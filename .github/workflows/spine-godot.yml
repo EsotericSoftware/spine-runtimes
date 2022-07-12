@@ -90,6 +90,115 @@ jobs:
           name: godot-editor-macos.zip
           path: spine-godot/godot/bin/godot-editor-macos.zip
 
+  godot-template-ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup python and scons
+        uses: ./.github/actions/setup-godot-deps   
+
+      - name: Build Godot artifact
+        run: |
+          mkdir -p spine-godot/godot/bin/
+          touch spine-godot/godot/bin/iphone.zip
+        # ./spine-godot/build/setup.sh 3.4.4-stable false
+        # ./spine-godot/build/build-templates.sh ios
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: godot-template-ios.zip
+          path: spine-godot/godot/bin/iphone.zip
+      
+
+  godot-template-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup python and scons
+        uses: ./.github/actions/setup-godot-deps   
+
+      - name: Build Godot artifact
+        run: |
+          mkdir -p spine-godot/godot/bin/
+          touch spine-godot/godot/bin/osx.zip
+        # ./spine-godot/build/setup.sh 3.4.4-stable false
+        # ./spine-godot/build/build-templates.sh macos
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: godot-template-macos.zip
+          path: spine-godot/godot/bin/osx.zip
+
+  godot-template-linux:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup python and scons
+        uses: ./.github/actions/setup-godot-deps   
+
+      - name: Build Godot artifact
+        run: |
+          mkdir -p spine-godot/godot/bin/
+          touch spine-godot/godot/bin/linux_x11_64_debug
+          touch spine-godot/godot/bin/linux_x11_64_release
+        # sudo apt-get install build-essential scons pkg-config libx11-dev libxcursor-dev libxinerama-dev libgl1-mesa-dev libglu-dev libasound2-dev libpulse-dev libudev-dev libxi-dev libxrandr-dev
+        # ./spine-godot/build/setup.sh 3.4.4-stable false
+        # ./spine-godot/build/build-templates.sh linux
+
+      - name: Upload artifacts debug
+        uses: actions/upload-artifact@v2
+        with:
+          name: godot-template-linux-debug.zip
+          path: spine-godot/godot/bin/linux_x11_64_debug
+
+      - name: Upload artifacts release
+        uses: actions/upload-artifact@v2
+        with:
+          name: godot-template-linux-release.zip
+          path: spine-godot/godot/bin/linux_x11_64_release
+
+  godot-template-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup python and scons
+        uses: ./.github/actions/setup-godot-deps
+
+      - name: Build Godot artifact
+        shell: bash
+        run: |
+          mkdir -p spine-godot/godot/bin/
+          touch spine-godot/godot/bin/windows_64_debug.exe
+          touch spine-godot/godot/bin/windows_64_release.exe
+        # ./spine-godot/build/setup.sh 3.4.4-stable false
+        # ./spine-godot/build/build-templates.sh windows
+
+      - name: Upload artifacts debug
+        uses: actions/upload-artifact@v2
+        with:
+          name: godot-template-windows-debug.zip
+          path: spine-godot/godot/bin/windows_64_debug.exe
+
+      - name: Upload artifacts release
+        uses: actions/upload-artifact@v2
+        with:
+          name: godot-template-windows-release.zip
+          path: spine-godot/godot/bin/windows_64_release.exe
+
   upload-to-s3:
     needs: [godot-editor-windows, godot-editor-linux, godot-editor-macos]
     runs-on: ubuntu-latest
@@ -108,6 +217,36 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: godot-editor-macos.zip
+
+      - name: Download godot-template-ios artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: godot-template-ios.zip
+
+      - name: Download godot-template-macos artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: godot-template-macos.zip
+
+      - name: Download godot-template-windows-release artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: godot-template-windows-release.zip
+
+      - name: Download godot-template-windows-debug artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: godot-template-windows-debug.zip
+
+     - name: Download godot-template-linux-release artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: godot-template-linux-release.zip
+          
+      - name: Download godot-template-linux-debug artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: godot-template-linux-debug.zip
 
       - name: Unpack editors and templates
         run: |            
