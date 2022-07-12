@@ -199,7 +199,7 @@ jobs:
           path: spine-godot/godot/bin/windows_64_release.exe
 
   upload-to-s3:
-    needs: [godot-editor-windows, godot-editor-linux, godot-editor-macos]
+    needs: [godot-editor-windows, godot-editor-linux, godot-editor-macos, godot-template-ios, godot-template-macos, godot-template-windows, godot-template-linux]
     runs-on: ubuntu-latest
     steps:
       - name: Download godot-editor-windows artifact
