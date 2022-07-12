@@ -198,8 +198,58 @@ jobs:
           name: godot-template-windows-release.zip
           path: spine-godot/godot/bin/windows_64_release.exe
 
+  godot-template-android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      # Azure repositories are not reliable, we need to prevent azure giving us packages.
+      - name: Make apt sources.list use the default Ubuntu repositories
+        run: |
+          sudo rm -f /etc/apt/sources.list.d/*
+          sudo cp -f misc/ci/sources.list /etc/apt/sources.list
+          sudo apt-get update
+          
+      - name: Set up Java 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+
+      - name: Setup python and scons
+        uses: ./.github/actions/setup-godot-deps
+
+      - name: Build Godot artifact
+        shell: bash
+        run: |
+          mkdir -p spine-godot/godot/bin/
+          touch spine-godot/godot/bin/android_release.apk
+          touch spine-godot/godot/bin/android_debug.apk
+          touch spine-godot/godot/bin/android_source.zip
+        # ./spine-godot/build/setup.sh 3.4.4-stable false
+        # ./spine-godot/build/build-templates.sh android
+
+      - name: Upload artifacts debug
+        uses: actions/upload-artifact@v2
+        with:
+          name: godot-template-android-debug.zip
+          path: spine-godot/godot/bin/android_debug.apk
+
+      - name: Upload artifacts release
+        uses: actions/upload-artifact@v2
+        with:
+          name: godot-template-android-release.zip
+          path: spine-godot/godot/bin/android_release.apk
+
+      - name: Upload artifacts source
+        uses: actions/upload-artifact@v2
+        with:
+          name: godot-template-android-source.zip
+          path: spine-godot/godot/bin/android_source.zip
+
   upload-to-s3:
-    needs: [godot-editor-windows, godot-editor-linux, godot-editor-macos, godot-template-ios, godot-template-macos, godot-template-windows, godot-template-linux]
+    needs: [godot-editor-windows, godot-editor-linux, godot-editor-macos, godot-template-ios, godot-template-macos, godot-template-windows, godot-template-linux, godot-template-android]
     runs-on: ubuntu-latest
     steps:
       - name: Download godot-editor-windows artifact
@@ -246,6 +296,21 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: godot-template-linux-debug.zip
+
+      - name: Download godot-template-android-release artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: godot-template-android-release.zip
+          
+      - name: Download godot-template-android-debug artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: godot-template-android-debug.zip
+
+      - name: Download godot-template-android-source artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: godot-template-android-source.zip
 
       - name: Unpack editors and templates
         run: |            
