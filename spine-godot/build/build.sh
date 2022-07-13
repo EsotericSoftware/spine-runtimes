@@ -61,11 +61,7 @@ else
 		target="$target vsproj=yes livepp=$LIVEPP"
 	fi
 	scons $target compiledb=yes custom_modules="../spine_godot" --jobs=$cpus	
-	if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-		if [ "$target" = "release_debug" ]; then
-			strip bin/godot.x11.opt.tools.64
-		fi
-	fi
+	strip bin/godot.x11.opt.tools.64	
 fi
 popd
 
