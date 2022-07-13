@@ -372,7 +372,7 @@ namespace Spine.Unity {
 			Vector2 invMixXY = timeline.EvaluateTranslateXYMix(time);
 			Vector2 constraintPos;
 			if (useLastConstraintPos)
-				constraintPos = transformConstraintLastPos[constraintIndex];
+				constraintPos = transformConstraintLastPos[GetConstraintLastPosIndex(constraintIndex)];
 			else {
 				Bone targetBone = constraint.Target;
 				constraintPos = new Vector2(targetBone.X, targetBone.Y);
@@ -391,7 +391,7 @@ namespace Spine.Unity {
 			float invMixRotate = timeline.EvaluateRotateMix(time);
 			float constraintRotation;
 			if (useLastConstraintRotation)
-				constraintRotation = transformConstraintLastRotation[constraintIndex];
+				constraintRotation = transformConstraintLastRotation[GetConstraintLastPosIndex(constraintIndex)];
 			else {
 				Bone targetBone = constraint.Target;
 				constraintRotation = targetBone.Rotation;
@@ -403,7 +403,7 @@ namespace Spine.Unity {
 			foreach (int constraintIndex in this.transformConstraintIndices) {
 				TransformConstraint constraint = transformConstraintsItems[constraintIndex];
 				Bone targetBone = constraint.Target;
-				transformConstraintLastPos[constraintIndex] = new Vector2(targetBone.X, targetBone.Y);
+				transformConstraintLastPos[GetConstraintLastPosIndex(constraintIndex)] = new Vector2(targetBone.X, targetBone.Y);
 			}
 		}
 
@@ -411,7 +411,7 @@ namespace Spine.Unity {
 			foreach (int constraintIndex in this.transformConstraintIndices) {
 				TransformConstraint constraint = transformConstraintsItems[constraintIndex];
 				Bone targetBone = constraint.Target;
-				transformConstraintLastRotation[constraintIndex] = targetBone.Rotation;
+				transformConstraintLastRotation[GetConstraintLastPosIndex(constraintIndex)] = targetBone.Rotation;
 			}
 		}
 
@@ -438,6 +438,12 @@ namespace Spine.Unity {
 				return rootMotion;
 			}
 			return rootMotion;
+		}
+
+		int GetConstraintLastPosIndex (int constraintIndex) {
+			var constraints = skeletonComponent.Skeleton.TransformConstraints;
+			TransformConstraint targetConstraint = constraints.Items[constraintIndex];
+			return constraints.FindIndex(constraint => constraint == targetConstraint);
 		}
 
 		void FindTransformConstraintsAffectingBone () {
