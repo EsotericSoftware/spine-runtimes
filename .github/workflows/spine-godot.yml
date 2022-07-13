@@ -63,6 +63,7 @@ jobs:
       - name: Build Godot artifact
         shell: bash
         run: |          
+          sudo apt-get install build-essential scons pkg-config libx11-dev libxcursor-dev libxinerama-dev libgl1-mesa-dev libglu-dev libasound2-dev libpulse-dev libudev-dev libxi-dev libxrandr-dev
           ./spine-godot/build/setup.sh $GODOT_TAG false
           ./spine-godot/build/build.sh release_debug
 
