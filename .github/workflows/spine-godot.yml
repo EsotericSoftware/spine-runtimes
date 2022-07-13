@@ -374,10 +374,6 @@ jobs:
         with:
           name: godot-template-web-debug.zip
 
-      - name: Unpack editors and templates
-        run: |            
-          ls -lah
-
       - name: Upload artifacts to S3
         shell: bash
         if: env.AWS_ACCESS_KEY_ID != null
@@ -388,7 +384,8 @@ jobs:
           aws s3 cp godot.x11.opt.tools.64 s3://spine-godot/$BRANCH/$GODOT_TAG/
           aws s3 cp godot-editor-macos.zip s3://spine-godot/$BRANCH/$GODOT_TAG/
           echo "$GODOT_VERSION" > version.txt
-          zip spine-godot-$BRANCH-$GODOT_TAG.zip iphone.zip osx.zip windows_64_debug.exe windows_64_release.exe linux_x11_64_debug linux_x11_64_release webassembly_debug.zip webassembly_release.zip android_release.apk android_debug.apk android_source.zip version.txt
+          ls -lah
+          zip spine-godot-templates-$BRANCH-$GODOT_TAG.zip iphone.zip osx.zip windows_64_debug.exe windows_64_release.exe linux_x11_64_debug linux_x11_64_release webassembly_debug.zip webassembly_release.zip android_release.apk android_debug.apk android_source.zip version.txt
           aws s3 cp spine-godot-$BRANCH-$GODOT_TAG.zip s3://spine-godot/$BRANCH/$GODOT_TAG/
 
   
