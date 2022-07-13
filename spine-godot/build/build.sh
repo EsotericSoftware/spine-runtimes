@@ -60,10 +60,10 @@ else
 	if [ "$OSTYPE" = "msys" ]; then
 		target="$target vsproj=yes livepp=$LIVEPP"
 	fi
-	scons $target compiledb=yes custom_modules="../spine_godot" --jobs=$cpus
+	scons $target compiledb=yes custom_modules="../spine_godot" --jobs=$cpus	
 	if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 		if [ "$target" = "release_debug" ]; then
-			strip godot.x11.opt.tools.64
+			strip bin/godot.x11.opt.tools.64
 		fi
 	fi
 fi
