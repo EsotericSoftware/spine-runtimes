@@ -22,26 +22,54 @@ spine-godot supports all Spine features, except two-color tinting and the screen
 
 spine-godot works with the latest stable Godot 3.4 release. It requires compilation of Godot, as spine-godot is implemented as a module.
 
-To integrate spine-godot into your project:
+> *NOTE:* spine-godot also compiles and works against Godot 4.x. However, we currently can not guarantee stability, as Godot 4.x is still heavily in flux.
 
-1. Follow the [instructions on how to compilation of Godot](https://docs.godotengine.org/en/stable/development/compiling/index.html)
-2. Copy the `spine-runtimes/spine-godot/spine_godot` folder into the folder `modules/spine_godot` in your Godot source tree.
-3. Copy the `spine-cpp/spine-cpp`folder into the folder `modules/spine_godot/spine-cpp` in your Godot source tree.
-4. Compile Godot via scons for your platform as per the Godot documentation.
+### Pre-built Godot editor and export template binaries
 
-The resulting Godot engine binary will include the spine-godot runtime.
+We provide prebuilt Godot editor and export template binaries for Godot 3.4.4-stable:
+
+* [Godot Editor Windows]()
+* [Godot Editor Linux]()
+* [Godot Editor macOS]()
+* [Godot export templates for Windows, Linux, macOS, Web, Android, iOS]()
+
+### Building the Godot editor and export templates yourself
+
+If you want to build the Godot editor and export templates yourself, either because you want to add custom engine modules or for engine development, you can use the shell scripts in the `spine-godot/build` folder. 
+
+> *NOTE:* Make sure you have all build dependencies installed before attempting this, as per the [official instructions by Godot](https://docs.godotengine.org/en/stable/development/compiling/index.html).
+
+To build a Godot editor binary, run the following in a Bash shell (use Git Bash on Windows):
+
+```
+cd spine-godot
+./build/setup.sh 3.4.4-stable false
+./build/build.sh release_debug
+```
+
+The first argument to `setup.sh` is the Godot repository branch or commit hash you want to build the Godot editor from. The second argument specifies whether you want to compile the editor for development, which will include support for Live++ on Windows, and disable many modules so compilation is faster.
+
+The first argument to `build.sh` specifies the optimization level of the resulting binary. Supported values are `debug`, which allows full debugging but may be slow due to missing optimizations, and `release_debug`, which is generally used for release builds of the Godot editor.
+
+The resulting Godot editor binary can then be found in `spine-godot/godot/bin`.
+
+To build the export template for a specific platform, run the following in a Bash shell (use Git Bash on Windows):
+
+```
+cd spine-godot
+./build/setup.sh 3.4.4-stable false
+./build/build-templates.sh windows
+```
+
+The first argument to `setup.sh` is the Godot repository branch or commit hash you want to build the Godot editor from. The second argument must be `false`.
+
+The first argument to `built-templates.sh` is the platform to compile the template for. Valid values are `windows`, `linux`, `macos`, `web`, `android`, and `ios`. Note that macOS and iOS export templates can only be build on a machine running macOS. See the [official instructions by Godot](https://docs.godotengine.org/en/stable/development/compiling/index.html).
+
+The resulting Godot export template binary can then be found in `spine-godot/godot/bin`.
+
 
 ## Example
-Install the [software required to build Godot] for your operating system. This generally means:
-
-1. Git
-1. A C++ compiler (MSVC, Clang, GCC)
-1. Python 3+
-1. Scons
-
-Then execute the `setup.bat` file on Windows, or the `setup.sh` file on Linux and macOS. After the script completes, you should find the Godot editor binary in `spine-runtimes/spine-godot/godot/bin`. Run it, and open the Godot example project in `spine-runtimes/spine-godot/example`.
-
-
+Sample projects for both Godot 3.4.x and Godot 4.x are provided in the `example/` and `example-v4/` folders respectively. They illustrate all spine-godot functionality and can be opened and exported with the pre-built or custom build Godot editor and export template binaries.
 
 
 
