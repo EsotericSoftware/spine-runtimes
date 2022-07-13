@@ -33,7 +33,7 @@ We provide prebuilt Godot editor and export template binaries for Godot 3.4.4-st
 * [Godot Editor macOS]()
 * [Godot export templates for Windows, Linux, macOS, Web, Android, iOS]()
 
-### Building the Godot editor and export templates yourself
+### Building the Godot editor and export templates locally
 
 If you want to build the Godot editor and export templates yourself, either because you want to add custom engine modules or for engine development, you can use the shell scripts in the `spine-godot/build` folder. 
 
@@ -67,6 +67,14 @@ The first argument to `built-templates.sh` is the platform to compile the templa
 
 The resulting Godot export template binary can then be found in `spine-godot/godot/bin`.
 
+### Building the Godot editor and export templates via GitHub Actions
+This repository contains a GitHub workflow in `.github/workflows/spine-godot.yml` that allows building all Godot editor and export template binaries through GitHub actions. This may be simpler than compiling these artifacts locally. To use the GitHub workflow:
+
+1. Clone this repository
+2. Enable GitHub workflows on the cloned repository
+3. Manually trigger the `spine-godot` workflow.
+
+The resulting binaries will be attached as artifacts to a sucessful workflow run.
 
 ## Example
 Sample projects for both Godot 3.4.x and Godot 4.x are provided in the `example/` and `example-v4/` folders respectively. They illustrate all spine-godot functionality and can be opened and exported with the pre-built or custom build Godot editor and export template binaries.
