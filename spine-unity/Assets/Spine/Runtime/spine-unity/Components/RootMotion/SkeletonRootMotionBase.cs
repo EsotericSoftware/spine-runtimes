@@ -443,7 +443,7 @@ namespace Spine.Unity {
 		int GetConstraintLastPosIndex (int constraintIndex) {
 			var constraints = skeletonComponent.Skeleton.TransformConstraints;
 			TransformConstraint targetConstraint = constraints.Items[constraintIndex];
-			return constraints.FindIndex(constraint => constraint == targetConstraint);
+			return transformConstraintIndices.FindIndex(addedIndex => addedIndex == constraintIndex);
 		}
 
 		void FindTransformConstraintsAffectingBone () {
