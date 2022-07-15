@@ -358,10 +358,12 @@ jobs:
         run: |
           BRANCH=${GITHUB_REF#refs/heads/}
           echo "branch: $BRANCH"
-          zip godot-editor-windows.zip godot.windows.opt.tools.64.exe
-          zip godot-editor-linux.zip godot.x11.opt.tools.64
-          aws s3 cp godot.windows.opt.tools.64.exe s3://spine-godot/$BRANCH/$GODOT_TAG/godot-editor-windows.zip
-          aws s3 cp godot.x11.opt.tools.64 s3://spine-godot/$BRANCH/$GODOT_TAG/godot-editor-linux.zip
+          mv godot.windows.opt.tools.64.exe godot-$BRANCH-$GODOT_TAG.exe
+          mv godot.x11.opt.tools.64 godot-$BRANCH-$GODOT_TAG
+          zip godot-editor-windows.zip godot-$BRANCH-$GODOT_TAG.exe
+          zip godot-editor-linux.zip godot-$BRANCH-$GODOT_TAG
+          aws s3 cp godot-editor-windows.zip s3://spine-godot/$BRANCH/$GODOT_TAG/
+          aws s3 cp godot-editor-linux.zip s3://spine-godot/$BRANCH/$GODOT_TAG/
           aws s3 cp godot-editor-macos.zip s3://spine-godot/$BRANCH/$GODOT_TAG/
           echo "$GODOT_VERSION" > version.txt
           ls -lah

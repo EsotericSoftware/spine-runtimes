@@ -31,7 +31,7 @@ We provide prebuilt Godot editor and export template binaries for Godot 3.4.4-st
 * [Godot Editor Windows](https://spine-godot.s3.eu-central-1.amazonaws.com/4.2-beta/3.4.4-stable/godot-editor-windows.zip)
 * [Godot Editor Linux](https://spine-godot.s3.eu-central-1.amazonaws.com/4.2-beta/3.4.4-stable/godot-editor-linux.zip)
 * [Godot Editor macOS](https://spine-godot.s3.eu-central-1.amazonaws.com/4.2-beta/3.4.4-stable/godot-editor-macos.zip)
-* [Godot export templates for Windows, Linux, macOS, Web, Android, iOS](https://spine-godot.s3.eu-central-1.amazonaws.com/4.2-beta/3.4.4-stable/spine-godot-templates-4.2-beta-3.4.4-stable.zip)
+* [Godot export templates for Windows, Linux, macOS, Web, Android, iOS](https://spine-godot.s3.eu-central-1.amazonaws.com/4.2-beta/3.4.4-stable/spine-godot-templates-4.2-beta-3.4.4-stable.tpz)
 
 ### Building the Godot editor and export templates locally
 
