@@ -1,0 +1,26 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://assets/spineboy/spineboy-data-res.tres" type="SpineSkeletonDataResource" id=1]
+[ext_resource path="res://examples/06-bone-following/bone-following.gd" type="Script" id=2]
+[ext_resource path="res://icon.png" type="Texture" id=3]
+
+[node name="Node2D" type="Node2D"]
+script = ExtResource( 2 )
+
+[node name="Spineboy" type="SpineSprite" parent="."]
+position = Vector2( 478, 483 )
+scale = Vector2( 0.58461, 0.58461 )
+skeleton_data_res = ExtResource( 1 )
+preview_animation = ""
+preview_frame = false
+preview_time = 0.0
+
+[node name="GunTipBone" type="SpineBoneNode" parent="Spineboy"]
+show_behind_parent = true
+position = Vector2( 214.298, -162.047 )
+rotation = 0.713316
+scale = Vector2( 1, 1 )
+bone_name = "gun-tip"
+
+[node name="Sprite" type="Sprite" parent="Spineboy/GunTipBone"]
+texture = ExtResource( 3 )

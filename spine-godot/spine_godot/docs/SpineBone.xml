@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineBone" inherits="SpineObjectWrapper" version="3.4">
+	<brief_description>
+		A bone of a Spine skeleton, storing its current pose.
+	</brief_description>
+	<description>
+		A bone of a Spine skeleton, storing its current pose.
+		A bone has a local transform which is used to compute its world transform. A bone also has an applied transform, which is a local transform that can be applied to compute the world transform. The local transform and applied transform may differ if a constraint or application code modifies the world transform after it was computed from the local transform.
+		The bone's world transform is relative to the skeleton's coordinate system origin. Use [code]set_global_transform()[/code] and [code]get_global_transform()[/code] to convert from and to Godot's Canvas coordinate system.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="get_a">
+			<return type="float" />
+			<description>
+				Part of the world transform matrix for the X axis. If changed, [code]update_applied_transform[/code] should be called.
+			</description>
+		</method>
+		<method name="get_a_scale_x">
+			<return type="float" />
+			<description>
+				The local scaleX.
+			</description>
+		</method>
+		<method name="get_a_scale_y">
+			<return type="float" />
+			<description>
+				The local scaleY.
+			</description>
+		</method>
+		<method name="get_a_shear_x">
+			<return type="float" />
+			<description>
+				The local shearX.
+			</description>
+		</method>
+		<method name="get_a_shear_y">
+			<return type="float" />
+			<description>
+				The local shearY.
+			</description>
+		</method>
+		<method name="get_a_x">
+			<return type="float" />
+			<description>
+				The applied local x translation.
+			</description>
+		</method>
+		<method name="get_a_y">
+			<return type="float" />
+			<description>
+				The applied local y translation.
+			</description>
+		</method>
+		<method name="get_applied_rotation">
+			<return type="float" />
+			<description>
+				The applied local rotation in degrees, counter clockwise.
+			</description>
+		</method>
+		<method name="get_b">
+			<return type="float" />
+			<description>
+				Part of the world transform matrix for the Y axis. If changed, [code]update_applied_transform()[/code] should be called.
+			</description>
+		</method>
+		<method name="get_c">
+			<return type="float" />
+			<description>
+				Part of the world transform matrix for the X axis. If changed, [code]update_applied_transform()[/code] should be called.
+			</description>
+		</method>
+		<method name="get_children">
+			<return type="Array" />
+			<description>
+				The immediate children of this bone. Modifications of the array have no effect.
+			</description>
+		</method>
+		<method name="get_d">
+			<return type="float" />
+			<description>
+				Part of the world transform matrix for the Y axis. If changed, [code]update_applied_transform()[/code] should be called.
+			</description>
+		</method>
+		<method name="get_data">
+			<return type="SpineBoneData" />
+			<description>
+				The bone's setup pose data.
+			</description>
+		</method>
+		<method name="get_global_transform">
+			<return type="Transform2D" />
+			<description>
+				Returns the bone transform as a [code]Transform2D[/code] relative to Godot's global canvas coordinate space. Shear is not encoded in the transform.
+			</description>
+		</method>
+		<method name="get_parent">
+			<return type="SpineBone" />
+			<description>
+				The parent bone, or null if this is the root bone.
+			</description>
+		</method>
+		<method name="get_rotation">
+			<return type="float" />
+			<description>
+				The local rotation in degrees, counter clockwise.
+			</description>
+		</method>
+		<method name="get_scale_x">
+			<return type="float" />
+			<description>
+				The local scaleX.
+			</description>
+		</method>
+		<method name="get_scale_y">
+			<return type="float" />
+			<description>
+				The local scaleY.
+			</description>
+		</method>
+		<method name="get_shear_x">
+			<return type="float" />
+			<description>
+				The local shearX.
+			</description>
+		</method>
+		<method name="get_shear_y">
+			<return type="float" />
+			<description>
+				The local shearY.
+			</description>
+		</method>
+		<method name="get_transform">
+			<return type="Transform2D" />
+			<description>
+				Returns the bone transform as a [code]Transform2D[/code] relative to the [code]SpineSprite[/code] node representing the skeleton. Shear is not encoded in the transform.
+			</description>
+		</method>
+		<method name="get_world_rotation_x">
+			<return type="float" />
+			<description>
+				The world rotation for the X axis in degrees, calculated using a and c of the transform. The rotation is relative to the [code]SpineSprite[/code].
+			</description>
+		</method>
+		<method name="get_world_rotation_y">
+			<return type="float" />
+			<description>
+				The world rotation for the X axis in degrees, calculated using b and d of the transform. The rotation is relative to the [code]SpineSprite[/code].
+			</description>
+		</method>
+		<method name="get_world_scale_x">
+			<return type="float" />
+			<description>
+				The magnitude (always positive) of the world scale X, calculated using a and c. The scale is relative to the [code]SpineSprite[/code].
+			</description>
+		</method>
+		<method name="get_world_scale_y">
+			<return type="float" />
+			<description>
+				The magnitude (always positive) of the world scale X, calculated using b and d. The scale is relative to the [code]SpineSprite[/code].
+			</description>
+		</method>
+		<method name="get_world_to_local_rotation_x">
+			<return type="float" />
+			<description>
+				Transforms a world rotation to a local rotation. The world coordinate system is equal to the [code]SpineSprite[/code] coordinate space.
+			</description>
+		</method>
+		<method name="get_world_to_local_rotation_y">
+			<return type="float" />
+			<description>
+				Transforms a world rotation to a local rotation. The world coordinate system is equal to the [code]SpineSprite[/code] coordinate space.
+			</description>
+		</method>
+		<method name="get_world_x">
+			<return type="float" />
+			<description>
+				The world X position. If changed, [code]update_applied_transform()[/code] should be called. The world coordinate system is equal to the [code]SpineSprite[/code] coordinate space.
+			</description>
+		</method>
+		<method name="get_world_y">
+			<return type="float" />
+			<description>
+				The world Y position. If changed, [code]update_applied_transform()[/code] should be called. The world coordinate system is equal to the [code]SpineSprite[/code] coordinate space.
+			</description>
+		</method>
+		<method name="get_x">
+			<return type="float" />
+			<description>
+				The local x translation.
+			</description>
+		</method>
+		<method name="get_y">
+			<return type="float" />
+			<description>
+				The local y translation.
+			</description>
+		</method>
+		<method name="is_active">
+			<return type="bool" />
+			<description>
+				Returns false when the bone has not been computed because [code]BoneData.get_skin_required()[/code] is true and the active skin does not contain this bone.
+			</description>
+		</method>
+		<method name="local_to_world">
+			<return type="Vector2" />
+			<argument index="0" name="local_position" type="Vector2" />
+			<description>
+				Transforms a point from the bone's local coordinates to world coordinates. The world coordinate space equals the coordinate space of the [code]SpineSprite[/code].
+			</description>
+		</method>
+		<method name="local_to_world_rotation">
+			<return type="float" />
+			<argument index="0" name="local_rotation" type="float" />
+			<description>
+				Transforms a local rotation to a world rotation. The world coordinate space equals the coordinate space of the [code]SpineSprite[/code].
+			</description>
+		</method>
+		<method name="rotate_world">
+			<return type="void" />
+			<argument index="0" name="arg0" type="float" />
+			<description>
+				Rotates the world transform the specified amount.
+				After changes are made to the world transform, [code]update_applied_transform[/code] should be called and [code]update()[/code] will need to be called on any child bones, recursively.
+			</description>
+		</method>
+		<method name="set_a">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_a_scale_x">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_a_scale_y">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_a_shear_x">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_a_shear_y">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_a_x">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_a_y">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_active">
+			<return type="void" />
+			<argument index="0" name="v" type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="set_applied_rotation">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_b">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_c">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_d">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_global_transform">
+			<return type="void" />
+			<argument index="0" name="global_transform" type="Transform2D" />
+			<description>
+				Sets the bone's transform to the global Godot [code]Transform2D[/code].
+			</description>
+		</method>
+		<method name="set_rotation">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_scale_x">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_scale_y">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_shear_x">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_shear_y">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_to_setup_pose">
+			<return type="void" />
+			<description>
+				Sets this bone's local transform to the setup pose.
+			</description>
+		</method>
+		<method name="set_transform">
+			<return type="void" />
+			<argument index="0" name="local_transform" type="Transform2D" />
+			<description>
+				Sets the bone transform to the Godot [code]Transform2D[/code].
+			</description>
+		</method>
+		<method name="set_world_x">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_world_y">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_x">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_y">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="update_world_transform">
+			<return type="void" />
+			<description>
+				Computes the world transform using the parent bone and this bone's local transform.
+			</description>
+		</method>
+		<method name="world_to_local">
+			<return type="Vector2" />
+			<argument index="0" name="world_position" type="Vector2" />
+			<description>
+				Transforms a point from world coordinates to the bone's local coordinates. The world coordinate space is equal to the [code]SpineSprite[/code] coordinate space.
+			</description>
+		</method>
+		<method name="world_to_local_rotation">
+			<return type="float" />
+			<argument index="0" name="world_rotation" type="float" />
+			<description>
+				Transforms a world rotation to a local rotation. The world coordinate space is equal to the [code]SpineSprite[/code] coordinate space.
+			</description>
+		</method>
+	</methods>
+	<constants>
+	</constants>
+</class>

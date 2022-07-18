@@ -1,0 +1,13 @@
+[remap]
+
+importer="spine.json"
+type="SpineSkeletonFileResource"
+path="res://.import/raggedy spineboy.json-a7000cc987b23355ac0b09613918efcc.spjson"
+
+[deps]
+
+source_file="res://assets/raggedyspineboy/raggedy spineboy.json"
+dest_files=[ "res://.import/raggedy spineboy.json-a7000cc987b23355ac0b09613918efcc.spjson" ]
+
+[params]
+

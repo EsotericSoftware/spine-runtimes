@@ -1,0 +1,124 @@
+diff --git a/methods.py b/methods.py
+index fe84641e9d0625b4f0c4d90a65839337d6120ff8..51ef8550d3a9def0a2ff88a2fde4fa096c085de9 100644
+--- a/methods.py
++++ b/methods.py
+@@ -734,6 +734,7 @@ def generate_vs_project(env, num_jobs):
+                     f"target={configuration_getter}",
+                     "progress=no",
+                     "tools=!tools!",
++                    "livepp=%s" % env["livepp"],
+                     "-j%s" % num_jobs,
+                 ]
+ 
+diff --git a/platform/windows/detect.py b/platform/windows/detect.py
+index 0b18fb74fb145e4d2e88ee91abe99f8f39312a46..04880a8fa8209c4002b49f964d86227974ce9ca8 100644
+--- a/platform/windows/detect.py
++++ b/platform/windows/detect.py
+@@ -44,7 +44,7 @@ def can_build():
+ 
+ 
+ def get_opts():
+-    from SCons.Variables import BoolVariable, EnumVariable
++    from SCons.Variables import BoolVariable, EnumVariable, PathVariable
+ 
+     mingw32 = ""
+     mingw64 = ""
+@@ -73,6 +73,7 @@ def get_opts():
+         BoolVariable("use_thinlto", "Use ThinLTO", False),
+         BoolVariable("use_static_cpp", "Link MinGW/MSVC C++ runtime libraries statically", True),
+         BoolVariable("use_asan", "Use address sanitizer (ASAN)", False),
++        PathVariable("livepp", "Path to the Live++ installation", "", PathVariable.PathAccept),
+     ]
+ 
+ 
+@@ -310,6 +311,19 @@ def configure_msvc(env, manual_msvc_config):
+ 
+     env.AppendUnique(LINKFLAGS=["/STACK:" + str(STACK_SIZE)])
+ 
++    # Check if LIVEPP_PATH is set and add #define. Perform
++    # some sanity checks.
++    if env.get("livepp"):
++        if env["target"] == "release_debug" or env["target"] == "debug":
++            print("Found Live++ at %s" % env.get("livepp"))
++            env.AppendUnique(CPPDEFINES=["LIVEPP_PATH=%s" % env.get("livepp")])
++            env.AppendUnique(CPPPATH=[env.get("livepp")])
++            env.AppendUnique(LINKFLAGS=["/FUNCTIONPADMIN"])
++        else:
++            print("Live++ can only be used with targets 'debug' and 'release_debug'")
++    else:
++        print("No Live++ specified.")
++
+ 
+ def configure_mingw(env):
+     # Workaround for MinGW. See:
+diff --git a/platform/windows/godot_windows.cpp b/platform/windows/godot_windows.cpp
+index 8de3ef294a99c6f02f6f1380e331e4bb598864ce..8e4c15dd66d1b640a352ed826b25b23917f72cc4 100644
+--- a/platform/windows/godot_windows.cpp
++++ b/platform/windows/godot_windows.cpp
+@@ -34,6 +34,11 @@
+ #include <locale.h>
+ #include <stdio.h>
+ 
++#ifdef LIVEPP_PATH
++#include "API/LPP_API.h"
++HMODULE livePP;
++#endif
++
+ // For export templates, add a section; the exporter will patch it to enclose
+ // the data appended to the executable (bundled PCK)
+ #ifndef TOOLS_ENABLED
+@@ -147,6 +152,16 @@ char *wc_to_utf8(const wchar_t *wc) {
+ }
+ 
+ int widechar_main(int argc, wchar_t **argv) {
++#ifdef LIVEPP_PATH
++#define _MKSTR_L(x) _STR_L(x)
++#define _STR_L(x) L#x
++	livePP = lpp::lppLoadAndRegister(_MKSTR_L(LIVEPP_PATH), "Godot");
++	lpp::lppEnableAllCallingModulesSync(livePP);
++	lpp::lppInstallExceptionHandler(livePP);
++#undef _MKSTR_L
++#undef _STR_L
++#endif
++
+ 	OS_Windows os(nullptr);
+ 
+ 	setlocale(LC_CTYPE, "");
+@@ -179,6 +194,11 @@ int widechar_main(int argc, wchar_t **argv) {
+ 	}
+ 	delete[] argv_utf8;
+ 
++#ifdef LIVEPP_PATH
++	lpp::lppShutdown(livePP);
++	::FreeLibrary(livePP);
++#endif
++
+ 	return os.get_exit_code();
+ }
+ 
+diff --git a/platform/windows/os_windows.cpp b/platform/windows/os_windows.cpp
+index 8755bc65dce7e4b88fd509d0cbdbec576356c5f5..50e0d8d0b06bf76d5f4d085d010cf6a683a9e64f 100644
+--- a/platform/windows/os_windows.cpp
++++ b/platform/windows/os_windows.cpp
+@@ -53,6 +53,11 @@
+ #include <regstr.h>
+ #include <shlobj.h>
+ 
++#ifdef LIVEPP_PATH
++#include "API/LPP_API.h"
++extern HMODULE livePP;
++#endif
++
+ extern "C" {
+ __declspec(dllexport) DWORD NvOptimusEnablement = 1;
+ __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
+@@ -677,6 +682,9 @@ void OS_Windows::run() {
+ 		if (Main::iteration()) {
+ 			break;
+ 		}
++#ifdef LIVEPP_PATH
++		lpp::lppSyncPoint(livePP);
++#endif
+ 	}
+ 
+ 	main_loop->finalize();

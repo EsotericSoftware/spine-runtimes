@@ -1,0 +1,363 @@
+name: Build and Publish Godot editor and templates
+
+on:
+  push:
+    paths:
+      - ".github/workflows/spine-godot.yml"
+      - 'spine-godot/**'
+      - 'spine-cpp/**'
+  workflow_dispatch:
+
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_EC2_METADATA_DISABLED: true
+  EM_VERSION: 3.1.10
+  GODOT_TAG: 3.4.4-stable
+  GODOT_VERSION: 3.4.4.stable
+
+jobs:
+
+  godot-editor-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup python and scons
+        uses: ./.github/actions/setup-godot-deps
+
+      - name: Build Godot artifact
+        shell: bash
+        run: |          
+          ./spine-godot/build/setup.sh $GODOT_TAG false
+          ./spine-godot/build/build.sh release_debug
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: godot-editor-windows.zip
+          path: spine-godot/godot/bin/godot.windows.opt.tools.64.exe
+
+  godot-editor-linux:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup python and scons
+        uses: ./.github/actions/setup-godot-deps
+
+      - name: Build Godot artifact
+        shell: bash
+        run: |          
+          sudo apt-get install build-essential scons pkg-config libx11-dev libxcursor-dev libxinerama-dev libgl1-mesa-dev libglu-dev libasound2-dev libpulse-dev libudev-dev libxi-dev libxrandr-dev
+          ./spine-godot/build/setup.sh $GODOT_TAG false
+          ./spine-godot/build/build.sh release_debug
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: godot-editor-linux.zip
+          path: spine-godot/godot/bin/godot.x11.opt.tools.64
+
+  godot-editor-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup python and scons
+        uses: ./.github/actions/setup-godot-deps
+
+      - name: Build Godot artifact
+        shell: bash
+        run: |
+          ./spine-godot/build/setup.sh $GODOT_TAG false
+          ./spine-godot/build/build.sh release_debug
+          pushd spine-godot/godot/bin
+          zip -r godot-editor-macos.zip Godot.app
+          popd
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: godot-editor-macos.zip
+          path: spine-godot/godot/bin/godot-editor-macos.zip
+
+  godot-template-ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup python and scons
+        uses: ./.github/actions/setup-godot-deps   
+
+      - name: Build Godot artifact
+        run: |          
+          ./spine-godot/build/setup.sh $GODOT_TAG false
+          ./spine-godot/build/build-templates.sh ios
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: godot-template-ios.zip
+          path: spine-godot/godot/bin/iphone.zip
+
+  godot-template-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup python and scons
+        uses: ./.github/actions/setup-godot-deps   
+
+      - name: Build Godot artifact
+        run: |          
+          ./spine-godot/build/setup.sh $GODOT_TAG false
+          ./spine-godot/build/build-templates.sh macos
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: godot-template-macos.zip
+          path: spine-godot/godot/bin/osx.zip
+
+  godot-template-linux:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup python and scons
+        uses: ./.github/actions/setup-godot-deps   
+
+      - name: Build Godot artifact
+        run: |
+          sudo apt-get install build-essential scons pkg-config libx11-dev libxcursor-dev libxinerama-dev libgl1-mesa-dev libglu-dev libasound2-dev libpulse-dev libudev-dev libxi-dev libxrandr-dev
+          ./spine-godot/build/setup.sh $GODOT_TAG false
+          ./spine-godot/build/build-templates.sh linux
+
+      - name: Upload artifacts debug
+        uses: actions/upload-artifact@v2
+        with:
+          name: godot-template-linux-debug.zip
+          path: spine-godot/godot/bin/linux_x11_64_debug
+
+      - name: Upload artifacts release
+        uses: actions/upload-artifact@v2
+        with:
+          name: godot-template-linux-release.zip
+          path: spine-godot/godot/bin/linux_x11_64_release
+
+  godot-template-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup python and scons
+        uses: ./.github/actions/setup-godot-deps
+
+      - name: Build Godot artifact
+        shell: bash
+        run: |
+          ./spine-godot/build/setup.sh $GODOT_TAG false
+          ./spine-godot/build/build-templates.sh windows
+
+      - name: Upload artifacts debug
+        uses: actions/upload-artifact@v2
+        with:
+          name: godot-template-windows-debug.zip
+          path: spine-godot/godot/bin/windows_64_debug.exe
+
+      - name: Upload artifacts release
+        uses: actions/upload-artifact@v2
+        with:
+          name: godot-template-windows-release.zip
+          path: spine-godot/godot/bin/windows_64_release.exe
+
+  godot-template-android:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      # Azure repositories are not reliable, we need to prevent azure giving us packages.
+      - name: Make apt sources.list use the default Ubuntu repositories
+        run: |
+          sudo rm -f /etc/apt/sources.list.d/*
+          sudo cp -f spine-godot/build/sources.lst /etc/apt/sources.list
+          sudo apt-get update
+          
+      - name: Set up Java 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+
+      - name: Setup python and scons
+        uses: ./.github/actions/setup-godot-deps
+
+      - name: Build Godot artifact
+        shell: bash
+        run: |
+          ./spine-godot/build/setup.sh $GODOT_TAG false
+          ./spine-godot/build/build-templates.sh android
+
+      - name: Upload artifacts debug
+        uses: actions/upload-artifact@v2
+        with:
+          name: godot-template-android-debug.zip
+          path: spine-godot/godot/bin/android_debug.apk
+
+      - name: Upload artifacts release
+        uses: actions/upload-artifact@v2
+        with:
+          name: godot-template-android-release.zip
+          path: spine-godot/godot/bin/android_release.apk
+
+      - name: Upload artifacts source
+        uses: actions/upload-artifact@v2
+        with:
+          name: godot-template-android-source.zip
+          path: spine-godot/godot/bin/android_source.zip
+
+  godot-template-web:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set up Emscripten latest
+        uses: mymindstorm/setup-emsdk@v10
+        with:
+          version: ${{env.EM_VERSION}}          
+
+      - name: Verify Emscripten setup
+        run: |
+          emcc -v
+
+      - name: Setup python and scons
+        uses: ./.github/actions/setup-godot-deps   
+
+      - name: Build Godot artifact
+        run: |          
+          ./spine-godot/build/setup.sh $GODOT_TAG false
+          ./spine-godot/build/build-templates.sh web
+
+      - name: Upload artifacts debug
+        uses: actions/upload-artifact@v2
+        with:
+          name: godot-template-web-debug.zip
+          path: spine-godot/godot/bin/webassembly_debug.zip
+
+      - name: Upload artifacts release
+        uses: actions/upload-artifact@v2
+        with:
+          name: godot-template-web-release.zip
+          path: spine-godot/godot/bin/webassembly_release.zip
+
+  upload-to-s3:
+    needs: [godot-editor-windows, godot-editor-linux, godot-editor-macos, godot-template-ios, godot-template-macos, godot-template-windows, godot-template-linux, godot-template-android, godot-template-web]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download godot-editor-windows artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: godot-editor-windows.zip
+
+      - name: Download godot-editor-linux artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: godot-editor-linux.zip
+
+      - name: Download godot-editor-macos artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: godot-editor-macos.zip
+
+      - name: Download godot-template-ios artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: godot-template-ios.zip
+
+      - name: Download godot-template-macos artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: godot-template-macos.zip
+
+      - name: Download godot-template-windows-release artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: godot-template-windows-release.zip
+
+      - name: Download godot-template-windows-debug artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: godot-template-windows-debug.zip
+
+      - name: Download godot-template-linux-release artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: godot-template-linux-release.zip
+          
+      - name: Download godot-template-linux-debug artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: godot-template-linux-debug.zip
+
+      - name: Download godot-template-android-release artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: godot-template-android-release.zip
+          
+      - name: Download godot-template-android-debug artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: godot-template-android-debug.zip
+
+      - name: Download godot-template-android-source artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: godot-template-android-source.zip
+
+      - name: Download godot-template-web-release artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: godot-template-web-release.zip
+          
+      - name: Download godot-template-web-debug artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: godot-template-web-debug.zip
+
+      - name: Upload artifacts to S3
+        shell: bash
+        if: env.AWS_ACCESS_KEY_ID != null
+        run: |
+          BRANCH=${GITHUB_REF#refs/heads/}
+          echo "branch: $BRANCH"
+          mv godot.windows.opt.tools.64.exe godot-$BRANCH-$GODOT_TAG.exe
+          mv godot.x11.opt.tools.64 godot-$BRANCH-$GODOT_TAG
+          zip godot-editor-windows.zip godot-$BRANCH-$GODOT_TAG.exe
+          zip godot-editor-linux.zip godot-$BRANCH-$GODOT_TAG
+          aws s3 cp godot-editor-windows.zip s3://spine-godot/$BRANCH/$GODOT_TAG/
+          aws s3 cp godot-editor-linux.zip s3://spine-godot/$BRANCH/$GODOT_TAG/
+          aws s3 cp godot-editor-macos.zip s3://spine-godot/$BRANCH/$GODOT_TAG/
+          echo "$GODOT_VERSION" > version.txt
+          ls -lah
+          zip spine-godot-templates-$BRANCH-$GODOT_TAG.zip iphone.zip osx.zip windows_64_debug.exe windows_64_release.exe linux_x11_64_debug linux_x11_64_release webassembly_debug.zip webassembly_release.zip android_release.apk android_debug.apk android_source.zip version.txt
+          aws s3 cp spine-godot-templates-$BRANCH-$GODOT_TAG.zip s3://spine-godot/$BRANCH/$GODOT_TAG/spine-godot-templates-$BRANCH-$GODOT_TAG.tpz
+
+  

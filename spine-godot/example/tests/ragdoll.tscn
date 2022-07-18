@@ -1,0 +1,53 @@
+[gd_scene format=2]
+
+[node name="Node2D" type="Node2D"]
+
+[node name="A" type="RigidBody2D" parent="."]
+position = Vector2( 483, 158 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="A"]
+position = Vector2( 6, 17 )
+polygon = PoolVector2Array( -38, 6, 28, 6, 28, -45, -40, -45 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="B" type="RigidBody2D" parent="."]
+position = Vector2( 484, 228 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="B"]
+position = Vector2( 6, 17 )
+polygon = PoolVector2Array( -38, 6, 28, 6, 28, -45, -40, -45 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="C" type="RigidBody2D" parent="."]
+position = Vector2( 485, 296 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="C"]
+position = Vector2( 6, 17 )
+polygon = PoolVector2Array( -38, 6, 28, 6, 28, -45, -40, -45 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="PinJoint2D" type="PinJoint2D" parent="."]
+position = Vector2( 484, 189 )
+node_a = NodePath("../A")
+node_b = NodePath("../B")
+bias = 0.9
+disable_collision = false
+
+[node name="PinJoint2D2" type="PinJoint2D" parent="."]
+position = Vector2( 486, 257 )
+node_a = NodePath("../B")
+node_b = NodePath("../C")
+bias = 0.9
+disable_collision = false
+
+[node name="Ground" type="StaticBody2D" parent="."]
+position = Vector2( 489, 478 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Ground"]
+polygon = PoolVector2Array( -116, -4, 128, -100, 204, 34, -156, 48 )

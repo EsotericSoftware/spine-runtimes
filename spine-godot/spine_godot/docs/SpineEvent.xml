@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineEvent" inherits="SpineObjectWrapper" version="3.4">
+	<brief_description>
+		Stores the current pose values for an event. See [url]http://esotericsoftware.com/spine-events[/url] in the Spine User Guide.
+	</brief_description>
+	<description>
+		Stores the current pose values for an event. See [url]http://esotericsoftware.com/spine-events[/url] in the Spine User Guide.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="get_balance">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_data">
+			<return type="SpineEventData" />
+			<description>
+			</description>
+		</method>
+		<method name="get_float_value">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_int_value">
+			<return type="int" />
+			<description>
+			</description>
+		</method>
+		<method name="get_string_value">
+			<return type="String" />
+			<description>
+			</description>
+		</method>
+		<method name="get_time">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_volume">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_balance">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_float_value">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_int_value">
+			<return type="void" />
+			<argument index="0" name="v" type="int" />
+			<description>
+			</description>
+		</method>
+		<method name="set_string_value">
+			<return type="void" />
+			<argument index="0" name="v" type="String" />
+			<description>
+			</description>
+		</method>
+		<method name="set_volume">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+	</methods>
+	<constants>
+	</constants>
+</class>

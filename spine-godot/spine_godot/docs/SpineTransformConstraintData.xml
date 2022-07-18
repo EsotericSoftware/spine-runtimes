@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineTransformConstraintData" inherits="SpineConstraintData" version="3.4">
+	<brief_description>
+	</brief_description>
+	<description>
+		Stores the setup pose for a transform constraint.
+		See [url]http://esotericsoftware.com/spine-transform-constraints[/url] in the Spine User Guide.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="get_bones">
+			<return type="Array" />
+			<description>
+				The bones that will be modified by this transform constraint. Modifying the array has no effect.
+			</description>
+		</method>
+		<method name="get_mix_rotate">
+			<return type="float" />
+			<description>
+				A percentage (0-1) that controls the mix between the constrained and unconstrained rotation.
+			</description>
+		</method>
+		<method name="get_mix_scale_x">
+			<return type="float" />
+			<description>
+				A percentage (0-1) that controls the mix between the constrained and unconstrained scale X.
+			</description>
+		</method>
+		<method name="get_mix_scale_y">
+			<return type="float" />
+			<description>
+				A percentage (0-1) that controls the mix between the constrained and unconstrained scale Y.
+			</description>
+		</method>
+		<method name="get_mix_shear_y">
+			<return type="float" />
+			<description>
+				A percentage (0-1) that controls the mix between the constrained and unconstrained shear Y.
+			</description>
+		</method>
+		<method name="get_mix_x">
+			<return type="float" />
+			<description>
+				A percentage (0-1) that controls the mix between the constrained and unconstrained translation X.
+			</description>
+		</method>
+		<method name="get_mix_y">
+			<return type="float" />
+			<description>
+				A percentage (0-1) that controls the mix between the constrained and unconstrained translation Y.
+			</description>
+		</method>
+		<method name="get_offset_rotation">
+			<return type="float" />
+			<description>
+				An offset added to the constrained bone rotation.
+			</description>
+		</method>
+		<method name="get_offset_scale_x">
+			<return type="float" />
+			<description>
+				An offset added to the constrained bone scaleX.
+			</description>
+		</method>
+		<method name="get_offset_scale_y">
+			<return type="float" />
+			<description>
+				An offset added to the constrained bone scaleY.
+			</description>
+		</method>
+		<method name="get_offset_shear_y">
+			<return type="float" />
+			<description>
+				An offset added to the constrained bone shearY.
+			</description>
+		</method>
+		<method name="get_offset_x">
+			<return type="float" />
+			<description>
+				An offset added to the constrained bone X translation.
+			</description>
+		</method>
+		<method name="get_offset_y">
+			<return type="float" />
+			<description>
+				An offset added to the constrained bone Y translation.
+			</description>
+		</method>
+		<method name="get_target">
+			<return type="SpineBoneData" />
+			<description>
+				The target bone whose world transform will be copied to the constrained bones.
+			</description>
+		</method>
+		<method name="is_local">
+			<return type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="is_relative">
+			<return type="bool" />
+			<description>
+			</description>
+		</method>
+	</methods>
+	<constants>
+	</constants>
+</class>

@@ -1,0 +1,12 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://tests/unit-tests.gd" type="Script" id=1]
+[ext_resource path="res://assets/spineboy/spineboy-data-res.tres" type="SpineSkeletonDataResource" id=2]
+
+[node name="Node2D" type="Node2D"]
+position = Vector2( 496.659, 431.634 )
+scale = Vector2( 0.7, 0.7 )
+
+[node name="SpineSprite" type="SpineSprite" parent="."]
+skeleton_data_res = ExtResource( 2 )
+script = ExtResource( 1 )

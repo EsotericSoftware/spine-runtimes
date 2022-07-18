@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineAttachment" inherits="SpineObjectWrapper" version="3.4">
+	<brief_description>
+		Represents an attachment in a Spine skeleton's skin.
+	</brief_description>
+	<description>
+		Represents an attachment in a Spine skeleton's skin. See [url]http://en.esotericsoftware.com/spine-runtime-skins[/url].
+		Attachments can only be queried for their name and can not be manipulated.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="copy">
+			<return type="SpineAttachment" />
+			<description>
+			</description>
+		</method>
+		<method name="get_attachment_name">
+			<return type="String" />
+			<description>
+			</description>
+		</method>
+	</methods>
+	<constants>
+	</constants>
+</class>

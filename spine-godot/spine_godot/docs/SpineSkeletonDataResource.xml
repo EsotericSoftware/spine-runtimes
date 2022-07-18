@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineSkeletonDataResource" inherits="Resource" version="3.4">
+	<brief_description>
+		Resource used to spawn new [code]SpineSkeleton[/code] instances.
+	</brief_description>
+	<description>
+		Resource used to spawn new [code]SpineSkeleton[/code] instances. The skeleton data resource consists of the skeleton data loaded from a .json or .skel [code]SpineSkeletonFileResource[/code], the texture atlas loaded from a .atlas and .png files making up a [code]SpineAtlasResource[/code], as well as animation mixes, governing for how long two specific animations should be cross faded via [code]SpineAnimationState[/code].
+		A single skeleton data resource can be shared among multiple [code]SpineSprite[/code] instances to avoid duplication of resources.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="find_animation" qualifiers="const">
+			<return type="SpineAnimation" />
+			<argument index="0" name="animation_name" type="String" />
+			<description>
+				Finds an animation by comparing each animation's name. It is more efficient to cache the results of this method than to call it multiple times.
+			</description>
+		</method>
+		<method name="find_bone" qualifiers="const">
+			<return type="SpineBoneData" />
+			<argument index="0" name="bone_name" type="String" />
+			<description>
+				Finds a bone by comparing each bone's name. It is more efficient to cache the results of this method than to call it multiple times.
+			</description>
+		</method>
+		<method name="find_event" qualifiers="const">
+			<return type="SpineEventData" />
+			<argument index="0" name="event_data_name" type="String" />
+			<description>
+				Finds an event by comparing each events's name. It is more efficient to cache the results of this method than to call it multiple times.
+			</description>
+		</method>
+		<method name="find_ik_constraint_data" qualifiers="const">
+			<return type="SpineIkConstraintData" />
+			<argument index="0" name="constraint_name" type="String" />
+			<description>
+				Finds an IK constraint by comparing each IK constraint's name. It is more efficient to cache the results of this method than to call it multiple times.
+			</description>
+		</method>
+		<method name="find_path_constraint_data" qualifiers="const">
+			<return type="SpinePathConstraintData" />
+			<argument index="0" name="constraint_name" type="String" />
+			<description>
+				Finds a path constraint by comparing each path constraint's name. It is more efficient to cache the results of this method than to call it multiple times.
+			</description>
+		</method>
+		<method name="find_skin" qualifiers="const">
+			<return type="SpineSkin" />
+			<argument index="0" name="skin_name" type="String" />
+			<description>
+				Finds a skin by comparing each skin's name. It is more efficient to cache the results of this method than to call it multiple times.
+			</description>
+		</method>
+		<method name="find_slot" qualifiers="const">
+			<return type="SpineSlotData" />
+			<argument index="0" name="slot_name" type="String" />
+			<description>
+				Finds a slot by comparing each slot's name. It is more efficient to cache the results of this method than to call it multiple times.
+			</description>
+		</method>
+		<method name="find_transform_constraint_data" qualifiers="const">
+			<return type="SpineTransformConstraintData" />
+			<argument index="0" name="constraint_name" type="String" />
+			<description>
+				Finds a transform constraint by comparing each transform constraint's name. It is more efficient to cache the results of this method than to call it multiple times.
+			</description>
+		</method>
+		<method name="get_animations" qualifiers="const">
+			<return type="Array" />
+			<description>
+				The skeleton's animations. Modifying the array has no effect.
+			</description>
+		</method>
+		<method name="get_audio_path" qualifiers="const">
+			<return type="String" />
+			<description>
+				The path to the audio directory as defined in Spine, or null if nonessential data was not exported.
+			</description>
+		</method>
+		<method name="get_bones" qualifiers="const">
+			<return type="Array" />
+			<description>
+				The skeleton's bones, sorted parent first. The root bone is always the first bone. Modifying the array has no effect.
+			</description>
+		</method>
+		<method name="get_default_skin" qualifiers="const">
+			<return type="SpineSkin" />
+			<description>
+				The skeleton's default skin. By default this skin contains all attachments that were not in a skin in Spine.
+				See [code]Skeleton.get_attachment()[/code].
+			</description>
+		</method>
+		<method name="get_events" qualifiers="const">
+			<return type="Array" />
+			<description>
+				The skeleton's events. Modifying the array has no effect.
+			</description>
+		</method>
+		<method name="get_fps" qualifiers="const">
+			<return type="float" />
+			<description>
+				The dopesheet FPS in Spine, or zero if nonessential data was not exported.
+			</description>
+		</method>
+		<method name="get_hash" qualifiers="const">
+			<return type="String" />
+			<description>
+				The skeleton data hash. This value will change if any of the skeleton data has changed.
+			</description>
+		</method>
+		<method name="get_height" qualifiers="const">
+			<return type="float" />
+			<description>
+				The height of the skeleton's axis aligned bounding box in the setup pose.
+			</description>
+		</method>
+		<method name="get_ik_constraints" qualifiers="const">
+			<return type="Array" />
+			<description>
+				The skeleton's IK constraints. Modifying the array has no effect.
+			</description>
+		</method>
+		<method name="get_images_path" qualifiers="const">
+			<return type="String" />
+			<description>
+				The path to the images directory as defined in Spine, or null if nonessential data was not exported.
+			</description>
+		</method>
+		<method name="get_path_constraints" qualifiers="const">
+			<return type="Array" />
+			<description>
+				The skeleton's path constraints. Modifying the array has no effect.
+			</description>
+		</method>
+		<method name="get_skeleton_name" qualifiers="const">
+			<return type="String" />
+			<description>
+				The skeleton's name, which by default is the name of the skeleton data file when possible, or null when a name hasn't been set.
+			</description>
+		</method>
+		<method name="get_skins" qualifiers="const">
+			<return type="Array" />
+			<description>
+				All skins, including the default skin. Modifying the array has no effect.
+			</description>
+		</method>
+		<method name="get_slots" qualifiers="const">
+			<return type="Array" />
+			<description>
+				The skeleton's slots. Modifying the array has no effect.
+			</description>
+		</method>
+		<method name="get_transform_constraints" qualifiers="const">
+			<return type="Array" />
+			<description>
+				The skeleton's transform constraints. Modifying the array has no effect.
+			</description>
+		</method>
+		<method name="get_version" qualifiers="const">
+			<return type="String" />
+			<description>
+				The Spine version used to export the skeleton data, or null.
+			</description>
+		</method>
+		<method name="get_width" qualifiers="const">
+			<return type="float" />
+			<description>
+				The width of the skeleton's axis aligned bounding box in the setup pose.
+			</description>
+		</method>
+		<method name="get_x" qualifiers="const">
+			<return type="float" />
+			<description>
+				The X coordinate of the skeleton's axis aligned bounding box in the setup pose.
+			</description>
+		</method>
+		<method name="get_y" qualifiers="const">
+			<return type="float" />
+			<description>
+				The Y coordinate of the skeleton's axis aligned bounding box in the setup pose.
+			</description>
+		</method>
+		<method name="is_skeleton_data_loaded" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Whether the skeleton data file and atlas have been successfully loaded.
+			</description>
+		</method>
+		<method name="set_default_skin">
+			<return type="void" />
+			<argument index="0" name="skin" type="SpineSkin" />
+			<description>
+				Sets the skeleton's default skin.
+			</description>
+		</method>
+	</methods>
+	<members>
+		<member name="animation_mixes" type="Array" setter="set_animation_mixes" getter="get_animation_mixes" default="[  ]">
+		</member>
+		<member name="atlas_res" type="SpineAtlasResource" setter="set_atlas_res" getter="get_atlas_res">
+		</member>
+		<member name="default_mix" type="float" setter="set_default_mix" getter="get_default_mix" default="0.0">
+		</member>
+		<member name="skeleton_file_res" type="SpineSkeletonFileResource" setter="set_skeleton_file_res" getter="get_skeleton_file_res">
+		</member>
+	</members>
+	<signals>
+		<signal name="_internal_spine_objects_invalidated">
+			<description>
+			</description>
+		</signal>
+		<signal name="skeleton_data_changed">
+			<description>
+			</description>
+		</signal>
+	</signals>
+	<constants>
+	</constants>
+</class>

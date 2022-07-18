@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineSkin" inherits="SpineObjectWrapper" version="3.4">
+	<brief_description>
+		Stores attachments by slot index and attachment name.
+	</brief_description>
+	<description>
+		Stores attachments by slot index and attachment name.
+		See [url]http://esotericsoftware.com/spine-runtime-skins[/url] in the Spine Runtimes Guide.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="add_skin">
+			<return type="void" />
+			<argument index="0" name="other" type="SpineSkin" />
+			<description>
+				Adds all attachments, bones, and constraints from the specified skin to this skin.
+			</description>
+		</method>
+		<method name="copy_skin">
+			<return type="void" />
+			<argument index="0" name="other" type="SpineSkin" />
+			<description>
+				Adds all bones and constraints and copies of all attachments from the specified skin to this skin. Mesh attachments are not copied, instead a new linked mesh is created. The attachment copies can be modified without affecting the originals.
+			</description>
+		</method>
+		<method name="find_attachments_for_slot">
+			<return type="Array" />
+			<argument index="0" name="slot_index" type="int" />
+			<description>
+				Returns all attachments for a slot index. Modifying the array has no effect.
+			</description>
+		</method>
+		<method name="find_names_for_slot">
+			<return type="Array" />
+			<argument index="0" name="slot_index" type="int" />
+			<description>
+				Finds the skin keys for a given slot. The results are added to the passed array of names. Modifying the array has no effect.
+			</description>
+		</method>
+		<method name="get_attachment">
+			<return type="SpineAttachment" />
+			<argument index="0" name="slot_index" type="int" />
+			<argument index="1" name="name" type="String" />
+			<description>
+				Returns the attachment for the specified slot index and name, or null.
+			</description>
+		</method>
+		<method name="get_attachments">
+			<return type="Array" />
+			<description>
+				Returns all attachments in this skin. Modifying the array has no effect.
+			</description>
+		</method>
+		<method name="get_bones">
+			<return type="Array" />
+			<description>
+				Returns the bones associated with this skin. Modifying the array has no effect.
+			</description>
+		</method>
+		<method name="get_constraints">
+			<return type="Array" />
+			<description>
+				Returns the constraints associated with this skin. Modifying the array has no effect.
+			</description>
+		</method>
+		<method name="get_name">
+			<return type="String" />
+			<description>
+				The name of the skin.
+			</description>
+		</method>
+		<method name="remove_attachment">
+			<return type="void" />
+			<argument index="0" name="slot_index" type="int" />
+			<argument index="1" name="name" type="String" />
+			<description>
+				Removes the attachment in the skin for the specified slot index and name, if any.
+			</description>
+		</method>
+		<method name="set_attachment">
+			<return type="void" />
+			<argument index="0" name="slot_index" type="int" />
+			<argument index="1" name="name" type="String" />
+			<argument index="2" name="attachment" type="SpineAttachment" />
+			<description>
+				Adds an attachment to the skin for the specified slot index and name.
+			</description>
+		</method>
+	</methods>
+	<constants>
+	</constants>
+</class>

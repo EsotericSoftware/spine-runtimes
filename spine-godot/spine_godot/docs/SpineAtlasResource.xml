@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineAtlasResource" inherits="Resource" version="3.4">
+	<brief_description>
+		A Godot resource encapsulating a Spine atlas and its atlas page images.
+	</brief_description>
+	<description>
+		A Godot resource encapsulating a Spine atlas and its atlas page images.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="load_from_atlas_file">
+			<return type="int" enum="Error" />
+			<argument index="0" name="path" type="String" />
+			<description>
+			</description>
+		</method>
+	</methods>
+	<members>
+		<member name="normal_maps" type="Array" setter="" getter="get_normal_maps" default="[  ]">
+		</member>
+		<member name="source_path" type="String" setter="" getter="get_source_path" default="&quot;&quot;">
+		</member>
+		<member name="textures" type="Array" setter="" getter="get_textures" default="[  ]">
+		</member>
+	</members>
+	<constants>
+	</constants>
+</class>
