@@ -105,7 +105,7 @@ namespace Spine.Unity.TK2D {
 			page.rendererObject = material;
 			region.page = page;
 			region.u = u;
-			region.u = v;
+			region.v = v;
 			region.u2 = u2;
 			region.v2 = v2;
 			region.rotate = regionRotated;

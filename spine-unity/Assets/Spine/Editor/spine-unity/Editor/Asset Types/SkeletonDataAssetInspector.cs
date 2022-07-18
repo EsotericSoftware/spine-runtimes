@@ -193,7 +193,7 @@ namespace Spine.Unity.Editor {
 				}
 
 				if (changeCheck.changed) {
-					if (requiresReload || serializedObject.ApplyModifiedProperties()) {
+					if (serializedObject.ApplyModifiedProperties() || requiresReload) {
 						this.Clear();
 						this.InitializeEditor();
 
