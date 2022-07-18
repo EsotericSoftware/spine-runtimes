@@ -10,7 +10,7 @@
 	<groupId>com.esotericsoftware.spine</groupId>
 	<artifactId>spine-libgdx</artifactId>
 	<packaging>jar</packaging>
-	<version>4.1.0</version>
+	<version>4.1.1-SNAPSHOT</version>
 
 
 	<name>spine-libgdx</name>
