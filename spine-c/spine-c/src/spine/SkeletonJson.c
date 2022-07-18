@@ -1258,6 +1258,8 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 				data->spacingMode = SP_SPACING_MODE_FIXED;
 			else if (strcmp(item, "percent") == 0)
 				data->spacingMode = SP_SPACING_MODE_PERCENT;
+			else
+				data->spacingMode = SP_SPACING_MODE_PROPORTIONAL;
 
 			item = Json_getString(constraintMap, "rotateMode", "tangent");
 			if (strcmp(item, "tangent") == 0) data->rotateMode = SP_ROTATE_MODE_TANGENT;

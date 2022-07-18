@@ -40,6 +40,7 @@ using std::max;
 
 #include "renderer/backend/Device.h"
 #include "renderer/ccShaders.h"
+#include "renderer/backend/Types.h"
 
 namespace spine {
 
@@ -89,17 +90,17 @@ namespace spine {
 	void SkeletonBatch::updateProgramStateLayout(cocos2d::backend::ProgramState *programState) {
 		auto vertexLayout = programState->getVertexLayout();
 
-		auto locPosition = programState->getAttributeLocation("a_position");
-		auto locTexcoord = programState->getAttributeLocation("a_texCoord");
-		auto locColor = programState->getAttributeLocation("a_color");
-		vertexLayout->setAttribute("a_position", locPosition, backend::VertexFormat::FLOAT3, offsetof(V3F_C4B_T2F, vertices), false);
-		vertexLayout->setAttribute("a_color", locColor, backend::VertexFormat::UBYTE4, offsetof(V3F_C4B_T2F, colors), true);
-		vertexLayout->setAttribute("a_texCoord", locTexcoord, backend::VertexFormat::FLOAT2, offsetof(V3F_C4B_T2F, texCoords), false);
+		auto locPosition = programState->getAttributeLocation(backend::ATTRIBUTE_NAME_POSITION);
+		auto locTexcoord = programState->getAttributeLocation(backend::ATTRIBUTE_NAME_TEXCOORD);
+		auto locColor = programState->getAttributeLocation(backend::ATTRIBUTE_NAME_COLOR);
+		vertexLayout->setAttribute(backend::ATTRIBUTE_NAME_POSITION, locPosition, backend::VertexFormat::FLOAT3, offsetof(V3F_C4B_T2F, vertices), false);
+		vertexLayout->setAttribute(backend::ATTRIBUTE_NAME_COLOR, locColor, backend::VertexFormat::UBYTE4, offsetof(V3F_C4B_T2F, colors), true);
+		vertexLayout->setAttribute(backend::ATTRIBUTE_NAME_TEXCOORD, locTexcoord, backend::VertexFormat::FLOAT2, offsetof(V3F_C4B_T2F, texCoords), false);
 		vertexLayout->setLayout(sizeof(_vertices[0]));
 
 
-		_locMVP = programState->getUniformLocation("u_MVPMatrix");
-		_locTexture = programState->getUniformLocation("u_texture");
+		_locMVP = programState->getUniformLocation(backend::UNIFORM_NAME_MVP_MATRIX);
+		_locTexture = programState->getUniformLocation(backend::UNIFORM_NAME_TEXTURE);
 	}
 
 	void SkeletonBatch::update(float delta) {
