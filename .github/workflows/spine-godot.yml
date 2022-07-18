@@ -2,21 +2,11 @@ name: Build and Publish Godot editor and templates
 
 on:
   push:
-    branches:
-      - "4.2-beta"
-      - "4.2"
-      - "4.3-beta"
-      - "4.3"
     paths:
       - ".github/workflows/spine-godot.yml"
       - 'spine-godot/**'
       - 'spine-cpp/**'
   workflow_dispatch:
-      branches:
-      - "4.2-beta"
-      - "4.2"
-      - "4.3-beta"
-      - "4.3" 
 
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
