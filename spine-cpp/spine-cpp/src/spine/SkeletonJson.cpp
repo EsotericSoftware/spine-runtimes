@@ -512,43 +512,43 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 				skeletonData->_defaultSkin = skin;
 			}
 
-			for (attachmentsMap = Json::getItem(skinMap,
-												"attachments")
-										  ->_child;
-				 attachmentsMap; attachmentsMap = attachmentsMap->_next) {
-				SlotData *slot = skeletonData->findSlot(attachmentsMap->_name);
-				Json *attachmentMap;
+			Json *attachments = Json::getItem(skinMap, "attachments");
+			if (attachments)
+				for (attachmentsMap = attachments->_child;
+					 attachmentsMap; attachmentsMap = attachmentsMap->_next) {
+					SlotData *slot = skeletonData->findSlot(attachmentsMap->_name);
+					Json *attachmentMap;
 
-				for (attachmentMap = attachmentsMap->_child; attachmentMap; attachmentMap = attachmentMap->_next) {
-					Attachment *attachment = NULL;
-					const char *skinAttachmentName = attachmentMap->_name;
-					const char *attachmentName = Json::getString(attachmentMap, "name", skinAttachmentName);
-					const char *attachmentPath = Json::getString(attachmentMap, "path", attachmentName);
-					const char *color;
-					Json *entry;
+					for (attachmentMap = attachmentsMap->_child; attachmentMap; attachmentMap = attachmentMap->_next) {
+						Attachment *attachment = NULL;
+						const char *skinAttachmentName = attachmentMap->_name;
+						const char *attachmentName = Json::getString(attachmentMap, "name", skinAttachmentName);
+						const char *attachmentPath = Json::getString(attachmentMap, "path", attachmentName);
+						const char *color;
+						Json *entry;
 
-					const char *typeString = Json::getString(attachmentMap, "type", "region");
-					AttachmentType type;
-					if (strcmp(typeString, "region") == 0) type = AttachmentType_Region;
-					else if (strcmp(typeString, "mesh") == 0)
-						type = AttachmentType_Mesh;
-					else if (strcmp(typeString, "linkedmesh") == 0)
-						type = AttachmentType_Linkedmesh;
-					else if (strcmp(typeString, "boundingbox") == 0)
-						type = AttachmentType_Boundingbox;
-					else if (strcmp(typeString, "path") == 0)
-						type = AttachmentType_Path;
-					else if (strcmp(typeString, "clipping") == 0)
-						type = AttachmentType_Clipping;
-					else if (strcmp(typeString, "point") == 0)
-						type = AttachmentType_Point;
-					else {
-						delete skeletonData;
-						setError(root, "Unknown attachment type: ", typeString);
-						return NULL;
-					}
+						const char *typeString = Json::getString(attachmentMap, "type", "region");
+						AttachmentType type;
+						if (strcmp(typeString, "region") == 0) type = AttachmentType_Region;
+						else if (strcmp(typeString, "mesh") == 0)
+							type = AttachmentType_Mesh;
+						else if (strcmp(typeString, "linkedmesh") == 0)
+							type = AttachmentType_Linkedmesh;
+						else if (strcmp(typeString, "boundingbox") == 0)
+							type = AttachmentType_Boundingbox;
+						else if (strcmp(typeString, "path") == 0)
+							type = AttachmentType_Path;
+						else if (strcmp(typeString, "clipping") == 0)
+							type = AttachmentType_Clipping;
+						else if (strcmp(typeString, "point") == 0)
+							type = AttachmentType_Point;
+						else {
+							delete skeletonData;
+							setError(root, "Unknown attachment type: ", typeString);
+							return NULL;
+						}
 
-					switch (type) {
+						switch (type) {
 						case AttachmentType_Region: {
 							Sequence *sequence = readSequence(Json::getItem(attachmentMap, "sequence"));
 							attachment = _attachmentLoader->newRegionAttachment(*skin, attachmentName, attachmentPath, sequence);
@@ -632,8 +632,8 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 								bool inheritTimelines = Json::getInt(attachmentMap, "timelines", 1) ? true : false;
 								LinkedMesh *linkedMesh = new (__FILE__, __LINE__) LinkedMesh(mesh,
 																							 String(Json::getString(
-																									 attachmentMap,
-																									 "skin", 0)),
+																										attachmentMap,
+																										"skin", 0)),
 																							 slot->getIndex(),
 																							 String(entry->_valueString),
 																							 inheritTimelines);
@@ -661,7 +661,7 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 							int vertexCount = 0;
 							pathAttatchment->_closed = Json::getInt(attachmentMap, "closed", 0) ? true : false;
 							pathAttatchment->_constantSpeed = Json::getInt(attachmentMap, "constantSpeed", 1) ? true
-																											  : false;
+								: false;
 							vertexCount = Json::getInt(attachmentMap, "vertexCount", 0);
 							readVertices(attachmentMap, pathAttatchment, vertexCount << 1);
 
@@ -704,11 +704,11 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 							_attachmentLoader->configureAttachment(attachment);
 							break;
 						}
-					}
+						}
 
-					skin->setAttachment(slot->getIndex(), skinAttachmentName, attachment);
+						skin->setAttachment(slot->getIndex(), skinAttachmentName, attachment);
+					}
 				}
-			}
 		}
 	}
 
