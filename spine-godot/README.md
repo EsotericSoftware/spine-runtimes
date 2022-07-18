@@ -2,6 +2,8 @@
 
 The spine-godot runtime provides functionality to load, manipulate and render [Spine](http://esotericsoftware.com) skeletal animation data using [Godot](https://godotengine.org/). spine-godot is based on [spine-cpp](../spine-cpp).
 
+# See the [spine-godot documentation](http://esotericsoftware.com/spine-godot]) for in-depth information.
+
 ## Licensing
 
 You are welcome to evaluate the Spine Runtimes and the examples we provide in this repository free of charge.
