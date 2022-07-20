@@ -88,6 +88,11 @@ namespace Spine.Unity.TK2D {
 
 			regionWidth = (int)(def.boundsData[1].x / def.texelSize.x);
 			regionHeight = (int)(def.boundsData[1].y / def.texelSize.y);
+			if (regionRotated) {
+				float tempSwap = regionWidth;
+				regionWidth = regionHeight;
+				regionHeight = tempSwap;
+			}
 
 			float x0 = def.untrimmedBoundsData[0].x - def.untrimmedBoundsData[1].x / 2;
 			float x1 = def.boundsData[0].x - def.boundsData[1].x / 2;
