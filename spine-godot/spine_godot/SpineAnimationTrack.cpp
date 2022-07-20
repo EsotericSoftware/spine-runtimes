@@ -122,7 +122,6 @@ void SpineAnimationTrack::setup_animation_player() {
 	if (!sprite) return;
 	if (!sprite->get_skeleton_data_res().is_valid() || !sprite->get_skeleton_data_res()->is_skeleton_data_loaded()) return;
 	AnimationPlayer *animation_player = find_animation_player();
-	if (animation_player) return;
 
 	// If we don't have a track index yet, find the highest track number used
 	// by existing tracks.
