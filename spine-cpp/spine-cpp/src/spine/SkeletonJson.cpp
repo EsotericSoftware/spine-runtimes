@@ -967,7 +967,7 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 				toColor(color2, Json::getString(keyMap, "dark", 0), false);
 
 				for (frame = 0, bezier = 0;; ++frame) {
-					timeline->setFrame(frame, time, color.r, color.g, color.b, color.a, color2.g, color2.g, color2.b);
+					timeline->setFrame(frame, time, color.r, color.g, color.b, color.a, color2.r, color2.g, color2.b);
 					nextMap = keyMap->_next;
 					if (!nextMap) {
 						// timeline.shrink(); // BOZO
