@@ -10,6 +10,8 @@
 
 #ifdef TOOLS_ENABLED
 #include "editor/plugins/animation_player_editor_plugin.h"
+#include "editor/plugins/animation_tree_editor_plugin.h"
+
 #endif
 
 void SpineAnimationTrack::_bind_methods() {
@@ -38,6 +40,8 @@ void SpineAnimationTrack::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_draw_order_threshold"), &SpineAnimationTrack::get_draw_order_threshold);
 	ClassDB::bind_method(D_METHOD("set_mix_blend", "mix_blend"), &SpineAnimationTrack::set_mix_blend);
 	ClassDB::bind_method(D_METHOD("get_mix_blend"), &SpineAnimationTrack::get_mix_blend);
+        ClassDB::bind_method(D_METHOD("set_blend_tree_mode", "blend_tree_mode_enabled"), &SpineAnimationTrack::set_blend_tree_mode);
+        ClassDB::bind_method(D_METHOD("get_blend_tree_mode"), &SpineAnimationTrack::get_blend_tree_mode);
 	ClassDB::bind_method(D_METHOD("set_debug", "debug"), &SpineAnimationTrack::set_debug);
 	ClassDB::bind_method(D_METHOD("get_debug"), &SpineAnimationTrack::get_debug);
 
@@ -56,6 +60,7 @@ void SpineAnimationTrack::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::VARIANT_FLOAT, "attachment_threshold"), "set_attachment_threshold", "get_attachment_threshold");
 	ADD_PROPERTY(PropertyInfo(Variant::VARIANT_FLOAT, "draw_order_threshold"), "set_draw_order_threshold", "get_draw_order_threshold");
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "mix_blend", PROPERTY_HINT_ENUM, "Setup,First,Replace,Add"), "set_mix_blend", "get_mix_blend");
+        ADD_PROPERTY(PropertyInfo(Variant::BOOL, "blend_tree_mode"), "set_blend_tree_mode", "get_blend_tree_mode");
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "debug"), "set_debug", "get_debug");
 }
 
@@ -70,6 +75,7 @@ SpineAnimationTrack::SpineAnimationTrack() : loop(false),
 											 attachment_threshold(0),
 											 draw_order_threshold(0),
 											 mix_blend(SpineConstant::MixBlend_Replace),
+											 blend_tree_mode(false),
 											 debug(false),
 											 sprite(nullptr) {
 }
@@ -122,7 +128,6 @@ void SpineAnimationTrack::setup_animation_player() {
 	if (!sprite) return;
 	if (!sprite->get_skeleton_data_res().is_valid() || !sprite->get_skeleton_data_res()->is_skeleton_data_loaded()) return;
 	AnimationPlayer *animation_player = find_animation_player();
-	if (animation_player) return;
 
 	// If we don't have a track index yet, find the highest track number used
 	// by existing tracks.
@@ -245,6 +250,45 @@ void SpineAnimationTrack::update_animation_state(const Variant &variant_sprite) 
 
 	if (Engine::get_singleton()->is_editor_hint()) {
 #ifdef TOOLS_ENABLED
+		if (blend_tree_mode) {
+			AnimationTreeEditor* tree_editor = AnimationTreeEditor::get_singleton();
+			// When the animation tree dock is no longer visible, bail.
+			if (!tree_editor->is_visible_in_tree()) {
+				skeleton->setToSetupPose();
+				animation_state->clearTracks();
+				animation_state->setTimeScale(1);
+				return;
+			}
+			auto current_entry = animation_state->getCurrent(track_index);
+			bool should_set_mix = mix_duration >= 0;
+			bool should_set_animation = !current_entry || (animation_name != current_entry->getAnimation()->getName().buffer() || current_entry->getLoop() != loop);
+
+			if (should_set_animation) {
+				if (!EMPTY(animation_name)) {
+					auto entry = animation_state->setAnimation(track_index, SPINE_STRING(animation_name), loop);
+					if (should_set_mix) entry->setMixDuration(mix_duration);
+
+					entry->setHoldPrevious(hold_previous);
+					entry->setReverse(reverse);
+					entry->setShortestRotation(shortest_rotation);
+					entry->setTimeScale(time_scale);
+					entry->setAlpha(alpha);
+					entry->setAttachmentThreshold(attachment_threshold);
+					entry->setDrawOrderThreshold(draw_order_threshold);
+					entry->setMixBlend((spine::MixBlend) mix_blend);
+
+					if (debug) print_line(String("Setting animation {0} with mix_duration {1} on track {2} on {3}").format(varray(animation_name, mix_duration, track_index, sprite->get_name())).utf8().ptr());
+				} else {
+					if (!current_entry || (String("<empty>") != current_entry->getAnimation()->getName().buffer())) {
+						auto entry = animation_state->setEmptyAnimation(track_index, should_set_mix ? mix_duration : 0);
+						entry->setTrackEnd(FLT_MAX);
+						if (debug) print_line(String("Setting empty animation with mix_duration {0} on track {1} on {2}").format(varray(mix_duration, track_index, sprite->get_name())).utf8().ptr());
+					}
+				}
+			}
+			return;
+		}
+
 		// When the animation dock is no longer visible or we aren't being
 		// keyed in the current animation, bail.
 #if VERSION_MAJOR > 3
@@ -465,6 +509,14 @@ void SpineAnimationTrack::set_mix_blend(SpineConstant::MixBlend _blend) {
 
 SpineConstant::MixBlend SpineAnimationTrack::get_mix_blend() {
 	return mix_blend;
+}
+
+void SpineAnimationTrack::set_blend_tree_mode(bool _blend_tree_mode) {
+  blend_tree_mode = _blend_tree_mode;
+}
+
+bool SpineAnimationTrack::get_blend_tree_mode() {
+  return blend_tree_mode;
 }
 
 void SpineAnimationTrack::set_debug(bool _debug) {

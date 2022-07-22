@@ -2496,7 +2496,7 @@ void spTransformConstraintTimeline_setFrame(spTransformConstraintTimeline *self,
 	frames[frame] = time;
 	frames[frame + TRANSFORMCONSTRAINT_ROTATE] = mixRotate;
 	frames[frame + TRANSFORMCONSTRAINT_X] = mixX;
-	frames[frame + TRANSFORMCONSTRAINT_X] = mixY;
+	frames[frame + TRANSFORMCONSTRAINT_Y] = mixY;
 	frames[frame + TRANSFORMCONSTRAINT_SCALEX] = mixScaleX;
 	frames[frame + TRANSFORMCONSTRAINT_SCALEY] = mixScaleY;
 	frames[frame + TRANSFORMCONSTRAINT_SHEARY] = mixShearY;

@@ -53,6 +53,7 @@ protected:
 	float attachment_threshold;
 	float draw_order_threshold;
 	SpineConstant::MixBlend mix_blend;
+	bool blend_tree_mode;
 	bool debug;
 
 	SpineSprite *sprite;
@@ -123,6 +124,10 @@ public:
 	void set_mix_blend(SpineConstant::MixBlend _blend);
 
 	SpineConstant::MixBlend get_mix_blend();
+
+	void set_blend_tree_mode(bool _blend_tree_mode);
+
+	bool get_blend_tree_mode();
 
 	void set_debug(bool _debug);
 
