@@ -3,8 +3,6 @@
 #
 set(DEPS_DIR "${CMAKE_CURRENT_LIST_DIR}/dependencies/")
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-	set(CMAKE_OSX_ARCHITECTURES x86_64)
-	set(ONLY_ACTIVE_ARCH NO)
     set(SFML_URL "https://www.sfml-dev.org/files/SFML-2.5.1-macOS-clang.tar.gz")
     set(SFML_DIR ${DEPS_DIR}/SFML-2.5.1-macos-clang)
 	if (NOT EXISTS "${SFML_DIR}")
