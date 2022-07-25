@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineObjectWrapper" version="3.4">
+	<brief_description>
+		The base class for anything that wraps a spine-cpp class. All wrappers are a Godot reference.
+	</brief_description>
+	<description>
+		The base class for anything that wraps a spine-cpp class. All wrappers are a Godot reference.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+	</methods>
+	<constants>
+	</constants>
+</class>
