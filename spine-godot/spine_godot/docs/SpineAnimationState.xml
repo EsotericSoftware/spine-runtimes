@@ -27,7 +27,7 @@
 			<argument index="2" name="delay" type="float" />
 			<description>
 				Adds an empty animation to be played after the current or last queued animation for a track, and sets the track entry's mix duration. If the track is empty, it is equivalent to calling [code]set_empty_animation()[/code]. See [code]set_empty_animation()[/code].
-				If [code]delay[/code]> 0, sets the track entry's delay. If &lt;= 0, the delay set is the duration of the previous track entry minus any mix duration plus the specified [code]delay[/code] (ie the mix ends at ([code]delay[/code] = 0) or before ([code]delay[/code] &lt; 0) the previous track entry duration). If the previous entry is looping, its next loop completion is used instead of its duration.
+				If [code]delay[/code]&gt; 0, sets the track entry's delay. If &lt;= 0, the delay set is the duration of the previous track entry minus any mix duration plus the specified [code]delay[/code] (ie the mix ends at ([code]delay[/code] = 0) or before ([code]delay[/code] &lt; 0) the previous track entry duration). If the previous entry is looping, its next loop completion is used instead of its duration.
 				Returns a track entry to allow further customization of animation playback. References to the track entry must not be kept
 				after the dispose event occurs.
 			</description>

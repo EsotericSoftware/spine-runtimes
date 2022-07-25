@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="SpineTrackEntry" inherits="SpineObjectWrapper" version="3.4">
 	<brief_description>
-
 	</brief_description>
 	<description>
 		Stores settings and other state for the playback of an animation on an animation state track.
@@ -58,7 +57,7 @@
 		<method name="get_delay">
 			<return type="float" />
 			<description>
-				Seconds to postpone playing the animation. When this track entry is the current track entry, delay postpones incrementing the [code]get_track_time()[/code]. When this track entry is queued, delay is the time from the start of the previous animation to when this track entry will become the current track entry (ie when the previous track entry [code]get_track_time()[/code] >= this track entry's delay).
+				Seconds to postpone playing the animation. When this track entry is the current track entry, delay postpones incrementing the [code]get_track_time()[/code]. When this track entry is queued, delay is the time from the start of the previous animation to when this track entry will become the current track entry (ie when the previous track entry [code]get_track_time()[/code] &gt;= this track entry's delay).
 				[code]get_time_scale()[/code] affects the delay.
 				When using [code]AnimationState.add_animation()[/code] with a delay &lt;= 0, the delay is set using the mix duration from the skeleton data resource. If mix duration is set afterward, the delay may need to be adjusted.
 			</description>
