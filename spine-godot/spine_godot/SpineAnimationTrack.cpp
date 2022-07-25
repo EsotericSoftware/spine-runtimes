@@ -40,8 +40,8 @@ void SpineAnimationTrack::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_draw_order_threshold"), &SpineAnimationTrack::get_draw_order_threshold);
 	ClassDB::bind_method(D_METHOD("set_mix_blend", "mix_blend"), &SpineAnimationTrack::set_mix_blend);
 	ClassDB::bind_method(D_METHOD("get_mix_blend"), &SpineAnimationTrack::get_mix_blend);
-        ClassDB::bind_method(D_METHOD("set_blend_tree_mode", "blend_tree_mode_enabled"), &SpineAnimationTrack::set_blend_tree_mode);
-        ClassDB::bind_method(D_METHOD("get_blend_tree_mode"), &SpineAnimationTrack::get_blend_tree_mode);
+	ClassDB::bind_method(D_METHOD("set_blend_tree_mode", "blend_tree_mode_enabled"), &SpineAnimationTrack::set_blend_tree_mode);
+	ClassDB::bind_method(D_METHOD("get_blend_tree_mode"), &SpineAnimationTrack::get_blend_tree_mode);
 	ClassDB::bind_method(D_METHOD("set_debug", "debug"), &SpineAnimationTrack::set_debug);
 	ClassDB::bind_method(D_METHOD("get_debug"), &SpineAnimationTrack::get_debug);
 
@@ -60,7 +60,7 @@ void SpineAnimationTrack::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::VARIANT_FLOAT, "attachment_threshold"), "set_attachment_threshold", "get_attachment_threshold");
 	ADD_PROPERTY(PropertyInfo(Variant::VARIANT_FLOAT, "draw_order_threshold"), "set_draw_order_threshold", "get_draw_order_threshold");
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "mix_blend", PROPERTY_HINT_ENUM, "Setup,First,Replace,Add"), "set_mix_blend", "get_mix_blend");
-        ADD_PROPERTY(PropertyInfo(Variant::BOOL, "blend_tree_mode"), "set_blend_tree_mode", "get_blend_tree_mode");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "blend_tree_mode"), "set_blend_tree_mode", "get_blend_tree_mode");
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "debug"), "set_debug", "get_debug");
 }
 
@@ -251,7 +251,7 @@ void SpineAnimationTrack::update_animation_state(const Variant &variant_sprite) 
 	if (Engine::get_singleton()->is_editor_hint()) {
 #ifdef TOOLS_ENABLED
 		if (blend_tree_mode) {
-			AnimationTreeEditor* tree_editor = AnimationTreeEditor::get_singleton();
+			AnimationTreeEditor *tree_editor = AnimationTreeEditor::get_singleton();
 			// When the animation tree dock is no longer visible, bail.
 			if (!tree_editor->is_visible_in_tree()) {
 				skeleton->setToSetupPose();
@@ -512,11 +512,11 @@ SpineConstant::MixBlend SpineAnimationTrack::get_mix_blend() {
 }
 
 void SpineAnimationTrack::set_blend_tree_mode(bool _blend_tree_mode) {
-  blend_tree_mode = _blend_tree_mode;
+	blend_tree_mode = _blend_tree_mode;
 }
 
 bool SpineAnimationTrack::get_blend_tree_mode() {
-  return blend_tree_mode;
+	return blend_tree_mode;
 }
 
 void SpineAnimationTrack::set_debug(bool _debug) {
