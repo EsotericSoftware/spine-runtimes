@@ -47,6 +47,7 @@ protected:
 	Ref<SpineAnimationState> animation_state;
 	SpineConstant::UpdateMode update_mode;
 
+	String preview_skin;
 	String preview_animation;
 	bool preview_frame;
 	float preview_time;

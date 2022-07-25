@@ -148,7 +148,7 @@ void SpineSprite::_bind_methods() {
 	// Filled in in _get_property_list()
 }
 
-SpineSprite::SpineSprite() : update_mode(SpineConstant::UpdateMode_Process), preview_animation("-- Empty --"), preview_frame(false), preview_time(0), skeleton_clipper(nullptr), modified_bones(false) {
+SpineSprite::SpineSprite() : update_mode(SpineConstant::UpdateMode_Process), preview_skin("Default"), preview_animation("-- Empty --"), preview_frame(false), preview_time(0), skeleton_clipper(nullptr), modified_bones(false) {
 	skeleton_clipper = new spine::SkeletonClipping();
 
 	// One material per blend mode, shared across all sprites.
@@ -346,8 +346,18 @@ void SpineSprite::_notification(int what) {
 void SpineSprite::_get_property_list(List<PropertyInfo> *list) const {
 	if (!skeleton_data_res.is_valid() || !skeleton_data_res->is_skeleton_data_loaded()) return;
 	Vector<String> animation_names;
+	Vector<String> skin_names;
 	skeleton_data_res->get_animation_names(animation_names);
+	skeleton_data_res->get_skin_names(skin_names);
 	animation_names.insert(0, "-- Empty --");
+
+	PropertyInfo preview_skin_property;
+	preview_skin_property.name = "preview_skin";
+	preview_skin_property.type = Variant::STRING;
+	preview_skin_property.usage = PROPERTY_USAGE_EDITOR | PROPERTY_USAGE_STORAGE;
+	preview_skin_property.hint_string = String(",").join(skin_names);
+	preview_skin_property.hint = PROPERTY_HINT_ENUM;
+	list->push_back(preview_skin_property);
 
 	PropertyInfo preview_anim_property;
 	preview_anim_property.name = "preview_animation";
@@ -378,6 +388,11 @@ void SpineSprite::_get_property_list(List<PropertyInfo> *list) const {
 }
 
 bool SpineSprite::_get(const StringName &property, Variant &value) const {
+	if (property == "preview_skin") {
+		value = preview_skin;
+		return true;
+	}
+
 	if (property == "preview_animation") {
 		value = preview_animation;
 		return true;
@@ -395,8 +410,14 @@ bool SpineSprite::_get(const StringName &property, Variant &value) const {
 	return false;
 }
 
-static void update_preview_animation(SpineSprite *sprite, const String &animation, bool frame, float time) {
+static void update_preview_animation(SpineSprite *sprite, const String &skin, const String &animation, bool frame, float time) {
 	if (!sprite->get_skeleton().is_valid()) return;
+
+	if (EMPTY(skin) || skin == "Default") {
+		sprite->get_skeleton()->set_skin(nullptr);
+	} else {
+		sprite->get_skeleton()->set_skin_by_name(skin);
+	}
 	sprite->get_skeleton()->set_to_setup_pose();
 	if (EMPTY(animation) || animation == "-- Empty --") {
 		sprite->get_animation_state()->set_empty_animation(0, 0);
@@ -412,22 +433,29 @@ static void update_preview_animation(SpineSprite *sprite, const String &animatio
 }
 
 bool SpineSprite::_set(const StringName &property, const Variant &value) {
+	if (property == "preview_skin") {
+		preview_skin = value;
+		update_preview_animation(this, preview_skin, preview_animation, preview_frame, preview_time);
+		NOTIFY_PROPERTY_LIST_CHANGED();
+		return true;
+	}
+
 	if (property == "preview_animation") {
 		preview_animation = value;
-		update_preview_animation(this, preview_animation, preview_frame, preview_time);
+		update_preview_animation(this, preview_skin, preview_animation, preview_frame, preview_time);
 		NOTIFY_PROPERTY_LIST_CHANGED();
 		return true;
 	}
 
 	if (property == "preview_frame") {
 		preview_frame = value;
-		update_preview_animation(this, preview_animation, preview_frame, preview_time);
+		update_preview_animation(this, preview_skin, preview_animation, preview_frame, preview_time);
 		return true;
 	}
 
 	if (property == "preview_time") {
 		preview_time = value;
-		update_preview_animation(this, preview_animation, preview_frame, preview_time);
+		update_preview_animation(this, preview_skin, preview_animation, preview_frame, preview_time);
 		return true;
 	}
 
