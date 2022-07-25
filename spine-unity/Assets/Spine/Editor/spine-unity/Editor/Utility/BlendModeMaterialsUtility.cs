@@ -203,6 +203,11 @@ namespace Spine.Unity.Editor {
 					var renderableAttachment = entry.Attachment as IHasTextureRegion;
 					if (renderableAttachment != null) {
 						var originalRegion = (AtlasRegion)renderableAttachment.Region;
+						Sequence sequence = null;
+						if (originalRegion == null && (sequence = renderableAttachment.Sequence) != null) {
+							if (sequence.Regions != null && sequence.Regions.Length > 0)
+								originalRegion = (AtlasRegion)sequence.Regions[0];
+						}
 						bool replacementExists = replacementMaterials.Exists(
 							replacement => replacement.pageName == originalRegion.page.name);
 						if (!replacementExists) {
