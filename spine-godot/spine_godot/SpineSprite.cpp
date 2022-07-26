@@ -532,13 +532,11 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> skeleton_ref) {
 		spine::Slot *slot = skeleton->getDrawOrder()[i];
 		spine::Attachment *attachment = slot->getAttachment();
 		MeshInstance2D *mesh_instance = mesh_instances[i];
+		clear_mesh_instance(mesh_instance);
 		if (!attachment) {
-			mesh_instances[i]->set_visible(false);
 			skeleton_clipper->clipEnd(*slot);
 			continue;
 		}
-		mesh_instance->set_visible(true);
-		clear_mesh_instance(mesh_instance);
 
 		spine::Color skeleton_color = skeleton->getColor();
 		spine::Color slot_color = slot->getColor();
@@ -598,6 +596,7 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> skeleton_ref) {
 		}
 
 		if (indices->size() > 0) {
+			// Set the mesh
 			size_t num_vertices = vertices->size() / 2;
 			scratch_points.resize((int) num_vertices);
 			memcpy(scratch_points.ptrw(), vertices->buffer(), num_vertices * 2 * sizeof(float));
