@@ -669,7 +669,7 @@ namespace Spine.Unity.Editor {
 									if (atlas == null)
 										continue;
 									for (int i = 0; i < missingPaths.Count; i++) {
-										if (atlas.FindRegion(missingPaths[i]) != null) {
+										if (atlas.FindRegionIgnoringNumberSuffix(missingPaths[i]) != null) {
 											missingPaths.RemoveAt(i);
 											i--;
 										}

@@ -127,8 +127,18 @@ namespace Spine.Unity {
 				foreach (var entry in skinEntries) {
 					var renderableAttachment = entry.Attachment as IHasTextureRegion;
 					if (renderableAttachment != null) {
-						renderableAttachment.Region = CloneAtlasRegionWithMaterial(
+						if (renderableAttachment.Region != null) {
+							renderableAttachment.Region = CloneAtlasRegionWithMaterial(
 							(AtlasRegion)renderableAttachment.Region, replacementMaterials);
+						} else {
+							if (renderableAttachment.Sequence != null) {
+								var regions = renderableAttachment.Sequence.Regions;
+								for (int i = 0; i < regions.Length; ++i) {
+									regions[i] = CloneAtlasRegionWithMaterial(
+										(AtlasRegion)regions[i], replacementMaterials);
+								}
+							}
+						}
 					}
 				}
 			}
