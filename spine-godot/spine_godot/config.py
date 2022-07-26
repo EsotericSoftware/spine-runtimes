@@ -34,6 +34,5 @@ def get_doc_classes():
         "SpineTimeline",
         "SpineTrackEntry",
         "SpineTransformConstraint",
-        "SpineTransformConstraintData",
-        "SpineObjectWrapper"
+        "SpineTransformConstraintData"
     ]

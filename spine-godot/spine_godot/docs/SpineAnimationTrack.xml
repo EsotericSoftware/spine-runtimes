@@ -43,6 +43,8 @@
 		</member>
 		<member name="attachment_threshold" type="float" setter="set_attachment_threshold" getter="get_attachment_threshold" default="0.0">
 		</member>
+		<member name="blend_tree_mode" type="bool" setter="set_blend_tree_mode" getter="get_blend_tree_mode" default="false">
+		</member>
 		<member name="debug" type="bool" setter="set_debug" getter="get_debug" default="false">
 		</member>
 		<member name="draw_order_threshold" type="float" setter="set_draw_order_threshold" getter="get_draw_order_threshold" default="0.0">

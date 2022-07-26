@@ -221,6 +221,26 @@ namespace Spine.Unity.Editor {
 			return GetMatchingAtlas(requiredPaths, atlasAssets);
 		}
 
+		internal static AtlasRegion FindRegionIgnoringNumberSuffix (this Atlas atlas, string regionPath) {
+			AtlasRegion region = atlas.FindRegion(regionPath);
+			if (region != null)
+				return region;
+			return atlas.FindRegionWithNumberSuffix(regionPath);
+		}
+
+		internal static AtlasRegion FindRegionWithNumberSuffix (this Atlas atlas, string regionPath) {
+			int pathLength = regionPath.Length;
+			foreach (AtlasRegion region in atlas.Regions) {
+				string name = region.name;
+				if (name.StartsWith(regionPath)) {
+					string suffix = name.Substring(pathLength);
+					if (suffix.All(c => c >= '0' && c <= '9'))
+						return region;
+				}
+			}
+			return null;
+		}
+
 		internal static AtlasAssetBase GetMatchingAtlas (List<string> requiredPaths, List<AtlasAssetBase> atlasAssets) {
 			AtlasAssetBase atlasAssetMatch = null;
 
@@ -228,7 +248,7 @@ namespace Spine.Unity.Editor {
 				Atlas atlas = a.GetAtlas();
 				bool failed = false;
 				foreach (string regionPath in requiredPaths) {
-					if (atlas.FindRegion(regionPath) == null) {
+					if (atlas.FindRegionIgnoringNumberSuffix(regionPath) == null) {
 						failed = true;
 						break;
 					}
@@ -1118,7 +1138,7 @@ namespace Spine.Unity.Editor {
 					foreach (var atlasAsset in atlasAssets) {
 						var atlas = atlasAsset.GetAtlas();
 						for (int i = 0; i < missingRegions.Count; i++) {
-							if (atlas.FindRegion(missingRegions[i]) != null) {
+							if (atlas.FindRegionIgnoringNumberSuffix(missingRegions[i]) != null) {
 								missingRegions.RemoveAt(i);
 								i--;
 							}
@@ -1152,7 +1172,7 @@ namespace Spine.Unity.Editor {
 							var atlas = selectedAtlasAsset.GetAtlas();
 							bool hasValidRegion = false;
 							foreach (string str in missingRegions) {
-								if (atlas.FindRegion(str) != null) {
+								if (atlas.FindRegionIgnoringNumberSuffix(str) != null) {
 									hasValidRegion = true;
 									break;
 								}

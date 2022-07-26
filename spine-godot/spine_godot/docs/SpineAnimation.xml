@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="SpineAnimation" inherits="SpineObjectWrapper" version="3.4">
 	<brief_description>
-	Stores a list of timelines to animate a skeleton's pose over time. The timelines can not be modified through GDScript.
+		Stores a list of timelines to animate a skeleton's pose over time. The timelines can not be modified through GDScript.
 	</brief_description>
 	<description>
-	Stores a list of timelines to animate a skeleton's pose over time. The timelines can not be modified through GDScript.
+		Stores a list of timelines to animate a skeleton's pose over time. The timelines can not be modified through GDScript.
 	</description>
 	<tutorials>
 	</tutorials>
@@ -20,7 +20,7 @@
 			<argument index="6" name="blend" type="int" enum="SpineConstant.MixBlend" />
 			<argument index="7" name="direction" type="int" enum="SpineConstant.MixDirection" />
 			<description>
-			Applies the animation's timelines to the specified skeleton.
+				Applies the animation's timelines to the specified skeleton.
 			</description>
 		</method>
 		<method name="get_duration">
