@@ -15,15 +15,15 @@ FetchContent_MakeAvailable(SDL)
 
 include_directories(src)
 
-add_library(spine-sdl-c STATIC src/spine-sdl-c.c src/spine-sdl-c.h)
+add_library(spine-sdl-c STATIC src/spine-sdl-c.c src/spine-sdl-c.h src/stb_image.h)
 target_link_libraries(spine-sdl-c LINK_PUBLIC spine-c)
 install(TARGETS spine-sdl-c DESTINATION dist/lib)
-install(FILES src/spine-sdl-c.h DESTINATION dist/include)
+install(FILES src/spine-sdl-c.h src/stb_image.h DESTINATION dist/include)
 
-add_library(spine-sdl-cpp STATIC src/spine-sdl-cpp.cpp src/spine-sdl-cpp.h)
+add_library(spine-sdl-cpp STATIC src/spine-sdl-cpp.cpp src/spine-sdl-cpp.h src/stb_image.h)
 target_link_libraries(spine-sdl-cpp LINK_PUBLIC spine-cpp)
 install(TARGETS spine-sdl-cpp DESTINATION dist/lib)
-install(FILES src/spine-sdl-cpp.h DESTINATION dist/include)
+install(FILES src/spine-sdl-cpp.h src/stb_image.h DESTINATION dist/include)
 
 add_executable(spine-sdl-c-example example/main.c)
 target_link_libraries(spine-sdl-c-example SDL2 spine-sdl-c)
