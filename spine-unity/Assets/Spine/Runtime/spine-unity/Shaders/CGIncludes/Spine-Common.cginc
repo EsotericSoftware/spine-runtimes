@@ -39,4 +39,18 @@ inline half4 PMAGammaToTargetSpace(half4 gammaPMAColor) {
 #endif
 }
 
+// Saturated version to prevent numerical issues that occur at CanvasRenderer
+// shader during linear-space PMA vertex color correction (countering automatic Unity conversion).
+// Note: Only use this method when the original color.rgb values lie within [0,1] range and
+// it's not an HDR color. This method is usually suitable for vertex color.
+inline half4 PMAGammaToTargetSpaceSaturated(half4 gammaPMAColor) {
+#if UNITY_COLORSPACE_GAMMA
+	return gammaPMAColor;
+#else
+	return gammaPMAColor.a == 0 ?
+		half4(GammaToLinearSpace(gammaPMAColor.rgb), gammaPMAColor.a) :
+		half4(saturate(GammaToLinearSpace(gammaPMAColor.rgb / gammaPMAColor.a)) * gammaPMAColor.a, gammaPMAColor.a);
+#endif
+}
+
 #endif

@@ -32,6 +32,10 @@ if [ $dev = "true" ]; then
 		git apply ../build/livepp-v4.patch
 		popd
 	fi
+
+	if [ `uname` == 'Darwin' ] && [ ! -d "$HOME/VulkanSDK" ]; then
+		./build/install-macos-vulkan-sdk.sh
+	fi
 fi
 cp -r ../spine-cpp/spine-cpp spine_godot
 popd

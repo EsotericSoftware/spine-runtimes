@@ -1240,7 +1240,7 @@ namespace Spine.Unity.Editor {
 		internal static readonly List<SkeletonComponentSpawnType> additionalSpawnTypes = new List<SkeletonComponentSpawnType>();
 
 		public static void TryInitializeSkeletonRendererSettings (SkeletonRenderer skeletonRenderer, Skin skin = null) {
-			const string PMAShaderQuery = "Spine/Skeleton";
+			const string PMAShaderQuery = "Spine/";
 			const string TintBlackShaderQuery = "Tint Black";
 
 			if (skeletonRenderer == null) return;
