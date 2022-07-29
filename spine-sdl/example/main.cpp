@@ -3,6 +3,7 @@
 #include <spine/spine.h>
 
 #define STB_IMAGE_IMPLEMENTATION
+
 #include <stb_image.h>
 
 namespace spine {
@@ -13,11 +14,11 @@ namespace spine {
 
         SkeletonDrawable(SkeletonData *skeletonData, AnimationStateData *animationStateData = nullptr) {
             Bone::setYDown(true);
-            skeleton = new (__FILE__, __LINE__) Skeleton(skeletonData);
+            skeleton = new(__FILE__, __LINE__) Skeleton(skeletonData);
 
             ownsAnimationStateData = animationStateData == 0;
-            if (ownsAnimationStateData) animationStateData = new (__FILE__, __LINE__) AnimationStateData(skeletonData);
-            animationState = new (__FILE__, __LINE__) AnimationState(animationStateData);
+            if (ownsAnimationStateData) animationStateData = new(__FILE__, __LINE__) AnimationStateData(skeletonData);
+            animationState = new(__FILE__, __LINE__) AnimationState(animationStateData);
         }
 
         ~SkeletonDrawable() {
@@ -37,22 +38,41 @@ namespace spine {
         }
     };
 
-    class SDLTextureLoader: public spine::TextureLoader {
+    class SDLTextureLoader : public spine::TextureLoader {
+        SDL_Renderer *renderer;
+
+        SDLTextureLoader(SDL_Renderer *renderer): renderer(renderer) {
+        }
+
+        SDL_Texture *loadTexture(SDL_Renderer *renderer, const spine::String &path) {
+            int width, height, components;
+            stbi_uc *imageData = stbi_load(path.buffer(), &width, &height, &components, 4);
+            if (!imageData) return nullptr;
+            SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STATIC, width, height);
+            if (!texture) {
+                stbi_image_free(imageData);
+                return nullptr;
+            }
+            if (SDL_UpdateTexture(texture, nullptr, imageData, width * 4)) {
+                stbi_image_free(imageData);
+                return nullptr;
+            }
+            stbi_image_free(imageData);
+            return texture;
+        }
+
         void load(AtlasPage &page, const String &path) {
-            /*Texture *texture = new Texture();
-            if (!texture->loadFromFile(path.buffer())) return;
-
-            if (page.magFilter == TextureFilter_Linear) texture->setSmooth(true);
-            if (page.uWrap == TextureWrap_Repeat && page.vWrap == TextureWrap_Repeat) texture->setRepeated(true);
-
+            SDL_Texture *texture = loadTexture(renderer, path);
+            if (!texture) return;
             page.setRendererObject(texture);
-            Vector2u size = texture->getSize();
-            page.width = size.x;
-            page.height = size.y;*/
+            SDL_QueryTexture(texture, nullptr, nullptr, &page.width, &page.height);
+
+            /*if (page.magFilter == TextureFilter_Linear) texture->setSmooth(true);
+            if (page.uWrap == TextureWrap_Repeat && page.vWrap == TextureWrap_Repeat) texture->setRepeated(true);*/
         }
 
         void unload(void *texture) {
-            // delete (Texture *) texture;
+            SDL_DestroyTexture((SDL_Texture*)texture);
         }
     };
 
@@ -61,8 +81,8 @@ namespace spine {
     }
 }
 
-void loadSkeleton(const char *json, const char *skel, const char *atlas) {
-
+spine::SkeletonDrawable *loadSkeleton(const char *json, const char *skel, const char *atlas) {
+    return nullptr;
 }
 
 int main() {
@@ -70,24 +90,32 @@ int main() {
         printf("Error: %s", SDL_GetError());
         return -1;
     }
-    SDL_Window *window = SDL_CreateWindow("Spine SDL", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480,
-                              SDL_WINDOW_SHOWN);
+    SDL_Window *window = SDL_CreateWindow("Spine SDL", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600, 0);
     if (!window) {
         printf("Error: %s", SDL_GetError());
         return -1;
     }
-    SDL_Surface *surface = SDL_GetWindowSurface(window);
+    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    if (!renderer) {
+        printf("Error: %s", SDL_GetError());
+        return -1;
+    }
+    // spine::SkeletonDrawable skeletonDrawable(nullptr, nullptr);
 
-    spine::SkeletonDrawable skeletonDrawable(nullptr, nullptr);
-
-    bool exit = false;
-    do {
+    bool quit = false;
+    while (!quit) {
         SDL_Event event;
         while (SDL_PollEvent(&event) != 0) {
-            if (event.type == SDL_QUIT)
-                exit = true;
+            if (event.type == SDL_QUIT) {
+                quit = true;
+                break;
+            }
         }
-    } while (!exit);
+
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+        SDL_RenderPresent(renderer);
+    }
 
     SDL_DestroyWindow(window);
     SDL_Quit();
