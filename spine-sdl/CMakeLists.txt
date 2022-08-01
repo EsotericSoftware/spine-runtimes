@@ -21,7 +21,7 @@ install(TARGETS spine-sdl-c DESTINATION dist/lib)
 install(FILES src/spine-sdl-c.h src/stb_image.h DESTINATION dist/include)
 
 add_library(spine-sdl-cpp STATIC src/spine-sdl-cpp.cpp src/spine-sdl-cpp.h src/stb_image.h)
-target_link_libraries(spine-sdl-cpp LINK_PUBLIC spine-cpp)
+target_link_libraries(spine-sdl-cpp LINK_PUBLIC SDL2 spine-cpp)
 install(TARGETS spine-sdl-cpp DESTINATION dist/lib)
 install(FILES src/spine-sdl-cpp.h src/stb_image.h DESTINATION dist/include)
 
