@@ -155,6 +155,12 @@ cp -f ../../spine-unity/Assets/Spine\ Examples/Spine\ Skeletons/Raggedy\ Spinebo
 cp -f ../../spine-unity/Assets/Spine\ Examples/Spine\ Skeletons/Raggedy\ Spineboy/Raggedy\ Spineboy.atlas.txt "$ROOT/spine-godot/example-v4/assets/raggedyspineboy/Raggedy Spineboy.atlas"
 cp -f ../../spine-unity/Assets/Spine\ Examples/Spine\ Skeletons/Raggedy\ Spineboy/Raggedy\ Spineboy.png "$ROOT/spine-godot/example-v4/assets/raggedyspineboy/"
 
+echo "spine-sdl"
+rm -f "$ROOT/spine-sdl/data/"*
+cp -f ../spineboy/export/spineboy-pro.json "$ROOT/spine-sdl/data/"
+cp -f ../spineboy/export/spineboy.atlas "$ROOT/spine-sdl/data/"
+cp -f ../spineboy/export/spineboy.png "$ROOT/spine-sdl/data/"
+
 echo "spine-sfml-c"
 rm "$ROOT/spine-sfml/c/data/"*
 cp -f ../coin/export/coin-pro.json "$ROOT/spine-sfml/c/data/"
@@ -382,11 +388,11 @@ UNITY_SOURCE_DIR=../spine-unity
 # and error out otherwise.
 sed="sed"
 if [[ $OSTYPE == 'darwin'* ]]; then
-  if [ ! -f "/usr/local/bin/gsed" ]; then
+  if [ ! -f "/opt/homebrew/bin/gsed" ]; then
 	echo "macOS sed detected. Please install GNU sed via brew install gnu-sed"
 	exit -1
   fi
-  sed="/usr/local/bin/gsed"
+  sed="/opt/homebrew/bin/gsed"
 fi
 
 # Do not delete everything in unity dirs, especially not .meta files.

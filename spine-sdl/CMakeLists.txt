@@ -30,3 +30,12 @@ target_link_libraries(spine-sdl-c-example SDL2 spine-sdl-c)
 
 add_executable(spine-sdl-cpp-example example/main.cpp)
 target_link_libraries(spine-sdl-cpp-example SDL2 spine-sdl-cpp)
+
+# copy data to build directory
+add_custom_command(TARGET spine-sdl-c-example PRE_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_directory
+		${CMAKE_CURRENT_LIST_DIR}/data $<TARGET_FILE_DIR:spine-sdl-c-example>/data)
+
+add_custom_command(TARGET spine-sdl-cpp-example PRE_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_directory
+		${CMAKE_CURRENT_LIST_DIR}/data $<TARGET_FILE_DIR:spine-sdl-cpp-example>/data)

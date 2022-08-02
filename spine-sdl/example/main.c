@@ -46,18 +46,19 @@ int main() {
 		return -1;
 	}
 
-	spAtlas *atlas = spAtlas_createFromFile("/Users/badlogic/workspaces/spine-runtimes/examples/spineboy/export/spineboy.atlas", renderer);
+	spAtlas *atlas = spAtlas_createFromFile("data/spineboy.atlas", renderer);
 	spSkeletonJson *json = spSkeletonJson_create(atlas);
 	json->scale = 0.5f;
-	spSkeletonData *skeletonData = spSkeletonJson_readSkeletonDataFile(json, "/Users/badlogic/workspaces/spine-runtimes/examples/spineboy/export/spineboy-pro.json");
+	spSkeletonData *skeletonData = spSkeletonJson_readSkeletonDataFile(json, "data/spineboy-pro.json");
 	spAnimationStateData *animationStateData = spAnimationStateData_create(skeletonData);
+    animationStateData->defaultMix = 0.2f;
 	spSkeletonDrawable *drawable = spSkeletonDrawable_create(skeletonData, animationStateData);
-
 	drawable->skeleton->x = 400;
 	drawable->skeleton->y = 500;
 	spSkeleton_setToSetupPose(drawable->skeleton);
 	spSkeletonDrawable_update(drawable, 0);
-	spAnimationState_setAnimationByName(drawable->animationState, 0, "run", -1);
+	spAnimationState_setAnimationByName(drawable->animationState, 0, "portal", 0);
+    spAnimationState_addAnimationByName(drawable->animationState, 0, "run", -1, 0);
 
 	int quit = 0;
 	uint64_t lastFrameTime = SDL_GetPerformanceCounter();
