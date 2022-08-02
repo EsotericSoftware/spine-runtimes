@@ -183,6 +183,59 @@ namespace Spine.Unity {
 		#endregion
 
 		#region Overrides
+		// API for taking over rendering.
+		/// <summary>When true, no meshes and materials are assigned at CanvasRenderers if the used override
+		/// AssignMeshOverrideSingleRenderer or AssignMeshOverrideMultipleRenderers is non-null.</summary>
+		public bool disableMeshAssignmentOnOverride = true;
+		/// <summary>Delegate type for overriding mesh and material assignment,
+		/// used when <c>allowMultipleCanvasRenderers</c> is false.</summary>
+		/// <param name="mesh">Mesh normally assigned at the main CanvasRenderer.</param>
+		/// <param name="graphicMaterial">Material normally assigned at the main CanvasRenderer.</param>
+		/// <param name="texture">Texture normally assigned at the main CanvasRenderer.</param>
+		public delegate void MeshAssignmentDelegateSingle (Mesh mesh, Material graphicMaterial, Texture texture);
+		/// <param name="meshCount">Number of meshes. Don't use <c>meshes.Length</c> as this might be higher
+		/// due to pre-allocated entries.</param>
+		/// <param name="meshes">Mesh array where each element is normally assigned to one of the <c>canvasRenderers</c>.</param>
+		/// <param name="graphicMaterials">Material array where each element is normally assigned to one of the <c>canvasRenderers</c>.</param>
+		/// <param name="textures">Texture array where each element is normally assigned to one of the <c>canvasRenderers</c>.</param>
+		public delegate void MeshAssignmentDelegateMultiple (int meshCount, Mesh[] meshes, Material[] graphicMaterials, Texture[] textures);
+		event MeshAssignmentDelegateSingle assignMeshOverrideSingle;
+		event MeshAssignmentDelegateMultiple assignMeshOverrideMultiple;
+
+		/// <summary>Allows separate code to take over mesh and material assignment for this SkeletonGraphic component.
+		/// Used when <c>allowMultipleCanvasRenderers</c> is false.</summary>
+		public event MeshAssignmentDelegateSingle AssignMeshOverrideSingleRenderer {
+			add {
+				assignMeshOverrideSingle += value;
+				if (disableMeshAssignmentOnOverride && assignMeshOverrideSingle != null) {
+					Initialize(false);
+				}
+			}
+			remove {
+				assignMeshOverrideSingle -= value;
+				if (disableMeshAssignmentOnOverride && assignMeshOverrideSingle == null) {
+					Initialize(false);
+				}
+			}
+		}
+		/// <summary>Allows separate code to take over mesh and material assignment for this SkeletonGraphic component.
+		/// Used when <c>allowMultipleCanvasRenderers</c> is true.</summary>
+		public event MeshAssignmentDelegateMultiple AssignMeshOverrideMultipleRenderers {
+			add {
+				assignMeshOverrideMultiple += value;
+				if (disableMeshAssignmentOnOverride && assignMeshOverrideMultiple != null) {
+					Initialize(false);
+				}
+			}
+			remove {
+				assignMeshOverrideMultiple -= value;
+				if (disableMeshAssignmentOnOverride && assignMeshOverrideMultiple == null) {
+					Initialize(false);
+				}
+			}
+		}
+
+
 		[System.NonSerialized] readonly Dictionary<Texture, Texture> customTextureOverride = new Dictionary<Texture, Texture>();
 		/// <summary>Use this Dictionary to override a Texture with a different Texture.</summary>
 		public Dictionary<Texture, Texture> CustomTextureOverride { get { return customTextureOverride; } }
@@ -334,6 +387,8 @@ namespace Spine.Unity {
 			if (updateMode != UpdateMode.FullUpdate) return;
 
 			PrepareInstructionsAndRenderers();
+			if (OnInstructionsPrepared != null)
+				OnInstructionsPrepared(this.currentInstructions);
 			SetVerticesDirty(); // triggers Rebuild and avoids potential double-update in a single frame
 		}
 
@@ -390,13 +445,21 @@ namespace Spine.Unity {
 		public bool IsValid { get { return skeleton != null; } }
 
 		public delegate void SkeletonRendererDelegate (SkeletonGraphic skeletonGraphic);
+		public delegate void InstructionDelegate (SkeletonRendererInstruction instruction);
 
 		/// <summary>OnRebuild is raised after the Skeleton is successfully initialized.</summary>
 		public event SkeletonRendererDelegate OnRebuild;
 
-		/// <summary>OnMeshAndMaterialsUpdated is at the end of LateUpdate after the Mesh and
-		/// all materials have been updated.</summary>
+		/// <summary>OnInstructionsPrepared is raised at the end of <c>LateUpdate</c> after render instructions
+		/// are done, target renderers are prepared, and the mesh is ready to be generated.</summary>
+		public event InstructionDelegate OnInstructionsPrepared;
+
+		/// <summary>OnMeshAndMaterialsUpdated is raised at the end of <c>Rebuild</c> after the Mesh and
+		/// all materials have been updated. Note that some Unity API calls are not permitted to be issued from
+		/// <c>Rebuild</c>, so you may want to subscribe to <see cref="OnInstructionsPrepared"/> instead
+		/// from where you can issue such preparation calls.</summary>
 		public event SkeletonRendererDelegate OnMeshAndMaterialsUpdated;
+		//FIXXME: perform some final checks on documentation and changes, then finalize these changes and commit. then integrate in 4.0_cleanup project as well.
 
 		protected Spine.AnimationState state;
 		public Spine.AnimationState AnimationState {
@@ -411,6 +474,12 @@ namespace Spine.Unity {
 		DoubleBuffered<Spine.Unity.MeshRendererBuffers.SmartMesh> meshBuffers;
 		SkeletonRendererInstruction currentInstructions = new SkeletonRendererInstruction();
 		readonly ExposedList<Mesh> meshes = new ExposedList<Mesh>();
+		readonly ExposedList<Material> usedMaterials = new ExposedList<Material>();
+		readonly ExposedList<Texture> usedTextures = new ExposedList<Texture>();
+
+		public ExposedList<Mesh> MeshesMultipleCanvasRenderers { get { return meshes; } }
+		public ExposedList<Material> MaterialsMultipleCanvasRenderers { get { return usedMaterials; } }
+		public ExposedList<Texture> TexturesMultipleCanvasRenderers { get { return usedTextures; } }
 
 		public Mesh GetLastMesh () {
 			return meshBuffers.GetCurrent().mesh;
@@ -513,6 +582,8 @@ namespace Spine.Unity {
 			for (int i = 0; i < canvasRenderers.Count; ++i)
 				canvasRenderers[i].Clear();
 			DestroyMeshes();
+			usedMaterials.Clear();
+			usedTextures.Clear();
 			DisposeMeshBuffers();
 		}
 
@@ -601,6 +672,7 @@ namespace Spine.Unity {
 				int submeshCount = currentInstructions.submeshInstructions.Count;
 				EnsureCanvasRendererCount(submeshCount);
 				EnsureMeshesCount(submeshCount);
+				EnsureUsedTexturesAndMaterialsCount(submeshCount);
 				EnsureSeparatorPartCount();
 				PrepareRendererGameObjects(currentInstructions);
 			}
@@ -618,6 +690,7 @@ namespace Spine.Unity {
 			if (!this.allowMultipleCanvasRenderers) {
 				UpdateMeshSingleCanvasRenderer(currentInstructions);
 			} else {
+				UpdateMaterialsMultipleCanvasRenderers(currentInstructions);
 				UpdateMeshMultipleCanvasRenderers(currentInstructions);
 			}
 
@@ -675,19 +748,67 @@ namespace Spine.Unity {
 			if (updateTriangles) meshGenerator.FillTriangles(mesh);
 			meshGenerator.FillLateVertexData(mesh);
 
-			canvasRenderer.SetMesh(mesh);
 			smartMesh.instructionUsed.Set(currentInstructions);
+			if (assignMeshOverrideSingle != null)
+				assignMeshOverrideSingle(mesh, this.canvasRenderer.GetMaterial(), this.mainTexture);
+
+			bool assignAtCanvasRenderer = (assignMeshOverrideSingle == null || !disableMeshAssignmentOnOverride);
+			if (assignAtCanvasRenderer)
+				canvasRenderer.SetMesh(mesh);
+			else
+				canvasRenderer.SetMesh(null);
 
 			if (currentInstructions.submeshInstructions.Count > 0) {
 				var material = currentInstructions.submeshInstructions.Items[0].material;
 				if (material != null && baseTexture != material.mainTexture) {
 					baseTexture = material.mainTexture;
-					if (overrideTexture == null)
+					if (overrideTexture == null && assignAtCanvasRenderer)
 						canvasRenderer.SetTexture(this.mainTexture);
 				}
 			}
+		}
 
-			//this.UpdateMaterial(); // note: This would allocate memory.
+		protected void UpdateMaterialsMultipleCanvasRenderers (SkeletonRendererInstruction currentInstructions) {
+			int submeshCount = currentInstructions.submeshInstructions.Count;
+			bool useOriginalTextureAndMaterial = (customMaterialOverride.Count == 0 && customTextureOverride.Count == 0);
+
+			BlendModeMaterials blendModeMaterials = skeletonDataAsset.blendModeMaterials;
+			bool hasBlendModeMaterials = blendModeMaterials.RequiresBlendModeMaterials;
+
+			bool pmaVertexColors = meshGenerator.settings.pmaVertexColors;
+			Material[] usedMaterialItems = usedMaterials.Items;
+			Texture[] usedTextureItems = usedTextures.Items;
+			for (int i = 0; i < submeshCount; i++) {
+				var submeshInstructionItem = currentInstructions.submeshInstructions.Items[i];
+				var submeshMaterial = submeshInstructionItem.material;
+				if (useOriginalTextureAndMaterial) {
+					usedTextureItems[i] = submeshMaterial.mainTexture;
+					if (!hasBlendModeMaterials) {
+						usedMaterialItems[i] = this.materialForRendering;
+					} else {
+						BlendMode blendMode = blendModeMaterials.BlendModeForMaterial(submeshMaterial);
+						Material usedMaterial = this.materialForRendering;
+						if (blendMode == BlendMode.Additive && !pmaVertexColors && additiveMaterial) {
+							usedMaterial = additiveMaterial;
+						} else if (blendMode == BlendMode.Multiply && multiplyMaterial)
+							usedMaterial = multiplyMaterial;
+						else if (blendMode == BlendMode.Screen && screenMaterial)
+							usedMaterial = screenMaterial;
+						usedMaterialItems[i] = submeshGraphics[i].GetModifiedMaterial(usedMaterial);
+					}
+				} else {
+					var originalTexture = submeshMaterial.mainTexture;
+					Material usedMaterial;
+					Texture usedTexture;
+					if (!customMaterialOverride.TryGetValue(originalTexture, out usedMaterial))
+						usedMaterial = material;
+					if (!customTextureOverride.TryGetValue(originalTexture, out usedTexture))
+						usedTexture = originalTexture;
+
+					usedMaterialItems[i] = submeshGraphics[i].GetModifiedMaterial(usedMaterial);
+					usedTextureItems[i] = usedTexture;
+				}
+			}
 		}
 
 		protected void UpdateMeshMultipleCanvasRenderers (SkeletonRendererInstruction currentInstructions) {
@@ -705,6 +826,9 @@ namespace Spine.Unity {
 			bool mainCullTransparentMesh = this.canvasRenderer.cullTransparentMesh;
 #endif
 			bool pmaVertexColors = meshGenerator.settings.pmaVertexColors;
+			Material[] usedMaterialItems = usedMaterials.Items;
+			Texture[] usedTextureItems = usedTextures.Items;
+			bool assignAtCanvasRenderer = (assignMeshOverrideSingle == null || !disableMeshAssignmentOnOverride);
 			for (int i = 0; i < submeshCount; i++) {
 				var submeshInstructionItem = currentInstructions.submeshInstructions.Items[i];
 				meshGenerator.Begin();
@@ -717,53 +841,31 @@ namespace Spine.Unity {
 				meshGenerator.FillTriangles(targetMesh);
 				meshGenerator.FillLateVertexData(targetMesh);
 
-				var submeshMaterial = submeshInstructionItem.material;
 				var canvasRenderer = canvasRenderers[i];
-				canvasRenderer.SetMesh(targetMesh);
-				canvasRenderer.materialCount = 1;
+				if (assignMeshOverrideSingle == null || !disableMeshAssignmentOnOverride)
+					canvasRenderer.SetMesh(targetMesh);
+				else
+					canvasRenderer.SetMesh(null);
 
 				SkeletonSubmeshGraphic submeshGraphic = submeshGraphics[i];
-				if (useOriginalTextureAndMaterial) {
-					Texture usedTexture = submeshMaterial.mainTexture;
-					if (!hasBlendModeMaterials)
-						canvasRenderer.SetMaterial(this.materialForRendering, usedTexture);
-					else {
-						bool allowCullTransparentMesh = true;
-						BlendMode blendMode = blendModeMaterials.BlendModeForMaterial(submeshMaterial);
-						Material usedMaterial = this.materialForRendering;
-						if (blendMode == BlendMode.Normal) {
-							if (submeshInstructionItem.hasPMAAdditiveSlot)
-								allowCullTransparentMesh = false;
-						} else if (blendMode == BlendMode.Additive) {
-							if (pmaVertexColors)
-								allowCullTransparentMesh = false;
-							else if (additiveMaterial)
-								usedMaterial = additiveMaterial;
-						} else if (blendMode == BlendMode.Multiply && multiplyMaterial)
-							usedMaterial = multiplyMaterial;
-						else if (blendMode == BlendMode.Screen && screenMaterial)
-							usedMaterial = screenMaterial;
-
-						usedMaterial = submeshGraphic.GetModifiedMaterial(usedMaterial);
-						canvasRenderer.SetMaterial(usedMaterial, usedTexture);
-#if HAS_CULL_TRANSPARENT_MESH
-						canvasRenderer.cullTransparentMesh = allowCullTransparentMesh ?
-							mainCullTransparentMesh : false;
-#endif
+				if (useOriginalTextureAndMaterial && hasBlendModeMaterials) {
+					bool allowCullTransparentMesh = true;
+					BlendMode materialBlendMode = blendModeMaterials.BlendModeForMaterial(usedMaterialItems[i]);
+					if ((materialBlendMode == BlendMode.Normal && submeshInstructionItem.hasPMAAdditiveSlot) ||
+						(materialBlendMode == BlendMode.Additive && pmaVertexColors)) {
+						allowCullTransparentMesh = false;
 					}
-				} else {
-					var originalTexture = submeshMaterial.mainTexture;
-					Material usedMaterial;
-					Texture usedTexture;
-					if (!customMaterialOverride.TryGetValue(originalTexture, out usedMaterial))
-						usedMaterial = material;
-					if (!customTextureOverride.TryGetValue(originalTexture, out usedTexture))
-						usedTexture = originalTexture;
-
-					usedMaterial = submeshGraphic.GetModifiedMaterial(usedMaterial);
-					canvasRenderer.SetMaterial(usedMaterial, usedTexture);
+#if HAS_CULL_TRANSPARENT_MESH
+					canvasRenderer.cullTransparentMesh = allowCullTransparentMesh ?
+						mainCullTransparentMesh : false;
+#endif
 				}
+				canvasRenderer.materialCount = 1;
+				if (assignAtCanvasRenderer)
+					canvasRenderer.SetMaterial(usedMaterialItems[i], usedTextureItems[i]);
 			}
+			if (assignMeshOverrideMultiple != null)
+				assignMeshOverrideMultiple(submeshCount, meshesItems, usedMaterialItems, usedTextureItems);
 		}
 
 		protected void EnsureCanvasRendererCount (int targetCount) {
@@ -854,6 +956,16 @@ namespace Spine.Unity {
 			meshes.EnsureCapacity(targetCount);
 			for (int i = oldCount; i < targetCount; i++)
 				meshes.Add(SpineMesh.NewSkeletonMesh());
+		}
+
+		protected void EnsureUsedTexturesAndMaterialsCount (int targetCount) {
+			int oldCount = usedMaterials.Count;
+			usedMaterials.EnsureCapacity(targetCount);
+			usedTextures.EnsureCapacity(targetCount);
+			for (int i = oldCount; i < targetCount; i++) {
+				usedMaterials.Add(null);
+				usedTextures.Add(null);
+			}
 		}
 
 		protected void DestroyMeshes () {

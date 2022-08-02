@@ -27,30 +27,32 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#if UNITY_2019_3_OR_NEWER
-#define HAS_FORCE_RENDER_OFF
-#endif
-
-#if UNITY_2018_2_OR_NEWER
-#define HAS_GET_SHARED_MATERIALS
-#endif
-
+using System;
 using UnityEngine;
 using UnityEngine.Rendering;
 
 namespace Spine.Unity.Examples {
 
 	public abstract class SkeletonRenderTextureBase : MonoBehaviour {
-#if HAS_GET_SHARED_MATERIALS
 		public Color color = Color.white;
 		public int maxRenderTextureSize = 1024;
 		public GameObject quad;
 		protected Mesh quadMesh;
 		public RenderTexture renderTexture;
+		public Camera targetCamera;
 
 		protected CommandBuffer commandBuffer;
 		protected Vector2Int requiredRenderTextureSize;
 		protected Vector2Int allocatedRenderTextureSize;
+
+		protected Vector3 worldCornerNoDistortion0;
+		protected Vector3 worldCornerNoDistortion1;
+		protected Vector3 worldCornerNoDistortion2;
+		protected Vector3 worldCornerNoDistortion3;
+		protected Vector2 uvCorner0;
+		protected Vector2 uvCorner1;
+		protected Vector2 uvCorner2;
+		protected Vector2 uvCorner3;
 
 		protected virtual void Awake () {
 			commandBuffer = new CommandBuffer();
@@ -59,6 +61,34 @@ namespace Spine.Unity.Examples {
 		void OnDestroy () {
 			if (renderTexture)
 				RenderTexture.ReleaseTemporary(renderTexture);
+		}
+
+		protected void PrepareTextureMapping (out Vector3 screenSpaceMin, out Vector3 screenSpaceMax,
+			Vector3 screenCorner0, Vector3 screenCorner1, Vector3 screenCorner2, Vector3 screenCorner3) {
+
+			screenSpaceMin =
+				Vector3.Min(screenCorner0, Vector3.Min(screenCorner1,
+				Vector3.Min(screenCorner2, screenCorner3)));
+			screenSpaceMax =
+				Vector3.Max(screenCorner0, Vector3.Max(screenCorner1,
+				Vector3.Max(screenCorner2, screenCorner3)));
+			// ensure we are on whole pixel borders
+			screenSpaceMin.x = Mathf.Floor(screenSpaceMin.x);
+			screenSpaceMin.y = Mathf.Floor(screenSpaceMin.y);
+			screenSpaceMax.x = Mathf.Ceil(screenSpaceMax.x);
+			screenSpaceMax.y = Mathf.Ceil(screenSpaceMax.y);
+
+			// inverse-map screenCornerN to screenSpaceMin/screenSpaceMax area to get UV coordinates
+			uvCorner0 = MathUtilities.InverseLerp(screenSpaceMin, screenSpaceMax, screenCorner0);
+			uvCorner1 = MathUtilities.InverseLerp(screenSpaceMin, screenSpaceMax, screenCorner1);
+			uvCorner2 = MathUtilities.InverseLerp(screenSpaceMin, screenSpaceMax, screenCorner2);
+			uvCorner3 = MathUtilities.InverseLerp(screenSpaceMin, screenSpaceMax, screenCorner3);
+
+			requiredRenderTextureSize = new Vector2Int(
+				Math.Min(maxRenderTextureSize, Math.Abs((int)screenSpaceMax.x - (int)screenSpaceMin.x)),
+				Math.Min(maxRenderTextureSize, Math.Abs((int)screenSpaceMax.y - (int)screenSpaceMin.y)));
+
+			PrepareRenderTexture();
 		}
 
 		protected void PrepareRenderTexture () {
@@ -74,6 +104,44 @@ namespace Spine.Unity.Examples {
 				allocatedRenderTextureSize = textureSize;
 			}
 		}
-#endif
+
+		protected void AssignAtQuad () {
+			Transform quadTransform = quad.transform;
+			quadTransform.position = this.transform.position;
+			quadTransform.rotation = this.transform.rotation;
+			quadTransform.localScale = this.transform.localScale;
+
+			Vector3 v0 = quadTransform.InverseTransformPoint(worldCornerNoDistortion0);
+			Vector3 v1 = quadTransform.InverseTransformPoint(worldCornerNoDistortion1);
+			Vector3 v2 = quadTransform.InverseTransformPoint(worldCornerNoDistortion2);
+			Vector3 v3 = quadTransform.InverseTransformPoint(worldCornerNoDistortion3);
+			Vector3[] vertices = new Vector3[4] { v0, v1, v2, v3 };
+
+			quadMesh.vertices = vertices;
+
+			int[] indices = new int[6] { 0, 1, 2, 2, 1, 3 };
+			quadMesh.triangles = indices;
+
+			Vector3[] normals = new Vector3[4] {
+				-Vector3.forward,
+				-Vector3.forward,
+				-Vector3.forward,
+				-Vector3.forward
+			};
+			quadMesh.normals = normals;
+
+			float maxU = (float)requiredRenderTextureSize.x / (float)allocatedRenderTextureSize.x;
+			float maxV = (float)requiredRenderTextureSize.y / (float)allocatedRenderTextureSize.y;
+			Vector2[] uv = new Vector2[4] {
+				new Vector2(uvCorner0.x * maxU, uvCorner0.y * maxV),
+				new Vector2(uvCorner1.x * maxU, uvCorner1.y * maxV),
+				new Vector2(uvCorner2.x * maxU, uvCorner2.y * maxV),
+				new Vector2(uvCorner3.x * maxU, uvCorner3.y * maxV),
+			};
+			quadMesh.uv = uv;
+			AssignMeshAtRenderer();
+		}
+
+		protected abstract void AssignMeshAtRenderer ();
 	}
 }
