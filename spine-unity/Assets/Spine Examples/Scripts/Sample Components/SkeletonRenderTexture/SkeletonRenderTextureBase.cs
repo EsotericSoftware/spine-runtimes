@@ -31,9 +31,14 @@ using System;
 using UnityEngine;
 using UnityEngine.Rendering;
 
+#if UNITY_2017_2_OR_NEWER
+#define HAS_VECTOR2INT
+#endif
+
 namespace Spine.Unity.Examples {
 
 	public abstract class SkeletonRenderTextureBase : MonoBehaviour {
+#if HAS_VECTOR2INT
 		public Color color = Color.white;
 		public int maxRenderTextureSize = 1024;
 		public GameObject quad;
@@ -143,5 +148,6 @@ namespace Spine.Unity.Examples {
 		}
 
 		protected abstract void AssignMeshAtRenderer ();
+#endif // HAS_VECTOR2INT
 	}
 }

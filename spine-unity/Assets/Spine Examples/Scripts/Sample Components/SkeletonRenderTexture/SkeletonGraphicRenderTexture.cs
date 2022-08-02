@@ -27,6 +27,10 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#if UNITY_2017_2_OR_NEWER
+#define HAS_VECTOR2INT
+#endif
+
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -44,6 +48,7 @@ namespace Spine.Unity.Examples {
 	/// </summary>
 	[RequireComponent(typeof(SkeletonGraphic))]
 	public class SkeletonGraphicRenderTexture : SkeletonRenderTextureBase {
+#if HAS_VECTOR2INT
 		[System.Serializable]
 		public struct TextureMaterialPair {
 			public Texture texture;
@@ -249,5 +254,6 @@ namespace Spine.Unity.Examples {
 		protected override void AssignMeshAtRenderer () {
 			quadCanvasRenderer.SetMesh(quadMesh);
 		}
+#endif // HAS_VECTOR2INT
 	}
 }
