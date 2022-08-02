@@ -31,58 +31,59 @@
 #include <SDL.h>
 
 int main() {
-    if (SDL_Init(SDL_INIT_VIDEO)) {
-        printf("Error: %s", SDL_GetError());
-        return -1;
-    }
-    SDL_Window *window = SDL_CreateWindow("Spine SDL", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600, 0);
-    if (!window) {
-        printf("Error: %s", SDL_GetError());
-        return -1;
-    }
-    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    if (!renderer) {
-        printf("Error: %s", SDL_GetError());
-        return -1;
-    }
+	if (SDL_Init(SDL_INIT_VIDEO)) {
+		printf("Error: %s", SDL_GetError());
+		return -1;
+	}
+	SDL_Window *window = SDL_CreateWindow("Spine SDL", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600, 0);
+	if (!window) {
+		printf("Error: %s", SDL_GetError());
+		return -1;
+	}
+	SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	if (!renderer) {
+		printf("Error: %s", SDL_GetError());
+		return -1;
+	}
 
-    spAtlas *atlas = spAtlas_createFromFile("/Users/badlogic/workspaces/spine-runtimes/examples/spineboy/export/spineboy.atlas", renderer);
-    spSkeletonJson *json = spSkeletonJson_create(atlas);
-    json->scale = 0.5f;
-    spSkeletonData *skeletonData = spSkeletonJson_readSkeletonDataFile(json, "/Users/badlogic/workspaces/spine-runtimes/examples/spineboy/export/spineboy-pro.json");
-    spAnimationStateData *animationStateData = spAnimationStateData_create(skeletonData);
-    spSkeletonDrawable *drawable = spSkeletonDrawable_create(skeletonData, animationStateData);
+	spAtlas *atlas = spAtlas_createFromFile("/Users/badlogic/workspaces/spine-runtimes/examples/spineboy/export/spineboy.atlas", renderer);
+	spSkeletonJson *json = spSkeletonJson_create(atlas);
+	json->scale = 0.5f;
+	spSkeletonData *skeletonData = spSkeletonJson_readSkeletonDataFile(json, "/Users/badlogic/workspaces/spine-runtimes/examples/spineboy/export/spineboy-pro.json");
+	spAnimationStateData *animationStateData = spAnimationStateData_create(skeletonData);
+	spSkeletonDrawable *drawable = spSkeletonDrawable_create(skeletonData, animationStateData);
 
-    drawable->skeleton->x = 400; drawable->skeleton->y = 500;
-    spSkeleton_setToSetupPose(drawable->skeleton);
-    spSkeletonDrawable_update(drawable, 0);
-    spAnimationState_setAnimationByName(drawable->animationState, 0, "run", -1);
+	drawable->skeleton->x = 400;
+	drawable->skeleton->y = 500;
+	spSkeleton_setToSetupPose(drawable->skeleton);
+	spSkeletonDrawable_update(drawable, 0);
+	spAnimationState_setAnimationByName(drawable->animationState, 0, "run", -1);
 
-    int quit = 0;
-    uint64_t lastFrameTime = SDL_GetPerformanceCounter();
-    while (!quit) {
-        SDL_Event event;
-        while (SDL_PollEvent(&event) != 0) {
-            if (event.type == SDL_QUIT) {
-                quit = -1;
-                break;
-            }
-        }
+	int quit = 0;
+	uint64_t lastFrameTime = SDL_GetPerformanceCounter();
+	while (!quit) {
+		SDL_Event event;
+		while (SDL_PollEvent(&event) != 0) {
+			if (event.type == SDL_QUIT) {
+				quit = -1;
+				break;
+			}
+		}
 
-        SDL_SetRenderDrawColor(renderer, 94, 93, 96, 255);
-        SDL_RenderClear(renderer);
+		SDL_SetRenderDrawColor(renderer, 94, 93, 96, 255);
+		SDL_RenderClear(renderer);
 
-        uint64_t now = SDL_GetPerformanceCounter();
-        double deltaTime = (now - lastFrameTime) / (double) SDL_GetPerformanceFrequency();
-        lastFrameTime = now;
+		uint64_t now = SDL_GetPerformanceCounter();
+		double deltaTime = (now - lastFrameTime) / (double) SDL_GetPerformanceFrequency();
+		lastFrameTime = now;
 
-        spSkeletonDrawable_update(drawable, deltaTime);
-        spSkeletonDrawable_draw(drawable, renderer);
+		spSkeletonDrawable_update(drawable, deltaTime);
+		spSkeletonDrawable_draw(drawable, renderer);
 
-        SDL_RenderPresent(renderer);
-    }
+		SDL_RenderPresent(renderer);
+	}
 
-    SDL_DestroyWindow(window);
-    SDL_Quit();
-    return 0;
+	SDL_DestroyWindow(window);
+	SDL_Quit();
+	return 0;
 }

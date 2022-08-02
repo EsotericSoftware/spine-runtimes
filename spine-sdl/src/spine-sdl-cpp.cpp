@@ -58,13 +58,13 @@ void SkeletonDrawable::update(float delta) {
 }
 
 void SkeletonDrawable::draw(SDL_Renderer *renderer) {
-    Vector<unsigned short> quadIndices;
-    quadIndices.add(0);
-    quadIndices.add(1);
-    quadIndices.add(2);
-    quadIndices.add(2);
-    quadIndices.add(3);
-    quadIndices.add(0);
+	Vector<unsigned short> quadIndices;
+	quadIndices.add(0);
+	quadIndices.add(1);
+	quadIndices.add(2);
+	quadIndices.add(2);
+	quadIndices.add(3);
+	quadIndices.add(0);
 	SDL_Texture *texture;
 	SDL_Vertex sdlVertex;
 	for (unsigned i = 0; i < skeleton->getSlots().size(); ++i) {

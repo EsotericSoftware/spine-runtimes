@@ -42,13 +42,13 @@ struct SDL_Vertex;
 _SP_ARRAY_DECLARE_TYPE(spSdlVertexArray, struct SDL_Vertex)
 
 typedef struct spSkeletonDrawable {
-    spSkeleton *skeleton;
-    spAnimationState *animationState;
+	spSkeleton *skeleton;
+	spAnimationState *animationState;
 
-    spSkeletonClipping *clipper;
-    spFloatArray *worldVertices;
-    spSdlVertexArray *sdlVertices;
-    spIntArray *sdlIndices;
+	spSkeletonClipping *clipper;
+	spFloatArray *worldVertices;
+	spSdlVertexArray *sdlVertices;
+	spIntArray *sdlIndices;
 } spSkeletonDrawable;
 
 SP_API spSkeletonDrawable *spSkeletonDrawable_create(spSkeletonData *skeletonData, spAnimationStateData *animationStateData);
