@@ -39,7 +39,7 @@ extern "C" {
 struct SDL_Renderer;
 struct SDL_Texture;
 struct SDL_Vertex;
-_SP_ARRAY_DECLARE_TYPE(spSdlVertexArray, struct SDL_Vertex);
+_SP_ARRAY_DECLARE_TYPE(spSdlVertexArray, struct SDL_Vertex)
 
 typedef struct spSkeletonDrawable {
     spSkeleton *skeleton;

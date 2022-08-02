@@ -36,7 +36,10 @@
 
 #include <stb_image.h>
 
+_SP_ARRAY_IMPLEMENT_TYPE_NO_CONTAINS(spSdlVertexArray, SDL_Vertex)
+
 spSkeletonDrawable *spSkeletonDrawable_create(spSkeletonData *skeletonData, spAnimationStateData *animationStateData) {
+    spBone_setYDown(-1);
     spSkeletonDrawable *self = NEW(spSkeletonDrawable);
     self->skeleton = spSkeleton_create(skeletonData);
     self->animationState = spAnimationState_create(animationStateData);
@@ -69,7 +72,7 @@ void spSkeletonDrawable_draw(spSkeletonDrawable *self, struct SDL_Renderer *rend
     spSkeletonClipping *clipper = self->clipper;
     SDL_Texture *texture;
     SDL_Vertex sdlVertex;
-    for (unsigned i = 0; i < skeleton->slotsCount; ++i) {
+    for (int i = 0; i < skeleton->slotsCount; ++i) {
         spSlot *slot = skeleton->drawOrder[i];
         spAttachment *attachment = slot->attachment;
         if (!attachment) continue;
@@ -100,8 +103,8 @@ void spSkeletonDrawable_draw(spSkeletonDrawable *self, struct SDL_Renderer *rend
             spFloatArray_setSize(vertices, 8);
             spRegionAttachment_computeWorldVertices(region, slot, vertices->items, 0, 2);
             verticesCount = 4;
-            uvs = &region->uvs;
-            indices = &quadIndices;
+            uvs = region->uvs;
+            indices = quadIndices;
             indicesCount = 6;
             texture = (SDL_Texture *) ((spAtlasRegion*)region->rendererObject)->page->rendererObject;
         } else if (attachment->type == SP_ATTACHMENT_MESH) {
@@ -115,7 +118,7 @@ void spSkeletonDrawable_draw(spSkeletonDrawable *self, struct SDL_Renderer *rend
             }
 
             spFloatArray_setSize(vertices, mesh->super.worldVerticesLength);
-            spVertexAttachment_computeWorldVertices(SUPER(mesh), slot, 0, mesh->super.worldVerticesLength, vertices, 0, 2);
+            spVertexAttachment_computeWorldVertices(SUPER(mesh), slot, 0, mesh->super.worldVerticesLength, vertices->items, 0, 2);
             verticesCount = mesh->super.worldVerticesLength >> 1;
             uvs = mesh->uvs;
             indices = mesh->triangles;
@@ -138,8 +141,8 @@ void spSkeletonDrawable_draw(spSkeletonDrawable *self, struct SDL_Renderer *rend
         sdlVertex.color.a = a;
 
         if (spSkeletonClipping_isClipping(clipper)) {
-            spSkeletonClipping_clipTriangles(clipper, vertices, verticesCount << 1, indices, indicesCount, uvs, 2);
-            vertices = clipper->clippedVertices->items;
+            spSkeletonClipping_clipTriangles(clipper, vertices->items, verticesCount << 1, indices, indicesCount, uvs, 2);
+            vertices = clipper->clippedVertices;
             verticesCount = clipper->clippedVertices->size >> 1;
             uvs = clipper->clippedUVs->items;
             indices = clipper->clippedTriangles->items;
@@ -184,7 +187,7 @@ void _spAtlasPage_createTexture(spAtlasPage *self, const char *path) {
     int width, height, components;
     stbi_uc *imageData = stbi_load(path, &width, &height, &components, 4);
     if (!imageData) return;
-    SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STATIC, width,
+    SDL_Texture *texture = SDL_CreateTexture((SDL_Renderer*)self->atlas->rendererObject, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STATIC, width,
                                              height);
     if (!texture) {
         stbi_image_free(imageData);
@@ -195,6 +198,7 @@ void _spAtlasPage_createTexture(spAtlasPage *self, const char *path) {
         return;
     }
     stbi_image_free(imageData);
+    self->rendererObject = texture;
     return;
 }
 
