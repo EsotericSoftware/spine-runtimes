@@ -27,13 +27,13 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using System;
-using UnityEngine;
-using UnityEngine.Rendering;
-
 #if UNITY_2017_2_OR_NEWER
 #define HAS_VECTOR2INT
 #endif
+
+using System;
+using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace Spine.Unity.Examples {
 
