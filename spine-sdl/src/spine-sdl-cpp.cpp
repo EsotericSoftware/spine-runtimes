@@ -43,12 +43,6 @@ SkeletonDrawable::SkeletonDrawable(SkeletonData *skeletonData, AnimationStateDat
 	ownsAnimationStateData = animationStateData == 0;
 	if (ownsAnimationStateData) animationStateData = new (__FILE__, __LINE__) AnimationStateData(skeletonData);
 	animationState = new (__FILE__, __LINE__) AnimationState(animationStateData);
-	quadIndices.add(0);
-	quadIndices.add(1);
-	quadIndices.add(2);
-	quadIndices.add(2);
-	quadIndices.add(3);
-	quadIndices.add(0);
 }
 
 SkeletonDrawable::~SkeletonDrawable() {
@@ -64,6 +58,13 @@ void SkeletonDrawable::update(float delta) {
 }
 
 void SkeletonDrawable::draw(SDL_Renderer *renderer) {
+    Vector<unsigned short> quadIndices;
+    quadIndices.add(0);
+    quadIndices.add(1);
+    quadIndices.add(2);
+    quadIndices.add(2);
+    quadIndices.add(3);
+    quadIndices.add(0);
 	SDL_Texture *texture;
 	SDL_Vertex sdlVertex;
 	for (unsigned i = 0; i < skeleton->getSlots().size(); ++i) {

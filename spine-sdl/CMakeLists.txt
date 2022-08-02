@@ -16,7 +16,7 @@ FetchContent_MakeAvailable(SDL)
 include_directories(src)
 
 add_library(spine-sdl-c STATIC src/spine-sdl-c.c src/spine-sdl-c.h src/stb_image.h)
-target_link_libraries(spine-sdl-c LINK_PUBLIC spine-c)
+target_link_libraries(spine-sdl-c LINK_PUBLIC SDL2 spine-c)
 install(TARGETS spine-sdl-c DESTINATION dist/lib)
 install(FILES src/spine-sdl-c.h src/stb_image.h DESTINATION dist/include)
 

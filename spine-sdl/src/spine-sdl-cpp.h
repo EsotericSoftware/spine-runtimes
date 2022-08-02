@@ -53,7 +53,6 @@ namespace spine {
 		bool ownsAnimationStateData;
 		SkeletonClipping clipper;
 		Vector<float> worldVertices;
-		Vector<unsigned short> quadIndices;
 		Vector<SDL_Vertex> sdlVertices;
 		Vector<int> sdlIndices;
 	};
