@@ -459,7 +459,6 @@ namespace Spine.Unity {
 		/// <c>Rebuild</c>, so you may want to subscribe to <see cref="OnInstructionsPrepared"/> instead
 		/// from where you can issue such preparation calls.</summary>
 		public event SkeletonRendererDelegate OnMeshAndMaterialsUpdated;
-		//FIXXME: perform some final checks on documentation and changes, then finalize these changes and commit. then integrate in 4.0_cleanup project as well.
 
 		protected Spine.AnimationState state;
 		public Spine.AnimationState AnimationState {
