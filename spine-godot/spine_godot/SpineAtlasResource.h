@@ -97,7 +97,11 @@ class SpineAtlasResourceFormatSaver : public ResourceFormatSaver {
 	GDCLASS(SpineAtlasResourceFormatSaver, ResourceFormatSaver)
 
 public:
+#if VERSION_MAJOR > 3
+	Error save(const Ref<Resource> &resource, const String &path, uint32_t p_flags = 0) override;
+#else
 	Error save(const String &path, const RES &resource, uint32_t flags) override;
+#endif
 
 	void get_recognized_extensions(const RES &resource, List<String> *extensions) const override;
 

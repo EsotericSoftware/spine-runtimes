@@ -254,10 +254,15 @@ bool SpineAtlasResourceFormatLoader::handles_type(const String &type) const {
 	return type == "SpineAtlasResource" || ClassDB::is_parent_class(type, "SpineAtlasResource");
 }
 
+#if VERSION_MAJOR > 3
+Error SpineAtlasResourceFormatSaver::save(const Ref<Resource> &resource, const String &path, uint32_t p_flags) {
+#else
 Error SpineAtlasResourceFormatSaver::save(const String &path, const RES &resource, uint32_t flags) {
+#endif
 	Ref<SpineAtlasResource> res = resource;
 	return res->save_to_file(path);
 }
+
 
 void SpineAtlasResourceFormatSaver::get_recognized_extensions(const RES &resource, List<String> *extensions) const {
 	if (Object::cast_to<SpineAtlasResource>(*resource))
