@@ -16,20 +16,22 @@ FetchContent_MakeAvailable(SDL)
 include_directories(src)
 
 add_library(spine-sdl-c STATIC src/spine-sdl-c.c src/spine-sdl-c.h src/stb_image.h)
-target_link_libraries(spine-sdl-c LINK_PUBLIC SDL2 spine-c)
+target_link_libraries(spine-sdl-c LINK_PUBLIC SDL2-static spine-c)
 install(TARGETS spine-sdl-c DESTINATION dist/lib)
 install(FILES src/spine-sdl-c.h src/stb_image.h DESTINATION dist/include)
 
 add_library(spine-sdl-cpp STATIC src/spine-sdl-cpp.cpp src/spine-sdl-cpp.h src/stb_image.h)
-target_link_libraries(spine-sdl-cpp LINK_PUBLIC SDL2 spine-cpp)
+target_link_libraries(spine-sdl-cpp LINK_PUBLIC SDL2-static spine-cpp)
 install(TARGETS spine-sdl-cpp DESTINATION dist/lib)
 install(FILES src/spine-sdl-cpp.h src/stb_image.h DESTINATION dist/include)
 
 add_executable(spine-sdl-c-example example/main.c)
-target_link_libraries(spine-sdl-c-example SDL2 spine-sdl-c)
+target_link_libraries(spine-sdl-c-example SDL2-static spine-sdl-c)
+set_property(TARGET spine-sdl-c-example PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/spine-sdl")
 
 add_executable(spine-sdl-cpp-example example/main.cpp)
-target_link_libraries(spine-sdl-cpp-example SDL2 spine-sdl-cpp)
+target_link_libraries(spine-sdl-cpp-example SDL2-static spine-sdl-cpp)
+set_property(TARGET spine-sdl-cpp-example PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/spine-sdl")
 
 # copy data to build directory
 add_custom_command(TARGET spine-sdl-c-example PRE_BUILD

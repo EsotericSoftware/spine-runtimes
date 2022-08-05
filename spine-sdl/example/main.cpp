@@ -29,8 +29,9 @@
 
 #include <spine-sdl-cpp.h>
 #include <SDL.h>
+#undef main
 
-int main() {
+int main(int argc, char **argv) {
 	if (SDL_Init(SDL_INIT_VIDEO)) {
 		printf("Error: %s", SDL_GetError());
 		return -1;
