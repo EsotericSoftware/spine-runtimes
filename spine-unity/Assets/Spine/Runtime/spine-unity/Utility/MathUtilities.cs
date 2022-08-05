@@ -27,66 +27,45 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#if UNITY_2017_2_OR_NEWER
-#define HAS_VECTOR_INT
-#endif
-
-using System.Collections;
 using UnityEngine;
-using UnityEngine.Events;
 
-namespace Spine.Unity.Examples {
-	public class RenderTextureFadeoutExample : MonoBehaviour {
-
-		public SkeletonRenderTextureFadeout renderTextureFadeout;
-		public SkeletonRenderTextureFadeout renderTextureFadeoutCanvas;
-		public SkeletonRenderer normalSkeletonRenderer;
-
-		float fadeoutSeconds = 2.0f;
-		float fadeoutSecondsRemaining;
-
-		IEnumerator Start () {
-			while (true) {
-				StartFadeoutBad();
-				StartFadeoutGood(renderTextureFadeout);
-				StartFadeoutGood(renderTextureFadeoutCanvas);
-				yield return new WaitForSeconds(fadeoutSeconds + 1.0f);
-			}
-		}
-		void Update () {
-			UpdateBadFadeOutAlpha();
+namespace Spine.Unity {
+	public static class MathUtilities {
+		public static float InverseLerp (float a, float b, float value) {
+			return (value - a) / (b - a);
 		}
 
-		void UpdateBadFadeOutAlpha () {
-			if (fadeoutSecondsRemaining == 0)
-				return;
-
-			fadeoutSecondsRemaining -= Time.deltaTime;
-			if (fadeoutSecondsRemaining <= 0) {
-				fadeoutSecondsRemaining = 0;
-				return;
-			}
-			float fadeoutAlpha = fadeoutSecondsRemaining / fadeoutSeconds;
-
-			// changing transparency at a MeshRenderer does not yield the desired effect
-			// due to overlapping attachment meshes.
-			normalSkeletonRenderer.Skeleton.SetColor(new Color(1, 1, 1, fadeoutAlpha));
+		/// <summary>
+		/// Returns the linear interpolation ratio of <c>a</c> to <c>b</c> that <c>value</c> lies on.
+		/// This is the t value that fulfills <c>value = lerp(a, b, t)</c>.
+		/// </summary>
+		public static Vector2 InverseLerp (Vector2 a, Vector2 b, Vector2 value) {
+			return new Vector2(
+				(value.x - a.x) / (b.x - a.x),
+				(value.y - a.y) / (b.y - a.y));
 		}
 
-		void StartFadeoutBad () {
-			fadeoutSecondsRemaining = fadeoutSeconds;
+		/// <summary>
+		/// Returns the linear interpolation ratio of <c>a</c> to <c>b</c> that <c>value</c> lies on.
+		/// This is the t value that fulfills <c>value = lerp(a, b, t)</c>.
+		/// </summary>
+		public static Vector3 InverseLerp (Vector3 a, Vector3 b, Vector3 value) {
+			return new Vector3(
+				(value.x - a.x) / (b.x - a.x),
+				(value.y - a.y) / (b.y - a.y),
+				(value.z - a.z) / (b.z - a.z));
 		}
 
-		void StartFadeoutGood (SkeletonRenderTextureFadeout fadeoutComponent) {
-			fadeoutComponent.gameObject.SetActive(true);
-			// enabling the SkeletonRenderTextureFadeout component starts the fadeout.
-			fadeoutComponent.enabled = true;
-			fadeoutComponent.OnFadeoutComplete -= DisableGameObject;
-			fadeoutComponent.OnFadeoutComplete += DisableGameObject;
-		}
-
-		void DisableGameObject (SkeletonRenderTextureFadeout target) {
-			target.gameObject.SetActive(false);
+		/// <summary>
+		/// Returns the linear interpolation ratio of <c>a</c> to <c>b</c> that <c>value</c> lies on.
+		/// This is the t value that fulfills <c>value = lerp(a, b, t)</c>.
+		/// </summary>
+		public static Vector4 InverseLerp (Vector4 a, Vector4 b, Vector4 value) {
+			return new Vector4(
+				(value.x - a.x) / (b.x - a.x),
+				(value.y - a.y) / (b.y - a.y),
+				(value.z - a.z) / (b.z - a.z),
+				(value.w - a.w) / (b.w - a.w));
 		}
 	}
 }

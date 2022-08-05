@@ -35,7 +35,6 @@
 #define HAS_GET_SHARED_MATERIALS
 #endif
 
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -54,20 +53,11 @@ namespace Spine.Unity.Examples {
 	public class SkeletonRenderTexture : SkeletonRenderTextureBase {
 #if HAS_GET_SHARED_MATERIALS
 		public Material quadMaterial;
-		public Camera targetCamera;
 		protected SkeletonRenderer skeletonRenderer;
 		protected MeshRenderer meshRenderer;
 		protected MeshFilter meshFilter;
 		protected MeshRenderer quadMeshRenderer;
 		protected MeshFilter quadMeshFilter;
-		protected Vector3 worldCornerNoDistortion0;
-		protected Vector3 worldCornerNoDistortion1;
-		protected Vector3 worldCornerNoDistortion2;
-		protected Vector3 worldCornerNoDistortion3;
-		protected Vector2 uvCorner0;
-		protected Vector2 uvCorner1;
-		protected Vector2 uvCorner2;
-		protected Vector2 uvCorner3;
 
 		private MaterialPropertyBlock propertyBlock;
 		private readonly List<Material> materials = new List<Material>();
@@ -160,40 +150,13 @@ namespace Spine.Unity.Examples {
 			worldCornerNoDistortion2 = targetCamera.ScreenToWorldPoint(screenCorner2);
 			worldCornerNoDistortion3 = targetCamera.ScreenToWorldPoint(screenCorner3);
 
-			Vector3 screenSpaceMin =
-				Vector3.Min(screenCorner0, Vector3.Min(screenCorner1,
-				Vector3.Min(screenCorner2, screenCorner3)));
-			Vector3 screenSpaceMax =
-				Vector3.Max(screenCorner0, Vector3.Max(screenCorner1,
-				Vector3.Max(screenCorner2, screenCorner3)));
-			// ensure we are on whole pixel borders
-			screenSpaceMin.x = Mathf.Floor(screenSpaceMin.x);
-			screenSpaceMin.y = Mathf.Floor(screenSpaceMin.y);
-			screenSpaceMax.x = Mathf.Ceil(screenSpaceMax.x);
-			screenSpaceMax.y = Mathf.Ceil(screenSpaceMax.y);
-
-			// inverse-map screenCornerN to screenSpaceMin/screenSpaceMax area to get UV coordinates
-			uvCorner0 = InverseLerp(screenSpaceMin, screenSpaceMax, screenCorner0);
-			uvCorner1 = InverseLerp(screenSpaceMin, screenSpaceMax, screenCorner1);
-			uvCorner2 = InverseLerp(screenSpaceMin, screenSpaceMax, screenCorner2);
-			uvCorner3 = InverseLerp(screenSpaceMin, screenSpaceMax, screenCorner3);
-
-			requiredRenderTextureSize = new Vector2Int(
-				Math.Min(maxRenderTextureSize, Math.Abs((int)screenSpaceMax.x - (int)screenSpaceMin.x)),
-				Math.Min(maxRenderTextureSize, Math.Abs((int)screenSpaceMax.y - (int)screenSpaceMin.y)));
-
-			PrepareRenderTexture();
+			Vector3 screenSpaceMin, screenSpaceMax;
+			PrepareTextureMapping(out screenSpaceMin, out screenSpaceMax,
+				screenCorner0, screenCorner1, screenCorner2, screenCorner3);
 			PrepareCommandBuffer(targetCamera, screenSpaceMin, screenSpaceMax);
 		}
 
-		protected Vector2 InverseLerp (Vector2 a, Vector2 b, Vector2 value) {
-			return new Vector2(
-				(value.x - a.x) / (b.x - a.x),
-				(value.y - a.y) / (b.y - a.y));
-		}
-
 		protected void PrepareCommandBuffer (Camera targetCamera, Vector3 screenSpaceMin, Vector3 screenSpaceMax) {
-
 			commandBuffer.Clear();
 			commandBuffer.SetRenderTarget(renderTexture);
 			commandBuffer.ClearRenderTarget(true, true, Color.clear);
@@ -214,40 +177,7 @@ namespace Spine.Unity.Examples {
 			Graphics.ExecuteCommandBuffer(commandBuffer);
 		}
 
-		protected void AssignAtQuad () {
-			Transform quadTransform = quadMeshRenderer.transform;
-			quadTransform.position = this.transform.position;
-			quadTransform.rotation = this.transform.rotation;
-			quadTransform.localScale = this.transform.localScale;
-
-			Vector3 v0 = quadTransform.InverseTransformPoint(worldCornerNoDistortion0);
-			Vector3 v1 = quadTransform.InverseTransformPoint(worldCornerNoDistortion1);
-			Vector3 v2 = quadTransform.InverseTransformPoint(worldCornerNoDistortion2);
-			Vector3 v3 = quadTransform.InverseTransformPoint(worldCornerNoDistortion3);
-			Vector3[] vertices = new Vector3[4] { v0, v1, v2, v3 };
-
-			quadMesh.vertices = vertices;
-
-			int[] indices = new int[6] { 0, 2, 1, 2, 3, 1 };
-			quadMesh.triangles = indices;
-
-			Vector3[] normals = new Vector3[4] {
-				-Vector3.forward,
-				-Vector3.forward,
-				-Vector3.forward,
-				-Vector3.forward
-			};
-			quadMesh.normals = normals;
-
-			float maxU = (float)requiredRenderTextureSize.x / (float)allocatedRenderTextureSize.x;
-			float maxV = (float)requiredRenderTextureSize.y / (float)allocatedRenderTextureSize.y;
-			Vector2[] uv = new Vector2[4] {
-				new Vector2(uvCorner0.x * maxU, uvCorner0.y * maxV),
-				new Vector2(uvCorner1.x * maxU, uvCorner1.y * maxV),
-				new Vector2(uvCorner2.x * maxU, uvCorner2.y * maxV),
-				new Vector2(uvCorner3.x * maxU, uvCorner3.y * maxV),
-			};
-			quadMesh.uv = uv;
+		protected override void AssignMeshAtRenderer () {
 			quadMeshFilter.mesh = quadMesh;
 			quadMeshRenderer.sharedMaterial.mainTexture = this.renderTexture;
 			quadMeshRenderer.sharedMaterial.color = color;

@@ -54,11 +54,11 @@ int main(int argc, char **argv) {
 	json.setScale(0.5f);
 	spine::SkeletonData *skeletonData = json.readSkeletonDataFile("data/spineboy-pro.json");
 	spine::SkeletonDrawable drawable(skeletonData);
-    drawable.animationState->getData()->setDefaultMix(0.2f);
+	drawable.animationState->getData()->setDefaultMix(0.2f);
 	drawable.skeleton->setPosition(400, 500);
 	drawable.skeleton->setToSetupPose();
 	drawable.update(0);
-    drawable.animationState->setAnimation(0, "portal", true);
+	drawable.animationState->setAnimation(0, "portal", true);
 	drawable.animationState->addAnimation(0, "run", true, 0);
 
 	bool quit = false;
