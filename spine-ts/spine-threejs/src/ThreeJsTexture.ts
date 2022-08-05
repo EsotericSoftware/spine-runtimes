@@ -35,8 +35,10 @@ export class ThreeJsTexture extends Texture {
 
 	constructor (image: HTMLImageElement | ImageBitmap) {
 		super(image);
-		if (image instanceof ImageBitmap) throw new Error("ImageBitmap not supported.");
-		this.texture = new THREE.Texture(image);
+		if (image instanceof ImageBitmap)
+			this.texture = new THREE.CanvasTexture(image);
+		else
+			this.texture = new THREE.Texture(image);
 		this.texture.flipY = false;
 		this.texture.needsUpdate = true;
 	}

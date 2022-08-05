@@ -316,6 +316,8 @@
   * Added example component `SkeletonRenderTexture` to render a `SkeletonRenderer` to a `RenderTexture`, mainly for proper transparency. Added an example scene named `RenderTexture FadeOut Transparency` that demonstrates usage for a fadeout transparency effect.
   * Added another fadeout example component named `SkeletonRenderTextureFadeout` which takes over transparency fadeout when enabled. You can use this component as-is, attach it in disabled state and enable it to start a fadeout effect.
   * Timeline clips now offer an additional `Alpha` parameter for setting a custom constant mix alpha value other than 1.0, just as `TrackEntry.Alpha`. Defaults to 1.0.
+  * `SkeletonGraphic` now provides additional render callback delegates `OnInstructionsPrepared`, `AssignMeshOverrideSingleRenderer` and `AssignMeshOverrideMultipleRenderers`. `OnInstructionsPrepared` is raised at the end of LateUpdate after render instructions are done, target renderers are prepared, and the mesh is ready to be generated. The two `AssignMeshOverride` delegates allow separate code to take over mesh and material assignment of a `SkeletonGraphic` component.
+  * Added example component `SkeletonGraphicRenderTexture` to render a `SkeletonGraphic` to a `RenderTexture` (similar as `SkeletonRenderTexture`), mainly for proper transparency. Extended example scene `RenderTexture FadeOut Transparency` accordingly.
 
 * **Changes of default values**
 
