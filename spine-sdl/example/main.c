@@ -51,14 +51,14 @@ int main() {
 	json->scale = 0.5f;
 	spSkeletonData *skeletonData = spSkeletonJson_readSkeletonDataFile(json, "data/spineboy-pro.json");
 	spAnimationStateData *animationStateData = spAnimationStateData_create(skeletonData);
-    animationStateData->defaultMix = 0.2f;
+	animationStateData->defaultMix = 0.2f;
 	spSkeletonDrawable *drawable = spSkeletonDrawable_create(skeletonData, animationStateData);
 	drawable->skeleton->x = 400;
 	drawable->skeleton->y = 500;
 	spSkeleton_setToSetupPose(drawable->skeleton);
 	spSkeletonDrawable_update(drawable, 0);
 	spAnimationState_setAnimationByName(drawable->animationState, 0, "portal", 0);
-    spAnimationState_addAnimationByName(drawable->animationState, 0, "run", -1, 0);
+	spAnimationState_addAnimationByName(drawable->animationState, 0, "run", -1, 0);
 
 	int quit = 0;
 	uint64_t lastFrameTime = SDL_GetPerformanceCounter();
