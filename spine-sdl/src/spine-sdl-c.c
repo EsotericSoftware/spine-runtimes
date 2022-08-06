@@ -30,7 +30,6 @@
 #include "spine-sdl-c.h"
 #include <spine/spine.h>
 #include <spine/extension.h>
-#include <SDL.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 
