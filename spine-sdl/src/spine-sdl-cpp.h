@@ -31,9 +31,7 @@
 #define SPINE_SDL
 
 #include <spine/spine.h>
-
-struct SDL_Renderer;
-struct SDL_Vertex;
+#include <SDL.h>
 
 namespace spine {
 	class SkeletonDrawable {

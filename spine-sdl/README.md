@@ -38,9 +38,7 @@ The Spine SFML example works on Windows, Linux and Mac OS X. For a spine-c based
 6. Click `Browse Build` and select the `spine-runtimes/spine-sdl/build` directory. You can create the `build` folder directly in the file dialog via `New Folder`.
 7. Click `Configure`. Then click `Generate`. This will create a Visual Studio solution file called `spine.sln` in `spine-runtimes/spine-sdl/build` and also download the SDL dependencies.
 8. Open the `spine.sln` file in Visual Studio
-9. Right click the `spine-sfml-example` project in the solution explorer and select `Set as Startup Project` from the context menu
-10. Right click the `spine-sfml-example` project in the solution explorer and select `Properties` from the context menu
-11. Select `Debugging` in the left-hand list, then set `Working Directory` to `$(OutputPath)`
+9. Right click the `spine-sdl-example-c` or `spine-sdl-example-cpp` project in the solution explorer and select `Set as Startup Project` from the context menus
 12. Click `Local Windows Debugger` to run the example
 
 The entire example code is contained in [main.cpp](example/main.cpp#L61)
