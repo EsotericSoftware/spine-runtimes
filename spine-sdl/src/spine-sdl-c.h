@@ -32,13 +32,12 @@
 
 #include <spine/spine.h>
 
+#include <SDL.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-struct SDL_Renderer;
-struct SDL_Texture;
-struct SDL_Vertex;
 _SP_ARRAY_DECLARE_TYPE(spSdlVertexArray, struct SDL_Vertex)
 
 typedef struct spSkeletonDrawable {

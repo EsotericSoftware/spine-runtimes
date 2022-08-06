@@ -29,6 +29,7 @@
 
 #include <spine-sdl-c.h>
 #include <SDL.h>
+#undef main
 
 int main() {
 	if (SDL_Init(SDL_INIT_VIDEO)) {
