@@ -42,7 +42,11 @@ Error SpineAtlasResourceImportPlugin::import(const String &source_file, const St
 	atlas->load_from_atlas_file(source_file);
 
 	String file_name = vformat("%s.%s", save_path, get_save_extension());
+#if VERSION_MAJOR > 3
+	auto error = ResourceSaver::save(atlas, file_name);
+#else
 	auto error = ResourceSaver::save(file_name, atlas);
+#endif
 	return error;
 }
 
@@ -70,7 +74,11 @@ Error SpineJsonResourceImportPlugin::import(const String &source_file, const Str
 	skeleton_file_res->load_from_file(source_file);
 
 	String file_name = vformat("%s.%s", save_path, get_save_extension());
+#if VERSION_MAJOR > 3
+	auto error = ResourceSaver::save(skeleton_file_res, file_name);
+#else
 	auto error = ResourceSaver::save(file_name, skeleton_file_res);
+#endif
 	return error;
 }
 
@@ -83,7 +91,11 @@ Error SpineBinaryResourceImportPlugin::import(const String &source_file, const S
 	skeleton_file_res->load_from_file(source_file);
 
 	String file_name = vformat("%s.%s", save_path, get_save_extension());
+#if VERSION_MAJOR > 3
+	auto error = ResourceSaver::save(skeleton_file_res, file_name);
+#else
 	auto error = ResourceSaver::save(file_name, skeleton_file_res);
+#endif
 	return error;
 }
 
@@ -205,7 +217,7 @@ void SpineEditorPropertyAnimationMixes::update_property() {
 		hbox->add_child(delete_button);
 		delete_button->set_text("Remove");
 #if VERSION_MAJOR > 3
-		delete_button->connect("pressed", callable_mp(this, &SpineEditorPropertyAnimationMixes::delete_mix), varray(i));
+		delete_button->connect("pressed", callable_mp(this, &SpineEditorPropertyAnimationMixes::delete_mix), i);
 #else
 		delete_button->connect("pressed", this, "delete_mix", varray(i));
 #endif

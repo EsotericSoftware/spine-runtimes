@@ -844,7 +844,7 @@ void SpineSprite::draw() {
 #if VERSION_MAJOR > 3
 	Rect2 background_rect(0, -default_font->get_height(Font::DEFAULT_FONT_SIZE) - 5, rect_width + 20, line_height * hover_text_lines.size() + 10);
 #else
-Rect2 background_rect(0, -default_font->get_height() - 5, rect_width + 20, line_height * hover_text_lines.size() + 10);
+	Rect2 background_rect(0, -default_font->get_height() - 5, rect_width + 20, line_height * hover_text_lines.size() + 10);
 #endif
 	if (hover_text_lines.size() > 0) draw_rect(background_rect, Color(0, 0, 0, 0.8));
 	for (int i = 0; i < hover_text_lines.size(); i++) {

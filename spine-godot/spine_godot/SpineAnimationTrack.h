@@ -113,11 +113,11 @@ public:
 
 	float get_alpha();
 
-	void set_attachment_threshold(bool _attachment_threshold);
+	void set_attachment_threshold(float _attachment_threshold);
 
 	float get_attachment_threshold();
 
-	void set_draw_order_threshold(bool _draw_order_threshold);
+	void set_draw_order_threshold(float _draw_order_threshold);
 
 	float get_draw_order_threshold();
 

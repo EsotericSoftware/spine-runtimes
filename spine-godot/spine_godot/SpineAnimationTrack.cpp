@@ -487,7 +487,7 @@ float SpineAnimationTrack::get_alpha() {
 	return alpha;
 }
 
-void SpineAnimationTrack::set_attachment_threshold(bool _attachment_threshold) {
+void SpineAnimationTrack::set_attachment_threshold(float _attachment_threshold) {
 	attachment_threshold = _attachment_threshold;
 }
 
@@ -495,7 +495,7 @@ float SpineAnimationTrack::get_attachment_threshold() {
 	return attachment_threshold;
 }
 
-void SpineAnimationTrack::set_draw_order_threshold(bool _draw_order_threshold) {
+void SpineAnimationTrack::set_draw_order_threshold(float _draw_order_threshold) {
 	draw_order_threshold = _draw_order_threshold;
 }
 
