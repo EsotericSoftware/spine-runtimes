@@ -831,12 +831,21 @@ void SpineSprite::draw() {
 	auto global_scale = get_global_scale();
 	draw_set_transform(mouse_position + Vector2(20, 0), -get_global_rotation(), Vector2(inverse_zoom * (1 / global_scale.x), inverse_zoom * (1 / global_scale.y)));
 
+#if VERSION_MAJOR > 3
 	float line_height = default_font->get_height(Font::DEFAULT_FONT_SIZE) + default_font->get_descent(Font::DEFAULT_FONT_SIZE);
+#else
+	float line_height = default_font->get_height() + default_font->get_descent();
+#endif
 	float rect_width = 0;
 	for (int i = 0; i < hover_text_lines.size(); i++) {
 		rect_width = MAX(rect_width, default_font->get_string_size(hover_text_lines[i]).x);
 	}
+
+#if VERSION_MAJOR > 3
 	Rect2 background_rect(0, -default_font->get_height(Font::DEFAULT_FONT_SIZE) - 5, rect_width + 20, line_height * hover_text_lines.size() + 10);
+#else
+Rect2 background_rect(0, -default_font->get_height() - 5, rect_width + 20, line_height * hover_text_lines.size() + 10);
+#endif
 	if (hover_text_lines.size() > 0) draw_rect(background_rect, Color(0, 0, 0, 0.8));
 	for (int i = 0; i < hover_text_lines.size(); i++) {
 #if VERSION_MAJOR > 3
