@@ -22,18 +22,18 @@ spine-godot supports all Spine features, except two-color tinting and the screen
 
 ## Setup
 
-spine-godot works with the latest stable Godot 3.4 release. It requires compilation of Godot, as spine-godot is implemented as a module.
+spine-godot works with the latest stable Godot 3.5 release. It requires compilation of Godot, as spine-godot is implemented as a module.
 
 > *NOTE:* spine-godot also compiles and works against Godot 4.x. However, we currently can not guarantee stability, as Godot 4.x is still heavily in flux.
 
 ### Pre-built Godot editor and export template binaries
 
-We provide prebuilt Godot editor and export template binaries for Godot 3.4.4-stable:
+We provide prebuilt Godot editor and export template binaries for Godot 3.5-stable:
 
-* [Godot Editor Windows](https://spine-godot.s3.eu-central-1.amazonaws.com/4.1/3.4.4-stable/godot-editor-windows.zip)
-* [Godot Editor Linux](https://spine-godot.s3.eu-central-1.amazonaws.com/4.1/3.4.4-stable/godot-editor-linux.zip)
-* [Godot Editor macOS](https://spine-godot.s3.eu-central-1.amazonaws.com/4.1/3.4.4-stable/godot-editor-macos.zip)
-* [Godot export templates for Windows, Linux, macOS, Web, Android, iOS](https://spine-godot.s3.eu-central-1.amazonaws.com/4.1/3.4.4-stable/spine-godot-templates-4.1-3.4.4-stable.tpz)
+* [Godot Editor Windows](https://spine-godot.s3.eu-central-1.amazonaws.com/4.1/3.5-stable/godot-editor-windows.zip)
+* [Godot Editor Linux](https://spine-godot.s3.eu-central-1.amazonaws.com/4.1/3.5-stable/godot-editor-linux.zip)
+* [Godot Editor macOS](https://spine-godot.s3.eu-central-1.amazonaws.com/4.1/3.5-stable/godot-editor-macos.zip)
+* [Godot export templates for Windows, Linux, macOS, Web, Android, iOS](https://spine-godot.s3.eu-central-1.amazonaws.com/4.1/3.5-stable/spine-godot-templates-4.1-3.5-stable.tpz)
 
 ### Building the Godot editor and export templates locally
 
@@ -59,7 +59,7 @@ To build the export template for a specific platform, run the following in a Bas
 
 ```
 cd spine-godot
-./build/setup.sh 3.4.4-stable false
+./build/setup.sh 3.5-stable false
 ./build/build-templates.sh windows
 ```
 
@@ -79,7 +79,7 @@ This repository contains a GitHub workflow in `.github/workflows/spine-godot.yml
 The resulting binaries will be attached as artifacts to a sucessful workflow run.
 
 ## Example
-Sample projects for both Godot 3.4.x and Godot 4.x are provided in the `example/` and `example-v4/` folders respectively. They illustrate all spine-godot functionality and can be opened and exported with the pre-built or custom build Godot editor and export template binaries.
+Sample projects for both Godot 3.5.x and Godot 4.x are provided in the `example/` and `example-v4/` folders respectively. They illustrate all spine-godot functionality and can be opened and exported with the pre-built or custom build Godot editor and export template binaries.
 
 
 

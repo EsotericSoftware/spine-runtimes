@@ -75,7 +75,11 @@ class SpineSkeletonFileResourceFormatSaver : public ResourceFormatSaver {
 	GDCLASS(SpineSkeletonFileResourceFormatSaver, ResourceFormatSaver);
 
 public:
+#if VERSION_MAJOR > 3
+	Error save(const RES &resource, const String &path, uint32_t flags) override;
+#else
 	Error save(const String &path, const RES &resource, uint32_t flags) override;
+#endif
 
 	void get_recognized_extensions(const RES &resource, List<String> *p_extensions) const override;
 

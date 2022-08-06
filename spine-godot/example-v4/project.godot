@@ -12,9 +12,9 @@ config_version=5
 
 config/name="spine-godot-examples"
 run/main_scene="res://examples/08-animation-player/animation-player.tscn"
+config/features=PackedStringArray("4.0")
 run/low_processor_mode=true
 config/icon="res://icon.png"
-config/features=PackedStringArray("4.0")
 
 [global]
 
