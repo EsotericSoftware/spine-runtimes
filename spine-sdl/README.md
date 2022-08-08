@@ -2,6 +2,8 @@
 
 The spine-sdl runtime provides functionality to load, manipulate and render [Spine](http://esotericsoftware.com) skeletal animation data using [SDL](https://www.libsdl.org/). spine-sdl is based on [spine-c](../../spine-c) and [spine-cpp](../spine-cpp), depending on whether you want to use a C or C++ implementation.
 
+# See the [spine-godot documentation](http://esotericsoftware.com/spine-sdl) for in-depth information
+
 ## Licensing
 
 You are welcome to evaluate the Spine Runtimes and the examples we provide in this repository free of charge.
@@ -27,7 +29,7 @@ spine-sdl supports all Spine features except premultiplied alpha, screen blend m
 See the [Spine Runtimes documentation](http://esotericsoftware.com/spine-documentation#runtimesTitle) on how to use the APIs or check out the Spine SDL example in this repository.
 
 ## Example
-The Spine SFML example works on Windows, Linux and Mac OS X. For a spine-c based example, see [example/main.c](example/main.c), for a spine-cpp example see [example/main.cpp](example/main.cpp).
+The Spine SDL example works on Windows, Linux and Mac OS X. For a spine-c based example, see [example/main.c](example/main.c), for a spine-cpp example see [example/main.cpp](example/main.cpp).
 
 ### Windows
 1. Install [Visual Studio Community](https://www.visualstudio.com/en-us/downloads/download-visual-studio-vs.aspx). Make sure you install support for C++ as well as th Windows SDK for XP/7/8.
