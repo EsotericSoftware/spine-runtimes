@@ -1,6 +1,6 @@
 # spine-sdl
 
-The spine-sdl runtime provides functionality to load, manipulate and render [Spine](http://esotericsoftware.com) skeletal animation data using [SDL](https://www.libsdl.org/). spine-sdl is based on [spine-c](../../spine-c) and [spine-cpp](../spine-cpp), depending on whether you want to use a C or C++ implementation.
+The spine-sdl runtime provides functionality to load, manipulate and render [Spine](http://esotericsoftware.com) skeletal animation data using [SDL](https://www.libsdl.org/). spine-sdl is based on [spine-c](../spine-c) and [spine-cpp](../spine-cpp), depending on whether you want to use a C or C++ implementation.
 
 # See the [spine-godot documentation](http://esotericsoftware.com/spine-sdl) for in-depth information
 
