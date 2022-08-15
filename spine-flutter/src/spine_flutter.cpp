@@ -1,16 +1,13 @@
 #include "spine_flutter.h"
 #include <spine/spine.h>
+#include <spine/Version.h>
 
-FFI_PLUGIN_EXPORT intptr_t sum(intptr_t a, intptr_t b) { return a + b; }
+int32_t spine_major_version() {
+    return SPINE_MAJOR_VERSION;
+}
 
-FFI_PLUGIN_EXPORT intptr_t sum_long_running(intptr_t a, intptr_t b) {
-  // Simulate work.
-#if _WIN32
-  Sleep(5000);
-#else
-  usleep(5000 * 1000);
-#endif
-  return a + b;
+int32_t spine_minor_version() {
+    return SPINE_MINOR_VERSION;
 }
 
 spine::SpineExtension *spine::getDefaultExtension() {

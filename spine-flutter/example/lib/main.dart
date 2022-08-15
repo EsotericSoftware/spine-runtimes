@@ -15,14 +15,14 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  late int sumResult;
-  late Future<int> sumAsyncResult;
+  late int majorVersion;
+  late int minorVersion;
 
   @override
   void initState() {
     super.initState();
-    sumResult = spine_flutter.sum(1, 2);
-    sumAsyncResult = spine_flutter.sumAsync(3, 4);
+    majorVersion = spine_flutter.spine_major_version();
+    minorVersion = spine_flutter.spine_minor_version();
   }
 
   @override
@@ -47,23 +47,10 @@ class _MyAppState extends State<MyApp> {
                 ),
                 spacerSmall,
                 Text(
-                  'sum(1, 2) = $sumResult',
+                  'Spine version: $majorVersion.$minorVersion',
                   style: textStyle,
                   textAlign: TextAlign.center,
-                ),
-                spacerSmall,
-                FutureBuilder<int>(
-                  future: sumAsyncResult,
-                  builder: (BuildContext context, AsyncSnapshot<int> value) {
-                    final displayValue =
-                        (value.hasData) ? value.data : 'loading';
-                    return Text(
-                      'await sumAsync(3, 4) = $displayValue',
-                      style: textStyle,
-                      textAlign: TextAlign.center,
-                    );
-                  },
-                ),
+                )
               ],
             ),
           ),
