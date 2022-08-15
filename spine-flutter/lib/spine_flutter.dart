@@ -11,7 +11,7 @@ import 'package:path/path.dart' as Path;
 int majorVersion() => _bindings.spine_major_version();
 int minorVersion() => _bindings.spine_minor_version();
 
-void loadAtlas(AssetBundle assetBundle, String atlasFileName) async {
+Future<Pointer<spine_atlas>> loadAtlas(AssetBundle assetBundle, String atlasFileName) async {
   final atlasData = await assetBundle.loadString(atlasFileName);
   final atlasDataNative = atlasData.toNativeUtf8();
   final atlas = _bindings.spine_atlas_load(atlasDataNative.cast());
@@ -31,7 +31,33 @@ void loadAtlas(AssetBundle assetBundle, String atlasFileName) async {
     atlasPages.add(await Image(image: AssetImage(imagePath)));
   }
 
-  _bindings.spine_atlas_dispose(atlas);
+  return atlas;
+}
+
+Pointer<spine_skeleton_data> loadSkeletonDataJson(Pointer<spine_atlas> atlas, String json) {
+  final jsonNative = json.toNativeUtf8();
+  final skeletonData = _bindings.spine_skeleton_data_load_json(atlas, jsonNative.cast());
+  if (skeletonData.ref.error.address != nullptr.address) {
+    final Pointer<Utf8> error = skeletonData.ref.error.cast();
+    final message = error.toDartString();
+    _bindings.spine_skeleton_data_dispose(skeletonData);
+    throw Exception("Couldn't load skeleton data: " + message);
+  }
+  return skeletonData;
+}
+
+Pointer<spine_skeleton_data> loadSkeletonDataBinary(Pointer<spine_atlas> atlas, ByteData binary) {
+  final Pointer<Uint8> binaryNative = malloc.allocate(binary.lengthInBytes);
+  binaryNative.asTypedList(binary.lengthInBytes).setAll(0, binary.buffer.asUint8List());
+  final skeletonData = _bindings.spine_skeleton_data_load_binary(atlas, binaryNative.cast(), binary.lengthInBytes);
+  malloc.free(binaryNative);
+  if (skeletonData.ref.error.address != nullptr.address) {
+    final Pointer<Utf8> error = skeletonData.ref.error.cast();
+    final message = error.toDartString();
+    _bindings.spine_skeleton_data_dispose(skeletonData);
+    throw Exception("Couldn't load skeleton data: " + message);
+  }
+  return skeletonData;
 }
 
 const String _libName = 'spine_flutter';

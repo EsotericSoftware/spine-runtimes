@@ -72,6 +72,63 @@ class SpineFlutterBindings {
           'spine_atlas_dispose');
   late final _spine_atlas_dispose = _spine_atlas_disposePtr
       .asFunction<void Function(ffi.Pointer<spine_atlas>)>();
+
+  ffi.Pointer<spine_skeleton_data> spine_skeleton_data_load_json(
+    ffi.Pointer<spine_atlas> atlas,
+    ffi.Pointer<ffi.Int8> skeletonData,
+  ) {
+    return _spine_skeleton_data_load_json(
+      atlas,
+      skeletonData,
+    );
+  }
+
+  late final _spine_skeleton_data_load_jsonPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<spine_skeleton_data> Function(ffi.Pointer<spine_atlas>,
+              ffi.Pointer<ffi.Int8>)>>('spine_skeleton_data_load_json');
+  late final _spine_skeleton_data_load_json =
+      _spine_skeleton_data_load_jsonPtr.asFunction<
+          ffi.Pointer<spine_skeleton_data> Function(
+              ffi.Pointer<spine_atlas>, ffi.Pointer<ffi.Int8>)>();
+
+  ffi.Pointer<spine_skeleton_data> spine_skeleton_data_load_binary(
+    ffi.Pointer<spine_atlas> atlas,
+    ffi.Pointer<ffi.Uint8> skeletonData,
+    int length,
+  ) {
+    return _spine_skeleton_data_load_binary(
+      atlas,
+      skeletonData,
+      length,
+    );
+  }
+
+  late final _spine_skeleton_data_load_binaryPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<spine_skeleton_data> Function(
+              ffi.Pointer<spine_atlas>,
+              ffi.Pointer<ffi.Uint8>,
+              ffi.Int32)>>('spine_skeleton_data_load_binary');
+  late final _spine_skeleton_data_load_binary =
+      _spine_skeleton_data_load_binaryPtr.asFunction<
+          ffi.Pointer<spine_skeleton_data> Function(
+              ffi.Pointer<spine_atlas>, ffi.Pointer<ffi.Uint8>, int)>();
+
+  void spine_skeleton_data_dispose(
+    ffi.Pointer<spine_skeleton_data> skeletonData,
+  ) {
+    return _spine_skeleton_data_dispose(
+      skeletonData,
+    );
+  }
+
+  late final _spine_skeleton_data_disposePtr = _lookup<
+          ffi.NativeFunction<
+              ffi.Void Function(ffi.Pointer<spine_skeleton_data>)>>(
+      'spine_skeleton_data_dispose');
+  late final _spine_skeleton_data_dispose = _spine_skeleton_data_disposePtr
+      .asFunction<void Function(ffi.Pointer<spine_skeleton_data>)>();
 }
 
 class spine_atlas extends ffi.Struct {
@@ -81,6 +138,12 @@ class spine_atlas extends ffi.Struct {
 
   @ffi.Int32()
   external int numImagePaths;
+
+  external ffi.Pointer<ffi.Int8> error;
+}
+
+class spine_skeleton_data extends ffi.Struct {
+  external ffi.Pointer<ffi.Void> skeletonData;
 
   external ffi.Pointer<ffi.Int8> error;
 }

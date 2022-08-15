@@ -22,7 +22,14 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     majorVersion = spine_flutter.majorVersion();
     minorVersion = spine_flutter.minorVersion();
-    spine_flutter.loadAtlas(rootBundle, "assets/spineboy.atlas");
+    
+    loadSkeleton();
+  }
+  
+  void loadSkeleton() async {
+    final atlas = await spine_flutter.loadAtlas(rootBundle, "assets/spineboy.atlas");
+    final skeletonData = spine_flutter.loadSkeletonDataJson(atlas, await rootBundle.loadString("assets/spineboy-pro.json"));
+    final skeletonDataBinary = spine_flutter.loadSkeletonDataBinary(atlas, await rootBundle.load("assets/spineboy-pro.skel"));
   }
 
   @override

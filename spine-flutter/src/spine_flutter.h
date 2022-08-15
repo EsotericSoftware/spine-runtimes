@@ -36,3 +36,12 @@ typedef struct spine_atlas {
 FFI_PLUGIN_EXPORT spine_atlas* spine_atlas_load(const char *atlasData);
 FFI_PLUGIN_EXPORT void spine_atlas_dispose(spine_atlas *atlas);
 
+typedef struct spine_skeleton_data {
+    void *skeletonData;
+    char *error;
+} spine_skeleton_data;
+
+FFI_PLUGIN_EXPORT spine_skeleton_data* spine_skeleton_data_load_json(spine_atlas *atlas, const char *skeletonData);
+FFI_PLUGIN_EXPORT spine_skeleton_data* spine_skeleton_data_load_binary(spine_atlas *atlas, const unsigned char *skeletonData, int32_t length);
+FFI_PLUGIN_EXPORT void spine_skeleton_data_dispose(spine_skeleton_data *skeletonData);
+
