@@ -6,4 +6,5 @@ pushd $dir > /dev/null
 # all source files to be under the same folder hierarchy the podspec file resides in.
 cp -r ../spine-cpp/spine-cpp ios/Classes
 cp -r ../spine-cpp/spine-cpp macos/Classes
+cp -r ../spine-cpp/spine-cpp src
 popd
