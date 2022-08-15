@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
-
 import 'package:spine_flutter/spine_flutter.dart' as spine_flutter;
+import 'package:flutter/services.dart' show rootBundle;
 
 void main() {
   runApp(const MyApp());
@@ -21,8 +20,9 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    majorVersion = spine_flutter.spine_major_version();
-    minorVersion = spine_flutter.spine_minor_version();
+    majorVersion = spine_flutter.majorVersion();
+    minorVersion = spine_flutter.minorVersion();
+    spine_flutter.loadAtlas(rootBundle, "assets/spineboy.atlas");
   }
 
   @override
@@ -31,20 +31,12 @@ class _MyAppState extends State<MyApp> {
     const spacerSmall = SizedBox(height: 10);
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Native Packages'),
-        ),
         body: SingleChildScrollView(
           child: Container(
             padding: const EdgeInsets.all(10),
             child: Column(
               children: [
-                const Text(
-                  'This calls a native function through FFI that is shipped as source in the package. '
-                  'The native code is built as part of the Flutter Runner build.',
-                  style: textStyle,
-                  textAlign: TextAlign.center,
-                ),
+                const Image(image: AssetImage("assets/spineboy.png")),
                 spacerSmall,
                 Text(
                   'Spine version: $majorVersion.$minorVersion',

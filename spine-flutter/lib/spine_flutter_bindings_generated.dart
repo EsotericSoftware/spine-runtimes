@@ -43,4 +43,44 @@ class SpineFlutterBindings {
       _lookup<ffi.NativeFunction<ffi.Int32 Function()>>('spine_minor_version');
   late final _spine_minor_version =
       _spine_minor_versionPtr.asFunction<int Function()>();
+
+  ffi.Pointer<spine_atlas> spine_atlas_load(
+    ffi.Pointer<ffi.Int8> atlasData,
+  ) {
+    return _spine_atlas_load(
+      atlasData,
+    );
+  }
+
+  late final _spine_atlas_loadPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<spine_atlas> Function(
+              ffi.Pointer<ffi.Int8>)>>('spine_atlas_load');
+  late final _spine_atlas_load = _spine_atlas_loadPtr
+      .asFunction<ffi.Pointer<spine_atlas> Function(ffi.Pointer<ffi.Int8>)>();
+
+  void spine_atlas_dispose(
+    ffi.Pointer<spine_atlas> atlas,
+  ) {
+    return _spine_atlas_dispose(
+      atlas,
+    );
+  }
+
+  late final _spine_atlas_disposePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<spine_atlas>)>>(
+          'spine_atlas_dispose');
+  late final _spine_atlas_dispose = _spine_atlas_disposePtr
+      .asFunction<void Function(ffi.Pointer<spine_atlas>)>();
+}
+
+class spine_atlas extends ffi.Struct {
+  external ffi.Pointer<ffi.Void> atlas;
+
+  external ffi.Pointer<ffi.Pointer<ffi.Int8>> imagePaths;
+
+  @ffi.Int32()
+  external int numImagePaths;
+
+  external ffi.Pointer<ffi.Int8> error;
 }
