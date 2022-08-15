@@ -180,3 +180,4 @@ spine-ts/spine-ts.zip
 *.d
 spine-flutter/ios/Classes/spine-cpp
 spine-flutter/macos/Classes/spine-cpp
+spine-flutter/src/spine-cpp
