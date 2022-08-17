@@ -33,16 +33,99 @@
 #else
 #include "core/os/file_access.h"
 #endif
+#include <spine/Json.h>
+#include <spine/Version.h>
+#include <spine/Extension.h>
+
+
+struct BinaryInput {
+  const unsigned char *cursor;
+  const unsigned char *end;
+};
+
+static unsigned char readByte(BinaryInput *input) {
+  return *input->cursor++;
+}
+
+static int readVarint(BinaryInput *input, bool optimizePositive) {
+  unsigned char b = readByte(input);
+  int value = b & 0x7F;
+  if (b & 0x80) {
+    b = readByte(input);
+    value |= (b & 0x7F) << 7;
+    if (b & 0x80) {
+      b = readByte(input);
+      value |= (b & 0x7F) << 14;
+      if (b & 0x80) {
+        b = readByte(input);
+        value |= (b & 0x7F) << 21;
+        if (b & 0x80) value |= (readByte(input) & 0x7F) << 28;
+      }
+    }
+  }
+
+  if (!optimizePositive) {
+    value = (((unsigned int) value >> 1) ^ -(value & 1));
+  }
+
+  return value;
+}
+
+static char *readString(BinaryInput *input) {
+  int length = readVarint(input, true);
+  char *string;
+  if (length == 0) {
+    return NULL;
+  }
+  string = spine::SpineExtension::alloc<char>(length, __FILE__, __LINE__);
+  memcpy(string, input->cursor, length - 1);
+  input->cursor += length - 1;
+  string[length - 1] = '\0';
+  return string;
+}
 
 void SpineSkeletonFileResource::_bind_methods() {
 }
 
+static bool checkVersion(const char *version) {
+  if (!version) return false;
+  char *result = (char *) (strstr(version, SPINE_VERSION_STRING) - version);
+  return result == 0;
+}
+
+static bool checkJson(const char *jsonData) {
+  spine::Json json(jsonData);
+  spine::Json *skeleton = spine::Json::getItem(&json, "skeleton");
+  if (!skeleton) return false;
+  const char *version = spine::Json::getString(skeleton, "spine", 0);
+  if (!version) return false;
+
+  return checkVersion(version);
+}
+
+static bool checkBinary(const char *binaryData, int length) {
+  BinaryInput input;
+  input.cursor = (const unsigned char *) binaryData;
+  input.end = (const unsigned char *) binaryData + length;
+  // Skip hash
+  input.cursor += 8;
+  char *version = readString(&input);
+  bool result = checkVersion(version);
+  spine::SpineExtension::free(version, __FILE__, __LINE__);
+  return result;
+}
+
 Error SpineSkeletonFileResource::load_from_file(const String &path) {
-	Error error;
-	if (path.ends_with("spjson"))
-		json = FileAccess::get_file_as_string(path, &error);
-	else
-		binary = FileAccess::get_file_as_array(path, &error);
+	Error error = OK;
+	if (path.ends_with(".spjson") || path.ends_with(".json")) {
+          json = FileAccess::get_file_as_string(path, &error);
+          if (error != OK) return error;
+          if (!checkJson(json.utf8())) return ERR_INVALID_DATA;
+        } else {
+          binary = FileAccess::get_file_as_array(path, &error);
+          if (error != OK) return error;
+          if (!checkBinary((const char*)binary.ptr(), binary.size())) return ERR_INVALID_DATA;
+        }
 	return error;
 }
 
