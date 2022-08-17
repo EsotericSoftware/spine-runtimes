@@ -57,6 +57,8 @@ public:
 #if VERSION_MAJOR > 3
 	int get_import_order() const override { return IMPORT_ORDER_DEFAULT; }
 
+        float get_priority() const override { return 1; }
+
 	void get_import_options(const String &path, List<ImportOption> *options, int preset) const override;
 
 	virtual bool get_option_visibility(const String &path, const String &option, const HashMap<StringName, Variant> &options) const override { return true; }
@@ -92,6 +94,8 @@ public:
 #if VERSION_MAJOR > 3
 	int get_import_order() const override { return IMPORT_ORDER_DEFAULT; }
 
+        float get_priority() const override { return 1; }
+
 	void get_import_options(const String &path, List<ImportOption> *options, int preset) const override {}
 
 	bool get_option_visibility(const String &path, const String &option, const HashMap<StringName, Variant> &options) const override { return true; }
@@ -126,6 +130,8 @@ public:
 
 #if VERSION_MAJOR > 3
 	int get_import_order() const override { return IMPORT_ORDER_DEFAULT; }
+
+        float get_priority() const override { return 1; }
 
 	void get_import_options(const String &path, List<ImportOption> *options, int preset) const override {}
 
