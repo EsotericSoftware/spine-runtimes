@@ -217,7 +217,7 @@ void SpineEditorPropertyAnimationMixes::update_property() {
 		hbox->add_child(delete_button);
 		delete_button->set_text("Remove");
 #if VERSION_MAJOR > 3
-		delete_button->connect("pressed", callable_mp(this, &SpineEditorPropertyAnimationMixes::delete_mix), i);
+		delete_button->connect("pressed", callable_mp(this, &SpineEditorPropertyAnimationMixes::delete_mix).bind(varray(i)));
 #else
 		delete_button->connect("pressed", this, "delete_mix", varray(i));
 #endif
