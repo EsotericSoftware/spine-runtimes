@@ -4,7 +4,7 @@ The spine-sdl runtime provides functionality to load, manipulate and render [Spi
 
 # See the [spine-godot documentation](http://esotericsoftware.com/spine-sdl) for in-depth information
 
-# See the [spine-godot documentation](http://esotericsoftware.com/spine-sdl) for in-depth information
+# See the [spine-sdl documentation](http://esotericsoftware.com/spine-sdl) for in-depth information
 
 ## Licensing
 
