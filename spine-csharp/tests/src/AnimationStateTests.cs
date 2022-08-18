@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated January 1, 2020. Replaces all prior versions.
+ * Last updated September 24, 2021. Replaces all prior versions.
  *
- * Copyright (c) 2013-2020, Esoteric Software LLC
+ * Copyright (c) 2013-2022, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -462,10 +462,10 @@ namespace Spine {
 			state.SetAnimation(0, "events0", true);
 			Run(0.1f, 6, new TestListener(
 				(time) => {
-						if (IsEqual(time, 1.4f)) state.AddAnimation(0, "events1", false, 0).TrackEnd = 1;
+					if (IsEqual(time, 1.4f)) state.AddAnimation(0, "events1", false, 0).TrackEnd = 1;
 				}));
 
-			Setup ("add animation on empty track", // 14
+			Setup("add animation on empty track", // 14
 				Expect(0, "start", 0, 0), //
 				Expect(0, "event 0", 0, 0), //
 				Expect(0, "event 14", 0.5f, 0.5f), //
@@ -715,23 +715,23 @@ namespace Spine {
 
 			Setup("setAnimation during AnimationStateListener"); // 24
 			state.Start += (trackEntry) => {
-					if (trackEntry.Animation.Name.Equals("events0")) state.SetAnimation(1, "events1", false);
-				};
+				if (trackEntry.Animation.Name.Equals("events0")) state.SetAnimation(1, "events1", false);
+			};
 			state.Interrupt += (trackEntry) => {
-					state.AddAnimation(3, "events1", false, 0);
-				};
+				state.AddAnimation(3, "events1", false, 0);
+			};
 			state.End += (trackEntry) => {
-					if (trackEntry.Animation.Name.Equals("events0")) state.SetAnimation(0, "events1", false);
-				};
+				if (trackEntry.Animation.Name.Equals("events0")) state.SetAnimation(0, "events1", false);
+			};
 			state.Dispose += (trackEntry) => {
-					if (trackEntry.Animation.Name.Equals("events0")) state.SetAnimation(1, "events1", false);
-				};
+				if (trackEntry.Animation.Name.Equals("events0")) state.SetAnimation(1, "events1", false);
+			};
 			state.Complete += (trackEntry) => {
-					if (trackEntry.Animation.Name.Equals("events0")) state.SetAnimation(1, "events1", false);
-				};
+				if (trackEntry.Animation.Name.Equals("events0")) state.SetAnimation(1, "events1", false);
+			};
 			state.Event += (trackEntry, ev) => {
-					if (trackEntry.TrackIndex != 2) state.SetAnimation(2, "events1", false);
-				};
+				if (trackEntry.TrackIndex != 2) state.SetAnimation(2, "events1", false);
+			};
 			state.AddAnimation(0, "events0", false, 0);
 			state.AddAnimation(0, "events1", false, 0);
 			state.SetAnimation(1, "events1", false).TrackEnd = 1;
@@ -775,23 +775,23 @@ namespace Spine {
 			int counter = 0;
 			entry = state.AddAnimation(0, "events0", false, 0);
 			entry.Start += (trackEntry) => {
-					Interlocked.Add(ref counter, 1 << 1);
-				};
+				Interlocked.Add(ref counter, 1 << 1);
+			};
 			entry.Interrupt += (trackEntry) => {
-					Interlocked.Add(ref counter, 1 << 5);
-				};
+				Interlocked.Add(ref counter, 1 << 5);
+			};
 			entry.End += (trackEntry) => {
-					Interlocked.Add(ref counter, 1 << 9);
-				};
+				Interlocked.Add(ref counter, 1 << 9);
+			};
 			entry.Dispose += (trackEntry) => {
-					Interlocked.Add(ref counter, 1 << 13);
-				};
+				Interlocked.Add(ref counter, 1 << 13);
+			};
 			entry.Complete += (trackEntry) => {
-					Interlocked.Add(ref counter, 1 << 17);
-				};
+				Interlocked.Add(ref counter, 1 << 17);
+			};
 			entry.Event += (trackEntry, ev) => {
-					Interlocked.Add(ref counter, 1 << 21);
-				};
+				Interlocked.Add(ref counter, 1 << 21);
+			};
 			state.AddAnimation(0, "events0", false, 0);
 			state.AddAnimation(0, "events1", false, 0);
 			state.SetAnimation(1, "events1", false).TrackEnd = 1;
@@ -967,14 +967,14 @@ namespace Spine {
 
 		class TestListener {
 
-			public TestListener(FrameDelegate frame) {
+			public TestListener (FrameDelegate frame) {
 				this.frame = frame;
 			}
 
 			public delegate void FrameDelegate (float time);
 			public event FrameDelegate frame;
 
-			public void Frame(float time) {
+			public void Frame (float time) {
 				frame(time);
 			}
 		}
