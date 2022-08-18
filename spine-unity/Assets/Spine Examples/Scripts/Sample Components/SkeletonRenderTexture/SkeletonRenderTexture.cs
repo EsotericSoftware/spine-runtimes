@@ -79,6 +79,9 @@ namespace Spine.Unity.Examples {
 			quadMeshRenderer = quad.GetComponent<MeshRenderer>();
 			quadMeshFilter = quad.GetComponent<MeshFilter>();
 
+			quadMeshRenderer.sortingOrder = meshRenderer.sortingOrder;
+			quadMeshRenderer.sortingLayerID = meshRenderer.sortingLayerID;
+
 			quadMesh = new Mesh();
 			quadMesh.MarkDynamic();
 			quadMesh.name = "RenderTexture Quad";
