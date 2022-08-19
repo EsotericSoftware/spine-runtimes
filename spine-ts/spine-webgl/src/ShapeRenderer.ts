@@ -184,7 +184,7 @@ export class ShapeRenderer implements Disposable {
 	polygon (polygonVertices: ArrayLike<number>, offset: number, count: number, color?: Color) {
 		if (count < 3) throw new Error("Polygon must contain at least 3 vertices");
 		this.check(ShapeType.Line, count * 2);
-		if (color) color = this.color;
+		if (!color) color = this.color;
 		let vertices = this.mesh.getVertices();
 		let idx = this.vertexIndex;
 
@@ -258,7 +258,7 @@ export class ShapeRenderer implements Disposable {
 
 	curve (x1: number, y1: number, cx1: number, cy1: number, cx2: number, cy2: number, x2: number, y2: number, segments: number, color?: Color) {
 		this.check(ShapeType.Line, segments * 2 + 2);
-		if (color) color = this.color;
+		if (!color) color = this.color;
 
 		// Algorithm from: http://www.antigrain.com/research/bezier_interpolation/index.html#PAGE_BEZIER_INTERPOLATION
 		let subdiv_step = 1 / segments;
