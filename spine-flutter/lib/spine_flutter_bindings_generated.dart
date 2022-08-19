@@ -129,6 +129,76 @@ class SpineFlutterBindings {
       'spine_skeleton_data_dispose');
   late final _spine_skeleton_data_dispose = _spine_skeleton_data_disposePtr
       .asFunction<void Function(ffi.Pointer<spine_skeleton_data>)>();
+
+  ffi.Pointer<spine_skeleton_drawable> spine_skeleton_drawable_create(
+    ffi.Pointer<spine_skeleton_data> skeletonData,
+  ) {
+    return _spine_skeleton_drawable_create(
+      skeletonData,
+    );
+  }
+
+  late final _spine_skeleton_drawable_createPtr = _lookup<
+          ffi.NativeFunction<
+              ffi.Pointer<spine_skeleton_drawable> Function(
+                  ffi.Pointer<spine_skeleton_data>)>>(
+      'spine_skeleton_drawable_create');
+  late final _spine_skeleton_drawable_create =
+      _spine_skeleton_drawable_createPtr.asFunction<
+          ffi.Pointer<spine_skeleton_drawable> Function(
+              ffi.Pointer<spine_skeleton_data>)>();
+
+  void spine_skeleton_drawable_update(
+    ffi.Pointer<spine_skeleton_drawable> drawable,
+    double deltaTime,
+  ) {
+    return _spine_skeleton_drawable_update(
+      drawable,
+      deltaTime,
+    );
+  }
+
+  late final _spine_skeleton_drawable_updatePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(ffi.Pointer<spine_skeleton_drawable>,
+              ffi.Float)>>('spine_skeleton_drawable_update');
+  late final _spine_skeleton_drawable_update =
+      _spine_skeleton_drawable_updatePtr.asFunction<
+          void Function(ffi.Pointer<spine_skeleton_drawable>, double)>();
+
+  ffi.Pointer<spine_render_command> spine_skeleton_drawable_render(
+    ffi.Pointer<spine_skeleton_drawable> drawable,
+  ) {
+    return _spine_skeleton_drawable_render(
+      drawable,
+    );
+  }
+
+  late final _spine_skeleton_drawable_renderPtr = _lookup<
+          ffi.NativeFunction<
+              ffi.Pointer<spine_render_command> Function(
+                  ffi.Pointer<spine_skeleton_drawable>)>>(
+      'spine_skeleton_drawable_render');
+  late final _spine_skeleton_drawable_render =
+      _spine_skeleton_drawable_renderPtr.asFunction<
+          ffi.Pointer<spine_render_command> Function(
+              ffi.Pointer<spine_skeleton_drawable>)>();
+
+  void spine_skeleton_drawable_dispose(
+    ffi.Pointer<spine_skeleton_drawable> drawable,
+  ) {
+    return _spine_skeleton_drawable_dispose(
+      drawable,
+    );
+  }
+
+  late final _spine_skeleton_drawable_disposePtr = _lookup<
+          ffi.NativeFunction<
+              ffi.Void Function(ffi.Pointer<spine_skeleton_drawable>)>>(
+      'spine_skeleton_drawable_dispose');
+  late final _spine_skeleton_drawable_dispose =
+      _spine_skeleton_drawable_disposePtr
+          .asFunction<void Function(ffi.Pointer<spine_skeleton_drawable>)>();
 }
 
 class spine_atlas extends ffi.Struct {
@@ -146,4 +216,43 @@ class spine_skeleton_data extends ffi.Struct {
   external ffi.Pointer<ffi.Void> skeletonData;
 
   external ffi.Pointer<ffi.Int8> error;
+}
+
+abstract class spine_blend_mode {
+  static const int SPINE_BLEND_MODE_NORMAL = 0;
+  static const int SPINE_BLEND_MODE_ADDITIVE = 1;
+  static const int SPINE_BLEND_MODE_MULTIPLY = 2;
+  static const int SPINE_BLEND_MODE_SCREEN = 3;
+}
+
+class spine_render_command extends ffi.Struct {
+  external ffi.Pointer<ffi.Float> positions;
+
+  external ffi.Pointer<ffi.Float> uvs;
+
+  external ffi.Pointer<ffi.Int32> colors;
+
+  @ffi.Int32()
+  external int numVertices;
+
+  external ffi.Pointer<ffi.Uint16> indices;
+
+  @ffi.Int32()
+  external int numIndices;
+
+  @ffi.Int32()
+  external int atlasPage;
+
+  @ffi.Int32()
+  external int blendMode;
+
+  external ffi.Pointer<spine_render_command> next;
+}
+
+class spine_skeleton_drawable extends ffi.Struct {
+  external ffi.Pointer<ffi.Void> skeleton;
+
+  external ffi.Pointer<ffi.Void> animationState;
+
+  external ffi.Pointer<spine_render_command> renderCommand;
 }

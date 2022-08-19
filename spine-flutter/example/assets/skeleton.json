@@ -1,0 +1,40 @@
+{
+  "skeleton": {
+    "hash": "EzIWQLMq9sw",
+    "spine": "4.1.08",
+    "x": -92,
+    "y": -97,
+    "width": 184,
+    "height": 194,
+    "images": "",
+    "audio": ""
+  },
+  "bones": [
+    {
+      "name": "root"
+    }
+  ],
+  "slots": [
+    {
+      "name": "image",
+      "bone": "root",
+      "attachment": "Screenshot 2022-08-19 at 13.45.53"
+    }
+  ],
+  "skins": [
+    {
+      "name": "default",
+      "attachments": {
+        "image": {
+          "Screenshot 2022-08-19 at 13.45.53": {
+            "width": 184,
+            "height": 194
+          }
+        }
+      }
+    }
+  ],
+  "animations": {
+    "animation": {}
+  }
+}

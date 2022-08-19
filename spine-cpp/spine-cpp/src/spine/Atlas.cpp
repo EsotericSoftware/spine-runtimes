@@ -286,6 +286,7 @@ void Atlas::load(const char *begin, int length, const char *dir, bool createText
 			} else {
 				page->texturePath = String(path, true);
 			}
+            page->index = _pages.size();
 			_pages.add(page);
 		} else {
 			AtlasRegion *region = new (__FILE__, __LINE__) AtlasRegion();

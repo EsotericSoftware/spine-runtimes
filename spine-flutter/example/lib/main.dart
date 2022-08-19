@@ -27,9 +27,13 @@ class _MyAppState extends State<MyApp> {
   }
   
   void loadSkeleton() async {
-    final atlas = await spine_flutter.loadAtlas(rootBundle, "assets/spineboy.atlas");
-    final skeletonData = spine_flutter.loadSkeletonDataJson(atlas, await rootBundle.loadString("assets/spineboy-pro.json"));
-    final skeletonDataBinary = spine_flutter.loadSkeletonDataBinary(atlas, await rootBundle.load("assets/spineboy-pro.skel"));
+    final atlas = await spine_flutter.loadAtlas(rootBundle, "assets/skeleton.atlas");
+    final skeletonData = spine_flutter.loadSkeletonDataJson(atlas, await rootBundle.loadString("assets/skeleton.json"));
+    // final skeletonDataBinary = spine_flutter.loadSkeletonDataBinary(atlas, await rootBundle.load("assets/spineboy-pro.skel"));
+    final skeletonDrawable = spine_flutter.createSkeletonDrawable(skeletonData);
+    spine_flutter.updateSkeletonDrawable(skeletonDrawable, 0.016);
+    final renderCommands = spine_flutter.renderSkeletonDrawable(skeletonDrawable);
+    print(renderCommands[0].vertices);
   }
 
   @override

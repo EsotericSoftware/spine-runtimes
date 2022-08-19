@@ -1,6 +1,8 @@
 
 import 'dart:ffi';
 import 'dart:io';
+import 'dart:typed_data';
+import 'dart:ui';
 import 'package:ffi/ffi.dart';
 
 import 'package:flutter/services.dart';
@@ -58,6 +60,46 @@ Pointer<spine_skeleton_data> loadSkeletonDataBinary(Pointer<spine_atlas> atlas, 
     throw Exception("Couldn't load skeleton data: " + message);
   }
   return skeletonData;
+}
+
+Pointer<spine_skeleton_drawable> createSkeletonDrawable(Pointer<spine_skeleton_data> skeletonData) {
+  return _bindings.spine_skeleton_drawable_create(skeletonData);
+}
+
+void updateSkeletonDrawable(Pointer<spine_skeleton_drawable> drawable, double deltaTime) {
+  _bindings.spine_skeleton_drawable_update(drawable, deltaTime);
+}
+
+class RenderCommand {
+  late Vertices vertices;
+  late int atlasPageIndex;
+  RenderCommand? next;
+
+  RenderCommand(Pointer<spine_render_command> nativeCmd) {
+    atlasPageIndex = nativeCmd.ref.atlasPage;
+    int numVertices = nativeCmd.ref.numVertices;
+    int numIndices = nativeCmd.ref.numIndices;
+    // We pass the native data as views directly to Vertices.raw. According to the sources, the data
+    // is copied, so it doesn't matter that we free up the underlying memory on the next
+    // render call. See the implementation of Vertices.raw() here:
+    // https://github.com/flutter/engine/blob/5c60785b802ad2c8b8899608d949342d5c624952/lib/ui/painting/vertices.cc#L21
+    vertices = Vertices.raw(VertexMode.triangles,
+        nativeCmd.ref.positions.asTypedList(numVertices * 2),
+        textureCoordinates: nativeCmd.ref.uvs.asTypedList(numVertices * 2),
+        colors: nativeCmd.ref.colors.asTypedList(numVertices),
+        indices: nativeCmd.ref.indices.asTypedList(numIndices));
+  }
+}
+
+List<RenderCommand> renderSkeletonDrawable(Pointer<spine_skeleton_drawable> drawable) {
+  Pointer<spine_render_command> nativeCmd = _bindings.spine_skeleton_drawable_render(drawable);
+  List<RenderCommand> commands = [];
+  while(nativeCmd.address != nullptr.address) {
+    commands.add(RenderCommand(nativeCmd));
+    nativeCmd = nativeCmd.ref.next;
+  }
+  return commands;
+
 }
 
 const String _libName = 'spine_flutter';

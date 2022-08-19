@@ -45,3 +45,33 @@ FFI_PLUGIN_EXPORT spine_skeleton_data* spine_skeleton_data_load_json(spine_atlas
 FFI_PLUGIN_EXPORT spine_skeleton_data* spine_skeleton_data_load_binary(spine_atlas *atlas, const unsigned char *skeletonData, int32_t length);
 FFI_PLUGIN_EXPORT void spine_skeleton_data_dispose(spine_skeleton_data *skeletonData);
 
+typedef enum spine_blend_mode {
+    SPINE_BLEND_MODE_NORMAL = 0,
+    SPINE_BLEND_MODE_ADDITIVE,
+    SPINE_BLEND_MODE_MULTIPLY,
+    SPINE_BLEND_MODE_SCREEN
+} spine_blend_mode;
+
+typedef struct spine_render_command {
+    float *positions;
+    float *uvs;
+    int32_t *colors;
+    int32_t numVertices;
+    uint16_t *indices;
+    int32_t numIndices;
+    int32_t atlasPage;
+    spine_blend_mode blendMode;
+    struct spine_render_command *next;
+} spine_render_command;
+
+typedef struct spine_skeleton_drawable {
+    void *skeleton;
+    void *animationState;
+    spine_render_command *renderCommand;
+} spine_skeleton_drawable;
+
+FFI_PLUGIN_EXPORT spine_skeleton_drawable *spine_skeleton_drawable_create(spine_skeleton_data *skeletonData);
+FFI_PLUGIN_EXPORT void spine_skeleton_drawable_update(spine_skeleton_drawable *drawable, float deltaTime);
+FFI_PLUGIN_EXPORT spine_render_command *spine_skeleton_drawable_render(spine_skeleton_drawable *drawable);
+FFI_PLUGIN_EXPORT void spine_skeleton_drawable_dispose(spine_skeleton_drawable *drawable);
+
