@@ -51,6 +51,8 @@ export class GLTexture extends Texture implements Disposable, Restorable {
 		this.bind();
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, minFilter);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, GLTexture.validateMagFilter(magFilter));
+		this.useMipMaps = GLTexture.usesMipMaps(minFilter);
+		if (this.useMipMaps) gl.generateMipmap(gl.TEXTURE_2D);
 	}
 
 	static validateMagFilter (magFilter: TextureFilter) {
@@ -63,6 +65,19 @@ export class GLTexture extends Texture implements Disposable, Restorable {
 				return TextureFilter.Linear;
 			default:
 				return magFilter;
+		}
+	}
+
+	static usesMipMaps(filter: TextureFilter) {
+		switch (filter) {
+			case TextureFilter.MipMap:
+			case TextureFilter.MipMapLinearLinear:
+			case TextureFilter.MipMapLinearNearest:
+			case TextureFilter.MipMapNearestLinear:
+			case TextureFilter.MipMapNearestNearest:
+				return true;
+			default:
+				return false;
 		}
 	}
 
