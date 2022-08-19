@@ -1,6 +1,6 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated January 1, 2020. Replaces all prior versions.
+ * Last updated September 24, 2021. Replaces all prior versions.
  *
  * Copyright (c) 2013-2022, Esoteric Software LLC
  *
@@ -78,6 +78,9 @@ namespace Spine.Unity.Examples {
 			quad.transform.SetParent(this.transform.parent, false);
 			quadMeshRenderer = quad.GetComponent<MeshRenderer>();
 			quadMeshFilter = quad.GetComponent<MeshFilter>();
+
+			quadMeshRenderer.sortingOrder = meshRenderer.sortingOrder;
+			quadMeshRenderer.sortingLayerID = meshRenderer.sortingLayerID;
 
 			quadMesh = new Mesh();
 			quadMesh.MarkDynamic();
