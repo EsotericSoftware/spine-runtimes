@@ -1,12 +1,11 @@
-
 import 'dart:ffi';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui';
 import 'package:ffi/ffi.dart';
+import 'package:flutter/rendering.dart';
 
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'spine_flutter_bindings_generated.dart';
 import 'package:path/path.dart' as Path;
 
@@ -16,8 +15,9 @@ int minorVersion() => _bindings.spine_minor_version();
 class SpineAtlas {
   Pointer<spine_atlas> _atlas;
   List<Image> _atlasPages;
+  List<Paint> atlasPagePaints;
 
-  SpineAtlas(this._atlas, this._atlasPages);
+  SpineAtlas(this._atlas, this._atlasPages, this.atlasPagePaints);
 
   static Future<SpineAtlas> fromAsset(AssetBundle assetBundle, String atlasFileName) async {
     final atlasData = await assetBundle.loadString(atlasFileName);
@@ -33,13 +33,19 @@ class SpineAtlas {
 
     final atlasDir = Path.dirname(atlasFileName);
     List<Image> atlasPages = [];
+    List<Paint> atlasPagePaints = [];
     for (int i = 0; i < atlas.ref.numImagePaths; i++) {
       final Pointer<Utf8> atlasPageFile = atlas.ref.imagePaths[i].cast();
       final imagePath = Path.join(atlasDir, atlasPageFile.toDartString());
-      atlasPages.add(Image(image: AssetImage(imagePath)));
+      var imageData = await assetBundle.load(imagePath);
+      final Codec codec = await instantiateImageCodec(imageData.buffer.asUint8List());
+      final FrameInfo frameInfo = await codec.getNextFrame();
+      final Image image = frameInfo.image;
+      atlasPages.add(image);
+      atlasPagePaints.add(Paint()..shader = ImageShader(image, TileMode.clamp, TileMode.clamp, Matrix4.identity().storage));
     }
 
-    return SpineAtlas(atlas, atlasPages);
+    return SpineAtlas(atlas, atlasPages, atlasPagePaints);
   }
 }
 
@@ -92,7 +98,8 @@ class SpineSkeletonDrawable {
     Pointer<spine_render_command> nativeCmd = _bindings.spine_skeleton_drawable_render(_drawable);
     List<SpineRenderCommand> commands = [];
     while(nativeCmd.address != nullptr.address) {
-      commands.add(SpineRenderCommand(nativeCmd));
+      final atlasPage = atlas._atlasPages[nativeCmd.ref.atlasPage];
+      commands.add(SpineRenderCommand(nativeCmd, atlasPage.width.toDouble(), atlasPage.height.toDouble()));
       nativeCmd = nativeCmd.ref.next;
     }
     return commands;
@@ -103,19 +110,28 @@ class SpineRenderCommand {
   late Vertices vertices;
   late int atlasPageIndex;
 
-  SpineRenderCommand(Pointer<spine_render_command> nativeCmd) {
+  SpineRenderCommand(Pointer<spine_render_command> nativeCmd, double pageWidth, double pageHeight) {
     atlasPageIndex = nativeCmd.ref.atlasPage;
     int numVertices = nativeCmd.ref.numVertices;
     int numIndices = nativeCmd.ref.numIndices;
+    final positions = Float32List.fromList(nativeCmd.ref.positions.asTypedList(numVertices * 2));
+    final uvs = Float32List.fromList(nativeCmd.ref.uvs.asTypedList(numVertices * 2));
+    final colors = Int32List.fromList(nativeCmd.ref.colors.asTypedList(numVertices));
+    final indices = Uint16List.fromList(nativeCmd.ref.indices.asTypedList(numIndices));
+    for (int i = 0; i < numVertices * 2; i += 2) {
+      uvs[i] *= pageWidth;
+      uvs[i+1] *= pageHeight;
+    }
     // We pass the native data as views directly to Vertices.raw. According to the sources, the data
     // is copied, so it doesn't matter that we free up the underlying memory on the next
     // render call. See the implementation of Vertices.raw() here:
     // https://github.com/flutter/engine/blob/5c60785b802ad2c8b8899608d949342d5c624952/lib/ui/painting/vertices.cc#L21
     vertices = Vertices.raw(VertexMode.triangles,
-        nativeCmd.ref.positions.asTypedList(numVertices * 2),
-        textureCoordinates: nativeCmd.ref.uvs.asTypedList(numVertices * 2),
-        colors: nativeCmd.ref.colors.asTypedList(numVertices),
-        indices: nativeCmd.ref.indices.asTypedList(numIndices));
+        positions,
+        textureCoordinates: uvs,
+        colors: colors,
+        indices: indices
+    );
   }
 }
 

@@ -7,21 +7,66 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
+class SpineWidget extends StatefulWidget {
+  final String skeletonFile;
+  final String atlasFile;
+
+  const SpineWidget(this.skeletonFile, this.atlasFile, {super.key});
 
   @override
-  _MyAppState createState() => _MyAppState();
+  State<SpineWidget> createState() => _SpineWidgetState();
 }
 
-class SpinePainter extends CustomPainter {
+class _SpineWidgetState extends State<SpineWidget> {
+  spine_flutter.SpineSkeletonDrawable? skeletonDrawable;
+
+  @override
+  void initState() {
+    super.initState();
+    loadSkeleton(widget.skeletonFile, widget.atlasFile);
+  }
+
+  void loadSkeleton(String skeletonFile, String atlasFile) async {
+    final atlas = await spine_flutter.SpineAtlas.fromAsset(rootBundle, atlasFile);
+    final skeletonData = skeletonFile.endsWith(".json") ?
+    spine_flutter.SpineSkeletonData.fromJson(atlas, await rootBundle.loadString(skeletonFile))
+        : spine_flutter.SpineSkeletonData.fromBinary(atlas, await rootBundle.load(skeletonFile));
+    skeletonDrawable = spine_flutter.SpineSkeletonDrawable(atlas, skeletonData);
+    skeletonDrawable?.update(0.016);
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (skeletonDrawable != null) {
+      print("Skeleton loaded, creating painter");
+      return CustomPaint(
+          painter: _SpinePainter(this),
+          child: Container()
+      );
+    } else {
+      print("Skeleton not loaded yet");
+      return Container();
+    }
+  }
+}
+
+class _SpinePainter extends CustomPainter {
+  final _SpineWidgetState state;
+
+  _SpinePainter(this.state);
+
   @override
   void paint(Canvas canvas, Size size) {
-    var paint = Paint()
-      ..color = Colors.teal
-      ..strokeWidth = 5
-      ..strokeCap = StrokeCap.round;
-    canvas.drawLine(Offset(0, 0), Offset(size.width, size.height), paint);
+    print("painting");
+    final drawable = state.skeletonDrawable;
+    if (drawable == null) return;
+    final commands = drawable.render();
+    canvas.translate(size.width / 2, size.height);
+    for (final cmd in commands) {
+      canvas.drawVertices(cmd.vertices, BlendMode.srcOut, Paint()..color = Colors.white); //drawable.atlas.atlasPagePaints[cmd.atlasPageIndex]);
+    }
+    canvas.drawLine(Offset(0, 0), Offset(size.width, size.height), Paint()..color = Colors.blue);
   }
 
   @override
@@ -30,32 +75,11 @@ class SpinePainter extends CustomPainter {
   }
 }
 
-class SpineWidget extends StatelessWidget {
-  String skeletonFile;
-  String atlasFile;
-  late spine_flutter.SpineSkeletonDrawable skeletonDrawable;
-
-  SpineWidget(this.skeletonFile, this.atlasFile) {
-    loadSkeleton();
-  }
-
-  void loadSkeleton() async {
-    final atlas = await spine_flutter.SpineAtlas.fromAsset(rootBundle, atlasFile);
-    final skeletonData = skeletonFile.endsWith(".json") ?
-      spine_flutter.SpineSkeletonData.fromJson(atlas, await rootBundle.loadString(skeletonFile))
-    : spine_flutter.SpineSkeletonData.fromBinary(atlas, await rootBundle.load(skeletonFile));
-    skeletonDrawable = spine_flutter.SpineSkeletonDrawable(atlas, skeletonData);
-    skeletonDrawable.update(0.016);
-    print("Loaded skeleton");
-  }
+class MyApp extends StatefulWidget {
+  const MyApp({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-        painter: SpinePainter(),
-        child: Container()
-      );
-  }
+  _MyAppState createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
@@ -68,8 +92,8 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     const textStyle = TextStyle(fontSize: 25);
     const spacerSmall = SizedBox(height: 10);
-    return MaterialApp(
-      home: SpineWidget("assets/skeleton.json", "assets/skeleton.atlas")
+    return const MaterialApp(
+      home: SpineWidget("assets/spineboy-pro.json", "assets/spineboy.atlas")
     );
   }
 }

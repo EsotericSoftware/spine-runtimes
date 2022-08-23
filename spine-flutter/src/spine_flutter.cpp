@@ -37,6 +37,7 @@ FFI_PLUGIN_EXPORT void spine_atlas_dispose(spine_atlas *atlas) {
 }
 
 FFI_PLUGIN_EXPORT spine_skeleton_data *spine_skeleton_data_load_json(spine_atlas *atlas, const char *skeletonData) {
+    Bone::setYDown(true);
     if (!atlas) return nullptr;
     if (!atlas->atlas) return nullptr;
     if (!skeletonData) return nullptr;
@@ -51,6 +52,7 @@ FFI_PLUGIN_EXPORT spine_skeleton_data *spine_skeleton_data_load_json(spine_atlas
 }
 
 FFI_PLUGIN_EXPORT spine_skeleton_data* spine_skeleton_data_load_binary(spine_atlas *atlas, const unsigned char *skeletonData, int32_t length) {
+    Bone::setYDown(true);
     if (!atlas) return nullptr;
     if (!atlas->atlas) return nullptr;
     if (!skeletonData) return nullptr;
@@ -76,6 +78,7 @@ FFI_PLUGIN_EXPORT spine_skeleton_drawable *spine_skeleton_drawable_create(spine_
     spine_skeleton_drawable *drawable = SpineExtension::calloc<spine_skeleton_drawable>(1, __FILE__, __LINE__);
     drawable->skeleton = new Skeleton((SkeletonData*)skeletonData->skeletonData);
     drawable->animationState = new AnimationState(new AnimationStateData((SkeletonData*)skeletonData->skeletonData));
+    drawable->clipping = new SkeletonClipping();
     return drawable;
 }
 
@@ -83,6 +86,7 @@ FFI_PLUGIN_EXPORT void spine_skeleton_drawable_update(spine_skeleton_drawable *d
     if (!drawable) return;
     if (!drawable->skeleton) return;
     if (!drawable->animationState) return;
+    if (!drawable->clipping) return;
 
     Skeleton *skeleton = (Skeleton*)drawable->skeleton;
     AnimationState *animationState = (AnimationState*)drawable->animationState;
@@ -132,7 +136,7 @@ FFI_PLUGIN_EXPORT spine_render_command *spine_skeleton_drawable_render(spine_ske
     quadIndices.add(3);
     quadIndices.add(0);
     Vector<float> worldVertices;
-    SkeletonClipping clipper;
+    SkeletonClipping &clipper = *(SkeletonClipping*)drawable->clipping;
     Skeleton *skeleton = (Skeleton*)drawable->skeleton;
     spine_render_command *lastCommand = nullptr;
 
@@ -238,6 +242,7 @@ FFI_PLUGIN_EXPORT void spine_skeleton_drawable_dispose(spine_skeleton_drawable *
     if (!drawable) return;
     if (drawable->skeleton) delete (Skeleton*)drawable->skeleton;
     if (drawable->animationState) delete (AnimationState*)drawable->animationState;
+    if (drawable->clipping) delete (SkeletonClipping*)drawable->clipping;
     while (drawable->renderCommand) {
         spine_render_command *cmd = drawable->renderCommand;
         drawable->renderCommand = cmd->next;

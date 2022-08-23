@@ -67,6 +67,7 @@ typedef struct spine_render_command {
 typedef struct spine_skeleton_drawable {
     void *skeleton;
     void *animationState;
+    void *clipping;
     spine_render_command *renderCommand;
 } spine_skeleton_drawable;
 
