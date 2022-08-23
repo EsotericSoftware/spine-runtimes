@@ -39,7 +39,7 @@ class _SpineWidgetState extends State<SpineWidget> {
   @override
   Widget build(BuildContext context) {
     if (skeletonDrawable != null) {
-      print("Skeleton loaded, creating painter");
+      print("Skeleton loaded, rebuilding painter");
       return CustomPaint(
           painter: _SpinePainter(this),
           child: Container()
@@ -62,11 +62,15 @@ class _SpinePainter extends CustomPainter {
     final drawable = state.skeletonDrawable;
     if (drawable == null) return;
     final commands = drawable.render();
+    canvas.save();
     canvas.translate(size.width / 2, size.height);
     for (final cmd in commands) {
-      canvas.drawVertices(cmd.vertices, BlendMode.srcOut, Paint()..color = Colors.white); //drawable.atlas.atlasPagePaints[cmd.atlasPageIndex]);
+      canvas.drawVertices(cmd.vertices, BlendMode.srcOut, drawable.atlas.atlasPagePaints[cmd.atlasPageIndex]);
     }
-    canvas.drawLine(Offset(0, 0), Offset(size.width, size.height), Paint()..color = Colors.blue);
+    canvas.restore();
+    canvas.drawLine(Offset(0, 0), Offset(size.width, size.height), Paint()
+      ..color = Colors.blue
+      ..strokeWidth = 4);
   }
 
   @override

@@ -97,8 +97,8 @@ FFI_PLUGIN_EXPORT void spine_skeleton_drawable_update(spine_skeleton_drawable *d
 
 spine_render_command *spine_render_command_create(int32_t numVertices, int32_t numIndices, spine_blend_mode blendMode, int pageIndex) {
     spine_render_command *cmd = SpineExtension::alloc<spine_render_command>(1, __FILE__, __LINE__);
-    cmd->positions = SpineExtension::alloc<float>(numVertices * 2, __FILE__, __LINE__);
-    cmd->uvs = SpineExtension::alloc<float>(numVertices * 2, __FILE__, __LINE__);
+    cmd->positions = SpineExtension::alloc<float>(numVertices << 1, __FILE__, __LINE__);
+    cmd->uvs = SpineExtension::alloc<float>(numVertices << 1, __FILE__, __LINE__);
     cmd->colors = SpineExtension::alloc<int32_t>(numVertices, __FILE__, __LINE__);
     cmd->numVertices = numVertices;
     cmd->indices = SpineExtension::alloc<uint16_t>(numIndices, __FILE__, __LINE__);
@@ -219,8 +219,8 @@ FFI_PLUGIN_EXPORT spine_render_command *spine_skeleton_drawable_render(spine_ske
 
         spine_render_command *cmd = spine_render_command_create(verticesCount, indicesCount, (spine_blend_mode)slot.getData().getBlendMode(), pageIndex);
 
-        memcpy(cmd->positions, vertices->buffer(), (verticesCount << 2) * sizeof(float));
-        memcpy(cmd->uvs, uvs->buffer(), (verticesCount << 2) * sizeof(float));
+        memcpy(cmd->positions, vertices->buffer(), (verticesCount << 1) * sizeof(float));
+        memcpy(cmd->uvs, uvs->buffer(), (verticesCount << 1) * sizeof(float));
         for (int ii = 0; ii < verticesCount; ii++) cmd->colors[ii] = color;
         memcpy(cmd->indices, indices->buffer(), indices->size() * sizeof(uint16_t));
 
