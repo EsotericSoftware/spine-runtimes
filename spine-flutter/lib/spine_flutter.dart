@@ -14,10 +14,10 @@ int minorVersion() => _bindings.spine_minor_version();
 
 class SpineAtlas {
   Pointer<spine_atlas> _atlas;
-  List<Image> _atlasPages;
+  List<Image> atlasPages;
   List<Paint> atlasPagePaints;
 
-  SpineAtlas(this._atlas, this._atlasPages, this.atlasPagePaints);
+  SpineAtlas(this._atlas, this.atlasPages, this.atlasPagePaints);
 
   static Future<SpineAtlas> fromAsset(AssetBundle assetBundle, String atlasFileName) async {
     final atlasData = await assetBundle.loadString(atlasFileName);
@@ -42,7 +42,10 @@ class SpineAtlas {
       final FrameInfo frameInfo = await codec.getNextFrame();
       final Image image = frameInfo.image;
       atlasPages.add(image);
-      atlasPagePaints.add(Paint()..shader = ImageShader(image, TileMode.clamp, TileMode.clamp, Matrix4.identity().storage));
+      atlasPagePaints.add(Paint()
+        ..shader = ImageShader(image, TileMode.clamp, TileMode.clamp, Matrix4.identity().storage, filterQuality: FilterQuality.high)
+        ..isAntiAlias = true
+      );
     }
 
     return SpineAtlas(atlas, atlasPages, atlasPagePaints);
@@ -98,7 +101,7 @@ class SpineSkeletonDrawable {
     Pointer<spine_render_command> nativeCmd = _bindings.spine_skeleton_drawable_render(_drawable);
     List<SpineRenderCommand> commands = [];
     while(nativeCmd.address != nullptr.address) {
-      final atlasPage = atlas._atlasPages[nativeCmd.ref.atlasPage];
+      final atlasPage = atlas.atlasPages[nativeCmd.ref.atlasPage];
       commands.add(SpineRenderCommand(nativeCmd, atlasPage.width.toDouble(), atlasPage.height.toDouble()));
       nativeCmd = nativeCmd.ref.next;
     }
@@ -114,10 +117,7 @@ class SpineRenderCommand {
     atlasPageIndex = nativeCmd.ref.atlasPage;
     int numVertices = nativeCmd.ref.numVertices;
     int numIndices = nativeCmd.ref.numIndices;
-    final positions = Float32List.fromList(nativeCmd.ref.positions.asTypedList(numVertices * 2));
-    final uvs = Float32List.fromList(nativeCmd.ref.uvs.asTypedList(numVertices * 2));
-    final colors = Int32List.fromList(nativeCmd.ref.colors.asTypedList(numVertices));
-    final indices = Uint16List.fromList(nativeCmd.ref.indices.asTypedList(numIndices));
+    final uvs = nativeCmd.ref.uvs.asTypedList(numVertices * 2);
     for (int i = 0; i < numVertices * 2; i += 2) {
       uvs[i] *= pageWidth;
       uvs[i+1] *= pageHeight;
@@ -127,10 +127,10 @@ class SpineRenderCommand {
     // render call. See the implementation of Vertices.raw() here:
     // https://github.com/flutter/engine/blob/5c60785b802ad2c8b8899608d949342d5c624952/lib/ui/painting/vertices.cc#L21
     vertices = Vertices.raw(VertexMode.triangles,
-        positions,
+        nativeCmd.ref.positions.asTypedList(numVertices * 2),
         textureCoordinates: uvs,
-        colors: colors,
-        indices: indices
+        colors: nativeCmd.ref.colors.asTypedList(numVertices),
+        indices: nativeCmd.ref.indices.asTypedList(numIndices)
     );
   }
 }

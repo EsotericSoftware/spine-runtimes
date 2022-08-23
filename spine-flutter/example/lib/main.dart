@@ -65,12 +65,9 @@ class _SpinePainter extends CustomPainter {
     canvas.save();
     canvas.translate(size.width / 2, size.height);
     for (final cmd in commands) {
-      canvas.drawVertices(cmd.vertices, BlendMode.srcOut, drawable.atlas.atlasPagePaints[cmd.atlasPageIndex]);
+      canvas.drawVertices(cmd.vertices, BlendMode.modulate, drawable.atlas.atlasPagePaints[cmd.atlasPageIndex]);
     }
     canvas.restore();
-    canvas.drawLine(Offset(0, 0), Offset(size.width, size.height), Paint()
-      ..color = Colors.blue
-      ..strokeWidth = 4);
   }
 
   @override
