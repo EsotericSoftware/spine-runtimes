@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:spine_flutter/spine_flutter.dart' as spine_flutter;
 import 'package:flutter/services.dart' show rootBundle;
-import 'package:spine_flutter/spine_flutter_bindings_generated.dart';
+import 'package:spine_flutter/spine_flutter.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,7 +20,7 @@ class SpineWidget extends StatefulWidget {
 }
 
 class _SpineWidgetState extends State<SpineWidget> {
-  spine_flutter.SpineSkeletonDrawable? skeletonDrawable;
+  SpineSkeletonDrawable? skeletonDrawable;
 
   @override
   void initState() {
@@ -40,39 +42,93 @@ class _SpineWidgetState extends State<SpineWidget> {
   Widget build(BuildContext context) {
     if (skeletonDrawable != null) {
       print("Skeleton loaded, rebuilding painter");
-      return CustomPaint(
-          painter: _SpinePainter(this),
-          child: Container()
-      );
+      return _SpineRenderObjectWidget(skeletonDrawable!);
     } else {
       print("Skeleton not loaded yet");
-      return Container();
+      return SizedBox();
     }
   }
 }
 
-class _SpinePainter extends CustomPainter {
-  final _SpineWidgetState state;
-
-  _SpinePainter(this.state);
+class _SpineRenderObjectWidget extends LeafRenderObjectWidget {
+  final SpineSkeletonDrawable skeletonDrawable;
+  _SpineRenderObjectWidget(this.skeletonDrawable);
 
   @override
-  void paint(Canvas canvas, Size size) {
-    print("painting");
-    final drawable = state.skeletonDrawable;
-    if (drawable == null) return;
-    final commands = drawable.render();
-    canvas.save();
-    canvas.translate(size.width / 2, size.height);
-    for (final cmd in commands) {
-      canvas.drawVertices(cmd.vertices, BlendMode.modulate, drawable.atlas.atlasPagePaints[cmd.atlasPageIndex]);
-    }
-    canvas.restore();
+  RenderObject createRenderObject(BuildContext context) {
+    return _SpineRenderObject(skeletonDrawable);
   }
 
   @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    return false;
+  void updateRenderObject(BuildContext context, covariant _SpineRenderObject renderObject) {
+    renderObject.skeletonDrawable = skeletonDrawable;
+  }
+}
+
+class _SpineRenderObject extends RenderBox {
+  SpineSkeletonDrawable _skeletonDrawable;
+  double _deltaTime = 0;
+  final Stopwatch _stopwatch = Stopwatch();
+
+  _SpineRenderObject(this._skeletonDrawable);
+
+  set skeletonDrawable(SpineSkeletonDrawable skeletonDrawable) {
+    if (_skeletonDrawable == skeletonDrawable) return;
+
+    // FIXME dispose old drawable here?
+    _skeletonDrawable = skeletonDrawable;
+    markNeedsPaint();
+  }
+
+  @override
+  bool get sizedByParent => true;
+
+  @override
+  bool get isRepaintBoundary => true;
+
+  @override
+  bool hitTestSelf(Offset position) => true;
+
+  @override
+  void performResize() {
+    size = constraints.biggest;
+  }
+
+  @override
+  void attach(PipelineOwner owner) {
+    super.attach(owner);
+    _stopwatch.start();
+  }
+
+  @override
+  void detach() {
+    _stopwatch.stop();
+    super.detach();
+  }
+
+  void _beginFrame(Duration duration) {
+    _deltaTime = _stopwatch.elapsedTicks / _stopwatch.frequency;
+    _stopwatch.reset();
+    _stopwatch.start();
+    markNeedsPaint();
+  }
+
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    print("painting");
+    final Canvas canvas = context.canvas
+      ..save()
+      ..clipRect(offset & size);
+
+    final commands = _skeletonDrawable.render();
+    canvas.save();
+    canvas.translate(offset.dx, offset.dy);
+    for (final cmd in commands) {
+      canvas.drawVertices(cmd.vertices, BlendMode.modulate, _skeletonDrawable.atlas.atlasPagePaints[cmd.atlasPageIndex]);
+    }
+
+    canvas.restore();
+    SchedulerBinding.instance.scheduleFrameCallback(_beginFrame);
   }
 }
 
@@ -91,8 +147,6 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    const textStyle = TextStyle(fontSize: 25);
-    const spacerSmall = SizedBox(height: 10);
     return const MaterialApp(
       home: SpineWidget("assets/spineboy-pro.json", "assets/spineboy.atlas")
     );
