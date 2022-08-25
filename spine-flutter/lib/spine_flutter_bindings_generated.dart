@@ -44,6 +44,15 @@ class SpineFlutterBindings {
   late final _spine_minor_version =
       _spine_minor_versionPtr.asFunction<int Function()>();
 
+  void spine_report_leaks() {
+    return _spine_report_leaks();
+  }
+
+  late final _spine_report_leaksPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function()>>('spine_report_leaks');
+  late final _spine_report_leaks =
+      _spine_report_leaksPtr.asFunction<void Function()>();
+
   ffi.Pointer<spine_atlas> spine_atlas_load(
     ffi.Pointer<ffi.Int8> atlasData,
   ) {
@@ -253,6 +262,8 @@ class spine_skeleton_drawable extends ffi.Struct {
   external ffi.Pointer<ffi.Void> skeleton;
 
   external ffi.Pointer<ffi.Void> animationState;
+
+  external ffi.Pointer<ffi.Void> clipping;
 
   external ffi.Pointer<spine_render_command> renderCommand;
 }

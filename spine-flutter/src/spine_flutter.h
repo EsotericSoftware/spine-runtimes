@@ -25,6 +25,7 @@
 
 FFI_PLUGIN_EXPORT int32_t spine_major_version();
 FFI_PLUGIN_EXPORT int32_t spine_minor_version();
+FFI_PLUGIN_EXPORT void spine_report_leaks();
 
 typedef struct spine_atlas {
     void *atlas;

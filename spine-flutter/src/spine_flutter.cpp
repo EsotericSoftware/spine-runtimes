@@ -1,6 +1,7 @@
 #include "spine_flutter.h"
 #include <spine/spine.h>
 #include <spine/Version.h>
+#include <spine/Debug.h>
 
 using namespace spine;
 
@@ -26,6 +27,10 @@ FFI_PLUGIN_EXPORT spine_atlas* spine_atlas_load(const char *atlasData) {
     return result;
 }
 
+void spine_report_leaks() {
+    ((DebugExtension*)spine::SpineExtension::getInstance())->reportLeaks();
+}
+
 FFI_PLUGIN_EXPORT void spine_atlas_dispose(spine_atlas *atlas) {
     if (!atlas) return;
     if (atlas->atlas) delete (Atlas*)atlas->atlas;
@@ -33,6 +38,7 @@ FFI_PLUGIN_EXPORT void spine_atlas_dispose(spine_atlas *atlas) {
     for (int i = 0; i < atlas->numImagePaths; i++) {
         free(atlas->imagePaths[i]);
     }
+    SpineExtension::free(atlas->imagePaths, __FILE__, __LINE__);
     SpineExtension::free(atlas, __FILE__, __LINE__);
 }
 
@@ -74,27 +80,6 @@ FFI_PLUGIN_EXPORT void spine_skeleton_data_dispose(spine_skeleton_data *skeleton
     SpineExtension::free(skeletonData, __FILE__, __LINE__);
 }
 
-FFI_PLUGIN_EXPORT spine_skeleton_drawable *spine_skeleton_drawable_create(spine_skeleton_data *skeletonData) {
-    spine_skeleton_drawable *drawable = SpineExtension::calloc<spine_skeleton_drawable>(1, __FILE__, __LINE__);
-    drawable->skeleton = new Skeleton((SkeletonData*)skeletonData->skeletonData);
-    drawable->animationState = new AnimationState(new AnimationStateData((SkeletonData*)skeletonData->skeletonData));
-    drawable->clipping = new SkeletonClipping();
-    return drawable;
-}
-
-FFI_PLUGIN_EXPORT void spine_skeleton_drawable_update(spine_skeleton_drawable *drawable, float deltaTime) {
-    if (!drawable) return;
-    if (!drawable->skeleton) return;
-    if (!drawable->animationState) return;
-    if (!drawable->clipping) return;
-
-    Skeleton *skeleton = (Skeleton*)drawable->skeleton;
-    AnimationState *animationState = (AnimationState*)drawable->animationState;
-    animationState->update(deltaTime);
-    animationState->apply(*skeleton);
-    skeleton->updateWorldTransform();
-}
-
 spine_render_command *spine_render_command_create(int32_t numVertices, int32_t numIndices, spine_blend_mode blendMode, int pageIndex) {
     spine_render_command *cmd = SpineExtension::alloc<spine_render_command>(1, __FILE__, __LINE__);
     cmd->positions = SpineExtension::alloc<float>(numVertices << 1, __FILE__, __LINE__);
@@ -116,6 +101,44 @@ void spine_render_command_dispose(spine_render_command *cmd) {
     if (cmd->colors) SpineExtension::free(cmd->colors, __FILE__, __LINE__);
     if (cmd->indices) SpineExtension::free(cmd->indices, __FILE__, __LINE__);
     SpineExtension::free(cmd, __FILE__, __LINE__);
+}
+
+FFI_PLUGIN_EXPORT spine_skeleton_drawable *spine_skeleton_drawable_create(spine_skeleton_data *skeletonData) {
+    spine_skeleton_drawable *drawable = SpineExtension::calloc<spine_skeleton_drawable>(1, __FILE__, __LINE__);
+    drawable->skeleton = new Skeleton((SkeletonData*)skeletonData->skeletonData);
+    drawable->animationState = new AnimationState(new AnimationStateData((SkeletonData*)skeletonData->skeletonData));
+    drawable->clipping = new SkeletonClipping();
+    return drawable;
+}
+
+FFI_PLUGIN_EXPORT void spine_skeleton_drawable_dispose(spine_skeleton_drawable *drawable) {
+    if (!drawable) return;
+    if (drawable->skeleton) delete (Skeleton*)drawable->skeleton;
+    if (drawable->animationState) {
+        AnimationState *state = (AnimationState*)drawable->animationState;
+        delete state->getData();
+        delete (AnimationState*)state;
+    }
+    if (drawable->clipping) delete (SkeletonClipping*)drawable->clipping;
+    while (drawable->renderCommand) {
+        spine_render_command *cmd = drawable->renderCommand;
+        drawable->renderCommand = cmd->next;
+        spine_render_command_dispose(cmd);
+    }
+    SpineExtension::free(drawable, __FILE__, __LINE__);
+}
+
+FFI_PLUGIN_EXPORT void spine_skeleton_drawable_update(spine_skeleton_drawable *drawable, float deltaTime) {
+    if (!drawable) return;
+    if (!drawable->skeleton) return;
+    if (!drawable->animationState) return;
+    if (!drawable->clipping) return;
+
+    Skeleton *skeleton = (Skeleton*)drawable->skeleton;
+    AnimationState *animationState = (AnimationState*)drawable->animationState;
+    animationState->update(deltaTime);
+    animationState->apply(*skeleton);
+    skeleton->updateWorldTransform();
 }
 
 FFI_PLUGIN_EXPORT spine_render_command *spine_skeleton_drawable_render(spine_skeleton_drawable *drawable) {
@@ -238,19 +261,6 @@ FFI_PLUGIN_EXPORT spine_render_command *spine_skeleton_drawable_render(spine_ske
     return drawable->renderCommand;
 }
 
-FFI_PLUGIN_EXPORT void spine_skeleton_drawable_dispose(spine_skeleton_drawable *drawable) {
-    if (!drawable) return;
-    if (drawable->skeleton) delete (Skeleton*)drawable->skeleton;
-    if (drawable->animationState) delete (AnimationState*)drawable->animationState;
-    if (drawable->clipping) delete (SkeletonClipping*)drawable->clipping;
-    while (drawable->renderCommand) {
-        spine_render_command *cmd = drawable->renderCommand;
-        drawable->renderCommand = cmd->next;
-        spine_render_command_dispose(cmd);
-    }
-    SpineExtension::free(drawable, __FILE__, __LINE__);
-}
-
 spine::SpineExtension *spine::getDefaultExtension() {
-   return new spine::DefaultSpineExtension();
+   return new spine::DebugExtension(new spine::DefaultSpineExtension());
 }

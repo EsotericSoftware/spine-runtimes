@@ -12,13 +12,15 @@ import 'package:path/path.dart' as Path;
 
 int majorVersion() => _bindings.spine_major_version();
 int minorVersion() => _bindings.spine_minor_version();
+void reportLeaks() => _bindings.spine_report_leaks();
 
 class SpineAtlas {
   Pointer<spine_atlas> _atlas;
   List<Image> atlasPages;
   List<Paint> atlasPagePaints;
+  bool _disposed;
 
-  SpineAtlas(this._atlas, this.atlasPages, this.atlasPagePaints);
+  SpineAtlas(this._atlas, this.atlasPages, this.atlasPagePaints): _disposed = false;
 
   static Future<SpineAtlas> fromAsset(AssetBundle assetBundle, String atlasFileName) async {
     final atlasData = await assetBundle.loadString(atlasFileName);
@@ -51,12 +53,20 @@ class SpineAtlas {
 
     return SpineAtlas(atlas, atlasPages, atlasPagePaints);
   }
+
+  void dispose() {
+    if (_disposed) return;
+    _disposed = true;
+    _bindings.spine_atlas_dispose(this._atlas);
+    for (final image in atlasPages) image.dispose();
+  }
 }
 
 class SpineSkeletonData {
   Pointer<spine_skeleton_data> _skeletonData;
+  bool _disposed;
 
-  SpineSkeletonData(this._skeletonData);
+  SpineSkeletonData(this._skeletonData): _disposed = false;
 
   static SpineSkeletonData fromJson(SpineAtlas atlas, String json) {
     final jsonNative = json.toNativeUtf8();
@@ -83,22 +93,31 @@ class SpineSkeletonData {
     }
     return SpineSkeletonData(skeletonData);
   }
+
+  void dispose() {
+    if (_disposed) return;
+    _disposed = true;
+    _bindings.spine_skeleton_data_dispose(this._skeletonData);
+  }
 }
 
 class SpineSkeletonDrawable {
   SpineAtlas atlas;
   SpineSkeletonData skeletonData;
   late Pointer<spine_skeleton_drawable> _drawable;
+  bool _disposed;
 
-  SpineSkeletonDrawable(this.atlas, this.skeletonData) {
+  SpineSkeletonDrawable(this.atlas, this.skeletonData): _disposed = false {
     _drawable = _bindings.spine_skeleton_drawable_create(skeletonData._skeletonData);
   }
 
   void update(double delta) {
+    if (_disposed) return;
     _bindings.spine_skeleton_drawable_update(_drawable, delta);
   }
 
   List<SpineRenderCommand> render() {
+    if (_disposed) return [];
     Pointer<spine_render_command> nativeCmd = _bindings.spine_skeleton_drawable_render(_drawable);
     List<SpineRenderCommand> commands = [];
     while(nativeCmd.address != nullptr.address) {
@@ -107,6 +126,14 @@ class SpineSkeletonDrawable {
       nativeCmd = nativeCmd.ref.next;
     }
     return commands;
+  }
+
+  void dispose() {
+    if (_disposed) return;
+    _disposed = true;
+    atlas.dispose();
+    skeletonData.dispose();
+    _bindings.spine_skeleton_drawable_dispose(_drawable);
   }
 }
 

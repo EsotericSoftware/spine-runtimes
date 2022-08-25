@@ -47,6 +47,12 @@ class _SpineWidgetState extends State<SpineWidget> {
       return SizedBox();
     }
   }
+
+  @override
+  void dispose() {
+    skeletonDrawable?.dispose();
+    super.dispose();
+  }
 }
 
 class _SpineRenderObjectWidget extends LeafRenderObjectWidget {
@@ -76,7 +82,6 @@ class _SpineRenderObject extends RenderBox {
   set skeletonDrawable(SpineSkeletonDrawable skeletonDrawable) {
     if (_skeletonDrawable == skeletonDrawable) return;
 
-    // FIXME dispose old drawable here?
     _skeletonDrawable = skeletonDrawable;
     markNeedsPaint();
   }

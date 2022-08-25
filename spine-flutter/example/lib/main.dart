@@ -5,7 +5,6 @@ class ExampleSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const spacer = SizedBox(height: 10);
-
     return Scaffold(
         appBar: AppBar(title: const Text('Spine Examples')),
         body: Center(
@@ -48,6 +47,6 @@ class Spineboy extends StatelessWidget {
 void main() {
   runApp(MaterialApp(
       title: "Spine Examples",
-      home: Spineboy()
+      home: ExampleSelector()
   ));
 }

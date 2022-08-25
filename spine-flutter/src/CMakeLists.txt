@@ -18,6 +18,4 @@ set_target_properties(spine_flutter PROPERTIES
 )
 target_include_directories(spine_flutter PUBLIC spine-cpp/include)
 target_compile_definitions(spine_flutter PUBLIC DART_SHARED_LIB)
-#target_compile_options(spine_flutter PUBLIC -fsanitize=address -fno-omit-frame-pointer)
-#set_target_properties(spine_flutter PROPERTIES LINK_FLAGS -fsanitize=address)
 
