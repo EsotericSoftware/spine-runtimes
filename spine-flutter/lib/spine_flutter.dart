@@ -7,6 +7,7 @@ import 'package:flutter/rendering.dart';
 
 import 'package:flutter/services.dart';
 import 'spine_flutter_bindings_generated.dart';
+export 'spine_widget.dart';
 import 'package:path/path.dart' as Path;
 
 int majorVersion() => _bindings.spine_major_version();
