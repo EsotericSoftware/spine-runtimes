@@ -208,6 +208,225 @@ class SpineFlutterBindings {
   late final _spine_skeleton_drawable_dispose =
       _spine_skeleton_drawable_disposePtr
           .asFunction<void Function(ffi.Pointer<spine_skeleton_drawable>)>();
+
+  void spine_animation_state_update(
+    spine_animation_state state,
+    double delta,
+  ) {
+    return _spine_animation_state_update(
+      state,
+      delta,
+    );
+  }
+
+  late final _spine_animation_state_updatePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_animation_state,
+              ffi.Float)>>('spine_animation_state_update');
+  late final _spine_animation_state_update = _spine_animation_state_updatePtr
+      .asFunction<void Function(spine_animation_state, double)>();
+
+  void spine_animation_state_apply(
+    spine_animation_state state,
+    spine_skeleton skeleton,
+  ) {
+    return _spine_animation_state_apply(
+      state,
+      skeleton,
+    );
+  }
+
+  late final _spine_animation_state_applyPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_animation_state,
+              spine_skeleton)>>('spine_animation_state_apply');
+  late final _spine_animation_state_apply = _spine_animation_state_applyPtr
+      .asFunction<void Function(spine_animation_state, spine_skeleton)>();
+
+  void spine_animation_state_clear_tracks(
+    spine_animation_state state,
+  ) {
+    return _spine_animation_state_clear_tracks(
+      state,
+    );
+  }
+
+  late final _spine_animation_state_clear_tracksPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_animation_state)>>(
+          'spine_animation_state_clear_tracks');
+  late final _spine_animation_state_clear_tracks =
+      _spine_animation_state_clear_tracksPtr
+          .asFunction<void Function(spine_animation_state)>();
+
+  void spine_animation_state_clear_track(
+    spine_animation_state state,
+    int trackIndex,
+  ) {
+    return _spine_animation_state_clear_track(
+      state,
+      trackIndex,
+    );
+  }
+
+  late final _spine_animation_state_clear_trackPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_animation_state,
+              ffi.Int32)>>('spine_animation_state_clear_track');
+  late final _spine_animation_state_clear_track =
+      _spine_animation_state_clear_trackPtr
+          .asFunction<void Function(spine_animation_state, int)>();
+
+  spine_track_entry spine_animation_state_set_animation(
+    spine_animation_state state,
+    int trackIndex,
+    ffi.Pointer<ffi.Int8> animationName,
+    int loop,
+  ) {
+    return _spine_animation_state_set_animation(
+      state,
+      trackIndex,
+      animationName,
+      loop,
+    );
+  }
+
+  late final _spine_animation_state_set_animationPtr = _lookup<
+      ffi.NativeFunction<
+          spine_track_entry Function(
+              spine_animation_state,
+              ffi.Int32,
+              ffi.Pointer<ffi.Int8>,
+              ffi.Int32)>>('spine_animation_state_set_animation');
+  late final _spine_animation_state_set_animation =
+      _spine_animation_state_set_animationPtr.asFunction<
+          spine_track_entry Function(
+              spine_animation_state, int, ffi.Pointer<ffi.Int8>, int)>();
+
+  spine_track_entry spine_animation_state_add_animation(
+    spine_animation_state state,
+    int trackIndex,
+    ffi.Pointer<ffi.Int8> animationName,
+    int loop,
+    double delay,
+  ) {
+    return _spine_animation_state_add_animation(
+      state,
+      trackIndex,
+      animationName,
+      loop,
+      delay,
+    );
+  }
+
+  late final _spine_animation_state_add_animationPtr = _lookup<
+      ffi.NativeFunction<
+          spine_track_entry Function(
+              spine_animation_state,
+              ffi.Int32,
+              ffi.Pointer<ffi.Int8>,
+              ffi.Int32,
+              ffi.Float)>>('spine_animation_state_add_animation');
+  late final _spine_animation_state_add_animation =
+      _spine_animation_state_add_animationPtr.asFunction<
+          spine_track_entry Function(spine_animation_state, int,
+              ffi.Pointer<ffi.Int8>, int, double)>();
+
+  spine_track_entry spine_animation_state_set_empty_animation(
+    spine_animation_state state,
+    int trackIndex,
+    double mixDuration,
+  ) {
+    return _spine_animation_state_set_empty_animation(
+      state,
+      trackIndex,
+      mixDuration,
+    );
+  }
+
+  late final _spine_animation_state_set_empty_animationPtr = _lookup<
+      ffi.NativeFunction<
+          spine_track_entry Function(spine_animation_state, ffi.Int32,
+              ffi.Float)>>('spine_animation_state_set_empty_animation');
+  late final _spine_animation_state_set_empty_animation =
+      _spine_animation_state_set_empty_animationPtr.asFunction<
+          spine_track_entry Function(spine_animation_state, int, double)>();
+
+  spine_track_entry spine_animation_state_add_empty_animation(
+    spine_animation_state state,
+    int trackIndex,
+    double mixDuration,
+    double delay,
+  ) {
+    return _spine_animation_state_add_empty_animation(
+      state,
+      trackIndex,
+      mixDuration,
+      delay,
+    );
+  }
+
+  late final _spine_animation_state_add_empty_animationPtr = _lookup<
+      ffi.NativeFunction<
+          spine_track_entry Function(
+              spine_animation_state,
+              ffi.Int32,
+              ffi.Float,
+              ffi.Float)>>('spine_animation_state_add_empty_animation');
+  late final _spine_animation_state_add_empty_animation =
+      _spine_animation_state_add_empty_animationPtr.asFunction<
+          spine_track_entry Function(
+              spine_animation_state, int, double, double)>();
+
+  void spine_animation_state_set_empty_animations(
+    spine_animation_state state,
+    double mixDuration,
+  ) {
+    return _spine_animation_state_set_empty_animations(
+      state,
+      mixDuration,
+    );
+  }
+
+  late final _spine_animation_state_set_empty_animationsPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_animation_state,
+              ffi.Float)>>('spine_animation_state_set_empty_animations');
+  late final _spine_animation_state_set_empty_animations =
+      _spine_animation_state_set_empty_animationsPtr
+          .asFunction<void Function(spine_animation_state, double)>();
+
+  double spine_animation_state_get_time_scale(
+    spine_animation_state state,
+  ) {
+    return _spine_animation_state_get_time_scale(
+      state,
+    );
+  }
+
+  late final _spine_animation_state_get_time_scalePtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_animation_state)>>(
+          'spine_animation_state_get_time_scale');
+  late final _spine_animation_state_get_time_scale =
+      _spine_animation_state_get_time_scalePtr
+          .asFunction<double Function(spine_animation_state)>();
+
+  void spine_animation_state_set_time_scale(
+    spine_animation_state state,
+    double timeScale,
+  ) {
+    return _spine_animation_state_set_time_scale(
+      state,
+      timeScale,
+    );
+  }
+
+  late final _spine_animation_state_set_time_scalePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_animation_state,
+              ffi.Float)>>('spine_animation_state_set_time_scale');
+  late final _spine_animation_state_set_time_scale =
+      _spine_animation_state_set_time_scalePtr
+          .asFunction<void Function(spine_animation_state, double)>();
 }
 
 class spine_atlas extends ffi.Struct {
@@ -259,11 +478,15 @@ class spine_render_command extends ffi.Struct {
 }
 
 class spine_skeleton_drawable extends ffi.Struct {
-  external ffi.Pointer<ffi.Void> skeleton;
+  external spine_skeleton skeleton;
 
-  external ffi.Pointer<ffi.Void> animationState;
+  external spine_animation_state animationState;
 
   external ffi.Pointer<ffi.Void> clipping;
 
   external ffi.Pointer<spine_render_command> renderCommand;
 }
+
+typedef spine_skeleton = ffi.Pointer<ffi.Void>;
+typedef spine_animation_state = ffi.Pointer<ffi.Void>;
+typedef spine_track_entry = ffi.Pointer<ffi.Void>;

@@ -65,9 +65,13 @@ typedef struct spine_render_command {
     struct spine_render_command *next;
 } spine_render_command;
 
+typedef void* spine_skeleton;
+typedef void* spine_animation_state;
+typedef void* spine_track_entry;
+
 typedef struct spine_skeleton_drawable {
-    void *skeleton;
-    void *animationState;
+    spine_skeleton skeleton;
+    spine_animation_state animationState;
     void *clipping;
     spine_render_command *renderCommand;
 } spine_skeleton_drawable;
@@ -77,3 +81,14 @@ FFI_PLUGIN_EXPORT void spine_skeleton_drawable_update(spine_skeleton_drawable *d
 FFI_PLUGIN_EXPORT spine_render_command *spine_skeleton_drawable_render(spine_skeleton_drawable *drawable);
 FFI_PLUGIN_EXPORT void spine_skeleton_drawable_dispose(spine_skeleton_drawable *drawable);
 
+FFI_PLUGIN_EXPORT void spine_animation_state_update(spine_animation_state state, float delta);
+FFI_PLUGIN_EXPORT void spine_animation_state_apply(spine_animation_state state, spine_skeleton skeleton);
+FFI_PLUGIN_EXPORT void spine_animation_state_clear_tracks(spine_animation_state state);
+FFI_PLUGIN_EXPORT void spine_animation_state_clear_track(spine_animation_state state, int32_t trackIndex);
+FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_set_animation(spine_animation_state state, int32_t trackIndex, const char* animationName, int32_t loop);
+FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_add_animation(spine_animation_state state, int32_t trackIndex, const char* animationName, int32_t loop, float delay);
+FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_set_empty_animation(spine_animation_state state, int32_t trackIndex, float mixDuration);
+FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_add_empty_animation(spine_animation_state state, int32_t trackIndex, float mixDuration, float delay);
+FFI_PLUGIN_EXPORT void spine_animation_state_set_empty_animations(spine_animation_state state, float mixDuration);
+FFI_PLUGIN_EXPORT float spine_animation_state_get_time_scale(spine_animation_state state);
+FFI_PLUGIN_EXPORT void spine_animation_state_set_time_scale(spine_animation_state state, float timeScale);

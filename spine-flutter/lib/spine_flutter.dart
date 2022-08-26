@@ -16,15 +16,15 @@ int majorVersion() => _bindings.spine_major_version();
 int minorVersion() => _bindings.spine_minor_version();
 void reportLeaks() => _bindings.spine_report_leaks();
 
-class SpineAtlas {
-  Pointer<spine_atlas> _atlas;
-  List<Image> atlasPages;
-  List<Paint> atlasPagePaints;
+class Atlas {
+  final Pointer<spine_atlas> _atlas;
+  final List<Image> atlasPages;
+  final List<Paint> atlasPagePaints;
   bool _disposed;
 
-  SpineAtlas(this._atlas, this.atlasPages, this.atlasPagePaints): _disposed = false;
+  Atlas(this._atlas, this.atlasPages, this.atlasPagePaints): _disposed = false;
 
-  static Future<SpineAtlas> _load(String atlasFileName, Future<Uint8List> Function(String name) loadFile) async {
+  static Future<Atlas> _load(String atlasFileName, Future<Uint8List> Function(String name) loadFile) async {
     final atlasBytes = await loadFile(atlasFileName);
     final atlasData = convert.utf8.decode(atlasBytes);
     final atlasDataNative = atlasData.toNativeUtf8();
@@ -54,18 +54,18 @@ class SpineAtlas {
       );
     }
 
-    return SpineAtlas(atlas, atlasPages, atlasPagePaints);
+    return Atlas(atlas, atlasPages, atlasPagePaints);
   }
 
-  static Future<SpineAtlas> fromAsset(AssetBundle assetBundle, String atlasFileName) async {
+  static Future<Atlas> fromAsset(AssetBundle assetBundle, String atlasFileName) async {
     return _load(atlasFileName, (file) async => (await assetBundle.load(file)).buffer.asUint8List());
   }
 
-  static Future<SpineAtlas> fromFile(String atlasFileName) async {
+  static Future<Atlas> fromFile(String atlasFileName) async {
     return _load(atlasFileName, (file) => File(file).readAsBytes());
   }
 
-  static Future<SpineAtlas> fromUrl(String atlasFileName) async {
+  static Future<Atlas> fromUrl(String atlasFileName) async {
     return _load(atlasFileName, (file) async {
       return (await http.get(Uri.parse(file))).bodyBytes;
     });
@@ -79,13 +79,13 @@ class SpineAtlas {
   }
 }
 
-class SpineSkeletonData {
-  Pointer<spine_skeleton_data> _skeletonData;
+class SkeletonData {
+  final Pointer<spine_skeleton_data> _skeletonData;
   bool _disposed;
 
-  SpineSkeletonData(this._skeletonData): _disposed = false;
+  SkeletonData(this._skeletonData): _disposed = false;
 
-  static SpineSkeletonData fromJson(SpineAtlas atlas, String json) {
+  static SkeletonData fromJson(Atlas atlas, String json) {
     final jsonNative = json.toNativeUtf8();
     final skeletonData = _bindings.spine_skeleton_data_load_json(atlas._atlas, jsonNative.cast());
     if (skeletonData.ref.error.address != nullptr.address) {
@@ -94,10 +94,10 @@ class SpineSkeletonData {
       _bindings.spine_skeleton_data_dispose(skeletonData);
       throw Exception("Couldn't load skeleton data: " + message);
     }
-    return SpineSkeletonData(skeletonData);
+    return SkeletonData(skeletonData);
   }
 
-  static SpineSkeletonData fromBinary(SpineAtlas atlas, Uint8List binary) {
+  static SkeletonData fromBinary(Atlas atlas, Uint8List binary) {
     final Pointer<Uint8> binaryNative = malloc.allocate(binary.lengthInBytes);
     binaryNative.asTypedList(binary.lengthInBytes).setAll(0, binary);
     final skeletonData = _bindings.spine_skeleton_data_load_binary(atlas._atlas, binaryNative.cast(), binary.lengthInBytes);
@@ -108,7 +108,7 @@ class SpineSkeletonData {
       _bindings.spine_skeleton_data_dispose(skeletonData);
       throw Exception("Couldn't load skeleton data: " + message);
     }
-    return SpineSkeletonData(skeletonData);
+    return SkeletonData(skeletonData);
   }
 
   void dispose() {
@@ -118,14 +118,127 @@ class SpineSkeletonData {
   }
 }
 
-class SpineSkeletonDrawable {
-  SpineAtlas atlas;
-  SpineSkeletonData skeletonData;
-  late Pointer<spine_skeleton_drawable> _drawable;
+class Skeleton {
+  final spine_skeleton _skeleton;
+
+  Skeleton(this._skeleton);
+}
+
+class TrackEntry {
+  final spine_track_entry _entry;
+
+  TrackEntry(this._entry);
+}
+
+class AnimationState {
+  final spine_animation_state _state;
+
+  AnimationState(this._state);
+
+  /// Increments the track entry times, setting queued animations as current if needed
+  /// @param delta delta time
+  void update(double delta) {
+    _bindings.spine_animation_state_update(_state, delta);
+  }
+
+  /// Poses the skeleton using the track entry animations. There are no side effects other than invoking listeners, so the
+  /// animation state can be applied to multiple skeletons to pose them identically.
+  void apply(Skeleton skeleton) {
+    _bindings.spine_animation_state_apply(_state, skeleton._skeleton);
+  }
+
+  /// Removes all animations from all tracks, leaving skeletons in their previous pose.
+  /// It may be desired to use AnimationState.setEmptyAnimations(float) to mix the skeletons back to the setup pose,
+  /// rather than leaving them in their previous pose.
+  void clearTracks() {
+    _bindings.spine_animation_state_clear_tracks(_state);
+  }
+
+  /// Removes all animations from the tracks, leaving skeletons in their previous pose.
+  /// It may be desired to use AnimationState.setEmptyAnimations(float) to mix the skeletons back to the setup pose,
+  /// rather than leaving them in their previous pose.
+  void clearTrack(int trackIndex) {
+    _bindings.spine_animation_state_clear_track(_state, trackIndex);
+  }
+
+  /// Sets the current animation for a track, discarding any queued animations.
+  /// @param loop If true, the animation will repeat.
+  /// If false, it will not, instead its last frame is applied if played beyond its duration.
+  /// In either case TrackEntry.TrackEnd determines when the track is cleared.
+  /// @return
+  /// A track entry to allow further customization of animation playback. References to the track entry must not be kept
+  /// after AnimationState.Dispose.
+  TrackEntry setAnimation(int trackIndex, String animationName, bool loop) {
+    final animation = animationName.toNativeUtf8();
+    final entry = _bindings.spine_animation_state_set_animation(_state, trackIndex, animation.cast(), loop ? -1 : 0);
+    calloc.free(animation);
+    if (entry.address == nullptr.address) throw Exception("Couldn't set animation $animationName");
+    return TrackEntry(entry);
+  }
+
+  /// Adds an animation to be played delay seconds after the current or last queued animation
+  /// for a track. If the track is empty, it is equivalent to calling setAnimation.
+  /// @param delay
+  /// Seconds to begin this animation after the start of the previous animation. May be &lt;= 0 to use the animation
+  /// duration of the previous track minus any mix duration plus the negative delay.
+  ///
+  /// @return A track entry to allow further customization of animation playback. References to the track entry must not be kept
+  /// after AnimationState.Dispose
+  TrackEntry addAnimation(int trackIndex, String animationName, bool loop, double delay) {
+    final animation = animationName.toNativeUtf8();
+    final entry = _bindings.spine_animation_state_add_animation(_state, trackIndex, animation.cast(), loop ? -1 : 0, delay);
+    calloc.free(animation);
+    if (entry.address == nullptr.address) throw Exception("Couldn't add animation $animationName");
+    return TrackEntry(entry);
+  }
+
+  /// Sets an empty animation for a track, discarding any queued animations, and mixes to it over the specified mix duration.
+  TrackEntry setEmptyAnimation(int trackIndex, double mixDuration) {
+    final entry = _bindings.spine_animation_state_set_empty_animation(_state, trackIndex, mixDuration);
+    return TrackEntry(entry);
+  }
+
+  /// Adds an empty animation to be played after the current or last queued animation for a track, and mixes to it over the
+  /// specified mix duration.
+  /// @return
+  /// A track entry to allow further customization of animation playback. References to the track entry must not be kept after AnimationState.Dispose.
+  ///
+  /// @param trackIndex Track number.
+  /// @param mixDuration Mix duration.
+  /// @param delay Seconds to begin this animation after the start of the previous animation. May be &lt;= 0 to use the animation
+  /// duration of the previous track minus any mix duration plus the negative delay.
+  TrackEntry addEmptyAnimation(int trackIndex, double mixDuration, double delay) {
+    final entry = _bindings.spine_animation_state_add_empty_animation(_state, trackIndex, mixDuration, delay);
+    return TrackEntry(entry);
+  }
+
+  /// Sets an empty animation for every track, discarding any queued animations, and mixes to it over the specified mix duration.
+  void setEmptyAnimations(double mixDuration) {
+    _bindings.spine_animation_state_set_empty_animations(_state, mixDuration);
+  }
+
+  double getTimeScale() {
+    return _bindings.spine_animation_state_get_time_scale(_state);
+  }
+
+  void setTimeScale(double timeScale) {
+    _bindings.spine_animation_state_set_time_scale(_state, timeScale);
+  }
+}
+
+class SkeletonDrawable {
+  final Atlas atlas;
+  final SkeletonData skeletonData;
+  late final Pointer<spine_skeleton_drawable> _drawable;
+  late final Skeleton skeleton;
+  late final AnimationState animationState;
+  final bool _ownsData;
   bool _disposed;
 
-  SpineSkeletonDrawable(this.atlas, this.skeletonData): _disposed = false {
+  SkeletonDrawable(this.atlas, this.skeletonData, this._ownsData): _disposed = false {
     _drawable = _bindings.spine_skeleton_drawable_create(skeletonData._skeletonData);
+    skeleton = Skeleton(_drawable.ref.skeleton);
+    animationState = AnimationState(_drawable.ref.animationState);
   }
 
   void update(double delta) {
@@ -133,13 +246,13 @@ class SpineSkeletonDrawable {
     _bindings.spine_skeleton_drawable_update(_drawable, delta);
   }
 
-  List<SpineRenderCommand> render() {
+  List<RenderCommand> render() {
     if (_disposed) return [];
     Pointer<spine_render_command> nativeCmd = _bindings.spine_skeleton_drawable_render(_drawable);
-    List<SpineRenderCommand> commands = [];
+    List<RenderCommand> commands = [];
     while(nativeCmd.address != nullptr.address) {
       final atlasPage = atlas.atlasPages[nativeCmd.ref.atlasPage];
-      commands.add(SpineRenderCommand(nativeCmd, atlasPage.width.toDouble(), atlasPage.height.toDouble()));
+      commands.add(RenderCommand(nativeCmd, atlasPage.width.toDouble(), atlasPage.height.toDouble()));
       nativeCmd = nativeCmd.ref.next;
     }
     return commands;
@@ -148,17 +261,19 @@ class SpineSkeletonDrawable {
   void dispose() {
     if (_disposed) return;
     _disposed = true;
-    atlas.dispose();
-    skeletonData.dispose();
+    if (_ownsData) {
+      atlas.dispose();
+      skeletonData.dispose();
+    }
     _bindings.spine_skeleton_drawable_dispose(_drawable);
   }
 }
 
-class SpineRenderCommand {
-  late Vertices vertices;
-  late int atlasPageIndex;
+class RenderCommand {
+  late final Vertices vertices;
+  late final int atlasPageIndex;
 
-  SpineRenderCommand(Pointer<spine_render_command> nativeCmd, double pageWidth, double pageHeight) {
+  RenderCommand(Pointer<spine_render_command> nativeCmd, double pageWidth, double pageHeight) {
     atlasPageIndex = nativeCmd.ref.atlasPage;
     int numVertices = nativeCmd.ref.numVertices;
     int numIndices = nativeCmd.ref.numIndices;

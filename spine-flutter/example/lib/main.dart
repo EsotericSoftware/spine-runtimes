@@ -35,9 +35,13 @@ class Spineboy extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = SpineWidgetController((controller) {
+      controller.animationState?.setAnimation(0, "walk", true);
+    });
+
     return Scaffold(
       appBar: AppBar(title: const Text('Spineboy')),
-      body: const SpineWidget.asset("assets/spineboy-pro.skel", "assets/spineboy.atlas"),
+      body: SpineWidget.asset("assets/spineboy-pro.skel", "assets/spineboy.atlas", controller),
       // body: const SpineWidget.file("/Users/badlogic/workspaces/spine-runtimes/examples/spineboy/export/spineboy-pro.skel", "/Users/badlogic/workspaces/spine-runtimes/examples/spineboy/export/spineboy.atlas"),
       // body: const SpineWidget.http("https://marioslab.io/dump/spineboy/spineboy-pro.json", "https://marioslab.io/dump/spineboy/spineboy.atlas"),
     );

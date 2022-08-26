@@ -5,6 +5,10 @@
 
 using namespace spine;
 
+spine::SpineExtension *spine::getDefaultExtension() {
+   return new spine::DebugExtension(new spine::DefaultSpineExtension());
+}
+
 FFI_PLUGIN_EXPORT int32_t spine_major_version() {
     return SPINE_MAJOR_VERSION;
 }
@@ -15,11 +19,11 @@ FFI_PLUGIN_EXPORT int32_t spine_minor_version() {
 
 FFI_PLUGIN_EXPORT spine_atlas* spine_atlas_load(const char *atlasData) {
     if (!atlasData) return nullptr;
-    int length = strlen(atlasData);
+    int length = (int)strlen(atlasData);
     auto atlas = new Atlas(atlasData, length, "", (TextureLoader*)nullptr, false);
     spine_atlas *result = SpineExtension::calloc<spine_atlas>(1, __FILE__, __LINE__);
     result->atlas = atlas;
-    result->numImagePaths = atlas->getPages().size();
+    result->numImagePaths = (int32_t)atlas->getPages().size();
     result->imagePaths = SpineExtension::calloc<char *>(result->numImagePaths, __FILE__, __LINE__);
     for (int i = 0; i < result->numImagePaths; i++) {
         result->imagePaths[i] = strdup(atlas->getPages()[i]->texturePath.buffer());
@@ -213,10 +217,10 @@ FFI_PLUGIN_EXPORT spine_render_command *spine_skeleton_drawable_render(spine_ske
             worldVertices.setSize(mesh->getWorldVerticesLength(), 0);
             pageIndex = ((AtlasRegion *) mesh->getRendererObject())->page->index;
             mesh->computeWorldVertices(slot, 0, mesh->getWorldVerticesLength(), worldVertices.buffer(), 0, 2);
-            verticesCount = mesh->getWorldVerticesLength() >> 1;
+            verticesCount = (int)(mesh->getWorldVerticesLength() >> 1);
             uvs = &mesh->getUVs();
             indices = &mesh->getTriangles();
-            indicesCount = indices->size();
+            indicesCount = (int)indices->size();
 
         } else if (attachment->getRTTI().isExactly(ClippingAttachment::rtti)) {
             ClippingAttachment *clip = (ClippingAttachment *) slot.getAttachment();
@@ -234,10 +238,10 @@ FFI_PLUGIN_EXPORT spine_render_command *spine_skeleton_drawable_render(spine_ske
         if (clipper.isClipping()) {
             clipper.clipTriangles(worldVertices, *indices, *uvs, 2);
             vertices = &clipper.getClippedVertices();
-            verticesCount = clipper.getClippedVertices().size() >> 1;
+            verticesCount = (int)(clipper.getClippedVertices().size() >> 1);
             uvs = &clipper.getClippedUVs();
             indices = &clipper.getClippedTriangles();
-            indicesCount = clipper.getClippedTriangles().size();
+            indicesCount = (int)(clipper.getClippedTriangles().size());
         }
 
         spine_render_command *cmd = spine_render_command_create(verticesCount, indicesCount, (spine_blend_mode)slot.getData().getBlendMode(), pageIndex);
@@ -261,6 +265,68 @@ FFI_PLUGIN_EXPORT spine_render_command *spine_skeleton_drawable_render(spine_ske
     return drawable->renderCommand;
 }
 
-spine::SpineExtension *spine::getDefaultExtension() {
-   return new spine::DebugExtension(new spine::DefaultSpineExtension());
+FFI_PLUGIN_EXPORT void spine_animation_state_update(spine_animation_state state, float delta) {
+    if (state == nullptr) return;
+    AnimationState *_state = (AnimationState*)state;
+    _state->update(delta);
+}
+
+FFI_PLUGIN_EXPORT void spine_animation_state_apply(spine_animation_state state, spine_skeleton skeleton) {
+    if (state == nullptr) return;
+    AnimationState *_state = (AnimationState*)state;
+    _state->apply(*(Skeleton*)skeleton);
+}
+
+FFI_PLUGIN_EXPORT void spine_animation_state_clear_tracks(spine_animation_state state) {
+    if (state == nullptr) return;
+    AnimationState *_state = (AnimationState*)state;
+    _state->clearTracks();
+}
+
+FFI_PLUGIN_EXPORT void spine_animation_state_clear_track(spine_animation_state state, int32_t trackIndex) {
+    if (state == nullptr) return;
+    AnimationState *_state = (AnimationState*)state;
+    _state->clearTrack(trackIndex);
+}
+
+FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_set_animation(spine_animation_state state, int32_t trackIndex, const char* animationName, int32_t loop) {
+    if (state == nullptr) return nullptr;
+    AnimationState *_state = (AnimationState*)state;
+    return _state->setAnimation(trackIndex, animationName, loop);
+}
+
+FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_add_animation(spine_animation_state state, int32_t trackIndex, const char* animationName, int32_t loop, float delay) {
+    if (state == nullptr) return nullptr;
+    AnimationState *_state = (AnimationState*)state;
+    return _state->addAnimation(trackIndex, animationName, loop, delay);
+}
+
+FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_set_empty_animation(spine_animation_state state, int32_t trackIndex, float mixDuration) {
+    if (state == nullptr) return nullptr;
+    AnimationState *_state = (AnimationState*)state;
+    return _state->setEmptyAnimation(trackIndex, mixDuration);
+}
+
+FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_add_empty_animation(spine_animation_state state, int32_t trackIndex, float mixDuration, float delay) {
+    if (state == nullptr) return nullptr;
+    AnimationState *_state = (AnimationState*)state;
+    return _state->addEmptyAnimation(trackIndex, mixDuration, delay);
+}
+
+FFI_PLUGIN_EXPORT void spine_animation_state_set_empty_animations(spine_animation_state state, float mixDuration) {
+    if (state == nullptr) return;
+    AnimationState *_state = (AnimationState*)state;
+    _state->setEmptyAnimations(mixDuration);
+}
+
+FFI_PLUGIN_EXPORT float spine_animation_state_get_time_scale(spine_animation_state state) {
+    if (state == nullptr) return 0;
+    AnimationState *_state = (AnimationState*)state;
+    return _state->getTimeScale();
+}
+
+FFI_PLUGIN_EXPORT void spine_animation_state_set_time_scale(spine_animation_state state, float timeScale) {
+    if (state == nullptr) return;
+    AnimationState *_state = (AnimationState*)state;
+    _state->setTimeScale(timeScale);
 }
