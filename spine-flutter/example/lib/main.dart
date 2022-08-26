@@ -37,9 +37,9 @@ class Spineboy extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Spineboy')),
-      body: const Center(
-        child: SpineWidget("assets/spineboy-pro.skel", "assets/spineboy.atlas")
-      ),
+      body: const SpineWidget.asset("assets/spineboy-pro.skel", "assets/spineboy.atlas"),
+      // body: const SpineWidget.file("/Users/badlogic/workspaces/spine-runtimes/examples/spineboy/export/spineboy-pro.skel", "/Users/badlogic/workspaces/spine-runtimes/examples/spineboy/export/spineboy.atlas"),
+      // body: const SpineWidget.http("https://marioslab.io/dump/spineboy/spineboy-pro.json", "https://marioslab.io/dump/spineboy/spineboy.atlas"),
     );
   }
 }

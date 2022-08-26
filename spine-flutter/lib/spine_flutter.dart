@@ -1,9 +1,11 @@
+import 'dart:convert' as convert;
 import 'dart:ffi';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui';
 import 'package:ffi/ffi.dart';
 import 'package:flutter/rendering.dart';
+import 'package:http/http.dart' as http;
 
 import 'package:flutter/services.dart';
 import 'spine_flutter_bindings_generated.dart';
@@ -22,8 +24,9 @@ class SpineAtlas {
 
   SpineAtlas(this._atlas, this.atlasPages, this.atlasPagePaints): _disposed = false;
 
-  static Future<SpineAtlas> fromAsset(AssetBundle assetBundle, String atlasFileName) async {
-    final atlasData = await assetBundle.loadString(atlasFileName);
+  static Future<SpineAtlas> _load(String atlasFileName, Future<Uint8List> Function(String name) loadFile) async {
+    final atlasBytes = await loadFile(atlasFileName);
+    final atlasData = convert.utf8.decode(atlasBytes);
     final atlasDataNative = atlasData.toNativeUtf8();
     final atlas = _bindings.spine_atlas_load(atlasDataNative.cast());
     calloc.free(atlasDataNative);
@@ -40,8 +43,8 @@ class SpineAtlas {
     for (int i = 0; i < atlas.ref.numImagePaths; i++) {
       final Pointer<Utf8> atlasPageFile = atlas.ref.imagePaths[i].cast();
       final imagePath = Path.join(atlasDir, atlasPageFile.toDartString());
-      var imageData = await assetBundle.load(imagePath);
-      final Codec codec = await instantiateImageCodec(imageData.buffer.asUint8List());
+      var imageData = await loadFile(imagePath);
+      final Codec codec = await instantiateImageCodec(imageData);
       final FrameInfo frameInfo = await codec.getNextFrame();
       final Image image = frameInfo.image;
       atlasPages.add(image);
@@ -52,6 +55,20 @@ class SpineAtlas {
     }
 
     return SpineAtlas(atlas, atlasPages, atlasPagePaints);
+  }
+
+  static Future<SpineAtlas> fromAsset(AssetBundle assetBundle, String atlasFileName) async {
+    return _load(atlasFileName, (file) async => (await assetBundle.load(file)).buffer.asUint8List());
+  }
+
+  static Future<SpineAtlas> fromFile(String atlasFileName) async {
+    return _load(atlasFileName, (file) => File(file).readAsBytes());
+  }
+
+  static Future<SpineAtlas> fromUrl(String atlasFileName) async {
+    return _load(atlasFileName, (file) async {
+      return (await http.get(Uri.parse(file))).bodyBytes;
+    });
   }
 
   void dispose() {
@@ -80,9 +97,9 @@ class SpineSkeletonData {
     return SpineSkeletonData(skeletonData);
   }
 
-  static SpineSkeletonData fromBinary(SpineAtlas atlas, ByteData binary) {
+  static SpineSkeletonData fromBinary(SpineAtlas atlas, Uint8List binary) {
     final Pointer<Uint8> binaryNative = malloc.allocate(binary.lengthInBytes);
-    binaryNative.asTypedList(binary.lengthInBytes).setAll(0, binary.buffer.asUint8List());
+    binaryNative.asTypedList(binary.lengthInBytes).setAll(0, binary);
     final skeletonData = _bindings.spine_skeleton_data_load_binary(atlas._atlas, binaryNative.cast(), binary.lengthInBytes);
     malloc.free(binaryNative);
     if (skeletonData.ref.error.address != nullptr.address) {
