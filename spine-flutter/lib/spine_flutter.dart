@@ -10,7 +10,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart';
 import 'spine_flutter_bindings_generated.dart';
 export 'spine_widget.dart';
-import 'package:path/path.dart' as Path;
+import 'package:path/path.dart' as path;
 
 int majorVersion() => _bindings.spine_major_version();
 int minorVersion() => _bindings.spine_minor_version();
@@ -34,15 +34,15 @@ class Atlas {
       final Pointer<Utf8> error = atlas.ref.error.cast();
       final message = error.toDartString();
       _bindings.spine_atlas_dispose(atlas);
-      throw Exception("Couldn't load atlas: " + message);
+      throw Exception("Couldn't load atlas: $message");
     }
 
-    final atlasDir = Path.dirname(atlasFileName);
+    final atlasDir = path.dirname(atlasFileName);
     List<Image> atlasPages = [];
     List<Paint> atlasPagePaints = [];
     for (int i = 0; i < atlas.ref.numImagePaths; i++) {
       final Pointer<Utf8> atlasPageFile = atlas.ref.imagePaths[i].cast();
-      final imagePath = Path.join(atlasDir, atlasPageFile.toDartString());
+      final imagePath = path.join(atlasDir, atlasPageFile.toDartString());
       var imageData = await loadFile(imagePath);
       final Codec codec = await instantiateImageCodec(imageData);
       final FrameInfo frameInfo = await codec.getNextFrame();
@@ -80,7 +80,7 @@ class Atlas {
 }
 
 class SkeletonData {
-  final Pointer<spine_skeleton_data> _skeletonData;
+  final Pointer<spine_skeleton_data_result> _skeletonData;
   bool _disposed;
 
   SkeletonData(this._skeletonData): _disposed = false;
@@ -91,8 +91,8 @@ class SkeletonData {
     if (skeletonData.ref.error.address != nullptr.address) {
       final Pointer<Utf8> error = skeletonData.ref.error.cast();
       final message = error.toDartString();
-      _bindings.spine_skeleton_data_dispose(skeletonData);
-      throw Exception("Couldn't load skeleton data: " + message);
+      _bindings.spine_skeleton_data_result_dispose(skeletonData);
+      throw Exception("Couldn't load skeleton data: $message");
     }
     return SkeletonData(skeletonData);
   }
@@ -105,8 +105,8 @@ class SkeletonData {
     if (skeletonData.ref.error.address != nullptr.address) {
       final Pointer<Utf8> error = skeletonData.ref.error.cast();
       final message = error.toDartString();
-      _bindings.spine_skeleton_data_dispose(skeletonData);
-      throw Exception("Couldn't load skeleton data: " + message);
+      _bindings.spine_skeleton_data_result_dispose(skeletonData);
+      throw Exception("Couldn't load skeleton data: $message");
     }
     return SkeletonData(skeletonData);
   }
@@ -114,7 +114,7 @@ class SkeletonData {
   void dispose() {
     if (_disposed) return;
     _disposed = true;
-    _bindings.spine_skeleton_data_dispose(this._skeletonData);
+    _bindings.spine_skeleton_data_result_dispose(_skeletonData);
   }
 }
 
@@ -515,14 +515,16 @@ class SkeletonDrawable {
   bool _disposed;
 
   SkeletonDrawable(this.atlas, this.skeletonData, this._ownsData): _disposed = false {
-    _drawable = _bindings.spine_skeleton_drawable_create(skeletonData._skeletonData);
+    _drawable = _bindings.spine_skeleton_drawable_create(skeletonData._skeletonData.ref.skeletonData.cast());
     skeleton = Skeleton(_drawable.ref.skeleton);
     animationState = AnimationState(_drawable.ref.animationState);
   }
 
   void update(double delta) {
     if (_disposed) return;
-    _bindings.spine_skeleton_drawable_update(_drawable, delta);
+    _bindings.spine_animation_state_update(_drawable.ref.animationState, delta);
+    _bindings.spine_animation_state_apply(_drawable.ref.animationState, _drawable.ref.skeleton);
+    _bindings.spine_skeleton_update_world_transform(_drawable.ref.skeleton);
   }
 
   List<RenderCommand> render() {

@@ -19,6 +19,7 @@ class SpineWidgetController {
   SpineWidgetController([this.onInitialized]);
 
   void _initialize(Atlas atlas, SkeletonData data, SkeletonDrawable drawable) {
+    if (initialized) throw Exception("SpineWidgetController already initialized. A controller can only be used with one widget.");
     _atlas = atlas;
     _data = data;
     _drawable = drawable;

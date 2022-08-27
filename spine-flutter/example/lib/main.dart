@@ -35,17 +35,29 @@ class Spineboy extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = SpineWidgetController((controller) {
-      final state = controller.animationState;
-      state?.setAnimation(0, "walk", false).setMixDuration(2);
-      state?.addEmptyAnimation(0, 0.2, 0);
-    });
+    final controller = SpineWidgetController((controller) => controller.animationState?.setAnimation(0, "walk", true));
 
     return Scaffold(
       appBar: AppBar(title: const Text('Spineboy')),
       body: SpineWidget.asset("assets/spineboy-pro.skel", "assets/spineboy.atlas", controller),
       // body: const SpineWidget.file("/Users/badlogic/workspaces/spine-runtimes/examples/spineboy/export/spineboy-pro.skel", "/Users/badlogic/workspaces/spine-runtimes/examples/spineboy/export/spineboy.atlas"),
       // body: const SpineWidget.http("https://marioslab.io/dump/spineboy/spineboy-pro.json", "https://marioslab.io/dump/spineboy/spineboy.atlas"),
+    );
+  }
+}
+
+class AnimationStateEvents extends StatelessWidget {
+  const AnimationStateEvents({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = SpineWidgetController((controller) {
+      final trackEntry = controller.animationState?.setAnimation(0, "walk", true);
+    });
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('Spineboy')),
+      body: SpineWidget.asset("assets/spineboy-pro.skel", "assets/spineboy.atlas", controller),
     );
   }
 }
