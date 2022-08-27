@@ -330,3 +330,279 @@ FFI_PLUGIN_EXPORT void spine_animation_state_set_time_scale(spine_animation_stat
     AnimationState *_state = (AnimationState*)state;
     _state->setTimeScale(timeScale);
 }
+
+FFI_PLUGIN_EXPORT int spine_track_entry_get_track_index(spine_track_entry entry) {
+    if (entry == nullptr) return 0;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    return _entry->getTrackIndex();
+}
+
+FFI_PLUGIN_EXPORT spine_animation spine_track_entry_get_animation(spine_track_entry entry) {
+    if (entry == nullptr) return nullptr;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    return _entry->getAnimation();
+}
+
+FFI_PLUGIN_EXPORT spine_track_entry spine_track_entry_get_previous(spine_track_entry entry) {
+    if (entry == nullptr) return nullptr;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    return _entry->getPrevious();
+}
+
+FFI_PLUGIN_EXPORT int spine_track_entry_get_loop(spine_track_entry entry) {
+    if (entry == nullptr) return 0;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    return _entry->getLoop() ? -1 : 0;
+}
+
+FFI_PLUGIN_EXPORT void spine_track_entry_set_loop(spine_track_entry entry, int loop) {
+    if (entry == nullptr) return;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    _entry->setLoop(loop);
+}
+
+FFI_PLUGIN_EXPORT int spine_track_entry_get_hold_previous(spine_track_entry entry) {
+    if (entry == nullptr) return 0;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    return _entry->getHoldPrevious() ? -1 : 0;
+}
+
+FFI_PLUGIN_EXPORT void spine_track_entry_set_hold_previous(spine_track_entry entry, int holdPrevious) {
+    if (entry == nullptr) return;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    _entry->setHoldPrevious(holdPrevious);
+}
+
+FFI_PLUGIN_EXPORT int spine_track_entry_get_reverse(spine_track_entry entry) {
+    if (entry == nullptr) return 0;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    return _entry->getReverse() ? -1 : 0;
+}
+
+FFI_PLUGIN_EXPORT void spine_track_entry_set_reverse(spine_track_entry entry, int reverse) {
+    if (entry == nullptr) return;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    _entry->setReverse(reverse);
+}
+
+FFI_PLUGIN_EXPORT int spine_track_entry_get_shortest_rotation(spine_track_entry entry) {
+    if (entry == nullptr) return 0;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    return _entry->getShortestRotation() ? -1 : 0;
+}
+
+FFI_PLUGIN_EXPORT void spine_track_entry_set_shortest_rotation(spine_track_entry entry, int shortestRotation) {
+    if (entry == nullptr) return;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    _entry->setShortestRotation(shortestRotation);
+}
+
+FFI_PLUGIN_EXPORT float spine_track_entry_get_delay(spine_track_entry entry) {
+    if (entry == nullptr) return 0;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    return _entry->getDelay();
+}
+
+FFI_PLUGIN_EXPORT void spine_track_entry_set_delay(spine_track_entry entry, float delay) {
+    if (entry == nullptr) return;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    _entry->setDelay(delay);
+}
+
+FFI_PLUGIN_EXPORT float spine_track_entry_get_track_time(spine_track_entry entry) {
+    if (entry == nullptr) return 0;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    return _entry->getTrackTime();
+}
+
+FFI_PLUGIN_EXPORT void spine_track_entry_set_track_time(spine_track_entry entry, float trackTime) {
+    if (entry == nullptr) return;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    _entry->setTrackTime(trackTime);
+}
+
+FFI_PLUGIN_EXPORT float spine_track_entry_get_track_end(spine_track_entry entry) {
+    if (entry == nullptr) return 0;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    return _entry->getTrackEnd();
+}
+
+FFI_PLUGIN_EXPORT void spine_track_entry_set_track_end(spine_track_entry entry, float trackEnd) {
+    if (entry == nullptr) return;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    _entry->setTrackEnd(trackEnd);
+}
+
+FFI_PLUGIN_EXPORT float spine_track_entry_get_animation_start(spine_track_entry entry) {
+    if (entry == nullptr) return 0;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    return _entry->getAnimationStart();
+}
+
+FFI_PLUGIN_EXPORT void spine_track_entry_set_animation_start(spine_track_entry entry, float animationStart) {
+    if (entry == nullptr) return;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    _entry->setAnimationStart(animationStart);
+}
+
+FFI_PLUGIN_EXPORT float spine_track_entry_get_animation_end(spine_track_entry entry) {
+    if (entry == nullptr) return 0;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    return _entry->getAnimationEnd();
+}
+
+FFI_PLUGIN_EXPORT void spine_track_entry_set_animation_end(spine_track_entry entry, float animationEnd) {
+    if (entry == nullptr) return;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    _entry->setAnimationEnd(animationEnd);
+}
+
+FFI_PLUGIN_EXPORT float spine_track_entry_get_animation_last(spine_track_entry entry) {
+    if (entry == nullptr) return 0;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    return _entry->getAnimationLast();
+}
+
+FFI_PLUGIN_EXPORT void spine_track_entry_set_animation_last(spine_track_entry entry, float animationLast) {
+    if (entry == nullptr) return;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    _entry->setAnimationLast(animationLast);
+}
+
+FFI_PLUGIN_EXPORT float spine_track_entry_get_animation_time(spine_track_entry entry) {
+    if (entry == nullptr) return 0;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    return _entry->getAnimationTime();
+}
+
+FFI_PLUGIN_EXPORT float spine_track_entry_get_time_scale(spine_track_entry entry) {
+    if (entry == nullptr) return 0;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    return _entry->getTimeScale();
+}
+
+FFI_PLUGIN_EXPORT void spine_track_entry_set_time_scale(spine_track_entry entry, float timeScale) {
+    if (entry == nullptr) return;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    _entry->setTimeScale(timeScale);
+}
+
+FFI_PLUGIN_EXPORT float spine_track_entry_get_alpha(spine_track_entry entry) {
+    if (entry == nullptr) return 0;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    return _entry->getAlpha();
+}
+
+FFI_PLUGIN_EXPORT void spine_track_entry_set_alpha(spine_track_entry entry, float alpha) {
+    if (entry == nullptr) return;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    _entry->setAlpha(alpha);
+}
+
+FFI_PLUGIN_EXPORT float spine_track_entry_get_event_threshold(spine_track_entry entry) {
+    if (entry == nullptr) return 0;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    return _entry->getEventThreshold();
+}
+
+FFI_PLUGIN_EXPORT void spine_track_entry_set_event_threshold(spine_track_entry entry, float eventThreshold) {
+    if (entry == nullptr) return;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    _entry->setEventThreshold(eventThreshold);
+}
+
+FFI_PLUGIN_EXPORT float spine_track_entry_get_attachment_threshold(spine_track_entry entry) {
+    if (entry == nullptr) return 0;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    return _entry->getAttachmentThreshold();
+}
+
+FFI_PLUGIN_EXPORT void spine_track_entry_set_attachment_threshold(spine_track_entry entry, float attachmentThreshold) {
+    if (entry == nullptr) return;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    _entry->setAttachmentThreshold(attachmentThreshold);
+}
+
+FFI_PLUGIN_EXPORT float spine_track_entry_get_draw_order_threshold(spine_track_entry entry) {
+    if (entry == nullptr) return 0;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    return _entry->getDrawOrderThreshold();
+}
+
+FFI_PLUGIN_EXPORT void spine_track_entry_set_draw_order_threshold(spine_track_entry entry, float drawOrderThreshold) {
+    if (entry == nullptr) return;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    _entry->setDrawOrderThreshold(drawOrderThreshold);
+}
+
+FFI_PLUGIN_EXPORT spine_track_entry spine_track_entry_get_next(spine_track_entry entry) {
+    if (entry == nullptr) return nullptr;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    return _entry->getNext();
+}
+
+FFI_PLUGIN_EXPORT int spine_track_entry_is_complete(spine_track_entry entry) {
+    if (entry == nullptr) return 0;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    return _entry->isComplete() ? -1 : 0;
+}
+
+FFI_PLUGIN_EXPORT float spine_track_entry_get_mix_time(spine_track_entry entry) {
+    if (entry == nullptr) return 0;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    return _entry->getMixTime();
+}
+
+FFI_PLUGIN_EXPORT void spine_track_entry_set_mix_time(spine_track_entry entry, float mixTime) {
+    if (entry == nullptr) return;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    _entry->setMixTime(mixTime);
+}
+
+FFI_PLUGIN_EXPORT float spine_track_entry_get_mix_duration(spine_track_entry entry) {
+    if (entry == nullptr) return 0;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    return _entry->getMixDuration();
+}
+
+FFI_PLUGIN_EXPORT void spine_track_entry_set_mix_duration(spine_track_entry entry, float mixDuration) {
+    if (entry == nullptr) return;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    _entry->setMixDuration(mixDuration);
+}
+
+FFI_PLUGIN_EXPORT spine_mix_blend spine_track_entry_get_mix_blend(spine_track_entry entry) {
+    if (entry == nullptr) return SPINE_MIX_BLEND_SETUP;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    return (spine_mix_blend)_entry->getMixBlend();
+}
+
+FFI_PLUGIN_EXPORT void spine_track_entry_set_mix_blend(spine_track_entry entry, spine_mix_blend mixBlend) {
+    if (entry == nullptr) return;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    _entry->setMixBlend((MixBlend)mixBlend);
+}
+
+FFI_PLUGIN_EXPORT spine_track_entry spine_track_entry_get_mixing_from(spine_track_entry entry) {
+    if (entry == nullptr) return nullptr;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    return _entry->getMixingFrom();
+}
+
+FFI_PLUGIN_EXPORT spine_track_entry spine_track_entry_get_mixing_to(spine_track_entry entry) {
+    if (entry == nullptr) return nullptr;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    return _entry->getMixingTo();
+}
+
+FFI_PLUGIN_EXPORT void spine_track_entry_reset_rotation_directions(spine_track_entry entry) {
+    if (entry == nullptr) return;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    _entry->resetRotationDirections();
+}
+
+FFI_PLUGIN_EXPORT float spine_track_entry_get_track_complete(spine_track_entry entry) {
+    if (entry == nullptr) return 0;
+    TrackEntry *_entry = (TrackEntry*)entry;
+    return _entry->getTrackComplete();
+}

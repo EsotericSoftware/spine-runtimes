@@ -53,6 +53,13 @@ typedef enum spine_blend_mode {
     SPINE_BLEND_MODE_SCREEN
 } spine_blend_mode;
 
+typedef enum spine_mix_blend {
+    SPINE_MIX_BLEND_SETUP = 0,
+    SPINE_MIX_BLEND_FIRST,
+    SPINE_MIX_BLEND_REPLACE,
+    SPINE_MIX_BLEND_ADD
+} spine_mix_blend;
+
 typedef struct spine_render_command {
     float *positions;
     float *uvs;
@@ -68,6 +75,7 @@ typedef struct spine_render_command {
 typedef void* spine_skeleton;
 typedef void* spine_animation_state;
 typedef void* spine_track_entry;
+typedef void* spine_animation;
 
 typedef struct spine_skeleton_drawable {
     spine_skeleton skeleton;
@@ -92,3 +100,50 @@ FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_add_empty_animation(sp
 FFI_PLUGIN_EXPORT void spine_animation_state_set_empty_animations(spine_animation_state state, float mixDuration);
 FFI_PLUGIN_EXPORT float spine_animation_state_get_time_scale(spine_animation_state state);
 FFI_PLUGIN_EXPORT void spine_animation_state_set_time_scale(spine_animation_state state, float timeScale);
+
+FFI_PLUGIN_EXPORT int spine_track_entry_get_track_index(spine_track_entry entry);
+FFI_PLUGIN_EXPORT spine_animation spine_track_entry_get_animation(spine_track_entry entry);
+FFI_PLUGIN_EXPORT spine_track_entry spine_track_entry_get_previous(spine_track_entry entry);
+FFI_PLUGIN_EXPORT int spine_track_entry_get_loop(spine_track_entry entry);
+FFI_PLUGIN_EXPORT void spine_track_entry_set_loop(spine_track_entry entry, int loop);
+FFI_PLUGIN_EXPORT int spine_track_entry_get_hold_previous(spine_track_entry entry);
+FFI_PLUGIN_EXPORT void spine_track_entry_set_hold_previous(spine_track_entry entry, int holdPrevious);
+FFI_PLUGIN_EXPORT int spine_track_entry_get_reverse(spine_track_entry entry);
+FFI_PLUGIN_EXPORT void spine_track_entry_set_reverse(spine_track_entry entry, int reverse);
+FFI_PLUGIN_EXPORT int spine_track_entry_get_shortest_rotation(spine_track_entry entry);
+FFI_PLUGIN_EXPORT void spine_track_entry_set_shortest_rotation(spine_track_entry entry, int shortestRotation);
+FFI_PLUGIN_EXPORT float spine_track_entry_get_delay(spine_track_entry entry);
+FFI_PLUGIN_EXPORT void spine_track_entry_set_delay(spine_track_entry entry, float delay);
+FFI_PLUGIN_EXPORT float spine_track_entry_get_track_time(spine_track_entry entry);
+FFI_PLUGIN_EXPORT void spine_track_entry_set_track_time(spine_track_entry entry, float trackTime);
+FFI_PLUGIN_EXPORT float spine_track_entry_get_track_end(spine_track_entry entry);
+FFI_PLUGIN_EXPORT void spine_track_entry_set_track_end(spine_track_entry entry, float trackEnd);
+FFI_PLUGIN_EXPORT float spine_track_entry_get_animation_start(spine_track_entry entry);
+FFI_PLUGIN_EXPORT void spine_track_entry_set_animation_start(spine_track_entry entry, float animationStart);
+FFI_PLUGIN_EXPORT float spine_track_entry_get_animation_end(spine_track_entry entry);
+FFI_PLUGIN_EXPORT void spine_track_entry_set_animation_end(spine_track_entry entry, float animationEnd);
+FFI_PLUGIN_EXPORT float spine_track_entry_get_animation_last(spine_track_entry entry);
+FFI_PLUGIN_EXPORT void spine_track_entry_set_animation_last(spine_track_entry entry, float animationLast);
+FFI_PLUGIN_EXPORT float spine_track_entry_get_animation_time(spine_track_entry entry);
+FFI_PLUGIN_EXPORT float spine_track_entry_get_time_scale(spine_track_entry entry);
+FFI_PLUGIN_EXPORT void spine_track_entry_set_time_scale(spine_track_entry entry, float timeScale);
+FFI_PLUGIN_EXPORT float spine_track_entry_get_alpha(spine_track_entry entry);
+FFI_PLUGIN_EXPORT void spine_track_entry_set_alpha(spine_track_entry entry, float alpha);
+FFI_PLUGIN_EXPORT float spine_track_entry_get_event_threshold(spine_track_entry entry);
+FFI_PLUGIN_EXPORT void spine_track_entry_set_event_threshold(spine_track_entry entry, float eventThreshold);
+FFI_PLUGIN_EXPORT float spine_track_entry_get_attachment_threshold(spine_track_entry entry);
+FFI_PLUGIN_EXPORT void spine_track_entry_set_attachment_threshold(spine_track_entry entry, float attachmentThreshold);
+FFI_PLUGIN_EXPORT float spine_track_entry_get_draw_order_threshold(spine_track_entry entry);
+FFI_PLUGIN_EXPORT void spine_track_entry_set_draw_order_threshold(spine_track_entry entry, float drawOrderThreshold);
+FFI_PLUGIN_EXPORT spine_track_entry spine_track_entry_get_next(spine_track_entry entry);
+FFI_PLUGIN_EXPORT int spine_track_entry_is_complete(spine_track_entry entry);
+FFI_PLUGIN_EXPORT float spine_track_entry_get_mix_time(spine_track_entry entry);
+FFI_PLUGIN_EXPORT void spine_track_entry_set_mix_time(spine_track_entry entry, float mixTime);
+FFI_PLUGIN_EXPORT float spine_track_entry_get_mix_duration(spine_track_entry entry);
+FFI_PLUGIN_EXPORT void spine_track_entry_set_mix_duration(spine_track_entry entry, float mixDuration);
+FFI_PLUGIN_EXPORT spine_mix_blend spine_track_entry_get_mix_blend(spine_track_entry entry);
+FFI_PLUGIN_EXPORT void spine_track_entry_set_mix_blend(spine_track_entry entry, spine_mix_blend mixBlend);
+FFI_PLUGIN_EXPORT spine_track_entry spine_track_entry_get_mixing_from(spine_track_entry entry);
+FFI_PLUGIN_EXPORT spine_track_entry spine_track_entry_get_mixing_to(spine_track_entry entry);
+FFI_PLUGIN_EXPORT void spine_track_entry_reset_rotation_directions(spine_track_entry entry);
+FFI_PLUGIN_EXPORT float spine_track_entry_get_track_complete(spine_track_entry entry);

@@ -427,6 +427,722 @@ class SpineFlutterBindings {
   late final _spine_animation_state_set_time_scale =
       _spine_animation_state_set_time_scalePtr
           .asFunction<void Function(spine_animation_state, double)>();
+
+  int spine_track_entry_get_track_index(
+    spine_track_entry entry,
+  ) {
+    return _spine_track_entry_get_track_index(
+      entry,
+    );
+  }
+
+  late final _spine_track_entry_get_track_indexPtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_track_entry)>>(
+          'spine_track_entry_get_track_index');
+  late final _spine_track_entry_get_track_index =
+      _spine_track_entry_get_track_indexPtr
+          .asFunction<int Function(spine_track_entry)>();
+
+  spine_animation spine_track_entry_get_animation(
+    spine_track_entry entry,
+  ) {
+    return _spine_track_entry_get_animation(
+      entry,
+    );
+  }
+
+  late final _spine_track_entry_get_animationPtr =
+      _lookup<ffi.NativeFunction<spine_animation Function(spine_track_entry)>>(
+          'spine_track_entry_get_animation');
+  late final _spine_track_entry_get_animation =
+      _spine_track_entry_get_animationPtr
+          .asFunction<spine_animation Function(spine_track_entry)>();
+
+  spine_track_entry spine_track_entry_get_previous(
+    spine_track_entry entry,
+  ) {
+    return _spine_track_entry_get_previous(
+      entry,
+    );
+  }
+
+  late final _spine_track_entry_get_previousPtr = _lookup<
+          ffi.NativeFunction<spine_track_entry Function(spine_track_entry)>>(
+      'spine_track_entry_get_previous');
+  late final _spine_track_entry_get_previous =
+      _spine_track_entry_get_previousPtr
+          .asFunction<spine_track_entry Function(spine_track_entry)>();
+
+  int spine_track_entry_get_loop(
+    spine_track_entry entry,
+  ) {
+    return _spine_track_entry_get_loop(
+      entry,
+    );
+  }
+
+  late final _spine_track_entry_get_loopPtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_track_entry)>>(
+          'spine_track_entry_get_loop');
+  late final _spine_track_entry_get_loop = _spine_track_entry_get_loopPtr
+      .asFunction<int Function(spine_track_entry)>();
+
+  void spine_track_entry_set_loop(
+    spine_track_entry entry,
+    int loop,
+  ) {
+    return _spine_track_entry_set_loop(
+      entry,
+      loop,
+    );
+  }
+
+  late final _spine_track_entry_set_loopPtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(spine_track_entry, ffi.Int32)>>(
+      'spine_track_entry_set_loop');
+  late final _spine_track_entry_set_loop = _spine_track_entry_set_loopPtr
+      .asFunction<void Function(spine_track_entry, int)>();
+
+  int spine_track_entry_get_hold_previous(
+    spine_track_entry entry,
+  ) {
+    return _spine_track_entry_get_hold_previous(
+      entry,
+    );
+  }
+
+  late final _spine_track_entry_get_hold_previousPtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_track_entry)>>(
+          'spine_track_entry_get_hold_previous');
+  late final _spine_track_entry_get_hold_previous =
+      _spine_track_entry_get_hold_previousPtr
+          .asFunction<int Function(spine_track_entry)>();
+
+  void spine_track_entry_set_hold_previous(
+    spine_track_entry entry,
+    int holdPrevious,
+  ) {
+    return _spine_track_entry_set_hold_previous(
+      entry,
+      holdPrevious,
+    );
+  }
+
+  late final _spine_track_entry_set_hold_previousPtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(spine_track_entry, ffi.Int32)>>(
+      'spine_track_entry_set_hold_previous');
+  late final _spine_track_entry_set_hold_previous =
+      _spine_track_entry_set_hold_previousPtr
+          .asFunction<void Function(spine_track_entry, int)>();
+
+  int spine_track_entry_get_reverse(
+    spine_track_entry entry,
+  ) {
+    return _spine_track_entry_get_reverse(
+      entry,
+    );
+  }
+
+  late final _spine_track_entry_get_reversePtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_track_entry)>>(
+          'spine_track_entry_get_reverse');
+  late final _spine_track_entry_get_reverse = _spine_track_entry_get_reversePtr
+      .asFunction<int Function(spine_track_entry)>();
+
+  void spine_track_entry_set_reverse(
+    spine_track_entry entry,
+    int reverse,
+  ) {
+    return _spine_track_entry_set_reverse(
+      entry,
+      reverse,
+    );
+  }
+
+  late final _spine_track_entry_set_reversePtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(spine_track_entry, ffi.Int32)>>(
+      'spine_track_entry_set_reverse');
+  late final _spine_track_entry_set_reverse = _spine_track_entry_set_reversePtr
+      .asFunction<void Function(spine_track_entry, int)>();
+
+  int spine_track_entry_get_shortest_rotation(
+    spine_track_entry entry,
+  ) {
+    return _spine_track_entry_get_shortest_rotation(
+      entry,
+    );
+  }
+
+  late final _spine_track_entry_get_shortest_rotationPtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_track_entry)>>(
+          'spine_track_entry_get_shortest_rotation');
+  late final _spine_track_entry_get_shortest_rotation =
+      _spine_track_entry_get_shortest_rotationPtr
+          .asFunction<int Function(spine_track_entry)>();
+
+  void spine_track_entry_set_shortest_rotation(
+    spine_track_entry entry,
+    int shortestRotation,
+  ) {
+    return _spine_track_entry_set_shortest_rotation(
+      entry,
+      shortestRotation,
+    );
+  }
+
+  late final _spine_track_entry_set_shortest_rotationPtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(spine_track_entry, ffi.Int32)>>(
+      'spine_track_entry_set_shortest_rotation');
+  late final _spine_track_entry_set_shortest_rotation =
+      _spine_track_entry_set_shortest_rotationPtr
+          .asFunction<void Function(spine_track_entry, int)>();
+
+  double spine_track_entry_get_delay(
+    spine_track_entry entry,
+  ) {
+    return _spine_track_entry_get_delay(
+      entry,
+    );
+  }
+
+  late final _spine_track_entry_get_delayPtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_track_entry)>>(
+          'spine_track_entry_get_delay');
+  late final _spine_track_entry_get_delay = _spine_track_entry_get_delayPtr
+      .asFunction<double Function(spine_track_entry)>();
+
+  void spine_track_entry_set_delay(
+    spine_track_entry entry,
+    double delay,
+  ) {
+    return _spine_track_entry_set_delay(
+      entry,
+      delay,
+    );
+  }
+
+  late final _spine_track_entry_set_delayPtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(spine_track_entry, ffi.Float)>>(
+      'spine_track_entry_set_delay');
+  late final _spine_track_entry_set_delay = _spine_track_entry_set_delayPtr
+      .asFunction<void Function(spine_track_entry, double)>();
+
+  double spine_track_entry_get_track_time(
+    spine_track_entry entry,
+  ) {
+    return _spine_track_entry_get_track_time(
+      entry,
+    );
+  }
+
+  late final _spine_track_entry_get_track_timePtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_track_entry)>>(
+          'spine_track_entry_get_track_time');
+  late final _spine_track_entry_get_track_time =
+      _spine_track_entry_get_track_timePtr
+          .asFunction<double Function(spine_track_entry)>();
+
+  void spine_track_entry_set_track_time(
+    spine_track_entry entry,
+    double trackTime,
+  ) {
+    return _spine_track_entry_set_track_time(
+      entry,
+      trackTime,
+    );
+  }
+
+  late final _spine_track_entry_set_track_timePtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(spine_track_entry, ffi.Float)>>(
+      'spine_track_entry_set_track_time');
+  late final _spine_track_entry_set_track_time =
+      _spine_track_entry_set_track_timePtr
+          .asFunction<void Function(spine_track_entry, double)>();
+
+  double spine_track_entry_get_track_end(
+    spine_track_entry entry,
+  ) {
+    return _spine_track_entry_get_track_end(
+      entry,
+    );
+  }
+
+  late final _spine_track_entry_get_track_endPtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_track_entry)>>(
+          'spine_track_entry_get_track_end');
+  late final _spine_track_entry_get_track_end =
+      _spine_track_entry_get_track_endPtr
+          .asFunction<double Function(spine_track_entry)>();
+
+  void spine_track_entry_set_track_end(
+    spine_track_entry entry,
+    double trackEnd,
+  ) {
+    return _spine_track_entry_set_track_end(
+      entry,
+      trackEnd,
+    );
+  }
+
+  late final _spine_track_entry_set_track_endPtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(spine_track_entry, ffi.Float)>>(
+      'spine_track_entry_set_track_end');
+  late final _spine_track_entry_set_track_end =
+      _spine_track_entry_set_track_endPtr
+          .asFunction<void Function(spine_track_entry, double)>();
+
+  double spine_track_entry_get_animation_start(
+    spine_track_entry entry,
+  ) {
+    return _spine_track_entry_get_animation_start(
+      entry,
+    );
+  }
+
+  late final _spine_track_entry_get_animation_startPtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_track_entry)>>(
+          'spine_track_entry_get_animation_start');
+  late final _spine_track_entry_get_animation_start =
+      _spine_track_entry_get_animation_startPtr
+          .asFunction<double Function(spine_track_entry)>();
+
+  void spine_track_entry_set_animation_start(
+    spine_track_entry entry,
+    double animationStart,
+  ) {
+    return _spine_track_entry_set_animation_start(
+      entry,
+      animationStart,
+    );
+  }
+
+  late final _spine_track_entry_set_animation_startPtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(spine_track_entry, ffi.Float)>>(
+      'spine_track_entry_set_animation_start');
+  late final _spine_track_entry_set_animation_start =
+      _spine_track_entry_set_animation_startPtr
+          .asFunction<void Function(spine_track_entry, double)>();
+
+  double spine_track_entry_get_animation_end(
+    spine_track_entry entry,
+  ) {
+    return _spine_track_entry_get_animation_end(
+      entry,
+    );
+  }
+
+  late final _spine_track_entry_get_animation_endPtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_track_entry)>>(
+          'spine_track_entry_get_animation_end');
+  late final _spine_track_entry_get_animation_end =
+      _spine_track_entry_get_animation_endPtr
+          .asFunction<double Function(spine_track_entry)>();
+
+  void spine_track_entry_set_animation_end(
+    spine_track_entry entry,
+    double animationEnd,
+  ) {
+    return _spine_track_entry_set_animation_end(
+      entry,
+      animationEnd,
+    );
+  }
+
+  late final _spine_track_entry_set_animation_endPtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(spine_track_entry, ffi.Float)>>(
+      'spine_track_entry_set_animation_end');
+  late final _spine_track_entry_set_animation_end =
+      _spine_track_entry_set_animation_endPtr
+          .asFunction<void Function(spine_track_entry, double)>();
+
+  double spine_track_entry_get_animation_last(
+    spine_track_entry entry,
+  ) {
+    return _spine_track_entry_get_animation_last(
+      entry,
+    );
+  }
+
+  late final _spine_track_entry_get_animation_lastPtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_track_entry)>>(
+          'spine_track_entry_get_animation_last');
+  late final _spine_track_entry_get_animation_last =
+      _spine_track_entry_get_animation_lastPtr
+          .asFunction<double Function(spine_track_entry)>();
+
+  void spine_track_entry_set_animation_last(
+    spine_track_entry entry,
+    double animationLast,
+  ) {
+    return _spine_track_entry_set_animation_last(
+      entry,
+      animationLast,
+    );
+  }
+
+  late final _spine_track_entry_set_animation_lastPtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(spine_track_entry, ffi.Float)>>(
+      'spine_track_entry_set_animation_last');
+  late final _spine_track_entry_set_animation_last =
+      _spine_track_entry_set_animation_lastPtr
+          .asFunction<void Function(spine_track_entry, double)>();
+
+  double spine_track_entry_get_animation_time(
+    spine_track_entry entry,
+  ) {
+    return _spine_track_entry_get_animation_time(
+      entry,
+    );
+  }
+
+  late final _spine_track_entry_get_animation_timePtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_track_entry)>>(
+          'spine_track_entry_get_animation_time');
+  late final _spine_track_entry_get_animation_time =
+      _spine_track_entry_get_animation_timePtr
+          .asFunction<double Function(spine_track_entry)>();
+
+  double spine_track_entry_get_time_scale(
+    spine_track_entry entry,
+  ) {
+    return _spine_track_entry_get_time_scale(
+      entry,
+    );
+  }
+
+  late final _spine_track_entry_get_time_scalePtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_track_entry)>>(
+          'spine_track_entry_get_time_scale');
+  late final _spine_track_entry_get_time_scale =
+      _spine_track_entry_get_time_scalePtr
+          .asFunction<double Function(spine_track_entry)>();
+
+  void spine_track_entry_set_time_scale(
+    spine_track_entry entry,
+    double timeScale,
+  ) {
+    return _spine_track_entry_set_time_scale(
+      entry,
+      timeScale,
+    );
+  }
+
+  late final _spine_track_entry_set_time_scalePtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(spine_track_entry, ffi.Float)>>(
+      'spine_track_entry_set_time_scale');
+  late final _spine_track_entry_set_time_scale =
+      _spine_track_entry_set_time_scalePtr
+          .asFunction<void Function(spine_track_entry, double)>();
+
+  double spine_track_entry_get_alpha(
+    spine_track_entry entry,
+  ) {
+    return _spine_track_entry_get_alpha(
+      entry,
+    );
+  }
+
+  late final _spine_track_entry_get_alphaPtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_track_entry)>>(
+          'spine_track_entry_get_alpha');
+  late final _spine_track_entry_get_alpha = _spine_track_entry_get_alphaPtr
+      .asFunction<double Function(spine_track_entry)>();
+
+  void spine_track_entry_set_alpha(
+    spine_track_entry entry,
+    double alpha,
+  ) {
+    return _spine_track_entry_set_alpha(
+      entry,
+      alpha,
+    );
+  }
+
+  late final _spine_track_entry_set_alphaPtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(spine_track_entry, ffi.Float)>>(
+      'spine_track_entry_set_alpha');
+  late final _spine_track_entry_set_alpha = _spine_track_entry_set_alphaPtr
+      .asFunction<void Function(spine_track_entry, double)>();
+
+  double spine_track_entry_get_event_threshold(
+    spine_track_entry entry,
+  ) {
+    return _spine_track_entry_get_event_threshold(
+      entry,
+    );
+  }
+
+  late final _spine_track_entry_get_event_thresholdPtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_track_entry)>>(
+          'spine_track_entry_get_event_threshold');
+  late final _spine_track_entry_get_event_threshold =
+      _spine_track_entry_get_event_thresholdPtr
+          .asFunction<double Function(spine_track_entry)>();
+
+  void spine_track_entry_set_event_threshold(
+    spine_track_entry entry,
+    double eventThreshold,
+  ) {
+    return _spine_track_entry_set_event_threshold(
+      entry,
+      eventThreshold,
+    );
+  }
+
+  late final _spine_track_entry_set_event_thresholdPtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(spine_track_entry, ffi.Float)>>(
+      'spine_track_entry_set_event_threshold');
+  late final _spine_track_entry_set_event_threshold =
+      _spine_track_entry_set_event_thresholdPtr
+          .asFunction<void Function(spine_track_entry, double)>();
+
+  double spine_track_entry_get_attachment_threshold(
+    spine_track_entry entry,
+  ) {
+    return _spine_track_entry_get_attachment_threshold(
+      entry,
+    );
+  }
+
+  late final _spine_track_entry_get_attachment_thresholdPtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_track_entry)>>(
+          'spine_track_entry_get_attachment_threshold');
+  late final _spine_track_entry_get_attachment_threshold =
+      _spine_track_entry_get_attachment_thresholdPtr
+          .asFunction<double Function(spine_track_entry)>();
+
+  void spine_track_entry_set_attachment_threshold(
+    spine_track_entry entry,
+    double attachmentThreshold,
+  ) {
+    return _spine_track_entry_set_attachment_threshold(
+      entry,
+      attachmentThreshold,
+    );
+  }
+
+  late final _spine_track_entry_set_attachment_thresholdPtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(spine_track_entry, ffi.Float)>>(
+      'spine_track_entry_set_attachment_threshold');
+  late final _spine_track_entry_set_attachment_threshold =
+      _spine_track_entry_set_attachment_thresholdPtr
+          .asFunction<void Function(spine_track_entry, double)>();
+
+  double spine_track_entry_get_draw_order_threshold(
+    spine_track_entry entry,
+  ) {
+    return _spine_track_entry_get_draw_order_threshold(
+      entry,
+    );
+  }
+
+  late final _spine_track_entry_get_draw_order_thresholdPtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_track_entry)>>(
+          'spine_track_entry_get_draw_order_threshold');
+  late final _spine_track_entry_get_draw_order_threshold =
+      _spine_track_entry_get_draw_order_thresholdPtr
+          .asFunction<double Function(spine_track_entry)>();
+
+  void spine_track_entry_set_draw_order_threshold(
+    spine_track_entry entry,
+    double drawOrderThreshold,
+  ) {
+    return _spine_track_entry_set_draw_order_threshold(
+      entry,
+      drawOrderThreshold,
+    );
+  }
+
+  late final _spine_track_entry_set_draw_order_thresholdPtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(spine_track_entry, ffi.Float)>>(
+      'spine_track_entry_set_draw_order_threshold');
+  late final _spine_track_entry_set_draw_order_threshold =
+      _spine_track_entry_set_draw_order_thresholdPtr
+          .asFunction<void Function(spine_track_entry, double)>();
+
+  spine_track_entry spine_track_entry_get_next(
+    spine_track_entry entry,
+  ) {
+    return _spine_track_entry_get_next(
+      entry,
+    );
+  }
+
+  late final _spine_track_entry_get_nextPtr = _lookup<
+          ffi.NativeFunction<spine_track_entry Function(spine_track_entry)>>(
+      'spine_track_entry_get_next');
+  late final _spine_track_entry_get_next = _spine_track_entry_get_nextPtr
+      .asFunction<spine_track_entry Function(spine_track_entry)>();
+
+  int spine_track_entry_is_complete(
+    spine_track_entry entry,
+  ) {
+    return _spine_track_entry_is_complete(
+      entry,
+    );
+  }
+
+  late final _spine_track_entry_is_completePtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_track_entry)>>(
+          'spine_track_entry_is_complete');
+  late final _spine_track_entry_is_complete = _spine_track_entry_is_completePtr
+      .asFunction<int Function(spine_track_entry)>();
+
+  double spine_track_entry_get_mix_time(
+    spine_track_entry entry,
+  ) {
+    return _spine_track_entry_get_mix_time(
+      entry,
+    );
+  }
+
+  late final _spine_track_entry_get_mix_timePtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_track_entry)>>(
+          'spine_track_entry_get_mix_time');
+  late final _spine_track_entry_get_mix_time =
+      _spine_track_entry_get_mix_timePtr
+          .asFunction<double Function(spine_track_entry)>();
+
+  void spine_track_entry_set_mix_time(
+    spine_track_entry entry,
+    double mixTime,
+  ) {
+    return _spine_track_entry_set_mix_time(
+      entry,
+      mixTime,
+    );
+  }
+
+  late final _spine_track_entry_set_mix_timePtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(spine_track_entry, ffi.Float)>>(
+      'spine_track_entry_set_mix_time');
+  late final _spine_track_entry_set_mix_time =
+      _spine_track_entry_set_mix_timePtr
+          .asFunction<void Function(spine_track_entry, double)>();
+
+  double spine_track_entry_get_mix_duration(
+    spine_track_entry entry,
+  ) {
+    return _spine_track_entry_get_mix_duration(
+      entry,
+    );
+  }
+
+  late final _spine_track_entry_get_mix_durationPtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_track_entry)>>(
+          'spine_track_entry_get_mix_duration');
+  late final _spine_track_entry_get_mix_duration =
+      _spine_track_entry_get_mix_durationPtr
+          .asFunction<double Function(spine_track_entry)>();
+
+  void spine_track_entry_set_mix_duration(
+    spine_track_entry entry,
+    double mixDuration,
+  ) {
+    return _spine_track_entry_set_mix_duration(
+      entry,
+      mixDuration,
+    );
+  }
+
+  late final _spine_track_entry_set_mix_durationPtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(spine_track_entry, ffi.Float)>>(
+      'spine_track_entry_set_mix_duration');
+  late final _spine_track_entry_set_mix_duration =
+      _spine_track_entry_set_mix_durationPtr
+          .asFunction<void Function(spine_track_entry, double)>();
+
+  int spine_track_entry_get_mix_blend(
+    spine_track_entry entry,
+  ) {
+    return _spine_track_entry_get_mix_blend(
+      entry,
+    );
+  }
+
+  late final _spine_track_entry_get_mix_blendPtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_track_entry)>>(
+          'spine_track_entry_get_mix_blend');
+  late final _spine_track_entry_get_mix_blend =
+      _spine_track_entry_get_mix_blendPtr
+          .asFunction<int Function(spine_track_entry)>();
+
+  void spine_track_entry_set_mix_blend(
+    spine_track_entry entry,
+    int mixBlend,
+  ) {
+    return _spine_track_entry_set_mix_blend(
+      entry,
+      mixBlend,
+    );
+  }
+
+  late final _spine_track_entry_set_mix_blendPtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(spine_track_entry, ffi.Int32)>>(
+      'spine_track_entry_set_mix_blend');
+  late final _spine_track_entry_set_mix_blend =
+      _spine_track_entry_set_mix_blendPtr
+          .asFunction<void Function(spine_track_entry, int)>();
+
+  spine_track_entry spine_track_entry_get_mixing_from(
+    spine_track_entry entry,
+  ) {
+    return _spine_track_entry_get_mixing_from(
+      entry,
+    );
+  }
+
+  late final _spine_track_entry_get_mixing_fromPtr = _lookup<
+          ffi.NativeFunction<spine_track_entry Function(spine_track_entry)>>(
+      'spine_track_entry_get_mixing_from');
+  late final _spine_track_entry_get_mixing_from =
+      _spine_track_entry_get_mixing_fromPtr
+          .asFunction<spine_track_entry Function(spine_track_entry)>();
+
+  spine_track_entry spine_track_entry_get_mixing_to(
+    spine_track_entry entry,
+  ) {
+    return _spine_track_entry_get_mixing_to(
+      entry,
+    );
+  }
+
+  late final _spine_track_entry_get_mixing_toPtr = _lookup<
+          ffi.NativeFunction<spine_track_entry Function(spine_track_entry)>>(
+      'spine_track_entry_get_mixing_to');
+  late final _spine_track_entry_get_mixing_to =
+      _spine_track_entry_get_mixing_toPtr
+          .asFunction<spine_track_entry Function(spine_track_entry)>();
+
+  void spine_track_entry_reset_rotation_directions(
+    spine_track_entry entry,
+  ) {
+    return _spine_track_entry_reset_rotation_directions(
+      entry,
+    );
+  }
+
+  late final _spine_track_entry_reset_rotation_directionsPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_track_entry)>>(
+          'spine_track_entry_reset_rotation_directions');
+  late final _spine_track_entry_reset_rotation_directions =
+      _spine_track_entry_reset_rotation_directionsPtr
+          .asFunction<void Function(spine_track_entry)>();
+
+  double spine_track_entry_get_track_complete(
+    spine_track_entry entry,
+  ) {
+    return _spine_track_entry_get_track_complete(
+      entry,
+    );
+  }
+
+  late final _spine_track_entry_get_track_completePtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_track_entry)>>(
+          'spine_track_entry_get_track_complete');
+  late final _spine_track_entry_get_track_complete =
+      _spine_track_entry_get_track_completePtr
+          .asFunction<double Function(spine_track_entry)>();
 }
 
 class spine_atlas extends ffi.Struct {
@@ -451,6 +1167,13 @@ abstract class spine_blend_mode {
   static const int SPINE_BLEND_MODE_ADDITIVE = 1;
   static const int SPINE_BLEND_MODE_MULTIPLY = 2;
   static const int SPINE_BLEND_MODE_SCREEN = 3;
+}
+
+abstract class spine_mix_blend {
+  static const int SPINE_MIX_BLEND_SETUP = 0;
+  static const int SPINE_MIX_BLEND_FIRST = 1;
+  static const int SPINE_MIX_BLEND_REPLACE = 2;
+  static const int SPINE_MIX_BLEND_ADD = 3;
 }
 
 class spine_render_command extends ffi.Struct {
@@ -490,3 +1213,4 @@ class spine_skeleton_drawable extends ffi.Struct {
 typedef spine_skeleton = ffi.Pointer<ffi.Void>;
 typedef spine_animation_state = ffi.Pointer<ffi.Void>;
 typedef spine_track_entry = ffi.Pointer<ffi.Void>;
+typedef spine_animation = ffi.Pointer<ffi.Void>;

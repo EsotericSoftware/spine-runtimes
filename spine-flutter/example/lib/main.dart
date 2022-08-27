@@ -36,7 +36,9 @@ class Spineboy extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = SpineWidgetController((controller) {
-      controller.animationState?.setAnimation(0, "walk", true);
+      final state = controller.animationState;
+      state?.setAnimation(0, "walk", false).setMixDuration(2);
+      state?.addEmptyAnimation(0, 0.2, 0);
     });
 
     return Scaffold(
