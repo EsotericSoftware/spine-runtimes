@@ -53,6 +53,7 @@ class AnimationStateEvents extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = SpineWidgetController((controller) {
       final trackEntry = controller.animationState?.setAnimation(0, "walk", true);
+      controller.skeleton.setColor(1, 0, 0, 1);
     });
 
     return Scaffold(

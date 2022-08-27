@@ -204,9 +204,10 @@ class _SpineRenderObject extends RenderBox {
       ..save()
       ..clipRect(offset & size);
 
-    final commands = _skeletonDrawable.render();
     canvas.save();
     canvas.translate(offset.dx + size.width / 2, offset.dy + size.height);
+
+    final commands = _skeletonDrawable.render();
     for (final cmd in commands) {
       canvas.drawVertices(cmd.vertices, BlendMode.modulate,
           _skeletonDrawable.atlas.atlasPagePaints[cmd.atlasPageIndex]);

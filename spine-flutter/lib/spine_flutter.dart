@@ -118,10 +118,154 @@ class SkeletonData {
   }
 }
 
+class Bone {
+  final spine_bone _bone;
+
+  Bone(this._bone);
+}
+
+class Slot {
+  final spine_slot _slot;
+
+  Slot(this._slot);
+}
+
+class Attachment {
+  final spine_attachment _attachment;
+
+  Attachment(this._attachment);
+}
+
+class IkConstraint {
+  final spine_ik_constraint _constraint;
+
+  IkConstraint(this._constraint);
+}
+
+class TransformConstraint {
+  final spine_transform_constraint _constraint;
+
+  TransformConstraint(this._constraint);
+}
+
+class PathConstraint {
+  final spine_path_constraint _constraint;
+
+  PathConstraint(this._constraint);
+}
+
 class Skeleton {
   final spine_skeleton _skeleton;
 
   Skeleton(this._skeleton);
+
+  /// Caches information about bones and constraints. Must be called if bones, constraints or weighted path attachments are added
+  /// or removed.
+  void updateCache() {
+    _bindings.spine_skeleton_update_cache(_skeleton);
+  }
+
+  /// Updates the world transform for each bone and applies constraints.
+  void updateWorldTransform() {
+    _bindings.spine_skeleton_update_world_transform(_skeleton);
+  }
+
+  void updateWorldTransformBone(Bone parent) {
+    _bindings.spine_skeleton_update_world_transform_bone(_skeleton, parent._bone);
+  }
+
+  /// Sets the bones, constraints, and slots to their setup pose values.
+  void setToSetupPose() {
+    _bindings.spine_skeleton_set_to_setup_pose(_skeleton);
+  }
+
+  /// Sets the bones and constraints to their setup pose values.
+  void setBonesToSetupPose() {
+    _bindings.spine_skeleton_set_bones_to_setup_pose(_skeleton);
+  }
+
+  void setSlotsToSetupPose() {
+    _bindings.spine_skeleton_set_slots_to_setup_pose(_skeleton);
+  }
+
+  Bone? findBone(String boneName) {
+    final nameNative = boneName.toNativeUtf8();
+    final bone = _bindings.spine_skeleton_find_bone(_skeleton, nameNative.cast());
+    calloc.free(nameNative);
+    if (bone.address == nullptr.address) return null;
+    return Bone(bone);
+  }
+
+  Slot? findSlot(String slotName) {
+    final nameNative = slotName.toNativeUtf8();
+    final slot = _bindings.spine_skeleton_find_slot(_skeleton, nameNative.cast());
+    calloc.free(nameNative);
+    if (slot.address == nullptr.address) return null;
+    return Slot(slot);
+  }
+
+  /// Attachments from the new skin are attached if the corresponding attachment from the old skin was attached.
+  /// If there was no old skin, each slot's setup mode attachment is attached from the new skin.
+  /// After changing the skin, the visible attachments can be reset to those attached in the setup pose by calling
+  /// See Skeleton::setSlotsToSetupPose()
+  /// Also, often AnimationState::apply(Skeleton&) is called before the next time the
+  /// skeleton is rendered to allow any attachment keys in the current animation(s) to hide or show attachments from the new skin.
+  /// @param newSkin May be NULL.
+  void setSkin(String skinName) {
+    final nameNative = skinName.toNativeUtf8();
+    _bindings.spine_skeleton_set_skin(_skeleton, nameNative.cast());
+    calloc.free(nameNative);
+  }
+
+  Attachment? getAttachmentByName(String slotName, String attachmentName) {
+    final slotNameNative = slotName.toNativeUtf8();
+    final attachmentNameNative = attachmentName.toNativeUtf8();
+    final attachment = _bindings.spine_skeleton_get_attachment_by_name(_skeleton, slotNameNative.cast(), attachmentNameNative.cast());
+    calloc.free(slotNameNative);
+    calloc.free(attachmentNameNative);
+    if (attachment.address == nullptr.address) return null;
+    return Attachment(attachment);
+  }
+
+  Attachment? getAttachment(int slotIndex, String attachmentName) {
+    final attachmentNameNative = attachmentName.toNativeUtf8();
+    final attachment = _bindings.spine_skeleton_get_attachment(_skeleton, slotIndex, attachmentNameNative.cast());
+    calloc.free(attachmentNameNative);
+    if (attachment.address == nullptr.address) return null;
+    return Attachment(attachment);
+  }
+
+  void setAttachment(String slotName, String attachmentName) {
+    final slotNameNative = slotName.toNativeUtf8();
+    final attachmentNameNative = attachmentName.toNativeUtf8();
+    _bindings.spine_skeleton_set_attachment(_skeleton, slotNameNative.cast(), attachmentNameNative.cast());
+    calloc.free(slotNameNative);
+    calloc.free(attachmentNameNative);
+  }
+
+  IkConstraint? findIkConstraint(String constraintName) {
+    final nameNative = constraintName.toNativeUtf8();
+    final constraint = _bindings.spine_skeleton_find_ik_constraint(_skeleton, nameNative.cast());
+    calloc.free(nameNative);
+    if (constraint.address == nullptr.address) return null;
+    return IkConstraint(constraint);
+  }
+
+  TransformConstraint? findTransformConstraint(String constraintName) {
+    final nameNative = constraintName.toNativeUtf8();
+    final constraint = _bindings.spine_skeleton_find_transform_constraint(_skeleton, nameNative.cast());
+    calloc.free(nameNative);
+    if (constraint.address == nullptr.address) return null;
+    return TransformConstraint(constraint);
+  }
+
+  PathConstraint? findPathConstraint(String constraintName) {
+    final nameNative = constraintName.toNativeUtf8();
+    final constraint = _bindings.spine_skeleton_find_path_constraint(_skeleton, nameNative.cast());
+    calloc.free(nameNative);
+    if (constraint.address == nullptr.address) return null;
+    return PathConstraint(constraint);
+  }
 }
 
 class Animation {

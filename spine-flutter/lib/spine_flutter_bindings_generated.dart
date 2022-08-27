@@ -1243,7 +1243,7 @@ class SpineFlutterBindings {
 
   void spine_skeleton_update_world_transform_bone(
     spine_skeleton skeleton,
-    ffi.Pointer<spine_bone> parent,
+    spine_bone parent,
   ) {
     return _spine_skeleton_update_world_transform_bone(
       skeleton,
@@ -1252,12 +1252,11 @@ class SpineFlutterBindings {
   }
 
   late final _spine_skeleton_update_world_transform_bonePtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Void Function(spine_skeleton, ffi.Pointer<spine_bone>)>>(
+          ffi.NativeFunction<ffi.Void Function(spine_skeleton, spine_bone)>>(
       'spine_skeleton_update_world_transform_bone');
   late final _spine_skeleton_update_world_transform_bone =
       _spine_skeleton_update_world_transform_bonePtr
-          .asFunction<void Function(spine_skeleton, ffi.Pointer<spine_bone>)>();
+          .asFunction<void Function(spine_skeleton, spine_bone)>();
 
   void spine_skeleton_set_to_setup_pose(
     spine_skeleton skeleton,

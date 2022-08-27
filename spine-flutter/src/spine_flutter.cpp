@@ -660,7 +660,7 @@ FFI_PLUGIN_EXPORT void spine_skeleton_update_world_transform(spine_skeleton skel
     _skeleton->updateWorldTransform();
 }
 
-FFI_PLUGIN_EXPORT void spine_skeleton_update_world_transform_bone(spine_skeleton skeleton, spine_bone *parent) {
+FFI_PLUGIN_EXPORT void spine_skeleton_update_world_transform_bone(spine_skeleton skeleton, spine_bone parent) {
     if (skeleton == nullptr) return;
     if (parent == nullptr) return;
     Skeleton *_skeleton = (Skeleton*)skeleton;
