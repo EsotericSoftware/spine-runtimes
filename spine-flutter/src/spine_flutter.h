@@ -26,22 +26,28 @@
 typedef void* spine_skeleton;
 typedef void* spine_skeleton_data;
 typedef void* spine_bone;
+typedef void* spine_bone_data;
 typedef void* spine_slot;
+typedef void* spine_slot_data;
 typedef void* spine_skin;
 typedef void* spine_attachment;
 typedef void* spine_ik_constraint;
+typedef void* spine_ik_constraint_data;
 typedef void* spine_transform_constraint;
+typedef void* spine_transform_constraint_data;
 typedef void* spine_path_constraint;
+typedef void* spine_path_constraint_data;
 typedef void* spine_animation_state;
 typedef void* spine_animation_state_events;
 typedef void* spine_event;
+typedef void* spine_event_data;
 typedef void* spine_track_entry;
 typedef void* spine_animation;
 
 typedef struct spine_atlas {
     void *atlas;
     char **imagePaths;
-    int32_t numImagePaths;
+    int numImagePaths;
     char *error;
 } spine_atlas;
 
@@ -77,10 +83,10 @@ typedef struct spine_render_command {
     float *positions;
     float *uvs;
     int32_t *colors;
-    int32_t numVertices;
+    int numVertices;
     uint16_t *indices;
-    int32_t numIndices;
-    int32_t atlasPage;
+    int numIndices;
+    int atlasPage;
     spine_blend_mode blendMode;
     struct spine_render_command *next;
 } spine_render_command;
@@ -101,15 +107,15 @@ typedef struct spine_skeleton_drawable {
     spine_render_command *renderCommand;
 } spine_skeleton_drawable;
 
-FFI_PLUGIN_EXPORT int32_t spine_major_version();
-FFI_PLUGIN_EXPORT int32_t spine_minor_version();
+FFI_PLUGIN_EXPORT int spine_major_version();
+FFI_PLUGIN_EXPORT int spine_minor_version();
 FFI_PLUGIN_EXPORT void spine_report_leaks();
 
 FFI_PLUGIN_EXPORT spine_atlas* spine_atlas_load(const char *atlasData);
 FFI_PLUGIN_EXPORT void spine_atlas_dispose(spine_atlas *atlas);
 
 FFI_PLUGIN_EXPORT spine_skeleton_data_result spine_skeleton_data_load_json(spine_atlas *atlas, const char *skeletonData);
-FFI_PLUGIN_EXPORT spine_skeleton_data_result spine_skeleton_data_load_binary(spine_atlas *atlas, const unsigned char *skeletonData, int32_t length);
+FFI_PLUGIN_EXPORT spine_skeleton_data_result spine_skeleton_data_load_binary(spine_atlas *atlas, const unsigned char *skeletonData, int length);
 FFI_PLUGIN_EXPORT void spine_skeleton_data_dispose(spine_skeleton_data skeletonData);
 
 FFI_PLUGIN_EXPORT spine_skeleton_drawable *spine_skeleton_drawable_create(spine_skeleton_data skeletonData);
@@ -119,11 +125,11 @@ FFI_PLUGIN_EXPORT void spine_skeleton_drawable_dispose(spine_skeleton_drawable *
 FFI_PLUGIN_EXPORT void spine_animation_state_update(spine_animation_state state, float delta);
 FFI_PLUGIN_EXPORT void spine_animation_state_apply(spine_animation_state state, spine_skeleton skeleton);
 FFI_PLUGIN_EXPORT void spine_animation_state_clear_tracks(spine_animation_state state);
-FFI_PLUGIN_EXPORT void spine_animation_state_clear_track(spine_animation_state state, int32_t trackIndex);
-FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_set_animation(spine_animation_state state, int32_t trackIndex, const char* animationName, int32_t loop);
-FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_add_animation(spine_animation_state state, int32_t trackIndex, const char* animationName, int32_t loop, float delay);
-FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_set_empty_animation(spine_animation_state state, int32_t trackIndex, float mixDuration);
-FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_add_empty_animation(spine_animation_state state, int32_t trackIndex, float mixDuration, float delay);
+FFI_PLUGIN_EXPORT void spine_animation_state_clear_track(spine_animation_state state, int trackIndex);
+FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_set_animation(spine_animation_state state, int trackIndex, const char* animationName, int loop);
+FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_add_animation(spine_animation_state state, int trackIndex, const char* animationName, int loop, float delay);
+FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_set_empty_animation(spine_animation_state state, int trackIndex, float mixDuration);
+FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_add_empty_animation(spine_animation_state state, int trackIndex, float mixDuration, float delay);
 FFI_PLUGIN_EXPORT void spine_animation_state_set_empty_animations(spine_animation_state state, float mixDuration);
 FFI_PLUGIN_EXPORT float spine_animation_state_get_time_scale(spine_animation_state state);
 FFI_PLUGIN_EXPORT void spine_animation_state_set_time_scale(spine_animation_state state, float timeScale);

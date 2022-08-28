@@ -23,8 +23,8 @@ class SpineWidgetController {
     _atlas = atlas;
     _data = data;
     _drawable = drawable;
-    initialized = true;
     onInitialized?.call(this);
+    initialized = true;
   }
 
   Atlas? get atlas => _atlas;

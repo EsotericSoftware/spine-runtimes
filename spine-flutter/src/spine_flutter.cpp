@@ -24,11 +24,11 @@ spine::SpineExtension *spine::getDefaultExtension() {
    return new spine::DebugExtension(new spine::DefaultSpineExtension());
 }
 
-FFI_PLUGIN_EXPORT int32_t spine_major_version() {
+FFI_PLUGIN_EXPORT int spine_major_version() {
     return SPINE_MAJOR_VERSION;
 }
 
-FFI_PLUGIN_EXPORT int32_t spine_minor_version() {
+FFI_PLUGIN_EXPORT int spine_minor_version() {
     return SPINE_MINOR_VERSION;
 }
 
@@ -38,7 +38,7 @@ FFI_PLUGIN_EXPORT spine_atlas* spine_atlas_load(const char *atlasData) {
     auto atlas = new Atlas(atlasData, length, "", (TextureLoader*)nullptr, false);
     spine_atlas *result = SpineExtension::calloc<spine_atlas>(1, __FILE__, __LINE__);
     result->atlas = atlas;
-    result->numImagePaths = (int32_t)atlas->getPages().size();
+    result->numImagePaths = (int)atlas->getPages().size();
     result->imagePaths = SpineExtension::calloc<char *>(result->numImagePaths, __FILE__, __LINE__);
     for (int i = 0; i < result->numImagePaths; i++) {
         result->imagePaths[i] = strdup(atlas->getPages()[i]->texturePath.buffer());
@@ -76,7 +76,7 @@ FFI_PLUGIN_EXPORT spine_skeleton_data_result spine_skeleton_data_load_json(spine
     return result;
 }
 
-FFI_PLUGIN_EXPORT spine_skeleton_data_result spine_skeleton_data_load_binary(spine_atlas *atlas, const unsigned char *skeletonData, int32_t length) {
+FFI_PLUGIN_EXPORT spine_skeleton_data_result spine_skeleton_data_load_binary(spine_atlas *atlas, const unsigned char *skeletonData, int length) {
     spine_skeleton_data_result result = { nullptr, nullptr };
     Bone::setYDown(true);
     if (!atlas) return result;
@@ -97,7 +97,7 @@ FFI_PLUGIN_EXPORT void spine_skeleton_data_dispose(spine_skeleton_data skeletonD
     delete (SkeletonData*)skeletonData;
 }
 
-spine_render_command *spine_render_command_create(int32_t numVertices, int32_t numIndices, spine_blend_mode blendMode, int pageIndex) {
+spine_render_command *spine_render_command_create(int numVertices, int numIndices, spine_blend_mode blendMode, int pageIndex) {
     spine_render_command *cmd = SpineExtension::alloc<spine_render_command>(1, __FILE__, __LINE__);
     cmd->positions = SpineExtension::alloc<float>(numVertices << 1, __FILE__, __LINE__);
     cmd->uvs = SpineExtension::alloc<float>(numVertices << 1, __FILE__, __LINE__);
@@ -288,31 +288,31 @@ FFI_PLUGIN_EXPORT void spine_animation_state_clear_tracks(spine_animation_state 
     _state->clearTracks();
 }
 
-FFI_PLUGIN_EXPORT void spine_animation_state_clear_track(spine_animation_state state, int32_t trackIndex) {
+FFI_PLUGIN_EXPORT void spine_animation_state_clear_track(spine_animation_state state, int trackIndex) {
     if (state == nullptr) return;
     AnimationState *_state = (AnimationState*)state;
     _state->clearTrack(trackIndex);
 }
 
-FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_set_animation(spine_animation_state state, int32_t trackIndex, const char* animationName, int32_t loop) {
+FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_set_animation(spine_animation_state state, int trackIndex, const char* animationName, int loop) {
     if (state == nullptr) return nullptr;
     AnimationState *_state = (AnimationState*)state;
     return _state->setAnimation(trackIndex, animationName, loop);
 }
 
-FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_add_animation(spine_animation_state state, int32_t trackIndex, const char* animationName, int32_t loop, float delay) {
+FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_add_animation(spine_animation_state state, int trackIndex, const char* animationName, int loop, float delay) {
     if (state == nullptr) return nullptr;
     AnimationState *_state = (AnimationState*)state;
     return _state->addAnimation(trackIndex, animationName, loop, delay);
 }
 
-FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_set_empty_animation(spine_animation_state state, int32_t trackIndex, float mixDuration) {
+FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_set_empty_animation(spine_animation_state state, int trackIndex, float mixDuration) {
     if (state == nullptr) return nullptr;
     AnimationState *_state = (AnimationState*)state;
     return _state->setEmptyAnimation(trackIndex, mixDuration);
 }
 
-FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_add_empty_animation(spine_animation_state state, int32_t trackIndex, float mixDuration, float delay) {
+FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_add_empty_animation(spine_animation_state state, int trackIndex, float mixDuration, float delay) {
     if (state == nullptr) return nullptr;
     AnimationState *_state = (AnimationState*)state;
     return _state->addEmptyAnimation(trackIndex, mixDuration, delay);
