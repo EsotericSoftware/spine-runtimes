@@ -107,8 +107,8 @@ class _SpineWidgetState extends State<SpineWidget> {
     }
 
     skeletonDrawable = SkeletonDrawable(atlas, skeletonData, true);
-    skeletonDrawable?.update(0.016);
     widget.controller._initialize(atlas, skeletonData, skeletonDrawable!);
+    skeletonDrawable?.update(0);
     setState(() {
     });
   }
