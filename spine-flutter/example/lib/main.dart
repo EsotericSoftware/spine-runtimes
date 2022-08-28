@@ -47,6 +47,7 @@ class SimpleAnimation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    reportLeaks();
     final controller = SpineWidgetController((controller) => controller.animationState?.setAnimation(0, "walk", true));
 
     return Scaffold(

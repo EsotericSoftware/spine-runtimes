@@ -444,8 +444,9 @@ enum MixBlend {
 
 class TrackEntry {
   final spine_track_entry _entry;
+  final AnimationState _state;
 
-  TrackEntry(this._entry);
+  TrackEntry(this._entry, this._state);
 
   /// The index of the track where this entry is either current or queued.
   int getTtrackIndex() {
@@ -635,7 +636,7 @@ class TrackEntry {
   TrackEntry? getNext() {
     final next = _bindings.spine_track_entry_get_next(_entry);
     if (next.address == nullptr.address) return null;
-    return TrackEntry(next);
+    return TrackEntry(next, this._state);
   }
 
   /// Returns true if at least one loop has been completed.
@@ -682,7 +683,7 @@ class TrackEntry {
   TrackEntry? getMixingFrom() {
     final from = _bindings.spine_track_entry_get_mixing_from(_entry);
     if (from.address == nullptr.address) return null;
-    return TrackEntry(from);
+    return TrackEntry(from, this._state);
   }
 
   /// The track entry for the next animation when mixing from this animation, or NULL if no mixing is currently occuring.
@@ -690,7 +691,7 @@ class TrackEntry {
   TrackEntry? getMixingTo() {
     final to = _bindings.spine_track_entry_get_mixing_to(_entry);
     if (to.address == nullptr.address) return null;
-    return TrackEntry(to);
+    return TrackEntry(to, this._state);
   }
 
   /// Resets the rotation directions for mixing this entry's rotate timelines. This can be useful to avoid bones rotating the
@@ -711,15 +712,20 @@ class TrackEntry {
 
 class AnimationState {
   final spine_animation_state _state;
+  final spine_animation_state_events _events;
 
-  AnimationState(this._state);
+  AnimationState(this._state, this._events);
 
-  // FIXME add listener methods, get current
+  // FIXME add listener methods
 
   /// Increments the track entry times, setting queued animations as current if needed
   /// @param delta delta time
   void update(double delta) {
     _bindings.spine_animation_state_update(_state, delta);
+
+    final numEvents = _bindings.spine_animation_state_events_get_num_events(_events);
+    print("events: $numEvents");
+    _bindings.spine_animation_state_events_reset(_events);
   }
 
   /// Poses the skeleton using the track entry animations. There are no side effects other than invoking listeners, so the
@@ -754,7 +760,7 @@ class AnimationState {
     final entry = _bindings.spine_animation_state_set_animation(_state, trackIndex, animation.cast(), loop ? -1 : 0);
     calloc.free(animation);
     if (entry.address == nullptr.address) throw Exception("Couldn't set animation $animationName");
-    return TrackEntry(entry);
+    return TrackEntry(entry, this);
   }
 
   /// Adds an animation to be played delay seconds after the current or last queued animation
@@ -770,13 +776,13 @@ class AnimationState {
     final entry = _bindings.spine_animation_state_add_animation(_state, trackIndex, animation.cast(), loop ? -1 : 0, delay);
     calloc.free(animation);
     if (entry.address == nullptr.address) throw Exception("Couldn't add animation $animationName");
-    return TrackEntry(entry);
+    return TrackEntry(entry, this);
   }
 
   /// Sets an empty animation for a track, discarding any queued animations, and mixes to it over the specified mix duration.
   TrackEntry setEmptyAnimation(int trackIndex, double mixDuration) {
     final entry = _bindings.spine_animation_state_set_empty_animation(_state, trackIndex, mixDuration);
-    return TrackEntry(entry);
+    return TrackEntry(entry, this);
   }
 
   /// Adds an empty animation to be played after the current or last queued animation for a track, and mixes to it over the
@@ -790,7 +796,13 @@ class AnimationState {
   /// duration of the previous track minus any mix duration plus the negative delay.
   TrackEntry addEmptyAnimation(int trackIndex, double mixDuration, double delay) {
     final entry = _bindings.spine_animation_state_add_empty_animation(_state, trackIndex, mixDuration, delay);
-    return TrackEntry(entry);
+    return TrackEntry(entry, this);
+  }
+
+  TrackEntry? getCurrent(int trackIndex) {
+    final entry = _bindings.spine_animation_state_get_current(_state, trackIndex);
+    if (entry.address == nullptr.address) return null;
+    return TrackEntry(entry, this);
   }
 
   /// Sets an empty animation for every track, discarding any queued animations, and mixes to it over the specified mix duration.
@@ -813,20 +825,20 @@ class SkeletonDrawable {
   late final Pointer<spine_skeleton_drawable> _drawable;
   late final Skeleton skeleton;
   late final AnimationState animationState;
-  final bool _ownsData;
+  final bool _ownsAtlasAndSkeletonData;
   bool _disposed;
 
-  SkeletonDrawable(this.atlas, this.skeletonData, this._ownsData): _disposed = false {
+  SkeletonDrawable(this.atlas, this.skeletonData, this._ownsAtlasAndSkeletonData): _disposed = false {
     _drawable = _bindings.spine_skeleton_drawable_create(skeletonData._skeletonData);
     skeleton = Skeleton(_drawable.ref.skeleton);
-    animationState = AnimationState(_drawable.ref.animationState);
+    animationState = AnimationState(_drawable.ref.animationState, _drawable.ref.animationStateEvents);
   }
 
   void update(double delta) {
     if (_disposed) return;
-    _bindings.spine_animation_state_update(_drawable.ref.animationState, delta);
-    _bindings.spine_animation_state_apply(_drawable.ref.animationState, _drawable.ref.skeleton);
-    _bindings.spine_skeleton_update_world_transform(_drawable.ref.skeleton);
+    animationState.update(delta);
+    animationState.apply(skeleton);
+    skeleton.updateWorldTransform();
   }
 
   List<RenderCommand> render() {
@@ -844,7 +856,7 @@ class SkeletonDrawable {
   void dispose() {
     if (_disposed) return;
     _disposed = true;
-    if (_ownsData) {
+    if (_ownsAtlasAndSkeletonData) {
       atlas.dispose();
       skeletonData.dispose();
     }

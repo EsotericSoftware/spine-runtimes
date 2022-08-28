@@ -324,6 +324,12 @@ FFI_PLUGIN_EXPORT void spine_animation_state_set_empty_animations(spine_animatio
     _state->setEmptyAnimations(mixDuration);
 }
 
+FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_get_current(spine_animation_state state, int trackIndex) {
+    if (state == nullptr) return nullptr;
+    AnimationState *_state = (AnimationState*)state;
+    return _state->getCurrent(trackIndex);
+}
+
 FFI_PLUGIN_EXPORT float spine_animation_state_get_time_scale(spine_animation_state state) {
     if (state == nullptr) return 0;
     AnimationState *_state = (AnimationState*)state;

@@ -374,6 +374,24 @@ class SpineFlutterBindings {
       _spine_animation_state_set_empty_animationsPtr
           .asFunction<void Function(spine_animation_state, double)>();
 
+  spine_track_entry spine_animation_state_get_current(
+    spine_animation_state state,
+    int trackIndex,
+  ) {
+    return _spine_animation_state_get_current(
+      state,
+      trackIndex,
+    );
+  }
+
+  late final _spine_animation_state_get_currentPtr = _lookup<
+      ffi.NativeFunction<
+          spine_track_entry Function(spine_animation_state,
+              ffi.Int32)>>('spine_animation_state_get_current');
+  late final _spine_animation_state_get_current =
+      _spine_animation_state_get_currentPtr
+          .asFunction<spine_track_entry Function(spine_animation_state, int)>();
+
   double spine_animation_state_get_time_scale(
     spine_animation_state state,
   ) {
