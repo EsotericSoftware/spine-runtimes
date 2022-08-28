@@ -61,42 +61,40 @@ FFI_PLUGIN_EXPORT void spine_atlas_dispose(spine_atlas *atlas) {
     SpineExtension::free(atlas, __FILE__, __LINE__);
 }
 
-FFI_PLUGIN_EXPORT spine_skeleton_data_result *spine_skeleton_data_load_json(spine_atlas *atlas, const char *skeletonData) {
+FFI_PLUGIN_EXPORT spine_skeleton_data_result spine_skeleton_data_load_json(spine_atlas *atlas, const char *skeletonData) {
+    spine_skeleton_data_result result = { nullptr, nullptr };
     Bone::setYDown(true);
-    if (!atlas) return nullptr;
-    if (!atlas->atlas) return nullptr;
-    if (!skeletonData) return nullptr;
+    if (!atlas) return result;
+    if (!atlas->atlas) return result;
+    if (!skeletonData) return result;
     SkeletonJson json((Atlas*)atlas->atlas);
     SkeletonData *data = json.readSkeletonData(skeletonData);
-    spine_skeleton_data_result *result = SpineExtension::calloc<spine_skeleton_data_result>(1, __FILE__, __LINE__);
-    result->skeletonData = data;
+    result.skeletonData = data;
     if (!json.getError().isEmpty()) {
-        result->error = strdup(json.getError().buffer());
+        result.error = strdup(json.getError().buffer());
     }
     return result;
 }
 
-FFI_PLUGIN_EXPORT spine_skeleton_data_result* spine_skeleton_data_load_binary(spine_atlas *atlas, const unsigned char *skeletonData, int32_t length) {
+FFI_PLUGIN_EXPORT spine_skeleton_data_result spine_skeleton_data_load_binary(spine_atlas *atlas, const unsigned char *skeletonData, int32_t length) {
+    spine_skeleton_data_result result = { nullptr, nullptr };
     Bone::setYDown(true);
-    if (!atlas) return nullptr;
-    if (!atlas->atlas) return nullptr;
-    if (!skeletonData) return nullptr;
-    if (length <= 0) return nullptr;
+    if (!atlas) return result;
+    if (!atlas->atlas) return result;
+    if (!skeletonData) return result;
+    if (length <= 0) return result;
     SkeletonBinary binary((Atlas*)atlas->atlas);
     SkeletonData *data = binary.readSkeletonData(skeletonData, length);
-    spine_skeleton_data_result *result = SpineExtension::calloc<spine_skeleton_data_result>(1, __FILE__, __LINE__);
-    result->skeletonData = data;
+    result.skeletonData = data;
     if (!binary.getError().isEmpty()) {
-        result->error = strdup(binary.getError().buffer());
+        result.error = strdup(binary.getError().buffer());
     }
     return result;
 }
 
-FFI_PLUGIN_EXPORT void spine_skeleton_data_result_dispose(spine_skeleton_data_result *skeletonData) {
+FFI_PLUGIN_EXPORT void spine_skeleton_data_dispose(spine_skeleton_data skeletonData) {
     if (!skeletonData) return;
-    if (skeletonData->skeletonData) delete (SkeletonData*)skeletonData->skeletonData;
-    if (skeletonData->error) free(skeletonData->error);
-    SpineExtension::free(skeletonData, __FILE__, __LINE__);
+    delete (SkeletonData*)skeletonData;
 }
 
 spine_render_command *spine_render_command_create(int32_t numVertices, int32_t numIndices, spine_blend_mode blendMode, int pageIndex) {
@@ -122,7 +120,7 @@ void spine_render_command_dispose(spine_render_command *cmd) {
     SpineExtension::free(cmd, __FILE__, __LINE__);
 }
 
-FFI_PLUGIN_EXPORT spine_skeleton_drawable *spine_skeleton_drawable_create(spine_skeleton_data *skeletonData) {
+FFI_PLUGIN_EXPORT spine_skeleton_drawable *spine_skeleton_drawable_create(spine_skeleton_data skeletonData) {
     spine_skeleton_drawable *drawable = SpineExtension::calloc<spine_skeleton_drawable>(1, __FILE__, __LINE__);
     drawable->skeleton = new Skeleton((SkeletonData*)skeletonData);
     AnimationState *state = new AnimationState(new AnimationStateData((SkeletonData*)skeletonData));

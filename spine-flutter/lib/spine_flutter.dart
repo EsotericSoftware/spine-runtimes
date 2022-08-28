@@ -80,41 +80,41 @@ class Atlas {
 }
 
 class SkeletonData {
-  final Pointer<spine_skeleton_data_result> _skeletonData;
+  final spine_skeleton_data _skeletonData;
   bool _disposed;
 
   SkeletonData(this._skeletonData): _disposed = false;
 
   static SkeletonData fromJson(Atlas atlas, String json) {
     final jsonNative = json.toNativeUtf8();
-    final skeletonData = _bindings.spine_skeleton_data_load_json(atlas._atlas, jsonNative.cast());
-    if (skeletonData.ref.error.address != nullptr.address) {
-      final Pointer<Utf8> error = skeletonData.ref.error.cast();
+    final result = _bindings.spine_skeleton_data_load_json(atlas._atlas, jsonNative.cast());
+    if (result.error.address != nullptr.address) {
+      final Pointer<Utf8> error = result.error.cast();
       final message = error.toDartString();
-      _bindings.spine_skeleton_data_result_dispose(skeletonData);
+      calloc.free(error);
       throw Exception("Couldn't load skeleton data: $message");
     }
-    return SkeletonData(skeletonData);
+    return SkeletonData(result.skeletonData);
   }
 
   static SkeletonData fromBinary(Atlas atlas, Uint8List binary) {
     final Pointer<Uint8> binaryNative = malloc.allocate(binary.lengthInBytes);
     binaryNative.asTypedList(binary.lengthInBytes).setAll(0, binary);
-    final skeletonData = _bindings.spine_skeleton_data_load_binary(atlas._atlas, binaryNative.cast(), binary.lengthInBytes);
+    final result = _bindings.spine_skeleton_data_load_binary(atlas._atlas, binaryNative.cast(), binary.lengthInBytes);
     malloc.free(binaryNative);
-    if (skeletonData.ref.error.address != nullptr.address) {
-      final Pointer<Utf8> error = skeletonData.ref.error.cast();
+    if (result.error.address != nullptr.address) {
+      final Pointer<Utf8> error = result.error.cast();
       final message = error.toDartString();
-      _bindings.spine_skeleton_data_result_dispose(skeletonData);
+      calloc.free(error);
       throw Exception("Couldn't load skeleton data: $message");
     }
-    return SkeletonData(skeletonData);
+    return SkeletonData(result.skeletonData);
   }
 
   void dispose() {
     if (_disposed) return;
     _disposed = true;
-    _bindings.spine_skeleton_data_result_dispose(_skeletonData);
+    _bindings.spine_skeleton_data_dispose(_skeletonData);
   }
 }
 
@@ -136,6 +136,21 @@ class Attachment {
   Attachment(this._attachment);
 }
 
+class Skin {
+  final spine_skin _skin;
+
+  Skin(this._skin);
+}
+
+class Color {
+  double r;
+  double g;
+  double b;
+  double a;
+
+  Color(this.r, this.g, this.b, this.a);
+}
+
 class IkConstraint {
   final spine_ik_constraint _constraint;
 
@@ -152,6 +167,15 @@ class PathConstraint {
   final spine_path_constraint _constraint;
 
   PathConstraint(this._constraint);
+}
+
+class Bounds {
+  double x;
+  double y;
+  double width;
+  double height;
+
+  Bounds(this.x, this.y, this.width, this.height);
 }
 
 class Skeleton {
@@ -265,6 +289,140 @@ class Skeleton {
     calloc.free(nameNative);
     if (constraint.address == nullptr.address) return null;
     return PathConstraint(constraint);
+  }
+
+  /// Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose.
+  /// @param outX The horizontal distance between the skeleton origin and the left side of the AABB.
+  /// @param outY The vertical distance between the skeleton origin and the bottom side of the AABB.
+  /// @param outWidth The width of the AABB
+  /// @param outHeight The height of the AABB.
+  /// @param outVertexBuffer Reference to hold a Vector of floats. This method will assign it with new floats as needed.
+  Bounds getBounds() {
+    final nativeBounds = _bindings.spine_skeleton_get_bounds(_skeleton);
+    return Bounds(nativeBounds.x, nativeBounds.y, nativeBounds.width, nativeBounds.height);
+  }
+
+  Bone? getRootBone() {
+    final bone = _bindings.spine_skeleton_get_root_bone(_skeleton);
+    if (bone.address == nullptr.address) return null;
+    return Bone(bone);
+  }
+
+  SkeletonData? getData() {
+    final data = _bindings.spine_skeleton_get_data(_skeleton);
+    if (data.address == nullptr.address) return null;
+    return SkeletonData(data);
+  }
+
+  List<Bone> getBones() {
+    final List<Bone> bones = [];
+    final numBones = _bindings.spine_skeleton_get_num_bones(_skeleton);
+    final nativeBones = _bindings.spine_skeleton_get_bones(_skeleton);
+    for (int i = 0; i < numBones; i++) {
+      bones.add(Bone(nativeBones[i]));
+    }
+    return bones;
+  }
+
+  List<Slot> getSlots() {
+    final List<Slot> slots = [];
+    final numSlots = _bindings.spine_skeleton_get_num_slots(_skeleton);
+    final nativeSlots = _bindings.spine_skeleton_get_slots(_skeleton);
+    for (int i = 0; i < numSlots; i++) {
+      slots.add(Slot(nativeSlots[i]));
+    }
+    return slots;
+  }
+
+  List<Slot> getDrawOrder() {
+    final List<Slot> slots = [];
+    final numSlots = _bindings.spine_skeleton_get_num_draw_order(_skeleton);
+    final nativeDrawOrder = _bindings.spine_skeleton_get_draw_order(_skeleton);
+    for (int i = 0; i < numSlots; i++) {
+      slots.add(Slot(nativeDrawOrder[i]));
+    }
+    return slots;
+  }
+
+  List<IkConstraint> getIkConstraints() {
+    final List<IkConstraint> constraints = [];
+    final numConstraints = _bindings.spine_skeleton_get_num_ik_constraints(_skeleton);
+    final nativeConstraints = _bindings.spine_skeleton_get_ik_constraints(_skeleton);
+    for (int i = 0; i < numConstraints; i++) {
+      constraints.add(IkConstraint(nativeConstraints[i]));
+    }
+    return constraints;
+  }
+
+  List<PathConstraint> getPathConstraints() {
+    final List<PathConstraint> constraints = [];
+    final numConstraints = _bindings.spine_skeleton_get_num_path_constraints(_skeleton);
+    final nativeConstraints = _bindings.spine_skeleton_get_path_constraints(_skeleton);
+    for (int i = 0; i < numConstraints; i++) {
+      constraints.add(PathConstraint(nativeConstraints[i]));
+    }
+    return constraints;
+  }
+
+  List<TransformConstraint> getTransformConstraints() {
+    final List<TransformConstraint> constraints = [];
+    final numConstraints = _bindings.spine_skeleton_get_num_transform_constraints(_skeleton);
+    final nativeConstraints = _bindings.spine_skeleton_get_transform_constraints(_skeleton);
+    for (int i = 0; i < numConstraints; i++) {
+      constraints.add(TransformConstraint(nativeConstraints[i]));
+    }
+    return constraints;
+  }
+
+  Skin? getSkin() {
+    final skin = _bindings.spine_skeleton_get_skin(_skeleton);
+    if (skin.address == nullptr.address) return null;
+    return Skin(skin);
+  }
+
+  Color getColor() {
+    final color = _bindings.spine_skeleton_get_color(_skeleton);
+    return Color(color.r, color.g, color.b, color.a);
+  }
+
+  void setColor(Color color) {
+    _bindings.spine_skeleton_set_color(_skeleton, color.r, color.g, color.b, color.a);
+  }
+
+  void setPosition(double x, double y) {
+    _bindings.spine_skeleton_set_position(_skeleton, x, y);
+  }
+
+  double getX() {
+    return _bindings.spine_skeleton_get_x(_skeleton);
+  }
+
+  void setX(double x) {
+    _bindings.spine_skeleton_set_x(_skeleton, x);
+  }
+
+  double getY() {
+    return _bindings.spine_skeleton_get_x(_skeleton);
+  }
+
+  void setY(double y) {
+    _bindings.spine_skeleton_set_y(_skeleton, y);
+  }
+
+  double getScaleX() {
+    return _bindings.spine_skeleton_get_scale_x(_skeleton);
+  }
+
+  void setScaleX(double scaleX) {
+    _bindings.spine_skeleton_set_scale_x(_skeleton, scaleX);
+  }
+
+  double getScaleY() {
+    return _bindings.spine_skeleton_get_scale_x(_skeleton);
+  }
+
+  void setScaleY(double scaleY) {
+    _bindings.spine_skeleton_set_scale_y(_skeleton, scaleY);
   }
 }
 
@@ -659,7 +817,7 @@ class SkeletonDrawable {
   bool _disposed;
 
   SkeletonDrawable(this.atlas, this.skeletonData, this._ownsData): _disposed = false {
-    _drawable = _bindings.spine_skeleton_drawable_create(skeletonData._skeletonData.ref.skeletonData.cast());
+    _drawable = _bindings.spine_skeleton_drawable_create(skeletonData._skeletonData);
     skeleton = Skeleton(_drawable.ref.skeleton);
     animationState = AnimationState(_drawable.ref.animationState);
   }

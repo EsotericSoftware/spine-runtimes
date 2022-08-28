@@ -82,7 +82,7 @@ class SpineFlutterBindings {
   late final _spine_atlas_dispose = _spine_atlas_disposePtr
       .asFunction<void Function(ffi.Pointer<spine_atlas>)>();
 
-  ffi.Pointer<spine_skeleton_data_result> spine_skeleton_data_load_json(
+  spine_skeleton_data_result spine_skeleton_data_load_json(
     ffi.Pointer<spine_atlas> atlas,
     ffi.Pointer<ffi.Int8> skeletonData,
   ) {
@@ -94,15 +94,14 @@ class SpineFlutterBindings {
 
   late final _spine_skeleton_data_load_jsonPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Pointer<spine_skeleton_data_result> Function(
-              ffi.Pointer<spine_atlas>,
+          spine_skeleton_data_result Function(ffi.Pointer<spine_atlas>,
               ffi.Pointer<ffi.Int8>)>>('spine_skeleton_data_load_json');
   late final _spine_skeleton_data_load_json =
       _spine_skeleton_data_load_jsonPtr.asFunction<
-          ffi.Pointer<spine_skeleton_data_result> Function(
+          spine_skeleton_data_result Function(
               ffi.Pointer<spine_atlas>, ffi.Pointer<ffi.Int8>)>();
 
-  ffi.Pointer<spine_skeleton_data_result> spine_skeleton_data_load_binary(
+  spine_skeleton_data_result spine_skeleton_data_load_binary(
     ffi.Pointer<spine_atlas> atlas,
     ffi.Pointer<ffi.Uint8> skeletonData,
     int length,
@@ -116,33 +115,31 @@ class SpineFlutterBindings {
 
   late final _spine_skeleton_data_load_binaryPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Pointer<spine_skeleton_data_result> Function(
+          spine_skeleton_data_result Function(
               ffi.Pointer<spine_atlas>,
               ffi.Pointer<ffi.Uint8>,
               ffi.Int32)>>('spine_skeleton_data_load_binary');
   late final _spine_skeleton_data_load_binary =
       _spine_skeleton_data_load_binaryPtr.asFunction<
-          ffi.Pointer<spine_skeleton_data_result> Function(
+          spine_skeleton_data_result Function(
               ffi.Pointer<spine_atlas>, ffi.Pointer<ffi.Uint8>, int)>();
 
-  void spine_skeleton_data_result_dispose(
-    ffi.Pointer<spine_skeleton_data_result> skeletonData,
+  void spine_skeleton_data_dispose(
+    spine_skeleton_data skeletonData,
   ) {
-    return _spine_skeleton_data_result_dispose(
+    return _spine_skeleton_data_dispose(
       skeletonData,
     );
   }
 
-  late final _spine_skeleton_data_result_disposePtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Void Function(ffi.Pointer<spine_skeleton_data_result>)>>(
-      'spine_skeleton_data_result_dispose');
-  late final _spine_skeleton_data_result_dispose =
-      _spine_skeleton_data_result_disposePtr
-          .asFunction<void Function(ffi.Pointer<spine_skeleton_data_result>)>();
+  late final _spine_skeleton_data_disposePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_skeleton_data)>>(
+          'spine_skeleton_data_dispose');
+  late final _spine_skeleton_data_dispose = _spine_skeleton_data_disposePtr
+      .asFunction<void Function(spine_skeleton_data)>();
 
   ffi.Pointer<spine_skeleton_drawable> spine_skeleton_drawable_create(
-    ffi.Pointer<spine_skeleton_data> skeletonData,
+    spine_skeleton_data skeletonData,
   ) {
     return _spine_skeleton_drawable_create(
       skeletonData,
@@ -150,14 +147,12 @@ class SpineFlutterBindings {
   }
 
   late final _spine_skeleton_drawable_createPtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Pointer<spine_skeleton_drawable> Function(
-                  ffi.Pointer<spine_skeleton_data>)>>(
-      'spine_skeleton_drawable_create');
+      ffi.NativeFunction<
+          ffi.Pointer<spine_skeleton_drawable> Function(
+              spine_skeleton_data)>>('spine_skeleton_drawable_create');
   late final _spine_skeleton_drawable_create =
       _spine_skeleton_drawable_createPtr.asFunction<
-          ffi.Pointer<spine_skeleton_drawable> Function(
-              ffi.Pointer<spine_skeleton_data>)>();
+          ffi.Pointer<spine_skeleton_drawable> Function(spine_skeleton_data)>();
 
   ffi.Pointer<spine_render_command> spine_skeleton_drawable_render(
     ffi.Pointer<spine_skeleton_drawable> drawable,

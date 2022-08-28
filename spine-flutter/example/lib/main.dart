@@ -12,12 +12,24 @@ class ExampleSelector extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               ElevatedButton(
-                child: const Text('Spineboy'),
+                child: const Text('Simple Animation'),
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute<void>(
-                      builder: (context) => const Spineboy(),
+                      builder: (context) => const SimpleAnimation(),
+                    ),
+                  );
+                },
+              ),
+              spacer,
+              ElevatedButton(
+                child: const Text('Animation State Listener'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (context) => const AnimationStateEvents(),
                     ),
                   );
                 },
@@ -30,8 +42,8 @@ class ExampleSelector extends StatelessWidget {
   }
 }
 
-class Spineboy extends StatelessWidget {
-  const Spineboy({Key? key}) : super(key: key);
+class SimpleAnimation extends StatelessWidget {
+  const SimpleAnimation({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -52,8 +64,13 @@ class AnimationStateEvents extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = SpineWidgetController((controller) {
+      for (final bone in controller.skeleton!.getBones()) {
+        print(bone);
+      }
+      controller.skeleton?.setScaleX(0.5);
+      controller.skeleton?.setScaleY(0.5);
+      controller.skeleton?.setColor(Color(1, 1, 0, 1));
       final trackEntry = controller.animationState?.setAnimation(0, "walk", true);
-      controller.skeleton.setColor(1, 0, 0, 1);
     });
 
     return Scaffold(

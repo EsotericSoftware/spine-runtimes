@@ -108,11 +108,11 @@ FFI_PLUGIN_EXPORT void spine_report_leaks();
 FFI_PLUGIN_EXPORT spine_atlas* spine_atlas_load(const char *atlasData);
 FFI_PLUGIN_EXPORT void spine_atlas_dispose(spine_atlas *atlas);
 
-FFI_PLUGIN_EXPORT spine_skeleton_data_result* spine_skeleton_data_load_json(spine_atlas *atlas, const char *skeletonData);
-FFI_PLUGIN_EXPORT spine_skeleton_data_result* spine_skeleton_data_load_binary(spine_atlas *atlas, const unsigned char *skeletonData, int32_t length);
-FFI_PLUGIN_EXPORT void spine_skeleton_data_result_dispose(spine_skeleton_data_result *skeletonData);
+FFI_PLUGIN_EXPORT spine_skeleton_data_result spine_skeleton_data_load_json(spine_atlas *atlas, const char *skeletonData);
+FFI_PLUGIN_EXPORT spine_skeleton_data_result spine_skeleton_data_load_binary(spine_atlas *atlas, const unsigned char *skeletonData, int32_t length);
+FFI_PLUGIN_EXPORT void spine_skeleton_data_dispose(spine_skeleton_data skeletonData);
 
-FFI_PLUGIN_EXPORT spine_skeleton_drawable *spine_skeleton_drawable_create(spine_skeleton_data *skeletonData);
+FFI_PLUGIN_EXPORT spine_skeleton_drawable *spine_skeleton_drawable_create(spine_skeleton_data skeletonData);
 FFI_PLUGIN_EXPORT spine_render_command *spine_skeleton_drawable_render(spine_skeleton_drawable *drawable);
 FFI_PLUGIN_EXPORT void spine_skeleton_drawable_dispose(spine_skeleton_drawable *drawable);
 
