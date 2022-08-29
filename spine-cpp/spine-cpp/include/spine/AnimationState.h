@@ -45,7 +45,7 @@
 
 namespace spine {
 	enum EventType {
-		EventType_Start,
+		EventType_Start = 0,
 		EventType_Interrupt,
 		EventType_End,
 		EventType_Complete,
@@ -429,6 +429,12 @@ namespace spine {
 
 		void enableQueue();
 
+		void setManualTrackEntryDisposal(bool inValue);
+
+        bool getManualTrackEntryDisposal();
+
+		void disposeTrackEntry(TrackEntry *entry);
+
 	private:
 		static const int Subsequent = 0;
 		static const int First = 1;
@@ -455,6 +461,8 @@ namespace spine {
 		int _unkeyedState;
 
 		float _timeScale;
+
+		bool _manualTrackEntryDisposal;
 
 		static Animation *getEmptyAnimation();
 

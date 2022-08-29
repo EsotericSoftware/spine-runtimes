@@ -295,8 +295,7 @@ void EventQueue::drain() {
 				else
 					state._listenerObject->callback(&state, EventType_Dispose, trackEntry, NULL);
 
-				trackEntry->reset();
-				_trackEntryPool.free(trackEntry);
+				if (!_state.getManualTrackEntryDisposal()) _state.disposeTrackEntry(trackEntry);
 				break;
 			case EventType_Event:
 				if (!trackEntry->_listenerObject)
@@ -320,7 +319,8 @@ AnimationState::AnimationState(AnimationStateData *data) : _data(data),
 														   _listener(dummyOnAnimationEventFunc),
 														   _listenerObject(NULL),
 														   _unkeyedState(0),
-														   _timeScale(1) {
+														   _timeScale(1),
+														   _manualTrackEntryDisposal(false) {
 }
 
 AnimationState::~AnimationState() {
@@ -664,6 +664,19 @@ void AnimationState::disableQueue() {
 
 void AnimationState::enableQueue() {
 	_queue->_drainDisabled = false;
+}
+
+void AnimationState::setManualTrackEntryDisposal(bool inValue) {
+	_manualTrackEntryDisposal = inValue;
+}
+
+bool AnimationState::getManualTrackEntryDisposal() {
+	return _manualTrackEntryDisposal;
+}
+
+void AnimationState::disposeTrackEntry(TrackEntry *entry) {
+	entry->reset();
+	_trackEntryPool.free(entry);
 }
 
 Animation *AnimationState::getEmptyAnimation() {

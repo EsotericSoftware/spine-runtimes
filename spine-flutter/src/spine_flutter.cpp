@@ -125,6 +125,7 @@ FFI_PLUGIN_EXPORT spine_skeleton_drawable *spine_skeleton_drawable_create(spine_
     drawable->skeleton = new Skeleton((SkeletonData*)skeletonData);
     AnimationState *state = new AnimationState(new AnimationStateData((SkeletonData*)skeletonData));
     drawable->animationState = state;
+    state->setManualTrackEntryDisposal(true);
     EventListener *listener =  new EventListener();
     drawable->animationStateEvents = listener;
     state->setListener(listener);
@@ -276,6 +277,13 @@ FFI_PLUGIN_EXPORT void spine_animation_state_update(spine_animation_state state,
     _state->update(delta);
 }
 
+FFI_PLUGIN_EXPORT void spine_animation_state_dispose_track_entry(spine_animation_state state, spine_track_entry entry) {
+    if (state == nullptr) return;
+    if (entry == nullptr) return;
+    AnimationState *_state = (AnimationState*)state;
+    _state->disposeTrackEntry((TrackEntry*)entry);
+}
+
 FFI_PLUGIN_EXPORT void spine_animation_state_apply(spine_animation_state state, spine_skeleton skeleton) {
     if (state == nullptr) return;
     AnimationState *_state = (AnimationState*)state;
@@ -352,21 +360,21 @@ FFI_PLUGIN_EXPORT spine_event_type spine_animation_state_events_get_event_type(s
     if (events == nullptr) return SPINE_EVENT_TYPE_DISPOSE;
     if (index < 0) return SPINE_EVENT_TYPE_DISPOSE;
     EventListener *_events = (EventListener*)events;
-    if (_events->events.size() >= index) return SPINE_EVENT_TYPE_DISPOSE;
+    if (index >= _events->events.size()) return SPINE_EVENT_TYPE_DISPOSE;
     return (spine_event_type)_events->events[index].type;
 }
 
 FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_events_get_track_entry(spine_animation_state_events events, int index) {
     if (events == nullptr) return nullptr;
     EventListener *_events = (EventListener*)events;
-    if (_events->events.size() >= index) return nullptr;
+    if (index >= _events->events.size()) return nullptr;
     return (spine_track_entry)_events->events[index].entry;
 }
 
 FFI_PLUGIN_EXPORT spine_event spine_animation_state_events_get_event(spine_animation_state_events events, int index) {
     if (events == nullptr) return nullptr;
     EventListener *_events = (EventListener*)events;
-    if (_events->events.size() >= index) return nullptr;
+    if (index >= _events->events.size()) return nullptr;
     return (spine_track_entry)_events->events[index].entry;
 }
 

@@ -205,6 +205,24 @@ class SpineFlutterBindings {
   late final _spine_animation_state_update = _spine_animation_state_updatePtr
       .asFunction<void Function(spine_animation_state, double)>();
 
+  void spine_animation_state_dispose_track_entry(
+    spine_animation_state state,
+    spine_track_entry entry,
+  ) {
+    return _spine_animation_state_dispose_track_entry(
+      state,
+      entry,
+    );
+  }
+
+  late final _spine_animation_state_dispose_track_entryPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_animation_state,
+              spine_track_entry)>>('spine_animation_state_dispose_track_entry');
+  late final _spine_animation_state_dispose_track_entry =
+      _spine_animation_state_dispose_track_entryPtr.asFunction<
+          void Function(spine_animation_state, spine_track_entry)>();
+
   void spine_animation_state_apply(
     spine_animation_state state,
     spine_skeleton skeleton,

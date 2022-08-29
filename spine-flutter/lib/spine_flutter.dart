@@ -708,15 +708,48 @@ class TrackEntry {
   double getTrackComplete() {
     return _bindings.spine_track_entry_get_track_complete(_entry);
   }
+
+  void setListener(AnimationStateListener listener) {
+    _state._setTrackEntryListener(_entry, listener);
+  }
 }
+
+enum EventType {
+  Start,
+  Interrupt,
+  End,
+  Complete,
+  Dispose,
+  Event
+}
+
+class Event {
+  final spine_event _event;
+
+  Event(this._event);
+}
+
+class AnimationStateEvent {
+  final EventType type;
+  final TrackEntry entry;
+  final Event? event;
+
+  AnimationStateEvent(this.type, this.entry, this.event);
+}
+
+typedef AnimationStateListener = void Function(AnimationStateEvent event);
 
 class AnimationState {
   final spine_animation_state _state;
   final spine_animation_state_events _events;
+  final Map<spine_track_entry, AnimationStateListener> _trackEntryListeners;
+  AnimationStateListener? _stateListener;
 
-  AnimationState(this._state, this._events);
+  AnimationState(this._state, this._events): _trackEntryListeners = {};
 
-  // FIXME add listener methods
+  void _setTrackEntryListener(spine_track_entry entry, AnimationStateListener listener) {
+    _trackEntryListeners[entry] = listener;
+  }
 
   /// Increments the track entry times, setting queued animations as current if needed
   /// @param delta delta time
@@ -724,7 +757,43 @@ class AnimationState {
     _bindings.spine_animation_state_update(_state, delta);
 
     final numEvents = _bindings.spine_animation_state_events_get_num_events(_events);
-    print("events: $numEvents");
+    if (numEvents > 0) {
+      for (int i = 0; i < numEvents; i++) {
+        late final EventType type;
+        switch(_bindings.spine_animation_state_events_get_event_type(_events, i)) {
+          case 0:
+            type = EventType.Start;
+            break;
+          case 1:
+            type = EventType.Interrupt;
+            break;
+          case 2:
+            type = EventType.End;
+            break;
+          case 3:
+            type = EventType.Complete;
+            break;
+          case 4:
+            type = EventType.Dispose;
+            break;
+          case 5:
+            type = EventType.Event;
+            break;
+        }
+        final entry = _bindings.spine_animation_state_events_get_track_entry(_events, i);
+        final nativeEvent = _bindings.spine_animation_state_events_get_event(_events, i);
+        final event = AnimationStateEvent(type, TrackEntry(entry, this), nativeEvent.address == nullptr.address ? null : Event(nativeEvent));
+        if (_trackEntryListeners.containsKey(entry)) {
+          _trackEntryListeners[entry]?.call(event);
+        }
+        if (_stateListener != null) {
+          _stateListener?.call(event);
+        }
+        if (type == EventType.Dispose) {
+          _bindings.spine_animation_state_dispose_track_entry(_state, entry);
+        }
+      }
+    }
     _bindings.spine_animation_state_events_reset(_events);
   }
 

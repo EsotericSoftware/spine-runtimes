@@ -64,6 +64,7 @@ class AnimationStateEvents extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    reportLeaks();
     final controller = SpineWidgetController((controller) {
       for (final bone in controller.skeleton!.getBones()) {
         print(bone);
@@ -71,7 +72,12 @@ class AnimationStateEvents extends StatelessWidget {
       controller.skeleton?.setScaleX(0.5);
       controller.skeleton?.setScaleY(0.5);
       controller.skeleton?.setColor(Color(1, 1, 0, 1));
-      final trackEntry = controller.animationState?.setAnimation(0, "walk", true);
+      controller.animationState?.setAnimation(0, "walk", true)?.setListener((event) {
+        print("Walk animation event ${event.type}");
+      });
+      controller.animationState?.addAnimation(0, "run", true, 2)?.setListener((event) {
+        print("Run animation event ${event.type}");
+      });
     });
 
     return Scaffold(
