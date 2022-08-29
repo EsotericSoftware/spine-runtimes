@@ -57,7 +57,7 @@ public:
 #if VERSION_MAJOR > 3
 	int get_import_order() const override { return IMPORT_ORDER_DEFAULT; }
 
-        float get_priority() const override { return 1; }
+	float get_priority() const override { return 1; }
 
 	void get_import_options(const String &path, List<ImportOption> *options, int preset) const override;
 
@@ -94,7 +94,7 @@ public:
 #if VERSION_MAJOR > 3
 	int get_import_order() const override { return IMPORT_ORDER_DEFAULT; }
 
-        float get_priority() const override { return 1; }
+	float get_priority() const override { return 1; }
 
 	void get_import_options(const String &path, List<ImportOption> *options, int preset) const override {}
 
@@ -131,7 +131,7 @@ public:
 #if VERSION_MAJOR > 3
 	int get_import_order() const override { return IMPORT_ORDER_DEFAULT; }
 
-        float get_priority() const override { return 1; }
+	float get_priority() const override { return 1; }
 
 	void get_import_options(const String &path, List<ImportOption> *options, int preset) const override {}
 

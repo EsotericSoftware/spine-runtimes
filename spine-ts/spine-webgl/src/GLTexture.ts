@@ -68,7 +68,7 @@ export class GLTexture extends Texture implements Disposable, Restorable {
 		}
 	}
 
-	static usesMipMaps(filter: TextureFilter) {
+	static usesMipMaps (filter: TextureFilter) {
 		switch (filter) {
 			case TextureFilter.MipMap:
 			case TextureFilter.MipMapLinearLinear:
