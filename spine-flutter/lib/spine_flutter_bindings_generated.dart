@@ -1934,6 +1934,104 @@ class SpineFlutterBindings {
           'spine_skeleton_set_scale_y');
   late final _spine_skeleton_set_scale_y = _spine_skeleton_set_scale_yPtr
       .asFunction<void Function(spine_skeleton, double)>();
+
+  spine_event_data spine_event_get_data(
+    spine_event event,
+  ) {
+    return _spine_event_get_data(
+      event,
+    );
+  }
+
+  late final _spine_event_get_dataPtr =
+      _lookup<ffi.NativeFunction<spine_event_data Function(spine_event)>>(
+          'spine_event_get_data');
+  late final _spine_event_get_data = _spine_event_get_dataPtr
+      .asFunction<spine_event_data Function(spine_event)>();
+
+  double spine_event_get_time(
+    spine_event event,
+  ) {
+    return _spine_event_get_time(
+      event,
+    );
+  }
+
+  late final _spine_event_get_timePtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_event)>>(
+          'spine_event_get_time');
+  late final _spine_event_get_time =
+      _spine_event_get_timePtr.asFunction<double Function(spine_event)>();
+
+  int spine_event_get_int_value(
+    spine_event event,
+  ) {
+    return _spine_event_get_int_value(
+      event,
+    );
+  }
+
+  late final _spine_event_get_int_valuePtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_event)>>(
+          'spine_event_get_int_value');
+  late final _spine_event_get_int_value =
+      _spine_event_get_int_valuePtr.asFunction<int Function(spine_event)>();
+
+  double spine_event_get_float_value(
+    spine_event event,
+  ) {
+    return _spine_event_get_float_value(
+      event,
+    );
+  }
+
+  late final _spine_event_get_float_valuePtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_event)>>(
+          'spine_event_get_float_value');
+  late final _spine_event_get_float_value = _spine_event_get_float_valuePtr
+      .asFunction<double Function(spine_event)>();
+
+  ffi.Pointer<ffi.Int8> spine_event_get_string_value(
+    spine_event event,
+  ) {
+    return _spine_event_get_string_value(
+      event,
+    );
+  }
+
+  late final _spine_event_get_string_valuePtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(spine_event)>>(
+          'spine_event_get_string_value');
+  late final _spine_event_get_string_value = _spine_event_get_string_valuePtr
+      .asFunction<ffi.Pointer<ffi.Int8> Function(spine_event)>();
+
+  double spine_event_get_volume(
+    spine_event event,
+  ) {
+    return _spine_event_get_volume(
+      event,
+    );
+  }
+
+  late final _spine_event_get_volumePtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_event)>>(
+          'spine_event_get_volume');
+  late final _spine_event_get_volume =
+      _spine_event_get_volumePtr.asFunction<double Function(spine_event)>();
+
+  double spine_event_get_balance(
+    spine_event event,
+  ) {
+    return _spine_event_get_balance(
+      event,
+    );
+  }
+
+  late final _spine_event_get_balancePtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_event)>>(
+          'spine_event_get_balance');
+  late final _spine_event_get_balance =
+      _spine_event_get_balancePtr.asFunction<double Function(spine_event)>();
 }
 
 class spine_atlas extends ffi.Struct {
@@ -2055,3 +2153,4 @@ typedef spine_attachment = ffi.Pointer<ffi.Void>;
 typedef spine_ik_constraint = ffi.Pointer<ffi.Void>;
 typedef spine_transform_constraint = ffi.Pointer<ffi.Void>;
 typedef spine_path_constraint = ffi.Pointer<ffi.Void>;
+typedef spine_event_data = ffi.Pointer<ffi.Void>;

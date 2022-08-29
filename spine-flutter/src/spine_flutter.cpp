@@ -375,7 +375,7 @@ FFI_PLUGIN_EXPORT spine_event spine_animation_state_events_get_event(spine_anima
     if (events == nullptr) return nullptr;
     EventListener *_events = (EventListener*)events;
     if (index >= _events->events.size()) return nullptr;
-    return (spine_track_entry)_events->events[index].entry;
+    return (spine_track_entry)_events->events[index].event;
 }
 
 FFI_PLUGIN_EXPORT void spine_animation_state_events_reset(spine_animation_state_events events) {
@@ -925,4 +925,46 @@ FFI_PLUGIN_EXPORT void spine_skeleton_set_scale_y(spine_skeleton skeleton, float
     if (skeleton == nullptr) return;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     _skeleton->setScaleY(scaleY);
+}
+
+FFI_PLUGIN_EXPORT spine_event_data spine_event_get_data(spine_event event) {
+    if (event == nullptr) return nullptr;
+    Event *_event = (Event*)event;
+    return (spine_event_data)&_event->getData();
+}
+
+FFI_PLUGIN_EXPORT float spine_event_get_time(spine_event event) {
+    if (event == nullptr) return 0;
+    Event *_event = (Event*)event;
+    return _event->getTime();
+}
+
+FFI_PLUGIN_EXPORT int spine_event_get_int_value(spine_event event) {
+    if (event == nullptr) return 0;
+    Event *_event = (Event*)event;
+    return _event->getIntValue();
+}
+
+FFI_PLUGIN_EXPORT float spine_event_get_float_value(spine_event event) {
+    if (event == nullptr) return 0;
+    Event *_event = (Event*)event;
+    return _event->getFloatValue();
+}
+
+FFI_PLUGIN_EXPORT const char* spine_event_get_string_value(spine_event event) {
+    if (event == nullptr) return nullptr;
+    Event *_event = (Event*)event;
+    return _event->getStringValue().buffer();
+}
+
+FFI_PLUGIN_EXPORT float spine_event_get_volume(spine_event event) {
+    if (event == nullptr) return 0;
+    Event *_event = (Event*)event;
+    return _event->getVolume();
+}
+
+FFI_PLUGIN_EXPORT float spine_event_get_balance(spine_event event) {
+    if (event == nullptr) return 0;
+    Event *_event = (Event*)event;
+    return _event->getBalance();
 }

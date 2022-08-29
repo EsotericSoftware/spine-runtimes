@@ -709,7 +709,7 @@ class TrackEntry {
     return _bindings.spine_track_entry_get_track_complete(_entry);
   }
 
-  void setListener(AnimationStateListener listener) {
+  void setListener(AnimationStateListener? listener) {
     _state._setTrackEntryListener(_entry, listener);
   }
 }
@@ -723,10 +723,45 @@ enum EventType {
   Event
 }
 
+class EventData {
+  final spine_event_data _data;
+
+  EventData(this._data);
+}
+
 class Event {
   final spine_event _event;
 
   Event(this._event);
+
+  EventData getData() {
+    return EventData(_bindings.spine_event_get_data(_event));
+  }
+
+  double getTime() {
+    return _bindings.spine_event_get_time(_event);
+  }
+
+  int getIntValue() {
+    return _bindings.spine_event_get_int_value(_event);
+  }
+
+  double getFloatValue() {
+    return _bindings.spine_event_get_float_value(_event);
+  }
+
+  String getStringValue() {
+    final Pointer<Utf8> value = _bindings.spine_event_get_string_value(_event).cast();
+    return value.toDartString();
+  }
+
+  double getVolume() {
+    return _bindings.spine_event_get_volume(_event);
+  }
+
+  double getBalance() {
+    return _bindings.spine_event_get_balance(_event);
+  }
 }
 
 class AnimationStateEvent {
@@ -747,8 +782,9 @@ class AnimationState {
 
   AnimationState(this._state, this._events): _trackEntryListeners = {};
 
-  void _setTrackEntryListener(spine_track_entry entry, AnimationStateListener listener) {
-    _trackEntryListeners[entry] = listener;
+  void _setTrackEntryListener(spine_track_entry entry, AnimationStateListener? listener) {
+    if (listener == null) _trackEntryListeners.remove(entry);
+    else _trackEntryListeners[entry] = listener;
   }
 
   /// Increments the track entry times, setting queued animations as current if needed
@@ -885,6 +921,10 @@ class AnimationState {
 
   void setTimeScale(double timeScale) {
     _bindings.spine_animation_state_set_time_scale(_state, timeScale);
+  }
+
+  void setListener(AnimationStateListener? listener) {
+    _stateListener = listener;
   }
 }
 

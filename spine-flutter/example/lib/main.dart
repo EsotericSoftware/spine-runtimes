@@ -78,6 +78,11 @@ class AnimationStateEvents extends StatelessWidget {
       controller.animationState?.addAnimation(0, "run", true, 2)?.setListener((event) {
         print("Run animation event ${event.type}");
       });
+      controller.animationState?.setListener((event) {
+        if (event.type == EventType.Event) {
+          print("User event: { intValue: ${event.event?.getIntValue()}, floatValue: intValue: ${event.event?.getFloatValue()}, stringValue: ${event.event?.getStringValue()} }");
+        }
+      });
     });
 
     return Scaffold(

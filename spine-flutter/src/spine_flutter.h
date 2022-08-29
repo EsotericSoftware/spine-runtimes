@@ -232,3 +232,11 @@ FFI_PLUGIN_EXPORT float spine_skeleton_get_scale_x(spine_skeleton skeleton);
 FFI_PLUGIN_EXPORT void spine_skeleton_set_scale_x(spine_skeleton skeleton, float scaleX);
 FFI_PLUGIN_EXPORT float spine_skeleton_get_scale_y(spine_skeleton skeleton);
 FFI_PLUGIN_EXPORT void spine_skeleton_set_scale_y(spine_skeleton skeleton, float scaleY);
+
+FFI_PLUGIN_EXPORT spine_event_data spine_event_get_data(spine_event event);
+FFI_PLUGIN_EXPORT float spine_event_get_time(spine_event event);
+FFI_PLUGIN_EXPORT int spine_event_get_int_value(spine_event event);
+FFI_PLUGIN_EXPORT float spine_event_get_float_value(spine_event event);
+FFI_PLUGIN_EXPORT const char* spine_event_get_string_value(spine_event event);
+FFI_PLUGIN_EXPORT float spine_event_get_volume(spine_event event);
+FFI_PLUGIN_EXPORT float spine_event_get_balance(spine_event event);
