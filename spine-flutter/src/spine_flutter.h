@@ -251,3 +251,24 @@ FFI_PLUGIN_EXPORT float spine_event_get_float_value(spine_event event);
 FFI_PLUGIN_EXPORT const char* spine_event_get_string_value(spine_event event);
 FFI_PLUGIN_EXPORT float spine_event_get_volume(spine_event event);
 FFI_PLUGIN_EXPORT float spine_event_get_balance(spine_event event);
+
+FFI_PLUGIN_EXPORT int spine_slot_data_get_index(spine_slot_data slot);
+FFI_PLUGIN_EXPORT const char* spine_slot_data_get_name(spine_slot_data slot);
+FFI_PLUGIN_EXPORT spine_bone_data spine_slot_data_get_bone_data(spine_slot_data slot);
+FFI_PLUGIN_EXPORT spine_color spine_slot_data_get_color(spine_slot_data slot);
+FFI_PLUGIN_EXPORT spine_color spine_slot_data_get_dark_color(spine_slot_data slot);
+FFI_PLUGIN_EXPORT int spine_slot_data_has_dark_color(spine_slot_data slot);
+FFI_PLUGIN_EXPORT const char* spine_slot_data_get_attachment_name(spine_slot_data slot);
+FFI_PLUGIN_EXPORT spine_blend_mode spine_slot_data_get_blend_mode(spine_slot_data slot);
+
+FFI_PLUGIN_EXPORT void spine_slot_set_to_setup_pose(spine_slot slot);
+FFI_PLUGIN_EXPORT spine_slot_data spine_slot_get_data(spine_slot slot);
+FFI_PLUGIN_EXPORT spine_bone spine_slot_get_bone(spine_slot slot);
+FFI_PLUGIN_EXPORT spine_skeleton spine_slot_get_skeleton(spine_slot slot);
+FFI_PLUGIN_EXPORT spine_color spine_slot_get_color(spine_slot slot);
+FFI_PLUGIN_EXPORT void spine_slot_set_color(spine_slot slot, float r, float g, float b, float a);
+FFI_PLUGIN_EXPORT spine_color spine_slot_get_dark_color(spine_slot slot);
+FFI_PLUGIN_EXPORT void spine_slot_set_dark_color(spine_slot slot, float r, float g, float b, float a);
+FFI_PLUGIN_EXPORT int spine_slot_has_dark_color(spine_slot slot);
+FFI_PLUGIN_EXPORT spine_attachment spine_slot_get_attachment(spine_slot slot);
+FFI_PLUGIN_EXPORT void spine_slot_set_attachment(spine_slot slot, spine_attachment attachment);

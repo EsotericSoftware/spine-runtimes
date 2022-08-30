@@ -1042,3 +1042,127 @@ FFI_PLUGIN_EXPORT float spine_event_get_balance(spine_event event) {
     Event *_event = (Event*)event;
     return _event->getBalance();
 }
+
+// SlotData
+FFI_PLUGIN_EXPORT int spine_slot_data_get_index(spine_slot_data slot) {
+    if (slot == nullptr) return 0;
+    SlotData *_slot = (SlotData*)slot;
+    return _slot->getIndex();
+}
+
+FFI_PLUGIN_EXPORT const char* spine_slot_data_get_name(spine_slot_data slot) {
+    if (slot == nullptr) return nullptr;
+    SlotData *_slot = (SlotData*)slot;
+    return _slot->getName().buffer();
+}
+
+FFI_PLUGIN_EXPORT spine_bone_data spine_slot_data_get_bone_data(spine_slot_data slot) {
+    if (slot == nullptr) return nullptr;
+    SlotData *_slot = (SlotData*)slot;
+    return &_slot->getBoneData();
+}
+
+FFI_PLUGIN_EXPORT spine_color spine_slot_data_get_color(spine_slot_data slot) {
+    spine_color color = { 0, 0, 0, 0 };
+    if (slot == nullptr) return color;
+    SlotData *_slot = (SlotData*)slot;
+    color = { _slot->getColor().r, _slot->getColor().g, _slot->getColor().b, _slot->getColor().a };
+    return color;
+}
+
+FFI_PLUGIN_EXPORT spine_color spine_slot_data_get_dark_color(spine_slot_data slot) {
+    spine_color color = { 0, 0, 0, 0 };
+    if (slot == nullptr) return color;
+    SlotData *_slot = (SlotData*)slot;
+    color = { _slot->getDarkColor().r, _slot->getDarkColor().g, _slot->getDarkColor().b, _slot->getDarkColor().a };
+    return color;
+}
+
+FFI_PLUGIN_EXPORT int spine_slot_data_has_dark_color(spine_slot_data slot) {
+    if (slot == nullptr) return 0;
+    SlotData *_slot = (SlotData*)slot;
+    return _slot->hasDarkColor() ? -1 : 0;
+}
+
+FFI_PLUGIN_EXPORT const char* spine_slot_data_get_attachment_name(spine_slot_data slot) {
+    if (slot == nullptr) return nullptr;
+    SlotData *_slot = (SlotData*)slot;
+    return _slot->getAttachmentName().buffer();
+}
+
+FFI_PLUGIN_EXPORT spine_blend_mode spine_slot_data_get_blend_mode(spine_slot_data slot) {
+    if (slot == nullptr) return SPINE_BLEND_MODE_NORMAL;
+    SlotData *_slot = (SlotData*)slot;
+    return (spine_blend_mode)_slot->getBlendMode();
+}
+
+// Slot
+FFI_PLUGIN_EXPORT void spine_slot_set_to_setup_pose(spine_slot slot) {
+    if (slot == nullptr) return;
+    Slot *_slot = (Slot*)slot;
+    _slot->setToSetupPose();
+}
+
+FFI_PLUGIN_EXPORT spine_slot_data spine_slot_get_data(spine_slot slot) {
+    if (slot == nullptr) return nullptr;
+    Slot *_slot = (Slot*)slot;
+    return &_slot->getData();
+}
+
+FFI_PLUGIN_EXPORT spine_bone spine_slot_get_bone(spine_slot slot) {
+    if (slot == nullptr) return nullptr;
+    Slot *_slot = (Slot*)slot;
+    return &_slot->getBone();
+}
+
+FFI_PLUGIN_EXPORT spine_skeleton spine_slot_get_skeleton(spine_slot slot) {
+    if (slot == nullptr) return nullptr;
+    Slot *_slot = (Slot*)slot;
+    return &_slot->getSkeleton();
+}
+
+FFI_PLUGIN_EXPORT spine_color spine_slot_get_color(spine_slot slot) {
+    spine_color color = { 0, 0, 0, 0 };
+    if (slot == nullptr) return color;
+    Slot *_slot = (Slot*)slot;
+    color = { _slot->getColor().r, _slot->getColor().g, _slot->getColor().b, _slot->getColor().a };
+    return color;
+}
+
+FFI_PLUGIN_EXPORT void spine_slot_set_color(spine_slot slot, float r, float g, float b, float a) {
+    if (slot == nullptr) return;
+    Slot *_slot = (Slot*)slot;
+    _slot->getColor().set(r, g, b, a);
+}
+
+FFI_PLUGIN_EXPORT spine_color spine_slot_get_dark_color(spine_slot slot) {
+    spine_color color = { 0, 0, 0, 0 };
+    if (slot == nullptr) return color;
+    Slot *_slot = (Slot*)slot;
+    color = { _slot->getDarkColor().r, _slot->getDarkColor().g, _slot->getDarkColor().b, _slot->getDarkColor().a };
+    return color;
+}
+
+FFI_PLUGIN_EXPORT void spine_slot_set_dark_color(spine_slot slot, float r, float g, float b, float a) {
+    if (slot == nullptr) return;
+    Slot *_slot = (Slot*)slot;
+    _slot->getDarkColor().set(r, g, b, a);
+}
+
+FFI_PLUGIN_EXPORT int spine_slot_has_dark_color(spine_slot slot) {
+    if (slot == nullptr) return 0;
+    Slot *_slot = (Slot*)slot;
+    return _slot->hasDarkColor() ? -1 : 0;
+}
+
+FFI_PLUGIN_EXPORT spine_attachment spine_slot_get_attachment(spine_slot slot) {
+    if (slot == nullptr) return nullptr;
+    Slot *_slot = (Slot*)slot;
+    return _slot->getAttachment();
+}
+
+FFI_PLUGIN_EXPORT void spine_slot_set_attachment(spine_slot slot, spine_attachment attachment) {
+    if (slot == nullptr) return;
+    Slot *_slot = (Slot*)slot;
+    _slot->setAttachment((Attachment*)attachment);
+}

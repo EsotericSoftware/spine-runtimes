@@ -16,6 +16,24 @@ int majorVersion() => _bindings.spine_major_version();
 int minorVersion() => _bindings.spine_minor_version();
 void reportLeaks() => _bindings.spine_report_leaks();
 
+class Color {
+  double r;
+  double g;
+  double b;
+  double a;
+
+  Color(this.r, this.g, this.b, this.a);
+}
+
+class Bounds {
+  double x;
+  double y;
+  double width;
+  double height;
+
+  Bounds(this.x, this.y, this.width, this.height);
+}
+
 class Atlas {
   final Pointer<spine_atlas> _atlas;
   final List<Image> atlasPages;
@@ -88,6 +106,7 @@ class SkeletonData {
   static SkeletonData fromJson(Atlas atlas, String json) {
     final jsonNative = json.toNativeUtf8();
     final result = _bindings.spine_skeleton_data_load_json(atlas._atlas, jsonNative.cast());
+    calloc.free(jsonNative);
     if (result.error.address != nullptr.address) {
       final Pointer<Utf8> error = result.error.cast();
       final message = error.toDartString();
@@ -118,16 +137,122 @@ class SkeletonData {
   }
 }
 
+enum BlendMode {
+  Normal(0),
+  Additive(1),
+  Multiply(2),
+  Screen(3);
+
+  final int value;
+  const BlendMode(this.value);
+}
+
+class BoneData {
+  final spine_bone_data _data;
+
+  BoneData(this._data);
+}
+
 class Bone {
   final spine_bone _bone;
 
   Bone(this._bone);
 }
 
+class SlotData {
+  final spine_slot_data _data;
+
+  SlotData(this._data);
+
+  int getIndex() {
+    return _bindings.spine_slot_data_get_index(_data);
+  }
+
+  String getName() {
+    final Pointer<Utf8> value = _bindings.spine_slot_data_get_name(_data).cast();
+    return value.toDartString();
+  }
+
+  BoneData getBoneData() {
+    return BoneData(_bindings.spine_slot_data_get_bone_data(_data));
+  }
+
+  Color getColor() {
+    final color = _bindings.spine_slot_data_get_color(_data);
+    return Color(color.r, color.g, color.b, color.a);
+  }
+
+  Color getDarkColor() {
+    final color = _bindings.spine_slot_data_get_dark_color(_data);
+    return Color(color.r, color.g, color.b, color.a);
+  }
+
+  bool hasDarkColor() {
+    return _bindings.spine_slot_data_has_dark_color(_data) == -1;
+  }
+
+  String getAttachmentName() {
+    final Pointer<Utf8> value = _bindings.spine_slot_data_get_attachment_name(_data).cast();
+    return value.toDartString();
+  }
+
+  BlendMode getBlendMode() {
+    return BlendMode.values[_bindings.spine_slot_data_get_blend_mode(_data)];
+  }
+}
+
 class Slot {
   final spine_slot _slot;
 
   Slot(this._slot);
+
+  void setToSetupPose() {
+    _bindings.spine_slot_set_to_setup_pose(_slot);
+  }
+
+  SlotData getData() {
+    return SlotData(_bindings.spine_slot_get_data(_slot));
+  }
+
+  Bone getBone() {
+    return Bone(_bindings.spine_slot_get_bone(_slot));
+  }
+
+  Skeleton getSkeleton() {
+    return Skeleton(_bindings.spine_slot_get_skeleton(_slot));
+  }
+
+  Color getColor() {
+    final color = _bindings.spine_slot_get_color(_slot);
+    return Color(color.r, color.g, color.b, color.a);
+  }
+
+  void setColor(Color color) {
+    _bindings.spine_slot_set_color(_slot, color.r, color.g, color.b, color.a);
+  }
+
+  Color getDarkColor() {
+    final color = _bindings.spine_slot_get_dark_color(_slot);
+    return Color(color.r, color.g, color.b, color.a);
+  }
+
+  void setDarkColor(Color color) {
+    _bindings.spine_slot_set_dark_color(_slot, color.r, color.g, color.b, color.a);
+  }
+
+  bool hasDarkColor() {
+    return _bindings.spine_slot_has_dark_color(_slot) == -1;
+  }
+
+  Attachment? getAttachment() {
+    final attachment = _bindings.spine_slot_get_attachment(_slot);
+    if (attachment.address == nullptr.address) return null;
+    return Attachment(attachment);
+  }
+
+  void setAttachment(Attachment? attachment) {
+    _bindings.spine_slot_set_attachment(_slot, attachment != null ? attachment._attachment : nullptr);
+  }
 }
 
 class Attachment {
@@ -140,15 +265,6 @@ class Skin {
   final spine_skin _skin;
 
   Skin(this._skin);
-}
-
-class Color {
-  double r;
-  double g;
-  double b;
-  double a;
-
-  Color(this.r, this.g, this.b, this.a);
 }
 
 class IkConstraint {
@@ -167,15 +283,6 @@ class PathConstraint {
   final spine_path_constraint _constraint;
 
   PathConstraint(this._constraint);
-}
-
-class Bounds {
-  double x;
-  double y;
-  double width;
-  double height;
-
-  Bounds(this.x, this.y, this.width, this.height);
 }
 
 class Skeleton {
@@ -234,7 +341,7 @@ class Skeleton {
   /// See Skeleton::setSlotsToSetupPose()
   /// Also, often AnimationState::apply(Skeleton&) is called before the next time the
   /// skeleton is rendered to allow any attachment keys in the current animation(s) to hide or show attachments from the new skin.
-  /// @param newSkin May be NULL.
+  /// @param skinName May be NULL.
   void setSkin(String skinName) {
     final nameNative = skinName.toNativeUtf8();
     _bindings.spine_skeleton_set_skin(_skeleton, nameNative.cast());

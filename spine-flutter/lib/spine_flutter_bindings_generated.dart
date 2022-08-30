@@ -2162,6 +2162,296 @@ class SpineFlutterBindings {
           'spine_event_get_balance');
   late final _spine_event_get_balance =
       _spine_event_get_balancePtr.asFunction<double Function(spine_event)>();
+
+  int spine_slot_data_get_index(
+    spine_slot_data slot,
+  ) {
+    return _spine_slot_data_get_index(
+      slot,
+    );
+  }
+
+  late final _spine_slot_data_get_indexPtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_slot_data)>>(
+          'spine_slot_data_get_index');
+  late final _spine_slot_data_get_index =
+      _spine_slot_data_get_indexPtr.asFunction<int Function(spine_slot_data)>();
+
+  ffi.Pointer<ffi.Int8> spine_slot_data_get_name(
+    spine_slot_data slot,
+  ) {
+    return _spine_slot_data_get_name(
+      slot,
+    );
+  }
+
+  late final _spine_slot_data_get_namePtr = _lookup<
+          ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(spine_slot_data)>>(
+      'spine_slot_data_get_name');
+  late final _spine_slot_data_get_name = _spine_slot_data_get_namePtr
+      .asFunction<ffi.Pointer<ffi.Int8> Function(spine_slot_data)>();
+
+  spine_bone_data spine_slot_data_get_bone_data(
+    spine_slot_data slot,
+  ) {
+    return _spine_slot_data_get_bone_data(
+      slot,
+    );
+  }
+
+  late final _spine_slot_data_get_bone_dataPtr =
+      _lookup<ffi.NativeFunction<spine_bone_data Function(spine_slot_data)>>(
+          'spine_slot_data_get_bone_data');
+  late final _spine_slot_data_get_bone_data = _spine_slot_data_get_bone_dataPtr
+      .asFunction<spine_bone_data Function(spine_slot_data)>();
+
+  spine_color spine_slot_data_get_color(
+    spine_slot_data slot,
+  ) {
+    return _spine_slot_data_get_color(
+      slot,
+    );
+  }
+
+  late final _spine_slot_data_get_colorPtr =
+      _lookup<ffi.NativeFunction<spine_color Function(spine_slot_data)>>(
+          'spine_slot_data_get_color');
+  late final _spine_slot_data_get_color = _spine_slot_data_get_colorPtr
+      .asFunction<spine_color Function(spine_slot_data)>();
+
+  spine_color spine_slot_data_get_dark_color(
+    spine_slot_data slot,
+  ) {
+    return _spine_slot_data_get_dark_color(
+      slot,
+    );
+  }
+
+  late final _spine_slot_data_get_dark_colorPtr =
+      _lookup<ffi.NativeFunction<spine_color Function(spine_slot_data)>>(
+          'spine_slot_data_get_dark_color');
+  late final _spine_slot_data_get_dark_color =
+      _spine_slot_data_get_dark_colorPtr
+          .asFunction<spine_color Function(spine_slot_data)>();
+
+  int spine_slot_data_has_dark_color(
+    spine_slot_data slot,
+  ) {
+    return _spine_slot_data_has_dark_color(
+      slot,
+    );
+  }
+
+  late final _spine_slot_data_has_dark_colorPtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_slot_data)>>(
+          'spine_slot_data_has_dark_color');
+  late final _spine_slot_data_has_dark_color =
+      _spine_slot_data_has_dark_colorPtr
+          .asFunction<int Function(spine_slot_data)>();
+
+  ffi.Pointer<ffi.Int8> spine_slot_data_get_attachment_name(
+    spine_slot_data slot,
+  ) {
+    return _spine_slot_data_get_attachment_name(
+      slot,
+    );
+  }
+
+  late final _spine_slot_data_get_attachment_namePtr = _lookup<
+          ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(spine_slot_data)>>(
+      'spine_slot_data_get_attachment_name');
+  late final _spine_slot_data_get_attachment_name =
+      _spine_slot_data_get_attachment_namePtr
+          .asFunction<ffi.Pointer<ffi.Int8> Function(spine_slot_data)>();
+
+  int spine_slot_data_get_blend_mode(
+    spine_slot_data slot,
+  ) {
+    return _spine_slot_data_get_blend_mode(
+      slot,
+    );
+  }
+
+  late final _spine_slot_data_get_blend_modePtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_slot_data)>>(
+          'spine_slot_data_get_blend_mode');
+  late final _spine_slot_data_get_blend_mode =
+      _spine_slot_data_get_blend_modePtr
+          .asFunction<int Function(spine_slot_data)>();
+
+  void spine_slot_set_to_setup_pose(
+    spine_slot slot,
+  ) {
+    return _spine_slot_set_to_setup_pose(
+      slot,
+    );
+  }
+
+  late final _spine_slot_set_to_setup_posePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_slot)>>(
+          'spine_slot_set_to_setup_pose');
+  late final _spine_slot_set_to_setup_pose =
+      _spine_slot_set_to_setup_posePtr.asFunction<void Function(spine_slot)>();
+
+  spine_slot_data spine_slot_get_data(
+    spine_slot slot,
+  ) {
+    return _spine_slot_get_data(
+      slot,
+    );
+  }
+
+  late final _spine_slot_get_dataPtr =
+      _lookup<ffi.NativeFunction<spine_slot_data Function(spine_slot)>>(
+          'spine_slot_get_data');
+  late final _spine_slot_get_data = _spine_slot_get_dataPtr
+      .asFunction<spine_slot_data Function(spine_slot)>();
+
+  spine_bone spine_slot_get_bone(
+    spine_slot slot,
+  ) {
+    return _spine_slot_get_bone(
+      slot,
+    );
+  }
+
+  late final _spine_slot_get_bonePtr =
+      _lookup<ffi.NativeFunction<spine_bone Function(spine_slot)>>(
+          'spine_slot_get_bone');
+  late final _spine_slot_get_bone =
+      _spine_slot_get_bonePtr.asFunction<spine_bone Function(spine_slot)>();
+
+  spine_skeleton spine_slot_get_skeleton(
+    spine_slot slot,
+  ) {
+    return _spine_slot_get_skeleton(
+      slot,
+    );
+  }
+
+  late final _spine_slot_get_skeletonPtr =
+      _lookup<ffi.NativeFunction<spine_skeleton Function(spine_slot)>>(
+          'spine_slot_get_skeleton');
+  late final _spine_slot_get_skeleton = _spine_slot_get_skeletonPtr
+      .asFunction<spine_skeleton Function(spine_slot)>();
+
+  spine_color spine_slot_get_color(
+    spine_slot slot,
+  ) {
+    return _spine_slot_get_color(
+      slot,
+    );
+  }
+
+  late final _spine_slot_get_colorPtr =
+      _lookup<ffi.NativeFunction<spine_color Function(spine_slot)>>(
+          'spine_slot_get_color');
+  late final _spine_slot_get_color =
+      _spine_slot_get_colorPtr.asFunction<spine_color Function(spine_slot)>();
+
+  void spine_slot_set_color(
+    spine_slot slot,
+    double r,
+    double g,
+    double b,
+    double a,
+  ) {
+    return _spine_slot_set_color(
+      slot,
+      r,
+      g,
+      b,
+      a,
+    );
+  }
+
+  late final _spine_slot_set_colorPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_slot, ffi.Float, ffi.Float, ffi.Float,
+              ffi.Float)>>('spine_slot_set_color');
+  late final _spine_slot_set_color = _spine_slot_set_colorPtr
+      .asFunction<void Function(spine_slot, double, double, double, double)>();
+
+  spine_color spine_slot_get_dark_color(
+    spine_slot slot,
+  ) {
+    return _spine_slot_get_dark_color(
+      slot,
+    );
+  }
+
+  late final _spine_slot_get_dark_colorPtr =
+      _lookup<ffi.NativeFunction<spine_color Function(spine_slot)>>(
+          'spine_slot_get_dark_color');
+  late final _spine_slot_get_dark_color = _spine_slot_get_dark_colorPtr
+      .asFunction<spine_color Function(spine_slot)>();
+
+  void spine_slot_set_dark_color(
+    spine_slot slot,
+    double r,
+    double g,
+    double b,
+    double a,
+  ) {
+    return _spine_slot_set_dark_color(
+      slot,
+      r,
+      g,
+      b,
+      a,
+    );
+  }
+
+  late final _spine_slot_set_dark_colorPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_slot, ffi.Float, ffi.Float, ffi.Float,
+              ffi.Float)>>('spine_slot_set_dark_color');
+  late final _spine_slot_set_dark_color = _spine_slot_set_dark_colorPtr
+      .asFunction<void Function(spine_slot, double, double, double, double)>();
+
+  int spine_slot_has_dark_color(
+    spine_slot slot,
+  ) {
+    return _spine_slot_has_dark_color(
+      slot,
+    );
+  }
+
+  late final _spine_slot_has_dark_colorPtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_slot)>>(
+          'spine_slot_has_dark_color');
+  late final _spine_slot_has_dark_color =
+      _spine_slot_has_dark_colorPtr.asFunction<int Function(spine_slot)>();
+
+  spine_attachment spine_slot_get_attachment(
+    spine_slot slot,
+  ) {
+    return _spine_slot_get_attachment(
+      slot,
+    );
+  }
+
+  late final _spine_slot_get_attachmentPtr =
+      _lookup<ffi.NativeFunction<spine_attachment Function(spine_slot)>>(
+          'spine_slot_get_attachment');
+  late final _spine_slot_get_attachment = _spine_slot_get_attachmentPtr
+      .asFunction<spine_attachment Function(spine_slot)>();
+
+  void spine_slot_set_attachment(
+    spine_slot slot,
+    spine_attachment attachment,
+  ) {
+    return _spine_slot_set_attachment(
+      slot,
+      attachment,
+    );
+  }
+
+  late final _spine_slot_set_attachmentPtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(spine_slot, spine_attachment)>>(
+      'spine_slot_set_attachment');
+  late final _spine_slot_set_attachment = _spine_slot_set_attachmentPtr
+      .asFunction<void Function(spine_slot, spine_attachment)>();
 }
 
 class spine_atlas extends ffi.Struct {
@@ -2284,3 +2574,5 @@ typedef spine_ik_constraint = ffi.Pointer<ffi.Void>;
 typedef spine_transform_constraint = ffi.Pointer<ffi.Void>;
 typedef spine_path_constraint = ffi.Pointer<ffi.Void>;
 typedef spine_event_data = ffi.Pointer<ffi.Void>;
+typedef spine_slot_data = ffi.Pointer<ffi.Void>;
+typedef spine_bone_data = ffi.Pointer<ffi.Void>;
