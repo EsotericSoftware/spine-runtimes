@@ -99,181 +99,217 @@ FFI_PLUGIN_EXPORT spine_skeleton_data_result spine_skeleton_data_load_binary(spi
 FFI_PLUGIN_EXPORT spine_bone_data spine_skeleton_data_find_bone(spine_skeleton_data *data, const char *name) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
+    return _data->findBone(name);
 }
 
 FFI_PLUGIN_EXPORT spine_slot_data spine_skeleton_data_find_slot(spine_skeleton_data *data, const char *name) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
+    return _data->findSlot(name);
 }
 
 FFI_PLUGIN_EXPORT spine_skin spine_skeleton_data_find_skin(spine_skeleton_data *data, const char *name) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
+    return _data->findSkin(name);
 }
 
 FFI_PLUGIN_EXPORT spine_event_data spine_skeleton_data_find_event(spine_skeleton_data *data, const char *name) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
+    return _data->findEvent(name);
 }
 
 FFI_PLUGIN_EXPORT spine_animation spine_skeleton_data_find_animation(spine_skeleton_data *data, const char *name) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
+    return _data->findAnimation(name);
 }
 
 FFI_PLUGIN_EXPORT spine_ik_constraint spine_skeleton_data_find_ik_constraint(spine_skeleton_data *data, const char *name) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
+    return _data->findIkConstraint(name);
 }
 
 FFI_PLUGIN_EXPORT spine_transform_constraint spine_skeleton_data_find_transform_constraint(spine_skeleton_data *data, const char *name) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
+    return _data->findTransformConstraint(name);
 }
 
 FFI_PLUGIN_EXPORT spine_path_constraint spine_skeleton_data_find_path_constraint(spine_skeleton_data *data, const char *name) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
+    return _data->findPathConstraint(name);
 }
 
 FFI_PLUGIN_EXPORT const char* spine_skeleton_data_get_name(spine_skeleton_data data) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
+    return _data->getName().buffer();
 }
 
 FFI_PLUGIN_EXPORT int spine_skeleton_data_get_num_bones(spine_skeleton_data data) {
     if (data == nullptr) return 0;
     SkeletonData *_data = (SkeletonData*)data;
+    return (int)_data->getBones().size();
 }
 
 FFI_PLUGIN_EXPORT spine_bone_data* spine_skeleton_data_get_bones(spine_skeleton_data data) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
+    return (void**)_data->getBones().buffer();
 }
 
 FFI_PLUGIN_EXPORT int spine_skeleton_data_get_num_slots(spine_skeleton_data data) {
     if (data == nullptr) return 0;
     SkeletonData *_data = (SkeletonData*)data;
+    return (int)_data->getSlots().size();
 }
 
 FFI_PLUGIN_EXPORT spine_slot_data* spine_skeleton_data_get_slots(spine_skeleton_data data) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
+    return (void**)_data->getSlots().buffer();
 }
 
 FFI_PLUGIN_EXPORT int spine_skeleton_data_get_num_skins(spine_skeleton_data data) {
     if (data == nullptr) return 0;
     SkeletonData *_data = (SkeletonData*)data;
+    return (int)_data->getSkins().size();
 }
 
 FFI_PLUGIN_EXPORT spine_skin* spine_skeleton_data_get_skins(spine_skeleton_data data) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
+    return (void**)_data->getSkins().buffer();
 }
 
 FFI_PLUGIN_EXPORT spine_skin spine_skeleton_data_get_default_skin(spine_skeleton_data data) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
+    return _data->getDefaultSkin();
 }
 
 FFI_PLUGIN_EXPORT void spine_skeleton_data_set_default_skin(spine_skeleton_data data, spine_skin skin) {
     if (data == nullptr) return;
     SkeletonData *_data = (SkeletonData*)data;
+    _data->setDefaultSkin((Skin*)skin);
 }
 
 FFI_PLUGIN_EXPORT int spine_skeleton_data_get_num_events(spine_skeleton_data data) {
     if (data == nullptr) return 0;
     SkeletonData *_data = (SkeletonData*)data;
+    return (int)_data->getEvents().size();
 }
 
 FFI_PLUGIN_EXPORT spine_event_data* spine_skeleton_data_get_events(spine_skeleton_data data) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
+    return (void**)_data->getEvents().buffer();
 }
 
 FFI_PLUGIN_EXPORT int spine_skeleton_data_get_num_animations(spine_skeleton_data data) {
     if (data == nullptr) return 0;
     SkeletonData *_data = (SkeletonData*)data;
+    return (int)_data->getAnimations().size();
 }
 
 FFI_PLUGIN_EXPORT spine_animation* spine_skeleton_data_get_animation(spine_skeleton_data data) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
+    return (void**)_data->getAnimations().buffer();
 }
 
 FFI_PLUGIN_EXPORT int spine_skeleton_data_get_num_ik_constraints(spine_skeleton_data data) {
     if (data == nullptr) return 0;
     SkeletonData *_data = (SkeletonData*)data;
+    return (int)_data->getIkConstraints().size();
 }
 
 FFI_PLUGIN_EXPORT spine_ik_constraint_data * spine_skeleton_data_get_ik_constraints(spine_skeleton_data data) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
+    return (void**)_data->getIkConstraints().buffer();
 }
 
 FFI_PLUGIN_EXPORT int spine_skeleton_data_get_num_transform_constraints(spine_skeleton_data data) {
     if (data == nullptr) return 0;
     SkeletonData *_data = (SkeletonData*)data;
+    return (int)_data->getTransformConstraints().size();
 }
 
 FFI_PLUGIN_EXPORT spine_transform_constraint_data spine_skeleton_data_get_transform_constraints(spine_skeleton_data data) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
+    return (void**)_data->getTransformConstraints().buffer();
 }
 
 FFI_PLUGIN_EXPORT int spine_skeleton_data_get_num_path_constraints(spine_skeleton_data data) {
     if (data == nullptr) return 0;
     SkeletonData *_data = (SkeletonData*)data;
+    return (int)_data->getPathConstraints().size();
 }
 
 FFI_PLUGIN_EXPORT spine_path_constraint_data spine_skeleton_data_get_path_constraints(spine_skeleton_data data) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
+    return (void**)_data->getPathConstraints().buffer();
 }
 
 FFI_PLUGIN_EXPORT float spine_skeleton_data_get_x(spine_skeleton_data data) {
     if (data == nullptr) return 0;
     SkeletonData *_data = (SkeletonData*)data;
+    return _data->getX();
 }
 
 FFI_PLUGIN_EXPORT float spine_skeleton_data_get_y(spine_skeleton_data data) {
     if (data == nullptr) return 0;
     SkeletonData *_data = (SkeletonData*)data;
+    return _data->getY();
 }
 
 FFI_PLUGIN_EXPORT float spine_skeleton_data_get_width(spine_skeleton_data data) {
     if (data == nullptr) return 0;
     SkeletonData *_data = (SkeletonData*)data;
+    return _data->getWidth();
 }
 
 FFI_PLUGIN_EXPORT float spine_skeleton_data_get_height(spine_skeleton_data data) {
     if (data == nullptr) return 0;
     SkeletonData *_data = (SkeletonData*)data;
+    return _data->getHeight();
 }
 
 FFI_PLUGIN_EXPORT const char* spine_skeleton_data_get_version(spine_skeleton_data data) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
+    return _data->getVersion().buffer();
 }
 
 FFI_PLUGIN_EXPORT const char* spine_skeleton_data_get_hash(spine_skeleton_data data) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
+    return _data->getHash().buffer();
 }
 
 FFI_PLUGIN_EXPORT const char* spine_skeleton_data_get_images_path(spine_skeleton_data data) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
+    return _data->getImagesPath().buffer();
 }
 
 FFI_PLUGIN_EXPORT const char* spine_skeleton_data_get_audio_path(spine_skeleton_data data) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
+    return _data->getAudioPath().buffer();
 }
 
 FFI_PLUGIN_EXPORT float spine_skeleton_data_get_fps(spine_skeleton_data data) {
     if (data == nullptr) return 0;
     SkeletonData *_data = (SkeletonData*)data;
+    return _data->getFps();
 }
 
 FFI_PLUGIN_EXPORT void spine_skeleton_data_dispose(spine_skeleton_data data) {
@@ -556,7 +592,7 @@ FFI_PLUGIN_EXPORT void spine_animation_state_set_time_scale(spine_animation_stat
 FFI_PLUGIN_EXPORT int spine_animation_state_events_get_num_events(spine_animation_state_events events) {
     if (events == nullptr) return 0;
     EventListener *_events = (EventListener*)events;
-    return _events->events.size();
+    return (int)_events->events.size();
 }
 
 FFI_PLUGIN_EXPORT spine_event_type spine_animation_state_events_get_event_type(spine_animation_state_events events, int index) {
@@ -990,7 +1026,7 @@ FFI_PLUGIN_EXPORT spine_skeleton_data spine_skeleton_get_data(spine_skeleton ske
 FFI_PLUGIN_EXPORT int spine_skeleton_get_num_bones(spine_skeleton skeleton) {
     if (skeleton == nullptr) return 0;
     Skeleton *_skeleton = (Skeleton*)skeleton;
-    return _skeleton->getBones().size();
+    return (int)_skeleton->getBones().size();
 }
 
 FFI_PLUGIN_EXPORT spine_bone* spine_skeleton_get_bones(spine_skeleton skeleton) {
@@ -1002,7 +1038,7 @@ FFI_PLUGIN_EXPORT spine_bone* spine_skeleton_get_bones(spine_skeleton skeleton) 
 FFI_PLUGIN_EXPORT int spine_skeleton_get_num_slots(spine_skeleton skeleton) {
     if (skeleton == nullptr) return 0;
     Skeleton *_skeleton = (Skeleton*)skeleton;
-    return _skeleton->getSlots().size();
+    return (int)_skeleton->getSlots().size();
 }
 
 FFI_PLUGIN_EXPORT spine_slot* spine_skeleton_get_slots(spine_skeleton skeleton) {
@@ -1014,7 +1050,7 @@ FFI_PLUGIN_EXPORT spine_slot* spine_skeleton_get_slots(spine_skeleton skeleton) 
 FFI_PLUGIN_EXPORT int spine_skeleton_get_num_draw_order(spine_skeleton skeleton) {
     if (skeleton == nullptr) return 0;
     Skeleton *_skeleton = (Skeleton*)skeleton;
-    return _skeleton->getDrawOrder().size();
+    return (int)_skeleton->getDrawOrder().size();
 }
 
 FFI_PLUGIN_EXPORT spine_slot* spine_skeleton_get_draw_order(spine_skeleton skeleton) {
@@ -1026,7 +1062,7 @@ FFI_PLUGIN_EXPORT spine_slot* spine_skeleton_get_draw_order(spine_skeleton skele
 FFI_PLUGIN_EXPORT int spine_skeleton_get_num_ik_constraints(spine_skeleton skeleton) {
     if (skeleton == nullptr) return 0;
     Skeleton *_skeleton = (Skeleton*)skeleton;
-    return _skeleton->getIkConstraints().size();
+    return (int)_skeleton->getIkConstraints().size();
 }
 
 FFI_PLUGIN_EXPORT spine_ik_constraint* spine_skeleton_get_ik_constraints(spine_skeleton skeleton) {
@@ -1038,7 +1074,7 @@ FFI_PLUGIN_EXPORT spine_ik_constraint* spine_skeleton_get_ik_constraints(spine_s
 FFI_PLUGIN_EXPORT int spine_skeleton_get_num_transform_constraints(spine_skeleton skeleton) {
     if (skeleton == nullptr) return 0;
     Skeleton *_skeleton = (Skeleton*)skeleton;
-    return _skeleton->getTransformConstraints().size();
+    return (int)_skeleton->getTransformConstraints().size();
 }
 
 FFI_PLUGIN_EXPORT spine_transform_constraint* spine_skeleton_get_transform_constraints(spine_skeleton skeleton) {
@@ -1050,7 +1086,7 @@ FFI_PLUGIN_EXPORT spine_transform_constraint* spine_skeleton_get_transform_const
 FFI_PLUGIN_EXPORT int spine_skeleton_get_num_path_constraints(spine_skeleton skeleton) {
     if (skeleton == nullptr) return 0;
     Skeleton *_skeleton = (Skeleton*)skeleton;
-    return _skeleton->getPathConstraints().size();
+    return (int)_skeleton->getPathConstraints().size();
 }
 
 FFI_PLUGIN_EXPORT spine_path_constraint* spine_skeleton_get_path_constraints(spine_skeleton skeleton) {

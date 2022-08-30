@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/rendering.dart';
+import 'package:flutter/rendering.dart' as rendering;
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -179,7 +179,7 @@ class _SpineRenderObject extends RenderBox {
   }
 
   @override
-  void attach(PipelineOwner owner) {
+  void attach(rendering.PipelineOwner owner) {
     super.attach(owner);
     _stopwatch.start();
   }
@@ -209,7 +209,7 @@ class _SpineRenderObject extends RenderBox {
 
     final commands = _skeletonDrawable.render();
     for (final cmd in commands) {
-      canvas.drawVertices(cmd.vertices, BlendMode.modulate,
+      canvas.drawVertices(cmd.vertices, rendering.BlendMode.modulate,
           _skeletonDrawable.atlas.atlasPagePaints[cmd.atlasPageIndex]);
     }
 
