@@ -86,6 +86,7 @@
   * Added `UnscaledTime` property at `SkeletonAnimation` as well, behaving like `SkeletonGraphic.UnscaledTime`. If enabled, AnimationState uses unscaled game time (`Time.unscaledDeltaTime`), running animations independent of e.g. game pause (`Time.timeScale`).
   * `SkeletonAnimation`, `SkeletonMecanim` and `SkeletonGraphic` now provide an additional `OnAnimationRebuild` callback delegate which is issued after both the skeleton and the animation state have been initialized.
   * Timeline `SkeletonAnimation Track` and `SkeletonGraphic Track` now provide an `Unscaled Time` property. Whenever starting a new animation clip of this track, `SkeletonAnimation.UnscaledTime` or `SkeletonGraphic.UnscaledTime` will be set to this value. This allows you to play back Timeline clips either in normal game time or unscaled game time. Note that `PlayableDirector.UpdateMethod` is ignored and replaced by this property, which allows more fine-granular control per Timeline track.
+  * Added `SkeletonRootMotion` callback delegates `ProcessRootMotionOverride` and `PhysicsUpdateRootMotionOverride` to customize how root motion is applied. The new property `disableOnOverride` determines whether the callback will be issued in addition or instead of normally applying root motion. Added property `rootMotionScaleRotation` to allow scaling rotational root-motion to match e.g. a 90 degree rotation to a custom target angle.
  
 * **Breaking changes**
   * Made `SkeletonGraphic.unscaledTime` parameter protected, use the new property `UnscaledTime` instead.
