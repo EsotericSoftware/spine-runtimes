@@ -430,6 +430,15 @@ class Animation {
   final spine_animation _animation;
 
   Animation(this._animation);
+
+  String getName() {
+    final Pointer<Utf8> value = _bindings.spine_animation_get_name(_animation).cast();
+    return value.toDartString();
+  }
+
+  double getDuration() {
+    return _bindings.spine_animation_get_duration(_animation);
+  }
 }
 
 enum MixBlend {
@@ -727,6 +736,37 @@ class EventData {
   final spine_event_data _data;
 
   EventData(this._data);
+
+  String getName() {
+    final Pointer<Utf8> value = _bindings.spine_event_data_get_name(_data).cast();
+    return value.toDartString();
+  }
+
+  int getIntValue() {
+    return _bindings.spine_event_data_get_int_value(_data);
+  }
+
+  double getFloatValue() {
+    return _bindings.spine_event_data_get_float_value(_data);
+  }
+
+  String getStringValue() {
+    final Pointer<Utf8> value = _bindings.spine_event_data_get_string_value(_data).cast();
+    return value.toDartString();
+  }
+
+  String getAudioPath() {
+    final Pointer<Utf8> value = _bindings.spine_event_data_get_audio_path(_data).cast();
+    return value.toDartString();
+  }
+
+  double getVolume() {
+    return _bindings.spine_event_data_get_volume(_data);
+  }
+
+  double getBalance() {
+    return _bindings.spine_event_data_get_balance(_data);
+  }
 }
 
 class Event {

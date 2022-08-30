@@ -188,6 +188,34 @@ class SpineFlutterBindings {
       _spine_skeleton_drawable_disposePtr
           .asFunction<void Function(ffi.Pointer<spine_skeleton_drawable>)>();
 
+  ffi.Pointer<ffi.Int8> spine_animation_get_name(
+    spine_animation animation,
+  ) {
+    return _spine_animation_get_name(
+      animation,
+    );
+  }
+
+  late final _spine_animation_get_namePtr = _lookup<
+          ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(spine_animation)>>(
+      'spine_animation_get_name');
+  late final _spine_animation_get_name = _spine_animation_get_namePtr
+      .asFunction<ffi.Pointer<ffi.Int8> Function(spine_animation)>();
+
+  double spine_animation_get_duration(
+    spine_animation animation,
+  ) {
+    return _spine_animation_get_duration(
+      animation,
+    );
+  }
+
+  late final _spine_animation_get_durationPtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_animation)>>(
+          'spine_animation_get_duration');
+  late final _spine_animation_get_duration = _spine_animation_get_durationPtr
+      .asFunction<double Function(spine_animation)>();
+
   void spine_animation_state_update(
     spine_animation_state state,
     double delta,
@@ -1935,6 +1963,108 @@ class SpineFlutterBindings {
   late final _spine_skeleton_set_scale_y = _spine_skeleton_set_scale_yPtr
       .asFunction<void Function(spine_skeleton, double)>();
 
+  ffi.Pointer<ffi.Int8> spine_event_data_get_name(
+    spine_event event,
+  ) {
+    return _spine_event_data_get_name(
+      event,
+    );
+  }
+
+  late final _spine_event_data_get_namePtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(spine_event)>>(
+          'spine_event_data_get_name');
+  late final _spine_event_data_get_name = _spine_event_data_get_namePtr
+      .asFunction<ffi.Pointer<ffi.Int8> Function(spine_event)>();
+
+  int spine_event_data_get_int_value(
+    spine_event event,
+  ) {
+    return _spine_event_data_get_int_value(
+      event,
+    );
+  }
+
+  late final _spine_event_data_get_int_valuePtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_event)>>(
+          'spine_event_data_get_int_value');
+  late final _spine_event_data_get_int_value =
+      _spine_event_data_get_int_valuePtr
+          .asFunction<int Function(spine_event)>();
+
+  double spine_event_data_get_float_value(
+    spine_event event,
+  ) {
+    return _spine_event_data_get_float_value(
+      event,
+    );
+  }
+
+  late final _spine_event_data_get_float_valuePtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_event)>>(
+          'spine_event_data_get_float_value');
+  late final _spine_event_data_get_float_value =
+      _spine_event_data_get_float_valuePtr
+          .asFunction<double Function(spine_event)>();
+
+  ffi.Pointer<ffi.Int8> spine_event_data_get_string_value(
+    spine_event event,
+  ) {
+    return _spine_event_data_get_string_value(
+      event,
+    );
+  }
+
+  late final _spine_event_data_get_string_valuePtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(spine_event)>>(
+          'spine_event_data_get_string_value');
+  late final _spine_event_data_get_string_value =
+      _spine_event_data_get_string_valuePtr
+          .asFunction<ffi.Pointer<ffi.Int8> Function(spine_event)>();
+
+  ffi.Pointer<ffi.Int8> spine_event_data_get_audio_path(
+    spine_event event,
+  ) {
+    return _spine_event_data_get_audio_path(
+      event,
+    );
+  }
+
+  late final _spine_event_data_get_audio_pathPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(spine_event)>>(
+          'spine_event_data_get_audio_path');
+  late final _spine_event_data_get_audio_path =
+      _spine_event_data_get_audio_pathPtr
+          .asFunction<ffi.Pointer<ffi.Int8> Function(spine_event)>();
+
+  double spine_event_data_get_volume(
+    spine_event event,
+  ) {
+    return _spine_event_data_get_volume(
+      event,
+    );
+  }
+
+  late final _spine_event_data_get_volumePtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_event)>>(
+          'spine_event_data_get_volume');
+  late final _spine_event_data_get_volume = _spine_event_data_get_volumePtr
+      .asFunction<double Function(spine_event)>();
+
+  double spine_event_data_get_balance(
+    spine_event event,
+  ) {
+    return _spine_event_data_get_balance(
+      event,
+    );
+  }
+
+  late final _spine_event_data_get_balancePtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_event)>>(
+          'spine_event_data_get_balance');
+  late final _spine_event_data_get_balance = _spine_event_data_get_balancePtr
+      .asFunction<double Function(spine_event)>();
+
   spine_event_data spine_event_get_data(
     spine_event event,
   ) {
@@ -2143,9 +2273,9 @@ class spine_skeleton_drawable extends ffi.Struct {
 typedef spine_skeleton = ffi.Pointer<ffi.Void>;
 typedef spine_animation_state = ffi.Pointer<ffi.Void>;
 typedef spine_animation_state_events = ffi.Pointer<ffi.Void>;
+typedef spine_animation = ffi.Pointer<ffi.Void>;
 typedef spine_track_entry = ffi.Pointer<ffi.Void>;
 typedef spine_event = ffi.Pointer<ffi.Void>;
-typedef spine_animation = ffi.Pointer<ffi.Void>;
 typedef spine_bone = ffi.Pointer<ffi.Void>;
 typedef spine_slot = ffi.Pointer<ffi.Void>;
 typedef spine_skin = ffi.Pointer<ffi.Void>;

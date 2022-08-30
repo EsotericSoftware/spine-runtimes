@@ -32,6 +32,8 @@ FFI_PLUGIN_EXPORT int spine_minor_version() {
     return SPINE_MINOR_VERSION;
 }
 
+// Atlas
+
 FFI_PLUGIN_EXPORT spine_atlas* spine_atlas_load(const char *atlasData) {
     if (!atlasData) return nullptr;
     int length = (int)strlen(atlasData);
@@ -60,6 +62,8 @@ FFI_PLUGIN_EXPORT void spine_atlas_dispose(spine_atlas *atlas) {
     SpineExtension::free(atlas->imagePaths, __FILE__, __LINE__);
     SpineExtension::free(atlas, __FILE__, __LINE__);
 }
+
+// SkeletonData
 
 FFI_PLUGIN_EXPORT spine_skeleton_data_result spine_skeleton_data_load_json(spine_atlas *atlas, const char *skeletonData) {
     spine_skeleton_data_result result = { nullptr, nullptr };
@@ -97,6 +101,8 @@ FFI_PLUGIN_EXPORT void spine_skeleton_data_dispose(spine_skeleton_data skeletonD
     delete (SkeletonData*)skeletonData;
 }
 
+// RenderCommand
+
 spine_render_command *spine_render_command_create(int numVertices, int numIndices, spine_blend_mode blendMode, int pageIndex) {
     spine_render_command *cmd = SpineExtension::alloc<spine_render_command>(1, __FILE__, __LINE__);
     cmd->positions = SpineExtension::alloc<float>(numVertices << 1, __FILE__, __LINE__);
@@ -119,6 +125,8 @@ void spine_render_command_dispose(spine_render_command *cmd) {
     if (cmd->indices) SpineExtension::free(cmd->indices, __FILE__, __LINE__);
     SpineExtension::free(cmd, __FILE__, __LINE__);
 }
+
+// SkeletonDrawable
 
 FFI_PLUGIN_EXPORT spine_skeleton_drawable *spine_skeleton_drawable_create(spine_skeleton_data skeletonData) {
     spine_skeleton_drawable *drawable = SpineExtension::calloc<spine_skeleton_drawable>(1, __FILE__, __LINE__);
@@ -185,12 +193,12 @@ FFI_PLUGIN_EXPORT spine_render_command *spine_skeleton_drawable_render(spine_ske
         }
 
         Vector<float> *vertices = &worldVertices;
-        int verticesCount = 0;
-        Vector<float> *uvs = NULL;
+        int verticesCount;
+        Vector<float> *uvs;
         Vector<unsigned short> *indices;
-        int indicesCount = 0;
+        int indicesCount;
         Color *attachmentColor;
-        int pageIndex = -1;
+        int pageIndex;
 
         if (attachment->getRTTI().isExactly(RegionAttachment::rtti)) {
             RegionAttachment *regionAttachment = (RegionAttachment *) attachment;
@@ -270,6 +278,22 @@ FFI_PLUGIN_EXPORT spine_render_command *spine_skeleton_drawable_render(spine_ske
 
     return drawable->renderCommand;
 }
+
+// Animation
+
+FFI_PLUGIN_EXPORT const char* spine_animation_get_name(spine_animation animation) {
+    if (animation == nullptr) return nullptr;
+    Animation *_animation = (Animation*)animation;
+    return _animation->getName().buffer();
+}
+
+FFI_PLUGIN_EXPORT float spine_animation_get_duration(spine_animation animation) {
+    if (animation == nullptr) return 0;
+    Animation *_animation = (Animation*)animation;
+    return _animation->getDuration();
+}
+
+// AnimationState
 
 FFI_PLUGIN_EXPORT void spine_animation_state_update(spine_animation_state state, float delta) {
     if (state == nullptr) return;
@@ -383,6 +407,8 @@ FFI_PLUGIN_EXPORT void spine_animation_state_events_reset(spine_animation_state_
     EventListener *_events = (EventListener*)events;
     _events->events.clear();
 }
+
+// TrackEntry
 
 FFI_PLUGIN_EXPORT int spine_track_entry_get_track_index(spine_track_entry entry) {
     if (entry == nullptr) return 0;
@@ -660,6 +686,8 @@ FFI_PLUGIN_EXPORT float spine_track_entry_get_track_complete(spine_track_entry e
     return _entry->getTrackComplete();
 }
 
+// Skeleton
+
 FFI_PLUGIN_EXPORT void spine_skeleton_update_cache(spine_skeleton skeleton) {
     if (skeleton == nullptr) return;
     Skeleton *_skeleton = (Skeleton*)skeleton;
@@ -926,6 +954,52 @@ FFI_PLUGIN_EXPORT void spine_skeleton_set_scale_y(spine_skeleton skeleton, float
     Skeleton *_skeleton = (Skeleton*)skeleton;
     _skeleton->setScaleY(scaleY);
 }
+
+// EventData
+
+FFI_PLUGIN_EXPORT const char* spine_event_data_get_name(spine_event_data event) {
+    if (event == nullptr) return nullptr;
+    EventData *_event = (EventData*)event;
+    return _event->getName().buffer();
+}
+
+FFI_PLUGIN_EXPORT int spine_event_data_get_int_value(spine_event_data event) {
+    if (event == nullptr) return 0;
+    EventData *_event = (EventData*)event;
+    return _event->getIntValue();
+}
+
+FFI_PLUGIN_EXPORT float spine_event_data_get_float_value(spine_event_data event) {
+    if (event == nullptr) return 0;
+    EventData *_event = (EventData*)event;
+    return _event->getFloatValue();
+}
+
+FFI_PLUGIN_EXPORT const char* spine_event_data_get_string_value(spine_event_data event) {
+    if (event == nullptr) return nullptr;
+    EventData *_event = (EventData*)event;
+    return _event->getStringValue().buffer();
+}
+
+FFI_PLUGIN_EXPORT const char* spine_event_data_get_audio_path(spine_event_data event) {
+    if (event == nullptr) return nullptr;
+    EventData *_event = (EventData*)event;
+    return _event->getAudioPath().buffer();
+}
+
+FFI_PLUGIN_EXPORT float spine_event_data_get_volume(spine_event_data event) {
+    if (event == nullptr) return 0;
+    EventData *_event = (EventData*)event;
+    return _event->getVolume();
+}
+
+FFI_PLUGIN_EXPORT float spine_event_data_get_balance(spine_event_data event) {
+    if (event == nullptr) return 0;
+    EventData *_event = (EventData*)event;
+    return _event->getBalance();
+}
+
+// Event
 
 FFI_PLUGIN_EXPORT spine_event_data spine_event_get_data(spine_event event) {
     if (event == nullptr) return nullptr;
