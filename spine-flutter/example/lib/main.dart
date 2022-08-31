@@ -55,6 +55,7 @@ class SimpleAnimation extends StatelessWidget {
       print("Skeleton name: ${controller.skeletonData?.getName()}");
       print("Skeleton version: ${controller.skeletonData?.getVersion()}");
       print("Skeleton hash: ${controller.skeletonData?.getHash()}");
+      print("Bones: ${controller.skeletonData!.getBones()}");
     });
 
     return Scaffold(

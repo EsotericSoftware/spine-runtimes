@@ -391,11 +391,88 @@ enum BlendMode {
   const BlendMode(this.value);
 }
 
+enum TransformMode {
+  Normal(0),
+  OnlyTranslation(1),
+  NoRotationOrReflection(2),
+  NoScale(3),
+  NoScaleOrReflection(4);
+
+  final int value;
+  const TransformMode(this.value);
+}
+
 // FIXME
 class BoneData {
   final spine_bone_data _data;
 
   BoneData(this._data);
+
+  int getIndex() {
+    return _bindings.spine_bone_data_get_index(_data);
+  }
+
+  String getName() {
+    Pointer<Utf8> name = _bindings.spine_bone_data_get_name(_data).cast();
+    return name.toDartString();
+  }
+
+  BoneData? getParent() {
+    final parent = _bindings.spine_bone_data_get_parent(_data);
+    if (parent.address == nullptr.address) return null;
+    return BoneData(parent);
+  }
+
+  double getLength() {
+    return _bindings.spine_bone_data_get_length(_data);
+  }
+
+  double getX() {
+    return _bindings.spine_bone_data_get_x(_data);
+  }
+
+  double getY() {
+    return _bindings.spine_bone_data_get_y(_data);
+  }
+
+  double getRotation() {
+    return _bindings.spine_bone_data_get_rotation(_data);
+  }
+
+  double getScaleX() {
+    return _bindings.spine_bone_data_get_scale_x(_data);
+  }
+
+  double getScaleY() {
+    return _bindings.spine_bone_data_get_scale_y(_data);
+  }
+
+  double getShearX() {
+    return _bindings.spine_bone_data_get_shear_x(_data);
+  }
+
+  double getShearY() {
+    return _bindings.spine_bone_data_get_shear_y(_data);
+  }
+
+  TransformMode getTransformMode() {
+    final nativeMode = _bindings.spine_bone_data_get_transform_mode(_data);
+    return TransformMode.values[nativeMode];
+  }
+
+  bool isSkinRequired() {
+    return _bindings.spine_bone_data_is_skin_required(_data) == -1;
+  }
+
+  Color getColor() {
+    final color = _bindings.spine_bone_data_get_color(_data);
+    return Color(color.r, color.g, color.b, color.a);
+  }
+
+  @override
+  String toString() {
+    return getName();
+  }
 }
 
 // FIXME

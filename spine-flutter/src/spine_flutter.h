@@ -79,6 +79,14 @@ typedef enum spine_event_type {
     SPINE_EVENT_TYPE_EVENT
 } spine_event_type;
 
+typedef enum spine_transform_mode {
+    SPINE_TRANSFORM_MODE_NORMAL = 0,
+    SPINE_TRANSFORM_ONLY_TRANSLATION,
+    SPINE_TRANSFORM_NO_ROTATION_OR_REFLECTION,
+    SPINE_TRANSFORM_NO_SCALE,
+    SPINE_TRANSFORM_NO_SCALE_OR_REFLECTION
+} spine_transform_mode;
+
 typedef struct spine_render_command {
     float *positions;
     float *uvs;
@@ -272,13 +280,13 @@ FFI_PLUGIN_EXPORT void spine_skeleton_set_scale_x(spine_skeleton skeleton, float
 FFI_PLUGIN_EXPORT float spine_skeleton_get_scale_y(spine_skeleton skeleton);
 FFI_PLUGIN_EXPORT void spine_skeleton_set_scale_y(spine_skeleton skeleton, float scaleY);
 
-FFI_PLUGIN_EXPORT const char* spine_event_data_get_name(spine_event event);
-FFI_PLUGIN_EXPORT int spine_event_data_get_int_value(spine_event event);
-FFI_PLUGIN_EXPORT float spine_event_data_get_float_value(spine_event event);
-FFI_PLUGIN_EXPORT const char* spine_event_data_get_string_value(spine_event event);
-FFI_PLUGIN_EXPORT const char* spine_event_data_get_audio_path(spine_event event);
-FFI_PLUGIN_EXPORT float spine_event_data_get_volume(spine_event event);
-FFI_PLUGIN_EXPORT float spine_event_data_get_balance(spine_event event);
+FFI_PLUGIN_EXPORT const char* spine_event_data_get_name(spine_event_data event);
+FFI_PLUGIN_EXPORT int spine_event_data_get_int_value(spine_event_data event);
+FFI_PLUGIN_EXPORT float spine_event_data_get_float_value(spine_event_data event);
+FFI_PLUGIN_EXPORT const char* spine_event_data_get_string_value(spine_event_data event);
+FFI_PLUGIN_EXPORT const char* spine_event_data_get_audio_path(spine_event_data event);
+FFI_PLUGIN_EXPORT float spine_event_data_get_volume(spine_event_data event);
+FFI_PLUGIN_EXPORT float spine_event_data_get_balance(spine_event_data event);
 
 FFI_PLUGIN_EXPORT spine_event_data spine_event_get_data(spine_event event);
 FFI_PLUGIN_EXPORT float spine_event_get_time(spine_event event);
@@ -308,3 +316,18 @@ FFI_PLUGIN_EXPORT void spine_slot_set_dark_color(spine_slot slot, float r, float
 FFI_PLUGIN_EXPORT int spine_slot_has_dark_color(spine_slot slot);
 FFI_PLUGIN_EXPORT spine_attachment spine_slot_get_attachment(spine_slot slot);
 FFI_PLUGIN_EXPORT void spine_slot_set_attachment(spine_slot slot, spine_attachment attachment);
+
+FFI_PLUGIN_EXPORT int spine_bone_data_get_index(spine_bone_data data);
+FFI_PLUGIN_EXPORT const char* spine_bone_data_get_name(spine_bone_data data);
+FFI_PLUGIN_EXPORT spine_bone_data spine_bone_data_get_parent(spine_bone_data data);
+FFI_PLUGIN_EXPORT float spine_bone_data_get_length(spine_bone_data data);
+FFI_PLUGIN_EXPORT float spine_bone_data_get_x(spine_bone_data data);
+FFI_PLUGIN_EXPORT float spine_bone_data_get_y(spine_bone_data data);
+FFI_PLUGIN_EXPORT float spine_bone_data_get_rotation(spine_bone_data data);
+FFI_PLUGIN_EXPORT float spine_bone_data_get_scale_x(spine_bone_data data);
+FFI_PLUGIN_EXPORT float spine_bone_data_get_scale_y(spine_bone_data data);
+FFI_PLUGIN_EXPORT float spine_bone_data_get_shear_x(spine_bone_data data);
+FFI_PLUGIN_EXPORT float spine_bone_data_get_shear_y(spine_bone_data data);
+FFI_PLUGIN_EXPORT spine_transform_mode spine_bone_data_get_transform_mode(spine_bone_data data);
+FFI_PLUGIN_EXPORT int spine_bone_data_is_skin_required(spine_bone_data data);
+FFI_PLUGIN_EXPORT spine_color spine_bone_data_get_color(spine_bone_data data);
