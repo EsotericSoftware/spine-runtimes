@@ -47,7 +47,7 @@ class Atlas {
     final atlasData = convert.utf8.decode(atlasBytes);
     final atlasDataNative = atlasData.toNativeUtf8();
     final atlas = _bindings.spine_atlas_load(atlasDataNative.cast());
-    calloc.free(atlasDataNative);
+    malloc.free(atlasDataNative);
     if (atlas.ref.error.address != nullptr.address) {
       final Pointer<Utf8> error = atlas.ref.error.cast();
       final message = error.toDartString();
@@ -97,20 +97,21 @@ class Atlas {
   }
 }
 
+// FIXME
 class SkeletonData {
-  final spine_skeleton_data _skeletonData;
+  final spine_skeleton_data _data;
   bool _disposed;
 
-  SkeletonData(this._skeletonData): _disposed = false;
+  SkeletonData(this._data): _disposed = false;
 
   static SkeletonData fromJson(Atlas atlas, String json) {
     final jsonNative = json.toNativeUtf8();
     final result = _bindings.spine_skeleton_data_load_json(atlas._atlas, jsonNative.cast());
-    calloc.free(jsonNative);
+    malloc.free(jsonNative);
     if (result.error.address != nullptr.address) {
       final Pointer<Utf8> error = result.error.cast();
       final message = error.toDartString();
-      calloc.free(error);
+      malloc.free(error);
       throw Exception("Couldn't load skeleton data: $message");
     }
     return SkeletonData(result.skeletonData);
@@ -124,16 +125,259 @@ class SkeletonData {
     if (result.error.address != nullptr.address) {
       final Pointer<Utf8> error = result.error.cast();
       final message = error.toDartString();
-      calloc.free(error);
+      malloc.free(error);
       throw Exception("Couldn't load skeleton data: $message");
     }
     return SkeletonData(result.skeletonData);
   }
 
+  /// Finds a bone by comparing each bone's name. It is more efficient to cache the results of this method than to call it multiple times.
+  BoneData? findBone(String name) {
+    final nativeName = name.toNativeUtf8();
+    final bone = _bindings.spine_skeleton_data_find_bone(_data, nativeName.cast());
+    malloc.free(nativeName);
+    if (bone.address == nullptr.address) return null;
+    return BoneData(bone);
+  }
+
+  /// Finds a slot by comparing each slot's name. It is more efficient to cache the results of this method than to call it multiple times.
+  SlotData? findSlot(String name) {
+    final nativeName = name.toNativeUtf8();
+    final slot = _bindings.spine_skeleton_data_find_slot(_data, nativeName.cast());
+    malloc.free(nativeName);
+    if (slot.address == nullptr.address) return null;
+    return SlotData(slot);
+  }
+
+  /// Finds a skin by comparing each skin's name. It is more efficient to cache the results of this method than to call it
+  /// multiple times.
+  Skin? findSkin(String name) {
+    final nativeName = name.toNativeUtf8();
+    final skin = _bindings.spine_skeleton_data_find_skin(_data, nativeName.cast());
+    malloc.free(nativeName);
+    if (skin.address == nullptr.address) return null;
+    return Skin(skin);
+  }
+
+  /// Finds an event by comparing each events's name. It is more efficient to cache the results of this method than to call it
+  /// multiple times.
+  EventData? findEvent(String name) {
+    final nativeName = name.toNativeUtf8();
+    final event = _bindings.spine_skeleton_data_find_event(_data, nativeName.cast());
+    malloc.free(nativeName);
+    if (event.address == nullptr.address) return null;
+    return EventData(event);
+  }
+
+  /// Finds an animation by comparing each animation's name. It is more efficient to cache the results of this method than to
+  /// call it multiple times.
+  Animation? findAnimation(String name) {
+    final nativeName = name.toNativeUtf8();
+    final animation = _bindings.spine_skeleton_data_find_animation(_data, nativeName.cast());
+    malloc.free(nativeName);
+    if (animation.address == nullptr.address) return null;
+    return Animation(animation);
+  }
+
+  /// Finds an IK constraint by comparing each IK constraint's name. It is more efficient to cache the results of this method
+  /// than to call it multiple times.
+  IkConstraintData? findIkConstraint(String name) {
+    final nativeName = name.toNativeUtf8();
+    final constraint = _bindings.spine_skeleton_data_find_ik_constraint(_data, nativeName.cast());
+    malloc.free(nativeName);
+    if (constraint.address == nullptr.address) return null;
+    return IkConstraintData(constraint);
+  }
+
+  /// Finds a transform constraint by comparing each transform constraint's name. It is more efficient to cache the results of
+  /// this method than to call it multiple times.
+  TransformConstraintData? findTransformConstraint(String name) {
+    final nativeName = name.toNativeUtf8();
+    final constraint = _bindings.spine_skeleton_data_find_transform_constraint(_data, nativeName.cast());
+    malloc.free(nativeName);
+    if (constraint.address == nullptr.address) return null;
+    return TransformConstraintData(constraint);
+  }
+
+  /// Finds a path constraint by comparing each path constraint's name. It is more efficient to cache the results of this method
+  /// than to call it multiple times.
+  PathConstraintData? findPathConstraint(String name) {
+    final nativeName = name.toNativeUtf8();
+    final constraint = _bindings.spine_skeleton_data_find_transform_constraint(_data, nativeName.cast());
+    malloc.free(nativeName);
+    if (constraint.address == nullptr.address) return null;
+    return PathConstraintData(constraint);
+  }
+
+  /// The skeleton's name, which by default is the name of the skeleton data file when possible, or null when a name hasn't been
+  /// set.
+  String? getName() {
+    Pointer<Utf8> name = _bindings.spine_skeleton_data_get_name(_data).cast();
+    if (name.address == nullptr.address) return null;
+    return name.toDartString();
+  }
+
+  /// The skeleton's bones, sorted parent first. The root bone is always the first bone.
+  List<BoneData> getBones() {
+    final List<BoneData> bones = [];
+    final numBones = _bindings.spine_skeleton_data_get_num_bones(_data);
+    final nativeBones = _bindings.spine_skeleton_data_get_bones(_data);
+    for (int i = 0; i < numBones; i++) {
+      bones.add(BoneData(nativeBones[i]));
+    }
+    return bones;
+  }
+
+  /// The skeleton's slots.
+  List<SlotData> getSlots() {
+    final List<SlotData> slots = [];
+    final numSlots = _bindings.spine_skeleton_data_get_num_slots(_data);
+    final nativeSlots = _bindings.spine_skeleton_data_get_slots(_data);
+    for (int i = 0; i < numSlots; i++) {
+      slots.add(SlotData(nativeSlots[i]));
+    }
+    return slots;
+  }
+
+  /// All skins, including the default skin.
+  List<Skin> getSkins() {
+    final List<Skin> skins = [];
+    final numSkins = _bindings.spine_skeleton_data_get_num_skins(_data);
+    final nativeSkins = _bindings.spine_skeleton_data_get_skins(_data);
+    for (int i = 0; i < numSkins; i++) {
+      skins.add(Skin(nativeSkins[i]));
+    }
+    return skins;
+  }
+
+  /// The skeleton's default skin. By default this skin contains all attachments that were not in a skin in Spine.
+  Skin? getDefaultSkin() {
+    final skin = _bindings.spine_skeleton_data_get_default_skin(_data);
+    if (skin.address == nullptr.address) return null;
+    return Skin(skin);
+  }
+
+  void setDefaultSkin(Skin? skin) {
+    if (skin == null) {
+      _bindings.spine_skeleton_data_set_default_skin(_data, nullptr);
+    } else {
+      _bindings.spine_skeleton_data_set_default_skin(_data, skin._skin);
+    }
+  }
+
+  /// The skeleton's events.
+  List<EventData> getEvents() {
+    final List<EventData> events = [];
+    final numEvents = _bindings.spine_skeleton_data_get_num_events(_data);
+    final nativeEvents = _bindings.spine_skeleton_data_get_events(_data);
+    for (int i = 0; i < numEvents; i++) {
+      events.add(EventData(nativeEvents[i]));
+    }
+    return events;
+  }
+
+
+  /// The skeleton's animations.
+  List<Animation> getAnimations() {
+    final List<Animation> events = [];
+    final numAnimation = _bindings.spine_skeleton_data_get_num_animations(_data);
+    final nativeAnimations = _bindings.spine_skeleton_data_get_animations(_data);
+    for (int i = 0; i < numAnimation; i++) {
+      events.add(Animation(nativeAnimations[i]));
+    }
+    return events;
+  }
+
+  /// The skeleton's IK constraints.
+  List<IkConstraintData> getIkConstraints() {
+    final List<IkConstraintData> constraints = [];
+    final numConstraints = _bindings.spine_skeleton_data_get_num_ik_constraints(_data);
+    final nativeConstraints = _bindings.spine_skeleton_data_get_ik_constraints(_data);
+    for (int i = 0; i < numConstraints; i++) {
+      constraints.add(IkConstraintData(nativeConstraints[i]));
+    }
+    return constraints;
+  }
+
+  /// The skeleton's transform constraints.
+  List<TransformConstraint> getTransformConstraints() {
+    final List<TransformConstraint> constraints = [];
+    final numConstraints = _bindings.spine_skeleton_data_get_num_transform_constraints(_data);
+    final nativeConstraints = _bindings.spine_skeleton_data_get_transform_constraints(_data);
+    for (int i = 0; i < numConstraints; i++) {
+      constraints.add(TransformConstraint(nativeConstraints[i]));
+    }
+    return constraints;
+  }
+
+  /// The skeleton's path constraints.
+  List<PathConstraintData> getPathConstraints() {
+    final List<PathConstraintData> constraints = [];
+    final numConstraints = _bindings.spine_skeleton_data_get_num_path_constraints(_data);
+    final nativeConstraints = _bindings.spine_skeleton_data_get_path_constraints(_data);
+    for (int i = 0; i < numConstraints; i++) {
+      constraints.add(PathConstraintData(nativeConstraints[i]));
+    }
+    return constraints;
+  }
+
+  /// The X coordinate of the skeleton's axis aligned bounding box in the setup pose.
+  double getX() {
+    return _bindings.spine_skeleton_data_get_x(_data);
+  }
+
+  /// The Y coordinate of the skeleton's axis aligned bounding box in the setup pose.
+  double getY() {
+    return _bindings.spine_skeleton_data_get_y(_data);
+  }
+
+  /// The width of the skeleton's axis aligned bounding box in the setup pose.
+  double getWidth() {
+    return _bindings.spine_skeleton_data_get_width(_data);
+  }
+
+  /// The height of the skeleton's axis aligned bounding box in the setup pose.
+  double getHeight() {
+    return _bindings.spine_skeleton_data_get_height(_data);
+  }
+
+  /// The Spine version used to export the skeleton data.
+  String? getVersion() {
+    Pointer<Utf8> name = _bindings.spine_skeleton_data_get_version(_data).cast();
+    if (name.address == nullptr.address) return null;
+    return name.toDartString();
+  }
+
+  /// The skeleton data hash. This value will change if any of the skeleton data has changed.
+  String? getHash() {
+    Pointer<Utf8> name = _bindings.spine_skeleton_data_get_hash(_data).cast();
+    if (name.address == nullptr.address) return null;
+    return name.toDartString();
+  }
+
+  /// The path to the images directory as defined in Spine, or null if nonessential data was not exported.
+  String? getImagesPath() {
+    Pointer<Utf8> name = _bindings.spine_skeleton_data_get_images_path(_data).cast();
+    if (name.address == nullptr.address) return null;
+    return name.toDartString();
+  }
+
+  /// The path to the audio directory as defined in Spine, or null if nonessential data was not exported.
+  String? getAudioPath() {
+    Pointer<Utf8> name = _bindings.spine_skeleton_data_get_audio_path(_data).cast();
+    if (name.address == nullptr.address) return null;
+    return name.toDartString();
+  }
+
+  /// The dopesheet FPS in Spine, or zero if nonessential data was not exported.
+  double getFps() {
+    return _bindings.spine_skeleton_data_get_fps(_data);
+  }
+
   void dispose() {
     if (_disposed) return;
     _disposed = true;
-    _bindings.spine_skeleton_data_dispose(_skeletonData);
+    _bindings.spine_skeleton_data_dispose(_data);
   }
 }
 
@@ -147,12 +391,14 @@ enum BlendMode {
   const BlendMode(this.value);
 }
 
+// FIXME
 class BoneData {
   final spine_bone_data _data;
 
   BoneData(this._data);
 }
 
+// FIXME
 class Bone {
   final spine_bone _bone;
 
@@ -255,30 +501,57 @@ class Slot {
   }
 }
 
+// FIXME
 class Attachment {
   final spine_attachment _attachment;
 
   Attachment(this._attachment);
 }
 
+// FIXME
 class Skin {
   final spine_skin _skin;
 
   Skin(this._skin);
 }
 
+
+// FIXME
+class IkConstraintData {
+  final spine_ik_constraint_data _data;
+
+  IkConstraintData(this._data);
+}
+
+// FIXME
 class IkConstraint {
   final spine_ik_constraint _constraint;
 
   IkConstraint(this._constraint);
 }
 
+// FIXME
+class TransformConstraintData {
+  final spine_transform_constraint_data _data;
+
+  TransformConstraintData(this._data);
+}
+
+// FIXME
 class TransformConstraint {
   final spine_transform_constraint _constraint;
 
   TransformConstraint(this._constraint);
 }
 
+// FIXME
+class PathConstraintData {
+  final spine_path_constraint_data _data;
+
+  PathConstraintData(this._data);
+}
+
+// FIXME
 class PathConstraint {
   final spine_path_constraint _constraint;
 
@@ -322,7 +595,7 @@ class Skeleton {
   Bone? findBone(String boneName) {
     final nameNative = boneName.toNativeUtf8();
     final bone = _bindings.spine_skeleton_find_bone(_skeleton, nameNative.cast());
-    calloc.free(nameNative);
+    malloc.free(nameNative);
     if (bone.address == nullptr.address) return null;
     return Bone(bone);
   }
@@ -330,7 +603,7 @@ class Skeleton {
   Slot? findSlot(String slotName) {
     final nameNative = slotName.toNativeUtf8();
     final slot = _bindings.spine_skeleton_find_slot(_skeleton, nameNative.cast());
-    calloc.free(nameNative);
+    malloc.free(nameNative);
     if (slot.address == nullptr.address) return null;
     return Slot(slot);
   }
@@ -345,15 +618,15 @@ class Skeleton {
   void setSkin(String skinName) {
     final nameNative = skinName.toNativeUtf8();
     _bindings.spine_skeleton_set_skin(_skeleton, nameNative.cast());
-    calloc.free(nameNative);
+    malloc.free(nameNative);
   }
 
   Attachment? getAttachmentByName(String slotName, String attachmentName) {
     final slotNameNative = slotName.toNativeUtf8();
     final attachmentNameNative = attachmentName.toNativeUtf8();
     final attachment = _bindings.spine_skeleton_get_attachment_by_name(_skeleton, slotNameNative.cast(), attachmentNameNative.cast());
-    calloc.free(slotNameNative);
-    calloc.free(attachmentNameNative);
+    malloc.free(slotNameNative);
+    malloc.free(attachmentNameNative);
     if (attachment.address == nullptr.address) return null;
     return Attachment(attachment);
   }
@@ -361,7 +634,7 @@ class Skeleton {
   Attachment? getAttachment(int slotIndex, String attachmentName) {
     final attachmentNameNative = attachmentName.toNativeUtf8();
     final attachment = _bindings.spine_skeleton_get_attachment(_skeleton, slotIndex, attachmentNameNative.cast());
-    calloc.free(attachmentNameNative);
+    malloc.free(attachmentNameNative);
     if (attachment.address == nullptr.address) return null;
     return Attachment(attachment);
   }
@@ -370,14 +643,14 @@ class Skeleton {
     final slotNameNative = slotName.toNativeUtf8();
     final attachmentNameNative = attachmentName.toNativeUtf8();
     _bindings.spine_skeleton_set_attachment(_skeleton, slotNameNative.cast(), attachmentNameNative.cast());
-    calloc.free(slotNameNative);
-    calloc.free(attachmentNameNative);
+    malloc.free(slotNameNative);
+    malloc.free(attachmentNameNative);
   }
 
   IkConstraint? findIkConstraint(String constraintName) {
     final nameNative = constraintName.toNativeUtf8();
     final constraint = _bindings.spine_skeleton_find_ik_constraint(_skeleton, nameNative.cast());
-    calloc.free(nameNative);
+    malloc.free(nameNative);
     if (constraint.address == nullptr.address) return null;
     return IkConstraint(constraint);
   }
@@ -385,7 +658,7 @@ class Skeleton {
   TransformConstraint? findTransformConstraint(String constraintName) {
     final nameNative = constraintName.toNativeUtf8();
     final constraint = _bindings.spine_skeleton_find_transform_constraint(_skeleton, nameNative.cast());
-    calloc.free(nameNative);
+    malloc.free(nameNative);
     if (constraint.address == nullptr.address) return null;
     return TransformConstraint(constraint);
   }
@@ -393,7 +666,7 @@ class Skeleton {
   PathConstraint? findPathConstraint(String constraintName) {
     final nameNative = constraintName.toNativeUtf8();
     final constraint = _bindings.spine_skeleton_find_path_constraint(_skeleton, nameNative.cast());
-    calloc.free(nameNative);
+    malloc.free(nameNative);
     if (constraint.address == nullptr.address) return null;
     return PathConstraint(constraint);
   }
@@ -1010,7 +1283,7 @@ class AnimationState {
   TrackEntry setAnimation(int trackIndex, String animationName, bool loop) {
     final animation = animationName.toNativeUtf8();
     final entry = _bindings.spine_animation_state_set_animation(_state, trackIndex, animation.cast(), loop ? -1 : 0);
-    calloc.free(animation);
+    malloc.free(animation);
     if (entry.address == nullptr.address) throw Exception("Couldn't set animation $animationName");
     return TrackEntry(entry, this);
   }
@@ -1026,7 +1299,7 @@ class AnimationState {
   TrackEntry addAnimation(int trackIndex, String animationName, bool loop, double delay) {
     final animation = animationName.toNativeUtf8();
     final entry = _bindings.spine_animation_state_add_animation(_state, trackIndex, animation.cast(), loop ? -1 : 0, delay);
-    calloc.free(animation);
+    malloc.free(animation);
     if (entry.address == nullptr.address) throw Exception("Couldn't add animation $animationName");
     return TrackEntry(entry, this);
   }
@@ -1085,7 +1358,7 @@ class SkeletonDrawable {
   bool _disposed;
 
   SkeletonDrawable(this.atlas, this.skeletonData, this._ownsAtlasAndSkeletonData): _disposed = false {
-    _drawable = _bindings.spine_skeleton_drawable_create(skeletonData._skeletonData);
+    _drawable = _bindings.spine_skeleton_drawable_create(skeletonData._data);
     skeleton = Skeleton(_drawable.ref.skeleton);
     animationState = AnimationState(_drawable.ref.animationState, _drawable.ref.animationStateEvents);
   }
