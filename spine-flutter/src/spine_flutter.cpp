@@ -1469,3 +1469,380 @@ FFI_PLUGIN_EXPORT spine_color spine_bone_data_get_color(spine_bone_data data) {
     color = { _data->getColor().r, _data->getColor().g, _data->getColor().b, _data->getColor().a };
     return color;
 }
+
+// Bone
+FFI_PLUGIN_EXPORT void spine_bone_update(spine_bone bone) {
+    if (bone == nullptr) return;
+    Bone *_bone = (Bone*)bone;
+    _bone->update();
+}
+
+FFI_PLUGIN_EXPORT void spine_bone_update_world_transform(spine_bone bone) {
+    if (bone == nullptr) return;
+    Bone *_bone = (Bone*)bone;
+    _bone->updateWorldTransform();
+}
+
+FFI_PLUGIN_EXPORT void spine_bone_update_world_transform_with(spine_bone bone, float x, float y, float rotation, float scaleX, float scaleY, float shearX, float shearY) {
+    if (bone == nullptr) return;
+    Bone *_bone = (Bone*)bone;
+    _bone->updateWorldTransform(x, y, rotation, scaleX, scaleY, shearX, shearY);
+}
+
+FFI_PLUGIN_EXPORT void spine_bone_set_to_setup_pose(spine_bone bone) {
+    if (bone == nullptr) return;
+    Bone *_bone = (Bone*)bone;
+    _bone->setToSetupPose();
+}
+
+FFI_PLUGIN_EXPORT spine_vector spine_bone_world_to_local(spine_bone bone, float worldX, float worldY) {
+    spine_vector coords = { 0, 0 };
+    if (bone == nullptr) return coords;
+    Bone *_bone = (Bone*)bone;
+    _bone->worldToLocal(worldX, worldY, coords.x, coords.y);
+    return coords;
+}
+
+FFI_PLUGIN_EXPORT spine_vector spine_bone_local_to_world(spine_bone bone, float localX, float localY) {
+    spine_vector coords = { 0, 0 };
+    if (bone == nullptr) return coords;
+    Bone *_bone = (Bone*)bone;
+    _bone->localToWorld(localX, localY, coords.x, coords.y);
+    return coords;
+}
+
+FFI_PLUGIN_EXPORT float spine_bone_world_to_local_rotation(spine_bone bone, float worldRotation) {
+    if (bone == nullptr) return 0;
+    Bone *_bone = (Bone*)bone;
+    return _bone->worldToLocalRotation(worldRotation);
+}
+
+FFI_PLUGIN_EXPORT float spine_bone_local_to_worldrotation(spine_bone bone, float localRotation) {
+    if (bone == nullptr) return 0;
+    Bone *_bone = (Bone*)bone;
+    return _bone->localToWorldRotation(localRotation);
+}
+
+FFI_PLUGIN_EXPORT void spine_bone_rotateWorld(spine_bone bone, float degrees) {
+    if (bone == nullptr) return;
+    Bone *_bone = (Bone*)bone;
+    _bone->rotateWorld(degrees);
+}
+
+FFI_PLUGIN_EXPORT float spine_bone_get_world_to_local_rotation_x(spine_bone bone) {
+    if (bone == nullptr) return 0;
+    Bone *_bone = (Bone*)bone;
+    return _bone->getWorldToLocalRotationX();
+}
+
+FFI_PLUGIN_EXPORT float spine_bone_get_world_to_local_rotation_y(spine_bone bone) {
+    if (bone == nullptr) return 0;
+    Bone *_bone = (Bone*)bone;
+    return _bone->getWorldToLocalRotationY();
+}
+
+FFI_PLUGIN_EXPORT spine_bone_data spine_bone_get_data(spine_bone bone) {
+    if (bone == nullptr) return nullptr;
+    Bone *_bone = (Bone*)bone;
+    return &_bone->getData();
+}
+
+FFI_PLUGIN_EXPORT spine_skeleton spine_bone_get_skeleton(spine_bone bone) {
+    if (bone == nullptr) return nullptr;
+    Bone *_bone = (Bone*)bone;
+    return &_bone->getSkeleton();
+}
+
+FFI_PLUGIN_EXPORT spine_bone spine_bone_get_parent(spine_bone bone) {
+    if (bone == nullptr) return nullptr;
+    Bone *_bone = (Bone*)bone;
+    return _bone->getParent();
+}
+
+FFI_PLUGIN_EXPORT int spine_bone_get_num_children(spine_bone bone) {
+    if (bone == nullptr) return 0;
+    Bone *_bone = (Bone*)bone;
+    return (int)_bone->getChildren().size();
+}
+
+FFI_PLUGIN_EXPORT spine_bone* spine_bone_get_children(spine_bone bone) {
+    if (bone == nullptr) return nullptr;
+    Bone *_bone = (Bone*)bone;
+    return (spine_bone*)_bone->getChildren().buffer();
+}
+
+FFI_PLUGIN_EXPORT float spine_bone_get_x(spine_bone bone) {
+    if (bone == nullptr) return 0;
+    Bone *_bone = (Bone*)bone;
+    return _bone->getX();
+}
+
+FFI_PLUGIN_EXPORT void spine_bone_set_x(spine_bone bone, float x) {
+    if (bone == nullptr) return;
+    Bone *_bone = (Bone*)bone;
+    _bone->setX(x);
+}
+
+FFI_PLUGIN_EXPORT float spine_bone_get_y(spine_bone bone) {
+    if (bone == nullptr) return 0;
+    Bone *_bone = (Bone*)bone;
+    return _bone->getY();
+}
+
+FFI_PLUGIN_EXPORT void spine_bone_set_y(spine_bone bone, float y) {
+    if (bone == nullptr) return;
+    Bone *_bone = (Bone*)bone;
+    _bone->setY(y);
+}
+
+FFI_PLUGIN_EXPORT float spine_bone_get_rotation(spine_bone bone) {
+    if (bone == nullptr) return 0;
+    Bone *_bone = (Bone*)bone;
+    return _bone->getRotation();
+}
+
+FFI_PLUGIN_EXPORT void spine_bone_set_rotation(spine_bone bone, float rotation) {
+    if (bone == nullptr) return;
+    Bone *_bone = (Bone*)bone;
+    _bone->setRotation(rotation);
+}
+
+FFI_PLUGIN_EXPORT float spine_bone_get_scale_x(spine_bone bone) {
+    if (bone == nullptr) return 0;
+    Bone *_bone = (Bone*)bone;
+    return _bone->getScaleX();
+}
+
+FFI_PLUGIN_EXPORT void spine_bone_set_scale_x(spine_bone bone, float scaleX) {
+    if (bone == nullptr) return;
+    Bone *_bone = (Bone*)bone;
+    _bone->setScaleX(scaleX);
+}
+
+FFI_PLUGIN_EXPORT float spine_bone_get_scale_y(spine_bone bone) {
+    if (bone == nullptr) return 0;
+    Bone *_bone = (Bone*)bone;
+    return _bone->getScaleY();
+}
+
+FFI_PLUGIN_EXPORT void spine_bone_set_scale_y(spine_bone bone, float scaleY) {
+    if (bone == nullptr) return;
+    Bone *_bone = (Bone*)bone;
+    _bone->setScaleY(scaleY);
+}
+
+FFI_PLUGIN_EXPORT float spine_bone_get_shear_x(spine_bone bone) {
+    if (bone == nullptr) return 0;
+    Bone *_bone = (Bone*)bone;
+    return _bone->getShearX();
+}
+
+FFI_PLUGIN_EXPORT void spine_bone_set_shear_x(spine_bone bone, float shearX) {
+    if (bone == nullptr) return;
+    Bone *_bone = (Bone*)bone;
+    _bone->setShearX(shearX);
+}
+
+FFI_PLUGIN_EXPORT float spine_bone_get_shear_y(spine_bone bone) {
+    if (bone == nullptr) return 0;
+    Bone *_bone = (Bone*)bone;
+    return _bone->getShearY();
+}
+
+FFI_PLUGIN_EXPORT void spine_bone_set_shear_y(spine_bone bone, float shearY) {
+    if (bone == nullptr) return;
+    Bone *_bone = (Bone*)bone;
+    _bone->setShearY(shearY);
+}
+
+FFI_PLUGIN_EXPORT float spine_bone_get_applied_rotation(spine_bone bone) {
+    if (bone == nullptr) return 0;
+    Bone *_bone = (Bone*)bone;
+    return _bone->getAppliedRotation();
+}
+
+FFI_PLUGIN_EXPORT void spine_bone_set_applied_rotation(spine_bone bone, float rotation) {
+    if (bone == nullptr) return;
+    Bone *_bone = (Bone*)bone;
+    _bone->setAppliedRotation(rotation);
+}
+
+FFI_PLUGIN_EXPORT float spine_bone_get_a_x(spine_bone bone) {
+    if (bone == nullptr) return 0;
+    Bone *_bone = (Bone*)bone;
+    return _bone->getAX();
+}
+
+FFI_PLUGIN_EXPORT void spine_bone_set_a_x(spine_bone bone, float x) {
+    if (bone == nullptr) return;
+    Bone *_bone = (Bone*)bone;
+    _bone->setAX(x);
+}
+
+FFI_PLUGIN_EXPORT float spine_bone_get_a_y(spine_bone bone) {
+    if (bone == nullptr) return 0;
+    Bone *_bone = (Bone*)bone;
+    return _bone->getAY();
+}
+
+FFI_PLUGIN_EXPORT void spine_bone_set_a_y(spine_bone bone, float y) {
+    if (bone == nullptr) return;
+    Bone *_bone = (Bone*)bone;
+    _bone->setAY(y);
+}
+
+FFI_PLUGIN_EXPORT float spine_bone_get_a_scale_x(spine_bone bone) {
+    if (bone == nullptr) return 0;
+    Bone *_bone = (Bone*)bone;
+    return _bone->getAScaleX();
+}
+
+FFI_PLUGIN_EXPORT void spine_bone_set_a_scale_x(spine_bone bone, float scaleX) {
+    if (bone == nullptr) return;
+    Bone *_bone = (Bone*)bone;
+    _bone->setAScaleX(scaleX);
+}
+
+FFI_PLUGIN_EXPORT float spine_bone_get_a_scale_y(spine_bone bone) {
+    if (bone == nullptr) return 0;
+    Bone *_bone = (Bone*)bone;
+    return _bone->getAScaleY();
+}
+
+FFI_PLUGIN_EXPORT void spine_bone_set_a_scale_y(spine_bone bone, float scaleY) {
+    if (bone == nullptr) return;
+    Bone *_bone = (Bone*)bone;
+    _bone->setAScaleY(scaleY);
+}
+
+FFI_PLUGIN_EXPORT float spine_bone_get_a_shear_x(spine_bone bone) {
+    if (bone == nullptr) return 0;
+    Bone *_bone = (Bone*)bone;
+    return _bone->getAShearX();
+}
+
+FFI_PLUGIN_EXPORT void spine_bone_set_a_shear_x(spine_bone bone, float shearX) {
+    if (bone == nullptr) return;
+    Bone *_bone = (Bone*)bone;
+    _bone->setAShearX(shearX);
+}
+
+FFI_PLUGIN_EXPORT float spine_bone_get_a_shear_y(spine_bone bone) {
+    if (bone == nullptr) return 0;
+    Bone *_bone = (Bone*)bone;
+    return _bone->getAShearY();
+}
+
+FFI_PLUGIN_EXPORT void spine_bone_set_shear_a_y(spine_bone bone, float shearY) {
+    if (bone == nullptr) return;
+    Bone *_bone = (Bone*)bone;
+    _bone->setAShearY(shearY);
+}
+
+FFI_PLUGIN_EXPORT float spine_bone_get_a(spine_bone bone) {
+    if (bone == nullptr) return 0;
+    Bone *_bone = (Bone*)bone;
+    return _bone->getA();
+}
+
+FFI_PLUGIN_EXPORT void spine_bone_set_a(spine_bone bone, float a) {
+    if (bone == nullptr) return;
+    Bone *_bone = (Bone*)bone;
+    _bone->setA(a);
+}
+
+FFI_PLUGIN_EXPORT float spine_bone_get_b(spine_bone bone) {
+    if (bone == nullptr) return 0;
+    Bone *_bone = (Bone*)bone;
+    return _bone->getB();
+}
+
+FFI_PLUGIN_EXPORT void spine_bone_set_b(spine_bone bone, float b) {
+    if (bone == nullptr) return;
+    Bone *_bone = (Bone*)bone;
+    _bone->setB(b);
+}
+
+FFI_PLUGIN_EXPORT float spine_bone_get_c(spine_bone bone) {
+    if (bone == nullptr) return 0;
+    Bone *_bone = (Bone*)bone;
+    return _bone->getC();
+}
+
+FFI_PLUGIN_EXPORT void spine_bone_set_c(spine_bone bone, float c) {
+    if (bone == nullptr) return;
+    Bone *_bone = (Bone*)bone;
+    _bone->setC(c);
+}
+
+FFI_PLUGIN_EXPORT float spine_bone_get_d(spine_bone bone) {
+    if (bone == nullptr) return 0;
+    Bone *_bone = (Bone*)bone;
+    return _bone->getD();
+}
+
+FFI_PLUGIN_EXPORT void spine_bone_set_d(spine_bone bone, float d) {
+    if (bone == nullptr) return;
+    Bone *_bone = (Bone*)bone;
+    _bone->setD(d);
+}
+
+FFI_PLUGIN_EXPORT float spine_bone_get_world_x(spine_bone bone) {
+    if (bone == nullptr) return 0;
+    Bone *_bone = (Bone*)bone;
+    return _bone->getWorldX();
+}
+
+FFI_PLUGIN_EXPORT void spine_bone_set_world_x(spine_bone bone, float worldX) {
+    if (bone == nullptr) return;
+    Bone *_bone = (Bone*)bone;
+    _bone->setWorldX(worldX);
+}
+
+FFI_PLUGIN_EXPORT float spine_bone_get_world_y(spine_bone bone) {
+    if (bone == nullptr) return 0;
+    Bone *_bone = (Bone*)bone;
+    return _bone->getWorldY();
+}
+
+FFI_PLUGIN_EXPORT void spine_bone_set_world_y(spine_bone bone, float worldY) {
+    if (bone == nullptr) return;
+    Bone *_bone = (Bone*)bone;
+    _bone->setWorldY(worldY);
+}
+
+FFI_PLUGIN_EXPORT float spine_bone_get_world_rotation_x(spine_bone bone) {
+    if (bone == nullptr) return 0;
+    Bone *_bone = (Bone*)bone;
+    return _bone->getWorldRotationX();
+}
+
+FFI_PLUGIN_EXPORT float spine_bone_get_world_rotation_y(spine_bone bone) {
+    if (bone == nullptr) return 0;
+    Bone *_bone = (Bone*)bone;
+    return _bone->getWorldToLocalRotationY();
+}
+
+FFI_PLUGIN_EXPORT float spine_bone_get_world_scale_x(spine_bone bone) {
+    if (bone == nullptr) return 0;
+    Bone *_bone = (Bone*)bone;
+    return _bone->getWorldScaleX();
+}
+
+FFI_PLUGIN_EXPORT float spine_bone_get_world_scale_y(spine_bone bone) {
+    if (bone == nullptr) return 0;
+    Bone *_bone = (Bone*)bone;
+    return _bone->getWorldScaleY();
+}
+
+FFI_PLUGIN_EXPORT int spine_bone_get_is_active(spine_bone bone) {
+    if (bone == nullptr) return 0;
+    Bone *_bone = (Bone*)bone;
+    return _bone->isActive() ? -1 : 0;
+}
+
+FFI_PLUGIN_EXPORT void spine_bone_set_is_active(spine_bone bone, int isActive) {
+    if (bone == nullptr) return;
+    Bone *_bone = (Bone*)bone;
+    _bone->setActive(isActive);
+}
