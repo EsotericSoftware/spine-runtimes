@@ -80,15 +80,15 @@ class AnimationStateEvents extends StatelessWidget {
       controller.skeleton?.setScaleX(0.5);
       controller.skeleton?.setScaleY(0.5);
       controller.skeleton?.findSlot("gun")?.setColor(Color(1, 0, 0, 1));
-      controller.animationState?.setAnimation(0, "walk", true)?.setListener((event) {
-        print("Walk animation event ${event.type}");
+      controller.animationState?.setAnimation(0, "walk", true)?.setListener((type, trackEntry, event) {
+        print("Walk animation event ${type}");
       });
-      controller.animationState?.addAnimation(0, "run", true, 2)?.setListener((event) {
-        print("Run animation event ${event.type}");
+      controller.animationState?.addAnimation(0, "run", true, 2)?.setListener((type, trackEntry, event) {
+        print("Run animation event ${type}");
       });
-      controller.animationState?.setListener((event) {
-        if (event.type == EventType.Event) {
-          print("User event: { name: ${event.event?.getData().getName()}, intValue: ${event.event?.getIntValue()}, floatValue: intValue: ${event.event?.getFloatValue()}, stringValue: ${event.event?.getStringValue()} }");
+      controller.animationState?.setListener((type, trackEntry, event) {
+        if (type == EventType.Event) {
+          print("User event: { name: ${event?.getData().getName()}, intValue: ${event?.getIntValue()}, floatValue: intValue: ${event?.getFloatValue()}, stringValue: ${event?.getStringValue()} }");
         }
       });
       print("Current: ${controller.animationState?.getCurrent(0)?.getAnimation().getName()}");
