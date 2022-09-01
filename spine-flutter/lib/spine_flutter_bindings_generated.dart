@@ -3375,37 +3375,37 @@ class SpineFlutterBindings {
       _spine_bone_world_to_local_rotationPtr
           .asFunction<double Function(spine_bone, double)>();
 
-  double spine_bone_local_to_worldrotation(
+  double spine_bone_local_to_world_rotation(
     spine_bone bone,
     double localRotation,
   ) {
-    return _spine_bone_local_to_worldrotation(
+    return _spine_bone_local_to_world_rotation(
       bone,
       localRotation,
     );
   }
 
-  late final _spine_bone_local_to_worldrotationPtr =
+  late final _spine_bone_local_to_world_rotationPtr =
       _lookup<ffi.NativeFunction<ffi.Float Function(spine_bone, ffi.Float)>>(
-          'spine_bone_local_to_worldrotation');
-  late final _spine_bone_local_to_worldrotation =
-      _spine_bone_local_to_worldrotationPtr
+          'spine_bone_local_to_world_rotation');
+  late final _spine_bone_local_to_world_rotation =
+      _spine_bone_local_to_world_rotationPtr
           .asFunction<double Function(spine_bone, double)>();
 
-  void spine_bone_rotateWorld(
+  void spine_bone_rotate_world(
     spine_bone bone,
     double degrees,
   ) {
-    return _spine_bone_rotateWorld(
+    return _spine_bone_rotate_world(
       bone,
       degrees,
     );
   }
 
-  late final _spine_bone_rotateWorldPtr =
+  late final _spine_bone_rotate_worldPtr =
       _lookup<ffi.NativeFunction<ffi.Void Function(spine_bone, ffi.Float)>>(
-          'spine_bone_rotateWorld');
-  late final _spine_bone_rotateWorld = _spine_bone_rotateWorldPtr
+          'spine_bone_rotate_world');
+  late final _spine_bone_rotate_world = _spine_bone_rotate_worldPtr
       .asFunction<void Function(spine_bone, double)>();
 
   double spine_bone_get_world_to_local_rotation_x(

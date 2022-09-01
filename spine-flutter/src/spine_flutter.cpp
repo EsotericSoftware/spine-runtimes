@@ -1517,13 +1517,13 @@ FFI_PLUGIN_EXPORT float spine_bone_world_to_local_rotation(spine_bone bone, floa
     return _bone->worldToLocalRotation(worldRotation);
 }
 
-FFI_PLUGIN_EXPORT float spine_bone_local_to_worldrotation(spine_bone bone, float localRotation) {
+FFI_PLUGIN_EXPORT float spine_bone_local_to_world_rotation(spine_bone bone, float localRotation) {
     if (bone == nullptr) return 0;
     Bone *_bone = (Bone*)bone;
     return _bone->localToWorldRotation(localRotation);
 }
 
-FFI_PLUGIN_EXPORT void spine_bone_rotateWorld(spine_bone bone, float degrees) {
+FFI_PLUGIN_EXPORT void spine_bone_rotate_world(spine_bone bone, float degrees) {
     if (bone == nullptr) return;
     Bone *_bone = (Bone*)bone;
     _bone->rotateWorld(degrees);

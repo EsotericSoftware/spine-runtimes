@@ -34,6 +34,13 @@ class Bounds {
   Bounds(this.x, this.y, this.width, this.height);
 }
 
+class Vector2 {
+  double x;
+  double y;
+
+  Vector2(this.x, this.y);
+}
+
 class Atlas {
   final Pointer<spine_atlas> _atlas;
   final List<Image> atlasPages;
@@ -475,11 +482,264 @@ class BoneData {
   }
 }
 
-// FIXME
 class Bone {
   final spine_bone _bone;
 
   Bone._(this._bone);
+
+  void update() {
+    _bindings.spine_bone_update(_bone);
+  }
+
+  void updateWorldTransform() {
+    _bindings.spine_bone_update_world_transform(_bone);
+  }
+
+  void updateWorldTransformWith(double x, double y, double rotation, double scaleX, double scaleY, double shearX, double shearY) {
+    _bindings.spine_bone_update_world_transform_with(_bone, x, y, rotation, scaleX, scaleY, shearX, shearY);
+  }
+
+  void setToSetupPose() {
+    _bindings.spine_bone_set_to_setup_pose(_bone);
+  }
+
+  Vector2 worldToLocal(double worldX, double worldY) {
+    final local = _bindings.spine_bone_world_to_local(_bone, worldX, worldY);
+    return Vector2(local.x, local.y);
+  }
+
+  Vector2 localToWorld(double localX, double localY) {
+    final world = _bindings.spine_bone_local_to_world(_bone, localX, localY);
+    return Vector2(world.x, world.y);
+  }
+
+  double worldToLocalRotation(double worldRotation) {
+    return _bindings.spine_bone_world_to_local_rotation(_bone, worldRotation);
+  }
+
+  double localToWorldRotation(double localRotation) {
+    return _bindings.spine_bone_local_to_world_rotation(_bone, localRotation);
+  }
+
+  void rotateWorld(double degrees) {
+    _bindings.spine_bone_rotate_world(_bone, degrees);
+  }
+
+  double getWorldToLocalRotationX() {
+    return _bindings.spine_bone_get_world_rotation_x(_bone);
+  }
+
+  double getWorldToLocalRotationY() {
+    return _bindings.spine_bone_get_world_to_local_rotation_y(_bone);
+  }
+
+  BoneData getData() {
+    return BoneData._(_bindings.spine_bone_get_data(_bone));
+  }
+
+  Skeleton getSkeleton() {
+    return Skeleton._(_bindings.spine_bone_get_skeleton(_bone));
+  }
+
+  Bone? getParent() {
+    final parent = _bindings.spine_bone_get_parent(_bone);
+    if (parent.address == nullptr.address) return null;
+    return Bone._(parent);
+  }
+
+  List<Bone> getChildren() {
+    List<Bone> children = [];
+    final numChildren = _bindings.spine_bone_get_num_children(_bone);
+    final nativeChildren = _bindings.spine_bone_get_children(_bone);
+    for (int i = 0; i < numChildren; i++) {
+      children.add(Bone._(nativeChildren[i]));
+    }
+    return children;
+  }
+
+  double getX() {
+    return _bindings.spine_bone_get_x(_bone);
+  }
+
+  void setX(double x) {
+    _bindings.spine_bone_set_x(_bone, x);
+  }
+
+  double getY() {
+    return _bindings.spine_bone_get_y(_bone);
+  }
+
+  void setY(double y) {
+    _bindings.spine_bone_set_y(_bone, y);
+  }
+
+  double getRotation() {
+    return _bindings.spine_bone_get_rotation(_bone);
+  }
+
+  void setRotation(double rotation) {
+    _bindings.spine_bone_set_rotation(_bone, rotation);
+  }
+
+  double getScaleX() {
+    return _bindings.spine_bone_get_scale_x(_bone);
+  }
+
+  void setScaleX(double scaleX) {
+    _bindings.spine_bone_set_scale_x(_bone, scaleX);
+  }
+
+  double getScaleY() {
+    return _bindings.spine_bone_get_scale_y(_bone);
+  }
+
+  void setScaleY(double scaleY) {
+    _bindings.spine_bone_set_scale_y(_bone, scaleY);
+  }
+
+  double getShearX() {
+    return _bindings.spine_bone_get_shear_x(_bone);
+  }
+
+  void setShearX(double shearX) {
+    _bindings.spine_bone_set_shear_x(_bone, shearX);
+  }
+
+  double getShearY() {
+    return _bindings.spine_bone_get_shear_y(_bone);
+  }
+
+  void setShearY(double shearY) {
+    _bindings.spine_bone_set_shear_y(_bone, shearY);
+  }
+
+  double getAX() {
+    return _bindings.spine_bone_get_a_x(_bone);
+  }
+
+  void setAX(double x) {
+    _bindings.spine_bone_set_a_x(_bone, x);
+  }
+
+  double getAY() {
+    return _bindings.spine_bone_get_a_y(_bone);
+  }
+
+  void setAY(double y) {
+    _bindings.spine_bone_set_a_y(_bone, y);
+  }
+
+  double getAppliedRotation() {
+    return _bindings.spine_bone_get_applied_rotation(_bone);
+  }
+
+  void setAppliedRotation(double rotation) {
+    _bindings.spine_bone_set_applied_rotation(_bone, rotation);
+  }
+
+  double getAScaleX() {
+    return _bindings.spine_bone_get_a_scale_x(_bone);
+  }
+
+  void setAScaleX(double scaleX) {
+    _bindings.spine_bone_set_a_scale_x(_bone, scaleX);
+  }
+
+  double getAScaleY() {
+    return _bindings.spine_bone_get_a_scale_y(_bone);
+  }
+
+  void setAScaleY(double scaleY) {
+    _bindings.spine_bone_set_a_scale_y(_bone, scaleY);
+  }
+
+  double getAShearX() {
+    return _bindings.spine_bone_get_a_shear_x(_bone);
+  }
+
+  void setAShearX(double shearX) {
+    _bindings.spine_bone_set_a_shear_x(_bone, shearX);
+  }
+
+  double getAShearY() {
+    return _bindings.spine_bone_get_a_shear_y(_bone);
+  }
+
+  void setAShearY(double shearY) {
+    _bindings.spine_bone_set_a_shear_y(_bone, shearY);
+  }
+
+  double getA() {
+    return _bindings.spine_bone_get_a(_bone);
+  }
+
+  void setA(double a) {
+    _bindings.spine_bone_set_a(_bone, a);
+  }
+
+  double getB() {
+    return _bindings.spine_bone_get_b(_bone);
+  }
+
+  void setB(double b) {
+    _bindings.spine_bone_set_b(_bone, b);
+  }
+
+  double getC() {
+    return _bindings.spine_bone_get_c(_bone);
+  }
+
+  void setC(double c) {
+    _bindings.spine_bone_set_c(_bone, c);
+  }
+
+  double getD() {
+    return _bindings.spine_bone_get_d(_bone);
+  }
+
+  void setD(double d) {
+    _bindings.spine_bone_set_a(_bone, d);
+  }
+
+  double getWorldX() {
+    return _bindings.spine_bone_get_world_x(_bone);
+  }
+
+  void setWorldX(double worldX) {
+    _bindings.spine_bone_set_world_x(_bone, worldX);
+  }
+
+  double getWorldY() {
+    return _bindings.spine_bone_get_world_y(_bone);
+  }
+
+  void setWorldY(double worldY) {
+    _bindings.spine_bone_set_world_y(_bone, worldY);
+  }
+
+  double getWorldRotationX() {
+    return _bindings.spine_bone_get_world_rotation_x(_bone);
+  }
+
+  double getWorldRotationY() {
+    return _bindings.spine_bone_get_world_rotation_y(_bone);
+  }
+
+  double getWorldScaleX() {
+    return _bindings.spine_bone_get_world_scale_x(_bone);
+  }
+
+  double getWorldScaleY() {
+    return _bindings.spine_bone_get_world_scale_y(_bone);
+  }
+
+  bool isActive() {
+    return _bindings.spine_bone_get_is_active(_bone) == -1;
+  }
+
+  void setIsActive(bool isActive) {
+    _bindings.spine_bone_set_is_active(_bone, isActive ? -1 : 0);
+  }
 }
 
 class SlotData {
