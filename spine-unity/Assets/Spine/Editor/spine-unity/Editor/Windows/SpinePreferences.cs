@@ -288,7 +288,7 @@ namespace Spine.Unity.Editor {
 				EditorGUILayout.Space();
 				EditorGUILayout.LabelField("Warnings", EditorStyles.boldLabel);
 				{
-					EditorGUILayout.PropertyField(settings.FindProperty("atlasTxtImportWarning"), new GUIContent("Atlas Extension Warning", "Log a warning and recommendation whenever a `.atlas` file is found."));
+					EditorGUILayout.PropertyField(settings.FindProperty("atlasTxtImportWarning"), new GUIContent("Atlas & Skel Extension Warning", "Log a warning and recommendation whenever a `.atlas` or `.skel` file is found."));
 					EditorGUILayout.PropertyField(settings.FindProperty("textureImporterWarning"), new GUIContent("Texture Settings Warning", "Log a warning and recommendation whenever Texture Import Settings are detected that could lead to undesired effects, e.g. white border artifacts."));
 					EditorGUILayout.PropertyField(settings.FindProperty("componentMaterialWarning"), new GUIContent("Component & Material Warning", "Log a warning and recommendation whenever Component and Material settings are not compatible."));
 				}
