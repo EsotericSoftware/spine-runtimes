@@ -35,6 +35,8 @@
 
 using namespace spine;
 
+RTTI_IMPL(TransformConstraintData, ConstraintData)
+
 TransformConstraintData::TransformConstraintData(const String &name) : ConstraintData(name),
 																	   _target(NULL),
 																	   _mixRotate(0),

@@ -50,6 +50,8 @@ namespace spine {
 		friend class TransformConstraintTimeline;
 
 	public:
+		RTTI_DECL
+
 		explicit TransformConstraintData(const String &name);
 
 		Vector<BoneData *> &getBones();
