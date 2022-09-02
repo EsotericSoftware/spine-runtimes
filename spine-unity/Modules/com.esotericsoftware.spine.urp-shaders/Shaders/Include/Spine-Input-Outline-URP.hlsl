@@ -17,6 +17,7 @@ float4 _OutlineColor;
 float4 _MainTex_TexelSize;
 float _ThresholdEnd;
 float _OutlineSmoothness;
+float _OutlineOpaqueAlpha;
 float _OutlineMipLevel;
 int _OutlineReferenceTexWidth;
 CBUFFER_END

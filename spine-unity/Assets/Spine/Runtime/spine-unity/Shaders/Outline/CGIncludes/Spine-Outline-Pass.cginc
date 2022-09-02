@@ -16,6 +16,7 @@ float4 _OutlineColor;
 float4 _MainTex_TexelSize;
 float _ThresholdEnd;
 float _OutlineSmoothness;
+float _OutlineOpaqueAlpha;
 float _OutlineMipLevel;
 int _OutlineReferenceTexWidth;
 
@@ -80,7 +81,7 @@ float4 fragOutline(VertexOutput i) : SV_Target {
 
 	float4 texColor = computeOutlinePixel(_MainTex, _MainTex_TexelSize.xy, i.uv, i.vertexColorAlpha,
 		_OutlineWidth, _OutlineReferenceTexWidth, _OutlineMipLevel,
-		_OutlineSmoothness, _ThresholdEnd, _OutlineColor);
+		_OutlineSmoothness, _ThresholdEnd, _OutlineOpaqueAlpha, _OutlineColor);
 
 #ifdef SKELETON_GRAPHIC
 	texColor *= UnityGet2DClipping(i.worldPosition.xy, _ClipRect);
