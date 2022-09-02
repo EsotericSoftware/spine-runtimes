@@ -264,10 +264,22 @@ FFI_PLUGIN_EXPORT float spine_skeleton_data_get_x(spine_skeleton_data data) {
     return _data->getX();
 }
 
+FFI_PLUGIN_EXPORT void spine_skeleton_data_set_x(spine_skeleton_data data, float x) {
+    if (data == nullptr) return;
+    SkeletonData *_data = (SkeletonData*)data;
+    _data->setX(x);
+}
+
 FFI_PLUGIN_EXPORT float spine_skeleton_data_get_y(spine_skeleton_data data) {
     if (data == nullptr) return 0;
     SkeletonData *_data = (SkeletonData*)data;
     return _data->getY();
+}
+
+FFI_PLUGIN_EXPORT void spine_skeleton_data_set_y(spine_skeleton_data data, float y) {
+    if (data == nullptr) return;
+    SkeletonData *_data = (SkeletonData*)data;
+    _data->setY(y);
 }
 
 FFI_PLUGIN_EXPORT float spine_skeleton_data_get_width(spine_skeleton_data data) {
@@ -276,10 +288,22 @@ FFI_PLUGIN_EXPORT float spine_skeleton_data_get_width(spine_skeleton_data data) 
     return _data->getWidth();
 }
 
+FFI_PLUGIN_EXPORT void spine_skeleton_data_set_width(spine_skeleton_data data, float width) {
+    if (data == nullptr) return;
+    SkeletonData *_data = (SkeletonData*)data;
+    _data->setWidth(width);
+}
+
 FFI_PLUGIN_EXPORT float spine_skeleton_data_get_height(spine_skeleton_data data) {
     if (data == nullptr) return 0;
     SkeletonData *_data = (SkeletonData*)data;
     return _data->getHeight();
+}
+
+FFI_PLUGIN_EXPORT void spine_skeleton_data_set_height(spine_skeleton_data data, float height) {
+    if (data == nullptr) return;
+    SkeletonData *_data = (SkeletonData*)data;
+    _data->setHeight(height);
 }
 
 FFI_PLUGIN_EXPORT const char* spine_skeleton_data_get_version(spine_skeleton_data data) {
@@ -1285,6 +1309,12 @@ FFI_PLUGIN_EXPORT spine_color spine_slot_data_get_color(spine_slot_data slot) {
     return color;
 }
 
+FFI_PLUGIN_EXPORT void spine_slot_data_set_color(spine_slot_data slot, float r, float g, float b, float a) {
+    if (slot == nullptr) return;
+    SlotData *_slot = (SlotData*)slot;
+    _slot->getColor().set(r, g, b, a);
+}
+
 FFI_PLUGIN_EXPORT spine_color spine_slot_data_get_dark_color(spine_slot_data slot) {
     spine_color color = { 0, 0, 0, 0 };
     if (slot == nullptr) return color;
@@ -1293,16 +1323,34 @@ FFI_PLUGIN_EXPORT spine_color spine_slot_data_get_dark_color(spine_slot_data slo
     return color;
 }
 
+FFI_PLUGIN_EXPORT void spine_slot_data_set_dark_color(spine_slot_data slot, float r, float g, float b, float a) {
+    if (slot == nullptr) return;
+    SlotData *_slot = (SlotData*)slot;
+    _slot->getDarkColor().set(r, g, b, a);
+}
+
 FFI_PLUGIN_EXPORT int spine_slot_data_has_dark_color(spine_slot_data slot) {
     if (slot == nullptr) return 0;
     SlotData *_slot = (SlotData*)slot;
     return _slot->hasDarkColor() ? -1 : 0;
 }
 
+FFI_PLUGIN_EXPORT void spine_slot_data_set_has_dark_color(spine_slot_data slot, int hasDarkColor) {
+    if (slot == nullptr) return;
+    SlotData *_slot = (SlotData*)slot;
+    _slot->setHasDarkColor(hasDarkColor);
+}
+
 FFI_PLUGIN_EXPORT const char* spine_slot_data_get_attachment_name(spine_slot_data slot) {
     if (slot == nullptr) return nullptr;
     SlotData *_slot = (SlotData*)slot;
     return _slot->getAttachmentName().buffer();
+}
+
+FFI_PLUGIN_EXPORT void spine_slot_data_set_attachment_name(spine_slot_data slot, const char* attachmentName) {
+    if (slot == nullptr) return;
+    SlotData *_slot = (SlotData*)slot;
+    _slot->setAttachmentName(attachmentName);
 }
 
 FFI_PLUGIN_EXPORT spine_blend_mode spine_slot_data_get_blend_mode(spine_slot_data slot) {
@@ -1407,10 +1455,22 @@ FFI_PLUGIN_EXPORT float spine_bone_data_get_length(spine_bone_data data) {
     return _data->getLength();
 }
 
+FFI_PLUGIN_EXPORT void spine_bone_data_set_length(spine_bone_data data, float length) {
+    if (data == nullptr) return;
+    BoneData *_data = (BoneData*)data;
+    _data->setLength(length);
+}
+
 FFI_PLUGIN_EXPORT float spine_bone_data_get_x(spine_bone_data data) {
     if (data == nullptr) return 0;
     BoneData *_data = (BoneData*)data;
     return _data->getX();
+}
+
+FFI_PLUGIN_EXPORT void spine_bone_data_set_x(spine_bone_data data, float x) {
+    if (data == nullptr) return;
+    BoneData *_data = (BoneData*)data;
+    _data->setX(x);
 }
 
 FFI_PLUGIN_EXPORT float spine_bone_data_get_y(spine_bone_data data) {
@@ -1419,17 +1479,34 @@ FFI_PLUGIN_EXPORT float spine_bone_data_get_y(spine_bone_data data) {
     return _data->getY();
 }
 
+FFI_PLUGIN_EXPORT void spine_bone_data_set_y(spine_bone_data data, float y) {
+    if (data == nullptr) return;
+    BoneData *_data = (BoneData*)data;
+    _data->setY(y);
+}
+
 FFI_PLUGIN_EXPORT float spine_bone_data_get_rotation(spine_bone_data data) {
     if (data == nullptr) return 0;
     BoneData *_data = (BoneData*)data;
     return _data->getRotation();
 }
 
-FFI_PLUGIN_EXPORT float spine_bone_data_get_scale_x(spine_bone_data data)
-{
+FFI_PLUGIN_EXPORT void spine_bone_data_set_rotation(spine_bone_data data, float rotation) {
+    if (data == nullptr) return;
+    BoneData *_data = (BoneData*)data;
+    _data->setRotation(rotation);
+}
+
+FFI_PLUGIN_EXPORT float spine_bone_data_get_scale_x(spine_bone_data data) {
     if (data == nullptr) return 0;
     BoneData *_data = (BoneData*)data;
     return _data->getScaleX();
+}
+
+FFI_PLUGIN_EXPORT void spine_bone_data_set_scale_x(spine_bone_data data, float scaleX) {
+    if (data == nullptr) return;
+    BoneData *_data = (BoneData*)data;
+    _data->setScaleX(scaleX);
 }
 
 FFI_PLUGIN_EXPORT float spine_bone_data_get_scale_y(spine_bone_data data) {
@@ -1438,10 +1515,22 @@ FFI_PLUGIN_EXPORT float spine_bone_data_get_scale_y(spine_bone_data data) {
     return _data->getScaleY();
 }
 
+FFI_PLUGIN_EXPORT void spine_bone_data_set_scale_y(spine_bone_data data, float scaleY) {
+    if (data == nullptr) return;
+    BoneData *_data = (BoneData*)data;
+    _data->setScaleY(scaleY);
+}
+
 FFI_PLUGIN_EXPORT float spine_bone_data_get_shear_x(spine_bone_data data) {
     if (data == nullptr) return 0;
     BoneData *_data = (BoneData*)data;
     return _data->getShearX();
+}
+
+FFI_PLUGIN_EXPORT void spine_bone_data_set_shear_x(spine_bone_data data, float shearX) {
+    if (data == nullptr) return;
+    BoneData *_data = (BoneData*)data;
+    _data->setShearX(shearX);
 }
 
 FFI_PLUGIN_EXPORT float spine_bone_data_get_shear_y(spine_bone_data data) {
@@ -1450,10 +1539,22 @@ FFI_PLUGIN_EXPORT float spine_bone_data_get_shear_y(spine_bone_data data) {
     return _data->getShearY();
 }
 
+FFI_PLUGIN_EXPORT void spine_bone_data_set_shear_y(spine_bone_data data, float y) {
+    if (data == nullptr) return;
+    BoneData *_data = (BoneData*)data;
+    _data->setShearY(y);
+}
+
 FFI_PLUGIN_EXPORT spine_transform_mode spine_bone_data_get_transform_mode(spine_bone_data data) {
     if (data == nullptr) return SPINE_TRANSFORM_MODE_NORMAL;
     BoneData *_data = (BoneData*)data;
     return (spine_transform_mode)_data->getTransformMode();
+}
+
+FFI_PLUGIN_EXPORT void spine_bone_data_set_transform_mode(spine_bone_data data, spine_transform_mode mode) {
+    if (data == nullptr) return;
+    BoneData *_data = (BoneData*)data;
+    _data->setTransformMode((TransformMode)mode);
 }
 
 FFI_PLUGIN_EXPORT int spine_bone_data_is_skin_required(spine_bone_data data) {
@@ -1462,12 +1563,24 @@ FFI_PLUGIN_EXPORT int spine_bone_data_is_skin_required(spine_bone_data data) {
     return _data->isSkinRequired() ? -1 : 0;
 }
 
+FFI_PLUGIN_EXPORT void spine_bone_data_set_is_skin_required(spine_bone_data data, int isSkinRequired) {
+    if (data == nullptr) return;
+    BoneData *_data = (BoneData*)data;
+    _data->setSkinRequired(isSkinRequired);
+}
+
 FFI_PLUGIN_EXPORT spine_color spine_bone_data_get_color(spine_bone_data data) {
     spine_color color = { 0, 0, 0 , 0};
     if (data == nullptr) return color;
     BoneData *_data = (BoneData*)data;
     color = { _data->getColor().r, _data->getColor().g, _data->getColor().b, _data->getColor().a };
     return color;
+}
+
+FFI_PLUGIN_EXPORT void spine_bone_data_set_color(spine_bone_data data, float r, float g, float b, float a) {
+    if (data == nullptr) return;
+    BoneData *_data = (BoneData*)data;
+    _data->getColor().set(r, g, b, a);
 }
 
 // Bone

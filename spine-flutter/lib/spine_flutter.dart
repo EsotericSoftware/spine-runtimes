@@ -334,9 +334,17 @@ class SkeletonData {
     return _bindings.spine_skeleton_data_get_x(_data);
   }
 
+  void setX(double x) {
+    _bindings.spine_skeleton_data_set_x(_data, x);
+  }
+
   /// The Y coordinate of the skeleton's axis aligned bounding box in the setup pose.
   double getY() {
     return _bindings.spine_skeleton_data_get_y(_data);
+  }
+
+  void setY(double y) {
+    _bindings.spine_skeleton_data_set_x(_data, y);
   }
 
   /// The width of the skeleton's axis aligned bounding box in the setup pose.
@@ -344,9 +352,17 @@ class SkeletonData {
     return _bindings.spine_skeleton_data_get_width(_data);
   }
 
+  void setWidth(double width) {
+    _bindings.spine_skeleton_data_set_width(_data, width);
+  }
+
   /// The height of the skeleton's axis aligned bounding box in the setup pose.
   double getHeight() {
     return _bindings.spine_skeleton_data_get_height(_data);
+  }
+
+  void setHeight(double height) {
+    _bindings.spine_skeleton_data_set_height(_data, height);
   }
 
   /// The Spine version used to export the skeleton data.
@@ -434,32 +450,64 @@ class BoneData {
     return _bindings.spine_bone_data_get_length(_data);
   }
 
+  void setLength(double length) {
+    _bindings.spine_bone_data_set_length(_data, length);
+  }
+
   double getX() {
     return _bindings.spine_bone_data_get_x(_data);
+  }
+
+  void setX(double x) {
+    _bindings.spine_bone_data_set_x(_data, x);
   }
 
   double getY() {
     return _bindings.spine_bone_data_get_y(_data);
   }
 
+  void setY(double y) {
+    _bindings.spine_bone_data_set_y(_data, y);
+  }
+
   double getRotation() {
     return _bindings.spine_bone_data_get_rotation(_data);
+  }
+
+  void setRotation(double rotation) {
+    _bindings.spine_bone_data_set_rotation(_data, rotation);
   }
 
   double getScaleX() {
     return _bindings.spine_bone_data_get_scale_x(_data);
   }
 
+  void setScaleX(double scaleX) {
+    _bindings.spine_bone_data_set_scale_x(_data, scaleX);
+  }
+
   double getScaleY() {
     return _bindings.spine_bone_data_get_scale_y(_data);
+  }
+
+  void setScaleY(double scaleY) {
+    _bindings.spine_bone_data_set_scale_y(_data, scaleY);
   }
 
   double getShearX() {
     return _bindings.spine_bone_data_get_shear_x(_data);
   }
 
+  void setShearX(double shearX) {
+    _bindings.spine_bone_data_set_shear_x(_data, shearX);
+  }
+
   double getShearY() {
     return _bindings.spine_bone_data_get_shear_y(_data);
+  }
+
+  void setShearY(double shearY) {
+    _bindings.spine_bone_data_set_shear_y(_data, shearY);
   }
 
   TransformMode getTransformMode() {
@@ -467,13 +515,25 @@ class BoneData {
     return TransformMode.values[nativeMode];
   }
 
+  void setTransformMode(TransformMode mode) {
+    _bindings.spine_bone_data_set_transform_mode(_data, mode.value);
+  }
+
   bool isSkinRequired() {
     return _bindings.spine_bone_data_is_skin_required(_data) == -1;
+  }
+
+  void setIsSkinRequired(bool isSkinRequired) {
+    _bindings.spine_bone_data_set_is_skin_required(_data, isSkinRequired ? -1 : 0);
   }
 
   Color getColor() {
     final color = _bindings.spine_bone_data_get_color(_data);
     return Color(color.r, color.g, color.b, color.a);
+  }
+
+  void setColor(double r, double g, double b, double a) {
+    _bindings.spine_bone_data_set_color(_data, r, g, b, a);
   }
 
   @override
@@ -765,13 +825,25 @@ class SlotData {
     return Color(color.r, color.g, color.b, color.a);
   }
 
+  void setColor(double r, double g, double b, double a) {
+    _bindings.spine_slot_data_set_color(_data, r, g, b, a);
+  }
+
   Color getDarkColor() {
     final color = _bindings.spine_slot_data_get_dark_color(_data);
     return Color(color.r, color.g, color.b, color.a);
   }
 
+  void setDarkColor(double r, double g, double b, double a) {
+    _bindings.spine_slot_data_set_dark_color(_data, r, g, b, a);
+  }
+
   bool hasDarkColor() {
     return _bindings.spine_slot_data_has_dark_color(_data) == -1;
+  }
+
+  void setHasDarkColor(bool hasDarkColor) {
+    _bindings.spine_slot_data_set_has_dark_color(_data, hasDarkColor ? -1 : 0);
   }
 
   String getAttachmentName() {
@@ -779,8 +851,18 @@ class SlotData {
     return value.toDartString();
   }
 
+  void setAttachmentName(String attachmentName) {
+    final nativeName = attachmentName.toNativeUtf8();
+    _bindings.spine_slot_data_set_attachment_name(_data, nativeName.cast());
+    malloc.free(nativeName);
+  }
+
   BlendMode getBlendMode() {
     return BlendMode.values[_bindings.spine_slot_data_get_blend_mode(_data)];
+  }
+
+  void setBlendMode(BlendMode mode) {
+    _bindings.spine_slot_data_set_blend_mode(_data, mode.value);
   }
 
   @override

@@ -592,6 +592,23 @@ class SpineFlutterBindings {
   late final _spine_skeleton_data_get_x = _spine_skeleton_data_get_xPtr
       .asFunction<double Function(spine_skeleton_data)>();
 
+  void spine_skeleton_data_set_x(
+    spine_skeleton_data data,
+    double x,
+  ) {
+    return _spine_skeleton_data_set_x(
+      data,
+      x,
+    );
+  }
+
+  late final _spine_skeleton_data_set_xPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(
+              spine_skeleton_data, ffi.Float)>>('spine_skeleton_data_set_x');
+  late final _spine_skeleton_data_set_x = _spine_skeleton_data_set_xPtr
+      .asFunction<void Function(spine_skeleton_data, double)>();
+
   double spine_skeleton_data_get_y(
     spine_skeleton_data data,
   ) {
@@ -605,6 +622,23 @@ class SpineFlutterBindings {
           'spine_skeleton_data_get_y');
   late final _spine_skeleton_data_get_y = _spine_skeleton_data_get_yPtr
       .asFunction<double Function(spine_skeleton_data)>();
+
+  void spine_skeleton_data_set_y(
+    spine_skeleton_data data,
+    double y,
+  ) {
+    return _spine_skeleton_data_set_y(
+      data,
+      y,
+    );
+  }
+
+  late final _spine_skeleton_data_set_yPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(
+              spine_skeleton_data, ffi.Float)>>('spine_skeleton_data_set_y');
+  late final _spine_skeleton_data_set_y = _spine_skeleton_data_set_yPtr
+      .asFunction<void Function(spine_skeleton_data, double)>();
 
   double spine_skeleton_data_get_width(
     spine_skeleton_data data,
@@ -620,6 +654,23 @@ class SpineFlutterBindings {
   late final _spine_skeleton_data_get_width = _spine_skeleton_data_get_widthPtr
       .asFunction<double Function(spine_skeleton_data)>();
 
+  void spine_skeleton_data_set_width(
+    spine_skeleton_data data,
+    double width,
+  ) {
+    return _spine_skeleton_data_set_width(
+      data,
+      width,
+    );
+  }
+
+  late final _spine_skeleton_data_set_widthPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_skeleton_data,
+              ffi.Float)>>('spine_skeleton_data_set_width');
+  late final _spine_skeleton_data_set_width = _spine_skeleton_data_set_widthPtr
+      .asFunction<void Function(spine_skeleton_data, double)>();
+
   double spine_skeleton_data_get_height(
     spine_skeleton_data data,
   ) {
@@ -634,6 +685,24 @@ class SpineFlutterBindings {
   late final _spine_skeleton_data_get_height =
       _spine_skeleton_data_get_heightPtr
           .asFunction<double Function(spine_skeleton_data)>();
+
+  void spine_skeleton_data_set_height(
+    spine_skeleton_data data,
+    double height,
+  ) {
+    return _spine_skeleton_data_set_height(
+      data,
+      height,
+    );
+  }
+
+  late final _spine_skeleton_data_set_heightPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_skeleton_data,
+              ffi.Float)>>('spine_skeleton_data_set_height');
+  late final _spine_skeleton_data_set_height =
+      _spine_skeleton_data_set_heightPtr
+          .asFunction<void Function(spine_skeleton_data, double)>();
 
   ffi.Pointer<ffi.Int8> spine_skeleton_data_get_version(
     spine_skeleton_data data,
@@ -2807,6 +2876,30 @@ class SpineFlutterBindings {
   late final _spine_slot_data_get_color = _spine_slot_data_get_colorPtr
       .asFunction<spine_color Function(spine_slot_data)>();
 
+  void spine_slot_data_set_color(
+    spine_slot_data slot,
+    double r,
+    double g,
+    double b,
+    double a,
+  ) {
+    return _spine_slot_data_set_color(
+      slot,
+      r,
+      g,
+      b,
+      a,
+    );
+  }
+
+  late final _spine_slot_data_set_colorPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_slot_data, ffi.Float, ffi.Float, ffi.Float,
+              ffi.Float)>>('spine_slot_data_set_color');
+  late final _spine_slot_data_set_color =
+      _spine_slot_data_set_colorPtr.asFunction<
+          void Function(spine_slot_data, double, double, double, double)>();
+
   spine_color spine_slot_data_get_dark_color(
     spine_slot_data slot,
   ) {
@@ -2821,6 +2914,30 @@ class SpineFlutterBindings {
   late final _spine_slot_data_get_dark_color =
       _spine_slot_data_get_dark_colorPtr
           .asFunction<spine_color Function(spine_slot_data)>();
+
+  void spine_slot_data_set_dark_color(
+    spine_slot_data slot,
+    double r,
+    double g,
+    double b,
+    double a,
+  ) {
+    return _spine_slot_data_set_dark_color(
+      slot,
+      r,
+      g,
+      b,
+      a,
+    );
+  }
+
+  late final _spine_slot_data_set_dark_colorPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_slot_data, ffi.Float, ffi.Float, ffi.Float,
+              ffi.Float)>>('spine_slot_data_set_dark_color');
+  late final _spine_slot_data_set_dark_color =
+      _spine_slot_data_set_dark_colorPtr.asFunction<
+          void Function(spine_slot_data, double, double, double, double)>();
 
   int spine_slot_data_has_dark_color(
     spine_slot_data slot,
@@ -2837,6 +2954,23 @@ class SpineFlutterBindings {
       _spine_slot_data_has_dark_colorPtr
           .asFunction<int Function(spine_slot_data)>();
 
+  void spine_slot_data_set_has_dark_color(
+    spine_slot_data slot,
+    int hasDarkColor,
+  ) {
+    return _spine_slot_data_set_has_dark_color(
+      slot,
+      hasDarkColor,
+    );
+  }
+
+  late final _spine_slot_data_set_has_dark_colorPtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(spine_slot_data, ffi.Int32)>>(
+      'spine_slot_data_set_has_dark_color');
+  late final _spine_slot_data_set_has_dark_color =
+      _spine_slot_data_set_has_dark_colorPtr
+          .asFunction<void Function(spine_slot_data, int)>();
+
   ffi.Pointer<ffi.Int8> spine_slot_data_get_attachment_name(
     spine_slot_data slot,
   ) {
@@ -2852,6 +2986,24 @@ class SpineFlutterBindings {
       _spine_slot_data_get_attachment_namePtr
           .asFunction<ffi.Pointer<ffi.Int8> Function(spine_slot_data)>();
 
+  void spine_slot_data_set_attachment_name(
+    spine_slot_data slot,
+    ffi.Pointer<ffi.Int8> attachmentName,
+  ) {
+    return _spine_slot_data_set_attachment_name(
+      slot,
+      attachmentName,
+    );
+  }
+
+  late final _spine_slot_data_set_attachment_namePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_slot_data,
+              ffi.Pointer<ffi.Int8>)>>('spine_slot_data_set_attachment_name');
+  late final _spine_slot_data_set_attachment_name =
+      _spine_slot_data_set_attachment_namePtr
+          .asFunction<void Function(spine_slot_data, ffi.Pointer<ffi.Int8>)>();
+
   int spine_slot_data_get_blend_mode(
     spine_slot_data slot,
   ) {
@@ -2866,6 +3018,23 @@ class SpineFlutterBindings {
   late final _spine_slot_data_get_blend_mode =
       _spine_slot_data_get_blend_modePtr
           .asFunction<int Function(spine_slot_data)>();
+
+  void spine_slot_data_set_blend_mode(
+    spine_slot_data slot,
+    int blendMode,
+  ) {
+    return _spine_slot_data_set_blend_mode(
+      slot,
+      blendMode,
+    );
+  }
+
+  late final _spine_slot_data_set_blend_modePtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(spine_slot_data, ffi.Int32)>>(
+      'spine_slot_data_set_blend_mode');
+  late final _spine_slot_data_set_blend_mode =
+      _spine_slot_data_set_blend_modePtr
+          .asFunction<void Function(spine_slot_data, int)>();
 
   void spine_slot_set_to_setup_pose(
     spine_slot slot,
@@ -3097,6 +3266,22 @@ class SpineFlutterBindings {
   late final _spine_bone_data_get_length = _spine_bone_data_get_lengthPtr
       .asFunction<double Function(spine_bone_data)>();
 
+  void spine_bone_data_set_length(
+    spine_bone_data data,
+    double length,
+  ) {
+    return _spine_bone_data_set_length(
+      data,
+      length,
+    );
+  }
+
+  late final _spine_bone_data_set_lengthPtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(spine_bone_data, ffi.Float)>>(
+      'spine_bone_data_set_length');
+  late final _spine_bone_data_set_length = _spine_bone_data_set_lengthPtr
+      .asFunction<void Function(spine_bone_data, double)>();
+
   double spine_bone_data_get_x(
     spine_bone_data data,
   ) {
@@ -3110,6 +3295,22 @@ class SpineFlutterBindings {
           'spine_bone_data_get_x');
   late final _spine_bone_data_get_x =
       _spine_bone_data_get_xPtr.asFunction<double Function(spine_bone_data)>();
+
+  void spine_bone_data_set_x(
+    spine_bone_data data,
+    double x,
+  ) {
+    return _spine_bone_data_set_x(
+      data,
+      x,
+    );
+  }
+
+  late final _spine_bone_data_set_xPtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(spine_bone_data, ffi.Float)>>(
+      'spine_bone_data_set_x');
+  late final _spine_bone_data_set_x = _spine_bone_data_set_xPtr
+      .asFunction<void Function(spine_bone_data, double)>();
 
   double spine_bone_data_get_y(
     spine_bone_data data,
@@ -3125,6 +3326,22 @@ class SpineFlutterBindings {
   late final _spine_bone_data_get_y =
       _spine_bone_data_get_yPtr.asFunction<double Function(spine_bone_data)>();
 
+  void spine_bone_data_set_y(
+    spine_bone_data data,
+    double y,
+  ) {
+    return _spine_bone_data_set_y(
+      data,
+      y,
+    );
+  }
+
+  late final _spine_bone_data_set_yPtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(spine_bone_data, ffi.Float)>>(
+      'spine_bone_data_set_y');
+  late final _spine_bone_data_set_y = _spine_bone_data_set_yPtr
+      .asFunction<void Function(spine_bone_data, double)>();
+
   double spine_bone_data_get_rotation(
     spine_bone_data data,
   ) {
@@ -3138,6 +3355,22 @@ class SpineFlutterBindings {
           'spine_bone_data_get_rotation');
   late final _spine_bone_data_get_rotation = _spine_bone_data_get_rotationPtr
       .asFunction<double Function(spine_bone_data)>();
+
+  void spine_bone_data_set_rotation(
+    spine_bone_data data,
+    double rotation,
+  ) {
+    return _spine_bone_data_set_rotation(
+      data,
+      rotation,
+    );
+  }
+
+  late final _spine_bone_data_set_rotationPtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(spine_bone_data, ffi.Float)>>(
+      'spine_bone_data_set_rotation');
+  late final _spine_bone_data_set_rotation = _spine_bone_data_set_rotationPtr
+      .asFunction<void Function(spine_bone_data, double)>();
 
   double spine_bone_data_get_scale_x(
     spine_bone_data data,
@@ -3153,6 +3386,22 @@ class SpineFlutterBindings {
   late final _spine_bone_data_get_scale_x = _spine_bone_data_get_scale_xPtr
       .asFunction<double Function(spine_bone_data)>();
 
+  void spine_bone_data_set_scale_x(
+    spine_bone_data data,
+    double scaleX,
+  ) {
+    return _spine_bone_data_set_scale_x(
+      data,
+      scaleX,
+    );
+  }
+
+  late final _spine_bone_data_set_scale_xPtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(spine_bone_data, ffi.Float)>>(
+      'spine_bone_data_set_scale_x');
+  late final _spine_bone_data_set_scale_x = _spine_bone_data_set_scale_xPtr
+      .asFunction<void Function(spine_bone_data, double)>();
+
   double spine_bone_data_get_scale_y(
     spine_bone_data data,
   ) {
@@ -3166,6 +3415,22 @@ class SpineFlutterBindings {
           'spine_bone_data_get_scale_y');
   late final _spine_bone_data_get_scale_y = _spine_bone_data_get_scale_yPtr
       .asFunction<double Function(spine_bone_data)>();
+
+  void spine_bone_data_set_scale_y(
+    spine_bone_data data,
+    double scaleY,
+  ) {
+    return _spine_bone_data_set_scale_y(
+      data,
+      scaleY,
+    );
+  }
+
+  late final _spine_bone_data_set_scale_yPtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(spine_bone_data, ffi.Float)>>(
+      'spine_bone_data_set_scale_y');
+  late final _spine_bone_data_set_scale_y = _spine_bone_data_set_scale_yPtr
+      .asFunction<void Function(spine_bone_data, double)>();
 
   double spine_bone_data_get_shear_x(
     spine_bone_data data,
@@ -3181,6 +3446,22 @@ class SpineFlutterBindings {
   late final _spine_bone_data_get_shear_x = _spine_bone_data_get_shear_xPtr
       .asFunction<double Function(spine_bone_data)>();
 
+  void spine_bone_data_set_shear_x(
+    spine_bone_data data,
+    double shearx,
+  ) {
+    return _spine_bone_data_set_shear_x(
+      data,
+      shearx,
+    );
+  }
+
+  late final _spine_bone_data_set_shear_xPtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(spine_bone_data, ffi.Float)>>(
+      'spine_bone_data_set_shear_x');
+  late final _spine_bone_data_set_shear_x = _spine_bone_data_set_shear_xPtr
+      .asFunction<void Function(spine_bone_data, double)>();
+
   double spine_bone_data_get_shear_y(
     spine_bone_data data,
   ) {
@@ -3194,6 +3475,22 @@ class SpineFlutterBindings {
           'spine_bone_data_get_shear_y');
   late final _spine_bone_data_get_shear_y = _spine_bone_data_get_shear_yPtr
       .asFunction<double Function(spine_bone_data)>();
+
+  void spine_bone_data_set_shear_y(
+    spine_bone_data data,
+    double shearY,
+  ) {
+    return _spine_bone_data_set_shear_y(
+      data,
+      shearY,
+    );
+  }
+
+  late final _spine_bone_data_set_shear_yPtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(spine_bone_data, ffi.Float)>>(
+      'spine_bone_data_set_shear_y');
+  late final _spine_bone_data_set_shear_y = _spine_bone_data_set_shear_yPtr
+      .asFunction<void Function(spine_bone_data, double)>();
 
   int spine_bone_data_get_transform_mode(
     spine_bone_data data,
@@ -3210,6 +3507,23 @@ class SpineFlutterBindings {
       _spine_bone_data_get_transform_modePtr
           .asFunction<int Function(spine_bone_data)>();
 
+  void spine_bone_data_set_transform_mode(
+    spine_bone_data data,
+    int mode,
+  ) {
+    return _spine_bone_data_set_transform_mode(
+      data,
+      mode,
+    );
+  }
+
+  late final _spine_bone_data_set_transform_modePtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(spine_bone_data, ffi.Int32)>>(
+      'spine_bone_data_set_transform_mode');
+  late final _spine_bone_data_set_transform_mode =
+      _spine_bone_data_set_transform_modePtr
+          .asFunction<void Function(spine_bone_data, int)>();
+
   int spine_bone_data_is_skin_required(
     spine_bone_data data,
   ) {
@@ -3225,6 +3539,23 @@ class SpineFlutterBindings {
       _spine_bone_data_is_skin_requiredPtr
           .asFunction<int Function(spine_bone_data)>();
 
+  void spine_bone_data_set_is_skin_required(
+    spine_bone_data data,
+    int isSkinRequired,
+  ) {
+    return _spine_bone_data_set_is_skin_required(
+      data,
+      isSkinRequired,
+    );
+  }
+
+  late final _spine_bone_data_set_is_skin_requiredPtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(spine_bone_data, ffi.Int32)>>(
+      'spine_bone_data_set_is_skin_required');
+  late final _spine_bone_data_set_is_skin_required =
+      _spine_bone_data_set_is_skin_requiredPtr
+          .asFunction<void Function(spine_bone_data, int)>();
+
   spine_color spine_bone_data_get_color(
     spine_bone_data data,
   ) {
@@ -3238,6 +3569,30 @@ class SpineFlutterBindings {
           'spine_bone_data_get_color');
   late final _spine_bone_data_get_color = _spine_bone_data_get_colorPtr
       .asFunction<spine_color Function(spine_bone_data)>();
+
+  void spine_bone_data_set_color(
+    spine_bone_data data,
+    double r,
+    double g,
+    double b,
+    double a,
+  ) {
+    return _spine_bone_data_set_color(
+      data,
+      r,
+      g,
+      b,
+      a,
+    );
+  }
+
+  late final _spine_bone_data_set_colorPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_bone_data, ffi.Float, ffi.Float, ffi.Float,
+              ffi.Float)>>('spine_bone_data_set_color');
+  late final _spine_bone_data_set_color =
+      _spine_bone_data_set_colorPtr.asFunction<
+          void Function(spine_bone_data, double, double, double, double)>();
 
   void spine_bone_update(
     spine_bone bone,
