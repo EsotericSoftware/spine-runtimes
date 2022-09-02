@@ -37,7 +37,7 @@ FFI_PLUGIN_EXPORT int spine_minor_version() {
 FFI_PLUGIN_EXPORT spine_atlas* spine_atlas_load(const char *atlasData) {
     if (!atlasData) return nullptr;
     int length = (int)strlen(atlasData);
-    auto atlas = new Atlas(atlasData, length, "", (TextureLoader*)nullptr, false);
+    auto atlas = new (__FILE__, __LINE__) Atlas(atlasData, length, "", (TextureLoader*)nullptr, false);
     spine_atlas *result = SpineExtension::calloc<spine_atlas>(1, __FILE__, __LINE__);
     result->atlas = atlas;
     result->numImagePaths = (int)atlas->getPages().size();
@@ -369,14 +369,14 @@ void spine_render_command_dispose(spine_render_command *cmd) {
 
 FFI_PLUGIN_EXPORT spine_skeleton_drawable *spine_skeleton_drawable_create(spine_skeleton_data skeletonData) {
     spine_skeleton_drawable *drawable = SpineExtension::calloc<spine_skeleton_drawable>(1, __FILE__, __LINE__);
-    drawable->skeleton = new Skeleton((SkeletonData*)skeletonData);
-    AnimationState *state = new AnimationState(new AnimationStateData((SkeletonData*)skeletonData));
+    drawable->skeleton = new (__FILE__, __LINE__) Skeleton((SkeletonData*)skeletonData);
+    AnimationState *state = new (__FILE__, __LINE__) AnimationState(new AnimationStateData((SkeletonData*)skeletonData));
     drawable->animationState = state;
     state->setManualTrackEntryDisposal(true);
     EventListener *listener =  new EventListener();
     drawable->animationStateEvents = listener;
     state->setListener(listener);
-    drawable->clipping = new SkeletonClipping();
+    drawable->clipping = new (__FILE__, __LINE__) SkeletonClipping();
     return drawable;
 }
 
@@ -1958,4 +1958,138 @@ FFI_PLUGIN_EXPORT void spine_bone_set_is_active(spine_bone bone, int isActive) {
     if (bone == nullptr) return;
     Bone *_bone = (Bone*)bone;
     _bone->setActive(isActive);
+}
+
+// Attachment
+FFI_PLUGIN_EXPORT const char* spine_attachment_get_name(spine_attachment attachment) {
+    if (attachment == nullptr) return nullptr;
+    Attachment *_attachment = (Attachment*)attachment;
+    return _attachment->getName().buffer();
+}
+
+FFI_PLUGIN_EXPORT spine_attachment_type spine_attachment_get_type(spine_attachment attachment) {
+    if (attachment == nullptr) return SPINE_ATTACHMENT_REGION;
+    Attachment *_attachment = (Attachment*)attachment;
+    if (_attachment->getRTTI().isExactly(RegionAttachment::rtti)) {
+        return SPINE_ATTACHMENT_REGION;
+    } else if (_attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
+        return SPINE_ATTACHMENT_MESH;
+    } else if (_attachment->getRTTI().isExactly(ClippingAttachment::rtti)) {
+        return SPINE_ATTACHMENT_CLIPPING;
+    } else if (_attachment->getRTTI().isExactly(BoundingBoxAttachment::rtti)) {
+        return SPINE_ATTACHMENT_BOUNDING_BOX;
+    } else if (_attachment->getRTTI().isExactly(PathAttachment::rtti)) {
+        return SPINE_ATTACHMENT_PATH;
+    } else if (_attachment->getRTTI().isExactly(PointAttachment::rtti)) {
+        return SPINE_ATTACHMENT_POINT;
+    } else {
+        return SPINE_ATTACHMENT_REGION;
+    }
+}
+
+// Skin
+FFI_PLUGIN_EXPORT void spine_skin_set_attachment(spine_skin skin, int slotIndex, const char* name, spine_attachment attachment) {
+    if (skin == nullptr) return;
+    Skin *_skin = (Skin*)skin;
+    _skin->setAttachment(slotIndex, name, (Attachment*)attachment);
+}
+
+FFI_PLUGIN_EXPORT spine_attachment spine_skin_get_attachment(spine_skin skin, int slotIndex, const char* name) {
+    if (skin == nullptr) return nullptr;
+    Skin *_skin = (Skin*)skin;
+    return _skin->getAttachment(slotIndex, name);
+}
+
+FFI_PLUGIN_EXPORT void spine_skin_remove_attachment(spine_skin skin, int slotIndex, const char* name) {
+    if (skin == nullptr) return;
+    Skin *_skin = (Skin*)skin;
+    _skin->removeAttachment(slotIndex, name);
+}
+
+FFI_PLUGIN_EXPORT const char* spine_skin_get_name(spine_skin skin) {
+    if (skin == nullptr) return nullptr;
+    Skin *_skin = (Skin*)skin;
+    return _skin->getName().buffer();
+}
+
+FFI_PLUGIN_EXPORT void spine_skin_add_skin(spine_skin skin, spine_skin other) {
+    if (skin == nullptr) return;
+    if (other == nullptr) return;
+    Skin *_skin = (Skin*)skin;
+    _skin->addSkin((Skin*)other);
+}
+
+FFI_PLUGIN_EXPORT spine_skin_entries *spine_skin_get_entries(spine_skin skin) {
+    if (skin == nullptr) return nullptr;
+    Skin *_skin = (Skin*)skin;
+    spine_skin_entries *entries = SpineExtension::getInstance()->calloc<spine_skin_entries>(1, __FILE__, __LINE__);
+    {
+        Skin::AttachmentMap::Entries mapEntries = _skin->getAttachments();
+        while (mapEntries.hasNext()) entries->numEntries++;
+    }
+    {
+        entries->entries = SpineExtension::getInstance()->calloc<spine_skin_entry>(entries->numEntries, __FILE__, __LINE__);
+        Skin::AttachmentMap::Entries mapEntries = _skin->getAttachments();
+        int i = 0;
+        while (mapEntries.hasNext()) {
+            Skin::AttachmentMap::Entry entry = mapEntries.next();
+            entries->entries[i++] = { (int)entry._slotIndex, entry._name.buffer(), entry._attachment };
+        }
+    }
+    return entries;
+}
+
+FFI_PLUGIN_EXPORT void spine_skin_entries_dispose(spine_skin_entries *entries) {
+    if (entries == nullptr) return;
+    SpineExtension::getInstance()->free(entries->entries, __FILE__, __LINE__);
+    SpineExtension::getInstance()->free(entries, __FILE__, __LINE__);
+}
+
+FFI_PLUGIN_EXPORT int spine_skin_get_num_bones(spine_skin skin) {
+    if (skin == nullptr) return 0;
+    Skin *_skin = (Skin*)skin;
+    return _skin->getBones().size();
+}
+
+FFI_PLUGIN_EXPORT spine_bone_data* spine_skin_get_bones(spine_skin skin) {
+    if (skin == nullptr) return nullptr;
+    Skin *_skin = (Skin*)skin;
+    return (spine_bone_data*)_skin->getBones().buffer();
+}
+
+FFI_PLUGIN_EXPORT int spine_skin_get_num_constraints(spine_skin skin) {
+    if (skin == nullptr) return 0;
+    Skin *_skin = (Skin*)skin;
+    return _skin->getConstraints().size();
+}
+
+FFI_PLUGIN_EXPORT spine_constraint_data* spine_skin_get_constraints(spine_skin skin) {
+    if (skin == nullptr) return nullptr;
+    Skin *_skin = (Skin*)skin;
+    return (spine_constraint_data*)_skin->getConstraints().buffer();
+}
+
+FFI_PLUGIN_EXPORT spine_skin spine_skin_create(const char* name) {
+    if (name == nullptr) return nullptr;
+    return new (__FILE__, __LINE__) Skin(name);
+}
+
+FFI_PLUGIN_EXPORT void spine_skin_dispose(spine_skin skin) {
+    if (skin == nullptr) return;
+    Skin *_skin = (Skin*)skin;
+    delete _skin;
+}
+
+FFI_PLUGIN_EXPORT spine_constraint_type spine_constraint_data_get_type(spine_constraint_data data) {
+    if (data == nullptr) return SPINE_CONSTRAINT_IK;
+    ConstraintData *_data = (ConstraintData*)data;
+    if (_data->getRTTI().isExactly(IkConstraintData::rtti)) {
+        return SPINE_CONSTRAINT_IK;
+    } else if (_data->getRTTI().isExactly(TransformConstraintData::rtti)) {
+        return SPINE_CONSTRAINT_TRANSFORM;
+    } else if (_data->getRTTI().isExactly(PathConstraintData::rtti)) {
+        return SPINE_CONSTRAINT_PATH;
+    } else {
+        return SPINE_CONSTRAINT_IK;
+    }
 }

@@ -31,6 +31,8 @@ typedef void* spine_slot;
 typedef void* spine_slot_data;
 typedef void* spine_skin;
 typedef void* spine_attachment;
+typedef void* spine_constraint;
+typedef void* spine_constraint_data;
 typedef void* spine_ik_constraint;
 typedef void* spine_ik_constraint_data;
 typedef void* spine_transform_constraint;
@@ -79,6 +81,21 @@ typedef enum spine_event_type {
     SPINE_EVENT_TYPE_EVENT
 } spine_event_type;
 
+typedef enum spine_attachment_type {
+    SPINE_ATTACHMENT_REGION = 0,
+    SPINE_ATTACHMENT_MESH,
+    SPINE_ATTACHMENT_CLIPPING,
+    SPINE_ATTACHMENT_BOUNDING_BOX,
+    SPINE_ATTACHMENT_PATH,
+    SPINE_ATTACHMENT_POINT,
+} spine_attachment_type;
+
+typedef enum spine_constraint_type {
+    SPINE_CONSTRAINT_IK,
+    SPINE_CONSTRAINT_TRANSFORM,
+    SPINE_CONSTRAINT_PATH
+} spine_constraint_type;
+
 typedef enum spine_transform_mode {
     SPINE_TRANSFORM_MODE_NORMAL = 0,
     SPINE_TRANSFORM_ONLY_TRANSLATION,
@@ -118,6 +135,17 @@ typedef struct spine_skeleton_drawable {
     void *clipping;
     spine_render_command *renderCommand;
 } spine_skeleton_drawable;
+
+typedef struct spine_skin_entry {
+    int slotIndex;
+    const char* name;
+    spine_attachment attachment;
+} spine_skin_entry;
+
+typedef struct spine_skin_entries {
+    int numEntries;
+    spine_skin_entry* entries;
+} spine_skin_entries;
 
 FFI_PLUGIN_EXPORT int spine_major_version();
 FFI_PLUGIN_EXPORT int spine_minor_version();
@@ -418,3 +446,22 @@ FFI_PLUGIN_EXPORT float spine_bone_get_world_scale_x(spine_bone bone);
 FFI_PLUGIN_EXPORT float spine_bone_get_world_scale_y(spine_bone bone);
 FFI_PLUGIN_EXPORT int spine_bone_get_is_active(spine_bone bone);
 FFI_PLUGIN_EXPORT void spine_bone_set_is_active(spine_bone bone, int isActive);
+
+FFI_PLUGIN_EXPORT const char* spine_attachment_get_name(spine_attachment attachment);
+FFI_PLUGIN_EXPORT spine_attachment_type spine_attachment_get_type(spine_attachment attachment);
+
+FFI_PLUGIN_EXPORT void spine_skin_set_attachment(spine_skin skin, int slotIndex, const char* name, spine_attachment attachment);
+FFI_PLUGIN_EXPORT spine_attachment spine_skin_get_attachment(spine_skin skin, int slotIndex, const char* name);
+FFI_PLUGIN_EXPORT void spine_skin_remove_attachment(spine_skin skin, int slotIndex, const char* name);
+FFI_PLUGIN_EXPORT const char* spine_skin_get_name(spine_skin skin);
+FFI_PLUGIN_EXPORT void spine_skin_add_skin(spine_skin skin, spine_skin other);
+FFI_PLUGIN_EXPORT spine_skin_entries *spine_skin_get_entries(spine_skin skin);
+FFI_PLUGIN_EXPORT void spine_skin_entries_dispose(spine_skin_entries *entries);
+FFI_PLUGIN_EXPORT int spine_skin_get_num_bones(spine_skin skin);
+FFI_PLUGIN_EXPORT spine_bone_data* spine_skin_get_bones(spine_skin skin);
+FFI_PLUGIN_EXPORT int spine_skin_get_num_constraints(spine_skin skin);
+FFI_PLUGIN_EXPORT spine_constraint_data* spine_skin_get_constraints(spine_skin skin);
+FFI_PLUGIN_EXPORT spine_skin spine_skin_create(const char* name);
+FFI_PLUGIN_EXPORT void spine_skin_dispose(spine_skin skin);
+
+FFI_PLUGIN_EXPORT spine_constraint_type spine_constraint_data_get_type(spine_constraint_data data);

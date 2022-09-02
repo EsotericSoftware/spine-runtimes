@@ -930,26 +930,130 @@ class Slot {
   }
 }
 
-// FIXME
+enum AttachmentType {
+  Region(0),
+  Mesh(1),
+  Clipping(2),
+  BoundingBox(3),
+  Path(4),
+  Point(5);
+
+  final int value;
+  const AttachmentType(this.value);
+}
 class Attachment {
   final spine_attachment _attachment;
 
   Attachment._(this._attachment);
+
+  String getName() {
+    Pointer<Utf8> name = _bindings.spine_attachment_get_name(_attachment).cast();
+    return name.toString();
+  }
+
+  AttachmentType getType() {
+    final type = _bindings.spine_attachment_get_type(_attachment);
+    return AttachmentType.values[type];
+  }
 }
 
-// FIXME
+class SkinEntry {
+  final int slotIndex;
+  final String name;
+  final Attachment? attachment;
+
+  SkinEntry(this.slotIndex, this.name, this.attachment);
+}
+
 class Skin {
   final spine_skin _skin;
 
   Skin._(this._skin);
+
+  void setAttachment(int slotIndex, String name, Attachment? attachment) {
+    final nativeName = name.toNativeUtf8();
+    _bindings.spine_skin_set_attachment(_skin, slotIndex, nativeName.cast(), attachment == null ? nullptr : attachment._attachment);
+    malloc.free(nativeName);
+  }
+
+  Attachment? getAttachment(int slotIndex, String name) {
+    final nativeName = name.toNativeUtf8();
+    final attachment = _bindings.spine_skin_get_attachment(_skin, slotIndex, nativeName.cast());
+    malloc.free(nativeName);
+    if (attachment.address == nullptr.address) return null;
+    return Attachment._(attachment);
+  }
+
+  void removeAttachment(int slotIndex, String name) {
+    final nativeName = name.toNativeUtf8();
+    _bindings.spine_skin_remove_attachment(_skin, slotIndex, nativeName.cast());
+    malloc.free(nativeName);
+  }
+
+  String getName() {
+    Pointer<Utf8> name = _bindings.spine_skin_get_name(_skin).cast();
+    return name.toDartString();
+  }
+
+  void addSkin(Skin other) {
+    _bindings.spine_skin_add_skin(_skin, other._skin);
+  }
+
+  List<SkinEntry> getEntries() {
+    List<SkinEntry> result = [];
+    final entries = _bindings.spine_skin_get_entries(_skin);
+    int numEntries = entries.ref.numEntries;
+    for (int i = 0; i < numEntries; i++) {
+      final entry = entries.ref.entries[i];
+      Pointer<Utf8> name = entry.name.cast();
+      result.add(SkinEntry(entry.slotIndex, name.toDartString(), entry.attachment.address == nullptr.address ? null : Attachment._(entry.attachment)));
+    }
+    return result;
+  }
+  
+  List<BoneData> getBones() {
+    List<BoneData> bones = [];
+    final numBones = _bindings.spine_skin_get_num_bones(_skin);
+    final nativeBones = _bindings.spine_skin_get_bones(_skin);
+    for (int i = 0; i < numBones; i++) {
+      bones.add(BoneData._(nativeBones[i]));
+    }
+    return bones;
+  }
+
+  List<ConstraintData> getConstraints() {
+    List<ConstraintData> constraints = [];
+    final numConstraints = _bindings.spine_skin_get_num_constraints(_skin);
+    final nativeConstraints = _bindings.spine_skin_get_constraints(_skin);
+    for (int i = 0; i < numConstraints; i++) {
+      final nativeConstraint = nativeConstraints[i];
+      final type = _bindings.spine_constraint_data_get_type(nativeConstraint);
+      switch (type) {
+        case spine_constraint_type.SPINE_CONSTRAINT_IK:
+          constraints.add(IkConstraintData._(nativeConstraint));
+          break;
+        case spine_constraint_type.SPINE_CONSTRAINT_TRANSFORM:
+          constraints.add(TransformConstraintData._(nativeConstraint));
+          break;
+        case spine_constraint_type.SPINE_CONSTRAINT_PATH:
+          constraints.add(PathConstraintData._(nativeConstraint));
+          break;
+      }
+    }
+    return constraints;
+  }
 }
 
+// FIXME
+class ConstraintData {
+  final spine_constraint_data _data;
+
+  ConstraintData._(this._data);
+}
 
 // FIXME
-class IkConstraintData {
-  final spine_ik_constraint_data _data;
-
-  IkConstraintData._(this._data);
+class IkConstraintData extends ConstraintData {
+  IkConstraintData._(spine_ik_constraint_data data): super._(data);
 }
 
 // FIXME
@@ -960,10 +1064,8 @@ class IkConstraint {
 }
 
 // FIXME
-class TransformConstraintData {
-  final spine_transform_constraint_data _data;
-
-  TransformConstraintData._(this._data);
+class TransformConstraintData extends ConstraintData {
+  TransformConstraintData._(spine_transform_constraint_data data): super._(data);
 }
 
 // FIXME
@@ -974,10 +1076,8 @@ class TransformConstraint {
 }
 
 // FIXME
-class PathConstraintData {
-  final spine_path_constraint_data _data;
-
-  PathConstraintData._(this._data);
+class PathConstraintData extends ConstraintData {
+  PathConstraintData._(spine_path_constraint_data data): super._(data);
 }
 
 // FIXME
