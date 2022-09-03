@@ -483,7 +483,11 @@ void SpineSprite::update_skeleton(float delta) {
 	if (modified_bones) skeleton->update_world_transform();
 	sort_slot_nodes();
 	update_meshes(skeleton);
+#if VERSION_MAJOR > 3
+	queue_redraw();
+#else
 	update();
+#endif
 }
 
 static void clear_mesh_instance(MeshInstance2D *mesh_instance) {
@@ -794,7 +798,7 @@ void SpineSprite::draw() {
 			scratch_points.set(2, Vector2(bone_length, 0));
 			scratch_points.set(3, Vector2(0, -debug_bones_thickness));
 			scratch_points.set(4, Vector2(-debug_bones_thickness, 0));
-			Transform2D bone_transform(Math::deg2rad(bone->getWorldRotationX()), Vector2(bone->getWorldX(), bone->getWorldY()));
+			Transform2D bone_transform(spine::MathUtil::Deg_Rad * bone->getWorldRotationX(), Vector2(bone->getWorldX(), bone->getWorldY()));
 			bone_transform.scale_basis(Vector2(bone->getWorldScaleX(), bone->getWorldScaleY()));
 			auto mouse_local_position = bone_transform.affine_inverse().xform(mouse_position);
 			if (GEOMETRY2D::is_point_in_polygon(mouse_local_position, scratch_points)) {
@@ -858,7 +862,7 @@ void SpineSprite::draw() {
 }
 
 void SpineSprite::draw_bone(spine::Bone *bone, const Color &color) {
-	draw_set_transform(Vector2(bone->getWorldX(), bone->getWorldY()), Math::deg2rad(bone->getWorldRotationX()), Vector2(bone->getWorldScaleX(), bone->getWorldScaleY()));
+	draw_set_transform(Vector2(bone->getWorldX(), bone->getWorldY()), spine::MathUtil::Deg_Rad * bone->getWorldRotationX(), Vector2(bone->getWorldScaleX(), bone->getWorldScaleY()));
 	float bone_length = bone->getData().getLength();
 	if (bone_length == 0) bone_length = debug_bones_thickness * 2;
 	Vector<Vector2> points;

@@ -253,7 +253,7 @@ void SpineEditorPropertyAnimationMix::_bind_methods() {
 void SpineEditorPropertyAnimationMix::data_changed(const String &property, const Variant &value, const String &name, bool changing) {
 	auto mix = Object::cast_to<SpineAnimationMix>(get_edited_object()->get(get_edited_property()));
 
-	UndoRedo *undo_redo = EditorNode::get_undo_redo();
+	auto undo_redo = EditorNode::get_undo_redo();
 	undo_redo->create_action("Set mix property " + property);
 	undo_redo->add_do_property(mix, property, value);
 	undo_redo->add_undo_property(mix, property, mix->get(property));

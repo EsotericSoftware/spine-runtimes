@@ -141,7 +141,11 @@ bool SpineBoneNode::_set(const StringName &property, const Variant &value) {
 void SpineBoneNode::on_world_transforms_changed(const Variant &_sprite) {
 	SpineSprite *sprite = cast_to<SpineSprite>(_sprite.operator Object *());
 	update_transform(sprite);
+#if VERSION_MAJOR > 3
+	queue_redraw();
+#else
 	update();
+#endif
 }
 
 void SpineBoneNode::update_transform(SpineSprite *sprite) {
