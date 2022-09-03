@@ -78,7 +78,7 @@ Error SpineJsonResourceImportPlugin::import(const String &source_file, const Str
 #if VERSION_MAJOR > 3
 	error = ResourceSaver::save(skeleton_file_res, file_name);
 #else
-	auto error = ResourceSaver::save(file_name, skeleton_file_res);
+	error = ResourceSaver::save(file_name, skeleton_file_res);
 #endif
 	return error;
 }
@@ -96,7 +96,7 @@ Error SpineBinaryResourceImportPlugin::import(const String &source_file, const S
 #if VERSION_MAJOR > 3
 	error = ResourceSaver::save(skeleton_file_res, file_name);
 #else
-	auto error = ResourceSaver::save(file_name, skeleton_file_res);
+	error = ResourceSaver::save(file_name, skeleton_file_res);
 #endif
 	return error;
 }

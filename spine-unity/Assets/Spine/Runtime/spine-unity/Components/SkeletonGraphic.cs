@@ -114,6 +114,11 @@ namespace Spine.Unity {
 				} else {
 					if (freeze) return;
 
+					if (!Application.isPlaying) {
+						Initialize(true);
+						return;
+					}
+
 					if (!string.IsNullOrEmpty(initialSkinName)) {
 						var skin = skeleton.Data.FindSkin(initialSkinName);
 						if (skin != null) {
@@ -123,19 +128,6 @@ namespace Spine.Unity {
 								skeleton.SetSkin(skin);
 						}
 
-					}
-
-					// Only provide visual feedback to inspector changes in Unity Editor Edit mode.
-					if (!Application.isPlaying) {
-						skeleton.ScaleX = this.initialFlipX ? -1 : 1;
-						skeleton.ScaleY = this.initialFlipY ? -1 : 1;
-
-						state.ClearTrack(0);
-						skeleton.SetToSetupPose();
-						if (!string.IsNullOrEmpty(startingAnimation)) {
-							state.SetAnimation(0, startingAnimation, startingLoop);
-							Update(0f);
-						}
 					}
 				}
 			} else {
@@ -727,12 +719,6 @@ namespace Spine.Unity {
 			meshGenerator.Begin();
 
 			bool useAddSubmesh = currentInstructions.hasActiveClipping && currentInstructions.submeshInstructions.Count > 0;
-#if UNITY_EDITOR
-			// Editor triggers Graphic.Rebuild without prior LateUpdate call, which
-			// can lead to filling unprepared vertex buffer and out-of-bounds write access.
-			if (!Application.isPlaying)
-				useAddSubmesh = true;
-#endif
 			if (useAddSubmesh) {
 				meshGenerator.AddSubmesh(currentInstructions.submeshInstructions.Items[0], updateTriangles);
 			} else {

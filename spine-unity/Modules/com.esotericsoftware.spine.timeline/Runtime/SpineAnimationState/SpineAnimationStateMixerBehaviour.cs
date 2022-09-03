@@ -51,6 +51,7 @@ namespace Spine.Unity.Playables {
 		bool isPaused = false;
 		TrackEntry pausedTrackEntry;
 		float previousTimeScale = 1;
+		float rootPlayableSpeed = 1;
 
 		TrackEntry timelineStartedTrackEntry;
 
@@ -109,6 +110,18 @@ namespace Spine.Unity.Playables {
 			}
 		}
 
+		private void AdjustTrackEntryTimeScale (Playable playable, int input, TrackEntry currentTrackEntry) {
+			if (currentTrackEntry == null)
+				return;
+			ScriptPlayable<SpineAnimationStateBehaviour> clipPlayable = (ScriptPlayable<SpineAnimationStateBehaviour>)playable.GetInput(input);
+			float clipSpeed = (float)clipPlayable.GetSpeed();
+			SpineAnimationStateBehaviour clipData = clipPlayable.GetBehaviour();
+			if (clipData != null && clipData.animationReference != null
+				&& currentTrackEntry.Animation == clipData.animationReference.Animation) {
+				currentTrackEntry.TimeScale = clipSpeed * rootPlayableSpeed;
+			}
+		}
+
 		// NOTE: This function is called at runtime and edit time. Keep that in mind when setting the values of properties.
 		public override void ProcessFrame (Playable playable, FrameData info, object playerData) {
 			var skeletonAnimation = playerData as SkeletonAnimation;
@@ -129,7 +142,9 @@ namespace Spine.Unity.Playables {
 			}
 
 			int inputCount = playable.GetInputCount();
-			float rootSpeed = GetRootPlayableSpeed(playable);
+			float previousRootSpeed = rootPlayableSpeed;
+			rootPlayableSpeed = GetRootPlayableSpeed(playable);
+			bool rootSpeedChanged = previousRootSpeed != rootPlayableSpeed;
 
 			// Ensure correct buffer size.
 			if (this.lastInputWeights == null || this.lastInputWeights.Length < inputCount) {
@@ -151,9 +166,14 @@ namespace Spine.Unity.Playables {
 					anyClipPlaying = true;
 				lastInputWeights[i] = inputWeight;
 
-				if (clipStarted && numStartingClips < 2) {
-					ScriptPlayable<SpineAnimationStateBehaviour> clipPlayable = (ScriptPlayable<SpineAnimationStateBehaviour>)playable.GetInput(i);
-					startingClips[numStartingClips++] = clipPlayable;
+				if (clipStarted) {
+					if (numStartingClips < 2) {
+						ScriptPlayable<SpineAnimationStateBehaviour> clipPlayable = (ScriptPlayable<SpineAnimationStateBehaviour>)playable.GetInput(i);
+						startingClips[numStartingClips++] = clipPlayable;
+					}
+				} else if (rootSpeedChanged) {
+					TrackEntry currentEntry = state.GetCurrent(trackIndex);
+					AdjustTrackEntryTimeScale(playable, i, currentEntry);
 				}
 			}
 			// unfortunately order of clips can be wrong when two start at the same time, we have to sort clips
@@ -192,14 +212,14 @@ namespace Spine.Unity.Playables {
 						float clipSpeed = (float)clipPlayable.GetSpeed();
 						trackEntry.EventThreshold = clipData.eventThreshold;
 						trackEntry.DrawOrderThreshold = clipData.drawOrderThreshold;
-						trackEntry.TrackTime = (float)clipPlayable.GetTime() * clipSpeed * rootSpeed;
-						trackEntry.TimeScale = clipSpeed * rootSpeed;
+						trackEntry.TrackTime = (float)clipPlayable.GetTime() * clipSpeed * rootPlayableSpeed;
+						trackEntry.TimeScale = clipSpeed * rootPlayableSpeed;
 						trackEntry.AttachmentThreshold = clipData.attachmentThreshold;
 						trackEntry.HoldPrevious = clipData.holdPrevious;
 						trackEntry.Alpha = clipData.alpha;
 
 						if (clipData.customDuration)
-							trackEntry.MixDuration = customMixDuration / rootSpeed;
+							trackEntry.MixDuration = customMixDuration / rootPlayableSpeed;
 
 						timelineStartedTrackEntry = trackEntry;
 					}

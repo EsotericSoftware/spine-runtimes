@@ -50,6 +50,7 @@ namespace Spine.Unity {
 
 		public float rootMotionScaleX = 1;
 		public float rootMotionScaleY = 1;
+		public float rootMotionScaleRotation = 1;
 		/// <summary>Skeleton space X translation per skeleton space Y translation root motion.</summary>
 		public float rootMotionTranslateXPerY = 0;
 		/// <summary>Skeleton space Y translation per skeleton space X translation root motion.</summary>
@@ -59,6 +60,36 @@ namespace Spine.Unity {
 		public Rigidbody2D rigidBody2D;
 		public bool applyRigidbody2DGravity = false;
 		public Rigidbody rigidBody;
+
+		/// <summary>Delegate type for customizing application of rootmotion.
+		public delegate void RootMotionDelegate (SkeletonRootMotionBase component, Vector2 translation, float rotation);
+		/// <summary>This callback can be used to apply root-motion in a custom way. It is raised after evaluating
+		/// this animation frame's root-motion, before it is potentially applied (see <see cref="disableOnOverride"/>)
+		/// to either Transform or Rigidbody.
+		/// When <see cref="SkeletonAnimation.UpdateTiming"/> is set to <see cref="UpdateTiming.InUpdate"/>, multiple
+		/// animation frames might take place before <c>FixedUpdate</c> is called once.
+		/// The callback parameters <c>translation</c> and <c>rotation</c> are filled out with
+		/// this animation frame's skeleton-space root-motion (not cumulated). You can use
+		/// e.g. <c>transform.TransformVector()</c> to transform skeleton-space root-motion to world space.
+		/// </summary>
+		/// <seealso cref="PhysicsUpdateRootMotionOverride"/>
+		public event RootMotionDelegate ProcessRootMotionOverride;
+		/// <summary>This callback can be used to apply root-motion in a custom way. It is raised in FixedUpdate
+		/// after (when <see cref="disableOnOverride"/> is set to false) or instead of when root-motion
+		/// would be applied at the Rigidbody.
+		/// When <see cref="SkeletonAnimation.UpdateTiming"/> is set to <see cref="UpdateTiming.InUpdate"/>, multiple
+		/// animation frames might take place before before <c>FixedUpdate</c> is called once.
+		/// The callback parameters <c>translation</c> and <c>rotation</c> are filled out with the
+		/// (cumulated) skeleton-space root-motion since the the last <c>FixedUpdate</c> call. You can use
+		/// e.g. <c>transform.TransformVector()</c> to transform skeleton-space root-motion to world space.
+		/// </summary>
+		/// <seealso cref="ProcessRootMotionOverride"/>
+		public event RootMotionDelegate PhysicsUpdateRootMotionOverride;
+		/// <summary>When true, root-motion is not applied to the Transform or Rigidbody.
+		/// Otherwise the delegate callbacks are issued additionally.</summary>
+		public bool disableOnOverride = true;
+
+		public Bone RootMotionBone { get { return rootMotionBone; } }
 
 		public bool UsesRigidbody {
 			get { return rigidBody != null || rigidBody2D != null; }
@@ -108,12 +139,13 @@ namespace Spine.Unity {
 		protected List<float> transformConstraintLastRotation = new List<float>();
 		protected List<Bone> topLevelBones = new List<Bone>();
 		protected Vector2 initialOffset = Vector2.zero;
+		protected bool accumulatedUntilFixedUpdate = false;
 		protected Vector2 tempSkeletonDisplacement;
 		protected Vector3 rigidbodyDisplacement;
 		protected Vector3 previousRigidbodyRootMotion = Vector2.zero;
 		protected Vector2 additionalRigidbody2DMovement = Vector2.zero;
 
-		protected Quaternion rigidbodyRotation = Quaternion.identity;
+		protected Quaternion rigidbodyLocalRotation = Quaternion.identity;
 		protected float rigidbody2DRotation;
 		protected float initialOffsetRotation;
 		protected float tempSkeletonRotation;
@@ -149,35 +181,44 @@ namespace Spine.Unity {
 		}
 
 		protected virtual void PhysicsUpdate (bool skeletonAnimationUsesFixedUpdate) {
-			if (rigidBody2D != null) {
-				Vector2 gravityAndVelocityMovement = Vector2.zero;
-				if (applyRigidbody2DGravity) {
-					float deltaTime = Time.fixedDeltaTime;
-					float deltaTimeSquared = (deltaTime * deltaTime);
+			Vector2 callbackDisplacement = tempSkeletonDisplacement;
+			float callbackRotation = tempSkeletonRotation;
 
-					rigidBody2D.velocity += rigidBody2D.gravityScale * Physics2D.gravity * deltaTime;
-					gravityAndVelocityMovement = 0.5f * rigidBody2D.gravityScale * Physics2D.gravity * deltaTimeSquared +
-						rigidBody2D.velocity * deltaTime;
+			bool isApplyAtRigidbodyAllowed = PhysicsUpdateRootMotionOverride == null || !disableOnOverride;
+			if (isApplyAtRigidbodyAllowed) {
+				if (rigidBody2D != null) {
+					Vector2 gravityAndVelocityMovement = Vector2.zero;
+					if (applyRigidbody2DGravity) {
+						float deltaTime = Time.fixedDeltaTime;
+						float deltaTimeSquared = (deltaTime * deltaTime);
+
+						rigidBody2D.velocity += rigidBody2D.gravityScale * Physics2D.gravity * deltaTime;
+						gravityAndVelocityMovement = 0.5f * rigidBody2D.gravityScale * Physics2D.gravity * deltaTimeSquared +
+							rigidBody2D.velocity * deltaTime;
+					}
+
+					Vector2 rigidbodyDisplacement2D = new Vector2(rigidbodyDisplacement.x, rigidbodyDisplacement.y);
+					rigidBody2D.MovePosition(gravityAndVelocityMovement + new Vector2(transform.position.x, transform.position.y)
+						+ rigidbodyDisplacement2D + additionalRigidbody2DMovement);
+					rigidBody2D.MoveRotation(rigidbody2DRotation + rigidBody2D.rotation);
+				} else if (rigidBody != null) {
+					rigidBody.MovePosition(transform.position
+						+ new Vector3(rigidbodyDisplacement.x, rigidbodyDisplacement.y, rigidbodyDisplacement.z));
+					rigidBody.MoveRotation(rigidBody.rotation * rigidbodyLocalRotation);
 				}
+			}
 
-				Vector2 rigidbodyDisplacement2D = new Vector2(rigidbodyDisplacement.x, rigidbodyDisplacement.y);
-				rigidBody2D.MovePosition(gravityAndVelocityMovement + new Vector2(transform.position.x, transform.position.y)
-					+ rigidbodyDisplacement2D + additionalRigidbody2DMovement);
-				rigidBody2D.MoveRotation(rigidbody2DRotation + rigidBody2D.rotation);
-			} else if (rigidBody != null) {
-				rigidBody.MovePosition(transform.position
-					+ new Vector3(rigidbodyDisplacement.x, rigidbodyDisplacement.y, 0));
-				rigidBody.MoveRotation(rigidBody.rotation * rigidbodyRotation);
-			} else return;
-
-			Vector2 parentBoneScale;
-			GetScaleAffectingRootMotion(out parentBoneScale);
-			if (!skeletonAnimationUsesFixedUpdate) {
+			previousRigidbodyRootMotion = rigidbodyDisplacement;
+			if (accumulatedUntilFixedUpdate) {
+				Vector2 parentBoneScale;
+				GetScaleAffectingRootMotion(out parentBoneScale);
 				ClearEffectiveBoneOffsets(parentBoneScale);
 				skeletonComponent.Skeleton.UpdateWorldTransform();
 			}
-			previousRigidbodyRootMotion = rigidbodyDisplacement;
 			ClearRigidbodyTempMovement();
+
+			if (PhysicsUpdateRootMotionOverride != null)
+				PhysicsUpdateRootMotionOverride(this, callbackDisplacement, callbackRotation);
 		}
 
 		protected virtual void OnDisable () {
@@ -499,6 +540,7 @@ namespace Spine.Unity {
 			float skeletonRotationDelta = 0;
 			if (transformRotation) {
 				float boneLocalDeltaRotation = CalculateAnimationsRotationDelta();
+				boneLocalDeltaRotation *= rootMotionScaleRotation;
 				skeletonRotationDelta = GetSkeletonSpaceRotationDelta(boneLocalDeltaRotation, totalScale);
 			}
 
@@ -511,40 +553,45 @@ namespace Spine.Unity {
 
 		void ApplyRootMotion (Vector2 skeletonTranslationDelta, float skeletonRotationDelta, Vector2 parentBoneScale,
 			bool skeletonAnimationUsesFixedUpdate) {
-			// Apply root motion to Transform or RigidBody;
-			if (UsesRigidbody) {
+
+			// Accumulated displacement is applied on the next Physics update in FixedUpdate.
+			// Until the next Physics update, tempSkeletonDisplacement and tempSkeletonRotation
+			// are offsetting bone locations to prevent stutter which would otherwise occur if
+			// we don't move every Update.
+			bool usesRigidbody = this.UsesRigidbody;
+			bool applyToTransform = !usesRigidbody && (ProcessRootMotionOverride == null || !disableOnOverride);
+			accumulatedUntilFixedUpdate = !applyToTransform && !skeletonAnimationUsesFixedUpdate;
+
+			if (ProcessRootMotionOverride != null)
+				ProcessRootMotionOverride(this, skeletonTranslationDelta, skeletonRotationDelta);
+
+			// Apply root motion to Transform or update values applied to RigidBody later (must happen in FixedUpdate).
+			if (usesRigidbody) {
 				rigidbodyDisplacement += transform.TransformVector(skeletonTranslationDelta);
-
-				// Accumulated displacement is applied on the next Physics update in FixedUpdate.
-				// Until the next Physics update, tempBoneDisplacement is offsetting bone locations
-				// to prevent stutter which would otherwise occur if we don't move every Update.
-				if (!skeletonAnimationUsesFixedUpdate)
-					tempSkeletonDisplacement += skeletonTranslationDelta;
-
 				if (skeletonRotationDelta != 0.0f) {
 					if (rigidBody != null) {
-						Quaternion addedWorldRotation = Quaternion.AngleAxis(skeletonRotationDelta, transform.forward);
-						rigidbodyRotation = rigidbodyRotation * addedWorldRotation;
+						Quaternion addedWorldRotation = Quaternion.Euler(0, 0, skeletonRotationDelta);
+						rigidbodyLocalRotation = rigidbodyLocalRotation * addedWorldRotation;
 					} else if (rigidBody2D != null) {
 						Vector3 lossyScale = transform.lossyScale;
 						float rotationSign = lossyScale.x * lossyScale.y > 0 ? 1 : -1;
 						rigidbody2DRotation += rotationSign * skeletonRotationDelta;
 					}
-					if (!skeletonAnimationUsesFixedUpdate)
-						tempSkeletonRotation += skeletonRotationDelta;
 				}
-
-				if (skeletonAnimationUsesFixedUpdate)
-					ClearEffectiveBoneOffsets(parentBoneScale);
-				else
-					SetEffectiveBoneOffsetsTo(tempSkeletonDisplacement, tempSkeletonRotation, parentBoneScale);
-			} else {
+			} else if (applyToTransform) {
 				transform.position += transform.TransformVector(skeletonTranslationDelta);
 				if (skeletonRotationDelta != 0.0f) {
 					Vector3 lossyScale = transform.lossyScale;
 					float rotationSign = lossyScale.x * lossyScale.y > 0 ? 1 : -1;
 					transform.Rotate(0, 0, rotationSign * skeletonRotationDelta);
 				}
+			}
+
+			tempSkeletonDisplacement += skeletonTranslationDelta;
+			tempSkeletonRotation += skeletonRotationDelta;
+			if (accumulatedUntilFixedUpdate) {
+				SetEffectiveBoneOffsetsTo(tempSkeletonDisplacement, tempSkeletonRotation, parentBoneScale);
+			} else {
 				ClearEffectiveBoneOffsets(parentBoneScale);
 			}
 		}
@@ -654,7 +701,7 @@ namespace Spine.Unity {
 		void ClearRigidbodyTempMovement () {
 			rigidbodyDisplacement = Vector2.zero;
 			tempSkeletonDisplacement = Vector2.zero;
-			rigidbodyRotation = Quaternion.identity;
+			rigidbodyLocalRotation = Quaternion.identity;
 			rigidbody2DRotation = 0;
 			tempSkeletonRotation = 0;
 		}
