@@ -90,7 +90,7 @@ Error SpineBinaryResourceImportPlugin::import(const String &source_file, const S
 #endif
 	Ref<SpineSkeletonFileResource> skeleton_file_res(memnew(SpineSkeletonFileResource));
 	Error error = skeleton_file_res->load_from_file(source_file);
-    if (error != OK) return error;
+	if (error != OK) return error;
 
 	String file_name = vformat("%s.%s", save_path, get_save_extension());
 #if VERSION_MAJOR > 3
