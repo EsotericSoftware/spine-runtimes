@@ -1334,11 +1334,96 @@ class TransformConstraintData extends ConstraintData {
   }
 }
 
-// FIXME
 class TransformConstraint {
   final spine_transform_constraint _constraint;
 
   TransformConstraint._(this._constraint);
+
+  void update() {
+    _bindings.spine_transform_constraint_update(_constraint);
+  }
+
+  int getOrder() {
+    return _bindings.spine_transform_constraint_get_order(_constraint);
+  }
+
+  TransformConstraintData getData() {
+    return TransformConstraintData._(_bindings.spine_transform_constraint_get_data(_constraint));
+  }
+
+  List<Bone> getBones() {
+    List<Bone> result = [];
+    final num = _bindings.spine_transform_constraint_get_num_bones(_constraint);
+    final nativeBones = _bindings.spine_transform_constraint_get_bones(_constraint);
+    for (int i = 0; i < num; i++) {
+      result.add(Bone._(nativeBones[i]));
+    }
+    return result;
+  }
+
+  Bone getTarget() {
+    return Bone._(_bindings.spine_transform_constraint_get_target(_constraint));
+  }
+
+  void setTarget(Bone target) {
+    _bindings.spine_transform_constraint_set_target(_constraint, target._bone);
+  }
+
+  double getMixRotate() {
+    return _bindings.spine_transform_constraint_get_mix_rotate(_constraint);
+  }
+
+  void setMixRotate(double mixRotate) {
+    _bindings.spine_transform_constraint_set_mix_rotate(_constraint, mixRotate);
+  }
+
+  double getMixX() {
+    return _bindings.spine_transform_constraint_get_mix_x(_constraint);
+  }
+
+  void setMixX(double mixX) {
+    _bindings.spine_transform_constraint_set_mix_x(_constraint, mixX);
+  }
+
+  double getMixY() {
+    return _bindings.spine_transform_constraint_get_mix_y(_constraint);
+  }
+
+  void setMixY(double mixY) {
+    _bindings.spine_transform_constraint_set_mix_y(_constraint, mixY);
+  }
+
+  double getMixScaleX() {
+    return _bindings.spine_transform_constraint_get_mix_scale_x(_constraint);
+  }
+
+  void setMixScaleX(double mixScaleX) {
+    _bindings.spine_transform_constraint_set_mix_scale_x(_constraint, mixScaleX);
+  }
+
+  double getMixScaleY() {
+    return _bindings.spine_transform_constraint_get_mix_scale_y(_constraint);
+  }
+
+  void setMixScaleY(double mixScaleY) {
+    _bindings.spine_transform_constraint_set_mix_scale_y(_constraint, mixScaleY);
+  }
+
+  double getMixShearY() {
+    return _bindings.spine_transform_constraint_get_mix_shear_y(_constraint);
+  }
+
+  void setMixShearY(double mixShearY) {
+    _bindings.spine_transform_constraint_set_mix_shear_y(_constraint, mixShearY);
+  }
+
+  bool isActive() {
+    return _bindings.spine_transform_constraint_get_is_active(_constraint) == -1;
+  }
+
+  void setIsActive(bool isActive) {
+    _bindings.spine_transform_constraint_set_is_active(_constraint, isActive ? -1 : 0);
+  }
 }
 
 // FIXME
