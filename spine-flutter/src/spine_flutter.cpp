@@ -2299,3 +2299,191 @@ FFI_PLUGIN_EXPORT void spine_ik_constraint_set_is_active(spine_ik_constraint con
     IkConstraint *_constraint = (IkConstraint*)constraint;
     _constraint->setActive(isActive);
 }
+
+// TransformConstraintData
+FFI_PLUGIN_EXPORT int spine_transform_constraint_data_get_num_bones(spine_transform_constraint_data data) {
+    if (data == nullptr) return 0;
+    TransformConstraintData *_data = (TransformConstraintData*)data;
+    return (int)_data->getBones().size();
+}
+
+FFI_PLUGIN_EXPORT spine_bone_data* spine_transform_constraint_data_get_bones(spine_transform_constraint_data data) {
+    if (data == nullptr) return nullptr;
+    TransformConstraintData *_data = (TransformConstraintData*)data;
+    return (spine_bone_data*)_data->getBones().buffer();
+}
+
+FFI_PLUGIN_EXPORT spine_bone_data spine_transform_constraint_data_get_target(spine_transform_constraint_data data) {
+    if (data == nullptr) return nullptr;
+    TransformConstraintData *_data = (TransformConstraintData*)data;
+    return _data->getTarget();
+}
+
+FFI_PLUGIN_EXPORT float spine_transform_constraint_data_get_mix_rotate(spine_transform_constraint_data data) {
+    if (data == nullptr) return 0;
+    TransformConstraintData *_data = (TransformConstraintData*)data;
+    return _data->getMixRotate();
+}
+
+FFI_PLUGIN_EXPORT void spine_transform_constraint_data_set_mix_rotate(spine_transform_constraint_data data, float mixRotate) {
+    if (data == nullptr) return;
+    TransformConstraintData *_data = (TransformConstraintData*)data;
+    _data->setMixRotate(mixRotate);
+}
+
+FFI_PLUGIN_EXPORT float spine_transform_constraint_data_get_mix_x(spine_transform_constraint_data data) {
+    if (data == nullptr) return 0;
+    TransformConstraintData *_data = (TransformConstraintData*)data;
+    return _data->getMixX();
+}
+
+FFI_PLUGIN_EXPORT void spine_transform_constraint_data_set_mix_x(spine_transform_constraint_data data, float mixX) {
+    if (data == nullptr) return;
+    TransformConstraintData *_data = (TransformConstraintData*)data;
+    _data->setMixX(mixX);
+}
+
+FFI_PLUGIN_EXPORT float spine_transform_constraint_data_get_mix_y(spine_transform_constraint_data data) {
+    if (data == nullptr) return 0;
+    TransformConstraintData *_data = (TransformConstraintData*)data;
+    return _data->getMixY();
+}
+
+FFI_PLUGIN_EXPORT void spine_transform_constraint_data_set_mix_y(spine_transform_constraint_data data, float mixY) {
+    if (data == nullptr) return;
+    TransformConstraintData *_data = (TransformConstraintData*)data;
+    _data->setMixY(mixY);
+}
+
+FFI_PLUGIN_EXPORT float spine_transform_constraint_data_get_mix_scale_x(spine_transform_constraint_data data) {
+    if (data == nullptr) return 0;
+    TransformConstraintData *_data = (TransformConstraintData*)data;
+    return _data->getMixScaleX();
+}
+
+FFI_PLUGIN_EXPORT void spine_transform_constraint_data_set_mix_scale_x(spine_transform_constraint_data data, float mixScaleX) {
+    if (data == nullptr) return;
+    TransformConstraintData *_data = (TransformConstraintData*)data;
+    _data->setMixScaleX(mixScaleX);
+}
+
+FFI_PLUGIN_EXPORT float spine_transform_constraint_data_get_mix_scale_y(spine_transform_constraint_data data) {
+    if (data == nullptr) return 0;
+    TransformConstraintData *_data = (TransformConstraintData*)data;
+    return _data->getMixScaleY();
+}
+
+FFI_PLUGIN_EXPORT void spine_transform_constraint_data_set_mix_scale_y(spine_transform_constraint_data data, float mixScaleY) {
+    if (data == nullptr) return;
+    TransformConstraintData *_data = (TransformConstraintData*)data;
+    _data->setMixScaleY(mixScaleY);
+}
+
+FFI_PLUGIN_EXPORT float spine_transform_constraint_data_get_mix_shear_y(spine_transform_constraint_data data) {
+    if (data == nullptr) return 0;
+    TransformConstraintData *_data = (TransformConstraintData*)data;
+    return _data->getMixShearY();
+}
+
+FFI_PLUGIN_EXPORT void spine_transform_constraint_data_set_mix_shear_y(spine_transform_constraint_data data, float mixShearY) {
+    if (data == nullptr) return;
+    TransformConstraintData *_data = (TransformConstraintData*)data;
+    _data->setMixShearY(mixShearY);
+}
+
+FFI_PLUGIN_EXPORT float spine_transform_constraint_data_get_offset_rotation(spine_transform_constraint_data data) {
+    if (data == nullptr) return 0;
+    TransformConstraintData *_data = (TransformConstraintData*)data;
+    return _data->getOffsetRotation();
+}
+
+FFI_PLUGIN_EXPORT void spine_transform_constraint_data_set_offset_rotation(spine_transform_constraint_data data, float offsetRotation) {
+    if (data == nullptr) return;
+    TransformConstraintData *_data = (TransformConstraintData*)data;
+    _data->setOffsetRotation(offsetRotation);
+}
+
+FFI_PLUGIN_EXPORT float spine_transform_constraint_data_get_offset_x(spine_transform_constraint_data data) {
+    if (data == nullptr) return 0;
+    TransformConstraintData *_data = (TransformConstraintData*)data;
+    return _data->getOffsetX();
+}
+
+FFI_PLUGIN_EXPORT void spine_transform_constraint_data_set_offset_x(spine_transform_constraint_data data, float offsetX) {
+    if (data == nullptr) return;
+    TransformConstraintData *_data = (TransformConstraintData*)data;
+    _data->setOffsetX(offsetX);
+}
+
+FFI_PLUGIN_EXPORT float spine_transform_constraint_data_get_offset_y(spine_transform_constraint_data data) {
+    if (data == nullptr) return 0;
+    TransformConstraintData *_data = (TransformConstraintData*)data;
+    return _data->getOffsetY();
+}
+
+FFI_PLUGIN_EXPORT void spine_transform_constraint_data_set_offset_y(spine_transform_constraint_data data, float offsetY) {
+    if (data == nullptr) return;
+    TransformConstraintData *_data = (TransformConstraintData*)data;
+    _data->setOffsetY(offsetY);
+}
+
+FFI_PLUGIN_EXPORT float spine_transform_constraint_data_get_offset_scale_x(spine_transform_constraint_data data) {
+    if (data == nullptr) return 0;
+    TransformConstraintData *_data = (TransformConstraintData*)data;
+    return _data->getOffsetScaleX();
+}
+
+FFI_PLUGIN_EXPORT void spine_transform_constraint_data_set_offset_scale_x(spine_transform_constraint_data data, float offsetScaleX) {
+    if (data == nullptr) return;
+    TransformConstraintData *_data = (TransformConstraintData*)data;
+    _data->setOffsetScaleX(offsetScaleX);
+}
+
+FFI_PLUGIN_EXPORT float spine_transform_constraint_data_get_offset_scale_y(spine_transform_constraint_data data) {
+    if (data == nullptr) return 0;
+    TransformConstraintData *_data = (TransformConstraintData*)data;
+    return _data->getOffsetScaleY();
+}
+
+FFI_PLUGIN_EXPORT void spine_transform_constraint_data_set_offset_scale_y(spine_transform_constraint_data data, float offsetScaleY) {
+    if (data == nullptr) return;
+    TransformConstraintData *_data = (TransformConstraintData*)data;
+    _data->setOffsetScaleY(offsetScaleY);
+}
+
+FFI_PLUGIN_EXPORT float spine_transform_constraint_data_get_offset_shear_y(spine_transform_constraint_data data) {
+    if (data == nullptr) return 0;
+    TransformConstraintData *_data = (TransformConstraintData*)data;
+    return _data->getOffsetShearY();
+}
+
+FFI_PLUGIN_EXPORT void spine_transform_constraint_data_set_offset_shear_y(spine_transform_constraint_data data, float offsetShearY) {
+    if (data == nullptr) return;
+    TransformConstraintData *_data = (TransformConstraintData*)data;
+    _data->setOffsetShearY(offsetShearY);
+}
+
+FFI_PLUGIN_EXPORT int spine_transform_constraint_data_get_is_relative(spine_transform_constraint_data data) {
+    if (data == nullptr) return 0;
+    TransformConstraintData *_data = (TransformConstraintData*)data;
+    return _data->isRelative() ? -1 : 0;
+}
+
+FFI_PLUGIN_EXPORT void spine_transform_constraint_data_set_is_relative(spine_transform_constraint_data data, int isRelative) {
+    if (data == nullptr) return;
+    TransformConstraintData *_data = (TransformConstraintData*)data;
+    _data->setRelative(isRelative);
+}
+
+FFI_PLUGIN_EXPORT int spine_transform_constraint_data_get_is_local(spine_transform_constraint_data data) {
+    if (data == nullptr) return 0;
+    TransformConstraintData *_data = (TransformConstraintData*)data;
+    return _data->isLocal() ? -1 : 0;
+}
+
+FFI_PLUGIN_EXPORT void spine_transform_constraint_data_set_is_local(spine_transform_constraint_data data, int isLocal) {
+    if (data == nullptr) return;
+    TransformConstraintData *_data = (TransformConstraintData*)data;
+    _data->setLocal(isLocal);
+}
+

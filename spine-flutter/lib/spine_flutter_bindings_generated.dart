@@ -5368,6 +5368,532 @@ class SpineFlutterBindings {
   late final _spine_ik_constraint_set_is_active =
       _spine_ik_constraint_set_is_activePtr
           .asFunction<void Function(spine_ik_constraint, int)>();
+
+  int spine_transform_constraint_data_get_num_bones(
+    spine_transform_constraint_data data,
+  ) {
+    return _spine_transform_constraint_data_get_num_bones(
+      data,
+    );
+  }
+
+  late final _spine_transform_constraint_data_get_num_bonesPtr = _lookup<
+          ffi.NativeFunction<
+              ffi.Int32 Function(spine_transform_constraint_data)>>(
+      'spine_transform_constraint_data_get_num_bones');
+  late final _spine_transform_constraint_data_get_num_bones =
+      _spine_transform_constraint_data_get_num_bonesPtr
+          .asFunction<int Function(spine_transform_constraint_data)>();
+
+  ffi.Pointer<spine_bone_data> spine_transform_constraint_data_get_bones(
+    spine_transform_constraint_data data,
+  ) {
+    return _spine_transform_constraint_data_get_bones(
+      data,
+    );
+  }
+
+  late final _spine_transform_constraint_data_get_bonesPtr = _lookup<
+          ffi.NativeFunction<
+              ffi.Pointer<spine_bone_data> Function(
+                  spine_transform_constraint_data)>>(
+      'spine_transform_constraint_data_get_bones');
+  late final _spine_transform_constraint_data_get_bones =
+      _spine_transform_constraint_data_get_bonesPtr.asFunction<
+          ffi.Pointer<spine_bone_data> Function(
+              spine_transform_constraint_data)>();
+
+  spine_bone_data spine_transform_constraint_data_get_target(
+    spine_transform_constraint_data data,
+  ) {
+    return _spine_transform_constraint_data_get_target(
+      data,
+    );
+  }
+
+  late final _spine_transform_constraint_data_get_targetPtr = _lookup<
+          ffi.NativeFunction<
+              spine_bone_data Function(spine_transform_constraint_data)>>(
+      'spine_transform_constraint_data_get_target');
+  late final _spine_transform_constraint_data_get_target =
+      _spine_transform_constraint_data_get_targetPtr.asFunction<
+          spine_bone_data Function(spine_transform_constraint_data)>();
+
+  double spine_transform_constraint_data_get_mix_rotate(
+    spine_transform_constraint_data data,
+  ) {
+    return _spine_transform_constraint_data_get_mix_rotate(
+      data,
+    );
+  }
+
+  late final _spine_transform_constraint_data_get_mix_rotatePtr = _lookup<
+          ffi.NativeFunction<
+              ffi.Float Function(spine_transform_constraint_data)>>(
+      'spine_transform_constraint_data_get_mix_rotate');
+  late final _spine_transform_constraint_data_get_mix_rotate =
+      _spine_transform_constraint_data_get_mix_rotatePtr
+          .asFunction<double Function(spine_transform_constraint_data)>();
+
+  void spine_transform_constraint_data_set_mix_rotate(
+    spine_transform_constraint_data data,
+    double mixRotate,
+  ) {
+    return _spine_transform_constraint_data_set_mix_rotate(
+      data,
+      mixRotate,
+    );
+  }
+
+  late final _spine_transform_constraint_data_set_mix_rotatePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_transform_constraint_data,
+              ffi.Float)>>('spine_transform_constraint_data_set_mix_rotate');
+  late final _spine_transform_constraint_data_set_mix_rotate =
+      _spine_transform_constraint_data_set_mix_rotatePtr
+          .asFunction<void Function(spine_transform_constraint_data, double)>();
+
+  double spine_transform_constraint_data_get_mix_x(
+    spine_transform_constraint_data data,
+  ) {
+    return _spine_transform_constraint_data_get_mix_x(
+      data,
+    );
+  }
+
+  late final _spine_transform_constraint_data_get_mix_xPtr = _lookup<
+          ffi.NativeFunction<
+              ffi.Float Function(spine_transform_constraint_data)>>(
+      'spine_transform_constraint_data_get_mix_x');
+  late final _spine_transform_constraint_data_get_mix_x =
+      _spine_transform_constraint_data_get_mix_xPtr
+          .asFunction<double Function(spine_transform_constraint_data)>();
+
+  void spine_transform_constraint_data_set_mix_x(
+    spine_transform_constraint_data data,
+    double mixX,
+  ) {
+    return _spine_transform_constraint_data_set_mix_x(
+      data,
+      mixX,
+    );
+  }
+
+  late final _spine_transform_constraint_data_set_mix_xPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_transform_constraint_data,
+              ffi.Float)>>('spine_transform_constraint_data_set_mix_x');
+  late final _spine_transform_constraint_data_set_mix_x =
+      _spine_transform_constraint_data_set_mix_xPtr
+          .asFunction<void Function(spine_transform_constraint_data, double)>();
+
+  double spine_transform_constraint_data_get_mix_y(
+    spine_transform_constraint_data data,
+  ) {
+    return _spine_transform_constraint_data_get_mix_y(
+      data,
+    );
+  }
+
+  late final _spine_transform_constraint_data_get_mix_yPtr = _lookup<
+          ffi.NativeFunction<
+              ffi.Float Function(spine_transform_constraint_data)>>(
+      'spine_transform_constraint_data_get_mix_y');
+  late final _spine_transform_constraint_data_get_mix_y =
+      _spine_transform_constraint_data_get_mix_yPtr
+          .asFunction<double Function(spine_transform_constraint_data)>();
+
+  void spine_transform_constraint_data_set_mix_y(
+    spine_transform_constraint_data data,
+    double mixY,
+  ) {
+    return _spine_transform_constraint_data_set_mix_y(
+      data,
+      mixY,
+    );
+  }
+
+  late final _spine_transform_constraint_data_set_mix_yPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_transform_constraint_data,
+              ffi.Float)>>('spine_transform_constraint_data_set_mix_y');
+  late final _spine_transform_constraint_data_set_mix_y =
+      _spine_transform_constraint_data_set_mix_yPtr
+          .asFunction<void Function(spine_transform_constraint_data, double)>();
+
+  double spine_transform_constraint_data_get_mix_scale_x(
+    spine_transform_constraint_data data,
+  ) {
+    return _spine_transform_constraint_data_get_mix_scale_x(
+      data,
+    );
+  }
+
+  late final _spine_transform_constraint_data_get_mix_scale_xPtr = _lookup<
+          ffi.NativeFunction<
+              ffi.Float Function(spine_transform_constraint_data)>>(
+      'spine_transform_constraint_data_get_mix_scale_x');
+  late final _spine_transform_constraint_data_get_mix_scale_x =
+      _spine_transform_constraint_data_get_mix_scale_xPtr
+          .asFunction<double Function(spine_transform_constraint_data)>();
+
+  void spine_transform_constraint_data_set_mix_scale_x(
+    spine_transform_constraint_data data,
+    double mixScaleX,
+  ) {
+    return _spine_transform_constraint_data_set_mix_scale_x(
+      data,
+      mixScaleX,
+    );
+  }
+
+  late final _spine_transform_constraint_data_set_mix_scale_xPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_transform_constraint_data,
+              ffi.Float)>>('spine_transform_constraint_data_set_mix_scale_x');
+  late final _spine_transform_constraint_data_set_mix_scale_x =
+      _spine_transform_constraint_data_set_mix_scale_xPtr
+          .asFunction<void Function(spine_transform_constraint_data, double)>();
+
+  double spine_transform_constraint_data_get_mix_scale_y(
+    spine_transform_constraint_data data,
+  ) {
+    return _spine_transform_constraint_data_get_mix_scale_y(
+      data,
+    );
+  }
+
+  late final _spine_transform_constraint_data_get_mix_scale_yPtr = _lookup<
+          ffi.NativeFunction<
+              ffi.Float Function(spine_transform_constraint_data)>>(
+      'spine_transform_constraint_data_get_mix_scale_y');
+  late final _spine_transform_constraint_data_get_mix_scale_y =
+      _spine_transform_constraint_data_get_mix_scale_yPtr
+          .asFunction<double Function(spine_transform_constraint_data)>();
+
+  void spine_transform_constraint_data_set_mix_scale_y(
+    spine_transform_constraint_data data,
+    double mixScaleY,
+  ) {
+    return _spine_transform_constraint_data_set_mix_scale_y(
+      data,
+      mixScaleY,
+    );
+  }
+
+  late final _spine_transform_constraint_data_set_mix_scale_yPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_transform_constraint_data,
+              ffi.Float)>>('spine_transform_constraint_data_set_mix_scale_y');
+  late final _spine_transform_constraint_data_set_mix_scale_y =
+      _spine_transform_constraint_data_set_mix_scale_yPtr
+          .asFunction<void Function(spine_transform_constraint_data, double)>();
+
+  double spine_transform_constraint_data_get_mix_shear_y(
+    spine_transform_constraint_data data,
+  ) {
+    return _spine_transform_constraint_data_get_mix_shear_y(
+      data,
+    );
+  }
+
+  late final _spine_transform_constraint_data_get_mix_shear_yPtr = _lookup<
+          ffi.NativeFunction<
+              ffi.Float Function(spine_transform_constraint_data)>>(
+      'spine_transform_constraint_data_get_mix_shear_y');
+  late final _spine_transform_constraint_data_get_mix_shear_y =
+      _spine_transform_constraint_data_get_mix_shear_yPtr
+          .asFunction<double Function(spine_transform_constraint_data)>();
+
+  void spine_transform_constraint_data_set_mix_shear_y(
+    spine_transform_constraint_data data,
+    double mixShearY,
+  ) {
+    return _spine_transform_constraint_data_set_mix_shear_y(
+      data,
+      mixShearY,
+    );
+  }
+
+  late final _spine_transform_constraint_data_set_mix_shear_yPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_transform_constraint_data,
+              ffi.Float)>>('spine_transform_constraint_data_set_mix_shear_y');
+  late final _spine_transform_constraint_data_set_mix_shear_y =
+      _spine_transform_constraint_data_set_mix_shear_yPtr
+          .asFunction<void Function(spine_transform_constraint_data, double)>();
+
+  double spine_transform_constraint_data_get_offset_rotation(
+    spine_transform_constraint_data data,
+  ) {
+    return _spine_transform_constraint_data_get_offset_rotation(
+      data,
+    );
+  }
+
+  late final _spine_transform_constraint_data_get_offset_rotationPtr = _lookup<
+          ffi.NativeFunction<
+              ffi.Float Function(spine_transform_constraint_data)>>(
+      'spine_transform_constraint_data_get_offset_rotation');
+  late final _spine_transform_constraint_data_get_offset_rotation =
+      _spine_transform_constraint_data_get_offset_rotationPtr
+          .asFunction<double Function(spine_transform_constraint_data)>();
+
+  void spine_transform_constraint_data_set_offset_rotation(
+    spine_transform_constraint_data data,
+    double offsetRotation,
+  ) {
+    return _spine_transform_constraint_data_set_offset_rotation(
+      data,
+      offsetRotation,
+    );
+  }
+
+  late final _spine_transform_constraint_data_set_offset_rotationPtr = _lookup<
+          ffi.NativeFunction<
+              ffi.Void Function(spine_transform_constraint_data, ffi.Float)>>(
+      'spine_transform_constraint_data_set_offset_rotation');
+  late final _spine_transform_constraint_data_set_offset_rotation =
+      _spine_transform_constraint_data_set_offset_rotationPtr
+          .asFunction<void Function(spine_transform_constraint_data, double)>();
+
+  double spine_transform_constraint_data_get_offset_x(
+    spine_transform_constraint_data data,
+  ) {
+    return _spine_transform_constraint_data_get_offset_x(
+      data,
+    );
+  }
+
+  late final _spine_transform_constraint_data_get_offset_xPtr = _lookup<
+          ffi.NativeFunction<
+              ffi.Float Function(spine_transform_constraint_data)>>(
+      'spine_transform_constraint_data_get_offset_x');
+  late final _spine_transform_constraint_data_get_offset_x =
+      _spine_transform_constraint_data_get_offset_xPtr
+          .asFunction<double Function(spine_transform_constraint_data)>();
+
+  void spine_transform_constraint_data_set_offset_x(
+    spine_transform_constraint_data data,
+    double offsetX,
+  ) {
+    return _spine_transform_constraint_data_set_offset_x(
+      data,
+      offsetX,
+    );
+  }
+
+  late final _spine_transform_constraint_data_set_offset_xPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_transform_constraint_data,
+              ffi.Float)>>('spine_transform_constraint_data_set_offset_x');
+  late final _spine_transform_constraint_data_set_offset_x =
+      _spine_transform_constraint_data_set_offset_xPtr
+          .asFunction<void Function(spine_transform_constraint_data, double)>();
+
+  double spine_transform_constraint_data_get_offset_y(
+    spine_transform_constraint_data data,
+  ) {
+    return _spine_transform_constraint_data_get_offset_y(
+      data,
+    );
+  }
+
+  late final _spine_transform_constraint_data_get_offset_yPtr = _lookup<
+          ffi.NativeFunction<
+              ffi.Float Function(spine_transform_constraint_data)>>(
+      'spine_transform_constraint_data_get_offset_y');
+  late final _spine_transform_constraint_data_get_offset_y =
+      _spine_transform_constraint_data_get_offset_yPtr
+          .asFunction<double Function(spine_transform_constraint_data)>();
+
+  void spine_transform_constraint_data_set_offset_y(
+    spine_transform_constraint_data data,
+    double offsetY,
+  ) {
+    return _spine_transform_constraint_data_set_offset_y(
+      data,
+      offsetY,
+    );
+  }
+
+  late final _spine_transform_constraint_data_set_offset_yPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_transform_constraint_data,
+              ffi.Float)>>('spine_transform_constraint_data_set_offset_y');
+  late final _spine_transform_constraint_data_set_offset_y =
+      _spine_transform_constraint_data_set_offset_yPtr
+          .asFunction<void Function(spine_transform_constraint_data, double)>();
+
+  double spine_transform_constraint_data_get_offset_scale_x(
+    spine_transform_constraint_data data,
+  ) {
+    return _spine_transform_constraint_data_get_offset_scale_x(
+      data,
+    );
+  }
+
+  late final _spine_transform_constraint_data_get_offset_scale_xPtr = _lookup<
+          ffi.NativeFunction<
+              ffi.Float Function(spine_transform_constraint_data)>>(
+      'spine_transform_constraint_data_get_offset_scale_x');
+  late final _spine_transform_constraint_data_get_offset_scale_x =
+      _spine_transform_constraint_data_get_offset_scale_xPtr
+          .asFunction<double Function(spine_transform_constraint_data)>();
+
+  void spine_transform_constraint_data_set_offset_scale_x(
+    spine_transform_constraint_data data,
+    double offsetScaleX,
+  ) {
+    return _spine_transform_constraint_data_set_offset_scale_x(
+      data,
+      offsetScaleX,
+    );
+  }
+
+  late final _spine_transform_constraint_data_set_offset_scale_xPtr = _lookup<
+          ffi.NativeFunction<
+              ffi.Void Function(spine_transform_constraint_data, ffi.Float)>>(
+      'spine_transform_constraint_data_set_offset_scale_x');
+  late final _spine_transform_constraint_data_set_offset_scale_x =
+      _spine_transform_constraint_data_set_offset_scale_xPtr
+          .asFunction<void Function(spine_transform_constraint_data, double)>();
+
+  double spine_transform_constraint_data_get_offset_scale_y(
+    spine_transform_constraint_data data,
+  ) {
+    return _spine_transform_constraint_data_get_offset_scale_y(
+      data,
+    );
+  }
+
+  late final _spine_transform_constraint_data_get_offset_scale_yPtr = _lookup<
+          ffi.NativeFunction<
+              ffi.Float Function(spine_transform_constraint_data)>>(
+      'spine_transform_constraint_data_get_offset_scale_y');
+  late final _spine_transform_constraint_data_get_offset_scale_y =
+      _spine_transform_constraint_data_get_offset_scale_yPtr
+          .asFunction<double Function(spine_transform_constraint_data)>();
+
+  void spine_transform_constraint_data_set_offset_scale_y(
+    spine_transform_constraint_data data,
+    double offsetScaleY,
+  ) {
+    return _spine_transform_constraint_data_set_offset_scale_y(
+      data,
+      offsetScaleY,
+    );
+  }
+
+  late final _spine_transform_constraint_data_set_offset_scale_yPtr = _lookup<
+          ffi.NativeFunction<
+              ffi.Void Function(spine_transform_constraint_data, ffi.Float)>>(
+      'spine_transform_constraint_data_set_offset_scale_y');
+  late final _spine_transform_constraint_data_set_offset_scale_y =
+      _spine_transform_constraint_data_set_offset_scale_yPtr
+          .asFunction<void Function(spine_transform_constraint_data, double)>();
+
+  double spine_transform_constraint_data_get_offset_shear_y(
+    spine_transform_constraint_data data,
+  ) {
+    return _spine_transform_constraint_data_get_offset_shear_y(
+      data,
+    );
+  }
+
+  late final _spine_transform_constraint_data_get_offset_shear_yPtr = _lookup<
+          ffi.NativeFunction<
+              ffi.Float Function(spine_transform_constraint_data)>>(
+      'spine_transform_constraint_data_get_offset_shear_y');
+  late final _spine_transform_constraint_data_get_offset_shear_y =
+      _spine_transform_constraint_data_get_offset_shear_yPtr
+          .asFunction<double Function(spine_transform_constraint_data)>();
+
+  void spine_transform_constraint_data_set_offset_shear_y(
+    spine_transform_constraint_data data,
+    double offsetShearY,
+  ) {
+    return _spine_transform_constraint_data_set_offset_shear_y(
+      data,
+      offsetShearY,
+    );
+  }
+
+  late final _spine_transform_constraint_data_set_offset_shear_yPtr = _lookup<
+          ffi.NativeFunction<
+              ffi.Void Function(spine_transform_constraint_data, ffi.Float)>>(
+      'spine_transform_constraint_data_set_offset_shear_y');
+  late final _spine_transform_constraint_data_set_offset_shear_y =
+      _spine_transform_constraint_data_set_offset_shear_yPtr
+          .asFunction<void Function(spine_transform_constraint_data, double)>();
+
+  int spine_transform_constraint_data_get_is_relative(
+    spine_transform_constraint_data data,
+  ) {
+    return _spine_transform_constraint_data_get_is_relative(
+      data,
+    );
+  }
+
+  late final _spine_transform_constraint_data_get_is_relativePtr = _lookup<
+          ffi.NativeFunction<
+              ffi.Int32 Function(spine_transform_constraint_data)>>(
+      'spine_transform_constraint_data_get_is_relative');
+  late final _spine_transform_constraint_data_get_is_relative =
+      _spine_transform_constraint_data_get_is_relativePtr
+          .asFunction<int Function(spine_transform_constraint_data)>();
+
+  void spine_transform_constraint_data_set_is_relative(
+    spine_transform_constraint_data data,
+    int isRelative,
+  ) {
+    return _spine_transform_constraint_data_set_is_relative(
+      data,
+      isRelative,
+    );
+  }
+
+  late final _spine_transform_constraint_data_set_is_relativePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_transform_constraint_data,
+              ffi.Int32)>>('spine_transform_constraint_data_set_is_relative');
+  late final _spine_transform_constraint_data_set_is_relative =
+      _spine_transform_constraint_data_set_is_relativePtr
+          .asFunction<void Function(spine_transform_constraint_data, int)>();
+
+  int spine_transform_constraint_data_get_is_local(
+    spine_transform_constraint_data data,
+  ) {
+    return _spine_transform_constraint_data_get_is_local(
+      data,
+    );
+  }
+
+  late final _spine_transform_constraint_data_get_is_localPtr = _lookup<
+          ffi.NativeFunction<
+              ffi.Int32 Function(spine_transform_constraint_data)>>(
+      'spine_transform_constraint_data_get_is_local');
+  late final _spine_transform_constraint_data_get_is_local =
+      _spine_transform_constraint_data_get_is_localPtr
+          .asFunction<int Function(spine_transform_constraint_data)>();
+
+  void spine_transform_constraint_data_set_is_local(
+    spine_transform_constraint_data data,
+    int isLocal,
+  ) {
+    return _spine_transform_constraint_data_set_is_local(
+      data,
+      isLocal,
+    );
+  }
+
+  late final _spine_transform_constraint_data_set_is_localPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_transform_constraint_data,
+              ffi.Int32)>>('spine_transform_constraint_data_set_is_local');
+  late final _spine_transform_constraint_data_set_is_local =
+      _spine_transform_constraint_data_set_is_localPtr
+          .asFunction<void Function(spine_transform_constraint_data, int)>();
 }
 
 class spine_atlas extends ffi.Struct {
