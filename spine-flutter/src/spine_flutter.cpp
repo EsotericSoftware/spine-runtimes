@@ -2185,3 +2185,117 @@ FFI_PLUGIN_EXPORT void spine_ik_constraint_data_set_softness(spine_ik_constraint
     _data->setSoftness(softness);
 }
 
+// IKConstraint
+FFI_PLUGIN_EXPORT void spine_ik_constraint_update(spine_ik_constraint constraint) {
+    if (constraint == nullptr) return;
+    IkConstraint *_constraint = (IkConstraint*)constraint;
+    _constraint->update();
+}
+
+FFI_PLUGIN_EXPORT int spine_ik_constraint_get_order(spine_ik_constraint constraint) {
+    if (constraint == nullptr) return 0;
+    IkConstraint *_constraint = (IkConstraint*)constraint;
+    return _constraint->getOrder();
+}
+
+FFI_PLUGIN_EXPORT spine_ik_constraint_data spine_ik_constraint_get_data(spine_ik_constraint constraint) {
+    if (constraint == nullptr) return nullptr;
+    IkConstraint *_constraint = (IkConstraint*)constraint;
+    return (spine_ik_constraint_data)&_constraint->getData();
+}
+
+FFI_PLUGIN_EXPORT int spine_ik_constraint_get_num_bones(spine_ik_constraint constraint) {
+    if (constraint == nullptr) return 0;
+    IkConstraint *_constraint = (IkConstraint*)constraint;
+    return (int)_constraint->getBones().size();
+}
+
+FFI_PLUGIN_EXPORT spine_bone* spine_ik_constraint_get_bones(spine_ik_constraint constraint) {
+    if (constraint == nullptr) return nullptr;
+    IkConstraint *_constraint = (IkConstraint*)constraint;
+    return (spine_bone*)_constraint->getBones().buffer();
+}
+
+FFI_PLUGIN_EXPORT spine_bone spine_ik_constraint_get_target(spine_ik_constraint constraint) {
+    if (constraint == nullptr) return nullptr;
+    IkConstraint *_constraint = (IkConstraint*)constraint;
+    return (spine_bone)_constraint->getTarget();
+}
+
+FFI_PLUGIN_EXPORT void spine_ik_constraint_set_target(spine_ik_constraint constraint, spine_bone target) {
+    if (constraint == nullptr) return;
+    IkConstraint *_constraint = (IkConstraint*)constraint;
+    _constraint->setTarget((Bone*)target);
+}
+
+FFI_PLUGIN_EXPORT int spine_ik_constraint_get_bend_direction(spine_ik_constraint constraint) {
+    if (constraint == nullptr) return 1;
+    IkConstraint *_constraint = (IkConstraint*)constraint;
+    return _constraint->getBendDirection();
+}
+
+FFI_PLUGIN_EXPORT void spine_ik_constraint_set_bend_direction(spine_ik_constraint constraint, int bendDirection) {
+    if (constraint == nullptr) return;
+    IkConstraint *_constraint = (IkConstraint*)constraint;
+    _constraint->setBendDirection(bendDirection);
+}
+
+FFI_PLUGIN_EXPORT int spine_ik_constraint_get_compress(spine_ik_constraint constraint) {
+    if (constraint == nullptr) return 0;
+    IkConstraint *_constraint = (IkConstraint*)constraint;
+    return _constraint->getCompress() ? -1 : 0;
+}
+
+FFI_PLUGIN_EXPORT void spine_ik_constraint_set_compress(spine_ik_constraint constraint, int compress) {
+    if (constraint == nullptr) return;
+    IkConstraint *_constraint = (IkConstraint*)constraint;
+    _constraint->setCompress(compress);
+}
+
+FFI_PLUGIN_EXPORT int spine_ik_constraint_get_stretch(spine_ik_constraint constraint) {
+    if (constraint == nullptr) return 0;
+    IkConstraint *_constraint = (IkConstraint*)constraint;
+    return _constraint->getStretch() ? -1 : 0;
+}
+
+FFI_PLUGIN_EXPORT void spine_ik_constraint_set_stretch(spine_ik_constraint constraint, int stretch) {
+    if (constraint == nullptr) return;
+    IkConstraint *_constraint = (IkConstraint*)constraint;
+    _constraint->setStretch(stretch);
+}
+
+FFI_PLUGIN_EXPORT float spine_ik_constraint_get_mix(spine_ik_constraint constraint) {
+    if (constraint == nullptr) return 0;
+    IkConstraint *_constraint = (IkConstraint*)constraint;
+    return _constraint->getMix();
+}
+
+FFI_PLUGIN_EXPORT void spine_ik_constraint_set_mix(spine_ik_constraint constraint, float mix) {
+    if (constraint == nullptr) return;
+    IkConstraint *_constraint = (IkConstraint*)constraint;
+    _constraint->setMix(mix);
+}
+
+FFI_PLUGIN_EXPORT float spine_ik_constraint_get_softness(spine_ik_constraint constraint) {
+    if (constraint == nullptr) return 0;
+    IkConstraint *_constraint = (IkConstraint*)constraint;
+    return _constraint->getSoftness();
+}
+
+FFI_PLUGIN_EXPORT void spine_ik_constraint_set_softness(spine_ik_constraint constraint, float softness) {
+    if (constraint == nullptr) return;
+    IkConstraint *_constraint = (IkConstraint*)constraint;
+    _constraint->setSoftness(softness);
+}
+
+FFI_PLUGIN_EXPORT int spine_ik_constraint_get_is_active(spine_ik_constraint constraint) {
+    if (constraint == nullptr) return 0;
+    IkConstraint *_constraint = (IkConstraint*)constraint;
+    return _constraint->isActive() ? -1 : 0;
+}
+
+FFI_PLUGIN_EXPORT void spine_ik_constraint_set_is_active(spine_ik_constraint constraint, int isActive) {
+    if (constraint == nullptr) return;
+    IkConstraint *_constraint = (IkConstraint*)constraint;
+    _constraint->setActive(isActive);
+}

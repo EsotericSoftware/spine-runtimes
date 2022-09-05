@@ -5066,6 +5066,308 @@ class SpineFlutterBindings {
   late final _spine_ik_constraint_data_set_softness =
       _spine_ik_constraint_data_set_softnessPtr
           .asFunction<void Function(spine_ik_constraint_data, double)>();
+
+  void spine_ik_constraint_update(
+    spine_ik_constraint constraint,
+  ) {
+    return _spine_ik_constraint_update(
+      constraint,
+    );
+  }
+
+  late final _spine_ik_constraint_updatePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_ik_constraint)>>(
+          'spine_ik_constraint_update');
+  late final _spine_ik_constraint_update = _spine_ik_constraint_updatePtr
+      .asFunction<void Function(spine_ik_constraint)>();
+
+  int spine_ik_constraint_get_order(
+    spine_ik_constraint constraint,
+  ) {
+    return _spine_ik_constraint_get_order(
+      constraint,
+    );
+  }
+
+  late final _spine_ik_constraint_get_orderPtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_ik_constraint)>>(
+          'spine_ik_constraint_get_order');
+  late final _spine_ik_constraint_get_order = _spine_ik_constraint_get_orderPtr
+      .asFunction<int Function(spine_ik_constraint)>();
+
+  spine_ik_constraint_data spine_ik_constraint_get_data(
+    spine_ik_constraint constraint,
+  ) {
+    return _spine_ik_constraint_get_data(
+      constraint,
+    );
+  }
+
+  late final _spine_ik_constraint_get_dataPtr = _lookup<
+      ffi.NativeFunction<
+          spine_ik_constraint_data Function(
+              spine_ik_constraint)>>('spine_ik_constraint_get_data');
+  late final _spine_ik_constraint_get_data = _spine_ik_constraint_get_dataPtr
+      .asFunction<spine_ik_constraint_data Function(spine_ik_constraint)>();
+
+  int spine_ik_constraint_get_num_bones(
+    spine_ik_constraint constraint,
+  ) {
+    return _spine_ik_constraint_get_num_bones(
+      constraint,
+    );
+  }
+
+  late final _spine_ik_constraint_get_num_bonesPtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_ik_constraint)>>(
+          'spine_ik_constraint_get_num_bones');
+  late final _spine_ik_constraint_get_num_bones =
+      _spine_ik_constraint_get_num_bonesPtr
+          .asFunction<int Function(spine_ik_constraint)>();
+
+  ffi.Pointer<spine_bone> spine_ik_constraint_get_bones(
+    spine_ik_constraint constraint,
+  ) {
+    return _spine_ik_constraint_get_bones(
+      constraint,
+    );
+  }
+
+  late final _spine_ik_constraint_get_bonesPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<spine_bone> Function(
+              spine_ik_constraint)>>('spine_ik_constraint_get_bones');
+  late final _spine_ik_constraint_get_bones = _spine_ik_constraint_get_bonesPtr
+      .asFunction<ffi.Pointer<spine_bone> Function(spine_ik_constraint)>();
+
+  spine_bone spine_ik_constraint_get_target(
+    spine_ik_constraint constraint,
+  ) {
+    return _spine_ik_constraint_get_target(
+      constraint,
+    );
+  }
+
+  late final _spine_ik_constraint_get_targetPtr =
+      _lookup<ffi.NativeFunction<spine_bone Function(spine_ik_constraint)>>(
+          'spine_ik_constraint_get_target');
+  late final _spine_ik_constraint_get_target =
+      _spine_ik_constraint_get_targetPtr
+          .asFunction<spine_bone Function(spine_ik_constraint)>();
+
+  void spine_ik_constraint_set_target(
+    spine_ik_constraint constraint,
+    spine_bone target,
+  ) {
+    return _spine_ik_constraint_set_target(
+      constraint,
+      target,
+    );
+  }
+
+  late final _spine_ik_constraint_set_targetPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_ik_constraint,
+              spine_bone)>>('spine_ik_constraint_set_target');
+  late final _spine_ik_constraint_set_target =
+      _spine_ik_constraint_set_targetPtr
+          .asFunction<void Function(spine_ik_constraint, spine_bone)>();
+
+  int spine_ik_constraint_get_bend_direction(
+    spine_ik_constraint constraint,
+  ) {
+    return _spine_ik_constraint_get_bend_direction(
+      constraint,
+    );
+  }
+
+  late final _spine_ik_constraint_get_bend_directionPtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_ik_constraint)>>(
+          'spine_ik_constraint_get_bend_direction');
+  late final _spine_ik_constraint_get_bend_direction =
+      _spine_ik_constraint_get_bend_directionPtr
+          .asFunction<int Function(spine_ik_constraint)>();
+
+  void spine_ik_constraint_set_bend_direction(
+    spine_ik_constraint constraint,
+    int bendDirection,
+  ) {
+    return _spine_ik_constraint_set_bend_direction(
+      constraint,
+      bendDirection,
+    );
+  }
+
+  late final _spine_ik_constraint_set_bend_directionPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_ik_constraint,
+              ffi.Int32)>>('spine_ik_constraint_set_bend_direction');
+  late final _spine_ik_constraint_set_bend_direction =
+      _spine_ik_constraint_set_bend_directionPtr
+          .asFunction<void Function(spine_ik_constraint, int)>();
+
+  int spine_ik_constraint_get_compress(
+    spine_ik_constraint constraint,
+  ) {
+    return _spine_ik_constraint_get_compress(
+      constraint,
+    );
+  }
+
+  late final _spine_ik_constraint_get_compressPtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_ik_constraint)>>(
+          'spine_ik_constraint_get_compress');
+  late final _spine_ik_constraint_get_compress =
+      _spine_ik_constraint_get_compressPtr
+          .asFunction<int Function(spine_ik_constraint)>();
+
+  void spine_ik_constraint_set_compress(
+    spine_ik_constraint constraint,
+    int compress,
+  ) {
+    return _spine_ik_constraint_set_compress(
+      constraint,
+      compress,
+    );
+  }
+
+  late final _spine_ik_constraint_set_compressPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_ik_constraint,
+              ffi.Int32)>>('spine_ik_constraint_set_compress');
+  late final _spine_ik_constraint_set_compress =
+      _spine_ik_constraint_set_compressPtr
+          .asFunction<void Function(spine_ik_constraint, int)>();
+
+  int spine_ik_constraint_get_stretch(
+    spine_ik_constraint constraint,
+  ) {
+    return _spine_ik_constraint_get_stretch(
+      constraint,
+    );
+  }
+
+  late final _spine_ik_constraint_get_stretchPtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_ik_constraint)>>(
+          'spine_ik_constraint_get_stretch');
+  late final _spine_ik_constraint_get_stretch =
+      _spine_ik_constraint_get_stretchPtr
+          .asFunction<int Function(spine_ik_constraint)>();
+
+  void spine_ik_constraint_set_stretch(
+    spine_ik_constraint constraint,
+    int stretch,
+  ) {
+    return _spine_ik_constraint_set_stretch(
+      constraint,
+      stretch,
+    );
+  }
+
+  late final _spine_ik_constraint_set_stretchPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_ik_constraint,
+              ffi.Int32)>>('spine_ik_constraint_set_stretch');
+  late final _spine_ik_constraint_set_stretch =
+      _spine_ik_constraint_set_stretchPtr
+          .asFunction<void Function(spine_ik_constraint, int)>();
+
+  double spine_ik_constraint_get_mix(
+    spine_ik_constraint constraint,
+  ) {
+    return _spine_ik_constraint_get_mix(
+      constraint,
+    );
+  }
+
+  late final _spine_ik_constraint_get_mixPtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_ik_constraint)>>(
+          'spine_ik_constraint_get_mix');
+  late final _spine_ik_constraint_get_mix = _spine_ik_constraint_get_mixPtr
+      .asFunction<double Function(spine_ik_constraint)>();
+
+  void spine_ik_constraint_set_mix(
+    spine_ik_constraint constraint,
+    double mix,
+  ) {
+    return _spine_ik_constraint_set_mix(
+      constraint,
+      mix,
+    );
+  }
+
+  late final _spine_ik_constraint_set_mixPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(
+              spine_ik_constraint, ffi.Float)>>('spine_ik_constraint_set_mix');
+  late final _spine_ik_constraint_set_mix = _spine_ik_constraint_set_mixPtr
+      .asFunction<void Function(spine_ik_constraint, double)>();
+
+  double spine_ik_constraint_get_softness(
+    spine_ik_constraint constraint,
+  ) {
+    return _spine_ik_constraint_get_softness(
+      constraint,
+    );
+  }
+
+  late final _spine_ik_constraint_get_softnessPtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_ik_constraint)>>(
+          'spine_ik_constraint_get_softness');
+  late final _spine_ik_constraint_get_softness =
+      _spine_ik_constraint_get_softnessPtr
+          .asFunction<double Function(spine_ik_constraint)>();
+
+  void spine_ik_constraint_set_softness(
+    spine_ik_constraint constraint,
+    double softness,
+  ) {
+    return _spine_ik_constraint_set_softness(
+      constraint,
+      softness,
+    );
+  }
+
+  late final _spine_ik_constraint_set_softnessPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_ik_constraint,
+              ffi.Float)>>('spine_ik_constraint_set_softness');
+  late final _spine_ik_constraint_set_softness =
+      _spine_ik_constraint_set_softnessPtr
+          .asFunction<void Function(spine_ik_constraint, double)>();
+
+  int spine_ik_constraint_get_is_active(
+    spine_ik_constraint constraint,
+  ) {
+    return _spine_ik_constraint_get_is_active(
+      constraint,
+    );
+  }
+
+  late final _spine_ik_constraint_get_is_activePtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_ik_constraint)>>(
+          'spine_ik_constraint_get_is_active');
+  late final _spine_ik_constraint_get_is_active =
+      _spine_ik_constraint_get_is_activePtr
+          .asFunction<int Function(spine_ik_constraint)>();
+
+  void spine_ik_constraint_set_is_active(
+    spine_ik_constraint constraint,
+    int isActive,
+  ) {
+    return _spine_ik_constraint_set_is_active(
+      constraint,
+      isActive,
+    );
+  }
+
+  late final _spine_ik_constraint_set_is_activePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_ik_constraint,
+              ffi.Int32)>>('spine_ik_constraint_set_is_active');
+  late final _spine_ik_constraint_set_is_active =
+      _spine_ik_constraint_set_is_activePtr
+          .asFunction<void Function(spine_ik_constraint, int)>();
 }
 
 class spine_atlas extends ffi.Struct {

@@ -1080,7 +1080,7 @@ class IkConstraintData extends ConstraintData {
   }
 
   bool getCompress() {
-    return _bindings.spine_ik_constraint_data_get_compress(_data) == -1 ? true : false;
+    return _bindings.spine_ik_constraint_data_get_compress(_data) == -1;
   }
 
   void setCompress(bool compress) {
@@ -1088,7 +1088,7 @@ class IkConstraintData extends ConstraintData {
   }
 
   bool getStretch() {
-    return _bindings.spine_ik_constraint_data_get_stretch(_data) == -1 ? true : false;
+    return _bindings.spine_ik_constraint_data_get_stretch(_data) == -1;
   }
 
   void setStretch(bool stretch) {
@@ -1096,7 +1096,7 @@ class IkConstraintData extends ConstraintData {
   }
 
   bool getUniform() {
-    return _bindings.spine_ik_constraint_data_get_uniform(_data) == -1 ? true : false;
+    return _bindings.spine_ik_constraint_data_get_uniform(_data) == -1;
   }
 
   void setUniform(bool uniform) {
@@ -1120,11 +1120,88 @@ class IkConstraintData extends ConstraintData {
   }
 }
 
-// FIXME
 class IkConstraint {
   final spine_ik_constraint _constraint;
 
   IkConstraint._(this._constraint);
+
+  void update() {
+    _bindings.spine_ik_constraint_update(_constraint);
+  }
+
+  int getOrder() {
+    return _bindings.spine_ik_constraint_get_order(_constraint);
+  }
+
+  IkConstraintData getData() {
+    return IkConstraintData._(_bindings.spine_ik_constraint_get_data(_constraint));
+  }
+
+  List<Bone> getBones() {
+    List<Bone> result = [];
+    final num = _bindings.spine_ik_constraint_get_num_bones(_constraint);
+    final nativeBones = _bindings.spine_ik_constraint_get_bones(_constraint);
+    for (int i = 0; i < num; i++) {
+      result.add(Bone._(nativeBones[i]));
+    }
+    return result;
+  }
+
+  Bone getTarget() {
+    return Bone._(_bindings.spine_ik_constraint_get_target(_constraint));
+  }
+
+  void setTarget(Bone target) {
+    _bindings.spine_ik_constraint_set_target(_constraint, target._bone);
+  }
+
+  int getBendDirection() {
+    return _bindings.spine_ik_constraint_get_bend_direction(_constraint);
+  }
+
+  void setBendDirection(int bendDirection) {
+    _bindings.spine_ik_constraint_set_bend_direction(_constraint, bendDirection);
+  }
+
+  bool getCompress() {
+    return _bindings.spine_ik_constraint_get_compress(_constraint) == -1;
+  }
+
+  void setCompress(bool compress) {
+    _bindings.spine_ik_constraint_set_compress(_constraint, compress ? -1 : 0);
+  }
+
+  bool getStretch() {
+    return _bindings.spine_ik_constraint_get_stretch(_constraint) == -1;
+  }
+
+  void setStretch(bool stretch) {
+    _bindings.spine_ik_constraint_set_stretch(_constraint, stretch ? -1 : 0);
+  }
+
+  double getMix() {
+    return _bindings.spine_ik_constraint_get_mix(_constraint);
+  }
+
+  void setMix(double mix) {
+    _bindings.spine_ik_constraint_set_mix(_constraint, mix);
+  }
+
+  double getSoftness() {
+    return _bindings.spine_ik_constraint_get_softness(_constraint);
+  }
+
+  void setSoftness(double softness) {
+    _bindings.spine_ik_constraint_set_softness(_constraint, softness);
+  }
+
+  bool isActive() {
+    return _bindings.spine_ik_constraint_get_is_active(_constraint) == -1;
+  }
+
+  void setIsActive(bool isActive) {
+    _bindings.spine_ik_constraint_set_is_active(_constraint, isActive ? -1 : 0);
+  }
 }
 
 // FIXME
