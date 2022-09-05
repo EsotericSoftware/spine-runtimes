@@ -2048,7 +2048,7 @@ FFI_PLUGIN_EXPORT void spine_skin_entries_dispose(spine_skin_entries *entries) {
 FFI_PLUGIN_EXPORT int spine_skin_get_num_bones(spine_skin skin) {
     if (skin == nullptr) return 0;
     Skin *_skin = (Skin*)skin;
-    return _skin->getBones().size();
+    return (int)_skin->getBones().size();
 }
 
 FFI_PLUGIN_EXPORT spine_bone_data* spine_skin_get_bones(spine_skin skin) {
@@ -2060,7 +2060,7 @@ FFI_PLUGIN_EXPORT spine_bone_data* spine_skin_get_bones(spine_skin skin) {
 FFI_PLUGIN_EXPORT int spine_skin_get_num_constraints(spine_skin skin) {
     if (skin == nullptr) return 0;
     Skin *_skin = (Skin*)skin;
-    return _skin->getConstraints().size();
+    return (int)_skin->getConstraints().size();
 }
 
 FFI_PLUGIN_EXPORT spine_constraint_data* spine_skin_get_constraints(spine_skin skin) {
@@ -2093,3 +2093,95 @@ FFI_PLUGIN_EXPORT spine_constraint_type spine_constraint_data_get_type(spine_con
         return SPINE_CONSTRAINT_IK;
     }
 }
+
+// IkConstraintData
+FFI_PLUGIN_EXPORT int spine_ik_constraint_data_get_num_bones(spine_ik_constraint_data data) {
+    if (data == nullptr) return 0;
+    IkConstraintData *_data = (IkConstraintData*)data;
+    return (int)_data->getBones().size();
+}
+
+FFI_PLUGIN_EXPORT spine_bone_data* spine_ik_constraint_data_get_bones(spine_ik_constraint_data data) {
+    if (data == nullptr) return nullptr;
+    IkConstraintData *_data = (IkConstraintData*)data;
+    return (spine_bone_data*)_data->getBones().buffer();
+}
+
+FFI_PLUGIN_EXPORT spine_bone_data spine_ik_constraint_data_get_target(spine_ik_constraint_data data) {
+    if (data == nullptr) return nullptr;
+    IkConstraintData *_data = (IkConstraintData*)data;
+    return _data->getTarget();
+}
+
+FFI_PLUGIN_EXPORT void spine_ik_constraint_data_set_target(spine_ik_constraint_data data, spine_bone_data target) {
+    if (data == nullptr) return;
+    IkConstraintData *_data = (IkConstraintData*)data;
+    _data->setTarget((BoneData*)target);
+}
+
+FFI_PLUGIN_EXPORT int spine_ik_constraint_data_get_bend_direction(spine_ik_constraint_data data) {
+    if (data == nullptr) return 1;
+    IkConstraintData *_data = (IkConstraintData*)data;
+    return _data->getBendDirection();
+}
+
+FFI_PLUGIN_EXPORT void spine_ik_constraint_data_set_bend_direction(spine_ik_constraint_data data, int bendDirection) {
+    if (data == nullptr) return;
+    IkConstraintData *_data = (IkConstraintData*)data;
+    _data->setBendDirection(bendDirection);
+}
+
+FFI_PLUGIN_EXPORT int spine_ik_constraint_data_get_compress(spine_ik_constraint_data data) {
+    if (data == nullptr) return 0;
+    IkConstraintData *_data = (IkConstraintData*)data;
+    return _data->getCompress() ? -1 : 0;
+}
+
+FFI_PLUGIN_EXPORT void spine_ik_constraint_data_set_compress(spine_ik_constraint_data data, int compress) {
+    if (data == nullptr) return;
+    IkConstraintData *_data = (IkConstraintData*)data;
+    _data->setCompress(compress);
+}
+
+FFI_PLUGIN_EXPORT int spine_ik_constraint_data_get_stretch(spine_ik_constraint_data data) {
+    if (data == nullptr) return 0;
+    IkConstraintData *_data = (IkConstraintData*)data;
+    return _data->getStretch() ? -1 : 0;
+}
+
+FFI_PLUGIN_EXPORT void spine_ik_constraint_data_set_stretch(spine_ik_constraint_data data, int stretch) {
+    if (data == nullptr) return;
+    IkConstraintData *_data = (IkConstraintData*)data;
+    _data->setStretch(stretch);
+}
+
+FFI_PLUGIN_EXPORT int spine_ik_constraint_data_get_uniform(spine_ik_constraint_data data) {
+    if (data == nullptr) return 0;
+    IkConstraintData *_data = (IkConstraintData*)data;
+    return _data->getUniform() ? -1 : 0;
+}
+
+FFI_PLUGIN_EXPORT float spine_ik_constraint_data_get_mix(spine_ik_constraint_data data) {
+    if (data == nullptr) return 0;
+    IkConstraintData *_data = (IkConstraintData*)data;
+    return _data->getMix();
+}
+
+FFI_PLUGIN_EXPORT void spine_ik_constraint_data_set_mix(spine_ik_constraint_data data, float mix) {
+    if (data == nullptr) return;
+    IkConstraintData *_data = (IkConstraintData*)data;
+    _data->setMix(mix);
+}
+
+FFI_PLUGIN_EXPORT float spine_ik_constraint_data_get_softness(spine_ik_constraint_data data) {
+    if (data == nullptr) return 0;
+    IkConstraintData *_data = (IkConstraintData*)data;
+    return _data->getSoftness();
+}
+
+FFI_PLUGIN_EXPORT void spine_ik_constraint_data_set_softness(spine_ik_constraint_data data, float softness) {
+    if (data == nullptr) return;
+    IkConstraintData *_data = (IkConstraintData*)data;
+    _data->setSoftness(softness);
+}
+

@@ -1044,16 +1044,80 @@ class Skin {
   }
 }
 
-// FIXME
 class ConstraintData {
   final spine_constraint_data _data;
 
   ConstraintData._(this._data);
 }
 
-// FIXME
 class IkConstraintData extends ConstraintData {
   IkConstraintData._(spine_ik_constraint_data data): super._(data);
+
+  List<BoneData> getBones() {
+    final List<BoneData> result = [];
+    final numBones = _bindings.spine_ik_constraint_data_get_num_bones(_data);
+    final nativeBones = _bindings.spine_ik_constraint_data_get_bones(_data);
+    for (int i = 0; i < numBones; i++) {
+      result.add(BoneData._(nativeBones[i]));
+    }
+    return result;
+  }
+
+  BoneData getTarget() {
+    return BoneData._(_bindings.spine_ik_constraint_data_get_target(_data));
+  }
+
+  void setTarget(BoneData target) {
+    _bindings.spine_ik_constraint_data_set_target(_data, target._data);
+  }
+
+  int getBendDirection() {
+    return _bindings.spine_ik_constraint_data_get_bend_direction(_data);
+  }
+
+  void setBendDirection(int bendDirection) {
+    _bindings.spine_ik_constraint_data_set_bend_direction(_data, bendDirection);
+  }
+
+  bool getCompress() {
+    return _bindings.spine_ik_constraint_data_get_compress(_data) == -1 ? true : false;
+  }
+
+  void setCompress(bool compress) {
+    _bindings.spine_ik_constraint_data_set_compress(_data, compress ? -1 : 0);
+  }
+
+  bool getStretch() {
+    return _bindings.spine_ik_constraint_data_get_stretch(_data) == -1 ? true : false;
+  }
+
+  void setStretch(bool stretch) {
+    _bindings.spine_ik_constraint_data_set_stretch(_data, stretch ? -1 : 0);
+  }
+
+  bool getUniform() {
+    return _bindings.spine_ik_constraint_data_get_uniform(_data) == -1 ? true : false;
+  }
+
+  void setUniform(bool uniform) {
+    _bindings.spine_ik_constraint_data_set_uniform(_data, uniform ? -1 : 0);
+  }
+
+  double getMix() {
+    return _bindings.spine_ik_constraint_data_get_mix(_data);
+  }
+
+  void setMix(double mix) {
+    _bindings.spine_ik_constraint_data_set_mix(_data, mix);
+  }
+
+  double getSoftness() {
+    return _bindings.spine_ik_constraint_data_get_softness(_data);
+  }
+
+  void setSoftness(double softness) {
+    _bindings.spine_ik_constraint_data_set_softness(_data, softness);
+  }
 }
 
 // FIXME
