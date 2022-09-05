@@ -104,6 +104,24 @@ typedef enum spine_transform_mode {
     SPINE_TRANSFORM_NO_SCALE_OR_REFLECTION
 } spine_transform_mode;
 
+typedef enum spine_position_mode {
+    SPINE_POSITION_MODE_FIXED = 0,
+    SPINE_POSITION_MODE_PERCENT
+} spine_position_mode;
+
+typedef enum spine_spacing_mode {
+    SPINE_SPACING_MODE_LENGTH = 0,
+    SPINE_SPACING_MODE_FIXED,
+    SPINE_SPACING_MODE_PERCENT,
+    SPINE_SPACING_MODE_PROPORTIONAL
+} spine_spacing_mode;
+
+typedef enum spine_rotate_mode {
+    SPINE_ROTATE_MODE_TANGENT = 0,
+    SPINE_ROTATE_MODE_CHAIN,
+    SPINE_ROTATE_MODE_CHAIN_SCALE
+} spine_rotate_mode;
+
 typedef struct spine_render_command {
     float *positions;
     float *uvs;
@@ -506,6 +524,7 @@ FFI_PLUGIN_EXPORT void spine_ik_constraint_set_is_active(spine_ik_constraint con
 FFI_PLUGIN_EXPORT int spine_transform_constraint_data_get_num_bones(spine_transform_constraint_data data);
 FFI_PLUGIN_EXPORT spine_bone_data* spine_transform_constraint_data_get_bones(spine_transform_constraint_data data);
 FFI_PLUGIN_EXPORT spine_bone_data spine_transform_constraint_data_get_target(spine_transform_constraint_data data);
+FFI_PLUGIN_EXPORT void spine_transform_constraint_data_set_target(spine_transform_constraint_data data, spine_bone_data target);
 FFI_PLUGIN_EXPORT float spine_transform_constraint_data_get_mix_rotate(spine_transform_constraint_data data);
 FFI_PLUGIN_EXPORT void spine_transform_constraint_data_set_mix_rotate(spine_transform_constraint_data data, float mixRotate);
 FFI_PLUGIN_EXPORT float spine_transform_constraint_data_get_mix_x(spine_transform_constraint_data data);
@@ -557,4 +576,45 @@ FFI_PLUGIN_EXPORT void spine_transform_constraint_set_mix_shear_y(spine_transfor
 FFI_PLUGIN_EXPORT float spine_transform_constraint_get_is_active(spine_transform_constraint constraint);
 FFI_PLUGIN_EXPORT void spine_transform_constraint_set_is_active(spine_transform_constraint constraint, int isActive);
 
+FFI_PLUGIN_EXPORT int spine_path_constraint_data_get_num_bones(spine_path_constraint_data data);
+FFI_PLUGIN_EXPORT spine_bone_data* spine_path_constraint_data_get_bones(spine_path_constraint_data data);
+FFI_PLUGIN_EXPORT spine_slot_data spine_path_constraint_data_get_target(spine_path_constraint_data data);
+FFI_PLUGIN_EXPORT void spine_path_constraint_data_set_target(spine_path_constraint_data data, spine_slot_data target);
+FFI_PLUGIN_EXPORT spine_position_mode spine_path_constraint_data_get_position_mode(spine_path_constraint_data data);
+FFI_PLUGIN_EXPORT void spine_path_constraint_data_set_position_mode(spine_path_constraint_data data, spine_position_mode positionMode);
+FFI_PLUGIN_EXPORT spine_spacing_mode spine_path_constraint_data_get_spacing_mode(spine_path_constraint_data data);
+FFI_PLUGIN_EXPORT void spine_path_constraint_data_set_spacing_mode(spine_path_constraint_data data, spine_spacing_mode spacingMode);
+FFI_PLUGIN_EXPORT spine_rotate_mode spine_path_constraint_data_get_rotate_mode(spine_path_constraint_data data);
+FFI_PLUGIN_EXPORT void spine_path_constraint_data_set_rotate_mode(spine_path_constraint_data data, spine_rotate_mode rotateMode);
+FFI_PLUGIN_EXPORT float spine_path_constraint_data_get_offset_rotation(spine_path_constraint_data data);
+FFI_PLUGIN_EXPORT void spine_path_constraint_data_set_offset_rotation(spine_path_constraint_data data, float offsetRotation);
+FFI_PLUGIN_EXPORT float spine_path_constraint_data_get_position(spine_path_constraint_data data);
+FFI_PLUGIN_EXPORT void spine_path_constraint_data_set_position(spine_path_constraint_data data, float position);
+FFI_PLUGIN_EXPORT float spine_path_constraint_data_get_spacing(spine_path_constraint_data data);
+FFI_PLUGIN_EXPORT void spine_path_constraint_data_set_spacing(spine_path_constraint_data data, float spacing);
+FFI_PLUGIN_EXPORT float spine_path_constraint_data_get_mix_rotate(spine_path_constraint_data data);
+FFI_PLUGIN_EXPORT void spine_path_constraint_data_set_mix_rotate(spine_path_constraint_data data, float mixRotate);
+FFI_PLUGIN_EXPORT float spine_path_constraint_data_get_mix_x(spine_path_constraint_data data);
+FFI_PLUGIN_EXPORT void spine_path_constraint_data_set_mix_x(spine_path_constraint_data data, float mixX);
+FFI_PLUGIN_EXPORT float spine_path_constraint_data_get_mix_y(spine_path_constraint_data data);
+FFI_PLUGIN_EXPORT void spine_path_constraint_data_set_mix_y(spine_path_constraint_data data, float mixY);
 
+FFI_PLUGIN_EXPORT void spine_path_constraint_update(spine_path_constraint constraint);
+FFI_PLUGIN_EXPORT int spine_path_constraint_get_order(spine_path_constraint constraint);
+FFI_PLUGIN_EXPORT spine_path_constraint_data spine_path_constraint_get_data(spine_path_constraint constraint);
+FFI_PLUGIN_EXPORT int spine_path_constraint_get_num_bones(spine_path_constraint constraint);
+FFI_PLUGIN_EXPORT spine_bone* spine_path_constraint_get_bones(spine_path_constraint constraint);
+FFI_PLUGIN_EXPORT spine_slot spine_path_constraint_get_target(spine_path_constraint constraint);
+FFI_PLUGIN_EXPORT void spine_path_constraint_set_target(spine_path_constraint constraint, spine_slot target);
+FFI_PLUGIN_EXPORT float spine_path_constraint_get_position(spine_path_constraint constraint);
+FFI_PLUGIN_EXPORT void spine_path_constraint_set_position(spine_path_constraint constraint, float position);
+FFI_PLUGIN_EXPORT float spine_path_constraint_get_spacing(spine_path_constraint constraint);
+FFI_PLUGIN_EXPORT void spine_path_constraint_set_spacing(spine_path_constraint constraint, float spacing);
+FFI_PLUGIN_EXPORT float spine_path_constraint_get_mix_rotate(spine_path_constraint constraint);
+FFI_PLUGIN_EXPORT void spine_path_constraint_set_mix_rotate(spine_path_constraint constraint, float mixRotate);
+FFI_PLUGIN_EXPORT float spine_path_constraint_get_mix_x(spine_path_constraint constraint);
+FFI_PLUGIN_EXPORT void spine_path_constraint_set_mix_x(spine_path_constraint constraint, float mixX);
+FFI_PLUGIN_EXPORT float spine_path_constraint_get_mix_y(spine_path_constraint constraint);
+FFI_PLUGIN_EXPORT void spine_path_constraint_set_mix_y(spine_path_constraint constraint, float mixY);
+FFI_PLUGIN_EXPORT int spine_path_constraint_get_is_active(spine_path_constraint constraint);
+FFI_PLUGIN_EXPORT void spine_path_constraint_set_is_active(spine_path_constraint constraint, int isActive);

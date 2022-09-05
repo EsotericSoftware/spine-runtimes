@@ -426,6 +426,33 @@ enum TransformMode {
   const TransformMode(this.value);
 }
 
+enum PositionMode {
+  Fixed(0),
+  Percent(1);
+
+  final int value;
+  const PositionMode(this.value);
+}
+
+enum SpacingMode {
+  Length(0),
+  Fixed(1),
+  Percent(2),
+  Proportional(3);
+
+  final int value;
+  const SpacingMode(this.value);
+}
+
+enum RotateMode {
+  Tangent(0),
+  Chain(1),
+  ChainScale(2);
+
+  final int value;
+  const RotateMode(this.value);
+}
+
 class BoneData {
   final spine_bone_data _data;
 
@@ -1221,6 +1248,10 @@ class TransformConstraintData extends ConstraintData {
     return BoneData._(_bindings.spine_ik_constraint_data_get_target(_data));
   }
 
+  void setTarget(BoneData target) {
+    _bindings.spine_transform_constraint_data_set_target(_data, target._data);
+  }
+
   double getMixRotate() {
     return _bindings.spine_transform_constraint_data_get_mix_rotate(_data);
   }
@@ -1426,16 +1457,178 @@ class TransformConstraint {
   }
 }
 
-// FIXME
 class PathConstraintData extends ConstraintData {
   PathConstraintData._(spine_path_constraint_data data): super._(data);
+
+  List<BoneData> getBones() {
+    final List<BoneData> result = [];
+    final numBones = _bindings.spine_path_constraint_data_get_num_bones(_data);
+    final nativeBones = _bindings.spine_path_constraint_data_get_bones(_data);
+    for (int i = 0; i < numBones; i++) {
+      result.add(BoneData._(nativeBones[i]));
+    }
+    return result;
+  }
+
+  SlotData getTarget() {
+    return SlotData._(_bindings.spine_path_constraint_data_get_target(_data));
+  }
+
+  void setTarget(SlotData target) {
+    _bindings.spine_path_constraint_data_set_target(_data, target._data);
+  }
+
+  PositionMode getPositionMode() {
+    return PositionMode.values[_bindings.spine_path_constraint_data_get_position_mode(_data)];
+  }
+
+  void setPositionMode(PositionMode positionMode) {
+    _bindings.spine_path_constraint_data_set_position_mode(_data, positionMode.value);
+  }
+
+  SpacingMode getSpacingMode() {
+    return SpacingMode.values[_bindings.spine_path_constraint_data_get_spacing_mode(_data)];
+  }
+
+  void setSpacingMode(SpacingMode spacingMode) {
+    _bindings.spine_path_constraint_data_set_spacing_mode(_data, spacingMode.value);
+  }
+
+  RotateMode getRotateMode() {
+    return RotateMode.values[_bindings.spine_path_constraint_data_get_rotate_mode(_data)];
+  }
+
+  void setRotateMode(RotateMode rotateMode) {
+    _bindings.spine_path_constraint_data_set_rotate_mode(_data, rotateMode.value);
+  }
+
+  double getOffsetRotation() {
+    return _bindings.spine_path_constraint_data_get_offset_rotation(_data);
+  }
+
+  void setOffsetRotation(double offsetRotation) {
+    _bindings.spine_path_constraint_data_set_offset_rotation(_data, offsetRotation);
+  }
+
+  double getPosition() {
+    return _bindings.spine_path_constraint_data_get_position(_data);
+  }
+
+  void setPosition(double position) {
+    _bindings.spine_path_constraint_data_set_position(_data, position);
+  }
+
+  double getSpacing() {
+    return _bindings.spine_path_constraint_data_get_spacing(_data);
+  }
+
+  void setSpacing(double spacing) {
+    _bindings.spine_path_constraint_data_set_spacing(_data, spacing);
+  }
+
+  double getMixRotate() {
+    return _bindings.spine_path_constraint_data_get_mix_rotate(_data);
+  }
+
+  void setMixRotate(double mixRotate) {
+    _bindings.spine_path_constraint_data_set_mix_rotate(_data, mixRotate);
+  }
+
+  double getMixX() {
+    return _bindings.spine_path_constraint_data_get_mix_x(_data);
+  }
+
+  void setMixX(double mixX) {
+    _bindings.spine_path_constraint_data_set_mix_x(_data, mixX);
+  }
+
+  double getMixY() {
+    return _bindings.spine_path_constraint_data_get_mix_x(_data);
+  }
+
+  void setMixY(double mixY) {
+    _bindings.spine_path_constraint_data_set_mix_y(_data, mixY);
+  }
 }
 
-// FIXME
 class PathConstraint {
   final spine_path_constraint _constraint;
 
   PathConstraint._(this._constraint);
+
+  void update() {
+    _bindings.spine_path_constraint_update(_constraint);
+  }
+
+  int getOrder() {
+    return _bindings.spine_path_constraint_get_order(_constraint);
+  }
+
+  List<Bone> getBones() {
+    List<Bone> result = [];
+    final num = _bindings.spine_path_constraint_get_num_bones(_constraint);
+    final nativeBones = _bindings.spine_path_constraint_get_bones(_constraint);
+    for (int i = 0; i < num; i++) {
+      result.add(Bone._(nativeBones[i]));
+    }
+    return result;
+  }
+
+  Slot getTarget() {
+    return Slot._(_bindings.spine_path_constraint_get_target(_constraint));
+  }
+
+  void setTarget(Slot target) {
+    _bindings.spine_path_constraint_set_target(_constraint, target._slot);
+  }
+
+  double getPosition() {
+    return _bindings.spine_path_constraint_get_position(_constraint);
+  }
+
+  void setPosition(double position) {
+    _bindings.spine_path_constraint_set_position(_constraint, position);
+  }
+
+  double getSpacing() {
+    return _bindings.spine_path_constraint_get_spacing(_constraint);
+  }
+
+  void setSpacing(double spacing) {
+    _bindings.spine_path_constraint_set_spacing(_constraint, spacing);
+  }
+
+  double getMixRotate() {
+    return _bindings.spine_path_constraint_get_mix_rotate(_constraint);
+  }
+
+  void setMixRotate(double mixRotate) {
+    _bindings.spine_path_constraint_set_mix_rotate(_constraint, mixRotate);
+  }
+
+  double getMixX() {
+    return _bindings.spine_path_constraint_get_mix_x(_constraint);
+  }
+
+  void setMixX(double mixX) {
+    _bindings.spine_path_constraint_set_mix_x(_constraint, mixX);
+  }
+
+  double getMixY() {
+    return _bindings.spine_path_constraint_get_mix_y(_constraint);
+  }
+
+  void setMixY(double mixY) {
+    _bindings.spine_path_constraint_set_mix_y(_constraint, mixY);
+  }
+
+  bool isActive() {
+    return _bindings.spine_path_constraint_get_is_active(_constraint) == -1;
+  }
+
+  void setIsActive(bool isActive) {
+    _bindings.spine_path_constraint_set_is_active(_constraint, isActive ? -1 : 0);
+  }
 }
 
 class Skeleton {

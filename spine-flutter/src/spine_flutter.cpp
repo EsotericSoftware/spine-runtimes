@@ -2319,6 +2319,12 @@ FFI_PLUGIN_EXPORT spine_bone_data spine_transform_constraint_data_get_target(spi
     return _data->getTarget();
 }
 
+FFI_PLUGIN_EXPORT void spine_transform_constraint_data_set_target(spine_transform_constraint_data data, spine_bone_data target) {
+    if (data == nullptr) return;
+    TransformConstraintData *_data = (TransformConstraintData*)data;
+    _data->setTarget((BoneData*)target);
+}
+
 FFI_PLUGIN_EXPORT float spine_transform_constraint_data_get_mix_rotate(spine_transform_constraint_data data) {
     if (data == nullptr) return 0;
     TransformConstraintData *_data = (TransformConstraintData*)data;
@@ -2613,3 +2619,252 @@ FFI_PLUGIN_EXPORT void spine_transform_constraint_set_is_active(spine_transform_
     TransformConstraint *_constraint = (TransformConstraint*)constraint;
     _constraint->setActive(isActive);
 }
+
+// PathConstraintData
+FFI_PLUGIN_EXPORT int spine_path_constraint_data_get_num_bones(spine_path_constraint_data data) {
+    if (data == nullptr) return 0;
+    PathConstraintData *_data = (PathConstraintData*)data;
+    return (int)_data->getBones().size();
+}
+
+FFI_PLUGIN_EXPORT spine_bone_data* spine_path_constraint_data_get_bones(spine_path_constraint_data data) {
+    if (data == nullptr) return nullptr;
+    PathConstraintData *_data = (PathConstraintData*)data;
+    return (spine_bone_data*)_data->getBones().buffer();
+}
+
+FFI_PLUGIN_EXPORT spine_slot_data spine_path_constraint_data_get_target(spine_path_constraint_data data) {
+    if (data == nullptr) return nullptr;
+    PathConstraintData *_data = (PathConstraintData*)data;
+    return (spine_slot_data)_data->getTarget();
+}
+
+FFI_PLUGIN_EXPORT void spine_path_constraint_data_set_target(spine_path_constraint_data data, spine_slot_data target) {
+    if (data == nullptr) return;
+    PathConstraintData *_data = (PathConstraintData*)data;
+    _data->setTarget((SlotData*)target);
+}
+
+FFI_PLUGIN_EXPORT spine_position_mode spine_path_constraint_data_get_position_mode(spine_path_constraint_data data) {
+    if (data == nullptr) return SPINE_POSITION_MODE_FIXED;
+    PathConstraintData *_data = (PathConstraintData*)data;
+    return (spine_position_mode)_data->getPositionMode();
+}
+
+FFI_PLUGIN_EXPORT void spine_path_constraint_data_set_position_mode(spine_path_constraint_data data, spine_position_mode positionMode) {
+    if (data == nullptr) return;
+    PathConstraintData *_data = (PathConstraintData*)data;
+    _data->setPositionMode((PositionMode)positionMode);
+}
+
+FFI_PLUGIN_EXPORT spine_spacing_mode spine_path_constraint_data_get_spacing_mode(spine_path_constraint_data data) {
+    if (data == nullptr) return SPINE_SPACING_MODE_LENGTH;
+    PathConstraintData *_data = (PathConstraintData*)data;
+    return (spine_spacing_mode)_data->getSpacingMode();
+}
+
+FFI_PLUGIN_EXPORT void spine_path_constraint_data_set_spacing_mode(spine_path_constraint_data data, spine_spacing_mode spacingMode) {
+    if (data == nullptr) return;
+    PathConstraintData *_data = (PathConstraintData*)data;
+    _data->setSpacingMode((SpacingMode)spacingMode);
+}
+
+FFI_PLUGIN_EXPORT spine_rotate_mode spine_path_constraint_data_get_rotate_mode(spine_path_constraint_data data) {
+    if (data == nullptr) return SPINE_ROTATE_MODE_TANGENT;
+    PathConstraintData *_data = (PathConstraintData*)data;
+    return (spine_rotate_mode)_data->getRotateMode();
+}
+
+FFI_PLUGIN_EXPORT void spine_path_constraint_data_set_rotate_mode(spine_path_constraint_data data, spine_rotate_mode rotateMode) {
+    if (data == nullptr) return;
+    PathConstraintData *_data = (PathConstraintData*)data;
+    _data->setRotateMode((RotateMode)rotateMode);
+}
+
+FFI_PLUGIN_EXPORT float spine_path_constraint_data_get_offset_rotation(spine_path_constraint_data data) {
+    if (data == nullptr) return 0;
+    PathConstraintData *_data = (PathConstraintData*)data;
+    return _data->getOffsetRotation();
+}
+
+FFI_PLUGIN_EXPORT void spine_path_constraint_data_set_offset_rotation(spine_path_constraint_data data, float offsetRotation) {
+    if (data == nullptr) return;
+    PathConstraintData *_data = (PathConstraintData*)data;
+    _data->setOffsetRotation(offsetRotation);
+}
+
+FFI_PLUGIN_EXPORT float spine_path_constraint_data_get_position(spine_path_constraint_data data) {
+    if (data == nullptr) return 0;
+    PathConstraintData *_data = (PathConstraintData*)data;
+    return _data->getPosition();
+}
+
+FFI_PLUGIN_EXPORT void spine_path_constraint_data_set_position(spine_path_constraint_data data, float position) {
+    if (data == nullptr) return;
+    PathConstraintData *_data = (PathConstraintData*)data;
+    _data->setPosition(position);
+}
+
+FFI_PLUGIN_EXPORT float spine_path_constraint_data_get_spacing(spine_path_constraint_data data) {
+    if (data == nullptr) return 0;
+    PathConstraintData *_data = (PathConstraintData*)data;
+    return _data->getSpacing();
+}
+
+FFI_PLUGIN_EXPORT void spine_path_constraint_data_set_spacing(spine_path_constraint_data data, float spacing) {
+    if (data == nullptr) return;
+    PathConstraintData *_data = (PathConstraintData*)data;
+    _data->setSpacing(spacing);
+}
+
+FFI_PLUGIN_EXPORT float spine_path_constraint_data_get_mix_rotate(spine_path_constraint_data data) {
+    if (data == nullptr) return 0;
+    PathConstraintData *_data = (PathConstraintData*)data;
+    return _data->getMixRotate();
+}
+
+FFI_PLUGIN_EXPORT void spine_path_constraint_data_set_mix_rotate(spine_path_constraint_data data, float mixRotate) {
+    if (data == nullptr) return;
+    PathConstraintData *_data = (PathConstraintData*)data;
+    _data->setMixRotate(mixRotate);
+}
+
+FFI_PLUGIN_EXPORT float spine_path_constraint_data_get_mix_x(spine_path_constraint_data data) {
+    if (data == nullptr) return 0;
+    PathConstraintData *_data = (PathConstraintData*)data;
+    return _data->getMixX();
+}
+
+FFI_PLUGIN_EXPORT void spine_path_constraint_data_set_mix_x(spine_path_constraint_data data, float mixX) {
+    if (data == nullptr) return;
+    PathConstraintData *_data = (PathConstraintData*)data;
+    _data->setMixX(mixX);
+}
+
+FFI_PLUGIN_EXPORT float spine_path_constraint_data_get_mix_y(spine_path_constraint_data data) {
+    if (data == nullptr) return 0;
+    PathConstraintData *_data = (PathConstraintData*)data;
+    return _data->getMixY();
+}
+
+FFI_PLUGIN_EXPORT void spine_path_constraint_data_set_mix_y(spine_path_constraint_data data, float mixY) {
+    if (data == nullptr) return;
+    PathConstraintData *_data = (PathConstraintData*)data;
+    _data->setMixY(mixY);
+}
+
+// PathConstraint
+FFI_PLUGIN_EXPORT void spine_path_constraint_update(spine_path_constraint constraint) {
+    if (constraint == nullptr) return;
+    PathConstraint *_constraint = (PathConstraint*)constraint;
+    _constraint->update();
+}
+
+FFI_PLUGIN_EXPORT int spine_path_constraint_get_order(spine_path_constraint constraint) {
+    if (constraint == nullptr) return 0;
+    PathConstraint *_constraint = (PathConstraint*)constraint;
+    return _constraint->getOrder();
+}
+
+FFI_PLUGIN_EXPORT spine_path_constraint_data spine_path_constraint_get_data(spine_path_constraint constraint) {
+    if (constraint == nullptr) return nullptr;
+    PathConstraint *_constraint = (PathConstraint*)constraint;
+    return (spine_path_constraint_data)&_constraint->getData();
+}
+
+FFI_PLUGIN_EXPORT int spine_path_constraint_get_num_bones(spine_path_constraint constraint) {
+    if (constraint == nullptr) return 0;
+    PathConstraint *_constraint = (PathConstraint*)constraint;
+    return (int)_constraint->getBones().size();
+}
+
+FFI_PLUGIN_EXPORT spine_bone* spine_path_constraint_get_bones(spine_path_constraint constraint) {
+    if (constraint == nullptr) return nullptr;
+    PathConstraint *_constraint = (PathConstraint*)constraint;
+    return (spine_bone*)_constraint->getBones().buffer();
+}
+
+FFI_PLUGIN_EXPORT spine_slot spine_path_constraint_get_target(spine_path_constraint constraint) {
+    if (constraint == nullptr) return nullptr;
+    PathConstraint *_constraint = (PathConstraint*)constraint;
+    return (spine_slot)_constraint->getTarget();
+}
+
+FFI_PLUGIN_EXPORT void spine_path_constraint_set_target(spine_path_constraint constraint, spine_slot target) {
+    if (constraint == nullptr) return;
+    PathConstraint *_constraint = (PathConstraint*)constraint;
+    _constraint->setTarget((Slot*)target);
+}
+
+FFI_PLUGIN_EXPORT float spine_path_constraint_get_position(spine_path_constraint constraint) {
+    if (constraint == nullptr) return 0;
+    PathConstraint *_constraint = (PathConstraint*)constraint;
+    return _constraint->getPosition();
+}
+
+FFI_PLUGIN_EXPORT void spine_path_constraint_set_position(spine_path_constraint constraint, float position) {
+    if (constraint == nullptr) return;
+    PathConstraint *_constraint = (PathConstraint*)constraint;
+    _constraint->setPosition(position);
+}
+
+FFI_PLUGIN_EXPORT float spine_path_constraint_get_spacing(spine_path_constraint constraint) {
+    if (constraint == nullptr) return 0;
+    PathConstraint *_constraint = (PathConstraint*)constraint;
+    return _constraint->getSpacing();
+}
+
+FFI_PLUGIN_EXPORT void spine_path_constraint_set_spacing(spine_path_constraint constraint, float spacing) {
+    if (constraint == nullptr) return;
+    PathConstraint *_constraint = (PathConstraint*)constraint;
+    _constraint->setSpacing(spacing);
+}
+
+FFI_PLUGIN_EXPORT float spine_path_constraint_get_mix_rotate(spine_path_constraint constraint) {
+    if (constraint == nullptr) return 0;
+    PathConstraint *_constraint = (PathConstraint*)constraint;
+    return _constraint->getMixRotate();
+}
+
+FFI_PLUGIN_EXPORT void spine_path_constraint_set_mix_rotate(spine_path_constraint constraint, float mixRotate) {
+    if (constraint == nullptr) return;
+    PathConstraint *_constraint = (PathConstraint*)constraint;
+    _constraint->setMixRotate(mixRotate);
+}
+
+FFI_PLUGIN_EXPORT float spine_path_constraint_get_mix_x(spine_path_constraint constraint) {
+    if (constraint == nullptr) return 0;
+    PathConstraint *_constraint = (PathConstraint*)constraint;
+    return _constraint->getMixX();
+}
+
+FFI_PLUGIN_EXPORT void spine_path_constraint_set_mix_x(spine_path_constraint constraint, float mixX) {
+    if (constraint == nullptr) return;
+    PathConstraint *_constraint = (PathConstraint*)constraint;
+    _constraint->setMixX(mixX);
+}
+
+FFI_PLUGIN_EXPORT float spine_path_constraint_get_mix_y(spine_path_constraint constraint) {
+    if (constraint == nullptr) return 0;
+    PathConstraint *_constraint = (PathConstraint*)constraint;
+    return _constraint->getMixY();
+}
+
+FFI_PLUGIN_EXPORT void spine_path_constraint_set_mix_y(spine_path_constraint constraint, float mixY) {
+    if (constraint == nullptr) return;
+    PathConstraint *_constraint = (PathConstraint*)constraint;
+    _constraint->setMixY(mixY);
+}
+
+FFI_PLUGIN_EXPORT int spine_path_constraint_get_is_active(spine_path_constraint constraint) {
+    if (constraint == nullptr) return 0;
+    PathConstraint *_constraint = (PathConstraint*)constraint;
+    return _constraint->isActive() ? -1 : 0;
+}
+
+FFI_PLUGIN_EXPORT void spine_path_constraint_set_is_active(spine_path_constraint constraint, int isActive) {
+    if (constraint == nullptr) return;
+    PathConstraint *_constraint = (PathConstraint*)constraint;
+    _constraint->setActive(isActive);
+}
+
