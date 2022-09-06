@@ -1029,7 +1029,7 @@ class RegionAttachment extends Attachment {
   RegionAttachment._(spine_attachment attachment): super._(attachment);
 
   List<double> computeWorldVertices(Slot slot) {
-    Pointer<Float> vertices = malloc.allocate(4 * 9).cast();
+    Pointer<Float> vertices = malloc.allocate(4 * 8).cast();
     _bindings.spine_region_attachment_compute_world_vertices(_attachment, slot._slot, vertices);
     final result = vertices.asTypedList(8).toList();
     malloc.free(vertices);
@@ -1133,6 +1133,37 @@ class RegionAttachment extends Attachment {
 
 class VertexAttachment extends Attachment {
   VertexAttachment._(spine_attachment attachment): super._(attachment);
+
+  List<double> computeWorldVertices(Slot slot) {
+    final worldVerticesLength = _bindings.spine_vertex_attachment_get_world_vertices_length(_attachment);
+    Pointer<Float> vertices = malloc.allocate(4 * worldVerticesLength).cast();
+    _bindings.spine_vertex_attachment_compute_world_vertices(_attachment, slot._slot, vertices);
+    final result = vertices.asTypedList(worldVerticesLength).toList();
+    malloc.free(vertices);
+    return result;
+  }
+
+  Int32List getBones() {
+    final num = _bindings.spine_vertex_attachment_get_num_bones(_attachment);
+    final bones = _bindings.spine_region_attachment_get_bones(_attachment);
+    return bones.asTypedList(num);
+  }
+
+  Float32List getVertices() {
+    final num = _bindings.spine_vertex_attachment_get_num_vertices(_attachment);
+    final vertices = _bindings.spine_region_attachment_get_vertices(_attachment);
+    return vertices.asTypedList(num);
+  }
+
+  Attachment? getTimelineAttachment() {
+    final attachment = _bindings.spine_vertex_attachment_get_timeline_attachment(_attachment);
+    if (_attachment.address == nullptr.address) return null;
+    return Attachment._toSubclass(attachment);
+  }
+
+  void setTimelineAttachment(Attachment? attachment) {
+    _bindings.spine_vertex_attachment_set_timeline_attachment(_attachment, attachment == null ? nullptr : attachment._attachment);
+  }
 }
 
 // FIXME

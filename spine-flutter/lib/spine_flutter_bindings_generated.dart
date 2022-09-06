@@ -5293,10 +5293,10 @@ class SpineFlutterBindings {
           ffi.Pointer<ffi.Float> Function(spine_region_attachment)>();
 
   spine_attachment spine_vertex_attachment_get_timeline_attachment(
-    spine_vertex_attachment attachment,
+    spine_vertex_attachment timelineAttachment,
   ) {
     return _spine_vertex_attachment_get_timeline_attachment(
-      attachment,
+      timelineAttachment,
     );
   }
 
@@ -5310,18 +5310,21 @@ class SpineFlutterBindings {
 
   void spine_vertex_attachment_set_timeline_attachment(
     spine_vertex_attachment attachment,
+    spine_attachment timelineAttachment,
   ) {
     return _spine_vertex_attachment_set_timeline_attachment(
       attachment,
+      timelineAttachment,
     );
   }
 
-  late final _spine_vertex_attachment_set_timeline_attachmentPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(spine_vertex_attachment)>>(
-          'spine_vertex_attachment_set_timeline_attachment');
+  late final _spine_vertex_attachment_set_timeline_attachmentPtr = _lookup<
+          ffi.NativeFunction<
+              ffi.Void Function(spine_vertex_attachment, spine_attachment)>>(
+      'spine_vertex_attachment_set_timeline_attachment');
   late final _spine_vertex_attachment_set_timeline_attachment =
-      _spine_vertex_attachment_set_timeline_attachmentPtr
-          .asFunction<void Function(spine_vertex_attachment)>();
+      _spine_vertex_attachment_set_timeline_attachmentPtr.asFunction<
+          void Function(spine_vertex_attachment, spine_attachment)>();
 
   void spine_skin_set_attachment(
     spine_skin skin,

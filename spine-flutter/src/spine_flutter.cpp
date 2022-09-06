@@ -2262,10 +2262,10 @@ FFI_PLUGIN_EXPORT spine_attachment spine_vertex_attachment_get_timeline_attachme
     return _attachment->getTimelineAttachment();
 }
 
-FFI_PLUGIN_EXPORT void spine_vertex_attachment_set_timeline_attachment(spine_vertex_attachment attachment) {
+FFI_PLUGIN_EXPORT void spine_vertex_attachment_set_timeline_attachment(spine_vertex_attachment attachment, spine_attachment timelineAttachment) {
     if (attachment == nullptr) return;
     VertexAttachment *_attachment = (VertexAttachment*)attachment;
-    _attachment->setTimelineAttachment((Attachment*)attachment);
+    _attachment->setTimelineAttachment((Attachment*)timelineAttachment);
 }
 
 // Skin
