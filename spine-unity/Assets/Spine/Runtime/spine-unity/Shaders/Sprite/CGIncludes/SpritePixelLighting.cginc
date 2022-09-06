@@ -222,6 +222,13 @@ fixed4 fragAdd(VertexOutput input) : SV_Target
 
 	ALPHA_CLIP(texureColor, input.color)
 
+	// previous fragBase pass was zwrite pass, so overlapping regions require
+	// full alpha applied since they are applied only once.
+#if defined(_ALPHAPREMULTIPLY_ON)
+	texureColor.rgb /= texureColor.a == 0 ? 1 : texureColor.a;
+#endif
+	texureColor.a = 1.0;
+
 	//Get normal direction
 	fixed3 normalWorld = calculateNormalWorld(input);
 

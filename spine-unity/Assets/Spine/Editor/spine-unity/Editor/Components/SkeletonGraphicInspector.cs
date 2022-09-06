@@ -261,7 +261,7 @@ namespace Spine.Unity.Editor {
 								EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("This mesh uses multiple atlas pages or blend modes.\n" +
 																							"You need to enable 'Multiple Canvas Renderers'\n" +
 																							"for correct rendering. Consider packing\n" +
-																							"attachments to a single atlas page if possible.", Icons.warning), GUILayout.Height(60), GUILayout.Width(340));
+																							"attachments to a single atlas page if possible.", Icons.warning), GUILayout.Height(60), GUILayout.Width(380));
 							}
 						}
 					}
