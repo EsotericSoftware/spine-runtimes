@@ -944,7 +944,7 @@ class Slot {
   Attachment? getAttachment() {
     final attachment = _bindings.spine_slot_get_attachment(_slot);
     if (attachment.address == nullptr.address) return null;
-    return Attachment._(attachment);
+    return Attachment._toSubclass(attachment);
   }
 
   void setAttachment(Attachment? attachment) {
@@ -968,7 +968,8 @@ enum AttachmentType {
   final int value;
   const AttachmentType(this.value);
 }
-class Attachment {
+
+abstract class Attachment {
   final spine_attachment _attachment;
 
   Attachment._(this._attachment);
@@ -982,6 +983,107 @@ class Attachment {
     final type = _bindings.spine_attachment_get_type(_attachment);
     return AttachmentType.values[type];
   }
+
+  static Attachment _toSubclass(spine_attachment attachment) {
+    final type = AttachmentType.values[_bindings.spine_attachment_get_type(attachment)];
+    switch(type) {
+      case AttachmentType.Region:
+        return RegionAttachment._(attachment);
+      case AttachmentType.Mesh:
+        return MeshAttachment._(attachment);
+      case AttachmentType.Clipping:
+        return ClippingAttachment._(attachment);
+      case AttachmentType.BoundingBox:
+        return BoundingBoxAttachment._(attachment);
+      case AttachmentType.Path:
+        return PathAttachment._(attachment);
+      case AttachmentType.Point:
+        return PointAttachment._(attachment);
+    }
+  }
+
+  Attachment copy() {
+    return _toSubclass(_bindings.spine_attachment_copy(_attachment));
+  }
+
+  void dispose() {
+    _bindings.spine_attachment_dispose(_attachment);
+  }
+}
+
+// FIXME
+class RegionAttachment extends Attachment {
+  RegionAttachment._(spine_attachment attachment): super._(attachment);
+}
+
+class VertexAttachment extends Attachment {
+  VertexAttachment._(spine_attachment attachment): super._(attachment);
+}
+
+// FIXME
+class MeshAttachment extends VertexAttachment {
+  MeshAttachment._(spine_attachment attachment): super._(attachment);
+}
+
+// FIXME
+class ClippingAttachment extends VertexAttachment {
+  ClippingAttachment._(spine_attachment attachment): super._(attachment);
+}
+
+// FIXME
+class BoundingBoxAttachment extends VertexAttachment {
+  BoundingBoxAttachment._(spine_attachment attachment): super._(attachment);
+}
+
+// FIXME
+class PathAttachment extends VertexAttachment {
+  PathAttachment._(spine_attachment attachment): super._(attachment);
+}
+
+class PointAttachment extends Attachment {
+  PointAttachment._(spine_attachment attachment): super._(attachment);
+
+  Vector2 computeWorldPosition(Bone bone) {
+    final position = _bindings.spine_point_attachment_compute_world_position(_attachment, bone._bone);
+    return Vector2(position.x, position.y);
+  }
+
+  double computeWorldRotation(Bone bone) {
+    return _bindings.spine_point_attachment_compute_world_rotation(_attachment, bone._bone);
+  }
+
+  double getX() {
+    return _bindings.spine_point_attachment_get_x(_attachment);
+  }
+
+  void setX(double x) {
+    _bindings.spine_point_attachment_set_x(_attachment, x);
+  }
+
+  double getY() {
+    return _bindings.spine_point_attachment_get_y(_attachment);
+  }
+
+  void setY(double y) {
+    _bindings.spine_point_attachment_set_y(_attachment, y);
+  }
+
+  double getRotation() {
+    return _bindings.spine_point_attachment_get_rotation(_attachment);
+  }
+
+  void setRotation(double rotation) {
+    _bindings.spine_point_attachment_set_x(_attachment, rotation);
+  }
+
+  Color getColor() {
+    final color = _bindings.spine_point_attachment_get_color(_attachment);
+    return Color(color.r, color.g, color.b, color.a);
+  }
+
+  void setColor(double r, double g, double b, double a) {
+    _bindings.spine_point_attachment_set_color(_attachment, r, g, b, a);
+  }
 }
 
 class SkinEntry {
@@ -992,6 +1094,7 @@ class SkinEntry {
   SkinEntry(this.slotIndex, this.name, this.attachment);
 }
 
+// FIXME add a way to create a new skin
 class Skin {
   final spine_skin _skin;
 
@@ -1008,7 +1111,7 @@ class Skin {
     final attachment = _bindings.spine_skin_get_attachment(_skin, slotIndex, nativeName.cast());
     malloc.free(nativeName);
     if (attachment.address == nullptr.address) return null;
-    return Attachment._(attachment);
+    return Attachment._toSubclass(attachment);
   }
 
   void removeAttachment(int slotIndex, String name) {
@@ -1033,7 +1136,7 @@ class Skin {
     for (int i = 0; i < numEntries; i++) {
       final entry = entries.ref.entries[i];
       Pointer<Utf8> name = entry.name.cast();
-      result.add(SkinEntry(entry.slotIndex, name.toDartString(), entry.attachment.address == nullptr.address ? null : Attachment._(entry.attachment)));
+      result.add(SkinEntry(entry.slotIndex, name.toDartString(), entry.attachment.address == nullptr.address ? null : Attachment._toSubclass(entry.attachment)));
     }
     return result;
   }
@@ -1701,7 +1804,7 @@ class Skeleton {
     malloc.free(slotNameNative);
     malloc.free(attachmentNameNative);
     if (attachment.address == nullptr.address) return null;
-    return Attachment._(attachment);
+    return Attachment._toSubclass(attachment);
   }
 
   Attachment? getAttachment(int slotIndex, String attachmentName) {
@@ -1709,7 +1812,7 @@ class Skeleton {
     final attachment = _bindings.spine_skeleton_get_attachment(_skeleton, slotIndex, attachmentNameNative.cast());
     malloc.free(attachmentNameNative);
     if (attachment.address == nullptr.address) return null;
-    return Attachment._(attachment);
+    return Attachment._toSubclass(attachment);
   }
 
   void setAttachment(String slotName, String attachmentName) {
@@ -1879,6 +1982,7 @@ class Skeleton {
   }
 }
 
+// FIXME expose timelines and apply?
 class Animation {
   final spine_animation _animation;
 

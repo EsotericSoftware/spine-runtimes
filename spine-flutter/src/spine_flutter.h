@@ -31,6 +31,12 @@ typedef void* spine_slot;
 typedef void* spine_slot_data;
 typedef void* spine_skin;
 typedef void* spine_attachment;
+typedef void* spine_point_attachment;
+typedef void* spine_region_attachment;
+typedef void* spine_mesh_attachment;
+typedef void* spine_clipping_attachment;
+typedef void* spine_bounding_box_attachment;
+typedef void* spine_path_attachment;
 typedef void* spine_constraint;
 typedef void* spine_constraint_data;
 typedef void* spine_ik_constraint;
@@ -467,6 +473,19 @@ FFI_PLUGIN_EXPORT void spine_bone_set_is_active(spine_bone bone, int isActive);
 
 FFI_PLUGIN_EXPORT const char* spine_attachment_get_name(spine_attachment attachment);
 FFI_PLUGIN_EXPORT spine_attachment_type spine_attachment_get_type(spine_attachment attachment);
+FFI_PLUGIN_EXPORT spine_attachment spine_attachment_copy(spine_attachment attachment);
+FFI_PLUGIN_EXPORT void spine_attachment_dispose(spine_attachment attachment);
+
+FFI_PLUGIN_EXPORT spine_vector spine_point_attachment_compute_world_position(spine_point_attachment attachment, spine_bone bone);
+FFI_PLUGIN_EXPORT float spine_point_attachment_compute_world_rotation(spine_point_attachment attachment, spine_bone bone);
+FFI_PLUGIN_EXPORT float spine_point_attachment_get_x(spine_point_attachment attachment);
+FFI_PLUGIN_EXPORT void spine_point_attachment_set_x(spine_point_attachment attachment, float x);
+FFI_PLUGIN_EXPORT float spine_point_attachment_get_y(spine_point_attachment attachment);
+FFI_PLUGIN_EXPORT void spine_point_attachment_set_y(spine_point_attachment attachment, float y);
+FFI_PLUGIN_EXPORT float spine_point_attachment_get_rotation(spine_point_attachment attachment);
+FFI_PLUGIN_EXPORT void spine_point_attachment_set_rotation(spine_point_attachment attachment, float rotation);
+FFI_PLUGIN_EXPORT spine_color spine_point_attachment_get_color(spine_point_attachment attachment);
+FFI_PLUGIN_EXPORT void spine_point_attachment_set_color(spine_point_attachment attachment, float r, float g, float b, float a);
 
 FFI_PLUGIN_EXPORT void spine_skin_set_attachment(spine_skin skin, int slotIndex, const char* name, spine_attachment attachment);
 FFI_PLUGIN_EXPORT spine_attachment spine_skin_get_attachment(spine_skin skin, int slotIndex, const char* name);

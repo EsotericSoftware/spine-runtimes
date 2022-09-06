@@ -1987,6 +1987,83 @@ FFI_PLUGIN_EXPORT spine_attachment_type spine_attachment_get_type(spine_attachme
     }
 }
 
+FFI_PLUGIN_EXPORT spine_attachment spine_attachment_copy(spine_attachment attachment) {
+    if (attachment == nullptr) return nullptr;
+    Attachment *_attachment = (Attachment*)attachment;
+    return (spine_attachment)_attachment->copy();
+}
+
+FFI_PLUGIN_EXPORT void spine_attachment_dispose(spine_attachment attachment) {
+    if (attachment == nullptr) return;
+    Attachment *_attachment = (Attachment*)attachment;
+    delete _attachment;
+}
+
+FFI_PLUGIN_EXPORT spine_vector spine_point_attachment_compute_world_position(spine_point_attachment attachment, spine_bone bone) {
+    spine_vector result = { 0, 0 };
+    if (attachment == nullptr) return result;
+    PointAttachment *_attachment = (PointAttachment*)attachment;
+    _attachment->computeWorldPosition(*(Bone*)bone, result.x, result.y);
+    return result;
+}
+
+FFI_PLUGIN_EXPORT float spine_point_attachment_compute_world_rotation(spine_point_attachment attachment, spine_bone bone) {
+    if (attachment == nullptr) return 0;
+    PointAttachment *_attachment = (PointAttachment*)attachment;
+    return _attachment->computeWorldRotation(*(Bone*)bone);
+}
+
+FFI_PLUGIN_EXPORT float spine_point_attachment_get_x(spine_point_attachment attachment) {
+    if (attachment == nullptr) return 0;
+    PointAttachment *_attachment = (PointAttachment*)attachment;
+    return _attachment->getX();
+}
+
+FFI_PLUGIN_EXPORT void spine_point_attachment_set_x(spine_point_attachment attachment, float x) {
+    if (attachment == nullptr) return;
+    PointAttachment *_attachment = (PointAttachment*)attachment;
+    _attachment->setX(x);
+}
+
+FFI_PLUGIN_EXPORT float spine_point_attachment_get_y(spine_point_attachment attachment) {
+    if (attachment == nullptr) return 0;
+    PointAttachment *_attachment = (PointAttachment*)attachment;
+    return _attachment->getY();
+}
+
+FFI_PLUGIN_EXPORT void spine_point_attachment_set_y(spine_point_attachment attachment, float y) {
+    if (attachment == nullptr) return;
+    PointAttachment *_attachment = (PointAttachment*)attachment;
+    _attachment->setY(y);
+}
+
+FFI_PLUGIN_EXPORT float spine_point_attachment_get_rotation(spine_point_attachment attachment) {
+    if (attachment == nullptr) return 0;
+    PointAttachment *_attachment = (PointAttachment*)attachment;
+    return _attachment->getRotation();
+}
+
+FFI_PLUGIN_EXPORT void spine_point_attachment_set_rotation(spine_point_attachment attachment, float rotation) {
+    if (attachment == nullptr) return;
+    PointAttachment *_attachment = (PointAttachment*)attachment;
+    _attachment->setRotation(rotation);
+}
+
+FFI_PLUGIN_EXPORT spine_color spine_point_attachment_get_color(spine_point_attachment attachment) {
+    spine_color result = { 0, 0, 0, 0 };
+    if (attachment == nullptr) return result;
+    PointAttachment *_attachment = (PointAttachment*)attachment;
+    Color &color = _attachment->getColor();
+    result = { color.r, color.g, color.b, color.a };
+    return result;
+}
+
+FFI_PLUGIN_EXPORT void spine_point_attachment_set_color(spine_point_attachment attachment, float r, float g, float b, float a) {
+    if (attachment == nullptr) return;
+    PointAttachment *_attachment = (PointAttachment*)attachment;
+    _attachment->getColor().set(r, g, b, a);
+}
+
 // Skin
 FFI_PLUGIN_EXPORT void spine_skin_set_attachment(spine_skin skin, int slotIndex, const char* name, spine_attachment attachment) {
     if (skin == nullptr) return;

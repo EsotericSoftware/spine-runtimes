@@ -4581,6 +4581,205 @@ class SpineFlutterBindings {
   late final _spine_attachment_get_type = _spine_attachment_get_typePtr
       .asFunction<int Function(spine_attachment)>();
 
+  spine_attachment spine_attachment_copy(
+    spine_attachment attachment,
+  ) {
+    return _spine_attachment_copy(
+      attachment,
+    );
+  }
+
+  late final _spine_attachment_copyPtr =
+      _lookup<ffi.NativeFunction<spine_attachment Function(spine_attachment)>>(
+          'spine_attachment_copy');
+  late final _spine_attachment_copy = _spine_attachment_copyPtr
+      .asFunction<spine_attachment Function(spine_attachment)>();
+
+  void spine_attachment_dispose(
+    spine_attachment attachment,
+  ) {
+    return _spine_attachment_dispose(
+      attachment,
+    );
+  }
+
+  late final _spine_attachment_disposePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_attachment)>>(
+          'spine_attachment_dispose');
+  late final _spine_attachment_dispose = _spine_attachment_disposePtr
+      .asFunction<void Function(spine_attachment)>();
+
+  spine_vector spine_point_attachment_compute_world_position(
+    spine_point_attachment attachment,
+    spine_bone bone,
+  ) {
+    return _spine_point_attachment_compute_world_position(
+      attachment,
+      bone,
+    );
+  }
+
+  late final _spine_point_attachment_compute_world_positionPtr = _lookup<
+      ffi.NativeFunction<
+          spine_vector Function(spine_point_attachment,
+              spine_bone)>>('spine_point_attachment_compute_world_position');
+  late final _spine_point_attachment_compute_world_position =
+      _spine_point_attachment_compute_world_positionPtr.asFunction<
+          spine_vector Function(spine_point_attachment, spine_bone)>();
+
+  double spine_point_attachment_compute_world_rotation(
+    spine_point_attachment attachment,
+    spine_bone bone,
+  ) {
+    return _spine_point_attachment_compute_world_rotation(
+      attachment,
+      bone,
+    );
+  }
+
+  late final _spine_point_attachment_compute_world_rotationPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Float Function(spine_point_attachment,
+              spine_bone)>>('spine_point_attachment_compute_world_rotation');
+  late final _spine_point_attachment_compute_world_rotation =
+      _spine_point_attachment_compute_world_rotationPtr
+          .asFunction<double Function(spine_point_attachment, spine_bone)>();
+
+  double spine_point_attachment_get_x(
+    spine_point_attachment attachment,
+  ) {
+    return _spine_point_attachment_get_x(
+      attachment,
+    );
+  }
+
+  late final _spine_point_attachment_get_xPtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_point_attachment)>>(
+          'spine_point_attachment_get_x');
+  late final _spine_point_attachment_get_x = _spine_point_attachment_get_xPtr
+      .asFunction<double Function(spine_point_attachment)>();
+
+  void spine_point_attachment_set_x(
+    spine_point_attachment attachment,
+    double x,
+  ) {
+    return _spine_point_attachment_set_x(
+      attachment,
+      x,
+    );
+  }
+
+  late final _spine_point_attachment_set_xPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_point_attachment,
+              ffi.Float)>>('spine_point_attachment_set_x');
+  late final _spine_point_attachment_set_x = _spine_point_attachment_set_xPtr
+      .asFunction<void Function(spine_point_attachment, double)>();
+
+  double spine_point_attachment_get_y(
+    spine_point_attachment attachment,
+  ) {
+    return _spine_point_attachment_get_y(
+      attachment,
+    );
+  }
+
+  late final _spine_point_attachment_get_yPtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_point_attachment)>>(
+          'spine_point_attachment_get_y');
+  late final _spine_point_attachment_get_y = _spine_point_attachment_get_yPtr
+      .asFunction<double Function(spine_point_attachment)>();
+
+  void spine_point_attachment_set_y(
+    spine_point_attachment attachment,
+    double y,
+  ) {
+    return _spine_point_attachment_set_y(
+      attachment,
+      y,
+    );
+  }
+
+  late final _spine_point_attachment_set_yPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_point_attachment,
+              ffi.Float)>>('spine_point_attachment_set_y');
+  late final _spine_point_attachment_set_y = _spine_point_attachment_set_yPtr
+      .asFunction<void Function(spine_point_attachment, double)>();
+
+  double spine_point_attachment_get_rotation(
+    spine_point_attachment attachment,
+  ) {
+    return _spine_point_attachment_get_rotation(
+      attachment,
+    );
+  }
+
+  late final _spine_point_attachment_get_rotationPtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_point_attachment)>>(
+          'spine_point_attachment_get_rotation');
+  late final _spine_point_attachment_get_rotation =
+      _spine_point_attachment_get_rotationPtr
+          .asFunction<double Function(spine_point_attachment)>();
+
+  void spine_point_attachment_set_rotation(
+    spine_point_attachment attachment,
+    double rotation,
+  ) {
+    return _spine_point_attachment_set_rotation(
+      attachment,
+      rotation,
+    );
+  }
+
+  late final _spine_point_attachment_set_rotationPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_point_attachment,
+              ffi.Float)>>('spine_point_attachment_set_rotation');
+  late final _spine_point_attachment_set_rotation =
+      _spine_point_attachment_set_rotationPtr
+          .asFunction<void Function(spine_point_attachment, double)>();
+
+  spine_color spine_point_attachment_get_color(
+    spine_point_attachment attachment,
+  ) {
+    return _spine_point_attachment_get_color(
+      attachment,
+    );
+  }
+
+  late final _spine_point_attachment_get_colorPtr =
+      _lookup<ffi.NativeFunction<spine_color Function(spine_point_attachment)>>(
+          'spine_point_attachment_get_color');
+  late final _spine_point_attachment_get_color =
+      _spine_point_attachment_get_colorPtr
+          .asFunction<spine_color Function(spine_point_attachment)>();
+
+  void spine_point_attachment_set_color(
+    spine_point_attachment attachment,
+    double r,
+    double g,
+    double b,
+    double a,
+  ) {
+    return _spine_point_attachment_set_color(
+      attachment,
+      r,
+      g,
+      b,
+      a,
+    );
+  }
+
+  late final _spine_point_attachment_set_colorPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_point_attachment, ffi.Float, ffi.Float,
+              ffi.Float, ffi.Float)>>('spine_point_attachment_set_color');
+  late final _spine_point_attachment_set_color =
+      _spine_point_attachment_set_colorPtr.asFunction<
+          void Function(
+              spine_point_attachment, double, double, double, double)>();
+
   void spine_skin_set_attachment(
     spine_skin skin,
     int slotIndex,
@@ -7119,4 +7318,5 @@ typedef spine_slot = ffi.Pointer<ffi.Void>;
 typedef spine_ik_constraint = ffi.Pointer<ffi.Void>;
 typedef spine_transform_constraint = ffi.Pointer<ffi.Void>;
 typedef spine_path_constraint = ffi.Pointer<ffi.Void>;
+typedef spine_point_attachment = ffi.Pointer<ffi.Void>;
 typedef spine_constraint_data = ffi.Pointer<ffi.Void>;
