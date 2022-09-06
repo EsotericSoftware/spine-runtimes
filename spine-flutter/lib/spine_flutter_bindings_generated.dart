@@ -4780,6 +4780,419 @@ class SpineFlutterBindings {
           void Function(
               spine_point_attachment, double, double, double, double)>();
 
+  void spine_region_attachment_update_region(
+    spine_region_attachment attachment,
+  ) {
+    return _spine_region_attachment_update_region(
+      attachment,
+    );
+  }
+
+  late final _spine_region_attachment_update_regionPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_region_attachment)>>(
+          'spine_region_attachment_update_region');
+  late final _spine_region_attachment_update_region =
+      _spine_region_attachment_update_regionPtr
+          .asFunction<void Function(spine_region_attachment)>();
+
+  void spine_region_attachment_compute_world_vertices(
+    spine_region_attachment attachment,
+    spine_slot slot,
+    ffi.Pointer<ffi.Float> worldVertices,
+  ) {
+    return _spine_region_attachment_compute_world_vertices(
+      attachment,
+      slot,
+      worldVertices,
+    );
+  }
+
+  late final _spine_region_attachment_compute_world_verticesPtr = _lookup<
+          ffi.NativeFunction<
+              ffi.Void Function(spine_region_attachment, spine_slot,
+                  ffi.Pointer<ffi.Float>)>>(
+      'spine_region_attachment_compute_world_vertices');
+  late final _spine_region_attachment_compute_world_vertices =
+      _spine_region_attachment_compute_world_verticesPtr.asFunction<
+          void Function(
+              spine_region_attachment, spine_slot, ffi.Pointer<ffi.Float>)>();
+
+  double spine_region_attachment_get_x(
+    spine_region_attachment attachment,
+  ) {
+    return _spine_region_attachment_get_x(
+      attachment,
+    );
+  }
+
+  late final _spine_region_attachment_get_xPtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_region_attachment)>>(
+          'spine_region_attachment_get_x');
+  late final _spine_region_attachment_get_x = _spine_region_attachment_get_xPtr
+      .asFunction<double Function(spine_region_attachment)>();
+
+  void spine_region_attachment_set_x(
+    spine_region_attachment attachment,
+    double x,
+  ) {
+    return _spine_region_attachment_set_x(
+      attachment,
+      x,
+    );
+  }
+
+  late final _spine_region_attachment_set_xPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_region_attachment,
+              ffi.Float)>>('spine_region_attachment_set_x');
+  late final _spine_region_attachment_set_x = _spine_region_attachment_set_xPtr
+      .asFunction<void Function(spine_region_attachment, double)>();
+
+  double spine_region_attachment_get_y(
+    spine_region_attachment attachment,
+  ) {
+    return _spine_region_attachment_get_y(
+      attachment,
+    );
+  }
+
+  late final _spine_region_attachment_get_yPtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_region_attachment)>>(
+          'spine_region_attachment_get_y');
+  late final _spine_region_attachment_get_y = _spine_region_attachment_get_yPtr
+      .asFunction<double Function(spine_region_attachment)>();
+
+  void spine_region_attachment_set_y(
+    spine_region_attachment attachment,
+    double y,
+  ) {
+    return _spine_region_attachment_set_y(
+      attachment,
+      y,
+    );
+  }
+
+  late final _spine_region_attachment_set_yPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_region_attachment,
+              ffi.Float)>>('spine_region_attachment_set_y');
+  late final _spine_region_attachment_set_y = _spine_region_attachment_set_yPtr
+      .asFunction<void Function(spine_region_attachment, double)>();
+
+  double spine_region_attachment_get_rotation(
+    spine_region_attachment attachment,
+  ) {
+    return _spine_region_attachment_get_rotation(
+      attachment,
+    );
+  }
+
+  late final _spine_region_attachment_get_rotationPtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_region_attachment)>>(
+          'spine_region_attachment_get_rotation');
+  late final _spine_region_attachment_get_rotation =
+      _spine_region_attachment_get_rotationPtr
+          .asFunction<double Function(spine_region_attachment)>();
+
+  void spine_region_attachment_set_rotation(
+    spine_region_attachment attachment,
+    double rotation,
+  ) {
+    return _spine_region_attachment_set_rotation(
+      attachment,
+      rotation,
+    );
+  }
+
+  late final _spine_region_attachment_set_rotationPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_region_attachment,
+              ffi.Float)>>('spine_region_attachment_set_rotation');
+  late final _spine_region_attachment_set_rotation =
+      _spine_region_attachment_set_rotationPtr
+          .asFunction<void Function(spine_region_attachment, double)>();
+
+  double spine_region_attachment_get_scale_x(
+    spine_region_attachment attachment,
+  ) {
+    return _spine_region_attachment_get_scale_x(
+      attachment,
+    );
+  }
+
+  late final _spine_region_attachment_get_scale_xPtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_region_attachment)>>(
+          'spine_region_attachment_get_scale_x');
+  late final _spine_region_attachment_get_scale_x =
+      _spine_region_attachment_get_scale_xPtr
+          .asFunction<double Function(spine_region_attachment)>();
+
+  void spine_region_attachment_set_scale_x(
+    spine_region_attachment attachment,
+    double scaleX,
+  ) {
+    return _spine_region_attachment_set_scale_x(
+      attachment,
+      scaleX,
+    );
+  }
+
+  late final _spine_region_attachment_set_scale_xPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_region_attachment,
+              ffi.Float)>>('spine_region_attachment_set_scale_x');
+  late final _spine_region_attachment_set_scale_x =
+      _spine_region_attachment_set_scale_xPtr
+          .asFunction<void Function(spine_region_attachment, double)>();
+
+  double spine_region_attachment_get_scale_y(
+    spine_region_attachment attachment,
+  ) {
+    return _spine_region_attachment_get_scale_y(
+      attachment,
+    );
+  }
+
+  late final _spine_region_attachment_get_scale_yPtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_region_attachment)>>(
+          'spine_region_attachment_get_scale_y');
+  late final _spine_region_attachment_get_scale_y =
+      _spine_region_attachment_get_scale_yPtr
+          .asFunction<double Function(spine_region_attachment)>();
+
+  void spine_region_attachment_set_scale_y(
+    spine_region_attachment attachment,
+    double scaleY,
+  ) {
+    return _spine_region_attachment_set_scale_y(
+      attachment,
+      scaleY,
+    );
+  }
+
+  late final _spine_region_attachment_set_scale_yPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_region_attachment,
+              ffi.Float)>>('spine_region_attachment_set_scale_y');
+  late final _spine_region_attachment_set_scale_y =
+      _spine_region_attachment_set_scale_yPtr
+          .asFunction<void Function(spine_region_attachment, double)>();
+
+  double spine_region_attachment_get_width(
+    spine_region_attachment attachment,
+  ) {
+    return _spine_region_attachment_get_width(
+      attachment,
+    );
+  }
+
+  late final _spine_region_attachment_get_widthPtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_region_attachment)>>(
+          'spine_region_attachment_get_width');
+  late final _spine_region_attachment_get_width =
+      _spine_region_attachment_get_widthPtr
+          .asFunction<double Function(spine_region_attachment)>();
+
+  void spine_region_attachment_set_width(
+    spine_region_attachment attachment,
+    double width,
+  ) {
+    return _spine_region_attachment_set_width(
+      attachment,
+      width,
+    );
+  }
+
+  late final _spine_region_attachment_set_widthPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_region_attachment,
+              ffi.Float)>>('spine_region_attachment_set_width');
+  late final _spine_region_attachment_set_width =
+      _spine_region_attachment_set_widthPtr
+          .asFunction<void Function(spine_region_attachment, double)>();
+
+  double spine_region_attachment_get_height(
+    spine_region_attachment attachment,
+  ) {
+    return _spine_region_attachment_get_height(
+      attachment,
+    );
+  }
+
+  late final _spine_region_attachment_get_heightPtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_region_attachment)>>(
+          'spine_region_attachment_get_height');
+  late final _spine_region_attachment_get_height =
+      _spine_region_attachment_get_heightPtr
+          .asFunction<double Function(spine_region_attachment)>();
+
+  void spine_region_attachment_set_height(
+    spine_region_attachment attachment,
+    double height,
+  ) {
+    return _spine_region_attachment_set_height(
+      attachment,
+      height,
+    );
+  }
+
+  late final _spine_region_attachment_set_heightPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_region_attachment,
+              ffi.Float)>>('spine_region_attachment_set_height');
+  late final _spine_region_attachment_set_height =
+      _spine_region_attachment_set_heightPtr
+          .asFunction<void Function(spine_region_attachment, double)>();
+
+  spine_color spine_region_attachment_get_color(
+    spine_region_attachment attachment,
+  ) {
+    return _spine_region_attachment_get_color(
+      attachment,
+    );
+  }
+
+  late final _spine_region_attachment_get_colorPtr = _lookup<
+          ffi.NativeFunction<spine_color Function(spine_region_attachment)>>(
+      'spine_region_attachment_get_color');
+  late final _spine_region_attachment_get_color =
+      _spine_region_attachment_get_colorPtr
+          .asFunction<spine_color Function(spine_region_attachment)>();
+
+  void spine_region_attachment_set_color(
+    spine_region_attachment attachment,
+    double r,
+    double g,
+    double b,
+    double a,
+  ) {
+    return _spine_region_attachment_set_color(
+      attachment,
+      r,
+      g,
+      b,
+      a,
+    );
+  }
+
+  late final _spine_region_attachment_set_colorPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_region_attachment, ffi.Float, ffi.Float,
+              ffi.Float, ffi.Float)>>('spine_region_attachment_set_color');
+  late final _spine_region_attachment_set_color =
+      _spine_region_attachment_set_colorPtr.asFunction<
+          void Function(
+              spine_region_attachment, double, double, double, double)>();
+
+  ffi.Pointer<ffi.Int8> spine_region_attachment_get_path(
+    spine_region_attachment attachment,
+  ) {
+    return _spine_region_attachment_get_path(
+      attachment,
+    );
+  }
+
+  late final _spine_region_attachment_get_pathPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<ffi.Int8> Function(
+              spine_region_attachment)>>('spine_region_attachment_get_path');
+  late final _spine_region_attachment_get_path =
+      _spine_region_attachment_get_pathPtr.asFunction<
+          ffi.Pointer<ffi.Int8> Function(spine_region_attachment)>();
+
+  spine_texture_region spine_region_attachment_get_region(
+    spine_region_attachment attachment,
+  ) {
+    return _spine_region_attachment_get_region(
+      attachment,
+    );
+  }
+
+  late final _spine_region_attachment_get_regionPtr = _lookup<
+      ffi.NativeFunction<
+          spine_texture_region Function(
+              spine_region_attachment)>>('spine_region_attachment_get_region');
+  late final _spine_region_attachment_get_region =
+      _spine_region_attachment_get_regionPtr
+          .asFunction<spine_texture_region Function(spine_region_attachment)>();
+
+  spine_sequence spine_region_attachment_get_sequence(
+    spine_region_attachment attachment,
+  ) {
+    return _spine_region_attachment_get_sequence(
+      attachment,
+    );
+  }
+
+  late final _spine_region_attachment_get_sequencePtr = _lookup<
+          ffi.NativeFunction<spine_sequence Function(spine_region_attachment)>>(
+      'spine_region_attachment_get_sequence');
+  late final _spine_region_attachment_get_sequence =
+      _spine_region_attachment_get_sequencePtr
+          .asFunction<spine_sequence Function(spine_region_attachment)>();
+
+  int spine_region_attachment_get_num_offset(
+    spine_region_attachment attachment,
+  ) {
+    return _spine_region_attachment_get_num_offset(
+      attachment,
+    );
+  }
+
+  late final _spine_region_attachment_get_num_offsetPtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_region_attachment)>>(
+          'spine_region_attachment_get_num_offset');
+  late final _spine_region_attachment_get_num_offset =
+      _spine_region_attachment_get_num_offsetPtr
+          .asFunction<int Function(spine_region_attachment)>();
+
+  ffi.Pointer<ffi.Float> spine_region_attachment_get_offset(
+    spine_region_attachment attachment,
+  ) {
+    return _spine_region_attachment_get_offset(
+      attachment,
+    );
+  }
+
+  late final _spine_region_attachment_get_offsetPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<ffi.Float> Function(
+              spine_region_attachment)>>('spine_region_attachment_get_offset');
+  late final _spine_region_attachment_get_offset =
+      _spine_region_attachment_get_offsetPtr.asFunction<
+          ffi.Pointer<ffi.Float> Function(spine_region_attachment)>();
+
+  int spine_region_attachment_get_num_uvs(
+    spine_region_attachment attachment,
+  ) {
+    return _spine_region_attachment_get_num_uvs(
+      attachment,
+    );
+  }
+
+  late final _spine_region_attachment_get_num_uvsPtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_region_attachment)>>(
+          'spine_region_attachment_get_num_uvs');
+  late final _spine_region_attachment_get_num_uvs =
+      _spine_region_attachment_get_num_uvsPtr
+          .asFunction<int Function(spine_region_attachment)>();
+
+  ffi.Pointer<ffi.Float> spine_region_attachment_get_uvs(
+    spine_region_attachment attachment,
+  ) {
+    return _spine_region_attachment_get_uvs(
+      attachment,
+    );
+  }
+
+  late final _spine_region_attachment_get_uvsPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<ffi.Float> Function(
+              spine_region_attachment)>>('spine_region_attachment_get_uvs');
+  late final _spine_region_attachment_get_uvs =
+      _spine_region_attachment_get_uvsPtr.asFunction<
+          ffi.Pointer<ffi.Float> Function(spine_region_attachment)>();
+
   void spine_skin_set_attachment(
     spine_skin skin,
     int slotIndex,
@@ -7319,4 +7732,7 @@ typedef spine_ik_constraint = ffi.Pointer<ffi.Void>;
 typedef spine_transform_constraint = ffi.Pointer<ffi.Void>;
 typedef spine_path_constraint = ffi.Pointer<ffi.Void>;
 typedef spine_point_attachment = ffi.Pointer<ffi.Void>;
+typedef spine_region_attachment = ffi.Pointer<ffi.Void>;
+typedef spine_texture_region = ffi.Pointer<ffi.Void>;
+typedef spine_sequence = ffi.Pointer<ffi.Void>;
 typedef spine_constraint_data = ffi.Pointer<ffi.Void>;

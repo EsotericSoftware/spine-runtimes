@@ -957,6 +957,20 @@ class Slot {
   }
 }
 
+// FIXME
+class TextureRegion {
+  final spine_texture_region _region;
+
+  TextureRegion._(this._region);
+}
+
+// FIXME
+class Sequence {
+  final spine_sequence _sequence;
+
+  Sequence._(this._sequence);
+}
+
 enum AttachmentType {
   Region(0),
   Mesh(1),
@@ -1011,9 +1025,110 @@ abstract class Attachment {
   }
 }
 
-// FIXME
 class RegionAttachment extends Attachment {
   RegionAttachment._(spine_attachment attachment): super._(attachment);
+
+  List<double> computeWorldVertices(Slot slot) {
+    Pointer<Float> vertices = malloc.allocate(4 * 9).cast();
+    _bindings.spine_region_attachment_compute_world_vertices(_attachment, slot._slot, vertices);
+    final result = vertices.asTypedList(8).toList();
+    malloc.free(vertices);
+    return result;
+  }
+
+  double getX() {
+    return _bindings.spine_region_attachment_get_x(_attachment);
+  }
+
+  void setX(double x) {
+    _bindings.spine_region_attachment_set_x(_attachment, x);
+  }
+
+  double getY() {
+    return _bindings.spine_region_attachment_get_y(_attachment);
+  }
+
+  void setY(double y) {
+    _bindings.spine_region_attachment_set_y(_attachment, y);
+  }
+
+  double getRotation() {
+    return _bindings.spine_region_attachment_get_rotation(_attachment);
+  }
+
+  void setRotation(double rotation) {
+    _bindings.spine_region_attachment_set_rotation(_attachment, rotation);
+  }
+
+  double getScaleX() {
+    return _bindings.spine_region_attachment_get_scale_x(_attachment);
+  }
+
+  void setScaleX(double scaleX) {
+    _bindings.spine_region_attachment_set_scale_x(_attachment, scaleX);
+  }
+
+  double getScaleY() {
+    return _bindings.spine_region_attachment_get_scale_y(_attachment);
+  }
+
+  void setScaleY(double scaleY) {
+    _bindings.spine_region_attachment_set_scale_x(_attachment, scaleY);
+  }
+
+  double getWidth() {
+    return _bindings.spine_region_attachment_get_width(_attachment);
+  }
+
+  void setWidth(double width) {
+    _bindings.spine_region_attachment_set_width(_attachment, width);
+  }
+
+  double getHeight() {
+    return _bindings.spine_region_attachment_get_height(_attachment);
+  }
+
+  void setHeight(double height) {
+    _bindings.spine_region_attachment_set_height(_attachment, height);
+  }
+
+  Color getColor() {
+    final color = _bindings.spine_region_attachment_get_color(_attachment);
+    return Color(color.r, color.g, color.b, color.a);
+  }
+
+  void setColor(double r, double g, double b, double a) {
+    _bindings.spine_region_attachment_set_color(_attachment, r, g, b, a);
+  }
+
+  String getPath() {
+    Pointer<Utf8> path = _bindings.spine_region_attachment_get_path(_attachment).cast();
+    return path.toDartString();
+  }
+
+  TextureRegion? getRegion() {
+    final region = _bindings.spine_region_attachment_get_region(_attachment);
+    if (region.address == nullptr.address) return null;
+    return TextureRegion._(region);
+  }
+
+  Sequence? getSequence() {
+    final sequence = _bindings.spine_region_attachment_get_sequence(_attachment);
+    if (sequence.address == nullptr.address) return null;
+    return Sequence._(sequence);
+  }
+
+  Float32List getOffset() {
+    final num = _bindings.spine_region_attachment_get_num_offset(_attachment);
+    final offset = _bindings.spine_region_attachment_get_offset(_attachment);
+    return offset.asTypedList(num);
+  }
+
+  Float32List getUVs() {
+    final num = _bindings.spine_region_attachment_get_num_uvs(_attachment);
+    final offset = _bindings.spine_region_attachment_get_uvs(_attachment);
+    return offset.asTypedList(num);
+  }
 }
 
 class VertexAttachment extends Attachment {

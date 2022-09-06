@@ -1999,6 +1999,7 @@ FFI_PLUGIN_EXPORT void spine_attachment_dispose(spine_attachment attachment) {
     delete _attachment;
 }
 
+// PointAttachment
 FFI_PLUGIN_EXPORT spine_vector spine_point_attachment_compute_world_position(spine_point_attachment attachment, spine_bone bone) {
     spine_vector result = { 0, 0 };
     if (attachment == nullptr) return result;
@@ -2062,6 +2063,160 @@ FFI_PLUGIN_EXPORT void spine_point_attachment_set_color(spine_point_attachment a
     if (attachment == nullptr) return;
     PointAttachment *_attachment = (PointAttachment*)attachment;
     _attachment->getColor().set(r, g, b, a);
+}
+
+// RegionAttachment
+FFI_PLUGIN_EXPORT void spine_region_attachment_update_region(spine_region_attachment attachment) {
+    if (attachment == nullptr) return;
+    RegionAttachment *_attachment = (RegionAttachment*)attachment;
+    _attachment->updateRegion();
+}
+
+FFI_PLUGIN_EXPORT void spine_region_attachment_compute_world_vertices(spine_region_attachment attachment, spine_slot slot, float *worldVertices) {
+    if (attachment == nullptr) return;
+    RegionAttachment *_attachment = (RegionAttachment*)attachment;
+    _attachment->computeWorldVertices(*(Slot*)slot, worldVertices, 0);
+}
+
+FFI_PLUGIN_EXPORT float spine_region_attachment_get_x(spine_region_attachment attachment) {
+    if (attachment == nullptr) return 0;
+    RegionAttachment *_attachment = (RegionAttachment*)attachment;
+    return _attachment->getX();
+}
+
+FFI_PLUGIN_EXPORT void spine_region_attachment_set_x(spine_region_attachment attachment, float x) {
+    if (attachment == nullptr) return;
+    RegionAttachment *_attachment = (RegionAttachment*)attachment;
+    _attachment->setX(x);
+}
+
+FFI_PLUGIN_EXPORT float spine_region_attachment_get_y(spine_region_attachment attachment) {
+    if (attachment == nullptr) return 0;
+    RegionAttachment *_attachment = (RegionAttachment*)attachment;
+    return _attachment->getY();
+}
+
+FFI_PLUGIN_EXPORT void spine_region_attachment_set_y(spine_region_attachment attachment, float y) {
+    if (attachment == nullptr) return;
+    RegionAttachment *_attachment = (RegionAttachment*)attachment;
+    _attachment->setY(y);
+}
+
+FFI_PLUGIN_EXPORT float spine_region_attachment_get_rotation(spine_region_attachment attachment) {
+    if (attachment == nullptr) return 0;
+    RegionAttachment *_attachment = (RegionAttachment*)attachment;
+    return _attachment->getRotation();
+}
+
+FFI_PLUGIN_EXPORT void spine_region_attachment_set_rotation(spine_region_attachment attachment, float rotation) {
+    if (attachment == nullptr) return;
+    RegionAttachment *_attachment = (RegionAttachment*)attachment;
+    _attachment->setRotation(rotation);
+}
+
+FFI_PLUGIN_EXPORT float spine_region_attachment_get_scale_x(spine_region_attachment attachment) {
+    if (attachment == nullptr) return 0;
+    RegionAttachment *_attachment = (RegionAttachment*)attachment;
+    return _attachment->getScaleX();
+}
+
+FFI_PLUGIN_EXPORT void spine_region_attachment_set_scale_x(spine_region_attachment attachment, float scaleX) {
+    if (attachment == nullptr) return;
+    RegionAttachment *_attachment = (RegionAttachment*)attachment;
+    _attachment->setScaleX(scaleX);
+}
+
+FFI_PLUGIN_EXPORT float spine_region_attachment_get_scale_y(spine_region_attachment attachment) {
+    if (attachment == nullptr) return 0;
+    RegionAttachment *_attachment = (RegionAttachment*)attachment;
+    return _attachment->getScaleY();
+}
+
+FFI_PLUGIN_EXPORT void spine_region_attachment_set_scale_y(spine_region_attachment attachment, float scaleY) {
+    if (attachment == nullptr) return;
+    RegionAttachment *_attachment = (RegionAttachment*)attachment;
+    _attachment->setScaleY(scaleY);
+}
+
+FFI_PLUGIN_EXPORT float spine_region_attachment_get_width(spine_region_attachment attachment) {
+    if (attachment == nullptr) return 0;
+    RegionAttachment *_attachment = (RegionAttachment*)attachment;
+    return _attachment->getWidth();
+}
+
+FFI_PLUGIN_EXPORT void spine_region_attachment_set_width(spine_region_attachment attachment, float width) {
+    if (attachment == nullptr) return;
+    RegionAttachment *_attachment = (RegionAttachment*)attachment;
+    _attachment->setWidth(width);
+}
+
+FFI_PLUGIN_EXPORT float spine_region_attachment_get_height(spine_region_attachment attachment) {
+    if (attachment == nullptr) return 0;
+    RegionAttachment *_attachment = (RegionAttachment*)attachment;
+    return _attachment->getHeight();
+}
+
+FFI_PLUGIN_EXPORT void spine_region_attachment_set_height(spine_region_attachment attachment, float height) {
+    if (attachment == nullptr) return;
+    RegionAttachment *_attachment = (RegionAttachment*)attachment;
+    _attachment->setHeight(height);
+}
+
+FFI_PLUGIN_EXPORT spine_color spine_region_attachment_get_color(spine_region_attachment attachment) {
+    spine_color result = { 0, 0, 0, 0 };
+    if (attachment == nullptr) return result;
+    RegionAttachment *_attachment = (RegionAttachment*)attachment;
+    Color &color = _attachment->getColor();
+    result = { color.r, color.g, color.b, color.a };
+    return result;
+}
+
+FFI_PLUGIN_EXPORT void spine_region_attachment_set_color(spine_region_attachment attachment, float r, float g, float b, float a) {
+    if (attachment == nullptr) return;
+    RegionAttachment *_attachment = (RegionAttachment*)attachment;
+    _attachment->getColor().set(r, g, b, a);
+}
+
+FFI_PLUGIN_EXPORT const char *spine_region_attachment_get_path(spine_region_attachment attachment) {
+    if (attachment == nullptr) return nullptr;
+    RegionAttachment *_attachment = (RegionAttachment*)attachment;
+    return _attachment->getPath().buffer();
+}
+
+FFI_PLUGIN_EXPORT spine_texture_region spine_region_attachment_get_region(spine_region_attachment attachment) {
+    if (attachment == nullptr) return nullptr;
+    RegionAttachment *_attachment = (RegionAttachment*)attachment;
+    return (spine_texture_region)_attachment->getRegion();
+}
+
+FFI_PLUGIN_EXPORT spine_sequence spine_region_attachment_get_sequence(spine_region_attachment attachment) {
+    if (attachment == nullptr) return nullptr;
+    RegionAttachment *_attachment = (RegionAttachment*)attachment;
+    return (spine_sequence)_attachment->getSequence();
+}
+
+FFI_PLUGIN_EXPORT int spine_region_attachment_get_num_offset(spine_region_attachment attachment) {
+    if (attachment == nullptr) return 0;
+    RegionAttachment *_attachment = (RegionAttachment*)attachment;
+    return (int)_attachment->getOffset().size();
+}
+
+FFI_PLUGIN_EXPORT float *spine_region_attachment_get_offset(spine_region_attachment attachment) {
+    if (attachment == nullptr) return nullptr;
+    RegionAttachment *_attachment = (RegionAttachment*)attachment;
+    return _attachment->getOffset().buffer();
+}
+
+FFI_PLUGIN_EXPORT int spine_region_attachment_get_num_uvs(spine_region_attachment attachment) {
+    if (attachment == nullptr) return 0;
+    RegionAttachment *_attachment = (RegionAttachment*)attachment;
+    return (int)_attachment->getUVs().size();
+}
+
+FFI_PLUGIN_EXPORT float *spine_region_attachment_get_uvs(spine_region_attachment attachment) {
+    if (attachment == nullptr) return nullptr;
+    RegionAttachment *_attachment = (RegionAttachment*)attachment;
+    return _attachment->getUVs().buffer();
 }
 
 // Skin
