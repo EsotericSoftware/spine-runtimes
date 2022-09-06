@@ -31,8 +31,12 @@ typedef void* spine_slot;
 typedef void* spine_slot_data;
 typedef void* spine_skin;
 typedef void* spine_attachment;
-typedef void* spine_point_attachment;
 typedef void* spine_region_attachment;
+typedef void* spine_vertex_attachment;
+typedef void* spine_mesh_attachment;
+typedef void* spine_clipping_attachment;
+typedef void* spine_path_attachment;
+typedef void* spine_point_attachment;
 typedef void* spine_texture_region;
 typedef void* spine_sequence;
 typedef void* spine_mesh_attachment;
@@ -514,6 +518,15 @@ FFI_PLUGIN_EXPORT int spine_region_attachment_get_num_offset(spine_region_attach
 FFI_PLUGIN_EXPORT float *spine_region_attachment_get_offset(spine_region_attachment attachment);
 FFI_PLUGIN_EXPORT int spine_region_attachment_get_num_uvs(spine_region_attachment attachment);
 FFI_PLUGIN_EXPORT float *spine_region_attachment_get_uvs(spine_region_attachment attachment);
+
+FFI_PLUGIN_EXPORT int spine_vertex_attachment_get_world_vertices_length(spine_vertex_attachment attachment);
+FFI_PLUGIN_EXPORT void spine_vertex_attachment_compute_world_vertices(spine_vertex_attachment attachment, spine_slot slot, float *worldVertices);
+FFI_PLUGIN_EXPORT int spine_vertex_attachment_get_num_bones(spine_vertex_attachment attachment);
+FFI_PLUGIN_EXPORT int *spine_region_attachment_get_bones(spine_region_attachment attachment);
+FFI_PLUGIN_EXPORT int spine_vertex_attachment_get_num_vertices(spine_vertex_attachment attachment);
+FFI_PLUGIN_EXPORT float *spine_region_attachment_get_vertices(spine_region_attachment attachment);
+FFI_PLUGIN_EXPORT spine_attachment spine_vertex_attachment_get_timeline_attachment(spine_vertex_attachment attachment);
+FFI_PLUGIN_EXPORT void spine_vertex_attachment_set_timeline_attachment(spine_vertex_attachment attachment);
 
 FFI_PLUGIN_EXPORT void spine_skin_set_attachment(spine_skin skin, int slotIndex, const char* name, spine_attachment attachment);
 FFI_PLUGIN_EXPORT spine_attachment spine_skin_get_attachment(spine_skin skin, int slotIndex, const char* name);

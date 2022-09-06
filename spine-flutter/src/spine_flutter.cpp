@@ -2219,6 +2219,55 @@ FFI_PLUGIN_EXPORT float *spine_region_attachment_get_uvs(spine_region_attachment
     return _attachment->getUVs().buffer();
 }
 
+// VertexAttachment
+FFI_PLUGIN_EXPORT int spine_vertex_attachment_get_world_vertices_length(spine_vertex_attachment attachment) {
+    if (attachment == nullptr) return 0;
+    VertexAttachment *_attachment = (VertexAttachment*)attachment;
+    return (int)_attachment->getWorldVerticesLength();
+}
+
+FFI_PLUGIN_EXPORT void spine_vertex_attachment_compute_world_vertices(spine_vertex_attachment attachment, spine_slot slot, float *worldVertices) {
+    if (attachment == nullptr) return;
+    VertexAttachment *_attachment = (VertexAttachment*)attachment;
+    _attachment->computeWorldVertices(*(Slot*)slot, worldVertices);
+}
+
+FFI_PLUGIN_EXPORT int spine_vertex_attachment_get_num_bones(spine_vertex_attachment attachment) {
+    if (attachment == nullptr) return 0;
+    VertexAttachment *_attachment = (VertexAttachment*)attachment;
+    return (int)_attachment->getBones().size();
+}
+
+FFI_PLUGIN_EXPORT int *spine_region_attachment_get_bones(spine_region_attachment attachment) {
+    if (attachment == nullptr) return nullptr;
+    VertexAttachment *_attachment = (VertexAttachment*)attachment;
+    return _attachment->getBones().buffer();
+}
+
+FFI_PLUGIN_EXPORT int spine_vertex_attachment_get_num_vertices(spine_vertex_attachment attachment) {
+    if (attachment == nullptr) return 0;
+    VertexAttachment *_attachment = (VertexAttachment*)attachment;
+    return (int)_attachment->getVertices().size();
+}
+
+FFI_PLUGIN_EXPORT float *spine_region_attachment_get_vertices(spine_region_attachment attachment) {
+    if (attachment == nullptr) return nullptr;
+    VertexAttachment *_attachment = (VertexAttachment*)attachment;
+    return _attachment->getVertices().buffer();
+}
+
+FFI_PLUGIN_EXPORT spine_attachment spine_vertex_attachment_get_timeline_attachment(spine_vertex_attachment attachment) {
+    if (attachment == nullptr) return nullptr;
+    VertexAttachment *_attachment = (VertexAttachment*)attachment;
+    return _attachment->getTimelineAttachment();
+}
+
+FFI_PLUGIN_EXPORT void spine_vertex_attachment_set_timeline_attachment(spine_vertex_attachment attachment) {
+    if (attachment == nullptr) return;
+    VertexAttachment *_attachment = (VertexAttachment*)attachment;
+    _attachment->setTimelineAttachment((Attachment*)attachment);
+}
+
 // Skin
 FFI_PLUGIN_EXPORT void spine_skin_set_attachment(spine_skin skin, int slotIndex, const char* name, spine_attachment attachment) {
     if (skin == nullptr) return;

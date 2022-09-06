@@ -5193,6 +5193,136 @@ class SpineFlutterBindings {
       _spine_region_attachment_get_uvsPtr.asFunction<
           ffi.Pointer<ffi.Float> Function(spine_region_attachment)>();
 
+  int spine_vertex_attachment_get_world_vertices_length(
+    spine_vertex_attachment attachment,
+  ) {
+    return _spine_vertex_attachment_get_world_vertices_length(
+      attachment,
+    );
+  }
+
+  late final _spine_vertex_attachment_get_world_vertices_lengthPtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_vertex_attachment)>>(
+          'spine_vertex_attachment_get_world_vertices_length');
+  late final _spine_vertex_attachment_get_world_vertices_length =
+      _spine_vertex_attachment_get_world_vertices_lengthPtr
+          .asFunction<int Function(spine_vertex_attachment)>();
+
+  void spine_vertex_attachment_compute_world_vertices(
+    spine_vertex_attachment attachment,
+    spine_slot slot,
+    ffi.Pointer<ffi.Float> worldVertices,
+  ) {
+    return _spine_vertex_attachment_compute_world_vertices(
+      attachment,
+      slot,
+      worldVertices,
+    );
+  }
+
+  late final _spine_vertex_attachment_compute_world_verticesPtr = _lookup<
+          ffi.NativeFunction<
+              ffi.Void Function(spine_vertex_attachment, spine_slot,
+                  ffi.Pointer<ffi.Float>)>>(
+      'spine_vertex_attachment_compute_world_vertices');
+  late final _spine_vertex_attachment_compute_world_vertices =
+      _spine_vertex_attachment_compute_world_verticesPtr.asFunction<
+          void Function(
+              spine_vertex_attachment, spine_slot, ffi.Pointer<ffi.Float>)>();
+
+  int spine_vertex_attachment_get_num_bones(
+    spine_vertex_attachment attachment,
+  ) {
+    return _spine_vertex_attachment_get_num_bones(
+      attachment,
+    );
+  }
+
+  late final _spine_vertex_attachment_get_num_bonesPtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_vertex_attachment)>>(
+          'spine_vertex_attachment_get_num_bones');
+  late final _spine_vertex_attachment_get_num_bones =
+      _spine_vertex_attachment_get_num_bonesPtr
+          .asFunction<int Function(spine_vertex_attachment)>();
+
+  ffi.Pointer<ffi.Int32> spine_region_attachment_get_bones(
+    spine_region_attachment attachment,
+  ) {
+    return _spine_region_attachment_get_bones(
+      attachment,
+    );
+  }
+
+  late final _spine_region_attachment_get_bonesPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<ffi.Int32> Function(
+              spine_region_attachment)>>('spine_region_attachment_get_bones');
+  late final _spine_region_attachment_get_bones =
+      _spine_region_attachment_get_bonesPtr.asFunction<
+          ffi.Pointer<ffi.Int32> Function(spine_region_attachment)>();
+
+  int spine_vertex_attachment_get_num_vertices(
+    spine_vertex_attachment attachment,
+  ) {
+    return _spine_vertex_attachment_get_num_vertices(
+      attachment,
+    );
+  }
+
+  late final _spine_vertex_attachment_get_num_verticesPtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_vertex_attachment)>>(
+          'spine_vertex_attachment_get_num_vertices');
+  late final _spine_vertex_attachment_get_num_vertices =
+      _spine_vertex_attachment_get_num_verticesPtr
+          .asFunction<int Function(spine_vertex_attachment)>();
+
+  ffi.Pointer<ffi.Float> spine_region_attachment_get_vertices(
+    spine_region_attachment attachment,
+  ) {
+    return _spine_region_attachment_get_vertices(
+      attachment,
+    );
+  }
+
+  late final _spine_region_attachment_get_verticesPtr = _lookup<
+          ffi.NativeFunction<
+              ffi.Pointer<ffi.Float> Function(spine_region_attachment)>>(
+      'spine_region_attachment_get_vertices');
+  late final _spine_region_attachment_get_vertices =
+      _spine_region_attachment_get_verticesPtr.asFunction<
+          ffi.Pointer<ffi.Float> Function(spine_region_attachment)>();
+
+  spine_attachment spine_vertex_attachment_get_timeline_attachment(
+    spine_vertex_attachment attachment,
+  ) {
+    return _spine_vertex_attachment_get_timeline_attachment(
+      attachment,
+    );
+  }
+
+  late final _spine_vertex_attachment_get_timeline_attachmentPtr = _lookup<
+          ffi.NativeFunction<
+              spine_attachment Function(spine_vertex_attachment)>>(
+      'spine_vertex_attachment_get_timeline_attachment');
+  late final _spine_vertex_attachment_get_timeline_attachment =
+      _spine_vertex_attachment_get_timeline_attachmentPtr
+          .asFunction<spine_attachment Function(spine_vertex_attachment)>();
+
+  void spine_vertex_attachment_set_timeline_attachment(
+    spine_vertex_attachment attachment,
+  ) {
+    return _spine_vertex_attachment_set_timeline_attachment(
+      attachment,
+    );
+  }
+
+  late final _spine_vertex_attachment_set_timeline_attachmentPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_vertex_attachment)>>(
+          'spine_vertex_attachment_set_timeline_attachment');
+  late final _spine_vertex_attachment_set_timeline_attachment =
+      _spine_vertex_attachment_set_timeline_attachmentPtr
+          .asFunction<void Function(spine_vertex_attachment)>();
+
   void spine_skin_set_attachment(
     spine_skin skin,
     int slotIndex,
@@ -7735,4 +7865,5 @@ typedef spine_point_attachment = ffi.Pointer<ffi.Void>;
 typedef spine_region_attachment = ffi.Pointer<ffi.Void>;
 typedef spine_texture_region = ffi.Pointer<ffi.Void>;
 typedef spine_sequence = ffi.Pointer<ffi.Void>;
+typedef spine_vertex_attachment = ffi.Pointer<ffi.Void>;
 typedef spine_constraint_data = ffi.Pointer<ffi.Void>;

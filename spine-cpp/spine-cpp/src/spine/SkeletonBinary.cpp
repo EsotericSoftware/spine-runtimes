@@ -564,7 +564,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput *input, Skin *skin, int slo
 			Vector<float> uvs;
 			Vector<unsigned short> triangles;
 			Vector<float> vertices;
-			Vector<size_t> bones;
+			Vector<int> bones;
 			int hullLength;
 			Sequence *sequence;
 			float width = 0;
@@ -702,7 +702,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput *input, Skin *skin, int slo
 	return NULL;
 }
 
-void SkeletonBinary::readVertices(DataInput *input, Vector<float> &vertices, Vector<size_t> &bones, int vertexCount) {
+void SkeletonBinary::readVertices(DataInput *input, Vector<float> &vertices, Vector<int> &bones, int vertexCount) {
 	float scale = _scale;
 	int verticesLength = vertexCount << 1;
 

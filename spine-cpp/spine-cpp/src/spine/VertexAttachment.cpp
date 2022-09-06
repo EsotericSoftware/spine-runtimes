@@ -64,7 +64,7 @@ void VertexAttachment::computeWorldVertices(Slot &slot, size_t start, size_t cou
 	Skeleton &skeleton = slot._bone._skeleton;
 	Vector<float> *deformArray = &slot.getDeform();
 	Vector<float> *vertices = &_vertices;
-	Vector<size_t> &bones = _bones;
+	Vector<int> &bones = _bones;
 	if (bones.size() == 0) {
 		if (deformArray->size() > 0) vertices = deformArray;
 
@@ -130,7 +130,7 @@ int VertexAttachment::getId() {
 	return _id;
 }
 
-Vector<size_t> &VertexAttachment::getBones() {
+Vector<int> &VertexAttachment::getBones() {
 	return _bones;
 }
 

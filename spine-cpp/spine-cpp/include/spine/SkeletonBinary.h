@@ -147,7 +147,7 @@ namespace spine {
 		Attachment *readAttachment(DataInput *input, Skin *skin, int slotIndex, const String &attachmentName,
 								   SkeletonData *skeletonData, bool nonessential);
 
-		void readVertices(DataInput *input, Vector<float> &vertices, Vector<size_t> &bones, int vertexCount);
+		void readVertices(DataInput *input, Vector<float> &vertices, Vector<int> &bones, int vertexCount);
 
 		void readFloatArray(DataInput *input, int n, float scale, Vector<float> &array);
 

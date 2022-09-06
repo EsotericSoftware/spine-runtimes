@@ -653,7 +653,7 @@ void Skeleton::sortPathConstraintAttachment(Skin *skin, size_t slotIndex, Bone &
 
 void Skeleton::sortPathConstraintAttachment(Attachment *attachment, Bone &slotBone) {
 	if (attachment == NULL || !attachment->getRTTI().instanceOf(PathAttachment::rtti)) return;
-	Vector<size_t> &pathBones = static_cast<PathAttachment *>(attachment)->getBones();
+	Vector<int> &pathBones = static_cast<PathAttachment *>(attachment)->getBones();
 	if (pathBones.size() == 0)
 		sortBone(&slotBone);
 	else {
