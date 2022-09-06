@@ -23,40 +23,41 @@
 #endif
 #endif
 
-typedef void* spine_skeleton;
-typedef void* spine_skeleton_data;
-typedef void* spine_bone;
-typedef void* spine_bone_data;
-typedef void* spine_slot;
-typedef void* spine_slot_data;
-typedef void* spine_skin;
-typedef void* spine_attachment;
-typedef void* spine_region_attachment;
-typedef void* spine_vertex_attachment;
-typedef void* spine_mesh_attachment;
-typedef void* spine_clipping_attachment;
-typedef void* spine_path_attachment;
-typedef void* spine_point_attachment;
-typedef void* spine_texture_region;
-typedef void* spine_sequence;
-typedef void* spine_mesh_attachment;
-typedef void* spine_clipping_attachment;
-typedef void* spine_bounding_box_attachment;
-typedef void* spine_path_attachment;
-typedef void* spine_constraint;
-typedef void* spine_constraint_data;
-typedef void* spine_ik_constraint;
-typedef void* spine_ik_constraint_data;
-typedef void* spine_transform_constraint;
-typedef void* spine_transform_constraint_data;
-typedef void* spine_path_constraint;
-typedef void* spine_path_constraint_data;
-typedef void* spine_animation_state;
-typedef void* spine_animation_state_events;
-typedef void* spine_event;
-typedef void* spine_event_data;
-typedef void* spine_track_entry;
-typedef void* spine_animation;
+#define SPINE_OPAQUE_TYPE(name) \
+    typedef struct name##_wrapper {} name##_wrapper; \
+    typedef name##_wrapper *name;
+
+SPINE_OPAQUE_TYPE(spine_skeleton)
+SPINE_OPAQUE_TYPE(spine_skeleton_data)
+SPINE_OPAQUE_TYPE(spine_bone)
+SPINE_OPAQUE_TYPE(spine_bone_data)
+SPINE_OPAQUE_TYPE(spine_slot)
+SPINE_OPAQUE_TYPE(spine_slot_data)
+SPINE_OPAQUE_TYPE(spine_skin)
+SPINE_OPAQUE_TYPE(spine_attachment)
+SPINE_OPAQUE_TYPE(spine_region_attachment)
+SPINE_OPAQUE_TYPE(spine_vertex_attachment)
+SPINE_OPAQUE_TYPE(spine_mesh_attachment)
+SPINE_OPAQUE_TYPE(spine_clipping_attachment)
+SPINE_OPAQUE_TYPE(spine_bounding_box_attachment)
+SPINE_OPAQUE_TYPE(spine_path_attachment)
+SPINE_OPAQUE_TYPE(spine_point_attachment)
+SPINE_OPAQUE_TYPE(spine_texture_region)
+SPINE_OPAQUE_TYPE(spine_sequence)
+SPINE_OPAQUE_TYPE(spine_constraint)
+SPINE_OPAQUE_TYPE(spine_constraint_data)
+SPINE_OPAQUE_TYPE(spine_ik_constraint)
+SPINE_OPAQUE_TYPE(spine_ik_constraint_data)
+SPINE_OPAQUE_TYPE(spine_transform_constraint)
+SPINE_OPAQUE_TYPE(spine_transform_constraint_data)
+SPINE_OPAQUE_TYPE(spine_path_constraint)
+SPINE_OPAQUE_TYPE(spine_path_constraint_data)
+SPINE_OPAQUE_TYPE(spine_animation_state)
+SPINE_OPAQUE_TYPE(spine_animation_state_events)
+SPINE_OPAQUE_TYPE(spine_event)
+SPINE_OPAQUE_TYPE(spine_event_data)
+SPINE_OPAQUE_TYPE(spine_track_entry)
+SPINE_OPAQUE_TYPE(spine_animation)
 
 typedef struct spine_atlas {
     void *atlas;
@@ -527,6 +528,16 @@ FFI_PLUGIN_EXPORT int spine_vertex_attachment_get_num_vertices(spine_vertex_atta
 FFI_PLUGIN_EXPORT float *spine_region_attachment_get_vertices(spine_region_attachment attachment);
 FFI_PLUGIN_EXPORT spine_attachment spine_vertex_attachment_get_timeline_attachment(spine_vertex_attachment timelineAttachment);
 FFI_PLUGIN_EXPORT void spine_vertex_attachment_set_timeline_attachment(spine_vertex_attachment attachment, spine_attachment timelineAttachment);
+
+FFI_PLUGIN_EXPORT void spine_mesh_attachment_update_region(spine_mesh_attachment attachment);
+
+FFI_PLUGIN_EXPORT spine_slot_data spine_clipping_attachment_get_end_slot(spine_clipping_attachment attachment);
+
+FFI_PLUGIN_EXPORT spine_color spine_bounding_box_attachment_get_color(spine_bounding_box_attachment attachment);
+FFI_PLUGIN_EXPORT void spine_bounding_box_attachment_set_color(spine_bounding_box_attachment attachment, float r, float g, float b, float a);
+
+FFI_PLUGIN_EXPORT spine_color spine_path_attachment_get_color(spine_path_attachment attachment);
+FFI_PLUGIN_EXPORT void spine_path_attachment_set_color(spine_path_attachment attachment, float r, float g, float b, float a);
 
 FFI_PLUGIN_EXPORT void spine_skin_set_attachment(spine_skin skin, int slotIndex, const char* name, spine_attachment attachment);
 FFI_PLUGIN_EXPORT spine_attachment spine_skin_get_attachment(spine_skin skin, int slotIndex, const char* name);

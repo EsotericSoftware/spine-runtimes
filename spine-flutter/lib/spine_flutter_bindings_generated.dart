@@ -5326,6 +5326,122 @@ class SpineFlutterBindings {
       _spine_vertex_attachment_set_timeline_attachmentPtr.asFunction<
           void Function(spine_vertex_attachment, spine_attachment)>();
 
+  void spine_mesh_attachment_update_region(
+    spine_mesh_attachment attachment,
+  ) {
+    return _spine_mesh_attachment_update_region(
+      attachment,
+    );
+  }
+
+  late final _spine_mesh_attachment_update_regionPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_mesh_attachment)>>(
+          'spine_mesh_attachment_update_region');
+  late final _spine_mesh_attachment_update_region =
+      _spine_mesh_attachment_update_regionPtr
+          .asFunction<void Function(spine_mesh_attachment)>();
+
+  spine_slot_data spine_clipping_attachment_get_end_slot(
+    spine_clipping_attachment attachment,
+  ) {
+    return _spine_clipping_attachment_get_end_slot(
+      attachment,
+    );
+  }
+
+  late final _spine_clipping_attachment_get_end_slotPtr = _lookup<
+          ffi.NativeFunction<
+              spine_slot_data Function(spine_clipping_attachment)>>(
+      'spine_clipping_attachment_get_end_slot');
+  late final _spine_clipping_attachment_get_end_slot =
+      _spine_clipping_attachment_get_end_slotPtr
+          .asFunction<spine_slot_data Function(spine_clipping_attachment)>();
+
+  spine_color spine_bounding_box_attachment_get_color(
+    spine_bounding_box_attachment attachment,
+  ) {
+    return _spine_bounding_box_attachment_get_color(
+      attachment,
+    );
+  }
+
+  late final _spine_bounding_box_attachment_get_colorPtr = _lookup<
+          ffi.NativeFunction<
+              spine_color Function(spine_bounding_box_attachment)>>(
+      'spine_bounding_box_attachment_get_color');
+  late final _spine_bounding_box_attachment_get_color =
+      _spine_bounding_box_attachment_get_colorPtr
+          .asFunction<spine_color Function(spine_bounding_box_attachment)>();
+
+  void spine_bounding_box_attachment_set_color(
+    spine_bounding_box_attachment attachment,
+    double r,
+    double g,
+    double b,
+    double a,
+  ) {
+    return _spine_bounding_box_attachment_set_color(
+      attachment,
+      r,
+      g,
+      b,
+      a,
+    );
+  }
+
+  late final _spine_bounding_box_attachment_set_colorPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(
+              spine_bounding_box_attachment,
+              ffi.Float,
+              ffi.Float,
+              ffi.Float,
+              ffi.Float)>>('spine_bounding_box_attachment_set_color');
+  late final _spine_bounding_box_attachment_set_color =
+      _spine_bounding_box_attachment_set_colorPtr.asFunction<
+          void Function(
+              spine_bounding_box_attachment, double, double, double, double)>();
+
+  spine_color spine_path_attachment_get_color(
+    spine_path_attachment attachment,
+  ) {
+    return _spine_path_attachment_get_color(
+      attachment,
+    );
+  }
+
+  late final _spine_path_attachment_get_colorPtr =
+      _lookup<ffi.NativeFunction<spine_color Function(spine_path_attachment)>>(
+          'spine_path_attachment_get_color');
+  late final _spine_path_attachment_get_color =
+      _spine_path_attachment_get_colorPtr
+          .asFunction<spine_color Function(spine_path_attachment)>();
+
+  void spine_path_attachment_set_color(
+    spine_path_attachment attachment,
+    double r,
+    double g,
+    double b,
+    double a,
+  ) {
+    return _spine_path_attachment_set_color(
+      attachment,
+      r,
+      g,
+      b,
+      a,
+    );
+  }
+
+  late final _spine_path_attachment_set_colorPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_path_attachment, ffi.Float, ffi.Float,
+              ffi.Float, ffi.Float)>>('spine_path_attachment_set_color');
+  late final _spine_path_attachment_set_color =
+      _spine_path_attachment_set_colorPtr.asFunction<
+          void Function(
+              spine_path_attachment, double, double, double, double)>();
+
   void spine_skin_set_attachment(
     spine_skin skin,
     int slotIndex,
@@ -7672,6 +7788,68 @@ class SpineFlutterBindings {
           .asFunction<void Function(spine_path_constraint, int)>();
 }
 
+class spine_skeleton_wrapper extends ffi.Opaque {}
+
+class spine_skeleton_data_wrapper extends ffi.Opaque {}
+
+class spine_bone_wrapper extends ffi.Opaque {}
+
+class spine_bone_data_wrapper extends ffi.Opaque {}
+
+class spine_slot_wrapper extends ffi.Opaque {}
+
+class spine_slot_data_wrapper extends ffi.Opaque {}
+
+class spine_skin_wrapper extends ffi.Opaque {}
+
+class spine_attachment_wrapper extends ffi.Opaque {}
+
+class spine_region_attachment_wrapper extends ffi.Opaque {}
+
+class spine_vertex_attachment_wrapper extends ffi.Opaque {}
+
+class spine_mesh_attachment_wrapper extends ffi.Opaque {}
+
+class spine_clipping_attachment_wrapper extends ffi.Opaque {}
+
+class spine_bounding_box_attachment_wrapper extends ffi.Opaque {}
+
+class spine_path_attachment_wrapper extends ffi.Opaque {}
+
+class spine_point_attachment_wrapper extends ffi.Opaque {}
+
+class spine_texture_region_wrapper extends ffi.Opaque {}
+
+class spine_sequence_wrapper extends ffi.Opaque {}
+
+class spine_constraint_wrapper extends ffi.Opaque {}
+
+class spine_constraint_data_wrapper extends ffi.Opaque {}
+
+class spine_ik_constraint_wrapper extends ffi.Opaque {}
+
+class spine_ik_constraint_data_wrapper extends ffi.Opaque {}
+
+class spine_transform_constraint_wrapper extends ffi.Opaque {}
+
+class spine_transform_constraint_data_wrapper extends ffi.Opaque {}
+
+class spine_path_constraint_wrapper extends ffi.Opaque {}
+
+class spine_path_constraint_data_wrapper extends ffi.Opaque {}
+
+class spine_animation_state_wrapper extends ffi.Opaque {}
+
+class spine_animation_state_events_wrapper extends ffi.Opaque {}
+
+class spine_event_wrapper extends ffi.Opaque {}
+
+class spine_event_data_wrapper extends ffi.Opaque {}
+
+class spine_track_entry_wrapper extends ffi.Opaque {}
+
+class spine_animation_wrapper extends ffi.Opaque {}
+
 class spine_atlas extends ffi.Struct {
   external ffi.Pointer<ffi.Void> atlas;
 
@@ -7689,7 +7867,7 @@ class spine_skeleton_data_result extends ffi.Struct {
   external ffi.Pointer<ffi.Int8> error;
 }
 
-typedef spine_skeleton_data = ffi.Pointer<ffi.Void>;
+typedef spine_skeleton_data = ffi.Pointer<spine_skeleton_data_wrapper>;
 
 abstract class spine_blend_mode {
   static const int SPINE_BLEND_MODE_NORMAL = 0;
@@ -7827,9 +8005,10 @@ class spine_skeleton_drawable extends ffi.Struct {
   external ffi.Pointer<spine_render_command> renderCommand;
 }
 
-typedef spine_skeleton = ffi.Pointer<ffi.Void>;
-typedef spine_animation_state = ffi.Pointer<ffi.Void>;
-typedef spine_animation_state_events = ffi.Pointer<ffi.Void>;
+typedef spine_skeleton = ffi.Pointer<spine_skeleton_wrapper>;
+typedef spine_animation_state = ffi.Pointer<spine_animation_state_wrapper>;
+typedef spine_animation_state_events
+    = ffi.Pointer<spine_animation_state_events_wrapper>;
 
 class spine_skin_entry extends ffi.Struct {
   @ffi.Int32()
@@ -7840,7 +8019,7 @@ class spine_skin_entry extends ffi.Struct {
   external spine_attachment attachment;
 }
 
-typedef spine_attachment = ffi.Pointer<ffi.Void>;
+typedef spine_attachment = ffi.Pointer<spine_attachment_wrapper>;
 
 class spine_skin_entries extends ffi.Struct {
   @ffi.Int32()
@@ -7849,24 +8028,34 @@ class spine_skin_entries extends ffi.Struct {
   external ffi.Pointer<spine_skin_entry> entries;
 }
 
-typedef spine_bone_data = ffi.Pointer<ffi.Void>;
-typedef spine_slot_data = ffi.Pointer<ffi.Void>;
-typedef spine_skin = ffi.Pointer<ffi.Void>;
-typedef spine_event_data = ffi.Pointer<ffi.Void>;
-typedef spine_animation = ffi.Pointer<ffi.Void>;
-typedef spine_ik_constraint_data = ffi.Pointer<ffi.Void>;
-typedef spine_transform_constraint_data = ffi.Pointer<ffi.Void>;
-typedef spine_path_constraint_data = ffi.Pointer<ffi.Void>;
-typedef spine_track_entry = ffi.Pointer<ffi.Void>;
-typedef spine_event = ffi.Pointer<ffi.Void>;
-typedef spine_bone = ffi.Pointer<ffi.Void>;
-typedef spine_slot = ffi.Pointer<ffi.Void>;
-typedef spine_ik_constraint = ffi.Pointer<ffi.Void>;
-typedef spine_transform_constraint = ffi.Pointer<ffi.Void>;
-typedef spine_path_constraint = ffi.Pointer<ffi.Void>;
-typedef spine_point_attachment = ffi.Pointer<ffi.Void>;
-typedef spine_region_attachment = ffi.Pointer<ffi.Void>;
-typedef spine_texture_region = ffi.Pointer<ffi.Void>;
-typedef spine_sequence = ffi.Pointer<ffi.Void>;
-typedef spine_vertex_attachment = ffi.Pointer<ffi.Void>;
-typedef spine_constraint_data = ffi.Pointer<ffi.Void>;
+typedef spine_bone_data = ffi.Pointer<spine_bone_data_wrapper>;
+typedef spine_slot_data = ffi.Pointer<spine_slot_data_wrapper>;
+typedef spine_skin = ffi.Pointer<spine_skin_wrapper>;
+typedef spine_event_data = ffi.Pointer<spine_event_data_wrapper>;
+typedef spine_animation = ffi.Pointer<spine_animation_wrapper>;
+typedef spine_ik_constraint_data
+    = ffi.Pointer<spine_ik_constraint_data_wrapper>;
+typedef spine_transform_constraint_data
+    = ffi.Pointer<spine_transform_constraint_data_wrapper>;
+typedef spine_path_constraint_data
+    = ffi.Pointer<spine_path_constraint_data_wrapper>;
+typedef spine_track_entry = ffi.Pointer<spine_track_entry_wrapper>;
+typedef spine_event = ffi.Pointer<spine_event_wrapper>;
+typedef spine_bone = ffi.Pointer<spine_bone_wrapper>;
+typedef spine_slot = ffi.Pointer<spine_slot_wrapper>;
+typedef spine_ik_constraint = ffi.Pointer<spine_ik_constraint_wrapper>;
+typedef spine_transform_constraint
+    = ffi.Pointer<spine_transform_constraint_wrapper>;
+typedef spine_path_constraint = ffi.Pointer<spine_path_constraint_wrapper>;
+typedef spine_point_attachment = ffi.Pointer<spine_point_attachment_wrapper>;
+typedef spine_region_attachment = ffi.Pointer<spine_region_attachment_wrapper>;
+typedef spine_texture_region = ffi.Pointer<spine_texture_region_wrapper>;
+typedef spine_sequence = ffi.Pointer<spine_sequence_wrapper>;
+typedef spine_vertex_attachment = ffi.Pointer<spine_vertex_attachment_wrapper>;
+typedef spine_mesh_attachment = ffi.Pointer<spine_mesh_attachment_wrapper>;
+typedef spine_clipping_attachment
+    = ffi.Pointer<spine_clipping_attachment_wrapper>;
+typedef spine_bounding_box_attachment
+    = ffi.Pointer<spine_bounding_box_attachment_wrapper>;
+typedef spine_path_attachment = ffi.Pointer<spine_path_attachment_wrapper>;
+typedef spine_constraint_data = ffi.Pointer<spine_constraint_data_wrapper>;

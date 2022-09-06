@@ -211,7 +211,7 @@ class SkeletonData {
   /// than to call it multiple times.
   PathConstraintData? findPathConstraint(String name) {
     final nativeName = name.toNativeUtf8();
-    final constraint = _bindings.spine_skeleton_data_find_transform_constraint(_data, nativeName.cast());
+    final constraint = _bindings.spine_skeleton_data_find_path_constraint(_data, nativeName.cast());
     malloc.free(nativeName);
     if (constraint.address == nullptr.address) return null;
     return PathConstraintData._(constraint);
@@ -313,7 +313,7 @@ class SkeletonData {
     final numConstraints = _bindings.spine_skeleton_data_get_num_transform_constraints(_data);
     final nativeConstraints = _bindings.spine_skeleton_data_get_transform_constraints(_data);
     for (int i = 0; i < numConstraints; i++) {
-      constraints.add(TransformConstraint._(nativeConstraints[i]));
+      constraints.add(TransformConstraint._(nativeConstraints[i].cast()));
     }
     return constraints;
   }
@@ -948,7 +948,7 @@ class Slot {
   }
 
   void setAttachment(Attachment? attachment) {
-    _bindings.spine_slot_set_attachment(_slot, attachment != null ? attachment._attachment : nullptr);
+    _bindings.spine_slot_set_attachment(_slot, attachment != null ? attachment._attachment.cast() : nullptr);
   }
 
   @override
@@ -983,18 +983,18 @@ enum AttachmentType {
   const AttachmentType(this.value);
 }
 
-abstract class Attachment {
-  final spine_attachment _attachment;
+abstract class Attachment<T extends Pointer> {
+  final T _attachment;
 
   Attachment._(this._attachment);
 
   String getName() {
-    Pointer<Utf8> name = _bindings.spine_attachment_get_name(_attachment).cast();
+    Pointer<Utf8> name = _bindings.spine_attachment_get_name(_attachment.cast()).cast();
     return name.toString();
   }
 
   AttachmentType getType() {
-    final type = _bindings.spine_attachment_get_type(_attachment);
+    final type = _bindings.spine_attachment_get_type(_attachment.cast());
     return AttachmentType.values[type];
   }
 
@@ -1002,31 +1002,31 @@ abstract class Attachment {
     final type = AttachmentType.values[_bindings.spine_attachment_get_type(attachment)];
     switch(type) {
       case AttachmentType.Region:
-        return RegionAttachment._(attachment);
+        return RegionAttachment._(attachment.cast());
       case AttachmentType.Mesh:
-        return MeshAttachment._(attachment);
+        return MeshAttachment._(attachment.cast());
       case AttachmentType.Clipping:
-        return ClippingAttachment._(attachment);
+        return ClippingAttachment._(attachment.cast());
       case AttachmentType.BoundingBox:
-        return BoundingBoxAttachment._(attachment);
+        return BoundingBoxAttachment._(attachment.cast());
       case AttachmentType.Path:
-        return PathAttachment._(attachment);
+        return PathAttachment._(attachment.cast());
       case AttachmentType.Point:
-        return PointAttachment._(attachment);
+        return PointAttachment._(attachment.cast());
     }
   }
 
   Attachment copy() {
-    return _toSubclass(_bindings.spine_attachment_copy(_attachment));
+    return _toSubclass(_bindings.spine_attachment_copy(_attachment.cast()));
   }
 
   void dispose() {
-    _bindings.spine_attachment_dispose(_attachment);
+    _bindings.spine_attachment_dispose(_attachment.cast());
   }
 }
 
-class RegionAttachment extends Attachment {
-  RegionAttachment._(spine_attachment attachment): super._(attachment);
+class RegionAttachment extends Attachment<spine_region_attachment> {
+  RegionAttachment._(spine_region_attachment attachment): super._(attachment);
 
   List<double> computeWorldVertices(Slot slot) {
     Pointer<Float> vertices = malloc.allocate(4 * 8).cast();
@@ -1131,63 +1131,63 @@ class RegionAttachment extends Attachment {
   }
 }
 
-class VertexAttachment extends Attachment {
-  VertexAttachment._(spine_attachment attachment): super._(attachment);
+class VertexAttachment<T extends Pointer> extends Attachment<T> {
+  VertexAttachment._(T attachment): super._(attachment);
 
   List<double> computeWorldVertices(Slot slot) {
-    final worldVerticesLength = _bindings.spine_vertex_attachment_get_world_vertices_length(_attachment);
+    final worldVerticesLength = _bindings.spine_vertex_attachment_get_world_vertices_length(_attachment.cast());
     Pointer<Float> vertices = malloc.allocate(4 * worldVerticesLength).cast();
-    _bindings.spine_vertex_attachment_compute_world_vertices(_attachment, slot._slot, vertices);
+    _bindings.spine_vertex_attachment_compute_world_vertices(_attachment.cast(), slot._slot, vertices);
     final result = vertices.asTypedList(worldVerticesLength).toList();
     malloc.free(vertices);
     return result;
   }
 
   Int32List getBones() {
-    final num = _bindings.spine_vertex_attachment_get_num_bones(_attachment);
-    final bones = _bindings.spine_region_attachment_get_bones(_attachment);
+    final num = _bindings.spine_vertex_attachment_get_num_bones(_attachment.cast());
+    final bones = _bindings.spine_region_attachment_get_bones(_attachment.cast());
     return bones.asTypedList(num);
   }
 
   Float32List getVertices() {
-    final num = _bindings.spine_vertex_attachment_get_num_vertices(_attachment);
-    final vertices = _bindings.spine_region_attachment_get_vertices(_attachment);
+    final num = _bindings.spine_vertex_attachment_get_num_vertices(_attachment.cast());
+    final vertices = _bindings.spine_region_attachment_get_vertices(_attachment.cast());
     return vertices.asTypedList(num);
   }
 
   Attachment? getTimelineAttachment() {
-    final attachment = _bindings.spine_vertex_attachment_get_timeline_attachment(_attachment);
+    final attachment = _bindings.spine_vertex_attachment_get_timeline_attachment(_attachment.cast());
     if (_attachment.address == nullptr.address) return null;
     return Attachment._toSubclass(attachment);
   }
 
   void setTimelineAttachment(Attachment? attachment) {
-    _bindings.spine_vertex_attachment_set_timeline_attachment(_attachment, attachment == null ? nullptr : attachment._attachment);
+    _bindings.spine_vertex_attachment_set_timeline_attachment(_attachment.cast(), attachment == null ? nullptr : attachment._attachment.cast());
   }
 }
 
 // FIXME
-class MeshAttachment extends VertexAttachment {
-  MeshAttachment._(spine_attachment attachment): super._(attachment);
+class MeshAttachment extends VertexAttachment<spine_mesh_attachment> {
+  MeshAttachment._(spine_mesh_attachment attachment): super._(attachment.cast());
 }
 
 // FIXME
-class ClippingAttachment extends VertexAttachment {
-  ClippingAttachment._(spine_attachment attachment): super._(attachment);
+class ClippingAttachment extends VertexAttachment<spine_clipping_attachment> {
+  ClippingAttachment._(spine_clipping_attachment attachment): super._(attachment.cast());
 }
 
 // FIXME
-class BoundingBoxAttachment extends VertexAttachment {
-  BoundingBoxAttachment._(spine_attachment attachment): super._(attachment);
+class BoundingBoxAttachment extends VertexAttachment<spine_bounding_box_attachment> {
+  BoundingBoxAttachment._(spine_bounding_box_attachment attachment): super._(attachment);
 }
 
 // FIXME
-class PathAttachment extends VertexAttachment {
-  PathAttachment._(spine_attachment attachment): super._(attachment);
+class PathAttachment extends VertexAttachment<spine_path_attachment> {
+  PathAttachment._(spine_path_attachment attachment): super._(attachment);
 }
 
-class PointAttachment extends Attachment {
-  PointAttachment._(spine_attachment attachment): super._(attachment);
+class PointAttachment extends Attachment<spine_point_attachment> {
+  PointAttachment._(spine_point_attachment attachment): super._(attachment);
 
   Vector2 computeWorldPosition(Bone bone) {
     final position = _bindings.spine_point_attachment_compute_world_position(_attachment, bone._bone);
@@ -1248,7 +1248,7 @@ class Skin {
 
   void setAttachment(int slotIndex, String name, Attachment? attachment) {
     final nativeName = name.toNativeUtf8();
-    _bindings.spine_skin_set_attachment(_skin, slotIndex, nativeName.cast(), attachment == null ? nullptr : attachment._attachment);
+    _bindings.spine_skin_set_attachment(_skin, slotIndex, nativeName.cast(), attachment == null ? nullptr : attachment._attachment.cast());
     malloc.free(nativeName);
   }
 
@@ -1306,13 +1306,13 @@ class Skin {
       final type = _bindings.spine_constraint_data_get_type(nativeConstraint);
       switch (type) {
         case spine_constraint_type.SPINE_CONSTRAINT_IK:
-          constraints.add(IkConstraintData._(nativeConstraint));
+          constraints.add(IkConstraintData._(nativeConstraint.cast()));
           break;
         case spine_constraint_type.SPINE_CONSTRAINT_TRANSFORM:
-          constraints.add(TransformConstraintData._(nativeConstraint));
+          constraints.add(TransformConstraintData._(nativeConstraint.cast()));
           break;
         case spine_constraint_type.SPINE_CONSTRAINT_PATH:
-          constraints.add(PathConstraintData._(nativeConstraint));
+          constraints.add(PathConstraintData._(nativeConstraint.cast()));
           break;
       }
     }
@@ -1320,13 +1320,13 @@ class Skin {
   }
 }
 
-class ConstraintData {
-  final spine_constraint_data _data;
+class ConstraintData<T extends Pointer> {
+  final T _data;
 
   ConstraintData._(this._data);
 }
 
-class IkConstraintData extends ConstraintData {
+class IkConstraintData extends ConstraintData<spine_ik_constraint_data> {
   IkConstraintData._(spine_ik_constraint_data data): super._(data);
 
   List<BoneData> getBones() {
@@ -1480,7 +1480,7 @@ class IkConstraint {
   }
 }
 
-class TransformConstraintData extends ConstraintData {
+class TransformConstraintData extends ConstraintData<spine_transform_constraint_data> {
   TransformConstraintData._(spine_transform_constraint_data data): super._(data);
 
   List<BoneData> getBones() {
@@ -1494,7 +1494,7 @@ class TransformConstraintData extends ConstraintData {
   }
 
   BoneData getTarget() {
-    return BoneData._(_bindings.spine_ik_constraint_data_get_target(_data));
+    return BoneData._(_bindings.spine_transform_constraint_data_get_target(_data));
   }
 
   void setTarget(BoneData target) {
@@ -1706,7 +1706,7 @@ class TransformConstraint {
   }
 }
 
-class PathConstraintData extends ConstraintData {
+class PathConstraintData extends ConstraintData<spine_path_constraint_data> {
   PathConstraintData._(spine_path_constraint_data data): super._(data);
 
   List<BoneData> getBones() {
@@ -2292,7 +2292,7 @@ class TrackEntry {
   /// Multiplier for the delta time when the animation state is updated, causing time for this animation to play slower or
   /// faster. Defaults to 1.
   double getTimeScale() {
-    return _bindings.spine_animation_state_get_time_scale(_entry);
+    return _bindings.spine_track_entry_get_time_scale(_entry);
   }
 
   void setTimeScale(double timeScale) {
