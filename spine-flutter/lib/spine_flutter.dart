@@ -1166,24 +1166,168 @@ class VertexAttachment<T extends Pointer> extends Attachment<T> {
   }
 }
 
-// FIXME
 class MeshAttachment extends VertexAttachment<spine_mesh_attachment> {
   MeshAttachment._(spine_mesh_attachment attachment): super._(attachment.cast());
+
+  void updateRegion() {
+    _bindings.spine_mesh_attachment_update_region(_attachment);
+  }
+
+  int getHullLength() {
+    return _bindings.spine_mesh_attachment_get_hull_length(_attachment);
+  }
+
+  void setHullLength(int hullLength) {
+    _bindings.spine_mesh_attachment_set_hull_length(_attachment, hullLength);
+  }
+
+  Float32List getRegionUVs() {
+    final num = _bindings.spine_mesh_attachment_get_num_region_uvs(_attachment);
+    final uvs = _bindings.spine_mesh_attachment_get_region_uvs(_attachment);
+    return uvs.asTypedList(num);
+  }
+
+  Float32List getUVs() {
+    final num = _bindings.spine_mesh_attachment_get_num_uvs(_attachment);
+    final uvs = _bindings.spine_mesh_attachment_get_uvs(_attachment);
+    return uvs.asTypedList(num);
+  }
+
+  Uint16List getTriangles() {
+    final num = _bindings.spine_mesh_attachment_get_num_triangles(_attachment);
+    final triangles = _bindings.spine_mesh_attachment_get_triangles(_attachment);
+    return triangles.asTypedList(num);
+  }
+
+  Color getColor() {
+    final color = _bindings.spine_mesh_attachment_get_color(_attachment);
+    return Color(color.r, color.g, color.b, color.a);
+  }
+
+  void setColor(double r, double g, double b, double a) {
+    _bindings.spine_mesh_attachment_set_color(_attachment, r, g, b, a);
+  }
+
+  String getPath() {
+    Pointer<Utf8> path = _bindings.spine_mesh_attachment_get_path(_attachment).cast();
+    return path.toDartString();
+  }
+
+  TextureRegion? getRegion() {
+    final region = _bindings.spine_mesh_attachment_get_region(_attachment);
+    if (region.address == nullptr.address) return null;
+    return TextureRegion._(region);
+  }
+
+  Sequence? getSequence() {
+    final sequence = _bindings.spine_mesh_attachment_get_sequence(_attachment);
+    if (sequence.address == nullptr.address) return null;
+    return Sequence._(sequence);
+  }
+
+  MeshAttachment? getParentMesh() {
+    final parent = _bindings.spine_mesh_attachment_get_parent_mesh(_attachment);
+    if (parent.address == nullptr.address) return null;
+    return MeshAttachment._(parent);
+  }
+
+  void setParentMesh(MeshAttachment? parentMesh) {
+    _bindings.spine_mesh_attachment_set_parent_mesh(_attachment, parentMesh == null ? nullptr : parentMesh._attachment);
+  }
+
+  Uint16List getEdges() {
+    final num = _bindings.spine_mesh_attachment_get_num_edges(_attachment);
+    final edges = _bindings.spine_mesh_attachment_get_edges(_attachment);
+    return edges.asTypedList(num);
+  }
+
+  double getWidth() {
+    return _bindings.spine_mesh_attachment_get_width(_attachment);
+  }
+
+  void setWidth(double width) {
+    _bindings.spine_mesh_attachment_set_width(_attachment, width);
+  }
+
+  double getHeight() {
+    return _bindings.spine_mesh_attachment_get_height(_attachment);
+  }
+
+  void setHeight(double height) {
+    _bindings.spine_mesh_attachment_set_height(_attachment, height);
+  }
 }
 
-// FIXME
 class ClippingAttachment extends VertexAttachment<spine_clipping_attachment> {
   ClippingAttachment._(spine_clipping_attachment attachment): super._(attachment.cast());
+
+  SlotData? getEndSlot() {
+    final endSlot = _bindings.spine_clipping_attachment_get_end_slot(_attachment);
+    if (endSlot.address == nullptr.address) return null;
+    return SlotData._(endSlot);
+  }
+
+  void setEndSlot(SlotData? endSlot) {
+    _bindings.spine_clipping_attachment_set_end_slot(_attachment, endSlot == null ? nullptr : endSlot._data);
+  }
+
+
+  Color getColor() {
+    final color = _bindings.spine_clipping_attachment_get_color(_attachment);
+    return Color(color.r, color.g, color.b, color.a);
+  }
+
+  void setColor(double r, double g, double b, double a) {
+    _bindings.spine_clipping_attachment_set_color(_attachment, r, g, b, a);
+  }
 }
 
-// FIXME
 class BoundingBoxAttachment extends VertexAttachment<spine_bounding_box_attachment> {
   BoundingBoxAttachment._(spine_bounding_box_attachment attachment): super._(attachment);
+
+  Color getColor() {
+    final color = _bindings.spine_bounding_box_attachment_get_color(_attachment);
+    return Color(color.r, color.g, color.b, color.a);
+  }
+
+  void setColor(double r, double g, double b, double a) {
+    _bindings.spine_bounding_box_attachment_set_color(_attachment, r, g, b, a);
+  }
 }
 
-// FIXME
 class PathAttachment extends VertexAttachment<spine_path_attachment> {
   PathAttachment._(spine_path_attachment attachment): super._(attachment);
+
+  Float32List getLengths() {
+    final num = _bindings.spine_path_attachment_get_num_lengths(_attachment);
+    final lengths = _bindings.spine_path_attachment_get_lengths(_attachment);
+    return lengths.asTypedList(num);
+  }
+
+  bool isClosed() {
+    return _bindings.spine_path_attachment_get_is_closed(_attachment) == -1;
+  }
+
+  void setIsClosed(bool isClosed) {
+    _bindings.spine_path_attachment_set_is_closed(_attachment, isClosed ? -1 : 0);
+  }
+
+  bool isConstantSpeed() {
+    return _bindings.spine_path_attachment_get_is_constant_speed(_attachment) == -1;
+  }
+
+  void setIsConstantSpeed(bool isClosed) {
+    _bindings.spine_path_attachment_set_is_constant_speed(_attachment, isClosed ? -1 : 0);
+  }
+
+  Color getColor() {
+    final color = _bindings.spine_path_attachment_get_color(_attachment);
+    return Color(color.r, color.g, color.b, color.a);
+  }
+
+  void setColor(double r, double g, double b, double a) {
+    _bindings.spine_path_attachment_set_color(_attachment, r, g, b, a);
+  }
 }
 
 class PointAttachment extends Attachment<spine_point_attachment> {

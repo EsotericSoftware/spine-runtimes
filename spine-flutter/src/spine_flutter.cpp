@@ -2244,6 +2244,7 @@ FFI_PLUGIN_EXPORT int *spine_region_attachment_get_bones(spine_region_attachment
     return _attachment->getBones().buffer();
 }
 
+// VertexAttachment
 FFI_PLUGIN_EXPORT int spine_vertex_attachment_get_num_vertices(spine_vertex_attachment attachment) {
     if (attachment == nullptr) return 0;
     VertexAttachment *_attachment = (VertexAttachment*)attachment;
@@ -2266,6 +2267,238 @@ FFI_PLUGIN_EXPORT void spine_vertex_attachment_set_timeline_attachment(spine_ver
     if (attachment == nullptr) return;
     VertexAttachment *_attachment = (VertexAttachment*)attachment;
     _attachment->setTimelineAttachment((Attachment*)timelineAttachment);
+}
+
+// MeshAttachment
+FFI_PLUGIN_EXPORT void spine_mesh_attachment_update_region(spine_mesh_attachment attachment) {
+    if (attachment == nullptr) return;
+    MeshAttachment *_attachment = (MeshAttachment*)attachment;
+    _attachment->updateRegion();
+}
+
+FFI_PLUGIN_EXPORT int spine_mesh_attachment_get_hull_length(spine_mesh_attachment attachment) {
+    if (attachment == nullptr) return 0;
+    MeshAttachment *_attachment = (MeshAttachment*)attachment;
+    return _attachment->getHullLength();
+}
+
+FFI_PLUGIN_EXPORT void spine_mesh_attachment_set_hull_length(spine_mesh_attachment attachment, int hullLength) {
+    if (attachment == nullptr) return;
+    MeshAttachment *_attachment = (MeshAttachment*)attachment;
+    _attachment->setHullLength(hullLength);
+}
+
+FFI_PLUGIN_EXPORT int spine_mesh_attachment_get_num_region_uvs(spine_mesh_attachment attachment) {
+    if (attachment == nullptr) return 0;
+    MeshAttachment *_attachment = (MeshAttachment*)attachment;
+    return _attachment->getRegionUVs().size();
+}
+
+FFI_PLUGIN_EXPORT float *spine_mesh_attachment_get_region_uvs(spine_mesh_attachment attachment) {
+    if (attachment == nullptr) return nullptr;
+    MeshAttachment *_attachment = (MeshAttachment*)attachment;
+    return _attachment->getRegionUVs().buffer();
+}
+
+FFI_PLUGIN_EXPORT int spine_mesh_attachment_get_num_uvs(spine_mesh_attachment attachment) {
+    if (attachment == nullptr) return 0;
+    MeshAttachment *_attachment = (MeshAttachment*)attachment;
+    return _attachment->getUVs().size();
+}
+
+FFI_PLUGIN_EXPORT float *spine_mesh_attachment_get_uvs(spine_mesh_attachment attachment) {
+    if (attachment == nullptr) return 0;
+    MeshAttachment *_attachment = (MeshAttachment*)attachment;
+    return _attachment->getUVs().buffer();
+}
+
+FFI_PLUGIN_EXPORT int spine_mesh_attachment_get_num_triangles(spine_mesh_attachment attachment) {
+    if (attachment == nullptr) return 0;
+    MeshAttachment *_attachment = (MeshAttachment*)attachment;
+    return _attachment->getTriangles().size();
+}
+
+FFI_PLUGIN_EXPORT unsigned short *spine_mesh_attachment_get_triangles(spine_mesh_attachment attachment) {
+    if (attachment == nullptr) return nullptr;
+    MeshAttachment *_attachment = (MeshAttachment*)attachment;
+    return _attachment->getTriangles().buffer();
+}
+
+FFI_PLUGIN_EXPORT spine_color spine_mesh_attachment_get_color(spine_mesh_attachment attachment) {
+    spine_color result = { 0, 0, 0, 0 };
+    if (attachment == nullptr) return result;
+    MeshAttachment *_attachment = (MeshAttachment*)attachment;
+    Color &color = _attachment->getColor();
+    result = { color.r, color.g, color.b, color.a };
+    return result;
+}
+
+FFI_PLUGIN_EXPORT void spine_mesh_attachment_set_color(spine_mesh_attachment attachment, float r, float g, float b, float a) {
+    if (attachment == nullptr) return;
+    MeshAttachment *_attachment = (MeshAttachment*)attachment;
+    _attachment->getColor().set(r, g, b, a);
+}
+
+FFI_PLUGIN_EXPORT const char *spine_mesh_attachment_get_path(spine_mesh_attachment attachment) {
+    if (attachment == nullptr) return nullptr;
+    MeshAttachment *_attachment = (MeshAttachment*)attachment;
+    return _attachment->getPath().buffer();
+}
+
+FFI_PLUGIN_EXPORT spine_texture_region spine_mesh_attachment_get_region(spine_mesh_attachment attachment) {
+    if (attachment == nullptr) return nullptr;
+    MeshAttachment *_attachment = (MeshAttachment*)attachment;
+    return (spine_texture_region)_attachment->getRegion();
+}
+
+FFI_PLUGIN_EXPORT spine_sequence spine_mesh_attachment_get_sequence(spine_mesh_attachment attachment) {
+    if (attachment == nullptr) return nullptr;
+    MeshAttachment *_attachment = (MeshAttachment*)attachment;
+    return (spine_sequence)_attachment->getSequence();
+}
+
+FFI_PLUGIN_EXPORT spine_mesh_attachment spine_mesh_attachment_get_parent_mesh(spine_mesh_attachment attachment) {
+    if (attachment == nullptr) return nullptr;
+    MeshAttachment *_attachment = (MeshAttachment*)attachment;
+    return (spine_mesh_attachment)_attachment->getParentMesh();
+}
+
+FFI_PLUGIN_EXPORT void spine_mesh_attachment_set_parent_mesh(spine_mesh_attachment attachment, spine_mesh_attachment parentMesh) {
+    if (attachment == nullptr) return;
+    MeshAttachment *_attachment = (MeshAttachment*)attachment;
+    _attachment->setParentMesh((MeshAttachment*)parentMesh);
+}
+
+FFI_PLUGIN_EXPORT int spine_mesh_attachment_get_num_edges(spine_mesh_attachment attachment) {
+    if (attachment == nullptr) return 0;
+    MeshAttachment *_attachment = (MeshAttachment*)attachment;
+    return _attachment->getEdges().size();
+}
+
+FFI_PLUGIN_EXPORT unsigned short *spine_mesh_attachment_get_edges(spine_mesh_attachment attachment) {
+    if (attachment == nullptr) return nullptr;
+    MeshAttachment *_attachment = (MeshAttachment*)attachment;
+    return _attachment->getEdges().buffer();
+}
+
+FFI_PLUGIN_EXPORT float spine_mesh_attachment_get_width(spine_mesh_attachment attachment) {
+    if (attachment == nullptr) return 0;
+    MeshAttachment *_attachment = (MeshAttachment*)attachment;
+    return _attachment->getWidth();
+}
+
+FFI_PLUGIN_EXPORT void spine_mesh_attachment_set_width(spine_mesh_attachment attachment, float width) {
+    if (attachment == nullptr) return;
+    MeshAttachment *_attachment = (MeshAttachment*)attachment;
+    _attachment->setWidth(width);
+}
+
+FFI_PLUGIN_EXPORT float spine_mesh_attachment_get_height(spine_mesh_attachment attachment) {
+    if (attachment == nullptr) return 0;
+    MeshAttachment *_attachment = (MeshAttachment*)attachment;
+    return _attachment->getHeight();
+}
+
+FFI_PLUGIN_EXPORT void spine_mesh_attachment_set_height(spine_mesh_attachment attachment, float height) {
+    if (attachment == nullptr) return;
+    MeshAttachment *_attachment = (MeshAttachment*)attachment;
+    _attachment->setHeight(height);
+}
+
+// ClippingAttachment
+FFI_PLUGIN_EXPORT spine_slot_data spine_clipping_attachment_get_end_slot(spine_clipping_attachment attachment) {
+    if (attachment == nullptr) return nullptr;
+    ClippingAttachment *_attachment = (ClippingAttachment*)attachment;
+    return (spine_slot_data)_attachment->getEndSlot();
+}
+
+FFI_PLUGIN_EXPORT void spine_clipping_attachment_set_end_slot(spine_clipping_attachment attachment, spine_slot_data endSlot) {
+    if (attachment == nullptr) return;
+    ClippingAttachment *_attachment = (ClippingAttachment*)attachment;
+    _attachment->setEndSlot((SlotData*)endSlot);
+}
+
+FFI_PLUGIN_EXPORT spine_color spine_clipping_attachment_get_color(spine_clipping_attachment attachment) {
+    spine_color result = { 0, 0, 0, 0 };
+    if (attachment == nullptr) return result;
+    ClippingAttachment *_attachment = (ClippingAttachment*)attachment;
+    Color &color = _attachment->getColor();
+    result = { color.r, color.g, color.b, color.a };
+    return result;
+}
+
+FFI_PLUGIN_EXPORT void spine_clipping_attachment_set_color(spine_clipping_attachment attachment, float r, float g, float b, float a) {
+    if (attachment == nullptr) return;
+    ClippingAttachment *_attachment = (ClippingAttachment*)attachment;
+    _attachment->getColor().set(r, g, b, a);
+}
+
+// BoundingBoxAttachment
+FFI_PLUGIN_EXPORT spine_color spine_bounding_box_attachment_get_color(spine_bounding_box_attachment attachment) {
+    spine_color result = { 0, 0, 0, 0 };
+    if (attachment == nullptr) return result;
+    BoundingBoxAttachment *_attachment = (BoundingBoxAttachment*)attachment;
+    Color &color = _attachment->getColor();
+    result = { color.r, color.g, color.b, color.a };
+    return result;
+}
+
+FFI_PLUGIN_EXPORT void spine_bounding_box_attachment_set_color(spine_bounding_box_attachment attachment, float r, float g, float b, float a) {
+    if (attachment == nullptr) return;
+    BoundingBoxAttachment *_attachment = (BoundingBoxAttachment*)attachment;
+    _attachment->getColor().set(r, g, b, a);
+}
+
+// PathAttachment
+FFI_PLUGIN_EXPORT int spine_path_attachment_get_num_lengths(spine_path_attachment attachment) {
+    if (attachment == nullptr) return 0;
+    PathAttachment *_attachment = (PathAttachment*)attachment;
+    return _attachment->getLengths().size();
+}
+
+FFI_PLUGIN_EXPORT float *spine_path_attachment_get_lengths(spine_path_attachment attachment) {
+    if (attachment == nullptr) return nullptr;
+    PathAttachment *_attachment = (PathAttachment*)attachment;
+    return _attachment->getLengths().buffer();
+}
+
+FFI_PLUGIN_EXPORT int spine_path_attachment_get_is_closed(spine_path_attachment attachment) {
+    if (attachment == nullptr) return 0;
+    PathAttachment *_attachment = (PathAttachment*)attachment;
+    return _attachment->isClosed() ? -1 : 0;
+}
+
+FFI_PLUGIN_EXPORT void spine_path_attachment_set_is_closed(spine_path_attachment attachment, int isClosed) {
+    if (attachment == nullptr) return;
+    PathAttachment *_attachment = (PathAttachment*)attachment;
+    _attachment->setClosed(isClosed);
+}
+
+FFI_PLUGIN_EXPORT int spine_path_attachment_get_is_constant_speed(spine_path_attachment attachment) {
+    if (attachment == nullptr) return 0;
+    PathAttachment *_attachment = (PathAttachment*)attachment;
+    return _attachment->isConstantSpeed() ? -1 : 0;
+}
+
+FFI_PLUGIN_EXPORT void spine_path_attachment_set_is_constant_speed(spine_path_attachment attachment, int isConstantSpeed) {
+    if (attachment == nullptr) return;
+    PathAttachment *_attachment = (PathAttachment*)attachment;
+    _attachment->setConstantSpeed(isConstantSpeed);
+}
+
+FFI_PLUGIN_EXPORT spine_color spine_path_attachment_get_color(spine_path_attachment attachment) {
+    spine_color result = { 0, 0, 0, 0 };
+    if (attachment == nullptr) return result;
+    PathAttachment *_attachment = (PathAttachment*)attachment;
+    Color &color = _attachment->getColor();
+    result = { color.r, color.g, color.b, color.a };
+    return result;
+}
+
+FFI_PLUGIN_EXPORT void spine_path_attachment_set_color(spine_path_attachment attachment, float r, float g, float b, float a) {
+    if (attachment == nullptr) return;
+    PathAttachment *_attachment = (PathAttachment*)attachment;
+    _attachment->getColor().set(r, g, b, a);
 }
 
 // Skin
