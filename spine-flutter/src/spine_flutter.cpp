@@ -370,7 +370,9 @@ void spine_render_command_dispose(spine_render_command *cmd) {
 FFI_PLUGIN_EXPORT spine_skeleton_drawable *spine_skeleton_drawable_create(spine_skeleton_data skeletonData) {
     spine_skeleton_drawable *drawable = SpineExtension::calloc<spine_skeleton_drawable>(1, __FILE__, __LINE__);
     drawable->skeleton = (spine_skeleton)new (__FILE__, __LINE__) Skeleton((SkeletonData*)skeletonData);
-    AnimationState *state = new (__FILE__, __LINE__) AnimationState(new AnimationStateData((SkeletonData*)skeletonData));
+    AnimationStateData *stateData = new (__FILE__, __LINE__) AnimationStateData((SkeletonData*)skeletonData);
+    drawable->animationStateData = (spine_animation_state_data)stateData;
+    AnimationState *state = new (__FILE__, __LINE__) AnimationState(stateData);
     drawable->animationState = (spine_animation_state)state;
     state->setManualTrackEntryDisposal(true);
     EventListener *listener =  new EventListener();
@@ -383,11 +385,8 @@ FFI_PLUGIN_EXPORT spine_skeleton_drawable *spine_skeleton_drawable_create(spine_
 FFI_PLUGIN_EXPORT void spine_skeleton_drawable_dispose(spine_skeleton_drawable *drawable) {
     if (!drawable) return;
     if (drawable->skeleton) delete (Skeleton*)drawable->skeleton;
-    if (drawable->animationState) {
-        AnimationState *state = (AnimationState*)drawable->animationState;
-        delete state->getData();
-        delete (AnimationState*)state;
-    }
+    if (drawable->animationState) delete (AnimationState*)drawable->animationState;
+    if (drawable->animationStateData) delete (AnimationStateData*)drawable->animationStateData;
     if (drawable->animationStateEvents) delete (Vector<AnimationStateEvent>*)(drawable->animationStateEvents);
     if (drawable->clipping) delete (SkeletonClipping*)drawable->clipping;
     while (drawable->renderCommand) {
@@ -532,8 +531,62 @@ FFI_PLUGIN_EXPORT float spine_animation_get_duration(spine_animation animation) 
     return _animation->getDuration();
 }
 
-// AnimationState
+// AnimationStateData
+FFI_PLUGIN_EXPORT spine_skeleton_data spine_animation_state_data_get_skeleton_data(spine_animation_state_data stateData) {
+    if (stateData == nullptr) return nullptr;
+    AnimationStateData* _stateData = (AnimationStateData*)stateData;
+    return (spine_skeleton_data)_stateData->getSkeletonData();
+}
 
+FFI_PLUGIN_EXPORT float spine_animation_state_data_get_default_mix(spine_animation_state_data stateData) {
+    if (stateData == nullptr) return 0;
+    AnimationStateData* _stateData = (AnimationStateData*)stateData;
+    return _stateData->getDefaultMix();
+}
+
+FFI_PLUGIN_EXPORT void spine_animation_state_data_set_default_mix(spine_animation_state_data stateData, float defaultMix) {
+    if (stateData == nullptr) return;
+    AnimationStateData* _stateData = (AnimationStateData*)stateData;
+    _stateData->setDefaultMix(defaultMix);
+}
+
+FFI_PLUGIN_EXPORT void spine_animation_state_data_set_mix(spine_animation_state_data stateData, spine_animation from, spine_animation to, float duration) {
+    if (stateData == nullptr) return;
+    if (from == nullptr || to == nullptr) return;
+    AnimationStateData* _stateData = (AnimationStateData*)stateData;
+    _stateData->setMix((Animation*)from, (Animation*)to, duration);
+}
+
+FFI_PLUGIN_EXPORT float spine_animation_state_data_get_mix(spine_animation_state_data stateData, spine_animation from, spine_animation to) {
+    if (stateData == nullptr) return 0;
+    if (from == nullptr || to == nullptr) return 0;
+    AnimationStateData* _stateData = (AnimationStateData*)stateData;
+    return _stateData->getMix((Animation*)from, (Animation*)to);
+}
+
+FFI_PLUGIN_EXPORT void spine_animation_state_data_set_mix_by_name(spine_animation_state_data stateData, const char* fromName, const char* toName, float duration) {
+    if (stateData == nullptr) return;
+    if (fromName == nullptr || toName == nullptr) return;
+    AnimationStateData* _stateData = (AnimationStateData*)stateData;
+    _stateData->setMix(fromName, toName, duration);
+}
+
+FFI_PLUGIN_EXPORT float spine_animation_state_data_get_mix_by_name(spine_animation_state_data stateData, const char* fromName, const char* toName) {
+    if (stateData == nullptr) return 0;
+    AnimationStateData* _stateData = (AnimationStateData*)stateData;
+    Animation* from = _stateData->getSkeletonData()->findAnimation(fromName);
+    Animation* to = _stateData->getSkeletonData()->findAnimation(toName);
+    if (from == nullptr || to == nullptr) return 0;
+    return _stateData->getMix(from, to);
+}
+
+FFI_PLUGIN_EXPORT void spine_animation_state_data_clear(spine_animation_state_data stateData) {
+    if (stateData == nullptr) return ;
+    AnimationStateData* _stateData = (AnimationStateData*)stateData;
+    _stateData->clear();
+}
+
+// AnimationState
 FFI_PLUGIN_EXPORT void spine_animation_state_update(spine_animation_state state, float delta) {
     if (state == nullptr) return;
     AnimationState *_state = (AnimationState*)state;

@@ -29,6 +29,7 @@ class SpineWidgetController {
 
   Atlas? get atlas => _atlas;
   SkeletonData? get skeletonData => _data;
+  AnimationStateData? get animationStateData => _drawable?.animationStateData;
   AnimationState? get animationState => _drawable?.animationState;
   Skeleton? get skeleton => _drawable?.skeleton;
 }

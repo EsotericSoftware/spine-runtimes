@@ -2654,7 +2654,50 @@ class Event {
 typedef AnimationStateListener = void Function(EventType type, TrackEntry entry, Event? event);
 
 class AnimationStateData {
-  // FIXME
+  spine_animation_state_data _data;
+
+  AnimationStateData._(this._data);
+
+  SkeletonData getSkeletonData() {
+    return SkeletonData._(_bindings.spine_animation_state_data_get_skeleton_data(_data));
+  }
+
+  double getDefaultMix() {
+    return _bindings.spine_animation_state_data_get_default_mix(_data);
+  }
+
+  void setDefaultMix(double defaultMix) {
+    _bindings.spine_animation_state_data_set_default_mix(_data, defaultMix);
+  }
+
+  void setMixByName(String fromName, String toName, double duration) {
+    final fromNative = fromName.toNativeUtf8();
+    final toNative = toName.toNativeUtf8();
+    _bindings.spine_animation_state_data_set_mix_by_name(_data, fromNative.cast(), toNative.cast(), duration);
+    malloc.free(fromNative);
+    malloc.free(toNative);
+  }
+
+  double getMixByName(String fromName, String toName) {
+    final fromNative = fromName.toNativeUtf8();
+    final toNative = toName.toNativeUtf8();
+    final duration = _bindings.spine_animation_state_data_get_mix_by_name(_data, fromNative.cast(), toNative.cast());
+    malloc.free(fromNative);
+    malloc.free(toNative);
+    return duration;
+  }
+
+  void setMix(Animation from, Animation to, double duration) {
+    _bindings.spine_animation_state_data_set_mix(_data, from._animation, to._animation, duration);
+  }
+
+  double getMix(Animation from, Animation to) {
+    return _bindings.spine_animation_state_data_get_mix(_data, from._animation, to._animation);
+  }
+
+  void clear() {
+    _bindings.spine_animation_state_data_clear(_data);
+  }
 }
 
 class AnimationState {
@@ -2820,6 +2863,7 @@ class SkeletonDrawable {
   final SkeletonData skeletonData;
   late final Pointer<spine_skeleton_drawable> _drawable;
   late final Skeleton skeleton;
+  late final AnimationStateData animationStateData;
   late final AnimationState animationState;
   final bool _ownsAtlasAndSkeletonData;
   bool _disposed;
@@ -2827,6 +2871,7 @@ class SkeletonDrawable {
   SkeletonDrawable(this.atlas, this.skeletonData, this._ownsAtlasAndSkeletonData): _disposed = false {
     _drawable = _bindings.spine_skeleton_drawable_create(skeletonData._data);
     skeleton = Skeleton._(_drawable.ref.skeleton);
+    animationStateData = AnimationStateData._(_drawable.ref.animationStateData);
     animationState = AnimationState._(_drawable.ref.animationState, _drawable.ref.animationStateEvents);
   }
 

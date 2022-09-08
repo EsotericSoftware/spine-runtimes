@@ -80,6 +80,7 @@ class AnimationStateEvents extends StatelessWidget {
       controller.skeleton?.setScaleX(0.5);
       controller.skeleton?.setScaleY(0.5);
       controller.skeleton?.findSlot("gun")?.setColor(Color(1, 0, 0, 1));
+      controller.animationStateData?.setDefaultMix(0.2);
       controller.animationState?.setAnimation(0, "walk", true)?.setListener((type, trackEntry, event) {
         print("Walk animation event ${type}");
       });

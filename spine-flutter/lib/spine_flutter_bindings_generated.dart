@@ -873,6 +873,165 @@ class SpineFlutterBindings {
   late final _spine_animation_get_duration = _spine_animation_get_durationPtr
       .asFunction<double Function(spine_animation)>();
 
+  spine_skeleton_data spine_animation_state_data_get_skeleton_data(
+    spine_animation_state_data stateData,
+  ) {
+    return _spine_animation_state_data_get_skeleton_data(
+      stateData,
+    );
+  }
+
+  late final _spine_animation_state_data_get_skeleton_dataPtr = _lookup<
+          ffi.NativeFunction<
+              spine_skeleton_data Function(spine_animation_state_data)>>(
+      'spine_animation_state_data_get_skeleton_data');
+  late final _spine_animation_state_data_get_skeleton_data =
+      _spine_animation_state_data_get_skeleton_dataPtr.asFunction<
+          spine_skeleton_data Function(spine_animation_state_data)>();
+
+  double spine_animation_state_data_get_default_mix(
+    spine_animation_state_data stateData,
+  ) {
+    return _spine_animation_state_data_get_default_mix(
+      stateData,
+    );
+  }
+
+  late final _spine_animation_state_data_get_default_mixPtr = _lookup<
+          ffi.NativeFunction<ffi.Float Function(spine_animation_state_data)>>(
+      'spine_animation_state_data_get_default_mix');
+  late final _spine_animation_state_data_get_default_mix =
+      _spine_animation_state_data_get_default_mixPtr
+          .asFunction<double Function(spine_animation_state_data)>();
+
+  void spine_animation_state_data_set_default_mix(
+    spine_animation_state_data stateData,
+    double defaultMix,
+  ) {
+    return _spine_animation_state_data_set_default_mix(
+      stateData,
+      defaultMix,
+    );
+  }
+
+  late final _spine_animation_state_data_set_default_mixPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_animation_state_data,
+              ffi.Float)>>('spine_animation_state_data_set_default_mix');
+  late final _spine_animation_state_data_set_default_mix =
+      _spine_animation_state_data_set_default_mixPtr
+          .asFunction<void Function(spine_animation_state_data, double)>();
+
+  void spine_animation_state_data_set_mix(
+    spine_animation_state_data stateData,
+    spine_animation from,
+    spine_animation to,
+    double duration,
+  ) {
+    return _spine_animation_state_data_set_mix(
+      stateData,
+      from,
+      to,
+      duration,
+    );
+  }
+
+  late final _spine_animation_state_data_set_mixPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(
+              spine_animation_state_data,
+              spine_animation,
+              spine_animation,
+              ffi.Float)>>('spine_animation_state_data_set_mix');
+  late final _spine_animation_state_data_set_mix =
+      _spine_animation_state_data_set_mixPtr.asFunction<
+          void Function(spine_animation_state_data, spine_animation,
+              spine_animation, double)>();
+
+  double spine_animation_state_data_get_mix(
+    spine_animation_state_data stateData,
+    spine_animation from,
+    spine_animation to,
+  ) {
+    return _spine_animation_state_data_get_mix(
+      stateData,
+      from,
+      to,
+    );
+  }
+
+  late final _spine_animation_state_data_get_mixPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Float Function(spine_animation_state_data, spine_animation,
+              spine_animation)>>('spine_animation_state_data_get_mix');
+  late final _spine_animation_state_data_get_mix =
+      _spine_animation_state_data_get_mixPtr.asFunction<
+          double Function(
+              spine_animation_state_data, spine_animation, spine_animation)>();
+
+  void spine_animation_state_data_set_mix_by_name(
+    spine_animation_state_data stateData,
+    ffi.Pointer<ffi.Int8> fromName,
+    ffi.Pointer<ffi.Int8> toName,
+    double duration,
+  ) {
+    return _spine_animation_state_data_set_mix_by_name(
+      stateData,
+      fromName,
+      toName,
+      duration,
+    );
+  }
+
+  late final _spine_animation_state_data_set_mix_by_namePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(
+              spine_animation_state_data,
+              ffi.Pointer<ffi.Int8>,
+              ffi.Pointer<ffi.Int8>,
+              ffi.Float)>>('spine_animation_state_data_set_mix_by_name');
+  late final _spine_animation_state_data_set_mix_by_name =
+      _spine_animation_state_data_set_mix_by_namePtr.asFunction<
+          void Function(spine_animation_state_data, ffi.Pointer<ffi.Int8>,
+              ffi.Pointer<ffi.Int8>, double)>();
+
+  double spine_animation_state_data_get_mix_by_name(
+    spine_animation_state_data stateData,
+    ffi.Pointer<ffi.Int8> fromName,
+    ffi.Pointer<ffi.Int8> toName,
+  ) {
+    return _spine_animation_state_data_get_mix_by_name(
+      stateData,
+      fromName,
+      toName,
+    );
+  }
+
+  late final _spine_animation_state_data_get_mix_by_namePtr = _lookup<
+          ffi.NativeFunction<
+              ffi.Float Function(spine_animation_state_data,
+                  ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>)>>(
+      'spine_animation_state_data_get_mix_by_name');
+  late final _spine_animation_state_data_get_mix_by_name =
+      _spine_animation_state_data_get_mix_by_namePtr.asFunction<
+          double Function(spine_animation_state_data, ffi.Pointer<ffi.Int8>,
+              ffi.Pointer<ffi.Int8>)>();
+
+  void spine_animation_state_data_clear(
+    spine_animation_state_data stateData,
+  ) {
+    return _spine_animation_state_data_clear(
+      stateData,
+    );
+  }
+
+  late final _spine_animation_state_data_clearPtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(spine_animation_state_data)>>(
+      'spine_animation_state_data_clear');
+  late final _spine_animation_state_data_clear =
+      _spine_animation_state_data_clearPtr
+          .asFunction<void Function(spine_animation_state_data)>();
+
   void spine_animation_state_update(
     spine_animation_state state,
     double delta,
@@ -8338,6 +8497,8 @@ class spine_path_constraint_data_wrapper extends ffi.Opaque {}
 
 class spine_animation_state_wrapper extends ffi.Opaque {}
 
+class spine_animation_state_data_wrapper extends ffi.Opaque {}
+
 class spine_animation_state_events_wrapper extends ffi.Opaque {}
 
 class spine_event_wrapper extends ffi.Opaque {}
@@ -8496,6 +8657,8 @@ class spine_skeleton_drawable extends ffi.Struct {
 
   external spine_animation_state animationState;
 
+  external spine_animation_state_data animationStateData;
+
   external spine_animation_state_events animationStateEvents;
 
   external ffi.Pointer<ffi.Void> clipping;
@@ -8505,6 +8668,8 @@ class spine_skeleton_drawable extends ffi.Struct {
 
 typedef spine_skeleton = ffi.Pointer<spine_skeleton_wrapper>;
 typedef spine_animation_state = ffi.Pointer<spine_animation_state_wrapper>;
+typedef spine_animation_state_data
+    = ffi.Pointer<spine_animation_state_data_wrapper>;
 typedef spine_animation_state_events
     = ffi.Pointer<spine_animation_state_events_wrapper>;
 

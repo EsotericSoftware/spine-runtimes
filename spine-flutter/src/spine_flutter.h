@@ -53,6 +53,7 @@ SPINE_OPAQUE_TYPE(spine_transform_constraint_data)
 SPINE_OPAQUE_TYPE(spine_path_constraint)
 SPINE_OPAQUE_TYPE(spine_path_constraint_data)
 SPINE_OPAQUE_TYPE(spine_animation_state)
+SPINE_OPAQUE_TYPE(spine_animation_state_data)
 SPINE_OPAQUE_TYPE(spine_animation_state_events)
 SPINE_OPAQUE_TYPE(spine_event)
 SPINE_OPAQUE_TYPE(spine_event_data)
@@ -162,6 +163,7 @@ typedef struct spine_vector {
 typedef struct spine_skeleton_drawable {
     spine_skeleton skeleton;
     spine_animation_state animationState;
+    spine_animation_state_data animationStateData;
     spine_animation_state_events animationStateEvents;
     void *clipping;
     spine_render_command *renderCommand;
@@ -235,6 +237,15 @@ FFI_PLUGIN_EXPORT void spine_skeleton_drawable_dispose(spine_skeleton_drawable *
 
 FFI_PLUGIN_EXPORT const char* spine_animation_get_name(spine_animation animation);
 FFI_PLUGIN_EXPORT float spine_animation_get_duration(spine_animation animation);
+
+FFI_PLUGIN_EXPORT spine_skeleton_data spine_animation_state_data_get_skeleton_data(spine_animation_state_data stateData);
+FFI_PLUGIN_EXPORT float spine_animation_state_data_get_default_mix(spine_animation_state_data stateData);
+FFI_PLUGIN_EXPORT void spine_animation_state_data_set_default_mix(spine_animation_state_data stateData, float defaultMix);
+FFI_PLUGIN_EXPORT void spine_animation_state_data_set_mix(spine_animation_state_data stateData, spine_animation from, spine_animation to, float duration);
+FFI_PLUGIN_EXPORT float spine_animation_state_data_get_mix(spine_animation_state_data stateData, spine_animation from, spine_animation to);
+FFI_PLUGIN_EXPORT void spine_animation_state_data_set_mix_by_name(spine_animation_state_data stateData, const char* fromName, const char* toName, float duration);
+FFI_PLUGIN_EXPORT float spine_animation_state_data_get_mix_by_name(spine_animation_state_data stateData, const char* fromName, const char* toName);
+FFI_PLUGIN_EXPORT void spine_animation_state_data_clear(spine_animation_state_data stateData);
 
 FFI_PLUGIN_EXPORT void spine_animation_state_update(spine_animation_state state, float delta);
 FFI_PLUGIN_EXPORT void spine_animation_state_dispose_track_entry(spine_animation_state state, spine_track_entry entry);
