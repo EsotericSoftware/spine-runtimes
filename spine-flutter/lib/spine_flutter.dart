@@ -2858,6 +2858,7 @@ class AnimationState {
   }
 }
 
+// FIXME add callbacks for update, apply and updateWorldTransform. Pass through SpineWidgetController
 class SkeletonDrawable {
   final Atlas atlas;
   final SkeletonData skeletonData;

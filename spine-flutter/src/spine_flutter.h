@@ -198,6 +198,7 @@ FFI_PLUGIN_EXPORT spine_ik_constraint_data spine_skeleton_data_find_ik_constrain
 FFI_PLUGIN_EXPORT spine_transform_constraint_data spine_skeleton_data_find_transform_constraint(spine_skeleton_data data, const char *name);
 FFI_PLUGIN_EXPORT spine_path_constraint_data spine_skeleton_data_find_path_constraint(spine_skeleton_data data, const char *name);
 FFI_PLUGIN_EXPORT const char* spine_skeleton_data_get_name(spine_skeleton_data data);
+// OMITTED setName()
 FFI_PLUGIN_EXPORT int spine_skeleton_data_get_num_bones(spine_skeleton_data data);
 FFI_PLUGIN_EXPORT spine_bone_data* spine_skeleton_data_get_bones(spine_skeleton_data data);
 FFI_PLUGIN_EXPORT int spine_skeleton_data_get_num_slots(spine_skeleton_data data);
@@ -225,10 +226,15 @@ FFI_PLUGIN_EXPORT void spine_skeleton_data_set_width(spine_skeleton_data data, f
 FFI_PLUGIN_EXPORT float spine_skeleton_data_get_height(spine_skeleton_data data);
 FFI_PLUGIN_EXPORT void spine_skeleton_data_set_height(spine_skeleton_data data, float height);
 FFI_PLUGIN_EXPORT const char* spine_skeleton_data_get_version(spine_skeleton_data data);
+// OMITTED setVersion()
 FFI_PLUGIN_EXPORT const char* spine_skeleton_data_get_hash(spine_skeleton_data data);
+// OMITTED setHash()
 FFI_PLUGIN_EXPORT const char* spine_skeleton_data_get_images_path(spine_skeleton_data data);
+// OMITTED setImagesPath()
 FFI_PLUGIN_EXPORT const char* spine_skeleton_data_get_audio_path(spine_skeleton_data data);
+// OMITTED setAudioPath()
 FFI_PLUGIN_EXPORT float spine_skeleton_data_get_fps(spine_skeleton_data data);
+// OMITTED setFps()
 FFI_PLUGIN_EXPORT void spine_skeleton_data_dispose(spine_skeleton_data data);
 
 FFI_PLUGIN_EXPORT spine_skeleton_drawable *spine_skeleton_drawable_create(spine_skeleton_data skeletonData);
@@ -236,7 +242,10 @@ FFI_PLUGIN_EXPORT spine_render_command *spine_skeleton_drawable_render(spine_ske
 FFI_PLUGIN_EXPORT void spine_skeleton_drawable_dispose(spine_skeleton_drawable *drawable);
 
 FFI_PLUGIN_EXPORT const char* spine_animation_get_name(spine_animation animation);
+// OMITTED getTimelines()
+// OMITTED hasTimeline()
 FFI_PLUGIN_EXPORT float spine_animation_get_duration(spine_animation animation);
+// OMITTED setDuration()
 
 FFI_PLUGIN_EXPORT spine_skeleton_data spine_animation_state_data_get_skeleton_data(spine_animation_state_data stateData);
 FFI_PLUGIN_EXPORT float spine_animation_state_data_get_default_mix(spine_animation_state_data stateData);
@@ -248,18 +257,27 @@ FFI_PLUGIN_EXPORT float spine_animation_state_data_get_mix_by_name(spine_animati
 FFI_PLUGIN_EXPORT void spine_animation_state_data_clear(spine_animation_state_data stateData);
 
 FFI_PLUGIN_EXPORT void spine_animation_state_update(spine_animation_state state, float delta);
-FFI_PLUGIN_EXPORT void spine_animation_state_dispose_track_entry(spine_animation_state state, spine_track_entry entry);
 FFI_PLUGIN_EXPORT void spine_animation_state_apply(spine_animation_state state, spine_skeleton skeleton);
 FFI_PLUGIN_EXPORT void spine_animation_state_clear_tracks(spine_animation_state state);
 FFI_PLUGIN_EXPORT void spine_animation_state_clear_track(spine_animation_state state, int trackIndex);
-FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_set_animation(spine_animation_state state, int trackIndex, const char* animationName, int loop);
-FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_add_animation(spine_animation_state state, int trackIndex, const char* animationName, int loop, float delay);
+FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_set_animation_by_name(spine_animation_state state, int trackIndex, const char* animationName, int loop);
+FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_set_animation(spine_animation_state state, int trackIndex, spine_animation animation, int loop);
+FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_add_animation_by_name(spine_animation_state state, int trackIndex, const char* animationName, int loop, float delay);
+FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_add_animation(spine_animation_state state, int trackIndex, spine_animation animation, int loop, float delay);
 FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_set_empty_animation(spine_animation_state state, int trackIndex, float mixDuration);
 FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_add_empty_animation(spine_animation_state state, int trackIndex, float mixDuration, float delay);
 FFI_PLUGIN_EXPORT void spine_animation_state_set_empty_animations(spine_animation_state state, float mixDuration);
 FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_get_current(spine_animation_state state, int trackIndex);
+FFI_PLUGIN_EXPORT spine_animation_state_data spine_animation_state_get_data(spine_animation_state state);
 FFI_PLUGIN_EXPORT float spine_animation_state_get_time_scale(spine_animation_state state);
 FFI_PLUGIN_EXPORT void spine_animation_state_set_time_scale(spine_animation_state state, float timeScale);
+// OMITTED setListener()
+// OMITTED setListener()
+// OMITTED disableQueue()
+// OMITTED enableQueue()
+// OMITTED setManualTrackEntryDisposal()
+// OMITTED getManualTrackEntryDisposal()
+FFI_PLUGIN_EXPORT void spine_animation_state_dispose_track_entry(spine_animation_state state, spine_track_entry entry);
 
 FFI_PLUGIN_EXPORT int spine_animation_state_events_get_num_events(spine_animation_state_events events);
 FFI_PLUGIN_EXPORT spine_event_type spine_animation_state_events_get_event_type(spine_animation_state_events events, int index);
@@ -313,8 +331,11 @@ FFI_PLUGIN_EXPORT spine_track_entry spine_track_entry_get_mixing_from(spine_trac
 FFI_PLUGIN_EXPORT spine_track_entry spine_track_entry_get_mixing_to(spine_track_entry entry);
 FFI_PLUGIN_EXPORT void spine_track_entry_reset_rotation_directions(spine_track_entry entry);
 FFI_PLUGIN_EXPORT float spine_track_entry_get_track_complete(spine_track_entry entry);
+// OMITTED setListener()
+// OMITTED setListener()
 
 FFI_PLUGIN_EXPORT void spine_skeleton_update_cache(spine_skeleton skeleton);
+// OMITTED printUpdateCache()
 FFI_PLUGIN_EXPORT void spine_skeleton_update_world_transform(spine_skeleton skeleton);
 FFI_PLUGIN_EXPORT void spine_skeleton_update_world_transform_bone(spine_skeleton skeleton, spine_bone parent);
 FFI_PLUGIN_EXPORT void spine_skeleton_set_to_setup_pose(spine_skeleton skeleton);
@@ -335,6 +356,7 @@ FFI_PLUGIN_EXPORT spine_bone spine_skeleton_get_root_bone(spine_skeleton skeleto
 FFI_PLUGIN_EXPORT spine_skeleton_data spine_skeleton_get_data(spine_skeleton skeleton);
 FFI_PLUGIN_EXPORT int spine_skeleton_get_num_bones(spine_skeleton skeleton);
 FFI_PLUGIN_EXPORT spine_bone* spine_skeleton_get_bones(spine_skeleton skeleton);
+// OMITTED getUpdateCacheList()
 FFI_PLUGIN_EXPORT int spine_skeleton_get_num_slots(spine_skeleton skeleton);
 FFI_PLUGIN_EXPORT spine_slot* spine_skeleton_get_slots(spine_skeleton skeleton);
 FFI_PLUGIN_EXPORT int spine_skeleton_get_num_draw_order(spine_skeleton skeleton);
@@ -360,19 +382,30 @@ FFI_PLUGIN_EXPORT void spine_skeleton_set_scale_y(spine_skeleton skeleton, float
 
 FFI_PLUGIN_EXPORT const char* spine_event_data_get_name(spine_event_data event);
 FFI_PLUGIN_EXPORT int spine_event_data_get_int_value(spine_event_data event);
+FFI_PLUGIN_EXPORT void spine_event_data_set_int_value(spine_event_data event, int value);
 FFI_PLUGIN_EXPORT float spine_event_data_get_float_value(spine_event_data event);
+FFI_PLUGIN_EXPORT void spine_event_data_set_float_value(spine_event_data event, float value);
 FFI_PLUGIN_EXPORT const char* spine_event_data_get_string_value(spine_event_data event);
+FFI_PLUGIN_EXPORT void spine_event_data_set_string_value(spine_event_data event, const char *value);
 FFI_PLUGIN_EXPORT const char* spine_event_data_get_audio_path(spine_event_data event);
+// OMITTED setAudioPath()
 FFI_PLUGIN_EXPORT float spine_event_data_get_volume(spine_event_data event);
+FFI_PLUGIN_EXPORT void spine_event_data_set_volume(spine_event_data event, float volume);
 FFI_PLUGIN_EXPORT float spine_event_data_get_balance(spine_event_data event);
+FFI_PLUGIN_EXPORT void spine_event_data_set_balance(spine_event_data event, float balance);
 
 FFI_PLUGIN_EXPORT spine_event_data spine_event_get_data(spine_event event);
 FFI_PLUGIN_EXPORT float spine_event_get_time(spine_event event);
 FFI_PLUGIN_EXPORT int spine_event_get_int_value(spine_event event);
+FFI_PLUGIN_EXPORT void spine_event_set_int_value(spine_event event, int value);
 FFI_PLUGIN_EXPORT float spine_event_get_float_value(spine_event event);
+FFI_PLUGIN_EXPORT void spine_event_set_float_value(spine_event event, float value);
 FFI_PLUGIN_EXPORT const char* spine_event_get_string_value(spine_event event);
+FFI_PLUGIN_EXPORT void spine_event_set_string_value(spine_event event, const char *value);
 FFI_PLUGIN_EXPORT float spine_event_get_volume(spine_event event);
+FFI_PLUGIN_EXPORT void spine_event_set_volume(spine_event event, float volume);
 FFI_PLUGIN_EXPORT float spine_event_get_balance(spine_event event);
+FFI_PLUGIN_EXPORT void spine_event_set_balance(spine_event event, float balance);
 
 FFI_PLUGIN_EXPORT int spine_slot_data_get_index(spine_slot_data slot);
 FFI_PLUGIN_EXPORT const char* spine_slot_data_get_name(spine_slot_data slot);
@@ -399,6 +432,10 @@ FFI_PLUGIN_EXPORT void spine_slot_set_dark_color(spine_slot slot, float r, float
 FFI_PLUGIN_EXPORT int spine_slot_has_dark_color(spine_slot slot);
 FFI_PLUGIN_EXPORT spine_attachment spine_slot_get_attachment(spine_slot slot);
 FFI_PLUGIN_EXPORT void spine_slot_set_attachment(spine_slot slot, spine_attachment attachment);
+// OMITTED getDeform()
+FFI_PLUGIN_EXPORT int spine_slot_get_sequence_index(spine_slot slot);
+FFI_PLUGIN_EXPORT void spine_slot_set_sequence_index(spine_slot slot, int sequenceIndex);
+
 
 FFI_PLUGIN_EXPORT int spine_bone_data_get_index(spine_bone_data data);
 FFI_PLUGIN_EXPORT const char* spine_bone_data_get_name(spine_bone_data data);

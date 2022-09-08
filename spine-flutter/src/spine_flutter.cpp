@@ -618,16 +618,28 @@ FFI_PLUGIN_EXPORT void spine_animation_state_clear_track(spine_animation_state s
     _state->clearTrack(trackIndex);
 }
 
-FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_set_animation(spine_animation_state state, int trackIndex, const char* animationName, int loop) {
+FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_set_animation_by_name(spine_animation_state state, int trackIndex, const char* animationName, int loop) {
     if (state == nullptr) return nullptr;
     AnimationState *_state = (AnimationState*)state;
     return (spine_track_entry)_state->setAnimation(trackIndex, animationName, loop);
 }
 
-FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_add_animation(spine_animation_state state, int trackIndex, const char* animationName, int loop, float delay) {
+FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_set_animation(spine_animation_state state, int trackIndex, spine_animation animation, int loop) {
+    if (state == nullptr) return nullptr;
+    AnimationState *_state = (AnimationState*)state;
+    return (spine_track_entry)_state->setAnimation(trackIndex, (Animation*)animation, loop);
+}
+
+FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_add_animation_by_name(spine_animation_state state, int trackIndex, const char* animationName, int loop, float delay) {
     if (state == nullptr) return nullptr;
     AnimationState *_state = (AnimationState*)state;
     return (spine_track_entry)_state->addAnimation(trackIndex, animationName, loop, delay);
+}
+
+FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_add_animation(spine_animation_state state, int trackIndex, spine_animation animation, int loop, float delay) {
+    if (state == nullptr) return nullptr;
+    AnimationState *_state = (AnimationState*)state;
+    return (spine_track_entry)_state->addAnimation(trackIndex, (Animation*)animation, loop, delay);
 }
 
 FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_set_empty_animation(spine_animation_state state, int trackIndex, float mixDuration) {
@@ -652,6 +664,12 @@ FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_get_current(spine_anim
     if (state == nullptr) return nullptr;
     AnimationState *_state = (AnimationState*)state;
     return (spine_track_entry)_state->getCurrent(trackIndex);
+}
+
+FFI_PLUGIN_EXPORT spine_animation_state_data spine_animation_state_get_data(spine_animation_state state) {
+    if (state == nullptr) return nullptr;
+    AnimationState *_state = (AnimationState*)state;
+    return (spine_animation_state_data)_state->getData();
 }
 
 FFI_PLUGIN_EXPORT float spine_animation_state_get_time_scale(spine_animation_state state) {
@@ -1261,16 +1279,34 @@ FFI_PLUGIN_EXPORT int spine_event_data_get_int_value(spine_event_data event) {
     return _event->getIntValue();
 }
 
+FFI_PLUGIN_EXPORT void spine_event_data_set_int_value(spine_event_data event, int value) {
+    if (event == nullptr) return;
+    EventData *_event = (EventData*)event;
+    _event->setIntValue(value);
+}
+
 FFI_PLUGIN_EXPORT float spine_event_data_get_float_value(spine_event_data event) {
     if (event == nullptr) return 0;
     EventData *_event = (EventData*)event;
     return _event->getFloatValue();
 }
 
+FFI_PLUGIN_EXPORT void spine_event_data_set_float_value(spine_event_data event, float value) {
+    if (event == nullptr) return;
+    EventData *_event = (EventData*)event;
+    _event->setFloatValue(value);
+}
+
 FFI_PLUGIN_EXPORT const char* spine_event_data_get_string_value(spine_event_data event) {
     if (event == nullptr) return nullptr;
     EventData *_event = (EventData*)event;
     return _event->getStringValue().buffer();
+}
+
+FFI_PLUGIN_EXPORT void spine_event_data_set_string_value(spine_event_data event, const char *value) {
+    if (event == nullptr) return;
+    EventData *_event = (EventData*)event;
+    _event->setStringValue(value);
 }
 
 FFI_PLUGIN_EXPORT const char* spine_event_data_get_audio_path(spine_event_data event) {
@@ -1285,10 +1321,22 @@ FFI_PLUGIN_EXPORT float spine_event_data_get_volume(spine_event_data event) {
     return _event->getVolume();
 }
 
+FFI_PLUGIN_EXPORT void spine_event_data_set_volume(spine_event_data event, float volume) {
+    if (event == nullptr) return;
+    EventData *_event = (EventData*)event;
+    _event->setVolume(volume);
+}
+
 FFI_PLUGIN_EXPORT float spine_event_data_get_balance(spine_event_data event) {
     if (event == nullptr) return 0;
     EventData *_event = (EventData*)event;
     return _event->getBalance();
+}
+
+FFI_PLUGIN_EXPORT void spine_event_data_set_balance(spine_event_data event, float balance) {
+    if (event == nullptr) return;
+    EventData *_event = (EventData*)event;
+    _event->setBalance(balance);
 }
 
 // Event
@@ -1311,10 +1359,22 @@ FFI_PLUGIN_EXPORT int spine_event_get_int_value(spine_event event) {
     return _event->getIntValue();
 }
 
+FFI_PLUGIN_EXPORT void spine_event_set_int_value(spine_event event, int value) {
+    if (event == nullptr) return;
+    Event *_event = (Event*)event;
+    _event->setIntValue(value);
+}
+
 FFI_PLUGIN_EXPORT float spine_event_get_float_value(spine_event event) {
     if (event == nullptr) return 0;
     Event *_event = (Event*)event;
     return _event->getFloatValue();
+}
+
+FFI_PLUGIN_EXPORT void spine_event_set_float_value(spine_event event, float value) {
+    if (event == nullptr) return;
+    Event *_event = (Event*)event;
+    _event->setFloatValue(value);
 }
 
 FFI_PLUGIN_EXPORT const char* spine_event_get_string_value(spine_event event) {
@@ -1323,16 +1383,34 @@ FFI_PLUGIN_EXPORT const char* spine_event_get_string_value(spine_event event) {
     return _event->getStringValue().buffer();
 }
 
+FFI_PLUGIN_EXPORT void spine_event_set_string_value(spine_event event, const char *value) {
+    if (event == nullptr) return;
+    Event *_event = (Event*)event;
+    _event->setStringValue(value);
+}
+
 FFI_PLUGIN_EXPORT float spine_event_get_volume(spine_event event) {
     if (event == nullptr) return 0;
     Event *_event = (Event*)event;
     return _event->getVolume();
 }
 
+FFI_PLUGIN_EXPORT void spine_event_set_volume(spine_event event, float volume) {
+    if (event == nullptr) return;
+    Event *_event = (Event*)event;
+    _event->setVolume(volume);
+}
+
 FFI_PLUGIN_EXPORT float spine_event_get_balance(spine_event event) {
     if (event == nullptr) return 0;
     Event *_event = (Event*)event;
     return _event->getBalance();
+}
+
+FFI_PLUGIN_EXPORT void spine_event_set_balance(spine_event event, float balance) {
+    if (event == nullptr) return;
+    Event *_event = (Event*)event;
+    _event->setBalance(balance);
 }
 
 // SlotData
@@ -1481,6 +1559,18 @@ FFI_PLUGIN_EXPORT void spine_slot_set_attachment(spine_slot slot, spine_attachme
     if (slot == nullptr) return;
     Slot *_slot = (Slot*)slot;
     _slot->setAttachment((Attachment*)attachment);
+}
+
+FFI_PLUGIN_EXPORT int spine_slot_get_sequence_index(spine_slot slot) {
+    if (slot == nullptr) return 0;
+    Slot *_slot = (Slot*)slot;
+    return _slot->getSequenceIndex();
+}
+
+FFI_PLUGIN_EXPORT void spine_slot_set_sequence_index(spine_slot slot, int sequenceIndex) {
+    if (slot == nullptr) return;
+    Slot *_slot = (Slot*)slot;
+    _slot->setSequenceIndex(sequenceIndex);
 }
 
 // BoneData
