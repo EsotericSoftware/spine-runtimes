@@ -574,6 +574,14 @@ class Bone {
 
   Bone._(this._bone);
 
+  static void setIsYDown(bool isYDown) {
+    _bindings.spine_bone_set_is_y_down(isYDown ? -1 : 0);
+  }
+
+  static bool getIsYDown() {
+    return _bindings.spine_bone_get_is_y_down() == 1;
+  }
+
   void update() {
     _bindings.spine_bone_update(_bone);
   }
@@ -955,20 +963,177 @@ class Slot {
   String toString() {
     return getData().getName();
   }
+
+  int getSequenceIndex() {
+    return _bindings.spine_slot_get_sequence_index(_slot);
+  }
+
+  void setSequenceIndex(int sequenceIndex) {
+    _bindings.spine_slot_set_sequence_index(_slot, sequenceIndex);
+  }
 }
 
-// FIXME
 class TextureRegion {
   final spine_texture_region _region;
 
   TextureRegion._(this._region);
+
+  Pointer<Void> getTexture() {
+    return _bindings.spine_texture_region_get_texture(_region);
+  }
+
+  void setTexture(Pointer<Void> texture) {
+    _bindings.spine_texture_region_set_texture(_region, texture);
+  }
+
+  double getU() {
+    return _bindings.spine_texture_region_get_u(_region);
+  }
+
+  void setU(double u) {
+    _bindings.spine_texture_region_set_u(_region, u);
+  }
+
+  double getV() {
+    return _bindings.spine_texture_region_get_v(_region);
+  }
+
+  void setV(double v) {
+    _bindings.spine_texture_region_set_v(_region, v);
+  }
+
+  double getU2() {
+    return _bindings.spine_texture_region_get_u2(_region);
+  }
+
+  void setU2(double u2) {
+    _bindings.spine_texture_region_set_u2(_region, u2);
+  }
+
+  double getV2() {
+    return _bindings.spine_texture_region_get_v2(_region);
+  }
+
+  void setV2(double v2) {
+    _bindings.spine_texture_region_set_v2(_region, v2);
+  }
+
+  int getDegrees() {
+    return _bindings.spine_texture_region_get_degrees(_region);
+  }
+
+  void setDegrees(int degrees) {
+    _bindings.spine_texture_region_set_degrees(_region, degrees);
+  }
+
+  double getOffsetX() {
+    return _bindings.spine_texture_region_get_offset_x(_region);
+  }
+
+  void setOffsetX(double offsetX) {
+    _bindings.spine_texture_region_set_offset_x(_region, offsetX);
+  }
+
+  double getOffsetY() {
+    return _bindings.spine_texture_region_get_offset_x(_region);
+  }
+
+  void setOffsetY(double offsetX) {
+    _bindings.spine_texture_region_set_offset_x(_region, offsetX);
+  }
+
+  int getWidth() {
+    return _bindings.spine_texture_region_get_width(_region);
+  }
+
+  void setWidth(int width) {
+    _bindings.spine_texture_region_set_width(_region, width);
+  }
+
+  int getHeight() {
+    return _bindings.spine_texture_region_get_height(_region);
+  }
+
+  void setHeight(int height) {
+    _bindings.spine_texture_region_set_height(_region, height);
+  }
+
+  int getOriginalWidth() {
+    return _bindings.spine_texture_region_get_original_width(_region);
+  }
+
+  void setOriginalWidth(int originalWidth) {
+    _bindings.spine_texture_region_set_original_width(_region, originalWidth);
+  }
+
+  int getOriginalHeight() {
+    return _bindings.spine_texture_region_get_original_height(_region);
+  }
+
+  void setOriginalHeight(int originalHeight) {
+    _bindings.spine_texture_region_set_original_height(_region, originalHeight);
+  }
 }
 
-// FIXME
 class Sequence {
   final spine_sequence _sequence;
 
   Sequence._(this._sequence);
+
+  void apply(Slot slot, Attachment attachment) {
+    _bindings.spine_sequence_apply(_sequence, slot._slot, attachment._attachment.cast());
+  }
+
+  String getPath(String basePath, int index) {
+    final nativeBasePath = basePath.toNativeUtf8();
+    final Pointer<Utf8> path = _bindings.spine_sequence_get_path(_sequence, nativeBasePath.cast(), index).cast();
+    final result = path.toDartString();
+    malloc.free(nativeBasePath);
+    malloc.free(path);
+    return result;
+  }
+
+  int getId() {
+    return _bindings.spine_sequence_get_id(_sequence);
+  }
+
+  void setId(int id) {
+    _bindings.spine_sequence_set_id(_sequence, id);
+  }
+
+  int getStart() {
+    return _bindings.spine_sequence_get_start(_sequence);
+  }
+
+  void setStart(int start) {
+    _bindings.spine_sequence_set_start(_sequence, start);
+  }
+
+  int getDigits() {
+    return _bindings.spine_sequence_get_digits(_sequence);
+  }
+
+  void setDigits(int digits) {
+    _bindings.spine_sequence_set_digits(_sequence, digits);
+  }
+
+  int getSetupIndex() {
+    return _bindings.spine_sequence_get_setup_index(_sequence);
+  }
+
+  void setSetupIndex(int setupIndex) {
+    _bindings.spine_sequence_set_setup_index(_sequence, setupIndex);
+  }
+
+  List<TextureRegion> getRegions() {
+    List<TextureRegion> result = [];
+    final num = _bindings.spine_sequence_get_num_regions(_sequence);
+    final nativeRegions = _bindings.spine_sequence_get_regions(_sequence);
+    for (int i = 0; i < num; i++) {
+      result.add(TextureRegion._(nativeRegions[i]));
+    }
+    return result;
+  }
 }
 
 enum AttachmentType {
@@ -1462,12 +1627,37 @@ class Skin {
     }
     return constraints;
   }
+
+  void copy(Skin other) {
+    _bindings.spine_skin_copy_skin(_skin, other._skin);
+  }
 }
 
 class ConstraintData<T extends Pointer> {
   final T _data;
 
   ConstraintData._(this._data);
+
+  String getName() {
+    final Pointer<Utf8> name = _bindings.spine_constraint_data_get_name(_data.cast()).cast();
+    return name.toDartString();
+  }
+
+  int getOrder() {
+    return _bindings.spine_constraint_data_get_order(_data.cast());
+  }
+
+  void setOrder(int order) {
+    _bindings.spine_constraint_data_set_order(_data.cast(), order);
+  }
+
+  bool isSkinRequired() {
+    return _bindings.spine_constraint_data_get_is_skin_required(_data.cast()) == 1;
+  }
+
+  void setIsSkinRequired(bool isSkinRequired) {
+    _bindings.spine_constraint_data_set_is_skin_required(_data.cast(), isSkinRequired ? -1 : 0);
+  }
 }
 
 class IkConstraintData extends ConstraintData<spine_ik_constraint_data> {
@@ -2593,13 +2783,27 @@ class EventData {
     return _bindings.spine_event_data_get_int_value(_data);
   }
 
+  void setIntValue(int value) {
+    _bindings.spine_event_data_set_int_value(_data, value);
+  }
+
   double getFloatValue() {
     return _bindings.spine_event_data_get_float_value(_data);
+  }
+
+  void setFloatValue(double value) {
+    _bindings.spine_event_data_set_float_value(_data, value);
   }
 
   String getStringValue() {
     final Pointer<Utf8> value = _bindings.spine_event_data_get_string_value(_data).cast();
     return value.toDartString();
+  }
+
+  void setStringValue(String value) {
+    final nativeString = value.toNativeUtf8();
+    _bindings.spine_event_data_set_string_value(_data, nativeString.cast());
+    malloc.free(nativeString);
   }
 
   String getAudioPath() {
@@ -2611,8 +2815,16 @@ class EventData {
     return _bindings.spine_event_data_get_volume(_data);
   }
 
+  void setVolume(double volume) {
+    _bindings.spine_event_data_set_volume(_data, volume);
+  }
+
   double getBalance() {
     return _bindings.spine_event_data_get_balance(_data);
+  }
+
+  void setBalance(double value) {
+    _bindings.spine_event_data_set_balance(_data, value);
   }
 }
 
@@ -2633,8 +2845,16 @@ class Event {
     return _bindings.spine_event_get_int_value(_event);
   }
 
+  void setIntValue(int value) {
+    _bindings.spine_event_set_int_value(_event, value);
+  }
+
   double getFloatValue() {
     return _bindings.spine_event_get_float_value(_event);
+  }
+
+  void setFloatValue(double value) {
+    _bindings.spine_event_set_float_value(_event, value);
   }
 
   String getStringValue() {
@@ -2642,12 +2862,26 @@ class Event {
     return value.toDartString();
   }
 
+  void setStringValue(String value) {
+    final nativeString = value.toNativeUtf8();
+    _bindings.spine_event_set_string_value(_event, nativeString.cast());
+    malloc.free(nativeString);
+  }
+
   double getVolume() {
     return _bindings.spine_event_get_volume(_event);
   }
 
+  void setVolume(double volume) {
+    _bindings.spine_event_set_volume(_event, volume);
+  }
+
   double getBalance() {
     return _bindings.spine_event_get_balance(_event);
+  }
+
+  void setBalance(double balance) {
+    _bindings.spine_event_set_balance(_event, balance);
   }
 }
 
@@ -2863,6 +3097,10 @@ class AnimationState {
 
   void setTimeScale(double timeScale) {
     _bindings.spine_animation_state_set_time_scale(_state, timeScale);
+  }
+
+  AnimationStateData getData() {
+    return AnimationStateData._(_bindings.spine_animation_state_get_data(_state));
   }
 
   void setListener(AnimationStateListener? listener) {
