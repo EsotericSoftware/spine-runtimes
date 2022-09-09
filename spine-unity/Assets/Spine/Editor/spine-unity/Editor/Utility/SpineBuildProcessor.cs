@@ -67,7 +67,8 @@ namespace Spine.Unity.Editor {
 		internal static void PreprocessBuild () {
 			isBuilding = true;
 #if HAS_ON_POSTPROCESS_PREFAB
-			PreprocessSpinePrefabMeshes();
+			if (SpineEditorUtilities.Preferences.removePrefabPreviewMeshes)
+				PreprocessSpinePrefabMeshes();
 #endif
 			PreprocessSpriteAtlases();
 		}
@@ -75,7 +76,8 @@ namespace Spine.Unity.Editor {
 		internal static void PostprocessBuild () {
 			isBuilding = false;
 #if HAS_ON_POSTPROCESS_PREFAB
-			PostprocessSpinePrefabMeshes();
+			if (SpineEditorUtilities.Preferences.removePrefabPreviewMeshes)
+				PostprocessSpinePrefabMeshes();
 #endif
 			PostprocessSpriteAtlases();
 		}
