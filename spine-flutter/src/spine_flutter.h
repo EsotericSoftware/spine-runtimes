@@ -1,26 +1,49 @@
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
+/******************************************************************************
+ * Spine Runtimes License Agreement
+ * Last updated September 24, 2021. Replaces all prior versions.
+ *
+ * Copyright (c) 2013-2021, Esoteric Software LLC
+ *
+ * Integration of the Spine Runtimes into software or otherwise creating
+ * derivative works of the Spine Runtimes is permitted under the terms and
+ * conditions of Section 2 of the Spine Editor License Agreement:
+ * http://esotericsoftware.com/spine-editor-license
+ *
+ * Otherwise, it is permitted to integrate the Spine Runtimes into software
+ * or otherwise create derivative works of the Spine Runtimes (collectively,
+ * "Products"), provided that each user of the Products must obtain their own
+ * Spine Editor license and redistribution of the Products in any form must
+ * include this license and copyright notice.
+ *
+ * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+ * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
 
-#if _WIN32
-#include <windows.h>
-#else
-#include <pthread.h>
-#include <unistd.h>
-#endif
+#ifndef SPINE_FLUTTER
+#define SPINE_FLUTTER
+
+#include <stdint.h>
 
 #ifdef __cplusplus
-#if _WIN32
-#define FFI_PLUGIN_EXPORT extern "C" __declspec(dllexport)
+#   if _WIN32
+#       define FFI_PLUGIN_EXPORT extern "C" __declspec(dllexport)
+#   else
+#       define FFI_PLUGIN_EXPORT extern "C"
+#   endif
 #else
-#define FFI_PLUGIN_EXPORT extern "C"
-#endif
-#else
-#if _WIN32
-#define FFI_PLUGIN_EXPORT __declspec(dllexport)
-#else
-#define FFI_PLUGIN_EXPORT
-#endif
+#   if _WIN32
+#       define FFI_PLUGIN_EXPORT __declspec(dllexport)
+#   else
+#       define FFI_PLUGIN_EXPORT
+#   endif
 #endif
 
 #define SPINE_OPAQUE_TYPE(name) \
@@ -463,6 +486,8 @@ FFI_PLUGIN_EXPORT void spine_bone_data_set_is_skin_required(spine_bone_data data
 FFI_PLUGIN_EXPORT spine_color spine_bone_data_get_color(spine_bone_data data);
 FFI_PLUGIN_EXPORT void spine_bone_data_set_color(spine_bone_data data, float r, float g, float b, float a);
 
+FFI_PLUGIN_EXPORT void spine_bone_set_is_y_down(int yDown);
+FFI_PLUGIN_EXPORT int spine_bone_get_is_y_down();
 FFI_PLUGIN_EXPORT void spine_bone_update(spine_bone bone);
 FFI_PLUGIN_EXPORT void spine_bone_update_world_transform(spine_bone bone);
 FFI_PLUGIN_EXPORT void spine_bone_update_world_transform_with(spine_bone bone, float x, float y, float rotation, float scaleX, float scaleY, float shearX, float shearY);
@@ -561,8 +586,11 @@ FFI_PLUGIN_EXPORT void spine_region_attachment_set_height(spine_region_attachmen
 FFI_PLUGIN_EXPORT spine_color spine_region_attachment_get_color(spine_region_attachment attachment);
 FFI_PLUGIN_EXPORT void spine_region_attachment_set_color(spine_region_attachment attachment, float r, float g, float b, float a);
 FFI_PLUGIN_EXPORT const char *spine_region_attachment_get_path(spine_region_attachment attachment);
+// OMITTED setPath()
 FFI_PLUGIN_EXPORT spine_texture_region spine_region_attachment_get_region(spine_region_attachment attachment);
+// OMITTED setRegion()
 FFI_PLUGIN_EXPORT spine_sequence spine_region_attachment_get_sequence(spine_region_attachment attachment);
+// OMITTED setSequence()
 FFI_PLUGIN_EXPORT int spine_region_attachment_get_num_offset(spine_region_attachment attachment);
 FFI_PLUGIN_EXPORT float *spine_region_attachment_get_offset(spine_region_attachment attachment);
 FFI_PLUGIN_EXPORT int spine_region_attachment_get_num_uvs(spine_region_attachment attachment);
@@ -570,12 +598,14 @@ FFI_PLUGIN_EXPORT float *spine_region_attachment_get_uvs(spine_region_attachment
 
 FFI_PLUGIN_EXPORT int spine_vertex_attachment_get_world_vertices_length(spine_vertex_attachment attachment);
 FFI_PLUGIN_EXPORT void spine_vertex_attachment_compute_world_vertices(spine_vertex_attachment attachment, spine_slot slot, float *worldVertices);
+// OMITTED getId()
 FFI_PLUGIN_EXPORT int spine_vertex_attachment_get_num_bones(spine_vertex_attachment attachment);
-FFI_PLUGIN_EXPORT int *spine_region_attachment_get_bones(spine_region_attachment attachment);
+FFI_PLUGIN_EXPORT int32_t *spine_vertex_attachment_get_bones(spine_vertex_attachment attachment);
 FFI_PLUGIN_EXPORT int spine_vertex_attachment_get_num_vertices(spine_vertex_attachment attachment);
-FFI_PLUGIN_EXPORT float *spine_region_attachment_get_vertices(spine_region_attachment attachment);
+FFI_PLUGIN_EXPORT float *spine_vertex_attachment_get_vertices(spine_vertex_attachment attachment);
 FFI_PLUGIN_EXPORT spine_attachment spine_vertex_attachment_get_timeline_attachment(spine_vertex_attachment timelineAttachment);
 FFI_PLUGIN_EXPORT void spine_vertex_attachment_set_timeline_attachment(spine_vertex_attachment attachment, spine_attachment timelineAttachment);
+// OMITTED copyTo()
 
 FFI_PLUGIN_EXPORT void spine_mesh_attachment_update_region(spine_mesh_attachment attachment);
 FFI_PLUGIN_EXPORT int spine_mesh_attachment_get_hull_length(spine_mesh_attachment attachment);
@@ -585,20 +615,24 @@ FFI_PLUGIN_EXPORT float *spine_mesh_attachment_get_region_uvs(spine_mesh_attachm
 FFI_PLUGIN_EXPORT int spine_mesh_attachment_get_num_uvs(spine_mesh_attachment attachment);
 FFI_PLUGIN_EXPORT float *spine_mesh_attachment_get_uvs(spine_mesh_attachment attachment);
 FFI_PLUGIN_EXPORT int spine_mesh_attachment_get_num_triangles(spine_mesh_attachment attachment);
-FFI_PLUGIN_EXPORT unsigned short *spine_mesh_attachment_get_triangles(spine_mesh_attachment attachment);
+FFI_PLUGIN_EXPORT uint16_t *spine_mesh_attachment_get_triangles(spine_mesh_attachment attachment);
 FFI_PLUGIN_EXPORT spine_color spine_mesh_attachment_get_color(spine_mesh_attachment attachment);
 FFI_PLUGIN_EXPORT void spine_mesh_attachment_set_color(spine_mesh_attachment attachment, float r, float g, float b, float a);
 FFI_PLUGIN_EXPORT const char *spine_mesh_attachment_get_path(spine_mesh_attachment attachment);
+// OMITTED setPath()
 FFI_PLUGIN_EXPORT spine_texture_region spine_mesh_attachment_get_region(spine_mesh_attachment attachment);
+// OMITTED setRegion()
 FFI_PLUGIN_EXPORT spine_sequence spine_mesh_attachment_get_sequence(spine_mesh_attachment attachment);
+// OMITTED setSequence()
 FFI_PLUGIN_EXPORT spine_mesh_attachment spine_mesh_attachment_get_parent_mesh(spine_mesh_attachment attachment);
 FFI_PLUGIN_EXPORT void spine_mesh_attachment_set_parent_mesh(spine_mesh_attachment attachment, spine_mesh_attachment parentMesh);
 FFI_PLUGIN_EXPORT int spine_mesh_attachment_get_num_edges(spine_mesh_attachment attachment);
-FFI_PLUGIN_EXPORT unsigned short *spine_mesh_attachment_get_edges(spine_mesh_attachment attachment);
+FFI_PLUGIN_EXPORT uint16_t *spine_mesh_attachment_get_edges(spine_mesh_attachment attachment);
 FFI_PLUGIN_EXPORT float spine_mesh_attachment_get_width(spine_mesh_attachment attachment);
 FFI_PLUGIN_EXPORT void spine_mesh_attachment_set_width(spine_mesh_attachment attachment, float width);
 FFI_PLUGIN_EXPORT float spine_mesh_attachment_get_height(spine_mesh_attachment attachment);
 FFI_PLUGIN_EXPORT void spine_mesh_attachment_set_height(spine_mesh_attachment attachment, float height);
+// OMITTED newLinkedMesh()
 
 FFI_PLUGIN_EXPORT spine_slot_data spine_clipping_attachment_get_end_slot(spine_clipping_attachment attachment);
 FFI_PLUGIN_EXPORT void spine_clipping_attachment_set_end_slot(spine_clipping_attachment attachment, spine_slot_data endSlot);
@@ -620,8 +654,11 @@ FFI_PLUGIN_EXPORT void spine_path_attachment_set_color(spine_path_attachment att
 FFI_PLUGIN_EXPORT void spine_skin_set_attachment(spine_skin skin, int slotIndex, const char* name, spine_attachment attachment);
 FFI_PLUGIN_EXPORT spine_attachment spine_skin_get_attachment(spine_skin skin, int slotIndex, const char* name);
 FFI_PLUGIN_EXPORT void spine_skin_remove_attachment(spine_skin skin, int slotIndex, const char* name);
+// OMITTED findNamesForSlot()
+// OMITTED findAttachmentsForSlot()
 FFI_PLUGIN_EXPORT const char* spine_skin_get_name(spine_skin skin);
 FFI_PLUGIN_EXPORT void spine_skin_add_skin(spine_skin skin, spine_skin other);
+FFI_PLUGIN_EXPORT void spine_skin_copy_skin(spine_skin skin, spine_skin other);
 FFI_PLUGIN_EXPORT spine_skin_entries *spine_skin_get_entries(spine_skin skin);
 FFI_PLUGIN_EXPORT void spine_skin_entries_dispose(spine_skin_entries *entries);
 FFI_PLUGIN_EXPORT int spine_skin_get_num_bones(spine_skin skin);
@@ -632,6 +669,11 @@ FFI_PLUGIN_EXPORT spine_skin spine_skin_create(const char* name);
 FFI_PLUGIN_EXPORT void spine_skin_dispose(spine_skin skin);
 
 FFI_PLUGIN_EXPORT spine_constraint_type spine_constraint_data_get_type(spine_constraint_data data);
+FFI_PLUGIN_EXPORT const char* spine_constraint_data_get_name(spine_constraint_data data);
+FFI_PLUGIN_EXPORT uint64_t spine_constraint_data_get_order(spine_constraint_data data);
+FFI_PLUGIN_EXPORT void spine_constraint_data_set_order(spine_constraint_data data, uint64_t order);
+FFI_PLUGIN_EXPORT int spine_constraint_data_get_is_skin_required(spine_constraint_data data);
+FFI_PLUGIN_EXPORT void spine_constraint_data_set_is_skin_required(spine_constraint_data data, int isSkinRequired);
 
 FFI_PLUGIN_EXPORT int spine_ik_constraint_data_get_num_bones(spine_ik_constraint_data data);
 FFI_PLUGIN_EXPORT spine_bone_data* spine_ik_constraint_data_get_bones(spine_ik_constraint_data data);
@@ -767,3 +809,44 @@ FFI_PLUGIN_EXPORT float spine_path_constraint_get_mix_y(spine_path_constraint co
 FFI_PLUGIN_EXPORT void spine_path_constraint_set_mix_y(spine_path_constraint constraint, float mixY);
 FFI_PLUGIN_EXPORT int spine_path_constraint_get_is_active(spine_path_constraint constraint);
 FFI_PLUGIN_EXPORT void spine_path_constraint_set_is_active(spine_path_constraint constraint, int isActive);
+
+// OMITTED copy()
+FFI_PLUGIN_EXPORT void spine_sequence_apply(spine_sequence sequence, spine_slot slot, spine_attachment attachment);
+FFI_PLUGIN_EXPORT const char* spine_sequence_get_path(spine_sequence sequence, const char *basePath, int index);
+FFI_PLUGIN_EXPORT int spine_sequence_get_id(spine_sequence sequence);
+FFI_PLUGIN_EXPORT void spine_sequence_set_id(spine_sequence sequence, int id);
+FFI_PLUGIN_EXPORT int spine_sequence_get_start(spine_sequence sequence);
+FFI_PLUGIN_EXPORT void spine_sequence_set_start(spine_sequence sequence, int start);
+FFI_PLUGIN_EXPORT int spine_sequence_get_digits(spine_sequence sequence);
+FFI_PLUGIN_EXPORT void spine_sequence_set_digits(spine_sequence sequence, int digits);
+FFI_PLUGIN_EXPORT int spine_sequence_get_setup_index(spine_sequence sequence);
+FFI_PLUGIN_EXPORT void spine_sequence_set_setup_index(spine_sequence sequence, int setupIndex);
+FFI_PLUGIN_EXPORT int spine_sequence_get_num_regions(spine_sequence sequence);
+FFI_PLUGIN_EXPORT spine_texture_region* spine_sequence_get_regions(spine_sequence sequence);
+
+FFI_PLUGIN_EXPORT void* spine_texture_region_get_texture(spine_texture_region textureRegion);
+FFI_PLUGIN_EXPORT void spine_texture_region_set_texture(spine_texture_region textureRegion, void *texture);
+FFI_PLUGIN_EXPORT float spine_texture_region_get_u(spine_texture_region textureRegion);
+FFI_PLUGIN_EXPORT void spine_texture_region_set_u(spine_texture_region textureRegion, float u);
+FFI_PLUGIN_EXPORT float spine_texture_region_get_v(spine_texture_region textureRegion);
+FFI_PLUGIN_EXPORT void spine_texture_region_set_v(spine_texture_region textureRegion, float v);
+FFI_PLUGIN_EXPORT float spine_texture_region_get_u2(spine_texture_region textureRegion);
+FFI_PLUGIN_EXPORT void spine_texture_region_set_u2(spine_texture_region textureRegion, float u2);
+FFI_PLUGIN_EXPORT float spine_texture_region_get_v2(spine_texture_region textureRegion);
+FFI_PLUGIN_EXPORT void spine_texture_region_set_v2(spine_texture_region textureRegion, float v2);
+FFI_PLUGIN_EXPORT int spine_texture_region_get_degrees(spine_texture_region textureRegion);
+FFI_PLUGIN_EXPORT void spine_texture_region_set_degrees(spine_texture_region textureRegion, int degrees);
+FFI_PLUGIN_EXPORT float spine_texture_region_get_offset_x(spine_texture_region textureRegion);
+FFI_PLUGIN_EXPORT void spine_texture_region_set_offset_x(spine_texture_region textureRegion, float offsetX);
+FFI_PLUGIN_EXPORT float spine_texture_region_get_offset_y(spine_texture_region textureRegion);
+FFI_PLUGIN_EXPORT void spine_texture_region_set_offset_y(spine_texture_region textureRegion, float offsetY);
+FFI_PLUGIN_EXPORT int spine_texture_region_get_width(spine_texture_region textureRegion);
+FFI_PLUGIN_EXPORT void spine_texture_region_set_width(spine_texture_region textureRegion, int width);
+FFI_PLUGIN_EXPORT int spine_texture_region_get_height(spine_texture_region textureRegion);
+FFI_PLUGIN_EXPORT void spine_texture_region_set_height(spine_texture_region textureRegion, int height);
+FFI_PLUGIN_EXPORT int spine_texture_region_get_original_width(spine_texture_region textureRegion);
+FFI_PLUGIN_EXPORT void spine_texture_region_set_original_width(spine_texture_region textureRegion, int originalWidth);
+FFI_PLUGIN_EXPORT int spine_texture_region_get_original_height(spine_texture_region textureRegion);
+FFI_PLUGIN_EXPORT void spine_texture_region_set_original_height(spine_texture_region textureRegion, int originalHeight);
+
+#endif

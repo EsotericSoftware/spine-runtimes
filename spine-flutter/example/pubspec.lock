@@ -56,7 +56,7 @@ packages:
       name: ffi
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.2.1"
+    version: "2.0.1"
   flutter:
     dependency: "direct main"
     description: flutter

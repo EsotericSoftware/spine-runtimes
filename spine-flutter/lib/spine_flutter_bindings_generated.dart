@@ -31,7 +31,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_major_versionPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function()>>('spine_major_version');
+      _lookup<ffi.NativeFunction<ffi.Int Function()>>('spine_major_version');
   late final _spine_major_version =
       _spine_major_versionPtr.asFunction<int Function()>();
 
@@ -40,7 +40,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_minor_versionPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function()>>('spine_minor_version');
+      _lookup<ffi.NativeFunction<ffi.Int Function()>>('spine_minor_version');
   late final _spine_minor_version =
       _spine_minor_versionPtr.asFunction<int Function()>();
 
@@ -54,7 +54,7 @@ class SpineFlutterBindings {
       _spine_report_leaksPtr.asFunction<void Function()>();
 
   ffi.Pointer<spine_atlas> spine_atlas_load(
-    ffi.Pointer<ffi.Int8> atlasData,
+    ffi.Pointer<ffi.Char> atlasData,
   ) {
     return _spine_atlas_load(
       atlasData,
@@ -64,9 +64,9 @@ class SpineFlutterBindings {
   late final _spine_atlas_loadPtr = _lookup<
       ffi.NativeFunction<
           ffi.Pointer<spine_atlas> Function(
-              ffi.Pointer<ffi.Int8>)>>('spine_atlas_load');
+              ffi.Pointer<ffi.Char>)>>('spine_atlas_load');
   late final _spine_atlas_load = _spine_atlas_loadPtr
-      .asFunction<ffi.Pointer<spine_atlas> Function(ffi.Pointer<ffi.Int8>)>();
+      .asFunction<ffi.Pointer<spine_atlas> Function(ffi.Pointer<ffi.Char>)>();
 
   void spine_atlas_dispose(
     ffi.Pointer<spine_atlas> atlas,
@@ -84,7 +84,7 @@ class SpineFlutterBindings {
 
   spine_skeleton_data_result spine_skeleton_data_load_json(
     ffi.Pointer<spine_atlas> atlas,
-    ffi.Pointer<ffi.Int8> skeletonData,
+    ffi.Pointer<ffi.Char> skeletonData,
   ) {
     return _spine_skeleton_data_load_json(
       atlas,
@@ -95,15 +95,15 @@ class SpineFlutterBindings {
   late final _spine_skeleton_data_load_jsonPtr = _lookup<
       ffi.NativeFunction<
           spine_skeleton_data_result Function(ffi.Pointer<spine_atlas>,
-              ffi.Pointer<ffi.Int8>)>>('spine_skeleton_data_load_json');
+              ffi.Pointer<ffi.Char>)>>('spine_skeleton_data_load_json');
   late final _spine_skeleton_data_load_json =
       _spine_skeleton_data_load_jsonPtr.asFunction<
           spine_skeleton_data_result Function(
-              ffi.Pointer<spine_atlas>, ffi.Pointer<ffi.Int8>)>();
+              ffi.Pointer<spine_atlas>, ffi.Pointer<ffi.Char>)>();
 
   spine_skeleton_data_result spine_skeleton_data_load_binary(
     ffi.Pointer<spine_atlas> atlas,
-    ffi.Pointer<ffi.Uint8> skeletonData,
+    ffi.Pointer<ffi.UnsignedChar> skeletonData,
     int length,
   ) {
     return _spine_skeleton_data_load_binary(
@@ -117,16 +117,16 @@ class SpineFlutterBindings {
       ffi.NativeFunction<
           spine_skeleton_data_result Function(
               ffi.Pointer<spine_atlas>,
-              ffi.Pointer<ffi.Uint8>,
-              ffi.Int32)>>('spine_skeleton_data_load_binary');
+              ffi.Pointer<ffi.UnsignedChar>,
+              ffi.Int)>>('spine_skeleton_data_load_binary');
   late final _spine_skeleton_data_load_binary =
       _spine_skeleton_data_load_binaryPtr.asFunction<
           spine_skeleton_data_result Function(
-              ffi.Pointer<spine_atlas>, ffi.Pointer<ffi.Uint8>, int)>();
+              ffi.Pointer<spine_atlas>, ffi.Pointer<ffi.UnsignedChar>, int)>();
 
   spine_bone_data spine_skeleton_data_find_bone(
     spine_skeleton_data data,
-    ffi.Pointer<ffi.Int8> name,
+    ffi.Pointer<ffi.Char> name,
   ) {
     return _spine_skeleton_data_find_bone(
       data,
@@ -137,15 +137,15 @@ class SpineFlutterBindings {
   late final _spine_skeleton_data_find_bonePtr = _lookup<
       ffi.NativeFunction<
           spine_bone_data Function(spine_skeleton_data,
-              ffi.Pointer<ffi.Int8>)>>('spine_skeleton_data_find_bone');
+              ffi.Pointer<ffi.Char>)>>('spine_skeleton_data_find_bone');
   late final _spine_skeleton_data_find_bone =
       _spine_skeleton_data_find_bonePtr.asFunction<
           spine_bone_data Function(
-              spine_skeleton_data, ffi.Pointer<ffi.Int8>)>();
+              spine_skeleton_data, ffi.Pointer<ffi.Char>)>();
 
   spine_slot_data spine_skeleton_data_find_slot(
     spine_skeleton_data data,
-    ffi.Pointer<ffi.Int8> name,
+    ffi.Pointer<ffi.Char> name,
   ) {
     return _spine_skeleton_data_find_slot(
       data,
@@ -156,15 +156,15 @@ class SpineFlutterBindings {
   late final _spine_skeleton_data_find_slotPtr = _lookup<
       ffi.NativeFunction<
           spine_slot_data Function(spine_skeleton_data,
-              ffi.Pointer<ffi.Int8>)>>('spine_skeleton_data_find_slot');
+              ffi.Pointer<ffi.Char>)>>('spine_skeleton_data_find_slot');
   late final _spine_skeleton_data_find_slot =
       _spine_skeleton_data_find_slotPtr.asFunction<
           spine_slot_data Function(
-              spine_skeleton_data, ffi.Pointer<ffi.Int8>)>();
+              spine_skeleton_data, ffi.Pointer<ffi.Char>)>();
 
   spine_skin spine_skeleton_data_find_skin(
     spine_skeleton_data data,
-    ffi.Pointer<ffi.Int8> name,
+    ffi.Pointer<ffi.Char> name,
   ) {
     return _spine_skeleton_data_find_skin(
       data,
@@ -175,14 +175,14 @@ class SpineFlutterBindings {
   late final _spine_skeleton_data_find_skinPtr = _lookup<
       ffi.NativeFunction<
           spine_skin Function(spine_skeleton_data,
-              ffi.Pointer<ffi.Int8>)>>('spine_skeleton_data_find_skin');
+              ffi.Pointer<ffi.Char>)>>('spine_skeleton_data_find_skin');
   late final _spine_skeleton_data_find_skin =
       _spine_skeleton_data_find_skinPtr.asFunction<
-          spine_skin Function(spine_skeleton_data, ffi.Pointer<ffi.Int8>)>();
+          spine_skin Function(spine_skeleton_data, ffi.Pointer<ffi.Char>)>();
 
   spine_event_data spine_skeleton_data_find_event(
     spine_skeleton_data data,
-    ffi.Pointer<ffi.Int8> name,
+    ffi.Pointer<ffi.Char> name,
   ) {
     return _spine_skeleton_data_find_event(
       data,
@@ -193,15 +193,15 @@ class SpineFlutterBindings {
   late final _spine_skeleton_data_find_eventPtr = _lookup<
       ffi.NativeFunction<
           spine_event_data Function(spine_skeleton_data,
-              ffi.Pointer<ffi.Int8>)>>('spine_skeleton_data_find_event');
+              ffi.Pointer<ffi.Char>)>>('spine_skeleton_data_find_event');
   late final _spine_skeleton_data_find_event =
       _spine_skeleton_data_find_eventPtr.asFunction<
           spine_event_data Function(
-              spine_skeleton_data, ffi.Pointer<ffi.Int8>)>();
+              spine_skeleton_data, ffi.Pointer<ffi.Char>)>();
 
   spine_animation spine_skeleton_data_find_animation(
     spine_skeleton_data data,
-    ffi.Pointer<ffi.Int8> name,
+    ffi.Pointer<ffi.Char> name,
   ) {
     return _spine_skeleton_data_find_animation(
       data,
@@ -212,15 +212,15 @@ class SpineFlutterBindings {
   late final _spine_skeleton_data_find_animationPtr = _lookup<
       ffi.NativeFunction<
           spine_animation Function(spine_skeleton_data,
-              ffi.Pointer<ffi.Int8>)>>('spine_skeleton_data_find_animation');
+              ffi.Pointer<ffi.Char>)>>('spine_skeleton_data_find_animation');
   late final _spine_skeleton_data_find_animation =
       _spine_skeleton_data_find_animationPtr.asFunction<
           spine_animation Function(
-              spine_skeleton_data, ffi.Pointer<ffi.Int8>)>();
+              spine_skeleton_data, ffi.Pointer<ffi.Char>)>();
 
   spine_ik_constraint_data spine_skeleton_data_find_ik_constraint(
     spine_skeleton_data data,
-    ffi.Pointer<ffi.Int8> name,
+    ffi.Pointer<ffi.Char> name,
   ) {
     return _spine_skeleton_data_find_ik_constraint(
       data,
@@ -231,16 +231,16 @@ class SpineFlutterBindings {
   late final _spine_skeleton_data_find_ik_constraintPtr = _lookup<
           ffi.NativeFunction<
               spine_ik_constraint_data Function(
-                  spine_skeleton_data, ffi.Pointer<ffi.Int8>)>>(
+                  spine_skeleton_data, ffi.Pointer<ffi.Char>)>>(
       'spine_skeleton_data_find_ik_constraint');
   late final _spine_skeleton_data_find_ik_constraint =
       _spine_skeleton_data_find_ik_constraintPtr.asFunction<
           spine_ik_constraint_data Function(
-              spine_skeleton_data, ffi.Pointer<ffi.Int8>)>();
+              spine_skeleton_data, ffi.Pointer<ffi.Char>)>();
 
   spine_transform_constraint_data spine_skeleton_data_find_transform_constraint(
     spine_skeleton_data data,
-    ffi.Pointer<ffi.Int8> name,
+    ffi.Pointer<ffi.Char> name,
   ) {
     return _spine_skeleton_data_find_transform_constraint(
       data,
@@ -251,16 +251,16 @@ class SpineFlutterBindings {
   late final _spine_skeleton_data_find_transform_constraintPtr = _lookup<
           ffi.NativeFunction<
               spine_transform_constraint_data Function(
-                  spine_skeleton_data, ffi.Pointer<ffi.Int8>)>>(
+                  spine_skeleton_data, ffi.Pointer<ffi.Char>)>>(
       'spine_skeleton_data_find_transform_constraint');
   late final _spine_skeleton_data_find_transform_constraint =
       _spine_skeleton_data_find_transform_constraintPtr.asFunction<
           spine_transform_constraint_data Function(
-              spine_skeleton_data, ffi.Pointer<ffi.Int8>)>();
+              spine_skeleton_data, ffi.Pointer<ffi.Char>)>();
 
   spine_path_constraint_data spine_skeleton_data_find_path_constraint(
     spine_skeleton_data data,
-    ffi.Pointer<ffi.Int8> name,
+    ffi.Pointer<ffi.Char> name,
   ) {
     return _spine_skeleton_data_find_path_constraint(
       data,
@@ -271,14 +271,14 @@ class SpineFlutterBindings {
   late final _spine_skeleton_data_find_path_constraintPtr = _lookup<
           ffi.NativeFunction<
               spine_path_constraint_data Function(
-                  spine_skeleton_data, ffi.Pointer<ffi.Int8>)>>(
+                  spine_skeleton_data, ffi.Pointer<ffi.Char>)>>(
       'spine_skeleton_data_find_path_constraint');
   late final _spine_skeleton_data_find_path_constraint =
       _spine_skeleton_data_find_path_constraintPtr.asFunction<
           spine_path_constraint_data Function(
-              spine_skeleton_data, ffi.Pointer<ffi.Int8>)>();
+              spine_skeleton_data, ffi.Pointer<ffi.Char>)>();
 
-  ffi.Pointer<ffi.Int8> spine_skeleton_data_get_name(
+  ffi.Pointer<ffi.Char> spine_skeleton_data_get_name(
     spine_skeleton_data data,
   ) {
     return _spine_skeleton_data_get_name(
@@ -288,11 +288,12 @@ class SpineFlutterBindings {
 
   late final _spine_skeleton_data_get_namePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Pointer<ffi.Int8> Function(
+          ffi.Pointer<ffi.Char> Function(
               spine_skeleton_data)>>('spine_skeleton_data_get_name');
   late final _spine_skeleton_data_get_name = _spine_skeleton_data_get_namePtr
-      .asFunction<ffi.Pointer<ffi.Int8> Function(spine_skeleton_data)>();
+      .asFunction<ffi.Pointer<ffi.Char> Function(spine_skeleton_data)>();
 
+  /// OMITTED setName()
   int spine_skeleton_data_get_num_bones(
     spine_skeleton_data data,
   ) {
@@ -302,7 +303,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_skeleton_data_get_num_bonesPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_skeleton_data)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_skeleton_data)>>(
           'spine_skeleton_data_get_num_bones');
   late final _spine_skeleton_data_get_num_bones =
       _spine_skeleton_data_get_num_bonesPtr
@@ -332,7 +333,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_skeleton_data_get_num_slotsPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_skeleton_data)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_skeleton_data)>>(
           'spine_skeleton_data_get_num_slots');
   late final _spine_skeleton_data_get_num_slots =
       _spine_skeleton_data_get_num_slotsPtr
@@ -362,7 +363,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_skeleton_data_get_num_skinsPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_skeleton_data)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_skeleton_data)>>(
           'spine_skeleton_data_get_num_skins');
   late final _spine_skeleton_data_get_num_skins =
       _spine_skeleton_data_get_num_skinsPtr
@@ -425,7 +426,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_skeleton_data_get_num_eventsPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_skeleton_data)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_skeleton_data)>>(
           'spine_skeleton_data_get_num_events');
   late final _spine_skeleton_data_get_num_events =
       _spine_skeleton_data_get_num_eventsPtr
@@ -456,7 +457,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_skeleton_data_get_num_animationsPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_skeleton_data)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_skeleton_data)>>(
           'spine_skeleton_data_get_num_animations');
   late final _spine_skeleton_data_get_num_animations =
       _spine_skeleton_data_get_num_animationsPtr
@@ -487,7 +488,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_skeleton_data_get_num_ik_constraintsPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_skeleton_data)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_skeleton_data)>>(
           'spine_skeleton_data_get_num_ik_constraints');
   late final _spine_skeleton_data_get_num_ik_constraints =
       _spine_skeleton_data_get_num_ik_constraintsPtr
@@ -519,7 +520,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_skeleton_data_get_num_transform_constraintsPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_skeleton_data)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_skeleton_data)>>(
           'spine_skeleton_data_get_num_transform_constraints');
   late final _spine_skeleton_data_get_num_transform_constraints =
       _spine_skeleton_data_get_num_transform_constraintsPtr
@@ -553,7 +554,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_skeleton_data_get_num_path_constraintsPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_skeleton_data)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_skeleton_data)>>(
           'spine_skeleton_data_get_num_path_constraints');
   late final _spine_skeleton_data_get_num_path_constraints =
       _spine_skeleton_data_get_num_path_constraintsPtr
@@ -704,7 +705,7 @@ class SpineFlutterBindings {
       _spine_skeleton_data_set_heightPtr
           .asFunction<void Function(spine_skeleton_data, double)>();
 
-  ffi.Pointer<ffi.Int8> spine_skeleton_data_get_version(
+  ffi.Pointer<ffi.Char> spine_skeleton_data_get_version(
     spine_skeleton_data data,
   ) {
     return _spine_skeleton_data_get_version(
@@ -714,13 +715,14 @@ class SpineFlutterBindings {
 
   late final _spine_skeleton_data_get_versionPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Pointer<ffi.Int8> Function(
+          ffi.Pointer<ffi.Char> Function(
               spine_skeleton_data)>>('spine_skeleton_data_get_version');
   late final _spine_skeleton_data_get_version =
       _spine_skeleton_data_get_versionPtr
-          .asFunction<ffi.Pointer<ffi.Int8> Function(spine_skeleton_data)>();
+          .asFunction<ffi.Pointer<ffi.Char> Function(spine_skeleton_data)>();
 
-  ffi.Pointer<ffi.Int8> spine_skeleton_data_get_hash(
+  /// OMITTED setVersion()
+  ffi.Pointer<ffi.Char> spine_skeleton_data_get_hash(
     spine_skeleton_data data,
   ) {
     return _spine_skeleton_data_get_hash(
@@ -730,12 +732,13 @@ class SpineFlutterBindings {
 
   late final _spine_skeleton_data_get_hashPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Pointer<ffi.Int8> Function(
+          ffi.Pointer<ffi.Char> Function(
               spine_skeleton_data)>>('spine_skeleton_data_get_hash');
   late final _spine_skeleton_data_get_hash = _spine_skeleton_data_get_hashPtr
-      .asFunction<ffi.Pointer<ffi.Int8> Function(spine_skeleton_data)>();
+      .asFunction<ffi.Pointer<ffi.Char> Function(spine_skeleton_data)>();
 
-  ffi.Pointer<ffi.Int8> spine_skeleton_data_get_images_path(
+  /// OMITTED setHash()
+  ffi.Pointer<ffi.Char> spine_skeleton_data_get_images_path(
     spine_skeleton_data data,
   ) {
     return _spine_skeleton_data_get_images_path(
@@ -745,13 +748,14 @@ class SpineFlutterBindings {
 
   late final _spine_skeleton_data_get_images_pathPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Pointer<ffi.Int8> Function(
+          ffi.Pointer<ffi.Char> Function(
               spine_skeleton_data)>>('spine_skeleton_data_get_images_path');
   late final _spine_skeleton_data_get_images_path =
       _spine_skeleton_data_get_images_pathPtr
-          .asFunction<ffi.Pointer<ffi.Int8> Function(spine_skeleton_data)>();
+          .asFunction<ffi.Pointer<ffi.Char> Function(spine_skeleton_data)>();
 
-  ffi.Pointer<ffi.Int8> spine_skeleton_data_get_audio_path(
+  /// OMITTED setImagesPath()
+  ffi.Pointer<ffi.Char> spine_skeleton_data_get_audio_path(
     spine_skeleton_data data,
   ) {
     return _spine_skeleton_data_get_audio_path(
@@ -761,12 +765,13 @@ class SpineFlutterBindings {
 
   late final _spine_skeleton_data_get_audio_pathPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Pointer<ffi.Int8> Function(
+          ffi.Pointer<ffi.Char> Function(
               spine_skeleton_data)>>('spine_skeleton_data_get_audio_path');
   late final _spine_skeleton_data_get_audio_path =
       _spine_skeleton_data_get_audio_pathPtr
-          .asFunction<ffi.Pointer<ffi.Int8> Function(spine_skeleton_data)>();
+          .asFunction<ffi.Pointer<ffi.Char> Function(spine_skeleton_data)>();
 
+  /// OMITTED setAudioPath()
   double spine_skeleton_data_get_fps(
     spine_skeleton_data data,
   ) {
@@ -781,6 +786,7 @@ class SpineFlutterBindings {
   late final _spine_skeleton_data_get_fps = _spine_skeleton_data_get_fpsPtr
       .asFunction<double Function(spine_skeleton_data)>();
 
+  /// OMITTED setFps()
   void spine_skeleton_data_dispose(
     spine_skeleton_data data,
   ) {
@@ -845,7 +851,7 @@ class SpineFlutterBindings {
       _spine_skeleton_drawable_disposePtr
           .asFunction<void Function(ffi.Pointer<spine_skeleton_drawable>)>();
 
-  ffi.Pointer<ffi.Int8> spine_animation_get_name(
+  ffi.Pointer<ffi.Char> spine_animation_get_name(
     spine_animation animation,
   ) {
     return _spine_animation_get_name(
@@ -854,11 +860,13 @@ class SpineFlutterBindings {
   }
 
   late final _spine_animation_get_namePtr = _lookup<
-          ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(spine_animation)>>(
+          ffi.NativeFunction<ffi.Pointer<ffi.Char> Function(spine_animation)>>(
       'spine_animation_get_name');
   late final _spine_animation_get_name = _spine_animation_get_namePtr
-      .asFunction<ffi.Pointer<ffi.Int8> Function(spine_animation)>();
+      .asFunction<ffi.Pointer<ffi.Char> Function(spine_animation)>();
 
+  /// OMITTED getTimelines()
+  /// OMITTED hasTimeline()
   double spine_animation_get_duration(
     spine_animation animation,
   ) {
@@ -873,6 +881,7 @@ class SpineFlutterBindings {
   late final _spine_animation_get_duration = _spine_animation_get_durationPtr
       .asFunction<double Function(spine_animation)>();
 
+  /// OMITTED setDuration()
   spine_skeleton_data spine_animation_state_data_get_skeleton_data(
     spine_animation_state_data stateData,
   ) {
@@ -971,8 +980,8 @@ class SpineFlutterBindings {
 
   void spine_animation_state_data_set_mix_by_name(
     spine_animation_state_data stateData,
-    ffi.Pointer<ffi.Int8> fromName,
-    ffi.Pointer<ffi.Int8> toName,
+    ffi.Pointer<ffi.Char> fromName,
+    ffi.Pointer<ffi.Char> toName,
     double duration,
   ) {
     return _spine_animation_state_data_set_mix_by_name(
@@ -987,18 +996,18 @@ class SpineFlutterBindings {
       ffi.NativeFunction<
           ffi.Void Function(
               spine_animation_state_data,
-              ffi.Pointer<ffi.Int8>,
-              ffi.Pointer<ffi.Int8>,
+              ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Char>,
               ffi.Float)>>('spine_animation_state_data_set_mix_by_name');
   late final _spine_animation_state_data_set_mix_by_name =
       _spine_animation_state_data_set_mix_by_namePtr.asFunction<
-          void Function(spine_animation_state_data, ffi.Pointer<ffi.Int8>,
-              ffi.Pointer<ffi.Int8>, double)>();
+          void Function(spine_animation_state_data, ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Char>, double)>();
 
   double spine_animation_state_data_get_mix_by_name(
     spine_animation_state_data stateData,
-    ffi.Pointer<ffi.Int8> fromName,
-    ffi.Pointer<ffi.Int8> toName,
+    ffi.Pointer<ffi.Char> fromName,
+    ffi.Pointer<ffi.Char> toName,
   ) {
     return _spine_animation_state_data_get_mix_by_name(
       stateData,
@@ -1010,12 +1019,12 @@ class SpineFlutterBindings {
   late final _spine_animation_state_data_get_mix_by_namePtr = _lookup<
           ffi.NativeFunction<
               ffi.Float Function(spine_animation_state_data,
-                  ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>)>>(
+                  ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>)>>(
       'spine_animation_state_data_get_mix_by_name');
   late final _spine_animation_state_data_get_mix_by_name =
       _spine_animation_state_data_get_mix_by_namePtr.asFunction<
-          double Function(spine_animation_state_data, ffi.Pointer<ffi.Int8>,
-              ffi.Pointer<ffi.Int8>)>();
+          double Function(spine_animation_state_data, ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Char>)>();
 
   void spine_animation_state_data_clear(
     spine_animation_state_data stateData,
@@ -1048,24 +1057,6 @@ class SpineFlutterBindings {
               ffi.Float)>>('spine_animation_state_update');
   late final _spine_animation_state_update = _spine_animation_state_updatePtr
       .asFunction<void Function(spine_animation_state, double)>();
-
-  void spine_animation_state_dispose_track_entry(
-    spine_animation_state state,
-    spine_track_entry entry,
-  ) {
-    return _spine_animation_state_dispose_track_entry(
-      state,
-      entry,
-    );
-  }
-
-  late final _spine_animation_state_dispose_track_entryPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Void Function(spine_animation_state,
-              spine_track_entry)>>('spine_animation_state_dispose_track_entry');
-  late final _spine_animation_state_dispose_track_entry =
-      _spine_animation_state_dispose_track_entryPtr.asFunction<
-          void Function(spine_animation_state, spine_track_entry)>();
 
   void spine_animation_state_apply(
     spine_animation_state state,
@@ -1112,21 +1103,47 @@ class SpineFlutterBindings {
   late final _spine_animation_state_clear_trackPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_animation_state,
-              ffi.Int32)>>('spine_animation_state_clear_track');
+              ffi.Int)>>('spine_animation_state_clear_track');
   late final _spine_animation_state_clear_track =
       _spine_animation_state_clear_trackPtr
           .asFunction<void Function(spine_animation_state, int)>();
 
+  spine_track_entry spine_animation_state_set_animation_by_name(
+    spine_animation_state state,
+    int trackIndex,
+    ffi.Pointer<ffi.Char> animationName,
+    int loop,
+  ) {
+    return _spine_animation_state_set_animation_by_name(
+      state,
+      trackIndex,
+      animationName,
+      loop,
+    );
+  }
+
+  late final _spine_animation_state_set_animation_by_namePtr = _lookup<
+      ffi.NativeFunction<
+          spine_track_entry Function(
+              spine_animation_state,
+              ffi.Int,
+              ffi.Pointer<ffi.Char>,
+              ffi.Int)>>('spine_animation_state_set_animation_by_name');
+  late final _spine_animation_state_set_animation_by_name =
+      _spine_animation_state_set_animation_by_namePtr.asFunction<
+          spine_track_entry Function(
+              spine_animation_state, int, ffi.Pointer<ffi.Char>, int)>();
+
   spine_track_entry spine_animation_state_set_animation(
     spine_animation_state state,
     int trackIndex,
-    ffi.Pointer<ffi.Int8> animationName,
+    spine_animation animation,
     int loop,
   ) {
     return _spine_animation_state_set_animation(
       state,
       trackIndex,
-      animationName,
+      animation,
       loop,
     );
   }
@@ -1135,25 +1152,54 @@ class SpineFlutterBindings {
       ffi.NativeFunction<
           spine_track_entry Function(
               spine_animation_state,
-              ffi.Int32,
-              ffi.Pointer<ffi.Int8>,
-              ffi.Int32)>>('spine_animation_state_set_animation');
+              ffi.Int,
+              spine_animation,
+              ffi.Int)>>('spine_animation_state_set_animation');
   late final _spine_animation_state_set_animation =
       _spine_animation_state_set_animationPtr.asFunction<
           spine_track_entry Function(
-              spine_animation_state, int, ffi.Pointer<ffi.Int8>, int)>();
+              spine_animation_state, int, spine_animation, int)>();
+
+  spine_track_entry spine_animation_state_add_animation_by_name(
+    spine_animation_state state,
+    int trackIndex,
+    ffi.Pointer<ffi.Char> animationName,
+    int loop,
+    double delay,
+  ) {
+    return _spine_animation_state_add_animation_by_name(
+      state,
+      trackIndex,
+      animationName,
+      loop,
+      delay,
+    );
+  }
+
+  late final _spine_animation_state_add_animation_by_namePtr = _lookup<
+      ffi.NativeFunction<
+          spine_track_entry Function(
+              spine_animation_state,
+              ffi.Int,
+              ffi.Pointer<ffi.Char>,
+              ffi.Int,
+              ffi.Float)>>('spine_animation_state_add_animation_by_name');
+  late final _spine_animation_state_add_animation_by_name =
+      _spine_animation_state_add_animation_by_namePtr.asFunction<
+          spine_track_entry Function(spine_animation_state, int,
+              ffi.Pointer<ffi.Char>, int, double)>();
 
   spine_track_entry spine_animation_state_add_animation(
     spine_animation_state state,
     int trackIndex,
-    ffi.Pointer<ffi.Int8> animationName,
+    spine_animation animation,
     int loop,
     double delay,
   ) {
     return _spine_animation_state_add_animation(
       state,
       trackIndex,
-      animationName,
+      animation,
       loop,
       delay,
     );
@@ -1163,14 +1209,14 @@ class SpineFlutterBindings {
       ffi.NativeFunction<
           spine_track_entry Function(
               spine_animation_state,
-              ffi.Int32,
-              ffi.Pointer<ffi.Int8>,
-              ffi.Int32,
+              ffi.Int,
+              spine_animation,
+              ffi.Int,
               ffi.Float)>>('spine_animation_state_add_animation');
   late final _spine_animation_state_add_animation =
       _spine_animation_state_add_animationPtr.asFunction<
-          spine_track_entry Function(spine_animation_state, int,
-              ffi.Pointer<ffi.Int8>, int, double)>();
+          spine_track_entry Function(
+              spine_animation_state, int, spine_animation, int, double)>();
 
   spine_track_entry spine_animation_state_set_empty_animation(
     spine_animation_state state,
@@ -1186,7 +1232,7 @@ class SpineFlutterBindings {
 
   late final _spine_animation_state_set_empty_animationPtr = _lookup<
       ffi.NativeFunction<
-          spine_track_entry Function(spine_animation_state, ffi.Int32,
+          spine_track_entry Function(spine_animation_state, ffi.Int,
               ffi.Float)>>('spine_animation_state_set_empty_animation');
   late final _spine_animation_state_set_empty_animation =
       _spine_animation_state_set_empty_animationPtr.asFunction<
@@ -1208,10 +1254,7 @@ class SpineFlutterBindings {
 
   late final _spine_animation_state_add_empty_animationPtr = _lookup<
       ffi.NativeFunction<
-          spine_track_entry Function(
-              spine_animation_state,
-              ffi.Int32,
-              ffi.Float,
+          spine_track_entry Function(spine_animation_state, ffi.Int, ffi.Float,
               ffi.Float)>>('spine_animation_state_add_empty_animation');
   late final _spine_animation_state_add_empty_animation =
       _spine_animation_state_add_empty_animationPtr.asFunction<
@@ -1249,10 +1292,26 @@ class SpineFlutterBindings {
   late final _spine_animation_state_get_currentPtr = _lookup<
       ffi.NativeFunction<
           spine_track_entry Function(spine_animation_state,
-              ffi.Int32)>>('spine_animation_state_get_current');
+              ffi.Int)>>('spine_animation_state_get_current');
   late final _spine_animation_state_get_current =
       _spine_animation_state_get_currentPtr
           .asFunction<spine_track_entry Function(spine_animation_state, int)>();
+
+  spine_animation_state_data spine_animation_state_get_data(
+    spine_animation_state state,
+  ) {
+    return _spine_animation_state_get_data(
+      state,
+    );
+  }
+
+  late final _spine_animation_state_get_dataPtr = _lookup<
+      ffi.NativeFunction<
+          spine_animation_state_data Function(
+              spine_animation_state)>>('spine_animation_state_get_data');
+  late final _spine_animation_state_get_data =
+      _spine_animation_state_get_dataPtr.asFunction<
+          spine_animation_state_data Function(spine_animation_state)>();
 
   double spine_animation_state_get_time_scale(
     spine_animation_state state,
@@ -1287,6 +1346,30 @@ class SpineFlutterBindings {
       _spine_animation_state_set_time_scalePtr
           .asFunction<void Function(spine_animation_state, double)>();
 
+  /// OMITTED setListener()
+  /// OMITTED setListener()
+  /// OMITTED disableQueue()
+  /// OMITTED enableQueue()
+  /// OMITTED setManualTrackEntryDisposal()
+  /// OMITTED getManualTrackEntryDisposal()
+  void spine_animation_state_dispose_track_entry(
+    spine_animation_state state,
+    spine_track_entry entry,
+  ) {
+    return _spine_animation_state_dispose_track_entry(
+      state,
+      entry,
+    );
+  }
+
+  late final _spine_animation_state_dispose_track_entryPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_animation_state,
+              spine_track_entry)>>('spine_animation_state_dispose_track_entry');
+  late final _spine_animation_state_dispose_track_entry =
+      _spine_animation_state_dispose_track_entryPtr.asFunction<
+          void Function(spine_animation_state, spine_track_entry)>();
+
   int spine_animation_state_events_get_num_events(
     spine_animation_state_events events,
   ) {
@@ -1296,7 +1379,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_animation_state_events_get_num_eventsPtr = _lookup<
-          ffi.NativeFunction<ffi.Int32 Function(spine_animation_state_events)>>(
+          ffi.NativeFunction<ffi.Int Function(spine_animation_state_events)>>(
       'spine_animation_state_events_get_num_events');
   late final _spine_animation_state_events_get_num_events =
       _spine_animation_state_events_get_num_eventsPtr
@@ -1315,7 +1398,7 @@ class SpineFlutterBindings {
   late final _spine_animation_state_events_get_event_typePtr = _lookup<
       ffi.NativeFunction<
           ffi.Int32 Function(spine_animation_state_events,
-              ffi.Int32)>>('spine_animation_state_events_get_event_type');
+              ffi.Int)>>('spine_animation_state_events_get_event_type');
   late final _spine_animation_state_events_get_event_type =
       _spine_animation_state_events_get_event_typePtr
           .asFunction<int Function(spine_animation_state_events, int)>();
@@ -1333,7 +1416,7 @@ class SpineFlutterBindings {
   late final _spine_animation_state_events_get_track_entryPtr = _lookup<
       ffi.NativeFunction<
           spine_track_entry Function(spine_animation_state_events,
-              ffi.Int32)>>('spine_animation_state_events_get_track_entry');
+              ffi.Int)>>('spine_animation_state_events_get_track_entry');
   late final _spine_animation_state_events_get_track_entry =
       _spine_animation_state_events_get_track_entryPtr.asFunction<
           spine_track_entry Function(spine_animation_state_events, int)>();
@@ -1351,7 +1434,7 @@ class SpineFlutterBindings {
   late final _spine_animation_state_events_get_eventPtr = _lookup<
       ffi.NativeFunction<
           spine_event Function(spine_animation_state_events,
-              ffi.Int32)>>('spine_animation_state_events_get_event');
+              ffi.Int)>>('spine_animation_state_events_get_event');
   late final _spine_animation_state_events_get_event =
       _spine_animation_state_events_get_eventPtr.asFunction<
           spine_event Function(spine_animation_state_events, int)>();
@@ -1380,7 +1463,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_track_entry_get_track_indexPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_track_entry)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_track_entry)>>(
           'spine_track_entry_get_track_index');
   late final _spine_track_entry_get_track_index =
       _spine_track_entry_get_track_indexPtr
@@ -1425,7 +1508,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_track_entry_get_loopPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_track_entry)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_track_entry)>>(
           'spine_track_entry_get_loop');
   late final _spine_track_entry_get_loop = _spine_track_entry_get_loopPtr
       .asFunction<int Function(spine_track_entry)>();
@@ -1441,7 +1524,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_track_entry_set_loopPtr = _lookup<
-          ffi.NativeFunction<ffi.Void Function(spine_track_entry, ffi.Int32)>>(
+          ffi.NativeFunction<ffi.Void Function(spine_track_entry, ffi.Int)>>(
       'spine_track_entry_set_loop');
   late final _spine_track_entry_set_loop = _spine_track_entry_set_loopPtr
       .asFunction<void Function(spine_track_entry, int)>();
@@ -1455,7 +1538,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_track_entry_get_hold_previousPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_track_entry)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_track_entry)>>(
           'spine_track_entry_get_hold_previous');
   late final _spine_track_entry_get_hold_previous =
       _spine_track_entry_get_hold_previousPtr
@@ -1472,7 +1555,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_track_entry_set_hold_previousPtr = _lookup<
-          ffi.NativeFunction<ffi.Void Function(spine_track_entry, ffi.Int32)>>(
+          ffi.NativeFunction<ffi.Void Function(spine_track_entry, ffi.Int)>>(
       'spine_track_entry_set_hold_previous');
   late final _spine_track_entry_set_hold_previous =
       _spine_track_entry_set_hold_previousPtr
@@ -1487,7 +1570,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_track_entry_get_reversePtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_track_entry)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_track_entry)>>(
           'spine_track_entry_get_reverse');
   late final _spine_track_entry_get_reverse = _spine_track_entry_get_reversePtr
       .asFunction<int Function(spine_track_entry)>();
@@ -1503,7 +1586,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_track_entry_set_reversePtr = _lookup<
-          ffi.NativeFunction<ffi.Void Function(spine_track_entry, ffi.Int32)>>(
+          ffi.NativeFunction<ffi.Void Function(spine_track_entry, ffi.Int)>>(
       'spine_track_entry_set_reverse');
   late final _spine_track_entry_set_reverse = _spine_track_entry_set_reversePtr
       .asFunction<void Function(spine_track_entry, int)>();
@@ -1517,7 +1600,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_track_entry_get_shortest_rotationPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_track_entry)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_track_entry)>>(
           'spine_track_entry_get_shortest_rotation');
   late final _spine_track_entry_get_shortest_rotation =
       _spine_track_entry_get_shortest_rotationPtr
@@ -1534,7 +1617,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_track_entry_set_shortest_rotationPtr = _lookup<
-          ffi.NativeFunction<ffi.Void Function(spine_track_entry, ffi.Int32)>>(
+          ffi.NativeFunction<ffi.Void Function(spine_track_entry, ffi.Int)>>(
       'spine_track_entry_set_shortest_rotation');
   late final _spine_track_entry_set_shortest_rotation =
       _spine_track_entry_set_shortest_rotationPtr
@@ -1926,7 +2009,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_track_entry_is_completePtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_track_entry)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_track_entry)>>(
           'spine_track_entry_is_complete');
   late final _spine_track_entry_is_complete = _spine_track_entry_is_completePtr
       .asFunction<int Function(spine_track_entry)>();
@@ -2087,6 +2170,8 @@ class SpineFlutterBindings {
       _spine_track_entry_get_track_completePtr
           .asFunction<double Function(spine_track_entry)>();
 
+  /// OMITTED setListener()
+  /// OMITTED setListener()
   void spine_skeleton_update_cache(
     spine_skeleton skeleton,
   ) {
@@ -2101,6 +2186,7 @@ class SpineFlutterBindings {
   late final _spine_skeleton_update_cache = _spine_skeleton_update_cachePtr
       .asFunction<void Function(spine_skeleton)>();
 
+  /// OMITTED printUpdateCache()
   void spine_skeleton_update_world_transform(
     spine_skeleton skeleton,
   ) {
@@ -2180,7 +2266,7 @@ class SpineFlutterBindings {
 
   spine_bone spine_skeleton_find_bone(
     spine_skeleton skeleton,
-    ffi.Pointer<ffi.Int8> boneName,
+    ffi.Pointer<ffi.Char> boneName,
   ) {
     return _spine_skeleton_find_bone(
       skeleton,
@@ -2191,13 +2277,13 @@ class SpineFlutterBindings {
   late final _spine_skeleton_find_bonePtr = _lookup<
       ffi.NativeFunction<
           spine_bone Function(spine_skeleton,
-              ffi.Pointer<ffi.Int8>)>>('spine_skeleton_find_bone');
+              ffi.Pointer<ffi.Char>)>>('spine_skeleton_find_bone');
   late final _spine_skeleton_find_bone = _spine_skeleton_find_bonePtr
-      .asFunction<spine_bone Function(spine_skeleton, ffi.Pointer<ffi.Int8>)>();
+      .asFunction<spine_bone Function(spine_skeleton, ffi.Pointer<ffi.Char>)>();
 
   spine_slot spine_skeleton_find_slot(
     spine_skeleton skeleton,
-    ffi.Pointer<ffi.Int8> slotName,
+    ffi.Pointer<ffi.Char> slotName,
   ) {
     return _spine_skeleton_find_slot(
       skeleton,
@@ -2208,13 +2294,13 @@ class SpineFlutterBindings {
   late final _spine_skeleton_find_slotPtr = _lookup<
       ffi.NativeFunction<
           spine_slot Function(spine_skeleton,
-              ffi.Pointer<ffi.Int8>)>>('spine_skeleton_find_slot');
+              ffi.Pointer<ffi.Char>)>>('spine_skeleton_find_slot');
   late final _spine_skeleton_find_slot = _spine_skeleton_find_slotPtr
-      .asFunction<spine_slot Function(spine_skeleton, ffi.Pointer<ffi.Int8>)>();
+      .asFunction<spine_slot Function(spine_skeleton, ffi.Pointer<ffi.Char>)>();
 
   void spine_skeleton_set_skin_by_name(
     spine_skeleton skeleton,
-    ffi.Pointer<ffi.Int8> skinName,
+    ffi.Pointer<ffi.Char> skinName,
   ) {
     return _spine_skeleton_set_skin_by_name(
       skeleton,
@@ -2225,10 +2311,10 @@ class SpineFlutterBindings {
   late final _spine_skeleton_set_skin_by_namePtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_skeleton,
-              ffi.Pointer<ffi.Int8>)>>('spine_skeleton_set_skin_by_name');
+              ffi.Pointer<ffi.Char>)>>('spine_skeleton_set_skin_by_name');
   late final _spine_skeleton_set_skin_by_name =
       _spine_skeleton_set_skin_by_namePtr
-          .asFunction<void Function(spine_skeleton, ffi.Pointer<ffi.Int8>)>();
+          .asFunction<void Function(spine_skeleton, ffi.Pointer<ffi.Char>)>();
 
   void spine_skeleton_set_skin(
     spine_skeleton skeleton,
@@ -2248,8 +2334,8 @@ class SpineFlutterBindings {
 
   spine_attachment spine_skeleton_get_attachment_by_name(
     spine_skeleton skeleton,
-    ffi.Pointer<ffi.Int8> slotName,
-    ffi.Pointer<ffi.Int8> attachmentName,
+    ffi.Pointer<ffi.Char> slotName,
+    ffi.Pointer<ffi.Char> attachmentName,
   ) {
     return _spine_skeleton_get_attachment_by_name(
       skeleton,
@@ -2260,17 +2346,17 @@ class SpineFlutterBindings {
 
   late final _spine_skeleton_get_attachment_by_namePtr = _lookup<
       ffi.NativeFunction<
-          spine_attachment Function(spine_skeleton, ffi.Pointer<ffi.Int8>,
-              ffi.Pointer<ffi.Int8>)>>('spine_skeleton_get_attachment_by_name');
+          spine_attachment Function(spine_skeleton, ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Char>)>>('spine_skeleton_get_attachment_by_name');
   late final _spine_skeleton_get_attachment_by_name =
       _spine_skeleton_get_attachment_by_namePtr.asFunction<
           spine_attachment Function(
-              spine_skeleton, ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>)>();
+              spine_skeleton, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>)>();
 
   spine_attachment spine_skeleton_get_attachment(
     spine_skeleton skeleton,
     int slotIndex,
-    ffi.Pointer<ffi.Int8> attachmentName,
+    ffi.Pointer<ffi.Char> attachmentName,
   ) {
     return _spine_skeleton_get_attachment(
       skeleton,
@@ -2281,17 +2367,17 @@ class SpineFlutterBindings {
 
   late final _spine_skeleton_get_attachmentPtr = _lookup<
       ffi.NativeFunction<
-          spine_attachment Function(spine_skeleton, ffi.Int32,
-              ffi.Pointer<ffi.Int8>)>>('spine_skeleton_get_attachment');
+          spine_attachment Function(spine_skeleton, ffi.Int,
+              ffi.Pointer<ffi.Char>)>>('spine_skeleton_get_attachment');
   late final _spine_skeleton_get_attachment =
       _spine_skeleton_get_attachmentPtr.asFunction<
           spine_attachment Function(
-              spine_skeleton, int, ffi.Pointer<ffi.Int8>)>();
+              spine_skeleton, int, ffi.Pointer<ffi.Char>)>();
 
   void spine_skeleton_set_attachment(
     spine_skeleton skeleton,
-    ffi.Pointer<ffi.Int8> slotName,
-    ffi.Pointer<ffi.Int8> attachmentName,
+    ffi.Pointer<ffi.Char> slotName,
+    ffi.Pointer<ffi.Char> attachmentName,
   ) {
     return _spine_skeleton_set_attachment(
       skeleton,
@@ -2302,16 +2388,16 @@ class SpineFlutterBindings {
 
   late final _spine_skeleton_set_attachmentPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Void Function(spine_skeleton, ffi.Pointer<ffi.Int8>,
-              ffi.Pointer<ffi.Int8>)>>('spine_skeleton_set_attachment');
+          ffi.Void Function(spine_skeleton, ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Char>)>>('spine_skeleton_set_attachment');
   late final _spine_skeleton_set_attachment =
       _spine_skeleton_set_attachmentPtr.asFunction<
           void Function(
-              spine_skeleton, ffi.Pointer<ffi.Int8>, ffi.Pointer<ffi.Int8>)>();
+              spine_skeleton, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>)>();
 
   spine_ik_constraint spine_skeleton_find_ik_constraint(
     spine_skeleton skeleton,
-    ffi.Pointer<ffi.Int8> constraintName,
+    ffi.Pointer<ffi.Char> constraintName,
   ) {
     return _spine_skeleton_find_ik_constraint(
       skeleton,
@@ -2322,15 +2408,15 @@ class SpineFlutterBindings {
   late final _spine_skeleton_find_ik_constraintPtr = _lookup<
       ffi.NativeFunction<
           spine_ik_constraint Function(spine_skeleton,
-              ffi.Pointer<ffi.Int8>)>>('spine_skeleton_find_ik_constraint');
+              ffi.Pointer<ffi.Char>)>>('spine_skeleton_find_ik_constraint');
   late final _spine_skeleton_find_ik_constraint =
       _spine_skeleton_find_ik_constraintPtr.asFunction<
           spine_ik_constraint Function(
-              spine_skeleton, ffi.Pointer<ffi.Int8>)>();
+              spine_skeleton, ffi.Pointer<ffi.Char>)>();
 
   spine_transform_constraint spine_skeleton_find_transform_constraint(
     spine_skeleton skeleton,
-    ffi.Pointer<ffi.Int8> constraintName,
+    ffi.Pointer<ffi.Char> constraintName,
   ) {
     return _spine_skeleton_find_transform_constraint(
       skeleton,
@@ -2341,16 +2427,16 @@ class SpineFlutterBindings {
   late final _spine_skeleton_find_transform_constraintPtr = _lookup<
           ffi.NativeFunction<
               spine_transform_constraint Function(
-                  spine_skeleton, ffi.Pointer<ffi.Int8>)>>(
+                  spine_skeleton, ffi.Pointer<ffi.Char>)>>(
       'spine_skeleton_find_transform_constraint');
   late final _spine_skeleton_find_transform_constraint =
       _spine_skeleton_find_transform_constraintPtr.asFunction<
           spine_transform_constraint Function(
-              spine_skeleton, ffi.Pointer<ffi.Int8>)>();
+              spine_skeleton, ffi.Pointer<ffi.Char>)>();
 
   spine_path_constraint spine_skeleton_find_path_constraint(
     spine_skeleton skeleton,
-    ffi.Pointer<ffi.Int8> constraintName,
+    ffi.Pointer<ffi.Char> constraintName,
   ) {
     return _spine_skeleton_find_path_constraint(
       skeleton,
@@ -2361,11 +2447,11 @@ class SpineFlutterBindings {
   late final _spine_skeleton_find_path_constraintPtr = _lookup<
       ffi.NativeFunction<
           spine_path_constraint Function(spine_skeleton,
-              ffi.Pointer<ffi.Int8>)>>('spine_skeleton_find_path_constraint');
+              ffi.Pointer<ffi.Char>)>>('spine_skeleton_find_path_constraint');
   late final _spine_skeleton_find_path_constraint =
       _spine_skeleton_find_path_constraintPtr.asFunction<
           spine_path_constraint Function(
-              spine_skeleton, ffi.Pointer<ffi.Int8>)>();
+              spine_skeleton, ffi.Pointer<ffi.Char>)>();
 
   spine_bounds spine_skeleton_get_bounds(
     spine_skeleton skeleton,
@@ -2418,7 +2504,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_skeleton_get_num_bonesPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_skeleton)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_skeleton)>>(
           'spine_skeleton_get_num_bones');
   late final _spine_skeleton_get_num_bones = _spine_skeleton_get_num_bonesPtr
       .asFunction<int Function(spine_skeleton)>();
@@ -2437,6 +2523,7 @@ class SpineFlutterBindings {
   late final _spine_skeleton_get_bones = _spine_skeleton_get_bonesPtr
       .asFunction<ffi.Pointer<spine_bone> Function(spine_skeleton)>();
 
+  /// OMITTED getUpdateCacheList()
   int spine_skeleton_get_num_slots(
     spine_skeleton skeleton,
   ) {
@@ -2446,7 +2533,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_skeleton_get_num_slotsPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_skeleton)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_skeleton)>>(
           'spine_skeleton_get_num_slots');
   late final _spine_skeleton_get_num_slots = _spine_skeleton_get_num_slotsPtr
       .asFunction<int Function(spine_skeleton)>();
@@ -2474,7 +2561,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_skeleton_get_num_draw_orderPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_skeleton)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_skeleton)>>(
           'spine_skeleton_get_num_draw_order');
   late final _spine_skeleton_get_num_draw_order =
       _spine_skeleton_get_num_draw_orderPtr
@@ -2503,7 +2590,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_skeleton_get_num_ik_constraintsPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_skeleton)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_skeleton)>>(
           'spine_skeleton_get_num_ik_constraints');
   late final _spine_skeleton_get_num_ik_constraints =
       _spine_skeleton_get_num_ik_constraintsPtr
@@ -2534,7 +2621,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_skeleton_get_num_transform_constraintsPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_skeleton)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_skeleton)>>(
           'spine_skeleton_get_num_transform_constraints');
   late final _spine_skeleton_get_num_transform_constraints =
       _spine_skeleton_get_num_transform_constraintsPtr
@@ -2566,7 +2653,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_skeleton_get_num_path_constraintsPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_skeleton)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_skeleton)>>(
           'spine_skeleton_get_num_path_constraints');
   late final _spine_skeleton_get_num_path_constraints =
       _spine_skeleton_get_num_path_constraintsPtr
@@ -2779,7 +2866,7 @@ class SpineFlutterBindings {
   late final _spine_skeleton_set_scale_y = _spine_skeleton_set_scale_yPtr
       .asFunction<void Function(spine_skeleton, double)>();
 
-  ffi.Pointer<ffi.Int8> spine_event_data_get_name(
+  ffi.Pointer<ffi.Char> spine_event_data_get_name(
     spine_event_data event,
   ) {
     return _spine_event_data_get_name(
@@ -2788,10 +2875,10 @@ class SpineFlutterBindings {
   }
 
   late final _spine_event_data_get_namePtr = _lookup<
-          ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(spine_event_data)>>(
+          ffi.NativeFunction<ffi.Pointer<ffi.Char> Function(spine_event_data)>>(
       'spine_event_data_get_name');
   late final _spine_event_data_get_name = _spine_event_data_get_namePtr
-      .asFunction<ffi.Pointer<ffi.Int8> Function(spine_event_data)>();
+      .asFunction<ffi.Pointer<ffi.Char> Function(spine_event_data)>();
 
   int spine_event_data_get_int_value(
     spine_event_data event,
@@ -2802,11 +2889,28 @@ class SpineFlutterBindings {
   }
 
   late final _spine_event_data_get_int_valuePtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_event_data)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_event_data)>>(
           'spine_event_data_get_int_value');
   late final _spine_event_data_get_int_value =
       _spine_event_data_get_int_valuePtr
           .asFunction<int Function(spine_event_data)>();
+
+  void spine_event_data_set_int_value(
+    spine_event_data event,
+    int value,
+  ) {
+    return _spine_event_data_set_int_value(
+      event,
+      value,
+    );
+  }
+
+  late final _spine_event_data_set_int_valuePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_event_data, ffi.Int)>>(
+          'spine_event_data_set_int_value');
+  late final _spine_event_data_set_int_value =
+      _spine_event_data_set_int_valuePtr
+          .asFunction<void Function(spine_event_data, int)>();
 
   double spine_event_data_get_float_value(
     spine_event_data event,
@@ -2823,7 +2927,24 @@ class SpineFlutterBindings {
       _spine_event_data_get_float_valuePtr
           .asFunction<double Function(spine_event_data)>();
 
-  ffi.Pointer<ffi.Int8> spine_event_data_get_string_value(
+  void spine_event_data_set_float_value(
+    spine_event_data event,
+    double value,
+  ) {
+    return _spine_event_data_set_float_value(
+      event,
+      value,
+    );
+  }
+
+  late final _spine_event_data_set_float_valuePtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(spine_event_data, ffi.Float)>>(
+      'spine_event_data_set_float_value');
+  late final _spine_event_data_set_float_value =
+      _spine_event_data_set_float_valuePtr
+          .asFunction<void Function(spine_event_data, double)>();
+
+  ffi.Pointer<ffi.Char> spine_event_data_get_string_value(
     spine_event_data event,
   ) {
     return _spine_event_data_get_string_value(
@@ -2832,13 +2953,31 @@ class SpineFlutterBindings {
   }
 
   late final _spine_event_data_get_string_valuePtr = _lookup<
-          ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(spine_event_data)>>(
+          ffi.NativeFunction<ffi.Pointer<ffi.Char> Function(spine_event_data)>>(
       'spine_event_data_get_string_value');
   late final _spine_event_data_get_string_value =
       _spine_event_data_get_string_valuePtr
-          .asFunction<ffi.Pointer<ffi.Int8> Function(spine_event_data)>();
+          .asFunction<ffi.Pointer<ffi.Char> Function(spine_event_data)>();
 
-  ffi.Pointer<ffi.Int8> spine_event_data_get_audio_path(
+  void spine_event_data_set_string_value(
+    spine_event_data event,
+    ffi.Pointer<ffi.Char> value,
+  ) {
+    return _spine_event_data_set_string_value(
+      event,
+      value,
+    );
+  }
+
+  late final _spine_event_data_set_string_valuePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_event_data,
+              ffi.Pointer<ffi.Char>)>>('spine_event_data_set_string_value');
+  late final _spine_event_data_set_string_value =
+      _spine_event_data_set_string_valuePtr
+          .asFunction<void Function(spine_event_data, ffi.Pointer<ffi.Char>)>();
+
+  ffi.Pointer<ffi.Char> spine_event_data_get_audio_path(
     spine_event_data event,
   ) {
     return _spine_event_data_get_audio_path(
@@ -2847,12 +2986,13 @@ class SpineFlutterBindings {
   }
 
   late final _spine_event_data_get_audio_pathPtr = _lookup<
-          ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(spine_event_data)>>(
+          ffi.NativeFunction<ffi.Pointer<ffi.Char> Function(spine_event_data)>>(
       'spine_event_data_get_audio_path');
   late final _spine_event_data_get_audio_path =
       _spine_event_data_get_audio_pathPtr
-          .asFunction<ffi.Pointer<ffi.Int8> Function(spine_event_data)>();
+          .asFunction<ffi.Pointer<ffi.Char> Function(spine_event_data)>();
 
+  /// OMITTED setAudioPath()
   double spine_event_data_get_volume(
     spine_event_data event,
   ) {
@@ -2867,6 +3007,22 @@ class SpineFlutterBindings {
   late final _spine_event_data_get_volume = _spine_event_data_get_volumePtr
       .asFunction<double Function(spine_event_data)>();
 
+  void spine_event_data_set_volume(
+    spine_event_data event,
+    double volume,
+  ) {
+    return _spine_event_data_set_volume(
+      event,
+      volume,
+    );
+  }
+
+  late final _spine_event_data_set_volumePtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(spine_event_data, ffi.Float)>>(
+      'spine_event_data_set_volume');
+  late final _spine_event_data_set_volume = _spine_event_data_set_volumePtr
+      .asFunction<void Function(spine_event_data, double)>();
+
   double spine_event_data_get_balance(
     spine_event_data event,
   ) {
@@ -2880,6 +3036,22 @@ class SpineFlutterBindings {
           'spine_event_data_get_balance');
   late final _spine_event_data_get_balance = _spine_event_data_get_balancePtr
       .asFunction<double Function(spine_event_data)>();
+
+  void spine_event_data_set_balance(
+    spine_event_data event,
+    double balance,
+  ) {
+    return _spine_event_data_set_balance(
+      event,
+      balance,
+    );
+  }
+
+  late final _spine_event_data_set_balancePtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(spine_event_data, ffi.Float)>>(
+      'spine_event_data_set_balance');
+  late final _spine_event_data_set_balance = _spine_event_data_set_balancePtr
+      .asFunction<void Function(spine_event_data, double)>();
 
   spine_event_data spine_event_get_data(
     spine_event event,
@@ -2918,10 +3090,26 @@ class SpineFlutterBindings {
   }
 
   late final _spine_event_get_int_valuePtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_event)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_event)>>(
           'spine_event_get_int_value');
   late final _spine_event_get_int_value =
       _spine_event_get_int_valuePtr.asFunction<int Function(spine_event)>();
+
+  void spine_event_set_int_value(
+    spine_event event,
+    int value,
+  ) {
+    return _spine_event_set_int_value(
+      event,
+      value,
+    );
+  }
+
+  late final _spine_event_set_int_valuePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_event, ffi.Int)>>(
+          'spine_event_set_int_value');
+  late final _spine_event_set_int_value = _spine_event_set_int_valuePtr
+      .asFunction<void Function(spine_event, int)>();
 
   double spine_event_get_float_value(
     spine_event event,
@@ -2937,7 +3125,23 @@ class SpineFlutterBindings {
   late final _spine_event_get_float_value = _spine_event_get_float_valuePtr
       .asFunction<double Function(spine_event)>();
 
-  ffi.Pointer<ffi.Int8> spine_event_get_string_value(
+  void spine_event_set_float_value(
+    spine_event event,
+    double value,
+  ) {
+    return _spine_event_set_float_value(
+      event,
+      value,
+    );
+  }
+
+  late final _spine_event_set_float_valuePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_event, ffi.Float)>>(
+          'spine_event_set_float_value');
+  late final _spine_event_set_float_value = _spine_event_set_float_valuePtr
+      .asFunction<void Function(spine_event, double)>();
+
+  ffi.Pointer<ffi.Char> spine_event_get_string_value(
     spine_event event,
   ) {
     return _spine_event_get_string_value(
@@ -2946,10 +3150,27 @@ class SpineFlutterBindings {
   }
 
   late final _spine_event_get_string_valuePtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(spine_event)>>(
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function(spine_event)>>(
           'spine_event_get_string_value');
   late final _spine_event_get_string_value = _spine_event_get_string_valuePtr
-      .asFunction<ffi.Pointer<ffi.Int8> Function(spine_event)>();
+      .asFunction<ffi.Pointer<ffi.Char> Function(spine_event)>();
+
+  void spine_event_set_string_value(
+    spine_event event,
+    ffi.Pointer<ffi.Char> value,
+  ) {
+    return _spine_event_set_string_value(
+      event,
+      value,
+    );
+  }
+
+  late final _spine_event_set_string_valuePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_event,
+              ffi.Pointer<ffi.Char>)>>('spine_event_set_string_value');
+  late final _spine_event_set_string_value = _spine_event_set_string_valuePtr
+      .asFunction<void Function(spine_event, ffi.Pointer<ffi.Char>)>();
 
   double spine_event_get_volume(
     spine_event event,
@@ -2965,6 +3186,22 @@ class SpineFlutterBindings {
   late final _spine_event_get_volume =
       _spine_event_get_volumePtr.asFunction<double Function(spine_event)>();
 
+  void spine_event_set_volume(
+    spine_event event,
+    double volume,
+  ) {
+    return _spine_event_set_volume(
+      event,
+      volume,
+    );
+  }
+
+  late final _spine_event_set_volumePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_event, ffi.Float)>>(
+          'spine_event_set_volume');
+  late final _spine_event_set_volume = _spine_event_set_volumePtr
+      .asFunction<void Function(spine_event, double)>();
+
   double spine_event_get_balance(
     spine_event event,
   ) {
@@ -2979,6 +3216,22 @@ class SpineFlutterBindings {
   late final _spine_event_get_balance =
       _spine_event_get_balancePtr.asFunction<double Function(spine_event)>();
 
+  void spine_event_set_balance(
+    spine_event event,
+    double balance,
+  ) {
+    return _spine_event_set_balance(
+      event,
+      balance,
+    );
+  }
+
+  late final _spine_event_set_balancePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_event, ffi.Float)>>(
+          'spine_event_set_balance');
+  late final _spine_event_set_balance = _spine_event_set_balancePtr
+      .asFunction<void Function(spine_event, double)>();
+
   int spine_slot_data_get_index(
     spine_slot_data slot,
   ) {
@@ -2988,12 +3241,12 @@ class SpineFlutterBindings {
   }
 
   late final _spine_slot_data_get_indexPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_slot_data)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_slot_data)>>(
           'spine_slot_data_get_index');
   late final _spine_slot_data_get_index =
       _spine_slot_data_get_indexPtr.asFunction<int Function(spine_slot_data)>();
 
-  ffi.Pointer<ffi.Int8> spine_slot_data_get_name(
+  ffi.Pointer<ffi.Char> spine_slot_data_get_name(
     spine_slot_data slot,
   ) {
     return _spine_slot_data_get_name(
@@ -3002,10 +3255,10 @@ class SpineFlutterBindings {
   }
 
   late final _spine_slot_data_get_namePtr = _lookup<
-          ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(spine_slot_data)>>(
+          ffi.NativeFunction<ffi.Pointer<ffi.Char> Function(spine_slot_data)>>(
       'spine_slot_data_get_name');
   late final _spine_slot_data_get_name = _spine_slot_data_get_namePtr
-      .asFunction<ffi.Pointer<ffi.Int8> Function(spine_slot_data)>();
+      .asFunction<ffi.Pointer<ffi.Char> Function(spine_slot_data)>();
 
   spine_bone_data spine_slot_data_get_bone_data(
     spine_slot_data slot,
@@ -3107,7 +3360,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_slot_data_has_dark_colorPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_slot_data)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_slot_data)>>(
           'spine_slot_data_has_dark_color');
   late final _spine_slot_data_has_dark_color =
       _spine_slot_data_has_dark_colorPtr
@@ -3123,14 +3376,14 @@ class SpineFlutterBindings {
     );
   }
 
-  late final _spine_slot_data_set_has_dark_colorPtr = _lookup<
-          ffi.NativeFunction<ffi.Void Function(spine_slot_data, ffi.Int32)>>(
-      'spine_slot_data_set_has_dark_color');
+  late final _spine_slot_data_set_has_dark_colorPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_slot_data, ffi.Int)>>(
+          'spine_slot_data_set_has_dark_color');
   late final _spine_slot_data_set_has_dark_color =
       _spine_slot_data_set_has_dark_colorPtr
           .asFunction<void Function(spine_slot_data, int)>();
 
-  ffi.Pointer<ffi.Int8> spine_slot_data_get_attachment_name(
+  ffi.Pointer<ffi.Char> spine_slot_data_get_attachment_name(
     spine_slot_data slot,
   ) {
     return _spine_slot_data_get_attachment_name(
@@ -3139,15 +3392,15 @@ class SpineFlutterBindings {
   }
 
   late final _spine_slot_data_get_attachment_namePtr = _lookup<
-          ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(spine_slot_data)>>(
+          ffi.NativeFunction<ffi.Pointer<ffi.Char> Function(spine_slot_data)>>(
       'spine_slot_data_get_attachment_name');
   late final _spine_slot_data_get_attachment_name =
       _spine_slot_data_get_attachment_namePtr
-          .asFunction<ffi.Pointer<ffi.Int8> Function(spine_slot_data)>();
+          .asFunction<ffi.Pointer<ffi.Char> Function(spine_slot_data)>();
 
   void spine_slot_data_set_attachment_name(
     spine_slot_data slot,
-    ffi.Pointer<ffi.Int8> attachmentName,
+    ffi.Pointer<ffi.Char> attachmentName,
   ) {
     return _spine_slot_data_set_attachment_name(
       slot,
@@ -3158,10 +3411,10 @@ class SpineFlutterBindings {
   late final _spine_slot_data_set_attachment_namePtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_slot_data,
-              ffi.Pointer<ffi.Int8>)>>('spine_slot_data_set_attachment_name');
+              ffi.Pointer<ffi.Char>)>>('spine_slot_data_set_attachment_name');
   late final _spine_slot_data_set_attachment_name =
       _spine_slot_data_set_attachment_namePtr
-          .asFunction<void Function(spine_slot_data, ffi.Pointer<ffi.Int8>)>();
+          .asFunction<void Function(spine_slot_data, ffi.Pointer<ffi.Char>)>();
 
   int spine_slot_data_get_blend_mode(
     spine_slot_data slot,
@@ -3334,7 +3587,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_slot_has_dark_colorPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_slot)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_slot)>>(
           'spine_slot_has_dark_color');
   late final _spine_slot_has_dark_color =
       _spine_slot_has_dark_colorPtr.asFunction<int Function(spine_slot)>();
@@ -3369,6 +3622,37 @@ class SpineFlutterBindings {
   late final _spine_slot_set_attachment = _spine_slot_set_attachmentPtr
       .asFunction<void Function(spine_slot, spine_attachment)>();
 
+  /// OMITTED getDeform()
+  int spine_slot_get_sequence_index(
+    spine_slot slot,
+  ) {
+    return _spine_slot_get_sequence_index(
+      slot,
+    );
+  }
+
+  late final _spine_slot_get_sequence_indexPtr =
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_slot)>>(
+          'spine_slot_get_sequence_index');
+  late final _spine_slot_get_sequence_index =
+      _spine_slot_get_sequence_indexPtr.asFunction<int Function(spine_slot)>();
+
+  void spine_slot_set_sequence_index(
+    spine_slot slot,
+    int sequenceIndex,
+  ) {
+    return _spine_slot_set_sequence_index(
+      slot,
+      sequenceIndex,
+    );
+  }
+
+  late final _spine_slot_set_sequence_indexPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_slot, ffi.Int)>>(
+          'spine_slot_set_sequence_index');
+  late final _spine_slot_set_sequence_index = _spine_slot_set_sequence_indexPtr
+      .asFunction<void Function(spine_slot, int)>();
+
   int spine_bone_data_get_index(
     spine_bone_data data,
   ) {
@@ -3378,12 +3662,12 @@ class SpineFlutterBindings {
   }
 
   late final _spine_bone_data_get_indexPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_bone_data)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_bone_data)>>(
           'spine_bone_data_get_index');
   late final _spine_bone_data_get_index =
       _spine_bone_data_get_indexPtr.asFunction<int Function(spine_bone_data)>();
 
-  ffi.Pointer<ffi.Int8> spine_bone_data_get_name(
+  ffi.Pointer<ffi.Char> spine_bone_data_get_name(
     spine_bone_data data,
   ) {
     return _spine_bone_data_get_name(
@@ -3392,10 +3676,10 @@ class SpineFlutterBindings {
   }
 
   late final _spine_bone_data_get_namePtr = _lookup<
-          ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(spine_bone_data)>>(
+          ffi.NativeFunction<ffi.Pointer<ffi.Char> Function(spine_bone_data)>>(
       'spine_bone_data_get_name');
   late final _spine_bone_data_get_name = _spine_bone_data_get_namePtr
-      .asFunction<ffi.Pointer<ffi.Int8> Function(spine_bone_data)>();
+      .asFunction<ffi.Pointer<ffi.Char> Function(spine_bone_data)>();
 
   spine_bone_data spine_bone_data_get_parent(
     spine_bone_data data,
@@ -3692,7 +3976,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_bone_data_is_skin_requiredPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_bone_data)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_bone_data)>>(
           'spine_bone_data_is_skin_required');
   late final _spine_bone_data_is_skin_required =
       _spine_bone_data_is_skin_requiredPtr
@@ -3708,9 +3992,9 @@ class SpineFlutterBindings {
     );
   }
 
-  late final _spine_bone_data_set_is_skin_requiredPtr = _lookup<
-          ffi.NativeFunction<ffi.Void Function(spine_bone_data, ffi.Int32)>>(
-      'spine_bone_data_set_is_skin_required');
+  late final _spine_bone_data_set_is_skin_requiredPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_bone_data, ffi.Int)>>(
+          'spine_bone_data_set_is_skin_required');
   late final _spine_bone_data_set_is_skin_required =
       _spine_bone_data_set_is_skin_requiredPtr
           .asFunction<void Function(spine_bone_data, int)>();
@@ -3752,6 +4036,30 @@ class SpineFlutterBindings {
   late final _spine_bone_data_set_color =
       _spine_bone_data_set_colorPtr.asFunction<
           void Function(spine_bone_data, double, double, double, double)>();
+
+  void spine_bone_set_is_y_down(
+    int yDown,
+  ) {
+    return _spine_bone_set_is_y_down(
+      yDown,
+    );
+  }
+
+  late final _spine_bone_set_is_y_downPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int)>>(
+          'spine_bone_set_is_y_down');
+  late final _spine_bone_set_is_y_down =
+      _spine_bone_set_is_y_downPtr.asFunction<void Function(int)>();
+
+  int spine_bone_get_is_y_down() {
+    return _spine_bone_get_is_y_down();
+  }
+
+  late final _spine_bone_get_is_y_downPtr =
+      _lookup<ffi.NativeFunction<ffi.Int Function()>>(
+          'spine_bone_get_is_y_down');
+  late final _spine_bone_get_is_y_down =
+      _spine_bone_get_is_y_downPtr.asFunction<int Function()>();
 
   void spine_bone_update(
     spine_bone bone,
@@ -4003,7 +4311,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_bone_get_num_childrenPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_bone)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_bone)>>(
           'spine_bone_get_num_children');
   late final _spine_bone_get_num_children =
       _spine_bone_get_num_childrenPtr.asFunction<int Function(spine_bone)>();
@@ -4691,7 +4999,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_bone_get_is_activePtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_bone)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_bone)>>(
           'spine_bone_get_is_active');
   late final _spine_bone_get_is_active =
       _spine_bone_get_is_activePtr.asFunction<int Function(spine_bone)>();
@@ -4707,12 +5015,12 @@ class SpineFlutterBindings {
   }
 
   late final _spine_bone_set_is_activePtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(spine_bone, ffi.Int32)>>(
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_bone, ffi.Int)>>(
           'spine_bone_set_is_active');
   late final _spine_bone_set_is_active =
       _spine_bone_set_is_activePtr.asFunction<void Function(spine_bone, int)>();
 
-  ffi.Pointer<ffi.Int8> spine_attachment_get_name(
+  ffi.Pointer<ffi.Char> spine_attachment_get_name(
     spine_attachment attachment,
   ) {
     return _spine_attachment_get_name(
@@ -4721,10 +5029,10 @@ class SpineFlutterBindings {
   }
 
   late final _spine_attachment_get_namePtr = _lookup<
-          ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(spine_attachment)>>(
+          ffi.NativeFunction<ffi.Pointer<ffi.Char> Function(spine_attachment)>>(
       'spine_attachment_get_name');
   late final _spine_attachment_get_name = _spine_attachment_get_namePtr
-      .asFunction<ffi.Pointer<ffi.Int8> Function(spine_attachment)>();
+      .asFunction<ffi.Pointer<ffi.Char> Function(spine_attachment)>();
 
   int spine_attachment_get_type(
     spine_attachment attachment,
@@ -5243,7 +5551,7 @@ class SpineFlutterBindings {
           void Function(
               spine_region_attachment, double, double, double, double)>();
 
-  ffi.Pointer<ffi.Int8> spine_region_attachment_get_path(
+  ffi.Pointer<ffi.Char> spine_region_attachment_get_path(
     spine_region_attachment attachment,
   ) {
     return _spine_region_attachment_get_path(
@@ -5253,12 +5561,13 @@ class SpineFlutterBindings {
 
   late final _spine_region_attachment_get_pathPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Pointer<ffi.Int8> Function(
+          ffi.Pointer<ffi.Char> Function(
               spine_region_attachment)>>('spine_region_attachment_get_path');
   late final _spine_region_attachment_get_path =
       _spine_region_attachment_get_pathPtr.asFunction<
-          ffi.Pointer<ffi.Int8> Function(spine_region_attachment)>();
+          ffi.Pointer<ffi.Char> Function(spine_region_attachment)>();
 
+  /// OMITTED setPath()
   spine_texture_region spine_region_attachment_get_region(
     spine_region_attachment attachment,
   ) {
@@ -5275,6 +5584,7 @@ class SpineFlutterBindings {
       _spine_region_attachment_get_regionPtr
           .asFunction<spine_texture_region Function(spine_region_attachment)>();
 
+  /// OMITTED setRegion()
   spine_sequence spine_region_attachment_get_sequence(
     spine_region_attachment attachment,
   ) {
@@ -5290,6 +5600,7 @@ class SpineFlutterBindings {
       _spine_region_attachment_get_sequencePtr
           .asFunction<spine_sequence Function(spine_region_attachment)>();
 
+  /// OMITTED setSequence()
   int spine_region_attachment_get_num_offset(
     spine_region_attachment attachment,
   ) {
@@ -5299,7 +5610,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_region_attachment_get_num_offsetPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_region_attachment)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_region_attachment)>>(
           'spine_region_attachment_get_num_offset');
   late final _spine_region_attachment_get_num_offset =
       _spine_region_attachment_get_num_offsetPtr
@@ -5330,7 +5641,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_region_attachment_get_num_uvsPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_region_attachment)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_region_attachment)>>(
           'spine_region_attachment_get_num_uvs');
   late final _spine_region_attachment_get_num_uvs =
       _spine_region_attachment_get_num_uvsPtr
@@ -5361,7 +5672,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_vertex_attachment_get_world_vertices_lengthPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_vertex_attachment)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_vertex_attachment)>>(
           'spine_vertex_attachment_get_world_vertices_length');
   late final _spine_vertex_attachment_get_world_vertices_length =
       _spine_vertex_attachment_get_world_vertices_lengthPtr
@@ -5389,6 +5700,7 @@ class SpineFlutterBindings {
           void Function(
               spine_vertex_attachment, spine_slot, ffi.Pointer<ffi.Float>)>();
 
+  /// OMITTED getId()
   int spine_vertex_attachment_get_num_bones(
     spine_vertex_attachment attachment,
   ) {
@@ -5398,27 +5710,27 @@ class SpineFlutterBindings {
   }
 
   late final _spine_vertex_attachment_get_num_bonesPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_vertex_attachment)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_vertex_attachment)>>(
           'spine_vertex_attachment_get_num_bones');
   late final _spine_vertex_attachment_get_num_bones =
       _spine_vertex_attachment_get_num_bonesPtr
           .asFunction<int Function(spine_vertex_attachment)>();
 
-  ffi.Pointer<ffi.Int32> spine_region_attachment_get_bones(
-    spine_region_attachment attachment,
+  ffi.Pointer<ffi.Int32> spine_vertex_attachment_get_bones(
+    spine_vertex_attachment attachment,
   ) {
-    return _spine_region_attachment_get_bones(
+    return _spine_vertex_attachment_get_bones(
       attachment,
     );
   }
 
-  late final _spine_region_attachment_get_bonesPtr = _lookup<
+  late final _spine_vertex_attachment_get_bonesPtr = _lookup<
       ffi.NativeFunction<
           ffi.Pointer<ffi.Int32> Function(
-              spine_region_attachment)>>('spine_region_attachment_get_bones');
-  late final _spine_region_attachment_get_bones =
-      _spine_region_attachment_get_bonesPtr.asFunction<
-          ffi.Pointer<ffi.Int32> Function(spine_region_attachment)>();
+              spine_vertex_attachment)>>('spine_vertex_attachment_get_bones');
+  late final _spine_vertex_attachment_get_bones =
+      _spine_vertex_attachment_get_bonesPtr.asFunction<
+          ffi.Pointer<ffi.Int32> Function(spine_vertex_attachment)>();
 
   int spine_vertex_attachment_get_num_vertices(
     spine_vertex_attachment attachment,
@@ -5429,27 +5741,27 @@ class SpineFlutterBindings {
   }
 
   late final _spine_vertex_attachment_get_num_verticesPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_vertex_attachment)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_vertex_attachment)>>(
           'spine_vertex_attachment_get_num_vertices');
   late final _spine_vertex_attachment_get_num_vertices =
       _spine_vertex_attachment_get_num_verticesPtr
           .asFunction<int Function(spine_vertex_attachment)>();
 
-  ffi.Pointer<ffi.Float> spine_region_attachment_get_vertices(
-    spine_region_attachment attachment,
+  ffi.Pointer<ffi.Float> spine_vertex_attachment_get_vertices(
+    spine_vertex_attachment attachment,
   ) {
-    return _spine_region_attachment_get_vertices(
+    return _spine_vertex_attachment_get_vertices(
       attachment,
     );
   }
 
-  late final _spine_region_attachment_get_verticesPtr = _lookup<
+  late final _spine_vertex_attachment_get_verticesPtr = _lookup<
           ffi.NativeFunction<
-              ffi.Pointer<ffi.Float> Function(spine_region_attachment)>>(
-      'spine_region_attachment_get_vertices');
-  late final _spine_region_attachment_get_vertices =
-      _spine_region_attachment_get_verticesPtr.asFunction<
-          ffi.Pointer<ffi.Float> Function(spine_region_attachment)>();
+              ffi.Pointer<ffi.Float> Function(spine_vertex_attachment)>>(
+      'spine_vertex_attachment_get_vertices');
+  late final _spine_vertex_attachment_get_vertices =
+      _spine_vertex_attachment_get_verticesPtr.asFunction<
+          ffi.Pointer<ffi.Float> Function(spine_vertex_attachment)>();
 
   spine_attachment spine_vertex_attachment_get_timeline_attachment(
     spine_vertex_attachment timelineAttachment,
@@ -5485,6 +5797,7 @@ class SpineFlutterBindings {
       _spine_vertex_attachment_set_timeline_attachmentPtr.asFunction<
           void Function(spine_vertex_attachment, spine_attachment)>();
 
+  /// OMITTED copyTo()
   void spine_mesh_attachment_update_region(
     spine_mesh_attachment attachment,
   ) {
@@ -5509,7 +5822,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_mesh_attachment_get_hull_lengthPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_mesh_attachment)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_mesh_attachment)>>(
           'spine_mesh_attachment_get_hull_length');
   late final _spine_mesh_attachment_get_hull_length =
       _spine_mesh_attachment_get_hull_lengthPtr
@@ -5528,7 +5841,7 @@ class SpineFlutterBindings {
   late final _spine_mesh_attachment_set_hull_lengthPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_mesh_attachment,
-              ffi.Int32)>>('spine_mesh_attachment_set_hull_length');
+              ffi.Int)>>('spine_mesh_attachment_set_hull_length');
   late final _spine_mesh_attachment_set_hull_length =
       _spine_mesh_attachment_set_hull_lengthPtr
           .asFunction<void Function(spine_mesh_attachment, int)>();
@@ -5542,7 +5855,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_mesh_attachment_get_num_region_uvsPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_mesh_attachment)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_mesh_attachment)>>(
           'spine_mesh_attachment_get_num_region_uvs');
   late final _spine_mesh_attachment_get_num_region_uvs =
       _spine_mesh_attachment_get_num_region_uvsPtr
@@ -5573,7 +5886,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_mesh_attachment_get_num_uvsPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_mesh_attachment)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_mesh_attachment)>>(
           'spine_mesh_attachment_get_num_uvs');
   late final _spine_mesh_attachment_get_num_uvs =
       _spine_mesh_attachment_get_num_uvsPtr
@@ -5603,7 +5916,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_mesh_attachment_get_num_trianglesPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_mesh_attachment)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_mesh_attachment)>>(
           'spine_mesh_attachment_get_num_triangles');
   late final _spine_mesh_attachment_get_num_triangles =
       _spine_mesh_attachment_get_num_trianglesPtr
@@ -5665,7 +5978,7 @@ class SpineFlutterBindings {
           void Function(
               spine_mesh_attachment, double, double, double, double)>();
 
-  ffi.Pointer<ffi.Int8> spine_mesh_attachment_get_path(
+  ffi.Pointer<ffi.Char> spine_mesh_attachment_get_path(
     spine_mesh_attachment attachment,
   ) {
     return _spine_mesh_attachment_get_path(
@@ -5675,12 +5988,13 @@ class SpineFlutterBindings {
 
   late final _spine_mesh_attachment_get_pathPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Pointer<ffi.Int8> Function(
+          ffi.Pointer<ffi.Char> Function(
               spine_mesh_attachment)>>('spine_mesh_attachment_get_path');
   late final _spine_mesh_attachment_get_path =
       _spine_mesh_attachment_get_pathPtr
-          .asFunction<ffi.Pointer<ffi.Int8> Function(spine_mesh_attachment)>();
+          .asFunction<ffi.Pointer<ffi.Char> Function(spine_mesh_attachment)>();
 
+  /// OMITTED setPath()
   spine_texture_region spine_mesh_attachment_get_region(
     spine_mesh_attachment attachment,
   ) {
@@ -5697,6 +6011,7 @@ class SpineFlutterBindings {
       _spine_mesh_attachment_get_regionPtr
           .asFunction<spine_texture_region Function(spine_mesh_attachment)>();
 
+  /// OMITTED setRegion()
   spine_sequence spine_mesh_attachment_get_sequence(
     spine_mesh_attachment attachment,
   ) {
@@ -5712,6 +6027,7 @@ class SpineFlutterBindings {
       _spine_mesh_attachment_get_sequencePtr
           .asFunction<spine_sequence Function(spine_mesh_attachment)>();
 
+  /// OMITTED setSequence()
   spine_mesh_attachment spine_mesh_attachment_get_parent_mesh(
     spine_mesh_attachment attachment,
   ) {
@@ -5755,7 +6071,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_mesh_attachment_get_num_edgesPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_mesh_attachment)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_mesh_attachment)>>(
           'spine_mesh_attachment_get_num_edges');
   late final _spine_mesh_attachment_get_num_edges =
       _spine_mesh_attachment_get_num_edgesPtr
@@ -5843,6 +6159,7 @@ class SpineFlutterBindings {
       _spine_mesh_attachment_set_heightPtr
           .asFunction<void Function(spine_mesh_attachment, double)>();
 
+  /// OMITTED newLinkedMesh()
   spine_slot_data spine_clipping_attachment_get_end_slot(
     spine_clipping_attachment attachment,
   ) {
@@ -5971,7 +6288,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_path_attachment_get_num_lengthsPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_path_attachment)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_path_attachment)>>(
           'spine_path_attachment_get_num_lengths');
   late final _spine_path_attachment_get_num_lengths =
       _spine_path_attachment_get_num_lengthsPtr
@@ -6002,7 +6319,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_path_attachment_get_is_closedPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_path_attachment)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_path_attachment)>>(
           'spine_path_attachment_get_is_closed');
   late final _spine_path_attachment_get_is_closed =
       _spine_path_attachment_get_is_closedPtr
@@ -6021,7 +6338,7 @@ class SpineFlutterBindings {
   late final _spine_path_attachment_set_is_closedPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_path_attachment,
-              ffi.Int32)>>('spine_path_attachment_set_is_closed');
+              ffi.Int)>>('spine_path_attachment_set_is_closed');
   late final _spine_path_attachment_set_is_closed =
       _spine_path_attachment_set_is_closedPtr
           .asFunction<void Function(spine_path_attachment, int)>();
@@ -6035,7 +6352,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_path_attachment_get_is_constant_speedPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_path_attachment)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_path_attachment)>>(
           'spine_path_attachment_get_is_constant_speed');
   late final _spine_path_attachment_get_is_constant_speed =
       _spine_path_attachment_get_is_constant_speedPtr
@@ -6054,7 +6371,7 @@ class SpineFlutterBindings {
   late final _spine_path_attachment_set_is_constant_speedPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_path_attachment,
-              ffi.Int32)>>('spine_path_attachment_set_is_constant_speed');
+              ffi.Int)>>('spine_path_attachment_set_is_constant_speed');
   late final _spine_path_attachment_set_is_constant_speed =
       _spine_path_attachment_set_is_constant_speedPtr
           .asFunction<void Function(spine_path_attachment, int)>();
@@ -6102,7 +6419,7 @@ class SpineFlutterBindings {
   void spine_skin_set_attachment(
     spine_skin skin,
     int slotIndex,
-    ffi.Pointer<ffi.Int8> name,
+    ffi.Pointer<ffi.Char> name,
     spine_attachment attachment,
   ) {
     return _spine_skin_set_attachment(
@@ -6115,17 +6432,17 @@ class SpineFlutterBindings {
 
   late final _spine_skin_set_attachmentPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Void Function(spine_skin, ffi.Int32, ffi.Pointer<ffi.Int8>,
+          ffi.Void Function(spine_skin, ffi.Int, ffi.Pointer<ffi.Char>,
               spine_attachment)>>('spine_skin_set_attachment');
   late final _spine_skin_set_attachment =
       _spine_skin_set_attachmentPtr.asFunction<
           void Function(
-              spine_skin, int, ffi.Pointer<ffi.Int8>, spine_attachment)>();
+              spine_skin, int, ffi.Pointer<ffi.Char>, spine_attachment)>();
 
   spine_attachment spine_skin_get_attachment(
     spine_skin skin,
     int slotIndex,
-    ffi.Pointer<ffi.Int8> name,
+    ffi.Pointer<ffi.Char> name,
   ) {
     return _spine_skin_get_attachment(
       skin,
@@ -6136,16 +6453,16 @@ class SpineFlutterBindings {
 
   late final _spine_skin_get_attachmentPtr = _lookup<
       ffi.NativeFunction<
-          spine_attachment Function(spine_skin, ffi.Int32,
-              ffi.Pointer<ffi.Int8>)>>('spine_skin_get_attachment');
+          spine_attachment Function(spine_skin, ffi.Int,
+              ffi.Pointer<ffi.Char>)>>('spine_skin_get_attachment');
   late final _spine_skin_get_attachment =
       _spine_skin_get_attachmentPtr.asFunction<
-          spine_attachment Function(spine_skin, int, ffi.Pointer<ffi.Int8>)>();
+          spine_attachment Function(spine_skin, int, ffi.Pointer<ffi.Char>)>();
 
   void spine_skin_remove_attachment(
     spine_skin skin,
     int slotIndex,
-    ffi.Pointer<ffi.Int8> name,
+    ffi.Pointer<ffi.Char> name,
   ) {
     return _spine_skin_remove_attachment(
       skin,
@@ -6156,12 +6473,14 @@ class SpineFlutterBindings {
 
   late final _spine_skin_remove_attachmentPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Void Function(spine_skin, ffi.Int32,
-              ffi.Pointer<ffi.Int8>)>>('spine_skin_remove_attachment');
+          ffi.Void Function(spine_skin, ffi.Int,
+              ffi.Pointer<ffi.Char>)>>('spine_skin_remove_attachment');
   late final _spine_skin_remove_attachment = _spine_skin_remove_attachmentPtr
-      .asFunction<void Function(spine_skin, int, ffi.Pointer<ffi.Int8>)>();
+      .asFunction<void Function(spine_skin, int, ffi.Pointer<ffi.Char>)>();
 
-  ffi.Pointer<ffi.Int8> spine_skin_get_name(
+  /// OMITTED findNamesForSlot()
+  /// OMITTED findAttachmentsForSlot()
+  ffi.Pointer<ffi.Char> spine_skin_get_name(
     spine_skin skin,
   ) {
     return _spine_skin_get_name(
@@ -6170,10 +6489,10 @@ class SpineFlutterBindings {
   }
 
   late final _spine_skin_get_namePtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int8> Function(spine_skin)>>(
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function(spine_skin)>>(
           'spine_skin_get_name');
   late final _spine_skin_get_name = _spine_skin_get_namePtr
-      .asFunction<ffi.Pointer<ffi.Int8> Function(spine_skin)>();
+      .asFunction<ffi.Pointer<ffi.Char> Function(spine_skin)>();
 
   void spine_skin_add_skin(
     spine_skin skin,
@@ -6189,6 +6508,22 @@ class SpineFlutterBindings {
       _lookup<ffi.NativeFunction<ffi.Void Function(spine_skin, spine_skin)>>(
           'spine_skin_add_skin');
   late final _spine_skin_add_skin = _spine_skin_add_skinPtr
+      .asFunction<void Function(spine_skin, spine_skin)>();
+
+  void spine_skin_copy_skin(
+    spine_skin skin,
+    spine_skin other,
+  ) {
+    return _spine_skin_copy_skin(
+      skin,
+      other,
+    );
+  }
+
+  late final _spine_skin_copy_skinPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_skin, spine_skin)>>(
+          'spine_skin_copy_skin');
+  late final _spine_skin_copy_skin = _spine_skin_copy_skinPtr
       .asFunction<void Function(spine_skin, spine_skin)>();
 
   ffi.Pointer<spine_skin_entries> spine_skin_get_entries(
@@ -6230,7 +6565,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_skin_get_num_bonesPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_skin)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_skin)>>(
           'spine_skin_get_num_bones');
   late final _spine_skin_get_num_bones =
       _spine_skin_get_num_bonesPtr.asFunction<int Function(spine_skin)>();
@@ -6259,7 +6594,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_skin_get_num_constraintsPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_skin)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_skin)>>(
           'spine_skin_get_num_constraints');
   late final _spine_skin_get_num_constraints =
       _spine_skin_get_num_constraintsPtr.asFunction<int Function(spine_skin)>();
@@ -6280,7 +6615,7 @@ class SpineFlutterBindings {
       .asFunction<ffi.Pointer<spine_constraint_data> Function(spine_skin)>();
 
   spine_skin spine_skin_create(
-    ffi.Pointer<ffi.Int8> name,
+    ffi.Pointer<ffi.Char> name,
   ) {
     return _spine_skin_create(
       name,
@@ -6288,10 +6623,10 @@ class SpineFlutterBindings {
   }
 
   late final _spine_skin_createPtr =
-      _lookup<ffi.NativeFunction<spine_skin Function(ffi.Pointer<ffi.Int8>)>>(
+      _lookup<ffi.NativeFunction<spine_skin Function(ffi.Pointer<ffi.Char>)>>(
           'spine_skin_create');
   late final _spine_skin_create = _spine_skin_createPtr
-      .asFunction<spine_skin Function(ffi.Pointer<ffi.Int8>)>();
+      .asFunction<spine_skin Function(ffi.Pointer<ffi.Char>)>();
 
   void spine_skin_dispose(
     spine_skin skin,
@@ -6322,6 +6657,88 @@ class SpineFlutterBindings {
       _spine_constraint_data_get_typePtr
           .asFunction<int Function(spine_constraint_data)>();
 
+  ffi.Pointer<ffi.Char> spine_constraint_data_get_name(
+    spine_constraint_data data,
+  ) {
+    return _spine_constraint_data_get_name(
+      data,
+    );
+  }
+
+  late final _spine_constraint_data_get_namePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<ffi.Char> Function(
+              spine_constraint_data)>>('spine_constraint_data_get_name');
+  late final _spine_constraint_data_get_name =
+      _spine_constraint_data_get_namePtr
+          .asFunction<ffi.Pointer<ffi.Char> Function(spine_constraint_data)>();
+
+  int spine_constraint_data_get_order(
+    spine_constraint_data data,
+  ) {
+    return _spine_constraint_data_get_order(
+      data,
+    );
+  }
+
+  late final _spine_constraint_data_get_orderPtr =
+      _lookup<ffi.NativeFunction<ffi.Uint64 Function(spine_constraint_data)>>(
+          'spine_constraint_data_get_order');
+  late final _spine_constraint_data_get_order =
+      _spine_constraint_data_get_orderPtr
+          .asFunction<int Function(spine_constraint_data)>();
+
+  void spine_constraint_data_set_order(
+    spine_constraint_data data,
+    int order,
+  ) {
+    return _spine_constraint_data_set_order(
+      data,
+      order,
+    );
+  }
+
+  late final _spine_constraint_data_set_orderPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_constraint_data,
+              ffi.Uint64)>>('spine_constraint_data_set_order');
+  late final _spine_constraint_data_set_order =
+      _spine_constraint_data_set_orderPtr
+          .asFunction<void Function(spine_constraint_data, int)>();
+
+  int spine_constraint_data_get_is_skin_required(
+    spine_constraint_data data,
+  ) {
+    return _spine_constraint_data_get_is_skin_required(
+      data,
+    );
+  }
+
+  late final _spine_constraint_data_get_is_skin_requiredPtr =
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_constraint_data)>>(
+          'spine_constraint_data_get_is_skin_required');
+  late final _spine_constraint_data_get_is_skin_required =
+      _spine_constraint_data_get_is_skin_requiredPtr
+          .asFunction<int Function(spine_constraint_data)>();
+
+  void spine_constraint_data_set_is_skin_required(
+    spine_constraint_data data,
+    int isSkinRequired,
+  ) {
+    return _spine_constraint_data_set_is_skin_required(
+      data,
+      isSkinRequired,
+    );
+  }
+
+  late final _spine_constraint_data_set_is_skin_requiredPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_constraint_data,
+              ffi.Int)>>('spine_constraint_data_set_is_skin_required');
+  late final _spine_constraint_data_set_is_skin_required =
+      _spine_constraint_data_set_is_skin_requiredPtr
+          .asFunction<void Function(spine_constraint_data, int)>();
+
   int spine_ik_constraint_data_get_num_bones(
     spine_ik_constraint_data data,
   ) {
@@ -6331,7 +6748,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_ik_constraint_data_get_num_bonesPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_ik_constraint_data)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_ik_constraint_data)>>(
           'spine_ik_constraint_data_get_num_bones');
   late final _spine_ik_constraint_data_get_num_bones =
       _spine_ik_constraint_data_get_num_bonesPtr
@@ -6396,7 +6813,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_ik_constraint_data_get_bend_directionPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_ik_constraint_data)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_ik_constraint_data)>>(
           'spine_ik_constraint_data_get_bend_direction');
   late final _spine_ik_constraint_data_get_bend_direction =
       _spine_ik_constraint_data_get_bend_directionPtr
@@ -6415,7 +6832,7 @@ class SpineFlutterBindings {
   late final _spine_ik_constraint_data_set_bend_directionPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_ik_constraint_data,
-              ffi.Int32)>>('spine_ik_constraint_data_set_bend_direction');
+              ffi.Int)>>('spine_ik_constraint_data_set_bend_direction');
   late final _spine_ik_constraint_data_set_bend_direction =
       _spine_ik_constraint_data_set_bend_directionPtr
           .asFunction<void Function(spine_ik_constraint_data, int)>();
@@ -6429,7 +6846,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_ik_constraint_data_get_compressPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_ik_constraint_data)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_ik_constraint_data)>>(
           'spine_ik_constraint_data_get_compress');
   late final _spine_ik_constraint_data_get_compress =
       _spine_ik_constraint_data_get_compressPtr
@@ -6448,7 +6865,7 @@ class SpineFlutterBindings {
   late final _spine_ik_constraint_data_set_compressPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_ik_constraint_data,
-              ffi.Int32)>>('spine_ik_constraint_data_set_compress');
+              ffi.Int)>>('spine_ik_constraint_data_set_compress');
   late final _spine_ik_constraint_data_set_compress =
       _spine_ik_constraint_data_set_compressPtr
           .asFunction<void Function(spine_ik_constraint_data, int)>();
@@ -6462,7 +6879,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_ik_constraint_data_get_stretchPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_ik_constraint_data)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_ik_constraint_data)>>(
           'spine_ik_constraint_data_get_stretch');
   late final _spine_ik_constraint_data_get_stretch =
       _spine_ik_constraint_data_get_stretchPtr
@@ -6481,7 +6898,7 @@ class SpineFlutterBindings {
   late final _spine_ik_constraint_data_set_stretchPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_ik_constraint_data,
-              ffi.Int32)>>('spine_ik_constraint_data_set_stretch');
+              ffi.Int)>>('spine_ik_constraint_data_set_stretch');
   late final _spine_ik_constraint_data_set_stretch =
       _spine_ik_constraint_data_set_stretchPtr
           .asFunction<void Function(spine_ik_constraint_data, int)>();
@@ -6495,7 +6912,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_ik_constraint_data_get_uniformPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_ik_constraint_data)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_ik_constraint_data)>>(
           'spine_ik_constraint_data_get_uniform');
   late final _spine_ik_constraint_data_get_uniform =
       _spine_ik_constraint_data_get_uniformPtr
@@ -6514,7 +6931,7 @@ class SpineFlutterBindings {
   late final _spine_ik_constraint_data_set_uniformPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_ik_constraint_data,
-              ffi.Int32)>>('spine_ik_constraint_data_set_uniform');
+              ffi.Int)>>('spine_ik_constraint_data_set_uniform');
   late final _spine_ik_constraint_data_set_uniform =
       _spine_ik_constraint_data_set_uniformPtr
           .asFunction<void Function(spine_ik_constraint_data, int)>();
@@ -6608,7 +7025,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_ik_constraint_get_orderPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_ik_constraint)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_ik_constraint)>>(
           'spine_ik_constraint_get_order');
   late final _spine_ik_constraint_get_order = _spine_ik_constraint_get_orderPtr
       .asFunction<int Function(spine_ik_constraint)>();
@@ -6637,7 +7054,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_ik_constraint_get_num_bonesPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_ik_constraint)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_ik_constraint)>>(
           'spine_ik_constraint_get_num_bones');
   late final _spine_ik_constraint_get_num_bones =
       _spine_ik_constraint_get_num_bonesPtr
@@ -6700,7 +7117,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_ik_constraint_get_bend_directionPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_ik_constraint)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_ik_constraint)>>(
           'spine_ik_constraint_get_bend_direction');
   late final _spine_ik_constraint_get_bend_direction =
       _spine_ik_constraint_get_bend_directionPtr
@@ -6717,9 +7134,8 @@ class SpineFlutterBindings {
   }
 
   late final _spine_ik_constraint_set_bend_directionPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Void Function(spine_ik_constraint,
-              ffi.Int32)>>('spine_ik_constraint_set_bend_direction');
+          ffi.NativeFunction<ffi.Void Function(spine_ik_constraint, ffi.Int)>>(
+      'spine_ik_constraint_set_bend_direction');
   late final _spine_ik_constraint_set_bend_direction =
       _spine_ik_constraint_set_bend_directionPtr
           .asFunction<void Function(spine_ik_constraint, int)>();
@@ -6733,7 +7149,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_ik_constraint_get_compressPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_ik_constraint)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_ik_constraint)>>(
           'spine_ik_constraint_get_compress');
   late final _spine_ik_constraint_get_compress =
       _spine_ik_constraint_get_compressPtr
@@ -6750,9 +7166,8 @@ class SpineFlutterBindings {
   }
 
   late final _spine_ik_constraint_set_compressPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Void Function(spine_ik_constraint,
-              ffi.Int32)>>('spine_ik_constraint_set_compress');
+          ffi.NativeFunction<ffi.Void Function(spine_ik_constraint, ffi.Int)>>(
+      'spine_ik_constraint_set_compress');
   late final _spine_ik_constraint_set_compress =
       _spine_ik_constraint_set_compressPtr
           .asFunction<void Function(spine_ik_constraint, int)>();
@@ -6766,7 +7181,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_ik_constraint_get_stretchPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_ik_constraint)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_ik_constraint)>>(
           'spine_ik_constraint_get_stretch');
   late final _spine_ik_constraint_get_stretch =
       _spine_ik_constraint_get_stretchPtr
@@ -6783,9 +7198,8 @@ class SpineFlutterBindings {
   }
 
   late final _spine_ik_constraint_set_stretchPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Void Function(spine_ik_constraint,
-              ffi.Int32)>>('spine_ik_constraint_set_stretch');
+          ffi.NativeFunction<ffi.Void Function(spine_ik_constraint, ffi.Int)>>(
+      'spine_ik_constraint_set_stretch');
   late final _spine_ik_constraint_set_stretch =
       _spine_ik_constraint_set_stretchPtr
           .asFunction<void Function(spine_ik_constraint, int)>();
@@ -6863,7 +7277,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_ik_constraint_get_is_activePtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_ik_constraint)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_ik_constraint)>>(
           'spine_ik_constraint_get_is_active');
   late final _spine_ik_constraint_get_is_active =
       _spine_ik_constraint_get_is_activePtr
@@ -6880,9 +7294,8 @@ class SpineFlutterBindings {
   }
 
   late final _spine_ik_constraint_set_is_activePtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Void Function(spine_ik_constraint,
-              ffi.Int32)>>('spine_ik_constraint_set_is_active');
+          ffi.NativeFunction<ffi.Void Function(spine_ik_constraint, ffi.Int)>>(
+      'spine_ik_constraint_set_is_active');
   late final _spine_ik_constraint_set_is_active =
       _spine_ik_constraint_set_is_activePtr
           .asFunction<void Function(spine_ik_constraint, int)>();
@@ -6897,7 +7310,7 @@ class SpineFlutterBindings {
 
   late final _spine_transform_constraint_data_get_num_bonesPtr = _lookup<
           ffi.NativeFunction<
-              ffi.Int32 Function(spine_transform_constraint_data)>>(
+              ffi.Int Function(spine_transform_constraint_data)>>(
       'spine_transform_constraint_data_get_num_bones');
   late final _spine_transform_constraint_data_get_num_bones =
       _spine_transform_constraint_data_get_num_bonesPtr
@@ -7373,7 +7786,7 @@ class SpineFlutterBindings {
 
   late final _spine_transform_constraint_data_get_is_relativePtr = _lookup<
           ffi.NativeFunction<
-              ffi.Int32 Function(spine_transform_constraint_data)>>(
+              ffi.Int Function(spine_transform_constraint_data)>>(
       'spine_transform_constraint_data_get_is_relative');
   late final _spine_transform_constraint_data_get_is_relative =
       _spine_transform_constraint_data_get_is_relativePtr
@@ -7392,7 +7805,7 @@ class SpineFlutterBindings {
   late final _spine_transform_constraint_data_set_is_relativePtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_transform_constraint_data,
-              ffi.Int32)>>('spine_transform_constraint_data_set_is_relative');
+              ffi.Int)>>('spine_transform_constraint_data_set_is_relative');
   late final _spine_transform_constraint_data_set_is_relative =
       _spine_transform_constraint_data_set_is_relativePtr
           .asFunction<void Function(spine_transform_constraint_data, int)>();
@@ -7407,7 +7820,7 @@ class SpineFlutterBindings {
 
   late final _spine_transform_constraint_data_get_is_localPtr = _lookup<
           ffi.NativeFunction<
-              ffi.Int32 Function(spine_transform_constraint_data)>>(
+              ffi.Int Function(spine_transform_constraint_data)>>(
       'spine_transform_constraint_data_get_is_local');
   late final _spine_transform_constraint_data_get_is_local =
       _spine_transform_constraint_data_get_is_localPtr
@@ -7426,7 +7839,7 @@ class SpineFlutterBindings {
   late final _spine_transform_constraint_data_set_is_localPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_transform_constraint_data,
-              ffi.Int32)>>('spine_transform_constraint_data_set_is_local');
+              ffi.Int)>>('spine_transform_constraint_data_set_is_local');
   late final _spine_transform_constraint_data_set_is_local =
       _spine_transform_constraint_data_set_is_localPtr
           .asFunction<void Function(spine_transform_constraint_data, int)>();
@@ -7454,9 +7867,9 @@ class SpineFlutterBindings {
     );
   }
 
-  late final _spine_transform_constraint_get_orderPtr = _lookup<
-          ffi.NativeFunction<ffi.Int32 Function(spine_transform_constraint)>>(
-      'spine_transform_constraint_get_order');
+  late final _spine_transform_constraint_get_orderPtr =
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_transform_constraint)>>(
+          'spine_transform_constraint_get_order');
   late final _spine_transform_constraint_get_order =
       _spine_transform_constraint_get_orderPtr
           .asFunction<int Function(spine_transform_constraint)>();
@@ -7487,9 +7900,9 @@ class SpineFlutterBindings {
     );
   }
 
-  late final _spine_transform_constraint_get_num_bonesPtr = _lookup<
-          ffi.NativeFunction<ffi.Int32 Function(spine_transform_constraint)>>(
-      'spine_transform_constraint_get_num_bones');
+  late final _spine_transform_constraint_get_num_bonesPtr =
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_transform_constraint)>>(
+          'spine_transform_constraint_get_num_bones');
   late final _spine_transform_constraint_get_num_bones =
       _spine_transform_constraint_get_num_bonesPtr
           .asFunction<int Function(spine_transform_constraint)>();
@@ -7769,7 +8182,7 @@ class SpineFlutterBindings {
   late final _spine_transform_constraint_set_is_activePtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_transform_constraint,
-              ffi.Int32)>>('spine_transform_constraint_set_is_active');
+              ffi.Int)>>('spine_transform_constraint_set_is_active');
   late final _spine_transform_constraint_set_is_active =
       _spine_transform_constraint_set_is_activePtr
           .asFunction<void Function(spine_transform_constraint, int)>();
@@ -7782,9 +8195,9 @@ class SpineFlutterBindings {
     );
   }
 
-  late final _spine_path_constraint_data_get_num_bonesPtr = _lookup<
-          ffi.NativeFunction<ffi.Int32 Function(spine_path_constraint_data)>>(
-      'spine_path_constraint_data_get_num_bones');
+  late final _spine_path_constraint_data_get_num_bonesPtr =
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_path_constraint_data)>>(
+          'spine_path_constraint_data_get_num_bones');
   late final _spine_path_constraint_data_get_num_bones =
       _spine_path_constraint_data_get_num_bonesPtr
           .asFunction<int Function(spine_path_constraint_data)>();
@@ -8160,7 +8573,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_path_constraint_get_orderPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_path_constraint)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_path_constraint)>>(
           'spine_path_constraint_get_order');
   late final _spine_path_constraint_get_order =
       _spine_path_constraint_get_orderPtr
@@ -8191,7 +8604,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_path_constraint_get_num_bonesPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_path_constraint)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_path_constraint)>>(
           'spine_path_constraint_get_num_bones');
   late final _spine_path_constraint_get_num_bones =
       _spine_path_constraint_get_num_bonesPtr
@@ -8420,7 +8833,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_path_constraint_get_is_activePtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_path_constraint)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_path_constraint)>>(
           'spine_path_constraint_get_is_active');
   late final _spine_path_constraint_get_is_active =
       _spine_path_constraint_get_is_activePtr
@@ -8439,10 +8852,586 @@ class SpineFlutterBindings {
   late final _spine_path_constraint_set_is_activePtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_path_constraint,
-              ffi.Int32)>>('spine_path_constraint_set_is_active');
+              ffi.Int)>>('spine_path_constraint_set_is_active');
   late final _spine_path_constraint_set_is_active =
       _spine_path_constraint_set_is_activePtr
           .asFunction<void Function(spine_path_constraint, int)>();
+
+  /// OMITTED copy()
+  void spine_sequence_apply(
+    spine_sequence sequence,
+    spine_slot slot,
+    spine_attachment attachment,
+  ) {
+    return _spine_sequence_apply(
+      sequence,
+      slot,
+      attachment,
+    );
+  }
+
+  late final _spine_sequence_applyPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_sequence, spine_slot,
+              spine_attachment)>>('spine_sequence_apply');
+  late final _spine_sequence_apply = _spine_sequence_applyPtr.asFunction<
+      void Function(spine_sequence, spine_slot, spine_attachment)>();
+
+  ffi.Pointer<ffi.Char> spine_sequence_get_path(
+    spine_sequence sequence,
+    ffi.Pointer<ffi.Char> basePath,
+    int index,
+  ) {
+    return _spine_sequence_get_path(
+      sequence,
+      basePath,
+      index,
+    );
+  }
+
+  late final _spine_sequence_get_pathPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<ffi.Char> Function(spine_sequence, ffi.Pointer<ffi.Char>,
+              ffi.Int)>>('spine_sequence_get_path');
+  late final _spine_sequence_get_path = _spine_sequence_get_pathPtr.asFunction<
+      ffi.Pointer<ffi.Char> Function(
+          spine_sequence, ffi.Pointer<ffi.Char>, int)>();
+
+  int spine_sequence_get_id(
+    spine_sequence sequence,
+  ) {
+    return _spine_sequence_get_id(
+      sequence,
+    );
+  }
+
+  late final _spine_sequence_get_idPtr =
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_sequence)>>(
+          'spine_sequence_get_id');
+  late final _spine_sequence_get_id =
+      _spine_sequence_get_idPtr.asFunction<int Function(spine_sequence)>();
+
+  void spine_sequence_set_id(
+    spine_sequence sequence,
+    int id,
+  ) {
+    return _spine_sequence_set_id(
+      sequence,
+      id,
+    );
+  }
+
+  late final _spine_sequence_set_idPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_sequence, ffi.Int)>>(
+          'spine_sequence_set_id');
+  late final _spine_sequence_set_id = _spine_sequence_set_idPtr
+      .asFunction<void Function(spine_sequence, int)>();
+
+  int spine_sequence_get_start(
+    spine_sequence sequence,
+  ) {
+    return _spine_sequence_get_start(
+      sequence,
+    );
+  }
+
+  late final _spine_sequence_get_startPtr =
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_sequence)>>(
+          'spine_sequence_get_start');
+  late final _spine_sequence_get_start =
+      _spine_sequence_get_startPtr.asFunction<int Function(spine_sequence)>();
+
+  void spine_sequence_set_start(
+    spine_sequence sequence,
+    int start,
+  ) {
+    return _spine_sequence_set_start(
+      sequence,
+      start,
+    );
+  }
+
+  late final _spine_sequence_set_startPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_sequence, ffi.Int)>>(
+          'spine_sequence_set_start');
+  late final _spine_sequence_set_start = _spine_sequence_set_startPtr
+      .asFunction<void Function(spine_sequence, int)>();
+
+  int spine_sequence_get_digits(
+    spine_sequence sequence,
+  ) {
+    return _spine_sequence_get_digits(
+      sequence,
+    );
+  }
+
+  late final _spine_sequence_get_digitsPtr =
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_sequence)>>(
+          'spine_sequence_get_digits');
+  late final _spine_sequence_get_digits =
+      _spine_sequence_get_digitsPtr.asFunction<int Function(spine_sequence)>();
+
+  void spine_sequence_set_digits(
+    spine_sequence sequence,
+    int digits,
+  ) {
+    return _spine_sequence_set_digits(
+      sequence,
+      digits,
+    );
+  }
+
+  late final _spine_sequence_set_digitsPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_sequence, ffi.Int)>>(
+          'spine_sequence_set_digits');
+  late final _spine_sequence_set_digits = _spine_sequence_set_digitsPtr
+      .asFunction<void Function(spine_sequence, int)>();
+
+  int spine_sequence_get_setup_index(
+    spine_sequence sequence,
+  ) {
+    return _spine_sequence_get_setup_index(
+      sequence,
+    );
+  }
+
+  late final _spine_sequence_get_setup_indexPtr =
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_sequence)>>(
+          'spine_sequence_get_setup_index');
+  late final _spine_sequence_get_setup_index =
+      _spine_sequence_get_setup_indexPtr
+          .asFunction<int Function(spine_sequence)>();
+
+  void spine_sequence_set_setup_index(
+    spine_sequence sequence,
+    int setupIndex,
+  ) {
+    return _spine_sequence_set_setup_index(
+      sequence,
+      setupIndex,
+    );
+  }
+
+  late final _spine_sequence_set_setup_indexPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_sequence, ffi.Int)>>(
+          'spine_sequence_set_setup_index');
+  late final _spine_sequence_set_setup_index =
+      _spine_sequence_set_setup_indexPtr
+          .asFunction<void Function(spine_sequence, int)>();
+
+  int spine_sequence_get_num_regions(
+    spine_sequence sequence,
+  ) {
+    return _spine_sequence_get_num_regions(
+      sequence,
+    );
+  }
+
+  late final _spine_sequence_get_num_regionsPtr =
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_sequence)>>(
+          'spine_sequence_get_num_regions');
+  late final _spine_sequence_get_num_regions =
+      _spine_sequence_get_num_regionsPtr
+          .asFunction<int Function(spine_sequence)>();
+
+  ffi.Pointer<spine_texture_region> spine_sequence_get_regions(
+    spine_sequence sequence,
+  ) {
+    return _spine_sequence_get_regions(
+      sequence,
+    );
+  }
+
+  late final _spine_sequence_get_regionsPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<spine_texture_region> Function(
+              spine_sequence)>>('spine_sequence_get_regions');
+  late final _spine_sequence_get_regions = _spine_sequence_get_regionsPtr
+      .asFunction<ffi.Pointer<spine_texture_region> Function(spine_sequence)>();
+
+  ffi.Pointer<ffi.Void> spine_texture_region_get_texture(
+    spine_texture_region textureRegion,
+  ) {
+    return _spine_texture_region_get_texture(
+      textureRegion,
+    );
+  }
+
+  late final _spine_texture_region_get_texturePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<ffi.Void> Function(
+              spine_texture_region)>>('spine_texture_region_get_texture');
+  late final _spine_texture_region_get_texture =
+      _spine_texture_region_get_texturePtr
+          .asFunction<ffi.Pointer<ffi.Void> Function(spine_texture_region)>();
+
+  void spine_texture_region_set_texture(
+    spine_texture_region textureRegion,
+    ffi.Pointer<ffi.Void> texture,
+  ) {
+    return _spine_texture_region_set_texture(
+      textureRegion,
+      texture,
+    );
+  }
+
+  late final _spine_texture_region_set_texturePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_texture_region,
+              ffi.Pointer<ffi.Void>)>>('spine_texture_region_set_texture');
+  late final _spine_texture_region_set_texture =
+      _spine_texture_region_set_texturePtr.asFunction<
+          void Function(spine_texture_region, ffi.Pointer<ffi.Void>)>();
+
+  double spine_texture_region_get_u(
+    spine_texture_region textureRegion,
+  ) {
+    return _spine_texture_region_get_u(
+      textureRegion,
+    );
+  }
+
+  late final _spine_texture_region_get_uPtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_texture_region)>>(
+          'spine_texture_region_get_u');
+  late final _spine_texture_region_get_u = _spine_texture_region_get_uPtr
+      .asFunction<double Function(spine_texture_region)>();
+
+  void spine_texture_region_set_u(
+    spine_texture_region textureRegion,
+    double u,
+  ) {
+    return _spine_texture_region_set_u(
+      textureRegion,
+      u,
+    );
+  }
+
+  late final _spine_texture_region_set_uPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(
+              spine_texture_region, ffi.Float)>>('spine_texture_region_set_u');
+  late final _spine_texture_region_set_u = _spine_texture_region_set_uPtr
+      .asFunction<void Function(spine_texture_region, double)>();
+
+  double spine_texture_region_get_v(
+    spine_texture_region textureRegion,
+  ) {
+    return _spine_texture_region_get_v(
+      textureRegion,
+    );
+  }
+
+  late final _spine_texture_region_get_vPtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_texture_region)>>(
+          'spine_texture_region_get_v');
+  late final _spine_texture_region_get_v = _spine_texture_region_get_vPtr
+      .asFunction<double Function(spine_texture_region)>();
+
+  void spine_texture_region_set_v(
+    spine_texture_region textureRegion,
+    double v,
+  ) {
+    return _spine_texture_region_set_v(
+      textureRegion,
+      v,
+    );
+  }
+
+  late final _spine_texture_region_set_vPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(
+              spine_texture_region, ffi.Float)>>('spine_texture_region_set_v');
+  late final _spine_texture_region_set_v = _spine_texture_region_set_vPtr
+      .asFunction<void Function(spine_texture_region, double)>();
+
+  double spine_texture_region_get_u2(
+    spine_texture_region textureRegion,
+  ) {
+    return _spine_texture_region_get_u2(
+      textureRegion,
+    );
+  }
+
+  late final _spine_texture_region_get_u2Ptr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_texture_region)>>(
+          'spine_texture_region_get_u2');
+  late final _spine_texture_region_get_u2 = _spine_texture_region_get_u2Ptr
+      .asFunction<double Function(spine_texture_region)>();
+
+  void spine_texture_region_set_u2(
+    spine_texture_region textureRegion,
+    double u2,
+  ) {
+    return _spine_texture_region_set_u2(
+      textureRegion,
+      u2,
+    );
+  }
+
+  late final _spine_texture_region_set_u2Ptr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(
+              spine_texture_region, ffi.Float)>>('spine_texture_region_set_u2');
+  late final _spine_texture_region_set_u2 = _spine_texture_region_set_u2Ptr
+      .asFunction<void Function(spine_texture_region, double)>();
+
+  double spine_texture_region_get_v2(
+    spine_texture_region textureRegion,
+  ) {
+    return _spine_texture_region_get_v2(
+      textureRegion,
+    );
+  }
+
+  late final _spine_texture_region_get_v2Ptr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_texture_region)>>(
+          'spine_texture_region_get_v2');
+  late final _spine_texture_region_get_v2 = _spine_texture_region_get_v2Ptr
+      .asFunction<double Function(spine_texture_region)>();
+
+  void spine_texture_region_set_v2(
+    spine_texture_region textureRegion,
+    double v2,
+  ) {
+    return _spine_texture_region_set_v2(
+      textureRegion,
+      v2,
+    );
+  }
+
+  late final _spine_texture_region_set_v2Ptr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(
+              spine_texture_region, ffi.Float)>>('spine_texture_region_set_v2');
+  late final _spine_texture_region_set_v2 = _spine_texture_region_set_v2Ptr
+      .asFunction<void Function(spine_texture_region, double)>();
+
+  int spine_texture_region_get_degrees(
+    spine_texture_region textureRegion,
+  ) {
+    return _spine_texture_region_get_degrees(
+      textureRegion,
+    );
+  }
+
+  late final _spine_texture_region_get_degreesPtr =
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_texture_region)>>(
+          'spine_texture_region_get_degrees');
+  late final _spine_texture_region_get_degrees =
+      _spine_texture_region_get_degreesPtr
+          .asFunction<int Function(spine_texture_region)>();
+
+  void spine_texture_region_set_degrees(
+    spine_texture_region textureRegion,
+    int degrees,
+  ) {
+    return _spine_texture_region_set_degrees(
+      textureRegion,
+      degrees,
+    );
+  }
+
+  late final _spine_texture_region_set_degreesPtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(spine_texture_region, ffi.Int)>>(
+      'spine_texture_region_set_degrees');
+  late final _spine_texture_region_set_degrees =
+      _spine_texture_region_set_degreesPtr
+          .asFunction<void Function(spine_texture_region, int)>();
+
+  double spine_texture_region_get_offset_x(
+    spine_texture_region textureRegion,
+  ) {
+    return _spine_texture_region_get_offset_x(
+      textureRegion,
+    );
+  }
+
+  late final _spine_texture_region_get_offset_xPtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_texture_region)>>(
+          'spine_texture_region_get_offset_x');
+  late final _spine_texture_region_get_offset_x =
+      _spine_texture_region_get_offset_xPtr
+          .asFunction<double Function(spine_texture_region)>();
+
+  void spine_texture_region_set_offset_x(
+    spine_texture_region textureRegion,
+    double offsetX,
+  ) {
+    return _spine_texture_region_set_offset_x(
+      textureRegion,
+      offsetX,
+    );
+  }
+
+  late final _spine_texture_region_set_offset_xPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_texture_region,
+              ffi.Float)>>('spine_texture_region_set_offset_x');
+  late final _spine_texture_region_set_offset_x =
+      _spine_texture_region_set_offset_xPtr
+          .asFunction<void Function(spine_texture_region, double)>();
+
+  double spine_texture_region_get_offset_y(
+    spine_texture_region textureRegion,
+  ) {
+    return _spine_texture_region_get_offset_y(
+      textureRegion,
+    );
+  }
+
+  late final _spine_texture_region_get_offset_yPtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_texture_region)>>(
+          'spine_texture_region_get_offset_y');
+  late final _spine_texture_region_get_offset_y =
+      _spine_texture_region_get_offset_yPtr
+          .asFunction<double Function(spine_texture_region)>();
+
+  void spine_texture_region_set_offset_y(
+    spine_texture_region textureRegion,
+    double offsetY,
+  ) {
+    return _spine_texture_region_set_offset_y(
+      textureRegion,
+      offsetY,
+    );
+  }
+
+  late final _spine_texture_region_set_offset_yPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_texture_region,
+              ffi.Float)>>('spine_texture_region_set_offset_y');
+  late final _spine_texture_region_set_offset_y =
+      _spine_texture_region_set_offset_yPtr
+          .asFunction<void Function(spine_texture_region, double)>();
+
+  int spine_texture_region_get_width(
+    spine_texture_region textureRegion,
+  ) {
+    return _spine_texture_region_get_width(
+      textureRegion,
+    );
+  }
+
+  late final _spine_texture_region_get_widthPtr =
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_texture_region)>>(
+          'spine_texture_region_get_width');
+  late final _spine_texture_region_get_width =
+      _spine_texture_region_get_widthPtr
+          .asFunction<int Function(spine_texture_region)>();
+
+  void spine_texture_region_set_width(
+    spine_texture_region textureRegion,
+    int width,
+  ) {
+    return _spine_texture_region_set_width(
+      textureRegion,
+      width,
+    );
+  }
+
+  late final _spine_texture_region_set_widthPtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(spine_texture_region, ffi.Int)>>(
+      'spine_texture_region_set_width');
+  late final _spine_texture_region_set_width =
+      _spine_texture_region_set_widthPtr
+          .asFunction<void Function(spine_texture_region, int)>();
+
+  int spine_texture_region_get_height(
+    spine_texture_region textureRegion,
+  ) {
+    return _spine_texture_region_get_height(
+      textureRegion,
+    );
+  }
+
+  late final _spine_texture_region_get_heightPtr =
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_texture_region)>>(
+          'spine_texture_region_get_height');
+  late final _spine_texture_region_get_height =
+      _spine_texture_region_get_heightPtr
+          .asFunction<int Function(spine_texture_region)>();
+
+  void spine_texture_region_set_height(
+    spine_texture_region textureRegion,
+    int height,
+  ) {
+    return _spine_texture_region_set_height(
+      textureRegion,
+      height,
+    );
+  }
+
+  late final _spine_texture_region_set_heightPtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(spine_texture_region, ffi.Int)>>(
+      'spine_texture_region_set_height');
+  late final _spine_texture_region_set_height =
+      _spine_texture_region_set_heightPtr
+          .asFunction<void Function(spine_texture_region, int)>();
+
+  int spine_texture_region_get_original_width(
+    spine_texture_region textureRegion,
+  ) {
+    return _spine_texture_region_get_original_width(
+      textureRegion,
+    );
+  }
+
+  late final _spine_texture_region_get_original_widthPtr =
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_texture_region)>>(
+          'spine_texture_region_get_original_width');
+  late final _spine_texture_region_get_original_width =
+      _spine_texture_region_get_original_widthPtr
+          .asFunction<int Function(spine_texture_region)>();
+
+  void spine_texture_region_set_original_width(
+    spine_texture_region textureRegion,
+    int originalWidth,
+  ) {
+    return _spine_texture_region_set_original_width(
+      textureRegion,
+      originalWidth,
+    );
+  }
+
+  late final _spine_texture_region_set_original_widthPtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(spine_texture_region, ffi.Int)>>(
+      'spine_texture_region_set_original_width');
+  late final _spine_texture_region_set_original_width =
+      _spine_texture_region_set_original_widthPtr
+          .asFunction<void Function(spine_texture_region, int)>();
+
+  int spine_texture_region_get_original_height(
+    spine_texture_region textureRegion,
+  ) {
+    return _spine_texture_region_get_original_height(
+      textureRegion,
+    );
+  }
+
+  late final _spine_texture_region_get_original_heightPtr =
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_texture_region)>>(
+          'spine_texture_region_get_original_height');
+  late final _spine_texture_region_get_original_height =
+      _spine_texture_region_get_original_heightPtr
+          .asFunction<int Function(spine_texture_region)>();
+
+  void spine_texture_region_set_original_height(
+    spine_texture_region textureRegion,
+    int originalHeight,
+  ) {
+    return _spine_texture_region_set_original_height(
+      textureRegion,
+      originalHeight,
+    );
+  }
+
+  late final _spine_texture_region_set_original_heightPtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(spine_texture_region, ffi.Int)>>(
+      'spine_texture_region_set_original_height');
+  late final _spine_texture_region_set_original_height =
+      _spine_texture_region_set_original_heightPtr
+          .asFunction<void Function(spine_texture_region, int)>();
 }
 
 class spine_skeleton_wrapper extends ffi.Opaque {}
@@ -8512,18 +9501,18 @@ class spine_animation_wrapper extends ffi.Opaque {}
 class spine_atlas extends ffi.Struct {
   external ffi.Pointer<ffi.Void> atlas;
 
-  external ffi.Pointer<ffi.Pointer<ffi.Int8>> imagePaths;
+  external ffi.Pointer<ffi.Pointer<ffi.Char>> imagePaths;
 
-  @ffi.Int32()
+  @ffi.Int()
   external int numImagePaths;
 
-  external ffi.Pointer<ffi.Int8> error;
+  external ffi.Pointer<ffi.Char> error;
 }
 
 class spine_skeleton_data_result extends ffi.Struct {
   external spine_skeleton_data skeletonData;
 
-  external ffi.Pointer<ffi.Int8> error;
+  external ffi.Pointer<ffi.Char> error;
 }
 
 typedef spine_skeleton_data = ffi.Pointer<spine_skeleton_data_wrapper>;
@@ -8599,15 +9588,15 @@ class spine_render_command extends ffi.Struct {
 
   external ffi.Pointer<ffi.Int32> colors;
 
-  @ffi.Int32()
+  @ffi.Int()
   external int numVertices;
 
   external ffi.Pointer<ffi.Uint16> indices;
 
-  @ffi.Int32()
+  @ffi.Int()
   external int numIndices;
 
-  @ffi.Int32()
+  @ffi.Int()
   external int atlasPage;
 
   @ffi.Int32()
@@ -8674,10 +9663,10 @@ typedef spine_animation_state_events
     = ffi.Pointer<spine_animation_state_events_wrapper>;
 
 class spine_skin_entry extends ffi.Struct {
-  @ffi.Int32()
+  @ffi.Int()
   external int slotIndex;
 
-  external ffi.Pointer<ffi.Int8> name;
+  external ffi.Pointer<ffi.Char> name;
 
   external spine_attachment attachment;
 }
@@ -8685,7 +9674,7 @@ class spine_skin_entry extends ffi.Struct {
 typedef spine_attachment = ffi.Pointer<spine_attachment_wrapper>;
 
 class spine_skin_entries extends ffi.Struct {
-  @ffi.Int32()
+  @ffi.Int()
   external int numEntries;
 
   external ffi.Pointer<spine_skin_entry> entries;

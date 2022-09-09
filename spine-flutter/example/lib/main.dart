@@ -50,7 +50,7 @@ class SimpleAnimation extends StatelessWidget {
     reportLeaks();
     final controller = SpineWidgetController((controller) {
       // Set the walk animation on track 0, let it loop
-      controller.animationState?.setAnimation(0, "walk", true);
+      controller.animationState?.setAnimationByName(0, "walk", true);
 
       print("Skeleton name: ${controller.skeletonData?.getName()}");
       print("Skeleton version: ${controller.skeletonData?.getVersion()}");
@@ -81,10 +81,10 @@ class AnimationStateEvents extends StatelessWidget {
       controller.skeleton?.setScaleY(0.5);
       controller.skeleton?.findSlot("gun")?.setColor(Color(1, 0, 0, 1));
       controller.animationStateData?.setDefaultMix(0.2);
-      controller.animationState?.setAnimation(0, "walk", true)?.setListener((type, trackEntry, event) {
+      controller.animationState?.setAnimationByName(0, "walk", true)?.setListener((type, trackEntry, event) {
         print("Walk animation event ${type}");
       });
-      controller.animationState?.addAnimation(0, "run", true, 2)?.setListener((type, trackEntry, event) {
+      controller.animationState?.addAnimationByName(0, "run", true, 2)?.setListener((type, trackEntry, event) {
         print("Run animation event ${type}");
       });
       controller.animationState?.setListener((type, trackEntry, event) {

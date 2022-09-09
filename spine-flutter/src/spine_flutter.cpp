@@ -1,3 +1,32 @@
+/******************************************************************************
+ * Spine Runtimes License Agreement
+ * Last updated September 24, 2021. Replaces all prior versions.
+ *
+ * Copyright (c) 2013-2021, Esoteric Software LLC
+ *
+ * Integration of the Spine Runtimes into software or otherwise creating
+ * derivative works of the Spine Runtimes is permitted under the terms and
+ * conditions of Section 2 of the Spine Editor License Agreement:
+ * http://esotericsoftware.com/spine-editor-license
+ *
+ * Otherwise, it is permitted to integrate the Spine Runtimes into software
+ * or otherwise create derivative works of the Spine Runtimes (collectively,
+ * "Products"), provided that each user of the Products must obtain their own
+ * Spine Editor license and redistribution of the Products in any form must
+ * include this license and copyright notice.
+ *
+ * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+ * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
+
 #include "spine_flutter.h"
 #include <spine/spine.h>
 #include <spine/Version.h>
@@ -454,7 +483,7 @@ FFI_PLUGIN_EXPORT spine_render_command *spine_skeleton_drawable_render(spine_ske
             uvs = &regionAttachment->getUVs();
             indices = &quadIndices;
             indicesCount = 6;
-            pageIndex = ((AtlasRegion *) regionAttachment->getRendererObject())->page->index;
+            pageIndex = ((AtlasRegion*)regionAttachment->getRegion())->page->index;
 
         } else if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
             MeshAttachment *mesh = (MeshAttachment *) attachment;
@@ -467,12 +496,12 @@ FFI_PLUGIN_EXPORT spine_render_command *spine_skeleton_drawable_render(spine_ske
             }
 
             worldVertices.setSize(mesh->getWorldVerticesLength(), 0);
-            pageIndex = ((AtlasRegion *) mesh->getRendererObject())->page->index;
             mesh->computeWorldVertices(slot, 0, mesh->getWorldVerticesLength(), worldVertices.buffer(), 0, 2);
             verticesCount = (int)(mesh->getWorldVerticesLength() >> 1);
             uvs = &mesh->getUVs();
             indices = &mesh->getTriangles();
             indicesCount = (int)indices->size();
+            pageIndex = ((AtlasRegion*)mesh->getRegion())->page->index;
 
         } else if (attachment->getRTTI().isExactly(ClippingAttachment::rtti)) {
             ClippingAttachment *clip = (ClippingAttachment *) slot.getAttachment();
@@ -1727,6 +1756,14 @@ FFI_PLUGIN_EXPORT void spine_bone_data_set_color(spine_bone_data data, float r, 
 }
 
 // Bone
+FFI_PLUGIN_EXPORT void spine_bone_set_is_y_down(int yDown) {
+    Bone::setYDown(yDown);
+}
+
+FFI_PLUGIN_EXPORT int spine_bone_get_is_y_down() {
+    return Bone::isYDown() ? -1 : 0;
+}
+
 FFI_PLUGIN_EXPORT void spine_bone_update(spine_bone bone) {
     if (bone == nullptr) return;
     Bone *_bone = (Bone*)bone;
@@ -2381,7 +2418,7 @@ FFI_PLUGIN_EXPORT int spine_vertex_attachment_get_num_bones(spine_vertex_attachm
     return (int)_attachment->getBones().size();
 }
 
-FFI_PLUGIN_EXPORT int *spine_region_attachment_get_bones(spine_region_attachment attachment) {
+FFI_PLUGIN_EXPORT int32_t *spine_vertex_attachment_get_bones(spine_vertex_attachment attachment) {
     if (attachment == nullptr) return nullptr;
     VertexAttachment *_attachment = (VertexAttachment*)attachment;
     return _attachment->getBones().buffer();
@@ -2394,7 +2431,7 @@ FFI_PLUGIN_EXPORT int spine_vertex_attachment_get_num_vertices(spine_vertex_atta
     return (int)_attachment->getVertices().size();
 }
 
-FFI_PLUGIN_EXPORT float *spine_region_attachment_get_vertices(spine_region_attachment attachment) {
+FFI_PLUGIN_EXPORT float *spine_vertex_attachment_get_vertices(spine_vertex_attachment attachment) {
     if (attachment == nullptr) return nullptr;
     VertexAttachment *_attachment = (VertexAttachment*)attachment;
     return _attachment->getVertices().buffer();
@@ -2461,7 +2498,7 @@ FFI_PLUGIN_EXPORT int spine_mesh_attachment_get_num_triangles(spine_mesh_attachm
     return _attachment->getTriangles().size();
 }
 
-FFI_PLUGIN_EXPORT unsigned short *spine_mesh_attachment_get_triangles(spine_mesh_attachment attachment) {
+FFI_PLUGIN_EXPORT uint16_t *spine_mesh_attachment_get_triangles(spine_mesh_attachment attachment) {
     if (attachment == nullptr) return nullptr;
     MeshAttachment *_attachment = (MeshAttachment*)attachment;
     return _attachment->getTriangles().buffer();
@@ -2676,6 +2713,13 @@ FFI_PLUGIN_EXPORT void spine_skin_add_skin(spine_skin skin, spine_skin other) {
     _skin->addSkin((Skin*)other);
 }
 
+FFI_PLUGIN_EXPORT void spine_skin_copy_skin(spine_skin skin, spine_skin other) {
+    if (skin == nullptr) return;
+    if (other == nullptr) return;
+    Skin *_skin = (Skin*)skin;
+    _skin->copySkin((Skin*)other);
+}
+
 FFI_PLUGIN_EXPORT spine_skin_entries *spine_skin_get_entries(spine_skin skin) {
     if (skin == nullptr) return nullptr;
     Skin *_skin = (Skin*)skin;
@@ -2737,6 +2781,7 @@ FFI_PLUGIN_EXPORT void spine_skin_dispose(spine_skin skin) {
     delete _skin;
 }
 
+// ConstraintData
 FFI_PLUGIN_EXPORT spine_constraint_type spine_constraint_data_get_type(spine_constraint_data data) {
     if (data == nullptr) return SPINE_CONSTRAINT_IK;
     ConstraintData *_data = (ConstraintData*)data;
@@ -2749,6 +2794,36 @@ FFI_PLUGIN_EXPORT spine_constraint_type spine_constraint_data_get_type(spine_con
     } else {
         return SPINE_CONSTRAINT_IK;
     }
+}
+
+FFI_PLUGIN_EXPORT const char* spine_constraint_data_get_name(spine_constraint_data data) {
+    if (data == nullptr) return nullptr;
+    ConstraintData *_data = (ConstraintData*)data;
+    return _data->getName().buffer();
+}
+
+FFI_PLUGIN_EXPORT uint64_t spine_constraint_data_get_order(spine_constraint_data data) {
+    if (data == nullptr) return 0;
+    ConstraintData *_data = (ConstraintData*)data;
+    return (uint64_t)_data->getOrder();
+}
+
+FFI_PLUGIN_EXPORT void spine_constraint_data_set_order(spine_constraint_data data, uint64_t order) {
+    if (data == nullptr) return;
+    ConstraintData *_data = (ConstraintData*)data;
+    _data->setOrder((size_t)order);
+}
+
+FFI_PLUGIN_EXPORT int spine_constraint_data_get_is_skin_required(spine_constraint_data data) {
+    if (data == nullptr) return 0;
+    ConstraintData *_data = (ConstraintData*)data;
+    return _data->isSkinRequired() ? -1 : 0;
+}
+
+FFI_PLUGIN_EXPORT void spine_constraint_data_set_is_skin_required(spine_constraint_data data, int isSkinRequired) {
+    if (data == nullptr) return;
+    ConstraintData *_data = (ConstraintData*)data;
+    _data->setSkinRequired(isSkinRequired);
 }
 
 // IkConstraintData
@@ -3523,5 +3598,221 @@ FFI_PLUGIN_EXPORT void spine_path_constraint_set_is_active(spine_path_constraint
     if (constraint == nullptr) return;
     PathConstraint *_constraint = (PathConstraint*)constraint;
     _constraint->setActive(isActive);
+}
+
+// Sequence
+FFI_PLUGIN_EXPORT void spine_sequence_apply(spine_sequence sequence, spine_slot slot, spine_attachment attachment) {
+    if (sequence == nullptr) return;
+    Sequence *_sequence = (Sequence*)sequence;
+    _sequence->apply((Slot*)slot, (Attachment*)attachment);
+}
+
+FFI_PLUGIN_EXPORT const char* spine_sequence_get_path(spine_sequence sequence, const char *basePath, int index) {
+    if (sequence == nullptr) return nullptr;
+    Sequence *_sequence = (Sequence*)sequence;
+    return strdup(_sequence->getPath(basePath, index).buffer());
+}
+
+FFI_PLUGIN_EXPORT int spine_sequence_get_id(spine_sequence sequence) {
+    if (sequence == nullptr) return 0;
+    Sequence *_sequence = (Sequence *) sequence;
+    return _sequence->getId();
+}
+
+FFI_PLUGIN_EXPORT void spine_sequence_set_id(spine_sequence sequence, int id) {
+    if (sequence == nullptr) return;
+    Sequence *_sequence = (Sequence *) sequence;
+    _sequence->setId(id);
+}
+
+FFI_PLUGIN_EXPORT int spine_sequence_get_start(spine_sequence sequence) {
+    if (sequence == nullptr) return 0;
+    Sequence *_sequence = (Sequence *) sequence;
+    return _sequence->getStart();
+}
+
+FFI_PLUGIN_EXPORT void spine_sequence_set_start(spine_sequence sequence, int start) {
+    if (sequence == nullptr) return;
+    Sequence *_sequence = (Sequence *) sequence;
+    _sequence->setStart(start);
+}
+
+FFI_PLUGIN_EXPORT int spine_sequence_get_digits(spine_sequence sequence) {
+    if (sequence == nullptr) return 0;
+    Sequence *_sequence = (Sequence *) sequence;
+    return _sequence->getDigits();
+}
+
+FFI_PLUGIN_EXPORT void spine_sequence_set_digits(spine_sequence sequence, int digits) {
+    if (sequence == nullptr) return;
+    Sequence *_sequence = (Sequence *) sequence;
+    _sequence->setDigits(digits);
+}
+
+FFI_PLUGIN_EXPORT int spine_sequence_get_setup_index(spine_sequence sequence) {
+    if (sequence == nullptr) return 0;
+    Sequence *_sequence = (Sequence *) sequence;
+    return _sequence->getSetupIndex();
+}
+
+FFI_PLUGIN_EXPORT void spine_sequence_set_setup_index(spine_sequence sequence, int setupIndex) {
+    if (sequence == nullptr) return;
+    Sequence *_sequence = (Sequence *) sequence;
+    _sequence->setSetupIndex(setupIndex);
+}
+
+FFI_PLUGIN_EXPORT int spine_sequence_get_num_regions(spine_sequence sequence) {
+    if (sequence == nullptr) return 0;
+    Sequence *_sequence = (Sequence *) sequence;
+    return (int)_sequence->getRegions().size();
+}
+
+FFI_PLUGIN_EXPORT spine_texture_region* spine_sequence_get_regions(spine_sequence sequence) {
+    if (sequence == nullptr) return nullptr;
+    Sequence *_sequence = (Sequence *) sequence;
+    return (spine_texture_region*)_sequence->getRegions().buffer();
+}
+
+// TextureRegion
+FFI_PLUGIN_EXPORT void* spine_texture_region_get_texture(spine_texture_region textureRegion) {
+    if (textureRegion == nullptr) return nullptr;
+    TextureRegion *_region = (TextureRegion*)textureRegion;
+    return _region->rendererObject;
+}
+
+FFI_PLUGIN_EXPORT void spine_texture_region_set_texture(spine_texture_region textureRegion, void *texture) {
+    if (textureRegion == nullptr) return;
+    TextureRegion *_region = (TextureRegion*)textureRegion;
+    _region->rendererObject = texture;
+}
+
+FFI_PLUGIN_EXPORT float spine_texture_region_get_u(spine_texture_region textureRegion) {
+    if (textureRegion == nullptr) return 0;
+    TextureRegion *_region = (TextureRegion*)textureRegion;
+    return _region->u;
+}
+
+FFI_PLUGIN_EXPORT void spine_texture_region_set_u(spine_texture_region textureRegion, float u) {
+    if (textureRegion == nullptr) return;
+    TextureRegion *_region = (TextureRegion*)textureRegion;
+    _region->u = u;
+}
+
+FFI_PLUGIN_EXPORT float spine_texture_region_get_v(spine_texture_region textureRegion) {
+    if (textureRegion == nullptr) return 0;
+    TextureRegion *_region = (TextureRegion*)textureRegion;
+    return _region->v;
+}
+FFI_PLUGIN_EXPORT void spine_texture_region_set_v(spine_texture_region textureRegion, float v) {
+    if (textureRegion == nullptr) return;
+    TextureRegion *_region = (TextureRegion*)textureRegion;
+    _region->v = v;
+}
+FFI_PLUGIN_EXPORT float spine_texture_region_get_u2(spine_texture_region textureRegion) {
+    if (textureRegion == nullptr) return 0;
+    TextureRegion *_region = (TextureRegion*)textureRegion;
+    return _region->u2;
+}
+
+FFI_PLUGIN_EXPORT void spine_texture_region_set_u2(spine_texture_region textureRegion, float u2) {
+    if (textureRegion == nullptr) return;
+    TextureRegion *_region = (TextureRegion*)textureRegion;
+    _region->u2 = u2;
+}
+
+FFI_PLUGIN_EXPORT float spine_texture_region_get_v2(spine_texture_region textureRegion) {
+    if (textureRegion == nullptr) return 0;
+    TextureRegion *_region = (TextureRegion*)textureRegion;
+    return _region->v2;
+}
+
+FFI_PLUGIN_EXPORT void spine_texture_region_set_v2(spine_texture_region textureRegion, float v2) {
+    if (textureRegion == nullptr) return;
+    TextureRegion *_region = (TextureRegion*)textureRegion;
+    _region->v2 = v2;
+}
+
+FFI_PLUGIN_EXPORT int spine_texture_region_get_degrees(spine_texture_region textureRegion) {
+    if (textureRegion == nullptr) return 0;
+    TextureRegion *_region = (TextureRegion*)textureRegion;
+    return _region->degrees;
+}
+
+FFI_PLUGIN_EXPORT void spine_texture_region_set_degrees(spine_texture_region textureRegion, int degrees) {
+    if (textureRegion == nullptr) return;
+    TextureRegion *_region = (TextureRegion*)textureRegion;
+    _region->degrees = degrees;
+}
+
+FFI_PLUGIN_EXPORT float spine_texture_region_get_offset_x(spine_texture_region textureRegion) {
+    if (textureRegion == nullptr) return 0;
+    TextureRegion *_region = (TextureRegion*)textureRegion;
+    return _region->offsetX;
+}
+
+FFI_PLUGIN_EXPORT void spine_texture_region_set_offset_x(spine_texture_region textureRegion, float offsetX) {
+    if (textureRegion == nullptr) return;
+    TextureRegion *_region = (TextureRegion*)textureRegion;
+    _region->offsetX = offsetX;
+}
+
+FFI_PLUGIN_EXPORT float spine_texture_region_get_offset_y(spine_texture_region textureRegion) {
+    if (textureRegion == nullptr) return 0;
+    TextureRegion *_region = (TextureRegion*)textureRegion;
+    return _region->offsetY;
+}
+
+FFI_PLUGIN_EXPORT void spine_texture_region_set_offset_y(spine_texture_region textureRegion, float offsetY) {
+    if (textureRegion == nullptr) return;
+    TextureRegion *_region = (TextureRegion*)textureRegion;
+    _region->offsetY = offsetY;
+}
+
+FFI_PLUGIN_EXPORT int spine_texture_region_get_width(spine_texture_region textureRegion) {
+    if (textureRegion == nullptr) return 0;
+    TextureRegion *_region = (TextureRegion*)textureRegion;
+    return _region->width;
+}
+
+FFI_PLUGIN_EXPORT void spine_texture_region_set_width(spine_texture_region textureRegion, int width) {
+    if (textureRegion == nullptr) return;
+    TextureRegion *_region = (TextureRegion*)textureRegion;
+    _region->width = width;
+}
+
+FFI_PLUGIN_EXPORT int spine_texture_region_get_height(spine_texture_region textureRegion) {
+    if (textureRegion == nullptr) return 0;
+    TextureRegion *_region = (TextureRegion*)textureRegion;
+    return _region->height;
+}
+
+FFI_PLUGIN_EXPORT void spine_texture_region_set_height(spine_texture_region textureRegion, int height) {
+    if (textureRegion == nullptr) return;
+    TextureRegion *_region = (TextureRegion*)textureRegion;
+    _region->height = height;
+}
+
+FFI_PLUGIN_EXPORT int spine_texture_region_get_original_width(spine_texture_region textureRegion) {
+    if (textureRegion == nullptr) return 0;
+    TextureRegion *_region = (TextureRegion*)textureRegion;
+    return _region->originalWidth;
+}
+
+FFI_PLUGIN_EXPORT void spine_texture_region_set_original_width(spine_texture_region textureRegion, int originalWidth) {
+    if (textureRegion == nullptr) return;
+    TextureRegion *_region = (TextureRegion*)textureRegion;
+    _region->originalWidth = originalWidth;
+}
+
+FFI_PLUGIN_EXPORT int spine_texture_region_get_original_height(spine_texture_region textureRegion) {
+    if (textureRegion == nullptr) return 0;
+    TextureRegion *_region = (TextureRegion*)textureRegion;
+    return _region->originalHeight;
+}
+
+FFI_PLUGIN_EXPORT void spine_texture_region_set_original_height(spine_texture_region textureRegion, int originalHeight) {
+    if (textureRegion == nullptr) return;
+    TextureRegion *_region = (TextureRegion*)textureRegion;
+    _region->originalHeight = originalHeight;
 }
 

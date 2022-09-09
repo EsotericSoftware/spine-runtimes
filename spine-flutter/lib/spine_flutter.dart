@@ -1145,13 +1145,13 @@ class VertexAttachment<T extends Pointer> extends Attachment<T> {
 
   Int32List getBones() {
     final num = _bindings.spine_vertex_attachment_get_num_bones(_attachment.cast());
-    final bones = _bindings.spine_region_attachment_get_bones(_attachment.cast());
+    final bones = _bindings.spine_vertex_attachment_get_bones(_attachment.cast());
     return bones.asTypedList(num);
   }
 
   Float32List getVertices() {
     final num = _bindings.spine_vertex_attachment_get_num_vertices(_attachment.cast());
-    final vertices = _bindings.spine_region_attachment_get_vertices(_attachment.cast());
+    final vertices = _bindings.spine_vertex_attachment_get_vertices(_attachment.cast());
     return vertices.asTypedList(num);
   }
 
@@ -2790,11 +2790,17 @@ class AnimationState {
   /// @return
   /// A track entry to allow further customization of animation playback. References to the track entry must not be kept
   /// after AnimationState.Dispose.
-  TrackEntry setAnimation(int trackIndex, String animationName, bool loop) {
+  TrackEntry setAnimationByName(int trackIndex, String animationName, bool loop) {
     final animation = animationName.toNativeUtf8();
-    final entry = _bindings.spine_animation_state_set_animation(_state, trackIndex, animation.cast(), loop ? -1 : 0);
+    final entry = _bindings.spine_animation_state_set_animation_by_name(_state, trackIndex, animation.cast(), loop ? -1 : 0);
     malloc.free(animation);
     if (entry.address == nullptr.address) throw Exception("Couldn't set animation $animationName");
+    return TrackEntry._(entry, this);
+  }
+
+  TrackEntry setAnimation(int trackIndex, Animation animation, bool loop) {
+    final entry = _bindings.spine_animation_state_set_animation(_state, trackIndex, animation._animation, loop ? -1 : 0);
+    if (entry.address == nullptr.address) throw Exception("Couldn't set animation ${animation.getName()}");
     return TrackEntry._(entry, this);
   }
 
@@ -2806,11 +2812,17 @@ class AnimationState {
   ///
   /// @return A track entry to allow further customization of animation playback. References to the track entry must not be kept
   /// after AnimationState.Dispose
-  TrackEntry addAnimation(int trackIndex, String animationName, bool loop, double delay) {
+  TrackEntry addAnimationByName(int trackIndex, String animationName, bool loop, double delay) {
     final animation = animationName.toNativeUtf8();
-    final entry = _bindings.spine_animation_state_add_animation(_state, trackIndex, animation.cast(), loop ? -1 : 0, delay);
+    final entry = _bindings.spine_animation_state_add_animation_by_name(_state, trackIndex, animation.cast(), loop ? -1 : 0, delay);
     malloc.free(animation);
     if (entry.address == nullptr.address) throw Exception("Couldn't add animation $animationName");
+    return TrackEntry._(entry, this);
+  }
+
+  TrackEntry addAnimation(int trackIndex, Animation animation, bool loop, double delay) {
+    final entry = _bindings.spine_animation_state_add_animation(_state, trackIndex, animation._animation, loop ? -1 : 0, delay);
+    if (entry.address == nullptr.address) throw Exception("Couldn't add animation ${animation.getName()}");
     return TrackEntry._(entry, this);
   }
 
