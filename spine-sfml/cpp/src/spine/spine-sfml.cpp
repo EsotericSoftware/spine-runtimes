@@ -103,7 +103,6 @@ namespace spine {
 			}
 
 			Vector<float> *vertices = &worldVertices;
-			int verticesCount = 0;
 			Vector<float> *uvs = NULL;
 			Vector<unsigned short> *indices = NULL;
 			int indicesCount = 0;
@@ -121,11 +120,10 @@ namespace spine {
 
 				worldVertices.setSize(8, 0);
 				regionAttachment->computeWorldVertices(slot, worldVertices, 0, 2);
-				verticesCount = 4;
 				uvs = &regionAttachment->getUVs();
 				indices = &quadIndices;
 				indicesCount = 6;
-				texture = (Texture *) ((AtlasRegion *) regionAttachment->getRendererObject())->page->getRendererObject();
+				texture = (Texture *)regionAttachment->getRegion()->rendererObject;
 
 			} else if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
 				MeshAttachment *mesh = (MeshAttachment *) attachment;
@@ -138,9 +136,8 @@ namespace spine {
 				}
 
 				worldVertices.setSize(mesh->getWorldVerticesLength(), 0);
-				texture = (Texture *) ((AtlasRegion *) mesh->getRendererObject())->page->getRendererObject();
+				texture = (Texture *)mesh->getRegion()->rendererObject;
 				mesh->computeWorldVertices(slot, 0, mesh->getWorldVerticesLength(), worldVertices.buffer(), 0, 2);
-				verticesCount = mesh->getWorldVerticesLength() >> 1;
 				uvs = &mesh->getUVs();
 				indices = &mesh->getTriangles();
 				indicesCount = mesh->getTriangles().size();
@@ -216,7 +213,6 @@ namespace spine {
 			if (clipper.isClipping()) {
 				clipper.clipTriangles(worldVertices, *indices, *uvs, 2);
 				vertices = &clipper.getClippedVertices();
-				verticesCount = clipper.getClippedVertices().size() >> 1;
 				uvs = &clipper.getClippedUVs();
 				indices = &clipper.getClippedTriangles();
 				indicesCount = clipper.getClippedTriangles().size();
@@ -245,7 +241,7 @@ namespace spine {
 		if (page.magFilter == TextureFilter_Linear) texture->setSmooth(true);
 		if (page.uWrap == TextureWrap_Repeat && page.vWrap == TextureWrap_Repeat) texture->setRepeated(true);
 
-		page.setRendererObject(texture);
+		page.texture = texture;
 		Vector2u size = texture->getSize();
 		page.width = size.x;
 		page.height = size.y;

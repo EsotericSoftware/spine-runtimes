@@ -47,7 +47,7 @@ const int RegionAttachment::URY = 5;
 const int RegionAttachment::BRX = 6;
 const int RegionAttachment::BRY = 7;
 
-RegionAttachment::RegionAttachment(const String &name) : Attachment(name),
+RegionAttachment::RegionAttachment(const String &name) : Attachment(name), HasRendererObject(),
 														 _x(0),
 														 _y(0),
 														 _rotation(0),

@@ -74,6 +74,8 @@ open build-macos/spine-cocos2dx-example.xcodeproj
 
 This will generate an Xcode project in `build-macos/spine-cocos2dx-example.xcodeproj` and open it in Xcode. To build and run the example, select the `spine-cocos2dx-example` scheme and press `CMD + R`.
 
+> **Note**: cocos2d-x only ships pre-built external libraries like Bullet or FreeType for x86_64. If you build on a machine with Apple Silicon, adjust the `cmake` command above to `mkdir build-macos && cmake . -GXcode -Bbuild-macos -DCMAKE_OSX_ARCHITECTURES=x86_64`.
+
 ### iOS
 Execute the following on the command line:
 

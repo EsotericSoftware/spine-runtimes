@@ -101,7 +101,7 @@ void SkeletonDrawable::draw(SDL_Renderer *renderer) {
 			uvs = &regionAttachment->getUVs();
 			indices = &quadIndices;
 			indicesCount = 6;
-			texture = (SDL_Texture *) ((AtlasRegion *) regionAttachment->getRendererObject())->page->getRendererObject();
+			texture = (SDL_Texture *)regionAttachment->getRegion()->rendererObject;
 
 		} else if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
 			MeshAttachment *mesh = (MeshAttachment *) attachment;
@@ -114,7 +114,7 @@ void SkeletonDrawable::draw(SDL_Renderer *renderer) {
 			}
 
 			worldVertices.setSize(mesh->getWorldVerticesLength(), 0);
-			texture = (SDL_Texture *) ((AtlasRegion *) mesh->getRendererObject())->page->getRendererObject();
+			texture = (SDL_Texture *)mesh->getRegion()->rendererObject;
 			mesh->computeWorldVertices(slot, 0, mesh->getWorldVerticesLength(), worldVertices.buffer(), 0, 2);
 			verticesCount = mesh->getWorldVerticesLength() >> 1;
 			uvs = &mesh->getUVs();
@@ -201,7 +201,7 @@ SDL_Texture *loadTexture(SDL_Renderer *renderer, const String &path) {
 void SDLTextureLoader::load(AtlasPage &page, const String &path) {
 	SDL_Texture *texture = loadTexture(renderer, path);
 	if (!texture) return;
-	page.setRendererObject(texture);
+	page.texture = texture;
 	SDL_QueryTexture(texture, nullptr, nullptr, &page.width, &page.height);
 	switch (page.magFilter) {
 		case TextureFilter_Nearest:

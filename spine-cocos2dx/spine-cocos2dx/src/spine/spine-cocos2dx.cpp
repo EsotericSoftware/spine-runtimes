@@ -41,8 +41,7 @@ static void deleteAttachmentVertices(void *vertices) {
 static unsigned short quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 
 static void setAttachmentVertices(RegionAttachment *attachment) {
-	AtlasRegion *region = (AtlasRegion *) attachment->getRendererObject();
-	AttachmentVertices *attachmentVertices = new AttachmentVertices((Texture2D *) region->page->getRendererObject(), 4, quadTriangles, 6);
+	AttachmentVertices *attachmentVertices = new AttachmentVertices((Texture2D *) attachment->getRegion()->rendererObject, 4, quadTriangles, 6);
 	V3F_C4B_T2F *vertices = attachmentVertices->_triangles->verts;
 	for (int i = 0, ii = 0; i < 4; ++i, ii += 2) {
 		vertices[i].texCoords.u = attachment->getUVs()[ii];
@@ -52,8 +51,7 @@ static void setAttachmentVertices(RegionAttachment *attachment) {
 }
 
 static void setAttachmentVertices(MeshAttachment *attachment) {
-	AtlasRegion *region = (AtlasRegion *) attachment->getRendererObject();
-	AttachmentVertices *attachmentVertices = new AttachmentVertices((Texture2D *) region->page->getRendererObject(),
+	AttachmentVertices *attachmentVertices = new AttachmentVertices((Texture2D *)attachment->getRegion()->rendererObject,
 																	attachment->getWorldVerticesLength() >> 1, attachment->getTriangles().buffer(), attachment->getTriangles().size());
 	V3F_C4B_T2F *vertices = attachmentVertices->_triangles->verts;
 	for (int i = 0, ii = 0, nn = attachment->getWorldVerticesLength(); ii < nn; ++i, ii += 2) {
@@ -149,7 +147,7 @@ void Cocos2dTextureLoader::load(AtlasPage &page, const spine::String &path) {
 #endif
 		texture->setTexParameters(textureParams);
 
-		page.setRendererObject(texture);
+		page.texture = texture;
 		page.width = texture->getPixelsWide();
 		page.height = texture->getPixelsHigh();
 	}
