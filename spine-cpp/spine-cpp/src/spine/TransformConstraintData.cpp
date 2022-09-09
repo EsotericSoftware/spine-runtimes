@@ -120,61 +120,61 @@ bool TransformConstraintData::isLocal() {
 }
 
 void TransformConstraintData::setTarget(BoneData *target) {
-    _target = target;
+	_target = target;
 }
 
 void TransformConstraintData::setMixRotate(float mixRotate) {
-    _mixRotate = mixRotate;
+	_mixRotate = mixRotate;
 }
 
 void TransformConstraintData::setMixX(float mixX) {
-    _mixX = mixX;
+	_mixX = mixX;
 }
 
 void TransformConstraintData::setMixY(float mixY) {
-    _mixY = mixY;
+	_mixY = mixY;
 }
 
 void TransformConstraintData::setMixScaleX(float mixScaleX) {
-    _mixScaleX = mixScaleX;
+	_mixScaleX = mixScaleX;
 }
 
 void TransformConstraintData::setMixScaleY(float mixScaleY) {
-    _mixScaleY = mixScaleY;
+	_mixScaleY = mixScaleY;
 }
 
 void TransformConstraintData::setMixShearY(float mixShearY) {
-    _mixShearY = mixShearY;
+	_mixShearY = mixShearY;
 }
 
 void TransformConstraintData::setOffsetRotation(float offsetRotation) {
-    _offsetRotation = offsetRotation;
+	_offsetRotation = offsetRotation;
 }
 
 void TransformConstraintData::setOffsetX(float offsetX) {
-    _offsetX = offsetX;
+	_offsetX = offsetX;
 }
 
 void TransformConstraintData::setOffsetY(float offsetY) {
-    _offsetY = offsetY;
+	_offsetY = offsetY;
 }
 
 void TransformConstraintData::setOffsetScaleX(float offsetScaleX) {
-    _offsetScaleX = offsetScaleX;
+	_offsetScaleX = offsetScaleX;
 }
 
 void TransformConstraintData::setOffsetScaleY(float offsetScaleY) {
-    _offsetScaleY = offsetScaleY;
+	_offsetScaleY = offsetScaleY;
 }
 
 void TransformConstraintData::setOffsetShearY(float offsetShearY) {
-    _offsetShearY = offsetShearY;
+	_offsetShearY = offsetShearY;
 }
 
 void TransformConstraintData::setRelative(bool isRelative) {
-    _relative = isRelative;
+	_relative = isRelative;
 }
 
 void TransformConstraintData::setLocal(bool isLocal) {
-    _local = isLocal;
+	_local = isLocal;
 }

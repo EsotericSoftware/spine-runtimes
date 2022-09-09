@@ -101,7 +101,7 @@ void SkeletonDrawable::draw(SDL_Renderer *renderer) {
 			uvs = &regionAttachment->getUVs();
 			indices = &quadIndices;
 			indicesCount = 6;
-			texture = (SDL_Texture *)regionAttachment->getRegion()->rendererObject;
+			texture = (SDL_Texture *) regionAttachment->getRegion()->rendererObject;
 
 		} else if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
 			MeshAttachment *mesh = (MeshAttachment *) attachment;
@@ -114,7 +114,7 @@ void SkeletonDrawable::draw(SDL_Renderer *renderer) {
 			}
 
 			worldVertices.setSize(mesh->getWorldVerticesLength(), 0);
-			texture = (SDL_Texture *)mesh->getRegion()->rendererObject;
+			texture = (SDL_Texture *) mesh->getRegion()->rendererObject;
 			mesh->computeWorldVertices(slot, 0, mesh->getWorldVerticesLength(), worldVertices.buffer(), 0, 2);
 			verticesCount = mesh->getWorldVerticesLength() >> 1;
 			uvs = &mesh->getUVs();

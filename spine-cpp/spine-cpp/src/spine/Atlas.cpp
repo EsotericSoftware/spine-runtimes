@@ -286,12 +286,12 @@ void Atlas::load(const char *begin, int length, const char *dir, bool createText
 			} else {
 				page->texturePath = String(path, true);
 			}
-            page->index = _pages.size();
+			page->index = _pages.size();
 			_pages.add(page);
 		} else {
 			AtlasRegion *region = new (__FILE__, __LINE__) AtlasRegion();
 			region->page = page;
-            region->rendererObject = page->texture;
+			region->rendererObject = page->texture;
 			region->name = String(line->copy(), true);
 			while (true) {
 				line = reader.readLine();

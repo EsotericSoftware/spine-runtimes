@@ -19,7 +19,8 @@ class SpineWidgetController {
   SpineWidgetController([this.onInitialized]);
 
   void _initialize(Atlas atlas, SkeletonData data, SkeletonDrawable drawable) {
-    if (initialized) throw Exception("SpineWidgetController already initialized. A controller can only be used with one widget.");
+    if (initialized)
+      throw Exception("SpineWidgetController already initialized. A controller can only be used with one widget.");
     _atlas = atlas;
     _data = data;
     _drawable = drawable;
@@ -28,18 +29,17 @@ class SpineWidgetController {
   }
 
   Atlas? get atlas => _atlas;
+
   SkeletonData? get skeletonData => _data;
+
   AnimationStateData? get animationStateData => _drawable?.animationStateData;
+
   AnimationState? get animationState => _drawable?.animationState;
+
   Skeleton? get skeleton => _drawable?.skeleton;
 }
 
-enum AssetType {
-  Asset,
-  File,
-  Http,
-  Raw
-}
+enum AssetType { Asset, File, Http, Raw }
 
 class SpineWidget extends StatefulWidget {
   final String? skeletonFile;
@@ -49,10 +49,25 @@ class SpineWidget extends StatefulWidget {
   final SpineWidgetController controller;
   final AssetType _assetType;
 
-  const SpineWidget.asset(this.skeletonFile, this.atlasFile, this.controller, {super.key}): _assetType = AssetType.Asset, atlas = null, skeletonData = null;
-  const SpineWidget.file(this.skeletonFile, this.atlasFile, this.controller, {super.key}): _assetType = AssetType.File, atlas = null, skeletonData = null;
-  const SpineWidget.http(this.skeletonFile, this.atlasFile, this.controller, {super.key}): _assetType = AssetType.Http, atlas = null, skeletonData = null;
-  const SpineWidget.raw(this.skeletonData, this.atlas, this.controller, {super.key}): _assetType = AssetType.Raw, atlasFile = null, skeletonFile = null;
+  const SpineWidget.asset(this.skeletonFile, this.atlasFile, this.controller, {super.key})
+      : _assetType = AssetType.Asset,
+        atlas = null,
+        skeletonData = null;
+
+  const SpineWidget.file(this.skeletonFile, this.atlasFile, this.controller, {super.key})
+      : _assetType = AssetType.File,
+        atlas = null,
+        skeletonData = null;
+
+  const SpineWidget.http(this.skeletonFile, this.atlasFile, this.controller, {super.key})
+      : _assetType = AssetType.Http,
+        atlas = null,
+        skeletonData = null;
+
+  const SpineWidget.raw(this.skeletonData, this.atlas, this.controller, {super.key})
+      : _assetType = AssetType.Raw,
+        atlasFile = null,
+        skeletonFile = null;
 
   @override
   State<SpineWidget> createState() => _SpineWidgetState();
@@ -84,34 +99,27 @@ class _SpineWidgetState extends State<SpineWidget> {
       case AssetType.Asset:
         atlas = await Atlas.fromAsset(rootBundle, atlasFile);
         skeletonData = skeletonFile.endsWith(".json")
-            ? SkeletonData.fromJson(
-            atlas, await rootBundle.loadString(skeletonFile))
-            : SkeletonData.fromBinary(
-            atlas, (await rootBundle.load(skeletonFile)).buffer.asUint8List());
+            ? SkeletonData.fromJson(atlas, await rootBundle.loadString(skeletonFile))
+            : SkeletonData.fromBinary(atlas, (await rootBundle.load(skeletonFile)).buffer.asUint8List());
         break;
       case AssetType.File:
         atlas = await Atlas.fromFile(atlasFile);
         skeletonData = skeletonFile.endsWith(".json")
-            ? SkeletonData.fromJson(
-            atlas, utf8.decode(await File(skeletonFile).readAsBytes()))
-            : SkeletonData.fromBinary(
-            atlas, await File(skeletonFile).readAsBytes());
+            ? SkeletonData.fromJson(atlas, utf8.decode(await File(skeletonFile).readAsBytes()))
+            : SkeletonData.fromBinary(atlas, await File(skeletonFile).readAsBytes());
         break;
       case AssetType.Http:
         atlas = await Atlas.fromUrl(atlasFile);
         skeletonData = skeletonFile.endsWith(".json")
-            ? SkeletonData.fromJson(
-            atlas, utf8.decode((await http.get(Uri.parse(skeletonFile))).bodyBytes))
-            : SkeletonData.fromBinary(
-            atlas, (await http.get(Uri.parse(skeletonFile))).bodyBytes);
+            ? SkeletonData.fromJson(atlas, utf8.decode((await http.get(Uri.parse(skeletonFile))).bodyBytes))
+            : SkeletonData.fromBinary(atlas, (await http.get(Uri.parse(skeletonFile))).bodyBytes);
         break;
     }
 
     skeletonDrawable = SkeletonDrawable(atlas, skeletonData, true);
     widget.controller._initialize(atlas, skeletonData, skeletonDrawable!);
     skeletonDrawable?.update(0);
-    setState(() {
-    });
+    setState(() {});
   }
 
   @override
@@ -144,8 +152,7 @@ class _SpineRenderObjectWidget extends LeafRenderObjectWidget {
   }
 
   @override
-  void updateRenderObject(BuildContext context,
-      covariant _SpineRenderObject renderObject) {
+  void updateRenderObject(BuildContext context, covariant _SpineRenderObject renderObject) {
     renderObject.skeletonDrawable = _skeletonDrawable;
   }
 }
@@ -210,8 +217,8 @@ class _SpineRenderObject extends RenderBox {
 
     final commands = _skeletonDrawable.render();
     for (final cmd in commands) {
-      canvas.drawVertices(cmd.vertices, rendering.BlendMode.modulate,
-          _skeletonDrawable.atlas.atlasPagePaints[cmd.atlasPageIndex]);
+      canvas.drawVertices(
+          cmd.vertices, rendering.BlendMode.modulate, _skeletonDrawable.atlas.atlasPagePaints[cmd.atlasPageIndex]);
     }
 
     canvas.restore();

@@ -123,7 +123,7 @@ namespace spine {
 				uvs = &regionAttachment->getUVs();
 				indices = &quadIndices;
 				indicesCount = 6;
-				texture = (Texture *)regionAttachment->getRegion()->rendererObject;
+				texture = (Texture *) regionAttachment->getRegion()->rendererObject;
 
 			} else if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
 				MeshAttachment *mesh = (MeshAttachment *) attachment;
@@ -136,7 +136,7 @@ namespace spine {
 				}
 
 				worldVertices.setSize(mesh->getWorldVerticesLength(), 0);
-				texture = (Texture *)mesh->getRegion()->rendererObject;
+				texture = (Texture *) mesh->getRegion()->rendererObject;
 				mesh->computeWorldVertices(slot, 0, mesh->getWorldVerticesLength(), worldVertices.buffer(), 0, 2);
 				uvs = &mesh->getUVs();
 				indices = &mesh->getTriangles();

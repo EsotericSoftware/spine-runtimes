@@ -220,7 +220,7 @@ EventQueueEntry EventQueue::newEventQueueEntry(EventType eventType, TrackEntry *
 }
 
 EventQueue::EventQueue(AnimationState &state) : _state(state),
-																				  _drainDisabled(false) {
+												_drainDisabled(false) {
 }
 
 EventQueue::~EventQueue() {
