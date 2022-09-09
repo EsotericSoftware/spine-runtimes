@@ -43,6 +43,10 @@
 #define CONFIGURABLE_ENTER_PLAY_MODE
 #endif
 
+#if UNITY_2020_1_OR_NEWER
+#define REVERT_HAS_OVERLOADS
+#endif
+
 #define SPINE_OPTIONAL_RENDEROVERRIDE
 #define SPINE_OPTIONAL_MATERIALOVERRIDE
 
@@ -100,7 +104,11 @@ namespace Spine.Unity {
 						var objectOverrides = UnityEditor.PrefabUtility.GetObjectOverrides(instanceRoot);
 						foreach (UnityEditor.SceneManagement.ObjectOverride objectOverride in objectOverrides) {
 							if (objectOverride.instanceObject == meshFilter) {
+#if REVERT_HAS_OVERLOADS
+								objectOverride.Revert(UnityEditor.InteractionMode.AutomatedAction);
+#else
 								objectOverride.Revert();
+#endif
 								break;
 							}
 						}
