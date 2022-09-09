@@ -73,7 +73,7 @@ namespace spine {
 		TextureWrap_Repeat
 	};
 
-	class SP_API AtlasPage : public SpineObject, public HasRendererObject {
+	class SP_API AtlasPage : public SpineObject {
 	public:
 		String name;
 		String texturePath;
@@ -85,11 +85,12 @@ namespace spine {
 		int width, height;
 		bool pma;
         int index;
+        void *texture;
 
 		explicit AtlasPage(const String &inName) : name(inName), format(Format_RGBA8888),
 												   minFilter(TextureFilter_Nearest),
 												   magFilter(TextureFilter_Nearest), uWrap(TextureWrap_ClampToEdge),
-												   vWrap(TextureWrap_ClampToEdge), width(0), height(0), pma(false), index(0) {
+												   vWrap(TextureWrap_ClampToEdge), width(0), height(0), pma(false), index(0), texture(NULL) {
 		}
 	};
 

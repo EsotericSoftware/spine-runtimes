@@ -211,16 +211,15 @@ EventQueueEntry::EventQueueEntry(EventType eventType, TrackEntry *trackEntry, Ev
 																							  _event(event) {
 }
 
-EventQueue *EventQueue::newEventQueue(AnimationState &state, Pool<TrackEntry> &trackEntryPool) {
-	return new (__FILE__, __LINE__) EventQueue(state, trackEntryPool);
+EventQueue *EventQueue::newEventQueue(AnimationState &state) {
+	return new (__FILE__, __LINE__) EventQueue(state);
 }
 
 EventQueueEntry EventQueue::newEventQueueEntry(EventType eventType, TrackEntry *entry, Event *event) {
 	return EventQueueEntry(eventType, entry, event);
 }
 
-EventQueue::EventQueue(AnimationState &state, Pool<TrackEntry> &trackEntryPool) : _state(state),
-																				  _trackEntryPool(trackEntryPool),
+EventQueue::EventQueue(AnimationState &state) : _state(state),
 																				  _drainDisabled(false) {
 }
 
@@ -314,7 +313,7 @@ void EventQueue::drain() {
 }
 
 AnimationState::AnimationState(AnimationStateData *data) : _data(data),
-														   _queue(EventQueue::newEventQueue(*this, _trackEntryPool)),
+														   _queue(EventQueue::newEventQueue(*this)),
 														   _animationsChanged(false),
 														   _listener(dummyOnAnimationEventFunc),
 														   _listenerObject(NULL),

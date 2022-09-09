@@ -311,14 +311,13 @@ namespace spine {
 	private:
 		Vector<EventQueueEntry> _eventQueueEntries;
 		AnimationState &_state;
-		Pool<TrackEntry> &_trackEntryPool;
 		bool _drainDisabled;
 
-		static EventQueue *newEventQueue(AnimationState &state, Pool<TrackEntry> &trackEntryPool);
+		static EventQueue *newEventQueue(AnimationState &state);
 
 		static EventQueueEntry newEventQueueEntry(EventType eventType, TrackEntry *entry, Event *event = NULL);
 
-		EventQueue(AnimationState &state, Pool<TrackEntry> &trackEntryPool);
+		EventQueue(AnimationState &state);
 
 		~EventQueue();
 

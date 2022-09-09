@@ -63,7 +63,6 @@ namespace spine {
 		} else {
 			AtlasRegion *region = findRegion(path);
 			if (!region) return NULL;
-			attachment->setRendererObject(region);
 			attachment->setRegion(region);
 		}
 		return attachment;
@@ -78,7 +77,6 @@ namespace spine {
 		} else {
 			AtlasRegion *region = findRegion(path);
 			if (!region) return NULL;
-			attachment->setRendererObject(region);
 			attachment->setRegion(region);
 		}
 		return attachment;
