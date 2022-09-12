@@ -192,7 +192,6 @@ void Bone::updateWorldTransform(float x, float y, float rotation, float scaleX, 
 			_b = za * lb + zb * ld;
 			_c = zc * la + zd * lc;
 			_d = zc * lb + zd * ld;
-			break;
 		}
 	}
 	_a *= _skeleton.getScaleX();
