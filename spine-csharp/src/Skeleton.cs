@@ -42,7 +42,7 @@ namespace Spine {
 		internal ExposedList<IUpdatable> updateCache = new ExposedList<IUpdatable>();
 		internal Skin skin;
 		internal float r = 1, g = 1, b = 1, a = 1;
-		private float scaleX = 1, scaleY = 1;
+		internal float scaleX = 1, scaleY = 1;
 		internal float x, y;
 
 		public SkeletonData Data { get { return data; } }

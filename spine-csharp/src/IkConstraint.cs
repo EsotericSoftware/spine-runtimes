@@ -173,10 +173,10 @@ namespace Spine {
 				break;
 			case TransformMode.NoRotationOrReflection: {
 				float s = Math.Abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
-				float sa = pa / bone.skeleton.ScaleX;
-				float sc = pc / bone.skeleton.ScaleY;
-				pb = -sc * s * bone.skeleton.ScaleX;
-				pd = sa * s * bone.skeleton.ScaleY;
+				float sa = pa / bone.skeleton.scaleX;
+				float sc = pc / bone.skeleton.scaleY;
+				pb = -sc * s * bone.skeleton.scaleX;
+				pd = sa * s * bone.skeleton.scaleY;
 				rotationIK += (float)Math.Atan2(sc, sa) * MathUtils.RadDeg;
 				goto default; // Fall through.
 			}
