@@ -309,23 +309,62 @@ export class Bone implements Updatable {
 		}
 		let pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d;
 		let pid = 1 / (pa * pd - pb * pc);
+		let ia = pd * pid, ib = pb * pid, ic = pc * pid, id = pa * pid;
 		let dx = this.worldX - parent.worldX, dy = this.worldY - parent.worldY;
-		this.ax = (dx * pd * pid - dy * pb * pid);
-		this.ay = (dy * pa * pid - dx * pc * pid);
-		let ia = pid * pd;
-		let id = pid * pa;
-		let ib = pid * pb;
-		let ic = pid * pc;
-		let ra = ia * this.a - ib * this.c;
-		let rb = ia * this.b - ib * this.d;
-		let rc = id * this.c - ic * this.a;
-		let rd = id * this.d - ic * this.b;
+		this.ax = (dx * ia - dy * ib);
+		this.ay = (dy * id - dx * ic);
+
+		let ra, rb, rc, rd;
+		if (this.data.transformMode == TransformMode.OnlyTranslation) {
+			ra = this.a;
+			rb = this.b;
+			rc = this.c;
+			rd = this.d;
+		} else {
+			switch (this.data.transformMode) {
+				case TransformMode.NoRotationOrReflection: {
+					let s = Math.abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
+					let sa = pa / this.skeleton.scaleX;
+					let sc = pc / this.skeleton.scaleY;
+					pb = -sc * s * this.skeleton.scaleX;
+					pd = sa * s * this.skeleton.scaleY;
+					pid = 1 / (pa * pd - pb * pc);
+					ia = pd * pid;
+					ib = pb * pid;
+					break;
+				}
+				case TransformMode.NoScale:
+				case TransformMode.NoScaleOrReflection:
+					let cos = MathUtils.cosDeg(this.rotation), sin = MathUtils.sinDeg(this.rotation);
+					pa = (pa * cos + pb * sin) / this.skeleton.scaleX;
+					pc = (pc * cos + pd * sin) / this.skeleton.scaleY;
+					let s = Math.sqrt(pa * pa + pc * pc);
+					if (s > 0.00001) s = 1 / s;
+					pa *= s;
+					pc *= s;
+					s = Math.sqrt(pa * pa + pc * pc);
+					if (this.data.transformMode == TransformMode.NoScale && pid < 0 != (this.skeleton.scaleX < 0 != this.skeleton.scaleY < 0)) s = -s;
+					let r = MathUtils.PI / 2 + Math.atan2(pc, pa);
+					pb = Math.cos(r) * s;
+					pd = Math.sin(r) * s;
+					pid = 1 / (pa * pd - pb * pc);
+					ia = pd * pid;
+					ib = pb * pid;
+					ic = pc * pid;
+					id = pa * pid;
+			}
+			ra = ia * this.a - ib * this.c;
+			rb = ia * this.b - ib * this.d;
+			rc = id * this.c - ic * this.a;
+			rd = id * this.d - ic * this.b;
+		}
+
 		this.ashearX = 0;
 		this.ascaleX = Math.sqrt(ra * ra + rc * rc);
 		if (this.ascaleX > 0.0001) {
 			let det = ra * rd - rb * rc;
 			this.ascaleY = det / this.ascaleX;
-			this.ashearY = Math.atan2(ra * rb + rc * rd, det) * MathUtils.radDeg;
+			this.ashearY = -Math.atan2(ra * rb + rc * rd, det) * MathUtils.radDeg;
 			this.arotation = Math.atan2(rc, ra) * MathUtils.radDeg;
 		} else {
 			this.ascaleX = 0;
