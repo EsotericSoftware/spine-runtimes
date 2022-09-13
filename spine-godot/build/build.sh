@@ -63,6 +63,7 @@ else
 	scons $target compiledb=yes custom_modules="../spine_godot" --jobs=$cpus	
 	if [ -f "bin/godot.x11.opt.tools.64" ]; then
 		strip bin/godot.x11.opt.tools.64
+		chmod a+x bin/godot.x11.opt.tools.64
 	fi
 fi
 popd

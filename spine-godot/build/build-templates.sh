@@ -114,8 +114,10 @@ elif [ "$platform" = "linux" ]; then
 	# generates linux_x11_64_release, linux_x11_64_debug
 	scons platform=x11 tools=no target=release bits=64 custom_modules="../spine_godot" --jobs=$cpus
 	scons platform=x11 tools=no target=release_debug bits=64 custom_modules="../spine_godot" --jobs=$cpus
-	strip bin/godot.x11.opt.64
+	strip bin/godot.x11.opt.64	
 	strip bin/godot.x11.opt.debug.64
+	chmod a+x bin/godot.x11.opt.64
+	chmod a+x bin/godot.x11.opt.debug.64
 	cp bin/godot.x11.opt.64 bin/linux_x11_64_release
 	cp bin/godot.x11.opt.debug.64 bin/linux_x11_64_debug
 else
