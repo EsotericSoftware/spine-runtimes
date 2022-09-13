@@ -352,6 +352,11 @@ public class SkeletonViewer extends ApplicationAdapter {
 		if (!ui.minimizeButton.isChecked()) ui.window.setHeight(height / uiScale + 8);
 	}
 
+	public void dispose () {
+		super.dispose();
+		Runtime.getRuntime().exit(0);
+	}
+
 	static public void main (String[] args) throws Exception {
 		try { // Try to turn off illegal access log messages.
 			Class loggerClass = Class.forName("jdk.internal.module.IllegalAccessLogger");
