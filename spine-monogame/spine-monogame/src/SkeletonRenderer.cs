@@ -123,18 +123,16 @@ namespace Spine {
 				if (attachment is RegionAttachment) {
 					RegionAttachment regionAttachment = (RegionAttachment)attachment;
 					attachmentColorR = regionAttachment.R; attachmentColorG = regionAttachment.G; attachmentColorB = regionAttachment.B; attachmentColorA = regionAttachment.A;
-					AtlasRegion region = (AtlasRegion)regionAttachment.Region;
-					textureObject = region.page.rendererObject;
-					verticesCount = 4;
 					regionAttachment.ComputeWorldVertices(slot, vertices, 0, 2);
+					verticesCount = 4;
 					indicesCount = 6;
 					indices = quadTriangles;
 					uvs = regionAttachment.UVs;
+					AtlasRegion region = (AtlasRegion)regionAttachment.Region;
+					textureObject = region.page.rendererObject;
 				} else if (attachment is MeshAttachment) {
 					MeshAttachment mesh = (MeshAttachment)attachment;
 					attachmentColorR = mesh.R; attachmentColorG = mesh.G; attachmentColorB = mesh.B; attachmentColorA = mesh.A;
-					AtlasRegion region = (AtlasRegion)mesh.Region;
-					textureObject = region.page.rendererObject;
 					int vertexCount = mesh.WorldVerticesLength;
 					if (vertices.Length < vertexCount) vertices = new float[vertexCount];
 					verticesCount = vertexCount >> 1;
@@ -142,6 +140,8 @@ namespace Spine {
 					indicesCount = mesh.Triangles.Length;
 					indices = mesh.Triangles;
 					uvs = mesh.UVs;
+					AtlasRegion region = (AtlasRegion)mesh.Region;
+					textureObject = region.page.rendererObject;
 				} else if (attachment is ClippingAttachment) {
 					ClippingAttachment clip = (ClippingAttachment)attachment;
 					clipper.ClipStart(slot, clip);
