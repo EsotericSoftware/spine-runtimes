@@ -60,7 +60,7 @@ namespace Spine.Unity.Editor {
 			}
 
 			public static void ReloadAllActiveSkeletonsEditMode () {
-
+				if (!Preferences.reloadAfterPlayMode) return;
 				if (EditorApplication.isPaused) return;
 				if (EditorApplication.isPlaying) return;
 				if (EditorApplication.isCompiling) return;
