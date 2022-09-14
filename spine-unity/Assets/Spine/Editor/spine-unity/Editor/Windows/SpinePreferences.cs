@@ -80,6 +80,9 @@ namespace Spine.Unity.Editor {
 		internal const bool DEFAULT_SHOW_HIERARCHY_ICONS = true;
 		public bool showHierarchyIcons = DEFAULT_SHOW_HIERARCHY_ICONS;
 
+		internal const bool DEFAULT_RELOAD_AFTER_PLAYMODE = true;
+		public bool reloadAfterPlayMode = DEFAULT_RELOAD_AFTER_PLAYMODE;
+
 		internal const bool DEFAULT_SET_TEXTUREIMPORTER_SETTINGS = true;
 		public bool setTextureImporterSettings = DEFAULT_SET_TEXTUREIMPORTER_SETTINGS;
 
@@ -258,6 +261,7 @@ namespace Spine.Unity.Editor {
 				}
 
 				EditorGUILayout.PropertyField(settings.FindProperty("autoReloadSceneSkeletons"), new GUIContent("Auto-reload scene components", "Reloads Skeleton components in the scene whenever their SkeletonDataAsset is modified. This makes it so changes in the SkeletonData asset inspector are immediately reflected. This may be slow when your scenes have large numbers of SkeletonRenderers or SkeletonGraphic."));
+				EditorGUILayout.PropertyField(settings.FindProperty("reloadAfterPlayMode"), new GUIContent("Reload SkeletonData after Play", "When enabled, the shared SkeletonData of all skeletons in the active scene is reloaded (from the .json or .skel.bytes file) after exiting play-mode. This may add undesired delays, but prevents (accidental) modifications to the shared SkeletonData during play-mode carrying over its effect into subsequent plays."));
 
 				EditorGUILayout.Separator();
 				EditorGUILayout.LabelField("Auto-Import Settings", EditorStyles.boldLabel);
