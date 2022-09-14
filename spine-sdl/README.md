@@ -24,7 +24,7 @@ spine-sdl supports all Spine features except premultiplied alpha, screen blend m
 1. Create a new SDL project. See the [SDL documentation](https://wiki.libsdl.org/FrontPage) or have a look at the example in this repository.
 2. Download the Spine Runtimes source using git (`git clone https://github.com/esotericsoftware/spine-runtimes`) or download it as a zip via the download button above.
 3. If you are using C, add the sources from `spine-c/spine-c/src/spine` and `spine-sdl/src/spine-sdl-c.c` to your project, and add the folder `spine-c/spine-c/include` and `spine-sdl/src/spine-sdl-c.h` to your header search path. Note that includes are specified as `#inclue <spine/file.h>`, so the `spine` directory cannot be omitted when copying the source files.
-3. If you are using C++, add the sources from `spine-cpp/spine-cpp/src/spine` and `spine-sdl/src/spine-sdl-cpp.cpp` to your project, and add the folder `spine-cpp/spine-cpp/include` and `spine-sdl/src/spine-sdl-cpp.h` to your header search path. Note that includes are specified as `#inclue <spine/file.h>`, so the `spine` directory cannot be omitted when copying the source files.
+3. If you are using C++, add the sources from `spine-cpp/spine-cpp/src/spine` and `spine-sdl/src/spine-sdl-cpp.cpp` to your project, and add the folder `spine-cpp/spine-cpp/include` and `spine-sdl/src/spine-sdl-cpp.h` to your header search path. Note that includes are specified as `#include <spine/file.h>`, so the `spine` directory cannot be omitted when copying the source files.
 
 See the [Spine Runtimes documentation](http://esotericsoftware.com/spine-documentation#runtimesTitle) on how to use the APIs or check out the Spine SDL example in this repository.
 

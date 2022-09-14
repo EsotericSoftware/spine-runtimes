@@ -114,8 +114,8 @@ void SkeletonDrawable::draw(SDL_Renderer *renderer) {
 			}
 
 			worldVertices.setSize(mesh->getWorldVerticesLength(), 0);
-			texture = (SDL_Texture *) ((AtlasRegion *) mesh->getRendererObject())->page->getRendererObject();
 			mesh->computeWorldVertices(slot, 0, mesh->getWorldVerticesLength(), worldVertices.buffer(), 0, 2);
+			texture = (SDL_Texture *) ((AtlasRegion *) mesh->getRendererObject())->page->getRendererObject();
 			verticesCount = mesh->getWorldVerticesLength() >> 1;
 			uvs = &mesh->getUVs();
 			indices = &mesh->getTriangles();
