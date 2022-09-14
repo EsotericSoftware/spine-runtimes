@@ -129,7 +129,7 @@ static int readVarint(_dataInput *input, int /*bool*/ optimizePositive) {
 		}
 	}
 	if (!optimizePositive)
-        value = ((unsigned int) value >> 1) ^ (~(value & 1));
+		value = ((unsigned int) value >> 1) ^ (~(value & 1));
 	return (int) value;
 }
 
