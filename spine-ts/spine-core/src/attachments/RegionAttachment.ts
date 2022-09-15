@@ -131,14 +131,14 @@ export class RegionAttachment extends Attachment implements HasTextureRegion {
 		offset[7] = localYCos + localX2Sin;
 
 		if (region.degrees == 90) {
+			uvs[0] = region.u2;
+			uvs[1] = region.v2;
 			uvs[2] = region.u;
 			uvs[3] = region.v2;
 			uvs[4] = region.u;
 			uvs[5] = region.v;
 			uvs[6] = region.u2;
 			uvs[7] = region.v;
-			uvs[0] = region.u2;
-			uvs[1] = region.v2;
 		} else {
 			uvs[0] = region.u;
 			uvs[1] = region.v2;
