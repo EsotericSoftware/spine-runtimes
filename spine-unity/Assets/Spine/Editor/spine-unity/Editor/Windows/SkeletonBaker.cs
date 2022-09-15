@@ -513,9 +513,9 @@ namespace Spine.Unity.Editor {
 
 			bone.UpdateWorldTransform();
 
-			Vector2[] uvs = ExtractUV(attachment.UVs);
 			float[] floatVerts = new float[8];
 			attachment.ComputeWorldVertices(slot, floatVerts, 0);
+			Vector2[] uvs = ExtractUV(attachment.UVs);
 			Vector3[] verts = ExtractVerts(floatVerts);
 
 			//unrotate verts now that they're centered
@@ -550,9 +550,9 @@ namespace Spine.Unity.Editor {
 			slot.Bone.Y = 0;
 			slot.Bone.UpdateWorldTransform();
 
-			Vector2[] uvs = ExtractUV(attachment.UVs);
 			float[] floatVerts = new float[attachment.WorldVerticesLength];
 			attachment.ComputeWorldVertices(slot, floatVerts);
+			Vector2[] uvs = ExtractUV(attachment.UVs);
 			Vector3[] verts = ExtractVerts(floatVerts);
 
 			int[] triangles = attachment.Triangles;
@@ -617,7 +617,6 @@ namespace Spine.Unity.Editor {
 
 			float[] floatVerts = new float[attachment.WorldVerticesLength];
 			attachment.ComputeWorldVertices(skeleton.Slots.Items[slotIndex], floatVerts);
-
 			Vector2[] uvs = ExtractUV(attachment.UVs);
 			Vector3[] verts = ExtractVerts(floatVerts);
 
