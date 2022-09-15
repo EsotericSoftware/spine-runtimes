@@ -68,11 +68,13 @@ Execute the following on the command line:
 
 ```
 cd spine-runtimes/spine-cocos2dx/example
-mkdir build-macos && cmake . -GXcode -Bbuild-macos
+mkdir build-macos && cmake . -GXcode -Bbuild-macos -DCMAKE_OSX_ARCHITECTURES=x86_64
 open build-macos/spine-cocos2dx-example.xcodeproj
 ```
 
 This will generate an Xcode project in `build-macos/spine-cocos2dx-example.xcodeproj` and open it in Xcode. To build and run the example, select the `spine-cocos2dx-example` scheme and press `CMD + R`.
+
+> **NOTE:** Passing `-DCMAKE_OSX_ARCHITECTURES=x86_64` to CMake is currently required, as Cocos2d-X only provides prebuilt x86_64 binaries for its external dependencies.
 
 ### iOS
 Execute the following on the command line:
