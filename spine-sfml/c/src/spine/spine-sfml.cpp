@@ -211,12 +211,12 @@ namespace spine {
 				}
 
 				if (mesh->super.worldVerticesLength > SPINE_MESH_VERTEX_COUNT_MAX) continue;
-				texture = (Texture *) ((spAtlasRegion *) mesh->rendererObject)->page->rendererObject;
 				spVertexAttachment_computeWorldVertices(SUPER(mesh), slot, 0, mesh->super.worldVerticesLength, worldVertices, 0, 2);
 				verticesCount = mesh->super.worldVerticesLength >> 1;
 				uvs = mesh->uvs;
 				indices = mesh->triangles;
 				indicesCount = mesh->trianglesCount;
+                texture = (Texture *) ((spAtlasRegion *) mesh->rendererObject)->page->rendererObject;
 
 			} else if (attachment->type == SP_ATTACHMENT_CLIPPING) {
 				spClippingAttachment *clip = (spClippingAttachment *) slot->attachment;

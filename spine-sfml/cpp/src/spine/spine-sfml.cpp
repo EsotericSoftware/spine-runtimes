@@ -103,7 +103,6 @@ namespace spine {
 			}
 
 			Vector<float> *vertices = &worldVertices;
-			int verticesCount = 0;
 			Vector<float> *uvs = NULL;
 			Vector<unsigned short> *indices = NULL;
 			int indicesCount = 0;
@@ -121,7 +120,6 @@ namespace spine {
 
 				worldVertices.setSize(8, 0);
 				regionAttachment->computeWorldVertices(slot, worldVertices, 0, 2);
-				verticesCount = 4;
 				uvs = &regionAttachment->getUVs();
 				indices = &quadIndices;
 				indicesCount = 6;
@@ -138,12 +136,11 @@ namespace spine {
 				}
 
 				worldVertices.setSize(mesh->getWorldVerticesLength(), 0);
-				texture = (Texture *) ((AtlasRegion *) mesh->getRendererObject())->page->getRendererObject();
-				mesh->computeWorldVertices(slot, 0, mesh->getWorldVerticesLength(), worldVertices.buffer(), 0, 2);
-				verticesCount = mesh->getWorldVerticesLength() >> 1;
+                mesh->computeWorldVertices(slot, 0, mesh->getWorldVerticesLength(), worldVertices.buffer(), 0, 2);
 				uvs = &mesh->getUVs();
 				indices = &mesh->getTriangles();
 				indicesCount = mesh->getTriangles().size();
+                texture = (Texture *) ((AtlasRegion *) mesh->getRendererObject())->page->getRendererObject();
 
 			} else if (attachment->getRTTI().isExactly(ClippingAttachment::rtti)) {
 				ClippingAttachment *clip = (ClippingAttachment *) slot.getAttachment();
@@ -216,7 +213,6 @@ namespace spine {
 			if (clipper.isClipping()) {
 				clipper.clipTriangles(worldVertices, *indices, *uvs, 2);
 				vertices = &clipper.getClippedVertices();
-				verticesCount = clipper.getClippedVertices().size() >> 1;
 				uvs = &clipper.getClippedUVs();
 				indices = &clipper.getClippedTriangles();
 				indicesCount = clipper.getClippedTriangles().size();
