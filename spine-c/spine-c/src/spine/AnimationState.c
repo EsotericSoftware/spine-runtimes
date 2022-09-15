@@ -595,7 +595,7 @@ _spAnimationState_setAttachment(spAnimationState *self, spSkeleton *skeleton, sp
 
 /* @param target After the first and before the last entry. */
 static int binarySearch1(float *values, int valuesLength, float target) {
-    int i;
+	int i;
 	for (i = 1; i < valuesLength; i++) {
 		if (values[i] > target) return (int) (i - 1);
 	}

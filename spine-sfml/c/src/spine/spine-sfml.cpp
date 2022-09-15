@@ -216,7 +216,7 @@ namespace spine {
 				uvs = mesh->uvs;
 				indices = mesh->triangles;
 				indicesCount = mesh->trianglesCount;
-                texture = (Texture *) ((spAtlasRegion *) mesh->rendererObject)->page->rendererObject;
+				texture = (Texture *) ((spAtlasRegion *) mesh->rendererObject)->page->rendererObject;
 
 			} else if (attachment->type == SP_ATTACHMENT_CLIPPING) {
 				spClippingAttachment *clip = (spClippingAttachment *) slot->attachment;

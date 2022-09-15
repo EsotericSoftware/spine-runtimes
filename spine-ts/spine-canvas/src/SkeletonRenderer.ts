@@ -66,7 +66,7 @@ export class SkeletonRenderer {
 			if (!bone.active) continue;
 
 			let attachment = slot.getAttachment();
-			if (!(attachment instanceof RegionAttachment)) continue;			
+			if (!(attachment instanceof RegionAttachment)) continue;
 			attachment.computeWorldVertices(slot, worldVertices, 0, 2);
 			let region: TextureAtlasRegion = <TextureAtlasRegion>attachment.region;
 			let image: HTMLImageElement = (<CanvasTexture>region.page.texture).getImage() as HTMLImageElement;

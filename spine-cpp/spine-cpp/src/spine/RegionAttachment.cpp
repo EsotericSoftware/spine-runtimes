@@ -68,17 +68,17 @@ RegionAttachment::~RegionAttachment() {
 }
 
 void RegionAttachment::updateRegion() {
-    if (_region == NULL) {
-        _uvs[BLX] = 0;
-        _uvs[BLY] = 0;
-        _uvs[ULX] = 0;
-        _uvs[ULY] = 1;
-        _uvs[URX] = 1;
-        _uvs[URY] = 1;
-        _uvs[BRX] = 1;
-        _uvs[BRY] = 0;
-        return;
-    }
+	if (_region == NULL) {
+		_uvs[BLX] = 0;
+		_uvs[BLY] = 0;
+		_uvs[ULX] = 0;
+		_uvs[ULY] = 1;
+		_uvs[URX] = 1;
+		_uvs[URY] = 1;
+		_uvs[BRX] = 1;
+		_uvs[BRY] = 0;
+		return;
+	}
 
 	float regionScaleX = _width / _region->originalWidth * _scaleX;
 	float regionScaleY = _height / _region->originalHeight * _scaleY;

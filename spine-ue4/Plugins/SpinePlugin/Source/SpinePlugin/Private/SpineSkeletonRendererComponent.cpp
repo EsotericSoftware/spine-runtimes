@@ -235,7 +235,7 @@ void USpineSkeletonRendererComponent::UpdateMesh(Skeleton *Skeleton) {
 				continue;
 			}
 
-			attachmentColor.set(regionAttachment->getColor());			
+			attachmentColor.set(regionAttachment->getColor());
 			regionAttachment->computeWorldVertices(*slot, *attachmentVertices, 0, 2);
 			attachmentAtlasRegion = (AtlasRegion *) regionAttachment->getRendererObject();
 			attachmentIndices = quadIndices;
@@ -251,7 +251,7 @@ void USpineSkeletonRendererComponent::UpdateMesh(Skeleton *Skeleton) {
 				continue;
 			}
 
-			attachmentColor.set(mesh->getColor());			
+			attachmentColor.set(mesh->getColor());
 			mesh->computeWorldVertices(*slot, 0, mesh->getWorldVerticesLength(), attachmentVertices->buffer(), 0, 2);
 			attachmentAtlasRegion = (AtlasRegion *) mesh->getRendererObject();
 			attachmentIndices = mesh->getTriangles().buffer();

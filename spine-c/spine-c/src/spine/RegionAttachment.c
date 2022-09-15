@@ -79,21 +79,21 @@ spRegionAttachment *spRegionAttachment_create(const char *name) {
 }
 
 void spRegionAttachment_updateRegion(spRegionAttachment *self) {
-    float regionScaleX, regionScaleY, localX, localY, localX2, localY2;
-    float radians, cosine, sine;
-    float localXCos, localXSin, localYCos, localYSin, localX2Cos, localX2Sin, localY2Cos, localY2Sin;
+	float regionScaleX, regionScaleY, localX, localY, localX2, localY2;
+	float radians, cosine, sine;
+	float localXCos, localXSin, localYCos, localYSin, localX2Cos, localX2Sin, localY2Cos, localY2Sin;
 
-    if (self->region == NULL) {
-        self->uvs[0] = 0;
-        self->uvs[1] = 0;
-        self->uvs[2] = 1;
-        self->uvs[3] = 1;
-        self->uvs[4] = 1;
-        self->uvs[5] = 0;
-        self->uvs[6] = 0;
-        self->uvs[7] = 0;
-        return;
-    }
+	if (self->region == NULL) {
+		self->uvs[0] = 0;
+		self->uvs[1] = 0;
+		self->uvs[2] = 1;
+		self->uvs[3] = 1;
+		self->uvs[4] = 1;
+		self->uvs[5] = 0;
+		self->uvs[6] = 0;
+		self->uvs[7] = 0;
+		return;
+	}
 
 	regionScaleX = self->width / self->region->originalWidth * self->scaleX;
 	regionScaleY = self->height / self->region->originalHeight * self->scaleY;
