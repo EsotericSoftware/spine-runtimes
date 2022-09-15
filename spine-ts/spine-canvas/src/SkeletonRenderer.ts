@@ -30,6 +30,8 @@
 import { Utils, Color, Skeleton, RegionAttachment, TextureAtlasRegion, BlendMode, MeshAttachment, Slot } from "@esotericsoftware/spine-core";
 import { CanvasTexture } from "./CanvasTexture";
 
+const worldVertices = Utils.newFloatArray(8);
+
 export class SkeletonRenderer {
 	static QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
 	static VERTEX_SIZE = 2 + 2 + 4;
@@ -65,6 +67,7 @@ export class SkeletonRenderer {
 
 			let attachment = slot.getAttachment();
 			if (!(attachment instanceof RegionAttachment)) continue;
+			attachment.computeWorldVertices(slot, worldVertices, 0, 2);
 			let region: TextureAtlasRegion = <TextureAtlasRegion>attachment.region;
 			let image: HTMLImageElement = (<CanvasTexture>region.page.texture).getImage() as HTMLImageElement;
 

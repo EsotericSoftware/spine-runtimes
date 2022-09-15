@@ -84,7 +84,7 @@ public class RegionAttachment extends Attachment implements HasTextureRegion {
 		if (region == null) {
 			uvs[BLX] = 0;
 			uvs[BLY] = 0;
-			uvs[ULX] = 1;
+			uvs[ULX] = 0;
 			uvs[ULY] = 1;
 			uvs[URX] = 1;
 			uvs[URY] = 1;

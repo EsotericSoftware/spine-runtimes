@@ -136,11 +136,11 @@ namespace spine {
 				}
 
 				worldVertices.setSize(mesh->getWorldVerticesLength(), 0);
-				texture = (Texture *) mesh->getRegion()->rendererObject;
 				mesh->computeWorldVertices(slot, 0, mesh->getWorldVerticesLength(), worldVertices.buffer(), 0, 2);
 				uvs = &mesh->getUVs();
 				indices = &mesh->getTriangles();
 				indicesCount = mesh->getTriangles().size();
+				texture = (Texture *) ((AtlasRegion *) mesh->getRendererObject())->page->getRendererObject();
 
 			} else if (attachment->getRTTI().isExactly(ClippingAttachment::rtti)) {
 				ClippingAttachment *clip = (ClippingAttachment *) slot.getAttachment();

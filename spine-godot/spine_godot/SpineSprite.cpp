@@ -552,10 +552,10 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> skeleton_ref) {
 
 		if (attachment->getRTTI().isExactly(spine::RegionAttachment::rtti)) {
 			auto *region = (spine::RegionAttachment *) attachment;
-			renderer_object = (SpineRendererObject *) region->getRegion()->rendererObject;
 
 			vertices->setSize(8, 0);
 			region->computeWorldVertices(*slot, *vertices, 0);
+			renderer_object = (SpineRendererObject *) ((spine::AtlasRegion *) region->getRendererObject())->page->getRendererObject();
 			uvs = &region->getUVs();
 			indices = &quad_indices;
 
@@ -566,10 +566,10 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> skeleton_ref) {
 			tint.a *= attachment_color.a;
 		} else if (attachment->getRTTI().isExactly(spine::MeshAttachment::rtti)) {
 			auto *mesh = (spine::MeshAttachment *) attachment;
-			renderer_object = (SpineRendererObject *) mesh->getRegion()->rendererObject;
 
 			vertices->setSize(mesh->getWorldVerticesLength(), 0);
 			mesh->computeWorldVertices(*slot, *vertices);
+			renderer_object = (SpineRendererObject *) ((spine::AtlasRegion *) mesh->getRendererObject())->page->getRendererObject();
 			uvs = &mesh->getUVs();
 			indices = &mesh->getTriangles();
 
