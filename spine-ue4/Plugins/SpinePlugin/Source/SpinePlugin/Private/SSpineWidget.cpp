@@ -273,18 +273,18 @@ void SSpineWidget::UpdateMesh(int32 LayerId, FSlateWindowElementList &OutDrawEle
 
 		if (attachment->getRTTI().isExactly(RegionAttachment::rtti)) {
 			RegionAttachment *regionAttachment = (RegionAttachment *) attachment;
-			attachmentColor.set(regionAttachment->getColor());
-			attachmentAtlasRegion = (AtlasRegion *) regionAttachment->getRendererObject();
+			attachmentColor.set(regionAttachment->getColor());			
 			regionAttachment->computeWorldVertices(*slot, *attachmentVertices, 0, 2);
+			attachmentAtlasRegion = (AtlasRegion *) regionAttachment->getRendererObject();
 			attachmentIndices = quadIndices;
 			attachmentUvs = regionAttachment->getUVs().buffer();
 			numVertices = 4;
 			numIndices = 6;
 		} else if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
 			MeshAttachment *mesh = (MeshAttachment *) attachment;
-			attachmentColor.set(mesh->getColor());
-			attachmentAtlasRegion = (AtlasRegion *) mesh->getRendererObject();
+			attachmentColor.set(mesh->getColor());			
 			mesh->computeWorldVertices(*slot, 0, mesh->getWorldVerticesLength(), attachmentVertices->buffer(), 0, 2);
+			attachmentAtlasRegion = (AtlasRegion *) mesh->getRendererObject();
 			attachmentIndices = mesh->getTriangles().buffer();
 			attachmentUvs = mesh->getUVs().buffer();
 			numVertices = mesh->getWorldVerticesLength() >> 1;
