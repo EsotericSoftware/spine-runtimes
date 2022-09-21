@@ -438,7 +438,7 @@ int spAnimationState_apply(spAnimationState *self, spSkeleton *skeleton) {
 				if (!shortestRotation && timeline->type == SP_TIMELINE_ROTATE)
 					_spAnimationState_applyRotateTimeline(self, timeline, skeleton, applyTime, mix, timelineBlend,
 														  timelinesRotation, ii << 1, firstFrame);
-				else if (timeline->type == SP_TIMELINE_ROTATE)
+				else if (timeline->type == SP_TIMELINE_ATTACHMENT)
 					_spAnimationState_applyAttachmentTimeline(self, timeline, skeleton, applyTime, timelineBlend, -1);
 				else
 					spTimeline_apply(timeline, skeleton, animationLast, applyTime, applyEvents, &internal->eventsCount,
