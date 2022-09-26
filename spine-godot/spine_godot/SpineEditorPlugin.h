@@ -81,7 +81,7 @@ public:
 
 	String get_visible_name() const override { return "Spine Skeleton Json"; }
 
-	void get_recognized_extensions(List<String> *extensions) const override { extensions->push_back("json"); }
+	void get_recognized_extensions(List<String> *extensions) const override { extensions->push_back("spine-json"); }
 
 	String get_preset_name(int idx) const override { return idx == 0 ? "Default" : "Unknown"; }
 

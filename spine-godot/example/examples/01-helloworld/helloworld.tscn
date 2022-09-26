@@ -12,6 +12,7 @@ skeleton_data_res = ExtResource( 3 )
 bones_color = Color( 0.968627, 1, 0, 0.501961 )
 paths_color = Color( 1, 0.498039, 0, 0.466667 )
 paths_clipping = Color( 0.8, 0, 0, 0.5 )
+preview_skin = "Default"
 preview_animation = "run"
 preview_frame = true
 preview_time = 0.24
