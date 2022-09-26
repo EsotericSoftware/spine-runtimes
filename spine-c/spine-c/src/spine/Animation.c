@@ -1870,6 +1870,7 @@ void _spDeformTimeline_apply(
 					/* Vertex positions or deform offsets, with alpha. */
 					for (i = 0; i < vertexCount; i++)
 						deformArray[i] += (lastVertices[i] - deformArray[i]) * alpha;
+                    break;
 				case SP_MIX_BLEND_ADD:
 					vertexAttachment = SUB_CAST(spVertexAttachment, slot->attachment);
 					if (!vertexAttachment->bones) {
