@@ -1,7 +1,7 @@
 [gd_resource type="SpineSkeletonDataResource" load_steps=5 format=2]
 
 [ext_resource path="res://assets/spineboy/spineboy.atlas" type="SpineAtlasResource" id=1]
-[ext_resource path="res://assets/spineboy/spineboy-pro.json" type="SpineSkeletonFileResource" id=2]
+[ext_resource path="res://assets/spineboy/spineboy-pro.spine-json" type="SpineSkeletonFileResource" id=2]
 
 [sub_resource type="SpineAnimationMix" id=1]
 from = "idle"
