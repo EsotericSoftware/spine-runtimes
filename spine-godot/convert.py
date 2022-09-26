@@ -32,15 +32,18 @@ def convert_json(filename):
                 print("Removing " + str(filename) + ".import")
                 os.remove(filename + ".import")
 
-def convert_tscn_or_tres(filename):
-    print("Converting TSCN file " + str(filename))
+def convert_tscn_or_tres(filename):    
     file = codecs.open(filename, "r", "utf-8")
     content = file.read()
     file.close()
 
     new_content = ""
+    is_converted = False
     for line in content.splitlines(True):
-        if line.startswith("[ext_resource") and 'type="SpineSkeletonFileResource"' in line:
+        if line.startswith("[ext_resource") and 'type="SpineSkeletonFileResource"' in line and '.json"' in line:
+            if not is_converted:
+                print("Converting TSCN file " + str(filename))
+                is_converted = True
             print("Replacing .json with .spine-json in \n" + line)
             line = line.replace('.json"', '.spine-json"')
         new_content += line
