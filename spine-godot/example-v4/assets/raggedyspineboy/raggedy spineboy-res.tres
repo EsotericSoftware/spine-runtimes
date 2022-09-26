@@ -1,7 +1,7 @@
 [gd_resource type="SpineSkeletonDataResource" load_steps=3 format=2]
 
 [ext_resource path="res://assets/raggedyspineboy/Raggedy Spineboy.atlas" type="SpineAtlasResource" id=1]
-[ext_resource path="res://assets/raggedyspineboy/raggedy spineboy.json" type="SpineSkeletonFileResource" id=2]
+[ext_resource path="res://assets/raggedyspineboy/raggedy spineboy.spine-json" type="SpineSkeletonFileResource" id=2]
 
 [resource]
 atlas_res = ExtResource( 1 )

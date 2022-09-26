@@ -1,7 +1,7 @@
 [remap]
 
 importer="oggvorbisstr"
-type="AudioStreamOGGVorbis"
+type="AudioStreamOggVorbis"
 uid="uid://can7k84o8svum"
 path="res://.godot/imported/footstep.ogg-789c3f1e3c4e0ca3bebcb13f1160f623.oggvorbisstr"
 
@@ -14,3 +14,6 @@ dest_files=["res://.godot/imported/footstep.ogg-789c3f1e3c4e0ca3bebcb13f1160f623
 
 loop=false
 loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4
