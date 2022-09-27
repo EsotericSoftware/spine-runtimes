@@ -36,13 +36,6 @@ Shader "Universal Render Pipeline/Spine/Skeleton" {
 			#pragma exclude_renderers d3d11_9x
 
 			// -------------------------------------
-			// Universal Pipeline keywords
-			#pragma multi_compile _ _MAIN_LIGHT_SHADOWS
-			#pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
-			#pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
-			#pragma multi_compile _ _SHADOWS_SOFT
-
-			// -------------------------------------
 			// Unity defined keywords
 			#pragma multi_compile_fog
 
