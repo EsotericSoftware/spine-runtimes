@@ -433,7 +433,13 @@ namespace Spine.Unity {
 				skeleton = value;
 			}
 		}
-		public SkeletonData SkeletonData { get { return skeleton == null ? null : skeleton.Data; } }
+		public SkeletonData SkeletonData {
+			get {
+				Initialize(false);
+				return skeleton == null ? null : skeleton.Data;
+			}
+		}
+
 		public bool IsValid { get { return skeleton != null; } }
 
 		public delegate void SkeletonRendererDelegate (SkeletonGraphic skeletonGraphic);
