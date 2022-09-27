@@ -53,8 +53,6 @@ jobs:
       - name: Build Godot artifact
         shell: bash
         run: |          
-          sudo rm -f /etc/apt/sources.list.d/*
-          sudo cp -f spine-godot/build/sources.lst /etc/apt/sources.list
           sudo apt-get update
           sudo apt-get install build-essential scons pkg-config libx11-dev libxcursor-dev libxinerama-dev libgl1-mesa-dev libglu-dev libasound2-dev libpulse-dev libudev-dev libxi-dev libxrandr-dev
           ./spine-godot/build/setup.sh $GODOT_TAG false
@@ -144,9 +142,7 @@ jobs:
         uses: ./.github/actions/setup-godot-deps   
 
       - name: Build Godot artifact
-        run: |
-          sudo rm -f /etc/apt/sources.list.d/*
-          sudo cp -f spine-godot/build/sources.lst /etc/apt/sources.list
+        run: |          
           sudo apt-get update
           sudo apt-get install build-essential scons pkg-config libx11-dev libxcursor-dev libxinerama-dev libgl1-mesa-dev libglu-dev libasound2-dev libpulse-dev libudev-dev libxi-dev libxrandr-dev
           ./spine-godot/build/setup.sh $GODOT_TAG false
