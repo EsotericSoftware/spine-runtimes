@@ -165,6 +165,9 @@ namespace Spine.Unity.Editor {
 		internal const bool DEFAULT_COMPONENTMATERIAL_WARNING = true;
 		public bool componentMaterialWarning = DEFAULT_COMPONENTMATERIAL_WARNING;
 
+		internal const bool DEFAULT_SKELETONDATA_ASSET_NO_FILE_ERROR = true;
+		public bool skeletonDataAssetNoFileError = DEFAULT_SKELETONDATA_ASSET_NO_FILE_ERROR;
+
 		public const float DEFAULT_MIPMAPBIAS = -0.5f;
 
 		public const bool DEFAULT_AUTO_RELOAD_SCENESKELETONS = true;
@@ -211,6 +214,7 @@ namespace Spine.Unity.Editor {
 #if HAS_ON_POSTPROCESS_PREFAB
 			SkeletonRenderer.fixPrefabOverrideViaMeshFilterGlobal = settings.fixPrefabOverrideViaMeshFilter;
 #endif
+			SkeletonDataAsset.errorIfSkeletonFileNullGlobal = settings.skeletonDataAssetNoFileError;
 			return settings;
 		}
 
@@ -298,6 +302,8 @@ namespace Spine.Unity.Editor {
 					EditorGUILayout.PropertyField(settings.FindProperty("atlasTxtImportWarning"), new GUIContent("Atlas & Skel Extension Warning", "Log a warning and recommendation whenever a `.atlas` or `.skel` file is found."));
 					EditorGUILayout.PropertyField(settings.FindProperty("textureImporterWarning"), new GUIContent("Texture Settings Warning", "Log a warning and recommendation whenever Texture Import Settings are detected that could lead to undesired effects, e.g. white border artifacts."));
 					EditorGUILayout.PropertyField(settings.FindProperty("componentMaterialWarning"), new GUIContent("Component & Material Warning", "Log a warning and recommendation whenever Component and Material settings are not compatible."));
+					EditorGUILayout.PropertyField(settings.FindProperty("skeletonDataAssetNoFileError"), new GUIContent("SkeletonDataAsset no file Error", "Log an error when querying SkeletonData from SkeletonDataAsset with no json or binary file assigned."));
+					SkeletonDataAsset.errorIfSkeletonFileNullGlobal = settings.FindProperty("skeletonDataAssetNoFileError").boolValue;
 				}
 
 				EditorGUILayout.Space();
