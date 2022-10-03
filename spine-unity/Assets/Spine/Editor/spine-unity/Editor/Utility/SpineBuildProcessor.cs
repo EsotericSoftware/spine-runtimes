@@ -98,8 +98,8 @@ namespace Spine.Unity.Editor {
 #endif
 						prefabsToRestore.Add(assetPath);
 					}
-					EditorUtility.UnloadUnusedAssetsImmediate();
 				}
+				EditorUtility.UnloadUnusedAssetsImmediate();
 				AssetDatabase.StopAssetEditing();
 #if !HAS_SAVE_ASSET_IF_DIRTY
 				if (prefabAssets.Length > 0)
@@ -147,8 +147,8 @@ namespace Spine.Unity.Editor {
 #if HAS_SAVE_ASSET_IF_DIRTY
 					AssetDatabase.SaveAssetIfDirty(atlasAsset);
 #endif
-					EditorUtility.UnloadUnusedAssetsImmediate();
 				}
+				EditorUtility.UnloadUnusedAssetsImmediate();
 				AssetDatabase.StopAssetEditing();
 #if !HAS_SAVE_ASSET_IF_DIRTY
 				if (spriteAtlasAssets.Length > 0)

@@ -62,6 +62,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -125,7 +126,9 @@ class SkeletonViewerUI {
 
 	ButtonGroup<TextButton> trackButtons = new ButtonGroup();
 	CheckBox loopCheckbox = new CheckBox("Loop", skin);
-	CheckBox addCheckbox = new CheckBox("Add", skin);
+	CheckBox reverseCheckbox = new CheckBox("Reverse", skin);
+	CheckBox holdPrevCheckbox = new HigherTrackCheckBox("Hold previous");
+	CheckBox addCheckbox = new HigherTrackCheckBox("Add");
 
 	Slider alphaSlider = new Slider(0, 1, 0.01f, false, skin);
 	Label alphaLabel = new Label("100%", skin);
@@ -136,9 +139,6 @@ class SkeletonViewerUI {
 	Slider speedSlider = new Slider(0, 3, 0.01f, false, skin);
 	Label speedLabel = new Label("1.0x", skin);
 	TextButton speedResetButton = new TextButton("Reset", skin);
-
-	CheckBox reverseCheckbox = new CheckBox("Reverse", skin);
-	CheckBox holdPrevCheckbox = new CheckBox("Hold previous", skin);
 
 	Slider mixSlider = new Slider(0, 4, 0.01f, false, skin);
 	Label mixLabel = new Label("0.3s", skin);
@@ -194,6 +194,7 @@ class SkeletonViewerUI {
 
 		alphaSlider.setValue(1);
 		alphaSlider.setDisabled(true);
+		alphaLabel.setColor(skin.getColor("disabled"));
 
 		addCheckbox.setDisabled(true);
 		holdPrevCheckbox.setDisabled(true);
@@ -557,6 +558,7 @@ class SkeletonViewerUI {
 				animationList.getSelection().setProgrammaticChangeEvents(true);
 
 				alphaSlider.setDisabled(track == 0);
+				alphaLabel.setColor(track == 0 ? skin.getColor("disabled") : Color.WHITE);
 				alphaSlider.setValue(current == null ? 1 : current.alpha);
 
 				addCheckbox.setDisabled(track == 0);
@@ -564,9 +566,11 @@ class SkeletonViewerUI {
 
 				if (current != null) {
 					loopCheckbox.setChecked(current.getLoop());
-					addCheckbox.setChecked(current.getMixBlend() == MixBlend.add);
 					reverseCheckbox.setChecked(current.getReverse());
-					holdPrevCheckbox.setChecked(current.getHoldPrevious());
+					if (track > 0) {
+						addCheckbox.setChecked(current.getMixBlend() == MixBlend.add);
+						holdPrevCheckbox.setChecked(current.getHoldPrevious());
+					}
 				}
 			}
 		};
@@ -760,6 +764,17 @@ class SkeletonViewerUI {
 		} catch (Throwable ex) {
 			System.out.println("Unable to read preferences:");
 			ex.printStackTrace();
+		}
+	}
+
+	class HigherTrackCheckBox extends CheckBox {
+		public HigherTrackCheckBox (String text) {
+			super(text, skin);
+		}
+
+		protected Drawable getImageDrawable () {
+			if (trackButtons.getCheckedIndex() == 0) return getStyle().checkboxOffDisabled;
+			return super.getImageDrawable();
 		}
 	}
 }
