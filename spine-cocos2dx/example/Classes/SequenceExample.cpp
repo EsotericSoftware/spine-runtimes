@@ -27,27 +27,35 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include <spine/AttachmentVertices.h>
+#include "SequenceExample.h"
+#include "IKExample.h"
 
 USING_NS_CC;
+using namespace spine;
 
-namespace spine {
+Scene *SequenceExample::scene() {
+	Scene *scene = Scene::create();
+	scene->addChild(SequenceExample::create());
+	return scene;
+}
 
-	AttachmentVertices::AttachmentVertices(Texture2D *texture, int verticesCount, unsigned short *triangles, int trianglesCount) {
-		_texture = texture;
-		if (_texture) _texture->retain();
+bool SequenceExample::init() {
+	if (!LayerColor::initWithColor(Color4B(128, 128, 128, 255))) return false;
 
-		_triangles = new TrianglesCommand::Triangles();
-		_triangles->verts = new V3F_C4B_T2F[verticesCount];
-		_triangles->vertCount = verticesCount;
-		_triangles->indices = triangles;
-		_triangles->indexCount = trianglesCount;
-	}
+	skeletonNode = SkeletonAnimation::createWithBinaryFile("dragon-ess.skel", "dragon-pma.atlas", 1);
+	skeletonNode->setAnimation(0, "flying", true);
 
-	AttachmentVertices::~AttachmentVertices() {
-		delete[] _triangles->verts;
-		delete _triangles;
-		if (_texture) _texture->release();
-	}
+	skeletonNode->setPosition(Vec2(_contentSize.width / 2, _contentSize.height / 2));
+	addChild(skeletonNode);
 
-}// namespace spine
+	scheduleUpdate();
+
+	EventListenerTouchOneByOne *listener = EventListenerTouchOneByOne::create();
+	listener->onTouchBegan = [this](Touch *touch, cocos2d::Event *event) -> bool {
+        Director::getInstance()->replaceScene(IKExample::scene());
+		return true;
+	};
+	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
+
+	return true;
+}

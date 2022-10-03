@@ -27,22 +27,22 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef SPINE_ATTACHMENTVERTICES_H_
-#define SPINE_ATTACHMENTVERTICES_H_
+#ifndef _SEQUENCEEXAMPLE_H_
+#define _SEQUENCEEXAMPLE_H_
 
 #include "cocos2d.h"
+#include <spine/spine-cocos2dx.h>
 
-namespace spine {
+class SequenceExample : public cocos2d::LayerColor {
+public:
+	static cocos2d::Scene *scene();
 
-	class AttachmentVertices {
-	public:
-		AttachmentVertices(cocos2d::Texture2D *texture, int verticesCount, unsigned short *triangles, int trianglesCount);
-		virtual ~AttachmentVertices();
+	CREATE_FUNC(SequenceExample);
 
-		cocos2d::Texture2D *_texture;
-		cocos2d::TrianglesCommand::Triangles *_triangles;
-	};
+	virtual bool init();
 
-}// namespace spine
+private:
+	spine::SkeletonAnimation *skeletonNode;
+};
 
-#endif /* SPINE_ATTACHMENTVERTICES_H_ */
+#endif

@@ -34,6 +34,7 @@
 
 #include "AppMacros.h"
 #include "IKExample.h"
+#include "SequenceExample.h"
 #include <spine/Debug.h>
 #include <spine/spine-cocos2dx.h>
 
@@ -110,7 +111,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
 
 	// create a scene. it's an autorelease object
 	//auto scene = RaptorExample::scene();
-	auto scene = IKExample::scene();
+	auto scene = SequenceExample::scene();
 
 	// run
 	director->runWithScene(scene);
