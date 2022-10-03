@@ -284,7 +284,7 @@ namespace spine {
 
 			if (slot->getAttachment()->getRTTI().isExactly(RegionAttachment::rtti)) {
 				RegionAttachment *attachment = static_cast<RegionAttachment *>(slot->getAttachment());
-                texture = (Texture2D*)((AtlasRegion*)attachment->getRegion())->page->getRendererObject();
+                texture = (Texture2D*)((AtlasRegion*)attachment->getRegion())->page->texture;
 
 				float *dstTriangleVertices = nullptr;
 				int dstStride = 0;// in floats
@@ -322,7 +322,7 @@ namespace spine {
 				color = attachment->getColor();
 			} else if (slot->getAttachment()->getRTTI().isExactly(MeshAttachment::rtti)) {
 				MeshAttachment *attachment = (MeshAttachment *) slot->getAttachment();
-                texture = (Texture2D*)((AtlasRegion*)attachment->getRegion())->page->getRendererObject();
+                texture = (Texture2D*)((AtlasRegion*)attachment->getRegion())->page->texture;
 
 				float *dstTriangleVertices = nullptr;
 				int dstStride = 0;// in floats
