@@ -61,6 +61,10 @@ cp -f ../tank/export/tank.png "$ROOT/spine-cocos2d-objc/Resources/"
 echo "spine-cocos2dx"
 rm -rf "$ROOT/spine-cocos2dx/example/Resources/common/"*
 
+cp -f ../dragon/export/dragon-ess.skel "$ROOT/spine-cocos2dx/example/Resources/common/"
+cp -f ../dragon/export/dragon-pma.atlas "$ROOT/spine-cocos2dx/example/Resources/common/"
+cp -f ../dragon/export/dragon-pma*.png "$ROOT/spine-cocos2dx/example/Resources/common/"
+
 cp -f ../coin/export/coin-pro.skel "$ROOT/spine-cocos2dx/example/Resources/common/"
 cp -f ../coin/export/coin.atlas "$ROOT/spine-cocos2dx/example/Resources/common/"
 cp -f ../coin/export/coin.png "$ROOT/spine-cocos2dx/example/Resources/common/"

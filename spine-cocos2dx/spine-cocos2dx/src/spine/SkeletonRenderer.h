@@ -153,6 +153,8 @@ namespace spine {
 		int _startSlotIndex;
 		int _endSlotIndex;
 		bool _twoColorTint;
+
+        Pool<AttachmentVertices*> _verticesPool;
 	};
 
 }// namespace spine
