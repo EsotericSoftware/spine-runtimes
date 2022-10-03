@@ -234,7 +234,7 @@ Shader "Universal Render Pipeline/Spine/Sprite"
 			#define fixed3 half3
 			#define fixed half
 			#include "Include/Spine-Input-Sprite-URP.hlsl"
-			#include "Include/Spine-Sprite-DepthNormalPass-URP.hlsl"
+			#include "Include/Spine-Sprite-DepthNormalsPass-URP.hlsl"
 			ENDHLSL
 		}
 

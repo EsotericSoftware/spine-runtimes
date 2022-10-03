@@ -1,5 +1,5 @@
-#ifndef SPRITES_DEPTH_NORMAL_PASS_URP_INCLUDED
-#define SPRITES_DEPTH_NORMAL_PASS_URP_INCLUDED
+#ifndef SPRITES_DEPTH_NORMALS_PASS_URP_INCLUDED
+#define SPRITES_DEPTH_NORMALS_PASS_URP_INCLUDED
 
 #include "Include/Spine-Sprite-Common-URP.hlsl"
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
