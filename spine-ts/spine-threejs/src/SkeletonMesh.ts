@@ -249,7 +249,7 @@ export class SkeletonMesh extends THREE.Object3D {
 				}
 
 				// Start new batch if this one can't hold vertices/indices
-				if (!batch.canBatch(finalVerticesLength, finalIndicesLength)) {
+				if (!batch.canBatch(finalVerticesLength / SkeletonMesh.VERTEX_SIZE, finalIndicesLength)) {
 					batch.end();
 					batch = this.nextBatch();
 					batch.begin();

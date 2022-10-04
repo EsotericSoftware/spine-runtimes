@@ -98,9 +98,9 @@ export class MeshBatcher extends THREE.Mesh {
 		this.indicesLength = 0;
 	}
 
-	canBatch (verticesLength: number, indicesLength: number) {
-		if (this.indicesLength + indicesLength >= this.indices.byteLength / 2) return false;
-		if (this.verticesLength + verticesLength >= this.vertices.byteLength / 2) return false;
+	canBatch (numVertices: number, numIndices: number) {
+		if (this.indicesLength + numIndices >= this.indices.byteLength / 2) return false;
+		if (this.verticesLength / MeshBatcher.VERTEX_SIZE + numVertices >= (this.vertices.byteLength / 4) / MeshBatcher.VERTEX_SIZE) return false;
 		return true;
 	}
 
