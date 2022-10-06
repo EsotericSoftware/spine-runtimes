@@ -441,17 +441,21 @@ public class AnimationState {
 				lastTotal = 0;
 				lastDiff = diff;
 			} else {
-				lastTotal = timelinesRotation[i]; // Angle and direction of mix, including loops.
-				lastDiff = timelinesRotation[i + 1]; // Difference between bones.
+				lastTotal = timelinesRotation[i];
+				lastDiff = timelinesRotation[i + 1];
 			}
-			boolean current = diff > 0, dir = lastTotal >= 0;
-			// Detect cross at 0 (not 180).
-			if (Math.signum(lastDiff) != Math.signum(diff) && Math.abs(lastDiff) <= 90) {
-				// A cross after a 360 rotation is a loop.
-				if (Math.abs(lastTotal) > 180) lastTotal += 360 * Math.signum(lastTotal);
-				dir = current;
+			float loops = lastTotal - lastTotal % 360;
+			total = diff + loops;
+			boolean current = diff >= 0, dir = lastTotal >= 0;
+			if (Math.abs(lastDiff) <= 90 && Math.signum(lastDiff) != Math.signum(diff)) {
+				if (Math.abs(lastTotal - loops) > 180) {
+					total += 360 * Math.signum(lastTotal);
+					dir = current;
+				} else if (loops != 0)
+					total -= 360 * Math.signum(lastTotal);
+				else
+					dir = current;
 			}
-			total = diff + lastTotal - lastTotal % 360; // Store loops as part of lastTotal.
 			if (dir != current) total += 360 * Math.signum(lastTotal);
 			timelinesRotation[i] = total;
 		}
