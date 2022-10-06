@@ -673,18 +673,21 @@ void _spAnimationState_applyRotateTimeline(spAnimationState *self, spTimeline *t
 			lastTotal = 0;
 			lastDiff = diff;
 		} else {
-			lastTotal = timelinesRotation[i];    /* Angle and direction of mix, including loops. */
-			lastDiff = timelinesRotation[i + 1]; /* Difference between bones. */
+			lastTotal = timelinesRotation[i];
+			lastDiff = timelinesRotation[i + 1];
 		}
-		current = diff > 0;
-		dir = lastTotal >= 0;
-		/* Detect cross at 0 (not 180). */
-		if (SIGNUM(lastDiff) != SIGNUM(diff) && ABS(lastDiff) <= 90) {
-			/* A cross after a 360 rotation is a loop. */
-			if (ABS(lastTotal) > 180) lastTotal += 360 * SIGNUM(lastTotal);
-			dir = current;
-		}
-		total = diff + lastTotal - FMOD(lastTotal, 360); /* Store loops as part of lastTotal. */
+        float loops = lastTotal - FMOD(lastTotal, 360);
+        total = diff + loops;
+        int current = diff >= 0, dir = lastTotal >= 0;
+        if (ABS(lastDiff) <= 90 && SIGNUM(lastDiff) != SIGNUM(diff)) {
+            if (ABS(lastTotal - loops) > 180) {
+                total += 360 * SIGNUM(lastTotal);
+                dir = current;
+            } else if (loops != 0)
+                total -= 360 * SIGNUM(lastTotal);
+            else
+                dir = current;
+        }
 		if (dir != current) total += 360 * SIGNUM(lastTotal);
 		timelinesRotation[i] = total;
 	}
