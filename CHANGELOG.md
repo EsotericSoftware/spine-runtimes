@@ -1,3 +1,62 @@
+# 4.2
+
+## C
+* **Additions**
+  * Added `spTrackEntry_resetRotationDirections()`
+* **Breaking changes**
+
+### SFML
+
+## C++
+* **Additions**
+* **Breaking changes**
+
+### Cocos2d-x
+
+### SFML
+
+### SDL
+
+### UE4
+
+## C#
+
+* **Additions**
+* **Breaking changes**
+
+### Unity
+
+* **Officially supported Unity versions are 2017.1-2022.1**.
+
+* **Additions**
+* **Breaking changes**
+  
+* **Changes of default values**
+
+* **Deprecated**
+
+* **Restructuring (Non-Breaking)**
+
+### XNA/MonoGame
+
+## Java
+* **Additions**
+* **Breaking changes**
+  
+### libGDX
+
+## Typescript/Javascript
+* **Additions**
+* **Breaking changes**
+
+### WebGL backend
+
+### Canvas backend
+
+### Three.js backend
+
+### Player
+
 # 4.1
 
 ## C
