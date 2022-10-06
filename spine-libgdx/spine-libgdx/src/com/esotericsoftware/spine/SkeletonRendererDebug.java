@@ -38,6 +38,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 
+import com.esotericsoftware.spine.PhysicsConstraintData.Node;
+import com.esotericsoftware.spine.PhysicsConstraintData.Spring;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
 import com.esotericsoftware.spine.attachments.ClippingAttachment;
@@ -55,7 +57,7 @@ public class SkeletonRendererDebug {
 
 	private final ShapeRenderer shapes;
 	private boolean drawBones = true, drawRegionAttachments = true, drawBoundingBoxes = true, drawPoints = true;
-	private boolean drawMeshHull = true, drawMeshTriangles = true, drawPaths = true, drawClipping = true;
+	private boolean drawMeshHull = true, drawMeshTriangles = true, drawPaths = true, drawClipping = true, drawPhysics = true;
 	private final SkeletonBounds bounds = new SkeletonBounds();
 	private final FloatArray vertices = new FloatArray(32);
 	private float scale = 1;
@@ -236,6 +238,22 @@ public class SkeletonRendererDebug {
 			}
 		}
 
+		if (drawPhysics) {
+			Array<PhysicsConstraint> physicsConstraints = skeleton.physicsConstraints;
+			for (int i = 0, n = physicsConstraints.size; i < n; i++) {
+				PhysicsConstraint constraint = physicsConstraints.get(i);
+				if (constraint.mix <= 0) continue;
+				for (Spring spring : constraint.springs) {
+					shapes.setColor(Color.GOLDENROD);
+					shapes.line(spring.node1.x, spring.node1.y, spring.node2.x, spring.node2.y);
+				}
+				for (Node node : constraint.nodes) {
+					shapes.setColor(Color.GREEN);
+					shapes.circle(node.x, node.y, 8);
+				}
+			}
+		}
+
 		shapes.end();
 		shapes.begin(ShapeType.Filled);
 
@@ -277,31 +295,35 @@ public class SkeletonRendererDebug {
 	}
 
 	public void setRegionAttachments (boolean regionAttachments) {
-		this.drawRegionAttachments = regionAttachments;
+		drawRegionAttachments = regionAttachments;
 	}
 
 	public void setBoundingBoxes (boolean boundingBoxes) {
-		this.drawBoundingBoxes = boundingBoxes;
+		drawBoundingBoxes = boundingBoxes;
 	}
 
 	public void setMeshHull (boolean meshHull) {
-		this.drawMeshHull = meshHull;
+		drawMeshHull = meshHull;
 	}
 
 	public void setMeshTriangles (boolean meshTriangles) {
-		this.drawMeshTriangles = meshTriangles;
+		drawMeshTriangles = meshTriangles;
 	}
 
 	public void setPaths (boolean paths) {
-		this.drawPaths = paths;
+		drawPaths = paths;
 	}
 
 	public void setPoints (boolean points) {
-		this.drawPoints = points;
+		drawPoints = points;
 	}
 
 	public void setClipping (boolean clipping) {
-		this.drawClipping = clipping;
+		drawClipping = clipping;
+	}
+
+	public void setPhysics (boolean physics) {
+		drawPhysics = physics;
 	}
 
 	public void setPremultipliedAlpha (boolean premultipliedAlpha) {

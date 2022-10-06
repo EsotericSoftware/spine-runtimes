@@ -283,6 +283,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 			debugRenderer.setPaths(ui.debugPathsCheckbox.isChecked());
 			debugRenderer.setPoints(ui.debugPointsCheckbox.isChecked());
 			debugRenderer.setClipping(ui.debugClippingCheckbox.isChecked());
+			debugRenderer.setClipping(ui.debugPhysicsCheckbox.isChecked());
 			debugRenderer.draw(skeleton);
 		}
 
