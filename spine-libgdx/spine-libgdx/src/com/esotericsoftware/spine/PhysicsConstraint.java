@@ -48,7 +48,7 @@ public class PhysicsConstraint implements Updatable {
 
 	boolean active;
 
-	private final Skeleton skeleton;
+	final Skeleton skeleton;
 	float remaining, lastTime;
 	final Vector2 temp = new Vector2();
 
@@ -133,14 +133,39 @@ public class PhysicsConstraint implements Updatable {
 		Object[] springs = this.springs.items;
 		int springCount = this.springs.size;
 
-		remaining += lastTime - skeleton.time;
+		remaining += Math.max(skeleton.time - lastTime, 0);
 		lastTime = skeleton.time;
-		while (remaining > 0.016f) {
+		while (remaining >= 0.016f) {
 			remaining -= 0.016f;
 			for (int i = 0; i < springCount; i++)
 				((Spring)springs[i]).update();
 			for (int i = 0; i < nodeCount; i++)
 				((Node)nodes[i]).update(this);
+		}
+
+		for (int i = 0; i < nodeCount; i++) {
+			Node node = (Node)nodes[i];
+			Object[] bones = node.bones;
+			int ii = 0, nn = bones.length;
+			if (mix == 1) {
+				for (; ii < nn; ii++) {
+					Bone bone = (Bone)bones[ii];
+					bone.worldX = node.x;
+					bone.worldY = node.y;
+					bone.worldToLocal(temp.set(bone.worldX, bone.worldY));
+					bone.ax = temp.x;
+					bone.ay = temp.y;
+				}
+			} else {
+				for (; ii < nn; ii++) {
+					Bone bone = (Bone)bones[ii];
+					bone.worldX = bone.worldX + (node.x - bone.worldX) * mix;
+					bone.worldY = bone.worldY + (node.y - bone.worldY) * mix;
+					bone.worldToLocal(temp.set(bone.worldX, bone.worldY));
+					bone.ax = temp.x;
+					bone.ay = temp.y;
+				}
+			}
 		}
 	}
 
