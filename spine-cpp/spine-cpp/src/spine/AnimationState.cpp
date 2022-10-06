@@ -742,19 +742,21 @@ void AnimationState::applyRotateTimeline(RotateTimeline *rotateTimeline, Skeleto
 			lastTotal = 0;
 			lastDiff = diff;
 		} else {
-			lastTotal = timelinesRotation[i];   // Angle and direction of mix, including loops.
-			lastDiff = timelinesRotation[i + 1];// Difference between bones.
+			lastTotal = timelinesRotation[i];
+			lastDiff = timelinesRotation[i + 1];
 		}
-
-		bool current = diff > 0, dir = lastTotal >= 0;
-		// Detect cross at 0 (not 180).
-		if (MathUtil::sign(lastDiff) != MathUtil::sign(diff) && MathUtil::abs(lastDiff) <= 90) {
-			// A cross after a 360 rotation is a loop.
-			if (MathUtil::abs(lastTotal) > 180) lastTotal += 360 * MathUtil::sign(lastTotal);
-			dir = current;
-		}
-
-		total = diff + lastTotal - MathUtil::fmod(lastTotal, 360);// Store loops as part of lastTotal.
+        float loops = lastTotal - MathUtil::fmod(lastTotal, 360.f);
+        total = diff + loops;
+        bool current = diff >= 0, dir = lastTotal >= 0;
+        if (MathUtil::abs(lastDiff) <= 90 && MathUtil::sign(lastDiff) != MathUtil::sign(diff)) {
+            if (MathUtil::abs(lastTotal - loops) > 180) {
+                total += 360.f * MathUtil::sign(lastTotal);
+                dir = current;
+            } else if (loops != 0)
+                total -= 360.f * MathUtil::sign(lastTotal);
+            else
+                dir = current;
+        }
 		if (dir != current) {
 			total += 360 * MathUtil::sign(lastTotal);
 		}
