@@ -72,7 +72,7 @@ void SequenceTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vec
 	if (!slot->getBone().isActive()) return;
 	Attachment *slotAttachment = slot->getAttachment();
 	if (slotAttachment != _attachment) {
-		if (!slotAttachment->getRTTI().instanceOf(VertexAttachment::rtti) || ((VertexAttachment *) slotAttachment)->getTimelineAttachment() != _attachment) return;
+		if (slotAttachment == NULL || !slotAttachment->getRTTI().instanceOf(VertexAttachment::rtti) || ((VertexAttachment *) slotAttachment)->getTimelineAttachment() != _attachment) return;
 	}
 
 	Vector<float> &frames = this->_frames;
