@@ -599,9 +599,15 @@ export class SpinePlayer implements Disposable {
 								audioNodes.push(node);
 							}
 
-							if (typeof this.audioCtx!.createStereoPanner === 'function') {
-								const node = this.audioCtx!.createStereoPanner();
-								node.pan.setValueAtTime(event.balance, this.audioCtx!.currentTime);
+							// Cannot use createStereoPanner because some browser does not support it yet
+							if (typeof this.audioCtx!.createPanner === 'function') {
+								const node = this.audioCtx!.createPanner();
+								if (node.positionX !== undefined) {
+									node.positionX.value = event.balance;
+								} else {
+									node.setPosition(event.balance, 0, 1 - Math.abs(event.balance));
+									node.panningModel = 'equalpower';
+								}
 								audioNodes.push(node);
 							}
 
