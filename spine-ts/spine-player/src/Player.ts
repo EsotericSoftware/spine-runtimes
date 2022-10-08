@@ -760,6 +760,7 @@ export class SpinePlayer implements Disposable {
 				if (config.animation) this.setAnimation(config.animation);
 			}
 		}
+		this.audioCtx?.resume();
 	}
 
 	pause () {
@@ -770,6 +771,7 @@ export class SpinePlayer implements Disposable {
 			this.playButton!.classList.remove("spine-player-button-icon-pause");
 			this.playButton!.classList.add("spine-player-button-icon-play");
 		}
+		this.audioCtx?.suspend();
 	}
 
 	/* Sets a new animation and viewport on track 0. */
