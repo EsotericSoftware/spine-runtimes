@@ -124,7 +124,7 @@ namespace Spine.Unity {
 			if (!Application.isPlaying) {
 				skeletonRenderer.enabled = false;
 				skeletonRenderer.enabled = true;
-				skeletonRenderer.LateUpdate();
+				skeletonRenderer.LateUpdateMesh();
 			}
 #endif
 
@@ -187,6 +187,9 @@ namespace Spine.Unity {
 					mr.probeAnchor = probeAnchor;
 				}
 			}
+
+			if (skeletonRenderer.updateWhenInvisible != UpdateMode.FullUpdate)
+				skeletonRenderer.LateUpdateMesh();
 		}
 
 		public void OnDisable () {
@@ -194,13 +197,8 @@ namespace Spine.Unity {
 #if SPINE_OPTIONAL_RENDEROVERRIDE
 			skeletonRenderer.GenerateMeshOverride -= HandleRender;
 #endif
-
-			skeletonRenderer.LateUpdate();
-
-			foreach (var partsRenderer in partsRenderers) {
-				if (partsRenderer != null)
-					partsRenderer.ClearMesh();
-			}
+			skeletonRenderer.LateUpdateMesh();
+			ClearPartsRendererMeshes();
 		}
 
 		MaterialPropertyBlock copiedBlock;
@@ -262,8 +260,13 @@ namespace Spine.Unity {
 				if (currentRenderer != null)
 					partsRenderers[rendererIndex].ClearMesh();
 			}
-
 		}
 
+		protected void ClearPartsRendererMeshes () {
+			foreach (var partsRenderer in partsRenderers) {
+				if (partsRenderer != null)
+					partsRenderer.ClearMesh();
+			}
+		}
 	}
 }

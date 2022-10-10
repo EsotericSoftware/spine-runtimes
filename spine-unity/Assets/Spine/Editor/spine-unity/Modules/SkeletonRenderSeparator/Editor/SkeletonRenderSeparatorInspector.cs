@@ -105,8 +105,10 @@ namespace Spine.Unity.Examples {
 			using (new SpineInspectorUtility.LabelWidthScope()) {
 				bool componentEnabled = component.enabled;
 				bool checkBox = EditorGUILayout.Toggle("Enable Separator", componentEnabled);
-				if (checkBox != componentEnabled)
-					component.enabled = checkBox;
+				if (checkBox != componentEnabled) {
+					Undo.RecordObject(target, "Enable SkeletonRenderSeparator");
+					EditorUtility.SetObjectEnabled(target, checkBox);
+				}
 				if (component.SkeletonRenderer.disableRenderingOnOverride && !component.enabled)
 					EditorGUILayout.HelpBox("By default, SkeletonRenderer's MeshRenderer is disabled while the SkeletonRenderSeparator takes over rendering. It is re-enabled when SkeletonRenderSeparator is disabled.", MessageType.Info);
 
@@ -242,7 +244,7 @@ namespace Spine.Unity.Examples {
 
 			if (slotsReapplyRequired && UnityEngine.Event.current.type == EventType.Repaint) {
 				component.SkeletonRenderer.ReapplySeparatorSlotNames();
-				component.SkeletonRenderer.LateUpdate();
+				component.SkeletonRenderer.LateUpdateMesh();
 				SceneView.RepaintAll();
 				slotsReapplyRequired = false;
 			}
