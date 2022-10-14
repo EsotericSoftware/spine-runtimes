@@ -50,7 +50,7 @@ Animation::Animation(const String &name, Vector<Timeline *> &timelines, float du
 	}
 }
 
-bool Animation::hasTimeline(Vector<PropertyId> ids) {
+bool Animation::hasTimeline(Vector<PropertyId> &ids) {
 	for (size_t i = 0; i < ids.size(); i++) {
 		if (_timelineIds.containsKey(ids[i])) return true;
 	}
