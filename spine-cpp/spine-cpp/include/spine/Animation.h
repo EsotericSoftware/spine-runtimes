@@ -110,7 +110,7 @@ namespace spine {
 
 		Vector<Timeline *> &getTimelines();
 
-		bool hasTimeline(Vector<PropertyId> ids);
+		bool hasTimeline(Vector<PropertyId> &ids);
 
 		float getDuration();
 
