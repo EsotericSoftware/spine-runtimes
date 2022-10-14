@@ -169,10 +169,10 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 		SlotData *slotData = new (__FILE__, __LINE__) SlotData(i, String(slotName, true), *boneData);
 
 		readColor(input, slotData->getColor());
+        unsigned char a = readByte(input);
 		unsigned char r = readByte(input);
 		unsigned char g = readByte(input);
 		unsigned char b = readByte(input);
-		unsigned char a = readByte(input);
 		if (!(r == 0xff && g == 0xff && b == 0xff && a == 0xff)) {
 			slotData->getDarkColor().set(r / 255.0f, g / 255.0f, b / 255.0f, 1);
 			slotData->setHasDarkColor(true);
