@@ -38,6 +38,7 @@ import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.Null;
 
 import com.esotericsoftware.spine.PhysicsConstraint.Node;
+import com.esotericsoftware.spine.PhysicsConstraint.Spring;
 import com.esotericsoftware.spine.Skin.SkinEntry;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
@@ -355,15 +356,25 @@ public class Skeleton {
 
 		for (int i = 0; i < nodeCount; i++) {
 			Node node = (Node)nodes[i];
-			if (node.parentBone != null) sortReset(node.parentBone.children);
 			for (Bone bone : node.bones)
 				sortReset(bone.children);
 		}
 		for (int i = 0; i < nodeCount; i++) {
 			Node node = (Node)nodes[i];
-			if (node.parentBone != null) node.parentBone.sorted = true;
 			for (Bone bone : node.bones)
 				bone.sorted = true;
+		}
+
+		Object[] springs = constraint.springs.items;
+		for (int i = 0, n = constraint.springs.size; i < n; i++) {
+			Spring spring = (Spring)springs[i];
+			if (spring.bone == null) continue;
+			sortBone(spring.bone);
+			updateCache.add(spring);
+			sortReset(spring.bone.children);
+			spring.bone.sorted = true;
+			for (Bone child : spring.bone.children)
+				sortBone(child);
 		}
 	}
 

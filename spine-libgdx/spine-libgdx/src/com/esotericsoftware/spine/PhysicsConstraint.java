@@ -42,6 +42,8 @@ import com.esotericsoftware.spine.PhysicsConstraintData.SpringData;
  * <p>
  * See <a href="http://esotericsoftware.com/spine-physics-constraints">Physics constraints</a> in the Spine User Guide. */
 public class PhysicsConstraint implements Updatable {
+	static final Vector2 temp = new Vector2();
+
 	final PhysicsConstraintData data;
 	final Array<Node> nodes;
 	final Array<Spring> springs;
@@ -51,7 +53,6 @@ public class PhysicsConstraint implements Updatable {
 
 	final Skeleton skeleton;
 	float remaining, lastTime;
-	final Vector2 temp = new Vector2();
 
 	public PhysicsConstraint (PhysicsConstraintData data, Skeleton skeleton) {
 		if (data == null) throw new IllegalArgumentException("data cannot be null.");
@@ -123,9 +124,11 @@ public class PhysicsConstraint implements Updatable {
 
 	/** Applies the constraint to the constrained bones. */
 	public void update () {
+		if (mix == 0) return;
+
 		Object[] nodes = this.nodes.items;
 		int nodeCount = this.nodes.size;
-		Vector2 temp = this.temp;
+		Vector2 temp = PhysicsConstraint.temp;
 		for (int i = 0; i < nodeCount; i++) {
 			Node node = (Node)nodes[i];
 			if (node.parentBone == null) continue;
@@ -142,26 +145,29 @@ public class PhysicsConstraint implements Updatable {
 		while (remaining >= 0.016f) {
 			remaining -= 0.016f;
 			for (int i = 0; i < springCount; i++)
-				((Spring)springs[i]).update();
+				((Spring)springs[i]).step();
 			for (int i = 0; i < nodeCount; i++)
-				((Node)nodes[i]).update(this);
+				((Node)nodes[i]).step(this);
 		}
 
-		for (int i = 0; i < nodeCount; i++) {
-			Node node = (Node)nodes[i];
-			Object[] bones = node.bones;
-			int ii = 0, nn = bones.length;
-			if (mix == 1) {
-				for (; ii < nn; ii++) {
+		if (mix == 1) {
+			for (int i = 0; i < nodeCount; i++) {
+				Node node = (Node)nodes[i];
+				Object[] bones = node.bones;
+				for (int ii = 0, nn = bones.length; ii < nn; ii++) {
 					Bone bone = (Bone)bones[ii];
 					bone.worldX = node.x;
 					bone.worldY = node.y;
-					bone.worldToLocal(temp.set(bone.worldX, bone.worldY));
+					bone.parent.worldToLocal(temp.set(node.x, node.y));
 					bone.ax = temp.x;
 					bone.ay = temp.y;
 				}
-			} else {
-				for (; ii < nn; ii++) {
+			}
+		} else {
+			for (int i = 0; i < nodeCount; i++) {
+				Node node = (Node)nodes[i];
+				Object[] bones = node.bones;
+				for (int ii = 0, nn = bones.length; ii < nn; ii++) {
 					Bone bone = (Bone)bones[ii];
 					bone.worldX = bone.worldX + (node.x - bone.worldX) * mix;
 					bone.worldY = bone.worldY + (node.y - bone.worldY) * mix;
@@ -295,12 +301,8 @@ public class PhysicsConstraint implements Updatable {
 			vy = 0;
 		}
 
-		public void update (PhysicsConstraint constraint) {
-			if (parentBone != null) {
-				vx = 0;
-				vy = 0;
-				return;
-			}
+		public void step (PhysicsConstraint constraint) {
+			if (parentBone != null) return;
 			x += vx;
 			y += vy;
 			vx = vx * constraint.friction + constraint.wind;
@@ -308,35 +310,36 @@ public class PhysicsConstraint implements Updatable {
 		}
 	}
 
-	static public class Spring {
+	static public class Spring implements Updatable {
 		public final SpringData data;
+		public final PhysicsConstraint constraint;
 		public Node node1, node2;
-		public Bone[] bones;
+		public Bone bone;
 		public float length, stiffness, damping;
 
-		Spring (SpringData data) { // Editor.
+		Spring (SpringData data, PhysicsConstraint constraint) { // Editor.
 			this.data = data;
+			this.constraint = constraint;
 		}
 
 		public Spring (SpringData data, PhysicsConstraint constraint, Skeleton skeleton) {
 			this.data = data;
+			this.constraint = constraint;
 
 			node1 = constraint.nodes.get(data.node1);
 			node2 = constraint.nodes.get(data.node2);
 
-			bones = new Bone[data.bones.length];
-			for (int i = 0, n = bones.length; i < n; i++)
-				bones[i] = skeleton.bones.get(data.bones[i]);
+			bone = skeleton.bones.get(data.bone);
 
 			setToSetupPose();
 		}
 
 		public Spring (Spring spring, PhysicsConstraint constraint) {
 			this.data = spring.data;
+			this.constraint = constraint;
 			node1 = constraint.nodes.get(data.node1);
 			node2 = constraint.nodes.get(data.node2);
-			bones = new Bone[spring.bones.length];
-			arraycopy(spring.bones, 0, bones, 0, bones.length);
+			bone = spring.bone;
 			length = spring.length;
 			stiffness = spring.stiffness;
 			damping = spring.damping;
@@ -348,9 +351,10 @@ public class PhysicsConstraint implements Updatable {
 			damping = data.damping;
 		}
 
-		public void update () {
-			float x = node2.x - node1.x, y = node2.y - node1.y, d = (float)Math.sqrt(Math.max(x * x + y * y, 0.00001f));
+		public void step () {
+			float x = node2.x - node1.x, y = node2.y - node1.y, d = x * x + y * y;
 			if (data.rope && d <= length) return;
+			d = (float)Math.sqrt(Math.max(d, 0.00001f));
 			x /= d;
 			y /= d;
 			float m1 = node1.massInverse, m2 = node2.massInverse;
@@ -361,6 +365,22 @@ public class PhysicsConstraint implements Updatable {
 			node1.vy += y * m1;
 			node2.vx -= x * m2;
 			node2.vy -= y * m2;
+		}
+
+		public void update () {
+			float dx = node2.x - node1.x, dy = node2.y - node1.y;
+			float s = (float)Math.sqrt(dx * dx + dy * dy) / length, r = atan2(dy, dx), sin = sin(r), cos = cos(r);
+			if (constraint.mix == 1) {
+				bone.updateWorldTransform(bone.ax, bone.ay,
+					atan2(bone.a * sin - bone.c * cos, bone.d * cos - bone.b * sin) * radDeg + bone.arotation - bone.ashearX,
+					bone.ascaleX * s, bone.ascaleY, bone.ashearX, bone.ashearY);
+			} else {
+				// BOZO
+			}
+		}
+
+		public boolean isActive () {
+			return constraint.active;
 		}
 	}
 }

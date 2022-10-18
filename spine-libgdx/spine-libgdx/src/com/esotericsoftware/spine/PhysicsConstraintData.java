@@ -115,8 +115,7 @@ public class PhysicsConstraintData extends ConstraintData {
 	}
 
 	static public class SpringData {
-		public int node1, node2;
-		public int[] bones;
+		public int node1, node2, bone;
 		public float length, stiffness, damping;
 		public boolean rope;
 	}
