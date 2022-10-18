@@ -29,12 +29,13 @@
 
 package com.esotericsoftware.spine;
 
+import static com.esotericsoftware.spine.utils.SpineUtils.*;
+
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Null;
 
-import com.esotericsoftware.spine.PhysicsConstraintData.Node;
 import com.esotericsoftware.spine.PhysicsConstraintData.NodeData;
-import com.esotericsoftware.spine.PhysicsConstraintData.Spring;
 import com.esotericsoftware.spine.PhysicsConstraintData.SpringData;
 
 /** Stores the current pose for a physics constraint. A physics constraint applies physics to bones.
@@ -44,7 +45,7 @@ public class PhysicsConstraint implements Updatable {
 	final PhysicsConstraintData data;
 	final Array<Node> nodes;
 	final Array<Spring> springs;
-	float mix, length, strength, damping, gravity, wind;
+	float friction, gravity, wind, length, stiffness, damping, mix;
 
 	boolean active;
 
@@ -66,12 +67,13 @@ public class PhysicsConstraint implements Updatable {
 		for (SpringData springData : data.springs)
 			springs.add(new Spring(springData, this, skeleton));
 
-		mix = data.mix;
-		length = data.length;
-		strength = data.strength;
-		damping = data.damping;
+		friction = data.friction;
 		gravity = data.gravity;
 		wind = data.wind;
+		length = data.length;
+		stiffness = data.stiffness;
+		damping = data.damping;
+		mix = data.mix;
 	}
 
 	/** Copy constructor. */
@@ -88,12 +90,13 @@ public class PhysicsConstraint implements Updatable {
 		for (Spring spring : constraint.springs)
 			springs.add(new Spring(spring, this));
 
-		mix = constraint.mix;
-		length = constraint.length;
-		strength = constraint.strength;
-		damping = constraint.damping;
+		friction = constraint.friction;
 		gravity = constraint.gravity;
 		wind = constraint.wind;
+		length = constraint.length;
+		stiffness = constraint.stiffness;
+		damping = constraint.damping;
+		mix = constraint.mix;
 	}
 
 	public void setToSetupPose () {
@@ -109,12 +112,13 @@ public class PhysicsConstraint implements Updatable {
 			((Spring)springs[i]).setToSetupPose();
 
 		PhysicsConstraintData data = this.data;
-		mix = data.mix;
-		length = data.length;
-		strength = data.strength;
-		damping = data.damping;
+		friction = data.friction;
 		gravity = data.gravity;
 		wind = data.wind;
+		length = data.length;
+		stiffness = data.stiffness;
+		damping = data.damping;
+		mix = data.mix;
 	}
 
 	/** Applies the constraint to the constrained bones. */
@@ -177,37 +181,12 @@ public class PhysicsConstraint implements Updatable {
 		return springs;
 	}
 
-	/** A percentage (0-1) that controls the mix between the constrained and unconstrained poses. */
-	public float getMix () {
-		return mix;
+	public float getFriction () {
+		return friction;
 	}
 
-	public void setMix (float mix) {
-		this.mix = mix;
-	}
-
-	public float getLength () {
-		return length;
-	}
-
-	public void setLength (float length) {
-		this.length = length;
-	}
-
-	public float getStrength () {
-		return strength;
-	}
-
-	public void setStrength (float strength) {
-		this.strength = strength;
-	}
-
-	public float getDamping () {
-		return damping;
-	}
-
-	public void setDamping (float damping) {
-		this.damping = damping;
+	public void setFriction (float friction) {
+		this.friction = friction;
 	}
 
 	public float getGravity () {
@@ -226,6 +205,39 @@ public class PhysicsConstraint implements Updatable {
 		this.wind = wind;
 	}
 
+	public float getLength () {
+		return length;
+	}
+
+	public void setLength (float length) {
+		this.length = length;
+	}
+
+	public float getStiffness () {
+		return stiffness;
+	}
+
+	public void setStiffness (float stiffness) {
+		this.stiffness = stiffness;
+	}
+
+	public float getDamping () {
+		return damping;
+	}
+
+	public void setDamping (float damping) {
+		this.damping = damping;
+	}
+
+	/** A percentage (0-1) that controls the mix between the constrained and unconstrained poses. */
+	public float getMix () {
+		return mix;
+	}
+
+	public void setMix (float mix) {
+		this.mix = mix;
+	}
+
 	public boolean isActive () {
 		return active;
 	}
@@ -237,5 +249,118 @@ public class PhysicsConstraint implements Updatable {
 
 	public String toString () {
 		return data.name;
+	}
+
+	static public class Node {
+		public final NodeData data;
+		public @Null Bone parentBone;
+		public Bone[] bones;
+
+		/** Position relative to the parent bone, or world position if there is no parent bone. */
+		public float x, y;
+
+		public float massInverse, vx, vy;
+
+		Node (NodeData data) { // Editor.
+			this.data = data;
+		}
+
+		public Node (NodeData data, Skeleton skeleton) {
+			this.data = data;
+
+			parentBone = data.parentBone == -1 ? null : skeleton.bones.get(data.parentBone);
+
+			bones = new Bone[data.bones.length];
+			for (int i = 0, n = bones.length; i < n; i++)
+				bones[i] = skeleton.bones.get(data.bones[i]);
+
+			setToSetupPose();
+		}
+
+		public Node (Node node) {
+			this.data = node.data;
+			parentBone = node.parentBone;
+			bones = new Bone[node.bones.length];
+			arraycopy(node.bones, 0, bones, 0, bones.length);
+			x = node.x;
+			y = node.y;
+			vx = node.vx;
+			vy = node.vy;
+		}
+
+		public void setToSetupPose () {
+			x = data.x;
+			y = data.y;
+			vx = 0;
+			vy = 0;
+		}
+
+		public void update (PhysicsConstraint constraint) {
+			if (parentBone != null) {
+				vx = 0;
+				vy = 0;
+				return;
+			}
+			x += vx;
+			y += vy;
+			vx = vx * constraint.friction + constraint.wind;
+			vy = vy * constraint.friction - constraint.gravity;
+		}
+	}
+
+	static public class Spring {
+		public final SpringData data;
+		public Node node1, node2;
+		public Bone[] bones;
+		public float length, stiffness, damping;
+
+		Spring (SpringData data) { // Editor.
+			this.data = data;
+		}
+
+		public Spring (SpringData data, PhysicsConstraint constraint, Skeleton skeleton) {
+			this.data = data;
+
+			node1 = constraint.nodes.get(data.node1);
+			node2 = constraint.nodes.get(data.node2);
+
+			bones = new Bone[data.bones.length];
+			for (int i = 0, n = bones.length; i < n; i++)
+				bones[i] = skeleton.bones.get(data.bones[i]);
+
+			setToSetupPose();
+		}
+
+		public Spring (Spring spring, PhysicsConstraint constraint) {
+			this.data = spring.data;
+			node1 = constraint.nodes.get(data.node1);
+			node2 = constraint.nodes.get(data.node2);
+			bones = new Bone[spring.bones.length];
+			arraycopy(spring.bones, 0, bones, 0, bones.length);
+			length = spring.length;
+			stiffness = spring.stiffness;
+			damping = spring.damping;
+		}
+
+		public void setToSetupPose () {
+			length = data.length;
+			stiffness = data.stiffness;
+			damping = data.damping;
+		}
+
+		public void update () {
+			float x = node2.x - node1.x, y = node2.y - node1.y, d = (float)Math.sqrt(Math.max(x * x + y * y, 0.00001f));
+			if (data.rope && d <= length) return;
+			x /= d;
+			y /= d;
+			float m1 = node1.massInverse, m2 = node2.massInverse;
+			float i = (damping * (x * (node2.vx - node1.vx) + y * (node2.vy - node1.vy)) + stiffness * (d - length)) / (m1 + m2);
+			x *= i;
+			y *= i;
+			node1.vx += x * m1;
+			node1.vy += y * m1;
+			node2.vx -= x * m2;
+			node2.vy -= y * m2;
+		}
 	}
 }

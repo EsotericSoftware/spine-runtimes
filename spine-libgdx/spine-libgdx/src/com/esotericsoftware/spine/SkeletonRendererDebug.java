@@ -38,8 +38,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 
-import com.esotericsoftware.spine.PhysicsConstraintData.Node;
-import com.esotericsoftware.spine.PhysicsConstraintData.Spring;
+import com.esotericsoftware.spine.PhysicsConstraint.Node;
+import com.esotericsoftware.spine.PhysicsConstraint.Spring;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
 import com.esotericsoftware.spine.attachments.ClippingAttachment;

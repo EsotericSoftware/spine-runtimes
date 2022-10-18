@@ -170,16 +170,16 @@ class SkeletonViewerUI {
 		loopCheckbox.setChecked(true);
 
 		loadScaleSlider.setValue(1);
-		loadScaleSlider.setSnapToValues(new float[] {0.5f, 1, 1.5f, 2, 2.5f}, 0.09f);
+		loadScaleSlider.setSnapToValues(0.09f, 0.5f, 1, 1.5f, 2, 2.5f);
 
 		zoomSlider.setValue(1);
-		zoomSlider.setSnapToValues(new float[] {1, 2}, 0.30f);
+		zoomSlider.setSnapToValues(0.30f, 1, 2);
 
 		xScaleSlider.setValue(1);
-		xScaleSlider.setSnapToValues(new float[] {-1.5f, -1, -0.5f, 0.5f, 1, 1.5f}, 0.12f);
+		xScaleSlider.setSnapToValues(0.12f, -1.5f, -1, -0.5f, 0.5f, 1, 1.5f);
 
 		yScaleSlider.setValue(1);
-		yScaleSlider.setSnapToValues(new float[] {-1.5f, -1, -0.5f, 0.5f, 1, 1.5f}, 0.12f);
+		yScaleSlider.setSnapToValues(0.12f, -1.5f, -1, -0.5f, 0.5f, 1, 1.5f);
 
 		skinList.getSelection().setRequired(false);
 		skinList.getSelection().setToggle(true);
@@ -188,10 +188,10 @@ class SkeletonViewerUI {
 		animationList.getSelection().setToggle(true);
 
 		mixSlider.setValue(0.3f);
-		mixSlider.setSnapToValues(new float[] {1, 1.5f, 2, 2.5f, 3, 3.5f}, 0.12f);
+		mixSlider.setSnapToValues(0.12f, 1, 1.5f, 2, 2.5f, 3, 3.5f);
 
 		speedSlider.setValue(1);
-		speedSlider.setSnapToValues(new float[] {0.5f, 0.75f, 1, 1.25f, 1.5f, 2, 2.5f}, 0.09f);
+		speedSlider.setSnapToValues(0.09f, 0.5f, 0.75f, 1, 1.25f, 1.5f, 2, 2.5f);
 
 		alphaSlider.setValue(1);
 		alphaSlider.setDisabled(true);
