@@ -29,6 +29,8 @@
 
 package com.esotericsoftware.spine;
 
+import static com.esotericsoftware.spine.utils.SpineUtils.*;
+
 import java.util.Arrays;
 
 import com.badlogic.gdx.utils.Array;
@@ -39,7 +41,6 @@ import com.esotericsoftware.spine.PathConstraintData.RotateMode;
 import com.esotericsoftware.spine.PathConstraintData.SpacingMode;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.PathAttachment;
-import com.esotericsoftware.spine.utils.SpineUtils;
 
 /** Stores the current pose for a path constraint. A path constraint adjusts the rotation, translation, and scale of the
  * constrained bones so they follow a {@link PathAttachment}.
@@ -178,7 +179,7 @@ public class PathConstraint implements Updatable {
 		else {
 			tip = false;
 			Bone p = target.bone;
-			offsetRotation *= p.a * p.d - p.b * p.c > 0 ? SpineUtils.degRad : -SpineUtils.degRad;
+			offsetRotation *= p.a * p.d - p.b * p.c > 0 ? degRad : -degRad;
 		}
 		for (int i = 0, p = 3; i < boneCount; i++, p += 3) {
 			Bone bone = (Bone)bones[i];
@@ -212,10 +213,10 @@ public class PathConstraint implements Updatable {
 					boneY += (length * (sin * a + cos * c) - dy) * mixRotate;
 				} else
 					r += offsetRotation;
-				if (r > SpineUtils.PI)
-					r -= SpineUtils.PI2;
-				else if (r < -SpineUtils.PI) //
-					r += SpineUtils.PI2;
+				if (r > PI)
+					r -= PI2;
+				else if (r < -PI) //
+					r += PI2;
 				r *= mixRotate;
 				cos = (float)Math.cos(r);
 				sin = (float)Math.sin(r);
