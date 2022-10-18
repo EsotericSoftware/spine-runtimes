@@ -222,11 +222,14 @@ public class IkConstraint implements Updatable {
 				tx = targetX - bone.worldX;
 				ty = targetY - bone.worldY;
 			}
-			float b = bone.data.length * sx, dd = (float)Math.sqrt(tx * tx + ty * ty);
-			if ((compress && dd < b) || (stretch && dd > b) && b > 0.0001f) {
-				float s = (dd / b - 1) * alpha + 1;
-				sx *= s;
-				if (uniform) sy *= s;
+			float b = bone.data.length * sx;
+			if (b > 0.0001f) {
+				float dd = tx * tx + ty * ty;
+				if ((compress && dd < b * b) || (stretch && dd > b * b)) {
+					float s = ((float)Math.sqrt(dd) / b - 1) * alpha + 1;
+					sx *= s;
+					if (uniform) sy *= s;
+				}
 			}
 		}
 		bone.updateWorldTransform(bone.ax, bone.ay, bone.arotation + rotationIK * alpha, sx, sy, bone.ashearX, bone.ashearY);
