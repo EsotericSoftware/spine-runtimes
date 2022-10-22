@@ -229,6 +229,7 @@ export class SpinePlayer implements Disposable {
 	private audioCtx: AudioContext | null = null;
 	private audioEnabled = false;
 	private audioNodes: Record<string, () => void> = {};
+	private audioBufferCache: Record<string, AudioBuffer> = {};
 
 	constructor (parent: HTMLElement | string, private config: SpinePlayerConfig) {
 		let parentDom = typeof parent === "string" ? document.getElementById(parent) : parent;
@@ -611,29 +612,38 @@ export class SpinePlayer implements Disposable {
 							}
 							audioNodes.push(node);
 						}
-
 						audioNodes.push(this.audioCtx!.destination);
 
-						// Need to clone the ArrayBuffer since 'decodeAudioData' take Buffer ownership forever
-						const soundSrc = this.assetManager!.require([this.config.audioFolderUrl, audioPath].join("/"));
-
-						this.audioCtx!.decodeAudioData(soundSrc.slice(0),
-						(audioBuffer: AudioBuffer) => {
+						const storeAndPlayAudio = (audioBuffer: AudioBuffer, audioNodes: AudioNode[]) => {
 							const fn = () => {
 								const soundSource = this.audioCtx!.createBufferSource();
 								soundSource.buffer = audioBuffer;
 								soundSource.playbackRate.value = this.speed;
 								audioNodes.reduce((prevNode, node) => prevNode.connect(node), soundSource as AudioNode);
 								soundSource.start();
-							}
-							this.audioNodes[`${audioPath}-${event.balance}-${event.volume}`] = fn
+							};
+							this.audioNodes[`${audioPath}-${event.balance}-${event.volume}`] = fn;
 							fn();
-						},
-						(error) => {
-							const errorMsg = `"${audioPath}" cannot be decoded. Probably it is not an audio file or the format is not supported by your browser (Eg: Safari does not support .ogg). \n${error}`
-							console.error(errorMsg)
-							this.audioNodes[`${audioPath}-${event.balance}-${event.volume}`] = () => {}
-						});
+						}
+
+						const audioBuffer = this.audioBufferCache[audioPath];
+						if (audioBuffer) {
+							storeAndPlayAudio(audioBuffer, audioNodes);
+						} else {
+							const soundSrc = this.assetManager!.require([this.config.audioFolderUrl, audioPath].join("/"));
+							this.audioCtx!.decodeAudioData(soundSrc,
+								(audioBuffer: AudioBuffer) => {
+									this.audioBufferCache[audioPath] = audioBuffer
+									storeAndPlayAudio(audioBuffer, audioNodes);
+								},
+								(error) => {
+									const errorMsg = `"${audioPath}" cannot be decoded. Probably it is not an audio file or the format is not supported by your browser (Eg: Safari does not support .ogg). \n${error}`
+									console.error(errorMsg);
+									this.audioNodes[`${audioPath}-${event.balance}-${event.volume}`] = () => {};
+								});
+						}
+
+						
 					}
 				}
 			},
