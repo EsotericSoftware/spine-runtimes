@@ -585,13 +585,14 @@ export class SpinePlayer implements Disposable {
 	private setUpAudio() {
 		this.animationState!.addListener({
 			event: (entry, event) => {
-				if (this.audioEnabled) {
+				if (this.audioEnabled && this.audioCtx?.state === 'running') {
 					const audioPath = event.data.audioPath
 					if (audioPath) {
+						console.log(event, this.audioCtx)
 						const playAudio = this.audioNodes[`${audioPath}-${event.balance}-${event.volume}`];
 						if (playAudio) 
 							playAudio();
-						if (!playAudio) {
+						else {
 							const audioNodes = [] as AudioNode[];
 							if (typeof this.audioCtx!.createGain === 'function') {
 								const node = this.audioCtx!.createGain();
