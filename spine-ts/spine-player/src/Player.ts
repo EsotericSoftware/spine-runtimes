@@ -622,6 +622,7 @@ export class SpinePlayer implements Disposable {
 							const fn = () => {
 								const soundSource = this.audioCtx!.createBufferSource();
 								soundSource.buffer = audioBuffer;
+								soundSource.playbackRate.value = this.speed;
 								audioNodes.reduce((prevNode, node) => prevNode.connect(node), soundSource as AudioNode);
 								soundSource.start();
 							}
@@ -1138,6 +1139,9 @@ export class SpinePlayer implements Disposable {
 				throw new Error("TODO");
 			}
 			this.audioCtx = new AudioContext();
+			var g = this.audioCtx.createGain();
+			g.gain.value = 5;
+			g.connect(this.audioCtx.destination);
 			this.audioCtx.resume();
 		}
 		this.audioEnabled = !this.audioEnabled;
