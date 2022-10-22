@@ -17,11 +17,14 @@
 
 <body>
 	<div id="container" style="width:640px; height:380px"></div>
+	<div>
+		<button id="dispose">Dispose</button>
+	</div>
 </body>
 <script>
 	// Creates a new spine player. The debugRender option enables
 	// rendering of viewports and padding for debugging purposes.
-	new spine.SpinePlayer("container", {
+	const player = new spine.SpinePlayer("container", {
 		jsonUrl: "assets/mix-and-match-pro.json",
 		atlasUrl: "assets/mix-and-match-pro.atlas",
 		audioFolderUrl: "assets/mixAndMatch",
@@ -31,6 +34,12 @@
 		backgroundColor: "#cccccc",
 		showControls: true,
 	});
+
+	document.getElementById("dispose").addEventListener("click", event => {
+		console.log("Disposing player.");
+		player.dispose();
+	});
+
 
 </script>
 </body>

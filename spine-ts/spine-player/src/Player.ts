@@ -228,7 +228,7 @@ export class SpinePlayer implements Disposable {
 
 	private audioCtx: AudioContext | null = null;
 	private audioEnabled = false;
-	private audioNodes: Record<string, () => AudioBufferSourceNode> = {};
+	private audioNodes: Record<string, () => void> = {};
 
 	constructor (parent: HTMLElement | string, private config: SpinePlayerConfig) {
 		let parentDom = typeof parent === "string" ? document.getElementById(parent) : parent;
@@ -273,6 +273,7 @@ export class SpinePlayer implements Disposable {
 		this.sceneRenderer?.dispose();
 		this.loadingScreen?.dispose();
 		this.assetManager?.dispose();
+		this.audioCtx?.close();
 		for (var i = 0; i < this.eventListeners.length; i++) {
 			var eventListener = this.eventListeners[i];
 			eventListener.target.removeEventListener(eventListener.event, eventListener.func);
@@ -584,56 +585,54 @@ export class SpinePlayer implements Disposable {
 
 	private setUpAudio() {
 		this.animationState!.addListener({
-			event: (entry, event) => {
-				if (this.audioEnabled && this.audioCtx?.state === 'running') {
-					const audioPath = event.data.audioPath
-					if (audioPath) {
-						console.log(event, this.audioCtx)
-						const playAudio = this.audioNodes[`${audioPath}-${event.balance}-${event.volume}`];
-						if (playAudio) 
-							playAudio();
-						else {
-							const audioNodes = [] as AudioNode[];
-							if (typeof this.audioCtx!.createGain === 'function') {
-								const node = this.audioCtx!.createGain();
-								node.gain.setValueAtTime(event.volume, this.audioCtx!.currentTime);
-								audioNodes.push(node);
-							}
-
-							// Cannot use createStereoPanner because some browser does not support it yet
-							if (typeof this.audioCtx!.createPanner === 'function') {
-								const node = this.audioCtx!.createPanner();
-								if (node.positionX !== undefined) {
-									node.positionX.value = event.balance;
-								} else {
-									node.setPosition(event.balance, 0, 1 - Math.abs(event.balance));
-									node.panningModel = 'equalpower';
-								}
-								audioNodes.push(node);
-							}
-
-							audioNodes.push(this.audioCtx!.destination);
-
-							// Need to clone the ArrayBuffer since 'decodeAudioData' take Buffer ownership forever
-							const soundSrc = this.assetManager!.require([this.config.audioFolderUrl, audioPath].join("/"));
-
-							this.audioCtx!.decodeAudioData(soundSrc.slice(0),
-							(audioBuffer: AudioBuffer) => {
-								const fn = () => {
-									const soundSource = this.audioCtx!.createBufferSource();
-									soundSource.buffer = audioBuffer;
-									audioNodes.reduce((prevNode, node) => prevNode.connect(node), soundSource as AudioNode);
-									soundSource.start();
-									return soundSource;
-								}
-								this.audioNodes[`${audioPath}-${event.balance}-${event.volume}`] = fn
-								fn();
-							},
-							(error) => {
-								const errorMsg = `"${audioPath}" cannot be decoded. Probably it is not an audio file or the format is not supported by your browser (Eg: Safari does not support .ogg). \n${error}`
-								this.showError(errorMsg, error as any);
-							});
+			event: (_, event) => {
+				const audioPath = event.data.audioPath
+				if (this.audioEnabled && this.audioCtx?.state === 'running' && audioPath) {
+					const playAudio = this.audioNodes[`${audioPath}-${event.balance}-${event.volume}`];
+					if (playAudio) 
+						playAudio();
+					else {
+						const audioNodes = [] as AudioNode[];
+						if (typeof this.audioCtx!.createGain === 'function') {
+							const node = this.audioCtx!.createGain();
+							node.gain.setValueAtTime(event.volume, this.audioCtx!.currentTime);
+							audioNodes.push(node);
 						}
+
+						// Cannot use createStereoPanner because some browser does not support it yet
+						if (typeof this.audioCtx!.createPanner === 'function') {
+							const node = this.audioCtx!.createPanner();
+							// Attempt to use positionX since setPosition, but positionX is not supported by some browsers yet
+							if (node.positionX !== undefined) {
+								node.positionX.value = event.balance;
+							} else {
+								node.setPosition(event.balance, 0, 1 - Math.abs(event.balance));
+								node.panningModel = 'equalpower';
+							}
+							audioNodes.push(node);
+						}
+
+						audioNodes.push(this.audioCtx!.destination);
+
+						// Need to clone the ArrayBuffer since 'decodeAudioData' take Buffer ownership forever
+						const soundSrc = this.assetManager!.require([this.config.audioFolderUrl, audioPath].join("/"));
+
+						this.audioCtx!.decodeAudioData(soundSrc.slice(0),
+						(audioBuffer: AudioBuffer) => {
+							const fn = () => {
+								const soundSource = this.audioCtx!.createBufferSource();
+								soundSource.buffer = audioBuffer;
+								audioNodes.reduce((prevNode, node) => prevNode.connect(node), soundSource as AudioNode);
+								soundSource.start();
+							}
+							this.audioNodes[`${audioPath}-${event.balance}-${event.volume}`] = fn
+							fn();
+						},
+						(error) => {
+							const errorMsg = `"${audioPath}" cannot be decoded. Probably it is not an audio file or the format is not supported by your browser (Eg: Safari does not support .ogg). \n${error}`
+							console.error(errorMsg)
+							this.audioNodes[`${audioPath}-${event.balance}-${event.volume}`] = () => {}
+						});
 					}
 				}
 			},
