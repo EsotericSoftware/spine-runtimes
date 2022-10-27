@@ -352,9 +352,8 @@ public class PhysicsConstraint implements Updatable {
 		}
 
 		public void step () {
-			float x = node2.x - node1.x, y = node2.y - node1.y, d = x * x + y * y;
+			float x = node2.x - node1.x, y = node2.y - node1.y, d = (float)Math.sqrt(Math.max(x * x + y * y, 0.00001f));
 			if (data.rope && d <= length) return;
-			d = (float)Math.sqrt(Math.max(d, 0.00001f));
 			x /= d;
 			y /= d;
 			float m1 = node1.massInverse, m2 = node2.massInverse;
