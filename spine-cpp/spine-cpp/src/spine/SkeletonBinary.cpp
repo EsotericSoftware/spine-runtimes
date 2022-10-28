@@ -174,7 +174,7 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 		SlotData *slotData = new (__FILE__, __LINE__) SlotData(i, String(slotName, true), *boneData);
 
 		readColor(input, slotData->getColor());
-        unsigned char a = readByte(input);
+		unsigned char a = readByte(input);
 		unsigned char r = readByte(input);
 		unsigned char g = readByte(input);
 		unsigned char b = readByte(input);

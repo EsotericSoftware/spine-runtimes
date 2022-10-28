@@ -2016,7 +2016,7 @@ void _spSequenceTimeline_apply(spTimeline *timeline, spSkeleton *skeleton, float
 
 	slotAttachment = slot->attachment;
 	if (slotAttachment != self->attachment) {
-        if (slotAttachment == NULL) return;
+		if (slotAttachment == NULL) return;
 		switch (slotAttachment->type) {
 			case SP_ATTACHMENT_BOUNDING_BOX:
 			case SP_ATTACHMENT_CLIPPING:
