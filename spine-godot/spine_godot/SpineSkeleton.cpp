@@ -69,10 +69,11 @@ void SpineSkeleton::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_scale_y", "v"), &SpineSkeleton::set_scale_y);
 }
 
-SpineSkeleton::SpineSkeleton() : skeleton(nullptr), sprite(nullptr) {
+SpineSkeleton::SpineSkeleton() : skeleton(nullptr), sprite(nullptr), last_skin(nullptr) {
 }
 
 SpineSkeleton::~SpineSkeleton() {
+	if (last_skin.is_valid()) last_skin.unref();
 	delete skeleton;
 }
 
@@ -136,6 +137,8 @@ void SpineSkeleton::set_skin_by_name(const String &skin_name) {
 
 void SpineSkeleton::set_skin(Ref<SpineSkin> new_skin) {
 	SPINE_CHECK(skeleton, )
+	if (last_skin.is_valid()) last_skin.unref();
+	last_skin = new_skin;
 	skeleton->setSkin(new_skin.is_valid() && new_skin->get_spine_object() ? new_skin->get_spine_object() : nullptr);
 }
 
