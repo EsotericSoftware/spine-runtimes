@@ -47,8 +47,10 @@ namespace Spine.Unity.Examples {
 		public Camera targetCamera;
 
 		protected CommandBuffer commandBuffer;
-		protected Vector2Int requiredRenderTextureSize;
+		protected Vector2Int screenSize;
+		protected Vector2Int usedRenderTextureSize;
 		protected Vector2Int allocatedRenderTextureSize;
+		protected Vector2 downScaleFactor = Vector2.one;
 
 		protected Vector3 worldCornerNoDistortion0;
 		protected Vector3 worldCornerNoDistortion1;
@@ -89,17 +91,22 @@ namespace Spine.Unity.Examples {
 			uvCorner2 = MathUtilities.InverseLerp(screenSpaceMin, screenSpaceMax, screenCorner2);
 			uvCorner3 = MathUtilities.InverseLerp(screenSpaceMin, screenSpaceMax, screenCorner3);
 
-			requiredRenderTextureSize = new Vector2Int(
-				Math.Min(maxRenderTextureSize, Math.Abs((int)screenSpaceMax.x - (int)screenSpaceMin.x)),
-				Math.Min(maxRenderTextureSize, Math.Abs((int)screenSpaceMax.y - (int)screenSpaceMin.y)));
+			screenSize = new Vector2Int(Math.Abs((int)screenSpaceMax.x - (int)screenSpaceMin.x),
+										Math.Abs((int)screenSpaceMax.y - (int)screenSpaceMin.y));
+			usedRenderTextureSize = new Vector2Int(
+				Math.Min(maxRenderTextureSize, screenSize.x),
+				Math.Min(maxRenderTextureSize, screenSize.y));
+			downScaleFactor = new Vector2(
+				(float)usedRenderTextureSize.x / (float)screenSize.x,
+				(float)usedRenderTextureSize.y / (float)screenSize.y);
 
 			PrepareRenderTexture();
 		}
 
 		protected void PrepareRenderTexture () {
 			Vector2Int textureSize = new Vector2Int(
-				Mathf.NextPowerOfTwo(requiredRenderTextureSize.x),
-				Mathf.NextPowerOfTwo(requiredRenderTextureSize.y));
+				Mathf.NextPowerOfTwo(usedRenderTextureSize.x),
+				Mathf.NextPowerOfTwo(usedRenderTextureSize.y));
 
 			if (textureSize != allocatedRenderTextureSize) {
 				if (renderTexture)
@@ -135,8 +142,12 @@ namespace Spine.Unity.Examples {
 			};
 			quadMesh.normals = normals;
 
-			float maxU = (float)requiredRenderTextureSize.x / (float)allocatedRenderTextureSize.x;
-			float maxV = (float)requiredRenderTextureSize.y / (float)allocatedRenderTextureSize.y;
+			float maxU = (float)usedRenderTextureSize.x / (float)allocatedRenderTextureSize.x;
+			float maxV = (float)usedRenderTextureSize.y / (float)allocatedRenderTextureSize.y;
+			if (downScaleFactor.x < 1 || downScaleFactor.y < 1) {
+				maxU = downScaleFactor.x * (float)screenSize.x / (float)allocatedRenderTextureSize.x;
+				maxV = downScaleFactor.y * (float)screenSize.y / (float)allocatedRenderTextureSize.y;
+			}
 			Vector2[] uv = new Vector2[4] {
 				new Vector2(uvCorner0.x * maxU, uvCorner0.y * maxV),
 				new Vector2(uvCorner1.x * maxU, uvCorner1.y * maxV),
