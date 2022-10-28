@@ -38,41 +38,41 @@ using namespace spine;
 DebugExtension dbgExtension(SpineExtension::getInstance());
 
 void test() {
-    SFMLTextureLoader textureLoader;
-    Atlas atlas("data/bomb.atlas", &textureLoader);
-    SkeletonBinary loader(&atlas);
-    SkeletonData *skeletonData = loader.readSkeletonDataFile("data/bomb.skel");
+	SFMLTextureLoader textureLoader;
+	Atlas atlas("data/bomb.atlas", &textureLoader);
+	SkeletonBinary loader(&atlas);
+	SkeletonData *skeletonData = loader.readSkeletonDataFile("data/bomb.skel");
 
-    SkeletonDrawable drawable(skeletonData);
-    drawable.setUsePremultipliedAlpha(true);
-    drawable.skeleton->setPosition(320, 590);
-    drawable.state->setAnimation(0, "expl", false);
-    drawable.skeleton->setSkin("mdl");
+	SkeletonDrawable drawable(skeletonData);
+	drawable.setUsePremultipliedAlpha(true);
+	drawable.skeleton->setPosition(320, 590);
+	drawable.state->setAnimation(0, "expl", false);
+	drawable.skeleton->setSkin("mdl");
 
-    sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - Test");
-    window.setFramerateLimit(60);
-    sf::Event event;
-    sf::Clock deltaClock;
-    while (window.isOpen()) {
-        while (window.pollEvent(event))
-            if (event.type == sf::Event::Closed) window.close();
+	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - Test");
+	window.setFramerateLimit(60);
+	sf::Event event;
+	sf::Clock deltaClock;
+	while (window.isOpen()) {
+		while (window.pollEvent(event))
+			if (event.type == sf::Event::Closed) window.close();
 
-        float delta = deltaClock.getElapsedTime().asSeconds();
-        deltaClock.restart();
+		float delta = deltaClock.getElapsedTime().asSeconds();
+		deltaClock.restart();
 
-        drawable.update(delta);
+		drawable.update(delta);
 
-        window.clear();
-        window.draw(drawable);
-        window.display();
-    }
+		window.clear();
+		window.draw(drawable);
+		window.display();
+	}
 
-    delete skeletonData;
+	delete skeletonData;
 }
 
 int main() {
-    SpineExtension::setInstance(&dbgExtension);
-    test();
-    dbgExtension.reportLeaks();
-    return 0;
+	SpineExtension::setInstance(&dbgExtension);
+	test();
+	dbgExtension.reportLeaks();
+	return 0;
 }
