@@ -64,6 +64,7 @@ private:
 	spine::Skeleton *skeleton;
 	SpineSprite *sprite;
 	spine::Vector<float> bounds_vertex_buffer;
+        Ref<SpineSkin> last_skin;
 
 public:
 	SpineSkeleton();
