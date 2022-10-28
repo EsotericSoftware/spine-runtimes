@@ -676,18 +676,18 @@ void _spAnimationState_applyRotateTimeline(spAnimationState *self, spTimeline *t
 			lastTotal = timelinesRotation[i];
 			lastDiff = timelinesRotation[i + 1];
 		}
-        loops = lastTotal - FMOD(lastTotal, 360);
-        total = diff + loops;
-        current = diff >= 0, dir = lastTotal >= 0;
-        if (ABS(lastDiff) <= 90 && SIGNUM(lastDiff) != SIGNUM(diff)) {
-            if (ABS(lastTotal - loops) > 180) {
-                total += 360 * SIGNUM(lastTotal);
-                dir = current;
-            } else if (loops != 0)
-                total -= 360 * SIGNUM(lastTotal);
-            else
-                dir = current;
-        }
+		loops = lastTotal - FMOD(lastTotal, 360);
+		total = diff + loops;
+		current = diff >= 0, dir = lastTotal >= 0;
+		if (ABS(lastDiff) <= 90 && SIGNUM(lastDiff) != SIGNUM(diff)) {
+			if (ABS(lastTotal - loops) > 180) {
+				total += 360 * SIGNUM(lastTotal);
+				dir = current;
+			} else if (loops != 0)
+				total -= 360 * SIGNUM(lastTotal);
+			else
+				dir = current;
+		}
 		if (dir != current) total += 360 * SIGNUM(lastTotal);
 		timelinesRotation[i] = total;
 	}
@@ -1037,9 +1037,9 @@ float spTrackEntry_getAnimationTime(spTrackEntry *entry) {
 }
 
 void spTrackEntry_resetRotationDirections(spTrackEntry *entry) {
-    FREE(entry->timelinesRotation);
-    entry->timelinesRotation = NULL;
-    entry->timelinesRotationCount = 0;
+	FREE(entry->timelinesRotation);
+	entry->timelinesRotation = NULL;
+	entry->timelinesRotationCount = 0;
 }
 
 float spTrackEntry_getTrackComplete(spTrackEntry *entry) {

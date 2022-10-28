@@ -123,7 +123,7 @@ namespace spine {
 				uvs = &regionAttachment->getUVs();
 				indices = &quadIndices;
 				indicesCount = 6;
-                texture = (Texture *) ((AtlasRegion*)regionAttachment->getRegion())->page->texture;
+				texture = (Texture *) ((AtlasRegion *) regionAttachment->getRegion())->page->texture;
 
 			} else if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
 				MeshAttachment *mesh = (MeshAttachment *) attachment;
@@ -140,7 +140,7 @@ namespace spine {
 				uvs = &mesh->getUVs();
 				indices = &mesh->getTriangles();
 				indicesCount = mesh->getTriangles().size();
-                texture = (Texture *) ((AtlasRegion*)mesh->getRegion())->page->texture;
+				texture = (Texture *) ((AtlasRegion *) mesh->getRegion())->page->texture;
 
 			} else if (attachment->getRTTI().isExactly(ClippingAttachment::rtti)) {
 				ClippingAttachment *clip = (ClippingAttachment *) slot.getAttachment();
