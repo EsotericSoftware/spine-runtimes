@@ -125,31 +125,11 @@ export class AssetManagerBase implements Disposable {
 		error: (path: string, message: string) => void = () => { }) {
 		path = this.start(path);
 
-		let isBrowser = !!(typeof window !== 'undefined' && typeof navigator !== 'undefined' && window.document);
-		let isWebWorker = !isBrowser;
-
-		if (isWebWorker) {
-			fetch(path, { mode: <RequestMode>"cors" }).then((response) => {
-				if (response.ok) return response.arrayBuffer();
-				this.error(error, path, `Couldn't load image: ${path}`);
-				return null;
-			}).then(arrayBuffer => {
-				if (arrayBuffer) this.success(success, path, arrayBuffer);
-			})
-		} else {
-			const request = new XMLHttpRequest();
-			request.open("GET", path, true);
-			request.responseType = "arraybuffer";
-			request.onload = () => {
-				const audioData = request.response;
-				this.success(success, path, audioData);
-			};
-			request.onerror = () => {
-				this.error(error, path, `Couldn't load image: ${path}`);
-			};
-			if (this.downloader.rawDataUris[path]) path = this.downloader.rawDataUris[path];
-			request.send();
-		}
+		this.downloader.downloadBinary(path, (data: Uint8Array): void => {
+			this.success(success, path, data.buffer);
+		}, (status: number, responseText: string): void => {
+			this.error(error, path, `Couldn't load binary ${path}: status ${status}, ${responseText}`);
+		});
 	}
 
 	loadTexture (path: string,
