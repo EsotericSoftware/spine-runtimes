@@ -574,10 +574,18 @@ export class SpinePlayer implements Disposable {
 				this.setUpAudio();
 				this.audioFloatingButton!.classList.remove("spine-player-hidden");
 				this.audioButton?.classList.remove("spine-player-hidden");
-				
-				setTimeout(() => {
-					this.audioFloatingButton!.classList.add("spine-player-floating-audio-button-disappear");
-				}, this.audioFloatingTimeDisappearTime);
+
+				new window.IntersectionObserver(
+					([entry], observer) => {
+						if (entry.isIntersecting) {
+							setTimeout(() => {
+								this.audioFloatingButton!.classList.add("spine-player-floating-audio-button-disappear");
+							}, this.audioFloatingTimeDisappearTime);
+							observer.disconnect();
+						}
+					},
+					{ threshold: 0.25 },
+				).observe(this.parent);
 			}
 		}
 
