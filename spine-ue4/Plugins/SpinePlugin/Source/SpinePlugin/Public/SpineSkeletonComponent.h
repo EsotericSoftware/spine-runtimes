@@ -53,7 +53,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spine)
 	USpineSkeletonDataAsset *SkeletonData;
 
-	spine::Skeleton *GetSkeleton() { CheckState(); return skeleton; };
+	spine::Skeleton *GetSkeleton() {
+		CheckState();
+		return skeleton;
+	};
 
 	UFUNCTION(BlueprintPure, Category = "Components|Spine|Skeleton")
 	void GetSkins(TArray<FString> &Skins);

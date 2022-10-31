@@ -248,7 +248,8 @@ namespace Spine.Unity.Examples {
 			}
 
 			Vector2 targetCameraViewportSize = targetCamera.pixelRect.size;
-			commandBuffer.SetViewport(new Rect(-screenSpaceMin, targetCameraViewportSize));
+			Rect viewportRect = new Rect(-screenSpaceMin * downScaleFactor, targetCameraViewportSize * downScaleFactor);
+			commandBuffer.SetViewport(viewportRect);
 		}
 
 		protected override void AssignMeshAtRenderer () {
