@@ -168,6 +168,9 @@ void USpineWidget::CheckState() {
 				state->setRendererObject((void *) this);
 				state->setListener(callbackWidget);
 				trackEntries.Empty();
+				skeleton->setToSetupPose();
+				skeleton->updateWorldTransform();
+				slateWidget->SetData(this);
 			}
 		}
 
