@@ -26,6 +26,11 @@ fixed4 _Color;
 fixed4 _TextureSampleAdd;
 float4 _ClipRect;
 
+#ifdef ENABLE_FILL
+float4 _FillColor;
+float _FillPhase;
+#endif
+
 VertexOutput vert (VertexInput IN) {
 	VertexOutput OUT;
 
@@ -73,6 +78,9 @@ fixed4 frag (VertexOutput IN) : SV_Target
 	clip (color.a - 0.001);
 	#endif
 
+	#ifdef ENABLE_FILL
+	color.rgb = lerp(color.rgb, (_FillColor.rgb * color.a), _FillPhase); // make sure to PMA _FillColor.
+	#endif
 	return color;
 }
 

@@ -93,6 +93,7 @@
   * Added `SkeletonAnimationMulti` sample component methods `SetActiveSkeleton(int index)` and getter property `SkeletonAnimations` to more easily apply changes at all SkeletonAnimation instances instead of only the active one.
   * PMA textures now have `sRGB (Color Texture)` disabled by default, the preset template `PMATexturePreset.preset` has been adjusted accordingly. As PMA textures are only allowed with Gamma color space, `sRGB (Color Texture)` shall be disabled to prevent border artifacts when mipmaps are enabled. In Gamma color space having this setting disabled has no drawbacks, only benefits.
   * `SkeletonRenderTexture` and `SkeletonGraphicRenderTexture` components now support automatic down-scaling when required size on screen exceeds `Max Render Texture Size`.
+  * Added `Spine/SkeletonGraphic Fill` shader to provide functionality of `Spine/Skeleton Fill` shader for `SkeletonGraphic`.
  
 * **Breaking changes**
   * Made `SkeletonGraphic.unscaledTime` parameter protected, use the new property `UnscaledTime` instead.
