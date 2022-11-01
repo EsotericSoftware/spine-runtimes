@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Animation, AnimationState, AnimationStateData, AtlasAttachmentLoader, Bone, Color, Disposable, Downloader, MathUtils, MixBlend, MixDirection, Skeleton, SkeletonBinary, SkeletonData, SkeletonJson, StringMap, TextureAtlas, TextureFilter, TimeKeeper, TrackEntry, Vector2 } from "@esotericsoftware/spine-core"
+import { Animation, AnimationState, AnimationStateData, AtlasAttachmentLoader, Bone, Color, Disposable, Downloader, Event, EventTimeline, MathUtils, MixBlend, MixDirection, PathConstraintPositionTimeline, Skeleton, SkeletonBinary, SkeletonData, SkeletonJson, StringMap, TextureAtlas, TextureFilter, TimeKeeper, Timeline, TrackEntry, Vector2 } from "@esotericsoftware/spine-core"
 import { AssetManager, GLTexture, Input, LoadingScreen, ManagedWebGLRenderingContext, ResizeMode, SceneRenderer, Vector3 } from "@esotericsoftware/spine-webgl"
 
 export interface SpinePlayerConfig {
@@ -229,9 +229,14 @@ export class SpinePlayer implements Disposable {
 
 	private audioCtx: AudioContext | null = null;
 	private audioEnabled = false;
-	private audioNodes: Record<string, () => void> = {};
+	private audioPaths: Set<string> = new Set();
 	private audioBufferCache: Record<string, AudioBuffer> = {};
 	private audioFloatingTimeDisappearTime = 5000;
+	// TODO: not put any
+	private cacheAudioEvent: Record<string, { timeStart: number, timeEnd: number, schedulePlay: (fromEvent: boolean) => void }> = {};
+	private audioGainMuteNode: GainNode | null = null;
+	private audioToRescheduleForTimelineMoveOrToggleFirstTime = false;
+	private audioScheduled: Set<AudioBufferSourceNode> = new Set();
 
 	constructor (parent: HTMLElement | string, private config: SpinePlayerConfig) {
 		let parentDom = typeof parent === "string" ? document.getElementById(parent) : parent;
@@ -384,6 +389,7 @@ export class SpinePlayer implements Disposable {
 			timeline.appendChild(this.timelineSlider.create());
 			this.timelineSlider.change = (percentage) => {
 				this.pause();
+				this.audioToRescheduleForTimelineMoveOrToggleFirstTime = true;
 				let animationDuration = this.animationState!.getCurrent(0)!.animation!.duration;
 				let time = animationDuration * percentage;
 				this.animationState!.update(time - this.playTime);
@@ -560,7 +566,7 @@ export class SpinePlayer implements Disposable {
 
 		// Load audio
 		if (config.audioFolderPath) {
-			const audioPaths = skeletonData.events.reduce((acc, event) => {
+			this.audioPaths = skeletonData.events.reduce((acc, event) => {
 				if (event.audioPath) {
 					const audioPath = [config.audioFolderPath, event.audioPath].join("/");
 					acc.add(audioPath);
@@ -570,8 +576,7 @@ export class SpinePlayer implements Disposable {
 			}, new Set<string>());
 
 			// Show audio button only if there are audio events
-			if (audioPaths.size > 0) {
-				this.setUpAudio();
+			if (this.audioPaths.size > 0) {
 				this.audioFloatingButton!.classList.remove("spine-player-hidden");
 				this.audioButton?.classList.remove("spine-player-hidden");
 
@@ -606,72 +611,6 @@ export class SpinePlayer implements Disposable {
 			this.setViewport(entry.animation!);
 			this.play();
 		}
-	}
-
-	private setUpAudio() {
-		this.animationState!.addListener({
-			event: (_, event) => {
-				const audioPath = event.data.audioPath
-				if (this.audioEnabled && this.audioCtx?.state === 'running' && audioPath) {
-					const playAudio = this.audioNodes[`${audioPath}-${event.balance}-${event.volume}`];
-					if (playAudio) 
-						playAudio();
-					else {
-						const audioNodes = [] as AudioNode[];
-						if (typeof this.audioCtx!.createGain === 'function') {
-							const node = this.audioCtx!.createGain();
-							node.gain.setValueAtTime(event.volume, this.audioCtx!.currentTime);
-							audioNodes.push(node);
-						}
-
-						// Cannot use createStereoPanner because some browser does not support it yet
-						if (typeof this.audioCtx!.createPanner === 'function') {
-							const node = this.audioCtx!.createPanner();
-							// Attempt to use positionX since positionX is not supported by some browsers yet. Fallback to the deprecated setPosition
-							if (node.positionX !== undefined) {
-								node.positionX.value = event.balance;
-							} else {
-								node.setPosition(event.balance, 0, 1 - Math.abs(event.balance));
-								node.panningModel = 'equalpower';
-							}
-							audioNodes.push(node);
-						}
-						audioNodes.push(this.audioCtx!.destination);
-
-						const storeAndPlayAudio = (audioBuffer: AudioBuffer, audioNodes: AudioNode[]) => {
-							const fn = () => {
-								const soundSource = this.audioCtx!.createBufferSource();
-								soundSource.buffer = audioBuffer;
-								soundSource.playbackRate.value = this.speed;
-								audioNodes.reduce((prevNode, node) => prevNode.connect(node), soundSource as AudioNode);
-								soundSource.start();
-							};
-							this.audioNodes[`${audioPath}-${event.balance}-${event.volume}`] = fn;
-							fn();
-						}
-
-						const audioBuffer = this.audioBufferCache[audioPath];
-						if (audioBuffer) {
-							storeAndPlayAudio(audioBuffer, audioNodes);
-						} else {
-							const soundSrc = this.assetManager!.require([this.config.audioFolderPath, audioPath].join("/"));
-							this.audioCtx!.decodeAudioData(soundSrc,
-								(audioBuffer: AudioBuffer) => {
-									this.audioBufferCache[audioPath] = audioBuffer
-									storeAndPlayAudio(audioBuffer, audioNodes);
-								},
-								(error) => {
-									const errorMsg = `"${audioPath}" cannot be decoded. Probably it is not an audio file or the format is not supported by your browser (Eg: Safari does not support .ogg). \n${error}`
-									console.error(errorMsg);
-									this.audioNodes[`${audioPath}-${event.balance}-${event.volume}`] = () => {};
-								});
-						}
-
-						
-					}
-				}
-			},
-		})
 	}
 
 	private setupInput () {
@@ -800,6 +739,16 @@ export class SpinePlayer implements Disposable {
 					config.animation = this.skeleton!.data.animations[0].name;
 				if (config.animation) this.setAnimation(config.animation);
 			}
+		}
+		if (this.audioToRescheduleForTimelineMoveOrToggleFirstTime) {
+			this.audioToRescheduleForTimelineMoveOrToggleFirstTime = false;
+			// There is an audio glitch when an audio was playing and than resume after timeline moved in an empty section. Probably can be avoided removing audio exactly when timeline is moved
+			this.audioScheduled.forEach((element) => {
+				element.stop();
+				element.disconnect();
+				this.audioScheduled.delete(element);
+			})
+			this.scheduleAudio();
 		}
 		this.audioCtx?.resume();
 	}
@@ -1166,30 +1115,6 @@ export class SpinePlayer implements Disposable {
 		popup.show();
 	}
 
-	private toggleAudio () {
-		if (!this.audioCtx) {
-			const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-			if (!AudioContext) {
-				console.error("Current browser does not support AudioContext so Audio will not work.");
-				return;
-			}
-			this.audioCtx = new AudioContext();
-			this.audioCtx.resume();
-		}
-		this.audioEnabled = !this.audioEnabled;
-		if (this.audioEnabled) {
-			this.audioButton?.classList.add("spine-player-button-icon-audio-on");
-			this.audioButton?.classList.remove("spine-player-button-icon-audio-off");
-			this.audioFloatingButton?.classList.add("spine-player-button-icon-audio-on");
-			this.audioFloatingButton?.classList.remove("spine-player-button-icon-audio-off");
-		} else {
-			this.audioButton?.classList.add("spine-player-button-icon-audio-off");
-			this.audioButton?.classList.remove("spine-player-button-icon-audio-on");
-			this.audioFloatingButton?.classList.add("spine-player-button-icon-audio-off");
-			this.audioFloatingButton?.classList.remove("spine-player-button-icon-audio-on");
-		}
-	}
-
 	private showError (message: string, error?: Error) {
 		if (this.error) {
 			if (error) throw error; // Don't lose error if showError throws, is caught, and showError is called again.
@@ -1200,6 +1125,152 @@ export class SpinePlayer implements Disposable {
 				+ message.replace("\n", "<br><br>") + `</div>`));
 			if (this.config.error) this.config.error(this, message);
 			throw (error ? error : new Error(message));
+		}
+	}
+
+	private async setUpAudio() {
+		// wait for ArrayBuffer to be downloaded
+		await this.assetManager?.loadAll();
+
+		// wait for ArrayBuffer to be transformed in AudioBuffer
+		const waitArrayAudioBuffer = [...this.audioPaths].map((audioPath): Promise<boolean> => {
+			const soundSrc = this.assetManager!.require(audioPath);
+			return new Promise<true>((resolve) => {
+				this.audioCtx!.decodeAudioData(
+					soundSrc,
+					(audioBuffer: AudioBuffer) => {
+						this.audioBufferCache[audioPath] = audioBuffer
+						resolve(true);
+					},
+					(error) => {
+						const errorMsg = `"${audioPath}" cannot be decoded. Probably it is not an audio file or the format is not supported by your browser (Eg: Safari does not support .ogg). \n${error}`
+						console.error(errorMsg);
+						resolve(true);
+					});
+			})
+		})
+		await Promise.all(waitArrayAudioBuffer);
+
+		// prepare all audio events in a dictonary
+		this.skeleton!.data.animations.forEach((animation) => {
+			animation.timelines.forEach((timeline: Timeline) => {
+				if ('events' in timeline) {
+					const eventTimeline = timeline as EventTimeline;
+					eventTimeline.events.forEach((event) => {
+						const audioPath = event.data.audioPath!;
+
+						const audioNodes = [] as AudioNode[];
+						if (typeof this.audioCtx!.createGain === 'function') {
+							const node = this.audioCtx!.createGain();
+							node.gain.setValueAtTime(event.volume, this.audioCtx!.currentTime);
+							audioNodes.push(node);
+						}
+
+						// Cannot use createStereoPanner because some browser does not support it yet
+						if (typeof this.audioCtx!.createPanner === 'function') {
+							const node = this.audioCtx!.createPanner();
+							// Attempt to use positionX since positionX is not supported by some browsers yet. Fallback to the deprecated setPosition
+							if (node.positionX !== undefined) {
+								node.positionX.value = event.balance;
+							} else {
+								node.setPosition(event.balance, 0, 1 - Math.abs(event.balance));
+								node.panningModel = 'equalpower';
+							}
+							audioNodes.push(node);
+						}
+						audioNodes.push(this.audioGainMuteNode!);
+
+						const audioBuffer = this.audioBufferCache[[this.config.audioFolderPath, audioPath].join("/")];
+						if (audioBuffer) {
+							this.cacheAudioEvent[`${animation.name}-${event.data.name}`] = {
+								timeStart: event.time,
+								timeEnd: event.time + audioBuffer.duration,
+								schedulePlay: (fromEvent: boolean) => {
+									/*
+									 * TODO: verify that a sound is not already playing to avoid double schedule in rare situations.
+									 * Maybe checking in this.audioScheduled something
+									*/
+									if (!fromEvent && event.time + audioBuffer.duration < this.playTime) {
+										return;
+									};
+
+									const soundSource = this.audioCtx!.createBufferSource();
+									soundSource.buffer = audioBuffer;
+									soundSource.playbackRate.value = this.speed;
+									audioNodes.reduce((prevNode, node) => prevNode.connect(node), soundSource as AudioNode);
+
+									if (fromEvent)
+										soundSource.start();
+									else
+										soundSource.start(this.audioCtx!.currentTime, this.playTime - event.time);
+
+									this.audioScheduled.add(soundSource);
+									soundSource.addEventListener('ended', () => this.audioScheduled.delete(soundSource), { once: true })
+								},
+							};
+						}
+					})
+				}
+			})
+		});
+
+		this.animationState!.addListener({
+			event: (track, event) => {
+				if (this.audioCtx?.state === 'running' && event.data.audioPath) {
+					const playAudio = this.cacheAudioEvent[`${track.animation?.name}-${event.data.name}`];
+					if (playAudio) playAudio.schedulePlay(true);
+				}
+			}
+		})
+	}
+
+	private scheduleAudio() {
+		this.animationState!.tracks.forEach(trackentry => {
+			trackentry?.animation?.timelines.forEach((timeline: Timeline) => {
+				if ('events' in timeline) {
+					const events: Event[] = [];
+					(timeline as EventTimeline).apply(this.skeleton!, -1, this.playTime, events, 1, MixBlend.setup, MixDirection.mixIn)
+					events.forEach((event) => {
+						const playAudio = this.cacheAudioEvent[`${trackentry.animation?.name}-${event.data.name}`];
+						if (playAudio) playAudio.schedulePlay(false);
+					})
+				}
+			})
+		})
+	}
+
+	private toggleAudio () {
+		if (!this.audioCtx) {
+			const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+			if (!AudioContext) {
+				console.error("Current browser does not support AudioContext so Audio will not work.");
+				return;
+			}
+			this.audioCtx = new AudioContext();
+			this.audioCtx.resume();
+			this.audioGainMuteNode = this.audioCtx.createGain();
+			this.audioGainMuteNode.gain.setValueAtTime(1, this.audioCtx!.currentTime);
+			this.audioGainMuteNode.connect(this.audioCtx.destination);
+			this.setUpAudio().then(() => {
+				if (this.paused)
+					this.audioToRescheduleForTimelineMoveOrToggleFirstTime = true;
+				else
+					this.scheduleAudio();
+			});
+		}
+		this.audioEnabled = !this.audioEnabled;
+		if (this.audioEnabled) {
+			this.audioGainMuteNode!.gain.setValueAtTime(1, this.audioCtx!.currentTime);
+			this.audioButton?.classList.add("spine-player-button-icon-audio-on");
+			this.audioButton?.classList.remove("spine-player-button-icon-audio-off");
+			this.audioFloatingButton?.classList.add("spine-player-button-icon-audio-on");
+			this.audioFloatingButton?.classList.remove("spine-player-button-icon-audio-off");
+		} else {
+			this.audioGainMuteNode!.gain.setValueAtTime(0, this.audioCtx!.currentTime);
+			this.audioButton?.classList.add("spine-player-button-icon-audio-off");
+			this.audioButton?.classList.remove("spine-player-button-icon-audio-on");
+			this.audioFloatingButton?.classList.add("spine-player-button-icon-audio-off");
+			this.audioFloatingButton?.classList.remove("spine-player-button-icon-audio-on");
 		}
 	}
 }
