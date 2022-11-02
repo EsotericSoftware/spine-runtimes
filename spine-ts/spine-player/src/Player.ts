@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Animation, AnimationState, AnimationStateData, AtlasAttachmentLoader, Bone, Color, Disposable, Downloader, Event, EventTimeline, MathUtils, MixBlend, MixDirection, PathConstraintPositionTimeline, Skeleton, SkeletonBinary, SkeletonData, SkeletonJson, StringMap, TextureAtlas, TextureFilter, TimeKeeper, Timeline, TrackEntry, Vector2 } from "@esotericsoftware/spine-core"
+import { Animation, AnimationState, AnimationStateData, AtlasAttachmentLoader, Bone, Color, Disposable, Downloader, Event, EventTimeline, MathUtils, MixBlend, MixDirection, Skeleton, SkeletonBinary, SkeletonData, SkeletonJson, StringMap, TextureAtlas, TextureFilter, TimeKeeper, Timeline, TrackEntry, Vector2 } from "@esotericsoftware/spine-core"
 import { AssetManager, GLTexture, Input, LoadingScreen, ManagedWebGLRenderingContext, ResizeMode, SceneRenderer, Vector3 } from "@esotericsoftware/spine-webgl"
 
 export interface SpinePlayerConfig {
@@ -742,13 +742,7 @@ export class SpinePlayer implements Disposable {
 		}
 		if (this.audioToRescheduleForTimelineMoveOrToggleFirstTime) {
 			this.audioToRescheduleForTimelineMoveOrToggleFirstTime = false;
-			// There is an audio glitch when an audio was playing and than resume after timeline moved in an empty section. Probably can be avoided removing audio exactly when timeline is moved
-			this.audioScheduled.forEach((element) => {
-				element.stop();
-				element.disconnect();
-				this.audioScheduled.delete(element);
-			})
-			this.scheduleAudio();
+			this.rescheduleAudio();
 		}
 		this.audioCtx?.resume();
 	}
@@ -1025,7 +1019,10 @@ export class SpinePlayer implements Disposable {
 		let slider = new Slider(2, 0.1, true);
 		findWithClass(popup.dom, "spine-player-speed-slider").appendChild(slider.create());
 		slider.setValue(this.speed / 2);
-		slider.change = (percentage) => this.speed = percentage * 2;
+		slider.change = (percentage) => {
+			this.speed = percentage * 2
+			this.audioScheduled.forEach(soundSource => soundSource.playbackRate.value = this.speed)
+		};
 		popup.show();
 	}
 
@@ -1229,7 +1226,7 @@ export class SpinePlayer implements Disposable {
 			trackentry?.animation?.timelines.forEach((timeline: Timeline) => {
 				if ('events' in timeline) {
 					const events: Event[] = [];
-					(timeline as EventTimeline).apply(this.skeleton!, -1, this.playTime, events, 1, MixBlend.setup, MixDirection.mixIn)
+					(timeline as EventTimeline).apply(this.skeleton!, -1, this.playTime, events, 1, MixBlend.setup, MixDirection.mixIn);
 					events.forEach((event) => {
 						const playAudio = this.cacheAudioEvent[`${trackentry.animation?.name}-${event.data.name}`];
 						if (playAudio) playAudio.schedulePlay(false);
@@ -1273,6 +1270,16 @@ export class SpinePlayer implements Disposable {
 			this.audioFloatingButton?.classList.remove("spine-player-button-icon-audio-on");
 		}
 	}
+	
+	private rescheduleAudio() {
+		this.audioScheduled.forEach((element) => {
+			element.stop();
+			element.disconnect();
+			this.audioScheduled.delete(element);
+		})
+		this.scheduleAudio();
+	}
+	
 }
 
 class Popup {
