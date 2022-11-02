@@ -189,6 +189,7 @@ static bool handlerQueued = false;
 	float r = 0, g = 0, b = 0, a = 0;
 	float dr = 0, dg = 0, db = 0, da = _premultipliedAlpha ? 1 : 0;
 	for (int i = 0, n = _skeleton->slotsCount; i < n; i++) {
+		vertices = _worldVertices;
 		spSlot* slot = _skeleton->drawOrder[i];
 		if (!slot->attachment) continue;
 		if (!slot->bone->active) continue;
@@ -225,6 +226,7 @@ static bool handlerQueued = false;
 		case SP_ATTACHMENT_CLIPPING: {
 			spClippingAttachment* clip = (spClippingAttachment*)slot->attachment;
 			spSkeletonClipping_clipStart(_clipper, slot, clip);
+            continue;
 		}
 		default: ;
 		}
