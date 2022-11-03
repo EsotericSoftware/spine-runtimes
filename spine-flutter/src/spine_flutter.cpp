@@ -2471,7 +2471,7 @@ FFI_PLUGIN_EXPORT void spine_mesh_attachment_set_hull_length(spine_mesh_attachme
 FFI_PLUGIN_EXPORT int spine_mesh_attachment_get_num_region_uvs(spine_mesh_attachment attachment) {
     if (attachment == nullptr) return 0;
     MeshAttachment *_attachment = (MeshAttachment*)attachment;
-    return _attachment->getRegionUVs().size();
+    return (int)_attachment->getRegionUVs().size();
 }
 
 FFI_PLUGIN_EXPORT float *spine_mesh_attachment_get_region_uvs(spine_mesh_attachment attachment) {
@@ -2483,7 +2483,7 @@ FFI_PLUGIN_EXPORT float *spine_mesh_attachment_get_region_uvs(spine_mesh_attachm
 FFI_PLUGIN_EXPORT int spine_mesh_attachment_get_num_uvs(spine_mesh_attachment attachment) {
     if (attachment == nullptr) return 0;
     MeshAttachment *_attachment = (MeshAttachment*)attachment;
-    return _attachment->getUVs().size();
+    return (int)_attachment->getUVs().size();
 }
 
 FFI_PLUGIN_EXPORT float *spine_mesh_attachment_get_uvs(spine_mesh_attachment attachment) {
@@ -2495,7 +2495,7 @@ FFI_PLUGIN_EXPORT float *spine_mesh_attachment_get_uvs(spine_mesh_attachment att
 FFI_PLUGIN_EXPORT int spine_mesh_attachment_get_num_triangles(spine_mesh_attachment attachment) {
     if (attachment == nullptr) return 0;
     MeshAttachment *_attachment = (MeshAttachment*)attachment;
-    return _attachment->getTriangles().size();
+    return (int)_attachment->getTriangles().size();
 }
 
 FFI_PLUGIN_EXPORT uint16_t *spine_mesh_attachment_get_triangles(spine_mesh_attachment attachment) {
@@ -2552,7 +2552,7 @@ FFI_PLUGIN_EXPORT void spine_mesh_attachment_set_parent_mesh(spine_mesh_attachme
 FFI_PLUGIN_EXPORT int spine_mesh_attachment_get_num_edges(spine_mesh_attachment attachment) {
     if (attachment == nullptr) return 0;
     MeshAttachment *_attachment = (MeshAttachment*)attachment;
-    return _attachment->getEdges().size();
+    return (int)_attachment->getEdges().size();
 }
 
 FFI_PLUGIN_EXPORT unsigned short *spine_mesh_attachment_get_edges(spine_mesh_attachment attachment) {
@@ -2633,7 +2633,7 @@ FFI_PLUGIN_EXPORT void spine_bounding_box_attachment_set_color(spine_bounding_bo
 FFI_PLUGIN_EXPORT int spine_path_attachment_get_num_lengths(spine_path_attachment attachment) {
     if (attachment == nullptr) return 0;
     PathAttachment *_attachment = (PathAttachment*)attachment;
-    return _attachment->getLengths().size();
+    return (int)_attachment->getLengths().size();
 }
 
 FFI_PLUGIN_EXPORT float *spine_path_attachment_get_lengths(spine_path_attachment attachment) {
