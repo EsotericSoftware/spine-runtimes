@@ -523,7 +523,7 @@ void Bone::updateAppliedTransform() {
 				break;
 			}
 			case TransformMode_NoScale:
-			case TransformMode_NoScaleOrReflection:
+			case TransformMode_NoScaleOrReflection: {
 				float cos = MathUtil::cosDeg(_rotation), sin = MathUtil::sinDeg(_rotation);
 				pa = (pa * cos + pb * sin) / _skeleton.getScaleX();
 				pc = (pc * cos + pd * sin) / _skeleton.getScaleY();
@@ -540,7 +540,11 @@ void Bone::updateAppliedTransform() {
 				ia = pd * pid;
 				ib = pb * pid;
 				ic = pc * pid;
-				id = pa * pid;
+				id = pa * pid;			
+				break;
+			}
+			default:
+				break;		
 		}
 		ra = ia * _a - ib * _c;
 		rb = ia * _b - ib * _d;

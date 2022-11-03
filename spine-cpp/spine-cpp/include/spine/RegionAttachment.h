@@ -61,7 +61,7 @@ namespace spine {
 		void updateRegion();
 
 		/// Transforms the attachment's four vertices to world coordinates.
-		/// @param bone The parent bone.
+		/// @param slot The parent slot.
 		/// @param worldVertices The output world vertices. Must have a length greater than or equal to offset + 8.
 		/// @param offset The worldVertices index to begin writing values.
 		/// @param stride The number of worldVertices entries between the value pairs written.

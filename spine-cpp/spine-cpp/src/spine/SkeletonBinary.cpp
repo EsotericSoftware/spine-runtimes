@@ -109,9 +109,9 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 	int lowHash = readInt(input);
 	int hightHash = readInt(input);
 	String hashString;
-	sprintf(buffer, "%x", hightHash);
+	snprintf(buffer, 16, "%x", hightHash);
 	hashString.append(buffer);
-	sprintf(buffer, "%x", lowHash);
+	snprintf(buffer, 16, "%x", lowHash);
 	hashString.append(buffer);
 	skeletonData->_hash = hashString;
 
@@ -120,7 +120,7 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 
 	if (!skeletonData->_version.startsWith(SPINE_VERSION_STRING)) {
 		char errorMsg[255];
-		sprintf(errorMsg, "Skeleton version %s does not match runtime version %s", skeletonData->_version.buffer(), SPINE_VERSION_STRING);
+		snprintf(errorMsg, 255, "Skeleton version %s does not match runtime version %s", skeletonData->_version.buffer(), SPINE_VERSION_STRING);
 		setError(errorMsg, "");
 		return NULL;
 	}
