@@ -505,14 +505,14 @@ namespace Spine.Unity.AttachmentTools {
 			newSkin.Constraints.AddRange(o.Constraints);
 
 			inoutAttachments.Clear();
-			foreach (var entry in o.Attachments) {
+			foreach (var entry in skinAttachments) {
 				inoutAttachments.Add(entry.Attachment);
 			}
 			GetRepackedAttachments(inoutAttachments, inoutAttachments, materialPropertySource, out outputMaterial, out outputTexture,
 				maxAtlasSize, padding, textureFormat, mipmaps, newName, clearCache, useOriginalNonrenderables,
 				additionalTexturePropertyIDsToCopy, additionalOutputTextures, additionalTextureFormats, additionalTextureIsLinear);
 			int i = 0;
-			foreach (var originalSkinEntry in o.Attachments) {
+			foreach (var originalSkinEntry in skinAttachments) {
 				var newAttachment = inoutAttachments[i++];
 				newSkin.SetAttachment(originalSkinEntry.SlotIndex, originalSkinEntry.Name, newAttachment);
 			}
@@ -680,7 +680,13 @@ namespace Spine.Unity.AttachmentTools {
 		/// <summary>
 		/// Returns a Rect of the AtlasRegion according to Spine texture coordinates. (x-right, y-down)</summary>
 		static Rect GetSpineAtlasRect (this AtlasRegion region, bool includeRotate = true) {
-			return new Rect(region.x, region.y, region.packedWidth, region.packedHeight);
+			float width = region.packedWidth;
+			float height = region.packedHeight;
+			if (includeRotate && region.degrees == 270) {
+				width = region.packedHeight;
+				height = region.packedWidth;
+			}
+			return new Rect(region.x, region.y, width, height);
 		}
 
 		/// <summary>
@@ -706,13 +712,20 @@ namespace Spine.Unity.AttachmentTools {
 		/// <summary>
 		/// Creates a new Spine AtlasRegion according to a Unity UV Rect (x-right, y-up, uv-normalized).</summary>
 		static AtlasRegion UVRectToAtlasRegion (Rect uvRect, AtlasRegion referenceRegion, AtlasPage page) {
-			var tr = UVRectToTextureRect(uvRect, page.width, page.height);
-			var rr = tr.SpineUnityFlipRect(page.height);
+			Rect tr = UVRectToTextureRect(uvRect, page.width, page.height);
+			Rect rr = tr.SpineUnityFlipRect(page.height);
 
 			int x = (int)rr.x;
 			int y = (int)rr.y;
 			int w = (int)rr.width;
 			int h = (int)rr.height;
+
+			if (referenceRegion.degrees == 270) {
+				int tempW = w;
+				w = h;
+				h = tempW;
+			}
+
 			// Note: originalW and originalH need to be scaled according to the
 			// repacked width and height, repacking can mess with aspect ratio, etc.
 			int originalW = Mathf.RoundToInt((float)w * ((float)referenceRegion.originalWidth / (float)referenceRegion.width));
@@ -725,6 +738,14 @@ namespace Spine.Unity.AttachmentTools {
 			float u2 = uvRect.xMax;
 			float v = uvRect.yMax;
 			float v2 = uvRect.yMin;
+
+			if (referenceRegion.degrees == 270) {
+				// at a 270 degree region, u2/v2 deltas are swapped, and delta-v is negative.
+				float du = u2 - u;
+				float dv = v - v2;
+				u2 = u + dv;
+				v2 = v - du;
+			}
 
 			return new AtlasRegion {
 				page = page,
