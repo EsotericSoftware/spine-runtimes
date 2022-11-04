@@ -94,6 +94,7 @@
   * PMA textures now have `sRGB (Color Texture)` disabled by default, the preset template `PMATexturePreset.preset` has been adjusted accordingly. As PMA textures are only allowed with Gamma color space, `sRGB (Color Texture)` shall be disabled to prevent border artifacts when mipmaps are enabled. In Gamma color space having this setting disabled has no drawbacks, only benefits.
   * `SkeletonRenderTexture` and `SkeletonGraphicRenderTexture` components now support automatic down-scaling when required size on screen exceeds `Max Render Texture Size`.
   * Added `Spine/SkeletonGraphic Fill` shader to provide functionality of `Spine/Skeleton Fill` shader for `SkeletonGraphic`.
+  * Lit Spine URP shaders (`Universal Render Pipeline/Spine/Sprite` and `Universal Render Pipeline/Spine/Skeleton Lit`) now support `Forward+` rendering path as introduced by Unity 2022.2 and URP version 14.
  
 * **Breaking changes**
   * Made `SkeletonGraphic.unscaledTime` parameter protected, use the new property `UnscaledTime` instead.

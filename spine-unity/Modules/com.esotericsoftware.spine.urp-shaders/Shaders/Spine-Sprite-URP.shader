@@ -107,6 +107,9 @@ Shader "Universal Render Pipeline/Spine/Sprite"
 			#pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
 			#pragma multi_compile _ _SHADOWS_SOFT
 			#pragma multi_compile _ _MIXED_LIGHTING_SUBTRACTIVE
+			// Farward+ renderer keywords
+			#pragma multi_compile _ _FORWARD_PLUS
+			#pragma multi_compile_fragment _ _WRITE_RENDERING_LAYERS
 
 			// -------------------------------------
 			// Unity defined keywords
