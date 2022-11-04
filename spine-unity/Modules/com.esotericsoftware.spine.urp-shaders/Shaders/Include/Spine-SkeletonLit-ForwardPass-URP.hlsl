@@ -5,6 +5,7 @@
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 #include "SpineCoreShaders/Spine-Common.cginc"
+#include "Spine-Common-URP.hlsl"
 
 #if (defined(_MAIN_LIGHT_SHADOWS) || defined(MAIN_LIGHT_CALCULATE_SHADOWS)) && !defined(_RECEIVE_SHADOWS_OFF)
 #define SKELETONLIT_RECEIVE_SHADOWS
@@ -32,7 +33,19 @@ struct VertexOutput {
 	UNITY_VERTEX_OUTPUT_STEREO
 };
 
-half3 LightweightLightVertexSimplified(float3 positionWS, half3 normalWS, out half3 shadowedColor) {
+half3 ProcessLight(float3 positionWS, half3 normalWS, uint meshRenderingLayers, int lightIndex)
+{
+	Light light = GetAdditionalLight(lightIndex, positionWS);
+#ifdef _LIGHT_LAYERS
+	if (!IsMatchingLightLayer(light.layerMask, meshRenderingLayers))
+		return half3(0, 0, 0);
+#endif
+
+	half3 attenuatedLightColor = light.color * (light.distanceAttenuation * light.shadowAttenuation);
+	return LightingLambert(attenuatedLightColor, light.direction, normalWS);
+}
+
+half3 LightweightLightVertexSimplified(float3 positionWS, float3 positionCS, half3 normalWS, out half3 shadowedColor) {
 	Light mainLight = GetMainLight();
 	half3 attenuatedLightColor = mainLight.color * (mainLight.distanceAttenuation * mainLight.shadowAttenuation);
 	half3 mainLightColor = LightingLambert(attenuatedLightColor, mainLight.direction, normalWS);
@@ -40,12 +53,26 @@ half3 LightweightLightVertexSimplified(float3 positionWS, half3 normalWS, out ha
 	half3 additionalLightColor = half3(0, 0, 0);
 	// Note: we don't add any lighting in the fragment shader, thus we include both variants below
 #if defined(_ADDITIONAL_LIGHTS) || defined(_ADDITIONAL_LIGHTS_VERTEX)
-	for (int i = 0; i < GetAdditionalLightsCount(); ++i)
+	uint meshRenderingLayers = GetMeshRenderingLayerBackwardsCompatible();
+#if USE_FORWARD_PLUS
+	for (uint lightIndex = 0; lightIndex < min(_AdditionalLightsDirectionalCount, MAX_VISIBLE_LIGHTS); lightIndex++)
 	{
-		Light light = GetAdditionalLight(i, positionWS);
-		half3 attenuatedLightColor = light.color * (light.distanceAttenuation * light.shadowAttenuation);
-		additionalLightColor += LightingLambert(attenuatedLightColor, light.direction, normalWS);
+		additionalLightColor += ProcessLight(positionWS, normalWS, meshRenderingLayers, lightIndex);
 	}
+#endif
+	int pixelLightCount = GetAdditionalLightsCount();
+	// fill out InputData struct
+	InputData inputData; // LIGHT_LOOP_BEGIN macro requires InputData struct in USE_FORWARD_PLUS branch
+	inputData.positionWS = positionWS;
+#if defined(_ADDITIONAL_LIGHTS) && USE_FORWARD_PLUS
+	inputData.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(positionCS);
+#else
+	inputData.normalizedScreenSpaceUV = 0;
+#endif
+
+	LIGHT_LOOP_BEGIN_SPINE(pixelLightCount)
+		additionalLightColor += ProcessLight(positionWS, normalWS, meshRenderingLayers, lightIndex);
+	LIGHT_LOOP_END_SPINE
 #endif
 	shadowedColor = additionalLightColor;
 	return mainLightColor + additionalLightColor;
@@ -62,6 +89,7 @@ VertexOutput vert(appdata v) {
 	half3 normalWS = normalize(mul((float3x3)unity_ObjectToWorld, fixedNormal));
 	o.uv0 = v.uv0;
 	o.pos = TransformWorldToHClip(positionWS);
+	float3 positionCS = o.pos;
 
 #ifdef _DOUBLE_SIDED_LIGHTING
 	// unfortunately we have to compute the sign here in the vertex shader
@@ -83,7 +111,7 @@ VertexOutput vert(appdata v) {
 	}
 #endif // !defined(_LIGHT_AFFECTS_ADDITIVE)
 
-	color.rgb *= LightweightLightVertexSimplified(positionWS, normalWS, shadowedColor);
+	color.rgb *= LightweightLightVertexSimplified(positionWS, positionCS, normalWS, shadowedColor);
 #if defined(SKELETONLIT_RECEIVE_SHADOWS)
 	o.shadowedColor = shadowedColor;
 #endif
@@ -103,7 +131,12 @@ VertexOutput vert(appdata v) {
 	return o;
 }
 
-half4 frag(VertexOutput i) : SV_Target{
+half4 frag(VertexOutput i
+#ifdef _WRITE_RENDERING_LAYERS
+	, out float4 outRenderingLayers : SV_Target1
+#endif
+) : SV_Target0
+{
 	half4 tex = tex2D(_MainTex, i.uv0);
 	#if defined(_STRAIGHT_ALPHA_INPUT)
 	tex.rgb *= tex.a;
@@ -116,6 +149,12 @@ half4 frag(VertexOutput i) : SV_Target{
 	half shadowAttenuation = MainLightRealtimeShadow(i.shadowCoord);
 	i.color.rgb = lerp(i.shadowedColor, i.color.rgb, shadowAttenuation);
 #endif
+
+#ifdef _WRITE_RENDERING_LAYERS
+	uint renderingLayers = GetMeshRenderingLayerBackwardsCompatible();
+	outRenderingLayers = float4(EncodeMeshRenderingLayer(renderingLayers), 0, 0, 0);
+#endif
+
 	return tex * i.color;
 }
 

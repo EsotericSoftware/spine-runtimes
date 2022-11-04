@@ -47,6 +47,9 @@
 			#pragma multi_compile _ _SHADOWS_SOFT
 			#pragma multi_compile _ _MIXED_LIGHTING_SUBTRACTIVE
 			#pragma multi_compile _ _LIGHT_AFFECTS_ADDITIVE
+			// Farward+ renderer keywords
+			#pragma multi_compile _ _FORWARD_PLUS
+			#pragma multi_compile_fragment _ _WRITE_RENDERING_LAYERS
 
 			// -------------------------------------
 			// Unity defined keywords
