@@ -1147,7 +1147,8 @@ public class AnimationState {
 		 * {@link AnimationStateData#getMix(Animation, Animation)} based on the animation before this animation (if any).
 		 * <p>
 		 * A mix duration of 0 still mixes out over one frame to provide the track entry being mixed out a chance to revert the
-		 * properties it was animating.
+		 * properties it was animating. A mix duration of 0 can be set at any time to end the mix on the next
+		 * {@link AnimationState#update(float) update}.
 		 * <p>
 		 * The <code>mixDuration</code> can be set manually rather than use the value from
 		 * {@link AnimationStateData#getMix(Animation, Animation)}. In that case, the <code>mixDuration</code> can be set for a new
