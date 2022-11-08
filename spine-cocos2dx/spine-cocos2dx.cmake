@@ -25,4 +25,4 @@ file(GLOB_RECURSE SPINE_COCOS2DX_SOURCES "${SPINE_RUNTIMES_PATH}/spine-cocos2dx/
 add_library(spine-cocos2dx STATIC ${SPINE_COCOS2DX_SOURCES} ${SPINE_COCOS2DX_HEADERS})
 target_include_directories(spine-cocos2dx PUBLIC "${SPINE_RUNTIMES_PATH}/spine-cpp/spine-cpp/include/")
 target_include_directories(spine-cocos2dx PUBLIC "${SPINE_RUNTIMES_PATH}/spine-cocos2dx/spine-cocos2dx/src/")
-target_link_libraries(spine-cocos2dx PRIVATE cocos2d)
+target_link_libraries(spine-cocos2dx PRIVATE cocos2d spine-cpp)
