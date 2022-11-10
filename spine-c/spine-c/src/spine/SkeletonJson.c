@@ -282,7 +282,7 @@ static spAnimation *_spSkeletonJson_readAnimation(spSkeletonJson *self, Json *ro
 				spAttachmentTimeline *timeline = spAttachmentTimeline_create(frames, slotIndex);
 				for (keyMap = timelineMap->child, frame = 0; keyMap; keyMap = keyMap->next, ++frame) {
 					spAttachmentTimeline_setFrame(timeline, frame, Json_getFloat(keyMap, "time", 0),
-												  Json_getItem(keyMap, "name")->valueString);
+												  Json_getItem(keyMap, "name") ? Json_getItem(keyMap, "name")->valueString : NULL);
 				}
 				spTimelineArray_add(timelines, SUPER(timeline));
 
