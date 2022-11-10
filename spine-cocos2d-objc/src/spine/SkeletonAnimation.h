@@ -54,6 +54,7 @@ typedef void(^spUpdateWorldTransformsListener)(SkeletonAnimation* node);
 	spDisposeListener _disposeListener;
 	spCompleteListener _completeListener;
 	spEventListener _eventListener;
+    bool _updatedOnce;
 }
 
 + (id) skeletonWithData:(spSkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData;
