@@ -20,17 +20,19 @@ import os
 import pathlib
 import codecs
 
-def convert_json(filename):    
-    with open(filename) as file:
-        content = file.read()
-        if "skeleton" in content and "hash" in content and "spine" in content:
-            path = pathlib.Path(filename)
-            new_path = path.with_suffix('.spine-json')
-            print("Renaming " + str(path) + " to " + str(new_path))
-            path.rename(new_path)
-            if os.path.exists(filename + ".import"):
-                print("Removing " + str(filename) + ".import")
-                os.remove(filename + ".import")
+def convert_json(filename):
+    file = codecs.open(filename, "r", "utf-8")
+    content = file.read()
+    file.close()
+    
+    if "skeleton" in content and "hash" in content and "spine" in content:
+        path = pathlib.Path(filename)
+        new_path = path.with_suffix('.spine-json')
+        print("Renaming " + str(path) + " to " + str(new_path))
+        path.rename(new_path)
+        if os.path.exists(filename + ".import"):
+            print("Removing " + str(filename) + ".import")
+            os.remove(filename + ".import")
 
 def convert_tscn_or_tres(filename):    
     file = codecs.open(filename, "r", "utf-8")
