@@ -50,17 +50,13 @@ class SimpleAnimation extends StatelessWidget {
     reportLeaks();
     final controller = SpineWidgetController((controller) {
       // Set the walk animation on track 0, let it loop
-      controller.animationState?.setAnimationByName(0, "walk", true);
-
-      print("Skeleton name: ${controller.skeletonData?.getName()}");
-      print("Skeleton version: ${controller.skeletonData?.getVersion()}");
-      print("Skeleton hash: ${controller.skeletonData?.getHash()}");
-      print("Bones: ${controller.skeletonData!.getBones()}");
+      // controller.animationState?.setAnimationByName(0, "walk", true);
     });
 
     return Scaffold(
       appBar: AppBar(title: const Text('Spineboy')),
-      body: SpineWidget.asset("assets/spineboy-pro.skel", "assets/spineboy.atlas", controller),
+      // body: SpineWidget.asset("assets/skeleton.json", "assets/skeleton.atlas", controller, alignment: Alignment.center, fit: BoxFit.none),
+      body: SpineWidget.asset("assets/spineboy-pro.skel", "assets/spineboy.atlas", controller)
       // body: SpineWidget.file("/Users/badlogic/workspaces/spine-runtimes/examples/spineboy/export/spineboy-pro.skel", "/Users/badlogic/workspaces/spine-runtimes/examples/spineboy/export/spineboy.atlas", controller),
       // body: const SpineWidget.http("https://marioslab.io/dump/spineboy/spineboy-pro.json", "https://marioslab.io/dump/spineboy/spineboy.atlas"),
     );
@@ -84,7 +80,8 @@ class AnimationStateEvents extends StatelessWidget {
       controller.animationState?.setAnimationByName(0, "walk", true)?.setListener((type, trackEntry, event) {
         print("Walk animation event ${type}");
       });
-      controller.animationState?.addAnimationByName(0, "run", true, 2)?.setListener((type, trackEntry, event) {
+      controller.animationState?.addAnimationByName(0, "jump", false, 2);
+      controller.animationState?.addAnimationByName(0, "run", true, 0)?.setListener((type, trackEntry, event) {
         print("Run animation event ${type}");
       });
       controller.animationState?.setListener((type, trackEntry, event) {
