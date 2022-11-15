@@ -143,6 +143,14 @@ class SkeletonData {
     return SkeletonData._(result.skeletonData);
   }
 
+  static Future<SkeletonData> fromAsset(Atlas atlas, AssetBundle assetBundle, String skeletonFileName) async {
+    if (skeletonFileName.endsWith(".json")) {
+      return fromJson(atlas, await assetBundle.loadString(skeletonFileName));
+    } else {
+      return fromBinary(atlas, (await assetBundle.load(skeletonFileName)).buffer.asUint8List());
+    }
+  }
+
   /// Finds a bone by comparing each bone's name. It is more efficient to cache the results of this method than to call it multiple times.
   BoneData? findBone(String name) {
     final nativeName = name.toNativeUtf8();
@@ -1559,11 +1567,23 @@ class SkinEntry {
   SkinEntry(this.slotIndex, this.name, this.attachment);
 }
 
-// FIXME add a way to create a new skin
 class Skin {
-  final spine_skin _skin;
+  late final bool _isCustomSkin;
+  late final spine_skin _skin;
 
-  Skin._(this._skin);
+  Skin._(this._skin) : _isCustomSkin = false;
+
+  Skin.new(String name) {
+    final nativeName = name.toNativeUtf8();
+    _skin = _bindings.spine_skin_create(nativeName.cast());
+    malloc.free(nativeName);
+    _isCustomSkin = true;
+  }
+
+  void dispose() {
+    if (!_isCustomSkin) return;
+    _bindings.spine_skin_dispose(_skin);
+  }
 
   void setAttachment(int slotIndex, String name, Attachment? attachment) {
     final nativeName = name.toNativeUtf8();
@@ -2283,10 +2303,14 @@ class Skeleton {
   /// Also, often AnimationState::apply(Skeleton&) is called before the next time the
   /// skeleton is rendered to allow any attachment keys in the current animation(s) to hide or show attachments from the new skin.
   /// @param skinName May be NULL.
-  void setSkin(String skinName) {
+  void setSkinByName(String skinName) {
     final nameNative = skinName.toNativeUtf8();
-    _bindings.spine_skeleton_set_skin(_skeleton, nameNative.cast());
+    _bindings.spine_skeleton_set_skin_by_name(_skeleton, nameNative.cast());
     malloc.free(nameNative);
+  }
+
+  void setSkin(Skin skin) {
+    _bindings.spine_skeleton_set_skin(_skeleton, skin._skin);
   }
 
   Attachment? getAttachmentByName(String slotName, String attachmentName) {

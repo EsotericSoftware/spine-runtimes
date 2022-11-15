@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:spine_flutter/spine_flutter.dart';
 
 class ExampleSelector extends StatelessWidget {
@@ -46,6 +47,18 @@ class ExampleSelector extends StatelessWidget {
                   );
                 },
               ),
+              spacer,
+              ElevatedButton(
+                child: const Text('Skins'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (context) => const Skins(),
+                    ),
+                  );
+                },
+              ),
               spacer
             ]
           )
@@ -66,7 +79,7 @@ class SimpleAnimation extends StatelessWidget {
     });
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Spineboy')),
+      appBar: AppBar(title: const Text('Simple Animation')),
       body: SpineWidget.asset("assets/spineboy-pro.skel", "assets/spineboy.atlas", controller),
       // body: SpineWidget.file("/Users/badlogic/workspaces/spine-runtimes/examples/spineboy/export/spineboy-pro.skel", "/Users/badlogic/workspaces/spine-runtimes/examples/spineboy/export/spineboy.atlas", controller),
       // body: const SpineWidget.http("https://marioslab.io/dump/spineboy/spineboy-pro.json", "https://marioslab.io/dump/spineboy/spineboy.atlas"),
@@ -103,12 +116,96 @@ class PlayPauseAnimationState extends State<PlayPauseAnimation> {
     reportLeaks();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Spineboy')),
+      appBar: AppBar(title: const Text('Play/Pause')),
       body: SpineWidget.asset("assets/spineboy-pro.skel", "assets/spineboy.atlas", _controller),
       floatingActionButton: FloatingActionButton(
         onPressed: _togglePlaystate,
         child: Icon(_controller.isPlaying ? Icons.pause : Icons.play_arrow),
       ),
+    );
+  }
+}
+
+class Skins extends StatefulWidget {
+  const Skins({Key? key}) : super(key: key);
+
+  @override
+  SkinsState createState() => SkinsState();
+}
+
+class SkinsState extends State<Skins> {
+  Atlas? _atlas;
+  SkeletonData? _skeletonData;
+  final Map<String, bool> _availableSkins = {};
+  Skin? _customSkin;
+  late SpineWidgetController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+
+    Atlas.fromAsset(rootBundle, "assets/mix-and-match.atlas").then((atlas) async {
+      _skeletonData = await SkeletonData.fromAsset(atlas, rootBundle, "assets/mix-and-match-pro.skel");
+      _atlas = atlas;
+      for (var skin in _skeletonData?.getSkins() ?? []) {
+        _availableSkins[skin.getName()] = false;
+      }
+
+      _controller = SpineWidgetController((controller) {
+        controller.animationState?.setAnimationByName(0, "walk", true);
+      });
+
+      setState(() => _toggleSkin("full-skins/girl"));
+    });
+  }
+
+  void _toggleSkin(String skinName) {
+    _availableSkins[skinName] = !_availableSkins[skinName]!;
+
+    if (_customSkin != null) {
+      _customSkin?.dispose();
+      _customSkin = null;
+    }
+
+    _customSkin = Skin("custom-skin");
+    for (var skinName in _availableSkins.keys) {
+      if (_availableSkins[skinName] == true) {
+        var skin = _controller.skeletonData?.findSkin(skinName);
+        if (skin != null)
+          _customSkin?.addSkin(skin);
+      }
+    }
+    _controller.skeleton?.setSkin(_customSkin!);
+    _controller.skeleton?.setToSetupPose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(title: const Text('Skins')),
+        body: _skeletonData == null
+            ? SizedBox()
+            : Row(
+            children: [
+              Expanded(
+                  child:ListView(
+                    children: _availableSkins.keys.map((skinName) {
+                      return CheckboxListTile(
+                        title: Text(skinName),
+                        value: _availableSkins[skinName],
+                        onChanged: (bool? value) {
+                          _toggleSkin(skinName);
+                          setState(() => {});
+                        },
+                      );
+                    }).toList()
+                  )
+              ),
+              Expanded(
+                  child: SpineWidget.raw(_skeletonData, _atlas, _controller, boundsProvider: SkinAndAnimationBounds(["full-skins/girl"]))
+              )
+            ]
+        )
     );
   }
 }

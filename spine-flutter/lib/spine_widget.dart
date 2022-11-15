@@ -52,22 +52,6 @@ class SpineWidgetController {
   }
 
   bool get isPlaying => _drawable?.animationState.getTimeScale() != 0;
-
-  List<String> get animationNames {
-    List<String> names = [];
-    for (var anim in _drawable?.skeletonData.getAnimations() ?? []) {
-      names.add(anim.getName());
-    }
-    return names;
-  }
-
-  List<String> get skinNames {
-    List<String> names = [];
-    for (var skin in _drawable?.skeletonData.getSkins() ?? []) {
-      names.add(skin.getName());
-    }
-    return names;
-  }
 }
 
 enum AssetType { Asset, File, Http, Raw }
@@ -81,6 +65,7 @@ abstract class BoundsProvider {
 class SetupPoseBounds extends BoundsProvider {
   const SetupPoseBounds();
 
+  @override
   Bounds computeBounds(SkeletonDrawable drawable) {
     return drawable.skeleton.getBounds();
   }
@@ -91,12 +76,45 @@ class RawBounds extends BoundsProvider {
 
   RawBounds(this.x, this.y, this.width, this.height);
 
+  @override
   Bounds computeBounds(SkeletonDrawable drawable) {
     return Bounds(x, y, width, height);
   }
 }
 
+class SkinAndAnimationBounds extends BoundsProvider {
+  final List<String> _skins;
+  final String? _animation;
+
+  SkinAndAnimationBounds(this._skins, [this._animation]);
+
+  @override
+  Bounds computeBounds(SkeletonDrawable drawable) {
+    var data = drawable.skeletonData;
+    var oldSkin = drawable.skeleton.getSkin();
+    var customSkin = Skin("custom-skin");
+    for (var skinName in _skins) {
+      var skin = data.findSkin(skinName);
+      if (skin == null) continue;
+      customSkin.addSkin(skin);
+    }
+    drawable.skeleton.setSkin(customSkin);
+    drawable.skeleton.setToSetupPose();
+    var bounds = drawable.skeleton.getBounds();
+    customSkin.dispose();
+
+    if (oldSkin == null) {
+      drawable.skeleton.setSkinByName("");
+    } else {
+      drawable.skeleton.setSkin(oldSkin);
+    }
+    drawable.skeleton.setToSetupPose();
+    return bounds;
+  }
+}
+
 class ComputedBounds extends BoundsProvider {
+  @override
   Bounds computeBounds(SkeletonDrawable drawable) {
     return Bounds(0, 0, 0, 0);
   }
@@ -169,7 +187,9 @@ class _SpineWidgetState extends State<SpineWidget> {
 
   void loadRaw(SkeletonData skeletonData, Atlas atlas) {
     skeletonDrawable = SkeletonDrawable(atlas, skeletonData, false);
+    widget.controller._initialize(atlas, skeletonData, skeletonDrawable!);
     skeletonDrawable?.update(0);
+    setState(() {});
   }
 
   void loadFromAsset(String skeletonFile, String atlasFile, AssetType assetType) async {
@@ -199,10 +219,7 @@ class _SpineWidgetState extends State<SpineWidget> {
         throw Exception("Raw assets can not be loaded via loadFromAsset().");
     }
 
-    skeletonDrawable = SkeletonDrawable(atlas, skeletonData, true);
-    widget.controller._initialize(atlas, skeletonData, skeletonDrawable!);
-    skeletonDrawable?.update(0);
-    setState(() {});
+    loadRaw(skeletonData, atlas);
   }
 
   @override
