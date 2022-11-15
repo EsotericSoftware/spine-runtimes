@@ -345,7 +345,7 @@ class _SpineRenderObject extends RenderBox {
 
   void _setCanvasTransform(Canvas canvas, Offset offset) {
     final double x = -_bounds.x - _bounds.width / 2.0 - (_alignment.x * _bounds.width / 2.0);
-    final double y = -_bounds.y - _bounds.height / 2.0 + (_alignment.y * _bounds.height / 2.0);
+    final double y = -_bounds.y - _bounds.height / 2.0 - (_alignment.y * _bounds.height / 2.0);
     double scaleX = 1.0, scaleY = 1.0;
 
     switch (_fit) {

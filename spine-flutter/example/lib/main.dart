@@ -55,7 +55,7 @@ class SimpleAnimation extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Spineboy')),
-      body: SpineWidget.asset("assets/skeleton.json", "assets/skeleton.atlas", controller, alignment: Alignment.centerLeft, fit: BoxFit.none),
+      body: SpineWidget.asset("assets/skeleton.json", "assets/skeleton.atlas", controller, alignment: Alignment.topLeft, fit: BoxFit.cover),
       // body: SpineWidget.asset("assets/spineboy-pro.skel", "assets/spineboy.atlas", controller, alignment: Alignment.bottomLeft)
       // body: SpineWidget.file("/Users/badlogic/workspaces/spine-runtimes/examples/spineboy/export/spineboy-pro.skel", "/Users/badlogic/workspaces/spine-runtimes/examples/spineboy/export/spineboy.atlas", controller),
       // body: const SpineWidget.http("https://marioslab.io/dump/spineboy/spineboy-pro.json", "https://marioslab.io/dump/spineboy/spineboy.atlas"),
