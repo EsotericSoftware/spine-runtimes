@@ -38,6 +38,36 @@ class SpineWidgetController {
   AnimationState? get animationState => _drawable?.animationState;
 
   Skeleton? get skeleton => _drawable?.skeleton;
+
+  void pause() {
+    _drawable?.animationState.setTimeScale(0);
+  }
+
+  void play() {
+    _drawable?.animationState.setTimeScale(1);
+  }
+
+  void togglePlay() {
+    _drawable?.animationState.setTimeScale(isPlaying ? 0 : 1);
+  }
+
+  bool get isPlaying => _drawable?.animationState.getTimeScale() != 0;
+
+  List<String> get animationNames {
+    List<String> names = [];
+    for (var anim in _drawable?.skeletonData.getAnimations() ?? []) {
+      names.add(anim.getName());
+    }
+    return names;
+  }
+
+  List<String> get skinNames {
+    List<String> names = [];
+    for (var skin in _drawable?.skeletonData.getSkins() ?? []) {
+      names.add(skin.getName());
+    }
+    return names;
+  }
 }
 
 enum AssetType { Asset, File, Http, Raw }

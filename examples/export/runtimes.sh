@@ -95,6 +95,9 @@ cp -f ../spineboy/export/spineboy-pro.json "$ROOT/spine-flutter/example/assets/"
 cp -f ../spineboy/export/spineboy-pro.skel "$ROOT/spine-flutter/example/assets/"
 cp -f ../spineboy/export/spineboy.atlas "$ROOT/spine-flutter/example/assets/"
 cp -f ../spineboy/export/spineboy.png "$ROOT/spine-flutter/example/assets/"
+cp -f ../mix-and-match/export/mix-and-match-pro.skel "$ROOT/spine-flutter/example/assets/"
+cp -f ../mix-and-match/export/mix-and-match.atlas "$ROOT/spine-flutter/example/assets/"
+cp -f ../mix-and-match/export/mix-and-match.png "$ROOT/spine-flutter/example/assets/"
 
 echo "spine-godot"
 rm -f "$ROOT"/spine-godot/example/assets/spineboy/*.atlas

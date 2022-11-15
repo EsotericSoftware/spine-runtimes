@@ -24,6 +24,18 @@ class ExampleSelector extends StatelessWidget {
               ),
               spacer,
               ElevatedButton(
+                child: const Text('Pause/Play animation'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (context) => const PlayPauseAnimation(),
+                    ),
+                  );
+                },
+              ),
+              spacer,
+              ElevatedButton(
                 child: const Text('Animation State Listener'),
                 onPressed: () {
                   Navigator.push(
@@ -50,15 +62,53 @@ class SimpleAnimation extends StatelessWidget {
     reportLeaks();
     final controller = SpineWidgetController((controller) {
       // Set the walk animation on track 0, let it loop
-      controller.animationState?.setAnimationByName(0, "animation", true);
+      controller.animationState?.setAnimationByName(0, "walk", true);
     });
 
     return Scaffold(
       appBar: AppBar(title: const Text('Spineboy')),
-      body: SpineWidget.asset("assets/skeleton.json", "assets/skeleton.atlas", controller, alignment: Alignment.topLeft, fit: BoxFit.cover),
-      // body: SpineWidget.asset("assets/spineboy-pro.skel", "assets/spineboy.atlas", controller, alignment: Alignment.bottomLeft)
+      body: SpineWidget.asset("assets/spineboy-pro.skel", "assets/spineboy.atlas", controller),
       // body: SpineWidget.file("/Users/badlogic/workspaces/spine-runtimes/examples/spineboy/export/spineboy-pro.skel", "/Users/badlogic/workspaces/spine-runtimes/examples/spineboy/export/spineboy.atlas", controller),
       // body: const SpineWidget.http("https://marioslab.io/dump/spineboy/spineboy-pro.json", "https://marioslab.io/dump/spineboy/spineboy.atlas"),
+      // body: SpineWidget.asset("assets/skeleton.json", "assets/skeleton.atlas", controller, alignment: Alignment.topLeft, fit: BoxFit.cover),
+    );
+  }
+}
+
+class PlayPauseAnimation extends StatefulWidget {
+  const PlayPauseAnimation({Key? key}) : super(key: key);
+
+  @override
+  PlayPauseAnimationState createState() => PlayPauseAnimationState();
+}
+
+class PlayPauseAnimationState extends State<PlayPauseAnimation> {
+  late SpineWidgetController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = SpineWidgetController((controller) {
+      controller.animationState?.setAnimationByName(0, "walk", true);
+    });
+  }
+
+  void _togglePlaystate() {
+    _controller.togglePlay();
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    reportLeaks();
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('Spineboy')),
+      body: SpineWidget.asset("assets/spineboy-pro.skel", "assets/spineboy.atlas", _controller),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _togglePlaystate,
+        child: Icon(_controller.isPlaying ? Icons.pause : Icons.play_arrow),
+      ),
     );
   }
 }

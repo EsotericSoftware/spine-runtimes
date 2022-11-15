@@ -3097,6 +3097,10 @@ class AnimationState {
     return TrackEntry._(entry, this);
   }
 
+  int getNumTracks() {
+    return _bindings.spine_animation_state_get_num_tracks(_state);
+  }
+
   /// Sets an empty animation for every track, discarding any queued animations, and mixes to it over the specified mix duration.
   void setEmptyAnimations(double mixDuration) {
     _bindings.spine_animation_state_set_empty_animations(_state, mixDuration);

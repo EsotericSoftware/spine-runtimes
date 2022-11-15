@@ -641,6 +641,12 @@ FFI_PLUGIN_EXPORT void spine_animation_state_clear_tracks(spine_animation_state 
     _state->clearTracks();
 }
 
+FFI_PLUGIN_EXPORT int spine_animation_state_get_num_tracks(spine_animation_state state) {
+    if (state == nullptr) return 0;
+    AnimationState *_state = (AnimationState*)state;
+    return (int) _state->getTracks().size();
+}
+
 FFI_PLUGIN_EXPORT void spine_animation_state_clear_track(spine_animation_state state, int trackIndex) {
     if (state == nullptr) return;
     AnimationState *_state = (AnimationState*)state;

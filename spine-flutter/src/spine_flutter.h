@@ -283,6 +283,7 @@ FFI_PLUGIN_EXPORT void spine_animation_state_update(spine_animation_state state,
 FFI_PLUGIN_EXPORT void spine_animation_state_apply(spine_animation_state state, spine_skeleton skeleton);
 FFI_PLUGIN_EXPORT void spine_animation_state_clear_tracks(spine_animation_state state);
 FFI_PLUGIN_EXPORT void spine_animation_state_clear_track(spine_animation_state state, int trackIndex);
+FFI_PLUGIN_EXPORT int spine_animation_state_get_num_tracks(spine_animation_state state);
 FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_set_animation_by_name(spine_animation_state state, int trackIndex, const char* animationName, int loop);
 FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_set_animation(spine_animation_state state, int trackIndex, spine_animation animation, int loop);
 FFI_PLUGIN_EXPORT spine_track_entry spine_animation_state_add_animation_by_name(spine_animation_state state, int trackIndex, const char* animationName, int loop, float delay);
