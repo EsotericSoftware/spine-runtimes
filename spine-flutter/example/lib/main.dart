@@ -50,13 +50,13 @@ class SimpleAnimation extends StatelessWidget {
     reportLeaks();
     final controller = SpineWidgetController((controller) {
       // Set the walk animation on track 0, let it loop
-      // controller.animationState?.setAnimationByName(0, "walk", true);
+      controller.animationState?.setAnimationByName(0, "animation", true);
     });
 
     return Scaffold(
       appBar: AppBar(title: const Text('Spineboy')),
-      // body: SpineWidget.asset("assets/skeleton.json", "assets/skeleton.atlas", controller, alignment: Alignment.center, fit: BoxFit.none),
-      body: SpineWidget.asset("assets/spineboy-pro.skel", "assets/spineboy.atlas", controller)
+      body: SpineWidget.asset("assets/skeleton.json", "assets/skeleton.atlas", controller, alignment: Alignment.centerLeft, fit: BoxFit.none),
+      // body: SpineWidget.asset("assets/spineboy-pro.skel", "assets/spineboy.atlas", controller, alignment: Alignment.bottomLeft)
       // body: SpineWidget.file("/Users/badlogic/workspaces/spine-runtimes/examples/spineboy/export/spineboy-pro.skel", "/Users/badlogic/workspaces/spine-runtimes/examples/spineboy/export/spineboy.atlas", controller),
       // body: const SpineWidget.http("https://marioslab.io/dump/spineboy/spineboy-pro.json", "https://marioslab.io/dump/spineboy/spineboy.atlas"),
     );
