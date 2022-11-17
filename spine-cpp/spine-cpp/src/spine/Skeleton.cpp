@@ -425,8 +425,8 @@ PathConstraint *Skeleton::findPathConstraint(const String &constraintName) {
 void Skeleton::getBounds(float &outX, float &outY, float &outWidth, float &outHeight, Vector<float> &outVertexBuffer) {
 	float minX = FLT_MAX;
 	float minY = FLT_MAX;
-	float maxX = FLT_MIN;
-	float maxY = FLT_MIN;
+	float maxX = -FLT_MAX;
+	float maxY = -FLT_MAX;
 
 	for (size_t i = 0; i < _drawOrder.size(); ++i) {
 		Slot *slot = _drawOrder[i];
