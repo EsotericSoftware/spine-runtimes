@@ -5,7 +5,7 @@ import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:ffi/ffi.dart';
-import 'package:flutter/rendering.dart';
+import 'package:flutter/rendering.dart' as rendering;
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
@@ -3219,6 +3219,14 @@ class SkeletonDrawable {
     return commands;
   }
 
+  void renderToCanvas(Canvas canvas) {
+    var commands = render();
+    for (final cmd in commands) {
+      canvas.drawVertices(
+          cmd.vertices, rendering.BlendMode.modulate, atlas.atlasPagePaints[cmd.atlasPageIndex]);
+    }
+  }
+
   void dispose() {
     if (_disposed) return;
     _disposed = true;
@@ -3238,6 +3246,7 @@ class RenderCommand {
     atlasPageIndex = nativeCmd.ref.atlasPage;
     int numVertices = nativeCmd.ref.numVertices;
     int numIndices = nativeCmd.ref.numIndices;
+    final positions = nativeCmd.ref.positions.asTypedList(numVertices * 2);
     final uvs = nativeCmd.ref.uvs.asTypedList(numVertices * 2);
     for (int i = 0; i < numVertices * 2; i += 2) {
       uvs[i] *= pageWidth;
@@ -3247,7 +3256,7 @@ class RenderCommand {
     // is copied, so it doesn't matter that we free up the underlying memory on the next
     // render call. See the implementation of Vertices.raw() here:
     // https://github.com/flutter/engine/blob/5c60785b802ad2c8b8899608d949342d5c624952/lib/ui/painting/vertices.cc#L21
-    vertices = Vertices.raw(VertexMode.triangles, nativeCmd.ref.positions.asTypedList(numVertices * 2),
+    vertices = Vertices.raw(VertexMode.triangles, positions,
         textureCoordinates: uvs,
         colors: nativeCmd.ref.colors.asTypedList(numVertices),
         indices: nativeCmd.ref.indices.asTypedList(numIndices));

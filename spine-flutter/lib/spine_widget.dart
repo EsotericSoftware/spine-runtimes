@@ -1,12 +1,8 @@
-import 'dart:convert';
-import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/rendering.dart' as rendering;
 import 'package:flutter/scheduler.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:http/http.dart' as http;
 
 import 'spine_flutter.dart';
 
@@ -424,11 +420,7 @@ class _SpineRenderObject extends RenderBox {
     canvas.save();
     _setCanvasTransform(canvas, offset);
 
-    final commands = _skeletonDrawable.render();
-    for (final cmd in commands) {
-      canvas.drawVertices(
-          cmd.vertices, rendering.BlendMode.modulate, _skeletonDrawable.atlas.atlasPagePaints[cmd.atlasPageIndex]);
-    }
+    _skeletonDrawable.renderToCanvas(canvas);
 
     canvas.restore();
     SchedulerBinding.instance.scheduleFrameCallback(_beginFrame);

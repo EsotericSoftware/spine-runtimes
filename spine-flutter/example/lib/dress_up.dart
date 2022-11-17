@@ -2,6 +2,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:spine_flutter/spine_flutter.dart';
+import 'package:flutter/rendering.dart' as rendering;
 
 class DressUp extends StatefulWidget {
   const DressUp({Key? key}) : super(key: key);
@@ -20,12 +21,25 @@ class DressUpState extends State<DressUp> {
     super.initState();
     SkeletonDrawable.fromAsset("assets/mix-and-match-pro.skel", "assets/mix-and-match.atlas").then((drawable) async {
       for (var skin in drawable.skeletonData.getSkins()) {
+        //if (skin.getName() == "default") continue;
+
+        var skeleton = drawable.skeleton;
+        skeleton.setSkin(skin);
+        skeleton.setToSetupPose();
+        skeleton.updateWorldTransform();
+        var bounds = skeleton.getBounds();
+        var scale = 1 / (bounds.width > bounds.height ? bounds.width / thumbnailSize * 1.1 : bounds.height / thumbnailSize * 1.1);
+
         var recorder = ui.PictureRecorder();
         var canvas = Canvas(recorder, const Rect.fromLTWH(0, 0, thumbnailSize, thumbnailSize));
         var paint = Paint()
-          ..color = ui.Color(0xff995588)
+          ..color = const ui.Color(0xffff00ff)
           ..style = PaintingStyle.fill;
-        canvas.drawRect(Rect.fromLTWH(0, 0, 200, 200), paint);
+        canvas.drawRect(const Rect.fromLTWH(0, 0, thumbnailSize, thumbnailSize), paint);
+        canvas.scale(scale, scale);
+        canvas.translate(-bounds.x, -bounds.y);
+        drawable.renderToCanvas(canvas);
+
         var imageData = await (await recorder.endRecording().toImage(thumbnailSize.toInt(), thumbnailSize.toInt())).toByteData(format: ui.ImageByteFormat.png);
         _skinImages.add(Image.memory(imageData!.buffer.asUint8List(), fit: BoxFit.none));
       }
@@ -37,14 +51,16 @@ class DressUpState extends State<DressUp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: const Text('Skins')),
+        appBar: AppBar(title: const Text('Dress Up')),
         body: _skinImages.isEmpty
             ? const SizedBox()
             : Row(
             children: [
               Expanded(
                   child:ListView(
-                      children: _skinImages
+                      children: _skinImages.map((image) {
+                        return SizedBox(width: 100, height: 100, child: image);
+                      }).toList()
                   )
               ),
             ]
