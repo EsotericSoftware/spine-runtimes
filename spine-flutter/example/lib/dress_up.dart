@@ -30,7 +30,6 @@ class DressUpState extends State<DressUp> {
         skeleton.updateWorldTransform();
         var bounds = skeleton.getBounds();
         var scale = 1 / (bounds.width > bounds.height ? bounds.width / thumbnailSize : bounds.height / thumbnailSize);
-        scale *= 0.9;
 
         var recorder = ui.PictureRecorder();
         var canvas = Canvas(recorder);
@@ -40,7 +39,7 @@ class DressUpState extends State<DressUp> {
           ..style = PaintingStyle.fill;
         canvas.drawRect(const Rect.fromLTWH(0, 0, thumbnailSize, thumbnailSize), paint);
         canvas.scale(scale, scale);
-        canvas.translate(-bounds.x, -bounds.y);
+        canvas.translate(-bounds.x + bounds.width / 2, -bounds.y);
         canvas.drawRect(Rect.fromLTRB(-5, -5, 5, -5), paint..color = Colors.red);
         drawable.renderToCanvas(canvas);
 
