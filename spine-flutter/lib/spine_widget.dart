@@ -11,50 +11,51 @@ import 'package:http/http.dart' as http;
 import 'spine_flutter.dart';
 
 class SpineWidgetController {
-  Atlas? _atlas;
-  SkeletonData? _data;
   SkeletonDrawable? _drawable;
   final void Function(SpineWidgetController controller)? onInitialized;
   bool initialized = false;
 
   SpineWidgetController([this.onInitialized]);
 
-  void _initialize(Atlas atlas, SkeletonData data, SkeletonDrawable drawable) {
-    if (initialized)
-      throw Exception("SpineWidgetController already initialized. A controller can only be used with one widget.");
-    _atlas = atlas;
-    _data = data;
+  void _initialize(SkeletonDrawable drawable) {
+    if (_drawable != null) throw Exception("SpineWidgetController already initialized. A controller can only be used with one widget.");
     _drawable = drawable;
-    onInitialized?.call(this);
     initialized = true;
+    onInitialized?.call(this);
   }
 
-  Atlas? get atlas => _atlas;
-
-  SkeletonData? get skeletonData => _data;
-
-  AnimationStateData? get animationStateData => _drawable?.animationStateData;
-
-  AnimationState? get animationState => _drawable?.animationState;
-
-  Skeleton? get skeleton => _drawable?.skeleton;
-
-  void pause() {
-    _drawable?.animationState.setTimeScale(0);
+  Atlas get atlas  {
+    if (_drawable == null) throw Exception("Controller is not initialized yet.");
+    return _drawable!.atlas;
   }
 
-  void play() {
-    _drawable?.animationState.setTimeScale(1);
+  SkeletonData get skeletonData {
+    if (_drawable == null) throw Exception("Controller is not initialized yet.");
+    return _drawable!.skeletonData;
   }
 
-  void togglePlay() {
-    _drawable?.animationState.setTimeScale(isPlaying ? 0 : 1);
+  AnimationStateData get animationStateData {
+    if (_drawable == null) throw Exception("Controller is not initialized yet.");
+    return _drawable!.animationStateData;
   }
 
-  bool get isPlaying => _drawable?.animationState.getTimeScale() != 0;
+  AnimationState get animationState {
+    if (_drawable == null) throw Exception("Controller is not initialized yet.");
+    return _drawable!.animationState;
+  }
+
+  Skeleton get skeleton {
+    if (_drawable == null) throw Exception("Controller is not initialized yet.");
+      return _drawable!.skeleton;
+  }
+
+  SkeletonDrawable get drawable {
+    if (_drawable == null) throw Exception("Controller is not initialized yet.");
+    return _drawable!;
+  }
 }
 
-enum AssetType { Asset, File, Http, Raw }
+enum AssetType { Asset, File, Http, Drawable }
 
 abstract class BoundsProvider {
   const BoundsProvider();
@@ -122,51 +123,47 @@ class ComputedBounds extends BoundsProvider {
 
 class SpineWidget extends StatefulWidget {
   final AssetType _assetType;
-  final String? skeletonFile;
-  final String? atlasFile;
-  final SkeletonData? skeletonData;
-  final Atlas? atlas;
-  final SpineWidgetController controller;
-  final BoxFit fit;
-  final Alignment alignment;
-  final BoundsProvider boundsProvider;
-  final bool sizedByBounds;
+  final String? _skeletonFile;
+  final String? _atlasFile;
+  final SkeletonDrawable? _drawable;
+  final SpineWidgetController _controller;
+  final BoxFit _fit;
+  final Alignment _alignment;
+  final BoundsProvider _boundsProvider;
+  final bool _sizedByBounds;
 
-  const SpineWidget.asset(this.skeletonFile, this.atlasFile, this.controller, {BoxFit? fit, Alignment? alignment, BoundsProvider? boundsProvider, bool? sizedByBounds, super.key})
+  const SpineWidget.asset(this._skeletonFile, this._atlasFile, this._controller, {BoxFit? fit, Alignment? alignment, BoundsProvider? boundsProvider, bool? sizedByBounds, super.key})
       : _assetType = AssetType.Asset,
-        fit = fit ?? BoxFit.contain,
-        alignment = alignment ?? Alignment.center,
-        boundsProvider = boundsProvider ?? const SetupPoseBounds(),
-        sizedByBounds = sizedByBounds ?? false,
-        skeletonData = null,
-        atlas = null;
+        _fit = fit ?? BoxFit.contain,
+        _alignment = alignment ?? Alignment.center,
+        _boundsProvider = boundsProvider ?? const SetupPoseBounds(),
+        _sizedByBounds = sizedByBounds ?? false,
+        _drawable = null;
 
-  const SpineWidget.file(this.skeletonFile, this.atlasFile, this.controller, {BoxFit? fit, Alignment? alignment, BoundsProvider? boundsProvider, bool? sizedByBounds, super.key})
+  const SpineWidget.file(this._skeletonFile, this._atlasFile, this._controller, {BoxFit? fit, Alignment? alignment, BoundsProvider? boundsProvider, bool? sizedByBounds, super.key})
       : _assetType = AssetType.File,
-        fit = fit ?? BoxFit.contain,
-        alignment = alignment ?? Alignment.center,
-        boundsProvider = boundsProvider ?? const SetupPoseBounds(),
-        sizedByBounds = sizedByBounds ?? false,
-        skeletonData = null,
-        atlas = null;
+        _fit = fit ?? BoxFit.contain,
+        _alignment = alignment ?? Alignment.center,
+        _boundsProvider = boundsProvider ?? const SetupPoseBounds(),
+        _sizedByBounds = sizedByBounds ?? false,
+        _drawable = null;
 
-  const SpineWidget.http(this.skeletonFile, this.atlasFile, this.controller, {BoxFit? fit, Alignment? alignment, BoundsProvider? boundsProvider, bool? sizedByBounds, super.key})
+  const SpineWidget.http(this._skeletonFile, this._atlasFile, this._controller, {BoxFit? fit, Alignment? alignment, BoundsProvider? boundsProvider, bool? sizedByBounds, super.key})
       : _assetType = AssetType.Http,
-        fit = fit ?? BoxFit.contain,
-        alignment = alignment ?? Alignment.center,
-        boundsProvider = boundsProvider ?? const SetupPoseBounds(),
-        sizedByBounds = sizedByBounds ?? false,
-        skeletonData = null,
-        atlas = null;
+        _fit = fit ?? BoxFit.contain,
+        _alignment = alignment ?? Alignment.center,
+        _boundsProvider = boundsProvider ?? const SetupPoseBounds(),
+        _sizedByBounds = sizedByBounds ?? false,
+        _drawable = null;
 
-  const SpineWidget.raw(this.skeletonData, this.atlas, this.controller, {BoxFit? fit, Alignment? alignment, BoundsProvider? boundsProvider, bool? sizedByBounds, super.key})
-      : _assetType = AssetType.Raw,
-        fit = fit ?? BoxFit.contain,
-        alignment = alignment ?? Alignment.center,
-        boundsProvider = boundsProvider ?? const SetupPoseBounds(),
-        sizedByBounds = sizedByBounds ?? false,
-        skeletonFile = null,
-        atlasFile = null;
+  const SpineWidget.drawable(this._drawable, this._controller, {BoxFit? fit, Alignment? alignment, BoundsProvider? boundsProvider, bool? sizedByBounds, super.key})
+      : _assetType = AssetType.Drawable,
+        _fit = fit ?? BoxFit.contain,
+        _alignment = alignment ?? Alignment.center,
+        _boundsProvider = boundsProvider ?? const SetupPoseBounds(),
+        _sizedByBounds = sizedByBounds ?? false,
+        _skeletonFile = null,
+        _atlasFile = null;
 
   @override
   State<SpineWidget> createState() => _SpineWidgetState();
@@ -178,16 +175,16 @@ class _SpineWidgetState extends State<SpineWidget> {
   @override
   void initState() {
     super.initState();
-    if (widget._assetType == AssetType.Raw) {
-      loadRaw(widget.skeletonData!, widget.atlas!);
+    if (widget._assetType == AssetType.Drawable) {
+      loadDrawable(widget._drawable!);
     } else {
-      loadFromAsset(widget.skeletonFile!, widget.atlasFile!, widget._assetType);
+      loadFromAsset(widget._skeletonFile!, widget._atlasFile!, widget._assetType);
     }
   }
 
-  void loadRaw(SkeletonData skeletonData, Atlas atlas) {
-    skeletonDrawable = SkeletonDrawable(atlas, skeletonData, false);
-    widget.controller._initialize(atlas, skeletonData, skeletonDrawable!);
+  void loadDrawable(SkeletonDrawable drawable) {
+    skeletonDrawable = drawable;
+    widget._controller._initialize(skeletonDrawable!);
     skeletonDrawable?.update(0);
     setState(() {});
   }
@@ -198,35 +195,24 @@ class _SpineWidgetState extends State<SpineWidget> {
 
     switch (assetType) {
       case AssetType.Asset:
-        atlas = await Atlas.fromAsset(rootBundle, atlasFile);
-        skeletonData = skeletonFile.endsWith(".json")
-            ? SkeletonData.fromJson(atlas, await rootBundle.loadString(skeletonFile))
-            : SkeletonData.fromBinary(atlas, (await rootBundle.load(skeletonFile)).buffer.asUint8List());
+        loadDrawable(await SkeletonDrawable.fromAsset(skeletonFile, atlasFile));
         break;
       case AssetType.File:
-        atlas = await Atlas.fromFile(atlasFile);
-        skeletonData = skeletonFile.endsWith(".json")
-            ? SkeletonData.fromJson(atlas, utf8.decode(await File(skeletonFile).readAsBytes()))
-            : SkeletonData.fromBinary(atlas, await File(skeletonFile).readAsBytes());
+        loadDrawable(await SkeletonDrawable.fromFile(skeletonFile, atlasFile));
         break;
       case AssetType.Http:
-        atlas = await Atlas.fromUrl(atlasFile);
-        skeletonData = skeletonFile.endsWith(".json")
-            ? SkeletonData.fromJson(atlas, utf8.decode((await http.get(Uri.parse(skeletonFile))).bodyBytes))
-            : SkeletonData.fromBinary(atlas, (await http.get(Uri.parse(skeletonFile))).bodyBytes);
+        loadDrawable(await SkeletonDrawable.fromHttp(skeletonFile, atlasFile));
         break;
-      case AssetType.Raw:
-        throw Exception("Raw assets can not be loaded via loadFromAsset().");
+      case AssetType.Drawable:
+        throw Exception("Drawable can not be loaded via loadFromAsset().");
     }
-
-    loadRaw(skeletonData, atlas);
   }
 
   @override
   Widget build(BuildContext context) {
     if (skeletonDrawable != null) {
       print("Skeleton loaded, rebuilding painter");
-      return _SpineRenderObjectWidget(skeletonDrawable!, widget.fit, widget.alignment, widget.boundsProvider, widget.sizedByBounds);
+      return _SpineRenderObjectWidget(skeletonDrawable!, widget._fit, widget._alignment, widget._boundsProvider, widget._sizedByBounds);
     } else {
       print("Skeleton not loaded yet");
       return const SizedBox();

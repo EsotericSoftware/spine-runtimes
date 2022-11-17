@@ -143,11 +143,27 @@ class SkeletonData {
     return SkeletonData._(result.skeletonData);
   }
 
-  static Future<SkeletonData> fromAsset(Atlas atlas, AssetBundle assetBundle, String skeletonFileName) async {
-    if (skeletonFileName.endsWith(".json")) {
-      return fromJson(atlas, await assetBundle.loadString(skeletonFileName));
+  static Future<SkeletonData> fromAsset(AssetBundle assetBundle, Atlas atlas, String skeletonFile) async {
+    if (skeletonFile.endsWith(".json")) {
+      return fromJson(atlas, await assetBundle.loadString(skeletonFile));
     } else {
-      return fromBinary(atlas, (await assetBundle.load(skeletonFileName)).buffer.asUint8List());
+      return fromBinary(atlas, (await assetBundle.load(skeletonFile)).buffer.asUint8List());
+    }
+  }
+
+  static Future<SkeletonData> fromFile(Atlas atlas, String skeletonFile) async {
+    if (skeletonFile.endsWith(".json")) {
+      return fromJson(atlas, convert.utf8.decode(await File(skeletonFile).readAsBytes()));
+    } else {
+      return fromBinary(atlas, await File(skeletonFile).readAsBytes());
+    }
+  }
+
+  static Future<SkeletonData> fromHttp(Atlas atlas, String skeletonFile) async {
+    if (skeletonFile.endsWith(".json")) {
+      return fromJson(atlas, convert.utf8.decode((await http.get(Uri.parse(skeletonFile))).bodyBytes));
+    } else {
+      return fromBinary(atlas, (await http.get(Uri.parse(skeletonFile))).bodyBytes);
     }
   }
 
@@ -3163,6 +3179,25 @@ class SkeletonDrawable {
     skeleton = Skeleton._(_drawable.ref.skeleton);
     animationStateData = AnimationStateData._(_drawable.ref.animationStateData);
     animationState = AnimationState._(_drawable.ref.animationState, _drawable.ref.animationStateEvents);
+  }
+
+
+  static Future<SkeletonDrawable> fromAsset(String skeletonFile, String atlasFile) async {
+    var atlas = await Atlas.fromAsset(rootBundle, atlasFile);
+    var skeletonData = await SkeletonData.fromAsset(rootBundle, atlas, skeletonFile);
+    return SkeletonDrawable(atlas, skeletonData, true);
+  }
+
+  static Future<SkeletonDrawable> fromFile(String skeletonFile, String atlasFile) async {
+    var atlas = await Atlas.fromFile(atlasFile);
+    var skeletonData = await SkeletonData.fromFile(atlas, skeletonFile);
+    return SkeletonDrawable(atlas, skeletonData, true);
+  }
+
+  static Future<SkeletonDrawable> fromHttp(String skeletonFile, String atlasFile) async {
+    var atlas = await Atlas.fromUrl(atlasFile);
+    var skeletonData = await SkeletonData.fromHttp(atlas, skeletonFile);
+    return SkeletonDrawable(atlas, skeletonData, true);
   }
 
   void update(double delta) {
