@@ -67,7 +67,7 @@ class ExampleSelector extends StatelessWidget {
               ),
               spacer,
               ElevatedButton(
-                child: const Text('Skins'),
+                child: const Text('Dress Up'),
                 onPressed: () {
                   Navigator.push(
                     context,

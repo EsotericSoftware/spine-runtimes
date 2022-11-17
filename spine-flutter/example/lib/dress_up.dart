@@ -22,9 +22,12 @@ class DressUpState extends State<DressUp> {
       for (var skin in drawable.skeletonData.getSkins()) {
         var recorder = ui.PictureRecorder();
         var canvas = Canvas(recorder, const Rect.fromLTWH(0, 0, thumbnailSize, thumbnailSize));
-        canvas.drawRect(Rect(0, 0, 200, 200), ColorP)
+        var paint = Paint()
+          ..color = ui.Color(0xff995588)
+          ..style = PaintingStyle.fill;
+        canvas.drawRect(Rect.fromLTWH(0, 0, 200, 200), paint);
         var imageData = await (await recorder.endRecording().toImage(thumbnailSize.toInt(), thumbnailSize.toInt())).toByteData(format: ui.ImageByteFormat.png);
-        _skinImages.add(Image.memory(imageData!.buffer.asUint8List()));
+        _skinImages.add(Image.memory(imageData!.buffer.asUint8List(), fit: BoxFit.none));
       }
       _drawable = drawable;
       setState(() {});
