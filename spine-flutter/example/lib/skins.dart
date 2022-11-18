@@ -76,4 +76,10 @@ class SkinsState extends State<Skins> {
         )
     );
   }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _drawable?.dispose();
+  }
 }
