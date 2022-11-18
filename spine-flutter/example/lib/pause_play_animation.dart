@@ -15,7 +15,7 @@ class PlayPauseAnimationState extends State<PlayPauseAnimation> {
   @override
   void initState() {
     super.initState();
-    controller = SpineWidgetController((controller) {
+    controller = SpineWidgetController(onInitialized: (controller) {
       controller.animationState.setAnimationByName(0, "walk", true);
     });
     isPlaying = true;

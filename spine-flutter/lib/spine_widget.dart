@@ -8,15 +8,18 @@ import 'spine_flutter.dart';
 
 class SpineWidgetController {
   SkeletonDrawable? _drawable;
+  double _offsetX = 0, _offsetY = 0, _scaleX = 1, _scaleY = 1;
   final void Function(SpineWidgetController controller)? onInitialized;
-  bool initialized = false;
+  final void Function(SpineWidgetController controller)? onBeforeUpdateWorldTransforms;
+  final void Function(SpineWidgetController controller)? onAfterUpdateWorldTransforms;
+  final void Function(SpineWidgetController controller, Canvas canvas)? onBeforePaint;
+  final void Function(SpineWidgetController controller, Canvas canvas)? onAfterPaint;
 
-  SpineWidgetController([this.onInitialized]);
+  SpineWidgetController({this.onInitialized, this.onBeforeUpdateWorldTransforms, this.onAfterUpdateWorldTransforms, this.onBeforePaint, this.onAfterPaint});
 
   void _initialize(SkeletonDrawable drawable) {
     if (_drawable != null) throw Exception("SpineWidgetController already initialized. A controller can only be used with one widget.");
     _drawable = drawable;
-    initialized = true;
     onInitialized?.call(this);
   }
 
@@ -48,6 +51,19 @@ class SpineWidgetController {
   SkeletonDrawable get drawable {
     if (_drawable == null) throw Exception("Controller is not initialized yet.");
     return _drawable!;
+  }
+
+  void _setCoordinateTransform(double offsetX, double offsetY, double scaleX, double scaleY) {
+    _offsetX = offsetX;
+    _offsetY = offsetY;
+    _scaleX = scaleX;
+    _scaleY = scaleY;
+  }
+
+  Offset toSkeletonCoordinates(Offset position) {
+    var x = position.dx;
+    var y = position.dy;
+    return Offset(x / _scaleX - _offsetX, y / _scaleY - _offsetY);
   }
 }
 
@@ -166,7 +182,6 @@ class SpineWidget extends StatefulWidget {
 }
 
 class _SpineWidgetState extends State<SpineWidget> {
-  SkeletonDrawable? skeletonDrawable;
 
   @override
   void initState() {
@@ -179,16 +194,12 @@ class _SpineWidgetState extends State<SpineWidget> {
   }
 
   void loadDrawable(SkeletonDrawable drawable) {
-    skeletonDrawable = drawable;
-    widget._controller._initialize(skeletonDrawable!);
-    skeletonDrawable?.update(0);
+    widget._controller._initialize(drawable);
+    drawable.update(0);
     setState(() {});
   }
 
   void loadFromAsset(String skeletonFile, String atlasFile, AssetType assetType) async {
-    late Atlas atlas;
-    late SkeletonData skeletonData;
-
     switch (assetType) {
       case AssetType.Asset:
         loadDrawable(await SkeletonDrawable.fromAsset(skeletonFile, atlasFile));
@@ -206,9 +217,9 @@ class _SpineWidgetState extends State<SpineWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (skeletonDrawable != null) {
+    if (widget._controller._drawable != null) {
       print("Skeleton loaded, rebuilding painter");
-      return _SpineRenderObjectWidget(skeletonDrawable!, widget._fit, widget._alignment, widget._boundsProvider, widget._sizedByBounds);
+      return _SpineRenderObjectWidget(widget._controller._drawable!, widget._controller, widget._fit, widget._alignment, widget._boundsProvider, widget._sizedByBounds);
     } else {
       print("Skeleton not loaded yet");
       return const SizedBox();
@@ -217,23 +228,24 @@ class _SpineWidgetState extends State<SpineWidget> {
 
   @override
   void dispose() {
-    skeletonDrawable?.dispose();
     super.dispose();
+    widget._controller._drawable?.dispose();
   }
 }
 
 class _SpineRenderObjectWidget extends LeafRenderObjectWidget {
   final SkeletonDrawable _skeletonDrawable;
+  final SpineWidgetController _controller;
   final BoxFit _fit;
   final Alignment _alignment;
   final BoundsProvider _boundsProvider;
   final bool _sizedByBounds;
 
-  _SpineRenderObjectWidget(this._skeletonDrawable, this._fit, this._alignment, this._boundsProvider, this._sizedByBounds);
+  const _SpineRenderObjectWidget(this._skeletonDrawable, this._controller, this._fit, this._alignment, this._boundsProvider, this._sizedByBounds);
 
   @override
   RenderObject createRenderObject(BuildContext context) {
-    return _SpineRenderObject(_skeletonDrawable, _fit, _alignment, _boundsProvider, _sizedByBounds);
+    return _SpineRenderObject(_skeletonDrawable, _controller, _fit, _alignment, _boundsProvider, _sizedByBounds);
   }
 
   @override
@@ -248,6 +260,7 @@ class _SpineRenderObjectWidget extends LeafRenderObjectWidget {
 
 class _SpineRenderObject extends RenderBox {
   SkeletonDrawable _skeletonDrawable;
+  SpineWidgetController _controller;
   double _deltaTime = 0;
   final Stopwatch _stopwatch = Stopwatch();
   BoxFit _fit;
@@ -255,7 +268,7 @@ class _SpineRenderObject extends RenderBox {
   BoundsProvider _boundsProvider;
   bool _sizedByBounds;
   Bounds _bounds;
-  _SpineRenderObject(this._skeletonDrawable, this._fit, this._alignment, this._boundsProvider, this._sizedByBounds): _bounds = _boundsProvider.computeBounds(_skeletonDrawable);
+  _SpineRenderObject(this._skeletonDrawable, this._controller, this._fit, this._alignment, this._boundsProvider, this._sizedByBounds): _bounds = _boundsProvider.computeBounds(_skeletonDrawable);
 
   set skeletonDrawable(SkeletonDrawable skeletonDrawable) {
     if (_skeletonDrawable == skeletonDrawable) return;
@@ -368,7 +381,9 @@ class _SpineRenderObject extends RenderBox {
     _deltaTime = _stopwatch.elapsedTicks / _stopwatch.frequency;
     _stopwatch.reset();
     _stopwatch.start();
+    _controller.onBeforeUpdateWorldTransforms?.call(_controller);
     _skeletonDrawable.update(_deltaTime);
+    _controller.onAfterUpdateWorldTransforms?.call(_controller);
     markNeedsPaint();
   }
 
@@ -403,12 +418,13 @@ class _SpineRenderObject extends RenderBox {
         break;
     }
 
+    var offsetX = offset.dx + size.width / 2.0 + (_alignment.x * size.width / 2.0);
+    var offsetY = offset.dy + size.height / 2.0 + (_alignment.y * size.height / 2.0);
     canvas
-      ..translate(
-          offset.dx + size.width / 2.0 + (_alignment.x * size.width / 2.0),
-          offset.dy + size.height / 2.0 + (_alignment.y * size.height / 2.0))
+      ..translate(offsetX, offsetY)
       ..scale(scaleX, scaleY)
       ..translate(x, y);
+    _controller._setCoordinateTransform(x + offsetX / scaleY, y + offsetY / scaleY, scaleX, scaleY);
   }
 
   @override
@@ -420,7 +436,9 @@ class _SpineRenderObject extends RenderBox {
     canvas.save();
     _setCanvasTransform(canvas, offset);
 
+    _controller.onBeforePaint?.call(_controller, canvas);
     _skeletonDrawable.renderToCanvas(canvas);
+    _controller.onAfterPaint?.call(_controller, canvas);
 
     canvas.restore();
     SchedulerBinding.instance.scheduleFrameCallback(_beginFrame);

@@ -54,7 +54,7 @@ class DressUpState extends State<DressUp> {
         _selectedSkins[skin.getName()] = false;
       }
       _drawable = drawable;
-      _controller = SpineWidgetController((controller) {
+      _controller = SpineWidgetController(onInitialized: (controller) {
         controller.animationState.setAnimationByName(0, "dance", true);
       });
       setState(() {

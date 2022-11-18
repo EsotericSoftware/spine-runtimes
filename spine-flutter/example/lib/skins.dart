@@ -21,7 +21,7 @@ class SkinsState extends State<Skins> {
       for (var skin in drawable.skeletonData.getSkins()) {
         _selectedSkins[skin.getName()] = false;
       }
-      _controller = SpineWidgetController((controller) {
+      _controller = SpineWidgetController(onInitialized: (controller) {
         controller.animationState.setAnimationByName(0, "walk", true);
       });
       drawable.skeleton.setSkinByName("full-skins/girl");

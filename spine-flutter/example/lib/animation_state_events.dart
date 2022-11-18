@@ -7,7 +7,7 @@ class AnimationStateEvents extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     reportLeaks();
-    final controller = SpineWidgetController((controller) {
+    final controller = SpineWidgetController(onInitialized: (controller) {
       for (final bone in controller.skeleton.getBones()) {
         print(bone);
       }

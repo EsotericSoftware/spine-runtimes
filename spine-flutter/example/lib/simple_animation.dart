@@ -7,7 +7,7 @@ class SimpleAnimation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     reportLeaks();
-    final controller = SpineWidgetController((controller) {
+    final controller = SpineWidgetController(onInitialized: (controller) {
       // Set the walk animation on track 0, let it loop
       controller.animationState.setAnimationByName(0, "walk", true);
     });

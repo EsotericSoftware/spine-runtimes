@@ -5,6 +5,7 @@ import 'animation_state_events.dart';
 import 'pause_play_animation.dart';
 import 'skins.dart';
 import 'dress_up.dart';
+import 'ik_following.dart';
 
 class ExampleSelector extends StatelessWidget {
   const ExampleSelector({super.key});
@@ -73,6 +74,18 @@ class ExampleSelector extends StatelessWidget {
                     context,
                     MaterialPageRoute<void>(
                       builder: (context) => const DressUp(),
+                    ),
+                  );
+                },
+              ),
+              spacer,
+              ElevatedButton(
+                child: const Text('IK Following'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (context) => const IkFollowing(),
                     ),
                   );
                 },
