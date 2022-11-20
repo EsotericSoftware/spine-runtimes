@@ -1,18 +1,30 @@
 import 'dart:convert' as convert;
-import 'dart:ffi';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui';
 
-import 'package:ffi/ffi.dart';
 import 'package:flutter/rendering.dart' as rendering;
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
 
 import 'spine_flutter_bindings_generated.dart';
+import 'ffi_proxy.dart';
+import 'ffi_utf8.dart';
 
 export 'spine_widget.dart';
+import 'init.dart' if (dart.library.html) 'init_web.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+
+late SpineFlutterBindings _bindings;
+late Allocator _allocator;
+
+Future<void> initSpineFlutter() async {
+  final ffi = await initSpineFlutterFFI();
+  _bindings = SpineFlutterBindings(ffi.dylib);
+  _allocator = ffi.allocator;
+  return;
+}
 
 int majorVersion() => _bindings.spine_major_version();
 
@@ -46,7 +58,7 @@ class Vector2 {
 }
 
 class Atlas {
-  final Pointer<spine_atlas> _atlas;
+  final spine_atlas _atlas;
   final List<Image> atlasPages;
   final List<Paint> atlasPagePaints;
   bool _disposed;
@@ -56,11 +68,11 @@ class Atlas {
   static Future<Atlas> _load(String atlasFileName, Future<Uint8List> Function(String name) loadFile) async {
     final atlasBytes = await loadFile(atlasFileName);
     final atlasData = convert.utf8.decode(atlasBytes);
-    final atlasDataNative = atlasData.toNativeUtf8();
+    final atlasDataNative = atlasData.toNativeUtf8(_allocator);
     final atlas = _bindings.spine_atlas_load(atlasDataNative.cast());
-    malloc.free(atlasDataNative);
-    if (atlas.ref.error.address != nullptr.address) {
-      final Pointer<Utf8> error = atlas.ref.error.cast();
+    _allocator.free(atlasDataNative);
+    if (_bindings.spine_atlas_get_error(atlas).address != nullptr.address) {
+      final Pointer<Utf8> error = _bindings.spine_atlas_get_error(atlas).cast();
       final message = error.toDartString();
       _bindings.spine_atlas_dispose(atlas);
       throw Exception("Couldn't load atlas: $message");
@@ -69,8 +81,9 @@ class Atlas {
     final atlasDir = path.dirname(atlasFileName);
     List<Image> atlasPages = [];
     List<Paint> atlasPagePaints = [];
-    for (int i = 0; i < atlas.ref.numImagePaths; i++) {
-      final Pointer<Utf8> atlasPageFile = atlas.ref.imagePaths[i].cast();
+    final numImagePaths = _bindings.spine_atlas_get_num_image_paths(atlas);
+    for (int i = 0; i < numImagePaths; i++) {
+      final Pointer<Utf8> atlasPageFile = _bindings.spine_atlas_get_image_path(atlas, i).cast();
       final imagePath = path.join(atlasDir, atlasPageFile.toDartString());
       var imageData = await loadFile(imagePath);
       final Codec codec = await instantiateImageCodec(imageData);
@@ -117,30 +130,34 @@ class SkeletonData {
   SkeletonData._(this._data) : _disposed = false;
 
   static SkeletonData fromJson(Atlas atlas, String json) {
-    final jsonNative = json.toNativeUtf8();
+    final jsonNative = json.toNativeUtf8(_allocator);
     final result = _bindings.spine_skeleton_data_load_json(atlas._atlas, jsonNative.cast());
-    malloc.free(jsonNative);
-    if (result.error.address != nullptr.address) {
-      final Pointer<Utf8> error = result.error.cast();
+    _allocator.free(jsonNative);
+    if (_bindings.spine_skeleton_data_result_get_error(result).address != nullptr.address) {
+      final Pointer<Utf8> error = _bindings.spine_skeleton_data_result_get_error(result).cast();
       final message = error.toDartString();
-      malloc.free(error);
+      _bindings.spine_skeleton_data_result_dispose(result);
       throw Exception("Couldn't load skeleton data: $message");
     }
-    return SkeletonData._(result.skeletonData);
+    var data = SkeletonData._(_bindings.spine_skeleton_data_result_get_data(result));
+    _bindings.spine_skeleton_data_result_dispose(result);
+    return data;
   }
 
   static SkeletonData fromBinary(Atlas atlas, Uint8List binary) {
-    final Pointer<Uint8> binaryNative = malloc.allocate(binary.lengthInBytes);
+    final Pointer<Uint8> binaryNative = _allocator.allocate(binary.lengthInBytes);
     binaryNative.asTypedList(binary.lengthInBytes).setAll(0, binary);
     final result = _bindings.spine_skeleton_data_load_binary(atlas._atlas, binaryNative.cast(), binary.lengthInBytes);
-    malloc.free(binaryNative);
-    if (result.error.address != nullptr.address) {
-      final Pointer<Utf8> error = result.error.cast();
+    _allocator.free(binaryNative);
+    if (_bindings.spine_skeleton_data_result_get_error(result).address != nullptr.address) {
+      final Pointer<Utf8> error = _bindings.spine_skeleton_data_result_get_error(result).cast();
       final message = error.toDartString();
-      malloc.free(error);
+      _bindings.spine_skeleton_data_result_dispose(result);
       throw Exception("Couldn't load skeleton data: $message");
     }
-    return SkeletonData._(result.skeletonData);
+    var data = SkeletonData._(_bindings.spine_skeleton_data_result_get_data(result));
+    _bindings.spine_skeleton_data_result_dispose(result);
+    return data;
   }
 
   static Future<SkeletonData> fromAsset(AssetBundle assetBundle, Atlas atlas, String skeletonFile) async {
@@ -169,18 +186,18 @@ class SkeletonData {
 
   /// Finds a bone by comparing each bone's name. It is more efficient to cache the results of this method than to call it multiple times.
   BoneData? findBone(String name) {
-    final nativeName = name.toNativeUtf8();
+    final nativeName = name.toNativeUtf8(_allocator);
     final bone = _bindings.spine_skeleton_data_find_bone(_data, nativeName.cast());
-    malloc.free(nativeName);
+    _allocator.free(nativeName);
     if (bone.address == nullptr.address) return null;
     return BoneData._(bone);
   }
 
   /// Finds a slot by comparing each slot's name. It is more efficient to cache the results of this method than to call it multiple times.
   SlotData? findSlot(String name) {
-    final nativeName = name.toNativeUtf8();
+    final nativeName = name.toNativeUtf8(_allocator);
     final slot = _bindings.spine_skeleton_data_find_slot(_data, nativeName.cast());
-    malloc.free(nativeName);
+    _allocator.free(nativeName);
     if (slot.address == nullptr.address) return null;
     return SlotData._(slot);
   }
@@ -188,9 +205,9 @@ class SkeletonData {
   /// Finds a skin by comparing each skin's name. It is more efficient to cache the results of this method than to call it
   /// multiple times.
   Skin? findSkin(String name) {
-    final nativeName = name.toNativeUtf8();
+    final nativeName = name.toNativeUtf8(_allocator);
     final skin = _bindings.spine_skeleton_data_find_skin(_data, nativeName.cast());
-    malloc.free(nativeName);
+    _allocator.free(nativeName);
     if (skin.address == nullptr.address) return null;
     return Skin._(skin);
   }
@@ -198,9 +215,9 @@ class SkeletonData {
   /// Finds an event by comparing each events's name. It is more efficient to cache the results of this method than to call it
   /// multiple times.
   EventData? findEvent(String name) {
-    final nativeName = name.toNativeUtf8();
+    final nativeName = name.toNativeUtf8(_allocator);
     final event = _bindings.spine_skeleton_data_find_event(_data, nativeName.cast());
-    malloc.free(nativeName);
+    _allocator.free(nativeName);
     if (event.address == nullptr.address) return null;
     return EventData._(event);
   }
@@ -208,9 +225,9 @@ class SkeletonData {
   /// Finds an animation by comparing each animation's name. It is more efficient to cache the results of this method than to
   /// call it multiple times.
   Animation? findAnimation(String name) {
-    final nativeName = name.toNativeUtf8();
+    final nativeName = name.toNativeUtf8(_allocator);
     final animation = _bindings.spine_skeleton_data_find_animation(_data, nativeName.cast());
-    malloc.free(nativeName);
+    _allocator.free(nativeName);
     if (animation.address == nullptr.address) return null;
     return Animation._(animation);
   }
@@ -218,9 +235,9 @@ class SkeletonData {
   /// Finds an IK constraint by comparing each IK constraint's name. It is more efficient to cache the results of this method
   /// than to call it multiple times.
   IkConstraintData? findIkConstraint(String name) {
-    final nativeName = name.toNativeUtf8();
+    final nativeName = name.toNativeUtf8(_allocator);
     final constraint = _bindings.spine_skeleton_data_find_ik_constraint(_data, nativeName.cast());
-    malloc.free(nativeName);
+    _allocator.free(nativeName);
     if (constraint.address == nullptr.address) return null;
     return IkConstraintData._(constraint);
   }
@@ -228,9 +245,9 @@ class SkeletonData {
   /// Finds a transform constraint by comparing each transform constraint's name. It is more efficient to cache the results of
   /// this method than to call it multiple times.
   TransformConstraintData? findTransformConstraint(String name) {
-    final nativeName = name.toNativeUtf8();
+    final nativeName = name.toNativeUtf8(_allocator);
     final constraint = _bindings.spine_skeleton_data_find_transform_constraint(_data, nativeName.cast());
-    malloc.free(nativeName);
+    _allocator.free(nativeName);
     if (constraint.address == nullptr.address) return null;
     return TransformConstraintData._(constraint);
   }
@@ -238,9 +255,9 @@ class SkeletonData {
   /// Finds a path constraint by comparing each path constraint's name. It is more efficient to cache the results of this method
   /// than to call it multiple times.
   PathConstraintData? findPathConstraint(String name) {
-    final nativeName = name.toNativeUtf8();
+    final nativeName = name.toNativeUtf8(_allocator);
     final constraint = _bindings.spine_skeleton_data_find_path_constraint(_data, nativeName.cast());
-    malloc.free(nativeName);
+    _allocator.free(nativeName);
     if (constraint.address == nullptr.address) return null;
     return PathConstraintData._(constraint);
   }
@@ -588,7 +605,11 @@ class BoneData {
 
   Color getColor() {
     final color = _bindings.spine_bone_data_get_color(_data);
-    return Color(color.r, color.g, color.b, color.a);
+    return Color(
+        _bindings.spine_color_get_r(color),
+        _bindings.spine_color_get_g(color),
+        _bindings.spine_color_get_b(color),
+        _bindings.spine_color_get_a(color));
   }
 
   void setColor(double r, double g, double b, double a) {
@@ -633,12 +654,16 @@ class Bone {
 
   Vector2 worldToLocal(double worldX, double worldY) {
     final local = _bindings.spine_bone_world_to_local(_bone, worldX, worldY);
-    return Vector2(local.x, local.y);
+    final result = Vector2(_bindings.spine_vector_get_x(local), _bindings.spine_vector_get_y(local));
+    _allocator.free(local);
+    return result;
   }
 
   Vector2 localToWorld(double localX, double localY) {
     final world = _bindings.spine_bone_local_to_world(_bone, localX, localY);
-    return Vector2(world.x, world.y);
+    final result = Vector2(_bindings.spine_vector_get_x(world), _bindings.spine_vector_get_y(world));
+    _allocator.free(world);
+    return result;
   }
 
   double worldToLocalRotation(double worldRotation) {
@@ -890,7 +915,11 @@ class SlotData {
 
   Color getColor() {
     final color = _bindings.spine_slot_data_get_color(_data);
-    return Color(color.r, color.g, color.b, color.a);
+    return Color(
+        _bindings.spine_color_get_r(color),
+        _bindings.spine_color_get_g(color),
+        _bindings.spine_color_get_b(color),
+        _bindings.spine_color_get_a(color));
   }
 
   void setColor(double r, double g, double b, double a) {
@@ -899,7 +928,11 @@ class SlotData {
 
   Color getDarkColor() {
     final color = _bindings.spine_slot_data_get_dark_color(_data);
-    return Color(color.r, color.g, color.b, color.a);
+    return Color(
+        _bindings.spine_color_get_r(color),
+        _bindings.spine_color_get_g(color),
+        _bindings.spine_color_get_b(color),
+        _bindings.spine_color_get_a(color));
   }
 
   void setDarkColor(double r, double g, double b, double a) {
@@ -920,9 +953,9 @@ class SlotData {
   }
 
   void setAttachmentName(String attachmentName) {
-    final nativeName = attachmentName.toNativeUtf8();
+    final nativeName = attachmentName.toNativeUtf8(_allocator);
     _bindings.spine_slot_data_set_attachment_name(_data, nativeName.cast());
-    malloc.free(nativeName);
+    _allocator.free(nativeName);
   }
 
   BlendMode getBlendMode() {
@@ -962,7 +995,11 @@ class Slot {
 
   Color getColor() {
     final color = _bindings.spine_slot_get_color(_slot);
-    return Color(color.r, color.g, color.b, color.a);
+    return Color(
+        _bindings.spine_color_get_r(color),
+        _bindings.spine_color_get_g(color),
+        _bindings.spine_color_get_b(color),
+        _bindings.spine_color_get_a(color));
   }
 
   void setColor(Color color) {
@@ -971,7 +1008,11 @@ class Slot {
 
   Color getDarkColor() {
     final color = _bindings.spine_slot_get_dark_color(_slot);
-    return Color(color.r, color.g, color.b, color.a);
+    return Color(
+        _bindings.spine_color_get_r(color),
+        _bindings.spine_color_get_g(color),
+        _bindings.spine_color_get_b(color),
+        _bindings.spine_color_get_a(color));
   }
 
   void setDarkColor(Color color) {
@@ -1118,11 +1159,11 @@ class Sequence {
   }
 
   String getPath(String basePath, int index) {
-    final nativeBasePath = basePath.toNativeUtf8();
+    final nativeBasePath = basePath.toNativeUtf8(_allocator);
     final Pointer<Utf8> path = _bindings.spine_sequence_get_path(_sequence, nativeBasePath.cast(), index).cast();
     final result = path.toDartString();
-    malloc.free(nativeBasePath);
-    malloc.free(path);
+    _allocator.free(nativeBasePath);
+    _allocator.free(path);
     return result;
   }
 
@@ -1228,10 +1269,10 @@ class RegionAttachment extends Attachment<spine_region_attachment> {
   RegionAttachment._(spine_region_attachment attachment) : super._(attachment);
 
   List<double> computeWorldVertices(Slot slot) {
-    Pointer<Float> vertices = malloc.allocate(4 * 8).cast();
+    Pointer<Float> vertices = _allocator.allocate(4 * 8).cast();
     _bindings.spine_region_attachment_compute_world_vertices(_attachment, slot._slot, vertices);
     final result = vertices.asTypedList(8).toList();
-    malloc.free(vertices);
+    _allocator.free(vertices);
     return result;
   }
 
@@ -1293,7 +1334,11 @@ class RegionAttachment extends Attachment<spine_region_attachment> {
 
   Color getColor() {
     final color = _bindings.spine_region_attachment_get_color(_attachment);
-    return Color(color.r, color.g, color.b, color.a);
+    return Color(
+        _bindings.spine_color_get_r(color),
+        _bindings.spine_color_get_g(color),
+        _bindings.spine_color_get_b(color),
+        _bindings.spine_color_get_a(color));
   }
 
   void setColor(double r, double g, double b, double a) {
@@ -1335,10 +1380,10 @@ class VertexAttachment<T extends Pointer> extends Attachment<T> {
 
   List<double> computeWorldVertices(Slot slot) {
     final worldVerticesLength = _bindings.spine_vertex_attachment_get_world_vertices_length(_attachment.cast());
-    Pointer<Float> vertices = malloc.allocate(4 * worldVerticesLength).cast();
+    Pointer<Float> vertices = _allocator.allocate(4 * worldVerticesLength).cast();
     _bindings.spine_vertex_attachment_compute_world_vertices(_attachment.cast(), slot._slot, vertices);
     final result = vertices.asTypedList(worldVerticesLength).toList();
-    malloc.free(vertices);
+    _allocator.free(vertices);
     return result;
   }
 
@@ -1401,7 +1446,11 @@ class MeshAttachment extends VertexAttachment<spine_mesh_attachment> {
 
   Color getColor() {
     final color = _bindings.spine_mesh_attachment_get_color(_attachment);
-    return Color(color.r, color.g, color.b, color.a);
+    return Color(
+        _bindings.spine_color_get_r(color),
+        _bindings.spine_color_get_g(color),
+        _bindings.spine_color_get_b(color),
+        _bindings.spine_color_get_a(color));
   }
 
   void setColor(double r, double g, double b, double a) {
@@ -1473,7 +1522,11 @@ class ClippingAttachment extends VertexAttachment<spine_clipping_attachment> {
 
   Color getColor() {
     final color = _bindings.spine_clipping_attachment_get_color(_attachment);
-    return Color(color.r, color.g, color.b, color.a);
+    return Color(
+        _bindings.spine_color_get_r(color),
+        _bindings.spine_color_get_g(color),
+        _bindings.spine_color_get_b(color),
+        _bindings.spine_color_get_a(color));
   }
 
   void setColor(double r, double g, double b, double a) {
@@ -1486,7 +1539,11 @@ class BoundingBoxAttachment extends VertexAttachment<spine_bounding_box_attachme
 
   Color getColor() {
     final color = _bindings.spine_bounding_box_attachment_get_color(_attachment);
-    return Color(color.r, color.g, color.b, color.a);
+    return Color(
+        _bindings.spine_color_get_r(color),
+        _bindings.spine_color_get_g(color),
+        _bindings.spine_color_get_b(color),
+        _bindings.spine_color_get_a(color));
   }
 
   void setColor(double r, double g, double b, double a) {
@@ -1521,7 +1578,11 @@ class PathAttachment extends VertexAttachment<spine_path_attachment> {
 
   Color getColor() {
     final color = _bindings.spine_path_attachment_get_color(_attachment);
-    return Color(color.r, color.g, color.b, color.a);
+    return Color(
+        _bindings.spine_color_get_r(color),
+        _bindings.spine_color_get_g(color),
+        _bindings.spine_color_get_b(color),
+        _bindings.spine_color_get_a(color));
   }
 
   void setColor(double r, double g, double b, double a) {
@@ -1534,7 +1595,9 @@ class PointAttachment extends Attachment<spine_point_attachment> {
 
   Vector2 computeWorldPosition(Bone bone) {
     final position = _bindings.spine_point_attachment_compute_world_position(_attachment, bone._bone);
-    return Vector2(position.x, position.y);
+    final result = Vector2(_bindings.spine_vector_get_x(position), _bindings.spine_vector_get_y(position));
+    _allocator.free(position);
+    return result;
   }
 
   double computeWorldRotation(Bone bone) {
@@ -1567,7 +1630,11 @@ class PointAttachment extends Attachment<spine_point_attachment> {
 
   Color getColor() {
     final color = _bindings.spine_point_attachment_get_color(_attachment);
-    return Color(color.r, color.g, color.b, color.a);
+    return Color(
+        _bindings.spine_color_get_r(color),
+        _bindings.spine_color_get_g(color),
+        _bindings.spine_color_get_b(color),
+        _bindings.spine_color_get_a(color));
   }
 
   void setColor(double r, double g, double b, double a) {
@@ -1590,9 +1657,9 @@ class Skin {
   Skin._(this._skin) : _isCustomSkin = false;
 
   Skin.new(String name) {
-    final nativeName = name.toNativeUtf8();
+    final nativeName = name.toNativeUtf8(_allocator);
     _skin = _bindings.spine_skin_create(nativeName.cast());
-    malloc.free(nativeName);
+    _allocator.free(nativeName);
     _isCustomSkin = true;
   }
 
@@ -1602,24 +1669,24 @@ class Skin {
   }
 
   void setAttachment(int slotIndex, String name, Attachment? attachment) {
-    final nativeName = name.toNativeUtf8();
+    final nativeName = name.toNativeUtf8(_allocator);
     _bindings.spine_skin_set_attachment(
         _skin, slotIndex, nativeName.cast(), attachment == null ? nullptr : attachment._attachment.cast());
-    malloc.free(nativeName);
+    _allocator.free(nativeName);
   }
 
   Attachment? getAttachment(int slotIndex, String name) {
-    final nativeName = name.toNativeUtf8();
+    final nativeName = name.toNativeUtf8(_allocator);
     final attachment = _bindings.spine_skin_get_attachment(_skin, slotIndex, nativeName.cast());
-    malloc.free(nativeName);
+    _allocator.free(nativeName);
     if (attachment.address == nullptr.address) return null;
     return Attachment._toSubclass(attachment);
   }
 
   void removeAttachment(int slotIndex, String name) {
-    final nativeName = name.toNativeUtf8();
+    final nativeName = name.toNativeUtf8(_allocator);
     _bindings.spine_skin_remove_attachment(_skin, slotIndex, nativeName.cast());
-    malloc.free(nativeName);
+    _allocator.free(nativeName);
   }
 
   String getName() {
@@ -1634,12 +1701,12 @@ class Skin {
   List<SkinEntry> getEntries() {
     List<SkinEntry> result = [];
     final entries = _bindings.spine_skin_get_entries(_skin);
-    int numEntries = entries.ref.numEntries;
+    int numEntries = _bindings.spine_skin_entries_get_num_entries(entries);
     for (int i = 0; i < numEntries; i++) {
-      final entry = entries.ref.entries[i];
-      Pointer<Utf8> name = entry.name.cast();
-      result.add(SkinEntry(entry.slotIndex, name.toDartString(),
-          entry.attachment.address == nullptr.address ? null : Attachment._toSubclass(entry.attachment)));
+      final entry = _bindings.spine_skin_entries_get_entry(entries, i);
+      Pointer<Utf8> name = _bindings.spine_skin_entry_get_name(entry).cast();
+      result.add(SkinEntry(_bindings.spine_skin_entry_get_slot_index(entry), name.toDartString(),
+          _bindings.spine_skin_entry_get_attachment(entry).address == nullptr.address ? null : Attachment._toSubclass(_bindings.spine_skin_entry_get_attachment(entry))));
     }
     return result;
   }
@@ -2297,17 +2364,17 @@ class Skeleton {
   }
 
   Bone? findBone(String boneName) {
-    final nameNative = boneName.toNativeUtf8();
+    final nameNative = boneName.toNativeUtf8(_allocator);
     final bone = _bindings.spine_skeleton_find_bone(_skeleton, nameNative.cast());
-    malloc.free(nameNative);
+    _allocator.free(nameNative);
     if (bone.address == nullptr.address) return null;
     return Bone._(bone);
   }
 
   Slot? findSlot(String slotName) {
-    final nameNative = slotName.toNativeUtf8();
+    final nameNative = slotName.toNativeUtf8(_allocator);
     final slot = _bindings.spine_skeleton_find_slot(_skeleton, nameNative.cast());
-    malloc.free(nameNative);
+    _allocator.free(nameNative);
     if (slot.address == nullptr.address) return null;
     return Slot._(slot);
   }
@@ -2320,9 +2387,9 @@ class Skeleton {
   /// skeleton is rendered to allow any attachment keys in the current animation(s) to hide or show attachments from the new skin.
   /// @param skinName May be NULL.
   void setSkinByName(String skinName) {
-    final nameNative = skinName.toNativeUtf8();
+    final nameNative = skinName.toNativeUtf8(_allocator);
     _bindings.spine_skeleton_set_skin_by_name(_skeleton, nameNative.cast());
-    malloc.free(nameNative);
+    _allocator.free(nameNative);
   }
 
   void setSkin(Skin skin) {
@@ -2330,52 +2397,52 @@ class Skeleton {
   }
 
   Attachment? getAttachmentByName(String slotName, String attachmentName) {
-    final slotNameNative = slotName.toNativeUtf8();
-    final attachmentNameNative = attachmentName.toNativeUtf8();
+    final slotNameNative = slotName.toNativeUtf8(_allocator);
+    final attachmentNameNative = attachmentName.toNativeUtf8(_allocator);
     final attachment =
         _bindings.spine_skeleton_get_attachment_by_name(_skeleton, slotNameNative.cast(), attachmentNameNative.cast());
-    malloc.free(slotNameNative);
-    malloc.free(attachmentNameNative);
+    _allocator.free(slotNameNative);
+    _allocator.free(attachmentNameNative);
     if (attachment.address == nullptr.address) return null;
     return Attachment._toSubclass(attachment);
   }
 
   Attachment? getAttachment(int slotIndex, String attachmentName) {
-    final attachmentNameNative = attachmentName.toNativeUtf8();
+    final attachmentNameNative = attachmentName.toNativeUtf8(_allocator);
     final attachment = _bindings.spine_skeleton_get_attachment(_skeleton, slotIndex, attachmentNameNative.cast());
-    malloc.free(attachmentNameNative);
+    _allocator.free(attachmentNameNative);
     if (attachment.address == nullptr.address) return null;
     return Attachment._toSubclass(attachment);
   }
 
   void setAttachment(String slotName, String attachmentName) {
-    final slotNameNative = slotName.toNativeUtf8();
-    final attachmentNameNative = attachmentName.toNativeUtf8();
+    final slotNameNative = slotName.toNativeUtf8(_allocator);
+    final attachmentNameNative = attachmentName.toNativeUtf8(_allocator);
     _bindings.spine_skeleton_set_attachment(_skeleton, slotNameNative.cast(), attachmentNameNative.cast());
-    malloc.free(slotNameNative);
-    malloc.free(attachmentNameNative);
+    _allocator.free(slotNameNative);
+    _allocator.free(attachmentNameNative);
   }
 
   IkConstraint? findIkConstraint(String constraintName) {
-    final nameNative = constraintName.toNativeUtf8();
+    final nameNative = constraintName.toNativeUtf8(_allocator);
     final constraint = _bindings.spine_skeleton_find_ik_constraint(_skeleton, nameNative.cast());
-    malloc.free(nameNative);
+    _allocator.free(nameNative);
     if (constraint.address == nullptr.address) return null;
     return IkConstraint._(constraint);
   }
 
   TransformConstraint? findTransformConstraint(String constraintName) {
-    final nameNative = constraintName.toNativeUtf8();
+    final nameNative = constraintName.toNativeUtf8(_allocator);
     final constraint = _bindings.spine_skeleton_find_transform_constraint(_skeleton, nameNative.cast());
-    malloc.free(nameNative);
+    _allocator.free(nameNative);
     if (constraint.address == nullptr.address) return null;
     return TransformConstraint._(constraint);
   }
 
   PathConstraint? findPathConstraint(String constraintName) {
-    final nameNative = constraintName.toNativeUtf8();
+    final nameNative = constraintName.toNativeUtf8(_allocator);
     final constraint = _bindings.spine_skeleton_find_path_constraint(_skeleton, nameNative.cast());
-    malloc.free(nameNative);
+    _allocator.free(nameNative);
     if (constraint.address == nullptr.address) return null;
     return PathConstraint._(constraint);
   }
@@ -2388,7 +2455,13 @@ class Skeleton {
   /// @param outVertexBuffer Reference to hold a Vector of floats. This method will assign it with new floats as needed.
   Bounds getBounds() {
     final nativeBounds = _bindings.spine_skeleton_get_bounds(_skeleton);
-    return Bounds(nativeBounds.x, nativeBounds.y, nativeBounds.width, nativeBounds.height);
+    final bounds = Bounds(
+        _bindings.spine_bounds_get_x(nativeBounds),
+        _bindings.spine_bounds_get_y(nativeBounds),
+        _bindings.spine_bounds_get_width(nativeBounds),
+        _bindings.spine_bounds_get_height(nativeBounds));
+    _allocator.free(nativeBounds);
+    return bounds;
   }
 
   Bone? getRootBone() {
@@ -2471,7 +2544,11 @@ class Skeleton {
 
   Color getColor() {
     final color = _bindings.spine_skeleton_get_color(_skeleton);
-    return Color(color.r, color.g, color.b, color.a);
+    return Color(
+        _bindings.spine_color_get_r(color),
+        _bindings.spine_color_get_g(color),
+        _bindings.spine_color_get_b(color),
+        _bindings.spine_color_get_a(color));
   }
 
   void setColor(Color color) {
@@ -2848,9 +2925,9 @@ class EventData {
   }
 
   void setStringValue(String value) {
-    final nativeString = value.toNativeUtf8();
+    final nativeString = value.toNativeUtf8(_allocator);
     _bindings.spine_event_data_set_string_value(_data, nativeString.cast());
-    malloc.free(nativeString);
+    _allocator.free(nativeString);
   }
 
   String getAudioPath() {
@@ -2910,9 +2987,9 @@ class Event {
   }
 
   void setStringValue(String value) {
-    final nativeString = value.toNativeUtf8();
+    final nativeString = value.toNativeUtf8(_allocator);
     _bindings.spine_event_set_string_value(_event, nativeString.cast());
-    malloc.free(nativeString);
+    _allocator.free(nativeString);
   }
 
   double getVolume() {
@@ -2952,19 +3029,19 @@ class AnimationStateData {
   }
 
   void setMixByName(String fromName, String toName, double duration) {
-    final fromNative = fromName.toNativeUtf8();
-    final toNative = toName.toNativeUtf8();
+    final fromNative = fromName.toNativeUtf8(_allocator);
+    final toNative = toName.toNativeUtf8(_allocator);
     _bindings.spine_animation_state_data_set_mix_by_name(_data, fromNative.cast(), toNative.cast(), duration);
-    malloc.free(fromNative);
-    malloc.free(toNative);
+    _allocator.free(fromNative);
+    _allocator.free(toNative);
   }
 
   double getMixByName(String fromName, String toName) {
-    final fromNative = fromName.toNativeUtf8();
-    final toNative = toName.toNativeUtf8();
+    final fromNative = fromName.toNativeUtf8(_allocator);
+    final toNative = toName.toNativeUtf8(_allocator);
     final duration = _bindings.spine_animation_state_data_get_mix_by_name(_data, fromNative.cast(), toNative.cast());
-    malloc.free(fromNative);
-    malloc.free(toNative);
+    _allocator.free(fromNative);
+    _allocator.free(toNative);
     return duration;
   }
 
@@ -3072,10 +3149,10 @@ class AnimationState {
   /// A track entry to allow further customization of animation playback. References to the track entry must not be kept
   /// after AnimationState.Dispose.
   TrackEntry setAnimationByName(int trackIndex, String animationName, bool loop) {
-    final animation = animationName.toNativeUtf8();
+    final animation = animationName.toNativeUtf8(_allocator);
     final entry =
         _bindings.spine_animation_state_set_animation_by_name(_state, trackIndex, animation.cast(), loop ? -1 : 0);
-    malloc.free(animation);
+    _allocator.free(animation);
     if (entry.address == nullptr.address) throw Exception("Couldn't set animation $animationName");
     return TrackEntry._(entry, this);
   }
@@ -3096,10 +3173,10 @@ class AnimationState {
   /// @return A track entry to allow further customization of animation playback. References to the track entry must not be kept
   /// after AnimationState.Dispose
   TrackEntry addAnimationByName(int trackIndex, String animationName, bool loop, double delay) {
-    final animation = animationName.toNativeUtf8();
+    final animation = animationName.toNativeUtf8(_allocator);
     final entry = _bindings.spine_animation_state_add_animation_by_name(
         _state, trackIndex, animation.cast(), loop ? -1 : 0, delay);
-    malloc.free(animation);
+    _allocator.free(animation);
     if (entry.address == nullptr.address) throw Exception("Couldn't add animation $animationName");
     return TrackEntry._(entry, this);
   }
@@ -3167,7 +3244,7 @@ class AnimationState {
 class SkeletonDrawable {
   final Atlas atlas;
   final SkeletonData skeletonData;
-  late final Pointer<spine_skeleton_drawable> _drawable;
+  late final spine_skeleton_drawable _drawable;
   late final Skeleton skeleton;
   late final AnimationStateData animationStateData;
   late final AnimationState animationState;
@@ -3176,11 +3253,10 @@ class SkeletonDrawable {
 
   SkeletonDrawable(this.atlas, this.skeletonData, this._ownsAtlasAndSkeletonData) : _disposed = false {
     _drawable = _bindings.spine_skeleton_drawable_create(skeletonData._data);
-    skeleton = Skeleton._(_drawable.ref.skeleton);
-    animationStateData = AnimationStateData._(_drawable.ref.animationStateData);
-    animationState = AnimationState._(_drawable.ref.animationState, _drawable.ref.animationStateEvents);
+    skeleton = Skeleton._(_bindings.spine_skeleton_drawable_get_skeleton(_drawable));
+    animationStateData = AnimationStateData._(_bindings.spine_skeleton_drawable_get_animation_state_data(_drawable));
+    animationState = AnimationState._(_bindings.spine_skeleton_drawable_get_animation_state(_drawable), _bindings.spine_skeleton_drawable_get_animation_state_events(_drawable));
   }
-
 
   static Future<SkeletonDrawable> fromAsset(String skeletonFile, String atlasFile) async {
     var atlas = await Atlas.fromAsset(rootBundle, atlasFile);
@@ -3209,12 +3285,12 @@ class SkeletonDrawable {
 
   List<RenderCommand> render() {
     if (_disposed) return [];
-    Pointer<spine_render_command> nativeCmd = _bindings.spine_skeleton_drawable_render(_drawable);
+    spine_render_command nativeCmd = _bindings.spine_skeleton_drawable_render(_drawable);
     List<RenderCommand> commands = [];
     while (nativeCmd.address != nullptr.address) {
-      final atlasPage = atlas.atlasPages[nativeCmd.ref.atlasPage];
+      final atlasPage = atlas.atlasPages[_bindings.spine_render_command_get_atlas_page(nativeCmd)];
       commands.add(RenderCommand._(nativeCmd, atlasPage.width.toDouble(), atlasPage.height.toDouble()));
-      nativeCmd = nativeCmd.ref.next;
+      nativeCmd = _bindings.spine_render_command_get_next(nativeCmd);
     }
     return commands;
   }
@@ -3242,40 +3318,38 @@ class RenderCommand {
   late final Vertices vertices;
   late final int atlasPageIndex;
 
-  RenderCommand._(Pointer<spine_render_command> nativeCmd, double pageWidth, double pageHeight) {
-    atlasPageIndex = nativeCmd.ref.atlasPage;
-    int numVertices = nativeCmd.ref.numVertices;
-    int numIndices = nativeCmd.ref.numIndices;
-    final positions = nativeCmd.ref.positions.asTypedList(numVertices * 2);
-    final uvs = nativeCmd.ref.uvs.asTypedList(numVertices * 2);
+  RenderCommand._(spine_render_command nativeCmd, double pageWidth, double pageHeight) {
+    atlasPageIndex = _bindings.spine_render_command_get_atlas_page(nativeCmd);
+    int numVertices = _bindings.spine_render_command_get_num_vertices(nativeCmd);
+    int numIndices = _bindings.spine_render_command_get_num_indices(nativeCmd);
+    final positions = _bindings.spine_render_command_get_positions(nativeCmd).asTypedList(numVertices * 2);
+    final uvs = _bindings.spine_render_command_get_uvs(nativeCmd).asTypedList(numVertices * 2);
     for (int i = 0; i < numVertices * 2; i += 2) {
       uvs[i] *= pageWidth;
       uvs[i + 1] *= pageHeight;
     }
-    // We pass the native data as views directly to Vertices.raw. According to the sources, the data
-    // is copied, so it doesn't matter that we free up the underlying memory on the next
-    // render call. See the implementation of Vertices.raw() here:
-    // https://github.com/flutter/engine/blob/5c60785b802ad2c8b8899608d949342d5c624952/lib/ui/painting/vertices.cc#L21
-    vertices = Vertices.raw(VertexMode.triangles, positions,
-        textureCoordinates: uvs,
-        colors: nativeCmd.ref.colors.asTypedList(numVertices),
-        indices: nativeCmd.ref.indices.asTypedList(numIndices));
+    final colors = _bindings.spine_render_command_get_colors(nativeCmd).asTypedList(numVertices);
+    final indices = _bindings.spine_render_command_get_indices(nativeCmd).asTypedList(numIndices);
+
+    if (!kIsWeb) {
+      // We pass the native data as views directly to Vertices.raw. According to the sources, the data
+      // is copied, so it doesn't matter that we free up the underlying memory on the next
+      // render call. See the implementation of Vertices.raw() here:
+      // https://github.com/flutter/engine/blob/5c60785b802ad2c8b8899608d949342d5c624952/lib/ui/painting/vertices.cc#L21
+      vertices = Vertices.raw(VertexMode.triangles, positions,
+          textureCoordinates: uvs,
+          colors: _bindings.spine_render_command_get_colors(nativeCmd).asTypedList(numVertices),
+          indices: _bindings.spine_render_command_get_indices(nativeCmd).asTypedList(numIndices));
+    } else {
+      // On the web, rendering is done through CanvasKit, which requires copies of the native data.
+      final positionsCopy = Float32List.fromList(positions);
+      final uvsCopy = Float32List.fromList(uvs);
+      final colorsCopy = Int32List.fromList(colors);
+      final indicesCopy = Uint16List.fromList(indices);
+      vertices = Vertices.raw(VertexMode.triangles, positionsCopy,
+          textureCoordinates: uvsCopy,
+          colors: colorsCopy,
+          indices: indicesCopy);
+    }
   }
 }
-
-const String _libName = 'spine_flutter';
-
-final DynamicLibrary _dylib = () {
-  if (Platform.isMacOS || Platform.isIOS) {
-    return DynamicLibrary.open('$_libName.framework/$_libName');
-  }
-  if (Platform.isAndroid || Platform.isLinux) {
-    return DynamicLibrary.open('lib$_libName.so');
-  }
-  if (Platform.isWindows) {
-    return DynamicLibrary.open('$_libName.dll');
-  }
-  throw UnsupportedError('Unknown platform: ${Platform.operatingSystem}');
-}();
-
-final SpineFlutterBindings _bindings = SpineFlutterBindings(_dylib);

@@ -6,6 +6,7 @@ import 'pause_play_animation.dart';
 import 'skins.dart';
 import 'dress_up.dart';
 import 'ik_following.dart';
+import 'package:spine_flutter/spine_flutter.dart';
 
 class ExampleSelector extends StatelessWidget {
   const ExampleSelector({super.key});
@@ -98,7 +99,9 @@ class ExampleSelector extends StatelessWidget {
   }
 }
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initSpineFlutter();
   runApp(const MaterialApp(
       title: "Spine Examples",
       home: ExampleSelector()
