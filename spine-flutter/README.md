@@ -20,7 +20,16 @@ spine-flutter works with data exported from Spine 4.1.xx.
 
 spine-flutter supports all Spine features, except two-color tinting and the screen blend mode.
 
+## Supported platforms
+The spine-flutter runtime works on desktop, mobile and web. Web deployment requires canvaskit, which will add about 2mb of dependencies to your web deployment. You can compile your app for web with Canvaskit like this:
+
+```
+flutter build web --web-renderer canvaskit
+```
+
 ## Setup
+TBD
+
 
 ## Example
 The example in this repository is directly depending on the spine-flutter sources. The sources include C++ code ([spine-cpp](../spine-cpp)) which needs to be compiled. To run the example project, install the [Flutter SDK](https://docs.flutter.dev/get-started/install), then run `flutter doctor`` which will instruct you what other dependencies to install.
@@ -29,4 +38,4 @@ Once installed, run the `setup.sh` script in the `spine-flutter` folder. This wi
 
 You can then open `spine-flutter` in an IDE or editor of your choice that supports Flutter, like [IntelliJ IDEA/Android Studio](https://docs.flutter.dev/get-started/editor?tab=androidstudio) or [Visual Studio Code](https://docs.flutter.dev/get-started/editor?tab=vscode) to inspect and run the example. Alternatively, you can run the example from the [command line](https://docs.flutter.dev/get-started/test-drive?tab=terminal).
 
-> **Note**: spine-flutter does not work on the web. spine-flutter uses spine-cpp underneath, which requires Dart FFI which is currently not supported on the web.  
+  
