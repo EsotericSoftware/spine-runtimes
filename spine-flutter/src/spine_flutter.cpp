@@ -32,12 +32,6 @@
 #include <spine/Version.h>
 #include <spine/Debug.h>
 
-#ifdef __EMSCRIPTEN__
-#include <emscripten/emscripten.h>
-#else
-#define EMSCRIPTEN_KEEPALIVE
-#endif
-
 using namespace spine;
 
 struct AnimationStateEvent {
@@ -113,76 +107,76 @@ spine::SpineExtension *spine::getDefaultExtension() {
    return new spine::DebugExtension(new spine::DefaultSpineExtension());
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_major_version() {
+int32_t spine_major_version() {
     return SPINE_MAJOR_VERSION;
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_minor_version() {
+int32_t spine_minor_version() {
     return SPINE_MINOR_VERSION;
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_report_leaks() {
+void spine_report_leaks() {
     ((DebugExtension*)spine::SpineExtension::getInstance())->reportLeaks();
 }
 
 // Color
 
-EMSCRIPTEN_KEEPALIVE float spine_color_get_r(spine_color color) {
+float spine_color_get_r(spine_color color) {
     if (!color) return 0;
     return ((Color*)color)->r;
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_color_get_g(spine_color color) {
+float spine_color_get_g(spine_color color) {
     if (!color) return 0;
     return ((Color*)color)->g;
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_color_get_b(spine_color color) {
+float spine_color_get_b(spine_color color) {
     if (!color) return 0;
     return ((Color*)color)->b;
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_color_get_a(spine_color color) {
+float spine_color_get_a(spine_color color) {
     if (!color) return 0;
     return ((Color*)color)->a;
 }
 
 // Bounds
 
-EMSCRIPTEN_KEEPALIVE float spine_bounds_get_x(spine_bounds bounds) {
+float spine_bounds_get_x(spine_bounds bounds) {
     if (!bounds) return 0;
     return ((_spine_bounds*)bounds)->x;
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_bounds_get_y(spine_bounds bounds) {
+float spine_bounds_get_y(spine_bounds bounds) {
     if (!bounds) return 0;
     return ((_spine_bounds*)bounds)->y;
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_bounds_get_width(spine_bounds bounds) {
+float spine_bounds_get_width(spine_bounds bounds) {
     if (!bounds) return 0;
     return ((_spine_bounds*)bounds)->width;
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_bounds_get_height(spine_bounds bounds) {
+float spine_bounds_get_height(spine_bounds bounds) {
     if (!bounds) return 0;
     return ((_spine_bounds*)bounds)->height;
 }
 
 // Vector
-EMSCRIPTEN_KEEPALIVE float spine_vector_get_x(spine_vector vector) {
+float spine_vector_get_x(spine_vector vector) {
     if (!vector) return 0;
     return ((_spine_vector*)vector)->x;
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_vector_get_y(spine_vector vector) {
+float spine_vector_get_y(spine_vector vector) {
     if (!vector) return 0;
     return ((_spine_vector*)vector)->y;
 }
 
 // Atlas
 
-EMSCRIPTEN_KEEPALIVE spine_atlas spine_atlas_load(const utf8 *atlasData) {
+spine_atlas spine_atlas_load(const utf8 *atlasData) {
     if (!atlasData) return nullptr;
     int32_t length = (int32_t)strlen((char*)atlasData);
     auto atlas = new (__FILE__, __LINE__) Atlas((char*)atlasData, length, "", (TextureLoader*)nullptr, false);
@@ -196,22 +190,22 @@ EMSCRIPTEN_KEEPALIVE spine_atlas spine_atlas_load(const utf8 *atlasData) {
     return (spine_atlas)result;
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_atlas_get_num_image_paths(spine_atlas atlas) {
+int32_t spine_atlas_get_num_image_paths(spine_atlas atlas) {
     if (!atlas) return 0;
     return ((_spine_atlas*)atlas)->numImagePaths;
 }
 
-EMSCRIPTEN_KEEPALIVE utf8 *spine_atlas_get_image_path(spine_atlas atlas, int32_t index) {
+utf8 *spine_atlas_get_image_path(spine_atlas atlas, int32_t index) {
     if (!atlas) return nullptr;
     return ((_spine_atlas*)atlas)->imagePaths[index];
 }
 
-EMSCRIPTEN_KEEPALIVE utf8 *spine_atlas_get_error(spine_atlas atlas) {
+utf8 *spine_atlas_get_error(spine_atlas atlas) {
     if (!atlas) return nullptr;
     return ((_spine_atlas*)atlas)->error;
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_atlas_dispose(spine_atlas atlas) {
+void spine_atlas_dispose(spine_atlas atlas) {
     if (!atlas) return;
     _spine_atlas *_atlas = (_spine_atlas*)atlas;
     if (_atlas->atlas) delete (Atlas*)_atlas->atlas;
@@ -225,7 +219,7 @@ EMSCRIPTEN_KEEPALIVE void spine_atlas_dispose(spine_atlas atlas) {
 
 // SkeletonData
 
-EMSCRIPTEN_KEEPALIVE spine_skeleton_data_result spine_skeleton_data_load_json(spine_atlas atlas, const utf8 *skeletonData) {
+spine_skeleton_data_result spine_skeleton_data_load_json(spine_atlas atlas, const utf8 *skeletonData) {
     _spine_skeleton_data_result *result = SpineExtension::calloc<_spine_skeleton_data_result>(1, __FILE__, __LINE__);
     _spine_atlas *_atlas = (_spine_atlas*)atlas;
     Bone::setYDown(true);
@@ -241,7 +235,7 @@ EMSCRIPTEN_KEEPALIVE spine_skeleton_data_result spine_skeleton_data_load_json(sp
     return (spine_skeleton_data_result)result;
 }
 
-EMSCRIPTEN_KEEPALIVE spine_skeleton_data_result spine_skeleton_data_load_binary(spine_atlas atlas, const uint8_t *skeletonData, int32_t length) {
+spine_skeleton_data_result spine_skeleton_data_load_binary(spine_atlas atlas, const uint8_t *skeletonData, int32_t length) {
     _spine_skeleton_data_result *result = SpineExtension::calloc<_spine_skeleton_data_result>(1, __FILE__, __LINE__);
     _spine_atlas *_atlas = (_spine_atlas*)atlas;
     Bone::setYDown(true);
@@ -258,263 +252,263 @@ EMSCRIPTEN_KEEPALIVE spine_skeleton_data_result spine_skeleton_data_load_binary(
     return (spine_skeleton_data_result)result;
 }
 
-EMSCRIPTEN_KEEPALIVE utf8 *spine_skeleton_data_result_get_error(spine_skeleton_data_result result) {
+utf8 *spine_skeleton_data_result_get_error(spine_skeleton_data_result result) {
     if (!result) return nullptr;
     return ((_spine_skeleton_data_result*)result)->error;
 }
-EMSCRIPTEN_KEEPALIVE spine_skeleton_data spine_skeleton_data_result_get_data(spine_skeleton_data_result result) {
+spine_skeleton_data spine_skeleton_data_result_get_data(spine_skeleton_data_result result) {
     if (!result) return nullptr;
     return ((_spine_skeleton_data_result*)result)->skeletonData;
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_skeleton_data_result_dispose(spine_skeleton_data_result result) {
+void spine_skeleton_data_result_dispose(spine_skeleton_data_result result) {
     if (!result) return;
     _spine_skeleton_data_result *_result = (_spine_skeleton_data_result*)result;
     if (_result->error) SpineExtension::free(_result->error, __FILE__, __LINE__);
     SpineExtension::free(_result, __FILE__, __LINE__);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_bone_data spine_skeleton_data_find_bone(spine_skeleton_data data, const utf8 *name) {
+spine_bone_data spine_skeleton_data_find_bone(spine_skeleton_data data, const utf8 *name) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
     return (spine_bone_data)_data->findBone((char*)name);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_slot_data spine_skeleton_data_find_slot(spine_skeleton_data data, const utf8 *name) {
+spine_slot_data spine_skeleton_data_find_slot(spine_skeleton_data data, const utf8 *name) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
     return (spine_slot_data)_data->findSlot((char*)name);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_skin spine_skeleton_data_find_skin(spine_skeleton_data data, const utf8 *name) {
+spine_skin spine_skeleton_data_find_skin(spine_skeleton_data data, const utf8 *name) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
     return (spine_skin)_data->findSkin((char*)name);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_event_data spine_skeleton_data_find_event(spine_skeleton_data data, const utf8 *name) {
+spine_event_data spine_skeleton_data_find_event(spine_skeleton_data data, const utf8 *name) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
     return (spine_event_data)_data->findEvent((char*)name);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_animation spine_skeleton_data_find_animation(spine_skeleton_data data, const utf8 *name) {
+spine_animation spine_skeleton_data_find_animation(spine_skeleton_data data, const utf8 *name) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
     return (spine_animation)_data->findAnimation((char*)name);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_ik_constraint_data spine_skeleton_data_find_ik_constraint(spine_skeleton_data data, const utf8 *name) {
+spine_ik_constraint_data spine_skeleton_data_find_ik_constraint(spine_skeleton_data data, const utf8 *name) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
     return (spine_ik_constraint_data)_data->findIkConstraint((char*)name);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_transform_constraint_data spine_skeleton_data_find_transform_constraint(spine_skeleton_data data, const utf8 *name) {
+spine_transform_constraint_data spine_skeleton_data_find_transform_constraint(spine_skeleton_data data, const utf8 *name) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
     return (spine_transform_constraint_data)_data->findTransformConstraint((char*)name);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_path_constraint_data spine_skeleton_data_find_path_constraint(spine_skeleton_data data, const utf8 *name) {
+spine_path_constraint_data spine_skeleton_data_find_path_constraint(spine_skeleton_data data, const utf8 *name) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
     return (spine_path_constraint_data)_data->findPathConstraint((char*)name);
 }
 
-EMSCRIPTEN_KEEPALIVE const utf8* spine_skeleton_data_get_name(spine_skeleton_data data) {
+const utf8* spine_skeleton_data_get_name(spine_skeleton_data data) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
     return (utf8*)_data->getName().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_skeleton_data_get_num_bones(spine_skeleton_data data) {
+int32_t spine_skeleton_data_get_num_bones(spine_skeleton_data data) {
     if (data == nullptr) return 0;
     SkeletonData *_data = (SkeletonData*)data;
     return (int32_t)_data->getBones().size();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_bone_data* spine_skeleton_data_get_bones(spine_skeleton_data data) {
+spine_bone_data* spine_skeleton_data_get_bones(spine_skeleton_data data) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
     return (spine_bone_data*)_data->getBones().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_skeleton_data_get_num_slots(spine_skeleton_data data) {
+int32_t spine_skeleton_data_get_num_slots(spine_skeleton_data data) {
     if (data == nullptr) return 0;
     SkeletonData *_data = (SkeletonData*)data;
     return (int32_t)_data->getSlots().size();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_slot_data* spine_skeleton_data_get_slots(spine_skeleton_data data) {
+spine_slot_data* spine_skeleton_data_get_slots(spine_skeleton_data data) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
     return (spine_slot_data*)_data->getSlots().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_skeleton_data_get_num_skins(spine_skeleton_data data) {
+int32_t spine_skeleton_data_get_num_skins(spine_skeleton_data data) {
     if (data == nullptr) return 0;
     SkeletonData *_data = (SkeletonData*)data;
     return (int32_t)_data->getSkins().size();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_skin* spine_skeleton_data_get_skins(spine_skeleton_data data) {
+spine_skin* spine_skeleton_data_get_skins(spine_skeleton_data data) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
     return (spine_skin*)_data->getSkins().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_skin spine_skeleton_data_get_default_skin(spine_skeleton_data data) {
+spine_skin spine_skeleton_data_get_default_skin(spine_skeleton_data data) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
     return (spine_skin)_data->getDefaultSkin();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_skeleton_data_set_default_skin(spine_skeleton_data data, spine_skin skin) {
+void spine_skeleton_data_set_default_skin(spine_skeleton_data data, spine_skin skin) {
     if (data == nullptr) return;
     SkeletonData *_data = (SkeletonData*)data;
     _data->setDefaultSkin((Skin*)skin);
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_skeleton_data_get_num_events(spine_skeleton_data data) {
+int32_t spine_skeleton_data_get_num_events(spine_skeleton_data data) {
     if (data == nullptr) return 0;
     SkeletonData *_data = (SkeletonData*)data;
     return (int32_t)_data->getEvents().size();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_event_data* spine_skeleton_data_get_events(spine_skeleton_data data) {
+spine_event_data* spine_skeleton_data_get_events(spine_skeleton_data data) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
     return (spine_event_data*)_data->getEvents().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_skeleton_data_get_num_animations(spine_skeleton_data data) {
+int32_t spine_skeleton_data_get_num_animations(spine_skeleton_data data) {
     if (data == nullptr) return 0;
     SkeletonData *_data = (SkeletonData*)data;
     return (int32_t)_data->getAnimations().size();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_animation* spine_skeleton_data_get_animations(spine_skeleton_data data) {
+spine_animation* spine_skeleton_data_get_animations(spine_skeleton_data data) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
     return (spine_animation*)_data->getAnimations().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_skeleton_data_get_num_ik_constraints(spine_skeleton_data data) {
+int32_t spine_skeleton_data_get_num_ik_constraints(spine_skeleton_data data) {
     if (data == nullptr) return 0;
     SkeletonData *_data = (SkeletonData*)data;
     return (int32_t)_data->getIkConstraints().size();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_ik_constraint_data* spine_skeleton_data_get_ik_constraints(spine_skeleton_data data) {
+spine_ik_constraint_data* spine_skeleton_data_get_ik_constraints(spine_skeleton_data data) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
     return (spine_ik_constraint_data*)_data->getIkConstraints().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_skeleton_data_get_num_transform_constraints(spine_skeleton_data data) {
+int32_t spine_skeleton_data_get_num_transform_constraints(spine_skeleton_data data) {
     if (data == nullptr) return 0;
     SkeletonData *_data = (SkeletonData*)data;
     return (int32_t)_data->getTransformConstraints().size();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_transform_constraint_data* spine_skeleton_data_get_transform_constraints(spine_skeleton_data data) {
+spine_transform_constraint_data* spine_skeleton_data_get_transform_constraints(spine_skeleton_data data) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
     return (spine_transform_constraint_data*)_data->getTransformConstraints().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_skeleton_data_get_num_path_constraints(spine_skeleton_data data) {
+int32_t spine_skeleton_data_get_num_path_constraints(spine_skeleton_data data) {
     if (data == nullptr) return 0;
     SkeletonData *_data = (SkeletonData*)data;
     return (int32_t)_data->getPathConstraints().size();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_path_constraint_data* spine_skeleton_data_get_path_constraints(spine_skeleton_data data) {
+spine_path_constraint_data* spine_skeleton_data_get_path_constraints(spine_skeleton_data data) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
     return (spine_path_constraint_data*)_data->getPathConstraints().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_skeleton_data_get_x(spine_skeleton_data data) {
+float spine_skeleton_data_get_x(spine_skeleton_data data) {
     if (data == nullptr) return 0;
     SkeletonData *_data = (SkeletonData*)data;
     return _data->getX();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_skeleton_data_set_x(spine_skeleton_data data, float x) {
+void spine_skeleton_data_set_x(spine_skeleton_data data, float x) {
     if (data == nullptr) return;
     SkeletonData *_data = (SkeletonData*)data;
     _data->setX(x);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_skeleton_data_get_y(spine_skeleton_data data) {
+float spine_skeleton_data_get_y(spine_skeleton_data data) {
     if (data == nullptr) return 0;
     SkeletonData *_data = (SkeletonData*)data;
     return _data->getY();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_skeleton_data_set_y(spine_skeleton_data data, float y) {
+void spine_skeleton_data_set_y(spine_skeleton_data data, float y) {
     if (data == nullptr) return;
     SkeletonData *_data = (SkeletonData*)data;
     _data->setY(y);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_skeleton_data_get_width(spine_skeleton_data data) {
+float spine_skeleton_data_get_width(spine_skeleton_data data) {
     if (data == nullptr) return 0;
     SkeletonData *_data = (SkeletonData*)data;
     return _data->getWidth();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_skeleton_data_set_width(spine_skeleton_data data, float width) {
+void spine_skeleton_data_set_width(spine_skeleton_data data, float width) {
     if (data == nullptr) return;
     SkeletonData *_data = (SkeletonData*)data;
     _data->setWidth(width);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_skeleton_data_get_height(spine_skeleton_data data) {
+float spine_skeleton_data_get_height(spine_skeleton_data data) {
     if (data == nullptr) return 0;
     SkeletonData *_data = (SkeletonData*)data;
     return _data->getHeight();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_skeleton_data_set_height(spine_skeleton_data data, float height) {
+void spine_skeleton_data_set_height(spine_skeleton_data data, float height) {
     if (data == nullptr) return;
     SkeletonData *_data = (SkeletonData*)data;
     _data->setHeight(height);
 }
 
-EMSCRIPTEN_KEEPALIVE const utf8* spine_skeleton_data_get_version(spine_skeleton_data data) {
+const utf8* spine_skeleton_data_get_version(spine_skeleton_data data) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
     return (utf8*)_data->getVersion().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE const utf8* spine_skeleton_data_get_hash(spine_skeleton_data data) {
+const utf8* spine_skeleton_data_get_hash(spine_skeleton_data data) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
     return (utf8*)_data->getHash().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE const utf8* spine_skeleton_data_get_images_path(spine_skeleton_data data) {
+const utf8* spine_skeleton_data_get_images_path(spine_skeleton_data data) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
     return (utf8*)_data->getImagesPath().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE const utf8* spine_skeleton_data_get_audio_path(spine_skeleton_data data) {
+const utf8* spine_skeleton_data_get_audio_path(spine_skeleton_data data) {
     if (data == nullptr) return nullptr;
     SkeletonData *_data = (SkeletonData*)data;
     return (utf8*)_data->getAudioPath().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_skeleton_data_get_fps(spine_skeleton_data data) {
+float spine_skeleton_data_get_fps(spine_skeleton_data data) {
     if (data == nullptr) return 0;
     SkeletonData *_data = (SkeletonData*)data;
     return _data->getFps();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_skeleton_data_dispose(spine_skeleton_data data) {
+void spine_skeleton_data_dispose(spine_skeleton_data data) {
     if (!data) return;
     delete (SkeletonData*)data;
 }
@@ -545,7 +539,7 @@ void spine_render_command_dispose(_spine_render_command *cmd) {
 
 // SkeletonDrawable
 
-EMSCRIPTEN_KEEPALIVE spine_skeleton_drawable spine_skeleton_drawable_create(spine_skeleton_data skeletonData) {
+spine_skeleton_drawable spine_skeleton_drawable_create(spine_skeleton_data skeletonData) {
     _spine_skeleton_drawable *drawable = SpineExtension::calloc<_spine_skeleton_drawable>(1, __FILE__, __LINE__);
     drawable->skeleton = (spine_skeleton)new (__FILE__, __LINE__) Skeleton((SkeletonData*)skeletonData);
     AnimationStateData *stateData = new (__FILE__, __LINE__) AnimationStateData((SkeletonData*)skeletonData);
@@ -560,7 +554,7 @@ EMSCRIPTEN_KEEPALIVE spine_skeleton_drawable spine_skeleton_drawable_create(spin
     return (spine_skeleton_drawable)drawable;
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_skeleton_drawable_dispose(spine_skeleton_drawable drawable) {
+void spine_skeleton_drawable_dispose(spine_skeleton_drawable drawable) {
     _spine_skeleton_drawable *_drawable = (_spine_skeleton_drawable*)drawable;
     if (!_drawable) return;
     if (_drawable->skeleton) delete (Skeleton*)_drawable->skeleton;
@@ -576,7 +570,7 @@ EMSCRIPTEN_KEEPALIVE void spine_skeleton_drawable_dispose(spine_skeleton_drawabl
     SpineExtension::free(drawable, __FILE__, __LINE__);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_render_command spine_skeleton_drawable_render(spine_skeleton_drawable drawable) {
+spine_render_command spine_skeleton_drawable_render(spine_skeleton_drawable drawable) {
     _spine_skeleton_drawable *_drawable = (_spine_skeleton_drawable*)drawable;
     if (!_drawable) return nullptr;
     if (!_drawable->skeleton) return nullptr;
@@ -697,127 +691,127 @@ EMSCRIPTEN_KEEPALIVE spine_render_command spine_skeleton_drawable_render(spine_s
     return (spine_render_command)_drawable->renderCommand;
 }
 
-EMSCRIPTEN_KEEPALIVE spine_skeleton spine_skeleton_drawable_get_skeleton(spine_skeleton_drawable drawable) {
+spine_skeleton spine_skeleton_drawable_get_skeleton(spine_skeleton_drawable drawable) {
     if (!drawable) return nullptr;
     return ((_spine_skeleton_drawable*)drawable)->skeleton;
 }
 
-EMSCRIPTEN_KEEPALIVE spine_animation_state spine_skeleton_drawable_get_animation_state(spine_skeleton_drawable drawable) {
+spine_animation_state spine_skeleton_drawable_get_animation_state(spine_skeleton_drawable drawable) {
     if (!drawable) return nullptr;
     return ((_spine_skeleton_drawable*)drawable)->animationState;
 }
 
-EMSCRIPTEN_KEEPALIVE spine_animation_state_data spine_skeleton_drawable_get_animation_state_data(spine_skeleton_drawable drawable) {
+spine_animation_state_data spine_skeleton_drawable_get_animation_state_data(spine_skeleton_drawable drawable) {
     if (!drawable) return nullptr;
     return ((_spine_skeleton_drawable*)drawable)->animationStateData;
 }
 
-EMSCRIPTEN_KEEPALIVE spine_animation_state_events spine_skeleton_drawable_get_animation_state_events(spine_skeleton_drawable drawable) {
+spine_animation_state_events spine_skeleton_drawable_get_animation_state_events(spine_skeleton_drawable drawable) {
     if (!drawable) return nullptr;
     return ((_spine_skeleton_drawable*)drawable)->animationStateEvents;
 }
 
 // Render command
-EMSCRIPTEN_KEEPALIVE float *spine_render_command_get_positions(spine_render_command command) {
+float *spine_render_command_get_positions(spine_render_command command) {
     if (!command) return nullptr;
     return ((_spine_render_command*)command)->positions;
 }
 
-EMSCRIPTEN_KEEPALIVE float *spine_render_command_get_uvs(spine_render_command command) {
+float *spine_render_command_get_uvs(spine_render_command command) {
     if (!command) return nullptr;
     return ((_spine_render_command*)command)->uvs;
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t *spine_render_command_get_colors(spine_render_command command) {
+int32_t *spine_render_command_get_colors(spine_render_command command) {
     if (!command) return nullptr;
     return ((_spine_render_command*)command)->colors;
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_render_command_get_num_vertices(spine_render_command command) {
+int32_t spine_render_command_get_num_vertices(spine_render_command command) {
     if (!command) return 0;
     return ((_spine_render_command*)command)->numVertices;
 }
 
-EMSCRIPTEN_KEEPALIVE uint16_t *spine_render_command_get_indices(spine_render_command command) {
+uint16_t *spine_render_command_get_indices(spine_render_command command) {
     if (!command) return nullptr;
     return ((_spine_render_command*)command)->indices;
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_render_command_get_num_indices(spine_render_command command) {
+int32_t spine_render_command_get_num_indices(spine_render_command command) {
     if (!command) return 0;
     return ((_spine_render_command*)command)->numIndices;
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_render_command_get_atlas_page(spine_render_command command) {
+int32_t spine_render_command_get_atlas_page(spine_render_command command) {
     if (!command) return 0;
     return ((_spine_render_command*)command)->atlasPage;
 }
 
-EMSCRIPTEN_KEEPALIVE spine_blend_mode spine_render_command_get_blend_mode(spine_render_command command) {
+spine_blend_mode spine_render_command_get_blend_mode(spine_render_command command) {
     if (!command) return SPINE_BLEND_MODE_NORMAL;
     return ((_spine_render_command*)command)->blendMode;
 }
 
-EMSCRIPTEN_KEEPALIVE spine_render_command spine_render_command_get_next(spine_render_command command) {
+spine_render_command spine_render_command_get_next(spine_render_command command) {
     if (!command) return nullptr;
     return (spine_render_command)((_spine_render_command*)command)->next;
 }
 
 // Animation
 
-EMSCRIPTEN_KEEPALIVE const utf8* spine_animation_get_name(spine_animation animation) {
+const utf8* spine_animation_get_name(spine_animation animation) {
     if (animation == nullptr) return nullptr;
     Animation *_animation = (Animation*)animation;
     return (utf8*)_animation->getName().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_animation_get_duration(spine_animation animation) {
+float spine_animation_get_duration(spine_animation animation) {
     if (animation == nullptr) return 0;
     Animation *_animation = (Animation*)animation;
     return _animation->getDuration();
 }
 
 // AnimationStateData
-EMSCRIPTEN_KEEPALIVE spine_skeleton_data spine_animation_state_data_get_skeleton_data(spine_animation_state_data stateData) {
+spine_skeleton_data spine_animation_state_data_get_skeleton_data(spine_animation_state_data stateData) {
     if (stateData == nullptr) return nullptr;
     AnimationStateData* _stateData = (AnimationStateData*)stateData;
     return (spine_skeleton_data)_stateData->getSkeletonData();
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_animation_state_data_get_default_mix(spine_animation_state_data stateData) {
+float spine_animation_state_data_get_default_mix(spine_animation_state_data stateData) {
     if (stateData == nullptr) return 0;
     AnimationStateData* _stateData = (AnimationStateData*)stateData;
     return _stateData->getDefaultMix();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_animation_state_data_set_default_mix(spine_animation_state_data stateData, float defaultMix) {
+void spine_animation_state_data_set_default_mix(spine_animation_state_data stateData, float defaultMix) {
     if (stateData == nullptr) return;
     AnimationStateData* _stateData = (AnimationStateData*)stateData;
     _stateData->setDefaultMix(defaultMix);
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_animation_state_data_set_mix(spine_animation_state_data stateData, spine_animation from, spine_animation to, float duration) {
+void spine_animation_state_data_set_mix(spine_animation_state_data stateData, spine_animation from, spine_animation to, float duration) {
     if (stateData == nullptr) return;
     if (from == nullptr || to == nullptr) return;
     AnimationStateData* _stateData = (AnimationStateData*)stateData;
     _stateData->setMix((Animation*)from, (Animation*)to, duration);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_animation_state_data_get_mix(spine_animation_state_data stateData, spine_animation from, spine_animation to) {
+float spine_animation_state_data_get_mix(spine_animation_state_data stateData, spine_animation from, spine_animation to) {
     if (stateData == nullptr) return 0;
     if (from == nullptr || to == nullptr) return 0;
     AnimationStateData* _stateData = (AnimationStateData*)stateData;
     return _stateData->getMix((Animation*)from, (Animation*)to);
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_animation_state_data_set_mix_by_name(spine_animation_state_data stateData, const utf8* fromName, const utf8* toName, float duration) {
+void spine_animation_state_data_set_mix_by_name(spine_animation_state_data stateData, const utf8* fromName, const utf8* toName, float duration) {
     if (stateData == nullptr) return;
     if (fromName == nullptr || toName == nullptr) return;
     AnimationStateData* _stateData = (AnimationStateData*)stateData;
     _stateData->setMix((char*)fromName, (char*)toName, duration);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_animation_state_data_get_mix_by_name(spine_animation_state_data stateData, const utf8* fromName, const utf8* toName) {
+float spine_animation_state_data_get_mix_by_name(spine_animation_state_data stateData, const utf8* fromName, const utf8* toName) {
     if (stateData == nullptr) return 0;
     AnimationStateData* _stateData = (AnimationStateData*)stateData;
     Animation* from = _stateData->getSkeletonData()->findAnimation((char*)fromName);
@@ -826,123 +820,123 @@ EMSCRIPTEN_KEEPALIVE float spine_animation_state_data_get_mix_by_name(spine_anim
     return _stateData->getMix(from, to);
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_animation_state_data_clear(spine_animation_state_data stateData) {
+void spine_animation_state_data_clear(spine_animation_state_data stateData) {
     if (stateData == nullptr) return ;
     AnimationStateData* _stateData = (AnimationStateData*)stateData;
     _stateData->clear();
 }
 
 // AnimationState
-EMSCRIPTEN_KEEPALIVE void spine_animation_state_update(spine_animation_state state, float delta) {
+void spine_animation_state_update(spine_animation_state state, float delta) {
     if (state == nullptr) return;
     AnimationState *_state = (AnimationState*)state;
     _state->update(delta);
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_animation_state_dispose_track_entry(spine_animation_state state, spine_track_entry entry) {
+void spine_animation_state_dispose_track_entry(spine_animation_state state, spine_track_entry entry) {
     if (state == nullptr) return;
     if (entry == nullptr) return;
     AnimationState *_state = (AnimationState*)state;
     _state->disposeTrackEntry((TrackEntry*)entry);
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_animation_state_apply(spine_animation_state state, spine_skeleton skeleton) {
+void spine_animation_state_apply(spine_animation_state state, spine_skeleton skeleton) {
     if (state == nullptr) return;
     AnimationState *_state = (AnimationState*)state;
     _state->apply(*(Skeleton*)skeleton);
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_animation_state_clear_tracks(spine_animation_state state) {
+void spine_animation_state_clear_tracks(spine_animation_state state) {
     if (state == nullptr) return;
     AnimationState *_state = (AnimationState*)state;
     _state->clearTracks();
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_animation_state_get_num_tracks(spine_animation_state state) {
+int32_t spine_animation_state_get_num_tracks(spine_animation_state state) {
     if (state == nullptr) return 0;
     AnimationState *_state = (AnimationState*)state;
     return (int32_t) _state->getTracks().size();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_animation_state_clear_track(spine_animation_state state, int32_t trackIndex) {
+void spine_animation_state_clear_track(spine_animation_state state, int32_t trackIndex) {
     if (state == nullptr) return;
     AnimationState *_state = (AnimationState*)state;
     _state->clearTrack(trackIndex);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_track_entry spine_animation_state_set_animation_by_name(spine_animation_state state, int32_t trackIndex, const utf8* animationName, int32_t loop) {
+spine_track_entry spine_animation_state_set_animation_by_name(spine_animation_state state, int32_t trackIndex, const utf8* animationName, int32_t loop) {
     if (state == nullptr) return nullptr;
     AnimationState *_state = (AnimationState*)state;
     return (spine_track_entry)_state->setAnimation(trackIndex, (char*)animationName, loop);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_track_entry spine_animation_state_set_animation(spine_animation_state state, int32_t trackIndex, spine_animation animation, int32_t loop) {
+spine_track_entry spine_animation_state_set_animation(spine_animation_state state, int32_t trackIndex, spine_animation animation, int32_t loop) {
     if (state == nullptr) return nullptr;
     AnimationState *_state = (AnimationState*)state;
     return (spine_track_entry)_state->setAnimation(trackIndex, (Animation*)animation, loop);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_track_entry spine_animation_state_add_animation_by_name(spine_animation_state state, int32_t trackIndex, const utf8* animationName, int32_t loop, float delay) {
+spine_track_entry spine_animation_state_add_animation_by_name(spine_animation_state state, int32_t trackIndex, const utf8* animationName, int32_t loop, float delay) {
     if (state == nullptr) return nullptr;
     AnimationState *_state = (AnimationState*)state;
     return (spine_track_entry)_state->addAnimation(trackIndex, (char*)animationName, loop, delay);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_track_entry spine_animation_state_add_animation(spine_animation_state state, int32_t trackIndex, spine_animation animation, int32_t loop, float delay) {
+spine_track_entry spine_animation_state_add_animation(spine_animation_state state, int32_t trackIndex, spine_animation animation, int32_t loop, float delay) {
     if (state == nullptr) return nullptr;
     AnimationState *_state = (AnimationState*)state;
     return (spine_track_entry)_state->addAnimation(trackIndex, (Animation*)animation, loop, delay);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_track_entry spine_animation_state_set_empty_animation(spine_animation_state state, int32_t trackIndex, float mixDuration) {
+spine_track_entry spine_animation_state_set_empty_animation(spine_animation_state state, int32_t trackIndex, float mixDuration) {
     if (state == nullptr) return nullptr;
     AnimationState *_state = (AnimationState*)state;
     return (spine_track_entry)_state->setEmptyAnimation(trackIndex, mixDuration);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_track_entry spine_animation_state_add_empty_animation(spine_animation_state state, int32_t trackIndex, float mixDuration, float delay) {
+spine_track_entry spine_animation_state_add_empty_animation(spine_animation_state state, int32_t trackIndex, float mixDuration, float delay) {
     if (state == nullptr) return nullptr;
     AnimationState *_state = (AnimationState*)state;
     return (spine_track_entry)_state->addEmptyAnimation(trackIndex, mixDuration, delay);
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_animation_state_set_empty_animations(spine_animation_state state, float mixDuration) {
+void spine_animation_state_set_empty_animations(spine_animation_state state, float mixDuration) {
     if (state == nullptr) return;
     AnimationState *_state = (AnimationState*)state;
     _state->setEmptyAnimations(mixDuration);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_track_entry spine_animation_state_get_current(spine_animation_state state, int32_t trackIndex) {
+spine_track_entry spine_animation_state_get_current(spine_animation_state state, int32_t trackIndex) {
     if (state == nullptr) return nullptr;
     AnimationState *_state = (AnimationState*)state;
     return (spine_track_entry)_state->getCurrent(trackIndex);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_animation_state_data spine_animation_state_get_data(spine_animation_state state) {
+spine_animation_state_data spine_animation_state_get_data(spine_animation_state state) {
     if (state == nullptr) return nullptr;
     AnimationState *_state = (AnimationState*)state;
     return (spine_animation_state_data)_state->getData();
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_animation_state_get_time_scale(spine_animation_state state) {
+float spine_animation_state_get_time_scale(spine_animation_state state) {
     if (state == nullptr) return 0;
     AnimationState *_state = (AnimationState*)state;
     return _state->getTimeScale();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_animation_state_set_time_scale(spine_animation_state state, float timeScale) {
+void spine_animation_state_set_time_scale(spine_animation_state state, float timeScale) {
     if (state == nullptr) return;
     AnimationState *_state = (AnimationState*)state;
     _state->setTimeScale(timeScale);
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_animation_state_events_get_num_events(spine_animation_state_events events) {
+int32_t spine_animation_state_events_get_num_events(spine_animation_state_events events) {
     if (events == nullptr) return 0;
     EventListener *_events = (EventListener*)events;
     return (int32_t)_events->events.size();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_event_type spine_animation_state_events_get_event_type(spine_animation_state_events events, int32_t index) {
+spine_event_type spine_animation_state_events_get_event_type(spine_animation_state_events events, int32_t index) {
     if (events == nullptr) return SPINE_EVENT_TYPE_DISPOSE;
     if (index < 0) return SPINE_EVENT_TYPE_DISPOSE;
     EventListener *_events = (EventListener*)events;
@@ -950,21 +944,21 @@ EMSCRIPTEN_KEEPALIVE spine_event_type spine_animation_state_events_get_event_typ
     return (spine_event_type)_events->events[index].type;
 }
 
-EMSCRIPTEN_KEEPALIVE spine_track_entry spine_animation_state_events_get_track_entry(spine_animation_state_events events, int32_t index) {
+spine_track_entry spine_animation_state_events_get_track_entry(spine_animation_state_events events, int32_t index) {
     if (events == nullptr) return nullptr;
     EventListener *_events = (EventListener*)events;
     if (index >= _events->events.size()) return nullptr;
     return (spine_track_entry)_events->events[index].entry;
 }
 
-EMSCRIPTEN_KEEPALIVE spine_event spine_animation_state_events_get_event(spine_animation_state_events events, int32_t index) {
+spine_event spine_animation_state_events_get_event(spine_animation_state_events events, int32_t index) {
     if (events == nullptr) return nullptr;
     EventListener *_events = (EventListener*)events;
     if (index >= _events->events.size()) return nullptr;
     return (spine_event)_events->events[index].event;
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_animation_state_events_reset(spine_animation_state_events events) {
+void spine_animation_state_events_reset(spine_animation_state_events events) {
     if (events == nullptr) return;
     EventListener *_events = (EventListener*)events;
     _events->events.clear();
@@ -972,277 +966,277 @@ EMSCRIPTEN_KEEPALIVE void spine_animation_state_events_reset(spine_animation_sta
 
 // TrackEntry
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_track_entry_get_track_index(spine_track_entry entry) {
+int32_t spine_track_entry_get_track_index(spine_track_entry entry) {
     if (entry == nullptr) return 0;
     TrackEntry *_entry = (TrackEntry*)entry;
     return _entry->getTrackIndex();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_animation spine_track_entry_get_animation(spine_track_entry entry) {
+spine_animation spine_track_entry_get_animation(spine_track_entry entry) {
     if (entry == nullptr) return nullptr;
     TrackEntry *_entry = (TrackEntry*)entry;
     return (spine_animation)_entry->getAnimation();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_track_entry spine_track_entry_get_previous(spine_track_entry entry) {
+spine_track_entry spine_track_entry_get_previous(spine_track_entry entry) {
     if (entry == nullptr) return nullptr;
     TrackEntry *_entry = (TrackEntry*)entry;
     return (spine_track_entry)_entry->getPrevious();
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_track_entry_get_loop(spine_track_entry entry) {
+int32_t spine_track_entry_get_loop(spine_track_entry entry) {
     if (entry == nullptr) return 0;
     TrackEntry *_entry = (TrackEntry*)entry;
     return _entry->getLoop() ? -1 : 0;
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_track_entry_set_loop(spine_track_entry entry, int32_t loop) {
+void spine_track_entry_set_loop(spine_track_entry entry, int32_t loop) {
     if (entry == nullptr) return;
     TrackEntry *_entry = (TrackEntry*)entry;
     _entry->setLoop(loop);
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_track_entry_get_hold_previous(spine_track_entry entry) {
+int32_t spine_track_entry_get_hold_previous(spine_track_entry entry) {
     if (entry == nullptr) return 0;
     TrackEntry *_entry = (TrackEntry*)entry;
     return _entry->getHoldPrevious() ? -1 : 0;
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_track_entry_set_hold_previous(spine_track_entry entry, int32_t holdPrevious) {
+void spine_track_entry_set_hold_previous(spine_track_entry entry, int32_t holdPrevious) {
     if (entry == nullptr) return;
     TrackEntry *_entry = (TrackEntry*)entry;
     _entry->setHoldPrevious(holdPrevious);
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_track_entry_get_reverse(spine_track_entry entry) {
+int32_t spine_track_entry_get_reverse(spine_track_entry entry) {
     if (entry == nullptr) return 0;
     TrackEntry *_entry = (TrackEntry*)entry;
     return _entry->getReverse() ? -1 : 0;
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_track_entry_set_reverse(spine_track_entry entry, int32_t reverse) {
+void spine_track_entry_set_reverse(spine_track_entry entry, int32_t reverse) {
     if (entry == nullptr) return;
     TrackEntry *_entry = (TrackEntry*)entry;
     _entry->setReverse(reverse);
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_track_entry_get_shortest_rotation(spine_track_entry entry) {
+int32_t spine_track_entry_get_shortest_rotation(spine_track_entry entry) {
     if (entry == nullptr) return 0;
     TrackEntry *_entry = (TrackEntry*)entry;
     return _entry->getShortestRotation() ? -1 : 0;
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_track_entry_set_shortest_rotation(spine_track_entry entry, int32_t shortestRotation) {
+void spine_track_entry_set_shortest_rotation(spine_track_entry entry, int32_t shortestRotation) {
     if (entry == nullptr) return;
     TrackEntry *_entry = (TrackEntry*)entry;
     _entry->setShortestRotation(shortestRotation);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_track_entry_get_delay(spine_track_entry entry) {
+float spine_track_entry_get_delay(spine_track_entry entry) {
     if (entry == nullptr) return 0;
     TrackEntry *_entry = (TrackEntry*)entry;
     return _entry->getDelay();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_track_entry_set_delay(spine_track_entry entry, float delay) {
+void spine_track_entry_set_delay(spine_track_entry entry, float delay) {
     if (entry == nullptr) return;
     TrackEntry *_entry = (TrackEntry*)entry;
     _entry->setDelay(delay);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_track_entry_get_track_time(spine_track_entry entry) {
+float spine_track_entry_get_track_time(spine_track_entry entry) {
     if (entry == nullptr) return 0;
     TrackEntry *_entry = (TrackEntry*)entry;
     return _entry->getTrackTime();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_track_entry_set_track_time(spine_track_entry entry, float trackTime) {
+void spine_track_entry_set_track_time(spine_track_entry entry, float trackTime) {
     if (entry == nullptr) return;
     TrackEntry *_entry = (TrackEntry*)entry;
     _entry->setTrackTime(trackTime);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_track_entry_get_track_end(spine_track_entry entry) {
+float spine_track_entry_get_track_end(spine_track_entry entry) {
     if (entry == nullptr) return 0;
     TrackEntry *_entry = (TrackEntry*)entry;
     return _entry->getTrackEnd();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_track_entry_set_track_end(spine_track_entry entry, float trackEnd) {
+void spine_track_entry_set_track_end(spine_track_entry entry, float trackEnd) {
     if (entry == nullptr) return;
     TrackEntry *_entry = (TrackEntry*)entry;
     _entry->setTrackEnd(trackEnd);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_track_entry_get_animation_start(spine_track_entry entry) {
+float spine_track_entry_get_animation_start(spine_track_entry entry) {
     if (entry == nullptr) return 0;
     TrackEntry *_entry = (TrackEntry*)entry;
     return _entry->getAnimationStart();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_track_entry_set_animation_start(spine_track_entry entry, float animationStart) {
+void spine_track_entry_set_animation_start(spine_track_entry entry, float animationStart) {
     if (entry == nullptr) return;
     TrackEntry *_entry = (TrackEntry*)entry;
     _entry->setAnimationStart(animationStart);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_track_entry_get_animation_end(spine_track_entry entry) {
+float spine_track_entry_get_animation_end(spine_track_entry entry) {
     if (entry == nullptr) return 0;
     TrackEntry *_entry = (TrackEntry*)entry;
     return _entry->getAnimationEnd();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_track_entry_set_animation_end(spine_track_entry entry, float animationEnd) {
+void spine_track_entry_set_animation_end(spine_track_entry entry, float animationEnd) {
     if (entry == nullptr) return;
     TrackEntry *_entry = (TrackEntry*)entry;
     _entry->setAnimationEnd(animationEnd);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_track_entry_get_animation_last(spine_track_entry entry) {
+float spine_track_entry_get_animation_last(spine_track_entry entry) {
     if (entry == nullptr) return 0;
     TrackEntry *_entry = (TrackEntry*)entry;
     return _entry->getAnimationLast();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_track_entry_set_animation_last(spine_track_entry entry, float animationLast) {
+void spine_track_entry_set_animation_last(spine_track_entry entry, float animationLast) {
     if (entry == nullptr) return;
     TrackEntry *_entry = (TrackEntry*)entry;
     _entry->setAnimationLast(animationLast);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_track_entry_get_animation_time(spine_track_entry entry) {
+float spine_track_entry_get_animation_time(spine_track_entry entry) {
     if (entry == nullptr) return 0;
     TrackEntry *_entry = (TrackEntry*)entry;
     return _entry->getAnimationTime();
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_track_entry_get_time_scale(spine_track_entry entry) {
+float spine_track_entry_get_time_scale(spine_track_entry entry) {
     if (entry == nullptr) return 0;
     TrackEntry *_entry = (TrackEntry*)entry;
     return _entry->getTimeScale();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_track_entry_set_time_scale(spine_track_entry entry, float timeScale) {
+void spine_track_entry_set_time_scale(spine_track_entry entry, float timeScale) {
     if (entry == nullptr) return;
     TrackEntry *_entry = (TrackEntry*)entry;
     _entry->setTimeScale(timeScale);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_track_entry_get_alpha(spine_track_entry entry) {
+float spine_track_entry_get_alpha(spine_track_entry entry) {
     if (entry == nullptr) return 0;
     TrackEntry *_entry = (TrackEntry*)entry;
     return _entry->getAlpha();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_track_entry_set_alpha(spine_track_entry entry, float alpha) {
+void spine_track_entry_set_alpha(spine_track_entry entry, float alpha) {
     if (entry == nullptr) return;
     TrackEntry *_entry = (TrackEntry*)entry;
     _entry->setAlpha(alpha);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_track_entry_get_event_threshold(spine_track_entry entry) {
+float spine_track_entry_get_event_threshold(spine_track_entry entry) {
     if (entry == nullptr) return 0;
     TrackEntry *_entry = (TrackEntry*)entry;
     return _entry->getEventThreshold();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_track_entry_set_event_threshold(spine_track_entry entry, float eventThreshold) {
+void spine_track_entry_set_event_threshold(spine_track_entry entry, float eventThreshold) {
     if (entry == nullptr) return;
     TrackEntry *_entry = (TrackEntry*)entry;
     _entry->setEventThreshold(eventThreshold);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_track_entry_get_attachment_threshold(spine_track_entry entry) {
+float spine_track_entry_get_attachment_threshold(spine_track_entry entry) {
     if (entry == nullptr) return 0;
     TrackEntry *_entry = (TrackEntry*)entry;
     return _entry->getAttachmentThreshold();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_track_entry_set_attachment_threshold(spine_track_entry entry, float attachmentThreshold) {
+void spine_track_entry_set_attachment_threshold(spine_track_entry entry, float attachmentThreshold) {
     if (entry == nullptr) return;
     TrackEntry *_entry = (TrackEntry*)entry;
     _entry->setAttachmentThreshold(attachmentThreshold);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_track_entry_get_draw_order_threshold(spine_track_entry entry) {
+float spine_track_entry_get_draw_order_threshold(spine_track_entry entry) {
     if (entry == nullptr) return 0;
     TrackEntry *_entry = (TrackEntry*)entry;
     return _entry->getDrawOrderThreshold();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_track_entry_set_draw_order_threshold(spine_track_entry entry, float drawOrderThreshold) {
+void spine_track_entry_set_draw_order_threshold(spine_track_entry entry, float drawOrderThreshold) {
     if (entry == nullptr) return;
     TrackEntry *_entry = (TrackEntry*)entry;
     _entry->setDrawOrderThreshold(drawOrderThreshold);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_track_entry spine_track_entry_get_next(spine_track_entry entry) {
+spine_track_entry spine_track_entry_get_next(spine_track_entry entry) {
     if (entry == nullptr) return nullptr;
     TrackEntry *_entry = (TrackEntry*)entry;
     return (spine_track_entry)_entry->getNext();
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_track_entry_is_complete(spine_track_entry entry) {
+int32_t spine_track_entry_is_complete(spine_track_entry entry) {
     if (entry == nullptr) return 0;
     TrackEntry *_entry = (TrackEntry*)entry;
     return _entry->isComplete() ? -1 : 0;
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_track_entry_get_mix_time(spine_track_entry entry) {
+float spine_track_entry_get_mix_time(spine_track_entry entry) {
     if (entry == nullptr) return 0;
     TrackEntry *_entry = (TrackEntry*)entry;
     return _entry->getMixTime();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_track_entry_set_mix_time(spine_track_entry entry, float mixTime) {
+void spine_track_entry_set_mix_time(spine_track_entry entry, float mixTime) {
     if (entry == nullptr) return;
     TrackEntry *_entry = (TrackEntry*)entry;
     _entry->setMixTime(mixTime);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_track_entry_get_mix_duration(spine_track_entry entry) {
+float spine_track_entry_get_mix_duration(spine_track_entry entry) {
     if (entry == nullptr) return 0;
     TrackEntry *_entry = (TrackEntry*)entry;
     return _entry->getMixDuration();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_track_entry_set_mix_duration(spine_track_entry entry, float mixDuration) {
+void spine_track_entry_set_mix_duration(spine_track_entry entry, float mixDuration) {
     if (entry == nullptr) return;
     TrackEntry *_entry = (TrackEntry*)entry;
     _entry->setMixDuration(mixDuration);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_mix_blend spine_track_entry_get_mix_blend(spine_track_entry entry) {
+spine_mix_blend spine_track_entry_get_mix_blend(spine_track_entry entry) {
     if (entry == nullptr) return SPINE_MIX_BLEND_SETUP;
     TrackEntry *_entry = (TrackEntry*)entry;
     return (spine_mix_blend)_entry->getMixBlend();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_track_entry_set_mix_blend(spine_track_entry entry, spine_mix_blend mixBlend) {
+void spine_track_entry_set_mix_blend(spine_track_entry entry, spine_mix_blend mixBlend) {
     if (entry == nullptr) return;
     TrackEntry *_entry = (TrackEntry*)entry;
     _entry->setMixBlend((MixBlend)mixBlend);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_track_entry spine_track_entry_get_mixing_from(spine_track_entry entry) {
+spine_track_entry spine_track_entry_get_mixing_from(spine_track_entry entry) {
     if (entry == nullptr) return nullptr;
     TrackEntry *_entry = (TrackEntry*)entry;
     return (spine_track_entry)_entry->getMixingFrom();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_track_entry spine_track_entry_get_mixing_to(spine_track_entry entry) {
+spine_track_entry spine_track_entry_get_mixing_to(spine_track_entry entry) {
     if (entry == nullptr) return nullptr;
     TrackEntry *_entry = (TrackEntry*)entry;
     return (spine_track_entry)_entry->getMixingTo();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_track_entry_reset_rotation_directions(spine_track_entry entry) {
+void spine_track_entry_reset_rotation_directions(spine_track_entry entry) {
     if (entry == nullptr) return;
     TrackEntry *_entry = (TrackEntry*)entry;
     _entry->resetRotationDirections();
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_track_entry_get_track_complete(spine_track_entry entry) {
+float spine_track_entry_get_track_complete(spine_track_entry entry) {
     if (entry == nullptr) return 0;
     TrackEntry *_entry = (TrackEntry*)entry;
     return _entry->getTrackComplete();
@@ -1250,19 +1244,19 @@ EMSCRIPTEN_KEEPALIVE float spine_track_entry_get_track_complete(spine_track_entr
 
 // Skeleton
 
-EMSCRIPTEN_KEEPALIVE void spine_skeleton_update_cache(spine_skeleton skeleton) {
+void spine_skeleton_update_cache(spine_skeleton skeleton) {
     if (skeleton == nullptr) return;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     _skeleton->updateCache();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_skeleton_update_world_transform(spine_skeleton skeleton) {
+void spine_skeleton_update_world_transform(spine_skeleton skeleton) {
     if (skeleton == nullptr) return;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     _skeleton->updateWorldTransform();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_skeleton_update_world_transform_bone(spine_skeleton skeleton, spine_bone parent) {
+void spine_skeleton_update_world_transform_bone(spine_skeleton skeleton, spine_bone parent) {
     if (skeleton == nullptr) return;
     if (parent == nullptr) return;
     Skeleton *_skeleton = (Skeleton*)skeleton;
@@ -1270,86 +1264,86 @@ EMSCRIPTEN_KEEPALIVE void spine_skeleton_update_world_transform_bone(spine_skele
     _skeleton->updateWorldTransform(_bone);
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_skeleton_set_to_setup_pose(spine_skeleton skeleton) {
+void spine_skeleton_set_to_setup_pose(spine_skeleton skeleton) {
     if (skeleton == nullptr) return;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     _skeleton->setToSetupPose();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_skeleton_set_bones_to_setup_pose(spine_skeleton skeleton) {
+void spine_skeleton_set_bones_to_setup_pose(spine_skeleton skeleton) {
     if (skeleton == nullptr) return;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     _skeleton->setBonesToSetupPose();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_skeleton_set_slots_to_setup_pose(spine_skeleton skeleton) {
+void spine_skeleton_set_slots_to_setup_pose(spine_skeleton skeleton) {
     if (skeleton == nullptr) return;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     _skeleton->setSlotsToSetupPose();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_bone spine_skeleton_find_bone(spine_skeleton skeleton, const utf8* boneName) {
+spine_bone spine_skeleton_find_bone(spine_skeleton skeleton, const utf8* boneName) {
     if (skeleton == nullptr) return nullptr;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     return (spine_bone)_skeleton->findBone((char*)boneName);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_slot spine_skeleton_find_slot(spine_skeleton skeleton, const utf8* slotName) {
+spine_slot spine_skeleton_find_slot(spine_skeleton skeleton, const utf8* slotName) {
     if (skeleton == nullptr) return nullptr;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     return (spine_slot)_skeleton->findSlot((char*)slotName);
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_skeleton_set_skin_by_name(spine_skeleton skeleton, const utf8* skinName) {
+void spine_skeleton_set_skin_by_name(spine_skeleton skeleton, const utf8* skinName) {
     if (skeleton == nullptr) return;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     _skeleton->setSkin((char*)skinName);
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_skeleton_set_skin(spine_skeleton skeleton, spine_skin skin) {
+void spine_skeleton_set_skin(spine_skeleton skeleton, spine_skin skin) {
     if (skeleton == nullptr) return;
     if (skin == nullptr) return;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     _skeleton->setSkin((Skin*)skin);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_attachment spine_skeleton_get_attachment_by_name(spine_skeleton skeleton, const utf8* slotName, const utf8* attachmentName) {
+spine_attachment spine_skeleton_get_attachment_by_name(spine_skeleton skeleton, const utf8* slotName, const utf8* attachmentName) {
     if (skeleton == nullptr) return nullptr;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     return (spine_attachment)_skeleton->getAttachment((char*)slotName, (char*)attachmentName);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_attachment spine_skeleton_get_attachment(spine_skeleton skeleton, int32_t slotIndex, const utf8* attachmentName) {
+spine_attachment spine_skeleton_get_attachment(spine_skeleton skeleton, int32_t slotIndex, const utf8* attachmentName) {
     if (skeleton == nullptr) return nullptr;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     return (spine_attachment)_skeleton->getAttachment(slotIndex, (char*)attachmentName);
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_skeleton_set_attachment(spine_skeleton skeleton, const utf8* slotName, const utf8* attachmentName) {
+void spine_skeleton_set_attachment(spine_skeleton skeleton, const utf8* slotName, const utf8* attachmentName) {
     if (skeleton == nullptr) return;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     return _skeleton->setAttachment((char*)slotName, (char*)attachmentName);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_ik_constraint spine_skeleton_find_ik_constraint(spine_skeleton skeleton, const utf8* constraintName) {
+spine_ik_constraint spine_skeleton_find_ik_constraint(spine_skeleton skeleton, const utf8* constraintName) {
     if (skeleton == nullptr) return nullptr;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     return (spine_ik_constraint)_skeleton->findIkConstraint((char*)constraintName);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_transform_constraint spine_skeleton_find_transform_constraint(spine_skeleton skeleton, const utf8* constraintName) {
+spine_transform_constraint spine_skeleton_find_transform_constraint(spine_skeleton skeleton, const utf8* constraintName) {
     if (skeleton == nullptr) return nullptr;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     return (spine_transform_constraint)_skeleton->findTransformConstraint((char*)constraintName);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_path_constraint spine_skeleton_find_path_constraint(spine_skeleton skeleton, const utf8* constraintName) {
+spine_path_constraint spine_skeleton_find_path_constraint(spine_skeleton skeleton, const utf8* constraintName) {
     if (skeleton == nullptr) return nullptr;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     return (spine_path_constraint)_skeleton->findPathConstraint((char*)constraintName);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_bounds spine_skeleton_get_bounds(spine_skeleton skeleton) {
+spine_bounds spine_skeleton_get_bounds(spine_skeleton skeleton) {
     _spine_bounds *bounds = SpineExtension::calloc<_spine_bounds>(1, __FILE__, __LINE__);
     if (skeleton == nullptr) return (spine_bounds)bounds;
     Skeleton *_skeleton = (Skeleton*)skeleton;
@@ -1358,157 +1352,157 @@ EMSCRIPTEN_KEEPALIVE spine_bounds spine_skeleton_get_bounds(spine_skeleton skele
     return (spine_bounds)bounds;
 }
 
-EMSCRIPTEN_KEEPALIVE spine_bone spine_skeleton_get_root_bone(spine_skeleton skeleton) {
+spine_bone spine_skeleton_get_root_bone(spine_skeleton skeleton) {
     if (skeleton == nullptr) return nullptr;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     return (spine_bone)_skeleton->getRootBone();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_skeleton_data spine_skeleton_get_data(spine_skeleton skeleton) {
+spine_skeleton_data spine_skeleton_get_data(spine_skeleton skeleton) {
     if (skeleton == nullptr) return nullptr;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     return (spine_skeleton_data)_skeleton->getData();
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_skeleton_get_num_bones(spine_skeleton skeleton) {
+int32_t spine_skeleton_get_num_bones(spine_skeleton skeleton) {
     if (skeleton == nullptr) return 0;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     return (int32_t)_skeleton->getBones().size();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_bone* spine_skeleton_get_bones(spine_skeleton skeleton) {
+spine_bone* spine_skeleton_get_bones(spine_skeleton skeleton) {
     if (skeleton == nullptr) return nullptr;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     return (spine_bone*)_skeleton->getBones().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_skeleton_get_num_slots(spine_skeleton skeleton) {
+int32_t spine_skeleton_get_num_slots(spine_skeleton skeleton) {
     if (skeleton == nullptr) return 0;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     return (int32_t)_skeleton->getSlots().size();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_slot* spine_skeleton_get_slots(spine_skeleton skeleton) {
+spine_slot* spine_skeleton_get_slots(spine_skeleton skeleton) {
     if (skeleton == nullptr) return nullptr;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     return (spine_slot*)_skeleton->getSlots().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_skeleton_get_num_draw_order(spine_skeleton skeleton) {
+int32_t spine_skeleton_get_num_draw_order(spine_skeleton skeleton) {
     if (skeleton == nullptr) return 0;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     return (int32_t)_skeleton->getDrawOrder().size();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_slot* spine_skeleton_get_draw_order(spine_skeleton skeleton) {
+spine_slot* spine_skeleton_get_draw_order(spine_skeleton skeleton) {
     if (skeleton == nullptr) return nullptr;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     return (spine_slot*)_skeleton->getDrawOrder().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_skeleton_get_num_ik_constraints(spine_skeleton skeleton) {
+int32_t spine_skeleton_get_num_ik_constraints(spine_skeleton skeleton) {
     if (skeleton == nullptr) return 0;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     return (int32_t)_skeleton->getIkConstraints().size();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_ik_constraint* spine_skeleton_get_ik_constraints(spine_skeleton skeleton) {
+spine_ik_constraint* spine_skeleton_get_ik_constraints(spine_skeleton skeleton) {
     if (skeleton == nullptr) return nullptr;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     return (spine_ik_constraint*)_skeleton->getIkConstraints().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_skeleton_get_num_transform_constraints(spine_skeleton skeleton) {
+int32_t spine_skeleton_get_num_transform_constraints(spine_skeleton skeleton) {
     if (skeleton == nullptr) return 0;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     return (int32_t)_skeleton->getTransformConstraints().size();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_transform_constraint* spine_skeleton_get_transform_constraints(spine_skeleton skeleton) {
+spine_transform_constraint* spine_skeleton_get_transform_constraints(spine_skeleton skeleton) {
     if (skeleton == nullptr) return nullptr;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     return (spine_transform_constraint*)_skeleton->getTransformConstraints().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_skeleton_get_num_path_constraints(spine_skeleton skeleton) {
+int32_t spine_skeleton_get_num_path_constraints(spine_skeleton skeleton) {
     if (skeleton == nullptr) return 0;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     return (int32_t)_skeleton->getPathConstraints().size();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_path_constraint* spine_skeleton_get_path_constraints(spine_skeleton skeleton) {
+spine_path_constraint* spine_skeleton_get_path_constraints(spine_skeleton skeleton) {
     if (skeleton == nullptr) return nullptr;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     return (spine_path_constraint*)_skeleton->getPathConstraints().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_skin spine_skeleton_get_skin(spine_skeleton skeleton) {
+spine_skin spine_skeleton_get_skin(spine_skeleton skeleton) {
     if (skeleton == nullptr) return nullptr;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     return (spine_skin)_skeleton->getSkin();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_color spine_skeleton_get_color(spine_skeleton skeleton) {
+spine_color spine_skeleton_get_color(spine_skeleton skeleton) {
     if (skeleton == nullptr) return (spine_color)&NULL_COLOR;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     return (spine_color)&_skeleton->getColor();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_skeleton_set_color(spine_skeleton skeleton, float r, float g, float b, float a) {
+void spine_skeleton_set_color(spine_skeleton skeleton, float r, float g, float b, float a) {
     if (skeleton == nullptr) return;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     _skeleton->getColor().set(r, g, b, a);
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_skeleton_set_position(spine_skeleton skeleton, float x, float y) {
+void spine_skeleton_set_position(spine_skeleton skeleton, float x, float y) {
     if (skeleton == nullptr) return;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     _skeleton->setPosition(x, y);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_skeleton_get_x(spine_skeleton skeleton) {
+float spine_skeleton_get_x(spine_skeleton skeleton) {
     if (skeleton == nullptr) return 0;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     return _skeleton->getX();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_skeleton_set_x(spine_skeleton skeleton, float x) {
+void spine_skeleton_set_x(spine_skeleton skeleton, float x) {
     if (skeleton == nullptr) return;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     _skeleton->setX(x);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_skeleton_get_y(spine_skeleton skeleton) {
+float spine_skeleton_get_y(spine_skeleton skeleton) {
     if (skeleton == nullptr) return 0;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     return _skeleton->getY();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_skeleton_set_y(spine_skeleton skeleton, float y) {
+void spine_skeleton_set_y(spine_skeleton skeleton, float y) {
     if (skeleton == nullptr) return;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     _skeleton->setY(y);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_skeleton_get_scale_x(spine_skeleton skeleton) {
+float spine_skeleton_get_scale_x(spine_skeleton skeleton) {
     if (skeleton == nullptr) return 0;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     return _skeleton->getScaleX();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_skeleton_set_scale_x(spine_skeleton skeleton, float scaleX) {
+void spine_skeleton_set_scale_x(spine_skeleton skeleton, float scaleX) {
     if (skeleton == nullptr) return;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     _skeleton->setScaleX(scaleX);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_skeleton_get_scale_y(spine_skeleton skeleton) {
+float spine_skeleton_get_scale_y(spine_skeleton skeleton) {
     if (skeleton == nullptr) return 0;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     return _skeleton->getScaleY();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_skeleton_set_scale_y(spine_skeleton skeleton, float scaleY) {
+void spine_skeleton_set_scale_y(spine_skeleton skeleton, float scaleY) {
     if (skeleton == nullptr) return;
     Skeleton *_skeleton = (Skeleton*)skeleton;
     _skeleton->setScaleY(scaleY);
@@ -1516,73 +1510,73 @@ EMSCRIPTEN_KEEPALIVE void spine_skeleton_set_scale_y(spine_skeleton skeleton, fl
 
 // EventData
 
-EMSCRIPTEN_KEEPALIVE const utf8* spine_event_data_get_name(spine_event_data event) {
+const utf8* spine_event_data_get_name(spine_event_data event) {
     if (event == nullptr) return nullptr;
     EventData *_event = (EventData*)event;
     return (utf8*)_event->getName().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_event_data_get_int_value(spine_event_data event) {
+int32_t spine_event_data_get_int_value(spine_event_data event) {
     if (event == nullptr) return 0;
     EventData *_event = (EventData*)event;
     return _event->getIntValue();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_event_data_set_int_value(spine_event_data event, int32_t value) {
+void spine_event_data_set_int_value(spine_event_data event, int32_t value) {
     if (event == nullptr) return;
     EventData *_event = (EventData*)event;
     _event->setIntValue(value);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_event_data_get_float_value(spine_event_data event) {
+float spine_event_data_get_float_value(spine_event_data event) {
     if (event == nullptr) return 0;
     EventData *_event = (EventData*)event;
     return _event->getFloatValue();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_event_data_set_float_value(spine_event_data event, float value) {
+void spine_event_data_set_float_value(spine_event_data event, float value) {
     if (event == nullptr) return;
     EventData *_event = (EventData*)event;
     _event->setFloatValue(value);
 }
 
-EMSCRIPTEN_KEEPALIVE const utf8* spine_event_data_get_string_value(spine_event_data event) {
+const utf8* spine_event_data_get_string_value(spine_event_data event) {
     if (event == nullptr) return nullptr;
     EventData *_event = (EventData*)event;
     return (utf8*)_event->getStringValue().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_event_data_set_string_value(spine_event_data event, const utf8 *value) {
+void spine_event_data_set_string_value(spine_event_data event, const utf8 *value) {
     if (event == nullptr) return;
     EventData *_event = (EventData*)event;
     _event->setStringValue((char*)value);
 }
 
-EMSCRIPTEN_KEEPALIVE const utf8* spine_event_data_get_audio_path(spine_event_data event) {
+const utf8* spine_event_data_get_audio_path(spine_event_data event) {
     if (event == nullptr) return nullptr;
     EventData *_event = (EventData*)event;
     return (utf8*)_event->getAudioPath().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_event_data_get_volume(spine_event_data event) {
+float spine_event_data_get_volume(spine_event_data event) {
     if (event == nullptr) return 0;
     EventData *_event = (EventData*)event;
     return _event->getVolume();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_event_data_set_volume(spine_event_data event, float volume) {
+void spine_event_data_set_volume(spine_event_data event, float volume) {
     if (event == nullptr) return;
     EventData *_event = (EventData*)event;
     _event->setVolume(volume);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_event_data_get_balance(spine_event_data event) {
+float spine_event_data_get_balance(spine_event_data event) {
     if (event == nullptr) return 0;
     EventData *_event = (EventData*)event;
     return _event->getBalance();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_event_data_set_balance(spine_event_data event, float balance) {
+void spine_event_data_set_balance(spine_event_data event, float balance) {
     if (event == nullptr) return;
     EventData *_event = (EventData*)event;
     _event->setBalance(balance);
@@ -1590,415 +1584,415 @@ EMSCRIPTEN_KEEPALIVE void spine_event_data_set_balance(spine_event_data event, f
 
 // Event
 
-EMSCRIPTEN_KEEPALIVE spine_event_data spine_event_get_data(spine_event event) {
+spine_event_data spine_event_get_data(spine_event event) {
     if (event == nullptr) return nullptr;
     Event *_event = (Event*)event;
     return (spine_event_data)&_event->getData();
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_event_get_time(spine_event event) {
+float spine_event_get_time(spine_event event) {
     if (event == nullptr) return 0;
     Event *_event = (Event*)event;
     return _event->getTime();
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_event_get_int_value(spine_event event) {
+int32_t spine_event_get_int_value(spine_event event) {
     if (event == nullptr) return 0;
     Event *_event = (Event*)event;
     return _event->getIntValue();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_event_set_int_value(spine_event event, int32_t value) {
+void spine_event_set_int_value(spine_event event, int32_t value) {
     if (event == nullptr) return;
     Event *_event = (Event*)event;
     _event->setIntValue(value);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_event_get_float_value(spine_event event) {
+float spine_event_get_float_value(spine_event event) {
     if (event == nullptr) return 0;
     Event *_event = (Event*)event;
     return _event->getFloatValue();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_event_set_float_value(spine_event event, float value) {
+void spine_event_set_float_value(spine_event event, float value) {
     if (event == nullptr) return;
     Event *_event = (Event*)event;
     _event->setFloatValue(value);
 }
 
-EMSCRIPTEN_KEEPALIVE const utf8* spine_event_get_string_value(spine_event event) {
+const utf8* spine_event_get_string_value(spine_event event) {
     if (event == nullptr) return nullptr;
     Event *_event = (Event*)event;
     return (utf8*)_event->getStringValue().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_event_set_string_value(spine_event event, const utf8 *value) {
+void spine_event_set_string_value(spine_event event, const utf8 *value) {
     if (event == nullptr) return;
     Event *_event = (Event*)event;
     _event->setStringValue((char*)value);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_event_get_volume(spine_event event) {
+float spine_event_get_volume(spine_event event) {
     if (event == nullptr) return 0;
     Event *_event = (Event*)event;
     return _event->getVolume();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_event_set_volume(spine_event event, float volume) {
+void spine_event_set_volume(spine_event event, float volume) {
     if (event == nullptr) return;
     Event *_event = (Event*)event;
     _event->setVolume(volume);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_event_get_balance(spine_event event) {
+float spine_event_get_balance(spine_event event) {
     if (event == nullptr) return 0;
     Event *_event = (Event*)event;
     return _event->getBalance();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_event_set_balance(spine_event event, float balance) {
+void spine_event_set_balance(spine_event event, float balance) {
     if (event == nullptr) return;
     Event *_event = (Event*)event;
     _event->setBalance(balance);
 }
 
 // SlotData
-EMSCRIPTEN_KEEPALIVE int32_t spine_slot_data_get_index(spine_slot_data slot) {
+int32_t spine_slot_data_get_index(spine_slot_data slot) {
     if (slot == nullptr) return 0;
     SlotData *_slot = (SlotData*)slot;
     return _slot->getIndex();
 }
 
-EMSCRIPTEN_KEEPALIVE const utf8* spine_slot_data_get_name(spine_slot_data slot) {
+const utf8* spine_slot_data_get_name(spine_slot_data slot) {
     if (slot == nullptr) return nullptr;
     SlotData *_slot = (SlotData*)slot;
     return (utf8*)_slot->getName().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_bone_data spine_slot_data_get_bone_data(spine_slot_data slot) {
+spine_bone_data spine_slot_data_get_bone_data(spine_slot_data slot) {
     if (slot == nullptr) return nullptr;
     SlotData *_slot = (SlotData*)slot;
     return (spine_bone_data)&_slot->getBoneData();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_color spine_slot_data_get_color(spine_slot_data slot) {
+spine_color spine_slot_data_get_color(spine_slot_data slot) {
     if (slot == nullptr) return (spine_color)&NULL_COLOR;
     SlotData *_slot = (SlotData*)slot;
     return (spine_color)&_slot->getColor();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_slot_data_set_color(spine_slot_data slot, float r, float g, float b, float a) {
+void spine_slot_data_set_color(spine_slot_data slot, float r, float g, float b, float a) {
     if (slot == nullptr) return;
     SlotData *_slot = (SlotData*)slot;
     _slot->getColor().set(r, g, b, a);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_color spine_slot_data_get_dark_color(spine_slot_data slot) {
+spine_color spine_slot_data_get_dark_color(spine_slot_data slot) {
     if (slot == nullptr) return (spine_color)&NULL_COLOR;
     SlotData *_slot = (SlotData*)slot;
     return (spine_color)&_slot->getDarkColor();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_slot_data_set_dark_color(spine_slot_data slot, float r, float g, float b, float a) {
+void spine_slot_data_set_dark_color(spine_slot_data slot, float r, float g, float b, float a) {
     if (slot == nullptr) return;
     SlotData *_slot = (SlotData*)slot;
     _slot->getDarkColor().set(r, g, b, a);
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_slot_data_has_dark_color(spine_slot_data slot) {
+int32_t spine_slot_data_has_dark_color(spine_slot_data slot) {
     if (slot == nullptr) return 0;
     SlotData *_slot = (SlotData*)slot;
     return _slot->hasDarkColor() ? -1 : 0;
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_slot_data_set_has_dark_color(spine_slot_data slot, int32_t hasDarkColor) {
+void spine_slot_data_set_has_dark_color(spine_slot_data slot, int32_t hasDarkColor) {
     if (slot == nullptr) return;
     SlotData *_slot = (SlotData*)slot;
     _slot->setHasDarkColor(hasDarkColor);
 }
 
-EMSCRIPTEN_KEEPALIVE const utf8* spine_slot_data_get_attachment_name(spine_slot_data slot) {
+const utf8* spine_slot_data_get_attachment_name(spine_slot_data slot) {
     if (slot == nullptr) return nullptr;
     SlotData *_slot = (SlotData*)slot;
     return (utf8*)_slot->getAttachmentName().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_slot_data_set_attachment_name(spine_slot_data slot, const utf8 *attachmentName) {
+void spine_slot_data_set_attachment_name(spine_slot_data slot, const utf8 *attachmentName) {
     if (slot == nullptr) return;
     SlotData *_slot = (SlotData*)slot;
     _slot->setAttachmentName((char*)attachmentName);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_blend_mode spine_slot_data_get_blend_mode(spine_slot_data slot) {
+spine_blend_mode spine_slot_data_get_blend_mode(spine_slot_data slot) {
     if (slot == nullptr) return SPINE_BLEND_MODE_NORMAL;
     SlotData *_slot = (SlotData*)slot;
     return (spine_blend_mode)_slot->getBlendMode();
 }
 
 // Slot
-EMSCRIPTEN_KEEPALIVE void spine_slot_set_to_setup_pose(spine_slot slot) {
+void spine_slot_set_to_setup_pose(spine_slot slot) {
     if (slot == nullptr) return;
     Slot *_slot = (Slot*)slot;
     _slot->setToSetupPose();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_slot_data spine_slot_get_data(spine_slot slot) {
+spine_slot_data spine_slot_get_data(spine_slot slot) {
     if (slot == nullptr) return nullptr;
     Slot *_slot = (Slot*)slot;
     return (spine_slot_data)&_slot->getData();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_bone spine_slot_get_bone(spine_slot slot) {
+spine_bone spine_slot_get_bone(spine_slot slot) {
     if (slot == nullptr) return nullptr;
     Slot *_slot = (Slot*)slot;
     return (spine_bone)&_slot->getBone();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_skeleton spine_slot_get_skeleton(spine_slot slot) {
+spine_skeleton spine_slot_get_skeleton(spine_slot slot) {
     if (slot == nullptr) return nullptr;
     Slot *_slot = (Slot*)slot;
     return (spine_skeleton)&_slot->getSkeleton();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_color spine_slot_get_color(spine_slot slot) {
+spine_color spine_slot_get_color(spine_slot slot) {
     if (slot == nullptr) return (spine_color)&NULL_COLOR;
     Slot *_slot = (Slot*)slot;
     return (spine_color)&_slot->getColor();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_slot_set_color(spine_slot slot, float r, float g, float b, float a) {
+void spine_slot_set_color(spine_slot slot, float r, float g, float b, float a) {
     if (slot == nullptr) return;
     Slot *_slot = (Slot*)slot;
     _slot->getColor().set(r, g, b, a);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_color spine_slot_get_dark_color(spine_slot slot) {
+spine_color spine_slot_get_dark_color(spine_slot slot) {
     if (slot == nullptr) return (spine_color)&NULL_COLOR;
     Slot *_slot = (Slot*)slot;
     return (spine_color)&_slot->getDarkColor();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_slot_set_dark_color(spine_slot slot, float r, float g, float b, float a) {
+void spine_slot_set_dark_color(spine_slot slot, float r, float g, float b, float a) {
     if (slot == nullptr) return;
     Slot *_slot = (Slot*)slot;
     _slot->getDarkColor().set(r, g, b, a);
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_slot_has_dark_color(spine_slot slot) {
+int32_t spine_slot_has_dark_color(spine_slot slot) {
     if (slot == nullptr) return 0;
     Slot *_slot = (Slot*)slot;
     return _slot->hasDarkColor() ? -1 : 0;
 }
 
-EMSCRIPTEN_KEEPALIVE spine_attachment spine_slot_get_attachment(spine_slot slot) {
+spine_attachment spine_slot_get_attachment(spine_slot slot) {
     if (slot == nullptr) return nullptr;
     Slot *_slot = (Slot*)slot;
     return (spine_attachment)_slot->getAttachment();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_slot_set_attachment(spine_slot slot, spine_attachment attachment) {
+void spine_slot_set_attachment(spine_slot slot, spine_attachment attachment) {
     if (slot == nullptr) return;
     Slot *_slot = (Slot*)slot;
     _slot->setAttachment((Attachment*)attachment);
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_slot_get_sequence_index(spine_slot slot) {
+int32_t spine_slot_get_sequence_index(spine_slot slot) {
     if (slot == nullptr) return 0;
     Slot *_slot = (Slot*)slot;
     return _slot->getSequenceIndex();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_slot_set_sequence_index(spine_slot slot, int32_t sequenceIndex) {
+void spine_slot_set_sequence_index(spine_slot slot, int32_t sequenceIndex) {
     if (slot == nullptr) return;
     Slot *_slot = (Slot*)slot;
     _slot->setSequenceIndex(sequenceIndex);
 }
 
 // BoneData
-EMSCRIPTEN_KEEPALIVE int32_t spine_bone_data_get_index(spine_bone_data data) {
+int32_t spine_bone_data_get_index(spine_bone_data data) {
     if (data == nullptr) return 0;
     BoneData *_data = (BoneData*)data;
     return _data->getIndex();
 }
 
-EMSCRIPTEN_KEEPALIVE const utf8* spine_bone_data_get_name(spine_bone_data data) {
+const utf8* spine_bone_data_get_name(spine_bone_data data) {
     if (data == nullptr) return nullptr;
     BoneData *_data = (BoneData*)data;
     return (utf8*)_data->getName().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_bone_data spine_bone_data_get_parent(spine_bone_data data) {
+spine_bone_data spine_bone_data_get_parent(spine_bone_data data) {
     if (data == nullptr) return nullptr;
     BoneData *_data = (BoneData*)data;
     return (spine_bone_data)_data->getParent();
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_bone_data_get_length(spine_bone_data data) {
+float spine_bone_data_get_length(spine_bone_data data) {
     if (data == nullptr) return 0;
     BoneData *_data = (BoneData*)data;
     return _data->getLength();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_bone_data_set_length(spine_bone_data data, float length) {
+void spine_bone_data_set_length(spine_bone_data data, float length) {
     if (data == nullptr) return;
     BoneData *_data = (BoneData*)data;
     _data->setLength(length);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_bone_data_get_x(spine_bone_data data) {
+float spine_bone_data_get_x(spine_bone_data data) {
     if (data == nullptr) return 0;
     BoneData *_data = (BoneData*)data;
     return _data->getX();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_bone_data_set_x(spine_bone_data data, float x) {
+void spine_bone_data_set_x(spine_bone_data data, float x) {
     if (data == nullptr) return;
     BoneData *_data = (BoneData*)data;
     _data->setX(x);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_bone_data_get_y(spine_bone_data data) {
+float spine_bone_data_get_y(spine_bone_data data) {
     if (data == nullptr) return 0;
     BoneData *_data = (BoneData*)data;
     return _data->getY();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_bone_data_set_y(spine_bone_data data, float y) {
+void spine_bone_data_set_y(spine_bone_data data, float y) {
     if (data == nullptr) return;
     BoneData *_data = (BoneData*)data;
     _data->setY(y);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_bone_data_get_rotation(spine_bone_data data) {
+float spine_bone_data_get_rotation(spine_bone_data data) {
     if (data == nullptr) return 0;
     BoneData *_data = (BoneData*)data;
     return _data->getRotation();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_bone_data_set_rotation(spine_bone_data data, float rotation) {
+void spine_bone_data_set_rotation(spine_bone_data data, float rotation) {
     if (data == nullptr) return;
     BoneData *_data = (BoneData*)data;
     _data->setRotation(rotation);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_bone_data_get_scale_x(spine_bone_data data) {
+float spine_bone_data_get_scale_x(spine_bone_data data) {
     if (data == nullptr) return 0;
     BoneData *_data = (BoneData*)data;
     return _data->getScaleX();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_bone_data_set_scale_x(spine_bone_data data, float scaleX) {
+void spine_bone_data_set_scale_x(spine_bone_data data, float scaleX) {
     if (data == nullptr) return;
     BoneData *_data = (BoneData*)data;
     _data->setScaleX(scaleX);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_bone_data_get_scale_y(spine_bone_data data) {
+float spine_bone_data_get_scale_y(spine_bone_data data) {
     if (data == nullptr) return 0;
     BoneData *_data = (BoneData*)data;
     return _data->getScaleY();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_bone_data_set_scale_y(spine_bone_data data, float scaleY) {
+void spine_bone_data_set_scale_y(spine_bone_data data, float scaleY) {
     if (data == nullptr) return;
     BoneData *_data = (BoneData*)data;
     _data->setScaleY(scaleY);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_bone_data_get_shear_x(spine_bone_data data) {
+float spine_bone_data_get_shear_x(spine_bone_data data) {
     if (data == nullptr) return 0;
     BoneData *_data = (BoneData*)data;
     return _data->getShearX();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_bone_data_set_shear_x(spine_bone_data data, float shearX) {
+void spine_bone_data_set_shear_x(spine_bone_data data, float shearX) {
     if (data == nullptr) return;
     BoneData *_data = (BoneData*)data;
     _data->setShearX(shearX);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_bone_data_get_shear_y(spine_bone_data data) {
+float spine_bone_data_get_shear_y(spine_bone_data data) {
     if (data == nullptr) return 0;
     BoneData *_data = (BoneData*)data;
     return _data->getShearY();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_bone_data_set_shear_y(spine_bone_data data, float y) {
+void spine_bone_data_set_shear_y(spine_bone_data data, float y) {
     if (data == nullptr) return;
     BoneData *_data = (BoneData*)data;
     _data->setShearY(y);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_transform_mode spine_bone_data_get_transform_mode(spine_bone_data data) {
+spine_transform_mode spine_bone_data_get_transform_mode(spine_bone_data data) {
     if (data == nullptr) return SPINE_TRANSFORM_MODE_NORMAL;
     BoneData *_data = (BoneData*)data;
     return (spine_transform_mode)_data->getTransformMode();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_bone_data_set_transform_mode(spine_bone_data data, spine_transform_mode mode) {
+void spine_bone_data_set_transform_mode(spine_bone_data data, spine_transform_mode mode) {
     if (data == nullptr) return;
     BoneData *_data = (BoneData*)data;
     _data->setTransformMode((TransformMode)mode);
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_bone_data_is_skin_required(spine_bone_data data) {
+int32_t spine_bone_data_is_skin_required(spine_bone_data data) {
     if (data == nullptr) return 0;
     BoneData *_data = (BoneData*)data;
     return _data->isSkinRequired() ? -1 : 0;
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_bone_data_set_is_skin_required(spine_bone_data data, int32_t isSkinRequired) {
+void spine_bone_data_set_is_skin_required(spine_bone_data data, int32_t isSkinRequired) {
     if (data == nullptr) return;
     BoneData *_data = (BoneData*)data;
     _data->setSkinRequired(isSkinRequired);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_color spine_bone_data_get_color(spine_bone_data data) {
+spine_color spine_bone_data_get_color(spine_bone_data data) {
     if (data == nullptr) return (spine_color)&NULL_COLOR;
     BoneData *_data = (BoneData*)data;
     return (spine_color)&_data->getColor();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_bone_data_set_color(spine_bone_data data, float r, float g, float b, float a) {
+void spine_bone_data_set_color(spine_bone_data data, float r, float g, float b, float a) {
     if (data == nullptr) return;
     BoneData *_data = (BoneData*)data;
     _data->getColor().set(r, g, b, a);
 }
 
 // Bone
-EMSCRIPTEN_KEEPALIVE void spine_bone_set_is_y_down(int32_t yDown) {
+void spine_bone_set_is_y_down(int32_t yDown) {
     Bone::setYDown(yDown);
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_bone_get_is_y_down() {
+int32_t spine_bone_get_is_y_down() {
     return Bone::isYDown() ? -1 : 0;
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_bone_update(spine_bone bone) {
+void spine_bone_update(spine_bone bone) {
     if (bone == nullptr) return;
     Bone *_bone = (Bone*)bone;
     _bone->update();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_bone_update_world_transform(spine_bone bone) {
+void spine_bone_update_world_transform(spine_bone bone) {
     if (bone == nullptr) return;
     Bone *_bone = (Bone*)bone;
     _bone->updateWorldTransform();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_bone_update_world_transform_with(spine_bone bone, float x, float y, float rotation, float scaleX, float scaleY, float shearX, float shearY) {
+void spine_bone_update_world_transform_with(spine_bone bone, float x, float y, float rotation, float scaleX, float scaleY, float shearX, float shearY) {
     if (bone == nullptr) return;
     Bone *_bone = (Bone*)bone;
     _bone->updateWorldTransform(x, y, rotation, scaleX, scaleY, shearX, shearY);
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_bone_set_to_setup_pose(spine_bone bone) {
+void spine_bone_set_to_setup_pose(spine_bone bone) {
     if (bone == nullptr) return;
     Bone *_bone = (Bone*)bone;
     _bone->setToSetupPose();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_vector spine_bone_world_to_local(spine_bone bone, float worldX, float worldY) {
+spine_vector spine_bone_world_to_local(spine_bone bone, float worldX, float worldY) {
     _spine_vector *coords = SpineExtension::calloc<_spine_vector>(1, __FILE__, __LINE__);
     if (bone == nullptr) return (spine_vector)coords;
     Bone *_bone = (Bone*)bone;
@@ -2006,7 +2000,7 @@ EMSCRIPTEN_KEEPALIVE spine_vector spine_bone_world_to_local(spine_bone bone, flo
     return (spine_vector)coords;
 }
 
-EMSCRIPTEN_KEEPALIVE spine_vector spine_bone_local_to_world(spine_bone bone, float localX, float localY) {
+spine_vector spine_bone_local_to_world(spine_bone bone, float localX, float localY) {
     _spine_vector *coords = SpineExtension::calloc<_spine_vector>(1, __FILE__, __LINE__);
     if (bone == nullptr) return (spine_vector)coords;
     Bone *_bone = (Bone*)bone;
@@ -2014,350 +2008,350 @@ EMSCRIPTEN_KEEPALIVE spine_vector spine_bone_local_to_world(spine_bone bone, flo
     return (spine_vector)coords;
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_bone_world_to_local_rotation(spine_bone bone, float worldRotation) {
+float spine_bone_world_to_local_rotation(spine_bone bone, float worldRotation) {
     if (bone == nullptr) return 0;
     Bone *_bone = (Bone*)bone;
     return _bone->worldToLocalRotation(worldRotation);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_bone_local_to_world_rotation(spine_bone bone, float localRotation) {
+float spine_bone_local_to_world_rotation(spine_bone bone, float localRotation) {
     if (bone == nullptr) return 0;
     Bone *_bone = (Bone*)bone;
     return _bone->localToWorldRotation(localRotation);
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_bone_rotate_world(spine_bone bone, float degrees) {
+void spine_bone_rotate_world(spine_bone bone, float degrees) {
     if (bone == nullptr) return;
     Bone *_bone = (Bone*)bone;
     _bone->rotateWorld(degrees);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_bone_get_world_to_local_rotation_x(spine_bone bone) {
+float spine_bone_get_world_to_local_rotation_x(spine_bone bone) {
     if (bone == nullptr) return 0;
     Bone *_bone = (Bone*)bone;
     return _bone->getWorldToLocalRotationX();
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_bone_get_world_to_local_rotation_y(spine_bone bone) {
+float spine_bone_get_world_to_local_rotation_y(spine_bone bone) {
     if (bone == nullptr) return 0;
     Bone *_bone = (Bone*)bone;
     return _bone->getWorldToLocalRotationY();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_bone_data spine_bone_get_data(spine_bone bone) {
+spine_bone_data spine_bone_get_data(spine_bone bone) {
     if (bone == nullptr) return nullptr;
     Bone *_bone = (Bone*)bone;
     return (spine_bone_data)&_bone->getData();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_skeleton spine_bone_get_skeleton(spine_bone bone) {
+spine_skeleton spine_bone_get_skeleton(spine_bone bone) {
     if (bone == nullptr) return nullptr;
     Bone *_bone = (Bone*)bone;
     return (spine_skeleton)&_bone->getSkeleton();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_bone spine_bone_get_parent(spine_bone bone) {
+spine_bone spine_bone_get_parent(spine_bone bone) {
     if (bone == nullptr) return nullptr;
     Bone *_bone = (Bone*)bone;
     return (spine_bone)_bone->getParent();
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_bone_get_num_children(spine_bone bone) {
+int32_t spine_bone_get_num_children(spine_bone bone) {
     if (bone == nullptr) return 0;
     Bone *_bone = (Bone*)bone;
     return (int32_t)_bone->getChildren().size();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_bone* spine_bone_get_children(spine_bone bone) {
+spine_bone* spine_bone_get_children(spine_bone bone) {
     if (bone == nullptr) return nullptr;
     Bone *_bone = (Bone*)bone;
     return (spine_bone*)_bone->getChildren().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_bone_get_x(spine_bone bone) {
+float spine_bone_get_x(spine_bone bone) {
     if (bone == nullptr) return 0;
     Bone *_bone = (Bone*)bone;
     return _bone->getX();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_bone_set_x(spine_bone bone, float x) {
+void spine_bone_set_x(spine_bone bone, float x) {
     if (bone == nullptr) return;
     Bone *_bone = (Bone*)bone;
     _bone->setX(x);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_bone_get_y(spine_bone bone) {
+float spine_bone_get_y(spine_bone bone) {
     if (bone == nullptr) return 0;
     Bone *_bone = (Bone*)bone;
     return _bone->getY();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_bone_set_y(spine_bone bone, float y) {
+void spine_bone_set_y(spine_bone bone, float y) {
     if (bone == nullptr) return;
     Bone *_bone = (Bone*)bone;
     _bone->setY(y);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_bone_get_rotation(spine_bone bone) {
+float spine_bone_get_rotation(spine_bone bone) {
     if (bone == nullptr) return 0;
     Bone *_bone = (Bone*)bone;
     return _bone->getRotation();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_bone_set_rotation(spine_bone bone, float rotation) {
+void spine_bone_set_rotation(spine_bone bone, float rotation) {
     if (bone == nullptr) return;
     Bone *_bone = (Bone*)bone;
     _bone->setRotation(rotation);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_bone_get_scale_x(spine_bone bone) {
+float spine_bone_get_scale_x(spine_bone bone) {
     if (bone == nullptr) return 0;
     Bone *_bone = (Bone*)bone;
     return _bone->getScaleX();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_bone_set_scale_x(spine_bone bone, float scaleX) {
+void spine_bone_set_scale_x(spine_bone bone, float scaleX) {
     if (bone == nullptr) return;
     Bone *_bone = (Bone*)bone;
     _bone->setScaleX(scaleX);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_bone_get_scale_y(spine_bone bone) {
+float spine_bone_get_scale_y(spine_bone bone) {
     if (bone == nullptr) return 0;
     Bone *_bone = (Bone*)bone;
     return _bone->getScaleY();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_bone_set_scale_y(spine_bone bone, float scaleY) {
+void spine_bone_set_scale_y(spine_bone bone, float scaleY) {
     if (bone == nullptr) return;
     Bone *_bone = (Bone*)bone;
     _bone->setScaleY(scaleY);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_bone_get_shear_x(spine_bone bone) {
+float spine_bone_get_shear_x(spine_bone bone) {
     if (bone == nullptr) return 0;
     Bone *_bone = (Bone*)bone;
     return _bone->getShearX();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_bone_set_shear_x(spine_bone bone, float shearX) {
+void spine_bone_set_shear_x(spine_bone bone, float shearX) {
     if (bone == nullptr) return;
     Bone *_bone = (Bone*)bone;
     _bone->setShearX(shearX);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_bone_get_shear_y(spine_bone bone) {
+float spine_bone_get_shear_y(spine_bone bone) {
     if (bone == nullptr) return 0;
     Bone *_bone = (Bone*)bone;
     return _bone->getShearY();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_bone_set_shear_y(spine_bone bone, float shearY) {
+void spine_bone_set_shear_y(spine_bone bone, float shearY) {
     if (bone == nullptr) return;
     Bone *_bone = (Bone*)bone;
     _bone->setShearY(shearY);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_bone_get_applied_rotation(spine_bone bone) {
+float spine_bone_get_applied_rotation(spine_bone bone) {
     if (bone == nullptr) return 0;
     Bone *_bone = (Bone*)bone;
     return _bone->getAppliedRotation();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_bone_set_applied_rotation(spine_bone bone, float rotation) {
+void spine_bone_set_applied_rotation(spine_bone bone, float rotation) {
     if (bone == nullptr) return;
     Bone *_bone = (Bone*)bone;
     _bone->setAppliedRotation(rotation);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_bone_get_a_x(spine_bone bone) {
+float spine_bone_get_a_x(spine_bone bone) {
     if (bone == nullptr) return 0;
     Bone *_bone = (Bone*)bone;
     return _bone->getAX();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_bone_set_a_x(spine_bone bone, float x) {
+void spine_bone_set_a_x(spine_bone bone, float x) {
     if (bone == nullptr) return;
     Bone *_bone = (Bone*)bone;
     _bone->setAX(x);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_bone_get_a_y(spine_bone bone) {
+float spine_bone_get_a_y(spine_bone bone) {
     if (bone == nullptr) return 0;
     Bone *_bone = (Bone*)bone;
     return _bone->getAY();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_bone_set_a_y(spine_bone bone, float y) {
+void spine_bone_set_a_y(spine_bone bone, float y) {
     if (bone == nullptr) return;
     Bone *_bone = (Bone*)bone;
     _bone->setAY(y);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_bone_get_a_scale_x(spine_bone bone) {
+float spine_bone_get_a_scale_x(spine_bone bone) {
     if (bone == nullptr) return 0;
     Bone *_bone = (Bone*)bone;
     return _bone->getAScaleX();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_bone_set_a_scale_x(spine_bone bone, float scaleX) {
+void spine_bone_set_a_scale_x(spine_bone bone, float scaleX) {
     if (bone == nullptr) return;
     Bone *_bone = (Bone*)bone;
     _bone->setAScaleX(scaleX);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_bone_get_a_scale_y(spine_bone bone) {
+float spine_bone_get_a_scale_y(spine_bone bone) {
     if (bone == nullptr) return 0;
     Bone *_bone = (Bone*)bone;
     return _bone->getAScaleY();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_bone_set_a_scale_y(spine_bone bone, float scaleY) {
+void spine_bone_set_a_scale_y(spine_bone bone, float scaleY) {
     if (bone == nullptr) return;
     Bone *_bone = (Bone*)bone;
     _bone->setAScaleY(scaleY);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_bone_get_a_shear_x(spine_bone bone) {
+float spine_bone_get_a_shear_x(spine_bone bone) {
     if (bone == nullptr) return 0;
     Bone *_bone = (Bone*)bone;
     return _bone->getAShearX();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_bone_set_a_shear_x(spine_bone bone, float shearX) {
+void spine_bone_set_a_shear_x(spine_bone bone, float shearX) {
     if (bone == nullptr) return;
     Bone *_bone = (Bone*)bone;
     _bone->setAShearX(shearX);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_bone_get_a_shear_y(spine_bone bone) {
+float spine_bone_get_a_shear_y(spine_bone bone) {
     if (bone == nullptr) return 0;
     Bone *_bone = (Bone*)bone;
     return _bone->getAShearY();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_bone_set_shear_a_y(spine_bone bone, float shearY) {
+void spine_bone_set_shear_a_y(spine_bone bone, float shearY) {
     if (bone == nullptr) return;
     Bone *_bone = (Bone*)bone;
     _bone->setAShearY(shearY);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_bone_get_a(spine_bone bone) {
+float spine_bone_get_a(spine_bone bone) {
     if (bone == nullptr) return 0;
     Bone *_bone = (Bone*)bone;
     return _bone->getA();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_bone_set_a(spine_bone bone, float a) {
+void spine_bone_set_a(spine_bone bone, float a) {
     if (bone == nullptr) return;
     Bone *_bone = (Bone*)bone;
     _bone->setA(a);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_bone_get_b(spine_bone bone) {
+float spine_bone_get_b(spine_bone bone) {
     if (bone == nullptr) return 0;
     Bone *_bone = (Bone*)bone;
     return _bone->getB();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_bone_set_b(spine_bone bone, float b) {
+void spine_bone_set_b(spine_bone bone, float b) {
     if (bone == nullptr) return;
     Bone *_bone = (Bone*)bone;
     _bone->setB(b);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_bone_get_c(spine_bone bone) {
+float spine_bone_get_c(spine_bone bone) {
     if (bone == nullptr) return 0;
     Bone *_bone = (Bone*)bone;
     return _bone->getC();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_bone_set_c(spine_bone bone, float c) {
+void spine_bone_set_c(spine_bone bone, float c) {
     if (bone == nullptr) return;
     Bone *_bone = (Bone*)bone;
     _bone->setC(c);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_bone_get_d(spine_bone bone) {
+float spine_bone_get_d(spine_bone bone) {
     if (bone == nullptr) return 0;
     Bone *_bone = (Bone*)bone;
     return _bone->getD();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_bone_set_d(spine_bone bone, float d) {
+void spine_bone_set_d(spine_bone bone, float d) {
     if (bone == nullptr) return;
     Bone *_bone = (Bone*)bone;
     _bone->setD(d);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_bone_get_world_x(spine_bone bone) {
+float spine_bone_get_world_x(spine_bone bone) {
     if (bone == nullptr) return 0;
     Bone *_bone = (Bone*)bone;
     return _bone->getWorldX();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_bone_set_world_x(spine_bone bone, float worldX) {
+void spine_bone_set_world_x(spine_bone bone, float worldX) {
     if (bone == nullptr) return;
     Bone *_bone = (Bone*)bone;
     _bone->setWorldX(worldX);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_bone_get_world_y(spine_bone bone) {
+float spine_bone_get_world_y(spine_bone bone) {
     if (bone == nullptr) return 0;
     Bone *_bone = (Bone*)bone;
     return _bone->getWorldY();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_bone_set_world_y(spine_bone bone, float worldY) {
+void spine_bone_set_world_y(spine_bone bone, float worldY) {
     if (bone == nullptr) return;
     Bone *_bone = (Bone*)bone;
     _bone->setWorldY(worldY);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_bone_get_world_rotation_x(spine_bone bone) {
+float spine_bone_get_world_rotation_x(spine_bone bone) {
     if (bone == nullptr) return 0;
     Bone *_bone = (Bone*)bone;
     return _bone->getWorldRotationX();
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_bone_get_world_rotation_y(spine_bone bone) {
+float spine_bone_get_world_rotation_y(spine_bone bone) {
     if (bone == nullptr) return 0;
     Bone *_bone = (Bone*)bone;
     return _bone->getWorldToLocalRotationY();
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_bone_get_world_scale_x(spine_bone bone) {
+float spine_bone_get_world_scale_x(spine_bone bone) {
     if (bone == nullptr) return 0;
     Bone *_bone = (Bone*)bone;
     return _bone->getWorldScaleX();
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_bone_get_world_scale_y(spine_bone bone) {
+float spine_bone_get_world_scale_y(spine_bone bone) {
     if (bone == nullptr) return 0;
     Bone *_bone = (Bone*)bone;
     return _bone->getWorldScaleY();
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_bone_get_is_active(spine_bone bone) {
+int32_t spine_bone_get_is_active(spine_bone bone) {
     if (bone == nullptr) return 0;
     Bone *_bone = (Bone*)bone;
     return _bone->isActive() ? -1 : 0;
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_bone_set_is_active(spine_bone bone, int32_t isActive) {
+void spine_bone_set_is_active(spine_bone bone, int32_t isActive) {
     if (bone == nullptr) return;
     Bone *_bone = (Bone*)bone;
     _bone->setActive(isActive);
 }
 
 // Attachment
-EMSCRIPTEN_KEEPALIVE const utf8* spine_attachment_get_name(spine_attachment attachment) {
+const utf8* spine_attachment_get_name(spine_attachment attachment) {
     if (attachment == nullptr) return nullptr;
     Attachment *_attachment = (Attachment*)attachment;
     return (utf8*)_attachment->getName().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_attachment_type spine_attachment_get_type(spine_attachment attachment) {
+spine_attachment_type spine_attachment_get_type(spine_attachment attachment) {
     if (attachment == nullptr) return SPINE_ATTACHMENT_REGION;
     Attachment *_attachment = (Attachment*)attachment;
     if (_attachment->getRTTI().isExactly(RegionAttachment::rtti)) {
@@ -2377,20 +2371,20 @@ EMSCRIPTEN_KEEPALIVE spine_attachment_type spine_attachment_get_type(spine_attac
     }
 }
 
-EMSCRIPTEN_KEEPALIVE spine_attachment spine_attachment_copy(spine_attachment attachment) {
+spine_attachment spine_attachment_copy(spine_attachment attachment) {
     if (attachment == nullptr) return nullptr;
     Attachment *_attachment = (Attachment*)attachment;
     return (spine_attachment)_attachment->copy();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_attachment_dispose(spine_attachment attachment) {
+void spine_attachment_dispose(spine_attachment attachment) {
     if (attachment == nullptr) return;
     Attachment *_attachment = (Attachment*)attachment;
     delete _attachment;
 }
 
 // PointAttachment
-EMSCRIPTEN_KEEPALIVE spine_vector spine_point_attachment_compute_world_position(spine_point_attachment attachment, spine_bone bone) {
+spine_vector spine_point_attachment_compute_world_position(spine_point_attachment attachment, spine_bone bone) {
     _spine_vector *result = SpineExtension::calloc<_spine_vector>(1, __FILE__, __LINE__);
     if (attachment == nullptr) return (spine_vector)result;
     PointAttachment *_attachment = (PointAttachment*)attachment;
@@ -2398,521 +2392,521 @@ EMSCRIPTEN_KEEPALIVE spine_vector spine_point_attachment_compute_world_position(
     return (spine_vector)result;
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_point_attachment_compute_world_rotation(spine_point_attachment attachment, spine_bone bone) {
+float spine_point_attachment_compute_world_rotation(spine_point_attachment attachment, spine_bone bone) {
     if (attachment == nullptr) return 0;
     PointAttachment *_attachment = (PointAttachment*)attachment;
     return _attachment->computeWorldRotation(*(Bone*)bone);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_point_attachment_get_x(spine_point_attachment attachment) {
+float spine_point_attachment_get_x(spine_point_attachment attachment) {
     if (attachment == nullptr) return 0;
     PointAttachment *_attachment = (PointAttachment*)attachment;
     return _attachment->getX();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_point_attachment_set_x(spine_point_attachment attachment, float x) {
+void spine_point_attachment_set_x(spine_point_attachment attachment, float x) {
     if (attachment == nullptr) return;
     PointAttachment *_attachment = (PointAttachment*)attachment;
     _attachment->setX(x);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_point_attachment_get_y(spine_point_attachment attachment) {
+float spine_point_attachment_get_y(spine_point_attachment attachment) {
     if (attachment == nullptr) return 0;
     PointAttachment *_attachment = (PointAttachment*)attachment;
     return _attachment->getY();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_point_attachment_set_y(spine_point_attachment attachment, float y) {
+void spine_point_attachment_set_y(spine_point_attachment attachment, float y) {
     if (attachment == nullptr) return;
     PointAttachment *_attachment = (PointAttachment*)attachment;
     _attachment->setY(y);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_point_attachment_get_rotation(spine_point_attachment attachment) {
+float spine_point_attachment_get_rotation(spine_point_attachment attachment) {
     if (attachment == nullptr) return 0;
     PointAttachment *_attachment = (PointAttachment*)attachment;
     return _attachment->getRotation();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_point_attachment_set_rotation(spine_point_attachment attachment, float rotation) {
+void spine_point_attachment_set_rotation(spine_point_attachment attachment, float rotation) {
     if (attachment == nullptr) return;
     PointAttachment *_attachment = (PointAttachment*)attachment;
     _attachment->setRotation(rotation);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_color spine_point_attachment_get_color(spine_point_attachment attachment) {
+spine_color spine_point_attachment_get_color(spine_point_attachment attachment) {
     if (attachment == nullptr) return (spine_color)&NULL_COLOR;
     PointAttachment *_attachment = (PointAttachment*)attachment;
     return (spine_color)&_attachment->getColor();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_point_attachment_set_color(spine_point_attachment attachment, float r, float g, float b, float a) {
+void spine_point_attachment_set_color(spine_point_attachment attachment, float r, float g, float b, float a) {
     if (attachment == nullptr) return;
     PointAttachment *_attachment = (PointAttachment*)attachment;
     _attachment->getColor().set(r, g, b, a);
 }
 
 // RegionAttachment
-EMSCRIPTEN_KEEPALIVE void spine_region_attachment_update_region(spine_region_attachment attachment) {
+void spine_region_attachment_update_region(spine_region_attachment attachment) {
     if (attachment == nullptr) return;
     RegionAttachment *_attachment = (RegionAttachment*)attachment;
     _attachment->updateRegion();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_region_attachment_compute_world_vertices(spine_region_attachment attachment, spine_slot slot, float *worldVertices) {
+void spine_region_attachment_compute_world_vertices(spine_region_attachment attachment, spine_slot slot, float *worldVertices) {
     if (attachment == nullptr) return;
     RegionAttachment *_attachment = (RegionAttachment*)attachment;
     _attachment->computeWorldVertices(*(Slot*)slot, worldVertices, 0);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_region_attachment_get_x(spine_region_attachment attachment) {
+float spine_region_attachment_get_x(spine_region_attachment attachment) {
     if (attachment == nullptr) return 0;
     RegionAttachment *_attachment = (RegionAttachment*)attachment;
     return _attachment->getX();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_region_attachment_set_x(spine_region_attachment attachment, float x) {
+void spine_region_attachment_set_x(spine_region_attachment attachment, float x) {
     if (attachment == nullptr) return;
     RegionAttachment *_attachment = (RegionAttachment*)attachment;
     _attachment->setX(x);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_region_attachment_get_y(spine_region_attachment attachment) {
+float spine_region_attachment_get_y(spine_region_attachment attachment) {
     if (attachment == nullptr) return 0;
     RegionAttachment *_attachment = (RegionAttachment*)attachment;
     return _attachment->getY();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_region_attachment_set_y(spine_region_attachment attachment, float y) {
+void spine_region_attachment_set_y(spine_region_attachment attachment, float y) {
     if (attachment == nullptr) return;
     RegionAttachment *_attachment = (RegionAttachment*)attachment;
     _attachment->setY(y);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_region_attachment_get_rotation(spine_region_attachment attachment) {
+float spine_region_attachment_get_rotation(spine_region_attachment attachment) {
     if (attachment == nullptr) return 0;
     RegionAttachment *_attachment = (RegionAttachment*)attachment;
     return _attachment->getRotation();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_region_attachment_set_rotation(spine_region_attachment attachment, float rotation) {
+void spine_region_attachment_set_rotation(spine_region_attachment attachment, float rotation) {
     if (attachment == nullptr) return;
     RegionAttachment *_attachment = (RegionAttachment*)attachment;
     _attachment->setRotation(rotation);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_region_attachment_get_scale_x(spine_region_attachment attachment) {
+float spine_region_attachment_get_scale_x(spine_region_attachment attachment) {
     if (attachment == nullptr) return 0;
     RegionAttachment *_attachment = (RegionAttachment*)attachment;
     return _attachment->getScaleX();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_region_attachment_set_scale_x(spine_region_attachment attachment, float scaleX) {
+void spine_region_attachment_set_scale_x(spine_region_attachment attachment, float scaleX) {
     if (attachment == nullptr) return;
     RegionAttachment *_attachment = (RegionAttachment*)attachment;
     _attachment->setScaleX(scaleX);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_region_attachment_get_scale_y(spine_region_attachment attachment) {
+float spine_region_attachment_get_scale_y(spine_region_attachment attachment) {
     if (attachment == nullptr) return 0;
     RegionAttachment *_attachment = (RegionAttachment*)attachment;
     return _attachment->getScaleY();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_region_attachment_set_scale_y(spine_region_attachment attachment, float scaleY) {
+void spine_region_attachment_set_scale_y(spine_region_attachment attachment, float scaleY) {
     if (attachment == nullptr) return;
     RegionAttachment *_attachment = (RegionAttachment*)attachment;
     _attachment->setScaleY(scaleY);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_region_attachment_get_width(spine_region_attachment attachment) {
+float spine_region_attachment_get_width(spine_region_attachment attachment) {
     if (attachment == nullptr) return 0;
     RegionAttachment *_attachment = (RegionAttachment*)attachment;
     return _attachment->getWidth();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_region_attachment_set_width(spine_region_attachment attachment, float width) {
+void spine_region_attachment_set_width(spine_region_attachment attachment, float width) {
     if (attachment == nullptr) return;
     RegionAttachment *_attachment = (RegionAttachment*)attachment;
     _attachment->setWidth(width);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_region_attachment_get_height(spine_region_attachment attachment) {
+float spine_region_attachment_get_height(spine_region_attachment attachment) {
     if (attachment == nullptr) return 0;
     RegionAttachment *_attachment = (RegionAttachment*)attachment;
     return _attachment->getHeight();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_region_attachment_set_height(spine_region_attachment attachment, float height) {
+void spine_region_attachment_set_height(spine_region_attachment attachment, float height) {
     if (attachment == nullptr) return;
     RegionAttachment *_attachment = (RegionAttachment*)attachment;
     _attachment->setHeight(height);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_color spine_region_attachment_get_color(spine_region_attachment attachment) {
+spine_color spine_region_attachment_get_color(spine_region_attachment attachment) {
     if (attachment == nullptr) return (spine_color)&NULL_COLOR;
     RegionAttachment *_attachment = (RegionAttachment*)attachment;
     return (spine_color)&_attachment->getColor();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_region_attachment_set_color(spine_region_attachment attachment, float r, float g, float b, float a) {
+void spine_region_attachment_set_color(spine_region_attachment attachment, float r, float g, float b, float a) {
     if (attachment == nullptr) return;
     RegionAttachment *_attachment = (RegionAttachment*)attachment;
     _attachment->getColor().set(r, g, b, a);
 }
 
-EMSCRIPTEN_KEEPALIVE const utf8 *spine_region_attachment_get_path(spine_region_attachment attachment) {
+const utf8 *spine_region_attachment_get_path(spine_region_attachment attachment) {
     if (attachment == nullptr) return nullptr;
     RegionAttachment *_attachment = (RegionAttachment*)attachment;
     return (utf8*)_attachment->getPath().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_texture_region spine_region_attachment_get_region(spine_region_attachment attachment) {
+spine_texture_region spine_region_attachment_get_region(spine_region_attachment attachment) {
     if (attachment == nullptr) return nullptr;
     RegionAttachment *_attachment = (RegionAttachment*)attachment;
     return (spine_texture_region)_attachment->getRegion();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_sequence spine_region_attachment_get_sequence(spine_region_attachment attachment) {
+spine_sequence spine_region_attachment_get_sequence(spine_region_attachment attachment) {
     if (attachment == nullptr) return nullptr;
     RegionAttachment *_attachment = (RegionAttachment*)attachment;
     return (spine_sequence)_attachment->getSequence();
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_region_attachment_get_num_offset(spine_region_attachment attachment) {
+int32_t spine_region_attachment_get_num_offset(spine_region_attachment attachment) {
     if (attachment == nullptr) return 0;
     RegionAttachment *_attachment = (RegionAttachment*)attachment;
     return (int32_t)_attachment->getOffset().size();
 }
 
-EMSCRIPTEN_KEEPALIVE float *spine_region_attachment_get_offset(spine_region_attachment attachment) {
+float *spine_region_attachment_get_offset(spine_region_attachment attachment) {
     if (attachment == nullptr) return nullptr;
     RegionAttachment *_attachment = (RegionAttachment*)attachment;
     return _attachment->getOffset().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_region_attachment_get_num_uvs(spine_region_attachment attachment) {
+int32_t spine_region_attachment_get_num_uvs(spine_region_attachment attachment) {
     if (attachment == nullptr) return 0;
     RegionAttachment *_attachment = (RegionAttachment*)attachment;
     return (int32_t)_attachment->getUVs().size();
 }
 
-EMSCRIPTEN_KEEPALIVE float *spine_region_attachment_get_uvs(spine_region_attachment attachment) {
+float *spine_region_attachment_get_uvs(spine_region_attachment attachment) {
     if (attachment == nullptr) return nullptr;
     RegionAttachment *_attachment = (RegionAttachment*)attachment;
     return _attachment->getUVs().buffer();
 }
 
 // VertexAttachment
-EMSCRIPTEN_KEEPALIVE int32_t spine_vertex_attachment_get_world_vertices_length(spine_vertex_attachment attachment) {
+int32_t spine_vertex_attachment_get_world_vertices_length(spine_vertex_attachment attachment) {
     if (attachment == nullptr) return 0;
     VertexAttachment *_attachment = (VertexAttachment*)attachment;
     return (int32_t)_attachment->getWorldVerticesLength();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_vertex_attachment_compute_world_vertices(spine_vertex_attachment attachment, spine_slot slot, float *worldVertices) {
+void spine_vertex_attachment_compute_world_vertices(spine_vertex_attachment attachment, spine_slot slot, float *worldVertices) {
     if (attachment == nullptr) return;
     VertexAttachment *_attachment = (VertexAttachment*)attachment;
     _attachment->computeWorldVertices(*(Slot*)slot, worldVertices);
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_vertex_attachment_get_num_bones(spine_vertex_attachment attachment) {
+int32_t spine_vertex_attachment_get_num_bones(spine_vertex_attachment attachment) {
     if (attachment == nullptr) return 0;
     VertexAttachment *_attachment = (VertexAttachment*)attachment;
     return (int32_t)_attachment->getBones().size();
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t *spine_vertex_attachment_get_bones(spine_vertex_attachment attachment) {
+int32_t *spine_vertex_attachment_get_bones(spine_vertex_attachment attachment) {
     if (attachment == nullptr) return nullptr;
     VertexAttachment *_attachment = (VertexAttachment*)attachment;
     return _attachment->getBones().buffer();
 }
 
 // VertexAttachment
-EMSCRIPTEN_KEEPALIVE int32_t spine_vertex_attachment_get_num_vertices(spine_vertex_attachment attachment) {
+int32_t spine_vertex_attachment_get_num_vertices(spine_vertex_attachment attachment) {
     if (attachment == nullptr) return 0;
     VertexAttachment *_attachment = (VertexAttachment*)attachment;
     return (int32_t)_attachment->getVertices().size();
 }
 
-EMSCRIPTEN_KEEPALIVE float *spine_vertex_attachment_get_vertices(spine_vertex_attachment attachment) {
+float *spine_vertex_attachment_get_vertices(spine_vertex_attachment attachment) {
     if (attachment == nullptr) return nullptr;
     VertexAttachment *_attachment = (VertexAttachment*)attachment;
     return _attachment->getVertices().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_attachment spine_vertex_attachment_get_timeline_attachment(spine_vertex_attachment attachment) {
+spine_attachment spine_vertex_attachment_get_timeline_attachment(spine_vertex_attachment attachment) {
     if (attachment == nullptr) return nullptr;
     VertexAttachment *_attachment = (VertexAttachment*)attachment;
     return (spine_attachment)_attachment->getTimelineAttachment();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_vertex_attachment_set_timeline_attachment(spine_vertex_attachment attachment, spine_attachment timelineAttachment) {
+void spine_vertex_attachment_set_timeline_attachment(spine_vertex_attachment attachment, spine_attachment timelineAttachment) {
     if (attachment == nullptr) return;
     VertexAttachment *_attachment = (VertexAttachment*)attachment;
     _attachment->setTimelineAttachment((Attachment*)timelineAttachment);
 }
 
 // MeshAttachment
-EMSCRIPTEN_KEEPALIVE void spine_mesh_attachment_update_region(spine_mesh_attachment attachment) {
+void spine_mesh_attachment_update_region(spine_mesh_attachment attachment) {
     if (attachment == nullptr) return;
     MeshAttachment *_attachment = (MeshAttachment*)attachment;
     _attachment->updateRegion();
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_mesh_attachment_get_hull_length(spine_mesh_attachment attachment) {
+int32_t spine_mesh_attachment_get_hull_length(spine_mesh_attachment attachment) {
     if (attachment == nullptr) return 0;
     MeshAttachment *_attachment = (MeshAttachment*)attachment;
     return _attachment->getHullLength();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_mesh_attachment_set_hull_length(spine_mesh_attachment attachment, int32_t hullLength) {
+void spine_mesh_attachment_set_hull_length(spine_mesh_attachment attachment, int32_t hullLength) {
     if (attachment == nullptr) return;
     MeshAttachment *_attachment = (MeshAttachment*)attachment;
     _attachment->setHullLength(hullLength);
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_mesh_attachment_get_num_region_uvs(spine_mesh_attachment attachment) {
+int32_t spine_mesh_attachment_get_num_region_uvs(spine_mesh_attachment attachment) {
     if (attachment == nullptr) return 0;
     MeshAttachment *_attachment = (MeshAttachment*)attachment;
     return (int32_t)_attachment->getRegionUVs().size();
 }
 
-EMSCRIPTEN_KEEPALIVE float *spine_mesh_attachment_get_region_uvs(spine_mesh_attachment attachment) {
+float *spine_mesh_attachment_get_region_uvs(spine_mesh_attachment attachment) {
     if (attachment == nullptr) return nullptr;
     MeshAttachment *_attachment = (MeshAttachment*)attachment;
     return _attachment->getRegionUVs().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_mesh_attachment_get_num_uvs(spine_mesh_attachment attachment) {
+int32_t spine_mesh_attachment_get_num_uvs(spine_mesh_attachment attachment) {
     if (attachment == nullptr) return 0;
     MeshAttachment *_attachment = (MeshAttachment*)attachment;
     return (int32_t)_attachment->getUVs().size();
 }
 
-EMSCRIPTEN_KEEPALIVE float *spine_mesh_attachment_get_uvs(spine_mesh_attachment attachment) {
+float *spine_mesh_attachment_get_uvs(spine_mesh_attachment attachment) {
     if (attachment == nullptr) return 0;
     MeshAttachment *_attachment = (MeshAttachment*)attachment;
     return _attachment->getUVs().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_mesh_attachment_get_num_triangles(spine_mesh_attachment attachment) {
+int32_t spine_mesh_attachment_get_num_triangles(spine_mesh_attachment attachment) {
     if (attachment == nullptr) return 0;
     MeshAttachment *_attachment = (MeshAttachment*)attachment;
     return (int32_t)_attachment->getTriangles().size();
 }
 
-EMSCRIPTEN_KEEPALIVE uint16_t *spine_mesh_attachment_get_triangles(spine_mesh_attachment attachment) {
+uint16_t *spine_mesh_attachment_get_triangles(spine_mesh_attachment attachment) {
     if (attachment == nullptr) return nullptr;
     MeshAttachment *_attachment = (MeshAttachment*)attachment;
     return _attachment->getTriangles().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_color spine_mesh_attachment_get_color(spine_mesh_attachment attachment) {
+spine_color spine_mesh_attachment_get_color(spine_mesh_attachment attachment) {
     if (attachment == nullptr) return (spine_color)&NULL_COLOR;
     MeshAttachment *_attachment = (MeshAttachment*)attachment;
     return (spine_color)&_attachment->getColor();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_mesh_attachment_set_color(spine_mesh_attachment attachment, float r, float g, float b, float a) {
+void spine_mesh_attachment_set_color(spine_mesh_attachment attachment, float r, float g, float b, float a) {
     if (attachment == nullptr) return;
     MeshAttachment *_attachment = (MeshAttachment*)attachment;
     _attachment->getColor().set(r, g, b, a);
 }
 
-EMSCRIPTEN_KEEPALIVE const utf8 *spine_mesh_attachment_get_path(spine_mesh_attachment attachment) {
+const utf8 *spine_mesh_attachment_get_path(spine_mesh_attachment attachment) {
     if (attachment == nullptr) return nullptr;
     MeshAttachment *_attachment = (MeshAttachment*)attachment;
     return (utf8*)_attachment->getPath().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_texture_region spine_mesh_attachment_get_region(spine_mesh_attachment attachment) {
+spine_texture_region spine_mesh_attachment_get_region(spine_mesh_attachment attachment) {
     if (attachment == nullptr) return nullptr;
     MeshAttachment *_attachment = (MeshAttachment*)attachment;
     return (spine_texture_region)_attachment->getRegion();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_sequence spine_mesh_attachment_get_sequence(spine_mesh_attachment attachment) {
+spine_sequence spine_mesh_attachment_get_sequence(spine_mesh_attachment attachment) {
     if (attachment == nullptr) return nullptr;
     MeshAttachment *_attachment = (MeshAttachment*)attachment;
     return (spine_sequence)_attachment->getSequence();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_mesh_attachment spine_mesh_attachment_get_parent_mesh(spine_mesh_attachment attachment) {
+spine_mesh_attachment spine_mesh_attachment_get_parent_mesh(spine_mesh_attachment attachment) {
     if (attachment == nullptr) return nullptr;
     MeshAttachment *_attachment = (MeshAttachment*)attachment;
     return (spine_mesh_attachment)_attachment->getParentMesh();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_mesh_attachment_set_parent_mesh(spine_mesh_attachment attachment, spine_mesh_attachment parentMesh) {
+void spine_mesh_attachment_set_parent_mesh(spine_mesh_attachment attachment, spine_mesh_attachment parentMesh) {
     if (attachment == nullptr) return;
     MeshAttachment *_attachment = (MeshAttachment*)attachment;
     _attachment->setParentMesh((MeshAttachment*)parentMesh);
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_mesh_attachment_get_num_edges(spine_mesh_attachment attachment) {
+int32_t spine_mesh_attachment_get_num_edges(spine_mesh_attachment attachment) {
     if (attachment == nullptr) return 0;
     MeshAttachment *_attachment = (MeshAttachment*)attachment;
     return (int32_t)_attachment->getEdges().size();
 }
 
-EMSCRIPTEN_KEEPALIVE unsigned short *spine_mesh_attachment_get_edges(spine_mesh_attachment attachment) {
+unsigned short *spine_mesh_attachment_get_edges(spine_mesh_attachment attachment) {
     if (attachment == nullptr) return nullptr;
     MeshAttachment *_attachment = (MeshAttachment*)attachment;
     return _attachment->getEdges().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_mesh_attachment_get_width(spine_mesh_attachment attachment) {
+float spine_mesh_attachment_get_width(spine_mesh_attachment attachment) {
     if (attachment == nullptr) return 0;
     MeshAttachment *_attachment = (MeshAttachment*)attachment;
     return _attachment->getWidth();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_mesh_attachment_set_width(spine_mesh_attachment attachment, float width) {
+void spine_mesh_attachment_set_width(spine_mesh_attachment attachment, float width) {
     if (attachment == nullptr) return;
     MeshAttachment *_attachment = (MeshAttachment*)attachment;
     _attachment->setWidth(width);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_mesh_attachment_get_height(spine_mesh_attachment attachment) {
+float spine_mesh_attachment_get_height(spine_mesh_attachment attachment) {
     if (attachment == nullptr) return 0;
     MeshAttachment *_attachment = (MeshAttachment*)attachment;
     return _attachment->getHeight();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_mesh_attachment_set_height(spine_mesh_attachment attachment, float height) {
+void spine_mesh_attachment_set_height(spine_mesh_attachment attachment, float height) {
     if (attachment == nullptr) return;
     MeshAttachment *_attachment = (MeshAttachment*)attachment;
     _attachment->setHeight(height);
 }
 
 // ClippingAttachment
-EMSCRIPTEN_KEEPALIVE spine_slot_data spine_clipping_attachment_get_end_slot(spine_clipping_attachment attachment) {
+spine_slot_data spine_clipping_attachment_get_end_slot(spine_clipping_attachment attachment) {
     if (attachment == nullptr) return nullptr;
     ClippingAttachment *_attachment = (ClippingAttachment*)attachment;
     return (spine_slot_data)_attachment->getEndSlot();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_clipping_attachment_set_end_slot(spine_clipping_attachment attachment, spine_slot_data endSlot) {
+void spine_clipping_attachment_set_end_slot(spine_clipping_attachment attachment, spine_slot_data endSlot) {
     if (attachment == nullptr) return;
     ClippingAttachment *_attachment = (ClippingAttachment*)attachment;
     _attachment->setEndSlot((SlotData*)endSlot);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_color spine_clipping_attachment_get_color(spine_clipping_attachment attachment) {
+spine_color spine_clipping_attachment_get_color(spine_clipping_attachment attachment) {
     if (attachment == nullptr) return (spine_color)&NULL_COLOR;
     ClippingAttachment *_attachment = (ClippingAttachment*)attachment;
     return (spine_color)&_attachment->getColor();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_clipping_attachment_set_color(spine_clipping_attachment attachment, float r, float g, float b, float a) {
+void spine_clipping_attachment_set_color(spine_clipping_attachment attachment, float r, float g, float b, float a) {
     if (attachment == nullptr) return;
     ClippingAttachment *_attachment = (ClippingAttachment*)attachment;
     _attachment->getColor().set(r, g, b, a);
 }
 
 // BoundingBoxAttachment
-EMSCRIPTEN_KEEPALIVE spine_color spine_bounding_box_attachment_get_color(spine_bounding_box_attachment attachment) {
+spine_color spine_bounding_box_attachment_get_color(spine_bounding_box_attachment attachment) {
     if (attachment == nullptr) return (spine_color)&NULL_COLOR;
     BoundingBoxAttachment *_attachment = (BoundingBoxAttachment*)attachment;
     return (spine_color)&_attachment->getColor();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_bounding_box_attachment_set_color(spine_bounding_box_attachment attachment, float r, float g, float b, float a) {
+void spine_bounding_box_attachment_set_color(spine_bounding_box_attachment attachment, float r, float g, float b, float a) {
     if (attachment == nullptr) return;
     BoundingBoxAttachment *_attachment = (BoundingBoxAttachment*)attachment;
     _attachment->getColor().set(r, g, b, a);
 }
 
 // PathAttachment
-EMSCRIPTEN_KEEPALIVE int32_t spine_path_attachment_get_num_lengths(spine_path_attachment attachment) {
+int32_t spine_path_attachment_get_num_lengths(spine_path_attachment attachment) {
     if (attachment == nullptr) return 0;
     PathAttachment *_attachment = (PathAttachment*)attachment;
     return (int32_t)_attachment->getLengths().size();
 }
 
-EMSCRIPTEN_KEEPALIVE float *spine_path_attachment_get_lengths(spine_path_attachment attachment) {
+float *spine_path_attachment_get_lengths(spine_path_attachment attachment) {
     if (attachment == nullptr) return nullptr;
     PathAttachment *_attachment = (PathAttachment*)attachment;
     return _attachment->getLengths().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_path_attachment_get_is_closed(spine_path_attachment attachment) {
+int32_t spine_path_attachment_get_is_closed(spine_path_attachment attachment) {
     if (attachment == nullptr) return 0;
     PathAttachment *_attachment = (PathAttachment*)attachment;
     return _attachment->isClosed() ? -1 : 0;
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_path_attachment_set_is_closed(spine_path_attachment attachment, int32_t isClosed) {
+void spine_path_attachment_set_is_closed(spine_path_attachment attachment, int32_t isClosed) {
     if (attachment == nullptr) return;
     PathAttachment *_attachment = (PathAttachment*)attachment;
     _attachment->setClosed(isClosed);
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_path_attachment_get_is_constant_speed(spine_path_attachment attachment) {
+int32_t spine_path_attachment_get_is_constant_speed(spine_path_attachment attachment) {
     if (attachment == nullptr) return 0;
     PathAttachment *_attachment = (PathAttachment*)attachment;
     return _attachment->isConstantSpeed() ? -1 : 0;
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_path_attachment_set_is_constant_speed(spine_path_attachment attachment, int32_t isConstantSpeed) {
+void spine_path_attachment_set_is_constant_speed(spine_path_attachment attachment, int32_t isConstantSpeed) {
     if (attachment == nullptr) return;
     PathAttachment *_attachment = (PathAttachment*)attachment;
     _attachment->setConstantSpeed(isConstantSpeed);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_color spine_path_attachment_get_color(spine_path_attachment attachment) {
+spine_color spine_path_attachment_get_color(spine_path_attachment attachment) {
     if (attachment == nullptr) return (spine_color)&NULL_COLOR;
     PathAttachment *_attachment = (PathAttachment*)attachment;
     return (spine_color)&_attachment->getColor();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_path_attachment_set_color(spine_path_attachment attachment, float r, float g, float b, float a) {
+void spine_path_attachment_set_color(spine_path_attachment attachment, float r, float g, float b, float a) {
     if (attachment == nullptr) return;
     PathAttachment *_attachment = (PathAttachment*)attachment;
     _attachment->getColor().set(r, g, b, a);
 }
 
 // Skin
-EMSCRIPTEN_KEEPALIVE void spine_skin_set_attachment(spine_skin skin, int32_t slotIndex, const utf8* name, spine_attachment attachment) {
+void spine_skin_set_attachment(spine_skin skin, int32_t slotIndex, const utf8* name, spine_attachment attachment) {
     if (skin == nullptr) return;
     Skin *_skin = (Skin*)skin;
     _skin->setAttachment(slotIndex, (char*)name, (Attachment*)attachment);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_attachment spine_skin_get_attachment(spine_skin skin, int32_t slotIndex, const utf8* name) {
+spine_attachment spine_skin_get_attachment(spine_skin skin, int32_t slotIndex, const utf8* name) {
     if (skin == nullptr) return nullptr;
     Skin *_skin = (Skin*)skin;
     return (spine_attachment)_skin->getAttachment(slotIndex, (char*)name);
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_skin_remove_attachment(spine_skin skin, int32_t slotIndex, const utf8* name) {
+void spine_skin_remove_attachment(spine_skin skin, int32_t slotIndex, const utf8* name) {
     if (skin == nullptr) return;
     Skin *_skin = (Skin*)skin;
     _skin->removeAttachment(slotIndex, (char*)name);
 }
 
-EMSCRIPTEN_KEEPALIVE const utf8* spine_skin_get_name(spine_skin skin) {
+const utf8* spine_skin_get_name(spine_skin skin) {
     if (skin == nullptr) return nullptr;
     Skin *_skin = (Skin*)skin;
     return (utf8*)_skin->getName().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_skin_add_skin(spine_skin skin, spine_skin other) {
+void spine_skin_add_skin(spine_skin skin, spine_skin other) {
     if (skin == nullptr) return;
     if (other == nullptr) return;
     Skin *_skin = (Skin*)skin;
     _skin->addSkin((Skin*)other);
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_skin_copy_skin(spine_skin skin, spine_skin other) {
+void spine_skin_copy_skin(spine_skin skin, spine_skin other) {
     if (skin == nullptr) return;
     if (other == nullptr) return;
     Skin *_skin = (Skin*)skin;
     _skin->copySkin((Skin*)other);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_skin_entries spine_skin_get_entries(spine_skin skin) {
+spine_skin_entries spine_skin_get_entries(spine_skin skin) {
     if (skin == nullptr) return nullptr;
     Skin *_skin = (Skin*)skin;
     _spine_skin_entries *entries = SpineExtension::getInstance()->calloc<_spine_skin_entries>(1, __FILE__, __LINE__);
@@ -2932,74 +2926,74 @@ EMSCRIPTEN_KEEPALIVE spine_skin_entries spine_skin_get_entries(spine_skin skin) 
     return (spine_skin_entries)entries;
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_skin_entries_get_num_entries(spine_skin_entries entries) {
+int32_t spine_skin_entries_get_num_entries(spine_skin_entries entries) {
     if (!entries) return 0;
     return ((_spine_skin_entries*)entries)->numEntries;
 }
 
-EMSCRIPTEN_KEEPALIVE spine_skin_entry spine_skin_entries_get_entry(spine_skin_entries entries, int32_t index) {
+spine_skin_entry spine_skin_entries_get_entry(spine_skin_entries entries, int32_t index) {
     if (!entries) return 0;
     return (spine_skin_entry)&((_spine_skin_entries*)entries)->entries[index];
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_skin_entries_dispose(spine_skin_entries entries) {
+void spine_skin_entries_dispose(spine_skin_entries entries) {
     if (entries == nullptr) return;
     SpineExtension::getInstance()->free(((_spine_skin_entries*)entries)->entries, __FILE__, __LINE__);
     SpineExtension::getInstance()->free(entries, __FILE__, __LINE__);
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_skin_entry_get_slot_index(spine_skin_entry entry) {
+int32_t spine_skin_entry_get_slot_index(spine_skin_entry entry) {
     if (!entry) return 0;
     return ((_spine_skin_entry*)entry)->slotIndex;
 }
 
-EMSCRIPTEN_KEEPALIVE utf8 *spine_skin_entry_get_name(spine_skin_entry entry) {
+utf8 *spine_skin_entry_get_name(spine_skin_entry entry) {
     if (!entry) return nullptr;
     return ((_spine_skin_entry*)entry)->name;
 }
 
-EMSCRIPTEN_KEEPALIVE spine_attachment spine_skin_entry_get_attachment(spine_skin_entry entry) {
+spine_attachment spine_skin_entry_get_attachment(spine_skin_entry entry) {
     if (!entry) return nullptr;
     return ((_spine_skin_entry*)entry)->attachment;
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_skin_get_num_bones(spine_skin skin) {
+int32_t spine_skin_get_num_bones(spine_skin skin) {
     if (skin == nullptr) return 0;
     Skin *_skin = (Skin*)skin;
     return (int32_t)_skin->getBones().size();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_bone_data* spine_skin_get_bones(spine_skin skin) {
+spine_bone_data* spine_skin_get_bones(spine_skin skin) {
     if (skin == nullptr) return nullptr;
     Skin *_skin = (Skin*)skin;
     return (spine_bone_data*)_skin->getBones().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_skin_get_num_constraints(spine_skin skin) {
+int32_t spine_skin_get_num_constraints(spine_skin skin) {
     if (skin == nullptr) return 0;
     Skin *_skin = (Skin*)skin;
     return (int32_t)_skin->getConstraints().size();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_constraint_data* spine_skin_get_constraints(spine_skin skin) {
+spine_constraint_data* spine_skin_get_constraints(spine_skin skin) {
     if (skin == nullptr) return nullptr;
     Skin *_skin = (Skin*)skin;
     return (spine_constraint_data*)_skin->getConstraints().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_skin spine_skin_create(const utf8* name) {
+spine_skin spine_skin_create(const utf8* name) {
     if (name == nullptr) return nullptr;
     return (spine_skin)new (__FILE__, __LINE__) Skin((char*)name);
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_skin_dispose(spine_skin skin) {
+void spine_skin_dispose(spine_skin skin) {
     if (skin == nullptr) return;
     Skin *_skin = (Skin*)skin;
     delete _skin;
 }
 
 // ConstraintData
-EMSCRIPTEN_KEEPALIVE spine_constraint_type spine_constraint_data_get_type(spine_constraint_data data) {
+spine_constraint_type spine_constraint_data_get_type(spine_constraint_data data) {
     if (data == nullptr) return SPINE_CONSTRAINT_IK;
     ConstraintData *_data = (ConstraintData*)data;
     if (_data->getRTTI().isExactly(IkConstraintData::rtti)) {
@@ -3013,1021 +3007,1021 @@ EMSCRIPTEN_KEEPALIVE spine_constraint_type spine_constraint_data_get_type(spine_
     }
 }
 
-EMSCRIPTEN_KEEPALIVE const utf8* spine_constraint_data_get_name(spine_constraint_data data) {
+const utf8* spine_constraint_data_get_name(spine_constraint_data data) {
     if (data == nullptr) return nullptr;
     ConstraintData *_data = (ConstraintData*)data;
     return (utf8*)_data->getName().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE uint64_t spine_constraint_data_get_order(spine_constraint_data data) {
+uint64_t spine_constraint_data_get_order(spine_constraint_data data) {
     if (data == nullptr) return 0;
     ConstraintData *_data = (ConstraintData*)data;
     return (uint64_t)_data->getOrder();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_constraint_data_set_order(spine_constraint_data data, uint64_t order) {
+void spine_constraint_data_set_order(spine_constraint_data data, uint64_t order) {
     if (data == nullptr) return;
     ConstraintData *_data = (ConstraintData*)data;
     _data->setOrder((size_t)order);
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_constraint_data_get_is_skin_required(spine_constraint_data data) {
+int32_t spine_constraint_data_get_is_skin_required(spine_constraint_data data) {
     if (data == nullptr) return 0;
     ConstraintData *_data = (ConstraintData*)data;
     return _data->isSkinRequired() ? -1 : 0;
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_constraint_data_set_is_skin_required(spine_constraint_data data, int32_t isSkinRequired) {
+void spine_constraint_data_set_is_skin_required(spine_constraint_data data, int32_t isSkinRequired) {
     if (data == nullptr) return;
     ConstraintData *_data = (ConstraintData*)data;
     _data->setSkinRequired(isSkinRequired);
 }
 
 // IkConstraintData
-EMSCRIPTEN_KEEPALIVE int32_t spine_ik_constraint_data_get_num_bones(spine_ik_constraint_data data) {
+int32_t spine_ik_constraint_data_get_num_bones(spine_ik_constraint_data data) {
     if (data == nullptr) return 0;
     IkConstraintData *_data = (IkConstraintData*)data;
     return (int32_t)_data->getBones().size();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_bone_data* spine_ik_constraint_data_get_bones(spine_ik_constraint_data data) {
+spine_bone_data* spine_ik_constraint_data_get_bones(spine_ik_constraint_data data) {
     if (data == nullptr) return nullptr;
     IkConstraintData *_data = (IkConstraintData*)data;
     return (spine_bone_data*)_data->getBones().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_bone_data spine_ik_constraint_data_get_target(spine_ik_constraint_data data) {
+spine_bone_data spine_ik_constraint_data_get_target(spine_ik_constraint_data data) {
     if (data == nullptr) return nullptr;
     IkConstraintData *_data = (IkConstraintData*)data;
     return (spine_bone_data)_data->getTarget();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_ik_constraint_data_set_target(spine_ik_constraint_data data, spine_bone_data target) {
+void spine_ik_constraint_data_set_target(spine_ik_constraint_data data, spine_bone_data target) {
     if (data == nullptr) return;
     IkConstraintData *_data = (IkConstraintData*)data;
     _data->setTarget((BoneData*)target);
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_ik_constraint_data_get_bend_direction(spine_ik_constraint_data data) {
+int32_t spine_ik_constraint_data_get_bend_direction(spine_ik_constraint_data data) {
     if (data == nullptr) return 1;
     IkConstraintData *_data = (IkConstraintData*)data;
     return _data->getBendDirection();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_ik_constraint_data_set_bend_direction(spine_ik_constraint_data data, int32_t bendDirection) {
+void spine_ik_constraint_data_set_bend_direction(spine_ik_constraint_data data, int32_t bendDirection) {
     if (data == nullptr) return;
     IkConstraintData *_data = (IkConstraintData*)data;
     _data->setBendDirection(bendDirection);
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_ik_constraint_data_get_compress(spine_ik_constraint_data data) {
+int32_t spine_ik_constraint_data_get_compress(spine_ik_constraint_data data) {
     if (data == nullptr) return 0;
     IkConstraintData *_data = (IkConstraintData*)data;
     return _data->getCompress() ? -1 : 0;
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_ik_constraint_data_set_compress(spine_ik_constraint_data data, int32_t compress) {
+void spine_ik_constraint_data_set_compress(spine_ik_constraint_data data, int32_t compress) {
     if (data == nullptr) return;
     IkConstraintData *_data = (IkConstraintData*)data;
     _data->setCompress(compress);
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_ik_constraint_data_get_stretch(spine_ik_constraint_data data) {
+int32_t spine_ik_constraint_data_get_stretch(spine_ik_constraint_data data) {
     if (data == nullptr) return 0;
     IkConstraintData *_data = (IkConstraintData*)data;
     return _data->getStretch() ? -1 : 0;
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_ik_constraint_data_set_stretch(spine_ik_constraint_data data, int32_t stretch) {
+void spine_ik_constraint_data_set_stretch(spine_ik_constraint_data data, int32_t stretch) {
     if (data == nullptr) return;
     IkConstraintData *_data = (IkConstraintData*)data;
     _data->setStretch(stretch);
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_ik_constraint_data_get_uniform(spine_ik_constraint_data data) {
+int32_t spine_ik_constraint_data_get_uniform(spine_ik_constraint_data data) {
     if (data == nullptr) return 0;
     IkConstraintData *_data = (IkConstraintData*)data;
     return _data->getUniform() ? -1 : 0;
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_ik_constraint_data_get_mix(spine_ik_constraint_data data) {
+float spine_ik_constraint_data_get_mix(spine_ik_constraint_data data) {
     if (data == nullptr) return 0;
     IkConstraintData *_data = (IkConstraintData*)data;
     return _data->getMix();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_ik_constraint_data_set_mix(spine_ik_constraint_data data, float mix) {
+void spine_ik_constraint_data_set_mix(spine_ik_constraint_data data, float mix) {
     if (data == nullptr) return;
     IkConstraintData *_data = (IkConstraintData*)data;
     _data->setMix(mix);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_ik_constraint_data_get_softness(spine_ik_constraint_data data) {
+float spine_ik_constraint_data_get_softness(spine_ik_constraint_data data) {
     if (data == nullptr) return 0;
     IkConstraintData *_data = (IkConstraintData*)data;
     return _data->getSoftness();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_ik_constraint_data_set_softness(spine_ik_constraint_data data, float softness) {
+void spine_ik_constraint_data_set_softness(spine_ik_constraint_data data, float softness) {
     if (data == nullptr) return;
     IkConstraintData *_data = (IkConstraintData*)data;
     _data->setSoftness(softness);
 }
 
 // IKConstraint
-EMSCRIPTEN_KEEPALIVE void spine_ik_constraint_update(spine_ik_constraint constraint) {
+void spine_ik_constraint_update(spine_ik_constraint constraint) {
     if (constraint == nullptr) return;
     IkConstraint *_constraint = (IkConstraint*)constraint;
     _constraint->update();
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_ik_constraint_get_order(spine_ik_constraint constraint) {
+int32_t spine_ik_constraint_get_order(spine_ik_constraint constraint) {
     if (constraint == nullptr) return 0;
     IkConstraint *_constraint = (IkConstraint*)constraint;
     return _constraint->getOrder();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_ik_constraint_data spine_ik_constraint_get_data(spine_ik_constraint constraint) {
+spine_ik_constraint_data spine_ik_constraint_get_data(spine_ik_constraint constraint) {
     if (constraint == nullptr) return nullptr;
     IkConstraint *_constraint = (IkConstraint*)constraint;
     return (spine_ik_constraint_data)&_constraint->getData();
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_ik_constraint_get_num_bones(spine_ik_constraint constraint) {
+int32_t spine_ik_constraint_get_num_bones(spine_ik_constraint constraint) {
     if (constraint == nullptr) return 0;
     IkConstraint *_constraint = (IkConstraint*)constraint;
     return (int32_t)_constraint->getBones().size();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_bone* spine_ik_constraint_get_bones(spine_ik_constraint constraint) {
+spine_bone* spine_ik_constraint_get_bones(spine_ik_constraint constraint) {
     if (constraint == nullptr) return nullptr;
     IkConstraint *_constraint = (IkConstraint*)constraint;
     return (spine_bone*)_constraint->getBones().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_bone spine_ik_constraint_get_target(spine_ik_constraint constraint) {
+spine_bone spine_ik_constraint_get_target(spine_ik_constraint constraint) {
     if (constraint == nullptr) return nullptr;
     IkConstraint *_constraint = (IkConstraint*)constraint;
     return (spine_bone)_constraint->getTarget();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_ik_constraint_set_target(spine_ik_constraint constraint, spine_bone target) {
+void spine_ik_constraint_set_target(spine_ik_constraint constraint, spine_bone target) {
     if (constraint == nullptr) return;
     IkConstraint *_constraint = (IkConstraint*)constraint;
     _constraint->setTarget((Bone*)target);
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_ik_constraint_get_bend_direction(spine_ik_constraint constraint) {
+int32_t spine_ik_constraint_get_bend_direction(spine_ik_constraint constraint) {
     if (constraint == nullptr) return 1;
     IkConstraint *_constraint = (IkConstraint*)constraint;
     return _constraint->getBendDirection();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_ik_constraint_set_bend_direction(spine_ik_constraint constraint, int32_t bendDirection) {
+void spine_ik_constraint_set_bend_direction(spine_ik_constraint constraint, int32_t bendDirection) {
     if (constraint == nullptr) return;
     IkConstraint *_constraint = (IkConstraint*)constraint;
     _constraint->setBendDirection(bendDirection);
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_ik_constraint_get_compress(spine_ik_constraint constraint) {
+int32_t spine_ik_constraint_get_compress(spine_ik_constraint constraint) {
     if (constraint == nullptr) return 0;
     IkConstraint *_constraint = (IkConstraint*)constraint;
     return _constraint->getCompress() ? -1 : 0;
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_ik_constraint_set_compress(spine_ik_constraint constraint, int32_t compress) {
+void spine_ik_constraint_set_compress(spine_ik_constraint constraint, int32_t compress) {
     if (constraint == nullptr) return;
     IkConstraint *_constraint = (IkConstraint*)constraint;
     _constraint->setCompress(compress);
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_ik_constraint_get_stretch(spine_ik_constraint constraint) {
+int32_t spine_ik_constraint_get_stretch(spine_ik_constraint constraint) {
     if (constraint == nullptr) return 0;
     IkConstraint *_constraint = (IkConstraint*)constraint;
     return _constraint->getStretch() ? -1 : 0;
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_ik_constraint_set_stretch(spine_ik_constraint constraint, int32_t stretch) {
+void spine_ik_constraint_set_stretch(spine_ik_constraint constraint, int32_t stretch) {
     if (constraint == nullptr) return;
     IkConstraint *_constraint = (IkConstraint*)constraint;
     _constraint->setStretch(stretch);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_ik_constraint_get_mix(spine_ik_constraint constraint) {
+float spine_ik_constraint_get_mix(spine_ik_constraint constraint) {
     if (constraint == nullptr) return 0;
     IkConstraint *_constraint = (IkConstraint*)constraint;
     return _constraint->getMix();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_ik_constraint_set_mix(spine_ik_constraint constraint, float mix) {
+void spine_ik_constraint_set_mix(spine_ik_constraint constraint, float mix) {
     if (constraint == nullptr) return;
     IkConstraint *_constraint = (IkConstraint*)constraint;
     _constraint->setMix(mix);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_ik_constraint_get_softness(spine_ik_constraint constraint) {
+float spine_ik_constraint_get_softness(spine_ik_constraint constraint) {
     if (constraint == nullptr) return 0;
     IkConstraint *_constraint = (IkConstraint*)constraint;
     return _constraint->getSoftness();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_ik_constraint_set_softness(spine_ik_constraint constraint, float softness) {
+void spine_ik_constraint_set_softness(spine_ik_constraint constraint, float softness) {
     if (constraint == nullptr) return;
     IkConstraint *_constraint = (IkConstraint*)constraint;
     _constraint->setSoftness(softness);
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_ik_constraint_get_is_active(spine_ik_constraint constraint) {
+int32_t spine_ik_constraint_get_is_active(spine_ik_constraint constraint) {
     if (constraint == nullptr) return 0;
     IkConstraint *_constraint = (IkConstraint*)constraint;
     return _constraint->isActive() ? -1 : 0;
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_ik_constraint_set_is_active(spine_ik_constraint constraint, int32_t isActive) {
+void spine_ik_constraint_set_is_active(spine_ik_constraint constraint, int32_t isActive) {
     if (constraint == nullptr) return;
     IkConstraint *_constraint = (IkConstraint*)constraint;
     _constraint->setActive(isActive);
 }
 
 // TransformConstraintData
-EMSCRIPTEN_KEEPALIVE int32_t spine_transform_constraint_data_get_num_bones(spine_transform_constraint_data data) {
+int32_t spine_transform_constraint_data_get_num_bones(spine_transform_constraint_data data) {
     if (data == nullptr) return 0;
     TransformConstraintData *_data = (TransformConstraintData*)data;
     return (int32_t)_data->getBones().size();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_bone_data* spine_transform_constraint_data_get_bones(spine_transform_constraint_data data) {
+spine_bone_data* spine_transform_constraint_data_get_bones(spine_transform_constraint_data data) {
     if (data == nullptr) return nullptr;
     TransformConstraintData *_data = (TransformConstraintData*)data;
     return (spine_bone_data*)_data->getBones().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_bone_data spine_transform_constraint_data_get_target(spine_transform_constraint_data data) {
+spine_bone_data spine_transform_constraint_data_get_target(spine_transform_constraint_data data) {
     if (data == nullptr) return nullptr;
     TransformConstraintData *_data = (TransformConstraintData*)data;
     return (spine_bone_data)_data->getTarget();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_transform_constraint_data_set_target(spine_transform_constraint_data data, spine_bone_data target) {
+void spine_transform_constraint_data_set_target(spine_transform_constraint_data data, spine_bone_data target) {
     if (data == nullptr) return;
     TransformConstraintData *_data = (TransformConstraintData*)data;
     _data->setTarget((BoneData*)target);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_transform_constraint_data_get_mix_rotate(spine_transform_constraint_data data) {
+float spine_transform_constraint_data_get_mix_rotate(spine_transform_constraint_data data) {
     if (data == nullptr) return 0;
     TransformConstraintData *_data = (TransformConstraintData*)data;
     return _data->getMixRotate();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_transform_constraint_data_set_mix_rotate(spine_transform_constraint_data data, float mixRotate) {
+void spine_transform_constraint_data_set_mix_rotate(spine_transform_constraint_data data, float mixRotate) {
     if (data == nullptr) return;
     TransformConstraintData *_data = (TransformConstraintData*)data;
     _data->setMixRotate(mixRotate);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_transform_constraint_data_get_mix_x(spine_transform_constraint_data data) {
+float spine_transform_constraint_data_get_mix_x(spine_transform_constraint_data data) {
     if (data == nullptr) return 0;
     TransformConstraintData *_data = (TransformConstraintData*)data;
     return _data->getMixX();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_transform_constraint_data_set_mix_x(spine_transform_constraint_data data, float mixX) {
+void spine_transform_constraint_data_set_mix_x(spine_transform_constraint_data data, float mixX) {
     if (data == nullptr) return;
     TransformConstraintData *_data = (TransformConstraintData*)data;
     _data->setMixX(mixX);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_transform_constraint_data_get_mix_y(spine_transform_constraint_data data) {
+float spine_transform_constraint_data_get_mix_y(spine_transform_constraint_data data) {
     if (data == nullptr) return 0;
     TransformConstraintData *_data = (TransformConstraintData*)data;
     return _data->getMixY();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_transform_constraint_data_set_mix_y(spine_transform_constraint_data data, float mixY) {
+void spine_transform_constraint_data_set_mix_y(spine_transform_constraint_data data, float mixY) {
     if (data == nullptr) return;
     TransformConstraintData *_data = (TransformConstraintData*)data;
     _data->setMixY(mixY);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_transform_constraint_data_get_mix_scale_x(spine_transform_constraint_data data) {
+float spine_transform_constraint_data_get_mix_scale_x(spine_transform_constraint_data data) {
     if (data == nullptr) return 0;
     TransformConstraintData *_data = (TransformConstraintData*)data;
     return _data->getMixScaleX();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_transform_constraint_data_set_mix_scale_x(spine_transform_constraint_data data, float mixScaleX) {
+void spine_transform_constraint_data_set_mix_scale_x(spine_transform_constraint_data data, float mixScaleX) {
     if (data == nullptr) return;
     TransformConstraintData *_data = (TransformConstraintData*)data;
     _data->setMixScaleX(mixScaleX);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_transform_constraint_data_get_mix_scale_y(spine_transform_constraint_data data) {
+float spine_transform_constraint_data_get_mix_scale_y(spine_transform_constraint_data data) {
     if (data == nullptr) return 0;
     TransformConstraintData *_data = (TransformConstraintData*)data;
     return _data->getMixScaleY();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_transform_constraint_data_set_mix_scale_y(spine_transform_constraint_data data, float mixScaleY) {
+void spine_transform_constraint_data_set_mix_scale_y(spine_transform_constraint_data data, float mixScaleY) {
     if (data == nullptr) return;
     TransformConstraintData *_data = (TransformConstraintData*)data;
     _data->setMixScaleY(mixScaleY);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_transform_constraint_data_get_mix_shear_y(spine_transform_constraint_data data) {
+float spine_transform_constraint_data_get_mix_shear_y(spine_transform_constraint_data data) {
     if (data == nullptr) return 0;
     TransformConstraintData *_data = (TransformConstraintData*)data;
     return _data->getMixShearY();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_transform_constraint_data_set_mix_shear_y(spine_transform_constraint_data data, float mixShearY) {
+void spine_transform_constraint_data_set_mix_shear_y(spine_transform_constraint_data data, float mixShearY) {
     if (data == nullptr) return;
     TransformConstraintData *_data = (TransformConstraintData*)data;
     _data->setMixShearY(mixShearY);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_transform_constraint_data_get_offset_rotation(spine_transform_constraint_data data) {
+float spine_transform_constraint_data_get_offset_rotation(spine_transform_constraint_data data) {
     if (data == nullptr) return 0;
     TransformConstraintData *_data = (TransformConstraintData*)data;
     return _data->getOffsetRotation();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_transform_constraint_data_set_offset_rotation(spine_transform_constraint_data data, float offsetRotation) {
+void spine_transform_constraint_data_set_offset_rotation(spine_transform_constraint_data data, float offsetRotation) {
     if (data == nullptr) return;
     TransformConstraintData *_data = (TransformConstraintData*)data;
     _data->setOffsetRotation(offsetRotation);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_transform_constraint_data_get_offset_x(spine_transform_constraint_data data) {
+float spine_transform_constraint_data_get_offset_x(spine_transform_constraint_data data) {
     if (data == nullptr) return 0;
     TransformConstraintData *_data = (TransformConstraintData*)data;
     return _data->getOffsetX();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_transform_constraint_data_set_offset_x(spine_transform_constraint_data data, float offsetX) {
+void spine_transform_constraint_data_set_offset_x(spine_transform_constraint_data data, float offsetX) {
     if (data == nullptr) return;
     TransformConstraintData *_data = (TransformConstraintData*)data;
     _data->setOffsetX(offsetX);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_transform_constraint_data_get_offset_y(spine_transform_constraint_data data) {
+float spine_transform_constraint_data_get_offset_y(spine_transform_constraint_data data) {
     if (data == nullptr) return 0;
     TransformConstraintData *_data = (TransformConstraintData*)data;
     return _data->getOffsetY();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_transform_constraint_data_set_offset_y(spine_transform_constraint_data data, float offsetY) {
+void spine_transform_constraint_data_set_offset_y(spine_transform_constraint_data data, float offsetY) {
     if (data == nullptr) return;
     TransformConstraintData *_data = (TransformConstraintData*)data;
     _data->setOffsetY(offsetY);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_transform_constraint_data_get_offset_scale_x(spine_transform_constraint_data data) {
+float spine_transform_constraint_data_get_offset_scale_x(spine_transform_constraint_data data) {
     if (data == nullptr) return 0;
     TransformConstraintData *_data = (TransformConstraintData*)data;
     return _data->getOffsetScaleX();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_transform_constraint_data_set_offset_scale_x(spine_transform_constraint_data data, float offsetScaleX) {
+void spine_transform_constraint_data_set_offset_scale_x(spine_transform_constraint_data data, float offsetScaleX) {
     if (data == nullptr) return;
     TransformConstraintData *_data = (TransformConstraintData*)data;
     _data->setOffsetScaleX(offsetScaleX);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_transform_constraint_data_get_offset_scale_y(spine_transform_constraint_data data) {
+float spine_transform_constraint_data_get_offset_scale_y(spine_transform_constraint_data data) {
     if (data == nullptr) return 0;
     TransformConstraintData *_data = (TransformConstraintData*)data;
     return _data->getOffsetScaleY();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_transform_constraint_data_set_offset_scale_y(spine_transform_constraint_data data, float offsetScaleY) {
+void spine_transform_constraint_data_set_offset_scale_y(spine_transform_constraint_data data, float offsetScaleY) {
     if (data == nullptr) return;
     TransformConstraintData *_data = (TransformConstraintData*)data;
     _data->setOffsetScaleY(offsetScaleY);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_transform_constraint_data_get_offset_shear_y(spine_transform_constraint_data data) {
+float spine_transform_constraint_data_get_offset_shear_y(spine_transform_constraint_data data) {
     if (data == nullptr) return 0;
     TransformConstraintData *_data = (TransformConstraintData*)data;
     return _data->getOffsetShearY();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_transform_constraint_data_set_offset_shear_y(spine_transform_constraint_data data, float offsetShearY) {
+void spine_transform_constraint_data_set_offset_shear_y(spine_transform_constraint_data data, float offsetShearY) {
     if (data == nullptr) return;
     TransformConstraintData *_data = (TransformConstraintData*)data;
     _data->setOffsetShearY(offsetShearY);
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_transform_constraint_data_get_is_relative(spine_transform_constraint_data data) {
+int32_t spine_transform_constraint_data_get_is_relative(spine_transform_constraint_data data) {
     if (data == nullptr) return 0;
     TransformConstraintData *_data = (TransformConstraintData*)data;
     return _data->isRelative() ? -1 : 0;
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_transform_constraint_data_set_is_relative(spine_transform_constraint_data data, int32_t isRelative) {
+void spine_transform_constraint_data_set_is_relative(spine_transform_constraint_data data, int32_t isRelative) {
     if (data == nullptr) return;
     TransformConstraintData *_data = (TransformConstraintData*)data;
     _data->setRelative(isRelative);
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_transform_constraint_data_get_is_local(spine_transform_constraint_data data) {
+int32_t spine_transform_constraint_data_get_is_local(spine_transform_constraint_data data) {
     if (data == nullptr) return 0;
     TransformConstraintData *_data = (TransformConstraintData*)data;
     return _data->isLocal() ? -1 : 0;
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_transform_constraint_data_set_is_local(spine_transform_constraint_data data, int32_t isLocal) {
+void spine_transform_constraint_data_set_is_local(spine_transform_constraint_data data, int32_t isLocal) {
     if (data == nullptr) return;
     TransformConstraintData *_data = (TransformConstraintData*)data;
     _data->setLocal(isLocal);
 }
 
 // TransformConstraint
-EMSCRIPTEN_KEEPALIVE void spine_transform_constraint_update(spine_transform_constraint constraint) {
+void spine_transform_constraint_update(spine_transform_constraint constraint) {
     if (constraint == nullptr) return;
     TransformConstraint *_constraint = (TransformConstraint*)constraint;
     _constraint->update();
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_transform_constraint_get_order(spine_transform_constraint constraint) {
+int32_t spine_transform_constraint_get_order(spine_transform_constraint constraint) {
     if (constraint == nullptr) return 0;
     TransformConstraint *_constraint = (TransformConstraint*)constraint;
     return _constraint->getOrder();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_transform_constraint_data spine_transform_constraint_get_data(spine_transform_constraint constraint) {
+spine_transform_constraint_data spine_transform_constraint_get_data(spine_transform_constraint constraint) {
     if (constraint == nullptr) return nullptr;
     TransformConstraint *_constraint = (TransformConstraint*)constraint;
     return (spine_transform_constraint_data)&_constraint->getData();
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_transform_constraint_get_num_bones(spine_transform_constraint constraint) {
+int32_t spine_transform_constraint_get_num_bones(spine_transform_constraint constraint) {
     if (constraint == nullptr) return 0;
     TransformConstraint *_constraint = (TransformConstraint*)constraint;
     return (int32_t)_constraint->getBones().size();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_bone* spine_transform_constraint_get_bones(spine_transform_constraint constraint) {
+spine_bone* spine_transform_constraint_get_bones(spine_transform_constraint constraint) {
     if (constraint == nullptr) return nullptr;
     TransformConstraint *_constraint = (TransformConstraint*)constraint;
     return (spine_bone*)_constraint->getBones().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_bone spine_transform_constraint_get_target(spine_transform_constraint constraint) {
+spine_bone spine_transform_constraint_get_target(spine_transform_constraint constraint) {
     if (constraint == nullptr) return nullptr;
     TransformConstraint *_constraint = (TransformConstraint*)constraint;
     return (spine_bone)_constraint->getTarget();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_transform_constraint_set_target(spine_transform_constraint constraint, spine_bone target) {
+void spine_transform_constraint_set_target(spine_transform_constraint constraint, spine_bone target) {
     if (constraint == nullptr) return;
     TransformConstraint *_constraint = (TransformConstraint*)constraint;
     _constraint->setTarget((Bone*)target);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_transform_constraint_get_mix_rotate(spine_transform_constraint constraint) {
+float spine_transform_constraint_get_mix_rotate(spine_transform_constraint constraint) {
     if (constraint == nullptr) return 0;
     TransformConstraint *_constraint = (TransformConstraint*)constraint;
     return _constraint->getMixRotate();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_transform_constraint_set_mix_rotate(spine_transform_constraint constraint, float mixRotate) {
+void spine_transform_constraint_set_mix_rotate(spine_transform_constraint constraint, float mixRotate) {
     if (constraint == nullptr) return;
     TransformConstraint *_constraint = (TransformConstraint*)constraint;
     _constraint->setMixRotate(mixRotate);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_transform_constraint_get_mix_x(spine_transform_constraint constraint) {
+float spine_transform_constraint_get_mix_x(spine_transform_constraint constraint) {
     if (constraint == nullptr) return 0;
     TransformConstraint *_constraint = (TransformConstraint*)constraint;
     return _constraint->getMixX();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_transform_constraint_set_mix_x(spine_transform_constraint constraint, float mixX) {
+void spine_transform_constraint_set_mix_x(spine_transform_constraint constraint, float mixX) {
     if (constraint == nullptr) return;
     TransformConstraint *_constraint = (TransformConstraint*)constraint;
     _constraint->setMixX(mixX);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_transform_constraint_get_mix_y(spine_transform_constraint constraint) {
+float spine_transform_constraint_get_mix_y(spine_transform_constraint constraint) {
     if (constraint == nullptr) return 0;
     TransformConstraint *_constraint = (TransformConstraint*)constraint;
     return _constraint->getMixY();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_transform_constraint_set_mix_y(spine_transform_constraint constraint, float mixY) {
+void spine_transform_constraint_set_mix_y(spine_transform_constraint constraint, float mixY) {
     if (constraint == nullptr) return;
     TransformConstraint *_constraint = (TransformConstraint*)constraint;
     _constraint->setMixY(mixY);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_transform_constraint_get_mix_scale_x(spine_transform_constraint constraint) {
+float spine_transform_constraint_get_mix_scale_x(spine_transform_constraint constraint) {
     if (constraint == nullptr) return 0;
     TransformConstraint *_constraint = (TransformConstraint*)constraint;
     return _constraint->getMixScaleX();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_transform_constraint_set_mix_scale_x(spine_transform_constraint constraint, float mixScaleX) {
+void spine_transform_constraint_set_mix_scale_x(spine_transform_constraint constraint, float mixScaleX) {
     if (constraint == nullptr) return;
     TransformConstraint *_constraint = (TransformConstraint*)constraint;
     _constraint->setMixScaleX(mixScaleX);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_transform_constraint_get_mix_scale_y(spine_transform_constraint constraint) {
+float spine_transform_constraint_get_mix_scale_y(spine_transform_constraint constraint) {
     if (constraint == nullptr) return 0;
     TransformConstraint *_constraint = (TransformConstraint*)constraint;
     return _constraint->getMixScaleY();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_transform_constraint_set_mix_scale_y(spine_transform_constraint constraint, float mixScaleY) {
+void spine_transform_constraint_set_mix_scale_y(spine_transform_constraint constraint, float mixScaleY) {
     if (constraint == nullptr) return;
     TransformConstraint *_constraint = (TransformConstraint*)constraint;
     _constraint->setMixScaleY(mixScaleY);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_transform_constraint_get_mix_shear_y(spine_transform_constraint constraint) {
+float spine_transform_constraint_get_mix_shear_y(spine_transform_constraint constraint) {
     if (constraint == nullptr) return 0;
     TransformConstraint *_constraint = (TransformConstraint*)constraint;
     return _constraint->getMixShearY();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_transform_constraint_set_mix_shear_y(spine_transform_constraint constraint, float mixShearY) {
+void spine_transform_constraint_set_mix_shear_y(spine_transform_constraint constraint, float mixShearY) {
     if (constraint == nullptr) return;
     TransformConstraint *_constraint = (TransformConstraint*)constraint;
     _constraint->setMixShearY(mixShearY);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_transform_constraint_get_is_active(spine_transform_constraint constraint) {
+float spine_transform_constraint_get_is_active(spine_transform_constraint constraint) {
     if (constraint == nullptr) return 0;
     TransformConstraint *_constraint = (TransformConstraint*)constraint;
     return _constraint->isActive() ? -1 : 0;
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_transform_constraint_set_is_active(spine_transform_constraint constraint, int32_t isActive) {
+void spine_transform_constraint_set_is_active(spine_transform_constraint constraint, int32_t isActive) {
     if (constraint == nullptr) return;
     TransformConstraint *_constraint = (TransformConstraint*)constraint;
     _constraint->setActive(isActive);
 }
 
 // PathConstraintData
-EMSCRIPTEN_KEEPALIVE int32_t spine_path_constraint_data_get_num_bones(spine_path_constraint_data data) {
+int32_t spine_path_constraint_data_get_num_bones(spine_path_constraint_data data) {
     if (data == nullptr) return 0;
     PathConstraintData *_data = (PathConstraintData*)data;
     return (int32_t)_data->getBones().size();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_bone_data* spine_path_constraint_data_get_bones(spine_path_constraint_data data) {
+spine_bone_data* spine_path_constraint_data_get_bones(spine_path_constraint_data data) {
     if (data == nullptr) return nullptr;
     PathConstraintData *_data = (PathConstraintData*)data;
     return (spine_bone_data*)_data->getBones().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_slot_data spine_path_constraint_data_get_target(spine_path_constraint_data data) {
+spine_slot_data spine_path_constraint_data_get_target(spine_path_constraint_data data) {
     if (data == nullptr) return nullptr;
     PathConstraintData *_data = (PathConstraintData*)data;
     return (spine_slot_data)_data->getTarget();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_path_constraint_data_set_target(spine_path_constraint_data data, spine_slot_data target) {
+void spine_path_constraint_data_set_target(spine_path_constraint_data data, spine_slot_data target) {
     if (data == nullptr) return;
     PathConstraintData *_data = (PathConstraintData*)data;
     _data->setTarget((SlotData*)target);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_position_mode spine_path_constraint_data_get_position_mode(spine_path_constraint_data data) {
+spine_position_mode spine_path_constraint_data_get_position_mode(spine_path_constraint_data data) {
     if (data == nullptr) return SPINE_POSITION_MODE_FIXED;
     PathConstraintData *_data = (PathConstraintData*)data;
     return (spine_position_mode)_data->getPositionMode();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_path_constraint_data_set_position_mode(spine_path_constraint_data data, spine_position_mode positionMode) {
+void spine_path_constraint_data_set_position_mode(spine_path_constraint_data data, spine_position_mode positionMode) {
     if (data == nullptr) return;
     PathConstraintData *_data = (PathConstraintData*)data;
     _data->setPositionMode((PositionMode)positionMode);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_spacing_mode spine_path_constraint_data_get_spacing_mode(spine_path_constraint_data data) {
+spine_spacing_mode spine_path_constraint_data_get_spacing_mode(spine_path_constraint_data data) {
     if (data == nullptr) return SPINE_SPACING_MODE_LENGTH;
     PathConstraintData *_data = (PathConstraintData*)data;
     return (spine_spacing_mode)_data->getSpacingMode();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_path_constraint_data_set_spacing_mode(spine_path_constraint_data data, spine_spacing_mode spacingMode) {
+void spine_path_constraint_data_set_spacing_mode(spine_path_constraint_data data, spine_spacing_mode spacingMode) {
     if (data == nullptr) return;
     PathConstraintData *_data = (PathConstraintData*)data;
     _data->setSpacingMode((SpacingMode)spacingMode);
 }
 
-EMSCRIPTEN_KEEPALIVE spine_rotate_mode spine_path_constraint_data_get_rotate_mode(spine_path_constraint_data data) {
+spine_rotate_mode spine_path_constraint_data_get_rotate_mode(spine_path_constraint_data data) {
     if (data == nullptr) return SPINE_ROTATE_MODE_TANGENT;
     PathConstraintData *_data = (PathConstraintData*)data;
     return (spine_rotate_mode)_data->getRotateMode();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_path_constraint_data_set_rotate_mode(spine_path_constraint_data data, spine_rotate_mode rotateMode) {
+void spine_path_constraint_data_set_rotate_mode(spine_path_constraint_data data, spine_rotate_mode rotateMode) {
     if (data == nullptr) return;
     PathConstraintData *_data = (PathConstraintData*)data;
     _data->setRotateMode((RotateMode)rotateMode);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_path_constraint_data_get_offset_rotation(spine_path_constraint_data data) {
+float spine_path_constraint_data_get_offset_rotation(spine_path_constraint_data data) {
     if (data == nullptr) return 0;
     PathConstraintData *_data = (PathConstraintData*)data;
     return _data->getOffsetRotation();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_path_constraint_data_set_offset_rotation(spine_path_constraint_data data, float offsetRotation) {
+void spine_path_constraint_data_set_offset_rotation(spine_path_constraint_data data, float offsetRotation) {
     if (data == nullptr) return;
     PathConstraintData *_data = (PathConstraintData*)data;
     _data->setOffsetRotation(offsetRotation);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_path_constraint_data_get_position(spine_path_constraint_data data) {
+float spine_path_constraint_data_get_position(spine_path_constraint_data data) {
     if (data == nullptr) return 0;
     PathConstraintData *_data = (PathConstraintData*)data;
     return _data->getPosition();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_path_constraint_data_set_position(spine_path_constraint_data data, float position) {
+void spine_path_constraint_data_set_position(spine_path_constraint_data data, float position) {
     if (data == nullptr) return;
     PathConstraintData *_data = (PathConstraintData*)data;
     _data->setPosition(position);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_path_constraint_data_get_spacing(spine_path_constraint_data data) {
+float spine_path_constraint_data_get_spacing(spine_path_constraint_data data) {
     if (data == nullptr) return 0;
     PathConstraintData *_data = (PathConstraintData*)data;
     return _data->getSpacing();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_path_constraint_data_set_spacing(spine_path_constraint_data data, float spacing) {
+void spine_path_constraint_data_set_spacing(spine_path_constraint_data data, float spacing) {
     if (data == nullptr) return;
     PathConstraintData *_data = (PathConstraintData*)data;
     _data->setSpacing(spacing);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_path_constraint_data_get_mix_rotate(spine_path_constraint_data data) {
+float spine_path_constraint_data_get_mix_rotate(spine_path_constraint_data data) {
     if (data == nullptr) return 0;
     PathConstraintData *_data = (PathConstraintData*)data;
     return _data->getMixRotate();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_path_constraint_data_set_mix_rotate(spine_path_constraint_data data, float mixRotate) {
+void spine_path_constraint_data_set_mix_rotate(spine_path_constraint_data data, float mixRotate) {
     if (data == nullptr) return;
     PathConstraintData *_data = (PathConstraintData*)data;
     _data->setMixRotate(mixRotate);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_path_constraint_data_get_mix_x(spine_path_constraint_data data) {
+float spine_path_constraint_data_get_mix_x(spine_path_constraint_data data) {
     if (data == nullptr) return 0;
     PathConstraintData *_data = (PathConstraintData*)data;
     return _data->getMixX();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_path_constraint_data_set_mix_x(spine_path_constraint_data data, float mixX) {
+void spine_path_constraint_data_set_mix_x(spine_path_constraint_data data, float mixX) {
     if (data == nullptr) return;
     PathConstraintData *_data = (PathConstraintData*)data;
     _data->setMixX(mixX);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_path_constraint_data_get_mix_y(spine_path_constraint_data data) {
+float spine_path_constraint_data_get_mix_y(spine_path_constraint_data data) {
     if (data == nullptr) return 0;
     PathConstraintData *_data = (PathConstraintData*)data;
     return _data->getMixY();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_path_constraint_data_set_mix_y(spine_path_constraint_data data, float mixY) {
+void spine_path_constraint_data_set_mix_y(spine_path_constraint_data data, float mixY) {
     if (data == nullptr) return;
     PathConstraintData *_data = (PathConstraintData*)data;
     _data->setMixY(mixY);
 }
 
 // PathConstraint
-EMSCRIPTEN_KEEPALIVE void spine_path_constraint_update(spine_path_constraint constraint) {
+void spine_path_constraint_update(spine_path_constraint constraint) {
     if (constraint == nullptr) return;
     PathConstraint *_constraint = (PathConstraint*)constraint;
     _constraint->update();
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_path_constraint_get_order(spine_path_constraint constraint) {
+int32_t spine_path_constraint_get_order(spine_path_constraint constraint) {
     if (constraint == nullptr) return 0;
     PathConstraint *_constraint = (PathConstraint*)constraint;
     return _constraint->getOrder();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_path_constraint_data spine_path_constraint_get_data(spine_path_constraint constraint) {
+spine_path_constraint_data spine_path_constraint_get_data(spine_path_constraint constraint) {
     if (constraint == nullptr) return nullptr;
     PathConstraint *_constraint = (PathConstraint*)constraint;
     return (spine_path_constraint_data)&_constraint->getData();
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_path_constraint_get_num_bones(spine_path_constraint constraint) {
+int32_t spine_path_constraint_get_num_bones(spine_path_constraint constraint) {
     if (constraint == nullptr) return 0;
     PathConstraint *_constraint = (PathConstraint*)constraint;
     return (int32_t)_constraint->getBones().size();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_bone* spine_path_constraint_get_bones(spine_path_constraint constraint) {
+spine_bone* spine_path_constraint_get_bones(spine_path_constraint constraint) {
     if (constraint == nullptr) return nullptr;
     PathConstraint *_constraint = (PathConstraint*)constraint;
     return (spine_bone*)_constraint->getBones().buffer();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_slot spine_path_constraint_get_target(spine_path_constraint constraint) {
+spine_slot spine_path_constraint_get_target(spine_path_constraint constraint) {
     if (constraint == nullptr) return nullptr;
     PathConstraint *_constraint = (PathConstraint*)constraint;
     return (spine_slot)_constraint->getTarget();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_path_constraint_set_target(spine_path_constraint constraint, spine_slot target) {
+void spine_path_constraint_set_target(spine_path_constraint constraint, spine_slot target) {
     if (constraint == nullptr) return;
     PathConstraint *_constraint = (PathConstraint*)constraint;
     _constraint->setTarget((Slot*)target);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_path_constraint_get_position(spine_path_constraint constraint) {
+float spine_path_constraint_get_position(spine_path_constraint constraint) {
     if (constraint == nullptr) return 0;
     PathConstraint *_constraint = (PathConstraint*)constraint;
     return _constraint->getPosition();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_path_constraint_set_position(spine_path_constraint constraint, float position) {
+void spine_path_constraint_set_position(spine_path_constraint constraint, float position) {
     if (constraint == nullptr) return;
     PathConstraint *_constraint = (PathConstraint*)constraint;
     _constraint->setPosition(position);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_path_constraint_get_spacing(spine_path_constraint constraint) {
+float spine_path_constraint_get_spacing(spine_path_constraint constraint) {
     if (constraint == nullptr) return 0;
     PathConstraint *_constraint = (PathConstraint*)constraint;
     return _constraint->getSpacing();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_path_constraint_set_spacing(spine_path_constraint constraint, float spacing) {
+void spine_path_constraint_set_spacing(spine_path_constraint constraint, float spacing) {
     if (constraint == nullptr) return;
     PathConstraint *_constraint = (PathConstraint*)constraint;
     _constraint->setSpacing(spacing);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_path_constraint_get_mix_rotate(spine_path_constraint constraint) {
+float spine_path_constraint_get_mix_rotate(spine_path_constraint constraint) {
     if (constraint == nullptr) return 0;
     PathConstraint *_constraint = (PathConstraint*)constraint;
     return _constraint->getMixRotate();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_path_constraint_set_mix_rotate(spine_path_constraint constraint, float mixRotate) {
+void spine_path_constraint_set_mix_rotate(spine_path_constraint constraint, float mixRotate) {
     if (constraint == nullptr) return;
     PathConstraint *_constraint = (PathConstraint*)constraint;
     _constraint->setMixRotate(mixRotate);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_path_constraint_get_mix_x(spine_path_constraint constraint) {
+float spine_path_constraint_get_mix_x(spine_path_constraint constraint) {
     if (constraint == nullptr) return 0;
     PathConstraint *_constraint = (PathConstraint*)constraint;
     return _constraint->getMixX();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_path_constraint_set_mix_x(spine_path_constraint constraint, float mixX) {
+void spine_path_constraint_set_mix_x(spine_path_constraint constraint, float mixX) {
     if (constraint == nullptr) return;
     PathConstraint *_constraint = (PathConstraint*)constraint;
     _constraint->setMixX(mixX);
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_path_constraint_get_mix_y(spine_path_constraint constraint) {
+float spine_path_constraint_get_mix_y(spine_path_constraint constraint) {
     if (constraint == nullptr) return 0;
     PathConstraint *_constraint = (PathConstraint*)constraint;
     return _constraint->getMixY();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_path_constraint_set_mix_y(spine_path_constraint constraint, float mixY) {
+void spine_path_constraint_set_mix_y(spine_path_constraint constraint, float mixY) {
     if (constraint == nullptr) return;
     PathConstraint *_constraint = (PathConstraint*)constraint;
     _constraint->setMixY(mixY);
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_path_constraint_get_is_active(spine_path_constraint constraint) {
+int32_t spine_path_constraint_get_is_active(spine_path_constraint constraint) {
     if (constraint == nullptr) return 0;
     PathConstraint *_constraint = (PathConstraint*)constraint;
     return _constraint->isActive() ? -1 : 0;
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_path_constraint_set_is_active(spine_path_constraint constraint, int32_t isActive) {
+void spine_path_constraint_set_is_active(spine_path_constraint constraint, int32_t isActive) {
     if (constraint == nullptr) return;
     PathConstraint *_constraint = (PathConstraint*)constraint;
     _constraint->setActive(isActive);
 }
 
 // Sequence
-EMSCRIPTEN_KEEPALIVE void spine_sequence_apply(spine_sequence sequence, spine_slot slot, spine_attachment attachment) {
+void spine_sequence_apply(spine_sequence sequence, spine_slot slot, spine_attachment attachment) {
     if (sequence == nullptr) return;
     Sequence *_sequence = (Sequence*)sequence;
     _sequence->apply((Slot*)slot, (Attachment*)attachment);
 }
 
-EMSCRIPTEN_KEEPALIVE const utf8* spine_sequence_get_path(spine_sequence sequence, const utf8 *basePath, int32_t index) {
+const utf8* spine_sequence_get_path(spine_sequence sequence, const utf8 *basePath, int32_t index) {
     if (sequence == nullptr) return nullptr;
     Sequence *_sequence = (Sequence*)sequence;
     return (utf8*)strdup(_sequence->getPath((char*)basePath, index).buffer());
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_sequence_get_id(spine_sequence sequence) {
+int32_t spine_sequence_get_id(spine_sequence sequence) {
     if (sequence == nullptr) return 0;
     Sequence *_sequence = (Sequence *) sequence;
     return _sequence->getId();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_sequence_set_id(spine_sequence sequence, int32_t id) {
+void spine_sequence_set_id(spine_sequence sequence, int32_t id) {
     if (sequence == nullptr) return;
     Sequence *_sequence = (Sequence *) sequence;
     _sequence->setId(id);
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_sequence_get_start(spine_sequence sequence) {
+int32_t spine_sequence_get_start(spine_sequence sequence) {
     if (sequence == nullptr) return 0;
     Sequence *_sequence = (Sequence *) sequence;
     return _sequence->getStart();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_sequence_set_start(spine_sequence sequence, int32_t start) {
+void spine_sequence_set_start(spine_sequence sequence, int32_t start) {
     if (sequence == nullptr) return;
     Sequence *_sequence = (Sequence *) sequence;
     _sequence->setStart(start);
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_sequence_get_digits(spine_sequence sequence) {
+int32_t spine_sequence_get_digits(spine_sequence sequence) {
     if (sequence == nullptr) return 0;
     Sequence *_sequence = (Sequence *) sequence;
     return _sequence->getDigits();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_sequence_set_digits(spine_sequence sequence, int32_t digits) {
+void spine_sequence_set_digits(spine_sequence sequence, int32_t digits) {
     if (sequence == nullptr) return;
     Sequence *_sequence = (Sequence *) sequence;
     _sequence->setDigits(digits);
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_sequence_get_setup_index(spine_sequence sequence) {
+int32_t spine_sequence_get_setup_index(spine_sequence sequence) {
     if (sequence == nullptr) return 0;
     Sequence *_sequence = (Sequence *) sequence;
     return _sequence->getSetupIndex();
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_sequence_set_setup_index(spine_sequence sequence, int32_t setupIndex) {
+void spine_sequence_set_setup_index(spine_sequence sequence, int32_t setupIndex) {
     if (sequence == nullptr) return;
     Sequence *_sequence = (Sequence *) sequence;
     _sequence->setSetupIndex(setupIndex);
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_sequence_get_num_regions(spine_sequence sequence) {
+int32_t spine_sequence_get_num_regions(spine_sequence sequence) {
     if (sequence == nullptr) return 0;
     Sequence *_sequence = (Sequence *) sequence;
     return (int32_t)_sequence->getRegions().size();
 }
 
-EMSCRIPTEN_KEEPALIVE spine_texture_region* spine_sequence_get_regions(spine_sequence sequence) {
+spine_texture_region* spine_sequence_get_regions(spine_sequence sequence) {
     if (sequence == nullptr) return nullptr;
     Sequence *_sequence = (Sequence *) sequence;
     return (spine_texture_region*)_sequence->getRegions().buffer();
 }
 
 // TextureRegion
-EMSCRIPTEN_KEEPALIVE void* spine_texture_region_get_texture(spine_texture_region textureRegion) {
+void* spine_texture_region_get_texture(spine_texture_region textureRegion) {
     if (textureRegion == nullptr) return nullptr;
     TextureRegion *_region = (TextureRegion*)textureRegion;
     return _region->rendererObject;
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_texture_region_set_texture(spine_texture_region textureRegion, void *texture) {
+void spine_texture_region_set_texture(spine_texture_region textureRegion, void *texture) {
     if (textureRegion == nullptr) return;
     TextureRegion *_region = (TextureRegion*)textureRegion;
     _region->rendererObject = texture;
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_texture_region_get_u(spine_texture_region textureRegion) {
+float spine_texture_region_get_u(spine_texture_region textureRegion) {
     if (textureRegion == nullptr) return 0;
     TextureRegion *_region = (TextureRegion*)textureRegion;
     return _region->u;
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_texture_region_set_u(spine_texture_region textureRegion, float u) {
+void spine_texture_region_set_u(spine_texture_region textureRegion, float u) {
     if (textureRegion == nullptr) return;
     TextureRegion *_region = (TextureRegion*)textureRegion;
     _region->u = u;
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_texture_region_get_v(spine_texture_region textureRegion) {
+float spine_texture_region_get_v(spine_texture_region textureRegion) {
     if (textureRegion == nullptr) return 0;
     TextureRegion *_region = (TextureRegion*)textureRegion;
     return _region->v;
 }
-EMSCRIPTEN_KEEPALIVE void spine_texture_region_set_v(spine_texture_region textureRegion, float v) {
+void spine_texture_region_set_v(spine_texture_region textureRegion, float v) {
     if (textureRegion == nullptr) return;
     TextureRegion *_region = (TextureRegion*)textureRegion;
     _region->v = v;
 }
-EMSCRIPTEN_KEEPALIVE float spine_texture_region_get_u2(spine_texture_region textureRegion) {
+float spine_texture_region_get_u2(spine_texture_region textureRegion) {
     if (textureRegion == nullptr) return 0;
     TextureRegion *_region = (TextureRegion*)textureRegion;
     return _region->u2;
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_texture_region_set_u2(spine_texture_region textureRegion, float u2) {
+void spine_texture_region_set_u2(spine_texture_region textureRegion, float u2) {
     if (textureRegion == nullptr) return;
     TextureRegion *_region = (TextureRegion*)textureRegion;
     _region->u2 = u2;
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_texture_region_get_v2(spine_texture_region textureRegion) {
+float spine_texture_region_get_v2(spine_texture_region textureRegion) {
     if (textureRegion == nullptr) return 0;
     TextureRegion *_region = (TextureRegion*)textureRegion;
     return _region->v2;
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_texture_region_set_v2(spine_texture_region textureRegion, float v2) {
+void spine_texture_region_set_v2(spine_texture_region textureRegion, float v2) {
     if (textureRegion == nullptr) return;
     TextureRegion *_region = (TextureRegion*)textureRegion;
     _region->v2 = v2;
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_texture_region_get_degrees(spine_texture_region textureRegion) {
+int32_t spine_texture_region_get_degrees(spine_texture_region textureRegion) {
     if (textureRegion == nullptr) return 0;
     TextureRegion *_region = (TextureRegion*)textureRegion;
     return _region->degrees;
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_texture_region_set_degrees(spine_texture_region textureRegion, int32_t degrees) {
+void spine_texture_region_set_degrees(spine_texture_region textureRegion, int32_t degrees) {
     if (textureRegion == nullptr) return;
     TextureRegion *_region = (TextureRegion*)textureRegion;
     _region->degrees = degrees;
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_texture_region_get_offset_x(spine_texture_region textureRegion) {
+float spine_texture_region_get_offset_x(spine_texture_region textureRegion) {
     if (textureRegion == nullptr) return 0;
     TextureRegion *_region = (TextureRegion*)textureRegion;
     return _region->offsetX;
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_texture_region_set_offset_x(spine_texture_region textureRegion, float offsetX) {
+void spine_texture_region_set_offset_x(spine_texture_region textureRegion, float offsetX) {
     if (textureRegion == nullptr) return;
     TextureRegion *_region = (TextureRegion*)textureRegion;
     _region->offsetX = offsetX;
 }
 
-EMSCRIPTEN_KEEPALIVE float spine_texture_region_get_offset_y(spine_texture_region textureRegion) {
+float spine_texture_region_get_offset_y(spine_texture_region textureRegion) {
     if (textureRegion == nullptr) return 0;
     TextureRegion *_region = (TextureRegion*)textureRegion;
     return _region->offsetY;
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_texture_region_set_offset_y(spine_texture_region textureRegion, float offsetY) {
+void spine_texture_region_set_offset_y(spine_texture_region textureRegion, float offsetY) {
     if (textureRegion == nullptr) return;
     TextureRegion *_region = (TextureRegion*)textureRegion;
     _region->offsetY = offsetY;
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_texture_region_get_width(spine_texture_region textureRegion) {
+int32_t spine_texture_region_get_width(spine_texture_region textureRegion) {
     if (textureRegion == nullptr) return 0;
     TextureRegion *_region = (TextureRegion*)textureRegion;
     return _region->width;
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_texture_region_set_width(spine_texture_region textureRegion, int32_t width) {
+void spine_texture_region_set_width(spine_texture_region textureRegion, int32_t width) {
     if (textureRegion == nullptr) return;
     TextureRegion *_region = (TextureRegion*)textureRegion;
     _region->width = width;
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_texture_region_get_height(spine_texture_region textureRegion) {
+int32_t spine_texture_region_get_height(spine_texture_region textureRegion) {
     if (textureRegion == nullptr) return 0;
     TextureRegion *_region = (TextureRegion*)textureRegion;
     return _region->height;
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_texture_region_set_height(spine_texture_region textureRegion, int32_t height) {
+void spine_texture_region_set_height(spine_texture_region textureRegion, int32_t height) {
     if (textureRegion == nullptr) return;
     TextureRegion *_region = (TextureRegion*)textureRegion;
     _region->height = height;
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_texture_region_get_original_width(spine_texture_region textureRegion) {
+int32_t spine_texture_region_get_original_width(spine_texture_region textureRegion) {
     if (textureRegion == nullptr) return 0;
     TextureRegion *_region = (TextureRegion*)textureRegion;
     return _region->originalWidth;
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_texture_region_set_original_width(spine_texture_region textureRegion, int32_t originalWidth) {
+void spine_texture_region_set_original_width(spine_texture_region textureRegion, int32_t originalWidth) {
     if (textureRegion == nullptr) return;
     TextureRegion *_region = (TextureRegion*)textureRegion;
     _region->originalWidth = originalWidth;
 }
 
-EMSCRIPTEN_KEEPALIVE int32_t spine_texture_region_get_original_height(spine_texture_region textureRegion) {
+int32_t spine_texture_region_get_original_height(spine_texture_region textureRegion) {
     if (textureRegion == nullptr) return 0;
     TextureRegion *_region = (TextureRegion*)textureRegion;
     return _region->originalHeight;
 }
 
-EMSCRIPTEN_KEEPALIVE void spine_texture_region_set_original_height(spine_texture_region textureRegion, int32_t originalHeight) {
+void spine_texture_region_set_original_height(spine_texture_region textureRegion, int32_t originalHeight) {
     if (textureRegion == nullptr) return;
     TextureRegion *_region = (TextureRegion*)textureRegion;
     _region->originalHeight = originalHeight;
