@@ -1,8 +1,8 @@
 import 'package:flutter/services.dart';
 import 'package:inject_js/inject_js.dart' as js;
 import 'package:spine_flutter/ffi_utf8.dart';
-import 'package:web_ffi/web_ffi.dart';
-import 'package:web_ffi/web_ffi_modules.dart';
+import 'web_ffi/web_ffi.dart';
+import 'web_ffi/web_ffi_modules.dart';
 import 'spine_flutter_bindings_generated.dart';
 
 Module? _module;
