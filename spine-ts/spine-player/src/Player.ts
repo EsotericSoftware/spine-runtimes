@@ -1399,7 +1399,7 @@ class AudioManager implements Disposable {
 
 						const audioBuffer = this.audioBufferCache[[this.audioFolderPath, audioPath].join("/")];
 						if (audioBuffer) {
-							this.cacheAudioEvent[`${animation.name}-${event.data.name}`] = {
+							this.cacheAudioEvent[`${animation.name}-${event.data.name}-${event.time}`] = {
 								timeStart: event.time,
 								timeEnd: event.time + audioBuffer.duration,
 								schedulePlay: (fromEvent: boolean) => {
@@ -1429,9 +1429,8 @@ class AudioManager implements Disposable {
 
 		this.player.animationState!.addListener({
 			event: (track, event: Event) => {
-				if (this.audioCtx?.state === 'running' && event.data.audioPath) {
-					const playAudio = this.cacheAudioEvent[`${track.animation?.name}-${event.data.name}`];
-					if (playAudio) playAudio.schedulePlay(true);
+				if (this.audioCtx?.state === 'running') {
+					this.playCachedAudio(track.animation!.name, event, true);
 				}
 			}
 		})
@@ -1443,10 +1442,7 @@ class AudioManager implements Disposable {
 				if ('events' in timeline) {
 					const events: Event[] = [];
 					(timeline as EventTimeline).apply(this.player.skeleton!, -1, this.player.getPlayTime, events, 1, MixBlend.setup, MixDirection.mixIn);
-					events.forEach((event) => {
-						const playAudio = this.cacheAudioEvent[`${trackentry.animation?.name}-${event.data.name}`];
-						if (playAudio) playAudio.schedulePlay(false);
-					})
+					events.forEach((event) => this.playCachedAudio(trackentry.animation!.name, event, false));
 				}
 			})
 		})
@@ -1459,6 +1455,11 @@ class AudioManager implements Disposable {
 			this.audioScheduled.delete(element);
 		})
 		this.scheduleAudio();
+	}
+
+	private playCachedAudio(animationName: string, event: Event, fromEvent: boolean) {
+		const playAudio = this.cacheAudioEvent[`${animationName}-${event.data.name}-${event.time}`];
+		if (playAudio) playAudio.schedulePlay(fromEvent);
 	}
 
 	private addGainNode(volume: number, nodes: AudioNode[]) {
