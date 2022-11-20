@@ -5,7 +5,6 @@ import 'package:web_ffi/web_ffi.dart';
 import 'package:web_ffi/web_ffi_modules.dart';
 import 'spine_flutter_bindings_generated.dart';
 
-const String _basePath = 'packages/spine_flutter/assets';
 Module? _module;
 
 class SpineFlutterFFI {
@@ -62,9 +61,8 @@ Future<SpineFlutterFFI> initSpineFlutterFFI() async {
     registerOpaqueType<spine_skin_entry_wrapper>();
     registerOpaqueType<spine_skin_entries_wrapper>();
 
-    await js.importLibrary('$_basePath/libspine_flutter.js');
-    String path = '../packages/spine_flutter/assets/libspine_flutter.wasm';
-    Uint8List wasmBinaries = (await rootBundle.load(path)).buffer.asUint8List();
+    await js.importLibrary('assets/packages/spine_flutter/lib/assets/libspine_flutter.js');
+    Uint8List wasmBinaries = (await rootBundle.load('packages/spine_flutter/lib/assets/libspine_flutter.wasm')).buffer.asUint8List();
     _module = await EmscriptenModule.compile(wasmBinaries, 'libspine_flutter');
   }
   Module? m = _module;
