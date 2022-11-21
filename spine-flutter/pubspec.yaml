@@ -3,6 +3,8 @@ description: The official Spine Flutter Runtime to load, display and interact wi
 version: 0.0.1
 homepage: https://esotericsoftware.com
 repository: https://github.com/esotericsoftware/spine-runtimes
+issue_tracker: https://github.com/esotericsoftware/spine-runtimes/issues
+documentation: https://esotericsoftware.com/spine-flutter
 
 environment:
   sdk: ">=2.17.6 <3.0.0"
@@ -38,6 +40,7 @@ flutter:
         ffiPlugin: true
       windows:
         ffiPlugin: true
+      web:
 
   assets:
     - lib/assets/libspine_flutter.js
