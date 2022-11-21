@@ -104,7 +104,8 @@ typedef struct _spine_skin_entries {
 static Color NULL_COLOR(0, 0, 0, 0);
 
 spine::SpineExtension *spine::getDefaultExtension() {
-   return new spine::DebugExtension(new spine::DefaultSpineExtension());
+   // return new spine::DebugExtension(new spine::DefaultSpineExtension());
+   return new spine::DefaultSpineExtension();
 }
 
 int32_t spine_major_version() {
@@ -116,7 +117,7 @@ int32_t spine_minor_version() {
 }
 
 void spine_report_leaks() {
-    ((DebugExtension*)spine::SpineExtension::getInstance())->reportLeaks();
+    // ((DebugExtension*)spine::SpineExtension::getInstance())->reportLeaks();
 }
 
 // Color
