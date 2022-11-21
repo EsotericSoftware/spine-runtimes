@@ -1,22 +1,22 @@
 PODS:
-  - FlutterMacOS (1.0.0)
-  - spine_flutter (0.0.1):
+  - esotericsoftware_spine_flutter (0.0.1):
     - FlutterMacOS
+  - FlutterMacOS (1.0.0)
 
 DEPENDENCIES:
+  - esotericsoftware_spine_flutter (from `Flutter/ephemeral/.symlinks/plugins/esotericsoftware_spine_flutter/macos`)
   - FlutterMacOS (from `Flutter/ephemeral`)
-  - spine_flutter (from `Flutter/ephemeral/.symlinks/plugins/spine_flutter/macos`)
 
 EXTERNAL SOURCES:
+  esotericsoftware_spine_flutter:
+    :path: Flutter/ephemeral/.symlinks/plugins/esotericsoftware_spine_flutter/macos
   FlutterMacOS:
     :path: Flutter/ephemeral
-  spine_flutter:
-    :path: Flutter/ephemeral/.symlinks/plugins/spine_flutter/macos
 
 SPEC CHECKSUMS:
+  esotericsoftware_spine_flutter: 9222ab83a8f5635976f03740fa1eb809809f2b4a
   FlutterMacOS: ae6af50a8ea7d6103d888583d46bd8328a7e9811
-  spine_flutter: 931c60737aba4b37f80892ebc67d3acf53932912
 
-PODFILE CHECKSUM: a884f6dd3f7494f3892ee6c81feea3a3abbf9153
+PODFILE CHECKSUM: 6eac6b3292e5142cfc23bdeb71848a40ec51c14c
 
 COCOAPODS: 1.11.3

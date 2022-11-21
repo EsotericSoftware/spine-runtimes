@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:spine_flutter/spine_flutter.dart';
+import 'package:esotericsoftware_spine_flutter/spine_flutter.dart';
 
 class Skins extends StatefulWidget {
   const Skins({Key? key}) : super(key: key);

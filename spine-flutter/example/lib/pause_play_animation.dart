@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:spine_flutter/spine_flutter.dart';
+import 'package:esotericsoftware_spine_flutter/spine_flutter.dart';
 
 class PlayPauseAnimation extends StatefulWidget {
   const PlayPauseAnimation({Key? key}) : super(key: key);

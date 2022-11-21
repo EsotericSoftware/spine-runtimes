@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:ffi';
 import 'package:ffi/ffi.dart';
 
-const String _libName = 'spine_flutter';
+const String _libName = 'esotericsoftware_spine_flutter';
 final DynamicLibrary _dylib = () {
   if (Platform.isMacOS || Platform.isIOS) {
     return DynamicLibrary.open('$_libName.framework/$_libName');
