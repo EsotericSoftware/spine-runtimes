@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/rendering.dart' as rendering;
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 import 'spine_flutter.dart';
@@ -135,6 +136,7 @@ class ComputedBounds extends BoundsProvider {
 
 class SpineWidget extends StatefulWidget {
   final AssetType _assetType;
+  AssetBundle? _bundle;
   final String? _skeletonFile;
   final String? _atlasFile;
   final SkeletonDrawable? _drawable;
@@ -144,32 +146,37 @@ class SpineWidget extends StatefulWidget {
   final BoundsProvider _boundsProvider;
   final bool _sizedByBounds;
 
-  const SpineWidget.asset(this._skeletonFile, this._atlasFile, this._controller, {BoxFit? fit, Alignment? alignment, BoundsProvider? boundsProvider, bool? sizedByBounds, super.key})
+  SpineWidget.asset(this._skeletonFile, this._atlasFile, this._controller, {AssetBundle? bundle, BoxFit? fit, Alignment? alignment, BoundsProvider? boundsProvider, bool? sizedByBounds, super.key})
       : _assetType = AssetType.Asset,
         _fit = fit ?? BoxFit.contain,
         _alignment = alignment ?? Alignment.center,
         _boundsProvider = boundsProvider ?? const SetupPoseBounds(),
         _sizedByBounds = sizedByBounds ?? false,
-        _drawable = null;
+        _drawable = null {
+    _bundle = bundle ?? rootBundle;
+  }
 
-  const SpineWidget.file(this._skeletonFile, this._atlasFile, this._controller, {BoxFit? fit, Alignment? alignment, BoundsProvider? boundsProvider, bool? sizedByBounds, super.key})
+  SpineWidget.file(this._skeletonFile, this._atlasFile, this._controller, {BoxFit? fit, Alignment? alignment, BoundsProvider? boundsProvider, bool? sizedByBounds, super.key})
       : _assetType = AssetType.File,
+        _bundle = null,
         _fit = fit ?? BoxFit.contain,
         _alignment = alignment ?? Alignment.center,
         _boundsProvider = boundsProvider ?? const SetupPoseBounds(),
         _sizedByBounds = sizedByBounds ?? false,
         _drawable = null;
 
-  const SpineWidget.http(this._skeletonFile, this._atlasFile, this._controller, {BoxFit? fit, Alignment? alignment, BoundsProvider? boundsProvider, bool? sizedByBounds, super.key})
+  SpineWidget.http(this._skeletonFile, this._atlasFile, this._controller, {BoxFit? fit, Alignment? alignment, BoundsProvider? boundsProvider, bool? sizedByBounds, super.key})
       : _assetType = AssetType.Http,
+        _bundle = null,
         _fit = fit ?? BoxFit.contain,
         _alignment = alignment ?? Alignment.center,
         _boundsProvider = boundsProvider ?? const SetupPoseBounds(),
         _sizedByBounds = sizedByBounds ?? false,
         _drawable = null;
 
-  const SpineWidget.drawable(this._drawable, this._controller, {BoxFit? fit, Alignment? alignment, BoundsProvider? boundsProvider, bool? sizedByBounds, super.key})
+  SpineWidget.drawable(this._drawable, this._controller, {BoxFit? fit, Alignment? alignment, BoundsProvider? boundsProvider, bool? sizedByBounds, super.key})
       : _assetType = AssetType.Drawable,
+        _bundle = null,
         _fit = fit ?? BoxFit.contain,
         _alignment = alignment ?? Alignment.center,
         _boundsProvider = boundsProvider ?? const SetupPoseBounds(),
@@ -189,26 +196,25 @@ class _SpineWidgetState extends State<SpineWidget> {
     if (widget._assetType == AssetType.Drawable) {
       loadDrawable(widget._drawable!);
     } else {
-      loadFromAsset(widget._skeletonFile!, widget._atlasFile!, widget._assetType);
+      loadFromAsset(widget._bundle, widget._skeletonFile!, widget._atlasFile!, widget._assetType);
     }
   }
 
   void loadDrawable(SkeletonDrawable drawable) {
     widget._controller._initialize(drawable);
-    drawable.update(0);
     setState(() {});
   }
 
-  void loadFromAsset(String skeletonFile, String atlasFile, AssetType assetType) async {
+  void loadFromAsset(AssetBundle? bundle, String atlasFile, String skeletonFile, AssetType assetType) async {
     switch (assetType) {
       case AssetType.Asset:
-        loadDrawable(await SkeletonDrawable.fromAsset(skeletonFile, atlasFile));
+        loadDrawable(await SkeletonDrawable.fromAsset(atlasFile, skeletonFile, bundle: bundle));
         break;
       case AssetType.File:
-        loadDrawable(await SkeletonDrawable.fromFile(skeletonFile, atlasFile));
+        loadDrawable(await SkeletonDrawable.fromFile(atlasFile, skeletonFile));
         break;
       case AssetType.Http:
-        loadDrawable(await SkeletonDrawable.fromHttp(skeletonFile, atlasFile));
+        loadDrawable(await SkeletonDrawable.fromHttp(atlasFile, skeletonFile));
         break;
       case AssetType.Drawable:
         throw Exception("Drawable can not be loaded via loadFromAsset().");

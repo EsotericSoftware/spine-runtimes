@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart' as painting;
 import 'package:esotericsoftware_spine_flutter/spine_flutter.dart';
+import 'package:flutter/services.dart';
 import 'package:raw_image_provider/raw_image_provider.dart';
 
 class DressUp extends StatefulWidget {
@@ -25,7 +26,7 @@ class DressUpState extends State<DressUp> {
   void initState() {
     reportLeaks();
     super.initState();
-    SkeletonDrawable.fromAsset("assets/mix-and-match-pro.skel", "assets/mix-and-match.atlas").then((drawable) async {
+    SkeletonDrawable.fromAsset("assets/mix-and-match.atlas", "assets/mix-and-match-pro.skel").then((drawable) async {
       for (var skin in drawable.skeletonData.getSkins()) {
         if (skin.getName() == "default") continue;
 

@@ -50,11 +50,11 @@ class Bounds {
   Bounds(this.x, this.y, this.width, this.height);
 }
 
-class Vector2 {
+class Vec2 {
   double x;
   double y;
 
-  Vector2(this.x, this.y);
+  Vec2(this.x, this.y);
 }
 
 class Atlas {
@@ -99,8 +99,9 @@ class Atlas {
     return Atlas._(atlas, atlasPages, atlasPagePaints);
   }
 
-  static Future<Atlas> fromAsset(AssetBundle assetBundle, String atlasFileName) async {
-    return _load(atlasFileName, (file) async => (await assetBundle.load(file)).buffer.asUint8List());
+  static Future<Atlas> fromAsset(String atlasFileName, {AssetBundle? bundle}) async {
+    bundle ??= rootBundle;
+    return _load(atlasFileName, (file) async => (await bundle!.load(file)).buffer.asUint8List());
   }
 
   static Future<Atlas> fromFile(String atlasFileName) async {
@@ -160,11 +161,12 @@ class SkeletonData {
     return data;
   }
 
-  static Future<SkeletonData> fromAsset(AssetBundle assetBundle, Atlas atlas, String skeletonFile) async {
+  static Future<SkeletonData> fromAsset(Atlas atlas, String skeletonFile, {AssetBundle? bundle}) async {
+    bundle ??= rootBundle;
     if (skeletonFile.endsWith(".json")) {
-      return fromJson(atlas, await assetBundle.loadString(skeletonFile));
+      return fromJson(atlas, await bundle.loadString(skeletonFile));
     } else {
-      return fromBinary(atlas, (await assetBundle.load(skeletonFile)).buffer.asUint8List());
+      return fromBinary(atlas, (await bundle.load(skeletonFile)).buffer.asUint8List());
     }
   }
 
@@ -652,16 +654,16 @@ class Bone {
     _bindings.spine_bone_set_to_setup_pose(_bone);
   }
 
-  Vector2 worldToLocal(double worldX, double worldY) {
+  Vec2 worldToLocal(double worldX, double worldY) {
     final local = _bindings.spine_bone_world_to_local(_bone, worldX, worldY);
-    final result = Vector2(_bindings.spine_vector_get_x(local), _bindings.spine_vector_get_y(local));
+    final result = Vec2(_bindings.spine_vector_get_x(local), _bindings.spine_vector_get_y(local));
     _allocator.free(local);
     return result;
   }
 
-  Vector2 localToWorld(double localX, double localY) {
+  Vec2 localToWorld(double localX, double localY) {
     final world = _bindings.spine_bone_local_to_world(_bone, localX, localY);
-    final result = Vector2(_bindings.spine_vector_get_x(world), _bindings.spine_vector_get_y(world));
+    final result = Vec2(_bindings.spine_vector_get_x(world), _bindings.spine_vector_get_y(world));
     _allocator.free(world);
     return result;
   }
@@ -1593,9 +1595,9 @@ class PathAttachment extends VertexAttachment<spine_path_attachment> {
 class PointAttachment extends Attachment<spine_point_attachment> {
   PointAttachment._(spine_point_attachment attachment) : super._(attachment);
 
-  Vector2 computeWorldPosition(Bone bone) {
+  Vec2 computeWorldPosition(Bone bone) {
     final position = _bindings.spine_point_attachment_compute_world_position(_attachment, bone._bone);
-    final result = Vector2(_bindings.spine_vector_get_x(position), _bindings.spine_vector_get_y(position));
+    final result = Vec2(_bindings.spine_vector_get_x(position), _bindings.spine_vector_get_y(position));
     _allocator.free(position);
     return result;
   }
@@ -3256,21 +3258,23 @@ class SkeletonDrawable {
     skeleton = Skeleton._(_bindings.spine_skeleton_drawable_get_skeleton(_drawable));
     animationStateData = AnimationStateData._(_bindings.spine_skeleton_drawable_get_animation_state_data(_drawable));
     animationState = AnimationState._(_bindings.spine_skeleton_drawable_get_animation_state(_drawable), _bindings.spine_skeleton_drawable_get_animation_state_events(_drawable));
+    skeleton.updateWorldTransform();
   }
 
-  static Future<SkeletonDrawable> fromAsset(String skeletonFile, String atlasFile) async {
-    var atlas = await Atlas.fromAsset(rootBundle, atlasFile);
-    var skeletonData = await SkeletonData.fromAsset(rootBundle, atlas, skeletonFile);
+  static Future<SkeletonDrawable> fromAsset(String atlasFile, String skeletonFile, {AssetBundle? bundle}) async {
+    bundle ??= rootBundle;
+    var atlas = await Atlas.fromAsset(atlasFile, bundle: bundle);
+    var skeletonData = await SkeletonData.fromAsset(atlas, skeletonFile, bundle: bundle);
     return SkeletonDrawable(atlas, skeletonData, true);
   }
 
-  static Future<SkeletonDrawable> fromFile(String skeletonFile, String atlasFile) async {
+  static Future<SkeletonDrawable> fromFile(String atlasFile, String skeletonFile) async {
     var atlas = await Atlas.fromFile(atlasFile);
     var skeletonData = await SkeletonData.fromFile(atlas, skeletonFile);
     return SkeletonDrawable(atlas, skeletonData, true);
   }
 
-  static Future<SkeletonDrawable> fromHttp(String skeletonFile, String atlasFile) async {
+  static Future<SkeletonDrawable> fromHttp(String atlasFile, String skeletonFile) async {
     var atlas = await Atlas.fromUrl(atlasFile);
     var skeletonData = await SkeletonData.fromHttp(atlas, skeletonFile);
     return SkeletonDrawable(atlas, skeletonData, true);

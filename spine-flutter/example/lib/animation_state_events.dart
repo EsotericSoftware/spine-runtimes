@@ -36,7 +36,7 @@ class AnimationStateEvents extends StatelessWidget {
         children: [
           const Text("See output in console!"),
           Expanded(
-              child: SpineWidget.asset("assets/spineboy-pro.skel", "assets/spineboy.atlas", controller)
+              child: SpineWidget.asset("assets/spineboy.atlas", "assets/spineboy-pro.skel", controller)
           )
         ]
       )

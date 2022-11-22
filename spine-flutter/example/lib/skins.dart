@@ -17,7 +17,7 @@ class SkinsState extends State<Skins> {
   @override
   void initState() {
     super.initState();
-    SkeletonDrawable.fromAsset("assets/mix-and-match-pro.skel", "assets/mix-and-match.atlas").then((drawable) {
+    SkeletonDrawable.fromAsset("assets/mix-and-match.atlas", "assets/mix-and-match-pro.skel").then((drawable) {
       for (var skin in drawable.skeletonData.getSkins()) {
         _selectedSkins[skin.getName()] = false;
       }

@@ -33,7 +33,7 @@ class PlayPauseAnimationState extends State<PlayPauseAnimation> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Play/Pause')),
-      body: SpineWidget.asset("assets/spineboy-pro.skel", "assets/spineboy.atlas", controller),
+      body: SpineWidget.asset("assets/spineboy.atlas", "assets/spineboy-pro.skel", controller),
       floatingActionButton: FloatingActionButton(
         onPressed: _togglePlay,
         child: Icon(isPlaying ? Icons.pause : Icons.play_arrow),

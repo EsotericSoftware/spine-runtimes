@@ -25,7 +25,7 @@ class IkFollowingState extends State<IkFollowing> {
       if (worldPosition == null) return;
       var bone = controller.skeleton.findBone("crosshair");
       if (bone == null) return;
-      var position = bone.getParent()?.worldToLocal(worldPosition.dx, worldPosition.dy) ?? Vector2(0, 0);
+      var position = bone.getParent()?.worldToLocal(worldPosition.dx, worldPosition.dy) ?? Vec2(0, 0);
       bone.setX(position.x);
       bone.setY(position.y);
     });
@@ -44,7 +44,7 @@ class IkFollowingState extends State<IkFollowing> {
         body: GestureDetector(
           onPanDown: (drag) => _updateBonePosition(drag.localPosition),
           onPanUpdate: (drag) => _updateBonePosition(drag.localPosition),
-          child: SpineWidget.asset("assets/spineboy-pro.skel", "assets/spineboy.atlas", controller),
+          child: SpineWidget.asset("assets/spineboy.atlas", "assets/spineboy-pro.skel", controller),
         ));
   }
 }

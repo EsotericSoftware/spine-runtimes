@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:esotericsoftware_spine_flutter/spine_flutter.dart';
 
+import 'flame_example.dart';
 import 'simple_animation.dart';
 import 'animation_state_events.dart';
 import 'pause_play_animation.dart';
 import 'skins.dart';
 import 'dress_up.dart';
 import 'ik_following.dart';
-import 'package:esotericsoftware_spine_flutter/spine_flutter.dart';
 
 class ExampleSelector extends StatelessWidget {
   const ExampleSelector({super.key});
@@ -87,6 +88,30 @@ class ExampleSelector extends StatelessWidget {
                     context,
                     MaterialPageRoute<void>(
                       builder: (context) => const IkFollowing(),
+                    ),
+                  );
+                },
+              ),
+              spacer,
+              ElevatedButton(
+                child: const Text('Flame: Simple Example'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (context) => SpineFlameGameWidget(SimpleFlameExample()),
+                    ),
+                  );
+                },
+              ),
+              spacer,
+              ElevatedButton(
+                child: const Text('Flame: Pre-load and share Spine data'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (context) => SpineFlameGameWidget(PreloadAndShareSpineDataExample()),
                     ),
                   );
                 },
