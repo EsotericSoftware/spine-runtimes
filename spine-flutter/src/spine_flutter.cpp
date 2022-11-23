@@ -179,8 +179,8 @@ float spine_vector_get_y(spine_vector vector) {
 
 spine_atlas spine_atlas_load(const utf8 *atlasData) {
 	if (!atlasData) return nullptr;
-	int32_t length = (int32_t) strlen((char *) atlasData);
-	auto atlas = new (__FILE__, __LINE__) Atlas((char *) atlasData, length, "", (TextureLoader *) nullptr, false);
+	int32_t length = (int32_t) strlen(atlasData);
+	auto atlas = new (__FILE__, __LINE__) Atlas(atlasData, length, "", (TextureLoader *) nullptr, false);
 	_spine_atlas *result = SpineExtension::calloc<_spine_atlas>(1, __FILE__, __LINE__);
 	result->atlas = atlas;
 	result->numImagePaths = (int32_t) atlas->getPages().size();
@@ -228,7 +228,7 @@ spine_skeleton_data_result spine_skeleton_data_load_json(spine_atlas atlas, cons
 	if (!_atlas->atlas) return (spine_skeleton_data_result) result;
 	if (!skeletonData) return (spine_skeleton_data_result) result;
 	SkeletonJson json((Atlas *) _atlas->atlas);
-	SkeletonData *data = json.readSkeletonData((char *) skeletonData);
+	SkeletonData *data = json.readSkeletonData(skeletonData);
 	result->skeletonData = (spine_skeleton_data) data;
 	if (!json.getError().isEmpty()) {
 		result->error = (utf8 *) strdup(json.getError().buffer());
@@ -272,49 +272,49 @@ void spine_skeleton_data_result_dispose(spine_skeleton_data_result result) {
 spine_bone_data spine_skeleton_data_find_bone(spine_skeleton_data data, const utf8 *name) {
 	if (data == nullptr) return nullptr;
 	SkeletonData *_data = (SkeletonData *) data;
-	return (spine_bone_data) _data->findBone((char *) name);
+	return (spine_bone_data) _data->findBone(name);
 }
 
 spine_slot_data spine_skeleton_data_find_slot(spine_skeleton_data data, const utf8 *name) {
 	if (data == nullptr) return nullptr;
 	SkeletonData *_data = (SkeletonData *) data;
-	return (spine_slot_data) _data->findSlot((char *) name);
+	return (spine_slot_data) _data->findSlot(name);
 }
 
 spine_skin spine_skeleton_data_find_skin(spine_skeleton_data data, const utf8 *name) {
 	if (data == nullptr) return nullptr;
 	SkeletonData *_data = (SkeletonData *) data;
-	return (spine_skin) _data->findSkin((char *) name);
+	return (spine_skin) _data->findSkin(name);
 }
 
 spine_event_data spine_skeleton_data_find_event(spine_skeleton_data data, const utf8 *name) {
 	if (data == nullptr) return nullptr;
 	SkeletonData *_data = (SkeletonData *) data;
-	return (spine_event_data) _data->findEvent((char *) name);
+	return (spine_event_data) _data->findEvent(name);
 }
 
 spine_animation spine_skeleton_data_find_animation(spine_skeleton_data data, const utf8 *name) {
 	if (data == nullptr) return nullptr;
 	SkeletonData *_data = (SkeletonData *) data;
-	return (spine_animation) _data->findAnimation((char *) name);
+	return (spine_animation) _data->findAnimation(name);
 }
 
 spine_ik_constraint_data spine_skeleton_data_find_ik_constraint(spine_skeleton_data data, const utf8 *name) {
 	if (data == nullptr) return nullptr;
 	SkeletonData *_data = (SkeletonData *) data;
-	return (spine_ik_constraint_data) _data->findIkConstraint((char *) name);
+	return (spine_ik_constraint_data) _data->findIkConstraint(name);
 }
 
 spine_transform_constraint_data spine_skeleton_data_find_transform_constraint(spine_skeleton_data data, const utf8 *name) {
 	if (data == nullptr) return nullptr;
 	SkeletonData *_data = (SkeletonData *) data;
-	return (spine_transform_constraint_data) _data->findTransformConstraint((char *) name);
+	return (spine_transform_constraint_data) _data->findTransformConstraint(name);
 }
 
 spine_path_constraint_data spine_skeleton_data_find_path_constraint(spine_skeleton_data data, const utf8 *name) {
 	if (data == nullptr) return nullptr;
 	SkeletonData *_data = (SkeletonData *) data;
-	return (spine_path_constraint_data) _data->findPathConstraint((char *) name);
+	return (spine_path_constraint_data) _data->findPathConstraint(name);
 }
 
 const utf8 *spine_skeleton_data_get_name(spine_skeleton_data data) {
@@ -809,14 +809,14 @@ void spine_animation_state_data_set_mix_by_name(spine_animation_state_data state
 	if (stateData == nullptr) return;
 	if (fromName == nullptr || toName == nullptr) return;
 	AnimationStateData *_stateData = (AnimationStateData *) stateData;
-	_stateData->setMix((char *) fromName, (char *) toName, duration);
+	_stateData->setMix(fromName, toName, duration);
 }
 
 float spine_animation_state_data_get_mix_by_name(spine_animation_state_data stateData, const utf8 *fromName, const utf8 *toName) {
 	if (stateData == nullptr) return 0;
 	AnimationStateData *_stateData = (AnimationStateData *) stateData;
-	Animation *from = _stateData->getSkeletonData()->findAnimation((char *) fromName);
-	Animation *to = _stateData->getSkeletonData()->findAnimation((char *) toName);
+	Animation *from = _stateData->getSkeletonData()->findAnimation(fromName);
+	Animation *to = _stateData->getSkeletonData()->findAnimation(toName);
 	if (from == nullptr || to == nullptr) return 0;
 	return _stateData->getMix(from, to);
 }
@@ -868,7 +868,7 @@ void spine_animation_state_clear_track(spine_animation_state state, int32_t trac
 spine_track_entry spine_animation_state_set_animation_by_name(spine_animation_state state, int32_t trackIndex, const utf8 *animationName, int32_t loop) {
 	if (state == nullptr) return nullptr;
 	AnimationState *_state = (AnimationState *) state;
-	return (spine_track_entry) _state->setAnimation(trackIndex, (char *) animationName, loop);
+	return (spine_track_entry) _state->setAnimation(trackIndex, animationName, loop);
 }
 
 spine_track_entry spine_animation_state_set_animation(spine_animation_state state, int32_t trackIndex, spine_animation animation, int32_t loop) {
@@ -880,7 +880,7 @@ spine_track_entry spine_animation_state_set_animation(spine_animation_state stat
 spine_track_entry spine_animation_state_add_animation_by_name(spine_animation_state state, int32_t trackIndex, const utf8 *animationName, int32_t loop, float delay) {
 	if (state == nullptr) return nullptr;
 	AnimationState *_state = (AnimationState *) state;
-	return (spine_track_entry) _state->addAnimation(trackIndex, (char *) animationName, loop, delay);
+	return (spine_track_entry) _state->addAnimation(trackIndex, animationName, loop, delay);
 }
 
 spine_track_entry spine_animation_state_add_animation(spine_animation_state state, int32_t trackIndex, spine_animation animation, int32_t loop, float delay) {
@@ -1286,19 +1286,19 @@ void spine_skeleton_set_slots_to_setup_pose(spine_skeleton skeleton) {
 spine_bone spine_skeleton_find_bone(spine_skeleton skeleton, const utf8 *boneName) {
 	if (skeleton == nullptr) return nullptr;
 	Skeleton *_skeleton = (Skeleton *) skeleton;
-	return (spine_bone) _skeleton->findBone((char *) boneName);
+	return (spine_bone) _skeleton->findBone(boneName);
 }
 
 spine_slot spine_skeleton_find_slot(spine_skeleton skeleton, const utf8 *slotName) {
 	if (skeleton == nullptr) return nullptr;
 	Skeleton *_skeleton = (Skeleton *) skeleton;
-	return (spine_slot) _skeleton->findSlot((char *) slotName);
+	return (spine_slot) _skeleton->findSlot(slotName);
 }
 
 void spine_skeleton_set_skin_by_name(spine_skeleton skeleton, const utf8 *skinName) {
 	if (skeleton == nullptr) return;
 	Skeleton *_skeleton = (Skeleton *) skeleton;
-	_skeleton->setSkin((char *) skinName);
+	_skeleton->setSkin(skinName);
 }
 
 void spine_skeleton_set_skin(spine_skeleton skeleton, spine_skin skin) {
@@ -1311,37 +1311,37 @@ void spine_skeleton_set_skin(spine_skeleton skeleton, spine_skin skin) {
 spine_attachment spine_skeleton_get_attachment_by_name(spine_skeleton skeleton, const utf8 *slotName, const utf8 *attachmentName) {
 	if (skeleton == nullptr) return nullptr;
 	Skeleton *_skeleton = (Skeleton *) skeleton;
-	return (spine_attachment) _skeleton->getAttachment((char *) slotName, (char *) attachmentName);
+	return (spine_attachment) _skeleton->getAttachment(slotName, attachmentName);
 }
 
 spine_attachment spine_skeleton_get_attachment(spine_skeleton skeleton, int32_t slotIndex, const utf8 *attachmentName) {
 	if (skeleton == nullptr) return nullptr;
 	Skeleton *_skeleton = (Skeleton *) skeleton;
-	return (spine_attachment) _skeleton->getAttachment(slotIndex, (char *) attachmentName);
+	return (spine_attachment) _skeleton->getAttachment(slotIndex, attachmentName);
 }
 
 void spine_skeleton_set_attachment(spine_skeleton skeleton, const utf8 *slotName, const utf8 *attachmentName) {
 	if (skeleton == nullptr) return;
 	Skeleton *_skeleton = (Skeleton *) skeleton;
-	return _skeleton->setAttachment((char *) slotName, (char *) attachmentName);
+	return _skeleton->setAttachment(slotName, attachmentName);
 }
 
 spine_ik_constraint spine_skeleton_find_ik_constraint(spine_skeleton skeleton, const utf8 *constraintName) {
 	if (skeleton == nullptr) return nullptr;
 	Skeleton *_skeleton = (Skeleton *) skeleton;
-	return (spine_ik_constraint) _skeleton->findIkConstraint((char *) constraintName);
+	return (spine_ik_constraint) _skeleton->findIkConstraint(constraintName);
 }
 
 spine_transform_constraint spine_skeleton_find_transform_constraint(spine_skeleton skeleton, const utf8 *constraintName) {
 	if (skeleton == nullptr) return nullptr;
 	Skeleton *_skeleton = (Skeleton *) skeleton;
-	return (spine_transform_constraint) _skeleton->findTransformConstraint((char *) constraintName);
+	return (spine_transform_constraint) _skeleton->findTransformConstraint(constraintName);
 }
 
 spine_path_constraint spine_skeleton_find_path_constraint(spine_skeleton skeleton, const utf8 *constraintName) {
 	if (skeleton == nullptr) return nullptr;
 	Skeleton *_skeleton = (Skeleton *) skeleton;
-	return (spine_path_constraint) _skeleton->findPathConstraint((char *) constraintName);
+	return (spine_path_constraint) _skeleton->findPathConstraint(constraintName);
 }
 
 spine_bounds spine_skeleton_get_bounds(spine_skeleton skeleton) {
@@ -1550,7 +1550,7 @@ const utf8 *spine_event_data_get_string_value(spine_event_data event) {
 void spine_event_data_set_string_value(spine_event_data event, const utf8 *value) {
 	if (event == nullptr) return;
 	EventData *_event = (EventData *) event;
-	_event->setStringValue((char *) value);
+	_event->setStringValue(value);
 }
 
 const utf8 *spine_event_data_get_audio_path(spine_event_data event) {
@@ -1630,7 +1630,7 @@ const utf8 *spine_event_get_string_value(spine_event event) {
 void spine_event_set_string_value(spine_event event, const utf8 *value) {
 	if (event == nullptr) return;
 	Event *_event = (Event *) event;
-	_event->setStringValue((char *) value);
+	_event->setStringValue(value);
 }
 
 float spine_event_get_volume(spine_event event) {
@@ -1721,7 +1721,7 @@ const utf8 *spine_slot_data_get_attachment_name(spine_slot_data slot) {
 void spine_slot_data_set_attachment_name(spine_slot_data slot, const utf8 *attachmentName) {
 	if (slot == nullptr) return;
 	SlotData *_slot = (SlotData *) slot;
-	_slot->setAttachmentName((char *) attachmentName);
+	_slot->setAttachmentName(attachmentName);
 }
 
 spine_blend_mode spine_slot_data_get_blend_mode(spine_slot_data slot) {
@@ -2872,19 +2872,19 @@ void spine_path_attachment_set_color(spine_path_attachment attachment, float r, 
 void spine_skin_set_attachment(spine_skin skin, int32_t slotIndex, const utf8 *name, spine_attachment attachment) {
 	if (skin == nullptr) return;
 	Skin *_skin = (Skin *) skin;
-	_skin->setAttachment(slotIndex, (char *) name, (Attachment *) attachment);
+	_skin->setAttachment(slotIndex, name, (Attachment *) attachment);
 }
 
 spine_attachment spine_skin_get_attachment(spine_skin skin, int32_t slotIndex, const utf8 *name) {
 	if (skin == nullptr) return nullptr;
 	Skin *_skin = (Skin *) skin;
-	return (spine_attachment) _skin->getAttachment(slotIndex, (char *) name);
+	return (spine_attachment) _skin->getAttachment(slotIndex, name);
 }
 
 void spine_skin_remove_attachment(spine_skin skin, int32_t slotIndex, const utf8 *name) {
 	if (skin == nullptr) return;
 	Skin *_skin = (Skin *) skin;
-	_skin->removeAttachment(slotIndex, (char *) name);
+	_skin->removeAttachment(slotIndex, name);
 }
 
 const utf8 *spine_skin_get_name(spine_skin skin) {
@@ -2984,7 +2984,7 @@ spine_constraint_data *spine_skin_get_constraints(spine_skin skin) {
 
 spine_skin spine_skin_create(const utf8 *name) {
 	if (name == nullptr) return nullptr;
-	return (spine_skin) new (__FILE__, __LINE__) Skin((char *) name);
+	return (spine_skin) new (__FILE__, __LINE__) Skin(name);
 }
 
 void spine_skin_dispose(spine_skin skin) {
@@ -3822,7 +3822,7 @@ void spine_sequence_apply(spine_sequence sequence, spine_slot slot, spine_attach
 const utf8 *spine_sequence_get_path(spine_sequence sequence, const utf8 *basePath, int32_t index) {
 	if (sequence == nullptr) return nullptr;
 	Sequence *_sequence = (Sequence *) sequence;
-	return (utf8 *) strdup(_sequence->getPath((char *) basePath, index).buffer());
+	return (utf8 *) strdup(_sequence->getPath(basePath, index).buffer());
 }
 
 int32_t spine_sequence_get_id(spine_sequence sequence) {

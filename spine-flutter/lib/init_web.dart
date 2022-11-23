@@ -1,8 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:inject_js/inject_js.dart' as js;
-import 'web_ffi/web_ffi.dart';
-import 'web_ffi/web_ffi_modules.dart';
-import 'ffi_utf8.dart';
+import 'package:web_ffi_fork/web_ffi.dart';
+import 'package:web_ffi_fork/web_ffi_modules.dart';
 import 'spine_flutter_bindings_generated.dart';
 
 Module? _module;
@@ -18,7 +17,6 @@ Future<SpineFlutterFFI> initSpineFlutterFFI() async {
   if (_module == null) {
     Memory.init();
 
-    registerOpaqueType<Utf8>();
     registerOpaqueType<spine_skeleton_wrapper>();
     registerOpaqueType<spine_skeleton_data_wrapper>();
     registerOpaqueType<spine_bone_wrapper>();

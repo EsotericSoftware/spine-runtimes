@@ -10,7 +10,6 @@ import 'package:path/path.dart' as path;
 
 import 'spine_flutter_bindings_generated.dart';
 import 'ffi_proxy.dart';
-import 'ffi_utf8.dart';
 
 export 'spine_widget.dart';
 import 'init.dart' if (dart.library.html) 'init_web.dart';
@@ -68,7 +67,7 @@ class Atlas {
   static Future<Atlas> _load(String atlasFileName, Future<Uint8List> Function(String name) loadFile) async {
     final atlasBytes = await loadFile(atlasFileName);
     final atlasData = convert.utf8.decode(atlasBytes);
-    final atlasDataNative = atlasData.toNativeUtf8(_allocator);
+    final atlasDataNative = atlasData.toNativeUtf8(allocator: _allocator);
     final atlas = _bindings.spine_atlas_load(atlasDataNative.cast());
     _allocator.free(atlasDataNative);
     if (_bindings.spine_atlas_get_error(atlas).address != nullptr.address) {
@@ -131,7 +130,7 @@ class SkeletonData {
   SkeletonData._(this._data) : _disposed = false;
 
   static SkeletonData fromJson(Atlas atlas, String json) {
-    final jsonNative = json.toNativeUtf8(_allocator);
+    final jsonNative = json.toNativeUtf8(allocator: _allocator);
     final result = _bindings.spine_skeleton_data_load_json(atlas._atlas, jsonNative.cast());
     _allocator.free(jsonNative);
     if (_bindings.spine_skeleton_data_result_get_error(result).address != nullptr.address) {
@@ -188,7 +187,7 @@ class SkeletonData {
 
   /// Finds a bone by comparing each bone's name. It is more efficient to cache the results of this method than to call it multiple times.
   BoneData? findBone(String name) {
-    final nativeName = name.toNativeUtf8(_allocator);
+    final nativeName = name.toNativeUtf8(allocator: _allocator);
     final bone = _bindings.spine_skeleton_data_find_bone(_data, nativeName.cast());
     _allocator.free(nativeName);
     if (bone.address == nullptr.address) return null;
@@ -197,7 +196,7 @@ class SkeletonData {
 
   /// Finds a slot by comparing each slot's name. It is more efficient to cache the results of this method than to call it multiple times.
   SlotData? findSlot(String name) {
-    final nativeName = name.toNativeUtf8(_allocator);
+    final nativeName = name.toNativeUtf8(allocator: _allocator);
     final slot = _bindings.spine_skeleton_data_find_slot(_data, nativeName.cast());
     _allocator.free(nativeName);
     if (slot.address == nullptr.address) return null;
@@ -207,7 +206,7 @@ class SkeletonData {
   /// Finds a skin by comparing each skin's name. It is more efficient to cache the results of this method than to call it
   /// multiple times.
   Skin? findSkin(String name) {
-    final nativeName = name.toNativeUtf8(_allocator);
+    final nativeName = name.toNativeUtf8(allocator: _allocator);
     final skin = _bindings.spine_skeleton_data_find_skin(_data, nativeName.cast());
     _allocator.free(nativeName);
     if (skin.address == nullptr.address) return null;
@@ -217,7 +216,7 @@ class SkeletonData {
   /// Finds an event by comparing each events's name. It is more efficient to cache the results of this method than to call it
   /// multiple times.
   EventData? findEvent(String name) {
-    final nativeName = name.toNativeUtf8(_allocator);
+    final nativeName = name.toNativeUtf8(allocator: _allocator);
     final event = _bindings.spine_skeleton_data_find_event(_data, nativeName.cast());
     _allocator.free(nativeName);
     if (event.address == nullptr.address) return null;
@@ -227,7 +226,7 @@ class SkeletonData {
   /// Finds an animation by comparing each animation's name. It is more efficient to cache the results of this method than to
   /// call it multiple times.
   Animation? findAnimation(String name) {
-    final nativeName = name.toNativeUtf8(_allocator);
+    final nativeName = name.toNativeUtf8(allocator: _allocator);
     final animation = _bindings.spine_skeleton_data_find_animation(_data, nativeName.cast());
     _allocator.free(nativeName);
     if (animation.address == nullptr.address) return null;
@@ -237,7 +236,7 @@ class SkeletonData {
   /// Finds an IK constraint by comparing each IK constraint's name. It is more efficient to cache the results of this method
   /// than to call it multiple times.
   IkConstraintData? findIkConstraint(String name) {
-    final nativeName = name.toNativeUtf8(_allocator);
+    final nativeName = name.toNativeUtf8(allocator: _allocator);
     final constraint = _bindings.spine_skeleton_data_find_ik_constraint(_data, nativeName.cast());
     _allocator.free(nativeName);
     if (constraint.address == nullptr.address) return null;
@@ -247,7 +246,7 @@ class SkeletonData {
   /// Finds a transform constraint by comparing each transform constraint's name. It is more efficient to cache the results of
   /// this method than to call it multiple times.
   TransformConstraintData? findTransformConstraint(String name) {
-    final nativeName = name.toNativeUtf8(_allocator);
+    final nativeName = name.toNativeUtf8(allocator: _allocator);
     final constraint = _bindings.spine_skeleton_data_find_transform_constraint(_data, nativeName.cast());
     _allocator.free(nativeName);
     if (constraint.address == nullptr.address) return null;
@@ -257,7 +256,7 @@ class SkeletonData {
   /// Finds a path constraint by comparing each path constraint's name. It is more efficient to cache the results of this method
   /// than to call it multiple times.
   PathConstraintData? findPathConstraint(String name) {
-    final nativeName = name.toNativeUtf8(_allocator);
+    final nativeName = name.toNativeUtf8(allocator: _allocator);
     final constraint = _bindings.spine_skeleton_data_find_path_constraint(_data, nativeName.cast());
     _allocator.free(nativeName);
     if (constraint.address == nullptr.address) return null;
@@ -955,7 +954,7 @@ class SlotData {
   }
 
   void setAttachmentName(String attachmentName) {
-    final nativeName = attachmentName.toNativeUtf8(_allocator);
+    final nativeName = attachmentName.toNativeUtf8(allocator: _allocator);
     _bindings.spine_slot_data_set_attachment_name(_data, nativeName.cast());
     _allocator.free(nativeName);
   }
@@ -1161,7 +1160,7 @@ class Sequence {
   }
 
   String getPath(String basePath, int index) {
-    final nativeBasePath = basePath.toNativeUtf8(_allocator);
+    final nativeBasePath = basePath.toNativeUtf8(allocator: _allocator);
     final Pointer<Utf8> path = _bindings.spine_sequence_get_path(_sequence, nativeBasePath.cast(), index).cast();
     final result = path.toDartString();
     _allocator.free(nativeBasePath);
@@ -1659,7 +1658,7 @@ class Skin {
   Skin._(this._skin) : _isCustomSkin = false;
 
   Skin.new(String name) {
-    final nativeName = name.toNativeUtf8(_allocator);
+    final nativeName = name.toNativeUtf8(allocator: _allocator);
     _skin = _bindings.spine_skin_create(nativeName.cast());
     _allocator.free(nativeName);
     _isCustomSkin = true;
@@ -1671,14 +1670,14 @@ class Skin {
   }
 
   void setAttachment(int slotIndex, String name, Attachment? attachment) {
-    final nativeName = name.toNativeUtf8(_allocator);
+    final nativeName = name.toNativeUtf8(allocator: _allocator);
     _bindings.spine_skin_set_attachment(
         _skin, slotIndex, nativeName.cast(), attachment == null ? nullptr : attachment._attachment.cast());
     _allocator.free(nativeName);
   }
 
   Attachment? getAttachment(int slotIndex, String name) {
-    final nativeName = name.toNativeUtf8(_allocator);
+    final nativeName = name.toNativeUtf8(allocator: _allocator);
     final attachment = _bindings.spine_skin_get_attachment(_skin, slotIndex, nativeName.cast());
     _allocator.free(nativeName);
     if (attachment.address == nullptr.address) return null;
@@ -1686,7 +1685,7 @@ class Skin {
   }
 
   void removeAttachment(int slotIndex, String name) {
-    final nativeName = name.toNativeUtf8(_allocator);
+    final nativeName = name.toNativeUtf8(allocator: _allocator);
     _bindings.spine_skin_remove_attachment(_skin, slotIndex, nativeName.cast());
     _allocator.free(nativeName);
   }
@@ -2366,7 +2365,7 @@ class Skeleton {
   }
 
   Bone? findBone(String boneName) {
-    final nameNative = boneName.toNativeUtf8(_allocator);
+    final nameNative = boneName.toNativeUtf8(allocator: _allocator);
     final bone = _bindings.spine_skeleton_find_bone(_skeleton, nameNative.cast());
     _allocator.free(nameNative);
     if (bone.address == nullptr.address) return null;
@@ -2374,7 +2373,7 @@ class Skeleton {
   }
 
   Slot? findSlot(String slotName) {
-    final nameNative = slotName.toNativeUtf8(_allocator);
+    final nameNative = slotName.toNativeUtf8(allocator: _allocator);
     final slot = _bindings.spine_skeleton_find_slot(_skeleton, nameNative.cast());
     _allocator.free(nameNative);
     if (slot.address == nullptr.address) return null;
@@ -2389,7 +2388,7 @@ class Skeleton {
   /// skeleton is rendered to allow any attachment keys in the current animation(s) to hide or show attachments from the new skin.
   /// @param skinName May be NULL.
   void setSkinByName(String skinName) {
-    final nameNative = skinName.toNativeUtf8(_allocator);
+    final nameNative = skinName.toNativeUtf8(allocator: _allocator);
     _bindings.spine_skeleton_set_skin_by_name(_skeleton, nameNative.cast());
     _allocator.free(nameNative);
   }
@@ -2399,8 +2398,8 @@ class Skeleton {
   }
 
   Attachment? getAttachmentByName(String slotName, String attachmentName) {
-    final slotNameNative = slotName.toNativeUtf8(_allocator);
-    final attachmentNameNative = attachmentName.toNativeUtf8(_allocator);
+    final slotNameNative = slotName.toNativeUtf8(allocator: _allocator);
+    final attachmentNameNative = attachmentName.toNativeUtf8(allocator: _allocator);
     final attachment =
         _bindings.spine_skeleton_get_attachment_by_name(_skeleton, slotNameNative.cast(), attachmentNameNative.cast());
     _allocator.free(slotNameNative);
@@ -2410,7 +2409,7 @@ class Skeleton {
   }
 
   Attachment? getAttachment(int slotIndex, String attachmentName) {
-    final attachmentNameNative = attachmentName.toNativeUtf8(_allocator);
+    final attachmentNameNative = attachmentName.toNativeUtf8(allocator: _allocator);
     final attachment = _bindings.spine_skeleton_get_attachment(_skeleton, slotIndex, attachmentNameNative.cast());
     _allocator.free(attachmentNameNative);
     if (attachment.address == nullptr.address) return null;
@@ -2418,15 +2417,15 @@ class Skeleton {
   }
 
   void setAttachment(String slotName, String attachmentName) {
-    final slotNameNative = slotName.toNativeUtf8(_allocator);
-    final attachmentNameNative = attachmentName.toNativeUtf8(_allocator);
+    final slotNameNative = slotName.toNativeUtf8(allocator: _allocator);
+    final attachmentNameNative = attachmentName.toNativeUtf8(allocator: _allocator);
     _bindings.spine_skeleton_set_attachment(_skeleton, slotNameNative.cast(), attachmentNameNative.cast());
     _allocator.free(slotNameNative);
     _allocator.free(attachmentNameNative);
   }
 
   IkConstraint? findIkConstraint(String constraintName) {
-    final nameNative = constraintName.toNativeUtf8(_allocator);
+    final nameNative = constraintName.toNativeUtf8(allocator: _allocator);
     final constraint = _bindings.spine_skeleton_find_ik_constraint(_skeleton, nameNative.cast());
     _allocator.free(nameNative);
     if (constraint.address == nullptr.address) return null;
@@ -2434,7 +2433,7 @@ class Skeleton {
   }
 
   TransformConstraint? findTransformConstraint(String constraintName) {
-    final nameNative = constraintName.toNativeUtf8(_allocator);
+    final nameNative = constraintName.toNativeUtf8(allocator: _allocator);
     final constraint = _bindings.spine_skeleton_find_transform_constraint(_skeleton, nameNative.cast());
     _allocator.free(nameNative);
     if (constraint.address == nullptr.address) return null;
@@ -2442,7 +2441,7 @@ class Skeleton {
   }
 
   PathConstraint? findPathConstraint(String constraintName) {
-    final nameNative = constraintName.toNativeUtf8(_allocator);
+    final nameNative = constraintName.toNativeUtf8(allocator: _allocator);
     final constraint = _bindings.spine_skeleton_find_path_constraint(_skeleton, nameNative.cast());
     _allocator.free(nameNative);
     if (constraint.address == nullptr.address) return null;
@@ -2927,7 +2926,7 @@ class EventData {
   }
 
   void setStringValue(String value) {
-    final nativeString = value.toNativeUtf8(_allocator);
+    final nativeString = value.toNativeUtf8(allocator: _allocator);
     _bindings.spine_event_data_set_string_value(_data, nativeString.cast());
     _allocator.free(nativeString);
   }
@@ -2989,7 +2988,7 @@ class Event {
   }
 
   void setStringValue(String value) {
-    final nativeString = value.toNativeUtf8(_allocator);
+    final nativeString = value.toNativeUtf8(allocator: _allocator);
     _bindings.spine_event_set_string_value(_event, nativeString.cast());
     _allocator.free(nativeString);
   }
@@ -3031,16 +3030,16 @@ class AnimationStateData {
   }
 
   void setMixByName(String fromName, String toName, double duration) {
-    final fromNative = fromName.toNativeUtf8(_allocator);
-    final toNative = toName.toNativeUtf8(_allocator);
+    final fromNative = fromName.toNativeUtf8(allocator: _allocator);
+    final toNative = toName.toNativeUtf8(allocator: _allocator);
     _bindings.spine_animation_state_data_set_mix_by_name(_data, fromNative.cast(), toNative.cast(), duration);
     _allocator.free(fromNative);
     _allocator.free(toNative);
   }
 
   double getMixByName(String fromName, String toName) {
-    final fromNative = fromName.toNativeUtf8(_allocator);
-    final toNative = toName.toNativeUtf8(_allocator);
+    final fromNative = fromName.toNativeUtf8(allocator: _allocator);
+    final toNative = toName.toNativeUtf8(allocator: _allocator);
     final duration = _bindings.spine_animation_state_data_get_mix_by_name(_data, fromNative.cast(), toNative.cast());
     _allocator.free(fromNative);
     _allocator.free(toNative);
@@ -3151,7 +3150,7 @@ class AnimationState {
   /// A track entry to allow further customization of animation playback. References to the track entry must not be kept
   /// after AnimationState.Dispose.
   TrackEntry setAnimationByName(int trackIndex, String animationName, bool loop) {
-    final animation = animationName.toNativeUtf8(_allocator);
+    final animation = animationName.toNativeUtf8(allocator: _allocator);
     final entry =
         _bindings.spine_animation_state_set_animation_by_name(_state, trackIndex, animation.cast(), loop ? -1 : 0);
     _allocator.free(animation);
@@ -3175,7 +3174,7 @@ class AnimationState {
   /// @return A track entry to allow further customization of animation playback. References to the track entry must not be kept
   /// after AnimationState.Dispose
   TrackEntry addAnimationByName(int trackIndex, String animationName, bool loop, double delay) {
-    final animation = animationName.toNativeUtf8(_allocator);
+    final animation = animationName.toNativeUtf8(allocator: _allocator);
     final entry = _bindings.spine_animation_state_add_animation_by_name(
         _state, trackIndex, animation.cast(), loop ? -1 : 0, delay);
     _allocator.free(animation);

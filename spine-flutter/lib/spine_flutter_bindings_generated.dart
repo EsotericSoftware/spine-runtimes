@@ -10100,7 +10100,7 @@ typedef spine_color = ffi.Pointer<spine_color_wrapper>;
 typedef spine_bounds = ffi.Pointer<spine_bounds_wrapper>;
 typedef spine_vector = ffi.Pointer<spine_vector_wrapper>;
 typedef spine_atlas = ffi.Pointer<spine_atlas_wrapper>;
-typedef utf8 = ffi.Uint8;
+typedef utf8 = ffi.Char;
 typedef spine_skeleton_data_result
     = ffi.Pointer<spine_skeleton_data_result_wrapper>;
 typedef spine_skeleton_data = ffi.Pointer<spine_skeleton_data_wrapper>;

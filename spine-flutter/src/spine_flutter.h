@@ -101,7 +101,7 @@ SPINE_OPAQUE_TYPE(spine_skeleton_drawable)
 SPINE_OPAQUE_TYPE(spine_skin_entry)
 SPINE_OPAQUE_TYPE(spine_skin_entries)
 
-typedef uint8_t utf8;
+typedef char utf8;
 
 typedef enum spine_blend_mode {
 	SPINE_BLEND_MODE_NORMAL = 0,
