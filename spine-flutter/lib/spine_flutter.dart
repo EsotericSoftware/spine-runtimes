@@ -3342,8 +3342,8 @@ class RenderCommand {
       // https://github.com/flutter/engine/blob/5c60785b802ad2c8b8899608d949342d5c624952/lib/ui/painting/vertices.cc#L21
       vertices = Vertices.raw(VertexMode.triangles, positions,
           textureCoordinates: uvs,
-          colors: _bindings.spine_render_command_get_colors(nativeCmd).asTypedList(numVertices),
-          indices: _bindings.spine_render_command_get_indices(nativeCmd).asTypedList(numIndices));
+          colors: colors,
+          indices: indices);
     } else {
       // On the web, rendering is done through CanvasKit, which requires copies of the native data.
       final positionsCopy = Float32List.fromList(positions);

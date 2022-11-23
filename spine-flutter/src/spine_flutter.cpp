@@ -49,7 +49,6 @@ struct Block {
 
 	uint8_t* allocate(int numBytes) {
 		uint8_t *ptr = memory + allocated;
-		memset(ptr, 0, numBytes);
 		allocated += numBytes;
 		return ptr;
 	}
@@ -150,14 +149,25 @@ typedef struct _spine_vector {
 	float x, y;
 } _spine_vector;
 
-typedef struct _spine_skeleton_drawable {
+typedef struct _spine_skeleton_drawable : public SpineObject {
 	spine_skeleton skeleton;
 	spine_animation_state animationState;
 	spine_animation_state_data animationStateData;
 	spine_animation_state_events animationStateEvents;
 	void *clipping;
-	_spine_render_command *renderCommand;
 	BlockAllocator *allocator;
+	Vector<float> worldVertices;
+	Vector<unsigned short> quadIndices;
+	Vector<_spine_render_command *> renderCommands;
+
+	_spine_skeleton_drawable() {
+		quadIndices.add(0);
+		quadIndices.add(1);
+		quadIndices.add(2);
+		quadIndices.add(2);
+		quadIndices.add(3);
+		quadIndices.add(0);
+	}
 } _spine_skeleton_drawable;
 
 typedef struct _spine_skin_entry {
@@ -619,7 +629,7 @@ static _spine_render_command *spine_render_command_create(BlockAllocator &alloca
 // SkeletonDrawable
 
 spine_skeleton_drawable spine_skeleton_drawable_create(spine_skeleton_data skeletonData) {
-	_spine_skeleton_drawable *drawable = SpineExtension::calloc<_spine_skeleton_drawable>(1, __FILE__, __LINE__);
+	_spine_skeleton_drawable *drawable = new (__FILE__, __LINE__) _spine_skeleton_drawable();
 	drawable->skeleton = (spine_skeleton) new (__FILE__, __LINE__) Skeleton((SkeletonData *) skeletonData);
 	AnimationStateData *stateData = new (__FILE__, __LINE__) AnimationStateData((SkeletonData *) skeletonData);
 	drawable->animationStateData = (spine_animation_state_data) stateData;
@@ -646,25 +656,76 @@ void spine_skeleton_drawable_dispose(spine_skeleton_drawable drawable) {
 	SpineExtension::free(drawable, __FILE__, __LINE__);
 }
 
+static _spine_render_command *batch_sub_commands(BlockAllocator &allocator, Vector<_spine_render_command*> &commands, int first, int last, int numVertices, int numIndices) {
+	_spine_render_command *batched = spine_render_command_create(allocator, numVertices, numIndices, commands[0]->blendMode, commands[0]->atlasPage);
+	float *positions = batched->positions;
+	float *uvs = batched->uvs;
+	int32_t *colors = batched->colors;
+	uint16_t *indices = batched->indices;
+	int indicesOffset = 0;
+	for (int i = first; i <= last; i++) {
+		_spine_render_command *cmd = commands[i];
+		memcpy(positions, cmd->positions, sizeof(float) * 2 * cmd->numVertices);
+		memcpy(uvs, cmd->uvs, sizeof(float) * 2 * cmd->numVertices);
+		memcpy(colors, cmd->colors, sizeof(int32_t) * cmd->numVertices);
+		for (int ii = 0; ii < cmd->numIndices; ii++)
+			indices[ii] = cmd->indices[ii] + indicesOffset;
+		indicesOffset += cmd->numVertices;
+		positions += 2 * cmd->numVertices;
+		uvs += 2 * cmd->numVertices;
+		colors += cmd->numVertices;
+		indices += cmd->numIndices;
+	}
+	return batched;
+}
+
+static _spine_render_command *batch_commands(BlockAllocator &allocator, Vector<_spine_render_command*> &commands) {
+	if (commands.size() == 0) return nullptr;
+
+	_spine_render_command *root = nullptr;
+	_spine_render_command *last = nullptr;
+
+	_spine_render_command *first = commands[0];
+	int startIndex = 0;
+	int i = 1;
+	int numVertices = first->numVertices;
+	int numIndices = first->numIndices;
+	while (i <= commands.size()) {
+		_spine_render_command *cmd = i < commands.size() ? commands[i] : nullptr;
+		if (cmd != nullptr && cmd->atlasPage == first->atlasPage &&
+			cmd->blendMode == first->blendMode &&
+			numIndices + cmd->numIndices < 0xffff) {
+			numVertices += cmd->numVertices;
+			numIndices += cmd->numIndices;
+		} else {
+			_spine_render_command *batched = batch_sub_commands(allocator, commands, startIndex, i - 1, numVertices, numIndices);
+			if (!last) {
+				root = last = batched;
+			} else {
+				last->next = batched;
+				last = batched;
+			}
+			if (i == commands.size()) break;
+			first = commands[i];
+			startIndex = i;
+			numVertices = first->numVertices;
+			numIndices = first->numIndices;
+		}
+		i++;
+	}
+	return root;
+}
+
 spine_render_command spine_skeleton_drawable_render(spine_skeleton_drawable drawable) {
 	_spine_skeleton_drawable *_drawable = (_spine_skeleton_drawable *) drawable;
 	if (!_drawable) return nullptr;
 	if (!_drawable->skeleton) return nullptr;
 
 	_drawable->allocator->compress();
-	_drawable->renderCommand = nullptr;
+	_drawable->renderCommands.clear();
 
-	Vector<unsigned short> quadIndices;
-	quadIndices.add(0);
-	quadIndices.add(1);
-	quadIndices.add(2);
-	quadIndices.add(2);
-	quadIndices.add(3);
-	quadIndices.add(0);
-	Vector<float> worldVertices;
 	SkeletonClipping &clipper = *(SkeletonClipping *) _drawable->clipping;
 	Skeleton *skeleton = (Skeleton *) _drawable->skeleton;
-	_spine_render_command *lastCommand = nullptr;
 
 	for (unsigned i = 0; i < skeleton->getSlots().size(); ++i) {
 		Slot &slot = *skeleton->getDrawOrder()[i];
@@ -677,7 +738,9 @@ spine_render_command spine_skeleton_drawable_render(spine_skeleton_drawable draw
 			continue;
 		}
 
-		Vector<float> *vertices = &worldVertices;
+		Vector<float> *worldVertices = &_drawable->worldVertices;
+		Vector<unsigned short> *quadIndices = &_drawable->quadIndices;
+		Vector<float> *vertices = worldVertices;
 		int32_t verticesCount;
 		Vector<float> *uvs;
 		Vector<unsigned short> *indices;
@@ -695,11 +758,11 @@ spine_render_command spine_skeleton_drawable_render(spine_skeleton_drawable draw
 				continue;
 			}
 
-			worldVertices.setSize(8, 0);
-			regionAttachment->computeWorldVertices(slot, worldVertices, 0, 2);
+			worldVertices->setSize(8, 0);
+			regionAttachment->computeWorldVertices(slot, *worldVertices, 0, 2);
 			verticesCount = 4;
 			uvs = &regionAttachment->getUVs();
-			indices = &quadIndices;
+			indices = quadIndices;
 			indicesCount = 6;
 			pageIndex = ((AtlasRegion *) regionAttachment->getRegion())->page->index;
 
@@ -713,8 +776,8 @@ spine_render_command spine_skeleton_drawable_render(spine_skeleton_drawable draw
 				continue;
 			}
 
-			worldVertices.setSize(mesh->getWorldVerticesLength(), 0);
-			mesh->computeWorldVertices(slot, 0, mesh->getWorldVerticesLength(), worldVertices.buffer(), 0, 2);
+			worldVertices->setSize(mesh->getWorldVerticesLength(), 0);
+			mesh->computeWorldVertices(slot, 0, mesh->getWorldVerticesLength(), worldVertices->buffer(), 0, 2);
 			verticesCount = (int32_t) (mesh->getWorldVerticesLength() >> 1);
 			uvs = &mesh->getUVs();
 			indices = &mesh->getTriangles();
@@ -735,7 +798,7 @@ spine_render_command spine_skeleton_drawable_render(spine_skeleton_drawable draw
 		uint32_t color = (a << 24) | (r << 16) | (g << 8) | b;
 
 		if (clipper.isClipping()) {
-			clipper.clipTriangles(worldVertices, *indices, *uvs, 2);
+			clipper.clipTriangles(*worldVertices, *indices, *uvs, 2);
 			vertices = &clipper.getClippedVertices();
 			verticesCount = (int32_t) (clipper.getClippedVertices().size() >> 1);
 			uvs = &clipper.getClippedUVs();
@@ -744,24 +807,16 @@ spine_render_command spine_skeleton_drawable_render(spine_skeleton_drawable draw
 		}
 
 		_spine_render_command *cmd = spine_render_command_create(*_drawable->allocator, verticesCount, indicesCount, (spine_blend_mode) slot.getData().getBlendMode(), pageIndex);
-
+		_drawable->renderCommands.add(cmd);
 		memcpy(cmd->positions, vertices->buffer(), (verticesCount << 1) * sizeof(float));
 		memcpy(cmd->uvs, uvs->buffer(), (verticesCount << 1) * sizeof(float));
 		for (int ii = 0; ii < verticesCount; ii++) cmd->colors[ii] = color;
 		memcpy(cmd->indices, indices->buffer(), indices->size() * sizeof(uint16_t));
-
-		if (!lastCommand) {
-			_drawable->renderCommand = lastCommand = cmd;
-		} else {
-			lastCommand->next = cmd;
-			lastCommand = cmd;
-		}
-
 		clipper.clipEnd(slot);
 	}
 	clipper.clipEnd();
 
-	return (spine_render_command) _drawable->renderCommand;
+	return (spine_render_command) batch_commands(*_drawable->allocator, _drawable->renderCommands);
 }
 
 spine_skeleton spine_skeleton_drawable_get_skeleton(spine_skeleton_drawable drawable) {

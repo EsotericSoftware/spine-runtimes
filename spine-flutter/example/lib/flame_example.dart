@@ -116,7 +116,7 @@ class PreloadAndShareSpineDataExample extends FlameGame {
     // gets their own SkeletonDrawable copy derived from the cached data. The
     // SkeletonDrawable copies do not own the underlying skeleton data and atlas.
     final rng = Random();
-    for (int i = 0; i < 50; i++) {
+    for (int i = 0; i < 100; i++) {
       final drawable = SkeletonDrawable(cachedAtlas, cachedSkeletonData, false);
       final scale = 0.1 + rng.nextDouble() * 0.2;
       final position = Vector2(rng.nextDouble() * size.x, rng.nextDouble() * size.y);
