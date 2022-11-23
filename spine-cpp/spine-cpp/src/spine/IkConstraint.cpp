@@ -44,11 +44,11 @@ using namespace spine;
 RTTI_IMPL(IkConstraint, Updatable)
 
 void IkConstraint::apply(Bone &bone, float targetX, float targetY, bool compress, bool stretch, bool uniform, float alpha) {
+	if (!bone._appliedValid) bone.updateAppliedTransform();
 	Bone *p = bone.getParent();
 	float pa = p->_a, pb = p->_b, pc = p->_c, pd = p->_d;
 	float rotationIK = -bone._ashearX - bone._arotation;
 	float tx = 0, ty = 0;
-    if (!bone._appliedValid) bone.updateAppliedTransform();
 
 	switch(bone._data.getTransformMode()) {
         case TransformMode_OnlyTranslation:
