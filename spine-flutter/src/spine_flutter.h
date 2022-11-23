@@ -169,6 +169,7 @@ typedef enum spine_rotate_mode {
 
 SPINE_FLUTTER_EXPORT int32_t spine_major_version();
 SPINE_FLUTTER_EXPORT int32_t spine_minor_version();
+SPINE_FLUTTER_EXPORT void spine_enable_debug_extension(int enable);
 SPINE_FLUTTER_EXPORT void spine_report_leaks();
 
 SPINE_FLUTTER_EXPORT float spine_color_get_r(spine_color color);

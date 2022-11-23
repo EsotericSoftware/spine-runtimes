@@ -44,6 +44,20 @@ class SpineFlutterBindings {
   late final _spine_minor_version =
       _spine_minor_versionPtr.asFunction<int Function()>();
 
+  void spine_enable_debug_extension(
+    int enable,
+  ) {
+    return _spine_enable_debug_extension(
+      enable,
+    );
+  }
+
+  late final _spine_enable_debug_extensionPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int)>>(
+          'spine_enable_debug_extension');
+  late final _spine_enable_debug_extension =
+      _spine_enable_debug_extensionPtr.asFunction<void Function(int)>();
+
   void spine_report_leaks() {
     return _spine_report_leaks();
   }

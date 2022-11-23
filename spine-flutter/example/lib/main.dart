@@ -126,7 +126,7 @@ class ExampleSelector extends StatelessWidget {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await initSpineFlutter();
+  await initSpineFlutter(enableMemoryDebugging: false);
   runApp(const MaterialApp(
       title: "Spine Examples",
       home: ExampleSelector()

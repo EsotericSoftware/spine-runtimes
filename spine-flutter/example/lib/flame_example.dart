@@ -6,13 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:esotericsoftware_spine_flutter/spine_flutter.dart';
 
 class SpineComponent extends PositionComponent {
+  static final Finalizer<SpineComponent> _finalizer = Finalizer((spineComponent) => spineComponent.dispose());
   final BoundsProvider _boundsProvider;
   final SkeletonDrawable _drawable;
   late final Bounds _bounds;
   final bool _ownsDrawable;
 
   SpineComponent(this._drawable, {
-        bool ownsDrawable = false,
+        bool ownsDrawable = true,
         BoundsProvider boundsProvider = const SetupPoseBounds(),
         super.position,
         super.scale,
@@ -26,6 +27,7 @@ class SpineComponent extends PositionComponent {
     _drawable.update(0);
     _bounds = _boundsProvider.computeBounds(_drawable);
     size = Vector2(_bounds.width, _bounds.height);
+    _finalizer.attach(this, this);
   }
 
   static Future<SpineComponent> fromAssets(String atlasFile, String skeletonFile, {
@@ -50,9 +52,11 @@ class SpineComponent extends PositionComponent {
         priority: priority);
   }
 
-  @override
-  void onRemove() {
-    if (_ownsDrawable) _drawable.dispose();
+  void dispose() {
+    if (_ownsDrawable) {
+      _drawable.dispose();
+    }
+    _finalizer.detach(this);
   }
   
   @override
@@ -92,12 +96,18 @@ class SimpleFlameExample extends FlameGame {
     spineboy.animationState.setAnimationByName(0, "walk", true);
     await add(spineboy);
   }
+
+  @override
+  void onDetach() {
+    // Dispose the native resources that have been loaded for spineboy.
+    spineboy.dispose();
+  }
 }
 
 class PreloadAndShareSpineDataExample extends FlameGame {
   late final SkeletonData cachedSkeletonData;
   late final Atlas cachedAtlas;
-  late final List<SpineComponent> spineboys;
+  late final List<SpineComponent> spineboys = [];
 
   @override
   Future<void> onLoad() async {
@@ -109,7 +119,7 @@ class PreloadAndShareSpineDataExample extends FlameGame {
     // gets their own SkeletonDrawable copy derived from the cached data. The
     // SkeletonDrawable copies do not own the underlying skeleton data and atlas.
     final rng = Random();
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 50; i++) {
       final drawable = SkeletonDrawable(cachedAtlas, cachedSkeletonData, false);
       final scale = 0.1 + rng.nextDouble() * 0.2;
       final position = Vector2(rng.nextDouble() * size.x, rng.nextDouble() * size.y);
@@ -119,15 +129,19 @@ class PreloadAndShareSpineDataExample extends FlameGame {
           position: position
       );
       spineboy.animationState.setAnimationByName(0, "walk", true);
+      spineboys.add(spineboy);
       await add(spineboy);
     }
   }
 
   @override
-  void onRemove() {
+  void onDetach() {
     // Dispose the pre-loaded atlas and skeleton data when the game/scene is removed
     cachedAtlas.dispose();
     cachedSkeletonData.dispose();
+    for (final spineboy in spineboys) {
+      spineboy.dispose();
+    }
   }
 }
 

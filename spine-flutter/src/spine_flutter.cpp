@@ -34,6 +34,75 @@
 
 using namespace spine;
 
+struct Block {
+	int size;
+	int allocated;
+	uint8_t* memory;
+
+	int free() {
+		return size - allocated;
+	}
+
+	bool canFit(int numBytes) {
+		return free() >= numBytes;
+	}
+
+	uint8_t* allocate(int numBytes) {
+		uint8_t *ptr = memory + allocated;
+		memset(ptr, 0, numBytes);
+		allocated += numBytes;
+		return ptr;
+	}
+};
+
+class BlockAllocator : public SpineObject{
+	int initialBlockSize;
+	Vector<Block> blocks;
+
+public:
+	BlockAllocator(int initialBlockSize) : initialBlockSize(initialBlockSize) {
+		blocks.add(newBlock(initialBlockSize));
+	}
+
+	~BlockAllocator() {
+        for (int i = 0; i < blocks.size(); i++) {
+            SpineExtension::free(blocks[i].memory, __FILE__, __LINE__);
+        }
+	}
+
+	Block newBlock(int numBytes) {
+		Block block = {MathUtil::max(initialBlockSize, numBytes), 0, nullptr};
+		block.memory = SpineExtension::alloc<uint8_t>(block.size, __FILE__, __LINE__);
+		return block;
+	}
+
+	template<typename T>
+	T *allocate(size_t num) {
+		return (T *) _allocate((int)(sizeof(T) * num));
+	}
+
+	void compress() {
+		int totalSize = 0;
+		for (int i = 0; i < blocks.size(); i++) {
+			totalSize += blocks[i].size;
+			SpineExtension::free(blocks[i].memory, __FILE__, __LINE__);
+		}
+		blocks.clear();
+		blocks.add(newBlock(totalSize));
+	}
+private:
+    void *_allocate(int numBytes) {
+        // 16-byte align allocations
+        int alignedNumBytes = numBytes + (numBytes % 16 != 0 ? 16 - (numBytes % 16) : 0);
+        Block *block = &blocks[blocks.size() - 1];
+        if (!block->canFit(alignedNumBytes)) {
+            blocks.add(newBlock(MathUtil::max(initialBlockSize, alignedNumBytes)));
+            block = &blocks[blocks.size() - 1];
+        }
+        return block->allocate(alignedNumBytes);
+    }
+};
+
 struct AnimationStateEvent {
 	EventType type;
 	TrackEntry *entry;
@@ -88,6 +157,7 @@ typedef struct _spine_skeleton_drawable {
 	spine_animation_state_events animationStateEvents;
 	void *clipping;
 	_spine_render_command *renderCommand;
+	BlockAllocator *allocator;
 } _spine_skeleton_drawable;
 
 typedef struct _spine_skin_entry {
@@ -103,9 +173,24 @@ typedef struct _spine_skin_entries {
 
 static Color NULL_COLOR(0, 0, 0, 0);
 
+static SpineExtension *defaultExtension = nullptr;
+static DebugExtension *debugExtension = nullptr;
+
+static void initExtensions() {
+    if (defaultExtension == nullptr) {
+        defaultExtension = new DefaultSpineExtension();
+        debugExtension = new DebugExtension(defaultExtension);
+    }
+}
+
 spine::SpineExtension *spine::getDefaultExtension() {
-	// return new spine::DebugExtension(new spine::DefaultSpineExtension());
-	return new spine::DefaultSpineExtension();
+    initExtensions();
+	return defaultExtension;
+}
+
+void spine_enable_debug_extension(int enable) {
+    initExtensions();
+	SpineExtension::setInstance(enable ? debugExtension : defaultExtension);
 }
 
 int32_t spine_major_version() {
@@ -117,7 +202,9 @@ int32_t spine_minor_version() {
 }
 
 void spine_report_leaks() {
-	// ((DebugExtension*)spine::SpineExtension::getInstance())->reportLeaks();
+    initExtensions();
+	debugExtension->reportLeaks();
+	fflush(stdout);
 }
 
 // Color
@@ -515,27 +602,18 @@ void spine_skeleton_data_dispose(spine_skeleton_data data) {
 }
 
 // RenderCommand
-_spine_render_command *spine_render_command_create(int numVertices, int32_t numIndices, spine_blend_mode blendMode, int32_t pageIndex) {
-	_spine_render_command *cmd = SpineExtension::alloc<_spine_render_command>(1, __FILE__, __LINE__);
-	cmd->positions = SpineExtension::alloc<float>(numVertices << 1, __FILE__, __LINE__);
-	cmd->uvs = SpineExtension::alloc<float>(numVertices << 1, __FILE__, __LINE__);
-	cmd->colors = SpineExtension::alloc<int32_t>(numVertices, __FILE__, __LINE__);
+static _spine_render_command *spine_render_command_create(BlockAllocator &allocator, int numVertices, int32_t numIndices, spine_blend_mode blendMode, int32_t pageIndex) {
+	_spine_render_command *cmd = allocator.allocate<_spine_render_command>(1);
+	cmd->positions = allocator.allocate<float>(numVertices << 1);
+	cmd->uvs = allocator.allocate<float>(numVertices << 1);
+	cmd->colors = allocator.allocate<int32_t>(numVertices);
 	cmd->numVertices = numVertices;
-	cmd->indices = SpineExtension::alloc<uint16_t>(numIndices, __FILE__, __LINE__);
+	cmd->indices = allocator.allocate<uint16_t>(numIndices);
 	cmd->numIndices = numIndices;
 	cmd->blendMode = blendMode;
 	cmd->atlasPage = pageIndex;
 	cmd->next = nullptr;
 	return cmd;
-}
-
-void spine_render_command_dispose(_spine_render_command *cmd) {
-	if (!cmd) return;
-	if (cmd->positions) SpineExtension::free(cmd->positions, __FILE__, __LINE__);
-	if (cmd->uvs) SpineExtension::free(cmd->uvs, __FILE__, __LINE__);
-	if (cmd->colors) SpineExtension::free(cmd->colors, __FILE__, __LINE__);
-	if (cmd->indices) SpineExtension::free(cmd->indices, __FILE__, __LINE__);
-	SpineExtension::free(cmd, __FILE__, __LINE__);
 }
 
 // SkeletonDrawable
@@ -552,6 +630,7 @@ spine_skeleton_drawable spine_skeleton_drawable_create(spine_skeleton_data skele
 	drawable->animationStateEvents = (spine_animation_state_events) listener;
 	state->setListener(listener);
 	drawable->clipping = new (__FILE__, __LINE__) SkeletonClipping();
+	drawable->allocator = new (__FILE__, __LINE__) BlockAllocator(2048);
 	return (spine_skeleton_drawable) drawable;
 }
 
@@ -563,11 +642,7 @@ void spine_skeleton_drawable_dispose(spine_skeleton_drawable drawable) {
 	if (_drawable->animationStateData) delete (AnimationStateData *) _drawable->animationStateData;
 	if (_drawable->animationStateEvents) delete (Vector<AnimationStateEvent> *) (_drawable->animationStateEvents);
 	if (_drawable->clipping) delete (SkeletonClipping *) _drawable->clipping;
-	while (_drawable->renderCommand) {
-		_spine_render_command *cmd = _drawable->renderCommand;
-		_drawable->renderCommand = cmd->next;
-		spine_render_command_dispose(cmd);
-	}
+	if (_drawable->allocator) delete (BlockAllocator *) _drawable->allocator;
 	SpineExtension::free(drawable, __FILE__, __LINE__);
 }
 
@@ -576,11 +651,8 @@ spine_render_command spine_skeleton_drawable_render(spine_skeleton_drawable draw
 	if (!_drawable) return nullptr;
 	if (!_drawable->skeleton) return nullptr;
 
-	while (_drawable->renderCommand) {
-		_spine_render_command *cmd = _drawable->renderCommand;
-		_drawable->renderCommand = cmd->next;
-		spine_render_command_dispose(cmd);
-	}
+	_drawable->allocator->compress();
+	_drawable->renderCommand = nullptr;
 
 	Vector<unsigned short> quadIndices;
 	quadIndices.add(0);
@@ -671,7 +743,7 @@ spine_render_command spine_skeleton_drawable_render(spine_skeleton_drawable draw
 			indicesCount = (int32_t) (clipper.getClippedTriangles().size());
 		}
 
-		_spine_render_command *cmd = spine_render_command_create(verticesCount, indicesCount, (spine_blend_mode) slot.getData().getBlendMode(), pageIndex);
+		_spine_render_command *cmd = spine_render_command_create(*_drawable->allocator, verticesCount, indicesCount, (spine_blend_mode) slot.getData().getBlendMode(), pageIndex);
 
 		memcpy(cmd->positions, vertices->buffer(), (verticesCount << 1) * sizeof(float));
 		memcpy(cmd->uvs, uvs->buffer(), (verticesCount << 1) * sizeof(float));
@@ -1345,7 +1417,7 @@ spine_path_constraint spine_skeleton_find_path_constraint(spine_skeleton skeleto
 }
 
 spine_bounds spine_skeleton_get_bounds(spine_skeleton skeleton) {
-	_spine_bounds *bounds = SpineExtension::calloc<_spine_bounds>(1, __FILE__, __LINE__);
+	_spine_bounds *bounds = (_spine_bounds*)malloc(sizeof(_spine_bounds));
 	if (skeleton == nullptr) return (spine_bounds) bounds;
 	Skeleton *_skeleton = (Skeleton *) skeleton;
 	Vector<float> vertices;

@@ -18,10 +18,11 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 late SpineFlutterBindings _bindings;
 late Allocator _allocator;
 
-Future<void> initSpineFlutter() async {
+Future<void> initSpineFlutter({bool enableMemoryDebugging = false}) async {
   final ffi = await initSpineFlutterFFI();
   _bindings = SpineFlutterBindings(ffi.dylib);
   _allocator = ffi.allocator;
+  if (enableMemoryDebugging) _bindings.spine_enable_debug_extension(-1);
   return;
 }
 

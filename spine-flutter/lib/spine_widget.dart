@@ -224,10 +224,8 @@ class _SpineWidgetState extends State<SpineWidget> {
   @override
   Widget build(BuildContext context) {
     if (widget._controller._drawable != null) {
-      print("Skeleton loaded, rebuilding painter");
       return _SpineRenderObjectWidget(widget._controller._drawable!, widget._controller, widget._fit, widget._alignment, widget._boundsProvider, widget._sizedByBounds);
     } else {
-      print("Skeleton not loaded yet");
       return const SizedBox();
     }
   }

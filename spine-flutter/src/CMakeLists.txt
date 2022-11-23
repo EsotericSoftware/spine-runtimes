@@ -19,3 +19,10 @@ set_target_properties(esotericsoftware_spine_flutter PROPERTIES
 target_include_directories(esotericsoftware_spine_flutter PUBLIC spine-cpp/include)
 target_compile_definitions(esotericsoftware_spine_flutter PUBLIC DART_SHARED_LIB)
 
+if(${SPINE_FLUTTER_TESTBED})
+set (CMAKE_CXX_STANDARD 11)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address -fsanitize=undefined")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fsanitize=undefined")
+add_executable(spine_flutter_test main.cpp spine_flutter.cpp ${SPINE_SOURCES})
+include_directories(spine_flutter_test PUBLIC spine-cpp/include)
+endif()
