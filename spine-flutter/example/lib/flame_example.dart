@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:esotericsoftware_spine_flutter/spine_flutter.dart';
 
 class SpineComponent extends PositionComponent {
-  static final Finalizer<SpineComponent> _finalizer = Finalizer((spineComponent) => spineComponent.dispose());
   final BoundsProvider _boundsProvider;
   final SkeletonDrawable _drawable;
   late final Bounds _bounds;
@@ -27,7 +26,6 @@ class SpineComponent extends PositionComponent {
     _drawable.update(0);
     _bounds = _boundsProvider.computeBounds(_drawable);
     size = Vector2(_bounds.width, _bounds.height);
-    _finalizer.attach(this, this);
   }
 
   static Future<SpineComponent> fromAssets(String atlasFile, String skeletonFile, {
@@ -56,7 +54,6 @@ class SpineComponent extends PositionComponent {
     if (_ownsDrawable) {
       _drawable.dispose();
     }
-    _finalizer.detach(this);
   }
   
   @override

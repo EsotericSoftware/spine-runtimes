@@ -188,7 +188,7 @@ spine::SpineExtension *spine::getDefaultExtension() {
 	return defaultExtension;
 }
 
-void spine_enable_debug_extension(int enable) {
+void spine_enable_debug_extension(int32_t enable) {
     initExtensions();
 	SpineExtension::setInstance(enable ? debugExtension : defaultExtension);
 }

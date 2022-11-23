@@ -53,7 +53,7 @@ class SpineFlutterBindings {
   }
 
   late final _spine_enable_debug_extensionPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int)>>(
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int32)>>(
           'spine_enable_debug_extension');
   late final _spine_enable_debug_extension =
       _spine_enable_debug_extensionPtr.asFunction<void Function(int)>();
