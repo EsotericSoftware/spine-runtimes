@@ -540,11 +540,11 @@ void Bone::updateAppliedTransform() {
 				ia = pd * pid;
 				ib = pb * pid;
 				ic = pc * pid;
-				id = pa * pid;			
+				id = pa * pid;
 				break;
 			}
 			default:
-				break;		
+				break;
 		}
 		ra = ia * _a - ib * _c;
 		rb = ia * _b - ib * _d;

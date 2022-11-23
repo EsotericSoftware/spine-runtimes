@@ -33,30 +33,31 @@
 #include <stdint.h>
 
 #ifdef __cplusplus
-#   if _WIN32
-#       define SPINE_FLUTTER_EXPORT extern "C" __declspec(dllexport)
-#   else
-#       ifdef __EMSCRIPTEN__
-#           define SPINE_FLUTTER_EXPORT extern "C" __attribute__((used))
-#       else
-#           define SPINE_FLUTTER_EXPORT extern "C"
-#       endif
-#   endif
+#if _WIN32
+#define SPINE_FLUTTER_EXPORT extern "C" __declspec(dllexport)
 #else
-#   if _WIN32
-#       define SPINE_FLUTTER_EXPORT __declspec(dllexport)
-#   else
-#       ifdef __EMSCRIPTEN__
-#           define SPINE_FLUTTER_EXPORT __attribute__((used))
-#       else
-#           define SPINE_FLUTTER_EXPORT
-#       endif
-#   endif
+#ifdef __EMSCRIPTEN__
+#define SPINE_FLUTTER_EXPORT extern "C" __attribute__((used))
+#else
+#define SPINE_FLUTTER_EXPORT extern "C"
+#endif
+#endif
+#else
+#if _WIN32
+#define SPINE_FLUTTER_EXPORT __declspec(dllexport)
+#else
+#ifdef __EMSCRIPTEN__
+#define SPINE_FLUTTER_EXPORT __attribute__((used))
+#else
+#define SPINE_FLUTTER_EXPORT
+#endif
+#endif
 #endif
 
-#define SPINE_OPAQUE_TYPE(name) \
-    typedef struct name##_wrapper {} name##_wrapper; \
-    typedef name##_wrapper *name;
+#define SPINE_OPAQUE_TYPE(name)     \
+	typedef struct name##_wrapper { \
+	} name##_wrapper;               \
+	typedef name##_wrapper *name;
 
 SPINE_OPAQUE_TYPE(spine_skeleton)
 SPINE_OPAQUE_TYPE(spine_skeleton_data)
@@ -103,67 +104,67 @@ SPINE_OPAQUE_TYPE(spine_skin_entries)
 typedef uint8_t utf8;
 
 typedef enum spine_blend_mode {
-    SPINE_BLEND_MODE_NORMAL = 0,
-    SPINE_BLEND_MODE_ADDITIVE,
-    SPINE_BLEND_MODE_MULTIPLY,
-    SPINE_BLEND_MODE_SCREEN
+	SPINE_BLEND_MODE_NORMAL = 0,
+	SPINE_BLEND_MODE_ADDITIVE,
+	SPINE_BLEND_MODE_MULTIPLY,
+	SPINE_BLEND_MODE_SCREEN
 } spine_blend_mode;
 
 typedef enum spine_mix_blend {
-    SPINE_MIX_BLEND_SETUP = 0,
-    SPINE_MIX_BLEND_FIRST,
-    SPINE_MIX_BLEND_REPLACE,
-    SPINE_MIX_BLEND_ADD
+	SPINE_MIX_BLEND_SETUP = 0,
+	SPINE_MIX_BLEND_FIRST,
+	SPINE_MIX_BLEND_REPLACE,
+	SPINE_MIX_BLEND_ADD
 } spine_mix_blend;
 
 typedef enum spine_event_type {
-    SPINE_EVENT_TYPE_START = 0,
-    SPINE_EVENT_TYPE_INTERRUPT,
-    SPINE_EVENT_TYPE_END,
-    SPINE_EVENT_TYPE_COMPLETE,
-    SPINE_EVENT_TYPE_DISPOSE,
-    SPINE_EVENT_TYPE_EVENT
+	SPINE_EVENT_TYPE_START = 0,
+	SPINE_EVENT_TYPE_INTERRUPT,
+	SPINE_EVENT_TYPE_END,
+	SPINE_EVENT_TYPE_COMPLETE,
+	SPINE_EVENT_TYPE_DISPOSE,
+	SPINE_EVENT_TYPE_EVENT
 } spine_event_type;
 
 typedef enum spine_attachment_type {
-    SPINE_ATTACHMENT_REGION = 0,
-    SPINE_ATTACHMENT_MESH,
-    SPINE_ATTACHMENT_CLIPPING,
-    SPINE_ATTACHMENT_BOUNDING_BOX,
-    SPINE_ATTACHMENT_PATH,
-    SPINE_ATTACHMENT_POINT,
+	SPINE_ATTACHMENT_REGION = 0,
+	SPINE_ATTACHMENT_MESH,
+	SPINE_ATTACHMENT_CLIPPING,
+	SPINE_ATTACHMENT_BOUNDING_BOX,
+	SPINE_ATTACHMENT_PATH,
+	SPINE_ATTACHMENT_POINT,
 } spine_attachment_type;
 
 typedef enum spine_constraint_type {
-    SPINE_CONSTRAINT_IK,
-    SPINE_CONSTRAINT_TRANSFORM,
-    SPINE_CONSTRAINT_PATH
+	SPINE_CONSTRAINT_IK,
+	SPINE_CONSTRAINT_TRANSFORM,
+	SPINE_CONSTRAINT_PATH
 } spine_constraint_type;
 
 typedef enum spine_transform_mode {
-    SPINE_TRANSFORM_MODE_NORMAL = 0,
-    SPINE_TRANSFORM_ONLY_TRANSLATION,
-    SPINE_TRANSFORM_NO_ROTATION_OR_REFLECTION,
-    SPINE_TRANSFORM_NO_SCALE,
-    SPINE_TRANSFORM_NO_SCALE_OR_REFLECTION
+	SPINE_TRANSFORM_MODE_NORMAL = 0,
+	SPINE_TRANSFORM_ONLY_TRANSLATION,
+	SPINE_TRANSFORM_NO_ROTATION_OR_REFLECTION,
+	SPINE_TRANSFORM_NO_SCALE,
+	SPINE_TRANSFORM_NO_SCALE_OR_REFLECTION
 } spine_transform_mode;
 
 typedef enum spine_position_mode {
-    SPINE_POSITION_MODE_FIXED = 0,
-    SPINE_POSITION_MODE_PERCENT
+	SPINE_POSITION_MODE_FIXED = 0,
+	SPINE_POSITION_MODE_PERCENT
 } spine_position_mode;
 
 typedef enum spine_spacing_mode {
-    SPINE_SPACING_MODE_LENGTH = 0,
-    SPINE_SPACING_MODE_FIXED,
-    SPINE_SPACING_MODE_PERCENT,
-    SPINE_SPACING_MODE_PROPORTIONAL
+	SPINE_SPACING_MODE_LENGTH = 0,
+	SPINE_SPACING_MODE_FIXED,
+	SPINE_SPACING_MODE_PERCENT,
+	SPINE_SPACING_MODE_PROPORTIONAL
 } spine_spacing_mode;
 
 typedef enum spine_rotate_mode {
-    SPINE_ROTATE_MODE_TANGENT = 0,
-    SPINE_ROTATE_MODE_CHAIN,
-    SPINE_ROTATE_MODE_CHAIN_SCALE
+	SPINE_ROTATE_MODE_TANGENT = 0,
+	SPINE_ROTATE_MODE_CHAIN,
+	SPINE_ROTATE_MODE_CHAIN_SCALE
 } spine_rotate_mode;
 
 SPINE_FLUTTER_EXPORT int32_t spine_major_version();
@@ -202,26 +203,26 @@ SPINE_FLUTTER_EXPORT spine_animation spine_skeleton_data_find_animation(spine_sk
 SPINE_FLUTTER_EXPORT spine_ik_constraint_data spine_skeleton_data_find_ik_constraint(spine_skeleton_data data, const utf8 *name);
 SPINE_FLUTTER_EXPORT spine_transform_constraint_data spine_skeleton_data_find_transform_constraint(spine_skeleton_data data, const utf8 *name);
 SPINE_FLUTTER_EXPORT spine_path_constraint_data spine_skeleton_data_find_path_constraint(spine_skeleton_data data, const utf8 *name);
-SPINE_FLUTTER_EXPORT const utf8* spine_skeleton_data_get_name(spine_skeleton_data data);
+SPINE_FLUTTER_EXPORT const utf8 *spine_skeleton_data_get_name(spine_skeleton_data data);
 // OMITTED setName()
 SPINE_FLUTTER_EXPORT int32_t spine_skeleton_data_get_num_bones(spine_skeleton_data data);
-SPINE_FLUTTER_EXPORT spine_bone_data* spine_skeleton_data_get_bones(spine_skeleton_data data);
+SPINE_FLUTTER_EXPORT spine_bone_data *spine_skeleton_data_get_bones(spine_skeleton_data data);
 SPINE_FLUTTER_EXPORT int32_t spine_skeleton_data_get_num_slots(spine_skeleton_data data);
-SPINE_FLUTTER_EXPORT spine_slot_data* spine_skeleton_data_get_slots(spine_skeleton_data data);
+SPINE_FLUTTER_EXPORT spine_slot_data *spine_skeleton_data_get_slots(spine_skeleton_data data);
 SPINE_FLUTTER_EXPORT int32_t spine_skeleton_data_get_num_skins(spine_skeleton_data data);
-SPINE_FLUTTER_EXPORT spine_skin* spine_skeleton_data_get_skins(spine_skeleton_data data);
+SPINE_FLUTTER_EXPORT spine_skin *spine_skeleton_data_get_skins(spine_skeleton_data data);
 SPINE_FLUTTER_EXPORT spine_skin spine_skeleton_data_get_default_skin(spine_skeleton_data data);
 SPINE_FLUTTER_EXPORT void spine_skeleton_data_set_default_skin(spine_skeleton_data data, spine_skin skin);
 SPINE_FLUTTER_EXPORT int32_t spine_skeleton_data_get_num_events(spine_skeleton_data data);
-SPINE_FLUTTER_EXPORT spine_event_data* spine_skeleton_data_get_events(spine_skeleton_data data);
+SPINE_FLUTTER_EXPORT spine_event_data *spine_skeleton_data_get_events(spine_skeleton_data data);
 SPINE_FLUTTER_EXPORT int32_t spine_skeleton_data_get_num_animations(spine_skeleton_data data);
-SPINE_FLUTTER_EXPORT spine_animation* spine_skeleton_data_get_animations(spine_skeleton_data data);
+SPINE_FLUTTER_EXPORT spine_animation *spine_skeleton_data_get_animations(spine_skeleton_data data);
 SPINE_FLUTTER_EXPORT int32_t spine_skeleton_data_get_num_ik_constraints(spine_skeleton_data data);
-SPINE_FLUTTER_EXPORT spine_ik_constraint_data* spine_skeleton_data_get_ik_constraints(spine_skeleton_data data);
+SPINE_FLUTTER_EXPORT spine_ik_constraint_data *spine_skeleton_data_get_ik_constraints(spine_skeleton_data data);
 SPINE_FLUTTER_EXPORT int32_t spine_skeleton_data_get_num_transform_constraints(spine_skeleton_data data);
-SPINE_FLUTTER_EXPORT spine_transform_constraint_data* spine_skeleton_data_get_transform_constraints(spine_skeleton_data data);
+SPINE_FLUTTER_EXPORT spine_transform_constraint_data *spine_skeleton_data_get_transform_constraints(spine_skeleton_data data);
 SPINE_FLUTTER_EXPORT int32_t spine_skeleton_data_get_num_path_constraints(spine_skeleton_data data);
-SPINE_FLUTTER_EXPORT spine_path_constraint_data* spine_skeleton_data_get_path_constraints(spine_skeleton_data data);
+SPINE_FLUTTER_EXPORT spine_path_constraint_data *spine_skeleton_data_get_path_constraints(spine_skeleton_data data);
 SPINE_FLUTTER_EXPORT float spine_skeleton_data_get_x(spine_skeleton_data data);
 SPINE_FLUTTER_EXPORT void spine_skeleton_data_set_x(spine_skeleton_data data, float x);
 SPINE_FLUTTER_EXPORT float spine_skeleton_data_get_y(spine_skeleton_data data);
@@ -260,7 +261,7 @@ SPINE_FLUTTER_EXPORT int32_t spine_render_command_get_atlas_page(spine_render_co
 SPINE_FLUTTER_EXPORT spine_blend_mode spine_render_command_get_blend_mode(spine_render_command command);
 SPINE_FLUTTER_EXPORT spine_render_command spine_render_command_get_next(spine_render_command command);
 
-SPINE_FLUTTER_EXPORT const utf8* spine_animation_get_name(spine_animation animation);
+SPINE_FLUTTER_EXPORT const utf8 *spine_animation_get_name(spine_animation animation);
 // OMITTED getTimelines()
 // OMITTED hasTimeline()
 SPINE_FLUTTER_EXPORT float spine_animation_get_duration(spine_animation animation);
@@ -271,8 +272,8 @@ SPINE_FLUTTER_EXPORT float spine_animation_state_data_get_default_mix(spine_anim
 SPINE_FLUTTER_EXPORT void spine_animation_state_data_set_default_mix(spine_animation_state_data stateData, float defaultMix);
 SPINE_FLUTTER_EXPORT void spine_animation_state_data_set_mix(spine_animation_state_data stateData, spine_animation from, spine_animation to, float duration);
 SPINE_FLUTTER_EXPORT float spine_animation_state_data_get_mix(spine_animation_state_data stateData, spine_animation from, spine_animation to);
-SPINE_FLUTTER_EXPORT void spine_animation_state_data_set_mix_by_name(spine_animation_state_data stateData, const utf8* fromName, const utf8* toName, float duration);
-SPINE_FLUTTER_EXPORT float spine_animation_state_data_get_mix_by_name(spine_animation_state_data stateData, const utf8* fromName, const utf8* toName);
+SPINE_FLUTTER_EXPORT void spine_animation_state_data_set_mix_by_name(spine_animation_state_data stateData, const utf8 *fromName, const utf8 *toName, float duration);
+SPINE_FLUTTER_EXPORT float spine_animation_state_data_get_mix_by_name(spine_animation_state_data stateData, const utf8 *fromName, const utf8 *toName);
 SPINE_FLUTTER_EXPORT void spine_animation_state_data_clear(spine_animation_state_data stateData);
 
 SPINE_FLUTTER_EXPORT void spine_animation_state_update(spine_animation_state state, float delta);
@@ -280,9 +281,9 @@ SPINE_FLUTTER_EXPORT void spine_animation_state_apply(spine_animation_state stat
 SPINE_FLUTTER_EXPORT void spine_animation_state_clear_tracks(spine_animation_state state);
 SPINE_FLUTTER_EXPORT void spine_animation_state_clear_track(spine_animation_state state, int32_t trackIndex);
 SPINE_FLUTTER_EXPORT int32_t spine_animation_state_get_num_tracks(spine_animation_state state);
-SPINE_FLUTTER_EXPORT spine_track_entry spine_animation_state_set_animation_by_name(spine_animation_state state, int32_t trackIndex, const utf8* animationName, int32_t loop);
+SPINE_FLUTTER_EXPORT spine_track_entry spine_animation_state_set_animation_by_name(spine_animation_state state, int32_t trackIndex, const utf8 *animationName, int32_t loop);
 SPINE_FLUTTER_EXPORT spine_track_entry spine_animation_state_set_animation(spine_animation_state state, int32_t trackIndex, spine_animation animation, int32_t loop);
-SPINE_FLUTTER_EXPORT spine_track_entry spine_animation_state_add_animation_by_name(spine_animation_state state, int32_t trackIndex, const utf8* animationName, int32_t loop, float delay);
+SPINE_FLUTTER_EXPORT spine_track_entry spine_animation_state_add_animation_by_name(spine_animation_state state, int32_t trackIndex, const utf8 *animationName, int32_t loop, float delay);
 SPINE_FLUTTER_EXPORT spine_track_entry spine_animation_state_add_animation(spine_animation_state state, int32_t trackIndex, spine_animation animation, int32_t loop, float delay);
 SPINE_FLUTTER_EXPORT spine_track_entry spine_animation_state_set_empty_animation(spine_animation_state state, int32_t trackIndex, float mixDuration);
 SPINE_FLUTTER_EXPORT spine_track_entry spine_animation_state_add_empty_animation(spine_animation_state state, int32_t trackIndex, float mixDuration, float delay);
@@ -361,32 +362,32 @@ SPINE_FLUTTER_EXPORT void spine_skeleton_update_world_transform_bone(spine_skele
 SPINE_FLUTTER_EXPORT void spine_skeleton_set_to_setup_pose(spine_skeleton skeleton);
 SPINE_FLUTTER_EXPORT void spine_skeleton_set_bones_to_setup_pose(spine_skeleton skeleton);
 SPINE_FLUTTER_EXPORT void spine_skeleton_set_slots_to_setup_pose(spine_skeleton skeleton);
-SPINE_FLUTTER_EXPORT spine_bone spine_skeleton_find_bone(spine_skeleton skeleton, const utf8* boneName);
-SPINE_FLUTTER_EXPORT spine_slot spine_skeleton_find_slot(spine_skeleton skeleton, const utf8* slotName);
-SPINE_FLUTTER_EXPORT void spine_skeleton_set_skin_by_name(spine_skeleton skeleton, const utf8* skinName);
+SPINE_FLUTTER_EXPORT spine_bone spine_skeleton_find_bone(spine_skeleton skeleton, const utf8 *boneName);
+SPINE_FLUTTER_EXPORT spine_slot spine_skeleton_find_slot(spine_skeleton skeleton, const utf8 *slotName);
+SPINE_FLUTTER_EXPORT void spine_skeleton_set_skin_by_name(spine_skeleton skeleton, const utf8 *skinName);
 SPINE_FLUTTER_EXPORT void spine_skeleton_set_skin(spine_skeleton skeleton, spine_skin skin);
-SPINE_FLUTTER_EXPORT spine_attachment spine_skeleton_get_attachment_by_name(spine_skeleton skeleton, const utf8* slotName, const utf8* attachmentName);
-SPINE_FLUTTER_EXPORT spine_attachment spine_skeleton_get_attachment(spine_skeleton skeleton, int32_t slotIndex, const utf8* attachmentName);
-SPINE_FLUTTER_EXPORT void spine_skeleton_set_attachment(spine_skeleton skeleton, const utf8* slotName, const utf8* attachmentName);
-SPINE_FLUTTER_EXPORT spine_ik_constraint spine_skeleton_find_ik_constraint(spine_skeleton skeleton, const utf8* constraintName);
-SPINE_FLUTTER_EXPORT spine_transform_constraint spine_skeleton_find_transform_constraint(spine_skeleton skeleton, const utf8* constraintName);
-SPINE_FLUTTER_EXPORT spine_path_constraint spine_skeleton_find_path_constraint(spine_skeleton skeleton, const utf8* constraintName);
+SPINE_FLUTTER_EXPORT spine_attachment spine_skeleton_get_attachment_by_name(spine_skeleton skeleton, const utf8 *slotName, const utf8 *attachmentName);
+SPINE_FLUTTER_EXPORT spine_attachment spine_skeleton_get_attachment(spine_skeleton skeleton, int32_t slotIndex, const utf8 *attachmentName);
+SPINE_FLUTTER_EXPORT void spine_skeleton_set_attachment(spine_skeleton skeleton, const utf8 *slotName, const utf8 *attachmentName);
+SPINE_FLUTTER_EXPORT spine_ik_constraint spine_skeleton_find_ik_constraint(spine_skeleton skeleton, const utf8 *constraintName);
+SPINE_FLUTTER_EXPORT spine_transform_constraint spine_skeleton_find_transform_constraint(spine_skeleton skeleton, const utf8 *constraintName);
+SPINE_FLUTTER_EXPORT spine_path_constraint spine_skeleton_find_path_constraint(spine_skeleton skeleton, const utf8 *constraintName);
 SPINE_FLUTTER_EXPORT spine_bounds spine_skeleton_get_bounds(spine_skeleton skeleton);
 SPINE_FLUTTER_EXPORT spine_bone spine_skeleton_get_root_bone(spine_skeleton skeleton);
 SPINE_FLUTTER_EXPORT spine_skeleton_data spine_skeleton_get_data(spine_skeleton skeleton);
 SPINE_FLUTTER_EXPORT int32_t spine_skeleton_get_num_bones(spine_skeleton skeleton);
-SPINE_FLUTTER_EXPORT spine_bone* spine_skeleton_get_bones(spine_skeleton skeleton);
+SPINE_FLUTTER_EXPORT spine_bone *spine_skeleton_get_bones(spine_skeleton skeleton);
 // OMITTED getUpdateCacheList()
 SPINE_FLUTTER_EXPORT int32_t spine_skeleton_get_num_slots(spine_skeleton skeleton);
-SPINE_FLUTTER_EXPORT spine_slot* spine_skeleton_get_slots(spine_skeleton skeleton);
+SPINE_FLUTTER_EXPORT spine_slot *spine_skeleton_get_slots(spine_skeleton skeleton);
 SPINE_FLUTTER_EXPORT int32_t spine_skeleton_get_num_draw_order(spine_skeleton skeleton);
-SPINE_FLUTTER_EXPORT spine_slot* spine_skeleton_get_draw_order(spine_skeleton skeleton);
+SPINE_FLUTTER_EXPORT spine_slot *spine_skeleton_get_draw_order(spine_skeleton skeleton);
 SPINE_FLUTTER_EXPORT int32_t spine_skeleton_get_num_ik_constraints(spine_skeleton skeleton);
-SPINE_FLUTTER_EXPORT spine_ik_constraint* spine_skeleton_get_ik_constraints(spine_skeleton skeleton);
+SPINE_FLUTTER_EXPORT spine_ik_constraint *spine_skeleton_get_ik_constraints(spine_skeleton skeleton);
 SPINE_FLUTTER_EXPORT int32_t spine_skeleton_get_num_transform_constraints(spine_skeleton skeleton);
-SPINE_FLUTTER_EXPORT spine_transform_constraint* spine_skeleton_get_transform_constraints(spine_skeleton skeleton);
+SPINE_FLUTTER_EXPORT spine_transform_constraint *spine_skeleton_get_transform_constraints(spine_skeleton skeleton);
 SPINE_FLUTTER_EXPORT int32_t spine_skeleton_get_num_path_constraints(spine_skeleton skeleton);
-SPINE_FLUTTER_EXPORT spine_path_constraint* spine_skeleton_get_path_constraints(spine_skeleton skeleton);
+SPINE_FLUTTER_EXPORT spine_path_constraint *spine_skeleton_get_path_constraints(spine_skeleton skeleton);
 SPINE_FLUTTER_EXPORT spine_skin spine_skeleton_get_skin(spine_skeleton skeleton);
 SPINE_FLUTTER_EXPORT spine_color spine_skeleton_get_color(spine_skeleton skeleton);
 SPINE_FLUTTER_EXPORT void spine_skeleton_set_color(spine_skeleton skeleton, float r, float g, float b, float a);
@@ -400,14 +401,14 @@ SPINE_FLUTTER_EXPORT void spine_skeleton_set_scale_x(spine_skeleton skeleton, fl
 SPINE_FLUTTER_EXPORT float spine_skeleton_get_scale_y(spine_skeleton skeleton);
 SPINE_FLUTTER_EXPORT void spine_skeleton_set_scale_y(spine_skeleton skeleton, float scaleY);
 
-SPINE_FLUTTER_EXPORT const utf8* spine_event_data_get_name(spine_event_data event);
+SPINE_FLUTTER_EXPORT const utf8 *spine_event_data_get_name(spine_event_data event);
 SPINE_FLUTTER_EXPORT int32_t spine_event_data_get_int_value(spine_event_data event);
 SPINE_FLUTTER_EXPORT void spine_event_data_set_int_value(spine_event_data event, int32_t value);
 SPINE_FLUTTER_EXPORT float spine_event_data_get_float_value(spine_event_data event);
 SPINE_FLUTTER_EXPORT void spine_event_data_set_float_value(spine_event_data event, float value);
-SPINE_FLUTTER_EXPORT const utf8* spine_event_data_get_string_value(spine_event_data event);
+SPINE_FLUTTER_EXPORT const utf8 *spine_event_data_get_string_value(spine_event_data event);
 SPINE_FLUTTER_EXPORT void spine_event_data_set_string_value(spine_event_data event, const utf8 *value);
-SPINE_FLUTTER_EXPORT const utf8* spine_event_data_get_audio_path(spine_event_data event);
+SPINE_FLUTTER_EXPORT const utf8 *spine_event_data_get_audio_path(spine_event_data event);
 // OMITTED setAudioPath()
 SPINE_FLUTTER_EXPORT float spine_event_data_get_volume(spine_event_data event);
 SPINE_FLUTTER_EXPORT void spine_event_data_set_volume(spine_event_data event, float volume);
@@ -420,7 +421,7 @@ SPINE_FLUTTER_EXPORT int32_t spine_event_get_int_value(spine_event event);
 SPINE_FLUTTER_EXPORT void spine_event_set_int_value(spine_event event, int32_t value);
 SPINE_FLUTTER_EXPORT float spine_event_get_float_value(spine_event event);
 SPINE_FLUTTER_EXPORT void spine_event_set_float_value(spine_event event, float value);
-SPINE_FLUTTER_EXPORT const utf8* spine_event_get_string_value(spine_event event);
+SPINE_FLUTTER_EXPORT const utf8 *spine_event_get_string_value(spine_event event);
 SPINE_FLUTTER_EXPORT void spine_event_set_string_value(spine_event event, const utf8 *value);
 SPINE_FLUTTER_EXPORT float spine_event_get_volume(spine_event event);
 SPINE_FLUTTER_EXPORT void spine_event_set_volume(spine_event event, float volume);
@@ -428,7 +429,7 @@ SPINE_FLUTTER_EXPORT float spine_event_get_balance(spine_event event);
 SPINE_FLUTTER_EXPORT void spine_event_set_balance(spine_event event, float balance);
 
 SPINE_FLUTTER_EXPORT int32_t spine_slot_data_get_index(spine_slot_data slot);
-SPINE_FLUTTER_EXPORT const utf8* spine_slot_data_get_name(spine_slot_data slot);
+SPINE_FLUTTER_EXPORT const utf8 *spine_slot_data_get_name(spine_slot_data slot);
 SPINE_FLUTTER_EXPORT spine_bone_data spine_slot_data_get_bone_data(spine_slot_data slot);
 SPINE_FLUTTER_EXPORT spine_color spine_slot_data_get_color(spine_slot_data slot);
 SPINE_FLUTTER_EXPORT void spine_slot_data_set_color(spine_slot_data slot, float r, float g, float b, float a);
@@ -436,7 +437,7 @@ SPINE_FLUTTER_EXPORT spine_color spine_slot_data_get_dark_color(spine_slot_data 
 SPINE_FLUTTER_EXPORT void spine_slot_data_set_dark_color(spine_slot_data slot, float r, float g, float b, float a);
 SPINE_FLUTTER_EXPORT int32_t spine_slot_data_has_dark_color(spine_slot_data slot);
 SPINE_FLUTTER_EXPORT void spine_slot_data_set_has_dark_color(spine_slot_data slot, int32_t hasDarkColor);
-SPINE_FLUTTER_EXPORT const utf8* spine_slot_data_get_attachment_name(spine_slot_data slot);
+SPINE_FLUTTER_EXPORT const utf8 *spine_slot_data_get_attachment_name(spine_slot_data slot);
 SPINE_FLUTTER_EXPORT void spine_slot_data_set_attachment_name(spine_slot_data slot, const utf8 *attachmentName);
 SPINE_FLUTTER_EXPORT spine_blend_mode spine_slot_data_get_blend_mode(spine_slot_data slot);
 SPINE_FLUTTER_EXPORT void spine_slot_data_set_blend_mode(spine_slot_data slot, spine_blend_mode blendMode);
@@ -456,9 +457,8 @@ SPINE_FLUTTER_EXPORT void spine_slot_set_attachment(spine_slot slot, spine_attac
 SPINE_FLUTTER_EXPORT int32_t spine_slot_get_sequence_index(spine_slot slot);
 SPINE_FLUTTER_EXPORT void spine_slot_set_sequence_index(spine_slot slot, int32_t sequenceIndex);
 
-
 SPINE_FLUTTER_EXPORT int32_t spine_bone_data_get_index(spine_bone_data data);
-SPINE_FLUTTER_EXPORT const utf8* spine_bone_data_get_name(spine_bone_data data);
+SPINE_FLUTTER_EXPORT const utf8 *spine_bone_data_get_name(spine_bone_data data);
 SPINE_FLUTTER_EXPORT spine_bone_data spine_bone_data_get_parent(spine_bone_data data);
 SPINE_FLUTTER_EXPORT float spine_bone_data_get_length(spine_bone_data data);
 SPINE_FLUTTER_EXPORT void spine_bone_data_set_length(spine_bone_data data, float length);
@@ -500,7 +500,7 @@ SPINE_FLUTTER_EXPORT spine_bone_data spine_bone_get_data(spine_bone bone);
 SPINE_FLUTTER_EXPORT spine_skeleton spine_bone_get_skeleton(spine_bone bone);
 SPINE_FLUTTER_EXPORT spine_bone spine_bone_get_parent(spine_bone bone);
 SPINE_FLUTTER_EXPORT int32_t spine_bone_get_num_children(spine_bone bone);
-SPINE_FLUTTER_EXPORT spine_bone* spine_bone_get_children(spine_bone bone);
+SPINE_FLUTTER_EXPORT spine_bone *spine_bone_get_children(spine_bone bone);
 SPINE_FLUTTER_EXPORT float spine_bone_get_x(spine_bone bone);
 SPINE_FLUTTER_EXPORT void spine_bone_set_x(spine_bone bone, float x);
 SPINE_FLUTTER_EXPORT float spine_bone_get_y(spine_bone bone);
@@ -548,7 +548,7 @@ SPINE_FLUTTER_EXPORT float spine_bone_get_world_scale_y(spine_bone bone);
 SPINE_FLUTTER_EXPORT int32_t spine_bone_get_is_active(spine_bone bone);
 SPINE_FLUTTER_EXPORT void spine_bone_set_is_active(spine_bone bone, int32_t isActive);
 
-SPINE_FLUTTER_EXPORT const utf8* spine_attachment_get_name(spine_attachment attachment);
+SPINE_FLUTTER_EXPORT const utf8 *spine_attachment_get_name(spine_attachment attachment);
 SPINE_FLUTTER_EXPORT spine_attachment_type spine_attachment_get_type(spine_attachment attachment);
 SPINE_FLUTTER_EXPORT spine_attachment spine_attachment_copy(spine_attachment attachment);
 SPINE_FLUTTER_EXPORT void spine_attachment_dispose(spine_attachment attachment);
@@ -648,12 +648,12 @@ SPINE_FLUTTER_EXPORT void spine_path_attachment_set_is_constant_speed(spine_path
 SPINE_FLUTTER_EXPORT spine_color spine_path_attachment_get_color(spine_path_attachment attachment);
 SPINE_FLUTTER_EXPORT void spine_path_attachment_set_color(spine_path_attachment attachment, float r, float g, float b, float a);
 
-SPINE_FLUTTER_EXPORT void spine_skin_set_attachment(spine_skin skin, int32_t slotIndex, const utf8* name, spine_attachment attachment);
-SPINE_FLUTTER_EXPORT spine_attachment spine_skin_get_attachment(spine_skin skin, int32_t slotIndex, const utf8* name);
-SPINE_FLUTTER_EXPORT void spine_skin_remove_attachment(spine_skin skin, int32_t slotIndex, const utf8* name);
+SPINE_FLUTTER_EXPORT void spine_skin_set_attachment(spine_skin skin, int32_t slotIndex, const utf8 *name, spine_attachment attachment);
+SPINE_FLUTTER_EXPORT spine_attachment spine_skin_get_attachment(spine_skin skin, int32_t slotIndex, const utf8 *name);
+SPINE_FLUTTER_EXPORT void spine_skin_remove_attachment(spine_skin skin, int32_t slotIndex, const utf8 *name);
 // OMITTED findNamesForSlot()
 // OMITTED findAttachmentsForSlot()
-SPINE_FLUTTER_EXPORT const utf8* spine_skin_get_name(spine_skin skin);
+SPINE_FLUTTER_EXPORT const utf8 *spine_skin_get_name(spine_skin skin);
 SPINE_FLUTTER_EXPORT void spine_skin_add_skin(spine_skin skin, spine_skin other);
 SPINE_FLUTTER_EXPORT void spine_skin_copy_skin(spine_skin skin, spine_skin other);
 SPINE_FLUTTER_EXPORT spine_skin_entries spine_skin_get_entries(spine_skin skin);
@@ -664,21 +664,21 @@ SPINE_FLUTTER_EXPORT int32_t spine_skin_entry_get_slot_index(spine_skin_entry en
 SPINE_FLUTTER_EXPORT utf8 *spine_skin_entry_get_name(spine_skin_entry entry);
 SPINE_FLUTTER_EXPORT spine_attachment spine_skin_entry_get_attachment(spine_skin_entry entry);
 SPINE_FLUTTER_EXPORT int32_t spine_skin_get_num_bones(spine_skin skin);
-SPINE_FLUTTER_EXPORT spine_bone_data* spine_skin_get_bones(spine_skin skin);
+SPINE_FLUTTER_EXPORT spine_bone_data *spine_skin_get_bones(spine_skin skin);
 SPINE_FLUTTER_EXPORT int32_t spine_skin_get_num_constraints(spine_skin skin);
-SPINE_FLUTTER_EXPORT spine_constraint_data* spine_skin_get_constraints(spine_skin skin);
-SPINE_FLUTTER_EXPORT spine_skin spine_skin_create(const utf8* name);
+SPINE_FLUTTER_EXPORT spine_constraint_data *spine_skin_get_constraints(spine_skin skin);
+SPINE_FLUTTER_EXPORT spine_skin spine_skin_create(const utf8 *name);
 SPINE_FLUTTER_EXPORT void spine_skin_dispose(spine_skin skin);
 
 SPINE_FLUTTER_EXPORT spine_constraint_type spine_constraint_data_get_type(spine_constraint_data data);
-SPINE_FLUTTER_EXPORT const utf8* spine_constraint_data_get_name(spine_constraint_data data);
+SPINE_FLUTTER_EXPORT const utf8 *spine_constraint_data_get_name(spine_constraint_data data);
 SPINE_FLUTTER_EXPORT uint64_t spine_constraint_data_get_order(spine_constraint_data data);
 SPINE_FLUTTER_EXPORT void spine_constraint_data_set_order(spine_constraint_data data, uint64_t order);
 SPINE_FLUTTER_EXPORT int32_t spine_constraint_data_get_is_skin_required(spine_constraint_data data);
 SPINE_FLUTTER_EXPORT void spine_constraint_data_set_is_skin_required(spine_constraint_data data, int32_t isSkinRequired);
 
 SPINE_FLUTTER_EXPORT int32_t spine_ik_constraint_data_get_num_bones(spine_ik_constraint_data data);
-SPINE_FLUTTER_EXPORT spine_bone_data* spine_ik_constraint_data_get_bones(spine_ik_constraint_data data);
+SPINE_FLUTTER_EXPORT spine_bone_data *spine_ik_constraint_data_get_bones(spine_ik_constraint_data data);
 SPINE_FLUTTER_EXPORT spine_bone_data spine_ik_constraint_data_get_target(spine_ik_constraint_data data);
 SPINE_FLUTTER_EXPORT void spine_ik_constraint_data_set_target(spine_ik_constraint_data data, spine_bone_data target);
 SPINE_FLUTTER_EXPORT int32_t spine_ik_constraint_data_get_bend_direction(spine_ik_constraint_data data);
@@ -698,7 +698,7 @@ SPINE_FLUTTER_EXPORT void spine_ik_constraint_update(spine_ik_constraint constra
 SPINE_FLUTTER_EXPORT int32_t spine_ik_constraint_get_order(spine_ik_constraint constraint);
 SPINE_FLUTTER_EXPORT spine_ik_constraint_data spine_ik_constraint_get_data(spine_ik_constraint constraint);
 SPINE_FLUTTER_EXPORT int32_t spine_ik_constraint_get_num_bones(spine_ik_constraint constraint);
-SPINE_FLUTTER_EXPORT spine_bone* spine_ik_constraint_get_bones(spine_ik_constraint constraint);
+SPINE_FLUTTER_EXPORT spine_bone *spine_ik_constraint_get_bones(spine_ik_constraint constraint);
 SPINE_FLUTTER_EXPORT spine_bone spine_ik_constraint_get_target(spine_ik_constraint constraint);
 SPINE_FLUTTER_EXPORT void spine_ik_constraint_set_target(spine_ik_constraint constraint, spine_bone target);
 SPINE_FLUTTER_EXPORT int32_t spine_ik_constraint_get_bend_direction(spine_ik_constraint constraint);
@@ -715,7 +715,7 @@ SPINE_FLUTTER_EXPORT int32_t spine_ik_constraint_get_is_active(spine_ik_constrai
 SPINE_FLUTTER_EXPORT void spine_ik_constraint_set_is_active(spine_ik_constraint constraint, int32_t isActive);
 
 SPINE_FLUTTER_EXPORT int32_t spine_transform_constraint_data_get_num_bones(spine_transform_constraint_data data);
-SPINE_FLUTTER_EXPORT spine_bone_data* spine_transform_constraint_data_get_bones(spine_transform_constraint_data data);
+SPINE_FLUTTER_EXPORT spine_bone_data *spine_transform_constraint_data_get_bones(spine_transform_constraint_data data);
 SPINE_FLUTTER_EXPORT spine_bone_data spine_transform_constraint_data_get_target(spine_transform_constraint_data data);
 SPINE_FLUTTER_EXPORT void spine_transform_constraint_data_set_target(spine_transform_constraint_data data, spine_bone_data target);
 SPINE_FLUTTER_EXPORT float spine_transform_constraint_data_get_mix_rotate(spine_transform_constraint_data data);
@@ -751,7 +751,7 @@ SPINE_FLUTTER_EXPORT void spine_transform_constraint_update(spine_transform_cons
 SPINE_FLUTTER_EXPORT int32_t spine_transform_constraint_get_order(spine_transform_constraint constraint);
 SPINE_FLUTTER_EXPORT spine_transform_constraint_data spine_transform_constraint_get_data(spine_transform_constraint constraint);
 SPINE_FLUTTER_EXPORT int32_t spine_transform_constraint_get_num_bones(spine_transform_constraint constraint);
-SPINE_FLUTTER_EXPORT spine_bone* spine_transform_constraint_get_bones(spine_transform_constraint constraint);
+SPINE_FLUTTER_EXPORT spine_bone *spine_transform_constraint_get_bones(spine_transform_constraint constraint);
 SPINE_FLUTTER_EXPORT spine_bone spine_transform_constraint_get_target(spine_transform_constraint constraint);
 SPINE_FLUTTER_EXPORT void spine_transform_constraint_set_target(spine_transform_constraint constraint, spine_bone target);
 SPINE_FLUTTER_EXPORT float spine_transform_constraint_get_mix_rotate(spine_transform_constraint constraint);
@@ -770,7 +770,7 @@ SPINE_FLUTTER_EXPORT float spine_transform_constraint_get_is_active(spine_transf
 SPINE_FLUTTER_EXPORT void spine_transform_constraint_set_is_active(spine_transform_constraint constraint, int32_t isActive);
 
 SPINE_FLUTTER_EXPORT int32_t spine_path_constraint_data_get_num_bones(spine_path_constraint_data data);
-SPINE_FLUTTER_EXPORT spine_bone_data* spine_path_constraint_data_get_bones(spine_path_constraint_data data);
+SPINE_FLUTTER_EXPORT spine_bone_data *spine_path_constraint_data_get_bones(spine_path_constraint_data data);
 SPINE_FLUTTER_EXPORT spine_slot_data spine_path_constraint_data_get_target(spine_path_constraint_data data);
 SPINE_FLUTTER_EXPORT void spine_path_constraint_data_set_target(spine_path_constraint_data data, spine_slot_data target);
 SPINE_FLUTTER_EXPORT spine_position_mode spine_path_constraint_data_get_position_mode(spine_path_constraint_data data);
@@ -796,7 +796,7 @@ SPINE_FLUTTER_EXPORT void spine_path_constraint_update(spine_path_constraint con
 SPINE_FLUTTER_EXPORT int32_t spine_path_constraint_get_order(spine_path_constraint constraint);
 SPINE_FLUTTER_EXPORT spine_path_constraint_data spine_path_constraint_get_data(spine_path_constraint constraint);
 SPINE_FLUTTER_EXPORT int32_t spine_path_constraint_get_num_bones(spine_path_constraint constraint);
-SPINE_FLUTTER_EXPORT spine_bone* spine_path_constraint_get_bones(spine_path_constraint constraint);
+SPINE_FLUTTER_EXPORT spine_bone *spine_path_constraint_get_bones(spine_path_constraint constraint);
 SPINE_FLUTTER_EXPORT spine_slot spine_path_constraint_get_target(spine_path_constraint constraint);
 SPINE_FLUTTER_EXPORT void spine_path_constraint_set_target(spine_path_constraint constraint, spine_slot target);
 SPINE_FLUTTER_EXPORT float spine_path_constraint_get_position(spine_path_constraint constraint);
@@ -814,7 +814,7 @@ SPINE_FLUTTER_EXPORT void spine_path_constraint_set_is_active(spine_path_constra
 
 // OMITTED copy()
 SPINE_FLUTTER_EXPORT void spine_sequence_apply(spine_sequence sequence, spine_slot slot, spine_attachment attachment);
-SPINE_FLUTTER_EXPORT const utf8* spine_sequence_get_path(spine_sequence sequence, const utf8 *basePath, int32_t index);
+SPINE_FLUTTER_EXPORT const utf8 *spine_sequence_get_path(spine_sequence sequence, const utf8 *basePath, int32_t index);
 SPINE_FLUTTER_EXPORT int32_t spine_sequence_get_id(spine_sequence sequence);
 SPINE_FLUTTER_EXPORT void spine_sequence_set_id(spine_sequence sequence, int32_t id);
 SPINE_FLUTTER_EXPORT int32_t spine_sequence_get_start(spine_sequence sequence);
@@ -824,9 +824,9 @@ SPINE_FLUTTER_EXPORT void spine_sequence_set_digits(spine_sequence sequence, int
 SPINE_FLUTTER_EXPORT int32_t spine_sequence_get_setup_index(spine_sequence sequence);
 SPINE_FLUTTER_EXPORT void spine_sequence_set_setup_index(spine_sequence sequence, int32_t setupIndex);
 SPINE_FLUTTER_EXPORT int32_t spine_sequence_get_num_regions(spine_sequence sequence);
-SPINE_FLUTTER_EXPORT spine_texture_region* spine_sequence_get_regions(spine_sequence sequence);
+SPINE_FLUTTER_EXPORT spine_texture_region *spine_sequence_get_regions(spine_sequence sequence);
 
-SPINE_FLUTTER_EXPORT void* spine_texture_region_get_texture(spine_texture_region textureRegion);
+SPINE_FLUTTER_EXPORT void *spine_texture_region_get_texture(spine_texture_region textureRegion);
 SPINE_FLUTTER_EXPORT void spine_texture_region_set_texture(spine_texture_region textureRegion, void *texture);
 SPINE_FLUTTER_EXPORT float spine_texture_region_get_u(spine_texture_region textureRegion);
 SPINE_FLUTTER_EXPORT void spine_texture_region_set_u(spine_texture_region textureRegion, float u);
