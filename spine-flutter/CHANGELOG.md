@@ -1,3 +1,6 @@
+# 4.2.5
+* Implemented batching of render commands, reducing the number of draw calls. 60/120fps for 100 Spineboys on all platforms.
+
 # 0.0.4
 * Clean-up `fromAsset()` factory methods so the atlas comes before skeleton data file name.
 * Rename `Vector2` to `Vec2`.
