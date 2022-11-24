@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui';
 
+import 'package:flutter/material.dart' as material;
 import 'package:flutter/rendering.dart' as rendering;
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -3242,7 +3243,6 @@ class AnimationState {
   }
 }
 
-// FIXME add callbacks for update, apply and updateWorldTransform. Pass through SpineWidgetController
 class SkeletonDrawable {
   final Atlas atlas;
   final SkeletonData skeletonData;
@@ -3321,19 +3321,23 @@ class SkeletonDrawable {
 class RenderCommand {
   late final Vertices vertices;
   late final int atlasPageIndex;
+  late final Float32List positions;
+  late final Float32List uvs;
+  late final Int32List colors;
+  late final Uint16List indices;
 
   RenderCommand._(spine_render_command nativeCmd, double pageWidth, double pageHeight) {
     atlasPageIndex = _bindings.spine_render_command_get_atlas_page(nativeCmd);
     int numVertices = _bindings.spine_render_command_get_num_vertices(nativeCmd);
     int numIndices = _bindings.spine_render_command_get_num_indices(nativeCmd);
-    final positions = _bindings.spine_render_command_get_positions(nativeCmd).asTypedList(numVertices * 2);
-    final uvs = _bindings.spine_render_command_get_uvs(nativeCmd).asTypedList(numVertices * 2);
+    positions = _bindings.spine_render_command_get_positions(nativeCmd).asTypedList(numVertices * 2);
+    uvs = _bindings.spine_render_command_get_uvs(nativeCmd).asTypedList(numVertices * 2);
     for (int i = 0; i < numVertices * 2; i += 2) {
       uvs[i] *= pageWidth;
       uvs[i + 1] *= pageHeight;
     }
-    final colors = _bindings.spine_render_command_get_colors(nativeCmd).asTypedList(numVertices);
-    final indices = _bindings.spine_render_command_get_indices(nativeCmd).asTypedList(numIndices);
+    colors = _bindings.spine_render_command_get_colors(nativeCmd).asTypedList(numVertices);
+    indices = _bindings.spine_render_command_get_indices(nativeCmd).asTypedList(numIndices);
 
     if (!kIsWeb) {
       // We pass the native data as views directly to Vertices.raw. According to the sources, the data
@@ -3354,6 +3358,19 @@ class RenderCommand {
           textureCoordinates: uvsCopy,
           colors: colorsCopy,
           indices: indicesCopy);
+    }
+  }
+}
+
+class DebugRenderer {
+  const DebugRenderer();
+
+  void render(SkeletonDrawable drawable, Canvas canvas, List<RenderCommand> commands) {
+    final bonePaint = Paint()
+      ..color = material.Colors.blue
+      ..style = PaintingStyle.fill;
+    for (final bone in drawable.skeleton.getBones()) {
+      canvas.drawRect(Rect.fromCenter(center: Offset(bone.getWorldX(), bone.getWorldY()), width: 5, height: 5), bonePaint);
     }
   }
 }

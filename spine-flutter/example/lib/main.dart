@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:esotericsoftware_spine_flutter/spine_flutter.dart';
+import 'package:spine_flutter_example/debug_rendering.dart';
 
 import 'flame_example.dart';
 import 'simple_animation.dart';
@@ -52,6 +53,18 @@ class ExampleSelector extends StatelessWidget {
                     context,
                     MaterialPageRoute<void>(
                       builder: (context) => const AnimationStateEvents(),
+                    ),
+                  );
+                },
+              ),
+              spacer,
+              ElevatedButton(
+                child: const Text('Debug Rendering'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (context) => DebugRendering(),
                     ),
                   );
                 },

@@ -14,7 +14,7 @@ class SpineWidgetController {
   final void Function(SpineWidgetController controller)? onBeforeUpdateWorldTransforms;
   final void Function(SpineWidgetController controller)? onAfterUpdateWorldTransforms;
   final void Function(SpineWidgetController controller, Canvas canvas)? onBeforePaint;
-  final void Function(SpineWidgetController controller, Canvas canvas)? onAfterPaint;
+  final void Function(SpineWidgetController controller, Canvas canvas, List<RenderCommand> commands)? onAfterPaint;
 
   SpineWidgetController({this.onInitialized, this.onBeforeUpdateWorldTransforms, this.onAfterUpdateWorldTransforms, this.onBeforePaint, this.onAfterPaint});
 
@@ -211,6 +211,7 @@ class SpineWidget extends StatefulWidget {
 
 class _SpineWidgetState extends State<SpineWidget> {
   late Bounds _computedBounds;
+  SkeletonDrawable? _drawable;
 
   @override
   void initState() {
@@ -223,6 +224,7 @@ class _SpineWidgetState extends State<SpineWidget> {
   }
 
   void loadDrawable(SkeletonDrawable drawable) {
+    _drawable = drawable;
     _computedBounds = widget._boundsProvider.computeBounds(drawable);
     widget._controller._initialize(drawable);
     setState(() {});
@@ -246,8 +248,8 @@ class _SpineWidgetState extends State<SpineWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget._controller._drawable != null) {
-      return _SpineRenderObjectWidget(widget._controller._drawable!, widget._controller, widget._fit, widget._alignment, _computedBounds, widget._sizedByBounds);
+    if (_drawable != null) {
+      return _SpineRenderObjectWidget(_drawable!, widget._controller, widget._fit, widget._alignment, _computedBounds, widget._sizedByBounds);
     } else {
       return const SizedBox();
     }
@@ -461,8 +463,11 @@ class _SpineRenderObject extends RenderBox {
     _setCanvasTransform(canvas, offset);
 
     _controller.onBeforePaint?.call(_controller, canvas);
-    _skeletonDrawable.renderToCanvas(canvas);
-    _controller.onAfterPaint?.call(_controller, canvas);
+    var commands = _skeletonDrawable.render();
+    for (final cmd in commands) {
+      canvas.drawVertices(cmd.vertices, rendering.BlendMode.modulate, _skeletonDrawable.atlas.atlasPagePaints[cmd.atlasPageIndex]);
+    }
+    _controller.onAfterPaint?.call(_controller, canvas, commands);
 
     canvas.restore();
     SchedulerBinding.instance.scheduleFrameCallback(_beginFrame);
