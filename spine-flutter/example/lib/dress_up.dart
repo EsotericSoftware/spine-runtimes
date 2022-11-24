@@ -80,7 +80,15 @@ class DressUpState extends State<DressUp> {
                                 },
                                 child: _selectedSkins[skinName] == true
                                       ? box
-                                      : ColorFiltered(colorFilter: const ColorFilter.mode(Colors.grey, painting.BlendMode.saturation,), child: box)
+                                      // Does not work on web.
+                                      //: ColorFiltered(colorFilter: const ColorFilter.mode(Colors.grey, painting.BlendMode.saturation,), child: box)
+                                      : Container(
+                                          foregroundDecoration: BoxDecoration(
+                                            color: Colors.grey,
+                                            backgroundBlendMode: painting.BlendMode.saturation,
+                                          ),
+                                          child: box
+                                        )
                             );
                           }).toList()
                       ),
