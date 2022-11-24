@@ -3308,7 +3308,7 @@ class SkeletonDrawable {
     }
   }
 
-  Future<RawImageData> renderToRawImageData(double width, double height) async {
+  PictureRecorder renderToPictureRecorder(double width, double height) {
     var bounds = skeleton.getBounds();
     var scale = 1 / (bounds.width > bounds.height ? bounds.width / width : bounds.height / height);
 
@@ -3324,6 +3324,17 @@ class SkeletonDrawable {
     canvas.translate(-(bounds.x + bounds.width / 2), -(bounds.y + bounds.height / 2));
     canvas.drawRect(const Rect.fromLTRB(-5, -5, 5, -5), paint..color = material.Colors.red);
     renderToCanvas(canvas);
+    return recorder;
+  }
+
+  Future<Uint8List> renderToPng(double width, double height) async {
+    final recorder = renderToPictureRecorder(width, height);
+    final image = await recorder.endRecording().toImage(width.toInt(), height.toInt());
+    return (await image.toByteData(format: ImageByteFormat.png))!.buffer.asUint8List();
+  }
+
+  Future<RawImageData> renderToRawImageData(double width, double height) async {
+    final recorder = renderToPictureRecorder(width, height);
     var rawImageData = (await (await recorder.endRecording().toImage(width.toInt(), height.toInt())).toByteData(format: ImageByteFormat.rawRgba))!.buffer.asUint8List();
     return RawImageData(rawImageData, width.toInt(), height.toInt());
   }

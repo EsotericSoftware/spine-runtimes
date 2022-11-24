@@ -67,7 +67,7 @@ class DressUpState extends State<DressUp> {
             ? const SizedBox()
             : Row(
                   children: [
-                    Container(width: thumbnailSize, child:
+                    SizedBox(width: thumbnailSize, child:
                       ListView(
                           children: _skinImages.keys.map((skinName) {
                             var rawImageData = _skinImages[skinName]!;
@@ -80,7 +80,7 @@ class DressUpState extends State<DressUp> {
                                 },
                                 child: _selectedSkins[skinName] == true
                                       ? box
-                                      : ColorFiltered(colorFilter: ColorFilter.mode(Colors.grey, painting.BlendMode.saturation,), child: box)
+                                      : ColorFiltered(colorFilter: const ColorFilter.mode(Colors.grey, painting.BlendMode.saturation,), child: box)
                             );
                           }).toList()
                       ),
@@ -97,5 +97,6 @@ class DressUpState extends State<DressUp> {
   void dispose() {
     super.dispose();
     _drawable?.dispose();
+    _customSkin?.dispose();
   }
 }
