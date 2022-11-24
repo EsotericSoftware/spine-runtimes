@@ -6,7 +6,6 @@ import 'flame_example.dart';
 import 'simple_animation.dart';
 import 'animation_state_events.dart';
 import 'pause_play_animation.dart';
-import 'skins.dart';
 import 'dress_up.dart';
 import 'ik_following.dart';
 
@@ -65,18 +64,6 @@ class ExampleSelector extends StatelessWidget {
                     context,
                     MaterialPageRoute<void>(
                       builder: (context) => DebugRendering(),
-                    ),
-                  );
-                },
-              ),
-              spacer,
-              ElevatedButton(
-                child: const Text('Skins'),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute<void>(
-                      builder: (context) => const Skins(),
                     ),
                   );
                 },

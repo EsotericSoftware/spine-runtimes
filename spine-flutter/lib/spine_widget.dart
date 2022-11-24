@@ -106,17 +106,18 @@ class SkinAndAnimationBounds extends BoundsProvider {
 
   @override
   Bounds computeBounds(SkeletonDrawable drawable) {
-    var data = drawable.skeletonData;
-    var customSkin = Skin("custom-skin");
-    for (var skinName in skins) {
-      var skin = data.findSkin(skinName);
+    final data = drawable.skeletonData;
+    final oldSkin = drawable.skeleton.getSkin();
+    final customSkin = Skin("custom-skin");
+    for (final skinName in skins) {
+      final skin = data.findSkin(skinName);
       if (skin == null) continue;
       customSkin.addSkin(skin);
     }
     drawable.skeleton.setSkin(customSkin);
     drawable.skeleton.setToSetupPose();
 
-    final animation = data.findAnimation(this.animation!);
+    final animation = this.animation != null ? data.findAnimation(this.animation!) : null;
     double minX = double.infinity;
     double minY = double.infinity;
     double maxX = double.negativeInfinity;
@@ -142,6 +143,7 @@ class SkinAndAnimationBounds extends BoundsProvider {
     customSkin.dispose();
     drawable.skeleton.setSkinByName("default");
     drawable.animationState.clearTracks();
+    if (oldSkin != null) drawable.skeleton.setSkin(oldSkin);
     drawable.skeleton.setToSetupPose();
     drawable.update(0);
     return Bounds(minX, minY, maxX - minX, maxY - minY);

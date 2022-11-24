@@ -13,7 +13,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  plugin_platform_interface: ^2.0.2
   ffi: ^2.0.1
   web_ffi_fork: ^0.7.4
   inject_js: ^2.0.0
@@ -21,6 +20,7 @@ dependencies:
   meta: ^1.3.0
   http: ^0.13.5
   path: ^1.8.2
+  raw_image_provider: ^0.2.0
 
 dev_dependencies:
   ffigen: ^6.1.2

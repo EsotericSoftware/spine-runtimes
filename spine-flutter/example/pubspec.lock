@@ -132,15 +132,8 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.8.2"
-  plugin_platform_interface:
-    dependency: transitive
-    description:
-      name: plugin_platform_interface
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.1.2"
   raw_image_provider:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: raw_image_provider
       url: "https://pub.dartlang.org"

@@ -16,8 +16,7 @@ class DressUp extends StatefulWidget {
 
 class DressUpState extends State<DressUp> {
   static const double thumbnailSize = 200;
-  late SpineWidgetController _controller;
-  SkeletonDrawable? _drawable;
+  late SkeletonDrawable _drawable;
   Skin? _customSkin;
   final Map<String, RawImageData> _skinImages = {};
   final Map<String, bool> _selectedSkins = {};
@@ -27,42 +26,18 @@ class DressUpState extends State<DressUp> {
     reportLeaks();
     super.initState();
     SkeletonDrawable.fromAsset("assets/mix-and-match.atlas", "assets/mix-and-match-pro.skel").then((drawable) async {
+      _drawable = drawable;
       for (var skin in drawable.skeletonData.getSkins()) {
         if (skin.getName() == "default") continue;
-
         var skeleton = drawable.skeleton;
         skeleton.setSkin(skin);
         skeleton.setToSetupPose();
         skeleton.updateWorldTransform();
-        var bounds = skeleton.getBounds();
-        var scale = 1 / (bounds.width > bounds.height ? bounds.width / thumbnailSize : bounds.height / thumbnailSize);
-
-        var recorder = ui.PictureRecorder();
-        var canvas = Canvas(recorder);
-        var bgColor = Random().nextInt(0xffffffff) | 0xff0000000;
-        var paint = Paint()
-          ..color = ui.Color(bgColor)
-          ..style = PaintingStyle.fill;
-        canvas.drawRect(const Rect.fromLTWH(0, 0, thumbnailSize, thumbnailSize), paint);
-        canvas.translate(thumbnailSize / 2, thumbnailSize / 2);
-        canvas.scale(scale, scale);
-        canvas.translate(-(bounds.x + bounds.width / 2), -(bounds.y + bounds.height / 2));
-        canvas.drawRect(Rect.fromLTRB(-5, -5, 5, -5), paint..color = Colors.red);
-        drawable.renderToCanvas(canvas);
-
-        var rawImageData = (await (await recorder.endRecording().toImage(thumbnailSize.toInt(), thumbnailSize.toInt())).toByteData(format: ui.ImageByteFormat.rawRgba))!.buffer.asUint8List();
-        _skinImages[skin.getName()] = (RawImageData(rawImageData, thumbnailSize.toInt(), thumbnailSize.toInt()));
+        _skinImages[skin.getName()] = await drawable.renderToRawImageData(thumbnailSize, thumbnailSize);
         _selectedSkins[skin.getName()] = false;
       }
-      _drawable = drawable;
-      _controller = SpineWidgetController(onInitialized: (controller) {
-        controller.animationState.setAnimationByName(0, "dance", true);
-      });
-      setState(() {
-        _selectedSkins["full-skins/girl"] = true;
-        drawable.skeleton.setSkinByName("full-skins/girl");
-        drawable.skeleton.setToSetupPose();
-      });
+      _toggleSkin("full-skins/girl");
+      setState(() {});
     });
   }
 
@@ -72,16 +47,20 @@ class DressUpState extends State<DressUp> {
     _customSkin = Skin("custom-skin");
     for (var skinName in _selectedSkins.keys) {
       if (_selectedSkins[skinName] == true) {
-        var skin = _controller.skeletonData.findSkin(skinName);
+        var skin = _drawable.skeletonData.findSkin(skinName);
         if (skin != null) _customSkin?.addSkin(skin);
       }
     }
-    _controller.skeleton.setSkin(_customSkin!);
-    _controller.skeleton.setToSetupPose();
+    _drawable.skeleton.setSkin(_customSkin!);
+    _drawable.skeleton.setToSetupPose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final controller = SpineWidgetController(onInitialized: (controller) {
+      controller.animationState.setAnimationByName(0, "dance", true);
+    });
+
     return Scaffold(
         appBar: AppBar(title: const Text('Dress Up')),
         body: _skinImages.isEmpty
@@ -107,7 +86,7 @@ class DressUpState extends State<DressUp> {
                       ),
                     ),
                     Expanded(
-                      child: SpineWidget.drawable(_drawable, _controller, boundsProvider: SkinAndAnimationBounds(skins: ["full-skins/girl"]),)
+                      child: SpineWidget.drawable(_drawable, controller, boundsProvider: SkinAndAnimationBounds(skins: ["full-skins/girl"]),)
                     )
                   ]
               )

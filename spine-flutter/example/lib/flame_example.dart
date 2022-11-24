@@ -37,9 +37,8 @@ class SpineComponent extends PositionComponent {
         Iterable<Component>? children,
         int? priority,
       }) async {
-    final drawable = await SkeletonDrawable.fromAsset(atlasFile, skeletonFile, bundle: bundle);
     return SpineComponent(
-        drawable,
+        await SkeletonDrawable.fromAsset(atlasFile, skeletonFile, bundle: bundle),
         ownsDrawable: true,
         boundsProvider: boundsProvider,
         position: position,
@@ -53,6 +52,11 @@ class SpineComponent extends PositionComponent {
   void dispose() {
     if (_ownsDrawable) {
       _drawable.dispose();
+    }
+
+    @override
+    void onDetach() {
+
     }
   }
   
@@ -133,9 +137,11 @@ class PreloadAndShareSpineDataExample extends FlameGame {
 
   @override
   void onDetach() {
-    // Dispose the pre-loaded atlas and skeleton data when the game/scene is removed
+    // Dispose the pre-loaded atlas and skeleton data when the game/scene is removed.
     cachedAtlas.dispose();
     cachedSkeletonData.dispose();
+
+    // Dispose each spineboy and its internal SkeletonDrawable.
     for (final spineboy in spineboys) {
       spineboy.dispose();
     }

@@ -1,5 +1,6 @@
 import 'dart:convert' as convert;
 import 'dart:io';
+import 'dart:math';
 import 'dart:typed_data';
 import 'dart:ui';
 
@@ -8,6 +9,7 @@ import 'package:flutter/rendering.dart' as rendering;
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
+import 'package:raw_image_provider/raw_image_provider.dart';
 
 import 'spine_flutter_bindings_generated.dart';
 import 'ffi_proxy.dart';
@@ -2595,7 +2597,6 @@ class Skeleton {
   }
 }
 
-// FIXME expose timelines and apply?
 class Animation {
   final spine_animation _animation;
 
@@ -3305,6 +3306,26 @@ class SkeletonDrawable {
       canvas.drawVertices(
           cmd.vertices, rendering.BlendMode.modulate, atlas.atlasPagePaints[cmd.atlasPageIndex]);
     }
+  }
+
+  Future<RawImageData> renderToRawImageData(double width, double height) async {
+    var bounds = skeleton.getBounds();
+    var scale = 1 / (bounds.width > bounds.height ? bounds.width / width : bounds.height / height);
+
+    var recorder = PictureRecorder();
+    var canvas = Canvas(recorder);
+    var bgColor = Random().nextInt(0xffffffff) | 0xff0000000;
+    var paint = Paint()
+      ..color = material.Color(bgColor)
+      ..style = PaintingStyle.fill;
+    canvas.drawRect(Rect.fromLTWH(0, 0, width, height), paint);
+    canvas.translate(width / 2, height / 2);
+    canvas.scale(scale, scale);
+    canvas.translate(-(bounds.x + bounds.width / 2), -(bounds.y + bounds.height / 2));
+    canvas.drawRect(const Rect.fromLTRB(-5, -5, 5, -5), paint..color = material.Colors.red);
+    renderToCanvas(canvas);
+    var rawImageData = (await (await recorder.endRecording().toImage(width.toInt(), height.toInt())).toByteData(format: ImageByteFormat.rawRgba))!.buffer.asUint8List();
+    return RawImageData(rawImageData, width.toInt(), height.toInt());
   }
 
   void dispose() {
