@@ -16,7 +16,7 @@ class PlayPauseAnimationState extends State<PlayPauseAnimation> {
   void initState() {
     super.initState();
     controller = SpineWidgetController(onInitialized: (controller) {
-      controller.animationState.setAnimationByName(0, "walk", true);
+      controller.animationState.setAnimationByName(0, "flying", true);
     });
     isPlaying = true;
   }
@@ -33,7 +33,7 @@ class PlayPauseAnimationState extends State<PlayPauseAnimation> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Play/Pause')),
-      body: SpineWidget.asset("assets/spineboy.atlas", "assets/spineboy-pro.skel", controller),
+      body: SpineWidget.asset("assets/dragon.atlas", "assets/dragon-ess.skel", controller, boundsProvider: SkinAndAnimationBounds(animation: "flying"),),
       floatingActionButton: FloatingActionButton(
         onPressed: _togglePlay,
         child: Icon(isPlaying ? Icons.pause : Icons.play_arrow),

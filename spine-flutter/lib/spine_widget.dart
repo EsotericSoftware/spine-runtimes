@@ -97,33 +97,54 @@ class RawBounds extends BoundsProvider {
 }
 
 class SkinAndAnimationBounds extends BoundsProvider {
-  final List<String> _skins;
-  final String? _animation;
+  final List<String> skins;
+  final String? animation;
+  final double stepTime;
 
-  SkinAndAnimationBounds(this._skins, [this._animation]);
+  SkinAndAnimationBounds({List<String>? skins, this.animation, this.stepTime = 0.1}) :
+        skins = skins == null || skins.isEmpty? ["default"] : skins;
 
   @override
   Bounds computeBounds(SkeletonDrawable drawable) {
     var data = drawable.skeletonData;
-    var oldSkin = drawable.skeleton.getSkin();
     var customSkin = Skin("custom-skin");
-    for (var skinName in _skins) {
+    for (var skinName in skins) {
       var skin = data.findSkin(skinName);
       if (skin == null) continue;
       customSkin.addSkin(skin);
     }
     drawable.skeleton.setSkin(customSkin);
     drawable.skeleton.setToSetupPose();
-    var bounds = drawable.skeleton.getBounds();
-    customSkin.dispose();
 
-    if (oldSkin == null) {
-      drawable.skeleton.setSkinByName("");
+    final animation = data.findAnimation(this.animation!);
+    double minX = double.infinity;
+    double minY = double.infinity;
+    double maxX = double.negativeInfinity;
+    double maxY = double.negativeInfinity;
+    if (animation == null) {
+      final bounds = drawable.skeleton.getBounds();
+      minX = bounds.x;
+      minY = bounds.y;
+      maxX = minX + bounds.width;
+      maxY = minY + bounds.height;
     } else {
-      drawable.skeleton.setSkin(oldSkin);
+      drawable.animationState.setAnimation(0, animation, false);
+      final steps = max(animation.getDuration() / stepTime, 1.0).toInt();
+      for (int i = 0; i < steps; i++) {
+        drawable.update(i > 0 ? stepTime : 0);
+        final bounds = drawable.skeleton.getBounds();
+        minX = min(minX, bounds.x);
+        minY = min(minY, bounds.y);
+        maxX = max(maxX, minX + bounds.width);
+        maxY = max(maxY, minY + bounds.height);
+      }
     }
+    customSkin.dispose();
+    drawable.skeleton.setSkinByName("default");
+    drawable.animationState.clearTracks();
     drawable.skeleton.setToSetupPose();
-    return bounds;
+    drawable.update(0);
+    return Bounds(minX, minY, maxX - minX, maxY - minY);
   }
 }
 
@@ -189,6 +210,7 @@ class SpineWidget extends StatefulWidget {
 }
 
 class _SpineWidgetState extends State<SpineWidget> {
+  late Bounds _computedBounds;
 
   @override
   void initState() {
@@ -201,6 +223,7 @@ class _SpineWidgetState extends State<SpineWidget> {
   }
 
   void loadDrawable(SkeletonDrawable drawable) {
+    _computedBounds = widget._boundsProvider.computeBounds(drawable);
     widget._controller._initialize(drawable);
     setState(() {});
   }
@@ -224,7 +247,7 @@ class _SpineWidgetState extends State<SpineWidget> {
   @override
   Widget build(BuildContext context) {
     if (widget._controller._drawable != null) {
-      return _SpineRenderObjectWidget(widget._controller._drawable!, widget._controller, widget._fit, widget._alignment, widget._boundsProvider, widget._sizedByBounds);
+      return _SpineRenderObjectWidget(widget._controller._drawable!, widget._controller, widget._fit, widget._alignment, _computedBounds, widget._sizedByBounds);
     } else {
       return const SizedBox();
     }
@@ -242,14 +265,14 @@ class _SpineRenderObjectWidget extends LeafRenderObjectWidget {
   final SpineWidgetController _controller;
   final BoxFit _fit;
   final Alignment _alignment;
-  final BoundsProvider _boundsProvider;
+  final Bounds _bounds;
   final bool _sizedByBounds;
 
-  const _SpineRenderObjectWidget(this._skeletonDrawable, this._controller, this._fit, this._alignment, this._boundsProvider, this._sizedByBounds);
+  const _SpineRenderObjectWidget(this._skeletonDrawable, this._controller, this._fit, this._alignment, this._bounds, this._sizedByBounds);
 
   @override
   RenderObject createRenderObject(BuildContext context) {
-    return _SpineRenderObject(_skeletonDrawable, _controller, _fit, _alignment, _boundsProvider, _sizedByBounds);
+    return _SpineRenderObject(_skeletonDrawable, _controller, _fit, _alignment, _bounds, _sizedByBounds);
   }
 
   @override
@@ -257,7 +280,7 @@ class _SpineRenderObjectWidget extends LeafRenderObjectWidget {
     renderObject.skeletonDrawable = _skeletonDrawable;
     renderObject.fit = _fit;
     renderObject.alignment = _alignment;
-    renderObject.boundsProvider = _boundsProvider;
+    renderObject.bounds = _bounds;
     renderObject.sizedByBounds = _sizedByBounds;
   }
 }
@@ -269,16 +292,14 @@ class _SpineRenderObject extends RenderBox {
   final Stopwatch _stopwatch = Stopwatch();
   BoxFit _fit;
   Alignment _alignment;
-  BoundsProvider _boundsProvider;
-  bool _sizedByBounds;
   Bounds _bounds;
-  _SpineRenderObject(this._skeletonDrawable, this._controller, this._fit, this._alignment, this._boundsProvider, this._sizedByBounds): _bounds = _boundsProvider.computeBounds(_skeletonDrawable);
+  bool _sizedByBounds;
+  _SpineRenderObject(this._skeletonDrawable, this._controller, this._fit, this._alignment, this._bounds, this._sizedByBounds);
 
   set skeletonDrawable(SkeletonDrawable skeletonDrawable) {
     if (_skeletonDrawable == skeletonDrawable) return;
 
     _skeletonDrawable = skeletonDrawable;
-    _bounds = _boundsProvider.computeBounds(_skeletonDrawable);
     markNeedsLayout();
     markNeedsPaint();
   }
@@ -303,12 +324,11 @@ class _SpineRenderObject extends RenderBox {
     }
   }
 
-  BoundsProvider get boundsProvider => _boundsProvider;
+  Bounds get bounds => _bounds;
 
-  set boundsProvider(BoundsProvider boundsProvider) {
-    if (boundsProvider != _boundsProvider) {
-      _boundsProvider = boundsProvider;
-      _bounds = boundsProvider.computeBounds(_skeletonDrawable);
+  set bounds(Bounds bounds) {
+    if (bounds != _bounds) {
+      _bounds = bounds;
       markNeedsLayout();
       markNeedsPaint();
     }

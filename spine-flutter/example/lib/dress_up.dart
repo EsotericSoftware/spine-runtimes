@@ -107,7 +107,7 @@ class DressUpState extends State<DressUp> {
                       ),
                     ),
                     Expanded(
-                      child: SpineWidget.drawable(_drawable, _controller, boundsProvider: SkinAndAnimationBounds(["full-skins/girl"]),)
+                      child: SpineWidget.drawable(_drawable, _controller, boundsProvider: SkinAndAnimationBounds(skins: ["full-skins/girl"]),)
                     )
                   ]
               )

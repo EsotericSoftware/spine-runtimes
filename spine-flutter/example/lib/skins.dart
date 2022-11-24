@@ -70,7 +70,7 @@ class SkinsState extends State<Skins> {
                   )
               ),
               Expanded(
-                  child: SpineWidget.drawable(_drawable, _controller, boundsProvider: SkinAndAnimationBounds(["full-skins/girl"]))
+                  child: SpineWidget.drawable(_drawable, _controller, boundsProvider: SkinAndAnimationBounds(skins: ["full-skins/girl"]))
               )
             ]
         )

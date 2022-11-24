@@ -657,7 +657,7 @@ void spine_skeleton_drawable_dispose(spine_skeleton_drawable drawable) {
 }
 
 static _spine_render_command *batch_sub_commands(BlockAllocator &allocator, Vector<_spine_render_command*> &commands, int first, int last, int numVertices, int numIndices) {
-	_spine_render_command *batched = spine_render_command_create(allocator, numVertices, numIndices, commands[0]->blendMode, commands[0]->atlasPage);
+	_spine_render_command *batched = spine_render_command_create(allocator, numVertices, numIndices, commands[first]->blendMode, commands[first]->atlasPage);
 	float *positions = batched->positions;
 	float *uvs = batched->uvs;
 	int32_t *colors = batched->colors;
