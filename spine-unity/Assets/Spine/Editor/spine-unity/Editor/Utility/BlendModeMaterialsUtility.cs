@@ -203,38 +203,56 @@ namespace Spine.Unity.Editor {
 					var renderableAttachment = entry.Attachment as IHasTextureRegion;
 					if (renderableAttachment != null) {
 						var originalRegion = (AtlasRegion)renderableAttachment.Region;
-						Sequence sequence = null;
-						if (originalRegion == null && (sequence = renderableAttachment.Sequence) != null) {
-							if (sequence.Regions != null && sequence.Regions.Length > 0)
-								originalRegion = (AtlasRegion)sequence.Regions[0];
-						}
-						bool replacementExists = replacementMaterials.Exists(
-							replacement => replacement.pageName == originalRegion.page.name);
-						if (!replacementExists) {
-							bool createdNewMaterial;
-							var replacement = CreateOrLoadReplacementMaterial(originalRegion, materialTemplate, materialSuffix, out createdNewMaterial);
-							if (replacement != null) {
-								replacementMaterials.Add(replacement);
-								anyReplacementMaterialsChanged = true;
-								if (createdNewMaterial) {
-									Debug.Log(string.Format("Created blend mode Material '{0}' for SkeletonData asset '{1}'.",
-										replacement.material.name, skeletonDataAsset), replacement.material);
+						if (originalRegion != null) {
+							anyCreationFailed |= CreateForRegion(
+								ref replacementMaterials, ref anyReplacementMaterialsChanged,
+								originalRegion, materialTemplate, materialSuffix, skeletonDataAsset);
+						} else {
+							Sequence sequence = renderableAttachment.Sequence;
+							if (sequence != null && sequence.Regions != null) {
+								for (int i = 0, count = sequence.Regions.Length; i < count; ++i) {
+									originalRegion = (AtlasRegion)sequence.Regions[i];
+									anyCreationFailed |= CreateForRegion(
+										ref replacementMaterials, ref anyReplacementMaterialsChanged,
+										originalRegion, materialTemplate, materialSuffix, skeletonDataAsset);
 								}
-							} else {
-								Debug.LogError(string.Format("Failed creating blend mode Material for SkeletonData asset '{0}'," +
-									" atlas page '{1}', template '{2}'.",
-									skeletonDataAsset.name, originalRegion.page.name, materialTemplate.name),
-									skeletonDataAsset);
-								anyCreationFailed = true;
 							}
 						}
 					}
 				}
 			}
-
 			skeletonDataAsset.isUpgradingBlendModeMaterials = false;
 			EditorUtility.SetDirty(skeletonDataAsset);
 			return !anyCreationFailed;
+		}
+
+		protected static bool CreateForRegion (ref List<BlendModeMaterials.ReplacementMaterial> replacementMaterials,
+			ref bool anyReplacementMaterialsChanged,
+			AtlasRegion originalRegion, Material materialTemplate, string materialSuffix,
+			SkeletonDataAsset skeletonDataAsset) {
+
+			bool anyCreationFailed = false;
+			bool replacementExists = replacementMaterials.Exists(
+				replacement => replacement.pageName == originalRegion.page.name);
+			if (!replacementExists) {
+				bool createdNewMaterial;
+				var replacement = CreateOrLoadReplacementMaterial(originalRegion, materialTemplate, materialSuffix, out createdNewMaterial);
+				if (replacement != null) {
+					replacementMaterials.Add(replacement);
+					anyReplacementMaterialsChanged = true;
+					if (createdNewMaterial) {
+						Debug.Log(string.Format("Created blend mode Material '{0}' for SkeletonData asset '{1}'.",
+							replacement.material.name, skeletonDataAsset), replacement.material);
+					}
+				} else {
+					Debug.LogError(string.Format("Failed creating blend mode Material for SkeletonData asset '{0}'," +
+						" atlas page '{1}', template '{2}'.",
+						skeletonDataAsset.name, originalRegion.page.name, materialTemplate.name),
+						skeletonDataAsset);
+					anyCreationFailed = true;
+				}
+			}
+			return anyCreationFailed;
 		}
 
 		protected static string GetBlendModeMaterialPath (AtlasPage originalPage, string materialSuffix) {
