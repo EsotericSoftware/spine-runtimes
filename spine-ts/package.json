@@ -57,7 +57,7 @@
     "live-server": "^1.2.1",
     "npx": "^10.2.2",
     "rimraf": "^3.0.2",
-    "typescript": "^4.3.5",
+    "typescript": "^4.9.3",
     "@types/offscreencanvas": "^2019.6.4"
   }
 }
