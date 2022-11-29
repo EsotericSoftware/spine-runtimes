@@ -178,3 +178,4 @@ spine-godot/logs
 !spine-godot/build
 spine-ts/spine-ts.zip
 *.d
+spine-godot/.clang-format
