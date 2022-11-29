@@ -23,6 +23,7 @@ git clone --depth 1 https://github.com/godotengine/godot.git -b $branch
 if [ $dev = "true" ]; then
 	cp -r .idea godot
 	cp build/custom.py godot
+	cp ../formatters/.clang-format .
 	rm -rf example/.import
 	rm -rf example/.godot
 
