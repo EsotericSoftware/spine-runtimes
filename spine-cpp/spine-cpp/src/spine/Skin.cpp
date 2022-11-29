@@ -164,6 +164,7 @@ void Skin::addSkin(Skin *other) {
 	AttachmentMap::Entries entries = other->getAttachments();
 	while (entries.hasNext()) {
 		AttachmentMap::Entry &entry = entries.next();
+		entry._attachment->reference();
 		setAttachment(entry._slotIndex, entry._name, entry._attachment);
 	}
 }
