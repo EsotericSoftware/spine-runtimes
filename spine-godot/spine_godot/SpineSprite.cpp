@@ -621,7 +621,7 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> skeleton_ref) {
 			Ref<Material> custom_material;
 
 			// See if we have a slot node for this slot with a custom material
-			auto &nodes = slot_nodes[i];
+			auto &nodes = slot_nodes[slot->getData().getIndex()];
 			if (nodes.size() > 0) {
 				auto slot_node = nodes[0];
 				if (slot_node) {
