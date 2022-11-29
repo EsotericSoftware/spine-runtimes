@@ -31,6 +31,7 @@ position = Vector2( 501, 507 )
 scale = Vector2( 0.546374, 0.546373 )
 skeleton_data_res = ExtResource( 1 )
 normal_material = SubResource( 2 )
+preview_skin = "Default"
 preview_animation = "-- Empty --"
 preview_frame = false
 preview_time = 0.0
