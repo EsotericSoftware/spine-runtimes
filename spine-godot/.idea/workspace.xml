@@ -91,7 +91,7 @@
         <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="godot debug Linux" type="CLionExternalRunConfiguration" factoryName="Application" PROGRAM_PARAMS="--editor --path $ProjectFileDir$/../example" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="godot" TARGET_NAME="scons debug macOS/Linux" CONFIG_NAME="scons debug macOS/Linux" RUN_PATH="$PROJECT_DIR$/bin/godot.linux.tools.64">
+    <configuration name="godot debug Linux" type="CLionExternalRunConfiguration" factoryName="Application" PROGRAM_PARAMS="--editor --path $ProjectFileDir$/../example" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="godot" TARGET_NAME="scons debug macOS/Linux" CONFIG_NAME="scons debug macOS/Linux" RUN_PATH="$PROJECT_DIR$/bin/godot.linux.tools.64s">
       <method v="2">
         <option name="CLION.EXTERNAL.BUILD" enabled="true" />
       </method>
@@ -101,7 +101,7 @@
         <option name="CLION.EXTERNAL.BUILD" enabled="true" />
       </method>
     </configuration>
-    <configuration name="godot debug macOS" type="CLionExternalRunConfiguration" factoryName="Application" PROGRAM_PARAMS="--editor --path $ProjectFileDir$/../example" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="godot" TARGET_NAME="scons debug macOS/Linux" CONFIG_NAME="scons debug macOS/Linux" RUN_PATH="$PROJECT_DIR$/bin/godot.osx.tools.64">
+    <configuration name="godot debug macOS" type="CLionExternalRunConfiguration" factoryName="Application" PROGRAM_PARAMS="--editor --path $ProjectFileDir$/../example" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="godot" TARGET_NAME="scons debug macOS/Linux" CONFIG_NAME="scons debug macOS/Linux" RUN_PATH="$PROJECT_DIR$/bin/godot.osx.tools.64s">
       <method v="2">
         <option name="CLION.EXTERNAL.BUILD" enabled="true" />
       </method>
