@@ -536,6 +536,7 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> skeleton_ref) {
 		spine::Slot *slot = skeleton->getDrawOrder()[i];
 		spine::Attachment *attachment = slot->getAttachment();
 		MeshInstance2D *mesh_instance = mesh_instances[i];
+		mesh_instance->set_light_mask(get_light_mask());
 		clear_mesh_instance(mesh_instance);
 		if (!attachment) {
 			skeleton_clipper->clipEnd(*slot);
