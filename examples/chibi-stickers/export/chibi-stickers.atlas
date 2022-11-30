@@ -1,0 +1,459 @@
+chibi-stickers.png
+	size: 512, 128
+	filter: Linear, Linear
+	scale: 0.5
+common/angry-mark
+	bounds: 83, 2, 42, 41
+common/big-purple-fear
+	bounds: 70, 54, 134, 72
+common/big-tear
+	bounds: 35, 44, 33, 82
+common/eye-3
+	bounds: 336, 55, 15, 26
+	rotate: 90
+common/eye-closed-happy
+	bounds: 2, 2, 25, 9
+common/eye-dafault
+	bounds: 339, 31, 22, 21
+	rotate: 90
+common/eye-equal
+	bounds: 369, 101, 25, 15
+	rotate: 90
+common/eye-fire
+	bounds: 311, 25, 26, 28
+common/eye-half-open
+	bounds: 206, 54, 26, 16
+common/eye-heart
+	bounds: 344, 100, 26, 23
+	rotate: 90
+common/eye-reverse-v
+	bounds: 234, 54, 26, 16
+common/eye-sideway-v
+	bounds: 307, 72, 21, 23
+	rotate: 90
+common/eye-slant-close
+	bounds: 262, 54, 23, 16
+common/eye-small-dot
+	bounds: 362, 38, 15, 15
+common/eye-sparkle
+	bounds: 35, 13, 30, 29
+common/eye-star
+	bounds: 282, 23, 29, 27
+	rotate: 90
+common/eye-twirl
+	bounds: 324, 2, 21, 23
+	rotate: 90
+common/eye-u
+	bounds: 246, 72, 24, 17
+common/eye-x
+	bounds: 332, 72, 25, 22
+	rotate: 90
+common/lamp
+	bounds: 157, 5, 47, 65
+	rotate: 90
+common/mouth-3
+	bounds: 306, 55, 15, 28
+	rotate: 90
+common/mouth-bracket
+	bounds: 266, 3, 34, 11
+common/mouth-doubt
+	bounds: 356, 72, 26, 15
+	rotate: 90
+common/mouth-fangs
+	bounds: 67, 3, 39, 14
+	rotate: 90
+common/mouth-line
+	bounds: 70, 45, 36, 7
+common/mouth-neutral
+	bounds: 237, 2, 27, 12
+common/mouth-o-tall
+	bounds: 269, 93, 22, 33
+common/mouth-open-smile
+	bounds: 237, 16, 36, 22
+	rotate: 90
+common/mouth-rectangle
+	bounds: 246, 91, 35, 21
+	rotate: 90
+common/mouth-reverse-v
+	bounds: 332, 99, 27, 10
+	rotate: 90
+common/mouth-s
+	bounds: 224, 11, 41, 11
+	rotate: 90
+common/mouth-smile-little
+	bounds: 272, 72, 33, 19
+common/mouth-toungue-sticking-out
+	bounds: 293, 95, 31, 21
+	rotate: 90
+common/mouth-u
+	bounds: 261, 16, 36, 19
+	rotate: 90
+common/mouth-v
+	bounds: 316, 99, 27, 14
+	rotate: 90
+common/mouth-x
+	bounds: 349, 8, 21, 20
+	rotate: 90
+common/purple-fear-lines
+	bounds: 127, 4, 48, 28
+	rotate: 90
+common/shadow
+	bounds: 2, 13, 113, 31
+	rotate: 90
+common/small-dash
+	bounds: 29, 2, 9, 20
+	rotate: 90
+common/small-drop-line
+	bounds: 287, 54, 16, 17
+	rotate: 90
+common/small-purple-fear
+	bounds: 206, 72, 54, 38
+	rotate: 90
+common/tear
+	bounds: 302, 2, 20, 19
+
+chibi-stickers_2.png
+	size: 512, 512
+	filter: Linear, Linear
+	scale: 0.5
+erikari/arm
+	bounds: 239, 24, 28, 90
+	rotate: 90
+erikari/arm-shoulder-decoration
+	bounds: 327, 345, 32, 43
+	rotate: 90
+erikari/back-hair
+	bounds: 2, 95, 158, 141
+	rotate: 90
+erikari/back-hair-long
+	bounds: 2, 255, 220, 254
+erikari/blush
+	bounds: 136, 4, 29, 18
+erikari/body
+	bounds: 272, 183, 70, 98
+erikari/bracelet
+	bounds: 205, 11, 33, 11
+erikari/collar
+	bounds: 294, 61, 61, 62
+erikari/ear
+	bounds: 258, 66, 34, 42
+erikari/eyebrow
+	bounds: 240, 2, 20, 12
+	rotate: 90
+erikari/hair-front
+	bounds: 327, 379, 130, 65
+	rotate: 90
+erikari/hair-side
+	bounds: 2, 9, 43, 132
+	rotate: 90
+erikari/hat-border
+	bounds: 2, 54, 254, 39
+erikari/hat-top
+	bounds: 224, 283, 160, 60
+erikari/head-base
+	bounds: 145, 110, 143, 125
+	rotate: 90
+erikari/leg
+	bounds: 136, 24, 28, 101
+	rotate: 90
+erikari/leg-decoration
+	bounds: 167, 9, 36, 13
+erikari/skirt
+	bounds: 224, 345, 164, 101
+	rotate: 90
+erikari/strawberries-decoration
+	bounds: 272, 125, 112, 56
+
+chibi-stickers_3.png
+	size: 512, 256
+	filter: Linear, Linear
+	scale: 0.5
+harri/arm
+	bounds: 354, 125, 28, 90
+	rotate: 90
+harri/back-hair
+	bounds: 2, 87, 158, 141
+	rotate: 90
+harri/back-hair-long
+	bounds: 272, 105, 40, 80
+	rotate: 90
+harri/beard
+	bounds: 169, 89, 10, 11
+harri/blush
+	bounds: 344, 155, 29, 18
+harri/body
+	bounds: 272, 147, 70, 98
+harri/body-decoration
+	bounds: 344, 175, 70, 67
+	rotate: 90
+harri/ear
+	bounds: 413, 203, 34, 42
+harri/eyebrow
+	bounds: 145, 88, 22, 12
+harri/hair-front
+	bounds: 189, 10, 143, 90
+harri/head-base
+	bounds: 145, 102, 143, 125
+	rotate: 90
+harri/leg
+	bounds: 334, 2, 28, 101
+harri/sword
+	bounds: 2, 3, 185, 82
+
+chibi-stickers_4.png
+	size: 1024, 256
+	filter: Linear, Linear
+	scale: 0.5
+luke/arm
+	bounds: 184, 4, 28, 90
+luke/arm-shoulder-decoration
+	bounds: 487, 120, 31, 27
+	rotate: 90
+luke/back-hair
+	bounds: 157, 96, 158, 141
+	rotate: 90
+luke/blush
+	bounds: 427, 112, 29, 18
+luke/body
+	bounds: 516, 156, 70, 98
+luke/eyebrow
+	bounds: 458, 118, 27, 12
+luke/face-cover
+	bounds: 2, 85, 169, 153
+	rotate: 90
+luke/glasses-shadow
+	bounds: 2, 2, 147, 81
+luke/hair-decoration
+	bounds: 320, 2, 130, 107
+luke/hair-front
+	bounds: 427, 132, 122, 57
+	rotate: 90
+luke/head-base
+	bounds: 300, 111, 143, 125
+	rotate: 90
+luke/leg
+	bounds: 486, 153, 28, 101
+luke/shield
+	bounds: 214, 6, 88, 104
+	rotate: 90
+luke/skirt
+	bounds: 151, 2, 81, 31
+	rotate: 90
+luke/sword
+	bounds: 452, 6, 104, 71
+	rotate: 90
+
+chibi-stickers_5.png
+	size: 512, 256
+	filter: Linear, Linear
+	scale: 0.5
+mario/arm
+	bounds: 164, 30, 28, 90
+	rotate: 90
+mario/back-hair
+	bounds: 2, 105, 168, 148
+mario/back-hair-long
+	bounds: 2, 17, 86, 91
+	rotate: 90
+mario/beard
+	bounds: 317, 106, 147, 93
+	rotate: 90
+mario/blush
+	bounds: 144, 30, 29, 18
+	rotate: 90
+mario/body
+	bounds: 311, 34, 70, 98
+	rotate: 90
+mario/ear
+	bounds: 125, 61, 34, 42
+mario/eyebrow
+	bounds: 125, 27, 32, 17
+	rotate: 90
+mario/hair-front
+	bounds: 172, 60, 137, 66
+mario/head-base
+	bounds: 172, 128, 143, 125
+mario/leg
+	bounds: 95, 2, 28, 101
+
+chibi-stickers_6.png
+	size: 1024, 256
+	filter: Linear, Linear
+	scale: 0.5
+misaki/arm
+	bounds: 505, 22, 28, 90
+misaki/back-hair
+	bounds: 194, 96, 158, 141
+	rotate: 90
+misaki/back-hair-long
+	bounds: 2, 59, 190, 195
+misaki/belt
+	bounds: 525, 178, 76, 26
+	rotate: 90
+misaki/blush
+	bounds: 180, 2, 29, 18
+misaki/body
+	bounds: 433, 11, 70, 98
+misaki/ear
+	bounds: 144, 15, 34, 42
+misaki/eyebrow
+	bounds: 211, 8, 30, 12
+misaki/glasses
+	bounds: 180, 22, 141, 35
+misaki/glasses-side
+	bounds: 144, 5, 8, 23
+	rotate: 90
+misaki/hair-front
+	bounds: 464, 114, 140, 59
+	rotate: 90
+misaki/hair-side
+	bounds: 2, 10, 47, 140
+	rotate: 90
+misaki/head-base
+	bounds: 337, 111, 143, 125
+	rotate: 90
+misaki/leg
+	bounds: 194, 66, 28, 101
+	rotate: 90
+misaki/skirt
+	bounds: 323, 4, 108, 90
+
+chibi-stickers_7.png
+	size: 512, 256
+	filter: Linear, Linear
+	scale: 0.5
+nate/arm
+	bounds: 132, 18, 28, 90
+nate/back-hair
+	bounds: 2, 110, 158, 141
+nate/beard
+	bounds: 307, 104, 147, 68
+	rotate: 90
+nate/blush
+	bounds: 46, 18, 29, 18
+nate/body
+	bounds: 2, 38, 70, 98
+	rotate: 90
+nate/ear
+	bounds: 2, 2, 34, 42
+	rotate: 90
+nate/eyebrow
+	bounds: 77, 9, 27, 12
+	rotate: 90
+nate/glasses
+	bounds: 306, 67, 141, 35
+nate/glasses-side
+	bounds: 46, 8, 8, 16
+	rotate: 90
+nate/hair-front
+	bounds: 162, 59, 142, 65
+nate/head-base
+	bounds: 162, 126, 143, 125
+nate/leg
+	bounds: 102, 7, 28, 101
+
+chibi-stickers_8.png
+	size: 512, 256
+	filter: Linear, Linear
+	scale: 0.5
+sinisa/arm
+	bounds: 249, 19, 28, 90
+sinisa/back-hair
+	bounds: 2, 96, 158, 141
+	rotate: 90
+sinisa/beard
+	bounds: 272, 115, 139, 45
+	rotate: 90
+sinisa/blush
+	bounds: 300, 40, 29, 18
+	rotate: 90
+sinisa/body
+	bounds: 177, 11, 70, 98
+sinisa/body-decoration
+	bounds: 279, 2, 27, 27
+sinisa/ear
+	bounds: 279, 71, 34, 42
+sinisa/eyebrow
+	bounds: 279, 31, 38, 19
+	rotate: 90
+sinisa/hair-front
+	bounds: 2, 2, 143, 92
+sinisa/head-base
+	bounds: 145, 111, 143, 125
+	rotate: 90
+sinisa/leg
+	bounds: 147, 8, 28, 101
+
+chibi-stickers_9.png
+	size: 512, 256
+	filter: Linear, Linear
+	scale: 0.5
+soeren/arm
+	bounds: 2, 3, 28, 90
+soeren/back-hair
+	bounds: 156, 104, 150, 141
+	rotate: 90
+soeren/beard
+	bounds: 132, 32, 145, 68
+soeren/blush
+	bounds: 32, 3, 29, 18
+soeren/body
+	bounds: 32, 23, 70, 98
+	rotate: 90
+soeren/ear
+	bounds: 279, 5, 34, 42
+soeren/eyebrow
+	bounds: 63, 9, 27, 12
+soeren/glasses
+	bounds: 117, 102, 152, 37
+	rotate: 90
+soeren/glasses-side
+	bounds: 92, 14, 7, 20
+	rotate: 90
+soeren/glove
+	bounds: 279, 49, 42, 53
+soeren/hair-front
+	bounds: 2, 95, 159, 113
+	rotate: 90
+soeren/head-base
+	bounds: 299, 111, 143, 125
+	rotate: 90
+soeren/leg
+	bounds: 132, 2, 28, 101
+	rotate: 90
+
+chibi-stickers_10.png
+	size: 512, 256
+	filter: Linear, Linear
+	scale: 0.5
+spineboy/arm
+	bounds: 407, 97, 28, 90
+	rotate: 90
+spineboy/arm-decoration
+	bounds: 307, 127, 32, 29
+spineboy/arm-shoulder-decoration
+	bounds: 451, 72, 23, 23
+spineboy/back-hair
+	bounds: 2, 106, 158, 141
+spineboy/blush
+	bounds: 2, 2, 29, 18
+spineboy/body
+	bounds: 307, 55, 70, 98
+	rotate: 90
+spineboy/ear
+	bounds: 407, 61, 34, 42
+	rotate: 90
+spineboy/eyebrow
+	bounds: 143, 77, 27, 12
+	rotate: 90
+spineboy/glasses
+	bounds: 162, 158, 179, 89
+spineboy/glasses-shadow
+	bounds: 2, 22, 139, 82
+spineboy/hair-front
+	bounds: 343, 127, 145, 120
+spineboy/head-base
+	bounds: 162, 31, 143, 125
+spineboy/leg
+	bounds: 307, 24, 29, 101
+	rotate: 90

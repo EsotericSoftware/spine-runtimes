@@ -1,7 +1,7 @@
 {
 "skeleton": {
-	"hash": "5bSWDwjOkqw",
-	"spine": "4.1.23-beta",
+	"hash": "wi43rlDXH1o",
+	"spine": "4.1.17",
 	"x": -240.58,
 	"y": -3.38,
 	"width": 410.36,
@@ -1262,7 +1262,7 @@
 	},
 	{
 		"name": "accessories/bag",
-		"bones": [ "bag-back-front", "bag-flap", "bag-strap-front", "bag-back-down", "bag-strap-back", "bag", "bag-control" ],
+		"bones": [ "bag-control", "bag-strap-back", "bag-strap-front", "bag-back-down", "bag", "bag-flap", "bag-back-front" ],
 		"attachments": {
 			"bag-base": {
 				"bag-base": {
@@ -1323,7 +1323,7 @@
 	},
 	{
 		"name": "accessories/cape-blue",
-		"bones": [ "cape-blue-up", "cape-front-rotator", "cape-blue-control", "cape-blue-down-middle", "cape-blue-middle-back", "cape-blue-middle-front", "cape-blue-up-front", "cape-back-rotator", "cape-blue-down-back", "cape-blue-down-front", "cape-blue-down", "cape-blue-up-back" ],
+		"bones": [ "cape-blue-down-back", "cape-back-rotator", "cape-blue-middle-back", "cape-blue-control", "cape-blue-up-back", "cape-blue-middle-front", "cape-blue-up-front", "cape-blue-down", "cape-blue-up", "cape-front-rotator", "cape-blue-down-front", "cape-blue-down-middle" ],
 		"attachments": {
 			"cape-back": {
 				"cape-back": {
@@ -1411,7 +1411,7 @@
 	},
 	{
 		"name": "accessories/cape-red",
-		"bones": [ "cape-red-front-inside", "cape-red-front-outside", "cape-front-rotator", "cape-red-back-outside", "cape-back-rotator", "cape-red-back-inside" ],
+		"bones": [ "cape-back-rotator", "cape-red-back-inside", "cape-red-front-inside", "cape-red-front-outside", "cape-front-rotator", "cape-red-back-outside" ],
 		"attachments": {
 			"cape-red-down": {
 				"cape-red-down": {
@@ -1449,7 +1449,7 @@
 	},
 	{
 		"name": "accessories/hat-pointy-blue-yellow",
-		"bones": [ "pompom-control", "hat", "hat-control", "hat-base" ],
+		"bones": [ "hat-base", "pompom-control", "hat-control", "hat" ],
 		"transform": [ "hat-control" ],
 		"attachments": {
 			"hat": {
@@ -1475,7 +1475,7 @@
 	},
 	{
 		"name": "accessories/hat-red-yellow",
-		"bones": [ "pompom-control", "hat", "hat-control", "hat-base" ],
+		"bones": [ "hat-base", "pompom-control", "hat-control", "hat" ],
 		"transform": [ "hat-control" ],
 		"attachments": {
 			"hat": {
@@ -1526,8 +1526,8 @@
 	},
 	{
 		"name": "clothes/dress-blue",
-		"bones": [ "dress-control-leg-down-back", "dress-control-leg-up-back", "sleeve-control-front", "dress-control-leg-down-front", "sleeve-control-back", "dress-control-middle", "dress-control-foot-back", "dress-control-foot-front", "dress-control-leg-up-front" ],
-		"transform": [ "leg-down-front", "leg-up", "leg-down-back", "leg-down-back-up", "leg-down-down", "leg-up-back" ],
+		"bones": [ "dress-control-foot-front", "dress-control-leg-down-front", "dress-control-leg-up-front", "dress-control-leg-down-back", "dress-control-foot-back", "dress-control-leg-up-back", "dress-control-middle", "sleeve-control-front", "sleeve-control-back" ],
+		"transform": [ "leg-down-back", "leg-down-front", "leg-up", "leg-down-back-up", "leg-down-down", "leg-up-back" ],
 		"attachments": {
 			"arm-back": {
 				"arm-back": {
@@ -1615,7 +1615,7 @@
 	},
 	{
 		"name": "clothes/dress-green",
-		"bones": [ "skirt-control-front-down", "skirt-control-up", "skirt-control-back-down", "skirt-control", "skirt-control-front", "skirt-control-back", "skirt-control-middle" ],
+		"bones": [ "skirt-control-back", "skirt-control", "skirt-control-back-down", "skirt-control-front", "skirt-control-front-down", "skirt-control-middle", "skirt-control-up" ],
 		"attachments": {
 			"body-up": {
 				"body-up": { "name": "girl-spring-dress/body-up", "x": 59.16, "y": -14.67, "rotation": -94.33, "width": 128, "height": 131 }
@@ -2110,7 +2110,7 @@
 	},
 	{
 		"name": "full-skins/boy",
-		"bones": [ "hat-base", "pompom-control", "hat", "zip-boy", "hat-control", "backpack", "backpack-control" ],
+		"bones": [ "hat-base", "backpack-control", "pompom-control", "hat-control", "zip-boy", "backpack", "hat" ],
 		"transform": [ "hat-control" ],
 		"attachments": {
 			"arm-back": {
@@ -2535,7 +2535,7 @@
 	},
 	{
 		"name": "full-skins/girl",
-		"bones": [ "bag-back-front", "bag-flap", "hair-strand-back-1", "hair-strand-back-3", "hat", "pompom-control", "zip-girl", "bag-strap-front", "hair-holder-front", "scarf-back", "bag-back-down", "hat-control", "bag-strap-back", "hair-strand-front-2", "hair-strand-front-3", "hair-holder-back", "bag", "hair-strand-front-4", "bag-control", "hair-strand-front-1", "hair-strand-back-2", "hat-base" ],
+		"bones": [ "hat-base", "hair-strand-back-3", "bag-control", "hair-strand-front-2", "pompom-control", "hair-holder-front", "hair-strand-front-1", "zip-girl", "bag-strap-back", "hair-strand-front-4", "bag-strap-front", "hair-holder-back", "bag-back-down", "bag", "hair-strand-back-1", "hat-control", "hair-strand-front-3", "bag-flap", "hat", "hair-strand-back-2", "scarf-back", "bag-back-front" ],
 		"transform": [ "hat-control", "leg-down-back-up", "leg-up-back" ],
 		"attachments": {
 			"arm-back": {
@@ -3033,8 +3033,8 @@
 	},
 	{
 		"name": "full-skins/girl-blue-cape",
-		"bones": [ "cape-blue-up", "dress-control-leg-up-front", "dress-control-leg-down-back", "sleeve-control-front", "dress-control-leg-up-back", "cape-front-rotator", "cape-blue-control", "cape-blue-down-middle", "cape-blue-middle-back", "cape-blue-middle-front", "dress-control-leg-down-front", "dress-control-middle", "sleeve-control-back", "cape-blue-up-front", "cape-back-rotator", "cape-blue-down-back", "cape-blue-down-front", "dress-control-foot-back", "cape-blue-down", "dress-control-foot-front", "cape-blue-up-back" ],
-		"transform": [ "leg-down-front", "leg-up", "leg-down-back", "leg-down-back-up", "leg-down-down", "leg-up-back" ],
+		"bones": [ "dress-control-foot-front", "cape-blue-down-back", "dress-control-leg-down-front", "cape-back-rotator", "dress-control-leg-up-front", "cape-blue-middle-back", "cape-blue-control", "cape-blue-up-back", "dress-control-foot-back", "dress-control-leg-down-back", "cape-blue-middle-front", "dress-control-leg-up-back", "cape-blue-up-front", "cape-blue-down", "cape-blue-up", "dress-control-middle", "cape-front-rotator", "sleeve-control-front", "cape-blue-down-front", "cape-blue-down-middle", "sleeve-control-back" ],
+		"transform": [ "leg-down-back", "leg-down-front", "leg-up", "leg-down-back-up", "leg-down-down", "leg-up-back" ],
 		"attachments": {
 			"arm-back": {
 				"arm-back": {
@@ -3527,7 +3527,7 @@
 	},
 	{
 		"name": "full-skins/girl-spring-dress",
-		"bones": [ "cape-red-front-inside", "skirt-control-front-down", "cape-red-front-outside", "cape-front-rotator", "skirt-control-back-down", "skirt-control-up", "skirt-rotation-back", "skirt-control", "cape-red-back-outside", "cape-back-rotator", "skirt-rotation-front", "skirt-control-middle", "skirt-control-front", "skirt-control-back", "cape-red-back-inside" ],
+		"bones": [ "cape-back-rotator", "skirt-rotation-front", "cape-red-back-inside", "cape-red-front-inside", "skirt-control-back", "cape-red-front-outside", "skirt-control", "skirt-control-front", "skirt-control-back-down", "cape-front-rotator", "skirt-control-front-down", "skirt-control-middle", "cape-red-back-outside", "skirt-control-up", "skirt-rotation-back" ],
 		"transform": [ "skirt-rotation-back", "skirt-rotation-front" ],
 		"attachments": {
 			"arm-back": {
@@ -4256,7 +4256,7 @@
 	},
 	{
 		"name": "hair/long-blue-with-scarf",
-		"bones": [ "hair-strand-back-1", "hair-strand-back-3", "hair-holder-front", "scarf-back", "hair-strand-front-2", "hair-holder-back", "hair-strand-front-3", "hair-strand-front-1", "hair-strand-front-4", "hair-strand-back-2" ],
+		"bones": [ "hair-strand-back-3", "hair-strand-front-2", "hair-holder-front", "hair-strand-front-1", "hair-strand-front-4", "hair-holder-back", "hair-strand-back-1", "hair-strand-front-3", "hair-strand-back-2", "scarf-back" ],
 		"attachments": {
 			"ear": {
 				"ear": { "name": "girl/ear", "x": 56.58, "y": 85.63, "rotation": -87.57, "width": 38, "height": 45 }
