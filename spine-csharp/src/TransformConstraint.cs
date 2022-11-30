@@ -80,7 +80,7 @@ namespace Spine {
 		}
 
 		public void Update () {
-			if (mixRotate == 0 && mixX == 0 && mixY == 0 && mixScaleX == 0 && mixScaleX == 0 && mixShearY == 0) return;
+			if (mixRotate == 0 && mixX == 0 && mixY == 0 && mixScaleX == 0 && mixScaleY == 0 && mixShearY == 0) return;
 			if (data.local) {
 				if (data.relative)
 					ApplyRelativeLocal();

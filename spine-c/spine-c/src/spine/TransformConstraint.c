@@ -240,7 +240,7 @@ void _spTransformConstraint_applyRelativeLocal(spTransformConstraint *self) {
 }
 
 void spTransformConstraint_update(spTransformConstraint *self) {
-	if (self->mixRotate == 0 && self->mixX == 0 && self->mixY == 0 && self->mixScaleX == 0 && self->mixScaleX == 0 &&
+	if (self->mixRotate == 0 && self->mixX == 0 && self->mixY == 0 && self->mixScaleX == 0 && self->mixScaleY == 0 &&
 		self->mixShearY == 0)
 		return;
 
