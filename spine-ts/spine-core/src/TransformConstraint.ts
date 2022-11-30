@@ -80,7 +80,7 @@ export class TransformConstraint implements Updatable {
 	}
 
 	update () {
-		if (this.mixRotate == 0 && this.mixX == 0 && this.mixY == 0 && this.mixScaleX == 0 && this.mixScaleX == 0 && this.mixShearY == 0) return;
+		if (this.mixRotate == 0 && this.mixX == 0 && this.mixY == 0 && this.mixScaleX == 0 && this.mixScaleY == 0 && this.mixShearY == 0) return;
 
 		if (this.data.local) {
 			if (this.data.relative)
