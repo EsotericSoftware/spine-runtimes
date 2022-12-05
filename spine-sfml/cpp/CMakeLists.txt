@@ -62,7 +62,11 @@ install(FILES ${INCLUDES} DESTINATION dist/include)
 
 # Define spine-sfml example executable
 add_executable(spine-sfml-cpp-example example/main.cpp)
-add_executable(spine-sfml-cpp-test example/test.cpp)
+target_link_libraries(spine-sfml-cpp-example spine-cpp spine-sfml-cpp)
+
+# Define spine-sfml testbed executable
+add_executable(spine-sfml-cpp-testbed example/testbed.cpp)
+target_link_libraries(spine-sfml-cpp-testbed spine-cpp spine-sfml-cpp)
 
 # Link in SFML libraries and OS dependencies like OpenGL
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -71,10 +75,10 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	find_library(SFML_WINDOW sfml-window PATHS ${SFML_DIR}/Frameworks)
 	find_library(SFML_GRAPHICS sfml-graphics PATHS ${SFML_DIR}/Frameworks)
 	target_link_libraries(spine-sfml-cpp-example ${SFML} ${SFML_SYSTEM} ${SFML_WINDOW} ${SFML_GRAPHICS})
-	target_link_libraries(spine-sfml-cpp-test ${SFML} ${SFML_SYSTEM} ${SFML_WINDOW} ${SFML_GRAPHICS})
+	target_link_libraries(spine-sfml-cpp-testbed ${SFML} ${SFML_SYSTEM} ${SFML_WINDOW} ${SFML_GRAPHICS})
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	target_link_libraries(spine-sfml-cpp-example sfml-graphics sfml-window sfml-system)
-	target_link_libraries(spine-sfml-cpp-test sfml-graphics sfml-window sfml-system)
+	target_link_libraries(spine-sfml-cpp-testbed sfml-graphics sfml-window sfml-system)
 else()
 	set(SFML_LIBS ${SFML_DIR}/lib)
 	target_link_libraries(spine-sfml-cpp-example ${SFML_LIBS}/sfml-main-d.lib)
@@ -86,28 +90,23 @@ else()
 	target_link_libraries(spine-sfml-cpp-example opengl32)
 	target_link_libraries(spine-sfml-cpp-example gdi32)
 	target_link_libraries(spine-sfml-cpp-example winmm)
-	target_link_libraries(spine-sfml-cpp-test ${SFML_LIBS}/sfml-main-d.lib)
-	target_link_libraries(spine-sfml-cpp-test ${SFML_LIBS}/sfml-graphics-s-d.lib)
-	target_link_libraries(spine-sfml-cpp-test ${SFML_LIBS}/sfml-window-s-d.lib)
-	target_link_libraries(spine-sfml-cpp-test ${SFML_LIBS}/sfml-system-s-d.lib)
-	target_link_libraries(spine-sfml-cpp-test ${SFML_LIBS}/freetype.lib)
-	target_link_libraries(spine-sfml-cpp-test ${SFML_LIBS}/jpeg.lib)
-	target_link_libraries(spine-sfml-cpp-test opengl32)
-	target_link_libraries(spine-sfml-cpp-test gdi32)
-	target_link_libraries(spine-sfml-cpp-test winmm)
+	target_link_libraries(spine-sfml-cpp-testbed ${SFML_LIBS}/sfml-main-d.lib)
+	target_link_libraries(spine-sfml-cpp-testbed ${SFML_LIBS}/sfml-graphics-s-d.lib)
+	target_link_libraries(spine-sfml-cpp-testbed ${SFML_LIBS}/sfml-window-s-d.lib)
+	target_link_libraries(spine-sfml-cpp-testbed ${SFML_LIBS}/sfml-system-s-d.lib)
+	target_link_libraries(spine-sfml-cpp-testbed ${SFML_LIBS}/freetype.lib)
+	target_link_libraries(spine-sfml-cpp-testbed ${SFML_LIBS}/jpeg.lib)
+	target_link_libraries(spine-sfml-cpp-testbed opengl32)
+	target_link_libraries(spine-sfml-cpp-testbed gdi32)
+	target_link_libraries(spine-sfml-cpp-testbed winmm)
 	add_definitions(-DSFML_STATIC)
 endif()
 
 # copy data to build directory
-add_custom_command(TARGET spine-sfml-cpp-example PRE_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_directory
-		${CMAKE_CURRENT_LIST_DIR}/data $<TARGET_FILE_DIR:spine-sfml-cpp-example>/data)
-add_custom_command(TARGET spine-sfml-cpp-test PRE_BUILD
+add_custom_command(TARGET spine-sfml-cpp-example
 		COMMAND ${CMAKE_COMMAND} -E copy_directory
 		${CMAKE_CURRENT_LIST_DIR}/data $<TARGET_FILE_DIR:spine-sfml-cpp-example>/data)
 
-target_link_libraries(spine-sfml-cpp-example spine-cpp)
-target_link_libraries(spine-sfml-cpp-example spine-sfml-cpp)
-
-target_link_libraries(spine-sfml-cpp-test spine-cpp)
-target_link_libraries(spine-sfml-cpp-test spine-sfml-cpp)
+add_custom_command(TARGET spine-sfml-cpp-testbed
+		COMMAND ${CMAKE_COMMAND} -E copy_directory
+		${CMAKE_CURRENT_LIST_DIR}/data $<TARGET_FILE_DIR:spine-sfml-cpp-example>/data)
