@@ -1,4 +1,4 @@
-import 'package:esotericsoftware_spine_flutter/spine_flutter.dart';
+import 'package:spine_flutter/spine_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:spine_flutter_example/debug_rendering.dart';
 

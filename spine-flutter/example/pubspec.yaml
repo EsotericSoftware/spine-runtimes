@@ -10,7 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  esotericsoftware_spine_flutter:
+  spine_flutter:
     path: ../
   cupertino_icons: ^1.0.2
   flame: ^1.4.0

@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:esotericsoftware_spine_flutter/spine_flutter.dart';
+import 'package:spine_flutter/spine_flutter.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';

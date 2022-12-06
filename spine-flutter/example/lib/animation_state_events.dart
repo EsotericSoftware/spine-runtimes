@@ -1,5 +1,5 @@
 // ignore_for_file: avoid_print
-import 'package:esotericsoftware_spine_flutter/spine_flutter.dart';
+import 'package:spine_flutter/spine_flutter.dart';
 import 'package:flutter/material.dart';
 
 class AnimationStateEvents extends StatelessWidget {

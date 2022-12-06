@@ -1,3 +1,6 @@
+# 4.2.7
+* Change package name from  `esotericsoftware_spine_flutter` to `spine_flutter`.
+
 # 4.2.6
 * Fix analyzer errors, fix code style to adhere to Dart standards.
 
