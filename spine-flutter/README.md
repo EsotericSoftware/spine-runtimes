@@ -1,8 +1,8 @@
 # spine-flutter
 
-The spine-godot runtime provides functionality to load, manipulate and render [Spine](http://esotericsoftware.com) skeletal animation data using [Flutter](https://flutter.dev/). spine-flutter is based on [spine-cpp](../spine-cpp) and supports desktop and mobile Flutter deployment targets. spine-flutter does not support Flutter's web deployment target.
+The spine-godot runtime provides functionality to load, manipulate and render [Spine](https://esotericsoftware.com) skeletal animation data using [Flutter](https://flutter.dev/). spine-flutter is based on [spine-cpp](../spine-cpp) and supports desktop and mobile Flutter deployment targets. spine-flutter does not support Flutter's web deployment target.
 
-# See the [spine-flutter documentation](http://esotericsoftware.com/spine-flutter) for in-depth information.
+# See the [spine-flutter documentation](https://esotericsoftware.com/spine-flutter) for in-depth information.
 
 ## Licensing
 
@@ -12,7 +12,7 @@ You can integrate the Spine Runtimes into your software free of charge, but user
 
 In order to distribute your software containing the Spine Runtimes to others that don't have a Spine license, you need a [Spine license](https://esotericsoftware.com/spine-purchase) at the time of integration. Then you can distribute your software containing the Spine Runtimes however you like, provided others don't modify it or use it to create new software. If others want to do that, they'll need their own Spine license.
 
-For the official legal terms governing the Spine Runtimes, please read the [Spine Runtimes License Agreement](http://esotericsoftware.com/spine-runtimes-license) and Section 2 of the [Spine Editor License Agreement](http://esotericsoftware.com/spine-editor-license#s2).
+For the official legal terms governing the Spine Runtimes, please read the [Spine Runtimes License Agreement](https://esotericsoftware.com/spine-runtimes-license) and Section 2 of the [Spine Editor License Agreement](https://esotericsoftware.com/spine-editor-license#s2).
 
 ## Spine version
 
