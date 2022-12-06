@@ -1,6 +1,6 @@
 // ignore_for_file: avoid_print
-import 'package:flutter/material.dart';
 import 'package:esotericsoftware_spine_flutter/spine_flutter.dart';
+import 'package:flutter/material.dart';
 
 class AnimationStateEvents extends StatelessWidget {
   const AnimationStateEvents({Key? key}) : super(key: key);
@@ -22,22 +22,18 @@ class AnimationStateEvents extends StatelessWidget {
       });
       controller.animationState.setListener((type, trackEntry, event) {
         if (type == EventType.event) {
-          print("User event: { name: ${event?.getData().getName()}, intValue: ${event?.getIntValue()}, floatValue: intValue: ${event?.getFloatValue()}, stringValue: ${event?.getStringValue()} }");
+          print(
+              "User event: { name: ${event?.getData().getName()}, intValue: ${event?.getIntValue()}, floatValue: intValue: ${event?.getFloatValue()}, stringValue: ${event?.getStringValue()} }");
         }
       });
       print("Current: ${controller.animationState.getCurrent(0)?.getAnimation().getName()}");
     });
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Spineboy')),
-      body: Column(
-        children: [
+        appBar: AppBar(title: const Text('Spineboy')),
+        body: Column(children: [
           const Text("See output in console!"),
-          Expanded(
-              child: SpineWidget.asset("assets/spineboy.atlas", "assets/spineboy-pro.skel", controller)
-          )
-        ]
-      )
-    );
+          Expanded(child: SpineWidget.asset("assets/spineboy.atlas", "assets/spineboy-pro.skel", controller))
+        ]));
   }
 }

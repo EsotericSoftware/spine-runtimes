@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:esotericsoftware_spine_flutter/spine_flutter.dart';
+import 'package:flutter/material.dart';
 
 class PlayPauseAnimation extends StatefulWidget {
   const PlayPauseAnimation({Key? key}) : super(key: key);
@@ -33,7 +33,12 @@ class PlayPauseAnimationState extends State<PlayPauseAnimation> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Play/Pause')),
-      body: SpineWidget.asset("assets/dragon.atlas", "assets/dragon-ess.skel", controller, boundsProvider: SkinAndAnimationBounds(animation: "flying"),),
+      body: SpineWidget.asset(
+        "assets/dragon.atlas",
+        "assets/dragon-ess.skel",
+        controller,
+        boundsProvider: SkinAndAnimationBounds(animation: "flying"),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: _togglePlay,
         child: Icon(isPlaying ? Icons.pause : Icons.play_arrow),

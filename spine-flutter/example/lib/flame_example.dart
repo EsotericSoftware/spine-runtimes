@@ -1,9 +1,9 @@
 import 'dart:math';
 
+import 'package:esotericsoftware_spine_flutter/spine_flutter.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
-import 'package:esotericsoftware_spine_flutter/spine_flutter.dart';
 
 class SpineComponent extends PositionComponent {
   final BoundsProvider _boundsProvider;
@@ -11,34 +11,36 @@ class SpineComponent extends PositionComponent {
   late final Bounds _bounds;
   final bool _ownsDrawable;
 
-  SpineComponent(this._drawable, {
-        bool ownsDrawable = true,
-        BoundsProvider boundsProvider = const SetupPoseBounds(),
-        super.position,
-        super.scale,
-        double super.angle = 0.0,
-        Anchor super.anchor = Anchor.topLeft,
-        super.children,
-        super.priority,
-      }) :
-        _ownsDrawable = ownsDrawable,
+  SpineComponent(
+    this._drawable, {
+    bool ownsDrawable = true,
+    BoundsProvider boundsProvider = const SetupPoseBounds(),
+    super.position,
+    super.scale,
+    double super.angle = 0.0,
+    Anchor super.anchor = Anchor.topLeft,
+    super.children,
+    super.priority,
+  })  : _ownsDrawable = ownsDrawable,
         _boundsProvider = boundsProvider {
     _drawable.update(0);
     _bounds = _boundsProvider.computeBounds(_drawable);
     size = Vector2(_bounds.width, _bounds.height);
   }
 
-  static Future<SpineComponent> fromAssets(String atlasFile, String skeletonFile, {
-        AssetBundle? bundle, BoundsProvider boundsProvider = const SetupPoseBounds(),
-        Vector2? position,
-        Vector2? scale,
-        double angle = 0.0,
-        Anchor anchor = Anchor.topLeft,
-        Iterable<Component>? children,
-        int? priority,
-      }) async {
-    return SpineComponent(
-        await SkeletonDrawable.fromAsset(atlasFile, skeletonFile, bundle: bundle),
+  static Future<SpineComponent> fromAssets(
+    String atlasFile,
+    String skeletonFile, {
+    AssetBundle? bundle,
+    BoundsProvider boundsProvider = const SetupPoseBounds(),
+    Vector2? position,
+    Vector2? scale,
+    double angle = 0.0,
+    Anchor anchor = Anchor.topLeft,
+    Iterable<Component>? children,
+    int? priority,
+  }) async {
+    return SpineComponent(await SkeletonDrawable.fromAsset(atlasFile, skeletonFile, bundle: bundle),
         ownsDrawable: true,
         boundsProvider: boundsProvider,
         position: position,
@@ -54,12 +56,12 @@ class SpineComponent extends PositionComponent {
       _drawable.dispose();
     }
   }
-  
+
   @override
   void update(double dt) {
     _drawable.update(dt);
   }
-  
+
   @override
   void render(Canvas canvas) {
     canvas.save();
@@ -69,7 +71,9 @@ class SpineComponent extends PositionComponent {
   }
 
   get animationState => _drawable.animationState;
+
   get animationStateData => _drawable.animationStateData;
+
   get skeleton => _drawable.skeleton;
 }
 
@@ -81,12 +85,8 @@ class SimpleFlameExample extends FlameGame {
     // Load the Spineboy atlas and skeleton data from asset files
     // and create a SpineComponent from them, scaled down and
     // centered on the screen
-    spineboy = await SpineComponent.fromAssets(
-        "assets/spineboy.atlas", "assets/spineboy-pro.skel",
-        scale: Vector2(0.4, 0.4),
-        anchor: Anchor.center,
-        position: Vector2(size.x / 2, size.y / 2)
-    );
+    spineboy = await SpineComponent.fromAssets("assets/spineboy.atlas", "assets/spineboy-pro.skel",
+        scale: Vector2(0.4, 0.4), anchor: Anchor.center, position: Vector2(size.x / 2, size.y / 2));
 
     // Set the "walk" animation on track 0 in looping mode
     spineboy.animationState.setAnimationByName(0, "walk", true);
@@ -119,11 +119,7 @@ class PreloadAndShareSpineDataExample extends FlameGame {
       final drawable = SkeletonDrawable(cachedAtlas, cachedSkeletonData, false);
       final scale = 0.1 + rng.nextDouble() * 0.2;
       final position = Vector2(rng.nextDouble() * size.x, rng.nextDouble() * size.y);
-      final spineboy = SpineComponent(
-          drawable,
-          scale: Vector2(scale, scale),
-          position: position
-      );
+      final spineboy = SpineComponent(drawable, scale: Vector2(scale, scale), position: position);
       spineboy.animationState.setAnimationByName(0, "walk", true);
       spineboys.add(spineboy);
       await add(spineboy);
@@ -145,13 +141,11 @@ class PreloadAndShareSpineDataExample extends FlameGame {
 
 class SpineFlameGameWidget extends StatelessWidget {
   final FlameGame game;
+
   const SpineFlameGameWidget(this.game, {super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Flame Integration')),
-      body: GameWidget(game: game)
-    );
+    return Scaffold(appBar: AppBar(title: const Text('Flame Integration')), body: GameWidget(game: game));
   }
 }

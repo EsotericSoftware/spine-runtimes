@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:inject_js/inject_js.dart' as js;
 import 'package:web_ffi_fork/web_ffi.dart';
 import 'package:web_ffi_fork/web_ffi_modules.dart';
+
 import 'spine_flutter_bindings_generated.dart';
 
 Module? _module;
@@ -61,7 +62,8 @@ Future<SpineFlutterFFI> initSpineFlutterFFI() async {
     registerOpaqueType<spine_skin_entries_wrapper>();
 
     await js.importLibrary('assets/packages/esotericsoftware_spine_flutter/lib/assets/libspine_flutter.js');
-    Uint8List wasmBinaries = (await rootBundle.load('packages/esotericsoftware_spine_flutter/lib/assets/libspine_flutter.wasm')).buffer.asUint8List();
+    Uint8List wasmBinaries =
+        (await rootBundle.load('packages/esotericsoftware_spine_flutter/lib/assets/libspine_flutter.wasm')).buffer.asUint8List();
     _module = await EmscriptenModule.compile(wasmBinaries, 'libspine_flutter');
   }
   Module? m = _module;

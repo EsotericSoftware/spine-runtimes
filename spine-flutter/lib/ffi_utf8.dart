@@ -3,8 +3,9 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'dart:convert';
-import 'ffi_proxy.dart';
 import 'dart:typed_data';
+
+import 'ffi_proxy.dart';
 
 /// The contents of a native zero-terminated array of UTF-8 code units.
 ///
@@ -57,8 +58,7 @@ extension Utf8Pointer on Pointer<Utf8> {
 
   void _ensureNotNullptr(String operation) {
     if (this == nullptr) {
-      throw UnsupportedError(
-          "Operation '$operation' not allowed on a 'nullptr'.");
+      throw UnsupportedError("Operation '$operation' not allowed on a 'nullptr'.");
     }
   }
 }

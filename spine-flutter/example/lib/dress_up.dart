@@ -1,6 +1,6 @@
+import 'package:esotericsoftware_spine_flutter/spine_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart' as painting;
-import 'package:esotericsoftware_spine_flutter/spine_flutter.dart';
 import 'package:raw_image_provider/raw_image_provider.dart';
 
 class DressUp extends StatefulWidget {
@@ -61,40 +61,38 @@ class DressUpState extends State<DressUp> {
         appBar: AppBar(title: const Text('Dress Up')),
         body: _skinImages.isEmpty
             ? const SizedBox()
-            : Row(
-                  children: [
-                    SizedBox(width: thumbnailSize, child:
-                      ListView(
-                          children: _skinImages.keys.map((skinName) {
-                            var rawImageData = _skinImages[skinName]!;
-                            var image = Image(image: RawImageProvider(rawImageData));
-                            var box = SizedBox(width: 200, height: 200, child: image);
-                            return GestureDetector(
-                                onTap: () {
-                                  _toggleSkin(skinName);
-                                  setState(() {});
-                                },
-                                child: _selectedSkins[skinName] == true
-                                      ? box
-                                      // Does not work on web.
-                                      //: ColorFiltered(colorFilter: const ColorFilter.mode(Colors.grey, painting.BlendMode.saturation,), child: box)
-                                      : Container(
-                                          foregroundDecoration: const BoxDecoration(
-                                            color: Colors.grey,
-                                            backgroundBlendMode: painting.BlendMode.saturation,
-                                          ),
-                                          child: box
-                                        )
-                            );
-                          }).toList()
-                      ),
-                    ),
-                    Expanded(
-                      child: SpineWidget.drawable(_drawable, controller, boundsProvider: SkinAndAnimationBounds(skins: ["full-skins/girl"]),)
-                    )
-                  ]
-              )
-    );
+            : Row(children: [
+                SizedBox(
+                  width: thumbnailSize,
+                  child: ListView(
+                      children: _skinImages.keys.map((skinName) {
+                    var rawImageData = _skinImages[skinName]!;
+                    var image = Image(image: RawImageProvider(rawImageData));
+                    var box = SizedBox(width: 200, height: 200, child: image);
+                    return GestureDetector(
+                        onTap: () {
+                          _toggleSkin(skinName);
+                          setState(() {});
+                        },
+                        child: _selectedSkins[skinName] == true
+                            ? box
+                            // Does not work on web.
+                            //: ColorFiltered(colorFilter: const ColorFilter.mode(Colors.grey, painting.BlendMode.saturation,), child: box)
+                            : Container(
+                                foregroundDecoration: const BoxDecoration(
+                                  color: Colors.grey,
+                                  backgroundBlendMode: painting.BlendMode.saturation,
+                                ),
+                                child: box));
+                  }).toList()),
+                ),
+                Expanded(
+                    child: SpineWidget.drawable(
+                  _drawable,
+                  controller,
+                  boundsProvider: SkinAndAnimationBounds(skins: ["full-skins/girl"]),
+                ))
+              ]));
   }
 
   @override

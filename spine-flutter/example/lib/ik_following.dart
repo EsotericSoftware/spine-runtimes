@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:esotericsoftware_spine_flutter/spine_flutter.dart';
+import 'package:flutter/material.dart';
 
 class IkFollowing extends StatefulWidget {
   const IkFollowing({Key? key}) : super(key: key);
