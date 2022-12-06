@@ -46,7 +46,3 @@ flutter:
   assets:
     - lib/assets/libspine_flutter.js
     - lib/assets/libspine_flutter.wasm
-
-analyzer:
-  exclude:
-    - lib/init_web.dart
