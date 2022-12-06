@@ -17,6 +17,7 @@ Future<SpineFlutterFFI> initSpineFlutterFFI() async {
   if (_module == null) {
     Memory.init();
 
+    var v = 0;
     registerOpaqueType<spine_skeleton_wrapper>();
     registerOpaqueType<spine_skeleton_data_wrapper>();
     registerOpaqueType<spine_bone_wrapper>();

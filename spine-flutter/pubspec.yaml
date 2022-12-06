@@ -1,6 +1,6 @@
 name: esotericsoftware_spine_flutter
 description: The official Spine Flutter Runtime to load, display and interact with Spine animations.
-version: 4.2.5
+version: 4.2.6
 homepage: https://esotericsoftware.com
 repository: https://github.com/esotericsoftware/spine-runtimes
 issue_tracker: https://github.com/esotericsoftware/spine-runtimes/issues
@@ -46,3 +46,7 @@ flutter:
   assets:
     - lib/assets/libspine_flutter.js
     - lib/assets/libspine_flutter.wasm
+
+analyzer:
+  exclude:
+    - lib/init_web.dart
