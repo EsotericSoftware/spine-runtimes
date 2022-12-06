@@ -30,12 +30,48 @@ flutter build web --web-renderer canvaskit
 ```
 
 ## Setup
-TBD
+To add `spine_flutter` to your Flutter project, add the following dependency to your `pubspec.yaml` file:
 
+```yaml
+dependencies:
+  ...
+  spine_flutter: ^4.2.11
+```
+
+In your `main()`, add these two lines in the beginning to initialize the Spine Flutter runtime:
+
+```dart
+void main() {
+    WidgetsFlutterBinding.ensureInitialized();
+    await initSpineFlutter(enableMemoryDebugging: false);
+    ...
+}
+```
 
 ## Example
-The example in this repository is directly depending on the spine-flutter sources. The sources include C++ code ([spine-cpp](../spine-cpp)) which needs to be compiled. To run the example project, install the [Flutter SDK](https://docs.flutter.dev/get-started/install), then run `flutter doctor`` which will instruct you what other dependencies to install.
+If you have pulled the `spine_flutter` package from [pub.dev](https://pub.dev) directly, you can run the example in the `example/` folder as is:
 
-Once installed, run the `setup.sh` script in the `spine-flutter` folder. This will copy [spine-cpp](../spine-cpp) to the appropriate locations.
+```bash
+cd path/to/downloaded/spine_flutter
+cd example
+flutter run
+```
 
-You can then open `spine-flutter` in an IDE or editor of your choice that supports Flutter, like [IntelliJ IDEA/Android Studio](https://docs.flutter.dev/get-started/editor?tab=androidstudio) or [Visual Studio Code](https://docs.flutter.dev/get-started/editor?tab=vscode) to inspect and run the example. Alternatively, you can run the example from the [command line](https://docs.flutter.dev/get-started/test-drive?tab=terminal).
+Otherwise you can run the example like this:
+
+1. install the [Flutter SDK](https://docs.flutter.dev/get-started/install), then run `flutter doctor` which will instruct you what other dependencies to install.
+2. Clone this repository `git clone https://github.com/esotericsoftware/spine-runtimes`
+3. Run `setup.sh` in the `spine-flutter/` folder. On Windows, you can use [Git Bash](https://gitforwindows.org/) included in Git for Window to run the `setup.sh` Bash script.
+
+You can then open `spine-flutter` in an IDE or editor of your choice that supports Flutter, like [IntelliJ IDEA/Android Studio](https://docs.flutter.dev/get-started/editor?tab=androidstudio) or [Visual Studio Code](https://docs.flutter.dev/get-started/editor?tab=vscode) to inspect and run the example. 
+
+Alternatively, you can run the example from the [command line](https://docs.flutter.dev/get-started/test-drive?tab=terminal).
+
+## Development
+If all you modify are the Dart sources of the plugin, then the development setup is the same as the setup described under "Example" above.
+
+If you need to work on the `dart:ffi` bindings for `spine-cpp`, you will also need to install [Emscripten](https://emscripten.org/docs/getting_started/downloads.html).
+
+To generate the bindings based on the `src/spine_flutter.h` header, run `dart run ffigen --config ffigen.yaml`. After the bindings have been generated, you must replace the line `import 'dart:ffi' as ffi;` with `import 'ffi_proxy.dart' as ffi;` in the file `src/spine_flutter_bindings_generated.dart`. Otherwise the bindings will not compile for the web.
+
+If you made changes to `spine-cpp` or the source files in `src/`, you must run `compile-wasm.sh`. This will compile `spine-cpp` and the bindings for the Web and place updated versions of `libspine_flutter.js` and `libspine_flutter.wasm` in the `lib/assets/` folder. For web builds, the `initSpineFlutterFFI()` function in `lib/init_web.dart` will load these files from the package's asset bundle.
