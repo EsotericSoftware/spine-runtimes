@@ -1,3 +1,4 @@
+// ignore_for_file: type_argument_not_matching_bounds
 import 'package:flutter/services.dart';
 import 'package:inject_js/inject_js.dart' as js;
 import 'package:web_ffi_fork/web_ffi.dart';
@@ -17,7 +18,6 @@ Future<SpineFlutterFFI> initSpineFlutterFFI() async {
   if (_module == null) {
     Memory.init();
 
-    var v = 0;
     registerOpaqueType<spine_skeleton_wrapper>();
     registerOpaqueType<spine_skeleton_data_wrapper>();
     registerOpaqueType<spine_bone_wrapper>();

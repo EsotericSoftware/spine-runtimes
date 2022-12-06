@@ -1,3 +1,6 @@
+# 4.2.6
+* Fix analyzer errors, fix code style to adhere to Dart standards.
+
 # 4.2.5
 * Implemented batching of render commands, reducing the number of draw calls. 60/120fps for 100 Spineboys on all platforms.
 
