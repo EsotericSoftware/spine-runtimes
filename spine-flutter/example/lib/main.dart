@@ -63,7 +63,7 @@ class ExampleSelector extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute<void>(
-                      builder: (context) => DebugRendering(),
+                      builder: (context) => const DebugRendering(),
                     ),
                   );
                 },

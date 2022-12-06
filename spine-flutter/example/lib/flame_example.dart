@@ -53,11 +53,6 @@ class SpineComponent extends PositionComponent {
     if (_ownsDrawable) {
       _drawable.dispose();
     }
-
-    @override
-    void onDetach() {
-
-    }
   }
   
   @override

@@ -455,10 +455,10 @@ class SkeletonData {
 }
 
 enum BlendMode {
-  Normal(0),
-  Additive(1),
-  Multiply(2),
-  Screen(3);
+  normal(0),
+  additive(1),
+  multiply(2),
+  screen(3);
 
   final int value;
 
@@ -466,11 +466,11 @@ enum BlendMode {
 }
 
 enum TransformMode {
-  Normal(0),
-  OnlyTranslation(1),
-  NoRotationOrReflection(2),
-  NoScale(3),
-  NoScaleOrReflection(4);
+  normal(0),
+  onlyTranslation(1),
+  noRotationOrReflection(2),
+  noScale(3),
+  noScaleOrReflection(4);
 
   final int value;
 
@@ -478,8 +478,8 @@ enum TransformMode {
 }
 
 enum PositionMode {
-  Fixed(0),
-  Percent(1);
+  fixed(0),
+  percent(1);
 
   final int value;
 
@@ -487,10 +487,10 @@ enum PositionMode {
 }
 
 enum SpacingMode {
-  Length(0),
-  Fixed(1),
-  Percent(2),
-  Proportional(3);
+  length(0),
+  fixed(1),
+  percent(2),
+  proportional(3);
 
   final int value;
 
@@ -498,9 +498,9 @@ enum SpacingMode {
 }
 
 enum RotateMode {
-  Tangent(0),
-  Chain(1),
-  ChainScale(2);
+  tangent(0),
+  chain(1),
+  chainScale(2);
 
   final int value;
 
@@ -1216,12 +1216,12 @@ class Sequence {
 }
 
 enum AttachmentType {
-  Region(0),
-  Mesh(1),
-  Clipping(2),
-  BoundingBox(3),
-  Path(4),
-  Point(5);
+  region(0),
+  mesh(1),
+  clipping(2),
+  boundingBox(3),
+  path(4),
+  point(5);
 
   final int value;
 
@@ -1246,17 +1246,17 @@ abstract class Attachment<T extends Pointer> {
   static Attachment _toSubclass(spine_attachment attachment) {
     final type = AttachmentType.values[_bindings.spine_attachment_get_type(attachment)];
     switch (type) {
-      case AttachmentType.Region:
+      case AttachmentType.region:
         return RegionAttachment._(attachment.cast());
-      case AttachmentType.Mesh:
+      case AttachmentType.mesh:
         return MeshAttachment._(attachment.cast());
-      case AttachmentType.Clipping:
+      case AttachmentType.clipping:
         return ClippingAttachment._(attachment.cast());
-      case AttachmentType.BoundingBox:
+      case AttachmentType.boundingBox:
         return BoundingBoxAttachment._(attachment.cast());
-      case AttachmentType.Path:
+      case AttachmentType.path:
         return PathAttachment._(attachment.cast());
-      case AttachmentType.Point:
+      case AttachmentType.point:
         return PointAttachment._(attachment.cast());
     }
   }
@@ -1661,7 +1661,7 @@ class Skin {
 
   Skin._(this._skin) : _isCustomSkin = false;
 
-  Skin.new(String name) {
+  Skin(String name) {
     final nativeName = name.toNativeUtf8(allocator: _allocator);
     _skin = _bindings.spine_skin_create(nativeName.cast());
     _allocator.free(nativeName);
@@ -2613,10 +2613,10 @@ class Animation {
 }
 
 enum MixBlend {
-  Setup(0),
-  First(1),
-  Replace(2),
-  Add(3);
+  setup(0),
+  first(1),
+  replace(2),
+  add(3);
 
   final int value;
 
@@ -2895,7 +2895,7 @@ class TrackEntry {
   }
 }
 
-enum EventType { Start, Interrupt, End, Complete, Dispose, Event }
+enum EventType { start, interrupt, end, complete, dispose, event }
 
 class EventData {
   final spine_event_data _data;
@@ -3016,7 +3016,7 @@ class Event {
 typedef AnimationStateListener = void Function(EventType type, TrackEntry entry, Event? event);
 
 class AnimationStateData {
-  spine_animation_state_data _data;
+  final spine_animation_state_data _data;
 
   AnimationStateData._(this._data);
 
@@ -3089,22 +3089,22 @@ class AnimationState {
         late final EventType type;
         switch (_bindings.spine_animation_state_events_get_event_type(_events, i)) {
           case 0:
-            type = EventType.Start;
+            type = EventType.start;
             break;
           case 1:
-            type = EventType.Interrupt;
+            type = EventType.interrupt;
             break;
           case 2:
-            type = EventType.End;
+            type = EventType.end;
             break;
           case 3:
-            type = EventType.Complete;
+            type = EventType.complete;
             break;
           case 4:
-            type = EventType.Dispose;
+            type = EventType.dispose;
             break;
           case 5:
-            type = EventType.Event;
+            type = EventType.event;
             break;
         }
         final nativeEntry = _bindings.spine_animation_state_events_get_track_entry(_events, i);
@@ -3117,7 +3117,7 @@ class AnimationState {
         if (_stateListener != null) {
           _stateListener?.call(type, entry, event);
         }
-        if (type == EventType.Dispose) {
+        if (type == EventType.dispose) {
           _bindings.spine_animation_state_dispose_track_entry(_state, nativeEntry);
         }
       }

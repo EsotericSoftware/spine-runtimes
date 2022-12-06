@@ -8,9 +8,6 @@ class AnimationStateEvents extends StatelessWidget {
   Widget build(BuildContext context) {
     reportLeaks();
     final controller = SpineWidgetController(onInitialized: (controller) {
-      for (final bone in controller.skeleton.getBones()) {
-        print(bone);
-      }
       controller.skeleton.setScaleX(0.5);
       controller.skeleton.setScaleY(0.5);
       controller.skeleton.findSlot("gun")?.setColor(Color(1, 0, 0, 1));
@@ -23,7 +20,7 @@ class AnimationStateEvents extends StatelessWidget {
         print("Run animation event $type");
       });
       controller.animationState.setListener((type, trackEntry, event) {
-        if (type == EventType.Event) {
+        if (type == EventType.event) {
           print("User event: { name: ${event?.getData().getName()}, intValue: ${event?.getIntValue()}, floatValue: intValue: ${event?.getFloatValue()}, stringValue: ${event?.getStringValue()} }");
         }
       });

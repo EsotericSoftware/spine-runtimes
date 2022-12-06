@@ -150,7 +150,7 @@ packages:
     source: hosted
     version: "1.8.2"
   raw_image_provider:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: raw_image_provider
       sha256: d5b20d69e8a998a4dc846a3d35dca8760121d18b6895233fca52f9055a9a7e8e

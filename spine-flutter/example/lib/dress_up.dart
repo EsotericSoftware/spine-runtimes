@@ -1,10 +1,6 @@
-import 'dart:math';
-import 'dart:ui' as ui;
-
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart' as painting;
 import 'package:esotericsoftware_spine_flutter/spine_flutter.dart';
-import 'package:flutter/services.dart';
 import 'package:raw_image_provider/raw_image_provider.dart';
 
 class DressUp extends StatefulWidget {
@@ -83,7 +79,7 @@ class DressUpState extends State<DressUp> {
                                       // Does not work on web.
                                       //: ColorFiltered(colorFilter: const ColorFilter.mode(Colors.grey, painting.BlendMode.saturation,), child: box)
                                       : Container(
-                                          foregroundDecoration: BoxDecoration(
+                                          foregroundDecoration: const BoxDecoration(
                                             color: Colors.grey,
                                             backgroundBlendMode: painting.BlendMode.saturation,
                                           ),
@@ -104,7 +100,7 @@ class DressUpState extends State<DressUp> {
   @override
   void dispose() {
     super.dispose();
-    _drawable?.dispose();
+    _drawable.dispose();
     _customSkin?.dispose();
   }
 }
