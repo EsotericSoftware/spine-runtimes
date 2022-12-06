@@ -4,6 +4,7 @@ import 'dart:math';
 import 'dart:typed_data';
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart' as material;
 import 'package:flutter/rendering.dart' as rendering;
 import 'package:flutter/services.dart';
@@ -11,12 +12,11 @@ import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
 import 'package:raw_image_provider/raw_image_provider.dart';
 
-import 'spine_flutter_bindings_generated.dart';
 import 'ffi_proxy.dart';
+import 'init.dart' if (dart.library.html) 'init_web.dart';
+import 'spine_flutter_bindings_generated.dart';
 
 export 'spine_widget.dart';
-import 'init.dart' if (dart.library.html) 'init_web.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 
 late SpineFlutterBindings _bindings;
 late Allocator _allocator;
@@ -94,8 +94,7 @@ class Atlas {
       final Image image = frameInfo.image;
       atlasPages.add(image);
       atlasPagePaints.add(Paint()
-        ..shader = ImageShader(image, TileMode.clamp, TileMode.clamp, Matrix4.identity().storage,
-            filterQuality: FilterQuality.high)
+        ..shader = ImageShader(image, TileMode.clamp, TileMode.clamp, Matrix4.identity().storage, filterQuality: FilterQuality.high)
         ..isAntiAlias = true);
     }
 
@@ -610,10 +609,7 @@ class BoneData {
 
   Color getColor() {
     final color = _bindings.spine_bone_data_get_color(_data);
-    return Color(
-        _bindings.spine_color_get_r(color),
-        _bindings.spine_color_get_g(color),
-        _bindings.spine_color_get_b(color),
+    return Color(_bindings.spine_color_get_r(color), _bindings.spine_color_get_g(color), _bindings.spine_color_get_b(color),
         _bindings.spine_color_get_a(color));
   }
 
@@ -648,8 +644,7 @@ class Bone {
     _bindings.spine_bone_update_world_transform(_bone);
   }
 
-  void updateWorldTransformWith(
-      double x, double y, double rotation, double scaleX, double scaleY, double shearX, double shearY) {
+  void updateWorldTransformWith(double x, double y, double rotation, double scaleX, double scaleY, double shearX, double shearY) {
     _bindings.spine_bone_update_world_transform_with(_bone, x, y, rotation, scaleX, scaleY, shearX, shearY);
   }
 
@@ -920,10 +915,7 @@ class SlotData {
 
   Color getColor() {
     final color = _bindings.spine_slot_data_get_color(_data);
-    return Color(
-        _bindings.spine_color_get_r(color),
-        _bindings.spine_color_get_g(color),
-        _bindings.spine_color_get_b(color),
+    return Color(_bindings.spine_color_get_r(color), _bindings.spine_color_get_g(color), _bindings.spine_color_get_b(color),
         _bindings.spine_color_get_a(color));
   }
 
@@ -933,10 +925,7 @@ class SlotData {
 
   Color getDarkColor() {
     final color = _bindings.spine_slot_data_get_dark_color(_data);
-    return Color(
-        _bindings.spine_color_get_r(color),
-        _bindings.spine_color_get_g(color),
-        _bindings.spine_color_get_b(color),
+    return Color(_bindings.spine_color_get_r(color), _bindings.spine_color_get_g(color), _bindings.spine_color_get_b(color),
         _bindings.spine_color_get_a(color));
   }
 
@@ -1000,10 +989,7 @@ class Slot {
 
   Color getColor() {
     final color = _bindings.spine_slot_get_color(_slot);
-    return Color(
-        _bindings.spine_color_get_r(color),
-        _bindings.spine_color_get_g(color),
-        _bindings.spine_color_get_b(color),
+    return Color(_bindings.spine_color_get_r(color), _bindings.spine_color_get_g(color), _bindings.spine_color_get_b(color),
         _bindings.spine_color_get_a(color));
   }
 
@@ -1013,10 +999,7 @@ class Slot {
 
   Color getDarkColor() {
     final color = _bindings.spine_slot_get_dark_color(_slot);
-    return Color(
-        _bindings.spine_color_get_r(color),
-        _bindings.spine_color_get_g(color),
-        _bindings.spine_color_get_b(color),
+    return Color(_bindings.spine_color_get_r(color), _bindings.spine_color_get_g(color), _bindings.spine_color_get_b(color),
         _bindings.spine_color_get_a(color));
   }
 
@@ -1339,10 +1322,7 @@ class RegionAttachment extends Attachment<spine_region_attachment> {
 
   Color getColor() {
     final color = _bindings.spine_region_attachment_get_color(_attachment);
-    return Color(
-        _bindings.spine_color_get_r(color),
-        _bindings.spine_color_get_g(color),
-        _bindings.spine_color_get_b(color),
+    return Color(_bindings.spine_color_get_r(color), _bindings.spine_color_get_g(color), _bindings.spine_color_get_b(color),
         _bindings.spine_color_get_a(color));
   }
 
@@ -1451,10 +1431,7 @@ class MeshAttachment extends VertexAttachment<spine_mesh_attachment> {
 
   Color getColor() {
     final color = _bindings.spine_mesh_attachment_get_color(_attachment);
-    return Color(
-        _bindings.spine_color_get_r(color),
-        _bindings.spine_color_get_g(color),
-        _bindings.spine_color_get_b(color),
+    return Color(_bindings.spine_color_get_r(color), _bindings.spine_color_get_g(color), _bindings.spine_color_get_b(color),
         _bindings.spine_color_get_a(color));
   }
 
@@ -1527,10 +1504,7 @@ class ClippingAttachment extends VertexAttachment<spine_clipping_attachment> {
 
   Color getColor() {
     final color = _bindings.spine_clipping_attachment_get_color(_attachment);
-    return Color(
-        _bindings.spine_color_get_r(color),
-        _bindings.spine_color_get_g(color),
-        _bindings.spine_color_get_b(color),
+    return Color(_bindings.spine_color_get_r(color), _bindings.spine_color_get_g(color), _bindings.spine_color_get_b(color),
         _bindings.spine_color_get_a(color));
   }
 
@@ -1544,10 +1518,7 @@ class BoundingBoxAttachment extends VertexAttachment<spine_bounding_box_attachme
 
   Color getColor() {
     final color = _bindings.spine_bounding_box_attachment_get_color(_attachment);
-    return Color(
-        _bindings.spine_color_get_r(color),
-        _bindings.spine_color_get_g(color),
-        _bindings.spine_color_get_b(color),
+    return Color(_bindings.spine_color_get_r(color), _bindings.spine_color_get_g(color), _bindings.spine_color_get_b(color),
         _bindings.spine_color_get_a(color));
   }
 
@@ -1583,10 +1554,7 @@ class PathAttachment extends VertexAttachment<spine_path_attachment> {
 
   Color getColor() {
     final color = _bindings.spine_path_attachment_get_color(_attachment);
-    return Color(
-        _bindings.spine_color_get_r(color),
-        _bindings.spine_color_get_g(color),
-        _bindings.spine_color_get_b(color),
+    return Color(_bindings.spine_color_get_r(color), _bindings.spine_color_get_g(color), _bindings.spine_color_get_b(color),
         _bindings.spine_color_get_a(color));
   }
 
@@ -1635,10 +1603,7 @@ class PointAttachment extends Attachment<spine_point_attachment> {
 
   Color getColor() {
     final color = _bindings.spine_point_attachment_get_color(_attachment);
-    return Color(
-        _bindings.spine_color_get_r(color),
-        _bindings.spine_color_get_g(color),
-        _bindings.spine_color_get_b(color),
+    return Color(_bindings.spine_color_get_r(color), _bindings.spine_color_get_g(color), _bindings.spine_color_get_b(color),
         _bindings.spine_color_get_a(color));
   }
 
@@ -1675,8 +1640,7 @@ class Skin {
 
   void setAttachment(int slotIndex, String name, Attachment? attachment) {
     final nativeName = name.toNativeUtf8(allocator: _allocator);
-    _bindings.spine_skin_set_attachment(
-        _skin, slotIndex, nativeName.cast(), attachment == null ? nullptr : attachment._attachment.cast());
+    _bindings.spine_skin_set_attachment(_skin, slotIndex, nativeName.cast(), attachment == null ? nullptr : attachment._attachment.cast());
     _allocator.free(nativeName);
   }
 
@@ -1710,8 +1674,12 @@ class Skin {
     for (int i = 0; i < numEntries; i++) {
       final entry = _bindings.spine_skin_entries_get_entry(entries, i);
       Pointer<Utf8> name = _bindings.spine_skin_entry_get_name(entry).cast();
-      result.add(SkinEntry(_bindings.spine_skin_entry_get_slot_index(entry), name.toDartString(),
-          _bindings.spine_skin_entry_get_attachment(entry).address == nullptr.address ? null : Attachment._toSubclass(_bindings.spine_skin_entry_get_attachment(entry))));
+      result.add(SkinEntry(
+          _bindings.spine_skin_entry_get_slot_index(entry),
+          name.toDartString(),
+          _bindings.spine_skin_entry_get_attachment(entry).address == nullptr.address
+              ? null
+              : Attachment._toSubclass(_bindings.spine_skin_entry_get_attachment(entry))));
     }
     return result;
   }
@@ -2404,8 +2372,7 @@ class Skeleton {
   Attachment? getAttachmentByName(String slotName, String attachmentName) {
     final slotNameNative = slotName.toNativeUtf8(allocator: _allocator);
     final attachmentNameNative = attachmentName.toNativeUtf8(allocator: _allocator);
-    final attachment =
-        _bindings.spine_skeleton_get_attachment_by_name(_skeleton, slotNameNative.cast(), attachmentNameNative.cast());
+    final attachment = _bindings.spine_skeleton_get_attachment_by_name(_skeleton, slotNameNative.cast(), attachmentNameNative.cast());
     _allocator.free(slotNameNative);
     _allocator.free(attachmentNameNative);
     if (attachment.address == nullptr.address) return null;
@@ -2460,11 +2427,8 @@ class Skeleton {
   /// @param outVertexBuffer Reference to hold a Vector of floats. This method will assign it with new floats as needed.
   Bounds getBounds() {
     final nativeBounds = _bindings.spine_skeleton_get_bounds(_skeleton);
-    final bounds = Bounds(
-        _bindings.spine_bounds_get_x(nativeBounds),
-        _bindings.spine_bounds_get_y(nativeBounds),
-        _bindings.spine_bounds_get_width(nativeBounds),
-        _bindings.spine_bounds_get_height(nativeBounds));
+    final bounds = Bounds(_bindings.spine_bounds_get_x(nativeBounds), _bindings.spine_bounds_get_y(nativeBounds),
+        _bindings.spine_bounds_get_width(nativeBounds), _bindings.spine_bounds_get_height(nativeBounds));
     _allocator.free(nativeBounds);
     return bounds;
   }
@@ -2549,10 +2513,7 @@ class Skeleton {
 
   Color getColor() {
     final color = _bindings.spine_skeleton_get_color(_skeleton);
-    return Color(
-        _bindings.spine_color_get_r(color),
-        _bindings.spine_color_get_g(color),
-        _bindings.spine_color_get_b(color),
+    return Color(_bindings.spine_color_get_r(color), _bindings.spine_color_get_g(color), _bindings.spine_color_get_b(color),
         _bindings.spine_color_get_a(color));
   }
 
@@ -3154,16 +3115,14 @@ class AnimationState {
   /// after AnimationState.Dispose.
   TrackEntry setAnimationByName(int trackIndex, String animationName, bool loop) {
     final animation = animationName.toNativeUtf8(allocator: _allocator);
-    final entry =
-        _bindings.spine_animation_state_set_animation_by_name(_state, trackIndex, animation.cast(), loop ? -1 : 0);
+    final entry = _bindings.spine_animation_state_set_animation_by_name(_state, trackIndex, animation.cast(), loop ? -1 : 0);
     _allocator.free(animation);
     if (entry.address == nullptr.address) throw Exception("Couldn't set animation $animationName");
     return TrackEntry._(entry, this);
   }
 
   TrackEntry setAnimation(int trackIndex, Animation animation, bool loop) {
-    final entry =
-        _bindings.spine_animation_state_set_animation(_state, trackIndex, animation._animation, loop ? -1 : 0);
+    final entry = _bindings.spine_animation_state_set_animation(_state, trackIndex, animation._animation, loop ? -1 : 0);
     if (entry.address == nullptr.address) throw Exception("Couldn't set animation ${animation.getName()}");
     return TrackEntry._(entry, this);
   }
@@ -3178,16 +3137,14 @@ class AnimationState {
   /// after AnimationState.Dispose
   TrackEntry addAnimationByName(int trackIndex, String animationName, bool loop, double delay) {
     final animation = animationName.toNativeUtf8(allocator: _allocator);
-    final entry = _bindings.spine_animation_state_add_animation_by_name(
-        _state, trackIndex, animation.cast(), loop ? -1 : 0, delay);
+    final entry = _bindings.spine_animation_state_add_animation_by_name(_state, trackIndex, animation.cast(), loop ? -1 : 0, delay);
     _allocator.free(animation);
     if (entry.address == nullptr.address) throw Exception("Couldn't add animation $animationName");
     return TrackEntry._(entry, this);
   }
 
   TrackEntry addAnimation(int trackIndex, Animation animation, bool loop, double delay) {
-    final entry =
-        _bindings.spine_animation_state_add_animation(_state, trackIndex, animation._animation, loop ? -1 : 0, delay);
+    final entry = _bindings.spine_animation_state_add_animation(_state, trackIndex, animation._animation, loop ? -1 : 0, delay);
     if (entry.address == nullptr.address) throw Exception("Couldn't add animation ${animation.getName()}");
     return TrackEntry._(entry, this);
   }
@@ -3258,7 +3215,8 @@ class SkeletonDrawable {
     _drawable = _bindings.spine_skeleton_drawable_create(skeletonData._data);
     skeleton = Skeleton._(_bindings.spine_skeleton_drawable_get_skeleton(_drawable));
     animationStateData = AnimationStateData._(_bindings.spine_skeleton_drawable_get_animation_state_data(_drawable));
-    animationState = AnimationState._(_bindings.spine_skeleton_drawable_get_animation_state(_drawable), _bindings.spine_skeleton_drawable_get_animation_state_events(_drawable));
+    animationState = AnimationState._(_bindings.spine_skeleton_drawable_get_animation_state(_drawable),
+        _bindings.spine_skeleton_drawable_get_animation_state_events(_drawable));
     skeleton.updateWorldTransform();
   }
 
@@ -3303,8 +3261,7 @@ class SkeletonDrawable {
   void renderToCanvas(Canvas canvas) {
     var commands = render();
     for (final cmd in commands) {
-      canvas.drawVertices(
-          cmd.vertices, rendering.BlendMode.modulate, atlas.atlasPagePaints[cmd.atlasPageIndex]);
+      canvas.drawVertices(cmd.vertices, rendering.BlendMode.modulate, atlas.atlasPagePaints[cmd.atlasPageIndex]);
     }
   }
 
@@ -3335,7 +3292,10 @@ class SkeletonDrawable {
 
   Future<RawImageData> renderToRawImageData(double width, double height) async {
     final recorder = renderToPictureRecorder(width, height);
-    var rawImageData = (await (await recorder.endRecording().toImage(width.toInt(), height.toInt())).toByteData(format: ImageByteFormat.rawRgba))!.buffer.asUint8List();
+    var rawImageData =
+        (await (await recorder.endRecording().toImage(width.toInt(), height.toInt())).toByteData(format: ImageByteFormat.rawRgba))!
+            .buffer
+            .asUint8List();
     return RawImageData(rawImageData, width.toInt(), height.toInt());
   }
 
@@ -3376,20 +3336,14 @@ class RenderCommand {
       // is copied, so it doesn't matter that we free up the underlying memory on the next
       // render call. See the implementation of Vertices.raw() here:
       // https://github.com/flutter/engine/blob/5c60785b802ad2c8b8899608d949342d5c624952/lib/ui/painting/vertices.cc#L21
-      vertices = Vertices.raw(VertexMode.triangles, positions,
-          textureCoordinates: uvs,
-          colors: colors,
-          indices: indices);
+      vertices = Vertices.raw(VertexMode.triangles, positions, textureCoordinates: uvs, colors: colors, indices: indices);
     } else {
       // On the web, rendering is done through CanvasKit, which requires copies of the native data.
       final positionsCopy = Float32List.fromList(positions);
       final uvsCopy = Float32List.fromList(uvs);
       final colorsCopy = Int32List.fromList(colors);
       final indicesCopy = Uint16List.fromList(indices);
-      vertices = Vertices.raw(VertexMode.triangles, positionsCopy,
-          textureCoordinates: uvsCopy,
-          colors: colorsCopy,
-          indices: indicesCopy);
+      vertices = Vertices.raw(VertexMode.triangles, positionsCopy, textureCoordinates: uvsCopy, colors: colorsCopy, indices: indicesCopy);
     }
   }
 }

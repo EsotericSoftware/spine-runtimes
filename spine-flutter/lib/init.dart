@@ -1,5 +1,6 @@
-import 'dart:io';
 import 'dart:ffi';
+import 'dart:io';
+
 import 'package:ffi/ffi.dart';
 
 const String _libName = 'esotericsoftware_spine_flutter';
