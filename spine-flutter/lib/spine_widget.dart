@@ -170,7 +170,7 @@ class SpineWidget extends StatefulWidget {
   final BoundsProvider _boundsProvider;
   final bool _sizedByBounds;
 
-  SpineWidget.asset(this._skeletonFile, this._atlasFile, this._controller,
+  SpineWidget.asset(this._atlasFile, this._skeletonFile, this._controller,
       {AssetBundle? bundle, BoxFit? fit, Alignment? alignment, BoundsProvider? boundsProvider, bool? sizedByBounds, super.key})
       : _assetType = AssetType.asset,
         _fit = fit ?? BoxFit.contain,
@@ -180,7 +180,7 @@ class SpineWidget extends StatefulWidget {
         _drawable = null,
         _bundle = bundle ?? rootBundle;
 
-  const SpineWidget.file(this._skeletonFile, this._atlasFile, this._controller,
+  const SpineWidget.file(this._atlasFile, this._skeletonFile, this._controller,
       {BoxFit? fit, Alignment? alignment, BoundsProvider? boundsProvider, bool? sizedByBounds, super.key})
       : _assetType = AssetType.file,
         _bundle = null,
@@ -190,7 +190,7 @@ class SpineWidget extends StatefulWidget {
         _sizedByBounds = sizedByBounds ?? false,
         _drawable = null;
 
-  const SpineWidget.http(this._skeletonFile, this._atlasFile, this._controller,
+  const SpineWidget.http(this._atlasFile, this._skeletonFile, this._controller,
       {BoxFit? fit, Alignment? alignment, BoundsProvider? boundsProvider, bool? sizedByBounds, super.key})
       : _assetType = AssetType.http,
         _bundle = null,
