@@ -225,7 +225,7 @@ class _SpineWidgetState extends State<SpineWidget> {
     if (widget._assetType == AssetType.drawable) {
       loadDrawable(widget._drawable!);
     } else {
-      loadFromAsset(widget._bundle, widget._skeletonFile!, widget._atlasFile!, widget._assetType);
+      loadFromAsset(widget._bundle, widget._atlasFile!, widget._skeletonFile!, widget._assetType);
     }
   }
 
