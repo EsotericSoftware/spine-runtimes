@@ -1,3 +1,6 @@
+# 4.2.8
+* Change reversed positional argument order in `SpineWidget` constructors.
+
 # 4.2.7
 * Change package name from  `esotericsoftware_spine_flutter` to `spine_flutter`.
 
