@@ -1,3 +1,6 @@
+# 4.2.11
+* Update README.md with setup and development instructions.
+
 # 4.2.10
 * Update README.md to point to Junji's Dart-only Spine runtime.
 
