@@ -4,6 +4,8 @@ The spine-godot runtime provides functionality to load, manipulate and render [S
 
 # See the [spine-flutter documentation](https://esotericsoftware.com/spine-flutter) for in-depth information.
 
+The `spine_flutter` package name was previously used to publish the [Spine Flutter Runtime in plain Dart](https://github.com/jtakakura/spine_flutter/) by Junji Takakura. Junji has kindly transferred the package name to us and is now publishing his Dart-only Spine Flutter Runtime under the package name [spine_flutter_dart](https://pub.dev/packages/spine_flutter_dart).
+
 ## Licensing
 
 You are welcome to evaluate the Spine Runtimes and the examples we provide in this repository free of charge.

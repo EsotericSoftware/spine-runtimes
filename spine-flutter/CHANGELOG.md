@@ -1,3 +1,6 @@
+# 4.2.10
+* Update README.md to point to Junji's Dart-only Spine runtime.
+
 # 4.2.9
 * Fix atlas parsing.
 
