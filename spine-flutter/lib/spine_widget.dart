@@ -28,46 +28,53 @@ class SpineWidgetController {
       this.onAfterPaint});
 
   void _initialize(SkeletonDrawable drawable) {
-    if (_drawable != null)
+    if (_drawable != null) {
       throw Exception(
           "SpineWidgetController already initialized. A controller can only be used with one widget.");
+    }
     _drawable = drawable;
     onInitialized?.call(this);
   }
 
   Atlas get atlas {
-    if (_drawable == null)
+    if (_drawable == null) {
       throw Exception("Controller is not initialized yet.");
+    }
     return _drawable!.atlas;
   }
 
   SkeletonData get skeletonData {
-    if (_drawable == null)
+    if (_drawable == null) {
       throw Exception("Controller is not initialized yet.");
+    }
     return _drawable!.skeletonData;
   }
 
   AnimationStateData get animationStateData {
-    if (_drawable == null)
+    if (_drawable == null) {
       throw Exception("Controller is not initialized yet.");
+    }
     return _drawable!.animationStateData;
   }
 
   AnimationState get animationState {
-    if (_drawable == null)
+    if (_drawable == null) {
       throw Exception("Controller is not initialized yet.");
+    }
     return _drawable!.animationState;
   }
 
   Skeleton get skeleton {
-    if (_drawable == null)
+    if (_drawable == null) {
       throw Exception("Controller is not initialized yet.");
+    }
     return _drawable!.skeleton;
   }
 
   SkeletonDrawable get drawable {
-    if (_drawable == null)
+    if (_drawable == null) {
       throw Exception("Controller is not initialized yet.");
+    }
     return _drawable!;
   }
 

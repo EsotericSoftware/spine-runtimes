@@ -3319,16 +3319,18 @@ class AnimationState {
     final entry = _bindings.spine_animation_state_set_animation_by_name(
         _state, trackIndex, animation.cast(), loop ? -1 : 0);
     _allocator.free(animation);
-    if (entry.address == nullptr.address)
+    if (entry.address == nullptr.address) {
       throw Exception("Couldn't set animation $animationName");
+    }
     return TrackEntry._(entry, this);
   }
 
   TrackEntry setAnimation(int trackIndex, Animation animation, bool loop) {
     final entry = _bindings.spine_animation_state_set_animation(
         _state, trackIndex, animation._animation, loop ? -1 : 0);
-    if (entry.address == nullptr.address)
+    if (entry.address == nullptr.address) {
       throw Exception("Couldn't set animation ${animation.getName()}");
+    }
     return TrackEntry._(entry, this);
   }
 
@@ -3346,8 +3348,9 @@ class AnimationState {
     final entry = _bindings.spine_animation_state_add_animation_by_name(
         _state, trackIndex, animation.cast(), loop ? -1 : 0, delay);
     _allocator.free(animation);
-    if (entry.address == nullptr.address)
+    if (entry.address == nullptr.address) {
       throw Exception("Couldn't add animation $animationName");
+    }
     return TrackEntry._(entry, this);
   }
 
@@ -3355,8 +3358,9 @@ class AnimationState {
       int trackIndex, Animation animation, bool loop, double delay) {
     final entry = _bindings.spine_animation_state_add_animation(
         _state, trackIndex, animation._animation, loop ? -1 : 0, delay);
-    if (entry.address == nullptr.address)
+    if (entry.address == nullptr.address) {
       throw Exception("Couldn't add animation ${animation.getName()}");
+    }
     return TrackEntry._(entry, this);
   }
 
