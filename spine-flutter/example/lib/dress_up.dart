@@ -21,7 +21,9 @@ class DressUpState extends State<DressUp> {
   void initState() {
     reportLeaks();
     super.initState();
-    SkeletonDrawable.fromAsset("assets/mix-and-match.atlas", "assets/mix-and-match-pro.skel").then((drawable) async {
+    SkeletonDrawable.fromAsset(
+            "assets/mix-and-match.atlas", "assets/mix-and-match-pro.skel")
+        .then((drawable) async {
       _drawable = drawable;
       for (var skin in drawable.skeletonData.getSkins()) {
         if (skin.getName() == "default") continue;
@@ -29,7 +31,8 @@ class DressUpState extends State<DressUp> {
         skeleton.setSkin(skin);
         skeleton.setToSetupPose();
         skeleton.updateWorldTransform();
-        _skinImages[skin.getName()] = await drawable.renderToRawImageData(thumbnailSize, thumbnailSize);
+        _skinImages[skin.getName()] =
+            await drawable.renderToRawImageData(thumbnailSize, thumbnailSize);
         _selectedSkins[skin.getName()] = false;
       }
       _toggleSkin("full-skins/girl");
@@ -81,7 +84,8 @@ class DressUpState extends State<DressUp> {
                             : Container(
                                 foregroundDecoration: const BoxDecoration(
                                   color: Colors.grey,
-                                  backgroundBlendMode: painting.BlendMode.saturation,
+                                  backgroundBlendMode:
+                                      painting.BlendMode.saturation,
                                 ),
                                 child: box));
                   }).toList()),
@@ -90,7 +94,8 @@ class DressUpState extends State<DressUp> {
                     child: SpineWidget.drawable(
                   _drawable,
                   controller,
-                  boundsProvider: SkinAndAnimationBounds(skins: ["full-skins/girl"]),
+                  boundsProvider:
+                      SkinAndAnimationBounds(skins: ["full-skins/girl"]),
                 ))
               ]));
   }

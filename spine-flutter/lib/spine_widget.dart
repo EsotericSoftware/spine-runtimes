@@ -11,51 +11,68 @@ class SpineWidgetController {
   SkeletonDrawable? _drawable;
   double _offsetX = 0, _offsetY = 0, _scaleX = 1, _scaleY = 1;
   final void Function(SpineWidgetController controller)? onInitialized;
-  final void Function(SpineWidgetController controller)? onBeforeUpdateWorldTransforms;
-  final void Function(SpineWidgetController controller)? onAfterUpdateWorldTransforms;
-  final void Function(SpineWidgetController controller, Canvas canvas)? onBeforePaint;
-  final void Function(SpineWidgetController controller, Canvas canvas, List<RenderCommand> commands)? onAfterPaint;
+  final void Function(SpineWidgetController controller)?
+      onBeforeUpdateWorldTransforms;
+  final void Function(SpineWidgetController controller)?
+      onAfterUpdateWorldTransforms;
+  final void Function(SpineWidgetController controller, Canvas canvas)?
+      onBeforePaint;
+  final void Function(SpineWidgetController controller, Canvas canvas,
+      List<RenderCommand> commands)? onAfterPaint;
 
   SpineWidgetController(
-      {this.onInitialized, this.onBeforeUpdateWorldTransforms, this.onAfterUpdateWorldTransforms, this.onBeforePaint, this.onAfterPaint});
+      {this.onInitialized,
+      this.onBeforeUpdateWorldTransforms,
+      this.onAfterUpdateWorldTransforms,
+      this.onBeforePaint,
+      this.onAfterPaint});
 
   void _initialize(SkeletonDrawable drawable) {
-    if (_drawable != null) throw Exception("SpineWidgetController already initialized. A controller can only be used with one widget.");
+    if (_drawable != null)
+      throw Exception(
+          "SpineWidgetController already initialized. A controller can only be used with one widget.");
     _drawable = drawable;
     onInitialized?.call(this);
   }
 
   Atlas get atlas {
-    if (_drawable == null) throw Exception("Controller is not initialized yet.");
+    if (_drawable == null)
+      throw Exception("Controller is not initialized yet.");
     return _drawable!.atlas;
   }
 
   SkeletonData get skeletonData {
-    if (_drawable == null) throw Exception("Controller is not initialized yet.");
+    if (_drawable == null)
+      throw Exception("Controller is not initialized yet.");
     return _drawable!.skeletonData;
   }
 
   AnimationStateData get animationStateData {
-    if (_drawable == null) throw Exception("Controller is not initialized yet.");
+    if (_drawable == null)
+      throw Exception("Controller is not initialized yet.");
     return _drawable!.animationStateData;
   }
 
   AnimationState get animationState {
-    if (_drawable == null) throw Exception("Controller is not initialized yet.");
+    if (_drawable == null)
+      throw Exception("Controller is not initialized yet.");
     return _drawable!.animationState;
   }
 
   Skeleton get skeleton {
-    if (_drawable == null) throw Exception("Controller is not initialized yet.");
+    if (_drawable == null)
+      throw Exception("Controller is not initialized yet.");
     return _drawable!.skeleton;
   }
 
   SkeletonDrawable get drawable {
-    if (_drawable == null) throw Exception("Controller is not initialized yet.");
+    if (_drawable == null)
+      throw Exception("Controller is not initialized yet.");
     return _drawable!;
   }
 
-  void _setCoordinateTransform(double offsetX, double offsetY, double scaleX, double scaleY) {
+  void _setCoordinateTransform(
+      double offsetX, double offsetY, double scaleX, double scaleY) {
     _offsetX = offsetX;
     _offsetY = offsetY;
     _scaleX = scaleX;
@@ -102,7 +119,8 @@ class SkinAndAnimationBounds extends BoundsProvider {
   final String? animation;
   final double stepTime;
 
-  SkinAndAnimationBounds({List<String>? skins, this.animation, this.stepTime = 0.1})
+  SkinAndAnimationBounds(
+      {List<String>? skins, this.animation, this.stepTime = 0.1})
       : skins = skins == null || skins.isEmpty ? ["default"] : skins;
 
   @override
@@ -118,7 +136,8 @@ class SkinAndAnimationBounds extends BoundsProvider {
     drawable.skeleton.setSkin(customSkin);
     drawable.skeleton.setToSetupPose();
 
-    final animation = this.animation != null ? data.findAnimation(this.animation!) : null;
+    final animation =
+        this.animation != null ? data.findAnimation(this.animation!) : null;
     double minX = double.infinity;
     double minY = double.infinity;
     double maxX = double.negativeInfinity;
@@ -171,7 +190,12 @@ class SpineWidget extends StatefulWidget {
   final bool _sizedByBounds;
 
   SpineWidget.asset(this._atlasFile, this._skeletonFile, this._controller,
-      {AssetBundle? bundle, BoxFit? fit, Alignment? alignment, BoundsProvider? boundsProvider, bool? sizedByBounds, super.key})
+      {AssetBundle? bundle,
+      BoxFit? fit,
+      Alignment? alignment,
+      BoundsProvider? boundsProvider,
+      bool? sizedByBounds,
+      super.key})
       : _assetType = AssetType.asset,
         _fit = fit ?? BoxFit.contain,
         _alignment = alignment ?? Alignment.center,
@@ -181,7 +205,11 @@ class SpineWidget extends StatefulWidget {
         _bundle = bundle ?? rootBundle;
 
   const SpineWidget.file(this._atlasFile, this._skeletonFile, this._controller,
-      {BoxFit? fit, Alignment? alignment, BoundsProvider? boundsProvider, bool? sizedByBounds, super.key})
+      {BoxFit? fit,
+      Alignment? alignment,
+      BoundsProvider? boundsProvider,
+      bool? sizedByBounds,
+      super.key})
       : _assetType = AssetType.file,
         _bundle = null,
         _fit = fit ?? BoxFit.contain,
@@ -191,7 +219,11 @@ class SpineWidget extends StatefulWidget {
         _drawable = null;
 
   const SpineWidget.http(this._atlasFile, this._skeletonFile, this._controller,
-      {BoxFit? fit, Alignment? alignment, BoundsProvider? boundsProvider, bool? sizedByBounds, super.key})
+      {BoxFit? fit,
+      Alignment? alignment,
+      BoundsProvider? boundsProvider,
+      bool? sizedByBounds,
+      super.key})
       : _assetType = AssetType.http,
         _bundle = null,
         _fit = fit ?? BoxFit.contain,
@@ -201,7 +233,11 @@ class SpineWidget extends StatefulWidget {
         _drawable = null;
 
   const SpineWidget.drawable(this._drawable, this._controller,
-      {BoxFit? fit, Alignment? alignment, BoundsProvider? boundsProvider, bool? sizedByBounds, super.key})
+      {BoxFit? fit,
+      Alignment? alignment,
+      BoundsProvider? boundsProvider,
+      bool? sizedByBounds,
+      super.key})
       : _assetType = AssetType.drawable,
         _bundle = null,
         _fit = fit ?? BoxFit.contain,
@@ -225,7 +261,8 @@ class _SpineWidgetState extends State<SpineWidget> {
     if (widget._assetType == AssetType.drawable) {
       loadDrawable(widget._drawable!);
     } else {
-      loadFromAsset(widget._bundle, widget._atlasFile!, widget._skeletonFile!, widget._assetType);
+      loadFromAsset(widget._bundle, widget._atlasFile!, widget._skeletonFile!,
+          widget._assetType);
     }
   }
 
@@ -236,10 +273,12 @@ class _SpineWidgetState extends State<SpineWidget> {
     setState(() {});
   }
 
-  void loadFromAsset(AssetBundle? bundle, String atlasFile, String skeletonFile, AssetType assetType) async {
+  void loadFromAsset(AssetBundle? bundle, String atlasFile, String skeletonFile,
+      AssetType assetType) async {
     switch (assetType) {
       case AssetType.asset:
-        loadDrawable(await SkeletonDrawable.fromAsset(atlasFile, skeletonFile, bundle: bundle));
+        loadDrawable(await SkeletonDrawable.fromAsset(atlasFile, skeletonFile,
+            bundle: bundle));
         break;
       case AssetType.file:
         loadDrawable(await SkeletonDrawable.fromFile(atlasFile, skeletonFile));
@@ -256,7 +295,12 @@ class _SpineWidgetState extends State<SpineWidget> {
   Widget build(BuildContext context) {
     if (_drawable != null) {
       return _SpineRenderObjectWidget(
-          _drawable!, widget._controller, widget._fit, widget._alignment, _computedBounds, widget._sizedByBounds);
+          _drawable!,
+          widget._controller,
+          widget._fit,
+          widget._alignment,
+          _computedBounds,
+          widget._sizedByBounds);
     } else {
       return const SizedBox();
     }
@@ -277,15 +321,18 @@ class _SpineRenderObjectWidget extends LeafRenderObjectWidget {
   final Bounds _bounds;
   final bool _sizedByBounds;
 
-  const _SpineRenderObjectWidget(this._skeletonDrawable, this._controller, this._fit, this._alignment, this._bounds, this._sizedByBounds);
+  const _SpineRenderObjectWidget(this._skeletonDrawable, this._controller,
+      this._fit, this._alignment, this._bounds, this._sizedByBounds);
 
   @override
   RenderObject createRenderObject(BuildContext context) {
-    return _SpineRenderObject(_skeletonDrawable, _controller, _fit, _alignment, _bounds, _sizedByBounds);
+    return _SpineRenderObject(_skeletonDrawable, _controller, _fit, _alignment,
+        _bounds, _sizedByBounds);
   }
 
   @override
-  void updateRenderObject(BuildContext context, covariant _SpineRenderObject renderObject) {
+  void updateRenderObject(
+      BuildContext context, covariant _SpineRenderObject renderObject) {
     renderObject.skeletonDrawable = _skeletonDrawable;
     renderObject.fit = _fit;
     renderObject.alignment = _alignment;
@@ -304,7 +351,8 @@ class _SpineRenderObject extends RenderBox {
   Bounds _bounds;
   bool _sizedByBounds;
 
-  _SpineRenderObject(this._skeletonDrawable, this._controller, this._fit, this._alignment, this._bounds, this._sizedByBounds);
+  _SpineRenderObject(this._skeletonDrawable, this._controller, this._fit,
+      this._alignment, this._bounds, this._sizedByBounds);
 
   set skeletonDrawable(SkeletonDrawable skeletonDrawable) {
     if (_skeletonDrawable == skeletonDrawable) return;
@@ -365,22 +413,28 @@ class _SpineRenderObject extends RenderBox {
 
   @override
   double computeMinIntrinsicWidth(double height) {
-    return _computeConstrainedSize(BoxConstraints.tightForFinite(height: height)).width;
+    return _computeConstrainedSize(
+            BoxConstraints.tightForFinite(height: height))
+        .width;
   }
 
   @override
   double computeMaxIntrinsicWidth(double height) {
-    return _computeConstrainedSize(BoxConstraints.tightForFinite(height: height)).width;
+    return _computeConstrainedSize(
+            BoxConstraints.tightForFinite(height: height))
+        .width;
   }
 
   @override
   double computeMinIntrinsicHeight(double width) {
-    return _computeConstrainedSize(BoxConstraints.tightForFinite(width: width)).height;
+    return _computeConstrainedSize(BoxConstraints.tightForFinite(width: width))
+        .height;
   }
 
   @override
   double computeMaxIntrinsicHeight(double width) {
-    return _computeConstrainedSize(BoxConstraints.tightForFinite(width: width)).height;
+    return _computeConstrainedSize(BoxConstraints.tightForFinite(width: width))
+        .height;
   }
 
   // Called when not sizedByParent, uses the intrinsic width/height for sizing, while trying to retain aspect ratio.
@@ -398,7 +452,8 @@ class _SpineRenderObject extends RenderBox {
   Size _computeConstrainedSize(BoxConstraints constraints) {
     return sizedByParent
         ? constraints.smallest
-        : constraints.constrainSizeAndAttemptToPreserveAspectRatio(Size(_bounds.width, _bounds.height));
+        : constraints.constrainSizeAndAttemptToPreserveAspectRatio(
+            Size(_bounds.width, _bounds.height));
   }
 
   @override
@@ -424,8 +479,11 @@ class _SpineRenderObject extends RenderBox {
   }
 
   void _setCanvasTransform(Canvas canvas, Offset offset) {
-    final double x = -_bounds.x - _bounds.width / 2.0 - (_alignment.x * _bounds.width / 2.0);
-    final double y = -_bounds.y - _bounds.height / 2.0 - (_alignment.y * _bounds.height / 2.0);
+    final double x =
+        -_bounds.x - _bounds.width / 2.0 - (_alignment.x * _bounds.width / 2.0);
+    final double y = -_bounds.y -
+        _bounds.height / 2.0 -
+        (_alignment.y * _bounds.height / 2.0);
     double scaleX = 1.0, scaleY = 1.0;
 
     switch (_fit) {
@@ -434,10 +492,12 @@ class _SpineRenderObject extends RenderBox {
         scaleY = size.height / _bounds.height;
         break;
       case BoxFit.contain:
-        scaleX = scaleY = min(size.width / _bounds.width, size.height / _bounds.height);
+        scaleX = scaleY =
+            min(size.width / _bounds.width, size.height / _bounds.height);
         break;
       case BoxFit.cover:
-        scaleX = scaleY = max(size.width / _bounds.width, size.height / _bounds.height);
+        scaleX = scaleY =
+            max(size.width / _bounds.width, size.height / _bounds.height);
         break;
       case BoxFit.fitHeight:
         scaleX = scaleY = size.height / _bounds.height;
@@ -449,18 +509,22 @@ class _SpineRenderObject extends RenderBox {
         scaleX = scaleY = 1.0;
         break;
       case BoxFit.scaleDown:
-        final double scale = min(size.width / _bounds.width, size.height / _bounds.height);
+        final double scale =
+            min(size.width / _bounds.width, size.height / _bounds.height);
         scaleX = scaleY = scale < 1.0 ? scale : 1.0;
         break;
     }
 
-    var offsetX = offset.dx + size.width / 2.0 + (_alignment.x * size.width / 2.0);
-    var offsetY = offset.dy + size.height / 2.0 + (_alignment.y * size.height / 2.0);
+    var offsetX =
+        offset.dx + size.width / 2.0 + (_alignment.x * size.width / 2.0);
+    var offsetY =
+        offset.dy + size.height / 2.0 + (_alignment.y * size.height / 2.0);
     canvas
       ..translate(offsetX, offsetY)
       ..scale(scaleX, scaleY)
       ..translate(x, y);
-    _controller._setCoordinateTransform(x + offsetX / scaleY, y + offsetY / scaleY, scaleX, scaleY);
+    _controller._setCoordinateTransform(
+        x + offsetX / scaleY, y + offsetY / scaleY, scaleX, scaleY);
   }
 
   @override
@@ -475,7 +539,8 @@ class _SpineRenderObject extends RenderBox {
     _controller.onBeforePaint?.call(_controller, canvas);
     var commands = _skeletonDrawable.render();
     for (final cmd in commands) {
-      canvas.drawVertices(cmd.vertices, rendering.BlendMode.modulate, _skeletonDrawable.atlas.atlasPagePaints[cmd.atlasPageIndex]);
+      canvas.drawVertices(cmd.vertices, rendering.BlendMode.modulate,
+          _skeletonDrawable.atlas.atlasPagePaints[cmd.atlasPageIndex]);
     }
     _controller.onAfterPaint?.call(_controller, canvas, commands);
 

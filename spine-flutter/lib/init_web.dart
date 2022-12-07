@@ -61,9 +61,12 @@ Future<SpineFlutterFFI> initSpineFlutterFFI() async {
     registerOpaqueType<spine_skin_entry_wrapper>();
     registerOpaqueType<spine_skin_entries_wrapper>();
 
-    await js.importLibrary('assets/packages/spine_flutter/lib/assets/libspine_flutter.js');
-    Uint8List wasmBinaries =
-        (await rootBundle.load('packages/spine_flutter/lib/assets/libspine_flutter.wasm')).buffer.asUint8List();
+    await js.importLibrary(
+        'assets/packages/spine_flutter/lib/assets/libspine_flutter.js');
+    Uint8List wasmBinaries = (await rootBundle
+            .load('packages/spine_flutter/lib/assets/libspine_flutter.wasm'))
+        .buffer
+        .asUint8List();
     _module = await EmscriptenModule.compile(wasmBinaries, 'libspine_flutter');
   }
   Module? m = _module;

@@ -97,7 +97,8 @@ class ExampleSelector extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute<void>(
-                  builder: (context) => SpineFlameGameWidget(SimpleFlameExample()),
+                  builder: (context) =>
+                      SpineFlameGameWidget(SimpleFlameExample()),
                 ),
               );
             },
@@ -109,7 +110,8 @@ class ExampleSelector extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute<void>(
-                  builder: (context) => SpineFlameGameWidget(PreloadAndShareSpineDataExample()),
+                  builder: (context) =>
+                      SpineFlameGameWidget(PreloadAndShareSpineDataExample()),
                 ),
               );
             },
