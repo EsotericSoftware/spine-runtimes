@@ -1,0 +1,37 @@
+{
+  "name": "@esotericsoftware/spine-phaser",
+  "version": "4.2.10",
+  "description": "The official Spine Runtimes for the Phaser.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/esotericsoftware/spine-runtimes.git"
+  },
+  "keywords": [
+    "gamedev",
+    "animations",
+    "2d",
+    "spine",
+    "game-dev",
+    "runtimes",
+    "skeletal"
+  ],
+  "author": "Esoteric Software LLC",
+  "license": "LicenseRef-LICENSE",
+  "bugs": {
+    "url": "https://github.com/esotericsoftware/spine-runtimes/issues"
+  },
+  "homepage": "https://github.com/esotericsoftware/spine-runtimes#readme",
+  "dependencies": {
+    "@esotericsoftware/spine-core": "^4.2.10",
+    "phaser": "^3.55.2",
+    "phaser3-project-template": "^1.0.9"
+  }
+}

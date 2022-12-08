@@ -179,3 +179,5 @@ spine-godot/logs
 spine-ts/spine-ts.zip
 *.d
 spine-godot/.clang-format
+
+spine-ts/spine-phaser/dist
