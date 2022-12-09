@@ -10,18 +10,23 @@ var config = {
     height: 600,
     scene: {
         preload: preload,
-        create: create
+        create: create,
+    },
+    plugins: {
+        scene: [
+            { key: "spine.SpinePlugin", plugin: spine.SpinePlugin, mapping: "spine" }
+        ]
     }
 };
 
 var game = new Phaser.Game(config);
 
 function preload () {
-    this.load.scenePlugin("spine.SpinePlugin", "../dist/iife/spine-phaser.js", "spinePlugin", "spinePlugin");
+    this.load.spine("raptor", "assets/raptor-pro.json", "assets/raptor.atlas", true);
 }
 
 function create () {
-    let plugin = this.spinePlugin;
+    let plugin = this.spine;
     let numbers = plugin.getNumbers(10);
     this.add.text(10, 10, numbers, { font: '16px Courier', fill: '#00ff00' });
 }

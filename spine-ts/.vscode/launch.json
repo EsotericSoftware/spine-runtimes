@@ -31,6 +31,14 @@
 			"name": "threejs-example",
 			"url": "http://localhost:8080/spine-threejs/example/index.html",
 			"webRoot": "${workspaceFolder}"
+		},
+		{
+			"type": "pwa-chrome",
+			"request": "launch",
+			"name": "phaser-example",
+			"url": "http://localhost:8080/spine-phaser/example/index.html",
+			"webRoot": "${workspaceFolder}"
 		}
+
 	]
 }
