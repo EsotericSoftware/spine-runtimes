@@ -26,4 +26,8 @@ export class SpineGameObject extends ComputedSizeMixin(DepthMixin(FlipMixin(Scro
     renderWebGL(renderer: Phaser.Renderer.WebGL.WebGLRenderer, src: SpineGameObject, camera: Phaser.Cameras.Scene2D.Camera, parentMatrix: Phaser.GameObjects.Components.TransformMatrix, container: SpineContainer) {
 
     }
+
+    renderCanvas(renderer: Phaser.Renderer.Canvas.CanvasRenderer, src: SpineGameObject, camera: Phaser.Cameras.Scene2D.Camera, parentMatrix: Phaser.GameObjects.Components.TransformMatrix) {
+
+    }
 }
