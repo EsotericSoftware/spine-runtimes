@@ -27,6 +27,6 @@ function preload () {
 
 function create () {
     let plugin = this.spine;
-    let numbers = plugin.getNumbers(10);
-    this.add.text(10, 10, numbers, { font: '16px Courier', fill: '#00ff00' });
+    var boy = this.add.spine(400, 600, 'raptor');
+    this.add.text(10, 10, "Spine", { font: '16px Courier', fill: '#00ff00' });
 }
