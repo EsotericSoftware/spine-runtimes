@@ -348,10 +348,11 @@ cp -f ../raptor/export/raptor-pro.json "$ROOT/spine-ts/spine-threejs/example/ass
 cp -f ../raptor/export/raptor.atlas "$ROOT/spine-ts/spine-threejs/example/assets/"
 cp -f ../raptor/export/raptor.png "$ROOT/spine-ts/spine-threejs/example/assets/"
 
-rm "$ROOT/spine-ts/spine-player/example/assets/"*
+rm -rf "$ROOT/spine-ts/spine-player/example/assets/"*
 cp -f ../raptor/export/raptor-pro.json "$ROOT/spine-ts/spine-player/example/assets/"
 cp -f ../raptor/export/raptor-pma.atlas "$ROOT/spine-ts/spine-player/example/assets/"
 cp -f ../raptor/export/raptor-pma.png "$ROOT/spine-ts/spine-player/example/assets/"
+cp -rf ../raptor/audio "$ROOT/spine-ts/spine-player/example/assets/"
 
 cp -f ../spineboy/export/spineboy-pro.skel "$ROOT/spine-ts/spine-player/example/assets/"
 cp -f ../spineboy/export/spineboy-pma.atlas "$ROOT/spine-ts/spine-player/example/assets/"
