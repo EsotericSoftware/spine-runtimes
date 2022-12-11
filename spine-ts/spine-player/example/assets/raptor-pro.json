@@ -869,7 +869,10 @@
 	}
 ],
 "events": {
-	"footstep": {}
+	"footstep": { "audio": "step.mp3" },
+	"roar": { "audio": "roar.mp3" },
+	"jump-start": { "audio": "jump-start.mp3" },
+	"jump-end": { "audio": "step.mp3" }
 },
 "animations": {
 	"gun-grab": {
@@ -3487,6 +3490,10 @@
 					{ "slot": "front-thigh", "offset": -5 }
 				]
 			}
+		],
+		"events": [
+			{ "time": 0.25, "name": "jump-start" },
+			{ "time": 0.95, "name": "footstep" }
 		]
 	},
 	"roar": {
@@ -7330,6 +7337,9 @@
 					{ "slot": "front-thigh", "offset": -5 }
 				]
 			}
+		],
+		"events": [
+			{ "time": 0.6333, "name": "roar" }
 		]
 	},
 	"walk": {
