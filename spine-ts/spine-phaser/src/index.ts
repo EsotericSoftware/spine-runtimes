@@ -1,6 +1,5 @@
 export * from "./require-shim"
 export * from "./SpinePlugin"
-export * from "./SpineFile"
 export * from "./mixins"
 export * from "@esotericsoftware/spine-core";
 export * from "@esotericsoftware/spine-canvas";

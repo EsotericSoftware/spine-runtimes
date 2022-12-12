@@ -34,42 +34,42 @@
 using namespace spine;
 
 int main(void) {
-    String atlasFile("data/spineboy-pma.atlas");
-    String skeletonFile("data/spineboy-pro.skel");
-    float scale = 0.6f;
-    SFMLTextureLoader textureLoader;
-    Atlas *atlas = new Atlas(atlasFile, &textureLoader);
-    SkeletonData *skeletonData = nullptr;
-    if (strncmp(skeletonFile.buffer(), ".skel", skeletonFile.length()) > 0) {
-        SkeletonBinary binary(atlas);
-        binary.setScale(scale);
-        skeletonData = binary.readSkeletonDataFile(skeletonFile);
-    } else {
-        SkeletonJson json(atlas);
-        json.setScale(scale);
-        skeletonData = json.readSkeletonDataFile(skeletonFile);
-    }
+	String atlasFile("data/spineboy-pma.atlas");
+	String skeletonFile("data/spineboy-pro.skel");
+	float scale = 0.6f;
+	SFMLTextureLoader textureLoader;
+	Atlas *atlas = new Atlas(atlasFile, &textureLoader);
+	SkeletonData *skeletonData = nullptr;
+	if (strncmp(skeletonFile.buffer(), ".skel", skeletonFile.length()) > 0) {
+		SkeletonBinary binary(atlas);
+		binary.setScale(scale);
+		skeletonData = binary.readSkeletonDataFile(skeletonFile);
+	} else {
+		SkeletonJson json(atlas);
+		json.setScale(scale);
+		skeletonData = json.readSkeletonDataFile(skeletonFile);
+	}
 
-    AnimationStateData stateData(skeletonData);
-    SkeletonDrawable drawable(skeletonData, &stateData);
-    drawable.skeleton->setPosition(320, 590);
-    drawable.state->setAnimation(0, "walk", true);
+	AnimationStateData stateData(skeletonData);
+	SkeletonDrawable drawable(skeletonData, &stateData);
+	drawable.skeleton->setPosition(320, 590);
+	drawable.state->setAnimation(0, "walk", true);
 
-    sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - testbed");
-    window.setFramerateLimit(60);
-    sf::Event event;
-    sf::Clock deltaClock;
-    while (window.isOpen()) {
-        while (window.pollEvent(event))
-            if (event.type == sf::Event::Closed) window.close();
+	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - testbed");
+	window.setFramerateLimit(60);
+	sf::Event event;
+	sf::Clock deltaClock;
+	while (window.isOpen()) {
+		while (window.pollEvent(event))
+			if (event.type == sf::Event::Closed) window.close();
 
-        float delta = deltaClock.getElapsedTime().asSeconds();
-        deltaClock.restart();
-        drawable.update(delta);
-        window.clear();
-        window.draw(drawable);
-        window.display();
-    }
+		float delta = deltaClock.getElapsedTime().asSeconds();
+		deltaClock.restart();
+		drawable.update(delta);
+		window.clear();
+		window.draw(drawable);
+		window.display();
+	}
 
-    return 0;
+	return 0;
 }

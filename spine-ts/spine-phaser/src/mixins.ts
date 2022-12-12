@@ -33,41 +33,41 @@ export const Transform = components.Transform;
 export const Visible = components.Visible;
 
 export interface Type<
-    T,
-    P extends any[] = any[]
-> extends Function {
-    new(...args: P): T;
+	T,
+	P extends any[] = any[]
+	> extends Function {
+	new(...args: P): T;
 }
 
 export type Mixin<GameObjectComponent, GameObjectConstraint extends Phaser.GameObjects.GameObject> = <
-    GameObjectType extends Type<GameObjectConstraint>
->(
-    BaseGameObject: GameObjectType
+	GameObjectType extends Type<GameObjectConstraint>
+	>(
+	BaseGameObject: GameObjectType
 ) => GameObjectType & Type<GameObjectComponent>;
 
 export function createMixin<
-    GameObjectComponent,
-    GameObjectConstraint extends Phaser.GameObjects.GameObject = Phaser.GameObjects.GameObject
->(
-    ...component: GameObjectComponent[]
+	GameObjectComponent,
+	GameObjectConstraint extends Phaser.GameObjects.GameObject = Phaser.GameObjects.GameObject
+> (
+	...component: GameObjectComponent[]
 ): Mixin<GameObjectComponent, GameObjectConstraint> {
-    return (BaseGameObject) => {
-        applyMixins(BaseGameObject, component);
-        return BaseGameObject as any;
-    };
+	return (BaseGameObject) => {
+		applyMixins(BaseGameObject, component);
+		return BaseGameObject as any;
+	};
 }
 
-function applyMixins(derivedCtor: any, constructors: any[]) {
-    constructors.forEach((baseCtor) => {
-        Object.getOwnPropertyNames(baseCtor.prototype || baseCtor).forEach((name) => {
-            Object.defineProperty(
-                derivedCtor.prototype,
-                name,
-                Object.getOwnPropertyDescriptor(baseCtor.prototype || baseCtor, name) ||
-                Object.create(null)
-            );
-        });
-    });
+function applyMixins (derivedCtor: any, constructors: any[]) {
+	constructors.forEach((baseCtor) => {
+		Object.getOwnPropertyNames(baseCtor.prototype || baseCtor).forEach((name) => {
+			Object.defineProperty(
+				derivedCtor.prototype,
+				name,
+				Object.getOwnPropertyDescriptor(baseCtor.prototype || baseCtor, name) ||
+				Object.create(null)
+			);
+		});
+	});
 }
 
 type ComputedSizeMixin = Mixin<Phaser.GameObjects.Components.Transform, Phaser.GameObjects.GameObject>;
