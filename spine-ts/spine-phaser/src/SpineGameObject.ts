@@ -21,6 +21,7 @@ export class SpineGameObject extends ComputedSizeMixin(DepthMixin(FlipMixin(Scro
 	constructor (scene: Phaser.Scene, private plugin: SpinePlugin, x: number, y: number, dataKey: string, atlasKey: string) {
 		super(scene, SPINE_GAME_OBJECT_TYPE);
 		this.setPosition(x, y);
+		this.setSkeleton(dataKey, atlasKey);
 	}
 
 	setSkeleton (dataKey: string, atlasKey: string) {

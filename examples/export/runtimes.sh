@@ -341,6 +341,15 @@ cp -f ../spineboy/export/spineboy-pro.skel "$ROOT/spine-ts/spine-player/example/
 cp -f ../spineboy/export/spineboy-pma.atlas "$ROOT/spine-ts/spine-player/example/assets/"
 cp -f ../spineboy/export/spineboy-pma.png "$ROOT/spine-ts/spine-player/example/assets/"
 
+rm "$ROOT/spine-ts/spine-phaser/example/assets/"*
+cp -f ../raptor/export/raptor-pro.json "$ROOT/spine-ts/spine-phaser/example/assets/"
+cp -f ../raptor/export/raptor-pma.atlas "$ROOT/spine-ts/spine-phaser/example/assets/"
+cp -f ../raptor/export/raptor-pma.png "$ROOT/spine-ts/spine-phaser/example/assets/"
+
+cp -f ../spineboy/export/spineboy-pro.skel "$ROOT/spine-ts/spine-phaser/example/assets/"
+cp -f ../spineboy/export/spineboy-pma.atlas "$ROOT/spine-ts/spine-phaser/example/assets/"
+cp -f ../spineboy/export/spineboy-pma.png "$ROOT/spine-ts/spine-phaser/example/assets/"
+
 echo "spine-monogame"
 rm "$ROOT/spine-monogame/spine-monogame-example/data/"*
 cp -f ../coin/export/coin-pro.json "$ROOT/spine-monogame/spine-monogame-example/data/"

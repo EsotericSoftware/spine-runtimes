@@ -24,11 +24,14 @@ var game = new Phaser.Game(config);
 
 function preload () {
     this.load.spineJson("raptor-data", "assets/raptor-pro.json");
-    this.load.spineAtlas("raptor-atlas", "assets/raptor.atlas");
+    this.load.spineAtlas("raptor-atlas", "assets/raptor-pma.atlas");
+    this.load.spineBinary("spineboy-data", "assets/spineboy-pro.skel");
+    this.load.spineAtlas("spineboy-atlas", "assets/spineboy-pma.atlas");
 }
 
 function create () {
     let plugin = this.spine;
-    var boy = this.add.spine(400, 600, 'raptor-data', "raptor-atlas");
+    var raptor = this.add.spine(400, 600, 'raptor-data', "raptor-atlas");
+    var spineboy = this.add.spine(400, 600, 'spineboy-data', "spineboy-atlas");
     this.add.text(10, 10, "Spine", { font: '16px Courier', fill: '#00ff00' });
 }

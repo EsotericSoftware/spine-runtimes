@@ -1,6 +1,7 @@
-raptor.png
+raptor-pma.png
 	size: 1024, 512
 	filter: Linear, Linear
+	pma: true
 	scale: 0.5
 back-arm
 	bounds: 829, 88, 46, 25
