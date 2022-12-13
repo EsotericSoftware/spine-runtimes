@@ -67,25 +67,21 @@ export class SpineGameObject extends ComputedSizeMixin(DepthMixin(FlipMixin(Scro
 
 		camera.addToRenderList(src);
 		let transform = Phaser.GameObjects.GetCalcMatrix(src, camera, parentMatrix).calc;
-		let x = transform.tx;
+		/*let x = transform.tx;
 		let y = transform.ty;
 		let scaleX = transform.scaleX;
 		let scaleY = transform.scaleY;
 		let rotation = transform.rotationNormalized;
 		let cosRotation = Math.cos(rotation);
-		let sinRotation = Math.sin(rotation);
+		let sinRotation = Math.sin(rotation);*/
+		let a = transform.a, b = transform.b, c = transform.c, d = transform.d, tx = transform.tx, ty = transform.ty;
 
 		sceneRenderer.drawSkeleton(this.skeleton, this.premultipliedAlpha, -1, -1, (vertices, numVertices, stride) => {
 			for (let i = 0; i < numVertices; i += stride) {
 				let vx = vertices[i];
 				let vy = vertices[i + 1];
-				let vxOld = vx * scaleX, vyOld = vy * scaleY;
-				vx = vxOld * cosRotation - vyOld * sinRotation;
-				vy = vxOld * sinRotation + vyOld * cosRotation;
-				vx += x;
-				vy += y;
-				vertices[i] = vx;
-				vertices[i + 1] = vy;
+				vertices[i] = vx * a + vy * c + tx;
+				vertices[i + 1] = vx * b + vy * d + ty;
 			}
 		});
 
