@@ -34,7 +34,7 @@ import { PolygonBatcher } from "./PolygonBatcher";
 import { Shader } from "./Shader";
 import { ShapeRenderer } from "./ShapeRenderer";
 import { SkeletonDebugRenderer } from "./SkeletonDebugRenderer";
-import { SkeletonRenderer } from "./SkeletonRenderer";
+import { SkeletonRenderer, VertexTransformer } from "./SkeletonRenderer";
 import { ManagedWebGLRenderingContext } from "./WebGL";
 ;
 
@@ -86,10 +86,10 @@ export class SceneRenderer implements Disposable {
 		this.enableRenderer(this.batcher);
 	}
 
-	drawSkeleton (skeleton: Skeleton, premultipliedAlpha = false, slotRangeStart = -1, slotRangeEnd = -1) {
+	drawSkeleton (skeleton: Skeleton, premultipliedAlpha = false, slotRangeStart = -1, slotRangeEnd = -1, transform: VertexTransformer | null = null) {
 		this.enableRenderer(this.batcher);
 		this.skeletonRenderer.premultipliedAlpha = premultipliedAlpha;
-		this.skeletonRenderer.draw(this.batcher, skeleton, slotRangeStart, slotRangeEnd);
+		this.skeletonRenderer.draw(this.batcher, skeleton, slotRangeStart, slotRangeEnd, transform);
 	}
 
 	drawSkeletonDebug (skeleton: Skeleton, premultipliedAlpha = false, ignoredBones?: Array<string>) {

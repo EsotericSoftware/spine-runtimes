@@ -8,10 +8,11 @@ var config = {
     type: Phaser.AUTO,
     width: 800,
     height: 600,
-    type: Phaser.CANVAS,
+    type: Phaser.WEBGL,
     scene: {
         preload: preload,
         create: create,
+        update: update,
     },
     plugins: {
         scene: [
@@ -20,18 +21,35 @@ var config = {
     }
 };
 
-var game = new Phaser.Game(config);
+let game = new Phaser.Game(config);
+let debug;
 
 function preload () {
     this.load.spineJson("raptor-data", "assets/raptor-pro.json");
     this.load.spineAtlas("raptor-atlas", "assets/raptor-pma.atlas");
     this.load.spineBinary("spineboy-data", "assets/spineboy-pro.skel");
     this.load.spineAtlas("spineboy-atlas", "assets/spineboy-pma.atlas");
+    this.load.image("nyan", "nyan.png");
+    let canvas = document.querySelector("#game-canvas");
 }
 
 function create () {
     let plugin = this.spine;
-    var raptor = this.add.spine(400, 600, 'raptor-data', "raptor-atlas");
-    var spineboy = this.add.spine(400, 600, 'spineboy-data', "spineboy-atlas");
-    this.add.text(10, 10, "Spine", { font: '16px Courier', fill: '#00ff00' });
+    let x = 25;
+    let y = 60;
+    for (let j = 0; j < 10; j++, y+= 600 / 10) {
+        for (let i = 0; i < 20; i++, x += 800 / 20) {
+            let obj = Math.random() > 0.5
+                ? this.add.spine(x, y, 'spineboy-data', "spineboy-atlas")
+                : this.add.spine(x, y, 'raptor-data', "raptor-atlas");
+            obj.animationState.setAnimation(0, "walk", true);
+            obj.scale = 0.1;
+        }
+        x = 25;
+    }
+    debug = this.add.text(0, 600 - 40, "FPS: ");
+}
+
+function update () {
+    debug.setText("draw calls: " + spine.PolygonBatcher.getAndResetGlobalDrawCalls() + "\ndelta: " + game.loop.delta);
 }

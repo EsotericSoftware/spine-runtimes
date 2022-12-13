@@ -26,7 +26,7 @@ SOFTWARE.
 
 let components = (Phaser.GameObjects.Components as any);
 export const ComputedSize = components.ComputedSize;
-export const Depth = components.ComputedSize;
+export const Depth = components.Depth;
 export const Flip = components.Flip;
 export const ScrollFactor = components.ScrollFactor;
 export const Transform = components.Transform;
@@ -52,22 +52,9 @@ export function createMixin<
 	...component: GameObjectComponent[]
 ): Mixin<GameObjectComponent, GameObjectConstraint> {
 	return (BaseGameObject) => {
-		applyMixins(BaseGameObject, component);
+		(Phaser as any).Class.mixin(BaseGameObject, component);
 		return BaseGameObject as any;
 	};
-}
-
-function applyMixins (derivedCtor: any, constructors: any[]) {
-	constructors.forEach((baseCtor) => {
-		Object.getOwnPropertyNames(baseCtor.prototype || baseCtor).forEach((name) => {
-			Object.defineProperty(
-				derivedCtor.prototype,
-				name,
-				Object.getOwnPropertyDescriptor(baseCtor.prototype || baseCtor, name) ||
-				Object.create(null)
-			);
-		});
-	});
 }
 
 type ComputedSizeMixin = Mixin<Phaser.GameObjects.Components.Transform, Phaser.GameObjects.GameObject>;
@@ -77,14 +64,14 @@ type DepthMixin = Mixin<Phaser.GameObjects.Components.Depth, Phaser.GameObjects.
 export const DepthMixin: DepthMixin = createMixin<Phaser.GameObjects.Components.Depth>(Depth);
 
 type FlipMixin = Mixin<Phaser.GameObjects.Components.Flip, Phaser.GameObjects.GameObject>;
-export const FlipMixin: FlipMixin = createMixin<Phaser.GameObjects.Components.Flip>(Depth);
+export const FlipMixin: FlipMixin = createMixin<Phaser.GameObjects.Components.Flip>(Flip);
 
 type ScrollFactorMixin = Mixin<Phaser.GameObjects.Components.ScrollFactor, Phaser.GameObjects.GameObject>;
-export const ScrollFactorMixin: ScrollFactorMixin = createMixin<Phaser.GameObjects.Components.ScrollFactor>(Depth);
+export const ScrollFactorMixin: ScrollFactorMixin = createMixin<Phaser.GameObjects.Components.ScrollFactor>(ScrollFactor);
 
 type TransformMixin = Mixin<Phaser.GameObjects.Components.Transform, Phaser.GameObjects.GameObject>;
 export const TransformMixin: TransformMixin = createMixin<Phaser.GameObjects.Components.Transform>(Transform);
 
 type VisibleMixin = Mixin<Phaser.GameObjects.Components.Visible, Phaser.GameObjects.GameObject>;
-export const VisibleMixin: VisibleMixin = createMixin<Phaser.GameObjects.Components.Visible>(Depth);
+export const VisibleMixin: VisibleMixin = createMixin<Phaser.GameObjects.Components.Visible>(Visible);
 
