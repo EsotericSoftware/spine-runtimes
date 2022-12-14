@@ -1,9 +1,6 @@
 #ifndef BLENDMODES_NORMAL_PASS_INCLUDED
 #define BLENDMODES_NORMAL_PASS_INCLUDED
 
-#pragma shader_feature _ _STRAIGHT_ALPHA_INPUT
-#pragma vertex vert
-#pragma fragment frag
 #include "UnityCG.cginc"
 #include "../CGIncludes/Spine-Common.cginc"
 uniform sampler2D _MainTex;

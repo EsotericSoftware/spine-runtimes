@@ -1027,8 +1027,8 @@ namespace Spine {
 								} else if (timelineName == "sequence") {
 									SequenceTimeline timeline = new SequenceTimeline(frames, slot.index, attachment);
 									float lastDelay = 0;
-									for (int frame = 0; keyMap != null;
-										keyMapEnumerator.MoveNext(), keyMap = (Dictionary<string, Object>)keyMapEnumerator.Current, frame++) {
+									for (int frame = 0; keyMap != null; keyMap = keyMapEnumerator.MoveNext() ?
+										(Dictionary<string, Object>)keyMapEnumerator.Current : null, frame++) {
 
 										float delay = GetFloat(keyMap, "delay", lastDelay);
 										SequenceMode sequenceMode = (SequenceMode)Enum.Parse(typeof(SequenceMode),

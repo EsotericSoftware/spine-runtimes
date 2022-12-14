@@ -44,6 +44,9 @@ Shader "Spine/Blend Modes/Skeleton PMA Screen" {
 		Pass {
 			Name "Normal"
 			CGPROGRAM
+			#pragma vertex vert
+			#pragma fragment frag
+			#pragma shader_feature _ _STRAIGHT_ALPHA_INPUT
 			#include "../CGIncludes/Spine-BlendModes-NormalPass.cginc"
 			ENDCG
 		}
@@ -57,6 +60,10 @@ Shader "Spine/Blend Modes/Skeleton PMA Screen" {
 			ZTest LEqual
 
 			CGPROGRAM
+			#pragma vertex vert
+			#pragma fragment frag
+			#pragma multi_compile_shadowcaster
+			#pragma fragmentoption ARB_precision_hint_fastest
 			#include "../CGIncludes/Spine-BlendModes-ShadowCasterPass.cginc"
 			ENDCG
 		}
