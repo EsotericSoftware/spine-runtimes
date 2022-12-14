@@ -1,9 +1,17 @@
-
-/// <reference path="../../spine-core/src/index.ts" />
-/// <reference path="../../spine-canvas/src/index.ts" />
-/// <reference path="../../spine-webgl/src/index.ts" />
-/// <reference path="../src/index.ts" />
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
+    <script src="../dist/iife/spine-phaser.js"></script>
+    <title>Spine Phaser Example</title>
+</head>
+<body>
+    <h1>Batching test</h1>
+</body>
+<script>
 var config = {
     type: Phaser.AUTO,
     width: 800,
@@ -29,8 +37,6 @@ function preload () {
     this.load.spineAtlas("raptor-atlas", "assets/raptor-pma.atlas");
     this.load.spineBinary("spineboy-data", "assets/spineboy-pro.skel");
     this.load.spineAtlas("spineboy-atlas", "assets/spineboy-pma.atlas");
-    this.load.image("nyan", "nyan.png");
-    let canvas = document.querySelector("#game-canvas");
 }
 
 function create () {
@@ -53,3 +59,5 @@ function create () {
 function update () {
     debug.setText("draw calls: " + spine.PolygonBatcher.getAndResetGlobalDrawCalls() + "\ndelta: " + game.loop.delta);
 }
+</script>
+</html>

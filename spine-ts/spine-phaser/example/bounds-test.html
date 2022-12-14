@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
+    <script src="../dist/iife/spine-phaser.js"></script>
+    <title>Spine Phaser Example</title>
+</head>
+<body>
+    <h1>Bounds test</h1>
+</body>
+<script>
+var config = {
+    type: Phaser.AUTO,
+    width: 800,
+    height: 600,
+    type: Phaser.WEBGL,
+    scene: {
+        preload: preload,
+        create: create,
+        update: update,
+    },
+    plugins: {
+        scene: [
+            { key: "spine.SpinePlugin", plugin: spine.SpinePlugin, mapping: "spine" }
+        ]
+    }
+};
+
+let game = new Phaser.Game(config);
+let spineboy;
+
+function preload () {
+    this.load.spineBinary("spineboy-data", "assets/spineboy-pro.skel");
+    this.load.spineAtlas("spineboy-atlas", "assets/spineboy-pma.atlas");
+}
+
+function create () {
+    spineboy = this.add.spine(400, 300, 'spineboy-data', "spineboy-atlas");
+    spineboy.scale = 0.4
+    spineboy.setInteractive();
+    this.input.enableDebug(spineboy, 0xff00ff);
+    spineboy.on("pointerdown", () => spineboy.animationState.setAnimation(0, "run", true));
+}
+
+let time = 0;
+function update (t, delta) {
+    time += delta / 1000;
+    let scale = 0.4 + Math.cos(time) * 0.2;
+    spineboy.scale = scale;
+    spineboy.angle++;
+}
+</script>
+</html>

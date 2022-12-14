@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
+    <script src="../dist/iife/spine-phaser.js"></script>
+    <title>Spine Phaser Example</title>
+</head>
+<body>
+    <h1>Multi-scene test</h1>
+</body>
+<script>
+class Scene1 extends Phaser.Scene {
+    constructor () {
+        super({key: "Scene1"})
+    }
+
+    preload() {
+        this.load.spineBinary("spineboy-data", "assets/spineboy-pro.skel");
+        this.load.spineAtlas("spineboy-atlas", "assets/spineboy-pma.atlas");
+    }
+
+    create() {
+        let spineboy = this.add.spine(400, 500, 'spineboy-data', "spineboy-atlas");
+        spineboy.scale = 0.5;
+        spineboy.animationState.setAnimation(0, "walk", true);
+        this.input.once('pointerdown', () => this.scene.start('Scene2'));
+    }
+}
+
+class Scene2 extends Phaser.Scene {
+    constructor () {
+        super({key: "Scene2"})
+    }
+
+    preload() {
+        this.load.spineJson("raptor-data", "assets/raptor-pro.json");
+        this.load.spineAtlas("raptor-atlas", "assets/raptor-pma.atlas");
+    }
+
+    create() {
+        let raptor = this.add.spine(300, 600, 'raptor-data', "raptor-atlas");
+        raptor.scale = 0.5;
+        raptor.animationState.setAnimation(0, "walk", true);
+        this.input.once('pointerdown', () => this.scene.start('Scene1'));
+    }
+}
+
+var config = {
+    type: Phaser.AUTO,
+    width: 800,
+    height: 600,
+    type: Phaser.WEBGL,
+    scene: [ Scene1, Scene2 ],
+    plugins: {
+        scene: [
+            { key: "spine.SpinePlugin", plugin: spine.SpinePlugin, mapping: "spine" }
+        ]
+    }
+};
+let game = new Phaser.Game(config);
+</script>
+</html>
