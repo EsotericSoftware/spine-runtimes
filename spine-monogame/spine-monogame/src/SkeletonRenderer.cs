@@ -153,8 +153,8 @@ namespace Spine {
 				// set blend state
 				BlendState blend = slot.Data.BlendMode == BlendMode.Additive ? BlendState.Additive : defaultBlendState;
 				if (device.BlendState != blend) {
-					//End();
-					//device.BlendState = blend;
+					End();
+					device.BlendState = blend;
 				}
 
 				// calculate color
