@@ -38,7 +38,6 @@ namespace Spine {
 		internal ExposedList<IkConstraint> ikConstraints;
 		internal ExposedList<TransformConstraint> transformConstraints;
 		internal ExposedList<PathConstraint> pathConstraints;
-		internal ExposedList<SpringConstraint> springConstraints;
 		internal ExposedList<IUpdatable> updateCache = new ExposedList<IUpdatable>();
 		internal Skin skin;
 		internal float r = 1, g = 1, b = 1, a = 1;
@@ -52,7 +51,6 @@ namespace Spine {
 		public ExposedList<Slot> DrawOrder { get { return drawOrder; } }
 		public ExposedList<IkConstraint> IkConstraints { get { return ikConstraints; } }
 		public ExposedList<PathConstraint> PathConstraints { get { return pathConstraints; } }
-		public ExposedList<SpringConstraint> SpringConstraints { get { return SpringConstraints; } }
 		public ExposedList<TransformConstraint> TransformConstraints { get { return transformConstraints; } }
 
 		public Skin Skin {
@@ -120,10 +118,6 @@ namespace Spine {
 			foreach (PathConstraintData pathConstraintData in data.pathConstraints)
 				pathConstraints.Add(new PathConstraint(pathConstraintData, this));
 
-			springConstraints = new ExposedList<SpringConstraint>(data.springConstraints.Count);
-			foreach (SpringConstraintData springConstraintData in data.springConstraints)
-				springConstraints.Add(new SpringConstraint(springConstraintData, this));
-
 			UpdateCache();
 		}
 
@@ -169,10 +163,6 @@ namespace Spine {
 			foreach (PathConstraint pathConstraint in skeleton.pathConstraints)
 				pathConstraints.Add(new PathConstraint(pathConstraint, this));
 
-			springConstraints = new ExposedList<SpringConstraint>(skeleton.springConstraints.Count);
-			foreach (SpringConstraint springConstraint in skeleton.springConstraints)
-				springConstraints.Add(new SpringConstraint(springConstraint, this));
-
 			skin = skeleton.skin;
 			r = skeleton.r;
 			g = skeleton.g;
@@ -209,13 +199,11 @@ namespace Spine {
 				}
 			}
 
-			int ikCount = this.ikConstraints.Count, transformCount = this.transformConstraints.Count, pathCount = this.pathConstraints.Count,
-				springCount = this.springConstraints.Count;
+			int ikCount = this.ikConstraints.Count, transformCount = this.transformConstraints.Count, pathCount = this.pathConstraints.Count;
 			IkConstraint[] ikConstraints = this.ikConstraints.Items;
 			TransformConstraint[] transformConstraints = this.transformConstraints.Items;
 			PathConstraint[] pathConstraints = this.pathConstraints.Items;
-			SpringConstraint[] springConstraints = this.springConstraints.Items;
-			int constraintCount = ikCount + transformCount + pathCount + springCount;
+			int constraintCount = ikCount + transformCount + pathCount;
 			for (int i = 0; i < constraintCount; i++) {
 				for (int ii = 0; ii < ikCount; ii++) {
 					IkConstraint constraint = ikConstraints[ii];
@@ -235,13 +223,6 @@ namespace Spine {
 					PathConstraint constraint = pathConstraints[ii];
 					if (constraint.data.order == i) {
 						SortPathConstraint(constraint);
-						goto continue_outer;
-					}
-				}
-				for (int ii = 0; ii < springCount; ii++) {
-					SpringConstraint constraint = springConstraints[ii];
-					if (constraint.data.order == i) {
-						SortSpringConstraint(constraint);
 						goto continue_outer;
 					}
 				}
@@ -353,23 +334,6 @@ namespace Spine {
 						SortBone(bones[pathBones[i++]]);
 				}
 			}
-		}
-
-		private void SortSpringConstraint (SpringConstraint constraint) {
-			constraint.active = !constraint.data.skinRequired || (skin != null && skin.constraints.Contains(constraint.data));
-			if (!constraint.active) return;
-
-			Object[] constrained = constraint.bones.Items;
-			int boneCount = constraint.bones.Count;
-			for (int i = 0; i < boneCount; i++)
-				SortBone((Bone)constrained[i]);
-
-			updateCache.Add(constraint);
-
-			for (int i = 0; i < boneCount; i++)
-				SortReset(((Bone)constrained[i]).children);
-			for (int i = 0; i < boneCount; i++)
-				((Bone)constrained[i]).sorted = true;
 		}
 
 		private void SortBone (Bone bone) {
@@ -489,20 +453,6 @@ namespace Spine {
 				constraint.mixRotate = data.mixRotate;
 				constraint.mixX = data.mixX;
 				constraint.mixY = data.mixY;
-			}
-
-			SpringConstraint[] springConstraints = this.springConstraints.Items;
-			for (int i = 0, n = this.springConstraints.Count; i < n; i++) {
-				SpringConstraint constraint = springConstraints[i];
-				SpringConstraintData data = constraint.data;
-				constraint.mix = data.mix;
-				constraint.friction = data.friction;
-				constraint.gravity = data.gravity;
-				constraint.wind = data.wind;
-				constraint.stiffness = data.stiffness;
-				constraint.damping = data.damping;
-				constraint.rope = data.rope;
-				constraint.stretch = data.stretch;
 			}
 		}
 
@@ -653,19 +603,6 @@ namespace Spine {
 			for (int i = 0, n = this.pathConstraints.Count; i < n; i++) {
 				PathConstraint constraint = pathConstraints[i];
 				if (constraint.data.Name.Equals(constraintName)) return constraint;
-			}
-			return null;
-		}
-
-		/// <summary>Finds a spring constraint by comparing each spring constraint's name. It is more efficient to cache the results of this
-		/// method than to call it repeatedly.</summary>
-		/// <returns>May be null.</returns>
-		public SpringConstraint FindSpringConstraint (String constraintName) {
-			if (constraintName == null) throw new ArgumentNullException("constraintName", "constraintName cannot be null.");
-			SpringConstraint[] springConstraints = this.springConstraints.Items;
-			for (int i = 0, n = this.springConstraints.Count; i < n; i++) {
-				SpringConstraint constraint = springConstraints[i];
-				if (constraint.data.name.Equals(constraintName)) return constraint;
 			}
 			return null;
 		}
