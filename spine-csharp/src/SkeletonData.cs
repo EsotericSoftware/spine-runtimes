@@ -43,6 +43,7 @@ namespace Spine {
 		internal ExposedList<IkConstraintData> ikConstraints = new ExposedList<IkConstraintData>();
 		internal ExposedList<TransformConstraintData> transformConstraints = new ExposedList<TransformConstraintData>();
 		internal ExposedList<PathConstraintData> pathConstraints = new ExposedList<PathConstraintData>();
+		internal ExposedList<SpringConstraintData> springConstraints = new ExposedList<SpringConstraintData>();
 		internal float x, y, width, height;
 		internal string version, hash;
 
@@ -74,6 +75,7 @@ namespace Spine {
 		public ExposedList<IkConstraintData> IkConstraints { get { return ikConstraints; } set { ikConstraints = value; } }
 		public ExposedList<TransformConstraintData> TransformConstraints { get { return transformConstraints; } set { transformConstraints = value; } }
 		public ExposedList<PathConstraintData> PathConstraints { get { return pathConstraints; } set { pathConstraints = value; } }
+		public ExposedList<SpringConstraintData> SpringConstraints { get { return springConstraints; } set { springConstraints = value; } }
 
 		public float X { get { return x; } set { x = value; } }
 		public float Y { get { return y; } set { y = value; } }
@@ -195,6 +197,23 @@ namespace Spine {
 			var pathConstraints = this.pathConstraints.Items;
 			for (int i = 0, n = this.pathConstraints.Count; i < n; i++) {
 				PathConstraintData constraint = pathConstraints[i];
+				if (constraint.name.Equals(constraintName)) return constraint;
+			}
+			return null;
+		}
+
+		// --- Spring constraints
+
+		/// <summary>
+		/// Finds a spring constraint by comparing each spring constraint's name. It is more efficient to cache the results of this
+		/// method than to call it multiple times.
+		/// </summary>
+		/// <returns>May be null.</returns>
+		public SpringConstraintData FindSpringConstraint (String constraintName) {
+			if (constraintName == null) throw new ArgumentNullException("constraintName", "constraintName cannot be null.");
+			Object[] springConstraints = this.springConstraints.Items;
+			for (int i = 0, n = this.springConstraints.Count; i < n; i++) {
+				SpringConstraintData constraint = (SpringConstraintData)springConstraints[i];
 				if (constraint.name.Equals(constraintName)) return constraint;
 			}
 			return null;
