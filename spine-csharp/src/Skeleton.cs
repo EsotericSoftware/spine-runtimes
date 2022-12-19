@@ -38,23 +38,35 @@ namespace Spine {
 		internal ExposedList<IkConstraint> ikConstraints;
 		internal ExposedList<TransformConstraint> transformConstraints;
 		internal ExposedList<PathConstraint> pathConstraints;
-		internal ExposedList<SpringConstraint> springConstraints;
+		internal ExposedList<PhysicsConstraint> physicsConstraints;
 		internal ExposedList<IUpdatable> updateCache = new ExposedList<IUpdatable>();
 		internal Skin skin;
 		internal float r = 1, g = 1, b = 1, a = 1;
 		internal float scaleX = 1, scaleY = 1;
 		internal float x, y;
 
+		/// <summary>The skeleton's setup pose data.</summary>
 		public SkeletonData Data { get { return data; } }
+		/// <summary>The skeleton's bones, sorted parent first. The root bone is always the first bone.</summary>
 		public ExposedList<Bone> Bones { get { return bones; } }
+		/// <summary>The list of bones and constraints, sorted in the order they should be updated,
+		/// as computed by <see cref="UpdateCache()"/>.</summary>
 		public ExposedList<IUpdatable> UpdateCacheList { get { return updateCache; } }
+		/// <summary>The skeleton's slots.</summary>
 		public ExposedList<Slot> Slots { get { return slots; } }
+		/// <summary>The skeleton's slots in the order they should be drawn.
+		/// The returned array may be modified to change the draw order.</summary>
 		public ExposedList<Slot> DrawOrder { get { return drawOrder; } }
+		/// <summary>The skeleton's IK constraints.</summary>
 		public ExposedList<IkConstraint> IkConstraints { get { return ikConstraints; } }
+		/// <summary>The skeleton's path constraints.</summary>
 		public ExposedList<PathConstraint> PathConstraints { get { return pathConstraints; } }
-		public ExposedList<SpringConstraint> SpringConstraints { get { return springConstraints; } }
+		/// <summary>The skeleton's physics constraints.</summary>
+		public ExposedList<PhysicsConstraint> PhysicsConstraints { get { return physicsConstraints; } }
+		/// <summary>The skeleton's transform constraints.</summary>
 		public ExposedList<TransformConstraint> TransformConstraints { get { return transformConstraints; } }
 
+		/// <summary>The skeleton's current skin.</summary>
 		public Skin Skin {
 			/// <summary>The skeleton's current skin. May be null.</summary>
 			get { return skin; }
@@ -65,9 +77,21 @@ namespace Spine {
 		public float G { get { return g; } set { g = value; } }
 		public float B { get { return b; } set { b = value; } }
 		public float A { get { return a; } set { a = value; } }
+		/// <summary><para>The skeleton X position, which is added to the root bone worldX position.</para>
+		/// <para>
+		/// Bones that do not inherit translation are still affected by this property.</para></summary>
 		public float X { get { return x; } set { x = value; } }
+		/// <summary><para>The skeleton Y position, which is added to the root bone worldY position.</para>
+		/// <para>
+		/// Bones that do not inherit translation are still affected by this property.</para></summary>
 		public float Y { get { return y; } set { y = value; } }
+		/// <summary><para> Scales the entire skeleton on the X axis.</para>
+		/// <para>
+		/// Bones that do not inherit scale are still affected by this property.</para></summary>
 		public float ScaleX { get { return scaleX; } set { scaleX = value; } }
+		/// <summary><para> Scales the entire skeleton on the Y axis.</para>
+		/// <para>
+		/// Bones that do not inherit scale are still affected by this property.</para></summary>
 		public float ScaleY { get { return scaleY * (Bone.yDown ? -1 : 1); } set { scaleY = value; } }
 
 		[Obsolete("Use ScaleX instead. FlipX is when ScaleX is negative.")]
@@ -120,9 +144,9 @@ namespace Spine {
 			foreach (PathConstraintData pathConstraintData in data.pathConstraints)
 				pathConstraints.Add(new PathConstraint(pathConstraintData, this));
 
-			springConstraints = new ExposedList<SpringConstraint>(data.springConstraints.Count);
-			foreach (SpringConstraintData springConstraintData in data.springConstraints)
-				springConstraints.Add(new SpringConstraint(springConstraintData, this));
+			physicsConstraints = new ExposedList<PhysicsConstraint>(data.physicsConstraints.Count);
+			foreach (PhysicsConstraintData physicsConstraintData in data.physicsConstraints)
+				physicsConstraints.Add(new PhysicsConstraint(physicsConstraintData, this));
 
 			UpdateCache();
 		}
@@ -169,9 +193,9 @@ namespace Spine {
 			foreach (PathConstraint pathConstraint in skeleton.pathConstraints)
 				pathConstraints.Add(new PathConstraint(pathConstraint, this));
 
-			springConstraints = new ExposedList<SpringConstraint>(skeleton.springConstraints.Count);
-			foreach (SpringConstraint springConstraint in skeleton.springConstraints)
-				springConstraints.Add(new SpringConstraint(springConstraint, this));
+			physicsConstraints = new ExposedList<PhysicsConstraint>(skeleton.physicsConstraints.Count);
+			foreach (PhysicsConstraint physicsConstraint in skeleton.physicsConstraints)
+				physicsConstraints.Add(new PhysicsConstraint(physicsConstraint, this));
 
 			skin = skeleton.skin;
 			r = skeleton.r;
@@ -210,12 +234,12 @@ namespace Spine {
 			}
 
 			int ikCount = this.ikConstraints.Count, transformCount = this.transformConstraints.Count, pathCount = this.pathConstraints.Count,
-				springCount = this.springConstraints.Count;
+				physicsCount = this.physicsConstraints.Count;
 			IkConstraint[] ikConstraints = this.ikConstraints.Items;
 			TransformConstraint[] transformConstraints = this.transformConstraints.Items;
 			PathConstraint[] pathConstraints = this.pathConstraints.Items;
-			SpringConstraint[] springConstraints = this.springConstraints.Items;
-			int constraintCount = ikCount + transformCount + pathCount + springCount;
+			PhysicsConstraint[] physicsConstraints = this.physicsConstraints.Items;
+			int constraintCount = ikCount + transformCount + pathCount + physicsCount;
 			for (int i = 0; i < constraintCount; i++) {
 				for (int ii = 0; ii < ikCount; ii++) {
 					IkConstraint constraint = ikConstraints[ii];
@@ -238,10 +262,10 @@ namespace Spine {
 						goto continue_outer;
 					}
 				}
-				for (int ii = 0; ii < springCount; ii++) {
-					SpringConstraint constraint = springConstraints[ii];
+				for (int ii = 0; ii < physicsCount; ii++) {
+					PhysicsConstraint constraint = physicsConstraints[ii];
 					if (constraint.data.order == i) {
-						SortSpringConstraint(constraint);
+						SortPhysicsConstraint(constraint);
 						goto continue_outer;
 					}
 				}
@@ -355,7 +379,7 @@ namespace Spine {
 			}
 		}
 
-		private void SortSpringConstraint (SpringConstraint constraint) {
+		private void SortPhysicsConstraint (PhysicsConstraint constraint) {
 			constraint.active = !constraint.data.skinRequired || (skin != null && skin.constraints.Contains(constraint.data));
 			if (!constraint.active) return;
 
@@ -491,10 +515,10 @@ namespace Spine {
 				constraint.mixY = data.mixY;
 			}
 
-			SpringConstraint[] springConstraints = this.springConstraints.Items;
-			for (int i = 0, n = this.springConstraints.Count; i < n; i++) {
-				SpringConstraint constraint = springConstraints[i];
-				SpringConstraintData data = constraint.data;
+			PhysicsConstraint[] physicsConstraints = this.physicsConstraints.Items;
+			for (int i = 0, n = this.physicsConstraints.Count; i < n; i++) {
+				PhysicsConstraint constraint = physicsConstraints[i];
+				PhysicsConstraintData data = constraint.data;
 				constraint.mix = data.mix;
 				constraint.friction = data.friction;
 				constraint.gravity = data.gravity;
@@ -657,14 +681,14 @@ namespace Spine {
 			return null;
 		}
 
-		/// <summary>Finds a spring constraint by comparing each spring constraint's name. It is more efficient to cache the results of this
+		/// <summary>Finds a physics constraint by comparing each physics constraint's name. It is more efficient to cache the results of this
 		/// method than to call it repeatedly.</summary>
 		/// <returns>May be null.</returns>
-		public SpringConstraint FindSpringConstraint (String constraintName) {
+		public PhysicsConstraint FindPhysicsConstraint (String constraintName) {
 			if (constraintName == null) throw new ArgumentNullException("constraintName", "constraintName cannot be null.");
-			SpringConstraint[] springConstraints = this.springConstraints.Items;
-			for (int i = 0, n = this.springConstraints.Count; i < n; i++) {
-				SpringConstraint constraint = springConstraints[i];
+			PhysicsConstraint[] physicsConstraints = this.physicsConstraints.Items;
+			for (int i = 0, n = this.physicsConstraints.Count; i < n; i++) {
+				PhysicsConstraint constraint = physicsConstraints[i];
 				if (constraint.data.name.Equals(constraintName)) return constraint;
 			}
 			return null;

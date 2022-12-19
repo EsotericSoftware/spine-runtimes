@@ -31,21 +31,62 @@ using System;
 
 namespace Spine {
 	/// <summary>
-	/// Stores the setup pose for a <see cref="SpringConstraint"/>.
+	/// Stores the current pose for a physics constraint. A physics constraint applies physics to bones.
 	/// <para>
-	/// See <a href="http://esotericsoftware.com/spine-spring-constraints">Spring constraints</a> in the Spine User Guide.</para>
+	/// See <a href="http://esotericsoftware.com/spine-physics-constraints">Physics constraints</a> in the Spine User Guide.</para>
 	/// </summary>
-	public class SpringConstraintData : ConstraintData {
-		internal ExposedList<BoneData> bones = new ExposedList<BoneData>();
+	public class PhysicsConstraint : IUpdatable {
+		internal readonly PhysicsConstraintData data;
+		internal readonly ExposedList<Bone> bones;
+		// BOZO! - stiffness -> strength. stiffness, damping, rope, stretch -> move to spring.
 		internal float mix, friction, gravity, wind, stiffness, damping;
 		internal bool rope, stretch;
 
-		public SpringConstraintData (string name) : base(name) {
+		internal bool active;
+
+		public PhysicsConstraint (PhysicsConstraintData data, Skeleton skeleton) {
+			if (data == null) throw new ArgumentNullException("data", "data cannot be null.");
+			if (skeleton == null) throw new ArgumentNullException("skeleton", "skeleton cannot be null.");
+			this.data = data;
+			mix = data.mix;
+			friction = data.friction;
+			gravity = data.gravity;
+			wind = data.wind;
+			stiffness = data.stiffness;
+			damping = data.damping;
+			rope = data.rope;
+			stretch = data.stretch;
+
+			bones = new ExposedList<Bone>(data.Bones.Count);
+			foreach (BoneData boneData in data.bones)
+				bones.Add(skeleton.bones.Items[boneData.index]);
 		}
 
-		/// <summary>The bones that are constrained by this spring constraint.</summary>
-		public ExposedList<BoneData> Bones { get { return bones; } }
+		/// <summary>Copy constructor.</summary>
+		public PhysicsConstraint (PhysicsConstraint constraint, Skeleton skeleton) {
+			if (constraint == null) throw new ArgumentNullException("constraint", "constraint cannot be null.");
+			if (skeleton == null) throw new ArgumentNullException("skeleton", "skeleton cannot be null.");
+			data = constraint.data;
+			bones = new ExposedList<Bone>(constraint.bones.Count);
+			foreach (Bone bone in constraint.bones)
+				bones.Add(skeleton.bones.Items[bone.data.index]);
+			mix = constraint.mix;
+			friction = constraint.friction;
+			gravity = constraint.gravity;
+			wind = constraint.wind;
+			stiffness = constraint.stiffness;
+			damping = constraint.damping;
+			rope = constraint.rope;
+			stretch = constraint.stretch;
+		}
 
+		/// <summary>Applies the constraint to the constrained bones.</summary>
+		public void Update () {
+
+		}
+
+		/// <summary>The bones that will be modified by this physics constraint.</summary>
+		public ExposedList<Bone> Bones { get { return bones; } }
 		/// <summary>A percentage (0-1) that controls the mix between the constrained and unconstrained poses.</summary>
 		public float Mix { get { return mix; } set { mix = value; } }
 		public float Friction { get { return friction; } set { friction = value; } }
@@ -55,5 +96,12 @@ namespace Spine {
 		public float Damping { get { return damping; } set { damping = value; } }
 		public bool Rope { get { return rope; } set { rope = value; } }
 		public bool Stretch { get { return stretch; } set { stretch = value; } }
+		public bool Active { get { return active; } }
+		/// <summary>The physics constraint's setup pose data.</summary>
+		public PhysicsConstraintData Data { get { return data; } }
+
+		override public string ToString () {
+			return data.name;
+		}
 	}
 }
