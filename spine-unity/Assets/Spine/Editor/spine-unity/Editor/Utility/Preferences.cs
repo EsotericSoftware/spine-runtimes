@@ -59,11 +59,11 @@ namespace Spine.Unity.Editor {
 		static class SpineSettingsProviderRegistration {
 			[SettingsProvider]
 			public static SettingsProvider CreateSpineSettingsProvider () {
-				var provider = new SettingsProvider("Spine", SettingsScope.User) {
+				SettingsProvider provider = new SettingsProvider("Spine", SettingsScope.User) {
 					label = "Spine",
 					guiHandler = (searchContext) => {
-						var settings = SpinePreferences.GetOrCreateSettings();
-						var serializedSettings = new SerializedObject(settings);
+						SpinePreferences settings = SpinePreferences.GetOrCreateSettings();
+						SerializedObject serializedSettings = new SerializedObject(settings);
 						SpinePreferences.HandlePreferencesGUI(serializedSettings);
 						if (serializedSettings.ApplyModifiedProperties())
 							OldPreferences.SaveToEditorPrefs(settings);
@@ -274,7 +274,7 @@ namespace Spine.Unity.Editor {
 					SpineEditorUtilities.FloatPrefsField(ref defaultScale, DEFAULT_SCALE_KEY, new GUIContent("Default SkeletonData Scale", "The Default skeleton import scale for newly imported SkeletonDataAssets."), min: 0.0000001f);
 
 					EditorGUI.BeginChangeCheck();
-					var shader = (EditorGUILayout.ObjectField("Default Shader", Shader.Find(defaultShader), typeof(Shader), false) as Shader);
+					Shader shader = (EditorGUILayout.ObjectField("Default Shader", Shader.Find(defaultShader), typeof(Shader), false) as Shader);
 					defaultShader = shader != null ? shader.name : SpinePreferences.DEFAULT_DEFAULT_SHADER;
 					if (EditorGUI.EndChangeCheck())
 						EditorPrefs.SetString(DEFAULT_SHADER_KEY, defaultShader);
@@ -282,7 +282,7 @@ namespace Spine.Unity.Editor {
 					SpineEditorUtilities.BoolPrefsField(ref setTextureImporterSettings, SET_TEXTUREIMPORTER_SETTINGS_KEY, new GUIContent("Apply Atlas Texture Settings", "Apply the recommended settings for Texture Importers."));
 					SpineEditorUtilities.Texture2DPrefsField(ref textureSettingsReference, TEXTURE_SETTINGS_REFERENCE_KEY, new GUIContent("Atlas Texture Reference Settings", "Apply the selected reference texture import settings at newly imported atlas textures. When exporting atlas textures from Spine with \"Premultiply alpha\" enabled (the default), you can leave it at \"PMAPresetTemplate\". If you have disabled \"Premultiply alpha\", set it to \"StraightAlphaPresetTemplate\". You can also create your own reference texture asset and assign it here."));
 					if (string.IsNullOrEmpty(textureSettingsReference)) {
-						var pmaTextureSettingsReferenceGUIDS = AssetDatabase.FindAssets("PMAPresetTemplate");
+						string[] pmaTextureSettingsReferenceGUIDS = AssetDatabase.FindAssets("PMAPresetTemplate");
 						if (pmaTextureSettingsReferenceGUIDS.Length > 0) {
 							textureSettingsReference = AssetDatabase.GUIDToAssetPath(pmaTextureSettingsReferenceGUIDS[0]);
 							EditorPrefs.SetString(TEXTURE_SETTINGS_REFERENCE_KEY, textureSettingsReference);
@@ -291,21 +291,21 @@ namespace Spine.Unity.Editor {
 
 					SpineEditorUtilities.MaterialPrefsField(ref blendModeMaterialAdditive, BLEND_MODE_MATERIAL_ADDITIVE_KEY, new GUIContent("Additive Material", "Additive blend mode Material template."));
 					if (string.IsNullOrEmpty(blendModeMaterialAdditive)) {
-						var blendModeMaterialAdditiveGUIDS = AssetDatabase.FindAssets(DEFAULT_BLEND_MODE_ADDITIVE_MATERIAL);
+						string[] blendModeMaterialAdditiveGUIDS = AssetDatabase.FindAssets(DEFAULT_BLEND_MODE_ADDITIVE_MATERIAL);
 						if (blendModeMaterialAdditiveGUIDS.Length > 0) {
 							blendModeMaterialAdditive = AssetDatabase.GUIDToAssetPath(blendModeMaterialAdditiveGUIDS[0]);
 						}
 					}
 					SpineEditorUtilities.MaterialPrefsField(ref blendModeMaterialMultiply, BLEND_MODE_MATERIAL_MULTIPLY_KEY, new GUIContent("Multiply Material", "Multiply blend mode Material template."));
 					if (string.IsNullOrEmpty(blendModeMaterialMultiply)) {
-						var blendModeMaterialMultiplyGUIDS = AssetDatabase.FindAssets(DEFAULT_BLEND_MODE_MULTIPLY_MATERIAL);
+						string[] blendModeMaterialMultiplyGUIDS = AssetDatabase.FindAssets(DEFAULT_BLEND_MODE_MULTIPLY_MATERIAL);
 						if (blendModeMaterialMultiplyGUIDS.Length > 0) {
 							blendModeMaterialMultiply = AssetDatabase.GUIDToAssetPath(blendModeMaterialMultiplyGUIDS[0]);
 						}
 					}
 					SpineEditorUtilities.MaterialPrefsField(ref blendModeMaterialScreen, BLEND_MODE_MATERIAL_SCREEN_KEY, new GUIContent("Screen Material", "Screen blend mode Material template."));
 					if (string.IsNullOrEmpty(blendModeMaterialScreen)) {
-						var blendModeMaterialScreenGUIDS = AssetDatabase.FindAssets(DEFAULT_BLEND_MODE_SCREEN_MATERIAL);
+						string[] blendModeMaterialScreenGUIDS = AssetDatabase.FindAssets(DEFAULT_BLEND_MODE_SCREEN_MATERIAL);
 						if (blendModeMaterialScreenGUIDS.Length > 0) {
 							blendModeMaterialScreen = AssetDatabase.GUIDToAssetPath(blendModeMaterialScreenGUIDS[0]);
 						}
@@ -403,7 +403,7 @@ namespace Spine.Unity.Editor {
 		static void Texture2DPrefsField (ref string currentValue, string editorPrefsKey, GUIContent label) {
 			EditorGUI.BeginChangeCheck();
 			EditorGUIUtility.wideMode = true;
-			var texture = (EditorGUILayout.ObjectField(label, AssetDatabase.LoadAssetAtPath<Texture2D>(currentValue), typeof(Object), false) as Texture2D);
+			Texture2D texture = (EditorGUILayout.ObjectField(label, AssetDatabase.LoadAssetAtPath<Texture2D>(currentValue), typeof(Object), false) as Texture2D);
 			currentValue = texture != null ? AssetDatabase.GetAssetPath(texture) : "";
 			if (EditorGUI.EndChangeCheck()) {
 				EditorPrefs.SetString(editorPrefsKey, currentValue);
@@ -413,7 +413,7 @@ namespace Spine.Unity.Editor {
 		static void MaterialPrefsField (ref string currentValue, string editorPrefsKey, GUIContent label) {
 			EditorGUI.BeginChangeCheck();
 			EditorGUIUtility.wideMode = true;
-			var material = (EditorGUILayout.ObjectField(label, AssetDatabase.LoadAssetAtPath<Material>(currentValue), typeof(Object), false) as Material);
+			Material material = (EditorGUILayout.ObjectField(label, AssetDatabase.LoadAssetAtPath<Material>(currentValue), typeof(Object), false) as Material);
 			currentValue = material != null ? AssetDatabase.GetAssetPath(material) : "";
 			if (EditorGUI.EndChangeCheck()) {
 				EditorPrefs.SetString(editorPrefsKey, currentValue);
@@ -429,18 +429,18 @@ namespace Spine.Unity.Editor {
 		}
 
 		public static void ShaderPropertyField (SerializedProperty property, GUIContent label, string fallbackShaderName) {
-			var shader = (EditorGUILayout.ObjectField(label, Shader.Find(property.stringValue), typeof(Shader), false) as Shader);
+			Shader shader = (EditorGUILayout.ObjectField(label, Shader.Find(property.stringValue), typeof(Shader), false) as Shader);
 			property.stringValue = shader != null ? shader.name : fallbackShaderName;
 		}
 
 		public static void MaterialPropertyField (SerializedProperty property, GUIContent label) {
-			var material = (EditorGUILayout.ObjectField(label, AssetDatabase.LoadAssetAtPath<Material>(property.stringValue), typeof(Material), false) as Material);
+			Material material = (EditorGUILayout.ObjectField(label, AssetDatabase.LoadAssetAtPath<Material>(property.stringValue), typeof(Material), false) as Material);
 			property.stringValue = material ? AssetDatabase.GetAssetPath(material) : "";
 		}
 
 #if NEW_PREFERENCES_SETTINGS_PROVIDER
 		public static void PresetAssetPropertyField (SerializedProperty property, GUIContent label) {
-			var texturePreset = (EditorGUILayout.ObjectField(label, AssetDatabase.LoadAssetAtPath<UnityEditor.Presets.Preset>(property.stringValue), typeof(UnityEditor.Presets.Preset), false) as UnityEditor.Presets.Preset);
+			UnityEditor.Presets.Preset texturePreset = (EditorGUILayout.ObjectField(label, AssetDatabase.LoadAssetAtPath<UnityEditor.Presets.Preset>(property.stringValue), typeof(UnityEditor.Presets.Preset), false) as UnityEditor.Presets.Preset);
 			bool isTexturePreset = texturePreset != null && texturePreset.GetTargetTypeName() == "TextureImporter";
 			property.stringValue = isTexturePreset ? AssetDatabase.GetAssetPath(texturePreset) : "";
 		}

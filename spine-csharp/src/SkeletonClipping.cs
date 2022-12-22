@@ -57,7 +57,7 @@ namespace Spine {
 			clip.ComputeWorldVertices(slot, 0, n, vertices, 0, 2);
 			MakeClockwise(clippingPolygon);
 			clippingPolygons = triangulator.Decompose(clippingPolygon, triangulator.Triangulate(clippingPolygon));
-			foreach (var polygon in clippingPolygons) {
+			foreach (ExposedList<float> polygon in clippingPolygons) {
 				MakeClockwise(polygon);
 				polygon.Add(polygon.Items[0]);
 				polygon.Add(polygon.Items[1]);
@@ -80,8 +80,8 @@ namespace Spine {
 
 		public void ClipTriangles (float[] vertices, int verticesLength, int[] triangles, int trianglesLength, float[] uvs) {
 			ExposedList<float> clipOutput = this.clipOutput, clippedVertices = this.clippedVertices;
-			var clippedTriangles = this.clippedTriangles;
-			var polygons = clippingPolygons.Items;
+			ExposedList<int> clippedTriangles = this.clippedTriangles;
+			ExposedList<float>[] polygons = clippingPolygons.Items;
 			int polygonsCount = clippingPolygons.Count;
 
 			int index = 0;
@@ -170,8 +170,8 @@ namespace Spine {
 		/** Clips the input triangle against the convex, clockwise clipping area. If the triangle lies entirely within the clipping
 		 * area, false is returned. The clipping area must duplicate the first vertex at the end of the vertices list. */
 		internal bool Clip (float x1, float y1, float x2, float y2, float x3, float y3, ExposedList<float> clippingArea, ExposedList<float> output) {
-			var originalOutput = output;
-			var clipped = false;
+			ExposedList<float> originalOutput = output;
+			bool clipped = false;
 
 			// Avoid copy at the end.
 			ExposedList<float> input = null;
@@ -249,7 +249,7 @@ namespace Spine {
 				output.Add(output.Items[1]);
 
 				if (i == clippingVerticesLast) break;
-				var temp = output;
+				ExposedList<float> temp = output;
 				output = input;
 				output.Clear();
 				input = temp;

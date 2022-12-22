@@ -55,8 +55,8 @@ namespace Spine.Unity.Examples {
 		public float shockTimer = 0f;
 
 		void Start () {
-			var skeletonAnimation = GetComponent<SkeletonAnimation>();
-			var skeleton = skeletonAnimation.Skeleton;
+			SkeletonAnimation skeletonAnimation = GetComponent<SkeletonAnimation>();
+			Skeleton skeleton = skeletonAnimation.Skeleton;
 			eyeSlot = skeleton.FindSlot(eyeSlotName);
 			mouthSlot = skeleton.FindSlot(mouthSlotName);
 

@@ -60,9 +60,9 @@ namespace Spine.Unity.Examples {
 
 				// Build a reference collection of timelines to match
 				// and a collection of dummy timelines that can be used to fill-in missing items.
-				var timelineDictionary = new Dictionary<string, Spine.Timeline>();
-				foreach (var animation in animations) {
-					foreach (var timeline in animation.Timelines) {
+				Dictionary<string, Timeline> timelineDictionary = new Dictionary<string, Spine.Timeline>();
+				foreach (Animation animation in animations) {
+					foreach (Timeline timeline in animation.Timelines) {
 						if (timeline is EventTimeline) continue;
 
 						foreach (string propertyId in timeline.PropertyIds) {
@@ -72,20 +72,20 @@ namespace Spine.Unity.Examples {
 						}
 					}
 				}
-				var idsToMatch = new List<string>(timelineDictionary.Keys);
+				List<string> idsToMatch = new List<string>(timelineDictionary.Keys);
 
 				// For each animation in the list, check for and add missing timelines.
-				var currentAnimationIDs = new HashSet<string>();
-				foreach (var animation in animations) {
+				HashSet<string> currentAnimationIDs = new HashSet<string>();
+				foreach (Animation animation in animations) {
 					currentAnimationIDs.Clear();
-					foreach (var timeline in animation.Timelines) {
+					foreach (Timeline timeline in animation.Timelines) {
 						if (timeline is EventTimeline) continue;
 						foreach (string propertyId in timeline.PropertyIds) {
 							currentAnimationIDs.Add(propertyId);
 						}
 					}
 
-					var animationTimelines = animation.Timelines;
+					ExposedList<Timeline> animationTimelines = animation.Timelines;
 					foreach (string propertyId in idsToMatch) {
 						if (!currentAnimationIDs.Contains(propertyId))
 							animationTimelines.Add(timelineDictionary[propertyId]);
@@ -134,52 +134,52 @@ namespace Spine.Unity.Examples {
 			}
 
 			static RotateTimeline GetFillerTimeline (RotateTimeline timeline, SkeletonData skeletonData) {
-				var t = new RotateTimeline(1, 0, timeline.BoneIndex);
+				RotateTimeline t = new RotateTimeline(1, 0, timeline.BoneIndex);
 				t.SetFrame(0, 0, 0);
 				return t;
 			}
 
 			static TranslateTimeline GetFillerTimeline (TranslateTimeline timeline, SkeletonData skeletonData) {
-				var t = new TranslateTimeline(1, 0, timeline.BoneIndex);
+				TranslateTimeline t = new TranslateTimeline(1, 0, timeline.BoneIndex);
 				t.SetFrame(0, 0, 0, 0);
 				return t;
 			}
 
 			static ScaleTimeline GetFillerTimeline (ScaleTimeline timeline, SkeletonData skeletonData) {
-				var t = new ScaleTimeline(1, 0, timeline.BoneIndex);
+				ScaleTimeline t = new ScaleTimeline(1, 0, timeline.BoneIndex);
 				t.SetFrame(0, 0, 0, 0);
 				return t;
 			}
 
 			static ShearTimeline GetFillerTimeline (ShearTimeline timeline, SkeletonData skeletonData) {
-				var t = new ShearTimeline(1, 0, timeline.BoneIndex);
+				ShearTimeline t = new ShearTimeline(1, 0, timeline.BoneIndex);
 				t.SetFrame(0, 0, 0, 0);
 				return t;
 			}
 
 			static AttachmentTimeline GetFillerTimeline (AttachmentTimeline timeline, SkeletonData skeletonData) {
-				var t = new AttachmentTimeline(1, timeline.SlotIndex);
-				var slotData = skeletonData.Slots.Items[t.SlotIndex];
+				AttachmentTimeline t = new AttachmentTimeline(1, timeline.SlotIndex);
+				SlotData slotData = skeletonData.Slots.Items[t.SlotIndex];
 				t.SetFrame(0, 0, slotData.AttachmentName);
 				return t;
 			}
 
 			static RGBATimeline GetFillerTimeline (RGBATimeline timeline, SkeletonData skeletonData) {
-				var t = new RGBATimeline(1, 0, timeline.SlotIndex);
-				var slotData = skeletonData.Slots.Items[t.SlotIndex];
+				RGBATimeline t = new RGBATimeline(1, 0, timeline.SlotIndex);
+				SlotData slotData = skeletonData.Slots.Items[t.SlotIndex];
 				t.SetFrame(0, 0, slotData.R, slotData.G, slotData.B, slotData.A);
 				return t;
 			}
 
 			static RGBA2Timeline GetFillerTimeline (RGBA2Timeline timeline, SkeletonData skeletonData) {
-				var t = new RGBA2Timeline(1, 0, timeline.SlotIndex);
-				var slotData = skeletonData.Slots.Items[t.SlotIndex];
+				RGBA2Timeline t = new RGBA2Timeline(1, 0, timeline.SlotIndex);
+				SlotData slotData = skeletonData.Slots.Items[t.SlotIndex];
 				t.SetFrame(0, 0, slotData.R, slotData.G, slotData.B, slotData.A, slotData.R2, slotData.G2, slotData.B2);
 				return t;
 			}
 
 			static DeformTimeline GetFillerTimeline (DeformTimeline timeline, SkeletonData skeletonData) {
-				var t = new DeformTimeline(1, 0, timeline.SlotIndex, timeline.Attachment);
+				DeformTimeline t = new DeformTimeline(1, 0, timeline.SlotIndex, timeline.Attachment);
 				if (t.Attachment.IsWeighted()) {
 					t.SetFrame(0, 0, new float[t.Attachment.Vertices.Length]);
 				} else {
@@ -190,42 +190,42 @@ namespace Spine.Unity.Examples {
 			}
 
 			static DrawOrderTimeline GetFillerTimeline (DrawOrderTimeline timeline, SkeletonData skeletonData) {
-				var t = new DrawOrderTimeline(1);
+				DrawOrderTimeline t = new DrawOrderTimeline(1);
 				t.SetFrame(0, 0, null); // null means use setup pose in DrawOrderTimeline.Apply.
 				return t;
 			}
 
 			static IkConstraintTimeline GetFillerTimeline (IkConstraintTimeline timeline, SkeletonData skeletonData) {
-				var t = new IkConstraintTimeline(1, 0, timeline.IkConstraintIndex);
-				var ikConstraintData = skeletonData.IkConstraints.Items[timeline.IkConstraintIndex];
+				IkConstraintTimeline t = new IkConstraintTimeline(1, 0, timeline.IkConstraintIndex);
+				IkConstraintData ikConstraintData = skeletonData.IkConstraints.Items[timeline.IkConstraintIndex];
 				t.SetFrame(0, 0, ikConstraintData.Mix, ikConstraintData.Softness, ikConstraintData.BendDirection, ikConstraintData.Compress, ikConstraintData.Stretch);
 				return t;
 			}
 
 			static TransformConstraintTimeline GetFillerTimeline (TransformConstraintTimeline timeline, SkeletonData skeletonData) {
-				var t = new TransformConstraintTimeline(1, 0, timeline.TransformConstraintIndex);
-				var data = skeletonData.TransformConstraints.Items[timeline.TransformConstraintIndex];
+				TransformConstraintTimeline t = new TransformConstraintTimeline(1, 0, timeline.TransformConstraintIndex);
+				TransformConstraintData data = skeletonData.TransformConstraints.Items[timeline.TransformConstraintIndex];
 				t.SetFrame(0, 0, data.MixRotate, data.MixX, data.MixY, data.MixScaleX, data.MixScaleY, data.MixShearY);
 				return t;
 			}
 
 			static PathConstraintPositionTimeline GetFillerTimeline (PathConstraintPositionTimeline timeline, SkeletonData skeletonData) {
-				var t = new PathConstraintPositionTimeline(1, 0, timeline.PathConstraintIndex);
-				var data = skeletonData.PathConstraints.Items[timeline.PathConstraintIndex];
+				PathConstraintPositionTimeline t = new PathConstraintPositionTimeline(1, 0, timeline.PathConstraintIndex);
+				PathConstraintData data = skeletonData.PathConstraints.Items[timeline.PathConstraintIndex];
 				t.SetFrame(0, 0, data.Position);
 				return t;
 			}
 
 			static PathConstraintSpacingTimeline GetFillerTimeline (PathConstraintSpacingTimeline timeline, SkeletonData skeletonData) {
-				var t = new PathConstraintSpacingTimeline(1, 0, timeline.PathConstraintIndex);
-				var data = skeletonData.PathConstraints.Items[timeline.PathConstraintIndex];
+				PathConstraintSpacingTimeline t = new PathConstraintSpacingTimeline(1, 0, timeline.PathConstraintIndex);
+				PathConstraintData data = skeletonData.PathConstraints.Items[timeline.PathConstraintIndex];
 				t.SetFrame(0, 0, data.Spacing);
 				return t;
 			}
 
 			static PathConstraintMixTimeline GetFillerTimeline (PathConstraintMixTimeline timeline, SkeletonData skeletonData) {
-				var t = new PathConstraintMixTimeline(1, 0, timeline.PathConstraintIndex);
-				var data = skeletonData.PathConstraints.Items[timeline.PathConstraintIndex];
+				PathConstraintMixTimeline t = new PathConstraintMixTimeline(1, 0, timeline.PathConstraintIndex);
+				PathConstraintData data = skeletonData.PathConstraints.Items[timeline.PathConstraintIndex];
 				t.SetFrame(0, 0, data.RotateMix, data.MixX, data.MixY);
 				return t;
 			}

@@ -223,7 +223,7 @@ namespace Spine.Unity.Editor {
 			string[] guids = AssetDatabase.FindAssets(typeSearchString);
 			foreach (string guid in guids) {
 				string path = AssetDatabase.GUIDToAssetPath(guid);
-				var preferences = AssetDatabase.LoadAssetAtPath<SpinePreferences>(path);
+				SpinePreferences preferences = AssetDatabase.LoadAssetAtPath<SpinePreferences>(path);
 				if (preferences != null)
 					return preferences;
 			}
@@ -234,7 +234,7 @@ namespace Spine.Unity.Editor {
 			string blendType, bool isTexturePresetPMA) {
 
 			EditorGUILayout.PropertyField(blendModeMaterialProperty, new GUIContent(blendType + " Material", blendType + " blend mode Material template."));
-			var material = blendModeMaterialProperty.objectReferenceValue as Material;
+			Material material = blendModeMaterialProperty.objectReferenceValue as Material;
 			if (material == null)
 				return;
 
@@ -276,12 +276,12 @@ namespace Spine.Unity.Editor {
 					SpineEditorUtilities.ShaderPropertyField(settings.FindProperty("defaultShader"), new GUIContent("Default Shader"), SpinePreferences.DEFAULT_DEFAULT_SHADER);
 
 					EditorGUILayout.PropertyField(settings.FindProperty("setTextureImporterSettings"), new GUIContent("Apply Atlas Texture Settings", "Apply reference settings for Texture Importers."));
-					var textureSettingsRef = settings.FindProperty("textureSettingsReference");
+					SerializedProperty textureSettingsRef = settings.FindProperty("textureSettingsReference");
 					SpineEditorUtilities.PresetAssetPropertyField(textureSettingsRef, new GUIContent("Atlas Texture Settings", "Apply the selected texture import settings at newly imported atlas textures. When exporting atlas textures from Spine with \"Premultiply alpha\" enabled (the default), you can leave it at \"PMATexturePreset\". If you have disabled \"Premultiply alpha\", set it to \"StraightAlphaTexturePreset\". You can also create your own TextureImporter Preset asset and assign it here."));
 					if (string.IsNullOrEmpty(textureSettingsRef.stringValue)) {
-						var pmaTextureSettingsReferenceGUIDS = AssetDatabase.FindAssets("PMATexturePreset");
+						string[] pmaTextureSettingsReferenceGUIDS = AssetDatabase.FindAssets("PMATexturePreset");
 						if (pmaTextureSettingsReferenceGUIDS.Length > 0) {
-							var assetPath = AssetDatabase.GUIDToAssetPath(pmaTextureSettingsReferenceGUIDS[0]);
+							string assetPath = AssetDatabase.GUIDToAssetPath(pmaTextureSettingsReferenceGUIDS[0]);
 							if (!string.IsNullOrEmpty(assetPath))
 								textureSettingsRef.stringValue = assetPath;
 						}
@@ -323,7 +323,7 @@ namespace Spine.Unity.Editor {
 				EditorGUILayout.LabelField("Handles and Gizmos", EditorStyles.boldLabel);
 				{
 					EditorGUI.BeginChangeCheck();
-					var scaleProperty = settings.FindProperty("handleScale");
+					SerializedProperty scaleProperty = settings.FindProperty("handleScale");
 					EditorGUILayout.PropertyField(scaleProperty, new GUIContent("Editor Bone Scale"));
 					if (EditorGUI.EndChangeCheck()) {
 						EditorPrefs.SetFloat(SpinePreferences.SCENE_ICONS_SCALE_KEY, scaleProperty.floatValue);

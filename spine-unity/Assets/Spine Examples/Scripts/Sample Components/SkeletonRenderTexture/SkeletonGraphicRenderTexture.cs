@@ -94,7 +94,7 @@ namespace Spine.Unity.Examples {
 			skeletonGraphic = this.GetComponent<SkeletonGraphic>();
 			AtlasAssetBase[] atlasAssets = skeletonGraphic.SkeletonDataAsset.atlasAssets;
 			for (int i = 0; i < atlasAssets.Length; ++i) {
-				foreach (var material in atlasAssets[i].Materials) {
+				foreach (Material material in atlasAssets[i].Materials) {
 					if (material.mainTexture != null) {
 						meshRendererMaterialForTexture.Add(
 							new TextureMaterialPair(material.mainTexture, material));
@@ -109,7 +109,7 @@ namespace Spine.Unity.Examples {
 			skeletonGraphic.AssignMeshOverrideMultipleRenderers += RenderMultipleMeshesToRenderTexture;
 			skeletonGraphic.disableMeshAssignmentOnOverride = true;
 			skeletonGraphic.OnMeshAndMaterialsUpdated += RenderOntoQuad;
-			var canvasRenderers = skeletonGraphic.canvasRenderers;
+			List<CanvasRenderer> canvasRenderers = skeletonGraphic.canvasRenderers;
 			for (int i = 0; i < canvasRenderers.Count; ++i)
 				canvasRenderers[i].cull = true;
 
@@ -123,7 +123,7 @@ namespace Spine.Unity.Examples {
 			skeletonGraphic.AssignMeshOverrideMultipleRenderers -= RenderMultipleMeshesToRenderTexture;
 			skeletonGraphic.disableMeshAssignmentOnOverride = false;
 			skeletonGraphic.OnMeshAndMaterialsUpdated -= RenderOntoQuad;
-			var canvasRenderers = skeletonGraphic.canvasRenderers;
+			List<CanvasRenderer> canvasRenderers = skeletonGraphic.canvasRenderers;
 			for (int i = 0; i < canvasRenderers.Count; ++i)
 				canvasRenderers[i].cull = false;
 
@@ -214,8 +214,8 @@ namespace Spine.Unity.Examples {
 			quadRawImage.color = color;
 			quadCanvasRenderer.SetColor(color);
 
-			var srcRectTransform = skeletonGraphic.rectTransform;
-			var dstRectTransform = quadRawImage.rectTransform;
+			RectTransform srcRectTransform = skeletonGraphic.rectTransform;
+			RectTransform dstRectTransform = quadRawImage.rectTransform;
 
 			dstRectTransform.anchorMin = srcRectTransform.anchorMin;
 			dstRectTransform.anchorMax = srcRectTransform.anchorMax;

@@ -50,7 +50,7 @@ namespace Spine.Unity.Examples {
 
 		void Start () {
 			dictionary.Clear();
-			foreach (var e in transitions) {
+			foreach (SerializedEntry e in transitions) {
 				dictionary.Add(new AnimationStateData.AnimationPair(e.from.Animation, e.to.Animation), e.transition.Animation);
 			}
 		}

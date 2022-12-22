@@ -62,13 +62,13 @@ namespace Spine.Unity.Examples {
 			int vertexCount = buffers.vertexCount;
 
 			// Modify vertex positions by accessing Vector3[] vertexBuffer
-			var vertices = buffers.vertexBuffer;
+			Vector3[] vertices = buffers.vertexBuffer;
 			for (int i = 0; i < vertexCount; i++)
 				vertices[i] += (Vector3)(Random.insideUnitCircle * jitterMagnitude);
 
 			// You can also modify uvs and colors.
-			//var uvs = buffers.uvBuffer;
-			//var colors = buffers.colorBuffer;
+			//Vector2[] uvs = buffers.uvBuffer;
+			//Color32[] colors = buffers.colorBuffer;
 
 			//
 		}

@@ -135,7 +135,7 @@ namespace Spine.Unity.Examples {
 
 		public void OptimizeSkin () {
 			// Create a repacked skin.
-			var previousSkin = skeletonAnimation.Skeleton.Skin;
+			Skin previousSkin = skeletonAnimation.Skeleton.Skin;
 			// Note: materials and textures returned by GetRepackedSkin() behave like 'new Texture2D()' and need to be destroyed
 			if (runtimeMaterial)
 				Destroy(runtimeMaterial);
@@ -159,8 +159,8 @@ namespace Spine.Unity.Examples {
 		}
 
 		void UpdateCharacterSkin () {
-			var skeleton = skeletonAnimation.Skeleton;
-			var skeletonData = skeleton.Data;
+			Skeleton skeleton = skeletonAnimation.Skeleton;
+			SkeletonData skeletonData = skeleton.Data;
 			characterSkin = new Skin("character-base");
 			// Note that the result Skin returned by calls to skeletonData.FindSkin()
 			// could be cached once in Start() instead of searching for the same skin
@@ -173,8 +173,8 @@ namespace Spine.Unity.Examples {
 		}
 
 		void AddEquipmentSkinsTo (Skin combinedSkin) {
-			var skeleton = skeletonAnimation.Skeleton;
-			var skeletonData = skeleton.Data;
+			Skeleton skeleton = skeletonAnimation.Skeleton;
+			SkeletonData skeletonData = skeleton.Data;
 			combinedSkin.AddSkin(skeletonData.FindSkin(clothesSkin));
 			combinedSkin.AddSkin(skeletonData.FindSkin(pantsSkin));
 			if (!string.IsNullOrEmpty(bagSkin)) combinedSkin.AddSkin(skeletonData.FindSkin(bagSkin));
@@ -182,8 +182,8 @@ namespace Spine.Unity.Examples {
 		}
 
 		void UpdateCombinedSkin () {
-			var skeleton = skeletonAnimation.Skeleton;
-			var resultCombinedSkin = new Skin("character-combined");
+			Skeleton skeleton = skeletonAnimation.Skeleton;
+			Skin resultCombinedSkin = new Skin("character-combined");
 
 			resultCombinedSkin.AddSkin(characterSkin);
 			AddEquipmentSkinsTo(resultCombinedSkin);

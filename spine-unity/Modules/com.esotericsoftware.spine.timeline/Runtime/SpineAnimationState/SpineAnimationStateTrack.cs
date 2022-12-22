@@ -55,13 +55,13 @@ namespace Spine.Unity.Playables {
 		public override Playable CreateTrackMixer (PlayableGraph graph, GameObject go, int inputCount) {
 			IEnumerable<TimelineClip> clips = this.GetClips();
 			foreach (TimelineClip clip in clips) {
-				var animationStateClip = clip.asset as SpineAnimationStateClip;
+				SpineAnimationStateClip animationStateClip = clip.asset as SpineAnimationStateClip;
 				if (animationStateClip != null)
 					animationStateClip.timelineClip = clip;
 			}
 
 			var scriptPlayable = ScriptPlayable<SpineAnimationStateMixerBehaviour>.Create(graph, inputCount);
-			var mixerBehaviour = scriptPlayable.GetBehaviour();
+			SpineAnimationStateMixerBehaviour mixerBehaviour = scriptPlayable.GetBehaviour();
 			mixerBehaviour.trackIndex = this.trackIndex;
 			mixerBehaviour.unscaledTime = this.unscaledTime;
 			return scriptPlayable;

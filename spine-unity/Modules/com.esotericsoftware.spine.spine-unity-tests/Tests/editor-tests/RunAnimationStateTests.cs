@@ -42,10 +42,10 @@ namespace Spine.Unity.Tests {
 
 			string testJsonFilename = "test";
 			string testJsonPathEnd = "tests/assets/" + testJsonFilename + ".json";
-			var guids = UnityEditor.AssetDatabase.FindAssets(testJsonFilename + " t:textasset");
+			string[] guids = UnityEditor.AssetDatabase.FindAssets(testJsonFilename + " t:textasset");
 			if (guids.Length <= 0) Fail(testJsonFilename + ".json asset not found.");
 
-			foreach (var guid in guids) {
+			foreach (string guid in guids) {
 				string assetPath = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
 				if (assetPath.EndsWith(testJsonPathEnd)) {
 					AnimationStateTests.Main(assetPath);

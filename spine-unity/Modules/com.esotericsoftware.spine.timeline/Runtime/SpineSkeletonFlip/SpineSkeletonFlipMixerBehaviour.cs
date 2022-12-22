@@ -76,7 +76,7 @@ namespace Spine.Unity.Playables {
 			if (playableHandle == null)
 				return;
 
-			var skeleton = playableHandle.Skeleton;
+			Skeleton skeleton = playableHandle.Skeleton;
 
 			if (!m_FirstFrameHappened) {
 				originalScaleX = skeleton.ScaleX;
@@ -125,7 +125,7 @@ namespace Spine.Unity.Playables {
 			if (playableHandle == null)
 				return;
 
-			var skeleton = playableHandle.Skeleton;
+			Skeleton skeleton = playableHandle.Skeleton;
 			skeleton.ScaleX = originalScaleX;
 			skeleton.ScaleY = originalScaleY;
 		}

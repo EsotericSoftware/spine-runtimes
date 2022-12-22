@@ -159,13 +159,13 @@ namespace Spine.Unity {
 
 		/// <summary>Gets a skeleton space UnityEngine.Quaternion representation of bone.WorldRotationX.</summary>
 		public static Quaternion GetQuaternion (this Bone bone) {
-			var halfRotation = Mathf.Atan2(bone.C, bone.A) * 0.5f;
+			float halfRotation = Mathf.Atan2(bone.C, bone.A) * 0.5f;
 			return new Quaternion(0, 0, Mathf.Sin(halfRotation), Mathf.Cos(halfRotation));
 		}
 
 		/// <summary>Gets a bone-local space UnityEngine.Quaternion representation of bone.rotation.</summary>
 		public static Quaternion GetLocalQuaternion (this Bone bone) {
-			var halfRotation = bone.Rotation * Mathf.Deg2Rad * 0.5f;
+			float halfRotation = bone.Rotation * Mathf.Deg2Rad * 0.5f;
 			return new Quaternion(0, 0, Mathf.Sin(halfRotation), Mathf.Cos(halfRotation));
 		}
 
@@ -198,7 +198,7 @@ namespace Spine.Unity {
 				bone.SetLocalPosition(skeletonSpacePosition);
 				return skeletonSpacePosition;
 			} else {
-				var parent = bone.Parent;
+				Bone parent = bone.Parent;
 				Vector2 parentLocal = parent.WorldToLocal(skeletonSpacePosition);
 				bone.SetLocalPosition(parentLocal);
 				return parentLocal;
@@ -209,7 +209,7 @@ namespace Spine.Unity {
 		#region Attachments
 		public static Material GetMaterial (this Attachment a) {
 			object rendererObject = null;
-			var renderableAttachment = a as IHasTextureRegion;
+			IHasTextureRegion renderableAttachment = a as IHasTextureRegion;
 			if (renderableAttachment != null)
 				rendererObject = renderableAttachment.Region;
 
@@ -234,13 +234,13 @@ namespace Spine.Unity {
 			if (buffer.Length < bufferTargetSize) throw new System.ArgumentException(string.Format("Vector2 buffer too small. {0} requires an array of size {1}. Use the attachment's .WorldVerticesLength to get the correct size.", va.Name, floatsCount), "buffer");
 
 			if (va.Bones == null && slot.Deform.Count == 0) {
-				var localVerts = va.Vertices;
+				float[] localVerts = va.Vertices;
 				for (int i = 0; i < bufferTargetSize; i++) {
 					int j = i * 2;
 					buffer[i] = new Vector2(localVerts[j], localVerts[j + 1]);
 				}
 			} else {
-				var floats = new float[floatsCount];
+				float[] floats = new float[floatsCount];
 				va.ComputeWorldVertices(slot, floats);
 
 				Bone sb = slot.Bone;
@@ -267,7 +267,7 @@ namespace Spine.Unity {
 			buffer = buffer ?? new Vector2[bufferTargetSize];
 			if (buffer.Length < bufferTargetSize) throw new System.ArgumentException(string.Format("Vector2 buffer too small. {0} requires an array of size {1}. Use the attachment's .WorldVerticesLength to get the correct size.", a.Name, worldVertsLength), "buffer");
 
-			var floats = new float[worldVertsLength];
+			float[] floats = new float[worldVertsLength];
 			a.ComputeWorldVertices(slot, floats);
 
 			for (int i = 0, n = worldVertsLength >> 1; i < n; i++) {
@@ -317,7 +317,7 @@ namespace Spine {
 		}
 
 		static BoneMatrix GetInheritedInternal (BoneData boneData, BoneMatrix parentMatrix) {
-			var parent = boneData.Parent;
+			BoneData parent = boneData.Parent;
 			if (parent == null) return new BoneMatrix(boneData); // isRootBone
 
 			float pa = parentMatrix.a, pb = parentMatrix.b, pc = parentMatrix.c, pd = parentMatrix.d;

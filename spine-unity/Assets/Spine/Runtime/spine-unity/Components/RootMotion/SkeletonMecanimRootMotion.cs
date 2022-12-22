@@ -63,9 +63,9 @@ namespace Spine.Unity {
 		}
 
 		public override Vector2 GetRemainingRootMotion (int layerIndex) {
-			var pair = skeletonMecanim.Translator.GetActiveAnimationAndTime(layerIndex);
-			var animation = pair.Key;
-			var time = pair.Value;
+			KeyValuePair<Animation, float> pair = skeletonMecanim.Translator.GetActiveAnimationAndTime(layerIndex);
+			Animation animation = pair.Key;
+			float time = pair.Value;
 			if (animation == null)
 				return Vector2.zero;
 
@@ -75,9 +75,9 @@ namespace Spine.Unity {
 		}
 
 		public override RootMotionInfo GetRootMotionInfo (int layerIndex) {
-			var pair = skeletonMecanim.Translator.GetActiveAnimationAndTime(layerIndex);
-			var animation = pair.Key;
-			var time = pair.Value;
+			KeyValuePair<Animation, float> pair = skeletonMecanim.Translator.GetActiveAnimationAndTime(layerIndex);
+			Animation animation = pair.Key;
+			float time = pair.Value;
 			if (animation == null)
 				return new RootMotionInfo();
 			return GetAnimationRootMotionInfo(animation, time);
