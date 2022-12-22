@@ -1,7 +1,8 @@
 import { SPINE_GAME_OBJECT_TYPE } from "./keys";
 import { SpinePlugin } from "./SpinePlugin";
 import { ComputedSizeMixin, DepthMixin, FlipMixin, ScrollFactorMixin, TransformMixin, VisibleMixin } from "./mixins";
-import { AnimationState, AnimationStateData, MathUtils, Skeleton, Skin } from "@esotericsoftware/spine-core";
+import { AnimationState, AnimationStateData, Bone, MathUtils, Skeleton, Skin, Vector2 } from "@esotericsoftware/spine-core";
+import { Vector3 } from "@esotericsoftware/spine-webgl";
 
 class BaseSpineGameObject extends Phaser.GameObjects.GameObject {
 	constructor(scene: Phaser.Scene, type: string) {
@@ -149,6 +150,34 @@ export class SpineGameObject extends ComputedSizeMixin(DepthMixin(FlipMixin(Scro
 		self.height = bounds.height;
 		this.displayOriginX = -bounds.x;
 		this.displayOriginY = -bounds.y;
+	}
+
+	skeletonToPhaserWorldCoordinates(point: {x: number, y: number}) {
+		let transform = this.getWorldTransformMatrix();
+		let a = transform.a, b = transform.b, c = transform.c, d = transform.d, tx = transform.tx, ty = transform.ty;
+		let x = point.x
+		let y = point.y
+		point.x = x * a + y * c + tx;
+		point.y = x * b + y * d + ty;
+	}
+
+	phaserWorldCoordinatesToSkeleton(point: {x: number, y: number}) {
+		let transform = this.getWorldTransformMatrix();
+		transform = transform.invert();
+		let a = transform.a, b = transform.b, c = transform.c, d = transform.d, tx = transform.tx, ty = transform.ty;
+		let x = point.x
+		let y = point.y
+		point.x = x * a + y * c + tx;
+		point.y = x * b + y * d + ty;
+	}
+
+	phaserWorldCoordinatesToBone(point: {x: number, y: number}, bone: Bone) {
+		this.phaserWorldCoordinatesToSkeleton(point);
+		if (bone.parent) {
+			bone.parent.worldToLocal(point as Vector2);
+		} else {
+			bone.worldToLocal(point as Vector2);
+		}
 	}
 
 	preUpdate(time: number, delta: number) {
