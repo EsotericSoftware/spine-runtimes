@@ -1,7 +1,7 @@
 import { SPINE_GAME_OBJECT_TYPE } from "./keys";
 import { SpinePlugin } from "./SpinePlugin";
 import { ComputedSizeMixin, DepthMixin, FlipMixin, ScrollFactorMixin, TransformMixin, VisibleMixin } from "./mixins";
-import { AnimationState, AnimationStateData, MathUtils, Skeleton } from "@esotericsoftware/spine-core";
+import { AnimationState, AnimationStateData, MathUtils, Skeleton, Skin } from "@esotericsoftware/spine-core";
 
 class BaseSpineGameObject extends Phaser.GameObjects.GameObject {
 	constructor(scene: Phaser.Scene, type: string) {
@@ -16,23 +16,66 @@ export interface SpineGameObjectBoundsProvider {
 export class SetupPoseBoundsProvider implements SpineGameObjectBoundsProvider {
 	calculateBounds(gameObject: SpineGameObject) {
 		if (!gameObject.skeleton) return { x: 0, y: 0, width: 0, height: 0 };
-		gameObject.skeleton.setToSetupPose();
-		gameObject.skeleton.updateWorldTransform();
-		return gameObject.skeleton.getBoundsRect();
+		// Make a copy of animation state and skeleton as this might be called while
+		// the skeleton in the GameObject has already been heavily modified. We can not
+		// reconstruct that state.
+		const skeleton = new Skeleton(gameObject.skeleton.data);
+		skeleton.setToSetupPose();
+		skeleton.updateWorldTransform();
+		return skeleton.getBoundsRect();
 	}
 }
 
 export class SkinsAndAnimationBoundsProvider implements SpineGameObjectBoundsProvider {
-	constructor(private animation: string, private skins: string[] = []) {
+	constructor(private animation: string, private skins: string[] = [], private timeStep: number = 0.05) {
 
 	}
 
 	calculateBounds(gameObject: SpineGameObject): { x: number; y: number; width: number; height: number; } {
-		if (!gameObject.skeleton) return { x: 0, y: 0, width: 0, height: 0 };
-		// FIXME
-		gameObject.skeleton.setToSetupPose();
-		gameObject.skeleton.updateWorldTransform();
-		return gameObject.skeleton.getBoundsRect();
+		if (!gameObject.skeleton || !gameObject.animationState) return { x: 0, y: 0, width: 0, height: 0 };
+		// Make a copy of animation state and skeleton as this might be called while
+		// the skeleton in the GameObject has already been heavily modified. We can not
+		// reconstruct that state.
+		const animationState = new AnimationState(gameObject.animationState.data);
+		const skeleton = new Skeleton(gameObject.skeleton.data);
+		const data = skeleton.data;
+		let customSkin = new Skin("custom-skin");
+		if (this.skins.length > 0) {
+			for (const skinName of this.skins) {
+				const skin = data.findSkin(skinName);
+				if (skin == null) continue;
+				customSkin.addSkin(skin);
+			}
+			skeleton.setSkin(customSkin);
+		}
+		skeleton.setToSetupPose();
+
+		const animation = this.animation != null ? data.findAnimation(this.animation!) : null;
+		let minX = Number.POSITIVE_INFINITY, minY = Number.POSITIVE_INFINITY, maxX = Number.NEGATIVE_INFINITY, maxY = Number.NEGATIVE_INFINITY;
+		if (animation == null) {
+			skeleton.updateWorldTransform();
+			const bounds = skeleton.getBoundsRect();
+			minX = bounds.x;
+			minY = bounds.y;
+			maxX = minX + bounds.width;
+			maxY = minY + bounds.height;
+		} else {
+			animationState.clearTracks();
+			animationState.setAnimationWith(0, animation, false);
+			const steps = Math.max(animation.duration / this.timeStep, 1.0);
+			for (let i = 0; i < steps; i++) {
+				animationState.update(i > 0 ? this.timeStep : 0);
+				animationState.apply(skeleton);
+				skeleton.updateWorldTransform();
+
+				const bounds = skeleton.getBoundsRect();
+				minX = Math.min(minX, bounds.x);
+				minY = Math.min(minY, bounds.y);
+				maxX = Math.max(maxX, minX + bounds.width);
+				maxY = Math.max(maxY, minY + bounds.height);
+			}
+		}
+		return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
 	}
 }
 
@@ -93,7 +136,7 @@ export class SpineGameObject extends ComputedSizeMixin(DepthMixin(FlipMixin(Scro
 	}
 
 	public get scaleY() {
-		return this._scaleX;
+		return this._scaleY;
 	}
 
 	public set scaleY(value: number) {

@@ -30,7 +30,7 @@
 import Phaser from "phaser";
 import { SPINE_ATLAS_CACHE_KEY, SPINE_CONTAINER_TYPE, SPINE_GAME_OBJECT_TYPE, SPINE_ATLAS_TEXTURE_CACHE_KEY, SPINE_SKELETON_DATA_FILE_TYPE, SPINE_ATLAS_FILE_TYPE, SPINE_SKELETON_FILE_CACHE_KEY as SPINE_SKELETON_DATA_CACHE_KEY } from "./keys";
 import { AtlasAttachmentLoader, Bone, GLTexture, SceneRenderer, Skeleton, SkeletonBinary, SkeletonData, SkeletonJson, TextureAtlas } from "@esotericsoftware/spine-webgl"
-import { SpineGameObject } from "./SpineGameObject";
+import { SpineGameObject, SpineGameObjectBoundsProvider } from "./SpineGameObject";
 import { CanvasTexture, SkeletonRenderer } from "@esotericsoftware/spine-canvas";
 
 export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
@@ -98,8 +98,8 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 		pluginManager.registerFileType("spineAtlas", atlasFileCallback, scene);
 
 		let self = this;
-		let addSpineGameObject = function (this: Phaser.GameObjects.GameObjectFactory, x: number, y: number, dataKey: string, atlasKey: string) {
-			let gameObject = new SpineGameObject(scene, self, x, y, dataKey, atlasKey);
+		let addSpineGameObject = function (this: Phaser.GameObjects.GameObjectFactory, x: number, y: number, dataKey: string, atlasKey: string, boundsProvider: SpineGameObjectBoundsProvider) {
+			let gameObject = new SpineGameObject(scene, self, x, y, dataKey, atlasKey, boundsProvider);
 			this.displayList.add(gameObject);
 			this.updateList.add(gameObject);
 			return gameObject;

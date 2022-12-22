@@ -38,7 +38,7 @@ function preload () {
 }
 
 function create () {
-    spineboy = this.add.spine(400, 300, 'spineboy-data', "spineboy-atlas");
+    spineboy = this.add.spine(400, 300, 'spineboy-data', "spineboy-atlas", new spine.SkinsAndAnimationBoundsProvider("run"));
     spineboy.scale = 0.4
     spineboy.setInteractive();
     this.input.enableDebug(spineboy, 0xff00ff);
