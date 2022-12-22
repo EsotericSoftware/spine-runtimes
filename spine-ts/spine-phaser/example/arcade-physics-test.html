@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
+    <script src="../dist/iife/spine-phaser.js"></script>
+    <title>Spine Phaser Example</title>
+</head>
+<body>
+    <h1>Arcade Physics example</h1>
+</body>
+<script>
+var config = {
+    type: Phaser.AUTO,
+    width: 800,
+    height: 600,
+    type: Phaser.WEBGL,
+    physics: {
+        default: 'arcade',
+        arcade: {
+            debug: true,
+            gravity: { y: 200 }
+        }
+    },
+    scene: {
+        preload: preload,
+        create: create,
+    },
+    plugins: {
+        scene: [
+            { key: "spine.SpinePlugin", plugin: spine.SpinePlugin, mapping: "spine" }
+        ]
+    }
+};
+
+let game = new Phaser.Game(config);
+
+function preload () {
+    this.load.spineBinary("coin-data", "assets/coin-pro.skel");
+    this.load.spineAtlas("coin-atlas", "assets/coin-pma.atlas");
+}
+
+function create () {
+    let coin = this.add.spine(400, 200, 'coin-data', "coin-atlas");
+    coin.animationState.setAnimation(0, "animation", true);
+    coin.setScale(0.3);
+    coin.setSize(280, 280);
+
+    this.physics.add.existing(coin);
+
+    coin.body.setOffset(0, 50);
+    coin.body.setVelocity(100, 200);
+    coin.body.setBounce(1, 1);
+    coin.body.setCollideWorldBounds(true);
+}
+</script>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
+    <script src="../dist/iife/spine-phaser.js"></script>
+    <title>Spine Phaser Example</title>
+</head>
+
+<body>
+    <h1>Camera pipeline test</h1>
+    <script>
+        var config = {
+            type: Phaser.AUTO,
+            width: 800,
+            height: 600,
+            type: Phaser.WEBGL,
+            backgroundColor: '#cdcdcd',
+            scene: {
+                preload: preload,
+                create: create,
+            },
+            plugins: {
+                scene: [
+                    { key: "spine.SpinePlugin", plugin: spine.SpinePlugin, mapping: "spine" }
+                ]
+            }
+        };
+
+        const fragShader = `
+        #define SHADER_NAME PLASMA_FS
+
+        precision mediump float;
+
+        uniform sampler2D uMainSampler;
+        uniform float uTime;
+        uniform vec2 uResolution;
+
+        varying vec2 outTexCoord;
+
+        void main()
+        {
+        vec2 p = -1.0 + 2.0 * gl_FragCoord.xy / uResolution.xy;
+
+        float x = p.x;
+        float y = p.y;
+        float mov0 = x+y+cos(sin(uTime)*2.0)*100.+sin(x/100.)*1000.;
+        float mov1 = y / 0.9 +  uTime;
+        float mov2 = x / 0.2;
+        float c1 = abs(sin(mov1+uTime)/2.+mov2/2.-mov1-mov2+uTime);
+        float c2 = abs(sin(c1+sin(mov0/1000.+uTime)+sin(y/40.+uTime)+sin((x+y)/100.)*3.));
+        float c3 = abs(sin(c2+cos(mov1+mov2+c2)+cos(mov2)+sin(x/1000.)));
+
+        vec4 pixel = texture2D(uMainSampler, outTexCoord);
+
+        gl_FragColor = pixel * vec4(c1, c2, c3, 1);
+        }
+        `;
+
+        class PlasmaPostFX extends Phaser.Renderer.WebGL.Pipelines.PostFXPipeline {
+            constructor(game) {
+                super({
+                    game,
+                    name: 'PlasmaPostFX',
+                    fragShader,
+                    uniforms: [
+                        'uMainSampler',
+                        'uTime',
+                        'uResolution'
+                    ]
+                });
+            }
+
+            onPreRender() {
+                this.set1f('uTime', this.game.loop.time / 1000);
+            }
+
+            onDraw(renderTarget) {
+                this.set2f('uResolution', renderTarget.width, renderTarget.height);
+
+                this.bindAndDraw(renderTarget);
+            }
+        }
+
+        let game = new Phaser.Game(config);
+
+        function preload() {
+            this.load.spineBinary("spineboy-data", "assets/spineboy-pro.skel");
+            this.load.spineAtlas("spineboy-atlas", "assets/spineboy-pma.atlas");
+            this.load.image("img", "assets/raptor-pma.png")
+        }
+
+        function create() {
+            this.renderer.pipelines.addPostPipeline('PlasmaPostFX', PlasmaPostFX);
+
+            // FIXME: Need a dummy sprite so the MultiPipeline sets up state
+            // so rendering the Spine sprite actually works. Unsure what state
+            // is needed.
+            var s = this.add.sprite(0, 0, 'img');
+
+            let spineboy = this.add.spine(400, 300, 'spineboy-data', "spineboy-atlas");
+            spineboy.scale = 0.5;
+            spineboy.animationState.setAnimation(0, "walk", true);
+
+            this.cameras.main.setPostPipeline("PlasmaPostFX");
+        }
+    </script>
+</body>
+
+</html>

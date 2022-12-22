@@ -39,8 +39,8 @@ export class SkinsAndAnimationBoundsProvider implements SpineGameObjectBoundsPro
 		const animationState = new AnimationState(gameObject.animationState.data);
 		const skeleton = new Skeleton(gameObject.skeleton.data);
 		const data = skeleton.data;
-		let customSkin = new Skin("custom-skin");
 		if (this.skins.length > 0) {
+			let customSkin = new Skin("custom-skin");
 			for (const skinName of this.skins) {
 				const skin = data.findSkin(skinName);
 				if (skin == null) continue;
@@ -51,15 +51,11 @@ export class SkinsAndAnimationBoundsProvider implements SpineGameObjectBoundsPro
 		skeleton.setToSetupPose();
 
 		const animation = this.animation != null ? data.findAnimation(this.animation!) : null;
-		let minX = Number.POSITIVE_INFINITY, minY = Number.POSITIVE_INFINITY, maxX = Number.NEGATIVE_INFINITY, maxY = Number.NEGATIVE_INFINITY;
 		if (animation == null) {
 			skeleton.updateWorldTransform();
-			const bounds = skeleton.getBoundsRect();
-			minX = bounds.x;
-			minY = bounds.y;
-			maxX = minX + bounds.width;
-			maxY = minY + bounds.height;
+			return skeleton.getBoundsRect();
 		} else {
+			let minX = Number.POSITIVE_INFINITY, minY = Number.POSITIVE_INFINITY, maxX = Number.NEGATIVE_INFINITY, maxY = Number.NEGATIVE_INFINITY;
 			animationState.clearTracks();
 			animationState.setAnimationWith(0, animation, false);
 			const steps = Math.max(animation.duration / this.timeStep, 1.0);
@@ -74,8 +70,8 @@ export class SkinsAndAnimationBoundsProvider implements SpineGameObjectBoundsPro
 				maxX = Math.max(maxX, minX + bounds.width);
 				maxY = Math.max(maxY, minY + bounds.height);
 			}
+			return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
 		}
-		return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
 	}
 }
 
