@@ -36,6 +36,7 @@ import { ManagedWebGLRenderingContext } from "./WebGL";
 export class PolygonBatcher implements Disposable {
 	private context: ManagedWebGLRenderingContext;
 	private drawCalls = 0;
+	private static globalDrawCalls = 0;
 	private isDrawing = false;
 	private mesh: Mesh;
 	private shader: Shader | null = null;
@@ -120,6 +121,7 @@ export class PolygonBatcher implements Disposable {
 		this.mesh.setVerticesLength(0);
 		this.mesh.setIndicesLength(0);
 		this.drawCalls++;
+		PolygonBatcher.globalDrawCalls++;
 	}
 
 	end () {
@@ -136,6 +138,12 @@ export class PolygonBatcher implements Disposable {
 
 	getDrawCalls () {
 		return this.drawCalls;
+	}
+
+	static getAndResetGlobalDrawCalls () {
+		let result = PolygonBatcher.globalDrawCalls;
+		PolygonBatcher.globalDrawCalls = 0;
+		return result;
 	}
 
 	dispose () {

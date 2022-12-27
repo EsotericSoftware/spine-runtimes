@@ -45,6 +45,8 @@ import { Color, Utils, MathUtils, Vector2, NumberArrayLike } from "./Utils";
  *
  * See [Instance objects](http://esotericsoftware.com/spine-runtime-architecture#Instance-objects) in the Spine Runtimes Guide. */
 export class Skeleton {
+	static yDown = false;;
+
 	/** The skeleton's setup pose data. */
 	data: SkeletonData;
 
@@ -81,7 +83,15 @@ export class Skeleton {
 
 	/** Scales the entire skeleton on the Y axis. This affects all bones, even if the bone's transform mode disallows scale
 	  * inheritance. */
-	scaleY = 1;
+	private _scaleY	= 1;
+
+	public get scaleY() {
+		return Skeleton.yDown ? -this._scaleY : this._scaleY;
+	}
+
+	public set scaleY(scaleY: number) {
+		this._scaleY = scaleY;
+	}
 
 	/** Sets the skeleton X position, which is added to the root bone worldX position. */
 	x = 0;

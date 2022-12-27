@@ -37,6 +37,8 @@ class Renderable {
 	constructor (public vertices: NumberArrayLike, public numVertices: number, public numFloats: number) { }
 };
 
+export type VertexTransformer = (vertices: NumberArrayLike, numVertices: number, stride: number) => void;
+
 export class SkeletonRenderer {
 	static QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
 
@@ -60,7 +62,7 @@ export class SkeletonRenderer {
 		this.vertices = Utils.newFloatArray(this.vertexSize * 1024);
 	}
 
-	draw (batcher: PolygonBatcher, skeleton: Skeleton, slotRangeStart: number = -1, slotRangeEnd: number = -1) {
+	draw (batcher: PolygonBatcher, skeleton: Skeleton, slotRangeStart: number = -1, slotRangeEnd: number = -1, transformer: VertexTransformer | null = null) {
 		let clipper = this.clipper;
 		let premultipliedAlpha = this.premultipliedAlpha;
 		let twoColorTint = this.twoColorTint;
@@ -174,6 +176,7 @@ export class SkeletonRenderer {
 					clipper.clipTriangles(renderable.vertices, renderable.numFloats, triangles, triangles.length, uvs, finalColor, darkColor, twoColorTint);
 					let clippedVertices = new Float32Array(clipper.clippedVertices);
 					let clippedTriangles = clipper.clippedTriangles;
+					if (transformer) transformer(renderable.vertices, renderable.numFloats, vertexSize);
 					batcher.draw(texture, clippedVertices, clippedTriangles);
 				} else {
 					let verts = renderable.vertices;
@@ -201,6 +204,7 @@ export class SkeletonRenderer {
 						}
 					}
 					let view = (renderable.vertices as Float32Array).subarray(0, renderable.numFloats);
+					if (transformer) transformer(renderable.vertices, renderable.numFloats, vertexSize);
 					batcher.draw(texture, view, triangles);
 				}
 			}
