@@ -106,6 +106,7 @@ static void toColor2(spColor *color, const char *value, int /*bool*/ hasAlpha) {
 	color->g = toColor(value, 1);
 	color->b = toColor(value, 2);
 	if (hasAlpha) color->a = toColor(value, 3);
+    else color->a =1.0f;
 }
 
 static void
