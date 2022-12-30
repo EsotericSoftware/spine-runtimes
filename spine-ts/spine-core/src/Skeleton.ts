@@ -27,6 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+import { ClippingAttachment } from "./attachments";
 import { Attachment } from "./attachments/Attachment";
 import { MeshAttachment } from "./attachments/MeshAttachment";
 import { PathAttachment } from "./attachments/PathAttachment";
@@ -610,6 +611,7 @@ export class Skeleton {
 	getBounds (offset: Vector2, size: Vector2, temp: Array<number> = new Array<number>(2)) {
 		if (!offset) throw new Error("offset cannot be null.");
 		if (!size) throw new Error("size cannot be null.");
+		let onlyClippings = false;
 		let drawOrder = this.drawOrder;
 		let minX = Number.POSITIVE_INFINITY, minY = Number.POSITIVE_INFINITY, maxX = Number.NEGATIVE_INFINITY, maxY = Number.NEGATIVE_INFINITY;
 		for (let i = 0, n = drawOrder.length; i < n; i++) {
@@ -618,11 +620,24 @@ export class Skeleton {
 			let verticesLength = 0;
 			let vertices: NumberArrayLike | null = null;
 			let attachment = slot.getAttachment();
-			if (attachment instanceof RegionAttachment) {
+			if (attachment instanceof ClippingAttachment) {
+				if (!onlyClippings) {
+					onlyClippings = true;
+					minX = Number.POSITIVE_INFINITY;
+					minY = Number.POSITIVE_INFINITY;
+					maxX = Number.NEGATIVE_INFINITY;
+					maxY = Number.NEGATIVE_INFINITY;
+				}
+				verticesLength = attachment.worldVerticesLength;
+				vertices = Utils.setArraySize(temp, verticesLength, 0);
+				attachment.computeWorldVertices(slot, 0, verticesLength, vertices, 0, 2);
+			} else if (attachment instanceof RegionAttachment) {
+        if (onlyClippings) continue;
 				verticesLength = 8;
 				vertices = Utils.setArraySize(temp, verticesLength, 0);
 				(<RegionAttachment>attachment).computeWorldVertices(slot, vertices, 0, 2);
 			} else if (attachment instanceof MeshAttachment) {
+        if (onlyClippings) continue;
 				let mesh = (<MeshAttachment>attachment);
 				verticesLength = mesh.worldVerticesLength;
 				vertices = Utils.setArraySize(temp, verticesLength, 0);
