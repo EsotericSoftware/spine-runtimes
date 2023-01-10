@@ -204,7 +204,7 @@ namespace Spine.Unity {
 				return null;
 
 			if (skeletonDataModifiers != null) {
-				foreach (var modifier in skeletonDataModifiers) {
+				foreach (SkeletonDataModifierAsset modifier in skeletonDataModifiers) {
 					if (modifier != null && !(isUpgradingBlendModeMaterials && modifier is BlendModeMaterialsAsset)) {
 						modifier.Apply(loadedSkeletonData);
 					}
@@ -253,11 +253,11 @@ namespace Spine.Unity {
 		}
 
 		internal Atlas[] GetAtlasArray () {
-			var returnList = new System.Collections.Generic.List<Atlas>(atlasAssets.Length);
+			List<Atlas> returnList = new System.Collections.Generic.List<Atlas>(atlasAssets.Length);
 			for (int i = 0; i < atlasAssets.Length; i++) {
-				var aa = atlasAssets[i];
+				AtlasAssetBase aa = atlasAssets[i];
 				if (aa == null) continue;
-				var a = aa.GetAtlas();
+				Atlas a = aa.GetAtlas();
 				if (a == null) continue;
 				returnList.Add(a);
 			}
@@ -265,8 +265,8 @@ namespace Spine.Unity {
 		}
 
 		internal static SkeletonData ReadSkeletonData (byte[] bytes, AttachmentLoader attachmentLoader, float scale) {
-			using (var input = new MemoryStream(bytes)) {
-				var binary = new SkeletonBinary(attachmentLoader) {
+			using (MemoryStream input = new MemoryStream(bytes)) {
+				SkeletonBinary binary = new SkeletonBinary(attachmentLoader) {
 					Scale = scale
 				};
 				return binary.ReadSkeletonData(input);
@@ -274,8 +274,8 @@ namespace Spine.Unity {
 		}
 
 		internal static SkeletonData ReadSkeletonData (string text, AttachmentLoader attachmentLoader, float scale) {
-			var input = new StringReader(text);
-			var json = new SkeletonJson(attachmentLoader) {
+			StringReader input = new StringReader(text);
+			SkeletonJson json = new SkeletonJson(attachmentLoader) {
 				Scale = scale
 			};
 			return json.ReadSkeletonData(input);

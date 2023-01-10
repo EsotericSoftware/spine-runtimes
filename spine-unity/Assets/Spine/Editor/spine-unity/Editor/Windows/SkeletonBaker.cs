@@ -36,6 +36,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using UnityEditor;
 using UnityEngine;
 
@@ -80,7 +81,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		public static void GenerateMecanimAnimationClips (SkeletonDataAsset skeletonDataAsset) {
-			var data = skeletonDataAsset.GetSkeletonData(true);
+			SkeletonData data = skeletonDataAsset.GetSkeletonData(true);
 			if (data == null) {
 				Debug.LogError("SkeletonData loading failed!", skeletonDataAsset);
 				return;
@@ -110,16 +111,16 @@ namespace Spine.Unity.Editor {
 
 			UnityEngine.Object[] objs = AssetDatabase.LoadAllAssetsAtPath(controllerPath);
 
-			var unityAnimationClipTable = new Dictionary<string, AnimationClip>();
-			var spineAnimationTable = new Dictionary<string, Spine.Animation>();
+			Dictionary<string, AnimationClip> unityAnimationClipTable = new Dictionary<string, AnimationClip>();
+			Dictionary<string, Animation> spineAnimationTable = new Dictionary<string, Spine.Animation>();
 
-			foreach (var o in objs) {
+			foreach (UnityEngine.Object o in objs) {
 				//Debug.LogFormat("({0}){1} : {3} + {2} + {4}", o.GetType(), o.name, o.hideFlags, o.GetInstanceID(), o.GetHashCode());
 				// There is a bug in Unity 5.3.3 (and likely before) that creates
 				// a duplicate AnimationClip when you duplicate a Mecanim Animator State.
 				// These duplicates seem to be identifiable by their HideFlags, so we'll exclude them.
 				if (o is AnimationClip) {
-					var clip = o as AnimationClip;
+					AnimationClip clip = o as AnimationClip;
 					if (!clip.HasFlag(HideFlags.HideInHierarchy)) {
 						if (unityAnimationClipTable.ContainsKey(clip.name)) {
 							Debug.LogWarningFormat("Duplicate AnimationClips were found named {0}", clip.name);
@@ -129,7 +130,7 @@ namespace Spine.Unity.Editor {
 				}
 			}
 
-			foreach (var animations in data.Animations) {
+			foreach (Animation animations in data.Animations) {
 				string animationName = animations.Name; // Review for unsafe names. Requires runtime implementation too.
 				spineAnimationTable.Add(animationName, animations);
 
@@ -144,12 +145,12 @@ namespace Spine.Unity.Editor {
 
 				AnimationClip clip = unityAnimationClipTable[animationName];
 				clip.SetCurve("", typeof(GameObject), "dummy", AnimationCurve.Linear(0, 0, animations.Duration, 0));
-				var settings = AnimationUtility.GetAnimationClipSettings(clip);
+				AnimationClipSettings settings = AnimationUtility.GetAnimationClipSettings(clip);
 				settings.stopTime = animations.Duration;
 				SetAnimationSettings(clip, settings);
 
-				var previousAnimationEvents = AnimationUtility.GetAnimationEvents(clip);
-				var animationEvents = new List<AnimationEvent>();
+				AnimationEvent[] previousAnimationEvents = AnimationUtility.GetAnimationEvents(clip);
+				List<AnimationEvent> animationEvents = new List<AnimationEvent>();
 				foreach (Timeline t in animations.Timelines) {
 					if (t is EventTimeline)
 						ParseEventTimeline(ref animationEvents, (EventTimeline)t, SendMessageOptions.DontRequireReceiver);
@@ -161,7 +162,7 @@ namespace Spine.Unity.Editor {
 				unityAnimationClipTable.Remove(animationName);
 			}
 
-			foreach (var clip in unityAnimationClipTable.Values) {
+			foreach (AnimationClip clip in unityAnimationClipTable.Values) {
 				AnimationClip.DestroyImmediate(clip, true);
 			}
 
@@ -192,14 +193,14 @@ namespace Spine.Unity.Editor {
 				System.IO.Directory.CreateDirectory(outputPath);
 			}
 
-			var skeletonData = skeletonDataAsset.GetSkeletonData(true);
+			SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(true);
 			bool hasAnimations = bakeAnimations && skeletonData.Animations.Count > 0;
 			UnityEditor.Animations.AnimatorController controller = null;
 			if (hasAnimations) {
 				string controllerPath = outputPath + "/" + skeletonDataAsset.skeletonJSON.name + " Controller.controller";
 				bool newAnimContainer = false;
 
-				var runtimeController = AssetDatabase.LoadAssetAtPath(controllerPath, typeof(RuntimeAnimatorController));
+				UnityEngine.Object runtimeController = AssetDatabase.LoadAssetAtPath(controllerPath, typeof(RuntimeAnimatorController));
 
 				if (runtimeController != null) {
 					controller = (UnityEditor.Animations.AnimatorController)runtimeController;
@@ -208,13 +209,13 @@ namespace Spine.Unity.Editor {
 					newAnimContainer = true;
 				}
 
-				var existingClipTable = new Dictionary<string, AnimationClip>();
-				var unusedClipNames = new List<string>();
+				Dictionary<string, AnimationClip> existingClipTable = new Dictionary<string, AnimationClip>();
+				List<string> unusedClipNames = new List<string>();
 				Object[] animObjs = AssetDatabase.LoadAllAssetsAtPath(controllerPath);
 
 				foreach (Object o in animObjs) {
 					if (o is AnimationClip) {
-						var clip = (AnimationClip)o;
+						AnimationClip clip = (AnimationClip)o;
 						existingClipTable.Add(clip.name, clip);
 						unusedClipNames.Add(clip.name);
 					}
@@ -227,10 +228,10 @@ namespace Spine.Unity.Editor {
 				for (int s = 0; s < skeletonData.Slots.Count; s++) {
 					List<string> attachmentNames = new List<string>();
 					for (int i = 0; i < skinCount; i++) {
-						var skin = skins.Items[i];
-						var skinEntries = new List<Skin.SkinEntry>();
+						Skin skin = skins.Items[i];
+						List<Skin.SkinEntry> skinEntries = new List<Skin.SkinEntry>();
 						skin.GetAttachments(s, skinEntries);
-						foreach (var entry in skinEntries) {
+						foreach (Skin.SkinEntry entry in skinEntries) {
 							if (!attachmentNames.Contains(entry.Name))
 								attachmentNames.Add(entry.Name);
 						}
@@ -238,7 +239,7 @@ namespace Spine.Unity.Editor {
 					slotLookup.Add(s, attachmentNames);
 				}
 
-				foreach (var anim in skeletonData.Animations) {
+				foreach (Animation anim in skeletonData.Animations) {
 
 					AnimationClip clip = null;
 					if (existingClipTable.ContainsKey(anim.Name)) {
@@ -273,7 +274,7 @@ namespace Spine.Unity.Editor {
 				}
 			}
 
-			foreach (var skin in skins) {
+			foreach (Skin skin in skins) {
 				bool newPrefab = false;
 
 				string prefabPath = outputPath + "/" + skeletonDataAsset.skeletonJSON.name + " (" + skin.Name + ").prefab";
@@ -293,8 +294,8 @@ namespace Spine.Unity.Editor {
 
 				Dictionary<string, Mesh> meshTable = new Dictionary<string, Mesh>();
 				List<string> unusedMeshNames = new List<string>();
-				Object[] assets = AssetDatabase.LoadAllAssetsAtPath(prefabPath);
-				foreach (var obj in assets) {
+				UnityEngine.Object[] assets = AssetDatabase.LoadAllAssetsAtPath(prefabPath);
+				foreach (UnityEngine.Object obj in assets) {
 					if (obj is Mesh) {
 						meshTable.Add(obj.name, (Mesh)obj);
 						unusedMeshNames.Add(obj.name);
@@ -309,7 +310,7 @@ namespace Spine.Unity.Editor {
 
 				//create bones
 				for (int i = 0; i < skeletonData.Bones.Count; i++) {
-					var boneData = skeletonData.Bones.Items[i];
+					BoneData boneData = skeletonData.Bones.Items[i];
 					Transform boneTransform = EditorInstantiation.NewGameObject(boneData.Name, true).transform;
 					boneTransform.parent = prefabRoot.transform;
 					boneTable.Add(boneTransform.name, boneTransform);
@@ -318,7 +319,7 @@ namespace Spine.Unity.Editor {
 
 				for (int i = 0; i < skeletonData.Bones.Count; i++) {
 
-					var boneData = skeletonData.Bones.Items[i];
+					BoneData boneData = skeletonData.Bones.Items[i];
 					Transform boneTransform = boneTable[boneData.Name];
 					Transform parentTransform = null;
 					if (i > 0)
@@ -328,7 +329,7 @@ namespace Spine.Unity.Editor {
 
 					boneTransform.parent = parentTransform;
 					boneTransform.localPosition = new Vector3(boneData.X, boneData.Y, 0);
-					var tm = boneData.TransformMode;
+					TransformMode tm = boneData.TransformMode;
 					if (tm.InheritsRotation())
 						boneTransform.localRotation = Quaternion.Euler(0, 0, boneData.Rotation);
 					else
@@ -340,18 +341,18 @@ namespace Spine.Unity.Editor {
 
 				//create slots and attachments
 				for (int slotIndex = 0; slotIndex < skeletonData.Slots.Count; slotIndex++) {
-					var slotData = skeletonData.Slots.Items[slotIndex];
+					SlotData slotData = skeletonData.Slots.Items[slotIndex];
 					Transform slotTransform = EditorInstantiation.NewGameObject(slotData.Name, true).transform;
 					slotTransform.parent = prefabRoot.transform;
 					slotTable.Add(slotData.Name, slotTransform);
 
-					var skinEntries = new List<Skin.SkinEntry>();
+					List<Skin.SkinEntry> skinEntries = new List<Skin.SkinEntry>();
 					skin.GetAttachments(slotIndex, skinEntries);
 					if (skin != skeletonData.DefaultSkin)
 						skeletonData.DefaultSkin.GetAttachments(slotIndex, skinEntries);
 
 					for (int a = 0; a < skinEntries.Count; a++) {
-						var attachment = skinEntries[a].Attachment;
+						Attachment attachment = skinEntries[a].Attachment;
 						string attachmentName = skinEntries[a].Name;
 						string attachmentMeshName = "[" + slotData.Name + "] " + attachmentName;
 						Vector3 offset = Vector3.zero;
@@ -363,7 +364,7 @@ namespace Spine.Unity.Editor {
 						if (meshTable.ContainsKey(attachmentMeshName))
 							mesh = meshTable[attachmentMeshName];
 						if (attachment is RegionAttachment) {
-							var regionAttachment = (RegionAttachment)attachment;
+							RegionAttachment regionAttachment = (RegionAttachment)attachment;
 							offset.x = regionAttachment.X;
 							offset.y = regionAttachment.Y;
 							rotation = regionAttachment.Rotation;
@@ -373,7 +374,7 @@ namespace Spine.Unity.Editor {
 							if (newPrefab || meshTable.ContainsKey(attachmentMeshName) == false)
 								AssetDatabase.AddObjectToAsset(mesh, prefab);
 						} else if (attachment is MeshAttachment) {
-							var meshAttachment = (MeshAttachment)attachment;
+							MeshAttachment meshAttachment = (MeshAttachment)attachment;
 							isWeightedMesh = (meshAttachment.Bones != null);
 							offset.x = 0;
 							offset.y = 0;
@@ -400,7 +401,7 @@ namespace Spine.Unity.Editor {
 						if (isWeightedMesh) {
 							attachmentTransform.position = Vector3.zero;
 							attachmentTransform.rotation = Quaternion.identity;
-							var skinnedMeshRenderer = attachmentTransform.gameObject.AddComponent<SkinnedMeshRenderer>();
+							SkinnedMeshRenderer skinnedMeshRenderer = attachmentTransform.gameObject.AddComponent<SkinnedMeshRenderer>();
 							skinnedMeshRenderer.rootBone = boneList[0];
 							skinnedMeshRenderer.bones = boneList.ToArray();
 							skinnedMeshRenderer.sharedMesh = mesh;
@@ -418,7 +419,7 @@ namespace Spine.Unity.Editor {
 
 				}
 
-				foreach (var slotData in skeletonData.Slots) {
+				foreach (SlotData slotData in skeletonData.Slots) {
 					Transform slotTransform = slotTable[slotData.Name];
 					slotTransform.parent = boneTable[slotData.BoneData.Name];
 					slotTransform.localPosition = Vector3.zero;
@@ -427,7 +428,7 @@ namespace Spine.Unity.Editor {
 				}
 
 				if (hasAnimations) {
-					var animator = prefabRoot.AddComponent<Animator>();
+					Animator animator = prefabRoot.AddComponent<Animator>();
 					animator.applyRootMotion = false;
 					animator.runtimeAnimatorController = (RuntimeAnimatorController)controller;
 					EditorGUIUtility.PingObject(controller);
@@ -503,8 +504,8 @@ namespace Spine.Unity.Editor {
 		}
 
 		internal static Mesh ExtractRegionAttachment (string name, RegionAttachment attachment, Mesh mesh = null, bool centered = true) {
-			var slot = GetDummySlot();
-			var bone = slot.Bone;
+			Slot slot = GetDummySlot();
+			Bone bone = slot.Bone;
 
 			if (centered) {
 				bone.X = -attachment.X;
@@ -544,7 +545,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		internal static Mesh ExtractMeshAttachment (string name, MeshAttachment attachment, Mesh mesh = null) {
-			var slot = GetDummySlot();
+			Slot slot = GetDummySlot();
 
 			slot.Bone.X = 0;
 			slot.Bone.Y = 0;
@@ -640,8 +641,8 @@ namespace Spine.Unity.Editor {
 			mesh.RecalculateBounds();
 
 			// Handle weights and binding
-			var weightTable = new Dictionary<int, BoneWeightContainer>();
-			var warningBuilder = new System.Text.StringBuilder();
+			Dictionary<int, BoneWeightContainer> weightTable = new Dictionary<int, BoneWeightContainer>();
+			StringBuilder warningBuilder = new System.Text.StringBuilder();
 
 			int[] bones = attachment.Bones;
 			float[] weights = attachment.Vertices;
@@ -668,9 +669,9 @@ namespace Spine.Unity.Editor {
 
 			for (int i = 0; i < weightTable.Count; i++) {
 				BoneWeight bw = new BoneWeight();
-				var container = weightTable[i];
+				BoneWeightContainer container = weightTable[i];
 
-				var pairs = container.pairs.OrderByDescending(pair => pair.weight).ToList();
+				List<BoneWeightContainer.Pair> pairs = container.pairs.OrderByDescending(pair => pair.weight).ToList();
 
 				for (int b = 0; b < pairs.Count; b++) {
 					if (b > 3) {
@@ -746,9 +747,9 @@ namespace Spine.Unity.Editor {
 
 		#region Animation Baking
 		static AnimationClip ExtractAnimation (string name, SkeletonData skeletonData, Dictionary<int, List<string>> slotLookup, bool bakeIK, SendMessageOptions eventOptions, AnimationClip clip = null) {
-			var animation = skeletonData.FindAnimation(name);
+			Animation animation = skeletonData.FindAnimation(name);
 
-			var timelines = animation.Timelines;
+			ExposedList<Timeline> timelines = animation.Timelines;
 
 			if (clip == null) {
 				clip = new AnimationClip();
@@ -809,7 +810,7 @@ namespace Spine.Unity.Editor {
 
 			}
 
-			var settings = AnimationUtility.GetAnimationClipSettings(clip);
+			AnimationClipSettings settings = AnimationUtility.GetAnimationClipSettings(clip);
 			settings.loopTime = true;
 			settings.stopTime = Mathf.Max(clip.length, 0.001f);
 
@@ -901,8 +902,8 @@ namespace Spine.Unity.Editor {
 		}
 
 		static void ParseTranslateTimeline (Skeleton skeleton, TranslateTimeline timeline, AnimationClip clip) {
-			var boneData = skeleton.Data.Bones.Items[timeline.BoneIndex];
-			var bone = skeleton.Bones.Items[timeline.BoneIndex];
+			BoneData boneData = skeleton.Data.Bones.Items[timeline.BoneIndex];
+			Bone bone = skeleton.Bones.Items[timeline.BoneIndex];
 
 			AnimationCurve xCurve = new AnimationCurve();
 			AnimationCurve yCurve = new AnimationCurve();
@@ -1044,8 +1045,8 @@ namespace Spine.Unity.Editor {
 			CurveTimeline1 timeline = isXTimeline ? timelineX : timelineY as CurveTimeline1;
 			IBoneTimeline boneTimeline = isXTimeline ? timelineX : timelineY as IBoneTimeline;
 
-			var boneData = skeleton.Data.Bones.Items[boneTimeline.BoneIndex];
-			var bone = skeleton.Bones.Items[boneTimeline.BoneIndex];
+			BoneData boneData = skeleton.Data.Bones.Items[boneTimeline.BoneIndex];
+			Bone bone = skeleton.Bones.Items[boneTimeline.BoneIndex];
 			float boneDataOffset = isXTimeline ? boneData.X : boneData.Y;
 
 			AnimationCurve curve = new AnimationCurve();
@@ -1137,8 +1138,8 @@ namespace Spine.Unity.Editor {
 		}
 
 		static void ParseScaleTimeline (Skeleton skeleton, ScaleTimeline timeline, AnimationClip clip) {
-			var boneData = skeleton.Data.Bones.Items[timeline.BoneIndex];
-			var bone = skeleton.Bones.Items[timeline.BoneIndex];
+			BoneData boneData = skeleton.Data.Bones.Items[timeline.BoneIndex];
+			Bone bone = skeleton.Bones.Items[timeline.BoneIndex];
 
 			AnimationCurve xCurve = new AnimationCurve();
 			AnimationCurve yCurve = new AnimationCurve();
@@ -1275,8 +1276,8 @@ namespace Spine.Unity.Editor {
 			CurveTimeline1 timeline = isXTimeline ? timelineX : timelineY as CurveTimeline1;
 			IBoneTimeline boneTimeline = isXTimeline ? timelineX : timelineY as IBoneTimeline;
 
-			var boneData = skeleton.Data.Bones.Items[boneTimeline.BoneIndex];
-			var bone = skeleton.Bones.Items[boneTimeline.BoneIndex];
+			BoneData boneData = skeleton.Data.Bones.Items[boneTimeline.BoneIndex];
+			Bone bone = skeleton.Bones.Items[boneTimeline.BoneIndex];
 			float boneDataOffset = isXTimeline ? boneData.ScaleX : boneData.ScaleY;
 
 			AnimationCurve curve = new AnimationCurve();
@@ -1366,16 +1367,16 @@ namespace Spine.Unity.Editor {
 		}
 
 		static void ParseRotateTimeline (Skeleton skeleton, RotateTimeline timeline, AnimationClip clip) {
-			var boneData = skeleton.Data.Bones.Items[timeline.BoneIndex];
-			var bone = skeleton.Bones.Items[timeline.BoneIndex];
+			BoneData boneData = skeleton.Data.Bones.Items[timeline.BoneIndex];
+			Bone bone = skeleton.Bones.Items[timeline.BoneIndex];
 
-			var curve = new AnimationCurve();
+			AnimationCurve curve = new AnimationCurve();
 
 			float endTime = timeline.Frames[(timeline.FrameCount * 2) - 2];
 
 			float currentTime = timeline.Frames[0];
 
-			var keys = new List<Keyframe>();
+			List<Keyframe> keys = new List<Keyframe>();
 
 			float rotation = timeline.Frames[1] + boneData.Rotation;
 
@@ -1500,7 +1501,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		static void ParseEventTimeline (EventTimeline timeline, AnimationClip clip, SendMessageOptions eventOptions) {
-			var animationEvents = new List<AnimationEvent>();
+			List<AnimationEvent> animationEvents = new List<AnimationEvent>();
 			ParseEventTimeline(ref animationEvents, timeline, eventOptions);
 			AnimationUtility.SetAnimationEvents(clip, animationEvents.ToArray());
 		}
@@ -1509,16 +1510,16 @@ namespace Spine.Unity.Editor {
 			EventTimeline timeline, SendMessageOptions eventOptions) {
 
 			float[] frames = timeline.Frames;
-			var events = timeline.Events;
+			Event[] events = timeline.Events;
 
 			for (int i = 0, n = frames.Length; i < n; i++) {
-				var spineEvent = events[i];
+				Event spineEvent = events[i];
 				string eventName = spineEvent.Data.Name;
 				if (SpineEditorUtilities.Preferences.mecanimEventIncludeFolderName)
 					eventName = eventName.Replace("/", ""); // calls method FolderNameEventName()
 				else
 					eventName = eventName.Substring(eventName.LastIndexOf('/') + 1); // calls method EventName()
-				var unityAnimationEvent = new AnimationEvent {
+				AnimationEvent unityAnimationEvent = new AnimationEvent {
 					time = frames[i],
 					functionName = eventName,
 					messageOptions = eventOptions,
@@ -1541,7 +1542,7 @@ namespace Spine.Unity.Editor {
 			foreach (AnimationEvent previousEvent in previousEvents) {
 				if (previousEvent.stringParameter == SpineEventStringId)
 					continue;
-				var identicalEvent = allEvents.Find(newEvent => {
+				AnimationEvent identicalEvent = allEvents.Find(newEvent => {
 					return newEvent.functionName == previousEvent.functionName &&
 						Mathf.Abs(newEvent.time - previousEvent.time) < EventTimeEqualityEpsilon;
 				});
@@ -1553,7 +1554,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		static void ParseAttachmentTimeline (Skeleton skeleton, AttachmentTimeline timeline, Dictionary<int, List<string>> slotLookup, AnimationClip clip) {
-			var attachmentNames = slotLookup[timeline.SlotIndex];
+			List<string> attachmentNames = slotLookup[timeline.SlotIndex];
 
 			string bonePath = GetPath(skeleton.Slots.Items[timeline.SlotIndex].Bone.Data);
 			string slotPath = bonePath + "/" + skeleton.Slots.Items[timeline.SlotIndex].Data.Name;
@@ -1568,7 +1569,7 @@ namespace Spine.Unity.Editor {
 
 			if (frames[0] != 0) {
 				string startingName = skeleton.Slots.Items[timeline.SlotIndex].Data.AttachmentName;
-				foreach (var pair in curveTable) {
+				foreach (KeyValuePair<string, AnimationCurve> pair in curveTable) {
 					if (startingName == "" || startingName == null) {
 						pair.Value.AddKey(new Keyframe(0, 0, float.PositiveInfinity, float.PositiveInfinity));
 					} else {
@@ -1590,7 +1591,7 @@ namespace Spine.Unity.Editor {
 				int frameIndex = Search(frames, time);
 
 				string name = timeline.AttachmentNames[frameIndex];
-				foreach (var pair in curveTable) {
+				foreach (KeyValuePair<string, AnimationCurve> pair in curveTable) {
 					if (name == "") {
 						pair.Value.AddKey(new Keyframe(time, 0, float.PositiveInfinity, float.PositiveInfinity));
 					} else {
@@ -1606,7 +1607,7 @@ namespace Spine.Unity.Editor {
 				f += 1;
 			}
 
-			foreach (var pair in curveTable) {
+			foreach (KeyValuePair<string, AnimationCurve> pair in curveTable) {
 				string path = slotPath + "/" + pair.Key;
 				string prop = "m_IsActive";
 

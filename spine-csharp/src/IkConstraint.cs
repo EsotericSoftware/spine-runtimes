@@ -82,7 +82,7 @@ namespace Spine {
 		public void Update () {
 			if (mix == 0) return;
 			Bone target = this.target;
-			var bones = this.bones.Items;
+			Bone[] bones = this.bones.Items;
 			switch (this.bones.Count) {
 			case 1:
 				Apply(bones[0], target.worldX, target.worldY, compress, stretch, data.uniform, mix);

@@ -135,8 +135,8 @@ namespace Spine.Unity.Editor {
 		protected void DisplayWarnings () {
 			bool usesRigidbodyPhysics = rigidBody.objectReferenceValue != null || rigidBody2D.objectReferenceValue != null;
 			if (usesRigidbodyPhysics) {
-				var rootMotionComponent = (SkeletonRootMotionBase)serializedObject.targetObject;
-				var skeletonComponent = rootMotionComponent ? rootMotionComponent.TargetSkeletonAnimationComponent : null;
+				SkeletonRootMotionBase rootMotionComponent = (SkeletonRootMotionBase)serializedObject.targetObject;
+				ISkeletonAnimation skeletonComponent = rootMotionComponent ? rootMotionComponent.TargetSkeletonAnimationComponent : null;
 				if (skeletonComponent != null && skeletonComponent.UpdateTiming == UpdateTiming.InUpdate) {
 					string warningMessage = "Skeleton component uses 'Advanced - Animation Update' mode 'In Update'.\n" +
 						"When using a Rigidbody, 'In FixedUpdate' is recommended instead.";

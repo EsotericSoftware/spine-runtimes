@@ -42,7 +42,7 @@ namespace Spine.Unity.Editor {
 
 		[MenuItem("CONTEXT/SkeletonDataAsset/Skeleton Baking", false, 5000)]
 		public static void Init (MenuCommand command) {
-			var window = EditorWindow.GetWindow<SkeletonBakingWindow>(IsUtilityWindow);
+			SkeletonBakingWindow window = EditorWindow.GetWindow<SkeletonBakingWindow>(IsUtilityWindow);
 			window.minSize = new Vector2(330f, 530f);
 			window.maxSize = new Vector2(600f, 1000f);
 			window.titleContent = new GUIContent("Skeleton Baking", Icons.spine);
@@ -94,7 +94,7 @@ namespace Spine.Unity.Editor {
 			EditorGUILayout.HelpBox(BakingWarningMessage, MessageType.Info, true);
 
 			EditorGUI.BeginChangeCheck();
-			var skeletonDataAssetProperty = so.FindProperty("skeletonDataAsset");
+			SerializedProperty skeletonDataAssetProperty = so.FindProperty("skeletonDataAsset");
 			EditorGUILayout.PropertyField(skeletonDataAssetProperty, SpineInspectorUtility.TempContent("SkeletonDataAsset", Icons.spine));
 			if (EditorGUI.EndChangeCheck()) {
 				so.ApplyModifiedProperties();
@@ -103,7 +103,7 @@ namespace Spine.Unity.Editor {
 			EditorGUILayout.Space();
 
 			if (skeletonDataAsset == null) return;
-			var skeletonData = skeletonDataAsset.GetSkeletonData(false);
+			SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(false);
 			if (skeletonData == null) return;
 			bool hasExtraSkins = skeletonData.Skins.Count > 1;
 
@@ -121,7 +121,7 @@ namespace Spine.Unity.Editor {
 					}
 
 					int totalAttachments = 0;
-					foreach (var s in skeletonData.Skins)
+					foreach (Skin s in skeletonData.Skins)
 						totalAttachments += s.Attachments.Count;
 					EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("Total Attachments: " + totalAttachments, Icons.genericAttachment));
 				}
@@ -145,7 +145,7 @@ namespace Spine.Unity.Editor {
 			if (!string.IsNullOrEmpty(skinToBake) && UnityEngine.Event.current.type == EventType.Repaint)
 				bakeSkin = skeletonData.FindSkin(skinToBake) ?? skeletonData.DefaultSkin;
 
-			var prefabIcon = EditorGUIUtility.FindTexture("PrefabModel Icon");
+			Texture2D prefabIcon = EditorGUIUtility.FindTexture("PrefabModel Icon");
 
 			if (hasExtraSkins) {
 				EditorGUI.BeginChangeCheck();

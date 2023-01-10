@@ -97,7 +97,7 @@ namespace Spine.Unity.Playables {
 		protected void HandleClipEnd () {
 			if (animationStateComponent.IsNullOrDestroyed()) return;
 
-			var state = animationStateComponent.AnimationState;
+			AnimationState state = animationStateComponent.AnimationState;
 			if (endAtClipEnd &&
 				timelineStartedTrackEntry != null &&
 				timelineStartedTrackEntry == state.GetCurrent(trackIndex)) {
@@ -124,14 +124,14 @@ namespace Spine.Unity.Playables {
 
 		// NOTE: This function is called at runtime and edit time. Keep that in mind when setting the values of properties.
 		public override void ProcessFrame (Playable playable, FrameData info, object playerData) {
-			var skeletonAnimation = playerData as SkeletonAnimation;
-			var skeletonGraphic = playerData as SkeletonGraphic;
+			SkeletonAnimation skeletonAnimation = playerData as SkeletonAnimation;
+			SkeletonGraphic skeletonGraphic = playerData as SkeletonGraphic;
 			animationStateComponent = playerData as IAnimationStateComponent;
-			var skeletonComponent = playerData as ISkeletonComponent;
+			ISkeletonComponent skeletonComponent = playerData as ISkeletonComponent;
 			if (animationStateComponent.IsNullOrDestroyed() || skeletonComponent == null) return;
 
-			var skeleton = skeletonComponent.Skeleton;
-			var state = animationStateComponent.AnimationState;
+			Skeleton skeleton = skeletonComponent.Skeleton;
+			AnimationState state = animationStateComponent.AnimationState;
 
 			if (!Application.isPlaying) {
 #if SPINE_EDITMODEPOSE
@@ -153,7 +153,7 @@ namespace Spine.Unity.Playables {
 				for (int i = 0; i < inputCount; i++)
 					this.lastInputWeights[i] = default(float);
 			}
-			var lastInputWeights = this.lastInputWeights;
+			float[] lastInputWeights = this.lastInputWeights;
 			int numStartingClips = 0;
 			bool anyClipPlaying = false;
 
@@ -266,7 +266,7 @@ namespace Spine.Unity.Playables {
 					(ScriptPlayable<SpineAnimationStateBehaviour>)playable.GetInput(lastNonZeroWeightTrack);
 				SpineAnimationStateBehaviour clipData = inputPlayableClip.GetBehaviour();
 
-				var skeleton = skeletonComponent.Skeleton;
+				Skeleton skeleton = skeletonComponent.Skeleton;
 
 				bool skeletonDataMismatch = clipData.animationReference != null && clipData.animationReference.SkeletonDataAsset &&
 					skeletonComponent.SkeletonDataAsset.GetSkeletonData(true) != clipData.animationReference.SkeletonDataAsset.GetSkeletonData(true);
@@ -281,7 +281,7 @@ namespace Spine.Unity.Playables {
 				bool fromClipLoop = false;
 				if (lastNonZeroWeightTrack != 0 && inputCount > 1) {
 					var fromClip = (ScriptPlayable<SpineAnimationStateBehaviour>)playable.GetInput(lastNonZeroWeightTrack - 1);
-					var fromClipData = fromClip.GetBehaviour();
+					SpineAnimationStateBehaviour fromClipData = fromClip.GetBehaviour();
 					fromAnimation = fromClipData.animationReference != null ? fromClipData.animationReference.Animation : null;
 					fromClipTime = (float)fromClip.GetTime() * (float)fromClip.GetSpeed() * rootSpeed;
 					fromClipLoop = fromClipData.loop;
@@ -302,8 +302,8 @@ namespace Spine.Unity.Playables {
 				if (fromAnimation != null && mixDuration > 0 && toClipTime < mixDuration) {
 					dummyAnimationState = dummyAnimationState ?? new AnimationState(skeletonComponent.SkeletonDataAsset.GetAnimationStateData());
 
-					var toEntry = dummyAnimationState.GetCurrent(0);
-					var fromEntry = toEntry != null ? toEntry.MixingFrom : null;
+					TrackEntry toEntry = dummyAnimationState.GetCurrent(0);
+					TrackEntry fromEntry = toEntry != null ? toEntry.MixingFrom : null;
 					bool isAnimationTransitionMatch = (toEntry != null && toEntry.Animation == toAnimation && fromEntry != null && fromEntry.Animation == fromAnimation);
 
 					if (!isAnimationTransitionMatch) {
@@ -351,9 +351,9 @@ namespace Spine.Unity.Playables {
 				return (float)graph.GetRootPlayable(0).GetSpeed();
 			else {
 				for (int rootIndex = 0; rootIndex < rootPlayableCount; ++rootIndex) {
-					var rootPlayable = graph.GetRootPlayable(rootIndex);
+					Playable rootPlayable = graph.GetRootPlayable(rootIndex);
 					for (int i = 0, n = rootPlayable.GetInputCount(); i < n; ++i) {
-						var playableChild = rootPlayable.GetInput(i);
+						Playable playableChild = rootPlayable.GetInput(i);
 						if (playableChild.Equals(playable)) {
 							return (float)rootPlayable.GetSpeed();
 						}

@@ -94,12 +94,12 @@ namespace Spine.Unity {
 			LazyIntialize();
 
 			// STEP 1: Create instruction
-			var smartMesh = buffers.GetNextMesh();
+			MeshRendererBuffers.SmartMesh smartMesh = buffers.GetNextMesh();
 			currentInstructions.SetWithSubset(instructions, startSubmesh, endSubmesh);
 			bool updateTriangles = SkeletonRendererInstruction.GeometryNotEqual(currentInstructions, smartMesh.instructionUsed);
 
 			// STEP 2: Generate mesh buffers.
-			var currentInstructionsSubmeshesItems = currentInstructions.submeshInstructions.Items;
+			SubmeshInstruction[] currentInstructionsSubmeshesItems = currentInstructions.submeshInstructions.Items;
 			meshGenerator.Begin();
 			if (currentInstructions.hasActiveClipping) {
 				for (int i = 0; i < currentInstructions.submeshInstructions.Count; i++)
@@ -111,7 +111,7 @@ namespace Spine.Unity {
 			buffers.UpdateSharedMaterials(currentInstructions.submeshInstructions);
 
 			// STEP 3: modify mesh.
-			var mesh = smartMesh.mesh;
+			Mesh mesh = smartMesh.mesh;
 
 			if (meshGenerator.VertexCount <= 0) { // Clear an empty mesh
 				updateTriangles = false;
@@ -140,9 +140,9 @@ namespace Spine.Unity {
 		}
 
 		public static SkeletonPartsRenderer NewPartsRendererGameObject (Transform parent, string name, int sortingOrder = 0) {
-			var go = new GameObject(name, typeof(MeshFilter), typeof(MeshRenderer));
+			GameObject go = new GameObject(name, typeof(MeshFilter), typeof(MeshRenderer));
 			go.transform.SetParent(parent, false);
-			var returnComponent = go.AddComponent<SkeletonPartsRenderer>();
+			SkeletonPartsRenderer returnComponent = go.AddComponent<SkeletonPartsRenderer>();
 			returnComponent.MeshRenderer.sortingOrder = sortingOrder;
 
 			return returnComponent;

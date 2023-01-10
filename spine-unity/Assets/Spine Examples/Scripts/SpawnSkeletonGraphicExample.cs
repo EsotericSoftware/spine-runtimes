@@ -48,7 +48,7 @@ namespace Spine.Unity.Examples {
 			skeletonDataAsset.GetSkeletonData(false); // Preload SkeletonDataAsset.
 			yield return new WaitForSeconds(1f); // Pretend stuff is happening.
 
-			var sg = SkeletonGraphic.NewSkeletonGraphicGameObject(skeletonDataAsset, this.transform, skeletonGraphicMaterial); // Spawn a new SkeletonGraphic GameObject.
+			SkeletonGraphic sg = SkeletonGraphic.NewSkeletonGraphicGameObject(skeletonDataAsset, this.transform, skeletonGraphicMaterial); // Spawn a new SkeletonGraphic GameObject.
 			sg.gameObject.name = "SkeletonGraphic Instance";
 
 			// Extra Stuff

@@ -33,8 +33,8 @@
 
 #if TIMELINE_HAS_CLIPEDITOR_CLASS
 
-using UnityEditor;
 using Spine.Unity.Playables;
+using UnityEditor;
 using UnityEditor.Timeline;
 using UnityEngine.Timeline;
 
@@ -51,11 +51,11 @@ namespace Spine.Unity.Editor {
 			SetDisplayName(clip);
 		}
 
-		protected void SetDisplayName(TimelineClip clip) {
-			var flipClip = (SpineSkeletonFlipClip)clip.asset;
+		protected void SetDisplayName (TimelineClip clip) {
+			SpineSkeletonFlipClip flipClip = (SpineSkeletonFlipClip)clip.asset;
 			if (flipClip != null) {
 				bool flipX = false, flipY = false;
-				var settings = flipClip.template;
+				SpineSkeletonFlipBehaviour settings = flipClip.template;
 				if (settings != null) {
 					flipX = settings.flipX;
 					flipY = settings.flipY;

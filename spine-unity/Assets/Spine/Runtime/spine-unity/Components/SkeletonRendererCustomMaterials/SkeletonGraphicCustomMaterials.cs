@@ -55,12 +55,12 @@ namespace Spine.Unity {
 
 			// Populate material list
 			if (skeletonGraphic != null && skeletonGraphic.skeletonDataAsset != null) {
-				var atlasAssets = skeletonGraphic.skeletonDataAsset.atlasAssets;
+				AtlasAssetBase[] atlasAssets = skeletonGraphic.skeletonDataAsset.atlasAssets;
 
-				var initialAtlasMaterialOverrides = new List<AtlasMaterialOverride>();
+				List<AtlasMaterialOverride> initialAtlasMaterialOverrides = new List<AtlasMaterialOverride>();
 				foreach (AtlasAssetBase atlasAsset in atlasAssets) {
 					foreach (Material atlasMaterial in atlasAsset.Materials) {
-						var atlasMaterialOverride = new AtlasMaterialOverride {
+						AtlasMaterialOverride atlasMaterialOverride = new AtlasMaterialOverride {
 							overrideEnabled = false,
 							originalTexture = atlasMaterial.mainTexture
 						};
@@ -73,12 +73,12 @@ namespace Spine.Unity {
 
 			// Populate texture list
 			if (skeletonGraphic != null && skeletonGraphic.skeletonDataAsset != null) {
-				var atlasAssets = skeletonGraphic.skeletonDataAsset.atlasAssets;
+				AtlasAssetBase[] atlasAssets = skeletonGraphic.skeletonDataAsset.atlasAssets;
 
-				var initialAtlasTextureOverrides = new List<AtlasTextureOverride>();
+				List<AtlasTextureOverride> initialAtlasTextureOverrides = new List<AtlasTextureOverride>();
 				foreach (AtlasAssetBase atlasAsset in atlasAssets) {
 					foreach (Material atlasMaterial in atlasAsset.Materials) {
-						var atlasTextureOverride = new AtlasTextureOverride {
+						AtlasTextureOverride atlasTextureOverride = new AtlasTextureOverride {
 							overrideEnabled = false,
 							originalTexture = atlasMaterial.mainTexture
 						};

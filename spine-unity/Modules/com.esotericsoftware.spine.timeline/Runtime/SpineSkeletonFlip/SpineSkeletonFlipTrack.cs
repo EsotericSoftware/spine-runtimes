@@ -53,8 +53,8 @@ namespace Spine.Unity.Playables {
 			if (trackBinding == null)
 				return;
 
-			var serializedObject = new UnityEditor.SerializedObject(trackBinding);
-			var iterator = serializedObject.GetIterator();
+			UnityEditor.SerializedObject serializedObject = new UnityEditor.SerializedObject(trackBinding);
+			UnityEditor.SerializedProperty iterator = serializedObject.GetIterator();
 			while (iterator.NextVisible(true)) {
 				if (iterator.hasVisibleChildren)
 					continue;

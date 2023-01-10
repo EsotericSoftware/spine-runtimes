@@ -77,8 +77,8 @@ namespace Spine.Unity {
 
 		void ResetJointPositions (HingeJoint2D[] joints) {
 			for (int i = 0; i < joints.Length; ++i) {
-				var joint = joints[i];
-				var parent = joint.connectedBody.transform;
+				HingeJoint2D joint = joints[i];
+				Transform parent = joint.connectedBody.transform;
 				joint.transform.position = parent.TransformPoint(joint.connectedAnchor);
 			}
 		}

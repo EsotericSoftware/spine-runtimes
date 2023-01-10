@@ -104,9 +104,9 @@ namespace Spine.Unity {
 			+ "You may want to duplicate the 'SkeletonGraphicTintBlack' material and change settings at the duplicate to not affect all instances.";
 
 		public static bool IsMaterialSetupProblematic (SkeletonRenderer renderer, ref string errorMessage) {
-			var materials = renderer.GetComponent<Renderer>().sharedMaterials;
+			Material[] materials = renderer.GetComponent<Renderer>().sharedMaterials;
 			bool isProblematic = false;
-			foreach (var material in materials) {
+			foreach (Material material in materials) {
 				if (material == null) continue;
 				isProblematic |= IsMaterialSetupProblematic(material, ref errorMessage);
 				if (renderer.zSpacing == 0) {
@@ -129,11 +129,11 @@ namespace Spine.Unity {
 		}
 
 		public static bool IsMaterialSetupProblematic (SkeletonGraphic skeletonGraphic, ref string errorMessage) {
-			var material = skeletonGraphic.material;
+			Material material = skeletonGraphic.material;
 			bool isProblematic = false;
 			if (material) {
 				isProblematic |= IsMaterialSetupProblematic(material, ref errorMessage);
-				var settings = skeletonGraphic.MeshGenerator.settings;
+				MeshGenerator.Settings settings = skeletonGraphic.MeshGenerator.settings;
 				if (settings.zSpacing == 0) {
 					isProblematic |= IsZSpacingRequired(material, ref errorMessage);
 				}

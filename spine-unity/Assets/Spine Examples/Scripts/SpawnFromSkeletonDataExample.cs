@@ -46,9 +46,9 @@ namespace Spine.Unity.Examples {
 			skeletonDataAsset.GetSkeletonData(false); // Preload SkeletonDataAsset.
 			yield return new WaitForSeconds(1f); // Pretend stuff is happening.
 
-			var spineAnimation = skeletonDataAsset.GetSkeletonData(false).FindAnimation(startingAnimation);
+			Animation spineAnimation = skeletonDataAsset.GetSkeletonData(false).FindAnimation(startingAnimation);
 			for (int i = 0; i < count; i++) {
-				var sa = SkeletonAnimation.NewSkeletonAnimationGameObject(skeletonDataAsset); // Spawn a new SkeletonAnimation GameObject.
+				SkeletonAnimation sa = SkeletonAnimation.NewSkeletonAnimationGameObject(skeletonDataAsset); // Spawn a new SkeletonAnimation GameObject.
 				DoExtraStuff(sa, spineAnimation); // optional stuff for fun.
 				sa.gameObject.name = i.ToString();
 				yield return new WaitForSeconds(1f / 8f);

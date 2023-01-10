@@ -83,7 +83,7 @@ namespace Spine {
 #if !ISUNITY && WINDOWS_STOREAPP
 		private async Task<SkeletonData> ReadFile(string path) {
 			var folder = Windows.ApplicationModel.Package.Current.InstalledLocation;
-			using (var input = new BufferedStream(await folder.GetFileAsync(path).AsTask().ConfigureAwait(false))) {
+			using (BufferedStream input = new BufferedStream(await folder.GetFileAsync(path).AsTask().ConfigureAwait(false))) {
 				SkeletonData skeletonData = ReadSkeletonData(input);
 				skeletonData.Name = Path.GetFileNameWithoutExtension(path);
 				return skeletonData;
@@ -96,9 +96,9 @@ namespace Spine {
 #else
 		public override SkeletonData ReadSkeletonData (string path) {
 #if WINDOWS_PHONE
-			using (var input = new BufferedStream(Microsoft.Xna.Framework.TitleContainer.OpenStream(path))) {
+			using (BufferedStream input = new BufferedStream(Microsoft.Xna.Framework.TitleContainer.OpenStream(path))) {
 #else
-			using (var input = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read)) {
+			using (FileStream input = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read)) {
 #endif
 				SkeletonData skeletonData = ReadSkeletonData(input);
 				skeletonData.name = Path.GetFileNameWithoutExtension(path);
@@ -127,7 +127,7 @@ namespace Spine {
 			if (file == null) throw new ArgumentNullException("file");
 			float scale = this.scale;
 
-			var skeletonData = new SkeletonData();
+			SkeletonData skeletonData = new SkeletonData();
 			SkeletonInput input = new SkeletonInput(file);
 
 			long hash = input.ReadLong();
@@ -162,7 +162,7 @@ namespace Spine {
 				o[i] = input.ReadString();
 
 			// Bones.
-			var bones = skeletonData.bones.Resize(n = input.ReadInt(true)).Items;
+			BoneData[] bones = skeletonData.bones.Resize(n = input.ReadInt(true)).Items;
 			for (int i = 0; i < n; i++) {
 				String name = input.ReadString();
 				BoneData parent = i == 0 ? null : bones[input.ReadInt(true)];
@@ -182,7 +182,7 @@ namespace Spine {
 			}
 
 			// Slots.
-			var slots = skeletonData.slots.Resize(n = input.ReadInt(true)).Items;
+			SlotData[] slots = skeletonData.slots.Resize(n = input.ReadInt(true)).Items;
 			for (int i = 0; i < n; i++) {
 				String slotName = input.ReadString();
 				BoneData boneData = bones[input.ReadInt(true)];
@@ -212,7 +212,7 @@ namespace Spine {
 				IkConstraintData data = new IkConstraintData(input.ReadString());
 				data.order = input.ReadInt(true);
 				data.skinRequired = input.ReadBoolean();
-				var constraintBones = data.bones.Resize(nn = input.ReadInt(true)).Items;
+				BoneData[] constraintBones = data.bones.Resize(nn = input.ReadInt(true)).Items;
 				for (int ii = 0; ii < nn; ii++)
 					constraintBones[ii] = bones[input.ReadInt(true)];
 				data.target = bones[input.ReadInt(true)];
@@ -231,7 +231,7 @@ namespace Spine {
 				TransformConstraintData data = new TransformConstraintData(input.ReadString());
 				data.order = input.ReadInt(true);
 				data.skinRequired = input.ReadBoolean();
-				var constraintBones = data.bones.Resize(nn = input.ReadInt(true)).Items;
+				BoneData[] constraintBones = data.bones.Resize(nn = input.ReadInt(true)).Items;
 				for (int ii = 0; ii < nn; ii++)
 					constraintBones[ii] = bones[input.ReadInt(true)];
 				data.target = bones[input.ReadInt(true)];
@@ -341,17 +341,17 @@ namespace Spine {
 			} else {
 				skin = new Skin(input.ReadStringRef());
 				Object[] bones = skin.bones.Resize(input.ReadInt(true)).Items;
-				var bonesItems = skeletonData.bones.Items;
+				BoneData[] bonesItems = skeletonData.bones.Items;
 				for (int i = 0, n = skin.bones.Count; i < n; i++)
 					bones[i] = bonesItems[input.ReadInt(true)];
 
-				var ikConstraintsItems = skeletonData.ikConstraints.Items;
+				IkConstraintData[] ikConstraintsItems = skeletonData.ikConstraints.Items;
 				for (int i = 0, n = input.ReadInt(true); i < n; i++)
 					skin.constraints.Add(ikConstraintsItems[input.ReadInt(true)]);
-				var transformConstraintsItems = skeletonData.transformConstraints.Items;
+				TransformConstraintData[] transformConstraintsItems = skeletonData.transformConstraints.Items;
 				for (int i = 0, n = input.ReadInt(true); i < n; i++)
 					skin.constraints.Add(transformConstraintsItems[input.ReadInt(true)]);
-				var pathConstraintsItems = skeletonData.pathConstraints.Items;
+				PathConstraintData[] pathConstraintsItems = skeletonData.pathConstraints.Items;
 				for (int i = 0, n = input.ReadInt(true); i < n; i++)
 					skin.constraints.Add(pathConstraintsItems[input.ReadInt(true)]);
 				skin.constraints.TrimExcess();
@@ -561,8 +561,8 @@ namespace Spine {
 				vertices.vertices = ReadFloatArray(input, verticesLength, scale);
 				return vertices;
 			}
-			var weights = new ExposedList<float>(verticesLength * 3 * 3);
-			var bonesArray = new ExposedList<int>(verticesLength * 3);
+			ExposedList<float> weights = new ExposedList<float>(verticesLength * 3 * 3);
+			ExposedList<int> bonesArray = new ExposedList<int>(verticesLength * 3);
 			for (int i = 0; i < vertexCount; i++) {
 				int boneCount = input.ReadInt(true);
 				bonesArray.Add(boneCount);
@@ -602,7 +602,7 @@ namespace Spine {
 		/// <exception cref="SerializationException">SerializationException will be thrown when a Vertex attachment is not found.</exception>
 		/// <exception cref="IOException">Throws IOException when a read operation fails.</exception>
 		private Animation ReadAnimation (String name, SkeletonInput input, SkeletonData skeletonData) {
-			var timelines = new ExposedList<Timeline>(input.ReadInt(true));
+			ExposedList<Timeline> timelines = new ExposedList<Timeline>(input.ReadInt(true));
 			float scale = this.scale;
 
 			// Slot timelines.
@@ -1049,7 +1049,7 @@ namespace Spine {
 			}
 
 			float duration = 0;
-			var items = timelines.Items;
+			Timeline[] items = timelines.Items;
 			for (int i = 0, n = timelines.Count; i < n; i++)
 				duration = Math.Max(duration, items[i].Duration);
 			return new Animation(name, timelines, duration);
@@ -1221,10 +1221,10 @@ namespace Spine {
 			public string GetVersionString () {
 				try {
 					// try reading 4.0+ format
-					var initialPosition = input.Position;
+					long initialPosition = input.Position;
 					ReadLong(); // long hash
 
-					var stringPosition = input.Position;
+					long stringPosition = input.Position;
 					int stringByteCount = ReadInt(true);
 					input.Position = stringPosition;
 					if (stringByteCount <= 13) {
@@ -1250,7 +1250,7 @@ namespace Spine {
 				byteCount = ReadInt(true);
 				if (byteCount > 1 && byteCount <= 13) {
 					byteCount--;
-					var buffer = new byte[byteCount];
+					byte[] buffer = new byte[byteCount];
 					ReadFully(buffer, 0, byteCount);
 					return System.Text.Encoding.UTF8.GetString(buffer, 0, byteCount);
 				}

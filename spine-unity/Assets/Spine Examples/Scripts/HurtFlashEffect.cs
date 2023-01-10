@@ -58,7 +58,7 @@ public class HurtFlashEffect : MonoBehaviour {
 		int fillPhase = Shader.PropertyToID(fillPhaseProperty);
 		int fillColor = Shader.PropertyToID(fillColorProperty);
 
-		var wait = new WaitForSeconds(interval);
+		WaitForSeconds wait = new WaitForSeconds(interval);
 
 		for (int i = 0; i < flashCount; i++) {
 			mpb.SetColor(fillColor, flashColor);

@@ -54,14 +54,14 @@ namespace Spine.Unity.Editor {
 		#region SkeletonRenderer context menu
 		[MenuItem("CONTEXT/SkeletonRenderer/Add Basic Serialized Custom Materials")]
 		static void AddSkeletonRendererCustomMaterials (MenuCommand menuCommand) {
-			var skeletonRenderer = (SkeletonRenderer)menuCommand.context;
-			var newComponent = skeletonRenderer.gameObject.AddComponent<SkeletonRendererCustomMaterials>();
+			SkeletonRenderer skeletonRenderer = (SkeletonRenderer)menuCommand.context;
+			SkeletonRendererCustomMaterials newComponent = skeletonRenderer.gameObject.AddComponent<SkeletonRendererCustomMaterials>();
 			Undo.RegisterCreatedObjectUndo(newComponent, "Add Basic Serialized Custom Materials");
 		}
 
 		[MenuItem("CONTEXT/SkeletonRenderer/Add Basic Serialized Custom Materials", true)]
 		static bool AddSkeletonRendererCustomMaterials_Validate (MenuCommand menuCommand) {
-			var skeletonRenderer = (SkeletonRenderer)menuCommand.context;
+			SkeletonRenderer skeletonRenderer = (SkeletonRenderer)menuCommand.context;
 			return (skeletonRenderer.GetComponent<SkeletonRendererCustomMaterials>() == null);
 		}
 		#endregion
@@ -76,7 +76,7 @@ namespace Spine.Unity.Editor {
 
 		public override void OnInspectorGUI () {
 			component = (SkeletonRendererCustomMaterials)target;
-			var skeletonRenderer = component.skeletonRenderer;
+			SkeletonRenderer skeletonRenderer = component.skeletonRenderer;
 
 			// Draw the default inspector
 			DrawDefaultInspector();

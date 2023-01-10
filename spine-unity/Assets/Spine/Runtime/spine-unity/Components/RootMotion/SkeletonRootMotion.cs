@@ -61,7 +61,7 @@ namespace Spine.Unity {
 			if (track == null)
 				return Vector2.zero;
 
-			var animation = track.Animation;
+			Animation animation = track.Animation;
 			float start = track.AnimationTime;
 			float end = animation.Duration;
 			return GetAnimationRootMotion(start, end, animation);
@@ -72,7 +72,7 @@ namespace Spine.Unity {
 			if (track == null)
 				return new RootMotionInfo();
 
-			var animation = track.Animation;
+			Animation animation = track.Animation;
 			float time = track.AnimationTime;
 			return GetAnimationRootMotionInfo(track.Animation, time);
 		}
@@ -90,7 +90,7 @@ namespace Spine.Unity {
 
 		protected override void Start () {
 			base.Start();
-			var animstateComponent = skeletonComponent as IAnimationStateComponent;
+			IAnimationStateComponent animstateComponent = skeletonComponent as IAnimationStateComponent;
 			this.animationState = (animstateComponent != null) ? animstateComponent.AnimationState : null;
 
 			if (this.GetComponent<CanvasRenderer>() != null) {
@@ -111,10 +111,10 @@ namespace Spine.Unity {
 				TrackEntry track = animationState.GetCurrent(trackIndex);
 				TrackEntry next = null;
 				while (track != null) {
-					var animation = track.Animation;
+					Animation animation = track.Animation;
 					float start = track.AnimationLast;
 					float end = track.AnimationTime;
-					var currentDelta = GetAnimationRootMotion(start, end, animation);
+					Vector2 currentDelta = GetAnimationRootMotion(start, end, animation);
 					if (currentDelta != Vector2.zero) {
 						ApplyMixAlphaToDelta(ref currentDelta, next, track);
 						localDelta += currentDelta;
@@ -141,10 +141,10 @@ namespace Spine.Unity {
 				TrackEntry track = animationState.GetCurrent(trackIndex);
 				TrackEntry next = null;
 				while (track != null) {
-					var animation = track.Animation;
+					Animation animation = track.Animation;
 					float start = track.AnimationLast;
 					float end = track.AnimationTime;
-					var currentDelta = GetAnimationRootMotionRotation(start, end, animation);
+					float currentDelta = GetAnimationRootMotionRotation(start, end, animation);
 					if (currentDelta != 0) {
 						ApplyMixAlphaToDelta(ref currentDelta, next, track);
 						localDelta += currentDelta;

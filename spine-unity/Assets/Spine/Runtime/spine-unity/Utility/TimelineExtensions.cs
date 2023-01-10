@@ -66,7 +66,7 @@ namespace Spine.Unity.AnimationTools {
 			if (skeletonData == null) {
 				return new Vector2(x, y);
 			} else {
-				var bonesItems = skeletonData.Bones.Items;
+				BoneData[] bonesItems = skeletonData.Bones.Items;
 				BoneData boneDataX = bonesItems[xTimeline.BoneIndex];
 				BoneData boneDataY = bonesItems[yTimeline.BoneIndex];
 				return new Vector2(boneDataX.X + x, boneDataY.Y + y);
@@ -114,11 +114,11 @@ namespace Spine.Unity.AnimationTools {
 		/// The root bone is always boneIndex 0.
 		/// This will return null if a TranslateTimeline is not found.</summary>
 		public static TranslateTimeline FindTranslateTimelineForBone (this Animation a, int boneIndex) {
-			foreach (var timeline in a.Timelines) {
+			foreach (Timeline timeline in a.Timelines) {
 				if (timeline.GetType().IsSubclassOf(typeof(TranslateTimeline)))
 					continue;
 
-				var translateTimeline = timeline as TranslateTimeline;
+				TranslateTimeline translateTimeline = timeline as TranslateTimeline;
 				if (translateTimeline != null && translateTimeline.BoneIndex == boneIndex)
 					return translateTimeline;
 			}
@@ -130,7 +130,7 @@ namespace Spine.Unity.AnimationTools {
 		/// The root bone is always boneIndex 0.
 		/// This will return null if a timeline of the given type is not found.</summary>
 		public static T FindTimelineForBone<T> (this Animation a, int boneIndex) where T : class, IBoneTimeline {
-			foreach (var timeline in a.Timelines) {
+			foreach (Timeline timeline in a.Timelines) {
 				T translateTimeline = timeline as T;
 				if (translateTimeline != null && translateTimeline.BoneIndex == boneIndex)
 					return translateTimeline;
@@ -143,11 +143,11 @@ namespace Spine.Unity.AnimationTools {
 		/// The root bone is always boneIndex 0.
 		/// This will return null if a TranslateTimeline is not found.</summary>
 		public static TransformConstraintTimeline FindTransformConstraintTimeline (this Animation a, int transformConstraintIndex) {
-			foreach (var timeline in a.Timelines) {
+			foreach (Timeline timeline in a.Timelines) {
 				if (timeline.GetType().IsSubclassOf(typeof(TransformConstraintTimeline)))
 					continue;
 
-				var transformConstraintTimeline = timeline as TransformConstraintTimeline;
+				TransformConstraintTimeline transformConstraintTimeline = timeline as TransformConstraintTimeline;
 				if (transformConstraintTimeline != null &&
 					transformConstraintTimeline.TransformConstraintIndex == transformConstraintIndex)
 					return transformConstraintTimeline;
