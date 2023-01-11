@@ -51,6 +51,10 @@
 #define PROBLEMATIC_PACKAGE_ASSET_MODIFICATION
 #endif
 
+#if UNITY_2017_3_OR_NEWER
+#define HAS_PACKAGE_INFO
+#endif
+
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -112,6 +116,17 @@ namespace Spine.Unity.Editor {
 				AssetUtility.assetsImportedInWrongState.Clear();
 				AssetUtility.ImportSpineContent(combinedAssets, texturesWithoutMetaFile);
 			}
+		}
+
+		public static bool AssetCanBeModified (string assetPath) {
+#if HAS_PACKAGE_INFO
+			UnityEditor.PackageManager.PackageInfo packageInfo = UnityEditor.PackageManager.PackageInfo.FindForAssetPath(assetPath);
+			return (packageInfo == null ||
+			   packageInfo.source == UnityEditor.PackageManager.PackageSource.Embedded ||
+			   packageInfo.source == UnityEditor.PackageManager.PackageSource.Local);
+#else
+			return assetPath.StartsWith("Assets");
+#endif
 		}
 
 		#region Match SkeletonData with Atlases
