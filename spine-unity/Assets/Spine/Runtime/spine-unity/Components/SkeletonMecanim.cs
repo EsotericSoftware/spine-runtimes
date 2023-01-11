@@ -28,8 +28,10 @@
  *****************************************************************************/
 
 using System.Collections.Generic;
-using UnityEditor.Animations;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor.Animations;
+#endif
 
 namespace Spine.Unity {
 	[RequireComponent(typeof(Animator))]

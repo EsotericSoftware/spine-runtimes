@@ -51,8 +51,10 @@
 #define SPINE_OPTIONAL_MATERIALOVERRIDE
 
 using System.Collections.Generic;
-using UnityEditor.SceneManagement;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor.SceneManagement;
+#endif
 
 namespace Spine.Unity {
 	/// <summary>Base class of animated Spine skeleton components. This component manages and renders a skeleton.</summary>
