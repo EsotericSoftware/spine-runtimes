@@ -371,7 +371,7 @@ public class PhysicsConstraint implements Updatable {
 			float s = (float)Math.sqrt(dx * dx + dy * dy) / length, r = atan2(dy, dx), sin = sin(r), cos = cos(r);
 			if (constraint.mix == 1) {
 				bone.updateWorldTransform(bone.ax, bone.ay,
-					atan2(bone.a * sin - bone.c * cos, bone.d * cos - bone.b * sin) * radDeg + bone.arotation - bone.ashearX,
+					atan2Deg(bone.a * sin - bone.c * cos, bone.d * cos - bone.b * sin) + bone.arotation - bone.ashearX,
 					bone.ascaleX * s, bone.ascaleY, bone.ashearX, bone.ashearY);
 			} else {
 				// BOZO

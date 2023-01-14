@@ -93,8 +93,7 @@ public class RegionAttachment extends Attachment implements HasTextureRegion {
 			return;
 		}
 
-		float width = getWidth();
-		float height = getHeight();
+		float width = getWidth(), height = getHeight();
 		float localX2 = width / 2;
 		float localY2 = height / 2;
 		float localX = -localX2;
@@ -113,17 +112,13 @@ public class RegionAttachment extends Attachment implements HasTextureRegion {
 				localY2 -= (region.originalHeight - region.offsetY - region.packedHeight) / region.originalHeight * height;
 			}
 		}
-		float scaleX = getScaleX();
-		float scaleY = getScaleY();
+		float scaleX = getScaleX(), scaleY = getScaleY();
 		localX *= scaleX;
 		localY *= scaleY;
 		localX2 *= scaleX;
 		localY2 *= scaleY;
-		float rotation = getRotation();
-		float cos = (float)Math.cos(degRad * rotation);
-		float sin = (float)Math.sin(degRad * rotation);
-		float x = getX();
-		float y = getY();
+		float r = getRotation() * degRad, cos = cos(r), sin = sin(r);
+		float x = getX(), y = getY();
 		float localXCos = localX * cos + x;
 		float localXSin = localX * sin;
 		float localYCos = localY * cos + y;

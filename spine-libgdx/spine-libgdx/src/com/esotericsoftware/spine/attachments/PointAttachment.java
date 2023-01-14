@@ -29,7 +29,7 @@
 
 package com.esotericsoftware.spine.attachments;
 
-import static com.badlogic.gdx.math.MathUtils.*;
+import static com.esotericsoftware.spine.utils.SpineUtils.*;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
@@ -97,10 +97,10 @@ public class PointAttachment extends Attachment {
 	}
 
 	public float computeWorldRotation (Bone bone) {
-		float cos = cosDeg(rotation), sin = sinDeg(rotation);
+		float r = rotation * degRad, cos = cos(r), sin = sin(r);
 		float x = cos * bone.getA() + sin * bone.getB();
 		float y = cos * bone.getC() + sin * bone.getD();
-		return (float)Math.atan2(y, x) * radDeg;
+		return atan2Deg(y, x);
 	}
 
 	public PointAttachment copy () {

@@ -200,7 +200,7 @@ public class IkConstraint implements Updatable {
 			float sc = pc / bone.skeleton.scaleY;
 			pb = -sc * s * bone.skeleton.scaleX;
 			pd = sa * s * bone.skeleton.scaleY;
-			rotationIK += atan2(sc, sa) * radDeg;
+			rotationIK += atan2Deg(sc, sa);
 			// Fall through.
 		default:
 			float x = targetX - p.worldX, y = targetY - p.worldY;
@@ -208,7 +208,7 @@ public class IkConstraint implements Updatable {
 			tx = (x * pd - y * pb) / d - bone.ax;
 			ty = (y * pa - x * pc) / d - bone.ay;
 		}
-		rotationIK += atan2(ty, tx) * radDeg;
+		rotationIK += atan2Deg(ty, tx);
 		if (bone.ascaleX < 0) rotationIK += 180;
 		if (rotationIK > 180)
 			rotationIK -= 360;

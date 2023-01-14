@@ -444,11 +444,12 @@ public class Skeleton {
 		rootBone.worldX = pa * x + pb * y + parent.worldX;
 		rootBone.worldY = pc * x + pd * y + parent.worldY;
 
-		float rotationY = rootBone.rotation + 90 + rootBone.shearY;
-		float la = cosDeg(rootBone.rotation + rootBone.shearX) * rootBone.scaleX;
-		float lb = cosDeg(rotationY) * rootBone.scaleY;
-		float lc = sinDeg(rootBone.rotation + rootBone.shearX) * rootBone.scaleX;
-		float ld = sinDeg(rotationY) * rootBone.scaleY;
+		float rx = (rootBone.rotation + rootBone.shearX) * degRad;
+		float ry = (rootBone.rotation + 90 + rootBone.shearY) * degRad;
+		float la = cos(rx) * rootBone.scaleX;
+		float lb = cos(ry) * rootBone.scaleY;
+		float lc = sin(rx) * rootBone.scaleX;
+		float ld = sin(ry) * rootBone.scaleY;
 		rootBone.a = (pa * la + pb * lc) * scaleX;
 		rootBone.b = (pa * lb + pb * ld) * scaleX;
 		rootBone.c = (pc * la + pd * lc) * scaleY;
