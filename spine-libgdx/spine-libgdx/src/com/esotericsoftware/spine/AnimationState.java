@@ -221,6 +221,7 @@ public class AnimationState {
 				mix *= applyMixingFrom(current, skeleton, blend);
 			else if (current.trackTime >= current.trackEnd && current.next == null) //
 				mix = 0; // Set to setup pose the last time the entry will be applied.
+			boolean attachments = mix < current.attachmentThreshold;
 
 			// Apply current entry.
 			float animationLast = current.animationLast, animationTime = current.getAnimationTime(), applyTime = animationTime;
@@ -232,10 +233,11 @@ public class AnimationState {
 			int timelineCount = current.animation.timelines.size;
 			Object[] timelines = current.animation.timelines.items;
 			if ((i == 0 && mix == 1) || blend == MixBlend.add) {
+				if (i == 0) attachments = true;
 				for (int ii = 0; ii < timelineCount; ii++) {
 					Object timeline = timelines[ii];
 					if (timeline instanceof AttachmentTimeline)
-						applyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, blend, true);
+						applyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, blend, attachments);
 					else
 						((Timeline)timeline).apply(skeleton, animationLast, applyTime, applyEvents, mix, blend, MixDirection.in);
 				}
@@ -254,7 +256,7 @@ public class AnimationState {
 						applyRotateTimeline((RotateTimeline)timeline, skeleton, applyTime, mix, timelineBlend, timelinesRotation,
 							ii << 1, firstFrame);
 					} else if (timeline instanceof AttachmentTimeline)
-						applyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, blend, true);
+						applyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, blend, attachments);
 					else
 						timeline.apply(skeleton, animationLast, applyTime, applyEvents, mix, timelineBlend, MixDirection.in);
 				}
@@ -1168,6 +1170,17 @@ public class AnimationState {
 
 		public void setMixDuration (float mixDuration) {
 			this.mixDuration = mixDuration;
+		}
+
+		/** Sets both {@link #getMixDuration()} and {@link #getDelay()}.
+		 * @param delay If > 0, sets {@link TrackEntry#getDelay()}. If <= 0, the delay set is the duration of the previous track
+		 *           entry minus the specified mix duration plus the specified <code>delay</code> (ie the mix ends at
+		 *           (<code>delay</code> = 0) or before (<code>delay</code> < 0) the previous track entry duration). If the previous
+		 *           entry is looping, its next loop completion is used instead of its duration. */
+		public void setMixDuration (float mixDuration, float delay) {
+			this.mixDuration = mixDuration;
+			if (previous != null && delay <= 0) delay += previous.getTrackComplete() - mixDuration;
+			this.delay = delay;
 		}
 
 		/** Controls how properties keyed in the animation are mixed with lower tracks. Defaults to {@link MixBlend#replace}.
