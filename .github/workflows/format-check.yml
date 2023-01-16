@@ -11,7 +11,7 @@ jobs:
     - name: Install OS dependencies (needed for act on ubuntu-latest)      
       run: |
         sudo apt update
-        sudo apt install -y --force-yes curl xz-utils libicu-dev git dos2unix
+        sudo apt install -y --force-yes curl xz-utils libicu-dev git dos2unix libncurses5
 
     - uses: actions/checkout@v1      
 
