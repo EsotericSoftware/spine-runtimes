@@ -1,7 +1,8 @@
 name: Check format
 
 on:
-  push:    
+  push:
+  workflow_dispatch:
 
 jobs:
   build:
@@ -51,7 +52,8 @@ jobs:
     - name: Format   
       run: | 
         export CLANGFORMAT=`pwd`/clang/bin/clang-format
-        export PATH="$PATH:/root/.dotnet/tools"      
+        export PATH="$PATH:/root/.dotnet/tools"
+        dotnet-format --version   
         ./formatters/format.sh
         find . -type f -name '*.cs' -exec perl -pi -e 's/\r\n/\n/g' '{}' +
         git diff
