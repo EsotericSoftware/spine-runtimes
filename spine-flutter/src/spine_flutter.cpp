@@ -37,7 +37,7 @@ using namespace spine;
 struct Block {
 	int size;
 	int allocated;
-	uint8_t* memory;
+	uint8_t *memory;
 
 	int free() {
 		return size - allocated;
@@ -47,14 +47,14 @@ struct Block {
 		return free() >= numBytes;
 	}
 
-	uint8_t* allocate(int numBytes) {
+	uint8_t *allocate(int numBytes) {
 		uint8_t *ptr = memory + allocated;
 		allocated += numBytes;
 		return ptr;
 	}
 };
 
-class BlockAllocator : public SpineObject{
+class BlockAllocator : public SpineObject {
 	int initialBlockSize;
 	Vector<Block> blocks;
 
@@ -64,9 +64,9 @@ public:
 	}
 
 	~BlockAllocator() {
-        for (int i = 0; i < blocks.size(); i++) {
-            SpineExtension::free(blocks[i].memory, __FILE__, __LINE__);
-        }
+		for (int i = 0; i < blocks.size(); i++) {
+			SpineExtension::free(blocks[i].memory, __FILE__, __LINE__);
+		}
 	}
 
 	Block newBlock(int numBytes) {
@@ -77,7 +77,7 @@ public:
 
 	template<typename T>
 	T *allocate(size_t num) {
-		return (T *) _allocate((int)(sizeof(T) * num));
+		return (T *) _allocate((int) (sizeof(T) * num));
 	}
 
 	void compress() {
@@ -89,17 +89,18 @@ public:
 		blocks.clear();
 		blocks.add(newBlock(totalSize));
 	}
+
 private:
-    void *_allocate(int numBytes) {
-        // 16-byte align allocations
-        int alignedNumBytes = numBytes + (numBytes % 16 != 0 ? 16 - (numBytes % 16) : 0);
-        Block *block = &blocks[blocks.size() - 1];
-        if (!block->canFit(alignedNumBytes)) {
-            blocks.add(newBlock(MathUtil::max(initialBlockSize, alignedNumBytes)));
-            block = &blocks[blocks.size() - 1];
-        }
-        return block->allocate(alignedNumBytes);
-    }
+	void *_allocate(int numBytes) {
+		// 16-byte align allocations
+		int alignedNumBytes = numBytes + (numBytes % 16 != 0 ? 16 - (numBytes % 16) : 0);
+		Block *block = &blocks[blocks.size() - 1];
+		if (!block->canFit(alignedNumBytes)) {
+			blocks.add(newBlock(MathUtil::max(initialBlockSize, alignedNumBytes)));
+			block = &blocks[blocks.size() - 1];
+		}
+		return block->allocate(alignedNumBytes);
+	}
 };
 
 struct AnimationStateEvent {
@@ -187,19 +188,19 @@ static SpineExtension *defaultExtension = nullptr;
 static DebugExtension *debugExtension = nullptr;
 
 static void initExtensions() {
-    if (defaultExtension == nullptr) {
-        defaultExtension = new DefaultSpineExtension();
-        debugExtension = new DebugExtension(defaultExtension);
-    }
+	if (defaultExtension == nullptr) {
+		defaultExtension = new DefaultSpineExtension();
+		debugExtension = new DebugExtension(defaultExtension);
+	}
 }
 
 spine::SpineExtension *spine::getDefaultExtension() {
-    initExtensions();
+	initExtensions();
 	return defaultExtension;
 }
 
 void spine_enable_debug_extension(int32_t enable) {
-    initExtensions();
+	initExtensions();
 	SpineExtension::setInstance(enable ? debugExtension : defaultExtension);
 }
 
@@ -212,7 +213,7 @@ int32_t spine_minor_version() {
 }
 
 void spine_report_leaks() {
-    initExtensions();
+	initExtensions();
 	debugExtension->reportLeaks();
 	fflush(stdout);
 }
@@ -656,7 +657,7 @@ void spine_skeleton_drawable_dispose(spine_skeleton_drawable drawable) {
 	SpineExtension::free(drawable, __FILE__, __LINE__);
 }
 
-static _spine_render_command *batch_sub_commands(BlockAllocator &allocator, Vector<_spine_render_command*> &commands, int first, int last, int numVertices, int numIndices) {
+static _spine_render_command *batch_sub_commands(BlockAllocator &allocator, Vector<_spine_render_command *> &commands, int first, int last, int numVertices, int numIndices) {
 	_spine_render_command *batched = spine_render_command_create(allocator, numVertices, numIndices, commands[first]->blendMode, commands[first]->atlasPage);
 	float *positions = batched->positions;
 	float *uvs = batched->uvs;
@@ -679,7 +680,7 @@ static _spine_render_command *batch_sub_commands(BlockAllocator &allocator, Vect
 	return batched;
 }
 
-static _spine_render_command *batch_commands(BlockAllocator &allocator, Vector<_spine_render_command*> &commands) {
+static _spine_render_command *batch_commands(BlockAllocator &allocator, Vector<_spine_render_command *> &commands) {
 	if (commands.size() == 0) return nullptr;
 
 	_spine_render_command *root = nullptr;
@@ -1472,7 +1473,7 @@ spine_path_constraint spine_skeleton_find_path_constraint(spine_skeleton skeleto
 }
 
 spine_bounds spine_skeleton_get_bounds(spine_skeleton skeleton) {
-	_spine_bounds *bounds = (_spine_bounds*)malloc(sizeof(_spine_bounds));
+	_spine_bounds *bounds = (_spine_bounds *) malloc(sizeof(_spine_bounds));
 	if (skeleton == nullptr) return (spine_bounds) bounds;
 	Skeleton *_skeleton = (Skeleton *) skeleton;
 	Vector<float> vertices;
