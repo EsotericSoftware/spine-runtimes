@@ -286,7 +286,7 @@ float *spPathConstraint_computeWorldPositions(spPathConstraint *self, spPathAtta
 		float *lengths = path->lengths;
 		curveCount -= closed ? 1 : 2;
 		pathLength = lengths[curveCount];
-		if (self->data->positionMode == SP_POSITION_MODE_PERCENT) position += pathLength;
+		if (self->data->positionMode == SP_POSITION_MODE_PERCENT) position *= pathLength;
 		switch (self->data->spacingMode) {
 			case SP_SPACING_MODE_PERCENT:
 				multiplier = pathLength;
