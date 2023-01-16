@@ -183,7 +183,7 @@ namespace Spine.Unity {
 				texture = AccessPackedTextureEditor(spriteAtlas);
 			else
 #endif
-				texture = AccessPackedTexture(sprites);
+			texture = AccessPackedTexture(sprites);
 
 			Material material = materials[0];
 #if !UNITY_EDITOR

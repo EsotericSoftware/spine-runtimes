@@ -208,7 +208,7 @@ namespace Spine.Unity {
 						DestroyImmediate(collider);
 					else
 #endif
-						Destroy(collider);
+					Destroy(collider);
 				}
 			}
 		}
