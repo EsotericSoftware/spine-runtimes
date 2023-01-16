@@ -41,7 +41,7 @@ jobs:
           path: spine-godot/godot/bin/godot.windows.opt.tools.64.exe
 
   godot-editor-linux:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
         with:
