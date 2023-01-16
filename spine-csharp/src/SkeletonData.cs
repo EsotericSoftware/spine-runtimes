@@ -103,7 +103,7 @@ namespace Spine {
 		/// <returns>May be null.</returns>
 		public BoneData FindBone (string boneName) {
 			if (boneName == null) throw new ArgumentNullException("boneName", "boneName cannot be null.");
-			var bones = this.bones.Items;
+			BoneData[] bones = this.bones.Items;
 			for (int i = 0, n = this.bones.Count; i < n; i++) {
 				BoneData bone = bones[i];
 				if (bone.name == boneName) return bone;
@@ -116,7 +116,7 @@ namespace Spine {
 		/// <returns>May be null.</returns>
 		public SlotData FindSlot (string slotName) {
 			if (slotName == null) throw new ArgumentNullException("slotName", "slotName cannot be null.");
-			var slots = this.slots.Items;
+			SlotData[] slots = this.slots.Items;
 			for (int i = 0, n = this.slots.Count; i < n; i++) {
 				SlotData slot = slots[i];
 				if (slot.name == slotName) return slot;
@@ -149,7 +149,7 @@ namespace Spine {
 		/// <returns>May be null.</returns>
 		public Animation FindAnimation (string animationName) {
 			if (animationName == null) throw new ArgumentNullException("animationName", "animationName cannot be null.");
-			var animations = this.animations.Items;
+			Animation[] animations = this.animations.Items;
 			for (int i = 0, n = this.animations.Count; i < n; i++) {
 				Animation animation = animations[i];
 				if (animation.name == animationName) return animation;
@@ -162,7 +162,7 @@ namespace Spine {
 		/// <returns>May be null.</returns>
 		public IkConstraintData FindIkConstraint (string constraintName) {
 			if (constraintName == null) throw new ArgumentNullException("constraintName", "constraintName cannot be null.");
-			var ikConstraints = this.ikConstraints.Items;
+			IkConstraintData[] ikConstraints = this.ikConstraints.Items;
 			for (int i = 0, n = this.ikConstraints.Count; i < n; i++) {
 				IkConstraintData ikConstraint = ikConstraints[i];
 				if (ikConstraint.name == constraintName) return ikConstraint;
@@ -175,7 +175,7 @@ namespace Spine {
 		/// <returns>May be null.</returns>
 		public TransformConstraintData FindTransformConstraint (string constraintName) {
 			if (constraintName == null) throw new ArgumentNullException("constraintName", "constraintName cannot be null.");
-			var transformConstraints = this.transformConstraints.Items;
+			TransformConstraintData[] transformConstraints = this.transformConstraints.Items;
 			for (int i = 0, n = this.transformConstraints.Count; i < n; i++) {
 				TransformConstraintData transformConstraint = transformConstraints[i];
 				if (transformConstraint.name == constraintName) return transformConstraint;
@@ -192,7 +192,7 @@ namespace Spine {
 		/// <returns>May be null.</returns>
 		public PathConstraintData FindPathConstraint (string constraintName) {
 			if (constraintName == null) throw new ArgumentNullException("constraintName", "constraintName cannot be null.");
-			var pathConstraints = this.pathConstraints.Items;
+			PathConstraintData[] pathConstraints = this.pathConstraints.Items;
 			for (int i = 0, n = this.pathConstraints.Count; i < n; i++) {
 				PathConstraintData constraint = pathConstraints[i];
 				if (constraint.name.Equals(constraintName)) return constraint;

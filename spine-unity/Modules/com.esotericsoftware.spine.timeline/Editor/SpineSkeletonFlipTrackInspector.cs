@@ -40,7 +40,7 @@ namespace Spine.Unity.Editor {
 	public class SpineSkeletonFlipTrackInspector : TrackEditor {
 
 		public override TrackDrawOptions GetTrackOptions (TrackAsset track, UnityEngine.Object binding) {
-			var options = base.GetTrackOptions(track, binding);
+			TrackDrawOptions options = base.GetTrackOptions(track, binding);
 			options.icon = SpineEditorUtilities.Icons.subMeshRenderer;
 			options.trackColor = new Color(0.855f, 0.8623f, 0.87f);
 			return options;

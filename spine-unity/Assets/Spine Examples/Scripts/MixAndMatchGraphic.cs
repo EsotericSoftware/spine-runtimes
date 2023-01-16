@@ -63,7 +63,7 @@ namespace Spine.Unity.Examples {
 
 		void OnValidate () {
 			if (sourceMaterial == null) {
-				var skeletonGraphic = GetComponent<SkeletonGraphic>();
+				SkeletonGraphic skeletonGraphic = GetComponent<SkeletonGraphic>();
 				if (skeletonGraphic != null)
 					sourceMaterial = skeletonGraphic.SkeletonDataAsset.atlasAssets[0].PrimaryMaterial;
 			}
@@ -76,15 +76,15 @@ namespace Spine.Unity.Examples {
 
 		[ContextMenu("Apply")]
 		void Apply () {
-			var skeletonGraphic = GetComponent<SkeletonGraphic>();
-			var skeleton = skeletonGraphic.Skeleton;
+			SkeletonGraphic skeletonGraphic = GetComponent<SkeletonGraphic>();
+			Skeleton skeleton = skeletonGraphic.Skeleton;
 
 			// STEP 0: PREPARE SKINS
 			// Let's prepare a new skin to be our custom skin with equips/customizations. We get a clone so our original skins are unaffected.
 			customSkin = customSkin ?? new Skin("custom skin"); // This requires that all customizations are done with skin placeholders defined in Spine.
 
 			// Next let's get the skin that contains our source attachments. These are the attachments that
-			var baseSkin = skeleton.Data.FindSkin(baseSkinName);
+			Skin baseSkin = skeleton.Data.FindSkin(baseSkinName);
 
 			// STEP 1: "EQUIP" ITEMS USING SPRITES
 			// STEP 1.1 Find the original attachment.
@@ -119,7 +119,7 @@ namespace Spine.Unity.Examples {
 			// 				Combine all the attachment sources into one skin. Usually this means the default skin and the custom skin.
 			// 				call Skin.GetRepackedSkin to get a cloned skin with cloned attachments that all use one texture.
 			if (repack) {
-				var repackedSkin = new Skin("repacked skin");
+				Skin repackedSkin = new Skin("repacked skin");
 				repackedSkin.AddSkin(skeleton.Data.DefaultSkin);
 				repackedSkin.AddSkin(customSkin);
 				// Note: materials and textures returned by GetRepackedSkin() behave like 'new Texture2D()' and need to be destroyed

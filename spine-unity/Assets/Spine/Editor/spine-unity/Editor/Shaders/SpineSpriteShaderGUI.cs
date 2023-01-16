@@ -434,7 +434,7 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 		}
 
 		EditorGUI.BeginChangeCheck();
-		var culling = (eCulling)Mathf.RoundToInt(_culling.floatValue);
+		eCulling culling = (eCulling)Mathf.RoundToInt(_culling.floatValue);
 		EditorGUI.showMixedValue = _culling.hasMixedValue;
 		culling = (eCulling)EditorGUILayout.Popup(_cullingModeText, (int)culling, _cullingModeOptions);
 		if (EditorGUI.EndChangeCheck()) {
@@ -885,7 +885,7 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 	#region Private Functions
 
 	void RenderMeshInfoBox () {
-		var material = (Material)_materialEditor.target;
+		Material material = (Material)_materialEditor.target;
 		bool requiresNormals = _fixedNormal != null && GetMaterialNormalsMode(material) == eNormalsMode.MeshNormals;
 		bool requiresTangents = material.HasProperty("_BumpMap") && material.GetTexture("_BumpMap") != null;
 

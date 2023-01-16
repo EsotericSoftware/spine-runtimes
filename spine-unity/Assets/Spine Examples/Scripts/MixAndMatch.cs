@@ -64,7 +64,7 @@ namespace Spine.Unity.Examples {
 
 		void OnValidate () {
 			if (sourceMaterial == null) {
-				var skeletonAnimation = GetComponent<SkeletonAnimation>();
+				SkeletonAnimation skeletonAnimation = GetComponent<SkeletonAnimation>();
 				if (skeletonAnimation != null)
 					sourceMaterial = skeletonAnimation.SkeletonDataAsset.atlasAssets[0].PrimaryMaterial;
 			}
@@ -76,13 +76,13 @@ namespace Spine.Unity.Examples {
 		}
 
 		void Apply () {
-			var skeletonAnimation = GetComponent<SkeletonAnimation>();
-			var skeleton = skeletonAnimation.Skeleton;
+			SkeletonAnimation skeletonAnimation = GetComponent<SkeletonAnimation>();
+			Skeleton skeleton = skeletonAnimation.Skeleton;
 
 			// STEP 0: PREPARE SKINS
 			// Let's prepare a new skin to be our custom skin with equips/customizations. We get a clone so our original skins are unaffected.
 			customSkin = customSkin ?? new Skin("custom skin"); // This requires that all customizations are done with skin placeholders defined in Spine.
-			var templateSkin = skeleton.Data.FindSkin(templateAttachmentsSkin);
+			Skin templateSkin = skeleton.Data.FindSkin(templateAttachmentsSkin);
 
 			// STEP 1: "EQUIP" ITEMS USING SPRITES
 			// STEP 1.1 Find the original/template attachment.
@@ -120,7 +120,7 @@ namespace Spine.Unity.Examples {
 			// 				Combine all the attachment sources into one skin. Usually this means the default skin and the custom skin.
 			// 				call Skin.GetRepackedSkin to get a cloned skin with cloned attachments that all use one texture.
 			if (repack) {
-				var repackedSkin = new Skin("repacked skin");
+				Skin repackedSkin = new Skin("repacked skin");
 				repackedSkin.AddSkin(skeleton.Data.DefaultSkin); // Include the "default" skin. (everything outside of skin placeholders)
 				repackedSkin.AddSkin(customSkin); // Include your new custom skin.
 

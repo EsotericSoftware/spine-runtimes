@@ -40,7 +40,7 @@ namespace Spine.Unity.Editor {
 	public class SpineAnimationStateTrackInspector : TrackEditor {
 
 		public override TrackDrawOptions GetTrackOptions (TrackAsset track, UnityEngine.Object binding) {
-			var options = base.GetTrackOptions(track, binding);
+			TrackDrawOptions options = base.GetTrackOptions(track, binding);
 			options.icon = SpineEditorUtilities.Icons.skeletonDataAssetIcon;
 			options.trackColor = new Color(255 / 255.0f, 64 / 255.0f, 1 / 255.0f);
 			return options;

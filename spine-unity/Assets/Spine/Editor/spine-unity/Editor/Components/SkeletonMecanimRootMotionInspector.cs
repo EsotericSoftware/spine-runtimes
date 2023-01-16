@@ -58,7 +58,7 @@ namespace Spine.Unity.Editor {
 			int maxLayerCount = 0;
 			int maxIndex = 0;
 			for (int i = 0; i < targets.Length; ++i) {
-				var skeletonMecanim = ((SkeletonMecanimRootMotion)targets[i]).SkeletonMecanim;
+				SkeletonMecanim skeletonMecanim = ((SkeletonMecanimRootMotion)targets[i]).SkeletonMecanim;
 				int count = skeletonMecanim.Translator.MecanimLayerCount;
 				if (count > maxLayerCount) {
 					maxLayerCount = count;
@@ -67,7 +67,7 @@ namespace Spine.Unity.Editor {
 			}
 			if (maxLayerCount == 0)
 				return new string[0];
-			var skeletonMecanimMaxLayers = ((SkeletonMecanimRootMotion)targets[maxIndex]).SkeletonMecanim;
+			SkeletonMecanim skeletonMecanimMaxLayers = ((SkeletonMecanimRootMotion)targets[maxIndex]).SkeletonMecanim;
 			return skeletonMecanimMaxLayers.Translator.MecanimLayerNames;
 		}
 

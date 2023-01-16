@@ -47,14 +47,14 @@ namespace Spine.Unity.Examples {
 
 #if UNITY_EDITOR
 		void OnValidate () {
-			var skeletonComponent = GetComponent<ISkeletonComponent>();
-			var skeletonRenderer = skeletonComponent as SkeletonRenderer;
+			ISkeletonComponent skeletonComponent = GetComponent<ISkeletonComponent>();
+			SkeletonRenderer skeletonRenderer = skeletonComponent as SkeletonRenderer;
 			bool applyPMA;
 
 			if (skeletonRenderer != null) {
 				applyPMA = skeletonRenderer.pmaVertexColors;
 			} else {
-				var skeletonGraphic = skeletonComponent as SkeletonGraphic;
+				SkeletonGraphic skeletonGraphic = skeletonComponent as SkeletonGraphic;
 				applyPMA = skeletonGraphic != null && skeletonGraphic.MeshGenerator.settings.pmaVertexColors;
 			}
 
@@ -82,7 +82,7 @@ namespace Spine.Unity.Examples {
 			AtlasPage atlasPage;
 			atlasPageCache.TryGetValue(texture, out atlasPage);
 			if (atlasPage == null) {
-				var newMaterial = new Material(shader);
+				Material newMaterial = new Material(shader);
 				atlasPage = newMaterial.ToSpineAtlasPage();
 				atlasPageCache[texture] = atlasPage;
 			}
@@ -105,19 +105,19 @@ namespace Spine.Unity.Examples {
 		public void Initialize (bool overwrite = true) {
 			if (overwrite || attachment == null) {
 				// Get the applyPMA value.
-				var skeletonComponent = GetComponent<ISkeletonComponent>();
-				var skeletonRenderer = skeletonComponent as SkeletonRenderer;
+				ISkeletonComponent skeletonComponent = GetComponent<ISkeletonComponent>();
+				SkeletonRenderer skeletonRenderer = skeletonComponent as SkeletonRenderer;
 				if (skeletonRenderer != null)
 					this.applyPMA = skeletonRenderer.pmaVertexColors;
 				else {
-					var skeletonGraphic = skeletonComponent as SkeletonGraphic;
+					SkeletonGraphic skeletonGraphic = skeletonComponent as SkeletonGraphic;
 					if (skeletonGraphic != null)
 						this.applyPMA = skeletonGraphic.MeshGenerator.settings.pmaVertexColors;
 				}
 
 				// Subscribe to UpdateComplete to override animation keys.
 				if (overrideAnimation) {
-					var animatedSkeleton = skeletonComponent as ISkeletonAnimation;
+					ISkeletonAnimation animatedSkeleton = skeletonComponent as ISkeletonAnimation;
 					if (animatedSkeleton != null) {
 						animatedSkeleton.UpdateComplete -= AnimationOverrideSpriteAttach;
 						animatedSkeleton.UpdateComplete += AnimationOverrideSpriteAttach;
@@ -134,7 +134,7 @@ namespace Spine.Unity.Examples {
 		}
 
 		void OnDestroy () {
-			var animatedSkeleton = GetComponent<ISkeletonAnimation>();
+			ISkeletonAnimation animatedSkeleton = GetComponent<ISkeletonAnimation>();
 			if (animatedSkeleton != null)
 				animatedSkeleton.UpdateComplete -= AnimationOverrideSpriteAttach;
 		}
@@ -170,7 +170,7 @@ namespace Spine.Unity.Examples {
 		public static RegionAttachment AddUnitySprite (this SkeletonData skeletonData, string slotName, Sprite sprite, string skinName, Shader shader, bool applyPMA, float rotation = 0f) {
 			RegionAttachment att = applyPMA ? sprite.ToRegionAttachmentPMAClone(shader, rotation: rotation) : sprite.ToRegionAttachment(new Material(shader), rotation);
 
-			var slotIndex = skeletonData.FindSlot(slotName).Index;
+			int slotIndex = skeletonData.FindSlot(slotName).Index;
 			Skin skin = skeletonData.DefaultSkin;
 			if (skinName != "")
 				skin = skeletonData.FindSkin(skinName);

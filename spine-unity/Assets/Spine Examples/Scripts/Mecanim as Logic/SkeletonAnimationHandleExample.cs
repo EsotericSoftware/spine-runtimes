@@ -61,17 +61,17 @@ namespace Spine.Unity.Examples {
 
 		void Awake () {
 			// Initialize AnimationReferenceAssets
-			foreach (var entry in statesAndAnimations) {
+			foreach (StateNameToAnimationReference entry in statesAndAnimations) {
 				entry.animation.Initialize();
 			}
-			foreach (var entry in transitions) {
+			foreach (AnimationTransition entry in transitions) {
 				entry.from.Initialize();
 				entry.to.Initialize();
 				entry.transition.Initialize();
 			}
 
 			// Build Dictionary
-			//foreach (var entry in transitions) {
+			//foreach (AnimationTransition entry in transitions) {
 			//	transitionDictionary.Add(new AnimationStateData.AnimationPair(entry.from.Animation, entry.to.Animation), entry.transition.Animation);
 			//}
 		}
@@ -90,7 +90,7 @@ namespace Spine.Unity.Examples {
 
 		/// <summary>Plays an animation based on the hash of the state name.</summary>
 		public void PlayAnimationForState (int shortNameHash, int layerIndex) {
-			var foundAnimation = GetAnimationForState(shortNameHash);
+			Animation foundAnimation = GetAnimationForState(shortNameHash);
 			if (foundAnimation == null)
 				return;
 
@@ -104,7 +104,7 @@ namespace Spine.Unity.Examples {
 
 		/// <summary>Gets a Spine Animation based on the hash of the state name.</summary>
 		public Spine.Animation GetAnimationForState (int shortNameHash) {
-			var foundState = statesAndAnimations.Find(entry => StringToHash(entry.stateName) == shortNameHash);
+			StateNameToAnimationReference foundState = statesAndAnimations.Find(entry => StringToHash(entry.stateName) == shortNameHash);
 			return (foundState == null) ? null : foundState.animation;
 		}
 
@@ -129,10 +129,10 @@ namespace Spine.Unity.Examples {
 
 		/// <summary>Play a non-looping animation once then continue playing the state animation.</summary>
 		public void PlayOneShot (Spine.Animation oneShot, int layerIndex) {
-			var state = skeletonAnimation.AnimationState;
+			AnimationState state = skeletonAnimation.AnimationState;
 			state.SetAnimation(0, oneShot, false);
 
-			var transition = TryGetTransition(oneShot, TargetAnimation);
+			Animation transition = TryGetTransition(oneShot, TargetAnimation);
 			if (transition != null)
 				state.AddAnimation(0, transition, false, 0f);
 
@@ -140,7 +140,7 @@ namespace Spine.Unity.Examples {
 		}
 
 		Spine.Animation TryGetTransition (Spine.Animation from, Spine.Animation to) {
-			foreach (var transition in transitions) {
+			foreach (AnimationTransition transition in transitions) {
 				if (transition.from.Animation == from && transition.to.Animation == to) {
 					return transition.transition.Animation;
 				}
@@ -153,7 +153,7 @@ namespace Spine.Unity.Examples {
 		}
 
 		Spine.Animation GetCurrentAnimation (int layerIndex) {
-			var currentTrackEntry = skeletonAnimation.AnimationState.GetCurrent(layerIndex);
+			TrackEntry currentTrackEntry = skeletonAnimation.AnimationState.GetCurrent(layerIndex);
 			return (currentTrackEntry != null) ? currentTrackEntry.Animation : null;
 		}
 

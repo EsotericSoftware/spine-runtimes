@@ -110,7 +110,7 @@ namespace Spine.Unity {
 				return;
 			}
 
-			var skeleton = hierarchy.Skeleton;
+			Skeleton skeleton = hierarchy.Skeleton;
 
 			if (bone == null) {
 				if (string.IsNullOrEmpty(boneName)) return;
@@ -124,7 +124,7 @@ namespace Spine.Unity {
 
 			float positionScale = hierarchy.PositionScale;
 
-			var thisTransform = cachedTransform;
+			Transform thisTransform = cachedTransform;
 			float skeletonFlipRotation = Mathf.Sign(skeleton.ScaleX * skeleton.ScaleY);
 			if (mode == Mode.Follow) {
 				switch (phase) {

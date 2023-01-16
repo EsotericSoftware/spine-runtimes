@@ -123,7 +123,7 @@ namespace Spine.Unity {
 
 		protected bool SkeletonAnimationUsesFixedUpdate {
 			get {
-				var skeletonAnimation = skeletonComponent as ISkeletonAnimation;
+				ISkeletonAnimation skeletonAnimation = skeletonComponent as ISkeletonAnimation;
 				if (skeletonAnimation != null) {
 					return skeletonAnimation.UpdateTiming == UpdateTiming.InFixedUpdate;
 				}
@@ -163,7 +163,7 @@ namespace Spine.Unity {
 				initialOffsetRotation = rootMotionBone.Rotation;
 			}
 
-			var skeletonAnimation = skeletonComponent as ISkeletonAnimation;
+			ISkeletonAnimation skeletonAnimation = skeletonComponent as ISkeletonAnimation;
 			if (skeletonAnimation != null) {
 				skeletonAnimation.UpdateLocal -= HandleUpdateLocal;
 				skeletonAnimation.UpdateLocal += HandleUpdateLocal;
@@ -264,7 +264,7 @@ namespace Spine.Unity {
 		}
 
 		public void SetRootMotionBone (string name) {
-			var skeleton = skeletonComponent.Skeleton;
+			Skeleton skeleton = skeletonComponent.Skeleton;
 			Bone bone = skeleton.FindBone(name);
 			if (bone != null) {
 				this.rootMotionBoneIndex = bone.Data.Index;
@@ -328,7 +328,7 @@ namespace Spine.Unity {
 				endPos = TimelineExtensions.Evaluate(xTimeline, yTimeline, endTime);
 				startPos = TimelineExtensions.Evaluate(xTimeline, yTimeline, startTime);
 			}
-			var transformConstraintsItems = skeletonComponent.Skeleton.TransformConstraints.Items;
+			TransformConstraint[] transformConstraintsItems = skeletonComponent.Skeleton.TransformConstraints.Items;
 			foreach (int constraintIndex in this.transformConstraintIndices) {
 				TransformConstraint constraint = transformConstraintsItems[constraintIndex];
 				ApplyConstraintToPos(animation, constraint, constraintIndex, endTime, false, ref endPos);
@@ -377,7 +377,7 @@ namespace Spine.Unity {
 				endRotation = rotateTimeline.Evaluate(endTime);
 				startRotation = rotateTimeline.Evaluate(startTime);
 			}
-			var transformConstraintsItems = skeletonComponent.Skeleton.TransformConstraints.Items;
+			TransformConstraint[] transformConstraintsItems = skeletonComponent.Skeleton.TransformConstraints.Items;
 			foreach (int constraintIndex in this.transformConstraintIndices) {
 				TransformConstraint constraint = transformConstraintsItems[constraintIndex];
 				ApplyConstraintToRotation(animation, constraint, constraintIndex, endTime, false, ref endRotation);
@@ -482,14 +482,14 @@ namespace Spine.Unity {
 		}
 
 		int GetConstraintLastPosIndex (int constraintIndex) {
-			var constraints = skeletonComponent.Skeleton.TransformConstraints;
+			ExposedList<TransformConstraint> constraints = skeletonComponent.Skeleton.TransformConstraints;
 			TransformConstraint targetConstraint = constraints.Items[constraintIndex];
 			return transformConstraintIndices.FindIndex(addedIndex => addedIndex == constraintIndex);
 		}
 
 		void FindTransformConstraintsAffectingBone () {
-			var constraints = skeletonComponent.Skeleton.TransformConstraints;
-			var constraintsItems = constraints.Items;
+			ExposedList<TransformConstraint> constraints = skeletonComponent.Skeleton.TransformConstraints;
+			TransformConstraint[] constraintsItems = constraints.Items;
 			for (int i = 0, n = constraints.Count; i < n; ++i) {
 				TransformConstraint constraint = constraintsItems[i];
 				if (constraint.Bones.Contains(rootMotionBone)) {
@@ -522,8 +522,8 @@ namespace Spine.Unity {
 
 		void GatherTopLevelBones () {
 			topLevelBones.Clear();
-			var skeleton = skeletonComponent.Skeleton;
-			foreach (var bone in skeleton.Bones) {
+			Skeleton skeleton = skeletonComponent.Skeleton;
+			foreach (Bone bone in skeleton.Bones) {
 				if (bone.Parent == null)
 					topLevelBones.Add(bone);
 			}
@@ -600,7 +600,7 @@ namespace Spine.Unity {
 			rootMotionBone.AX = rootMotionBone.X;
 			rootMotionBone.AY = rootMotionBone.Y;
 			rootMotionBone.AppliedRotation = rootMotionBone.Rotation;
-			var transformConstraintsItems = skeletonComponent.Skeleton.TransformConstraints.Items;
+			TransformConstraint[] transformConstraintsItems = skeletonComponent.Skeleton.TransformConstraints.Items;
 			foreach (int constraintIndex in this.transformConstraintIndices) {
 				TransformConstraint constraint = transformConstraintsItems[constraintIndex];
 				// apply the constraint and sets Bone.ax, Bone.ay and Bone.arotation values.
@@ -616,7 +616,7 @@ namespace Spine.Unity {
 		}
 
 		Vector2 GetScaleAffectingRootMotion (out Vector2 parentBoneScale) {
-			var skeleton = skeletonComponent.Skeleton;
+			Skeleton skeleton = skeletonComponent.Skeleton;
 			Vector2 totalScale = Vector2.one;
 			totalScale.x *= skeleton.ScaleX;
 			totalScale.y *= skeleton.ScaleY;
@@ -661,8 +661,8 @@ namespace Spine.Unity {
 			ApplyTransformConstraints();
 
 			// Move top level bones in opposite direction of the root motion bone
-			var skeleton = skeletonComponent.Skeleton;
-			foreach (var topLevelBone in topLevelBones) {
+			Skeleton skeleton = skeletonComponent.Skeleton;
+			foreach (Bone topLevelBone in topLevelBones) {
 				if (topLevelBone == rootMotionBone) {
 					if (transformPositionX) topLevelBone.X = displacementSkeletonSpace.x / skeleton.ScaleX;
 					if (transformPositionY) topLevelBone.Y = displacementSkeletonSpace.y / skeleton.ScaleY;

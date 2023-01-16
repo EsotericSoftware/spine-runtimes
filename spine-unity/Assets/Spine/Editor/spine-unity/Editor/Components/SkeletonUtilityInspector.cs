@@ -129,7 +129,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		void SpawnHierarchyContextMenu () {
-			var menu = new GenericMenu();
+			GenericMenu menu = new GenericMenu();
 
 			menu.AddItem(new GUIContent("Follow all bones"), false, SpawnFollowHierarchy);
 			menu.AddItem(new GUIContent("Follow (Root Only)"), false, SpawnFollowHierarchyRootOnly);
@@ -161,8 +161,8 @@ namespace Spine.Unity.Editor {
 
 		static void AttachIconsToChildren (Transform root) {
 			if (root != null) {
-				var utilityBones = root.GetComponentsInChildren<SkeletonUtilityBone>();
-				foreach (var utilBone in utilityBones)
+				SkeletonUtilityBone[] utilityBones = root.GetComponentsInChildren<SkeletonUtilityBone>();
+				foreach (SkeletonUtilityBone utilBone in utilityBones)
 					AttachIcon(utilBone);
 			}
 		}

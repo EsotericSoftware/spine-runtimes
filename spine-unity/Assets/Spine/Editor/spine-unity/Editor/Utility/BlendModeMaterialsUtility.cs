@@ -57,14 +57,14 @@ namespace Spine.Unity.Editor {
 		};
 
 		public static void UpgradeBlendModeMaterials (SkeletonDataAsset skeletonDataAsset) {
-			var skeletonData = skeletonDataAsset.GetSkeletonData(true);
+			SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(true);
 			if (skeletonData == null)
 				return;
 			UpdateBlendModeMaterials(skeletonDataAsset, ref skeletonData, true);
 		}
 
 		public static void UpdateBlendModeMaterials (SkeletonDataAsset skeletonDataAsset) {
-			var skeletonData = skeletonDataAsset.GetSkeletonData(true);
+			SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(true);
 			if (skeletonData == null)
 				return;
 			UpdateBlendModeMaterials(skeletonDataAsset, ref skeletonData, false);
@@ -76,7 +76,7 @@ namespace Spine.Unity.Editor {
 			TemplateMaterials templateMaterials = new TemplateMaterials();
 			bool anyMaterialsChanged = ClearUndesiredMaterialEntries(skeletonDataAsset);
 
-			var blendModesModifierAsset = FindBlendModeMaterialsModifierAsset(skeletonDataAsset);
+			BlendModeMaterialsAsset blendModesModifierAsset = FindBlendModeMaterialsModifierAsset(skeletonDataAsset);
 			if (blendModesModifierAsset) {
 				if (upgradeFromModifierAssets) {
 					TransferSettingsFromModifierAsset(blendModesModifierAsset,
@@ -118,7 +118,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		protected static BlendModeMaterialsAsset FindBlendModeMaterialsModifierAsset (SkeletonDataAsset skeletonDataAsset) {
-			foreach (var modifierAsset in skeletonDataAsset.skeletonDataModifiers) {
+			foreach (SkeletonDataModifierAsset modifierAsset in skeletonDataAsset.skeletonDataModifiers) {
 				if (modifierAsset is BlendModeMaterialsAsset)
 					return (BlendModeMaterialsAsset)modifierAsset;
 			}
@@ -159,18 +159,18 @@ namespace Spine.Unity.Editor {
 			TemplateMaterials templateMaterials, ref bool anyReplacementMaterialsChanged) {
 
 			bool anyCreationFailed = false;
-			var blendModeMaterials = skeletonDataAsset.blendModeMaterials;
+			BlendModeMaterials blendModeMaterials = skeletonDataAsset.blendModeMaterials;
 			bool applyAdditiveMaterial = blendModeMaterials.applyAdditiveMaterial;
 
-			var skinEntries = new List<Skin.SkinEntry>();
+			List<Skin.SkinEntry> skinEntries = new List<Skin.SkinEntry>();
 
 			SpineEditorUtilities.ClearSkeletonDataAsset(skeletonDataAsset);
 			skeletonDataAsset.isUpgradingBlendModeMaterials = true;
 			SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(true);
 
-			var slotsItems = skeletonData.Slots.Items;
+			SlotData[] slotsItems = skeletonData.Slots.Items;
 			for (int slotIndex = 0, slotCount = skeletonData.Slots.Count; slotIndex < slotCount; slotIndex++) {
-				var slot = slotsItems[slotIndex];
+				SlotData slot = slotsItems[slotIndex];
 				if (slot.BlendMode == BlendMode.Normal) continue;
 				if (!applyAdditiveMaterial && slot.BlendMode == BlendMode.Additive) continue;
 
@@ -196,13 +196,13 @@ namespace Spine.Unity.Editor {
 				}
 
 				skinEntries.Clear();
-				foreach (var skin in skeletonData.Skins)
+				foreach (Skin skin in skeletonData.Skins)
 					skin.GetAttachments(slotIndex, skinEntries);
 
-				foreach (var entry in skinEntries) {
-					var renderableAttachment = entry.Attachment as IHasTextureRegion;
+				foreach (Skin.SkinEntry entry in skinEntries) {
+					IHasTextureRegion renderableAttachment = entry.Attachment as IHasTextureRegion;
 					if (renderableAttachment != null) {
-						var originalRegion = (AtlasRegion)renderableAttachment.Region;
+						AtlasRegion originalRegion = (AtlasRegion)renderableAttachment.Region;
 						if (originalRegion != null) {
 							anyCreationFailed |= CreateForRegion(
 								ref replacementMaterials, ref anyReplacementMaterialsChanged,
@@ -236,7 +236,7 @@ namespace Spine.Unity.Editor {
 				replacement => replacement.pageName == originalRegion.page.name);
 			if (!replacementExists) {
 				bool createdNewMaterial;
-				var replacement = CreateOrLoadReplacementMaterial(originalRegion, materialTemplate, materialSuffix, out createdNewMaterial);
+				BlendModeMaterials.ReplacementMaterial replacement = CreateOrLoadReplacementMaterial(originalRegion, materialTemplate, materialSuffix, out createdNewMaterial);
 				if (replacement != null) {
 					replacementMaterials.Add(replacement);
 					anyReplacementMaterialsChanged = true;
@@ -256,8 +256,8 @@ namespace Spine.Unity.Editor {
 		}
 
 		protected static string GetBlendModeMaterialPath (AtlasPage originalPage, string materialSuffix) {
-			var originalMaterial = originalPage.rendererObject as Material;
-			var originalPath = AssetDatabase.GetAssetPath(originalMaterial);
+			Material originalMaterial = originalPage.rendererObject as Material;
+			string originalPath = AssetDatabase.GetAssetPath(originalMaterial);
 			return originalPath.Replace(".mat", materialSuffix + ".mat");
 		}
 
@@ -265,16 +265,16 @@ namespace Spine.Unity.Editor {
 			AtlasRegion originalRegion, Material materialTemplate, string materialSuffix, out bool createdNewMaterial) {
 
 			createdNewMaterial = false;
-			var newReplacement = new BlendModeMaterials.ReplacementMaterial();
-			var originalPage = originalRegion.page;
-			var originalMaterial = originalPage.rendererObject as Material;
-			var blendMaterialPath = GetBlendModeMaterialPath(originalPage, materialSuffix);
+			BlendModeMaterials.ReplacementMaterial newReplacement = new BlendModeMaterials.ReplacementMaterial();
+			AtlasPage originalPage = originalRegion.page;
+			Material originalMaterial = originalPage.rendererObject as Material;
+			string blendMaterialPath = GetBlendModeMaterialPath(originalPage, materialSuffix);
 
 			newReplacement.pageName = originalPage.name;
 			if (File.Exists(blendMaterialPath)) {
 				newReplacement.material = AssetDatabase.LoadAssetAtPath<Material>(blendMaterialPath);
 			} else {
-				var blendModeMaterial = new Material(materialTemplate) {
+				Material blendModeMaterial = new Material(materialTemplate) {
 					name = originalMaterial.name + " " + materialTemplate.name,
 					mainTexture = originalMaterial.mainTexture
 				};

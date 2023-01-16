@@ -821,7 +821,7 @@ namespace Spine {
 				Expect(1, "dispose", 1, 2.1f) //
 			);
 			state.SetAnimation(0, "events0", false);
-			var entry1 = state.AddAnimation(0, "events1", false, 0);
+			TrackEntry entry1 = state.AddAnimation(0, "events1", false, 0);
 			entry1.MixDuration = 0.25f;
 			entry1.TrackEnd = 1.0f;
 			Run(0.1f, 1000, null);

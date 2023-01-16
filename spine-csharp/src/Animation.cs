@@ -66,7 +66,7 @@ namespace Spine {
 			string[] propertyIds = new string[idCount];
 			int currentId = 0;
 			for (int t = 0; t < timelinesCount; ++t) {
-				var ids = timelinesItems[t].PropertyIds;
+				string[] ids = timelinesItems[t].PropertyIds;
 				for (int i = 0, idsLength = ids.Length; i < idsLength; ++i)
 					propertyIds[currentId++] = ids[i];
 			}
@@ -115,7 +115,7 @@ namespace Spine {
 				if (lastTime > 0) lastTime %= duration;
 			}
 
-			var timelines = this.timelines.Items;
+			Timeline[] timelines = this.timelines.Items;
 			for (int i = 0, n = this.timelines.Count; i < n; i++)
 				timelines[i].Apply(skeleton, lastTime, time, events, alpha, blend, direction);
 		}
@@ -1173,7 +1173,7 @@ namespace Spine {
 
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
-				var setup = slot.data;
+				SlotData setup = slot.data;
 				switch (blend) {
 				case MixBlend.Setup:
 					slot.r = setup.r;
@@ -1289,7 +1289,7 @@ namespace Spine {
 
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
-				var setup = slot.data;
+				SlotData setup = slot.data;
 				switch (blend) {
 				case MixBlend.Setup:
 					slot.r = setup.r;
@@ -1338,7 +1338,7 @@ namespace Spine {
 			} else {
 				float br, bg, bb;
 				if (blend == MixBlend.Setup) {
-					var setup = slot.data;
+					SlotData setup = slot.data;
 					br = setup.r;
 					bg = setup.g;
 					bb = setup.b;
@@ -1377,7 +1377,7 @@ namespace Spine {
 
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
-				var setup = slot.data;
+				SlotData setup = slot.data;
 				switch (blend) {
 				case MixBlend.Setup:
 					slot.a = setup.a;
@@ -1869,10 +1869,10 @@ namespace Spine {
 
 			Slot slot = skeleton.slots.Items[slotIndex];
 			if (!slot.bone.active) return;
-			var vertexAttachment = slot.attachment as VertexAttachment;
+			VertexAttachment vertexAttachment = slot.attachment as VertexAttachment;
 			if (vertexAttachment == null || vertexAttachment.TimelineAttachment != attachment) return;
 
-			var deformArray = slot.deform;
+			ExposedList<float> deformArray = slot.deform;
 			if (deformArray.Count == 0) blend = MixBlend.Setup;
 
 			float[][] vertices = this.vertices;
