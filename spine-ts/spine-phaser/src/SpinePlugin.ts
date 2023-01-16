@@ -168,7 +168,7 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 		if (this.webGLRenderer) this.webGLRenderer.dispose();
 	}
 
-	isAtlasPremultiplied(atlasKey: string) {
+	isAtlasPremultiplied (atlasKey: string) {
 		let atlasFile = this.game.cache.text.get(atlasKey);
 		if (!atlasFile) return false;
 		return atlasFile.premultipliedAlpha;
@@ -305,7 +305,7 @@ export class SpineAtlasFile extends Phaser.Loader.MultiFile {
 				} else {
 					file.data = {
 						data: file.data,
-						premultipliedAlpha: this.premultipliedAlpha || file.data.indexOf("pma: true") >= 0
+						premultipliedAlpha: this.premultipliedAlpha || file.data.indexOf("pma: true") >= 0
 					};
 					file.addToCache();
 				}

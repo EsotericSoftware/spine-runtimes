@@ -83,13 +83,13 @@ export class Skeleton {
 
 	/** Scales the entire skeleton on the Y axis. This affects all bones, even if the bone's transform mode disallows scale
 	  * inheritance. */
-	private _scaleY	= 1;
+	private _scaleY = 1;
 
-	public get scaleY() {
+	public get scaleY () {
 		return Skeleton.yDown ? -this._scaleY : this._scaleY;
 	}
 
-	public set scaleY(scaleY: number) {
+	public set scaleY (scaleY: number) {
 		this._scaleY = scaleY;
 	}
 

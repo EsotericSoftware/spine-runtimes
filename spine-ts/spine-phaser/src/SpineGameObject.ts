@@ -5,17 +5,17 @@ import { AnimationState, AnimationStateData, Bone, MathUtils, Skeleton, Skin, Ve
 import { Vector3 } from "@esotericsoftware/spine-webgl";
 
 class BaseSpineGameObject extends Phaser.GameObjects.GameObject {
-	constructor(scene: Phaser.Scene, type: string) {
+	constructor (scene: Phaser.Scene, type: string) {
 		super(scene, type);
 	}
 }
 
 export interface SpineGameObjectBoundsProvider {
-	calculateBounds(gameObject: SpineGameObject): { x: number, y: number, width: number, height: number };
+	calculateBounds (gameObject: SpineGameObject): { x: number, y: number, width: number, height: number };
 }
 
 export class SetupPoseBoundsProvider implements SpineGameObjectBoundsProvider {
-	calculateBounds(gameObject: SpineGameObject) {
+	calculateBounds (gameObject: SpineGameObject) {
 		if (!gameObject.skeleton) return { x: 0, y: 0, width: 0, height: 0 };
 		// Make a copy of animation state and skeleton as this might be called while
 		// the skeleton in the GameObject has already been heavily modified. We can not
@@ -28,11 +28,11 @@ export class SetupPoseBoundsProvider implements SpineGameObjectBoundsProvider {
 }
 
 export class SkinsAndAnimationBoundsProvider implements SpineGameObjectBoundsProvider {
-	constructor(private animation: string, private skins: string[] = [], private timeStep: number = 0.05) {
+	constructor (private animation: string, private skins: string[] = [], private timeStep: number = 0.05) {
 
 	}
 
-	calculateBounds(gameObject: SpineGameObject): { x: number; y: number; width: number; height: number; } {
+	calculateBounds (gameObject: SpineGameObject): { x: number; y: number; width: number; height: number; } {
 		if (!gameObject.skeleton || !gameObject.animationState) return { x: 0, y: 0, width: 0, height: 0 };
 		// Make a copy of animation state and skeleton as this might be called while
 		// the skeleton in the GameObject has already been heavily modified. We can not
@@ -87,13 +87,13 @@ export class SpineGameObject extends ComputedSizeMixin(DepthMixin(FlipMixin(Scro
 	private _scaleX = 1;
 	private _scaleY = 1;
 
-	constructor(scene: Phaser.Scene, private plugin: SpinePlugin, x: number, y: number, dataKey: string, atlasKey: string, public boundsProvider: SpineGameObjectBoundsProvider = new SetupPoseBoundsProvider()) {
+	constructor (scene: Phaser.Scene, private plugin: SpinePlugin, x: number, y: number, dataKey: string, atlasKey: string, public boundsProvider: SpineGameObjectBoundsProvider = new SetupPoseBoundsProvider()) {
 		super(scene, SPINE_GAME_OBJECT_TYPE);
 		this.setPosition(x, y); x
 		this.setSkeleton(dataKey, atlasKey);
 	}
 
-	setSkeleton(dataKey: string, atlasKey: string) {
+	setSkeleton (dataKey: string, atlasKey: string) {
 		if (dataKey && atlasKey) {
 			this.premultipliedAlpha = this.plugin.isAtlasPremultiplied(atlasKey);
 			this.skeleton = this.plugin.createSkeleton(dataKey, atlasKey);
@@ -107,41 +107,41 @@ export class SpineGameObject extends ComputedSizeMixin(DepthMixin(FlipMixin(Scro
 		}
 	}
 
-	public get displayOriginX() {
+	public get displayOriginX () {
 		return this._displayOriginX;
 	}
 
-	public set displayOriginX(value: number) {
+	public set displayOriginX (value: number) {
 		this._displayOriginX = value;
 	}
 
-	public get displayOriginY() {
+	public get displayOriginY () {
 		return this._displayOriginY;
 	}
 
-	public set displayOriginY(value: number) {
+	public set displayOriginY (value: number) {
 		this._displayOriginY = value;
 	}
 
-	public get scaleX() {
+	public get scaleX () {
 		return this._scaleX;
 	}
 
-	public set scaleX(value: number) {
+	public set scaleX (value: number) {
 		this._scaleX = value;
 		this.updateSize();
 	}
 
-	public get scaleY() {
+	public get scaleY () {
 		return this._scaleY;
 	}
 
-	public set scaleY(value: number) {
+	public set scaleY (value: number) {
 		this._scaleY = value;
 		this.updateSize();
 	}
 
-	updateSize() {
+	updateSize () {
 		if (!this.skeleton) return;
 		let bounds = this.boundsProvider.calculateBounds(this);
 		// For some reason the TS compiler and the ComputedSize mixin don't work well together...
@@ -152,7 +152,7 @@ export class SpineGameObject extends ComputedSizeMixin(DepthMixin(FlipMixin(Scro
 		this.displayOriginY = -bounds.y;
 	}
 
-	skeletonToPhaserWorldCoordinates(point: {x: number, y: number}) {
+	skeletonToPhaserWorldCoordinates (point: { x: number, y: number }) {
 		let transform = this.getWorldTransformMatrix();
 		let a = transform.a, b = transform.b, c = transform.c, d = transform.d, tx = transform.tx, ty = transform.ty;
 		let x = point.x
@@ -161,7 +161,7 @@ export class SpineGameObject extends ComputedSizeMixin(DepthMixin(FlipMixin(Scro
 		point.y = x * b + y * d + ty;
 	}
 
-	phaserWorldCoordinatesToSkeleton(point: {x: number, y: number}) {
+	phaserWorldCoordinatesToSkeleton (point: { x: number, y: number }) {
 		let transform = this.getWorldTransformMatrix();
 		transform = transform.invert();
 		let a = transform.a, b = transform.b, c = transform.c, d = transform.d, tx = transform.tx, ty = transform.ty;
@@ -171,7 +171,7 @@ export class SpineGameObject extends ComputedSizeMixin(DepthMixin(FlipMixin(Scro
 		point.y = x * b + y * d + ty;
 	}
 
-	phaserWorldCoordinatesToBone(point: {x: number, y: number}, bone: Bone) {
+	phaserWorldCoordinatesToBone (point: { x: number, y: number }, bone: Bone) {
 		this.phaserWorldCoordinatesToSkeleton(point);
 		if (bone.parent) {
 			bone.parent.worldToLocal(point as Vector2);
@@ -180,7 +180,7 @@ export class SpineGameObject extends ComputedSizeMixin(DepthMixin(FlipMixin(Scro
 		}
 	}
 
-	preUpdate(time: number, delta: number) {
+	preUpdate (time: number, delta: number) {
 		if (!this.skeleton || !this.animationState) return;
 
 		this.animationState.update(delta / 1000);
@@ -188,13 +188,13 @@ export class SpineGameObject extends ComputedSizeMixin(DepthMixin(FlipMixin(Scro
 		this.skeleton.updateWorldTransform();
 	}
 
-	preDestroy() {
+	preDestroy () {
 		this.skeleton = null;
 		this.animationState = null;
 		// FIXME tear down any event emitters
 	}
 
-	willRender(camera: Phaser.Cameras.Scene2D.Camera) {
+	willRender (camera: Phaser.Cameras.Scene2D.Camera) {
 		if (!this.visible) return false;
 
 		var GameObjectRenderMask = 0xf;
@@ -203,7 +203,7 @@ export class SpineGameObject extends ComputedSizeMixin(DepthMixin(FlipMixin(Scro
 		return result;
 	}
 
-	renderWebGL(renderer: Phaser.Renderer.WebGL.WebGLRenderer, src: SpineGameObject, camera: Phaser.Cameras.Scene2D.Camera, parentMatrix: Phaser.GameObjects.Components.TransformMatrix) {
+	renderWebGL (renderer: Phaser.Renderer.WebGL.WebGLRenderer, src: SpineGameObject, camera: Phaser.Cameras.Scene2D.Camera, parentMatrix: Phaser.GameObjects.Components.TransformMatrix) {
 		if (!this.skeleton || !this.animationState || !this.plugin.webGLRenderer) return;
 
 		let sceneRenderer = this.plugin.webGLRenderer;
@@ -230,7 +230,7 @@ export class SpineGameObject extends ComputedSizeMixin(DepthMixin(FlipMixin(Scro
 		}
 	}
 
-	renderCanvas(renderer: Phaser.Renderer.Canvas.CanvasRenderer, src: SpineGameObject, camera: Phaser.Cameras.Scene2D.Camera, parentMatrix: Phaser.GameObjects.Components.TransformMatrix) {
+	renderCanvas (renderer: Phaser.Renderer.Canvas.CanvasRenderer, src: SpineGameObject, camera: Phaser.Cameras.Scene2D.Camera, parentMatrix: Phaser.GameObjects.Components.TransformMatrix) {
 		if (!this.skeleton || !this.animationState || !this.plugin.canvasRenderer) return;
 
 		let context = renderer.currentContext;

@@ -91,6 +91,8 @@ namespace Spine.Unity.Editor {
 				string[] prefabAssets = AssetDatabase.FindAssets("t:Prefab");
 				foreach (string asset in prefabAssets) {
 					string assetPath = AssetDatabase.GUIDToAssetPath(asset);
+					if (!AssetUtility.AssetCanBeModified(assetPath)) continue;
+
 					GameObject prefabGameObject = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
 					if (SpineEditorUtilities.CleanupSpinePrefabMesh(prefabGameObject)) {
 #if HAS_SAVE_ASSET_IF_DIRTY
@@ -139,6 +141,8 @@ namespace Spine.Unity.Editor {
 				string[] spriteAtlasAssets = AssetDatabase.FindAssets("t:SpineSpriteAtlasAsset");
 				foreach (string asset in spriteAtlasAssets) {
 					string assetPath = AssetDatabase.GUIDToAssetPath(asset);
+					if (!AssetUtility.AssetCanBeModified(assetPath)) continue;
+
 					SpineSpriteAtlasAsset atlasAsset = AssetDatabase.LoadAssetAtPath<SpineSpriteAtlasAsset>(assetPath);
 					if (atlasAsset && atlasAsset.materials.Length > 0) {
 						spriteAtlasTexturesToRestore[assetPath] = AssetDatabase.GetAssetPath(atlasAsset.materials[0].mainTexture);
