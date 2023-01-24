@@ -1,17 +1,17 @@
 diff --git a/methods.py b/methods.py
-index 9b8cb38c0c1c0fd4ba2917815fdfb7efafb4b646..874e10bcc637632db26b4ac062a5359cd44eaa25 100644
+index 436fe63..d6c81b9 100644
 --- a/methods.py
 +++ b/methods.py
-@@ -688,6 +688,7 @@ def generate_vs_project(env, num_jobs):
-                 "target=$(Configuration)",
-                 "progress=no",
-                 "tools=!tools!",
-+                "livepp=%s" % env["livepp"],
-                 "-j%s" % num_jobs,
-             ]
+@@ -782,6 +782,7 @@ def generate_vs_project(env, num_jobs):
+                     f"target={configuration_getter}",
+                     "progress=no",
+                     "tools=!tools!",
++                    "livepp=%s" % env["livepp"],
+                     "-j%s" % num_jobs,
+                 ]
  
 diff --git a/platform/windows/detect.py b/platform/windows/detect.py
-index e4facad816b7584fe38dc760356310e0a3937288..2d9da3df65cd3a0b0882ace984002320ebf6c3fc 100644
+index e6829ae..3a7e38d 100644
 --- a/platform/windows/detect.py
 +++ b/platform/windows/detect.py
 @@ -44,7 +44,7 @@ def can_build():
@@ -23,7 +23,7 @@ index e4facad816b7584fe38dc760356310e0a3937288..2d9da3df65cd3a0b0882ace984002320
  
      mingw32 = ""
      mingw64 = ""
-@@ -72,6 +72,7 @@ def get_opts():
+@@ -73,6 +73,7 @@ def get_opts():
          BoolVariable("use_thinlto", "Use ThinLTO", False),
          BoolVariable("use_static_cpp", "Link MinGW/MSVC C++ runtime libraries statically", True),
          BoolVariable("use_asan", "Use address sanitizer (ASAN)", False),
@@ -31,7 +31,7 @@ index e4facad816b7584fe38dc760356310e0a3937288..2d9da3df65cd3a0b0882ace984002320
      ]
  
  
-@@ -296,6 +297,18 @@ def configure_msvc(env, manual_msvc_config):
+@@ -305,6 +306,22 @@ def configure_msvc(env, manual_msvc_config):
  
      env.AppendUnique(LINKFLAGS=["/STACK:" + str(STACK_SIZE)])
  
@@ -39,19 +39,23 @@ index e4facad816b7584fe38dc760356310e0a3937288..2d9da3df65cd3a0b0882ace984002320
 +    # some sanity checks.
 +    if env.get("livepp"):
 +        if env["target"] == "release_debug" or env["target"] == "debug":
-+            print("Found Live++ at %s" % env.get("livepp"))
-+            env.AppendUnique(CPPDEFINES=["LIVEPP_PATH=%s" % env.get("livepp")])
-+            env.AppendUnique(CPPPATH=[env.get("livepp")])
-+            env.AppendUnique(LINKFLAGS=["/FUNCTIONPADMIN"])
++            if os.path.exists(env.get("livepp")):
++                print("Found Live++ at %s" % env.get("livepp"))
++                env.AppendUnique(CPPDEFINES=["LIVEPP_PATH=%s" % env.get("livepp")])
++                env.AppendUnique(CPPPATH=[env.get("livepp")])
++                env.AppendUnique(LINKFLAGS=["/FUNCTIONPADMIN"])
++            else:
++                printf("Specified Live++ path does not exist")
 +        else:
 +            print("Live++ can only be used with targets 'debug' and 'release_debug'")
 +    else:
 +        print("No Live++ specified.")
++
  
  def configure_mingw(env):
      # Workaround for MinGW. See:
 diff --git a/platform/windows/godot_windows.cpp b/platform/windows/godot_windows.cpp
-index d7d9e4eace00a696abbb47cb9632f40e183a4ec4..e362320e51c725cd01f292887bd93442752c1c48 100644
+index ef70c33..957158e 100644
 --- a/platform/windows/godot_windows.cpp
 +++ b/platform/windows/godot_windows.cpp
 @@ -34,6 +34,11 @@
@@ -66,7 +70,7 @@ index d7d9e4eace00a696abbb47cb9632f40e183a4ec4..e362320e51c725cd01f292887bd93442
  // For export templates, add a section; the exporter will patch it to enclose
  // the data appended to the executable (bundled PCK)
  #ifndef TOOLS_ENABLED
-@@ -136,6 +141,16 @@ char *wc_to_utf8(const wchar_t *wc) {
+@@ -147,6 +152,16 @@ char *wc_to_utf8(const wchar_t *wc) {
  }
  
  __declspec(dllexport) int widechar_main(int argc, wchar_t **argv) {
@@ -83,7 +87,7 @@ index d7d9e4eace00a696abbb47cb9632f40e183a4ec4..e362320e51c725cd01f292887bd93442
  	OS_Windows os(NULL);
  
  	setlocale(LC_CTYPE, "");
-@@ -170,6 +185,11 @@ __declspec(dllexport) int widechar_main(int argc, wchar_t **argv) {
+@@ -180,6 +195,11 @@ __declspec(dllexport) int widechar_main(int argc, wchar_t **argv) {
  	}
  	delete[] argv_utf8;
  
@@ -96,7 +100,7 @@ index d7d9e4eace00a696abbb47cb9632f40e183a4ec4..e362320e51c725cd01f292887bd93442
  };
  
 diff --git a/platform/windows/os_windows.cpp b/platform/windows/os_windows.cpp
-index 8b28cbf1f23d6574aac41a3676fea64ddf786fc4..0124d4ac9652df9ba682ab8cc18b4008461d74cf 100644
+index 4977d11..6642be9 100644
 --- a/platform/windows/os_windows.cpp
 +++ b/platform/windows/os_windows.cpp
 @@ -53,6 +53,11 @@
@@ -111,7 +115,7 @@ index 8b28cbf1f23d6574aac41a3676fea64ddf786fc4..0124d4ac9652df9ba682ab8cc18b4008
  static const WORD MAX_CONSOLE_LINES = 1500;
  
  extern "C" {
-@@ -3371,6 +3376,9 @@ void OS_Windows::run() {
+@@ -3542,6 +3547,9 @@ void OS_Windows::run() {
  		process_events(); // get rid of pending events
  		if (Main::iteration())
  			break;

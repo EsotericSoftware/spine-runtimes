@@ -31,9 +31,9 @@
 #include "SpineEditorPlugin.h"
 #include "SpineAtlasResource.h"
 #include "SpineSkeletonFileResource.h"
-#include "editor/editor_undo_redo_manager.h"
 
 #if VERSION_MAJOR > 3
+#include "editor/editor_undo_redo_manager.h"
 Error SpineAtlasResourceImportPlugin::import(const String &source_file, const String &save_path, const HashMap<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) {
 #else
 Error SpineAtlasResourceImportPlugin::import(const String &source_file, const String &save_path, const Map<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) {

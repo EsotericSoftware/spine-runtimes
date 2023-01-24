@@ -10,7 +10,7 @@
                 "cwd": "${workspaceFolder}/godot"
             },
             "args": [
-                "-j 8",
+                "-j 16",
                 "dev_build=yes",
                 "custom_modules=\"${workspaceFolder}/spine_godot"
             ],
@@ -25,10 +25,18 @@
                 "cwd": "${workspaceFolder}/godot"
             },
             "args": [
-                "-j 8",
-                "debug",
+                "-j 16",
+                "target=debug",
                 "custom_modules=\"${workspaceFolder}/spine_godot"
             ],
+            "windows": {
+                "args": [
+                    "-j 16",
+                    "target=debug",
+                    "custom_modules=\"${workspaceFolder}/spine_godot",
+                    "livepp=${env:LIVEPP}"
+                ]
+            },
             "problemMatcher": "$msCompile"
         }
     ]
