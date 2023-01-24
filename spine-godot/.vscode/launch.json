@@ -1,0 +1,84 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "cppvsdbg",
+            "request": "launch",
+            "name": "debug scene v4",
+            "program": "godot/bin/godot.windows.editor.dev.x86_64.exe",
+            "args": [
+                "--path",
+                "example-v4",
+                "examples/01-helloworld/helloworld.tscn"
+            ],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "build-v4"
+        },
+        {
+            "type": "cppvsdbg",
+            "request": "launch",
+            "name": "debug editor v4",
+            "program": "godot/bin/godot.windows.editor.dev.x86_64.exe",
+            "args": [
+                "-e",
+                "--path",
+                "example-v4",
+            ],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "build-v4"
+        },
+        {
+            "type": "cppvsdbg",
+            "request": "launch",
+            "name": "debug scene v3",
+            "cwd": "${workspaceFolder}",
+            "program": "godot/bin/godot.windows.tools.64.exe",
+            "args": [
+                "--path",
+                "example",
+                "examples/01-helloworld/helloworld.tscn"
+            ],
+            "preLaunchTask": "build-v3",
+            "linux": {
+                "type": "cppdbg",
+                "request": "launch",
+                "name": "debug scene v3",
+                "program": "godot/bin/godot.windows.tools.64.exe",
+            },
+            "osx": {
+                "type": "cppdbg",
+                "request": "launch",
+                "name": "debug scene v3",
+                "program": "godot/bin/godot.tools.64.exe",
+            },
+        },
+        {
+            "type": "cppvsdbg",
+            "request": "launch",
+            "name": "debug editor v3",
+            "program": "godot/bin/godot.windows.tools.64.exe",
+            "args": [
+                "-e",
+                "--path",
+                "example",
+            ],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "build-v3",
+            "linux": {
+                "type": "cppdbg",
+                "request": "launch",
+                "name": "debug editor v3",
+                "program": "godot/bin/godot.windows.tools.64.exe",
+            },
+            "osx": {
+                "type": "cppdbg",
+                "request": "launch",
+                "name": "debug editor v3",
+                "program": "godot/bin/godot.tools.64.exe",
+            },
+        },
+    ]
+}

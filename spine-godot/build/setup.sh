@@ -29,8 +29,13 @@ if [ $dev = "true" ]; then
 
 	if [ "$OSTYPE" = "msys" ]; then
 		pushd godot
-		git apply ../build/livepp.patch
-		git apply ../build/livepp-v4.patch
+		if [[ $branch == 3* ]]; then
+			echo "Applying V3 Live++ patch"
+			git apply ../build/livepp.patch
+		else
+			echo "Applying V4 Live++ patch"
+			git apply ../build/livepp-v4.patch
+		fi
 		popd
 	fi
 

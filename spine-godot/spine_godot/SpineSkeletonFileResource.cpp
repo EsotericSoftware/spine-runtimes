@@ -122,7 +122,11 @@ Error SpineSkeletonFileResource::load_from_file(const String &path) {
 		if (error != OK) return error;
 		if (!checkJson(json.utf8())) return ERR_INVALID_DATA;
 	} else {
+#if VERSION_MAJOR > 3
+		binary = FileAccess::get_file_as_bytes(path, &error);
+#else
 		binary = FileAccess::get_file_as_array(path, &error);
+#endif
 		if (error != OK) return error;
 		if (!checkBinary((const char *) binary.ptr(), binary.size())) return ERR_INVALID_DATA;
 	}

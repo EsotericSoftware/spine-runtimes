@@ -5,11 +5,11 @@ dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 pushd $dir > /dev/null
 
 if [ ! "$#" -eq 1 ]; then
-	echo "Usage: ./build.sh <target>"
+	echo "Usage: ./build-v4.sh <target>"
 	echo
 	echo "e.g.:"
-	echo "       ./build.sh release_debug"
-	echo "       ./build.sh debug"
+	echo "       ./build.sh editor"
+	echo "       ./build.sh template_debug"
 	echo	
 	exit 1
 fi
@@ -59,6 +59,9 @@ if [ `uname` == 'Darwin' ] && [ $dev = "false" ]; then
 else
 	if [ "$OSTYPE" = "msys" ]; then
 		target="$target vsproj=yes livepp=$LIVEPP"
+	fi
+	if [ "$dev" = "true" ]; then
+		target="$target dev_build=true"
 	fi
 	scons $target compiledb=yes custom_modules="../spine_godot" --jobs=$cpus	
 	cp compile_commands.json ../build

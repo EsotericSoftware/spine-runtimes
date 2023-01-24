@@ -186,3 +186,5 @@ spine-flutter/src/spine-cpp
 spine-godot/.clang-format
 
 spine-ts/spine-phaser/dist
+spine-godot/.cache
+spine-godot/build/compile_commands.json

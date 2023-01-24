@@ -33,6 +33,7 @@
 #include "SpineSkeletonFileResource.h"
 
 #if VERSION_MAJOR > 3
+#include "editor/editor_undo_redo_manager.h"
 Error SpineAtlasResourceImportPlugin::import(const String &source_file, const String &save_path, const HashMap<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) {
 #else
 Error SpineAtlasResourceImportPlugin::import(const String &source_file, const String &save_path, const Map<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) {
@@ -253,7 +254,11 @@ void SpineEditorPropertyAnimationMix::_bind_methods() {
 void SpineEditorPropertyAnimationMix::data_changed(const String &property, const Variant &value, const String &name, bool changing) {
 	auto mix = Object::cast_to<SpineAnimationMix>(get_edited_object()->get(get_edited_property()));
 
+#if VERSION_MAJOR > 3
+	auto undo_redo = EditorUndoRedoManager::get_singleton();
+#else
 	auto undo_redo = EditorNode::get_undo_redo();
+#endif
 	undo_redo->create_action("Set mix property " + property);
 	undo_redo->add_do_property(mix, property, value);
 	undo_redo->add_undo_property(mix, property, mix->get(property));
@@ -273,7 +278,11 @@ void SpineEditorPropertyAnimationMix::update_property() {
 
 	if (container) {
 		memdelete(container);
+#if VERSION_MAJOR > 3
+		SceneTree::get_singleton()->queue_delete(container);
+#else
 		container->queue_delete();
+#endif
 		container = nullptr;
 	}
 
