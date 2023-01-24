@@ -32,6 +32,9 @@
 #ifdef TOOLS_ENABLED
 #include "SpineCommon.h"
 #include "SpineSprite.h"
+#if VERSION_MAJOR > 3
+#include "editor/import/editor_import_plugin.h"
+#endif
 #include "editor/editor_node.h"
 #include "editor/editor_properties.h"
 #include "editor/editor_properties_array_dict.h"

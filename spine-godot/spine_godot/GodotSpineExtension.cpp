@@ -61,7 +61,11 @@ void GodotSpineExtension::_free(void *mem, const char *file, int line) {
 
 char *GodotSpineExtension::_readFile(const spine::String &path, int *length) {
 	Error error;
+#if VERSION_MAJOR > 3
+	auto res = FileAccess::get_file_as_bytes(String(path.buffer()), &error);
+#else
 	auto res = FileAccess::get_file_as_array(String(path.buffer()), &error);
+#endif
 	if (error != OK) {
 		if (length) *length = 0;
 		return NULL;

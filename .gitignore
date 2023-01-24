@@ -181,3 +181,5 @@ spine-ts/spine-ts.zip
 spine-godot/.clang-format
 
 spine-ts/spine-phaser/dist
+spine-godot/.cache
+spine-godot/build/compile_commands.json

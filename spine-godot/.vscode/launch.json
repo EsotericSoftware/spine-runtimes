@@ -1,0 +1,47 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "cppvsdbg",
+            "request": "launch",
+            "name": "debug scene v4",
+            "program": "godot/bin/godot.windows.editor.dev.x86_64.exe",
+            "args": [
+                "--path",
+                "example-v4",
+                "examples/01-helloworld/helloworld.tscn"
+            ],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "build-v4"
+        },
+        {
+            "type": "cppvsdbg",
+            "request": "launch",
+            "name": "debug editor v4",
+            "program": "godot/bin/godot.windows.editor.dev.x86_64.exe",
+            "args": [
+                "-e",
+                "--path",
+                "example-v4",
+            ],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "build-v4"
+        },
+        {
+            "type": "cppvsdbg",
+            "request": "launch",
+            "name": "debug scene v3",
+            "program": "godot/bin/godot.windows.editor.dev.x86_64.exe",
+            "args": [
+                "--path",
+                "example",
+                "examples/01-helloworld/helloworld.tscn"
+            ],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "build-v3"
+        }
+    ]
+}

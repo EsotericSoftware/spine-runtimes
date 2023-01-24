@@ -28,6 +28,7 @@
  *****************************************************************************/
 
 #include "SpineCommon.h"
+#include "modules/register_module_types.h"
 #include "register_types.h"
 #include "SpineAtlasResource.h"
 #include "SpineSkeletonFileResource.h"
@@ -70,12 +71,20 @@ static void editor_init_callback() {
 
 #if VERSION_MAJOR > 3
 void initialize_spine_godot_module(ModuleInitializationLevel level) {
+	if (level == MODULE_INITIALIZATION_LEVEL_EDITOR) {
+#ifdef TOOLS_ENABLED
+		EditorNode::add_init_callback(editor_init_callback);
+		GDREGISTER_CLASS(SpineEditorPropertyAnimationMixes);
+		return;
+#endif
+	}
+	if (level != MODULE_INITIALIZATION_LEVEL_CORE) return;
 #else
 void register_spine_godot_types() {
-#endif
 #ifdef TOOLS_ENABLED
 	EditorNode::add_init_callback(editor_init_callback);
 	GDREGISTER_CLASS(SpineEditorPropertyAnimationMixes);
+#endif
 #endif
 	spine::Bone::setYDown(true);
 	GDREGISTER_CLASS(SpineObjectWrapper);
@@ -140,13 +149,14 @@ void register_spine_godot_types() {
 
 #if VERSION_MAJOR > 3
 void uninitialize_spine_godot_module(ModuleInitializationLevel level) {
+	if (level != MODULE_INITIALIZATION_LEVEL_CORE) return;
 #else
 void unregister_spine_godot_types() {
 #endif
-	ResourceLoader::remove_resource_format_loader(atlas_loader);
+	/*ResourceLoader::remove_resource_format_loader(atlas_loader);
 	ResourceSaver::remove_resource_format_saver(atlas_saver);
 	ResourceLoader::remove_resource_format_loader(skeleton_file_loader);
-	ResourceSaver::remove_resource_format_saver(skeleton_file_saver);
+	ResourceSaver::remove_resource_format_saver(skeleton_file_saver);*/
 
 	/*memdelete(atlas_loader);
 	memdelete(atlas_saver);

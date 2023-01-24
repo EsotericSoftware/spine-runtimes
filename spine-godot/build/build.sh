@@ -61,6 +61,7 @@ else
 		target="$target vsproj=yes livepp=$LIVEPP"
 	fi
 	scons $target compiledb=yes custom_modules="../spine_godot" --jobs=$cpus	
+	cp compile_commands.json ../build
 	if [ -f "bin/godot.x11.opt.tools.64" ]; then
 		strip bin/godot.x11.opt.tools.64
 		chmod a+x bin/godot.x11.opt.tools.64
