@@ -32,7 +32,7 @@ jobs:
         shell: bash
         run: |          
           ./spine-godot/build/setup.sh $GODOT_TAG false
-          ./spine-godot/build/build.sh release_debug
+          ./spine-godot/build/build.sh release_debug          
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
@@ -56,7 +56,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install build-essential scons pkg-config libx11-dev libxcursor-dev libxinerama-dev libgl1-mesa-dev libglu-dev libasound2-dev libpulse-dev libudev-dev libxi-dev libxrandr-dev
           ./spine-godot/build/setup.sh $GODOT_TAG false
-          ./spine-godot/build/build.sh release_debug
+          ./spine-godot/build/build.sh release_debug          
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
@@ -81,7 +81,7 @@ jobs:
           ./spine-godot/build/build.sh release_debug
           pushd spine-godot/godot/bin
           zip -r godot-editor-macos.zip Godot.app
-          popd
+          popd          
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
@@ -350,8 +350,8 @@ jobs:
         run: |
           BRANCH=${GITHUB_REF#refs/heads/}
           echo "branch: $BRANCH"
-          mv godot.windows.opt.tools.64.exe godot-$BRANCH-$GODOT_TAG.exe
-          mv godot.x11.opt.tools.64 godot-$BRANCH-$GODOT_TAG
+          mv godot.windows.opt.tools.64.s.exe godot-$BRANCH-$GODOT_TAG.exe
+          mv godot.x11.opt.tools.64s godot-$BRANCH-$GODOT_TAG
           zip godot-editor-windows.zip godot-$BRANCH-$GODOT_TAG.exe
           zip godot-editor-linux.zip godot-$BRANCH-$GODOT_TAG
           aws s3 cp godot-editor-windows.zip s3://spine-godot/$BRANCH/$GODOT_TAG/
