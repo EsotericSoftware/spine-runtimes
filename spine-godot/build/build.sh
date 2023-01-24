@@ -60,7 +60,7 @@ else
 	if [ "$OSTYPE" = "msys" ]; then
 		target="$target vsproj=yes livepp=$LIVEPP"
 	fi
-	scons $target compiledb=yes use_asan=yes custom_modules="../spine_godot" --jobs=$cpus	
+	scons $target compiledb=yes custom_modules="../spine_godot" --jobs=$cpus	
 	if [ -f "bin/godot.x11.opt.tools.64" ]; then
 		strip bin/godot.x11.opt.tools.64
 		chmod a+x bin/godot.x11.opt.tools.64
