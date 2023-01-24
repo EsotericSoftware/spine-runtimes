@@ -38,7 +38,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: godot-editor-windows.zip
-          path: spine-godot/godot/bin/godot.windows.opt.tools.64.s.exe
+          path: spine-godot/godot/bin/godot.windows.opt.tools.64.exe
 
   godot-editor-linux:
     runs-on: ubuntu-latest
@@ -62,7 +62,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: godot-editor-linux.zip
-          path: spine-godot/godot/bin/godot.x11.opt.tools.64s
+          path: spine-godot/godot/bin/godot.x11.opt.tools.64
 
   godot-editor-macos:
     runs-on: macos-latest
