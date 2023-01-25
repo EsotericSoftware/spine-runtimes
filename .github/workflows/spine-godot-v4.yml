@@ -77,6 +77,7 @@ jobs:
       - name: Build Godot artifact
         shell: bash
         run: |
+          ./spine-godot/build/install-macos-vulkan-sdk.sh
           ./spine-godot/build/setup.sh $GODOT_TAG false
           ./spine-godot/build/build-v4.sh
           pushd spine-godot/godot/bin
@@ -100,7 +101,8 @@ jobs:
         uses: ./.github/actions/setup-godot-deps   
 
       - name: Build Godot artifact
-        run: |          
+        run: |     
+          ./spine-godot/build/install-macos-vulkan-sdk.sh     
           ./spine-godot/build/setup.sh $GODOT_TAG false
           ./spine-godot/build/build-templates-v4.sh ios
 
@@ -122,6 +124,7 @@ jobs:
 
       - name: Build Godot artifact
         run: |          
+          ./spine-godot/build/install-macos-vulkan-sdk.sh
           ./spine-godot/build/setup.sh $GODOT_TAG false
           ./spine-godot/build/build-templates-v4.sh macos
 
