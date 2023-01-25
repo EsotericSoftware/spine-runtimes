@@ -66,28 +66,28 @@ elif [ "$platform" = "macos" ]; then
 	popd
 elif [ "$platform" = "ios" ]; then
 	# --- iOS --
-	# generates iphone.zip
+	# generates ios.zip
 
-	scons p=iphone tools=no target=template_release arch=arm64 custom_modules="../spine_godot" --jobs=$cpus
-	scons p=iphone tools=no target=template_debug arch=arm64 custom_modules="../spine_godot" --jobs=$cpus
-	scons p=iphone tools=no target=template_release arch=arm64 ios_simulator=yes custom_modules="../spine_godot" --jobs=$cpus
-	scons p=iphone tools=no target=template_release arch=x86_64 ios_simulator=yes custom_modules="../spine_godot" --jobs=$cpus
-	scons p=iphone tools=no target=template_debug arch=arm64 ios_simulator=yes custom_modules="../spine_godot" --jobs=$cpus
-	scons p=iphone tools=no target=template_debug arch=x86_64 ios_simulator=yes custom_modules="../spine_godot" --jobs=$cpus
-	lipo -create bin/libgodot.iphone.opt.arm64.simulator.a bin/libgodot.iphone.opt.x86_64.simulator.a -output bin/libgodot.iphone.opt.simulator.a
-	lipo -create bin/libgodot.iphone.opt.debug.arm64.simulator.a bin/libgodot.iphone.opt.debug.x86_64.simulator.a -output bin/libgodot.iphone.opt.debug.simulator.a
-	strip -S -x bin/libgodot.iphone.opt.arm64.a
-	strip -S -x bin/libgodot.iphone.opt.simulator.a		
+	scons p=ios tools=no target=template_release arch=arm64 custom_modules="../spine_godot" --jobs=$cpus
+	scons p=ios tools=no target=template_debug arch=arm64 custom_modules="../spine_godot" --jobs=$cpus
+	scons p=ios tools=no target=template_release arch=arm64 ios_simulator=yes custom_modules="../spine_godot" --jobs=$cpus
+	scons p=ios tools=no target=template_release arch=x86_64 ios_simulator=yes custom_modules="../spine_godot" --jobs=$cpus
+	scons p=ios tools=no target=template_debug arch=arm64 ios_simulator=yes custom_modules="../spine_godot" --jobs=$cpus
+	scons p=ios tools=no target=template_debug arch=x86_64 ios_simulator=yes custom_modules="../spine_godot" --jobs=$cpus
+	lipo -create bin/libgodot.ios.template_release.arm64.simulator.a bin/libgodot.ios.template_release.x86_64.simulator.a -output bin/libgodot.ios.template_release.simulator.a
+	lipo -create bin/libgodot.ios.template_debug.arm64.simulator.a bin/libgodot.ios.template_debug.x86_64.simulator.a -output bin/libgodot.ios.template_debug.simulator.a
+	strip -S -x bin/libgodot.ios.template_release.arm64.a
+	strip -S -x bin/libgodot.ios.template_release.simulator.a		
 
 	pushd bin
 	cp -r ../misc/dist/ios_xcode .		
-	cp libgodot.iphone.opt.arm64.a ios_xcode/libgodot.iphone.release.xcframework/ios-arm64/libgodot.a
-	cp libgodot.iphone.opt.simulator.a ios_xcode/libgodot.iphone.release.xcframework/ios-arm64_x86_64-simulator/libgodot.a	
-	cp libgodot.iphone.opt.debug.arm64.a ios_xcode/libgodot.iphone.debug.xcframework/ios-arm64/libgodot.a
-	cp libgodot.iphone.opt.debug.simulator.a ios_xcode/libgodot.iphone.debug.xcframework/ios-arm64_x86_64-simulator/libgodot.a	
-	rm -rf iphone.zip
+	cp libgodot.ios.template_release.arm64.a ios_xcode/libgodot.ios.release.xcframework/ios-arm64/libgodot.a
+	cp libgodot.ios.template_release.simulator.a ios_xcode/libgodot.ios.release.xcframework/ios-arm64_x86_64-simulator/libgodot.a	
+	cp libgodot.ios.template_debug.arm64.a ios_xcode/libgodot.ios.debug.xcframework/ios-arm64/libgodot.a
+	cp libgodot.ios.template_debug.simulator.a ios_xcode/libgodot.ios.debug.xcframework/ios-arm64_x86_64-simulator/libgodot.a	
+	rm -rf ios.zip
 	pushd ios_xcode
-	zip -q -9 -r ../iphone.zip *
+	zip -q -9 -r ../ios.zip *
 	popd
 	popd	
 elif [ "$platform" = "web" ]; then

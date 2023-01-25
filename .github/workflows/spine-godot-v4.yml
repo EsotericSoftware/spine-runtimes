@@ -108,7 +108,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: godot-template-ios.zip
-          path: spine-godot/godot/bin/iphone.zip
+          path: spine-godot/godot/bin/ios.zip
 
   godot-template-macos:
     runs-on: macos-latest
@@ -359,7 +359,7 @@ jobs:
           aws s3 cp godot-editor-macos.zip s3://spine-godot/$BRANCH/$GODOT_TAG/
           echo "$GODOT_VERSION" > version.txt
           ls -lah
-          zip spine-godot-templates-$BRANCH-$GODOT_TAG.zip iphone.zip macos.zip windows_64_debug.exe windows_64_release.exe linux_x11_64_debug linux_x11_64_release webassembly_debug.zip webassembly_release.zip android_release.apk android_debug.apk android_source.zip version.txt
+          zip spine-godot-templates-$BRANCH-$GODOT_TAG.zip ios.zip macos.zip windows_64_debug.exe windows_64_release.exe linux_x11_64_debug linux_x11_64_release webassembly_debug.zip webassembly_release.zip android_release.apk android_debug.apk android_source.zip version.txt
           aws s3 cp spine-godot-templates-$BRANCH-$GODOT_TAG.zip s3://spine-godot/$BRANCH/$GODOT_TAG/spine-godot-templates-$BRANCH-$GODOT_TAG.tpz
 
   
