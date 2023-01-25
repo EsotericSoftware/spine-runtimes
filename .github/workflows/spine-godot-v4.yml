@@ -1,4 +1,4 @@
-name: Build and Publish Godot editor and templates
+name: Build and Publish Godot 4.0 editor and templates
 
 on:
   push:
@@ -146,7 +146,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install build-essential scons pkg-config libx11-dev libxcursor-dev libxinerama-dev libgl1-mesa-dev libglu-dev libasound2-dev libpulse-dev libudev-dev libxi-dev libxrandr-dev
           ./spine-godot/build/setup.sh $GODOT_TAG false
-          ./spine-godot/build/build-templates.sh linux
+          ./spine-godot/build/build-templates-v4.sh linux
 
       - name: Upload artifacts debug
         uses: actions/upload-artifact@v2
@@ -174,7 +174,7 @@ jobs:
         shell: bash
         run: |
           ./spine-godot/build/setup.sh $GODOT_TAG false
-          ./spine-godot/build/build-templates.sh windows
+          ./spine-godot/build/build-templates-v4.sh windows
 
       - name: Upload artifacts debug
         uses: actions/upload-artifact@v2
@@ -214,7 +214,7 @@ jobs:
         shell: bash
         run: |
           ./spine-godot/build/setup.sh $GODOT_TAG false
-          ./spine-godot/build/build-templates.sh android
+          ./spine-godot/build/build-templates-v4.sh android
 
       - name: Upload artifacts debug
         uses: actions/upload-artifact@v2
@@ -256,7 +256,7 @@ jobs:
       - name: Build Godot artifact
         run: |          
           ./spine-godot/build/setup.sh $GODOT_TAG false
-          ./spine-godot/build/build-templates.sh web
+          ./spine-godot/build/build-templates-v4.sh web
 
       - name: Upload artifacts debug
         uses: actions/upload-artifact@v2
