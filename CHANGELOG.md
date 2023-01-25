@@ -29,6 +29,8 @@
 * **Officially supported Unity versions are 2017.1-2022.1**.
 
 * **Additions**
+  * `OnPostProcessVertices` callback parameter `MeshGeneratorBuffers` now provides access to `uv2Buffer` and `uv3Buffer` properties of `MeshGenerator`, automatically allocating buffers upon access if `tintBlack` is disabled. This allows for passing own vertex data to a shader on second and third uv channels.
+
 * **Breaking changes**
   
 * **Changes of default values**
