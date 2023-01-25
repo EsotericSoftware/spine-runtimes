@@ -4,14 +4,13 @@
 #else
 #include "core/engine.h"
 #endif
-#include "godot/editor/editor_node.h"
 #include "scene/animation/animation_player.h"
 #include "scene/resources/animation.h"
 
 #ifdef TOOLS_ENABLED
+#include "godot/editor/editor_node.h"
 #include "editor/plugins/animation_player_editor_plugin.h"
 #include "editor/plugins/animation_tree_editor_plugin.h"
-
 #endif
 
 void SpineAnimationTrack::_bind_methods() {

@@ -29,7 +29,9 @@
 
 #include "SpineSlotNode.h"
 
+#ifdef TOOLS_ENABLED
 #include "editor/editor_node.h"
+#endif
 #include "scene/main/viewport.h"
 
 void SpineSlotNode::_bind_methods() {

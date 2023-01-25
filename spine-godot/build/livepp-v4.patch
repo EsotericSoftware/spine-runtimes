@@ -45,7 +45,7 @@ index 1b55574..8bc0fb1 100644
 +                env.AppendUnique(CPPPATH=[env.get("livepp")])
 +                env.AppendUnique(LINKFLAGS=["/FUNCTIONPADMIN"])
 +            else:
-+                printf("Specified Live++ path does not exist")
++                print("Specified Live++ path does not exist")
 +        else:
 +            print("Live++ can only be used with targets 'editor'")
 +    else:

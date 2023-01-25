@@ -4,16 +4,6 @@ set -e
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 pushd $dir > /dev/null
 
-if [ ! "$#" -eq 1 ]; then
-	echo "Usage: ./build-v4.sh <target>"
-	echo
-	echo "e.g.:"
-	echo "       ./build.sh editor"
-	echo "       ./build.sh template_debug"
-	echo	
-	exit 1
-fi
-
 if [ ! -d ../godot ]; then
 	echo "No Godot clone found. Run ./setup.sh <Godot branch or tag> <dev> first."
 	exit 1
@@ -58,7 +48,7 @@ if [ `uname` == 'Darwin' ] && [ $dev = "false" ]; then
 	popd
 else
 	if [ "$OSTYPE" = "msys" ]; then
-		target="$target vsproj=yes livepp=$LIVEPP"
+		target="vsproj=yes livepp=$LIVEPP"
 	fi
 	if [ "$dev" = "true" ]; then
 		target="$target dev_build=true"
