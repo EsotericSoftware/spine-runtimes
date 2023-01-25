@@ -49,9 +49,9 @@ else
 	fi
 	scons $target compiledb=yes custom_modules="../spine_godot" --jobs=$cpus	
 	cp compile_commands.json ../build
-	if [ -f "bin/godot.x11.opt.tools.64" ]; then
-		strip bin/godot.x11.opt.tools.64
-		chmod a+x bin/godot.x11.opt.tools.64
+	if [ -f "bin/godot.linuxbsd.editor.x86_64" ]; then
+		strip bin/godot.linuxbsd.editor.x86_64
+		chmod a+x bin/godot.linuxbsd.editor.x86_64
 	fi
 fi
 popd

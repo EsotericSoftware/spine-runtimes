@@ -62,7 +62,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: godot-editor-linux.zip
-          path: spine-godot/godot/bin/godot.linux.editor.x86_64
+          path: spine-godot/godot/bin/godot.linuxbsd.editor.x86_64
 
   godot-editor-macos:
     runs-on: macos-latest
@@ -351,7 +351,7 @@ jobs:
           BRANCH=${GITHUB_REF#refs/heads/}
           echo "branch: $BRANCH"
           mv godot.windows.editor.x86_64.exe godot-$BRANCH-$GODOT_TAG.exe
-          mv godot.linux.editor.x86_64 godot-$BRANCH-$GODOT_TAG
+          mv godot.linuxbsd.editor.x86_64 godot-$BRANCH-$GODOT_TAG
           zip godot-editor-windows.zip godot-$BRANCH-$GODOT_TAG.exe
           zip godot-editor-linux.zip godot-$BRANCH-$GODOT_TAG
           aws s3 cp godot-editor-windows.zip s3://spine-godot/$BRANCH/$GODOT_TAG/

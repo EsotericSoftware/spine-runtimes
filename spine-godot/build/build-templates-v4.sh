@@ -110,16 +110,16 @@ elif [ "$platform" = "android" ]; then
 		./gradlew generateGodotTemplates
 	popd
 elif [ "$platform" = "linux" ]; then
-	# --- Linix ---
+	# --- Linux ---
 	# generates linux_x11_64_release, linux_x11_64_debug
 	scons platform=linuxbsd tools=no target=template_release bits=64 custom_modules="../spine_godot" --jobs=$cpus
-	scons platform=linuxbsd tools=no target=template_debug bits=64 custom_modules="../spine_godot" --jobs=$cpus
-	strip bin/godot.x11.opt.64	
-	strip bin/godot.x11.opt.debug.64
-	chmod a+x bin/godot.x11.opt.64
-	chmod a+x bin/godot.x11.opt.debug.64
-	cp bin/godot.x11.opt.64 bin/linux_x11_64_release
-	cp bin/godot.x11.opt.debug.64 bin/linux_x11_64_debug
+	scons platform=linuxbsd tools=no target=template_debug bits=64 custom_modules="../spine_godot" --jobs=$cpus	
+	strip bin/godot.linuxbsd.template_release.64
+	strip bin/godot.linuxbsd.template_debug.64
+	chmod a+x bin/godot.linuxbsd.template_release.64
+	chmod a+x bin/godot.linuxbsd.template_debug.64
+	cp bin/godot.linuxbsd.template_release.64 bin/linux_x11_64_release
+	cp bin/godot.linuxbsd.template_debug.64 bin/linux_x11_64_debug
 else
 	echo "Unknown platform: $platform"
 	exit 1
