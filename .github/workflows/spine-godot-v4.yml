@@ -262,13 +262,13 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: godot-template-web-debug.zip
-          path: spine-godot/godot/bin/webassembly_debug.zip
+          path: spine-godot/godot/bin/web_debug.zip
 
       - name: Upload artifacts release
         uses: actions/upload-artifact@v2
         with:
           name: godot-template-web-release.zip
-          path: spine-godot/godot/bin/webassembly_release.zip
+          path: spine-godot/godot/bin/web_release.zip
 
   upload-to-s3:
     needs: [godot-editor-windows, godot-editor-linux, godot-editor-macos, godot-template-ios, godot-template-macos, godot-template-windows, godot-template-linux, godot-template-android, godot-template-web]
@@ -350,8 +350,8 @@ jobs:
         run: |
           BRANCH=${GITHUB_REF#refs/heads/}
           echo "branch: $BRANCH"
-          mv godot.windows.opt.tools.64.exe godot-$BRANCH-$GODOT_TAG.exe
-          mv godot.x11.opt.tools.64 godot-$BRANCH-$GODOT_TAG
+          mv godot.windows.editor.x86_64.exe godot-$BRANCH-$GODOT_TAG.exe
+          mv godot.linux.editor.x86_64 godot-$BRANCH-$GODOT_TAG
           zip godot-editor-windows.zip godot-$BRANCH-$GODOT_TAG.exe
           zip godot-editor-linux.zip godot-$BRANCH-$GODOT_TAG
           aws s3 cp godot-editor-windows.zip s3://spine-godot/$BRANCH/$GODOT_TAG/
@@ -359,7 +359,7 @@ jobs:
           aws s3 cp godot-editor-macos.zip s3://spine-godot/$BRANCH/$GODOT_TAG/
           echo "$GODOT_VERSION" > version.txt
           ls -lah
-          zip spine-godot-templates-$BRANCH-$GODOT_TAG.zip ios.zip macos.zip windows_64_debug.exe windows_64_release.exe linux_x11_64_debug linux_x11_64_release webassembly_debug.zip webassembly_release.zip android_release.apk android_debug.apk android_source.zip version.txt
+          zip spine-godot-templates-$BRANCH-$GODOT_TAG.zip ios.zip macos.zip windows_64_debug.exe windows_64_release.exe linux_x11_64_debug linux_x11_64_release web_debug.zip web_release.zip android_release.apk android_debug.apk android_source.zip version.txt
           aws s3 cp spine-godot-templates-$BRANCH-$GODOT_TAG.zip s3://spine-godot/$BRANCH/$GODOT_TAG/spine-godot-templates-$BRANCH-$GODOT_TAG.tpz
 
   
