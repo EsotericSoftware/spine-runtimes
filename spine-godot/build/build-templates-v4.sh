@@ -45,35 +45,35 @@ if [ "$platform" = "windows" ]; then
 
 elif [ "$platform" = "macos" ]; then
 	# --- macOS ---
-	# generates osx.zip
+	# generates macos.zip
 
-	scons platform=osx tools=no target=release arch=x86_64 custom_modules="../spine_godot" --jobs=$cpus
-	scons platform=osx tools=no target=release_debug arch=x86_64 custom_modules="../spine_godot" --jobs=$cpus
-	scons platform=osx tools=no target=release arch=arm64 custom_modules="../spine_godot" --jobs=$cpus
-	scons platform=osx tools=no target=release_debug arch=arm64 custom_modules="../spine_godot" --jobs=$cpus
-	lipo -create bin/godot.osx.opt.x86_64 bin/godot.osx.opt.arm64 -output bin/godot.osx.opt.universal
-	lipo -create bin/godot.osx.opt.debug.x86_64 bin/godot.osx.opt.debug.arm64 -output bin/godot.osx.opt.debug.universal
-	strip -S -x bin/godot.osx.opt.universal
+	scons platform=macos tools=no target=template_release arch=x86_64 custom_modules="../spine_godot" --jobs=$cpus
+	scons platform=macos tools=no target=template_debug arch=x86_64 custom_modules="../spine_godot" --jobs=$cpus
+	scons platform=macos tools=no target=template_release arch=arm64 custom_modules="../spine_godot" --jobs=$cpus
+	scons platform=macos tools=no target=template_debug arch=arm64 custom_modules="../spine_godot" --jobs=$cpus
+	lipo -create bin/godot.macos.template_release.x86_64 bin/godot.macos.template_release.arm64 -output bin/godot.macos.universal
+	lipo -create bin/godot.macos.template_debug.x86_64 bin/godot.macos.template_debug.arm64 -output bin/godot.macos.debug.universal
+	strip -S -x bin/godot.macos.universal
 
 	pushd bin
-	cp -r ../misc/dist/osx_template.app .
-	mkdir -p osx_template.app/Contents/MacOS
-	cp godot.osx.opt.universal osx_template.app/Contents/MacOS/godot_osx_release.64
-	cp godot.osx.opt.debug.universal osx_template.app/Contents/MacOS/godot_osx_debug.64
-	chmod +x osx_template.app/Contents/MacOS/godot_osx*		
-	rm -rf osx.zip
-	zip -q -9 -r osx.zip osx_template.app
+	cp -r ../misc/dist/macos_template.app .
+	mkdir -p macos_template.app/Contents/MacOS
+	cp godot.macos.universal macos_template.app/Contents/MacOS/godot_macos_release.64
+	cp godot.macos.debug.universal macos_template.app/Contents/MacOS/godot_macos_debug.64
+	chmod +x macos_template.app/Contents/MacOS/godot_macos*		
+	rm -rf macos.zip
+	zip -q -9 -r macos.zip macos_template.app
 	popd
 elif [ "$platform" = "ios" ]; then
 	# --- iOS --
 	# generates iphone.zip
 
-	scons p=iphone tools=no target=release arch=arm64 custom_modules="../spine_godot" --jobs=$cpus
-	scons p=iphone tools=no target=release_debug arch=arm64 custom_modules="../spine_godot" --jobs=$cpus
-	scons p=iphone tools=no target=release arch=arm64 ios_simulator=yes custom_modules="../spine_godot" --jobs=$cpus
-	scons p=iphone tools=no target=release arch=x86_64 ios_simulator=yes custom_modules="../spine_godot" --jobs=$cpus
-	scons p=iphone tools=no target=release_debug arch=arm64 ios_simulator=yes custom_modules="../spine_godot" --jobs=$cpus
-	scons p=iphone tools=no target=release_debug arch=x86_64 ios_simulator=yes custom_modules="../spine_godot" --jobs=$cpus
+	scons p=iphone tools=no target=template_release arch=arm64 custom_modules="../spine_godot" --jobs=$cpus
+	scons p=iphone tools=no target=template_debug arch=arm64 custom_modules="../spine_godot" --jobs=$cpus
+	scons p=iphone tools=no target=template_release arch=arm64 ios_simulator=yes custom_modules="../spine_godot" --jobs=$cpus
+	scons p=iphone tools=no target=template_release arch=x86_64 ios_simulator=yes custom_modules="../spine_godot" --jobs=$cpus
+	scons p=iphone tools=no target=template_debug arch=arm64 ios_simulator=yes custom_modules="../spine_godot" --jobs=$cpus
+	scons p=iphone tools=no target=template_debug arch=x86_64 ios_simulator=yes custom_modules="../spine_godot" --jobs=$cpus
 	lipo -create bin/libgodot.iphone.opt.arm64.simulator.a bin/libgodot.iphone.opt.x86_64.simulator.a -output bin/libgodot.iphone.opt.simulator.a
 	lipo -create bin/libgodot.iphone.opt.debug.arm64.simulator.a bin/libgodot.iphone.opt.debug.x86_64.simulator.a -output bin/libgodot.iphone.opt.debug.simulator.a
 	strip -S -x bin/libgodot.iphone.opt.arm64.a
@@ -93,17 +93,17 @@ elif [ "$platform" = "ios" ]; then
 elif [ "$platform" = "web" ]; then
 	# --- WEB ---
 	# generates webassembly_debug.zip, webassembly_release.zip
-	scons platform=javascript tools=no target=release custom_modules="../spine_godot" --jobs=$cpus
-	scons platform=javascript tools=no target=release_debug custom_modules="../spine_godot" --jobs=$cpus
+	scons platform=javascript tools=no target=template_release custom_modules="../spine_godot" --jobs=$cpus
+	scons platform=javascript tools=no target=template_debug custom_modules="../spine_godot" --jobs=$cpus
 	mv bin/godot.javascript.opt.zip bin/webassembly_release.zip
 	mv bin/godot.javascript.opt.debug.zip bin/webassembly_debug.zip
 elif [ "$platform" = "android" ]; then
 	# --- ANROID ---
 	# generates android_release.apk, android_debug.apk, android_source.zip
-	scons platform=android target=release android_arch=armv7 custom_modules="../spine_godot" --jobs=$cpus
-	scons platform=android target=release_debug android_arch=armv7 custom_modules="../spine_godot" --jobs=$cpus
-	scons platform=android target=release android_arch=arm64v8 custom_modules="../spine_godot" --jobs=$cpus
-	scons platform=android target=release_debug android_arch=arm64v8 custom_modules="../spine_godot" --jobs=$cpus
+	scons platform=android target=template_release android_arch=armv7 custom_modules="../spine_godot" --jobs=$cpus
+	scons platform=android target=template_debug android_arch=armv7 custom_modules="../spine_godot" --jobs=$cpus
+	scons platform=android target=template_release android_arch=arm64v8 custom_modules="../spine_godot" --jobs=$cpus
+	scons platform=android target=template_debug android_arch=arm64v8 custom_modules="../spine_godot" --jobs=$cpus
 
 	pushd platform/android/java
 		chmod a+x gradlew
@@ -112,8 +112,8 @@ elif [ "$platform" = "android" ]; then
 elif [ "$platform" = "linux" ]; then
 	# --- Linix ---
 	# generates linux_x11_64_release, linux_x11_64_debug
-	scons platform=x11 tools=no target=release bits=64 custom_modules="../spine_godot" --jobs=$cpus
-	scons platform=x11 tools=no target=release_debug bits=64 custom_modules="../spine_godot" --jobs=$cpus
+	scons platform=linuxbsd tools=no target=template_release bits=64 custom_modules="../spine_godot" --jobs=$cpus
+	scons platform=linuxbsd tools=no target=template_debug bits=64 custom_modules="../spine_godot" --jobs=$cpus
 	strip bin/godot.x11.opt.64	
 	strip bin/godot.x11.opt.debug.64
 	chmod a+x bin/godot.x11.opt.64

@@ -9,7 +9,7 @@ if [ ! -d ../godot ]; then
 	exit 1
 fi
 
-target="target=${1%/}"
+target=""
 dev="false"
 if [ -f "../godot/custom.py" ]; then
 	dev="true"
@@ -32,19 +32,13 @@ if [ `uname` == 'Darwin' ] && [ $dev = "false" ]; then
 	scons $target arch=arm64 compiledb=yes custom_modules="../spine_godot" --jobs=$cpus
 
 	pushd bin
-	cp -r ../misc/dist/osx_tools.app .
-	mv osx_tools.app Godot.app
+	cp -r ../misc/dist/macos_tools.app .
+	mv macos_tools.app Godot.app
 	mkdir -p Godot.app/Contents/MacOS
-	if [ "$target" = "debug" ]; then
-		lipo -create godot.osx.tools.x86_64 godot.osx.tools.arm64 -output godot.osx.tools.universal
-		strip -S -x godot.osx.tools.universal
-		cp godot.osx.tools.universal Godot.app/Contents/MacOS/Godot
-	else
-		lipo -create godot.osx.opt.tools.x86_64 godot.osx.opt.tools.arm64 -output godot.osx.opt.tools.universal
-		strip -S -x godot.osx.opt.tools.universal
-		cp godot.osx.opt.tools.universal Godot.app/Contents/MacOS/Godot
-	fi	
-	chmod +x Godot.app/Contents/MacOS/Godot	
+	lipo -create godot.macos.editor.arm64 godot.macos.editor.x86_64 -output Godot
+	strip -S -x Godot
+	cp Godot Godot.app/Contents/MacOS/Godot
+	chmod +x Godot.app/Contents/MacOS/Godot
 	popd
 else
 	if [ "$OSTYPE" = "msys" ]; then
