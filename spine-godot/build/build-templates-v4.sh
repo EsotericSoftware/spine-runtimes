@@ -40,8 +40,8 @@ if [ "$platform" = "windows" ]; then
 	#generates windows_64_debug.exe and windows_64_release.exe
 	scons platform=windows tools=no target=template_release custom_modules="../spine_godot" --jobs=$cpus
 	scons platform=windows tools=no target=template_debug custom_modules="../spine_godot" --jobs=$cpus
-	cp bin/godot.windows.template_release.x86_64.exe bin/windows_64_release.exe
-	cp bin/godot.windows.template_debug.x86_64.exe bin/windows_64_debug.exe
+	cp bin/godot.windows.template_release.x86_64.exe bin/windows_release_x86_64.exe
+	cp bin/godot.windows.template_debug.x86_64.exe bin/windows_debug_x86_64.exe
 
 elif [ "$platform" = "macos" ]; then
 	# --- macOS ---
