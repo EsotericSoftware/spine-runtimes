@@ -1010,7 +1010,7 @@ Animation *SkeletonBinary::readAnimation(const String &name, DataInput *input, S
 						timeline->setFrame(frame, time, a);
 						if (frame == frameLast) break;
 						float time2 = readFloat(input);
-						float a2 = readByte(input) / 255;
+						float a2 = readByte(input) / 255.0;
 						switch (readSByte(input)) {
 							case CURVE_STEPPED:
 								timeline->setStepped(frame);
