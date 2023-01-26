@@ -143,7 +143,7 @@
   * `VertexEffect` has been removed.
 
 ### WebGL backend
-  * `PolygonBatcher.start()` now disables culling and restores the previous state on `PolygonBatcher.end()`.
+  * `PolygonBatcher` can now disable culling automatically if the static variable `PolygonBatcher.disableCulling` is set to true.
   * Added `SpineCanvas`, a simpler way to render a scene via spine-webgl. See `spine-ts/spine-webgl/examples/barebones.html` and `spine-ts/spine-webgl/examples/mix-and-match.html`.
 
 ### Canvas backend
