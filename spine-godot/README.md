@@ -28,12 +28,21 @@ spine-godot works with the latest stable Godot 3.5 release. It requires compilat
 
 ### Pre-built Godot editor and export template binaries
 
-We provide prebuilt Godot editor and export template binaries for Godot 3.5-stable:
+We provide prebuilt Godot editor and export template binaries for Godot 3.5.1-stable:
 
-* [Godot Editor Windows](https://spine-godot.s3.eu-central-1.amazonaws.com/4.1/3.5-stable/godot-editor-windows.zip)
-* [Godot Editor Linux](https://spine-godot.s3.eu-central-1.amazonaws.com/4.1/3.5-stable/godot-editor-linux.zip)
-* [Godot Editor macOS](https://spine-godot.s3.eu-central-1.amazonaws.com/4.1/3.5-stable/godot-editor-macos.zip)
-* [Godot export templates for Windows, Linux, macOS, Web, Android, iOS](https://spine-godot.s3.eu-central-1.amazonaws.com/4.1/3.5-stable/spine-godot-templates-4.1-3.5-stable.tpz)
+* [Godot Editor Windows](https://spine-godot.s3.eu-central-1.amazonaws.com/4.1/3.5.1-stable/godot-editor-windows.zip)
+* [Godot Editor Linux](https://spine-godot.s3.eu-central-1.amazonaws.com/4.1/3.5.1-stable/godot-editor-linux.zip)
+* [Godot Editor macOS](https://spine-godot.s3.eu-central-1.amazonaws.com/4.1/3.5.1-stable/godot-editor-macos.zip)
+* [Godot export templates for Windows, Linux, macOS, Web, Android, iOS](https://spine-godot.s3.eu-central-1.amazonaws.com/4.1/3.5.1-stable/spine-godot-templates-4.1-3.5-stable.tpz)
+
+We also provide prebuilt Godot editor and export template binaries for the Godot master branch:
+
+* [Godot 4.0 Editor Windows](https://spine-godot.s3.eu-central-1.amazonaws.com/4.1/master/godot-editor-windows.zip)
+* [Godot 4.0 Editor Linux](https://spine-godot.s3.eu-central-1.amazonaws.com/4.1/master/godot-editor-linux.zip)
+* [Godot 4.0 Editor macOS](https://spine-godot.s3.eu-central-1.amazonaws.com/4.1/master/godot-editor-macos.zip)
+* [Godot 4.0 Export templates for Windows, Linux, macOS, Web, Android, iOS](https://spine-godot.s3.eu-central-1.amazonaws.com/4.1/master/spine-godot-templates-4.1-master.tpz)
+
+Note that Godot 4.0 is unstable. Use Godot 3.5.1 for production for now.
 
 ### Building the Godot editor and export templates locally
 
@@ -70,13 +79,13 @@ The first argument to `built-templates.sh` is the platform to compile the templa
 The resulting Godot export template binary can then be found in `spine-godot/godot/bin`.
 
 ### Building the Godot editor and export templates via GitHub Actions
-This repository contains a GitHub workflow in `.github/workflows/spine-godot.yml` that allows building all Godot editor and export template binaries through GitHub actions. This may be simpler than compiling these artifacts locally. To use the GitHub workflow:
+This repository contains a GitHub workflow in `.github/workflows/spine-godot.yml` and `.github/workflows/spine-godot-v4.yml` that allows building all Godot editor and export template binaries through GitHub actions for Godot 3.5.x and Godot 4.0. This may be simpler than compiling these artifacts locally. To use the GitHub workflow:
 
 1. Clone this repository
 2. Enable GitHub workflows on the cloned repository
-3. Manually trigger the `spine-godot` workflow.
+3. Manually trigger the `spine-godot` or `spine-godot-v4` workflow.
 
-The resulting binaries will be attached as artifacts to a sucessful workflow run.
+The resulting binaries will be attached as artifacts to a successful workflow run.
 
 ## Example
 Sample projects for both Godot 3.5.x and Godot 4.x are provided in the `example/` and `example-v4/` folders respectively. They illustrate all spine-godot functionality and can be opened and exported with the pre-built or custom build Godot editor and export template binaries.
