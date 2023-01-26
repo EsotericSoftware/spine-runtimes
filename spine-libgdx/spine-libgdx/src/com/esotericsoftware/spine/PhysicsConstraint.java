@@ -42,7 +42,8 @@ import com.esotericsoftware.spine.PhysicsConstraintData.SpringData;
  * <p>
  * See <a href="http://esotericsoftware.com/spine-physics-constraints">Physics constraints</a> in the Spine User Guide. */
 public class PhysicsConstraint implements Updatable {
-	static final Vector2 temp = new Vector2();
+	static private final Vector2 temp = new Vector2();
+	static private final float epsilon = 0.00001f;
 
 	final PhysicsConstraintData data;
 	final Array<Node> nodes;
@@ -153,6 +154,13 @@ public class PhysicsConstraint implements Updatable {
 		if (mix == 1) {
 			for (int i = 0; i < nodeCount; i++) {
 				Node node = (Node)nodes[i];
+
+				// BOZO
+				if (node.parentBone != null) {
+					node.parentBone.rotateWorld(node.offset);
+					node.parentBone.updateAppliedTransform();
+				}
+
 				Object[] bones = node.bones;
 				for (int ii = 0, nn = bones.length; ii < nn; ii++) {
 					Bone bone = (Bone)bones[ii];
@@ -267,6 +275,9 @@ public class PhysicsConstraint implements Updatable {
 
 		public float massInverse, vx, vy;
 
+		public boolean reset;
+		public float offset, velocity, wx, wy;
+
 		Node (NodeData data) { // Editor.
 			this.data = data;
 		}
@@ -299,9 +310,48 @@ public class PhysicsConstraint implements Updatable {
 			y = data.y;
 			vx = 0;
 			vy = 0;
+
+			offset = 0;
+			velocity = 0;
+			reset = true;
 		}
 
 		public void step (PhysicsConstraint constraint) {
+			// BOZO
+			if (parentBone != null) {
+				float strength = 0.1f;
+				float damping = 0.9f;
+				float wind = 0;
+				float gravity = 0;// -0.0048f;
+				float mass = 4;
+
+				float length = parentBone.data.length, x = length * parentBone.a, y = length * parentBone.c;
+				length = (float)Math.sqrt(x * x + y * y);
+
+				float r = atan2(parentBone.c, parentBone.a) - offset * degRad;
+				float cos = (float)Math.cos(r), sin = (float)Math.sin(r);
+				{
+					float tx = parentBone.worldX + length * cos, ty = parentBone.worldY + length * sin;
+					if (reset)
+						reset = false;
+					else {
+						if (wx - tx != 0 || wy - ty != 0) {
+							float diff = new Vector2(length, 0).rotateRad(r).add(wx - parentBone.worldX, wy - parentBone.worldY)
+								.angleRad() - r;
+							offset += diff * radDeg;
+						}
+					}
+					wx = tx;
+					wy = ty;
+				}
+
+				velocity += ((((offset % 360) + 540) % 360) - 180) * strength / mass;
+				r += offset * degRad;
+				velocity += (length * sin * wind - length * cos * gravity) * mass;
+				offset -= velocity;
+				velocity *= damping;
+			}
+
 			if (parentBone != null) return;
 			x += vx;
 			y += vy;

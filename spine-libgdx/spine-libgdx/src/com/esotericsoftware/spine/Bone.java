@@ -611,10 +611,11 @@ public class Bone implements Updatable {
 	public void rotateWorld (float degrees) {
 		degrees *= degRad;
 		float sin = sin(degrees), cos = cos(degrees);
-		a = cos * a - sin * c;
-		b = cos * b - sin * d;
-		c = sin * a + cos * c;
-		d = sin * b + cos * d;
+		float ra = a, rb = b;
+		a = cos * ra - sin * c;
+		b = cos * rb - sin * d;
+		c = sin * ra + cos * c;
+		d = sin * rb + cos * d;
 	}
 
 	// ---

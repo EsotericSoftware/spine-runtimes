@@ -47,8 +47,8 @@ import com.esotericsoftware.spine.attachments.PathAttachment;
  * <p>
  * See <a href="http://esotericsoftware.com/spine-path-constraints">Path constraints</a> in the Spine User Guide. */
 public class PathConstraint implements Updatable {
-	static private final int NONE = -1, BEFORE = -2, AFTER = -3;
-	static private final float epsilon = 0.00001f;
+	static final int NONE = -1, BEFORE = -2, AFTER = -3;
+	static final float epsilon = 0.00001f;
 
 	final PathConstraintData data;
 	final Array<Bone> bones;
@@ -122,12 +122,8 @@ public class PathConstraint implements Updatable {
 				for (int i = 0, n = spacesCount - 1; i < n; i++) {
 					Bone bone = (Bone)bones[i];
 					float setupLength = bone.data.length;
-					if (setupLength < epsilon)
-						lengths[i] = 0;
-					else {
-						float x = setupLength * bone.a, y = setupLength * bone.c;
-						lengths[i] = (float)Math.sqrt(x * x + y * y);
-					}
+					float x = setupLength * bone.a, y = setupLength * bone.c;
+					lengths[i] = (float)Math.sqrt(x * x + y * y);
 				}
 			}
 			Arrays.fill(spaces, 1, spacesCount, spacing);

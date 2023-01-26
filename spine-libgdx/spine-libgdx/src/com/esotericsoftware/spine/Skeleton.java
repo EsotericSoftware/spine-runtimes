@@ -347,35 +347,40 @@ public class Skeleton {
 		int nodeCount = constraint.nodes.size;
 		for (int i = 0; i < nodeCount; i++) {
 			Node node = (Node)nodes[i];
-			if (node.parentBone != null) sortBone(node.parentBone);
-			for (Bone bone : node.bones)
-				sortBone(bone);
+			sortBone(node.parentBone);
+// for (Bone bone : node.bones)
+// sortBone(bone);
 		}
 
 		updateCache.add(constraint);
 
 		for (int i = 0; i < nodeCount; i++) {
 			Node node = (Node)nodes[i];
-			for (Bone bone : node.bones)
-				sortReset(bone.children);
-		}
-		for (int i = 0; i < nodeCount; i++) {
-			Node node = (Node)nodes[i];
-			for (Bone bone : node.bones)
-				bone.sorted = true;
+			sortReset(node.parentBone.children);
 		}
 
-		Object[] springs = constraint.springs.items;
-		for (int i = 0, n = constraint.springs.size; i < n; i++) {
-			Spring spring = (Spring)springs[i];
-			if (spring.bone == null) continue;
-			sortBone(spring.bone);
-			updateCache.add(spring);
-			sortReset(spring.bone.children);
-			spring.bone.sorted = true;
-			for (Bone child : spring.bone.children)
-				sortBone(child);
-		}
+// for (int i = 0; i < nodeCount; i++) {
+// Node node = (Node)nodes[i];
+// for (Bone bone : node.bones)
+// sortReset(bone.children);
+// }
+// for (int i = 0; i < nodeCount; i++) {
+// Node node = (Node)nodes[i];
+// for (Bone bone : node.bones)
+// bone.sorted = true;
+// }
+//
+// Object[] springs = constraint.springs.items;
+// for (int i = 0, n = constraint.springs.size; i < n; i++) {
+// Spring spring = (Spring)springs[i];
+// if (spring.bone == null) continue;
+// sortBone(spring.bone);
+// updateCache.add(spring);
+// sortReset(spring.bone.children);
+// spring.bone.sorted = true;
+// for (Bone child : spring.bone.children)
+// sortBone(child);
+// }
 	}
 
 	private void sortBone (Bone bone) {
