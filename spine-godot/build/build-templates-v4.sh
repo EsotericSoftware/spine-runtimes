@@ -58,8 +58,8 @@ elif [ "$platform" = "macos" ]; then
 	pushd bin
 	cp -r ../misc/dist/macos_template.app .
 	mkdir -p macos_template.app/Contents/MacOS
-	cp godot.macos.universal macos_template.app/Contents/MacOS/godot_macos_release.64
-	cp godot.macos.debug.universal macos_template.app/Contents/MacOS/godot_macos_debug.64
+	cp godot.macos.universal macos_template.app/Contents/MacOS/godot_macos_release.universal
+	cp godot.macos.debug.universal macos_template.app/Contents/MacOS/godot_macos_debug.universal
 	chmod +x macos_template.app/Contents/MacOS/godot_macos*		
 	rm -rf macos.zip
 	zip -q -9 -r macos.zip macos_template.app
