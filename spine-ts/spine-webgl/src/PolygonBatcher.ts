@@ -34,6 +34,8 @@ import { Shader } from "./Shader";
 import { ManagedWebGLRenderingContext } from "./WebGL";
 
 export class PolygonBatcher implements Disposable {
+	public static disableCulling = false;
+
 	private context: ManagedWebGLRenderingContext;
 	private drawCalls = 0;
 	private static globalDrawCalls = 0;
@@ -72,8 +74,10 @@ export class PolygonBatcher implements Disposable {
 		gl.enable(gl.BLEND);
 		gl.blendFuncSeparate(this.srcColorBlend, this.dstBlend, this.srcAlphaBlend, this.dstBlend);
 
-		this.cullWasEnabled = gl.isEnabled(gl.CULL_FACE);
-		if (this.cullWasEnabled) gl.disable(gl.CULL_FACE);
+		if (PolygonBatcher.disableCulling) {
+			this.cullWasEnabled = gl.isEnabled(gl.CULL_FACE);
+			if (this.cullWasEnabled) gl.disable(gl.CULL_FACE);
+		}
 	}
 
 	setBlendMode (srcColorBlend: number, srcAlphaBlend: number, dstBlend: number) {
@@ -133,7 +137,9 @@ export class PolygonBatcher implements Disposable {
 
 		let gl = this.context.gl;
 		gl.disable(gl.BLEND);
-		if (this.cullWasEnabled) gl.enable(gl.CULL_FACE);
+		if (PolygonBatcher.disableCulling) {
+			if(this.cullWasEnabled) gl.enable(gl.CULL_FACE);
+		}
 	}
 
 	getDrawCalls () {
