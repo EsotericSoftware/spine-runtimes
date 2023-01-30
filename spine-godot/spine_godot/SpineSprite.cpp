@@ -542,6 +542,10 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> skeleton_ref) {
 			skeleton_clipper->clipEnd(*slot);
 			continue;
 		}
+		if (!slot->getBone().isActive()) {
+			skeleton_clipper->clipEnd(*slot);
+			continue;
+		}
 
 		spine::Color skeleton_color = skeleton->getColor();
 		spine::Color slot_color = slot->getColor();
