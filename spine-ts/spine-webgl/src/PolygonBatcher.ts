@@ -138,7 +138,7 @@ export class PolygonBatcher implements Disposable {
 		let gl = this.context.gl;
 		gl.disable(gl.BLEND);
 		if (PolygonBatcher.disableCulling) {
-			if(this.cullWasEnabled) gl.enable(gl.CULL_FACE);
+			if (this.cullWasEnabled) gl.enable(gl.CULL_FACE);
 		}
 	}
 
