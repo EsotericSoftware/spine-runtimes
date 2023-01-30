@@ -6,5 +6,5 @@ curl -L "https://sdk.lunarg.com/sdk/download/latest/mac/vulkan-sdk.dmg" -o /tmp/
 hdiutil attach /tmp/vulkan-sdk.dmg -mountpoint /Volumes/vulkan-sdk
 /Volumes/vulkan-sdk/InstallVulkan.app/Contents/MacOS/InstallVulkan \
     --accept-licenses --default-answer --confirm-command install
-hdiutil detach /Volumes/vulkan-sdk
+# hdiutil detach /Volumes/vulkan-sdk
 rm -f /tmp/vulkan-sdk.dmg

@@ -28,8 +28,8 @@ echo "CPUS: $cpus"
 
 pushd ../godot
 if [ `uname` == 'Darwin' ] && [ $dev = "false" ]; then	
-	scons $target arch=x86_64 compiledb=yes custom_modules="../spine_godot" --jobs=$cpus
-	scons $target arch=arm64 compiledb=yes custom_modules="../spine_godot" --jobs=$cpus
+	scons $target arch=x86_64 compiledb=yes custom_modules="../spine_godot" opengl3=yes --jobs=$cpus
+	scons $target arch=arm64 compiledb=yes custom_modules="../spine_godot" opengl3=yes --jobs=$cpus
 
 	pushd bin
 	cp -r ../misc/dist/macos_tools.app .
@@ -47,7 +47,7 @@ else
 	if [ "$dev" = "true" ]; then
 		target="$target dev_build=true"
 	fi
-	scons $target compiledb=yes custom_modules="../spine_godot" --jobs=$cpus	
+	scons $target compiledb=yes custom_modules="../spine_godot" opengl3=yes --jobs=$cpus	
 	cp compile_commands.json ../build
 	if [ -f "bin/godot.linuxbsd.editor.x86_64" ]; then
 		strip bin/godot.linuxbsd.editor.x86_64
