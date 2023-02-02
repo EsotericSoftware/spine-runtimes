@@ -115,7 +115,7 @@ bool SpineSkeletonDataResourceInspectorPlugin::can_handle(Object *object) {
 }
 
 #if VERSION_MAJOR > 3
-bool SpineSkeletonDataResourceInspectorPlugin::parse_property(Object *object, const Variant::Type type, const String &path, const PropertyHint hint, const String &hint_text, const uint32_t usage, const bool wide) {
+bool SpineSkeletonDataResourceInspectorPlugin::parse_property(Object *object, const Variant::Type type, const String &path, const PropertyHint hint, const String &hint_text, const BitField<PropertyUsageFlags> p_usage, const bool wide) {
 #else
 bool SpineSkeletonDataResourceInspectorPlugin::parse_property(Object *object, Variant::Type type, const String &path,
 															  PropertyHint hint, const String &hint_text, int usage) {
