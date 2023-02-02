@@ -108,6 +108,7 @@ Shader "Universal Render Pipeline/Spine/Sprite"
 			#pragma multi_compile _ _SHADOWS_SOFT
 			#pragma multi_compile _ _MIXED_LIGHTING_SUBTRACTIVE
 			// Farward+ renderer keywords
+			#pragma multi_compile_fragment _ _LIGHT_LAYERS
 			#pragma multi_compile _ _FORWARD_PLUS
 			#pragma multi_compile_fragment _ _WRITE_RENDERING_LAYERS
 
@@ -119,6 +120,7 @@ Shader "Universal Render Pipeline/Spine/Sprite"
 			//--------------------------------------
 			// GPU Instancing
 			#pragma multi_compile_instancing
+			#pragma instancing_options renderinglayer
 
 			//--------------------------------------
 			// Spine related keywords
@@ -141,6 +143,7 @@ Shader "Universal Render Pipeline/Spine/Sprite"
 			Tags{"LightMode" = "ShadowCaster"}
 
 			ZWrite On
+			ColorMask 0
 			ZTest LEqual
 			Cull Off
 
@@ -177,7 +180,7 @@ Shader "Universal Render Pipeline/Spine/Sprite"
 			Tags{"LightMode" = "DepthOnly"}
 
 			ZWrite On
-			ColorMask 0
+			ColorMask R
 			Cull Off
 
 			HLSLPROGRAM

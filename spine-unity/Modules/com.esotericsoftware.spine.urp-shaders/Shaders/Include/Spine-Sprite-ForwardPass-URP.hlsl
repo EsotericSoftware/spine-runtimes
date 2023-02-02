@@ -38,9 +38,6 @@ struct VertexOutputLWRP
 #if defined(NEEDS_POSITION_WS)
 	float4 positionWS : TEXCOORD8;
 #endif
-#if defined(_ADDITIONAL_LIGHTS)
-	float4 positionCS : TEXCOORD9;
-#endif
 
 	UNITY_VERTEX_OUTPUT_STEREO
 };
@@ -142,8 +139,9 @@ half4 LightweightFragmentPBRSimplified(InputData inputData, half4 texAlbedoAlpha
 #endif
 
 #if USE_FORWARD_PLUS
-	for (uint lightIndex = 0; lightIndex < min(_AdditionalLightsDirectionalCount, MAX_VISIBLE_LIGHTS); lightIndex++)
+	for (uint lightIndex = 0; lightIndex < min(URP_FP_DIRECTIONAL_LIGHTS_COUNT, MAX_VISIBLE_LIGHTS); lightIndex++)
 	{
+		FORWARD_PLUS_SUBTRACTIVE_LIGHT_CHECK
 		finalColor += ProcessLightPBRSimplified(inputData, brdfData, shadowMask, meshRenderingLayers, lightIndex);
 	}
 #endif
@@ -217,8 +215,9 @@ half4 LightweightFragmentBlinnPhongSimplified(InputData inputData, half4 texDiff
 	half4 shadowMask = half4(1, 1, 1, 1);
 #endif
 #if USE_FORWARD_PLUS
-	for (uint lightIndex = 0; lightIndex < min(_AdditionalLightsDirectionalCount, MAX_VISIBLE_LIGHTS); lightIndex++)
+	for (uint lightIndex = 0; lightIndex < min(URP_FP_DIRECTIONAL_LIGHTS_COUNT, MAX_VISIBLE_LIGHTS); lightIndex++)
 	{
+		FORWARD_PLUS_SUBTRACTIVE_LIGHT_CHECK
 		diffuseLighting += ProcessLightLambert(inputData, shadowMask, meshRenderingLayers, lightIndex);
 	}
 #endif
@@ -258,9 +257,6 @@ VertexOutputLWRP ForwardPassVertexSprite(VertexInput input)
 	output.viewDirectionWS = GetCameraPositionWS() - positionWS;
 #if defined(NEEDS_POSITION_WS)
 	output.positionWS = float4(positionWS, 1);
-#endif
-#if defined(_ADDITIONAL_LIGHTS)
-	output.positionCS = output.pos;
 #endif
 
 	half3 normalWS = calculateSpriteWorldNormal(input, -backFaceSign);
@@ -329,11 +325,11 @@ half4 ForwardPassFragmentSprite(VertexOutputLWRP input
 	inputData.positionWS = input.positionWS.rgb;
 #endif
 #if defined(_ADDITIONAL_LIGHTS) && USE_FORWARD_PLUS
-	inputData.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(input.positionCS);
+	inputData.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(input.pos);
 #else
 	inputData.normalizedScreenSpaceUV = 0;
 #endif
-
+	
 #if defined(SPECULAR)
 	half2 metallicGloss = getMetallicGloss(input.texcoord.xy);
 	half metallic = metallicGloss.x;

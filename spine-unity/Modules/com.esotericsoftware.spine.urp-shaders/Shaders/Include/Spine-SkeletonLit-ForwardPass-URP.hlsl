@@ -29,6 +29,10 @@ struct VertexOutput {
 	float4 shadowCoord : TEXCOORD1;
 	half3 shadowedColor : TEXCOORD2;
 #endif
+#if defined(_ADDITIONAL_LIGHTS) && USE_FORWARD_PLUS
+	float3 positionWS : TEXCOORD3;
+	half3 normalWS : TEXCOORD4;
+#endif
 
 	UNITY_VERTEX_OUTPUT_STEREO
 };
@@ -45,7 +49,7 @@ half3 ProcessLight(float3 positionWS, half3 normalWS, uint meshRenderingLayers, 
 	return LightingLambert(attenuatedLightColor, light.direction, normalWS);
 }
 
-half3 LightweightLightVertexSimplified(float3 positionWS, float3 positionCS, half3 normalWS, out half3 shadowedColor) {
+half3 LightweightLightVertexSimplified(float3 positionWS, half3 normalWS, out half3 shadowedColor) {
 	Light mainLight = GetMainLight();
 	half3 attenuatedLightColor = mainLight.color * (mainLight.distanceAttenuation * mainLight.shadowAttenuation);
 	half3 mainLightColor = LightingLambert(attenuatedLightColor, mainLight.direction, normalWS);
@@ -55,28 +59,40 @@ half3 LightweightLightVertexSimplified(float3 positionWS, float3 positionCS, hal
 #if defined(_ADDITIONAL_LIGHTS) || defined(_ADDITIONAL_LIGHTS_VERTEX)
 	uint meshRenderingLayers = GetMeshRenderingLayerBackwardsCompatible();
 #if USE_FORWARD_PLUS
-	for (uint lightIndex = 0; lightIndex < min(_AdditionalLightsDirectionalCount, MAX_VISIBLE_LIGHTS); lightIndex++)
+	for (uint lightIndex = 0; lightIndex < min(URP_FP_DIRECTIONAL_LIGHTS_COUNT, MAX_VISIBLE_LIGHTS); lightIndex++)
 	{
+		FORWARD_PLUS_SUBTRACTIVE_LIGHT_CHECK
 		additionalLightColor += ProcessLight(positionWS, normalWS, meshRenderingLayers, lightIndex);
 	}
-#endif
+#else // !USE_FORWARD_PLUS
 	int pixelLightCount = GetAdditionalLightsCount();
-	// fill out InputData struct
-	InputData inputData; // LIGHT_LOOP_BEGIN macro requires InputData struct in USE_FORWARD_PLUS branch
-	inputData.positionWS = positionWS;
-#if defined(_ADDITIONAL_LIGHTS) && USE_FORWARD_PLUS
-	inputData.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(positionCS);
-#else
-	inputData.normalizedScreenSpaceUV = 0;
-#endif
-
 	LIGHT_LOOP_BEGIN_SPINE(pixelLightCount)
 		additionalLightColor += ProcessLight(positionWS, normalWS, meshRenderingLayers, lightIndex);
 	LIGHT_LOOP_END_SPINE
+#endif // USE_FORWARD_PLUS
 #endif
+
 	shadowedColor = additionalLightColor;
 	return mainLightColor + additionalLightColor;
 }
+
+#if defined(_ADDITIONAL_LIGHTS) && USE_FORWARD_PLUS
+half3 LightweightLightFragmentSimplified(float3 positionWS, float2 positionCS, half3 normalWS, out half3 shadowedColor) {
+	half3 additionalLightColor = half3(0, 0, 0);
+	shadowedColor = half3(0, 0, 0);
+
+	InputData inputData; // LIGHT_LOOP_BEGIN macro requires InputData struct in USE_FORWARD_PLUS branch
+	inputData.positionWS = positionWS;
+	inputData.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(positionCS);
+	
+	uint meshRenderingLayers = GetMeshRenderingLayerBackwardsCompatible();
+	int pixelLightCount = GetAdditionalLightsCount();
+	LIGHT_LOOP_BEGIN_SPINE(pixelLightCount)
+		additionalLightColor += ProcessLight(positionWS, normalWS, meshRenderingLayers, lightIndex);
+	LIGHT_LOOP_END_SPINE
+	return additionalLightColor;
+}
+#endif
 
 VertexOutput vert(appdata v) {
 	VertexOutput o;
@@ -89,7 +105,6 @@ VertexOutput vert(appdata v) {
 	half3 normalWS = normalize(mul((float3x3)unity_ObjectToWorld, fixedNormal));
 	o.uv0 = v.uv0;
 	o.pos = TransformWorldToHClip(positionWS);
-	float3 positionCS = o.pos;
 
 #ifdef _DOUBLE_SIDED_LIGHTING
 	// unfortunately we have to compute the sign here in the vertex shader
@@ -97,6 +112,11 @@ VertexOutput vert(appdata v) {
 	half3 viewDirWS = UNITY_MATRIX_V[2].xyz;
 	half faceSign = sign(dot(viewDirWS, normalWS));
 	normalWS *= faceSign;
+#endif
+
+#if defined(_ADDITIONAL_LIGHTS) && USE_FORWARD_PLUS
+	o.positionWS = positionWS;
+	o.normalWS = normalWS;
 #endif
 
 	half3 shadowedColor;
@@ -111,7 +131,7 @@ VertexOutput vert(appdata v) {
 	}
 #endif // !defined(_LIGHT_AFFECTS_ADDITIVE)
 
-	color.rgb *= LightweightLightVertexSimplified(positionWS, positionCS, normalWS, shadowedColor);
+	color.rgb *= LightweightLightVertexSimplified(positionWS, normalWS, shadowedColor);
 #if defined(SKELETONLIT_RECEIVE_SHADOWS)
 	o.shadowedColor = shadowedColor;
 #endif
@@ -144,6 +164,14 @@ half4 frag(VertexOutput i
 
 	if (i.color.a == 0)
 		return tex * i.color;
+
+#if defined(_ADDITIONAL_LIGHTS) && USE_FORWARD_PLUS
+	// USE_FORWARD_PLUS lights need to be processed in fragment shader,
+	// otherwise light culling by vertex will create a very bad lighting result.
+	half3 shadowedColor;
+	i.color.rgb += LightweightLightFragmentSimplified(i.positionWS, i.pos, i.normalWS, shadowedColor);
+	i.shadowedColor += shadowedColor;
+#endif
 
 #if defined(SKELETONLIT_RECEIVE_SHADOWS)
 	half shadowAttenuation = MainLightRealtimeShadow(i.shadowCoord);
