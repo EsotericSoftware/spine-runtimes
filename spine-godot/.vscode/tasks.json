@@ -14,6 +14,7 @@
                 "16",
                 "target=editor",
                 "dev_build=yes",
+                "opengl3=yes",
                 "custom_modules=\"${workspaceFolder}/spine_godot\""
             ],
             "problemMatcher": "$msCompile",
@@ -23,6 +24,7 @@
                     "16",
                     "target=editor",
                     "dev_build=yes",
+                    "opengl3=yes",
                     "custom_modules=\"${workspaceFolder}/spine_godot\"",
                     "livepp=${env:LIVEPP}"
                 ]
