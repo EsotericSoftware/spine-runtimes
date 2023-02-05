@@ -165,7 +165,7 @@ class SpineSkeletonDataResourceInspectorPlugin : public EditorInspectorPlugin {
 public:
 	bool can_handle(Object *object) override;
 #if VERSION_MAJOR > 3
-	bool parse_property(Object *object, Variant::Type type, const String &path, PropertyHint hint, const String &hint_text, uint32_t usage, bool wide) override;
+	bool parse_property(Object *object, Variant::Type type, const String &path, PropertyHint hint, const String &hint_text, const BitField<PropertyUsageFlags> usage, bool wide) override;
 #else
 	bool parse_property(Object *object, Variant::Type type, const String &path, PropertyHint hint, const String &hint_text, int usage) override;
 #endif
