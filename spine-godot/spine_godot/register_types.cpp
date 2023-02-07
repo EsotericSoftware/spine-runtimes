@@ -153,13 +153,8 @@ void uninitialize_spine_godot_module(ModuleInitializationLevel level) {
 #else
 void unregister_spine_godot_types() {
 #endif
-	/*ResourceLoader::remove_resource_format_loader(atlas_loader);
+	ResourceLoader::remove_resource_format_loader(atlas_loader);
 	ResourceSaver::remove_resource_format_saver(atlas_saver);
 	ResourceLoader::remove_resource_format_loader(skeleton_file_loader);
-	ResourceSaver::remove_resource_format_saver(skeleton_file_saver);*/
-
-	/*memdelete(atlas_loader);
-	memdelete(atlas_saver);
-	memdelete(skeleton_file_saver);
-	memdelete(skeleton_file_loader);*/
+	ResourceSaver::remove_resource_format_saver(skeleton_file_saver);
 }
