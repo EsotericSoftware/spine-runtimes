@@ -132,6 +132,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
 	bool HasBone(const FString BoneName);
 
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
+	FTransform GetBoneTransform(const FString &BoneName);
+
 	UFUNCTION(BlueprintPure, Category = "Components|Spine|Skeleton")
 	void GetSlots(TArray<FString> &Slots);
 
