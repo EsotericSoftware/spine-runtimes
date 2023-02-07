@@ -32,11 +32,35 @@
 #include "SpineSkeleton.h"
 #include "SpineAnimationState.h"
 #include "scene/2d/node_2d.h"
-#include "scene/2d/mesh_instance_2d.h"
 
 class SpineSlotNode;
 
-class SpineSprite : public Node2D, public spine::AnimationStateListenerObject {
+struct SpineRendererObject;
+
+class SpineSprite;
+
+class SpineMesh2D : public Node2D {
+	GDCLASS(SpineMesh2D, Node2D);
+
+	friend class SpineSprite;
+
+protected:
+	void _notification(int what);
+	static void _bind_methods();
+
+	Vector<Vector2> vertices;
+	Vector<Vector2> uvs;
+	Vector<Color> colors;
+	Vector<int> indices;
+	SpineRendererObject *renderer_object;
+
+public:
+	SpineMesh2D() : renderer_object(nullptr){};
+	~SpineMesh2D(){};
+};
+
+class SpineSprite : public Node2D,
+					public spine::AnimationStateListenerObject {
 	GDCLASS(SpineSprite, Node2D)
 
 	friend class SpineBone;
@@ -67,7 +91,7 @@ protected:
 	Color debug_clipping_color;
 
 	spine::Vector<spine::Vector<SpineSlotNode *>> slot_nodes;
-	Vector<MeshInstance2D *> mesh_instances;
+	Vector<SpineMesh2D *> mesh_instances;
 	static Ref<CanvasItemMaterial> default_materials[4];
 	Ref<Material> normal_material;
 	Ref<Material> additive_material;
