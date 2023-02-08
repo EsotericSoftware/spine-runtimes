@@ -1050,24 +1050,30 @@ class Bone {
   }
 }
 
+/// Stores the setup pose for a [Slot].
 class SlotData {
   final spine_slot_data _data;
 
   SlotData._(this._data);
 
+  /// The index of the slot in [Skeleton.getSlots].
   int getIndex() {
     return _bindings.spine_slot_data_get_index(_data);
   }
 
+  /// The name of the slot, which is unique across all slots in the skeleton.
   String getName() {
     final Pointer<Utf8> value = _bindings.spine_slot_data_get_name(_data).cast();
     return value.toDartString();
   }
 
+  /// The bone this slot belongs to.
   BoneData getBoneData() {
     return BoneData._(_bindings.spine_slot_data_get_bone_data(_data));
   }
 
+  /// The [Color] used to tint the slot's attachment. If [hasDarkColor] is true, this is used as the light color for two
+  /// color tinting.
   Color getColor() {
     final color = _bindings.spine_slot_data_get_color(_data);
     return Color(_bindings.spine_color_get_r(color), _bindings.spine_color_get_g(color), _bindings.spine_color_get_b(color),
@@ -1078,6 +1084,8 @@ class SlotData {
     _bindings.spine_slot_data_set_color(_data, r, g, b, a);
   }
 
+  /// The dark color used to tint the slot's attachment for two color tinting, if [hasDarkColor] is true. The dark
+  /// color's alpha is not used.
   Color getDarkColor() {
     final color = _bindings.spine_slot_data_get_dark_color(_data);
     return Color(_bindings.spine_color_get_r(color), _bindings.spine_color_get_g(color), _bindings.spine_color_get_b(color),
@@ -1088,6 +1096,7 @@ class SlotData {
     _bindings.spine_slot_data_set_dark_color(_data, r, g, b, a);
   }
 
+  /// Returns whether this slot has a dark color set for two color tinting.
   bool hasDarkColor() {
     return _bindings.spine_slot_data_has_dark_color(_data) == -1;
   }
@@ -1096,6 +1105,7 @@ class SlotData {
     _bindings.spine_slot_data_set_has_dark_color(_data, hasDarkColor ? -1 : 0);
   }
 
+  /// The name of the attachment that is visible for this slot in the setup pose, or null if no attachment is visible.
   String getAttachmentName() {
     final Pointer<Utf8> value = _bindings.spine_slot_data_get_attachment_name(_data).cast();
     return value.toDartString();
@@ -1107,6 +1117,7 @@ class SlotData {
     _allocator.free(nativeName);
   }
 
+  /// The [BlendMode] for drawing the slot's attachment.
   BlendMode getBlendMode() {
     return BlendMode.values[_bindings.spine_slot_data_get_blend_mode(_data)];
   }
@@ -1121,27 +1132,36 @@ class SlotData {
   }
 }
 
+/// Stores a slot's current pose. Slots organize attachments for [Skeleton.getDrawOrder] purposes and provide a place to store
+/// state for an attachment. State cannot be stored in an attachment itself because attachments are stateless and may be shared
+/// across multiple skeletons.
 class Slot {
   final spine_slot _slot;
 
   Slot._(this._slot);
 
+  /// Sets this slot to the setup pose.
   void setToSetupPose() {
     _bindings.spine_slot_set_to_setup_pose(_slot);
   }
 
+  /// The slot's setup pose data.
   SlotData getData() {
     return SlotData._(_bindings.spine_slot_get_data(_slot));
   }
 
+  /// The bone this slot belongs to.
   Bone getBone() {
     return Bone._(_bindings.spine_slot_get_bone(_slot));
   }
 
+  /// The skeleton this slot belongs to.
   Skeleton getSkeleton() {
     return Skeleton._(_bindings.spine_slot_get_skeleton(_slot));
   }
 
+  /// The color used to tint the slot's attachment. If [hasDarkColor] is true, this is used as the light color for two
+  /// color tinting.
   Color getColor() {
     final color = _bindings.spine_slot_get_color(_slot);
     return Color(_bindings.spine_color_get_r(color), _bindings.spine_color_get_g(color), _bindings.spine_color_get_b(color),
@@ -1152,6 +1172,8 @@ class Slot {
     _bindings.spine_slot_set_color(_slot, color.r, color.g, color.b, color.a);
   }
 
+  /// The dark color used to tint the slot's attachment for two color tinting, if [hasDarkColor] is true. The dark
+  /// color's alpha is not used.
   Color getDarkColor() {
     final color = _bindings.spine_slot_get_dark_color(_slot);
     return Color(_bindings.spine_color_get_r(color), _bindings.spine_color_get_g(color), _bindings.spine_color_get_b(color),
@@ -1162,10 +1184,12 @@ class Slot {
     _bindings.spine_slot_set_dark_color(_slot, color.r, color.g, color.b, color.a);
   }
 
+  /// Returns whether this slot has a dark color set for two color tinting.
   bool hasDarkColor() {
     return _bindings.spine_slot_has_dark_color(_slot) == -1;
   }
 
+  /// The current attachment for the slot, or null if the slot has no attachment.
   Attachment? getAttachment() {
     final attachment = _bindings.spine_slot_get_attachment(_slot);
     if (attachment.address == nullptr.address) return null;
@@ -1181,6 +1205,8 @@ class Slot {
     return getData().getName();
   }
 
+  /// The index of the texture region to display when the slot's attachment has a [Sequence]. -1 represents the
+  /// [Sequence.getSetupIndex].
   int getSequenceIndex() {
     return _bindings.spine_slot_get_sequence_index(_slot);
   }
@@ -1190,6 +1216,8 @@ class Slot {
   }
 }
 
+/// A region within a texture, given in normalized texture coordinates of the top left ([getU], [getV]) and
+/// bottom left ([getU2], [getV2]) corner of the region within the texture.
 class TextureRegion {
   final spine_texture_region _region;
 
@@ -1292,6 +1320,7 @@ class TextureRegion {
   }
 }
 
+/// Stores a sequence of [TextureRegion] instances that will switched through when set on an attachment.
 class Sequence {
   final spine_sequence _sequence;
 
@@ -1353,6 +1382,7 @@ class Sequence {
   }
 }
 
+/// Attachment types.
 enum AttachmentType {
   region(0),
   mesh(1),
@@ -1366,16 +1396,19 @@ enum AttachmentType {
   const AttachmentType(this.value);
 }
 
+/// The base class for all attachments.
 abstract class Attachment<T extends Pointer> {
   final T _attachment;
 
   Attachment._(this._attachment);
 
+  /// The attachment's name.
   String getName() {
     Pointer<Utf8> name = _bindings.spine_attachment_get_name(_attachment.cast()).cast();
     return name.toString();
   }
 
+  /// The attachment's type.
   AttachmentType getType() {
     final type = _bindings.spine_attachment_get_type(_attachment.cast());
     return AttachmentType.values[type];
@@ -1399,6 +1432,8 @@ abstract class Attachment<T extends Pointer> {
     }
   }
 
+  /// Returns a copy of the attachment. Copied attachments need to be disposed manually
+  /// when no longer in use via the [dispose] method.
   Attachment copy() {
     return _toSubclass(_bindings.spine_attachment_copy(_attachment.cast()));
   }
@@ -1408,9 +1443,17 @@ abstract class Attachment<T extends Pointer> {
   }
 }
 
+/// An attachment that displays a textured quadrilateral.
+///
+/// See [Region attachments](http://esotericsoftware.com/spine-regions) in the Spine User Guide.
 class RegionAttachment extends Attachment<spine_region_attachment> {
   RegionAttachment._(spine_region_attachment attachment) : super._(attachment);
 
+  /// Transforms and returns the attachment's four vertices to world coordinates. If the attachment has a [Sequence], the region may
+  /// be changed.
+  ///
+  /// See [World transforms](http://esotericsoftware.com/spine-runtime-skeletons#World-transforms) in the Spine
+  /// Runtimes Guide.
   List<double> computeWorldVertices(Slot slot) {
     Pointer<Float> vertices = _allocator.allocate(4 * 8).cast();
     _bindings.spine_region_attachment_compute_world_vertices(_attachment, slot._slot, vertices);
@@ -1419,6 +1462,7 @@ class RegionAttachment extends Attachment<spine_region_attachment> {
     return result;
   }
 
+  /// The local x translation.
   double getX() {
     return _bindings.spine_region_attachment_get_x(_attachment);
   }
@@ -1427,6 +1471,7 @@ class RegionAttachment extends Attachment<spine_region_attachment> {
     _bindings.spine_region_attachment_set_x(_attachment, x);
   }
 
+  /// The local y translation.
   double getY() {
     return _bindings.spine_region_attachment_get_y(_attachment);
   }
@@ -1435,6 +1480,7 @@ class RegionAttachment extends Attachment<spine_region_attachment> {
     _bindings.spine_region_attachment_set_y(_attachment, y);
   }
 
+  /// The local rotation.
   double getRotation() {
     return _bindings.spine_region_attachment_get_rotation(_attachment);
   }
@@ -1443,6 +1489,7 @@ class RegionAttachment extends Attachment<spine_region_attachment> {
     _bindings.spine_region_attachment_set_rotation(_attachment, rotation);
   }
 
+  /// The local scaleX.
   double getScaleX() {
     return _bindings.spine_region_attachment_get_scale_x(_attachment);
   }
@@ -1451,6 +1498,7 @@ class RegionAttachment extends Attachment<spine_region_attachment> {
     _bindings.spine_region_attachment_set_scale_x(_attachment, scaleX);
   }
 
+  /// The local scaleY.
   double getScaleY() {
     return _bindings.spine_region_attachment_get_scale_y(_attachment);
   }
@@ -1459,6 +1507,7 @@ class RegionAttachment extends Attachment<spine_region_attachment> {
     _bindings.spine_region_attachment_set_scale_x(_attachment, scaleY);
   }
 
+  /// The width of the region attachment in Spine.
   double getWidth() {
     return _bindings.spine_region_attachment_get_width(_attachment);
   }
@@ -1467,6 +1516,7 @@ class RegionAttachment extends Attachment<spine_region_attachment> {
     _bindings.spine_region_attachment_set_width(_attachment, width);
   }
 
+  /// The height of the region attachment in Spine.
   double getHeight() {
     return _bindings.spine_region_attachment_get_height(_attachment);
   }
@@ -1502,6 +1552,9 @@ class RegionAttachment extends Attachment<spine_region_attachment> {
     return Sequence._(sequence);
   }
 
+  /// For each of the 4 vertices, a pair of `x,y` values that is the local position of the vertex.
+  ///
+  /// See [updateRegion].
   Float32List getOffset() {
     final num = _bindings.spine_region_attachment_get_num_offset(_attachment);
     final offset = _bindings.spine_region_attachment_get_offset(_attachment);
@@ -1515,9 +1568,16 @@ class RegionAttachment extends Attachment<spine_region_attachment> {
   }
 }
 
+/// Base class for an attachment with vertices that are transformed by one or more bones and can be deformed by a slot's
+/// [Slot.getDeform].
 class VertexAttachment<T extends Pointer> extends Attachment<T> {
   VertexAttachment._(T attachment) : super._(attachment);
 
+  /// Transforms and returns the attachment's local [getVertices] to world coordinates. If the slot's [Slot.getDeform] is
+  /// not empty, it is used to deform the vertices.
+
+  /// See [World transforms](http://esotericsoftware.com/spine-runtime-skeletons#World-transforms) in the Spine
+  /// Runtimes Guide.
   List<double> computeWorldVertices(Slot slot) {
     final worldVerticesLength = _bindings.spine_vertex_attachment_get_world_vertices_length(_attachment.cast());
     Pointer<Float> vertices = _allocator.allocate(4 * worldVerticesLength).cast();
@@ -1527,18 +1587,26 @@ class VertexAttachment<T extends Pointer> extends Attachment<T> {
     return result;
   }
 
+  /// The bones which affect the [getVertices]. The array entries are, for each vertex, the number of bones affecting
+  /// the vertex followed by that many bone indices, which is the index of the bone in [Skeleton.getBones]. Will be null
+  /// if this attachment has no weights.
   Int32List getBones() {
     final num = _bindings.spine_vertex_attachment_get_num_bones(_attachment.cast());
     final bones = _bindings.spine_vertex_attachment_get_bones(_attachment.cast());
     return bones.asTypedList(num);
   }
 
+  /// The vertex positions in the bone's coordinate system. For a non-weighted attachment, the values are `x,y`
+  /// entries for each vertex. For a weighted attachment, the values are `x,y,weight` entries for each bone affecting
+  /// each vertex.
   Float32List getVertices() {
     final num = _bindings.spine_vertex_attachment_get_num_vertices(_attachment.cast());
     final vertices = _bindings.spine_vertex_attachment_get_vertices(_attachment.cast());
     return vertices.asTypedList(num);
   }
 
+  /// Timelines for the timeline attachment are also applied to this attachment. May return `null` if not
+  /// attachment-specific timelines should be applied.
   Attachment? getTimelineAttachment() {
     final attachment = _bindings.spine_vertex_attachment_get_timeline_attachment(_attachment.cast());
     if (_attachment.address == nullptr.address) return null;
@@ -1551,13 +1619,20 @@ class VertexAttachment<T extends Pointer> extends Attachment<T> {
   }
 }
 
+/// An attachment that displays a textured mesh. A mesh has hull vertices and internal vertices within the hull. Holes are not
+/// supported. Each vertex has UVs (texture coordinates) and triangles are used to map an image on to the mesh.
+///
+/// See [Mesh attachments](http://esotericsoftware.com/spine-meshes) in the Spine User Guide.
 class MeshAttachment extends VertexAttachment<spine_mesh_attachment> {
   MeshAttachment._(spine_mesh_attachment attachment) : super._(attachment.cast());
 
+  /// Calculates texture coordinates returned by [getUVs] using the coordinates returned by [getRegionUVs] and region. Must be called if
+  /// the region, the region's properties, or the [getRegionUVs] are changed.
   void updateRegion() {
     _bindings.spine_mesh_attachment_update_region(_attachment);
   }
 
+  /// The number of entries at the beginning of {@link #vertices} that make up the mesh hull.
   int getHullLength() {
     return _bindings.spine_mesh_attachment_get_hull_length(_attachment);
   }
@@ -1566,18 +1641,23 @@ class MeshAttachment extends VertexAttachment<spine_mesh_attachment> {
     _bindings.spine_mesh_attachment_set_hull_length(_attachment, hullLength);
   }
 
+  /// The UV pair for each vertex, normalized within the texture region.
   Float32List getRegionUVs() {
     final num = _bindings.spine_mesh_attachment_get_num_region_uvs(_attachment);
     final uvs = _bindings.spine_mesh_attachment_get_region_uvs(_attachment);
     return uvs.asTypedList(num);
   }
 
+  /// The UV pair for each vertex, normalized within the entire texture.
+  ///
+  /// See [updateRegion].
   Float32List getUVs() {
     final num = _bindings.spine_mesh_attachment_get_num_uvs(_attachment);
     final uvs = _bindings.spine_mesh_attachment_get_uvs(_attachment);
     return uvs.asTypedList(num);
   }
 
+  /// Triplets of vertex indices which describe the mesh's triangulation.
   Uint16List getTriangles() {
     final num = _bindings.spine_mesh_attachment_get_num_triangles(_attachment);
     final triangles = _bindings.spine_mesh_attachment_get_triangles(_attachment);
@@ -1611,6 +1691,9 @@ class MeshAttachment extends VertexAttachment<spine_mesh_attachment> {
     return Sequence._(sequence);
   }
 
+  /// The parent mesh if this is a linked mesh, else null. A linked mesh shares the bones, vertices,
+  /// region UVs, triangles, hull length, edges, width, and height with the
+  /// parent mesh, but may have a different name or path (and therefore a different texture).
   MeshAttachment? getParentMesh() {
     final parent = _bindings.spine_mesh_attachment_get_parent_mesh(_attachment);
     if (parent.address == nullptr.address) return null;
@@ -1621,12 +1704,15 @@ class MeshAttachment extends VertexAttachment<spine_mesh_attachment> {
     _bindings.spine_mesh_attachment_set_parent_mesh(_attachment, parentMesh == null ? nullptr : parentMesh._attachment);
   }
 
+  /// Vertex index pairs describing edges for controlling triangulation, or be null if nonessential data was not exported. Mesh
+  /// triangles will never cross edges. Triangulation is not performed at runtime.
   Uint16List getEdges() {
     final num = _bindings.spine_mesh_attachment_get_num_edges(_attachment);
     final edges = _bindings.spine_mesh_attachment_get_edges(_attachment);
     return edges.asTypedList(num);
   }
 
+  /// The width of the mesh's image, or zero if nonessential data was not exported.
   double getWidth() {
     return _bindings.spine_mesh_attachment_get_width(_attachment);
   }
@@ -1635,6 +1721,7 @@ class MeshAttachment extends VertexAttachment<spine_mesh_attachment> {
     _bindings.spine_mesh_attachment_set_width(_attachment, width);
   }
 
+  /// The height of the mesh's image, or zero if nonessential data was not exported.
   double getHeight() {
     return _bindings.spine_mesh_attachment_get_height(_attachment);
   }
@@ -1644,9 +1731,12 @@ class MeshAttachment extends VertexAttachment<spine_mesh_attachment> {
   }
 }
 
+/// An attachment with vertices that make up a polygon used for clipping the rendering of other attachments.
 class ClippingAttachment extends VertexAttachment<spine_clipping_attachment> {
   ClippingAttachment._(spine_clipping_attachment attachment) : super._(attachment.cast());
 
+  /// Clipping is performed between the clipping attachment's slot and the end slot. If null clipping is done until the end of
+  /// the skeleton's rendering.
   SlotData? getEndSlot() {
     final endSlot = _bindings.spine_clipping_attachment_get_end_slot(_attachment);
     if (endSlot.address == nullptr.address) return null;
@@ -1657,6 +1747,8 @@ class ClippingAttachment extends VertexAttachment<spine_clipping_attachment> {
     _bindings.spine_clipping_attachment_set_end_slot(_attachment, endSlot == null ? nullptr : endSlot._data);
   }
 
+  /// The color of the clipping attachment as it was in Spine, or a default color if nonessential data was not exported. Clipping
+  /// attachments are not usually rendered at runtime.
   Color getColor() {
     final color = _bindings.spine_clipping_attachment_get_color(_attachment);
     return Color(_bindings.spine_color_get_r(color), _bindings.spine_color_get_g(color), _bindings.spine_color_get_b(color),
@@ -1668,9 +1760,16 @@ class ClippingAttachment extends VertexAttachment<spine_clipping_attachment> {
   }
 }
 
+/// An attachment with vertices that make up a polygon. Can be used for hit detection, creating physics bodies, spawning particle
+/// effects, and more.
+///
+/// See [SkeletonBounds] and [Bounding boxes](http://esotericsoftware.com/spine-bounding-boxes) in the Spine User
+/// Guide.
 class BoundingBoxAttachment extends VertexAttachment<spine_bounding_box_attachment> {
   BoundingBoxAttachment._(spine_bounding_box_attachment attachment) : super._(attachment);
 
+  /// The color of the bounding box as it was in Spine, or a default color if nonessential data was not exported. Bounding boxes
+  /// are not usually rendered at runtime.
   Color getColor() {
     final color = _bindings.spine_bounding_box_attachment_get_color(_attachment);
     return Color(_bindings.spine_color_get_r(color), _bindings.spine_color_get_g(color), _bindings.spine_color_get_b(color),
@@ -1682,15 +1781,20 @@ class BoundingBoxAttachment extends VertexAttachment<spine_bounding_box_attachme
   }
 }
 
+/// An attachment whose vertices make up a composite Bezier curve.
+///
+/// See [PathConstraint] and [Paths](http://esotericsoftware.com/spine-paths) in the Spine User Guide.
 class PathAttachment extends VertexAttachment<spine_path_attachment> {
   PathAttachment._(spine_path_attachment attachment) : super._(attachment);
 
+  /// The lengths along the path in the setup pose from the start of the path to the end of each Bezier curve.
   Float32List getLengths() {
     final num = _bindings.spine_path_attachment_get_num_lengths(_attachment);
     final lengths = _bindings.spine_path_attachment_get_lengths(_attachment);
     return lengths.asTypedList(num);
   }
 
+  /// If true, the start and end knots are connected.
   bool isClosed() {
     return _bindings.spine_path_attachment_get_is_closed(_attachment) == -1;
   }
@@ -1699,6 +1803,8 @@ class PathAttachment extends VertexAttachment<spine_path_attachment> {
     _bindings.spine_path_attachment_set_is_closed(_attachment, isClosed ? -1 : 0);
   }
 
+  /// If true, additional calculations are performed to make computing positions along the path more accurate and movement along
+  /// the path have a constant speed.
   bool isConstantSpeed() {
     return _bindings.spine_path_attachment_get_is_constant_speed(_attachment) == -1;
   }
@@ -1707,6 +1813,8 @@ class PathAttachment extends VertexAttachment<spine_path_attachment> {
     _bindings.spine_path_attachment_set_is_constant_speed(_attachment, isClosed ? -1 : 0);
   }
 
+  /// The color of the path as it was in Spine, or a default color if nonessential data was not exported. Paths are not usually
+  /// rendered at runtime.
   Color getColor() {
     final color = _bindings.spine_path_attachment_get_color(_attachment);
     return Color(_bindings.spine_color_get_r(color), _bindings.spine_color_get_g(color), _bindings.spine_color_get_b(color),
@@ -1718,6 +1826,11 @@ class PathAttachment extends VertexAttachment<spine_path_attachment> {
   }
 }
 
+/// An attachment which is a single point and a rotation. This can be used to spawn projectiles, particles, etc. A bone can be
+/// used in similar ways, but a PointAttachment is slightly less expensive to compute and can be hidden, shown, and placed in a
+/// skin.
+///
+/// See [Point Attachments](http://esotericsoftware.com/spine-point-attachments) in the Spine User Guide.
 class PointAttachment extends Attachment<spine_point_attachment> {
   PointAttachment._(spine_point_attachment attachment) : super._(attachment);
 
@@ -1756,6 +1869,8 @@ class PointAttachment extends Attachment<spine_point_attachment> {
     _bindings.spine_point_attachment_set_x(_attachment, rotation);
   }
 
+  /// The color of the point attachment as it was in Spine, or a default clor if nonessential data was not exported. Point
+  /// attachments are not usually rendered at runtime.
   Color getColor() {
     final color = _bindings.spine_point_attachment_get_color(_attachment);
     return Color(_bindings.spine_color_get_r(color), _bindings.spine_color_get_g(color), _bindings.spine_color_get_b(color),
@@ -1767,6 +1882,7 @@ class PointAttachment extends Attachment<spine_point_attachment> {
   }
 }
 
+/// An entry storing the attachment to be used for a specific slot within [Skin].
 class SkinEntry {
   final int slotIndex;
   final String name;
@@ -1775,12 +1891,21 @@ class SkinEntry {
   SkinEntry(this.slotIndex, this.name, this.attachment);
 }
 
+/// Stores attachments by slot index and attachment name.
+///
+/// Skins constructed manually via the `Skin(String name)` constructor must be manually disposed via the [dipose] method if they
+/// are no longer used.
+///
+/// See [SkeletonData.defaultSkin], [Skeleton.getSkin}, and [Runtime skins](http://esotericsoftware.com/spine-runtime-skins) in the
+/// Spine Runtimes Guide.
 class Skin {
   late final bool _isCustomSkin;
   late final spine_skin _skin;
 
   Skin._(this._skin) : _isCustomSkin = false;
 
+  /// Constructs a new empty skin using the given [name]. Skins constructed this way must be manually disposed via the [dispose] method
+  /// if they are no longer used.
   Skin(String name) {
     final nativeName = name.toNativeUtf8(allocator: _allocator);
     _skin = _bindings.spine_skin_create(nativeName.cast());
@@ -1788,17 +1913,20 @@ class Skin {
     _isCustomSkin = true;
   }
 
+  /// Diposes this skin.
   void dispose() {
     if (!_isCustomSkin) return;
     _bindings.spine_skin_dispose(_skin);
   }
 
+  /// Adds an attachment to the skin for the specified slot index and name.
   void setAttachment(int slotIndex, String name, Attachment? attachment) {
     final nativeName = name.toNativeUtf8(allocator: _allocator);
     _bindings.spine_skin_set_attachment(_skin, slotIndex, nativeName.cast(), attachment == null ? nullptr : attachment._attachment.cast());
     _allocator.free(nativeName);
   }
 
+  /// Returns the attachment for the specified slot index and name, or null.
   Attachment? getAttachment(int slotIndex, String name) {
     final nativeName = name.toNativeUtf8(allocator: _allocator);
     final attachment = _bindings.spine_skin_get_attachment(_skin, slotIndex, nativeName.cast());
@@ -1807,21 +1935,25 @@ class Skin {
     return Attachment._toSubclass(attachment);
   }
 
+  /// Removes the attachment in the skin for the specified slot index and name, if any.
   void removeAttachment(int slotIndex, String name) {
     final nativeName = name.toNativeUtf8(allocator: _allocator);
     _bindings.spine_skin_remove_attachment(_skin, slotIndex, nativeName.cast());
     _allocator.free(nativeName);
   }
 
+  /// The skin's name, which is unique across all skins in the skeleton.
   String getName() {
     Pointer<Utf8> name = _bindings.spine_skin_get_name(_skin).cast();
     return name.toDartString();
   }
 
+  /// Adds all attachments, bones, and constraints from the specified skin to this skin.
   void addSkin(Skin other) {
     _bindings.spine_skin_add_skin(_skin, other._skin);
   }
 
+  /// Returns all entries in this skin.
   List<SkinEntry> getEntries() {
     List<SkinEntry> result = [];
     final entries = _bindings.spine_skin_get_entries(_skin);
@@ -1871,21 +2003,27 @@ class Skin {
     return constraints;
   }
 
+  /// Adds all bones and constraints and copies of all attachments from the specified skin to this skin. Mesh attachments are not
+  /// copied, instead a new linked mesh is created. The attachment copies can be modified without affecting the originals.
   void copy(Skin other) {
     _bindings.spine_skin_copy_skin(_skin, other._skin);
   }
 }
 
+/// The base class for all constraint datas.
 class ConstraintData<T extends Pointer> {
   final T _data;
 
   ConstraintData._(this._data);
 
+  /// The constraint's name, which is unique across all constraints in the skeleton of the same type.
   String getName() {
     final Pointer<Utf8> name = _bindings.spine_constraint_data_get_name(_data.cast()).cast();
     return name.toDartString();
   }
 
+  /// The ordinal of this constraint for the order a skeleton's constraints will be applied by
+  /// [Skeleton.updateWorldTransform].
   int getOrder() {
     return _bindings.spine_constraint_data_get_order(_data.cast());
   }
@@ -1894,6 +2032,10 @@ class ConstraintData<T extends Pointer> {
     _bindings.spine_constraint_data_set_order(_data.cast(), order);
   }
 
+  /// When true, [Skeleton.updateWorldTransform] only updates this constraint if the skin returned by [Skeleton.getSkin] contains
+  /// this constraint.
+  ///
+  /// See [Skin.getConstraints].
   bool isSkinRequired() {
     return _bindings.spine_constraint_data_get_is_skin_required(_data.cast()) == 1;
   }
@@ -1903,9 +2045,13 @@ class ConstraintData<T extends Pointer> {
   }
 }
 
+/// Stores the setup pose for an [IkConstraint].
+///
+/// See [IK constraints](http://esotericsoftware.com/spine-ik-constraints) in the Spine User Guide.
 class IkConstraintData extends ConstraintData<spine_ik_constraint_data> {
   IkConstraintData._(spine_ik_constraint_data data) : super._(data);
 
+  /// The bones that are constrained by this IK constraint.
   List<BoneData> getBones() {
     final List<BoneData> result = [];
     final numBones = _bindings.spine_ik_constraint_data_get_num_bones(_data);
@@ -1916,6 +2062,7 @@ class IkConstraintData extends ConstraintData<spine_ik_constraint_data> {
     return result;
   }
 
+  /// The bone that is the IK target.
   BoneData getTarget() {
     return BoneData._(_bindings.spine_ik_constraint_data_get_target(_data));
   }
@@ -1924,6 +2071,7 @@ class IkConstraintData extends ConstraintData<spine_ik_constraint_data> {
     _bindings.spine_ik_constraint_data_set_target(_data, target._data);
   }
 
+  /// For two bone IK, controls the bend direction of the IK bones, either 1 or -1.
   int getBendDirection() {
     return _bindings.spine_ik_constraint_data_get_bend_direction(_data);
   }
@@ -1932,6 +2080,7 @@ class IkConstraintData extends ConstraintData<spine_ik_constraint_data> {
     _bindings.spine_ik_constraint_data_set_bend_direction(_data, bendDirection);
   }
 
+  /// For one bone IK, when true and the target is too close, the bone is scaled to reach it.
   bool getCompress() {
     return _bindings.spine_ik_constraint_data_get_compress(_data) == -1;
   }
@@ -1940,6 +2089,10 @@ class IkConstraintData extends ConstraintData<spine_ik_constraint_data> {
     _bindings.spine_ik_constraint_data_set_compress(_data, compress ? -1 : 0);
   }
 
+  /// When true and the target is out of range, the parent bone is scaled to reach it.
+  ///
+  /// For two bone IK: 1) the child bone's local Y translation is set to 0, 2) stretch is not applied if [getSoftness] is
+  /// > 0, and 3) if the parent bone has local nonuniform scale, stretch is not applied.
   bool getStretch() {
     return _bindings.spine_ik_constraint_data_get_stretch(_data) == -1;
   }
@@ -1948,6 +2101,7 @@ class IkConstraintData extends ConstraintData<spine_ik_constraint_data> {
     _bindings.spine_ik_constraint_data_set_stretch(_data, stretch ? -1 : 0);
   }
 
+  /// When true and [getCompress] or [getStretch] is used, the bone is scaled on both the X and Y axes.
   bool getUniform() {
     return _bindings.spine_ik_constraint_data_get_uniform(_data) == -1;
   }
@@ -1956,6 +2110,9 @@ class IkConstraintData extends ConstraintData<spine_ik_constraint_data> {
     _bindings.spine_ik_constraint_data_set_uniform(_data, uniform ? -1 : 0);
   }
 
+  /// A percentage (0-1) that controls the mix between the constrained and unconstrained rotation.
+  ///
+  /// For two bone IK: if the parent bone has local nonuniform scale, the child bone's local Y translation is set to 0.
   double getMix() {
     return _bindings.spine_ik_constraint_data_get_mix(_data);
   }
@@ -1964,6 +2121,8 @@ class IkConstraintData extends ConstraintData<spine_ik_constraint_data> {
     _bindings.spine_ik_constraint_data_set_mix(_data, mix);
   }
 
+  /// For two bone IK, the target bone's distance from the maximum reach of the bones where rotation begins to slow. The bones
+  /// will not straighten completely until the target is this far out of range.
   double getSoftness() {
     return _bindings.spine_ik_constraint_data_get_softness(_data);
   }
@@ -1973,11 +2132,16 @@ class IkConstraintData extends ConstraintData<spine_ik_constraint_data> {
   }
 }
 
+/// Stores the current pose for an IK constraint. An IK constraint adjusts the rotation of 1 or 2 constrained bones so the tip of
+/// the last bone is as close to the target bone as possible.
+/// <p>
+/// See <a href="http://esotericsoftware.com/spine-ik-constraints">IK constraints</a> in the Spine User Guide.
 class IkConstraint {
   final spine_ik_constraint _constraint;
 
   IkConstraint._(this._constraint);
 
+  /// Applies the constraint to the constrained bones.
   void update() {
     _bindings.spine_ik_constraint_update(_constraint);
   }
@@ -1986,10 +2150,12 @@ class IkConstraint {
     return _bindings.spine_ik_constraint_get_order(_constraint);
   }
 
+  /// The IK constraint's setup pose data.
   IkConstraintData getData() {
     return IkConstraintData._(_bindings.spine_ik_constraint_get_data(_constraint));
   }
 
+  /// The bones that will be modified by this IK constraint.
   List<Bone> getBones() {
     List<Bone> result = [];
     final num = _bindings.spine_ik_constraint_get_num_bones(_constraint);
@@ -2000,6 +2166,7 @@ class IkConstraint {
     return result;
   }
 
+  /// The bone that is the IK target.
   Bone getTarget() {
     return Bone._(_bindings.spine_ik_constraint_get_target(_constraint));
   }
@@ -2008,6 +2175,7 @@ class IkConstraint {
     _bindings.spine_ik_constraint_set_target(_constraint, target._bone);
   }
 
+  /// For two bone IK, controls the bend direction of the IK bones, either 1 or -1.
   int getBendDirection() {
     return _bindings.spine_ik_constraint_get_bend_direction(_constraint);
   }
@@ -2016,6 +2184,7 @@ class IkConstraint {
     _bindings.spine_ik_constraint_set_bend_direction(_constraint, bendDirection);
   }
 
+  /// For one bone IK, when true and the target is too close, the bone is scaled to reach it.
   bool getCompress() {
     return _bindings.spine_ik_constraint_get_compress(_constraint) == -1;
   }
@@ -2024,6 +2193,10 @@ class IkConstraint {
     _bindings.spine_ik_constraint_set_compress(_constraint, compress ? -1 : 0);
   }
 
+  /// When true and the target is out of range, the parent bone is scaled to reach it.
+  ///
+  /// For two bone IK: 1) the child bone's local Y translation is set to 0, 2) stretch is not applied if [getSoftness] is
+  /// > 0, and 3) if the parent bone has local nonuniform scale, stretch is not applied.
   bool getStretch() {
     return _bindings.spine_ik_constraint_get_stretch(_constraint) == -1;
   }
@@ -2032,6 +2205,9 @@ class IkConstraint {
     _bindings.spine_ik_constraint_set_stretch(_constraint, stretch ? -1 : 0);
   }
 
+  /// A percentage (0-1) that controls the mix between the constrained and unconstrained rotation.
+  ///
+  /// For two bone IK: if the parent bone has local nonuniform scale, the child bone's local Y translation is set to 0.
   double getMix() {
     return _bindings.spine_ik_constraint_get_mix(_constraint);
   }
@@ -2040,6 +2216,8 @@ class IkConstraint {
     _bindings.spine_ik_constraint_set_mix(_constraint, mix);
   }
 
+  /// For two bone IK, the target bone's distance from the maximum reach of the bones where rotation begins to slow. The bones
+  /// will not straighten completely until the target is this far out of range.
   double getSoftness() {
     return _bindings.spine_ik_constraint_get_softness(_constraint);
   }
@@ -2057,9 +2235,13 @@ class IkConstraint {
   }
 }
 
+/// Stores the setup pose for a {@link TransformConstraint}.
+///
+/// See [Transform constraints](http://esotericsoftware.com/spine-transform-constraints) in the Spine User Guide.
 class TransformConstraintData extends ConstraintData<spine_transform_constraint_data> {
   TransformConstraintData._(spine_transform_constraint_data data) : super._(data);
 
+  /// The bones that will be modified by this transform constraint.
   List<BoneData> getBones() {
     final List<BoneData> result = [];
     final numBones = _bindings.spine_transform_constraint_data_get_num_bones(_data);
@@ -2070,6 +2252,7 @@ class TransformConstraintData extends ConstraintData<spine_transform_constraint_
     return result;
   }
 
+  /// The target bone whose world transform will be copied to the constrained bones.
   BoneData getTarget() {
     return BoneData._(_bindings.spine_transform_constraint_data_get_target(_data));
   }
@@ -2078,6 +2261,7 @@ class TransformConstraintData extends ConstraintData<spine_transform_constraint_
     _bindings.spine_transform_constraint_data_set_target(_data, target._data);
   }
 
+  /// A percentage (0-1) that controls the mix between the constrained and unconstrained rotation.
   double getMixRotate() {
     return _bindings.spine_transform_constraint_data_get_mix_rotate(_data);
   }
@@ -2086,6 +2270,7 @@ class TransformConstraintData extends ConstraintData<spine_transform_constraint_
     _bindings.spine_transform_constraint_data_set_mix_rotate(_data, mixRotate);
   }
 
+  /// A percentage (0-1) that controls the mix between the constrained and unconstrained translation X.
   double getMixX() {
     return _bindings.spine_transform_constraint_data_get_mix_x(_data);
   }
@@ -2094,6 +2279,7 @@ class TransformConstraintData extends ConstraintData<spine_transform_constraint_
     _bindings.spine_transform_constraint_data_set_mix_x(_data, mixX);
   }
 
+  /// A percentage (0-1) that controls the mix between the constrained and unconstrained translation Y.
   double getMixY() {
     return _bindings.spine_transform_constraint_data_get_mix_y(_data);
   }
@@ -2102,6 +2288,7 @@ class TransformConstraintData extends ConstraintData<spine_transform_constraint_
     _bindings.spine_transform_constraint_data_set_mix_y(_data, mixY);
   }
 
+  /// A percentage (0-1) that controls the mix between the constrained and unconstrained scale X.
   double getMixScaleX() {
     return _bindings.spine_transform_constraint_data_get_mix_scale_x(_data);
   }
@@ -2110,6 +2297,7 @@ class TransformConstraintData extends ConstraintData<spine_transform_constraint_
     _bindings.spine_transform_constraint_data_set_mix_scale_x(_data, mixScaleX);
   }
 
+  /// A percentage (0-1) that controls the mix between the constrained and unconstrained scale Y.
   double getMixScaleY() {
     return _bindings.spine_transform_constraint_data_get_mix_scale_y(_data);
   }
@@ -2118,6 +2306,7 @@ class TransformConstraintData extends ConstraintData<spine_transform_constraint_
     _bindings.spine_transform_constraint_data_set_mix_scale_y(_data, mixScaleY);
   }
 
+  /// A percentage (0-1) that controls the mix between the constrained and unconstrained shear Y.
   double getMixShearY() {
     return _bindings.spine_transform_constraint_data_get_mix_shear_y(_data);
   }
@@ -2126,6 +2315,7 @@ class TransformConstraintData extends ConstraintData<spine_transform_constraint_
     _bindings.spine_transform_constraint_data_set_mix_shear_y(_data, mixShearY);
   }
 
+  /// An offset added to the constrained bone rotation.
   double getOffsetRotation() {
     return _bindings.spine_transform_constraint_data_get_offset_rotation(_data);
   }
@@ -2134,6 +2324,7 @@ class TransformConstraintData extends ConstraintData<spine_transform_constraint_
     _bindings.spine_transform_constraint_data_set_offset_rotation(_data, offsetRotation);
   }
 
+  /// An offset added to the constrained bone X translation.
   double getOffsetX() {
     return _bindings.spine_transform_constraint_data_get_offset_x(_data);
   }
@@ -2142,14 +2333,17 @@ class TransformConstraintData extends ConstraintData<spine_transform_constraint_
     _bindings.spine_transform_constraint_data_set_offset_x(_data, offsetX);
   }
 
+  /// An offset added to the constrained bone Y translation.
   double getOffsetY() {
     return _bindings.spine_transform_constraint_data_get_offset_y(_data);
   }
 
+  /// An offset added to the constrained bone scaleX.
   void setOffsetY(double offsetY) {
     _bindings.spine_transform_constraint_data_set_offset_y(_data, offsetY);
   }
 
+  /// An offset added to the constrained bone scaleX.
   double getOffsetScaleX() {
     return _bindings.spine_transform_constraint_data_get_offset_scale_x(_data);
   }
@@ -2158,6 +2352,7 @@ class TransformConstraintData extends ConstraintData<spine_transform_constraint_
     _bindings.spine_transform_constraint_data_set_offset_x(_data, offsetScaleX);
   }
 
+  /// An offset added to the constrained bone scaleY.
   double getOffsetScaleY() {
     return _bindings.spine_transform_constraint_data_get_offset_scale_y(_data);
   }
@@ -2166,6 +2361,7 @@ class TransformConstraintData extends ConstraintData<spine_transform_constraint_
     _bindings.spine_transform_constraint_data_set_offset_scale_y(_data, offsetScaleY);
   }
 
+  /// An offset added to the constrained bone shearY.
   double getOffsetShearY() {
     return _bindings.spine_transform_constraint_data_get_offset_shear_y(_data);
   }
@@ -2191,11 +2387,16 @@ class TransformConstraintData extends ConstraintData<spine_transform_constraint_
   }
 }
 
+/// Stores the current pose for a transform constraint. A transform constraint adjusts the world transform of the constrained
+/// bones to match that of the target bone.
+///
+/// See [Transform constraints](http://esotericsoftware.com/spine-transform-constraints) in the Spine User Guide.
 class TransformConstraint {
   final spine_transform_constraint _constraint;
 
   TransformConstraint._(this._constraint);
 
+  /// Applies the constraint to the constrained bones.
   void update() {
     _bindings.spine_transform_constraint_update(_constraint);
   }
@@ -2204,10 +2405,12 @@ class TransformConstraint {
     return _bindings.spine_transform_constraint_get_order(_constraint);
   }
 
+  /// The transform constraint's setup pose data.
   TransformConstraintData getData() {
     return TransformConstraintData._(_bindings.spine_transform_constraint_get_data(_constraint));
   }
 
+  /// The bones that will be modified by this transform constraint.
   List<Bone> getBones() {
     List<Bone> result = [];
     final num = _bindings.spine_transform_constraint_get_num_bones(_constraint);
@@ -2218,6 +2421,7 @@ class TransformConstraint {
     return result;
   }
 
+  /// The target bone whose world transform will be copied to the constrained bones.
   Bone getTarget() {
     return Bone._(_bindings.spine_transform_constraint_get_target(_constraint));
   }
@@ -2226,6 +2430,7 @@ class TransformConstraint {
     _bindings.spine_transform_constraint_set_target(_constraint, target._bone);
   }
 
+  /// A percentage (0-1) that controls the mix between the constrained and unconstrained rotation.
   double getMixRotate() {
     return _bindings.spine_transform_constraint_get_mix_rotate(_constraint);
   }
@@ -2234,6 +2439,7 @@ class TransformConstraint {
     _bindings.spine_transform_constraint_set_mix_rotate(_constraint, mixRotate);
   }
 
+  /// A percentage (0-1) that controls the mix between the constrained and unconstrained translation X.
   double getMixX() {
     return _bindings.spine_transform_constraint_get_mix_x(_constraint);
   }
@@ -2242,6 +2448,7 @@ class TransformConstraint {
     _bindings.spine_transform_constraint_set_mix_x(_constraint, mixX);
   }
 
+  /// A percentage (0-1) that controls the mix between the constrained and unconstrained translation Y.
   double getMixY() {
     return _bindings.spine_transform_constraint_get_mix_y(_constraint);
   }
@@ -2250,6 +2457,7 @@ class TransformConstraint {
     _bindings.spine_transform_constraint_set_mix_y(_constraint, mixY);
   }
 
+  /// A percentage (0-1) that controls the mix between the constrained and unconstrained scale X.
   double getMixScaleX() {
     return _bindings.spine_transform_constraint_get_mix_scale_x(_constraint);
   }
@@ -2258,6 +2466,7 @@ class TransformConstraint {
     _bindings.spine_transform_constraint_set_mix_scale_x(_constraint, mixScaleX);
   }
 
+  /// A percentage (0-1) that controls the mix between the constrained and unconstrained scale X.
   double getMixScaleY() {
     return _bindings.spine_transform_constraint_get_mix_scale_y(_constraint);
   }
@@ -2266,6 +2475,7 @@ class TransformConstraint {
     _bindings.spine_transform_constraint_set_mix_scale_y(_constraint, mixScaleY);
   }
 
+  /// A percentage (0-1) that controls the mix between the constrained and unconstrained shear Y.
   double getMixShearY() {
     return _bindings.spine_transform_constraint_get_mix_shear_y(_constraint);
   }
@@ -2283,9 +2493,13 @@ class TransformConstraint {
   }
 }
 
+/// Stores the setup pose for a [PathConstraint].
+///
+/// See [Path constraints](http://esotericsoftware.com/spine-path-constraints) in the Spine User Guide.
 class PathConstraintData extends ConstraintData<spine_path_constraint_data> {
   PathConstraintData._(spine_path_constraint_data data) : super._(data);
 
+  /// The bones that will be modified by this path constraint.
   List<BoneData> getBones() {
     final List<BoneData> result = [];
     final numBones = _bindings.spine_path_constraint_data_get_num_bones(_data);
@@ -2296,6 +2510,7 @@ class PathConstraintData extends ConstraintData<spine_path_constraint_data> {
     return result;
   }
 
+  /// The slot whose path attachment will be used to constrained the bones.
   SlotData getTarget() {
     return SlotData._(_bindings.spine_path_constraint_data_get_target(_data));
   }
@@ -2304,6 +2519,7 @@ class PathConstraintData extends ConstraintData<spine_path_constraint_data> {
     _bindings.spine_path_constraint_data_set_target(_data, target._data);
   }
 
+  /// The mode for positioning the first bone on the path.
   PositionMode getPositionMode() {
     return PositionMode.values[_bindings.spine_path_constraint_data_get_position_mode(_data)];
   }
@@ -2312,6 +2528,7 @@ class PathConstraintData extends ConstraintData<spine_path_constraint_data> {
     _bindings.spine_path_constraint_data_set_position_mode(_data, positionMode.value);
   }
 
+  /// The mode for positioning the bones after the first bone on the path.
   SpacingMode getSpacingMode() {
     return SpacingMode.values[_bindings.spine_path_constraint_data_get_spacing_mode(_data)];
   }
@@ -2320,6 +2537,7 @@ class PathConstraintData extends ConstraintData<spine_path_constraint_data> {
     _bindings.spine_path_constraint_data_set_spacing_mode(_data, spacingMode.value);
   }
 
+  /// The mode for adjusting the rotation of the bones.
   RotateMode getRotateMode() {
     return RotateMode.values[_bindings.spine_path_constraint_data_get_rotate_mode(_data)];
   }
@@ -2328,6 +2546,7 @@ class PathConstraintData extends ConstraintData<spine_path_constraint_data> {
     _bindings.spine_path_constraint_data_set_rotate_mode(_data, rotateMode.value);
   }
 
+  /// An offset added to the constrained bone rotation.
   double getOffsetRotation() {
     return _bindings.spine_path_constraint_data_get_offset_rotation(_data);
   }
@@ -2336,6 +2555,7 @@ class PathConstraintData extends ConstraintData<spine_path_constraint_data> {
     _bindings.spine_path_constraint_data_set_offset_rotation(_data, offsetRotation);
   }
 
+  /// The position along the path.
   double getPosition() {
     return _bindings.spine_path_constraint_data_get_position(_data);
   }
@@ -2344,6 +2564,7 @@ class PathConstraintData extends ConstraintData<spine_path_constraint_data> {
     _bindings.spine_path_constraint_data_set_position(_data, position);
   }
 
+  /// The spacing between bones.
   double getSpacing() {
     return _bindings.spine_path_constraint_data_get_spacing(_data);
   }
@@ -2352,6 +2573,7 @@ class PathConstraintData extends ConstraintData<spine_path_constraint_data> {
     _bindings.spine_path_constraint_data_set_spacing(_data, spacing);
   }
 
+  /// A percentage (0-1) that controls the mix between the constrained and unconstrained rotation.
   double getMixRotate() {
     return _bindings.spine_path_constraint_data_get_mix_rotate(_data);
   }
@@ -2360,6 +2582,7 @@ class PathConstraintData extends ConstraintData<spine_path_constraint_data> {
     _bindings.spine_path_constraint_data_set_mix_rotate(_data, mixRotate);
   }
 
+  /// A percentage (0-1) that controls the mix between the constrained and unconstrained translation X.
   double getMixX() {
     return _bindings.spine_path_constraint_data_get_mix_x(_data);
   }
@@ -2368,6 +2591,7 @@ class PathConstraintData extends ConstraintData<spine_path_constraint_data> {
     _bindings.spine_path_constraint_data_set_mix_x(_data, mixX);
   }
 
+  /// A percentage (0-1) that controls the mix between the constrained and unconstrained translation Y.
   double getMixY() {
     return _bindings.spine_path_constraint_data_get_mix_x(_data);
   }
@@ -2377,11 +2601,16 @@ class PathConstraintData extends ConstraintData<spine_path_constraint_data> {
   }
 }
 
+/// Stores the current pose for a path constraint. A path constraint adjusts the rotation, translation, and scale of the
+/// constrained bones so they follow a [PathAttachment].
+///
+/// See [Path constraints](http://esotericsoftware.com/spine-path-constraints) in the Spine User Guide.
 class PathConstraint {
   final spine_path_constraint _constraint;
 
   PathConstraint._(this._constraint);
 
+  /// Applies the constraint to the constrained bones.
   void update() {
     _bindings.spine_path_constraint_update(_constraint);
   }
@@ -2390,6 +2619,7 @@ class PathConstraint {
     return _bindings.spine_path_constraint_get_order(_constraint);
   }
 
+  /// The bones that will be modified by this path constraint.
   List<Bone> getBones() {
     List<Bone> result = [];
     final num = _bindings.spine_path_constraint_get_num_bones(_constraint);
@@ -2400,6 +2630,7 @@ class PathConstraint {
     return result;
   }
 
+  /// The slot whose path attachment will be used to constrained the bones.
   Slot getTarget() {
     return Slot._(_bindings.spine_path_constraint_get_target(_constraint));
   }
@@ -2408,6 +2639,7 @@ class PathConstraint {
     _bindings.spine_path_constraint_set_target(_constraint, target._slot);
   }
 
+  /// The position along the path.
   double getPosition() {
     return _bindings.spine_path_constraint_get_position(_constraint);
   }
@@ -2416,6 +2648,7 @@ class PathConstraint {
     _bindings.spine_path_constraint_set_position(_constraint, position);
   }
 
+  /// The spacing between bones.
   double getSpacing() {
     return _bindings.spine_path_constraint_get_spacing(_constraint);
   }
@@ -2424,6 +2657,7 @@ class PathConstraint {
     _bindings.spine_path_constraint_set_spacing(_constraint, spacing);
   }
 
+  /// A percentage (0-1) that controls the mix between the constrained and unconstrained rotation.
   double getMixRotate() {
     return _bindings.spine_path_constraint_get_mix_rotate(_constraint);
   }
@@ -2432,6 +2666,7 @@ class PathConstraint {
     _bindings.spine_path_constraint_set_mix_rotate(_constraint, mixRotate);
   }
 
+  /// A percentage (0-1) that controls the mix between the constrained and unconstrained translation X.
   double getMixX() {
     return _bindings.spine_path_constraint_get_mix_x(_constraint);
   }
@@ -2440,6 +2675,7 @@ class PathConstraint {
     _bindings.spine_path_constraint_set_mix_x(_constraint, mixX);
   }
 
+  /// A percentage (0-1) that controls the mix between the constrained and unconstrained translation Y.
   double getMixY() {
     return _bindings.spine_path_constraint_get_mix_y(_constraint);
   }
@@ -2457,27 +2693,39 @@ class PathConstraint {
   }
 }
 
+/// Stores the current pose for a skeleton.
+///
+/// See [Instance objects](http://esotericsoftware.com/spine-runtime-architecture#Instance-objects) in the Spine
+/// Runtimes Guide.
 class Skeleton {
   final spine_skeleton _skeleton;
 
   Skeleton._(this._skeleton);
 
-  /// Caches information about bones and constraints. Must be called if bones, constraints or weighted path attachments are added
-  /// or removed.
+  /// Caches information about bones and constraints. Must be called if the [getSkin] is modified or if bones,
+  /// constraints, or weighted path attachments are added or removed.
   void updateCache() {
     _bindings.spine_skeleton_update_cache(_skeleton);
   }
 
-  /// Updates the world transform for each bone and applies constraints.
+  /// Updates the world transform for each bone and applies all constraints.
+  ///
+  /// See [World transforms](http://esotericsoftware.com/spine-runtime-skeletons#World-transforms) in the Spine
+  /// Runtimes Guide.
   void updateWorldTransform() {
     _bindings.spine_skeleton_update_world_transform(_skeleton);
   }
 
+  /// Temporarily sets the root bone as a child of the specified bone, then updates the world transform for each bone and applies
+  /// all constraints.
+  ///
+  /// See [World transforms](http://esotericsoftware.com/spine-runtime-skeletons#World-transforms) in the Spine
+  /// Runtimes Guide.
   void updateWorldTransformBone(Bone parent) {
     _bindings.spine_skeleton_update_world_transform_bone(_skeleton, parent._bone);
   }
 
-  /// Sets the bones, constraints, and slots to their setup pose values.
+  /// Sets the bones, constraints, slots, and draw order to their setup pose values.
   void setToSetupPose() {
     _bindings.spine_skeleton_set_to_setup_pose(_skeleton);
   }
@@ -2487,10 +2735,13 @@ class Skeleton {
     _bindings.spine_skeleton_set_bones_to_setup_pose(_skeleton);
   }
 
+  /// Sets the slots and draw order to their setup pose values.
   void setSlotsToSetupPose() {
     _bindings.spine_skeleton_set_slots_to_setup_pose(_skeleton);
   }
 
+  /// Finds a bone by comparing each bone's name. It is more efficient to cache the results of this method than to call it
+  /// repeatedly.
   Bone? findBone(String boneName) {
     final nameNative = boneName.toNativeUtf8(allocator: _allocator);
     final bone = _bindings.spine_skeleton_find_bone(_skeleton, nameNative.cast());
@@ -2499,6 +2750,8 @@ class Skeleton {
     return Bone._(bone);
   }
 
+  /// Finds a slot by comparing each slot's name. It is more efficient to cache the results of this method than to call it
+  /// repeatedly.
   Slot? findSlot(String slotName) {
     final nameNative = slotName.toNativeUtf8(allocator: _allocator);
     final slot = _bindings.spine_skeleton_find_slot(_skeleton, nameNative.cast());
@@ -2507,23 +2760,35 @@ class Skeleton {
     return Slot._(slot);
   }
 
-  /// Attachments from the new skin are attached if the corresponding attachment from the old skin was attached.
-  /// If there was no old skin, each slot's setup mode attachment is attached from the new skin.
-  /// After changing the skin, the visible attachments can be reset to those attached in the setup pose by calling
-  /// See Skeleton::setSlotsToSetupPose()
-  /// Also, often AnimationState::apply(Skeleton&) is called before the next time the
-  /// skeleton is rendered to allow any attachment keys in the current animation(s) to hide or show attachments from the new skin.
-  /// @param skinName May be NULL.
+
+  /// Sets a skin by name.
+  ///
+  /// See [setSkin].
   void setSkinByName(String skinName) {
     final nameNative = skinName.toNativeUtf8(allocator: _allocator);
     _bindings.spine_skeleton_set_skin_by_name(_skeleton, nameNative.cast());
     _allocator.free(nameNative);
   }
 
+
+  /// Sets the skin used to look up attachments before looking in the default skin (see [SkeletonData.getDefaultSkin]). If the
+  /// skin is changed, [updateCache] is called.
+  ///
+  /// Attachments from the new skin are attached if the corresponding attachment from the old skin was attached. If there was no
+  /// old skin, each slot's setup mode attachment is attached from the new skin.
+  ///
+  /// After changing the skin, the visible attachments can be reset to those attached in the setup pose by calling
+  /// [setSlotsToSetupPose]. Also, often [AnimationState.apply] is called before the next time the
+  /// skeleton is rendered to allow any attachment keys in the current animation(s) to hide or show attachments from the new
+  /// skin.
   void setSkin(Skin skin) {
     _bindings.spine_skeleton_set_skin(_skeleton, skin._skin);
   }
 
+  /// Finds an attachment by looking in the currently set skin (see [getSkin]) and default skin (see [SkeletonData.getDefaultSkin]) using
+  /// the slot name and attachment name.
+  ///
+  /// See [getAttachment].
   Attachment? getAttachmentByName(String slotName, String attachmentName) {
     final slotNameNative = slotName.toNativeUtf8(allocator: _allocator);
     final attachmentNameNative = attachmentName.toNativeUtf8(allocator: _allocator);
@@ -2534,6 +2799,10 @@ class Skeleton {
     return Attachment._toSubclass(attachment);
   }
 
+  /// Finds an attachment by looking in the currently set skin (see [getSkin]) and default skin (see [SkeletonData.getDefaultSkin]) using the
+  /// slot index and attachment name. First the skin is checked and if the attachment was not found, the default skin is checked.
+  ///
+  /// See [Runtime skins](http://esotericsoftware.com/spine-runtime-skins) in the Spine Runtimes Guide.
   Attachment? getAttachment(int slotIndex, String attachmentName) {
     final attachmentNameNative = attachmentName.toNativeUtf8(allocator: _allocator);
     final attachment = _bindings.spine_skeleton_get_attachment(_skeleton, slotIndex, attachmentNameNative.cast());
@@ -2542,6 +2811,8 @@ class Skeleton {
     return Attachment._toSubclass(attachment);
   }
 
+  /// A convenience method to set an attachment by finding the slot with [findSlot], finding the attachment with
+  /// [getAttachment], then setting the slot's attachment. The [attachmentName] may be an empty string to clear the slot's attachment.
   void setAttachment(String slotName, String attachmentName) {
     final slotNameNative = slotName.toNativeUtf8(allocator: _allocator);
     final attachmentNameNative = attachmentName.toNativeUtf8(allocator: _allocator);
@@ -2550,6 +2821,8 @@ class Skeleton {
     _allocator.free(attachmentNameNative);
   }
 
+  /// Finds an IK constraint by comparing each IK constraint's name. It is more efficient to cache the results of this method
+  /// than to call it repeatedly.
   IkConstraint? findIkConstraint(String constraintName) {
     final nameNative = constraintName.toNativeUtf8(allocator: _allocator);
     final constraint = _bindings.spine_skeleton_find_ik_constraint(_skeleton, nameNative.cast());
@@ -2558,6 +2831,8 @@ class Skeleton {
     return IkConstraint._(constraint);
   }
 
+  /// Finds a transform constraint by comparing each transform constraint's name. It is more efficient to cache the results of
+  /// this method than to call it repeatedly.
   TransformConstraint? findTransformConstraint(String constraintName) {
     final nameNative = constraintName.toNativeUtf8(allocator: _allocator);
     final constraint = _bindings.spine_skeleton_find_transform_constraint(_skeleton, nameNative.cast());
@@ -2566,6 +2841,8 @@ class Skeleton {
     return TransformConstraint._(constraint);
   }
 
+  /// Finds a path constraint by comparing each path constraint's name. It is more efficient to cache the results of this method
+  /// than to call it repeatedly.
   PathConstraint? findPathConstraint(String constraintName) {
     final nameNative = constraintName.toNativeUtf8(allocator: _allocator);
     final constraint = _bindings.spine_skeleton_find_path_constraint(_skeleton, nameNative.cast());
@@ -2575,11 +2852,6 @@ class Skeleton {
   }
 
   /// Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose.
-  /// @param outX The horizontal distance between the skeleton origin and the left side of the AABB.
-  /// @param outY The vertical distance between the skeleton origin and the bottom side of the AABB.
-  /// @param outWidth The width of the AABB
-  /// @param outHeight The height of the AABB.
-  /// @param outVertexBuffer Reference to hold a Vector of floats. This method will assign it with new floats as needed.
   Bounds getBounds() {
     final nativeBounds = _bindings.spine_skeleton_get_bounds(_skeleton);
     final bounds = Bounds(_bindings.spine_bounds_get_x(nativeBounds), _bindings.spine_bounds_get_y(nativeBounds),
@@ -2588,18 +2860,21 @@ class Skeleton {
     return bounds;
   }
 
+  /// Returns the root bone, or null if the skeleton has no bones.
   Bone? getRootBone() {
     final bone = _bindings.spine_skeleton_get_root_bone(_skeleton);
     if (bone.address == nullptr.address) return null;
     return Bone._(bone);
   }
 
+  /// The skeleton's setup pose data.
   SkeletonData? getData() {
     final data = _bindings.spine_skeleton_get_data(_skeleton);
     if (data.address == nullptr.address) return null;
     return SkeletonData._(data);
   }
 
+  /// The skeleton's bones, sorted parent first. The root bone is always the first bone.
   List<Bone> getBones() {
     final List<Bone> bones = [];
     final numBones = _bindings.spine_skeleton_get_num_bones(_skeleton);
@@ -2610,6 +2885,7 @@ class Skeleton {
     return bones;
   }
 
+  /// The skeleton's slots.
   List<Slot> getSlots() {
     final List<Slot> slots = [];
     final numSlots = _bindings.spine_skeleton_get_num_slots(_skeleton);
@@ -2620,6 +2896,7 @@ class Skeleton {
     return slots;
   }
 
+  /// The skeleton's slots in the order they should be drawn. The returned array may be modified to change the draw order.
   List<Slot> getDrawOrder() {
     final List<Slot> slots = [];
     final numSlots = _bindings.spine_skeleton_get_num_draw_order(_skeleton);
@@ -2630,6 +2907,7 @@ class Skeleton {
     return slots;
   }
 
+  /// The skeleton's IK constraints.
   List<IkConstraint> getIkConstraints() {
     final List<IkConstraint> constraints = [];
     final numConstraints = _bindings.spine_skeleton_get_num_ik_constraints(_skeleton);
@@ -2640,6 +2918,7 @@ class Skeleton {
     return constraints;
   }
 
+  /// The skeleton's path constraints.
   List<PathConstraint> getPathConstraints() {
     final List<PathConstraint> constraints = [];
     final numConstraints = _bindings.spine_skeleton_get_num_path_constraints(_skeleton);
@@ -2650,6 +2929,7 @@ class Skeleton {
     return constraints;
   }
 
+  /// The skeleton's transform constraints.
   List<TransformConstraint> getTransformConstraints() {
     final List<TransformConstraint> constraints = [];
     final numConstraints = _bindings.spine_skeleton_get_num_transform_constraints(_skeleton);
@@ -2660,12 +2940,14 @@ class Skeleton {
     return constraints;
   }
 
+  /// The skeleton's current skin.
   Skin? getSkin() {
     final skin = _bindings.spine_skeleton_get_skin(_skeleton);
     if (skin.address == nullptr.address) return null;
     return Skin._(skin);
   }
 
+  /// The color to tint all the skeleton's attachments.
   Color getColor() {
     final color = _bindings.spine_skeleton_get_color(_skeleton);
     return Color(_bindings.spine_color_get_r(color), _bindings.spine_color_get_g(color), _bindings.spine_color_get_b(color),
@@ -2676,10 +2958,16 @@ class Skeleton {
     _bindings.spine_skeleton_set_color(_skeleton, color.r, color.g, color.b, color.a);
   }
 
+  /// Sets the skeleton X and Y position, which is added to the root bone worldX and worldY position.
+  ///
+  /// Bones that do not inherit translation are still affected by this property.
   void setPosition(double x, double y) {
     _bindings.spine_skeleton_set_position(_skeleton, x, y);
   }
 
+  /// Sets the skeleton X position, which is added to the root bone worldX position.
+  ///
+  /// Bones that do not inherit translation are still affected by this property.
   double getX() {
     return _bindings.spine_skeleton_get_x(_skeleton);
   }
@@ -2688,6 +2976,9 @@ class Skeleton {
     _bindings.spine_skeleton_set_x(_skeleton, x);
   }
 
+  /// Sets the skeleton Y position, which is added to the root bone worldY position.
+  /// <p>
+  /// Bones that do not inherit translation are still affected by this property.
   double getY() {
     return _bindings.spine_skeleton_get_x(_skeleton);
   }
@@ -2696,6 +2987,9 @@ class Skeleton {
     _bindings.spine_skeleton_set_y(_skeleton, y);
   }
 
+  /// Scales the entire skeleton on the X axis.
+  ///
+  /// Bones that do not inherit scale are still affected by this property.
   double getScaleX() {
     return _bindings.spine_skeleton_get_scale_x(_skeleton);
   }
@@ -2704,6 +2998,9 @@ class Skeleton {
     _bindings.spine_skeleton_set_scale_x(_skeleton, scaleX);
   }
 
+  /// Scales the entire skeleton on the Y axis.
+  ///
+  /// Bones that do not inherit scale are still affected by this property.
   double getScaleY() {
     return _bindings.spine_skeleton_get_scale_x(_skeleton);
   }
@@ -2713,25 +3010,48 @@ class Skeleton {
   }
 }
 
+/// Stores a list of timelines to animate a skeleton's pose over time.
 class Animation {
   final spine_animation _animation;
 
   Animation._(this._animation);
 
+  /// The animation's name, which is unique across all animations in the skeleton.
   String getName() {
     final Pointer<Utf8> value = _bindings.spine_animation_get_name(_animation).cast();
     return value.toDartString();
   }
 
+  /// The duration of the animation in seconds, which is usually the highest time of all frames in the timeline. The duration is
+  /// used to know when it has completed and when it should loop back to the start.
   double getDuration() {
     return _bindings.spine_animation_get_duration(_animation);
   }
 }
 
+/// Controls how timeline values are mixed with setup pose values or current pose values when a timeline is applied with
+/// <code>alpha</code> < 1.
 enum MixBlend {
+  /// Transitions from the setup value to the timeline value (the current value is not used). Before the first frame, the
+  /// setup value is set.
   setup(0),
+  /// Transitions from the current value to the timeline value. Before the first frame, transitions from the current value to
+  /// the setup value. Timelines which perform instant transitions, such as {@link DrawOrderTimeline} or
+  /// {@link AttachmentTimeline}, use the setup value before the first frame.
+  /// <p>
+  /// <code>first</code> is intended for the first animations applied, not for animations layered on top of those.
   first(1),
+  /// Transitions from the current value to the timeline value. No change is made before the first frame (the current value is
+  /// kept until the first frame).
+  /// <p>
+  /// <code>replace</code> is intended for animations layered on top of others, not for the first animations applied.
   replace(2),
+  /// Transitions from the current value to the current value plus the timeline value. No change is made before the first
+  /// frame (the current value is kept until the first frame).
+  /// <p>
+  /// <code>add</code> is intended for animations layered on top of others, not for the first animations applied. Properties
+  /// set by additive animations must be set manually or by another animation before applying the additive animations, else the
+  /// property values will increase each time the additive animations are applied.
   add(3);
 
   final int value;
@@ -2739,13 +3059,18 @@ enum MixBlend {
   const MixBlend(this.value);
 }
 
+/// Stores settings and other state for the playback of an animation on an [AnimationState] track.
+///
+/// References to a track entry must not be kept after the dispose [EventType] is reported to [AnimationStateListener].
 class TrackEntry {
   final spine_track_entry _entry;
   final AnimationState _state;
 
   TrackEntry._(this._entry, this._state);
 
-  /// The index of the track where this entry is either current or queued.
+  /// The index of the track where this track entry is either current or queued.
+  ///
+  /// See [AnimationState.getCurrent].
   int getTtrackIndex() {
     return _bindings.spine_track_entry_get_track_index(_entry);
   }
@@ -2755,7 +3080,8 @@ class TrackEntry {
     return Animation._(_bindings.spine_track_entry_get_animation(_entry));
   }
 
-  /// If true, the animation will repeat. If false, it will not, instead its last frame is applied if played beyond its duration.
+  /// If true, the animation will repeat. If false it will not, instead its last frame is applied if played beyond its
+  /// duration.
   bool getLoop() {
     return _bindings.spine_track_entry_get_loop(_entry) == -1;
   }
@@ -2764,17 +3090,17 @@ class TrackEntry {
     _bindings.spine_track_entry_set_loop(_entry, loop ? -1 : 0);
   }
 
-  /// If true, when mixing from the previous animation to this animation, the previous animation is applied as normal instead
-  /// of being mixed out.
+
+  /// Seconds to postpone playing the animation. When this track entry is the current track entry, <code>delay</code>
+  /// postpones incrementing the [getTrackTime]. When this track entry is queued, <code>delay</code> is the time from
+  /// the start of the previous animation to when this track entry will become the current track entry (ie when the previous
+  /// track entry [getTrackTime] >= this track entry's <code>delay</code>).
   ///
-  /// When mixing between animations that key the same property, if a lower track also keys that property then the value will
-  /// briefly dip toward the lower track value during the mix. This happens because the first animation mixes from 100% to 0%
-  /// while the second animation mixes from 0% to 100%. Setting holdPrevious to true applies the first animation
-  /// at 100% during the mix so the lower track value is overwritten. Such dipping does not occur on the lowest track which
-  /// keys the property, only when a higher track also keys the property.
+  /// [getTimeScale] affects the delay.
   ///
-  /// Snapping will occur if holdPrevious is true and this animation does not key all the same properties as the
-  /// previous animation.
+  /// When using [AnimationState.addAnimation] with a <code>delay</code> <= 0, the delay
+  /// is set using the mix duration from the [AnimationStateData]. If [getMixDuration] is set afterward, the delay
+  /// may need to be adjusted.
   bool getHoldPrevious() {
     return _bindings.spine_track_entry_get_hold_previous(_entry) == -1;
   }
@@ -2783,6 +3109,7 @@ class TrackEntry {
     _bindings.spine_track_entry_set_hold_previous(_entry, holdPrevious ? -1 : 0);
   }
 
+  /// If true, the animation will be applied in reverse. Events are not fired when an animation is applied in reverse.
   bool getReverse() {
     return _bindings.spine_track_entry_get_reverse(_entry) == -1;
   }
@@ -2791,6 +3118,11 @@ class TrackEntry {
     _bindings.spine_track_entry_set_reverse(_entry, reverse ? -1 : 0);
   }
 
+  /// If true, mixing rotation between tracks always uses the shortest rotation direction. If the rotation is animated, the
+  /// shortest rotation direction may change during the mix.
+  ///
+  /// If false, the shortest rotation direction is remembered when the mix starts and the same direction is used for the rest
+  /// of the mix. Defaults to false.
   bool getShortestRotation() {
     return _bindings.spine_track_entry_get_shortest_rotation(_entry) == 1;
   }
@@ -2799,9 +3131,16 @@ class TrackEntry {
     _bindings.spine_track_entry_set_shortest_rotation(_entry, shortestRotation ? -1 : 0);
   }
 
-  /// Seconds to postpone playing the animation. When a track entry is the current track entry, delay postpones incrementing
-  /// the track time. When a track entry is queued, delay is the time from the start of the previous animation to when the
-  /// track entry will become the current track entry.
+  /// Seconds to postpone playing the animation. When this track entry is the current track entry, <code>delay</code>
+  /// postpones incrementing the [getTrackTime]. When this track entry is queued, <code>delay</code> is the time from
+  /// the start of the previous animation to when this track entry will become the current track entry (ie when the previous
+  /// track entry [getTrackTime] >= this track entry's <code>delay</code>).
+  ///
+  /// [getTimeScale] affects the delay.
+  ///
+  /// When using [AnimationState.addAnimation] with a <code>delay</code> <= 0, the delay
+  /// is set using the mix duration from the [AnimationStateData]. If [getMixDuration] is set afterward, the delay
+  /// may need to be adjusted.
   double getDelay() {
     return _bindings.spine_track_entry_get_delay(_entry);
   }
@@ -2811,7 +3150,8 @@ class TrackEntry {
   }
 
   /// Current time in seconds this track entry has been the current track entry. The track time determines
-  /// TrackEntry.AnimationTime. The track time can be set to start the animation at a time other than 0, without affecting looping.
+  /// [getAnimationTime]. The track time can be set to start the animation at a time other than 0, without affecting
+  /// looping.
   double getTrackTime() {
     return _bindings.spine_track_entry_get_track_time(_entry);
   }
@@ -2820,13 +3160,13 @@ class TrackEntry {
     _bindings.spine_track_entry_set_track_time(_entry, trackTime);
   }
 
-  /// The track time in seconds when this animation will be removed from the track. Defaults to the animation duration for
-  /// non-looping animations and to int.MaxValue for looping animations. If the track end time is reached and no
-  /// other animations are queued for playback, and mixing from any previous animations is complete, properties keyed by the animation,
-  /// are set to the setup pose and the track is cleared.
+  /// The track time in seconds when this animation will be removed from the track. Defaults to the highest possible float
+  /// value, meaning the animation will be applied until a new animation is set or the track is cleared. If the track end time
+  /// is reached, no other animations are queued for playback, and mixing from any previous animations is complete, then the
+  /// properties keyed by the animation are set to the setup pose and the track is cleared.
   ///
-  /// It may be desired to use AnimationState.addEmptyAnimation(int, float, float) to mix the properties back to the
-  /// setup pose over time, rather than have it happen instantly.
+  /// It may be desired to use [AnimationState.addEmptyAnimation] rather than have the animation
+  /// abruptly cease being applied.
   double getTrackEnd() {
     return _bindings.spine_track_entry_get_track_end(_entry);
   }
@@ -2837,8 +3177,8 @@ class TrackEntry {
 
   /// Seconds when this animation starts, both initially and after looping. Defaults to 0.
   ///
-  /// When changing the animation start time, it often makes sense to set TrackEntry.AnimationLast to the same value to
-  /// prevent timeline keys before the start time from triggering.
+  /// When changing the <code>animationStart</code> time, it often makes sense to set [getAnimationLast] to the same
+  /// value to prevent timeline keys before the start time from triggering.
   double getAnimationStart() {
     return _bindings.spine_track_entry_get_animation_start(_entry);
   }
@@ -2848,7 +3188,7 @@ class TrackEntry {
   }
 
   /// Seconds for the last frame of this animation. Non-looping animations won't play past this time. Looping animations will
-  /// loop back to TrackEntry.AnimationStart at this time. Defaults to the animation duration.
+  /// loop back to [getAnimationStart] at this time. Defaults to the animation [Animation.getDuration].
   double getAnimationEnd() {
     return _bindings.spine_track_entry_get_animation_end(_entry);
   }
@@ -2858,8 +3198,9 @@ class TrackEntry {
   }
 
   /// The time in seconds this animation was last applied. Some timelines use this for one-time triggers. Eg, when this
-  /// animation is applied, event timelines will fire all events between the animation last time (exclusive) and animation time
-  /// (inclusive). Defaults to -1 to ensure triggers on frame 0 happen the first time this animation is applied.
+  /// animation is applied, event timelines will fire all events between the <code>animationLast</code> time (exclusive) and
+  /// <code>animationTime</code> (inclusive). Defaults to -1 to ensure triggers on frame 0 happen the first time this animation
+  /// is applied.
   double getAnimationLast() {
     return _bindings.spine_track_entry_get_animation_last(_entry);
   }
@@ -2868,14 +3209,29 @@ class TrackEntry {
     _bindings.spine_track_entry_set_animation_last(_entry, animationLast);
   }
 
-  /// Uses TrackEntry.TrackTime to compute the animation time between TrackEntry.AnimationStart. and
-  /// TrackEntry.AnimationEnd. When the track time is 0, the animation time is equal to the animation start time.
+  /// Uses [getTrackTime] to compute the <code>animationTime</code>. When the <code>trackTime</code> is 0, the
+  /// <code>animationTime</code> is equal to the <code>animationStart</code> time.
+  /// <p>
+  /// The <code>animationTime</code> is between [getAnimationStart] and [getAnimationEnd], except if this
+  /// track entry is non-looping and [getAnimationEnd] is >= to the animation [Animation.getDuration], then
+  /// <code>animationTime</code> continues to increase past [getAnimationEnd].
   double getAnimationTime() {
     return _bindings.spine_track_entry_get_animation_time(_entry);
   }
 
-  /// Multiplier for the delta time when the animation state is updated, causing time for this animation to play slower or
+  /// Multiplier for the delta time when this track entry is updated, causing time for this animation to pass slower or
   /// faster. Defaults to 1.
+  ///
+  /// Values < 0 are not supported. To play an animation in reverse, use [getReverse].
+  ///
+  /// [getMixTime] is not affected by track entry time scale, so [getMixDuration] may need to be adjusted to
+  /// match the animation speed.
+  ///
+  /// When using [AnimationState.addAnimation] with a <code>delay</code> <= 0, the
+  /// [getDelay] is set using the mix duration from the [AnimationStateData], assuming time scale to be 1. If
+  /// the time scale is not 1, the delay may need to be adjusted.
+  ///
+  /// See [AnimationState.getTimeScale] for affecting all animations.
   double getTimeScale() {
     return _bindings.spine_track_entry_get_time_scale(_entry);
   }
@@ -2884,12 +3240,12 @@ class TrackEntry {
     _bindings.spine_track_entry_set_time_scale(_entry, timeScale);
   }
 
-  /// Values less than 1 mix this animation with the last skeleton pose. Defaults to 1, which overwrites the last skeleton pose with
-  /// this animation.
+  /// Values < 1 mix this animation with the skeleton's current pose (usually the pose resulting from lower tracks). Defaults
+  /// to 1, which overwrites the skeleton's current pose with this animation.
   ///
-  /// Typically track 0 is used to completely pose the skeleton, then alpha can be used on higher tracks. It doesn't make sense
-  /// to use alpha on track 0 if the skeleton pose is from the last frame render.
-  double getAlpha() {
+  /// Typically track 0 is used to completely pose the skeleton, then alpha is used on higher tracks. It doesn't make sense to
+  /// use alpha on track 0 if the skeleton pose is from the last frame render.
+  Future<double> getAlpha() async {
     return _bindings.spine_track_entry_get_alpha(_entry);
   }
 
@@ -2897,8 +3253,9 @@ class TrackEntry {
     _bindings.spine_track_entry_set_alpha(_entry, alpha);
   }
 
-  /// When the mix percentage (mix time / mix duration) is less than the event threshold, event timelines for the animation
-  /// being mixed out will be applied. Defaults to 0, so event timelines are not applied for an animation being mixed out.
+  /// When the mix percentage ([getMixTime] / [getMixDuration]) is less than the
+  /// <code>eventThreshold</code>, event timelines are applied while this animation is being mixed out. Defaults to 0, so event
+  /// timelines are not applied while this animation is being mixed out.
   double getEventThreshold() {
     return _bindings.spine_track_entry_get_event_threshold(_entry);
   }
@@ -2907,9 +3264,9 @@ class TrackEntry {
     _bindings.spine_track_entry_set_event_threshold(_entry, eventThreshold);
   }
 
-  /// When the mix percentage (mix time / mix duration) is less than the attachment threshold, attachment timelines for the
-  /// animation being mixed out will be applied. Defaults to 0, so attachment timelines are not applied for an animation being
-  /// mixed out.
+  /// When the mix percentage ([getMixTime] / [getMixDuration]) is less than the
+  /// <code>attachmentThreshold</code>, attachment timelines are applied while this animation is being mixed out. Defaults to
+  /// 0, so attachment timelines are not applied while this animation is being mixed out.
   double getAttachmentThreshold() {
     return _bindings.spine_track_entry_get_attachment_threshold(_entry);
   }
@@ -2918,9 +3275,9 @@ class TrackEntry {
     _bindings.spine_track_entry_set_attachment_threshold(_entry, attachmentThreshold);
   }
 
-  /// When the mix percentage (mix time / mix duration) is less than the draw order threshold, draw order timelines for the
-  /// animation being mixed out will be applied. Defaults to 0, so draw order timelines are not applied for an animation being
-  /// mixed out.
+  /// When the mix percentage ([getMixTime] / [getMixDuration]) is less than the
+  /// <code>drawOrderThreshold</code>, draw order timelines are applied while this animation is being mixed out. Defaults to 0,
+  /// so draw order timelines are not applied while this animation is being mixed out.
   double getDrawOrderThreshold() {
     return _bindings.spine_track_entry_get_draw_order_threshold(_entry);
   }
@@ -2929,7 +3286,10 @@ class TrackEntry {
     _bindings.spine_track_entry_set_draw_order_threshold(_entry, drawOrderThreshold);
   }
 
-  /// The animation queued to start after this animation, or null.
+  /// The animation queued to start after this animation, or null if there is none. <code>next</code> makes up a doubly linked
+  /// list.
+  ///
+  /// See [AnimationState.clearNext] to truncate the list.
   TrackEntry? getNext() {
     final next = _bindings.spine_track_entry_get_next(_entry);
     if (next.address == nullptr.address) return null;
@@ -2941,8 +3301,8 @@ class TrackEntry {
     return _bindings.spine_track_entry_is_complete(_entry) == -1;
   }
 
-  /// Seconds from 0 to the mix duration when mixing from the previous animation to this animation. May be slightly more than
-  /// TrackEntry.MixDuration when the mix is complete.
+  /// Seconds from 0 to the [getMixDuration] when mixing from the previous animation to this animation. May be
+  /// slightly more than <code>mixDuration</code> when the mix is complete.
   double getMixTime() {
     return _bindings.spine_track_entry_get_mix_time(_entry);
   }
@@ -2951,14 +3311,21 @@ class TrackEntry {
     _bindings.spine_track_entry_set_mix_time(_entry, mixTime);
   }
 
-  /// Seconds for mixing from the previous animation to this animation. Defaults to the value provided by
-  /// AnimationStateData based on the animation before this animation (if any).
-  ///
-  /// The mix duration can be set manually rather than use the value from AnimationStateData.GetMix.
-  /// In that case, the mixDuration must be set before AnimationState.update(float) is next called.
-  ///
-  /// When using AnimationState::addAnimation(int, Animation, bool, float) with a delay
-  /// less than or equal to 0, note the Delay is set using the mix duration from the AnimationStateData
+  /// Seconds for mixing from the previous animation to this animation. Defaults to the value provided by AnimationStateData
+  /// {@link AnimationStateData#getMix(Animation, Animation)} based on the animation before this animation (if any).
+  /// <p>
+  /// A mix duration of 0 still mixes out over one frame to provide the track entry being mixed out a chance to revert the
+  /// properties it was animating. A mix duration of 0 can be set at any time to end the mix on the next
+  /// {@link AnimationState#update(float) update}.
+  /// <p>
+  /// The <code>mixDuration</code> can be set manually rather than use the value from
+  /// {@link AnimationStateData#getMix(Animation, Animation)}. In that case, the <code>mixDuration</code> can be set for a new
+  /// track entry only before {@link AnimationState#update(float)} is first called.
+  /// <p>
+  /// When using {@link AnimationState#addAnimation(int, Animation, boolean, float)} with a <code>delay</code> <= 0, the
+  /// {@link #getDelay()} is set using the mix duration from the {@link AnimationStateData}. If <code>mixDuration</code> is set
+  /// afterward, the delay may need to be adjusted. For example:
+  /// <code>entry.delay = entry.previous.getTrackComplete() - entry.mixDuration;</code>
   double getMixDuration() {
     return _bindings.spine_track_entry_get_mix_duration(_entry);
   }
