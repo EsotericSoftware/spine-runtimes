@@ -35,6 +35,8 @@ int minorVersion() => _bindings.spine_minor_version();
 
 void reportLeaks() => _bindings.spine_report_leaks();
 
+/// A color made of red, green, blue, and alpha components,
+/// ranging from 0-1.
 class Color {
   double r;
   double g;
@@ -44,6 +46,8 @@ class Color {
   Color(this.r, this.g, this.b, this.a);
 }
 
+/// Bounds denoted by the top left corner coordinates [x] and [y]
+/// and the [width] and [height].
 class Bounds {
   double x;
   double y;
@@ -53,6 +57,7 @@ class Bounds {
   Bounds(this.x, this.y, this.width, this.height);
 }
 
+/// A two-dimensional vector with [x] and [y] components.
 class Vec2 {
   double x;
   double y;
@@ -60,6 +65,12 @@ class Vec2 {
   Vec2(this.x, this.y);
 }
 
+/// Atlas data loaded from a `.atlas` file and its corresponding `.png` files. For each atlas image,
+/// a corresponding [Image] and [Paint] is constructed, which are used when rendering a skeleton
+/// that uses this atlas.
+///
+/// Use the static methods [fromAsset], [fromFile], and [fromHttp] to load an atlas. Call [dispose]
+/// when the atlas is no longer in use to release its resources.
 class Atlas {
   final spine_atlas _atlas;
   final List<Image> atlasPages;
@@ -101,21 +112,33 @@ class Atlas {
     return Atlas._(atlas, atlasPages, atlasPagePaints);
   }
 
+  /// Loads an [Atlas] from the file [atlasFileName] in the root bundle or the optionally provided [bundle].
+  ///
+  /// Throws an [Exception] in case the atlas could not be loaded.
   static Future<Atlas> fromAsset(String atlasFileName, {AssetBundle? bundle}) async {
     bundle ??= rootBundle;
     return _load(atlasFileName, (file) async => (await bundle!.load(file)).buffer.asUint8List());
   }
 
+  /// Loads an [Atlas] from the file [atlasFileName].
+  ///
+  /// Throws an [Exception] in case the atlas could not be loaded.
   static Future<Atlas> fromFile(String atlasFileName) async {
     return _load(atlasFileName, (file) => File(file).readAsBytes());
   }
 
-  static Future<Atlas> fromUrl(String atlasFileName) async {
-    return _load(atlasFileName, (file) async {
+  /// Loads an [Atlas] from the URL [atlasURL].
+  ///
+  /// Throws an [Exception] in case the atlas could not be loaded.
+  static Future<Atlas> fromHttp(String atlasURL) async {
+    return _load(atlasURL, (file) async {
       return (await http.get(Uri.parse(file))).bodyBytes;
     });
   }
 
+  /// Disposes the (native) resources of this atlas. The atlas can no longer be
+  /// used after calling this function. Only the first call to this method will
+  /// have an effect. Subsequent calls are ignored.
   void dispose() {
     if (_disposed) return;
     _disposed = true;
@@ -126,12 +149,28 @@ class Atlas {
   }
 }
 
+/// Skeleton data loaded from a skeleton `.json` or `.skel` file. Contains bones, slots, constraints,
+/// skins, animations, and so on making up a skeleton. Also contains meta data such as the skeletons
+/// setup pose bounding box, the Spine editor version it was exported from, and so on.
+///
+/// Skeleton data is stateless. Stateful [Skeleton] instances can be constructed from a [SkeletonData] instance.
+/// A single [SkeletonData] instance can be shared by multiple [Skeleton] instances.
+///
+/// Use the static methods [fromJson], [fromBinary], [fromAsset], [fromFile], and [fromURL] to load
+/// skeleton data. Call [dispose] when the skeleton data is no longer in use to free its resources.
+///
+/// See [Data objects](http://esotericsoftware.com/spine-runtime-architecture#Data-objects) in the Spine
+/// Runtimes Guide.
 class SkeletonData {
   final spine_skeleton_data _data;
   bool _disposed;
 
   SkeletonData._(this._data) : _disposed = false;
 
+  /// Loads a [SkeletonData] from the [json] string, using the provided [atlas] to resolve attachment
+  /// images.
+  ///
+  /// Throws an [Exception] in case the atlas could not be loaded.
   static SkeletonData fromJson(Atlas atlas, String json) {
     final jsonNative = json.toNativeUtf8(allocator: _allocator);
     final result = _bindings.spine_skeleton_data_load_json(atlas._atlas, jsonNative.cast());
@@ -147,6 +186,10 @@ class SkeletonData {
     return data;
   }
 
+  /// Loads a [SkeletonData] from the [binary] skeleton data, using the provided [atlas] to resolve attachment
+  /// images.
+  ///
+  /// Throws an [Exception] in case the skeleton data could not be loaded.
   static SkeletonData fromBinary(Atlas atlas, Uint8List binary) {
     final Pointer<Uint8> binaryNative = _allocator.allocate(binary.lengthInBytes);
     binaryNative.asTypedList(binary.lengthInBytes).setAll(0, binary);
@@ -163,6 +206,11 @@ class SkeletonData {
     return data;
   }
 
+
+  /// Loads a [SkeletonData] from the file [skeletonFile] in the root bundle or the optionally provided [bundle].
+  /// Uses the provided [atlas] to resolve attachment images.
+  ///
+  /// Throws an [Exception] in case the skeleton data could not be loaded.
   static Future<SkeletonData> fromAsset(Atlas atlas, String skeletonFile, {AssetBundle? bundle}) async {
     bundle ??= rootBundle;
     if (skeletonFile.endsWith(".json")) {
@@ -172,6 +220,9 @@ class SkeletonData {
     }
   }
 
+  /// Loads a [SkeletonData] from the file [skeletonFile]. Uses the provided [atlas] to resolve attachment images.
+  ///
+  /// Throws an [Exception] in case the skeleton data could not be loaded.
   static Future<SkeletonData> fromFile(Atlas atlas, String skeletonFile) async {
     if (skeletonFile.endsWith(".json")) {
       return fromJson(atlas, convert.utf8.decode(await File(skeletonFile).readAsBytes()));
@@ -180,98 +231,15 @@ class SkeletonData {
     }
   }
 
-  static Future<SkeletonData> fromHttp(Atlas atlas, String skeletonFile) async {
-    if (skeletonFile.endsWith(".json")) {
-      return fromJson(atlas, convert.utf8.decode((await http.get(Uri.parse(skeletonFile))).bodyBytes));
+  /// Loads a [SkeletonData] from the URL [skeletonURL]. Uses the provided [atlas] to resolve attachment images.
+  ///
+  /// Throws an [Exception] in case the skeleton data could not be loaded.
+  static Future<SkeletonData> fromHttp(Atlas atlas, String skeletonURL) async {
+    if (skeletonURL.endsWith(".json")) {
+      return fromJson(atlas, convert.utf8.decode((await http.get(Uri.parse(skeletonURL))).bodyBytes));
     } else {
-      return fromBinary(atlas, (await http.get(Uri.parse(skeletonFile))).bodyBytes);
+      return fromBinary(atlas, (await http.get(Uri.parse(skeletonURL))).bodyBytes);
     }
-  }
-
-  /// Finds a bone by comparing each bone's name. It is more efficient to cache the results of this method than to call it multiple times.
-  BoneData? findBone(String name) {
-    final nativeName = name.toNativeUtf8(allocator: _allocator);
-    final bone = _bindings.spine_skeleton_data_find_bone(_data, nativeName.cast());
-    _allocator.free(nativeName);
-    if (bone.address == nullptr.address) return null;
-    return BoneData._(bone);
-  }
-
-  /// Finds a slot by comparing each slot's name. It is more efficient to cache the results of this method than to call it multiple times.
-  SlotData? findSlot(String name) {
-    final nativeName = name.toNativeUtf8(allocator: _allocator);
-    final slot = _bindings.spine_skeleton_data_find_slot(_data, nativeName.cast());
-    _allocator.free(nativeName);
-    if (slot.address == nullptr.address) return null;
-    return SlotData._(slot);
-  }
-
-  /// Finds a skin by comparing each skin's name. It is more efficient to cache the results of this method than to call it
-  /// multiple times.
-  Skin? findSkin(String name) {
-    final nativeName = name.toNativeUtf8(allocator: _allocator);
-    final skin = _bindings.spine_skeleton_data_find_skin(_data, nativeName.cast());
-    _allocator.free(nativeName);
-    if (skin.address == nullptr.address) return null;
-    return Skin._(skin);
-  }
-
-  /// Finds an event by comparing each events's name. It is more efficient to cache the results of this method than to call it
-  /// multiple times.
-  EventData? findEvent(String name) {
-    final nativeName = name.toNativeUtf8(allocator: _allocator);
-    final event = _bindings.spine_skeleton_data_find_event(_data, nativeName.cast());
-    _allocator.free(nativeName);
-    if (event.address == nullptr.address) return null;
-    return EventData._(event);
-  }
-
-  /// Finds an animation by comparing each animation's name. It is more efficient to cache the results of this method than to
-  /// call it multiple times.
-  Animation? findAnimation(String name) {
-    final nativeName = name.toNativeUtf8(allocator: _allocator);
-    final animation = _bindings.spine_skeleton_data_find_animation(_data, nativeName.cast());
-    _allocator.free(nativeName);
-    if (animation.address == nullptr.address) return null;
-    return Animation._(animation);
-  }
-
-  /// Finds an IK constraint by comparing each IK constraint's name. It is more efficient to cache the results of this method
-  /// than to call it multiple times.
-  IkConstraintData? findIkConstraint(String name) {
-    final nativeName = name.toNativeUtf8(allocator: _allocator);
-    final constraint = _bindings.spine_skeleton_data_find_ik_constraint(_data, nativeName.cast());
-    _allocator.free(nativeName);
-    if (constraint.address == nullptr.address) return null;
-    return IkConstraintData._(constraint);
-  }
-
-  /// Finds a transform constraint by comparing each transform constraint's name. It is more efficient to cache the results of
-  /// this method than to call it multiple times.
-  TransformConstraintData? findTransformConstraint(String name) {
-    final nativeName = name.toNativeUtf8(allocator: _allocator);
-    final constraint = _bindings.spine_skeleton_data_find_transform_constraint(_data, nativeName.cast());
-    _allocator.free(nativeName);
-    if (constraint.address == nullptr.address) return null;
-    return TransformConstraintData._(constraint);
-  }
-
-  /// Finds a path constraint by comparing each path constraint's name. It is more efficient to cache the results of this method
-  /// than to call it multiple times.
-  PathConstraintData? findPathConstraint(String name) {
-    final nativeName = name.toNativeUtf8(allocator: _allocator);
-    final constraint = _bindings.spine_skeleton_data_find_path_constraint(_data, nativeName.cast());
-    _allocator.free(nativeName);
-    if (constraint.address == nullptr.address) return null;
-    return PathConstraintData._(constraint);
-  }
-
-  /// The skeleton's name, which by default is the name of the skeleton data file when possible, or null when a name hasn't been
-  /// set.
-  String? getName() {
-    Pointer<Utf8> name = _bindings.spine_skeleton_data_get_name(_data).cast();
-    if (name.address == nullptr.address) return null;
-    return name.toDartString();
   }
 
   /// The skeleton's bones, sorted parent first. The root bone is always the first bone.
@@ -285,6 +253,15 @@ class SkeletonData {
     return bones;
   }
 
+  /// Finds a bone by comparing each bone's name. It is more efficient to cache the results of this method than to call it multiple times.
+  BoneData? findBone(String name) {
+    final nativeName = name.toNativeUtf8(allocator: _allocator);
+    final bone = _bindings.spine_skeleton_data_find_bone(_data, nativeName.cast());
+    _allocator.free(nativeName);
+    if (bone.address == nullptr.address) return null;
+    return BoneData._(bone);
+  }
+
   /// The skeleton's slots.
   List<SlotData> getSlots() {
     final List<SlotData> slots = [];
@@ -294,6 +271,15 @@ class SkeletonData {
       slots.add(SlotData._(nativeSlots[i]));
     }
     return slots;
+  }
+
+  /// Finds a slot by comparing each slot's name. It is more efficient to cache the results of this method than to call it multiple times.
+  SlotData? findSlot(String name) {
+    final nativeName = name.toNativeUtf8(allocator: _allocator);
+    final slot = _bindings.spine_skeleton_data_find_slot(_data, nativeName.cast());
+    _allocator.free(nativeName);
+    if (slot.address == nullptr.address) return null;
+    return SlotData._(slot);
   }
 
   /// All skins, including the default skin.
@@ -322,6 +308,16 @@ class SkeletonData {
     }
   }
 
+  /// Finds a skin by comparing each skin's name. It is more efficient to cache the results of this method than to call it
+  /// multiple times.
+  Skin? findSkin(String name) {
+    final nativeName = name.toNativeUtf8(allocator: _allocator);
+    final skin = _bindings.spine_skeleton_data_find_skin(_data, nativeName.cast());
+    _allocator.free(nativeName);
+    if (skin.address == nullptr.address) return null;
+    return Skin._(skin);
+  }
+
   /// The skeleton's events.
   List<EventData> getEvents() {
     final List<EventData> events = [];
@@ -333,6 +329,17 @@ class SkeletonData {
     return events;
   }
 
+  /// Finds an event by comparing each events's name. It is more efficient to cache the results of this method than to call it
+  /// multiple times.
+  EventData? findEvent(String name) {
+    final nativeName = name.toNativeUtf8(allocator: _allocator);
+    final event = _bindings.spine_skeleton_data_find_event(_data, nativeName.cast());
+    _allocator.free(nativeName);
+    if (event.address == nullptr.address) return null;
+    return EventData._(event);
+  }
+
+
   /// The skeleton's animations.
   List<Animation> getAnimations() {
     final List<Animation> events = [];
@@ -342,6 +349,16 @@ class SkeletonData {
       events.add(Animation._(nativeAnimations[i]));
     }
     return events;
+  }
+
+  /// Finds an animation by comparing each animation's name. It is more efficient to cache the results of this method than to
+  /// call it multiple times.
+  Animation? findAnimation(String name) {
+    final nativeName = name.toNativeUtf8(allocator: _allocator);
+    final animation = _bindings.spine_skeleton_data_find_animation(_data, nativeName.cast());
+    _allocator.free(nativeName);
+    if (animation.address == nullptr.address) return null;
+    return Animation._(animation);
   }
 
   /// The skeleton's IK constraints.
@@ -355,6 +372,16 @@ class SkeletonData {
     return constraints;
   }
 
+  /// Finds an IK constraint by comparing each IK constraint's name. It is more efficient to cache the results of this method
+  /// than to call it multiple times.
+  IkConstraintData? findIkConstraint(String name) {
+    final nativeName = name.toNativeUtf8(allocator: _allocator);
+    final constraint = _bindings.spine_skeleton_data_find_ik_constraint(_data, nativeName.cast());
+    _allocator.free(nativeName);
+    if (constraint.address == nullptr.address) return null;
+    return IkConstraintData._(constraint);
+  }
+
   /// The skeleton's transform constraints.
   List<TransformConstraint> getTransformConstraints() {
     final List<TransformConstraint> constraints = [];
@@ -366,6 +393,16 @@ class SkeletonData {
     return constraints;
   }
 
+  /// Finds a transform constraint by comparing each transform constraint's name. It is more efficient to cache the results of
+  /// this method than to call it multiple times.
+  TransformConstraintData? findTransformConstraint(String name) {
+    final nativeName = name.toNativeUtf8(allocator: _allocator);
+    final constraint = _bindings.spine_skeleton_data_find_transform_constraint(_data, nativeName.cast());
+    _allocator.free(nativeName);
+    if (constraint.address == nullptr.address) return null;
+    return TransformConstraintData._(constraint);
+  }
+
   /// The skeleton's path constraints.
   List<PathConstraintData> getPathConstraints() {
     final List<PathConstraintData> constraints = [];
@@ -375,6 +412,24 @@ class SkeletonData {
       constraints.add(PathConstraintData._(nativeConstraints[i]));
     }
     return constraints;
+  }
+
+  /// Finds a path constraint by comparing each path constraint's name. It is more efficient to cache the results of this method
+  /// than to call it multiple times.
+  PathConstraintData? findPathConstraint(String name) {
+    final nativeName = name.toNativeUtf8(allocator: _allocator);
+    final constraint = _bindings.spine_skeleton_data_find_path_constraint(_data, nativeName.cast());
+    _allocator.free(nativeName);
+    if (constraint.address == nullptr.address) return null;
+    return PathConstraintData._(constraint);
+  }
+
+  /// The skeleton's name, which by default is the name of the skeleton data file when possible, or null when a name hasn't been
+  /// set.
+  String? getName() {
+    Pointer<Utf8> name = _bindings.spine_skeleton_data_get_name(_data).cast();
+    if (name.address == nullptr.address) return null;
+    return name.toDartString();
   }
 
   /// The X coordinate of the skeleton's axis aligned bounding box in the setup pose.
@@ -446,6 +501,9 @@ class SkeletonData {
     return _bindings.spine_skeleton_data_get_fps(_data);
   }
 
+  /// Disposes the (native) resources of this skeleton data. The skeleton data can no longer be
+  /// used after calling this function. Only the first call to this method will
+  /// have an effect. Subsequent calls are ignored.
   void dispose() {
     if (_disposed) return;
     _disposed = true;
@@ -453,6 +511,8 @@ class SkeletonData {
   }
 }
 
+/// Determines how images are blended with existing pixels when drawn. See [Blending](http://esotericsoftware.com/spine-slots#Blending) in
+/// the Spine User Guide.
 enum BlendMode {
   normal(0),
   additive(1),
@@ -464,6 +524,8 @@ enum BlendMode {
   const BlendMode(this.value);
 }
 
+/// Determines how a bone inherits world transforms from parent bones. See [Transform inheritance](esotericsoftware.com/spine-bones#Transform-inheritance)
+/// in the Spine User Guide.
 enum TransformMode {
   normal(0),
   onlyTranslation(1),
@@ -476,6 +538,9 @@ enum TransformMode {
   const TransformMode(this.value);
 }
 
+/// Controls how the first bone is positioned along the path.
+///
+/// See [Position mode](http://esotericsoftware.com/spine-path-constraints#Position-mode) in the Spine User Guide.
 enum PositionMode {
   fixed(0),
   percent(1);
@@ -485,6 +550,9 @@ enum PositionMode {
   const PositionMode(this.value);
 }
 
+/// Controls how bones after the first bone are positioned along the path.
+///
+/// See [Spacing mode](http://esotericsoftware.com/spine-path-constraints#Spacing-mode) in the Spine User Guide.
 enum SpacingMode {
   length(0),
   fixed(1),
@@ -496,6 +564,9 @@ enum SpacingMode {
   const SpacingMode(this.value);
 }
 
+/// Controls how bones are rotated, translated, and scaled to match the path.
+///
+/// See [Rotate mode](http://esotericsoftware.com/spine-path-constraints#Rotate-mode) in the Spine User Guide.
 enum RotateMode {
   tangent(0),
   chain(1),
@@ -506,26 +577,31 @@ enum RotateMode {
   const RotateMode(this.value);
 }
 
+/// Stores the setup pose for a [Bone].
 class BoneData {
   final spine_bone_data _data;
 
   BoneData._(this._data);
 
+  /// The index of the bone in [Skeleton.getBones].
   int getIndex() {
     return _bindings.spine_bone_data_get_index(_data);
   }
 
+  /// The name of the bone, which is unique across all bones in the skeleton.
   String getName() {
     Pointer<Utf8> name = _bindings.spine_bone_data_get_name(_data).cast();
     return name.toDartString();
   }
 
+  /// The parent bone or `null` if this is the root bone.
   BoneData? getParent() {
     final parent = _bindings.spine_bone_data_get_parent(_data);
     if (parent.address == nullptr.address) return null;
     return BoneData._(parent);
   }
 
+  /// The bone's length.
   double getLength() {
     return _bindings.spine_bone_data_get_length(_data);
   }
@@ -534,6 +610,7 @@ class BoneData {
     _bindings.spine_bone_data_set_length(_data, length);
   }
 
+  /// The local x translation.
   double getX() {
     return _bindings.spine_bone_data_get_x(_data);
   }
@@ -542,6 +619,7 @@ class BoneData {
     _bindings.spine_bone_data_set_x(_data, x);
   }
 
+  /// The local y translation.
   double getY() {
     return _bindings.spine_bone_data_get_y(_data);
   }
@@ -550,6 +628,7 @@ class BoneData {
     _bindings.spine_bone_data_set_y(_data, y);
   }
 
+  /// The local rotation in degrees.
   double getRotation() {
     return _bindings.spine_bone_data_get_rotation(_data);
   }
@@ -558,6 +637,7 @@ class BoneData {
     _bindings.spine_bone_data_set_rotation(_data, rotation);
   }
 
+  /// The local scaleX.
   double getScaleX() {
     return _bindings.spine_bone_data_get_scale_x(_data);
   }
@@ -566,6 +646,7 @@ class BoneData {
     _bindings.spine_bone_data_set_scale_x(_data, scaleX);
   }
 
+  /// The local scaleY.
   double getScaleY() {
     return _bindings.spine_bone_data_get_scale_y(_data);
   }
@@ -574,6 +655,7 @@ class BoneData {
     _bindings.spine_bone_data_set_scale_y(_data, scaleY);
   }
 
+  /// The local shearX.
   double getShearX() {
     return _bindings.spine_bone_data_get_shear_x(_data);
   }
@@ -582,6 +664,7 @@ class BoneData {
     _bindings.spine_bone_data_set_shear_x(_data, shearX);
   }
 
+  /// The local shearY.
   double getShearY() {
     return _bindings.spine_bone_data_get_shear_y(_data);
   }
@@ -590,6 +673,7 @@ class BoneData {
     _bindings.spine_bone_data_set_shear_y(_data, shearY);
   }
 
+  /// The [TransformMode] for how parent world transforms affect this bone.
   TransformMode getTransformMode() {
     final nativeMode = _bindings.spine_bone_data_get_transform_mode(_data);
     return TransformMode.values[nativeMode];
@@ -599,6 +683,9 @@ class BoneData {
     _bindings.spine_bone_data_set_transform_mode(_data, mode.value);
   }
 
+  /// When true, [Skeleton.updateWorldTransform] only updates this bone if the [Skeleton.getSkin] contains this bone.
+  ///
+  /// See [Skin.getBones].
   bool isSkinRequired() {
     return _bindings.spine_bone_data_is_skin_required(_data) == -1;
   }
@@ -607,6 +694,8 @@ class BoneData {
     _bindings.spine_bone_data_set_is_skin_required(_data, isSkinRequired ? -1 : 0);
   }
 
+  /// The [Color] of the bone as it was in Spine, or a default color if nonessential data was not exported. Bones are not usually
+  /// rendered at runtime.
   Color getColor() {
     final color = _bindings.spine_bone_data_get_color(_data);
     return Color(_bindings.spine_color_get_r(color), _bindings.spine_color_get_g(color), _bindings.spine_color_get_b(color),
@@ -623,11 +712,17 @@ class BoneData {
   }
 }
 
+/// Stores a bone's current pose.
+///
+///  A bone has a local transform which is used to compute its world transform. A bone also has an applied transform, which is a
+///  local transform that can be applied to compute the world transform. The local transform and applied transform may differ if a
+///  constraint or application code modifies the world transform after it was computed from the local transform.
 class Bone {
   final spine_bone _bone;
 
   Bone._(this._bone);
 
+  /// Assume y-axis pointing down for all calculations.
   static void setIsYDown(bool isYDown) {
     _bindings.spine_bone_set_is_y_down(isYDown ? -1 : 0);
   }
@@ -636,22 +731,45 @@ class Bone {
     return _bindings.spine_bone_get_is_y_down() == 1;
   }
 
+  /// Computes the world transform using the parent bone and this bone's local applied transform.
   void update() {
     _bindings.spine_bone_update(_bone);
   }
 
+  /// Computes the world transform using the parent bone and this bone's local transform.
+  ///
+  /// See [updateWorldTransformWith].
   void updateWorldTransform() {
     _bindings.spine_bone_update_world_transform(_bone);
   }
 
+  /// Computes the world transform using the parent bone and the specified local transform. The applied transform is set to the
+  /// specified local transform. Child bones are not updated.
+  ///
+  /// See [World transform](http://esotericsoftware.com/spine-runtime-skeletons#World-transforms) in the Spine
+  /// Runtimes Guide.
   void updateWorldTransformWith(double x, double y, double rotation, double scaleX, double scaleY, double shearX, double shearY) {
     _bindings.spine_bone_update_world_transform_with(_bone, x, y, rotation, scaleX, scaleY, shearX, shearY);
   }
 
+  /// Computes the applied transform values from the world transform.
+  ///
+  /// If the world transform is modified (by a constraint, [rotateWorld], etc) then this method should be called so
+  /// the applied transform matches the world transform. The applied transform may be needed by other code (eg to apply another
+  /// constraint).
+  ///
+  /// Some information is ambiguous in the world transform, such as -1,-1 scale versus 180 rotation. The applied transform after
+  /// calling this method is equivalent to the local transform used to compute the world transform, but may not be identical.
+  void updateAppliedTransform() {
+    _bindings.spine_bone_update_applied_transform(_bone);
+  }
+
+  /// Sets this bone's local transform to the setup pose.
   void setToSetupPose() {
     _bindings.spine_bone_set_to_setup_pose(_bone);
   }
 
+  /// Transforms a point from world coordinates to the bone's local coordinates.
   Vec2 worldToLocal(double worldX, double worldY) {
     final local = _bindings.spine_bone_world_to_local(_bone, worldX, worldY);
     final result = Vec2(_bindings.spine_vector_get_x(local), _bindings.spine_vector_get_y(local));
@@ -659,6 +777,7 @@ class Bone {
     return result;
   }
 
+  /// Transforms a point from the bone's local coordinates to world coordinates.
   Vec2 localToWorld(double localX, double localY) {
     final world = _bindings.spine_bone_local_to_world(_bone, localX, localY);
     final result = Vec2(_bindings.spine_vector_get_x(world), _bindings.spine_vector_get_y(world));
@@ -666,14 +785,20 @@ class Bone {
     return result;
   }
 
+  /// Transforms a world rotation to a local rotation.
   double worldToLocalRotation(double worldRotation) {
     return _bindings.spine_bone_world_to_local_rotation(_bone, worldRotation);
   }
 
+  /// Transforms a local rotation to a world rotation.
   double localToWorldRotation(double localRotation) {
     return _bindings.spine_bone_local_to_world_rotation(_bone, localRotation);
   }
 
+  /// Rotates the world transform the specified amount.
+  ///
+  /// After changes are made to the world transform, [updateAppliedTransform] should be called and [update] will
+  /// need to be called on any child bones, recursively.
   void rotateWorld(double degrees) {
     _bindings.spine_bone_rotate_world(_bone, degrees);
   }
@@ -686,20 +811,24 @@ class Bone {
     return _bindings.spine_bone_get_world_to_local_rotation_y(_bone);
   }
 
+  /// The bone's setup pose data.
   BoneData getData() {
     return BoneData._(_bindings.spine_bone_get_data(_bone));
   }
 
+  /// The skeleton this bone belongs to.
   Skeleton getSkeleton() {
     return Skeleton._(_bindings.spine_bone_get_skeleton(_bone));
   }
 
+  /// The parent bone, or null if this is the root bone.
   Bone? getParent() {
     final parent = _bindings.spine_bone_get_parent(_bone);
     if (parent.address == nullptr.address) return null;
     return Bone._(parent);
   }
 
+  /// The immediate children of this bone.
   List<Bone> getChildren() {
     List<Bone> children = [];
     final numChildren = _bindings.spine_bone_get_num_children(_bone);
@@ -710,6 +839,7 @@ class Bone {
     return children;
   }
 
+  /// The local x translation.
   double getX() {
     return _bindings.spine_bone_get_x(_bone);
   }
@@ -718,6 +848,7 @@ class Bone {
     _bindings.spine_bone_set_x(_bone, x);
   }
 
+  /// The local y translation.
   double getY() {
     return _bindings.spine_bone_get_y(_bone);
   }
@@ -726,6 +857,7 @@ class Bone {
     _bindings.spine_bone_set_y(_bone, y);
   }
 
+  /// The local rotation in degrees, counter clockwise.
   double getRotation() {
     return _bindings.spine_bone_get_rotation(_bone);
   }
@@ -734,6 +866,7 @@ class Bone {
     _bindings.spine_bone_set_rotation(_bone, rotation);
   }
 
+  /// The local scaleX.
   double getScaleX() {
     return _bindings.spine_bone_get_scale_x(_bone);
   }
@@ -742,6 +875,7 @@ class Bone {
     _bindings.spine_bone_set_scale_x(_bone, scaleX);
   }
 
+  /// The local scaleY.
   double getScaleY() {
     return _bindings.spine_bone_get_scale_y(_bone);
   }
@@ -750,6 +884,7 @@ class Bone {
     _bindings.spine_bone_set_scale_y(_bone, scaleY);
   }
 
+  /// The local shearX.
   double getShearX() {
     return _bindings.spine_bone_get_shear_x(_bone);
   }
@@ -758,6 +893,7 @@ class Bone {
     _bindings.spine_bone_set_shear_x(_bone, shearX);
   }
 
+  /// The local shearY.
   double getShearY() {
     return _bindings.spine_bone_get_shear_y(_bone);
   }
@@ -766,6 +902,7 @@ class Bone {
     _bindings.spine_bone_set_shear_y(_bone, shearY);
   }
 
+  /// The applied local x translation.
   double getAX() {
     return _bindings.spine_bone_get_a_x(_bone);
   }
@@ -774,6 +911,7 @@ class Bone {
     _bindings.spine_bone_set_a_x(_bone, x);
   }
 
+  /// The applied local y translation.
   double getAY() {
     return _bindings.spine_bone_get_a_y(_bone);
   }
@@ -782,6 +920,7 @@ class Bone {
     _bindings.spine_bone_set_a_y(_bone, y);
   }
 
+  /// The applied local rotation in degrees, counter clockwise.
   double getAppliedRotation() {
     return _bindings.spine_bone_get_applied_rotation(_bone);
   }
@@ -790,6 +929,7 @@ class Bone {
     _bindings.spine_bone_set_applied_rotation(_bone, rotation);
   }
 
+  /// The applied local scaleX.
   double getAScaleX() {
     return _bindings.spine_bone_get_a_scale_x(_bone);
   }
@@ -798,6 +938,7 @@ class Bone {
     _bindings.spine_bone_set_a_scale_x(_bone, scaleX);
   }
 
+  /// The applied local scaleY.
   double getAScaleY() {
     return _bindings.spine_bone_get_a_scale_y(_bone);
   }
@@ -806,6 +947,7 @@ class Bone {
     _bindings.spine_bone_set_a_scale_y(_bone, scaleY);
   }
 
+  /// The applied local shearX.
   double getAShearX() {
     return _bindings.spine_bone_get_a_shear_x(_bone);
   }
@@ -814,6 +956,7 @@ class Bone {
     _bindings.spine_bone_set_a_shear_x(_bone, shearX);
   }
 
+  /// The applied local shearY.
   double getAShearY() {
     return _bindings.spine_bone_get_a_shear_y(_bone);
   }
@@ -822,6 +965,7 @@ class Bone {
     _bindings.spine_bone_set_a_shear_y(_bone, shearY);
   }
 
+  /// Part of the world transform matrix for the X axis. If changed, [updateAppliedTransform] should be called.
   double getA() {
     return _bindings.spine_bone_get_a(_bone);
   }
@@ -830,6 +974,7 @@ class Bone {
     _bindings.spine_bone_set_a(_bone, a);
   }
 
+  /// Part of the world transform matrix for the Y axis. If changed, [updateAppliedTransform] should be called.
   double getB() {
     return _bindings.spine_bone_get_b(_bone);
   }
@@ -838,6 +983,7 @@ class Bone {
     _bindings.spine_bone_set_b(_bone, b);
   }
 
+  /// Part of the world transform matrix for the X axis. If changed, [updateAppliedTransform] should be called.
   double getC() {
     return _bindings.spine_bone_get_c(_bone);
   }
@@ -846,6 +992,7 @@ class Bone {
     _bindings.spine_bone_set_c(_bone, c);
   }
 
+  /// Part of the world transform matrix for the Y axis. If changed, [updateAppliedTransform] should be called.
   double getD() {
     return _bindings.spine_bone_get_d(_bone);
   }
@@ -854,6 +1001,7 @@ class Bone {
     _bindings.spine_bone_set_a(_bone, d);
   }
 
+  /// The world X position. If changed, [updateAppliedTransform] should be called.
   double getWorldX() {
     return _bindings.spine_bone_get_world_x(_bone);
   }
@@ -862,6 +1010,7 @@ class Bone {
     _bindings.spine_bone_set_world_x(_bone, worldX);
   }
 
+  /// The world Y position. If changed, [updateAppliedTransform] should be called.
   double getWorldY() {
     return _bindings.spine_bone_get_world_y(_bone);
   }
@@ -870,22 +1019,28 @@ class Bone {
     _bindings.spine_bone_set_world_y(_bone, worldY);
   }
 
+  /// The world rotation for the X axis, calculated using [getA] and [getC].
   double getWorldRotationX() {
     return _bindings.spine_bone_get_world_rotation_x(_bone);
   }
 
+  /// The world rotation for the Y axis, calculated using [getB] and [getD].
   double getWorldRotationY() {
     return _bindings.spine_bone_get_world_rotation_y(_bone);
   }
 
+  /// The magnitude (always positive) of the world scale X, calculated using [getA] and [getC].
   double getWorldScaleX() {
     return _bindings.spine_bone_get_world_scale_x(_bone);
   }
 
+  /// The magnitude (always positive) of the world scale Y, calculated using [getB] and [getD].
   double getWorldScaleY() {
     return _bindings.spine_bone_get_world_scale_y(_bone);
   }
 
+  /// Returns false when the bone has not been computed because [BoneData.getSkinRequired] is true and the
+  /// active skin (see [Skeleton.getSkin]) does not contain this bone (see [Skin.getBones]).
   bool isActive() {
     return _bindings.spine_bone_get_is_active(_bone) == -1;
   }
@@ -3234,7 +3389,7 @@ class SkeletonDrawable {
   }
 
   static Future<SkeletonDrawable> fromHttp(String atlasFile, String skeletonFile) async {
-    var atlas = await Atlas.fromUrl(atlasFile);
+    var atlas = await Atlas.fromHttp(atlasFile);
     var skeletonData = await SkeletonData.fromHttp(atlas, skeletonFile);
     return SkeletonDrawable(atlas, skeletonData, true);
   }

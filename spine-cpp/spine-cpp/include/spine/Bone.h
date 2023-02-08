@@ -113,6 +113,12 @@ namespace spine {
 		void
 		updateWorldTransform(float x, float y, float rotation, float scaleX, float scaleY, float shearX, float shearY);
 
+        /// Computes the individual applied transform values from the world transform. This can be useful to perform processing using
+		/// the applied transform after the world transform has been modified directly (eg, by a constraint)..
+		///
+		/// Some information is ambiguous in the world transform, such as -1,-1 scale versus 180 rotation.
+		void updateAppliedTransform();
+
 		void setToSetupPose();
 
 		void worldToLocal(float worldX, float worldY, float &outLocalX, float &outLocalY);
@@ -260,12 +266,6 @@ namespace spine {
 		float _c, _d, _worldY;
 		bool _sorted;
 		bool _active;
-
-		/// Computes the individual applied transform values from the world transform. This can be useful to perform processing using
-		/// the applied transform after the world transform has been modified directly (eg, by a constraint)..
-		///
-		/// Some information is ambiguous in the world transform, such as -1,-1 scale versus 180 rotation.
-		void updateAppliedTransform();
 	};
 }
 
