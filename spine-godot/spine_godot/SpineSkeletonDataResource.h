@@ -24,11 +24,11 @@ protected:
 public:
 	SpineAnimationMix();
 
-	void set_from(const StringName &from);
+	void set_from(const String &from);
 
 	String get_from();
 
-	void set_to(const StringName &to);
+	void set_to(const String &to);
 
 	String get_to();
 
