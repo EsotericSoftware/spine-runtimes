@@ -33,7 +33,7 @@ class PlayPauseAnimationState extends State<PlayPauseAnimation> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Play/Pause')),
-      body: SpineWidget.asset(
+      body: SpineWidget.fromAsset(
         "assets/dragon.atlas",
         "assets/dragon-ess.skel",
         controller,

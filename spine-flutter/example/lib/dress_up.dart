@@ -29,7 +29,7 @@ class DressUpState extends State<DressUp> {
         skeleton.setSkin(skin);
         skeleton.setToSetupPose();
         skeleton.updateWorldTransform();
-        _skinImages[skin.getName()] = await drawable.renderToRawImageData(thumbnailSize, thumbnailSize);
+        _skinImages[skin.getName()] = await drawable.renderToRawImageData(thumbnailSize, thumbnailSize, 0xffffffff);
         _selectedSkins[skin.getName()] = false;
       }
       _toggleSkin("full-skins/girl");
@@ -87,7 +87,7 @@ class DressUpState extends State<DressUp> {
                   }).toList()),
                 ),
                 Expanded(
-                    child: SpineWidget.drawable(
+                    child: SpineWidget.fromDrawable(
                   _drawable,
                   controller,
                   boundsProvider: SkinAndAnimationBounds(skins: ["full-skins/girl"]),

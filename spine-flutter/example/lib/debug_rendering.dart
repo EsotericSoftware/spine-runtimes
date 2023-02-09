@@ -17,7 +17,7 @@ class DebugRendering extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Debug Renderer')),
-      body: SpineWidget.asset("assets/spineboy.atlas", "assets/spineboy-pro.skel", controller),
+      body: SpineWidget.fromAsset("assets/spineboy.atlas", "assets/spineboy-pro.skel", controller),
     );
   }
 }
