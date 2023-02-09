@@ -28,9 +28,15 @@ import 'spine_flutter.dart';
 /// The underlying [Atlas], [SkeletonData], [Skeleton], [AnimationStateData], [AnimationState], and [SkeletonDrawable]
 /// can be accessed through their respective getters to inspect and/or modify the skeleton and its associated data. Accessing
 /// this data is only allowed if the [SpineWidget] and its data have been initialized and have not been disposed yet.
+///
+/// By default, the widget updates and renders the skeleton every frame. The [pause] method can be used to pause updating
+/// and rendering the skeleton. The [resume] method resumes updating and rendering the skeleton. The [isPlaying] getter
+/// reports the current state.
 class SpineWidgetController {
   SkeletonDrawable? _drawable;
   double _offsetX = 0, _offsetY = 0, _scaleX = 1, _scaleY = 1;
+  bool _isPlaying = true;
+  _SpineRenderObject? _renderObject = null;
   final void Function(SpineWidgetController controller)? onInitialized;
   final void Function(SpineWidgetController controller)? onBeforeUpdateWorldTransforms;
   final void Function(SpineWidgetController controller)? onAfterUpdateWorldTransforms;
@@ -92,6 +98,10 @@ class SpineWidgetController {
     _scaleY = scaleY;
   }
 
+  void _setRenderObject(_SpineRenderObject? renderObject) {
+    _renderObject = renderObject;
+  }
+
   /// Transforms the coordinates given in the [SpineWidget] coordinate system in [position] to
   /// the skeleton coordinate system. See the `ik_following.dart` example how to use this
   /// to move a bone based on user touch input.
@@ -99,6 +109,23 @@ class SpineWidgetController {
     var x = position.dx;
     var y = position.dy;
     return Offset(x / _scaleX - _offsetX, y / _scaleY - _offsetY);
+  }
+
+  /// Pauses updating and rendering the skeleton.
+  void pause() {
+    _isPlaying = false;
+  }
+
+  /// Resumes updating and rendering the skeleton.
+  void resume() {
+    _isPlaying = true;
+    _renderObject?._stopwatch.reset();
+    _renderObject?._stopwatch.start();
+    _renderObject?._scheduleFrame();
+  }
+
+  bool get isPlaying {
+    return _isPlaying;
   }
 }
 
@@ -391,6 +418,7 @@ class _SpineRenderObject extends RenderBox {
   Alignment _alignment;
   Bounds _bounds;
   bool _sizedByBounds;
+  bool _disposed = false;
 
   _SpineRenderObject(this._skeletonDrawable, this._controller, this._fit, this._alignment, this._bounds, this._sizedByBounds);
 
@@ -493,22 +521,39 @@ class _SpineRenderObject extends RenderBox {
   void attach(rendering.PipelineOwner owner) {
     super.attach(owner);
     _stopwatch.start();
+    SchedulerBinding.instance.scheduleFrameCallback(_beginFrame);
+    _controller._setRenderObject(this);
   }
 
   @override
   void detach() {
     _stopwatch.stop();
     super.detach();
+    _controller._setRenderObject(null);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _disposed = true;
+  }
+
+  void _scheduleFrame() {
+    SchedulerBinding.instance.scheduleFrameCallback(_beginFrame);
   }
 
   void _beginFrame(Duration duration) {
+    if (_disposed) return;
     _deltaTime = _stopwatch.elapsedTicks / _stopwatch.frequency;
     _stopwatch.reset();
     _stopwatch.start();
-    _controller.onBeforeUpdateWorldTransforms?.call(_controller);
-    _skeletonDrawable.update(_deltaTime);
-    _controller.onAfterUpdateWorldTransforms?.call(_controller);
-    markNeedsPaint();
+    if (_controller.isPlaying) {
+      _controller.onBeforeUpdateWorldTransforms?.call(_controller);
+      _skeletonDrawable.update(_deltaTime);
+      _controller.onAfterUpdateWorldTransforms?.call(_controller);
+      markNeedsPaint();
+      _scheduleFrame();
+    }
   }
 
   void _setCanvasTransform(Canvas canvas, Offset offset) {
@@ -568,6 +613,5 @@ class _SpineRenderObject extends RenderBox {
     _controller.onAfterPaint?.call(_controller, canvas, commands);
 
     canvas.restore();
-    SchedulerBinding.instance.scheduleFrameCallback(_beginFrame);
   }
 }
