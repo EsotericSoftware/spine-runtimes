@@ -206,7 +206,6 @@ class SkeletonData {
     return data;
   }
 
-
   /// Loads a [SkeletonData] from the file [skeletonFile] in the root bundle or the optionally provided [bundle].
   /// Uses the provided [atlas] to resolve attachment images.
   ///
@@ -338,7 +337,6 @@ class SkeletonData {
     if (event.address == nullptr.address) return null;
     return EventData._(event);
   }
-
 
   /// The skeleton's animations.
   List<Animation> getAnimations() {
@@ -2760,7 +2758,6 @@ class Skeleton {
     return Slot._(slot);
   }
 
-
   /// Sets a skin by name.
   ///
   /// See [setSkin].
@@ -2769,7 +2766,6 @@ class Skeleton {
     _bindings.spine_skeleton_set_skin_by_name(_skeleton, nameNative.cast());
     _allocator.free(nameNative);
   }
-
 
   /// Sets the skin used to look up attachments before looking in the default skin (see [SkeletonData.getDefaultSkin]). If the
   /// skin is changed, [updateCache] is called.
@@ -3035,17 +3031,20 @@ enum MixBlend {
   /// Transitions from the setup value to the timeline value (the current value is not used). Before the first frame, the
   /// setup value is set.
   setup(0),
+
   /// Transitions from the current value to the timeline value. Before the first frame, transitions from the current value to
   /// the setup value. Timelines which perform instant transitions, such as {@link DrawOrderTimeline} or
   /// {@link AttachmentTimeline}, use the setup value before the first frame.
   /// <p>
   /// <code>first</code> is intended for the first animations applied, not for animations layered on top of those.
   first(1),
+
   /// Transitions from the current value to the timeline value. No change is made before the first frame (the current value is
   /// kept until the first frame).
   /// <p>
   /// <code>replace</code> is intended for animations layered on top of others, not for the first animations applied.
   replace(2),
+
   /// Transitions from the current value to the current value plus the timeline value. No change is made before the first
   /// frame (the current value is kept until the first frame).
   /// <p>
@@ -3089,7 +3088,6 @@ class TrackEntry {
   void setLoop(bool loop) {
     _bindings.spine_track_entry_set_loop(_entry, loop ? -1 : 0);
   }
-
 
   /// Seconds to postpone playing the animation. When this track entry is the current track entry, <code>delay</code>
   /// postpones incrementing the [getTrackTime]. When this track entry is queued, <code>delay</code> is the time from
@@ -3396,12 +3394,15 @@ enum EventType {
   /// Emitted when [TrackEntry] has been set as the current entry. [EventType.end] will occur when this entry will no
   /// longer be applied.
   start,
+
   /// Emitted when another entry has replaced the current entry. This entry may continue being applied for
   /// mixing.
   interrupt,
+
   /// Emitted when this entry will never be applied again. This only occurs if this entry has previously been set as the
   /// current entry ([EventType.start] was emitted).
   end,
+
   /// Emitted every time the current entry's animation completes a loop. This may occur during mixing (after
   /// [EventType.interrupted] is emitted).
   ///
@@ -3410,10 +3411,12 @@ enum EventType {
   /// Because this event is triggered at the end of [AnimationState.apply], any animations set in response to
   /// the event won't be applied until the next time the [AnimationState] is applied.
   complete,
+
   /// Emitted when this entry will be disposed. This may occur without the entry ever being set as the current entry.
   ///
   /// References to the entry should not be kept after <code>dispose</code> is called, as it may be destroyed or reused.
   dispose,
+
   /// Invoked when the current entry's animation triggers an event. This may occur during mixing (after
   /// [EventType.interrupt] is emitted), see [TrackEntry.getEventThreshold].
   ///
@@ -3841,6 +3844,25 @@ class AnimationState {
   }
 }
 
+/// A SkeletonDrawable bundles loading, updating, and rendering an [Atlas], [Skeleton], and [AnimationState]
+/// into a single easy to use class.
+///
+/// Use the [fromAsset], [fromFile], or [fromHttp] methods to construct a SkeletonDrawable. To have
+/// multiple skeleton drawable instances share the same [Atlas] and [SkeletonData], use the constructor.
+///
+/// You can then directly access the [atlas], [skeletonData], [skeleton], [animationStateData], and [animationState]
+/// to query and animate the skeleton. Use the [AnimationState] to queue animations on one or more tracks
+/// via [AnimationState.setAnimation] or [AnimationState.addAnimation].
+///
+/// To update the [AnimationState] and apply it to the [Skeleton] call the [update] function, providing it
+/// a delta time in seconds to advance the animations.
+///
+/// To render the current pose of the [Skeleton], use the rendering methods [render], [renderToCanvas], [renderToPictureRecorder],
+/// [renderToPng], or [renderToRawImageData], depending on your needs.
+///
+/// When the skeleton drawable is no longer needed, call the [dispose] method to release its resources. If
+/// the skeleton drawable was constructed from a shared [Atlas] and [SkeletonData], make sure to dispose the
+/// atlas and skeleton data as well, if no skeleton drawable references them anymore.
 class SkeletonDrawable {
   final Atlas atlas;
   final SkeletonData skeletonData;
@@ -3851,6 +3873,9 @@ class SkeletonDrawable {
   final bool _ownsAtlasAndSkeletonData;
   bool _disposed;
 
+  /// Constructs a new skeleton drawable from the given (possibly shared) [Atlas] and [SkeletonData]. If
+  /// the atlas and skeleton data are not shared, the drawable can take ownership by passing true for [_ownsAtlasAndSkeletonData].
+  /// In that case a call to [dispose] will also dispose the atlas and skeleton data.
   SkeletonDrawable(this.atlas, this.skeletonData, this._ownsAtlasAndSkeletonData) : _disposed = false {
     _drawable = _bindings.spine_skeleton_drawable_create(skeletonData._data);
     skeleton = Skeleton._(_bindings.spine_skeleton_drawable_get_skeleton(_drawable));
@@ -3860,6 +3885,10 @@ class SkeletonDrawable {
     skeleton.updateWorldTransform();
   }
 
+  /// Constructs a new skeleton drawable from the [atlasFile] and [skeletonFile] from the root asset bundle
+  /// or the optionally provided [bundle].
+  ///
+  /// Throws an exception in case the data could not be loaded.
   static Future<SkeletonDrawable> fromAsset(String atlasFile, String skeletonFile, {AssetBundle? bundle}) async {
     bundle ??= rootBundle;
     var atlas = await Atlas.fromAsset(atlasFile, bundle: bundle);
@@ -3867,18 +3896,27 @@ class SkeletonDrawable {
     return SkeletonDrawable(atlas, skeletonData, true);
   }
 
+  /// Constructs a new skeleton drawable from the [atlasFile] and [skeletonFile].
+  ///
+  /// Throws an exception in case the data could not be loaded.
   static Future<SkeletonDrawable> fromFile(String atlasFile, String skeletonFile) async {
     var atlas = await Atlas.fromFile(atlasFile);
     var skeletonData = await SkeletonData.fromFile(atlas, skeletonFile);
     return SkeletonDrawable(atlas, skeletonData, true);
   }
 
-  static Future<SkeletonDrawable> fromHttp(String atlasFile, String skeletonFile) async {
-    var atlas = await Atlas.fromHttp(atlasFile);
-    var skeletonData = await SkeletonData.fromHttp(atlas, skeletonFile);
+  /// Constructs a new skeleton drawable from the [atlasUrl] and [skeletonUrl].
+  ///
+  /// Throws an exception in case the data could not be loaded.
+  static Future<SkeletonDrawable> fromHttp(String atlasUrl, String skeletonUrl) async {
+    var atlas = await Atlas.fromHttp(atlasUrl);
+    var skeletonData = await SkeletonData.fromHttp(atlas, skeletonUrl);
     return SkeletonDrawable(atlas, skeletonData, true);
   }
 
+  /// Updates the [AnimationState] using the [delta] time given in seconds, applies the
+  /// animation state to the [Skeleton] and updates the world transforms of the skeleton
+  /// to calculate its current pose.
   void update(double delta) {
     if (_disposed) return;
     animationState.update(delta);
@@ -3886,6 +3924,8 @@ class SkeletonDrawable {
     skeleton.updateWorldTransform();
   }
 
+  /// Renders to current skeleton pose to a list of [RenderCommand] instances. The render commands
+  /// can be rendered via [Canvas.drawVertices].
   List<RenderCommand> render() {
     if (_disposed) return [];
     spine_render_command nativeCmd = _bindings.spine_skeleton_drawable_render(_drawable);
@@ -3898,6 +3938,8 @@ class SkeletonDrawable {
     return commands;
   }
 
+  /// Renders the skeleton drawable's current pose to the given [canvas]. Does not perform any
+  /// scaling or fitting.
   void renderToCanvas(Canvas canvas) {
     var commands = render();
     for (final cmd in commands) {
@@ -3905,13 +3947,15 @@ class SkeletonDrawable {
     }
   }
 
-  PictureRecorder renderToPictureRecorder(double width, double height) {
+  /// Renders the skeleton drawable's current pose to a [PictureRecorder] with the given [width] and [height].
+  /// Uses [bgColor], a 32-bit ARGB color value, to paint the background.
+  /// Scales and centers the skeleton to fit the within the bounds of [width] and [height].
+  PictureRecorder renderToPictureRecorder(double width, double height, int bgColor) {
     var bounds = skeleton.getBounds();
     var scale = 1 / (bounds.width > bounds.height ? bounds.width / width : bounds.height / height);
 
     var recorder = PictureRecorder();
     var canvas = Canvas(recorder);
-    var bgColor = Random().nextInt(0xffffffff) | 0xff0000000;
     var paint = Paint()
       ..color = material.Color(bgColor)
       ..style = PaintingStyle.fill;
@@ -3924,14 +3968,20 @@ class SkeletonDrawable {
     return recorder;
   }
 
-  Future<Uint8List> renderToPng(double width, double height) async {
-    final recorder = renderToPictureRecorder(width, height);
+  /// Renders the skeleton drawable's current pose to a PNG encoded in a [Uint8List], with the given [width] and [height].
+  /// Uses [bgColor], a 32-bit ARGB color value, to paint the background.
+  /// Scales and centers the skeleton to fit the within the bounds of [width] and [height].
+  Future<Uint8List> renderToPng(double width, double height, int bgColor) async {
+    final recorder = renderToPictureRecorder(width, height, bgColor);
     final image = await recorder.endRecording().toImage(width.toInt(), height.toInt());
     return (await image.toByteData(format: ImageByteFormat.png))!.buffer.asUint8List();
   }
 
-  Future<RawImageData> renderToRawImageData(double width, double height) async {
-    final recorder = renderToPictureRecorder(width, height);
+  /// Renders the skeleton drawable's current pose to a [RawImageData], with the given [width] and [height].
+  /// Uses [bgColor], a 32-bit ARGB color value, to paint the background.
+  /// Scales and centers the skeleton to fit the within the bounds of [width] and [height].
+  Future<RawImageData> renderToRawImageData(double width, double height, int bgColor) async {
+    final recorder = renderToPictureRecorder(width, height, bgColor);
     var rawImageData =
         (await (await recorder.endRecording().toImage(width.toInt(), height.toInt())).toByteData(format: ImageByteFormat.rawRgba))!
             .buffer
@@ -3939,6 +3989,9 @@ class SkeletonDrawable {
     return RawImageData(rawImageData, width.toInt(), height.toInt());
   }
 
+  /// Disposes the skeleton drawable's resources. If the skeleton drawable owns the atlas
+  /// and skeleton data, they are disposed as well. Must be called when the skeleton drawable
+  /// is no longer in use.
   void dispose() {
     if (_disposed) return;
     _disposed = true;
@@ -3950,6 +4003,9 @@ class SkeletonDrawable {
   }
 }
 
+/// Stores the vertices, indices, and atlas page index to be used for rendering one or more attachments
+/// of a [Skeleton] to a [Canvas]. See the implementation of [SkeletonDrawable.renderToCanvas] on how to use this data to render it to a
+/// [Canvas].
 class RenderCommand {
   late final Vertices vertices;
   late final int atlasPageIndex;
@@ -3988,6 +4044,8 @@ class RenderCommand {
   }
 }
 
+/// Renders debug information for a [SkeletonDrawable], like bone locations, to a [Canvas].
+/// See [DebugRenderer.render].
 class DebugRenderer {
   const DebugRenderer();
 
