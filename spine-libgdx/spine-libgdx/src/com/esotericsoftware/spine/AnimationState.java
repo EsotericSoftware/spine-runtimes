@@ -847,7 +847,7 @@ public class AnimationState {
 		this.timeScale = timeScale;
 	}
 
-	/** The AnimationStateData to look up mix durations. */
+	/** The {@link AnimationStateData} to look up mix durations. */
 	public AnimationStateData getData () {
 		return data;
 	}
@@ -1199,13 +1199,13 @@ public class AnimationState {
 		}
 
 		/** The track entry for the previous animation when mixing from the previous animation to this animation, or null if no
-		 * mixing is currently occuring. When mixing from multiple animations, <code>mixingFrom</code> makes up a linked list. */
+		 * mixing is currently occurring. When mixing from multiple animations, <code>mixingFrom</code> makes up a linked list. */
 		public @Null TrackEntry getMixingFrom () {
 			return mixingFrom;
 		}
 
 		/** The track entry for the next animation when mixing from this animation to the next animation, or null if no mixing is
-		 * currently occuring. When mixing to multiple animations, <code>mixingTo</code> makes up a linked list. */
+		 * currently occurring. When mixing to multiple animations, <code>mixingTo</code> makes up a linked list. */
 		public @Null TrackEntry getMixingTo () {
 			return mixingTo;
 		}

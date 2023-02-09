@@ -2115,6 +2115,12 @@ void spine_bone_update_world_transform_with(spine_bone bone, float x, float y, f
 	_bone->updateWorldTransform(x, y, rotation, scaleX, scaleY, shearX, shearY);
 }
 
+void spine_bone_update_applied_transform(spine_bone bone) {
+	if (bone == nullptr) return;
+	Bone *_bone = (Bone *) bone;
+	_bone->updateAppliedTransform();
+}
+
 void spine_bone_set_to_setup_pose(spine_bone bone) {
 	if (bone == nullptr) return;
 	Bone *_bone = (Bone *) bone;

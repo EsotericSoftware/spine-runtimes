@@ -10,7 +10,6 @@ class PlayPauseAnimation extends StatefulWidget {
 
 class PlayPauseAnimationState extends State<PlayPauseAnimation> {
   late SpineWidgetController controller;
-  late bool isPlaying;
 
   @override
   void initState() {
@@ -18,12 +17,14 @@ class PlayPauseAnimationState extends State<PlayPauseAnimation> {
     controller = SpineWidgetController(onInitialized: (controller) {
       controller.animationState.setAnimationByName(0, "flying", true);
     });
-    isPlaying = true;
   }
 
   void _togglePlay() {
-    isPlaying = !isPlaying;
-    controller.animationState.setTimeScale(isPlaying ? 1 : 0);
+    if (controller.isPlaying) {
+      controller.pause();
+    } else {
+      controller.resume();
+    }
     setState(() {});
   }
 
@@ -33,7 +34,7 @@ class PlayPauseAnimationState extends State<PlayPauseAnimation> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Play/Pause')),
-      body: SpineWidget.asset(
+      body: SpineWidget.fromAsset(
         "assets/dragon.atlas",
         "assets/dragon-ess.skel",
         controller,
@@ -41,7 +42,7 @@ class PlayPauseAnimationState extends State<PlayPauseAnimation> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _togglePlay,
-        child: Icon(isPlaying ? Icons.pause : Icons.play_arrow),
+        child: Icon(controller.isPlaying ? Icons.pause : Icons.play_arrow),
       ),
     );
   }

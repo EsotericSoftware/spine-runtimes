@@ -489,6 +489,7 @@ SPINE_FLUTTER_EXPORT int32_t spine_bone_get_is_y_down();
 SPINE_FLUTTER_EXPORT void spine_bone_update(spine_bone bone);
 SPINE_FLUTTER_EXPORT void spine_bone_update_world_transform(spine_bone bone);
 SPINE_FLUTTER_EXPORT void spine_bone_update_world_transform_with(spine_bone bone, float x, float y, float rotation, float scaleX, float scaleY, float shearX, float shearY);
+SPINE_FLUTTER_EXPORT void spine_bone_update_applied_transform(spine_bone bone);
 SPINE_FLUTTER_EXPORT void spine_bone_set_to_setup_pose(spine_bone bone);
 SPINE_FLUTTER_EXPORT spine_vector spine_bone_world_to_local(spine_bone bone, float worldX, float worldY);
 SPINE_FLUTTER_EXPORT spine_vector spine_bone_local_to_world(spine_bone bone, float localX, float localY);

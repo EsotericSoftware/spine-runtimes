@@ -14,9 +14,7 @@ class SimpleAnimation extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Simple Animation')),
-      body: SpineWidget.asset("assets/spineboy.atlas", "assets/spineboy-pro.skel", controller),
-      // body: SpineWidget.file( "/Users/badlogic/workspaces/spine-runtimes/examples/spineboy/export/spineboy.atlas", "/Users/badlogic/workspaces/spine-runtimes/examples/spineboy/export/spineboy-pro.skel", controller),
-      // body: const SpineWidget.http("https://marioslab.io/dump/spineboy/spineboy.atlas", "https://marioslab.io/dump/spineboy/spineboy-pro.json"),
+      body: SpineWidget.fromAsset("assets/spineboy.atlas", "assets/spineboy-pro.skel", controller)
     );
   }
 }
