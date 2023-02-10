@@ -183,13 +183,13 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: godot-template-windows-debug.zip
-          path: spine-godot/godot/bin/windows_debug_x86_64.exe.exe
+          path: spine-godot/godot/bin/windows_debug_x86_64.exe
 
       - name: Upload artifacts release
         uses: actions/upload-artifact@v2
         with:
           name: godot-template-windows-release.zip
-          path: spine-godot/godot/bin/windows_debug_x86_64.exe.exe
+          path: spine-godot/godot/bin/windows_release_x86_64.exe
 
   godot-template-android:
     runs-on: ubuntu-20.04
