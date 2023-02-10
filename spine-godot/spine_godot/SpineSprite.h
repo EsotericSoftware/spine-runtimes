@@ -76,6 +76,8 @@ protected:
 	bool preview_frame;
 	float preview_time;
 
+	bool debug_root;
+	Color debug_root_color;
 	bool debug_bones;
 	Color debug_bones_color;
 	float debug_bones_thickness;
@@ -157,6 +159,14 @@ public:
 	Ref<Material> get_screen_material();
 
 	void set_screen_material(Ref<Material> material);
+
+	bool get_debug_root() { return debug_root; }
+
+	void set_debug_root(bool root) { debug_root = root; }
+
+	Color get_debug_root_color() { return debug_root_color; }
+
+	void set_debug_root_color(const Color &color) { debug_root_color = color; }
 
 	bool get_debug_bones() { return debug_bones; }
 

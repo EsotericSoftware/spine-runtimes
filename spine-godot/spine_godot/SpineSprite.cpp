@@ -142,6 +142,10 @@ void SpineSprite::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_screen_material", "material"), &SpineSprite::set_screen_material);
 	ClassDB::bind_method(D_METHOD("get_screen_material"), &SpineSprite::get_screen_material);
 
+	ClassDB::bind_method(D_METHOD("set_debug_root", "v"), &SpineSprite::set_debug_root);
+	ClassDB::bind_method(D_METHOD("get_debug_root"), &SpineSprite::get_debug_root);
+	ClassDB::bind_method(D_METHOD("set_debug_root_color", "v"), &SpineSprite::set_debug_root_color);
+	ClassDB::bind_method(D_METHOD("get_debug_root_color"), &SpineSprite::get_debug_root_color);
 	ClassDB::bind_method(D_METHOD("set_debug_bones", "v"), &SpineSprite::set_debug_bones);
 	ClassDB::bind_method(D_METHOD("get_debug_bones"), &SpineSprite::get_debug_bones);
 	ClassDB::bind_method(D_METHOD("set_debug_bones_color", "v"), &SpineSprite::set_debug_bones_color);
@@ -193,6 +197,8 @@ void SpineSprite::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "screen_material", PROPERTY_HINT_RESOURCE_TYPE, "Material"), "set_screen_material", "get_screen_material");
 
 	ADD_GROUP("Debug", "");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "root"), "set_debug_root", "get_debug_root");
+	ADD_PROPERTY(PropertyInfo(Variant::COLOR, "root_color"), "set_debug_root_color", "get_debug_root_color");
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "bones"), "set_debug_bones", "get_debug_bones");
 	ADD_PROPERTY(PropertyInfo(Variant::COLOR, "bones_color"), "set_debug_bones_color", "get_debug_bones_color");
 	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "bones_thickness"), "set_debug_bones_thickness", "get_debug_bones_thickness");
@@ -246,6 +252,8 @@ SpineSprite::SpineSprite() : update_mode(SpineConstant::UpdateMode_Process), pre
 	}
 
 	// Default debug settings
+	debug_root = false;
+	debug_root_color = Color(1, 1, 1, 0.5);
 	debug_bones = false;
 	debug_bones_color = Color(1, 1, 0, 0.5);
 	debug_bones_thickness = 5;
@@ -809,6 +817,27 @@ void SpineSprite::draw() {
 
 
 	spine::Bone *hovered_bone = nullptr;
+	if (debug_root) {
+		auto bone = skeleton->get_spine_object()->getRootBone();
+		draw_bone(bone, debug_root_color);
+
+		float bone_length = bone->getData().getLength();
+		if (bone_length == 0) bone_length = debug_bones_thickness * 2;
+
+		scratch_points.resize(5);
+		scratch_points.set(0, Vector2(-debug_bones_thickness, 0));
+		scratch_points.set(1, Vector2(0, debug_bones_thickness));
+		scratch_points.set(2, Vector2(bone_length, 0));
+		scratch_points.set(3, Vector2(0, -debug_bones_thickness));
+		scratch_points.set(4, Vector2(-debug_bones_thickness, 0));
+		Transform2D bone_transform(spine::MathUtil::Deg_Rad * bone->getWorldRotationX(), Vector2(bone->getWorldX(), bone->getWorldY()));
+		bone_transform.scale_basis(Vector2(bone->getWorldScaleX(), bone->getWorldScaleY()));
+		auto mouse_local_position = bone_transform.affine_inverse().xform(mouse_position);
+		if (GEOMETRY2D::is_point_in_polygon(mouse_local_position, scratch_points)) {
+			hovered_bone = bone;
+		}		
+	}
+	
 	if (debug_bones) {
 		auto &bones = skeleton->get_spine_object()->getBones();
 		for (int i = 0; i < (int) bones.size(); i++) {
