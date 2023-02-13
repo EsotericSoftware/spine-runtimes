@@ -247,7 +247,7 @@ void SpineAtlasResourceFormatLoader::get_recognized_extensions(List<String> *ext
 }
 
 String SpineAtlasResourceFormatLoader::get_resource_type(const String &path) const {
-	return "SpineAtlasResource";
+	return path.ends_with("spatlas") || path.ends_with(".atlas") ? "SpineAtlasResource" : "";
 }
 
 bool SpineAtlasResourceFormatLoader::handles_type(const String &type) const {
