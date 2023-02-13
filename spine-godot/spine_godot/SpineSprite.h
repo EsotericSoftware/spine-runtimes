@@ -55,16 +55,30 @@ protected:
 	Vector<Color> colors;
 	Vector<int> indices;
 	SpineRendererObject *renderer_object;
-	int slotIndex;
-	Attachment *attachment;
-	ArrayMesh *mesh;
+	uint64_t last_indices_id;
+	uint64_t indices_id;
+	RID mesh;			
+	uint32_t surface_offsets[RS::ARRAY_MAX];
+	int num_vertices;
+	int num_indices;
+	PackedByteArray vertex_buffer;
+	PackedByteArray attribute_buffer;
+	uint32_t vertex_stride;
+	uint32_t attribute_stride;	
 
 public:
-	SpineMesh2D() : renderer_object(nullptr), slotIndex(-1), attachment(nullptr), mesh(nullptr) {};
-	~SpineMesh2D(){
-		if (mesh) memdelete(mesh);
-	};
-	ArrayMesh *get_mesh() {return mesh;};
+	SpineMesh2D() : renderer_object(nullptr), last_indices_id(0), indices_id(0), num_vertices(0), num_indices(0), vertex_stride(0), attribute_stride(0) {};
+	~SpineMesh2D() {
+		if (mesh.is_valid()) {
+			RS::get_singleton()->free(mesh);
+		}
+	}
+
+	void update_mesh(const Vector<Point2> &vertices,
+					 const Vector<Point2> &uvs,
+					 const Vector<Color> &colors,
+					 const Vector<int> &indices,
+					 SpineRendererObject *renderer_object);
 };
 
 class SpineSprite : public Node2D,
