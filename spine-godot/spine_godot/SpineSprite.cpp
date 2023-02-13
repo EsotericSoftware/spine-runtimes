@@ -54,14 +54,6 @@ static spine::Vector<unsigned short> quad_indices;
 static spine::Vector<float> scratch_vertices;
 static Vector<Vector2> scratch_points;
 
-static void clear_triangles(SpineMesh2D *mesh_instance) {
-#if VERSION_MAJOR > 3
-	RenderingServer::get_singleton()->canvas_item_clear(mesh_instance->get_canvas_item());
-#else
-	VisualServer::get_singleton()->canvas_item_clear(mesh_instance->get_canvas_item());
-#endif
-}
-
 static void add_triangles(SpineMesh2D *mesh_instance,
 						  const Vector<Point2> &vertices,
 						  const Vector<Point2> &uvs,
@@ -568,7 +560,7 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> skeleton_ref) {
 		spine::Attachment *attachment = slot->getAttachment();
 		SpineMesh2D *mesh_instance = mesh_instances[i];
 		mesh_instance->renderer_object = nullptr;
-		mesh_instance->set_light_mask(get_light_mask());
+		
 		if (!attachment) {
 			skeleton_clipper->clipEnd(*slot);
 			continue;
@@ -636,7 +628,7 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> skeleton_ref) {
 		}
 
 		if (indices->size() > 0) {
-			// Set the mesh
+			mesh_instance->set_light_mask(get_light_mask());
 			size_t num_vertices = vertices->size() / 2;
 			mesh_instance->vertices.resize((int) num_vertices);
 			memcpy(mesh_instance->vertices.ptrw(), vertices->buffer(), num_vertices * 2 * sizeof(float));
