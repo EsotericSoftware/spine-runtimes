@@ -39,6 +39,8 @@ struct SpineRendererObject;
 
 class SpineSprite;
 
+class Attachment;
+
 class SpineMesh2D : public Node2D {
 	GDCLASS(SpineMesh2D, Node2D);
 
@@ -53,10 +55,16 @@ protected:
 	Vector<Color> colors;
 	Vector<int> indices;
 	SpineRendererObject *renderer_object;
+	int slotIndex;
+	Attachment *attachment;
+	ArrayMesh *mesh;
 
 public:
-	SpineMesh2D() : renderer_object(nullptr){};
-	~SpineMesh2D(){};
+	SpineMesh2D() : renderer_object(nullptr), slotIndex(-1), attachment(nullptr), mesh(nullptr) {};
+	~SpineMesh2D(){
+		if (mesh) memdelete(mesh);
+	};
+	ArrayMesh *get_mesh() {return mesh;};
 };
 
 class SpineSprite : public Node2D,
