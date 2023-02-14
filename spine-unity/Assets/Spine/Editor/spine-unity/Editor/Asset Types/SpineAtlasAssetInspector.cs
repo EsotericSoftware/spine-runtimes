@@ -320,12 +320,11 @@ namespace Spine.Unity.Editor {
 			List<SpriteMetaData> sprites = new List<SpriteMetaData>(spriteSheet);
 
 			List<AtlasRegion> regions = SpineAtlasAssetInspector.GetRegions(atlas);
-			char[] FilenameDelimiter = { '.' };
 			int updatedCount = 0;
 			int addedCount = 0;
 
 			foreach (AtlasRegion r in regions) {
-				string pageName = r.page.name.Split(FilenameDelimiter, StringSplitOptions.RemoveEmptyEntries)[0];
+				string pageName = System.IO.Path.GetFileNameWithoutExtension(r.page.name);
 				string textureName = texture.name;
 				bool pageMatch = string.Equals(pageName, textureName, StringComparison.Ordinal);
 
