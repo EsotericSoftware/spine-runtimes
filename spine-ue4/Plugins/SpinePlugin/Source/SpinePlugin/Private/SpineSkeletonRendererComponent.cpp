@@ -75,74 +75,57 @@ void USpineSkeletonRendererComponent::TickComponent(float DeltaTime, ELevelTick 
 	AActor *owner = GetOwner();
 	if (owner) {
 		UClass *skeletonClass = USpineSkeletonComponent::StaticClass();
-		USpineSkeletonComponent *skeleton = Cast<USpineSkeletonComponent>(owner->GetComponentByClass(skeletonClass));
+		USpineSkeletonComponent *skeletonComponent = Cast<USpineSkeletonComponent>(owner->GetComponentByClass(skeletonClass));
 
-		UpdateRenderer(skeleton);
+		UpdateRenderer(skeletonComponent);
 	}
 }
 
-void USpineSkeletonRendererComponent::UpdateRenderer(USpineSkeletonComponent *skeleton) {
-	if (skeleton && !skeleton->IsBeingDestroyed() && skeleton->GetSkeleton() && skeleton->Atlas) {
-		skeleton->GetSkeleton()->getColor().set(Color.R, Color.G, Color.B, Color.A);
+void USpineSkeletonRendererComponent::UpdateRenderer(USpineSkeletonComponent *component) {
+	if (component && !component->IsBeingDestroyed() && component->GetSkeleton() && component->Atlas) {
+		component->GetSkeleton()->getColor().set(Color.R, Color.G, Color.B, Color.A);
 
-		if (atlasNormalBlendMaterials.Num() != skeleton->Atlas->atlasPages.Num()) {
+		if (atlasNormalBlendMaterials.Num() != component->Atlas->atlasPages.Num()) {
 			atlasNormalBlendMaterials.SetNum(0);
-			pageToNormalBlendMaterial.Empty();
 			atlasAdditiveBlendMaterials.SetNum(0);
-			pageToAdditiveBlendMaterial.Empty();
 			atlasMultiplyBlendMaterials.SetNum(0);
-			pageToMultiplyBlendMaterial.Empty();
 			atlasScreenBlendMaterials.SetNum(0);
-			pageToScreenBlendMaterial.Empty();
 
-			for (int i = 0; i < skeleton->Atlas->atlasPages.Num(); i++) {
-				AtlasPage *currPage = skeleton->Atlas->GetAtlas()->getPages()[i];
+			for (int i = 0; i < component->Atlas->atlasPages.Num(); i++) {
+				AtlasPage *currPage = component->Atlas->GetAtlas()->getPages()[i];
 
 				UMaterialInstanceDynamic *material = UMaterialInstanceDynamic::Create(NormalBlendMaterial, this);
-				material->SetTextureParameterValue(TextureParameterName, skeleton->Atlas->atlasPages[i]);
+				material->SetTextureParameterValue(TextureParameterName, component->Atlas->atlasPages[i]);
 				atlasNormalBlendMaterials.Add(material);
-				pageToNormalBlendMaterial.Add(currPage, material);
 
 				material = UMaterialInstanceDynamic::Create(AdditiveBlendMaterial, this);
-				material->SetTextureParameterValue(TextureParameterName, skeleton->Atlas->atlasPages[i]);
+				material->SetTextureParameterValue(TextureParameterName, component->Atlas->atlasPages[i]);
 				atlasAdditiveBlendMaterials.Add(material);
-				pageToAdditiveBlendMaterial.Add(currPage, material);
 
 				material = UMaterialInstanceDynamic::Create(MultiplyBlendMaterial, this);
-				material->SetTextureParameterValue(TextureParameterName, skeleton->Atlas->atlasPages[i]);
+				material->SetTextureParameterValue(TextureParameterName, component->Atlas->atlasPages[i]);
 				atlasMultiplyBlendMaterials.Add(material);
-				pageToMultiplyBlendMaterial.Add(currPage, material);
 
 				material = UMaterialInstanceDynamic::Create(ScreenBlendMaterial, this);
-				material->SetTextureParameterValue(TextureParameterName, skeleton->Atlas->atlasPages[i]);
+				material->SetTextureParameterValue(TextureParameterName, component->Atlas->atlasPages[i]);
 				atlasScreenBlendMaterials.Add(material);
-				pageToScreenBlendMaterial.Add(currPage, material);
 			}
 		} else {
-			pageToNormalBlendMaterial.Empty();
-			pageToAdditiveBlendMaterial.Empty();
-			pageToMultiplyBlendMaterial.Empty();
-			pageToScreenBlendMaterial.Empty();
-
-			for (int i = 0; i < skeleton->Atlas->atlasPages.Num(); i++) {
-				AtlasPage *currPage = skeleton->Atlas->GetAtlas()->getPages()[i];
-				UTexture2D *texture = skeleton->Atlas->atlasPages[i];
-
-				UpdateRendererMaterial(currPage, texture, atlasNormalBlendMaterials[i], NormalBlendMaterial, pageToNormalBlendMaterial);
-				UpdateRendererMaterial(currPage, texture, atlasAdditiveBlendMaterials[i], AdditiveBlendMaterial, pageToAdditiveBlendMaterial);
-				UpdateRendererMaterial(currPage, texture, atlasMultiplyBlendMaterials[i], MultiplyBlendMaterial, pageToMultiplyBlendMaterial);
-				UpdateRendererMaterial(currPage, texture, atlasScreenBlendMaterials[i], ScreenBlendMaterial, pageToScreenBlendMaterial);
+			for (int i = 0; i < component->Atlas->atlasPages.Num(); i++) {
+				UTexture2D *texture = component->Atlas->atlasPages[i];
+				UpdateMaterial(texture, atlasNormalBlendMaterials[i], NormalBlendMaterial);
+				UpdateMaterial(texture, atlasAdditiveBlendMaterials[i], AdditiveBlendMaterial);
+				UpdateMaterial(texture, atlasMultiplyBlendMaterials[i], MultiplyBlendMaterial);
+				UpdateMaterial(texture, atlasScreenBlendMaterials[i], ScreenBlendMaterial);
 			}
 		}
-		UpdateMesh(skeleton->GetSkeleton());
+		UpdateMesh(component, component->GetSkeleton());
 	} else {
 		ClearAllMeshSections();
 	}
 }
 
-void USpineSkeletonRendererComponent::UpdateRendererMaterial(spine::AtlasPage *CurrentPage, UTexture2D *Texture,
-															 UMaterialInstanceDynamic *&CurrentInstance, UMaterialInterface *ParentMaterial,
-															 TMap<spine::AtlasPage *, UMaterialInstanceDynamic *> &PageToBlendMaterial) {
+void USpineSkeletonRendererComponent::UpdateMaterial(UTexture2D *Texture, UMaterialInstanceDynamic *&CurrentInstance, UMaterialInterface *ParentMaterial) {
 
 	UTexture *oldTexture = nullptr;
 	if (!CurrentInstance || !CurrentInstance->GetTextureParameterValue(TextureParameterName, oldTexture) ||
@@ -152,10 +135,10 @@ void USpineSkeletonRendererComponent::UpdateRendererMaterial(spine::AtlasPage *C
 		material->SetTextureParameterValue(TextureParameterName, Texture);
 		CurrentInstance = material;
 	}
-	PageToBlendMaterial.Add(CurrentPage, CurrentInstance);
+	
 }
 
-void USpineSkeletonRendererComponent::Flush(int &Idx, TArray<FVector> &Vertices, TArray<int32> &Indices, TArray<FVector> &Normals, TArray<FVector2D> &Uvs, TArray<FColor> &Colors, TArray<FVector> &Colors2, UMaterialInstanceDynamic *Material) {
+void USpineSkeletonRendererComponent::Flush(int &Idx, TArray<FVector> &Vertices, TArray<int32> &Indices, TArray<FVector> &Normals, TArray<FVector2D> &Uvs, TArray<FColor> &Colors, UMaterialInstanceDynamic *Material) {
 	if (Vertices.Num() == 0) return;
 	SetMaterial(Idx, Material);
 
@@ -175,24 +158,22 @@ void USpineSkeletonRendererComponent::Flush(int &Idx, TArray<FVector> &Vertices,
 	Normals.SetNum(0);
 	Uvs.SetNum(0);
 	Colors.SetNum(0);
-	Colors2.SetNum(0);
 	Idx++;
 }
 
-void USpineSkeletonRendererComponent::UpdateMesh(Skeleton *Skeleton) {
-	TArray<FVector> vertices;
-	TArray<int32> indices;
-	TArray<FVector> normals;
-	TArray<FVector2D> uvs;
-	TArray<FColor> colors;
-	TArray<FVector> darkColors;
-
+void USpineSkeletonRendererComponent::UpdateMesh(USpineSkeletonComponent *component, Skeleton *Skeleton) {
+	vertices.Empty();
+	indices.Empty();
+	normals.Empty();
+	uvs.Empty();
+	colors.Empty();
+	
 	int idx = 0;
 	int meshSection = 0;
 	UMaterialInstanceDynamic *lastMaterial = nullptr;
 
 	ClearAllMeshSections();
-
+	
 	// Early out if skeleton is invisible
 	if (Skeleton->getColor().a == 0) return;
 
@@ -236,6 +217,7 @@ void USpineSkeletonRendererComponent::UpdateMesh(Skeleton *Skeleton) {
 			}
 
 			attachmentColor.set(regionAttachment->getColor());
+			attachmentVertices->setSize(8, 0);
 			regionAttachment->computeWorldVertices(*slot, *attachmentVertices, 0, 2);
 			attachmentAtlasRegion = (AtlasRegion *) regionAttachment->getRendererObject();
 			attachmentIndices = quadIndices;
@@ -244,14 +226,15 @@ void USpineSkeletonRendererComponent::UpdateMesh(Skeleton *Skeleton) {
 			numIndices = 6;
 		} else if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
 			MeshAttachment *mesh = (MeshAttachment *) attachment;
-
+			
 			// Early out if region is invisible
 			if (mesh->getColor().a == 0) {
 				clipper.clipEnd(*slot);
 				continue;
 			}
-
+			
 			attachmentColor.set(mesh->getColor());
+			attachmentVertices->setSize(mesh->getWorldVerticesLength(), 0);
 			mesh->computeWorldVertices(*slot, 0, mesh->getWorldVerticesLength(), attachmentVertices->buffer(), 0, 2);
 			attachmentAtlasRegion = (AtlasRegion *) mesh->getRendererObject();
 			attachmentIndices = mesh->getTriangles().buffer();
@@ -262,47 +245,6 @@ void USpineSkeletonRendererComponent::UpdateMesh(Skeleton *Skeleton) {
 			ClippingAttachment *clip = (ClippingAttachment *) attachment;
 			clipper.clipStart(*slot, clip);
 			continue;
-		}
-
-		// if the user switches the atlas data while not having switched
-		// to the correct skeleton data yet, we won't find any regions.
-		// ignore regions for which we can't find a material
-		UMaterialInstanceDynamic *material = nullptr;
-		switch (slot->getData().getBlendMode()) {
-			case BlendMode_Normal:
-				if (!pageToNormalBlendMaterial.Contains(attachmentAtlasRegion->page)) {
-					clipper.clipEnd(*slot);
-					continue;
-				}
-				material = pageToNormalBlendMaterial[attachmentAtlasRegion->page];
-				break;
-			case BlendMode_Additive:
-				if (!pageToAdditiveBlendMaterial.Contains(attachmentAtlasRegion->page)) {
-					clipper.clipEnd(*slot);
-					continue;
-				}
-				material = pageToAdditiveBlendMaterial[attachmentAtlasRegion->page];
-				break;
-			case BlendMode_Multiply:
-				if (!pageToMultiplyBlendMaterial.Contains(attachmentAtlasRegion->page)) {
-					clipper.clipEnd(*slot);
-					continue;
-				}
-				material = pageToMultiplyBlendMaterial[attachmentAtlasRegion->page];
-				break;
-			case BlendMode_Screen:
-				if (!pageToScreenBlendMaterial.Contains(attachmentAtlasRegion->page)) {
-					clipper.clipEnd(*slot);
-					continue;
-				}
-				material = pageToScreenBlendMaterial[attachmentAtlasRegion->page];
-				break;
-			default:
-				if (!pageToNormalBlendMaterial.Contains(attachmentAtlasRegion->page)) {
-					clipper.clipEnd(*slot);
-					continue;
-				}
-				material = pageToNormalBlendMaterial[attachmentAtlasRegion->page];
 		}
 
 		if (clipper.isClipping()) {
@@ -317,70 +259,94 @@ void USpineSkeletonRendererComponent::UpdateMesh(Skeleton *Skeleton) {
 				continue;
 			}
 		}
-
+		
+		// if the user switches the atlas data while not having switched
+		// to the correct skeleton data yet, we won't find any regions.
+		// ignore regions for which we can't find a material
+		UMaterialInstanceDynamic* material = nullptr;
+		int foundPageIndex = -1;
+		for (int pageIndex = 0; i < component->Atlas->atlasPages.Num(); pageIndex++) {
+			AtlasPage* page = component->Atlas->GetAtlas()->getPages()[pageIndex];
+			if (attachmentAtlasRegion->page == page) {
+				foundPageIndex = pageIndex;
+				break;
+			}
+		}
+		if (foundPageIndex == -1) {
+			clipper.clipEnd(*slot);
+			continue;
+		}
+		switch (slot->getData().getBlendMode()) {
+		case BlendMode_Additive:
+			if (i >= atlasAdditiveBlendMaterials.Num()) {
+				clipper.clipEnd(*slot);
+				continue;
+			}
+			material = atlasAdditiveBlendMaterials[i];
+			break;
+		case BlendMode_Multiply:
+			if (i >= atlasMultiplyBlendMaterials.Num()) {
+				clipper.clipEnd(*slot);
+				continue;
+			}
+			material = atlasMultiplyBlendMaterials[i];
+			break;
+		case BlendMode_Screen:
+			if (i >= atlasScreenBlendMaterials.Num()) {
+				clipper.clipEnd(*slot);
+				continue;
+			}
+			material = atlasScreenBlendMaterials[i];
+			break;
+		case BlendMode_Normal:
+		default:
+			if (i >= atlasNormalBlendMaterials.Num()) {
+				clipper.clipEnd(*slot);
+				continue;
+			}
+			material = atlasNormalBlendMaterials[i];
+			break;
+		}
+		
 		if (lastMaterial != material) {
-			Flush(meshSection, vertices, indices, normals, uvs, colors, darkColors, lastMaterial);
+			Flush(meshSection, vertices, indices, normals, uvs, colors, lastMaterial);
 			lastMaterial = material;
 			idx = 0;
 		}
-
+		
 		SetMaterial(meshSection, material);
-
+		
 		uint8 r = static_cast<uint8>(Skeleton->getColor().r * slot->getColor().r * attachmentColor.r * 255);
 		uint8 g = static_cast<uint8>(Skeleton->getColor().g * slot->getColor().g * attachmentColor.g * 255);
 		uint8 b = static_cast<uint8>(Skeleton->getColor().b * slot->getColor().b * attachmentColor.b * 255);
 		uint8 a = static_cast<uint8>(Skeleton->getColor().a * slot->getColor().a * attachmentColor.a * 255);
-
-		float dr = slot->hasDarkColor() ? slot->getDarkColor().r : 0.0f;
-		float dg = slot->hasDarkColor() ? slot->getDarkColor().g : 0.0f;
-		float db = slot->hasDarkColor() ? slot->getDarkColor().b : 0.0f;
-
-		float *verticesPtr = attachmentVertices->buffer();
+		
+		float* verticesPtr = attachmentVertices->buffer();
 		for (int j = 0; j < numVertices << 1; j += 2) {
 			colors.Add(FColor(r, g, b, a));
-			darkColors.Add(FVector(dr, dg, db));
 			vertices.Add(FVector(verticesPtr[j], depthOffset, verticesPtr[j + 1]));
 			uvs.Add(FVector2D(attachmentUvs[j], attachmentUvs[j + 1]));
 		}
-
-		int firstIndex = indices.Num();
+		
 		for (int j = 0; j < numIndices; j++) {
 			indices.Add(idx + attachmentIndices[j]);
 		}
-
-
-		//Calculate total triangle to add on this loof.
-
-		int TriangleInitialCount = firstIndex / 3;
-
-		int TriangleToAddNum = indices.Num() / 3 - TriangleInitialCount;
-
-		int FirstVertexIndex = vertices.Num() - numVertices;
-
-		//loof through all the triangles and resolve to be reversed if the triangle has winding order as CCW.
-
-		for (int j = 0; j < TriangleToAddNum; j++) {
-
-			const int TargetTringleIndex = firstIndex + j * 3;
-
+		
+		int numTriangles = indices.Num() / 3;
+		for (int j = 0; j < numTriangles; j++) {
+			const int triangleIndex = j * 3;
 			if (FVector::CrossProduct(
-						vertices[indices[TargetTringleIndex + 2]] - vertices[indices[TargetTringleIndex]],
-						vertices[indices[TargetTringleIndex + 1]] - vertices[indices[TargetTringleIndex]])
-						.Y < 0.f) {
-
-				const int32 targetVertex = indices[TargetTringleIndex];
-				indices[TargetTringleIndex] = indices[TargetTringleIndex + 2];
-				indices[TargetTringleIndex + 2] = targetVertex;
+					vertices[indices[triangleIndex + 2]] - vertices[indices[triangleIndex]],
+					vertices[indices[triangleIndex + 1]] - vertices[indices[triangleIndex]])
+				.Y < 0.f) {
+				const int32 targetVertex = indices[triangleIndex];
+				indices[triangleIndex] = indices[triangleIndex + 2];
+				indices[triangleIndex + 2] = targetVertex;
 			}
 		}
-
-
+		
 		FVector normal = FVector(0, 1, 0);
-
-		//Add normals for vertices.
-
 		for (int j = 0; j < numVertices; j++) {
-
 			normals.Add(normal);
 		}
 
@@ -390,7 +356,7 @@ void USpineSkeletonRendererComponent::UpdateMesh(Skeleton *Skeleton) {
 		clipper.clipEnd(*slot);
 	}
 
-	Flush(meshSection, vertices, indices, normals, uvs, colors, darkColors, lastMaterial);
+	Flush(meshSection, vertices, indices, normals, uvs, colors, lastMaterial);
 	clipper.clipEnd();
 }
 
