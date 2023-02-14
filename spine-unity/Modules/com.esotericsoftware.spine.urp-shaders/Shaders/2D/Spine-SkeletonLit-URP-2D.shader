@@ -94,6 +94,8 @@
 				float4 clipVertex = o.positionCS / o.positionCS.w;
 				o.lightingUV = ComputeScreenPos(clipVertex).xy;
 				o.color = PMAGammaToTargetSpace(v.color);
+				// un-premultiply for additive lights in CombinedShapeLightShared, reapply afterwards
+				o.color.rgb = o.color.a == 0 ? o.color.rgb : o.color.rgb / o.color.a;
 				return o;
 			}
 
@@ -102,18 +104,19 @@
 			half4 CombinedShapeLightFragment(Varyings i) : SV_Target
 			{
 				half4 tex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv);
-				#if defined(_STRAIGHT_ALPHA_INPUT)
-				tex.rgb *= tex.a;
-				#endif
+			#if !defined(_STRAIGHT_ALPHA_INPUT)
+				// un-premultiply for additive lights in CombinedShapeLightShared, reapply afterwards
+				tex.rgb = tex.a == 0 ? tex.rgb : tex.rgb / tex.a;
+			#endif
 
 				half4 main = tex * i.color;
 			#if !defined(_LIGHT_AFFECTS_ADDITIVE)
 				if (i.color.a == 0)
-					return main;
+					return half4(main.rgb * main.a, main.a);
 			#endif
 				half4 mask = SAMPLE_TEXTURE2D(_MaskTex, sampler_MaskTex, i.uv);
 			#if UNITY_VERSION  < 202120
-				return half4(CombinedShapeLightShared(half4(main.rgb, 1), mask, i.lightingUV).rgb, main.a);
+				return half4(CombinedShapeLightShared(half4(main.rgb, 1), mask, i.lightingUV).rgb * main.a, main.a);
 			#else
 				SurfaceData2D surfaceData;
 				InputData2D inputData;
@@ -122,7 +125,7 @@
 				surfaceData.mask = mask;
 				inputData.uv = i.uv;
 				inputData.lightingUV = i.lightingUV;
-				return half4(CombinedShapeLightShared(surfaceData, inputData).rgb, main.a);
+				return half4(CombinedShapeLightShared(surfaceData, inputData).rgb * main.a, main.a);
 			#endif
 			}
 
