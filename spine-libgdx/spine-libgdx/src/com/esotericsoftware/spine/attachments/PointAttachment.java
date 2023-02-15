@@ -40,7 +40,7 @@ import com.esotericsoftware.spine.Bone;
  * used in similar ways, but a PointAttachment is slightly less expensive to compute and can be hidden, shown, and placed in a
  * skin.
  * <p>
- * See <a href="http://esotericsoftware.com/spine-point-attachments">Point Attachments</a> in the Spine User Guide. */
+ * See <a href="http://esotericsoftware.com/spine-points">Point Attachments</a> in the Spine User Guide. */
 public class PointAttachment extends Attachment {
 	float x, y, rotation;
 
