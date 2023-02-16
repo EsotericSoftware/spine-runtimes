@@ -708,7 +708,7 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> skeleton_ref) {
 			}
 
 			mesh_instance->renderer_object = renderer_object;
-#if VERSION > 3
+#if VERSION_MAJOR > 3
 			mesh_instance->indices_id = (uint64_t) indices;
 #endif
 			spine::BlendMode blend_mode = slot->getData().getBlendMode();
@@ -768,7 +768,7 @@ void SpineSprite::draw() {
 	if (!animation_state.is_valid() && !skeleton.is_valid()) return;
 	if (!Engine::get_singleton()->is_editor_hint() && !get_tree()->is_debugging_collisions_hint()) return;
 
-#if VERSION > 3
+#if VERSION_MAJOR > 3
 	RS::get_singleton()->canvas_item_clear(this->get_canvas_item());
 #else
 	VisualServer::get_singleton()->canvas_item_clear(this->get_canvas_item());
