@@ -131,7 +131,7 @@ half4 LightweightFragmentPBRSimplified(InputData inputData, half4 texAlbedoAlpha
 
 #ifdef _ADDITIONAL_LIGHTS
 	uint meshRenderingLayers = GetMeshRenderingLayerBackwardsCompatible();
-	
+
 #if defined(_ADDITIONAL_LIGHT_SHADOWS) && !defined(_RECEIVE_SHADOWS_OFF)
 	half4 shadowMask = CalculateShadowMaskBackwardsCompatible(inputData);
 #else
@@ -145,7 +145,7 @@ half4 LightweightFragmentPBRSimplified(InputData inputData, half4 texAlbedoAlpha
 		finalColor += ProcessLightPBRSimplified(inputData, brdfData, shadowMask, meshRenderingLayers, lightIndex);
 	}
 #endif
-	int pixelLightCount = GetAdditionalLightsCount();
+	uint pixelLightCount = GetAdditionalLightsCount();
 	LIGHT_LOOP_BEGIN_SPINE(pixelLightCount)
 		finalColor += ProcessLightPBRSimplified(inputData, brdfData, shadowMask, meshRenderingLayers, lightIndex);
 	LIGHT_LOOP_END_SPINE
@@ -221,11 +221,11 @@ half4 LightweightFragmentBlinnPhongSimplified(InputData inputData, half4 texDiff
 		diffuseLighting += ProcessLightLambert(inputData, shadowMask, meshRenderingLayers, lightIndex);
 	}
 #endif
-	int pixelLightCount = GetAdditionalLightsCount();
+	uint pixelLightCount = GetAdditionalLightsCount();
 	LIGHT_LOOP_BEGIN(pixelLightCount)
 		diffuseLighting += ProcessLightLambert(inputData, shadowMask, meshRenderingLayers, lightIndex);
 	LIGHT_LOOP_END
-    
+
 #endif
 #ifdef _ADDITIONAL_LIGHTS_VERTEX
 	diffuseLighting += inputData.vertexLighting;
@@ -329,7 +329,7 @@ half4 ForwardPassFragmentSprite(VertexOutputLWRP input
 #else
 	inputData.normalizedScreenSpaceUV = 0;
 #endif
-	
+
 #if defined(SPECULAR)
 	half2 metallicGloss = getMetallicGloss(input.texcoord.xy);
 	half metallic = metallicGloss.x;
