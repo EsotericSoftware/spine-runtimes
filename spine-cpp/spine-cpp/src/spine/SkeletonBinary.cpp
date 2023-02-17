@@ -1254,8 +1254,7 @@ Animation *SkeletonBinary::readAnimation(const String &name, DataInput *input, S
 				int frameLast = frameCount - 1;
 
 				switch (timelineType) {
-					case ATTACHMENT_DEFORM: {
-						VertexAttachment *attachment = static_cast<VertexAttachment *>(baseAttachment);
+					case ATTACHMENT_DEFORM: {						
 						bool weighted = attachment->_bones.size() > 0;
 						Vector<float> &vertices = attachment->_vertices;
 						int deformLength = weighted ? (int) vertices.size() / 3 * 2 : (int) vertices.size();
