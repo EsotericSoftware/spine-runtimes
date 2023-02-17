@@ -62,7 +62,7 @@ namespace spine {
 					   it->second.address);
 			}
 			printf("allocations: %zu, reallocations: %zu, frees: %zu\n", _allocations, _reallocations, _frees);
-			if (_allocated.empty()) printf("No leaks detected");
+			if (_allocated.empty()) printf("No leaks detected\n");
 		}
 
 		void clearAllocations() {

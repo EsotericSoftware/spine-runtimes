@@ -28,6 +28,7 @@
   * Added CMake parameter `SPINE_SANITIZE` which will enable sanitizers on macOS and Linux.
     * Added `SPINE_MAJOR_VERSION`, `SPINE_MINOR_VERSION`, and `SPINE_VERSION_STRING`. Parsing skeleton .JSON and .skel files will report an error if the skeleton version does not match the runtime version.
 * **Breaking changes**
+  * `RegionAttachment` and `MeshAttachment` no longer implement `HasRendererObject`.
   * `RegionAttachment` and `MeshAttachment` now contain a `TextureRegion*` instead of encoding region fields directly.
   * `AttachmentLoader::newRegionAttachment()` and `AttachmentLoader::newMeshAttachment()` now take an additional `Sequence*` parameter.
   * `MeshAttachment::updateUVs()` was renamed to `MeshAttachment::updateRegion()`.
@@ -36,7 +37,7 @@
   * `VertexAttachment::getDeformAttachment()` was renamed to `VertexAttachment::getTimelineAttachment()`.
   * `Skeleton::update()` has been removed.
   * `Skeleton::getTime()` has been removed.
-  * `VertexEffect` has been removed.
+  * `VertexEffect` has been removed.  
   
 ### Cocos2d-x
 

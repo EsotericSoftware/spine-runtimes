@@ -35,6 +35,8 @@
 
 using namespace spine;
 
+RTTI_IMPL(TransformConstraintData, ConstraintData)
+
 TransformConstraintData::TransformConstraintData(const String &name) : ConstraintData(name),
 																	   _target(NULL),
 																	   _mixRotate(0),
@@ -115,4 +117,64 @@ bool TransformConstraintData::isRelative() {
 
 bool TransformConstraintData::isLocal() {
 	return _local;
+}
+
+void TransformConstraintData::setTarget(BoneData *target) {
+	_target = target;
+}
+
+void TransformConstraintData::setMixRotate(float mixRotate) {
+	_mixRotate = mixRotate;
+}
+
+void TransformConstraintData::setMixX(float mixX) {
+	_mixX = mixX;
+}
+
+void TransformConstraintData::setMixY(float mixY) {
+	_mixY = mixY;
+}
+
+void TransformConstraintData::setMixScaleX(float mixScaleX) {
+	_mixScaleX = mixScaleX;
+}
+
+void TransformConstraintData::setMixScaleY(float mixScaleY) {
+	_mixScaleY = mixScaleY;
+}
+
+void TransformConstraintData::setMixShearY(float mixShearY) {
+	_mixShearY = mixShearY;
+}
+
+void TransformConstraintData::setOffsetRotation(float offsetRotation) {
+	_offsetRotation = offsetRotation;
+}
+
+void TransformConstraintData::setOffsetX(float offsetX) {
+	_offsetX = offsetX;
+}
+
+void TransformConstraintData::setOffsetY(float offsetY) {
+	_offsetY = offsetY;
+}
+
+void TransformConstraintData::setOffsetScaleX(float offsetScaleX) {
+	_offsetScaleX = offsetScaleX;
+}
+
+void TransformConstraintData::setOffsetScaleY(float offsetScaleY) {
+	_offsetScaleY = offsetScaleY;
+}
+
+void TransformConstraintData::setOffsetShearY(float offsetShearY) {
+	_offsetShearY = offsetShearY;
+}
+
+void TransformConstraintData::setRelative(bool isRelative) {
+	_relative = isRelative;
+}
+
+void TransformConstraintData::setLocal(bool isLocal) {
+	_local = isLocal;
 }

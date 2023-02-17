@@ -123,7 +123,7 @@ namespace spine {
 				uvs = &regionAttachment->getUVs();
 				indices = &quadIndices;
 				indicesCount = 6;
-				texture = (Texture *) ((AtlasRegion *) regionAttachment->getRendererObject())->page->getRendererObject();
+				texture = (Texture *) ((AtlasRegion *) regionAttachment->getRegion())->page->texture;
 
 			} else if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
 				MeshAttachment *mesh = (MeshAttachment *) attachment;
@@ -140,7 +140,7 @@ namespace spine {
 				uvs = &mesh->getUVs();
 				indices = &mesh->getTriangles();
 				indicesCount = mesh->getTriangles().size();
-				texture = (Texture *) ((AtlasRegion *) mesh->getRendererObject())->page->getRendererObject();
+				texture = (Texture *) ((AtlasRegion *) mesh->getRegion())->page->texture;
 
 			} else if (attachment->getRTTI().isExactly(ClippingAttachment::rtti)) {
 				ClippingAttachment *clip = (ClippingAttachment *) slot.getAttachment();
@@ -241,7 +241,7 @@ namespace spine {
 		if (page.magFilter == TextureFilter_Linear) texture->setSmooth(true);
 		if (page.uWrap == TextureWrap_Repeat && page.vWrap == TextureWrap_Repeat) texture->setRepeated(true);
 
-		page.setRendererObject(texture);
+		page.texture = texture;
 		Vector2u size = texture->getSize();
 		page.width = size.x;
 		page.height = size.y;

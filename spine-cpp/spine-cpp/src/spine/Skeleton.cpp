@@ -425,8 +425,8 @@ PathConstraint *Skeleton::findPathConstraint(const String &constraintName) {
 void Skeleton::getBounds(float &outX, float &outY, float &outWidth, float &outHeight, Vector<float> &outVertexBuffer) {
 	float minX = FLT_MAX;
 	float minY = FLT_MAX;
-	float maxX = FLT_MIN;
-	float maxY = FLT_MIN;
+	float maxX = -FLT_MAX;
+	float maxY = -FLT_MAX;
 
 	for (size_t i = 0; i < _drawOrder.size(); ++i) {
 		Slot *slot = _drawOrder[i];
@@ -653,7 +653,7 @@ void Skeleton::sortPathConstraintAttachment(Skin *skin, size_t slotIndex, Bone &
 
 void Skeleton::sortPathConstraintAttachment(Attachment *attachment, Bone &slotBone) {
 	if (attachment == NULL || !attachment->getRTTI().instanceOf(PathAttachment::rtti)) return;
-	Vector<size_t> &pathBones = static_cast<PathAttachment *>(attachment)->getBones();
+	Vector<int> &pathBones = static_cast<PathAttachment *>(attachment)->getBones();
 	if (pathBones.size() == 0)
 		sortBone(&slotBone);
 	else {

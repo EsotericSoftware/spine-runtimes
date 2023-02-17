@@ -35,7 +35,7 @@
 namespace spine {
 	class SP_API Vertices : public SpineObject {
 	public:
-		Vector <size_t> _bones;
+		Vector <int> _bones;
 		Vector<float> _vertices;
 	};
 }
