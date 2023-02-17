@@ -34,7 +34,7 @@ using namespace spine;
 
 RTTI_IMPL(MeshAttachment, VertexAttachment)
 
-MeshAttachment::MeshAttachment(const String &name) : VertexAttachment(name), HasRendererObject(),
+MeshAttachment::MeshAttachment(const String &name) : VertexAttachment(name),
 													 _parentMesh(NULL),
 													 _path(),
 													 _color(1, 1, 1, 1),
