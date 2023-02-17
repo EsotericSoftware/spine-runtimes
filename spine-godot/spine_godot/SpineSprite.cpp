@@ -58,6 +58,7 @@ static spine::Vector<unsigned short> quad_indices;
 static spine::Vector<float> scratch_vertices;
 static Vector<Vector2> scratch_points;
 
+
 static void clear_triangles(SpineMesh2D *mesh_instance) {
 #if VERSION_MAJOR > 3
 	RenderingServer::get_singleton()->canvas_item_clear(mesh_instance->get_canvas_item());
@@ -75,6 +76,10 @@ static void add_triangles(SpineMesh2D *mesh_instance,
 #if VERSION_MAJOR > 3
 	mesh_instance->update_mesh(vertices, uvs, colors, indices, renderer_object);
 #else
+#define USE_MESH 0
+#if USE_MESH
+	mesh_instance->update_mesh(vertices, uvs, colors, indices, renderer_object);
+#else
 	auto texture = renderer_object->texture;
 	auto normal_map = renderer_object->normal_map;
 	VisualServer::get_singleton()->canvas_item_add_triangle_array(mesh_instance->get_canvas_item(),
@@ -87,6 +92,7 @@ static void add_triangles(SpineMesh2D *mesh_instance,
 																  texture.is_null() ? RID() : texture->get_rid(),
 																  -1,
 																  normal_map.is_null() ? RID() : normal_map->get_rid());
+#endif
 #endif
 }
 
@@ -173,6 +179,64 @@ void SpineMesh2D::update_mesh(const Vector<Point2> &vertices,
 	}
 
 	RenderingServer::get_singleton()->canvas_item_add_mesh(this->get_canvas_item(), mesh, Transform2D(), Color(1, 1, 1, 1), renderer_object->canvas_texture->get_rid());
+#else
+	if (!mesh.is_valid() || vertices.size() != num_vertices || indices.size() != num_indices || last_indices_id != indices_id) {
+		if (mesh.is_valid()) {
+			VS::get_singleton()->free(mesh);
+		}
+		mesh = VS::get_singleton()->mesh_create();
+		Array arrays;
+		arrays.resize(Mesh::ARRAY_MAX);
+		arrays[Mesh::ARRAY_VERTEX] = vertices;
+		arrays[Mesh::ARRAY_TEX_UV] = uvs;
+		arrays[Mesh::ARRAY_COLOR] = colors;
+		arrays[Mesh::ARRAY_INDEX] = indices;
+		uint32_t compress_format = (VS::ARRAY_COMPRESS_DEFAULT & ~VS::ARRAY_COMPRESS_TEX_UV);
+		VS::get_singleton()->mesh_add_surface_from_arrays(mesh, (VS::PrimitiveType) Mesh::PRIMITIVE_TRIANGLES, arrays, Array(), compress_format);
+		int surface_vertex_len = VS::get_singleton()->mesh_surface_get_array_len(mesh, 0);
+		int surface_index_len = VS::get_singleton()->mesh_surface_get_array_index_len(mesh, 0);
+		mesh_surface_format = VS::get_singleton()->mesh_surface_get_format(mesh, 0);
+		mesh_buffer = VS::get_singleton()->mesh_surface_get_array(mesh, 0);
+		VS::get_singleton()->mesh_surface_make_offsets_from_format(mesh_surface_format, surface_vertex_len, surface_index_len, mesh_surface_offsets, mesh_stride);
+		num_vertices = vertices.size();
+		num_indices = indices.size();
+		last_indices_id = indices_id;
+	} else {
+		AABB aabb_new;
+		PoolVector<uint8_t>::Write write_buffer = mesh_buffer.write();
+
+		uint8_t color[4] = {
+				uint8_t(CLAMP(colors[0].r * 255.0, 0.0, 255.0)),
+				uint8_t(CLAMP(colors[0].g * 255.0, 0.0, 255.0)),
+				uint8_t(CLAMP(colors[0].b * 255.0, 0.0, 255.0)),
+				uint8_t(CLAMP(colors[0].a * 255.0, 0.0, 255.0))};
+
+		for (int i = 0; i < vertices.size(); i++) {
+			Vector2 vertex(vertices[i]);
+			if (i == 0) {
+				aabb_new.position = Vector3(vertex.x, vertex.y, 0);
+				aabb_new.size = Vector3();
+			} else {
+				aabb_new.expand_to(Vector3(vertex.x, vertex.y, 0));
+			}
+
+			float uv[2] = {(float) uvs[i].x, (float) uvs[i].y};
+			memcpy(&write_buffer[i * mesh_stride[VS::ARRAY_VERTEX] + mesh_surface_offsets[VS::ARRAY_VERTEX]], &vertex, sizeof(float) * 2);
+			memcpy(&write_buffer[i * mesh_stride[VS::ARRAY_TEX_UV] + mesh_surface_offsets[VS::ARRAY_TEX_UV]], uv, 8);
+			memcpy(&write_buffer[i * mesh_stride[VS::ARRAY_COLOR] + mesh_surface_offsets[VS::ARRAY_COLOR]], color, 4);
+		}
+		write_buffer.release();
+		VS::get_singleton()->mesh_surface_update_region(mesh, 0, 0, mesh_buffer);
+		VS::get_singleton()->mesh_set_custom_aabb(mesh, aabb_new);
+	}
+
+	VS::get_singleton()->canvas_item_add_mesh(
+			this->get_canvas_item(),
+			mesh,
+			Transform2D(),
+			Color(1, 1, 1, 1),
+			renderer_object->texture.is_null() ? RID() : renderer_object->texture->get_rid(),
+			renderer_object->normal_map.is_null() ? RID() : renderer_object->normal_map->get_rid());
 #endif
 }
 
