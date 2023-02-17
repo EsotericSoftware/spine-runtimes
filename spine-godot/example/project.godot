@@ -31,4 +31,5 @@ vram_compression/import_etc2=false
 batching/parameters/max_join_item_commands=100
 batching/parameters/batch_buffer_size=65535
 batching/parameters/item_reordering_lookahead=100
+batching/debug/diagnose_frame=true
 environment/default_environment="res://default_env.tres"
