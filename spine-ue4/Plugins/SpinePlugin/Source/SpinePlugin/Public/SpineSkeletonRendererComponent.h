@@ -99,15 +99,15 @@ protected:
 
 	spine::Vector<float> worldVertices;
 	spine::SkeletonClipping clipper;
-	
+
 	UPROPERTY();
 	TArray<FVector> vertices;
 	UPROPERTY();
-    TArray<int32> indices;
-    UPROPERTY();
-    TArray<FVector> normals;
-    UPROPERTY();
-    TArray<FVector2D> uvs;
-    UPROPERTY();
-    TArray<FColor> colors;
+	TArray<int32> indices;
+	UPROPERTY();
+	TArray<FVector> normals;
+	UPROPERTY();
+	TArray<FVector2D> uvs;
+	UPROPERTY();
+	TArray<FColor> colors;
 };

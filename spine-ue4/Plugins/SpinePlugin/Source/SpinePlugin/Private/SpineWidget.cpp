@@ -331,12 +331,12 @@ bool USpineWidget::HasBone(const FString BoneName) {
 	return false;
 }
 
-FTransform USpineWidget::GetBoneTransform(const FString& BoneName) {
+FTransform USpineWidget::GetBoneTransform(const FString &BoneName) {
 	CheckState();
 	if (skeleton) {
 		Bone *bone = skeleton->findBone(TCHAR_TO_UTF8(*BoneName));
 		if (!bone) return FTransform();
-		
+
 		FMatrix localTransform;
 		localTransform.SetIdentity();
 		localTransform.SetAxis(2, FVector(bone->getA(), 0, bone->getC()));

@@ -101,7 +101,7 @@ half4 CombinedShapeLightFragment(VertexOutputSpriteURP2D input) : SV_Target
 	surfaceData.albedo = main.rgb;
 	surfaceData.alpha = 1;
 	surfaceData.mask = mask;
-	inputData.uv = input.texcoord;
+	inputData.uv = input.texcoord.xy;
 	inputData.lightingUV = input.lightingUV;
 	half4 pixel = half4(CombinedShapeLightShared(surfaceData, inputData).rgb * main.a, main.a);
 #endif
