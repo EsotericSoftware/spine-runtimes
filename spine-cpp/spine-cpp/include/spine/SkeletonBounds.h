@@ -81,7 +81,18 @@ namespace spine {
 		/// Returns true if the polygon contains the line segment.
 		bool intersectsSegment(Polygon *polygon, float x1, float y1, float x2, float y2);
 
+        /// Returns the polygon for the given bounding box attachment or null if no
+        /// polygon can be found for the attachment. Requires a call to update() first.
 		Polygon *getPolygon(BoundingBoxAttachment *attachment);
+
+        /// Returns the bounding box for the given polygon or null. Requires a call to update() first.
+        BoundingBoxAttachment * getBoundingBox(Polygon *polygon);
+
+        /// Returns all polygons or an empty vector. Requires a call to update() first.
+        Vector<Polygon *> &getPolygons();
+
+        /// Returns all bounding boxes. Requires a call to update() first.
+        Vector<BoundingBoxAttachment *> &getBoundingBoxes();
 
 		float getWidth();
 

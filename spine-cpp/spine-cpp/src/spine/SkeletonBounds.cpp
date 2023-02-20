@@ -185,6 +185,19 @@ spine::Polygon *SkeletonBounds::getPolygon(BoundingBoxAttachment *attachment) {
 	return index == -1 ? NULL : _polygons[index];
 }
 
+BoundingBoxAttachment *SkeletonBounds::getBoundingBox(Polygon *polygon) {
+	int index = _polygons.indexOf(polygon);
+	return index == -1 ? NULL : _boundingBoxes[index];
+}
+
+Vector<Polygon *> &SkeletonBounds::getPolygons() {
+	return _polygons;
+}
+
+Vector<BoundingBoxAttachment *> &SkeletonBounds::getBoundingBoxes() {
+	return _boundingBoxes;
+}
+
 float SkeletonBounds::getWidth() {
 	return _maxX - _minX;
 }
