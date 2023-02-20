@@ -120,7 +120,7 @@ static int readCurve(Json *curve, spCurveTimeline *timeline, int bezier, int fra
 					 float value1, float value2, float scale) {
 	float cx1, cy1, cx2, cy2;
 	if (curve->type == Json_String && strcmp(curve->valueString, "stepped") == 0) {
-		if (value != 0) spCurveTimeline_setStepped(timeline, frame);
+		spCurveTimeline_setStepped(timeline, frame);
 		return bezier;
 	}
 	curve = Json_getItemAtIndex(curve, value << 2);
