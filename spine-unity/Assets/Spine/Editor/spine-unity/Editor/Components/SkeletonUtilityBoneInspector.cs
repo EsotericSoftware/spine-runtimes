@@ -158,8 +158,10 @@ namespace Spine.Unity.Editor {
 				}
 			}
 
-			EditorGUILayout.PropertyField(zPosition);
-			EditorGUILayout.PropertyField(position);
+			bool isOverrideMode = mode.enumValueIndex == 1;
+			using (new EditorGUI.DisabledGroupScope(isOverrideMode))
+				EditorGUILayout.PropertyField(zPosition);
+			EditorGUILayout.PropertyField(position, new GUIContent("XY Position"));
 			EditorGUILayout.PropertyField(rotation);
 			EditorGUILayout.PropertyField(scale);
 

@@ -130,7 +130,8 @@ namespace Spine.Unity {
 				switch (phase) {
 				case UpdatePhase.Local:
 					if (position)
-						thisTransform.localPosition = new Vector3(bone.X * positionScale, bone.Y * positionScale, 0);
+						thisTransform.localPosition = new Vector3(bone.X * positionScale, bone.Y * positionScale,
+							zPosition ? 0 : thisTransform.localPosition.z);
 
 					if (rotation) {
 						if (bone.Data.TransformMode.InheritsRotation()) {
@@ -149,7 +150,8 @@ namespace Spine.Unity {
 				case UpdatePhase.World:
 				case UpdatePhase.Complete:
 					if (position)
-						thisTransform.localPosition = new Vector3(bone.AX * positionScale, bone.AY * positionScale, 0);
+						thisTransform.localPosition = new Vector3(bone.AX * positionScale, bone.AY * positionScale,
+							zPosition ? 0 : thisTransform.localPosition.z);
 
 					if (rotation) {
 						if (bone.Data.TransformMode.InheritsRotation()) {
