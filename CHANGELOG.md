@@ -30,6 +30,7 @@
 
 * **Additions**
   * `OnPostProcessVertices` callback parameter `MeshGeneratorBuffers` now provides access to `uv2Buffer` and `uv3Buffer` properties of `MeshGenerator`, automatically allocating buffers upon access if `tintBlack` is disabled. This allows for passing own vertex data to a shader on second and third uv channels.
+  * Added `Spine/SkeletonGraphic Grayscale` shader to provide a basic grayscale shader for SkeletonGraphic as well. SkeletonGraphic Material `SkeletonGraphicDefaultGrayscale` uses this shader and can be assigned at `SkeletonGraphic` components as usual.
 
 * **Breaking changes**
   

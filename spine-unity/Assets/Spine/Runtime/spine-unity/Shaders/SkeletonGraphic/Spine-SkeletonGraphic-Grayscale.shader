@@ -1,13 +1,11 @@
-Shader "Spine/SkeletonGraphic Fill"
+Shader "Spine/SkeletonGraphic Grayscale"
 {
 	Properties
 	{
-		_FillColor("FillColor", Color) = (1,1,1,1)
-		_FillPhase("FillPhase", Range(0, 1)) = 0
+		_GrayPhase("Phase", Range(0, 1)) = 1
 		[PerRendererData] _MainTex("Sprite Texture", 2D) = "white" {}
 		[Toggle(_STRAIGHT_ALPHA_INPUT)] _StraightAlphaInput("Straight Alpha Texture", Int) = 0
 		[Toggle(_CANVAS_GROUP_COMPATIBLE)] _CanvasGroupCompatible("CanvasGroup Compatible", Int) = 1
-		_Color("Tint", Color) = (1,1,1,1)
 
 		[HideInInspector][Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Comparison", Float) = 8
 		[HideInInspector] _Stencil("Stencil ID", Float) = 0
@@ -69,7 +67,7 @@ Shader "Spine/SkeletonGraphic Fill"
 			#pragma fragment frag
 			#pragma target 2.0
 
-			#define ENABLE_FILL
+			#define ENABLE_GRAYSCALE
 			#include "CGIncludes/Spine-SkeletonGraphic-NormalPass.cginc"
 		ENDCG
 		}
