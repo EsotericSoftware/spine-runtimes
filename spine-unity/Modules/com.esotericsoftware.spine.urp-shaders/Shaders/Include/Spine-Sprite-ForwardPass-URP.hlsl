@@ -123,10 +123,10 @@ half4 LightweightFragmentPBRSimplified(InputData inputData, half4 texAlbedoAlpha
 	Light mainLight = GetMainLight();
 #endif
 
-	half3 finalColor = inputData.bakedGI;
+	half3 finalColor = inputData.bakedGI * albedo.rgb;
 	finalColor += LightingPhysicallyBased(brdfData, mainLight, inputData.normalWS, inputData.viewDirectionWS);
 #else // _MAIN_LIGHT_VERTEX
-	half3 finalColor = inputData.bakedGI;
+	half3 finalColor = inputData.bakedGI * albedo.rgb;
 #endif // _MAIN_LIGHT_VERTEX
 
 #ifdef _ADDITIONAL_LIGHTS
@@ -222,9 +222,9 @@ half4 LightweightFragmentBlinnPhongSimplified(InputData inputData, half4 texDiff
 	}
 #endif
 	uint pixelLightCount = GetAdditionalLightsCount();
-	LIGHT_LOOP_BEGIN(pixelLightCount)
+	LIGHT_LOOP_BEGIN_SPINE(pixelLightCount)
 		diffuseLighting += ProcessLightLambert(inputData, shadowMask, meshRenderingLayers, lightIndex);
-	LIGHT_LOOP_END
+	LIGHT_LOOP_END_SPINE
 
 #endif
 #ifdef _ADDITIONAL_LIGHTS_VERTEX
