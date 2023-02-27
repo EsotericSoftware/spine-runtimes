@@ -28,7 +28,6 @@
  *****************************************************************************/
 
 #include <spine/MeshAttachment.h>
-#include <spine/HasRendererObject.h>
 
 using namespace spine;
 
@@ -53,10 +52,13 @@ void MeshAttachment::updateRegion() {
 		_uvs.setSize(_regionUVs.size(), 0);
 	}
 
+	if (_region == nullptr) {
+		return;
+	}
+
 	int i = 0, n = (int) _regionUVs.size();
 	float u = _region->u, v = _region->v;
 	float width = 0, height = 0;
-
 	switch (_region->degrees) {
 		case 90: {
 			float textureWidth = _region->height / (_region->u2 - _region->u);
