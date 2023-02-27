@@ -264,7 +264,7 @@ void USpineSkeletonRendererComponent::UpdateMesh(USpineSkeletonComponent *compon
 		// ignore regions for which we can't find a material
 		UMaterialInstanceDynamic *material = nullptr;
 		int foundPageIndex = -1;
-		for (int pageIndex = 0; i < component->Atlas->atlasPages.Num(); pageIndex++) {
+		for (int pageIndex = 0; pageIndex < component->Atlas->atlasPages.Num(); pageIndex++) {
 			AtlasPage *page = component->Atlas->GetAtlas()->getPages()[pageIndex];
 			if (attachmentAtlasRegion->page == page) {
 				foundPageIndex = pageIndex;
@@ -277,33 +277,33 @@ void USpineSkeletonRendererComponent::UpdateMesh(USpineSkeletonComponent *compon
 		}
 		switch (slot->getData().getBlendMode()) {
 			case BlendMode_Additive:
-				if (i >= atlasAdditiveBlendMaterials.Num()) {
+				if (foundPageIndex >= atlasAdditiveBlendMaterials.Num()) {
 					clipper.clipEnd(*slot);
 					continue;
 				}
-				material = atlasAdditiveBlendMaterials[i];
+				material = atlasAdditiveBlendMaterials[foundPageIndex];
 				break;
 			case BlendMode_Multiply:
-				if (i >= atlasMultiplyBlendMaterials.Num()) {
+				if (foundPageIndex >= atlasMultiplyBlendMaterials.Num()) {
 					clipper.clipEnd(*slot);
 					continue;
 				}
-				material = atlasMultiplyBlendMaterials[i];
+				material = atlasMultiplyBlendMaterials[foundPageIndex];
 				break;
 			case BlendMode_Screen:
-				if (i >= atlasScreenBlendMaterials.Num()) {
+				if (foundPageIndex >= atlasScreenBlendMaterials.Num()) {
 					clipper.clipEnd(*slot);
 					continue;
 				}
-				material = atlasScreenBlendMaterials[i];
+				material = atlasScreenBlendMaterials[foundPageIndex];
 				break;
 			case BlendMode_Normal:
 			default:
-				if (i >= atlasNormalBlendMaterials.Num()) {
+				if (foundPageIndex >= atlasNormalBlendMaterials.Num()) {
 					clipper.clipEnd(*slot);
 					continue;
 				}
-				material = atlasNormalBlendMaterials[i];
+				material = atlasNormalBlendMaterials[foundPageIndex];
 				break;
 		}
 
