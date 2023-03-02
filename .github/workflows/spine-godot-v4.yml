@@ -13,8 +13,8 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   AWS_EC2_METADATA_DISABLED: true
   EM_VERSION: 3.1.18
-  GODOT_TAG: master
-  GODOT_VERSION: 4.0.beta
+  GODOT_TAG: 4.0-stable
+  GODOT_VERSION: 4.0.stable
 
 jobs:
 
