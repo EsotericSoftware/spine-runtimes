@@ -152,7 +152,7 @@ VertexOutput vert(appdata v) {
 }
 
 half4 frag(VertexOutput i
-#ifdef _WRITE_RENDERING_LAYERS
+#ifdef USE_WRITE_RENDERING_LAYERS
 	, out float4 outRenderingLayers : SV_Target1
 #endif
 ) : SV_Target0

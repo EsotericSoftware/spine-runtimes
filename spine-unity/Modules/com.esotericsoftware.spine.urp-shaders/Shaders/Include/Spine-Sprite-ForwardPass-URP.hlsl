@@ -285,7 +285,7 @@ VertexOutputLWRP ForwardPassVertexSprite(VertexInput input)
 }
 
 half4 ForwardPassFragmentSprite(VertexOutputLWRP input
-#ifdef _WRITE_RENDERING_LAYERS
+#ifdef USE_WRITE_RENDERING_LAYERS
 	, out float4 outRenderingLayers : SV_Target1
 #endif
 ) : SV_Target0
@@ -302,7 +302,7 @@ half4 ForwardPassFragmentSprite(VertexOutputLWRP input
 	#if defined(REQUIRES_VERTEX_SHADOW_COORD_INTERPOLATOR)
 		inputData.shadowCoord = input.shadowCoord;
 	#elif defined(MAIN_LIGHT_CALCULATE_SHADOWS)
-		inputData.shadowCoord = TransformWorldToShadowCoord(input.positionWS);
+		inputData.shadowCoord = TransformWorldToShadowCoord(input.positionWS.xyz);
 	#elif defined(_MAIN_LIGHT_SHADOWS)
 		inputData.shadowCoord = input.shadowCoord;
 	#else
@@ -352,7 +352,7 @@ half4 ForwardPassFragmentSprite(VertexOutputLWRP input
 	COLORISE(pixel)
 	APPLY_FOG_LWRP(pixel, input.fogFactorAndVertexLight.x)
 
-#ifdef _WRITE_RENDERING_LAYERS
+#ifdef USE_WRITE_RENDERING_LAYERS
 	uint renderingLayers = GetMeshRenderingLayerBackwardsCompatible();
 	outRenderingLayers = float4(EncodeMeshRenderingLayer(renderingLayers), 0, 0, 0);
 #endif

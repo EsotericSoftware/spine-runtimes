@@ -1,10 +1,10 @@
 [gd_scene load_steps=68 format=3 uid="uid://dmddd1ll1y0bm"]
 
-[ext_resource type="SpineSkeletonDataResource" path="res://assets/spineboy/spineboy-data-res.tres" id="1"]
+[ext_resource type="SpineSkeletonDataResource" uid="uid://cb6rn6vonqbx0" path="res://assets/spineboy/spineboy-data-res.tres" id="1"]
 [ext_resource type="Script" path="res://examples/08-animation-player/animation-player.gd" id="2"]
 [ext_resource type="SpineSkeletonDataResource" path="res://assets/raptor/raptor-data.tres" id="3"]
 
-[sub_resource type="Animation" id="Animation_t6m4d"]
+[sub_resource type="Animation" id="Animation_u8r30"]
 resource_name = "aim_looped"
 length = 0.5
 tracks/0/type = "value"
@@ -32,7 +32,7 @@ tracks/1/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_njcku"]
+[sub_resource type="Animation" id="Animation_pcd73"]
 resource_name = "aim"
 length = 0.5
 tracks/0/type = "value"
@@ -60,7 +60,7 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_uj85l"]
+[sub_resource type="Animation" id="Animation_anfvj"]
 resource_name = "death_looped"
 length = 4.9333
 tracks/0/type = "value"
@@ -88,7 +88,7 @@ tracks/1/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_irg42"]
+[sub_resource type="Animation" id="Animation_se2p7"]
 resource_name = "death"
 length = 4.9333
 tracks/0/type = "value"
@@ -116,7 +116,7 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_u0h4m"]
+[sub_resource type="Animation" id="Animation_g26yh"]
 resource_name = "hoverboard_looped"
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -143,7 +143,7 @@ tracks/1/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_ksgd8"]
+[sub_resource type="Animation" id="Animation_dx8qa"]
 resource_name = "hoverboard"
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -170,7 +170,7 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_onrph"]
+[sub_resource type="Animation" id="Animation_vy3tq"]
 resource_name = "idle_looped"
 length = 1.6667
 tracks/0/type = "value"
@@ -198,7 +198,7 @@ tracks/1/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_uq46m"]
+[sub_resource type="Animation" id="Animation_urltx"]
 resource_name = "idle"
 length = 1.6667
 tracks/0/type = "value"
@@ -226,7 +226,7 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_vm3do"]
+[sub_resource type="Animation" id="Animation_7xfju"]
 resource_name = "idle-turn_looped"
 length = 0.2667
 tracks/0/type = "value"
@@ -254,7 +254,7 @@ tracks/1/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_tlrtt"]
+[sub_resource type="Animation" id="Animation_bdf5o"]
 resource_name = "idle-turn"
 length = 0.2667
 tracks/0/type = "value"
@@ -282,7 +282,7 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_8gf4p"]
+[sub_resource type="Animation" id="Animation_2orbb"]
 resource_name = "jump_looped"
 length = 1.3333
 tracks/0/type = "value"
@@ -310,7 +310,7 @@ tracks/1/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_e3mt7"]
+[sub_resource type="Animation" id="Animation_3iuuy"]
 resource_name = "jump"
 length = 1.3333
 tracks/0/type = "value"
@@ -338,7 +338,7 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_q7d0d"]
+[sub_resource type="Animation" id="Animation_imcsw"]
 resource_name = "portal_looped"
 length = 3.1667
 tracks/0/type = "value"
@@ -366,7 +366,7 @@ tracks/1/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_hu1qx"]
+[sub_resource type="Animation" id="Animation_k3ycw"]
 resource_name = "portal"
 length = 3.1667
 tracks/0/type = "value"
@@ -394,7 +394,7 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_4qvwn"]
+[sub_resource type="Animation" id="Animation_uxgvr"]
 resource_name = "run_looped"
 length = 0.6667
 tracks/0/type = "value"
@@ -422,7 +422,7 @@ tracks/1/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_rcbj7"]
+[sub_resource type="Animation" id="Animation_4rtac"]
 resource_name = "run"
 length = 0.6667
 tracks/0/type = "value"
@@ -450,7 +450,7 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_xaopv"]
+[sub_resource type="Animation" id="Animation_jonld"]
 resource_name = "run-to-idle_looped"
 length = 0.2667
 tracks/0/type = "value"
@@ -478,7 +478,7 @@ tracks/1/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_hhaj8"]
+[sub_resource type="Animation" id="Animation_pc8cu"]
 resource_name = "run-to-idle"
 length = 0.2667
 tracks/0/type = "value"
@@ -506,7 +506,7 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_2epiy"]
+[sub_resource type="Animation" id="Animation_je08p"]
 resource_name = "shoot_looped"
 length = 0.6333
 tracks/0/type = "value"
@@ -534,7 +534,7 @@ tracks/1/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_xvf75"]
+[sub_resource type="Animation" id="Animation_o7hy8"]
 resource_name = "shoot"
 length = 0.6333
 tracks/0/type = "value"
@@ -562,7 +562,7 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_ailgk"]
+[sub_resource type="Animation" id="Animation_rfed2"]
 resource_name = "walk_looped"
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -589,7 +589,7 @@ tracks/1/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_1ifml"]
+[sub_resource type="Animation" id="Animation_6jfr5"]
 resource_name = "walk"
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -616,7 +616,7 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_13jvi"]
+[sub_resource type="Animation" id="Animation_871iw"]
 resource_name = "RESET"
 length = 0.5
 tracks/0/type = "value"
@@ -644,35 +644,35 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_3juul"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_v5cr7"]
 _data = {
-"-- Empty --": SubResource( "Animation_13jvi" ),
-"RESET": SubResource( "Animation_13jvi" ),
-"aim": SubResource( "Animation_njcku" ),
-"aim_looped": SubResource( "Animation_t6m4d" ),
-"death": SubResource( "Animation_irg42" ),
-"death_looped": SubResource( "Animation_uj85l" ),
-"hoverboard": SubResource( "Animation_ksgd8" ),
-"hoverboard_looped": SubResource( "Animation_u0h4m" ),
-"idle": SubResource( "Animation_uq46m" ),
-"idle-turn": SubResource( "Animation_tlrtt" ),
-"idle-turn_looped": SubResource( "Animation_vm3do" ),
-"idle_looped": SubResource( "Animation_onrph" ),
-"jump": SubResource( "Animation_e3mt7" ),
-"jump_looped": SubResource( "Animation_8gf4p" ),
-"portal": SubResource( "Animation_hu1qx" ),
-"portal_looped": SubResource( "Animation_q7d0d" ),
-"run": SubResource( "Animation_rcbj7" ),
-"run-to-idle": SubResource( "Animation_hhaj8" ),
-"run-to-idle_looped": SubResource( "Animation_xaopv" ),
-"run_looped": SubResource( "Animation_4qvwn" ),
-"shoot": SubResource( "Animation_xvf75" ),
-"shoot_looped": SubResource( "Animation_2epiy" ),
-"walk": SubResource( "Animation_1ifml" ),
-"walk_looped": SubResource( "Animation_ailgk" )
+"-- Empty --": SubResource("Animation_871iw"),
+"RESET": SubResource("Animation_871iw"),
+"aim": SubResource("Animation_pcd73"),
+"aim_looped": SubResource("Animation_u8r30"),
+"death": SubResource("Animation_se2p7"),
+"death_looped": SubResource("Animation_anfvj"),
+"hoverboard": SubResource("Animation_dx8qa"),
+"hoverboard_looped": SubResource("Animation_g26yh"),
+"idle": SubResource("Animation_urltx"),
+"idle-turn": SubResource("Animation_bdf5o"),
+"idle-turn_looped": SubResource("Animation_7xfju"),
+"idle_looped": SubResource("Animation_vy3tq"),
+"jump": SubResource("Animation_3iuuy"),
+"jump_looped": SubResource("Animation_2orbb"),
+"portal": SubResource("Animation_k3ycw"),
+"portal_looped": SubResource("Animation_imcsw"),
+"run": SubResource("Animation_4rtac"),
+"run-to-idle": SubResource("Animation_pc8cu"),
+"run-to-idle_looped": SubResource("Animation_jonld"),
+"run_looped": SubResource("Animation_uxgvr"),
+"shoot": SubResource("Animation_o7hy8"),
+"shoot_looped": SubResource("Animation_je08p"),
+"walk": SubResource("Animation_6jfr5"),
+"walk_looped": SubResource("Animation_rfed2")
 }
 
-[sub_resource type="Animation" id="Animation_43jug"]
+[sub_resource type="Animation" id="Animation_bqfyv"]
 resource_name = "aim_looped"
 length = 0.5
 tracks/0/type = "value"
@@ -700,7 +700,7 @@ tracks/1/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_npdlv"]
+[sub_resource type="Animation" id="Animation_wa8y8"]
 resource_name = "aim"
 length = 0.5
 tracks/0/type = "value"
@@ -728,7 +728,7 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_v5dry"]
+[sub_resource type="Animation" id="Animation_lqflw"]
 resource_name = "death_looped"
 length = 4.9333
 tracks/0/type = "value"
@@ -756,7 +756,7 @@ tracks/1/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_wthcu"]
+[sub_resource type="Animation" id="Animation_mybt4"]
 resource_name = "death"
 length = 4.9333
 tracks/0/type = "value"
@@ -784,7 +784,7 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_0t4px"]
+[sub_resource type="Animation" id="Animation_lgcur"]
 resource_name = "hoverboard_looped"
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -811,7 +811,7 @@ tracks/1/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_cflga"]
+[sub_resource type="Animation" id="Animation_qg507"]
 resource_name = "hoverboard"
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -838,7 +838,7 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_4l5af"]
+[sub_resource type="Animation" id="Animation_gro4g"]
 resource_name = "idle_looped"
 length = 1.6667
 tracks/0/type = "value"
@@ -866,7 +866,7 @@ tracks/1/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_3kd2q"]
+[sub_resource type="Animation" id="Animation_r4l52"]
 resource_name = "idle"
 length = 1.6667
 tracks/0/type = "value"
@@ -894,7 +894,7 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_pcovu"]
+[sub_resource type="Animation" id="Animation_dxou3"]
 resource_name = "idle-turn_looped"
 length = 0.2667
 tracks/0/type = "value"
@@ -922,7 +922,7 @@ tracks/1/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_ji8c3"]
+[sub_resource type="Animation" id="Animation_mtm0j"]
 resource_name = "idle-turn"
 length = 0.2667
 tracks/0/type = "value"
@@ -950,7 +950,7 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_hxqi7"]
+[sub_resource type="Animation" id="Animation_57vbo"]
 resource_name = "jump_looped"
 length = 1.3333
 tracks/0/type = "value"
@@ -978,7 +978,7 @@ tracks/1/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_h822y"]
+[sub_resource type="Animation" id="Animation_jaxeo"]
 resource_name = "jump"
 length = 1.3333
 tracks/0/type = "value"
@@ -1006,7 +1006,7 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_8f1h5"]
+[sub_resource type="Animation" id="Animation_p8eks"]
 resource_name = "portal_looped"
 length = 3.1667
 tracks/0/type = "value"
@@ -1034,7 +1034,7 @@ tracks/1/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_i0wgj"]
+[sub_resource type="Animation" id="Animation_gn2h2"]
 resource_name = "portal"
 length = 3.1667
 tracks/0/type = "value"
@@ -1062,7 +1062,7 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_0q41s"]
+[sub_resource type="Animation" id="Animation_qyc51"]
 resource_name = "run_looped"
 length = 0.6667
 tracks/0/type = "value"
@@ -1090,7 +1090,7 @@ tracks/1/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_og3lw"]
+[sub_resource type="Animation" id="Animation_wimlj"]
 resource_name = "run"
 length = 0.6667
 tracks/0/type = "value"
@@ -1118,7 +1118,7 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_q7ndl"]
+[sub_resource type="Animation" id="Animation_xpssf"]
 resource_name = "run-to-idle_looped"
 length = 0.2667
 tracks/0/type = "value"
@@ -1146,7 +1146,7 @@ tracks/1/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_nxlcc"]
+[sub_resource type="Animation" id="Animation_cv1an"]
 resource_name = "run-to-idle"
 length = 0.2667
 tracks/0/type = "value"
@@ -1174,7 +1174,7 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_riqly"]
+[sub_resource type="Animation" id="Animation_y0ah7"]
 resource_name = "shoot_looped"
 length = 0.6333
 tracks/0/type = "value"
@@ -1202,7 +1202,7 @@ tracks/1/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_e7tup"]
+[sub_resource type="Animation" id="Animation_6lofo"]
 resource_name = "shoot"
 length = 0.6333
 tracks/0/type = "value"
@@ -1230,7 +1230,7 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_5q6ru"]
+[sub_resource type="Animation" id="Animation_gpmbs"]
 resource_name = "walk_looped"
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -1257,7 +1257,7 @@ tracks/1/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_rbpim"]
+[sub_resource type="Animation" id="Animation_8kta1"]
 resource_name = "walk"
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -1284,7 +1284,7 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_n4owa"]
+[sub_resource type="Animation" id="Animation_arooe"]
 resource_name = "RESET"
 length = 0.5
 tracks/0/type = "value"
@@ -1312,35 +1312,35 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_weodw"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_fa8i5"]
 _data = {
-"-- Empty --": SubResource( "Animation_n4owa" ),
-"RESET": SubResource( "Animation_n4owa" ),
-"aim": SubResource( "Animation_npdlv" ),
-"aim_looped": SubResource( "Animation_43jug" ),
-"death": SubResource( "Animation_wthcu" ),
-"death_looped": SubResource( "Animation_v5dry" ),
-"hoverboard": SubResource( "Animation_cflga" ),
-"hoverboard_looped": SubResource( "Animation_0t4px" ),
-"idle": SubResource( "Animation_3kd2q" ),
-"idle-turn": SubResource( "Animation_ji8c3" ),
-"idle-turn_looped": SubResource( "Animation_pcovu" ),
-"idle_looped": SubResource( "Animation_4l5af" ),
-"jump": SubResource( "Animation_h822y" ),
-"jump_looped": SubResource( "Animation_hxqi7" ),
-"portal": SubResource( "Animation_i0wgj" ),
-"portal_looped": SubResource( "Animation_8f1h5" ),
-"run": SubResource( "Animation_og3lw" ),
-"run-to-idle": SubResource( "Animation_nxlcc" ),
-"run-to-idle_looped": SubResource( "Animation_q7ndl" ),
-"run_looped": SubResource( "Animation_0q41s" ),
-"shoot": SubResource( "Animation_e7tup" ),
-"shoot_looped": SubResource( "Animation_riqly" ),
-"walk": SubResource( "Animation_rbpim" ),
-"walk_looped": SubResource( "Animation_5q6ru" )
+"-- Empty --": SubResource("Animation_arooe"),
+"RESET": SubResource("Animation_arooe"),
+"aim": SubResource("Animation_wa8y8"),
+"aim_looped": SubResource("Animation_bqfyv"),
+"death": SubResource("Animation_mybt4"),
+"death_looped": SubResource("Animation_lqflw"),
+"hoverboard": SubResource("Animation_qg507"),
+"hoverboard_looped": SubResource("Animation_lgcur"),
+"idle": SubResource("Animation_r4l52"),
+"idle-turn": SubResource("Animation_mtm0j"),
+"idle-turn_looped": SubResource("Animation_dxou3"),
+"idle_looped": SubResource("Animation_gro4g"),
+"jump": SubResource("Animation_jaxeo"),
+"jump_looped": SubResource("Animation_57vbo"),
+"portal": SubResource("Animation_gn2h2"),
+"portal_looped": SubResource("Animation_p8eks"),
+"run": SubResource("Animation_wimlj"),
+"run-to-idle": SubResource("Animation_cv1an"),
+"run-to-idle_looped": SubResource("Animation_xpssf"),
+"run_looped": SubResource("Animation_qyc51"),
+"shoot": SubResource("Animation_6lofo"),
+"shoot_looped": SubResource("Animation_y0ah7"),
+"walk": SubResource("Animation_8kta1"),
+"walk_looped": SubResource("Animation_gpmbs")
 }
 
-[sub_resource type="Animation" id="Animation_g0fba"]
+[sub_resource type="Animation" id="Animation_hsvha"]
 resource_name = "gun-grab_looped"
 length = 0.666667
 tracks/0/type = "value"
@@ -1368,7 +1368,7 @@ tracks/1/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_tnmwm"]
+[sub_resource type="Animation" id="Animation_5dt73"]
 resource_name = "gun-grab"
 length = 0.666667
 tracks/0/type = "value"
@@ -1396,7 +1396,7 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_scefx"]
+[sub_resource type="Animation" id="Animation_hsxuq"]
 resource_name = "gun-holster_looped"
 length = 0.666667
 tracks/0/type = "value"
@@ -1424,7 +1424,7 @@ tracks/1/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_6lq4v"]
+[sub_resource type="Animation" id="Animation_5hjd5"]
 resource_name = "gun-holster"
 length = 0.666667
 tracks/0/type = "value"
@@ -1452,7 +1452,7 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_b7ns0"]
+[sub_resource type="Animation" id="Animation_304i6"]
 resource_name = "jump_looped"
 length = 1.53333
 tracks/0/type = "value"
@@ -1480,7 +1480,7 @@ tracks/1/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_l4kgf"]
+[sub_resource type="Animation" id="Animation_rn17q"]
 resource_name = "jump"
 length = 1.53333
 tracks/0/type = "value"
@@ -1508,7 +1508,7 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_jt8r5"]
+[sub_resource type="Animation" id="Animation_qxmqu"]
 resource_name = "roar_looped"
 length = 2.13333
 tracks/0/type = "value"
@@ -1536,7 +1536,7 @@ tracks/1/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_wlr0r"]
+[sub_resource type="Animation" id="Animation_awgy1"]
 resource_name = "roar"
 length = 2.13333
 tracks/0/type = "value"
@@ -1564,7 +1564,7 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_0e04p"]
+[sub_resource type="Animation" id="Animation_d43gs"]
 resource_name = "walk_looped"
 length = 1.26667
 tracks/0/type = "value"
@@ -1592,7 +1592,7 @@ tracks/1/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_ysb1x"]
+[sub_resource type="Animation" id="Animation_g6qku"]
 resource_name = "walk"
 length = 1.26667
 tracks/0/type = "value"
@@ -1620,7 +1620,7 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_j5g3u"]
+[sub_resource type="Animation" id="Animation_73tbf"]
 resource_name = "RESET"
 length = 0.5
 tracks/0/type = "value"
@@ -1648,20 +1648,20 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_nir4m"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_to4p6"]
 _data = {
-"-- Empty --": SubResource( "Animation_j5g3u" ),
-"RESET": SubResource( "Animation_j5g3u" ),
-"gun-grab": SubResource( "Animation_tnmwm" ),
-"gun-grab_looped": SubResource( "Animation_g0fba" ),
-"gun-holster": SubResource( "Animation_6lq4v" ),
-"gun-holster_looped": SubResource( "Animation_scefx" ),
-"jump": SubResource( "Animation_l4kgf" ),
-"jump_looped": SubResource( "Animation_b7ns0" ),
-"roar": SubResource( "Animation_wlr0r" ),
-"roar_looped": SubResource( "Animation_jt8r5" ),
-"walk": SubResource( "Animation_ysb1x" ),
-"walk_looped": SubResource( "Animation_0e04p" )
+"-- Empty --": SubResource("Animation_73tbf"),
+"RESET": SubResource("Animation_73tbf"),
+"gun-grab": SubResource("Animation_5dt73"),
+"gun-grab_looped": SubResource("Animation_hsvha"),
+"gun-holster": SubResource("Animation_5hjd5"),
+"gun-holster_looped": SubResource("Animation_hsxuq"),
+"jump": SubResource("Animation_rn17q"),
+"jump_looped": SubResource("Animation_304i6"),
+"roar": SubResource("Animation_awgy1"),
+"roar_looped": SubResource("Animation_qxmqu"),
+"walk": SubResource("Animation_g6qku"),
+"walk_looped": SubResource("Animation_d43gs")
 }
 
 [sub_resource type="Animation" id="25"]
@@ -1885,18 +1885,19 @@ tracks/3/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_3lgey"]
 _data = {
-"RESET": SubResource( "25" ),
-"cutscene": SubResource( "1" ),
-"slow-moonwalk": SubResource( "83" )
+"RESET": SubResource("25"),
+"cutscene": SubResource("1"),
+"slow-moonwalk": SubResource("83")
 }
 
 [node name="Node2D2" type="Node2D"]
-script = ExtResource( "2" )
+script = ExtResource("2")
 
 [node name="Spineboy" type="SpineSprite" parent="."]
 position = Vector2(72.0001, 520)
 scale = Vector2(0.323942, 0.323942)
-skeleton_data_res = ExtResource( "1" )
+skeleton_data_res = ExtResource("1")
+preview_skin = "Default"
 preview_animation = "-- Empty --"
 preview_frame = false
 preview_time = 0.0
@@ -1907,7 +1908,7 @@ debug = true
 
 [node name="Spineboy Track 0" type="AnimationPlayer" parent="Spineboy/SpineAnimationTrack"]
 libraries = {
-"": SubResource( "AnimationLibrary_3juul" )
+"": SubResource("AnimationLibrary_v5cr7")
 }
 
 [node name="SpineAnimationTrack2" type="SpineAnimationTrack" parent="Spineboy"]
@@ -1917,13 +1918,14 @@ debug = true
 
 [node name="Spineboy Track 1" type="AnimationPlayer" parent="Spineboy/SpineAnimationTrack2"]
 libraries = {
-"": SubResource( "AnimationLibrary_weodw" )
+"": SubResource("AnimationLibrary_fa8i5")
 }
 
 [node name="Raptor" type="SpineSprite" parent="."]
 position = Vector2(1284, 520)
 scale = Vector2(-0.328761, 0.328761)
-skeleton_data_res = ExtResource( "3" )
+skeleton_data_res = ExtResource("3")
+preview_skin = "Default"
 preview_animation = "-- Empty --"
 preview_frame = false
 preview_time = 0.0
@@ -1933,10 +1935,10 @@ track_index = 0
 
 [node name="Raptor Track 0" type="AnimationPlayer" parent="Raptor/SpineAnimationTrack"]
 libraries = {
-"": SubResource( "AnimationLibrary_nir4m" )
+"": SubResource("AnimationLibrary_to4p6")
 }
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
-"": SubResource( "AnimationLibrary_3lgey" )
+"": SubResource("AnimationLibrary_3lgey")
 }

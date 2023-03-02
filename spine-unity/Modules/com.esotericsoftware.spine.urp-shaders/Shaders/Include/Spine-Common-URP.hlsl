@@ -1,6 +1,16 @@
 #ifndef SPINE_COMMON_URP_INCLUDED
 #define SPINE_COMMON_URP_INCLUDED
 
+#ifdef USE_FORWARD_PLUS
+#define IS_URP_14_OR_NEWER 1
+#else
+#define IS_URP_14_OR_NEWER 0
+#endif
+
+#if defined(_WRITE_RENDERING_LAYERS) && IS_URP_14_OR_NEWER
+#define USE_WRITE_RENDERING_LAYERS
+#endif
+
 #ifdef _LIGHT_LAYERS
 uint GetMeshRenderingLayerBackwardsCompatible()
 {
