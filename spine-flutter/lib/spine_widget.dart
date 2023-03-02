@@ -373,6 +373,18 @@ class _SpineWidgetState extends State<SpineWidget> {
     }
   }
 
+  @override
+  void didUpdateWidget(covariant SpineWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    widget._controller._drawable?.dispose();
+    _drawable = null;
+    if (widget._assetType == _AssetType.drawable) {
+      loadDrawable(widget._drawable!);
+    } else {
+      loadFromAsset(widget._bundle, widget._atlasFile!, widget._skeletonFile!, widget._assetType);
+    }
+  }
+
   void loadDrawable(SkeletonDrawable drawable) {
     _drawable = drawable;
     _computedBounds = widget._boundsProvider.computeBounds(drawable);
