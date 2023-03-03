@@ -1,6 +1,5 @@
 import 'package:spine_flutter/spine_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:spine_flutter_example/animated_login.dart';
 import 'package:spine_flutter_example/debug_rendering.dart';
 
 import 'animation_state_events.dart';
@@ -63,18 +62,6 @@ class ExampleSelector extends StatelessWidget {
                 context,
                 MaterialPageRoute<void>(
                   builder: (context) => const DebugRendering(),
-                ),
-              );
-            },
-          ),
-          spacer,
-          ElevatedButton(
-            child: const Text('Animated login'),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute<void>(
-                  builder: (context) => const AnimatedLogin(),
                 ),
               );
             },

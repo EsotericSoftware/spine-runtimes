@@ -78,9 +78,9 @@ class SpineWidgetController {
       {this.onInitialized, this.onBeforeUpdateWorldTransforms, this.onAfterUpdateWorldTransforms, this.onBeforePaint, this.onAfterPaint});
 
   void _initialize(SkeletonDrawable drawable) {
-    if (_drawable != null) throw Exception("SpineWidgetController already initialized. A controller can only be used with one widget.");
+    var wasInitialized = _drawable != null;
     _drawable = drawable;
-    onInitialized?.call(this);
+    if (!wasInitialized) onInitialized?.call(this);
   }
 
   /// The [Atlas] from which images to render the skeleton are sourced.
@@ -283,14 +283,15 @@ class SpineWidget extends StatefulWidget {
   ///
   /// The widget can optionally by sized by the bounds provided by the [BoundsProvider] by passing `true` for [sizedByBounds].
   SpineWidget.fromAsset(this._atlasFile, this._skeletonFile, this._controller,
-      {AssetBundle? bundle, BoxFit? fit, Alignment? alignment, BoundsProvider? boundsProvider, bool? sizedByBounds, super.key})
+      {AssetBundle? bundle, BoxFit? fit, Alignment? alignment, BoundsProvider? boundsProvider, bool? sizedByBounds, Key? key})
       : _assetType = _AssetType.asset,
         _fit = fit ?? BoxFit.contain,
         _alignment = alignment ?? Alignment.center,
         _boundsProvider = boundsProvider ?? const SetupPoseBounds(),
         _sizedByBounds = sizedByBounds ?? false,
         _drawable = null,
-        _bundle = bundle ?? rootBundle;
+        _bundle = bundle ?? rootBundle,
+        super(key: key);
 
   /// Constructs a new [SpineWidget] from files. The [_atlasFile] specifies the `.atlas` file to be loaded for the images used to render
   /// the skeleton. The [_skeletonFile] specifies either a Skeleton `.json` or `.skel` file containing the skeleton data.
@@ -304,14 +305,15 @@ class SpineWidget extends StatefulWidget {
   ///
   /// The widget can optionally by sized by the bounds provided by the [BoundsProvider] by passing `true` for [sizedByBounds].
   const SpineWidget.fromFile(this._atlasFile, this._skeletonFile, this._controller,
-      {BoxFit? fit, Alignment? alignment, BoundsProvider? boundsProvider, bool? sizedByBounds, super.key})
+      {BoxFit? fit, Alignment? alignment, BoundsProvider? boundsProvider, bool? sizedByBounds, Key? key})
       : _assetType = _AssetType.file,
         _bundle = null,
         _fit = fit ?? BoxFit.contain,
         _alignment = alignment ?? Alignment.center,
         _boundsProvider = boundsProvider ?? const SetupPoseBounds(),
         _sizedByBounds = sizedByBounds ?? false,
-        _drawable = null;
+        _drawable = null,
+        super(key: key);
 
   /// Constructs a new [SpineWidget] from HTTP URLs. The [_atlasFile] specifies the `.atlas` file to be loaded for the images used to render
   /// the skeleton. The [_skeletonFile] specifies either a Skeleton `.json` or `.skel` file containing the skeleton data.
@@ -325,14 +327,15 @@ class SpineWidget extends StatefulWidget {
   ///
   /// The widget can optionally by sized by the bounds provided by the [BoundsProvider] by passing `true` for [sizedByBounds].
   const SpineWidget.fromHttp(this._atlasFile, this._skeletonFile, this._controller,
-      {BoxFit? fit, Alignment? alignment, BoundsProvider? boundsProvider, bool? sizedByBounds, super.key})
+      {BoxFit? fit, Alignment? alignment, BoundsProvider? boundsProvider, bool? sizedByBounds, Key? key})
       : _assetType = _AssetType.http,
         _bundle = null,
         _fit = fit ?? BoxFit.contain,
         _alignment = alignment ?? Alignment.center,
         _boundsProvider = boundsProvider ?? const SetupPoseBounds(),
         _sizedByBounds = sizedByBounds ?? false,
-        _drawable = null;
+        _drawable = null,
+        super(key: key);
 
   /// Constructs a new [SpineWidget] from a [SkeletonDrawable].
   ///
@@ -345,7 +348,7 @@ class SpineWidget extends StatefulWidget {
   ///
   /// The widget can optionally by sized by the bounds provided by the [BoundsProvider] by passing `true` for [sizedByBounds].
   const SpineWidget.fromDrawable(this._drawable, this._controller,
-      {BoxFit? fit, Alignment? alignment, BoundsProvider? boundsProvider, bool? sizedByBounds, super.key})
+      {BoxFit? fit, Alignment? alignment, BoundsProvider? boundsProvider, bool? sizedByBounds, Key? key})
       : _assetType = _AssetType.drawable,
         _bundle = null,
         _fit = fit ?? BoxFit.contain,
@@ -353,7 +356,8 @@ class SpineWidget extends StatefulWidget {
         _boundsProvider = boundsProvider ?? const SetupPoseBounds(),
         _sizedByBounds = sizedByBounds ?? false,
         _skeletonFile = null,
-        _atlasFile = null;
+        _atlasFile = null,
+        super(key: key);
 
   @override
   State<SpineWidget> createState() => _SpineWidgetState();
@@ -376,12 +380,31 @@ class _SpineWidgetState extends State<SpineWidget> {
   @override
   void didUpdateWidget(covariant SpineWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    widget._controller._drawable?.dispose();
-    _drawable = null;
-    if (widget._assetType == _AssetType.drawable) {
-      loadDrawable(widget._drawable!);
-    } else {
-      loadFromAsset(widget._bundle, widget._atlasFile!, widget._skeletonFile!, widget._assetType);
+
+    // Check if the skeleton/atlas data has changed. Only re-create
+    // everything if it has, otherwise, keep using what's already been
+    // loaded.
+    bool hasChanged = true;
+    if (oldWidget._assetType == widget._assetType) {
+      if (oldWidget._assetType == _AssetType.drawable &&
+          oldWidget._drawable == widget._drawable) {
+        hasChanged = false;
+      } else if (oldWidget._skeletonFile == widget._skeletonFile &&
+          oldWidget._atlasFile == widget._atlasFile &&
+          oldWidget._controller == widget._controller &&
+          oldWidget._bundle == widget._bundle) {
+        hasChanged = false;
+      }
+    }
+
+    if (hasChanged) {
+      widget._controller._drawable?.dispose();
+      _drawable = null;
+      if (widget._assetType == _AssetType.drawable) {
+        loadDrawable(widget._drawable!);
+      } else {
+        loadFromAsset(widget._bundle, widget._atlasFile!, widget._skeletonFile!, widget._assetType);
+      }
     }
   }
 
