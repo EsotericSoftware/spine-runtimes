@@ -24,15 +24,16 @@ func _animation_event(sprite: SpineSprite, animation_state: SpineAnimationState,
 
 func _ready():
 	var spineboy = $Spineboy
-	var animation_state = spineboy.get_animation_state()
-	animation_state.set_animation("jump", false, 0)
-	animation_state.add_animation("walk", 0, true, 0)
-	animation_state.add_animation("run", 2, true, 0)
-	
 	spineboy.animation_started.connect(_animation_started)
 	spineboy.animation_interrupted.connect(_animation_interrupted)
 	spineboy.animation_ended.connect(_animation_ended)
 	spineboy.animation_completed.connect(_animation_completed)
 	spineboy.animation_disposed.connect(_animation_disposed)
 	spineboy.animation_event.connect(_animation_event)
+	
+	var animation_state = spineboy.get_animation_state()
+	animation_state.set_animation("jump", false, 0)
+	animation_state.add_animation("walk", 0, true, 0)
+	animation_state.add_animation("run", 2, true, 0)
+	
 	pass
