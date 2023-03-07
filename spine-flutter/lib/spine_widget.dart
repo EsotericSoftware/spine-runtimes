@@ -65,7 +65,7 @@ class SpineWidgetController {
   SkeletonDrawable? _drawable;
   double _offsetX = 0, _offsetY = 0, _scaleX = 1, _scaleY = 1;
   bool _isPlaying = true;
-  _SpineRenderObject? _renderObject = null;
+  _SpineRenderObject? _renderObject;
   final void Function(SpineWidgetController controller)? onInitialized;
   final void Function(SpineWidgetController controller)? onBeforeUpdateWorldTransforms;
   final void Function(SpineWidgetController controller)? onAfterUpdateWorldTransforms;
