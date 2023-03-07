@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'spine-ts/**'
+  workflow_dispatch:
 
 jobs:
   build:
