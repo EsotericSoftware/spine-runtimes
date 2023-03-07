@@ -65,7 +65,7 @@ class SpineWidgetController {
   SkeletonDrawable? _drawable;
   double _offsetX = 0, _offsetY = 0, _scaleX = 1, _scaleY = 1;
   bool _isPlaying = true;
-  _SpineRenderObject? _renderObject = null;
+  _SpineRenderObject? _renderObject;
   final void Function(SpineWidgetController controller)? onInitialized;
   final void Function(SpineWidgetController controller)? onBeforeUpdateWorldTransforms;
   final void Function(SpineWidgetController controller)? onAfterUpdateWorldTransforms;
@@ -670,10 +670,7 @@ class _SpineRenderObject extends RenderBox {
     _setCanvasTransform(canvas, offset);
 
     _controller.onBeforePaint?.call(_controller, canvas);
-    var commands = _skeletonDrawable.render();
-    for (final cmd in commands) {
-      canvas.drawVertices(cmd.vertices, rendering.BlendMode.modulate, _skeletonDrawable.atlas.atlasPagePaints[cmd.atlasPageIndex]);
-    }
+    final commands = _skeletonDrawable.renderToCanvas(canvas);
     _controller.onAfterPaint?.call(_controller, canvas, commands);
 
     canvas.restore();

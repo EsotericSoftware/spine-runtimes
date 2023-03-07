@@ -102,7 +102,7 @@ class Vec2 {
 class Atlas {
   final spine_atlas _atlas;
   final List<Image> atlasPages;
-  final List<Paint> atlasPagePaints;
+  final List<Map<BlendMode, Paint>> atlasPagePaints;
   bool _disposed;
 
   Atlas._(this._atlas, this.atlasPages, this.atlasPagePaints) : _disposed = false;
@@ -122,7 +122,7 @@ class Atlas {
 
     final atlasDir = path.dirname(atlasFileName);
     List<Image> atlasPages = [];
-    List<Paint> atlasPagePaints = [];
+    List<Map<BlendMode, Paint>> atlasPagePaints = [];
     final numImagePaths = _bindings.spine_atlas_get_num_image_paths(atlas);
     for (int i = 0; i < numImagePaths; i++) {
       final Pointer<Utf8> atlasPageFile = _bindings.spine_atlas_get_image_path(atlas, i).cast();
@@ -132,9 +132,16 @@ class Atlas {
       final FrameInfo frameInfo = await codec.getNextFrame();
       final Image image = frameInfo.image;
       atlasPages.add(image);
-      atlasPagePaints.add(Paint()
-        ..shader = ImageShader(image, TileMode.clamp, TileMode.clamp, Matrix4.identity().storage, filterQuality: FilterQuality.high)
-        ..isAntiAlias = true);
+      Map<BlendMode, Paint> paints = {};
+      for (final blendMode in BlendMode.values) {
+        paints[blendMode] = Paint()
+          ..shader = ImageShader(image, TileMode.clamp, TileMode.clamp, Matrix4
+              .identity()
+              .storage, filterQuality: FilterQuality.high)
+          ..isAntiAlias = true
+          ..blendMode = blendMode.canvasBlendMode;
+      }
+      atlasPagePaints.add(paints);
     }
 
     return Atlas._(atlas, atlasPages, atlasPagePaints);
@@ -540,14 +547,15 @@ class SkeletonData {
 /// Determines how images are blended with existing pixels when drawn. See [Blending](http://esotericsoftware.com/spine-slots#Blending) in
 /// the Spine User Guide.
 enum BlendMode {
-  normal(0),
-  additive(1),
-  multiply(2),
-  screen(3);
+  normal(0, rendering.BlendMode.srcOver),
+  additive(1, rendering.BlendMode.plus),
+  multiply(2, rendering.BlendMode.modulate),
+  screen(3, rendering.BlendMode.screen);
 
   final int value;
+  final rendering.BlendMode canvasBlendMode;
 
-  const BlendMode(this.value);
+  const BlendMode(this.value, this.canvasBlendMode);
 }
 
 /// Determines how a bone inherits world transforms from parent bones. See [Transform inheritance](esotericsoftware.com/spine-bones#Transform-inheritance)
@@ -3968,11 +3976,12 @@ class SkeletonDrawable {
 
   /// Renders the skeleton drawable's current pose to the given [canvas]. Does not perform any
   /// scaling or fitting.
-  void renderToCanvas(Canvas canvas) {
+  List<RenderCommand> renderToCanvas(Canvas canvas) {
     var commands = render();
     for (final cmd in commands) {
-      canvas.drawVertices(cmd.vertices, rendering.BlendMode.modulate, atlas.atlasPagePaints[cmd.atlasPageIndex]);
+      canvas.drawVertices(cmd.vertices, rendering.BlendMode.modulate, atlas.atlasPagePaints[cmd.atlasPageIndex][cmd.blendMode]!);
     }
+    return commands;
   }
 
   /// Renders the skeleton drawable's current pose to a [PictureRecorder] with the given [width] and [height].
@@ -4041,6 +4050,7 @@ class RenderCommand {
   late final Float32List uvs;
   late final Int32List colors;
   late final Uint16List indices;
+  late final BlendMode blendMode;
 
   RenderCommand._(spine_render_command nativeCmd, double pageWidth, double pageHeight) {
     atlasPageIndex = _bindings.spine_render_command_get_atlas_page(nativeCmd);
@@ -4054,6 +4064,7 @@ class RenderCommand {
     }
     colors = _bindings.spine_render_command_get_colors(nativeCmd).asTypedList(numVertices);
     indices = _bindings.spine_render_command_get_indices(nativeCmd).asTypedList(numIndices);
+    blendMode = BlendMode.values[_bindings.spine_render_command_get_blend_mode(nativeCmd)];
 
     if (!kIsWeb) {
       // We pass the native data as views directly to Vertices.raw. According to the sources, the data
