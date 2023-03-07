@@ -14,11 +14,11 @@ jobs:
         sudo apt update
         sudo apt install -y --force-yes curl xz-utils libicu-dev git dos2unix libncurses5
 
-    - uses: actions/checkout@v1      
+    - uses: actions/checkout@v3      
 
     - name: Cache Clang
       id: cache-clang
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: clang
         key: ${{ runner.os }}-clang-13-0-1
@@ -31,14 +31,14 @@ jobs:
         mv clang+llvm-13.0.1-x86_64-linux-gnu-ubuntu-18.04 clang
 
     - name: Install dotnet
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v3
       with:
           dotnet-version: "6.0.x"      
           include-prerelease: true   
     - run: dotnet tool install -g dotnet-format    
           
     - name: Install Node and dependenceis    
-      uses: actions/setup-node@v1       
+      uses: actions/setup-node@v3 
       with:
         node-version: "16"
     - run: npm install -g typescript typescript-formatter        
@@ -60,7 +60,7 @@ jobs:
         git diff > format-diff.txt          
 
     - name: Archive formatting result
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: format-diff
         path: format-diff.txt
