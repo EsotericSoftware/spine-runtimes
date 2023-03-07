@@ -33,8 +33,7 @@ jobs:
     - name: Install dotnet
       uses: actions/setup-dotnet@v3
       with:
-          dotnet-version: "6.0.x"      
-          include-prerelease: true   
+          dotnet-version: "6.0.x"          
     - run: dotnet tool install -g dotnet-format    
           
     - name: Install Node and dependenceis    
@@ -44,7 +43,7 @@ jobs:
     - run: npm install -g typescript typescript-formatter        
 
     - name: Install JDK
-      uses: actions/setup-java@v2   
+      uses: actions/setup-java@v3 
       with:
         distribution: 'zulu'
         java-version: "16"          
