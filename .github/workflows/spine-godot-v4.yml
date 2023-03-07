@@ -21,7 +21,7 @@ jobs:
   godot-editor-windows:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -35,7 +35,7 @@ jobs:
           ./spine-godot/build/build-v4.sh       
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: godot-editor-windows.zip
           path: spine-godot/godot/bin/godot.windows.editor.x86_64.exe
@@ -43,7 +43,7 @@ jobs:
   godot-editor-linux:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -59,7 +59,7 @@ jobs:
           ./spine-godot/build/build-v4.sh
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: godot-editor-linux.zip
           path: spine-godot/godot/bin/godot.linuxbsd.editor.x86_64
@@ -67,7 +67,7 @@ jobs:
   godot-editor-macos:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -85,7 +85,7 @@ jobs:
           popd          
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: godot-editor-macos.zip
           path: spine-godot/godot/bin/godot-editor-macos.zip
@@ -93,7 +93,7 @@ jobs:
   godot-template-ios:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -107,7 +107,7 @@ jobs:
           ./spine-godot/build/build-templates-v4.sh ios
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: godot-template-ios.zip
           path: spine-godot/godot/bin/ios.zip
@@ -115,7 +115,7 @@ jobs:
   godot-template-macos:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -129,7 +129,7 @@ jobs:
           ./spine-godot/build/build-templates-v4.sh macos
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: godot-template-macos.zip
           path: spine-godot/godot/bin/macos.zip
@@ -137,7 +137,7 @@ jobs:
   godot-template-linux:
     runs-on: ubuntu-18.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -152,13 +152,13 @@ jobs:
           ./spine-godot/build/build-templates-v4.sh linux
 
       - name: Upload artifacts debug
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: godot-template-linux-debug.zip
           path: spine-godot/godot/bin/linux_x11_64_debug
 
       - name: Upload artifacts release
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: godot-template-linux-release.zip
           path: spine-godot/godot/bin/linux_x11_64_release
@@ -166,7 +166,7 @@ jobs:
   godot-template-windows:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -180,13 +180,13 @@ jobs:
           ./spine-godot/build/build-templates-v4.sh windows
 
       - name: Upload artifacts debug
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: godot-template-windows-debug.zip
           path: spine-godot/godot/bin/windows_debug_x86_64.exe
 
       - name: Upload artifacts release
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: godot-template-windows-release.zip
           path: spine-godot/godot/bin/windows_release_x86_64.exe
@@ -194,7 +194,7 @@ jobs:
   godot-template-android:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -220,19 +220,19 @@ jobs:
           ./spine-godot/build/build-templates-v4.sh android
 
       - name: Upload artifacts debug
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: godot-template-android-debug.zip
           path: spine-godot/godot/bin/android_debug.apk
 
       - name: Upload artifacts release
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: godot-template-android-release.zip
           path: spine-godot/godot/bin/android_release.apk
 
       - name: Upload artifacts source
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: godot-template-android-source.zip
           path: spine-godot/godot/bin/android_source.zip
@@ -240,12 +240,12 @@ jobs:
   godot-template-web:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
       - name: Set up Emscripten latest
-        uses: mymindstorm/setup-emsdk@v10
+        uses: mymindstorm/setup-emsdk@v11
         with:
           version: ${{env.EM_VERSION}}          
 
@@ -262,13 +262,13 @@ jobs:
           ./spine-godot/build/build-templates-v4.sh web
 
       - name: Upload artifacts debug
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: godot-template-web-debug.zip
           path: spine-godot/godot/bin/web_debug.zip
 
       - name: Upload artifacts release
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: godot-template-web-release.zip
           path: spine-godot/godot/bin/web_release.zip
