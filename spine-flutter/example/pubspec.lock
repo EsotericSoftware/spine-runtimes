@@ -169,7 +169,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "4.2.12"
+    version: "4.1.1"
   string_scanner:
     dependency: transitive
     description:
