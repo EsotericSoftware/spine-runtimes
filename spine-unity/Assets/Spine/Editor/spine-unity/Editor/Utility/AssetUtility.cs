@@ -634,6 +634,7 @@ namespace Spine.Unity.Editor {
 			atlasAsset.atlasFile = atlasText;
 
 			List<string> pageFiles = new List<string>();
+			atlasAsset.Clear(); // force reload
 			Atlas atlas = atlasAsset.GetAtlas(onlyMetaData: true);
 			if (atlas != null) {
 				foreach (AtlasPage page in atlas.Pages)
