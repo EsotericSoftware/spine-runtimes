@@ -1097,7 +1097,7 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 									  toColor(dark, 0),
 									  toColor(dark, 1),
 									  toColor(dark, 2),
-									  toColor(dark, 3));
+									  1.0f);
 			}
 
 			item = Json_getItem(slotMap, "attachment");
