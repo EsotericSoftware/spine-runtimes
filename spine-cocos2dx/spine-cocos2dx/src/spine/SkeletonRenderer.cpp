@@ -269,7 +269,7 @@ namespace spine {
 		Color darkColor;
 		const float darkPremultipliedAlpha = _premultipliedAlpha ? 1.f : 0;
 		TwoColorTrianglesCommand *lastTwoColorTrianglesCommand = nullptr;
-		for (int i = 0, n = _skeleton->getSlots().size(); i < n; ++i) {
+		for (int i = 0, n = (int)_skeleton->getSlots().size(); i < n; ++i) {
 			Slot *slot = _skeleton->getDrawOrder()[i];
 
 			if (nothingToDraw(*slot, _startSlotIndex, _endSlotIndex)) {
@@ -284,7 +284,7 @@ namespace spine {
 
 			if (slot->getAttachment()->getRTTI().isExactly(RegionAttachment::rtti)) {
 				RegionAttachment *attachment = static_cast<RegionAttachment *>(slot->getAttachment());
-                texture = (Texture2D*)((AtlasRegion*)attachment->getRegion())->page->getRendererObject();
+				texture = (Texture2D*)((AtlasRegion*)attachment->getRegion())->page->texture;
 
 				float *dstTriangleVertices = nullptr;
 				int dstStride = 0;// in floats
@@ -322,7 +322,7 @@ namespace spine {
 				color = attachment->getColor();
 			} else if (slot->getAttachment()->getRTTI().isExactly(MeshAttachment::rtti)) {
 				MeshAttachment *attachment = (MeshAttachment *) slot->getAttachment();
-                texture = (Texture2D*)((AtlasRegion*)attachment->getRegion())->page->getRendererObject();
+				texture = (Texture2D*)((AtlasRegion*)attachment->getRegion())->page->texture;
 
 				float *dstTriangleVertices = nullptr;
 				int dstStride = 0;// in floats
@@ -330,8 +330,8 @@ namespace spine {
 				if (hasSingleTint) {
 					triangles.indices = attachment->getTriangles().buffer();
 					triangles.indexCount = (unsigned short)attachment->getTriangles().size();
-					triangles.verts = batch->allocateVertices(attachment->getWorldVerticesLength() / 2);
-					triangles.vertCount = attachment->getWorldVerticesLength() / 2;
+					triangles.verts = batch->allocateVertices((int)attachment->getWorldVerticesLength() / 2);
+					triangles.vertCount = (int)attachment->getWorldVerticesLength() / 2;
                     for (int v = 0, i = 0; v < triangles.vertCount; v++, i += 2) {
                         auto &texCoords = triangles.verts[v].texCoords;
                         texCoords.u = attachment->getUVs()[i];
@@ -343,8 +343,8 @@ namespace spine {
 				} else {
 					trianglesTwoColor.indices = attachment->getTriangles().buffer();
 					trianglesTwoColor.indexCount = (unsigned short)attachment->getTriangles().size();
-					trianglesTwoColor.verts = twoColorBatch->allocateVertices(attachment->getWorldVerticesLength() / 2);
-					trianglesTwoColor.vertCount = attachment->getWorldVerticesLength() / 2;
+					trianglesTwoColor.verts = twoColorBatch->allocateVertices((int)attachment->getWorldVerticesLength() / 2);
+					trianglesTwoColor.vertCount = (int)attachment->getWorldVerticesLength() / 2;
                     for (int v = 0, i = 0; v < trianglesTwoColor.vertCount; v++, i += 2) {
                         auto &texCoords = trianglesTwoColor.verts[v].texCoords;
                         texCoords.u = attachment->getUVs()[i];
@@ -408,9 +408,9 @@ namespace spine {
 						continue;
 					}
 
-					triangles.vertCount = _clipper->getClippedVertices().size() / 2;
+					triangles.vertCount = (int)_clipper->getClippedVertices().size() / 2;
 					triangles.verts = batch->allocateVertices(triangles.vertCount);
-					triangles.indexCount = _clipper->getClippedTriangles().size();
+					triangles.indexCount = (int)_clipper->getClippedTriangles().size();
 					triangles.indices = batch->allocateIndices(triangles.indexCount);
 					memcpy(triangles.indices, _clipper->getClippedTriangles().buffer(), sizeof(unsigned short) * _clipper->getClippedTriangles().size());
 
@@ -454,9 +454,9 @@ namespace spine {
 						continue;
 					}
 
-					trianglesTwoColor.vertCount = _clipper->getClippedVertices().size() / 2;
+					trianglesTwoColor.vertCount = (int)_clipper->getClippedVertices().size() / 2;
 					trianglesTwoColor.verts = twoColorBatch->allocateVertices(trianglesTwoColor.vertCount);
-					trianglesTwoColor.indexCount = _clipper->getClippedTriangles().size();
+					trianglesTwoColor.indexCount = (int)_clipper->getClippedTriangles().size();
 					trianglesTwoColor.indices = twoColorBatch->allocateIndices(trianglesTwoColor.indexCount);
 					memcpy(trianglesTwoColor.indices, _clipper->getClippedTriangles().buffer(), sizeof(unsigned short) * _clipper->getClippedTriangles().size());
 
@@ -576,7 +576,7 @@ namespace spine {
 			drawNode->setLineWidth(2.0f);
 #endif
 			V3F_C4B_T2F_Quad quad;
-			for (int i = 0, n = _skeleton->getSlots().size(); i < n; i++) {
+			for (int i = 0, n = (int)_skeleton->getSlots().size(); i < n; i++) {
 				Slot *slot = _skeleton->getDrawOrder()[i];
 
 				if (!slot->getBone().isActive()) continue;
@@ -606,7 +606,7 @@ namespace spine {
 #else
 			drawNode->setLineWidth(2.0f);
 #endif
-			for (int i = 0, n = _skeleton->getBones().size(); i < n; i++) {
+			for (int i = 0, n = (int)_skeleton->getBones().size(); i < n; i++) {
 				Bone *bone = _skeleton->getBones()[i];
 				if (!bone->isActive()) continue;
 				float x = bone->getData().getLength() * bone->getA() + bone->getWorldX();
@@ -615,7 +615,7 @@ namespace spine {
 			}
 			// Bone origins.
 			auto color = Color4F::BLUE;// Root bone is blue.
-			for (int i = 0, n = _skeleton->getBones().size(); i < n; i++) {
+			for (int i = 0, n = (int)_skeleton->getBones().size(); i < n; i++) {
 				Bone *bone = _skeleton->getBones()[i];
 				if (!bone->isActive()) continue;
 				drawNode->drawPoint(Vec2(bone->getWorldX(), bone->getWorldY()), 4, color);
@@ -630,7 +630,7 @@ namespace spine {
 #else
 			drawNode->setLineWidth(2.0f);
 #endif
-			for (int i = 0, n = _skeleton->getSlots().size(); i < n; ++i) {
+			for (int i = 0, n = (int)_skeleton->getSlots().size(); i < n; ++i) {
 				Slot *slot = _skeleton->getDrawOrder()[i];
 				if (!slot->getBone().isActive()) continue;
 				if (!slot->getAttachment() || !slot->getAttachment()->getRTTI().isExactly(MeshAttachment::rtti)) continue;

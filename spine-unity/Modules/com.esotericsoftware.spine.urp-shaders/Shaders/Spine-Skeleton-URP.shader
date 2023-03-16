@@ -66,6 +66,7 @@ Shader "Universal Render Pipeline/Spine/Skeleton" {
 			Tags{"LightMode" = "ShadowCaster"}
 
 			ZWrite On
+			ColorMask 0
 			ZTest LEqual
 			Cull Off
 
@@ -103,7 +104,7 @@ Shader "Universal Render Pipeline/Spine/Skeleton" {
 			Tags{"LightMode" = "DepthOnly"}
 
 			ZWrite On
-			ColorMask 0
+			ColorMask R
 			Cull Off
 
 			HLSLPROGRAM

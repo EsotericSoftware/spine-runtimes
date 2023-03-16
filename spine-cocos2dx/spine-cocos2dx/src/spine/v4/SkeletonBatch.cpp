@@ -132,7 +132,7 @@ namespace spine {
 	unsigned short *SkeletonBatch::allocateIndices(uint32_t numIndices) {
 		if (_indices.getCapacity() - _indices.size() < numIndices) {
 			unsigned short *oldData = _indices.buffer();
-			int oldSize = _indices.size();
+			int oldSize = (int)_indices.size();
 			_indices.ensureCapacity(_indices.size() + numIndices);
 			unsigned short *newData = _indices.buffer();
 			for (uint32_t i = 0; i < this->_nextFreeCommand; i++) {
@@ -187,8 +187,8 @@ namespace spine {
 
 	cocos2d::TrianglesCommand *SkeletonBatch::nextFreeCommand() {
 		if (_commandsPool.size() <= _nextFreeCommand) {
-			unsigned int newSize = _commandsPool.size() * 2 + 1;
-			for (int i = _commandsPool.size(); i < newSize; i++) {
+			unsigned int newSize = (int)_commandsPool.size() * 2 + 1;
+			for (int i = (int)_commandsPool.size(); i < newSize; i++) {
 				_commandsPool.push_back(createNewTrianglesCommand());
 			}
 		}

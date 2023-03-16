@@ -69,7 +69,7 @@ Atlas::Atlas(const char *data, int length, const char *dir, TextureLoader *textu
 Atlas::~Atlas() {
 	if (_textureLoader) {
 		for (size_t i = 0, n = _pages.size(); i < n; ++i) {
-			_textureLoader->unload(_pages[i]->getRendererObject());
+			_textureLoader->unload(_pages[i]->texture);
 		}
 	}
 	ContainerUtil::cleanUpVectorOfPointers(_pages);
@@ -108,21 +108,21 @@ struct SimpleString {
 		while (isspace((unsigned char) *start) && start < end)
 			start++;
 		if (start == end) {
-			length = end - start;
+			length = (int) (end - start);
 			return *this;
 		}
 		end--;
 		while (((unsigned char) *end == '\r') && end >= start)
 			end--;
 		end++;
-		length = end - start;
+		length = (int) (end - start);
 		return *this;
 	}
 
 	int indexOf(char needle) {
 		char *c = start;
 		while (c < end) {
-			if (*c == needle) return c - start;
+			if (*c == needle) return (int) (c - start);
 			c++;
 		}
 		return -1;
@@ -131,7 +131,7 @@ struct SimpleString {
 	int indexOf(char needle, int at) {
 		char *c = start + at;
 		while (c < end) {
-			if (*c == needle) return c - start;
+			if (*c == needle) return (int) (c - start);
 			c++;
 		}
 		return -1;
@@ -150,7 +150,7 @@ struct SimpleString {
 		SimpleString result;
 		result.start = start + s;
 		result.end = end;
-		result.length = result.end - result.start;
+		result.length = (int) (result.end - result.start);
 		return result;
 	}
 
@@ -286,10 +286,12 @@ void Atlas::load(const char *begin, int length, const char *dir, bool createText
 			} else {
 				page->texturePath = String(path, true);
 			}
+			page->index = (int) _pages.size();
 			_pages.add(page);
 		} else {
 			AtlasRegion *region = new (__FILE__, __LINE__) AtlasRegion();
 			region->page = page;
+			region->rendererObject = page->texture;
 			region->name = String(line->copy(), true);
 			while (true) {
 				line = reader.readLine();

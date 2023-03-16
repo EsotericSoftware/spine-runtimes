@@ -93,6 +93,7 @@ void register_spine_godot_types() {
 	GDREGISTER_CLASS(SpineSkeletonDataResource);
 	GDREGISTER_CLASS(SpineAnimationMix);
 	GDREGISTER_CLASS(SpineSprite);
+	GDREGISTER_CLASS(SpineMesh2D);
 	GDREGISTER_CLASS(SpineSkeleton);
 	GDREGISTER_CLASS(SpineAnimationState);
 	GDREGISTER_CLASS(SpineAnimation);
@@ -153,13 +154,8 @@ void uninitialize_spine_godot_module(ModuleInitializationLevel level) {
 #else
 void unregister_spine_godot_types() {
 #endif
-	/*ResourceLoader::remove_resource_format_loader(atlas_loader);
+	ResourceLoader::remove_resource_format_loader(atlas_loader);
 	ResourceSaver::remove_resource_format_saver(atlas_saver);
 	ResourceLoader::remove_resource_format_loader(skeleton_file_loader);
-	ResourceSaver::remove_resource_format_saver(skeleton_file_saver);*/
-
-	/*memdelete(atlas_loader);
-	memdelete(atlas_saver);
-	memdelete(skeleton_file_saver);
-	memdelete(skeleton_file_loader);*/
+	ResourceSaver::remove_resource_format_saver(skeleton_file_saver);
 }

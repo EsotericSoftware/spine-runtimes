@@ -497,7 +497,7 @@ namespace Spine.Unity.Editor {
 
 		static void AddDependentAtlasIfImageChanged (List<string> atlasPaths, List<string> imagePaths) {
 			foreach (string imagePath in imagePaths) {
-				string atlasPath = imagePath.Replace(".png", ".atlas.txt");
+				string atlasPath = Path.ChangeExtension(imagePath, ".atlas.txt");
 				if (!System.IO.File.Exists(atlasPath))
 					continue;
 
@@ -634,6 +634,7 @@ namespace Spine.Unity.Editor {
 			atlasAsset.atlasFile = atlasText;
 
 			List<string> pageFiles = new List<string>();
+			atlasAsset.Clear(); // force reload
 			Atlas atlas = atlasAsset.GetAtlas(onlyMetaData: true);
 			if (atlas != null) {
 				foreach (AtlasPage page in atlas.Pages)

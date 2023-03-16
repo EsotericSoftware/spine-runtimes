@@ -331,6 +331,25 @@ bool USpineWidget::HasBone(const FString BoneName) {
 	return false;
 }
 
+FTransform USpineWidget::GetBoneTransform(const FString &BoneName) {
+	CheckState();
+	if (skeleton) {
+		Bone *bone = skeleton->findBone(TCHAR_TO_UTF8(*BoneName));
+		if (!bone) return FTransform();
+
+		FMatrix localTransform;
+		localTransform.SetIdentity();
+		localTransform.SetAxis(2, FVector(bone->getA(), 0, bone->getC()));
+		localTransform.SetAxis(0, FVector(bone->getB(), 0, bone->getD()));
+		localTransform.SetOrigin(FVector(bone->getWorldX(), 0, bone->getWorldY()));
+
+		FTransform result;
+		result.SetFromMatrix(localTransform);
+		return result;
+	}
+	return FTransform();
+}
+
 void USpineWidget::GetSlots(TArray<FString> &Slots) {
 	CheckState();
 	if (skeleton) {

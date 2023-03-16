@@ -45,11 +45,11 @@ Starting from Spine 4.1, the version number is composed of the corresponding edi
 To add the spine-libgdx runtime to your Maven project, add this dependency:
 
 ```
-<depenency>
+<dependency>
 	<groupId>com.esotericsoftware.spine</groupId>
 	<artifactId>spine-libgdx</artifactId>
 	<version>4.0.18.1</version>
-</depenency>
+</dependency>
 ```
 
 For SNAPSHOT versions, add the SonaType Snapshot repository to your `pom.xml`:

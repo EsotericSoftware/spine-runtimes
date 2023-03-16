@@ -50,39 +50,71 @@ namespace spine {
 		friend class TransformConstraintTimeline;
 
 	public:
+		RTTI_DECL
+
 		explicit TransformConstraintData(const String &name);
 
 		Vector<BoneData *> &getBones();
 
 		BoneData *getTarget();
 
+        void setTarget(BoneData *target);
+
 		float getMixRotate();
+
+        void setMixRotate(float mixRotate);
 
 		float getMixX();
 
+        void setMixX(float mixX);
+
 		float getMixY();
+
+        void setMixY(float mixY);
 
 		float getMixScaleX();
 
+        void setMixScaleX(float mixScaleX);
+
 		float getMixScaleY();
+
+        void setMixScaleY(float mixScaleY);
 
 		float getMixShearY();
 
+        void setMixShearY(float mixShearY);
+
 		float getOffsetRotation();
+
+        void setOffsetRotation(float offsetRotation);
 
 		float getOffsetX();
 
+        void setOffsetX(float offsetX);
+
 		float getOffsetY();
+
+        void setOffsetY(float offsetY);
 
 		float getOffsetScaleX();
 
+        void setOffsetScaleX(float offsetScaleX);
+
 		float getOffsetScaleY();
+
+        void setOffsetScaleY(float offsetScaleY);
 
 		float getOffsetShearY();
 
+        void setOffsetShearY(float offsetShearY);
+
 		bool isRelative();
 
+        void setRelative(bool isRelative);
+
 		bool isLocal();
+
+        void setLocal(bool isLocal);
 
 	private:
 		Vector<BoneData *> _bones;

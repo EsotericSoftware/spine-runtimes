@@ -47,7 +47,7 @@ const int RegionAttachment::URY = 5;
 const int RegionAttachment::BRX = 6;
 const int RegionAttachment::BRY = 7;
 
-RegionAttachment::RegionAttachment(const String &name) : Attachment(name), HasRendererObject(),
+RegionAttachment::RegionAttachment(const String &name) : Attachment(name),
 														 _x(0),
 														 _y(0),
 														 _rotation(0),
@@ -259,7 +259,6 @@ spine::Color &RegionAttachment::getColor() {
 Attachment *RegionAttachment::copy() {
 	RegionAttachment *copy = new (__FILE__, __LINE__) RegionAttachment(getName());
 	copy->_region = _region;
-	copy->setRendererObject(getRendererObject());
 	copy->_path = _path;
 	copy->_x = _x;
 	copy->_y = _y;

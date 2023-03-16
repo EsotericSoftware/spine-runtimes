@@ -114,7 +114,7 @@ void Cocos2dTextureLoader::load(AtlasPage &page, const spine::String &path) {
 #endif
 		texture->setTexParameters(textureParams);
 
-		page.setRendererObject(texture);
+		page.texture = texture;
 		page.width = texture->getPixelsWide();
 		page.height = texture->getPixelsHigh();
 	}

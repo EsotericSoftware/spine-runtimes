@@ -173,17 +173,22 @@ namespace Spine.Unity.Editor {
 			if (EditorApplication.isPlayingOrWillChangePlaymode) return;
 
 			string[] folders = { "Assets", "Packages" };
-			string[] assets = AssetDatabase.FindAssets("t:script SpineEditorUtilities", folders);
-			string assetPath = AssetDatabase.GUIDToAssetPath(assets[0]);
-			editorPath = Path.GetDirectoryName(assetPath).Replace('\\', '/');
-
+			string[] assets;
+			string assetPath;
 			assets = AssetDatabase.FindAssets("t:texture icon-subMeshRenderer", folders);
 			if (assets.Length > 0) {
 				assetPath = AssetDatabase.GUIDToAssetPath(assets[0]);
 				editorGUIPath = Path.GetDirectoryName(assetPath).Replace('\\', '/');
-			} else {
-				editorGUIPath = editorPath.Replace("/Utility", "/GUI");
 			}
+			assets = AssetDatabase.FindAssets("t:script SpineEditorUtilities", folders);
+			if (assets.Length > 0) {
+				assetPath = AssetDatabase.GUIDToAssetPath(assets[0]);
+				editorPath = Path.GetDirectoryName(assetPath).Replace('\\', '/');
+				if (string.IsNullOrEmpty(editorGUIPath))
+					editorGUIPath = editorPath.Replace("/Utility", "/GUI");
+			}
+			if (string.IsNullOrEmpty(editorGUIPath))
+				return;
 			Icons.Initialize();
 
 			// Drag and Drop

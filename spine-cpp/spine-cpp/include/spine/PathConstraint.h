@@ -59,12 +59,17 @@ namespace spine {
 	public:
 		PathConstraint(PathConstraintData &data, Skeleton &skeleton);
 
-		/// Applies the constraint to the constrained bones.
-		void apply();
-
 		virtual void update();
 
 		virtual int getOrder();
+
+        PathConstraintData &getData();
+
+        Vector<Bone *> &getBones();
+
+        Slot *getTarget();
+
+        void setTarget(Slot *inValue);
 
 		float getPosition();
 
@@ -85,14 +90,6 @@ namespace spine {
 		float getMixY();
 
 		void setMixY(float inValue);
-
-		Vector<Bone *> &getBones();
-
-		Slot *getTarget();
-
-		void setTarget(Slot *inValue);
-
-		PathConstraintData &getData();
 
 		bool isActive();
 

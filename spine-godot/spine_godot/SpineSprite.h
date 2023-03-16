@@ -32,11 +32,80 @@
 #include "SpineSkeleton.h"
 #include "SpineAnimationState.h"
 #include "scene/2d/node_2d.h"
-#include "scene/2d/mesh_instance_2d.h"
 
 class SpineSlotNode;
 
-class SpineSprite : public Node2D, public spine::AnimationStateListenerObject {
+struct SpineRendererObject;
+
+class SpineSprite;
+
+class Attachment;
+
+class SpineMesh2D : public Node2D {
+	GDCLASS(SpineMesh2D, Node2D);
+
+	friend class SpineSprite;
+
+protected:
+	void _notification(int what);
+	static void _bind_methods();
+
+	Vector<Vector2> vertices;
+	Vector<Vector2> uvs;
+	Vector<Color> colors;
+	Vector<int> indices;
+	SpineRendererObject *renderer_object;
+
+#if VERSION_MAJOR > 3
+	uint64_t last_indices_id;
+	uint64_t indices_id;
+	RID mesh;
+	uint32_t surface_offsets[RS::ARRAY_MAX];
+	int num_vertices;
+	int num_indices;
+	PackedByteArray vertex_buffer;
+	PackedByteArray attribute_buffer;
+	uint32_t vertex_stride;
+	uint32_t attribute_stride;
+#else
+	uint64_t last_indices_id;
+	uint64_t indices_id;
+	RID mesh;
+	uint32_t surface_offsets[VS::ARRAY_MAX];
+	int num_vertices;
+	int num_indices;
+	uint32_t mesh_surface_offsets[VS::ARRAY_MAX];
+	PoolByteArray mesh_buffer;
+	uint32_t mesh_stride[VS::ARRAY_MAX];
+	uint32_t mesh_surface_format;
+#endif
+
+public:
+#if VERSION_MAJOR > 3
+	SpineMesh2D() : renderer_object(nullptr), last_indices_id(0), indices_id(0), num_vertices(0), num_indices(0), vertex_stride(0), attribute_stride(0){};
+	~SpineMesh2D() {
+		if (mesh.is_valid()) {
+			RS::get_singleton()->free(mesh);
+		}
+	}
+#else
+	SpineMesh2D() : renderer_object(nullptr), last_indices_id(0), indices_id(0), num_vertices(0), num_indices(0){};
+	~SpineMesh2D() {
+		if (mesh.is_valid()) {
+			VS::get_singleton()->free(mesh);
+		}
+	}
+#endif
+
+	void update_mesh(const Vector<Point2> &vertices,
+					 const Vector<Point2> &uvs,
+					 const Vector<Color> &colors,
+					 const Vector<int> &indices,
+					 SpineRendererObject *renderer_object);
+};
+
+class SpineSprite : public Node2D,
+					public spine::AnimationStateListenerObject {
 	GDCLASS(SpineSprite, Node2D)
 
 	friend class SpineBone;
@@ -52,6 +121,8 @@ protected:
 	bool preview_frame;
 	float preview_time;
 
+	bool debug_root;
+	Color debug_root_color;
 	bool debug_bones;
 	Color debug_bones_color;
 	float debug_bones_thickness;
@@ -67,7 +138,7 @@ protected:
 	Color debug_clipping_color;
 
 	spine::Vector<spine::Vector<SpineSlotNode *>> slot_nodes;
-	Vector<MeshInstance2D *> mesh_instances;
+	Vector<SpineMesh2D *> mesh_instances;
 	static Ref<CanvasItemMaterial> default_materials[4];
 	Ref<Material> normal_material;
 	Ref<Material> additive_material;
@@ -133,6 +204,14 @@ public:
 	Ref<Material> get_screen_material();
 
 	void set_screen_material(Ref<Material> material);
+
+	bool get_debug_root() { return debug_root; }
+
+	void set_debug_root(bool root) { debug_root = root; }
+
+	Color get_debug_root_color() { return debug_root_color; }
+
+	void set_debug_root_color(const Color &color) { debug_root_color = color; }
 
 	bool get_debug_bones() { return debug_bones; }
 

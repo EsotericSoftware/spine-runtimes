@@ -38,9 +38,6 @@ struct VertexOutputLWRP
 #if defined(NEEDS_POSITION_WS)
 	float4 positionWS : TEXCOORD8;
 #endif
-#if defined(_ADDITIONAL_LIGHTS)
-	float4 positionCS : TEXCOORD9;
-#endif
 
 	UNITY_VERTEX_OUTPUT_STEREO
 };
@@ -126,15 +123,15 @@ half4 LightweightFragmentPBRSimplified(InputData inputData, half4 texAlbedoAlpha
 	Light mainLight = GetMainLight();
 #endif
 
-	half3 finalColor = inputData.bakedGI;
+	half3 finalColor = inputData.bakedGI * albedo.rgb;
 	finalColor += LightingPhysicallyBased(brdfData, mainLight, inputData.normalWS, inputData.viewDirectionWS);
 #else // _MAIN_LIGHT_VERTEX
-	half3 finalColor = inputData.bakedGI;
+	half3 finalColor = inputData.bakedGI * albedo.rgb;
 #endif // _MAIN_LIGHT_VERTEX
 
 #ifdef _ADDITIONAL_LIGHTS
 	uint meshRenderingLayers = GetMeshRenderingLayerBackwardsCompatible();
-	
+
 #if defined(_ADDITIONAL_LIGHT_SHADOWS) && !defined(_RECEIVE_SHADOWS_OFF)
 	half4 shadowMask = CalculateShadowMaskBackwardsCompatible(inputData);
 #else
@@ -142,12 +139,13 @@ half4 LightweightFragmentPBRSimplified(InputData inputData, half4 texAlbedoAlpha
 #endif
 
 #if USE_FORWARD_PLUS
-	for (uint lightIndex = 0; lightIndex < min(_AdditionalLightsDirectionalCount, MAX_VISIBLE_LIGHTS); lightIndex++)
+	for (uint lightIndex = 0; lightIndex < min(URP_FP_DIRECTIONAL_LIGHTS_COUNT, MAX_VISIBLE_LIGHTS); lightIndex++)
 	{
+		FORWARD_PLUS_SUBTRACTIVE_LIGHT_CHECK
 		finalColor += ProcessLightPBRSimplified(inputData, brdfData, shadowMask, meshRenderingLayers, lightIndex);
 	}
 #endif
-	int pixelLightCount = GetAdditionalLightsCount();
+	uint pixelLightCount = GetAdditionalLightsCount();
 	LIGHT_LOOP_BEGIN_SPINE(pixelLightCount)
 		finalColor += ProcessLightPBRSimplified(inputData, brdfData, shadowMask, meshRenderingLayers, lightIndex);
 	LIGHT_LOOP_END_SPINE
@@ -217,16 +215,17 @@ half4 LightweightFragmentBlinnPhongSimplified(InputData inputData, half4 texDiff
 	half4 shadowMask = half4(1, 1, 1, 1);
 #endif
 #if USE_FORWARD_PLUS
-	for (uint lightIndex = 0; lightIndex < min(_AdditionalLightsDirectionalCount, MAX_VISIBLE_LIGHTS); lightIndex++)
+	for (uint lightIndex = 0; lightIndex < min(URP_FP_DIRECTIONAL_LIGHTS_COUNT, MAX_VISIBLE_LIGHTS); lightIndex++)
 	{
+		FORWARD_PLUS_SUBTRACTIVE_LIGHT_CHECK
 		diffuseLighting += ProcessLightLambert(inputData, shadowMask, meshRenderingLayers, lightIndex);
 	}
 #endif
-	int pixelLightCount = GetAdditionalLightsCount();
-	LIGHT_LOOP_BEGIN(pixelLightCount)
+	uint pixelLightCount = GetAdditionalLightsCount();
+	LIGHT_LOOP_BEGIN_SPINE(pixelLightCount)
 		diffuseLighting += ProcessLightLambert(inputData, shadowMask, meshRenderingLayers, lightIndex);
-	LIGHT_LOOP_END
-    
+	LIGHT_LOOP_END_SPINE
+
 #endif
 #ifdef _ADDITIONAL_LIGHTS_VERTEX
 	diffuseLighting += inputData.vertexLighting;
@@ -259,9 +258,6 @@ VertexOutputLWRP ForwardPassVertexSprite(VertexInput input)
 #if defined(NEEDS_POSITION_WS)
 	output.positionWS = float4(positionWS, 1);
 #endif
-#if defined(_ADDITIONAL_LIGHTS)
-	output.positionCS = output.pos;
-#endif
 
 	half3 normalWS = calculateSpriteWorldNormal(input, -backFaceSign);
 	output.normalWorld.xyz = normalWS;
@@ -289,7 +285,7 @@ VertexOutputLWRP ForwardPassVertexSprite(VertexInput input)
 }
 
 half4 ForwardPassFragmentSprite(VertexOutputLWRP input
-#ifdef _WRITE_RENDERING_LAYERS
+#ifdef USE_WRITE_RENDERING_LAYERS
 	, out float4 outRenderingLayers : SV_Target1
 #endif
 ) : SV_Target0
@@ -306,7 +302,7 @@ half4 ForwardPassFragmentSprite(VertexOutputLWRP input
 	#if defined(REQUIRES_VERTEX_SHADOW_COORD_INTERPOLATOR)
 		inputData.shadowCoord = input.shadowCoord;
 	#elif defined(MAIN_LIGHT_CALCULATE_SHADOWS)
-		inputData.shadowCoord = TransformWorldToShadowCoord(input.positionWS);
+		inputData.shadowCoord = TransformWorldToShadowCoord(input.positionWS.xyz);
 	#elif defined(_MAIN_LIGHT_SHADOWS)
 		inputData.shadowCoord = input.shadowCoord;
 	#else
@@ -329,7 +325,7 @@ half4 ForwardPassFragmentSprite(VertexOutputLWRP input
 	inputData.positionWS = input.positionWS.rgb;
 #endif
 #if defined(_ADDITIONAL_LIGHTS) && USE_FORWARD_PLUS
-	inputData.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(input.positionCS);
+	inputData.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(input.pos);
 #else
 	inputData.normalizedScreenSpaceUV = 0;
 #endif
@@ -356,7 +352,7 @@ half4 ForwardPassFragmentSprite(VertexOutputLWRP input
 	COLORISE(pixel)
 	APPLY_FOG_LWRP(pixel, input.fogFactorAndVertexLight.x)
 
-#ifdef _WRITE_RENDERING_LAYERS
+#ifdef USE_WRITE_RENDERING_LAYERS
 	uint renderingLayers = GetMeshRenderingLayerBackwardsCompatible();
 	outRenderingLayers = float4(EncodeMeshRenderingLayer(renderingLayers), 0, 0, 0);
 #endif

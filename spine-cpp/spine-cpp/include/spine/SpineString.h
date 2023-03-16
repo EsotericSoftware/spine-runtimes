@@ -36,11 +36,6 @@
 #include <string.h>
 #include <stdio.h>
 
-// Required for sprintf on MSVC
-#ifdef _MSC_VER
-#pragma warning(disable:4996)
-#endif
-
 namespace spine {
 	class SP_API String : public SpineObject {
 	public:
@@ -170,14 +165,14 @@ namespace spine {
 
 		String &append(int other) {
 			char str[100];
-			sprintf(str, "%i", other);
+			snprintf(str, 100, "%i", other);
 			append(str);
 			return *this;
 		}
 
 		String &append(float other) {
 			char str[100];
-			sprintf(str, "%f", other);
+			snprintf(str, 100, "%f", other);
 			append(str);
 			return *this;
 		}

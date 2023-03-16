@@ -75,7 +75,7 @@ public:
 			auto renderer_object = memnew(SpineRendererObject);
 			renderer_object->texture = Ref<Texture>(nullptr);
 			renderer_object->normal_map = Ref<Texture>(nullptr);
-			page.setRendererObject((void *) renderer_object);
+			page.texture = (void *) renderer_object;
 			return;
 		}
 
@@ -97,7 +97,7 @@ public:
 		renderer_object->canvas_texture->set_normal_texture(renderer_object->normal_map);
 #endif
 
-		page.setRendererObject((void *) renderer_object);
+		page.texture = (void *) renderer_object;
 		page.width = texture->get_width();
 		page.height = texture->get_height();
 	}
@@ -247,7 +247,7 @@ void SpineAtlasResourceFormatLoader::get_recognized_extensions(List<String> *ext
 }
 
 String SpineAtlasResourceFormatLoader::get_resource_type(const String &path) const {
-	return "SpineAtlasResource";
+	return path.ends_with("spatlas") || path.ends_with(".atlas") ? "SpineAtlasResource" : "";
 }
 
 bool SpineAtlasResourceFormatLoader::handles_type(const String &type) const {

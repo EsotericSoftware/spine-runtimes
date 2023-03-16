@@ -28,13 +28,12 @@
  *****************************************************************************/
 
 #include <spine/MeshAttachment.h>
-#include <spine/HasRendererObject.h>
 
 using namespace spine;
 
 RTTI_IMPL(MeshAttachment, VertexAttachment)
 
-MeshAttachment::MeshAttachment(const String &name) : VertexAttachment(name), HasRendererObject(),
+MeshAttachment::MeshAttachment(const String &name) : VertexAttachment(name),
 													 _parentMesh(NULL),
 													 _path(),
 													 _color(1, 1, 1, 1),
@@ -53,10 +52,13 @@ void MeshAttachment::updateRegion() {
 		_uvs.setSize(_regionUVs.size(), 0);
 	}
 
+	if (_region == nullptr) {
+		return;
+	}
+
 	int i = 0, n = (int) _regionUVs.size();
 	float u = _region->u, v = _region->v;
 	float width = 0, height = 0;
-
 	switch (_region->degrees) {
 		case 90: {
 			float textureWidth = _region->height / (_region->u2 - _region->u);
@@ -203,7 +205,6 @@ Attachment *MeshAttachment::copy() {
 	if (_parentMesh) return newLinkedMesh();
 
 	MeshAttachment *copy = new (__FILE__, __LINE__) MeshAttachment(getName());
-	copy->setRendererObject(getRendererObject());
 	copy->setRegion(_region);
 	copy->setSequence(_sequence != NULL ? _sequence->copy() : NULL);
 	copy->_path = _path;
@@ -224,7 +225,6 @@ Attachment *MeshAttachment::copy() {
 
 MeshAttachment *MeshAttachment::newLinkedMesh() {
 	MeshAttachment *copy = new (__FILE__, __LINE__) MeshAttachment(getName());
-	copy->setRendererObject(getRendererObject());
 	copy->setRegion(_region);
 	copy->_path = _path;
 	copy->_color.set(_color);

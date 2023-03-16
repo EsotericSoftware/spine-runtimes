@@ -65,19 +65,15 @@ public:
 	// Need to hold on to the dynamic instances, or the GC will kill us while updating them
 	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadWrite)
 	TArray<UMaterialInstanceDynamic *> atlasNormalBlendMaterials;
-	TMap<spine::AtlasPage *, UMaterialInstanceDynamic *> pageToNormalBlendMaterial;
 
 	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadWrite)
 	TArray<UMaterialInstanceDynamic *> atlasAdditiveBlendMaterials;
-	TMap<spine::AtlasPage *, UMaterialInstanceDynamic *> pageToAdditiveBlendMaterial;
 
 	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadWrite)
 	TArray<UMaterialInstanceDynamic *> atlasMultiplyBlendMaterials;
-	TMap<spine::AtlasPage *, UMaterialInstanceDynamic *> pageToMultiplyBlendMaterial;
 
 	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadWrite)
 	TArray<UMaterialInstanceDynamic *> atlasScreenBlendMaterials;
-	TMap<spine::AtlasPage *, UMaterialInstanceDynamic *> pageToScreenBlendMaterial;
 
 	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadWrite)
 	float DepthOffset = 0.1f;
@@ -95,14 +91,23 @@ public:
 	virtual void FinishDestroy() override;
 
 protected:
-	void UpdateRendererMaterial(spine::AtlasPage *CurrentPage, UTexture2D *Texture,
-								UMaterialInstanceDynamic *&CurrentInstance, UMaterialInterface *ParentMaterial,
-								TMap<spine::AtlasPage *, UMaterialInstanceDynamic *> &PageToBlendMaterial);
+	void UpdateMaterial(UTexture2D *Texture, UMaterialInstanceDynamic *&CurrentInstance, UMaterialInterface *ParentMaterial);
 
-	void UpdateMesh(spine::Skeleton *Skeleton);
+	void UpdateMesh(USpineSkeletonComponent *component, spine::Skeleton *Skeleton);
 
-	void Flush(int &Idx, TArray<FVector> &Vertices, TArray<int32> &Indices, TArray<FVector> &Normals, TArray<FVector2D> &Uvs, TArray<FColor> &Colors, TArray<FVector> &Colors2, UMaterialInstanceDynamic *Material);
+	void Flush(int &Idx, TArray<FVector> &Vertices, TArray<int32> &Indices, TArray<FVector> &Normals, TArray<FVector2D> &Uvs, TArray<FColor> &Colors, UMaterialInstanceDynamic *Material);
 
 	spine::Vector<float> worldVertices;
 	spine::SkeletonClipping clipper;
+
+	UPROPERTY();
+	TArray<FVector> vertices;
+	UPROPERTY();
+	TArray<int32> indices;
+	UPROPERTY();
+	TArray<FVector> normals;
+	UPROPERTY();
+	TArray<FVector2D> uvs;
+	UPROPERTY();
+	TArray<FColor> colors;
 };

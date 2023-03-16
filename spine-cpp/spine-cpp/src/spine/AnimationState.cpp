@@ -211,17 +211,16 @@ EventQueueEntry::EventQueueEntry(EventType eventType, TrackEntry *trackEntry, Ev
 																							  _event(event) {
 }
 
-EventQueue *EventQueue::newEventQueue(AnimationState &state, Pool<TrackEntry> &trackEntryPool) {
-	return new (__FILE__, __LINE__) EventQueue(state, trackEntryPool);
+EventQueue *EventQueue::newEventQueue(AnimationState &state) {
+	return new (__FILE__, __LINE__) EventQueue(state);
 }
 
 EventQueueEntry EventQueue::newEventQueueEntry(EventType eventType, TrackEntry *entry, Event *event) {
 	return EventQueueEntry(eventType, entry, event);
 }
 
-EventQueue::EventQueue(AnimationState &state, Pool<TrackEntry> &trackEntryPool) : _state(state),
-																				  _trackEntryPool(trackEntryPool),
-																				  _drainDisabled(false) {
+EventQueue::EventQueue(AnimationState &state) : _state(state),
+												_drainDisabled(false) {
 }
 
 EventQueue::~EventQueue() {
@@ -295,8 +294,7 @@ void EventQueue::drain() {
 				else
 					state._listenerObject->callback(&state, EventType_Dispose, trackEntry, NULL);
 
-				trackEntry->reset();
-				_trackEntryPool.free(trackEntry);
+				if (!_state.getManualTrackEntryDisposal()) _state.disposeTrackEntry(trackEntry);
 				break;
 			case EventType_Event:
 				if (!trackEntry->_listenerObject)
@@ -315,12 +313,13 @@ void EventQueue::drain() {
 }
 
 AnimationState::AnimationState(AnimationStateData *data) : _data(data),
-														   _queue(EventQueue::newEventQueue(*this, _trackEntryPool)),
+														   _queue(EventQueue::newEventQueue(*this)),
 														   _animationsChanged(false),
 														   _listener(dummyOnAnimationEventFunc),
 														   _listenerObject(NULL),
 														   _unkeyedState(0),
-														   _timeScale(1) {
+														   _timeScale(1),
+														   _manualTrackEntryDisposal(false) {
 }
 
 AnimationState::~AnimationState() {
@@ -664,6 +663,19 @@ void AnimationState::disableQueue() {
 
 void AnimationState::enableQueue() {
 	_queue->_drainDisabled = false;
+}
+
+void AnimationState::setManualTrackEntryDisposal(bool inValue) {
+	_manualTrackEntryDisposal = inValue;
+}
+
+bool AnimationState::getManualTrackEntryDisposal() {
+	return _manualTrackEntryDisposal;
+}
+
+void AnimationState::disposeTrackEntry(TrackEntry *entry) {
+	entry->reset();
+	_trackEntryPool.free(entry);
 }
 
 Animation *AnimationState::getEmptyAnimation() {

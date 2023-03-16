@@ -27,7 +27,9 @@
   * Support for `shortestRotation` in animation state. See https://github.com/esotericsoftware/spine-runtimes/issues/2027.
   * Added CMake parameter `SPINE_SANITIZE` which will enable sanitizers on macOS and Linux.
     * Added `SPINE_MAJOR_VERSION`, `SPINE_MINOR_VERSION`, and `SPINE_VERSION_STRING`. Parsing skeleton .JSON and .skel files will report an error if the skeleton version does not match the runtime version.
+  * Added `SkeletonBounds::getBoundingBox()`, `SkeletonBounds::getPolygons()`, and `SkeletonBounds::getBoundingBoxes()`.
 * **Breaking changes**
+  * `RegionAttachment` and `MeshAttachment` no longer implement `HasRendererObject`.
   * `RegionAttachment` and `MeshAttachment` now contain a `TextureRegion*` instead of encoding region fields directly.
   * `AttachmentLoader::newRegionAttachment()` and `AttachmentLoader::newMeshAttachment()` now take an additional `Sequence*` parameter.
   * `MeshAttachment::updateUVs()` was renamed to `MeshAttachment::updateRegion()`.
@@ -36,7 +38,7 @@
   * `VertexAttachment::getDeformAttachment()` was renamed to `VertexAttachment::getTimelineAttachment()`.
   * `Skeleton::update()` has been removed.
   * `Skeleton::getTime()` has been removed.
-  * `VertexEffect` has been removed.
+  * `VertexEffect` has been removed.  
   
 ### Cocos2d-x
 
@@ -143,7 +145,7 @@
   * `VertexEffect` has been removed.
 
 ### WebGL backend
-  * `PolygonBatcher.start()` now disables culling and restores the previous state on `PolygonBatcher.end()`.
+  * `PolygonBatcher` can now disable culling automatically if the static variable `PolygonBatcher.disableCulling` is set to true.
   * Added `SpineCanvas`, a simpler way to render a scene via spine-webgl. See `spine-ts/spine-webgl/examples/barebones.html` and `spine-ts/spine-webgl/examples/mix-and-match.html`.
 
 ### Canvas backend
