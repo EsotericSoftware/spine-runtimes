@@ -102,12 +102,6 @@
     <Compile Include="..\..\spine-csharp\src\SlotData.cs">
       <Link>spine-csharp\SlotData.cs</Link>
     </Compile>
-    <Compile Include="..\..\spine-csharp\src\SpringConstraint.cs">
-      <Link>spine-csharp\SpringConstraint.cs</Link>
-    </Compile>
-    <Compile Include="..\..\spine-csharp\src\SpringConstraintData.cs">
-      <Link>spine-csharp\SpringConstraintData.cs</Link>
-    </Compile>
     <Compile Include="..\..\spine-csharp\src\TextureRegion.cs">
       <Link>spine-csharp\TextureRegion.cs</Link>
     </Compile>
@@ -259,12 +253,6 @@
     </None>
     <None Include="..\..\spine-csharp\src\spine-csharp.asmdef.meta">
       <Link>spine-csharp\spine-csharp.asmdef.meta</Link>
-    </None>
-    <None Include="..\..\spine-csharp\src\SpringConstraint.cs.meta">
-      <Link>spine-csharp\SpringConstraint.cs.meta</Link>
-    </None>
-    <None Include="..\..\spine-csharp\src\SpringConstraintData.cs.meta">
-      <Link>spine-csharp\SpringConstraintData.cs.meta</Link>
     </None>
     <None Include="..\..\spine-csharp\src\TransformConstraint.cs.meta">
       <Link>spine-csharp\TransformConstraint.cs.meta</Link>
