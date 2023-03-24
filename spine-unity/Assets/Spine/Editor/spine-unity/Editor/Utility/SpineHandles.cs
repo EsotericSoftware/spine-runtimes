@@ -424,6 +424,42 @@ namespace Spine.Unity.Editor {
 			}
 		}
 
+		public static void DrawReferenceRect (SkeletonGraphic skeletonGraphic, Color color) {
+			RectTransform rectTransform = skeletonGraphic.rectTransform;
+			Vector2 referenceRectSize = skeletonGraphic.GetReferenceRectSize();
+			Vector3 position = rectTransform.position;
+			Vector3 right = rectTransform.TransformVector(Vector3.right * referenceRectSize.x);
+			Vector3 up = rectTransform.TransformVector(Vector3.up * referenceRectSize.y);
+
+			Vector3 cornerVertexBL = position - rectTransform.pivot.x * right - rectTransform.pivot.y * up;
+			DrawRect(cornerVertexBL, right, up, color);
+		}
+
+		public static void DrawRectTransformRect (SkeletonGraphic skeletonGraphic, Color color) {
+			RectTransform rectTransform = skeletonGraphic.rectTransform;
+			Vector2 rectTransformSize = skeletonGraphic.RectTransformSize;
+			Vector3 position = rectTransform.position;
+			Vector3 right = rectTransform.TransformVector(Vector3.right * rectTransformSize.x);
+			Vector3 up = rectTransform.TransformVector(Vector3.up * rectTransformSize.y);
+
+			Vector3 cornerVertexBL = position - rectTransform.pivot.x * right - rectTransform.pivot.y * up;
+			DrawRect(cornerVertexBL, right, up, color);
+		}
+
+		public static void DrawRect (Vector3 cornerVertexBL, Vector3 right, Vector3 up, Color color) {
+			Vector3 v0 = cornerVertexBL;
+			Vector3 v1 = v0 + right;
+			Vector3 v2 = v0 + right + up;
+			Vector3 v3 = v0 + up;
+			Color previousColor = UnityEditor.Handles.color;
+			UnityEditor.Handles.color = color;
+			UnityEditor.Handles.DrawLine(v0, v1);
+			UnityEditor.Handles.DrawLine(v1, v2);
+			UnityEditor.Handles.DrawLine(v2, v3);
+			UnityEditor.Handles.DrawLine(v3, v0);
+			UnityEditor.Handles.color = previousColor;
+		}
+
 		static void DrawCrosshairs2D (Vector3 position, float scale, float skeletonRenderScale = 1f) {
 			scale *= SpineEditorUtilities.Preferences.handleScale * skeletonRenderScale;
 			Handles.DrawLine(position + new Vector3(-scale, 0), position + new Vector3(scale, 0));
