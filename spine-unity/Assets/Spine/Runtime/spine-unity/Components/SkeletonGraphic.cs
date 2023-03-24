@@ -588,7 +588,7 @@ namespace Spine.Unity {
 				if (parentTransform)
 					parentSize = parentTransform.rect.size;
 			}
-			Vector2 anchorAreaSize = target.rectTransform.anchorMax * parentSize - target.rectTransform.anchorMin * parentSize;
+			Vector2 anchorAreaSize = Vector2.Scale(target.rectTransform.anchorMax - target.rectTransform.anchorMin, parentSize);
 			target.rectTransform.sizeDelta = size - anchorAreaSize;
 		}
 
