@@ -57,7 +57,7 @@ namespace Spine.Unity.Editor {
 		SerializedProperty additiveMaterial, multiplyMaterial, screenMaterial;
 		SerializedProperty skeletonDataAsset, initialSkinName;
 		SerializedProperty startingAnimation, startingLoop, timeScale, freeze,
-			updateTiming, updateWhenInvisible, unscaledTime, tintBlack;
+			updateTiming, updateWhenInvisible, unscaledTime, tintBlack, layoutScaleMode, editReferenceRect;
 		SerializedProperty initialFlipX, initialFlipY;
 		SerializedProperty meshGeneratorSettings;
 		SerializedProperty allowMultipleCanvasRenderers, separatorSlotNames, enableSeparatorSlots, updateSeparatorPartLocation;
@@ -76,8 +76,8 @@ namespace Spine.Unity.Editor {
 		protected bool TargetIsValid {
 			get {
 				if (serializedObject.isEditingMultipleObjects) {
-					foreach (UnityEngine.Object o in targets) {
-						SkeletonGraphic component = (SkeletonGraphic)o;
+					foreach (UnityEngine.Object c in targets) {
+						SkeletonGraphic component = (SkeletonGraphic)c;
 						if (!component.IsValid)
 							return false;
 					}
@@ -129,6 +129,8 @@ namespace Spine.Unity.Editor {
 			freeze = so.FindProperty("freeze");
 			updateTiming = so.FindProperty("updateTiming");
 			updateWhenInvisible = so.FindProperty("updateWhenInvisible");
+			layoutScaleMode = so.FindProperty("layoutScaleMode");
+			editReferenceRect = so.FindProperty("editReferenceRect");
 
 			meshGeneratorSettings = so.FindProperty("meshGenerator").FindPropertyRelative("settings");
 			meshGeneratorSettings.isExpanded = SkeletonRendererInspector.advancedFoldout;
@@ -139,6 +141,13 @@ namespace Spine.Unity.Editor {
 
 			separatorSlotNames = so.FindProperty("separatorSlotNames");
 			separatorSlotNames.isExpanded = true;
+		}
+
+		void OnDisable () {
+			foreach (UnityEngine.Object c in targets) {
+				SkeletonGraphic component = (SkeletonGraphic)c;
+				component.EditReferenceRect = false;
+			}
 		}
 
 		public override void OnInspectorGUI () {
@@ -299,14 +308,29 @@ namespace Spine.Unity.Editor {
 			EditorGUILayout.PropertyField(raycastTarget);
 			if (maskable != null) EditorGUILayout.PropertyField(maskable);
 
-			EditorGUILayout.BeginHorizontal(GUILayout.Height(EditorGUIUtility.singleLineHeight + 5));
-			EditorGUILayout.PrefixLabel("Match RectTransform with Mesh");
-			if (GUILayout.Button("Match", EditorStyles.miniButton, GUILayout.Width(65f))) {
-				foreach (UnityEngine.Object skeletonGraphic in targets) {
-					MatchRectTransformWithBounds((SkeletonGraphic)skeletonGraphic);
-				}
+			EditorGUILayout.PropertyField(layoutScaleMode);
+
+			using (new EditorGUI.DisabledGroupScope(layoutScaleMode.intValue == 0)) {
+				EditorGUILayout.BeginHorizontal(GUILayout.Height(EditorGUIUtility.singleLineHeight + 5));
+				EditorGUILayout.PrefixLabel("Edit Layout Bounds");
+				editReferenceRect.boolValue = GUILayout.Toggle(editReferenceRect.boolValue,
+					EditorGUIUtility.IconContent("EditCollider"), EditorStyles.miniButton, GUILayout.Width(40f));
+				EditorGUILayout.EndHorizontal();
 			}
-			EditorGUILayout.EndHorizontal();
+			if (layoutScaleMode.intValue == 0) {
+				editReferenceRect.boolValue = false;
+			}
+
+			using (new EditorGUI.DisabledGroupScope(editReferenceRect.boolValue == false && layoutScaleMode.intValue != 0)) {
+				EditorGUILayout.BeginHorizontal(GUILayout.Height(EditorGUIUtility.singleLineHeight + 5));
+				EditorGUILayout.PrefixLabel("Match RectTransform with Mesh");
+				if (GUILayout.Button("Match", EditorStyles.miniButton, GUILayout.Width(65f))) {
+					foreach (UnityEngine.Object skeletonGraphic in targets) {
+						MatchRectTransformWithBounds((SkeletonGraphic)skeletonGraphic);
+					}
+				}
+				EditorGUILayout.EndHorizontal();
+			}
 
 			if (TargetIsValid && !isInspectingPrefab) {
 				EditorGUILayout.Space();
@@ -320,7 +344,6 @@ namespace Spine.Unity.Editor {
 			}
 
 			wasChanged |= EditorGUI.EndChangeCheck();
-
 			if (wasChanged) {
 				serializedObject.ApplyModifiedProperties();
 				slotsReapplyRequired = true;
@@ -344,6 +367,18 @@ namespace Spine.Unity.Editor {
 					return true;
 			}
 			return false;
+		}
+
+		protected void OnSceneGUI () {
+			SkeletonGraphic skeletonGraphic = (SkeletonGraphic)target;
+			if (skeletonGraphic.EditReferenceRect) {
+				SpineHandles.DrawRectTransformRect(skeletonGraphic, Color.gray);
+				SpineHandles.DrawReferenceRect(skeletonGraphic, Color.green);
+			} else {
+				SpineHandles.DrawReferenceRect(skeletonGraphic, Color.blue);
+			}
+
+
 		}
 
 		protected void AssignDefaultBlendModeMaterials () {
