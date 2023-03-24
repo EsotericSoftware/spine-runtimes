@@ -31,6 +31,7 @@
 * **Additions**
   * `OnPostProcessVertices` callback parameter `MeshGeneratorBuffers` now provides access to `uv2Buffer` and `uv3Buffer` properties of `MeshGenerator`, automatically allocating buffers upon access if `tintBlack` is disabled. This allows for passing own vertex data to a shader on second and third uv channels.
   * Added `Spine/SkeletonGraphic Grayscale` shader to provide a basic grayscale shader for SkeletonGraphic as well. SkeletonGraphic Material `SkeletonGraphicDefaultGrayscale` uses this shader and can be assigned at `SkeletonGraphic` components as usual.
+  * `SkeletonGraphic` now supports automatic scaling based on its `RectTransform` bounds. Automatic scaling can be enabled by setting the added `Layout Scale Mode` Inspector property to either `Width Controls Height`, `Height Controls Width`, `FitInParent` or `EnvelopeParent`. It is set to `None` by default to keep previous behaviour and avoid breaking existing projects. To modify the reference layout bounds, hit the additional `Edit Layout Bounds` toggle button to switch into edit mode, adjust the bounds or hit `Match RectTransform with Mesh`, and hit the button again when done adjusting. The skeleton will now be scaled accordingly to fit the reference layout bounds to the object's `RectTransform`.
 
 * **Breaking changes**
   
