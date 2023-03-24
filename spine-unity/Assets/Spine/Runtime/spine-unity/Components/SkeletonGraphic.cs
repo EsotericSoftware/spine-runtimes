@@ -89,8 +89,8 @@ namespace Spine.Unity {
 #else
 		protected const bool EditReferenceRect = false;
 #endif
-/// <summary>Update mode to optionally limit updates to e.g. only apply animations but not update the mesh.</summary>
-public UpdateMode UpdateMode { get { return updateMode; } set { updateMode = value; } }
+		/// <summary>Update mode to optionally limit updates to e.g. only apply animations but not update the mesh.</summary>
+		public UpdateMode UpdateMode { get { return updateMode; } set { updateMode = value; } }
 		protected UpdateMode updateMode = UpdateMode.FullUpdate;
 
 		/// <summary>Update mode used when the MeshRenderer becomes invisible
@@ -1142,7 +1142,7 @@ public UpdateMode UpdateMode { get { return updateMode; } set { updateMode = val
 		protected float GetLayoutScale (LayoutMode mode) {
 			Vector2 currentSize = GetCurrentRectSize();
 			float referenceAspect = referenceSize.x / referenceSize.y;
-				float frameAspect = currentSize.x / currentSize.y;
+			float frameAspect = currentSize.x / currentSize.y;
 			if (mode == LayoutMode.FitInParent)
 				mode = frameAspect > referenceAspect ? LayoutMode.HeightControlsWidth : LayoutMode.WidthControlsHeight;
 			else if (mode == LayoutMode.EnvelopeParent)
