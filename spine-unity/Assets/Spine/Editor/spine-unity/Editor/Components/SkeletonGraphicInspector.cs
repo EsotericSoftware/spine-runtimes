@@ -141,9 +141,20 @@ namespace Spine.Unity.Editor {
 
 			separatorSlotNames = so.FindProperty("separatorSlotNames");
 			separatorSlotNames.isExpanded = true;
+
+			EditorApplication.playModeStateChanged += OnPlaymodeChanged;
 		}
 
 		void OnDisable () {
+			EditorApplication.playModeStateChanged -= OnPlaymodeChanged;
+			DisableEditReferenceRectMode();
+		}
+
+		void OnPlaymodeChanged (PlayModeStateChange mode) {
+			DisableEditReferenceRectMode();
+		}
+
+		void DisableEditReferenceRectMode () {
 			foreach (UnityEngine.Object c in targets) {
 				SkeletonGraphic component = (SkeletonGraphic)c;
 				component.EditReferenceRect = false;
