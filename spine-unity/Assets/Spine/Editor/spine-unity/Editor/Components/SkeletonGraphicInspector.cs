@@ -35,6 +35,10 @@
 #define HAS_CULL_TRANSPARENT_MESH
 #endif
 
+#if UNITY_2017_2_OR_NEWER
+#define NEWPLAYMODECALLBACKS
+#endif
+
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
@@ -141,9 +145,32 @@ namespace Spine.Unity.Editor {
 
 			separatorSlotNames = so.FindProperty("separatorSlotNames");
 			separatorSlotNames.isExpanded = true;
+
+#if NEWPLAYMODECALLBACKS
+			EditorApplication.playModeStateChanged += OnPlaymodeChanged;
+#else
+			EditorApplication.playmodeStateChanged += OnPlaymodeChanged;
+#endif
 		}
 
 		void OnDisable () {
+#if NEWPLAYMODECALLBACKS
+			EditorApplication.playModeStateChanged -= OnPlaymodeChanged;
+#else
+			EditorApplication.playmodeStateChanged -= OnPlaymodeChanged;
+#endif
+			DisableEditReferenceRectMode();
+		}
+
+#if NEWPLAYMODECALLBACKS
+		void OnPlaymodeChanged (PlayModeStateChange mode) {
+#else
+		void OnPlaymodeChanged () {
+#endif
+			DisableEditReferenceRectMode();
+		}
+
+		void DisableEditReferenceRectMode () {
 			foreach (UnityEngine.Object c in targets) {
 				SkeletonGraphic component = (SkeletonGraphic)c;
 				component.EditReferenceRect = false;

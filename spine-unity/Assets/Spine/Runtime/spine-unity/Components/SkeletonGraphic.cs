@@ -321,8 +321,8 @@ namespace Spine.Unity {
 
 		public virtual void Update () {
 #if UNITY_EDITOR
+			UpdateReferenceRectSizes();
 			if (!Application.isPlaying) {
-				UpdateReferenceRectSizes();
 				Update(0f);
 				return;
 			}
