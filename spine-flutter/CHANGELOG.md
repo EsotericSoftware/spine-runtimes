@@ -1,3 +1,6 @@
+# 4.2.12
+* Merge changes from 4.1.1 and 4.1.2.
+
 # 4.1.2
 * API documentation and minor cosmetics.
 
