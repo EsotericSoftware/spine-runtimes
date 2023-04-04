@@ -21,13 +21,11 @@ class IkFollowingState extends State<IkFollowing> {
       controller.animationState.setAnimationByName(0, "walk", true);
       controller.animationState.setAnimationByName(1, "aim", true);
     }, onAfterUpdateWorldTransforms: (controller) {
-      var worldPosition = crossHairPosition;
+      final worldPosition = crossHairPosition;
       if (worldPosition == null) return;
-      var bone = controller.skeleton.findBone("crosshair");
-      if (bone == null) return;
-      var parent = bone.getParent();
-      if (parent == null) return;
-      var position = parent.worldToLocal(worldPosition.dx, worldPosition.dy);
+      final bone = controller.skeleton.findBone("crosshair")!;
+      final parent = bone.getParent()!;
+      final position = parent.worldToLocal(worldPosition.dx, worldPosition.dy);
       bone.setX(position.x);
       bone.setY(position.y);
     });
@@ -46,7 +44,7 @@ class IkFollowingState extends State<IkFollowing> {
         body: GestureDetector(
           onPanDown: (drag) => _updateBonePosition(drag.localPosition),
           onPanUpdate: (drag) => _updateBonePosition(drag.localPosition),
-          child: SpineWidget.fromAsset("assets/spineboy.atlas", "assets/spineboy-pro.skel", controller),
+          child: SpineWidget.fromAsset("assets/spineboy.atlas", "assets/spineboy-pro.skel", controller, alignment: Alignment.centerLeft,),
         ));
   }
 }

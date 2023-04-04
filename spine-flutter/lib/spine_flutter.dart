@@ -1597,8 +1597,8 @@ class RegionAttachment extends Attachment<spine_region_attachment> {
 
   Float32List getUVs() {
     final num = _bindings.spine_region_attachment_get_num_uvs(_attachment);
-    final offset = _bindings.spine_region_attachment_get_uvs(_attachment);
-    return offset.asTypedList(num);
+    final uvs = _bindings.spine_region_attachment_get_uvs(_attachment);
+    return uvs.asTypedList(num);
   }
 }
 
