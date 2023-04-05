@@ -117,7 +117,10 @@ export class IkConstraint implements Updatable {
 				ty = targetY - bone.worldY;
 				break;
 			case TransformMode.NoRotationOrReflection:
-				let s = Math.abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
+				let t = pa * pa + pc * pc;
+				if (t > 0) t = Math.max(0.0001, t);
+				else t = Math.min(-0.0001, t);
+				let s = Math.abs(pa * pd - pb * pc) / t;
 				let sa = pa / bone.skeleton.scaleX;
 				let sc = pc / bone.skeleton.scaleY;
 				pb = -sc * s * bone.skeleton.scaleX;
@@ -127,6 +130,8 @@ export class IkConstraint implements Updatable {
 			default:
 				let x = targetX - p.worldX, y = targetY - p.worldY;
 				let d = pa * pd - pb * pc;
+				if (d > 0) t = Math.max(0.0001, d);
+				else t = Math.min(-0.0001, d);
 				tx = (x * pd - y * pb) / d - bone.ax;
 				ty = (y * pa - x * pc) / d - bone.ay;
 		}
@@ -194,7 +199,9 @@ export class IkConstraint implements Updatable {
 		b = pp.b;
 		c = pp.c;
 		d = pp.d;
-		let id = 1 / (a * d - b * c), x = cwx - pp.worldX, y = cwy - pp.worldY;
+		let id = a * d - b * c, x = cwx - pp.worldX, y = cwy - pp.worldY;
+		if (id > 0) id = 1 / Math.max(0.0001, id);
+		else id = 1 / Math.min(-0.0001, id);
 		let dx = (x * d - y * b) * id - px, dy = (y * a - x * c) * id - py;
 		let l1 = Math.sqrt(dx * dx + dy * dy), l2 = child.data.length * csx, a1, a2;
 		if (l1 < 0.0001) {
