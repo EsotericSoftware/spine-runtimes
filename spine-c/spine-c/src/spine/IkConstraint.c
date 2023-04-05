@@ -181,7 +181,7 @@ void spIkConstraint_apply2(spBone *parent, spBone *child, float targetX, float t
 	d = pp->d;
 	id = a * d - b * c;
     if (id > 0) id = 1 / MAX(0.0001f, id);
-    else id = 1 / MIN(0.0001f, id);
+    else id = 1 / MIN(-0.0001f, id);
 	x = cwx - pp->worldX;
 	y = cwy - pp->worldY;
 	dx = (x * d - y * b) * id - px;
