@@ -51,7 +51,7 @@ void IkConstraint::apply(Bone &bone, float targetX, float targetY, bool compress
 			ty = targetY - bone._worldY;
 			break;
 		case TransformMode_NoRotationOrReflection: {
-			float s = MathUtil::abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
+			float s = MathUtil::abs(pa * pd - pb * pc) / MathUtil::max(0.0001f, pa * pa + pc * pc);
 			float sa = pa / bone._skeleton.getScaleX();
 			float sc = pc / bone._skeleton.getScaleY();
 			pb = -sc * s * bone._skeleton.getScaleX();
@@ -61,8 +61,13 @@ void IkConstraint::apply(Bone &bone, float targetX, float targetY, bool compress
 		default:
 			float x = targetX - p->_worldX, y = targetY - p->_worldY;
 			float d = pa * pd - pb * pc;
-			tx = (x * pd - y * pb) / d - bone._ax;
-			ty = (y * pa - x * pc) / d - bone._ay;
+			if (MathUtil::abs(d) <= 0.0001f) {
+				tx = 0;
+				ty = 0;
+			} else {
+				tx = (x * pd - y * pb) / d - bone._ax;
+				ty = (y * pa - x * pc) / d - bone._ay;
+			}
 	}
 	rotationIK += MathUtil::atan2(ty, tx) * MathUtil::Rad_Deg;
 	if (bone._ascaleX < 0) rotationIK += 180;
@@ -140,7 +145,8 @@ void IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY
 	b = pp->_b;
 	c = pp->_c;
 	d = pp->_d;
-	id = 1 / (a * d - b * c);
+	id = a * d - b * c;
+	id = MathUtil::abs(id) <= 0.0001f ? 0 : 1 / id;
 	x = cwx - pp->_worldX;
 	y = cwy - pp->_worldY;
 	dx = (x * d - y * b) * id - px;
