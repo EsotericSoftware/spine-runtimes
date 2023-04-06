@@ -61,10 +61,13 @@ void IkConstraint::apply(Bone &bone, float targetX, float targetY, bool compress
 		default:
 			float x = targetX - p->_worldX, y = targetY - p->_worldY;
 			float d = pa * pd - pb * pc;
-            if (d > 0) d = MathUtil::max(0.0001f, d);
-            d = MathUtil::min(-0.0001f, d);
-			tx = (x * pd - y * pb) / d - bone._ax;
-			ty = (y * pa - x * pc) / d - bone._ay;
+            if (MathUtil::abs(d) <= 0.0001f) {
+                tx = 0;
+                ty = 0;
+            } else {
+                tx = (x * pd - y * pb) / d - bone._ax;
+                ty = (y * pa - x * pc) / d - bone._ay;
+            }
 	}
 	rotationIK += MathUtil::atan2(ty, tx) * MathUtil::Rad_Deg;
 	if (bone._ascaleX < 0) rotationIK += 180;
@@ -143,8 +146,7 @@ void IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY
 	c = pp->_c;
 	d = pp->_d;
 	id = a * d - b * c;
-    if (id > 0) MathUtil::max(0.0001f, id);
-    else MathUtil::min(-0.0001f, id);
+    id = MathUtil::abs(id) <= 0.0001f ? 0 : 1 / id;
     x = cwx - pp->_worldX;
 	y = cwy - pp->_worldY;
 	dx = (x * d - y * b) * id - px;
