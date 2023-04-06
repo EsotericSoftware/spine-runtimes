@@ -127,10 +127,13 @@ export class IkConstraint implements Updatable {
 			default:
 				let x = targetX - p.worldX, y = targetY - p.worldY;
 				let d = pa * pd - pb * pc;
-				if (d > 0) d = Math.max(0.0001, d);
-				else d = Math.min(-0.0001, d);
-				tx = (x * pd - y * pb) / d - bone.ax;
-				ty = (y * pa - x * pc) / d - bone.ay;
+				if (Math.abs(d) <= 0.0001) {
+					tx = 0;
+					ty = 0;
+				} else {
+					tx = (x * pd - y * pb) / d - bone.ax;
+					ty = (y * pa - x * pc) / d - bone.ay;
+				}
 		}
 		rotationIK += Math.atan2(ty, tx) * MathUtils.radDeg;
 		if (bone.ascaleX < 0) rotationIK += 180;
@@ -197,8 +200,7 @@ export class IkConstraint implements Updatable {
 		c = pp.c;
 		d = pp.d;
 		let id = a * d - b * c, x = cwx - pp.worldX, y = cwy - pp.worldY;
-		if (id > 0) id = 1 / Math.max(0.0001, id);
-		else id = 1 / Math.min(-0.0001, id);
+		id = Math.abs(id) <= 0.0001 ? 0 : 1 / id;
 		let dx = (x * d - y * b) * id - px, dy = (y * a - x * c) * id - py;
 		let l1 = Math.sqrt(dx * dx + dy * dy), l2 = child.data.length * csx, a1, a2;
 		if (l1 < 0.0001) {
