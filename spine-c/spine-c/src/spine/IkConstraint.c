@@ -94,13 +94,13 @@ void spIkConstraint_apply1(spBone *bone, float targetX, float targetY, int /*boo
 		default: {
 			float x = targetX - p->worldX, y = targetY - p->worldY;
 			float d = pa * pd - pb * pc;
-            if (ABS(d) <= 0.0001f) {
-                tx = 0;
-                ty = 0;
-            } else {
-                tx = (x * pd - y * pb) / d - bone->ax;
-                ty = (y * pa - x * pc) / d - bone->ay;
-            }
+			if (ABS(d) <= 0.0001f) {
+				tx = 0;
+				ty = 0;
+			} else {
+				tx = (x * pd - y * pb) / d - bone->ax;
+				ty = (y * pa - x * pc) / d - bone->ay;
+			}
 		}
 	}
 	rotationIK += ATAN2(ty, tx) * RAD_DEG;
@@ -183,7 +183,7 @@ void spIkConstraint_apply2(spBone *parent, spBone *child, float targetX, float t
 	c = pp->c;
 	d = pp->d;
 	id = a * d - b * c;
-    id = ABS(id) <= 0.0001f ? 0 : 1 / id;
+	id = ABS(id) <= 0.0001f ? 0 : 1 / id;
 	x = cwx - pp->worldX;
 	y = cwy - pp->worldY;
 	dx = (x * d - y * b) * id - px;
