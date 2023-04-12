@@ -6,7 +6,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="//cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
-    <script src="../dist/iife/spine-phaser.js"></script>
     <title>Spine Phaser Example</title>
 </head>
 
@@ -22,11 +21,11 @@
             scene: {
                 preload: preload,
                 create: create,
-            },
-            plugins: {
-                scene: [
-                    { key: "spine.SpinePlugin", plugin: spine.SpinePlugin, mapping: "spine" }
-                ]
+                pack: {
+                    files: [
+                        { type: "scenePlugin", key: "spine.SpinePlugin", url: "../dist/iife/spine-phaser.js", sceneKey: "spine" }
+                    ]
+                }
             }
         };
 

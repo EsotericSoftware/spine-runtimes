@@ -126,6 +126,7 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 			if (!this.webGLRenderer) {
 				this.webGLRenderer = new SceneRenderer((this.phaserRenderer! as Phaser.Renderer.WebGL.WebGLRenderer).canvas, this.gl!, true);
 			}
+			this.onResize();
 			this.game.scale.on(Phaser.Scale.Events.RESIZE, this.onResize, this);
 		} else {
 			if (!this.canvasRenderer) {

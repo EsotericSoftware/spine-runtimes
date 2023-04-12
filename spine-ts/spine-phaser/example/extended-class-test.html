@@ -51,10 +51,10 @@
             this.scene = scene;
 
             this.parent = scene.add.container(0, 0);
-            this.spine = scene.make.spine({ scene, x, y, dataKey, atlasKey});
+            this.spine = scene.make.spine({ scene, x, y, dataKey, atlasKey });
             this.spine.animationState.setAnimation(0, animation, loop);
             this.parent.add(this.spine);
-        } 
+        }
     }
 
     class Example extends Phaser.Scene {

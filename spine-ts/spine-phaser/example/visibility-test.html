@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,43 +9,45 @@
     <script src="../dist/iife/spine-phaser.js"></script>
     <title>Spine Phaser Example</title>
 </head>
+
 <body>
     <h1>Basic example</h1>
 </body>
 <script>
-var config = {
-    type: Phaser.AUTO,
-    width: 800,
-    height: 600,
-    type: Phaser.WEBGL,
-    scene: {
-        preload: preload,
-        create: create,
-    },
-    plugins: {
-        scene: [
-            { key: "spine.SpinePlugin", plugin: spine.SpinePlugin, mapping: "spine" }
-        ]
+    var config = {
+        type: Phaser.AUTO,
+        width: 800,
+        height: 600,
+        type: Phaser.WEBGL,
+        scene: {
+            preload: preload,
+            create: create,
+            pack: {
+                files: [
+                    { type: "scenePlugin", key: "spine.SpinePlugin", url: "../dist/iife/spine-phaser.js", sceneKey: "spine" }
+                ]
+            }
+        }
+    };
+
+    let game = new Phaser.Game(config);
+
+    function preload() {
+        this.load.spineBinary("spineboy-data", "assets/spineboy-pro.skel");
+        this.load.spineAtlas("spineboy-atlas", "assets/spineboy-pma.atlas");
     }
-};
 
-let game = new Phaser.Game(config);
+    function create() {
+        let spineboy = this.add.spine(250, 500, 'spineboy-data', "spineboy-atlas");
+        spineboy.scale = 0.5;
+        spineboy.animationState.setAnimation(0, "walk", true);
 
-function preload () {
-    this.load.spineBinary("spineboy-data", "assets/spineboy-pro.skel");
-    this.load.spineAtlas("spineboy-atlas", "assets/spineboy-pma.atlas");
-}
+        let spineboy2 = this.add.spine(550, 500, 'spineboy-data', "spineboy-atlas");
+        spineboy2.scale = 0.5;
+        spineboy2.animationState.setAnimation(0, "run", true);
 
-function create () {
-    let spineboy = this.add.spine(250, 500, 'spineboy-data', "spineboy-atlas");
-    spineboy.scale = 0.5;
-    spineboy.animationState.setAnimation(0, "walk", true);
-
-    let spineboy2 = this.add.spine(550, 500, 'spineboy-data', "spineboy-atlas");
-    spineboy2.scale = 0.5;
-    spineboy2.animationState.setAnimation(0, "run", true);
-
-    this.input.on('pointerdown', () => spineboy2.visible = !spineboy2.visible);
-}
+        this.input.on('pointerdown', () => spineboy2.visible = !spineboy2.visible);
+    }
 </script>
+
 </html>
