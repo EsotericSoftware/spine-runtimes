@@ -106,13 +106,16 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 		};
 
 		let makeSpineGameObject = function (this: Phaser.GameObjects.GameObjectFactory, config: any, addToScene: boolean) {
+			let x = config.x ? config.x : 0;
+			let y = config.y ? config.y : 0;
 			let dataKey = config.dataKey ? config.dataKey : null;
 			let atlasKey = config.atlasKey ? config.atlasKey : null;
-			let gameObject = new SpineGameObject(this.scene, self, 0, 0, dataKey, atlasKey);
+			let boundsProvider = config.boundsProvider ? config.boundsProvider : undefined;
+			let gameObject = new SpineGameObject(this.scene, self, x, y, dataKey, atlasKey, boundsProvider);
 			if (addToScene !== undefined) {
 				config.add = addToScene;
 			}
-			Phaser.GameObjects.BuildGameObject(this.scene, gameObject, config);
+			return Phaser.GameObjects.BuildGameObject(this.scene, gameObject, config);
 		}
 		pluginManager.registerGameObject(SPINE_GAME_OBJECT_TYPE, addSpineGameObject, makeSpineGameObject);
 	}
@@ -123,6 +126,7 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 			if (!this.webGLRenderer) {
 				this.webGLRenderer = new SceneRenderer((this.phaserRenderer! as Phaser.Renderer.WebGL.WebGLRenderer).canvas, this.gl!, true);
 			}
+			this.onResize();
 			this.game.scale.on(Phaser.Scale.Events.RESIZE, this.onResize, this);
 		} else {
 			if (!this.canvasRenderer) {

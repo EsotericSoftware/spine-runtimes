@@ -1,8 +1,7 @@
 import { SPINE_GAME_OBJECT_TYPE } from "./keys";
 import { SpinePlugin } from "./SpinePlugin";
-import { ComputedSizeMixin, DepthMixin, FlipMixin, ScrollFactorMixin, TransformMixin, VisibleMixin } from "./mixins";
+import { ComputedSizeMixin, DepthMixin, FlipMixin, ScrollFactorMixin, TransformMixin, VisibleMixin, AlphaMixin } from "./mixins";
 import { AnimationState, AnimationStateData, Bone, MathUtils, Skeleton, Skin, Vector2 } from "@esotericsoftware/spine-core";
-import { Vector3 } from "@esotericsoftware/spine-webgl";
 
 class BaseSpineGameObject extends Phaser.GameObjects.GameObject {
 	constructor (scene: Phaser.Scene, type: string) {
@@ -76,7 +75,7 @@ export class SkinsAndAnimationBoundsProvider implements SpineGameObjectBoundsPro
 	}
 }
 
-export class SpineGameObject extends ComputedSizeMixin(DepthMixin(FlipMixin(ScrollFactorMixin(TransformMixin(VisibleMixin(BaseSpineGameObject)))))) {
+export class SpineGameObject extends ComputedSizeMixin(DepthMixin(FlipMixin(ScrollFactorMixin(TransformMixin(VisibleMixin(AlphaMixin(BaseSpineGameObject))))))) {
 	blendMode = -1;
 	skeleton: Skeleton | null = null;
 	animationStateData: AnimationStateData | null = null;
@@ -89,7 +88,7 @@ export class SpineGameObject extends ComputedSizeMixin(DepthMixin(FlipMixin(Scro
 
 	constructor (scene: Phaser.Scene, private plugin: SpinePlugin, x: number, y: number, dataKey: string, atlasKey: string, public boundsProvider: SpineGameObjectBoundsProvider = new SetupPoseBoundsProvider()) {
 		super(scene, SPINE_GAME_OBJECT_TYPE);
-		this.setPosition(x, y); x
+		this.setPosition(x, y);
 		this.setSkeleton(dataKey, atlasKey);
 	}
 
