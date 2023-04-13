@@ -700,7 +700,7 @@ namespace Spine.Unity {
 			if (!this.allowMultipleCanvasRenderers) {
 				MeshGenerator.GenerateSingleSubmeshInstruction(currentInstructions, skeleton, null);
 				if (canvasRenderers.Count > 0)
-					DisableUnusedCanvasRenderers(usedCount: 0, isInRebuild);
+					DisableUnusedCanvasRenderers(usedCount: 0, isInRebuild : isInRebuild);
 				usedRenderersCount = 0;
 			} else {
 				MeshGenerator.GenerateSkeletonRendererInstruction(currentInstructions, skeleton, null,
@@ -934,7 +934,7 @@ namespace Spine.Unity {
 			bool isInRebuild = false) {
 
 			int submeshCount = currentInstructions.submeshInstructions.Count;
-			DisableUnusedCanvasRenderers(usedCount: submeshCount, isInRebuild);
+			DisableUnusedCanvasRenderers(usedCount: submeshCount, isInRebuild : isInRebuild);
 
 			int separatorSlotGroupIndex = 0;
 			int targetSiblingIndex = 0;
