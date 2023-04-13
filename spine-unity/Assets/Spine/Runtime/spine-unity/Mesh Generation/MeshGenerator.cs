@@ -819,8 +819,8 @@ namespace Spine.Unity {
 									b2.x *= alpha;
 									b2.y = slot.Data.BlendMode == BlendMode.Additive ? 0 : alpha;
 								}
-								int meshVertexCount = meshAttachment.WorldVerticesLength;
-								for (int iii = 0; iii < meshVertexCount; iii += 2) {
+								int verticesArrayLength = meshAttachment.WorldVerticesLength;
+								for (int iii = 0; iii < verticesArrayLength; iii += 2) {
 									uv2i[vi] = rg;
 									uv3i[vi] = b2;
 									vi++;
@@ -892,8 +892,8 @@ namespace Spine.Unity {
 					} else { //if (settings.renderMeshes) {
 						MeshAttachment meshAttachment = attachment as MeshAttachment;
 						if (meshAttachment != null) {
-							int meshVertexCount = meshAttachment.WorldVerticesLength;
-							if (tempVerts.Length < meshVertexCount) this.tempVerts = tempVerts = new float[meshVertexCount];
+							int verticesArrayLength = meshAttachment.WorldVerticesLength;
+							if (tempVerts.Length < verticesArrayLength) this.tempVerts = tempVerts = new float[verticesArrayLength];
 							meshAttachment.ComputeWorldVertices(slot, tempVerts);
 
 							if (settings.pmaVertexColors) {
@@ -923,7 +923,7 @@ namespace Spine.Unity {
 								if (fy > bmax.y) bmax.y = fy;
 							}
 
-							for (int iii = 0; iii < meshVertexCount; iii += 2) {
+							for (int iii = 0; iii < verticesArrayLength; iii += 2) {
 								float x = tempVerts[iii], y = tempVerts[iii + 1];
 								vbi[vertexIndex].x = x; vbi[vertexIndex].y = y; vbi[vertexIndex].z = z;
 								cbi[vertexIndex] = color; ubi[vertexIndex].x = attachmentUVs[iii]; ubi[vertexIndex].y = attachmentUVs[iii + 1];
