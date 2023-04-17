@@ -236,6 +236,7 @@ export class TextureAtlasPage {
 	width: number = 0;
 	height: number = 0;
 	pma: boolean = false;
+	regions = new Array<TextureAtlasRegion>();
 
 	constructor (name: string) {
 		this.name = name;
@@ -245,6 +246,8 @@ export class TextureAtlasPage {
 		this.texture = texture;
 		texture.setFilters(this.minFilter, this.magFilter);
 		texture.setWraps(this.uWrap, this.vWrap);
+		for (let region of this.regions)
+			region.texture = texture;
 	}
 }
 
@@ -266,5 +269,6 @@ export class TextureAtlasRegion extends TextureRegion {
 		super();
 		this.page = page;
 		this.name = name;
+		page.regions.push(this);
 	}
 }

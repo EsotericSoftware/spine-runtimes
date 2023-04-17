@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Utils, Color, Skeleton, RegionAttachment, TextureAtlasRegion, BlendMode, MeshAttachment, Slot } from "@esotericsoftware/spine-core";
+import { Utils, Color, Skeleton, RegionAttachment, BlendMode, MeshAttachment, Slot, TextureRegion, TextureAtlasRegion } from "@esotericsoftware/spine-core";
 import { CanvasTexture } from "./CanvasTexture";
 
 const worldVertices = Utils.newFloatArray(8);
@@ -68,8 +68,9 @@ export class SkeletonRenderer {
 			let attachment = slot.getAttachment();
 			if (!(attachment instanceof RegionAttachment)) continue;
 			attachment.computeWorldVertices(slot, worldVertices, 0, 2);
-			let region: TextureAtlasRegion = <TextureAtlasRegion>attachment.region;
-			let image: HTMLImageElement = (<CanvasTexture>region.page.texture).getImage() as HTMLImageElement;
+			let region: TextureRegion = <TextureRegion>attachment.region;
+
+			let image: HTMLImageElement = (<CanvasTexture>region.texture).getImage() as HTMLImageElement;
 
 			let slotColor = slot.color;
 			let regionColor = attachment.color;
@@ -98,7 +99,7 @@ export class SkeletonRenderer {
 			ctx.translate(-w / 2, -h / 2);
 
 			ctx.globalAlpha = color.a;
-			ctx.drawImage(image, region.x, region.y, w, h, 0, 0, w, h);
+			ctx.drawImage(image, image.width * region.u, image.height * region.v, w, h, 0, 0, w, h);
 			if (this.debugRendering) ctx.strokeRect(0, 0, w, h);
 			ctx.restore();
 		}
@@ -123,15 +124,13 @@ export class SkeletonRenderer {
 			if (attachment instanceof RegionAttachment) {
 				let regionAttachment = <RegionAttachment>attachment;
 				vertices = this.computeRegionVertices(slot, regionAttachment, false);
-				triangles = SkeletonRenderer.QUAD_TRIANGLES;
-				region = <TextureAtlasRegion>regionAttachment.region;
-				texture = (<CanvasTexture>region.page.texture).getImage() as HTMLImageElement;
+				triangles = SkeletonRenderer.QUAD_TRIANGLES;				
+				texture = (<CanvasTexture>regionAttachment.region!.texture).getImage() as HTMLImageElement;
 			} else if (attachment instanceof MeshAttachment) {
 				let mesh = <MeshAttachment>attachment;
 				vertices = this.computeMeshVertices(slot, mesh, false);
-				triangles = mesh.triangles;
-				let region = (<TextureAtlasRegion>mesh.region!.renderObject);
-				texture = region.page.texture!.getImage() as HTMLImageElement;
+				triangles = mesh.triangles;				
+				texture = (<CanvasTexture>mesh.region!.texture).getImage() as HTMLImageElement;
 			} else
 				continue;
 

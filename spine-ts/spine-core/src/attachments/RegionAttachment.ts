@@ -65,8 +65,7 @@ export class RegionAttachment extends Attachment implements HasTextureRegion {
 
 	/** The name of the texture region for this attachment. */
 	path: string;
-
-	private rendererObject: any = null;
+	
 	region: TextureRegion | null = null;
 	sequence: Sequence | null = null;
 
@@ -195,8 +194,7 @@ export class RegionAttachment extends Attachment implements HasTextureRegion {
 
 	copy (): Attachment {
 		let copy = new RegionAttachment(this.name, this.path);
-		copy.region = this.region;
-		copy.rendererObject = this.rendererObject;
+		copy.region = this.region;		
 		copy.x = this.x;
 		copy.y = this.y;
 		copy.scaleX = this.scaleX;

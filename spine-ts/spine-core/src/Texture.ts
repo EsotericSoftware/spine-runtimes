@@ -60,7 +60,7 @@ export enum TextureWrap {
 }
 
 export class TextureRegion {
-	renderObject: any;
+	texture: any;
 	u = 0; v = 0;
 	u2 = 0; v2 = 0;
 	width = 0; height = 0;
