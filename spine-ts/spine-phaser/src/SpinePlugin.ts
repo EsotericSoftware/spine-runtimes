@@ -130,11 +130,11 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 			this.game.scale.on(Phaser.Scale.Events.RESIZE, this.onResize, this);
 		} else {
 			if (!this.canvasRenderer) {
-				this.canvasRenderer = new SkeletonRenderer(this.scene.sys.context);
+				this.canvasRenderer = new SkeletonRenderer(this.scene!.sys.context);
 			}
 		}
 
-		var eventEmitter = this.systems.events;
+		var eventEmitter = this.systems!.events;
 		eventEmitter.once('shutdown', this.shutdown, this);
 		eventEmitter.once('destroy', this.destroy, this);
 		this.game.events.once('destroy', this.gameDestroy, this);
@@ -156,7 +156,7 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 	}
 
 	shutdown () {
-		this.systems.events.off("shutdown", this.shutdown, this);
+		this.systems!.events.off("shutdown", this.shutdown, this);
 		if (this.isWebGL) {
 			this.game.scale.off(Phaser.Scale.Events.RESIZE, this.onResize, this);
 		}
