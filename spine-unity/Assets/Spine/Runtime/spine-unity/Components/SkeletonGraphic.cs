@@ -116,6 +116,7 @@ namespace Spine.Unity {
 		public bool updateSeparatorPartLocation = true;
 
 		private bool wasUpdatedAfterInit = true;
+		private bool requiresInstructionUpate = true;
 		private Texture baseTexture = null;
 
 #if UNITY_EDITOR
@@ -308,7 +309,10 @@ namespace Spine.Unity {
 		public override void Rebuild (CanvasUpdate update) {
 			base.Rebuild(update);
 			if (canvasRenderer.cull) return;
-			if (update == CanvasUpdate.PreRender) UpdateMeshToInstructions();
+			if (update == CanvasUpdate.PreRender) {
+				if (requiresInstructionUpate) PrepareInstructionsAndRenderers(isInRebuild: true);
+				UpdateMeshToInstructions();
+			}
 			if (allowMultipleCanvasRenderers) canvasRenderer.Clear();
 		}
 
@@ -404,8 +408,7 @@ namespace Spine.Unity {
 			if (updateMode != UpdateMode.FullUpdate) return;
 
 			PrepareInstructionsAndRenderers();
-			if (OnInstructionsPrepared != null)
-				OnInstructionsPrepared(this.currentInstructions);
+
 			SetVerticesDirty(); // triggers Rebuild and avoids potential double-update in a single frame
 		}
 
@@ -452,9 +455,11 @@ namespace Spine.Unity {
 		public Skeleton Skeleton {
 			get {
 				Initialize(false);
+				requiresInstructionUpate = true;
 				return skeleton;
 			}
 			set {
+				requiresInstructionUpate = true;
 				skeleton = value;
 			}
 		}
@@ -690,11 +695,12 @@ namespace Spine.Unity {
 				OnAnimationRebuild(this);
 		}
 
-		public void PrepareInstructionsAndRenderers () {
+		public void PrepareInstructionsAndRenderers (bool isInRebuild = false) {
+			requiresInstructionUpate = false;
 			if (!this.allowMultipleCanvasRenderers) {
 				MeshGenerator.GenerateSingleSubmeshInstruction(currentInstructions, skeleton, null);
 				if (canvasRenderers.Count > 0)
-					DisableUnusedCanvasRenderers(usedCount: 0);
+					DisableUnusedCanvasRenderers(usedCount: 0, isInRebuild: isInRebuild);
 				usedRenderersCount = 0;
 			} else {
 				MeshGenerator.GenerateSkeletonRendererInstruction(currentInstructions, skeleton, null,
@@ -707,8 +713,10 @@ namespace Spine.Unity {
 				EnsureMeshesCount(submeshCount);
 				EnsureUsedTexturesAndMaterialsCount(submeshCount);
 				EnsureSeparatorPartCount();
-				PrepareRendererGameObjects(currentInstructions);
+				PrepareRendererGameObjects(currentInstructions, isInRebuild);
 			}
+			if (OnInstructionsPrepared != null)
+				OnInstructionsPrepared(this.currentInstructions);
 		}
 
 		public void UpdateMesh () {
@@ -922,9 +930,11 @@ namespace Spine.Unity {
 			}
 		}
 
-		protected void PrepareRendererGameObjects (SkeletonRendererInstruction currentInstructions) {
+		protected void PrepareRendererGameObjects (SkeletonRendererInstruction currentInstructions,
+			bool isInRebuild = false) {
+
 			int submeshCount = currentInstructions.submeshInstructions.Count;
-			DisableUnusedCanvasRenderers(usedCount: submeshCount);
+			DisableUnusedCanvasRenderers(usedCount: submeshCount, isInRebuild: isInRebuild);
 
 			int separatorSlotGroupIndex = 0;
 			int targetSiblingIndex = 0;
@@ -961,13 +971,14 @@ namespace Spine.Unity {
 			usedRenderersCount = submeshCount;
 		}
 
-		protected void DisableUnusedCanvasRenderers (int usedCount) {
+		protected void DisableUnusedCanvasRenderers (int usedCount, bool isInRebuild = false) {
 #if UNITY_EDITOR
 			RemoveNullCanvasRenderers();
 #endif
 			for (int i = usedCount; i < canvasRenderers.Count; i++) {
 				canvasRenderers[i].Clear();
-				canvasRenderers[i].gameObject.SetActive(false);
+				if (!isInRebuild) // rebuild does not allow disabling Graphic and thus removing it from rebuild list.
+					canvasRenderers[i].gameObject.SetActive(false);
 			}
 		}
 
