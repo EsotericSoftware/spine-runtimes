@@ -1,6 +1,6 @@
 {
   "name": "@esotericsoftware/spine-threejs",
-  "version": "4.2.11",
+  "version": "4.2.13",
   "description": "The official Spine Runtimes for the web.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
