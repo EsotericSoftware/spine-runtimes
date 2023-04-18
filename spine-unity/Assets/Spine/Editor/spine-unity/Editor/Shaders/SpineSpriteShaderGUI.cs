@@ -268,14 +268,6 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 		_lightAffectsAdditive = FindProperty("_LightAffectsAdditive", props, false);
 	}
 
-	static bool BoldToggleField (GUIContent label, bool value) {
-		FontStyle origFontStyle = EditorStyles.label.fontStyle;
-		EditorStyles.label.fontStyle = FontStyle.Bold;
-		value = EditorGUILayout.Toggle(label, value, EditorStyles.toggle);
-		EditorStyles.label.fontStyle = origFontStyle;
-		return value;
-	}
-
 	protected virtual void ShaderPropertiesGUI () {
 		// Use default labelWidth
 		EditorGUIUtility.labelWidth = 0f;

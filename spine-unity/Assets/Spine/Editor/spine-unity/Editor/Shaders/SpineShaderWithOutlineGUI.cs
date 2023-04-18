@@ -84,7 +84,6 @@ public class SpineShaderWithOutlineGUI : ShaderGUI {
 	#endregion
 
 	#region Virtual Interface
-
 	protected virtual void FindProperties (MaterialProperty[] props) {
 
 		_OutlineWidth = FindProperty("_OutlineWidth", props, false);
@@ -168,11 +167,7 @@ public class SpineShaderWithOutlineGUI : ShaderGUI {
 		}
 	}
 
-	#endregion
-
-	#region Private Functions
-
-	void SwitchShaderToOutlineSettings (Material material, bool enableOutline) {
+	protected virtual void SwitchShaderToOutlineSettings (Material material, bool enableOutline) {
 
 		string shaderName = material.shader.name;
 		bool isSetToOutlineShader = shaderName.Contains(ShaderOutlineNamePrefix);
@@ -187,7 +182,7 @@ public class SpineShaderWithOutlineGUI : ShaderGUI {
 		}
 	}
 
-	static bool IsOutlineEnabled (MaterialEditor editor, out bool mixedValue) {
+	protected static bool IsOutlineEnabled (MaterialEditor editor, out bool mixedValue) {
 		mixedValue = false;
 		bool isAnyEnabled = false;
 		foreach (Material material in editor.targets) {
@@ -200,7 +195,7 @@ public class SpineShaderWithOutlineGUI : ShaderGUI {
 		return isAnyEnabled;
 	}
 
-	static bool IsShaderWithoutStandardVariantShader (MaterialEditor editor, out bool mixedValue) {
+	protected static bool IsShaderWithoutStandardVariantShader (MaterialEditor editor, out bool mixedValue) {
 		mixedValue = false;
 		bool isAnyShaderWithoutVariant = false;
 		foreach (Material material in editor.targets) {
@@ -213,13 +208,12 @@ public class SpineShaderWithOutlineGUI : ShaderGUI {
 		return isAnyShaderWithoutVariant;
 	}
 
-	static bool BoldToggleField (GUIContent label, bool value) {
+	protected static bool BoldToggleField (GUIContent label, bool value) {
 		FontStyle origFontStyle = EditorStyles.label.fontStyle;
 		EditorStyles.label.fontStyle = FontStyle.Bold;
 		value = EditorGUILayout.Toggle(label, value, EditorStyles.toggle);
 		EditorStyles.label.fontStyle = origFontStyle;
 		return value;
 	}
-
 	#endregion
 }
