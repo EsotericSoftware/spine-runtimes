@@ -178,9 +178,7 @@ export class SpineGameObject extends ComputedSizeMixin(DepthMixin(FlipMixin(Scro
 		this.skeleton.updateWorldTransform();
 	}
 
-	preDestroy () {
-		this.skeleton = null;
-		this.animationState = null;
+	preDestroy () {		
 		// FIXME tear down any event emitters
 	}
 
