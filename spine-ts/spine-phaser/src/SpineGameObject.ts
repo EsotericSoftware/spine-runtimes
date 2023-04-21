@@ -77,9 +77,9 @@ export class SkinsAndAnimationBoundsProvider implements SpineGameObjectBoundsPro
 
 export class SpineGameObject extends ComputedSizeMixin(DepthMixin(FlipMixin(ScrollFactorMixin(TransformMixin(VisibleMixin(AlphaMixin(BaseSpineGameObject))))))) {
 	blendMode = -1;
-	skeleton: Skeleton | null = null;
-	animationStateData: AnimationStateData | null = null;
-	animationState: AnimationState | null = null;
+	skeleton: Skeleton;
+	animationStateData: AnimationStateData;
+	animationState: AnimationState;
 	private premultipliedAlpha = false;
 	private _displayOriginX = 0;
 	private _displayOriginY = 0;
@@ -89,21 +89,12 @@ export class SpineGameObject extends ComputedSizeMixin(DepthMixin(FlipMixin(Scro
 	constructor (scene: Phaser.Scene, private plugin: SpinePlugin, x: number, y: number, dataKey: string, atlasKey: string, public boundsProvider: SpineGameObjectBoundsProvider = new SetupPoseBoundsProvider()) {
 		super(scene, SPINE_GAME_OBJECT_TYPE);
 		this.setPosition(x, y);
-		this.setSkeleton(dataKey, atlasKey);
-	}
-
-	setSkeleton (dataKey: string, atlasKey: string) {
-		if (dataKey && atlasKey) {
-			this.premultipliedAlpha = this.plugin.isAtlasPremultiplied(atlasKey);
-			this.skeleton = this.plugin.createSkeleton(dataKey, atlasKey);
-			this.animationStateData = new AnimationStateData(this.skeleton.data);
-			this.animationState = new AnimationState(this.animationStateData);
-			this.updateSize();
-		} else {
-			this.skeleton = null;
-			this.animationStateData = null;
-			this.animationState = null;
-		}
+		
+		this.premultipliedAlpha = this.plugin.isAtlasPremultiplied(atlasKey);
+		this.skeleton = this.plugin.createSkeleton(dataKey, atlasKey);
+		this.animationStateData = new AnimationStateData(this.skeleton.data);
+		this.animationState = new AnimationState(this.animationStateData);
+		this.updateSize();		
 	}
 
 	public get displayOriginX () {
@@ -187,9 +178,7 @@ export class SpineGameObject extends ComputedSizeMixin(DepthMixin(FlipMixin(Scro
 		this.skeleton.updateWorldTransform();
 	}
 
-	preDestroy () {
-		this.skeleton = null;
-		this.animationState = null;
+	preDestroy () {		
 		// FIXME tear down any event emitters
 	}
 

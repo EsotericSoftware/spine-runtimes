@@ -30,6 +30,6 @@
   },
   "homepage": "https://github.com/esotericsoftware/spine-runtimes#readme",
   "dependencies": {
-    "@esotericsoftware/spine-core": "^4.1.27"
+    "@esotericsoftware/spine-core": "4.2.13"
   }
 }
