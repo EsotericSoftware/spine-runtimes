@@ -4,7 +4,7 @@ export * from "./SpineGameObject"
 export * from "./mixins"
 export * from "@esotericsoftware/spine-core";
 export * from "@esotericsoftware/spine-webgl";
-import { SpinePlugin } from "./SpinePlugin";
+import { SpineGameObjectConfig, SpinePlugin } from "./SpinePlugin";
 (window as any).spine = { SpinePlugin: SpinePlugin };
 (window as any)["spine.SpinePlugin"] = SpinePlugin;
 
@@ -25,7 +25,7 @@ declare global {
         }
 
         export interface GameObjectCreator {
-            spine(config: any, addToScene: boolean): SpineGameObject;
+            spine(config: SpineGameObjectConfig, addToScene?: boolean): SpineGameObject;
         }
     }
 }

@@ -27,11 +27,19 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import Phaser from "phaser";
+import phaser from "phaser";
 import { SPINE_ATLAS_CACHE_KEY, SPINE_CONTAINER_TYPE, SPINE_GAME_OBJECT_TYPE, SPINE_ATLAS_TEXTURE_CACHE_KEY, SPINE_SKELETON_DATA_FILE_TYPE, SPINE_ATLAS_FILE_TYPE, SPINE_SKELETON_FILE_CACHE_KEY as SPINE_SKELETON_DATA_CACHE_KEY } from "./keys";
 import { AtlasAttachmentLoader, Bone, GLTexture, SceneRenderer, Skeleton, SkeletonBinary, SkeletonData, SkeletonJson, TextureAtlas } from "@esotericsoftware/spine-webgl"
 import { SpineGameObject, SpineGameObjectBoundsProvider } from "./SpineGameObject";
 import { CanvasTexture, SkeletonRenderer } from "@esotericsoftware/spine-canvas";
+
+export interface SpineGameObjectConfig extends Phaser.Types.GameObjects.GameObjectConfig {
+	x?: number,
+	y?: number,
+	dataKey: string,
+	atlasKey: string
+	boundsProvider?: SpineGameObjectBoundsProvider
+}
 
 export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 	game: Phaser.Game;
@@ -105,13 +113,11 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 			return gameObject;
 		};
 
-		let makeSpineGameObject = function (this: Phaser.GameObjects.GameObjectFactory, config: any, addToScene: boolean) {
+		let makeSpineGameObject = function (this: Phaser.GameObjects.GameObjectFactory, config: SpineGameObjectConfig, addToScene: boolean) {
 			let x = config.x ? config.x : 0;
-			let y = config.y ? config.y : 0;
-			let dataKey = config.dataKey ? config.dataKey : null;
-			let atlasKey = config.atlasKey ? config.atlasKey : null;
+			let y = config.y ? config.y : 0;			
 			let boundsProvider = config.boundsProvider ? config.boundsProvider : undefined;
-			let gameObject = new SpineGameObject(this.scene, self, x, y, dataKey, atlasKey, boundsProvider);
+			let gameObject = new SpineGameObject(this.scene, self, x, y, config.dataKey, config.atlasKey, boundsProvider);
 			if (addToScene !== undefined) {
 				config.add = addToScene;
 			}
