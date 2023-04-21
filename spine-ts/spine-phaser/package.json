@@ -30,8 +30,8 @@
   },
   "homepage": "https://github.com/esotericsoftware/spine-runtimes#readme",
   "dependencies": {
-    "@esotericsoftware/spine-core": "^4.1.28",
-    "@esotericsoftware/spine-webgl": "^4.1.28",
-    "@esotericsoftware/spine-canvas": "^4.1.28"    
+    "@esotericsoftware/spine-core": "4.1.28",
+    "@esotericsoftware/spine-webgl": "4.1.28",
+    "@esotericsoftware/spine-canvas": "4.1.28"
   }
 }

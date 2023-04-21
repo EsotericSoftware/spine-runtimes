@@ -30,6 +30,6 @@
   },
   "homepage": "https://github.com/esotericsoftware/spine-runtimes#readme",
   "dependencies": {
-    "@esotericsoftware/spine-webgl": "^4.1.28"
+    "@esotericsoftware/spine-webgl": "4.1.28"
   }
 }
