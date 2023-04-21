@@ -124,12 +124,12 @@ export class SkeletonRenderer {
 			if (attachment instanceof RegionAttachment) {
 				let regionAttachment = <RegionAttachment>attachment;
 				vertices = this.computeRegionVertices(slot, regionAttachment, false);
-				triangles = SkeletonRenderer.QUAD_TRIANGLES;				
+				triangles = SkeletonRenderer.QUAD_TRIANGLES;
 				texture = (<CanvasTexture>regionAttachment.region!.texture).getImage() as HTMLImageElement;
 			} else if (attachment instanceof MeshAttachment) {
 				let mesh = <MeshAttachment>attachment;
 				vertices = this.computeMeshVertices(slot, mesh, false);
-				triangles = mesh.triangles;				
+				triangles = mesh.triangles;
 				texture = (<CanvasTexture>mesh.region!.texture).getImage() as HTMLImageElement;
 			} else
 				continue;
