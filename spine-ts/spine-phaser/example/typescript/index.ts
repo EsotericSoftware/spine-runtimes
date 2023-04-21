@@ -1,5 +1,5 @@
 import {Scene} from "phaser"
-import {SpineGameObject, SpineGameObjectBoundsProvider, SpinePlugin} from "@esotericsoftware/spine-phaser"
+import {SpinePlugin} from "@esotericsoftware/spine-phaser"
 
 class SpineDemo extends Scene {
     preload() {

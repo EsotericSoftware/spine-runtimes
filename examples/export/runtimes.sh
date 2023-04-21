@@ -350,6 +350,10 @@ cp -f ../spineboy/export/spineboy-pro.skel "$ROOT/spine-ts/spine-phaser/example/
 cp -f ../spineboy/export/spineboy-pma.atlas "$ROOT/spine-ts/spine-phaser/example/assets/"
 cp -f ../spineboy/export/spineboy-pma.png "$ROOT/spine-ts/spine-phaser/example/assets/"
 
+cp -f ../spineboy/export/spineboy-pro.skel "$ROOT/spine-ts/spine-phaser/example/typescript/assets/"
+cp -f ../spineboy/export/spineboy-pma.atlas "$ROOT/spine-ts/spine-phaser/example/typescript/assets/"
+cp -f ../spineboy/export/spineboy-pma.png "$ROOT/spine-ts/spine-phaser/example/typescript/assets/"
+
 cp -f ../coin/export/coin-pro.skel "$ROOT/spine-ts/spine-phaser/example/assets/"
 cp -f ../coin/export/coin-pma.atlas "$ROOT/spine-ts/spine-phaser/example/assets/"
 cp -f ../coin/export/coin-pma.png "$ROOT/spine-ts/spine-phaser/example/assets/"
