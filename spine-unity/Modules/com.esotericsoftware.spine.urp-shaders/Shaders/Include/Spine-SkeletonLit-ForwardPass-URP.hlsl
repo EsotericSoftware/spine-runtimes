@@ -180,7 +180,7 @@ half4 frag(VertexOutput i
 	i.color.rgb = lerp(i.shadowedColor, i.color.rgb, shadowAttenuation);
 #endif
 
-#ifdef _WRITE_RENDERING_LAYERS
+#ifdef USE_WRITE_RENDERING_LAYERS
 	uint renderingLayers = GetMeshRenderingLayerBackwardsCompatible();
 	outRenderingLayers = float4(EncodeMeshRenderingLayer(renderingLayers), 0, 0, 0);
 #endif

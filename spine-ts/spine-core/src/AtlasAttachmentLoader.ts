@@ -55,7 +55,7 @@ export class AtlasAttachmentLoader implements AttachmentLoader {
 			let path = sequence.getPath(basePath, i);
 			let region = this.atlas.findRegion(path);
 			if (region == null) throw new Error("Region not found in atlas: " + path + " (sequence: " + name + ")");
-			regions[i] = region;			
+			regions[i] = region;
 		}
 	}
 
@@ -65,7 +65,7 @@ export class AtlasAttachmentLoader implements AttachmentLoader {
 			this.loadSequence(name, path, sequence);
 		} else {
 			let region = this.atlas.findRegion(path);
-			if (!region) throw new Error("Region not found in atlas: " + path + " (region attachment: " + name + ")");			
+			if (!region) throw new Error("Region not found in atlas: " + path + " (region attachment: " + name + ")");
 			attachment.region = region;
 		}
 		return attachment;
@@ -77,7 +77,7 @@ export class AtlasAttachmentLoader implements AttachmentLoader {
 			this.loadSequence(name, path, sequence);
 		} else {
 			let region = this.atlas.findRegion(path);
-			if (!region) throw new Error("Region not found in atlas: " + path + " (mesh attachment: " + name + ")");			
+			if (!region) throw new Error("Region not found in atlas: " + path + " (mesh attachment: " + name + ")");
 			attachment.region = region;
 		}
 		return attachment;
