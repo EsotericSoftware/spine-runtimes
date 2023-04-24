@@ -56,7 +56,7 @@ export class GLTexture extends Texture implements Disposable, Restorable {
 	}
 
 	static validateMagFilter (magFilter: TextureFilter) {
-		switch (magFilter) {			
+		switch (magFilter) {
 			case TextureFilter.MipMapLinearLinear:
 			case TextureFilter.MipMapLinearNearest:
 			case TextureFilter.MipMapNearestLinear:
@@ -68,7 +68,7 @@ export class GLTexture extends Texture implements Disposable, Restorable {
 	}
 
 	static usesMipMaps (filter: TextureFilter) {
-		switch (filter) {			
+		switch (filter) {
 			case TextureFilter.MipMapLinearLinear:
 			case TextureFilter.MipMapLinearNearest:
 			case TextureFilter.MipMapNearestLinear:
