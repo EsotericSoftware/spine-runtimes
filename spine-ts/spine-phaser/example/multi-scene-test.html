@@ -25,7 +25,7 @@
         }
 
         create() {
-            let spineboy = this.add.spine(400, 500, 'spineboy-data', "spineboy-atlas");
+            const spineboy = this.add.spine(400, 500, 'spineboy-data', "spineboy-atlas");
             spineboy.scale = 0.5;
             spineboy.animationState.setAnimation(0, "walk", true);
             this.input.once('pointerdown', () => this.scene.start('Scene2'));
@@ -43,14 +43,14 @@
         }
 
         create() {
-            let raptor = this.add.spine(300, 600, 'raptor-data', "raptor-atlas");
+            const raptor = this.add.spine(300, 600, 'raptor-data', "raptor-atlas");
             raptor.scale = 0.5;
             raptor.animationState.setAnimation(0, "walk", true);
             this.input.once('pointerdown', () => this.scene.start('Scene1'));
         }
     }
 
-    var config = {
+    const config = {
         type: Phaser.AUTO,
         width: 800,
         height: 600,
@@ -62,7 +62,7 @@
             ]
         }
     };
-    let game = new Phaser.Game(config);
+    const game = new Phaser.Game(config);
 </script>
 
 </html>

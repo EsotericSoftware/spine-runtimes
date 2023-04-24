@@ -13,7 +13,7 @@
     <h1>Depth test</h1>
 </body>
 <script>
-    var config = {
+    const config = {
         type: Phaser.AUTO,
         width: 800,
         height: 600,
@@ -29,7 +29,7 @@
         }
     };
 
-    let game = new Phaser.Game(config);
+    const game = new Phaser.Game(config);
 
     function preload() {
         this.load.image('logo', 'phaser.png');
@@ -39,7 +39,7 @@
 
     function create() {
         this.add.image(400, 350, 'logo').setName('logo1').setDepth(2);
-        let spineboy = this.add.spine(400, 600, 'spineboy-data', "spineboy-atlas");
+        const spineboy = this.add.spine(400, 600, 'spineboy-data', "spineboy-atlas");
         spineboy.animationState.setAnimation(0, "walk", true)
         spineboy.setScale(0.5)
         spineboy.setDepth(1);

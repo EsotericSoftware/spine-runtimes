@@ -14,7 +14,7 @@
     <h1>Basic example</h1>
 </body>
 <script>
-    var config = {
+    const config = {
         type: Phaser.AUTO,
         width: 800,
         height: 600,
@@ -30,7 +30,7 @@
         }
     };
 
-    let game = new Phaser.Game(config);
+    const game = new Phaser.Game(config);
 
     function preload() {
         this.load.spineBinary("spineboy-data", "assets/spineboy-pro.skel");
@@ -38,11 +38,11 @@
     }
 
     function create() {
-        let spineboy = this.add.spine(250, 500, 'spineboy-data', "spineboy-atlas");
+        const spineboy = this.add.spine(250, 500, 'spineboy-data', "spineboy-atlas");
         spineboy.scale = 0.5;
         spineboy.animationState.setAnimation(0, "walk", true);
 
-        let spineboy2 = this.add.spine(550, 500, 'spineboy-data', "spineboy-atlas");
+        const spineboy2 = this.add.spine(550, 500, 'spineboy-data', "spineboy-atlas");
         spineboy2.scale = 0.5;
         spineboy2.animationState.setAnimation(0, "run", true);
 

@@ -13,7 +13,7 @@
     <h1>Mix and match</h1>
 </body>
 <script>
-    var config = {
+    const config = {
         type: Phaser.AUTO,
         width: 800,
         height: 600,
@@ -29,7 +29,7 @@
         }
     };
 
-    let game = new Phaser.Game(config);
+    const game = new Phaser.Game(config);
 
     function preload() {
         this.load.spineBinary("mix-and-match-data", "assets/mix-and-match-pro.skel");
@@ -37,12 +37,12 @@
     }
 
     function create() {
-        let mixAndMatch = this.add.spine(400, 500, 'mix-and-match-data', "mix-and-match-atlas");
+        const mixAndMatch = this.add.spine(400, 500, 'mix-and-match-data', "mix-and-match-atlas");
         mixAndMatch.scale = 0.5;
         mixAndMatch.animationState.setAnimation(0, "walk", true);
 
-        let skeletonData = mixAndMatch.skeleton.data;
-        let skin = new spine.Skin("custom");
+        const skeletonData = mixAndMatch.skeleton.data;
+        const skin = new spine.Skin("custom");
         skin.addSkin(skeletonData.findSkin("skin-base"));
         skin.addSkin(skeletonData.findSkin("nose/short"));
         skin.addSkin(skeletonData.findSkin("eyelids/girly"));

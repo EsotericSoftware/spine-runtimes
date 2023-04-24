@@ -13,7 +13,7 @@
     <h1>Canvas test</h1>
 </body>
 <script>
-    var config = {
+    const config = {
         type: Phaser.AUTO,
         width: 800,
         height: 600,
@@ -29,7 +29,7 @@
         }
     };
 
-    let game = new Phaser.Game(config);
+    const game = new Phaser.Game(config);
 
     function preload() {
         this.load.spineBinary("spineboy-data", "assets/spineboy-pro.skel");
@@ -37,7 +37,7 @@
     }
 
     function create() {
-        let spineboy = this.add.spine(400, 300, 'spineboy-data', "spineboy-atlas");
+        const spineboy = this.add.spine(400, 300, 'spineboy-data', "spineboy-atlas");
         spineboy.scale = 0.5;
         spineboy.animationState.setAnimation(0, "walk", true);
     }
