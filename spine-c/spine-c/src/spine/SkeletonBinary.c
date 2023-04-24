@@ -1031,6 +1031,8 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
 			{
 				spAttachment *attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name,
 																			   path, sequence);
+				if (!attachment)
+					return NULL;
 				spRegionAttachment *region = SUB_CAST(spRegionAttachment, attachment);
 				region->path = path;
 				region->rotation = rotation;
@@ -1051,6 +1053,8 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
 			int vertexCount = readVarint(input, 1);
 			spAttachment *attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0,
 																		   NULL);
+			if (!attachment)
+				return NULL;
 			spVertexAttachment *vertexAttachment = SUB_CAST(spVertexAttachment, attachment);
 			_readVertices(self, input, &vertexAttachment->bonesCount, &vertexAttachment->bones,
 						  &vertexAttachment->verticesCount, &vertexAttachment->vertices,
@@ -1102,6 +1106,8 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
 
 			{
 				spAttachment *attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, path, sequence);
+				if (!attachment)
+					return NULL;
 				spMeshAttachment *mesh = SUB_CAST(spMeshAttachment, attachment);
 				mesh->path = path;
 				spColor_setFromColor(&mesh->color, &color);
@@ -1151,6 +1157,8 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
 
 			{
 				spAttachment *attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, path, sequence);
+				if (!attachment)
+					return NULL;
 				spMeshAttachment *mesh = SUB_CAST(spMeshAttachment, attachment);
 				mesh->path = path;
 				spColor_setFromColor(&mesh->color, &color);
@@ -1164,6 +1172,8 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
 		case SP_ATTACHMENT_PATH: {
 			spAttachment *attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0,
 																		   NULL);
+			if (!attachment)
+				return NULL;
 			spPathAttachment *path = SUB_CAST(spPathAttachment, attachment);
 			spVertexAttachment *vertexAttachment = SUPER(path);
 			int vertexCount = 0;
@@ -1187,6 +1197,8 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
 		case SP_ATTACHMENT_POINT: {
 			spAttachment *attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0,
 																		   NULL);
+			if (!attachment)
+				return NULL;
 			spPointAttachment *point = SUB_CAST(spPointAttachment, attachment);
 			point->rotation = readFloat(input);
 			point->x = readFloat(input) * self->scale;
@@ -1203,6 +1215,8 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
 			int vertexCount = readVarint(input, 1);
 			spAttachment *attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0,
 																		   NULL);
+			if (!attachment)
+				return NULL;
 			spClippingAttachment *clip = SUB_CAST(spClippingAttachment, attachment);
 			spVertexAttachment *vertexAttachment = SUPER(clip);
 			_readVertices(self, input, &vertexAttachment->bonesCount, &vertexAttachment->bones,
@@ -1253,7 +1267,9 @@ spSkin *spSkeletonBinary_readSkin(spSkeletonBinary *self, _dataInput *input, int
 			const char *name = readStringRef(input, skeletonData);
 			spAttachment *attachment = spSkeletonBinary_readAttachment(self, input, skin, slotIndex, name, skeletonData,
 																	   nonessential);
-			if (attachment) spSkin_setAttachment(skin, slotIndex, name, attachment);
+			if (!attachment)
+				return NULL;
+			spSkin_setAttachment(skin, slotIndex, name, attachment);
 		}
 	}
 	return skin;
@@ -1508,6 +1524,11 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 
 	/* Default skin. */
 	skeletonData->defaultSkin = spSkeletonBinary_readSkin(self, input, -1, skeletonData, nonessential);
+	if (self->attachmentLoader->error1) {
+		spSkeletonData_dispose(skeletonData);
+		_spSkeletonBinary_setError(self, self->attachmentLoader->error1, self->attachmentLoader->error2);
+		return NULL;
+	}
 	skeletonData->skinsCount = readVarint(input, 1);
 
 	if (skeletonData->defaultSkin)
@@ -1520,7 +1541,13 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 
 	/* Skins. */
 	for (i = skeletonData->defaultSkin ? 1 : 0; i < skeletonData->skinsCount; ++i) {
-		skeletonData->skins[i] = spSkeletonBinary_readSkin(self, input, 0, skeletonData, nonessential);
+		spSkin *skin = spSkeletonBinary_readSkin(self, input, 0, skeletonData, nonessential);
+		if (self->attachmentLoader->error1) {
+			spSkeletonData_dispose(skeletonData);
+			_spSkeletonBinary_setError(self, self->attachmentLoader->error1, self->attachmentLoader->error2);
+			return NULL;
+		}
+		skeletonData->skins[i] = skin;
 	}
 
 	/* Linked meshes. */
@@ -1575,6 +1602,7 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 		if (!animation) {
 			FREE(input);
 			spSkeletonData_dispose(skeletonData);
+			_spSkeletonBinary_setError(self, "Animation corrupted: ", name);
 			return NULL;
 		}
 		skeletonData->animations[i] = animation;

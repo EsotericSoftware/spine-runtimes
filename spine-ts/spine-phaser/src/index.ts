@@ -11,21 +11,21 @@ import { SpineGameObjectConfig, SpinePlugin } from "./SpinePlugin";
 import { SpineGameObject, SpineGameObjectBoundsProvider } from "./SpineGameObject";
 
 declare global {
-    namespace Phaser.Loader {
-        export interface LoaderPlugin {
-            spineJson(key: string, url: string, xhrSettings?: Phaser.Types.Loader.XHRSettingsObject): LoaderPlugin;
-            spineBinary(key: string, url: string, xhrSettings?: Phaser.Types.Loader.XHRSettingsObject): LoaderPlugin;
-            spineAtlas(key: string, url: string, premultipliedAlpha?: boolean, xhrSettings?: Phaser.Types.Loader.XHRSettingsObject): LoaderPlugin;
-        }
-    }
+	namespace Phaser.Loader {
+		export interface LoaderPlugin {
+			spineJson (key: string, url: string, xhrSettings?: Phaser.Types.Loader.XHRSettingsObject): LoaderPlugin;
+			spineBinary (key: string, url: string, xhrSettings?: Phaser.Types.Loader.XHRSettingsObject): LoaderPlugin;
+			spineAtlas (key: string, url: string, premultipliedAlpha?: boolean, xhrSettings?: Phaser.Types.Loader.XHRSettingsObject): LoaderPlugin;
+		}
+	}
 
-    namespace Phaser.GameObjects {
-        export interface GameObjectFactory {
-            spine(x: number, y: number, dataKey: string, atlasKey: string, boundsProvider?: SpineGameObjectBoundsProvider): SpineGameObject;
-        }
+	namespace Phaser.GameObjects {
+		export interface GameObjectFactory {
+			spine (x: number, y: number, dataKey: string, atlasKey: string, boundsProvider?: SpineGameObjectBoundsProvider): SpineGameObject;
+		}
 
-        export interface GameObjectCreator {
-            spine(config: SpineGameObjectConfig, addToScene?: boolean): SpineGameObject;
-        }
-    }
+		export interface GameObjectCreator {
+			spine (config: SpineGameObjectConfig, addToScene?: boolean): SpineGameObject;
+		}
+	}
 }

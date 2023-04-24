@@ -115,7 +115,7 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 
 		let makeSpineGameObject = function (this: Phaser.GameObjects.GameObjectFactory, config: SpineGameObjectConfig, addToScene: boolean) {
 			let x = config.x ? config.x : 0;
-			let y = config.y ? config.y : 0;			
+			let y = config.y ? config.y : 0;
 			let boundsProvider = config.boundsProvider ? config.boundsProvider : undefined;
 			let gameObject = new SpineGameObject(this.scene, self, x, y, config.dataKey, config.atlasKey, boundsProvider);
 			if (addToScene !== undefined) {
