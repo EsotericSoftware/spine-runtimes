@@ -89,12 +89,12 @@ export class SpineGameObject extends ComputedSizeMixin(DepthMixin(FlipMixin(Scro
 	constructor (scene: Phaser.Scene, private plugin: SpinePlugin, x: number, y: number, dataKey: string, atlasKey: string, public boundsProvider: SpineGameObjectBoundsProvider = new SetupPoseBoundsProvider()) {
 		super(scene, SPINE_GAME_OBJECT_TYPE);
 		this.setPosition(x, y);
-		
+
 		this.premultipliedAlpha = this.plugin.isAtlasPremultiplied(atlasKey);
 		this.skeleton = this.plugin.createSkeleton(dataKey, atlasKey);
 		this.animationStateData = new AnimationStateData(this.skeleton.data);
 		this.animationState = new AnimationState(this.animationStateData);
-		this.updateSize();		
+		this.updateSize();
 	}
 
 	public get displayOriginX () {
@@ -178,7 +178,7 @@ export class SpineGameObject extends ComputedSizeMixin(DepthMixin(FlipMixin(Scro
 		this.skeleton.updateWorldTransform();
 	}
 
-	preDestroy () {		
+	preDestroy () {
 		// FIXME tear down any event emitters
 	}
 

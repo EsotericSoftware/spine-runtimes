@@ -1547,7 +1547,7 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 			_spSkeletonBinary_setError(self, self->attachmentLoader->error1, self->attachmentLoader->error2);
 			return NULL;
 		}
-		skeletonData->skins[i] =skin;
+		skeletonData->skins[i] = skin;
 	}
 
 	/* Linked meshes. */
