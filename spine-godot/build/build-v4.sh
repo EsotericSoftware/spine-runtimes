@@ -2,7 +2,7 @@
 set -e
 
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
-pushd $dir > /dev/null
+pushd "$dir" > /dev/null
 
 if [ ! -d ../godot ]; then
 	echo "No Godot clone found. Run ./setup.sh <Godot branch or tag> <dev> first."
