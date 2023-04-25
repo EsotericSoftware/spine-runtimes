@@ -112,7 +112,7 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 			return gameObject;
 		};
 
-		let makeSpineGameObject = function (this: Phaser.GameObjects.GameObjectFactory, config: SpineGameObjectConfig, addToScene: boolean) {
+		let makeSpineGameObject = function (this: Phaser.GameObjects.GameObjectFactory, config: SpineGameObjectConfig, addToScene: boolean = false) {
 			let x = config.x ? config.x : 0;
 			let y = config.y ? config.y : 0;
 			let boundsProvider = config.boundsProvider ? config.boundsProvider : undefined;
@@ -184,10 +184,10 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 	}
 
 	createSkeleton (dataKey: string, atlasKey: string) {		
-		return new Skeleton(this.createSkeletonData(dataKey, atlasKey));
+		return new Skeleton(this.getSkeletonData(dataKey, atlasKey));
 	}
 
-	createAtlas(atlasKey: string) {
+	getAtlas(atlasKey: string) {
 		let atlas: TextureAtlas;
 		if (this.atlasCache.exists(atlasKey)) {
 			atlas = this.atlasCache.get(atlasKey);
@@ -210,8 +210,8 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 		return atlas;
 	}
 
-	createSkeletonData(dataKey: string, atlasKey: string) {
-		const atlas = this.createAtlas(atlasKey)
+	getSkeletonData(dataKey: string, atlasKey: string) {
+		const atlas = this.getAtlas(atlasKey)
 		const combinedKey = dataKey + atlasKey;
 		let skeletonData: SkeletonData;		
 		if (this.skeletonDataCache.exists(combinedKey)) {
