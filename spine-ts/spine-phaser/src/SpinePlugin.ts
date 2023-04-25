@@ -94,7 +94,6 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 		};
 		pluginManager.registerFileType("spineBinary", skeletonBinaryFileCallback, scene);
 
-
 		let atlasFileCallback = function (this: any, key: string,
 			url: string,
 			premultipliedAlpha: boolean,
@@ -184,7 +183,11 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 		return atlasFile.premultipliedAlpha;
 	}
 
-	createSkeleton (dataKey: string, atlasKey: string) {
+	createSkeleton (dataKey: string, atlasKey: string) {		
+		return new Skeleton(this.createSkeletonData(dataKey, atlasKey));
+	}
+
+	createAtlas(atlasKey: string) {
 		let atlas: TextureAtlas;
 		if (this.atlasCache.exists(atlasKey)) {
 			atlas = this.atlasCache.get(atlasKey);
@@ -204,10 +207,15 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 			}
 			this.atlasCache.add(atlasKey, atlas);
 		}
+		return atlas;
+	}
 
-		let skeletonData: SkeletonData;
-		if (this.skeletonDataCache.exists(dataKey)) {
-			skeletonData = this.skeletonDataCache.get(dataKey);
+	createSkeletonData(dataKey: string, atlasKey: string) {
+		const atlas = this.createAtlas(atlasKey)
+		const combinedKey = dataKey + atlasKey;
+		let skeletonData: SkeletonData;		
+		if (this.skeletonDataCache.exists(combinedKey)) {
+			skeletonData = this.skeletonDataCache.get(combinedKey);
 		} else {
 			if (this.game.cache.json.exists(dataKey)) {
 				let jsonFile = this.game.cache.json.get(dataKey) as any;
@@ -218,10 +226,9 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 				let binary = new SkeletonBinary(new AtlasAttachmentLoader(atlas));
 				skeletonData = binary.readSkeletonData(new Uint8Array(binaryFile));
 			}
-			this.skeletonDataCache.add(dataKey, skeletonData);
+			this.skeletonDataCache.add(combinedKey, skeletonData);
 		}
-
-		return new Skeleton(skeletonData);
+		return skeletonData;
 	}
 }
 

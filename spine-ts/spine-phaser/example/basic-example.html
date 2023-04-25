@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="//cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
+    <script src="../dist/iife/spine-phaser.js"></script>
     <title>Spine Phaser Example</title>
 </head>
 
@@ -21,15 +22,15 @@
         scene: {
             preload: preload,
             create: create,
-            pack: {
-                files: [
-                    { type: "scenePlugin", key: "spine.SpinePlugin", url: "../dist/iife/spine-phaser.js", sceneKey: "spine" }
-                ]
-            }
+        },
+        plugins: {
+            scene: [
+                { key: "spine.SpinePlugin", plugin: spine.SpinePlugin, mapping: "spine" }
+            ]
         }
     };
 
-    let game = new Phaser.Game(config);
+    const game = new Phaser.Game(config);
 
     function preload() {
         this.load.spineBinary("spineboy-data", "assets/spineboy-pro.skel");
@@ -37,9 +38,14 @@
     }
 
     function create() {
-        let spineboy = this.add.spine(400, 500, 'spineboy-data', "spineboy-atlas");
+        const spineboy = this.add.spine(400, 500, 'spineboy-data', "spineboy-atlas");
         spineboy.scale = 0.5;
         spineboy.animationState.setAnimation(0, "walk", true);
+
+        const spineboy2 = this.make.spine({
+            x: 200, y: 500, dataKey: "spineboy-data", atlasKey: "spineboy-atlas"
+        });
+        this.add(spineboy2);
     }
 </script>
 

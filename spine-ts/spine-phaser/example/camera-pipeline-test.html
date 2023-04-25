@@ -84,7 +84,7 @@
             }
         }
 
-        let game = new Phaser.Game(config);
+        const game = new Phaser.Game(config);
 
         function preload() {
             this.load.spineBinary("spineboy-data", "assets/spineboy-pro.skel");
@@ -100,7 +100,7 @@
             // is needed.
             this.add.sprite(0, 0, 'img');
 
-            let spineboy = this.add.spine(400, 300, 'spineboy-data', "spineboy-atlas");
+            const spineboy = this.add.spine(400, 300, 'spineboy-data', "spineboy-atlas");
             spineboy.scale = 0.5;
             spineboy.animationState.setAnimation(0, "walk", true);
 
