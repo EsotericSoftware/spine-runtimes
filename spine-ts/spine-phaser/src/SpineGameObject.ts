@@ -80,6 +80,8 @@ export class SpineGameObject extends ComputedSizeMixin(DepthMixin(FlipMixin(Scro
 	skeleton: Skeleton;
 	animationStateData: AnimationStateData;
 	animationState: AnimationState;
+	beforeUpdateWorldTransforms: (object: SpineGameObject) => void = () => {};
+	afterUpdateWorldTransforms: (object: SpineGameObject) => void = () => {};
 	private premultipliedAlpha = false;
 	private _displayOriginX = 0;
 	private _displayOriginY = 0;
@@ -175,7 +177,9 @@ export class SpineGameObject extends ComputedSizeMixin(DepthMixin(FlipMixin(Scro
 
 		this.animationState.update(delta / 1000);
 		this.animationState.apply(this.skeleton);
+		this.beforeUpdateWorldTransforms(this);
 		this.skeleton.updateWorldTransform();
+		this.afterUpdateWorldTransforms(this);
 	}
 
 	preDestroy () {
