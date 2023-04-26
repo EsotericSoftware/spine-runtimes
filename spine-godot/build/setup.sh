@@ -2,7 +2,7 @@
 set -e
 
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
-pushd $dir > /dev/null
+pushd "$dir" > /dev/null
 
 if [ ! "$#" -eq 2 ]; then
 	echo "Usage: ./setup.sh <Godot branch or tag> <dev:true|false>"
