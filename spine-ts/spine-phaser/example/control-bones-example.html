@@ -21,7 +21,7 @@
 
             create() {
                 const stretchyman = this.add.spine(400, 580, 'stretchyman-data', "stretchyman-atlas");                  
-                stretchyman.animationState.setEmptyAnimation(0, true);
+                stretchyman.animationState.setAnimation(0, "idle", true);
                 stretchyman.updatePose(0);
 
                 const controlBoneNames = ["back-arm-ik-target", "back-leg-ik-target", "front-arm-ik-target", "front-leg-ik-target"];

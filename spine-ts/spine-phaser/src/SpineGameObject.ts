@@ -183,7 +183,7 @@ export class SpineGameObject extends ComputedSizeMixin(DepthMixin(FlipMixin(Scro
 
 	preUpdate (time: number, delta: number) {
 		if (!this.skeleton || !this.animationState) return;
-		this.updatePose();
+		this.updatePose(delta);
 	}
 
 	preDestroy () {
