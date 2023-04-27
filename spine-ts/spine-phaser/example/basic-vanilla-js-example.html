@@ -14,15 +14,25 @@
     <h1>Basic example</h1>
 </body>
 <script>
+    class BasicExample extends Phaser.Scene {
+        preload() {
+            this.load.spineBinary("spineboy-data", "assets/spineboy-pro.skel");
+            this.load.spineAtlas("spineboy-atlas", "assets/spineboy-pma.atlas");
+        }
+
+        create() {
+            const spineboy = this.add.spine(400, 500, 'spineboy-data', "spineboy-atlas");
+            spineboy.scale = 0.5;
+            spineboy.animationState.setAnimation(0, "walk", true);
+        }
+    }
+
     const config = {
         type: Phaser.AUTO,
         width: 800,
         height: 600,
         type: Phaser.WEBGL,
-        scene: {
-            preload: preload,
-            create: create,
-        },
+        scene: [BasicExample],
         plugins: {
             scene: [
                 { key: "spine.SpinePlugin", plugin: spine.SpinePlugin, mapping: "spine" }
@@ -31,17 +41,6 @@
     };
 
     const game = new Phaser.Game(config);
-
-    function preload() {
-        this.load.spineBinary("spineboy-data", "assets/spineboy-pro.skel");
-        this.load.spineAtlas("spineboy-atlas", "assets/spineboy-pma.atlas");
-    }
-
-    function create() {
-        const spineboy = this.add.spine(400, 500, 'spineboy-data', "spineboy-atlas");
-        spineboy.scale = 0.5;
-        spineboy.animationState.setAnimation(0, "walk", true);
-    }
 </script>
 
 </html>

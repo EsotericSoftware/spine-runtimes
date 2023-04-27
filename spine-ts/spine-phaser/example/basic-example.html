@@ -24,16 +24,11 @@
             const spineboy = this.add.spine(400, 500, 'spineboy-data', "spineboy-atlas");
             spineboy.scale = 0.5;
             spineboy.animationState.setAnimation(0, "walk", true);
-
-            const spineboy2 = this.make.spine({
-                x: 200, y: 500, dataKey: "spineboy-data", atlasKey: "spineboy-atlas"
-            });
-            this.add.existing(spineboy2);
         }
     }
-
-    const config = {
-        type: Phaser.AUTO,
+    
+    new Phaser.Game({
+        type: Phaser.AUTO,        
         width: 800,
         height: 600,
         type: Phaser.WEBGL,
@@ -43,9 +38,7 @@
                 { key: "spine.SpinePlugin", plugin: spine.SpinePlugin, mapping: "spine" }
             ]
         }
-    };
-
-    const game = new Phaser.Game(config);
+    });
 </script>
 
 </html>

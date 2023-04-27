@@ -96,7 +96,8 @@ export class SpineGameObject extends ComputedSizeMixin(DepthMixin(FlipMixin(Scro
 		this.skeleton = this.plugin.createSkeleton(dataKey, atlasKey);
 		this.animationStateData = new AnimationStateData(this.skeleton.data);
 		this.animationState = new AnimationState(this.animationStateData);
-		this.updateSize();
+		this.skeleton.updateWorldTransform();
+		this.updateSize();		
 	}
 
 	public get displayOriginX () {
@@ -172,14 +173,17 @@ export class SpineGameObject extends ComputedSizeMixin(DepthMixin(FlipMixin(Scro
 		}
 	}
 
-	preUpdate (time: number, delta: number) {
-		if (!this.skeleton || !this.animationState) return;
-
+	updatePose(delta: number) {
 		this.animationState.update(delta / 1000);
 		this.animationState.apply(this.skeleton);
 		this.beforeUpdateWorldTransforms(this);
 		this.skeleton.updateWorldTransform();
 		this.afterUpdateWorldTransforms(this);
+	}
+
+	preUpdate (time: number, delta: number) {
+		if (!this.skeleton || !this.animationState) return;
+		this.updatePose();
 	}
 
 	preDestroy () {
