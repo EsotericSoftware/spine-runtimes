@@ -285,7 +285,7 @@ export class SpineAtlasFile extends Phaser.Loader.MultiFile {
 			this.pending--;
 
 			if (file.type == "text") {
-				var lines = file.data.split('\n');
+				var lines = file.data.split(/\r\n|\r|\n/);
 				let textures = [];
 				textures.push(lines[0]);
 				for (var t = 1; t < lines.length; t++) {
