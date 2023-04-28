@@ -102,7 +102,7 @@ namespace spine {
 	SpineExtension *getDefaultExtension() {
 		return new DefaultSpineExtension();
 	}
-}
+}// namespace spine
 
 int main(int argc, char **argv) {
 	SP_UNUSED(argc);
