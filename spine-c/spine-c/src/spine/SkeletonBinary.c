@@ -113,23 +113,23 @@ static int readInt(_dataInput *input) {
 }
 
 static int readVarint(_dataInput *input, int /*bool*/ optimizePositive) {
-    unsigned char b = readByte(input);
-    int32_t value = b & 0x7F;
-    if (b & 0x80) {
-        b = readByte(input);
-        value |= (b & 0x7F) << 7;
-        if (b & 0x80) {
-            b = readByte(input);
-            value |= (b & 0x7F) << 14;
-            if (b & 0x80) {
-                b = readByte(input);
-                value |= (b & 0x7F) << 21;
-                if (b & 0x80) value |= (readByte(input) & 0x7F) << 28;
-            }
-        }
-    }
-    if (!optimizePositive) value = (((unsigned int) value >> 1) ^ -(value & 1));
-    return value;
+	unsigned char b = readByte(input);
+	int32_t value = b & 0x7F;
+	if (b & 0x80) {
+		b = readByte(input);
+		value |= (b & 0x7F) << 7;
+		if (b & 0x80) {
+			b = readByte(input);
+			value |= (b & 0x7F) << 14;
+			if (b & 0x80) {
+				b = readByte(input);
+				value |= (b & 0x7F) << 21;
+				if (b & 0x80) value |= (readByte(input) & 0x7F) << 28;
+			}
+		}
+	}
+	if (!optimizePositive) value = (((unsigned int) value >> 1) ^ -(value & 1));
+	return value;
 }
 
 float readFloat(_dataInput *input) {
@@ -1030,7 +1030,7 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
 			{
 				spAttachment *attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name,
 																			   path, sequence);
-                spRegionAttachment *region = NULL;
+				spRegionAttachment *region = NULL;
 				if (!attachment)
 					return NULL;
 				region = SUB_CAST(spRegionAttachment, attachment);
@@ -1053,7 +1053,7 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
 			int vertexCount = readVarint(input, 1);
 			spAttachment *attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0,
 																		   NULL);
-            spVertexAttachment *vertexAttachment = NULL;
+			spVertexAttachment *vertexAttachment = NULL;
 			if (!attachment)
 				return NULL;
 			vertexAttachment = SUB_CAST(spVertexAttachment, attachment);
@@ -1107,7 +1107,7 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
 
 			{
 				spAttachment *attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, path, sequence);
-                spMeshAttachment *mesh = NULL;
+				spMeshAttachment *mesh = NULL;
 				if (!attachment)
 					return NULL;
 				mesh = SUB_CAST(spMeshAttachment, attachment);
@@ -1159,7 +1159,7 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
 
 			{
 				spAttachment *attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, path, sequence);
-                spMeshAttachment *mesh = NULL;
+				spMeshAttachment *mesh = NULL;
 				if (!attachment)
 					return NULL;
 				mesh = SUB_CAST(spMeshAttachment, attachment);
@@ -1175,13 +1175,13 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
 		case SP_ATTACHMENT_PATH: {
 			spAttachment *attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0,
 																		   NULL);
-            spPathAttachment *path = NULL;
-            spVertexAttachment *vertexAttachment = NULL;
-            int vertexCount = 0;
+			spPathAttachment *path = NULL;
+			spVertexAttachment *vertexAttachment = NULL;
+			int vertexCount = 0;
 			if (!attachment)
 				return NULL;
 			path = SUB_CAST(spPathAttachment, attachment);
-            vertexAttachment = SUPER(path);
+			vertexAttachment = SUPER(path);
 			path->closed = readBoolean(input);
 			path->constantSpeed = readBoolean(input);
 			vertexCount = readVarint(input, 1);
@@ -1202,7 +1202,7 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
 		case SP_ATTACHMENT_POINT: {
 			spAttachment *attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0,
 																		   NULL);
-            spPointAttachment *point = NULL;
+			spPointAttachment *point = NULL;
 			if (!attachment)
 				return NULL;
 			point = SUB_CAST(spPointAttachment, attachment);
@@ -1221,8 +1221,8 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
 			int vertexCount = readVarint(input, 1);
 			spAttachment *attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0,
 																		   NULL);
-            spClippingAttachment *clip = NULL;
-            spVertexAttachment *vertexAttachment = NULL;
+			spClippingAttachment *clip = NULL;
+			spVertexAttachment *vertexAttachment = NULL;
 			if (!attachment)
 				return NULL;
 			clip = SUB_CAST(spClippingAttachment, attachment);

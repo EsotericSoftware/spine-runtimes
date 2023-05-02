@@ -101,7 +101,7 @@ void SkeletonDrawable::draw(SDL_Renderer *renderer) {
 			uvs = &regionAttachment->getUVs();
 			indices = &quadIndices;
 			indicesCount = 6;
-			texture = (SDL_Texture *)regionAttachment->getRegion()->rendererObject;
+			texture = (SDL_Texture *) regionAttachment->getRegion()->rendererObject;
 
 		} else if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
 			MeshAttachment *mesh = (MeshAttachment *) attachment;
