@@ -13,7 +13,7 @@
     <h1>Blend test</h1>
 </body>
 <script>
-    var config = {
+    const config = {
         type: Phaser.AUTO,
         width: 800,
         height: 600,
@@ -32,7 +32,7 @@
     };
 
     let controls;
-    let game = new Phaser.Game(config);
+    const game = new Phaser.Game(config);
 
     function preload() {
         this.load.spineBinary("spineboy-data", "assets/spineboy-pro.skel");
@@ -41,14 +41,14 @@
 
     function create() {
         for (var i = 0; i < 4; i++) {
-            let obj = this.add.spine(i * 200, 600, 'spineboy-data', 'spineboy-atlas').setScale(0.25);
+            const obj = this.add.spine(i * 200, 600, 'spineboy-data', 'spineboy-atlas').setScale(0.25);
             obj.setScale(0.25);
             obj.animationState.setAnimation(0, "idle", true);
             obj.animationState.setAnimation(1, "shoot", true);
         }
-        var cursors = this.input.keyboard.createCursorKeys();
+        const cursors = this.input.keyboard.createCursorKeys();
 
-        var controlConfig = {
+        const controlConfig = {
             camera: this.cameras.main,
             left: cursors.left,
             right: cursors.right,

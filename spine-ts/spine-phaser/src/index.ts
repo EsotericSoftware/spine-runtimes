@@ -28,4 +28,10 @@ declare global {
 			spine (config: SpineGameObjectConfig, addToScene?: boolean): SpineGameObject;
 		}
 	}
+
+	namespace Phaser {
+		export interface Scene {
+			spine: SpinePlugin;
+		}
+	}
 }

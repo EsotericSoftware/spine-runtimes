@@ -2,7 +2,7 @@
 set -e
 
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
-pushd $dir > /dev/null
+pushd "$dir" > /dev/null
 
 if [ ! "$#" -eq 1 ]; then
 	echo "Usage: ./build.sh <target>"

@@ -22,7 +22,7 @@
     }
 
     function create() {
-        let spineboy = this.add.spine(400, 300, 'spineboy-data', "spineboy-atlas");
+        const spineboy = this.add.spine(400, 300, 'spineboy-data', "spineboy-atlas");
         spineboy.scale = 0.5;
         spineboy.animationState.setAnimation(0, "walk", true);
     }
@@ -71,11 +71,11 @@
         create() {
             this.add.image(0, 0, 'logo').setOrigin(0);
 
-            let custom1 = new CustomSpineObject1(this, 100, 550, 'spineboy-data', 'spineboy-atlas', 'idle', true);
+            const custom1 = new CustomSpineObject1(this, 100, 550, 'spineboy-data', 'spineboy-atlas', 'idle', true);
             custom1.spine.setScale(0.5);
-            let custom2 = new CustomSpineObject2(this, 350, 550, 'spineboy-data', 'spineboy-atlas', 'walk', true);
+            const custom2 = new CustomSpineObject2(this, 350, 550, 'spineboy-data', 'spineboy-atlas', 'walk', true);
             custom2.spine.setScale(0.5);
-            let custom3 = new CustomSpineObject3(this, 600, 550, 'spineboy-data', 'spineboy-atlas', 'run', true);
+            const custom3 = new CustomSpineObject3(this, 600, 550, 'spineboy-data', 'spineboy-atlas', 'run', true);
             custom3.spine.setScale(0.5);
 
             this.add.image(400, 0, 'logo').setOrigin(0);

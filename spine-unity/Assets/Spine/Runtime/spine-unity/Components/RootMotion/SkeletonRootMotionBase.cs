@@ -198,11 +198,11 @@ namespace Spine.Unity {
 					}
 
 					Vector2 rigidbodyDisplacement2D = new Vector2(rigidbodyDisplacement.x, rigidbodyDisplacement.y);
-					rigidBody2D.MovePosition(gravityAndVelocityMovement + new Vector2(transform.position.x, transform.position.y)
+					rigidBody2D.MovePosition(gravityAndVelocityMovement + new Vector2(rigidBody2D.position.x, rigidBody2D.position.y)
 						+ rigidbodyDisplacement2D + additionalRigidbody2DMovement);
 					rigidBody2D.MoveRotation(rigidbody2DRotation + rigidBody2D.rotation);
 				} else if (rigidBody != null) {
-					rigidBody.MovePosition(transform.position
+					rigidBody.MovePosition(rigidBody.position
 						+ new Vector3(rigidbodyDisplacement.x, rigidbodyDisplacement.y, rigidbodyDisplacement.z));
 					rigidBody.MoveRotation(rigidBody.rotation * rigidbodyLocalRotation);
 				}

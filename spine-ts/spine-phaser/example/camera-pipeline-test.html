@@ -12,7 +12,7 @@
 <body>
     <h1>Camera pipeline test</h1>
     <script>
-        var config = {
+        const config = {
             type: Phaser.AUTO,
             width: 800,
             height: 600,
@@ -84,7 +84,7 @@
             }
         }
 
-        let game = new Phaser.Game(config);
+        const game = new Phaser.Game(config);
 
         function preload() {
             this.load.spineBinary("spineboy-data", "assets/spineboy-pro.skel");
@@ -98,9 +98,9 @@
             // FIXME: Need a dummy sprite so the MultiPipeline sets up state
             // so rendering the Spine sprite actually works. Unsure what state
             // is needed.
-            var s = this.add.sprite(0, 0, 'img');
+            this.add.sprite(0, 0, 'img');
 
-            let spineboy = this.add.spine(400, 300, 'spineboy-data', "spineboy-atlas");
+            const spineboy = this.add.spine(400, 300, 'spineboy-data', "spineboy-atlas");
             spineboy.scale = 0.5;
             spineboy.animationState.setAnimation(0, "walk", true);
 

@@ -13,7 +13,7 @@
     <h1>Bounds test</h1>
 </body>
 <script>
-    var config = {
+    const config = {
         type: Phaser.AUTO,
         width: 800,
         height: 600,
@@ -30,7 +30,7 @@
         }
     };
 
-    let game = new Phaser.Game(config);
+    const game = new Phaser.Game(config);
     let spineboy;
 
     function preload() {
@@ -49,7 +49,7 @@
     let time = 0;
     function update(t, delta) {
         time += delta / 1000;
-        let scale = 0.4 + Math.cos(time) * 0.2;
+        const scale = 0.4 + Math.cos(time) * 0.2;
         spineboy.scale = scale;
         spineboy.angle++;
     }
