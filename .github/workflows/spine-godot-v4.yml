@@ -13,8 +13,8 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   AWS_EC2_METADATA_DISABLED: true
   EM_VERSION: 3.1.18
-  GODOT_TAG: 4.0-stable
-  GODOT_VERSION: 4.0.stable
+  GODOT_TAG: 4.0.1-stable
+  GODOT_VERSION: 4.0.1.stable
 
 jobs:
 
@@ -41,7 +41,7 @@ jobs:
           path: spine-godot/godot/bin/godot.windows.editor.x86_64.exe
 
   godot-editor-linux:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
         with:
@@ -135,7 +135,7 @@ jobs:
           path: spine-godot/godot/bin/macos.zip
 
   godot-template-linux:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
         with:
