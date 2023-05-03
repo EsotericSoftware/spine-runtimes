@@ -7,7 +7,7 @@
 #include "SpineCoreShaders/Spine-Common.cginc"
 #include "Spine-Common-URP.hlsl"
 
-#if defined(_RIM_LIGHTING) || defined(_ADDITIONAL_LIGHTS) || defined(MAIN_LIGHT_CALCULATE_SHADOWS)
+#if defined(_RIM_LIGHTING) || defined(_ADDITIONAL_LIGHTS) || defined(MAIN_LIGHT_CALCULATE_SHADOWS) || defined(_LIGHT_COOKIES)
 	#define NEEDS_POSITION_WS
 #endif
 
@@ -122,6 +122,10 @@ half4 LightweightFragmentPBRSimplified(InputData inputData, half4 texAlbedoAlpha
 #else
 	Light mainLight = GetMainLight();
 #endif
+#if defined(_LIGHT_COOKIES)
+	half3 cookieColor = SampleMainLightCookie(inputData.positionWS);
+	mainLight.color *= cookieColor;
+#endif
 
 	half3 finalColor = inputData.bakedGI * albedo.rgb;
 	finalColor += LightingPhysicallyBased(brdfData, mainLight, inputData.normalWS, inputData.viewDirectionWS);
@@ -193,6 +197,11 @@ half4 LightweightFragmentBlinnPhongSimplified(InputData inputData, half4 texDiff
 #else
 	Light mainLight = GetMainLight();
 #endif
+#if defined(_LIGHT_COOKIES)
+	half3 cookieColor = SampleMainLightCookie(inputData.positionWS);
+	mainLight.color *= cookieColor;
+#endif
+
 	half3 diffuseLighting = inputData.bakedGI;
 
 	half3 attenuation = mainLight.distanceAttenuation* mainLight.shadowAttenuation;
