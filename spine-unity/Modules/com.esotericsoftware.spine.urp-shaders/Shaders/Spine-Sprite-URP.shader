@@ -45,7 +45,7 @@ Shader "Universal Render Pipeline/Spine/Sprite"
 		[HideInInspector] _RenderQueue("__queue", Float) = 0.0
 		[HideInInspector] _Cull("__cull", Float) = 0.0
 		[HideInInspector] _StencilRef("Stencil Reference", Float) = 1.0
-		[Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Compare", Float) = 0.0 // Disabled stencil test by default
+		[Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Compare", Float) = 8 // Set to Always as default
 	}
 
 	SubShader
@@ -107,6 +107,8 @@ Shader "Universal Render Pipeline/Spine/Sprite"
 			#pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
 			#pragma multi_compile _ _SHADOWS_SOFT
 			#pragma multi_compile _ _MIXED_LIGHTING_SUBTRACTIVE
+			#pragma multi_compile_fragment _ _LIGHT_COOKIES
+			
 			// Farward+ renderer keywords
 			#pragma multi_compile_fragment _ _LIGHT_LAYERS
 			#pragma multi_compile _ _FORWARD_PLUS
