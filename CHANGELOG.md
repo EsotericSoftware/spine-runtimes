@@ -37,6 +37,7 @@
 
 * **Breaking changes**
   * Changed `SpineShaderWithOutlineGUI` outline related methods from `private` to `protected virtual` to allow for custom shader GUI subclasses to switch to different outline shaders.
+  * Changed `BoneFollower` and `BoneFollowerGraphic` methods `LateUpdate` and `Initialize` to `virtual` to allow easier overriding for e.g. positional offset in custom subclasses.
   
 * **Changes of default values**
 

@@ -113,7 +113,7 @@ namespace Spine.Unity {
 			Initialize();
 		}
 
-		public void Initialize () {
+		public virtual void Initialize () {
 			bone = null;
 			valid = skeletonRenderer != null && skeletonRenderer.valid;
 			if (!valid) return;
@@ -137,7 +137,7 @@ namespace Spine.Unity {
 				skeletonRenderer.OnRebuild -= HandleRebuildRenderer;
 		}
 
-		public void LateUpdate () {
+		public virtual void LateUpdate () {
 			if (!valid) {
 				Initialize();
 				return;
