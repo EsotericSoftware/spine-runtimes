@@ -101,10 +101,15 @@ namespace Spine.Unity.Examples {
 		}
 
 #if UNITY_EDITOR
+		// handle disabled scene reload
+		private void OnEnable () {
+			if (Application.isPlaying)
+				Awake();
+		}
+
 		private void Update () {
-			if (!Application.isPlaying) {
+			if (!Application.isPlaying)
 				InitializeDict();
-			}
 		}
 #endif
 
@@ -142,6 +147,7 @@ namespace Spine.Unity.Examples {
 		}
 
 		void InitializeDict () {
+			replacementMaterialDict.Clear();
 			for (int i = 0; i < replacementMaterials.Length; ++i) {
 				MaterialReplacement entry = replacementMaterials[i];
 				replacementMaterialDict[entry.originalMaterial] = entry.replacementMaterial;
