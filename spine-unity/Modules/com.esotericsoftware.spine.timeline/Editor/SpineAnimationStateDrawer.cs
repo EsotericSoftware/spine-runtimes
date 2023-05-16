@@ -56,9 +56,10 @@ public class SpineAnimationStateDrawer : PropertyDrawer {
 		SerializedProperty attachmentProp = property.FindPropertyRelative("attachmentThreshold");
 		SerializedProperty drawOrderProp = property.FindPropertyRelative("drawOrderThreshold");
 
-		// initialize useBlendDuration parameter according to preferences
+		// initialize customDuration (inverse default mix duration) and useBlendDuration parameters according to preferences
 		SerializedProperty isInitializedProp = property.FindPropertyRelative("isInitialized");
 		if (!isInitializedProp.hasMultipleDifferentValues && isInitializedProp.boolValue == false) {
+			customDurationProp.boolValue = !SpineEditorUtilities.Preferences.timelineDefaultMixDuration;
 			useBlendDurationProp.boolValue = SpineEditorUtilities.Preferences.timelineUseBlendDuration;
 			isInitializedProp.boolValue = true;
 		}

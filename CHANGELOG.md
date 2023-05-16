@@ -167,6 +167,7 @@
   * `SkeletonGraphic` now supports automatic scaling based on its `RectTransform` bounds. Automatic scaling can be enabled by setting the added `Layout Scale Mode` Inspector property to either `Width Controls Height`, `Height Controls Width`, `FitInParent` or `EnvelopeParent`. It is set to `None` by default to keep previous behaviour and avoid breaking existing projects. To modify the reference layout bounds, hit the additional `Edit Layout Bounds` toggle button to switch into edit mode, adjust the bounds or hit `Match RectTransform with Mesh`, and hit the button again when done adjusting. The skeleton will now be scaled accordingly to fit the reference layout bounds to the object's `RectTransform`.
   * Added previously missing unlit URP 2D shader variant, available under `Universal Render Pipeline/2D/Spine/Skeleton`.
   * Added support for light cookies at `Universal Render Pipeline/Spine/Sprite` shader.
+  * Timeline extension package: An additional Spine preferences parameter `Timeline` - `Default Mix Duration` has been added, setting newly added `SpineAnimationStateClip` clips accordingly, defaults to false. This Spine preferences parameter can be enabled to default to the previous behaviour before this update.
  
 * **Breaking changes**
   * Made `SkeletonGraphic.unscaledTime` parameter protected, use the new property `UnscaledTime` instead.
