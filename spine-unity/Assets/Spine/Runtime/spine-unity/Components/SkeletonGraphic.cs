@@ -278,7 +278,6 @@ namespace Spine.Unity {
 		}
 
 		protected override void Awake () {
-
 			base.Awake();
 			this.onCullStateChanged.AddListener(OnCullStateChanged);
 
@@ -293,7 +292,7 @@ namespace Spine.Unity {
 				}
 #endif
 				Initialize(false);
-				Rebuild(CanvasUpdate.PreRender);
+				if (this.IsValid) Rebuild(CanvasUpdate.PreRender);
 			}
 
 #if UNITY_EDITOR
