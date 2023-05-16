@@ -182,6 +182,9 @@ namespace Spine.Unity.Editor {
 		public bool mecanimEventIncludeFolderName = DEFAULT_MECANIM_EVENT_INCLUDE_FOLDERNAME;
 
 		// Timeline extension module
+		public const bool DEFAULT_TIMELINE_DEFAULT_MIX_DURATION = false;
+		public bool timelineDefaultMixDuration = DEFAULT_TIMELINE_DEFAULT_MIX_DURATION;
+
 		public const bool DEFAULT_TIMELINE_USE_BLEND_DURATION = true;
 		public bool timelineUseBlendDuration = DEFAULT_TIMELINE_USE_BLEND_DURATION;
 
@@ -369,6 +372,7 @@ namespace Spine.Unity.Editor {
 				GUILayout.Space(20);
 				EditorGUILayout.LabelField("Timeline Extension", EditorStyles.boldLabel);
 				{
+					EditorGUILayout.PropertyField(settings.FindProperty("timelineDefaultMixDuration"), new GUIContent("Default Mix Duration", "When enabled, the clip uses the default mix duration by default, as specified at the SkeletonDataAsset."));
 					EditorGUILayout.PropertyField(settings.FindProperty("timelineUseBlendDuration"), new GUIContent("Use Blend Duration", "When enabled, MixDuration will be synced with timeline clip transition duration 'Ease In Duration'."));
 				}
 			}
