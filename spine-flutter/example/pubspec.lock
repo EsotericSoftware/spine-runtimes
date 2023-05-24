@@ -122,10 +122,10 @@ packages:
     dependency: transitive
     description:
       name: meta
-      sha256: "12307e7f0605ce3da64cf0db90e5fcab0869f3ca03f76be6bb2991ce0a55e82b"
+      sha256: "3c74dbf8763d36539f114c799d8a2d87343b5067e9d796ca22b5eb8437090ee3"
       url: "https://pub.dev"
     source: hosted
-    version: "1.9.0"
+    version: "1.9.1"
   ordered_set:
     dependency: transitive
     description:
@@ -169,7 +169,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "4.1.1"
+    version: "4.1.2"
   string_scanner:
     dependency: transitive
     description:
@@ -211,5 +211,5 @@ packages:
     source: hosted
     version: "0.7.4"
 sdks:
-  dart: ">=2.19.0 <4.0.0"
-  flutter: ">=3.7.6"
+  dart: ">=3.0.0-0 <4.0.0"
+  flutter: ">=3.10.1"
