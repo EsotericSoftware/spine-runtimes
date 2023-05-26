@@ -307,6 +307,7 @@ namespace Spine.Unity {
 
 		public override void Rebuild (CanvasUpdate update) {
 			base.Rebuild(update);
+			if (!this.IsValid) return;
 			if (canvasRenderer.cull) return;
 			if (update == CanvasUpdate.PreRender) {
 				if (requiresInstructionUpate) PrepareInstructionsAndRenderers(isInRebuild: true);
@@ -401,6 +402,7 @@ namespace Spine.Unity {
 		}
 
 		public void LateUpdate () {
+			if (!this.IsValid) return;
 			// instantiation can happen from Update() after this component, leading to a missing Update() call.
 			if (!wasUpdatedAfterInit) Update(0);
 			if (freeze) return;
