@@ -130,6 +130,8 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 	MaterialProperty _smoothnessScale = null;
 
 	MaterialProperty _lightAffectsAdditive = null;
+	MaterialProperty _tintBlack = null;
+	MaterialProperty _darkColor = null;
 
 	static GUIContent _albedoText = new GUIContent("Albedo", "Albedo (RGB) and Transparency (A)");
 	static GUIContent _maskText = new GUIContent("Light Mask", "Light mask texture (secondary Sprite texture)");
@@ -192,6 +194,8 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 	static GUIContent _meshRequiresNormalsAndTangentsText = new GUIContent("Note: Material requires a mesh with Normals and Tangents.");
 	static GUIContent[] _fixedDiffuseRampModeOptions = { new GUIContent("Hard"), new GUIContent("Soft"), new GUIContent("Old Hard"), new GUIContent("Old Soft") };
 	static GUIContent _lightAffectsAdditiveText = new GUIContent("Light Affects Additive", "For PMA Additive Slots: When enabled, additive Slots are lit normally before the additive color is written to the target buffer. When disabled, the additive color is directly written with intensity 1.");
+	static GUIContent _tintBlackText = new GUIContent("Tint Black", "Enable Tint Black functionality.");
+	static GUIContent _darkColorText = new GUIContent("Dark Color", "Tint-black dark color.");
 
 	const string _primaryMapsText = "Main Maps";
 	const string _depthLabelText = "Depth";
@@ -266,6 +270,8 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 		_smoothnessScale = FindProperty("_GlossMapScale", props, false);
 
 		_lightAffectsAdditive = FindProperty("_LightAffectsAdditive", props, false);
+		_tintBlack = FindProperty("_TintBlack", props, false);
+		_darkColor = FindProperty("_Black", props, false);
 	}
 
 	protected virtual void ShaderPropertiesGUI () {
@@ -842,6 +848,15 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 			EditorGUI.BeginChangeCheck();
 			_materialEditor.ShaderProperty(_lightAffectsAdditive, _lightAffectsAdditiveText);
 			dataChanged |= EditorGUI.EndChangeCheck();
+		}
+
+		if (_tintBlack != null) {
+			EditorGUI.BeginChangeCheck();
+			_materialEditor.ShaderProperty(_tintBlack, _tintBlackText);
+			dataChanged |= EditorGUI.EndChangeCheck();
+
+			if (_darkColor != null && (_tintBlack.floatValue != 0 || _tintBlack.hasMixedValue))
+				_materialEditor.ShaderProperty(_darkColor, _darkColorText);
 		}
 		return dataChanged;
 	}

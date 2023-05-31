@@ -6,6 +6,9 @@
 		[Toggle(_RECEIVE_SHADOWS)] _ReceiveShadows("Receive Shadows", Int) = 0
 		[Toggle(_DOUBLE_SIDED_LIGHTING)] _DoubleSidedLighting("Double-Sided Lighting", Int) = 0
 		[MaterialToggle(_LIGHT_AFFECTS_ADDITIVE)] _LightAffectsAdditive("Light Affects Additive", Float) = 0
+		[MaterialToggle(_TINT_BLACK_ON)]  _TintBlack("Tint Black", Float) = 0
+		_Color("    Light Color", Color) = (1,1,1,1)
+		_Black("    Dark Color", Color) = (0,0,0,0)
 		[HideInInspector] _StencilRef("Stencil Reference", Float) = 1.0
 		[Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Compare", Float) = 8 // Set to Always as default
 	}
@@ -47,6 +50,7 @@
 			#pragma multi_compile _ _SHADOWS_SOFT
 			#pragma multi_compile _ _MIXED_LIGHTING_SUBTRACTIVE
 			#pragma multi_compile _ _LIGHT_AFFECTS_ADDITIVE
+			#pragma shader_feature _TINT_BLACK_ON
 			// Farward+ renderer keywords
 			#pragma multi_compile_fragment _ _LIGHT_LAYERS
 			#pragma multi_compile _ _FORWARD_PLUS

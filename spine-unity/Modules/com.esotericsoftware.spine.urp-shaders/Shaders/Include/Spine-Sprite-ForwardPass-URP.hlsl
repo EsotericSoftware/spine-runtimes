@@ -7,6 +7,13 @@
 #include "SpineCoreShaders/Spine-Common.cginc"
 #include "Spine-Common-URP.hlsl"
 
+#if defined(_ALPHAPREMULTIPLY_ON)
+	#undef _STRAIGHT_ALPHA_INPUT
+#else
+	#define _STRAIGHT_ALPHA_INPUT
+#endif
+#include "SpineCoreShaders/Spine-Skeleton-Tint-Common.cginc"
+
 #if defined(_RIM_LIGHTING) || defined(_ADDITIONAL_LIGHTS) || defined(MAIN_LIGHT_CALCULATE_SHADOWS) || defined(_LIGHT_COOKIES)
 	#define NEEDS_POSITION_WS
 #endif
@@ -37,6 +44,9 @@ struct VertexOutputLWRP
 #endif
 #if defined(NEEDS_POSITION_WS)
 	float4 positionWS : TEXCOORD8;
+#endif
+#if defined(_TINT_BLACK_ON)
+	float3 darkColor : TEXCOORD9;
 #endif
 
 	UNITY_VERTEX_OUTPUT_STEREO
@@ -109,7 +119,11 @@ half3 ProcessLightPBRSimplified(InputData inputData, BRDFData brdfData, half4 sh
 half4 LightweightFragmentPBRSimplified(InputData inputData, half4 texAlbedoAlpha, half metallic, half3 specular,
 	half smoothness, half3 emission, half4 vertexColor)
 {
+#if !defined(_TINT_BLACK_ON)
 	half4 albedo = texAlbedoAlpha * vertexColor;
+#else
+	half4 albedo = texAlbedoAlpha;
+#endif
 
 	BRDFData brdfData;
 	half ignoredAlpha = 1; // ignore alpha, otherwise
@@ -189,7 +203,11 @@ half3 ProcessLightLambert(InputData inputData, half4 shadowMask, uint meshRender
 
 half4 LightweightFragmentBlinnPhongSimplified(InputData inputData, half4 texDiffuseAlpha, half3 emission, half4 vertexColor)
 {
+#if !defined(_TINT_BLACK_ON)
 	half4 diffuse = texDiffuseAlpha * vertexColor;
+#else
+	half4 diffuse = texDiffuseAlpha;
+#endif
 
 #ifndef _MAIN_LIGHT_VERTEX
 #if (defined(_MAIN_LIGHT_SHADOWS) || defined(MAIN_LIGHT_CALCULATE_SHADOWS)) && !defined(_RECEIVE_SHADOWS_OFF)
@@ -255,6 +273,10 @@ VertexOutputLWRP ForwardPassVertexSprite(VertexInput input)
 
 	output.pos = calculateLocalPos(input.vertex);
 	output.vertexColor = calculateVertexColor(input.color);
+#if defined(_TINT_BLACK_ON)
+	output.darkColor = GammaToTargetSpace(
+		half3(input.tintBlackRG.r, input.tintBlackRG.g, input.tintBlackB.r)) + _Black.rgb;
+#endif
 	output.texcoord = float3(calculateTextureCoord(input.texcoord), 0);
 
 	float3 positionWS = TransformObjectToWorld(input.vertex.xyz);
@@ -302,8 +324,14 @@ half4 ForwardPassFragmentSprite(VertexOutputLWRP input
 	UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
 
 	fixed4 texureColor = calculateTexturePixel(input.texcoord.xy);
-	RETURN_UNLIT_IF_ADDITIVE_SLOT(texureColor, input.vertexColor) // shall be called before ALPHA_CLIP
+
+	RETURN_UNLIT_IF_ADDITIVE_SLOT_TINT(texureColor, input.vertexColor, input.darkColor, _Color.a, _Black.a) // shall be called before ALPHA_CLIP
+
 	ALPHA_CLIP(texureColor, input.vertexColor)
+
+#if defined(_TINT_BLACK_ON)
+	texureColor = fragTintedColor(texureColor, input.darkColor, input.vertexColor, _Color.a, _Black.a);
+#endif
 
 	// fill out InputData struct
 	InputData inputData;

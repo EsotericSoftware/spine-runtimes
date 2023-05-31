@@ -65,6 +65,10 @@ struct appdata {
 	float3 normal : NORMAL;
 	half4 color : COLOR;
 	float2 uv0 : TEXCOORD0;
+#if defined(_TINT_BLACK_ON)
+	float2 tintBlackRG : TEXCOORD1;
+	float2 tintBlackB : TEXCOORD2;
+#endif
 	UNITY_VERTEX_INPUT_INSTANCE_ID
 };
 
