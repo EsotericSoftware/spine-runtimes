@@ -14,7 +14,11 @@
 #ifdef _LIGHT_LAYERS
 uint GetMeshRenderingLayerBackwardsCompatible()
 {
+    #if IS_URP_14_OR_NEWER
     return GetMeshRenderingLayer();
+    #else
+    return GetMeshRenderingLightLayer();
+    #endif
 }
 #else
 uint GetMeshRenderingLayerBackwardsCompatible()

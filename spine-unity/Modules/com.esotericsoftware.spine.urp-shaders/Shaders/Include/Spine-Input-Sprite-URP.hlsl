@@ -7,15 +7,15 @@ CBUFFER_START(UnityPerMaterial)
 
 float4 _MainTex_ST;
 half4 _Color;
-#if defined(_TINT_BLACK_ON)
 half4 _Black;
-#endif
 half _Cutoff;
 half _ShadowAlphaCutoff;
 
+#ifndef SPRITE_SHADER_2D
 half _Metallic;
 half _Glossiness;
 half _GlossMapScale;
+#endif
 
 half _BumpScale;
 

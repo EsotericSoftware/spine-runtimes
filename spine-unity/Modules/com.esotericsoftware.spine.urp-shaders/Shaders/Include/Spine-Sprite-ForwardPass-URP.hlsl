@@ -9,7 +9,7 @@
 
 #if defined(_ALPHAPREMULTIPLY_ON)
 	#undef _STRAIGHT_ALPHA_INPUT
-#else
+#elif !defined(_STRAIGHT_ALPHA_INPUT)
 	#define _STRAIGHT_ALPHA_INPUT
 #endif
 #include "SpineCoreShaders/Spine-Skeleton-Tint-Common.cginc"

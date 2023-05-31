@@ -12,10 +12,8 @@ CBUFFER_START(UnityPerMaterial)
 
 float4 _MainTex_ST;
 half _Cutoff;
-#if defined(_TINT_BLACK_ON)
-    half4 _Color;
-    half4 _Black;
-#endif
+half4 _Color;
+half4 _Black;
 
 CBUFFER_END
 

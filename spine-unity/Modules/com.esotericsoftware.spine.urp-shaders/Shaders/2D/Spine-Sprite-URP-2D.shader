@@ -90,7 +90,7 @@ Shader "Universal Render Pipeline/2D/Spine/Sprite"
 			#pragma shader_feature _TINT_BLACK_ON
 
 			#pragma fragmentoption ARB_precision_hint_fastest
-			#pragma multi_compile _ PIXELSNAP_ON
+			#pragma multi_compile_local _ PIXELSNAP_ON
 
 			//--------------------------------------
 			// GPU Instancing
@@ -98,7 +98,6 @@ Shader "Universal Render Pipeline/2D/Spine/Sprite"
 
 			//--------------------------------------
 			// Spine related keywords
-			#pragma shader_feature _ _STRAIGHT_ALPHA_INPUT
 			#pragma vertex CombinedShapeLightVertex
 			#pragma fragment CombinedShapeLightFragment
 
@@ -109,6 +108,7 @@ Shader "Universal Render Pipeline/2D/Spine/Sprite"
 
 			#include "Packages/com.unity.render-pipelines.universal/Shaders/2D/Include/LightingUtility.hlsl"
 
+			#define SPRITE_SHADER_2D
 			#include "../Include/Spine-Input-Sprite-URP.hlsl"
 			#include "Include/Spine-Sprite-StandardPass-URP-2D.hlsl"
 			ENDHLSL
@@ -133,7 +133,7 @@ Shader "Universal Render Pipeline/2D/Spine/Sprite"
 			#pragma shader_feature _NORMALMAP
 			#pragma shader_feature _ALPHA_CLIP
 
-			#pragma multi_compile _ PIXELSNAP_ON
+			#pragma multi_compile_local _ PIXELSNAP_ON
 
 			//--------------------------------------
 			// GPU Instancing
@@ -143,7 +143,7 @@ Shader "Universal Render Pipeline/2D/Spine/Sprite"
 			#define fixed4 half4
 			#define fixed3 half3
 			#define fixed half
-
+			#define SPRITE_SHADER_2D
 			#include "../Include/Spine-Input-Sprite-URP.hlsl"
 			#include "Include/Spine-Sprite-NormalsPass-URP-2D.hlsl"
 
@@ -161,9 +161,6 @@ Shader "Universal Render Pipeline/2D/Spine/Sprite"
 
 			HLSLPROGRAM
 			#pragma shader_feature _ _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON _ALPHAPREMULTIPLY_VERTEX_ONLY _ADDITIVEBLEND _ADDITIVEBLEND_SOFT _MULTIPLYBLEND _MULTIPLYBLEND_X2
-			#if defined(_ALPHAPREMULTIPLY_VERTEX_ONLY) || defined(_ALPHABLEND_ON)
-			#define _STRAIGHT_ALPHA_INPUT
-			#endif
 
 			#pragma prefer_hlslcc gles
 			#pragma vertex UnlitVertex
