@@ -26,7 +26,12 @@ struct VertexInput
 #if defined(_NORMALMAP)
 	float4 tangent : TANGENT;
 #endif // _NORMALMAP
+#if defined(_TINT_BLACK_ON)
+	float2 tintBlackRG : TEXCOORD1;
+	float2 tintBlackB : TEXCOORD2;
+#endif
 	UNITY_VERTEX_INPUT_INSTANCE_ID
+
 };
 
 ////////////////////////////////////////
