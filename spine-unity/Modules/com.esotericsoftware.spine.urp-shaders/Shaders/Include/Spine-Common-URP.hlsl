@@ -43,6 +43,19 @@ uint GetMeshRenderingLayerBackwardsCompatible()
 }
 #endif
 
+// copy of an older version of InputData before additional members were added in more recent URP versions. 
+struct InputDataBackwardsCompatible {
+    float3  positionWS;
+    half3   normalWS;
+    half3   viewDirectionWS;
+    float4  shadowCoord;
+    //half    fogCoord;
+    half3   vertexLighting;
+    half3   bakedGI;
+    float2  normalizedScreenSpaceUV;
+    half4   shadowMask;
+};
+
 #if USE_FORWARD_PLUS
 // note: LIGHT_LOOP_BEGIN accesses inputData.normalizedScreenSpaceUV and inputData.positionWS.
 #define LIGHT_LOOP_BEGIN_SPINE LIGHT_LOOP_BEGIN
