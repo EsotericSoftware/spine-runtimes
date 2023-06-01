@@ -109,7 +109,7 @@ half3 ProcessLightPBRSimplified(InputData inputData, BRDFData brdfData, half4 sh
 #else
 	Light light = GetAdditionalLight(lightIndex, inputData.positionWS);
 #endif
-#ifdef _LIGHT_LAYERS
+#ifdef USE_LIGHT_LAYERS
 	if (!IsMatchingLightLayer(light.layerMask, meshRenderingLayers))
 		return half3(0, 0, 0);
 #endif
@@ -136,7 +136,7 @@ half4 LightweightFragmentPBRSimplified(InputData inputData, half4 texAlbedoAlpha
 #else
 	Light mainLight = GetMainLight();
 #endif
-#if defined(_LIGHT_COOKIES)
+#if defined(USE_LIGHT_COOKIES)
 	half3 cookieColor = SampleMainLightCookie(inputData.positionWS);
 	mainLight.color *= cookieColor;
 #endif
@@ -187,7 +187,7 @@ half3 ProcessLightLambert(InputData inputData, half4 shadowMask, uint meshRender
 	Light light = GetAdditionalLight(lightIndex, inputData.positionWS);
 #endif
 
-#ifdef _LIGHT_LAYERS
+#ifdef USE_LIGHT_LAYERS
 	if (!IsMatchingLightLayer(light.layerMask, meshRenderingLayers))
 		return half3(0, 0, 0);
 #endif
@@ -215,7 +215,7 @@ half4 LightweightFragmentBlinnPhongSimplified(InputData inputData, half4 texDiff
 #else
 	Light mainLight = GetMainLight();
 #endif
-#if defined(_LIGHT_COOKIES)
+#if defined(USE_LIGHT_COOKIES)
 	half3 cookieColor = SampleMainLightCookie(inputData.positionWS);
 	mainLight.color *= cookieColor;
 #endif
