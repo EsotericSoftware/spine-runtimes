@@ -14,7 +14,7 @@
 #endif
 #include "SpineCoreShaders/Spine-Skeleton-Tint-Common.cginc"
 
-#if defined(_RIM_LIGHTING) || defined(_ADDITIONAL_LIGHTS) || defined(MAIN_LIGHT_CALCULATE_SHADOWS) || defined(_LIGHT_COOKIES)
+#if defined(_RIM_LIGHTING) || defined(_ADDITIONAL_LIGHTS) || defined(MAIN_LIGHT_CALCULATE_SHADOWS) || defined(USE_LIGHT_COOKIES)
 	#define NEEDS_POSITION_WS
 #endif
 
@@ -358,7 +358,7 @@ half4 ForwardPassFragmentSprite(VertexOutputLWRP input
 
 	inputData.normalWS = normalWS;
 	inputData.bakedGI = SAMPLE_GI(input.lightmapUV, input.vertexSH, inputData.normalWS);
-#if defined(_RIM_LIGHTING) || defined(_ADDITIONAL_LIGHTS)
+#if defined(_RIM_LIGHTING) || defined(_ADDITIONAL_LIGHTS) || defined(USE_LIGHT_COOKIES)
 	inputData.positionWS = input.positionWS.rgb;
 #endif
 #if defined(_ADDITIONAL_LIGHTS) && USE_FORWARD_PLUS
