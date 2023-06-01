@@ -46,7 +46,7 @@ struct VertexOutput {
 half3 ProcessLight(float3 positionWS, half3 normalWS, uint meshRenderingLayers, int lightIndex)
 {
 	Light light = GetAdditionalLight(lightIndex, positionWS);
-#ifdef _LIGHT_LAYERS
+#ifdef USE_LIGHT_LAYERS
 	if (!IsMatchingLightLayer(light.layerMask, meshRenderingLayers))
 		return half3(0, 0, 0);
 #endif
