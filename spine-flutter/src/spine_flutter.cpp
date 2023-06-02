@@ -695,6 +695,7 @@ static _spine_render_command *batch_commands(BlockAllocator &allocator, Vector<_
 		_spine_render_command *cmd = i < commands.size() ? commands[i] : nullptr;
 		if (cmd != nullptr && cmd->atlasPage == first->atlasPage &&
 			cmd->blendMode == first->blendMode &&
+			cmd->colors[0] == first->colors[0] &&
 			numIndices + cmd->numIndices < 0xffff) {
 			numVertices += cmd->numVertices;
 			numIndices += cmd->numIndices;
