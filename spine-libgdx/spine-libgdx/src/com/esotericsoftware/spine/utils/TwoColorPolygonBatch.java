@@ -165,7 +165,7 @@ public class TwoColorPolygonBatch implements PolygonBatch {
 
 	@Override
 	public void setPackedColor (float packedColor) {
-		Color.rgba8888ToColor(light, NumberUtils.floatToIntColor(packedColor));
+		Color.abgr8888ToColor(light, packedColor);
 		lightPacked = packedColor;
 	}
 
@@ -190,7 +190,7 @@ public class TwoColorPolygonBatch implements PolygonBatch {
 	}
 
 	public void setPackedDarkColor (float packedColor) {
-		Color.rgba8888ToColor(dark, NumberUtils.floatToIntColor(packedColor));
+		Color.abgr8888ToColor(dark, packedColor);
 		this.darkPacked = packedColor;
 	}
 
