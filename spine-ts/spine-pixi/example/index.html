@@ -39,18 +39,22 @@
 			});
 			document.body.appendChild(app.view);
 
+			// Feel free to mix and match the binary skeleton, the json skeleton, the rect atlas and the polypack atlas
+			// You only need one skeleton and one atlas, the rest is just to show how to load different formats
 			PIXI.Assets.add("spineboySkeletonJson", "./assets/spineboy-pro.json");
 			PIXI.Assets.add("spineboySkeletonBinary", "./assets/spineboy-pro.skel");
 			PIXI.Assets.add("spineboyAtlas", "./assets/spineboy.atlas");
+			PIXI.Assets.add("spineboyAtlasPolypack", "./assets/spineboy-polypack.atlas");
 
 			await PIXI.Assets.load([
 				"spineboySkeletonJson",
 				"spineboySkeletonBinary",
 				"spineboyAtlas",
+				"spineboyAtlasPolypack"
 			]);
 
 			// Create the spine display object
-			const spineBoy = spine.Spine.from("spineboySkeletonJson", "spineboyAtlas", { scale: 0.5 });
+			const spineBoy = spine.Spine.from("spineboySkeletonJson", "spineboyAtlasPolypack", { scale: 0.5 });
 
 			// .from(...) is a shortcut + cache for creating the skeleton data at a certain scale
 			// Here would be the "long way" of doing it (without cache):
