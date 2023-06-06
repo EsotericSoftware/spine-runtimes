@@ -38,6 +38,8 @@ void SpineEventData::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_float_value", "v"), &SpineEventData::set_float_value);
 	ClassDB::bind_method(D_METHOD("get_string_value"), &SpineEventData::get_string_value);
 	ClassDB::bind_method(D_METHOD("set_string_value", "v"), &SpineEventData::set_string_value);
+	ClassDB::bind_method(D_METHOD("get_audio_path"), &SpineEventData::get_audio_path);
+	ClassDB::bind_method(D_METHOD("set_audio_path", "v"), &SpineEventData::set_audio_path);
 	ClassDB::bind_method(D_METHOD("get_volume"), &SpineEventData::get_volume);
 	ClassDB::bind_method(D_METHOD("set_volume", "v"), &SpineEventData::set_volume);
 	ClassDB::bind_method(D_METHOD("get_balance"), &SpineEventData::get_balance);
@@ -77,6 +79,16 @@ String SpineEventData::get_string_value() {
 void SpineEventData::set_string_value(const String &v) {
 	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setStringValue(spine::String(v.utf8()));
+}
+
+String SpineEventData::get_audio_path() {
+	SPINE_CHECK(get_spine_object(), "")
+	return get_spine_object()->getAudioPath().buffer();
+}
+
+void SpineEventData::set_audio_path(const String &v) {
+	SPINE_CHECK(get_spine_object(), )
+	get_spine_object()->setAudioPath(spine::String(v.utf8()));
 }
 
 float SpineEventData::get_volume() {
