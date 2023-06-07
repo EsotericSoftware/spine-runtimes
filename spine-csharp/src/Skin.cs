@@ -75,6 +75,20 @@ namespace Spine {
 				SetAttachment(entry.slotIndex, entry.name, entry.attachment);
 			}
 		}
+		
+		///<summary>Removes all attachments, bones, and constraints from the specified skin to this skin.</summary>
+		public void RemoveSkin (Skin skin) {
+			foreach (BoneData data in skin.bones)
+				if (!bones.Contains(data)) bones.Remove(data);
+
+			foreach (ConstraintData data in skin.constraints)
+				if (!constraints.Contains(data)) constraints.Remove(data);
+
+			foreach (var item in skin.attachments) {
+				SkinEntry entry = item.Value;
+				RemoveAttachment(entry.slotIndex, entry.name);
+			}
+		}
 
 		///<summary>Adds all attachments from the specified skin to this skin. Attachments are deep copied.</summary>
 		public void CopySkin (Skin skin) {
