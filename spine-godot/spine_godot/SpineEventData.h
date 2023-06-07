@@ -55,6 +55,10 @@ public:
 
 	void set_string_value(const String &v);
 
+	String get_audio_path();
+
+	void set_audio_path(const String &v);
+
 	float get_volume();
 
 	void set_volume(float v);
