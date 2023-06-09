@@ -332,11 +332,12 @@ namespace Spine.Unity.Playables {
 						toAnimation.Apply(skeleton, 0, toClipTime, clipData.loop, null, clipData.alpha, MixBlend.Setup, MixDirection.In);
 				}
 
+				skeleton.UpdateWorldTransform();
 				if (skeletonAnimation) {
-					skeletonAnimation.Update(0);
+					skeletonAnimation.AfterAnimationApplied();
 					skeletonAnimation.LateUpdate();
 				} else if (skeletonGraphic) {
-					skeletonGraphic.Update(0);
+					skeletonGraphic.AfterAnimationApplied();
 					skeletonGraphic.LateUpdate();
 				}
 			}
