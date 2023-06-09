@@ -298,9 +298,9 @@ SkeletonData *USpineSkeletonDataAsset::GetSkeletonData(Atlas *Atlas) {
 void USpineSkeletonDataAsset::SetMixes(AnimationStateData *animationStateData) {
 	for (auto &data : MixData) {
 		if (!data.From.IsEmpty() && !data.To.IsEmpty()) {
-			const char *fromChar = TCHAR_TO_UTF8(*data.From);
-			const char *toChar = TCHAR_TO_UTF8(*data.To);
-			animationStateData->setMix(fromChar, toChar, data.Mix);
+			std::string fromChar = TCHAR_TO_UTF8(*data.From);
+			std::string toChar = TCHAR_TO_UTF8(*data.To);
+			animationStateData->setMix(fromChar.c_str(), toChar.c_str(), data.Mix);
 		}
 	}
 	animationStateData->setDefaultMix(DefaultMix);

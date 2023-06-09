@@ -52,7 +52,7 @@ typedef struct spSkeletonDrawable {
 
 SP_API spSkeletonDrawable *spSkeletonDrawable_create(spSkeletonData *skeletonData, spAnimationStateData *animationStateData);
 
-SP_API void spSkeletonDrawable_destroy(spSkeletonDrawable *self);
+SP_API void spSkeletonDrawable_dispose(spSkeletonDrawable *self);
 
 SP_API void spSkeletonDrawable_update(spSkeletonDrawable *self, float delta);
 

@@ -4071,7 +4071,21 @@ class RenderCommand {
       // is copied, so it doesn't matter that we free up the underlying memory on the next
       // render call. See the implementation of Vertices.raw() here:
       // https://github.com/flutter/engine/blob/5c60785b802ad2c8b8899608d949342d5c624952/lib/ui/painting/vertices.cc#L21
-      vertices = Vertices.raw(VertexMode.triangles, positions, textureCoordinates: uvs, colors: colors, indices: indices);
+      //
+      // Impeller is currently using a slow path when using vertex colors.
+      // See https://github.com/flutter/flutter/issues/127486
+      //
+      // We thus batch all meshes not only by atlas page and blend mode, but also vertex color.
+      // See spine_flutter.cpp, batch_commands().
+      //
+      // If the vertex color equals (1, 1, 1, 1), we do not store
+      // colors, which will trigger the fast path in Impeller. Otherwise we have to go the slow path, which
+      // has to render to an offscreen surface.
+      if (colors.isNotEmpty && colors[0] == -1) {
+        vertices = Vertices.raw(VertexMode.triangles, positions, textureCoordinates: uvs, indices: indices);
+      } else {
+        vertices = Vertices.raw(VertexMode.triangles, positions, textureCoordinates: uvs, colors: colors, indices: indices);
+      }
     } else {
       // On the web, rendering is done through CanvasKit, which requires copies of the native data.
       final positionsCopy = Float32List.fromList(positions);
