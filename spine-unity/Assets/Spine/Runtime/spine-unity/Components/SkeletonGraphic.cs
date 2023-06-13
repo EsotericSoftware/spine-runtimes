@@ -67,6 +67,8 @@ namespace Spine.Unity {
 		public bool startingLoop;
 		public float timeScale = 1f;
 		public bool freeze;
+		protected float meshScale = 1f;
+		public float MeshScale { get { return meshScale; } }
 
 		public enum LayoutMode {
 			None = 0,
@@ -780,13 +782,13 @@ namespace Spine.Unity {
 				meshGenerator.BuildMeshWithArrays(currentInstructions, updateTriangles);
 			}
 
-			float scale = (canvas == null) ? 100 : canvas.referencePixelsPerUnit;
+			meshScale = (canvas == null) ? 100 : canvas.referencePixelsPerUnit;
 			if (layoutScaleMode != LayoutMode.None) {
-				scale *= referenceScale;
+				meshScale *= referenceScale;
 				if (!EditReferenceRect)
-					scale *= GetLayoutScale(layoutScaleMode);
+					meshScale *= GetLayoutScale(layoutScaleMode);
 			}
-			meshGenerator.ScaleVertexData(scale);
+			meshGenerator.ScaleVertexData(meshScale);
 			if (OnPostProcessVertices != null) OnPostProcessVertices.Invoke(this.meshGenerator.Buffers);
 
 			Mesh mesh = smartMesh.mesh;
@@ -858,11 +860,11 @@ namespace Spine.Unity {
 		}
 
 		protected void UpdateMeshMultipleCanvasRenderers (SkeletonRendererInstruction currentInstructions) {
-			float scale = (canvas == null) ? 100 : canvas.referencePixelsPerUnit;
+			meshScale = (canvas == null) ? 100 : canvas.referencePixelsPerUnit;
 			if (layoutScaleMode != LayoutMode.None) {
-				scale *= referenceScale;
+				meshScale *= referenceScale;
 				if (!EditReferenceRect)
-					scale *= GetLayoutScale(layoutScaleMode);
+					meshScale *= GetLayoutScale(layoutScaleMode);
 			}
 			// Generate meshes.
 			int submeshCount = currentInstructions.submeshInstructions.Count;
@@ -884,7 +886,7 @@ namespace Spine.Unity {
 				meshGenerator.AddSubmesh(submeshInstructionItem);
 
 				Mesh targetMesh = meshesItems[i];
-				meshGenerator.ScaleVertexData(scale);
+				meshGenerator.ScaleVertexData(meshScale);
 				if (OnPostProcessVertices != null) OnPostProcessVertices.Invoke(this.meshGenerator.Buffers);
 				meshGenerator.FillVertexData(targetMesh);
 				meshGenerator.FillTriangles(targetMesh);
