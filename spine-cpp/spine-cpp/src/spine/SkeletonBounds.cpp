@@ -190,7 +190,7 @@ BoundingBoxAttachment *SkeletonBounds::getBoundingBox(Polygon *polygon) {
 	return index == -1 ? NULL : _boundingBoxes[index];
 }
 
-Vector<Polygon *> &SkeletonBounds::getPolygons() {
+Vector<spine::Polygon *> &SkeletonBounds::getPolygons() {
 	return _polygons;
 }
 
