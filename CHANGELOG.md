@@ -169,7 +169,8 @@
   * Added support for light cookies at `Universal Render Pipeline/Spine/Sprite` shader.
   * Timeline extension package: An additional Spine preferences parameter `Timeline` - `Default Mix Duration` has been added, setting newly added `SpineAnimationStateClip` clips accordingly, defaults to false. This Spine preferences parameter can be enabled to default to the previous behaviour before this update.
   * Tint Black: Added support for [Tint Black](http://en.esotericsoftware.com/spine-slots#Tint-black) functionality at all Spine URP shaders (2D and 3D shaders) and at all standard pipeline `Spine/Sprite` shaders. This feature can be enabled via the `Tint Black` material parameter in the Inspector. Note: The URP Sprite shaders provided in the Spine URP Shaders extension UPM package require the latest version of the spine-unity runtime (package version 4.1.12, 2023-05-31 or newer) to display the added material parameters in the Inspector GUI.
- 
+  * Added `SkeletonGraphic.MeshScale` property to allow access to calculated mesh scale. `MeshScale` is based on (1) Canvas pixels per unit, and (2) `RectTransform` bounds when using `Layout Scale Mode` other than `None` at `SkeletonGraphic` which scales the skeleton mesh to fit the parent `RectTransform` bounds accordingly.
+
 * **Breaking changes**
   * Made `SkeletonGraphic.unscaledTime` parameter protected, use the new property `UnscaledTime` instead.
   * `SkeletonGraphic` `OnRebuild` callback delegate is now issued after the skeleton has been initialized, before the `AnimationState` component is initialized. This makes behaviour consistent with `SkeletonAnimation` and `SkeletonMecanim` component behaviour. Use the new callback `OnAnimationRebuild` if you want to receive a callback after the `SkeletonGraphic` `AnimationState` has been initialized.

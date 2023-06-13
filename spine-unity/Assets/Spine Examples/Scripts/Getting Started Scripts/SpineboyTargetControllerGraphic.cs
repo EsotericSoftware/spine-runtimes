@@ -54,7 +54,7 @@ namespace Spine.Unity.Examples {
 			Vector2 localRectPosition;
 			RectTransformUtility.ScreenPointToLocalPointInRectangle(
 				skeletonGraphic.rectTransform, mousePosition, null, out localRectPosition);
-			Vector3 skeletonSpacePoint = localRectPosition / canvas.referencePixelsPerUnit;
+			Vector3 skeletonSpacePoint = localRectPosition / skeletonGraphic.MeshScale;
 			skeletonSpacePoint.x *= skeletonGraphic.Skeleton.ScaleX;
 			skeletonSpacePoint.y *= skeletonGraphic.Skeleton.ScaleY;
 			bone.SetLocalPosition(skeletonSpacePoint);
