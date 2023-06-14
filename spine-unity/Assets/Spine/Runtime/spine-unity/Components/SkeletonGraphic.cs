@@ -116,6 +116,7 @@ namespace Spine.Unity {
 		[SerializeField] protected List<Transform> separatorParts = new List<Transform>();
 		public List<Transform> SeparatorParts { get { return separatorParts; } }
 		public bool updateSeparatorPartLocation = true;
+		public bool updateSeparatorPartScale = false;
 
 		private bool wasUpdatedAfterInit = true;
 		private bool requiresInstructionUpate = true;
@@ -950,6 +951,17 @@ namespace Spine.Unity {
 				for (int p = 0; p < this.separatorParts.Count; ++p) {
 					separatorParts[p].position = this.transform.position;
 					separatorParts[p].rotation = this.transform.rotation;
+				}
+			}
+			if (updateSeparatorPartScale) {
+				Vector3 targetScale = this.transform.lossyScale;
+				for (int p = 0; p < this.separatorParts.Count; ++p) {
+					Transform partParent = separatorParts[p].transform.parent;
+					Vector3 parentScale = partParent == null ? Vector3.one : partParent.lossyScale;
+					separatorParts[p].localScale = new Vector3(
+						parentScale.x == 0f ? 1f : targetScale.x / parentScale.x,
+						parentScale.y == 0f ? 1f : targetScale.y / parentScale.y,
+						parentScale.z == 0f ? 1f : targetScale.z / parentScale.z);
 				}
 			}
 

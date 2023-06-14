@@ -64,7 +64,8 @@ namespace Spine.Unity.Editor {
 			updateTiming, updateWhenInvisible, unscaledTime, tintBlack, layoutScaleMode, editReferenceRect;
 		SerializedProperty initialFlipX, initialFlipY;
 		SerializedProperty meshGeneratorSettings;
-		SerializedProperty allowMultipleCanvasRenderers, separatorSlotNames, enableSeparatorSlots, updateSeparatorPartLocation;
+		SerializedProperty allowMultipleCanvasRenderers, separatorSlotNames, enableSeparatorSlots,
+			updateSeparatorPartLocation, updateSeparatorPartScale;
 		SerializedProperty raycastTarget, maskable;
 
 		readonly GUIContent UnscaledTimeLabel = new GUIContent("Unscaled Time",
@@ -141,6 +142,7 @@ namespace Spine.Unity.Editor {
 
 			allowMultipleCanvasRenderers = so.FindProperty("allowMultipleCanvasRenderers");
 			updateSeparatorPartLocation = so.FindProperty("updateSeparatorPartLocation");
+			updateSeparatorPartScale = so.FindProperty("updateSeparatorPartScale");
 			enableSeparatorSlots = so.FindProperty("enableSeparatorSlots");
 
 			separatorSlotNames = so.FindProperty("separatorSlotNames");
@@ -304,7 +306,7 @@ namespace Spine.Unity.Editor {
 					}
 
 					EditorGUILayout.Space();
-					SeparatorsField(separatorSlotNames, enableSeparatorSlots, updateSeparatorPartLocation);
+					SeparatorsField(separatorSlotNames, enableSeparatorSlots, updateSeparatorPartLocation, updateSeparatorPartScale);
 				}
 			}
 
@@ -428,7 +430,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		public static void SeparatorsField (SerializedProperty separatorSlotNames, SerializedProperty enableSeparatorSlots,
-			SerializedProperty updateSeparatorPartLocation) {
+			SerializedProperty updateSeparatorPartLocation, SerializedProperty updateSeparatorPartScale) {
 
 			bool multi = separatorSlotNames.serializedObject.isEditingMultipleObjects;
 			bool hasTerminalSlot = false;
@@ -466,6 +468,7 @@ namespace Spine.Unity.Editor {
 
 				EditorGUILayout.PropertyField(enableSeparatorSlots, SpineInspectorUtility.TempContent("Enable Separation", tooltip: "Whether to enable separation at the above separator slots."));
 				EditorGUILayout.PropertyField(updateSeparatorPartLocation, SpineInspectorUtility.TempContent("Update Part Location", tooltip: "Update separator part GameObject location to match the position of the SkeletonGraphic. This can be helpful when re-parenting parts to a different GameObject."));
+				EditorGUILayout.PropertyField(updateSeparatorPartScale, SpineInspectorUtility.TempContent("Update Part Scale", tooltip: "Update separator part GameObject scale to match the scale (lossyScale) of the SkeletonGraphic. This can be helpful when re-parenting parts to a different GameObject."));
 			}
 		}
 
