@@ -542,6 +542,7 @@ export class SpinePlayer implements Disposable {
 			} else {
 				entry = this.animationState.setEmptyAnimation(0);
 				entry.trackEnd = 100000000;
+				this.skeleton.updateWorldTransform();
 				this.setViewport(entry.animation!);
 				this.pause();
 			}
