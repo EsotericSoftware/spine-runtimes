@@ -879,13 +879,13 @@ export class SpinePlayer implements Disposable {
 
 				// Draw the skeleton and debug output.
 				renderer.drawSkeleton(skeleton, config.premultipliedAlpha);
-				if ((renderer.skeletonDebugRenderer.drawBones = config.debug!.bones!)
-					|| (renderer.skeletonDebugRenderer.drawBoundingBoxes = config.debug!.bounds!)
-					|| (renderer.skeletonDebugRenderer.drawClipping = config.debug!.clipping!)
-					|| (renderer.skeletonDebugRenderer.drawMeshHull = config.debug!.hulls!)
-					|| (renderer.skeletonDebugRenderer.drawPaths = config.debug!.paths!)
-					|| (renderer.skeletonDebugRenderer.drawRegionAttachments = config.debug!.regions!)
-					|| (renderer.skeletonDebugRenderer.drawMeshTriangles = config.debug!.meshes!)
+				if (Number(renderer.skeletonDebugRenderer.drawBones = config.debug!.bones! ?? false)
+					+ Number(renderer.skeletonDebugRenderer.drawBoundingBoxes = config.debug!.bounds! ?? false)
+					+ Number(renderer.skeletonDebugRenderer.drawClipping = config.debug!.clipping! ?? false)
+					+ Number(renderer.skeletonDebugRenderer.drawMeshHull = config.debug!.hulls! ?? false)
+					+ Number(renderer.skeletonDebugRenderer.drawPaths = config.debug!.paths! ?? false)
+					+ Number(renderer.skeletonDebugRenderer.drawRegionAttachments = config.debug!.regions! ?? false)
+					+ Number(renderer.skeletonDebugRenderer.drawMeshTriangles = config.debug!.meshes! ?? false) > 0
 				) {
 					renderer.drawSkeletonDebug(skeleton, config.premultipliedAlpha);
 				}
