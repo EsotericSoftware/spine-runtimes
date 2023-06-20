@@ -880,12 +880,12 @@ export class SpinePlayer implements Disposable {
 				// Draw the skeleton and debug output.
 				renderer.drawSkeleton(skeleton, config.premultipliedAlpha);
 				if ((renderer.skeletonDebugRenderer.drawBones = config.debug!.bones!)
-					+ (renderer.skeletonDebugRenderer.drawBoundingBoxes = config.debug!.bounds!)
-					+ (renderer.skeletonDebugRenderer.drawClipping = config.debug!.clipping!)
-					+ (renderer.skeletonDebugRenderer.drawMeshHull = config.debug!.hulls!)
-					+ (renderer.skeletonDebugRenderer.drawPaths = config.debug!.paths!)
-					+ (renderer.skeletonDebugRenderer.drawRegionAttachments = config.debug!.regions!)
-					+ (renderer.skeletonDebugRenderer.drawMeshTriangles = config.debug!.meshes!) > 0
+					|| (renderer.skeletonDebugRenderer.drawBoundingBoxes = config.debug!.bounds!)
+					|| (renderer.skeletonDebugRenderer.drawClipping = config.debug!.clipping!)
+					|| (renderer.skeletonDebugRenderer.drawMeshHull = config.debug!.hulls!)
+					|| (renderer.skeletonDebugRenderer.drawPaths = config.debug!.paths!)
+					|| (renderer.skeletonDebugRenderer.drawRegionAttachments = config.debug!.regions!)
+					|| (renderer.skeletonDebugRenderer.drawMeshTriangles = config.debug!.meshes!)
 				) {
 					renderer.drawSkeletonDebug(skeleton, config.premultipliedAlpha);
 				}
