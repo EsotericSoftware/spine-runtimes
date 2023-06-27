@@ -145,6 +145,7 @@ spine-ts/spine-canvas/dist
 spine-ts/spine-webgl/dist
 spine-ts/spine-player/dist
 spine-ts/spine-threejs/dist
+spine-ts/spine-pixi/dist
 spine-libgdx/gradle
 spine-libgdx/gradlew
 spine-libgdx/gradlew.bat

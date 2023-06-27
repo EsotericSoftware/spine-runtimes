@@ -1,0 +1,140 @@
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>spine-pixi</title>
+	<script src="https://cdn.jsdelivr.net/npm/pixi.js@7.2.4/dist/pixi.min.js"></script>
+	<script src="../dist/iife/spine-pixi.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/tweakpane@3.1.9/dist/tweakpane.min.js"></script>
+</head>
+<style>
+	* {
+		margin: 0;
+		padding: 0;
+	}
+
+	body,
+	html {
+		height: 100%
+	}
+
+	canvas {
+		position: absolute;
+		width: 100%;
+		height: 100%;
+	}
+</style>
+
+<body>
+	<script>
+		(async function () {
+			var app = new PIXI.Application({
+				width: window.innerWidth,
+				height: window.innerHeight,
+				resolution: window.devicePixelRatio || 1,
+				autoDensity: true,
+				resizeTo: window,
+				backgroundColor: 0x2c3e50,
+				hello:true
+			});
+			document.body.appendChild(app.view);
+
+			// Feel free to mix and match the binary skeleton, the json skeleton, the rect atlas and the polypack atlas
+			// You only need one skeleton and one atlas, the rest is just to show how to load different formats
+			PIXI.Assets.add("spineboySkeletonJson", "./assets/spineboy-pro.json");
+			PIXI.Assets.add("spineboySkeletonBinary", "./assets/spineboy-pro.skel");
+			PIXI.Assets.add("spineboyAtlas", "./assets/spineboy.atlas");
+			PIXI.Assets.add("spineboyAtlasPolypack", "./assets/spineboy-polypack.atlas");
+
+			await PIXI.Assets.load([
+				"spineboySkeletonJson",
+				"spineboySkeletonBinary",
+				"spineboyAtlas",
+				"spineboyAtlasPolypack"
+			]);
+
+			// Create the spine display object
+			const spineBoy = spine.Spine.from("spineboySkeletonJson", "spineboyAtlasPolypack", { scale: 0.5 });
+
+			// .from(...) is a shortcut + cache for creating the skeleton data at a certain scale
+			// Here would be the "long way" of doing it (without cache):
+
+			// const skeletonAsset = Assets.get(skeletonAssetName);
+			// const atlasAsset = Assets.get(atlasAssetName);
+			// const attachmentLoader = new AtlasAttachmentLoader(atlasAsset);
+			// let parser; // You can skip this guessing step if you know the type of the skeleton asset
+			// if (skeletonAsset instanceof Uint8Array) {
+			// 	parser = new SkeletonBinary(attachmentLoader);
+			// } else {
+			// 	parser = new SkeletonJson(attachmentLoader);
+			// }
+			// parser.scale = options?.scale ?? 1;
+			// skeletonData = parser.readSkeletonData(skeletonAsset);
+			// onst spineBoy = new spine.Spine(skeletonData, options);
+
+
+			// Set the position
+			spineBoy.x = window.innerWidth / 2;
+			spineBoy.y = window.innerHeight * 0.9;
+
+			// start an animation. AutoUpdate is on by default, we don't need a manual rAF loop
+			spineBoy.state.setAnimation(0, "run", true);
+
+			// add to stage
+			app.stage.addChild(spineBoy);
+
+			// do we want debug? we can have debug!
+			const spinedebugger = new spine.SpineDebugRenderer();
+			spineBoy.debug = spinedebugger;
+
+			// End of spine setup. The rest is the tweakpane on the right to play with the spineboy
+
+			const pane = new Tweakpane.Pane({ title: 'spine pixi.js' });
+
+			// spineboy position on screen
+			pane.addInput(spineBoy, 'position', {
+				x: { min: 0, max: window.innerWidth },
+				y: { min: 0, max: window.innerHeight },
+			});
+
+			// Interesting example on how to get the pixi global position of a bone, and how to set a bone to a pixi global position
+			// spine's "global" position is local to the spine display object. It's not the same as pixi's global position
+			const aux = {aimPosition:spineBoy.toGlobal(spineBoy.getBonePosition("crosshair"))};
+			const aimControl = pane.addInput(aux, 'aimPosition', {
+				x: { min: 0, max: window.innerWidth },
+				y: { min: 0, max: window.innerHeight },
+			}).on("change", (e) => {
+				spineBoy.setBonePosition("crosshair", spineBoy.toLocal(e.value));
+			})
+			aimControl.hidden = true;
+
+			// anim changer
+			pane.addBlade({
+				view: 'list',
+				label: 'animation',
+				options: spineBoy.skeleton.data.animations.map(a => ({ text: a.name, value: a.name })),
+				value: 'run',
+			}).on("change", (e) => {
+				spineBoy.state.setAnimation(0, e.value, true);
+				aimControl.hidden = !(e.value == "aim")
+			})
+
+			// turn on or off debug draws
+			const debugFolder = pane.addFolder({
+				title: 'Debug options',
+			});
+
+			debugFolder.addInput(spinedebugger, 'drawMeshHull');
+			debugFolder.addInput(spinedebugger, 'drawMeshTriangles');
+			debugFolder.addInput(spinedebugger, 'drawBones');
+			debugFolder.addInput(spinedebugger, 'drawPaths');
+			debugFolder.addInput(spinedebugger, 'drawBoundingBoxes');
+			debugFolder.addInput(spinedebugger, 'drawClipping');
+			debugFolder.addInput(spinedebugger, 'drawRegionAttachments');
+			debugFolder.addInput(spinedebugger, 'drawEvents');
+
+		})();
+	</script>
+</body>
+
+</html>
