@@ -664,7 +664,7 @@ namespace Spine.Unity.Editor {
 				Material material = (Material)AssetDatabase.LoadAssetAtPath(materialPath, typeof(Material));
 
 				if (material == null) {
-					Shader defaultShader = Shader.Find(SpineEditorUtilities.Preferences.DefaultShader);
+					Shader defaultShader = GetDefaultShader();
 					material = defaultShader != null ? new Material(defaultShader) : null;
 					if (material) {
 						ApplyPMAOrStraightAlphaSettings(material, SpineEditorUtilities.Preferences.textureSettingsReference);
@@ -735,6 +735,13 @@ namespace Spine.Unity.Editor {
 			// asset returns null, regardless of refresh calls.
 			AtlasAssetBase loadedAtlas = (AtlasAssetBase)AssetDatabase.LoadAssetAtPath(atlasPath, typeof(AtlasAssetBase));
 			return loadedAtlas != null ? loadedAtlas : atlasAsset;
+		}
+
+		public static Shader GetDefaultShader () {
+			Shader shader = Shader.Find(SpineEditorUtilities.Preferences.DefaultShader);
+			if (shader == null) shader = Shader.Find("Spine/Skeleton");
+			if (shader == null) shader = Shader.Find("Standard");
+			return shader;
 		}
 
 		public static bool SpriteAtlasSettingsNeedAdjustment (UnityEngine.U2D.SpriteAtlas spriteAtlas) {
@@ -851,24 +858,24 @@ namespace Spine.Unity.Editor {
 
 			{
 				string pageName = "SpriteAtlas";
-
 				string materialPath = assetPath + "/" + primaryName + "_" + pageName + ".mat";
-				Material mat = AssetDatabase.LoadAssetAtPath<Material>(materialPath);
+				Material material = AssetDatabase.LoadAssetAtPath<Material>(materialPath);
 
-				if (mat == null) {
-					mat = new Material(Shader.Find(SpineEditorUtilities.Preferences.defaultShader));
-					ApplyPMAOrStraightAlphaSettings(mat, SpineEditorUtilities.Preferences.textureSettingsReference);
-					AssetDatabase.CreateAsset(mat, materialPath);
+				if (material == null) {
+					Shader defaultShader = GetDefaultShader();
+					material = defaultShader != null ? new Material(defaultShader) : null;
+					ApplyPMAOrStraightAlphaSettings(material, SpineEditorUtilities.Preferences.textureSettingsReference);
+					AssetDatabase.CreateAsset(material, materialPath);
 				} else {
-					vestigialMaterials.Remove(mat);
+					vestigialMaterials.Remove(material);
 				}
 
 				if (texture != null)
-					mat.mainTexture = texture;
+					material.mainTexture = texture;
 
-				EditorUtility.SetDirty(mat);
+				EditorUtility.SetDirty(material);
 				// note: don't call AssetDatabase.SaveAssets() since this would trigger OnPostprocessAllAssets() every time unnecessarily.
-				populatingMaterials.Add(mat); //atlasAsset.materials[i] = mat;
+				populatingMaterials.Add(material);
 			}
 
 			atlasAsset.materials = populatingMaterials.ToArray();
