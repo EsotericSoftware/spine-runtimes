@@ -5,7 +5,7 @@ import { Texture as PixiTexture, SCALE_MODES, MIPMAP_MODES, WRAP_MODES, BLEND_MO
 export class SpineTexture extends Texture {
 	private static textureMap: Map<PixiBaseTexture, SpineTexture> = new Map<PixiBaseTexture, SpineTexture>();
 
-	public static from(texture: PixiBaseTexture): SpineTexture {
+	public static from (texture: PixiBaseTexture): SpineTexture {
 		if (SpineTexture.textureMap.has(texture)) {
 			return SpineTexture.textureMap.get(texture)!;
 		}
@@ -14,31 +14,31 @@ export class SpineTexture extends Texture {
 
 	public readonly texture: PixiTexture;
 
-	private constructor(image: PixiBaseTexture) {
+	private constructor (image: PixiBaseTexture) {
 		// Todo: maybe add error handling if you feed a video texture to spine?
 		super((image.resource as BaseImageResource).source as any);
 		this.texture = PixiTexture.from(image);
 	}
 
-	public setFilters(minFilter: TextureFilter, _magFilter: TextureFilter): void {
+	public setFilters (minFilter: TextureFilter, _magFilter: TextureFilter): void {
 		this.texture.baseTexture.scaleMode = SpineTexture.toPixiTextureFilter(minFilter);
 		this.texture.baseTexture.mipmap = SpineTexture.toPixiMipMap(minFilter);
 
 		// pixi only has one filter for both min and mag, too bad
 	}
 
-	public setWraps(uWrap: TextureWrap, _vWrap: TextureWrap): void {
+	public setWraps (uWrap: TextureWrap, _vWrap: TextureWrap): void {
 		this.texture.baseTexture.wrapMode = SpineTexture.toPixiTextureWrap(uWrap);
 
 		// Pixi only has one setting
 	}
 
-	public dispose(): void {
+	public dispose (): void {
 		// I am not entirely sure about this...
 		this.texture.destroy();
 	}
 
-	private static toPixiTextureFilter(filter: TextureFilter): SCALE_MODES {
+	private static toPixiTextureFilter (filter: TextureFilter): SCALE_MODES {
 		switch (filter) {
 			case TextureFilter.Nearest:
 			case TextureFilter.MipMapNearestLinear:
@@ -55,7 +55,7 @@ export class SpineTexture extends Texture {
 		}
 	}
 
-	private static toPixiMipMap(filter: TextureFilter): MIPMAP_MODES {
+	private static toPixiMipMap (filter: TextureFilter): MIPMAP_MODES {
 		switch (filter) {
 			case TextureFilter.Nearest:
 			case TextureFilter.Linear:
@@ -72,7 +72,7 @@ export class SpineTexture extends Texture {
 		}
 	}
 
-	private static toPixiTextureWrap(wrap: TextureWrap): WRAP_MODES {
+	private static toPixiTextureWrap (wrap: TextureWrap): WRAP_MODES {
 		switch (wrap) {
 			case TextureWrap.ClampToEdge:
 				return WRAP_MODES.CLAMP;
@@ -88,7 +88,7 @@ export class SpineTexture extends Texture {
 		}
 	}
 
-	public static toPixiBlending(blend: BlendMode): BLEND_MODES {
+	public static toPixiBlending (blend: BlendMode): BLEND_MODES {
 		switch (blend) {
 			case BlendMode.Normal:
 				return BLEND_MODES.NORMAL;

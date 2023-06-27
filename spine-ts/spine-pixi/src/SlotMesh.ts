@@ -10,7 +10,7 @@ export class SlotMesh extends Mesh implements ISlotMesh {
 	private static readonly auxColor = [0, 0, 0, 0];
 	private warnedTwoTint: boolean = false;
 
-	constructor() {
+	constructor () {
 		const geometry = new MeshGeometry();
 
 		geometry.getBuffer("aVertexPosition").static = false;
@@ -19,7 +19,7 @@ export class SlotMesh extends Mesh implements ISlotMesh {
 		const meshMaterial = new MeshMaterial(Texture.EMPTY);
 		super(geometry, meshMaterial);
 	}
-	public updateFromSpineData(
+	public updateFromSpineData (
 		slotTexture: SpineTexture,
 		slotBlendMode: BlendMode,
 		slotName: string,

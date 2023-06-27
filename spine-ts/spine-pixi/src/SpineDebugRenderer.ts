@@ -13,17 +13,17 @@ export interface ISpineDebugRenderer {
 	/**
 	 * This will be called every frame, after the spine has been updated.
 	 */
-	renderDebug(spine: Spine): void;
+	renderDebug (spine: Spine): void;
 
 	/**
 	 *  This is called when the `spine.debug` object is set to null or when the spine is destroyed.
 	 */
-	unregisterSpine(spine: Spine): void;
+	unregisterSpine (spine: Spine): void;
 
 	/**
 	 * This is called when the `spine.debug` object is set to a new instance of a debug renderer.
 	 */
-	registerSpine(spine: Spine): void;
+	registerSpine (spine: Spine): void;
 }
 
 type DebugDisplayObjects = {
@@ -77,7 +77,7 @@ export class SpineDebugRenderer implements ISpineDebugRenderer {
 	/**
 	 * The debug is attached by force to each spine object. So we need to create it inside the spine when we get the first update
 	 */
-	public registerSpine(spine: Spine): void {
+	public registerSpine (spine: Spine): void {
 		if (this.registeredSpines.has(spine)) {
 			console.warn("SpineDebugRenderer.registerSpine() - this spine is already registered!", spine);
 			return;
@@ -128,11 +128,11 @@ export class SpineDebugRenderer implements ISpineDebugRenderer {
 		debugDisplayObjects.parentDebugContainer.addChild(debugDisplayObjects.eventText);
 
 		debugDisplayObjects.parentDebugContainer.zIndex = 9999999;
-		
+
 		// Disable screen reader and mouse input on debug objects.
 		(debugDisplayObjects.parentDebugContainer as any).accessibleChildren = false;
 		(debugDisplayObjects.parentDebugContainer as any).eventMode = "none";
-		(debugDisplayObjects.parentDebugContainer as any ).interactiveChildren = false;
+		(debugDisplayObjects.parentDebugContainer as any).interactiveChildren = false;
 
 		spine.addChild(debugDisplayObjects.parentDebugContainer);
 
@@ -140,7 +140,7 @@ export class SpineDebugRenderer implements ISpineDebugRenderer {
 
 		this.registeredSpines.set(spine, debugDisplayObjects);
 	}
-	public renderDebug(spine: Spine): void {
+	public renderDebug (spine: Spine): void {
 		if (!this.registeredSpines.has(spine)) {
 			// This should never happen. Spines are registered when you assign spine.debug
 			this.registerSpine(spine);
@@ -203,7 +203,7 @@ export class SpineDebugRenderer implements ISpineDebugRenderer {
 		}
 	}
 
-	private drawBonesFunc(spine: Spine, debugDisplayObjects: DebugDisplayObjects, lineWidth: number, scale: number): void {
+	private drawBonesFunc (spine: Spine, debugDisplayObjects: DebugDisplayObjects, lineWidth: number, scale: number): void {
 		const skeleton = spine.skeleton;
 		const skeletonX = skeleton.x;
 		const skeletonY = skeleton.y;
@@ -300,7 +300,7 @@ export class SpineDebugRenderer implements ISpineDebugRenderer {
 		debugDisplayObjects.skeletonXY.lineTo(skeletonX - startDotSize, skeletonY + startDotSize);
 	}
 
-	private drawRegionAttachmentsFunc(spine: Spine, debugDisplayObjects: DebugDisplayObjects, lineWidth: number): void {
+	private drawRegionAttachmentsFunc (spine: Spine, debugDisplayObjects: DebugDisplayObjects, lineWidth: number): void {
 		const skeleton = spine.skeleton;
 		const slots = skeleton.slots;
 
@@ -323,7 +323,7 @@ export class SpineDebugRenderer implements ISpineDebugRenderer {
 		}
 	}
 
-	private drawMeshHullAndMeshTriangles(spine: Spine, debugDisplayObjects: DebugDisplayObjects, lineWidth: number): void {
+	private drawMeshHullAndMeshTriangles (spine: Spine, debugDisplayObjects: DebugDisplayObjects, lineWidth: number): void {
 		const skeleton = spine.skeleton;
 		const slots = skeleton.slots;
 
@@ -381,7 +381,7 @@ export class SpineDebugRenderer implements ISpineDebugRenderer {
 		}
 	}
 
-	private drawClippingFunc(spine: Spine, debugDisplayObjects: DebugDisplayObjects, lineWidth: number): void {
+	private drawClippingFunc (spine: Spine, debugDisplayObjects: DebugDisplayObjects, lineWidth: number): void {
 		const skeleton = spine.skeleton;
 		const slots = skeleton.slots;
 
@@ -408,7 +408,7 @@ export class SpineDebugRenderer implements ISpineDebugRenderer {
 		}
 	}
 
-	private drawBoundingBoxesFunc(spine: Spine, debugDisplayObjects: DebugDisplayObjects, lineWidth: number): void {
+	private drawBoundingBoxesFunc (spine: Spine, debugDisplayObjects: DebugDisplayObjects, lineWidth: number): void {
 		// draw the total outline of the bounding box
 		debugDisplayObjects.boundingBoxesRect.lineStyle(lineWidth, this.boundingBoxesRectColor, 5);
 
@@ -453,7 +453,7 @@ export class SpineDebugRenderer implements ISpineDebugRenderer {
 		}
 	}
 
-	private drawPathsFunc(spine: Spine, debugDisplayObjects: DebugDisplayObjects, lineWidth: number): void {
+	private drawPathsFunc (spine: Spine, debugDisplayObjects: DebugDisplayObjects, lineWidth: number): void {
 		const skeleton = spine.skeleton;
 		const slots = skeleton.slots;
 
@@ -525,7 +525,7 @@ export class SpineDebugRenderer implements ISpineDebugRenderer {
 		}
 	}
 
-	public unregisterSpine(spine: Spine): void {
+	public unregisterSpine (spine: Spine): void {
 		if (!this.registeredSpines.has(spine)) {
 			console.warn("SpineDebugRenderer.unregisterSpine() - spine is not registered, can't unregister!", spine);
 		}

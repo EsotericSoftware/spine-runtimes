@@ -24,7 +24,6 @@ import type { IDestroyOptions, DisplayObject } from "@pixi/display";
 import { Container } from "@pixi/display";
 
 export interface ISpineOptions {
-	removeUnusedSlots?: boolean;
 	autoUpdate?: boolean;
 	slotMeshFactory?: () => ISlotMesh;
 }
@@ -43,10 +42,10 @@ export class Spine extends Container {
 	public state: AnimationState;
 
 	private _debug?: ISpineDebugRenderer | undefined = undefined;
-	public get debug(): ISpineDebugRenderer | undefined {
+	public get debug (): ISpineDebugRenderer | undefined {
 		return this._debug;
 	}
-	public set debug(value: ISpineDebugRenderer | undefined) {
+	public set debug (value: ISpineDebugRenderer | undefined) {
 		if (this._debug) {
 			this._debug.unregisterSpine(this);
 		}
@@ -56,16 +55,14 @@ export class Spine extends Container {
 		this._debug = value;
 	}
 
-	// Each slot is a pixi mesh, by default we just visible=false the ones we don't need. This forces a removeChild and addChild every time we need to show a slot.
-	public removeUnusedSlots: boolean;
 	protected slotMeshFactory: () => ISlotMesh;
 
 	private autoUpdateWarned: boolean = false;
 	private _autoUpdate: boolean = true;
-	public get autoUpdate(): boolean {
+	public get autoUpdate (): boolean {
 		return this._autoUpdate;
 	}
-	public set autoUpdate(value: boolean) {
+	public set autoUpdate (value: boolean) {
 		if (value) {
 			Ticker.shared.add(this.internalUpdate, this);
 			this.autoUpdateWarned = false;
@@ -88,13 +85,12 @@ export class Spine extends Container {
 	private darkColor = new Color();
 
 
-	constructor(skeletonData: SkeletonData, options?: ISpineOptions) {
+	constructor (skeletonData: SkeletonData, options?: ISpineOptions) {
 		super();
 
 		this.skeleton = new Skeleton(skeletonData);
 		const animData = new AnimationStateData(skeletonData);
 		this.state = new AnimationState(animData);
-		this.removeUnusedSlots = options?.removeUnusedSlots ?? false;
 		this.autoUpdate = options?.autoUpdate ?? true;
 		this.slotMeshFactory = options?.slotMeshFactory ?? ((): ISlotMesh => new SlotMesh());
 
@@ -116,7 +112,7 @@ export class Spine extends Container {
 		*/
 	}
 
-	public update(deltaSeconds: number): void {
+	public update (deltaSeconds: number): void {
 		if (this.autoUpdate && !this.autoUpdateWarned) {
 			console.warn("You are calling update on a Spine instance that has autoUpdate set to true. This is probably not what you want.");
 			this.autoUpdateWarned = true;
@@ -124,18 +120,18 @@ export class Spine extends Container {
 		this.internalUpdate(0, deltaSeconds);
 	}
 
-	protected internalUpdate(_deltaFrame: number, deltaSeconds?: number): void {
+	protected internalUpdate (_deltaFrame: number, deltaSeconds?: number): void {
 		// Because reasons, pixi uses deltaFrames at 60fps. We ignore the default deltaFrames and use the deltaSeconds from pixi ticker.
 		this.state.update(deltaSeconds ?? Ticker.shared.deltaMS / 1000);
 	}
 
-	public override updateTransform(): void {
+	public override updateTransform (): void {
 		this.updateSpineTransform();
 		this.debug?.renderDebug(this);
 		super.updateTransform();
 	}
 
-	protected updateSpineTransform(): void {
+	protected updateSpineTransform (): void {
 		// if I ever create the linked spines, this will be useful.
 
 		this.state.apply(this.skeleton);
@@ -144,7 +140,7 @@ export class Spine extends Container {
 		this.sortChildren();
 	}
 
-	public override destroy(options?: boolean | IDestroyOptions | undefined): void {
+	public override destroy (options?: boolean | IDestroyOptions | undefined): void {
 		for (const [, mesh] of this.meshesCache) {
 			mesh?.destroy();
 		}
@@ -154,11 +150,8 @@ export class Spine extends Container {
 		super.destroy(options);
 	}
 
-	private recycleMeshes(): void {
+	private resetMeshes (): void {
 		for (const [, mesh] of this.meshesCache) {
-			if (this.removeUnusedSlots) {
-				mesh.parent?.removeChild(mesh);
-			}
 			mesh.zIndex = -1;
 			mesh.visible = false;
 		}
@@ -167,7 +160,7 @@ export class Spine extends Container {
 	/**
 	 * If you want to manually handle which meshes go on which slot and how you cache, overwrite this method.
 	 */
-	protected getMeshForSlot(slot: Slot): ISlotMesh {
+	protected getMeshForSlot (slot: Slot): ISlotMesh {
 		if (!this.meshesCache.has(slot)) {
 			let mesh = this.slotMeshFactory();
 			this.addChild(mesh);
@@ -175,10 +168,6 @@ export class Spine extends Container {
 			return mesh;
 		} else {
 			let mesh = this.meshesCache.get(slot)!;
-
-			if (this.removeUnusedSlots) {
-				this.addChild(mesh);
-			}
 			mesh.visible = true;
 			return mesh;
 		}
@@ -186,8 +175,8 @@ export class Spine extends Container {
 
 	private verticesCache: NumberArrayLike = Utils.newFloatArray(1024);
 
-	private updateGeometry(): void {
-		this.recycleMeshes();
+	private updateGeometry (): void {
+		this.resetMeshes();
 
 		let triangles: Array<number> | null = null;
 		let uvs: NumberArrayLike | null = null;
@@ -300,46 +289,30 @@ export class Spine extends Container {
 		Spine.clipper.clipEnd();
 	}
 
-	public setBonePosition(bone: string | Bone, position: IPointData): void {
+	public setBonePosition (bone: string | Bone, position: IPointData): void {
 		const boneAux = bone;
 		if (typeof bone === "string") {
 			bone = this.skeleton.findBone(bone)!;
-			this.skeleton.findBone;
-			this.skeleton.findIkConstraint;
-			this.skeleton.findPathConstraint;
-			this.skeleton.findSlot;
-			this.skeleton.findTransformConstraint;
 		}
 
-		if (!bone) {
-			console.error(`Cant set bone position! Bone ${String(boneAux)} not found`);
-			return;
-		}
-
+		if (!bone) throw Error(`Cant set bone position, bone ${String(boneAux)} not found`);
 		Spine.vectorAux.set(position.x, position.y);
 
-		if (bone.parent)
-		{
+		if (bone.parent) {
 			const aux = bone.parent.worldToLocal(Spine.vectorAux);
 			bone.x = aux.x;
 			bone.y = aux.y;
 		}
-		else
-		{
+		else {
 			bone.x = Spine.vectorAux.x;
 			bone.y = Spine.vectorAux.y;
 		}
 	}
 
-	public getBonePosition(bone: string | Bone, outPos?: IPointData): IPointData | undefined {
+	public getBonePosition (bone: string | Bone, outPos?: IPointData): IPointData | undefined {
 		const boneAux = bone;
 		if (typeof bone === "string") {
 			bone = this.skeleton.findBone(bone)!;
-			this.skeleton.findBone;
-			this.skeleton.findIkConstraint;
-			this.skeleton.findPathConstraint;
-			this.skeleton.findSlot;
-			this.skeleton.findTransformConstraint;
 		}
 
 		if (!bone) {
@@ -358,34 +331,19 @@ export class Spine extends Container {
 
 	public static readonly skeletonCache: Record<string, SkeletonData> = Object.create(null);
 
-	public static from(skeletonAssetName: string, atlasAssetName: string, options?: ISpineOptions & { scale?: number }): Spine {
+	public static from (skeletonAssetName: string, atlasAssetName: string, options?: ISpineOptions & { scale?: number }): Spine {
 		const cacheKey = `${skeletonAssetName}-${atlasAssetName}-${options?.scale ?? 1}`;
-
 		let skeletonData = Spine.skeletonCache[cacheKey];
 		if (skeletonData) {
 			return new Spine(skeletonData, options);
 		}
-
 		const skeletonAsset = Assets.get<any | Uint8Array>(skeletonAssetName);
-
 		const atlasAsset = Assets.get<TextureAtlas>(atlasAssetName);
-
-		// If you want a custom attachment laoder, you don't use .from(...)
 		const attachmentLoader = new AtlasAttachmentLoader(atlasAsset);
-
-		// What parser do we need?
-		let parser: SkeletonBinary | SkeletonJson;
-		if (skeletonAsset instanceof Uint8Array) {
-			parser = new SkeletonBinary(attachmentLoader);
-		} else {
-			parser = new SkeletonJson(attachmentLoader);
-		}
+		let parser = skeletonAsset instanceof Uint8Array ?  new SkeletonBinary(attachmentLoader) : new SkeletonJson(attachmentLoader);
 		parser.scale = options?.scale ?? 1;
-
 		skeletonData = parser.readSkeletonData(skeletonAsset);
-
 		Spine.skeletonCache[cacheKey] = skeletonData;
-
 		return new this(skeletonData, options);
 	}
 }
@@ -394,7 +352,7 @@ Skeleton.yDown = true;
 
 export interface ISlotMesh extends DisplayObject {
 	name: string;
-	updateFromSpineData(
+	updateFromSpineData (
 		slotTexture: SpineTexture,
 		slotBlendMode: BlendMode,
 		slotName: string,

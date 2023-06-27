@@ -8,10 +8,10 @@ export class DarkSlotMesh extends DarkTintMesh implements ISlotMesh {
 
 	private static auxColor = [0, 0, 0, 0];
 
-	constructor() {
+	constructor () {
 		super();
 	}
-	public updateFromSpineData(
+	public updateFromSpineData (
 		slotTexture: SpineTexture,
 		slotBlendMode: BlendMode,
 		slotName: string,
