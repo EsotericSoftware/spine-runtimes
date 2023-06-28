@@ -340,7 +340,7 @@ export class Spine extends Container {
 		const skeletonAsset = Assets.get<any | Uint8Array>(skeletonAssetName);
 		const atlasAsset = Assets.get<TextureAtlas>(atlasAssetName);
 		const attachmentLoader = new AtlasAttachmentLoader(atlasAsset);
-		let parser = skeletonAsset instanceof Uint8Array ?  new SkeletonBinary(attachmentLoader) : new SkeletonJson(attachmentLoader);
+		let parser = skeletonAsset instanceof Uint8Array ? new SkeletonBinary(attachmentLoader) : new SkeletonJson(attachmentLoader);
 		parser.scale = options?.scale ?? 1;
 		skeletonData = parser.readSkeletonData(skeletonAsset);
 		Spine.skeletonCache[cacheKey] = skeletonData;
