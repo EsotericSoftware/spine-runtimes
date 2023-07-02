@@ -590,6 +590,18 @@ public class Bone implements Updatable {
 		return local;
 	}
 
+	/** Transforms a point from world coordinates to the parent bone's local coordinates. */
+	public Vector2 worldToParent (Vector2 world) {
+		if (world == null) throw new IllegalArgumentException("world cannot be null.");
+		return parent == null ? world : parent.worldToLocal(world);
+	}
+
+	/** Transforms a point from the parent bone's coordinates to world coordinates. */
+	public Vector2 parentToWorld (Vector2 world) {
+		if (world == null) throw new IllegalArgumentException("world cannot be null.");
+		return parent == null ? world : parent.localToWorld(world);
+	}
+
 	/** Transforms a world rotation to a local rotation. */
 	public float worldToLocalRotation (float worldRotation) {
 		worldRotation *= degRad;
