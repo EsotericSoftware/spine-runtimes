@@ -2,15 +2,20 @@
 #define SPINE_COMMON_URP_INCLUDED
 
 #ifdef USE_FORWARD_PLUS
-#define IS_URP_14_OR_NEWER 1
-#define IS_URP_12_OR_NEWER 1
-#else
-#define IS_URP_14_OR_NEWER 0
-    #ifdef UNIVERSAL_REALTIME_LIGHTS_INCLUDED
+    #define IS_URP_14_OR_NEWER 1
     #define IS_URP_12_OR_NEWER 1
+#else
+    #define IS_URP_14_OR_NEWER 0
+    #ifdef UNIVERSAL_REALTIME_LIGHTS_INCLUDED
+        #define IS_URP_12_OR_NEWER 1
     #else
-    #define IS_URP_12_OR_NEWER 0
+        #define IS_URP_12_OR_NEWER 0
     #endif
+#endif
+#if IS_URP_14_OR_NEWER && !defined(_USE_WEBGL1_LIGHTS)
+    #define IS_URP_15_OR_NEWER 1
+#else
+    #define IS_URP_15_OR_NEWER 0
 #endif
 
 #if defined(_WRITE_RENDERING_LAYERS) && IS_URP_14_OR_NEWER

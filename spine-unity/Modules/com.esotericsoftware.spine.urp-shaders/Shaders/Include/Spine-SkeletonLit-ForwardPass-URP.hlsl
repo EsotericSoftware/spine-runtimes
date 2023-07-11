@@ -150,7 +150,11 @@ VertexOutput vert(appdata v) {
 
 	// Note: ambient light is also handled via SH.
 	half3 vertexSH;
+#if IS_URP_15_OR_NEWER
+	OUTPUT_SH(positionWS, normalWS.xyz, GetWorldSpaceNormalizeViewDir(positionWS), vertexSH);
+#else
 	OUTPUT_SH(normalWS.xyz, vertexSH);
+#endif
 	color.rgb += SAMPLE_GI(v.lightmapUV, vertexSH, normalWS);
 	o.color = color;
 

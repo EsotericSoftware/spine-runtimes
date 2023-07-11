@@ -27,6 +27,10 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#if UNITY_2019_1_OR_NEWER
+#define SPEED_INCLUDED_IN_CLIP_TIME
+#endif
+
 #define SPINE_EDITMODEPOSE
 
 using System;
@@ -212,7 +216,11 @@ namespace Spine.Unity.Playables {
 						float clipSpeed = (float)clipPlayable.GetSpeed();
 						trackEntry.EventThreshold = clipData.eventThreshold;
 						trackEntry.DrawOrderThreshold = clipData.drawOrderThreshold;
-						trackEntry.TrackTime = (float)clipPlayable.GetTime() * clipSpeed * rootPlayableSpeed;
+#if SPEED_INCLUDED_IN_CLIP_TIME
+						trackEntry.TrackTime = (float)clipPlayable.GetTime();
+#else
+						trackEntry.TrackTime = (float)clipPlayable.GetTime() * rootPlayableSpeed * clipSpeed;
+#endif
 						trackEntry.TimeScale = clipSpeed * rootPlayableSpeed;
 						trackEntry.AttachmentThreshold = clipData.attachmentThreshold;
 						trackEntry.HoldPrevious = clipData.holdPrevious;
@@ -283,12 +291,20 @@ namespace Spine.Unity.Playables {
 					var fromClip = (ScriptPlayable<SpineAnimationStateBehaviour>)playable.GetInput(lastNonZeroWeightTrack - 1);
 					SpineAnimationStateBehaviour fromClipData = fromClip.GetBehaviour();
 					fromAnimation = fromClipData.animationReference != null ? fromClipData.animationReference.Animation : null;
+#if SPEED_INCLUDED_IN_CLIP_TIME
+					fromClipTime = (float)fromClip.GetTime();
+#else
 					fromClipTime = (float)fromClip.GetTime() * (float)fromClip.GetSpeed() * rootSpeed;
+#endif
 					fromClipLoop = fromClipData.loop;
 				}
 
 				Animation toAnimation = clipData.animationReference != null ? clipData.animationReference.Animation : null;
+#if SPEED_INCLUDED_IN_CLIP_TIME
+				float toClipTime = (float)inputPlayableClip.GetTime();
+#else
 				float toClipTime = (float)inputPlayableClip.GetTime() * (float)inputPlayableClip.GetSpeed() * rootSpeed;
+#endif
 				float mixDuration = clipData.mixDuration;
 
 				if (!clipData.customDuration && fromAnimation != null && toAnimation != null) {

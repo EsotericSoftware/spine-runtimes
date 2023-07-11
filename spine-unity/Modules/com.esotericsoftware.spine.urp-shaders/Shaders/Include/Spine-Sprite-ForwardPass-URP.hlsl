@@ -311,7 +311,11 @@ VertexOutputLWRP ForwardPassVertexSprite(VertexInput input)
 	output.fogFactorAndVertexLight.x = fogFactor;
 #endif
 
+#if IS_URP_15_OR_NEWER
+	OUTPUT_SH(positionWS, normalWS.xyz, GetWorldSpaceNormalizeViewDir(positionWS), output.vertexSH);
+#else
 	OUTPUT_SH(normalWS.xyz, output.vertexSH);
+#endif
 	return output;
 }
 

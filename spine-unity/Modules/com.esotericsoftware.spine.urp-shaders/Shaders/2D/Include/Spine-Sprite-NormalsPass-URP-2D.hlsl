@@ -1,8 +1,6 @@
 #ifndef SPRITE_NORMALS_PASS_URP_INCLUDED
 #define SPRITE_NORMALS_PASS_URP_INCLUDED
 
-#include "Packages/com.unity.render-pipelines.universal/Shaders/2D/Include/LightingUtility.hlsl"
-
 #include "../Include/SpineCoreShaders/ShaderShared.cginc"
 #include "../Include/SpineCoreShaders/SpriteLighting.cginc"
 
