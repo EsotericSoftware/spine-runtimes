@@ -1,6 +1,6 @@
 {
   "name": "@esotericsoftware/spine-core",
-  "version": "4.2.15",
+  "version": "4.2.16",
   "description": "The official Spine Runtimes for the web.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
