@@ -25,7 +25,8 @@ export class SetupPoseBoundsProvider implements SpineGameObjectBoundsProvider {
 		const skeleton = new Skeleton(gameObject.skeleton.data);
 		skeleton.setToSetupPose();
 		skeleton.updateWorldTransform();
-		return skeleton.getBoundsRect();
+		const bounds = skeleton.getBoundsRect();
+		return bounds.width == Number.NEGATIVE_INFINITY ? { x: 0, y: 0, width: 0, height: 0 } : bounds;
 	}
 }
 
@@ -36,7 +37,7 @@ export class SkinsAndAnimationBoundsProvider implements SpineGameObjectBoundsPro
 	 * @param skins The skins to use for calculating the bounds. If empty, the default skin is used.
 	 * @param timeStep The time step to use for calculating the bounds. A smaller time step means more precision, but slower calculation.
 	 */
-	constructor (private animation: string, private skins: string[] = [], private timeStep: number = 0.05) {
+	constructor (private animation: string | null, private skins: string[] = [], private timeStep: number = 0.05) {
 	}
 
 	calculateBounds (gameObject: SpineGameObject): { x: number; y: number; width: number; height: number; } {
@@ -61,7 +62,8 @@ export class SkinsAndAnimationBoundsProvider implements SpineGameObjectBoundsPro
 		const animation = this.animation != null ? data.findAnimation(this.animation!) : null;
 		if (animation == null) {
 			skeleton.updateWorldTransform();
-			return skeleton.getBoundsRect();
+			const bounds = skeleton.getBoundsRect();
+			return bounds.width == Number.NEGATIVE_INFINITY ? { x: 0, y: 0, width: 0, height: 0 } : bounds;
 		} else {
 			let minX = Number.POSITIVE_INFINITY, minY = Number.POSITIVE_INFINITY, maxX = Number.NEGATIVE_INFINITY, maxY = Number.NEGATIVE_INFINITY;
 			animationState.clearTracks();
@@ -78,30 +80,31 @@ export class SkinsAndAnimationBoundsProvider implements SpineGameObjectBoundsPro
 				maxX = Math.max(maxX, minX + bounds.width);
 				maxY = Math.max(maxY, minY + bounds.height);
 			}
-			return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
+			const bounds = { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
+			return bounds.width == Number.NEGATIVE_INFINITY ? { x: 0, y: 0, width: 0, height: 0 } : bounds;
 		}
 	}
 }
 
 /**
  * A SpineGameObject is a Phaser {@link GameObject} that can be added to a Phaser Scene and render a Spine skeleton.
- * 
+ *
  * The Spine GameObject is a thin wrapper around a Spine {@link Skeleton}, {@link AnimationState} and {@link AnimationStateData}. It is responsible for:
  * - updating the animation state
  * - applying the animation state to the skeleton's bones, slots, attachments, and draw order.
  * - updating the skeleton's bone world transforms
  * - rendering the skeleton
- * 
+ *
  * See the {@link SpinePlugin} class for more information on how to create a `SpineGameObject`.
- * 
+ *
  * The skeleton, animation state, and animation state data can be accessed via the repsective fields. They can be manually updated via {@link updatePose}.
- * 
+ *
  * To modify the bone hierarchy before the world transforms are computed, a callback can be set via the {@link beforeUpdateWorldTransforms} field.
- * 
+ *
  * To modify the bone hierarchy after the world transforms are computed, a callback can be set via the {@link afterUpdateWorldTransforms} field.
- * 
- * The class also features methods to convert between the skeleton coordinate system and the Phaser coordinate system. 
- * 
+ *
+ * The class also features methods to convert between the skeleton coordinate system and the Phaser coordinate system.
+ *
  * See {@link skeletonToPhaserWorldCoordinates}, {@link phaserWorldCoordinatesToSkeleton}, and {@link phaserWorldCoordinatesToBoneLocal.}
  */
 export class SpineGameObject extends ComputedSizeMixin(DepthMixin(FlipMixin(ScrollFactorMixin(TransformMixin(VisibleMixin(AlphaMixin(BaseSpineGameObject))))))) {
