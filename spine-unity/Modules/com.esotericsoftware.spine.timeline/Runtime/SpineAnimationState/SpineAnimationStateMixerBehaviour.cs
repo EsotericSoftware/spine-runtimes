@@ -165,7 +165,7 @@ namespace Spine.Unity.Playables {
 			for (int i = 0; i < inputCount; i++) {
 				float lastInputWeight = lastInputWeights[i];
 				float inputWeight = playable.GetInputWeight(i);
-				bool clipStarted = lastInputWeight == 0 && inputWeight > 0;
+				bool clipStarted = (lastInputWeight == 0 && inputWeight > 0) || info.seekOccurred || info.timeLooped;
 				if (inputWeight > 0)
 					anyClipPlaying = true;
 				lastInputWeights[i] = inputWeight;
@@ -231,10 +231,9 @@ namespace Spine.Unity.Playables {
 
 						timelineStartedTrackEntry = trackEntry;
 					}
-					//else Debug.LogWarningFormat("Animation named '{0}' not found", clipData.animationName);
 				}
-
-				// Ensure that the first frame ends with an updated mesh.
+			}
+			if (numStartingClips > 0) {
 				if (skeletonAnimation) {
 					skeletonAnimation.Update(0);
 					skeletonAnimation.LateUpdate();
