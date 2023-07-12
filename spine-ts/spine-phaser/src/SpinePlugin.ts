@@ -52,19 +52,19 @@ export interface SpineGameObjectConfig extends Phaser.Types.GameObjects.GameObje
 
 /**
  * {@link ScenePlugin} implementation adding Spine Runtime capabilities to a scene.
- * 
+ *
  * The scene's {@link LoaderPlugin} (`Scene.load`) gets these additional functions:
  * * `spineBinary(key: string, url: string, xhrSettings?: XHRSettingsObject)`: loads a skeleton binary `.skel` file from the `url`.
  * * `spineJson(key: string, url: string, xhrSettings?: XHRSettingsObject)`: loads a skeleton binary `.skel` file from the `url`.
  * * `spineAtlas(key: string, url: string, premultipliedAlpha: boolean = true, xhrSettings?: XHRSettingsObject)`: loads a texture atlas `.atlas` file from the `url` as well as its correponding texture atlas page images.
- * 
+ *
  * The scene's {@link GameObjectFactory} (`Scene.add`) gets these additional functions:
- * * `spine(x: number, y: number, dataKey: string, atlasKey: string, boundsProvider: SpineGameObjectBoundsProvider = SetupPoseBoundsProvider())`: 
+ * * `spine(x: number, y: number, dataKey: string, atlasKey: string, boundsProvider: SpineGameObjectBoundsProvider = SetupPoseBoundsProvider())`:
  *    creates a new {@link SpineGameObject} from the data and atlas at position `(x, y)`, using the {@link BoundsProvider} to calculate its bounding box. The object is automatically added to the scene.
- * 
+ *
  * The scene's {@link GameObjectCreator} (`Scene.make`) gets these additional functions:
  * * `spine(config: SpineGameObjectConfig)`: creates a new {@link SpineGameObject} from the given configuration object.
- * 
+ *
  * The plugin has additional public methods to work with Spine Runtime core API objects:
  * * `getAtlas(atlasKey: string)`: returns the {@link TextureAtlas} instance for the given atlas key.
  * * `getSkeletonData(skeletonDataKey: string)`: returns the {@link SkeletonData} instance for the given skeleton data key.
