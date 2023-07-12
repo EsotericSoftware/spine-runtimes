@@ -31,6 +31,7 @@ export const Flip = components.Flip;
 export const ScrollFactor = components.ScrollFactor;
 export const Transform = components.Transform;
 export const Visible = components.Visible;
+export const Origin = components.Origin;
 export const Alpha = components.Alpha;
 
 export interface Type<
@@ -75,6 +76,9 @@ export const TransformMixin: TransformMixin = createMixin<Phaser.GameObjects.Com
 
 type VisibleMixin = Mixin<Phaser.GameObjects.Components.Visible, Phaser.GameObjects.GameObject>;
 export const VisibleMixin: VisibleMixin = createMixin<Phaser.GameObjects.Components.Visible>(Visible);
+
+type OriginMixin = Mixin<Phaser.GameObjects.Components.Origin, Phaser.GameObjects.GameObject>;
+export const OriginMixin: OriginMixin = createMixin<Phaser.GameObjects.Components.Origin>(Origin);
 
 type AlphaMixin = Mixin<Phaser.GameObjects.Components.Alpha, Phaser.GameObjects.GameObject>;
 export const AlphaMixin: AlphaMixin = createMixin<Phaser.GameObjects.Components.Alpha>(Alpha);
