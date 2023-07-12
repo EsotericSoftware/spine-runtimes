@@ -22,13 +22,16 @@
 
         create() {
             const spineboy = this.add.spine(400, 500, 'spineboy-data', "spineboy-atlas");
-            spineboy.scale = 0.5;
+            spineboy.setInteractive();
+            spineboy.displayWidth = 200;
+            spineboy.displayHeight = spineboy.height / spineboy.width * 200;
+            this.input.enableDebug(spineboy, 0xff00ff);
             spineboy.animationState.setAnimation(0, "walk", true);
         }
     }
-    
+
     new Phaser.Game({
-        type: Phaser.AUTO,        
+        type: Phaser.AUTO,
         width: 800,
         height: 600,
         type: Phaser.WEBGL,
