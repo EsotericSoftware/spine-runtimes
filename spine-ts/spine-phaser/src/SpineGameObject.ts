@@ -1,6 +1,6 @@
 import { SPINE_GAME_OBJECT_TYPE } from "./keys";
 import { SpinePlugin } from "./SpinePlugin";
-import { ComputedSizeMixin, DepthMixin, FlipMixin, ScrollFactorMixin, TransformMixin, VisibleMixin, AlphaMixin } from "./mixins";
+import { ComputedSizeMixin, DepthMixin, FlipMixin, ScrollFactorMixin, TransformMixin, VisibleMixin, AlphaMixin, OriginMixin } from "./mixins";
 import { AnimationState, AnimationStateData, Bone, MathUtils, Skeleton, Skin, Vector2 } from "@esotericsoftware/spine-core";
 
 class BaseSpineGameObject extends Phaser.GameObjects.GameObject {
@@ -107,7 +107,7 @@ export class SkinsAndAnimationBoundsProvider implements SpineGameObjectBoundsPro
  *
  * See {@link skeletonToPhaserWorldCoordinates}, {@link phaserWorldCoordinatesToSkeleton}, and {@link phaserWorldCoordinatesToBoneLocal.}
  */
-export class SpineGameObject extends ComputedSizeMixin(DepthMixin(FlipMixin(ScrollFactorMixin(TransformMixin(VisibleMixin(AlphaMixin(BaseSpineGameObject))))))) {
+export class SpineGameObject extends DepthMixin(OriginMixin(ComputedSizeMixin(FlipMixin(ScrollFactorMixin(TransformMixin(VisibleMixin(AlphaMixin(BaseSpineGameObject)))))))) {
 	blendMode = -1;
 	skeleton: Skeleton;
 	animationStateData: AnimationStateData;
@@ -115,10 +115,6 @@ export class SpineGameObject extends ComputedSizeMixin(DepthMixin(FlipMixin(Scro
 	beforeUpdateWorldTransforms: (object: SpineGameObject) => void = () => { };
 	afterUpdateWorldTransforms: (object: SpineGameObject) => void = () => { };
 	private premultipliedAlpha = false;
-	private _displayOriginX = 0;
-	private _displayOriginY = 0;
-	private _scaleX = 1;
-	private _scaleY = 1;
 
 	constructor (scene: Phaser.Scene, private plugin: SpinePlugin, x: number, y: number, dataKey: string, atlasKey: string, public boundsProvider: SpineGameObjectBoundsProvider = new SetupPoseBoundsProvider()) {
 		super(scene, SPINE_GAME_OBJECT_TYPE);
@@ -132,44 +128,11 @@ export class SpineGameObject extends ComputedSizeMixin(DepthMixin(FlipMixin(Scro
 		this.updateSize();
 	}
 
-	public get displayOriginX () {
-		return this._displayOriginX;
-	}
-
-	public set displayOriginX (value: number) {
-		this._displayOriginX = value;
-	}
-
-	public get displayOriginY () {
-		return this._displayOriginY;
-	}
-
-	public set displayOriginY (value: number) {
-		this._displayOriginY = value;
-	}
-
-	public get scaleX () {
-		return this._scaleX;
-	}
-
-	public set scaleX (value: number) {
-		this._scaleX = value;
-		this.updateSize();
-	}
-
-	public get scaleY () {
-		return this._scaleY;
-	}
-
-	public set scaleY (value: number) {
-		this._scaleY = value;
-		this.updateSize();
-	}
-
 	updateSize () {
 		if (!this.skeleton) return;
 		let bounds = this.boundsProvider.calculateBounds(this);
-		// For some reason the TS compiler and the ComputedSize mixin don't work well together...
+		// For some reason the TS compiler and the ComputedSize mixin don't work well together and we have
+		// to cast to any.
 		let self = this as any;
 		self.width = bounds.width;
 		self.height = bounds.height;
