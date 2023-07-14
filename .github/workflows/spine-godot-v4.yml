@@ -13,8 +13,8 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   AWS_EC2_METADATA_DISABLED: true
   EM_VERSION: 3.1.18
-  GODOT_TAG: 4.0.1-stable
-  GODOT_VERSION: 4.0.1.stable
+  GODOT_TAG: 4.0.3-stable
+  GODOT_VERSION: 4.0.3.stable
 
 jobs:
 
@@ -30,9 +30,9 @@ jobs:
 
       - name: Build Godot artifact
         shell: bash
-        run: |          
+        run: |
           ./spine-godot/build/setup.sh $GODOT_TAG false
-          ./spine-godot/build/build-v4.sh       
+          ./spine-godot/build/build-v4.sh
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
@@ -52,7 +52,7 @@ jobs:
 
       - name: Build Godot artifact
         shell: bash
-        run: |          
+        run: |
           sudo apt-get update
           sudo apt-get install build-essential scons pkg-config libx11-dev libxcursor-dev libxinerama-dev libgl1-mesa-dev libglu-dev libasound2-dev libpulse-dev libudev-dev libxi-dev libxrandr-dev
           ./spine-godot/build/setup.sh $GODOT_TAG false
@@ -82,7 +82,7 @@ jobs:
           ./spine-godot/build/build-v4.sh
           pushd spine-godot/godot/bin
           zip -r godot-editor-macos.zip Godot.app
-          popd          
+          popd
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
@@ -98,11 +98,11 @@ jobs:
           fetch-depth: 0
 
       - name: Setup python and scons
-        uses: ./.github/actions/setup-godot-deps   
+        uses: ./.github/actions/setup-godot-deps
 
       - name: Build Godot artifact
-        run: |     
-          ./spine-godot/build/install-macos-vulkan-sdk.sh     
+        run: |
+          ./spine-godot/build/install-macos-vulkan-sdk.sh
           ./spine-godot/build/setup.sh $GODOT_TAG false
           ./spine-godot/build/build-templates-v4.sh ios
 
@@ -120,10 +120,10 @@ jobs:
           fetch-depth: 0
 
       - name: Setup python and scons
-        uses: ./.github/actions/setup-godot-deps   
+        uses: ./.github/actions/setup-godot-deps
 
       - name: Build Godot artifact
-        run: |          
+        run: |
           ./spine-godot/build/install-macos-vulkan-sdk.sh
           ./spine-godot/build/setup.sh $GODOT_TAG false
           ./spine-godot/build/build-templates-v4.sh macos
@@ -142,10 +142,10 @@ jobs:
           fetch-depth: 0
 
       - name: Setup python and scons
-        uses: ./.github/actions/setup-godot-deps   
+        uses: ./.github/actions/setup-godot-deps
 
       - name: Build Godot artifact
-        run: |          
+        run: |
           sudo apt-get update
           sudo apt-get install build-essential scons pkg-config libx11-dev libxcursor-dev libxinerama-dev libgl1-mesa-dev libglu-dev libasound2-dev libpulse-dev libudev-dev libxi-dev libxrandr-dev
           ./spine-godot/build/setup.sh $GODOT_TAG false
@@ -204,7 +204,7 @@ jobs:
           sudo rm -f /etc/apt/sources.list.d/*
           sudo cp -f spine-godot/build/sources.lst /etc/apt/sources.list
           sudo apt-get update
-          
+
       - name: Set up Java 11
         uses: actions/setup-java@v1
         with:
@@ -247,17 +247,17 @@ jobs:
       - name: Set up Emscripten latest
         uses: mymindstorm/setup-emsdk@v11
         with:
-          version: ${{env.EM_VERSION}}          
+          version: ${{env.EM_VERSION}}
 
       - name: Verify Emscripten setup
         run: |
           emcc -v
 
       - name: Setup python and scons
-        uses: ./.github/actions/setup-godot-deps   
+        uses: ./.github/actions/setup-godot-deps
 
       - name: Build Godot artifact
-        run: |          
+        run: |
           ./spine-godot/build/setup.sh $GODOT_TAG false
           ./spine-godot/build/build-templates-v4.sh web
 
@@ -316,7 +316,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: godot-template-linux-release.zip
-          
+
       - name: Download godot-template-linux-debug artifact
         uses: actions/download-artifact@v2
         with:
@@ -326,7 +326,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: godot-template-android-release.zip
-          
+
       - name: Download godot-template-android-debug artifact
         uses: actions/download-artifact@v2
         with:
@@ -341,7 +341,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: godot-template-web-release.zip
-          
+
       - name: Download godot-template-web-debug artifact
         uses: actions/download-artifact@v2
         with:
@@ -365,4 +365,4 @@ jobs:
           zip spine-godot-templates-$BRANCH-$GODOT_TAG.zip ios.zip macos.zip windows_debug_x86_64.exe windows_release_x86_64.exe linux_x11_64_debug linux_x11_64_release web_debug.zip web_release.zip android_release.apk android_debug.apk android_source.zip version.txt
           aws s3 cp spine-godot-templates-$BRANCH-$GODOT_TAG.zip s3://spine-godot/$BRANCH/$GODOT_TAG/spine-godot-templates-$BRANCH-$GODOT_TAG.tpz
 
-  
+
