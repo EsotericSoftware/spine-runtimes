@@ -41,6 +41,9 @@
 #include "core/variant/array.h"
 #include "scene/resources/mesh.h"
 #include "servers/rendering_server.h"
+#if VERSION_MINOR > 0
+#include "editor/editor_interface.h"
+#endif
 #else
 #include "core/engine.h"
 #endif
