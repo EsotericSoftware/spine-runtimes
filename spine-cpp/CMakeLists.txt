@@ -13,5 +13,5 @@ file(GLOB SOURCES "spine-cpp/src/**/*.cpp")
 
 add_library(spine-cpp STATIC ${SOURCES} ${INCLUDES})
 target_include_directories(spine-cpp PUBLIC spine-cpp/include)
-install(TARGETS spine-cpp DESTINATION dist/lib)
-install(FILES ${INCLUDES} DESTINATION dist/include)
+install(TARGETS spine-cpp DESTINATION lib)
+install(FILES ${INCLUDES} DESTINATION include/spine)
