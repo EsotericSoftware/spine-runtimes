@@ -165,7 +165,7 @@ namespace Spine.Unity.Playables {
 			for (int i = 0; i < inputCount; i++) {
 				float lastInputWeight = lastInputWeights[i];
 				float inputWeight = playable.GetInputWeight(i);
-				bool clipStarted = (lastInputWeight == 0 && inputWeight > 0) || info.seekOccurred || info.timeLooped;
+				bool clipStarted = (inputWeight > 0) && (lastInputWeight == 0 || info.seekOccurred || info.timeLooped);
 				if (inputWeight > 0)
 					anyClipPlaying = true;
 				lastInputWeights[i] = inputWeight;
