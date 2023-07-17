@@ -1,4 +1,4 @@
-name: Build and Publish Godot 4.0 editor and templates
+name: Build and Publish Godot 4.1 editor and templates
 
 on:
   push:
@@ -13,8 +13,8 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   AWS_EC2_METADATA_DISABLED: true
   EM_VERSION: 3.1.18
-  GODOT_TAG: 4.0.3-stable
-  GODOT_VERSION: 4.0.3.stable
+  GODOT_TAG: 4.1-stable
+  GODOT_VERSION: 4.1.stable
 
 jobs:
 
