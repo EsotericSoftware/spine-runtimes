@@ -7,9 +7,10 @@ mkdir -p lib/assets/
 # The entries for exported functions in Module.asm will be scrambled so
 # EmscriptenModule._fromJs() is unable to parse them and link them with original
 # names set on the module, e.g. Module._spine_get_major_version.
-emcc \
+echo "const module = {};" > pre.js
+em++ \
 	-Isrc/spine-cpp/include \
-	-O2 --closure 1 -fno-rtti -fno-exceptions -lc++abi -lc++ \
+	-O2 --closure 1 -fno-rtti -fno-exceptions \
 	-s STRICT=1 \
 	-s LLD_REPORT_UNDEFINED \
 	-s MODULARIZE=1 \
@@ -19,8 +20,10 @@ emcc \
 	-s EXPORT_ALL=1 \
 	-s EXPORTED_FUNCTIONS='["_malloc", "_free"]' \
 	--no-entry \
+	--extern-pre-js pre.js \
 	-s EXPORT_NAME=libspine_flutter \
 	src/spine_flutter.cpp `find src/spine-cpp/src -type f` \
 	-o lib/assets/libspine_flutter.js
 	ls -lah lib/assets
+rm pre.js
 popd

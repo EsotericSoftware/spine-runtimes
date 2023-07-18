@@ -122,23 +122,8 @@ export class Spine extends Container {
 		this.state = new AnimationState(animData);
 		this.autoUpdate = options?.autoUpdate ?? true;
 		this.slotMeshFactory = options?.slotMeshFactory ?? ((): ISlotMesh => new SlotMesh());
-
-
-		/**
-		  * This is locked behind https://github.com/pixijs/pixijs/issues/8957
-		  * I don't want to make a custom event emitter and do `this.spineEvents.on` because that's just as "far" as `this.state.addListener`
-		  * So, until pixi fixes the custom event system, I'll stick to spine native events. - @miltoncandelero
-
-			this.spineListeners = {
-				complete: (trackEntry) => this.emit("complete", trackEntry),
-				dispose: (trackEntry) => this.emit("dispose", trackEntry),
-				end: (trackEntry) => this.emit("end", trackEntry),
-				event: (trackEntry, event) => this.emit("event", trackEntry, event),
-				interrupt: (trackEntry) => this.emit("interrupt", trackEntry),
-				start: (trackEntry) => this.emit("start", trackEntry),
-			};
-			this.state.addListener(this.spineListeners);
-		*/
+		this.skeleton.setToSetupPose();
+		this.skeleton.updateWorldTransform();
 	}
 
 	public update (deltaSeconds: number): void {
