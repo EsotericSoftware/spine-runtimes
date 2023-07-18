@@ -1,3 +1,6 @@
+# 4.1.4
+* Fixes for WASM/web builds.
+
 # 4.1.3
 * Fixes for Impeller.
 
