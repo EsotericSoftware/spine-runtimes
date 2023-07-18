@@ -1,3 +1,6 @@
+# 4.2.12
+* Merge changes from 4.1.4.
+
 # 4.1.4
 * Fixes for WASM/web builds.
 
