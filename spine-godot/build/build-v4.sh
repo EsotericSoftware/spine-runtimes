@@ -35,17 +35,6 @@ if [ -f "../godot/custom.py" ]; then
 	dev="true"
 fi
 
-cpus=2
-if [ "$OSTYPE" = "msys" ]; then
-	cpus=$NUMBER_OF_PROCESSORS
-elif [[ "$OSTYPE" = "darwin"* ]]; then
-	cpus=$(sysctl -n hw.logicalcpu)
-else
-	cpus=$(grep -c ^processor /proc/cpuinfo)
-fi
-
-echo "CPUS: $cpus"
-
 mono_module=""
 mono_extension=""
 if [ $mono = "true" ]; then
@@ -53,28 +42,62 @@ if [ $mono = "true" ]; then
 	mono_extension=".mono"
 fi
 
+dev_extension=""
+if [ $dev = "true" ]; then
+	dev_extension=".dev"
+	target="$target dev_build=true"
+fi
+
+cpus=2
+if [ "$OSTYPE" = "msys" ]; then
+	os="windows"
+	cpus=$NUMBER_OF_PROCESSORS
+	target="vsproj=yes livepp=$LIVEPP"
+	godot_exe="godot.windows.editor$dev_extension.x86_64$mono_extension.exe"
+	godot_exe_host=$godot_exe
+elif [[ "$OSTYPE" = "darwin"* ]]; then
+	os="macos"
+	cpus=$(sysctl -n hw.logicalcpu)
+	godot_exe="godot.macos.editor$dev_extension.x86_64$mono_extension"
+	godot_exe_arm="godot.macos.editor$dev_extension.arm64$mono_extension"
+	godot_exe_host=$godot_exe
+	if [ `uname -m` == "arm64" ]; then
+		godot_exe_host=$godot_exe_arm
+	fi
+else
+	os="linux"
+	cpus=$(grep -c ^processor /proc/cpuinfo)
+	godot_exe="godot.linux.editor$dev_extension.x86_64$mono_extension"
+	godot_exe_host=$godot_exe
+fi
+
+echo "CPUS: $cpus"
+
 pushd ../godot
-if [ `uname` == 'Darwin' ] && [ $dev = "false" ]; then
+if [ "$os" = "macos" ] && [ $dev = "false" ]; then
 	scons $target $mono_module arch=x86_64 compiledb=yes custom_modules="../spine_godot" opengl3=yes --jobs=$cpus
 	scons $target $mono_module arch=arm64 compiledb=yes custom_modules="../spine_godot" opengl3=yes --jobs=$cpus
-
+	if [ $mono = "true" ]; then
+		echo "Building C# glue and assemblies."
+		"./bin/$godot_exe_host" --generate-mono-glue modules/mono/glue
+		./modules/mono/build_scripts/build_assemblies.py --godot-output-dir ./bin --push-nupkgs-local ../godot-nuget
+	fi
 	pushd bin
 	cp -r ../misc/dist/macos_tools.app .
 	mv macos_tools.app Godot.app
 	mkdir -p Godot.app/Contents/MacOS
-	lipo -create godot.macos.editor.arm64$mono_extension godot.macos.editor.x86_64$mono_extension -output Godot
+	lipo -create $godot_exe_arm $godot_exe -output Godot
 	strip -S -x Godot
 	cp Godot Godot.app/Contents/MacOS/Godot
 	chmod +x Godot.app/Contents/MacOS/Godot
 	popd
 else
-	if [ "$OSTYPE" = "msys" ]; then
-		target="vsproj=yes livepp=$LIVEPP"
-	fi
-	if [ "$dev" = "true" ]; then
-		target="$target dev_build=true"
-	fi
 	scons $target $mono_module compiledb=yes custom_modules="../spine_godot" opengl3=yes --jobs=$cpus
+	if [ $mono = "true" ]; then
+		echo "Building C# glue and assemblies."
+		"./bin/$godot_exe_host" --generate-mono-glue modules/mono/glue
+		./modules/mono/build_scripts/build_assemblies.py --godot-output-dir ./bin --push-nupkgs-local ../godot-nuget
+	fi
 	cp compile_commands.json ../build
 	if [ -f "bin/godot.linuxbsd.editor.x86_64$mono_extension" ]; then
 		strip bin/godot.linuxbsd.editor.x86_64$mono_extension

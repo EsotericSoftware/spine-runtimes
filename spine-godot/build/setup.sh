@@ -42,6 +42,7 @@ if [ $dev = "true" ]; then
 	cp -r .idea godot
 	cp build/custom.py godot
 	if [ "$mono" = "true" ]; then
+		echo "" >> godot/custom.py
     	echo "module_mono_enabled=\"yes\"" >> godot/custom.py
 	fi
 	cp ../formatters/.clang-format .
