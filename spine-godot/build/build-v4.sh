@@ -37,25 +37,28 @@ fi
 
 mono_module=""
 mono_extension=""
-if [ $mono = "true" ]; then
+if [ $mono == "true" ]; then
 	mono_module="module_mono_enabled=yes"
 	mono_extension=".mono"
+	echo "Building Godot with C# support"
+else
+	echo "Building Godot without C# support"
 fi
 
 dev_extension=""
-if [ $dev = "true" ]; then
+if [ $dev == "true" ]; then
 	dev_extension=".dev"
 	target="$target dev_build=true"
 fi
 
 cpus=2
-if [ "$OSTYPE" = "msys" ]; then
+if [ "$OSTYPE" == "msys" ]; then
 	os="windows"
 	cpus=$NUMBER_OF_PROCESSORS
 	target="vsproj=yes livepp=$LIVEPP"
 	godot_exe="godot.windows.editor$dev_extension.x86_64$mono_extension.exe"
 	godot_exe_host=$godot_exe
-elif [[ "$OSTYPE" = "darwin"* ]]; then
+elif [[ "$OSTYPE" == "darwin"* ]]; then
 	os="macos"
 	cpus=$(sysctl -n hw.logicalcpu)
 	godot_exe="godot.macos.editor$dev_extension.x86_64$mono_extension"
@@ -74,10 +77,10 @@ fi
 echo "CPUS: $cpus"
 
 pushd ../godot
-if [ "$os" = "macos" ] && [ $dev = "false" ]; then
+if [ "$os" == "macos" ] && [ $dev == "false" ]; then
 	scons $target $mono_module arch=x86_64 compiledb=yes custom_modules="../spine_godot" opengl3=yes --jobs=$cpus
 	scons $target $mono_module arch=arm64 compiledb=yes custom_modules="../spine_godot" opengl3=yes --jobs=$cpus
-	if [ $mono = "true" ]; then
+	if [ $mono == "true" ]; then
 		echo "Building C# glue and assemblies."
 		"./bin/$godot_exe_host" --generate-mono-glue modules/mono/glue
 		./modules/mono/build_scripts/build_assemblies.py --godot-output-dir ./bin --push-nupkgs-local ../godot-nuget
@@ -90,10 +93,13 @@ if [ "$os" = "macos" ] && [ $dev = "false" ]; then
 	strip -S -x Godot
 	cp Godot Godot.app/Contents/MacOS/Godot
 	chmod +x Godot.app/Contents/MacOS/Godot
+	if [ $mono == "true" ]; then
+		cp -r GodotSharp Godot.app/Contents/Resources
+	fi
 	popd
 else
 	scons $target $mono_module compiledb=yes custom_modules="../spine_godot" opengl3=yes --jobs=$cpus
-	if [ $mono = "true" ]; then
+	if [ $mono == "true" ]; then
 		echo "Building C# glue and assemblies."
 		"./bin/$godot_exe_host" --generate-mono-glue modules/mono/glue
 		./modules/mono/build_scripts/build_assemblies.py --godot-output-dir ./bin --push-nupkgs-local ../godot-nuget
