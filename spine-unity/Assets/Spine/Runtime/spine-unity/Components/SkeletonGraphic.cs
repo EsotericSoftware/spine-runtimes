@@ -588,6 +588,13 @@ namespace Spine.Unity {
 			SetRectTransformSize(this, size);
 			this.rectTransform.pivot = p;
 
+			foreach (Transform separatorPart in separatorParts) {
+				RectTransform separatorTransform = separatorPart.GetComponent<RectTransform>();
+				if (separatorTransform) {
+					SetRectTransformSize(separatorTransform, size);
+					separatorTransform.pivot = p;
+				}
+			}
 			foreach (SkeletonSubmeshGraphic submeshGraphic in submeshGraphics) {
 				SetRectTransformSize(submeshGraphic, size);
 				submeshGraphic.rectTransform.pivot = p;
@@ -595,14 +602,18 @@ namespace Spine.Unity {
 		}
 
 		public static void SetRectTransformSize (Graphic target, Vector2 size) {
+			SetRectTransformSize(target.rectTransform, size);
+		}
+
+		public static void SetRectTransformSize (RectTransform targetRectTransform, Vector2 size) {
 			Vector2 parentSize = Vector2.zero;
-			if (target.rectTransform.parent != null) {
-				RectTransform parentTransform = target.rectTransform.parent.GetComponent<RectTransform>();
+			if (targetRectTransform.parent != null) {
+				RectTransform parentTransform = targetRectTransform.parent.GetComponent<RectTransform>();
 				if (parentTransform)
 					parentSize = parentTransform.rect.size;
 			}
-			Vector2 anchorAreaSize = Vector2.Scale(target.rectTransform.anchorMax - target.rectTransform.anchorMin, parentSize);
-			target.rectTransform.sizeDelta = size - anchorAreaSize;
+			Vector2 anchorAreaSize = Vector2.Scale(targetRectTransform.anchorMax - targetRectTransform.anchorMin, parentSize);
+			targetRectTransform.sizeDelta = size - anchorAreaSize;
 		}
 
 		/// <summary>OnAnimationRebuild is raised after the SkeletonAnimation component is successfully initialized.</summary>
@@ -970,7 +981,7 @@ namespace Spine.Unity {
 				if (i >= usedRenderersCount)
 					canvasRenderer.gameObject.SetActive(true);
 
-				if (canvasRenderer.transform.parent != parent.transform)
+				if (canvasRenderer.transform.parent != parent.transform && !isInRebuild)
 					canvasRenderer.transform.SetParent(parent.transform, false);
 
 				canvasRenderer.transform.SetSiblingIndex(targetSiblingIndex++);
@@ -1007,6 +1018,7 @@ namespace Spine.Unity {
 				for (int i = canvasRenderers.Count - 1; i >= 0; --i) {
 					if (canvasRenderers[i] == null) {
 						canvasRenderers.RemoveAt(i);
+						submeshGraphics.RemoveAt(i);
 					}
 				}
 			}
@@ -1074,7 +1086,14 @@ namespace Spine.Unity {
 			for (int i = currentCount; i < targetCount; ++i) {
 				GameObject go = new GameObject(string.Format("{0}[{1}]", SeparatorPartGameObjectName, i), typeof(RectTransform));
 				go.transform.SetParent(this.transform, false);
-				go.transform.localPosition = Vector3.zero;
+
+				RectTransform dstTransform = go.transform.GetComponent<RectTransform>();
+				dstTransform.localPosition = Vector3.zero;
+				dstTransform.pivot = rectTransform.pivot;
+				dstTransform.anchorMin = Vector2.zero;
+				dstTransform.anchorMax = Vector2.one;
+				dstTransform.sizeDelta = Vector2.zero;
+
 				separatorParts.Add(go.transform);
 			}
 		}
