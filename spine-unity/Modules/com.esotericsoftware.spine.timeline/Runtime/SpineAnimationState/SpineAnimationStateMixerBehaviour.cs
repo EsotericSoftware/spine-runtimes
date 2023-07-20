@@ -68,7 +68,8 @@ namespace Spine.Unity.Playables {
 		}
 
 		public override void OnGraphStop (Playable playable) {
-			if (!isPaused && endAtClipEnd)
+			bool isStoppedNotPaused = playable.GetGraph().IsPlaying(); // end of track was reached or graph stopped.
+			if (isStoppedNotPaused && endAtClipEnd)
 				HandleClipEnd();
 		}
 
