@@ -1,4 +1,4 @@
-name: Build all Godot 4.x versions
+name: Build spine-godot (All Godot 4.x versions)
 
 on:
   push:
@@ -16,6 +16,7 @@ jobs:
           [
             {"tag": "4.0-stable", "version": "4.0.stable", "mono": false},
             {"tag": "4.1-stable", "version": "4.1.stable", "mono": false},
+            {"tag": "4.1-stable", "version": "4.1.stable", "mono": true},
           ]
     uses: ./.github/workflows/spine-godot-v4.yml
     with:
