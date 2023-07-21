@@ -15,7 +15,7 @@ mono="false"
 
 if [ $# -gt 0 ]; then
 	if [ $# -gt 1 ]; then
-		echo "Usage: $0 [mono:true|false]"
+		echo "Usage: $0 <mono:true|false>"
 		exit 1
 	else
 		if [ "$1" == "true" ] || [ "$1" == "false" ]; then
@@ -83,7 +83,7 @@ if [ "$os" == "macos" ] && [ $dev == "false" ]; then
 	if [ $mono == "true" ]; then
 		echo "Building C# glue and assemblies."
 		"./bin/$godot_exe_host" --generate-mono-glue modules/mono/glue
-		./modules/mono/build_scripts/build_assemblies.py --godot-output-dir ./bin --push-nupkgs-local ../godot-nuget
+		./modules/mono/build_scripts/build_assemblies.py --godot-output-dir ./bin --push-nupkgs-local ../godot-spine-csharp
 	fi
 	pushd bin
 	cp -r ../misc/dist/macos_tools.app .

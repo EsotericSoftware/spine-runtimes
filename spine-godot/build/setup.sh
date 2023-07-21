@@ -5,7 +5,7 @@ dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 pushd "$dir" > /dev/null
 
 if [ $# -lt 2 ] || [ $# -gt 3 ]; then
-	echo "Usage: ./setup.sh <Godot branch or tag> <dev:true|false> [mono:true|false]?"
+	echo "Usage: ./setup.sh <Godot branch or tag> <dev:true|false> <mono:true|false>?"
 	echo
 	echo "e.g.:"
 	echo "       ./setup.sh 3.5.2-stable true"
