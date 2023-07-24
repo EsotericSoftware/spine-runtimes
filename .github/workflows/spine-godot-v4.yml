@@ -37,6 +37,7 @@ jobs:
           echo "GODOT_VERSION: $GODOT_VERSION"
           echo "GODOT_MONO: $GODOT_MONO"
           echo "GODOT_MONO_UPLOAD_SUFFIX: $GODOT_MONO_UPLOAD_SUFFIX"
+          env
 
   godot-editor-windows:
     runs-on: windows-latest
