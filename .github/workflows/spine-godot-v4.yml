@@ -41,17 +41,6 @@ env:
   GODOT_MONO_UPLOAD_SUFFIX: ${{ inputs.godot_mono == true && '-mono' || '' }}
 
 jobs:
-  print_parameters:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Print build parameters
-        shell: bash
-        run: |
-          echo "GODOT_TAG: $GODOT_TAG"
-          echo "GODOT_VERSION: $GODOT_VERSION"
-          echo "GODOT_MONO: $GODOT_MONO"
-          echo "GODOT_MONO_UPLOAD_SUFFIX: $GODOT_MONO_UPLOAD_SUFFIX"
-          env
 
   godot-editor-windows:
     runs-on: windows-latest
