@@ -15,6 +15,20 @@ on:
         required: true
         type: boolean
         default: false
+  workflow_dispatch:
+    inputs:
+      godot_tag:
+        required: true
+        type: string
+        default: "Godot tag not specified!"
+      godot_version:
+        required: true
+        type: string
+        default: "Godot version not specified!"
+      godot_mono:
+        required: true
+        type: boolean
+        default: false
 
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
