@@ -55,8 +55,8 @@ jobs:
       - name: Build Godot artifact
         shell: bash
         run: |
-          ./spine-godot/build/setup.sh $GODOT_TAG false
-          ./spine-godot/build/build-v4.sh
+          ./spine-godot/build/setup.sh $GODOT_TAG false $GODOT_MONO
+          ./spine-godot/build/build-v4.sh $GODOT_MONO
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
@@ -79,8 +79,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install build-essential scons pkg-config libx11-dev libxcursor-dev libxinerama-dev libgl1-mesa-dev libglu-dev libasound2-dev libpulse-dev libudev-dev libxi-dev libxrandr-dev
-          ./spine-godot/build/setup.sh $GODOT_TAG false
-          ./spine-godot/build/build-v4.sh
+          ./spine-godot/build/setup.sh $GODOT_TAG false $GODOT_MONO
+          ./spine-godot/build/build-v4.sh $GODOT_MONO
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
@@ -102,8 +102,8 @@ jobs:
         shell: bash
         run: |
           ./spine-godot/build/install-macos-vulkan-sdk.sh
-          ./spine-godot/build/setup.sh $GODOT_TAG false
-          ./spine-godot/build/build-v4.sh
+          ./spine-godot/build/setup.sh $GODOT_TAG false $GODOT_MONO
+          ./spine-godot/build/build-v4.sh $GODOT_MONO
           pushd spine-godot/godot/bin
           zip -r godot-editor-macos.zip Godot.app
           popd
@@ -151,8 +151,8 @@ jobs:
       - name: Build Godot artifact
         run: |
           ./spine-godot/build/install-macos-vulkan-sdk.sh
-          ./spine-godot/build/setup.sh $GODOT_TAG false
-          ./spine-godot/build/build-templates-v4.sh macos
+          ./spine-godot/build/setup.sh $GODOT_TAG false $GODOT_MONO
+          ./spine-godot/build/build-templates-v4.sh macos $GODOT_MONO
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
@@ -174,8 +174,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install build-essential scons pkg-config libx11-dev libxcursor-dev libxinerama-dev libgl1-mesa-dev libglu-dev libasound2-dev libpulse-dev libudev-dev libxi-dev libxrandr-dev
-          ./spine-godot/build/setup.sh $GODOT_TAG false
-          ./spine-godot/build/build-templates-v4.sh linux
+          ./spine-godot/build/setup.sh $GODOT_TAG false $GODOT_MONO
+          ./spine-godot/build/build-templates-v4.sh linux $GODOT_MONO
 
       - name: Upload artifacts debug
         uses: actions/upload-artifact@v3
@@ -202,8 +202,8 @@ jobs:
       - name: Build Godot artifact
         shell: bash
         run: |
-          ./spine-godot/build/setup.sh $GODOT_TAG false
-          ./spine-godot/build/build-templates-v4.sh windows
+          ./spine-godot/build/setup.sh $GODOT_TAG false $GODOT_MONO
+          ./spine-godot/build/build-templates-v4.sh windows $GODOT_MONO
 
       - name: Upload artifacts debug
         uses: actions/upload-artifact@v3
