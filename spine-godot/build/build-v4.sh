@@ -70,7 +70,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
 else
 	os="linux"
 	cpus=$(grep -c ^processor /proc/cpuinfo)
-	godot_exe="godot.linux.editor$dev_extension.x86_64$mono_extension"
+	godot_exe="godot.linuxbsd.editor$dev_extension.x86_64$mono_extension"
 	godot_exe_host=$godot_exe
 fi
 
