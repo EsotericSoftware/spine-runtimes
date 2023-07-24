@@ -193,3 +193,5 @@ spine-godot/build/compile_commands.json
 spine-flutter/ios/Classes/spine-cpp
 spine-flutter/macos/Classes/spine-cpp
 spine-flutter/src/spine-cpp
+spine-godot/godot-nuget
+spine-godot/godot-spine-csharp

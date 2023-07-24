@@ -123,7 +123,7 @@
 			ENDHLSL
 		}
 
-			Pass
+		Pass
 		{
 			Name "DepthOnly"
 			Tags{"LightMode" = "DepthOnly"}
@@ -155,6 +155,40 @@
 			#define fixed half
 			#include "Include/Spine-Input-URP.hlsl"
 			#include "Include/Spine-DepthOnlyPass-URP.hlsl"
+			ENDHLSL
+		}
+
+		// This pass is used when drawing to a _CameraNormalsTexture texture
+		Pass
+		{
+			Name "DepthNormals"
+			Tags{"LightMode" = "DepthNormals"}
+
+			ZWrite On
+
+			HLSLPROGRAM
+			#pragma vertex DepthNormalsVertex
+			#pragma fragment DepthNormalsFragment
+
+			// -------------------------------------
+			// Material Keywords
+			#pragma shader_feature _ALPHATEST_ON
+			#pragma shader_feature _ _DOUBLE_SIDED_LIGHTING
+
+			// -------------------------------------
+			// Universal Pipeline keywords
+			#pragma multi_compile_fragment _ _WRITE_RENDERING_LAYERS
+
+			//--------------------------------------
+			// GPU Instancing
+			#pragma multi_compile_instancing
+
+			#define USE_URP
+			#define fixed4 half4
+			#define fixed3 half3
+			#define fixed half
+			#include "Include/Spine-Input-URP.hlsl"
+			#include "Include/Spine-DepthNormalsPass-URP.hlsl"
 			ENDHLSL
 		}
 	}

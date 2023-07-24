@@ -57,6 +57,31 @@
         {
             "type": "cppvsdbg",
             "request": "launch",
+            "name": "debug editor v4 c#",
+            "program": "godot/bin/godot.windows.editor.dev.x86_64.mono.exe",
+            "args": [
+                "-e",
+                "--path",
+                "example-v4",
+            ],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "build-v4",
+            "linux": {
+                "type": "lldb",
+                "request": "launch",
+                "name": "debug editor v4",
+                "program": "${workspaceFolder}/godot/bin/godot.linux.editor.dev.x86_64",
+            },
+            "osx": {
+                "type": "lldb",
+                "request": "launch",
+                "name": "debug editor v4",
+                "program": "${workspaceFolder}/godot/bin/godot.macos.editor.dev.arm64.mono",
+            },
+        },
+        {
+            "type": "cppvsdbg",
+            "request": "launch",
             "name": "debug scene v3",
             "cwd": "${workspaceFolder}",
             "program": "${workspaceFolder}/godot/bin/godot.windows.tools.64.exe",
