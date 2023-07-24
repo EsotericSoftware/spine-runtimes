@@ -21,10 +21,10 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   AWS_EC2_METADATA_DISABLED: true
   EM_VERSION: 3.1.18
-  GODOT_TAG: ${{ github.event.inputs.godot_tag }}
-  GODOT_VERSION: ${{ github.event.inputs.godot_version }}
-  GODOT_MONO: ${{ github.event.inputs.godot_mono }}
-  GODOT_MONO_UPLOAD_SUFFIX: ${{ github.event.inputs.godot_mono == true && '-mono' || '' }}
+  GODOT_TAG: ${{ inputs.godot_tag }}
+  GODOT_VERSION: ${{ inputs.godot_version }}
+  GODOT_MONO: ${{ inputs.godot_mono }}
+  GODOT_MONO_UPLOAD_SUFFIX: ${{ inputs.godot_mono == true && '-mono' || '' }}
 
 jobs:
   print_parameters:
@@ -113,7 +113,7 @@ jobs:
 
   godot-template-ios:
     runs-on: macos-latest
-    if: ${{ github.event.inputs.godot_mono == false }}
+    if: ${{ inputs.godot_mono == false }}
 
     steps:
       - uses: actions/checkout@v3
@@ -216,7 +216,7 @@ jobs:
 
   godot-template-android:
     runs-on: ubuntu-20.04
-    if: ${{ github.event.inputs.godot_mono == false }}
+    if: ${{ inputs.godot_mono == false }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -263,7 +263,7 @@ jobs:
 
   godot-template-web:
     runs-on: ubuntu-20.04
-    if: ${{ github.event.inputs.godot_mono == false }}
+    if: ${{ inputs.godot_mono == false }}
 
     steps:
       - uses: actions/checkout@v3
@@ -302,7 +302,7 @@ jobs:
   upload-to-s3:
     needs: [godot-editor-windows, godot-editor-linux, godot-editor-macos, godot-template-ios, godot-template-macos, godot-template-windows, godot-template-linux, godot-template-android, godot-template-web]
     runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.godot_mono == false }}
+    if: ${{ inputs.godot_mono == false }}
 
     steps:
       - name: Download godot-editor-windows artifact
@@ -396,7 +396,7 @@ jobs:
   upload-to-s3-mono:
     needs: [godot-editor-windows, godot-editor-linux, godot-editor-macos, godot-template-macos, godot-template-windows, godot-template-linux]
     runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.godot_mono == true }}
+    if: ${{ inputs.godot_mono == true }}
 
     steps:
       - name: Download godot-editor-windows artifact
