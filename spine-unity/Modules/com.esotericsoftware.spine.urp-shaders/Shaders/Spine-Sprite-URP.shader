@@ -212,41 +212,6 @@ Shader "Universal Render Pipeline/Spine/Sprite"
 			#include "Include/Spine-Sprite-DepthOnlyPass-URP.hlsl"
 			ENDHLSL
 		}
-		
-		Pass
-		{
-			Name "DepthNormals"
-			Tags{"LightMode" = "DepthNormals"}
-
-			ZWrite On
-			Cull Off
-
-			HLSLPROGRAM
-			// Required to compile gles 2.0 with standard srp library
-			#pragma prefer_hlslcc gles
-			#pragma exclude_renderers d3d11_9x
-
-			#pragma vertex DepthNormalVertexSprite
-			#pragma fragment DepthNormalFragmentSprite
-
-			// -------------------------------------
-			// Material Keywords
-			#pragma shader_feature _NORMALMAP
-			#pragma shader_feature _ALPHATEST_ON
-			#pragma shader_feature _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
-
-			//--------------------------------------
-			// GPU Instancing
-			#pragma multi_compile_instancing
-
-			#define USE_URP
-			#define fixed4 half4
-			#define fixed3 half3
-			#define fixed half
-			#include "Include/Spine-Input-Sprite-URP.hlsl"
-			#include "Include/Spine-Sprite-DepthNormalsPass-URP.hlsl"
-			ENDHLSL
-		}
 
 		// This pass is used when drawing to a _CameraNormalsTexture texture
 		Pass
