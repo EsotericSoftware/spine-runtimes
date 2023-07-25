@@ -43,5 +43,15 @@ namespace Spine.Unity {
 		protected override void OnPopulateMesh (VertexHelper vh) {
 			vh.Clear();
 		}
+
+		protected override void OnDisable () {
+			base.OnDisable();
+			this.canvasRenderer.cull = true;
+		}
+
+		protected override void OnEnable () {
+			base.OnEnable();
+			this.canvasRenderer.cull = false;
+		}
 	}
 }

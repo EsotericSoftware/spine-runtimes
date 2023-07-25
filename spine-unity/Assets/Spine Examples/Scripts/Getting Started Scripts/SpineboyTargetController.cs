@@ -49,9 +49,9 @@ namespace Spine.Unity.Examples {
 		}
 
 		void Update () {
-			var mousePosition = Input.mousePosition;
-			var worldMousePosition = cam.ScreenToWorldPoint(mousePosition);
-			var skeletonSpacePoint = skeletonAnimation.transform.InverseTransformPoint(worldMousePosition);
+			Vector3 mousePosition = Input.mousePosition;
+			Vector3 worldMousePosition = cam.ScreenToWorldPoint(mousePosition);
+			Vector3 skeletonSpacePoint = skeletonAnimation.transform.InverseTransformPoint(worldMousePosition);
 			skeletonSpacePoint.x *= skeletonAnimation.Skeleton.ScaleX;
 			skeletonSpacePoint.y *= skeletonAnimation.Skeleton.ScaleY;
 			bone.SetLocalPosition(skeletonSpacePoint);

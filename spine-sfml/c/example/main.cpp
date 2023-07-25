@@ -95,15 +95,17 @@ void testcase(void func(spSkeletonData *skeletonData, spAtlas *atlas),
 			  float scale) {
 	spAtlas *atlas = spAtlas_createFromFile(atlasName, 0);
 
-	spSkeletonData *skeletonData = readSkeletonJsonData(jsonName, atlas, scale);
+	spSkeletonData *skeletonData = readSkeletonBinaryData(binaryName, atlas, scale);
 	func(skeletonData, atlas);
 	spSkeletonData_dispose(skeletonData);
 
-	skeletonData = readSkeletonBinaryData(binaryName, atlas, scale);
+	skeletonData = readSkeletonJsonData(jsonName, atlas, scale);
 	func(skeletonData, atlas);
 	spSkeletonData_dispose(skeletonData);
 
 	spAtlas_dispose(atlas);
+
+	UNUSED(jsonName);
 }
 
 void spineboy(spSkeletonData *skeletonData, spAtlas *atlas) {
@@ -277,10 +279,6 @@ void raptor(spSkeletonData *skeletonData, spAtlas *atlas) {
 	drawable->timeScale = 1;
 	drawable->setUsePremultipliedAlpha(true);
 
-	spSwirlVertexEffect *effect = spSwirlVertexEffect_create(400);
-	effect->centerY = -200;
-	drawable->vertexEffect = &effect->super;
-
 	spSkeleton *skeleton = drawable->skeleton;
 	skeleton->x = 320;
 	skeleton->y = 590;
@@ -293,7 +291,6 @@ void raptor(spSkeletonData *skeletonData, spAtlas *atlas) {
 	window.setFramerateLimit(60);
 	sf::Event event;
 	sf::Clock deltaClock;
-	float swirlTime = 0;
 	while (window.isOpen()) {
 		while (window.pollEvent(event))
 			if (event.type == sf::Event::Closed) window.close();
@@ -301,18 +298,12 @@ void raptor(spSkeletonData *skeletonData, spAtlas *atlas) {
 		float delta = deltaClock.getElapsedTime().asSeconds();
 		deltaClock.restart();
 
-		swirlTime += delta;
-		float percent = (float) fmod(swirlTime, 2);
-		if (percent > 1) percent = 1 - (percent - 1);
-		effect->angle = _spMath_interpolate(_spMath_pow2_apply, -60, 60, percent);
-
 		drawable->update(delta);
 
 		window.clear();
 		window.draw(*drawable);
 		window.display();
 	}
-	spSwirlVertexEffect_dispose(effect);
 }
 
 void tank(spSkeletonData *skeletonData, spAtlas *atlas) {
@@ -444,6 +435,40 @@ void coin(spSkeletonData *skeletonData, spAtlas *atlas) {
 	}
 }
 
+void dragon(spSkeletonData *skeletonData, spAtlas *atlas) {
+	UNUSED(atlas);
+
+
+	SkeletonDrawable *drawable = new SkeletonDrawable(skeletonData);
+	drawable->timeScale = 1;
+	drawable->setUsePremultipliedAlpha(true);
+
+	spSkeleton *skeleton = drawable->skeleton;
+	skeleton->x = 320;
+	skeleton->y = 320;
+	spSkeleton_updateWorldTransform(skeleton);
+	spAnimationState_setAnimationByName(drawable->state, 0, "flying", true);
+
+	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - dragon");
+	window.setFramerateLimit(60);
+	sf::Event event;
+	sf::Clock deltaClock;
+
+	while (window.isOpen()) {
+		while (window.pollEvent(event))
+			if (event.type == sf::Event::Closed) window.close();
+
+		float delta = deltaClock.getElapsedTime().asSeconds();
+		deltaClock.restart();
+
+		drawable->update(delta);
+
+		window.clear();
+		window.draw(*drawable);
+		window.display();
+	}
+}
+
 void owl(spSkeletonData *skeletonData, spAtlas *atlas) {
 	UNUSED(atlas);
 	SkeletonDrawable *drawable = new SkeletonDrawable(skeletonData);
@@ -492,6 +517,7 @@ void owl(spSkeletonData *skeletonData, spAtlas *atlas) {
 		float delta = deltaClock.getElapsedTime().asSeconds();
 		deltaClock.restart();
 
+		spSkeleton_setToSetupPose(drawable->skeleton);
 		drawable->update(delta);
 
 		window.clear();
@@ -513,7 +539,6 @@ void test(spSkeletonData *skeletonData, spAtlas *atlas) {
 
 	float d = 3;
 	for (int i = 0; i < 1; i++) {
-		spSkeleton_update(skeleton, d);
 		spAnimationState_update(animState, d);
 		spAnimationState_apply(animState, skeleton);
 		spSkeleton_updateWorldTransform(skeleton);
@@ -624,6 +649,7 @@ void testMixAndMatch(spSkeletonData *skeletonData, spAtlas *atlas) {
 }
 
 int main() {
+	testcase(dragon, "data/dragon-ess.json", "data/dragon-ess.skel", "data/dragon-pma.atlas", 0.6f);
 	testcase(ikDemo, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.6f);
 	testcase(spineboy, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.6f);
 	testcase(coin, "data/coin-pro.json", "data/coin-pro.skel", "data/coin-pma.atlas", 0.5f);

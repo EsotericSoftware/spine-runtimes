@@ -43,6 +43,7 @@ typedef enum {
 
 void _spRegionAttachment_dispose(spAttachment *attachment) {
 	spRegionAttachment *self = SUB_CAST(spRegionAttachment, attachment);
+	if (self->sequence) spSequence_dispose(self->sequence);
 	_spAttachment_deinit(attachment);
 	FREE(self->path);
 	FREE(self);
@@ -78,22 +79,39 @@ spRegionAttachment *spRegionAttachment_create(const char *name) {
 }
 
 void spRegionAttachment_updateRegion(spRegionAttachment *self) {
-	float regionScaleX = self->width / self->region->originalWidth * self->scaleX;
-	float regionScaleY = self->height / self->region->originalHeight * self->scaleY;
-	float localX = -self->width / 2 * self->scaleX + self->region->offsetX * regionScaleX;
-	float localY = -self->height / 2 * self->scaleY + self->region->offsetY * regionScaleY;
-	float localX2 = localX + self->region->width * regionScaleX;
-	float localY2 = localY + self->region->height * regionScaleY;
-	float radians = self->rotation * DEG_RAD;
-	float cosine = COS(radians), sine = SIN(radians);
-	float localXCos = localX * cosine + self->x;
-	float localXSin = localX * sine;
-	float localYCos = localY * cosine + self->y;
-	float localYSin = localY * sine;
-	float localX2Cos = localX2 * cosine + self->x;
-	float localX2Sin = localX2 * sine;
-	float localY2Cos = localY2 * cosine + self->y;
-	float localY2Sin = localY2 * sine;
+	float regionScaleX, regionScaleY, localX, localY, localX2, localY2;
+	float radians, cosine, sine;
+	float localXCos, localXSin, localYCos, localYSin, localX2Cos, localX2Sin, localY2Cos, localY2Sin;
+
+	if (self->region == NULL) {
+		self->uvs[0] = 0;
+		self->uvs[1] = 0;
+		self->uvs[2] = 1;
+		self->uvs[3] = 1;
+		self->uvs[4] = 1;
+		self->uvs[5] = 0;
+		self->uvs[6] = 0;
+		self->uvs[7] = 0;
+		return;
+	}
+
+	regionScaleX = self->width / self->region->originalWidth * self->scaleX;
+	regionScaleY = self->height / self->region->originalHeight * self->scaleY;
+	localX = -self->width / 2 * self->scaleX + self->region->offsetX * regionScaleX;
+	localY = -self->height / 2 * self->scaleY + self->region->offsetY * regionScaleY;
+	localX2 = localX + self->region->width * regionScaleX;
+	localY2 = localY + self->region->height * regionScaleY;
+	radians = self->rotation * DEG_RAD;
+	cosine = COS(radians), sine = SIN(radians);
+	localXCos = localX * cosine + self->x;
+	localXSin = localX * sine;
+	localYCos = localY * cosine + self->y;
+	localYSin = localY * sine;
+	localX2Cos = localX2 * cosine + self->x;
+	localX2Sin = localX2 * sine;
+	localY2Cos = localY2 * cosine + self->y;
+	localY2Sin = localY2 * sine;
+
 	self->offset[BLX] = localXCos - localYSin;
 	self->offset[BLY] = localYCos + localXSin;
 	self->offset[ULX] = localXCos - localY2Sin;

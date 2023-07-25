@@ -32,11 +32,11 @@ VertexOutput vertOutline(VertexInput v) {
 	return o;
 }
 
-float4 fragOutline(VertexOutput i) : SV_Target{
+float4 fragOutline(VertexOutput i) : SV_Target {
 
 	float4 texColor = computeOutlinePixel(_MainTex, _MainTex_TexelSize.xy, i.uv, i.vertexColorAlpha,
 		_OutlineWidth, _OutlineReferenceTexWidth, _OutlineMipLevel,
-		_OutlineSmoothness, _ThresholdEnd, _OutlineColor);
+		_OutlineSmoothness, _ThresholdEnd, _OutlineOpaqueAlpha, _OutlineColor);
 	return texColor;
 }
 

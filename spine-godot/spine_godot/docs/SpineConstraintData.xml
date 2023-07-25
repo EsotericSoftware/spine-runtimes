@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineConstraintData" inherits="SpineObjectWrapper" version="3.4">
+	<brief_description>
+		The base class for all constraint datas.
+	</brief_description>
+	<description>
+		The base class for all constraint datas.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="get_constraint_name">
+			<return type="String" />
+			<description>
+				The constraint's name, which is unique across all constraints in the skeleton of the same type.
+			</description>
+		</method>
+		<method name="get_order">
+			<return type="int" />
+			<description>
+				The ordinal of this constraint for the order a skeleton's constraints will be applied by [code]Skeleton.update_world_transform[/code].
+			</description>
+		</method>
+		<method name="is_skin_required">
+			<return type="bool" />
+			<description>
+				When true, [code]Skeleton.update_world_transform[/code] only updates this constraint if the active skin contains this constraint.
+			</description>
+		</method>
+		<method name="set_order">
+			<return type="void" />
+			<argument index="0" name="v" type="int" />
+			<description>
+			</description>
+		</method>
+		<method name="set_skin_required">
+			<return type="void" />
+			<argument index="0" name="v" type="bool" />
+			<description>
+			</description>
+		</method>
+	</methods>
+	<constants>
+	</constants>
+</class>

@@ -53,7 +53,7 @@ namespace Spine.Unity.Examples {
 
 		public void SetGaugePercent (float percent) {
 			if (skeletonRenderer == null) return;
-			var skeleton = skeletonRenderer.skeleton; if (skeleton == null) return;
+			Skeleton skeleton = skeletonRenderer.skeleton; if (skeleton == null) return;
 
 			fillAnimation.Animation.Apply(skeleton, 0, percent, false, null, 1f, MixBlend.Setup, MixDirection.In);
 			skeleton.UpdateWorldTransform();

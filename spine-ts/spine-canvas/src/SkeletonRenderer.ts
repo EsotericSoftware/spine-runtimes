@@ -27,8 +27,10 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Utils, Color, Skeleton, RegionAttachment, TextureAtlasRegion, BlendMode, MeshAttachment, Slot } from "@esotericsoftware/spine-core";
+import { Utils, Color, Skeleton, RegionAttachment, BlendMode, MeshAttachment, Slot, TextureRegion, TextureAtlasRegion } from "@esotericsoftware/spine-core";
 import { CanvasTexture } from "./CanvasTexture";
+
+const worldVertices = Utils.newFloatArray(8);
 
 export class SkeletonRenderer {
 	static QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
@@ -65,8 +67,10 @@ export class SkeletonRenderer {
 
 			let attachment = slot.getAttachment();
 			if (!(attachment instanceof RegionAttachment)) continue;
-			let region: TextureAtlasRegion = <TextureAtlasRegion>attachment.region;
-			let image: HTMLImageElement = (<CanvasTexture>region.page.texture).getImage() as HTMLImageElement;
+			attachment.computeWorldVertices(slot, worldVertices, 0, 2);
+			let region: TextureRegion = <TextureRegion>attachment.region;
+
+			let image: HTMLImageElement = (<CanvasTexture>region.texture).getImage() as HTMLImageElement;
 
 			let slotColor = slot.color;
 			let regionColor = attachment.color;
@@ -85,7 +89,7 @@ export class SkeletonRenderer {
 
 			let w = region.width, h = region.height;
 			ctx.translate(w / 2, h / 2);
-			if (attachment.region.degrees == 90) {
+			if (attachment.region!.degrees == 90) {
 				let t = w;
 				w = h;
 				h = t;
@@ -95,7 +99,7 @@ export class SkeletonRenderer {
 			ctx.translate(-w / 2, -h / 2);
 
 			ctx.globalAlpha = color.a;
-			ctx.drawImage(image, region.x, region.y, w, h, 0, 0, w, h);
+			ctx.drawImage(image, image.width * region.u, image.height * region.v, w, h, 0, 0, w, h);
 			if (this.debugRendering) ctx.strokeRect(0, 0, w, h);
 			ctx.restore();
 		}
@@ -107,9 +111,9 @@ export class SkeletonRenderer {
 		let skeletonColor = skeleton.color;
 		let drawOrder = skeleton.drawOrder;
 
-		let blendMode: BlendMode = null;
+		let blendMode: BlendMode | null = null;
 		let vertices: ArrayLike<number> = this.vertices;
-		let triangles: Array<number> = null;
+		let triangles: Array<number> | null = null;
 
 		for (let i = 0, n = drawOrder.length; i < n; i++) {
 			let slot = drawOrder[i];
@@ -121,13 +125,12 @@ export class SkeletonRenderer {
 				let regionAttachment = <RegionAttachment>attachment;
 				vertices = this.computeRegionVertices(slot, regionAttachment, false);
 				triangles = SkeletonRenderer.QUAD_TRIANGLES;
-				region = <TextureAtlasRegion>regionAttachment.region;
-				texture = (<CanvasTexture>region.page.texture).getImage() as HTMLImageElement;
+				texture = (<CanvasTexture>regionAttachment.region!.texture).getImage() as HTMLImageElement;
 			} else if (attachment instanceof MeshAttachment) {
 				let mesh = <MeshAttachment>attachment;
 				vertices = this.computeMeshVertices(slot, mesh, false);
 				triangles = mesh.triangles;
-				texture = (<TextureAtlasRegion>mesh.region.renderObject).page.texture.getImage() as HTMLImageElement;
+				texture = (<CanvasTexture>mesh.region!.texture).getImage() as HTMLImageElement;
 			} else
 				continue;
 

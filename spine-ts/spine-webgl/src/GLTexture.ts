@@ -32,7 +32,7 @@ import { ManagedWebGLRenderingContext } from "./WebGL";
 
 export class GLTexture extends Texture implements Disposable, Restorable {
 	context: ManagedWebGLRenderingContext;
-	private texture: WebGLTexture = null;
+	private texture: WebGLTexture | null = null;
 	private boundUnit = 0;
 	private useMipMaps = false;
 
@@ -51,11 +51,12 @@ export class GLTexture extends Texture implements Disposable, Restorable {
 		this.bind();
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, minFilter);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, GLTexture.validateMagFilter(magFilter));
+		this.useMipMaps = GLTexture.usesMipMaps(minFilter);
+		if (this.useMipMaps) gl.generateMipmap(gl.TEXTURE_2D);
 	}
 
 	static validateMagFilter (magFilter: TextureFilter) {
 		switch (magFilter) {
-			case TextureFilter.MipMap:
 			case TextureFilter.MipMapLinearLinear:
 			case TextureFilter.MipMapLinearNearest:
 			case TextureFilter.MipMapNearestLinear:
@@ -63,6 +64,18 @@ export class GLTexture extends Texture implements Disposable, Restorable {
 				return TextureFilter.Linear;
 			default:
 				return magFilter;
+		}
+	}
+
+	static usesMipMaps (filter: TextureFilter) {
+		switch (filter) {
+			case TextureFilter.MipMapLinearLinear:
+			case TextureFilter.MipMapLinearNearest:
+			case TextureFilter.MipMapNearestLinear:
+			case TextureFilter.MipMapNearestNearest:
+				return true;
+			default:
+				return false;
 		}
 	}
 

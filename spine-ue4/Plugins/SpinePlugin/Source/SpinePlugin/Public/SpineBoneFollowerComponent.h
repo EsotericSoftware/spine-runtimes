@@ -30,6 +30,7 @@
 #pragma once
 
 #include "Components/ActorComponent.h"
+#include "Components/SceneComponent.h"
 #include "SpineBoneFollowerComponent.generated.h"
 
 

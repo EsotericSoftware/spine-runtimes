@@ -48,6 +48,7 @@ namespace Spine {
 		float[] vertices = new float[8];
 		int[] quadTriangles = { 0, 1, 2, 2, 3, 0 };
 		BlendState defaultBlendState;
+		BlendState blendStateMultiply = null;
 
 		Effect effect;
 		public Effect Effect { get { return effect; } set { effect = value; } }
@@ -86,6 +87,12 @@ namespace Spine {
 
 		public void Begin () {
 			defaultBlendState = premultipliedAlpha ? BlendState.AlphaBlend : BlendState.NonPremultiplied;
+			if (blendStateMultiply == null) {
+				blendStateMultiply = new BlendState();
+				blendStateMultiply.ColorBlendFunction = BlendFunction.Max;
+				blendStateMultiply.ColorSourceBlend = Blend.DestinationColor;
+				blendStateMultiply.ColorDestinationBlend = Blend.Zero;
+			}
 
 			device.RasterizerState = rasterizerState;
 			device.BlendState = defaultBlendState;
@@ -123,18 +130,16 @@ namespace Spine {
 				if (attachment is RegionAttachment) {
 					RegionAttachment regionAttachment = (RegionAttachment)attachment;
 					attachmentColorR = regionAttachment.R; attachmentColorG = regionAttachment.G; attachmentColorB = regionAttachment.B; attachmentColorA = regionAttachment.A;
-					AtlasRegion region = (AtlasRegion)regionAttachment.Region;
-					textureObject = region.page.rendererObject;
-					verticesCount = 4;
 					regionAttachment.ComputeWorldVertices(slot, vertices, 0, 2);
+					verticesCount = 4;
 					indicesCount = 6;
 					indices = quadTriangles;
 					uvs = regionAttachment.UVs;
+					AtlasRegion region = (AtlasRegion)regionAttachment.Region;
+					textureObject = region.page.rendererObject;
 				} else if (attachment is MeshAttachment) {
 					MeshAttachment mesh = (MeshAttachment)attachment;
 					attachmentColorR = mesh.R; attachmentColorG = mesh.G; attachmentColorB = mesh.B; attachmentColorA = mesh.A;
-					AtlasRegion region = (AtlasRegion)mesh.Region;
-					textureObject = region.page.rendererObject;
 					int vertexCount = mesh.WorldVerticesLength;
 					if (vertices.Length < vertexCount) vertices = new float[vertexCount];
 					verticesCount = vertexCount >> 1;
@@ -142,6 +147,8 @@ namespace Spine {
 					indicesCount = mesh.Triangles.Length;
 					indices = mesh.Triangles;
 					uvs = mesh.UVs;
+					AtlasRegion region = (AtlasRegion)mesh.Region;
+					textureObject = region.page.rendererObject;
 				} else if (attachment is ClippingAttachment) {
 					ClippingAttachment clip = (ClippingAttachment)attachment;
 					clipper.ClipStart(slot, clip);
@@ -151,10 +158,21 @@ namespace Spine {
 				}
 
 				// set blend state
-				BlendState blend = slot.Data.BlendMode == BlendMode.Additive ? BlendState.Additive : defaultBlendState;
+				BlendState blend;
+				switch (slot.Data.BlendMode) {
+				case BlendMode.Additive:
+					blend = BlendState.Additive;
+					break;
+				case BlendMode.Multiply:
+					blend = blendStateMultiply;
+					break;
+				default:
+					blend = defaultBlendState;
+					break;
+				}
 				if (device.BlendState != blend) {
-					//End();
-					//device.BlendState = blend;
+					End();
+					device.BlendState = blend;
 				}
 
 				// calculate color

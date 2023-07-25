@@ -35,10 +35,10 @@ export class BoneData {
 	index: number = 0;
 
 	/** The name of the bone, which is unique across all bones in the skeleton. */
-	name: string = null;
+	name: string;
 
 	/** @returns May be null. */
-	parent: BoneData = null;
+	parent: BoneData | null = null;
 
 	/** The bone's length. */
 	length: number = 0;
@@ -76,7 +76,7 @@ export class BoneData {
 	 * rendered at runtime. */
 	color = new Color();
 
-	constructor (index: number, name: string, parent: BoneData) {
+	constructor (index: number, name: string, parent: BoneData | null) {
 		if (index < 0) throw new Error("index must be >= 0.");
 		if (!name) throw new Error("name cannot be null.");
 		this.index = index;

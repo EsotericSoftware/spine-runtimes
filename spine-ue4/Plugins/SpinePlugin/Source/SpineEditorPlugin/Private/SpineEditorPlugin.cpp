@@ -27,9 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include "SpineEditorPluginPrivatePCH.h"
-#include "spine/spine.h"
-
+#include "SpineEditorPlugin.h"
 
 class FSpineEditorPlugin : public ISpineEditorPlugin {
 	virtual void StartupModule() override;

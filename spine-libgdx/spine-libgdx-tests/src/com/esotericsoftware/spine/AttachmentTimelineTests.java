@@ -35,7 +35,7 @@ import com.esotericsoftware.spine.Animation.AttachmentTimeline;
 import com.esotericsoftware.spine.Animation.Timeline;
 import com.esotericsoftware.spine.attachments.Attachment;
 
-/** Unit tests for {@link AttachmentTimeline}. */
+/** Unit tests to ensure {@link AttachmentTimeline} is working as expected. */
 public class AttachmentTimelineTests {
 	private final SkeletonData skeletonData;
 	private final Skeleton skeleton;

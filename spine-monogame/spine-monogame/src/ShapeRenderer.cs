@@ -65,18 +65,18 @@ namespace Spine {
 			device.BlendState = BlendState.AlphaBlend;
 		}
 
-		public void Line (float x1, float y1, float x2, float y2) {
-			vertices.Add(new VertexPositionColor(new Vector3(x1, y1, 0), color));
-			vertices.Add(new VertexPositionColor(new Vector3(x2, y2, 0), color));
+		public void Line (float x1, float y1, float x2, float y2, float z = 0f) {
+			vertices.Add(new VertexPositionColor(new Vector3(x1, y1, z), color));
+			vertices.Add(new VertexPositionColor(new Vector3(x2, y2, z), color));
 		}
 
 		/** Calls {@link #circle(float, float, float, int)} by estimating the number of segments needed for a smooth circle. */
-		public void Circle (float x, float y, float radius) {
-			Circle(x, y, radius, Math.Max(1, (int)(6 * (float)Math.Pow(radius, 1.0f / 3.0f))));
+		public void Circle (float x, float y, float radius, float z = 0f) {
+			Circle(x, y, radius, Math.Max(1, (int)(6 * (float)Math.Pow(radius, 1.0f / 3.0f))), z);
 		}
 
 		/** Draws a circle using {@link ShapeType#Line} or {@link ShapeType#Filled}. */
-		public void Circle (float x, float y, float radius, int segments) {
+		public void Circle (float x, float y, float radius, int segments, float z = 0f) {
 			if (segments <= 0) throw new ArgumentException("segments must be > 0.");
 			float angle = 2 * MathUtils.PI / segments;
 			float cos = MathUtils.Cos(angle);
@@ -85,37 +85,37 @@ namespace Spine {
 			float temp = 0;
 
 			for (int i = 0; i < segments; i++) {
-				vertices.Add(new VertexPositionColor(new Vector3(x + cx, y + cy, 0), color));
+				vertices.Add(new VertexPositionColor(new Vector3(x + cx, y + cy, z), color));
 				temp = cx;
 				cx = cos * cx - sin * cy;
 				cy = sin * temp + cos * cy;
-				vertices.Add(new VertexPositionColor(new Vector3(x + cx, y + cy, 0), color));
+				vertices.Add(new VertexPositionColor(new Vector3(x + cx, y + cy, z), color));
 			}
-			vertices.Add(new VertexPositionColor(new Vector3(x + cx, y + cy, 0), color));
+			vertices.Add(new VertexPositionColor(new Vector3(x + cx, y + cy, z), color));
 
 			temp = cx;
 			cx = radius;
 			cy = 0;
-			vertices.Add(new VertexPositionColor(new Vector3(x + cx, y + cy, 0), color));
+			vertices.Add(new VertexPositionColor(new Vector3(x + cx, y + cy, z), color));
 		}
 
-		public void Triangle (float x1, float y1, float x2, float y2, float x3, float y3) {
-			vertices.Add(new VertexPositionColor(new Vector3(x1, y1, 0), color));
-			vertices.Add(new VertexPositionColor(new Vector3(x2, y2, 0), color));
+		public void Triangle (float x1, float y1, float x2, float y2, float x3, float y3, float z = 0f) {
+			vertices.Add(new VertexPositionColor(new Vector3(x1, y1, z), color));
+			vertices.Add(new VertexPositionColor(new Vector3(x2, y2, z), color));
 
-			vertices.Add(new VertexPositionColor(new Vector3(x2, y2, 0), color));
-			vertices.Add(new VertexPositionColor(new Vector3(x3, y3, 0), color));
+			vertices.Add(new VertexPositionColor(new Vector3(x2, y2, z), color));
+			vertices.Add(new VertexPositionColor(new Vector3(x3, y3, z), color));
 
-			vertices.Add(new VertexPositionColor(new Vector3(x3, y3, 0), color));
-			vertices.Add(new VertexPositionColor(new Vector3(x1, y1, 0), color));
+			vertices.Add(new VertexPositionColor(new Vector3(x3, y3, z), color));
+			vertices.Add(new VertexPositionColor(new Vector3(x1, y1, z), color));
 		}
 
-		public void X (float x, float y, float len) {
-			Line(x + len, y + len, x - len, y - len);
-			Line(x - len, y + len, x + len, y - len);
+		public void X (float x, float y, float len, float z = 0f) {
+			Line(x + len, y + len, x - len, y - len, z);
+			Line(x - len, y + len, x + len, y - len, z);
 		}
 
-		public void Polygon (float[] polygonVertices, int offset, int count) {
+		public void Polygon (float[] polygonVertices, int offset, int count, float z = 0f) {
 			if (count < 3) throw new ArgumentException("Polygon must contain at least 3 vertices");
 
 			offset <<= 1;
@@ -139,15 +139,15 @@ namespace Spine {
 					y2 = polygonVertices[i + 3];
 				}
 
-				Line(x1, y1, x2, y2);
+				Line(x1, y1, x2, y2, z);
 			}
 		}
 
-		public void Rect (float x, float y, float width, float height) {
-			Line(x, y, x + width, y);
-			Line(x + width, y, x + width, y + height);
-			Line(x + width, y + height, x, y + height);
-			Line(x, y + height, x, y);
+		public void Rect (float x, float y, float width, float height, float z = 0f) {
+			Line(x, y, x + width, y, z);
+			Line(x + width, y, x + width, y + height, z);
+			Line(x + width, y + height, x, y + height, z);
+			Line(x, y + height, x, y, z);
 		}
 
 		public void End () {

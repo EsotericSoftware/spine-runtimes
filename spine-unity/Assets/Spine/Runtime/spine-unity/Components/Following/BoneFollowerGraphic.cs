@@ -99,7 +99,7 @@ namespace Spine.Unity {
 			if (initializeOnAwake) Initialize();
 		}
 
-		public void Initialize () {
+		public virtual void Initialize () {
 			bone = null;
 			valid = skeletonGraphic != null && skeletonGraphic.IsValid;
 			if (!valid) return;
@@ -119,7 +119,7 @@ namespace Spine.Unity {
 #endif
 		}
 
-		public void LateUpdate () {
+		public virtual void LateUpdate () {
 			if (!valid) {
 				Initialize();
 				return;
@@ -136,10 +136,10 @@ namespace Spine.Unity {
 				if (!SetBone(boneName)) return;
 			}
 
-			var thisTransform = this.transform as RectTransform;
+			RectTransform thisTransform = this.transform as RectTransform;
 			if (thisTransform == null) return;
 
-			var canvas = skeletonGraphic.canvas;
+			Canvas canvas = skeletonGraphic.canvas;
 			if (canvas == null) canvas = skeletonGraphic.GetComponentInParent<Canvas>();
 			float scale = canvas != null ? canvas.referencePixelsPerUnit : 100.0f;
 

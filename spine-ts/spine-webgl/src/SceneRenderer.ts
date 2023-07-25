@@ -34,7 +34,7 @@ import { PolygonBatcher } from "./PolygonBatcher";
 import { Shader } from "./Shader";
 import { ShapeRenderer } from "./ShapeRenderer";
 import { SkeletonDebugRenderer } from "./SkeletonDebugRenderer";
-import { SkeletonRenderer } from "./SkeletonRenderer";
+import { SkeletonRenderer, VertexTransformer } from "./SkeletonRenderer";
 import { ManagedWebGLRenderingContext } from "./WebGL";
 ;
 
@@ -56,7 +56,7 @@ export class SceneRenderer implements Disposable {
 	private batcherShader: Shader;
 	private shapes: ShapeRenderer;
 	private shapesShader: Shader;
-	private activeRenderer: PolygonBatcher | ShapeRenderer | SkeletonDebugRenderer;
+	private activeRenderer: PolygonBatcher | ShapeRenderer | SkeletonDebugRenderer | null = null;
 	skeletonRenderer: SkeletonRenderer;
 	skeletonDebugRenderer: SkeletonDebugRenderer;
 
@@ -86,21 +86,21 @@ export class SceneRenderer implements Disposable {
 		this.enableRenderer(this.batcher);
 	}
 
-	drawSkeleton (skeleton: Skeleton, premultipliedAlpha = false, slotRangeStart = -1, slotRangeEnd = -1) {
+	drawSkeleton (skeleton: Skeleton, premultipliedAlpha = false, slotRangeStart = -1, slotRangeEnd = -1, transform: VertexTransformer | null = null) {
 		this.enableRenderer(this.batcher);
 		this.skeletonRenderer.premultipliedAlpha = premultipliedAlpha;
-		this.skeletonRenderer.draw(this.batcher, skeleton, slotRangeStart, slotRangeEnd);
+		this.skeletonRenderer.draw(this.batcher, skeleton, slotRangeStart, slotRangeEnd, transform);
 	}
 
-	drawSkeletonDebug (skeleton: Skeleton, premultipliedAlpha = false, ignoredBones: Array<string> = null) {
+	drawSkeletonDebug (skeleton: Skeleton, premultipliedAlpha = false, ignoredBones?: Array<string>) {
 		this.enableRenderer(this.shapes);
 		this.skeletonDebugRenderer.premultipliedAlpha = premultipliedAlpha;
 		this.skeletonDebugRenderer.draw(this.shapes, skeleton, ignoredBones);
 	}
 
-	drawTexture (texture: GLTexture, x: number, y: number, width: number, height: number, color: Color = null) {
+	drawTexture (texture: GLTexture, x: number, y: number, width: number, height: number, color?: Color) {
 		this.enableRenderer(this.batcher);
-		if (color === null) color = WHITE;
+		if (!color) color = WHITE;
 		var i = 0;
 		quad[i++] = x;
 		quad[i++] = y;
@@ -161,9 +161,9 @@ export class SceneRenderer implements Disposable {
 		this.batcher.draw(texture, quad, QUAD_TRIANGLES);
 	}
 
-	drawTextureUV (texture: GLTexture, x: number, y: number, width: number, height: number, u: number, v: number, u2: number, v2: number, color: Color = null) {
+	drawTextureUV (texture: GLTexture, x: number, y: number, width: number, height: number, u: number, v: number, u2: number, v2: number, color?: Color) {
 		this.enableRenderer(this.batcher);
-		if (color === null) color = WHITE;
+		if (!color) color = WHITE;
 		var i = 0;
 		quad[i++] = x;
 		quad[i++] = y;
@@ -224,9 +224,9 @@ export class SceneRenderer implements Disposable {
 		this.batcher.draw(texture, quad, QUAD_TRIANGLES);
 	}
 
-	drawTextureRotated (texture: GLTexture, x: number, y: number, width: number, height: number, pivotX: number, pivotY: number, angle: number, color: Color = null) {
+	drawTextureRotated (texture: GLTexture, x: number, y: number, width: number, height: number, pivotX: number, pivotY: number, angle: number, color?: Color) {
 		this.enableRenderer(this.batcher);
-		if (color === null) color = WHITE;
+		if (!color) color = WHITE;
 
 		// bottom left and top right corner points relative to origin
 		let worldOriginX = x + pivotX;
@@ -354,9 +354,9 @@ export class SceneRenderer implements Disposable {
 		this.batcher.draw(texture, quad, QUAD_TRIANGLES);
 	}
 
-	drawRegion (region: TextureAtlasRegion, x: number, y: number, width: number, height: number, color: Color = null) {
+	drawRegion (region: TextureAtlasRegion, x: number, y: number, width: number, height: number, color?: Color) {
 		this.enableRenderer(this.batcher);
-		if (color === null) color = WHITE;
+		if (!color) color = WHITE;
 		var i = 0;
 		quad[i++] = x;
 		quad[i++] = y;
@@ -417,42 +417,42 @@ export class SceneRenderer implements Disposable {
 		this.batcher.draw(<GLTexture>region.page.texture, quad, QUAD_TRIANGLES);
 	}
 
-	line (x: number, y: number, x2: number, y2: number, color: Color = null, color2: Color = null) {
+	line (x: number, y: number, x2: number, y2: number, color?: Color, color2?: Color) {
 		this.enableRenderer(this.shapes);
 		this.shapes.line(x, y, x2, y2, color);
 	}
 
-	triangle (filled: boolean, x: number, y: number, x2: number, y2: number, x3: number, y3: number, color: Color = null, color2: Color = null, color3: Color = null) {
+	triangle (filled: boolean, x: number, y: number, x2: number, y2: number, x3: number, y3: number, color?: Color, color2?: Color, color3?: Color) {
 		this.enableRenderer(this.shapes);
 		this.shapes.triangle(filled, x, y, x2, y2, x3, y3, color, color2, color3);
 	}
 
-	quad (filled: boolean, x: number, y: number, x2: number, y2: number, x3: number, y3: number, x4: number, y4: number, color: Color = null, color2: Color = null, color3: Color = null, color4: Color = null) {
+	quad (filled: boolean, x: number, y: number, x2: number, y2: number, x3: number, y3: number, x4: number, y4: number, color?: Color, color2?: Color, color3?: Color, color4?: Color) {
 		this.enableRenderer(this.shapes);
 		this.shapes.quad(filled, x, y, x2, y2, x3, y3, x4, y4, color, color2, color3, color4);
 	}
 
-	rect (filled: boolean, x: number, y: number, width: number, height: number, color: Color = null) {
+	rect (filled: boolean, x: number, y: number, width: number, height: number, color?: Color) {
 		this.enableRenderer(this.shapes);
 		this.shapes.rect(filled, x, y, width, height, color);
 	}
 
-	rectLine (filled: boolean, x1: number, y1: number, x2: number, y2: number, width: number, color: Color = null) {
+	rectLine (filled: boolean, x1: number, y1: number, x2: number, y2: number, width: number, color?: Color) {
 		this.enableRenderer(this.shapes);
 		this.shapes.rectLine(filled, x1, y1, x2, y2, width, color);
 	}
 
-	polygon (polygonVertices: ArrayLike<number>, offset: number, count: number, color: Color = null) {
+	polygon (polygonVertices: ArrayLike<number>, offset: number, count: number, color?: Color) {
 		this.enableRenderer(this.shapes);
 		this.shapes.polygon(polygonVertices, offset, count, color);
 	}
 
-	circle (filled: boolean, x: number, y: number, radius: number, color: Color = null, segments: number = 0) {
+	circle (filled: boolean, x: number, y: number, radius: number, color?: Color, segments: number = 0) {
 		this.enableRenderer(this.shapes);
 		this.shapes.circle(filled, x, y, radius, color, segments);
 	}
 
-	curve (x1: number, y1: number, cx1: number, cy1: number, cx2: number, cy2: number, x2: number, y2: number, segments: number, color: Color = null) {
+	curve (x1: number, y1: number, cx1: number, cy1: number, cx2: number, cy2: number, x2: number, y2: number, segments: number, color?: Color) {
 		this.enableRenderer(this.shapes);
 		this.shapes.curve(x1, y1, cx1, cy1, cx2, cy2, x2, y2, segments, color);
 	}

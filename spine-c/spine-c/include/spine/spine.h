@@ -58,6 +58,5 @@
 #include <spine/SkeletonClipping.h>
 #include <spine/Event.h>
 #include <spine/EventData.h>
-#include <spine/VertexEffect.h>
 
 #endif /* SPINE_SPINE_H_ */

@@ -27,12 +27,8 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifdef SPINE_UE4
-#include "SpinePluginPrivatePCH.h"
-#endif
-
-#include <math.h>
 #include <spine/MathUtil.h>
+#include <math.h>
 #include <stdlib.h>
 
 // Required for division by 0 in _isNaN on MSVC

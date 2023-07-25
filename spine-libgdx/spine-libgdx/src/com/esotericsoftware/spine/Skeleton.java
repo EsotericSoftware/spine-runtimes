@@ -37,7 +37,8 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.Null;
 
-import com.esotericsoftware.spine.PhysicsConstraintData.Node;
+import com.esotericsoftware.spine.PhysicsConstraint.Node;
+import com.esotericsoftware.spine.PhysicsConstraint.Spring;
 import com.esotericsoftware.spine.Skin.SkinEntry;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
@@ -346,25 +347,40 @@ public class Skeleton {
 		int nodeCount = constraint.nodes.size;
 		for (int i = 0; i < nodeCount; i++) {
 			Node node = (Node)nodes[i];
-			if (node.parentBone != null) sortBone(node.parentBone);
-			for (Bone bone : node.bones)
-				sortBone(bone);
+			sortBone(node.parentBone);
+// for (Bone bone : node.bones)
+// sortBone(bone);
 		}
 
 		updateCache.add(constraint);
 
 		for (int i = 0; i < nodeCount; i++) {
 			Node node = (Node)nodes[i];
-			if (node.parentBone != null) sortReset(node.parentBone.children);
-			for (Bone bone : node.bones)
-				sortReset(bone.children);
+			sortReset(node.parentBone.children);
 		}
-		for (int i = 0; i < nodeCount; i++) {
-			Node node = (Node)nodes[i];
-			if (node.parentBone != null) node.parentBone.sorted = true;
-			for (Bone bone : node.bones)
-				bone.sorted = true;
-		}
+
+// for (int i = 0; i < nodeCount; i++) {
+// Node node = (Node)nodes[i];
+// for (Bone bone : node.bones)
+// sortReset(bone.children);
+// }
+// for (int i = 0; i < nodeCount; i++) {
+// Node node = (Node)nodes[i];
+// for (Bone bone : node.bones)
+// bone.sorted = true;
+// }
+//
+// Object[] springs = constraint.springs.items;
+// for (int i = 0, n = constraint.springs.size; i < n; i++) {
+// Spring spring = (Spring)springs[i];
+// if (spring.bone == null) continue;
+// sortBone(spring.bone);
+// updateCache.add(spring);
+// sortReset(spring.bone.children);
+// spring.bone.sorted = true;
+// for (Bone child : spring.bone.children)
+// sortBone(child);
+// }
 	}
 
 	private void sortBone (Bone bone) {
@@ -415,17 +431,30 @@ public class Skeleton {
 	public void updateWorldTransform (Bone parent) {
 		if (parent == null) throw new IllegalArgumentException("parent cannot be null.");
 
+		Object[] bones = this.bones.items;
+		for (int i = 1, n = this.bones.size; i < n; i++) { // Skip root bone.
+			Bone bone = (Bone)bones[i];
+			bone.ax = bone.x;
+			bone.ay = bone.y;
+			bone.arotation = bone.rotation;
+			bone.ascaleX = bone.scaleX;
+			bone.ascaleY = bone.scaleY;
+			bone.ashearX = bone.shearX;
+			bone.ashearY = bone.shearY;
+		}
+
 		// Apply the parent bone transform to the root bone. The root bone always inherits scale, rotation and reflection.
 		Bone rootBone = getRootBone();
 		float pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d;
 		rootBone.worldX = pa * x + pb * y + parent.worldX;
 		rootBone.worldY = pc * x + pd * y + parent.worldY;
 
-		float rotationY = rootBone.rotation + 90 + rootBone.shearY;
-		float la = cosDeg(rootBone.rotation + rootBone.shearX) * rootBone.scaleX;
-		float lb = cosDeg(rotationY) * rootBone.scaleY;
-		float lc = sinDeg(rootBone.rotation + rootBone.shearX) * rootBone.scaleX;
-		float ld = sinDeg(rotationY) * rootBone.scaleY;
+		float rx = (rootBone.rotation + rootBone.shearX) * degRad;
+		float ry = (rootBone.rotation + 90 + rootBone.shearY) * degRad;
+		float la = cos(rx) * rootBone.scaleX;
+		float lb = cos(ry) * rootBone.scaleY;
+		float lc = sin(rx) * rootBone.scaleX;
+		float ld = sin(ry) * rootBone.scaleY;
 		rootBone.a = (pa * la + pb * lc) * scaleX;
 		rootBone.b = (pa * lb + pb * ld) * scaleX;
 		rootBone.c = (pc * la + pd * lc) * scaleY;
@@ -746,8 +775,9 @@ public class Skeleton {
 		color.set(r, g, b, a);
 	}
 
-	/** Scales the entire skeleton on the X axis. This affects all bones, even if the bone's transform mode disallows scale
-	 * inheritance. */
+	/** Scales the entire skeleton on the X axis.
+	 * <p>
+	 * Bones that do not inherit scale are still affected by this property. */
 	public float getScaleX () {
 		return scaleX;
 	}
@@ -756,8 +786,9 @@ public class Skeleton {
 		this.scaleX = scaleX;
 	}
 
-	/** Scales the entire skeleton on the Y axis. This affects all bones, even if the bone's transform mode disallows scale
-	 * inheritance. */
+	/** Scales the entire skeleton on the Y axis.
+	 * <p>
+	 * Bones that do not inherit scale are still affected by this property. */
 	public float getScaleY () {
 		return scaleY;
 	}
@@ -766,12 +797,17 @@ public class Skeleton {
 		this.scaleY = scaleY;
 	}
 
+	/** Scales the entire skeleton on the X and Y axes.
+	 * <p>
+	 * Bones that do not inherit scale are still affected by this property. */
 	public void setScale (float scaleX, float scaleY) {
 		this.scaleX = scaleX;
 		this.scaleY = scaleY;
 	}
 
-	/** Sets the skeleton X position, which is added to the root bone worldX position. */
+	/** Sets the skeleton X position, which is added to the root bone worldX position.
+	 * <p>
+	 * Bones that do not inherit translation are still affected by this property. */
 	public float getX () {
 		return x;
 	}
@@ -780,7 +816,9 @@ public class Skeleton {
 		this.x = x;
 	}
 
-	/** Sets the skeleton Y position, which is added to the root bone worldY position. */
+	/** Sets the skeleton Y position, which is added to the root bone worldY position.
+	 * <p>
+	 * Bones that do not inherit translation are still affected by this property. */
 	public float getY () {
 		return y;
 	}
@@ -789,7 +827,9 @@ public class Skeleton {
 		this.y = y;
 	}
 
-	/** Sets the skeleton X and Y position, which is added to the root bone worldX and worldY position. */
+	/** Sets the skeleton X and Y position, which is added to the root bone worldX and worldY position.
+	 * <p>
+	 * Bones that do not inherit translation are still affected by this property. */
 	public void setPosition (float x, float y) {
 		this.x = x;
 		this.y = y;

@@ -80,7 +80,7 @@ namespace Spine {
 		}
 
 		public void Update () {
-			if (mixRotate == 0 && mixX == 0 && mixY == 0 && mixScaleX == 0 && mixScaleX == 0 && mixShearY == 0) return;
+			if (mixRotate == 0 && mixX == 0 && mixY == 0 && mixScaleX == 0 && mixScaleY == 0 && mixShearY == 0) return;
 			if (data.local) {
 				if (data.relative)
 					ApplyRelativeLocal();
@@ -104,7 +104,7 @@ namespace Spine {
 			float degRadReflect = ta * td - tb * tc > 0 ? MathUtils.DegRad : -MathUtils.DegRad;
 			float offsetRotation = data.offsetRotation * degRadReflect, offsetShearY = data.offsetShearY * degRadReflect;
 
-			var bones = this.bones.Items;
+			Bone[] bones = this.bones.Items;
 			for (int i = 0, n = this.bones.Count; i < n; i++) {
 				Bone bone = bones[i];
 
@@ -171,7 +171,7 @@ namespace Spine {
 			float degRadReflect = ta * td - tb * tc > 0 ? MathUtils.DegRad : -MathUtils.DegRad;
 			float offsetRotation = data.offsetRotation * degRadReflect, offsetShearY = data.offsetShearY * degRadReflect;
 
-			var bones = this.bones.Items;
+			Bone[] bones = this.bones.Items;
 			for (int i = 0, n = this.bones.Count; i < n; i++) {
 				Bone bone = bones[i];
 
@@ -231,7 +231,7 @@ namespace Spine {
 
 			Bone target = this.target;
 
-			var bones = this.bones.Items;
+			Bone[] bones = this.bones.Items;
 			for (int i = 0, n = this.bones.Count; i < n; i++) {
 				Bone bone = bones[i];
 
@@ -269,7 +269,7 @@ namespace Spine {
 
 			Bone target = this.target;
 
-			var bones = this.bones.Items;
+			Bone[] bones = this.bones.Items;
 			for (int i = 0, n = this.bones.Count; i < n; i++) {
 				Bone bone = bones[i];
 

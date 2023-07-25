@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineBoneData" inherits="SpineObjectWrapper" version="3.4">
+	<brief_description>
+		Stores the setup pose for a bone.
+	</brief_description>
+	<description>
+		Stores the setup pose for a bone.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="get_bone_name">
+			<return type="String" />
+			<description>
+				The name of the bone, which is unique across all bones in the skeleton.
+			</description>
+		</method>
+		<method name="get_color">
+			<return type="Color" />
+			<description>
+				The color of the bone as it was in Spine, or a default color if nonessential data was not exported. Bones are not usually rendered at runtime.
+			</description>
+		</method>
+		<method name="get_index">
+			<return type="int" />
+			<description>
+				The index of the bone in [code]Skeleton.get_bones()[/code].
+			</description>
+		</method>
+		<method name="get_length">
+			<return type="float" />
+			<description>
+				The bone's length.
+			</description>
+		</method>
+		<method name="get_parent">
+			<return type="SpineBoneData" />
+			<description>
+			</description>
+		</method>
+		<method name="get_rotation">
+			<return type="float" />
+			<description>
+				The local rotation in degrees.
+			</description>
+		</method>
+		<method name="get_scale_x">
+			<return type="float" />
+			<description>
+				The local scaleX.
+			</description>
+		</method>
+		<method name="get_scale_y">
+			<return type="float" />
+			<description>
+				The local scaleY.
+			</description>
+		</method>
+		<method name="get_shear_x">
+			<return type="float" />
+			<description>
+				The local shearX.
+			</description>
+		</method>
+		<method name="get_shear_y">
+			<return type="float" />
+			<description>
+				The local shearY.
+			</description>
+		</method>
+		<method name="get_transform_mode">
+			<return type="int" enum="SpineConstant.TransformMode" />
+			<description>
+				The transform mode for how parent world transforms affect this bone.
+			</description>
+		</method>
+		<method name="get_x">
+			<return type="float" />
+			<description>
+				The local x translation.
+			</description>
+		</method>
+		<method name="get_y">
+			<return type="float" />
+			<description>
+				The local y translation.
+			</description>
+		</method>
+		<method name="is_skin_required">
+			<return type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="set_color">
+			<return type="void" />
+			<argument index="0" name="v" type="Color" />
+			<description>
+			</description>
+		</method>
+		<method name="set_length">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_rotation">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_scale_x">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_scale_y">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_shear_x">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_shear_y">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_skin_required">
+			<return type="void" />
+			<argument index="0" name="v" type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="set_transform_mode">
+			<return type="void" />
+			<argument index="0" name="v" type="int" enum="SpineConstant.TransformMode" />
+			<description>
+			</description>
+		</method>
+		<method name="set_x">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_y">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+	</methods>
+	<constants>
+	</constants>
+</class>

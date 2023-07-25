@@ -110,7 +110,7 @@ namespace Spine.Unity {
 				return;
 			}
 
-			var skeleton = hierarchy.Skeleton;
+			Skeleton skeleton = hierarchy.Skeleton;
 
 			if (bone == null) {
 				if (string.IsNullOrEmpty(boneName)) return;
@@ -124,13 +124,14 @@ namespace Spine.Unity {
 
 			float positionScale = hierarchy.PositionScale;
 
-			var thisTransform = cachedTransform;
+			Transform thisTransform = cachedTransform;
 			float skeletonFlipRotation = Mathf.Sign(skeleton.ScaleX * skeleton.ScaleY);
 			if (mode == Mode.Follow) {
 				switch (phase) {
 				case UpdatePhase.Local:
 					if (position)
-						thisTransform.localPosition = new Vector3(bone.X * positionScale, bone.Y * positionScale, 0);
+						thisTransform.localPosition = new Vector3(bone.X * positionScale, bone.Y * positionScale,
+							zPosition ? 0 : thisTransform.localPosition.z);
 
 					if (rotation) {
 						if (bone.Data.TransformMode.InheritsRotation()) {
@@ -149,7 +150,8 @@ namespace Spine.Unity {
 				case UpdatePhase.World:
 				case UpdatePhase.Complete:
 					if (position)
-						thisTransform.localPosition = new Vector3(bone.AX * positionScale, bone.AY * positionScale, 0);
+						thisTransform.localPosition = new Vector3(bone.AX * positionScale, bone.AY * positionScale,
+							zPosition ? 0 : thisTransform.localPosition.z);
 
 					if (rotation) {
 						if (bone.Data.TransformMode.InheritsRotation()) {

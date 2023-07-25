@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineAnimationState" inherits="Reference" version="3.4">
+	<brief_description>
+		Applies animations over time, queues animations for later playback, mixes (crossfading) between animations, and applies multiple animations on top of each other (layering).
+	</brief_description>
+	<description>
+		Applies animations over time, queues animations for later playback, mixes (crossfading) between animations, and applies multiple animations on top of each other (layering). See [url]http://esotericsoftware.com/spine-applying-animations[/url] in the Spine Runtimes Guide.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="add_animation">
+			<return type="SpineTrackEntry" />
+			<argument index="0" name="animation_name" type="String" />
+			<argument index="1" name="delay" type="float" default="0" />
+			<argument index="2" name="loop" type="bool" default="true" />
+			<argument index="3" name="track_id" type="int" default="0" />
+			<description>
+				Adds an animation to be played after the current or last queued animation for a track. If the track is empty, it is equivalent to calling [code]set_animation[/code].
+				If [code]delay[/code] &gt; 0, sets [code]TrackEntry.delay[/code]. If [code]delay[/code] &lt;= 0, the delay set is the duration of the previous track entry minus any mix duration (from the [code]AnimationStateData[/code]) plus the specified [code]delay[/code] (ie the mix ends at ([code]delay[/code] &gt;= 0) or before ([code]delay[/code] &lt; 0) the previous track entry duration). If the previous entry is looping, its next loop completion is used instead of its duration.
+			</description>
+		</method>
+		<method name="add_empty_animation">
+			<return type="SpineTrackEntry" />
+			<argument index="0" name="track_id" type="int" />
+			<argument index="1" name="mix_duration" type="float" />
+			<argument index="2" name="delay" type="float" />
+			<description>
+				Adds an empty animation to be played after the current or last queued animation for a track, and sets the track entry's mix duration. If the track is empty, it is equivalent to calling [code]set_empty_animation()[/code]. See [code]set_empty_animation()[/code].
+				If [code]delay[/code]&gt; 0, sets the track entry's delay. If &lt;= 0, the delay set is the duration of the previous track entry minus any mix duration plus the specified [code]delay[/code] (ie the mix ends at ([code]delay[/code] = 0) or before ([code]delay[/code] &lt; 0) the previous track entry duration). If the previous entry is looping, its next loop completion is used instead of its duration.
+				Returns a track entry to allow further customization of animation playback. References to the track entry must not be kept
+				after the dispose event occurs.
+			</description>
+		</method>
+		<method name="apply">
+			<return type="bool" />
+			<argument index="0" name="skeleton" type="SpineSkeleton" />
+			<description>
+				Poses the skeleton using the track entry animations. The animation state is not changed, so can be applied to multiple skeletons to pose them identically.
+				Returns true if any animations were applied.
+			</description>
+		</method>
+		<method name="clear_track">
+			<return type="void" />
+			<argument index="0" name="arg0" type="int" />
+			<description>
+				Removes all animations from the track, leaving skeletons in their current pose.
+				It may be desired to use [code]set_empty_animation()[/code] to mix the skeletons back to the setup pose, rather than leaving them in their current pose.
+			</description>
+		</method>
+		<method name="clear_tracks">
+			<return type="void" />
+			<description>
+				Removes all animations from all tracks, leaving skeletons in their current pose.
+				It may be desired to use [code]set_empty_animations()[/code] to mix the skeletons back to the setup pose, rather than leaving them in their current pose.
+			</description>
+		</method>
+		<method name="disable_queue">
+			<return type="void" />
+			<description>
+				Halts the emission of any animation state events.
+			</description>
+		</method>
+		<method name="enable_queue">
+			<return type="void" />
+			<description>
+				Resumes the emission of any animation state events.
+			</description>
+		</method>
+		<method name="get_current">
+			<return type="SpineTrackEntry" />
+			<argument index="0" name="track_id" type="int" />
+			<description>
+				Returns the track entry for the animation currently playing on the track, or null if no animation is currently playing.
+			</description>
+		</method>
+		<method name="get_num_tracks">
+			<return type="int" />
+			<description>
+				Returns the number of tracks (or the highest track index) on which an animation has been set previously.
+			</description>
+		</method>
+		<method name="get_time_scale">
+			<return type="float" />
+			<description>
+				Multiplier for the delta time when the animation state is updated, causing time for all animations and mixes to play slower or faster. Defaults to 1.
+			</description>
+		</method>
+		<method name="set_animation">
+			<return type="SpineTrackEntry" />
+			<argument index="0" name="animation_name" type="String" />
+			<argument index="1" name="loop" type="bool" default="true" />
+			<argument index="2" name="track_id" type="int" default="0" />
+			<description>
+				Sets the current animation for a track, discarding any queued animations. If the formerly current track entry was never applied to a skeleton, it is replaced (not mixed from).
+				If [loop] is true, the animation will repeat. If false it will not, instead its last frame is applied if played beyond its duration. In either case [code]TrackEntry.trackEnd[/code] determines when the track is cleared.
+				Returns track entry to allow further customization of animation playback. References to the track entry must not be kept after the dispose event occurs.
+			</description>
+		</method>
+		<method name="set_empty_animation">
+			<return type="SpineTrackEntry" />
+			<argument index="0" name="track_id" type="int" />
+			<argument index="1" name="mix_duration" type="float" />
+			<description>
+				Sets an empty animation for a track, discarding any queued animations, and sets the track entry's mix duration. An empty animation has no timelines and serves as a placeholder for mixing in or out.
+				Mixing out is done by setting an empty animation with a mix duration using either [code]set_empty_animation()[/code], [code]set_empty_animations()[/code], or [code]add_empty_animation()[/code]. Mixing to an empty animation causes the previous animation to be applied less and less over the mix duration. Properties keyed in the previous animation transition to the value from lower tracks or to the setup pose value if no lower tracks key the property. A mix duration of 0 still mixes out over one frame.
+				Mixing in is done by first setting an empty animation, then adding an animation using [code]add_animation()[/code]with the desired delay (an empty animation has a duration of 0) and on the returned track entry, set the mix duration. Mixing from an empty animation causes the new animation to be applied more and more over the mix duration. Properties keyed in the new animation transition from the value from lower tracks or from the setup pose value if no lower tracks key the property to the value keyed in the new animation.
+			</description>
+		</method>
+		<method name="set_empty_animations">
+			<return type="void" />
+			<argument index="0" name="mix_duration" type="float" />
+			<description>
+				Sets an empty animation for every track, discarding any queued animations, and mixes to it over the specified mix duration.
+			</description>
+		</method>
+		<method name="set_time_scale">
+			<return type="void" />
+			<argument index="0" name="time_scale" type="float" />
+			<description>
+				Sets the multiplier for the delta time when the animation state is updated, causing time for all animations and mixes to play slower or faster. Defaults to 1.
+			</description>
+		</method>
+		<method name="update">
+			<return type="void" />
+			<argument index="0" name="delta" type="float" default="0" />
+			<description>
+				Increments each track entry track time, setting queued animations as current if needed.
+			</description>
+		</method>
+	</methods>
+	<constants>
+	</constants>
+</class>

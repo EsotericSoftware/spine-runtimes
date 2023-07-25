@@ -4,6 +4,12 @@
 #include "ShaderShared.cginc"
 #include "SpriteLighting.cginc"
 #include "SpriteSpecular.cginc"
+#if defined(_ALPHAPREMULTIPLY_ON)
+	#undef _STRAIGHT_ALPHA_INPUT
+#else
+	#define _STRAIGHT_ALPHA_INPUT
+#endif
+#include "../../CGIncludes/Spine-Skeleton-Tint-Common.cginc"
 
 ////////////////////////////////////////
 // Defines
@@ -114,6 +120,10 @@ struct VertexOutput
 #if defined(_FOG)
 	UNITY_FOG_COORDS(_FOG_COORD_INDEX)
 #endif // _FOG
+
+#if defined(_TINT_BLACK_ON)
+	float3 darkColor : TEXCOORD9;
+#endif
 
 	UNITY_VERTEX_OUTPUT_STEREO
 };
@@ -342,9 +352,12 @@ VertexOutput vert(VertexInput input)
 
 	output.pos = calculateLocalPos(input.vertex);
 	output.color = calculateVertexColor(input.color);
+#if defined(_TINT_BLACK_ON)
+	output.darkColor = GammaToTargetSpace(half3(input.tintBlackRG.r, input.tintBlackRG.g, input.tintBlackB.r)) + _Black.rgb;
+#endif
 	output.texcoord = float3(calculateTextureCoord(input.texcoord), 0);
 
-	float3 viewPos = UnityObjectToViewPos(input.vertex);  //float3 viewPos = mul(UNITY_MATRIX_MV, input.vertex); //
+	float3 viewPos = UnityObjectToViewPos(input.vertex);
 #if defined(FIXED_NORMALS_BACKFACE_RENDERING) || defined(_RIM_LIGHTING)
 	float4 powWorld = calculateWorldPos(input.vertex);
 #endif
@@ -402,8 +415,12 @@ VertexOutput vert(VertexInput input)
 fixed4 frag(VertexOutput input) : SV_Target
 {
 	fixed4 texureColor = calculateTexturePixel(input.texcoord.xy);
-	RETURN_UNLIT_IF_ADDITIVE_SLOT(texureColor, input.color) // shall be called before ALPHA_CLIP
+	RETURN_UNLIT_IF_ADDITIVE_SLOT_TINT(texureColor, input.color, input.darkColor, _Color.a, _Black.a) // shall be called before ALPHA_CLIP
 	ALPHA_CLIP(texureColor, input.color)
+
+#if defined(_TINT_BLACK_ON)
+	texureColor = fragTintedColor(texureColor, input.darkColor, input.color, _Color.a, _Black.a);
+#endif
 
 #if defined(PER_PIXEL_LIGHTING)
 

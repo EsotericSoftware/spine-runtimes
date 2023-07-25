@@ -2,7 +2,7 @@ group = "com.esotericsoftware.spine"
 version = "4.1.0"
 
 ext {
-    libgdxVersion = "1.10.1-SNAPSHOT"
+    libgdxVersion = "1.11.1-SNAPSHOT"
     javaVersion = 8
 }
 
@@ -23,6 +23,20 @@ project("spine-libgdx") {
 
     dependencies {
         implementation "com.badlogicgames.gdx:gdx:$libgdxVersion"
+    }
+}
+
+project("spine-skeletonviewer") {
+    jar {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+
+        manifest {
+            attributes "Main-Class": "com.esotericsoftware.spine.SkeletonViewer"
+        }
+
+        from {
+            configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+        }
     }
 }
 

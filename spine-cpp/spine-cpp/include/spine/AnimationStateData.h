@@ -67,6 +67,9 @@ namespace spine {
 		/// or the DefaultMix if no mix duration has been set.
 		float getMix(Animation *from, Animation *to);
 
+		/// Removes all mixes and sets the default mix to 0.
+		void clear();
+
 	private:
 		class AnimationPair : public SpineObject {
 		public:

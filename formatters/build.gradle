@@ -21,12 +21,19 @@ spotless {
                'spine-cocos2dx/src/**/*.h', 
                'spine-cocos2dx/example/Classes/**/*.cpp', 
                'spine-cocos2dx/example/Classes/**/*.h',
+               'spine-sdl/**/*.c',
+               'spine-sdl/**/*.cpp',
+               'spine-sdl/**/*.h',
                'spine-sfml/**/*.c',
                'spine-sfml/**/*.cpp',
                'spine-sfml/**/*.h',
                'spine-ue4/**/*.cpp',
-               'spine-ue4/**/*.h'
-        clangFormat("12.0.1").pathToExe("$System.env.CLANGFORMAT").style('file')
+               'spine-ue4/**/*.h',
+               'spine-godot/spine_godot/*.cpp',
+               'spine-godot/spine_godot/*.h',
+               'spine-flutter/src/spine_flutter.cpp',
+               'spine-flutter/src/spine_flutter.h'
+        clangFormat("13.0.1").pathToExe("$System.env.CLANGFORMAT").style('file')
     }
 
     typescript {

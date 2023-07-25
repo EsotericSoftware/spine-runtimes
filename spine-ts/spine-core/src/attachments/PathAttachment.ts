@@ -36,7 +36,7 @@ import { VertexAttachment, Attachment } from "./Attachment";
 export class PathAttachment extends VertexAttachment {
 
 	/** The lengths along the path in the setup pose from the start of the path to the end of each Bezier curve. */
-	lengths: Array<number> = null;
+	lengths: Array<number> = [];
 
 	/** If true, the start and end knots are connected. */
 	closed = false;

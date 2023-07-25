@@ -27,12 +27,8 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifdef SPINE_UE4
-#include "SpinePluginPrivatePCH.h"
-#endif
-
-#include <spine/Animation.h>
 #include <spine/AnimationStateData.h>
+#include <spine/Animation.h>
 #include <spine/SkeletonData.h>
 
 using namespace spine;
@@ -75,6 +71,11 @@ float AnimationStateData::getDefaultMix() {
 
 void AnimationStateData::setDefaultMix(float inValue) {
 	_defaultMix = inValue;
+}
+
+void AnimationStateData::clear() {
+	_defaultMix = 0;
+	_animationToMixTime.clear();
 }
 
 AnimationStateData::AnimationPair::AnimationPair(Animation *a1, Animation *a2) : _a1(a1), _a2(a2) {

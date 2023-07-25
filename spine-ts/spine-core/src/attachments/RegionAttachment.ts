@@ -64,11 +64,10 @@ export class RegionAttachment extends Attachment implements HasTextureRegion {
 	color = new Color(1, 1, 1, 1);
 
 	/** The name of the texture region for this attachment. */
-	path: string = null;
-
-	private rendererObject: any = null;
-	region: TextureRegion = null;
-	sequence: Sequence = null;
+	path: string;
+	
+	region: TextureRegion | null = null;
+	sequence: Sequence | null = null;
 
 	/** For each of the 4 vertices, a pair of <code>x,y</code> values that is the local position of the vertex.
 	 *
@@ -79,13 +78,29 @@ export class RegionAttachment extends Attachment implements HasTextureRegion {
 
 	tempColor = new Color(1, 1, 1, 1);
 
-	constructor (name: string) {
+	constructor (name: string, path: string) {
 		super(name);
+		this.path = path;
 	}
 
 	/** Calculates the {@link #offset} using the region settings. Must be called after changing region settings. */
 	updateRegion (): void {
+		if (!this.region) throw new Error("Region not set.");
 		let region = this.region;
+		let uvs = this.uvs;
+
+		if (region == null) {
+			uvs[0] = 0;
+			uvs[1] = 0;
+			uvs[2] = 0;
+			uvs[3] = 1;
+			uvs[4] = 1;
+			uvs[5] = 1;
+			uvs[6] = 1;
+			uvs[7] = 0;
+			return;
+		}
+
 		let regionScaleX = this.width / this.region.originalWidth * this.scaleX;
 		let regionScaleY = this.height / this.region.originalHeight * this.scaleY;
 		let localX = -this.width / 2 * this.scaleX + this.region.offsetX * regionScaleX;
@@ -114,16 +129,15 @@ export class RegionAttachment extends Attachment implements HasTextureRegion {
 		offset[6] = localX2Cos - localYSin;
 		offset[7] = localYCos + localX2Sin;
 
-		let uvs = this.uvs;
 		if (region.degrees == 90) {
+			uvs[0] = region.u2;
+			uvs[1] = region.v2;
 			uvs[2] = region.u;
 			uvs[3] = region.v2;
 			uvs[4] = region.u;
 			uvs[5] = region.v;
 			uvs[6] = region.u2;
 			uvs[7] = region.v;
-			uvs[0] = region.u2;
-			uvs[1] = region.v2;
 		} else {
 			uvs[0] = region.u;
 			uvs[1] = region.v2;
@@ -179,10 +193,8 @@ export class RegionAttachment extends Attachment implements HasTextureRegion {
 	}
 
 	copy (): Attachment {
-		let copy = new RegionAttachment(this.name);
-		copy.region = this.region;
-		copy.rendererObject = this.rendererObject;
-		copy.path = this.path;
+		let copy = new RegionAttachment(this.name, this.path);
+		copy.region = this.region;		
 		copy.x = this.x;
 		copy.y = this.y;
 		copy.scaleX = this.scaleX;

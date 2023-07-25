@@ -40,21 +40,21 @@ namespace Spine.Unity.Examples {
 		Skin combinedSkin;
 
 		void Start () {
-			var skeletonComponent = GetComponent<ISkeletonComponent>();
+			ISkeletonComponent skeletonComponent = GetComponent<ISkeletonComponent>();
 			if (skeletonComponent == null) return;
-			var skeleton = skeletonComponent.Skeleton;
+			Skeleton skeleton = skeletonComponent.Skeleton;
 			if (skeleton == null) return;
 
 			combinedSkin = combinedSkin ?? new Skin("combined");
 			combinedSkin.Clear();
-			foreach (var skinName in skinsToCombine) {
-				var skin = skeleton.Data.FindSkin(skinName);
+			foreach (string skinName in skinsToCombine) {
+				Skin skin = skeleton.Data.FindSkin(skinName);
 				if (skin != null) combinedSkin.AddSkin(skin);
 			}
 
 			skeleton.SetSkin(combinedSkin);
 			skeleton.SetToSetupPose();
-			var animationStateComponent = skeletonComponent as IAnimationStateComponent;
+			IAnimationStateComponent animationStateComponent = skeletonComponent as IAnimationStateComponent;
 			if (animationStateComponent != null) animationStateComponent.AnimationState.Apply(skeleton);
 		}
 	}

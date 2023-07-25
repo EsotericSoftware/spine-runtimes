@@ -32,8 +32,8 @@ export class Input {
 	mouseX = 0;
 	mouseY = 0;
 	buttonDown = false;
-	touch0: Touch = null;
-	touch1: Touch = null;
+	touch0: Touch | null = null;
+	touch1: Touch | null = null;
 	initialPinchDistance = 0;
 	private listeners = new Array<InputListener>();
 	private eventListeners: Array<{ target: any, event: any, func: any }> = [];
@@ -104,6 +104,7 @@ export class Input {
 			if (!this.touch0 || !this.touch1) {
 				var touches = ev.changedTouches;
 				let nativeTouch = touches.item(0);
+				if (!nativeTouch) return;
 				let rect = element.getBoundingClientRect();
 				let x = nativeTouch.clientX - rect.left;
 				let y = nativeTouch.clientY - rect.top;
@@ -180,7 +181,7 @@ export class Input {
 							this.mouseX = this.touch0.x;
 							this.mouseX = this.touch0.x;
 							this.buttonDown = true;
-							this.listeners.map((listener) => { if (listener.down) listener.down(this.touch0.x, this.touch0.y) });
+							this.listeners.map((listener) => { if (listener.down) listener.down(this.touch0!.x, this.touch0!.y) });
 						}
 					}
 

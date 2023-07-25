@@ -44,7 +44,7 @@ namespace Spine.Unity.Examples {
 
 			// Add normal material as default
 			if (skeletonGraphic != null && skeletonGraphic.skeletonDataAsset != null) {
-				var atlasAssets = skeletonGraphic.skeletonDataAsset.atlasAssets;
+				AtlasAssetBase[] atlasAssets = skeletonGraphic.skeletonDataAsset.atlasAssets;
 
 				if (atlasAssets.Length > 0 && atlasAssets[0].PrimaryMaterial) {
 					materialWithoutOutline = atlasAssets[0].PrimaryMaterial;

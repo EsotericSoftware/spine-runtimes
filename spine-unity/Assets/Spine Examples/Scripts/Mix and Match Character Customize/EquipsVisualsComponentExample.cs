@@ -50,7 +50,7 @@ namespace Spine.Unity.Examples {
 			equipsSkin = new Skin("Equips");
 
 			// OPTIONAL: Add all the attachments from the template skin.
-			var templateSkin = skeletonAnimation.Skeleton.Data.FindSkin(templateSkinName);
+			Skin templateSkin = skeletonAnimation.Skeleton.Data.FindSkin(templateSkinName);
 			if (templateSkin != null)
 				equipsSkin.AddSkin(templateSkin);
 
@@ -77,7 +77,7 @@ namespace Spine.Unity.Examples {
 				Destroy(runtimeMaterial);
 			if (runtimeAtlas)
 				Destroy(runtimeAtlas);
-			var repackedSkin = collectedSkin.GetRepackedSkin("Repacked skin", skeletonAnimation.SkeletonDataAsset.atlasAssets[0].PrimaryMaterial,
+			Skin repackedSkin = collectedSkin.GetRepackedSkin("Repacked skin", skeletonAnimation.SkeletonDataAsset.atlasAssets[0].PrimaryMaterial,
 				out runtimeMaterial, out runtimeAtlas, maxAtlasSize: 1024, clearCache: false);
 			collectedSkin.Clear();
 

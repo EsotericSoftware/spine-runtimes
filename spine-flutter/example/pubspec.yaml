@@ -1,0 +1,26 @@
+name: spine_flutter_example
+description: Demonstrates how to use the spine_flutter plugin.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=2.17.6 <4.0.0'
+  flutter: ">=3.10.5"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  spine_flutter:
+    path: ../
+  cupertino_icons: ^1.0.2
+  flame: ^1.4.0
+  raw_image_provider: ^0.2.0
+
+dev_dependencies:
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/

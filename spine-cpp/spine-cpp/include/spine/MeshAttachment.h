@@ -39,7 +39,7 @@
 
 namespace spine {
 	/// Attachment that displays a texture region using a mesh.
-	class SP_API MeshAttachment : public VertexAttachment, public HasRendererObject {
+	class SP_API MeshAttachment : public VertexAttachment {
 		friend class SkeletonBinary;
 
 		friend class SkeletonJson;
@@ -52,6 +52,8 @@ namespace spine {
 		explicit MeshAttachment(const String &name);
 
 		virtual ~MeshAttachment();
+
+		using VertexAttachment::computeWorldVertices;
 
 		virtual void computeWorldVertices(Slot &slot, size_t start, size_t count, float *worldVertices, size_t offset,
 		size_t stride = 2);

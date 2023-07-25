@@ -31,11 +31,12 @@
 #define NEW_PREFAB_SYSTEM
 #endif
 
-using Spine;
-using System.Collections.Generic;
+#if UNITY_2021_2_OR_NEWER
+#define PUBLIC_SET_ICON_FOR_OBJECT
+#endif
+
 using System.Reflection;
 using UnityEditor;
-using UnityEditor.AnimatedValues;
 using UnityEngine;
 
 namespace Spine.Unity.Editor {
@@ -93,7 +94,7 @@ namespace Spine.Unity.Editor {
 
 			if ((skeletonRenderer != null && !skeletonRenderer.valid) ||
 				(skeletonGraphic != null && !skeletonGraphic.IsValid)) {
-				GUILayout.Label(new GUIContent("Spine Component invalid. Check Skeleton Data Asset.", Icons.warning));
+				GUILayout.Label(new GUIContent("Spine Component invalid. Check SkeletonData asset.", Icons.warning));
 				return;
 			}
 
@@ -128,7 +129,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		void SpawnHierarchyContextMenu () {
-			var menu = new GenericMenu();
+			GenericMenu menu = new GenericMenu();
 
 			menu.AddItem(new GUIContent("Follow all bones"), false, SpawnFollowHierarchy);
 			menu.AddItem(new GUIContent("Follow (Root Only)"), false, SpawnFollowHierarchyRootOnly);
@@ -148,17 +149,20 @@ namespace Spine.Unity.Editor {
 					icon = Icons.constraintNib;
 					break;
 				}
-
+#if PUBLIC_SET_ICON_FOR_OBJECT
+			EditorGUIUtility.SetIconForObject(boneComponent.gameObject, icon);
+#else
 			typeof(EditorGUIUtility).InvokeMember("SetIconForObject", BindingFlags.InvokeMethod | BindingFlags.Static | BindingFlags.NonPublic, null, null, new object[2] {
 				boneComponent.gameObject,
 				icon
 			});
+#endif
 		}
 
 		static void AttachIconsToChildren (Transform root) {
 			if (root != null) {
-				var utilityBones = root.GetComponentsInChildren<SkeletonUtilityBone>();
-				foreach (var utilBone in utilityBones)
+				SkeletonUtilityBone[] utilityBones = root.GetComponentsInChildren<SkeletonUtilityBone>();
+				foreach (SkeletonUtilityBone utilBone in utilityBones)
 					AttachIcon(utilBone);
 			}
 		}

@@ -93,6 +93,19 @@ namespace Spine {
 		/// <summary>Calculates the <see cref="Offset"/> and <see cref="UVs"/> using the region and the attachment's transform. Must be called if the
 		/// region, the region's properties, or the transform are changed.</summary>
 		public void UpdateRegion () {
+			float[] uvs = this.uvs;
+			if (region == null) {
+				uvs[BLX] = 0;
+				uvs[BLY] = 0;
+				uvs[ULX] = 0;
+				uvs[ULY] = 1;
+				uvs[URX] = 1;
+				uvs[URY] = 1;
+				uvs[BRX] = 1;
+				uvs[BRY] = 0;
+				return;
+			}
+
 			float width = Width;
 			float height = Height;
 			float localX2 = width / 2;
@@ -142,25 +155,24 @@ namespace Spine {
 			offset[BRX] = localX2Cos - localYSin;
 			offset[BRY] = localYCos + localX2Sin;
 
-			float[] uvs = this.uvs;
 			if (rotated) {
-				uvs[URX] = region.u;
-				uvs[URY] = region.v2;
-				uvs[BRX] = region.u;
-				uvs[BRY] = region.v;
 				uvs[BLX] = region.u2;
 				uvs[BLY] = region.v;
 				uvs[ULX] = region.u2;
 				uvs[ULY] = region.v2;
+				uvs[URX] = region.u;
+				uvs[URY] = region.v2;
+				uvs[BRX] = region.u;
+				uvs[BRY] = region.v;
 			} else {
+				uvs[BLX] = region.u2;
+				uvs[BLY] = region.v2;
 				uvs[ULX] = region.u;
 				uvs[ULY] = region.v2;
 				uvs[URX] = region.u;
 				uvs[URY] = region.v;
 				uvs[BRX] = region.u2;
 				uvs[BRY] = region.v;
-				uvs[BLX] = region.u2;
-				uvs[BLY] = region.v2;
 			}
 		}
 

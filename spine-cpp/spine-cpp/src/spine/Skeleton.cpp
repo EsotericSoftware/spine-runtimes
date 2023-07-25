@@ -27,10 +27,6 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifdef SPINE_UE4
-#include "SpinePluginPrivatePCH.h"
-#endif
-
 #include <spine/Skeleton.h>
 
 #include <spine/Attachment.h>
@@ -372,7 +368,7 @@ void Skeleton::setAttachment(const String &slotName, const String &attachmentNam
 		if (slot->_data.getName() == slotName) {
 			Attachment *attachment = NULL;
 			if (attachmentName.length() > 0) {
-				attachment = getAttachment(i, attachmentName);
+				attachment = getAttachment((int) i, attachmentName);
 
 				assert(attachment != NULL);
 			}
@@ -429,8 +425,8 @@ PathConstraint *Skeleton::findPathConstraint(const String &constraintName) {
 void Skeleton::getBounds(float &outX, float &outY, float &outWidth, float &outHeight, Vector<float> &outVertexBuffer) {
 	float minX = FLT_MAX;
 	float minY = FLT_MAX;
-	float maxX = FLT_MIN;
-	float maxY = FLT_MIN;
+	float maxX = -FLT_MAX;
+	float maxY = -FLT_MAX;
 
 	for (size_t i = 0; i < _drawOrder.size(); ++i) {
 		Slot *slot = _drawOrder[i];
@@ -657,7 +653,7 @@ void Skeleton::sortPathConstraintAttachment(Skin *skin, size_t slotIndex, Bone &
 
 void Skeleton::sortPathConstraintAttachment(Attachment *attachment, Bone &slotBone) {
 	if (attachment == NULL || !attachment->getRTTI().instanceOf(PathAttachment::rtti)) return;
-	Vector<size_t> &pathBones = static_cast<PathAttachment *>(attachment)->getBones();
+	Vector<int> &pathBones = static_cast<PathAttachment *>(attachment)->getBones();
 	if (pathBones.size() == 0)
 		sortBone(&slotBone);
 	else {

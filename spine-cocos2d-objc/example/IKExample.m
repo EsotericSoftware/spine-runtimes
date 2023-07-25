@@ -92,7 +92,6 @@
 			spBone_worldToLocal(crosshair->parent, sceneStrong->position.x, sceneStrong->position.y, &localX, &localY);
 			crosshair->x = localX;
 			crosshair->y = localY;
-			crosshair->appliedValid = FALSE;
 			spBone_updateWorldTransform(crosshair);
 		}
     };

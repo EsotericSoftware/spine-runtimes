@@ -77,15 +77,15 @@ export class SpineCanvas {
 
 	/** Constructs a new spine canvas, rendering to the provided HTML canvas. */
 	constructor (canvas: HTMLCanvasElement, config: SpineCanvasConfig) {
-		if (config.pathPrefix === undefined) config.pathPrefix = "";
-		if (config.app === undefined) config.app = {
+		if (!config.pathPrefix) config.pathPrefix = "";
+		if (!config.app) config.app = {
 			loadAssets: () => { },
 			initialize: () => { },
 			update: () => { },
 			render: () => { },
 			error: () => { },
 		}
-		if (config.webglConfig === undefined) config.webglConfig = { alpha: true };
+		if (!config.webglConfig) config.webglConfig = { alpha: true };
 
 		this.htmlCanvas = canvas;
 		this.context = new ManagedWebGLRenderingContext(canvas, config.webglConfig);
@@ -94,21 +94,21 @@ export class SpineCanvas {
 		this.assetManager = new AssetManager(this.context, config.pathPrefix);
 		this.input = new Input(canvas);
 
-		config.app.loadAssets(this);
+		if (config.app.loadAssets) config.app.loadAssets(this);
 
 		let loop = () => {
 			requestAnimationFrame(loop);
 			this.time.update();
-			config.app.update(this, this.time.delta);
-			config.app.render(this);
+			if (config.app.update) config.app.update(this, this.time.delta);
+			if (config.app.render) config.app.render(this);
 		}
 
 		let waitForAssets = () => {
 			if (this.assetManager.isLoadingComplete()) {
 				if (this.assetManager.hasErrors()) {
-					config.app.error(this, this.assetManager.getErrors());
+					if (config.app.error) config.app.error(this, this.assetManager.getErrors());
 				} else {
-					config.app.initialize(this);
+					if (config.app.initialize) config.app.initialize(this);
 					loop();
 				}
 				return;

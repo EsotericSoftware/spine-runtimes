@@ -37,7 +37,7 @@ namespace Spine.Unity.Examples {
 
 		public void Start () {
 			skeletonAnimation = GetComponent<SkeletonAnimation>(); // Get the SkeletonAnimation component for the GameObject this script is attached to.
-			var animationState = skeletonAnimation.AnimationState;
+			AnimationState animationState = skeletonAnimation.AnimationState;
 
 			animationState.Event += HandleEvent; ; // Call our method any time an animation fires an event.
 			animationState.End += (entry) => Debug.Log("start: " + entry.TrackIndex); // A lambda can be used for the callback instead of a method.

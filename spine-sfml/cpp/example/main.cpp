@@ -278,9 +278,6 @@ void raptor(SkeletonData *skeletonData, Atlas *atlas) {
 
 	PowInterpolation pow2(2);
 	PowOutInterpolation powOut2(2);
-	SwirlVertexEffect effect(400, powOut2);
-	effect.setCenterY(-200);
-	drawable.vertexEffect = &effect;
 
 	Skeleton *skeleton = drawable.skeleton;
 	skeleton->setPosition(320, 590);
@@ -293,18 +290,12 @@ void raptor(SkeletonData *skeletonData, Atlas *atlas) {
 	window.setFramerateLimit(60);
 	sf::Event event;
 	sf::Clock deltaClock;
-	float swirlTime = 0;
 	while (window.isOpen()) {
 		while (window.pollEvent(event))
 			if (event.type == sf::Event::Closed) window.close();
 
 		float delta = deltaClock.getElapsedTime().asSeconds();
 		deltaClock.restart();
-
-		swirlTime += delta;
-		float percent = MathUtil::fmod(swirlTime, 2);
-		if (percent > 1) percent = 1 - (percent - 1);
-		effect.setAngle(pow2.interpolate(-60.0f, 60.0f, percent));
 
 		drawable.update(delta);
 
@@ -564,6 +555,7 @@ void owl(SkeletonData *skeletonData, Atlas *atlas) {
 		float delta = deltaClock.getElapsedTime().asSeconds();
 		deltaClock.restart();
 
+		drawable.skeleton->setToSetupPose();
 		drawable.update(delta);
 
 		window.clear();
@@ -644,6 +636,7 @@ DebugExtension dbgExtension(SpineExtension::getInstance());
 int main() {
 	SpineExtension::setInstance(&dbgExtension);
 
+	testcase(vine, "data/vine-pro.json", "data/vine-pro.skel", "data/vine-pma.atlas", 0.5f);
 	testcase(dragon, "data/dragon-ess.json", "data/dragon-ess.skel", "data/dragon-pma.atlas", 0.6f);
 	testcase(vine, "data/vine-pro.json", "data/vine-pro.skel", "data/vine-pma.atlas", 0.5f);
 	testcase(owl, "data/owl-pro.json", "data/owl-pro.skel", "data/owl-pma.atlas", 0.5f);

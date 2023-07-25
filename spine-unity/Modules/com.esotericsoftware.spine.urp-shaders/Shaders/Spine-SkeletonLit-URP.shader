@@ -6,8 +6,11 @@
 		[Toggle(_RECEIVE_SHADOWS)] _ReceiveShadows("Receive Shadows", Int) = 0
 		[Toggle(_DOUBLE_SIDED_LIGHTING)] _DoubleSidedLighting("Double-Sided Lighting", Int) = 0
 		[MaterialToggle(_LIGHT_AFFECTS_ADDITIVE)] _LightAffectsAdditive("Light Affects Additive", Float) = 0
+		[MaterialToggle(_TINT_BLACK_ON)]  _TintBlack("Tint Black", Float) = 0
+		_Color("    Light Color", Color) = (1,1,1,1)
+		_Black("    Dark Color", Color) = (0,0,0,0)
 		[HideInInspector] _StencilRef("Stencil Reference", Float) = 1.0
-		[Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Compare", Float) = 0.0 // Disabled stencil test by default
+		[Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Compare", Float) = 8 // Set to Always as default
 	}
 
 	SubShader {
@@ -47,6 +50,11 @@
 			#pragma multi_compile _ _SHADOWS_SOFT
 			#pragma multi_compile _ _MIXED_LIGHTING_SUBTRACTIVE
 			#pragma multi_compile _ _LIGHT_AFFECTS_ADDITIVE
+			#pragma shader_feature _TINT_BLACK_ON
+			// Farward+ renderer keywords
+			#pragma multi_compile_fragment _ _LIGHT_LAYERS
+			#pragma multi_compile _ _FORWARD_PLUS
+			#pragma multi_compile_fragment _ _WRITE_RENDERING_LAYERS
 
 			// -------------------------------------
 			// Unity defined keywords
@@ -55,6 +63,7 @@
 			//--------------------------------------
 			// GPU Instancing
 			#pragma multi_compile_instancing
+			#pragma instancing_options renderinglayer
 
 			//--------------------------------------
 			// Spine related keywords
@@ -81,6 +90,7 @@
 			Tags{"LightMode" = "ShadowCaster"}
 
 			ZWrite On
+			ColorMask 0
 			ZTest LEqual
 			Cull Off
 
@@ -113,13 +123,13 @@
 			ENDHLSL
 		}
 
-			Pass
+		Pass
 		{
 			Name "DepthOnly"
 			Tags{"LightMode" = "DepthOnly"}
 
 			ZWrite On
-			ColorMask 0
+			ColorMask R
 			Cull Off
 
 			HLSLPROGRAM
@@ -145,6 +155,40 @@
 			#define fixed half
 			#include "Include/Spine-Input-URP.hlsl"
 			#include "Include/Spine-DepthOnlyPass-URP.hlsl"
+			ENDHLSL
+		}
+
+		// This pass is used when drawing to a _CameraNormalsTexture texture
+		Pass
+		{
+			Name "DepthNormals"
+			Tags{"LightMode" = "DepthNormals"}
+
+			ZWrite On
+
+			HLSLPROGRAM
+			#pragma vertex DepthNormalsVertex
+			#pragma fragment DepthNormalsFragment
+
+			// -------------------------------------
+			// Material Keywords
+			#pragma shader_feature _ALPHATEST_ON
+			#pragma shader_feature _ _DOUBLE_SIDED_LIGHTING
+
+			// -------------------------------------
+			// Universal Pipeline keywords
+			#pragma multi_compile_fragment _ _WRITE_RENDERING_LAYERS
+
+			//--------------------------------------
+			// GPU Instancing
+			#pragma multi_compile_instancing
+
+			#define USE_URP
+			#define fixed4 half4
+			#define fixed3 half3
+			#define fixed half
+			#include "Include/Spine-Input-URP.hlsl"
+			#include "Include/Spine-DepthNormalsPass-URP.hlsl"
 			ENDHLSL
 		}
 	}

@@ -37,7 +37,7 @@ using System.Text;
 namespace Spine {
 	public static class Json {
 		public static object Deserialize (TextReader text) {
-			var parser = new SharpJson.JsonDecoder();
+			SharpJson.JsonDecoder parser = new SharpJson.JsonDecoder();
 			parser.parseNumbersAsFloat = true;
 			return parser.Decode(text.ReadToEnd());
 		}
@@ -175,7 +175,7 @@ namespace SharpJson {
 					case 'u':
 						int remainingLength = json.Length - index;
 						if (remainingLength >= 4) {
-							var hex = new string(json, index, 4);
+							string hex = new string(json, index, 4);
 
 							// XXX: handle UTF
 							stringBuffer[idx++] = (char)Convert.ToInt32(hex, 16);
@@ -217,7 +217,7 @@ namespace SharpJson {
 			int lastIndex = GetLastIndexOfNumber(index);
 			int charLength = (lastIndex - index) + 1;
 
-			var result = new string(json, index, charLength);
+			string result = new string(json, index, charLength);
 
 			index = lastIndex + 1;
 
@@ -226,7 +226,7 @@ namespace SharpJson {
 
 		public float ParseFloatNumber () {
 			float number;
-			var str = GetNumberString();
+			string str = GetNumberString();
 
 			if (!float.TryParse(str, NumberStyles.Float, CultureInfo.InvariantCulture, out number))
 				return 0;
@@ -236,7 +236,7 @@ namespace SharpJson {
 
 		public double ParseDoubleNumber () {
 			double number;
-			var str = GetNumberString();
+			string str = GetNumberString();
 
 			if (!double.TryParse(str, NumberStyles.Any, CultureInfo.InvariantCulture, out number))
 				return 0;
@@ -387,18 +387,18 @@ namespace SharpJson {
 		}
 
 		public static object DecodeText (string text) {
-			var builder = new JsonDecoder();
+			JsonDecoder builder = new JsonDecoder();
 			return builder.Decode(text);
 		}
 
 		IDictionary<string, object> ParseObject () {
-			var table = new Dictionary<string, object>();
+			Dictionary<string, object> table = new Dictionary<string, object>();
 
 			// {
 			lexer.NextToken();
 
 			while (true) {
-				var token = lexer.LookAhead();
+				Lexer.Token token = lexer.LookAhead();
 
 				switch (token) {
 				case Lexer.Token.None:
@@ -440,13 +440,13 @@ namespace SharpJson {
 		}
 
 		IList<object> ParseArray () {
-			var array = new List<object>();
+			List<object> array = new List<object>();
 
 			// [
 			lexer.NextToken();
 
 			while (true) {
-				var token = lexer.LookAhead();
+				Lexer.Token token = lexer.LookAhead();
 
 				switch (token) {
 				case Lexer.Token.None:

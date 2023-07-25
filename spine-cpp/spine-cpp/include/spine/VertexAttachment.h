@@ -71,7 +71,7 @@ namespace spine {
 		/// Gets a unique ID for this attachment.
 		int getId();
 
-		Vector <size_t> &getBones();
+		Vector<int> &getBones();
 
 		Vector<float> &getVertices();
 
@@ -86,7 +86,7 @@ namespace spine {
 		void copyTo(VertexAttachment *other);
 
 	protected:
-		Vector <size_t> _bones;
+		Vector <int> _bones;
 		Vector<float> _vertices;
 		size_t _worldVerticesLength;
 		Attachment *_timelineAttachment;

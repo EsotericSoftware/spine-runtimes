@@ -45,11 +45,11 @@ Starting from Spine 4.1, the version number is composed of the corresponding edi
 To add the spine-libgdx runtime to your Maven project, add this dependency:
 
 ```
-<depenency>
+<dependency>
 	<groupId>com.esotericsoftware.spine</groupId>
 	<artifactId>spine-libgdx</artifactId>
 	<version>4.0.18.1</version>
-</depenency>
+</dependency>
 ```
 
 For SNAPSHOT versions, add the SonaType Snapshot repository to your `pom.xml`:
@@ -83,3 +83,12 @@ project(":core") {
 Clone this repository and load the `spine-libgdx/build.gradle` file with IntelliJ IDEA or Eclipse. Alterantively, you can run `./gradlew eclipse` on the command line to generate Eclipse projects without having to use the Gradle build.
 
 The `spine-libgdx-tests` project has various examples you can inspect and run.
+
+## Building SkeletonViewer
+To build SkeletonViewer, run:
+
+```
+./gradlew spine-libgdx:jar spine-skeletonviewer.jar
+```
+
+You can then find an uber-jar of SkeletonViewer in `spine-skeletonviewer/build/libs/spine-skeletonviewer.jar`. You can run it via `java -jar spine-skeletonviewer.jar` or double clicking it in the file explorer.

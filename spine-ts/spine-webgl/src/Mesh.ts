@@ -35,11 +35,11 @@ import { ManagedWebGLRenderingContext } from "./WebGL";
 export class Mesh implements Disposable, Restorable {
 	private context: ManagedWebGLRenderingContext;
 	private vertices: Float32Array;
-	private verticesBuffer: WebGLBuffer;
+	private verticesBuffer: WebGLBuffer | null = null;
 	private verticesLength = 0;
 	private dirtyVertices = false;
 	private indices: Uint16Array;
-	private indicesBuffer: WebGLBuffer;
+	private indicesBuffer: WebGLBuffer | null = null;
 	private indicesLength = 0;
 	private dirtyIndices = false;
 	private elementsPerVertex = 0;

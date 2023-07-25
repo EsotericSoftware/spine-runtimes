@@ -68,7 +68,7 @@ namespace Spine.Unity.Examples {
 					return;
 			}
 
-			var parentMaterials = referenceRenderer.sharedMaterials;
+			Material[] parentMaterials = referenceRenderer.sharedMaterials;
 			if (replacementMaterials.Length != parentMaterials.Length) {
 				replacementMaterials = new MaterialReplacement[parentMaterials.Length];
 			}
@@ -87,7 +87,7 @@ namespace Spine.Unity.Examples {
 			}
 
 			// subscribe to OnMeshAndMaterialsUpdated
-			var skeletonRenderer = referenceRenderer.GetComponent<SkeletonAnimation>();
+			SkeletonAnimation skeletonRenderer = referenceRenderer.GetComponent<SkeletonAnimation>();
 			if (skeletonRenderer) {
 				skeletonRenderer.OnMeshAndMaterialsUpdated -= UpdateOnCallback;
 				skeletonRenderer.OnMeshAndMaterialsUpdated += UpdateOnCallback;
@@ -101,10 +101,15 @@ namespace Spine.Unity.Examples {
 		}
 
 #if UNITY_EDITOR
+		// handle disabled scene reload
+		private void OnEnable () {
+			if (Application.isPlaying)
+				Awake();
+		}
+
 		private void Update () {
-			if (!Application.isPlaying) {
+			if (!Application.isPlaying)
 				InitializeDict();
-			}
 		}
 #endif
 
@@ -128,12 +133,12 @@ namespace Spine.Unity.Examples {
 		void UpdateMaterials () {
 			ownMeshFilter.sharedMesh = referenceMeshFilter.sharedMesh;
 
-			var parentMaterials = referenceRenderer.sharedMaterials;
+			Material[] parentMaterials = referenceRenderer.sharedMaterials;
 			if (sharedMaterials.Length != parentMaterials.Length) {
 				sharedMaterials = new Material[parentMaterials.Length];
 			}
 			for (int i = 0; i < parentMaterials.Length; ++i) {
-				var parentMaterial = parentMaterials[i];
+				Material parentMaterial = parentMaterials[i];
 				if (replacementMaterialDict.ContainsKey(parentMaterial)) {
 					sharedMaterials[i] = replacementMaterialDict[parentMaterial];
 				}
@@ -142,8 +147,9 @@ namespace Spine.Unity.Examples {
 		}
 
 		void InitializeDict () {
+			replacementMaterialDict.Clear();
 			for (int i = 0; i < replacementMaterials.Length; ++i) {
-				var entry = replacementMaterials[i];
+				MaterialReplacement entry = replacementMaterials[i];
 				replacementMaterialDict[entry.originalMaterial] = entry.replacementMaterial;
 			}
 		}

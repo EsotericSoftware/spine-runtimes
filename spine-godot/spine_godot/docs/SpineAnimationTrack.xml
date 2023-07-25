@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineAnimationTrack" inherits="Node" version="3.4">
+	<brief_description>
+		Internal class to allow composing animations on [code]SpineSprite[/code] instances via Godot's animation player and animation editor.
+	</brief_description>
+	<description>
+		Internal class to allow composing animations on [code]SpineSprite[/code] instances via Godot's animation player and animation editor.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="get_animation_name">
+			<return type="String" />
+			<description>
+			</description>
+		</method>
+		<method name="get_loop">
+			<return type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="set_animation_name">
+			<return type="void" />
+			<argument index="0" name="animation_name" type="String" />
+			<description>
+			</description>
+		</method>
+		<method name="set_loop">
+			<return type="void" />
+			<argument index="0" name="loop" type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="update_animation_state">
+			<return type="void" />
+			<argument index="0" name="spine_sprite" type="Variant" />
+			<description>
+			</description>
+		</method>
+	</methods>
+	<members>
+		<member name="alpha" type="float" setter="set_alpha" getter="get_alpha" default="1.0">
+		</member>
+		<member name="attachment_threshold" type="float" setter="set_attachment_threshold" getter="get_attachment_threshold" default="0.0">
+		</member>
+		<member name="blend_tree_mode" type="bool" setter="set_blend_tree_mode" getter="get_blend_tree_mode" default="false">
+		</member>
+		<member name="debug" type="bool" setter="set_debug" getter="get_debug" default="false">
+		</member>
+		<member name="draw_order_threshold" type="float" setter="set_draw_order_threshold" getter="get_draw_order_threshold" default="0.0">
+		</member>
+		<member name="hold_previous" type="bool" setter="set_hold_previous" getter="get_hold_previous" default="false">
+		</member>
+		<member name="mix_blend" type="int" setter="set_mix_blend" getter="get_mix_blend" enum="SpineConstant.MixBlend" default="2">
+		</member>
+		<member name="mix_duration" type="float" setter="set_mix_duration" getter="get_mix_duration" default="-1.0">
+		</member>
+		<member name="reverse" type="bool" setter="set_reverse" getter="get_reverse" default="false">
+		</member>
+		<member name="shortest_rotation" type="bool" setter="set_shortest_rotation" getter="get_shortest_rotation" default="false">
+		</member>
+		<member name="time_scale" type="float" setter="set_time_scale" getter="get_time_scale" default="1.0">
+		</member>
+		<member name="track_index" type="int" setter="set_track_index" getter="get_track_index" default="-1">
+		</member>
+	</members>
+	<constants>
+	</constants>
+</class>

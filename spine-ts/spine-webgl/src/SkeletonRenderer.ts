@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { NumberArrayLike, VertexEffect, Color, SkeletonClipping, Vector2, Utils, Skeleton, BlendMode, RegionAttachment, TextureAtlasRegion, MeshAttachment, ClippingAttachment } from "@esotericsoftware/spine-core";
+import { NumberArrayLike, Color, SkeletonClipping, Vector2, Utils, Skeleton, BlendMode, RegionAttachment, TextureAtlasRegion, MeshAttachment, ClippingAttachment } from "@esotericsoftware/spine-core";
 import { GLTexture } from "./GLTexture";
 import { PolygonBatcher } from "./PolygonBatcher";
 import { ManagedWebGLRenderingContext, WebGLBlendModeConverter } from "./WebGL";
@@ -37,17 +37,18 @@ class Renderable {
 	constructor (public vertices: NumberArrayLike, public numVertices: number, public numFloats: number) { }
 };
 
+export type VertexTransformer = (vertices: NumberArrayLike, numVertices: number, stride: number) => void;
+
 export class SkeletonRenderer {
 	static QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
 
 	premultipliedAlpha = false;
-	vertexEffect: VertexEffect = null;
 	private tempColor = new Color();
 	private tempColor2 = new Color();
 	private vertices: NumberArrayLike;
 	private vertexSize = 2 + 2 + 4;
 	private twoColorTint = false;
-	private renderable: Renderable = new Renderable(null, 0, 0);
+	private renderable: Renderable = new Renderable([], 0, 0);
 	private clipper: SkeletonClipping = new SkeletonClipping();
 	private temp = new Vector2();
 	private temp2 = new Vector2();
@@ -61,11 +62,11 @@ export class SkeletonRenderer {
 		this.vertices = Utils.newFloatArray(this.vertexSize * 1024);
 	}
 
-	draw (batcher: PolygonBatcher, skeleton: Skeleton, slotRangeStart: number = -1, slotRangeEnd: number = -1) {
+	draw (batcher: PolygonBatcher, skeleton: Skeleton, slotRangeStart: number = -1, slotRangeEnd: number = -1, transformer: VertexTransformer | null = null) {
 		let clipper = this.clipper;
 		let premultipliedAlpha = this.premultipliedAlpha;
 		let twoColorTint = this.twoColorTint;
-		let blendMode: BlendMode = null;
+		let blendMode: BlendMode | null = null;
 
 		let tempPos = this.temp;
 		let tempUv = this.temp2;
@@ -73,10 +74,10 @@ export class SkeletonRenderer {
 		let tempDark = this.temp4;
 
 		let renderable: Renderable = this.renderable;
-		let uvs: NumberArrayLike = null;
-		let triangles: Array<number> = null;
+		let uvs: NumberArrayLike;
+		let triangles: Array<number>;
 		let drawOrder = skeleton.drawOrder;
-		let attachmentColor: Color = null;
+		let attachmentColor: Color;
 		let skeletonColor = skeleton.color;
 		let vertexSize = twoColorTint ? 12 : 8;
 		let inRange = false;
@@ -103,7 +104,7 @@ export class SkeletonRenderer {
 			}
 
 			let attachment = slot.getAttachment();
-			let texture: GLTexture = null;
+			let texture: GLTexture;
 			if (attachment instanceof RegionAttachment) {
 				let region = <RegionAttachment>attachment;
 				renderable.vertices = this.vertices;
@@ -112,7 +113,7 @@ export class SkeletonRenderer {
 				region.computeWorldVertices(slot, renderable.vertices, 0, clippedVertexSize);
 				triangles = SkeletonRenderer.QUAD_TRIANGLES;
 				uvs = region.uvs;
-				texture = <GLTexture>(<TextureAtlasRegion>region.region.renderObject).page.texture;
+				texture = <GLTexture>region.region!.texture;
 				attachmentColor = region.color;
 			} else if (attachment instanceof MeshAttachment) {
 				let mesh = <MeshAttachment>attachment;
@@ -124,7 +125,7 @@ export class SkeletonRenderer {
 				}
 				mesh.computeWorldVertices(slot, 0, mesh.worldVerticesLength, renderable.vertices, 0, clippedVertexSize);
 				triangles = mesh.triangles;
-				texture = <GLTexture>(<TextureAtlasRegion>mesh.region.renderObject).page.texture;
+				texture = <GLTexture>mesh.region!.texture;
 				uvs = mesh.uvs;
 				attachmentColor = mesh.color;
 			} else if (attachment instanceof ClippingAttachment) {
@@ -175,123 +176,35 @@ export class SkeletonRenderer {
 					clipper.clipTriangles(renderable.vertices, renderable.numFloats, triangles, triangles.length, uvs, finalColor, darkColor, twoColorTint);
 					let clippedVertices = new Float32Array(clipper.clippedVertices);
 					let clippedTriangles = clipper.clippedTriangles;
-					if (this.vertexEffect) {
-						let vertexEffect = this.vertexEffect;
-						let verts = clippedVertices;
-						if (!twoColorTint) {
-							for (let v = 0, n = clippedVertices.length; v < n; v += vertexSize) {
-								tempPos.x = verts[v];
-								tempPos.y = verts[v + 1];
-								tempLight.set(verts[v + 2], verts[v + 3], verts[v + 4], verts[v + 5]);
-								tempUv.x = verts[v + 6];
-								tempUv.y = verts[v + 7];
-								tempDark.set(0, 0, 0, 0);
-								vertexEffect.transform(tempPos, tempUv, tempLight, tempDark);
-								verts[v] = tempPos.x;
-								verts[v + 1] = tempPos.y;
-								verts[v + 2] = tempLight.r;
-								verts[v + 3] = tempLight.g;
-								verts[v + 4] = tempLight.b;
-								verts[v + 5] = tempLight.a;
-								verts[v + 6] = tempUv.x;
-								verts[v + 7] = tempUv.y
-							}
-						} else {
-							for (let v = 0, n = clippedVertices.length; v < n; v += vertexSize) {
-								tempPos.x = verts[v];
-								tempPos.y = verts[v + 1];
-								tempLight.set(verts[v + 2], verts[v + 3], verts[v + 4], verts[v + 5]);
-								tempUv.x = verts[v + 6];
-								tempUv.y = verts[v + 7];
-								tempDark.set(verts[v + 8], verts[v + 9], verts[v + 10], verts[v + 11]);
-								vertexEffect.transform(tempPos, tempUv, tempLight, tempDark);
-								verts[v] = tempPos.x;
-								verts[v + 1] = tempPos.y;
-								verts[v + 2] = tempLight.r;
-								verts[v + 3] = tempLight.g;
-								verts[v + 4] = tempLight.b;
-								verts[v + 5] = tempLight.a;
-								verts[v + 6] = tempUv.x;
-								verts[v + 7] = tempUv.y
-								verts[v + 8] = tempDark.r;
-								verts[v + 9] = tempDark.g;
-								verts[v + 10] = tempDark.b;
-								verts[v + 11] = tempDark.a;
-							}
-						}
-					}
+					if (transformer) transformer(clippedVertices, clippedVertices.length, vertexSize);
 					batcher.draw(texture, clippedVertices, clippedTriangles);
 				} else {
 					let verts = renderable.vertices;
-					if (this.vertexEffect) {
-						let vertexEffect = this.vertexEffect;
-						if (!twoColorTint) {
-							for (let v = 0, u = 0, n = renderable.numFloats; v < n; v += vertexSize, u += 2) {
-								tempPos.x = verts[v];
-								tempPos.y = verts[v + 1];
-								tempUv.x = uvs[u];
-								tempUv.y = uvs[u + 1]
-								tempLight.setFromColor(finalColor);
-								tempDark.set(0, 0, 0, 0);
-								vertexEffect.transform(tempPos, tempUv, tempLight, tempDark);
-								verts[v] = tempPos.x;
-								verts[v + 1] = tempPos.y;
-								verts[v + 2] = tempLight.r;
-								verts[v + 3] = tempLight.g;
-								verts[v + 4] = tempLight.b;
-								verts[v + 5] = tempLight.a;
-								verts[v + 6] = tempUv.x;
-								verts[v + 7] = tempUv.y
-							}
-						} else {
-							for (let v = 0, u = 0, n = renderable.numFloats; v < n; v += vertexSize, u += 2) {
-								tempPos.x = verts[v];
-								tempPos.y = verts[v + 1];
-								tempUv.x = uvs[u];
-								tempUv.y = uvs[u + 1]
-								tempLight.setFromColor(finalColor);
-								tempDark.setFromColor(darkColor);
-								vertexEffect.transform(tempPos, tempUv, tempLight, tempDark);
-								verts[v] = tempPos.x;
-								verts[v + 1] = tempPos.y;
-								verts[v + 2] = tempLight.r;
-								verts[v + 3] = tempLight.g;
-								verts[v + 4] = tempLight.b;
-								verts[v + 5] = tempLight.a;
-								verts[v + 6] = tempUv.x;
-								verts[v + 7] = tempUv.y
-								verts[v + 8] = tempDark.r;
-								verts[v + 9] = tempDark.g;
-								verts[v + 10] = tempDark.b;
-								verts[v + 11] = tempDark.a;
-							}
+					if (!twoColorTint) {
+						for (let v = 2, u = 0, n = renderable.numFloats; v < n; v += vertexSize, u += 2) {
+							verts[v] = finalColor.r;
+							verts[v + 1] = finalColor.g;
+							verts[v + 2] = finalColor.b;
+							verts[v + 3] = finalColor.a;
+							verts[v + 4] = uvs[u];
+							verts[v + 5] = uvs[u + 1];
 						}
 					} else {
-						if (!twoColorTint) {
-							for (let v = 2, u = 0, n = renderable.numFloats; v < n; v += vertexSize, u += 2) {
-								verts[v] = finalColor.r;
-								verts[v + 1] = finalColor.g;
-								verts[v + 2] = finalColor.b;
-								verts[v + 3] = finalColor.a;
-								verts[v + 4] = uvs[u];
-								verts[v + 5] = uvs[u + 1];
-							}
-						} else {
-							for (let v = 2, u = 0, n = renderable.numFloats; v < n; v += vertexSize, u += 2) {
-								verts[v] = finalColor.r;
-								verts[v + 1] = finalColor.g;
-								verts[v + 2] = finalColor.b;
-								verts[v + 3] = finalColor.a;
-								verts[v + 4] = uvs[u];
-								verts[v + 5] = uvs[u + 1];
-								verts[v + 6] = darkColor.r;
-								verts[v + 7] = darkColor.g;
-								verts[v + 8] = darkColor.b;
-								verts[v + 9] = darkColor.a;
-							}
+						for (let v = 2, u = 0, n = renderable.numFloats; v < n; v += vertexSize, u += 2) {
+							verts[v] = finalColor.r;
+							verts[v + 1] = finalColor.g;
+							verts[v + 2] = finalColor.b;
+							verts[v + 3] = finalColor.a;
+							verts[v + 4] = uvs[u];
+							verts[v + 5] = uvs[u + 1];
+							verts[v + 6] = darkColor.r;
+							verts[v + 7] = darkColor.g;
+							verts[v + 8] = darkColor.b;
+							verts[v + 9] = darkColor.a;
 						}
 					}
 					let view = (renderable.vertices as Float32Array).subarray(0, renderable.numFloats);
+					if (transformer) transformer(renderable.vertices, renderable.numFloats, vertexSize);
 					batcher.draw(texture, view, triangles);
 				}
 			}

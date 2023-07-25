@@ -29,7 +29,7 @@
 
 package com.esotericsoftware.spine.attachments;
 
-import static com.badlogic.gdx.math.MathUtils.*;
+import static com.esotericsoftware.spine.utils.SpineUtils.*;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
@@ -40,7 +40,7 @@ import com.esotericsoftware.spine.Bone;
  * used in similar ways, but a PointAttachment is slightly less expensive to compute and can be hidden, shown, and placed in a
  * skin.
  * <p>
- * See <a href="http://esotericsoftware.com/spine-point-attachments">Point Attachments</a> in the Spine User Guide. */
+ * See <a href="http://esotericsoftware.com/spine-points">Point Attachments</a> in the Spine User Guide. */
 public class PointAttachment extends Attachment {
 	float x, y, rotation;
 
@@ -97,10 +97,10 @@ public class PointAttachment extends Attachment {
 	}
 
 	public float computeWorldRotation (Bone bone) {
-		float cos = cosDeg(rotation), sin = sinDeg(rotation);
+		float r = rotation * degRad, cos = cos(r), sin = sin(r);
 		float x = cos * bone.getA() + sin * bone.getB();
 		float y = cos * bone.getC() + sin * bone.getD();
-		return (float)Math.atan2(y, x) * radDeg;
+		return atan2Deg(y, x);
 	}
 
 	public PointAttachment copy () {

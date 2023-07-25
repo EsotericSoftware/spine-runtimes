@@ -43,11 +43,18 @@
 #define CONFIGURABLE_ENTER_PLAY_MODE
 #endif
 
+#if UNITY_2020_1_OR_NEWER
+#define REVERT_HAS_OVERLOADS
+#endif
+
 #define SPINE_OPTIONAL_RENDEROVERRIDE
 #define SPINE_OPTIONAL_MATERIALOVERRIDE
 
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor.SceneManagement;
+#endif
 
 namespace Spine.Unity {
 	/// <summary>Base class of animated Spine skeleton components. This component manages and renders a skeleton.</summary>
@@ -95,12 +102,16 @@ namespace Spine.Unity {
 			if (dontSaveInEditor) {
 #if NEW_PREFAB_SYSTEM
 				if (UnityEditor.PrefabUtility.IsPartOfAnyPrefab(meshFilter)) {
-					var instanceRoot = UnityEditor.PrefabUtility.GetOutermostPrefabInstanceRoot(meshFilter);
+					GameObject instanceRoot = UnityEditor.PrefabUtility.GetOutermostPrefabInstanceRoot(meshFilter);
 					if (instanceRoot != null) {
-						var objectOverrides = UnityEditor.PrefabUtility.GetObjectOverrides(instanceRoot);
-						foreach (UnityEditor.SceneManagement.ObjectOverride objectOverride in objectOverrides) {
+						List<ObjectOverride> objectOverrides = UnityEditor.PrefabUtility.GetObjectOverrides(instanceRoot);
+						foreach (ObjectOverride objectOverride in objectOverrides) {
 							if (objectOverride.instanceObject == meshFilter) {
+#if REVERT_HAS_OVERLOADS
+								objectOverride.Revert(UnityEditor.InteractionMode.AutomatedAction);
+#else
 								objectOverride.Revert();
+#endif
 								break;
 							}
 						}
@@ -295,7 +306,7 @@ namespace Spine.Unity {
 		/// <summary>Add and prepare a Spine component that derives from SkeletonRenderer to a GameObject at runtime.</summary>
 		/// <typeparam name="T">T should be SkeletonRenderer or any of its derived classes.</typeparam>
 		public static T AddSpineComponent<T> (GameObject gameObject, SkeletonDataAsset skeletonDataAsset, bool quiet = false) where T : SkeletonRenderer {
-			var c = gameObject.AddComponent<T>();
+			T c = gameObject.AddComponent<T>();
 			if (skeletonDataAsset != null) {
 				c.skeletonDataAsset = skeletonDataAsset;
 				c.Initialize(false, quiet);
@@ -348,7 +359,7 @@ namespace Spine.Unity {
 		/// <summary>
 		/// Clears the previously generated mesh and resets the skeleton's pose.</summary>
 		public virtual void ClearState () {
-			var meshFilter = GetComponent<MeshFilter>();
+			MeshFilter meshFilter = GetComponent<MeshFilter>();
 			if (meshFilter != null) meshFilter.sharedMesh = null;
 			currentInstructions.Clear();
 			if (skeleton != null) skeleton.SetToSetupPose();
@@ -367,7 +378,10 @@ namespace Spine.Unity {
 		public virtual void Initialize (bool overwrite, bool quiet = false) {
 			if (valid && !overwrite)
 				return;
-
+#if UNITY_EDITOR
+			if (BuildUtilities.IsInSkeletonAssetBuildPreProcessing)
+				return;
+#endif
 			// Clear
 			{
 				// Note: do not reset meshFilter.sharedMesh or meshRenderer.sharedMaterial to null,
@@ -431,7 +445,7 @@ namespace Spine.Unity {
 
 #if UNITY_EDITOR && NEW_PREFAB_SYSTEM
 			// Don't store mesh or material at the prefab, otherwise it will permanently reload
-			var prefabType = UnityEditor.PrefabUtility.GetPrefabAssetType(this);
+			UnityEditor.PrefabAssetType prefabType = UnityEditor.PrefabUtility.GetPrefabAssetType(this);
 			if (UnityEditor.PrefabUtility.IsPartOfPrefabAsset(this) &&
 				(prefabType == UnityEditor.PrefabAssetType.Regular || prefabType == UnityEditor.PrefabAssetType.Variant)) {
 				return;
@@ -452,9 +466,9 @@ namespace Spine.Unity {
 			const bool doMeshOverride = false;
 			if (!meshRenderer.enabled) return;
 #endif
-			var currentInstructions = this.currentInstructions;
-			var workingSubmeshInstructions = currentInstructions.submeshInstructions;
-			var currentSmartMesh = rendererBuffers.GetNextMesh(); // Double-buffer for performance.
+			SkeletonRendererInstruction currentInstructions = this.currentInstructions;
+			ExposedList<SubmeshInstruction> workingSubmeshInstructions = currentInstructions.submeshInstructions;
+			MeshRendererBuffers.SmartMesh currentSmartMesh = rendererBuffers.GetNextMesh(); // Double-buffer for performance.
 
 			bool updateTriangles;
 
@@ -523,7 +537,7 @@ namespace Spine.Unity {
 			if (OnPostProcessVertices != null) OnPostProcessVertices.Invoke(this.meshGenerator.Buffers);
 
 			// STEP 3. Move the mesh data into a UnityEngine.Mesh ===========================================================================
-			var currentMesh = currentSmartMesh.mesh;
+			Mesh currentMesh = currentSmartMesh.mesh;
 			meshGenerator.FillVertexData(currentMesh);
 
 			rendererBuffers.UpdateSharedMaterials(workingSubmeshInstructions);
@@ -592,15 +606,15 @@ namespace Spine.Unity {
 			if (clearExistingSeparators)
 				separatorSlots.Clear();
 
-			var slots = skeleton.Slots;
-			foreach (var slot in slots) {
+			ExposedList<Slot> slots = skeleton.Slots;
+			foreach (Slot slot in slots) {
 				if (slotNamePredicate.Invoke(slot.Data.Name))
 					separatorSlots.Add(slot);
 			}
 
 			if (updateStringArray) {
-				var detectedSeparatorNames = new List<string>();
-				foreach (var slot in skeleton.Slots) {
+				List<string> detectedSeparatorNames = new List<string>();
+				foreach (Slot slot in skeleton.Slots) {
 					string slotName = slot.Data.Name;
 					if (slotNamePredicate.Invoke(slotName))
 						detectedSeparatorNames.Add(slotName);
@@ -622,7 +636,7 @@ namespace Spine.Unity {
 
 			separatorSlots.Clear();
 			for (int i = 0, n = separatorSlotNames.Length; i < n; i++) {
-				var slot = skeleton.FindSlot(separatorSlotNames[i]);
+				Slot slot = skeleton.FindSlot(separatorSlotNames[i]);
 				if (slot != null) {
 					separatorSlots.Add(slot);
 				}
@@ -679,8 +693,7 @@ namespace Spine.Unity {
 				return false;
 			}
 #endif
-
-			var originalMaterials = maskMaterials.materialsMaskDisabled;
+			Material[] originalMaterials = maskMaterials.materialsMaskDisabled;
 			materialsToFill = new Material[originalMaterials.Length];
 			for (int i = 0; i < originalMaterials.Length; i++) {
 				Material newMaterial = new Material(originalMaterials[i]);
@@ -700,12 +713,12 @@ namespace Spine.Unity {
 
 		private void FixAllProjectMaterialsStencilCompParameters () {
 			string[] materialGUIDS = UnityEditor.AssetDatabase.FindAssets("t:material");
-			foreach (var guid in materialGUIDS) {
+			foreach (string guid in materialGUIDS) {
 				string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
 				if (!string.IsNullOrEmpty(path)) {
-					var mat = UnityEditor.AssetDatabase.LoadAssetAtPath<Material>(path);
-					if (mat.HasProperty(STENCIL_COMP_PARAM_ID) && mat.GetFloat(STENCIL_COMP_PARAM_ID) == 0) {
-						mat.SetFloat(STENCIL_COMP_PARAM_ID, (int)STENCIL_COMP_MASKINTERACTION_NONE);
+					Material material = UnityEditor.AssetDatabase.LoadAssetAtPath<Material>(path);
+					if (material.HasProperty(STENCIL_COMP_PARAM_ID) && material.GetFloat(STENCIL_COMP_PARAM_ID) == 0) {
+						material.SetFloat(STENCIL_COMP_PARAM_ID, (int)STENCIL_COMP_MASKINTERACTION_NONE);
 					}
 				}
 			}
@@ -717,9 +730,9 @@ namespace Spine.Unity {
 			if (meshRenderer == null)
 				return false;
 
-			foreach (var mat in meshRenderer.sharedMaterials) {
-				if (mat != null && mat.HasProperty(STENCIL_COMP_PARAM_ID)) {
-					float currentCompValue = mat.GetFloat(STENCIL_COMP_PARAM_ID);
+			foreach (Material material in meshRenderer.sharedMaterials) {
+				if (material != null && material.HasProperty(STENCIL_COMP_PARAM_ID)) {
+					float currentCompValue = material.GetFloat(STENCIL_COMP_PARAM_ID);
 					if (currentCompValue == 0)
 						return true;
 				}

@@ -22,115 +22,87 @@ spine-cocos2dx supports all Spine features.
 
 The setup for cocos2d-x differs from most other Spine Runtimes because the cocos2d-x distribution includes a copy of the Spine Runtime files. This is not ideal because these files may be old and fail to work with the latest Spine editor. Also it means if cocos2d-x is updated, you may get newer Spine Runtime files which can break your application if you are not using the latest Spine editor. For these reasons, we have requested cocos2d-x to cease distributing the Spine Runtime files, but they  continue to do so. The following instructions allow you to use the official Spine cocos2d-x runtime with your cocos2d-x project.
 
-### Cocos2d-x v3.x
-1. Create a new cocos2d-x project. See [the cocos2d-x documentation](https://docs.cocos2d-x.org/cocos2d-x/v3/en/installation/)
-2. Delete the folder `cocos2d/cocos/editor-support/spine`. This will remove the outdated Spine cocos2d-x runtime shipped by cocos2d-x.
-3. Open your project in your IDE of choice, then open the cocos2d_libs sub project and delete the `editor-support/spine` group. This will remove the outdated Spine cocos2d-x runtime shipped by cocos2d-x from your build.
-3. Download the Spine Runtimes source using git (`git clone https://github.com/esotericsoftware/spine-runtimes`) or download it as a zip via the download button above.
-4. Add the sources from `spine-cpp/spine-cpp/src/spine` and `spine-cocos2dx/src/spine` to your project
-4. Add the folders `spine-cpp/spine-cpp/include` and `spine-cocos2dx/src` to your header search path. Note that includes are specified as `#inclue <spine/file.h>`, so the `spine` directory cannot be omitted when copying the source files.
+spine-cocos2dx works with both Cocos2d-x v3 and v4. The setup process is identical in both cases. The preferred way to integrate spine-cocos2dx into your Cocos2d-x project is to use the [Cocos2d-x CMake build system].
 
-### Cocos2d-x v4.x
-TBD
 
-1. Create a new Cocos2D-x project. See [the cocos2d-x documentation](https://docs.cocos2d-x.org/cocos2d-x/v4/en/installation/)
-2. Delete the folder `cocos2d/cocos/editor-support/spine` in your project. This will remove the outdated Spine cocos2d-x runtime shipped by cocos2d-x.
-3. TBD Integration in `CMakeLists.txt`
+1. [Create a new C++ cocos2d-x project](https://docs.cocos2d-x.org/cocos2d-x/v4/en/editors_and_tools/cocosCLTool.html). Let's assume you created your project in a folder `/path/to/MyGame/` somewhere on your disk.
+2. Download the Spine Runtimes source using git (`git clone https://github.com/esotericsoftware/spine-runtimes`) or download it as a zip via the download button above. Let's assume you cloned the Spine Runtimes to a folder `/path/to/spine-runtimes/` somewhere on your disk.
+3. Open `MyGame/CMakeLists.txt` in a text editor and modify it as follows:
+	* After the line `project(${APP_NAME})` add the following line:
+	 	```
+		include(/path/to/spine-runtimes/spine-cocos2dx/spine-cocos2dx.cmake)
+		```	  
+	* Before the line `target_link_libraries(${APP_NAME} cocos2d)`add the following line:
+		```
+		target_link_libraries(${APP_NAME} spine-cpp spine-cocos2dx)
+		```
+4. [Proceed with generating IDE files via CMake](https://docs.cocos2d-x.org/cocos2d-x/v4/en/installation/CMake-Guide.html) and build and run your project.
+
+For reference, have a look at our spine-cocos2dx example project in this repository described below.
 
 ## Example
-The Spine cocos2d-x example works on Windows, Mac OS X, iOS and Android.
+The spine-cocos2dx example works on Windows, Linux, macOS, iOS, Linux, and Android, for both cocos2d-x v3 and v4.
 
-### Cocos2d-x v3.x
+Please [install the reprequisit software](https://docs.cocos2d-x.org/cocos2d-x/v4/en/installation/prerequisites.html) as per the Cocos2d-x documentation. Ensure that the following programs are in your `PATH` environment variable and thus executable from the command line:
 
-#### Windows
-1. Install [Visual Studio 2019 Community](https://www.visualstudio.com/en-us/downloads/download-visual-studio-vs.aspx)
-2. Install CMake via the [Windows installer package](https://cmake.org/download/).
-3. Download the Spine Runtimes repository using git (`git clone https://github.com/esotericsoftware/spine-runtimes`) or download it as a zip via the download button above.
-4. Run CMake GUI from the start menu
-5. Click `Browse Source` and select the directory `spine-runtimes/spine-cocos2dx/`
-6. Click `Browse Build` and select the `spine-runtimes/spine-cocos2dx/build/` directory. You can create the `build` folder directly in the file dialog via `New Folder`.
-7. Click `Configure` again. This will download the cocos2d-x dependency and wire it up with the example source code in `spine-runtimes/spine-cocos2dx/example`. The download is 400mb, so get yourself a cup of tea.
-8. Open the file `spine-cocos2dx\example\cocos2d\cocos\2d\cocos2dx.props` and remove the `libSpine.lib` entry from the `<AdditionalDependencies>` tag.
-8. Open the `spine-runtimes/spine-cocos2dx/example/proj.win32/spine-cocos2d-x.sln` file in Visual Studio 2019. Visual Studio may ask you to install the Windows XP/7 SDK, which you should install.
-9. Expand `References` of the `libcocos2d` sub project, and remove the entry for `libSpine`, which should be marked with an error.
-9. Right click the `spine-cocos2d-x` project in the solution explorer and select `Set as Startup Project` from the context menu
-10. Click `Local Windows Debugger` to run the example
+* `git`
+* `cmake`
+* `python`
 
-#### macOS/iOS
-1. Install [Xcode](https://developer.apple.com/xcode/)
-2. Install [Homebrew](http://brew.sh/)
-3. Open a terminal and install CMake via `brew install cmake`
-3. Download the Spine Runtimes repository using git (`git clone https://github.com/esotericsoftware/spine-runtimes`) or download it as a zip via the download button above.
-4. Open a terminal, and `cd` into the `spine-runtimes/spine-cocos2dx` folder
-5. Type `mkdir build && cd build && cmake ../..`. This will download the cocos2d-x dependency and wire it up with the example source code in `spine-runtimes/spine-cocos2dx/example`. The download is 400mb, so get yourself a cup of tea.
-6. Open the Xcode project in `spine-runtimes/spine-cocos2dx/example/proj.ios_mac`
-7. Expand the `cocos2d_libs.xcodeproj` sub project, delete the group `editor-support/spine`. This will remove the outdated Spine cocos2d-x runtime shipped by cocos2d-x.
-8. Click the `Run` button or type `CMD+R` to run the example
+Before you can compile and run the example project for a specific target platform, you need to clone the [Cocos2d-x repository](https://github.com/cocos2d/cocos2d-x) to `spine-runtimes/spine-cocos2dx/example/cocos2d` and download the dependencies:
 
-#### Android (on macOS)
-1. Install the prerequisits for [cocos2d-x Android development](http://www.cocos2d-x.org/docs/installation/Android-terminal/)
-2. Install [Homebrew](http://brew.sh/)
-3. Open a terminal and install CMake via `brew install cmake`
-3. Download the Spine Runtimes repository using git (`git clone https://github.com/esotericsoftware/spine-runtimes`) or download it as a zip via the download button above.
-4. Open a terminal, and `cd` into the `spine-runtimes/spine-cocos2dx` folder
-5. Type `mkdir build && cd build && cmake ../..`. This will download the cocos2d-x dependency and wire it up with the example source code in `spine-runtimes/spine-cocos2dx/example`. The download is 400mb, so get yourself a cup of tea.
-6. Delete `spine-runtimes/spine-cocos2dx/example/cocos2d/cocos/editor-support/spine`
-7. Open `spine-runtimes/spine-cocos2dx/example/cocos2d/cocos/Android.mk` and remove the lines `LOCAL_STATIC_LIBRARIES += spine_static` and `$(call import-module,editor-support/spine)
-8. Switch to `spine-runtimes/spine-cocos2dx/example/proj.android/jni` and execute `cocos compile -p android -m debug --ndk-mode debug` to compile the example for Android
-9. In the same directory, execute `cocos run -p android -m debug` to deploy to the device
-10. For debugging, run `ndk-debug` in the `proj.android/jni` folder. This will attach to the running app via GDB.
+```
+cd spine-runtimes/spine-cocos2dx/example
+git clone -b v4 --depth 1 https://github.com/cocos2d/cocos2d-x cocos2d
+python cocos2d/download-deps.py -r yes
+```
 
-### Cocos2d-x v4.x
+> **NOTE:** If you want to run the example with Cocos2d-x version 3, replace `-b v4` with `-b v3` in the `git clone` command.
 
-Please note the [new prerequisits to compile Cocos2d-x v4 projects on different platforms](https://docs.cocos2d-x.org/cocos2d-x/v4/en/installation/prerequisites.html). This includes an installation of Python 2.7.x!
+> **NOTE:** On macOS Big Sur, replace `python` with `python3`.
 
-#### Windows
-1. Install [Visual Studio 2019 Community](https://www.visualstudio.com/en-us/downloads/download-visual-studio-vs.aspx)
-2. Install CMake via the [Windows installer package](https://cmake.org/download/).
-3. Install Python and make sure the `python.exe` is in your `PATH` environment variable. Python is required by cocos2d-x`s build system.
-3. Download the Spine Runtimes repository using git (`git clone https://github.com/esotericsoftware/spine-runtimes`) or download it as a zip via the download button above.
-4. Run CMake GUI from the start menu
-5. Click `Browse Source` and select the directory `spine-runtimes`
-6. Click `Browse Build` and select the `spine-runtimes/spine-cocos2dx/build-v4` directory. You can create the `build-v4` folder directly in the file dialog via `New Folder`.
-7. Click `Configure`. Check `USE_COCOS2DX_V4`
-8. Click `Configure` again. This will download the cocos2d-x dependency and wire it up with the example source code in `spine-runtimes/spine-cocos2dx/example`. The download is 400mb, so get yourself a cup of tea.
-9. Click `Generate` this will create the Visual Studio solution in `spine-runtimes/spine-cocos2dx/build-v4`.
-8. Open the `spine-runtimes/spine-cocos2dx/build-v4/spine-cocos2dx-example.sln` file in Visual Studio 2019. Visual Studio may ask you to install the Windows XP/7 SDK, which you should install.
-9. Right click the `spine-cocos2dx-example` project in the solution explorer and select `Set as Startup Project` from the context menu
-10. Click `Local Windows Debugger` to run the example
+You can now use CMake to create IDE projects for the target platform you want to compile and run the example on.
 
-Make sure to build the example for Windows 32-bit!
+### macOS
+Execute the following on the command line:
 
-#### macOS
-1. Install [Xcode](https://developer.apple.com/xcode/)
-2. Install [Homebrew](http://brew.sh/)
-3. Open a terminal and install CMake via `brew install cmake`
-3. Download the Spine Runtimes repository using git (`git clone https://github.com/esotericsoftware/spine-runtimes`) or download it as a zip via the download button above.
-4. Open a terminal, and `cd` into the `spine-runtimes/spine-cocos2dx` folder
-5. Type `mkdir build-v4 && cd build-v4 && cmake -GXcode -DUSE_COCOS2DX_V4=on ..`. This will download the cocos2d-x dependency and wire it up with the example source code in `spine-runtimes/spine-cocos2dx/example`. The download is 400mb, so get yourself a cup of tea.
-6. Open the Xcode project in `spine-runtimes/spine-cocos2dx/build-v4`
-7. Make sure you select `spine-cocos2dx-example > My Mac` as the target and click the `Run` button or type `CMD+R` to run the example.
+```
+cd spine-runtimes/spine-cocos2dx/example
+mkdir build-macos && cmake . -GXcode -Bbuild-macos -DCMAKE_OSX_ARCHITECTURES=x86_64
+open build-macos/spine-cocos2dx-example.xcodeproj
+```
 
-#### iOS
-1. Install [Xcode](https://developer.apple.com/xcode/)
-2. Install [Homebrew](http://brew.sh/)
-3. Open a terminal and install CMake via `brew install cmake`
-3. Download the Spine Runtimes repository using git (`git clone https://github.com/esotericsoftware/spine-runtimes`) or download it as a zip via the download button above.
-4. Open a terminal, and `cd` into the `spine-runtimes/spine-cocos2dx` folder
-5. Type `mkdir build-v4 && cd build-v4 && cmake -GXcode -DUSE_COCOS2DX_V4=on -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos ..`. This will download the cocos2d-x dependency and wire it up with the example source code in `spine-runtimes/spine-cocos2dx/example`. The download is 400mb, so get yourself a cup of tea.
-6. Open the Xcode project in `spine-runtimes/spine-cocos2dx/build-v4`
-7. Make sure you select `spine-cocos2dx-example > Device` as the target, where `Device` is either a simulator or a physically connected device. Click the `Run` button or type `CMD+R` to run the example.
+This will generate an Xcode project in `build-macos/spine-cocos2dx-example.xcodeproj` and open it in Xcode. To build and run the example, select the `spine-cocos2dx-example` scheme and press `CMD + R`.
 
-#### Android (on macOS)
-1. Install the prerequisits for [cocos2d-x Android development](http://www.cocos2d-x.org/docs/installation/Android-terminal/)
-2. Install [Homebrew](http://brew.sh/)
-3. Open a terminal and install CMake via `brew install cmake`
-3. Download the Spine Runtimes repository using git (`git clone https://github.com/esotericsoftware/spine-runtimes`) or download it as a zip via the download button above.
-4. Open a terminal, and `cd` into the `spine-runtimes/spine-cocos2dx` folder
-5. Type `mkdir build-v4 && cd build-v4 && cmake -DUSE_COCOS2DX_V4=on ..`. This will download the cocos2d-x dependency and wire it up with the example source code in `spine-runtimes/spine-cocos2dx/example`. The download is 400mb, so get yourself a cup of tea.
-6. Execute `cocos run -s . -p android`, this will build, deploy and run the APK on a connected device.
+> **NOTE:** Passing `-DCMAKE_OSX_ARCHITECTURES=x86_64` to CMake is currently required, as Cocos2d-X only provides prebuilt x86_64 binaries for its external dependencies.
+
+### iOS
+Execute the following on the command line:
+
+```
+cd spine-runtimes/spine-cocos2dx/example
+mkdir build-ios && cmake . -GXcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos -Bbuild-ios
+open build-ios/spine-cocos2dx-example.xcodeproj
+```
+
+This will generate an Xcode project in `build-ios/spine-cocos2dx-example.xcodeproj` and open it in Xcode. To build and run the example, select the `spine-cocos2dx-example` scheme and select a device or simulator to build for and run on. Finally, press `CMD + R` to build and run the example.
+
+### Android
+Open the project in `proj.android` in Android Studio. Make sure you have NDK version `24.0.8215888` installed via the SDK Manager. Alternatively, you can set the `ndkVersion` property in `proj.android/app/build.gradle` to the NDK version you have installed locally.
+
+### Windows
+Execute the following on the command line:
+
+```
+cd spine-runtimes/spine-cocos2dx/example
+mkdir build-win
+cmake . -G "Visual Studio 16 2019" -A Win32 -T host=x86 -Bbuild-win
+```
+
+You can then open the file `build-win/spine-cocos2dx-example.sln` with Visual Studio 2019. In the solution explorer, right click the `spine-cocos2dx-example` project, then click `Set as Startup Project` in the context menu. Finally, click the `Local Windows Debugger` button to build and run the example.
 
 ## Notes
 
 * Images are premultiplied by cocos2d-x, so the Spine atlas images should *not* use premultiplied alpha.
 * Two color tinting needs to be enabled on a per-skeleton basis. Call `SkeletonRenderer::setTwoColorTine(true)` or `SkeletonAnimation::setTwoColorTint(true)` after you created the skeleton instance. Note that two color tinting requires a custom shader and vertex format. Skeletons rendered with two color tinting can therefore not be batched with single color tinted skeletons or other 2D cocos2d-x elements like sprites. However, two-color tinted skeletons will be batched if possible when rendered after one another. Attaching a child to a two color tinted skeleton will also break the batch.
+

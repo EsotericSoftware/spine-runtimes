@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated January 1, 2020. Replaces all prior versions.
+ * Last updated September 24, 2021. Replaces all prior versions.
  *
- * Copyright (c) 2013-2020, Esoteric Software LLC
+ * Copyright (c) 2013-2022, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -27,8 +27,9 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using Spine.Unity;
-using System.Collections.Generic;
+#if UNITY_EDITOR
+using System.ComponentModel;
+#endif
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
@@ -38,6 +39,9 @@ namespace Spine.Unity.Playables {
 	[TrackColor(0.855f, 0.8623f, 0.87f)]
 	[TrackClipType(typeof(SpineSkeletonFlipClip))]
 	[TrackBindingType(typeof(SpinePlayableHandleBase))]
+#if UNITY_EDITOR
+	[DisplayName("Spine/Skeleton Flip Track")]
+#endif
 	public class SpineSkeletonFlipTrack : TrackAsset {
 		public override Playable CreateTrackMixer (PlayableGraph graph, GameObject go, int inputCount) {
 			return ScriptPlayable<SpineSkeletonFlipMixerBehaviour>.Create(graph, inputCount);
@@ -49,8 +53,8 @@ namespace Spine.Unity.Playables {
 			if (trackBinding == null)
 				return;
 
-			var serializedObject = new UnityEditor.SerializedObject(trackBinding);
-			var iterator = serializedObject.GetIterator();
+			UnityEditor.SerializedObject serializedObject = new UnityEditor.SerializedObject(trackBinding);
+			UnityEditor.SerializedProperty iterator = serializedObject.GetIterator();
 			while (iterator.NextVisible(true)) {
 				if (iterator.hasVisibleChildren)
 					continue;

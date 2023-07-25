@@ -20,8 +20,9 @@ then
 		spine-webgl/dist/iife/* \
 		spine-player/dist/iife/* \
 		spine-threejs/dist/iife/* \
-		spine-player/css/spine-player.css \
-		spine-player/example/external/*
+		spine-pixi/dist/iife/* \
+		spine-phaser/dist/iife/* \
+		spine-player/css/spine-player.css
 	curl -f -F "file=@spine-ts.zip" "$TS_UPDATE_URL$BRANCH"
 else
 	echo "Not deploying artifacts. TS_UPDATE_URL and/or BRANCH not set."

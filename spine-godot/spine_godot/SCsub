@@ -1,0 +1,15 @@
+Import('env')
+
+# Need to add the include path to env so the vsproj generator consumes it.
+if env["vsproj"]:
+    env.Append(CPPPATH=["#../spine_godot/spine-cpp/include"])
+
+env_spine_runtime = env.Clone()
+env_spine_runtime.Append(CPPPATH=["#../spine_godot/spine-cpp/include"])
+env_spine_runtime.add_source_files(env.modules_sources, "spine-cpp/src/spine/*.cpp")
+env_spine_runtime.add_source_files(env.modules_sources, "*.cpp")
+
+# Needed on Clang to not have a gazillion -Winconsistent-missing-override warnings for GDCLASS
+# I do not understand why other modules using GDCLASS do not have this issue when compiling.
+if not env_spine_runtime.msvc:
+    env_spine_runtime.Append(CXXFLAGS=["-Wno-inconsistent-missing-override"])

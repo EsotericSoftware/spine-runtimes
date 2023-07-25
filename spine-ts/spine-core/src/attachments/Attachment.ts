@@ -53,12 +53,12 @@ export abstract class VertexAttachment extends Attachment {
 	/** The bones which affect the {@link #getVertices()}. The array entries are, for each vertex, the number of bones affecting
 	 * the vertex followed by that many bone indices, which is the index of the bone in {@link Skeleton#bones}. Will be null
 	 * if this attachment has no weights. */
-	bones: Array<number> = null;
+	bones: Array<number> | null = null;
 
 	/** The vertex positions in the bone's coordinate system. For a non-weighted attachment, the values are `x,y`
 	 * entries for each vertex. For a weighted attachment, the values are `x,y,weight` entries for each bone affecting
 	 * each vertex. */
-	vertices: NumberArrayLike = null;
+	vertices: NumberArrayLike = [];
 
 	/** The maximum number of world vertex values that can be output by
 	 * {@link #computeWorldVertices()} using the `count` parameter. */
@@ -66,7 +66,7 @@ export abstract class VertexAttachment extends Attachment {
 
 	/** Timelines for the timeline attachment are also applied to this attachment.
 	 * May be null if no attachment-specific timelines should be applied. */
-	timelineAttahment: Attachment = this;
+	timelineAttachment: Attachment = this;
 
 	constructor (name: string) {
 		super(name);
@@ -152,10 +152,9 @@ export abstract class VertexAttachment extends Attachment {
 		if (this.vertices) {
 			attachment.vertices = Utils.newFloatArray(this.vertices.length);
 			Utils.arrayCopy(this.vertices, 0, attachment.vertices, 0, this.vertices.length);
-		} else
-			attachment.vertices = null;
+		}
 
 		attachment.worldVerticesLength = this.worldVerticesLength;
-		attachment.timelineAttahment = this.timelineAttahment;
+		attachment.timelineAttachment = this.timelineAttachment;
 	}
 }

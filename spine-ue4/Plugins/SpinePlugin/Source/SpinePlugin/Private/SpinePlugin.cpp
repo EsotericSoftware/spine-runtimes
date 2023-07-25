@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include "SpinePluginPrivatePCH.h"
+#include "SpinePlugin.h"
 #include "spine/Extension.h"
 
 DEFINE_LOG_CATEGORY(SpineLog);

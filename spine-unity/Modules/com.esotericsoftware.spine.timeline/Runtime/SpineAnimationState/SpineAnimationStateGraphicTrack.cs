@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated January 1, 2020. Replaces all prior versions.
+ * Last updated September 24, 2021. Replaces all prior versions.
  *
- * Copyright (c) 2013-2020, Esoteric Software LLC
+ * Copyright (c) 2013-2022, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -27,21 +27,43 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#if UNITY_EDITOR
+using System.ComponentModel;
+#endif
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
 
 namespace Spine.Unity.Playables {
-	[TrackColor(0.9960785f, 0.2509804f, 0.003921569f)]
+	[TrackColor(255 / 255.0f, 64 / 255.0f, 1 / 255.0f)]
 	[TrackClipType(typeof(SpineAnimationStateClip))]
 	[TrackBindingType(typeof(SkeletonGraphic))]
+#if UNITY_EDITOR
+	[DisplayName("Spine/SkeletonGraphic Track")]
+#endif
 	public class SpineAnimationStateGraphicTrack : TrackAsset {
 		public int trackIndex = 0;
+		[Tooltip("Whenever starting a new animation clip of this track, " +
+			"SkeletonGraphic.UnscaledTime will be set to this value. " +
+			"This allows you to play back Timeline clips either in normal game time " +
+			"or unscaled game time. Note that PlayableDirector.UpdateMethod " +
+			"is ignored and replaced by this property, which allows more fine-granular " +
+			"control per Timeline track.")]
+		public bool unscaledTime = false;
 
 		public override Playable CreateTrackMixer (PlayableGraph graph, GameObject go, int inputCount) {
+			IEnumerable<TimelineClip> clips = this.GetClips();
+			foreach (TimelineClip clip in clips) {
+				SpineAnimationStateClip animationStateClip = clip.asset as SpineAnimationStateClip;
+				if (animationStateClip != null)
+					animationStateClip.timelineClip = clip;
+			}
+
 			var scriptPlayable = ScriptPlayable<SpineAnimationStateMixerBehaviour>.Create(graph, inputCount);
-			var mixerBehaviour = scriptPlayable.GetBehaviour();
+			SpineAnimationStateMixerBehaviour mixerBehaviour = scriptPlayable.GetBehaviour();
 			mixerBehaviour.trackIndex = this.trackIndex;
+			mixerBehaviour.unscaledTime = this.unscaledTime;
 			return scriptPlayable;
 		}
 	}

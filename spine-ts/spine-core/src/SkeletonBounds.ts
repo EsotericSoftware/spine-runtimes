@@ -153,7 +153,7 @@ export class SkeletonBounds {
 
 	/** Returns the first bounding box attachment that contains the point, or null. When doing many checks, it is usually more
 	 * efficient to only call this method if {@link #aabbContainsPoint(float, float)} returns true. */
-	containsPoint (x: number, y: number): BoundingBoxAttachment {
+	containsPoint (x: number, y: number): BoundingBoxAttachment | null {
 		let polygons = this.polygons;
 		for (let i = 0, n = polygons.length; i < n; i++)
 			if (this.containsPointPolygon(polygons[i], x, y)) return this.boundingBoxes[i];

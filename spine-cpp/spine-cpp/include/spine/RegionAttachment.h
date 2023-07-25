@@ -44,7 +44,7 @@ namespace spine {
 	class Bone;
 
 	/// Attachment that displays a texture region.
-	class SP_API RegionAttachment : public Attachment, public HasRendererObject {
+	class SP_API RegionAttachment : public Attachment {
 		friend class SkeletonBinary;
 
 		friend class SkeletonJson;
@@ -61,7 +61,7 @@ namespace spine {
 		void updateRegion();
 
 		/// Transforms the attachment's four vertices to world coordinates.
-		/// @param bone The parent bone.
+		/// @param slot The parent slot.
 		/// @param worldVertices The output world vertices. Must have a length greater than or equal to offset + 8.
 		/// @param offset The worldVertices index to begin writing values.
 		/// @param stride The number of worldVertices entries between the value pairs written.

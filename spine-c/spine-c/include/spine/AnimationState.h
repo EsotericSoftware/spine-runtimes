@@ -142,6 +142,8 @@ SP_API void spAnimationState_clearListenerNotifications(spAnimationState *self);
 
 SP_API float spTrackEntry_getAnimationTime(spTrackEntry *entry);
 
+SP_API void spTrackEntry_resetRotationDirections(spTrackEntry *entry);
+
 SP_API float spTrackEntry_getTrackComplete(spTrackEntry *entry);
 
 SP_API void spAnimationState_clearNext(spAnimationState *self, spTrackEntry *entry);

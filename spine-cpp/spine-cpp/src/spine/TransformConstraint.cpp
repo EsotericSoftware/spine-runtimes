@@ -27,10 +27,6 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifdef SPINE_UE4
-#include "SpinePluginPrivatePCH.h"
-#endif
-
 #include <spine/TransformConstraint.h>
 
 #include <spine/Bone.h>
@@ -66,7 +62,7 @@ TransformConstraint::TransformConstraint(TransformConstraintData &data, Skeleton
 }
 
 void TransformConstraint::update() {
-	if (_mixRotate == 0 && _mixX == 0 && _mixY == 0 && _mixScaleX == 0 && _mixScaleX == 0 && _mixShearY == 0) return;
+	if (_mixRotate == 0 && _mixX == 0 && _mixY == 0 && _mixScaleX == 0 && _mixScaleY == 0 && _mixShearY == 0) return;
 
 	if (_data.isLocal()) {
 		if (_data.isRelative())
@@ -82,7 +78,7 @@ void TransformConstraint::update() {
 }
 
 int TransformConstraint::getOrder() {
-	return _data.getOrder();
+	return (int) _data.getOrder();
 }
 
 TransformConstraintData &TransformConstraint::getData() {

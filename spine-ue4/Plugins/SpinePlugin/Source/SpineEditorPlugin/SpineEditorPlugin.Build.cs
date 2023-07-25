@@ -1,17 +1,12 @@
-using System;
 using System.IO;
 
 namespace UnrealBuildTool.Rules
 {
 	public class SpineEditorPlugin : ModuleRules
 	{
-		public SpineEditorPlugin(ReadOnlyTargetRules Target) : base(Target)
+		public SpineEditorPlugin(ReadOnlyTargetRules target) : base(target)
 		{
-            PrivatePCHHeaderFile = "Private/SpineEditorPluginPrivatePCH.h";
-            PCHUsage = PCHUsageMode.UseSharedPCHs;
-#if UE_4_24_OR_LATER
-            DefaultBuildSettings = BuildSettingsVersion.V1;
-#endif
+			PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
             PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "Public"));
 			PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "../SpinePlugin/Public/spine-cpp/include"));
@@ -19,7 +14,7 @@ namespace UnrealBuildTool.Rules
 			PrivateIncludePaths.Add(Path.Combine(ModuleDirectory, "Private"));
 			PrivateIncludePaths.Add(Path.Combine(ModuleDirectory, "../SpinePlugin/Public/spine-cpp/include"));
 
-            PublicDependencyModuleNames.AddRange(new string[] {
+            PublicDependencyModuleNames.AddRange(new [] {
                 "Core",
                 "CoreUObject",
                 "Engine",
@@ -27,12 +22,12 @@ namespace UnrealBuildTool.Rules
                 "SpinePlugin"
             });
 
-            PublicIncludePathModuleNames.AddRange(new string[] {
+            PublicIncludePathModuleNames.AddRange(new [] {
                "AssetTools",
                "AssetRegistry"
             });
 
-            DynamicallyLoadedModuleNames.AddRange(new string[] {
+            DynamicallyLoadedModuleNames.AddRange(new [] {
                "AssetTools",
                "AssetRegistry"
             });

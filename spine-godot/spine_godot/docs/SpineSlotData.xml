@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineSlotData" inherits="SpineObjectWrapper" version="3.4">
+	<brief_description>
+		Stores the setup pose for a slot.
+	</brief_description>
+	<description>
+		Stores the setup pose for a slot.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="get_attachment_name">
+			<return type="String" />
+			<description>
+				The name of the attachment that is visible for this slot in the setup pose, or null if no attachment is visible.
+			</description>
+		</method>
+		<method name="get_blend_mode">
+			<return type="int" enum="SpineConstant.BlendMode" />
+			<description>
+				The blend mode for drawing the slot's attachment.
+			</description>
+		</method>
+		<method name="get_bone_data">
+			<return type="SpineBoneData" />
+			<description>
+				The bone this slot belongs to.
+			</description>
+		</method>
+		<method name="get_color">
+			<return type="Color" />
+			<description>
+				The color used to tint the slot's attachment. If {@link #getDarkColor()} is set, this is used as the light color for two color tinting. Modifying the color has no effect.
+			</description>
+		</method>
+		<method name="get_dark_color">
+			<return type="Color" />
+			<description>
+				The dark color used to tint the slot's attachment for two color tinting, or null if two color tinting is not used. The dark color's alpha is not used. Modifying the color has no effect.
+			</description>
+		</method>
+		<method name="get_index">
+			<return type="int" />
+			<description>
+				The index of the slot in [code]Skeleton.get_slots()[/code].
+			</description>
+		</method>
+		<method name="get_name">
+			<return type="String" />
+			<description>
+				The name of the slot, which is unique across all slots in the skeleton.
+			</description>
+		</method>
+		<method name="has_dark_color">
+			<return type="bool" />
+			<description>
+				Whether the slot has a dark color.
+			</description>
+		</method>
+		<method name="set_attachment_name">
+			<return type="void" />
+			<argument index="0" name="v" type="String" />
+			<description>
+			</description>
+		</method>
+		<method name="set_blend_mode">
+			<return type="void" />
+			<argument index="0" name="v" type="int" enum="SpineConstant.BlendMode" />
+			<description>
+			</description>
+		</method>
+		<method name="set_color">
+			<return type="void" />
+			<argument index="0" name="v" type="Color" />
+			<description>
+			</description>
+		</method>
+		<method name="set_dark_color">
+			<return type="void" />
+			<argument index="0" name="v" type="Color" />
+			<description>
+			</description>
+		</method>
+		<method name="set_has_dark_color">
+			<return type="void" />
+			<argument index="0" name="v" type="bool" />
+			<description>
+			</description>
+		</method>
+	</methods>
+	<constants>
+	</constants>
+</class>

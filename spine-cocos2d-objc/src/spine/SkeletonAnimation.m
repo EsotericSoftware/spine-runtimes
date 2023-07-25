@@ -104,6 +104,7 @@ static _TrackEntryListeners* getListeners (spTrackEntry* entry) {
 	_state->listener = animationCallback;
 
 	_spAnimationState* stateInternal = (_spAnimationState*)_state;
+    _updatedOnce = false;
 }
 
 - (id) initWithData:(spSkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData {
@@ -150,13 +151,13 @@ static _TrackEntryListeners* getListeners (spTrackEntry* entry) {
 }
 
 - (void) update:(CCTime)deltaTime {
-	deltaTime *= _timeScale;
-	spSkeleton_update(_skeleton, deltaTime);
+	deltaTime *= _timeScale;	
 	spAnimationState_update(_state, deltaTime);
 	spAnimationState_apply(_state, _skeleton);
 	if (_preUpdateWorldTransformsListener) _preUpdateWorldTransformsListener(self);
 	spSkeleton_updateWorldTransform(_skeleton);
 	if (_postUpdateWorldTransformsListener) _postUpdateWorldTransformsListener(self);
+    _updatedOnce = true;
 }
 
 - (void) setAnimationStateData:(spAnimationStateData*)stateData {
@@ -275,6 +276,11 @@ static _TrackEntryListeners* getListeners (spTrackEntry* entry) {
 
 - (void) setListenerForEntry:(spTrackEntry*)entry onEvent:(spEventListener)listener {
 	getListeners(entry)->eventListener = [listener copy];
+}
+
+-(void)draw:(CCRenderer *)renderer transform:(const GLKMatrix4 *)transform {
+    if (!_updatedOnce) [self update:0];    
+    [super draw:renderer transform:transform];
 }
 
 @end

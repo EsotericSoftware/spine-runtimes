@@ -1,17 +1,8 @@
 project(spine_cpp_unit_test)
 
-set(CMAKE_INSTALL_PREFIX "./")
-set(CMAKE_VERBOSE_MAKEFILE ON)
-
-include_directories(../spine-cpp/include teamcity minicppunit tests memory)
-
-set(SRC
-        src/main.cpp
-        )
-
+set(SRC src/main.cpp)
 add_executable(spine_cpp_unit_test ${SRC})
 target_link_libraries(spine_cpp_unit_test spine-cpp)
-
 
 #########################################################
 # copy resources to build output directory

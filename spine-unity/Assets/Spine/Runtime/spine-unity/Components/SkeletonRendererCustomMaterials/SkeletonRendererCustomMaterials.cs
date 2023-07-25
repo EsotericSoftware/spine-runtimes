@@ -58,12 +58,12 @@ namespace Spine.Unity {
 
 			// Populate atlas list
 			if (skeletonRenderer != null && skeletonRenderer.skeletonDataAsset != null) {
-				var atlasAssets = skeletonRenderer.skeletonDataAsset.atlasAssets;
+				AtlasAssetBase[] atlasAssets = skeletonRenderer.skeletonDataAsset.atlasAssets;
 
-				var initialAtlasMaterialOverrides = new List<AtlasMaterialOverride>();
+				List<AtlasMaterialOverride> initialAtlasMaterialOverrides = new List<AtlasMaterialOverride>();
 				foreach (AtlasAssetBase atlasAsset in atlasAssets) {
 					foreach (Material atlasMaterial in atlasAsset.Materials) {
-						var atlasMaterialOverride = new AtlasMaterialOverride {
+						AtlasMaterialOverride atlasMaterialOverride = new AtlasMaterialOverride {
 							overrideDisabled = true,
 							originalMaterial = atlasMaterial
 						};
@@ -90,7 +90,8 @@ namespace Spine.Unity {
 					continue;
 
 				Slot slotObject = skeletonRenderer.skeleton.FindSlot(slotMaterialOverride.slotName);
-				skeletonRenderer.CustomSlotMaterials[slotObject] = slotMaterialOverride.material;
+				if (slotObject != null)
+					skeletonRenderer.CustomSlotMaterials[slotObject] = slotMaterialOverride.material;
 			}
 		}
 
@@ -106,7 +107,8 @@ namespace Spine.Unity {
 					continue;
 
 				Slot slotObject = skeletonRenderer.skeleton.FindSlot(slotMaterialOverride.slotName);
-
+				if (slotObject == null)
+					continue;
 				Material currentMaterial;
 				if (!skeletonRenderer.CustomSlotMaterials.TryGetValue(slotObject, out currentMaterial))
 					continue;

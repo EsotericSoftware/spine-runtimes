@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineTrackEntry" inherits="SpineObjectWrapper" version="3.4">
+	<brief_description>
+	</brief_description>
+	<description>
+		Stores settings and other state for the playback of an animation on an animation state track.
+		References to a track entry must not be kept after the dispose event occurs.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="get_alpha">
+			<return type="float" />
+			<description>
+				Values &lt; 1 mix this animation with the skeleton's current pose (usually the pose resulting from lower tracks). Defaults to 1, which overwrites the skeleton's current pose with this animation.
+				Typically track 0 is used to completely pose the skeleton, then alpha is used on higher tracks. It doesn't make sense to use alpha on track 0 if the skeleton pose is from the last frame render.
+			</description>
+		</method>
+		<method name="get_animation">
+			<return type="SpineAnimation" />
+			<description>
+				The animation to apply for this track entry.
+			</description>
+		</method>
+		<method name="get_animation_end">
+			<return type="float" />
+			<description>
+				Seconds for the last frame of this animation. Non-looping animations won't play past this time. Looping animations will loop back to animation start at this time. Defaults to the animation duration.
+			</description>
+		</method>
+		<method name="get_animation_last">
+			<return type="float" />
+			<description>
+				The time in seconds this animation was last applied. Some timelines use this for one-time triggers. Eg, when this animation is applied, event timelines will fire all events between the [code]animationLast[/code] time (exclusive) and [code]animationTime[/code](inclusive). Defaults to -1 to ensure triggers on frame 0 happen the first time this animation is applied.
+			</description>
+		</method>
+		<method name="get_animation_start">
+			<return type="float" />
+			<description>
+				Seconds when this animation starts, both initially and after looping. Defaults to 0.
+				When changing the animation start time, it often makes sense to set animation last to the same value to prevent timeline keys before the start time from triggering.
+			</description>
+		</method>
+		<method name="get_animation_time">
+			<return type="float" />
+			<description>
+				Uses [code]get_track_time()[/code] to compute the animation time. When the track time is 0, the animation time is equal to the animation start time.
+				The animation time is between [code]get_animation_start()[/code] and [code]get_animation_end()[/code], except if this track entry is non-looping and [code]get_animation_end()[/code] is &gt;= to the animation duration, then animation time continues to increase past [code]get_animation_end()[/code].
+			</description>
+		</method>
+		<method name="get_attachment_threshold">
+			<return type="float" />
+			<description>
+				When the mix percentage ([code]get_mix_time()[/code] / [code]get_mix_duration()[/code]) is less than the attachment threshold, attachment timelines are applied while this animation is being mixed out. Defaults to 0, so attachment timelines are not applied while this animation is being mixed out.
+			</description>
+		</method>
+		<method name="get_delay">
+			<return type="float" />
+			<description>
+				Seconds to postpone playing the animation. When this track entry is the current track entry, delay postpones incrementing the [code]get_track_time()[/code]. When this track entry is queued, delay is the time from the start of the previous animation to when this track entry will become the current track entry (ie when the previous track entry [code]get_track_time()[/code] &gt;= this track entry's delay).
+				[code]get_time_scale()[/code] affects the delay.
+				When using [code]AnimationState.add_animation()[/code] with a delay &lt;= 0, the delay is set using the mix duration from the skeleton data resource. If mix duration is set afterward, the delay may need to be adjusted.
+			</description>
+		</method>
+		<method name="get_draw_order_threshold">
+			<return type="float" />
+			<description>
+				When the mix percentage ([code]get_mix_time()[/code] / [code]get_mix_duration()[/code]) is less than the draw order threshold, draw order timelines are applied while this animation is being mixed out. Defaults to 0, so draw order timelines are not applied while this animation is being mixed out.
+			</description>
+		</method>
+		<method name="get_event_threshold">
+			<return type="float" />
+			<description>
+				When the mix percentage ([code]get_mix_time()[/code] / [code]get_mix_duration()[/code]) is less than the event threshold, event timelines are applied while this animation is being mixed out. Defaults to 0, so event timelines are not applied while this animation is being mixed out.
+			</description>
+		</method>
+		<method name="get_hold_previous">
+			<return type="bool" />
+			<description>
+				If true, when mixing from the previous animation to this animation, the previous animation is applied as normal instead of being mixed out.
+				When mixing between animations that key the same property, if a lower track also keys that property then the value will briefly dip toward the lower track value during the mix. This happens because the first animation mixes from 100% to 0% while the second animation mixes from 0% to 100%. Setting hold previous to true applies the first animation at 100% during the mix so the lower track value is overwritten. Such dipping does not occur on the lowest track which keys the property, only when a higher track also keys the property.
+				Snapping will occur if hold previous is true and this animation does not key all the same properties as the previous animation.
+			</description>
+		</method>
+		<method name="get_loop">
+			<return type="bool" />
+			<description>
+				If true, the animation will repeat. If false it will not, instead its last frame is applied if played beyond its duration.
+			</description>
+		</method>
+		<method name="get_mix_blend">
+			<return type="int" enum="SpineConstant.MixBlend" />
+			<description>
+				Controls how properties keyed in the animation are mixed with lower tracks. Defaults to [code]MixBlend.replace[/code]. Track entries on track 0 ignore this setting and always use [code]MixBlend.first[/code].
+				The mix blend can be set for a new track entry only before [code]AnimationState.apply()[/code] is first called.
+			</description>
+		</method>
+		<method name="get_mix_duration">
+			<return type="float" />
+			<description>
+				Seconds for mixing from the previous animation to this animation. Defaults to the value provided by the skeleton data resource based on the animation before this animation (if any).
+				A mix duration of 0 still mixes out over one frame to provide the track entry being mixed out a chance to revert the properties it was animating. The mix duration can be set manually rather than use the value from the skeleton data resource. In that case, themix duration can be set for a new track entry only before [code]AnimationState#update()[/code] is first called.
+				When using [code]AnimationState.add_animation()[/code] with a delay &lt;= 0, the delay is set using the mix duration from the skeleton data resource. If mix duration is set afterward, the delay may need to be adjusted.
+			</description>
+		</method>
+		<method name="get_mix_time">
+			<return type="float" />
+			<description>
+				Seconds from 0 to the mix duration when mixing from the previous animation to this animation. May be slightly more than mix duration when the mix is complete.
+			</description>
+		</method>
+		<method name="get_mixing_from">
+			<return type="SpineTrackEntry" />
+			<description>
+				The track entry for the previous animation when mixing from the previous animation to this animation, or null if no mixing is currently occuring. When mixing from multiple animations, mixing from makes up a linked list.
+			</description>
+		</method>
+		<method name="get_mixing_to">
+			<return type="SpineTrackEntry" />
+			<description>
+				The track entry for the next animation when mixing from this animation to the next animation, or null if no mixing is currently occuring. When mixing to multiple animations, mixing to makes up a linked list.
+			</description>
+		</method>
+		<method name="get_next">
+			<return type="SpineTrackEntry" />
+			<description>
+				The animation queued to start after this animation, or null if there is none. Next makes up a doubly linked list.
+				See [code]AnimationState.clear_next()[/code] to truncate the list.
+			</description>
+		</method>
+		<method name="get_previous">
+			<return type="SpineTrackEntry" />
+			<description>
+				The animation queued to play before this animation, or null. previous makes up a doubly linked list.
+			</description>
+		</method>
+		<method name="get_reverse">
+			<return type="bool" />
+			<description>
+				If true, the animation will be applied in reverse. Events are not fired when an animation is applied in reverse.
+			</description>
+		</method>
+		<method name="get_shortest_rotation">
+			<return type="bool" />
+			<description>
+				If true, mixing rotation between tracks always uses the shortest rotation direction. If the rotation is animated, the shortest rotation direction may change during the mix.
+				If false, the shortest rotation direction is remembered when the mix starts and the same direction is used for the rest of the mix. Defaults to false.
+			</description>
+		</method>
+		<method name="get_time_scale">
+			<return type="float" />
+			<description>
+				Multiplier for the delta time when this track entry is updated, causing time for this animation to pass slower or faster. Defaults to 1.
+				Values &lt; 0 are not supported. To play an animation in reverse, use {@link #getReverse()}.
+				[code]get_mix_time()[/code] is not affected by track entry time scale, so [code]get_mix_duration()[/code] may need to be adjusted to match the animation speed.
+				When using [code]AnimationState.add_animation()[/code]with a delay &lt;= 0, the delay is set using the mix duration from the skeleton data resource, assuming time scale to be 1. If the time scale is not 1, the delay may need to be adjusted.
+				See [code]AnimationState.get_time_scale()[/code] for affecting all animations.
+			</description>
+		</method>
+		<method name="get_track_complete">
+			<return type="float" />
+			<description>
+				If this track entry is non-looping, the track time in seconds when [code]get_animation_end()[/code] is reached, or the current [code]get_track_time()[/code] if it has already been reached. If this track entry is looping, the track time when this animation will reach its next [code]get_animation_end()[/code] (the next loop completion).
+			</description>
+		</method>
+		<method name="get_track_end">
+			<return type="float" />
+			<description>
+				The track time in seconds when this animation will be removed from the track. Defaults to the highest possible float value, meaning the animation will be applied until a new animation is set or the track is cleared. If the track end time is reached, no other animations are queued for playback, and mixing from any previous animations is complete, then the properties keyed by the animation are set to the setup pose and the track is cleared.
+				It may be desired to use {@link AnimationState#addEmptyAnimation(int, float, float)} rather than have the animation abruptly cease being applied.
+			</description>
+		</method>
+		<method name="get_track_index">
+			<return type="int" />
+			<description>
+				The index of the track where this track entry is either current or queued.
+			</description>
+		</method>
+		<method name="get_track_time">
+			<return type="float" />
+			<description>
+				Current time in seconds this track entry has been the current track entry. The track time determines [code]get_animation_time()[/code]. The track time can be set to start the animation at a time other than 0, without affecting looping.
+			</description>
+		</method>
+		<method name="is_complete">
+			<return type="bool" />
+			<description>
+				Returns true if at least one loop has been completed.
+			</description>
+		</method>
+		<method name="reset_rotation_directions">
+			<return type="void" />
+			<description>
+				Resets the rotation directions for mixing this entry's rotate timelines. This can be useful to avoid bones rotating the long way around when using {@link #alpha} and starting animations on other tracks.
+				Mixing with [code]MixBlend.replace[/code] involves finding a rotation between two others, which has two possible solutions: the short way or the long way around. The two rotations likely change over time, so which direction is the short or long way also changes. If the short way was always chosen, bones would flip to the other side when that direction became the long way. TrackEntry chooses the short way the first time it is applied and remembers that direction.
+			</description>
+		</method>
+		<method name="set_alpha">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_animation_end">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_animation_last">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_animation_start">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_attachment_threshold">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_delay">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_draw_order_threshold">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_event_threshold">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_hold_previous">
+			<return type="void" />
+			<argument index="0" name="v" type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="set_loop">
+			<return type="void" />
+			<argument index="0" name="v" type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="set_mix_blend">
+			<return type="void" />
+			<argument index="0" name="v" type="int" enum="SpineConstant.MixBlend" />
+			<description>
+			</description>
+		</method>
+		<method name="set_mix_duration">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_mix_time">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_reverse">
+			<return type="void" />
+			<argument index="0" name="v" type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="set_shortest_rotation">
+			<return type="void" />
+			<argument index="0" name="v" type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="set_time_scale">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_track_end">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_track_time">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+	</methods>
+	<constants>
+	</constants>
+</class>

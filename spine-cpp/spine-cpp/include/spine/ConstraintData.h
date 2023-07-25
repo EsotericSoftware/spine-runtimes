@@ -34,8 +34,10 @@
 #include <spine/SpineString.h>
 
 namespace spine {
-/// The interface for all constraints.
+	/// The interface for all constraints.
 	class SP_API ConstraintData : public SpineObject {
+
+	RTTI_DECL
 
 	public:
 		ConstraintData(const String &name);

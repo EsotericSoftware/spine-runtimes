@@ -48,6 +48,11 @@ namespace Spine {
 		public static Color aabbColor = new Color(0f, 1f, 0f, 0.5f);
 
 		public BasicEffect Effect { get { return renderer.Effect; } set { renderer.Effect = value; } }
+
+		/// <summary>A Z position offset added at each vertex.</summary>
+		private float z = 0.0f;
+		public float Z { get { return z; } set { z = value; } }
+
 		public bool DrawBones { get; set; }
 		public bool DrawRegionAttachments { get; set; }
 		public bool DrawBoundingBoxes { get; set; }
@@ -104,9 +109,9 @@ namespace Spine {
 					if (bone.Parent == null) continue;
 					var x = bone.Data.Length * bone.A + bone.WorldX;
 					var y = bone.Data.Length * bone.C + bone.WorldY;
-					renderer.Line(bone.WorldX, bone.WorldY, x, y);
+					renderer.Line(bone.WorldX, bone.WorldY, x, y, z);
 				}
-				if (DrawSkeletonXY) renderer.X(skeletonX, skeletonY, 4);
+				if (DrawSkeletonXY) renderer.X(skeletonX, skeletonY, 4, z);
 			}
 
 			if (DrawRegionAttachments) {
@@ -119,10 +124,10 @@ namespace Spine {
 						var regionAttachment = (RegionAttachment)attachment;
 						var vertices = this.vertices;
 						regionAttachment.ComputeWorldVertices(slot, vertices, 0, 2);
-						renderer.Line(vertices[0], vertices[1], vertices[2], vertices[3]);
-						renderer.Line(vertices[2], vertices[3], vertices[4], vertices[5]);
-						renderer.Line(vertices[4], vertices[5], vertices[6], vertices[7]);
-						renderer.Line(vertices[6], vertices[7], vertices[0], vertices[1]);
+						renderer.Line(vertices[0], vertices[1], vertices[2], vertices[3], z);
+						renderer.Line(vertices[2], vertices[3], vertices[4], vertices[5], z);
+						renderer.Line(vertices[4], vertices[5], vertices[6], vertices[7], z);
+						renderer.Line(vertices[6], vertices[7], vertices[0], vertices[1], z);
 					}
 				}
 			}
@@ -144,7 +149,8 @@ namespace Spine {
 							int v1 = triangles[ii] * 2, v2 = triangles[ii + 1] * 2, v3 = triangles[ii + 2] * 2;
 							renderer.Triangle(world[v1], world[v1 + 1], //
 								world[v2], world[v2 + 1], //
-								world[v3], world[v3 + 1] //
+								world[v3], world[v3 + 1], //
+								z
 							);
 						}
 					}
@@ -154,7 +160,7 @@ namespace Spine {
 						float lastX = vertices[hullLength - 2], lastY = vertices[hullLength - 1];
 						for (int ii = 0, nn = hullLength; ii < nn; ii += 2) {
 							float x = vertices[ii], y = vertices[ii + 1];
-							renderer.Line(x, y, lastX, lastY);
+							renderer.Line(x, y, lastX, lastY, z);
 							lastX = x;
 							lastY = y;
 						}
@@ -166,12 +172,12 @@ namespace Spine {
 				var bounds = this.bounds;
 				bounds.Update(skeleton, true);
 				renderer.SetColor(aabbColor);
-				renderer.Rect(bounds.MinX, bounds.MinY, bounds.Width, bounds.Height);
+				renderer.Rect(bounds.MinX, bounds.MinY, bounds.Width, bounds.Height, z);
 				var polygons = bounds.Polygons;
 				var boxes = bounds.BoundingBoxes;
 				for (int i = 0, n = polygons.Count; i < n; i++) {
 					var polygon = polygons.Items[i];
-					renderer.Polygon(polygon.Vertices, 0, polygon.Count);
+					renderer.Polygon(polygon.Vertices, 0, polygon.Count, z);
 				}
 			}
 
@@ -179,7 +185,7 @@ namespace Spine {
 				renderer.SetColor(boneOriginColor);
 				for (int i = 0, n = bones.Count; i < n; i++) {
 					var bone = bones.Items[i];
-					renderer.Circle(bone.WorldX, bone.WorldY, 3);
+					renderer.Circle(bone.WorldX, bone.WorldY, 3, z);
 				}
 			}
 
@@ -200,7 +206,7 @@ namespace Spine {
 						var y = world[ii + 1];
 						var x2 = world[(ii + 2) % nn];
 						var y2 = world[(ii + 3) % nn];
-						renderer.Line(x, y, x2, y2);
+						renderer.Line(x, y, x2, y2, z);
 						clippingPolygon.Add(x);
 						clippingPolygon.Add(y);
 					}
@@ -214,7 +220,7 @@ namespace Spine {
 							SkeletonClipping.MakeClockwise(polygon);
 							polygon.Add(polygon.Items[0]);
 							polygon.Add(polygon.Items[1]);
-							renderer.Polygon(polygon.Items, 0, polygon.Count >> 1);
+							renderer.Polygon(polygon.Items, 0, polygon.Count >> 1, z);
 						}
 					}
 				}

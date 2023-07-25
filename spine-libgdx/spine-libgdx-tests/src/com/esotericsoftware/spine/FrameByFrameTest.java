@@ -46,32 +46,22 @@ public class FrameByFrameTest extends ApplicationAdapter {
 
 	TextureAtlas atlas;
 	float time;
-	Animation<AtlasSprite> walkAnimation, deathAnimation, current;
+	Animation<AtlasSprite> walkAnimation, current;
 
 	public void create () {
 		camera = new OrthographicCamera();
 		batch = new PolygonSpriteBatch();
 
-		atlas = new TextureAtlas("spineboy/frame-by-frame.atlas");
+		atlas = new TextureAtlas("spineboy/spineboy-run.atlas");
 
-		walkAnimation = new Animation(1 / 20f, atlas.createSprites("spineboy-pro-walk"));
+		walkAnimation = new Animation(1 / 15f, atlas.createSprites("spineboy-pro-run"));
 		walkAnimation.setPlayMode(PlayMode.LOOP);
-
-		deathAnimation = new Animation(1 / 20f, atlas.createSprites("spineboy-pro-death"));
 
 		current = walkAnimation;
 	}
 
 	public void render () {
 		time += Gdx.graphics.getDeltaTime();
-		if (current == deathAnimation && current.isAnimationFinished(time)) {
-			current = walkAnimation;
-			time = 0;
-		}
-		if (Gdx.input.justTouched()) {
-			current = deathAnimation;
-			time = 0;
-		}
 
 		AtlasSprite frame = current.getKeyFrame(time);
 		float x = Math.round(Gdx.graphics.getWidth() / 2), y = 25;

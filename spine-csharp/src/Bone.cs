@@ -173,7 +173,7 @@ namespace Spine {
 
 			Bone parent = this.parent;
 			if (parent == null) { // Root bone.
-				float rotationY = rotation + 90 + shearY, sx = skeleton.ScaleX, sy = skeleton.ScaleY;
+				float rotationY = rotation + 90 + shearY, sx = skeleton.scaleX, sy = skeleton.scaleY;
 				a = MathUtils.CosDeg(rotation + shearX) * scaleX * sx;
 				b = MathUtils.CosDeg(rotationY) * scaleY * sx;
 				c = MathUtils.SinDeg(rotation + shearX) * scaleX * sy;
@@ -212,8 +212,8 @@ namespace Spine {
 				float s = pa * pa + pc * pc, prx;
 				if (s > 0.0001f) {
 					s = Math.Abs(pa * pd - pb * pc) / s;
-					pa /= skeleton.ScaleX;
-					pc /= skeleton.ScaleY;
+					pa /= skeleton.scaleX;
+					pc /= skeleton.scaleY;
 					pb = pc * s;
 					pd = pa * s;
 					prx = MathUtils.Atan2(pc, pa) * MathUtils.RadDeg;
@@ -237,15 +237,15 @@ namespace Spine {
 			case TransformMode.NoScale:
 			case TransformMode.NoScaleOrReflection: {
 				float cos = MathUtils.CosDeg(rotation), sin = MathUtils.SinDeg(rotation);
-				float za = (pa * cos + pb * sin) / skeleton.ScaleX;
-				float zc = (pc * cos + pd * sin) / skeleton.ScaleY;
+				float za = (pa * cos + pb * sin) / skeleton.scaleX;
+				float zc = (pc * cos + pd * sin) / skeleton.scaleY;
 				float s = (float)Math.Sqrt(za * za + zc * zc);
 				if (s > 0.00001f) s = 1 / s;
 				za *= s;
 				zc *= s;
 				s = (float)Math.Sqrt(za * za + zc * zc);
 				if (data.transformMode == TransformMode.NoScale
-					&& (pa * pd - pb * pc < 0) != (skeleton.ScaleX < 0 != skeleton.ScaleY < 0)) s = -s;
+					&& (pa * pd - pb * pc < 0) != (skeleton.scaleX < 0 != skeleton.scaleY < 0)) s = -s;
 
 				float r = MathUtils.PI / 2 + MathUtils.Atan2(zc, za);
 				float zb = MathUtils.Cos(r) * s;
@@ -262,10 +262,10 @@ namespace Spine {
 			}
 			}
 
-			a *= skeleton.ScaleX;
-			b *= skeleton.ScaleX;
-			c *= skeleton.ScaleY;
-			d *= skeleton.ScaleY;
+			a *= skeleton.scaleX;
+			b *= skeleton.scaleX;
+			c *= skeleton.scaleY;
+			d *= skeleton.scaleY;
 		}
 
 		public void SetToSetupPose () {
@@ -303,23 +303,65 @@ namespace Spine {
 			}
 			float pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d;
 			float pid = 1 / (pa * pd - pb * pc);
+			float ia = pd * pid, ib = pb * pid, ic = pc * pid, id = pa * pid;
 			float dx = worldX - parent.worldX, dy = worldY - parent.worldY;
-			ax = (dx * pd * pid - dy * pb * pid);
-			ay = (dy * pa * pid - dx * pc * pid);
-			float ia = pid * pd;
-			float id = pid * pa;
-			float ib = pid * pb;
-			float ic = pid * pc;
-			float ra = ia * a - ib * c;
-			float rb = ia * b - ib * d;
-			float rc = id * c - ic * a;
-			float rd = id * d - ic * b;
+
+			ax = (dx * ia - dy * ib);
+			ay = (dy * id - dx * ic);
+
+			float ra, rb, rc, rd;
+			if (data.transformMode == TransformMode.OnlyTranslation) {
+				ra = a;
+				rb = b;
+				rc = c;
+				rd = d;
+			} else {
+				switch (data.transformMode) {
+				case TransformMode.NoRotationOrReflection: {
+					float s = Math.Abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
+					float sa = pa / skeleton.scaleX;
+					float sc = pc / skeleton.scaleY;
+					pb = -sc * s * skeleton.scaleX;
+					pd = sa * s * skeleton.scaleY;
+					pid = 1 / (pa * pd - pb * pc);
+					ia = pd * pid;
+					ib = pb * pid;
+					break;
+				}
+				case TransformMode.NoScale:
+				case TransformMode.NoScaleOrReflection: {
+					float cos = MathUtils.CosDeg(rotation), sin = MathUtils.SinDeg(rotation);
+					pa = (pa * cos + pb * sin) / skeleton.scaleX;
+					pc = (pc * cos + pd * sin) / skeleton.scaleY;
+					float s = (float)Math.Sqrt(pa * pa + pc * pc);
+					if (s > 0.00001f) s = 1 / s;
+					pa *= s;
+					pc *= s;
+					s = (float)Math.Sqrt(pa * pa + pc * pc);
+					if (data.transformMode == TransformMode.NoScale && pid < 0 != (skeleton.scaleX < 0 != skeleton.scaleY < 0)) s = -s;
+					float r = MathUtils.PI / 2 + MathUtils.Atan2(pc, pa);
+					pb = MathUtils.Cos(r) * s;
+					pd = MathUtils.Sin(r) * s;
+					pid = 1 / (pa * pd - pb * pc);
+					ia = pd * pid;
+					ib = pb * pid;
+					ic = pc * pid;
+					id = pa * pid;
+					break;
+				}
+				}
+				ra = ia * a - ib * c;
+				rb = ia * b - ib * d;
+				rc = id * c - ic * a;
+				rd = id * d - ic * b;
+			}
+
 			ashearX = 0;
 			ascaleX = (float)Math.Sqrt(ra * ra + rc * rc);
 			if (ascaleX > 0.0001f) {
 				float det = ra * rd - rb * rc;
 				ascaleY = det / ascaleX;
-				ashearY = MathUtils.Atan2(ra * rb + rc * rd, det) * MathUtils.RadDeg;
+				ashearY = -MathUtils.Atan2(ra * rb + rc * rd, det) * MathUtils.RadDeg;
 				arotation = MathUtils.Atan2(rc, ra) * MathUtils.RadDeg;
 			} else {
 				ascaleX = 0;

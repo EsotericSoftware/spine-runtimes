@@ -43,9 +43,10 @@ import com.esotericsoftware.spine.attachments.PointAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.Sequence;
 
+/** Demonstrates loading skeleton data without an atlas and plotting bone transform for each animation. */
 public class BonePlotting {
 	static public void main (String[] args) throws Exception {
-		// This example shows how to load skeleton data and plot a bone transform for each animation.
+		// Create a skeleton loader that doesn't use an atlas and doesn't create any attachments.
 		SkeletonJson json = new SkeletonJson(new AttachmentLoader() {
 			public RegionAttachment newRegionAttachment (Skin skin, String name, String path, @Null Sequence sequence) {
 				return null;
@@ -71,17 +72,22 @@ public class BonePlotting {
 				return null;
 			}
 		});
+
 		SkeletonData skeletonData = json.readSkeletonData(new FileHandle("assets/spineboy/spineboy-ess.json"));
 		Skeleton skeleton = new Skeleton(skeletonData);
 		Bone bone = skeleton.findBone("gun-tip");
+
+		// Pose the skeleton at regular intervals throughout each animation.
 		float fps = 1 / 15f;
 		for (Animation animation : skeletonData.getAnimations()) {
 			float time = 0;
 			while (time < animation.getDuration()) {
 				animation.apply(skeleton, time, time, false, null, 1, MixBlend.first, MixDirection.in);
 				skeleton.updateWorldTransform();
-				System.out
-					.println(animation.getName() + "," + bone.getWorldX() + "," + bone.getWorldY() + "," + bone.getWorldRotationX());
+
+				System.out.println(animation.getName() + "," //
+					+ bone.getWorldX() + "," + bone.getWorldY() + "," + bone.getWorldRotationX());
+
 				time += fps;
 			}
 		}

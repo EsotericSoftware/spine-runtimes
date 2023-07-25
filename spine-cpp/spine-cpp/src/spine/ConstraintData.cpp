@@ -27,13 +27,11 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifdef SPINE_UE4
-#include "SpinePluginPrivatePCH.h"
-#endif
-
 #include <spine/ConstraintData.h>
 
 using namespace spine;
+
+RTTI_IMPL_NOPARENT(ConstraintData)
 
 ConstraintData::ConstraintData(const String &name) : _name(name), _order(0), _skinRequired(false) {
 }

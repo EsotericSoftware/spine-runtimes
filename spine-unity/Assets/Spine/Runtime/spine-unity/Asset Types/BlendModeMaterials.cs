@@ -53,11 +53,11 @@ namespace Spine.Unity {
 		public bool RequiresBlendModeMaterials { get { return requiresBlendModeMaterials; } set { requiresBlendModeMaterials = value; } }
 
 		public BlendMode BlendModeForMaterial (Material material) {
-			foreach (var pair in multiplyMaterials)
+			foreach (ReplacementMaterial pair in multiplyMaterials)
 				if (pair.material == material) return BlendMode.Multiply;
-			foreach (var pair in additiveMaterials)
+			foreach (ReplacementMaterial pair in additiveMaterials)
 				if (pair.material == material) return BlendMode.Additive;
-			foreach (var pair in screenMaterials)
+			foreach (ReplacementMaterial pair in screenMaterials)
 				if (pair.material == material) return BlendMode.Screen;
 			return BlendMode.Normal;
 		}
@@ -72,18 +72,18 @@ namespace Spine.Unity {
 
 			if (skeletonData == null) return false;
 
-			var skinEntries = new List<Skin.SkinEntry>();
-			var slotsItems = skeletonData.Slots.Items;
+			List<Skin.SkinEntry> skinEntries = new List<Skin.SkinEntry>();
+			SlotData[] slotsItems = skeletonData.Slots.Items;
 			for (int slotIndex = 0, slotCount = skeletonData.Slots.Count; slotIndex < slotCount; slotIndex++) {
-				var slot = slotsItems[slotIndex];
+				SlotData slot = slotsItems[slotIndex];
 				if (slot.BlendMode == BlendMode.Normal) continue;
 				if (!applyAdditiveMaterial && slot.BlendMode == BlendMode.Additive) continue;
 
 				skinEntries.Clear();
-				foreach (var skin in skeletonData.Skins)
+				foreach (Skin skin in skeletonData.Skins)
 					skin.GetAttachments(slotIndex, skinEntries);
 
-				foreach (var entry in skinEntries) {
+				foreach (Skin.SkinEntry entry in skinEntries) {
 					if (entry.Attachment is IHasTextureRegion) {
 						requiresBlendModeMaterials = true;
 						return true;
@@ -98,10 +98,10 @@ namespace Spine.Unity {
 			if (!requiresBlendModeMaterials)
 				return;
 
-			var skinEntries = new List<Skin.SkinEntry>();
-			var slotsItems = skeletonData.Slots.Items;
+			List<Skin.SkinEntry> skinEntries = new List<Skin.SkinEntry>();
+			SlotData[] slotsItems = skeletonData.Slots.Items;
 			for (int slotIndex = 0, slotCount = skeletonData.Slots.Count; slotIndex < slotCount; slotIndex++) {
-				var slot = slotsItems[slotIndex];
+				SlotData slot = slotsItems[slotIndex];
 				if (slot.BlendMode == BlendMode.Normal) continue;
 				if (!applyAdditiveMaterial && slot.BlendMode == BlendMode.Additive) continue;
 
@@ -121,23 +121,33 @@ namespace Spine.Unity {
 					continue;
 
 				skinEntries.Clear();
-				foreach (var skin in skeletonData.Skins)
+				foreach (Skin skin in skeletonData.Skins)
 					skin.GetAttachments(slotIndex, skinEntries);
 
-				foreach (var entry in skinEntries) {
-					var renderableAttachment = entry.Attachment as IHasTextureRegion;
+				foreach (Skin.SkinEntry entry in skinEntries) {
+					IHasTextureRegion renderableAttachment = entry.Attachment as IHasTextureRegion;
 					if (renderableAttachment != null) {
-						renderableAttachment.Region = CloneAtlasRegionWithMaterial(
+						if (renderableAttachment.Region != null) {
+							renderableAttachment.Region = CloneAtlasRegionWithMaterial(
 							(AtlasRegion)renderableAttachment.Region, replacementMaterials);
+						} else {
+							if (renderableAttachment.Sequence != null) {
+								TextureRegion[] regions = renderableAttachment.Sequence.Regions;
+								for (int i = 0; i < regions.Length; ++i) {
+									regions[i] = CloneAtlasRegionWithMaterial(
+										(AtlasRegion)regions[i], replacementMaterials);
+								}
+							}
+						}
 					}
 				}
 			}
 		}
 
 		protected AtlasRegion CloneAtlasRegionWithMaterial (AtlasRegion originalRegion, List<ReplacementMaterial> replacementMaterials) {
-			var newRegion = originalRegion.Clone();
+			AtlasRegion newRegion = originalRegion.Clone();
 			Material material = null;
-			foreach (var replacement in replacementMaterials) {
+			foreach (ReplacementMaterial replacement in replacementMaterials) {
 				if (replacement.pageName == originalRegion.page.name) {
 					material = replacement.material;
 					break;
@@ -145,7 +155,7 @@ namespace Spine.Unity {
 			}
 
 			AtlasPage originalPage = originalRegion.page;
-			var newPage = originalPage.Clone();
+			AtlasPage newPage = originalPage.Clone();
 			newPage.rendererObject = material;
 			newRegion.page = newPage;
 			return newRegion;

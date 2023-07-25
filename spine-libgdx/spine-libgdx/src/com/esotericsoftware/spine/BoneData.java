@@ -115,7 +115,7 @@ public class BoneData {
 		this.y = y;
 	}
 
-	/** The local rotation. */
+	/** The local rotation in degrees, counter clockwise. */
 	public float getRotation () {
 		return rotation;
 	}

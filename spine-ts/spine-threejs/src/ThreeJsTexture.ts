@@ -33,9 +33,12 @@ import * as THREE from "three";
 export class ThreeJsTexture extends Texture {
 	texture: THREE.Texture;
 
-	constructor (image: HTMLImageElement) {
+	constructor (image: HTMLImageElement | ImageBitmap) {
 		super(image);
-		this.texture = new THREE.Texture(image);
+		if (image instanceof ImageBitmap)
+			this.texture = new THREE.CanvasTexture(image);
+		else
+			this.texture = new THREE.Texture(image);
 		this.texture.flipY = false;
 		this.texture.needsUpdate = true;
 	}

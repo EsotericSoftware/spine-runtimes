@@ -22,7 +22,9 @@
 		<button id="walk">Walk</button>
 		<button id="jump">Jump</button>
 		<button id="roar">Roar</button>
+		<button id="screenshot">Screenshot</button>
 	</div>
+	<img id="screenshot-image" src="" style="width: 400px;">
 </body>
 <script>
 	// Creates a new spine player. The debugRender option enables
@@ -35,6 +37,9 @@
 		backgroundColor: "#cccccc",
 		viewport: {
 			debugRender: true,
+		},
+		debug: {
+			meshes: true
 		},
 		showControls: true,
 	});
@@ -50,6 +55,7 @@
 		premultipliedAlpha: true,
 		backgroundColor: "#00000000",
 		alpha: true,
+		preserveDrawingBuffer: true,
 		defaultMix: 1,
 		controlBones: ["root"],
 		success: (player) => {
@@ -65,6 +71,9 @@
 
 			document.getElementById("roar").addEventListener("click", event => {
 				jsControlledPlayer.setAnimation("roar", true); // set the jump animation to loop
+			});
+			document.getElementById("screenshot").addEventListener("click", event => {
+				document.getElementById("screenshot-image").src = player.canvas.toDataURL();
 			});
 		}
 	});

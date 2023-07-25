@@ -27,10 +27,6 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifdef SPINE_UE4
-#include "SpinePluginPrivatePCH.h"
-#endif
-
 #include <spine/PathConstraintData.h>
 
 #include <spine/BoneData.h>
@@ -39,6 +35,8 @@
 #include <assert.h>
 
 using namespace spine;
+
+RTTI_IMPL(PathConstraintData, ConstraintData)
 
 PathConstraintData::PathConstraintData(const String &name) : ConstraintData(name),
 															 _target(NULL),

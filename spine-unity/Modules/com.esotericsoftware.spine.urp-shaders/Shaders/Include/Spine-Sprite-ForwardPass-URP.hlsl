@@ -5,8 +5,16 @@
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 #include "SpineCoreShaders/SpriteLighting.cginc"
 #include "SpineCoreShaders/Spine-Common.cginc"
+#include "Spine-Common-URP.hlsl"
 
-#if defined(_RIM_LIGHTING) || defined(_ADDITIONAL_LIGHTS) || defined(MAIN_LIGHT_CALCULATE_SHADOWS)
+#if defined(_ALPHAPREMULTIPLY_ON)
+	#undef _STRAIGHT_ALPHA_INPUT
+#elif !defined(_STRAIGHT_ALPHA_INPUT)
+	#define _STRAIGHT_ALPHA_INPUT
+#endif
+#include "SpineCoreShaders/Spine-Skeleton-Tint-Common.cginc"
+
+#if defined(_RIM_LIGHTING) || defined(_ADDITIONAL_LIGHTS) || defined(MAIN_LIGHT_CALCULATE_SHADOWS) || defined(USE_LIGHT_COOKIES)
 	#define NEEDS_POSITION_WS
 #endif
 
@@ -37,12 +45,32 @@ struct VertexOutputLWRP
 #if defined(NEEDS_POSITION_WS)
 	float4 positionWS : TEXCOORD8;
 #endif
+#if defined(_TINT_BLACK_ON)
+	float3 darkColor : TEXCOORD9;
+#endif
+
 	UNITY_VERTEX_OUTPUT_STEREO
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 //                  Vertex and Fragment functions                            //
 ///////////////////////////////////////////////////////////////////////////////
+#if defined(_ADDITIONAL_LIGHT_SHADOWS) && !defined(_RECEIVE_SHADOWS_OFF)
+half4 CalculateShadowMaskBackwardsCompatible(InputData inputData)
+{
+	// To ensure backward compatibility we have to avoid using shadowMask input, as it is not present in older shaders
+#if defined(SHADOWS_SHADOWMASK) && defined(LIGHTMAP_ON)
+	half4 shadowMask = inputData.shadowMask;
+#elif !defined (LIGHTMAP_ON)
+	half4 shadowMask = unity_ProbesOcclusion;
+#else
+	half4 shadowMask = half4(1, 1, 1, 1);
+#endif
+
+	return shadowMask;
+}
+#endif
+
 half3 LightweightLightVertexSimplified(float3 positionWS, half3 normalWS) {
 #ifdef _MAIN_LIGHT_VERTEX
 	Light mainLight = GetMainLight();
@@ -74,10 +102,28 @@ half3 LightingLambertRamped(half3 lightColor, float attenuation, half3 lightDir,
 
 #if defined(SPECULAR)
 
+half3 ProcessLightPBRSimplified(InputData inputData, BRDFData brdfData, half4 shadowMask, uint meshRenderingLayers, int lightIndex)
+{
+#if defined(_ADDITIONAL_LIGHT_SHADOWS) && !defined(_RECEIVE_SHADOWS_OFF)
+	Light light = GetAdditionalLight(lightIndex, inputData.positionWS, shadowMask);
+#else
+	Light light = GetAdditionalLight(lightIndex, inputData.positionWS);
+#endif
+#ifdef USE_LIGHT_LAYERS
+	if (!IsMatchingLightLayer(light.layerMask, meshRenderingLayers))
+		return half3(0, 0, 0);
+#endif
+	return LightingPhysicallyBased(brdfData, light, inputData.normalWS, inputData.viewDirectionWS);
+}
+
 half4 LightweightFragmentPBRSimplified(InputData inputData, half4 texAlbedoAlpha, half metallic, half3 specular,
 	half smoothness, half3 emission, half4 vertexColor)
 {
+#if !defined(_TINT_BLACK_ON)
 	half4 albedo = texAlbedoAlpha * vertexColor;
+#else
+	half4 albedo = texAlbedoAlpha;
+#endif
 
 	BRDFData brdfData;
 	half ignoredAlpha = 1; // ignore alpha, otherwise
@@ -90,21 +136,39 @@ half4 LightweightFragmentPBRSimplified(InputData inputData, half4 texAlbedoAlpha
 #else
 	Light mainLight = GetMainLight();
 #endif
+#if defined(USE_LIGHT_COOKIES)
+	half3 cookieColor = SampleMainLightCookie(inputData.positionWS);
+	mainLight.color *= cookieColor;
+#endif
 
-	half3 finalColor = inputData.bakedGI;
+	half3 finalColor = inputData.bakedGI * albedo.rgb;
 	finalColor += LightingPhysicallyBased(brdfData, mainLight, inputData.normalWS, inputData.viewDirectionWS);
 #else // _MAIN_LIGHT_VERTEX
-	half3 finalColor = inputData.bakedGI;
+	half3 finalColor = inputData.bakedGI * albedo.rgb;
 #endif // _MAIN_LIGHT_VERTEX
 
 #ifdef _ADDITIONAL_LIGHTS
-	int pixelLightCount = GetAdditionalLightsCount();
-	for (int i = 0; i < pixelLightCount; ++i)
+	uint meshRenderingLayers = GetMeshRenderingLayerBackwardsCompatible();
+
+#if defined(_ADDITIONAL_LIGHT_SHADOWS) && !defined(_RECEIVE_SHADOWS_OFF)
+	half4 shadowMask = CalculateShadowMaskBackwardsCompatible(inputData);
+#else
+	half4 shadowMask = half4(1, 1, 1, 1);
+#endif
+
+#if USE_FORWARD_PLUS
+	for (uint lightIndex = 0; lightIndex < min(URP_FP_DIRECTIONAL_LIGHTS_COUNT, MAX_VISIBLE_LIGHTS); lightIndex++)
 	{
-		Light light = GetAdditionalLight(i, inputData.positionWS);
-		finalColor += LightingPhysicallyBased(brdfData, light, inputData.normalWS, inputData.viewDirectionWS);
+		FORWARD_PLUS_SUBTRACTIVE_LIGHT_CHECK
+		finalColor += ProcessLightPBRSimplified(inputData, brdfData, shadowMask, meshRenderingLayers, lightIndex);
 	}
 #endif
+	uint pixelLightCount = GetAdditionalLightsCount();
+	LIGHT_LOOP_BEGIN_SPINE(pixelLightCount)
+		finalColor += ProcessLightPBRSimplified(inputData, brdfData, shadowMask, meshRenderingLayers, lightIndex);
+	LIGHT_LOOP_END_SPINE
+
+#endif // _ADDITIONAL_LIGHTS
 
 #ifdef _ADDITIONAL_LIGHTS_VERTEX
 	finalColor += inputData.vertexLighting * brdfData.diffuse;
@@ -115,9 +179,35 @@ half4 LightweightFragmentPBRSimplified(InputData inputData, half4 texAlbedoAlpha
 
 #else // !SPECULAR
 
+half3 ProcessLightLambert(InputData inputData, half4 shadowMask, uint meshRenderingLayers, int lightIndex)
+{
+#if defined(_ADDITIONAL_LIGHT_SHADOWS) && !defined(_RECEIVE_SHADOWS_OFF)
+	Light light = GetAdditionalLight(lightIndex, inputData.positionWS, shadowMask);
+#else
+	Light light = GetAdditionalLight(lightIndex, inputData.positionWS);
+#endif
+
+#ifdef USE_LIGHT_LAYERS
+	if (!IsMatchingLightLayer(light.layerMask, meshRenderingLayers))
+		return half3(0, 0, 0);
+#endif
+
+	half3 attenuation = (light.distanceAttenuation * light.shadowAttenuation);
+	half3 attenuatedLightColor = light.color * attenuation;
+#ifndef _DIFFUSE_RAMP
+	return LightingLambert(attenuatedLightColor, light.direction, inputData.normalWS);
+#else
+	return LightingLambertRamped(light.color, attenuation, light.direction, inputData.normalWS);
+#endif
+}
+
 half4 LightweightFragmentBlinnPhongSimplified(InputData inputData, half4 texDiffuseAlpha, half3 emission, half4 vertexColor)
 {
+#if !defined(_TINT_BLACK_ON)
 	half4 diffuse = texDiffuseAlpha * vertexColor;
+#else
+	half4 diffuse = texDiffuseAlpha;
+#endif
 
 #ifndef _MAIN_LIGHT_VERTEX
 #if (defined(_MAIN_LIGHT_SHADOWS) || defined(MAIN_LIGHT_CALCULATE_SHADOWS)) && !defined(_RECEIVE_SHADOWS_OFF)
@@ -125,6 +215,11 @@ half4 LightweightFragmentBlinnPhongSimplified(InputData inputData, half4 texDiff
 #else
 	Light mainLight = GetMainLight();
 #endif
+#if defined(USE_LIGHT_COOKIES)
+	half3 cookieColor = SampleMainLightCookie(inputData.positionWS);
+	mainLight.color *= cookieColor;
+#endif
+
 	half3 diffuseLighting = inputData.bakedGI;
 
 	half3 attenuation = mainLight.distanceAttenuation* mainLight.shadowAttenuation;
@@ -139,18 +234,25 @@ half4 LightweightFragmentBlinnPhongSimplified(InputData inputData, half4 texDiff
 #endif // _MAIN_LIGHT_VERTEX
 
 #ifdef _ADDITIONAL_LIGHTS
-	int pixelLightCount = GetAdditionalLightsCount();
-	for (int i = 0; i < pixelLightCount; ++i)
-	{
-		Light light = GetAdditionalLight(i, inputData.positionWS);
-		half3 attenuation = (light.distanceAttenuation * light.shadowAttenuation);
-		half3 attenuatedLightColor = light.color * attenuation;
-#ifndef _DIFFUSE_RAMP
-		diffuseLighting += LightingLambert(attenuatedLightColor, light.direction, inputData.normalWS);
+	uint meshRenderingLayers = GetMeshRenderingLayerBackwardsCompatible();
+
+#if defined(_ADDITIONAL_LIGHT_SHADOWS) && !defined(_RECEIVE_SHADOWS_OFF)
+	half4 shadowMask = CalculateShadowMaskBackwardsCompatible(inputData);
 #else
-		diffuseLighting += LightingLambertRamped(light.color, attenuation, light.direction, inputData.normalWS);
+	half4 shadowMask = half4(1, 1, 1, 1);
 #endif
+#if USE_FORWARD_PLUS
+	for (uint lightIndex = 0; lightIndex < min(URP_FP_DIRECTIONAL_LIGHTS_COUNT, MAX_VISIBLE_LIGHTS); lightIndex++)
+	{
+		FORWARD_PLUS_SUBTRACTIVE_LIGHT_CHECK
+		diffuseLighting += ProcessLightLambert(inputData, shadowMask, meshRenderingLayers, lightIndex);
 	}
+#endif
+	uint pixelLightCount = GetAdditionalLightsCount();
+	LIGHT_LOOP_BEGIN_SPINE(pixelLightCount)
+		diffuseLighting += ProcessLightLambert(inputData, shadowMask, meshRenderingLayers, lightIndex);
+	LIGHT_LOOP_END_SPINE
+
 #endif
 #ifdef _ADDITIONAL_LIGHTS_VERTEX
 	diffuseLighting += inputData.vertexLighting;
@@ -171,6 +273,10 @@ VertexOutputLWRP ForwardPassVertexSprite(VertexInput input)
 
 	output.pos = calculateLocalPos(input.vertex);
 	output.vertexColor = calculateVertexColor(input.color);
+#if defined(_TINT_BLACK_ON)
+	output.darkColor = GammaToTargetSpace(
+		half3(input.tintBlackRG.r, input.tintBlackRG.g, input.tintBlackB.r)) + _Black.rgb;
+#endif
 	output.texcoord = float3(calculateTextureCoord(input.texcoord), 0);
 
 	float3 positionWS = TransformObjectToWorld(input.vertex.xyz);
@@ -205,17 +311,31 @@ VertexOutputLWRP ForwardPassVertexSprite(VertexInput input)
 	output.fogFactorAndVertexLight.x = fogFactor;
 #endif
 
+#if IS_URP_15_OR_NEWER
+	OUTPUT_SH(positionWS, normalWS.xyz, GetWorldSpaceNormalizeViewDir(positionWS), output.vertexSH);
+#else
 	OUTPUT_SH(normalWS.xyz, output.vertexSH);
+#endif
 	return output;
 }
 
-half4 ForwardPassFragmentSprite(VertexOutputLWRP input) : SV_Target
+half4 ForwardPassFragmentSprite(VertexOutputLWRP input
+#ifdef USE_WRITE_RENDERING_LAYERS
+	, out float4 outRenderingLayers : SV_Target1
+#endif
+) : SV_Target0
 {
 	UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
 
 	fixed4 texureColor = calculateTexturePixel(input.texcoord.xy);
-	RETURN_UNLIT_IF_ADDITIVE_SLOT(texureColor, input.vertexColor) // shall be called before ALPHA_CLIP
+
+	RETURN_UNLIT_IF_ADDITIVE_SLOT_TINT(texureColor, input.vertexColor, input.darkColor, _Color.a, _Black.a) // shall be called before ALPHA_CLIP
+
 	ALPHA_CLIP(texureColor, input.vertexColor)
+
+#if defined(_TINT_BLACK_ON)
+	texureColor = fragTintedColor(texureColor, input.darkColor, input.vertexColor, _Color.a, _Black.a);
+#endif
 
 	// fill out InputData struct
 	InputData inputData;
@@ -223,7 +343,7 @@ half4 ForwardPassFragmentSprite(VertexOutputLWRP input) : SV_Target
 	#if defined(REQUIRES_VERTEX_SHADOW_COORD_INTERPOLATOR)
 		inputData.shadowCoord = input.shadowCoord;
 	#elif defined(MAIN_LIGHT_CALCULATE_SHADOWS)
-		inputData.shadowCoord = TransformWorldToShadowCoord(input.positionWS);
+		inputData.shadowCoord = TransformWorldToShadowCoord(input.positionWS.xyz);
 	#elif defined(_MAIN_LIGHT_SHADOWS)
 		inputData.shadowCoord = input.shadowCoord;
 	#else
@@ -242,8 +362,13 @@ half4 ForwardPassFragmentSprite(VertexOutputLWRP input) : SV_Target
 
 	inputData.normalWS = normalWS;
 	inputData.bakedGI = SAMPLE_GI(input.lightmapUV, input.vertexSH, inputData.normalWS);
-#if defined(_RIM_LIGHTING) || defined(_ADDITIONAL_LIGHTS)
+#if defined(_RIM_LIGHTING) || defined(_ADDITIONAL_LIGHTS) || defined(USE_LIGHT_COOKIES)
 	inputData.positionWS = input.positionWS.rgb;
+#endif
+#if defined(_ADDITIONAL_LIGHTS) && USE_FORWARD_PLUS
+	inputData.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(input.pos);
+#else
+	inputData.normalizedScreenSpaceUV = 0;
 #endif
 
 #if defined(SPECULAR)
@@ -267,6 +392,11 @@ half4 ForwardPassFragmentSprite(VertexOutputLWRP input) : SV_Target
 
 	COLORISE(pixel)
 	APPLY_FOG_LWRP(pixel, input.fogFactorAndVertexLight.x)
+
+#ifdef USE_WRITE_RENDERING_LAYERS
+	uint renderingLayers = GetMeshRenderingLayerBackwardsCompatible();
+	outRenderingLayers = float4(EncodeMeshRenderingLayer(renderingLayers), 0, 0, 0);
+#endif
 
 	return pixel;
 }

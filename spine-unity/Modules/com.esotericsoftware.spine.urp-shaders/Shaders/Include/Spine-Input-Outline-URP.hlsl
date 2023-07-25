@@ -10,13 +10,15 @@
 
 CBUFFER_START(UnityPerMaterial)
 float4 _MainTex_ST;
+#ifndef NO_CUTOFF_PARAM
 half _Cutoff;
-
+#endif
 float _OutlineWidth;
 float4 _OutlineColor;
 float4 _MainTex_TexelSize;
 float _ThresholdEnd;
 float _OutlineSmoothness;
+float _OutlineOpaqueAlpha;
 float _OutlineMipLevel;
 int _OutlineReferenceTexWidth;
 CBUFFER_END

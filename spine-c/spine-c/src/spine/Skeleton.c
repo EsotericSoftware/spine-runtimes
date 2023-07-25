@@ -437,7 +437,6 @@ void spSkeleton_updateWorldTransformWith(const spSkeleton *self, const spBone *p
 	/* Apply the parent bone transform to the root bone. The root bone always inherits scale, rotation and reflection. */
 	int i;
 	float rotationY, la, lb, lc, ld;
-	_spUpdate *updateCache;
 	_spSkeleton *internal = SUB_CAST(_spSkeleton, self);
 	spBone *rootBone = self->root;
 	float pa = parent->a, pb = parent->b, pc = parent->c, pd = parent->d;
@@ -455,7 +454,6 @@ void spSkeleton_updateWorldTransformWith(const spSkeleton *self, const spBone *p
 	CONST_CAST(float, rootBone->d) = (pc * lb + pd * ld) * self->scaleY;
 
 	/* Update everything except root bone. */
-	updateCache = internal->updateCache;
 	for (i = 0; i < internal->updateCacheCount; ++i) {
 		_spUpdate *update = internal->updateCache + i;
 		switch (update->type) {

@@ -61,11 +61,15 @@ namespace Spine.Unity {
 		private bool wasUpdatedAfterInit = true;
 		#endregion
 
-		#region Bone Callbacks ISkeletonAnimation
+		#region Bone and Initialization Callbacks ISkeletonAnimation
+		protected event ISkeletonAnimationDelegate _OnAnimationRebuild;
 		protected event UpdateBonesDelegate _BeforeApply;
 		protected event UpdateBonesDelegate _UpdateLocal;
 		protected event UpdateBonesDelegate _UpdateWorld;
 		protected event UpdateBonesDelegate _UpdateComplete;
+
+		/// <summary>OnAnimationRebuild is raised after the SkeletonAnimation component is successfully initialized.</summary>
+		public event ISkeletonAnimationDelegate OnAnimationRebuild { add { _OnAnimationRebuild += value; } remove { _OnAnimationRebuild -= value; } }
 
 		/// <summary>
 		/// Occurs before the animations are applied.
@@ -90,6 +94,16 @@ namespace Spine.Unity {
 		/// Use this callback if you want to use bone world space values, but don't intend to modify bone local values.
 		/// This callback can also be used when setting world position and the bone matrix.</summary>
 		public event UpdateBonesDelegate UpdateComplete { add { _UpdateComplete += value; } remove { _UpdateComplete -= value; } }
+
+		[SerializeField] protected UpdateTiming updateTiming = UpdateTiming.InUpdate;
+		public UpdateTiming UpdateTiming { get { return updateTiming; } set { updateTiming = value; } }
+
+		/// <summary>If enabled, AnimationState uses unscaled game time
+		/// (<c>Time.unscaledDeltaTime</c> instead of normal game time(<c>Time.deltaTime</c>),
+		/// running animations independent of e.g. game pause (<c>Time.timeScale</c>).
+		/// Instance SkeletonAnimation.timeScale will still be applied.</summary>
+		[SerializeField] protected bool unscaledTime;
+		public bool UnscaledTime { get { return unscaledTime; } set { unscaledTime = value; } }
 		#endregion
 
 		#region Serialized state and Beginner API
@@ -121,7 +135,7 @@ namespace Spine.Unity {
 				if (string.IsNullOrEmpty(value)) {
 					state.ClearTrack(0);
 				} else {
-					var animationObject = skeletonDataAsset.GetSkeletonData(false).FindAnimation(value);
+					Spine.Animation animationObject = skeletonDataAsset.GetSkeletonData(false).FindAnimation(value);
 					if (animationObject != null)
 						state.SetAnimation(0, animationObject, loop);
 				}
@@ -166,6 +180,10 @@ namespace Spine.Unity {
 		public override void Initialize (bool overwrite, bool quiet = false) {
 			if (valid && !overwrite)
 				return;
+#if UNITY_EDITOR
+			if (BuildUtilities.IsInSkeletonAssetBuildPreProcessing)
+				return;
+#endif
 			base.Initialize(overwrite, quiet);
 
 			if (!valid)
@@ -174,7 +192,7 @@ namespace Spine.Unity {
 			wasUpdatedAfterInit = false;
 
 			if (!string.IsNullOrEmpty(_animationName)) {
-				var animationObject = skeletonDataAsset.GetSkeletonData(false).FindAnimation(_animationName);
+				Spine.Animation animationObject = skeletonDataAsset.GetSkeletonData(false).FindAnimation(_animationName);
 				if (animationObject != null) {
 					state.SetAnimation(0, animationObject, loop);
 #if UNITY_EDITOR
@@ -183,17 +201,25 @@ namespace Spine.Unity {
 #endif
 				}
 			}
+
+			if (_OnAnimationRebuild != null)
+				_OnAnimationRebuild(this);
 		}
 
-		void Update () {
+		virtual protected void Update () {
 #if UNITY_EDITOR
 			if (!Application.isPlaying) {
 				Update(0f);
 				return;
 			}
 #endif
+			if (updateTiming != UpdateTiming.InUpdate) return;
+			Update(unscaledTime ? Time.unscaledDeltaTime : Time.deltaTime);
+		}
 
-			Update(Time.deltaTime);
+		virtual protected void FixedUpdate () {
+			if (updateTiming != UpdateTiming.InFixedUpdate) return;
+			Update(unscaledTime ? Time.unscaledDeltaTime : Time.deltaTime);
 		}
 
 		/// <summary>Progresses the AnimationState according to the given deltaTime, and applies it to the Skeleton. Use Time.deltaTime to update manually. Use deltaTime 0 to update without progressing the time.</summary>
@@ -227,6 +253,10 @@ namespace Spine.Unity {
 			else
 				state.ApplyEventTimelinesOnly(skeleton, issueEvents: true);
 
+			AfterAnimationApplied();
+		}
+
+		public void AfterAnimationApplied () {
 			if (_UpdateLocal != null)
 				_UpdateLocal(this);
 

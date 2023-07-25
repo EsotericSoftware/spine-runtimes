@@ -175,7 +175,6 @@ void spBone_updateWorldTransformWith(spBone *self, float x, float y, float rotat
 			CONST_CAST(float, self->b) = za * lb + zb * ld;
 			CONST_CAST(float, self->c) = zc * la + zd * lc;
 			CONST_CAST(float, self->d) = zc * lb + zd * ld;
-			break;
 		}
 	}
 
@@ -216,6 +215,14 @@ float spBone_getWorldScaleY(spBone *self) {
  * <p>
  * Some information is ambiguous in the world transform, such as -1,-1 scale versus 180 rotation. */
 void spBone_updateAppliedTransform(spBone *self) {
+	float pa, pb, pc, pd;
+	float pid;
+	float ia, ib, ic, id;
+	float dx, dy;
+	float ra, rb, rc, rd;
+	float s, r, sa, sc;
+	float cosine, sine;
+
 	spBone *parent = self->parent;
 	if (!parent) {
 		self->ax = self->worldX - self->skeleton->x;
@@ -225,33 +232,74 @@ void spBone_updateAppliedTransform(spBone *self) {
 		self->ascaleY = SQRT(self->b * self->b + self->d * self->d);
 		self->ashearX = 0;
 		self->ashearY = ATAN2(self->a * self->b + self->c * self->d, self->a * self->d - self->b * self->c) * RAD_DEG;
+		return;
+	}
+
+	pa = parent->a, pb = parent->b, pc = parent->c, pd = parent->d;
+	pid = 1 / (pa * pd - pb * pc);
+	ia = pd * pid, ib = pb * pid, ic = pc * pid, id = pa * pid;
+	dx = self->worldX - parent->worldX, dy = self->worldY - parent->worldY;
+	self->ax = (dx * ia - dy * ib);
+	self->ay = (dy * id - dx * ic);
+
+	if (self->data->transformMode == SP_TRANSFORMMODE_ONLYTRANSLATION) {
+		ra = self->a;
+		rb = self->b;
+		rc = self->c;
+		rd = self->d;
 	} else {
-		float pa = parent->a, pb = parent->b, pc = parent->c, pd = parent->d;
-		float pid = 1 / (pa * pd - pb * pc);
-		float dx = self->worldX - parent->worldX, dy = self->worldY - parent->worldY;
-		float ia = pid * pd;
-		float id = pid * pa;
-		float ib = pid * pb;
-		float ic = pid * pc;
-		float ra = ia * self->a - ib * self->c;
-		float rb = ia * self->b - ib * self->d;
-		float rc = id * self->c - ic * self->a;
-		float rd = id * self->d - ic * self->b;
-		self->ax = (dx * pd * pid - dy * pb * pid);
-		self->ay = (dy * pa * pid - dx * pc * pid);
-		self->ashearX = 0;
-		self->ascaleX = SQRT(ra * ra + rc * rc);
-		if (self->ascaleX > 0.0001f) {
-			float det = ra * rd - rb * rc;
-			self->ascaleY = det / self->ascaleX;
-			self->ashearY = ATAN2(ra * rb + rc * rd, det) * RAD_DEG;
-			self->arotation = ATAN2(rc, ra) * RAD_DEG;
-		} else {
-			self->ascaleX = 0;
-			self->ascaleY = SQRT(rb * rb + rd * rd);
-			self->ashearY = 0;
-			self->arotation = 90 - ATAN2(rd, rb) * RAD_DEG;
+		switch (self->data->transformMode) {
+			case SP_TRANSFORMMODE_NOROTATIONORREFLECTION: {
+				s = ABS(pa * pd - pb * pc) / (pa * pa + pc * pc);
+				sa = pa / self->skeleton->scaleX;
+				sc = pc / self->skeleton->scaleY;
+				pb = -sc * s * self->skeleton->scaleX;
+				pd = sa * s * self->skeleton->scaleY;
+				pid = 1 / (pa * pd - pb * pc);
+				ia = pd * pid;
+				ib = pb * pid;
+				break;
+			}
+			case SP_TRANSFORMMODE_NOSCALE:
+			case SP_TRANSFORMMODE_NOSCALEORREFLECTION:
+				cosine = COS_DEG(self->rotation), sine = SIN_DEG(self->rotation);
+				pa = (pa * cosine + pb * sine) / self->skeleton->scaleX;
+				pc = (pc * cosine + pd * sine) / self->skeleton->scaleY;
+				s = SQRT(pa * pa + pc * pc);
+				if (s > 0.00001f) s = 1 / s;
+				pa *= s;
+				pc *= s;
+				s = SQRT(pa * pa + pc * pc);
+				if (self->data->transformMode == SP_TRANSFORMMODE_NOSCALE &&
+					pid < 0 != (self->skeleton->scaleX < 0 != self->skeleton->scaleY < 0))
+					s = -s;
+				r = PI / 2 + ATAN2(pc, pa);
+				pb = COS(r) * s;
+				pd = SIN(r) * s;
+				pid = 1 / (pa * pd - pb * pc);
+				ia = pd * pid;
+				ib = pb * pid;
+				ic = pc * pid;
+				id = pa * pid;
 		}
+		ra = ia * self->a - ib * self->c;
+		rb = ia * self->b - ib * self->d;
+		rc = id * self->c - ic * self->a;
+		rd = id * self->d - ic * self->b;
+	}
+
+	self->ashearX = 0;
+	self->ascaleX = SQRT(ra * ra + rc * rc);
+	if (self->ascaleX > 0.0001f) {
+		float det = ra * rd - rb * rc;
+		self->ascaleY = det / self->ascaleX;
+		self->ashearY = -ATAN2(ra * rb + rc * rd, det) * RAD_DEG;
+		self->arotation = ATAN2(rc, ra) * RAD_DEG;
+	} else {
+		self->ascaleX = 0;
+		self->ascaleY = SQRT(rb * rb + rd * rd);
+		self->ashearY = 0;
+		self->arotation = 90 - ATAN2(rd, rb) * RAD_DEG;
 	}
 }
 

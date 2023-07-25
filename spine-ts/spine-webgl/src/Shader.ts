@@ -39,11 +39,11 @@ export class Shader implements Disposable, Restorable {
 	public static SAMPLER = "u_texture";
 
 	private context: ManagedWebGLRenderingContext;
-	private vs: WebGLShader = null;
+	private vs: WebGLShader | null = null;
 	private vsSource: string;
-	private fs: WebGLShader = null;
+	private fs: WebGLShader | null = null;
 	private fsSource: string;
-	private program: WebGLProgram = null;
+	private program: WebGLProgram | null = null;
 	private tmp2x2: Float32Array = new Float32Array(2 * 2);
 	private tmp3x3: Float32Array = new Float32Array(3 * 3);
 	private tmp4x4: Float32Array = new Float32Array(4 * 4);
@@ -66,7 +66,9 @@ export class Shader implements Disposable, Restorable {
 		let gl = this.context.gl;
 		try {
 			this.vs = this.compileShader(gl.VERTEX_SHADER, this.vertexShader);
+			if (!this.vs) throw new Error("Couldn't compile vertex shader.");
 			this.fs = this.compileShader(gl.FRAGMENT_SHADER, this.fragmentShader);
+			if (!this.fs) throw new Error("Couldn#t compile fragment shader.");
 			this.program = this.compileProgram(this.vs, this.fs);
 		} catch (e) {
 			this.dispose();
@@ -77,6 +79,7 @@ export class Shader implements Disposable, Restorable {
 	private compileShader (type: number, source: string) {
 		let gl = this.context.gl;
 		let shader = gl.createShader(type);
+		if (!shader) throw new Error("Couldn't create shader.");
 		gl.shaderSource(shader, source);
 		gl.compileShader(shader);
 		if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
@@ -90,6 +93,7 @@ export class Shader implements Disposable, Restorable {
 	private compileProgram (vs: WebGLShader, fs: WebGLShader) {
 		let gl = this.context.gl;
 		let program = gl.createProgram();
+		if (!program) throw new Error("Couldn't compile program.");
 		gl.attachShader(program, vs);
 		gl.attachShader(program, fs);
 		gl.linkProgram(program);
@@ -152,8 +156,9 @@ export class Shader implements Disposable, Restorable {
 		gl.uniformMatrix4fv(this.getUniformLocation(uniform), false, this.tmp4x4);
 	}
 
-	public getUniformLocation (uniform: string): WebGLUniformLocation {
+	public getUniformLocation (uniform: string): WebGLUniformLocation | null {
 		let gl = this.context.gl;
+		if (!this.program) throw new Error("Shader not compiled.");
 		let location = gl.getUniformLocation(this.program, uniform);
 		if (!location && !gl.isContextLost()) throw new Error(`Couldn't find location for uniform ${uniform}`);
 		return location;
@@ -161,6 +166,7 @@ export class Shader implements Disposable, Restorable {
 
 	public getAttributeLocation (attribute: string): number {
 		let gl = this.context.gl;
+		if (!this.program) throw new Error("Shader not compiled.");
 		let location = gl.getAttribLocation(this.program, attribute);
 		if (location == -1 && !gl.isContextLost()) throw new Error(`Couldn't find location for attribute ${attribute}`);
 		return location;
@@ -188,106 +194,106 @@ export class Shader implements Disposable, Restorable {
 
 	public static newColoredTextured (context: ManagedWebGLRenderingContext | WebGLRenderingContext): Shader {
 		let vs = `
-				attribute vec4 ${Shader.POSITION};
-				attribute vec4 ${Shader.COLOR};
-				attribute vec2 ${Shader.TEXCOORDS};
-				uniform mat4 ${Shader.MVP_MATRIX};
-				varying vec4 v_color;
-				varying vec2 v_texCoords;
+attribute vec4 ${Shader.POSITION};
+attribute vec4 ${Shader.COLOR};
+attribute vec2 ${Shader.TEXCOORDS};
+uniform mat4 ${Shader.MVP_MATRIX};
+varying vec4 v_color;
+varying vec2 v_texCoords;
 
-				void main () {
-					v_color = ${Shader.COLOR};
-					v_texCoords = ${Shader.TEXCOORDS};
-					gl_Position = ${Shader.MVP_MATRIX} * ${Shader.POSITION};
-				}
-			`;
+void main () {
+	v_color = ${Shader.COLOR};
+	v_texCoords = ${Shader.TEXCOORDS};
+	gl_Position = ${Shader.MVP_MATRIX} * ${Shader.POSITION};
+}
+`;
 
 		let fs = `
-				#ifdef GL_ES
-					#define LOWP lowp
-					precision mediump float;
-				#else
-					#define LOWP
-				#endif
-				varying LOWP vec4 v_color;
-				varying vec2 v_texCoords;
-				uniform sampler2D u_texture;
+#ifdef GL_ES
+	#define LOWP lowp
+	precision mediump float;
+#else
+	#define LOWP
+#endif
+varying LOWP vec4 v_color;
+varying vec2 v_texCoords;
+uniform sampler2D u_texture;
 
-				void main () {
-					gl_FragColor = v_color * texture2D(u_texture, v_texCoords);
-				}
-			`;
+void main () {
+	gl_FragColor = v_color * texture2D(u_texture, v_texCoords);
+}
+`;
 
 		return new Shader(context, vs, fs);
 	}
 
 	public static newTwoColoredTextured (context: ManagedWebGLRenderingContext | WebGLRenderingContext): Shader {
 		let vs = `
-				attribute vec4 ${Shader.POSITION};
-				attribute vec4 ${Shader.COLOR};
-				attribute vec4 ${Shader.COLOR2};
-				attribute vec2 ${Shader.TEXCOORDS};
-				uniform mat4 ${Shader.MVP_MATRIX};
-				varying vec4 v_light;
-				varying vec4 v_dark;
-				varying vec2 v_texCoords;
+attribute vec4 ${Shader.POSITION};
+attribute vec4 ${Shader.COLOR};
+attribute vec4 ${Shader.COLOR2};
+attribute vec2 ${Shader.TEXCOORDS};
+uniform mat4 ${Shader.MVP_MATRIX};
+varying vec4 v_light;
+varying vec4 v_dark;
+varying vec2 v_texCoords;
 
-				void main () {
-					v_light = ${Shader.COLOR};
-					v_dark = ${Shader.COLOR2};
-					v_texCoords = ${Shader.TEXCOORDS};
-					gl_Position = ${Shader.MVP_MATRIX} * ${Shader.POSITION};
-				}
-			`;
+void main () {
+	v_light = ${Shader.COLOR};
+	v_dark = ${Shader.COLOR2};
+	v_texCoords = ${Shader.TEXCOORDS};
+	gl_Position = ${Shader.MVP_MATRIX} * ${Shader.POSITION};
+}
+`;
 
 		let fs = `
-				#ifdef GL_ES
-					#define LOWP lowp
-					precision mediump float;
-				#else
-					#define LOWP
-				#endif
-				varying LOWP vec4 v_light;
-				varying LOWP vec4 v_dark;
-				varying vec2 v_texCoords;
-				uniform sampler2D u_texture;
+#ifdef GL_ES
+	#define LOWP lowp
+	precision mediump float;
+#else
+	#define LOWP
+#endif
+varying LOWP vec4 v_light;
+varying LOWP vec4 v_dark;
+varying vec2 v_texCoords;
+uniform sampler2D u_texture;
 
-				void main () {
-					vec4 texColor = texture2D(u_texture, v_texCoords);
-					gl_FragColor.a = texColor.a * v_light.a;
-					gl_FragColor.rgb = ((texColor.a - 1.0) * v_dark.a + 1.0 - texColor.rgb) * v_dark.rgb + texColor.rgb * v_light.rgb;
-				}
-			`;
+void main () {
+	vec4 texColor = texture2D(u_texture, v_texCoords);
+	gl_FragColor.a = texColor.a * v_light.a;
+	gl_FragColor.rgb = ((texColor.a - 1.0) * v_dark.a + 1.0 - texColor.rgb) * v_dark.rgb + texColor.rgb * v_light.rgb;
+}
+`;
 
 		return new Shader(context, vs, fs);
 	}
 
 	public static newColored (context: ManagedWebGLRenderingContext | WebGLRenderingContext): Shader {
 		let vs = `
-				attribute vec4 ${Shader.POSITION};
-				attribute vec4 ${Shader.COLOR};
-				uniform mat4 ${Shader.MVP_MATRIX};
-				varying vec4 v_color;
+attribute vec4 ${Shader.POSITION};
+attribute vec4 ${Shader.COLOR};
+uniform mat4 ${Shader.MVP_MATRIX};
+varying vec4 v_color;
 
-				void main () {
-					v_color = ${Shader.COLOR};
-					gl_Position = ${Shader.MVP_MATRIX} * ${Shader.POSITION};
-				}
-			`;
+void main () {
+	v_color = ${Shader.COLOR};
+	gl_Position = ${Shader.MVP_MATRIX} * ${Shader.POSITION};
+}
+`;
 
 		let fs = `
-				#ifdef GL_ES
-					#define LOWP lowp
-					precision mediump float;
-				#else
-					#define LOWP
-				#endif
-				varying LOWP vec4 v_color;
+#ifdef GL_ES
+	#define LOWP lowp
+	precision mediump float;
+#else
+	#define LOWP
+#endif
+varying LOWP vec4 v_color;
 
-				void main () {
-					gl_FragColor = v_color;
-				}
-			`;
+void main () {
+	gl_FragColor = v_color;
+}
+`;
 
 		return new Shader(context, vs, fs);
 	}

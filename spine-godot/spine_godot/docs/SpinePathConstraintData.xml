@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpinePathConstraintData" inherits="SpineConstraintData" version="3.4">
+	<brief_description>
+	</brief_description>
+	<description>
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="get_bones">
+			<return type="Array" />
+			<description>
+				The bones that will be modified by this path constraint. Modifying the array has no effect.
+			</description>
+		</method>
+		<method name="get_mix_rotate">
+			<return type="float" />
+			<description>
+				A percentage (0-1) that controls the mix between the constrained and unconstrained rotation.
+			</description>
+		</method>
+		<method name="get_mix_x">
+			<return type="float" />
+			<description>
+				A percentage (0-1) that controls the mix between the constrained and unconstrained translation X.
+			</description>
+		</method>
+		<method name="get_mix_y">
+			<return type="float" />
+			<description>
+				A percentage (0-1) that controls the mix between the constrained and unconstrained translation Y.
+			</description>
+		</method>
+		<method name="get_offset_rotation">
+			<return type="float" />
+			<description>
+				An offset added to the constrained bone rotation.
+			</description>
+		</method>
+		<method name="get_position">
+			<return type="float" />
+			<description>
+				The position along the path.
+			</description>
+		</method>
+		<method name="get_position_mode">
+			<return type="int" enum="SpineConstant.PositionMode" />
+			<description>
+				The mode for positioning the first bone on the path.
+			</description>
+		</method>
+		<method name="get_rotate_mode">
+			<return type="int" enum="SpineConstant.RotateMode" />
+			<description>
+				The mode for adjusting the rotation of the bones.
+			</description>
+		</method>
+		<method name="get_spacing">
+			<return type="float" />
+			<description>
+				The spacing between bones.
+			</description>
+		</method>
+		<method name="get_spacing_mode">
+			<return type="int" enum="SpineConstant.SpacingMode" />
+			<description>
+				The mode for positioning the bones after the first bone on the path.
+			</description>
+		</method>
+		<method name="get_target">
+			<return type="SpineSlotData" />
+			<description>
+				The slot whose path attachment will be used to constrained the bones.
+			</description>
+		</method>
+		<method name="set_mix_rotate">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_mix_x">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_mix_y">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_offset_rotation">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_position">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_position_mode">
+			<return type="void" />
+			<argument index="0" name="v" type="int" enum="SpineConstant.PositionMode" />
+			<description>
+			</description>
+		</method>
+		<method name="set_rotate_mode">
+			<return type="void" />
+			<argument index="0" name="v" type="int" enum="SpineConstant.RotateMode" />
+			<description>
+			</description>
+		</method>
+		<method name="set_spacing">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_spacing_mode">
+			<return type="void" />
+			<argument index="0" name="v" type="int" enum="SpineConstant.SpacingMode" />
+			<description>
+			</description>
+		</method>
+		<method name="set_target">
+			<return type="void" />
+			<argument index="0" name="v" type="SpineSlotData" />
+			<description>
+			</description>
+		</method>
+	</methods>
+	<constants>
+	</constants>
+</class>

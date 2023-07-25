@@ -1421,7 +1421,7 @@ TextMesh:
 
     animated via physics.
 
-    Try moving and jumping. (WASD+Spacebar, or XBOX Controller)'
+    Try moving and jumping. (WASD+Spacebar, or Gamepad)'
   m_OffsetZ: 0
   m_CharacterSize: 0.1
   m_LineSpacing: 1

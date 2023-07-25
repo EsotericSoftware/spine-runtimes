@@ -63,6 +63,10 @@ namespace Spine.Unity {
 		public float defaultMix;
 		public RuntimeAnimatorController controller;
 
+#if UNITY_EDITOR
+		public static bool errorIfSkeletonFileNullGlobal = true;
+#endif
+
 		public bool IsLoaded { get { return this.skeletonData != null; } }
 
 		void Reset () {
@@ -112,6 +116,9 @@ namespace Spine.Unity {
 		/// <summary>Loads, caches and returns the SkeletonData from the skeleton data file. Returns the cached SkeletonData after the first time it is called. Pass false to prevent direct errors from being logged.</summary>
 		public SkeletonData GetSkeletonData (bool quiet) {
 			if (skeletonJSON == null) {
+#if UNITY_EDITOR
+				if (!errorIfSkeletonFileNullGlobal) quiet = true;
+#endif
 				if (!quiet)
 					Debug.LogError("Skeleton JSON file not set for SkeletonData asset: " + name, this);
 				Clear();
@@ -197,7 +204,7 @@ namespace Spine.Unity {
 				return null;
 
 			if (skeletonDataModifiers != null) {
-				foreach (var modifier in skeletonDataModifiers) {
+				foreach (SkeletonDataModifierAsset modifier in skeletonDataModifiers) {
 					if (modifier != null && !(isUpgradingBlendModeMaterials && modifier is BlendModeMaterialsAsset)) {
 						modifier.Apply(loadedSkeletonData);
 					}
@@ -217,24 +224,40 @@ namespace Spine.Unity {
 			FillStateData();
 		}
 
-		public void FillStateData () {
+		public void FillStateData (bool quiet = false) {
 			if (stateData != null) {
 				stateData.DefaultMix = defaultMix;
 
 				for (int i = 0, n = fromAnimation.Length; i < n; i++) {
-					if (fromAnimation[i].Length == 0 || toAnimation[i].Length == 0)
+					string fromAnimationName = fromAnimation[i];
+					string toAnimationName = toAnimation[i];
+					if (fromAnimationName.Length == 0 || toAnimationName.Length == 0)
 						continue;
-					stateData.SetMix(fromAnimation[i], toAnimation[i], duration[i]);
+#if UNITY_EDITOR
+					if (skeletonData.FindAnimation(fromAnimationName) == null) {
+						if (!quiet) Debug.LogError(
+							string.Format("Custom Mix Durations: Animation '{0}' not found, was it renamed?",
+								fromAnimationName), this);
+						continue;
+					}
+					if (skeletonData.FindAnimation(toAnimationName) == null) {
+						if (!quiet) Debug.LogError(
+							string.Format("Custom Mix Durations: Animation '{0}' not found, was it renamed?",
+								toAnimationName), this);
+						continue;
+					}
+#endif
+					stateData.SetMix(fromAnimationName, toAnimationName, duration[i]);
 				}
 			}
 		}
 
 		internal Atlas[] GetAtlasArray () {
-			var returnList = new System.Collections.Generic.List<Atlas>(atlasAssets.Length);
+			List<Atlas> returnList = new System.Collections.Generic.List<Atlas>(atlasAssets.Length);
 			for (int i = 0; i < atlasAssets.Length; i++) {
-				var aa = atlasAssets[i];
+				AtlasAssetBase aa = atlasAssets[i];
 				if (aa == null) continue;
-				var a = aa.GetAtlas();
+				Atlas a = aa.GetAtlas();
 				if (a == null) continue;
 				returnList.Add(a);
 			}
@@ -242,8 +265,8 @@ namespace Spine.Unity {
 		}
 
 		internal static SkeletonData ReadSkeletonData (byte[] bytes, AttachmentLoader attachmentLoader, float scale) {
-			using (var input = new MemoryStream(bytes)) {
-				var binary = new SkeletonBinary(attachmentLoader) {
+			using (MemoryStream input = new MemoryStream(bytes)) {
+				SkeletonBinary binary = new SkeletonBinary(attachmentLoader) {
 					Scale = scale
 				};
 				return binary.ReadSkeletonData(input);
@@ -251,8 +274,8 @@ namespace Spine.Unity {
 		}
 
 		internal static SkeletonData ReadSkeletonData (string text, AttachmentLoader attachmentLoader, float scale) {
-			var input = new StringReader(text);
-			var json = new SkeletonJson(attachmentLoader) {
+			StringReader input = new StringReader(text);
+			SkeletonJson json = new SkeletonJson(attachmentLoader) {
 				Scale = scale
 			};
 			return json.ReadSkeletonData(input);

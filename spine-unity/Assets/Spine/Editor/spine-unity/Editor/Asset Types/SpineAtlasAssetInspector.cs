@@ -125,7 +125,7 @@ namespace Spine.Unity.Editor {
 
 			for (int i = 0; i < materials.arraySize; i++) {
 				SerializedProperty prop = materials.GetArrayElementAtIndex(i);
-				var material = (Material)prop.objectReferenceValue;
+				Material material = (Material)prop.objectReferenceValue;
 				if (material == null) {
 					EditorGUILayout.HelpBox("Materials cannot be null.", MessageType.Error);
 					return;
@@ -134,10 +134,10 @@ namespace Spine.Unity.Editor {
 
 			EditorGUILayout.Space();
 			if (SpineInspectorUtility.LargeCenteredButton(SpineInspectorUtility.TempContent("Set Mipmap Bias to " + SpinePreferences.DEFAULT_MIPMAPBIAS, tooltip: "This may help textures with mipmaps be less blurry when used for 2D sprites."))) {
-				foreach (var m in atlasAsset.materials) {
-					var texture = m.mainTexture;
+				foreach (Material m in atlasAsset.materials) {
+					Texture texture = m.mainTexture;
 					string texturePath = AssetDatabase.GetAssetPath(texture.GetInstanceID());
-					var importer = (TextureImporter)TextureImporter.GetAtPath(texturePath);
+					TextureImporter importer = (TextureImporter)TextureImporter.GetAtPath(texturePath);
 					importer.mipMapBias = SpinePreferences.DEFAULT_MIPMAPBIAS;
 					EditorUtility.SetDirty(texture);
 				}
@@ -147,8 +147,8 @@ namespace Spine.Unity.Editor {
 			EditorGUILayout.Space();
 			if (atlasFile.objectReferenceValue != null) {
 				if (SpineInspectorUtility.LargeCenteredButton(SpriteSlicesLabel)) {
-					var atlas = atlasAsset.GetAtlas();
-					foreach (var m in atlasAsset.materials)
+					Atlas atlas = atlasAsset.GetAtlas();
+					foreach (Material m in atlasAsset.materials)
 						UpdateSpriteSlices(m.mainTexture, atlas);
 				}
 			}
@@ -267,7 +267,7 @@ namespace Spine.Unity.Editor {
 
 				int baseIndent = EditorGUI.indentLevel;
 
-				var regions = SpineAtlasAssetInspector.GetRegions(atlasAsset.GetAtlas());
+				List<AtlasRegion> regions = SpineAtlasAssetInspector.GetRegions(atlasAsset.GetAtlas());
 				int regionsCount = regions.Count;
 				using (new EditorGUILayout.HorizontalScope()) {
 					EditorGUILayout.LabelField("Atlas Regions", EditorStyles.boldLabel);
@@ -314,18 +314,17 @@ namespace Spine.Unity.Editor {
 
 		static public void UpdateSpriteSlices (Texture texture, Atlas atlas) {
 			string texturePath = AssetDatabase.GetAssetPath(texture.GetInstanceID());
-			var t = (TextureImporter)TextureImporter.GetAtPath(texturePath);
+			TextureImporter t = (TextureImporter)TextureImporter.GetAtPath(texturePath);
 			t.spriteImportMode = SpriteImportMode.Multiple;
-			var spriteSheet = t.spritesheet;
-			var sprites = new List<SpriteMetaData>(spriteSheet);
+			SpriteMetaData[] spriteSheet = t.spritesheet;
+			List<SpriteMetaData> sprites = new List<SpriteMetaData>(spriteSheet);
 
-			var regions = SpineAtlasAssetInspector.GetRegions(atlas);
-			char[] FilenameDelimiter = { '.' };
+			List<AtlasRegion> regions = SpineAtlasAssetInspector.GetRegions(atlas);
 			int updatedCount = 0;
 			int addedCount = 0;
 
-			foreach (var r in regions) {
-				string pageName = r.page.name.Split(FilenameDelimiter, StringSplitOptions.RemoveEmptyEntries)[0];
+			foreach (AtlasRegion r in regions) {
+				string pageName = System.IO.Path.GetFileNameWithoutExtension(r.page.name);
 				string textureName = texture.name;
 				bool pageMatch = string.Equals(pageName, textureName, StringComparison.Ordinal);
 
@@ -356,7 +355,7 @@ namespace Spine.Unity.Editor {
 					spriteRect.y = r.page.height - spriteRect.height - r.y;
 
 					if (spriteNameMatchExists) {
-						var s = sprites[spriteIndex];
+						SpriteMetaData s = sprites[spriteIndex];
 						s.rect = spriteRect;
 						sprites[spriteIndex] = s;
 						updatedCount++;

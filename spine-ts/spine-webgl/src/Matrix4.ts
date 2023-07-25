@@ -27,6 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+import { Vector2 } from "@esotericsoftware/spine-core";
 import { Vector3 } from "./Vector3";
 
 export const M00 = 0;
@@ -50,9 +51,9 @@ export class Matrix4 {
 	temp: Float32Array = new Float32Array(16);
 	values: Float32Array = new Float32Array(16);
 
-	private static xAxis: Vector3 = null;
-	private static yAxis: Vector3 = null;
-	private static zAxis: Vector3 = null;
+	private static xAxis = new Vector3();
+	private static yAxis = new Vector3();
+	private static zAxis = new Vector3();
 	private static tmpMatrix = new Matrix4();
 
 	constructor () {
@@ -305,7 +306,6 @@ export class Matrix4 {
 	}
 
 	lookAt (position: Vector3, direction: Vector3, up: Vector3) {
-		Matrix4.initTemps();
 		let xAxis = Matrix4.xAxis, yAxis = Matrix4.yAxis, zAxis = Matrix4.zAxis;
 		zAxis.setFrom(direction).normalize();
 		xAxis.setFrom(direction).normalize();
@@ -330,11 +330,5 @@ export class Matrix4 {
 		this.multiply(Matrix4.tmpMatrix)
 
 		return this;
-	}
-
-	static initTemps () {
-		if (Matrix4.xAxis === null) Matrix4.xAxis = new Vector3();
-		if (Matrix4.yAxis === null) Matrix4.yAxis = new Vector3();
-		if (Matrix4.zAxis === null) Matrix4.zAxis = new Vector3();
 	}
 }

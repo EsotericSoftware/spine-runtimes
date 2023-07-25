@@ -53,7 +53,7 @@ export class MeshBatcher extends THREE.Mesh {
 		geo.setAttribute("color", new THREE.InterleavedBufferAttribute(vertexBuffer, 4, 3, false));
 		geo.setAttribute("uv", new THREE.InterleavedBufferAttribute(vertexBuffer, 2, 7, false));
 		geo.setIndex(new THREE.BufferAttribute(indices, 1));
-		geo.getIndex().usage = WebGLRenderingContext.DYNAMIC_DRAW;
+		geo.getIndex()!.usage = WebGLRenderingContext.DYNAMIC_DRAW;
 		geo.drawRange.start = 0;
 		geo.drawRange.count = 0;
 		this.geometry = geo;
@@ -98,9 +98,9 @@ export class MeshBatcher extends THREE.Mesh {
 		this.indicesLength = 0;
 	}
 
-	canBatch (verticesLength: number, indicesLength: number) {
-		if (this.indicesLength + indicesLength >= this.indices.byteLength / 2) return false;
-		if (this.verticesLength + verticesLength >= this.vertices.byteLength / 2) return false;
+	canBatch (numVertices: number, numIndices: number) {
+		if (this.indicesLength + numIndices >= this.indices.byteLength / 2) return false;
+		if (this.verticesLength / MeshBatcher.VERTEX_SIZE + numVertices >= (this.vertices.byteLength / 4) / MeshBatcher.VERTEX_SIZE) return false;
 		return true;
 	}
 
@@ -134,9 +134,11 @@ export class MeshBatcher extends THREE.Mesh {
 		this.vertexBuffer.updateRange.count = this.verticesLength;
 		let geo = (<THREE.BufferGeometry>this.geometry);
 		this.closeMaterialGroups();
-		geo.getIndex().needsUpdate = this.indicesLength > 0;
-		geo.getIndex().updateRange.offset = 0;
-		geo.getIndex().updateRange.count = this.indicesLength;
+		let index = geo.getIndex();
+		if (!index) throw new Error("BufferAttribute must not be null.");
+		index.needsUpdate = this.indicesLength > 0;
+		index.updateRange.offset = 0;
+		index.updateRange.count = this.indicesLength;
 		geo.drawRange.start = 0;
 		geo.drawRange.count = this.indicesLength;
 	}
@@ -168,7 +170,7 @@ export class MeshBatcher extends THREE.Mesh {
 			for (let i = 0; i < this.material.length; i++) {
 				const meshMaterial = this.material[i] as SkeletonMeshMaterial;
 
-				if (meshMaterial.uniforms.map.value === null) {
+				if (!meshMaterial.uniforms.map.value) {
 					updateMeshMaterial(meshMaterial, slotTexture, blending);
 					return i;
 				}

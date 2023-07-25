@@ -41,7 +41,7 @@ namespace Spine.Unity {
 
 		/// <summary>Factory method for creating a new mesh for use in Spine components. This can be called in field initializers.</summary>
 		public static Mesh NewSkeletonMesh () {
-			var m = new Mesh();
+			Mesh m = new Mesh();
 			m.MarkDynamic();
 			m.name = "Skeleton Mesh";
 			m.hideFlags = SpineMesh.MeshHideflags;

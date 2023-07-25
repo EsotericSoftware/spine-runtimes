@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated January 1, 2020. Replaces all prior versions.
+ * Last updated September 24, 2021. Replaces all prior versions.
  *
- * Copyright (c) 2013-2020, Esoteric Software LLC
+ * Copyright (c) 2013-2022, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -27,8 +27,6 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using Spine;
-using Spine.Unity;
 using Spine.Unity.Editor;
 using Spine.Unity.Playables;
 using UnityEditor;
@@ -38,7 +36,7 @@ using UnityEngine;
 public class SpineAnimationStateDrawer : PropertyDrawer {
 
 	public override float GetPropertyHeight (SerializedProperty property, GUIContent label) {
-		const int fieldCount = 15;
+		const int fieldCount = 16;
 		return fieldCount * EditorGUIUtility.singleLineHeight;
 	}
 
@@ -50,6 +48,7 @@ public class SpineAnimationStateDrawer : PropertyDrawer {
 		SerializedProperty useBlendDurationProp = property.FindPropertyRelative("useBlendDuration");
 		SerializedProperty mixDurationProp = property.FindPropertyRelative("mixDuration");
 		SerializedProperty holdPreviousProp = property.FindPropertyRelative("holdPrevious");
+		SerializedProperty alphaProp = property.FindPropertyRelative("alpha");
 		SerializedProperty dontPauseWithDirectorProp = property.FindPropertyRelative("dontPauseWithDirector");
 		SerializedProperty dontEndWithClip = property.FindPropertyRelative("dontEndWithClip");
 		SerializedProperty endMixOutDuration = property.FindPropertyRelative("endMixOutDuration");
@@ -57,9 +56,10 @@ public class SpineAnimationStateDrawer : PropertyDrawer {
 		SerializedProperty attachmentProp = property.FindPropertyRelative("attachmentThreshold");
 		SerializedProperty drawOrderProp = property.FindPropertyRelative("drawOrderThreshold");
 
-		// initialize useBlendDuration parameter according to preferences
+		// initialize customDuration (inverse default mix duration) and useBlendDuration parameters according to preferences
 		SerializedProperty isInitializedProp = property.FindPropertyRelative("isInitialized");
 		if (!isInitializedProp.hasMultipleDifferentValues && isInitializedProp.boolValue == false) {
+			customDurationProp.boolValue = !SpineEditorUtilities.Preferences.timelineDefaultMixDuration;
 			useBlendDurationProp.boolValue = SpineEditorUtilities.Preferences.timelineUseBlendDuration;
 			isInitializedProp.boolValue = true;
 		}
@@ -100,7 +100,10 @@ public class SpineAnimationStateDrawer : PropertyDrawer {
 		EditorGUI.LabelField(singleFieldRect, "Mixing Settings", EditorStyles.boldLabel);
 
 		singleFieldRect.y += lineHeightWithSpacing;
-		EditorGUI.PropertyField(singleFieldRect, customDurationProp);
+		customDurationProp.boolValue = !EditorGUI.Toggle(singleFieldRect,
+			new GUIContent("Default Mix Duration",
+			"Use the default mix duration as specified at the SkeletonDataAsset."),
+			!customDurationProp.boolValue);
 
 		bool greyOutCustomDurations = (!customDurationProp.hasMultipleDifferentValues &&
 										customDurationProp.boolValue == false);
@@ -128,5 +131,8 @@ public class SpineAnimationStateDrawer : PropertyDrawer {
 
 		singleFieldRect.y += lineHeightWithSpacing;
 		EditorGUI.PropertyField(singleFieldRect, drawOrderProp);
+
+		singleFieldRect.y += lineHeightWithSpacing;
+		EditorGUI.PropertyField(singleFieldRect, alphaProp);
 	}
 }

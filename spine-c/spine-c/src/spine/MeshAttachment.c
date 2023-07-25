@@ -33,6 +33,7 @@
 
 void _spMeshAttachment_dispose(spAttachment *attachment) {
 	spMeshAttachment *self = SUB_CAST(spMeshAttachment, attachment);
+	if (self->sequence) spSequence_dispose(self->sequence);
 	FREE(self->path);
 	FREE(self->uvs);
 	if (!self->parentMesh) {

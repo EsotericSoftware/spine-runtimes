@@ -873,7 +873,7 @@ TextMesh:
   m_GameObject: {fileID: 522034802}
   m_Text: 'Enter <b>PLAY MODE</b> in Unity to see bearded hero guy animate.
 
-    Try moving and jumping. (WASD+Spacebar, or XBOX Controller)'
+    Try moving and jumping. (WASD+Spacebar, or Gamepad)'
   m_OffsetZ: 0
   m_CharacterSize: 0.1
   m_LineSpacing: 1

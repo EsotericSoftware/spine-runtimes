@@ -35,8 +35,35 @@ cp -f ../mix-and-match/export/*.json "$ROOT/spine-libgdx/spine-libgdx-tests/asse
 cp -f ../mix-and-match/export/*.skel "$ROOT/spine-libgdx/spine-libgdx-tests/assets/mix-and-match/"
 cp -f ../mix-and-match/export/*-pma.* "$ROOT/spine-libgdx/spine-libgdx-tests/assets/mix-and-match/"
 
+echo "spine-cocos2d-objc"
+rm "$ROOT/spine-cocos2d-objc/Resources/"*
+
+cp -f ../coin/export/coin-pro.json "$ROOT/spine-cocos2d-objc/Resources/"
+cp -f ../coin/export/coin.atlas "$ROOT/spine-cocos2d-objc/Resources/"
+cp -f ../coin/export/coin.png "$ROOT/spine-cocos2d-objc/Resources/"
+
+cp -f ../goblins/export/goblins-pro.json "$ROOT/spine-cocos2d-objc/Resources/"
+cp -f ../goblins/export/goblins.atlas "$ROOT/spine-cocos2d-objc/Resources/"
+cp -f ../goblins/export/goblins.png "$ROOT/spine-cocos2d-objc/Resources/"
+
+cp -f ../raptor/export/raptor-pro.json "$ROOT/spine-cocos2d-objc/Resources/"
+cp -f ../raptor/export/raptor.atlas "$ROOT/spine-cocos2d-objc/Resources/"
+cp -f ../raptor/export/raptor.png "$ROOT/spine-cocos2d-objc/Resources/"
+
+cp -f ../spineboy/export/spineboy-pro.json "$ROOT/spine-cocos2d-objc/Resources/"
+cp -f ../spineboy/export/spineboy.atlas "$ROOT/spine-cocos2d-objc/Resources/"
+cp -f ../spineboy/export/spineboy.png "$ROOT/spine-cocos2d-objc/Resources/"
+
+cp -f ../tank/export/tank-pro.json "$ROOT/spine-cocos2d-objc/Resources/"
+cp -f ../tank/export/tank.atlas "$ROOT/spine-cocos2d-objc/Resources/"
+cp -f ../tank/export/tank.png "$ROOT/spine-cocos2d-objc/Resources/"
+
 echo "spine-cocos2dx"
 rm -rf "$ROOT/spine-cocos2dx/example/Resources/common/"*
+
+cp -f ../dragon/export/dragon-ess.skel "$ROOT/spine-cocos2dx/example/Resources/common/"
+cp -f ../dragon/export/dragon-pma.atlas "$ROOT/spine-cocos2dx/example/Resources/common/"
+cp -f ../dragon/export/dragon-pma*.png "$ROOT/spine-cocos2dx/example/Resources/common/"
 
 cp -f ../coin/export/coin-pro.skel "$ROOT/spine-cocos2dx/example/Resources/common/"
 cp -f ../coin/export/coin.atlas "$ROOT/spine-cocos2dx/example/Resources/common/"
@@ -62,31 +89,97 @@ cp -f ../mix-and-match/export/mix-and-match-pro.skel "$ROOT/spine-cocos2dx/examp
 cp -f ../mix-and-match/export/mix-and-match.atlas "$ROOT/spine-cocos2dx/example/Resources/common/"
 cp -f ../mix-and-match/export/mix-and-match.png "$ROOT/spine-cocos2dx/example/Resources/common/"
 
-rm "$ROOT/spine-cocos2dx/example-v4/Resources/common/"*
+echo "spine-flutter"
+rm -f "$ROOT/spine-flutter/example/assets/"*
+cp -f ../spineboy/export/spineboy-pro.json "$ROOT/spine-flutter/example/assets/"
+cp -f ../spineboy/export/spineboy-pro.skel "$ROOT/spine-flutter/example/assets/"
+cp -f ../spineboy/export/spineboy.atlas "$ROOT/spine-flutter/example/assets/"
+cp -f ../spineboy/export/spineboy.png "$ROOT/spine-flutter/example/assets/"
 
-cp -f ../coin/export/coin-pro.skel "$ROOT/spine-cocos2dx/example-v4/Resources/common/"
-cp -f ../coin/export/coin.atlas "$ROOT/spine-cocos2dx/example-v4/Resources/common/"
-cp -f ../coin/export/coin.png "$ROOT/spine-cocos2dx/example-v4/Resources/common/"
+cp -f ../mix-and-match/export/mix-and-match-pro.skel "$ROOT/spine-flutter/example/assets/"
+cp -f ../mix-and-match/export/mix-and-match.atlas "$ROOT/spine-flutter/example/assets/"
+cp -f ../mix-and-match/export/mix-and-match.png "$ROOT/spine-flutter/example/assets/"
 
-cp -f ../goblins/export/goblins-pro.json "$ROOT/spine-cocos2dx/example-v4/Resources/common/"
-cp -f ../goblins/export/goblins.atlas "$ROOT/spine-cocos2dx/example-v4/Resources/common/"
-cp -f ../goblins/export/goblins.png "$ROOT/spine-cocos2dx/example-v4/Resources/common/"
+cp -f ../dragon/export/dragon-ess.skel "$ROOT/spine-flutter/example/assets/"
+cp -f ../dragon/export/dragon.atlas "$ROOT/spine-flutter/example/assets/"
+cp -f ../dragon/export/dragon.png "$ROOT/spine-flutter/example/assets/"
+cp -f ../dragon/export/dragon_*.png "$ROOT/spine-flutter/example/assets/"
 
-cp -f ../raptor/export/raptor-pro.json "$ROOT/spine-cocos2dx/example-v4/Resources/common/"
-cp -f ../raptor/export/raptor.atlas "$ROOT/spine-cocos2dx/example-v4/Resources/common/"
-cp -f ../raptor/export/raptor.png "$ROOT/spine-cocos2dx/example-v4/Resources/common/"
+echo "spine-godot"
+rm -f "$ROOT"/spine-godot/example/assets/spineboy/*.atlas
+rm -f "$ROOT"/spine-godot/example/assets/spineboy/*.png
+rm -f "$ROOT"/spine-godot/example/assets/spineboy/*.spine-json
+rm -f "$ROOT"/spine-godot/example/assets/spineboy/*.skel
+rm -f "$ROOT"/spine-godot/example/assets/raptor/*.atlas
+rm -f "$ROOT"/spine-godot/example/assets/raptor/*.png
+rm -f "$ROOT"/spine-godot/example/assets/raptor/*.skel
+rm -f "$ROOT"/spine-godot/example/assets/mix-and-match/*.atlas
+rm -f "$ROOT"/spine-godot/example/assets/mix-and-match/*.png
+rm -f "$ROOT"/spine-godot/example/assets/mix-and-match/*.spine-json
+rm -f "$ROOT"/spine-godot/example/assets/mix-and-match/*.skel
+rm -f "$ROOT"/spine-godot/example/assets/raggedyspineboy/*.atlas
+rm -f "$ROOT"/spine-godot/example/assets/raggedyspineboy/*.png
+rm -f "$ROOT"/spine-godot/example/assets/raggedyspineboy/*.spine-json
 
-cp -f ../spineboy/export/spineboy-pro.json "$ROOT/spine-cocos2dx/example-v4/Resources/common/"
-cp -f ../spineboy/export/spineboy.atlas "$ROOT/spine-cocos2dx/example-v4/Resources/common/"
-cp -f ../spineboy/export/spineboy.png "$ROOT/spine-cocos2dx/example-v4/Resources/common/"
 
-cp -f ../tank/export/tank-pro.skel "$ROOT/spine-cocos2dx/example-v4/Resources/common/"
-cp -f ../tank/export/tank.atlas "$ROOT/spine-cocos2dx/example-v4/Resources/common/"
-cp -f ../tank/export/tank.png "$ROOT/spine-cocos2dx/example-v4/Resources/common/"
+cp -f ../spineboy/export/spineboy-pro.json "$ROOT/spine-godot/example/assets/spineboy/spineboy-pro.spine-json"
+cp -f ../spineboy/export/spineboy-pro.skel "$ROOT/spine-godot/example/assets/spineboy/"
+cp -f ../spineboy/export/spineboy.atlas "$ROOT/spine-godot/example/assets/spineboy/"
+cp -f ../spineboy/export/spineboy.png "$ROOT/spine-godot/example/assets/spineboy/"
 
-cp -f ../mix-and-match/export/mix-and-match-pro.skel "$ROOT/spine-cocos2dx/example-v4/Resources/common/"
-cp -f ../mix-and-match/export/mix-and-match.atlas "$ROOT/spine-cocos2dx/example-v4/Resources/common/"
-cp -f ../mix-and-match/export/mix-and-match.png "$ROOT/spine-cocos2dx/example-v4/Resources/common/"
+cp -f ../mix-and-match/export/mix-and-match-pro.json "$ROOT/spine-godot/example/assets/mix-and-match/mix-and-match-pro.spine-json"
+cp -f ../mix-and-match/export/mix-and-match.atlas "$ROOT/spine-godot/example/assets/mix-and-match/"
+cp -f ../mix-and-match/export/mix-and-match.png "$ROOT/spine-godot/example/assets/mix-and-match/"
+
+cp -f ../raptor/export/raptor-pro.skel "$ROOT/spine-godot/example/assets/raptor/"
+cp -f ../raptor/export/raptor.atlas "$ROOT/spine-godot/example/assets/raptor/"
+cp -f ../raptor/export/raptor.png "$ROOT/spine-godot/example/assets/raptor/"
+cp -f ../raptor/manual-maps/raptor-normals.png "$ROOT/spine-godot/example/assets/raptor/n_raptor.png"
+cp -f ../raptor/manual-maps/light-sprite.png "$ROOT/spine-godot/example/assets/raptor/light-sprite.png"
+
+#cp -f ../../spine-unity/Assets/Spine\ Examples/Spine\ Skeletons/Raggedy\ Spineboy/raggedy\ spineboy.json "$ROOT/spine-godot/example/assets/raggedyspineboy/"
+#cp -f ../../spine-unity/Assets/Spine\ Examples/Spine\ Skeletons/Raggedy\ Spineboy/Raggedy\ Spineboy.atlas.txt "$ROOT/spine-godot/example/assets/raggedyspineboy/Raggedy Spineboy.atlas"
+#cp -f ../../spine-unity/Assets/Spine\ Examples/Spine\ Skeletons/Raggedy\ Spineboy/Raggedy\ Spineboy.png "$ROOT/spine-godot/example/assets/raggedyspineboy/"
+
+rm -f "$ROOT"/spine-godot/example-v4/assets/spineboy/*.atlas
+rm -f "$ROOT"/spine-godot/example-v4/assets/spineboy/*.png
+rm -f "$ROOT"/spine-godot/example-v4/assets/spineboy/*.spine-json
+rm -f "$ROOT"/spine-godot/example-v4/assets/spineboy/*.skel
+rm -f "$ROOT"/spine-godot/example-v4/assets/raptor/*.atlas
+rm -f "$ROOT"/spine-godot/example-v4/assets/raptor/*.png
+rm -f "$ROOT"/spine-godot/example-v4/assets/raptor/*.skel
+rm -f "$ROOT"/spine-godot/example-v4/assets/mix-and-match/*.atlas
+rm -f "$ROOT"/spine-godot/example-v4/assets/mix-and-match/*.png
+rm -f "$ROOT"/spine-godot/example-v4/assets/mix-and-match/*.spine-json
+rm -f "$ROOT"/spine-godot/example-v4/assets/mix-and-match/*.skel
+rm -f "$ROOT"/spine-godot/example-v4/assets/raggedyspineboy/*.atlas
+rm -f "$ROOT"/spine-godot/example-v4/assets/raggedyspineboy/*.png
+rm -f "$ROOT"/spine-godot/example-v4/assets/raggedyspineboy/*.spine-json
+
+cp -f ../spineboy/export/spineboy-pro.json "$ROOT/spine-godot/example-v4/assets/spineboy/spineboy-pro.spine-json"
+cp -f ../spineboy/export/spineboy-pro.skel "$ROOT/spine-godot/example-v4/assets/spineboy/"
+cp -f ../spineboy/export/spineboy.atlas "$ROOT/spine-godot/example-v4/assets/spineboy/"
+cp -f ../spineboy/export/spineboy.png "$ROOT/spine-godot/example-v4/assets/spineboy/"
+
+cp -f ../mix-and-match/export/mix-and-match-pro.json "$ROOT/spine-godot/example-v4/assets/mix-and-match/mix-and-match-pro.spine-json"
+cp -f ../mix-and-match/export/mix-and-match.atlas "$ROOT/spine-godot/example-v4/assets/mix-and-match/"
+cp -f ../mix-and-match/export/mix-and-match.png "$ROOT/spine-godot/example-v4/assets/mix-and-match/"
+
+cp -f ../raptor/export/raptor-pro.skel "$ROOT/spine-godot/example-v4/assets/raptor/"
+cp -f ../raptor/export/raptor.atlas "$ROOT/spine-godot/example-v4/assets/raptor/"
+cp -f ../raptor/export/raptor.png "$ROOT/spine-godot/example-v4/assets/raptor/"
+cp -f ../raptor/manual-maps/raptor-normals.png "$ROOT/spine-godot/example-v4/assets/raptor/n_raptor.png"
+cp -f ../raptor/manual-maps/light-sprite.png "$ROOT/spine-godot/example-v4/assets/raptor/light-sprite.png"
+
+#cp -f ../../spine-unity/Assets/Spine\ Examples/Spine\ Skeletons/Raggedy\ Spineboy/raggedy\ spineboy.json "$ROOT/spine-godot/example-v4/assets/raggedyspineboy/"
+#cp -f ../../spine-unity/Assets/Spine\ Examples/Spine\ Skeletons/Raggedy\ Spineboy/Raggedy\ Spineboy.atlas.txt "$ROOT/spine-godot/example-v4/assets/raggedyspineboy/Raggedy Spineboy.atlas"
+#cp -f ../../spine-unity/Assets/Spine\ Examples/Spine\ Skeletons/Raggedy\ Spineboy/Raggedy\ Spineboy.png "$ROOT/spine-godot/example-v4/assets/raggedyspineboy/"
+
+echo "spine-sdl"
+rm -f "$ROOT/spine-sdl/data/"*
+cp -f ../spineboy/export/spineboy-pro.json "$ROOT/spine-sdl/data/"
+cp -f ../spineboy/export/spineboy.atlas "$ROOT/spine-sdl/data/"
+cp -f ../spineboy/export/spineboy.png "$ROOT/spine-sdl/data/"
 
 echo "spine-sfml-c"
 rm "$ROOT/spine-sfml/c/data/"*
@@ -264,6 +357,57 @@ cp -f ../spineboy/export/spineboy-pro.skel "$ROOT/spine-ts/spine-player/example/
 cp -f ../spineboy/export/spineboy-pma.atlas "$ROOT/spine-ts/spine-player/example/assets/"
 cp -f ../spineboy/export/spineboy-pma.png "$ROOT/spine-ts/spine-player/example/assets/"
 
+cp -f ../spineboy/export/spineboy-pro.json "$ROOT/spine-ts/spine-pixi/example/assets/"
+cp -f ../spineboy/export/spineboy-pro.skel "$ROOT/spine-ts/spine-pixi/example/assets/"
+cp -f ../spineboy/export/spineboy.atlas "$ROOT/spine-ts/spine-pixi/example/assets/"
+cp -f ../spineboy/export/spineboy.png "$ROOT/spine-ts/spine-pixi/example/assets/"
+
+rm "$ROOT/spine-ts/spine-phaser/example/assets/"*
+cp -f ../raptor/export/raptor-pro.json "$ROOT/spine-ts/spine-phaser/example/assets/"
+cp -f ../raptor/export/raptor-pma.atlas "$ROOT/spine-ts/spine-phaser/example/assets/"
+cp -f ../raptor/export/raptor-pma.png "$ROOT/spine-ts/spine-phaser/example/assets/"
+
+cp -f ../spineboy/export/spineboy-pro.skel "$ROOT/spine-ts/spine-phaser/example/assets/"
+cp -f ../spineboy/export/spineboy-pma.atlas "$ROOT/spine-ts/spine-phaser/example/assets/"
+cp -f ../spineboy/export/spineboy-pma.png "$ROOT/spine-ts/spine-phaser/example/assets/"
+
+cp -f ../spineboy/export/spineboy-pro.skel "$ROOT/spine-ts/spine-phaser/example/typescript/assets/"
+cp -f ../spineboy/export/spineboy-pma.atlas "$ROOT/spine-ts/spine-phaser/example/typescript/assets/"
+cp -f ../spineboy/export/spineboy-pma.png "$ROOT/spine-ts/spine-phaser/example/typescript/assets/"
+
+cp -f ../coin/export/coin-pro.skel "$ROOT/spine-ts/spine-phaser/example/assets/"
+cp -f ../coin/export/coin-pma.atlas "$ROOT/spine-ts/spine-phaser/example/assets/"
+cp -f ../coin/export/coin-pma.png "$ROOT/spine-ts/spine-phaser/example/assets/"
+
+cp -f ../stretchyman/export/stretchyman-pro.skel "$ROOT/spine-ts/spine-phaser/example/assets/"
+cp -f ../stretchyman/export/stretchyman-pma.atlas "$ROOT/spine-ts/spine-phaser/example/assets/"
+cp -f ../stretchyman/export/stretchyman-pma.png "$ROOT/spine-ts/spine-phaser/example/assets/"
+
+cp -f ../mix-and-match/export/mix-and-match-pro.skel "$ROOT/spine-ts/spine-phaser/example/assets/"
+cp -f ../mix-and-match/export/mix-and-match-pma.atlas "$ROOT/spine-ts/spine-phaser/example/assets/"
+cp -f ../mix-and-match/export/mix-and-match-pma.png "$ROOT/spine-ts/spine-phaser/example/assets/"
+
+rm "$ROOT/spine-ts/spine-pixi/example/assets/"*
+cp -f ../raptor/export/raptor-pro.json "$ROOT/spine-ts/spine-pixi/example/assets/"
+cp -f ../raptor/export/raptor.atlas "$ROOT/spine-ts/spine-pixi/example/assets/"
+cp -f ../raptor/export/raptor.png "$ROOT/spine-ts/spine-pixi/example/assets/"
+
+cp -f ../spineboy/export/spineboy-pro.skel "$ROOT/spine-ts/spine-pixi/example/assets/"
+cp -f ../spineboy/export/spineboy-pma.atlas "$ROOT/spine-ts/spine-pixi/example/assets/"
+cp -f ../spineboy/export/spineboy-pma.png "$ROOT/spine-ts/spine-pixi/example/assets/"
+
+cp -f ../coin/export/coin-pro.skel "$ROOT/spine-ts/spine-pixi/example/assets/"
+cp -f ../coin/export/coin-pma.atlas "$ROOT/spine-ts/spine-pixi/example/assets/"
+cp -f ../coin/export/coin-pma.png "$ROOT/spine-ts/spine-pixi/example/assets/"
+
+cp -f ../stretchyman/export/stretchyman-pro.skel "$ROOT/spine-ts/spine-pixi/example/assets/"
+cp -f ../stretchyman/export/stretchyman-pma.atlas "$ROOT/spine-ts/spine-pixi/example/assets/"
+cp -f ../stretchyman/export/stretchyman-pma.png "$ROOT/spine-ts/spine-pixi/example/assets/"
+
+cp -f ../mix-and-match/export/mix-and-match-pro.skel "$ROOT/spine-ts/spine-pixi/example/assets/"
+cp -f ../mix-and-match/export/mix-and-match-pma.atlas "$ROOT/spine-ts/spine-pixi/example/assets/"
+cp -f ../mix-and-match/export/mix-and-match-pma.png "$ROOT/spine-ts/spine-pixi/example/assets/"
+
 echo "spine-monogame"
 rm "$ROOT/spine-monogame/spine-monogame-example/data/"*
 cp -f ../coin/export/coin-pro.json "$ROOT/spine-monogame/spine-monogame-example/data/"
@@ -315,11 +459,11 @@ UNITY_SOURCE_DIR=../spine-unity
 # and error out otherwise.
 sed="sed"
 if [[ $OSTYPE == 'darwin'* ]]; then
-  if [ ! -f "/usr/local/bin/gsed" ]; then
+  if [ ! -f "/opt/homebrew/bin/gsed" ]; then
 	echo "macOS sed detected. Please install GNU sed via brew install gnu-sed"
 	exit -1
   fi
-  sed="/usr/local/bin/gsed"
+  sed="/opt/homebrew/bin/gsed"
 fi
 
 # Do not delete everything in unity dirs, especially not .meta files.

@@ -50,7 +50,7 @@ namespace Spine.Unity.Examples {
 		Atlas atlas;
 
 		void Awake () {
-			var skeletonRenderer = GetComponent<SkeletonRenderer>();
+			SkeletonRenderer skeletonRenderer = GetComponent<SkeletonRenderer>();
 			skeletonRenderer.OnRebuild += Apply;
 			if (skeletonRenderer.valid) Apply(skeletonRenderer);
 		}
@@ -62,7 +62,7 @@ namespace Spine.Unity.Examples {
 			if (atlas == null) return;
 			float scale = skeletonRenderer.skeletonDataAsset.scale;
 
-			foreach (var entry in attachments) {
+			foreach (SlotRegionPair entry in attachments) {
 				Slot slot = skeletonRenderer.Skeleton.FindSlot(entry.slot);
 				Attachment originalAttachment = slot.Attachment;
 				AtlasRegion region = atlas.FindRegion(entry.region);
@@ -72,7 +72,7 @@ namespace Spine.Unity.Examples {
 				} else if (inheritProperties && originalAttachment != null) {
 					slot.Attachment = originalAttachment.GetRemappedClone(region, true, true, scale);
 				} else {
-					var newRegionAttachment = region.ToRegionAttachment(region.name, scale);
+					RegionAttachment newRegionAttachment = region.ToRegionAttachment(region.name, scale);
 					slot.Attachment = newRegionAttachment;
 				}
 			}

@@ -56,18 +56,14 @@ namespace Spine.Unity.Editor {
 	public partial class SpineEditorUtilities {
 
 #if NEW_PREFERENCES_SETTINGS_PROVIDER
-		static class SpineSettingsProviderRegistration
-		{
+		static class SpineSettingsProviderRegistration {
 			[SettingsProvider]
-			public static SettingsProvider CreateSpineSettingsProvider()
-			{
-				var provider = new SettingsProvider("Spine", SettingsScope.User)
-				{
+			public static SettingsProvider CreateSpineSettingsProvider () {
+				SettingsProvider provider = new SettingsProvider("Spine", SettingsScope.User) {
 					label = "Spine",
-					guiHandler = (searchContext) =>
-					{
-						var settings = SpinePreferences.GetOrCreateSettings();
-						var serializedSettings = new SerializedObject(settings);
+					guiHandler = (searchContext) => {
+						SpinePreferences settings = SpinePreferences.GetOrCreateSettings();
+						SerializedObject serializedSettings = new SerializedObject(settings);
 						SpinePreferences.HandlePreferencesGUI(serializedSettings);
 						if (serializedSettings.ApplyModifiedProperties())
 							OldPreferences.SaveToEditorPrefs(settings);
@@ -108,6 +104,10 @@ namespace Spine.Unity.Editor {
 
 			const string DEFAULT_SHADER_KEY = "SPINE_DEFAULT_SHADER";
 			public static string defaultShader = SpinePreferences.DEFAULT_DEFAULT_SHADER;
+			public static string DefaultShader {
+				get { return !string.IsNullOrEmpty(defaultShader) ? defaultShader : SpinePreferences.DEFAULT_DEFAULT_SHADER; }
+				set { defaultShader = value; }
+			}
 
 			const string DEFAULT_ZSPACING_KEY = "SPINE_DEFAULT_ZSPACING";
 			public static float defaultZSpacing = SpinePreferences.DEFAULT_DEFAULT_ZSPACING;
@@ -117,6 +117,9 @@ namespace Spine.Unity.Editor {
 
 			const string SHOW_HIERARCHY_ICONS_KEY = "SPINE_SHOW_HIERARCHY_ICONS";
 			public static bool showHierarchyIcons = SpinePreferences.DEFAULT_SHOW_HIERARCHY_ICONS;
+
+			const string RELOAD_AFTER_PLAYMODE_KEY = "SPINE_RELOAD_AFTER_PLAYMODE";
+			public static bool reloadAfterPlayMode = SpinePreferences.DEFAULT_RELOAD_AFTER_PLAYMODE;
 
 			const string SET_TEXTUREIMPORTER_SETTINGS_KEY = "SPINE_SET_TEXTUREIMPORTER_SETTINGS";
 			public static bool setTextureImporterSettings = SpinePreferences.DEFAULT_SET_TEXTUREIMPORTER_SETTINGS;
@@ -159,6 +162,9 @@ namespace Spine.Unity.Editor {
 			const string COMPONENTMATERIAL_WARNING_KEY = "SPINE_COMPONENTMATERIAL_WARNING";
 			public static bool componentMaterialWarning = SpinePreferences.DEFAULT_COMPONENTMATERIAL_WARNING;
 
+			const string SKELETONDATA_ASSET_NO_FILE_ERROR_KEY = "SPINE_SKELETONDATA_ASSET_NO_FILE_ERROR";
+			public static bool skeletonDataAssetNoFileError = SpinePreferences.DEFAULT_SKELETONDATA_ASSET_NO_FILE_ERROR;
+
 			public const float DEFAULT_MIPMAPBIAS = SpinePreferences.DEFAULT_MIPMAPBIAS;
 
 			public const string SCENE_ICONS_SCALE_KEY = "SPINE_SCENE_ICONS_SCALE";
@@ -173,6 +179,8 @@ namespace Spine.Unity.Editor {
 			const string TIMELINE_USE_BLEND_DURATION_KEY = "SPINE_TIMELINE_USE_BLEND_DURATION_KEY";
 			public static bool timelineUseBlendDuration = SpinePreferences.DEFAULT_TIMELINE_USE_BLEND_DURATION;
 
+			const string TIMELINE_DEFAULT_MIX_DURATION_KEY = "SPINE_TIMELINE_DEFAULT_MIX_DURATION_KEY";
+			public static bool timelineDefaultMixDuration = SpinePreferences.DEFAULT_TIMELINE_DEFAULT_MIX_DURATION;
 
 			static bool preferencesLoaded = false;
 
@@ -185,6 +193,7 @@ namespace Spine.Unity.Editor {
 				defaultZSpacing = EditorPrefs.GetFloat(DEFAULT_ZSPACING_KEY, SpinePreferences.DEFAULT_DEFAULT_ZSPACING);
 				defaultShader = EditorPrefs.GetString(DEFAULT_SHADER_KEY, SpinePreferences.DEFAULT_DEFAULT_SHADER);
 				showHierarchyIcons = EditorPrefs.GetBool(SHOW_HIERARCHY_ICONS_KEY, SpinePreferences.DEFAULT_SHOW_HIERARCHY_ICONS);
+				reloadAfterPlayMode = EditorPrefs.GetBool(RELOAD_AFTER_PLAYMODE_KEY, SpinePreferences.DEFAULT_RELOAD_AFTER_PLAYMODE);
 				setTextureImporterSettings = EditorPrefs.GetBool(SET_TEXTUREIMPORTER_SETTINGS_KEY, SpinePreferences.DEFAULT_SET_TEXTUREIMPORTER_SETTINGS);
 				textureSettingsReference = EditorPrefs.GetString(TEXTURE_SETTINGS_REFERENCE_KEY, SpinePreferences.DEFAULT_TEXTURE_SETTINGS_REFERENCE);
 				blendModeMaterialMultiply = EditorPrefs.GetString(BLEND_MODE_MATERIAL_MULTIPLY_KEY, "");
@@ -195,18 +204,21 @@ namespace Spine.Unity.Editor {
 				atlasTxtImportWarning = EditorPrefs.GetBool(ATLASTXT_WARNING_KEY, SpinePreferences.DEFAULT_ATLASTXT_WARNING);
 				textureImporterWarning = EditorPrefs.GetBool(TEXTUREIMPORTER_WARNING_KEY, SpinePreferences.DEFAULT_TEXTUREIMPORTER_WARNING);
 				componentMaterialWarning = EditorPrefs.GetBool(COMPONENTMATERIAL_WARNING_KEY, SpinePreferences.DEFAULT_COMPONENTMATERIAL_WARNING);
+				skeletonDataAssetNoFileError = EditorPrefs.GetBool(SKELETONDATA_ASSET_NO_FILE_ERROR_KEY, SpinePreferences.DEFAULT_SKELETONDATA_ASSET_NO_FILE_ERROR);
+				timelineDefaultMixDuration = EditorPrefs.GetBool(TIMELINE_DEFAULT_MIX_DURATION_KEY, SpinePreferences.DEFAULT_TIMELINE_DEFAULT_MIX_DURATION);
 				timelineUseBlendDuration = EditorPrefs.GetBool(TIMELINE_USE_BLEND_DURATION_KEY, SpinePreferences.DEFAULT_TIMELINE_USE_BLEND_DURATION);
 				handleScale = EditorPrefs.GetFloat(SCENE_ICONS_SCALE_KEY, SpinePreferences.DEFAULT_SCENE_ICONS_SCALE);
 				preferencesLoaded = true;
 			}
 
 #if NEW_PREFERENCES_SETTINGS_PROVIDER
-			public static void CopyOldToNewPreferences(ref SpinePreferences newPreferences) {
+			public static void CopyOldToNewPreferences (ref SpinePreferences newPreferences) {
 				newPreferences.defaultMix = EditorPrefs.GetFloat(DEFAULT_MIX_KEY, SpinePreferences.DEFAULT_DEFAULT_MIX);
 				newPreferences.defaultScale = EditorPrefs.GetFloat(DEFAULT_SCALE_KEY, SpinePreferences.DEFAULT_DEFAULT_SCALE);
 				newPreferences.defaultZSpacing = EditorPrefs.GetFloat(DEFAULT_ZSPACING_KEY, SpinePreferences.DEFAULT_DEFAULT_ZSPACING);
 				newPreferences.defaultShader = EditorPrefs.GetString(DEFAULT_SHADER_KEY, SpinePreferences.DEFAULT_DEFAULT_SHADER);
 				newPreferences.showHierarchyIcons = EditorPrefs.GetBool(SHOW_HIERARCHY_ICONS_KEY, SpinePreferences.DEFAULT_SHOW_HIERARCHY_ICONS);
+				newPreferences.reloadAfterPlayMode = EditorPrefs.GetBool(RELOAD_AFTER_PLAYMODE_KEY, SpinePreferences.DEFAULT_RELOAD_AFTER_PLAYMODE);
 				newPreferences.setTextureImporterSettings = EditorPrefs.GetBool(SET_TEXTUREIMPORTER_SETTINGS_KEY, SpinePreferences.DEFAULT_SET_TEXTUREIMPORTER_SETTINGS);
 				newPreferences.textureSettingsReference = EditorPrefs.GetString(TEXTURE_SETTINGS_REFERENCE_KEY, SpinePreferences.DEFAULT_TEXTURE_SETTINGS_REFERENCE);
 				newPreferences.autoReloadSceneSkeletons = EditorPrefs.GetBool(AUTO_RELOAD_SCENESKELETONS_KEY, SpinePreferences.DEFAULT_AUTO_RELOAD_SCENESKELETONS);
@@ -214,16 +226,19 @@ namespace Spine.Unity.Editor {
 				newPreferences.atlasTxtImportWarning = EditorPrefs.GetBool(ATLASTXT_WARNING_KEY, SpinePreferences.DEFAULT_ATLASTXT_WARNING);
 				newPreferences.textureImporterWarning = EditorPrefs.GetBool(TEXTUREIMPORTER_WARNING_KEY, SpinePreferences.DEFAULT_TEXTUREIMPORTER_WARNING);
 				newPreferences.componentMaterialWarning = EditorPrefs.GetBool(COMPONENTMATERIAL_WARNING_KEY, SpinePreferences.DEFAULT_COMPONENTMATERIAL_WARNING);
+				newPreferences.skeletonDataAssetNoFileError = EditorPrefs.GetBool(SKELETONDATA_ASSET_NO_FILE_ERROR_KEY, SpinePreferences.DEFAULT_SKELETONDATA_ASSET_NO_FILE_ERROR);
+				newPreferences.timelineDefaultMixDuration = EditorPrefs.GetBool(TIMELINE_DEFAULT_MIX_DURATION_KEY, SpinePreferences.DEFAULT_TIMELINE_DEFAULT_MIX_DURATION);
 				newPreferences.timelineUseBlendDuration = EditorPrefs.GetBool(TIMELINE_USE_BLEND_DURATION_KEY, SpinePreferences.DEFAULT_TIMELINE_USE_BLEND_DURATION);
 				newPreferences.handleScale = EditorPrefs.GetFloat(SCENE_ICONS_SCALE_KEY, SpinePreferences.DEFAULT_SCENE_ICONS_SCALE);
 			}
 
-			public static void SaveToEditorPrefs(SpinePreferences preferences) {
+			public static void SaveToEditorPrefs (SpinePreferences preferences) {
 				EditorPrefs.SetFloat(DEFAULT_MIX_KEY, preferences.defaultMix);
 				EditorPrefs.SetFloat(DEFAULT_SCALE_KEY, preferences.defaultScale);
 				EditorPrefs.SetFloat(DEFAULT_ZSPACING_KEY, preferences.defaultZSpacing);
 				EditorPrefs.SetString(DEFAULT_SHADER_KEY, preferences.defaultShader);
 				EditorPrefs.SetBool(SHOW_HIERARCHY_ICONS_KEY, preferences.showHierarchyIcons);
+				EditorPrefs.SetBool(RELOAD_AFTER_PLAYMODE_KEY, preferences.reloadAfterPlayMode);
 				EditorPrefs.SetBool(SET_TEXTUREIMPORTER_SETTINGS_KEY, preferences.setTextureImporterSettings);
 				EditorPrefs.SetString(TEXTURE_SETTINGS_REFERENCE_KEY, preferences.textureSettingsReference);
 				EditorPrefs.SetBool(AUTO_RELOAD_SCENESKELETONS_KEY, preferences.autoReloadSceneSkeletons);
@@ -231,6 +246,8 @@ namespace Spine.Unity.Editor {
 				EditorPrefs.SetBool(ATLASTXT_WARNING_KEY, preferences.atlasTxtImportWarning);
 				EditorPrefs.SetBool(TEXTUREIMPORTER_WARNING_KEY, preferences.textureImporterWarning);
 				EditorPrefs.SetBool(COMPONENTMATERIAL_WARNING_KEY, preferences.componentMaterialWarning);
+				EditorPrefs.SetBool(SKELETONDATA_ASSET_NO_FILE_ERROR_KEY, preferences.skeletonDataAssetNoFileError);
+				EditorPrefs.SetBool(TIMELINE_DEFAULT_MIX_DURATION_KEY, preferences.timelineDefaultMixDuration);
 				EditorPrefs.SetBool(TIMELINE_USE_BLEND_DURATION_KEY, preferences.timelineUseBlendDuration);
 				EditorPrefs.SetFloat(SCENE_ICONS_SCALE_KEY, preferences.handleScale);
 			}
@@ -253,6 +270,7 @@ namespace Spine.Unity.Editor {
 				}
 
 				BoolPrefsField(ref autoReloadSceneSkeletons, AUTO_RELOAD_SCENESKELETONS_KEY, new GUIContent("Auto-reload scene components", "Reloads Skeleton components in the scene whenever their SkeletonDataAsset is modified. This makes it so changes in the SkeletonDataAsset inspector are immediately reflected. This may be slow when your scenes have large numbers of SkeletonRenderers or SkeletonGraphic."));
+				BoolPrefsField(ref reloadAfterPlayMode, RELOAD_AFTER_PLAYMODE_KEY, new GUIContent("Reload SkeletonData after Play", "When enabled, the shared SkeletonData of all skeletons in the active scene is reloaded (from the .json or .skel.bytes file) after exiting play-mode. This may add undesired delays, but prevents (accidental) modifications to the shared SkeletonData during play-mode carrying over its effect into subsequent plays."));
 
 				EditorGUILayout.Separator();
 				EditorGUILayout.LabelField("Auto-Import Settings", EditorStyles.boldLabel);
@@ -261,7 +279,7 @@ namespace Spine.Unity.Editor {
 					SpineEditorUtilities.FloatPrefsField(ref defaultScale, DEFAULT_SCALE_KEY, new GUIContent("Default SkeletonData Scale", "The Default skeleton import scale for newly imported SkeletonDataAssets."), min: 0.0000001f);
 
 					EditorGUI.BeginChangeCheck();
-					var shader = (EditorGUILayout.ObjectField("Default Shader", Shader.Find(defaultShader), typeof(Shader), false) as Shader);
+					Shader shader = (EditorGUILayout.ObjectField("Default Shader", Shader.Find(defaultShader), typeof(Shader), false) as Shader);
 					defaultShader = shader != null ? shader.name : SpinePreferences.DEFAULT_DEFAULT_SHADER;
 					if (EditorGUI.EndChangeCheck())
 						EditorPrefs.SetString(DEFAULT_SHADER_KEY, defaultShader);
@@ -269,7 +287,7 @@ namespace Spine.Unity.Editor {
 					SpineEditorUtilities.BoolPrefsField(ref setTextureImporterSettings, SET_TEXTUREIMPORTER_SETTINGS_KEY, new GUIContent("Apply Atlas Texture Settings", "Apply the recommended settings for Texture Importers."));
 					SpineEditorUtilities.Texture2DPrefsField(ref textureSettingsReference, TEXTURE_SETTINGS_REFERENCE_KEY, new GUIContent("Atlas Texture Reference Settings", "Apply the selected reference texture import settings at newly imported atlas textures. When exporting atlas textures from Spine with \"Premultiply alpha\" enabled (the default), you can leave it at \"PMAPresetTemplate\". If you have disabled \"Premultiply alpha\", set it to \"StraightAlphaPresetTemplate\". You can also create your own reference texture asset and assign it here."));
 					if (string.IsNullOrEmpty(textureSettingsReference)) {
-						var pmaTextureSettingsReferenceGUIDS = AssetDatabase.FindAssets("PMAPresetTemplate");
+						string[] pmaTextureSettingsReferenceGUIDS = AssetDatabase.FindAssets("PMAPresetTemplate");
 						if (pmaTextureSettingsReferenceGUIDS.Length > 0) {
 							textureSettingsReference = AssetDatabase.GUIDToAssetPath(pmaTextureSettingsReferenceGUIDS[0]);
 							EditorPrefs.SetString(TEXTURE_SETTINGS_REFERENCE_KEY, textureSettingsReference);
@@ -278,21 +296,21 @@ namespace Spine.Unity.Editor {
 
 					SpineEditorUtilities.MaterialPrefsField(ref blendModeMaterialAdditive, BLEND_MODE_MATERIAL_ADDITIVE_KEY, new GUIContent("Additive Material", "Additive blend mode Material template."));
 					if (string.IsNullOrEmpty(blendModeMaterialAdditive)) {
-						var blendModeMaterialAdditiveGUIDS = AssetDatabase.FindAssets(DEFAULT_BLEND_MODE_ADDITIVE_MATERIAL);
+						string[] blendModeMaterialAdditiveGUIDS = AssetDatabase.FindAssets(DEFAULT_BLEND_MODE_ADDITIVE_MATERIAL);
 						if (blendModeMaterialAdditiveGUIDS.Length > 0) {
 							blendModeMaterialAdditive = AssetDatabase.GUIDToAssetPath(blendModeMaterialAdditiveGUIDS[0]);
 						}
 					}
 					SpineEditorUtilities.MaterialPrefsField(ref blendModeMaterialMultiply, BLEND_MODE_MATERIAL_MULTIPLY_KEY, new GUIContent("Multiply Material", "Multiply blend mode Material template."));
 					if (string.IsNullOrEmpty(blendModeMaterialMultiply)) {
-						var blendModeMaterialMultiplyGUIDS = AssetDatabase.FindAssets(DEFAULT_BLEND_MODE_MULTIPLY_MATERIAL);
+						string[] blendModeMaterialMultiplyGUIDS = AssetDatabase.FindAssets(DEFAULT_BLEND_MODE_MULTIPLY_MATERIAL);
 						if (blendModeMaterialMultiplyGUIDS.Length > 0) {
 							blendModeMaterialMultiply = AssetDatabase.GUIDToAssetPath(blendModeMaterialMultiplyGUIDS[0]);
 						}
 					}
 					SpineEditorUtilities.MaterialPrefsField(ref blendModeMaterialScreen, BLEND_MODE_MATERIAL_SCREEN_KEY, new GUIContent("Screen Material", "Screen blend mode Material template."));
 					if (string.IsNullOrEmpty(blendModeMaterialScreen)) {
-						var blendModeMaterialScreenGUIDS = AssetDatabase.FindAssets(DEFAULT_BLEND_MODE_SCREEN_MATERIAL);
+						string[] blendModeMaterialScreenGUIDS = AssetDatabase.FindAssets(DEFAULT_BLEND_MODE_SCREEN_MATERIAL);
 						if (blendModeMaterialScreenGUIDS.Length > 0) {
 							blendModeMaterialScreen = AssetDatabase.GUIDToAssetPath(blendModeMaterialScreenGUIDS[0]);
 						}
@@ -305,6 +323,8 @@ namespace Spine.Unity.Editor {
 					SpineEditorUtilities.BoolPrefsField(ref atlasTxtImportWarning, ATLASTXT_WARNING_KEY, new GUIContent("Atlas Extension Warning", "Log a warning and recommendation whenever a `.atlas` file is found."));
 					SpineEditorUtilities.BoolPrefsField(ref textureImporterWarning, TEXTUREIMPORTER_WARNING_KEY, new GUIContent("Texture Settings Warning", "Log a warning and recommendation whenever Texture Import Settings are detected that could lead to undesired effects, e.g. white border artifacts."));
 					SpineEditorUtilities.BoolPrefsField(ref componentMaterialWarning, COMPONENTMATERIAL_WARNING_KEY, new GUIContent("Component & Material Warning", "Log a warning and recommendation whenever Component and Material settings are not compatible."));
+					SpineEditorUtilities.BoolPrefsField(ref skeletonDataAssetNoFileError, SKELETONDATA_ASSET_NO_FILE_ERROR_KEY, new GUIContent("SkeletonDataAsset no file Error", "Log an error when querying SkeletonData from SkeletonDataAsset with no json or binary file assigned."));
+					SkeletonDataAsset.errorIfSkeletonFileNullGlobal = skeletonDataAssetNoFileError;
 				}
 
 				EditorGUILayout.Space();
@@ -363,6 +383,7 @@ namespace Spine.Unity.Editor {
 				GUILayout.Space(20);
 				EditorGUILayout.LabelField("Timeline Extension", EditorStyles.boldLabel);
 				{
+					SpineEditorUtilities.BoolPrefsField(ref timelineDefaultMixDuration, TIMELINE_DEFAULT_MIX_DURATION_KEY, new GUIContent("Default Mix Duration", "When enabled, the clip uses the default mix duration by default, as specified at the SkeletonDataAsset."));
 					SpineEditorUtilities.BoolPrefsField(ref timelineUseBlendDuration, TIMELINE_USE_BLEND_DURATION_KEY, new GUIContent("Use Blend Duration", "When enabled, MixDuration will be synced with timeline clip transition duration 'Ease In Duration'."));
 				}
 			}
@@ -388,7 +409,7 @@ namespace Spine.Unity.Editor {
 		static void Texture2DPrefsField (ref string currentValue, string editorPrefsKey, GUIContent label) {
 			EditorGUI.BeginChangeCheck();
 			EditorGUIUtility.wideMode = true;
-			var texture = (EditorGUILayout.ObjectField(label, AssetDatabase.LoadAssetAtPath<Texture2D>(currentValue), typeof(Object), false) as Texture2D);
+			Texture2D texture = (EditorGUILayout.ObjectField(label, AssetDatabase.LoadAssetAtPath<Texture2D>(currentValue), typeof(Object), false) as Texture2D);
 			currentValue = texture != null ? AssetDatabase.GetAssetPath(texture) : "";
 			if (EditorGUI.EndChangeCheck()) {
 				EditorPrefs.SetString(editorPrefsKey, currentValue);
@@ -398,7 +419,7 @@ namespace Spine.Unity.Editor {
 		static void MaterialPrefsField (ref string currentValue, string editorPrefsKey, GUIContent label) {
 			EditorGUI.BeginChangeCheck();
 			EditorGUIUtility.wideMode = true;
-			var material = (EditorGUILayout.ObjectField(label, AssetDatabase.LoadAssetAtPath<Material>(currentValue), typeof(Object), false) as Material);
+			Material material = (EditorGUILayout.ObjectField(label, AssetDatabase.LoadAssetAtPath<Material>(currentValue), typeof(Object), false) as Material);
 			currentValue = material != null ? AssetDatabase.GetAssetPath(material) : "";
 			if (EditorGUI.EndChangeCheck()) {
 				EditorPrefs.SetString(editorPrefsKey, currentValue);
@@ -414,18 +435,18 @@ namespace Spine.Unity.Editor {
 		}
 
 		public static void ShaderPropertyField (SerializedProperty property, GUIContent label, string fallbackShaderName) {
-			var shader = (EditorGUILayout.ObjectField(label, Shader.Find(property.stringValue), typeof(Shader), false) as Shader);
+			Shader shader = (EditorGUILayout.ObjectField(label, Shader.Find(property.stringValue), typeof(Shader), false) as Shader);
 			property.stringValue = shader != null ? shader.name : fallbackShaderName;
 		}
 
 		public static void MaterialPropertyField (SerializedProperty property, GUIContent label) {
-			var material = (EditorGUILayout.ObjectField(label, AssetDatabase.LoadAssetAtPath<Material>(property.stringValue), typeof(Material), false) as Material);
+			Material material = (EditorGUILayout.ObjectField(label, AssetDatabase.LoadAssetAtPath<Material>(property.stringValue), typeof(Material), false) as Material);
 			property.stringValue = material ? AssetDatabase.GetAssetPath(material) : "";
 		}
 
 #if NEW_PREFERENCES_SETTINGS_PROVIDER
 		public static void PresetAssetPropertyField (SerializedProperty property, GUIContent label) {
-			var texturePreset = (EditorGUILayout.ObjectField(label, AssetDatabase.LoadAssetAtPath<UnityEditor.Presets.Preset>(property.stringValue), typeof(UnityEditor.Presets.Preset), false) as UnityEditor.Presets.Preset);
+			UnityEditor.Presets.Preset texturePreset = (EditorGUILayout.ObjectField(label, AssetDatabase.LoadAssetAtPath<UnityEditor.Presets.Preset>(property.stringValue), typeof(UnityEditor.Presets.Preset), false) as UnityEditor.Presets.Preset);
 			bool isTexturePreset = texturePreset != null && texturePreset.GetTargetTypeName() == "TextureImporter";
 			property.stringValue = isTexturePreset ? AssetDatabase.GetAssetPath(texturePreset) : "";
 		}

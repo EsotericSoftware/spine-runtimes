@@ -1,0 +1,43 @@
+{
+  "name": "@esotericsoftware/spine-pixi",
+  "version": "4.2.17",
+  "description": "The official Spine Runtimes for the web.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/esotericsoftware/spine-runtimes.git"
+  },
+  "keywords": [
+    "gamedev",
+    "animations",
+    "2d",
+    "spine",
+    "game-dev",
+    "runtimes",
+    "skeletal"
+  ],
+  "author": "Esoteric Software LLC",
+  "license": "LicenseRef-LICENSE",
+  "bugs": {
+    "url": "https://github.com/esotericsoftware/spine-runtimes/issues"
+  },
+  "homepage": "https://github.com/esotericsoftware/spine-runtimes#readme",
+  "dependencies": {
+    "@esotericsoftware/spine-core": "4.2.17"
+  },
+  "peerDependencies": {
+    "@pixi/core": "^7.2.4",
+    "@pixi/display": "^7.2.4",
+    "@pixi/graphics": "^7.2.4",
+    "@pixi/text": "^7.2.4",
+    "@pixi/assets": "^7.2.4",
+    "@pixi/mesh": "^7.2.4"
+  }
+}

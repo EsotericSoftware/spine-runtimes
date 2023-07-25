@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineSkeletonFileResource" inherits="Resource" version="3.4">
+	<brief_description>
+		Resource wrapping a Spine skeleton .spine-json or .skel file. Used by [code]SpineSkeletonDataResource[/code].
+	</brief_description>
+	<description>
+		Resource wrapping a Spine skeleton .spine-json or .skel file. Used by [code]SpineSkeletonDataResource[/code].
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+	</methods>
+	<constants>
+	</constants>
+</class>

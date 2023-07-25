@@ -8,12 +8,12 @@
 		"esModuleInterop": true,
 		"lib": [
 			"DOM",
-			"ES2015"
+			"ES2015",
+			"ScriptHost"
 		],
 		"declaration": true,
 		"composite": true,
-		"moduleResolution": "node"
-		/*"strictNullChecks": true,
-		"strictPropertyInitialization": true*/
+		"moduleResolution": "node",
+		"strict": true
 	}
 }

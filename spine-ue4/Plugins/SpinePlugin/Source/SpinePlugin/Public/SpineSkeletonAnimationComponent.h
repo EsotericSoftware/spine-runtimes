@@ -192,7 +192,7 @@ public:
 	float getAnimationDuration() { return entry ? entry->getAnimation()->getDuration() : 0; }
 
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|TrackEntry")
-	float isValidAnimation() { return entry != nullptr; }
+	bool isValidAnimation() { return entry != nullptr; }
 
 	UPROPERTY(BlueprintAssignable, Category = "Components|Spine|TrackEntry")
 	FSpineAnimationStartDelegate AnimationStart;

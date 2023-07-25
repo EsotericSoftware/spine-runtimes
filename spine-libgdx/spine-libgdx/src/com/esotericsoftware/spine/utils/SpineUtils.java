@@ -37,23 +37,27 @@ public class SpineUtils {
 	static public final float degreesToRadians = PI / 180;
 	static public final float degRad = degreesToRadians;
 
-	public static float cosDeg (float degrees) {
+	static public float cosDeg (float degrees) {
 		return (float)Math.cos(degrees * degRad);
 	}
 
-	public static float sinDeg (float degrees) {
+	static public float sinDeg (float degrees) {
 		return (float)Math.sin(degrees * degRad);
 	}
 
-	public static float cos (float radians) {
+	static public float cos (float radians) {
 		return (float)Math.cos(radians);
 	}
 
-	public static float sin (float radians) {
+	static public float sin (float radians) {
 		return (float)Math.sin(radians);
 	}
 
-	public static float atan2 (float y, float x) {
+	static public float atan2Deg (float y, float x) {
+		return (float)Math.atan2(y, x) * radDeg;
+	}
+
+	static public float atan2 (float y, float x) {
 		return (float)Math.atan2(y, x);
 	}
 

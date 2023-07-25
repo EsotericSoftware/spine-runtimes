@@ -27,21 +27,15 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifdef SPINE_UE4
-#include "SpinePluginPrivatePCH.h"
-#endif
-
-#include <spine/Bone.h>
 #include <spine/SequenceTimeline.h>
+#include <spine/Bone.h>
 #include <spine/RegionAttachment.h>
 #include <spine/MeshAttachment.h>
 #include <spine/Event.h>
 #include <spine/Skeleton.h>
 #include <spine/Attachment.h>
-#include <spine/PathConstraint.h>
 #include <spine/PathConstraintData.h>
 #include <spine/Slot.h>
-#include <spine/SlotData.h>
 #include <spine/Animation.h>
 
 using namespace spine;
@@ -78,7 +72,7 @@ void SequenceTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vec
 	if (!slot->getBone().isActive()) return;
 	Attachment *slotAttachment = slot->getAttachment();
 	if (slotAttachment != _attachment) {
-		if (!slotAttachment->getRTTI().instanceOf(VertexAttachment::rtti) || ((VertexAttachment *) slotAttachment)->getTimelineAttachment() != _attachment) return;
+		if (slotAttachment == NULL || !slotAttachment->getRTTI().instanceOf(VertexAttachment::rtti) || ((VertexAttachment *) slotAttachment)->getTimelineAttachment() != _attachment) return;
 	}
 
 	Vector<float> &frames = this->_frames;
@@ -95,7 +89,8 @@ void SequenceTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vec
 	Sequence *sequence = NULL;
 	if (_attachment->getRTTI().instanceOf(RegionAttachment::rtti)) sequence = ((RegionAttachment *) _attachment)->getSequence();
 	if (_attachment->getRTTI().instanceOf(MeshAttachment::rtti)) sequence = ((MeshAttachment *) _attachment)->getSequence();
-	int index = modeAndIndex >> 4, count = sequence->getRegions().size();
+	if (!sequence) return;
+	int index = modeAndIndex >> 4, count = (int) sequence->getRegions().size();
 	int mode = modeAndIndex & 0xf;
 	if (mode != SequenceMode::hold) {
 		index += (int) (((time - before) / delay + 0.00001));
@@ -108,7 +103,7 @@ void SequenceTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vec
 				break;
 			case SequenceMode::pingpong: {
 				int n = (count << 1) - 2;
-				index %= n;
+				index = n == 0 ? 0 : index % n;
 				if (index >= count) index = n - index;
 				break;
 			}
@@ -120,7 +115,7 @@ void SequenceTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vec
 				break;
 			case SequenceMode::pingpongReverse: {
 				int n = (count << 1) - 2;
-				index = (index + count - 1) % n;
+				index = n == 0 ? 0 : (index + count - 1) % n;
 				if (index >= count) index = n - index;
 			}
 		}

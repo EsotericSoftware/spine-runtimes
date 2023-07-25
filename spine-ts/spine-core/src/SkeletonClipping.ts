@@ -40,8 +40,8 @@ export class SkeletonClipping {
 	clippedTriangles = new Array<number>();
 	private scratch = new Array<number>();
 
-	private clipAttachment: ClippingAttachment;
-	private clippingPolygons: Array<Array<number>>;
+	private clipAttachment: ClippingAttachment | null = null;
+	private clippingPolygons: Array<Array<number>> | null = null;
 
 	clipStart (slot: Slot, clip: ClippingAttachment): number {
 		if (this.clipAttachment) return 0;
@@ -85,8 +85,8 @@ export class SkeletonClipping {
 
 		let clipOutput = this.clipOutput, clippedVertices = this.clippedVertices;
 		let clippedTriangles = this.clippedTriangles;
-		let polygons = this.clippingPolygons;
-		let polygonsCount = this.clippingPolygons.length;
+		let polygons = this.clippingPolygons!;
+		let polygonsCount = polygons.length;
 		let vertexSize = twoColor ? 12 : 8;
 
 		let index = 0;
@@ -234,7 +234,7 @@ export class SkeletonClipping {
 		let clipped = false;
 
 		// Avoid copy at the end.
-		let input: Array<number> = null;
+		let input: Array<number>;
 		if (clippingArea.length % 4 >= 2) {
 			input = output;
 			output = this.scratch;

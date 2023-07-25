@@ -3,6 +3,7 @@ class App {
         this.skeleton = null;
         this.animationState = null;
         this.canvas = null;
+        this.pma = true;
     }
 
     loadAssets(canvas) {
@@ -21,6 +22,12 @@ class App {
         let animationSelectBox = document.body.querySelector("#animations");
         animationSelectBox.onchange = () => {
             this.animationState.setAnimation(0, animationSelectBox.value, true);
+        }
+
+        // Setup listener for the PMA checkbox
+        let pmaCheckbox = document.body.querySelector("#pma");
+        pmaCheckbox.onchange = () => {
+            this.pma = pmaCheckbox.checked;
         }
 
         // Setup the drag and drop listener
@@ -116,8 +123,7 @@ class App {
             option.selected = animation.name == animationName;
             animationSelectBox.appendChild(option);
         }
-
-        if (animationName) this.animationState.setAnimation(0, animationName, true);
+        this.animationState.setAnimation(0, animationName, true);
 
         // Center the skeleton in the viewport
         this.centerSkeleton();
@@ -153,10 +159,11 @@ class App {
         renderer.resize(spine.ResizeMode.Expand);
 
         canvas.clear(0.2, 0.2, 0.2, 1);
+
         renderer.begin();
         renderer.line(-10000, 0, 10000, 0, spine.Color.RED);
         renderer.line(0, -10000, 0, 10000, spine.Color.GREEN);
-        renderer.drawSkeleton(this.skeleton, true);
+        renderer.drawSkeleton(this.skeleton, this.pma);
         renderer.end();
     }
 }

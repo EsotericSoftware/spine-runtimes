@@ -417,7 +417,7 @@ int spAnimationState_apply(spAnimationState *self, spSkeleton *skeleton) {
 		if ((i == 0 && mix == 1) || blend == SP_MIX_BLEND_ADD) {
 			for (ii = 0; ii < timelineCount; ii++) {
 				timeline = timelines[ii];
-				if (timeline->propertyIds[0] == SP_PROPERTY_ATTACHMENT) {
+				if (timeline->type == SP_TIMELINE_ATTACHMENT) {
 					_spAnimationState_applyAttachmentTimeline(self, timeline, skeleton, applyTime, blend, -1);
 				} else {
 					spTimeline_apply(timelines[ii], skeleton, animationLast, applyTime, applyEvents,
@@ -435,10 +435,10 @@ int spAnimationState_apply(spAnimationState *self, spSkeleton *skeleton) {
 			for (ii = 0; ii < timelineCount; ii++) {
 				timeline = timelines[ii];
 				timelineBlend = timelineMode->items[ii] == SUBSEQUENT ? blend : SP_MIX_BLEND_SETUP;
-				if (!shortestRotation && timeline->propertyIds[0] == SP_PROPERTY_ROTATE)
+				if (!shortestRotation && timeline->type == SP_TIMELINE_ROTATE)
 					_spAnimationState_applyRotateTimeline(self, timeline, skeleton, applyTime, mix, timelineBlend,
 														  timelinesRotation, ii << 1, firstFrame);
-				else if (timeline->propertyIds[0] == SP_PROPERTY_ATTACHMENT)
+				else if (timeline->type == SP_TIMELINE_ATTACHMENT)
 					_spAnimationState_applyAttachmentTimeline(self, timeline, skeleton, applyTime, timelineBlend, -1);
 				else
 					spTimeline_apply(timeline, skeleton, animationLast, applyTime, applyEvents, &internal->eventsCount,
@@ -538,7 +538,7 @@ float _spAnimationState_applyMixingFrom(spAnimationState *self, spTrackEntry *to
 
 			switch (timelineMode->items[i]) {
 				case SUBSEQUENT:
-					if (!drawOrder && timeline->propertyIds[0] == SP_PROPERTY_DRAWORDER) continue;
+					if (!drawOrder && timeline->type == SP_TIMELINE_DRAWORDER) continue;
 					timelineBlend = blend;
 					alpha = alphaMix;
 					break;
@@ -561,14 +561,14 @@ float _spAnimationState_applyMixingFrom(spAnimationState *self, spTrackEntry *to
 					break;
 			}
 			from->totalAlpha += alpha;
-			if (!shortestRotation && timeline->propertyIds[0] == SP_PROPERTY_ROTATE)
+			if (!shortestRotation && timeline->type == SP_TIMELINE_ROTATE)
 				_spAnimationState_applyRotateTimeline(self, timeline, skeleton, applyTime, alpha, timelineBlend,
 													  timelinesRotation, i << 1, firstFrame);
-			else if (timeline->propertyIds[0] == SP_PROPERTY_ATTACHMENT)
+			else if (timeline->type == SP_TIMELINE_ATTACHMENT)
 				_spAnimationState_applyAttachmentTimeline(self, timeline, skeleton, applyTime, timelineBlend,
 														  attachments);
 			else {
-				if (drawOrder && timeline->propertyIds[0] == SP_PROPERTY_DRAWORDER &&
+				if (drawOrder && timeline->type == SP_TIMELINE_DRAWORDER &&
 					timelineBlend == SP_MIX_BLEND_SETUP)
 					direction = SP_MIX_DIRECTION_IN;
 				spTimeline_apply(timeline, skeleton, animationLast, applyTime, events, &internal->eventsCount,
@@ -595,19 +595,11 @@ _spAnimationState_setAttachment(spAnimationState *self, spSkeleton *skeleton, sp
 
 /* @param target After the first and before the last entry. */
 static int binarySearch1(float *values, int valuesLength, float target) {
-	int low = 0, current;
-	int high = valuesLength - 2;
-	if (high == 0) return 1;
-	current = high >> 1;
-	while (1) {
-		if (values[(current + 1)] <= target)
-			low = current + 1;
-		else
-			high = current;
-		if (low == high) return low + 1;
-		current = (low + high) >> 1;
+	int i;
+	for (i = 1; i < valuesLength; i++) {
+		if (values[i] > target) return (int) (i - 1);
 	}
-	return 0;
+	return (int) valuesLength - 1;
 }
 
 void _spAnimationState_applyAttachmentTimeline(spAnimationState *self, spTimeline *timeline, spSkeleton *skeleton,
@@ -676,23 +668,26 @@ void _spAnimationState_applyRotateTimeline(spAnimationState *self, spTimeline *t
 	if (diff == 0) {
 		total = timelinesRotation[i];
 	} else {
-		float lastTotal, lastDiff;
+		float lastTotal, lastDiff, loops;
 		if (firstFrame) {
 			lastTotal = 0;
 			lastDiff = diff;
 		} else {
-			lastTotal = timelinesRotation[i];    /* Angle and direction of mix, including loops. */
-			lastDiff = timelinesRotation[i + 1]; /* Difference between bones. */
+			lastTotal = timelinesRotation[i];
+			lastDiff = timelinesRotation[i + 1];
 		}
-		current = diff > 0;
-		dir = lastTotal >= 0;
-		/* Detect cross at 0 (not 180). */
-		if (SIGNUM(lastDiff) != SIGNUM(diff) && ABS(lastDiff) <= 90) {
-			/* A cross after a 360 rotation is a loop. */
-			if (ABS(lastTotal) > 180) lastTotal += 360 * SIGNUM(lastTotal);
-			dir = current;
+		loops = lastTotal - FMOD(lastTotal, 360);
+		total = diff + loops;
+		current = diff >= 0, dir = lastTotal >= 0;
+		if (ABS(lastDiff) <= 90 && SIGNUM(lastDiff) != SIGNUM(diff)) {
+			if (ABS(lastTotal - loops) > 180) {
+				total += 360 * SIGNUM(lastTotal);
+				dir = current;
+			} else if (loops != 0)
+				total -= 360 * SIGNUM(lastTotal);
+			else
+				dir = current;
 		}
-		total = diff + lastTotal - FMOD(lastTotal, 360); /* Store loops as part of lastTotal. */
 		if (dir != current) total += 360 * SIGNUM(lastTotal);
 		timelinesRotation[i] = total;
 	}
@@ -1041,6 +1036,12 @@ float spTrackEntry_getAnimationTime(spTrackEntry *entry) {
 	return MIN(entry->trackTime + entry->animationStart, entry->animationEnd);
 }
 
+void spTrackEntry_resetRotationDirections(spTrackEntry *entry) {
+	FREE(entry->timelinesRotation);
+	entry->timelinesRotation = NULL;
+	entry->timelinesRotationCount = 0;
+}
+
 float spTrackEntry_getTrackComplete(spTrackEntry *entry) {
 	float duration = entry->animationEnd - entry->animationStart;
 	if (duration != 0) {
@@ -1083,9 +1084,9 @@ continue_outer:
 		int numIds = timeline->propertyIdsCount;
 		if (!_spAnimationState_addPropertyIDs(state, ids, numIds))
 			timelineMode[i] = SUBSEQUENT;
-		else if (to == 0 || timeline->propertyIds[0] == SP_PROPERTY_ATTACHMENT ||
-				 timeline->propertyIds[0] == SP_PROPERTY_DRAWORDER ||
-				 timeline->propertyIds[0] == SP_PROPERTY_EVENT ||
+		else if (to == 0 || timeline->type == SP_TIMELINE_ATTACHMENT ||
+				 timeline->type == SP_TIMELINE_DRAWORDER ||
+				 timeline->type == SP_TIMELINE_EVENT ||
 				 !spAnimation_hasTimeline(to->animation, ids, numIds)) {
 			timelineMode[i] = FIRST;
 		} else {

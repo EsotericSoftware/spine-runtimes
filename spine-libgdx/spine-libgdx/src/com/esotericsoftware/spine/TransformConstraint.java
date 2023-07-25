@@ -92,7 +92,7 @@ public class TransformConstraint implements Updatable {
 
 	/** Applies the constraint to the constrained bones. */
 	public void update () {
-		if (mixRotate == 0 && mixX == 0 && mixY == 0 && mixScaleX == 0 && mixScaleX == 0 && mixShearY == 0) return;
+		if (mixRotate == 0 && mixX == 0 && mixY == 0 && mixScaleX == 0 && mixScaleY == 0 && mixShearY == 0) return;
 		if (data.local) {
 			if (data.relative)
 				applyRelativeLocal();

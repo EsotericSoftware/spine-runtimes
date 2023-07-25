@@ -27,18 +27,14 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include "SpinePluginPrivatePCH.h"
-
+#include "SSpineWidget.h"
 #include "Framework/Application/SlateApplication.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Materials/MaterialInterface.h"
-#include "Modules/ModuleManager.h"
 #include "Rendering/DrawElements.h"
 #include "Runtime/SlateRHIRenderer/Public/Interfaces/ISlateRHIRendererModule.h"
-#include "SSpineWidget.h"
 #include "Slate/SMeshWidget.h"
 #include "Slate/SlateVectorArtData.h"
-#include "Slate/SlateVectorArtInstanceData.h"
 #include "SlateMaterialBrush.h"
 #include "SpineWidget.h"
 #include <spine/spine.h>
@@ -69,7 +65,12 @@ void SSpineWidget::SetData(USpineWidget *Widget) {
 		skeleton->setToSetupPose();
 		skeleton->updateWorldTransform();
 		Vector<float> scratchBuffer;
-		skeleton->getBounds(this->boundsMin.X, this->boundsMin.Y, this->boundsSize.X, this->boundsSize.Y, scratchBuffer);
+		float x, y, w, h;
+		skeleton->getBounds(x, y, w, h, scratchBuffer);
+		boundsMin.X = x;
+		boundsMin.Y = y;
+		boundsSize.X = w;
+		boundsSize.Y = h;
 	}
 }
 
@@ -273,8 +274,9 @@ void SSpineWidget::UpdateMesh(int32 LayerId, FSlateWindowElementList &OutDrawEle
 		if (attachment->getRTTI().isExactly(RegionAttachment::rtti)) {
 			RegionAttachment *regionAttachment = (RegionAttachment *) attachment;
 			attachmentColor.set(regionAttachment->getColor());
-			attachmentAtlasRegion = (AtlasRegion *) regionAttachment->getRendererObject();
+			attachmentVertices->setSize(8, 0);
 			regionAttachment->computeWorldVertices(*slot, *attachmentVertices, 0, 2);
+			attachmentAtlasRegion = (AtlasRegion *) regionAttachment->getRegion();
 			attachmentIndices = quadIndices;
 			attachmentUvs = regionAttachment->getUVs().buffer();
 			numVertices = 4;
@@ -282,8 +284,9 @@ void SSpineWidget::UpdateMesh(int32 LayerId, FSlateWindowElementList &OutDrawEle
 		} else if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
 			MeshAttachment *mesh = (MeshAttachment *) attachment;
 			attachmentColor.set(mesh->getColor());
-			attachmentAtlasRegion = (AtlasRegion *) mesh->getRendererObject();
+			attachmentVertices->setSize(mesh->getWorldVerticesLength(), 0);
 			mesh->computeWorldVertices(*slot, 0, mesh->getWorldVerticesLength(), attachmentVertices->buffer(), 0, 2);
+			attachmentAtlasRegion = (AtlasRegion *) mesh->getRegion();
 			attachmentIndices = mesh->getTriangles().buffer();
 			attachmentUvs = mesh->getUVs().buffer();
 			numVertices = mesh->getWorldVerticesLength() >> 1;

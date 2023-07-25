@@ -44,6 +44,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
 
+/** Demonstrates rendering an animation to a frame buffer (FBO) and then rendering the FBO to the screen. */
 public class FboTest extends ApplicationAdapter {
 	OrthographicCamera camera;
 	TwoColorPolygonBatch batch;

@@ -39,6 +39,8 @@ Shader "Spine/Sprite/Vertex Lit"
 		_BlendAmount ("Blend", Range(0,1)) = 0.0
 
 		[MaterialToggle(_LIGHT_AFFECTS_ADDITIVE)] _LightAffectsAdditive("Light Affects Additive", Float) = 0
+		[MaterialToggle(_TINT_BLACK_ON)]  _TintBlack("Tint Black", Float) = 0
+		_Black("Dark Color", Color) = (0,0,0,0)
 
 		[HideInInspector] _SrcBlend ("__src", Float) = 1.0
 		[HideInInspector] _DstBlend ("__dst", Float) = 0.0
@@ -54,6 +56,7 @@ Shader "Spine/Sprite/Vertex Lit"
 		[HideInInspector] _ThresholdEnd("Outline Threshold", Range(0,1)) = 0.25
 		[HideInInspector] _OutlineSmoothness("Outline Smoothness", Range(0,1)) = 1.0
 		[HideInInspector][MaterialToggle(_USE8NEIGHBOURHOOD_ON)] _Use8Neighbourhood("Sample 8 Neighbours", Float) = 1
+		[HideInInspector] _OutlineOpaqueAlpha("Opaque Alpha", Range(0,1)) = 1.0
 		[HideInInspector] _OutlineMipLevel("Outline Mip Level", Range(0,3)) = 0
 	}
 
@@ -95,6 +98,7 @@ Shader "Spine/Sprite/Vertex Lit"
 				#pragma shader_feature _SPHERICAL_HARMONICS
 				#pragma shader_feature _FOG
 				#pragma shader_feature _LIGHT_AFFECTS_ADDITIVE
+				#pragma shader_feature _TINT_BLACK_ON
 
 				#pragma fragmentoption ARB_precision_hint_fastest
 				#pragma multi_compile_fog

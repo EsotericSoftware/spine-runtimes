@@ -49,7 +49,7 @@ namespace spine {
 
 	SkeletonDrawable::SkeletonDrawable(SkeletonData *skeletonData, AnimationStateData *stateData) : timeScale(1),
 																									vertexArray(new VertexArray(Triangles, skeletonData->getBones().size() * 4)),
-																									vertexEffect(NULL), worldVertices(), clipper() {
+																									worldVertices(), clipper() {
 		Bone::setYDown(true);
 		worldVertices.ensureCapacity(SPINE_MESH_VERTEX_COUNT_MAX);
 		skeleton = new (__FILE__, __LINE__) Skeleton(skeletonData);
@@ -89,8 +89,6 @@ namespace spine {
 		// Early out if skeleton is invisible
 		if (skeleton->getColor().a == 0) return;
 
-		if (vertexEffect != NULL) vertexEffect->begin(*skeleton);
-
 		sf::Vertex vertex;
 		Texture *texture = NULL;
 		for (unsigned i = 0; i < skeleton->getSlots().size(); ++i) {
@@ -105,7 +103,6 @@ namespace spine {
 			}
 
 			Vector<float> *vertices = &worldVertices;
-			int verticesCount = 0;
 			Vector<float> *uvs = NULL;
 			Vector<unsigned short> *indices = NULL;
 			int indicesCount = 0;
@@ -123,11 +120,10 @@ namespace spine {
 
 				worldVertices.setSize(8, 0);
 				regionAttachment->computeWorldVertices(slot, worldVertices, 0, 2);
-				verticesCount = 4;
 				uvs = &regionAttachment->getUVs();
 				indices = &quadIndices;
 				indicesCount = 6;
-				texture = (Texture *) ((AtlasRegion *) regionAttachment->getRendererObject())->page->getRendererObject();
+				texture = (Texture *) ((AtlasRegion *) regionAttachment->getRegion())->page->texture;
 
 			} else if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
 				MeshAttachment *mesh = (MeshAttachment *) attachment;
@@ -140,12 +136,11 @@ namespace spine {
 				}
 
 				worldVertices.setSize(mesh->getWorldVerticesLength(), 0);
-				texture = (Texture *) ((AtlasRegion *) mesh->getRendererObject())->page->getRendererObject();
 				mesh->computeWorldVertices(slot, 0, mesh->getWorldVerticesLength(), worldVertices.buffer(), 0, 2);
-				verticesCount = mesh->getWorldVerticesLength() >> 1;
 				uvs = &mesh->getUVs();
 				indices = &mesh->getTriangles();
 				indicesCount = mesh->getTriangles().size();
+				texture = (Texture *) ((AtlasRegion *) mesh->getRegion())->page->texture;
 
 			} else if (attachment->getRTTI().isExactly(ClippingAttachment::rtti)) {
 				ClippingAttachment *clip = (ClippingAttachment *) slot.getAttachment();
@@ -218,7 +213,6 @@ namespace spine {
 			if (clipper.isClipping()) {
 				clipper.clipTriangles(worldVertices, *indices, *uvs, 2);
 				vertices = &clipper.getClippedVertices();
-				verticesCount = clipper.getClippedVertices().size() >> 1;
 				uvs = &clipper.getClippedUVs();
 				indices = &clipper.getClippedTriangles();
 				indicesCount = clipper.getClippedTriangles().size();
@@ -226,55 +220,18 @@ namespace spine {
 
 			Vector2u size = texture->getSize();
 
-			if (vertexEffect != 0) {
-				tempUvs.clear();
-				tempColors.clear();
-				for (int ii = 0; ii < verticesCount; ii++) {
-					Color vertexColor = light;
-					Color dark;
-					dark.r = dark.g = dark.b = dark.a = 0;
-					int index = ii << 1;
-					float x = (*vertices)[index];
-					float y = (*vertices)[index + 1];
-					float u = (*uvs)[index];
-					float v = (*uvs)[index + 1];
-					vertexEffect->transform(x, y, u, v, vertexColor, dark);
-					(*vertices)[index] = x;
-					(*vertices)[index + 1] = y;
-					tempUvs.add(u);
-					tempUvs.add(v);
-					tempColors.add(vertexColor);
-				}
-
-				for (int ii = 0; ii < indicesCount; ++ii) {
-					int index = (*indices)[ii] << 1;
-					vertex.position.x = (*vertices)[index];
-					vertex.position.y = (*vertices)[index + 1];
-					vertex.texCoords.x = (*uvs)[index] * size.x;
-					vertex.texCoords.y = (*uvs)[index + 1] * size.y;
-					Color vertexColor = tempColors[index >> 1];
-					vertex.color.r = static_cast<Uint8>(vertexColor.r * 255);
-					vertex.color.g = static_cast<Uint8>(vertexColor.g * 255);
-					vertex.color.b = static_cast<Uint8>(vertexColor.b * 255);
-					vertex.color.a = static_cast<Uint8>(vertexColor.a * 255);
-					vertexArray->append(vertex);
-				}
-			} else {
-				for (int ii = 0; ii < indicesCount; ++ii) {
-					int index = (*indices)[ii] << 1;
-					vertex.position.x = (*vertices)[index];
-					vertex.position.y = (*vertices)[index + 1];
-					vertex.texCoords.x = (*uvs)[index] * size.x;
-					vertex.texCoords.y = (*uvs)[index + 1] * size.y;
-					vertexArray->append(vertex);
-				}
+			for (int ii = 0; ii < indicesCount; ++ii) {
+				int index = (*indices)[ii] << 1;
+				vertex.position.x = (*vertices)[index];
+				vertex.position.y = (*vertices)[index + 1];
+				vertex.texCoords.x = (*uvs)[index] * size.x;
+				vertex.texCoords.y = (*uvs)[index + 1] * size.y;
+				vertexArray->append(vertex);
 			}
 			clipper.clipEnd(slot);
 		}
 		target.draw(*vertexArray, states);
 		clipper.clipEnd();
-
-		if (vertexEffect != 0) vertexEffect->end();
 	}
 
 	void SFMLTextureLoader::load(AtlasPage &page, const String &path) {
@@ -284,7 +241,7 @@ namespace spine {
 		if (page.magFilter == TextureFilter_Linear) texture->setSmooth(true);
 		if (page.uWrap == TextureWrap_Repeat && page.vWrap == TextureWrap_Repeat) texture->setRepeated(true);
 
-		page.setRendererObject(texture);
+		page.texture = texture;
 		Vector2u size = texture->getSize();
 		page.width = size.x;
 		page.height = size.y;

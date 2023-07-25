@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated January 1, 2020. Replaces all prior versions.
+ * Last updated September 24, 2021. Replaces all prior versions.
  *
- * Copyright (c) 2013-2020, Esoteric Software LLC
+ * Copyright (c) 2013-2022, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -76,7 +76,7 @@ namespace Spine.Unity.Playables {
 			if (playableHandle == null)
 				return;
 
-			var skeleton = playableHandle.Skeleton;
+			Skeleton skeleton = playableHandle.Skeleton;
 
 			if (!m_FirstFrameHappened) {
 				originalScaleX = skeleton.ScaleX;
@@ -125,7 +125,7 @@ namespace Spine.Unity.Playables {
 			if (playableHandle == null)
 				return;
 
-			var skeleton = playableHandle.Skeleton;
+			Skeleton skeleton = playableHandle.Skeleton;
 			skeleton.ScaleX = originalScaleX;
 			skeleton.ScaleY = originalScaleY;
 		}

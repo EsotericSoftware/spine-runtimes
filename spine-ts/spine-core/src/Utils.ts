@@ -35,7 +35,7 @@ export interface StringMap<T> {
 }
 
 export class IntSet {
-	array = new Array<number>();
+	array = new Array<number | undefined>();
 
 	add (value: number): boolean {
 		let contains = this.contains(value);
@@ -354,7 +354,7 @@ export class Pool<T> {
 	}
 
 	obtain () {
-		return this.items.length > 0 ? this.items.pop() : this.instantiator();
+		return this.items.length > 0 ? this.items.pop()! : this.instantiator();
 	}
 
 	free (item: T) {

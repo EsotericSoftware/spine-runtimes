@@ -195,20 +195,25 @@ public class IkConstraint implements Updatable {
 			ty = targetY - bone.worldY;
 			break;
 		case noRotationOrReflection:
-			float s = Math.abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
+			float s = Math.abs(pa * pd - pb * pc) / Math.max(0.0001f, pa * pa + pc * pc);
 			float sa = pa / bone.skeleton.scaleX;
 			float sc = pc / bone.skeleton.scaleY;
 			pb = -sc * s * bone.skeleton.scaleX;
 			pd = sa * s * bone.skeleton.scaleY;
-			rotationIK += atan2(sc, sa) * radDeg;
+			rotationIK += atan2Deg(sc, sa);
 			// Fall through.
 		default:
 			float x = targetX - p.worldX, y = targetY - p.worldY;
 			float d = pa * pd - pb * pc;
-			tx = (x * pd - y * pb) / d - bone.ax;
-			ty = (y * pa - x * pc) / d - bone.ay;
+			if (Math.abs(d) <= 0.0001f) {
+				tx = 0;
+				ty = 0;
+			} else {
+				tx = (x * pd - y * pb) / d - bone.ax;
+				ty = (y * pa - x * pc) / d - bone.ay;
+			}
 		}
-		rotationIK += atan2(ty, tx) * radDeg;
+		rotationIK += atan2Deg(ty, tx);
 		if (bone.ascaleX < 0) rotationIK += 180;
 		if (rotationIK > 180)
 			rotationIK -= 360;
@@ -222,11 +227,14 @@ public class IkConstraint implements Updatable {
 				tx = targetX - bone.worldX;
 				ty = targetY - bone.worldY;
 			}
-			float b = bone.data.length * sx, dd = (float)Math.sqrt(tx * tx + ty * ty);
-			if ((compress && dd < b) || (stretch && dd > b) && b > 0.0001f) {
-				float s = (dd / b - 1) * alpha + 1;
-				sx *= s;
-				if (uniform) sy *= s;
+			float b = bone.data.length * sx;
+			if (b > 0.0001f) {
+				float dd = tx * tx + ty * ty;
+				if ((compress && dd < b * b) || (stretch && dd > b * b)) {
+					float s = ((float)Math.sqrt(dd) / b - 1) * alpha + 1;
+					sx *= s;
+					if (uniform) sy *= s;
+				}
 			}
 		}
 		bone.updateWorldTransform(bone.ax, bone.ay, bone.arotation + rotationIK * alpha, sx, sy, bone.ashearX, bone.ashearY);
@@ -273,7 +281,8 @@ public class IkConstraint implements Updatable {
 		b = pp.b;
 		c = pp.c;
 		d = pp.d;
-		float id = 1 / (a * d - b * c), x = cwx - pp.worldX, y = cwy - pp.worldY;
+		float id = a * d - b * c, x = cwx - pp.worldX, y = cwy - pp.worldY;
+		id = Math.abs(id) <= 0.0001f ? 0 : 1 / id;
 		float dx = (x * d - y * b) * id - px, dy = (y * a - x * c) * id - py;
 		float l1 = (float)Math.sqrt(dx * dx + dy * dy), l2 = child.data.length * csx, a1, a2;
 		if (l1 < 0.0001f) {

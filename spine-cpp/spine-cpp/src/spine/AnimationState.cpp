@@ -27,12 +27,8 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifdef SPINE_UE4
-#include "SpinePluginPrivatePCH.h"
-#endif
-
-#include <spine/Animation.h>
 #include <spine/AnimationState.h>
+#include <spine/Animation.h>
 #include <spine/AnimationStateData.h>
 #include <spine/AttachmentTimeline.h>
 #include <spine/Bone.h>
@@ -215,17 +211,16 @@ EventQueueEntry::EventQueueEntry(EventType eventType, TrackEntry *trackEntry, Ev
 																							  _event(event) {
 }
 
-EventQueue *EventQueue::newEventQueue(AnimationState &state, Pool<TrackEntry> &trackEntryPool) {
-	return new (__FILE__, __LINE__) EventQueue(state, trackEntryPool);
+EventQueue *EventQueue::newEventQueue(AnimationState &state) {
+	return new (__FILE__, __LINE__) EventQueue(state);
 }
 
 EventQueueEntry EventQueue::newEventQueueEntry(EventType eventType, TrackEntry *entry, Event *event) {
 	return EventQueueEntry(eventType, entry, event);
 }
 
-EventQueue::EventQueue(AnimationState &state, Pool<TrackEntry> &trackEntryPool) : _state(state),
-																				  _trackEntryPool(trackEntryPool),
-																				  _drainDisabled(false) {
+EventQueue::EventQueue(AnimationState &state) : _state(state),
+												_drainDisabled(false) {
 }
 
 EventQueue::~EventQueue() {
@@ -299,8 +294,7 @@ void EventQueue::drain() {
 				else
 					state._listenerObject->callback(&state, EventType_Dispose, trackEntry, NULL);
 
-				trackEntry->reset();
-				_trackEntryPool.free(trackEntry);
+				if (!_state.getManualTrackEntryDisposal()) _state.disposeTrackEntry(trackEntry);
 				break;
 			case EventType_Event:
 				if (!trackEntry->_listenerObject)
@@ -319,12 +313,13 @@ void EventQueue::drain() {
 }
 
 AnimationState::AnimationState(AnimationStateData *data) : _data(data),
-														   _queue(EventQueue::newEventQueue(*this, _trackEntryPool)),
+														   _queue(EventQueue::newEventQueue(*this)),
 														   _animationsChanged(false),
 														   _listener(dummyOnAnimationEventFunc),
 														   _listenerObject(NULL),
 														   _unkeyedState(0),
-														   _timeScale(1) {
+														   _timeScale(1),
+														   _manualTrackEntryDisposal(false) {
 }
 
 AnimationState::~AnimationState() {
@@ -493,7 +488,7 @@ bool AnimationState::apply(Skeleton &skeleton) {
 
 	int setupState = _unkeyedState + Setup;
 	Vector<Slot *> &slots = skeleton.getSlots();
-	for (int i = 0, n = slots.size(); i < n; i++) {
+	for (int i = 0, n = (int) slots.size(); i < n; i++) {
 		Slot *slot = slots[i];
 		if (slot->getAttachmentState() == setupState) {
 			const String &attachmentName = slot->getData().getAttachmentName();
@@ -670,6 +665,19 @@ void AnimationState::enableQueue() {
 	_queue->_drainDisabled = false;
 }
 
+void AnimationState::setManualTrackEntryDisposal(bool inValue) {
+	_manualTrackEntryDisposal = inValue;
+}
+
+bool AnimationState::getManualTrackEntryDisposal() {
+	return _manualTrackEntryDisposal;
+}
+
+void AnimationState::disposeTrackEntry(TrackEntry *entry) {
+	entry->reset();
+	_trackEntryPool.free(entry);
+}
+
 Animation *AnimationState::getEmptyAnimation() {
 	static Vector<Timeline *> timelines;
 	static Animation ret(String("<empty>"), timelines, 0);
@@ -734,19 +742,21 @@ void AnimationState::applyRotateTimeline(RotateTimeline *rotateTimeline, Skeleto
 			lastTotal = 0;
 			lastDiff = diff;
 		} else {
-			lastTotal = timelinesRotation[i];   // Angle and direction of mix, including loops.
-			lastDiff = timelinesRotation[i + 1];// Difference between bones.
+			lastTotal = timelinesRotation[i];
+			lastDiff = timelinesRotation[i + 1];
 		}
-
-		bool current = diff > 0, dir = lastTotal >= 0;
-		// Detect cross at 0 (not 180).
-		if (MathUtil::sign(lastDiff) != MathUtil::sign(diff) && MathUtil::abs(lastDiff) <= 90) {
-			// A cross after a 360 rotation is a loop.
-			if (MathUtil::abs(lastTotal) > 180) lastTotal += 360 * MathUtil::sign(lastTotal);
-			dir = current;
+		float loops = lastTotal - MathUtil::fmod(lastTotal, 360.f);
+		total = diff + loops;
+		bool current = diff >= 0, dir = lastTotal >= 0;
+		if (MathUtil::abs(lastDiff) <= 90 && MathUtil::sign(lastDiff) != MathUtil::sign(diff)) {
+			if (MathUtil::abs(lastTotal - loops) > 180) {
+				total += 360.f * MathUtil::sign(lastTotal);
+				dir = current;
+			} else if (loops != 0)
+				total -= 360.f * MathUtil::sign(lastTotal);
+			else
+				dir = current;
 		}
-
-		total = diff + lastTotal - MathUtil::fmod(lastTotal, 360);// Store loops as part of lastTotal.
 		if (dir != current) {
 			total += 360 * MathUtil::sign(lastTotal);
 		}
@@ -955,7 +965,7 @@ TrackEntry *AnimationState::newTrackEntry(size_t trackIndex, Animation *animatio
 	TrackEntry *entryP = _trackEntryPool.obtain();// Pooling
 	TrackEntry &entry = *entryP;
 
-	entry._trackIndex = trackIndex;
+	entry._trackIndex = (int) trackIndex;
 	entry._animation = animation;
 	entry._loop = loop;
 	entry._holdPrevious = 0;

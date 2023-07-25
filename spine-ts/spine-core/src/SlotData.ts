@@ -36,10 +36,10 @@ export class SlotData {
 	index: number = 0;
 
 	/** The name of the slot, which is unique across all slots in the skeleton. */
-	name: string = null;
+	name: string;
 
 	/** The bone this slot belongs to. */
-	boneData: BoneData = null;
+	boneData: BoneData;
 
 	/** The color used to tint the slot's attachment. If {@link #getDarkColor()} is set, this is used as the light color for two
 	 * color tinting. */
@@ -47,13 +47,13 @@ export class SlotData {
 
 	/** The dark color used to tint the slot's attachment for two color tinting, or null if two color tinting is not used. The dark
 	 * color's alpha is not used. */
-	darkColor: Color = null;
+	darkColor: Color | null = null;
 
 	/** The name of the attachment that is visible for this slot in the setup pose, or null if no attachment is visible. */
-	attachmentName: string = null;
+	attachmentName: string | null = null;
 
 	/** The blend mode for drawing the slot's attachment. */
-	blendMode: BlendMode = null;
+	blendMode: BlendMode = BlendMode.Normal;
 
 	constructor (index: number, name: string, boneData: BoneData) {
 		if (index < 0) throw new Error("index must be >= 0.");

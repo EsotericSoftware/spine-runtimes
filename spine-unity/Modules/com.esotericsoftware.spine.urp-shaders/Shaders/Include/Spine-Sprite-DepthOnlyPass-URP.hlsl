@@ -36,7 +36,7 @@ half4 DepthOnlyFragmentSprite(VaryingsSprite input) : SV_TARGET
 {
 	fixed4 texureColor = calculateTexturePixel(input.texcoordAndAlpha.xy);
 	clip(texureColor.a * input.texcoordAndAlpha.a - _Cutoff);
-	return 0;
+	return input.positionCS.z;
 }
 
 #endif

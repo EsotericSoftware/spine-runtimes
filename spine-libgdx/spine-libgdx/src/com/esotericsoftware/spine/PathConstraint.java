@@ -29,6 +29,8 @@
 
 package com.esotericsoftware.spine;
 
+import static com.esotericsoftware.spine.utils.SpineUtils.*;
+
 import java.util.Arrays;
 
 import com.badlogic.gdx.utils.Array;
@@ -39,15 +41,14 @@ import com.esotericsoftware.spine.PathConstraintData.RotateMode;
 import com.esotericsoftware.spine.PathConstraintData.SpacingMode;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.PathAttachment;
-import com.esotericsoftware.spine.utils.SpineUtils;
 
 /** Stores the current pose for a path constraint. A path constraint adjusts the rotation, translation, and scale of the
  * constrained bones so they follow a {@link PathAttachment}.
  * <p>
  * See <a href="http://esotericsoftware.com/spine-path-constraints">Path constraints</a> in the Spine User Guide. */
 public class PathConstraint implements Updatable {
-	static private final int NONE = -1, BEFORE = -2, AFTER = -3;
-	static private final float epsilon = 0.00001f;
+	static final int NONE = -1, BEFORE = -2, AFTER = -3;
+	static final float epsilon = 0.00001f;
 
 	final PathConstraintData data;
 	final Array<Bone> bones;
@@ -121,12 +122,8 @@ public class PathConstraint implements Updatable {
 				for (int i = 0, n = spacesCount - 1; i < n; i++) {
 					Bone bone = (Bone)bones[i];
 					float setupLength = bone.data.length;
-					if (setupLength < epsilon)
-						lengths[i] = 0;
-					else {
-						float x = setupLength * bone.a, y = setupLength * bone.c;
-						lengths[i] = (float)Math.sqrt(x * x + y * y);
-					}
+					float x = setupLength * bone.a, y = setupLength * bone.c;
+					lengths[i] = (float)Math.sqrt(x * x + y * y);
 				}
 			}
 			Arrays.fill(spaces, 1, spacesCount, spacing);
@@ -178,7 +175,7 @@ public class PathConstraint implements Updatable {
 		else {
 			tip = false;
 			Bone p = target.bone;
-			offsetRotation *= p.a * p.d - p.b * p.c > 0 ? SpineUtils.degRad : -SpineUtils.degRad;
+			offsetRotation *= p.a * p.d - p.b * p.c > 0 ? degRad : -degRad;
 		}
 		for (int i = 0, p = 3; i < boneCount; i++, p += 3) {
 			Bone bone = (Bone)bones[i];
@@ -202,23 +199,23 @@ public class PathConstraint implements Updatable {
 				else if (spaces[i + 1] < epsilon)
 					r = positions[p + 2];
 				else
-					r = (float)Math.atan2(dy, dx);
-				r -= (float)Math.atan2(c, a);
+					r = atan2(dy, dx);
+				r -= atan2(c, a);
 				if (tip) {
-					cos = (float)Math.cos(r);
-					sin = (float)Math.sin(r);
+					cos = cos(r);
+					sin = sin(r);
 					float length = bone.data.length;
 					boneX += (length * (cos * a - sin * c) - dx) * mixRotate;
 					boneY += (length * (sin * a + cos * c) - dy) * mixRotate;
 				} else
 					r += offsetRotation;
-				if (r > SpineUtils.PI)
-					r -= SpineUtils.PI2;
-				else if (r < -SpineUtils.PI) //
-					r += SpineUtils.PI2;
+				if (r > PI)
+					r -= PI2;
+				else if (r < -PI) //
+					r += PI2;
 				r *= mixRotate;
-				cos = (float)Math.cos(r);
-				sin = (float)Math.sin(r);
+				cos = cos(r);
+				sin = sin(r);
 				bone.a = cos * a - sin * c;
 				bone.b = cos * b - sin * d;
 				bone.c = sin * a + cos * c;
@@ -464,16 +461,16 @@ public class PathConstraint implements Updatable {
 	}
 
 	private void addBeforePosition (float p, float[] temp, int i, float[] out, int o) {
-		float x1 = temp[i], y1 = temp[i + 1], dx = temp[i + 2] - x1, dy = temp[i + 3] - y1, r = (float)Math.atan2(dy, dx);
-		out[o] = x1 + p * (float)Math.cos(r);
-		out[o + 1] = y1 + p * (float)Math.sin(r);
+		float x1 = temp[i], y1 = temp[i + 1], dx = temp[i + 2] - x1, dy = temp[i + 3] - y1, r = atan2(dy, dx);
+		out[o] = x1 + p * cos(r);
+		out[o + 1] = y1 + p * sin(r);
 		out[o + 2] = r;
 	}
 
 	private void addAfterPosition (float p, float[] temp, int i, float[] out, int o) {
-		float x1 = temp[i + 2], y1 = temp[i + 3], dx = x1 - temp[i], dy = y1 - temp[i + 1], r = (float)Math.atan2(dy, dx);
-		out[o] = x1 + p * (float)Math.cos(r);
-		out[o + 1] = y1 + p * (float)Math.sin(r);
+		float x1 = temp[i + 2], y1 = temp[i + 3], dx = x1 - temp[i], dy = y1 - temp[i + 1], r = atan2(dy, dx);
+		out[o] = x1 + p * cos(r);
+		out[o + 1] = y1 + p * sin(r);
 		out[o + 2] = r;
 	}
 
@@ -482,7 +479,7 @@ public class PathConstraint implements Updatable {
 		if (p < epsilon || Float.isNaN(p)) {
 			out[o] = x1;
 			out[o + 1] = y1;
-			out[o + 2] = (float)Math.atan2(cy1 - y1, cx1 - x1);
+			out[o + 2] = atan2(cy1 - y1, cx1 - x1);
 			return;
 		}
 		float tt = p * p, ttt = tt * p, u = 1 - p, uu = u * u, uuu = uu * u;
@@ -492,9 +489,9 @@ public class PathConstraint implements Updatable {
 		out[o + 1] = y;
 		if (tangents) {
 			if (p < 0.001f)
-				out[o + 2] = (float)Math.atan2(cy1 - y1, cx1 - x1);
+				out[o + 2] = atan2(cy1 - y1, cx1 - x1);
 			else
-				out[o + 2] = (float)Math.atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
+				out[o + 2] = atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
 		}
 	}
 

@@ -4,7 +4,7 @@
 float4 computeOutlinePixel(sampler2D mainTexture, float2 mainTextureTexelSize,
 	float2 uv, float vertexColorAlpha,
 	float OutlineWidth, float OutlineReferenceTexWidth, float OutlineMipLevel,
-	float OutlineSmoothness, float ThresholdEnd, float4 OutlineColor) {
+	float OutlineSmoothness, float ThresholdEnd, float OutlineOpaqueAlpha, float4 OutlineColor) {
 
 	float4 texColor = fixed4(0, 0, 0, 0);
 
@@ -36,7 +36,18 @@ float4 computeOutlinePixel(sampler2D mainTexture, float2 mainTextureTexelSize,
 #endif
 	float thresholdStart = ThresholdEnd * (1.0 - OutlineSmoothness);
 	float outlineAlpha = saturate(saturate((average - thresholdStart) / (ThresholdEnd - thresholdStart)) - pixelCenter);
+	outlineAlpha = pixelCenter > OutlineOpaqueAlpha ? 0 : outlineAlpha;
 	return lerp(texColor, OutlineColor, outlineAlpha);
+}
+
+float4 computeOutlinePixel(sampler2D mainTexture, float2 mainTextureTexelSize,
+	float2 uv, float vertexColorAlpha,
+	float OutlineWidth, float OutlineReferenceTexWidth, float OutlineMipLevel,
+	float OutlineSmoothness, float ThresholdEnd, float4 OutlineColor) {
+
+	return computeOutlinePixel(mainTexture, mainTextureTexelSize,
+		uv, vertexColorAlpha, OutlineWidth, OutlineReferenceTexWidth, OutlineMipLevel,
+		OutlineSmoothness, ThresholdEnd, 1.0, OutlineColor);
 }
 
 #endif

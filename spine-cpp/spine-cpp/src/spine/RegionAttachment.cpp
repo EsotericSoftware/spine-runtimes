@@ -27,10 +27,6 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifdef SPINE_UE4
-#include "SpinePluginPrivatePCH.h"
-#endif
-
 #include <spine/RegionAttachment.h>
 
 #include <spine/Bone.h>
@@ -51,7 +47,7 @@ const int RegionAttachment::URY = 5;
 const int RegionAttachment::BRX = 6;
 const int RegionAttachment::BRY = 7;
 
-RegionAttachment::RegionAttachment(const String &name) : Attachment(name), HasRendererObject(),
+RegionAttachment::RegionAttachment(const String &name) : Attachment(name),
 														 _x(0),
 														 _y(0),
 														 _rotation(0),
@@ -72,6 +68,18 @@ RegionAttachment::~RegionAttachment() {
 }
 
 void RegionAttachment::updateRegion() {
+	if (_region == NULL) {
+		_uvs[BLX] = 0;
+		_uvs[BLY] = 0;
+		_uvs[ULX] = 0;
+		_uvs[ULY] = 1;
+		_uvs[URX] = 1;
+		_uvs[URY] = 1;
+		_uvs[BRX] = 1;
+		_uvs[BRY] = 0;
+		return;
+	}
+
 	float regionScaleX = _width / _region->originalWidth * _scaleX;
 	float regionScaleY = _height / _region->originalHeight * _scaleY;
 	float localX = -_width / 2 * _scaleX + _region->offsetX * regionScaleX;
@@ -251,7 +259,6 @@ spine::Color &RegionAttachment::getColor() {
 Attachment *RegionAttachment::copy() {
 	RegionAttachment *copy = new (__FILE__, __LINE__) RegionAttachment(getName());
 	copy->_region = _region;
-	copy->setRendererObject(getRendererObject());
 	copy->_path = _path;
 	copy->_x = _x;
 	copy->_y = _y;

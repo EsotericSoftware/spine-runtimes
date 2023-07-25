@@ -209,7 +209,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 			entry = state.setAnimation(track, ui.animationList.getSelected(), ui.loopCheckbox.isChecked());
 			entry.setHoldPrevious(track > 0 && ui.holdPrevCheckbox.isChecked());
 		}
-		entry.setMixBlend(ui.addCheckbox.isChecked() ? MixBlend.add : MixBlend.replace);
+		entry.setMixBlend(track > 0 && ui.addCheckbox.isChecked() ? MixBlend.add : MixBlend.replace);
 		entry.setReverse(ui.reverseCheckbox.isChecked());
 		entry.setAlpha(ui.alphaSlider.getValue());
 	}
@@ -283,6 +283,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 			debugRenderer.setPaths(ui.debugPathsCheckbox.isChecked());
 			debugRenderer.setPoints(ui.debugPointsCheckbox.isChecked());
 			debugRenderer.setClipping(ui.debugClippingCheckbox.isChecked());
+			debugRenderer.setClipping(ui.debugPhysicsCheckbox.isChecked());
 			debugRenderer.draw(skeleton);
 		}
 
@@ -350,6 +351,11 @@ public class SkeletonViewer extends ApplicationAdapter {
 		((ScreenViewport)ui.stage.getViewport()).setUnitsPerPixel(1 / uiScale);
 		ui.stage.getViewport().update(width, height, true);
 		if (!ui.minimizeButton.isChecked()) ui.window.setHeight(height / uiScale + 8);
+	}
+
+	public void dispose () {
+		super.dispose();
+		Runtime.getRuntime().exit(0);
 	}
 
 	static public void main (String[] args) throws Exception {

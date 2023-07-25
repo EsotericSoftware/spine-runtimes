@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineAnimation" inherits="SpineObjectWrapper" version="3.4">
+	<brief_description>
+		Stores a list of timelines to animate a skeleton's pose over time. The timelines can not be modified through GDScript.
+	</brief_description>
+	<description>
+		Stores a list of timelines to animate a skeleton's pose over time. The timelines can not be modified through GDScript.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="apply">
+			<return type="void" />
+			<argument index="0" name="skeleton" type="SpineSkeleton" />
+			<argument index="1" name="last_time" type="float" />
+			<argument index="2" name="time" type="float" />
+			<argument index="3" name="loop" type="bool" />
+			<argument index="4" name="events" type="Array" />
+			<argument index="5" name="alpha" type="float" />
+			<argument index="6" name="blend" type="int" enum="SpineConstant.MixBlend" />
+			<argument index="7" name="direction" type="int" enum="SpineConstant.MixDirection" />
+			<description>
+				Applies the animation's timelines to the specified skeleton.
+			</description>
+		</method>
+		<method name="get_duration">
+			<return type="float" />
+			<description>
+				The duration of the animation in seconds, which is usually the highest time of all frames in the timeline. The duration is used to know when it has completed and when it should loop back to the start.
+			</description>
+		</method>
+		<method name="get_name">
+			<return type="String" />
+			<description>
+				The animation's name, which is unique across all animations in the skeleton.
+			</description>
+		</method>
+		<method name="get_timelines">
+			<return type="Array" />
+			<description>
+				Returns the timlines making up this animation. Modifying the returned array has no effect on the animation.
+			</description>
+		</method>
+		<method name="has_timeline">
+			<return type="bool" />
+			<argument index="0" name="ids" type="Array" />
+			<description>
+				Returns whether the animation has the timeline with the given [code]ids[/code].
+			</description>
+		</method>
+		<method name="set_duration">
+			<return type="void" />
+			<argument index="0" name="duration" type="float" />
+			<description>
+				Sets the [code]duration[/code] of the timeline in seconds.
+			</description>
+		</method>
+	</methods>
+	<constants>
+	</constants>
+</class>

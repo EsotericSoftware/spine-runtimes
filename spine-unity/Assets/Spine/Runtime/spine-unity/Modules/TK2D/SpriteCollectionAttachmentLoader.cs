@@ -28,9 +28,9 @@
  *****************************************************************************/
 
 #if SPINE_TK2D
+using Spine;
 using System;
 using UnityEngine;
-using Spine;
 
 // MITCH: handle TPackerCW flip mode (probably not swap uv horizontaly)
 namespace Spine.Unity.TK2D {
@@ -49,9 +49,9 @@ namespace Spine.Unity.TK2D {
 			this.sprites = sprites;
 		}
 
-		private void ProcessSpriteDefinition (String name) {
+		private AtlasRegion ProcessSpriteDefinition (String name) {
 			// Strip folder names.
-			int index = name.LastIndexOfAny(new char[] {'/', '\\'});
+			int index = name.LastIndexOfAny(new char[] { '/', '\\' });
 			if (index != -1)
 				name = name.Substring(index + 1);
 
@@ -88,6 +88,11 @@ namespace Spine.Unity.TK2D {
 
 			regionWidth = (int)(def.boundsData[1].x / def.texelSize.x);
 			regionHeight = (int)(def.boundsData[1].y / def.texelSize.y);
+			if (regionRotated) {
+				float tempSwap = regionWidth;
+				regionWidth = regionHeight;
+				regionHeight = tempSwap;
+			}
 
 			float x0 = def.untrimmedBoundsData[0].x - def.untrimmedBoundsData[1].x / 2;
 			float x1 = def.boundsData[0].x - def.boundsData[1].x / 2;
@@ -98,42 +103,62 @@ namespace Spine.Unity.TK2D {
 			regionOffsetY = (int)((y1 - y0) / def.texelSize.y);
 
 			material = def.materialInst;
-		}
 
-		public RegionAttachment NewRegionAttachment (Skin skin, String name, String path) {
-			ProcessSpriteDefinition(path);
-
-			RegionAttachment region = new RegionAttachment(name);
-			region.Path = path;
-			region.RendererObject = material;
-			region.SetUVs(u, v, u2, v2, regionRotated);
-			region.RegionOriginalWidth = regionOriginalWidth;
-			region.RegionOriginalHeight = regionOriginalHeight;
-			region.RegionWidth = regionWidth;
-			region.RegionHeight = regionHeight;
-			region.RegionOffsetX = regionOffsetX;
-			region.RegionOffsetY = regionOffsetY;
+			AtlasRegion region = new AtlasRegion();
+			region.name = name;
+			AtlasPage page = new AtlasPage();
+			page.rendererObject = material;
+			region.page = page;
+			region.u = u;
+			region.v = v;
+			region.u2 = u2;
+			region.v2 = v2;
+			region.rotate = regionRotated;
+			region.degrees = regionRotated ? 90 : 0;
+			region.originalWidth = (int)regionOriginalWidth;
+			region.originalHeight = (int)regionOriginalHeight;
+			region.width = (int)regionWidth;
+			region.height = (int)regionHeight;
+			region.offsetX = regionOffsetX;
+			region.offsetY = regionOffsetY;
 			return region;
 		}
 
-		public MeshAttachment NewMeshAttachment (Skin skin, String name, String path) {
-			ProcessSpriteDefinition(path);
+		private void LoadSequence (string name, string basePath, Sequence sequence) {
+			TextureRegion[] regions = sequence.Regions;
+			for (int i = 0, n = regions.Length; i < n; i++) {
+				string path = sequence.GetPath(basePath, i);
+				regions[i] = ProcessSpriteDefinition(path);
+				if (regions[i] == null) throw new ArgumentException(string.Format("Region not found in atlas: {0} (region attachment: {1})", path, name));
+			}
+		}
 
-			MeshAttachment mesh = new MeshAttachment(name);
-			mesh.Path = path;
-			mesh.RendererObject = material;
-			mesh.RegionU = u;
-			mesh.RegionV = v;
-			mesh.RegionU2 = u2;
-			mesh.RegionV2 = v2;
-			mesh.RegionRotate = regionRotated;
-			mesh.RegionOriginalWidth = regionOriginalWidth;
-			mesh.RegionOriginalHeight = regionOriginalHeight;
-			mesh.RegionWidth = regionWidth;
-			mesh.RegionHeight = regionHeight;
-			mesh.RegionOffsetX = regionOffsetX;
-			mesh.RegionOffsetY = regionOffsetY;
-			return mesh;
+		public RegionAttachment NewRegionAttachment (Skin skin, String name, String path, Sequence sequence) {
+			RegionAttachment attachment = new RegionAttachment(name);
+			if (sequence != null)
+				LoadSequence(name, path, sequence);
+			else {
+				AtlasRegion region = ProcessSpriteDefinition(path);
+				if (region == null)
+					throw new ArgumentException(string.Format("Region not found in atlas: {0} (region attachment: {1})", path, name));
+				attachment.Region = region;
+				attachment.Path = path;
+			}
+			return attachment;
+		}
+
+		public MeshAttachment NewMeshAttachment (Skin skin, String name, String path, Sequence sequence) {
+			MeshAttachment attachment = new MeshAttachment(name);
+			if (sequence != null)
+				LoadSequence(name, path, sequence);
+			else {
+				AtlasRegion region = ProcessSpriteDefinition(path);
+				if (region == null)
+					throw new ArgumentException(string.Format("Region not found in atlas: {0} (region attachment: {1})", path, name));
+				attachment.Region = region;
+				attachment.Path = path;
+			}
+			return attachment;
 		}
 
 		public BoundingBoxAttachment NewBoundingBoxAttachment (Skin skin, String name) {

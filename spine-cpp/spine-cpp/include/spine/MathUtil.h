@@ -33,6 +33,9 @@
 #include <spine/SpineObject.h>
 
 #include <string.h>
+// Needed for older MSVC versions
+#undef min
+#undef max
 
 namespace spine {
 

@@ -41,8 +41,6 @@ public:
 
 	virtual bool init();
 
-	virtual void update(float fDelta);
-
 private:
 	spine::SkeletonAnimation *skeletonNode;
 	float swirlTime;

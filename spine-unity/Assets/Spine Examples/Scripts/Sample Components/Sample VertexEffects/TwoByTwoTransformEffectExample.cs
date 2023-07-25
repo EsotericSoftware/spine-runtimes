@@ -62,7 +62,7 @@ namespace Spine.Unity.Examples {
 			int vertexCount = buffers.vertexCount; // For efficiency, limit your effect to the actual mesh vertex count using vertexCount
 
 			// Modify vertex positions by accessing Vector3[] vertexBuffer
-			var vertices = buffers.vertexBuffer;
+			Vector3[] vertices = buffers.vertexBuffer;
 			Vector3 transformedPos = default(Vector3);
 			for (int i = 0; i < vertexCount; i++) {
 				Vector3 originalPos = vertices[i];
@@ -89,7 +89,7 @@ public class TwoByTwoTransformEffectExampleEditor : UnityEditor.Editor {
 	Spine.Unity.Examples.TwoByTwoTransformEffectExample Target { get { return target as Spine.Unity.Examples.TwoByTwoTransformEffectExample; } }
 
 	void OnSceneGUI () {
-		var transform = Target.transform;
+		Transform transform = Target.transform;
 		LocalVectorHandle(ref Target.xAxis, transform, Color.red);
 		LocalVectorHandle(ref Target.yAxis, transform, Color.green);
 	}

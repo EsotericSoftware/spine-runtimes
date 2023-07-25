@@ -96,12 +96,17 @@ namespace Spine.Unity {
 			"\nWarning: 'Canvas Group Tint Black' is enabled at SkeletonGraphic but not 'CanvasGroup Compatible' at the Material!\n\nPlease\n"
 			+ "a) enable 'CanvasGroup Compatible' at the Material or\n"
 			+ "b) disable 'Canvas Group Tint Black' at the SkeletonGraphic component under 'Advanced'.\n"
-			+ "You may want to duplicate the 'SkeletonGraphicDefault' material and change settings at the duplicate to not affect all instances.";
+			+ "You may want to duplicate the 'SkeletonGraphicTintBlack' material and change settings at the duplicate to not affect all instances.";
+		public static readonly string kCanvasGroupCompatibleDisabledMessage =
+			"\nWarning: 'CanvasGroup Compatible' is enabled at the Material but 'Canvas Group Tint Black' is disabled at SkeletonGraphic!\n\nPlease\n"
+			+ "a) disable 'CanvasGroup Compatible' at the Material or\n"
+			+ "b) enable 'Canvas Group Tint Black' at the SkeletonGraphic component under 'Advanced'.\n"
+			+ "You may want to duplicate the 'SkeletonGraphicTintBlack' material and change settings at the duplicate to not affect all instances.";
 
 		public static bool IsMaterialSetupProblematic (SkeletonRenderer renderer, ref string errorMessage) {
-			var materials = renderer.GetComponent<Renderer>().sharedMaterials;
+			Material[] materials = renderer.GetComponent<Renderer>().sharedMaterials;
 			bool isProblematic = false;
-			foreach (var material in materials) {
+			foreach (Material material in materials) {
 				if (material == null) continue;
 				isProblematic |= IsMaterialSetupProblematic(material, ref errorMessage);
 				if (renderer.zSpacing == 0) {
@@ -123,13 +128,12 @@ namespace Spine.Unity {
 			return isProblematic;
 		}
 
-		public static bool IsMaterialSetupProblematic(SkeletonGraphic skeletonGraphic, ref string errorMessage)
-		{
-			var material = skeletonGraphic.material;
+		public static bool IsMaterialSetupProblematic (SkeletonGraphic skeletonGraphic, ref string errorMessage) {
+			Material material = skeletonGraphic.material;
 			bool isProblematic = false;
 			if (material) {
 				isProblematic |= IsMaterialSetupProblematic(material, ref errorMessage);
-				var settings = skeletonGraphic.MeshGenerator.settings;
+				MeshGenerator.Settings settings = skeletonGraphic.MeshGenerator.settings;
 				if (settings.zSpacing == 0) {
 					isProblematic |= IsZSpacingRequired(material, ref errorMessage);
 				}
@@ -153,15 +157,20 @@ namespace Spine.Unity {
 					isProblematic = true;
 					errorMessage += kCanvasGroupCompatibleMessage;
 				}
+				if (settings.tintBlack == true && settings.canvasGroupTintBlack == false
+					&& IsCanvasGroupCompatible(material)) {
+					isProblematic = true;
+					errorMessage += kCanvasGroupCompatibleDisabledMessage;
+				}
 			}
 			return isProblematic;
 		}
 
-		public static bool IsMaterialSetupProblematic(Material material, ref string errorMessage) {
+		public static bool IsMaterialSetupProblematic (Material material, ref string errorMessage) {
 			return !IsColorSpaceSupported(material, ref errorMessage);
 		}
 
-		public static bool IsZSpacingRequired(Material material, ref string errorMessage) {
+		public static bool IsZSpacingRequired (Material material, ref string errorMessage) {
 			bool hasForwardAddPass = material.FindPass("FORWARD_DELTA") >= 0;
 			if (hasForwardAddPass) {
 				errorMessage += kZSpacingRequiredMessage;
@@ -222,8 +231,7 @@ namespace Spine.Unity {
 						"(You can disable this warning in `Edit - Preferences - Spine`)\n", texturePath, materialName);
 					isProblematic = true;
 				}
-			}
-			else { // straight alpha texture
+			} else { // straight alpha texture
 				if (!alphaIsTransparency) {
 					string materialName = System.IO.Path.GetFileName(materialPath);
 					errorMessage += string.Format("`{0}` and material `{1}` : Incorrect" +
@@ -245,14 +253,12 @@ namespace Spine.Unity {
 					material.DisableKeyword(STRAIGHT_ALPHA_KEYWORD);
 				else
 					material.EnableKeyword(STRAIGHT_ALPHA_KEYWORD);
-			}
-			else {
+			} else {
 				if (enablePMATexture) {
 					material.DisableKeyword(ALPHAPREMULTIPLY_ON_KEYWORD);
 					material.DisableKeyword(ALPHABLEND_ON_KEYWORD);
 					material.EnableKeyword(ALPHAPREMULTIPLY_VERTEX_ONLY_ON_KEYWORD);
-				}
-				else {
+				} else {
 					material.DisableKeyword(ALPHAPREMULTIPLY_ON_KEYWORD);
 					material.DisableKeyword(ALPHAPREMULTIPLY_VERTEX_ONLY_ON_KEYWORD);
 					material.EnableKeyword(ALPHABLEND_ON_KEYWORD);
@@ -260,7 +266,7 @@ namespace Spine.Unity {
 			}
 		}
 
-		static bool IsPMATextureMaterial (Material material) {
+		public static bool IsPMATextureMaterial (Material material) {
 			bool usesAlphaPremultiplyKeyword = IsSpriteShader(material);
 			if (usesAlphaPremultiplyKeyword)
 				return material.IsKeywordEnabled(ALPHAPREMULTIPLY_ON_KEYWORD);

@@ -99,6 +99,11 @@ spAtlasPage *spAtlasPage_create(spAtlas *atlas, const char *name) {
 	spAtlasPage *self = NEW(spAtlasPage);
 	CONST_CAST(spAtlas *, self->atlas) = atlas;
 	MALLOC_STR(self->name, name);
+	self->minFilter = SP_ATLAS_NEAREST;
+	self->magFilter = SP_ATLAS_NEAREST;
+	self->format = SP_ATLAS_RGBA8888;
+	self->uWrap = SP_ATLAS_CLAMPTOEDGE;
+	self->vWrap = SP_ATLAS_CLAMPTOEDGE;
 	return self;
 }
 

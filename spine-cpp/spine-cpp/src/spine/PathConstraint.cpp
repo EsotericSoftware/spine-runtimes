@@ -27,10 +27,6 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifdef SPINE_UE4
-#include "SpinePluginPrivatePCH.h"
-#endif
-
 #include <spine/PathConstraint.h>
 
 #include <spine/Bone.h>
@@ -152,7 +148,7 @@ void PathConstraint::update() {
 		}
 	}
 
-	Vector<float> &positions = computeWorldPositions(*attachment, spacesCount, tangents);
+	Vector<float> &positions = computeWorldPositions(*attachment, (int) spacesCount, tangents);
 	float boneX = positions[0];
 	float boneY = positions[1];
 	float offsetRotation = data.getOffsetRotation();
@@ -225,7 +221,7 @@ void PathConstraint::update() {
 }
 
 int PathConstraint::getOrder() {
-	return _data.getOrder();
+	return (int) _data.getOrder();
 }
 
 float PathConstraint::getPosition() {
@@ -292,7 +288,7 @@ PathConstraint::computeWorldPositions(PathAttachment &path, int spacesCount, boo
 	Vector<float> &out = _positions;
 	Vector<float> &world = _world;
 	bool closed = path.isClosed();
-	int verticesLength = path.getWorldVerticesLength();
+	int verticesLength = (int) path.getWorldVerticesLength();
 	int curveCount = verticesLength / 6;
 	int prevCurve = NONE;
 

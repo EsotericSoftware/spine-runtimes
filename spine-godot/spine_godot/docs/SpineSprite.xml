@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineSprite" inherits="Node2D" version="3.4">
+	<brief_description>
+		A node for animating and rendering a Spine skeleton to a 2D scene.
+	</brief_description>
+	<description>
+		A Spine sprite node is the main node type used to animate and render a Spine skeleton in a 2D scene.
+		The Spine sprite gets its skeleton, texture atlas data, and animation mixes from a [code]SpineSkeletonDataResource[/code]. The skeleton data resource can and should be shared across multiple Spine sprites to save resources.
+		The Spine sprite provides a [code]SpineAnimationState[/code] via [code]get_animation_state()[/code] through which it can be animated.
+		The Spine sprite also provides acccess to the underlying [code]SpineSkeleton[/code] via [code]get_skeleton[/code] which allows querying bones, slots, constraints, and other parts of the skeleton.
+		The [code]SpineSkeleton[/code] is also used to set the active skin. For mix-and-match scenarios, a new skin can be created via [code]new_skin()[/code] to which the attachments of existing skins can be added via [code]SpineSkin.add_skin()[/code].
+		To insert other nodes into the drawing order of the Spine sprite's slots, a [code]SpineSlotNode[/code] can be used. This allows attaching particle systems, collision shapes, and other Godot nodes to specific slots and bones of the Spine sprite's skeleton.
+		The Spine sprite allows overriding the internal materials through 4 material properties. If set, these materials will be used instead of the default internal materials for all attachments. For more fine grained control, a [code]SpineSlotNode[/code] can override the material of the attachment on a specific slot.
+		By default, a Spine sprite is updated during the standard [code]process[/code] update. It can be set to update during the physics update via the [code]process_mode[/code] property. It can also be set to be updated manually, in which case [code]update_skeleton[/code] must be called so the internal animation state is updated and applied to the skeleon.
+		The Spine sprite provides the method to query ([code]get_global_bone_transform()[/code]) and set ([code]set_global_bone_transform[/code]) a bone's global transform. This can be used to have another node follow a bone, or have a bone follow e.g. the mouse or another node. Alternatively, a [code]SpineBoneNode[/code] can be used to achieve the same, without having to manually update and synchronize transforms.
+		The Spine sprite provides signals to listen for animation state events, such as an animation having completed or when a user defined event occurred. It also provides signals before the animations state is updated and applied, and before and after the world transforms of bones have been computed, allowing to modify the underlying skeleton before these actions happen.
+		In editor mode, the Spine sprite provides properties to show debugging information, such as bone and slot names on hover, regions and meshes, and so forth. This can be used to inspect a skeleton and its hierarchy in the editor viewport.
+		To animate a Spine sprite via the Godot animation player, [code]SpineAnimationTrack[/code] instances can be used. See the Spine Godot Runtimes documentation and the [code]examples/08-animation-player[/code] examople for more information.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="get_animation_state">
+			<return type="SpineAnimationState" />
+			<description>
+				Returns the animation state for animating the skeleton.
+			</description>
+		</method>
+		<method name="get_global_bone_transform">
+			<return type="Transform2D" />
+			<argument index="0" name="bone_name" type="String" />
+			<description>
+				Returns the bone's global transform.
+			</description>
+		</method>
+		<method name="get_skeleton">
+			<return type="SpineSkeleton" />
+			<description>
+				Returns the skeleton.
+			</description>
+		</method>
+		<method name="new_skin">
+			<return type="SpineSkin" />
+			<argument index="0" name="name" type="String" />
+			<description>
+				Creates a new skin.
+			</description>
+		</method>
+		<method name="on_skeleton_data_changed">
+			<return type="void" />
+			<description>
+			</description>
+		</method>
+		<method name="set_global_bone_transform">
+			<return type="void" />
+			<argument index="0" name="bone_name" type="String" />
+			<argument index="1" name="global_transform" type="Transform2D" />
+			<description>
+				Sets a bone's global transform. This must be done before the skeleton world transforms are computed.
+			</description>
+		</method>
+		<method name="update_skeleton">
+			<return type="void" />
+			<argument index="0" name="delta" type="float" />
+			<description>
+				Updates and applies the animation state, then updates the world transforms. Only needed for the manual processing mode.
+			</description>
+		</method>
+	</methods>
+	<members>
+		<member name="additive_material" type="Material" setter="set_additive_material" getter="get_additive_material">
+		</member>
+		<member name="bones" type="bool" setter="set_debug_bones" getter="get_debug_bones" default="false">
+		</member>
+		<member name="bones_color" type="Color" setter="set_debug_bones_color" getter="get_debug_bones_color" default="Color( 1, 1, 0, 0.5 )">
+		</member>
+		<member name="bones_thickness" type="float" setter="set_debug_bones_thickness" getter="get_debug_bones_thickness" default="5.0">
+		</member>
+		<member name="bounding_boxes" type="bool" setter="set_debug_bounding_boxes" getter="get_debug_bounding_boxes" default="false">
+		</member>
+		<member name="bounding_boxes_color" type="Color" setter="set_debug_bounding_boxes_color" getter="get_debug_bounding_boxes_color" default="Color( 0, 1, 0, 0.5 )">
+		</member>
+		<member name="clipping" type="bool" setter="set_debug_clipping" getter="get_debug_clipping" default="false">
+		</member>
+		<member name="meshes" type="bool" setter="set_debug_meshes" getter="get_debug_meshes" default="false">
+		</member>
+		<member name="meshes_color" type="Color" setter="set_debug_meshes_color" getter="get_debug_meshes_color" default="Color( 0, 0, 1, 0.5 )">
+		</member>
+		<member name="multiply_material" type="Material" setter="set_multiply_material" getter="get_multiply_material">
+		</member>
+		<member name="normal_material" type="Material" setter="set_normal_material" getter="get_normal_material">
+		</member>
+		<member name="paths" type="bool" setter="set_debug_paths" getter="get_debug_paths" default="false">
+		</member>
+		<member name="paths_clipping" type="Color" setter="set_debug_clipping_color" getter="get_debug_clipping_color" default="Color( 0.8, 0, 0, 0.8 )">
+		</member>
+		<member name="paths_color" type="Color" setter="set_debug_paths_color" getter="get_debug_paths_color" default="Color( 1, 0.498039, 0, 0.466667 )">
+		</member>
+		<member name="regions" type="bool" setter="set_debug_regions" getter="get_debug_regions" default="false">
+		</member>
+		<member name="regions_color" type="Color" setter="set_debug_regions_color" getter="get_debug_regions_color" default="Color( 0, 0, 1, 0.5 )">
+		</member>
+		<member name="screen_material" type="Material" setter="set_screen_material" getter="get_screen_material">
+		</member>
+		<member name="skeleton_data_res" type="SpineSkeletonDataResource" setter="set_skeleton_data_res" getter="get_skeleton_data_res">
+		</member>
+		<member name="update_mode" type="int" setter="set_update_mode" getter="get_update_mode" enum="SpineConstant.UpdateMode" default="0">
+		</member>
+	</members>
+	<signals>
+		<signal name="_internal_spine_objects_invalidated">
+			<description>
+			</description>
+		</signal>
+		<signal name="animation_completed">
+			<argument index="0" name="spine_sprite" type="Object" />
+			<argument index="1" name="animation_state" type="Object" />
+			<argument index="2" name="track_entry" type="Object" />
+			<description>
+				Invoked every time this entry's animation completes a loop. This may occur during mixing (after interrupt).
+				If this entry's [code]get_mixing_to()[/code] is not null, this entry is mixing out (it is not the current entry).
+				Because this event is triggered at the end of [code]AnimationState.apply[/code], any animations set in response to the event won't be applied until the next time the AnimationState is applied.
+			</description>
+		</signal>
+		<signal name="animation_disposed">
+			<argument index="0" name="spine_sprite" type="Object" />
+			<argument index="1" name="animation_state" type="Object" />
+			<argument index="2" name="track_entry" type="Object" />
+			<description>
+				Invoked when this entry will be disposed. This may occur without the entry ever being set as the current entry.
+				References to the entry should not be kept after [code]dispose[/code] is called, as it may be destroyed or reused.
+			</description>
+		</signal>
+		<signal name="animation_ended">
+			<argument index="0" name="spine_sprite" type="Object" />
+			<argument index="1" name="animation_state" type="Object" />
+			<argument index="2" name="track_entry" type="Object" />
+			<description>
+				Invoked when this entry will never be applied again. This only occurs if this entry has previously been set as the current entry (start was invoked).
+			</description>
+		</signal>
+		<signal name="animation_event">
+			<argument index="0" name="spine_sprite" type="Object" />
+			<argument index="1" name="animation_state" type="Object" />
+			<argument index="2" name="track_entry" type="Object" />
+			<argument index="3" name="event" type="Object" />
+			<description>
+				Invoked when this entry's animation triggers an event. This may occur during mixing (after interrupt), see [code]TrackEntry.get_event_threshold()[/code].
+				Because this event is triggered at the end of {@link AnimationState#apply(Skeleton)}, any animations set in response to the event won't be applied until the next time the AnimationState is applied.
+			</description>
+		</signal>
+		<signal name="animation_interrupted">
+			<argument index="0" name="spine_sprite" type="Object" />
+			<argument index="1" name="animation_state" type="Object" />
+			<argument index="2" name="track_entry" type="Object" />
+			<description>
+				Invoked when another entry has replaced this entry as the current entry. This entry may continue being applied for mixing.
+			</description>
+		</signal>
+		<signal name="animation_started">
+			<argument index="0" name="spine_sprite" type="Object" />
+			<argument index="1" name="animation_state" type="Object" />
+			<argument index="2" name="track_entry" type="Object" />
+			<description>
+				Invoked when this entry has been set as the current entry. {@link #end(TrackEntry)} will occur when this entry will no longer be applied.
+			</description>
+		</signal>
+		<signal name="before_animation_state_apply">
+			<argument index="0" name="spine_sprite" type="Object" />
+			<description>
+				Invoked before the animation state is applied to the skeleton.
+			</description>
+		</signal>
+		<signal name="before_animation_state_update">
+			<argument index="0" name="spine_sprite" type="Object" />
+			<description>
+				Invoked before the animation state is updated.
+			</description>
+		</signal>
+		<signal name="before_world_transforms_change">
+			<argument index="0" name="spine_sprite" type="Object" />
+			<description>
+				Invoked before the world transforms are computed.
+			</description>
+		</signal>
+		<signal name="world_transforms_changed">
+			<argument index="0" name="spine_sprite" type="Object" />
+			<description>
+				Invoked after the world transforms have been computed.
+			</description>
+		</signal>
+	</signals>
+	<constants>
+	</constants>
+</class>

@@ -27,10 +27,6 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifdef SPINE_UE4
-#include "SpinePluginPrivatePCH.h"
-#endif
-
 #include <spine/Extension.h>
 #include <spine/SpineString.h>
 
@@ -108,6 +104,7 @@ void DefaultSpineExtension::_free(void *mem, const char *file, int line) {
 }
 
 char *DefaultSpineExtension::_readFile(const String &path, int *length) {
+#ifndef __EMSCRIPTEN__
 	char *data;
 	FILE *file = fopen(path.buffer(), "rb");
 	if (!file) return 0;
@@ -121,6 +118,9 @@ char *DefaultSpineExtension::_readFile(const String &path, int *length) {
 	fclose(file);
 
 	return data;
+#else
+	return nullptr;
+#endif
 }
 
 DefaultSpineExtension::DefaultSpineExtension() : SpineExtension() {

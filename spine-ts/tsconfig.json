@@ -11,10 +11,16 @@
 			"path": "./spine-webgl"
 		},
 		{
+			"path": "./spine-phaser"
+		},
+		{
 			"path": "./spine-player"
 		},
 		{
 			"path": "./spine-threejs"
+		},
+		{
+			"path": "./spine-pixi"
 		}
 	]
 }

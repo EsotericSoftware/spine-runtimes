@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated January 1, 2020. Replaces all prior versions.
+ * Last updated September 24, 2021. Replaces all prior versions.
  *
- * Copyright (c) 2013-2020, Esoteric Software LLC
+ * Copyright (c) 2013-2022, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -33,8 +33,8 @@
 
 #if TIMELINE_HAS_CLIPEDITOR_CLASS
 
-using UnityEditor;
 using Spine.Unity.Playables;
+using UnityEditor;
 using UnityEditor.Timeline;
 using UnityEngine.Timeline;
 
@@ -51,11 +51,11 @@ namespace Spine.Unity.Editor {
 			SetDisplayName(clip);
 		}
 
-		protected void SetDisplayName(TimelineClip clip) {
-			var flipClip = (SpineSkeletonFlipClip)clip.asset;
+		protected void SetDisplayName (TimelineClip clip) {
+			SpineSkeletonFlipClip flipClip = (SpineSkeletonFlipClip)clip.asset;
 			if (flipClip != null) {
 				bool flipX = false, flipY = false;
-				var settings = flipClip.template;
+				SpineSkeletonFlipBehaviour settings = flipClip.template;
 				if (settings != null) {
 					flipX = settings.flipX;
 					flipY = settings.flipY;

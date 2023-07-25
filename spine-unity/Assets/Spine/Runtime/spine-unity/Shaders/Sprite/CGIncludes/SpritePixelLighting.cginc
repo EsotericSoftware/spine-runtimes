@@ -5,6 +5,12 @@
 #include "SpriteLighting.cginc"
 #include "SpriteSpecular.cginc"
 #include "AutoLight.cginc"
+#if defined(_ALPHAPREMULTIPLY_ON)
+	#undef _STRAIGHT_ALPHA_INPUT
+#else
+	#define _STRAIGHT_ALPHA_INPUT
+#endif
+#include "../../CGIncludes/Spine-Skeleton-Tint-Common.cginc"
 
 ////////////////////////////////////////
 // Defines
@@ -19,11 +25,13 @@
 	#define _LIGHT_COORD_INDEX_0 6
 	#define _LIGHT_COORD_INDEX_1 7
 	#define _FOG_COORD_INDEX 8
+	#define _DARKCOLOR_TEXCOORD_INDEX TEXCOORD9
 #else
 	#define _VERTEX_LIGHTING_INDEX TEXCOORD3
 	#define _LIGHT_COORD_INDEX_0 4
 	#define _LIGHT_COORD_INDEX_1 5
 	#define _FOG_COORD_INDEX 6
+	#define _DARKCOLOR_TEXCOORD_INDEX TEXCOORD7
 #endif // _NORMALMAP
 
 struct VertexOutput
@@ -42,6 +50,10 @@ struct VertexOutput
 #if defined(_FOG)
 	UNITY_FOG_COORDS(_FOG_COORD_INDEX)
 #endif // _FOG
+
+#if defined(_TINT_BLACK_ON)
+	float3 darkColor : _DARKCOLOR_TEXCOORD_INDEX;
+#endif
 
 	UNITY_VERTEX_OUTPUT_STEREO
 };
@@ -130,11 +142,14 @@ VertexOutput vert(VertexInput v)
 {
 	VertexOutput output;
 
-	UNITY_SETUP_INSTANCE_ID(input);
+	UNITY_SETUP_INSTANCE_ID(v);
     UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
 
 	output.pos = calculateLocalPos(v.vertex);
 	output.color = calculateVertexColor(v.color);
+#if defined(_TINT_BLACK_ON)
+	output.darkColor = GammaToTargetSpace(half3(v.tintBlackRG.r, v.tintBlackRG.g, v.tintBlackB.r)) + _Black.rgb;
+#endif
 	output.texcoord = calculateTextureCoord(v.texcoord);
 	output.posWorld = calculateWorldPos(v.vertex);
 
@@ -166,8 +181,12 @@ VertexOutput vert(VertexInput v)
 fixed4 fragBase(VertexOutput input) : SV_Target
 {
 	fixed4 texureColor = calculateTexturePixel(input.texcoord);
-	RETURN_UNLIT_IF_ADDITIVE_SLOT(texureColor, input.color) // shall be called before ALPHA_CLIP
+	RETURN_UNLIT_IF_ADDITIVE_SLOT_TINT(texureColor, input.color, input.darkColor, _Color.a, _Black.a) // shall be called before ALPHA_CLIP
 	ALPHA_CLIP(texureColor, input.color)
+
+#if defined(_TINT_BLACK_ON)
+	texureColor = fragTintedColor(texureColor, input.darkColor, input.color, _Color.a, _Black.a);
+#endif
 
 	//Get normal direction
 	fixed3 normalWorld = calculateNormalWorld(input);
@@ -221,6 +240,13 @@ fixed4 fragAdd(VertexOutput input) : SV_Target
 #endif // _COLOR_ADJUST
 
 	ALPHA_CLIP(texureColor, input.color)
+
+	// previous fragBase pass was zwrite pass, so overlapping regions require
+	// full alpha applied since they are applied only once.
+#if defined(_ALPHAPREMULTIPLY_ON)
+	texureColor.rgb /= texureColor.a == 0 ? 1 : texureColor.a;
+#endif
+	texureColor.a = 1.0;
 
 	//Get normal direction
 	fixed3 normalWorld = calculateNormalWorld(input);

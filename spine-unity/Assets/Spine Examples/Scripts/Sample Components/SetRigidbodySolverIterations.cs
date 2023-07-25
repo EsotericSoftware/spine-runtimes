@@ -44,9 +44,9 @@ namespace Spine.Unity.Examples {
 		public int solverIterations = 30;
 
 		void Awake () {
-			var rigidbodies = this.GetComponentsInChildren<Rigidbody>();
-			foreach (var rb in rigidbodies) {
-				rb.solverIterations = solverIterations;
+			Rigidbody[] rigidbodies = this.GetComponentsInChildren<Rigidbody>();
+			foreach (Rigidbody rigidbody in rigidbodies) {
+				rigidbody.solverIterations = solverIterations;
 			}
 		}
 	}

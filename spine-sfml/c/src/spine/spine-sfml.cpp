@@ -123,7 +123,6 @@ namespace spine {
 
 	SkeletonDrawable::SkeletonDrawable(spSkeletonData *skeletonData, spAnimationStateData *stateData) : timeScale(1),
 																										vertexArray(new VertexArray(Triangles, skeletonData->bonesCount * 4)),
-																										vertexEffect(0),
 																										worldVertices(0), clipper(0) {
 		spBone_setYDown(true);
 		worldVertices = MALLOC(float, SPINE_MESH_VERTEX_COUNT_MAX);
@@ -151,7 +150,6 @@ namespace spine {
 	}
 
 	void SkeletonDrawable::update(float deltaTime) {
-		spSkeleton_update(skeleton, deltaTime);
 		spAnimationState_update(state, deltaTime * timeScale);
 		spAnimationState_apply(state, skeleton);
 		spSkeleton_updateWorldTransform(skeleton);
@@ -164,8 +162,6 @@ namespace spine {
 
 		// Early out if skeleton is invisible
 		if (skeleton->color.a == 0) return;
-
-		if (vertexEffect != 0) vertexEffect->begin(vertexEffect, skeleton);
 
 		sf::Vertex vertex;
 		Texture *texture = 0;
@@ -197,7 +193,7 @@ namespace spine {
 					continue;
 				}
 
-				spRegionAttachment_computeWorldVertices(regionAttachment, slot->bone, vertices, 0, 2);
+				spRegionAttachment_computeWorldVertices(regionAttachment, slot, vertices, 0, 2);
 				verticesCount = 4;
 				uvs = regionAttachment->uvs;
 				indices = quadIndices;
@@ -215,12 +211,12 @@ namespace spine {
 				}
 
 				if (mesh->super.worldVerticesLength > SPINE_MESH_VERTEX_COUNT_MAX) continue;
-				texture = (Texture *) ((spAtlasRegion *) mesh->rendererObject)->page->rendererObject;
 				spVertexAttachment_computeWorldVertices(SUPER(mesh), slot, 0, mesh->super.worldVerticesLength, worldVertices, 0, 2);
 				verticesCount = mesh->super.worldVerticesLength >> 1;
 				uvs = mesh->uvs;
 				indices = mesh->triangles;
 				indicesCount = mesh->trianglesCount;
+				texture = (Texture *) ((spAtlasRegion *) mesh->rendererObject)->page->rendererObject;
 
 			} else if (attachment->type == SP_ATTACHMENT_CLIPPING) {
 				spClippingAttachment *clip = (spClippingAttachment *) slot->attachment;
@@ -301,56 +297,19 @@ namespace spine {
 
 			Vector2u size = texture->getSize();
 
-			if (vertexEffect != 0) {
-				spFloatArray_clear(tempUvs);
-				spColorArray_clear(tempColors);
-				for (int j = 0; j < verticesCount; j++) {
-					spColor vertexColor = light;
-					spColor dark;
-					dark.r = dark.g = dark.b = dark.a = 0;
-					int index = j << 1;
-					float x = vertices[index];
-					float y = vertices[index + 1];
-					float u = uvs[index];
-					float v = uvs[index + 1];
-					vertexEffect->transform(vertexEffect, &x, &y, &u, &v, &vertexColor, &dark);
-					vertices[index] = x;
-					vertices[index + 1] = y;
-					spFloatArray_add(tempUvs, u);
-					spFloatArray_add(tempUvs, v);
-					spColorArray_add(tempColors, vertexColor);
-				}
-
-				for (int j = 0; j < indicesCount; ++j) {
-					int index = indices[j] << 1;
-					vertex.position.x = vertices[index];
-					vertex.position.y = vertices[index + 1];
-					vertex.texCoords.x = uvs[index] * size.x;
-					vertex.texCoords.y = uvs[index + 1] * size.y;
-					spColor vertexColor = tempColors->items[index >> 1];
-					vertex.color.r = static_cast<Uint8>(vertexColor.r * 255);
-					vertex.color.g = static_cast<Uint8>(vertexColor.g * 255);
-					vertex.color.b = static_cast<Uint8>(vertexColor.b * 255);
-					vertex.color.a = static_cast<Uint8>(vertexColor.a * 255);
-					vertexArray->append(vertex);
-				}
-			} else {
-				for (int j = 0; j < indicesCount; ++j) {
-					int index = indices[j] << 1;
-					vertex.position.x = vertices[index];
-					vertex.position.y = vertices[index + 1];
-					vertex.texCoords.x = uvs[index] * size.x;
-					vertex.texCoords.y = uvs[index + 1] * size.y;
-					vertexArray->append(vertex);
-				}
+			for (int j = 0; j < indicesCount; ++j) {
+				int index = indices[j] << 1;
+				vertex.position.x = vertices[index];
+				vertex.position.y = vertices[index + 1];
+				vertex.texCoords.x = uvs[index] * size.x;
+				vertex.texCoords.y = uvs[index + 1] * size.y;
+				vertexArray->append(vertex);
 			}
 
 			spSkeletonClipping_clipEnd(clipper, slot);
 		}
 		target.draw(*vertexArray, states);
 		spSkeletonClipping_clipEnd2(clipper);
-
-		if (vertexEffect != 0) vertexEffect->end(vertexEffect);
 	}
 
 } /* namespace spine */

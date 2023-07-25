@@ -43,7 +43,7 @@ import { Sequence } from "./attachments/Sequence"
  * See [Loading skeleton data](http://esotericsoftware.com/spine-loading-skeleton-data#JSON-and-binary-data) in the
  * Spine Runtimes Guide. */
 export class AtlasAttachmentLoader implements AttachmentLoader {
-	atlas: TextureAtlas = null;
+	atlas: TextureAtlas;
 
 	constructor (atlas: TextureAtlas) {
 		this.atlas = atlas;
@@ -53,33 +53,31 @@ export class AtlasAttachmentLoader implements AttachmentLoader {
 		let regions = sequence.regions;
 		for (let i = 0, n = regions.length; i < n; i++) {
 			let path = sequence.getPath(basePath, i);
-			regions[i] = this.atlas.findRegion(path);
-			regions[i].renderObject = regions[i];
-			if (regions[i] == null) throw new Error("Region not found in atlas: " + path + " (sequence: " + name + ")");
+			let region = this.atlas.findRegion(path);
+			if (region == null) throw new Error("Region not found in atlas: " + path + " (sequence: " + name + ")");
+			regions[i] = region;
 		}
 	}
 
 	newRegionAttachment (skin: Skin, name: string, path: string, sequence: Sequence): RegionAttachment {
-		let attachment = new RegionAttachment(name);
+		let attachment = new RegionAttachment(name, path);
 		if (sequence != null) {
 			this.loadSequence(name, path, sequence);
 		} else {
 			let region = this.atlas.findRegion(path);
 			if (!region) throw new Error("Region not found in atlas: " + path + " (region attachment: " + name + ")");
-			region.renderObject = region;
 			attachment.region = region;
 		}
 		return attachment;
 	}
 
 	newMeshAttachment (skin: Skin, name: string, path: string, sequence: Sequence): MeshAttachment {
-		let attachment = new MeshAttachment(name);
+		let attachment = new MeshAttachment(name, path);
 		if (sequence != null) {
 			this.loadSequence(name, path, sequence);
 		} else {
 			let region = this.atlas.findRegion(path);
 			if (!region) throw new Error("Region not found in atlas: " + path + " (mesh attachment: " + name + ")");
-			region.renderObject = region;
 			attachment.region = region;
 		}
 		return attachment;

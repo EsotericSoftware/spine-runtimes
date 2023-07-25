@@ -36,7 +36,6 @@ using namespace spine;
 
 PowInterpolation pow2(2);
 PowOutInterpolation powOut2(2);
-SwirlVertexEffect effect(400, powOut2);
 
 Scene *RaptorExample::scene() {
 	Scene *scene = Scene::create();
@@ -52,10 +51,6 @@ bool RaptorExample::init() {
 	skeletonNode->addAnimation(1, "gun-grab", false, 2);
 	skeletonNode->setTwoColorTint(true);
 
-	effect.setCenterY(200);
-	swirlTime = 0;
-
-	skeletonNode->setVertexEffect(&effect);
 
 	skeletonNode->setPosition(Vec2(_contentSize.width / 2, 20));
 	addChild(skeletonNode);
@@ -76,11 +71,4 @@ bool RaptorExample::init() {
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 
 	return true;
-}
-
-void RaptorExample::update(float fDelta) {
-	swirlTime += fDelta;
-	float percent = spine::MathUtil::fmod(swirlTime, 2);
-	if (percent > 1) percent = 1 - (percent - 1);
-	effect.setAngle(pow2.interpolate(-60.0f, 60.0f, percent));
 }

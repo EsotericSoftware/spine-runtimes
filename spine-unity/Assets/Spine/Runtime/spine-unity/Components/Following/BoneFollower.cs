@@ -113,7 +113,7 @@ namespace Spine.Unity {
 			Initialize();
 		}
 
-		public void Initialize () {
+		public virtual void Initialize () {
 			bone = null;
 			valid = skeletonRenderer != null && skeletonRenderer.valid;
 			if (!valid) return;
@@ -137,7 +137,7 @@ namespace Spine.Unity {
 				skeletonRenderer.OnRebuild -= HandleRebuildRenderer;
 		}
 
-		public void LateUpdate () {
+		public virtual void LateUpdate () {
 			if (!valid) {
 				Initialize();
 				return;
@@ -166,7 +166,7 @@ namespace Spine.Unity {
 					if (followLocalScale && bone.ScaleX < 0) // Negate rotation from negative scaleX. Don't use negative determinant. local scaleY doesn't factor into used rotation.
 						halfRotation += Mathf.PI * 0.5f;
 
-					var q = default(Quaternion);
+					Quaternion q = default(Quaternion);
 					q.z = Mathf.Sin(halfRotation);
 					q.w = Mathf.Cos(halfRotation);
 					thisTransform.localRotation = q;

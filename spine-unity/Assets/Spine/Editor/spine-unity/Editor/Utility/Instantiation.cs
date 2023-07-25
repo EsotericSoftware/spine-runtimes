@@ -48,22 +48,23 @@ namespace Spine.Unity.Editor {
 			public struct SpawnMenuData {
 				public Vector3 spawnPoint;
 				public Transform parent;
+				public int siblingIndex;
 				public SkeletonDataAsset skeletonDataAsset;
 				public EditorInstantiation.InstantiateDelegate instantiateDelegate;
 				public bool isUI;
 			}
 
 			public static void SceneViewDragAndDrop (SceneView sceneview) {
-				var current = UnityEngine.Event.current;
-				var references = DragAndDrop.objectReferences;
+				UnityEngine.Event current = UnityEngine.Event.current;
+				UnityEngine.Object[] references = DragAndDrop.objectReferences;
 				if (current.type == EventType.Layout)
 					return;
 
 				// Allow drag and drop of one SkeletonDataAsset.
 				if (references.Length == 1) {
-					var skeletonDataAsset = references[0] as SkeletonDataAsset;
+					SkeletonDataAsset skeletonDataAsset = references[0] as SkeletonDataAsset;
 					if (skeletonDataAsset != null) {
-						var mousePos = current.mousePosition;
+						Vector2 mousePos = current.mousePosition;
 
 						bool invalidSkeletonData = skeletonDataAsset.GetSkeletonData(true) == null;
 						if (invalidSkeletonData) {
@@ -82,7 +83,7 @@ namespace Spine.Unity.Editor {
 								RectTransform rectTransform = (Selection.activeGameObject == null) ? null : Selection.activeGameObject.GetComponent<RectTransform>();
 								Plane plane = (rectTransform == null) ? new Plane(Vector3.back, Vector3.zero) : new Plane(-rectTransform.forward, rectTransform.position);
 								Vector3 spawnPoint = MousePointToWorldPoint2D(mousePos, sceneview.camera, plane);
-								ShowInstantiateContextMenu(skeletonDataAsset, spawnPoint, null);
+								ShowInstantiateContextMenu(skeletonDataAsset, spawnPoint, null, 0);
 								DragAndDrop.AcceptDrag();
 								current.Use();
 							}
@@ -91,27 +92,30 @@ namespace Spine.Unity.Editor {
 				}
 			}
 
-			public static void ShowInstantiateContextMenu (SkeletonDataAsset skeletonDataAsset, Vector3 spawnPoint, Transform parent) {
-				var menu = new GenericMenu();
+			public static void ShowInstantiateContextMenu (SkeletonDataAsset skeletonDataAsset, Vector3 spawnPoint,
+				Transform parent, int siblingIndex = 0) {
+				GenericMenu menu = new GenericMenu();
 
 				// SkeletonAnimation
 				menu.AddItem(new GUIContent("SkeletonAnimation"), false, HandleSkeletonComponentDrop, new SpawnMenuData {
 					skeletonDataAsset = skeletonDataAsset,
 					spawnPoint = spawnPoint,
 					parent = parent,
+					siblingIndex = siblingIndex,
 					instantiateDelegate = (data) => EditorInstantiation.InstantiateSkeletonAnimation(data),
 					isUI = false
 				});
 
 				// SkeletonGraphic
-				var skeletonGraphicInspectorType = System.Type.GetType("Spine.Unity.Editor.SkeletonGraphicInspector");
+				System.Type skeletonGraphicInspectorType = System.Type.GetType("Spine.Unity.Editor.SkeletonGraphicInspector");
 				if (skeletonGraphicInspectorType != null) {
-					var graphicInstantiateDelegate = skeletonGraphicInspectorType.GetMethod("SpawnSkeletonGraphicFromDrop", BindingFlags.Static | BindingFlags.Public);
+					MethodInfo graphicInstantiateDelegate = skeletonGraphicInspectorType.GetMethod("SpawnSkeletonGraphicFromDrop", BindingFlags.Static | BindingFlags.Public);
 					if (graphicInstantiateDelegate != null)
 						menu.AddItem(new GUIContent("SkeletonGraphic (UI)"), false, HandleSkeletonComponentDrop, new SpawnMenuData {
 							skeletonDataAsset = skeletonDataAsset,
 							spawnPoint = spawnPoint,
 							parent = parent,
+							siblingIndex = siblingIndex,
 							instantiateDelegate = System.Delegate.CreateDelegate(typeof(EditorInstantiation.InstantiateDelegate), graphicInstantiateDelegate) as EditorInstantiation.InstantiateDelegate,
 							isUI = true
 						});
@@ -124,6 +128,7 @@ namespace Spine.Unity.Editor {
 					skeletonDataAsset = skeletonDataAsset,
 					spawnPoint = spawnPoint,
 					parent = parent,
+					siblingIndex = siblingIndex,
 					instantiateDelegate = (data) => EditorInstantiation.InstantiateSkeletonMecanim(data),
 					isUI = false
 				});
@@ -133,7 +138,7 @@ namespace Spine.Unity.Editor {
 			}
 
 			public static void HandleSkeletonComponentDrop (object spawnMenuData) {
-				var data = (SpawnMenuData)spawnMenuData;
+				SpawnMenuData data = (SpawnMenuData)spawnMenuData;
 
 				if (data.skeletonDataAsset.GetSkeletonData(true) == null) {
 					EditorUtility.DisplayDialog("Invalid SkeletonDataAsset", "Unable to create Spine GameObject.\n\nPlease check your SkeletonDataAsset.", "Ok");
@@ -146,17 +151,24 @@ namespace Spine.Unity.Editor {
 				GameObject newGameObject = newSkeletonComponent.gameObject;
 				Transform newTransform = newGameObject.transform;
 
-				var usedParent = data.parent != null ? data.parent.gameObject : isUI ? Selection.activeGameObject : null;
+				GameObject usedParent = data.parent != null ? data.parent.gameObject : isUI ? Selection.activeGameObject : null;
 				if (usedParent)
 					newTransform.SetParent(usedParent.transform, false);
+				if (data.siblingIndex != 0)
+					newTransform.SetSiblingIndex(data.siblingIndex);
 
 				newTransform.position = isUI ? data.spawnPoint : RoundVector(data.spawnPoint, 2);
 
 				if (isUI) {
+					SkeletonGraphic skeletonGraphic = ((SkeletonGraphic)newSkeletonComponent);
 					if (usedParent != null && usedParent.GetComponent<RectTransform>() != null) {
-						((SkeletonGraphic)newSkeletonComponent).MatchRectTransformWithBounds();
+						skeletonGraphic.MatchRectTransformWithBounds();
 					} else
 						Debug.Log("Created a UI Skeleton GameObject not under a RectTransform. It may not be visible until you parent it to a canvas.");
+					if (skeletonGraphic.HasMultipleSubmeshInstructions() && !skeletonGraphic.allowMultipleCanvasRenderers)
+						Debug.Log("This mesh uses multiple atlas pages or blend modes. " +
+							"You need to enable 'Multiple Canvas Renderers for correct rendering. " +
+							"Consider packing attachments to a single atlas page if possible.", skeletonGraphic);
 				}
 
 				if (!isUI && usedParent != null && usedParent.transform.localScale != Vector3.one)
@@ -181,8 +193,8 @@ namespace Spine.Unity.Editor {
 			/// Converts a mouse point to a world point on a plane.
 			/// </summary>
 			static Vector3 MousePointToWorldPoint2D (Vector2 mousePosition, Camera camera, Plane plane) {
-				var screenPos = new Vector3(mousePosition.x, camera.pixelHeight - mousePosition.y, 0f);
-				var ray = camera.ScreenPointToRay(screenPos);
+				Vector3 screenPos = new Vector3(mousePosition.x, camera.pixelHeight - mousePosition.y, 0f);
+				Ray ray = camera.ScreenPointToRay(screenPos);
 				float distance;
 				bool hit = plane.Raycast(ray, out distance);
 				return ray.GetPoint(distance);

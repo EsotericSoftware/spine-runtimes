@@ -36,7 +36,7 @@ static int /*bool*/ loadSequence(spAtlas *atlas, const char *basePath, spSequenc
 	char *path = CALLOC(char, strlen(basePath) + sequence->digits + 1);
 	int i;
 	for (i = 0; i < regions->size; i++) {
-		spSequence_getPath(basePath, i, path);
+		spSequence_getPath(sequence, basePath, i, path);
 		regions->items[i] = SUPER(spAtlas_findRegion(atlas, path));
 		if (!regions->items[i]) {
 			FREE(path);

@@ -36,7 +36,7 @@ half4 DepthOnlyFragment(VaryingsSpine input) : SV_TARGET
 {
 	fixed4 texureColor = tex2D(_MainTex, input.texcoordAndAlpha.xy);
 	clip(texureColor.a * input.texcoordAndAlpha.a - _Cutoff);
-	return 0;
+	return input.positionCS.z;
 }
 
 #endif

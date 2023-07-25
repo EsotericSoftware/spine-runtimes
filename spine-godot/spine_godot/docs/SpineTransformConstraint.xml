@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineTransformConstraint" inherits="SpineObjectWrapper" version="3.4">
+	<brief_description>
+		Stores the current pose for a transform constraint.
+	</brief_description>
+	<description>
+		Stores the current pose for a transform constraint. A transform constraint adjusts the world transform of the constrained bones to match that of the target bone.
+		See [url]http://esotericsoftware.com/spine-transform-constraints[/url] in the Spine User Guide.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="get_bones">
+			<return type="Array" />
+			<description>
+				The bones that will be modified by this transform constraint. Modifying the array has no effect.
+			</description>
+		</method>
+		<method name="get_data">
+			<return type="SpineTransformConstraintData" />
+			<description>
+				The transform constraint's setup pose data.
+			</description>
+		</method>
+		<method name="get_mix_rotate">
+			<return type="float" />
+			<description>
+				A percentage (0-1) that controls the mix between the constrained and unconstrained rotation.
+			</description>
+		</method>
+		<method name="get_mix_scale_x">
+			<return type="float" />
+			<description>
+				A percentage (0-1) that controls the mix between the constrained and unconstrained scale X.
+			</description>
+		</method>
+		<method name="get_mix_scale_y">
+			<return type="float" />
+			<description>
+				A percentage (0-1) that controls the mix between the constrained and unconstrained scale X.
+			</description>
+		</method>
+		<method name="get_mix_shear_y">
+			<return type="float" />
+			<description>
+				A percentage (0-1) that controls the mix between the constrained and unconstrained shear Y.
+			</description>
+		</method>
+		<method name="get_mix_x">
+			<return type="float" />
+			<description>
+				A percentage (0-1) that controls the mix between the constrained and unconstrained translation X.
+			</description>
+		</method>
+		<method name="get_mix_y">
+			<return type="float" />
+			<description>
+				A percentage (0-1) that controls the mix between the constrained and unconstrained translation Y.
+			</description>
+		</method>
+		<method name="get_target">
+			<return type="SpineBone" />
+			<description>
+				The target bone whose world transform will be copied to the constrained bones.
+			</description>
+		</method>
+		<method name="is_active">
+			<return type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="set_active">
+			<return type="void" />
+			<argument index="0" name="v" type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="set_mix_rotate">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_mix_scale_x">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_mix_scale_y">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_mix_shear_y">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_mix_x">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_mix_y">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_target">
+			<return type="void" />
+			<argument index="0" name="v" type="SpineBone" />
+			<description>
+			</description>
+		</method>
+		<method name="update">
+			<return type="void" />
+			<description>
+			</description>
+		</method>
+	</methods>
+	<constants>
+	</constants>
+</class>

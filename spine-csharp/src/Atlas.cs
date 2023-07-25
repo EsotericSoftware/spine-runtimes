@@ -63,10 +63,10 @@ namespace Spine {
 
 #if !(IS_UNITY)
 #if WINDOWS_STOREAPP
-		private async Task ReadFile(string path, TextureLoader textureLoader) {
+		private async Task ReadFile (string path, TextureLoader textureLoader) {
 			var folder = Windows.ApplicationModel.Package.Current.InstalledLocation;
 			var file = await folder.GetFileAsync(path).AsTask().ConfigureAwait(false);
-			using (var reader = new StreamReader(await file.OpenStreamForReadAsync().ConfigureAwait(false))) {
+			using (StreamReader reader = new StreamReader(await file.OpenStreamForReadAsync().ConfigureAwait(false))) {
 				try {
 					Atlas atlas = new Atlas(reader, Path.GetDirectoryName(path), textureLoader);
 					this.pages = atlas.pages;
@@ -78,7 +78,7 @@ namespace Spine {
 			}
 		}
 
-		public Atlas(string path, TextureLoader textureLoader) {
+		public Atlas (string path, TextureLoader textureLoader) {
 			this.ReadFile(path, textureLoader).Wait();
 		}
 #else
@@ -120,7 +120,7 @@ namespace Spine {
 			AtlasPage page = null;
 			AtlasRegion region = null;
 
-			var pageFields = new Dictionary<string, Action>(5);
+			Dictionary<string, Action> pageFields = new Dictionary<string, Action>(5);
 			pageFields.Add("size", () => {
 				page.width = int.Parse(entry[1], CultureInfo.InvariantCulture);
 				page.height = int.Parse(entry[2], CultureInfo.InvariantCulture);
@@ -140,7 +140,7 @@ namespace Spine {
 				page.pma = entry[1] == "true";
 			});
 
-			var regionFields = new Dictionary<string, Action>(8);
+			Dictionary<string, Action> regionFields = new Dictionary<string, Action>(8);
 			regionFields.Add("xy", () => { // Deprecated, use bounds.
 				region.x = int.Parse(entry[1], CultureInfo.InvariantCulture);
 				region.y = int.Parse(entry[2], CultureInfo.InvariantCulture);
@@ -246,7 +246,7 @@ namespace Spine {
 						region.u2 = (region.x + region.height) / (float)page.width;
 						region.v2 = (region.y + region.width) / (float)page.height;
 
-						var tempSwap = region.packedWidth;
+						int tempSwap = region.packedWidth;
 						region.packedWidth = region.packedHeight;
 						region.packedHeight = tempSwap;
 					} else {

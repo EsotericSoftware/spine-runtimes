@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated January 1, 2020. Replaces all prior versions.
+ * Last updated September 24, 2021. Replaces all prior versions.
  *
- * Copyright (c) 2013-2020, Esoteric Software LLC
+ * Copyright (c) 2013-2022, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -29,10 +29,24 @@
 
 using Spine.Unity.Playables;
 using UnityEditor;
+using UnityEditor.Timeline;
+using UnityEngine;
 using UnityEngine.Timeline;
 
 namespace Spine.Unity.Editor {
+#if UNITY_2019_1_OR_NEWER
+	[CustomTimelineEditor(typeof(SpineAnimationStateTrack))]
+	[CanEditMultipleObjects]
+	public class SpineAnimationStateTrackInspector : TrackEditor {
 
+		public override TrackDrawOptions GetTrackOptions (TrackAsset track, UnityEngine.Object binding) {
+			TrackDrawOptions options = base.GetTrackOptions(track, binding);
+			options.icon = SpineEditorUtilities.Icons.skeletonDataAssetIcon;
+			options.trackColor = new Color(255 / 255.0f, 64 / 255.0f, 1 / 255.0f);
+			return options;
+		}
+	}
+#else
 	[CustomEditor(typeof(SpineAnimationStateTrack))]
 	[CanEditMultipleObjects]
 	public class SpineAnimationStateTrackInspector : UnityEditor.Editor {
@@ -49,4 +63,5 @@ namespace Spine.Unity.Editor {
 			serializedObject.ApplyModifiedProperties();
 		}
 	}
+#endif
 }

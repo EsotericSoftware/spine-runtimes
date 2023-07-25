@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineSkeleton" inherits="Reference" version="3.4">
+	<brief_description>
+		Stores the current pose for a skeleton.
+	</brief_description>
+	<description>
+		Stores the current pose for a skeleton.
+		See [url]http://esotericsoftware.com/spine-runtime-architecture#Instance-objects[/url] in the Spine Runtimes Guide.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="find_bone">
+			<return type="SpineBone" />
+			<argument index="0" name="bone_name" type="String" />
+			<description>
+				Finds a bone by comparing each bone's name. It is more efficient to cache the results of this method than to call it repeatedly.
+			</description>
+		</method>
+		<method name="find_ik_constraint">
+			<return type="SpineIkConstraint" />
+			<argument index="0" name="constraint_name" type="String" />
+			<description>
+				Finds an IK constraint by comparing each IK constraint's name. It is more efficient to cache the results of this method than to call it repeatedly.
+			</description>
+		</method>
+		<method name="find_path_constraint">
+			<return type="SpinePathConstraint" />
+			<argument index="0" name="constraint_name" type="String" />
+			<description>
+				Finds a path constraint by comparing each path constraint's name. It is more efficient to cache the results of this method than to call it repeatedly.
+			</description>
+		</method>
+		<method name="find_slot">
+			<return type="SpineSlot" />
+			<argument index="0" name="slot_name" type="String" />
+			<description>
+				Finds a slot by comparing each slot's name. It is more efficient to cache the results of this method than to call it repeatedly.
+			</description>
+		</method>
+		<method name="find_transform_constraint">
+			<return type="SpineTransformConstraint" />
+			<argument index="0" name="constraint_name" type="String" />
+			<description>
+				Finds a transform constraint by comparing each transform constraint's name. It is more efficient to cache the results of this method than to call it repeatedly.
+			</description>
+		</method>
+		<method name="get_attachment_by_slot_index">
+			<return type="SpineAttachment" />
+			<argument index="0" name="slot_index" type="int" />
+			<argument index="1" name="attachment_name" type="String" />
+			<description>
+				Finds an attachment by looking in the active skin and default skin using the slot index and attachment name. First the skin is checked and if the attachment was not found, the default skin is checked.
+				See [url]http://esotericsoftware.com/spine-runtime-skins[/url] in the Spine Runtimes Guide.
+			</description>
+		</method>
+		<method name="get_attachment_by_slot_name">
+			<return type="SpineAttachment" />
+			<argument index="0" name="slot_name" type="String" />
+			<argument index="1" name="attachment_name" type="String" />
+			<description>
+				Finds an attachment by looking in the active skin and default skin using the slot index and attachment name. First the skin is checked and if the attachment was not found, the default skin is checked.
+				See [url]http://esotericsoftware.com/spine-runtime-skins[/url] in the Spine Runtimes Guide.
+			</description>
+		</method>
+		<method name="get_bones">
+			<return type="Array" />
+			<description>
+				The skeleton's bones, sorted parent first. The root bone is always the first bone. Modifying the array has no effect.
+			</description>
+		</method>
+		<method name="get_bounds">
+			<return type="Rect2" />
+			<description>
+				Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose. The bounds are relative to the [code]SpineSprite[/code] that stores the skeleton.
+			</description>
+		</method>
+		<method name="get_color">
+			<return type="Color" />
+			<description>
+				The color to tint all the skeleton's attachments.
+			</description>
+		</method>
+		<method name="get_data" qualifiers="const">
+			<return type="SpineSkeletonDataResource" />
+			<description>
+				The skeleton's setup pose data.
+			</description>
+		</method>
+		<method name="get_draw_order">
+			<return type="Array" />
+			<description>
+				The skeleton's slots in the order they should be drawn. The returned array may be modified to change the draw order. Modifying the array has no effect.
+			</description>
+		</method>
+		<method name="get_ik_constraints">
+			<return type="Array" />
+			<description>
+				The skeleton's IK constraints. Modifying the array has no effect.
+			</description>
+		</method>
+		<method name="get_path_constraints">
+			<return type="Array" />
+			<description>
+				The skeleton's path constraints. Modifying the array has no effect.
+			</description>
+		</method>
+		<method name="get_root_bone">
+			<return type="SpineBone" />
+			<description>
+				Returns the root bone, or null if the skeleton has no bones.
+			</description>
+		</method>
+		<method name="get_scale_x">
+			<return type="float" />
+			<description>
+				Scales the entire skeleton on the X axis.
+				Bones that do not inherit scale are still affected by this property.
+			</description>
+		</method>
+		<method name="get_scale_y">
+			<return type="float" />
+			<description>
+				Scales the entire skeleton on the Y axis.
+				Bones that do not inherit scale are still affected by this property.
+			</description>
+		</method>
+		<method name="get_skin">
+			<return type="SpineSkin" />
+			<description>
+				The skeleton's current skin.
+			</description>
+		</method>
+		<method name="get_slots">
+			<return type="Array" />
+			<description>
+				The skeleton's slots. Modifying the array has no effect.
+			</description>
+		</method>
+		<method name="get_transform_constraints">
+			<return type="Array" />
+			<description>
+				The skeleton's transform constraints. Modifying the array has no effect.
+			</description>
+		</method>
+		<method name="get_x">
+			<return type="float" />
+			<description>
+				Sets the skeleton X position, which is added to the root bone worldX position. Relative to the [code]SpineSprite[/code].
+				Bones that do not inherit translation are still affected by this property.
+			</description>
+		</method>
+		<method name="get_y">
+			<return type="float" />
+			<description>
+				Sets the skeleton Y position, which is added to the root bone worldX position. Relative to the [code]SpineSprite[/code].
+				Bones that do not inherit translation are still affected by this property.
+			</description>
+		</method>
+		<method name="set_attachment">
+			<return type="void" />
+			<argument index="0" name="slot_name" type="String" />
+			<argument index="1" name="attachment_name" type="String" />
+			<description>
+				A convenience method to set an attachment by finding the slot with [code]find_slot()[/code], finding the attachment with [code]get_attachment()[/code], then setting the slot's attachment.
+				[code]attachmentName[/code] may be null to clear the slot's attachment.
+			</description>
+		</method>
+		<method name="set_bones_to_setup_pose">
+			<return type="void" />
+			<description>
+				Sets the bones and constraints to their setup pose values.
+			</description>
+		</method>
+		<method name="set_color">
+			<return type="void" />
+			<argument index="0" name="v" type="Color" />
+			<description>
+				Sets the skeleton color.
+			</description>
+		</method>
+		<method name="set_position">
+			<return type="void" />
+			<argument index="0" name="position" type="Vector2" />
+			<description>
+				Sets the skeleton position relative to the [code]SpineSprite[/code].
+			</description>
+		</method>
+		<method name="set_scale_x">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+				Scales the skeleton on the X axis.
+			</description>
+		</method>
+		<method name="set_scale_y">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+				Scales the skeleton on the Y axis.
+			</description>
+		</method>
+		<method name="set_skin">
+			<return type="void" />
+			<argument index="0" name="new_skin" type="SpineSkin" />
+			<description>
+				Sets the skin used to look up attachments before looking in the default skin. If the skin is changed, [code]update_cache()[/code] is called.
+				Attachments from the new skin are attached if the corresponding attachment from the old skin was attached. If there was no old skin, each slot's setup mode attachment is attached from the new skin.
+				After changing the skin, the visible attachments can be reset to those attached in the setup pose by calling [code]set_slots_to_setup_pose()[/code]. Also, often [code]AnimationState.apply()[/code] is called before the next time the skeleton is rendered to allow any attachment keys in the current animation(s) to hide or show attachments from the new skin.
+			</description>
+		</method>
+		<method name="set_skin_by_name">
+			<return type="void" />
+			<argument index="0" name="skin_name" type="String" />
+			<description>
+				Sets the skin by name used to look up attachments before looking in the default skin. If the skin is changed, [code]update_cache()[/code] is called.
+				Attachments from the new skin are attached if the corresponding attachment from the old skin was attached. If there was no old skin, each slot's setup mode attachment is attached from the new skin.
+				After changing the skin, the visible attachments can be reset to those attached in the setup pose by calling [code]set_slots_to_setup_pose()[/code]. Also, often [code]AnimationState.apply()[/code] is called before the next time the skeleton is rendered to allow any attachment keys in the current animation(s) to hide or show attachments from the new skin.
+			</description>
+		</method>
+		<method name="set_slots_to_setup_pose">
+			<return type="void" />
+			<description>
+				Sets the slots and draw order to their setup pose values.
+			</description>
+		</method>
+		<method name="set_to_setup_pose">
+			<return type="void" />
+			<description>
+				Sets the bones, constraints, slots, and draw order to their setup pose values.
+			</description>
+		</method>
+		<method name="set_x">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+				Sets the skeleton X position, which is added to the root bone worldX position.
+				Bones that do not inherit translation are still affected by this property.
+			</description>
+		</method>
+		<method name="set_y">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+				Sets the skeleton Y position, which is added to the root bone worldX position.
+				Bones that do not inherit translation are still affected by this property.
+			</description>
+		</method>
+		<method name="update_world_transform">
+			<return type="void" />
+			<description>
+				Updates the world transform for each bone and applies all constraints.
+				See [url]http://esotericsoftware.com/spine-runtime-skeletons#World-transforms[/url] in the Spine Runtimes Guide.
+			</description>
+		</method>
+	</methods>
+	<constants>
+	</constants>
+</class>

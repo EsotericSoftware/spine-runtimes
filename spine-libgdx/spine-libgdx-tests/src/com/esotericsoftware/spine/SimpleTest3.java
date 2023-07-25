@@ -37,6 +37,7 @@ import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.ScreenUtils;
 
+/** Demonstrates applying multiple animations at once using {@link AnimationState} tracks. */
 public class SimpleTest3 extends ApplicationAdapter {
 	OrthographicCamera camera;
 	PolygonSpriteBatch batch;
@@ -61,7 +62,7 @@ public class SimpleTest3 extends ApplicationAdapter {
 
 		SkeletonJson loader = new SkeletonJson(atlas); // This loads skeleton JSON data, which is stateless.
 		// SkeletonLoader loader = new SkeletonBinary(atlas); // Or use SkeletonBinary to load binary data.
-		loader.setScale(0.1f); // Load the skeleton at 50% the size it was in Spine.
+		loader.setScale(0.5f); // Load the skeleton at 50% the size it was in Spine.
 		SkeletonData skeletonData = loader.readSkeletonData(Gdx.files.internal("raptor/raptor-pro.json"));
 
 		skeleton = new Skeleton(skeletonData); // Skeleton holds skeleton state (bone positions, slot attachments, etc).

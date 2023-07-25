@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated January 1, 2020. Replaces all prior versions.
+ * Last updated September 24, 2021. Replaces all prior versions.
  *
- * Copyright (c) 2013-2020, Esoteric Software LLC
+ * Copyright (c) 2013-2022, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -51,7 +51,7 @@ namespace Spine.Unity.Editor {
 			templateProp = serializedObject.FindProperty("template");
 			System.Array.Resize(ref clipInfo, targets.Length);
 			for (int i = 0; i < targets.Length; ++i) {
-				var clip = (SpineAnimationStateClip)targets[i];
+				SpineAnimationStateClip clip = (SpineAnimationStateClip)targets[i];
 				clipInfo[i] = new ClipInfo();
 				clipInfo[i].timelineClip = FindTimelineClip(clip);
 			}
@@ -62,7 +62,7 @@ namespace Spine.Unity.Editor {
 			EditorGUILayout.PropertyField(templateProp);
 
 			for (int i = 0; i < targets.Length; ++i) {
-				var targetClip = (SpineAnimationStateClip)targets[i];
+				SpineAnimationStateClip targetClip = (SpineAnimationStateClip)targets[i];
 				if (targetClip.template.useBlendDuration)
 					AdjustMixDuration(targetClip, clipInfo[i]);
 			}
@@ -75,7 +75,7 @@ namespace Spine.Unity.Editor {
 			if (timelineClipInfo == null)
 				return;
 
-			var timelineClip = timelineClipInfo.timelineClip;
+			TimelineClip timelineClip = timelineClipInfo.timelineClip;
 			if (timelineClip == null)
 				return;
 
@@ -100,8 +100,8 @@ namespace Spine.Unity.Editor {
 			string[] guids = AssetDatabase.FindAssets("t:TimelineAsset");
 			foreach (string guid in guids) {
 				TimelineAsset timeline = (TimelineAsset)AssetDatabase.LoadAssetAtPath(AssetDatabase.GUIDToAssetPath(guid), typeof(TimelineAsset));
-				foreach (var track in timeline.GetOutputTracks()) {
-					foreach (var clip in track.GetClips()) {
+				foreach (TrackAsset track in timeline.GetOutputTracks()) {
+					foreach (TimelineClip clip in track.GetClips()) {
 						if (clip.asset.GetType() == typeof(SpineAnimationStateClip) && object.ReferenceEquals(clip.asset, targetClip)) {
 							return clip;
 						}

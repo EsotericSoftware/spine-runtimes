@@ -3,6 +3,9 @@ Shader "Universal Render Pipeline/Spine/Skeleton" {
 		_Cutoff("Shadow alpha cutoff", Range(0,1)) = 0.1
 		[NoScaleOffset] _MainTex("Main Texture", 2D) = "black" {}
 		[Toggle(_STRAIGHT_ALPHA_INPUT)] _StraightAlphaInput("Straight Alpha Texture", Int) = 0
+		[MaterialToggle(_TINT_BLACK_ON)]  _TintBlack("Tint Black", Float) = 0
+		_Color("    Light Color", Color) = (1,1,1,1)
+		_Black("    Dark Color", Color) = (0,0,0,0)
 		[HideInInspector] _StencilRef("Stencil Reference", Float) = 1.0
 		[Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Comparison", Float) = 8 // Set to Always as default
 	}
@@ -36,13 +39,6 @@ Shader "Universal Render Pipeline/Spine/Skeleton" {
 			#pragma exclude_renderers d3d11_9x
 
 			// -------------------------------------
-			// Universal Pipeline keywords
-			#pragma multi_compile _ _MAIN_LIGHT_SHADOWS
-			#pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
-			#pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
-			#pragma multi_compile _ _SHADOWS_SOFT
-
-			// -------------------------------------
 			// Unity defined keywords
 			#pragma multi_compile_fog
 
@@ -53,6 +49,7 @@ Shader "Universal Render Pipeline/Spine/Skeleton" {
 			//--------------------------------------
 			// Spine related keywords
 			#pragma shader_feature _ _STRAIGHT_ALPHA_INPUT
+			#pragma shader_feature _TINT_BLACK_ON
 			#pragma vertex vert
 			#pragma fragment frag
 
@@ -73,6 +70,7 @@ Shader "Universal Render Pipeline/Spine/Skeleton" {
 			Tags{"LightMode" = "ShadowCaster"}
 
 			ZWrite On
+			ColorMask 0
 			ZTest LEqual
 			Cull Off
 
@@ -110,7 +108,7 @@ Shader "Universal Render Pipeline/Spine/Skeleton" {
 			Tags{"LightMode" = "DepthOnly"}
 
 			ZWrite On
-			ColorMask 0
+			ColorMask R
 			Cull Off
 
 			HLSLPROGRAM

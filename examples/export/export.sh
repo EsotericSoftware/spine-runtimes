@@ -16,7 +16,7 @@ fi
 echo "Spine exe: $SPINE_EXE"
 
 if [ "$#" -eq 0 ]; then
-	echo "Enter the Spine editor version to use for the export (eg 3.8.99):"
+	echo "Enter the Spine editor version to use for the export (eg 4.1.xx):"
 	read version
 else
 	version=${1%/}
@@ -38,6 +38,7 @@ rm -rf ../tank/export/*
 rm -rf ../vine/export/*
 rm -rf ../owl/export/*
 rm -rf ../mix-and-match/export/*
+rm -rf ../chibi-stickers/export/*
 
 echo ""
 echo "Exporting assets..."
@@ -79,6 +80,16 @@ echo "Exporting assets..."
 -i ../mix-and-match/images -o ../mix-and-match/export -n mix-and-match -p atlas-0.5.json \
 -i ../mix-and-match/images -o ../mix-and-match/export -n mix-and-match-pma -p atlas-0.5-pma.json \
 \
+-i ../chibi-stickers/chibi-stickers-pro.spine -o ../chibi-stickers/export -e json.json \
+-i ../chibi-stickers/chibi-stickers-pro.spine -o ../chibi-stickers/export -e binary.json \
+-i ../chibi-stickers/images -o ../chibi-stickers/export -n chibi-stickers -p atlas-0.5.json \
+-i ../chibi-stickers/images -o ../chibi-stickers/export -n chibi-stickers-pma -p atlas-0.5-pma.json \
+\
+-i ../owl/owl-pro.spine -o ../owl/export -e json.json \
+-i ../owl/owl-pro.spine -o ../owl/export -e binary.json \
+-i ../owl/images -o ../owl/export -n owl -p atlas-0.5.json \
+-i ../owl/images -o ../owl/export -n owl-pma -p atlas-0.5-pma.json \
+\
 -i ../powerup/powerup-ess.spine -o ../powerup/export -e json.json \
 -i ../powerup/powerup-ess.spine -o ../powerup/export -e binary.json \
 -i ../powerup/powerup-pro.spine -o ../powerup/export -e json.json \
@@ -100,6 +111,7 @@ echo "Exporting assets..."
 -i ../spineboy/spineboy-ess.spine -o ../spineboy/export -e binary.json \
 -i ../spineboy/spineboy-pro.spine -o ../spineboy/export -e json.json \
 -i ../spineboy/spineboy-pro.spine -o ../spineboy/export -e binary.json \
+-i ../spineboy/spineboy-pro.spine -o ../spineboy/export/spineboy-run.atlas -e png-0.5-frame-by-frame.json \
 -i ../spineboy/images -o ../spineboy/export -n spineboy -p atlas-0.5.json \
 -i ../spineboy/images -o ../spineboy/export -n spineboy-pma -p atlas-0.5-pma.json \
 \
@@ -126,14 +138,10 @@ echo "Exporting assets..."
 -i ../windmill/images -o ../windmill/export -n windmill -p atlas-0.5.json \
 -i ../windmill/images -o ../windmill/export -n windmill-pma -p atlas-0.5-pma.json
 
-# Owl needs separate export, as cleaning would kill keys in idle animation, which
-# would lead to incorrect additive animation blending.
+# spineboy-old.spine needs separate export, as its images are in an atlas.
 "$SPINE_EXE" \
 -u $version ${@:2} \
--i ../owl/owl-pro.spine -o ../owl/export -e json.json \
--i ../owl/owl-pro.spine -o ../owl/export -e binary.json \
--i ../owl/images -o ../owl/export -n owl -p atlas-0.5.json \
--i ../owl/images -o ../owl/export -n owl-pma -p atlas-0.5-pma.json \
+-i ../../spine-libgdx/spine-libgdx-tests/assets/spineboy-old/spineboy-old.spine -o ../../spine-libgdx/spine-libgdx-tests/assets/spineboy-old -e json.json
 
 # Export Unity Assets
 UNITY_BASE_DIR=../spine-unity

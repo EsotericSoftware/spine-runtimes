@@ -40,21 +40,21 @@ import { Slot } from "../Slot";
  *
  * See [Mesh attachments](http://esotericsoftware.com/spine-meshes) in the Spine User Guide. */
 export class MeshAttachment extends VertexAttachment implements HasTextureRegion {
-	region: TextureRegion = null;
+	region: TextureRegion | null = null;
 
 	/** The name of the texture region for this attachment. */
-	path: string = null;
+	path: string;
 
 	/** The UV pair for each vertex, normalized within the texture region. */
-	regionUVs: NumberArrayLike = null;
+	regionUVs: NumberArrayLike = [];
 
 	/** The UV pair for each vertex, normalized within the entire texture.
 	 *
 	 * See {@link #updateUVs}. */
-	uvs: NumberArrayLike = null;
+	uvs: NumberArrayLike = [];
 
 	/** Triplets of vertex indices which describe the mesh's triangulation. */
-	triangles: Array<number> = null;
+	triangles: Array<number> = [];
 
 	/** The color to tint the mesh. */
 	color = new Color(1, 1, 1, 1);
@@ -70,29 +70,31 @@ export class MeshAttachment extends VertexAttachment implements HasTextureRegion
 
 	/** Vertex index pairs describing edges for controling triangulation. Mesh triangles will never cross edges. Only available if
 	 * nonessential data was exported. Triangulation is not performed at runtime. */
-	edges: Array<number> = null;
+	edges: Array<number> = [];
 
-	private parentMesh: MeshAttachment = null;
+	private parentMesh: MeshAttachment | null = null;
 
-	sequence: Sequence = null;
+	sequence: Sequence | null = null;
 
 	tempColor = new Color(0, 0, 0, 0);
 
-	constructor (name: string) {
+	constructor (name: string, path: string) {
 		super(name);
+		this.path = path;
 	}
 
 	/** Calculates {@link #uvs} using the {@link #regionUVs} and region. Must be called if the region, the region's properties, or
 	 * the {@link #regionUVs} are changed. */
 	updateRegion () {
+		if (!this.region) throw new Error("Region not set.");
 		let regionUVs = this.regionUVs;
 		if (!this.uvs || this.uvs.length != regionUVs.length) this.uvs = Utils.newFloatArray(regionUVs.length);
 		let uvs = this.uvs;
 		let n = this.uvs.length;
 		let u = this.region.u, v = this.region.v, width = 0, height = 0;
 		if (this.region instanceof TextureAtlasRegion) {
-			let region = this.region, image = region.page.texture.getImage();
-			let textureWidth = image.width, textureHeight = image.height;
+			let region = this.region, page = region.page;
+			let textureWidth = page.width, textureHeight = page.height;
 			switch (region.degrees) {
 				case 90:
 					u -= (region.originalHeight - region.offsetY - region.height) / textureWidth;
@@ -167,9 +169,8 @@ export class MeshAttachment extends VertexAttachment implements HasTextureRegion
 	copy (): Attachment {
 		if (this.parentMesh) return this.newLinkedMesh();
 
-		let copy = new MeshAttachment(this.name);
+		let copy = new MeshAttachment(this.name, this.path);
 		copy.region = this.region;
-		copy.path = this.path;
 		copy.color.setFromColor(this.color);
 
 		this.copyTo(copy);
@@ -201,11 +202,10 @@ export class MeshAttachment extends VertexAttachment implements HasTextureRegion
 
 	/** Returns a new mesh with the {@link #parentMesh} set to this mesh's parent mesh, if any, else to this mesh. **/
 	newLinkedMesh (): MeshAttachment {
-		let copy = new MeshAttachment(this.name);
+		let copy = new MeshAttachment(this.name, this.path);
 		copy.region = this.region;
-		copy.path = this.path;
 		copy.color.setFromColor(this.color);
-		copy.timelineAttahment = this.timelineAttahment;
+		copy.timelineAttachment = this.timelineAttachment;
 		copy.setParentMesh(this.parentMesh ? this.parentMesh : this);
 		if (copy.region != null) copy.updateRegion();
 		return copy;

@@ -82,7 +82,7 @@ namespace Spine {
 		public void Update () {
 			if (mix == 0) return;
 			Bone target = this.target;
-			var bones = this.bones.Items;
+			Bone[] bones = this.bones.Items;
 			switch (this.bones.Count) {
 			case 1:
 				Apply(bones[0], target.worldX, target.worldY, compress, stretch, data.uniform, mix);
@@ -172,19 +172,24 @@ namespace Spine {
 				ty = targetY - bone.worldY;
 				break;
 			case TransformMode.NoRotationOrReflection: {
-				float s = Math.Abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
-				float sa = pa / bone.skeleton.ScaleX;
-				float sc = pc / bone.skeleton.ScaleY;
-				pb = -sc * s * bone.skeleton.ScaleX;
-				pd = sa * s * bone.skeleton.ScaleY;
+				float s = Math.Abs(pa * pd - pb * pc) / Math.Max(0.0001f, pa * pa + pc * pc);
+				float sa = pa / bone.skeleton.scaleX;
+				float sc = pc / bone.skeleton.scaleY;
+				pb = -sc * s * bone.skeleton.scaleX;
+				pd = sa * s * bone.skeleton.scaleY;
 				rotationIK += (float)Math.Atan2(sc, sa) * MathUtils.RadDeg;
 				goto default; // Fall through.
 			}
 			default: {
 				float x = targetX - p.worldX, y = targetY - p.worldY;
 				float d = pa * pd - pb * pc;
-				tx = (x * pd - y * pb) / d - bone.ax;
-				ty = (y * pa - x * pc) / d - bone.ay;
+				if (Math.Abs(d) <= 0.0001f) {
+					tx = 0;
+					ty = 0;
+				} else {
+					tx = (x * pd - y * pb) / d - bone.ax;
+					ty = (y * pa - x * pc) / d - bone.ay;
+				}
 				break;
 			}
 			}
@@ -256,7 +261,8 @@ namespace Spine {
 			b = pp.b;
 			c = pp.c;
 			d = pp.d;
-			float id = 1 / (a * d - b * c), x = cwx - pp.worldX, y = cwy - pp.worldY;
+			float id = a * d - b * c, x = cwx - pp.worldX, y = cwy - pp.worldY;
+			id = Math.Abs(id) <= 0.0001f ? 0 : 1 / id;
 			float dx = (x * d - y * b) * id - px, dy = (y * a - x * c) * id - py;
 			float l1 = (float)Math.Sqrt(dx * dx + dy * dy), l2 = child.data.length * csx, a1, a2;
 			if (l1 < 0.0001f) {

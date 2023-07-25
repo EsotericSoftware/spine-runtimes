@@ -1,3 +1,3 @@
 # spine-ts Player 
 
-Please see https://github.com/EsotericSoftware/spine-runtimes/blob/4.0/spine-ts/README.md for more information.
+Please see the [Spine Web Player documentation](https://esotericsoftware.com/spine-player) for more information.

@@ -62,7 +62,7 @@ export class SkeletonDebugRenderer implements Disposable {
 		this.context = context instanceof ManagedWebGLRenderingContext ? context : new ManagedWebGLRenderingContext(context);
 	}
 
-	draw (shapes: ShapeRenderer, skeleton: Skeleton, ignoredBones: Array<string> = null) {
+	draw (shapes: ShapeRenderer, skeleton: Skeleton, ignoredBones?: Array<string>) {
 		let skeletonX = skeleton.x;
 		let skeletonY = skeleton.y;
 		let gl = this.context.gl;
@@ -195,7 +195,7 @@ export class SkeletonDebugRenderer implements Disposable {
 			for (let i = 0, n = bones.length; i < n; i++) {
 				let bone = bones[i];
 				if (ignoredBones && ignoredBones.indexOf(bone.data.name) > -1) continue;
-				shapes.circle(true, bone.worldX, bone.worldY, 3 * this.scale, SkeletonDebugRenderer.GREEN, 8);
+				shapes.circle(true, bone.worldX, bone.worldY, 3 * this.scale, this.boneOriginColor, 8);
 			}
 		}
 

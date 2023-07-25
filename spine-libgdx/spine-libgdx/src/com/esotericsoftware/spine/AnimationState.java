@@ -221,6 +221,7 @@ public class AnimationState {
 				mix *= applyMixingFrom(current, skeleton, blend);
 			else if (current.trackTime >= current.trackEnd && current.next == null) //
 				mix = 0; // Set to setup pose the last time the entry will be applied.
+			boolean attachments = mix < current.attachmentThreshold;
 
 			// Apply current entry.
 			float animationLast = current.animationLast, animationTime = current.getAnimationTime(), applyTime = animationTime;
@@ -232,10 +233,11 @@ public class AnimationState {
 			int timelineCount = current.animation.timelines.size;
 			Object[] timelines = current.animation.timelines.items;
 			if ((i == 0 && mix == 1) || blend == MixBlend.add) {
+				if (i == 0) attachments = true;
 				for (int ii = 0; ii < timelineCount; ii++) {
 					Object timeline = timelines[ii];
 					if (timeline instanceof AttachmentTimeline)
-						applyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, blend, true);
+						applyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, blend, attachments);
 					else
 						((Timeline)timeline).apply(skeleton, animationLast, applyTime, applyEvents, mix, blend, MixDirection.in);
 				}
@@ -254,7 +256,7 @@ public class AnimationState {
 						applyRotateTimeline((RotateTimeline)timeline, skeleton, applyTime, mix, timelineBlend, timelinesRotation,
 							ii << 1, firstFrame);
 					} else if (timeline instanceof AttachmentTimeline)
-						applyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, blend, true);
+						applyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, blend, attachments);
 					else
 						timeline.apply(skeleton, animationLast, applyTime, applyEvents, mix, timelineBlend, MixDirection.in);
 				}
@@ -441,17 +443,21 @@ public class AnimationState {
 				lastTotal = 0;
 				lastDiff = diff;
 			} else {
-				lastTotal = timelinesRotation[i]; // Angle and direction of mix, including loops.
-				lastDiff = timelinesRotation[i + 1]; // Difference between bones.
+				lastTotal = timelinesRotation[i];
+				lastDiff = timelinesRotation[i + 1];
 			}
-			boolean current = diff > 0, dir = lastTotal >= 0;
-			// Detect cross at 0 (not 180).
-			if (Math.signum(lastDiff) != Math.signum(diff) && Math.abs(lastDiff) <= 90) {
-				// A cross after a 360 rotation is a loop.
-				if (Math.abs(lastTotal) > 180) lastTotal += 360 * Math.signum(lastTotal);
-				dir = current;
+			float loops = lastTotal - lastTotal % 360;
+			total = diff + loops;
+			boolean current = diff >= 0, dir = lastTotal >= 0;
+			if (Math.abs(lastDiff) <= 90 && Math.signum(lastDiff) != Math.signum(diff)) {
+				if (Math.abs(lastTotal - loops) > 180) {
+					total += 360 * Math.signum(lastTotal);
+					dir = current;
+				} else if (loops != 0)
+					total -= 360 * Math.signum(lastTotal);
+				else
+					dir = current;
 			}
-			total = diff + lastTotal - lastTotal % 360; // Store loops as part of lastTotal.
 			if (dir != current) total += 360 * Math.signum(lastTotal);
 			timelinesRotation[i] = total;
 		}
@@ -841,7 +847,7 @@ public class AnimationState {
 		this.timeScale = timeScale;
 	}
 
-	/** The AnimationStateData to look up mix durations. */
+	/** The {@link AnimationStateData} to look up mix durations. */
 	public AnimationStateData getData () {
 		return data;
 	}
@@ -1147,7 +1153,8 @@ public class AnimationState {
 		 * {@link AnimationStateData#getMix(Animation, Animation)} based on the animation before this animation (if any).
 		 * <p>
 		 * A mix duration of 0 still mixes out over one frame to provide the track entry being mixed out a chance to revert the
-		 * properties it was animating.
+		 * properties it was animating. A mix duration of 0 can be set at any time to end the mix on the next
+		 * {@link AnimationState#update(float) update}.
 		 * <p>
 		 * The <code>mixDuration</code> can be set manually rather than use the value from
 		 * {@link AnimationStateData#getMix(Animation, Animation)}. In that case, the <code>mixDuration</code> can be set for a new
@@ -1163,6 +1170,17 @@ public class AnimationState {
 
 		public void setMixDuration (float mixDuration) {
 			this.mixDuration = mixDuration;
+		}
+
+		/** Sets both {@link #getMixDuration()} and {@link #getDelay()}.
+		 * @param delay If > 0, sets {@link TrackEntry#getDelay()}. If <= 0, the delay set is the duration of the previous track
+		 *           entry minus the specified mix duration plus the specified <code>delay</code> (ie the mix ends at
+		 *           (<code>delay</code> = 0) or before (<code>delay</code> < 0) the previous track entry duration). If the previous
+		 *           entry is looping, its next loop completion is used instead of its duration. */
+		public void setMixDuration (float mixDuration, float delay) {
+			this.mixDuration = mixDuration;
+			if (previous != null && delay <= 0) delay += previous.getTrackComplete() - mixDuration;
+			this.delay = delay;
 		}
 
 		/** Controls how properties keyed in the animation are mixed with lower tracks. Defaults to {@link MixBlend#replace}.
@@ -1181,13 +1199,13 @@ public class AnimationState {
 		}
 
 		/** The track entry for the previous animation when mixing from the previous animation to this animation, or null if no
-		 * mixing is currently occuring. When mixing from multiple animations, <code>mixingFrom</code> makes up a linked list. */
+		 * mixing is currently occurring. When mixing from multiple animations, <code>mixingFrom</code> makes up a linked list. */
 		public @Null TrackEntry getMixingFrom () {
 			return mixingFrom;
 		}
 
 		/** The track entry for the next animation when mixing from this animation to the next animation, or null if no mixing is
-		 * currently occuring. When mixing to multiple animations, <code>mixingTo</code> makes up a linked list. */
+		 * currently occurring. When mixing to multiple animations, <code>mixingTo</code> makes up a linked list. */
 		public @Null TrackEntry getMixingTo () {
 			return mixingTo;
 		}

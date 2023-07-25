@@ -46,7 +46,7 @@ namespace Spine.Unity.Examples {
 		const float RunTimeScale = 1.5f;
 
 		IEnumerator Start () {
-			var state = skeletonGraphic.AnimationState;
+			AnimationState state = skeletonGraphic.AnimationState;
 
 			while (true) {
 				// Run phase
@@ -63,14 +63,14 @@ namespace Spine.Unity.Examples {
 				// Hit phase
 				SetXPosition(endX);
 				skeletonGraphic.enableSeparatorSlots = true; // Enable Separator when hit
-				var poleTrack = state.SetAnimation(0, pole, false);
+				TrackEntry poleTrack = state.SetAnimation(0, pole, false);
 				yield return new WaitForSpineAnimationComplete(poleTrack);
 				yield return new WaitForSeconds(1f);
 			}
 		}
 
 		void SetXPosition (float x) {
-			var tp = transform.localPosition;
+			Vector3 tp = transform.localPosition;
 			tp.x = x;
 			transform.localPosition = tp;
 		}

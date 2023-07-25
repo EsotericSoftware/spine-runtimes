@@ -1870,6 +1870,7 @@ void _spDeformTimeline_apply(
 					/* Vertex positions or deform offsets, with alpha. */
 					for (i = 0; i < vertexCount; i++)
 						deformArray[i] += (lastVertices[i] - deformArray[i]) * alpha;
+					break;
 				case SP_MIX_BLEND_ADD:
 					vertexAttachment = SUB_CAST(spVertexAttachment, slot->attachment);
 					if (!vertexAttachment->bones) {
@@ -1995,6 +1996,120 @@ void spDeformTimeline_setFrame(spDeformTimeline *self, int frame, float time, fl
 		self->frameVertices[frame] = MALLOC(float, self->frameVerticesCount);
 		memcpy(CONST_CAST(float *, self->frameVertices[frame]), vertices, self->frameVerticesCount * sizeof(float));
 	}
+}
+
+/**/
+
+static const int SEQUENCE_ENTRIES = 3, MODE = 1, DELAY = 2;
+
+void _spSequenceTimeline_apply(spTimeline *timeline, spSkeleton *skeleton, float lastTime, float time, spEvent **firedEvents,
+							   int *eventsCount, float alpha, spMixBlend blend, spMixDirection direction) {
+	spSequenceTimeline *self = (spSequenceTimeline *) timeline;
+	spSlot *slot = skeleton->slots[self->slotIndex];
+	spAttachment *slotAttachment;
+	float *frames;
+	int i, modeAndIndex, count, index, mode;
+	float before, delay;
+	spSequence *sequence = NULL;
+
+	if (!slot->bone->active) return;
+
+	slotAttachment = slot->attachment;
+	if (slotAttachment != self->attachment) {
+		if (slotAttachment == NULL) return;
+		switch (slotAttachment->type) {
+			case SP_ATTACHMENT_BOUNDING_BOX:
+			case SP_ATTACHMENT_CLIPPING:
+			case SP_ATTACHMENT_MESH:
+			case SP_ATTACHMENT_PATH: {
+				spVertexAttachment *vertexAttachment = SUB_CAST(spVertexAttachment, slot->attachment);
+				if (vertexAttachment->timelineAttachment != self->attachment) return;
+				break;
+			}
+			default:
+				return;
+		}
+	}
+
+	frames = self->super.frames->items;
+	if (time < frames[0]) { /* Time is before first frame. */
+		if (blend == SP_MIX_BLEND_SETUP || blend == SP_MIX_BLEND_FIRST) slot->sequenceIndex = -1;
+		return;
+	}
+
+	i = search2(self->super.frames, time, SEQUENCE_ENTRIES);
+	before = frames[i];
+	modeAndIndex = (int) frames[i + MODE];
+	delay = frames[i + DELAY];
+
+	if (self->attachment->type == SP_ATTACHMENT_REGION) sequence = ((spRegionAttachment *) self->attachment)->sequence;
+	if (self->attachment->type == SP_ATTACHMENT_MESH) sequence = ((spMeshAttachment *) self->attachment)->sequence;
+	if (!sequence) return;
+	index = modeAndIndex >> 4;
+	count = sequence->regions->size;
+	mode = modeAndIndex & 0xf;
+	if (mode != SP_SEQUENCE_MODE_HOLD) {
+		index += (int) (((time - before) / delay + 0.00001));
+		switch (mode) {
+			case SP_SEQUENCE_MODE_ONCE:
+				index = MIN(count - 1, index);
+				break;
+			case SP_SEQUENCE_MODE_LOOP:
+				index %= count;
+				break;
+			case SP_SEQUENCE_MODE_PINGPONG: {
+				int n = (count << 1) - 2;
+				index = n == 0 ? 0 : index % n;
+				if (index >= count) index = n - index;
+				break;
+			}
+			case SP_SEQUENCE_MODE_ONCEREVERSE:
+				index = MAX(count - 1 - index, 0);
+				break;
+			case SP_SEQUENCE_MODE_LOOPREVERSE:
+				index = count - 1 - (index % count);
+				break;
+			case SP_SEQUENCE_MODE_PINGPONGREVERSE: {
+				int n = (count << 1) - 2;
+				index = n == 0 ? 0 : (index + count - 1) % n;
+				if (index >= count) index = n - index;
+			}
+		}
+	}
+	slot->sequenceIndex = index;
+
+	UNUSED(lastTime);
+	UNUSED(firedEvents);
+	UNUSED(eventsCount);
+	UNUSED(alpha);
+	UNUSED(direction);
+}
+
+void _spSequenceTimeline_dispose(spTimeline *timeline) {
+	/* NO-OP */
+	UNUSED(timeline);
+}
+
+spSequenceTimeline *spSequenceTimeline_create(int framesCount, int slotIndex, spAttachment *attachment) {
+	int sequenceId = 0;
+	spSequenceTimeline *self = NEW(spSequenceTimeline);
+	spPropertyId ids[1];
+	if (attachment->type == SP_ATTACHMENT_REGION) sequenceId = ((spRegionAttachment *) attachment)->sequence->id;
+	if (attachment->type == SP_ATTACHMENT_MESH) sequenceId = ((spMeshAttachment *) attachment)->sequence->id;
+	ids[0] = (spPropertyId) SP_PROPERTY_SEQUENCE << 32 | ((slotIndex << 16 | sequenceId) & 0xffffffff);
+	_spTimeline_init(SUPER(self), framesCount, SEQUENCE_ENTRIES, ids, 1, SP_TIMELINE_SEQUENCE, _spSequenceTimeline_dispose,
+					 _spSequenceTimeline_apply, 0);
+	self->slotIndex = slotIndex;
+	self->attachment = attachment;
+	return self;
+}
+
+void spSequenceTimeline_setFrame(spSequenceTimeline *self, int frame, float time, int mode, int index, float delay) {
+	float *frames = self->super.frames->items;
+	frame *= SEQUENCE_ENTRIES;
+	frames[frame] = time;
+	frames[frame + MODE] = mode | (index << 4);
+	frames[frame + DELAY] = delay;
 }
 
 /**/
@@ -2383,7 +2498,7 @@ void spTransformConstraintTimeline_setFrame(spTransformConstraintTimeline *self,
 	frames[frame] = time;
 	frames[frame + TRANSFORMCONSTRAINT_ROTATE] = mixRotate;
 	frames[frame + TRANSFORMCONSTRAINT_X] = mixX;
-	frames[frame + TRANSFORMCONSTRAINT_X] = mixY;
+	frames[frame + TRANSFORMCONSTRAINT_Y] = mixY;
 	frames[frame + TRANSFORMCONSTRAINT_SCALEX] = mixScaleX;
 	frames[frame + TRANSFORMCONSTRAINT_SCALEY] = mixScaleY;
 	frames[frame + TRANSFORMCONSTRAINT_SHEARY] = mixShearY;
