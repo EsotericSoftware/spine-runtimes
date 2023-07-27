@@ -1016,6 +1016,7 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 	skeletonData->bones = MALLOC(spBoneData *, bones->size);
 	for (boneMap = bones->child, i = 0; boneMap; boneMap = boneMap->next, ++i) {
 		spBoneData *data;
+		const char *name;
 		const char *transformMode;
 		const char *color;
 
@@ -1030,7 +1031,8 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 			}
 		}
 
-		data = spBoneData_create(skeletonData->bonesCount, Json_getString(boneMap, "name", 0), parent);
+		MALLOC_STR(name, Json_getString(boneMap, "name", 0));
+		data = spBoneData_create(skeletonData->bonesCount, name, parent);
 		data->length = Json_getFloat(boneMap, "length", 0) * self->scale;
 		data->x = Json_getFloat(boneMap, "x", 0) * self->scale;
 		data->y = Json_getFloat(boneMap, "y", 0) * self->scale;
@@ -1067,6 +1069,7 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 		skeletonData->slots = MALLOC(spSlotData *, slots->size);
 		for (slotMap = slots->child, i = 0; slotMap; slotMap = slotMap->next, ++i) {
 			spSlotData *data;
+			const char *name;
 			const char *color;
 			const char *dark;
 			Json *item;
@@ -1079,7 +1082,8 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 				return NULL;
 			}
 
-			data = spSlotData_create(i, Json_getString(slotMap, "name", 0), boneData);
+			MALLOC_STR(name, Json_getString(slotMap, "name", 0));
+			data = spSlotData_create(i, name, boneData);
 
 			color = Json_getString(slotMap, "color", 0);
 			if (color) {
@@ -1124,9 +1128,10 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 		skeletonData->ikConstraintsCount = ik->size;
 		skeletonData->ikConstraints = MALLOC(spIkConstraintData *, ik->size);
 		for (constraintMap = ik->child, i = 0; constraintMap; constraintMap = constraintMap->next, ++i) {
-			const char *targetName;
+			const char *name, *targetName;
 
-			spIkConstraintData *data = spIkConstraintData_create(Json_getString(constraintMap, "name", 0));
+			MALLOC_STR(name, Json_getString(constraintMap, "name", 0));
+			spIkConstraintData *data = spIkConstraintData_create(name);
 			data->order = Json_getInt(constraintMap, "order", 0);
 			data->skinRequired = Json_getInt(constraintMap, "skin", 0) ? 1 : 0;
 
@@ -1168,10 +1173,10 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 		skeletonData->transformConstraintsCount = transform->size;
 		skeletonData->transformConstraints = MALLOC(spTransformConstraintData *, transform->size);
 		for (constraintMap = transform->child, i = 0; constraintMap; constraintMap = constraintMap->next, ++i) {
-			const char *name;
+			const char *name, *targetName;
 
-			spTransformConstraintData *data = spTransformConstraintData_create(
-					Json_getString(constraintMap, "name", 0));
+			MALLOC_STR(name, Json_getString(constraintMap, "name", 0));
+			spTransformConstraintData *data = spTransformConstraintData_create(name);
 			data->order = Json_getInt(constraintMap, "order", 0);
 			data->skinRequired = Json_getInt(constraintMap, "skin", 0) ? 1 : 0;
 
@@ -1187,11 +1192,11 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 				}
 			}
 
-			name = Json_getString(constraintMap, "target", 0);
-			data->target = spSkeletonData_findBone(skeletonData, name);
+			targetName = Json_getString(constraintMap, "target", 0);
+			data->target = spSkeletonData_findBone(skeletonData, targetName);
 			if (!data->target) {
 				spSkeletonData_dispose(skeletonData);
-				_spSkeletonJson_setError(self, root, "Target bone not found: ", name);
+				_spSkeletonJson_setError(self, root, "Target bone not found: ", targetName);
 				return NULL;
 			}
 
@@ -1222,10 +1227,11 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 		skeletonData->pathConstraintsCount = pathJson->size;
 		skeletonData->pathConstraints = MALLOC(spPathConstraintData *, pathJson->size);
 		for (constraintMap = pathJson->child, i = 0; constraintMap; constraintMap = constraintMap->next, ++i) {
-			const char *name;
+			const char *name, *targetName;
 			const char *item;
 
-			spPathConstraintData *data = spPathConstraintData_create(Json_getString(constraintMap, "name", 0));
+			MALLOC_STR(name, Json_getString(constraintMap, "name", 0));
+			spPathConstraintData *data = spPathConstraintData_create(name);
 			data->order = Json_getInt(constraintMap, "order", 0);
 			data->skinRequired = Json_getInt(constraintMap, "skin", 0) ? 1 : 0;
 
@@ -1241,11 +1247,11 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 				}
 			}
 
-			name = Json_getString(constraintMap, "target", 0);
-			data->target = spSkeletonData_findSlot(skeletonData, name);
+			targetName = Json_getString(constraintMap, "target", 0);
+			data->target = spSkeletonData_findSlot(skeletonData, targetName);
 			if (!data->target) {
 				spSkeletonData_dispose(skeletonData);
-				_spSkeletonJson_setError(self, root, "Target slot not found: ", name);
+				_spSkeletonJson_setError(self, root, "Target slot not found: ", targetName);
 				return NULL;
 			}
 

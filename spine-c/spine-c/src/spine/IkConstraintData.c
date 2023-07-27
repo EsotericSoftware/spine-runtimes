@@ -32,7 +32,7 @@
 
 spIkConstraintData *spIkConstraintData_create(const char *name) {
 	spIkConstraintData *self = NEW(spIkConstraintData);
-	MALLOC_STR(self->name, name);
+	CONST_CAST(const char *, self->name) = name;
 	self->bendDirection = 1;
 	self->compress = 0;
 	self->stretch = 0;

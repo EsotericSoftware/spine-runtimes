@@ -37,12 +37,16 @@ _SP_ARRAY_IMPLEMENT_TYPE(spPropertyIdArray, spPropertyId)
 _SP_ARRAY_IMPLEMENT_TYPE(spTimelineArray, spTimeline *)
 
 spAnimation *spAnimation_create(const char *name, spTimelineArray *timelines, float duration) {
-	int i, n;
+	int i, n, totalCount = 0;
 	spAnimation *self = NEW(spAnimation);
 	MALLOC_STR(self->name, name);
 	self->timelines = timelines != NULL ? timelines : spTimelineArray_create(1);
 	timelines = self->timelines;
-	self->timelineIds = spPropertyIdArray_create(16);
+
+	for (i = 0, n = timelines->size; i < n; i++)
+		totalCount += timelines->items[i]->propertyIdsCount;
+	self->timelineIds = spPropertyIdArray_create(totalCount);
+
 	for (i = 0, n = timelines->size; i < n; i++) {
 		spPropertyIdArray_addAllValues(self->timelineIds, timelines->items[i]->propertyIds, 0,
 									   timelines->items[i]->propertyIdsCount);

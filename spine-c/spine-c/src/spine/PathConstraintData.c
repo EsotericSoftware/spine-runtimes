@@ -32,7 +32,7 @@
 
 spPathConstraintData *spPathConstraintData_create(const char *name) {
 	spPathConstraintData *self = NEW(spPathConstraintData);
-	MALLOC_STR(self->name, name);
+	CONST_CAST(const char *, self->name) = name;
 	return self;
 }
 

@@ -33,7 +33,7 @@
 spSlotData *spSlotData_create(const int index, const char *name, spBoneData *boneData) {
 	spSlotData *self = NEW(spSlotData);
 	CONST_CAST(int, self->index) = index;
-	MALLOC_STR(self->name, name);
+	CONST_CAST(const char *, self->name) = name;
 	CONST_CAST(spBoneData *, self->boneData) = boneData;
 	spColor_setFromFloats(&self->color, 1, 1, 1, 1);
 	return self;

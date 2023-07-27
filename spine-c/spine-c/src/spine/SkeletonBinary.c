@@ -957,8 +957,8 @@ static void _readVertices(spSkeletonBinary *self, _dataInput *input, int *bonesC
 						  float **vertices, int *worldVerticesLength, int vertexCount) {
 	int i, ii;
 	int verticesLength = vertexCount << 1;
-	spFloatArray *weights = spFloatArray_create(8);
-	spIntArray *bones = spIntArray_create(8);
+	spFloatArray *weights;
+	spIntArray *bones;
 
 	*worldVerticesLength = verticesLength;
 
@@ -967,13 +967,11 @@ static void _readVertices(spSkeletonBinary *self, _dataInput *input, int *bonesC
 		*vertices = _readFloatArray(input, verticesLength, self->scale);
 		*bonesCount = 0;
 		*bones2 = NULL;
-		spFloatArray_dispose(weights);
-		spIntArray_dispose(bones);
 		return;
 	}
 
-	spFloatArray_ensureCapacity(weights, verticesLength * 3 * 3);
-	spIntArray_ensureCapacity(bones, verticesLength * 3);
+	weights = spFloatArray_create(verticesLength * 3 * 3);
+	bones = spIntArray_create(verticesLength * 3);
 
 	for (i = 0; i < vertexCount; ++i) {
 		int boneCount = readVarint(input, 1);
@@ -1379,9 +1377,7 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 		int mode;
 		const char *name = readString(input);
 		spBoneData *parent = i == 0 ? 0 : skeletonData->bones[readVarint(input, 1)];
-		/* TODO Avoid copying of name */
 		data = spBoneData_create(i, name, parent);
-		FREE(name);
 		data->rotation = readFloat(input);
 		data->x = readFloat(input) * self->scale;
 		data->y = readFloat(input) * self->scale;
@@ -1423,9 +1419,7 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 		const char *attachmentName;
 		const char *slotName = readString(input);
 		spBoneData *boneData = skeletonData->bones[readVarint(input, 1)];
-		/* TODO Avoid copying of slotName */
 		spSlotData *slotData = spSlotData_create(i, slotName, boneData);
-		FREE(slotName);
 		readColor(input, &slotData->color.r, &slotData->color.g, &slotData->color.b, &slotData->color.a);
 		a = readByte(input);
 		r = readByte(input);
@@ -1448,11 +1442,9 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 	skeletonData->ikConstraints = MALLOC(spIkConstraintData *, skeletonData->ikConstraintsCount);
 	for (i = 0; i < skeletonData->ikConstraintsCount; ++i) {
 		const char *name = readString(input);
-		/* TODO Avoid copying of name */
 		spIkConstraintData *data = spIkConstraintData_create(name);
 		data->order = readVarint(input, 1);
 		data->skinRequired = readBoolean(input);
-		FREE(name);
 		data->bonesCount = readVarint(input, 1);
 		data->bones = MALLOC(spBoneData *, data->bonesCount);
 		for (ii = 0; ii < data->bonesCount; ++ii)
@@ -1473,11 +1465,9 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 			spTransformConstraintData *, skeletonData->transformConstraintsCount);
 	for (i = 0; i < skeletonData->transformConstraintsCount; ++i) {
 		const char *name = readString(input);
-		/* TODO Avoid copying of name */
 		spTransformConstraintData *data = spTransformConstraintData_create(name);
 		data->order = readVarint(input, 1);
 		data->skinRequired = readBoolean(input);
-		FREE(name);
 		data->bonesCount = readVarint(input, 1);
 		CONST_CAST(spBoneData **, data->bones) = MALLOC(spBoneData *, data->bonesCount);
 		for (ii = 0; ii < data->bonesCount; ++ii)
@@ -1505,11 +1495,9 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 	skeletonData->pathConstraints = MALLOC(spPathConstraintData *, skeletonData->pathConstraintsCount);
 	for (i = 0; i < skeletonData->pathConstraintsCount; ++i) {
 		const char *name = readString(input);
-		/* TODO Avoid copying of name */
 		spPathConstraintData *data = spPathConstraintData_create(name);
 		data->order = readVarint(input, 1);
 		data->skinRequired = readBoolean(input);
-		FREE(name);
 		data->bonesCount = readVarint(input, 1);
 		CONST_CAST(spBoneData **, data->bones) = MALLOC(spBoneData *, data->bonesCount);
 		for (ii = 0; ii < data->bonesCount; ++ii)
