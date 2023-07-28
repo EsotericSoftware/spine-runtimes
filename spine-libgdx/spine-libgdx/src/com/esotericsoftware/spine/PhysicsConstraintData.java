@@ -35,20 +35,42 @@ import com.badlogic.gdx.utils.Array;
  * <p>
  * See <a href="http://esotericsoftware.com/spine-physics-constraints">Physics constraints</a> in the Spine User Guide. */
 public class PhysicsConstraintData extends ConstraintData {
-	final Array<NodeData> nodes = new Array();
-	final Array<SpringData> springs = new Array();
-	float friction, gravity, wind, length, stiffness, damping, mix;
+	final Array<BoneData> bones = new Array();
+	float speed = 1, mass = 1;
+	float strength, friction, damping, inertia, wind, gravity, mix;
+	boolean translate, rotate, scale, shear;
 
 	public PhysicsConstraintData (String name) {
 		super(name);
 	}
 
-	public Array<NodeData> getNodes () {
-		return nodes;
+	/** The bones that are constrained by this physics constraint. */
+	public Array<BoneData> getBones () {
+		return bones;
 	}
 
-	public Array<SpringData> getSprings () {
-		return springs;
+	public float getSpeed () {
+		return speed;
+	}
+
+	public void setSpeed (float speed) {
+		this.speed = speed;
+	}
+
+	public float getMass () {
+		return mass;
+	}
+
+	public void setMass (float mass) {
+		this.mass = mass;
+	}
+
+	public float getStrength () {
+		return strength;
+	}
+
+	public void setStrength (float strength) {
+		this.strength = strength;
 	}
 
 	public float getFriction () {
@@ -59,12 +81,20 @@ public class PhysicsConstraintData extends ConstraintData {
 		this.friction = friction;
 	}
 
-	public float getGravity () {
-		return gravity;
+	public float getDamping () {
+		return damping;
 	}
 
-	public void setGravity (float gravity) {
-		this.gravity = gravity;
+	public void setDamping (float damping) {
+		this.damping = damping;
+	}
+
+	public float getInertia () {
+		return inertia;
+	}
+
+	public void setInertia (float inertia) {
+		this.inertia = inertia;
 	}
 
 	public float getWind () {
@@ -75,28 +105,44 @@ public class PhysicsConstraintData extends ConstraintData {
 		this.wind = wind;
 	}
 
-	public float getLength () {
-		return length;
+	public float getGravity () {
+		return gravity;
 	}
 
-	public void setLength (float length) {
-		this.length = length;
+	public void setGravity (float gravity) {
+		this.gravity = gravity;
 	}
 
-	public float getStiffness () {
-		return stiffness;
+	public boolean getTranslate () {
+		return translate;
 	}
 
-	public void setStiffness (float stiffness) {
-		this.stiffness = stiffness;
+	public void setTranslate (boolean translate) {
+		this.translate = translate;
 	}
 
-	public float getDamping () {
-		return damping;
+	public boolean getRotate () {
+		return rotate;
 	}
 
-	public void setDamping (float damping) {
-		this.damping = damping;
+	public void setRotate (boolean rotate) {
+		this.rotate = rotate;
+	}
+
+	public boolean getScale () {
+		return scale;
+	}
+
+	public void setScale (boolean scale) {
+		this.scale = scale;
+	}
+
+	public boolean getShear () {
+		return shear;
+	}
+
+	public void setShear (boolean shear) {
+		this.shear = shear;
 	}
 
 	/** A percentage (0-1) that controls the mix between the constrained and unconstrained poses. */
@@ -106,17 +152,5 @@ public class PhysicsConstraintData extends ConstraintData {
 
 	public void setMix (float mix) {
 		this.mix = mix;
-	}
-
-	static public class NodeData {
-		public int parentBone = -1;
-		public int[] bones;
-		public float x, y;
-	}
-
-	static public class SpringData {
-		public int node1, node2, bone;
-		public float length, stiffness, damping;
-		public boolean rope;
 	}
 }

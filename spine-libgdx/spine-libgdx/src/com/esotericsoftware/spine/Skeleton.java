@@ -37,8 +37,6 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.Null;
 
-import com.esotericsoftware.spine.PhysicsConstraint.Node;
-import com.esotericsoftware.spine.PhysicsConstraint.Spring;
 import com.esotericsoftware.spine.Skin.SkinEntry;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
@@ -143,15 +141,15 @@ public class Skeleton {
 
 		ikConstraints = new Array(skeleton.ikConstraints.size);
 		for (IkConstraint ikConstraint : skeleton.ikConstraints)
-			ikConstraints.add(new IkConstraint(ikConstraint, this));
+			ikConstraints.add(new IkConstraint(ikConstraint));
 
 		transformConstraints = new Array(skeleton.transformConstraints.size);
 		for (TransformConstraint transformConstraint : skeleton.transformConstraints)
-			transformConstraints.add(new TransformConstraint(transformConstraint, this));
+			transformConstraints.add(new TransformConstraint(transformConstraint));
 
 		pathConstraints = new Array(skeleton.pathConstraints.size);
 		for (PathConstraint pathConstraint : skeleton.pathConstraints)
-			pathConstraints.add(new PathConstraint(pathConstraint, this));
+			pathConstraints.add(new PathConstraint(pathConstraint));
 
 		physicsConstraints = new Array(skeleton.physicsConstraints.size);
 		for (PhysicsConstraint physicsConstraint : skeleton.physicsConstraints)
@@ -343,44 +341,25 @@ public class Skeleton {
 		constraint.active = !constraint.data.skinRequired || (skin != null && skin.constraints.contains(constraint.data, true));
 		if (!constraint.active) return;
 
-		Object[] nodes = constraint.nodes.items;
-		int nodeCount = constraint.nodes.size;
-		for (int i = 0; i < nodeCount; i++) {
-			Node node = (Node)nodes[i];
-			sortBone(node.parentBone);
-// for (Bone bone : node.bones)
-// sortBone(bone);
+		Object[] constrained = constraint.bones.items;
+		int boneCount = constraint.bones.size;
+		for (int i = 0; i < boneCount; i++) {
+			if (((Bone)constrained[i]).active) {
+				constraint.active = true;
+				break;
+			}
 		}
+		if (!constraint.active) return;
+
+		for (int i = 0; i < boneCount; i++)
+			sortBone((Bone)constrained[i]);
 
 		updateCache.add(constraint);
 
-		for (int i = 0; i < nodeCount; i++) {
-			Node node = (Node)nodes[i];
-			sortReset(node.parentBone.children);
-		}
-
-// for (int i = 0; i < nodeCount; i++) {
-// Node node = (Node)nodes[i];
-// for (Bone bone : node.bones)
-// sortReset(bone.children);
-// }
-// for (int i = 0; i < nodeCount; i++) {
-// Node node = (Node)nodes[i];
-// for (Bone bone : node.bones)
-// bone.sorted = true;
-// }
-//
-// Object[] springs = constraint.springs.items;
-// for (int i = 0, n = constraint.springs.size; i < n; i++) {
-// Spring spring = (Spring)springs[i];
-// if (spring.bone == null) continue;
-// sortBone(spring.bone);
-// updateCache.add(spring);
-// sortReset(spring.bone.children);
-// spring.bone.sorted = true;
-// for (Bone child : spring.bone.children)
-// sortBone(child);
-// }
+		for (int i = 0; i < boneCount; i++)
+			sortReset(((Bone)constrained[i]).children);
+		for (int i = 0; i < boneCount; i++)
+			((Bone)constrained[i]).sorted = true;
 	}
 
 	private void sortBone (Bone bone) {

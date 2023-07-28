@@ -57,21 +57,20 @@ public class TransformConstraint implements Updatable {
 		mixScaleX = data.mixScaleX;
 		mixScaleY = data.mixScaleY;
 		mixShearY = data.mixShearY;
+
 		bones = new Array(data.bones.size);
 		for (BoneData boneData : data.bones)
 			bones.add(skeleton.bones.get(boneData.index));
+
 		target = skeleton.bones.get(data.target.index);
 	}
 
 	/** Copy constructor. */
-	public TransformConstraint (TransformConstraint constraint, Skeleton skeleton) {
+	public TransformConstraint (TransformConstraint constraint) {
 		if (constraint == null) throw new IllegalArgumentException("constraint cannot be null.");
-		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 		data = constraint.data;
-		bones = new Array(constraint.bones.size);
-		for (Bone bone : constraint.bones)
-			bones.add(skeleton.bones.get(bone.data.index));
-		target = skeleton.bones.get(constraint.target.data.index);
+		bones = new Array(constraint.bones);
+		target = constraint.target;
 		mixRotate = constraint.mixRotate;
 		mixX = constraint.mixX;
 		mixY = constraint.mixY;

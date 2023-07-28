@@ -60,18 +60,16 @@ public class IkConstraint implements Updatable {
 		bones = new Array(data.bones.size);
 		for (BoneData boneData : data.bones)
 			bones.add(skeleton.bones.get(boneData.index));
+
 		target = skeleton.bones.get(data.target.index);
 	}
 
 	/** Copy constructor. */
-	public IkConstraint (IkConstraint constraint, Skeleton skeleton) {
+	public IkConstraint (IkConstraint constraint) {
 		if (constraint == null) throw new IllegalArgumentException("constraint cannot be null.");
-		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 		data = constraint.data;
-		bones = new Array(constraint.bones.size);
-		for (Bone bone : constraint.bones)
-			bones.add(skeleton.bones.get(bone.data.index));
-		target = skeleton.bones.get(constraint.target.data.index);
+		bones = new Array(constraint.bones);
+		target = constraint.target;
 		mix = constraint.mix;
 		softness = constraint.softness;
 		bendDirection = constraint.bendDirection;

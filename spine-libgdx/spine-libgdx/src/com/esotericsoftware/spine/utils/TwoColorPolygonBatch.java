@@ -48,7 +48,6 @@ import com.badlogic.gdx.math.Affine2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Null;
-import com.badlogic.gdx.utils.NumberUtils;
 
 /** A batch that renders polygons and performs tinting using a light and dark color.
  * <p>
