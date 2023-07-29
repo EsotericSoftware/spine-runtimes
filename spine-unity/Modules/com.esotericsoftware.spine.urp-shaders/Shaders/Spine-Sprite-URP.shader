@@ -213,6 +213,42 @@ Shader "Universal Render Pipeline/Spine/Sprite"
 			ENDHLSL
 		}
 
+		// This pass is used when drawing to a _CameraNormalsTexture texture
+		Pass
+		{
+			Name "DepthNormals"
+			Tags{"LightMode" = "DepthNormals"}
+
+			ZWrite On
+			Cull[_Cull]
+
+			HLSLPROGRAM
+			#pragma vertex DepthNormalsVertexSprite
+			#pragma fragment DepthNormalsFragmentSprite
+
+			// -------------------------------------
+			// Material Keywords
+			#pragma shader_feature _ _FIXED_NORMALS_VIEWSPACE _FIXED_NORMALS_VIEWSPACE_BACKFACE _FIXED_NORMALS_MODELSPACE _FIXED_NORMALS_MODELSPACE_BACKFACE _FIXED_NORMALS_WORLDSPACE
+			#pragma shader_feature _NORMALMAP
+			#pragma shader_feature _ALPHA_CLIP
+
+			// -------------------------------------
+			// Universal Pipeline keywords
+			#pragma multi_compile_fragment _ _WRITE_RENDERING_LAYERS
+
+			//--------------------------------------
+			// GPU Instancing
+			#pragma multi_compile_instancing
+
+			#define USE_URP
+			#define fixed4 half4
+			#define fixed3 half3
+			#define fixed half
+			#include "Include/Spine-Input-Sprite-URP.hlsl"
+			#include "Include/Spine-Sprite-DepthNormalsPass-URP.hlsl"
+			ENDHLSL
+		}
+
 		Pass
 		{
 			Name "Unlit"

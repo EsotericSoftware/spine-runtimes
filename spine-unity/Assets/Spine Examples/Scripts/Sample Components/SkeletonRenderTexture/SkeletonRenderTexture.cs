@@ -73,6 +73,17 @@ namespace Spine.Unity.Examples {
 			CreateQuadChild();
 		}
 
+#if UNITY_EDITOR
+		protected void Reset () {
+			string[] folders = { "Assets", "Packages" };
+			string[] assets = UnityEditor.AssetDatabase.FindAssets("t:material RenderQuadMaterial", folders);
+			if (assets.Length > 0) {
+				string materialPath = UnityEditor.AssetDatabase.GUIDToAssetPath(assets[0]);
+				quadMaterial = UnityEditor.AssetDatabase.LoadAssetAtPath<Material>(materialPath);
+			}
+		}
+#endif
+
 		void CreateQuadChild () {
 			quad = new GameObject(this.name + " RenderTexture", typeof(MeshRenderer), typeof(MeshFilter));
 			quad.transform.SetParent(this.transform.parent, false);

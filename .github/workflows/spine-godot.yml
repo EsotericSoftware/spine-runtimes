@@ -1,5 +1,4 @@
-name: Build and Publish Godot 3.5 editor and templates
-
+name: Build spine-godot (Godot 3.5)
 on:
   push:
     paths:
@@ -17,7 +16,6 @@ env:
   GODOT_VERSION: 3.5.2.stable
 
 jobs:
-
   godot-editor-windows:
     runs-on: windows-latest
     steps:
