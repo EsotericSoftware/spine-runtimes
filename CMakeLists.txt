@@ -47,3 +47,8 @@ else()
 		add_subdirectory(spine-cpp/spine-cpp-unit-tests)
 	endif()
 endif()
+
+# Create config file that include the exported targets
+configure_file(SpineConfig.cmake.in
+	"${CMAKE_CURRENT_BINARY_DIR}/SpineConfig.cmake"
+	@ONLY)

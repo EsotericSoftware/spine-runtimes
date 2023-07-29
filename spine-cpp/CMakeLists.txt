@@ -13,5 +13,13 @@ file(GLOB SOURCES "spine-cpp/src/**/*.cpp")
 
 add_library(spine-cpp STATIC ${SOURCES} ${INCLUDES})
 target_include_directories(spine-cpp PUBLIC spine-cpp/include)
-install(TARGETS spine-cpp DESTINATION lib)
+
+# Install target
+install(TARGETS spine-cpp EXPORT spine-cpp_TARGETS DESTINATION lib)
 install(FILES ${INCLUDES} DESTINATION include/spine)
+
+# Export target
+export(
+	EXPORT spine-cpp_TARGETS
+	FILE ${CMAKE_CURRENT_BINARY_DIR}/spine-cppTargets.cmake
+	NAMESPACE "Spine::")
