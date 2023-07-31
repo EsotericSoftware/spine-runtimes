@@ -1,3 +1,9 @@
+# 4.2.15
+* Updated http dependency to 1.1.0
+
+# 4.1.5
+* Updated http dependency to 1.1.0
+
 # 4.2.14
 * Merge changes from 4.1.4.
 
