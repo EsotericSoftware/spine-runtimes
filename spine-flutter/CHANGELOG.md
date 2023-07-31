@@ -1,3 +1,6 @@
+# 4.1.5
+* Updated http dependency to 1.1.0
+
 # 4.1.4
 * Fixes for WASM/web builds.
 
