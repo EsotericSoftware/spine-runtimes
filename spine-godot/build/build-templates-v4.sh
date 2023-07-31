@@ -69,10 +69,10 @@ elif [ "$platform" = "macos" ]; then
 	# --- macOS ---
 	# generates macos.zip
 
-	scons platform=macos tools=no target=template_release arch=x86_64 custom_modules="../spine_godot" --jobs=$cpus
-	scons platform=macos tools=no target=template_debug arch=x86_64 custom_modules="../spine_godot" --jobs=$cpus
-	scons platform=macos tools=no target=template_release arch=arm64 custom_modules="../spine_godot" --jobs=$cpus
-	scons platform=macos tools=no target=template_debug arch=arm64 custom_modules="../spine_godot" --jobs=$cpus
+	scons platform=macos tools=no target=template_release arch=x86_64 custom_modules="../spine_godot" $mono_module --jobs=$cpus
+	scons platform=macos tools=no target=template_debug arch=x86_64 custom_modules="../spine_godot" $mono_module --jobs=$cpus
+	scons platform=macos tools=no target=template_release arch=arm64 custom_modules="../spine_godot" $mono_module --jobs=$cpus
+	scons platform=macos tools=no target=template_debug arch=arm64 custom_modules="../spine_godot" $mono_module --jobs=$cpus
 	lipo -create "bin/godot.macos.template_release.x86_64$mono_extension" "bin/godot.macos.template_release.arm64$mono_extension" -output bin/godot.macos.universal
 	lipo -create "bin/godot.macos.template_debug.x86_64$mono_extension" "bin/godot.macos.template_debug.arm64$mono_extension" -output bin/godot.macos.debug.universal
 	strip -S -x bin/godot.macos.universal
@@ -89,8 +89,8 @@ elif [ "$platform" = "macos" ]; then
 elif [ "$platform" = "linux" ]; then
 	# --- Linux ---
 	# generates linux_x11_64_release, linux_x11_64_debug
-	scons platform=linuxbsd tools=no target=template_release bits=64 custom_modules="../spine_godot" --jobs=$cpus
-	scons platform=linuxbsd tools=no target=template_debug bits=64 custom_modules="../spine_godot" --jobs=$cpus
+	scons platform=linuxbsd tools=no target=template_release bits=64 custom_modules="../spine_godot" $mono_module --jobs=$cpus
+	scons platform=linuxbsd tools=no target=template_debug bits=64 custom_modules="../spine_godot" $mono_module --jobs=$cpus
 	strip bin/godot.linuxbsd.template_release.x86_64$mono_extension
 	strip bin/godot.linuxbsd.template_debug.x86_64$mono_extension
 	chmod a+x bin/godot.linuxbsd.template_release.x86_64$mono_extension
