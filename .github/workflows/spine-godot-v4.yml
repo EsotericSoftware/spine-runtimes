@@ -114,32 +114,6 @@ jobs:
           name: ${{ format('{0}-{1}{2}.zip', 'godot-editor-macos', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
           path: spine-godot/godot/bin/godot-editor-macos.zip
 
-  godot-editor-macos-self-hosted:
-    runs-on: self-hosted
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      #- name: Setup python and scons
-      #  uses: ./.github/actions/setup-godot-deps
-
-      - name: Build Godot artifact
-        shell: bash
-        run: |
-          ./spine-godot/build/install-macos-vulkan-sdk.sh
-          ./spine-godot/build/setup.sh $GODOT_TAG false $GODOT_MONO
-          ./spine-godot/build/build-v4.sh $GODOT_MONO
-          pushd spine-godot/godot/bin
-          zip -r godot-editor-macos.zip Godot.app
-          popd
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ format('{0}-{1}{2}.zip', 'godot-editor-macos', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
-          path: spine-godot/godot/bin/godot-editor-macos.zip
-
   godot-template-ios:
     runs-on: macos-latest
     if: ${{ inputs.godot_mono == false }}
