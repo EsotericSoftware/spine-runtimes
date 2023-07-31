@@ -121,8 +121,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup python and scons
-        uses: ./.github/actions/setup-godot-deps
+      #- name: Setup python and scons
+      #  uses: ./.github/actions/setup-godot-deps
 
       - name: Build Godot artifact
         shell: bash
