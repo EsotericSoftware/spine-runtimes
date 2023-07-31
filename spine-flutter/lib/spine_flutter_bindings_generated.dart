@@ -9979,87 +9979,87 @@ class SpineFlutterBindings {
           .asFunction<void Function(spine_texture_region, int)>();
 }
 
-class spine_skeleton_wrapper extends ffi.Opaque {}
+final class spine_skeleton_wrapper extends ffi.Opaque {}
 
-class spine_skeleton_data_wrapper extends ffi.Opaque {}
+final class spine_skeleton_data_wrapper extends ffi.Opaque {}
 
-class spine_bone_wrapper extends ffi.Opaque {}
+final class spine_bone_wrapper extends ffi.Opaque {}
 
-class spine_bone_data_wrapper extends ffi.Opaque {}
+final class spine_bone_data_wrapper extends ffi.Opaque {}
 
-class spine_slot_wrapper extends ffi.Opaque {}
+final class spine_slot_wrapper extends ffi.Opaque {}
 
-class spine_slot_data_wrapper extends ffi.Opaque {}
+final class spine_slot_data_wrapper extends ffi.Opaque {}
 
-class spine_skin_wrapper extends ffi.Opaque {}
+final class spine_skin_wrapper extends ffi.Opaque {}
 
-class spine_attachment_wrapper extends ffi.Opaque {}
+final class spine_attachment_wrapper extends ffi.Opaque {}
 
-class spine_region_attachment_wrapper extends ffi.Opaque {}
+final class spine_region_attachment_wrapper extends ffi.Opaque {}
 
-class spine_vertex_attachment_wrapper extends ffi.Opaque {}
+final class spine_vertex_attachment_wrapper extends ffi.Opaque {}
 
-class spine_mesh_attachment_wrapper extends ffi.Opaque {}
+final class spine_mesh_attachment_wrapper extends ffi.Opaque {}
 
-class spine_clipping_attachment_wrapper extends ffi.Opaque {}
+final class spine_clipping_attachment_wrapper extends ffi.Opaque {}
 
-class spine_bounding_box_attachment_wrapper extends ffi.Opaque {}
+final class spine_bounding_box_attachment_wrapper extends ffi.Opaque {}
 
-class spine_path_attachment_wrapper extends ffi.Opaque {}
+final class spine_path_attachment_wrapper extends ffi.Opaque {}
 
-class spine_point_attachment_wrapper extends ffi.Opaque {}
+final class spine_point_attachment_wrapper extends ffi.Opaque {}
 
-class spine_texture_region_wrapper extends ffi.Opaque {}
+final class spine_texture_region_wrapper extends ffi.Opaque {}
 
-class spine_sequence_wrapper extends ffi.Opaque {}
+final class spine_sequence_wrapper extends ffi.Opaque {}
 
-class spine_constraint_wrapper extends ffi.Opaque {}
+final class spine_constraint_wrapper extends ffi.Opaque {}
 
-class spine_constraint_data_wrapper extends ffi.Opaque {}
+final class spine_constraint_data_wrapper extends ffi.Opaque {}
 
-class spine_ik_constraint_wrapper extends ffi.Opaque {}
+final class spine_ik_constraint_wrapper extends ffi.Opaque {}
 
-class spine_ik_constraint_data_wrapper extends ffi.Opaque {}
+final class spine_ik_constraint_data_wrapper extends ffi.Opaque {}
 
-class spine_transform_constraint_wrapper extends ffi.Opaque {}
+final class spine_transform_constraint_wrapper extends ffi.Opaque {}
 
-class spine_transform_constraint_data_wrapper extends ffi.Opaque {}
+final class spine_transform_constraint_data_wrapper extends ffi.Opaque {}
 
-class spine_path_constraint_wrapper extends ffi.Opaque {}
+final class spine_path_constraint_wrapper extends ffi.Opaque {}
 
-class spine_path_constraint_data_wrapper extends ffi.Opaque {}
+final class spine_path_constraint_data_wrapper extends ffi.Opaque {}
 
-class spine_animation_state_wrapper extends ffi.Opaque {}
+final class spine_animation_state_wrapper extends ffi.Opaque {}
 
-class spine_animation_state_data_wrapper extends ffi.Opaque {}
+final class spine_animation_state_data_wrapper extends ffi.Opaque {}
 
-class spine_animation_state_events_wrapper extends ffi.Opaque {}
+final class spine_animation_state_events_wrapper extends ffi.Opaque {}
 
-class spine_event_wrapper extends ffi.Opaque {}
+final class spine_event_wrapper extends ffi.Opaque {}
 
-class spine_event_data_wrapper extends ffi.Opaque {}
+final class spine_event_data_wrapper extends ffi.Opaque {}
 
-class spine_track_entry_wrapper extends ffi.Opaque {}
+final class spine_track_entry_wrapper extends ffi.Opaque {}
 
-class spine_animation_wrapper extends ffi.Opaque {}
+final class spine_animation_wrapper extends ffi.Opaque {}
 
-class spine_atlas_wrapper extends ffi.Opaque {}
+final class spine_atlas_wrapper extends ffi.Opaque {}
 
-class spine_skeleton_data_result_wrapper extends ffi.Opaque {}
+final class spine_skeleton_data_result_wrapper extends ffi.Opaque {}
 
-class spine_render_command_wrapper extends ffi.Opaque {}
+final class spine_render_command_wrapper extends ffi.Opaque {}
 
-class spine_bounds_wrapper extends ffi.Opaque {}
+final class spine_bounds_wrapper extends ffi.Opaque {}
 
-class spine_color_wrapper extends ffi.Opaque {}
+final class spine_color_wrapper extends ffi.Opaque {}
 
-class spine_vector_wrapper extends ffi.Opaque {}
+final class spine_vector_wrapper extends ffi.Opaque {}
 
-class spine_skeleton_drawable_wrapper extends ffi.Opaque {}
+final class spine_skeleton_drawable_wrapper extends ffi.Opaque {}
 
-class spine_skin_entry_wrapper extends ffi.Opaque {}
+final class spine_skin_entry_wrapper extends ffi.Opaque {}
 
-class spine_skin_entries_wrapper extends ffi.Opaque {}
+final class spine_skin_entries_wrapper extends ffi.Opaque {}
 
 abstract class spine_blend_mode {
   static const int SPINE_BLEND_MODE_NORMAL = 0;
