@@ -367,8 +367,7 @@ half4 ForwardPassFragmentSprite(VertexOutputLWRP input
 #endif
 #if defined(_ADDITIONAL_LIGHTS) && USE_FORWARD_PLUS
 	inputData.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(input.pos);
-#else
-	inputData.normalizedScreenSpaceUV = 0;
+	// note: don't assign normalizedScreenSpaceUV otherwise since old URP versions are missing this member variable
 #endif
 
 #if defined(SPECULAR)
