@@ -415,32 +415,32 @@ jobs:
       - name: Download godot-editor-macos artifact
         uses: actions/download-artifact@v2
         with:
-          name: ${{ format('{0}-{1}{2}.zip', 'godot-editor-macos.zip', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
+          name: ${{ format('{0}-{1}{2}.zip', 'godot-editor-macos', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
 
       - name: Download godot-template-macos artifact
         uses: actions/download-artifact@v2
         with:
-          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-macos.zip', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
+          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-macos', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
 
       - name: Download godot-template-windows-release artifact
         uses: actions/download-artifact@v2
         with:
-          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-windows-release.zip', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
+          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-windows-release', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
 
       - name: Download godot-template-windows-debug artifact
         uses: actions/download-artifact@v2
         with:
-          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-windows-debug.zip', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
+          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-windows-debug', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
 
       - name: Download godot-template-linux-release artifact
         uses: actions/download-artifact@v2
         with:
-          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-linux-release.zip', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
+          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-linux-release', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
 
       - name: Download godot-template-linux-debug artifact
         uses: actions/download-artifact@v2
         with:
-          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-linux-debug.zip', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
+          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-linux-debug', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
 
       - name: Upload artifacts to S3
         shell: bash
