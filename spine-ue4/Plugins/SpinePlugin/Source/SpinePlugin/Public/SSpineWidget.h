@@ -55,6 +55,8 @@ protected:
 
 	void Flush(int32 LayerId, FSlateWindowElementList &OutDrawElements, const FGeometry &AllottedGeometry, int &Idx, TArray<FVector> &Vertices, TArray<int32> &Indices, TArray<FVector2D> &Uvs, TArray<FColor> &Colors, TArray<FVector> &Colors2, UMaterialInstanceDynamic *Material);
 
+	virtual FVector2D ComputeDesiredSize(float) const override;
+
 	USpineWidget *widget;
 	FRenderData renderData;
 	FVector boundsMin;
