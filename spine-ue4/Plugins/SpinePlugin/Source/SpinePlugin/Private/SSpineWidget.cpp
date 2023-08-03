@@ -228,6 +228,14 @@ void SSpineWidget::Flush(int32 LayerId, FSlateWindowElementList &OutDrawElements
 	Idx++;
 }
 
+FVector2D SSpineWidget::ComputeDesiredSize(float X) const {
+	if (widget && widget->skeleton && widget->Atlas) {
+		return FVector2D(boundsSize.X, boundsSize.Y);
+	} else {
+		return FVector2D(256, 256);
+	}
+}
+
 void SSpineWidget::UpdateMesh(int32 LayerId, FSlateWindowElementList &OutDrawElements, const FGeometry &AllottedGeometry, Skeleton *Skeleton) {
 	TArray<FVector> vertices;
 	TArray<int32> indices;

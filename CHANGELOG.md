@@ -105,8 +105,8 @@
   * `VertexAttachment::getDeformAttachment()` was renamed to `VertexAttachment::getTimelineAttachment()`.
   * `Skeleton::update()` has been removed.
   * `Skeleton::getTime()` has been removed.
-  * `VertexEffect` has been removed.  
-  
+  * `VertexEffect` has been removed.
+
 ### Cocos2d-x
 
 ### SFML
@@ -158,7 +158,7 @@
   * Added `SkeletonRootMotion` callback delegates `ProcessRootMotionOverride` and `PhysicsUpdateRootMotionOverride` to customize how root motion is applied. The new property `disableOnOverride` determines whether the callback will be issued in addition or instead of normally applying root motion. Added property `rootMotionScaleRotation` to allow scaling rotational root-motion to match e.g. a 90 degree rotation to a custom target angle.
   * Added outline shader parameter `Advanced - Opaque Alpha` which can be used to exclude problematic semi-transparent areas, which may receive an undesired large outline color overlay otherwise.
   * Added Spine Preferences setting `Prefabs` - `Optimize Preview Meshes`. When enabled, Spine prefab preview meshes will be removed in a pre-build step to reduce build size. This increases build time as all prefabs in the project will be processed. Defaults to false to not slow down builds substantially every time.
-  * Added Spine Preferences setting `Reload SkeletonData after Play`. When enabled, the shared `SkeletonData` of all skeletons in the active scene is reloaded (from the `.json` or `.skel.bytes` file) after exiting play-mode. You can disable this setting to avoid the reloading delay if you can ensure that there are no (accidental) modifications to the shared `SkeletonData` during play-mode (otherwise it would carry over its effect into subsequent plays). Defaults to `true` (the safe setting), which maintains existing behaviour. 
+  * Added Spine Preferences setting `Reload SkeletonData after Play`. When enabled, the shared `SkeletonData` of all skeletons in the active scene is reloaded (from the `.json` or `.skel.bytes` file) after exiting play-mode. You can disable this setting to avoid the reloading delay if you can ensure that there are no (accidental) modifications to the shared `SkeletonData` during play-mode (otherwise it would carry over its effect into subsequent plays). Defaults to `true` (the safe setting), which maintains existing behaviour.
   * Added `SkeletonAnimationMulti` sample component methods `SetActiveSkeleton(int index)` and getter property `SkeletonAnimations` to more easily apply changes at all SkeletonAnimation instances instead of only the active one.
   * PMA textures now have `sRGB (Color Texture)` disabled by default, the preset template `PMATexturePreset.preset` has been adjusted accordingly. As PMA textures are only allowed with Gamma color space, `sRGB (Color Texture)` shall be disabled to prevent border artifacts when mipmaps are enabled. In Gamma color space having this setting disabled has no drawbacks, only benefits.
   * `SkeletonRenderTexture` and `SkeletonGraphicRenderTexture` components now support automatic down-scaling when required size on screen exceeds `Max Render Texture Size`.
@@ -220,7 +220,7 @@
   * `VertexEffect` has been removed.
   * Removed `RegionAttachment.rendererObject`.
   * Renamed `TextureRegion.renderObject` to `TextureRegion.texture`.
-  
+
 
 ### WebGL backend
   * `PolygonBatcher` can now disable culling automatically if the static variable `PolygonBatcher.disableCulling` is set to true.
@@ -232,7 +232,7 @@
 ### Three.js backend
   * Added orbital controls to THREJS example.
   * `SkeletonMesh` takes an optional `SkeletonMeshMaterialCustomizer`, allowing modification of materials used by `SkeletonMesh`.
-  * Added `SkeletonMeshMaterial.alphaTest`, when > 0, alpha testing will be performed and fragments will not be written to the depth buffer, if depth writes are enabled. 
+  * Added `SkeletonMeshMaterial.alphaTest`, when > 0, alpha testing will be performed and fragments will not be written to the depth buffer, if depth writes are enabled.
 
 ### Player
   * Added `SpinePlayer.dispose()` to explicitely dispose of all resources the player holds on to.
@@ -606,6 +606,7 @@
 * Added mix-and-match example to demonstrate the new Skin API.
 * Materials on `SkeletonRendererComponent` are now blueprint read and writeable. This allows setting dynamic material instances at runtime.
 * Added `InitialSkin` property to `USpineWidget`. This allows previewing different skins in the UMG Designer. Initial skins can still be overridden via blueprint events such as `On Initialized`.
+* `USpineWidget` will now report its own desired size based on the setup pose dimensions of the skeleton. This is used when selecting `Size to content` on a `USpineWidget` in the designer.
 
 ## C# ##
 * **Breaking changes**
