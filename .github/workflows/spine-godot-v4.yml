@@ -459,7 +459,7 @@ jobs:
           aws s3 cp godot-editor-macos-mono.zip s3://spine-godot/$BRANCH/$GODOT_TAG/
           echo "$GODOT_VERSION.mono" > version.txt
           zip spine-godot-templates-$BRANCH-$GODOT_TAG-mono.zip macos.zip windows_debug_x86_64.exe windows_release_x86_64.exe linux_debug.x86_64 linux_release.x86_64 version.txt
-          aws s3 cp spine-godot-templates-$BRANCH-$GODOT_TAG.zip s3://spine-godot/$BRANCH/$GODOT_TAG/spine-godot-templates-$BRANCH-$GODOT_TAG.tpz
+          aws s3 cp spine-godot-templates-$BRANCH-$GODOT_TAG-mono.zip s3://spine-godot/$BRANCH/$GODOT_TAG/spine-godot-templates-$BRANCH-$GODOT_TAG.tpz
 
 
 
