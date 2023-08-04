@@ -448,7 +448,7 @@ jobs:
         run: |
           BRANCH=${GITHUB_REF#refs/heads/}
           echo "branch: $BRANCH"
-          ls -lah
+          ls -lahR
           mv godot.windows.editor.x86_64.mono.exe godot-$BRANCH-$GODOT_TAG-mono.exe
           mv godot.linuxbsd.editor.x86_64.mono godot-$BRANCH-$GODOT_TAG-mono
           zip godot-editor-windows-mono.zip godot-$BRANCH-$GODOT_TAG-mono.exe GodotSharp
@@ -457,7 +457,6 @@ jobs:
           aws s3 cp godot-editor-linux-mono.zip s3://spine-godot/$BRANCH/$GODOT_TAG/
           aws s3 cp godot-editor-macos-mono.zip s3://spine-godot/$BRANCH/$GODOT_TAG/
           echo "$GODOT_VERSION.mono" > version.txt
-          ls -lah
           zip spine-godot-templates-$BRANCH-$GODOT_TAG-mono.zip macos.zip windows_debug_x86_64.exe windows_release_x86_64.exe linux_debug.x86_64 linux_release.x86_64 version.txt
           aws s3 cp spine-godot-templates-$BRANCH-$GODOT_TAG.zip s3://spine-godot/$BRANCH/$GODOT_TAG/spine-godot-templates-$BRANCH-$GODOT_TAG.tpz
 
