@@ -340,7 +340,7 @@ class SpineAtlasFile extends Phaser.Loader.MultiFile {
 				} else {
 					file.data = {
 						data: file.data,
-						premultipliedAlpha: this.premultipliedAlpha || file.data.indexOf("pma: true") >= 0
+						premultipliedAlpha: this.premultipliedAlpha || file.data.indexOf("pma: true") >= 0 || file.data.indexOf("pma:true") >= 0
 					};
 					file.addToCache();
 				}

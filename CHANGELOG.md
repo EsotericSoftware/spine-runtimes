@@ -607,6 +607,7 @@
 * Materials on `SkeletonRendererComponent` are now blueprint read and writeable. This allows setting dynamic material instances at runtime.
 * Added `InitialSkin` property to `USpineWidget`. This allows previewing different skins in the UMG Designer. Initial skins can still be overridden via blueprint events such as `On Initialized`.
 * `USpineWidget` will now report its own desired size based on the setup pose dimensions of the skeleton. This is used when selecting `Size to content` on a `USpineWidget` in the designer.
+* Updated example project to UE 5.2.
 
 ## C# ##
 * **Breaking changes**

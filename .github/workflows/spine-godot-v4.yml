@@ -321,62 +321,62 @@ jobs:
       - name: Download godot-editor-macos artifact
         uses: actions/download-artifact@v2
         with:
-          name: ${{ format('{0}-{1}{2}.zip', 'godot-editor-macos.zip', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
+          name: ${{ format('{0}-{1}{2}.zip', 'godot-editor-macos', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
 
       - name: Download godot-template-ios artifact
         uses: actions/download-artifact@v2
         with:
-          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-ios.zip', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
+          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-ios', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
 
       - name: Download godot-template-macos artifact
         uses: actions/download-artifact@v2
         with:
-          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-macos.zip', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
+          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-macos', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
 
       - name: Download godot-template-windows-release artifact
         uses: actions/download-artifact@v2
         with:
-          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-windows-release.zip', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
+          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-windows-release', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
 
       - name: Download godot-template-windows-debug artifact
         uses: actions/download-artifact@v2
         with:
-          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-windows-debug.zip', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
+          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-windows-debug', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
 
       - name: Download godot-template-linux-release artifact
         uses: actions/download-artifact@v2
         with:
-          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-linux-release.zip', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
+          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-linux-release', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
 
       - name: Download godot-template-linux-debug artifact
         uses: actions/download-artifact@v2
         with:
-          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-linux-debug.zip', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
+          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-linux-debug', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
 
       - name: Download godot-template-android-release artifact
         uses: actions/download-artifact@v2
         with:
-          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-android-release.zip', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
+          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-android-release', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
 
       - name: Download godot-template-android-debug artifact
         uses: actions/download-artifact@v2
         with:
-          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-android-debug.zip', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
+          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-android-debug', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
 
       - name: Download godot-template-android-source artifact
         uses: actions/download-artifact@v2
         with:
-          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-android-source.zip', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
+          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-android-source', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
 
       - name: Download godot-template-web-release artifact
         uses: actions/download-artifact@v2
         with:
-          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-web-release.zip', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
+          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-web-release', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
 
       - name: Download godot-template-web-debug artifact
         uses: actions/download-artifact@v2
         with:
-          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-web-debug.zip', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
+          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-web-debug', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
 
       - name: Upload artifacts to S3
         shell: bash
@@ -415,32 +415,32 @@ jobs:
       - name: Download godot-editor-macos artifact
         uses: actions/download-artifact@v2
         with:
-          name: ${{ format('{0}-{1}{2}.zip', 'godot-editor-macos.zip', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
+          name: ${{ format('{0}-{1}{2}.zip', 'godot-editor-macos', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
 
       - name: Download godot-template-macos artifact
         uses: actions/download-artifact@v2
         with:
-          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-macos.zip', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
+          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-macos', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
 
       - name: Download godot-template-windows-release artifact
         uses: actions/download-artifact@v2
         with:
-          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-windows-release.zip', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
+          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-windows-release', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
 
       - name: Download godot-template-windows-debug artifact
         uses: actions/download-artifact@v2
         with:
-          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-windows-debug.zip', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
+          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-windows-debug', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
 
       - name: Download godot-template-linux-release artifact
         uses: actions/download-artifact@v2
         with:
-          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-linux-release.zip', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
+          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-linux-release', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
 
       - name: Download godot-template-linux-debug artifact
         uses: actions/download-artifact@v2
         with:
-          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-linux-debug.zip', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
+          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-linux-debug', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
 
       - name: Upload artifacts to S3
         shell: bash
@@ -448,17 +448,18 @@ jobs:
         run: |
           BRANCH=${GITHUB_REF#refs/heads/}
           echo "branch: $BRANCH"
+          ls -lahR
           mv godot.windows.editor.x86_64.mono.exe godot-$BRANCH-$GODOT_TAG-mono.exe
           mv godot.linuxbsd.editor.x86_64.mono godot-$BRANCH-$GODOT_TAG-mono
           zip godot-editor-windows-mono.zip godot-$BRANCH-$GODOT_TAG-mono.exe GodotSharp
           zip godot-editor-linux-mono.zip godot-$BRANCH-$GODOT_TAG-mono GodotSharp
+          mv godot-editor-macos.zip godot-editor-macos-mono.zip
           aws s3 cp godot-editor-windows-mono.zip s3://spine-godot/$BRANCH/$GODOT_TAG/
           aws s3 cp godot-editor-linux-mono.zip s3://spine-godot/$BRANCH/$GODOT_TAG/
           aws s3 cp godot-editor-macos-mono.zip s3://spine-godot/$BRANCH/$GODOT_TAG/
           echo "$GODOT_VERSION.mono" > version.txt
-          ls -lah
           zip spine-godot-templates-$BRANCH-$GODOT_TAG-mono.zip macos.zip windows_debug_x86_64.exe windows_release_x86_64.exe linux_debug.x86_64 linux_release.x86_64 version.txt
-          aws s3 cp spine-godot-templates-$BRANCH-$GODOT_TAG.zip s3://spine-godot/$BRANCH/$GODOT_TAG/spine-godot-templates-$BRANCH-$GODOT_TAG.tpz
+          aws s3 cp spine-godot-templates-$BRANCH-$GODOT_TAG-mono.zip s3://spine-godot/$BRANCH/$GODOT_TAG/spine-godot-templates-$BRANCH-$GODOT_TAG-mono.tpz
 
 
 
