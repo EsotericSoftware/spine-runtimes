@@ -1,6 +1,6 @@
 {
   "name": "@esotericsoftware/spine-canvas",
-  "version": "4.2.17",
+  "version": "4.2.18",
   "description": "The official Spine Runtimes for the web.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -30,6 +30,6 @@
   },
   "homepage": "https://github.com/esotericsoftware/spine-runtimes#readme",
   "dependencies": {
-    "@esotericsoftware/spine-core": "4.2.17"
+    "@esotericsoftware/spine-core": "4.2.18"
   }
 }
