@@ -103,7 +103,7 @@ export class SkeletonJson {
 				data.skinRequired = getValue(boneMap, "skin", false);
 
 				let color = getValue(boneMap, "color", null);
-				if (color) data.color.setFromString(color);
+				if (color) data.color.setFromColor(color);
 
 				skeletonData.bones.push(data);
 			}
