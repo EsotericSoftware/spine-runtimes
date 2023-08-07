@@ -56,6 +56,9 @@
 #define VARIANT_FLOAT Variant::REAL
 #define GDREGISTER_CLASS(x) ClassDB::register_class<x>()
 #define GEOMETRY2D Geometry
+#ifndef SNAME
+#define SNAME(m_arg) ([]() -> const StringName & { static StringName sname = _scs_create(m_arg); return sname; })()
+#endif
 #endif
 
 #define SPINE_CHECK(obj, ret)                      \
@@ -65,6 +68,7 @@
 	}
 
 #define SPINE_STRING(x) spine::String((x).utf8())
+#define SPINE_STRING_TMP(x) spine::String((x).utf8(), true, false)
 
 // Can't do template classes with Godot's object model :(
 class SpineObjectWrapper : public REFCOUNTED {
@@ -81,9 +85,9 @@ protected:
 	void spine_objects_invalidated() {
 		spine_object = nullptr;
 #if VERSION_MAJOR > 3
-		spine_owner->disconnect("_internal_spine_objects_invalidated", callable_mp(this, &SpineObjectWrapper::spine_objects_invalidated));
+		spine_owner->disconnect(SNAME("_internal_spine_objects_invalidated"), callable_mp(this, &SpineObjectWrapper::spine_objects_invalidated));
 #else
-		spine_owner->disconnect("_internal_spine_objects_invalidated", this, "_internal_spine_objects_invalidated");
+		spine_owner->disconnect(SNAME("_internal_spine_objects_invalidated"), this, SNAME("_internal_spine_objects_invalidated"));
 #endif
 	}
 
@@ -108,9 +112,9 @@ protected:
 		spine_owner = (Object *) _owner;
 		spine_object = _object;
 #if VERSION_MAJOR > 3
-		spine_owner->connect("_internal_spine_objects_invalidated", callable_mp(this, &SpineObjectWrapper::spine_objects_invalidated));
+		spine_owner->connect(SNAME("_internal_spine_objects_invalidated"), callable_mp(this, &SpineObjectWrapper::spine_objects_invalidated));
 #else
-		spine_owner->connect("_internal_spine_objects_invalidated", this, "_internal_spine_objects_invalidated");
+		spine_owner->connect(SNAME("_internal_spine_objects_invalidated"), this, SNAME("_internal_spine_objects_invalidated"));
 #endif
 	}
 

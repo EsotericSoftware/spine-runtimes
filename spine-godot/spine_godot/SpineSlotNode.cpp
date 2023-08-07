@@ -62,9 +62,9 @@ void SpineSlotNode::_notification(int what) {
 			SpineSprite *sprite = cast_to<SpineSprite>(get_parent());
 			if (sprite) {
 #if VERSION_MAJOR > 3
-				sprite->connect("world_transforms_changed", callable_mp(this, &SpineSlotNode::on_world_transforms_changed));
+				sprite->connect(SNAME("world_transforms_changed"), callable_mp(this, &SpineSlotNode::on_world_transforms_changed));
 #else
-				sprite->connect("world_transforms_changed", this, "_on_world_transforms_changed");
+				sprite->connect(SNAME("world_transforms_changed"), this, SNAME("_on_world_transforms_changed"));
 #endif
 				update_transform(sprite);
 #if VERSION_MAJOR == 3
@@ -86,9 +86,9 @@ void SpineSlotNode::_notification(int what) {
 			SpineSprite *sprite = cast_to<SpineSprite>(get_parent());
 			if (sprite) {
 #if VERSION_MAJOR > 3
-				sprite->disconnect("world_transforms_changed", callable_mp(this, &SpineSlotNode::on_world_transforms_changed));
+				sprite->disconnect(SNAME("world_transforms_changed"), callable_mp(this, &SpineSlotNode::on_world_transforms_changed));
 #else
-				sprite->disconnect("world_transforms_changed", this, "_on_world_transforms_changed");
+				sprite->disconnect(SNAME("world_transforms_changed"), this, SNAME("_on_world_transforms_changed"));
 #endif
 			}
 			break;

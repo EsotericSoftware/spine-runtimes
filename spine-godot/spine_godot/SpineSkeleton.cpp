@@ -113,26 +113,34 @@ void SpineSkeleton::set_slots_to_setup_pose() {
 Ref<SpineBone> SpineSkeleton::find_bone(const String &name) {
 	SPINE_CHECK(skeleton, nullptr)
 	if (EMPTY(name)) return nullptr;
-	auto bone = skeleton->findBone(SPINE_STRING(name));
+	auto bone = skeleton->findBone(SPINE_STRING_TMP(name));
 	if (!bone) return nullptr;
+	if (_cached_bones.count(bone) > 0 ) {
+		return _cached_bones[bone];
+	}
 	Ref<SpineBone> bone_ref(memnew(SpineBone));
 	bone_ref->set_spine_object(sprite, bone);
+	_cached_bones[bone] = bone_ref;
 	return bone_ref;
 }
 
 Ref<SpineSlot> SpineSkeleton::find_slot(const String &name) {
 	SPINE_CHECK(skeleton, nullptr)
 	if (EMPTY(name)) return nullptr;
-	auto slot = skeleton->findSlot(SPINE_STRING(name));
+	auto slot = skeleton->findSlot(SPINE_STRING_TMP(name));
 	if (!slot) return nullptr;
+	if (_cached_slots.count(slot) > 0 ) {
+		return _cached_slots[slot];
+	}
 	Ref<SpineSlot> slot_ref(memnew(SpineSlot));
 	slot_ref->set_spine_object(sprite, slot);
+	_cached_slots[slot] = slot_ref;
 	return slot_ref;
 }
 
 void SpineSkeleton::set_skin_by_name(const String &skin_name) {
 	SPINE_CHECK(skeleton, )
-	skeleton->setSkin(SPINE_STRING(skin_name));
+	skeleton->setSkin(SPINE_STRING_TMP(skin_name));
 }
 
 void SpineSkeleton::set_skin(Ref<SpineSkin> new_skin) {
@@ -144,7 +152,7 @@ void SpineSkeleton::set_skin(Ref<SpineSkin> new_skin) {
 
 Ref<SpineAttachment> SpineSkeleton::get_attachment_by_slot_name(const String &slot_name, const String &attachment_name) {
 	SPINE_CHECK(skeleton, nullptr)
-	auto attachment = skeleton->getAttachment(SPINE_STRING(slot_name), SPINE_STRING(attachment_name));
+	auto attachment = skeleton->getAttachment(SPINE_STRING_TMP(slot_name), SPINE_STRING_TMP(attachment_name));
 	if (!attachment) return nullptr;
 	Ref<SpineAttachment> attachment_ref(memnew(SpineAttachment));
 	attachment_ref->set_spine_object(*sprite->get_skeleton_data_res(), attachment);
@@ -153,7 +161,7 @@ Ref<SpineAttachment> SpineSkeleton::get_attachment_by_slot_name(const String &sl
 
 Ref<SpineAttachment> SpineSkeleton::get_attachment_by_slot_index(int slot_index, const String &attachment_name) {
 	SPINE_CHECK(skeleton, nullptr)
-	auto attachment = skeleton->getAttachment(slot_index, SPINE_STRING(attachment_name));
+	auto attachment = skeleton->getAttachment(slot_index, SPINE_STRING_TMP(attachment_name));
 	if (!attachment) return nullptr;
 	Ref<SpineAttachment> attachment_ref(memnew(SpineAttachment));
 	attachment_ref->set_spine_object(*sprite->get_skeleton_data_res(), attachment);
@@ -168,7 +176,7 @@ void SpineSkeleton::set_attachment(const String &slot_name, const String &attach
 Ref<SpineIkConstraint> SpineSkeleton::find_ik_constraint(const String &constraint_name) {
 	SPINE_CHECK(skeleton, nullptr)
 	if (EMPTY(constraint_name)) return nullptr;
-	auto constraint = skeleton->findIkConstraint(SPINE_STRING(constraint_name));
+	auto constraint = skeleton->findIkConstraint(SPINE_STRING_TMP(constraint_name));
 	if (!constraint) return nullptr;
 	Ref<SpineIkConstraint> constraint_ref(memnew(SpineIkConstraint));
 	constraint_ref->set_spine_object(sprite, constraint);
@@ -178,7 +186,7 @@ Ref<SpineIkConstraint> SpineSkeleton::find_ik_constraint(const String &constrain
 Ref<SpineTransformConstraint> SpineSkeleton::find_transform_constraint(const String &constraint_name) {
 	SPINE_CHECK(skeleton, nullptr)
 	if (EMPTY(constraint_name)) return nullptr;
-	auto constraint = skeleton->findTransformConstraint(SPINE_STRING(constraint_name));
+	auto constraint = skeleton->findTransformConstraint(SPINE_STRING_TMP(constraint_name));
 	if (!constraint) return nullptr;
 	Ref<SpineTransformConstraint> constraint_ref(memnew(SpineTransformConstraint));
 	constraint_ref->set_spine_object(sprite, constraint);
@@ -188,7 +196,7 @@ Ref<SpineTransformConstraint> SpineSkeleton::find_transform_constraint(const Str
 Ref<SpinePathConstraint> SpineSkeleton::find_path_constraint(const String &constraint_name) {
 	SPINE_CHECK(skeleton, nullptr)
 	if (EMPTY(constraint_name)) return nullptr;
-	auto constraint = skeleton->findPathConstraint(SPINE_STRING(constraint_name));
+	auto constraint = skeleton->findPathConstraint(SPINE_STRING_TMP(constraint_name));
 	if (!constraint) return nullptr;
 	Ref<SpinePathConstraint> constraint_ref(memnew(SpinePathConstraint));
 	constraint_ref->set_spine_object(sprite, constraint);

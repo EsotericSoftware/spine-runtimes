@@ -415,15 +415,15 @@ void SpineSprite::on_skeleton_data_changed() {
 	remove_meshes();
 	skeleton.unref();
 	animation_state.unref();
-	emit_signal("_internal_spine_objects_invalidated");
+	emit_signal(SNAME("_internal_spine_objects_invalidated"));
 
 	if (skeleton_data_res.is_valid()) {
 #if VERSION_MAJOR > 3
-		if (!skeleton_data_res->is_connected("skeleton_data_changed", callable_mp(this, &SpineSprite::on_skeleton_data_changed)))
-			skeleton_data_res->connect("skeleton_data_changed", callable_mp(this, &SpineSprite::on_skeleton_data_changed));
+		if (!skeleton_data_res->is_connected(SNAME("skeleton_data_changed"), callable_mp(this, &SpineSprite::on_skeleton_data_changed)))
+			skeleton_data_res->connect(SNAME("skeleton_data_changed"), callable_mp(this, &SpineSprite::on_skeleton_data_changed));
 #else
-		if (!skeleton_data_res->is_connected("skeleton_data_changed", this, "on_skeleton_data_changed"))
-			skeleton_data_res->connect("skeleton_data_changed", this, "on_skeleton_data_changed");
+		if (!skeleton_data_res->is_connected(SNAME("skeleton_data_changed"), this, SNAME("on_skeleton_data_changed")))
+			skeleton_data_res->connect(SNAME("skeleton_data_changed"), this, SNAME("on_skeleton_data_changed"));
 #endif
 	}
 
@@ -665,15 +665,15 @@ void SpineSprite::update_skeleton(float delta) {
 		!animation_state->get_spine_object())
 		return;
 
-	emit_signal("before_animation_state_update", this);
+	emit_signal(SNAME("before_animation_state_update"), this);
 	animation_state->update(delta);
 	if (!is_visible_in_tree()) return;
-	emit_signal("before_animation_state_apply", this);
+	emit_signal(SNAME("before_animation_state_apply"), this);
 	animation_state->apply(skeleton);
-	emit_signal("before_world_transforms_change", this);
+	emit_signal(SNAME("before_world_transforms_change"), this);
 	skeleton->update_world_transform();
 	modified_bones = false;
-	emit_signal("world_transforms_changed", this);
+	emit_signal(SNAME("world_transforms_changed"), this);
 	if (modified_bones) skeleton->update_world_transform();
 	sort_slot_nodes();
 	update_meshes(skeleton);
@@ -1001,7 +1001,7 @@ void SpineSprite::draw() {
 #if VERSION_MAJOR > 3
 	default_font = control->get_theme_default_font();
 #else
-	default_font = control->get_font("font", "Label");
+	default_font = control->get_font(SNAME("font"), SNAME("Label"));
 #endif
 	memfree(control);
 
@@ -1073,22 +1073,22 @@ void SpineSprite::callback(spine::AnimationState *state, spine::EventType type, 
 
 	switch (type) {
 		case spine::EventType_Start:
-			emit_signal("animation_started", this, animation_state, entry_ref);
+			emit_signal(SNAME("animation_started"), this, animation_state, entry_ref);
 			break;
 		case spine::EventType_Interrupt:
-			emit_signal("animation_interrupted", this, animation_state, entry_ref);
+			emit_signal(SNAME("animation_interrupted"), this, animation_state, entry_ref);
 			break;
 		case spine::EventType_End:
-			emit_signal("animation_ended", this, animation_state, entry_ref);
+			emit_signal(SNAME("animation_ended"), this, animation_state, entry_ref);
 			break;
 		case spine::EventType_Complete:
-			emit_signal("animation_completed", this, animation_state, entry_ref);
+			emit_signal(SNAME("animation_completed"), this, animation_state, entry_ref);
 			break;
 		case spine::EventType_Dispose:
-			emit_signal("animation_disposed", this, animation_state, entry_ref);
+			emit_signal(SNAME("animation_disposed"), this, animation_state, entry_ref);
 			break;
 		case spine::EventType_Event:
-			emit_signal("animation_event", this, animation_state, entry_ref, event_ref);
+			emit_signal(SNAME("animation_event"), this, animation_state, entry_ref, event_ref);
 			break;
 	}
 }
