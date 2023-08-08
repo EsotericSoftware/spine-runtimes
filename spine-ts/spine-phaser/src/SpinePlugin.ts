@@ -259,13 +259,13 @@ class SpineSkeletonDataFile extends Phaser.Loader.MultiFile {
 	constructor (loader: Phaser.Loader.LoaderPlugin, key: string, url: string, public fileType: SpineSkeletonDataFileType, xhrSettings: Phaser.Types.Loader.XHRSettingsObject) {
 		
 		if (Phaser.Utils.Objects.IsPlainObject(key as any)) {
-            const config = key as any;
-            key = Phaser.Utils.Objects.GetFastValue(config, "key");
-            url = Phaser.Utils.Objects.GetFastValue(config, "url");
+            		const config = key as any;
+            		key = Phaser.Utils.Objects.GetFastValue(config, "key");
+            		url = Phaser.Utils.Objects.GetFastValue(config, "url");
 			const type = Phaser.Utils.Objects.GetFastValue(config, "type");
 			fileType = type === "spineJson" ? SpineSkeletonDataFileType.json : SpineSkeletonDataFileType.binary;
-            xhrSettings = Phaser.Utils.Objects.GetFastValue(config, "xhrSettings");
-        }
+            		xhrSettings = Phaser.Utils.Objects.GetFastValue(config, "xhrSettings");
+        	}
 		
 		let file = null;
 		let isJson = fileType == SpineSkeletonDataFileType.json;
@@ -300,12 +300,12 @@ class SpineAtlasFile extends Phaser.Loader.MultiFile {
 	constructor (loader: Phaser.Loader.LoaderPlugin, key: string, url: string, public premultipliedAlpha: boolean = true, xhrSettings: Phaser.Types.Loader.XHRSettingsObject) {
 		
 		if (Phaser.Utils.Objects.IsPlainObject(key as any)) {
-            const config = key as any;
-            key = Phaser.Utils.Objects.GetFastValue(config, "key");
-            url = Phaser.Utils.Objects.GetFastValue(config, "url");
+            		const config = key as any;
+            		key = Phaser.Utils.Objects.GetFastValue(config, "key");
+            		url = Phaser.Utils.Objects.GetFastValue(config, "url");
 			premultipliedAlpha = Phaser.Utils.Objects.GetFastValue(config, "premultipliedAlpha", true);
-            xhrSettings = Phaser.Utils.Objects.GetFastValue(config, "xhrSettings");
-        }
+            		xhrSettings = Phaser.Utils.Objects.GetFastValue(config, "xhrSettings");
+        	}
 
 		super(loader, SPINE_ATLAS_FILE_TYPE, key, [
 			new Phaser.Loader.FileTypes.TextFile(loader, {
