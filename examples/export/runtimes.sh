@@ -425,6 +425,9 @@ rm "$ROOT/spine-ue4/Content/GettingStarted/Assets/Raptor/raptor.png"
 rm "$ROOT/spine-ue4/Content/GettingStarted/Assets/Spineboy/spineboy.json"
 rm "$ROOT/spine-ue4/Content/GettingStarted/Assets/Spineboy/spineboy.atlas"
 rm "$ROOT/spine-ue4/Content/GettingStarted/Assets/Spineboy/spineboy.png"
+rm -f "$ROOT/spine-ue4/Content/GettingStarted/Assets/mix-and-match/mix-and-match-pro.skel"
+rm -f "$ROOT/spine-ue4/Content/GettingStarted/Assets/mix-and-match/mix-and-match-pro.atlas"
+rm -f "$ROOT/spine-ue4/Content/GettingStarted/Assets/mix-and-match/mix-and-match-pro.png"
 
 cp -f ../raptor/export/raptor-pro.json "$ROOT/spine-ue4/Content/GettingStarted/Assets/Raptor/raptor.json"
 cp -f ../raptor/export/raptor.atlas "$ROOT/spine-ue4/Content/GettingStarted/Assets/Raptor/"
@@ -433,6 +436,10 @@ cp -f ../raptor/export/raptor.png "$ROOT/spine-ue4/Content/GettingStarted/Assets
 cp -f ../spineboy/export/spineboy-pro.json "$ROOT/spine-ue4/Content/GettingStarted/Assets/Spineboy/spineboy.json"
 cp -f ../spineboy/export/spineboy.atlas "$ROOT/spine-ue4/Content/GettingStarted/Assets/Spineboy/"
 cp -f ../spineboy/export/spineboy.png "$ROOT/spine-ue4/Content/GettingStarted/Assets/Spineboy/"
+
+cp -f ../mix-and-match/export/mix-and-match.png "$ROOT/spine-ue4/Content/GettingStarted/Assets/mix-and-match/mix-and-match-pro.png"
+cp -f ../mix-and-match/export/mix-and-match.atlas "$ROOT/spine-ue4/Content/GettingStarted/Assets/mix-and-match/mix-and-match-pro.atlas"
+cp -f ../mix-and-match/export/mix-and-match-pro.skel "$ROOT/spine-ue4/Content/GettingStarted/Assets/mix-and-match/mix-and-match-pro.skel"
 
 echo "spine-unity"
 
