@@ -255,16 +255,22 @@ enum SpineSkeletonDataFileType {
 	binary
 }
 
+interface SpineSkeletonDataFileConfig {
+	key: string;
+	url: string;
+	type: "spineJson" | "spineBinary";
+	xhrSettings?: Phaser.Types.Loader.XHRSettingsObject
+}
+
 class SpineSkeletonDataFile extends Phaser.Loader.MultiFile {
-	constructor (loader: Phaser.Loader.LoaderPlugin, key: string, url: string, public fileType: SpineSkeletonDataFileType, xhrSettings: Phaser.Types.Loader.XHRSettingsObject) {
+	constructor (loader: Phaser.Loader.LoaderPlugin, key: string | SpineSkeletonDataFileConfig, url?: string, public fileType?: SpineSkeletonDataFileType, xhrSettings?: Phaser.Types.Loader.XHRSettingsObject) {
 		
-		if (Phaser.Utils.Objects.IsPlainObject(key as any)) {
-            		const config = key as any;
-            		key = Phaser.Utils.Objects.GetFastValue(config, "key");
-            		url = Phaser.Utils.Objects.GetFastValue(config, "url");
-			const type = Phaser.Utils.Objects.GetFastValue(config, "type");
-			fileType = type === "spineJson" ? SpineSkeletonDataFileType.json : SpineSkeletonDataFileType.binary;
-            		xhrSettings = Phaser.Utils.Objects.GetFastValue(config, "xhrSettings");
+		if (typeof key !== "string") {
+            		const config = key;
+            		key = config.key;
+            		url = config.url;
+			fileType = config.type === "spineJson" ? SpineSkeletonDataFileType.json : SpineSkeletonDataFileType.binary;
+            		xhrSettings = config.xhrSettings;
         	}
 		
 		let file = null;
@@ -296,15 +302,22 @@ class SpineSkeletonDataFile extends Phaser.Loader.MultiFile {
 	}
 }
 
+interface SpineAtlasFileConfig {
+	key: string;
+	url: string;
+	premultipliedAlpha?: boolean;
+	xhrSettings?: Phaser.Types.Loader.XHRSettingsObject;
+}
+
 class SpineAtlasFile extends Phaser.Loader.MultiFile {
-	constructor (loader: Phaser.Loader.LoaderPlugin, key: string, url: string, public premultipliedAlpha: boolean = true, xhrSettings: Phaser.Types.Loader.XHRSettingsObject) {
+	constructor (loader: Phaser.Loader.LoaderPlugin, key: string | SpineAtlasFileConfig, url?: string, public premultipliedAlpha: boolean = true, xhrSettings?: Phaser.Types.Loader.XHRSettingsObject) {
 		
-		if (Phaser.Utils.Objects.IsPlainObject(key as any)) {
-            		const config = key as any;
-            		key = Phaser.Utils.Objects.GetFastValue(config, "key");
-            		url = Phaser.Utils.Objects.GetFastValue(config, "url");
-			premultipliedAlpha = Phaser.Utils.Objects.GetFastValue(config, "premultipliedAlpha", true);
-            		xhrSettings = Phaser.Utils.Objects.GetFastValue(config, "xhrSettings");
+		if (typeof key !== "string") {
+            		const config = key;
+            		key = config.key;
+            		url = config.url;
+			premultipliedAlpha = config.premultipliedAlpha ?? true;
+            		xhrSettings = config.xhrSettings;
         	}
 
 		super(loader, SPINE_ATLAS_FILE_TYPE, key, [
