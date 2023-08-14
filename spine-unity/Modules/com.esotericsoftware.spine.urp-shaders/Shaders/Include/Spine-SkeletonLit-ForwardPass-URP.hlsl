@@ -144,9 +144,6 @@ VertexOutput vert(appdata v) {
 #endif // !defined(_LIGHT_AFFECTS_ADDITIVE)
 
 	color.rgb *= LightweightLightVertexSimplified(positionWS, normalWS, shadowedColor);
-#if defined(SKELETONLIT_RECEIVE_SHADOWS)
-	o.shadowedColor = shadowedColor;
-#endif
 
 	// Note: ambient light is also handled via SH.
 	half3 vertexSH;
@@ -155,10 +152,14 @@ VertexOutput vert(appdata v) {
 #else
 	OUTPUT_SH(normalWS.xyz, vertexSH);
 #endif
-	color.rgb += SAMPLE_GI(v.lightmapUV, vertexSH, normalWS);
+	half3 bakedGI = SAMPLE_GI(v.lightmapUV, vertexSH, normalWS);
+	color.rgb += bakedGI;
 	o.color = color;
 
 #if defined(SKELETONLIT_RECEIVE_SHADOWS)
+	shadowedColor += bakedGI;
+	o.shadowedColor = shadowedColor;
+	
 	VertexPositionInputs vertexInput;
 	vertexInput.positionWS = positionWS;
 	vertexInput.positionCS = o.pos;
