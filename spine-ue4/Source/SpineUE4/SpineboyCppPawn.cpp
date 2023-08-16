@@ -14,15 +14,15 @@ ASpineboyCppPawn::ASpineboyCppPawn() {
 // Called when the game starts or when spawned
 void ASpineboyCppPawn::BeginPlay() {
 	Super::BeginPlay();
-	USpineSkeletonAnimationComponent *animation = FindComponentByClass<USpineSkeletonAnimationComponent>();
-	animation->SetAnimation(0, FString("walk"), true);
+	USpineSkeletonAnimationComponent *animationComponent = FindComponentByClass<USpineSkeletonAnimationComponent>();
+	animationComponent->SetAnimation(0, FString("walk"), true);
 }
 
 // Called every frame
 void ASpineboyCppPawn::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
-	USpineSkeletonAnimationComponent *animation = FindComponentByClass<USpineSkeletonAnimationComponent>();
-	spine::AnimationState *state = animation->GetAnimationState();
+	USpineSkeletonAnimationComponent *animationComponent = FindComponentByClass<USpineSkeletonAnimationComponent>();
+	spine::AnimationState *state = animationComponent->GetAnimationState();
 	spine::TrackEntry *entry = state->getCurrent(0);
 	if (entry) {
 		GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Yellow, FString(entry->getAnimation()->getName().buffer()));
