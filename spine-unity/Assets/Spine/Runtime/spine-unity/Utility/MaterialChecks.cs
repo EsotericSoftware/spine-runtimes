@@ -102,6 +102,10 @@ namespace Spine.Unity {
 			+ "a) disable 'CanvasGroup Compatible' at the Material or\n"
 			+ "b) enable 'Canvas Group Tint Black' at the SkeletonGraphic component under 'Advanced'.\n"
 			+ "You may want to duplicate the 'SkeletonGraphicTintBlack' material and change settings at the duplicate to not affect all instances.";
+		public static readonly string kCanvasGroupCompatiblePMAVertexMessage =
+			"\nWarning: 'CanvasGroup Compatible' is enabled at the Material and 'PMA Vertex Colors' is enabled at SkeletonGraphic!\n\nPlease\n"
+			+ "a) disable 'CanvasGroup Compatible' at the Material or\n"
+			+ "b) disable 'PMA Vertex Colors' at the SkeletonGraphic component under 'Advanced'.";
 
 		public static bool IsMaterialSetupProblematic (SkeletonRenderer renderer, ref string errorMessage) {
 			Material[] materials = renderer.GetComponent<Renderer>().sharedMaterials;
@@ -161,6 +165,10 @@ namespace Spine.Unity {
 					&& IsCanvasGroupCompatible(material)) {
 					isProblematic = true;
 					errorMessage += kCanvasGroupCompatibleDisabledMessage;
+				}
+				if (settings.pmaVertexColors == true && IsCanvasGroupCompatible(material)) {
+					isProblematic = true;
+					errorMessage += kCanvasGroupCompatiblePMAVertexMessage;
 				}
 			}
 			return isProblematic;
