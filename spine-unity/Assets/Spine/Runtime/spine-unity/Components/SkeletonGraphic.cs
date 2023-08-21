@@ -955,42 +955,52 @@ namespace Spine.Unity {
 			int submeshCount = currentInstructions.submeshInstructions.Count;
 			DisableUnusedCanvasRenderers(usedCount: submeshCount, isInRebuild: isInRebuild);
 
-			int separatorSlotGroupIndex = 0;
-			int targetSiblingIndex = 0;
-			Transform parent = this.separatorSlots.Count == 0 ? this.transform : this.separatorParts[0];
+			Transform parent = this.separatorParts.Count == 0 ? this.transform : this.separatorParts[0];
 			if (updateSeparatorPartLocation) {
 				for (int p = 0; p < this.separatorParts.Count; ++p) {
-					separatorParts[p].position = this.transform.position;
-					separatorParts[p].rotation = this.transform.rotation;
+					Transform separatorPart = separatorParts[p];
+					if (separatorPart == null) continue;
+					separatorPart.position = this.transform.position;
+					separatorPart.rotation = this.transform.rotation;
 				}
 			}
 			if (updateSeparatorPartScale) {
 				Vector3 targetScale = this.transform.lossyScale;
 				for (int p = 0; p < this.separatorParts.Count; ++p) {
-					Transform partParent = separatorParts[p].transform.parent;
+					Transform separatorPart = separatorParts[p];
+					if (separatorPart == null) continue;
+					Transform partParent = separatorPart.parent;
 					Vector3 parentScale = partParent == null ? Vector3.one : partParent.lossyScale;
-					separatorParts[p].localScale = new Vector3(
+					separatorPart.localScale = new Vector3(
 						parentScale.x == 0f ? 1f : targetScale.x / parentScale.x,
 						parentScale.y == 0f ? 1f : targetScale.y / parentScale.y,
 						parentScale.z == 0f ? 1f : targetScale.z / parentScale.z);
 				}
 			}
 
+			int separatorSlotGroupIndex = 0;
+			int targetSiblingIndex = 0;
 			for (int i = 0; i < submeshCount; i++) {
 				CanvasRenderer canvasRenderer = canvasRenderers[i];
-				if (i >= usedRenderersCount)
-					canvasRenderer.gameObject.SetActive(true);
+				if (canvasRenderer != null) {
+					if (i >= usedRenderersCount)
+						canvasRenderer.gameObject.SetActive(true);
 
-				if (canvasRenderer.transform.parent != parent.transform && !isInRebuild)
-					canvasRenderer.transform.SetParent(parent.transform, false);
+					if (canvasRenderer.transform.parent != parent.transform && !isInRebuild)
+						canvasRenderer.transform.SetParent(parent.transform, false);
 
-				canvasRenderer.transform.SetSiblingIndex(targetSiblingIndex++);
-				RectTransform dstTransform = submeshGraphics[i].rectTransform;
-				dstTransform.localPosition = Vector3.zero;
-				dstTransform.pivot = rectTransform.pivot;
-				dstTransform.anchorMin = Vector2.zero;
-				dstTransform.anchorMax = Vector2.one;
-				dstTransform.sizeDelta = Vector2.zero;
+					canvasRenderer.transform.SetSiblingIndex(targetSiblingIndex++);
+				}
+
+				SkeletonSubmeshGraphic submeshGraphic = submeshGraphics[i];
+				if (submeshGraphic != null) {
+					RectTransform dstTransform = submeshGraphic.rectTransform;
+					dstTransform.localPosition = Vector3.zero;
+					dstTransform.pivot = rectTransform.pivot;
+					dstTransform.anchorMin = Vector2.zero;
+					dstTransform.anchorMax = Vector2.one;
+					dstTransform.sizeDelta = Vector2.zero;
+				}
 
 				SubmeshInstruction submeshInstructionItem = currentInstructions.submeshInstructions.Items[i];
 				if (submeshInstructionItem.forceSeparate) {
