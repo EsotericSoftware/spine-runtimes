@@ -47,7 +47,8 @@ export class PolygonBatcher implements Disposable {
 	private indicesLength = 0;
 	private srcColorBlend: number;
 	private srcAlphaBlend: number;
-	private dstBlend: number;
+	private dstColorBlend: number;
+	private dstAlphaBlend: number;
 	private cullWasEnabled = false;
 
 	constructor (context: ManagedWebGLRenderingContext | WebGLRenderingContext, twoColorTint: boolean = true, maxVertices: number = 10920) {
@@ -60,7 +61,8 @@ export class PolygonBatcher implements Disposable {
 		let gl = this.context.gl;
 		this.srcColorBlend = gl.SRC_ALPHA;
 		this.srcAlphaBlend = gl.ONE;
-		this.dstBlend = gl.ONE_MINUS_SRC_ALPHA;
+		this.dstColorBlend = gl.ONE_MINUS_SRC_ALPHA;
+		this.dstAlphaBlend = gl.ONE_MINUS_SRC_ALPHA;
 	}
 
 	begin (shader: Shader) {
@@ -72,7 +74,7 @@ export class PolygonBatcher implements Disposable {
 
 		let gl = this.context.gl;
 		gl.enable(gl.BLEND);
-		gl.blendFuncSeparate(this.srcColorBlend, this.dstBlend, this.srcAlphaBlend, this.dstBlend);
+		gl.blendFuncSeparate(this.srcColorBlend, this.dstColorBlend, this.srcAlphaBlend, this.dstAlphaBlend);
 
 		if (PolygonBatcher.disableCulling) {
 			this.cullWasEnabled = gl.isEnabled(gl.CULL_FACE);
@@ -80,15 +82,16 @@ export class PolygonBatcher implements Disposable {
 		}
 	}
 
-	setBlendMode (srcColorBlend: number, srcAlphaBlend: number, dstBlend: number) {
-		if (this.srcColorBlend == srcColorBlend && this.srcAlphaBlend == srcAlphaBlend && this.dstBlend == dstBlend) return;
+	setBlendMode (srcColorBlend: number, srcAlphaBlend: number, dstColorBlend: number, dstAlphaBlend: number) {
+		if (this.srcColorBlend == srcColorBlend && this.srcAlphaBlend == srcAlphaBlend && this.dstColorBlend == dstColorBlend && this.dstAlphaBlend == dstAlphaBlend) return;
 		this.srcColorBlend = srcColorBlend;
 		this.srcAlphaBlend = srcAlphaBlend;
-		this.dstBlend = dstBlend;
+		this.dstColorBlend = dstColorBlend;
+		this.dstAlphaBlend = dstAlphaBlend;
 		if (this.isDrawing) {
 			this.flush();
 			let gl = this.context.gl;
-			gl.blendFuncSeparate(srcColorBlend, dstBlend, srcAlphaBlend, dstBlend);
+			gl.blendFuncSeparate(srcColorBlend, dstColorBlend, srcAlphaBlend, dstAlphaBlend);
 		}
 	}
 
