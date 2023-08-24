@@ -1,0 +1,13 @@
+{
+  "ver": "4.0.23",
+  "importer": "typescript",
+  "imported": true,
+  "uuid": "dc74f8b5-d2ea-483d-9f72-7507b479acc6",
+  "files": [],
+  "subMetas": {},
+  "userData": {
+    "moduleId": "project:///assets/cases/spine/SpineCollider.js",
+    "importerSettings": 4,
+    "simulateGlobals": []
+  }
+}

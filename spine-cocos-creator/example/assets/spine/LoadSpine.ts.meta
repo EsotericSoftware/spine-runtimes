@@ -1,0 +1,13 @@
+{
+  "ver": "4.0.23",
+  "importer": "typescript",
+  "imported": true,
+  "uuid": "c17af389-e4f0-47c4-88a0-50e5417ef3e1",
+  "files": [],
+  "subMetas": {},
+  "userData": {
+    "moduleId": "project:///assets/cases/spine/LoadSpine.js",
+    "importerSettings": 4,
+    "simulateGlobals": []
+  }
+}
