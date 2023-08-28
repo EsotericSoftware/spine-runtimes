@@ -137,7 +137,7 @@
 
 ### Unity
 
-* **Officially supported Unity versions are 2017.1-2022.1**.
+* **Officially supported Unity versions are 2017.1-2023.1**.
 
 * **Additions**
   * `SpineAtlasAsset.CreateRuntimeInstance` methods now provide an optional `newCustomTextureLoader` parameter (defaults to `null`) which can be set to e.g. `(a) => new YourCustomTextureLoader(a)` to use your own `TextureLoader` subclass instead of `MaterialsTextureLoader`.
@@ -171,6 +171,7 @@
   * Tint Black: Added support for [Tint Black](http://en.esotericsoftware.com/spine-slots#Tint-black) functionality at all Spine URP shaders (2D and 3D shaders) and at all standard pipeline `Spine/Sprite` shaders. This feature can be enabled via the `Tint Black` material parameter in the Inspector. Note: The URP Sprite shaders provided in the Spine URP Shaders extension UPM package require the latest version of the spine-unity runtime (package version 4.1.12, 2023-05-31 or newer) to display the added material parameters in the Inspector GUI.
   * Added `SkeletonGraphic.MeshScale` property to allow access to calculated mesh scale. `MeshScale` is based on (1) Canvas pixels per unit, and (2) `RectTransform` bounds when using `Layout Scale Mode` other than `None` at `SkeletonGraphic` which scales the skeleton mesh to fit the parent `RectTransform` bounds accordingly.
   * Added `updateSeparatorPartScale` property to `SkeletonGraphic` to let render separator parts follow the scale (lossy scale) of the `SkeletonGraphic` GameObject. Defaults to `false` to maintain existing behaviour.
+  * Added experimental `EditorSkeletonPlayer` component to allow Editor playback of the initial animation set at `SkeletonAnimation` or `SkeletonGraphic` components. Add this component to your skeleton GameObject to enable the in-editor animation preview. Allows configurations for continuous playback when selected, deselected, and alternative single-frame preview by setting `Fixed Track Time` to any value other than 0. Limitations: At skeletons with variable material count the Inspector preview may be too unresponsive. It is then recommended to disable the `EditorSkeletonPlayer` component (at the top of the Inspector) to make it responsive again, then you can disable `Play When Selected` and re-enable the component to preview playback only when deselected. 
 
 * **Breaking changes**
   * Made `SkeletonGraphic.unscaledTime` parameter protected, use the new property `UnscaledTime` instead.
