@@ -44,6 +44,7 @@ namespace Spine.Unity {
 	public class EditorSkeletonPlayer : MonoBehaviour {
 		public bool playWhenSelected = true;
 		public bool playWhenDeselected = true;
+		public float fixedTrackTime = 0.0f;
 		private IEditorSkeletonWrapper skeletonWrapper;
 		private TrackEntry trackEntry;
 		private string oldAnimationName;
@@ -85,6 +86,16 @@ namespace Spine.Unity {
 			EditorApplication.update -= EditorUpdate;
 		}
 
+		private void Update () {
+			if (enabled == false || Application.isPlaying) return;
+			if (skeletonWrapper.State == null || skeletonWrapper.State.Tracks.Count == 0) return;
+
+			TrackEntry currentEntry = skeletonWrapper.State.Tracks.Items[0];
+			if (currentEntry != null && fixedTrackTime != 0) {
+				currentEntry.TrackTime = fixedTrackTime;
+			}
+		}
+
 		private void EditorUpdate () {
 			if (enabled == false || Application.isPlaying) return;
 			if (skeletonWrapper == null) return;
@@ -92,6 +103,7 @@ namespace Spine.Unity {
 			bool isSelected = Selection.Contains(this.gameObject);
 			if (!this.playWhenSelected && isSelected) return;
 			if (!this.playWhenDeselected && !isSelected) return;
+			if (fixedTrackTime != 0) return;
 
 			// Update animation
 			if (oldAnimationName != skeletonWrapper.AnimationName || oldLoop != skeletonWrapper.Loop) {
