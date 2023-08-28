@@ -130,7 +130,11 @@ namespace Spine.Unity {
 			oldTime = EditorApplication.timeSinceStartup;
 
 			// Force repaint to update animation smoothly
+#if UNITY_2017_2_OR_NEWER
 			EditorApplication.QueuePlayerLoopUpdate();
+#else
+			SceneView.RepaintAll();
+#endif
 		}
 
 		private class SkeletonAnimationWrapper : IEditorSkeletonWrapper {
