@@ -72,9 +72,11 @@ namespace Spine.Unity {
 			if (Application.isPlaying) return;
 
 			if (skeletonWrapper == null) {
-				if (TryGetComponent(out SkeletonAnimation skeletonAnimation))
+				SkeletonAnimation skeletonAnimation;
+				SkeletonGraphic skeletonGraphic;
+				if (skeletonAnimation = this.GetComponent<SkeletonAnimation>())
 					skeletonWrapper = new SkeletonAnimationWrapper(skeletonAnimation);
-				else if (TryGetComponent(out SkeletonGraphic skeletonGraphic))
+				else if (skeletonGraphic = this.GetComponent<SkeletonGraphic>())
 					skeletonWrapper = new SkeletonGraphicWrapper(skeletonGraphic);
 			}
 
@@ -88,6 +90,7 @@ namespace Spine.Unity {
 
 		private void Update () {
 			if (enabled == false || Application.isPlaying) return;
+			if (skeletonWrapper == null) return;
 			if (skeletonWrapper.State == null || skeletonWrapper.State.Tracks.Count == 0) return;
 
 			TrackEntry currentEntry = skeletonWrapper.State.Tracks.Items[0];
