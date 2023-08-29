@@ -312,7 +312,11 @@ VertexOutputLWRP ForwardPassVertexSprite(VertexInput input)
 #endif
 
 #if IS_URP_15_OR_NEWER
-	OUTPUT_SH(positionWS, normalWS.xyz, GetWorldSpaceNormalizeViewDir(positionWS), output.vertexSH);
+	#ifdef OUTPUT_SH4
+		OUTPUT_SH4(positionWS, normalWS.xyz, GetWorldSpaceNormalizeViewDir(positionWS), output.vertexSH);
+	#else
+		OUTPUT_SH(positionWS, normalWS.xyz, GetWorldSpaceNormalizeViewDir(positionWS), output.vertexSH);
+	#endif
 #else
 	OUTPUT_SH(normalWS.xyz, output.vertexSH);
 #endif
