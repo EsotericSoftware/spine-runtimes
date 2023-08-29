@@ -148,7 +148,11 @@ VertexOutput vert(appdata v) {
 	// Note: ambient light is also handled via SH.
 	half3 vertexSH;
 #if IS_URP_15_OR_NEWER
-	OUTPUT_SH(positionWS, normalWS.xyz, GetWorldSpaceNormalizeViewDir(positionWS), vertexSH);
+	#ifdef OUTPUT_SH4
+		OUTPUT_SH4(positionWS, normalWS.xyz, GetWorldSpaceNormalizeViewDir(positionWS), vertexSH);
+	#else
+		OUTPUT_SH(positionWS, normalWS.xyz, GetWorldSpaceNormalizeViewDir(positionWS), vertexSH);
+	#endif
 #else
 	OUTPUT_SH(normalWS.xyz, vertexSH);
 #endif
