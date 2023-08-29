@@ -202,7 +202,7 @@ namespace Spine.Unity.Editor {
 
 			if (!isInspectingPrefab) {
 				if (requireRepaint) {
-					UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
+					SceneView.RepaintAll();
 					requireRepaint = false;
 				}
 			}
@@ -586,7 +586,7 @@ namespace Spine.Unity.Editor {
 
 				if (mismatchDetected) {
 					mismatchDetected = false;
-					UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
+					SceneView.RepaintAll();
 				}
 			}
 		}
