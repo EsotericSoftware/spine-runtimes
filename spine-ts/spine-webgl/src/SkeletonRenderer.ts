@@ -170,7 +170,7 @@ export class SkeletonRenderer {
 						WebGLBlendModeConverter.getSourceColorGLBlendMode(blendMode, premultipliedAlpha),
 						WebGLBlendModeConverter.getSourceAlphaGLBlendMode(blendMode, premultipliedAlpha),
 						WebGLBlendModeConverter.getDestColorGLBlendMode(blendMode),
-						WebGLBlendModeConverter.getDestAlphaGLBlendMode(blendMode, premultipliedAlpha) );
+						WebGLBlendModeConverter.getDestAlphaGLBlendMode(blendMode, premultipliedAlpha));
 				}
 
 				if (clipper.isClipping()) {
