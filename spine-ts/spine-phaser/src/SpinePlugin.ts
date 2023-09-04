@@ -271,7 +271,7 @@ class SpineSkeletonDataFile extends Phaser.Loader.MultiFile {
 			url = config.url;
 			fileType = config.type === "spineJson" ? SpineSkeletonDataFileType.json : SpineSkeletonDataFileType.binary;
 			xhrSettings = config.xhrSettings;
-      }
+		}
 		let file = null;
 		let isJson = fileType == SpineSkeletonDataFileType.json;
 		if (isJson) {
