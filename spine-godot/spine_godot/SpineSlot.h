@@ -40,6 +40,10 @@ class SpineSprite;
 class SpineSlot : public SpineSpriteOwnedObject<spine::Slot> {
 	GDCLASS(SpineSlot, SpineObjectWrapper)
 
+private:
+	Ref<SpineBone> _bone;
+	Ref<SpineSlotData> _data;
+
 protected:
 	static void _bind_methods();
 

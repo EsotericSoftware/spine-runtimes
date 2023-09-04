@@ -114,9 +114,9 @@ void SpineAnimationTrack::_notification(int what) {
 			sprite = Object::cast_to<SpineSprite>(get_parent());
 			if (sprite)
 #if VERSION_MAJOR > 3
-				sprite->connect("before_animation_state_update", callable_mp(this, &SpineAnimationTrack::update_animation_state));
+				sprite->connect(SNAME("before_animation_state_update"), callable_mp(this, &SpineAnimationTrack::update_animation_state));
 #else
-				sprite->connect("before_animation_state_update", this, "update_animation_state");
+				sprite->connect(SNAME("before_animation_state_update"), this, SNAME("update_animation_state"));
 #endif
 			NOTIFY_PROPERTY_LIST_CHANGED();
 			break;
@@ -128,9 +128,9 @@ void SpineAnimationTrack::_notification(int what) {
 		case NOTIFICATION_UNPARENTED: {
 			if (sprite) {
 #if VERSION_MAJOR > 3
-				sprite->disconnect("before_animation_state_update", callable_mp(this, &SpineAnimationTrack::update_animation_state));
+				sprite->disconnect(SNAME("before_animation_state_update"), callable_mp(this, &SpineAnimationTrack::update_animation_state));
 #else
-				sprite->disconnect("before_animation_state_update", this, "update_animation_state");
+				sprite->disconnect(SNAME("before_animation_state_update"), this, SNAME("update_animation_state"));
 #endif
 				sprite = nullptr;
 			}
