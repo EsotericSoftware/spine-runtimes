@@ -28,7 +28,7 @@
  *****************************************************************************/
 
 import Phaser from "phaser";
-import { SPINE_ATLAS_CACHE_KEY, SPINE_CONTAINER_TYPE, SPINE_GAME_OBJECT_TYPE, SPINE_SKELETON_DATA_FILE_TYPE, SPINE_ATLAS_FILE_TYPE, SPINE_SKELETON_FILE_CACHE_KEY as SPINE_SKELETON_DATA_CACHE_KEY } from "./keys";
+import { SPINE_ATLAS_CACHE_KEY, SPINE_GAME_OBJECT_TYPE, SPINE_SKELETON_DATA_FILE_TYPE, SPINE_ATLAS_FILE_TYPE, SPINE_SKELETON_FILE_CACHE_KEY as SPINE_SKELETON_DATA_CACHE_KEY } from "./keys";
 import { AtlasAttachmentLoader, GLTexture, SceneRenderer, Skeleton, SkeletonBinary, SkeletonData, SkeletonJson, TextureAtlas } from "@esotericsoftware/spine-webgl"
 import { SpineGameObject, SpineGameObjectBoundsProvider } from "./SpineGameObject";
 import { CanvasTexture, SkeletonRenderer } from "@esotericsoftware/spine-canvas";
@@ -138,7 +138,7 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 			}
 			return Phaser.GameObjects.BuildGameObject(this.scene, gameObject, config);
 		}
-		pluginManager.registerGameObject(SPINE_GAME_OBJECT_TYPE, addSpineGameObject, makeSpineGameObject);
+		pluginManager.registerGameObject((window as any).SPINE_GAME_OBJECT_TYPE ? (window as any).SPINE_GAME_OBJECT_TYPE : SPINE_GAME_OBJECT_TYPE, addSpineGameObject, makeSpineGameObject);
 	}
 
 	boot () {
@@ -188,8 +188,7 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 	}
 
 	gameDestroy () {
-		this.pluginManager.removeGameObject(SPINE_GAME_OBJECT_TYPE, true, true);
-		this.pluginManager.removeGameObject(SPINE_CONTAINER_TYPE, true, true);
+		this.pluginManager.removeGameObject((window as any).SPINE_GAME_OBJECT_TYPE ? (window as any).SPINE_GAME_OBJECT_TYPE : SPINE_GAME_OBJECT_TYPE, true, true);
 		if (this.webGLRenderer) this.webGLRenderer.dispose();
 	}
 

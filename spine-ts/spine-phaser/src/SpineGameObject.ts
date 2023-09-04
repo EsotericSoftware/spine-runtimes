@@ -212,7 +212,7 @@ export class SpineGameObject extends DepthMixin(
     atlasKey: string,
     public boundsProvider: SpineGameObjectBoundsProvider = new SetupPoseBoundsProvider()
   ) {
-    super(scene, SPINE_GAME_OBJECT_TYPE);
+    super(scene, (window as any).SPINE_GAME_OBJECT_TYPE ? (window as any).SPINE_GAME_OBJECT_TYPE : SPINE_GAME_OBJECT_TYPE);
     this.setPosition(x, y);
 
     this.premultipliedAlpha = this.plugin.isAtlasPremultiplied(atlasKey);
