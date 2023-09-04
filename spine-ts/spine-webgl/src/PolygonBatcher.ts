@@ -39,7 +39,7 @@ export class PolygonBatcher implements Disposable {
 	private context: ManagedWebGLRenderingContext;
 	private drawCalls = 0;
 	private static globalDrawCalls = 0;
-	private isDrawing = false;
+	isDrawing = false;
 	private mesh: Mesh;
 	private shader: Shader | null = null;
 	private lastTexture: GLTexture | null = null;

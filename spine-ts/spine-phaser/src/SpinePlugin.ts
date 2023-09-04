@@ -74,9 +74,10 @@ export interface SpineGameObjectConfig extends Phaser.Types.GameObjects.GameObje
 export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 	game: Phaser.Game;
 	private isWebGL: boolean;
-	private gl: WebGLRenderingContext | null;
+	gl: WebGLRenderingContext | null;
 	webGLRenderer: SceneRenderer | null;
 	canvasRenderer: SkeletonRenderer | null;
+	phaserRenderer: Phaser.Renderer.Canvas.CanvasRenderer | Phaser.Renderer.WebGL.WebGLRenderer;
 	private skeletonDataCache: Phaser.Cache.BaseCache;
 	private atlasCache: Phaser.Cache.BaseCache;
 
@@ -85,6 +86,7 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 		this.game = pluginManager.game;
 		this.isWebGL = this.game.config.renderType === 2;
 		this.gl = this.isWebGL ? (this.game.renderer as Phaser.Renderer.WebGL.WebGLRenderer).gl : null;
+		this.phaserRenderer = this.game.renderer;
 		this.webGLRenderer = null;
 		this.canvasRenderer = null;
 		this.skeletonDataCache = this.game.cache.addCustom(SPINE_SKELETON_DATA_CACHE_KEY);
