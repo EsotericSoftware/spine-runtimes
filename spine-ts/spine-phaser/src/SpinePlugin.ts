@@ -264,7 +264,7 @@ interface SpineSkeletonDataFileConfig {
 
 class SpineSkeletonDataFile extends Phaser.Loader.MultiFile {
 	constructor (loader: Phaser.Loader.LoaderPlugin, key: string | SpineSkeletonDataFileConfig, url?: string, public fileType?: SpineSkeletonDataFileType, xhrSettings?: Phaser.Types.Loader.XHRSettingsObject) {
-		
+
 		if (typeof key !== "string") {
             		const config = key;
             		key = config.key;
@@ -272,7 +272,7 @@ class SpineSkeletonDataFile extends Phaser.Loader.MultiFile {
 			fileType = config.type === "spineJson" ? SpineSkeletonDataFileType.json : SpineSkeletonDataFileType.binary;
             		xhrSettings = config.xhrSettings;
         	}
-		
+
 		let file = null;
 		let isJson = fileType == SpineSkeletonDataFileType.json;
 		if (isJson) {
@@ -311,7 +311,7 @@ interface SpineAtlasFileConfig {
 
 class SpineAtlasFile extends Phaser.Loader.MultiFile {
 	constructor (loader: Phaser.Loader.LoaderPlugin, key: string | SpineAtlasFileConfig, url?: string, public premultipliedAlpha: boolean = true, xhrSettings?: Phaser.Types.Loader.XHRSettingsObject) {
-		
+
 		if (typeof key !== "string") {
             		const config = key;
             		key = config.key;
@@ -328,8 +328,6 @@ class SpineAtlasFile extends Phaser.Loader.MultiFile {
 				extension: "atlas"
 			})
 		]);
-
-		this.premultipliedAlpha = premultipliedAlpha;
 	}
 
 	onFileComplete (file: Phaser.Loader.File) {
