@@ -128,7 +128,7 @@
                 void main(void) {
                   #include <logdepthbuf_fragment>
 
-                  gl_FragColor = vec4(1, 0, 1, 1); // texture2D(map, vUv)*vColor;
+                  gl_FragColor = texture2D(map, vUv)*vColor;
                   #ifdef USE_SPINE_ALPHATEST
                   if (gl_FragColor.a < alphaTest) discard;
                   #endif
