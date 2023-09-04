@@ -37,6 +37,8 @@
 #include "SpineTransformConstraint.h"
 #include "SpinePathConstraint.h"
 
+#include <unordered_map>
+
 class SpineSprite;
 
 class SpineSkeleton : public REFCOUNTED {
@@ -65,6 +67,9 @@ private:
 	SpineSprite *sprite;
 	spine::Vector<float> bounds_vertex_buffer;
 	Ref<SpineSkin> last_skin;
+
+	std::unordered_map<spine::Bone*, Ref<SpineBone>> _cached_bones;
+	std::unordered_map<spine::Slot*, Ref<SpineSlot>> _cached_slots;
 
 public:
 	SpineSkeleton();

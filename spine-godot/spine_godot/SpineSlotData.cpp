@@ -104,7 +104,7 @@ String SpineSlotData::get_attachment_name() {
 }
 void SpineSlotData::set_attachment_name(const String &v) {
 	SPINE_CHECK(get_spine_object(), )
-	get_spine_object()->setAttachmentName(SPINE_STRING(v));
+	get_spine_object()->setAttachmentName(SPINE_STRING_TMP(v));
 }
 
 SpineConstant::BlendMode SpineSlotData::get_blend_mode() {
