@@ -256,8 +256,22 @@ enum SpineSkeletonDataFileType {
 	binary
 }
 
+interface SpineSkeletonDataFileConfig {
+	key: string;
+	url: string;
+	type: "spineJson" | "spineBinary";
+	xhrSettings?: Phaser.Types.Loader.XHRSettingsObject
+}
+
 class SpineSkeletonDataFile extends Phaser.Loader.MultiFile {
-	constructor (loader: Phaser.Loader.LoaderPlugin, key: string, url: string, public fileType: SpineSkeletonDataFileType, xhrSettings: Phaser.Types.Loader.XHRSettingsObject) {
+	constructor (loader: Phaser.Loader.LoaderPlugin, key: string | SpineSkeletonDataFileConfig, url?: string, public fileType?: SpineSkeletonDataFileType, xhrSettings?: Phaser.Types.Loader.XHRSettingsObject) {
+		if (typeof key !== "string") {
+			const config = key;
+			key = config.key;
+			url = config.url;
+			fileType = config.type === "spineJson" ? SpineSkeletonDataFileType.json : SpineSkeletonDataFileType.binary;
+			xhrSettings = config.xhrSettings;
+      }
 		let file = null;
 		let isJson = fileType == SpineSkeletonDataFileType.json;
 		if (isJson) {
@@ -287,8 +301,23 @@ class SpineSkeletonDataFile extends Phaser.Loader.MultiFile {
 	}
 }
 
+interface SpineAtlasFileConfig {
+	key: string;
+	url: string;
+	premultipliedAlpha?: boolean;
+	xhrSettings?: Phaser.Types.Loader.XHRSettingsObject;
+}
+
 class SpineAtlasFile extends Phaser.Loader.MultiFile {
-	constructor (loader: Phaser.Loader.LoaderPlugin, key: string, url: string, public premultipliedAlpha: boolean = true, xhrSettings: Phaser.Types.Loader.XHRSettingsObject) {
+	constructor (loader: Phaser.Loader.LoaderPlugin, key: string | SpineAtlasFileConfig, url?: string, public premultipliedAlpha: boolean = true, xhrSettings?: Phaser.Types.Loader.XHRSettingsObject) {
+		if (typeof key !== "string") {
+			const config = key;
+			key = config.key;
+			url = config.url;
+			premultipliedAlpha = config.premultipliedAlpha ?? true;
+			xhrSettings = config.xhrSettings;
+		}
+
 		super(loader, SPINE_ATLAS_FILE_TYPE, key, [
 			new Phaser.Loader.FileTypes.TextFile(loader, {
 				key: key,
