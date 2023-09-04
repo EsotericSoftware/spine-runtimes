@@ -33,4 +33,3 @@ export const SPINE_LOADER_TYPE = "spine";
 export const SPINE_SKELETON_DATA_FILE_TYPE = "spineSkeletonData";
 export const SPINE_ATLAS_FILE_TYPE = "spineAtlasData";
 export const SPINE_GAME_OBJECT_TYPE = "spine";
-export const SPINE_CONTAINER_TYPE = "spineContainer";

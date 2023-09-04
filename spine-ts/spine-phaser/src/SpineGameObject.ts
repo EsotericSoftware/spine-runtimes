@@ -29,90 +29,138 @@
 
 import { SPINE_GAME_OBJECT_TYPE } from "./keys";
 import { SpinePlugin } from "./SpinePlugin";
-import { ComputedSizeMixin, DepthMixin, FlipMixin, ScrollFactorMixin, TransformMixin, VisibleMixin, AlphaMixin, OriginMixin } from "./mixins";
-import { AnimationState, AnimationStateData, Bone, MathUtils, Skeleton, Skin, Vector2 } from "@esotericsoftware/spine-core";
+import {
+  ComputedSizeMixin,
+  DepthMixin,
+  FlipMixin,
+  ScrollFactorMixin,
+  TransformMixin,
+  VisibleMixin,
+  AlphaMixin,
+  OriginMixin,
+} from "./mixins";
+import {
+  AnimationState,
+  AnimationStateData,
+  Bone,
+  MathUtils,
+  Skeleton,
+  Skin,
+  Vector2,
+} from "@esotericsoftware/spine-core";
 
 class BaseSpineGameObject extends Phaser.GameObjects.GameObject {
-	constructor (scene: Phaser.Scene, type: string) {
-		super(scene, type);
-	}
+  constructor(scene: Phaser.Scene, type: string) {
+    super(scene, type);
+  }
 }
 
 /** A bounds provider calculates the bounding box for a skeleton, which is then assigned as the size of the SpineGameObject. */
 export interface SpineGameObjectBoundsProvider {
-	// Returns the bounding box for the skeleton, in skeleton space.
-	calculateBounds (gameObject: SpineGameObject): { x: number, y: number, width: number, height: number };
+  // Returns the bounding box for the skeleton, in skeleton space.
+  calculateBounds(gameObject: SpineGameObject): {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  };
 }
 
 /** A bounds provider that calculates the bounding box from the setup pose. */
 export class SetupPoseBoundsProvider implements SpineGameObjectBoundsProvider {
-	calculateBounds (gameObject: SpineGameObject) {
-		if (!gameObject.skeleton) return { x: 0, y: 0, width: 0, height: 0 };
-		// Make a copy of animation state and skeleton as this might be called while
-		// the skeleton in the GameObject has already been heavily modified. We can not
-		// reconstruct that state.
-		const skeleton = new Skeleton(gameObject.skeleton.data);
-		skeleton.setToSetupPose();
-		skeleton.updateWorldTransform();
-		const bounds = skeleton.getBoundsRect();
-		return bounds.width == Number.NEGATIVE_INFINITY ? { x: 0, y: 0, width: 0, height: 0 } : bounds;
-	}
+  calculateBounds(gameObject: SpineGameObject) {
+    if (!gameObject.skeleton) return { x: 0, y: 0, width: 0, height: 0 };
+    // Make a copy of animation state and skeleton as this might be called while
+    // the skeleton in the GameObject has already been heavily modified. We can not
+    // reconstruct that state.
+    const skeleton = new Skeleton(gameObject.skeleton.data);
+    skeleton.setToSetupPose();
+    skeleton.updateWorldTransform();
+    const bounds = skeleton.getBoundsRect();
+    return bounds.width == Number.NEGATIVE_INFINITY
+      ? { x: 0, y: 0, width: 0, height: 0 }
+      : bounds;
+  }
 }
 
 /** A bounds provider that calculates the bounding box by taking the maximumg bounding box for a combination of skins and specific animation. */
-export class SkinsAndAnimationBoundsProvider implements SpineGameObjectBoundsProvider {
-	/**
-	 * @param animation The animation to use for calculating the bounds. If null, the setup pose is used.
-	 * @param skins The skins to use for calculating the bounds. If empty, the default skin is used.
-	 * @param timeStep The time step to use for calculating the bounds. A smaller time step means more precision, but slower calculation.
-	 */
-	constructor (private animation: string | null, private skins: string[] = [], private timeStep: number = 0.05) {
-	}
+export class SkinsAndAnimationBoundsProvider
+  implements SpineGameObjectBoundsProvider
+{
+  /**
+   * @param animation The animation to use for calculating the bounds. If null, the setup pose is used.
+   * @param skins The skins to use for calculating the bounds. If empty, the default skin is used.
+   * @param timeStep The time step to use for calculating the bounds. A smaller time step means more precision, but slower calculation.
+   */
+  constructor(
+    private animation: string | null,
+    private skins: string[] = [],
+    private timeStep: number = 0.05
+  ) {}
 
-	calculateBounds (gameObject: SpineGameObject): { x: number; y: number; width: number; height: number; } {
-		if (!gameObject.skeleton || !gameObject.animationState) return { x: 0, y: 0, width: 0, height: 0 };
-		// Make a copy of animation state and skeleton as this might be called while
-		// the skeleton in the GameObject has already been heavily modified. We can not
-		// reconstruct that state.
-		const animationState = new AnimationState(gameObject.animationState.data);
-		const skeleton = new Skeleton(gameObject.skeleton.data);
-		const data = skeleton.data;
-		if (this.skins.length > 0) {
-			let customSkin = new Skin("custom-skin");
-			for (const skinName of this.skins) {
-				const skin = data.findSkin(skinName);
-				if (skin == null) continue;
-				customSkin.addSkin(skin);
-			}
-			skeleton.setSkin(customSkin);
-		}
-		skeleton.setToSetupPose();
+  calculateBounds(gameObject: SpineGameObject): {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  } {
+    if (!gameObject.skeleton || !gameObject.animationState)
+      return { x: 0, y: 0, width: 0, height: 0 };
+    // Make a copy of animation state and skeleton as this might be called while
+    // the skeleton in the GameObject has already been heavily modified. We can not
+    // reconstruct that state.
+    const animationState = new AnimationState(gameObject.animationState.data);
+    const skeleton = new Skeleton(gameObject.skeleton.data);
+    const data = skeleton.data;
+    if (this.skins.length > 0) {
+      let customSkin = new Skin("custom-skin");
+      for (const skinName of this.skins) {
+        const skin = data.findSkin(skinName);
+        if (skin == null) continue;
+        customSkin.addSkin(skin);
+      }
+      skeleton.setSkin(customSkin);
+    }
+    skeleton.setToSetupPose();
 
-		const animation = this.animation != null ? data.findAnimation(this.animation!) : null;
-		if (animation == null) {
-			skeleton.updateWorldTransform();
-			const bounds = skeleton.getBoundsRect();
-			return bounds.width == Number.NEGATIVE_INFINITY ? { x: 0, y: 0, width: 0, height: 0 } : bounds;
-		} else {
-			let minX = Number.POSITIVE_INFINITY, minY = Number.POSITIVE_INFINITY, maxX = Number.NEGATIVE_INFINITY, maxY = Number.NEGATIVE_INFINITY;
-			animationState.clearTracks();
-			animationState.setAnimationWith(0, animation, false);
-			const steps = Math.max(animation.duration / this.timeStep, 1.0);
-			for (let i = 0; i < steps; i++) {
-				animationState.update(i > 0 ? this.timeStep : 0);
-				animationState.apply(skeleton);
-				skeleton.updateWorldTransform();
+    const animation =
+      this.animation != null ? data.findAnimation(this.animation!) : null;
+    if (animation == null) {
+      skeleton.updateWorldTransform();
+      const bounds = skeleton.getBoundsRect();
+      return bounds.width == Number.NEGATIVE_INFINITY
+        ? { x: 0, y: 0, width: 0, height: 0 }
+        : bounds;
+    } else {
+      let minX = Number.POSITIVE_INFINITY,
+        minY = Number.POSITIVE_INFINITY,
+        maxX = Number.NEGATIVE_INFINITY,
+        maxY = Number.NEGATIVE_INFINITY;
+      animationState.clearTracks();
+      animationState.setAnimationWith(0, animation, false);
+      const steps = Math.max(animation.duration / this.timeStep, 1.0);
+      for (let i = 0; i < steps; i++) {
+        animationState.update(i > 0 ? this.timeStep : 0);
+        animationState.apply(skeleton);
+        skeleton.updateWorldTransform();
 
-				const bounds = skeleton.getBoundsRect();
-				minX = Math.min(minX, bounds.x);
-				minY = Math.min(minY, bounds.y);
-				maxX = Math.max(maxX, minX + bounds.width);
-				maxY = Math.max(maxY, minY + bounds.height);
-			}
-			const bounds = { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
-			return bounds.width == Number.NEGATIVE_INFINITY ? { x: 0, y: 0, width: 0, height: 0 } : bounds;
-		}
-	}
+        const bounds = skeleton.getBoundsRect();
+        minX = Math.min(minX, bounds.x);
+        minY = Math.min(minY, bounds.y);
+        maxX = Math.max(maxX, minX + bounds.width);
+        maxY = Math.max(maxY, minY + bounds.height);
+      }
+      const bounds = {
+        x: minX,
+        y: minY,
+        width: maxX - minX,
+        height: maxY - minY,
+      };
+      return bounds.width == Number.NEGATIVE_INFINITY
+        ? { x: 0, y: 0, width: 0, height: 0 }
+        : bounds;
+    }
+  }
 }
 
 /**
@@ -136,147 +184,215 @@ export class SkinsAndAnimationBoundsProvider implements SpineGameObjectBoundsPro
  *
  * See {@link skeletonToPhaserWorldCoordinates}, {@link phaserWorldCoordinatesToSkeleton}, and {@link phaserWorldCoordinatesToBoneLocal.}
  */
-export class SpineGameObject extends DepthMixin(OriginMixin(ComputedSizeMixin(FlipMixin(ScrollFactorMixin(TransformMixin(VisibleMixin(AlphaMixin(BaseSpineGameObject)))))))) {
-	blendMode = -1;
-	skeleton: Skeleton;
-	animationStateData: AnimationStateData;
-	animationState: AnimationState;
-	beforeUpdateWorldTransforms: (object: SpineGameObject) => void = () => { };
-	afterUpdateWorldTransforms: (object: SpineGameObject) => void = () => { };
-	private premultipliedAlpha = false;
+export class SpineGameObject extends DepthMixin(
+  OriginMixin(
+    ComputedSizeMixin(
+      FlipMixin(
+        ScrollFactorMixin(
+          TransformMixin(VisibleMixin(AlphaMixin(BaseSpineGameObject)))
+        )
+      )
+    )
+  )
+) {
+  blendMode = -1;
+  skeleton: Skeleton;
+  animationStateData: AnimationStateData;
+  animationState: AnimationState;
+  beforeUpdateWorldTransforms: (object: SpineGameObject) => void = () => {};
+  afterUpdateWorldTransforms: (object: SpineGameObject) => void = () => {};
+  private premultipliedAlpha = false;
 
-	constructor (scene: Phaser.Scene, private plugin: SpinePlugin, x: number, y: number, dataKey: string, atlasKey: string, public boundsProvider: SpineGameObjectBoundsProvider = new SetupPoseBoundsProvider()) {
-		super(scene, SPINE_GAME_OBJECT_TYPE);
-		this.setPosition(x, y);
+  constructor(
+    scene: Phaser.Scene,
+    private plugin: SpinePlugin,
+    x: number,
+    y: number,
+    dataKey: string,
+    atlasKey: string,
+    public boundsProvider: SpineGameObjectBoundsProvider = new SetupPoseBoundsProvider()
+  ) {
+    super(scene, (window as any).SPINE_GAME_OBJECT_TYPE ? (window as any).SPINE_GAME_OBJECT_TYPE : SPINE_GAME_OBJECT_TYPE);
+    this.setPosition(x, y);
 
-		this.premultipliedAlpha = this.plugin.isAtlasPremultiplied(atlasKey);
-		this.skeleton = this.plugin.createSkeleton(dataKey, atlasKey);
-		this.animationStateData = new AnimationStateData(this.skeleton.data);
-		this.animationState = new AnimationState(this.animationStateData);
-		this.skeleton.updateWorldTransform();
-		this.updateSize();
-	}
+    this.premultipliedAlpha = this.plugin.isAtlasPremultiplied(atlasKey);
+    this.skeleton = this.plugin.createSkeleton(dataKey, atlasKey);
+    this.animationStateData = new AnimationStateData(this.skeleton.data);
+    this.animationState = new AnimationState(this.animationStateData);
+    this.skeleton.updateWorldTransform();
+    this.updateSize();
+  }
 
-	updateSize () {
-		if (!this.skeleton) return;
-		let bounds = this.boundsProvider.calculateBounds(this);
-		// For some reason the TS compiler and the ComputedSize mixin don't work well together and we have
-		// to cast to any.
-		let self = this as any;
-		self.width = bounds.width;
-		self.height = bounds.height;
-		this.displayOriginX = -bounds.x;
-		this.displayOriginY = -bounds.y;
-	}
+  updateSize() {
+    if (!this.skeleton) return;
+    let bounds = this.boundsProvider.calculateBounds(this);
+    // For some reason the TS compiler and the ComputedSize mixin don't work well together and we have
+    // to cast to any.
+    let self = this as any;
+    self.width = bounds.width;
+    self.height = bounds.height;
+    this.displayOriginX = -bounds.x;
+    this.displayOriginY = -bounds.y;
+  }
 
-	/** Converts a point from the skeleton coordinate system to the Phaser world coordinate system. */
-	skeletonToPhaserWorldCoordinates (point: { x: number, y: number }) {
-		let transform = this.getWorldTransformMatrix();
-		let a = transform.a, b = transform.b, c = transform.c, d = transform.d, tx = transform.tx, ty = transform.ty;
-		let x = point.x
-		let y = point.y
-		point.x = x * a + y * c + tx;
-		point.y = x * b + y * d + ty;
-	}
+  /** Converts a point from the skeleton coordinate system to the Phaser world coordinate system. */
+  skeletonToPhaserWorldCoordinates(point: { x: number; y: number }) {
+    let transform = this.getWorldTransformMatrix();
+    let a = transform.a,
+      b = transform.b,
+      c = transform.c,
+      d = transform.d,
+      tx = transform.tx,
+      ty = transform.ty;
+    let x = point.x;
+    let y = point.y;
+    point.x = x * a + y * c + tx;
+    point.y = x * b + y * d + ty;
+  }
 
-	/** Converts a point from the Phaser world coordinate system to the skeleton coordinate system. */
-	phaserWorldCoordinatesToSkeleton (point: { x: number, y: number }) {
-		let transform = this.getWorldTransformMatrix();
-		transform = transform.invert();
-		let a = transform.a, b = transform.b, c = transform.c, d = transform.d, tx = transform.tx, ty = transform.ty;
-		let x = point.x
-		let y = point.y
-		point.x = x * a + y * c + tx;
-		point.y = x * b + y * d + ty;
-	}
+  /** Converts a point from the Phaser world coordinate system to the skeleton coordinate system. */
+  phaserWorldCoordinatesToSkeleton(point: { x: number; y: number }) {
+    let transform = this.getWorldTransformMatrix();
+    transform = transform.invert();
+    let a = transform.a,
+      b = transform.b,
+      c = transform.c,
+      d = transform.d,
+      tx = transform.tx,
+      ty = transform.ty;
+    let x = point.x;
+    let y = point.y;
+    point.x = x * a + y * c + tx;
+    point.y = x * b + y * d + ty;
+  }
 
-	/** Converts a point from the Phaser world coordinate system to the bone's local coordinate system. */
-	phaserWorldCoordinatesToBone (point: { x: number, y: number }, bone: Bone) {
-		this.phaserWorldCoordinatesToSkeleton(point);
-		if (bone.parent) {
-			bone.parent.worldToLocal(point as Vector2);
-		} else {
-			bone.worldToLocal(point as Vector2);
-		}
-	}
+  /** Converts a point from the Phaser world coordinate system to the bone's local coordinate system. */
+  phaserWorldCoordinatesToBone(point: { x: number; y: number }, bone: Bone) {
+    this.phaserWorldCoordinatesToSkeleton(point);
+    if (bone.parent) {
+      bone.parent.worldToLocal(point as Vector2);
+    } else {
+      bone.worldToLocal(point as Vector2);
+    }
+  }
 
-	/**
-	 * Updates the {@link AnimationState}, applies it to the {@link Skeleton}, then updates the world transforms of all bones.
-	 * @param delta The time delta in milliseconds
-	 */
-	updatePose (delta: number) {
-		this.animationState.update(delta / 1000);
-		this.animationState.apply(this.skeleton);
-		this.beforeUpdateWorldTransforms(this);
-		this.skeleton.updateWorldTransform();
-		this.afterUpdateWorldTransforms(this);
-	}
+  /**
+   * Updates the {@link AnimationState}, applies it to the {@link Skeleton}, then updates the world transforms of all bones.
+   * @param delta The time delta in milliseconds
+   */
+  updatePose(delta: number) {
+    this.animationState.update(delta / 1000);
+    this.animationState.apply(this.skeleton);
+    this.beforeUpdateWorldTransforms(this);
+    this.skeleton.updateWorldTransform();
+    this.afterUpdateWorldTransforms(this);
+  }
 
-	preUpdate (time: number, delta: number) {
-		if (!this.skeleton || !this.animationState) return;
-		this.updatePose(delta);
-	}
+  preUpdate(time: number, delta: number) {
+    if (!this.skeleton || !this.animationState) return;
+    this.updatePose(delta);
+  }
 
-	preDestroy () {
-		// FIXME tear down any event emitters
-	}
+  preDestroy() {
+    // FIXME tear down any event emitters
+  }
 
-	willRender (camera: Phaser.Cameras.Scene2D.Camera) {
-		if (!this.visible) return false;
+  willRender(camera: Phaser.Cameras.Scene2D.Camera) {
+    if (!this.visible) return false;
 
-		var GameObjectRenderMask = 0xf;
-		var result = (!this.skeleton || !(GameObjectRenderMask !== this.renderFlags || (this.cameraFilter !== 0 && (this.cameraFilter & camera.id))));
+    var GameObjectRenderMask = 0xf;
+    var result = !this.skeleton || !(GameObjectRenderMask !== this.renderFlags || (this.cameraFilter !== 0 && this.cameraFilter & camera.id));
 
-		return result;
-	}
+    if (!result && this.parentContainer && this.plugin.webGLRenderer) {
+      var sceneRenderer = this.plugin.webGLRenderer;
 
-	renderWebGL (renderer: Phaser.Renderer.WebGL.WebGLRenderer, src: SpineGameObject, camera: Phaser.Cameras.Scene2D.Camera, parentMatrix: Phaser.GameObjects.Components.TransformMatrix) {
-		if (!this.skeleton || !this.animationState || !this.plugin.webGLRenderer) return;
+      if (this.plugin.gl && this.plugin.phaserRenderer instanceof Phaser.Renderer.WebGL.WebGLRenderer && sceneRenderer.batcher.isDrawing) {
+        sceneRenderer.end();
+        this.plugin.phaserRenderer.pipelines.rebind();
+      }
+    }
 
-		let sceneRenderer = this.plugin.webGLRenderer;
-		if (renderer.newType) {
-			renderer.pipelines.clear();
-			sceneRenderer.begin();
-		}
+    return result;
+  }
 
-		camera.addToRenderList(src);
-		let transform = Phaser.GameObjects.GetCalcMatrix(src, camera, parentMatrix).calc;
-		let a = transform.a, b = transform.b, c = transform.c, d = transform.d, tx = transform.tx, ty = transform.ty;
-		sceneRenderer.drawSkeleton(this.skeleton, this.premultipliedAlpha, -1, -1, (vertices, numVertices, stride) => {
-			for (let i = 0; i < numVertices; i += stride) {
-				let vx = vertices[i];
-				let vy = vertices[i + 1];
-				vertices[i] = vx * a + vy * c + tx;
-				vertices[i + 1] = vx * b + vy * d + ty;
-			}
-		});
+  renderWebGL(
+    renderer: Phaser.Renderer.WebGL.WebGLRenderer,
+    src: SpineGameObject,
+    camera: Phaser.Cameras.Scene2D.Camera,
+    parentMatrix: Phaser.GameObjects.Components.TransformMatrix
+  ) {
+    if (!this.skeleton || !this.animationState || !this.plugin.webGLRenderer)
+      return;
 
-		if (!renderer.nextTypeMatch) {
-			sceneRenderer.end();
-			renderer.pipelines.rebind();
-		}
-	}
+    let sceneRenderer = this.plugin.webGLRenderer;
+    if (renderer.newType) {
+      renderer.pipelines.clear();
+      sceneRenderer.begin();
+    }
 
-	renderCanvas (renderer: Phaser.Renderer.Canvas.CanvasRenderer, src: SpineGameObject, camera: Phaser.Cameras.Scene2D.Camera, parentMatrix: Phaser.GameObjects.Components.TransformMatrix) {
-		if (!this.skeleton || !this.animationState || !this.plugin.canvasRenderer) return;
+    camera.addToRenderList(src);
+    let transform = Phaser.GameObjects.GetCalcMatrix(
+      src,
+      camera,
+      parentMatrix
+    ).calc;
+    let a = transform.a,
+      b = transform.b,
+      c = transform.c,
+      d = transform.d,
+      tx = transform.tx,
+      ty = transform.ty;
+    sceneRenderer.drawSkeleton(
+      this.skeleton,
+      this.premultipliedAlpha,
+      -1,
+      -1,
+      (vertices, numVertices, stride) => {
+        for (let i = 0; i < numVertices; i += stride) {
+          let vx = vertices[i];
+          let vy = vertices[i + 1];
+          vertices[i] = vx * a + vy * c + tx;
+          vertices[i + 1] = vx * b + vy * d + ty;
+        }
+      }
+    );
 
-		let context = renderer.currentContext;
-		let skeletonRenderer = this.plugin.canvasRenderer;
-		(skeletonRenderer as any).ctx = context;
+    if (!renderer.nextTypeMatch) {
+      sceneRenderer.end();
+      renderer.pipelines.rebind();
+    }
+  }
 
-		camera.addToRenderList(src);
-		let transform = Phaser.GameObjects.GetCalcMatrix(src, camera, parentMatrix).calc;
-		let skeleton = this.skeleton;
-		skeleton.x = transform.tx;
-		skeleton.y = transform.ty;
-		skeleton.scaleX = transform.scaleX;
-		skeleton.scaleY = transform.scaleY;
-		let root = skeleton.getRootBone()!;
-		root.rotation = -MathUtils.radiansToDegrees * transform.rotationNormalized;
-		this.skeleton.updateWorldTransform();
+  renderCanvas(
+    renderer: Phaser.Renderer.Canvas.CanvasRenderer,
+    src: SpineGameObject,
+    camera: Phaser.Cameras.Scene2D.Camera,
+    parentMatrix: Phaser.GameObjects.Components.TransformMatrix
+  ) {
+    if (!this.skeleton || !this.animationState || !this.plugin.canvasRenderer)
+      return;
 
-		context.save();
-		skeletonRenderer.draw(skeleton);
-		context.restore();
-	}
+    let context = renderer.currentContext;
+    let skeletonRenderer = this.plugin.canvasRenderer;
+    (skeletonRenderer as any).ctx = context;
+
+    camera.addToRenderList(src);
+    let transform = Phaser.GameObjects.GetCalcMatrix(
+      src,
+      camera,
+      parentMatrix
+    ).calc;
+    let skeleton = this.skeleton;
+    skeleton.x = transform.tx;
+    skeleton.y = transform.ty;
+    skeleton.scaleX = transform.scaleX;
+    skeleton.scaleY = transform.scaleY;
+    let root = skeleton.getRootBone()!;
+    root.rotation = -MathUtils.radiansToDegrees * transform.rotationNormalized;
+    this.skeleton.updateWorldTransform();
+
+    context.save();
+    skeletonRenderer.draw(skeleton);
+    context.restore();
+  }
 }

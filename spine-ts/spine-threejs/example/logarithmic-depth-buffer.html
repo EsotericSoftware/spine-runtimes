@@ -50,7 +50,7 @@
           camera.position.y = 100;
           camera.position.z = 400;
           scene = new THREE.Scene();
-          renderer = new THREE.WebGLRenderer();
+          renderer = new THREE.WebGLRenderer({ logarithmicDepthBuffer: true });
           renderer.setSize(width, height);
           document.body.appendChild(renderer.domElement);
           canvas = renderer.domElement;
@@ -92,12 +92,48 @@
             );
 
             // Create a SkeletonMesh from the data and attach it to the scene
+            // Provide a custom vertex/fragment shader pair that supports
+            // the logarithmic depth buffer.
+            // See https://discourse.threejs.org/t/shadermaterial-render-order-with-logarithmicdepthbuffer-is-wrong/49221/3
             skeletonMesh = new spine.SkeletonMesh(
               skeletonData,
-              (parameters) => {
-                parameters.depthTest = true;
-                parameters.depthWrite = true;
-                parameters.alphaTest = 0.001;
+              (materialParameters) => {
+                materialParameters.vertexShader = `
+                attribute vec4 color;
+                varying vec2 vUv;
+                varying vec4 vColor;
+
+                #include <common>
+                #include <logdepthbuf_pars_vertex>
+
+                void main() {
+                  vUv = uv;
+                  vColor = color;
+                  gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0);
+                  #include <logdepthbuf_vertex>
+                }
+                `;
+
+                materialParameters.fragmentShader = `
+                uniform sampler2D map;
+                #ifdef USE_SPINE_ALPHATEST
+                uniform float alphaTest;
+                #endif
+                varying vec2 vUv;
+                varying vec4 vColor;
+
+                #include <common>
+                #include <logdepthbuf_pars_fragment>
+
+                void main(void) {
+                  #include <logdepthbuf_fragment>
+
+                  gl_FragColor = texture2D(map, vUv)*vColor;
+                  #ifdef USE_SPINE_ALPHATEST
+                  if (gl_FragColor.a < alphaTest) discard;
+                  #endif
+                }
+                `;
               }
             );
             skeletonMesh.state.setAnimation(0, animation, true);

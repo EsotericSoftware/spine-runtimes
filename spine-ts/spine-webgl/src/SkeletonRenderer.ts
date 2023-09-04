@@ -168,8 +168,9 @@ export class SkeletonRenderer {
 					blendMode = slotBlendMode;
 					batcher.setBlendMode(
 						WebGLBlendModeConverter.getSourceColorGLBlendMode(blendMode, premultipliedAlpha),
-						WebGLBlendModeConverter.getSourceAlphaGLBlendMode(blendMode),
-						WebGLBlendModeConverter.getDestGLBlendMode(blendMode));
+						WebGLBlendModeConverter.getSourceAlphaGLBlendMode(blendMode, premultipliedAlpha),
+						WebGLBlendModeConverter.getDestColorGLBlendMode(blendMode),
+						WebGLBlendModeConverter.getDestAlphaGLBlendMode(blendMode, premultipliedAlpha) );
 				}
 
 				if (clipper.isClipping()) {
