@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="//cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.js"></script>
     <title>Spine Phaser Example</title>
 </head>
 
@@ -37,7 +37,7 @@
     }
 
     function create() {
-        const renderTexture = this.add.renderTexture(0, 0, 800, 600);
+        const renderTexture = this.add.renderTexture(400, 300, 800, 600);
         const spineboy = this.add.spine(400, 300, 'spineboy-data', "spineboy-atlas");
         spineboy.scale = 0.5;
         spineboy.animationState.setAnimation(0, "walk", true);

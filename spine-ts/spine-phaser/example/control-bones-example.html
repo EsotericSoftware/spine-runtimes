@@ -5,14 +5,14 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="//cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.js"></script>
     <script src="../dist/iife/spine-phaser.js"></script>
     <title>Spine Phaser Example</title>
 </head>
 
 <body>
     <h1>Control bones</h1>
-    <script>        
+    <script>
         class ControlBonesExample extends Phaser.Scene {
             preload() {
                 this.load.spineBinary("stretchyman-data", "assets/stretchyman-pro.skel");
@@ -20,7 +20,7 @@
             }
 
             create() {
-                const stretchyman = this.add.spine(400, 580, 'stretchyman-data', "stretchyman-atlas");                  
+                const stretchyman = this.add.spine(400, 580, 'stretchyman-data', "stretchyman-atlas");
                 stretchyman.animationState.setAnimation(0, "idle", true);
                 stretchyman.updatePose(0);
 
@@ -38,12 +38,12 @@
                     this.input.setDraggable(control);
                     this.input.on('drag', function (pointer, gameObject, dragX, dragY) {
                         gameObject.x = dragX;
-                        gameObject.y = dragY;                        
+                        gameObject.y = dragY;
                     }, this);
                 }
 
                 stretchyman.beforeUpdateWorldTransforms = () => {
-                    for (let controlBone of controlBones) {                        
+                    for (let controlBone of controlBones) {
                         const bone = controlBone.getData('bone');
                         const point = { x: controlBone.x, y: controlBone.y};
                         stretchyman.phaserWorldCoordinatesToBone(point, bone);
@@ -65,7 +65,7 @@
                     { key: "spine.SpinePlugin", plugin: spine.SpinePlugin, mapping: "spine" }
                 ]
             }
-        });    
+        });
     </script>
 </body>
 
