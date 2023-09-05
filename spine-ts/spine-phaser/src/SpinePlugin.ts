@@ -124,7 +124,7 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 
 		let self = this;
 		let addSpineGameObject = function (this: Phaser.GameObjects.GameObjectFactory, x: number, y: number, dataKey: string, atlasKey: string, boundsProvider: SpineGameObjectBoundsProvider) {
-			let gameObject = new SpineGameObject(scene, self, x, y, dataKey, atlasKey, boundsProvider);
+			let gameObject = new SpineGameObject(this.scene, self, x, y, dataKey, atlasKey, boundsProvider);
 			this.displayList.add(gameObject);
 			this.updateList.add(gameObject);
 			return gameObject;
