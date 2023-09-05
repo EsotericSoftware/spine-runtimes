@@ -75,7 +75,10 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 	game: Phaser.Game;
 	private isWebGL: boolean;
 	gl: WebGLRenderingContext | null;
-	webGLRenderer: SceneRenderer | null;
+	static gameWebGLRenderer: SceneRenderer | null = null;
+	get webGLRenderer(): SceneRenderer | null {
+		return SpinePlugin.gameWebGLRenderer;
+	}
 	canvasRenderer: SkeletonRenderer | null;
 	phaserRenderer: Phaser.Renderer.Canvas.CanvasRenderer | Phaser.Renderer.WebGL.WebGLRenderer;
 	private skeletonDataCache: Phaser.Cache.BaseCache;
@@ -87,7 +90,6 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 		this.isWebGL = this.game.config.renderType === 2;
 		this.gl = this.isWebGL ? (this.game.renderer as Phaser.Renderer.WebGL.WebGLRenderer).gl : null;
 		this.phaserRenderer = this.game.renderer;
-		this.webGLRenderer = null;
 		this.canvasRenderer = null;
 		this.skeletonDataCache = this.game.cache.addCustom(SPINE_SKELETON_DATA_CACHE_KEY);
 		this.atlasCache = this.game.cache.addCustom(SPINE_ATLAS_CACHE_KEY);
@@ -141,11 +143,12 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 		pluginManager.registerGameObject((window as any).SPINE_GAME_OBJECT_TYPE ? (window as any).SPINE_GAME_OBJECT_TYPE : SPINE_GAME_OBJECT_TYPE, addSpineGameObject, makeSpineGameObject);
 	}
 
+	static rendererId = 0;
 	boot () {
 		Skeleton.yDown = true;
 		if (this.isWebGL) {
-			if (!this.webGLRenderer) {
-				this.webGLRenderer = new SceneRenderer((this.game.renderer! as Phaser.Renderer.WebGL.WebGLRenderer).canvas, this.gl!, true);
+			if (!SpinePlugin.gameWebGLRenderer) {
+				SpinePlugin.gameWebGLRenderer = new SceneRenderer((this.game.renderer! as Phaser.Renderer.WebGL.WebGLRenderer).canvas, this.gl!, true);
 			}
 			this.onResize();
 			this.game.scale.on(Phaser.Scale.Events.RESIZE, this.onResize, this);
