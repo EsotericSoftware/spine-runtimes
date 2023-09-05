@@ -76,7 +76,7 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 	private isWebGL: boolean;
 	gl: WebGLRenderingContext | null;
 	static gameWebGLRenderer: SceneRenderer | null = null;
-	get webGLRenderer(): SceneRenderer | null {
+	get webGLRenderer (): SceneRenderer | null {
 		return SpinePlugin.gameWebGLRenderer;
 	}
 	canvasRenderer: SkeletonRenderer | null;
