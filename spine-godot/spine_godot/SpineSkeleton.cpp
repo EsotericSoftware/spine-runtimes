@@ -115,7 +115,7 @@ Ref<SpineBone> SpineSkeleton::find_bone(const String &name) {
 	if (EMPTY(name)) return nullptr;
 	auto bone = skeleton->findBone(SPINE_STRING_TMP(name));
 	if (!bone) return nullptr;
-	if (_cached_bones.count(bone) > 0 ) {
+	if (_cached_bones.count(bone) > 0) {
 		return _cached_bones[bone];
 	}
 	Ref<SpineBone> bone_ref(memnew(SpineBone));
@@ -129,7 +129,7 @@ Ref<SpineSlot> SpineSkeleton::find_slot(const String &name) {
 	if (EMPTY(name)) return nullptr;
 	auto slot = skeleton->findSlot(SPINE_STRING_TMP(name));
 	if (!slot) return nullptr;
-	if (_cached_slots.count(slot) > 0 ) {
+	if (_cached_slots.count(slot) > 0) {
 		return _cached_slots[slot];
 	}
 	Ref<SpineSlot> slot_ref(memnew(SpineSlot));

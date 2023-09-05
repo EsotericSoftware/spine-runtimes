@@ -59,10 +59,9 @@ void SpineSlot::set_to_setup_pose() {
 
 Ref<SpineSlotData> SpineSlot::get_data() {
 	SPINE_CHECK(get_spine_object(), nullptr)
-	if(_data.is_valid()) {
+	if (_data.is_valid()) {
 		return _data;
-	}
-	else {
+	} else {
 		auto &slot_data = get_spine_object()->getData();
 		Ref<SpineSlotData> slot_data_ref(memnew(SpineSlotData));
 		slot_data_ref->set_spine_object(*get_spine_owner()->get_skeleton_data_res(), &slot_data);
@@ -73,10 +72,9 @@ Ref<SpineSlotData> SpineSlot::get_data() {
 
 Ref<SpineBone> SpineSlot::get_bone() {
 	SPINE_CHECK(get_spine_object(), nullptr)
-	if(_bone.is_valid()) {
+	if (_bone.is_valid()) {
 		return _data;
-	}
-	else {
+	} else {
 		auto &bone = get_spine_object()->getBone();
 		Ref<SpineBone> bone_ref(memnew(SpineBone));
 		bone_ref->set_spine_object(get_spine_owner(), &bone);

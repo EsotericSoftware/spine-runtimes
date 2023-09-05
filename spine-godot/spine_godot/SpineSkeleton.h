@@ -68,8 +68,8 @@ private:
 	spine::Vector<float> bounds_vertex_buffer;
 	Ref<SpineSkin> last_skin;
 
-	std::unordered_map<spine::Bone*, Ref<SpineBone>> _cached_bones;
-	std::unordered_map<spine::Slot*, Ref<SpineSlot>> _cached_slots;
+	std::unordered_map<spine::Bone *, Ref<SpineBone>> _cached_bones;
+	std::unordered_map<spine::Slot *, Ref<SpineSlot>> _cached_slots;
 
 public:
 	SpineSkeleton();

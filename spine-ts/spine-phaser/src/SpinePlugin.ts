@@ -76,7 +76,7 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 	private isWebGL: boolean;
 	gl: WebGLRenderingContext | null;
 	static gameWebGLRenderer: SceneRenderer | null = null;
-	get webGLRenderer(): SceneRenderer | null {
+	get webGLRenderer (): SceneRenderer | null {
 		return SpinePlugin.gameWebGLRenderer;
 	}
 	canvasRenderer: SkeletonRenderer | null;
@@ -124,7 +124,7 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 
 		let self = this;
 		let addSpineGameObject = function (this: Phaser.GameObjects.GameObjectFactory, x: number, y: number, dataKey: string, atlasKey: string, boundsProvider: SpineGameObjectBoundsProvider) {
-			let gameObject = new SpineGameObject(scene, self, x, y, dataKey, atlasKey, boundsProvider);
+			let gameObject = new SpineGameObject(this.scene, self, x, y, dataKey, atlasKey, boundsProvider);
 			this.displayList.add(gameObject);
 			this.updateList.add(gameObject);
 			return gameObject;

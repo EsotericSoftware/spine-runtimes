@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="//cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.js"></script>
     <script src="../dist/iife/spine-phaser.js"></script>
     <title>Spine Phaser Example</title>
 </head>
@@ -17,7 +17,7 @@
         <textarea id="log" style="height: 10em;"></textarea>
     </div>
 </body>
-<script>    
+<script>
     function log(message) {
         let log = document.querySelector("#log");
         log.textContent += message + "\n";
@@ -40,7 +40,7 @@
                 interrupt: (entry) => log(`Interrupted animation ${entry.animation.name}`),
                 end: (entry) => log(`Ended animation ${entry.animation.name}`),
                 dispose: (entry) => log(`Disposed animation ${entry.animation.name}`),
-                complete: (entry) => log(`Completed animation ${entry.animation.name}`),                
+                complete: (entry) => log(`Completed animation ${entry.animation.name}`),
             })
 
             spineboy.animationState.setAnimation(0, "walk", true);
@@ -51,7 +51,7 @@
         }
     }
 
-    const config = {        
+    const config = {
         canvas: document.querySelector("#game"),
         width: 800,
         height: 600,
