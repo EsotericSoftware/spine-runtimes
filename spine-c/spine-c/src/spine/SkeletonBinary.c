@@ -970,8 +970,8 @@ static void _readVertices(spSkeletonBinary *self, _dataInput *input, int *bonesC
 		return;
 	}
 
-    weights = spFloatArray_create(verticesLength * 3 * 3);
-    bones = spIntArray_create(verticesLength * 3);
+	weights = spFloatArray_create(verticesLength * 3 * 3);
+	bones = spIntArray_create(verticesLength * 3);
 
 	for (i = 0; i < vertexCount; ++i) {
 		int boneCount = readVarint(input, 1);
