@@ -957,8 +957,8 @@ static void _readVertices(spSkeletonBinary *self, _dataInput *input, int *bonesC
 						  float **vertices, int *worldVerticesLength, int vertexCount) {
 	int i, ii;
 	int verticesLength = vertexCount << 1;
-	spFloatArray *weights = spFloatArray_create(8);
-	spIntArray *bones = spIntArray_create(8);
+	spFloatArray *weights = NULL;
+	spIntArray *bones = NULL;
 
 	*worldVerticesLength = verticesLength;
 
@@ -967,13 +967,11 @@ static void _readVertices(spSkeletonBinary *self, _dataInput *input, int *bonesC
 		*vertices = _readFloatArray(input, verticesLength, self->scale);
 		*bonesCount = 0;
 		*bones2 = NULL;
-		spFloatArray_dispose(weights);
-		spIntArray_dispose(bones);
 		return;
 	}
 
-	spFloatArray_ensureCapacity(weights, verticesLength * 3 * 3);
-	spIntArray_ensureCapacity(bones, verticesLength * 3);
+    weights = spFloatArray_create(verticesLength * 3 * 3);
+    bones = spIntArray_create(verticesLength * 3);
 
 	for (i = 0; i < vertexCount; ++i) {
 		int boneCount = readVarint(input, 1);
