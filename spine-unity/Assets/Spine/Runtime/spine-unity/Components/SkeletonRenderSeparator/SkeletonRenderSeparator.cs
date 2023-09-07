@@ -30,6 +30,11 @@
 #if UNITY_2018_3 || UNITY_2019 || UNITY_2018_3_OR_NEWER
 #define NEW_PREFAB_SYSTEM
 #endif
+
+#if UNITY_2018_1_OR_NEWER
+#define HAS_PROPERTY_BLOCK_QUERY
+#endif
+
 #define SPINE_OPTIONAL_RENDEROVERRIDE
 
 using System.Collections.Generic;
@@ -207,7 +212,12 @@ namespace Spine.Unity {
 			int rendererCount = partsRenderers.Count;
 			if (rendererCount <= 0) return;
 
-			if (copyPropertyBlock)
+#if HAS_PROPERTY_BLOCK_QUERY
+			bool assignPropertyBlock = this.copyPropertyBlock && mainMeshRenderer.HasPropertyBlock();
+#else
+			bool assignPropertyBlock = this.copyPropertyBlock;
+#endif
+			if (assignPropertyBlock)
 				mainMeshRenderer.GetPropertyBlock(copiedBlock);
 
 			MeshGenerator.Settings settings = new MeshGenerator.Settings {
@@ -234,9 +244,8 @@ namespace Spine.Unity {
 					MeshGenerator meshGenerator = currentRenderer.MeshGenerator;
 					meshGenerator.settings = settings;
 
-					if (copyPropertyBlock)
+					if (assignPropertyBlock)
 						currentRenderer.SetPropertyBlock(copiedBlock);
-
 					// Render
 					currentRenderer.RenderParts(instruction.submeshInstructions, start, si + 1);
 
