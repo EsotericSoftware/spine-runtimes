@@ -207,7 +207,8 @@ namespace Spine.Unity {
 			int rendererCount = partsRenderers.Count;
 			if (rendererCount <= 0) return;
 
-			if (copyPropertyBlock)
+			bool assignPropertyBlock = this.copyPropertyBlock && mainMeshRenderer.HasPropertyBlock();
+			if (assignPropertyBlock)
 				mainMeshRenderer.GetPropertyBlock(copiedBlock);
 
 			MeshGenerator.Settings settings = new MeshGenerator.Settings {
@@ -234,9 +235,8 @@ namespace Spine.Unity {
 					MeshGenerator meshGenerator = currentRenderer.MeshGenerator;
 					meshGenerator.settings = settings;
 
-					if (copyPropertyBlock)
+					if (assignPropertyBlock)
 						currentRenderer.SetPropertyBlock(copiedBlock);
-
 					// Render
 					currentRenderer.RenderParts(instruction.submeshInstructions, start, si + 1);
 
