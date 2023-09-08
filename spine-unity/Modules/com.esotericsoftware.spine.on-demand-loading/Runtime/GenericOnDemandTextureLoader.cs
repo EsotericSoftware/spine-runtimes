@@ -119,7 +119,7 @@ namespace Spine.Unity {
 				if (materialIndex >= placeholderMap.Length) {
 					Debug.LogError(string.Format("Failed to assign placeholder textures at {0}, material #{1} {2}. " +
 						"It seems like the GenericOnDemandTextureLoader asset was not setup accordingly for the AtlasAsset.",
-						atlasAsset, materialIndex+1, targetMaterial), this);
+						atlasAsset, materialIndex + 1, targetMaterial), this);
 					return false;
 				}
 				Texture activeTexture = targetMaterial.mainTexture;
@@ -139,8 +139,7 @@ namespace Spine.Unity {
 					Debug.LogWarning(string.Format("Placeholder texture set to null at {0}, for material #{1} {2}. " +
 						"It seems like the GenericOnDemandTextureLoader asset was not setup accordingly for the AtlasAsset.",
 						atlasAsset, materialIndex + 1, targetMaterial), this);
-				}
-				else {
+				} else {
 					targetMaterial.mainTexture = placeholderTexture;
 				}
 				++materialIndex;
@@ -258,7 +257,7 @@ namespace Spine.Unity {
 
 		public abstract Texture GetAlreadyLoadedTexture (int materialIndex, int textureIndex);
 
-		public abstract void CreateTextureRequest(TargetReference targetReference,
+		public abstract void CreateTextureRequest (TargetReference targetReference,
 			MaterialOnDemandData materialData, int textureIndex, Material materialToUpdate);
 
 		public virtual void UnloadUnusedTextures () {

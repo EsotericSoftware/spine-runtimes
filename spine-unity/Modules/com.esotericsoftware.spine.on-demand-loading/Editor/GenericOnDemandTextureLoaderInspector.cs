@@ -232,7 +232,7 @@ namespace Spine.Unity.Editor {
 			loader = (GenericOnDemandTextureLoader<TargetReference, TextureRequest>)target;
 
 			if (staticMethods == null)
-				staticMethods = CreateStaticMethodImplementations ();
+				staticMethods = CreateStaticMethodImplementations();
 		}
 
 #if NEWPLAYMODECALLBACKS

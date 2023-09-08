@@ -73,7 +73,7 @@ namespace Spine.Unity.Editor {
 			}
 		}
 
-#region Context Menu Item
+		#region Context Menu Item
 		[MenuItem("CONTEXT/AtlasAssetBase/Add Addressables Loader")]
 		static void AddAddressablesLoader (MenuCommand cmd) {
 			if (staticMethods == null)
