@@ -171,7 +171,7 @@ namespace Spine.Unity.Editor {
 				EditorUtility.UnloadUnusedAssetsImmediate();
 				AssetDatabase.StopAssetEditing();
 #if !HAS_SAVE_ASSET_IF_DIRTY
-				if (textureLoadersToRestore.Length > 0)
+				if (textureLoadersToRestore.Count > 0)
 					AssetDatabase.SaveAssets();
 #endif
 			} finally {
