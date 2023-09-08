@@ -51,11 +51,11 @@ namespace Spine.Unity.Editor {
 
 		public class AddressablesMethodImplementations : StaticMethodImplementations {
 			public override GenericTextureLoader GetOrCreateLoader (string loaderPath) {
-				GenericTextureLoader loader = AssetDatabase.LoadAssetAtPath<GenericTextureLoader>(loaderPath);
+				AddressablesTextureLoader loader = AssetDatabase.LoadAssetAtPath<AddressablesTextureLoader>(loaderPath);
 				if (loader == null) {
-					loader = GenericTextureLoader.CreateInstance<GenericTextureLoader>();
+					loader = AddressablesTextureLoader.CreateInstance<AddressablesTextureLoader>();
 					AssetDatabase.CreateAsset(loader, loaderPath);
-					loader = AssetDatabase.LoadAssetAtPath<GenericTextureLoader>(loaderPath);
+					loader = AssetDatabase.LoadAssetAtPath<AddressablesTextureLoader>(loaderPath);
 				} else {
 					loader.Clear(clearAtlasAsset: false);
 				}
