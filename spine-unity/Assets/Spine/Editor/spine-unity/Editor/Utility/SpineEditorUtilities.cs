@@ -238,7 +238,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		public static void ConfirmInitialization () {
-			if (!initialized || Icons.skeleton == null)
+			if (!initialized)
 				Initialize();
 		}
 

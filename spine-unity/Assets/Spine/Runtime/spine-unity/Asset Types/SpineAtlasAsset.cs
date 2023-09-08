@@ -263,7 +263,10 @@ namespace Spine.Unity {
 					Debug.LogError("Material is missing texture: " + other.name, other);
 					return;
 				}
-				if (other.mainTexture.name == name) {
+				string textureName = other.mainTexture.name;
+				if (textureName == name ||
+					(atlasAsset.OnDemandTextureLoader != null &&
+					textureName == atlasAsset.OnDemandTextureLoader.GetPlaceholderTextureName(name))) {
 					material = other;
 					break;
 				}
