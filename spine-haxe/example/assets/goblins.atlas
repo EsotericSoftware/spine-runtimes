@@ -1,0 +1,96 @@
+goblins.png
+	size: 1024, 128
+	filter: Linear, Linear
+dagger
+	bounds: 2, 18, 26, 108
+goblin/eyes-closed
+	bounds: 2, 4, 34, 12
+goblin/head
+	bounds: 113, 23, 103, 66
+	rotate: 90
+goblin/left-arm
+	bounds: 937, 89, 37, 35
+	rotate: 90
+goblin/left-foot
+	bounds: 609, 61, 65, 31
+	rotate: 90
+goblin/left-hand
+	bounds: 840, 21, 36, 41
+goblin/left-lower-leg
+	bounds: 504, 56, 33, 70
+goblin/left-shoulder
+	bounds: 745, 17, 29, 44
+goblin/left-upper-leg
+	bounds: 397, 53, 33, 73
+goblin/neck
+	bounds: 862, 85, 36, 41
+goblin/pelvis
+	bounds: 776, 18, 62, 43
+goblin/right-arm
+	bounds: 181, 5, 23, 50
+	rotate: 90
+goblin/right-foot
+	bounds: 747, 63, 63, 33
+	rotate: 90
+goblin/right-hand
+	bounds: 878, 3, 36, 37
+goblin/right-lower-leg
+	bounds: 321, 50, 36, 76
+goblin/right-shoulder
+	bounds: 663, 14, 39, 45
+goblin/right-upper-leg
+	bounds: 675, 63, 34, 63
+goblin/torso
+	bounds: 181, 30, 68, 96
+goblin/undie-straps
+	bounds: 38, 2, 55, 19
+goblin/undies
+	bounds: 974, 97, 36, 29
+goblingirl/eyes-closed
+	bounds: 397, 30, 37, 21
+goblingirl/head
+	bounds: 30, 23, 103, 81
+	rotate: 90
+goblingirl/left-arm
+	bounds: 916, 8, 37, 35
+	rotate: 90
+goblingirl/left-foot
+	bounds: 642, 61, 65, 31
+	rotate: 90
+goblingirl/left-hand
+	bounds: 900, 86, 35, 40
+goblingirl/left-lower-leg
+	bounds: 539, 56, 33, 70
+goblingirl/left-shoulder
+	bounds: 633, 13, 28, 46
+goblingirl/left-upper-leg
+	bounds: 574, 56, 33, 70
+goblingirl/neck
+	bounds: 878, 42, 35, 41
+goblingirl/pelvis
+	bounds: 817, 64, 62, 43
+	rotate: 90
+goblingirl/right-arm
+	bounds: 603, 4, 28, 50
+goblingirl/right-foot
+	bounds: 782, 63, 63, 33
+	rotate: 90
+goblingirl/right-hand
+	bounds: 915, 47, 36, 37
+goblingirl/right-lower-leg
+	bounds: 359, 50, 36, 76
+goblingirl/right-shoulder
+	bounds: 704, 16, 39, 45
+goblingirl/right-upper-leg
+	bounds: 711, 63, 34, 63
+goblingirl/torso
+	bounds: 251, 30, 68, 96
+goblingirl/undie-straps
+	bounds: 95, 2, 55, 19
+goblingirl/undies
+	bounds: 974, 66, 36, 29
+shield
+	bounds: 432, 54, 70, 72
+spear
+	bounds: 233, 6, 22, 368
+	rotate: 90
