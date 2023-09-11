@@ -144,7 +144,7 @@ namespace Spine.Unity.Examples {
 				else
 					UnityEngine.Object.Destroy(mesh);
 #else
-					UnityEngine.Object.Destroy(mesh);
+				UnityEngine.Object.Destroy(mesh);
 #endif
 			}
 		}
