@@ -136,7 +136,7 @@ namespace Spine.Unity.Examples {
 		}
 
 		void OnDestroy () {
-			for (int i  = 0; i < 2; ++i) {
+			for (int i = 0; i < 2; ++i) {
 				Mesh mesh = doubleBufferedMesh.GetNext();
 #if UNITY_EDITOR
 				if (Application.isEditor && !Application.isPlaying)
