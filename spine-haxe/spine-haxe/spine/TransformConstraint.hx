@@ -43,7 +43,7 @@ class TransformConstraint implements Updatable {
 	}
 
 	public function update():Void {
-		if (mixRotate == 0 && mixX == 0 && mixY == 0 && mixScaleX == 0 && mixScaleX == 0 && mixShearY == 0)
+		if (mixRotate == 0 && mixX == 0 && mixY == 0 && mixScaleX == 0 && mixScaleY == 0 && mixShearY == 0)
 			return;
 
 		if (data.local) {

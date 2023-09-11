@@ -5,7 +5,7 @@ import openfl.geom.Matrix;
 import openfl.geom.Point;
 import openfl.geom.Rectangle;
 import openfl.Vector;
-import spine.atlas.AtlasRegion;
+import spine.atlas.TextureAtlasRegion;
 import spine.attachments.Attachment;
 import spine.attachments.ClippingAttachment;
 import spine.attachments.MeshAttachment;
@@ -15,7 +15,6 @@ import spine.Skeleton;
 import spine.SkeletonClipping;
 import spine.SkeletonData;
 import spine.Slot;
-import spine.VertexEffect;
 import starling.display.BlendMode;
 import starling.display.DisplayObject;
 import starling.display.Image;
@@ -37,11 +36,8 @@ class SkeletonSprite extends DisplayObject {
 	private static var clipper:SkeletonClipping = new SkeletonClipping();
 	private static var QUAD_INDICES:Vector<Int> = Vector.ofArray([0, 1, 2, 2, 3, 0]);
 
-	public var vertexEffect:VertexEffect;
-
 	private var tempLight:spine.Color = new spine.Color(0, 0, 0);
 	private var tempDark:spine.Color = new spine.Color(0, 0, 0);
-	private var tempVertex:spine.Vertex = new spine.Vertex();
 
 	public function new(skeletonData:SkeletonData) {
 		super();
@@ -71,9 +67,6 @@ class SkeletonSprite extends DisplayObject {
 		var vertexData:VertexData;
 		var uvs:Vector<Float>;
 
-		if (vertexEffect != null)
-			vertexEffect.begin(skeleton);
-
 		for (slot in drawOrder) {
 			if (!slot.bone.active) {
 				clipper.clipEndWithSlot(slot);
@@ -96,8 +89,8 @@ class SkeletonSprite extends DisplayObject {
 				} else {
 					if (Std.isOfType(region.rendererObject, Image)) {
 						region.rendererObject = mesh = new SkeletonMesh(cast(region.rendererObject, Image).texture);
-					} else if (Std.isOfType(region.rendererObject, AtlasRegion)) {
-						region.rendererObject = mesh = new SkeletonMesh(cast(cast(region.rendererObject, AtlasRegion).rendererObject, Image).texture);
+					} else if (Std.isOfType(region.rendererObject, TextureAtlasRegion)) {
+						region.rendererObject = mesh = new SkeletonMesh(cast(region.rendererObject, TextureAtlasRegion).texture);
 					}
 
 					indexData = mesh.getIndexData();
@@ -127,9 +120,8 @@ class SkeletonSprite extends DisplayObject {
 				} else {
 					if (Std.isOfType(meshAttachment.rendererObject, Image)) {
 						meshAttachment.rendererObject = mesh = new SkeletonMesh(cast(meshAttachment.rendererObject, Image).texture);
-					} else if (Std.isOfType(meshAttachment.rendererObject, AtlasRegion)) {
-						meshAttachment.rendererObject = mesh = new SkeletonMesh(cast(cast(meshAttachment.rendererObject, AtlasRegion).rendererObject, Image)
-							.texture);
+					} else if (Std.isOfType(meshAttachment.rendererObject, TextureAtlasRegion)) {
+						meshAttachment.rendererObject = mesh = new SkeletonMesh(cast(meshAttachment.rendererObject, TextureAtlasRegion).texture);
 					}
 
 					indexData = mesh.getIndexData();
@@ -189,39 +181,12 @@ class SkeletonSprite extends DisplayObject {
 
 			vertexData = mesh.getVertexData();
 			vertexData.numVertices = verticesCount;
-			if (vertexEffect != null) {
-				tempLight.r = ((rgb >> 16) & 0xff) / 255.0;
-				tempLight.g = ((rgb >> 8) & 0xff) / 255.0;
-				tempLight.b = (rgb & 0xff) / 255.0;
-				tempLight.a = a;
-				tempDark.r = ((dark >> 16) & 0xff) / 255.0;
-				tempDark.g = ((dark >> 8) & 0xff) / 255.0;
-				tempDark.b = (dark & 0xff) / 255.0;
-				tempDark.a = 0;
-				var ii:Int = 0;
-				for (i in 0...verticesCount) {
-					tempVertex.x = worldVertices[ii];
-					tempVertex.y = worldVertices[ii + 1];
-					tempVertex.u = uvs[ii];
-					tempVertex.v = uvs[ii + 1];
-					tempVertex.light.setFromColor(tempLight);
-					tempVertex.dark.setFromColor(tempDark);
-					vertexEffect.transform(tempVertex);
-					vertexData.colorize("color",
-						Color.rgb(Std.int(tempVertex.light.r * 255), Std.int(tempVertex.light.g * 255), Std.int(tempVertex.light.b * 255)),
-						tempVertex.light.a, i, 1);
-					mesh.setVertexPosition(i, tempVertex.x, tempVertex.y);
-					mesh.setTexCoords(i, tempVertex.u, tempVertex.v);
-					ii += 2;
-				}
-			} else {
-				vertexData.colorize("color", rgb, a);
-				var ii:Int = 0;
-				for (i in 0...verticesCount) {
-					mesh.setVertexPosition(i, worldVertices[ii], worldVertices[ii + 1]);
-					mesh.setTexCoords(i, uvs[ii], uvs[ii + 1]);
-					ii += 2;
-				}
+			vertexData.colorize("color", rgb, a);
+			var ii:Int = 0;
+			for (i in 0...verticesCount) {
+				mesh.setVertexPosition(i, worldVertices[ii], worldVertices[ii + 1]);
+				mesh.setTexCoords(i, uvs[ii], uvs[ii + 1]);
+				ii += 2;
 			}
 
 			if (indexData.numIndices > 0 && vertexData.numVertices > 0) {
@@ -233,9 +198,6 @@ class SkeletonSprite extends DisplayObject {
 		}
 		painter.state.blendMode = originalBlendMode;
 		clipper.clipEnd();
-
-		if (vertexEffect != null)
-			vertexEffect.end();
 	}
 
 	override public function hitTest(localPoint:Point):DisplayObject {

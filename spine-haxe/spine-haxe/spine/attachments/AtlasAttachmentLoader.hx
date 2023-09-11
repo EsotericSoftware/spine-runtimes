@@ -1,22 +1,32 @@
 package spine.attachments;
 
 import openfl.errors.ArgumentError;
-import spine.atlas.Atlas;
-import spine.atlas.AtlasRegion;
+import spine.atlas.TextureAtlas;
 import spine.Skin;
 
 class AtlasAttachmentLoader implements AttachmentLoader {
-	private var atlas:Atlas;
+	private var atlas:TextureAtlas;
 
-	public function new(atlas:Atlas) {
+	public function new(atlas:TextureAtlas) {
 		if (atlas == null) {
 			throw new ArgumentError("atlas cannot be null.");
 		}
 		this.atlas = atlas;
 	}
 
+	private function loadSequence(name:String, basePath:String, sequence:Sequence) {
+		var regions = sequence.regions;
+		for (i in 0...regions.length) {
+			var path = sequence.getPath(basePath, i);
+			var region = this.atlas.findRegion(path);
+			if (region == null)
+				trace("Region not found in atlas: " + path + " (sequence: " + name + ")");
+			regions[i] = region;
+		}
+	}
+
 	public function newRegionAttachment(skin:Skin, name:String, path:String):RegionAttachment {
-		var region:AtlasRegion = atlas.findRegion(path);
+		var region = atlas.findRegion(path);
 		if (region == null) {
 			trace("Region not found in atlas: " + path + " (region attachment: " + name + ")");
 			return null;
@@ -34,7 +44,7 @@ class AtlasAttachmentLoader implements AttachmentLoader {
 	}
 
 	public function newMeshAttachment(skin:Skin, name:String, path:String):MeshAttachment {
-		var region:AtlasRegion = atlas.findRegion(path);
+		var region = atlas.findRegion(path);
 		if (region == null) {
 			trace("Region not found in atlas: " + path + " (mesh attachment: " + name + ")");
 			return null;

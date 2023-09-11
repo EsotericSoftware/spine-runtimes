@@ -13,7 +13,8 @@ class Slot {
 	public var darkColor:Color;
 
 	private var _attachment:Attachment;
-	private var _attachmentTime:Float = 0;
+
+	public var sequenceIndex = -1;
 
 	public var attachmentState:Int = 0;
 	public var deform:Vector<Float> = new Vector<Float>();
@@ -63,24 +64,12 @@ class Slot {
 			return attachmentNew;
 		if (!Std.isOfType(attachmentNew, VertexAttachment)
 			|| !Std.isOfType(attachment, VertexAttachment)
-			|| cast(attachmentNew, VertexAttachment).deformAttachment != cast(attachment, VertexAttachment).deformAttachment) {
+			|| cast(attachmentNew, VertexAttachment).timelineAttachment != cast(attachment, VertexAttachment).timelineAttachment) {
 			deform = new Vector<Float>();
 		}
 		_attachment = attachmentNew;
-		_attachmentTime = skeleton.time;
+		sequenceIndex = -1;
 		return attachmentNew;
-	}
-
-	public var attachmentTime(get, set):Float;
-
-	private function set_attachmentTime(time:Float):Float {
-		_attachmentTime = skeleton.time - time;
-		return _attachmentTime;
-	}
-
-	/** Returns the time since the attachment was set. */
-	private function get_attachmentTime():Float {
-		return skeleton.time - _attachmentTime;
 	}
 
 	public function setToSetupPose():Void {

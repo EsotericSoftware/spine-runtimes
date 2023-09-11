@@ -1,9 +1,9 @@
 package spine.atlas;
 
 interface TextureLoader {
-	function loadPage(page:AtlasPage, path:String):Void;
+	function loadPage(page:TextureAtlasPage, path:String):Void;
 
-	function loadRegion(region:AtlasRegion):Void;
+	function loadRegion(region:TextureAtlasRegion):Void;
 
-	function unloadPage(page:AtlasPage):Void;
+	function unloadPage(page:TextureAtlasPage):Void;
 }

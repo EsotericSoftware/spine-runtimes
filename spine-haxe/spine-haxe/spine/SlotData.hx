@@ -10,7 +10,7 @@ class SlotData {
 	public var color:Color = new Color(1, 1, 1, 1);
 	public var darkColor:Color = null;
 	public var attachmentName:String;
-	public var blendMode:BlendMode;
+	public var blendMode:BlendMode = BlendMode.normal;
 
 	public function new(index:Int, name:String, boneData:BoneData) {
 		if (index < 0)

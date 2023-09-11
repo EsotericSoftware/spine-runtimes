@@ -9,14 +9,14 @@ class VertexAttachment extends Attachment {
 	private static var nextID:Int = 0;
 
 	public var bones:Vector<Int>;
-	public var vertices:Vector<Float>;
+	public var vertices = new Vector<Float>();
 	public var worldVerticesLength:Int = 0;
 	public var id:Int = nextID++;
-	public var deformAttachment:VertexAttachment;
+	public var timelineAttachment:VertexAttachment;
 
 	public function new(name:String) {
 		super(name);
-		deformAttachment = this;
+		timelineAttachment = this;
 	}
 
 	/** Transforms the attachment's local {@link #vertices} to world coordinates. If the slot's {@link Slot#deform} is
@@ -130,11 +130,9 @@ class VertexAttachment extends Attachment {
 
 		if (this.vertices != null) {
 			attachment.vertices = vertices.concat();
-		} else {
-			attachment.vertices = null;
 		}
 
 		attachment.worldVerticesLength = worldVerticesLength;
-		attachment.deformAttachment = deformAttachment;
+		attachment.timelineAttachment = timelineAttachment;
 	}
 }

@@ -4,10 +4,10 @@ import spine.Skin;
 
 interface AttachmentLoader {
 	/** @return May be null to not load an attachment. */
-	function newRegionAttachment(skin:Skin, name:String, path:String):RegionAttachment;
+	function newRegionAttachment(skin:Skin, name:String, path:String, sequence:Sequence):RegionAttachment;
 
 	/** @return May be null to not load an attachment. */
-	function newMeshAttachment(skin:Skin, name:String, path:String):MeshAttachment;
+	function newMeshAttachment(skin:Skin, name:String, path:String, sequence:Sequence):MeshAttachment;
 
 	/** @return May be null to not load an attachment. */
 	function newBoundingBoxAttachment(skin:Skin, name:String):BoundingBoxAttachment;

@@ -4,8 +4,8 @@ import openfl.display.Bitmap;
 import openfl.display.BitmapData;
 import openfl.errors.ArgumentError;
 import openfl.utils.Object;
-import spine.atlas.AtlasPage;
-import spine.atlas.AtlasRegion;
+import spine.atlas.TextureAtlasPage;
+import spine.atlas.TextureAtlasRegion;
 import spine.atlas.TextureLoader;
 import starling.display.Image;
 import starling.textures.Texture;
@@ -46,37 +46,39 @@ class StarlingTextureLoader implements TextureLoader {
 		}
 	}
 
-	public function loadPage(page:AtlasPage, path:String):Void {
+	public function loadPage(page:TextureAtlasPage, path:String):Void {
 		var bitmapDataOrTexture:Dynamic = singleBitmapDataOrTexture != null ? singleBitmapDataOrTexture : bitmapDatasOrTextures[path];
 		if (bitmapDataOrTexture == null) {
 			throw new ArgumentError("BitmapData/Texture not found with name: " + path);
 		}
 		if (Std.isOfType(bitmapDataOrTexture, BitmapData)) {
 			var bitmapData:BitmapData = cast(bitmapDataOrTexture, BitmapData);
-			page.rendererObject = Texture.fromBitmapData(bitmapData);
+			page.texture = Texture.fromBitmapData(bitmapData);
 		} else {
 			var texture:Texture = cast(bitmapDataOrTexture, Texture);
-			page.rendererObject = texture;
+			page.texture = texture;
 		}
 	}
 
-	public function loadRegion(region:AtlasRegion):Void {
-		var image:Image = new Image(cast(region.page.rendererObject, Texture));
-		if (region.degrees == 90) {
-			image.setTexCoords(0, region.u, region.v2);
-			image.setTexCoords(1, region.u, region.v);
-			image.setTexCoords(2, region.u2, region.v2);
-			image.setTexCoords(3, region.u2, region.v);
-		} else {
-			image.setTexCoords(0, region.u, region.v);
-			image.setTexCoords(1, region.u2, region.v);
-			image.setTexCoords(2, region.u, region.v2);
-			image.setTexCoords(3, region.u2, region.v2);
-		}
-		region.rendererObject = image;
+	public function loadRegion(region:TextureAtlasRegion):Void {
+		// FIXME rotation shouldn't be implemented like this
+		/*var image:Image = new Image(cast(region.page.texture, Texture));
+			if (region.degrees == 90) {
+				image.setTexCoords(0, region.u, region.v2);
+				image.setTexCoords(1, region.u, region.v);
+				image.setTexCoords(2, region.u2, region.v2);
+				image.setTexCoords(3, region.u2, region.v);
+			} else {
+				image.setTexCoords(0, region.u, region.v);
+				image.setTexCoords(1, region.u2, region.v);
+				image.setTexCoords(2, region.u, region.v2);
+				image.setTexCoords(3, region.u2, region.v2);
+			}
+			region.texture = image; */
+		region.texture = region.page.texture;
 	}
 
-	public function unloadPage(page:AtlasPage):Void {
-		cast(page.rendererObject, Texture).dispose();
+	public function unloadPage(page:TextureAtlasPage):Void {
+		cast(page.texture, Texture).dispose();
 	}
 }

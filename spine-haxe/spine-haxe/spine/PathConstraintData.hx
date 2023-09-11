@@ -6,9 +6,9 @@ class PathConstraintData extends ConstraintData {
 	private var _bones:Vector<BoneData> = new Vector<BoneData>();
 
 	public var target:SlotData;
-	public var positionMode:PositionMode;
-	public var spacingMode:SpacingMode;
-	public var rotateMode:RotateMode;
+	public var positionMode:PositionMode = PositionMode.fixed;
+	public var spacingMode:SpacingMode = SpacingMode.fixed;
+	public var rotateMode:RotateMode = RotateMode.chain;
 	public var offsetRotation:Float = 0;
 	public var position:Float = 0;
 	public var spacing:Float = 0;

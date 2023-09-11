@@ -5,9 +5,9 @@ import openfl.utils.ByteArray;
 import openfl.utils.Dictionary;
 import openfl.Vector;
 
-class Atlas {
-	private var pages:Vector<AtlasPage> = new Vector<AtlasPage>();
-	private var regions:Vector<AtlasRegion> = new Vector<AtlasRegion>();
+class TextureAtlas {
+	private var pages = new Vector<TextureAtlasPage>();
+	private var regions = new Vector<TextureAtlasRegion>();
 	private var textureLoader:TextureLoader;
 
 	/** @param object A String or ByteArray. */
@@ -20,7 +20,7 @@ class Atlas {
 		} else if (Std.isOfType(object, ByteArrayData)) {
 			load(cast(object, ByteArray).readUTFBytes(cast(object, ByteArray).length), textureLoader);
 		} else {
-			throw new ArgumentError("object must be a TextureAtlas or AttachmentLoader.");
+			throw new ArgumentError("object must be a string or ByteArrayData.");
 		}
 	}
 
@@ -32,8 +32,8 @@ class Atlas {
 
 		var reader:Reader = new Reader(atlasText);
 		var entry:Vector<String> = new Vector<String>(5, true);
-		var page:AtlasPage = null;
-		var region:AtlasRegion = null;
+		var page:TextureAtlasPage = null;
+		var region:TextureAtlasRegion = null;
 
 		var pageFields:Dictionary<String, Void->Void> = new Dictionary<String, Void->Void>();
 		pageFields["size"] = function():Void {
@@ -58,11 +58,27 @@ class Atlas {
 		};
 
 		var regionFields:Dictionary<String, Void->Void> = new Dictionary<String, Void->Void>();
+		regionFields["xy"] = function():Void {
+			region.x = Std.parseInt(entry[1]);
+			region.y = Std.parseInt(entry[2]);
+		};
+		regionFields["size"] = function():Void {
+			region.width = Std.parseInt(entry[1]);
+			region.height = Std.parseInt(entry[2]);
+		};
 		regionFields["bounds"] = function():Void {
 			region.x = Std.parseInt(entry[1]);
 			region.y = Std.parseInt(entry[2]);
 			region.width = Std.parseInt(entry[3]);
 			region.height = Std.parseInt(entry[4]);
+		};
+		regionFields["offset"] = function():Void {
+			region.offsetX = Std.parseInt(entry[1]);
+			region.offsetY = Std.parseInt(entry[2]);
+		};
+		regionFields["orig"] = function():Void {
+			region.originalWidth = Std.parseInt(entry[1]);
+			region.originalHeight = Std.parseInt(entry[2]);
 		};
 		regionFields["offsets"] = function():Void {
 			region.offsetX = Std.parseInt(entry[1]);
@@ -107,8 +123,7 @@ class Atlas {
 				page = null;
 				line = reader.readLine();
 			} else if (page == null) {
-				page = new AtlasPage();
-				page.name = line;
+				page = new TextureAtlasPage(line);
 				while (true) {
 					if (reader.readEntry(entry, line = reader.readLine()) == 0)
 						break;
@@ -120,9 +135,7 @@ class Atlas {
 				textureLoader.loadPage(page, line);
 				pages.push(page);
 			} else {
-				region = new AtlasRegion();
-				region.page = page;
-				region.name = line;
+				region = new TextureAtlasRegion(page, line);
 				while (true) {
 					var count:Int = reader.readEntry(entry, line = reader.readLine());
 					if (count == 0)
@@ -149,7 +162,7 @@ class Atlas {
 					region.originalHeight = region.height;
 				}
 
-				if (names != null && names.length > 0) {
+				if (names != null && names.length > 0 && values != null && values.length > 0) {
 					region.names = names;
 					region.values = values;
 					names = null;
@@ -174,7 +187,7 @@ class Atlas {
 	/** Returns the first region found with the specified name. This method uses string comparison to find the region, so the result
 	 * should be cached rather than calling this method multiple times.
 	 * @return The region, or null. */
-	public function findRegion(name:String):AtlasRegion {
+	public function findRegion(name:String):TextureAtlasRegion {
 		for (region in regions) {
 			if (region.name == name) {
 				return region;

@@ -72,7 +72,7 @@ class IkConstraint implements Updatable {
 				tx = targetX - bone.worldX;
 				ty = targetY - bone.worldY;
 			case TransformMode.noRotationOrReflection:
-				var s:Float = Math.abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
+				var s = Math.abs(pa * pd - pb * pc) / Math.max(0.0001, pa * pa + pc * pc);
 				var sa:Float = pa / bone.skeleton.scaleX;
 				var sc:Float = pc / bone.skeleton.scaleY;
 				pb = -sc * s * bone.skeleton.scaleX;
@@ -85,8 +85,13 @@ class IkConstraint implements Updatable {
 			default:
 				var x:Float = targetX - p.worldX, y:Float = targetY - p.worldY;
 				var d:Float = pa * pd - pb * pc;
-				tx = (x * pd - y * pb) / d - bone.ax;
-				ty = (y * pa - x * pc) / d - bone.ay;
+				if (Math.abs(d) <= 0.0001) {
+					tx = 0;
+					ty = 0;
+				} else {
+					tx = (x * pd - y * pb) / d - bone.ax;
+					ty = (y * pa - x * pc) / d - bone.ay;
+				}
 		}
 
 		rotationIK += Math.atan2(ty, tx) * MathUtils.radDeg;
@@ -172,9 +177,8 @@ class IkConstraint implements Updatable {
 		b = pp.b;
 		c = pp.c;
 		d = pp.d;
-		var id:Float = 1 / (a * d - b * c),
-			x:Float = cwx - pp.worldX,
-			y:Float = cwy - pp.worldY;
+		var id = a * d - b * c, x = cwx - pp.worldX, y = cwy - pp.worldY;
+		id = Math.abs(id) <= 0.0001 ? 0 : 1 / id;
 		var dx:Float = (x * d - y * b) * id - px,
 			dy:Float = (y * a - x * c) * id - py;
 		var l1:Float = Math.sqrt(dx * dx + dy * dy);

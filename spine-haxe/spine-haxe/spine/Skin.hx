@@ -119,7 +119,7 @@ class Skin {
 	public function removeAttachment(slotIndex:Int, name:String):Void {
 		var dictionary:Dictionary<String, Attachment> = _attachments[slotIndex];
 		if (dictionary != null)
-			dictionary[name] = null;
+			dictionary.remove(name);
 	}
 
 	public function getAttachments():Vector<SkinEntry> {

@@ -10,7 +10,7 @@ import openfl.geom.Rectangle;
 import openfl.utils.ByteArray;
 import openfl.utils.Endian;
 import spine.animation.AnimationStateData;
-import spine.atlas.Atlas;
+import spine.atlas.TextureAtlas;
 import spine.attachments.AtlasAttachmentLoader;
 import spine.SkeletonBinary;
 import spine.SkeletonData;
@@ -22,7 +22,7 @@ import starling.events.Event;
 import starling.textures.Texture;
 
 class Main extends Sprite {
-	private static inline var loadBinary:Bool = true;
+	private static inline var loadBinary:Bool = false;
 
 	private var starlingSingleton:Starling;
 
@@ -44,13 +44,13 @@ class Main extends Sprite {
 
 	private function loadSpineAnimation():Void {
 		var textureAtlasBitmapData:BitmapData = Assets.getBitmapData("assets/coin.png");
-		var stAtlas:String = Assets.getText("assets/coin.atlas");
-		var binaryData:Bytes = Assets.getBytes("assets/coin-pro.skel");
-		var jsonData:String = Assets.getText("assets/coin-pro.json");
+		var stAtlas = Assets.getText("assets/coin.atlas");
+		var binaryData = Assets.getBytes("assets/coin-pro.skel");
+		var jsonData = Assets.getText("assets/coin-pro.json");
 
-		var textureAtlas:Texture = Texture.fromBitmapData(textureAtlasBitmapData);
-		var textureloader:StarlingTextureLoader = new StarlingTextureLoader(textureAtlas);
-		var atlas:Atlas = new Atlas(stAtlas, textureloader);
+		var textureAtlas = Texture.fromBitmapData(textureAtlasBitmapData);
+		var textureloader = new StarlingTextureLoader(textureAtlas);
+		var atlas = new TextureAtlas(stAtlas, textureloader);
 
 		var skeletondata:SkeletonData;
 		if (loadBinary) {

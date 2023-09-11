@@ -22,7 +22,6 @@ class Skeleton {
 	private var _skin:Skin;
 
 	public var color:Color = new Color(1, 1, 1, 1);
-	public var time:Float = 0;
 	public var scaleX:Float = 1;
 	public var scaleY:Float = 1;
 	public var x:Float = 0;
@@ -558,10 +557,6 @@ class Skeleton {
 		return null;
 	}
 
-	public function update(delta:Float):Void {
-		time += delta;
-	}
-
 	public function toString():String {
 		return _data.name != null ? _data.name : "Skeleton?";
 	}
@@ -583,7 +578,7 @@ class Skeleton {
 				verticesLength = 8;
 				temp.length = verticesLength;
 				vertices = temp;
-				cast(attachment, RegionAttachment).computeWorldVertices(slot.bone, vertices, 0, 2);
+				cast(attachment, RegionAttachment).computeWorldVertices(slot, vertices, 0, 2);
 			} else if (Std.isOfType(attachment, MeshAttachment)) {
 				var mesh:MeshAttachment = cast(attachment, MeshAttachment);
 				verticesLength = mesh.worldVerticesLength;

@@ -4,7 +4,7 @@ import openfl.Vector;
 import spine.Bone;
 import spine.Color;
 
-class RegionAttachment extends Attachment {
+class RegionAttachment extends Attachment implements HasTextureRegion {
 	public static inline var BLX:Int = 0;
 	public static inline var BLY:Int = 1;
 	public static inline var ULX:Int = 2;
@@ -24,49 +24,79 @@ class RegionAttachment extends Attachment {
 	public var color:Color = new Color(1, 1, 1, 1);
 	public var path:String;
 	public var rendererObject:Dynamic;
-	public var regionOffsetX:Float = 0; // Pixels stripped from the bottom left, unrotated.
-	public var regionOffsetY:Float = 0;
-	public var regionWidth:Float = 0; // Unrotated, stripped size.
-	public var regionHeight:Float = 0;
-	public var regionOriginalWidth:Float = 0; // Unrotated, unstripped size.
-	public var regionOriginalHeight:Float = 0;
+	public var region:TextureRegion;
+	public var sequence:Sequence;
 
 	private var offsets:Vector<Float> = new Vector<Float>(8, true);
 
 	public var uvs:Vector<Float> = new Vector<Float>(8, true);
 
-	public function new(name:String) {
+	public function new(name:String, path:String) {
 		super(name);
+		this.path = path;
 	}
 
-	public function updateOffset():Void {
-		var regionScaleX:Float = width / regionOriginalWidth * scaleX;
-		var regionScaleY:Float = height / regionOriginalHeight * scaleY;
-		var localX:Float = -width * 0.5 * scaleX + regionOffsetX * regionScaleX;
-		var localY:Float = -height * 0.5 * scaleY + regionOffsetY * regionScaleY;
-		var localX2:Float = localX + regionWidth * regionScaleX;
-		var localY2:Float = localY + regionHeight * regionScaleY;
+	public function updateRegion():Void {
+		if (region == null) {
+			trace("Region not set.");
+			uvs[0] = 0;
+			uvs[1] = 0;
+			uvs[2] = 0;
+			uvs[3] = 1;
+			uvs[4] = 1;
+			uvs[5] = 1;
+			uvs[6] = 1;
+			uvs[7] = 0;
+			return;
+		}
 
-		var radians:Float = rotation * MathUtils.degRad;
-		var cos:Float = Math.cos(radians);
-		var sin:Float = Math.sin(radians);
-		var localXCos:Float = localX * cos + x;
-		var localXSin:Float = localX * sin;
-		var localYCos:Float = localY * cos + y;
-		var localYSin:Float = localY * sin;
-		var localX2Cos:Float = localX2 * cos + x;
-		var localX2Sin:Float = localX2 * sin;
-		var localY2Cos:Float = localY2 * cos + y;
-		var localY2Sin:Float = localY2 * sin;
+		var regionScaleX = width / region.originalWidth * scaleX;
+		var regionScaleY = height / region.originalHeight * scaleY;
+		var localX = -width / 2 * scaleX + region.offsetX * regionScaleX;
+		var localY = -height / 2 * scaleY + region.offsetY * regionScaleY;
+		var localX2 = localX + region.width * regionScaleX;
+		var localY2 = localY + region.height * regionScaleY;
+		var radians = rotation * Math.PI / 180;
+		var cos = Math.cos(radians);
+		var sin = Math.sin(radians);
+		var x = this.x, y = this.y;
+		var localXCos = localX * cos + x;
+		var localXSin = localX * sin;
+		var localYCos = localY * cos + y;
+		var localYSin = localY * sin;
+		var localX2Cos = localX2 * cos + x;
+		var localX2Sin = localX2 * sin;
+		var localY2Cos = localY2 * cos + y;
+		var localY2Sin = localY2 * sin;
 
-		offsets[BLX] = localXCos - localYSin;
-		offsets[BLY] = localYCos + localXSin;
-		offsets[ULX] = localXCos - localY2Sin;
-		offsets[ULY] = localY2Cos + localXSin;
-		offsets[URX] = localX2Cos - localY2Sin;
-		offsets[URY] = localY2Cos + localX2Sin;
-		offsets[BRX] = localX2Cos - localYSin;
-		offsets[BRY] = localYCos + localX2Sin;
+		offsets[0] = localXCos - localYSin;
+		offsets[1] = localYCos + localXSin;
+		offsets[2] = localXCos - localY2Sin;
+		offsets[3] = localY2Cos + localXSin;
+		offsets[4] = localX2Cos - localY2Sin;
+		offsets[5] = localY2Cos + localX2Sin;
+		offsets[6] = localX2Cos - localYSin;
+		offsets[7] = localYCos + localX2Sin;
+
+		if (region.degrees == 90) {
+			uvs[0] = region.u2;
+			uvs[1] = region.v2;
+			uvs[2] = region.u;
+			uvs[3] = region.v2;
+			uvs[4] = region.u;
+			uvs[5] = region.v;
+			uvs[6] = region.u2;
+			uvs[7] = region.v;
+		} else {
+			uvs[0] = region.u;
+			uvs[1] = region.v2;
+			uvs[2] = region.u;
+			uvs[3] = region.v;
+			uvs[4] = region.u2;
+			uvs[5] = region.v;
+			uvs[6] = region.u2;
+			uvs[7] = region.v2;
+		}
 	}
 
 	public function setUVs(u:Float, v:Float, u2:Float, v2:Float, degrees:Int):Void {
@@ -91,48 +121,44 @@ class RegionAttachment extends Attachment {
 		}
 	}
 
-	public function computeWorldVertices(bone:Bone, worldVertices:Vector<Float>, offset:Int, stride:Int):Void {
-		var x:Float = bone.worldX, y:Float = bone.worldY;
-		var a:Float = bone.a,
-			b:Float = bone.b,
-			c:Float = bone.c,
-			d:Float = bone.d;
+	public function computeWorldVertices(slot:Slot, worldVertices:Vector<Float>, offset:Int, stride:Int):Void {
+		if (sequence != null)
+			sequence.apply(slot, this);
+
+		var bone = slot.bone;
+		var vertexOffset = this.offsets;
+		var x = bone.worldX, y = bone.worldY;
+		var a = bone.a, b = bone.b, c = bone.c, d = bone.d;
 		var offsetX:Float = 0, offsetY:Float = 0;
 
-		offsetX = offsets[BRX];
-		offsetY = offsets[BRY];
+		offsetX = vertexOffset[0];
+		offsetY = vertexOffset[1];
 		worldVertices[offset] = offsetX * a + offsetY * b + x; // br
 		worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
 		offset += stride;
 
-		offsetX = offsets[BLX];
-		offsetY = offsets[BLY];
+		offsetX = vertexOffset[2];
+		offsetY = vertexOffset[3];
 		worldVertices[offset] = offsetX * a + offsetY * b + x; // bl
 		worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
 		offset += stride;
 
-		offsetX = offsets[ULX];
-		offsetY = offsets[ULY];
+		offsetX = vertexOffset[4];
+		offsetY = vertexOffset[5];
 		worldVertices[offset] = offsetX * a + offsetY * b + x; // ul
 		worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
 		offset += stride;
 
-		offsetX = offsets[URX];
-		offsetY = offsets[URY];
+		offsetX = vertexOffset[6];
+		offsetY = vertexOffset[7];
 		worldVertices[offset] = offsetX * a + offsetY * b + x; // ur
 		worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
 	}
 
 	override public function copy():Attachment {
-		var copy:RegionAttachment = new RegionAttachment(name);
-		copy.regionWidth = regionWidth;
-		copy.regionHeight = regionHeight;
-		copy.regionOffsetX = regionOffsetX;
-		copy.regionOffsetY = regionOffsetY;
-		copy.regionOriginalWidth = regionOriginalWidth;
-		copy.regionOriginalHeight = regionOriginalHeight;
+		var copy:RegionAttachment = new RegionAttachment(name, path);
+		copy.region = region;
 		copy.rendererObject = rendererObject;
-		copy.path = path;
 		copy.x = x;
 		copy.y = y;
 		copy.scaleX = scaleX;
@@ -143,6 +169,7 @@ class RegionAttachment extends Attachment {
 		copy.uvs = uvs.concat();
 		copy.offsets = offsets.concat();
 		copy.color.setFromColor(color);
+		copy.sequence = sequence != null ? sequence.copy() : null;
 		return copy;
 	}
 }
