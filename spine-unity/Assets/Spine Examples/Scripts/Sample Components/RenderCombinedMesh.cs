@@ -31,6 +31,10 @@
 #define NEW_PREFAB_SYSTEM
 #endif
 
+#if UNITY_2019_3_OR_NEWER
+#define SET_VERTICES_HAS_LENGTH_PARAMETER
+#endif
+
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -230,10 +234,26 @@ namespace Spine.Unity.Examples {
 			}
 
 			Mesh combinedMesh = doubleBufferedMesh.GetNext();
+#if SET_VERTICES_HAS_LENGTH_PARAMETER
 			combinedMesh.SetVertices(this.positionBuffer.Items, 0, this.positionBuffer.Count);
 			combinedMesh.SetUVs(0, this.uvBuffer.Items, 0, this.uvBuffer.Count);
 			combinedMesh.SetColors(this.colorBuffer.Items, 0, this.colorBuffer.Count);
 			combinedMesh.SetTriangles(this.indexBuffer.Items, 0, this.indexBuffer.Count, 0);
+#else
+			// fill excess with zero positions
+			{
+				int listCount = this.positionBuffer.Count;
+				Vector3[] positionArray = this.positionBuffer.Items;
+				int arrayLength = positionArray.Length;
+				Vector3 vector3zero = Vector3.zero;
+				for (int i = listCount; i < arrayLength; i++)
+					positionArray[i] = vector3zero;
+			}
+			combinedMesh.vertices = this.positionBuffer.Items;
+			combinedMesh.uv = this.uvBuffer.Items;
+			combinedMesh.colors32 = this.colorBuffer.Items;
+			combinedMesh.triangles = this.indexBuffer.Items;
+#endif
 			ownMeshFilter.sharedMesh = combinedMesh;
 		}
 
