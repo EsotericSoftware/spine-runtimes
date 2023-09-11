@@ -297,10 +297,9 @@ export class SpineGameObject extends DepthMixin(
 	}
 
 	willRender (camera: Phaser.Cameras.Scene2D.Camera) {
-		if (!this.visible) return false;
-
 		var GameObjectRenderMask = 0xf;
 		var result = !this.skeleton || !(GameObjectRenderMask !== this.renderFlags || (this.cameraFilter !== 0 && this.cameraFilter & camera.id));
+		if (!this.visible) result = false;
 
 		if (!result && this.parentContainer && this.plugin.webGLRenderer) {
 			var sceneRenderer = this.plugin.webGLRenderer;

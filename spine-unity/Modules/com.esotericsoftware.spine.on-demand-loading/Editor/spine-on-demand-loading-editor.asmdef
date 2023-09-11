@@ -1,0 +1,20 @@
+{
+    "name": "spine-on-demand-loading-editor",
+    "rootNamespace": "",
+    "references": [
+        "spine-unity",
+        "spine-unity-editor",
+        "spine-on-demand-loading"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

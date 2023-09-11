@@ -49,6 +49,7 @@
 
 #define SPINE_OPTIONAL_RENDEROVERRIDE
 #define SPINE_OPTIONAL_MATERIALOVERRIDE
+#define SPINE_OPTIONAL_ON_DEMAND_LOADING
 
 using System.Collections.Generic;
 using UnityEngine;
@@ -565,6 +566,10 @@ namespace Spine.Unity {
 				AssignSpriteMaskMaterials();
 			}
 #endif
+#if SPINE_OPTIONAL_ON_DEMAND_LOADING
+			if (Application.isPlaying)
+				HandleOnDemandLoading();
+#endif
 
 #if PER_MATERIAL_PROPERTY_BLOCKS
 			if (fixDrawOrder && meshRenderer.sharedMaterials.Length > 2) {
@@ -742,6 +747,23 @@ namespace Spine.Unity {
 #endif // UNITY_EDITOR
 
 #endif //#if BUILT_IN_SPRITE_MASK_COMPONENT
+
+#if SPINE_OPTIONAL_ON_DEMAND_LOADING
+		void HandleOnDemandLoading () {
+			foreach (AtlasAssetBase atlasAsset in skeletonDataAsset.atlasAssets) {
+				if (atlasAsset.TextureLoadingMode != AtlasAssetBase.LoadingMode.Normal) {
+					atlasAsset.BeginCustomTextureLoading();
+					for (int i = 0, count = meshRenderer.sharedMaterials.Length; i < count; ++i) {
+						Material overrideMaterial = null;
+						atlasAsset.RequireTexturesLoaded(meshRenderer.sharedMaterials[i], ref overrideMaterial);
+						if (overrideMaterial != null)
+							meshRenderer.sharedMaterials[i] = overrideMaterial;
+					}
+					atlasAsset.EndCustomTextureLoading();
+				}
+			}
+		}
+#endif
 
 #if PER_MATERIAL_PROPERTY_BLOCKS
 		private MaterialPropertyBlock reusedPropertyBlock;

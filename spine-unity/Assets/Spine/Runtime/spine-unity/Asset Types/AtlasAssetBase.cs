@@ -27,6 +27,8 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#define SPINE_OPTIONAL_ON_DEMAND_LOADING
+
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -39,5 +41,38 @@ namespace Spine.Unity {
 		public abstract bool IsLoaded { get; }
 		public abstract void Clear ();
 		public abstract Atlas GetAtlas (bool onlyMetaData = false);
+
+#if SPINE_OPTIONAL_ON_DEMAND_LOADING
+		public enum LoadingMode {
+			Normal = 0,
+			OnDemand
+		}
+		public virtual LoadingMode TextureLoadingMode {
+			get { return textureLoadingMode; }
+			set { textureLoadingMode = value; }
+		}
+		public OnDemandTextureLoader OnDemandTextureLoader {
+			get { return onDemandTextureLoader; }
+			set { onDemandTextureLoader = value; }
+		}
+
+		public virtual void BeginCustomTextureLoading () {
+			if (onDemandTextureLoader)
+				onDemandTextureLoader.BeginCustomTextureLoading();
+		}
+
+		public virtual void EndCustomTextureLoading () {
+			if (onDemandTextureLoader)
+				onDemandTextureLoader.EndCustomTextureLoading();
+		}
+
+		public virtual void RequireTexturesLoaded (Material material, ref Material overrideMaterial) {
+			if (onDemandTextureLoader)
+				onDemandTextureLoader.RequestLoadMaterialTextures(material, ref overrideMaterial);
+		}
+
+		[SerializeField] protected LoadingMode textureLoadingMode = LoadingMode.Normal;
+		[SerializeField] protected OnDemandTextureLoader onDemandTextureLoader = null;
+#endif
 	}
 }

@@ -42,7 +42,7 @@ namespace Spine.Unity.Editor {
 
 	[CustomEditor(typeof(SpineAtlasAsset)), CanEditMultipleObjects]
 	public class SpineAtlasAssetInspector : UnityEditor.Editor {
-		SerializedProperty atlasFile, materials;
+		SerializedProperty atlasFile, materials, textureLoadingMode, onDemandTextureLoader;
 		SpineAtlasAsset atlasAsset;
 
 		GUIContent spriteSlicesLabel;
@@ -70,6 +70,8 @@ namespace Spine.Unity.Editor {
 			SpineEditorUtilities.ConfirmInitialization();
 			atlasFile = serializedObject.FindProperty("atlasFile");
 			materials = serializedObject.FindProperty("materials");
+			textureLoadingMode = serializedObject.FindProperty("textureLoadingMode");
+			onDemandTextureLoader = serializedObject.FindProperty("onDemandTextureLoader");
 			materials.isExpanded = true;
 			atlasAsset = (SpineAtlasAsset)target;
 #if REGION_BAKING_MESH
@@ -130,6 +132,12 @@ namespace Spine.Unity.Editor {
 					EditorGUILayout.HelpBox("Materials cannot be null.", MessageType.Error);
 					return;
 				}
+			}
+
+			if (textureLoadingMode != null) {
+				EditorGUILayout.Space();
+				EditorGUILayout.PropertyField(textureLoadingMode);
+				EditorGUILayout.PropertyField(onDemandTextureLoader);
 			}
 
 			EditorGUILayout.Space();

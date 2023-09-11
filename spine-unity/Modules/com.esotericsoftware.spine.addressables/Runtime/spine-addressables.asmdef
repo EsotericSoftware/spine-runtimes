@@ -1,0 +1,20 @@
+{
+    "name": "spine-addressables",
+    "rootNamespace": "",
+    "references": [
+        "spine-unity",
+        "spine-csharp",
+        "spine-on-demand-loading",
+        "Unity.Addressables",
+        "Unity.ResourceManager"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
