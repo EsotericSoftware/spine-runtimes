@@ -162,6 +162,8 @@ namespace Spine.Unity.Editor {
 		}
 
 		public static void DrawBoneNames (Transform transform, Skeleton skeleton, float positionScale = 1f) {
+			if (UnityEngine.Event.current.type != EventType.Repaint) return;
+
 			GUIStyle style = BoneNameStyle;
 			foreach (Bone b in skeleton.Bones) {
 				if (!b.Active) continue;
@@ -172,6 +174,8 @@ namespace Spine.Unity.Editor {
 		}
 
 		public static void DrawBones (Transform transform, Skeleton skeleton, float positionScale = 1f) {
+			if (UnityEngine.Event.current.type != EventType.Repaint) return;
+
 			float boneScale = 1.8f; // Draw the root bone largest;
 			DrawCrosshairs2D(skeleton.Bones.Items[0].GetWorldPosition(transform), 0.08f, positionScale);
 
@@ -191,6 +195,8 @@ namespace Spine.Unity.Editor {
 			return _boneWireBuffer;
 		}
 		public static void DrawBoneWireframe (Transform transform, Bone b, Color color, float skeletonRenderScale = 1f) {
+			if (UnityEngine.Event.current.type != EventType.Repaint) return;
+
 			Handles.color = color;
 			Vector3 pos = new Vector3(b.WorldX * skeletonRenderScale, b.WorldY * skeletonRenderScale, 0);
 			float length = b.Data.Length;
@@ -211,6 +217,8 @@ namespace Spine.Unity.Editor {
 		}
 
 		public static void DrawBone (Transform transform, Bone b, float boneScale, float skeletonRenderScale = 1f) {
+			if (UnityEngine.Event.current.type != EventType.Repaint) return;
+
 			Vector3 pos = new Vector3(b.WorldX * skeletonRenderScale, b.WorldY * skeletonRenderScale, 0);
 			float length = b.Data.Length;
 			if (length > 0) {
@@ -228,6 +236,8 @@ namespace Spine.Unity.Editor {
 		}
 
 		public static void DrawBone (Transform transform, Bone b, float boneScale, Color color, float skeletonRenderScale = 1f) {
+			if (UnityEngine.Event.current.type != EventType.Repaint) return;
+
 			Vector3 pos = new Vector3(b.WorldX * skeletonRenderScale, b.WorldY * skeletonRenderScale, 0);
 			float length = b.Data.Length;
 			if (length > 0) {
@@ -245,6 +255,8 @@ namespace Spine.Unity.Editor {
 		}
 
 		public static void DrawPaths (Transform transform, Skeleton skeleton) {
+			if (UnityEngine.Event.current.type != EventType.Repaint) return;
+
 			foreach (Slot s in skeleton.DrawOrder) {
 				PathAttachment p = s.Attachment as PathAttachment;
 				if (p != null) SpineHandles.DrawPath(s, p, transform, true);
@@ -253,6 +265,8 @@ namespace Spine.Unity.Editor {
 
 		static float[] pathVertexBuffer;
 		public static void DrawPath (Slot s, PathAttachment p, Transform t, bool includeName) {
+			if (UnityEngine.Event.current.type != EventType.Repaint) return;
+
 			int worldVerticesLength = p.WorldVerticesLength;
 
 			if (pathVertexBuffer == null || pathVertexBuffer.Length < worldVerticesLength)
@@ -296,10 +310,14 @@ namespace Spine.Unity.Editor {
 		}
 
 		public static void DrawDot (Vector3 position, float size) {
+			if (UnityEngine.Event.current.type != EventType.Repaint) return;
+
 			Handles.DotHandleCap(0, position, Quaternion.identity, size * HandleUtility.GetHandleSize(position), EventType.Ignore); //Handles.DotCap(0, position, Quaternion.identity, size * HandleUtility.GetHandleSize(position));
 		}
 
 		public static void DrawBoundingBoxes (Transform transform, Skeleton skeleton) {
+			if (UnityEngine.Event.current.type != EventType.Repaint) return;
+
 			foreach (Slot slot in skeleton.Slots) {
 				BoundingBoxAttachment bba = slot.Attachment as BoundingBoxAttachment;
 				if (bba != null) SpineHandles.DrawBoundingBox(slot, bba, transform);
@@ -307,6 +325,8 @@ namespace Spine.Unity.Editor {
 		}
 
 		public static void DrawBoundingBox (Slot slot, BoundingBoxAttachment box, Transform t) {
+			if (UnityEngine.Event.current.type != EventType.Repaint) return;
+
 			if (box.Vertices.Length <= 2) return; // Handle cases where user creates a BoundingBoxAttachment but doesn't actually define it.
 
 			float[] worldVerts = new float[box.WorldVerticesLength];
@@ -333,6 +353,8 @@ namespace Spine.Unity.Editor {
 		}
 
 		public static void DrawPointAttachment (Bone bone, PointAttachment pointAttachment, Transform skeletonTransform) {
+			if (UnityEngine.Event.current.type != EventType.Repaint) return;
+
 			if (bone == null) return;
 			if (pointAttachment == null) return;
 
@@ -346,6 +368,8 @@ namespace Spine.Unity.Editor {
 		}
 
 		public static void DrawConstraints (Transform transform, Skeleton skeleton, float skeletonRenderScale = 1f) {
+			if (UnityEngine.Event.current.type != EventType.Repaint) return;
+
 			Vector3 targetPos;
 			Vector3 pos;
 			bool active;
@@ -425,6 +449,8 @@ namespace Spine.Unity.Editor {
 		}
 
 		public static void DrawReferenceRect (SkeletonGraphic skeletonGraphic, Color color) {
+			if (UnityEngine.Event.current.type != EventType.Repaint) return;
+
 			RectTransform rectTransform = skeletonGraphic.rectTransform;
 			Vector2 referenceRectSize = skeletonGraphic.GetReferenceRectSize();
 			Vector3 position = rectTransform.position;
@@ -436,6 +462,8 @@ namespace Spine.Unity.Editor {
 		}
 
 		public static void DrawRectTransformRect (SkeletonGraphic skeletonGraphic, Color color) {
+			if (UnityEngine.Event.current.type != EventType.Repaint) return;
+
 			RectTransform rectTransform = skeletonGraphic.rectTransform;
 			Vector2 rectTransformSize = skeletonGraphic.RectTransformSize;
 			Vector3 position = rectTransform.position;
@@ -447,6 +475,8 @@ namespace Spine.Unity.Editor {
 		}
 
 		public static void DrawRect (Vector3 cornerVertexBL, Vector3 right, Vector3 up, Color color) {
+			if (UnityEngine.Event.current.type != EventType.Repaint) return;
+
 			Vector3 v0 = cornerVertexBL;
 			Vector3 v1 = v0 + right;
 			Vector3 v2 = v0 + right + up;
@@ -461,12 +491,16 @@ namespace Spine.Unity.Editor {
 		}
 
 		static void DrawCrosshairs2D (Vector3 position, float scale, float skeletonRenderScale = 1f) {
+			if (UnityEngine.Event.current.type != EventType.Repaint) return;
+
 			scale *= SpineEditorUtilities.Preferences.handleScale * skeletonRenderScale;
 			Handles.DrawLine(position + new Vector3(-scale, 0), position + new Vector3(scale, 0));
 			Handles.DrawLine(position + new Vector3(0, -scale), position + new Vector3(0, scale));
 		}
 
 		static void DrawCrosshairs (Vector3 position, float scale, float a, float b, float c, float d, Transform transform, float skeletonRenderScale = 1f) {
+			if (UnityEngine.Event.current.type != EventType.Repaint) return;
+
 			scale *= SpineEditorUtilities.Preferences.handleScale * skeletonRenderScale;
 
 			Vector3 xOffset = (Vector3)(new Vector2(a, c).normalized * scale);
@@ -479,6 +513,8 @@ namespace Spine.Unity.Editor {
 		}
 
 		static void DrawArrowhead2D (Vector3 pos, float localRotation, float scale = 1f) {
+			if (UnityEngine.Event.current.type != EventType.Repaint) return;
+
 			scale *= SpineEditorUtilities.Preferences.handleScale;
 
 			SpineHandles.IKMaterial.SetPass(0);
@@ -486,10 +522,14 @@ namespace Spine.Unity.Editor {
 		}
 
 		static void DrawArrowhead (Vector3 pos, Quaternion worldQuaternion) {
+			if (UnityEngine.Event.current.type != EventType.Repaint) return;
+
 			Graphics.DrawMeshNow(SpineHandles.ArrowheadMesh, pos, worldQuaternion, 0);
 		}
 
 		static void DrawArrowhead (Matrix4x4 m) {
+			if (UnityEngine.Event.current.type != EventType.Repaint) return;
+
 			float s = SpineEditorUtilities.Preferences.handleScale;
 			m.m00 *= s;
 			m.m01 *= s;
@@ -506,6 +546,8 @@ namespace Spine.Unity.Editor {
 		}
 
 		static void DrawBoneCircle (Vector3 pos, Color outlineColor, Vector3 normal, float scale = 1f) {
+			if (UnityEngine.Event.current.type != EventType.Repaint) return;
+
 			scale *= SpineEditorUtilities.Preferences.handleScale;
 
 			Color o = Handles.color;
@@ -524,6 +566,8 @@ namespace Spine.Unity.Editor {
 		}
 
 		internal static void DrawCubicBezier (Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3) {
+			if (UnityEngine.Event.current.type != EventType.Repaint) return;
+
 			Handles.DrawBezier(p0, p3, p1, p2, Handles.color, Texture2D.whiteTexture, 2f);
 			//			const float dotSize = 0.01f;
 			//			Quaternion q = Quaternion.identity;
