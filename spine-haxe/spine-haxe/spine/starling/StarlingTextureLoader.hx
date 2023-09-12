@@ -61,20 +61,6 @@ class StarlingTextureLoader implements TextureLoader {
 	}
 
 	public function loadRegion(region:TextureAtlasRegion):Void {
-		// FIXME rotation shouldn't be implemented like this
-		/*var image:Image = new Image(cast(region.page.texture, Texture));
-			if (region.degrees == 90) {
-				image.setTexCoords(0, region.u, region.v2);
-				image.setTexCoords(1, region.u, region.v);
-				image.setTexCoords(2, region.u2, region.v2);
-				image.setTexCoords(3, region.u2, region.v);
-			} else {
-				image.setTexCoords(0, region.u, region.v);
-				image.setTexCoords(1, region.u2, region.v);
-				image.setTexCoords(2, region.u, region.v2);
-				image.setTexCoords(3, region.u2, region.v2);
-			}
-			region.texture = image; */
 		region.texture = region.page.texture;
 	}
 
