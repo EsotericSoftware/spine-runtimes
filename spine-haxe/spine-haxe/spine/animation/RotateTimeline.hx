@@ -6,7 +6,7 @@ import spine.Event;
 import spine.Skeleton;
 
 class RotateTimeline extends CurveTimeline1 implements BoneTimeline {
-	private var boneIndex:Int = 0;
+	public var boneIndex:Int = 0;
 
 	public function new(frameCount:Int, bezierCount:Int, boneIndex:Int) {
 		super(frameCount, bezierCount, Vector.ofArray([Property.rotate + "|" + boneIndex]));

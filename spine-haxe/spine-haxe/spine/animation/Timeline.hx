@@ -26,7 +26,7 @@ class Timeline {
 	}
 
 	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Vector<Event>, alpha:Float, blend:MixBlend, direction:MixDirection):Void {
-		trace("Timeline implementations must override apply()");
+		throw new SpineException("Timeline implementations must override apply()");
 	}
 
 	public static function search1(frames:Vector<Float>, time:Float):Int {

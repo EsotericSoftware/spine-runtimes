@@ -27,7 +27,7 @@ class MeshAttachment extends VertexAttachment implements HasTextureRegion {
 
 	public function updateRegion():Void {
 		if (region == null) {
-			trace("Region not set.");
+			throw new SpineException("Region not set.");
 			return;
 		}
 		var regionUVs = this.regionUVs;
@@ -91,6 +91,7 @@ class MeshAttachment extends VertexAttachment implements HasTextureRegion {
 		while (i < n) {
 			uvs[i] = u + regionUVs[i] * width;
 			uvs[i + 1] = v + regionUVs[i + 1] * height;
+			i += 2;
 		}
 	}
 

@@ -26,5 +26,7 @@ class Property {
 	public static inline var pathConstraintSpacing:Int = 17;
 	public static inline var pathConstraintMix:Int = 18;
 
+	public static inline var sequence:Int = 19;
+
 	public function new() {}
 }

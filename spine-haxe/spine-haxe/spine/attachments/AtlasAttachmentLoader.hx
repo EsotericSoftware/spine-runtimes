@@ -20,49 +20,34 @@ class AtlasAttachmentLoader implements AttachmentLoader {
 			var path = sequence.getPath(basePath, i);
 			var region = this.atlas.findRegion(path);
 			if (region == null)
-				trace("Region not found in atlas: " + path + " (sequence: " + name + ")");
+				throw new SpineException("Region not found in atlas: " + path + " (sequence: " + name + ")");
 			regions[i] = region;
 		}
 	}
 
-	public function newRegionAttachment(skin:Skin, name:String, path:String):RegionAttachment {
-		var region = atlas.findRegion(path);
-		if (region == null) {
-			trace("Region not found in atlas: " + path + " (region attachment: " + name + ")");
-			return null;
+	public function newRegionAttachment(skin:Skin, name:String, path:String, sequence:Sequence):RegionAttachment {
+		var attachment = new RegionAttachment(name, path);
+		if (sequence != null) {
+			this.loadSequence(name, path, sequence);
+		} else {
+			var region = this.atlas.findRegion(path);
+			if (region == null)
+				throw new SpineException("Region not found in atlas: " + path + " (region attachment: " + name + ")");
+			attachment.region = region;
 		}
-		var attachment:RegionAttachment = new RegionAttachment(name);
-		attachment.rendererObject = region;
-		attachment.setUVs(region.u, region.v, region.u2, region.v2, region.degrees);
-		attachment.regionOffsetX = region.offsetX;
-		attachment.regionOffsetY = region.offsetY;
-		attachment.regionWidth = region.width;
-		attachment.regionHeight = region.height;
-		attachment.regionOriginalWidth = region.originalWidth;
-		attachment.regionOriginalHeight = region.originalHeight;
 		return attachment;
 	}
 
-	public function newMeshAttachment(skin:Skin, name:String, path:String):MeshAttachment {
-		var region = atlas.findRegion(path);
-		if (region == null) {
-			trace("Region not found in atlas: " + path + " (mesh attachment: " + name + ")");
-			return null;
+	public function newMeshAttachment(skin:Skin, name:String, path:String, sequence:Sequence):MeshAttachment {
+		var attachment = new MeshAttachment(name, path);
+		if (sequence != null) {
+			this.loadSequence(name, path, sequence);
+		} else {
+			var region = atlas.findRegion(path);
+			if (region == null)
+				throw new SpineException("Region not found in atlas: " + path + " (mesh attachment: " + name + ")");
+			attachment.region = region;
 		}
-
-		var attachment:MeshAttachment = new MeshAttachment(name);
-		attachment.rendererObject = region;
-		attachment.regionU = region.u;
-		attachment.regionV = region.v;
-		attachment.regionU2 = region.u2;
-		attachment.regionV2 = region.v2;
-		attachment.regionDegrees = region.degrees;
-		attachment.regionOffsetX = region.offsetX;
-		attachment.regionOffsetY = region.offsetY;
-		attachment.regionWidth = region.width;
-		attachment.regionHeight = region.height;
-		attachment.regionOriginalWidth = region.originalWidth;
-		attachment.regionOriginalHeight = region.originalHeight;
 		return attachment;
 	}
 
@@ -80,15 +65,5 @@ class AtlasAttachmentLoader implements AttachmentLoader {
 
 	public function newClippingAttachment(skin:Skin, name:String):ClippingAttachment {
 		return new ClippingAttachment(name);
-	}
-
-	static public function nextPOT(value:Int):Int {
-		value--;
-		value |= value >> 1;
-		value |= value >> 2;
-		value |= value >> 4;
-		value |= value >> 8;
-		value |= value >> 16;
-		return value + 1;
 	}
 }

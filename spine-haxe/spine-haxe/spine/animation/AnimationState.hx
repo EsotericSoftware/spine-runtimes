@@ -181,14 +181,22 @@ class AnimationState {
 			} else {
 				var timelineMode:Vector<Int> = current.timelineMode;
 
-				var firstFrame:Bool = current.timelinesRotation.length == 0;
+				var shortestRotation = current.shortestRotation;
+				var firstFrame:Bool = !shortestRotation && current.timelinesRotation.length != timelineCount << 1;
 				if (firstFrame)
 					current.timelinesRotation.length = timelineCount << 1;
 
 				for (ii in 0...timelineCount) {
 					var timeline:Timeline = timelines[ii];
 					var timelineBlend:MixBlend = timelineMode[ii] == SUBSEQUENT ? blend : MixBlend.setup;
-					timeline.apply(skeleton, animationLast, applyTime, applyEvents, mix, timelineBlend, MixDirection.mixIn);
+					if (!shortestRotation && Std.isOfType(timeline, RotateTimeline)) {
+						this.applyRotateTimeline(cast(timeline, RotateTimeline), skeleton, applyTime, mix, timelineBlend, current.timelinesRotation, ii << 1,
+							firstFrame);
+					} else if (Std.isOfType(timeline, AttachmentTimeline)) {
+						this.applyAttachmentTimeline(cast(timeline, AttachmentTimeline), skeleton, applyTime, blend, true);
+					} else {
+						timeline.apply(skeleton, animationLast, applyTime, applyEvents, mix, timelineBlend, MixDirection.mixIn);
+					}
 				}
 			}
 			queueEvents(current, animationTime);
@@ -255,8 +263,9 @@ class AnimationState {
 		} else {
 			var timelineMode:Vector<Int> = from.timelineMode;
 			var timelineHoldMix:Vector<TrackEntry> = from.timelineHoldMix;
+			var shortestRotation = from.shortestRotation;
 
-			var firstFrame:Bool = from.timelinesRotation.length != timelineCount << 1;
+			var firstFrame:Bool = !shortestRotation && from.timelinesRotation.length != timelineCount << 1;
 			if (firstFrame)
 				from.timelinesRotation.length = timelineCount << 1;
 			var timelinesRotation:Vector<Float> = from.timelinesRotation;
@@ -290,9 +299,15 @@ class AnimationState {
 
 				from.totalAlpha += alpha;
 
-				if (drawOrder && Std.isOfType(timeline, DrawOrderTimeline) && timelineBlend == MixBlend.setup)
-					direction = MixDirection.mixIn;
-				timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, timelineBlend, direction);
+				if (!shortestRotation && Std.isOfType(timeline, RotateTimeline)) {
+					applyRotateTimeline(cast(timeline, RotateTimeline), skeleton, applyTime, alpha, timelineBlend, from.timelinesRotation, i << 1, firstFrame);
+				} else if (Std.isOfType(timeline, AttachmentTimeline)) {
+					applyAttachmentTimeline(cast(timeline, AttachmentTimeline), skeleton, applyTime, timelineBlend, attachments);
+				} else {
+					if (drawOrder && Std.isOfType(timeline, DrawOrderTimeline) && timelineBlend == MixBlend.setup)
+						direction = MixDirection.mixIn;
+					timeline.apply(skeleton, animationLast, applyTime, events, alpha, timelineBlend, direction);
+				}
 			}
 		}
 
@@ -303,6 +318,83 @@ class AnimationState {
 		from.nextTrackLast = from.trackTime;
 
 		return mix;
+	}
+
+	public function applyAttachmentTimeline(timeline:AttachmentTimeline, skeleton:Skeleton, time:Float, blend:MixBlend, attachments:Bool) {
+		var slot = skeleton.slots[timeline.slotIndex];
+		if (!slot.bone.active)
+			return;
+
+		if (time < timeline.frames[0]) { // Time is before first frame.
+			if (blend == MixBlend.setup || blend == MixBlend.first)
+				this.setAttachment(skeleton, slot, slot.data.attachmentName, attachments);
+		} else
+			this.setAttachment(skeleton, slot, timeline.attachmentNames[Timeline.search1(timeline.frames, time)], attachments);
+
+		// If an attachment wasn't set (ie before the first frame or attachments is false), set the setup attachment later.
+		if (slot.attachmentState <= this.unkeyedState)
+			slot.attachmentState = this.unkeyedState + SETUP;
+	}
+
+	public function applyRotateTimeline(timeline:RotateTimeline, skeleton:Skeleton, time:Float, alpha:Float, blend:MixBlend, timelinesRotation:Vector<Float>,
+			i:Int, firstFrame:Bool) {
+		if (firstFrame)
+			timelinesRotation[i] = 0;
+
+		if (alpha == 1) {
+			timeline.apply(skeleton, 0, time, null, 1, blend, MixDirection.mixIn);
+			return;
+		}
+
+		var bone = skeleton.bones[timeline.boneIndex];
+		if (!bone.active)
+			return;
+		var frames = timeline.frames;
+		var r1:Float = 0, r2:Float = 0;
+		if (time < frames[0]) {
+			switch (blend) {
+				case MixBlend.setup:
+					bone.rotation = bone.data.rotation;
+				default:
+					return;
+				case MixBlend.first:
+					r1 = bone.rotation;
+					r2 = bone.data.rotation;
+			}
+		} else {
+			r1 = blend == MixBlend.setup ? bone.data.rotation : bone.rotation;
+			r2 = bone.data.rotation + timeline.getCurveValue(time);
+		}
+
+		// Mix between rotations using the direction of the shortest route on the first frame while detecting crosses.
+		var total:Float = 0, diff:Float = r2 - r1;
+		diff -= (16384.0 - Std.int((16384.499999999996 - diff / 360.0))) * 360.0;
+		if (diff == 0) {
+			total = timelinesRotation[i];
+		} else {
+			var lastTotal:Float = 0, lastDiff:Float = 0;
+			if (firstFrame) {
+				lastTotal = 0;
+				lastDiff = diff;
+			} else {
+				lastTotal = timelinesRotation[i]; // Angle and direction of mix, including loops.
+				lastDiff = timelinesRotation[i + 1]; // Difference between bones.
+			}
+			var current = diff > 0, dir = lastTotal >= 0;
+			// Detect cross at 0 (not 180).
+			if (MathUtils.signum(lastDiff) != MathUtils.signum(diff) && Math.abs(lastDiff) <= 90) {
+				// A cross after a 360 rotation is a loop.
+				if (Math.abs(lastTotal) > 180)
+					lastTotal += 360 * MathUtils.signum(lastTotal);
+				dir = current;
+			}
+			total = diff + lastTotal - lastTotal % 360; // Store loops as part of lastTotal.
+			if (dir != current)
+				total += 360 * MathUtils.signum(lastTotal);
+			timelinesRotation[i] = total;
+		}
+		timelinesRotation[i + 1] = diff;
+		bone.rotation = r1 + total * alpha;
 	}
 
 	private function setAttachment(skeleton:Skeleton, slot:Slot, attachmentName:String, attachments:Bool):Void {
@@ -519,6 +611,9 @@ class AnimationState {
 		entry.loop = loop;
 		entry.holdPrevious = false;
 
+		entry.reverse = false;
+		entry.shortestRotation = false;
+
 		entry.eventThreshold = 0;
 		entry.attachmentThreshold = 0;
 		entry.drawOrderThreshold = 0;
@@ -536,9 +631,10 @@ class AnimationState {
 		entry.timeScale = 1;
 
 		entry.alpha = 1;
-		entry.interruptAlpha = 1;
 		entry.mixTime = 0;
 		entry.mixDuration = last == null ? 0 : data.getMix(last.animation, animation);
+		entry.interruptAlpha = 1;
+		entry.totalAlpha = 0;
 		entry.mixBlend = MixBlend.replace;
 		return entry;
 	}

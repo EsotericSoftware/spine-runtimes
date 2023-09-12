@@ -1,5 +1,6 @@
 package spine.starling;
 
+import starling.textures.Texture;
 import starling.utils.Max;
 import openfl.geom.Matrix;
 import openfl.geom.Point;
@@ -80,18 +81,14 @@ class SkeletonSprite extends DisplayObject {
 				verticesCount = verticesLength >> 1;
 				if (worldVertices.length < verticesLength)
 					worldVertices.length = verticesLength;
-				region.computeWorldVertices(slot.bone, worldVertices, 0, 2);
+				region.computeWorldVertices(slot, worldVertices, 0, 2);
 
 				mesh = null;
 				if (Std.isOfType(region.rendererObject, SkeletonMesh)) {
 					mesh = cast(region.rendererObject, SkeletonMesh);
 					indices = QUAD_INDICES;
 				} else {
-					if (Std.isOfType(region.rendererObject, Image)) {
-						region.rendererObject = mesh = new SkeletonMesh(cast(region.rendererObject, Image).texture);
-					} else if (Std.isOfType(region.rendererObject, TextureAtlasRegion)) {
-						region.rendererObject = mesh = new SkeletonMesh(cast(region.rendererObject, TextureAtlasRegion).texture);
-					}
+					mesh = region.rendererObject = new SkeletonMesh(cast(region.region.texture, Texture));
 
 					indexData = mesh.getIndexData();
 					indices = QUAD_INDICES;
@@ -118,11 +115,7 @@ class SkeletonSprite extends DisplayObject {
 					mesh = cast(meshAttachment.rendererObject, SkeletonMesh);
 					indices = meshAttachment.triangles;
 				} else {
-					if (Std.isOfType(meshAttachment.rendererObject, Image)) {
-						meshAttachment.rendererObject = mesh = new SkeletonMesh(cast(meshAttachment.rendererObject, Image).texture);
-					} else if (Std.isOfType(meshAttachment.rendererObject, TextureAtlasRegion)) {
-						meshAttachment.rendererObject = mesh = new SkeletonMesh(cast(meshAttachment.rendererObject, TextureAtlasRegion).texture);
-					}
+					mesh = meshAttachment.rendererObject = new SkeletonMesh(cast(meshAttachment.region.texture, Texture));
 
 					indexData = mesh.getIndexData();
 					indices = meshAttachment.triangles;
@@ -220,7 +213,7 @@ class SkeletonSprite extends DisplayObject {
 			if (Std.isOfType(attachment, RegionAttachment)) {
 				var region:RegionAttachment = cast(slot.attachment, RegionAttachment);
 				verticesLength = 8;
-				region.computeWorldVertices(slot.bone, worldVertices, 0, 2);
+				region.computeWorldVertices(slot, worldVertices, 0, 2);
 			} else if (Std.isOfType(attachment, MeshAttachment)) {
 				var mesh:MeshAttachment = cast(attachment, MeshAttachment);
 				verticesLength = mesh.worldVerticesLength;

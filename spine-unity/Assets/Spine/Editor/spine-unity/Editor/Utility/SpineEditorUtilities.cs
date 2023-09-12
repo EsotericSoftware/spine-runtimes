@@ -310,6 +310,12 @@ namespace Spine.Unity.Editor {
 			if (oldAnimationState != null) {
 				stateComponent.AnimationState.AssignEventSubscribersFrom(oldAnimationState);
 			}
+			if (stateComponent != null) {
+				// Any set animation needs to be applied as well since it might set attachments,
+				// having an effect on generated SpriteMaskMaterials below.
+				stateComponent.AnimationState.Apply(component.skeleton);
+				component.LateUpdate();
+			}
 
 #if BUILT_IN_SPRITE_MASK_COMPONENT
 			SpineMaskUtilities.EditorAssignSpriteMaskMaterials(component);

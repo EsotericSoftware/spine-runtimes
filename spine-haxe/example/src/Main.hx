@@ -43,10 +43,10 @@ class Main extends Sprite {
 	}
 
 	private function loadSpineAnimation():Void {
-		var textureAtlasBitmapData:BitmapData = Assets.getBitmapData("assets/coin.png");
-		var stAtlas = Assets.getText("assets/coin.atlas");
-		var binaryData = Assets.getBytes("assets/coin-pro.skel");
-		var jsonData = Assets.getText("assets/coin-pro.json");
+		var textureAtlasBitmapData:BitmapData = Assets.getBitmapData("assets/raptor.png");
+		var stAtlas = Assets.getText("assets/raptor.atlas");
+		var binaryData = Assets.getBytes("assets/raptor-pro.skel");
+		var jsonData = Assets.getText("assets/raptor-pro.json");
 
 		var textureAtlas = Texture.fromBitmapData(textureAtlasBitmapData);
 		var textureloader = new StarlingTextureLoader(textureAtlas);
@@ -72,6 +72,6 @@ class Main extends Sprite {
 
 		Starling.current.stage.addChild(skeletonanimation);
 		Starling.current.juggler.add(skeletonanimation);
-		skeletonanimation.state.setAnimationByName(0, "animation", true);
+		skeletonanimation.state.setAnimationByName(0, "walk", true);
 	}
 }
