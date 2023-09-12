@@ -42,6 +42,7 @@ class TrackEntry implements Poolable {
 	public var timelineMode:Vector<Int> = new Vector<Int>();
 	public var timelineHoldMix:Vector<TrackEntry> = new Vector<TrackEntry>();
 	public var timelinesRotation:Vector<Float> = new Vector<Float>();
+	public var shortestRotation = false;
 
 	public function new() {}
 

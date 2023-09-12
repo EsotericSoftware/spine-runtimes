@@ -27,7 +27,7 @@ class MeshAttachment extends VertexAttachment implements HasTextureRegion {
 
 	public function updateRegion():Void {
 		if (region == null) {
-			trace("Region not set.");
+			throw new SpineException("Region not set.");
 			return;
 		}
 		var regionUVs = this.regionUVs;

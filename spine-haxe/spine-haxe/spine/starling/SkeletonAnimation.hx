@@ -18,7 +18,6 @@ class SkeletonAnimation extends SkeletonSprite implements IAnimatable {
 
 	public function advanceTime(time:Float):Void {
 		var stage = Starling.current.stage;
-		skeleton.update(time);
 		state.update(time);
 		state.apply(skeleton);
 		skeleton.updateWorldTransform();

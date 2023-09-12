@@ -38,7 +38,7 @@ class RegionAttachment extends Attachment implements HasTextureRegion {
 
 	public function updateRegion():Void {
 		if (region == null) {
-			trace("Region not set.");
+			throw new SpineException("Region not set.");
 			uvs[0] = 0;
 			uvs[1] = 0;
 			uvs[2] = 0;

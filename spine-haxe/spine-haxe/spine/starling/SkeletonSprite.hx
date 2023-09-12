@@ -80,7 +80,7 @@ class SkeletonSprite extends DisplayObject {
 				verticesCount = verticesLength >> 1;
 				if (worldVertices.length < verticesLength)
 					worldVertices.length = verticesLength;
-				region.computeWorldVertices(slot.bone, worldVertices, 0, 2);
+				region.computeWorldVertices(slot, worldVertices, 0, 2);
 
 				mesh = null;
 				if (Std.isOfType(region.rendererObject, SkeletonMesh)) {
@@ -220,7 +220,7 @@ class SkeletonSprite extends DisplayObject {
 			if (Std.isOfType(attachment, RegionAttachment)) {
 				var region:RegionAttachment = cast(slot.attachment, RegionAttachment);
 				verticesLength = 8;
-				region.computeWorldVertices(slot.bone, worldVertices, 0, 2);
+				region.computeWorldVertices(slot, worldVertices, 0, 2);
 			} else if (Std.isOfType(attachment, MeshAttachment)) {
 				var mesh:MeshAttachment = cast(attachment, MeshAttachment);
 				verticesLength = mesh.worldVerticesLength;

@@ -106,10 +106,10 @@ class DeformTimeline extends CurveTimeline implements SlotTimeline {
 		if (!slot.bone.active)
 			return;
 		var slotAttachment:Attachment = slot.attachment;
-
-		if (!Std.isOfType(slotAttachment, VertexAttachment) || cast(slotAttachment, VertexAttachment).deformAttachment != attachment)
+		if (slotAttachment == null)
 			return;
-		var vertexAttachment:VertexAttachment = cast(slotAttachment, VertexAttachment);
+		if (!Std.isOfType(slotAttachment, VertexAttachment) || cast(slotAttachment, VertexAttachment).timelineAttachment != attachment)
+			return;
 
 		var deform:Vector<Float> = slot.deform;
 		if (deform.length == 0)
@@ -128,6 +128,7 @@ class DeformTimeline extends CurveTimeline implements SlotTimeline {
 						return;
 					}
 					deform.length = vertexCount;
+					var vertexAttachment:VertexAttachment = cast(slotAttachment, VertexAttachment);
 					if (vertexAttachment.bones == null) {
 						// Unweighted vertex positions.
 						setupVertices = vertexAttachment.vertices;
@@ -152,6 +153,7 @@ class DeformTimeline extends CurveTimeline implements SlotTimeline {
 			var lastVertices:Vector<Float> = vertices[frames.length - 1];
 			if (alpha == 1) {
 				if (blend == MixBlend.add) {
+					var vertexAttachment:VertexAttachment = cast(slotAttachment, VertexAttachment);
 					if (vertexAttachment.bones == null) {
 						// Unweighted vertex positions, with alpha.
 						setupVertices = vertexAttachment.vertices;
@@ -172,6 +174,7 @@ class DeformTimeline extends CurveTimeline implements SlotTimeline {
 			} else {
 				switch (blend) {
 					case MixBlend.setup:
+						var vertexAttachment:VertexAttachment = cast(slotAttachment, VertexAttachment);
 						if (vertexAttachment.bones == null) {
 							// Unweighted vertex positions, with alpha.
 							setupVertices = vertexAttachment.vertices;
@@ -190,6 +193,7 @@ class DeformTimeline extends CurveTimeline implements SlotTimeline {
 							deform[i] += (lastVertices[i] - deform[i]) * alpha;
 						}
 					case MixBlend.add:
+						var vertexAttachment:VertexAttachment = cast(slotAttachment, VertexAttachment);
 						if (vertexAttachment.bones == null) {
 							// Unweighted vertex positions, with alpha.
 							setupVertices = vertexAttachment.vertices;
@@ -215,6 +219,7 @@ class DeformTimeline extends CurveTimeline implements SlotTimeline {
 
 		if (alpha == 1) {
 			if (blend == MixBlend.add) {
+				var vertexAttachment:VertexAttachment = cast(slotAttachment, VertexAttachment);
 				if (vertexAttachment.bones == null) {
 					// Unweighted vertex positions, with alpha.
 					setupVertices = vertexAttachment.vertices;
@@ -238,6 +243,7 @@ class DeformTimeline extends CurveTimeline implements SlotTimeline {
 		} else {
 			switch (blend) {
 				case MixBlend.setup:
+					var vertexAttachment:VertexAttachment = cast(slotAttachment, VertexAttachment);
 					if (vertexAttachment.bones == null) {
 						// Unweighted vertex positions, with alpha.
 						setupVertices = vertexAttachment.vertices;
@@ -259,6 +265,7 @@ class DeformTimeline extends CurveTimeline implements SlotTimeline {
 						deform[i] += (prev + (nextVertices[i] - prev) * percent - deform[i]) * alpha;
 					}
 				case MixBlend.add:
+					var vertexAttachment:VertexAttachment = cast(slotAttachment, VertexAttachment);
 					if (vertexAttachment.bones == null) {
 						// Unweighted vertex positions, with alpha.
 						setupVertices = vertexAttachment.vertices;

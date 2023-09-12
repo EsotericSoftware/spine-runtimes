@@ -15,18 +15,23 @@ class Animation {
 
 	public function new(name:String, timelines:Vector<Timeline>, duration:Float) {
 		if (name == null)
-			throw new ArgumentError("name cannot be null.");
-		if (timelines == null)
-			throw new ArgumentError("timelines cannot be null.");
+			throw new SpineException("name cannot be null.");
 		_name = name;
+		setTimelines(timelines);
+		this.duration = duration;
+	}
+
+	public function setTimelines(timelines:Vector<Timeline>) {
+		if (timelines == null)
+			throw new SpineException("timelines cannot be null.");
 		_timelines = timelines;
+		_timelineIds = new Dictionary<String, Bool>();
 		for (timeline in timelines) {
 			var ids:Vector<String> = timeline.propertyIds;
 			for (id in ids) {
 				_timelineIds[id] = true;
 			}
 		}
-		this.duration = duration;
 	}
 
 	public function hasTimeline(ids:Vector<String>):Bool {
