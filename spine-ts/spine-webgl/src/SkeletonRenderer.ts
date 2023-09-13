@@ -30,7 +30,7 @@
 import { NumberArrayLike, Color, SkeletonClipping, Vector2, Utils, Skeleton, BlendMode, RegionAttachment, TextureAtlasRegion, MeshAttachment, ClippingAttachment } from "@esotericsoftware/spine-core";
 import { GLTexture } from "./GLTexture";
 import { PolygonBatcher } from "./PolygonBatcher";
-import { ManagedWebGLRenderingContext, WebGLBlendModeConverter } from "./WebGL";
+import { ManagedWebGLRenderingContext } from "./WebGL";
 
 
 class Renderable {
@@ -67,11 +67,6 @@ export class SkeletonRenderer {
 		let premultipliedAlpha = this.premultipliedAlpha;
 		let twoColorTint = this.twoColorTint;
 		let blendMode: BlendMode | null = null;
-
-		let tempPos = this.temp;
-		let tempUv = this.temp2;
-		let tempLight = this.temp3;
-		let tempDark = this.temp4;
 
 		let renderable: Renderable = this.renderable;
 		let uvs: NumberArrayLike;
@@ -166,11 +161,7 @@ export class SkeletonRenderer {
 				let slotBlendMode = slot.data.blendMode;
 				if (slotBlendMode != blendMode) {
 					blendMode = slotBlendMode;
-					batcher.setBlendMode(
-						WebGLBlendModeConverter.getSourceColorGLBlendMode(blendMode, premultipliedAlpha),
-						WebGLBlendModeConverter.getSourceAlphaGLBlendMode(blendMode, premultipliedAlpha),
-						WebGLBlendModeConverter.getDestColorGLBlendMode(blendMode),
-						WebGLBlendModeConverter.getDestAlphaGLBlendMode(blendMode, premultipliedAlpha));
+					batcher.setBlendMode(blendMode, premultipliedAlpha);
 				}
 
 				if (clipper.isClipping()) {

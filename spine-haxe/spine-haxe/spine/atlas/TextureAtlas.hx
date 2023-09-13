@@ -19,7 +19,7 @@ class TextureAtlas {
 		}
 
 		var textureLoader = new AssetsTextureLoader(basePath);
-		return new TextureAtlas(Assets.getText("assets/raptor.atlas"), textureLoader);
+		return new TextureAtlas(Assets.getText(path), textureLoader);
 	}
 
 	/** @param object A String or ByteArray. */

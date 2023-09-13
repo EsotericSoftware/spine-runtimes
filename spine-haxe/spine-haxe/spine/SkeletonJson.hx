@@ -929,7 +929,7 @@ class SkeletonJson {
 					throw new SpineException("Slot not found: " + slotMapName);
 				for (attachmentMapName in slotMap) {
 					var attachmentMap = slotMap[attachmentMapName];
-					var attachment:VertexAttachment = cast(skin.getAttachment(slotIndex, attachmentMapName), VertexAttachment);
+					var attachment:Attachment = skin.getAttachment(slotIndex, attachmentMapName);
 					if (attachment == null)
 						throw new SpineException("Timeline attachment not found: " + attachmentMapName);
 
@@ -940,11 +940,12 @@ class SkeletonJson {
 							continue;
 
 						if (timelineMapName == "deform") {
-							var weighted:Bool = attachment.bones != null;
-							var vertices:Vector<Float> = attachment.vertices;
+							var vertexAttachment = cast(attachment, VertexAttachment);
+							var weighted:Bool = vertexAttachment.bones != null;
+							var vertices:Vector<Float> = vertexAttachment.vertices;
 							var deformLength:Int = weighted ? Std.int(vertices.length / 3 * 2) : vertices.length;
 
-							var deformTimeline:DeformTimeline = new DeformTimeline(timelineMap.length, timelineMap.length, slotIndex, attachment);
+							var deformTimeline:DeformTimeline = new DeformTimeline(timelineMap.length, timelineMap.length, slotIndex, vertexAttachment);
 							time = getFloat(keyMap, "time");
 							frame = 0;
 							bezier = 0;

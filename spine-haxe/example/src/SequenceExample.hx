@@ -6,12 +6,12 @@ import starling.core.Starling;
 import starling.events.TouchEvent;
 import starling.events.TouchPhase;
 
-class BasicExample extends Scene {
-	var loadBinary = true;
+class SequenceExample extends Scene {
+	var loadBinary = false;
 
 	public function load():Void {
-		var atlas = TextureAtlas.fromAssets("assets/raptor.atlas");
-		var skeletondata = SkeletonData.fromAssets("assets/raptor-pro" + (loadBinary ? ".skel" : ".json"), atlas);
+		var atlas = TextureAtlas.fromAssets("assets/dragon.atlas");
+		var skeletondata = SkeletonData.fromAssets("assets/dragon-ess" + (loadBinary ? ".skel" : ".json"), atlas);
 		var animationStateData = new AnimationStateData(skeletondata);
 		animationStateData.defaultMix = 0.25;
 
@@ -21,7 +21,11 @@ class BasicExample extends Scene {
 		skeletonSprite.x = Starling.current.stage.stageWidth / 2;
 		skeletonSprite.y = Starling.current.stage.stageHeight * 0.9;
 
-		skeletonSprite.state.setAnimationByName(0, "walk", true);
+		FIXME
+		sequences
+		are
+		broken
+		skeletonSprite.state.setAnimationByName(0, "flying", true);
 
 		addChild(skeletonSprite);
 		juggler.add(skeletonSprite);

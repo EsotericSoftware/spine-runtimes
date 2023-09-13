@@ -27,11 +27,18 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Disposable } from "@esotericsoftware/spine-core";
+import { BlendMode, Disposable } from "@esotericsoftware/spine-core";
 import { GLTexture } from "./GLTexture";
 import { Mesh, Position2Attribute, ColorAttribute, TexCoordAttribute, Color2Attribute } from "./Mesh";
 import { Shader } from "./Shader";
 import { ManagedWebGLRenderingContext } from "./WebGL";
+
+const GL_ONE = 1;
+const GL_ONE_MINUS_SRC_COLOR = 0x0301;
+const GL_SRC_ALPHA = 0x0302;
+const GL_ONE_MINUS_SRC_ALPHA = 0x0303;
+const GL_ONE_MINUS_DST_ALPHA = 0x0305;
+const GL_DST_COLOR = 0x0306;
 
 export class PolygonBatcher implements Disposable {
 	public static disableCulling = false;
@@ -47,8 +54,7 @@ export class PolygonBatcher implements Disposable {
 	private indicesLength = 0;
 	private srcColorBlend: number;
 	private srcAlphaBlend: number;
-	private dstColorBlend: number;
-	private dstAlphaBlend: number;
+	private dstBlend: number;
 	private cullWasEnabled = false;
 
 	constructor (context: ManagedWebGLRenderingContext | WebGLRenderingContext, twoColorTint: boolean = true, maxVertices: number = 10920) {
@@ -61,8 +67,7 @@ export class PolygonBatcher implements Disposable {
 		let gl = this.context.gl;
 		this.srcColorBlend = gl.SRC_ALPHA;
 		this.srcAlphaBlend = gl.ONE;
-		this.dstColorBlend = gl.ONE_MINUS_SRC_ALPHA;
-		this.dstAlphaBlend = gl.ONE_MINUS_SRC_ALPHA;
+		this.dstBlend = gl.ONE_MINUS_SRC_ALPHA;
 	}
 
 	begin (shader: Shader) {
@@ -74,7 +79,7 @@ export class PolygonBatcher implements Disposable {
 
 		let gl = this.context.gl;
 		gl.enable(gl.BLEND);
-		gl.blendFuncSeparate(this.srcColorBlend, this.dstColorBlend, this.srcAlphaBlend, this.dstAlphaBlend);
+		gl.blendFuncSeparate(this.srcColorBlend, this.dstBlend, this.srcAlphaBlend, this.dstBlend);
 
 		if (PolygonBatcher.disableCulling) {
 			this.cullWasEnabled = gl.isEnabled(gl.CULL_FACE);
@@ -82,17 +87,28 @@ export class PolygonBatcher implements Disposable {
 		}
 	}
 
-	setBlendMode (srcColorBlend: number, srcAlphaBlend: number, dstColorBlend: number, dstAlphaBlend: number) {
-		if (this.srcColorBlend == srcColorBlend && this.srcAlphaBlend == srcAlphaBlend && this.dstColorBlend == dstColorBlend && this.dstAlphaBlend == dstAlphaBlend) return;
+	private static blendModesGL: {srcRgb: number, srcRgbPma: number, dstRgb: number, srcAlpha: number}[] = [
+		{srcRgb: GL_SRC_ALPHA, srcRgbPma: GL_ONE, dstRgb: GL_ONE_MINUS_SRC_ALPHA, srcAlpha: GL_ONE },
+		{srcRgb: GL_SRC_ALPHA, srcRgbPma: GL_ONE, dstRgb: GL_ONE, srcAlpha: GL_ONE },
+		{srcRgb: GL_DST_COLOR, srcRgbPma: GL_DST_COLOR, dstRgb: GL_ONE_MINUS_SRC_ALPHA, srcAlpha: GL_ONE},
+		{srcRgb: GL_ONE, srcRgbPma: GL_ONE, dstRgb: GL_ONE_MINUS_SRC_COLOR, srcAlpha: GL_ONE }
+	]
+
+	setBlendMode (blendMode: BlendMode, premultipliedAlpha: boolean) {
+		const blendModeGL = PolygonBatcher.blendModesGL[blendMode];
+		const srcColorBlend = premultipliedAlpha ? blendModeGL.srcRgbPma : blendModeGL.srcRgb;
+		const srcAlphaBlend = blendModeGL.srcAlpha;
+		const dstBlend = blendModeGL.dstRgb;
+
+		if (this.srcColorBlend == srcColorBlend && this.srcAlphaBlend == srcAlphaBlend && this.dstBlend == dstBlend) return;
 		this.srcColorBlend = srcColorBlend;
 		this.srcAlphaBlend = srcAlphaBlend;
-		this.dstColorBlend = dstColorBlend;
-		this.dstAlphaBlend = dstAlphaBlend;
+		this.dstBlend = dstBlend;
 		if (this.isDrawing) {
 			this.flush();
-			let gl = this.context.gl;
-			gl.blendFuncSeparate(srcColorBlend, dstColorBlend, srcAlphaBlend, dstAlphaBlend);
 		}
+		let gl = this.context.gl;
+		gl.blendFuncSeparate(srcColorBlend, dstBlend, srcAlphaBlend, dstBlend);
 	}
 
 	draw (texture: GLTexture, vertices: ArrayLike<number>, indices: Array<number>) {
