@@ -20,11 +20,6 @@ class SequenceExample extends Scene {
 		skeletonSprite.scale = Starling.current.stage.stageWidth / bounds.width * 0.5;
 		skeletonSprite.x = Starling.current.stage.stageWidth / 2;
 		skeletonSprite.y = Starling.current.stage.stageHeight * 0.9;
-
-		FIXME
-		sequences
-		are
-		broken
 		skeletonSprite.state.setAnimationByName(0, "flying", true);
 
 		addChild(skeletonSprite);
