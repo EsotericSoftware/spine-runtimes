@@ -76,7 +76,7 @@ class BinaryInput {
 					chars += String.fromCharCode(((b & 0x0F) << 12 | (readByte() & 0x3F) << 6 | readByte() & 0x3F));
 					i += 3;
 				default:
-					chars += String.fromCharCode(b);
+					chars += String.fromCharCode(b & 0xff);
 					i++;
 			}
 		}

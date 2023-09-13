@@ -1,5 +1,6 @@
 package spine;
 
+import openfl.geom.Rectangle;
 import openfl.errors.ArgumentError;
 import openfl.utils.Dictionary;
 import openfl.Vector;
@@ -561,11 +562,10 @@ class Skeleton {
 		return _data.name != null ? _data.name : "Skeleton?";
 	}
 
-	public function getBounds(offset:Vector<Float>, size:Vector<Float>, temp:Vector<Float>):Void {
-		if (offset == null)
-			throw new ArgumentError("offset cannot be null.");
-		if (size == null)
-			throw new ArgumentError("size cannot be null.");
+	private var _tempVertices = new Vector<Float>();
+	private var _bounds = new Rectangle();
+
+	public function getBounds():Rectangle {
 		var minX:Float = Math.POSITIVE_INFINITY;
 		var minY:Float = Math.POSITIVE_INFINITY;
 		var maxX:Float = Math.NEGATIVE_INFINITY;
@@ -576,14 +576,14 @@ class Skeleton {
 			var attachment:Attachment = slot.attachment;
 			if (Std.isOfType(attachment, RegionAttachment)) {
 				verticesLength = 8;
-				temp.length = verticesLength;
-				vertices = temp;
+				_tempVertices.length = verticesLength;
+				vertices = _tempVertices;
 				cast(attachment, RegionAttachment).computeWorldVertices(slot, vertices, 0, 2);
 			} else if (Std.isOfType(attachment, MeshAttachment)) {
 				var mesh:MeshAttachment = cast(attachment, MeshAttachment);
 				verticesLength = mesh.worldVerticesLength;
-				temp.length = verticesLength;
-				vertices = temp;
+				_tempVertices.length = verticesLength;
+				vertices = _tempVertices;
 				mesh.computeWorldVertices(slot, 0, verticesLength, vertices, 0, 2);
 			}
 			if (vertices != null) {
@@ -599,9 +599,10 @@ class Skeleton {
 				}
 			}
 		}
-		offset[0] = minX;
-		offset[1] = minY;
-		size[0] = maxX - minX;
-		size[1] = maxY - minY;
+		_bounds.x = minX;
+		_bounds.y = minY;
+		_bounds.width = maxX - minX;
+		_bounds.height = maxY - minY;
+		return _bounds;
 	}
 }
