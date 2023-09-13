@@ -99,28 +99,6 @@ class RegionAttachment extends Attachment implements HasTextureRegion {
 		}
 	}
 
-	public function setUVs(u:Float, v:Float, u2:Float, v2:Float, degrees:Int):Void {
-		if (degrees == 90) {
-			uvs[4] = u;
-			uvs[5] = v2;
-			uvs[6] = u;
-			uvs[7] = v;
-			uvs[0] = u2;
-			uvs[1] = v;
-			uvs[2] = u2;
-			uvs[3] = v2;
-		} else {
-			uvs[2] = u;
-			uvs[3] = v2;
-			uvs[4] = u;
-			uvs[5] = v;
-			uvs[6] = u2;
-			uvs[7] = v;
-			uvs[0] = u2;
-			uvs[1] = v2;
-		}
-	}
-
 	public function computeWorldVertices(slot:Slot, worldVertices:Vector<Float>, offset:Int, stride:Int):Void {
 		if (sequence != null)
 			sequence.apply(slot, this);
