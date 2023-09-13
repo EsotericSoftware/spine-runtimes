@@ -1,37 +1,41 @@
 package spine.starling;
 
-import starling.textures.Texture;
-import starling.utils.Max;
+import starling.animation.IAnimatable;
+import openfl.Vector;
 import openfl.geom.Matrix;
 import openfl.geom.Point;
 import openfl.geom.Rectangle;
-import openfl.Vector;
-import spine.atlas.TextureAtlasRegion;
-import spine.attachments.Attachment;
-import spine.attachments.ClippingAttachment;
-import spine.attachments.MeshAttachment;
-import spine.attachments.RegionAttachment;
 import spine.Bone;
 import spine.Skeleton;
 import spine.SkeletonClipping;
 import spine.SkeletonData;
 import spine.Slot;
+import spine.animation.AnimationState;
+import spine.animation.AnimationStateData;
+import spine.attachments.Attachment;
+import spine.attachments.ClippingAttachment;
+import spine.attachments.MeshAttachment;
+import spine.attachments.RegionAttachment;
 import starling.display.BlendMode;
 import starling.display.DisplayObject;
-import starling.display.Image;
 import starling.rendering.IndexData;
 import starling.rendering.Painter;
 import starling.rendering.VertexData;
+import starling.textures.Texture;
 import starling.utils.Color;
 import starling.utils.MatrixUtil;
+import starling.utils.Max;
 
-class SkeletonSprite extends DisplayObject {
+class SkeletonSprite extends DisplayObject implements IAnimatable {
 	static private var _tempPoint:Point = new Point();
 	static private var _tempMatrix:Matrix = new Matrix();
 	static private var _tempVertices:Vector<Float> = new Vector<Float>();
 	static private var blendModes:Vector<String> = Vector.ofArray([BlendMode.NORMAL, BlendMode.ADD, BlendMode.MULTIPLY, BlendMode.SCREEN]);
 
 	private var _skeleton:Skeleton;
+
+	public var _state:AnimationState;
+
 	private var _smoothing:String = "bilinear";
 
 	private static var clipper:SkeletonClipping = new SkeletonClipping();
@@ -40,11 +44,12 @@ class SkeletonSprite extends DisplayObject {
 	private var tempLight:spine.Color = new spine.Color(0, 0, 0);
 	private var tempDark:spine.Color = new spine.Color(0, 0, 0);
 
-	public function new(skeletonData:SkeletonData) {
+	public function new(skeletonData:SkeletonData, animationStateData:AnimationStateData = null) {
 		super();
 		Bone.yDown = true;
 		_skeleton = new Skeleton(skeletonData);
 		_skeleton.updateWorldTransform();
+		_state = new AnimationState(animationStateData != null ? animationStateData : new AnimationStateData(skeletonData));
 	}
 
 	override public function render(painter:Painter):Void {
@@ -285,6 +290,12 @@ class SkeletonSprite extends DisplayObject {
 		return _skeleton;
 	}
 
+	public var state(get, never):AnimationState;
+
+	private function get_state():AnimationState {
+		return _state;
+	}
+
 	public var smoothing(get, set):String;
 
 	private function get_smoothing():String {
@@ -294,5 +305,12 @@ class SkeletonSprite extends DisplayObject {
 	private function set_smoothing(smoothing:String):String {
 		_smoothing = smoothing;
 		return _smoothing;
+	}
+
+	public function advanceTime(time:Float):Void {
+		_state.update(time);
+		_state.apply(skeleton);
+		skeleton.updateWorldTransform();
+		this.setRequiresRedraw();
 	}
 }

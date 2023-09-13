@@ -31,7 +31,9 @@
 #define SPEED_INCLUDED_IN_CLIP_TIME
 #endif
 
+#if UNITY_EDITOR
 #define SPINE_EDITMODEPOSE
+#endif
 
 using System;
 using UnityEngine;
@@ -250,8 +252,11 @@ namespace Spine.Unity.Playables {
 		}
 
 #if SPINE_EDITMODEPOSE
+		/// <summary>Animation event callback for editor scripts when outside of play-mode.</summary>
+		public static event AnimationState.TrackEntryEventDelegate EditorEvent;
 
 		AnimationState dummyAnimationState;
+		ExposedList<Spine.Event> editorAnimationEvents = new ExposedList<Event>();
 
 		public void PreviewEditModePose (Playable playable,
 			ISkeletonComponent skeletonComponent, IAnimationStateComponent animationStateComponent,
@@ -259,6 +264,7 @@ namespace Spine.Unity.Playables {
 
 			if (Application.isPlaying) return;
 			if (animationStateComponent.IsNullOrDestroyed() || skeletonComponent == null) return;
+			editorAnimationEvents.Clear(false);
 
 			int inputCount = playable.GetInputCount();
 			float rootSpeed = GetRootPlayableSpeed(playable);
@@ -341,11 +347,19 @@ namespace Spine.Unity.Playables {
 					}
 
 					// Apply Pose
+					dummyAnimationState.Event += EditorEvent;
 					dummyAnimationState.Update(0);
 					dummyAnimationState.Apply(skeleton);
+					dummyAnimationState.Event -= EditorEvent;
 				} else {
-					if (toAnimation != null)
-						toAnimation.Apply(skeleton, 0, toClipTime, clipData.loop, null, clipData.alpha, MixBlend.Setup, MixDirection.In);
+					if (toAnimation != null) {
+						toAnimation.Apply(skeleton, 0, toClipTime, clipData.loop, editorAnimationEvents, clipData.alpha, MixBlend.Setup, MixDirection.In);
+						if (EditorEvent != null) {
+							foreach (Spine.Event e in editorAnimationEvents) {
+								EditorEvent(null, e);
+							}
+						}
+					}
 				}
 
 				skeleton.UpdateWorldTransform();

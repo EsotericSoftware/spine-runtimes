@@ -178,12 +178,12 @@ namespace Spine.Unity.Examples {
 				indexBuffer = new ExposedList<int>(combinedIndexCount);
 			}
 
-			if (positionBuffer.Count < combinedVertexCount) {
+			if (positionBuffer.Count != combinedVertexCount) {
 				positionBuffer.Resize(combinedVertexCount);
 				uvBuffer.Resize(combinedVertexCount);
 				colorBuffer.Resize(combinedVertexCount);
 			}
-			if (indexBuffer.Count < combinedIndexCount) {
+			if (indexBuffer.Count != combinedIndexCount) {
 				indexBuffer.Resize(combinedIndexCount);
 			}
 		}
@@ -223,32 +223,27 @@ namespace Spine.Unity.Examples {
 				System.Array.Copy(positions, 0, this.positionBuffer.Items, combinedV, vertexCount);
 				System.Array.Copy(uvs, 0, this.uvBuffer.Items, combinedV, vertexCount);
 				System.Array.Copy(colors, 0, this.colorBuffer.Items, combinedV, vertexCount);
-				combinedV += vertexCount;
 
 				for (int s = 0, submeshCount = mesh.subMeshCount; s < submeshCount; ++s) {
 					int submeshIndexCount = (int)mesh.GetIndexCount(s);
 					int[] submeshIndices = mesh.GetIndices(s);
-					System.Array.Copy(submeshIndices, 0, this.indexBuffer.Items, combinedI, submeshIndexCount);
+					int[] dstIndices = this.indexBuffer.Items;
+					for (int i = 0; i < submeshIndexCount; ++i)
+						dstIndices[i + combinedI] = submeshIndices[i] + combinedV;
 					combinedI += submeshIndexCount;
 				}
+				combinedV += vertexCount;
 			}
 
 			Mesh combinedMesh = doubleBufferedMesh.GetNext();
+			combinedMesh.Clear();
 #if SET_VERTICES_HAS_LENGTH_PARAMETER
 			combinedMesh.SetVertices(this.positionBuffer.Items, 0, this.positionBuffer.Count);
 			combinedMesh.SetUVs(0, this.uvBuffer.Items, 0, this.uvBuffer.Count);
 			combinedMesh.SetColors(this.colorBuffer.Items, 0, this.colorBuffer.Count);
 			combinedMesh.SetTriangles(this.indexBuffer.Items, 0, this.indexBuffer.Count, 0);
 #else
-			// fill excess with zero positions
-			{
-				int listCount = this.positionBuffer.Count;
-				Vector3[] positionArray = this.positionBuffer.Items;
-				int arrayLength = positionArray.Length;
-				Vector3 vector3zero = Vector3.zero;
-				for (int i = listCount; i < arrayLength; i++)
-					positionArray[i] = vector3zero;
-			}
+			// Note: excess already contains zero positions and indices after ExposedList.Resize().
 			combinedMesh.vertices = this.positionBuffer.Items;
 			combinedMesh.uv = this.uvBuffer.Items;
 			combinedMesh.colors32 = this.colorBuffer.Items;

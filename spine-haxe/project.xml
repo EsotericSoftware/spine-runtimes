@@ -11,5 +11,6 @@
 
 	<source path="example/src" />
 	<assets path="example/assets" rename="assets" />
+	<assets path="example/assets" include="*.skel" rename="assets" type="binary" />
 
 </project>

@@ -1,5 +1,6 @@
 package spine.atlas;
 
+import openfl.utils.Assets;
 import openfl.errors.ArgumentError;
 import openfl.utils.ByteArray;
 import openfl.utils.Dictionary;
@@ -9,6 +10,17 @@ class TextureAtlas {
 	private var pages = new Vector<TextureAtlasPage>();
 	private var regions = new Vector<TextureAtlasRegion>();
 	private var textureLoader:TextureLoader;
+
+	public static function fromAssets(path:String) {
+		var basePath = "";
+		var slashIndex = path.lastIndexOf("/");
+		if (slashIndex != -1) {
+			basePath = path.substring(0, slashIndex);
+		}
+
+		var textureLoader = new AssetsTextureLoader(basePath);
+		return new TextureAtlas(Assets.getText("assets/raptor.atlas"), textureLoader);
+	}
 
 	/** @param object A String or ByteArray. */
 	public function new(object:Dynamic, textureLoader:TextureLoader) {
@@ -132,7 +144,7 @@ class TextureAtlas {
 						field();
 					}
 				}
-				textureLoader.loadPage(page, line);
+				textureLoader.loadPage(page, page.name);
 				pages.push(page);
 			} else {
 				region = new TextureAtlasRegion(page, line);

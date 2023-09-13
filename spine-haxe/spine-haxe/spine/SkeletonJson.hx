@@ -54,28 +54,17 @@ class SkeletonJson {
 
 	private var linkedMeshes:Vector<LinkedMesh> = new Vector<LinkedMesh>();
 
-	public function new(attachmentLoader:AttachmentLoader = null) {
+	public function new(attachmentLoader:AttachmentLoader) {
 		this.attachmentLoader = attachmentLoader;
 	}
 
-	/** @param object A String or ByteArray. */
-	public function readSkeletonData(object:Object, name:String = null):SkeletonData {
-		if (object == null)
+	public function readSkeletonData(json:String):SkeletonData {
+		if (json == null)
 			throw new ArgumentError("object cannot be null.");
 
-		var root:Object;
-		if (Std.isOfType(object, String)) {
-			root = Json.parse(cast(object, String));
-		} else if (Std.isOfType(object, ByteArrayData)) {
-			root = Json.parse(cast(object, ByteArray).readUTFBytes(cast(object, ByteArray).length));
-		} else if (Std.isOfType(object, Dynamic)) {
-			root = object;
-		} else {
-			throw new ArgumentError("object must be a String, ByteArray or Object.");
-		}
+		var root = Json.parse(json);
 
 		var skeletonData:SkeletonData = new SkeletonData();
-		skeletonData.name = name;
 
 		// Skeleton.
 		var skeletonMap:Object = getString(root, "skeleton", "");
@@ -1172,10 +1161,10 @@ class SkeletonJson {
 		}
 
 		var i:Int = value << 2;
-		var cx1:Float = curve[Std.string(i)];
-		var cy1:Float = curve[Std.string(i + 1)] * scale;
-		var cx2:Float = curve[Std.string(i + 2)];
-		var cy2:Float = curve[Std.string(i + 3)] * scale;
+		var cx1:Float = curve[i];
+		var cy1:Float = curve[i + 1] * scale;
+		var cx2:Float = curve[i + 2];
+		var cy2:Float = curve[i + 3] * scale;
 		timeline.setBezier(bezier, frame, value, time1, value1, cx1, cy1, cx2, cy2, time2, value2);
 		return bezier + 1;
 	}
