@@ -43,8 +43,7 @@ export class ShapeRenderer implements Disposable {
 	private tmp = new Vector2();
 	private srcColorBlend: number;
 	private srcAlphaBlend: number;
-	private dstColorBlend: number;
-	private dstAlphaBlend: number;
+	private dstBlend: number;
 
 	constructor (context: ManagedWebGLRenderingContext | WebGLRenderingContext, maxVertices: number = 10920) {
 		if (maxVertices > 10920) throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
@@ -53,8 +52,7 @@ export class ShapeRenderer implements Disposable {
 		let gl = this.context.gl;
 		this.srcColorBlend = gl.SRC_ALPHA;
 		this.srcAlphaBlend = gl.ONE;
-		this.dstColorBlend = gl.ONE_MINUS_SRC_ALPHA;
-		this.dstAlphaBlend = gl.ONE_MINUS_SRC_ALPHA;
+		this.dstBlend = gl.ONE_MINUS_SRC_ALPHA;
 	}
 
 	begin (shader: Shader) {
@@ -65,18 +63,17 @@ export class ShapeRenderer implements Disposable {
 
 		let gl = this.context.gl;
 		gl.enable(gl.BLEND);
-		gl.blendFuncSeparate(this.srcColorBlend, this.dstColorBlend, this.srcAlphaBlend, this.dstAlphaBlend);
+		gl.blendFuncSeparate(this.srcColorBlend, this.dstBlend, this.srcAlphaBlend, this.dstBlend);
 	}
 
-	setBlendMode (srcColorBlend: number, srcAlphaBlend: number, dstColorBlend: number, dstAlphaBlend: number) {
+	setBlendMode (srcColorBlend: number, srcAlphaBlend: number, dstBlend: number) {
 		this.srcColorBlend = srcColorBlend;
 		this.srcAlphaBlend = srcAlphaBlend;
-		this.dstColorBlend = dstColorBlend;
-		this.dstAlphaBlend = dstAlphaBlend;
+		this.dstBlend = dstBlend;
 		if (this.isDrawing) {
 			this.flush();
 			let gl = this.context.gl;
-			gl.blendFuncSeparate(srcColorBlend, dstColorBlend, srcAlphaBlend, dstAlphaBlend);
+			gl.blendFuncSeparate(srcColorBlend, dstBlend, srcAlphaBlend, dstBlend);
 		}
 	}
 

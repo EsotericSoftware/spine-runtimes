@@ -88,7 +88,7 @@ export class LoadingScreen implements Disposable {
 
 		renderer.resize(ResizeMode.Expand);
 		renderer.camera.position.set(canvas.width / 2, canvas.height / 2, 0);
-		renderer.batcher.setBlendMode(gl.ONE, gl.ONE, gl.ONE_MINUS_SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+		renderer.batcher.setBlendMode(gl.ONE, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 
 		if (complete) {
 			this.fadeOut += this.timeKeeper.delta * (this.timeKeeper.totalTime < 1 ? 2 : 1);
