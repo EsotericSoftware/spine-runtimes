@@ -27,7 +27,7 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Color, Disposable, TimeKeeper } from "@esotericsoftware/spine-core";
+import { BlendMode, Color, Disposable, TimeKeeper } from "@esotericsoftware/spine-core";
 import { GLTexture } from "./GLTexture";
 import { ResizeMode, SceneRenderer } from "./SceneRenderer";
 
@@ -88,7 +88,7 @@ export class LoadingScreen implements Disposable {
 
 		renderer.resize(ResizeMode.Expand);
 		renderer.camera.position.set(canvas.width / 2, canvas.height / 2, 0);
-		renderer.batcher.setBlendMode(gl.ONE, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+		renderer.batcher.setBlendMode(BlendMode.Normal, true);
 
 		if (complete) {
 			this.fadeOut += this.timeKeeper.delta * (this.timeKeeper.totalTime < 1 ? 2 : 1);
