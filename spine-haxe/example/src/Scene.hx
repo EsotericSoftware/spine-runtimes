@@ -1,3 +1,5 @@
+import starling.utils.Color;
+import starling.display.Quad;
 import starling.core.Starling;
 import starling.display.Sprite;
 

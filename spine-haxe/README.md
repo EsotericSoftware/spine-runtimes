@@ -51,4 +51,4 @@ As an IDE, we recommend [Visual Studio Code](https://code.visualstudio.com/) wit
 
 The extensions provide IDE features like auto-completion, debugging, and build support.
 
-To debug the HTML5 build, set the Lime target in the status bar at the bottom of VS Code to `HTML5 / Debug`. Next, press `CTRL+SHIFT+B` (`CMD+SHIFT+B` on macOS) to build the project. Run the `lime` run configuration by pressing `F5`. This will start a webserver at `http://localhost:3000`. Finally, start the `web` run configuration. If you modify code, rebuild and restart the `web` configuration.
+To debug a build, set the corresponding Lime target in the status bar at the bottom of VS Code to e.g. `HTML5 / Debug`. Run the `lime` run configuration by pressing `F5`.

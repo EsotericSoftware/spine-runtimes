@@ -22,6 +22,6 @@ class Main extends Sprite {
 		starlingSingleton.start();
 		Starling.current.stage.color = 0x000000;
 
-		SceneManager.getInstance().switchScene(new BasicExample());
+		SceneManager.getInstance().switchScene(new SequenceExample());
 	}
 }
