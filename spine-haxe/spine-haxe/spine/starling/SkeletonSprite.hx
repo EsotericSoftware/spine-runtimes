@@ -91,6 +91,7 @@ class SkeletonSprite extends DisplayObject implements IAnimatable {
 				mesh = null;
 				if (Std.isOfType(region.rendererObject, SkeletonMesh)) {
 					mesh = cast(region.rendererObject, SkeletonMesh);
+					mesh.texture = region.region.texture;
 					indices = QUAD_INDICES;
 				} else {
 					mesh = region.rendererObject = new SkeletonMesh(cast(region.region.texture, Texture));
@@ -118,6 +119,7 @@ class SkeletonSprite extends DisplayObject implements IAnimatable {
 				mesh = null;
 				if (Std.isOfType(meshAttachment.rendererObject, SkeletonMesh)) {
 					mesh = cast(meshAttachment.rendererObject, SkeletonMesh);
+					mesh.texture = meshAttachment.region.texture;
 					indices = meshAttachment.triangles;
 				} else {
 					mesh = meshAttachment.rendererObject = new SkeletonMesh(cast(meshAttachment.region.texture, Texture));

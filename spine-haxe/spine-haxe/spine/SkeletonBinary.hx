@@ -1005,7 +1005,7 @@ class SkeletonBinary {
 				slotIndex = input.readInt(true);
 				for (iii in 0...input.readInt(true)) {
 					var attachmentName:String = input.readStringRef();
-					var attachment:VertexAttachment = cast(skin.getAttachment(slotIndex, attachmentName), VertexAttachment);
+					var attachment = skin.getAttachment(slotIndex, attachmentName);
 					if (attachment == null)
 						throw new SpineException("Vertex attachment not found: " + attachmentName);
 					var timelineType = input.readByte();
@@ -1014,12 +1014,13 @@ class SkeletonBinary {
 
 					switch (timelineType) {
 						case ATTACHMENT_DEFORM:
-							var weighted:Bool = attachment.bones != null;
-							var vertices:Vector<Float> = attachment.vertices;
+							var vertexAttachment = cast(attachment, VertexAttachment);
+							var weighted:Bool = vertexAttachment.bones != null;
+							var vertices:Vector<Float> = vertexAttachment.vertices;
 							var deformLength:Int = weighted ? Std.int(vertices.length / 3 * 2) : vertices.length;
 
 							bezierCount = input.readInt(true);
-							var deformTimeline:DeformTimeline = new DeformTimeline(frameCount, bezierCount, slotIndex, attachment);
+							var deformTimeline:DeformTimeline = new DeformTimeline(frameCount, bezierCount, slotIndex, vertexAttachment);
 
 							time = input.readFloat();
 							frame = 0;
