@@ -1,5 +1,8 @@
 package spine;
 
+import spine.attachments.AtlasAttachmentLoader;
+import openfl.utils.Assets;
+import spine.atlas.TextureAtlas;
 import openfl.errors.ArgumentError;
 import openfl.Vector;
 import spine.animation.Animation;
@@ -26,6 +29,22 @@ class SkeletonData {
 	public var fps:Float = 0;
 	public var imagesPath:String;
 	public var audioPath:String;
+
+	public static function fromAssets(path:String, atlas:TextureAtlas, scale:Float = 1.0):SkeletonData {
+		if (StringTools.endsWith(path, ".skel")) {
+			var byteData = Assets.getBytes(path);
+			var loader = new SkeletonBinary(new AtlasAttachmentLoader(atlas));
+			loader.scale = scale;
+			return loader.readSkeletonData(byteData);
+		} else if (StringTools.endsWith(path, ".json")) {
+			var jsonData = Assets.getText(path);
+			var loader = new SkeletonJson(new AtlasAttachmentLoader(atlas));
+			loader.scale = scale;
+			return loader.readSkeletonData(jsonData);
+		} else {
+			throw new SpineException("Path of skeleton data file must end with .json or .skel");
+		}
+	}
 
 	public function new() {}
 

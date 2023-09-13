@@ -1,5 +1,7 @@
 package spine;
 
+import spine.attachments.AtlasAttachmentLoader;
+import openfl.utils.Endian;
 import spine.animation.SequenceTimeline;
 import openfl.errors.ArgumentError;
 import openfl.errors.Error;
@@ -81,20 +83,17 @@ class SkeletonBinary {
 	private static inline var CURVE_STEPPED:Int = 1;
 	private static inline var CURVE_BEZIER:Int = 2;
 
-	public function new(attachmentLoader:AttachmentLoader = null) {
+	public function new(attachmentLoader:AttachmentLoader) {
 		this.attachmentLoader = attachmentLoader;
 	}
 
-	public function readSkeletonData(object:ByteArray):SkeletonData {
-		if (object == null)
-			throw new ArgumentError("Object cannot be null");
-		if (!Std.isOfType(object, ByteArrayData))
-			throw new ArgumentError("Object must be ByteArrayData");
+	public function readSkeletonData(bytes:ByteArray):SkeletonData {
+		bytes.endian = Endian.BIG_ENDIAN;
 
 		var skeletonData:SkeletonData = new SkeletonData();
 		skeletonData.name = null;
 
-		var input:BinaryInput = new BinaryInput(object);
+		var input:BinaryInput = new BinaryInput(bytes);
 
 		var lowHash:Int = input.readInt32();
 		var highHash:Int = input.readInt32();
