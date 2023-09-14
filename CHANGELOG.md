@@ -112,6 +112,7 @@
     4) Assign this *_Outline* material at the new child GameObject's `MeshRenderer` component.
     If you are using `SkeletonRenderSeparator` and need to enable and disable the `SkeletonRenderSeparator` component at runtime, you can increase the `RenderCombinedMesh` `Reference Renderers` array by one and assign the `SkeletonRenderer` itself at the last entry after the parts renderers. Disabled `MeshRenderer` components will be skipped when combining the final mesh, so the combined mesh is automatically filled from the desired active renderers.
   * Timeline extension package: Added static `EditorEvent` callback to allow editor scripts to react to animation events outside of play-mode. Register to the events via `Spine.Unity.Playables.SpineAnimationStateMixerBehaviour.EditorEvent += YourCallback;`.
+  * URP Shaders: Added `Depth Write` property to shaders `Universal Render Pipeline/Spine/Skeleton` and `Universal Render Pipeline/Spine/Skeleton Lit`. Defaults to false to maintain existing behaviour.
 
 * **Breaking changes**
   * Made `SkeletonGraphic.unscaledTime` parameter protected, use the new property `UnscaledTime` instead.
