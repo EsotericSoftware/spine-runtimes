@@ -1,6 +1,5 @@
 package spine.animation;
 
-import openfl.errors.ArgumentError;
 import openfl.utils.Object;
 import spine.SkeletonData;
 
@@ -23,18 +22,18 @@ class AnimationStateData {
 	public function setMixByName(fromName:String, toName:String, duration:Float):Void {
 		var from:Animation = _skeletonData.findAnimation(fromName);
 		if (from == null)
-			throw new ArgumentError("Animation not found: " + fromName);
+			throw new SpineException("Animation not found: " + fromName);
 		var to:Animation = _skeletonData.findAnimation(toName);
 		if (to == null)
-			throw new ArgumentError("Animation not found: " + toName);
+			throw new SpineException("Animation not found: " + toName);
 		setMix(from, to, duration);
 	}
 
 	public function setMix(from:Animation, to:Animation, duration:Float):Void {
 		if (from == null)
-			throw new ArgumentError("from cannot be null.");
+			throw new SpineException("from cannot be null.");
 		if (to == null)
-			throw new ArgumentError("to cannot be null.");
+			throw new SpineException("to cannot be null.");
 		animationToMixTime[from.name + ":" + to.name] = duration;
 	}
 

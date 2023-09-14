@@ -1,7 +1,5 @@
 package spine;
 
-import openfl.errors.ArgumentError;
-
 class EventData {
 	private var _name:String;
 
@@ -14,7 +12,7 @@ class EventData {
 
 	public function new(name:String) {
 		if (name == null)
-			throw new ArgumentError("name cannot be null.");
+			throw new SpineException("name cannot be null.");
 		_name = name;
 	}
 

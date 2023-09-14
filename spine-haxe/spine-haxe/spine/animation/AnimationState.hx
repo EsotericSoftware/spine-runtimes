@@ -1,7 +1,5 @@
 package spine.animation;
 
-import starling.utils.Max;
-import openfl.errors.ArgumentError;
 import openfl.utils.Dictionary;
 import openfl.Vector;
 import spine.animation.Listeners.EventListeners;
@@ -43,7 +41,7 @@ class AnimationState {
 
 	public function new(data:AnimationStateData) {
 		if (data == null)
-			throw new ArgumentError("data can not be null");
+			throw new SpineException("data can not be null");
 		this.data = data;
 		this.queue = new EventQueue(this);
 		this.trackEntryPool = new Pool(function():Dynamic {
@@ -142,7 +140,7 @@ class AnimationState {
 
 	public function apply(skeleton:Skeleton):Bool {
 		if (skeleton == null)
-			throw new ArgumentError("skeleton cannot be null.");
+			throw new SpineException("skeleton cannot be null.");
 		if (animationsChanged)
 			_animationsChanged();
 		var applied:Bool = false;
@@ -507,13 +505,13 @@ class AnimationState {
 	public function setAnimationByName(trackIndex:Int, animationName:String, loop:Bool):TrackEntry {
 		var animation:Animation = data.skeletonData.findAnimation(animationName);
 		if (animation == null)
-			throw new ArgumentError("Animation not found: " + animationName);
+			throw new SpineException("Animation not found: " + animationName);
 		return setAnimation(trackIndex, animation, loop);
 	}
 
 	public function setAnimation(trackIndex:Int, animation:Animation, loop:Bool):TrackEntry {
 		if (animation == null)
-			throw new ArgumentError("animation cannot be null.");
+			throw new SpineException("animation cannot be null.");
 		var interrupt:Bool = true;
 		var current:TrackEntry = expandToIndex(trackIndex);
 		if (current != null) {
@@ -538,13 +536,13 @@ class AnimationState {
 	public function addAnimationByName(trackIndex:Int, animationName:String, loop:Bool, delay:Float):TrackEntry {
 		var animation:Animation = data.skeletonData.findAnimation(animationName);
 		if (animation == null)
-			throw new ArgumentError("Animation not found: " + animationName);
+			throw new SpineException("Animation not found: " + animationName);
 		return addAnimation(trackIndex, animation, loop, delay);
 	}
 
 	public function addAnimation(trackIndex:Int, animation:Animation, loop:Bool, delay:Float):TrackEntry {
 		if (animation == null)
-			throw new ArgumentError("animation cannot be null.");
+			throw new SpineException("animation cannot be null.");
 
 		var last:TrackEntry = expandToIndex(trackIndex);
 		if (last != null) {
@@ -627,7 +625,7 @@ class AnimationState {
 		entry.trackTime = 0;
 		entry.trackLast = -1;
 		entry.nextTrackLast = -1;
-		entry.trackEnd = Max.INT_MAX_VALUE;
+		entry.trackEnd = 2147483647;
 		entry.timeScale = 1;
 
 		entry.alpha = 1;

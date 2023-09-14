@@ -1,6 +1,5 @@
 package spine.animation;
 
-import starling.utils.Max;
 import openfl.Vector;
 import spine.animation.Timeline;
 import spine.Event;
@@ -34,7 +33,7 @@ class EventTimeline extends Timeline {
 
 		if (lastTime > time) // Fire events after last time for looped animations.
 		{
-			apply(skeleton, lastTime, Max.INT_MAX_VALUE, events, alpha, blend, direction);
+			apply(skeleton, lastTime, 2147483647, events, alpha, blend, direction);
 			lastTime = -1;
 		} else if (lastTime >= frames[frameCount - 1]) // Last time is after last frame.
 		{

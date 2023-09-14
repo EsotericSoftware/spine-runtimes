@@ -1,11 +1,10 @@
 package spine;
 
-import spine.attachments.AtlasAttachmentLoader;
-import openfl.utils.Assets;
-import spine.atlas.TextureAtlas;
-import openfl.errors.ArgumentError;
 import openfl.Vector;
+import openfl.utils.Assets;
 import spine.animation.Animation;
+import spine.atlas.TextureAtlas;
+import spine.attachments.AtlasAttachmentLoader;
 
 class SkeletonData {
 	/** May be null. */
@@ -53,7 +52,7 @@ class SkeletonData {
 	/** @return May be null. */
 	public function findBone(boneName:String):BoneData {
 		if (boneName == null)
-			throw new ArgumentError("boneName cannot be null.");
+			throw new SpineException("boneName cannot be null.");
 		for (i in 0...bones.length) {
 			var bone:BoneData = bones[i];
 			if (bone.name == boneName)
@@ -65,7 +64,7 @@ class SkeletonData {
 	/** @return -1 if the bone was not found. */
 	public function findBoneIndex(boneName:String):Int {
 		if (boneName == null)
-			throw new ArgumentError("boneName cannot be null.");
+			throw new SpineException("boneName cannot be null.");
 		for (i in 0...bones.length) {
 			if (bones[i].name == boneName)
 				return i;
@@ -78,7 +77,7 @@ class SkeletonData {
 	/** @return May be null. */
 	public function findSlot(slotName:String):SlotData {
 		if (slotName == null)
-			throw new ArgumentError("slotName cannot be null.");
+			throw new SpineException("slotName cannot be null.");
 		for (i in 0...slots.length) {
 			var slot:SlotData = slots[i];
 			if (slot.name == slotName)
@@ -92,7 +91,7 @@ class SkeletonData {
 	/** @return May be null. */
 	public function findSkin(skinName:String):Skin {
 		if (skinName == null)
-			throw new ArgumentError("skinName cannot be null.");
+			throw new SpineException("skinName cannot be null.");
 		for (skin in skins) {
 			if (skin.name == skinName)
 				return skin;
@@ -105,7 +104,7 @@ class SkeletonData {
 	/** @return May be null. */
 	public function findEvent(eventName:String):EventData {
 		if (eventName == null)
-			throw new ArgumentError("eventName cannot be null.");
+			throw new SpineException("eventName cannot be null.");
 		for (eventData in events) {
 			if (eventData.name == eventName)
 				return eventData;
@@ -118,7 +117,7 @@ class SkeletonData {
 	/** @return May be null. */
 	public function findAnimation(animationName:String):Animation {
 		if (animationName == null)
-			throw new ArgumentError("animationName cannot be null.");
+			throw new SpineException("animationName cannot be null.");
 		for (animation in animations) {
 			if (animation.name == animationName)
 				return animation;
@@ -131,7 +130,7 @@ class SkeletonData {
 	/** @return May be null. */
 	public function findIkConstraint(constraintName:String):IkConstraintData {
 		if (constraintName == null)
-			throw new ArgumentError("constraintName cannot be null.");
+			throw new SpineException("constraintName cannot be null.");
 		for (ikConstraintData in ikConstraints) {
 			if (ikConstraintData.name == constraintName)
 				return ikConstraintData;
@@ -144,7 +143,7 @@ class SkeletonData {
 	/** @return May be null. */
 	public function findTransformConstraint(constraintName:String):TransformConstraintData {
 		if (constraintName == null)
-			throw new ArgumentError("constraintName cannot be null.");
+			throw new SpineException("constraintName cannot be null.");
 		for (transformConstraintData in transformConstraints) {
 			if (transformConstraintData.name == constraintName)
 				return transformConstraintData;
@@ -155,7 +154,7 @@ class SkeletonData {
 	/** @return -1 if the transform constraint was not found. */
 	public function findTransformConstraintIndex(transformConstraintName:String):Int {
 		if (transformConstraintName == null)
-			throw new ArgumentError("transformConstraintName cannot be null.");
+			throw new SpineException("transformConstraintName cannot be null.");
 		for (i in 0...transformConstraints.length) {
 			if (transformConstraints[i].name == transformConstraintName)
 				return i;
@@ -168,7 +167,7 @@ class SkeletonData {
 	/** @return May be null. */
 	public function findPathConstraint(constraintName:String):PathConstraintData {
 		if (constraintName == null)
-			throw new ArgumentError("constraintName cannot be null.");
+			throw new SpineException("constraintName cannot be null.");
 		for (i in 0...pathConstraints.length) {
 			var constraint:PathConstraintData = pathConstraints[i];
 			if (constraint.name == constraintName)
@@ -180,7 +179,7 @@ class SkeletonData {
 	/** @return -1 if the path constraint was not found. */
 	public function findPathConstraintIndex(pathConstraintName:String):Int {
 		if (pathConstraintName == null)
-			throw new ArgumentError("pathConstraintName cannot be null.");
+			throw new SpineException("pathConstraintName cannot be null.");
 		for (i in 0...pathConstraints.length) {
 			if (pathConstraints[i].name == pathConstraintName)
 				return i;

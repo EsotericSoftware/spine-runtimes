@@ -1,6 +1,5 @@
 package spine.animation;
 
-import openfl.errors.ArgumentError;
 import openfl.utils.Dictionary;
 import openfl.Vector;
 import spine.Event;
@@ -46,7 +45,7 @@ class Animation {
 	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, loop:Bool, events:Vector<Event>, alpha:Float, blend:MixBlend,
 			direction:MixDirection):Void {
 		if (skeleton == null)
-			throw new ArgumentError("skeleton cannot be null.");
+			throw new SpineException("skeleton cannot be null.");
 
 		if (loop && duration != 0) {
 			time %= duration;

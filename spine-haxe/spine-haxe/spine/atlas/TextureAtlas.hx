@@ -1,7 +1,6 @@
 package spine.atlas;
 
 import openfl.utils.Assets;
-import openfl.errors.ArgumentError;
 import openfl.utils.ByteArray;
 import openfl.utils.Dictionary;
 import openfl.Vector;
@@ -32,13 +31,13 @@ class TextureAtlas {
 		} else if (Std.isOfType(object, ByteArrayData)) {
 			load(cast(object, ByteArray).readUTFBytes(cast(object, ByteArray).length), textureLoader);
 		} else {
-			throw new ArgumentError("object must be a string or ByteArrayData.");
+			throw new SpineException("object must be a string or ByteArrayData.");
 		}
 	}
 
 	private function load(atlasText:String, textureLoader:TextureLoader):Void {
 		if (textureLoader == null) {
-			throw new ArgumentError("textureLoader cannot be null.");
+			throw new SpineException("textureLoader cannot be null.");
 		}
 		this.textureLoader = textureLoader;
 

@@ -1,6 +1,5 @@
 package spine;
 
-import openfl.errors.ArgumentError;
 import openfl.utils.Dictionary;
 import openfl.Vector;
 import spine.attachments.Attachment;
@@ -15,13 +14,13 @@ class Skin {
 
 	public function new(name:String) {
 		if (name == null)
-			throw new ArgumentError("name cannot be null.");
+			throw new SpineException("name cannot be null.");
 		_name = name;
 	}
 
 	public function setAttachment(slotIndex:Int, name:String, attachment:Attachment):Void {
 		if (attachment == null)
-			throw new ArgumentError("attachment cannot be null.");
+			throw new SpineException("attachment cannot be null.");
 		if (slotIndex >= _attachments.length)
 			_attachments.length = slotIndex + 1;
 		if (_attachments[slotIndex] == null)

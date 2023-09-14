@@ -1,7 +1,5 @@
 package spine;
 
-import openfl.errors.ArgumentError;
-
 class Event {
 	private var _data:EventData;
 
@@ -14,7 +12,7 @@ class Event {
 
 	public function new(time:Float, data:EventData) {
 		if (data == null)
-			throw new ArgumentError("data cannot be null.");
+			throw new SpineException("data cannot be null.");
 		this.time = time;
 		_data = data;
 	}

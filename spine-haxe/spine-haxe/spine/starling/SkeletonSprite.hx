@@ -309,8 +309,13 @@ class SkeletonSprite extends DisplayObject implements IAnimatable {
 		return _smoothing;
 	}
 
+	var updated = false;
+
 	public function advanceTime(time:Float):Void {
-		_state.update(time);
+		if (!updated) {
+			// updated = true;
+			_state.update(0.016 * 0.1);
+		}
 		_state.apply(skeleton);
 		skeleton.updateWorldTransform();
 		this.setRequiresRedraw();

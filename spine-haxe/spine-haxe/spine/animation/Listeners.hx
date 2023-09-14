@@ -1,6 +1,5 @@
 package spine.animation;
 
-import openfl.errors.ArgumentError;
 import openfl.Vector;
 
 class Listeners {
@@ -24,7 +23,7 @@ class Listeners {
 
 	public function add(listener:TrackEntry->Void):Void {
 		if (listener == null)
-			throw new ArgumentError("listener cannot be null.");
+			throw new SpineException("listener cannot be null.");
 		var indexOf:Int = _listeners.indexOf(listener);
 		if (indexOf == -1)
 			_listeners.push(listener);
@@ -32,7 +31,7 @@ class Listeners {
 
 	public function remove(listener:TrackEntry->Void):Void {
 		if (listener == null)
-			throw new ArgumentError("listener cannot be null.");
+			throw new SpineException("listener cannot be null.");
 		var indexOf:Int = _listeners.indexOf(listener);
 		if (indexOf != -1)
 			_listeners.splice(indexOf, 1);
@@ -60,7 +59,7 @@ class EventListeners {
 
 	public function add(listener:TrackEntry->Event->Void):Void {
 		if (listener == null)
-			throw new ArgumentError("listener cannot be null.");
+			throw new SpineException("listener cannot be null.");
 		var indexOf:Int = _listeners.indexOf(listener);
 		if (indexOf == -1)
 			_listeners.push(listener);
@@ -68,7 +67,7 @@ class EventListeners {
 
 	public function remove(listener:TrackEntry->Event->Void):Void {
 		if (listener == null)
-			throw new ArgumentError("listener cannot be null.");
+			throw new SpineException("listener cannot be null.");
 		var indexOf:Int = _listeners.indexOf(listener);
 		if (indexOf != -1)
 			_listeners.splice(indexOf, 1);

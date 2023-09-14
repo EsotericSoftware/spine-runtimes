@@ -1,6 +1,5 @@
 package spine.attachments;
 
-import openfl.errors.ArgumentError;
 import spine.atlas.TextureAtlas;
 import spine.Skin;
 
@@ -9,7 +8,7 @@ class AtlasAttachmentLoader implements AttachmentLoader {
 
 	public function new(atlas:TextureAtlas) {
 		if (atlas == null) {
-			throw new ArgumentError("atlas cannot be null.");
+			throw new SpineException("atlas cannot be null.");
 		}
 		this.atlas = atlas;
 	}

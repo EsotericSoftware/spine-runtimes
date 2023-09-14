@@ -1,6 +1,5 @@
 package spine;
 
-import openfl.errors.ArgumentError;
 import openfl.Vector;
 
 class TransformConstraint implements Updatable {
@@ -21,9 +20,9 @@ class TransformConstraint implements Updatable {
 
 	public function new(data:TransformConstraintData, skeleton:Skeleton) {
 		if (data == null)
-			throw new ArgumentError("data cannot be null.");
+			throw new SpineException("data cannot be null.");
 		if (skeleton == null)
-			throw new ArgumentError("skeleton cannot be null.");
+			throw new SpineException("skeleton cannot be null.");
 		_data = data;
 		mixRotate = data.mixRotate;
 		mixX = data.mixX;

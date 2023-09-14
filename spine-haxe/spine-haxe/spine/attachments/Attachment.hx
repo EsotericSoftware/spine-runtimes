@@ -1,14 +1,11 @@
 package spine.attachments;
 
-import openfl.errors.ArgumentError;
-import openfl.errors.IllegalOperationError;
-
 class Attachment {
 	private var _name:String;
 
 	public function new(name:String) {
 		if (name == null) {
-			throw new ArgumentError("name cannot be null.");
+			throw new SpineException("name cannot be null.");
 		}
 		_name = name;
 	}
@@ -24,6 +21,6 @@ class Attachment {
 	}
 
 	public function copy():Attachment {
-		throw new IllegalOperationError("Not implemented");
+		throw new SpineException("Not implemented");
 	}
 }

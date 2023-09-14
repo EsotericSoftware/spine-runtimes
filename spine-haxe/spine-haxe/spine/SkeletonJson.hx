@@ -1,13 +1,9 @@
 package spine;
 
-import spine.animation.SequenceTimeline;
-import haxe.Json;
-import openfl.errors.ArgumentError;
-import openfl.errors.Error;
-import openfl.utils.ByteArray;
-import openfl.utils.Object;
-import openfl.Vector;
 import Reflect;
+import haxe.Json;
+import openfl.Vector;
+import openfl.utils.Object;
 import spine.animation.AlphaTimeline;
 import spine.animation.Animation;
 import spine.animation.AttachmentTimeline;
@@ -29,6 +25,7 @@ import spine.animation.RotateTimeline;
 import spine.animation.ScaleTimeline;
 import spine.animation.ScaleXTimeline;
 import spine.animation.ScaleYTimeline;
+import spine.animation.SequenceTimeline;
 import spine.animation.ShearTimeline;
 import spine.animation.ShearXTimeline;
 import spine.animation.ShearYTimeline;
@@ -60,7 +57,7 @@ class SkeletonJson {
 
 	public function readSkeletonData(json:String):SkeletonData {
 		if (json == null)
-			throw new ArgumentError("object cannot be null.");
+			throw new SpineException("object cannot be null.");
 
 		var root = Json.parse(json);
 

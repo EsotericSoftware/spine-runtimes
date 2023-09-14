@@ -1,6 +1,5 @@
 package spine;
 
-import openfl.errors.ArgumentError;
 import openfl.Vector;
 import spine.attachments.Attachment;
 import spine.attachments.VertexAttachment;
@@ -21,9 +20,9 @@ class Slot {
 
 	public function new(data:SlotData, bone:Bone) {
 		if (data == null)
-			throw new ArgumentError("data cannot be null.");
+			throw new SpineException("data cannot be null.");
 		if (bone == null)
-			throw new ArgumentError("bone cannot be null.");
+			throw new SpineException("bone cannot be null.");
 		_data = data;
 		_bone = bone;
 		this.color = new Color(1, 1, 1, 1);

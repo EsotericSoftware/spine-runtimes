@@ -1,6 +1,5 @@
 package spine;
 
-import openfl.errors.ArgumentError;
 import openfl.Vector;
 import spine.attachments.PathAttachment;
 
@@ -31,9 +30,9 @@ class PathConstraint implements Updatable {
 
 	public function new(data:PathConstraintData, skeleton:Skeleton) {
 		if (data == null)
-			throw new ArgumentError("data cannot be null.");
+			throw new SpineException("data cannot be null.");
 		if (skeleton == null)
-			throw new ArgumentError("skeleton cannot be null.");
+			throw new SpineException("skeleton cannot be null.");
 		_data = data;
 		_bones = new Vector<Bone>();
 		for (boneData in data.bones) {

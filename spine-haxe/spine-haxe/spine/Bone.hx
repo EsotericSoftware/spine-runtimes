@@ -1,6 +1,5 @@
 package spine;
 
-import openfl.errors.ArgumentError;
 import openfl.Vector;
 
 class Bone implements Updatable {
@@ -37,9 +36,9 @@ class Bone implements Updatable {
 	/** @param parent May be null. */
 	public function new(data:BoneData, skeleton:Skeleton, parent:Bone) {
 		if (data == null)
-			throw new ArgumentError("data cannot be null.");
+			throw new SpineException("data cannot be null.");
 		if (skeleton == null)
-			throw new ArgumentError("skeleton cannot be null.");
+			throw new SpineException("skeleton cannot be null.");
 		_data = data;
 		_skeleton = skeleton;
 		_parent = parent;

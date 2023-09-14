@@ -1,7 +1,5 @@
 package spine;
 
-import openfl.errors.ArgumentError;
-
 class SlotData {
 	private var _index:Int;
 	private var _name:String;
@@ -14,11 +12,11 @@ class SlotData {
 
 	public function new(index:Int, name:String, boneData:BoneData) {
 		if (index < 0)
-			throw new ArgumentError("index must be >= 0.");
+			throw new SpineException("index must be >= 0.");
 		if (name == null)
-			throw new ArgumentError("name cannot be null.");
+			throw new SpineException("name cannot be null.");
 		if (boneData == null)
-			throw new ArgumentError("boneData cannot be null.");
+			throw new SpineException("boneData cannot be null.");
 		_index = index;
 		_name = name;
 		_boneData = boneData;

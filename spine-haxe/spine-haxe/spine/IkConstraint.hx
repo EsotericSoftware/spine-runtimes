@@ -1,6 +1,5 @@
 package spine;
 
-import openfl.errors.ArgumentError;
 import openfl.Vector;
 
 class IkConstraint implements Updatable {
@@ -17,9 +16,9 @@ class IkConstraint implements Updatable {
 
 	public function new(data:IkConstraintData, skeleton:Skeleton) {
 		if (data == null)
-			throw new ArgumentError("data cannot be null.");
+			throw new SpineException("data cannot be null.");
 		if (skeleton == null)
-			throw new ArgumentError("skeleton cannot be null.");
+			throw new SpineException("skeleton cannot be null.");
 		_data = data;
 		mix = data.mix;
 		softness = data.softness;

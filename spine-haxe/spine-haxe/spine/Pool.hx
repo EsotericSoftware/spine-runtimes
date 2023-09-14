@@ -1,7 +1,12 @@
 package spine;
 
-import openfl.utils.Function;
 import openfl.Vector;
+
+#if flash
+typedef Function = Dynamic;
+#else
+typedef Function = haxe.Constraints.Function;
+#end
 
 @:generic class Pool<T> {
 	private var items:Vector<T>;

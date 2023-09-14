@@ -1,12 +1,9 @@
 package spine;
 
-import spine.attachments.AtlasAttachmentLoader;
-import openfl.utils.Endian;
-import spine.animation.SequenceTimeline;
-import openfl.errors.ArgumentError;
-import openfl.errors.Error;
-import openfl.utils.ByteArray;
+import StringTools;
 import openfl.Vector;
+import openfl.utils.ByteArray;
+import openfl.utils.Endian;
 import spine.animation.AlphaTimeline;
 import spine.animation.Animation;
 import spine.animation.AttachmentTimeline;
@@ -28,6 +25,7 @@ import spine.animation.RotateTimeline;
 import spine.animation.ScaleTimeline;
 import spine.animation.ScaleXTimeline;
 import spine.animation.ScaleYTimeline;
+import spine.animation.SequenceTimeline;
 import spine.animation.ShearTimeline;
 import spine.animation.ShearXTimeline;
 import spine.animation.ShearYTimeline;
@@ -46,7 +44,6 @@ import spine.attachments.PathAttachment;
 import spine.attachments.PointAttachment;
 import spine.attachments.RegionAttachment;
 import spine.attachments.VertexAttachment;
-import StringTools;
 
 class SkeletonBinary {
 	public var attachmentLoader:AttachmentLoader;
