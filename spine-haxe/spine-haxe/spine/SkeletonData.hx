@@ -29,6 +29,7 @@
 
 package spine;
 
+import haxe.io.Bytes;
 import openfl.utils.Assets;
 import spine.animation.Animation;
 import spine.atlas.TextureAtlas;
@@ -57,19 +58,17 @@ class SkeletonData {
 	public var imagesPath:String;
 	public var audioPath:String;
 
-	public static function fromAssets(path:String, atlas:TextureAtlas, scale:Float = 1.0):SkeletonData {
-		if (StringTools.endsWith(path, ".skel")) {
-			var byteData = Assets.getBytes(path);
+	public static function from(data:Dynamic, atlas:TextureAtlas, scale:Float = 1.0):SkeletonData {
+		if (Std.isOfType(data, Bytes)) {
 			var loader = new SkeletonBinary(new AtlasAttachmentLoader(atlas));
 			loader.scale = scale;
-			return loader.readSkeletonData(byteData);
-		} else if (StringTools.endsWith(path, ".json")) {
-			var jsonData = Assets.getText(path);
+			return loader.readSkeletonData(cast(data, Bytes));
+		} else if (Std.isOfType(data, String)) {
 			var loader = new SkeletonJson(new AtlasAttachmentLoader(atlas));
 			loader.scale = scale;
-			return loader.readSkeletonData(jsonData);
+			return loader.readSkeletonData(cast(data, String));
 		} else {
-			throw new SpineException("Path of skeleton data file must end with .json or .skel");
+			throw new SpineException("Data must either be a String (.json) or Bytes (.skel) instance.");
 		}
 	}
 

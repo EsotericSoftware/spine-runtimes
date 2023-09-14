@@ -37,17 +37,6 @@ class TextureAtlas {
 	private var regions = new Array<TextureAtlasRegion>();
 	private var textureLoader:TextureLoader;
 
-	public static function fromAssets(path:String) {
-		var basePath = "";
-		var slashIndex = path.lastIndexOf("/");
-		if (slashIndex != -1) {
-			basePath = path.substring(0, slashIndex);
-		}
-
-		var textureLoader = new AssetsTextureLoader(basePath);
-		return new TextureAtlas(Assets.getText(path), textureLoader);
-	}
-
 	/** @param object A String or ByteArray. */
 	public function new(atlasText:String, textureLoader:TextureLoader) {
 		if (atlasText == null) {

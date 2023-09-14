@@ -27,20 +27,22 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+import openfl.utils.Assets;
 import spine.SkeletonData;
 import spine.animation.AnimationStateData;
 import spine.atlas.TextureAtlas;
 import spine.starling.SkeletonSprite;
+import spine.starling.StarlingTextureLoader;
 import starling.core.Starling;
 import starling.events.TouchEvent;
 import starling.events.TouchPhase;
 
 class BasicExample extends Scene {
-	var loadBinary = false;
+	var loadBinary = true;
 
 	public function load():Void {
-		var atlas = TextureAtlas.fromAssets("assets/raptor.atlas");
-		var skeletondata = SkeletonData.fromAssets("assets/raptor-pro" + (loadBinary ? ".skel" : ".json"), atlas);
+		var atlas = new TextureAtlas(Assets.getText("assets/raptor.atlas"), new StarlingTextureLoader("assets/raptor-pro.atlas"));
+		var skeletondata = SkeletonData.from(loadBinary ? Assets.getBytes("assets/raptor-pro.skel") : Assets.getText("assets/raptor-pro.json"), atlas);
 		var animationStateData = new AnimationStateData(skeletondata);
 		animationStateData.defaultMix = 0.25;
 
