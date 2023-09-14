@@ -29,19 +29,17 @@
 
 package spine.animation;
 
-import openfl.Vector;
-
 class Listeners {
-	private var _listeners:Vector<TrackEntry->Void>;
+	private var _listeners:Array<TrackEntry->Void>;
 
-	public var listeners(get, never):Vector<TrackEntry->Void>;
+	public var listeners(get, never):Array<TrackEntry->Void>;
 
-	private function get_listeners():Vector<TrackEntry->Void> {
+	private function get_listeners():Array<TrackEntry->Void> {
 		return _listeners;
 	}
 
 	public function new() {
-		_listeners = new Vector<TrackEntry->Void>();
+		_listeners = new Array<TrackEntry->Void>();
 	}
 
 	public function invoke(entry:TrackEntry) {
@@ -68,16 +66,16 @@ class Listeners {
 }
 
 class EventListeners {
-	private var _listeners:Vector<TrackEntry->Event->Void>;
+	private var _listeners:Array<TrackEntry->Event->Void>;
 
-	public var listeners(get, never):Vector<TrackEntry->Event->Void>;
+	public var listeners(get, never):Array<TrackEntry->Event->Void>;
 
-	private function get_listeners():Vector<TrackEntry->Event->Void> {
+	private function get_listeners():Array<TrackEntry->Event->Void> {
 		return _listeners;
 	}
 
 	public function new() {
-		_listeners = new Vector<TrackEntry->Event->Void>();
+		_listeners = new Array<TrackEntry->Event->Void>();
 	}
 
 	public function invoke(entry:TrackEntry, event:Event) {

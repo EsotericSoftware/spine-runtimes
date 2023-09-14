@@ -29,7 +29,6 @@
 
 package spine;
 
-import openfl.Vector;
 import spine.attachments.PathAttachment;
 
 class PathConstraint implements Updatable {
@@ -39,7 +38,7 @@ class PathConstraint implements Updatable {
 	private static inline var epsilon:Float = 0.00001;
 
 	private var _data:PathConstraintData;
-	private var _bones:Vector<Bone>;
+	private var _bones:Array<Bone>;
 
 	public var target:Slot;
 	public var position:Float = 0;
@@ -48,12 +47,12 @@ class PathConstraint implements Updatable {
 	public var mixX:Float = 0;
 	public var mixY:Float = 0;
 
-	private var _spaces(default, never):Vector<Float> = new Vector<Float>();
-	private var _positions(default, never):Vector<Float> = new Vector<Float>();
-	private var _world(default, never):Vector<Float> = new Vector<Float>();
-	private var _curves(default, never):Vector<Float> = new Vector<Float>();
-	private var _lengths(default, never):Vector<Float> = new Vector<Float>();
-	private var _segments(default, never):Vector<Float> = new Vector<Float>(10, true);
+	private var _spaces(default, never):Array<Float> = new Array<Float>();
+	private var _positions(default, never):Array<Float> = new Array<Float>();
+	private var _world(default, never):Array<Float> = new Array<Float>();
+	private var _curves(default, never):Array<Float> = new Array<Float>();
+	private var _lengths(default, never):Array<Float> = new Array<Float>();
+	private var _segments(default, never):Array<Float> = new Array<Float>();
 
 	public var active:Bool = false;
 
@@ -63,7 +62,7 @@ class PathConstraint implements Updatable {
 		if (skeleton == null)
 			throw new SpineException("skeleton cannot be null.");
 		_data = data;
-		_bones = new Vector<Bone>();
+		_bones = new Array<Bone>();
 		for (boneData in data.bones) {
 			_bones.push(skeleton.findBone(boneData.name));
 		}
@@ -94,11 +93,11 @@ class PathConstraint implements Updatable {
 
 		var boneCount:Int = _bones.length;
 		var spacesCount:Int = fTangents ? boneCount : boneCount + 1;
-		var bones:Vector<Bone> = _bones;
-		_spaces.length = spacesCount;
+		var bones:Array<Bone> = _bones;
+		_spaces.resize(spacesCount);
 
 		if (fScale)
-			_lengths.length = boneCount;
+			_lengths.resize(boneCount);
 
 		var i:Int,
 			n:Int,
@@ -175,7 +174,7 @@ class PathConstraint implements Updatable {
 				}
 		}
 
-		var positions:Vector<Float> = computeWorldPositions(attachment, spacesCount, fTangents);
+		var positions:Array<Float> = computeWorldPositions(attachment, spacesCount, fTangents);
 		var boneX:Float = positions[0];
 		var boneY:Float = positions[1];
 		var offsetRotation:Float = data.offsetRotation;
@@ -253,10 +252,10 @@ class PathConstraint implements Updatable {
 		}
 	}
 
-	private function computeWorldPositions(path:PathAttachment, spacesCount:Int, tangents:Bool):Vector<Float> {
+	private function computeWorldPositions(path:PathAttachment, spacesCount:Int, tangents:Bool):Array<Float> {
 		var position:Float = this.position;
-		_positions.length = spacesCount * 3 + 2;
-		var out:Vector<Float> = _positions, world:Vector<Float>;
+		_positions.resize(spacesCount * 3 + 2);
+		var out:Array<Float> = _positions, world:Array<Float>;
 		var closed:Bool = path.closed;
 		var verticesLength:Int = path.worldVerticesLength;
 		var curveCount:Int = Std.int(verticesLength / 6);
@@ -264,7 +263,7 @@ class PathConstraint implements Updatable {
 		var multiplier:Float, i:Int;
 
 		if (!path.constantSpeed) {
-			var lengths:Vector<Float> = path.lengths;
+			var lengths:Array<Float> = path.lengths;
 			curveCount -= closed ? 1 : 2;
 			var pathLength:Float = lengths[curveCount];
 			if (data.positionMode == PositionMode.percent)
@@ -278,7 +277,7 @@ class PathConstraint implements Updatable {
 					multiplier = 1;
 			}
 
-			_world.length = 8;
+			_world.resize(8);
 			world = _world;
 			var i:Int = 0;
 			var o:Int = 0;
@@ -344,7 +343,7 @@ class PathConstraint implements Updatable {
 		// World vertices.
 		if (closed) {
 			verticesLength += 2;
-			_world.length = verticesLength;
+			_world.resize(verticesLength);
 			world = _world;
 			path.computeWorldVertices(target, 2, verticesLength - 4, world, 0, 2);
 			path.computeWorldVertices(target, 0, 2, world, verticesLength - 4, 2);
@@ -353,14 +352,14 @@ class PathConstraint implements Updatable {
 		} else {
 			curveCount--;
 			verticesLength -= 4;
-			_world.length = verticesLength;
+			_world.resize(verticesLength);
 			world = _world;
 			path.computeWorldVertices(target, 2, verticesLength, world, 0, 2);
 		}
 
 		// Curve lengths.
-		_curves.length = curveCount;
-		var curves:Vector<Float> = _curves;
+		_curves.resize(curveCount);
+		var curves:Array<Float> = _curves;
 		var pathLength:Float = 0;
 		var x1:Float = world[0],
 			y1:Float = world[1],
@@ -420,7 +419,7 @@ class PathConstraint implements Updatable {
 				multiplier = 1;
 		}
 
-		var segments:Vector<Float> = _segments;
+		var segments:Array<Float> = _segments;
 		var curveLength:Float = 0;
 		var segment:Int;
 		i = 0;
@@ -529,7 +528,7 @@ class PathConstraint implements Updatable {
 		return out;
 	}
 
-	private function addBeforePosition(p:Float, temp:Vector<Float>, i:Int, out:Vector<Float>, o:Int):Void {
+	private function addBeforePosition(p:Float, temp:Array<Float>, i:Int, out:Array<Float>, o:Int):Void {
 		var x1:Float = temp[i];
 		var y1:Float = temp[i + 1];
 		var dx:Float = temp[i + 2] - x1;
@@ -540,7 +539,7 @@ class PathConstraint implements Updatable {
 		out[o + 2] = r;
 	}
 
-	private function addAfterPosition(p:Float, temp:Vector<Float>, i:Int, out:Vector<Float>, o:Int):Void {
+	private function addAfterPosition(p:Float, temp:Array<Float>, i:Int, out:Array<Float>, o:Int):Void {
 		var x1:Float = temp[i + 2];
 		var y1:Float = temp[i + 3];
 		var dx:Float = x1 - temp[i];
@@ -551,7 +550,7 @@ class PathConstraint implements Updatable {
 		out[o + 2] = r;
 	}
 
-	private function addCurvePosition(p:Float, x1:Float, y1:Float, cx1:Float, cy1:Float, cx2:Float, cy2:Float, x2:Float, y2:Float, out:Vector<Float>, o:Int,
+	private function addCurvePosition(p:Float, x1:Float, y1:Float, cx1:Float, cy1:Float, cx2:Float, cy2:Float, x2:Float, y2:Float, out:Array<Float>, o:Int,
 			tangents:Bool):Void {
 		if (p == 0 || Math.isNaN(p)) {
 			out[o] = x1;
@@ -581,9 +580,9 @@ class PathConstraint implements Updatable {
 		}
 	}
 
-	public var bones(get, never):Vector<Bone>;
+	public var bones(get, never):Array<Bone>;
 
-	private function get_bones():Vector<Bone> {
+	private function get_bones():Array<Bone> {
 		return _bones;
 	}
 

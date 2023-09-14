@@ -36,7 +36,7 @@ import starling.events.TouchEvent;
 import starling.events.TouchPhase;
 
 class SequenceExample extends Scene {
-	var loadBinary = true;
+	var loadBinary = false;
 
 	public function load():Void {
 		var atlas = TextureAtlas.fromAssets("assets/dragon.atlas");

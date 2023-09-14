@@ -29,13 +29,11 @@
 
 package spine;
 
-import openfl.Vector;
-
 class PositionMode {
 	public static var fixed(default, never):PositionMode = new PositionMode("fixed");
 	public static var percent(default, never):PositionMode = new PositionMode("percent");
 
-	public static var values(default, never):Vector<PositionMode> = Vector.ofArray([fixed, percent]);
+	public static var values(default, never):Array<PositionMode> = [fixed, percent];
 
 	public var name(default, null):String;
 

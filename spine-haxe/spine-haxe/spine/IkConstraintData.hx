@@ -29,10 +29,8 @@
 
 package spine;
 
-import openfl.Vector;
-
 class IkConstraintData extends ConstraintData {
-	public var bones:Vector<BoneData> = new Vector<BoneData>();
+	public var bones:Array<BoneData> = new Array<BoneData>();
 	public var target:BoneData;
 	public var mix:Float = 1;
 	public var bendDirection:Int = 1;

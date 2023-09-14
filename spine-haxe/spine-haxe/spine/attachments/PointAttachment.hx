@@ -29,7 +29,6 @@
 
 package spine.attachments;
 
-import openfl.Vector;
 import spine.Bone;
 import spine.Color;
 import spine.MathUtils;
@@ -44,7 +43,7 @@ class PointAttachment extends VertexAttachment {
 		super(name);
 	}
 
-	public function computeWorldPosition(bone:Bone, point:Vector<Float>):Vector<Float> {
+	public function computeWorldPosition(bone:Bone, point:Array<Float>):Array<Float> {
 		point[0] = x * bone.a + y * bone.b + bone.worldX;
 		point[1] = x * bone.c + y * bone.d + bone.worldY;
 		return point;

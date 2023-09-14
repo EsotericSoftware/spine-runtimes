@@ -29,21 +29,20 @@
 
 package spine.attachments;
 
-import openfl.Vector;
 import spine.Color;
 import spine.atlas.TextureAtlasRegion;
 
 class MeshAttachment extends VertexAttachment implements HasTextureRegion {
 	public var region:TextureRegion;
 	public var path:String;
-	public var regionUVs = new Vector<Float>();
-	public var uvs = new Vector<Float>();
-	public var triangles = new Vector<Int>();
+	public var regionUVs = new Array<Float>();
+	public var uvs = new Array<Float>();
+	public var triangles = new Array<Int>();
 	public var color:Color = new Color(1, 1, 1, 1);
 	public var width:Float = 0;
 	public var height:Float = 0;
 	public var hullLength:Int = 0;
-	public var edges = new Vector<Int>();
+	public var edges = new Array<Int>();
 	public var rendererObject:Dynamic;
 	public var sequence:Sequence;
 
@@ -60,8 +59,10 @@ class MeshAttachment extends VertexAttachment implements HasTextureRegion {
 			return;
 		}
 		var regionUVs = this.regionUVs;
-		if (uvs.length != regionUVs.length)
-			uvs = new Vector<Float>(regionUVs.length, true);
+		if (uvs.length != regionUVs.length) {
+			uvs = new Array<Float>();
+			uvs.resize(regionUVs.length);
+		}
 		var n = uvs.length;
 		var u = region.u, v = region.v, width:Float = 0, height:Float = 0;
 		if (Std.isOfType(region, TextureAtlasRegion)) {
@@ -156,15 +157,15 @@ class MeshAttachment extends VertexAttachment implements HasTextureRegion {
 		copy.rendererObject = rendererObject;
 
 		this.copyTo(copy);
-		copy.regionUVs = regionUVs.concat();
-		copy.uvs = uvs.concat();
-		copy.triangles = triangles.concat();
+		copy.regionUVs = regionUVs.copy();
+		copy.uvs = uvs.copy();
+		copy.triangles = triangles.copy();
 		copy.hullLength = hullLength;
 
 		copy.sequence = sequence != null ? sequence.copy() : null;
 
 		if (edges != null) {
-			copy.edges = edges.concat();
+			copy.edges = edges.copy();
 		}
 		copy.width = width;
 		copy.height = height;
@@ -172,7 +173,7 @@ class MeshAttachment extends VertexAttachment implements HasTextureRegion {
 		return copy;
 	}
 
-	public override function computeWorldVertices(slot:Slot, start:Int, count:Int, worldVertices:Vector<Float>, offset:Int, stride:Int):Void {
+	public override function computeWorldVertices(slot:Slot, start:Int, count:Int, worldVertices:Array<Float>, offset:Int, stride:Int):Void {
 		if (sequence != null)
 			sequence.apply(slot, this);
 		super.computeWorldVertices(slot, start, count, worldVertices, offset, stride);

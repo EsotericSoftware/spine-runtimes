@@ -29,17 +29,17 @@
 
 package spine.animation;
 
-import openfl.Vector;
 import spine.Event;
 import spine.Skeleton;
 import spine.Slot;
 
 class DrawOrderTimeline extends Timeline {
-	public var drawOrders:Vector<Vector<Int>>;
+	public var drawOrders:Array<Array<Int>>;
 
 	public function new(frameCount:Int) {
-		super(frameCount, Vector.ofArray([Std.string(Property.drawOrder)]));
-		drawOrders = new Vector<Vector<Int>>(frameCount, true);
+		super(frameCount, [Std.string(Property.drawOrder)]);
+		drawOrders = new Array<Array<Int>>();
+		drawOrders.resize(frameCount);
 	}
 
 	public var frameCount(get, never):Int;
@@ -49,15 +49,15 @@ class DrawOrderTimeline extends Timeline {
 	}
 
 	/** Sets the time and value of the specified keyframe. */
-	public function setFrame(frame:Int, time:Float, drawOrder:Vector<Int>):Void {
+	public function setFrame(frame:Int, time:Float, drawOrder:Array<Int>):Void {
 		frames[frame] = time;
 		drawOrders[frame] = drawOrder;
 	}
 
-	override public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Vector<Event>, alpha:Float, blend:MixBlend,
+	override public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, blend:MixBlend,
 			direction:MixDirection):Void {
-		var drawOrder:Vector<Slot> = skeleton.drawOrder;
-		var slots:Vector<Slot> = skeleton.slots;
+		var drawOrder:Array<Slot> = skeleton.drawOrder;
+		var slots:Array<Slot> = skeleton.slots;
 		var i:Int = 0, n:Int = slots.length;
 
 		if (direction == MixDirection.mixOut) {
@@ -78,7 +78,7 @@ class DrawOrderTimeline extends Timeline {
 			return;
 		}
 
-		var drawOrderToSetupIndex:Vector<Int> = drawOrders[Timeline.search1(frames, time)];
+		var drawOrderToSetupIndex:Array<Int> = drawOrders[Timeline.search1(frames, time)];
 		if (drawOrderToSetupIndex == null) {
 			for (i in 0...n) {
 				drawOrder[i] = slots[i];

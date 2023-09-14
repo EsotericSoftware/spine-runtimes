@@ -29,10 +29,8 @@
 
 package spine;
 
+import haxe.io.Bytes;
 import StringTools;
-import openfl.Vector;
-import openfl.utils.ByteArray;
-import openfl.utils.Endian;
 import spine.animation.AlphaTimeline;
 import spine.animation.Animation;
 import spine.animation.AttachmentTimeline;
@@ -78,7 +76,7 @@ class SkeletonBinary {
 	public var attachmentLoader:AttachmentLoader;
 	public var scale:Float = 1;
 
-	private var linkedMeshes:Vector<LinkedMeshBinary> = new Vector<LinkedMeshBinary>();
+	private var linkedMeshes:Array<LinkedMeshBinary> = new Array<LinkedMeshBinary>();
 
 	private static inline var BONE_ROTATE:Int = 0;
 	private static inline var BONE_TRANSLATE:Int = 1;
@@ -113,8 +111,8 @@ class SkeletonBinary {
 		this.attachmentLoader = attachmentLoader;
 	}
 
-	public function readSkeletonData(bytes:ByteArray):SkeletonData {
-		bytes.endian = Endian.BIG_ENDIAN;
+	public function readSkeletonData(bytes:Bytes):SkeletonData {
+		// bytes.getData(). = Endian.BIG_ENDIAN;
 
 		var skeletonData:SkeletonData = new SkeletonData();
 		skeletonData.name = null;
@@ -291,7 +289,7 @@ class SkeletonBinary {
 			if (linkedMesh.mesh.region != null)
 				linkedMesh.mesh.updateRegion();
 		}
-		linkedMeshes.length = 0;
+		linkedMeshes.resize(0);
 
 		// Events.
 		n = input.readInt(true);
@@ -327,7 +325,7 @@ class SkeletonBinary {
 			skin = new Skin("default");
 		} else {
 			skin = new Skin(input.readStringRef());
-			skin.bones.length = input.readInt(true);
+			skin.bones.resize(input.readInt(true));
 			for (i in 0...skin.bones.length) {
 				skin.bones[i] = skeletonData.bones[input.readInt(true)];
 			}
@@ -436,12 +434,12 @@ class SkeletonBinary {
 				path = input.readStringRef();
 				color = input.readInt32();
 				vertexCount = input.readInt(true);
-				var uvs:Vector<Float> = readFloatArray(input, vertexCount << 1, 1);
-				var triangles:Vector<Int> = readShortArray(input);
+				var uvs:Array<Float> = readFloatArray(input, vertexCount << 1, 1);
+				var triangles:Array<Int> = readShortArray(input);
 				vertices = readVertices(input, vertexCount);
 				var hullLength:Int = input.readInt(true);
 				var sequence = readSequence(input);
-				var edges:Vector<Int> = null;
+				var edges:Array<Int> = null;
 				if (nonessential) {
 					edges = readShortArray(input);
 					width = input.readFloat();
@@ -502,8 +500,8 @@ class SkeletonBinary {
 				var constantSpeed:Bool = input.readBoolean();
 				vertexCount = input.readInt(true);
 				vertices = readVertices(input, vertexCount);
-				var lengths:Vector<Float> = new Vector<Float>();
-				lengths.length = Std.int(vertexCount / 3);
+				var lengths:Array<Float> = new Array<Float>();
+				lengths.resize(Std.int(vertexCount / 3));
 				for (i in 0...lengths.length) {
 					lengths[i] = input.readFloat() * scale;
 				}
@@ -567,8 +565,8 @@ class SkeletonBinary {
 			vertices.vertices = readFloatArray(input, verticesLength, scale);
 			return vertices;
 		}
-		var weights:Vector<Float> = new Vector<Float>();
-		var bonesArray:Vector<Int> = new Vector<Int>();
+		var weights:Array<Float> = new Array<Float>();
+		var bonesArray:Array<Int> = new Array<Int>();
 		for (i in 0...vertexCount) {
 			var boneCount:Int = input.readInt(true);
 			bonesArray.push(boneCount);
@@ -584,8 +582,8 @@ class SkeletonBinary {
 		return vertices;
 	}
 
-	private function readFloatArray(input:BinaryInput, n:Int, scale:Float):Vector<Float> {
-		var array:Vector<Float> = new Vector<Float>();
+	private function readFloatArray(input:BinaryInput, n:Int, scale:Float):Array<Float> {
+		var array:Array<Float> = new Array<Float>();
 		if (scale == 1) {
 			for (i in 0...n) {
 				array.push(input.readFloat());
@@ -598,9 +596,9 @@ class SkeletonBinary {
 		return array;
 	}
 
-	private function readShortArray(input:BinaryInput):Vector<Int> {
+	private function readShortArray(input:BinaryInput):Array<Int> {
 		var n:Int = input.readInt(true);
-		var array:Vector<Int> = new Vector<Int>();
+		var array:Array<Int> = new Array<Int>();
 		for (i in 0...n) {
 			array.push(input.readShort());
 		}
@@ -609,7 +607,7 @@ class SkeletonBinary {
 
 	private function readAnimation(input:BinaryInput, name:String, skeletonData:SkeletonData):Animation {
 		input.readInt(true); // Count of timelines.
-		var timelines:Vector<Timeline> = new Vector<Timeline>();
+		var timelines:Array<Timeline> = new Array<Timeline>();
 		var i:Int = 0, n:Int = 0, ii:Int = 0, nn:Int = 0;
 
 		var index:Int, slotIndex:Int, timelineType:Int, timelineScale:Float;
@@ -1042,7 +1040,7 @@ class SkeletonBinary {
 						case ATTACHMENT_DEFORM:
 							var vertexAttachment = cast(attachment, VertexAttachment);
 							var weighted:Bool = vertexAttachment.bones != null;
-							var vertices:Vector<Float> = vertexAttachment.vertices;
+							var vertices:Array<Float> = vertexAttachment.vertices;
 							var deformLength:Int = weighted ? Std.int(vertices.length / 3 * 2) : vertices.length;
 
 							bezierCount = input.readInt(true);
@@ -1052,17 +1050,19 @@ class SkeletonBinary {
 							frame = 0;
 							bezier = 0;
 							while (true) {
-								var deform:Vector<Float>;
+								var deform:Array<Float>;
 								var end:Int = input.readInt(true);
 								if (end == 0) {
 									if (weighted) {
-										deform = new Vector<Float>(deformLength, true);
+										deform = new Array<Float>();
+										deform.resize(deformLength);
 									} else {
 										deform = vertices;
 									}
 								} else {
 									var v:Int, vn:Int;
-									deform = new Vector<Float>(deformLength, true);
+									deform = new Array<Float>();
+									deform.resize(deformLength);
 									var start:Int = input.readInt(true);
 									end += start;
 									if (scale == 1) {
@@ -1118,12 +1118,14 @@ class SkeletonBinary {
 			for (i in 0...drawOrderCount) {
 				time = input.readFloat();
 				var offsetCount:Int = input.readInt(true);
-				var drawOrder:Vector<Int> = new Vector<Int>(slotCount, true);
+				var drawOrder:Array<Int> = new Array<Int>();
+				drawOrder.resize(slotCount);
 				var ii:Int = slotCount - 1;
 				while (ii >= 0) {
 					drawOrder[ii--] = -1;
 				}
-				var unchanged:Vector<Int> = new Vector<Int>(slotCount - offsetCount, true);
+				var unchanged:Array<Int> = new Array<Int>();
+				unchanged.resize(slotCount - offsetCount);
 				var originalIndex:Int = 0, unchangedIndex:Int = 0;
 				for (ii in 0...offsetCount) {
 					slotIndex = input.readInt(true);
@@ -1245,8 +1247,8 @@ class SkeletonBinary {
 }
 
 class Vertices {
-	public var vertices:Vector<Float> = new Vector<Float>();
-	public var bones:Vector<Int> = new Vector<Int>();
+	public var vertices:Array<Float> = new Array<Float>();
+	public var bones:Array<Int> = new Array<Int>();
 
 	public function new() {}
 }

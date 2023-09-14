@@ -29,7 +29,6 @@
 
 package spine;
 
-import openfl.Vector;
 import openfl.utils.Assets;
 import spine.animation.Animation;
 import spine.atlas.TextureAtlas;
@@ -39,15 +38,15 @@ class SkeletonData {
 	/** May be null. */
 	public var name:String;
 
-	public var bones:Vector<BoneData> = new Vector<BoneData>(); // Ordered parents first.
-	public var slots:Vector<SlotData> = new Vector<SlotData>(); // Setup pose draw order.
-	public var skins:Vector<Skin> = new Vector<Skin>();
+	public var bones:Array<BoneData> = new Array<BoneData>(); // Ordered parents first.
+	public var slots:Array<SlotData> = new Array<SlotData>(); // Setup pose draw order.
+	public var skins:Array<Skin> = new Array<Skin>();
 	public var defaultSkin:Skin;
-	public var events:Vector<EventData> = new Vector<EventData>();
-	public var animations:Vector<Animation> = new Vector<Animation>();
-	public var ikConstraints:Vector<IkConstraintData> = new Vector<IkConstraintData>();
-	public var transformConstraints:Vector<TransformConstraintData> = new Vector<TransformConstraintData>();
-	public var pathConstraints:Vector<PathConstraintData> = new Vector<PathConstraintData>();
+	public var events:Array<EventData> = new Array<EventData>();
+	public var animations:Array<Animation> = new Array<Animation>();
+	public var ikConstraints:Array<IkConstraintData> = new Array<IkConstraintData>();
+	public var transformConstraints:Array<TransformConstraintData> = new Array<TransformConstraintData>();
+	public var pathConstraints:Array<PathConstraintData> = new Array<PathConstraintData>();
 	public var x:Float = 0;
 	public var y:Float = 0;
 	public var width:Float = 0;

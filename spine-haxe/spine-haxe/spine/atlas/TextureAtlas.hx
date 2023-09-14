@@ -29,14 +29,12 @@
 
 package spine.atlas;
 
+import haxe.ds.StringMap;
 import openfl.utils.Assets;
-import openfl.utils.ByteArray;
-import openfl.utils.Dictionary;
-import openfl.Vector;
 
 class TextureAtlas {
-	private var pages = new Vector<TextureAtlasPage>();
-	private var regions = new Vector<TextureAtlasRegion>();
+	private var pages = new Array<TextureAtlasPage>();
+	private var regions = new Array<TextureAtlasRegion>();
 	private var textureLoader:TextureLoader;
 
 	public static function fromAssets(path:String) {
@@ -51,17 +49,14 @@ class TextureAtlas {
 	}
 
 	/** @param object A String or ByteArray. */
-	public function new(object:Dynamic, textureLoader:TextureLoader) {
-		if (object == null) {
-			return;
+	public function new(atlasText:String, textureLoader:TextureLoader) {
+		if (atlasText == null) {
+			throw new SpineException("atlasText must not be null");
 		}
-		if (Std.isOfType(object, String)) {
-			load(cast(object, String), textureLoader);
-		} else if (Std.isOfType(object, ByteArrayData)) {
-			load(cast(object, ByteArray).readUTFBytes(cast(object, ByteArray).length), textureLoader);
-		} else {
-			throw new SpineException("object must be a string or ByteArrayData.");
+		if (textureLoader == null) {
+			throw new SpineException("textureLoader must not be null");
 		}
+		load(atlasText, textureLoader);
 	}
 
 	private function load(atlasText:String, textureLoader:TextureLoader):Void {
@@ -71,71 +66,72 @@ class TextureAtlas {
 		this.textureLoader = textureLoader;
 
 		var reader:Reader = new Reader(atlasText);
-		var entry:Vector<String> = new Vector<String>(5, true);
+		var entry:Array<String> = new Array<String>();
+		entry.resize(5);
 		var page:TextureAtlasPage = null;
 		var region:TextureAtlasRegion = null;
 
-		var pageFields:Dictionary<String, Void->Void> = new Dictionary<String, Void->Void>();
-		pageFields["size"] = function():Void {
+		var pageFields:StringMap<Void->Void> = new StringMap<Void->Void>();
+		pageFields.set("size", function():Void {
 			page.width = Std.parseInt(entry[1]);
 			page.height = Std.parseInt(entry[2]);
-		};
-		pageFields["format"] = function():Void {
+		});
+		pageFields.set("format", function():Void {
 			page.format = Format.fromName(entry[0]);
-		};
-		pageFields["filter"] = function():Void {
+		});
+		pageFields.set("filter", function():Void {
 			page.minFilter = TextureFilter.fromName(entry[1]);
 			page.magFilter = TextureFilter.fromName(entry[2]);
-		};
-		pageFields["repeat"] = function():Void {
+		});
+		pageFields.set("repeat", function():Void {
 			if (entry[1].indexOf('x') != -1)
 				page.uWrap = TextureWrap.repeat;
 			if (entry[1].indexOf('y') != -1)
 				page.vWrap = TextureWrap.repeat;
-		};
-		pageFields["pma"] = function():Void {
+		});
+		pageFields.set("pma", function():Void {
 			page.pma = entry[1] == "true";
-		};
+		});
 
-		var regionFields:Dictionary<String, Void->Void> = new Dictionary<String, Void->Void>();
-		regionFields["xy"] = function():Void {
+		var regionFields:StringMap<Void->Void> = new StringMap<Void->Void>();
+		regionFields.set("xy", function():Void {
 			region.x = Std.parseInt(entry[1]);
 			region.y = Std.parseInt(entry[2]);
-		};
-		regionFields["size"] = function():Void {
+		});
+		regionFields.set("size", function():Void {
 			region.width = Std.parseInt(entry[1]);
 			region.height = Std.parseInt(entry[2]);
-		};
-		regionFields["bounds"] = function():Void {
+		});
+		regionFields.set("bounds", function():Void {
 			region.x = Std.parseInt(entry[1]);
 			region.y = Std.parseInt(entry[2]);
 			region.width = Std.parseInt(entry[3]);
 			region.height = Std.parseInt(entry[4]);
-		};
-		regionFields["offset"] = function():Void {
+		});
+		regionFields.set("offset", function():Void {
 			region.offsetX = Std.parseInt(entry[1]);
 			region.offsetY = Std.parseInt(entry[2]);
-		};
-		regionFields["orig"] = function():Void {
+		});
+		regionFields.set("orig", function():Void {
 			region.originalWidth = Std.parseInt(entry[1]);
 			region.originalHeight = Std.parseInt(entry[2]);
-		};
-		regionFields["offsets"] = function():Void {
+		});
+		regionFields.set("offsets", function():Void {
 			region.offsetX = Std.parseInt(entry[1]);
 			region.offsetY = Std.parseInt(entry[2]);
 			region.originalWidth = Std.parseInt(entry[3]);
 			region.originalHeight = Std.parseInt(entry[4]);
-		};
-		regionFields["rotate"] = function():Void {
+		});
+		regionFields.set("rotate", function():Void {
 			var value:String = entry[1];
 			if (value == "true")
 				region.degrees = 90;
 			else if (value != "false")
 				region.degrees = Std.parseInt(value);
-		};
-		regionFields["index"] = function():Void {
+		});
+		regionFields.set("index", function():Void {
 			region.index = Std.parseInt(entry[1]);
-		};
+		});
 
 		var line:String = reader.readLine();
 		// Ignore empty lines before first entry.
@@ -153,8 +149,8 @@ class TextureAtlas {
 		}
 
 		// Page and region entries.
-		var names:Vector<String> = null;
-		var values:Vector<Vector<Float>> = null;
+		var names:Array<String> = null;
+		var values:Array<Array<Float>> = null;
 		var field:Void->Void;
 		while (true) {
 			if (line == null)
@@ -167,7 +163,7 @@ class TextureAtlas {
 				while (true) {
 					if (reader.readEntry(entry, line = reader.readLine()) == 0)
 						break;
-					field = pageFields[entry[0]];
+					field = pageFields.get(entry[0]);
 					if (field != null) {
 						field();
 					}
@@ -180,16 +176,17 @@ class TextureAtlas {
 					var count:Int = reader.readEntry(entry, line = reader.readLine());
 					if (count == 0)
 						break;
-					field = regionFields[entry[0]];
+					field = regionFields.get(entry[0]);
 					if (field != null) {
 						field();
 					} else {
 						if (names == null) {
-							names = new Vector<String>();
-							values = new Vector<Vector<Float>>();
+							names = new Array<String>();
+							values = new Array<Array<Float>>();
 						}
 						names.push(entry[0]);
-						var entryValues:Vector<Float> = new Vector<Float>(count, true);
+						var entryValues:Array<Float> = new Array<Float>();
+						entryValues.resize(count);
 						for (i in 0...count) {
 							entryValues[i] = Std.parseInt(entry[i + 1]);
 						}
@@ -262,7 +259,7 @@ class Reader {
 		return index >= lines.length ? null : lines[index++];
 	}
 
-	public function readEntry(entry:Vector<String>, line:String):Int {
+	public function readEntry(entry:Array<String>, line:String):Int {
 		if (line == null)
 			return 0;
 		if (line.length == 0)

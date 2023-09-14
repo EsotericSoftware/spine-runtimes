@@ -29,32 +29,48 @@
 
 package spine;
 
-import openfl.utils.ByteArray;
-import openfl.Vector;
+import haxe.io.FPHelper;
+import haxe.io.Bytes;
 
 class BinaryInput {
-	private var bytes:ByteArray;
+	private var bytes:Bytes;
+	private var index:Int = 0;
 
-	public var strings:Vector<String> = new Vector<String>();
+	public var strings:Array<String> = new Array<String>();
 
-	public function new(bytes:ByteArray) {
+	public function new(bytes:Bytes) {
 		this.bytes = bytes;
 	}
 
 	public function readByte():Int {
-		return bytes.readByte();
+		var result = bytes.get(index++);
+		if ((result & 0x80) != 0) {
+			result |= 0xffffff00;
+		}
+		return result;
 	}
 
 	public function readUnsignedByte():Int {
-		return bytes.readUnsignedByte();
+		return bytes.get(index++);
 	}
 
 	public function readShort():Int {
-		return bytes.readShort();
+		var ch1 = readUnsignedByte();
+		var ch2 = readUnsignedByte();
+		var result = ((ch1 << 8) | ch2);
+		if ((result & 0x8000) != 0) {
+			result |= 0xFFFF0000;
+		}
+		return result;
 	}
 
 	public function readInt32():Int {
-		return bytes.readInt();
+		var ch1 = readUnsignedByte();
+		var ch2 = readUnsignedByte();
+		var ch3 = readUnsignedByte();
+		var ch4 = readUnsignedByte();
+		var result = (ch1 << 24) | (ch2 << 16) | (ch3 << 8) | ch4;
+		return result;
 	}
 
 	public function readInt(optimizePositive:Bool):Int {
@@ -80,8 +96,8 @@ class BinaryInput {
 	}
 
 	public function readStringRef():String {
-		var index:Int = readInt(true);
-		return index == 0 ? null : strings[index - 1];
+		var idx:Int = readInt(true);
+		return idx == 0 ? null : strings[idx - 1];
 	}
 
 	public function readString():String {
@@ -113,7 +129,7 @@ class BinaryInput {
 	}
 
 	public function readFloat():Float {
-		return bytes.readFloat();
+		return FPHelper.i32ToFloat(readInt32());
 	}
 
 	public function readBoolean():Bool {

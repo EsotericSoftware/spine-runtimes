@@ -29,8 +29,6 @@
 
 package spine;
 
-import openfl.Vector;
-
 class SequenceMode {
 	public static var hold(default, never):SequenceMode = new SequenceMode("hold", 0);
 	public static var once(default, never):SequenceMode = new SequenceMode("once", 1);
@@ -40,7 +38,7 @@ class SequenceMode {
 	public static var loopReverse(default, never):SequenceMode = new SequenceMode("loopReverse", 5);
 	public static var pingpongReverse(default, never):SequenceMode = new SequenceMode("pingpongReverse", 6);
 
-	public static var values(default, never):Vector<SequenceMode> = Vector.ofArray([hold, once, loop, pingpong, onceReverse, loopReverse, pingpongReverse]);
+	public static var values(default, never):Array<SequenceMode> = [hold, once, loop, pingpong, onceReverse, loopReverse, pingpongReverse];
 
 	public var name(default, null):String;
 	public var value:Int;

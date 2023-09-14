@@ -29,15 +29,13 @@
 
 package spine;
 
-import openfl.Vector;
-
 class Bone implements Updatable {
 	static public var yDown:Bool = false;
 
 	private var _data:BoneData;
 	private var _skeleton:Skeleton;
 	private var _parent:Bone;
-	private var _children:Vector<Bone> = new Vector<Bone>();
+	private var _children:Array<Bone> = new Array<Bone>();
 
 	public var x:Float = 0;
 	public var y:Float = 0;
@@ -230,9 +228,9 @@ class Bone implements Updatable {
 		return _parent;
 	}
 
-	public var children(get, never):Vector<Bone>;
+	public var children(get, never):Array<Bone>;
 
-	private function get_children():Vector<Bone> {
+	private function get_children():Array<Bone> {
 		return _children;
 	}
 
@@ -308,7 +306,7 @@ class Bone implements Updatable {
 		}
 	}
 
-	public function worldToLocal(world:Vector<Float>):Void {
+	public function worldToLocal(world:Array<Float>):Void {
 		var a:Float = a, b:Float = b, c:Float = c, d:Float = d;
 		var invDet:Float = 1 / (a * d - b * c);
 		var x:Float = world[0] - worldX, y:Float = world[1] - worldY;
@@ -316,7 +314,7 @@ class Bone implements Updatable {
 		world[1] = (y * a * invDet - x * c * invDet);
 	}
 
-	public function localToWorld(local:Vector<Float>):Void {
+	public function localToWorld(local:Array<Float>):Void {
 		var localX:Float = local[0], localY:Float = local[1];
 		local[0] = localX * a + localY * b + worldX;
 		local[1] = localX * c + localY * d + worldY;

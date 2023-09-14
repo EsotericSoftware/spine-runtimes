@@ -29,12 +29,12 @@
 
 package spine.animation;
 
-import openfl.utils.Object;
+import haxe.ds.StringMap;
 import spine.SkeletonData;
 
 class AnimationStateData {
 	private var _skeletonData:SkeletonData;
-	private var animationToMixTime:Object = new Object();
+	private var animationToMixTime:StringMap<Float> = new StringMap<Float>();
 
 	public var defaultMix:Float = 0;
 
@@ -63,13 +63,13 @@ class AnimationStateData {
 			throw new SpineException("from cannot be null.");
 		if (to == null)
 			throw new SpineException("to cannot be null.");
-		animationToMixTime[from.name + ":" + to.name] = duration;
+		animationToMixTime.set(from.name + ":" + to.name, duration);
 	}
 
 	public function getMix(from:Animation, to:Animation):Float {
-		var time:Object = animationToMixTime[from.name + ":" + to.name];
-		if (time == null)
+		if (animationToMixTime.exists(from.name + ":" + to.name))
+			return animationToMixTime.get(from.name + ":" + to.name);
+		else
 			return defaultMix;
-		return cast(time, Float);
 	}
 }

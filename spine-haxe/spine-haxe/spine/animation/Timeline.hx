@@ -31,15 +31,15 @@ package spine.animation;
 
 import spine.Event;
 import spine.Skeleton;
-import openfl.Vector;
 
 class Timeline {
-	public var propertyIds:Vector<String>;
-	public var frames:Vector<Float>;
+	public var propertyIds:Array<String>;
+	public var frames:Array<Float>;
 
-	public function new(frameCount:Int, propertyIds:Vector<String>) {
+	public function new(frameCount:Int, propertyIds:Array<String>) {
 		this.propertyIds = propertyIds;
-		frames = new Vector<Float>(frameCount * getFrameEntries(), true);
+		frames = new Array<Float>();
+		frames.resize(frameCount * getFrameEntries());
 	}
 
 	public function getFrameEntries():Int {
@@ -54,11 +54,11 @@ class Timeline {
 		return frames[frames.length - getFrameEntries()];
 	}
 
-	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Vector<Event>, alpha:Float, blend:MixBlend, direction:MixDirection):Void {
+	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, blend:MixBlend, direction:MixDirection):Void {
 		throw new SpineException("Timeline implementations must override apply()");
 	}
 
-	public static function search1(frames:Vector<Float>, time:Float):Int {
+	public static function search1(frames:Array<Float>, time:Float):Int {
 		var n:Int = frames.length;
 		for (i in 1...n) {
 			if (frames[i] > time)
@@ -67,7 +67,7 @@ class Timeline {
 		return n - 1;
 	}
 
-	public static function search(values:Vector<Float>, time:Float, step:Int):Int {
+	public static function search(values:Array<Float>, time:Float, step:Int):Int {
 		var n:Int = values.length;
 		var i:Int = step;
 		while (i < n) {

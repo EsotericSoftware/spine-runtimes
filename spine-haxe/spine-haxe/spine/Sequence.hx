@@ -29,13 +29,11 @@
 
 package spine;
 
-import openfl.Vector;
-
 class Sequence {
 	private static var _nextID = 0;
 
 	public var id = _nextID++;
-	public var regions:Vector<TextureRegion>;
+	public var regions:Array<TextureRegion>;
 	public var start = 0;
 	public var digits = 0;
 
@@ -43,7 +41,8 @@ class Sequence {
 	public var setupIndex = 0;
 
 	public function new(count:Int) {
-		this.regions = new Vector<TextureRegion>(count);
+		this.regions = new Array<TextureRegion>();
+		this.regions.resize(count);
 	}
 
 	public function copy():Sequence {

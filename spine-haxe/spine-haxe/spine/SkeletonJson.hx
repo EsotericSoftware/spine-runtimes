@@ -31,8 +31,6 @@ package spine;
 
 import Reflect;
 import haxe.Json;
-import openfl.Vector;
-import openfl.utils.Object;
 import spine.animation.AlphaTimeline;
 import spine.animation.Animation;
 import spine.animation.AttachmentTimeline;
@@ -78,7 +76,7 @@ class SkeletonJson {
 	public var attachmentLoader:AttachmentLoader;
 	public var scale:Float = 1;
 
-	private var linkedMeshes:Vector<LinkedMesh> = new Vector<LinkedMesh>();
+	private var linkedMeshes:Array<LinkedMesh> = new Array<LinkedMesh>();
 
 	public function new(attachmentLoader:AttachmentLoader) {
 		this.attachmentLoader = attachmentLoader;
@@ -93,7 +91,7 @@ class SkeletonJson {
 		var skeletonData:SkeletonData = new SkeletonData();
 
 		// Skeleton.
-		var skeletonMap:Object = getString(root, "skeleton", "");
+		var skeletonMap = getString(root, "skeleton", "");
 		if (skeletonMap != null) {
 			skeletonData.hash = getString(skeletonMap, "hash", "");
 			skeletonData.version = getString(skeletonMap, "spine", "");
@@ -318,11 +316,11 @@ class SkeletonJson {
 				}
 
 				if (Reflect.hasField(skinMap, "attachments")) {
-					var attachments:Object = Reflect.getProperty(skinMap, "attachments");
-					for (slotName in attachments) {
+					var attachments:Dynamic = Reflect.getProperty(skinMap, "attachments");
+					for (slotName in Reflect.fields(attachments)) {
 						var slot:SlotData = skeletonData.findSlot(slotName);
-						var slotEntry:Object = Reflect.getProperty(attachments, slotName);
-						for (attachmentName in slotEntry) {
+						var slotEntry:Dynamic = Reflect.getProperty(attachments, slotName);
+						for (attachmentName in Reflect.fields(slotEntry)) {
 							var attachment:Attachment = readAttachment(Reflect.getProperty(slotEntry, attachmentName), skin, slot.index, attachmentName,
 								skeletonData);
 							if (attachment != null) {
@@ -352,12 +350,12 @@ class SkeletonJson {
 			if (linkedMesh.mesh.region != null)
 				linkedMesh.mesh.updateRegion();
 		}
-		linkedMeshes.length = 0;
+		linkedMeshes.resize(0);
 
 		// Events.
-		var events:Object = Reflect.getProperty(root, "events");
-		for (eventName in events) {
-			var eventMap:Map<String, Dynamic> = events[eventName];
+		var events:Dynamic = Reflect.getProperty(root, "events");
+		for (eventName in Reflect.fields(events)) {
+			var eventMap:Map<String, Dynamic> = Reflect.field(events, eventName);
 			var eventData:EventData = new EventData(eventName);
 			eventData.intValue = getInt(eventMap, "int");
 			eventData.floatValue = getFloat(eventMap, "float");
@@ -371,14 +369,14 @@ class SkeletonJson {
 		}
 
 		// Animations.
-		var animations:Object = Reflect.getProperty(root, "animations");
-		for (animationName in animations) {
-			readAnimation(animations[animationName], animationName, skeletonData);
+		var animations:Dynamic = Reflect.getProperty(root, "animations");
+		for (animationName in Reflect.fields(animations)) {
+			readAnimation(Reflect.field(animations, animationName), animationName, skeletonData);
 		}
 		return skeletonData;
 	}
 
-	private function readSequence(map:Object) {
+	private function readSequence(map:Dynamic) {
 		if (map == null)
 			return null;
 		var sequence = new Sequence(getInt(map, "count", 0));
@@ -388,15 +386,15 @@ class SkeletonJson {
 		return sequence;
 	}
 
-	private function readAttachment(map:Object, skin:Skin, slotIndex:Int, name:String, skeletonData:SkeletonData):Attachment {
-		if (map["name"] != null)
-			name = map["name"];
+	private function readAttachment(map:Dynamic, skin:Skin, slotIndex:Int, name:String, skeletonData:SkeletonData):Attachment {
+		if (Reflect.field(map, "name") != null)
+			name = Reflect.field(map, "name");
 
 		var color:String;
 		switch (AttachmentType.fromName(Reflect.hasField(map, "type") ? Reflect.getProperty(map, "type") : "region")) {
 			case AttachmentType.region:
 				var path = getString(map, "path", name);
-				var sequence = readSequence(map["sequence"]);
+				var sequence = readSequence(Reflect.field(map, "sequence"));
 				var region:RegionAttachment = attachmentLoader.newRegionAttachment(skin, name, path, sequence);
 				if (region == null)
 					return null;
@@ -419,7 +417,7 @@ class SkeletonJson {
 				return region;
 			case AttachmentType.mesh, AttachmentType.linkedmesh:
 				var path = getString(map, "path", name);
-				var sequence = readSequence(map["sequence"]);
+				var sequence = readSequence(Reflect.field(map, "sequence"));
 				var mesh:MeshAttachment = attachmentLoader.newMeshAttachment(skin, name, path, sequence);
 				if (mesh == null)
 					return null;
@@ -434,20 +432,20 @@ class SkeletonJson {
 				mesh.height = getFloat(map, "height") * scale;
 				mesh.sequence = sequence;
 
-				if (map["parent"] != null) {
-					var inheritTimelines:Bool = map.hasOwnProperty("timelines") ? cast(map["timelines"], Bool) : true;
-					linkedMeshes.push(new LinkedMesh(mesh, map["skin"], slotIndex, map["parent"], inheritTimelines));
+				if (Reflect.field(map, "parent") != null) {
+					var inheritTimelines:Bool = map.hasOwnProperty("timelines") ? cast(Reflect.field(map, "timelines"), Bool) : true;
+					linkedMeshes.push(new LinkedMesh(mesh, Reflect.field(map, "skin"), slotIndex, Reflect.field(map, "parent"), inheritTimelines));
 					return mesh;
 				}
 
-				var uvs:Vector<Float> = getFloatArray(map, "uvs");
+				var uvs:Array<Float> = getFloatArray(map, "uvs");
 				readVertices(map, mesh, uvs.length);
 				mesh.triangles = getIntArray(map, "triangles");
 				mesh.regionUVs = uvs;
 				if (mesh.region != null)
 					mesh.updateRegion();
 
-				if (map["edges"] != null)
+				if (Reflect.field(map, "edges") != null)
 					mesh.edges = getIntArray(map, "edges");
 				mesh.hullLength = getInt(map, "hull") * 2;
 				return mesh;
@@ -455,18 +453,18 @@ class SkeletonJson {
 				var box:BoundingBoxAttachment = attachmentLoader.newBoundingBoxAttachment(skin, name);
 				if (box == null)
 					return null;
-				readVertices(map, box, Std.parseInt(map["vertexCount"]) << 1);
+				readVertices(map, box, Std.parseInt(Reflect.field(map, "vertexCount")) << 1);
 				return box;
 			case AttachmentType.path:
 				var path:PathAttachment = attachmentLoader.newPathAttachment(skin, name);
 				if (path == null)
 					return null;
-				path.closed = map.hasOwnProperty("closed") ? cast(map["closed"], Bool) : false;
-				path.constantSpeed = map.hasOwnProperty("constantSpeed") ? cast(map["constantSpeed"], Bool) : true;
-				var vertexCount:Int = Std.parseInt(map["vertexCount"]);
+				path.closed = map.hasOwnProperty("closed") ? cast(Reflect.field(map, "closed"), Bool) : false;
+				path.constantSpeed = map.hasOwnProperty("constantSpeed") ? cast(Reflect.field(map, "constantSpeed"), Bool) : true;
+				var vertexCount:Int = Std.parseInt(Reflect.field(map, "vertexCount"));
 				readVertices(map, path, vertexCount << 1);
-				var lengths:Vector<Float> = new Vector<Float>();
-				for (curves in cast(map["lengths"], Array<Dynamic>)) {
+				var lengths:Array<Float> = new Array<Float>();
+				for (curves in cast(Reflect.field(map, "lengths"), Array<Dynamic>)) {
 					lengths.push(Std.parseFloat(curves) * scale);
 				}
 				path.lengths = lengths;
@@ -475,9 +473,9 @@ class SkeletonJson {
 				var point:PointAttachment = attachmentLoader.newPointAttachment(skin, name);
 				if (point == null)
 					return null;
-				point.x = map.hasOwnProperty("x") ? Std.parseFloat(map["x"]) * scale : 0;
-				point.y = map.hasOwnProperty("y") ? Std.parseFloat(map["y"]) * scale : 0;
-				point.rotation = map.hasOwnProperty("rotation") ? Std.parseFloat(map["rotation"]) : 0;
+				point.x = getFloat(map, "x", 0) * scale;
+				point.y = getFloat(map, "y", 0) * scale;
+				point.rotation = getFloat(map, "rotation", 0);
 				color = Reflect.getProperty(map, "color");
 				if (color != null) {
 					point.color.setFromString(color);
@@ -487,14 +485,14 @@ class SkeletonJson {
 				var clip:ClippingAttachment = attachmentLoader.newClippingAttachment(skin, name);
 				if (clip == null)
 					return null;
-				var end:String = map["end"];
+				var end:String = getString(map, "end", null);
 				if (end != null) {
 					var slot:SlotData = skeletonData.findSlot(end);
 					if (slot == null)
 						throw new SpineException("Clipping end slot not found: " + end);
 					clip.endSlot = slot;
 				}
-				var vertexCount:Int = Std.parseInt(map["vertexCount"]);
+				var vertexCount:Int = getInt(map, "vertexCount", 0);
 				readVertices(map, clip, vertexCount << 1);
 				color = Reflect.getProperty(map, "color");
 				if (color != null) {
@@ -505,9 +503,9 @@ class SkeletonJson {
 		return null;
 	}
 
-	private function readVertices(map:Object, attachment:VertexAttachment, verticesLength:Int):Void {
+	private function readVertices(map:Dynamic, attachment:VertexAttachment, verticesLength:Int):Void {
 		attachment.worldVerticesLength = verticesLength;
-		var vertices:Vector<Float> = getFloatArray(map, "vertices");
+		var vertices:Array<Float> = getFloatArray(map, "vertices");
 		if (verticesLength == vertices.length) {
 			if (scale != 1) {
 				for (i in 0...vertices.length) {
@@ -518,8 +516,8 @@ class SkeletonJson {
 			return;
 		}
 
-		var weights:Vector<Float> = new Vector<Float>();
-		var bones:Vector<Int> = new Vector<Int>();
+		var weights:Array<Float> = new Array<Float>();
+		var bones:Array<Int> = new Array<Int>();
 		var i:Int = 0;
 		var n:Int = vertices.length;
 		while (i < n) {
@@ -539,28 +537,28 @@ class SkeletonJson {
 		attachment.vertices = weights;
 	}
 
-	private function readAnimation(map:Object, name:String, skeletonData:SkeletonData):Void {
-		var timelines:Vector<Timeline> = new Vector<Timeline>();
+	private function readAnimation(map:Dynamic, name:String, skeletonData:SkeletonData):Void {
+		var timelines:Array<Timeline> = new Array<Timeline>();
 
-		var slotMap:Object;
+		var slotMap:Dynamic;
 		var slotIndex:Int;
 		var slotName:String;
 
-		var timelineMap:Array<Object>;
-		var keyMap:Object;
-		var nextMap:Object;
+		var timelineMap:Array<Dynamic>;
+		var keyMap:Dynamic;
+		var nextMap:Dynamic;
 		var frame:Int, bezier:Int;
 		var time:Float, time2:Float;
-		var curve:Object;
+		var curve:Dynamic;
 		var timelineName:String;
 
 		// Slot timelines.
-		var slots:Object = Reflect.getProperty(map, "slots");
-		for (slotName in slots) {
-			slotMap = slots[slotName];
+		var slots:Dynamic = Reflect.getProperty(map, "slots");
+		for (slotName in Reflect.fields(slots)) {
+			slotMap = Reflect.field(slots, slotName);
 			slotIndex = skeletonData.findSlot(slotName).index;
-			for (timelineName in slotMap) {
-				timelineMap = slotMap[timelineName];
+			for (timelineName in Reflect.fields(slotMap)) {
+				timelineMap = Reflect.field(slotMap, timelineName);
 				if (timelineMap == null)
 					continue;
 				if (timelineName == "attachment") {
@@ -721,14 +719,14 @@ class SkeletonJson {
 		}
 
 		// Bone timelines.
-		var bones:Object = Reflect.getProperty(map, "bones");
-		for (boneName in bones) {
+		var bones:Dynamic = Reflect.getProperty(map, "bones");
+		for (boneName in Reflect.fields(bones)) {
 			var boneIndex:Int = skeletonData.findBoneIndex(boneName);
 			if (boneIndex == -1)
 				throw new SpineException("Bone not found: " + boneName);
-			var boneMap:Object = bones[boneName];
-			for (timelineName in boneMap) {
-				timelineMap = boneMap[timelineName];
+			var boneMap:Dynamic = Reflect.field(bones, boneName);
+			for (timelineName in Reflect.fields(boneMap)) {
+				timelineMap = Reflect.field(boneMap, timelineName);
 				if (timelineMap.length == 0)
 					continue;
 
@@ -768,9 +766,9 @@ class SkeletonJson {
 		}
 
 		// IK constraint timelines.
-		var iks:Object = Reflect.getProperty(map, "ik");
-		for (ikConstraintName in iks) {
-			timelineMap = iks[ikConstraintName];
+		var iks:Dynamic = Reflect.getProperty(map, "ik");
+		for (ikConstraintName in Reflect.fields(iks)) {
+			timelineMap = Reflect.field(iks, ikConstraintName);
 			keyMap = timelineMap[0];
 			if (keyMap == null)
 				continue;
@@ -819,9 +817,9 @@ class SkeletonJson {
 		var mixRotate:Float, mixRotate2:Float;
 		var mixX:Float, mixX2:Float;
 		var mixY:Float, mixY2:Float;
-		var transforms:Object = Reflect.getProperty(map, "transform");
-		for (transformName in transforms) {
-			timelineMap = transforms[transformName];
+		var transforms:Dynamic = Reflect.getProperty(map, "transform");
+		for (transformName in Reflect.fields(transforms)) {
+			timelineMap = Reflect.field(transforms, transformName);
 			keyMap = timelineMap[0];
 			if (keyMap == null)
 				continue;
@@ -879,16 +877,16 @@ class SkeletonJson {
 		}
 
 		// Path constraint timelines.
-		var paths:Object = Reflect.getProperty(map, "path");
-		for (pathName in paths) {
+		var paths:Dynamic = Reflect.getProperty(map, "path");
+		for (pathName in Reflect.fields(paths)) {
 			var index:Int = skeletonData.findPathConstraintIndex(pathName);
 			if (index == -1)
 				throw new SpineException("Path constraint not found: " + pathName);
 			var pathData:PathConstraintData = skeletonData.pathConstraints[index];
 
-			var pathMap:Object = paths[pathName];
-			for (timelineName in pathMap) {
-				timelineMap = pathMap[timelineName];
+			var pathMap:Dynamic = Reflect.field(paths, pathName);
+			for (timelineName in Reflect.fields(pathMap)) {
+				timelineMap = Reflect.field(pathMap, timelineName);
 				keyMap = timelineMap[0];
 				if (keyMap == null)
 					continue;
@@ -941,26 +939,26 @@ class SkeletonJson {
 		}
 
 		// Attachment timelines.
-		var attachments:Object = Reflect.getProperty(map, "attachments");
-		for (attachmentsName in attachments) {
-			var attachmentsMap:Object = attachments[attachmentsName];
+		var attachments:Dynamic = Reflect.getProperty(map, "attachments");
+		for (attachmentsName in Reflect.fields(attachments)) {
+			var attachmentsMap:Dynamic = Reflect.field(attachments, attachmentsName);
 			var skin:Skin = skeletonData.findSkin(attachmentsName);
 			if (skin == null)
 				throw new SpineException("Skin not found: " + attachmentsName);
 
-			for (slotMapName in attachmentsMap) {
-				slotMap = attachmentsMap[slotMapName];
+			for (slotMapName in Reflect.fields(attachmentsMap)) {
+				slotMap = Reflect.field(attachmentsMap, slotMapName);
 				slotIndex = skeletonData.findSlot(slotMapName).index;
 				if (slotIndex == -1)
 					throw new SpineException("Slot not found: " + slotMapName);
-				for (attachmentMapName in slotMap) {
-					var attachmentMap = slotMap[attachmentMapName];
+				for (attachmentMapName in Reflect.fields(slotMap)) {
+					var attachmentMap = Reflect.field(slotMap, attachmentMapName);
 					var attachment:Attachment = skin.getAttachment(slotIndex, attachmentMapName);
 					if (attachment == null)
 						throw new SpineException("Timeline attachment not found: " + attachmentMapName);
 
-					for (timelineMapName in attachmentMap) {
-						var timelineMap = attachmentMap[timelineMapName];
+					for (timelineMapName in Reflect.fields(attachmentMap)) {
+						var timelineMap = Reflect.field(attachmentMap, timelineMapName);
 						var keyMap = timelineMap[0];
 						if (keyMap == null)
 							continue;
@@ -968,7 +966,7 @@ class SkeletonJson {
 						if (timelineMapName == "deform") {
 							var vertexAttachment = cast(attachment, VertexAttachment);
 							var weighted:Bool = vertexAttachment.bones != null;
-							var vertices:Vector<Float> = vertexAttachment.vertices;
+							var vertices:Array<Float> = vertexAttachment.vertices;
 							var deformLength:Int = weighted ? Std.int(vertices.length / 3 * 2) : vertices.length;
 
 							var deformTimeline:DeformTimeline = new DeformTimeline(timelineMap.length, timelineMap.length, slotIndex, vertexAttachment);
@@ -976,14 +974,20 @@ class SkeletonJson {
 							frame = 0;
 							bezier = 0;
 							while (true) {
-								var deform:Vector<Float>;
-								var verticesValue:Vector<Float> = Reflect.getProperty(keyMap, "vertices");
+								var deform:Array<Float>;
+								var verticesValue:Array<Float> = Reflect.getProperty(keyMap, "vertices");
 								if (verticesValue == null) {
-									deform = weighted ? new Vector<Float>(deformLength, true) : vertices;
+									if (weighted) {
+										deform = new Array<Float>();
+										deform.resize(deformLength);
+									} else {
+										deform = vertices;
+									}
 								} else {
-									deform = new Vector<Float>(deformLength, true);
+									deform = new Array<Float>();
+									deform.resize(deformLength);
 									var start:Int = getInt(keyMap, "offset");
-									var temp:Vector<Float> = getFloatArray(keyMap, "vertices");
+									var temp:Array<Float> = getFloatArray(keyMap, "vertices");
 									for (i in 0...temp.length) {
 										deform[start + i] = temp[i];
 									}
@@ -1040,21 +1044,23 @@ class SkeletonJson {
 
 		// Draw order timelines.
 		if (Reflect.hasField(map, "drawOrder")) {
-			var drawOrders:Array<Dynamic> = cast(map["drawOrder"], Array<Dynamic>);
+			var drawOrders:Array<Dynamic> = cast(Reflect.field(map, "drawOrder"), Array<Dynamic>);
 			if (drawOrders != null) {
 				var drawOrderTimeline:DrawOrderTimeline = new DrawOrderTimeline(drawOrders.length);
 				var slotCount:Int = skeletonData.slots.length;
 				frame = 0;
 				for (drawOrderMap in drawOrders) {
-					var drawOrder:Vector<Int> = null;
+					var drawOrder:Array<Int> = null;
 					var offsets:Array<Dynamic> = Reflect.getProperty(drawOrderMap, "offsets");
 					if (offsets != null) {
-						drawOrder = new Vector<Int>(slotCount, true);
+						drawOrder = new Array<Int>();
+						drawOrder.resize(slotCount);
 						var i = slotCount - 1;
 						while (i >= 0) {
 							drawOrder[i--] = -1;
 						}
-						var unchanged:Vector<Int> = new Vector<Int>(slotCount - offsets.length, true);
+						var unchanged:Array<Int> = new Array<Int>();
+						unchanged.resize(slotCount - offsets.length);
 						var originalIndex:Int = 0, unchangedIndex:Int = 0;
 						for (offsetMap in offsets) {
 							slotIndex = skeletonData.findSlot(Reflect.getProperty(offsetMap, "slot")).index;
@@ -1087,7 +1093,7 @@ class SkeletonJson {
 
 		// Event timelines.
 		if (Reflect.hasField(map, "events")) {
-			var eventsMap:Array<Dynamic> = cast(map["events"], Array<Dynamic>);
+			var eventsMap:Array<Dynamic> = cast(Reflect.field(map, "events"), Array<Dynamic>);
 			if (eventsMap != null) {
 				var eventTimeline:EventTimeline = new EventTimeline(eventsMap.length);
 				frame = 0;
@@ -1120,21 +1126,21 @@ class SkeletonJson {
 	}
 
 	static private function readTimeline(keys:Array<Dynamic>, timeline:CurveTimeline1, defaultValue:Float, scale:Float):CurveTimeline1 {
-		var keyMap:Object = keys[0];
+		var keyMap:Dynamic = keys[0];
 		var time:Float = getFloat(keyMap, "time");
 		var value:Float = getFloat(keyMap, "value", defaultValue) * scale;
 		var bezier:Int = 0;
 		var frame:Int = 0;
 		while (true) {
 			timeline.setFrame(frame, time, value);
-			var nextMap:Object = keys[frame + 1];
+			var nextMap:Dynamic = keys[frame + 1];
 			if (nextMap == null) {
 				timeline.shrink(bezier);
 				break;
 			}
 			var time2:Float = getFloat(nextMap, "time");
 			var value2:Float = getFloat(nextMap, "value", defaultValue) * scale;
-			var curve:Object = keyMap.curve;
+			var curve:Dynamic = keyMap.curve;
 			if (curve != null) {
 				bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, value, value2, scale);
 			}
@@ -1149,7 +1155,7 @@ class SkeletonJson {
 
 	static private function readTimeline2(keys:Array<Dynamic>, timeline:CurveTimeline2, name1:String, name2:String, defaultValue:Float,
 			scale:Float):CurveTimeline2 {
-		var keyMap:Object = keys[0];
+		var keyMap:Dynamic = keys[0];
 		var time:Float = getFloat(keyMap, "time");
 		var value1:Float = getFloat(keyMap, name1, defaultValue) * scale;
 		var value2:Float = getFloat(keyMap, name2, defaultValue) * scale;
@@ -1157,7 +1163,7 @@ class SkeletonJson {
 		var frame:Int = 0;
 		while (true) {
 			timeline.setFrame(frame, time, value1, value2);
-			var nextMap:Object = keys[frame + 1];
+			var nextMap:Dynamic = keys[frame + 1];
 			if (nextMap == null) {
 				timeline.shrink(bezier);
 				break;
@@ -1165,7 +1171,7 @@ class SkeletonJson {
 			var time2:Float = getFloat(nextMap, "time");
 			var nvalue1:Float = getFloat(nextMap, name1, defaultValue) * scale;
 			var nvalue2:Float = getFloat(nextMap, name2, defaultValue) * scale;
-			var curve:Object = keyMap.curve;
+			var curve:Dynamic = keyMap.curve;
 			if (curve != null) {
 				bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, value1, nvalue1, scale);
 				bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, value2, nvalue2, scale);
@@ -1180,7 +1186,7 @@ class SkeletonJson {
 		return timeline;
 	}
 
-	static private function readCurve(curve:Object, timeline:CurveTimeline, bezier:Int, frame:Int, value:Int, time1:Float, time2:Float, value1:Float,
+	static private function readCurve(curve:Dynamic, timeline:CurveTimeline, bezier:Int, frame:Int, value:Int, time1:Float, time2:Float, value1:Float,
 			value2:Float, scale:Float):Int {
 		if (curve == "stepped") {
 			timeline.setStepped(frame);
@@ -1196,42 +1202,44 @@ class SkeletonJson {
 		return bezier + 1;
 	}
 
-	static private function getValue(map:Object, name:String, defaultValue:Dynamic):Dynamic {
+	static private function getValue(map:Dynamic, name:String, defaultValue:Dynamic):Dynamic {
 		if (map.hasOwnProperty(name))
-			return map[name];
+			return Reflect.field(map, name);
 		return defaultValue;
 	}
 
-	static private function getString(value:Object, name:String, defaultValue:String):String {
-		if (Std.isOfType(value[name], String))
-			return cast(value[name], String);
+	static private function getString(value:Dynamic, name:String, defaultValue:String):String {
+		if (Std.isOfType(Reflect.field(value, name), String))
+			return cast(Reflect.field(value, name), String);
 		return defaultValue;
 	}
 
-	static private function getFloat(value:Object, name:String, defaultValue:Float = 0):Float {
-		if (Std.isOfType(value[name], Float))
-			return cast(value[name], Float);
+	static private function getFloat(value:Dynamic, name:String, defaultValue:Float = 0):Float {
+		if (Std.isOfType(Reflect.field(value, name), Float))
+			return cast(Reflect.field(value, name), Float);
 		return defaultValue;
 	}
 
-	static private function getFloatArray(map:Object, name:String):Vector<Float> {
-		var list:Array<Dynamic> = cast(map[name], Array<Dynamic>);
-		var values:Vector<Float> = new Vector<Float>(list.length, true);
+	static private function getFloatArray(map:Dynamic, name:String):Array<Float> {
+		var list:Array<Dynamic> = cast(Reflect.field(map, name), Array<Dynamic>);
+		var values:Array<Float> = new Array<Float>();
+		values.resize(list.length);
 		for (i in 0...list.length) {
 			values[i] = cast(list[i], Float);
 		}
 		return values;
 	}
 
-	static private function getInt(value:Object, name:String, defaultValue:Int = 0):Int {
-		if (Std.isOfType(value[name], Int))
-			return cast(value[name], Int);
+	static private function getInt(value:Dynamic, name:String, defaultValue:Int = 0):Int {
+		if (Std.isOfType(Reflect.field(value, name), Int))
+			return cast(Reflect.field(value, name), Int);
 		return defaultValue;
 	}
 
-	static private function getIntArray(map:Object, name:String):Vector<Int> {
-		var list:Array<Dynamic> = cast(map[name], Array<Dynamic>);
-		var values:Vector<Int> = new Vector<Int>(list.length, true);
+	static private function getIntArray(map:Dynamic, name:String):Array<Int> {
+		var list:Array<Dynamic> = cast(Reflect.field(map, name), Array<Dynamic>);
+		var values:Array<Int> = new Array<Int>();
+		values.resize(list.length);
 		for (i in 0...list.length) {
 			values[i] = Std.int(list[i]);
 		}

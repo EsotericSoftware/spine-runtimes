@@ -29,19 +29,18 @@
 
 package spine.animation;
 
-import openfl.utils.Dictionary;
-import openfl.Vector;
+import haxe.ds.StringMap;
 import spine.Event;
 import spine.Skeleton;
 
 class Animation {
 	private var _name:String;
-	private var _timelines:Vector<Timeline>;
-	private var _timelineIds:Dictionary<String, Bool> = new Dictionary<String, Bool>();
+	private var _timelines:Array<Timeline>;
+	private var _timelineIds:StringMap<Bool> = new StringMap<Bool>();
 
 	public var duration:Float = 0;
 
-	public function new(name:String, timelines:Vector<Timeline>, duration:Float) {
+	public function new(name:String, timelines:Array<Timeline>, duration:Float) {
 		if (name == null)
 			throw new SpineException("name cannot be null.");
 		_name = name;
@@ -49,29 +48,29 @@ class Animation {
 		this.duration = duration;
 	}
 
-	public function setTimelines(timelines:Vector<Timeline>) {
+	public function setTimelines(timelines:Array<Timeline>) {
 		if (timelines == null)
 			throw new SpineException("timelines cannot be null.");
 		_timelines = timelines;
-		_timelineIds = new Dictionary<String, Bool>();
+		_timelineIds = new StringMap<Bool>();
 		for (timeline in timelines) {
-			var ids:Vector<String> = timeline.propertyIds;
+			var ids:Array<String> = timeline.propertyIds;
 			for (id in ids) {
-				_timelineIds[id] = true;
+				_timelineIds.set(id, true);
 			}
 		}
 	}
 
-	public function hasTimeline(ids:Vector<String>):Bool {
+	public function hasTimeline(ids:Array<String>):Bool {
 		for (id in ids) {
-			if (_timelineIds[id])
+			if (_timelineIds.exists(id))
 				return true;
 		}
 		return false;
 	}
 
 	/** Poses the skeleton at the specified time for this animation. */
-	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, loop:Bool, events:Vector<Event>, alpha:Float, blend:MixBlend,
+	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, loop:Bool, events:Array<Event>, alpha:Float, blend:MixBlend,
 			direction:MixDirection):Void {
 		if (skeleton == null)
 			throw new SpineException("skeleton cannot be null.");
@@ -97,9 +96,9 @@ class Animation {
 		return _name;
 	}
 
-	public var timelines(get, never):Vector<Timeline>;
+	public var timelines(get, never):Array<Timeline>;
 
-	private function get_timelines():Vector<Timeline> {
+	private function get_timelines():Array<Timeline> {
 		return _timelines;
 	}
 }

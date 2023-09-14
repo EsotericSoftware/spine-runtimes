@@ -29,11 +29,10 @@
 
 package spine.attachments;
 
-import openfl.Vector;
 import spine.Color;
 
 class PathAttachment extends VertexAttachment {
-	public var lengths:Vector<Float>;
+	public var lengths:Array<Float>;
 	public var closed:Bool = false;
 	public var constantSpeed:Bool = false;
 	public var color:Color = new Color(0, 0, 0, 0);
@@ -45,7 +44,7 @@ class PathAttachment extends VertexAttachment {
 	override public function copy():Attachment {
 		var copy:PathAttachment = new PathAttachment(name);
 		copyTo(copy);
-		copy.lengths = lengths.concat();
+		copy.lengths = lengths.copy();
 		copy.closed = closed;
 		copy.constantSpeed = constantSpeed;
 		return copy;

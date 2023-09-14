@@ -29,11 +29,9 @@
 
 package spine;
 
-import openfl.Vector;
-
 class TransformConstraint implements Updatable {
 	private var _data:TransformConstraintData;
-	private var _bones:Vector<Bone>;
+	private var _bones:Array<Bone>;
 
 	public var target:Bone;
 	public var mixRotate:Float = 0;
@@ -43,7 +41,7 @@ class TransformConstraint implements Updatable {
 	public var mixScaleY:Float = 0;
 	public var mixShearY:Float = 0;
 
-	private var _temp:Vector<Float> = new Vector<Float>(2, true);
+	private var _temp:Array<Float> = new Array<Float>();
 
 	public var active:Bool = false;
 
@@ -59,7 +57,7 @@ class TransformConstraint implements Updatable {
 		mixScaleX = data.mixScaleX;
 		mixScaleY = data.mixScaleY;
 		mixShearY = data.mixShearY;
-		_bones = new Vector<Bone>();
+		_bones = new Array<Bone>();
 		for (boneData in data.bones) {
 			_bones.push(skeleton.findBone(boneData.name));
 		}
@@ -187,7 +185,7 @@ class TransformConstraint implements Updatable {
 			}
 
 			if (translate) {
-				var temp:Vector<Float> = _temp;
+				var temp:Array<Float> = _temp;
 				temp[0] = _data.offsetX;
 				temp[1] = _data.offsetY;
 				target.localToWorld(temp);
@@ -275,9 +273,9 @@ class TransformConstraint implements Updatable {
 		return _data;
 	}
 
-	public var bones(get, never):Vector<Bone>;
+	public var bones(get, never):Array<Bone>;
 
-	private function get_bones():Vector<Bone> {
+	private function get_bones():Array<Bone> {
 		return _bones;
 	}
 

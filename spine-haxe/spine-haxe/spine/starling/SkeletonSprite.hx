@@ -30,7 +30,6 @@
 package spine.starling;
 
 import starling.animation.IAnimatable;
-import openfl.Vector;
 import openfl.geom.Matrix;
 import openfl.geom.Point;
 import openfl.geom.Rectangle;
@@ -58,8 +57,8 @@ import starling.utils.Max;
 class SkeletonSprite extends DisplayObject implements IAnimatable {
 	static private var _tempPoint:Point = new Point();
 	static private var _tempMatrix:Matrix = new Matrix();
-	static private var _tempVertices:Vector<Float> = new Vector<Float>();
-	static private var blendModes:Vector<String> = Vector.ofArray([BlendMode.NORMAL, BlendMode.ADD, BlendMode.MULTIPLY, BlendMode.SCREEN]);
+	static private var _tempVertices:Array<Float> = new Array<Float>();
+	static private var blendModes:Array<String> = [BlendMode.NORMAL, BlendMode.ADD, BlendMode.MULTIPLY, BlendMode.SCREEN];
 
 	private var _skeleton:Skeleton;
 
@@ -68,7 +67,7 @@ class SkeletonSprite extends DisplayObject implements IAnimatable {
 	private var _smoothing:String = "bilinear";
 
 	private static var clipper:SkeletonClipping = new SkeletonClipping();
-	private static var QUAD_INDICES:Vector<Int> = Vector.ofArray([0, 1, 2, 2, 3, 0]);
+	private static var QUAD_INDICES:Array<Int> = [0, 1, 2, 2, 3, 0];
 
 	private var tempLight:spine.Color = new spine.Color(0, 0, 0);
 	private var tempDark:spine.Color = new spine.Color(0, 0, 0);
@@ -88,7 +87,7 @@ class SkeletonSprite extends DisplayObject implements IAnimatable {
 		var r:Float = skeleton.color.r * 255;
 		var g:Float = skeleton.color.g * 255;
 		var b:Float = skeleton.color.b * 255;
-		var drawOrder:Vector<Slot> = skeleton.drawOrder;
+		var drawOrder:Array<Slot> = skeleton.drawOrder;
 		var attachmentColor:spine.Color;
 		var rgb:Int;
 		var a:Float;
@@ -98,9 +97,9 @@ class SkeletonSprite extends DisplayObject implements IAnimatable {
 		var verticesCount:Int;
 		var indicesLength:Int;
 		var indexData:IndexData;
-		var indices:Vector<Int> = null;
+		var indices:Array<Int> = null;
 		var vertexData:VertexData;
-		var uvs:Vector<Float>;
+		var uvs:Array<Float>;
 
 		for (slot in drawOrder) {
 			if (!slot.bone.active) {
@@ -108,13 +107,13 @@ class SkeletonSprite extends DisplayObject implements IAnimatable {
 				continue;
 			}
 
-			var worldVertices:Vector<Float> = _tempVertices;
+			var worldVertices:Array<Float> = _tempVertices;
 			if (Std.isOfType(slot.attachment, RegionAttachment)) {
 				var region:RegionAttachment = cast(slot.attachment, RegionAttachment);
 				verticesLength = 8;
 				verticesCount = verticesLength >> 1;
 				if (worldVertices.length < verticesLength)
-					worldVertices.length = verticesLength;
+					worldVertices.resize(verticesLength);
 				region.computeWorldVertices(slot, worldVertices, 0, 2);
 
 				mesh = null;
@@ -142,7 +141,7 @@ class SkeletonSprite extends DisplayObject implements IAnimatable {
 				verticesLength = meshAttachment.worldVerticesLength;
 				verticesCount = verticesLength >> 1;
 				if (worldVertices.length < verticesLength)
-					worldVertices.length = verticesLength;
+					worldVertices.resize(verticesLength);
 				meshAttachment.computeWorldVertices(slot, 0, meshAttachment.worldVerticesLength, worldVertices, 0, 2);
 
 				mesh = null;
@@ -237,8 +236,8 @@ class SkeletonSprite extends DisplayObject implements IAnimatable {
 		var minY:Float = Max.MAX_VALUE;
 		var maxX:Float = -Max.MAX_VALUE;
 		var maxY:Float = -Max.MAX_VALUE;
-		var slots:Vector<Slot> = skeleton.slots;
-		var worldVertices:Vector<Float> = _tempVertices;
+		var slots:Array<Slot> = skeleton.slots;
+		var worldVertices:Array<Float> = _tempVertices;
 		var empty:Bool = true;
 		for (i in 0...slots.length) {
 			var slot:Slot = slots[i];
@@ -254,7 +253,7 @@ class SkeletonSprite extends DisplayObject implements IAnimatable {
 				var mesh:MeshAttachment = cast(attachment, MeshAttachment);
 				verticesLength = mesh.worldVerticesLength;
 				if (worldVertices.length < verticesLength)
-					worldVertices.length = verticesLength;
+					worldVertices.resize(verticesLength);
 				mesh.computeWorldVertices(slot, 0, verticesLength, worldVertices, 0, 2);
 			} else {
 				continue;

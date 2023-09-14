@@ -29,8 +29,6 @@
 
 package spine.animation;
 
-import openfl.Vector;
-
 class RGBA2Timeline extends CurveTimeline implements SlotTimeline {
 	private static inline var ENTRIES:Int = 8;
 	private static inline var R:Int = 1;
@@ -44,11 +42,11 @@ class RGBA2Timeline extends CurveTimeline implements SlotTimeline {
 	private var slotIndex:Int = 0;
 
 	public function new(frameCount:Int, bezierCount:Int, slotIndex:Int) {
-		super(frameCount, bezierCount, Vector.ofArray([
+		super(frameCount, bezierCount, [
 			Property.rgb + "|" + slotIndex,
 			Property.alpha + "|" + slotIndex,
 			Property.rgb2 + "|" + slotIndex
-		]));
+		]);
 		this.slotIndex = slotIndex;
 	}
 
@@ -73,7 +71,7 @@ class RGBA2Timeline extends CurveTimeline implements SlotTimeline {
 		frames[frame + B2] = b2;
 	}
 
-	public override function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Vector<Event>, alpha:Float, blend:MixBlend,
+	public override function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, blend:MixBlend,
 			direction:MixDirection):Void {
 		var slot:Slot = skeleton.slots[slotIndex];
 		if (!slot.bone.active)

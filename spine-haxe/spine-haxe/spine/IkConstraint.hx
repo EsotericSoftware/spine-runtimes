@@ -29,12 +29,10 @@
 
 package spine;
 
-import openfl.Vector;
-
 class IkConstraint implements Updatable {
 	private var _data:IkConstraintData;
 
-	public var bones:Vector<Bone>;
+	public var bones:Array<Bone>;
 	public var target:Bone;
 	public var bendDirection:Int = 0;
 	public var compress:Bool = false;
@@ -55,7 +53,7 @@ class IkConstraint implements Updatable {
 		compress = data.compress;
 		stretch = data.stretch;
 
-		bones = new Vector<Bone>();
+		bones = new Array<Bone>();
 		for (boneData in data.bones) {
 			bones.push(skeleton.findBone(boneData.name));
 		}
