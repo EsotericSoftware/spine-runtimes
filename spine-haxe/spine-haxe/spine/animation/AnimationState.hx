@@ -1,7 +1,34 @@
+/******************************************************************************
+ * Spine Runtimes License Agreement
+ * Last updated July 28, 2023. Replaces all prior versions.
+ *
+ * Copyright (c) 2013-2023, Esoteric Software LLC
+ *
+ * Integration of the Spine Runtimes into software or otherwise creating
+ * derivative works of the Spine Runtimes is permitted under the terms and
+ * conditions of Section 2 of the Spine Editor License Agreement:
+ * http://esotericsoftware.com/spine-editor-license
+ *
+ * Otherwise, it is permitted to integrate the Spine Runtimes into software or
+ * otherwise create derivative works of the Spine Runtimes (collectively,
+ * "Products"), provided that each user of the Products must obtain their own
+ * Spine Editor license and redistribution of the Products in any form must
+ * include this license and copyright notice.
+ *
+ * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+ * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THE
+ * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*****************************************************************************/
+
 package spine.animation;
 
-import starling.utils.Max;
-import openfl.errors.ArgumentError;
 import openfl.utils.Dictionary;
 import openfl.Vector;
 import spine.animation.Listeners.EventListeners;
@@ -43,7 +70,7 @@ class AnimationState {
 
 	public function new(data:AnimationStateData) {
 		if (data == null)
-			throw new ArgumentError("data can not be null");
+			throw new SpineException("data can not be null");
 		this.data = data;
 		this.queue = new EventQueue(this);
 		this.trackEntryPool = new Pool(function():Dynamic {
@@ -142,7 +169,7 @@ class AnimationState {
 
 	public function apply(skeleton:Skeleton):Bool {
 		if (skeleton == null)
-			throw new ArgumentError("skeleton cannot be null.");
+			throw new SpineException("skeleton cannot be null.");
 		if (animationsChanged)
 			_animationsChanged();
 		var applied:Bool = false;
@@ -507,13 +534,13 @@ class AnimationState {
 	public function setAnimationByName(trackIndex:Int, animationName:String, loop:Bool):TrackEntry {
 		var animation:Animation = data.skeletonData.findAnimation(animationName);
 		if (animation == null)
-			throw new ArgumentError("Animation not found: " + animationName);
+			throw new SpineException("Animation not found: " + animationName);
 		return setAnimation(trackIndex, animation, loop);
 	}
 
 	public function setAnimation(trackIndex:Int, animation:Animation, loop:Bool):TrackEntry {
 		if (animation == null)
-			throw new ArgumentError("animation cannot be null.");
+			throw new SpineException("animation cannot be null.");
 		var interrupt:Bool = true;
 		var current:TrackEntry = expandToIndex(trackIndex);
 		if (current != null) {
@@ -538,13 +565,13 @@ class AnimationState {
 	public function addAnimationByName(trackIndex:Int, animationName:String, loop:Bool, delay:Float):TrackEntry {
 		var animation:Animation = data.skeletonData.findAnimation(animationName);
 		if (animation == null)
-			throw new ArgumentError("Animation not found: " + animationName);
+			throw new SpineException("Animation not found: " + animationName);
 		return addAnimation(trackIndex, animation, loop, delay);
 	}
 
 	public function addAnimation(trackIndex:Int, animation:Animation, loop:Bool, delay:Float):TrackEntry {
 		if (animation == null)
-			throw new ArgumentError("animation cannot be null.");
+			throw new SpineException("animation cannot be null.");
 
 		var last:TrackEntry = expandToIndex(trackIndex);
 		if (last != null) {
@@ -627,7 +654,7 @@ class AnimationState {
 		entry.trackTime = 0;
 		entry.trackLast = -1;
 		entry.nextTrackLast = -1;
-		entry.trackEnd = Max.INT_MAX_VALUE;
+		entry.trackEnd = 2147483647;
 		entry.timeScale = 1;
 
 		entry.alpha = 1;

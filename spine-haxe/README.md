@@ -16,6 +16,8 @@ For the official legal terms governing the Spine Runtimes, please read the [Spin
 
 spine-haxe works with data exported from Spine 4.1.xx.
 
+spine-haxe supports all Spine features except premultiplied alpha atlases and two color tinting.
+
 ## Setup
 
 TBD

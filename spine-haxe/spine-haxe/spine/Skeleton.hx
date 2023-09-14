@@ -1,7 +1,35 @@
+/******************************************************************************
+ * Spine Runtimes License Agreement
+ * Last updated July 28, 2023. Replaces all prior versions.
+ *
+ * Copyright (c) 2013-2023, Esoteric Software LLC
+ *
+ * Integration of the Spine Runtimes into software or otherwise creating
+ * derivative works of the Spine Runtimes is permitted under the terms and
+ * conditions of Section 2 of the Spine Editor License Agreement:
+ * http://esotericsoftware.com/spine-editor-license
+ *
+ * Otherwise, it is permitted to integrate the Spine Runtimes into software or
+ * otherwise create derivative works of the Spine Runtimes (collectively,
+ * "Products"), provided that each user of the Products must obtain their own
+ * Spine Editor license and redistribution of the Products in any form must
+ * include this license and copyright notice.
+ *
+ * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+ * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THE
+ * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*****************************************************************************/
+
 package spine;
 
 import openfl.geom.Rectangle;
-import openfl.errors.ArgumentError;
 import openfl.utils.Dictionary;
 import openfl.Vector;
 import spine.attachments.Attachment;
@@ -30,7 +58,7 @@ class Skeleton {
 
 	public function new(data:SkeletonData) {
 		if (data == null) {
-			throw new ArgumentError("data cannot be null.");
+			throw new SpineException("data cannot be null.");
 		}
 		_data = data;
 
@@ -400,7 +428,7 @@ class Skeleton {
 	/** @return May be null. */
 	public function findBone(boneName:String):Bone {
 		if (boneName == null) {
-			throw new ArgumentError("boneName cannot be null.");
+			throw new SpineException("boneName cannot be null.");
 		}
 		for (bone in bones) {
 			if (bone.data.name == boneName)
@@ -412,7 +440,7 @@ class Skeleton {
 	/** @return -1 if the bone was not found. */
 	public function findBoneIndex(boneName:String):Int {
 		if (boneName == null) {
-			throw new ArgumentError("boneName cannot be null.");
+			throw new SpineException("boneName cannot be null.");
 		}
 		var i:Int = 0;
 		for (bone in bones) {
@@ -426,7 +454,7 @@ class Skeleton {
 	/** @return May be null. */
 	public function findSlot(slotName:String):Slot {
 		if (slotName == null) {
-			throw new ArgumentError("slotName cannot be null.");
+			throw new SpineException("slotName cannot be null.");
 		}
 		for (slot in slots) {
 			if (slot.data.name == slotName)
@@ -440,7 +468,7 @@ class Skeleton {
 	private function set_skinName(skinName:String):String {
 		var skin:Skin = data.findSkin(skinName);
 		if (skin == null)
-			throw new ArgumentError("Skin not found: " + skinName);
+			throw new SpineException("Skin not found: " + skinName);
 		this.skin = skin;
 		return skinName;
 	}
@@ -492,7 +520,7 @@ class Skeleton {
 	/** @return May be null. */
 	public function getAttachmentForSlotIndex(slotIndex:Int, attachmentName:String):Attachment {
 		if (attachmentName == null)
-			throw new ArgumentError("attachmentName cannot be null.");
+			throw new SpineException("attachmentName cannot be null.");
 		if (skin != null) {
 			var attachment:Attachment = skin.getAttachment(slotIndex, attachmentName);
 			if (attachment != null)
@@ -506,7 +534,7 @@ class Skeleton {
 	/** @param attachmentName May be null. */
 	public function setAttachment(slotName:String, attachmentName:String):Void {
 		if (slotName == null)
-			throw new ArgumentError("slotName cannot be null.");
+			throw new SpineException("slotName cannot be null.");
 		var i:Int = 0;
 		for (slot in slots) {
 			if (slot.data.name == slotName) {
@@ -514,7 +542,7 @@ class Skeleton {
 				if (attachmentName != null) {
 					attachment = getAttachmentForSlotIndex(i, attachmentName);
 					if (attachment == null) {
-						throw new ArgumentError("Attachment not found: " + attachmentName + ", for slot: " + slotName);
+						throw new SpineException("Attachment not found: " + attachmentName + ", for slot: " + slotName);
 					}
 				}
 				slot.attachment = attachment;
@@ -522,13 +550,13 @@ class Skeleton {
 			}
 			i++;
 		}
-		throw new ArgumentError("Slot not found: " + slotName);
+		throw new SpineException("Slot not found: " + slotName);
 	}
 
 	/** @return May be null. */
 	public function findIkConstraint(constraintName:String):IkConstraint {
 		if (constraintName == null)
-			throw new ArgumentError("constraintName cannot be null.");
+			throw new SpineException("constraintName cannot be null.");
 		for (ikConstraint in ikConstraints) {
 			if (ikConstraint.data.name == constraintName)
 				return ikConstraint;
@@ -539,7 +567,7 @@ class Skeleton {
 	/** @return May be null. */
 	public function findTransformConstraint(constraintName:String):TransformConstraint {
 		if (constraintName == null)
-			throw new ArgumentError("constraintName cannot be null.");
+			throw new SpineException("constraintName cannot be null.");
 		for (transformConstraint in transformConstraints) {
 			if (transformConstraint.data.name == constraintName)
 				return transformConstraint;
@@ -550,7 +578,7 @@ class Skeleton {
 	/** @return May be null. */
 	public function findPathConstraint(constraintName:String):PathConstraint {
 		if (constraintName == null)
-			throw new ArgumentError("constraintName cannot be null.");
+			throw new SpineException("constraintName cannot be null.");
 		for (pathConstraint in pathConstraints) {
 			if (pathConstraint.data.name == constraintName)
 				return pathConstraint;
