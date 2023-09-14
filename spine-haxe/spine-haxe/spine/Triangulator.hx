@@ -29,37 +29,35 @@
 
 package spine;
 
-import openfl.Vector;
-
 class Triangulator {
-	private var convexPolygons:Vector<Vector<Float>> = new Vector<Vector<Float>>();
-	private var convexPolygonsIndices:Vector<Vector<Int>> = new Vector<Vector<Int>>();
-	private var indicesArray:Vector<Int> = new Vector<Int>();
-	private var isConcaveArray:Vector<Bool> = new Vector<Bool>();
-	private var triangles:Vector<Int> = new Vector<Int>();
-	private var polygonPool:Pool<Vector<Float>> = new Pool(function():Dynamic {
-		return new Vector<Float>();
+	private var convexPolygons:Array<Array<Float>> = new Array<Array<Float>>();
+	private var convexPolygonsIndices:Array<Array<Int>> = new Array<Array<Int>>();
+	private var indicesArray:Array<Int> = new Array<Int>();
+	private var isConcaveArray:Array<Bool> = new Array<Bool>();
+	private var triangles:Array<Int> = new Array<Int>();
+	private var polygonPool:Pool<Array<Float>> = new Pool(function():Dynamic {
+		return new Array<Float>();
 	});
-	private var polygonIndicesPool:Pool<Vector<Int>> = new Pool(function():Dynamic {
-		return new Vector<Int>();
+	private var polygonIndicesPool:Pool<Array<Int>> = new Pool(function():Dynamic {
+		return new Array<Int>();
 	});
 
 	public function new() {}
 
-	public function triangulate(vertices:Vector<Float>):Vector<Int> {
+	public function triangulate(vertices:Array<Float>):Array<Int> {
 		var vertexCount:Int = vertices.length >> 1;
 
-		indicesArray.length = 0;
+		indicesArray.resize(0);
 		for (i in 0...vertexCount) {
 			indicesArray.push(i);
 		}
 
-		isConcaveArray.length = 0;
+		isConcaveArray.resize(0);
 		for (i in 0...vertexCount) {
 			isConcaveArray.push(isConcave(i, vertexCount, vertices, indicesArray));
 		}
 
-		triangles.length = 0;
+		triangles.resize(0);
 
 		while (vertexCount > 3) {
 			// Find ear tip.
@@ -131,22 +129,22 @@ class Triangulator {
 		return triangles;
 	}
 
-	public function decompose(vertices:Vector<Float>, triangles:Vector<Int>):Vector<Vector<Float>> {
+	public function decompose(vertices:Array<Float>, triangles:Array<Int>):Array<Array<Float>> {
 		for (i in 0...convexPolygons.length) {
 			this.polygonPool.free(convexPolygons[i]);
 		}
-		convexPolygons.length = 0;
+		convexPolygons.resize(0);
 
 		for (i in 0...convexPolygonsIndices.length) {
 			this.polygonIndicesPool.free(convexPolygonsIndices[i]);
 		}
-		convexPolygonsIndices.length = 0;
+		convexPolygonsIndices.resize(0);
 
-		var polygonIndices:Vector<Int> = polygonIndicesPool.obtain();
-		polygonIndices.length = 0;
+		var polygonIndices:Array<Int> = polygonIndicesPool.obtain();
+		polygonIndices.resize(0);
 
-		var polygon:Vector<Float> = polygonPool.obtain();
-		polygon.length = 0;
+		var polygon:Array<Float> = polygonPool.obtain();
+		polygon.resize(0);
 
 		// Merge subsequent triangles if they form a triangle fan.
 		var fanBaseIndex:Int = -1, lastWinding:Int = 0;
@@ -188,7 +186,7 @@ class Triangulator {
 					polygonIndicesPool.free(polygonIndices);
 				}
 				polygon = polygonPool.obtain();
-				polygon.length = 0;
+				polygon.resize(0);
 				polygon.push(x1);
 				polygon.push(y1);
 				polygon.push(x2);
@@ -196,7 +194,7 @@ class Triangulator {
 				polygon.push(x3);
 				polygon.push(y3);
 				polygonIndices = polygonIndicesPool.obtain();
-				polygonIndices.length = 0;
+				polygonIndices.resize(0);
 				polygonIndices.push(t1);
 				polygonIndices.push(t2);
 				polygonIndices.push(t3);
@@ -238,7 +236,7 @@ class Triangulator {
 					ii++;
 					continue;
 				}
-				var otherIndices:Vector<Int> = convexPolygonsIndices[ii];
+				var otherIndices:Array<Int> = convexPolygonsIndices[ii];
 				if (otherIndices.length != 3) {
 					ii++;
 					continue;
@@ -247,7 +245,7 @@ class Triangulator {
 				var otherSecondIndex:Int = otherIndices[1];
 				var otherLastIndex:Int = otherIndices[2];
 
-				var otherPoly:Vector<Float> = convexPolygons[ii];
+				var otherPoly:Array<Float> = convexPolygons[ii];
 				x3 = otherPoly[otherPoly.length - 2];
 				y3 = otherPoly[otherPoly.length - 1];
 
@@ -258,8 +256,8 @@ class Triangulator {
 				winding1 = Triangulator.winding(prevPrevX, prevPrevY, prevX, prevY, x3, y3);
 				winding2 = Triangulator.winding(x3, y3, firstX, firstY, secondX, secondY);
 				if (winding1 == currWinding && winding2 == currWinding) {
-					otherPoly.length = 0;
-					otherIndices.length = 0;
+					otherPoly.resize(0);
+					otherIndices.resize(0);
 					polygon.push(x3);
 					polygon.push(y3);
 					polygonIndices.push(otherLastIndex);
@@ -294,7 +292,7 @@ class Triangulator {
 		return convexPolygons;
 	}
 
-	private static function isConcave(index:Int, vertexCount:Int, vertices:Vector<Float>, indices:Vector<Int>):Bool {
+	private static function isConcave(index:Int, vertexCount:Int, vertices:Array<Float>, indices:Array<Int>):Bool {
 		var previous:Int = indices[(vertexCount + index - 1) % vertexCount] << 1;
 		var current:Int = indices[index] << 1;
 		var next:Int = indices[(index + 1) % vertexCount] << 1;

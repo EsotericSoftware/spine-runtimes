@@ -29,7 +29,7 @@
 
 package spine;
 
-import openfl.Vector;
+import haxe.io.Bytes;
 import openfl.utils.Assets;
 import spine.animation.Animation;
 import spine.atlas.TextureAtlas;
@@ -39,15 +39,15 @@ class SkeletonData {
 	/** May be null. */
 	public var name:String;
 
-	public var bones:Vector<BoneData> = new Vector<BoneData>(); // Ordered parents first.
-	public var slots:Vector<SlotData> = new Vector<SlotData>(); // Setup pose draw order.
-	public var skins:Vector<Skin> = new Vector<Skin>();
+	public var bones:Array<BoneData> = new Array<BoneData>(); // Ordered parents first.
+	public var slots:Array<SlotData> = new Array<SlotData>(); // Setup pose draw order.
+	public var skins:Array<Skin> = new Array<Skin>();
 	public var defaultSkin:Skin;
-	public var events:Vector<EventData> = new Vector<EventData>();
-	public var animations:Vector<Animation> = new Vector<Animation>();
-	public var ikConstraints:Vector<IkConstraintData> = new Vector<IkConstraintData>();
-	public var transformConstraints:Vector<TransformConstraintData> = new Vector<TransformConstraintData>();
-	public var pathConstraints:Vector<PathConstraintData> = new Vector<PathConstraintData>();
+	public var events:Array<EventData> = new Array<EventData>();
+	public var animations:Array<Animation> = new Array<Animation>();
+	public var ikConstraints:Array<IkConstraintData> = new Array<IkConstraintData>();
+	public var transformConstraints:Array<TransformConstraintData> = new Array<TransformConstraintData>();
+	public var pathConstraints:Array<PathConstraintData> = new Array<PathConstraintData>();
 	public var x:Float = 0;
 	public var y:Float = 0;
 	public var width:Float = 0;
@@ -58,19 +58,17 @@ class SkeletonData {
 	public var imagesPath:String;
 	public var audioPath:String;
 
-	public static function fromAssets(path:String, atlas:TextureAtlas, scale:Float = 1.0):SkeletonData {
-		if (StringTools.endsWith(path, ".skel")) {
-			var byteData = Assets.getBytes(path);
+	public static function from(data:Dynamic, atlas:TextureAtlas, scale:Float = 1.0):SkeletonData {
+		if (Std.isOfType(data, Bytes)) {
 			var loader = new SkeletonBinary(new AtlasAttachmentLoader(atlas));
 			loader.scale = scale;
-			return loader.readSkeletonData(byteData);
-		} else if (StringTools.endsWith(path, ".json")) {
-			var jsonData = Assets.getText(path);
+			return loader.readSkeletonData(cast(data, Bytes));
+		} else if (Std.isOfType(data, String)) {
 			var loader = new SkeletonJson(new AtlasAttachmentLoader(atlas));
 			loader.scale = scale;
-			return loader.readSkeletonData(jsonData);
+			return loader.readSkeletonData(cast(data, String));
 		} else {
-			throw new SpineException("Path of skeleton data file must end with .json or .skel");
+			throw new SpineException("Data must either be a String (.json) or Bytes (.skel) instance.");
 		}
 	}
 

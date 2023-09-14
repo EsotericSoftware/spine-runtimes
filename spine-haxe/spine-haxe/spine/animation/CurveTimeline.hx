@@ -29,8 +29,6 @@
 
 package spine.animation;
 
-import openfl.Vector;
-
 /** Base class for frames that use an interpolation bezier curve. */
 class CurveTimeline extends Timeline {
 	private static inline var LINEAR:Int = 0;
@@ -38,11 +36,12 @@ class CurveTimeline extends Timeline {
 	private static inline var BEZIER:Int = 2;
 	private static inline var BEZIER_SIZE:Int = 18;
 
-	private var curves:Vector<Float>; // type, x, y, ...
+	private var curves:Array<Float>; // type, x, y, ...
 
-	public function new(frameCount:Int, bezierCount:Int, propertyIds:Vector<String>) {
+	public function new(frameCount:Int, bezierCount:Int, propertyIds:Array<String>) {
 		super(frameCount, propertyIds);
-		curves = new Vector<Float>(frameCount + bezierCount * BEZIER_SIZE, true);
+		curves = new Array<Float>();
+		curves.resize(frameCount + bezierCount * BEZIER_SIZE);
 		curves[frameCount - 1] = STEPPED;
 	}
 
@@ -58,7 +57,7 @@ class CurveTimeline extends Timeline {
 	 * than the actual number of Bezier curves. */
 	public function shrink(bezierCount:Int):Void {
 		var size:Int = getFrameCount() + bezierCount * BEZIER_SIZE;
-		curves.length = size;
+		curves.resize(size);
 	}
 
 	/** Stores the segments for the specified Bezier curve. For timelines that modify multiple values, there may be more than

@@ -27,18 +27,22 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-package spine.atlas;
+package spine.starling;
 
 import starling.textures.Texture;
 import spine.atlas.TextureAtlasRegion;
 import spine.atlas.TextureAtlasPage;
 import spine.atlas.TextureLoader;
 
-class AssetsTextureLoader implements TextureLoader {
+class StarlingTextureLoader implements TextureLoader {
 	private var basePath:String;
 
-	public function new(basePath:String) {
-		this.basePath = basePath;
+	public function new(atlasPath:String) {
+		basePath = "";
+		var slashIndex = atlasPath.lastIndexOf("/");
+		if (slashIndex != -1) {
+			basePath = atlasPath.substring(0, slashIndex);
+		}
 	}
 
 	public function loadPage(page:TextureAtlasPage, path:String) {

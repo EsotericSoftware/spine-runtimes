@@ -29,7 +29,6 @@
 
 package spine.attachments;
 
-import openfl.Vector;
 import spine.Bone;
 import spine.Skeleton;
 import spine.Slot;
@@ -37,8 +36,8 @@ import spine.Slot;
 class VertexAttachment extends Attachment {
 	private static var nextID:Int = 0;
 
-	public var bones:Vector<Int>;
-	public var vertices = new Vector<Float>();
+	public var bones:Array<Int>;
+	public var vertices = new Array<Float>();
 	public var worldVerticesLength:Int = 0;
 	public var id:Int = nextID++;
 	public var timelineAttachment:VertexAttachment;
@@ -59,10 +58,10 @@ class VertexAttachment extends Attachment {
 	 *           `stride` / 2.
 	 * @param offset The `worldVertices` index to begin writing values.
 	 * @param stride The number of `worldVertices` entries between the value pairs written. */
-	public function computeWorldVertices(slot:Slot, start:Int, count:Int, worldVertices:Vector<Float>, offset:Int, stride:Int):Void {
+	public function computeWorldVertices(slot:Slot, start:Int, count:Int, worldVertices:Array<Float>, offset:Int, stride:Int):Void {
 		count = offset + (count >> 1) * stride;
 		var skeleton:Skeleton = slot.skeleton;
-		var deform:Vector<Float> = slot.deform;
+		var deform:Array<Float> = slot.deform;
 
 		var v:Int, w:Int, n:Int, i:Int, skip:Int, b:Int, f:Int;
 		var vx:Float, vy:Float;
@@ -100,7 +99,7 @@ class VertexAttachment extends Attachment {
 			skip += n;
 			i += 2;
 		}
-		var skeletonBones:Vector<Bone> = skeleton.bones;
+		var skeletonBones:Array<Bone> = skeleton.bones;
 		if (deform.length == 0) {
 			w = offset;
 			b = skip * 3;
@@ -152,13 +151,13 @@ class VertexAttachment extends Attachment {
 
 	public function copyTo(attachment:VertexAttachment):Void {
 		if (bones != null) {
-			attachment.bones = bones.concat();
+			attachment.bones = bones.copy();
 		} else {
 			attachment.bones = null;
 		}
 
 		if (this.vertices != null) {
-			attachment.vertices = vertices.concat();
+			attachment.vertices = vertices.copy();
 		}
 
 		attachment.worldVerticesLength = worldVerticesLength;

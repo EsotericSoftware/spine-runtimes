@@ -29,7 +29,6 @@
 
 package spine.animation;
 
-import openfl.Vector;
 import spine.animation.Timeline;
 import spine.attachments.Attachment;
 import spine.attachments.VertexAttachment;
@@ -44,13 +43,14 @@ class DeformTimeline extends CurveTimeline implements SlotTimeline {
 	public var attachment:VertexAttachment;
 
 	/** The vertices for each key frame. */
-	public var vertices:Vector<Vector<Float>>;
+	public var vertices:Array<Array<Float>>;
 
 	public function new(frameCount:Int, bezierCount:Int, slotIndex:Int, attachment:VertexAttachment) {
-		super(frameCount, bezierCount, Vector.ofArray([Property.deform + "|" + slotIndex + "|" + attachment.id]));
+		super(frameCount, bezierCount, [Property.deform + "|" + slotIndex + "|" + attachment.id]);
 		this.slotIndex = slotIndex;
 		this.attachment = attachment;
-		vertices = new Vector<Vector<Float>>(frameCount, true);
+		vertices = new Array<Array<Float>>();
+		vertices.resize(frameCount);
 	}
 
 	public override function getFrameCount():Int {
@@ -63,7 +63,7 @@ class DeformTimeline extends CurveTimeline implements SlotTimeline {
 
 	/** Sets the time in seconds and the vertices for the specified key frame.
 	 * @param vertices Vertex positions for an unweighted VertexAttachment, or deform offsets if it has weights. */
-	public function setFrame(frame:Int, time:Float, verticesOrDeform:Vector<Float>):Void {
+	public function setFrame(frame:Int, time:Float, verticesOrDeform:Array<Float>):Void {
 		frames[frame] = time;
 		vertices[frame] = verticesOrDeform;
 	}
@@ -129,7 +129,7 @@ class DeformTimeline extends CurveTimeline implements SlotTimeline {
 		return y + (1 - y) * (time - x) / (frames[frame + getFrameEntries()] - x);
 	}
 
-	public override function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Vector<Event>, alpha:Float, blend:MixBlend,
+	public override function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, blend:MixBlend,
 			direction:MixDirection):Void {
 		var slot:Slot = skeleton.slots[slotIndex];
 		if (!slot.bone.active)
@@ -140,23 +140,23 @@ class DeformTimeline extends CurveTimeline implements SlotTimeline {
 		if (!Std.isOfType(slotAttachment, VertexAttachment) || cast(slotAttachment, VertexAttachment).timelineAttachment != attachment)
 			return;
 
-		var deform:Vector<Float> = slot.deform;
+		var deform:Array<Float> = slot.deform;
 		if (deform.length == 0)
 			blend = MixBlend.setup;
 
 		var vertexCount:Int = vertices[0].length;
-		var i:Int, setupVertices:Vector<Float>;
+		var i:Int, setupVertices:Array<Float>;
 
 		if (time < frames[0]) {
 			switch (blend) {
 				case MixBlend.setup:
-					deform.length = 0;
+					deform.resize(0);
 				case MixBlend.first:
 					if (alpha == 1) {
-						deform.length = 0;
+						deform.resize(0);
 						return;
 					}
-					deform.length = vertexCount;
+					deform.resize(vertexCount);
 					var vertexAttachment:VertexAttachment = cast(slotAttachment, VertexAttachment);
 					if (vertexAttachment.bones == null) {
 						// Unweighted vertex positions.
@@ -175,11 +175,11 @@ class DeformTimeline extends CurveTimeline implements SlotTimeline {
 			return;
 		}
 
-		deform.length = vertexCount;
+		deform.resize(vertexCount);
 		var setup:Float;
 		if (time >= frames[frames.length - 1]) // Time is after last frame.
 		{
-			var lastVertices:Vector<Float> = vertices[frames.length - 1];
+			var lastVertices:Array<Float> = vertices[frames.length - 1];
 			if (alpha == 1) {
 				if (blend == MixBlend.add) {
 					var vertexAttachment:VertexAttachment = cast(slotAttachment, VertexAttachment);
@@ -243,8 +243,8 @@ class DeformTimeline extends CurveTimeline implements SlotTimeline {
 		// Interpolate between the previous frame and the current frame.
 		var frame:Int = Timeline.search1(frames, time);
 		var percent:Float = getCurvePercent(time, frame);
-		var prevVertices:Vector<Float> = vertices[frame], prev:Float;
-		var nextVertices:Vector<Float> = vertices[frame + 1];
+		var prevVertices:Array<Float> = vertices[frame], prev:Float;
+		var nextVertices:Array<Float> = vertices[frame + 1];
 
 		if (alpha == 1) {
 			if (blend == MixBlend.add) {

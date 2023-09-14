@@ -29,9 +29,8 @@
 
 package spine;
 
-import openfl.geom.Rectangle;
-import openfl.utils.Dictionary;
-import openfl.Vector;
+import lime.math.Rectangle;
+import haxe.ds.StringMap;
 import spine.attachments.Attachment;
 import spine.attachments.MeshAttachment;
 import spine.attachments.PathAttachment;
@@ -40,14 +39,14 @@ import spine.attachments.RegionAttachment;
 class Skeleton {
 	private var _data:SkeletonData;
 
-	public var bones:Vector<Bone>;
-	public var slots:Vector<Slot>;
-	public var drawOrder:Vector<Slot>;
-	public var ikConstraints:Vector<IkConstraint>;
-	public var transformConstraints:Vector<TransformConstraint>;
-	public var pathConstraints:Vector<PathConstraint>;
+	public var bones:Array<Bone>;
+	public var slots:Array<Slot>;
+	public var drawOrder:Array<Slot>;
+	public var ikConstraints:Array<IkConstraint>;
+	public var transformConstraints:Array<TransformConstraint>;
+	public var pathConstraints:Array<PathConstraint>;
 
-	private var _updateCache:Vector<Updatable> = new Vector<Updatable>();
+	private var _updateCache:Array<Updatable> = new Array<Updatable>();
 	private var _skin:Skin;
 
 	public var color:Color = new Color(1, 1, 1, 1);
@@ -62,7 +61,7 @@ class Skeleton {
 		}
 		_data = data;
 
-		bones = new Vector<Bone>();
+		bones = new Array<Bone>();
 		for (boneData in data.bones) {
 			var bone:Bone;
 			if (boneData.parent == null) {
@@ -75,8 +74,8 @@ class Skeleton {
 			bones.push(bone);
 		}
 
-		slots = new Vector<Slot>();
-		drawOrder = new Vector<Slot>();
+		slots = new Array<Slot>();
+		drawOrder = new Array<Slot>();
 		for (slotData in data.slots) {
 			var bone = bones[slotData.boneData.index];
 			var slot:Slot = new Slot(slotData, bone);
@@ -84,17 +83,17 @@ class Skeleton {
 			drawOrder.push(slot);
 		}
 
-		ikConstraints = new Vector<IkConstraint>();
+		ikConstraints = new Array<IkConstraint>();
 		for (ikConstraintData in data.ikConstraints) {
 			ikConstraints.push(new IkConstraint(ikConstraintData, this));
 		}
 
-		transformConstraints = new Vector<TransformConstraint>();
+		transformConstraints = new Array<TransformConstraint>();
 		for (transformConstraintData in data.transformConstraints) {
 			transformConstraints.push(new TransformConstraint(transformConstraintData, this));
 		}
 
-		pathConstraints = new Vector<PathConstraint>();
+		pathConstraints = new Array<PathConstraint>();
 		for (pathConstraintData in data.pathConstraints) {
 			pathConstraints.push(new PathConstraint(pathConstraintData, this));
 		}
@@ -105,7 +104,7 @@ class Skeleton {
 	/** Caches information about bones and constraints. Must be called if bones, constraints, or weighted path attachments are
 	 * added or removed. */
 	public function updateCache():Void {
-		_updateCache.length = 0;
+		_updateCache.resize(0);
 
 		for (bone in bones) {
 			bone.sorted = bone.data.skinRequired;
@@ -113,7 +112,7 @@ class Skeleton {
 		}
 
 		if (skin != null) {
-			var skinBones:Vector<BoneData> = skin.bones;
+			var skinBones:Array<BoneData> = skin.bones;
 			for (i in 0...skin.bones.length) {
 				var bone:Bone = bones[skinBones[i].index];
 				do {
@@ -164,7 +163,7 @@ class Skeleton {
 		}
 	}
 
-	private static function contains(list:Vector<ConstraintData>, element:ConstraintData):Bool {
+	private static function contains(list:Array<ConstraintData>, element:ConstraintData):Bool {
 		return list.indexOf(element) != -1;
 	}
 
@@ -177,7 +176,7 @@ class Skeleton {
 		var target:Bone = constraint.target;
 		sortBone(target);
 
-		var constrained:Vector<Bone> = constraint.bones;
+		var constrained:Array<Bone> = constraint.bones;
 		var parent:Bone = constrained[0];
 		sortBone(parent);
 
@@ -222,7 +221,7 @@ class Skeleton {
 		if (Std.isOfType(attachment, PathAttachment))
 			sortPathConstraintAttachment2(attachment, slotBone);
 
-		var constrainedBones:Vector<Bone> = constraint.bones;
+		var constrainedBones:Array<Bone> = constraint.bones;
 		for (bone in constrainedBones) {
 			sortBone(bone);
 		}
@@ -245,7 +244,7 @@ class Skeleton {
 
 		sortBone(constraint.target);
 
-		var constrainedBones:Vector<Bone> = constraint.bones;
+		var constrainedBones:Array<Bone> = constraint.bones;
 		if (constraint.data.local) {
 			for (bone in constrainedBones) {
 				sortBone(bone.parent);
@@ -267,10 +266,10 @@ class Skeleton {
 	}
 
 	private function sortPathConstraintAttachment(skin:Skin, slotIndex:Int, slotBone:Bone):Void {
-		var dict:Dictionary<String, Attachment> = skin.attachments[slotIndex];
+		var dict:StringMap<Attachment> = skin.attachments[slotIndex];
 		if (dict != null) {
-			for (attachment in dict.each()) {
-				sortPathConstraintAttachment2(attachment, slotBone);
+			for (attachment in dict.keyValueIterator()) {
+				sortPathConstraintAttachment2(attachment.value, slotBone);
 			}
 		}
 	}
@@ -279,7 +278,7 @@ class Skeleton {
 		var pathAttachment:PathAttachment = cast(attachment, PathAttachment);
 		if (pathAttachment == null)
 			return;
-		var pathBones:Vector<Int> = pathAttachment.bones;
+		var pathBones:Array<Int> = pathAttachment.bones;
 		if (pathBones == null) {
 			sortBone(slotBone);
 		} else {
@@ -305,7 +304,7 @@ class Skeleton {
 		_updateCache.push(bone);
 	}
 
-	private function sortReset(bones:Vector<Bone>):Void {
+	private function sortReset(bones:Array<Bone>):Void {
 		for (bone in bones) {
 			if (!bone.active)
 				continue;
@@ -411,9 +410,9 @@ class Skeleton {
 		return _data;
 	}
 
-	public var getUpdateCache(get, never):Vector<Updatable>;
+	public var getUpdateCache(get, never):Array<Updatable>;
 
-	private function get_getUpdateCache():Vector<Updatable> {
+	private function get_getUpdateCache():Array<Updatable> {
 		return _updateCache;
 	}
 
@@ -590,7 +589,7 @@ class Skeleton {
 		return _data.name != null ? _data.name : "Skeleton?";
 	}
 
-	private var _tempVertices = new Vector<Float>();
+	private var _tempVertices = new Array<Float>();
 	private var _bounds = new Rectangle();
 
 	public function getBounds():Rectangle {
@@ -600,17 +599,17 @@ class Skeleton {
 		var maxY:Float = Math.NEGATIVE_INFINITY;
 		for (slot in drawOrder) {
 			var verticesLength:Int = 0;
-			var vertices:Vector<Float> = null;
+			var vertices:Array<Float> = null;
 			var attachment:Attachment = slot.attachment;
 			if (Std.isOfType(attachment, RegionAttachment)) {
 				verticesLength = 8;
-				_tempVertices.length = verticesLength;
+				_tempVertices.resize(verticesLength);
 				vertices = _tempVertices;
 				cast(attachment, RegionAttachment).computeWorldVertices(slot, vertices, 0, 2);
 			} else if (Std.isOfType(attachment, MeshAttachment)) {
 				var mesh:MeshAttachment = cast(attachment, MeshAttachment);
 				verticesLength = mesh.worldVerticesLength;
-				_tempVertices.length = verticesLength;
+				_tempVertices.resize(verticesLength);
 				vertices = _tempVertices;
 				mesh.computeWorldVertices(slot, 0, verticesLength, vertices, 0, 2);
 			}

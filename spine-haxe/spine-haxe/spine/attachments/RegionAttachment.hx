@@ -29,8 +29,6 @@
 
 package spine.attachments;
 
-import openfl.Vector;
-import spine.Bone;
 import spine.Color;
 
 class RegionAttachment extends Attachment implements HasTextureRegion {
@@ -56,9 +54,9 @@ class RegionAttachment extends Attachment implements HasTextureRegion {
 	public var region:TextureRegion;
 	public var sequence:Sequence;
 
-	private var offsets:Vector<Float> = new Vector<Float>(8, true);
+	private var offsets:Array<Float> = new Array<Float>();
 
-	public var uvs:Vector<Float> = new Vector<Float>(8, true);
+	public var uvs:Array<Float> = new Array<Float>();
 
 	public function new(name:String, path:String) {
 		super(name);
@@ -128,7 +126,7 @@ class RegionAttachment extends Attachment implements HasTextureRegion {
 		}
 	}
 
-	public function computeWorldVertices(slot:Slot, worldVertices:Vector<Float>, offset:Int, stride:Int):Void {
+	public function computeWorldVertices(slot:Slot, worldVertices:Array<Float>, offset:Int, stride:Int):Void {
 		if (sequence != null)
 			sequence.apply(slot, this);
 
@@ -173,8 +171,8 @@ class RegionAttachment extends Attachment implements HasTextureRegion {
 		copy.rotation = rotation;
 		copy.width = width;
 		copy.height = height;
-		copy.uvs = uvs.concat();
-		copy.offsets = offsets.concat();
+		copy.uvs = uvs.copy();
+		copy.offsets = offsets.copy();
 		copy.color.setFromColor(color);
 		copy.sequence = sequence != null ? sequence.copy() : null;
 		return copy;

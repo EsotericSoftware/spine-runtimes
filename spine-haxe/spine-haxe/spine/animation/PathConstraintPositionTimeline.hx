@@ -29,7 +29,6 @@
 
 package spine.animation;
 
-import openfl.Vector;
 import spine.Event;
 import spine.PathConstraint;
 import spine.Skeleton;
@@ -39,11 +38,11 @@ class PathConstraintPositionTimeline extends CurveTimeline1 {
 	public var pathConstraintIndex:Int = 0;
 
 	public function new(frameCount:Int, bezierCount:Int, pathConstraintIndex:Int) {
-		super(frameCount, bezierCount, Vector.ofArray([Property.pathConstraintPosition + "|" + pathConstraintIndex]));
+		super(frameCount, bezierCount, [Property.pathConstraintPosition + "|" + pathConstraintIndex]);
 		this.pathConstraintIndex = pathConstraintIndex;
 	}
 
-	public override function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Vector<Event>, alpha:Float, blend:MixBlend,
+	public override function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, blend:MixBlend,
 			direction:MixDirection):Void {
 		var constraint:PathConstraint = skeleton.pathConstraints[pathConstraintIndex];
 		if (!constraint.active)

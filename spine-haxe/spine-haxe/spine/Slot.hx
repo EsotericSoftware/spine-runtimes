@@ -29,7 +29,6 @@
 
 package spine;
 
-import openfl.Vector;
 import spine.attachments.Attachment;
 import spine.attachments.VertexAttachment;
 
@@ -45,7 +44,7 @@ class Slot {
 	public var sequenceIndex = -1;
 
 	public var attachmentState:Int = 0;
-	public var deform:Vector<Float> = new Vector<Float>();
+	public var deform:Array<Float> = new Array<Float>();
 
 	public function new(data:SlotData, bone:Bone) {
 		if (data == null)
@@ -93,7 +92,7 @@ class Slot {
 		if (!Std.isOfType(attachmentNew, VertexAttachment)
 			|| !Std.isOfType(attachment, VertexAttachment)
 			|| cast(attachmentNew, VertexAttachment).timelineAttachment != cast(attachment, VertexAttachment).timelineAttachment) {
-			deform = new Vector<Float>();
+			deform = new Array<Float>();
 		}
 		_attachment = attachmentNew;
 		sequenceIndex = -1;

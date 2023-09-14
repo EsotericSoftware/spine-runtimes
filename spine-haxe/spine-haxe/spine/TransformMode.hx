@@ -29,8 +29,6 @@
 
 package spine;
 
-import openfl.Vector;
-
 class TransformMode {
 	public static var normal(default, never):TransformMode = new TransformMode("normal");
 	public static var onlyTranslation(default, never):TransformMode = new TransformMode("onlyTranslation");
@@ -38,7 +36,7 @@ class TransformMode {
 	public static var noScale(default, never):TransformMode = new TransformMode("noScale");
 	public static var noScaleOrReflection(default, never):TransformMode = new TransformMode("noScaleOrReflection");
 
-	public static var values:Vector<TransformMode> = Vector.ofArray([normal, onlyTranslation, noRotationOrReflection, noScale, noScaleOrReflection]);
+	public static var values:Array<TransformMode> = [normal, onlyTranslation, noRotationOrReflection, noScale, noScaleOrReflection];
 
 	public var name(default, null):String;
 

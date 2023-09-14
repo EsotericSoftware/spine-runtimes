@@ -29,7 +29,6 @@
 
 package spine.animation;
 
-import openfl.Vector;
 import spine.Event;
 import spine.Skeleton;
 import spine.Slot;
@@ -38,12 +37,13 @@ class AttachmentTimeline extends Timeline implements SlotTimeline {
 	public var slotIndex:Int = 0;
 
 	/** The attachment name for each key frame. May contain null values to clear the attachment. */
-	public var attachmentNames:Vector<String>;
+	public var attachmentNames:Array<String>;
 
 	public function new(frameCount:Int, slotIndex:Int) {
-		super(frameCount, Vector.ofArray([Property.attachment + "|" + slotIndex]));
+		super(frameCount, [Property.attachment + "|" + slotIndex]);
 		this.slotIndex = slotIndex;
-		attachmentNames = new Vector<String>(frameCount, true);
+		attachmentNames = new Array<String>();
+		attachmentNames.resize(frameCount);
 	}
 
 	public override function getFrameCount():Int {
@@ -60,7 +60,7 @@ class AttachmentTimeline extends Timeline implements SlotTimeline {
 		attachmentNames[frame] = attachmentName;
 	}
 
-	public override function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Vector<Event>, alpha:Float, blend:MixBlend,
+	public override function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, blend:MixBlend,
 			direction:MixDirection):Void {
 		var slot:Slot = skeleton.slots[slotIndex];
 		if (!slot.bone.active)

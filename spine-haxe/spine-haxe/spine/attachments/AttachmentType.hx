@@ -29,8 +29,6 @@
 
 package spine.attachments;
 
-import openfl.Vector;
-
 class AttachmentType {
 	public static var region(default, never):AttachmentType = new AttachmentType(0, "region");
 	public static var boundingbox(default, never):AttachmentType = new AttachmentType(1, "boundingbox");
@@ -40,7 +38,7 @@ class AttachmentType {
 	public static var point(default, never):AttachmentType = new AttachmentType(5, "point");
 	public static var clipping(default, never):AttachmentType = new AttachmentType(6, "clipping");
 
-	public static var values(default, never):Vector<AttachmentType> = Vector.ofArray([region, boundingbox, mesh, linkedmesh, path, point, clipping]);
+	public static var values(default, never):Array<AttachmentType> = [region, boundingbox, mesh, linkedmesh, path, point, clipping];
 
 	public var ordinal(default, null):Int;
 	public var name(default, null):String;

@@ -30,15 +30,13 @@
 package spine.animation;
 
 /** The base class for a {@link CurveTimeline} that sets one property. */
-import openfl.Vector;
-
 class CurveTimeline1 extends CurveTimeline {
 	private static inline var ENTRIES:Int = 2;
 	private static inline var VALUE:Int = 1;
 
 	/** @param bezierCount The maximum number of Bezier curves. See {@link #shrink(Int)}.
 	 * @param propertyIds Unique identifiers for the properties the timeline modifies. */
-	public function new(frameCount:Int, bezierCount:Int, propertyIds:Vector<String>) {
+	public function new(frameCount:Int, bezierCount:Int, propertyIds:Array<String>) {
 		super(frameCount, bezierCount, propertyIds);
 	}
 

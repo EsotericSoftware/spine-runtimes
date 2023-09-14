@@ -1,8 +1,9 @@
-﻿Shader "Universal Render Pipeline/Spine/Skeleton Lit" {
+Shader "Universal Render Pipeline/Spine/Skeleton Lit" {
 	Properties {
 		_Cutoff ("Shadow alpha cutoff", Range(0,1)) = 0.1
 		[NoScaleOffset] _MainTex ("Main Texture", 2D) = "black" {}
 		[Toggle(_STRAIGHT_ALPHA_INPUT)] _StraightAlphaInput("Straight Alpha Texture", Int) = 0
+		[Toggle(_ZWRITE)] _ZWrite("Depth Write", Float) = 0.0
 		[Toggle(_RECEIVE_SHADOWS)] _ReceiveShadows("Receive Shadows", Int) = 0
 		[Toggle(_DOUBLE_SIDED_LIGHTING)] _DoubleSidedLighting("Double-Sided Lighting", Int) = 0
 		[MaterialToggle(_LIGHT_AFFECTS_ADDITIVE)] _LightAffectsAdditive("Light Affects Additive", Float) = 0
@@ -19,7 +20,7 @@
 		Tags { "RenderPipeline" = "UniversalPipeline" "Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent" }
 		LOD 100
 		Cull Off
-		ZWrite Off
+		ZWrite[_ZWrite]
 		Blend One OneMinusSrcAlpha
 
 		Stencil {
@@ -32,7 +33,7 @@
 			Name "ForwardLit"
 			Tags{"LightMode" = "UniversalForward"}
 
-			ZWrite Off
+			ZWrite[_ZWrite]
 			Cull Off
 			Blend One OneMinusSrcAlpha
 

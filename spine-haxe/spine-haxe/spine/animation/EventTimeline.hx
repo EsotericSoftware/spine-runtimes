@@ -29,17 +29,17 @@
 
 package spine.animation;
 
-import openfl.Vector;
 import spine.animation.Timeline;
 import spine.Event;
 import spine.Skeleton;
 
 class EventTimeline extends Timeline {
-	public var events:Vector<Event>;
+	public var events:Array<Event>;
 
 	public function new(frameCount:Int) {
-		super(frameCount, Vector.ofArray([Std.string(Property.event)]));
-		events = new Vector<Event>(frameCount, true);
+		super(frameCount, [Std.string(Property.event)]);
+		events = new Array<Event>();
+		events.resize(frameCount);
 	}
 
 	public override function getFrameCount():Int {
@@ -53,7 +53,7 @@ class EventTimeline extends Timeline {
 	}
 
 	/** Fires events for frames > `lastTime` and <= `time`. */
-	public override function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Vector<Event>, alpha:Float, blend:MixBlend,
+	public override function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, blend:MixBlend,
 			direction:MixDirection):Void {
 		if (events == null)
 			return;

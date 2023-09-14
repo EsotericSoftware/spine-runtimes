@@ -29,8 +29,6 @@
 
 package spine;
 
-import openfl.Vector;
-
 #if flash
 typedef Function = Dynamic;
 #else
@@ -38,11 +36,11 @@ typedef Function = haxe.Constraints.Function;
 #end
 
 @:generic class Pool<T> {
-	private var items:Vector<T>;
+	private var items:Array<T>;
 	private var instantiator:Function;
 
 	public function new(instantiator:Void->T) {
-		this.items = new Vector<T>();
+		this.items = new Array<T>();
 		this.instantiator = instantiator;
 	}
 
@@ -56,13 +54,13 @@ typedef Function = haxe.Constraints.Function;
 		items.push(item);
 	}
 
-	public function freeAll(items:Vector<T>):Void {
+	public function freeAll(items:Array<T>):Void {
 		for (item in items) {
 			free(item);
 		}
 	}
 
 	public function clear():Void {
-		items.length = 0;
+		items.resize(0);
 	}
 }

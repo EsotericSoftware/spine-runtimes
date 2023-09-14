@@ -29,17 +29,16 @@
 
 package spine;
 
-import openfl.utils.Dictionary;
-import openfl.Vector;
+import haxe.ds.StringMap;
 import spine.attachments.Attachment;
 import spine.attachments.MeshAttachment;
 
 /** Stores attachments by slot index and attachment name. */
 class Skin {
 	private var _name:String;
-	private var _attachments:Vector<Dictionary<String, Attachment>> = new Vector<Dictionary<String, Attachment>>();
-	private var _bones:Vector<BoneData> = new Vector<BoneData>();
-	private var _constraints:Vector<ConstraintData> = new Vector<ConstraintData>();
+	private var _attachments:Array<StringMap<Attachment>> = new Array<StringMap<Attachment>>();
+	private var _bones:Array<BoneData> = new Array<BoneData>();
+	private var _constraints:Array<ConstraintData> = new Array<ConstraintData>();
 
 	public function new(name:String) {
 		if (name == null)
@@ -51,10 +50,10 @@ class Skin {
 		if (attachment == null)
 			throw new SpineException("attachment cannot be null.");
 		if (slotIndex >= _attachments.length)
-			_attachments.length = slotIndex + 1;
+			_attachments.resize(slotIndex + 1);
 		if (_attachments[slotIndex] == null)
-			_attachments[slotIndex] = new Dictionary<String, Attachment>();
-		_attachments[slotIndex][name] = attachment;
+			_attachments[slotIndex] = new StringMap<Attachment>();
+		_attachments[slotIndex].set(name, attachment);
 	}
 
 	public function addSkin(skin:Skin):Void {
@@ -85,7 +84,7 @@ class Skin {
 				_constraints.push(constraint);
 		}
 
-		var attachments:Vector<SkinEntry> = skin.getAttachments();
+		var attachments:Array<SkinEntry> = skin.getAttachments();
 		for (i in 0...attachments.length) {
 			var attachment:SkinEntry = attachments[i];
 			setAttachment(attachment.slotIndex, attachment.name, attachment.attachment);
@@ -122,7 +121,7 @@ class Skin {
 				_constraints.push(constraint);
 		}
 
-		var attachments:Vector<SkinEntry> = skin.getAttachments();
+		var attachments:Array<SkinEntry> = skin.getAttachments();
 		for (i in 0...attachments.length) {
 			attachment = attachments[i];
 			if (attachment.attachment == null)
@@ -141,23 +140,23 @@ class Skin {
 	public function getAttachment(slotIndex:Int, name:String):Attachment {
 		if (slotIndex >= _attachments.length)
 			return null;
-		var dictionary:Dictionary<String, Attachment> = _attachments[slotIndex];
-		return dictionary != null ? dictionary[name] : null;
+		var dictionary:StringMap<Attachment> = _attachments[slotIndex];
+		return dictionary != null ? dictionary.get(name) : null;
 	}
 
 	public function removeAttachment(slotIndex:Int, name:String):Void {
-		var dictionary:Dictionary<String, Attachment> = _attachments[slotIndex];
+		var dictionary:StringMap<Attachment> = _attachments[slotIndex];
 		if (dictionary != null)
 			dictionary.remove(name);
 	}
 
-	public function getAttachments():Vector<SkinEntry> {
-		var entries:Vector<SkinEntry> = new Vector<SkinEntry>();
+	public function getAttachments():Array<SkinEntry> {
+		var entries:Array<SkinEntry> = new Array<SkinEntry>();
 		for (slotIndex in 0..._attachments.length) {
-			var attachments:Dictionary<String, Attachment> = _attachments[slotIndex];
+			var attachments:StringMap<Attachment> = _attachments[slotIndex];
 			if (attachments != null) {
-				for (name in attachments.iterator()) {
-					var attachment:Attachment = attachments[name];
+				for (name in attachments.keys()) {
+					var attachment:Attachment = attachments.get(name);
 					if (attachment != null)
 						entries.push(new SkinEntry(slotIndex, name, attachment));
 				}
@@ -166,12 +165,12 @@ class Skin {
 		return entries;
 	}
 
-	public function getAttachmentsForSlot(slotIndex:Int):Vector<SkinEntry> {
-		var entries:Vector<SkinEntry> = new Vector<SkinEntry>();
-		var attachments:Dictionary<String, Attachment> = _attachments[slotIndex];
+	public function getAttachmentsForSlot(slotIndex:Int):Array<SkinEntry> {
+		var entries:Array<SkinEntry> = new Array<SkinEntry>();
+		var attachments:StringMap<Attachment> = _attachments[slotIndex];
 		if (attachments != null) {
-			for (name in attachments.iterator()) {
-				var attachment:Attachment = attachments[name];
+			for (name in attachments.keys()) {
+				var attachment:Attachment = attachments.get(name);
 				if (attachment != null)
 					entries.push(new SkinEntry(slotIndex, name, attachment));
 			}
@@ -180,26 +179,26 @@ class Skin {
 	}
 
 	public function clear():Void {
-		_attachments.length = 0;
-		_bones.length = 0;
-		_constraints.length = 0;
+		_attachments.resize(0);
+		_bones.resize(0);
+		_constraints.resize(0);
 	}
 
-	public var attachments(get, never):Vector<Dictionary<String, Attachment>>;
+	public var attachments(get, never):Array<StringMap<Attachment>>;
 
-	private function get_attachments():Vector<Dictionary<String, Attachment>> {
+	private function get_attachments():Array<StringMap<Attachment>> {
 		return _attachments;
 	}
 
-	public var bones(get, never):Vector<BoneData>;
+	public var bones(get, never):Array<BoneData>;
 
-	private function get_bones():Vector<BoneData> {
+	private function get_bones():Array<BoneData> {
 		return _bones;
 	}
 
-	public var constraints(get, never):Vector<ConstraintData>;
+	public var constraints(get, never):Array<ConstraintData>;
 
-	private function get_constraints():Vector<ConstraintData> {
+	private function get_constraints():Array<ConstraintData> {
 		return _constraints;
 	}
 
@@ -221,9 +220,9 @@ class Skin {
 		for (slot in skeleton.slots) {
 			var slotAttachment:Attachment = slot.attachment;
 			if (slotAttachment != null && slotIndex < oldSkin.attachments.length) {
-				var dictionary:Dictionary<String, Attachment> = oldSkin.attachments[slotIndex];
-				for (name in dictionary) {
-					var skinAttachment:Attachment = dictionary[name];
+				var dictionary:StringMap<Attachment> = oldSkin.attachments[slotIndex];
+				for (name in dictionary.keys()) {
+					var skinAttachment:Attachment = dictionary.get(name);
 					if (slotAttachment == skinAttachment) {
 						var attachment:Attachment = getAttachment(slotIndex, name);
 						if (attachment != null)

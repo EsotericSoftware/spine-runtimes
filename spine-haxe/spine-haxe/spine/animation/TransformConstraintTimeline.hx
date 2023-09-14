@@ -29,7 +29,6 @@
 
 package spine.animation;
 
-import openfl.Vector;
 import spine.Event;
 import spine.Skeleton;
 import spine.TransformConstraint;
@@ -48,7 +47,7 @@ class TransformConstraintTimeline extends CurveTimeline {
 	public var transformConstraintIndex:Int = 0;
 
 	public function new(frameCount:Int, bezierCount:Int, transformConstraintIndex:Int) {
-		super(frameCount, bezierCount, Vector.ofArray([Property.transformConstraint + "|" + transformConstraintIndex]));
+		super(frameCount, bezierCount, [Property.transformConstraint + "|" + transformConstraintIndex]);
 		this.transformConstraintIndex = transformConstraintIndex;
 	}
 
@@ -68,7 +67,7 @@ class TransformConstraintTimeline extends CurveTimeline {
 		frames[frame + SHEARY] = mixShearY;
 	}
 
-	override public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Vector<Event>, alpha:Float, blend:MixBlend,
+	override public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, blend:MixBlend,
 			direction:MixDirection):Void {
 		var constraint:TransformConstraint = skeleton.transformConstraints[transformConstraintIndex];
 		if (!constraint.active)

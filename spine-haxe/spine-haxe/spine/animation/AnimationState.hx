@@ -29,8 +29,7 @@
 
 package spine.animation;
 
-import openfl.utils.Dictionary;
-import openfl.Vector;
+import haxe.ds.StringMap;
 import spine.animation.Listeners.EventListeners;
 import spine.Event;
 import spine.Pool;
@@ -45,12 +44,12 @@ class AnimationState {
 	public static inline var SETUP:Int = 1;
 	public static inline var CURRENT:Int = 2;
 
-	private static var emptyAnimation:Animation = new Animation("<empty>", new Vector<Timeline>(), 0);
+	private static var emptyAnimation:Animation = new Animation("<empty>", new Array<Timeline>(), 0);
 
 	public var data:AnimationStateData;
-	public var tracks:Vector<TrackEntry> = new Vector<TrackEntry>();
+	public var tracks:Array<TrackEntry> = new Array<TrackEntry>();
 
-	private var events:Vector<Event> = new Vector<Event>();
+	private var events:Array<Event> = new Array<Event>();
 
 	public var onStart:Listeners = new Listeners();
 	public var onInterrupt:Listeners = new Listeners();
@@ -193,12 +192,12 @@ class AnimationState {
 			var animationLast:Float = current.animationLast,
 				animationTime:Float = current.getAnimationTime(),
 				applyTime:Float = animationTime;
-			var applyEvents:Vector<Event> = events;
+			var applyEvents:Array<Event> = events;
 			if (current.reverse) {
 				applyTime = current.animation.duration - applyTime;
 				applyEvents = null;
 			}
-			var timelines:Vector<Timeline> = current.animation.timelines;
+			var timelines:Array<Timeline> = current.animation.timelines;
 			var timelineCount:Int = timelines.length;
 			var timeline:Timeline;
 			if ((i == 0 && mix == 1) || blend == MixBlend.add) {
@@ -206,12 +205,12 @@ class AnimationState {
 					timeline.apply(skeleton, animationLast, applyTime, applyEvents, mix, blend, MixDirection.mixIn);
 				}
 			} else {
-				var timelineMode:Vector<Int> = current.timelineMode;
+				var timelineMode:Array<Int> = current.timelineMode;
 
 				var shortestRotation = current.shortestRotation;
 				var firstFrame:Bool = !shortestRotation && current.timelinesRotation.length != timelineCount << 1;
 				if (firstFrame)
-					current.timelinesRotation.length = timelineCount << 1;
+					current.timelinesRotation.resize(timelineCount << 1);
 
 				for (ii in 0...timelineCount) {
 					var timeline:Timeline = timelines[ii];
@@ -227,7 +226,7 @@ class AnimationState {
 				}
 			}
 			queueEvents(current, animationTime);
-			events.length = 0;
+			events.resize(0);
 			current.nextAnimationLast = animationTime;
 			current.nextTrackLast = current.trackTime;
 		}
@@ -270,13 +269,13 @@ class AnimationState {
 		var attachments:Bool = mix < from.attachmentThreshold,
 			drawOrder:Bool = mix < from.drawOrderThreshold;
 		var timelineCount:Int = from.animation.timelines.length;
-		var timelines:Vector<Timeline> = from.animation.timelines;
+		var timelines:Array<Timeline> = from.animation.timelines;
 		var alphaHold:Float = from.alpha * to.interruptAlpha,
 			alphaMix:Float = alphaHold * (1 - mix);
 		var animationLast:Float = from.animationLast,
 			animationTime:Float = from.getAnimationTime(),
 			applyTime:Float = animationTime;
-		var applyEvents:Vector<Event> = null;
+		var applyEvents:Array<Event> = null;
 		if (from.reverse) {
 			applyTime = from.animation.duration - applyTime;
 		} else if (mix < from.eventThreshold) {
@@ -288,14 +287,14 @@ class AnimationState {
 				timeline.apply(skeleton, animationLast, applyTime, applyEvents, alphaMix, blend, MixDirection.mixOut);
 			}
 		} else {
-			var timelineMode:Vector<Int> = from.timelineMode;
-			var timelineHoldMix:Vector<TrackEntry> = from.timelineHoldMix;
+			var timelineMode:Array<Int> = from.timelineMode;
+			var timelineHoldMix:Array<TrackEntry> = from.timelineHoldMix;
 			var shortestRotation = from.shortestRotation;
 
 			var firstFrame:Bool = !shortestRotation && from.timelinesRotation.length != timelineCount << 1;
 			if (firstFrame)
-				from.timelinesRotation.length = timelineCount << 1;
-			var timelinesRotation:Vector<Float> = from.timelinesRotation;
+				from.timelinesRotation.resize(timelineCount << 1);
+			var timelinesRotation:Array<Float> = from.timelinesRotation;
 
 			from.totalAlpha = 0;
 			for (i in 0...timelineCount) {
@@ -340,7 +339,7 @@ class AnimationState {
 
 		if (to.mixDuration > 0)
 			queueEvents(from, animationTime);
-		events.length = 0;
+		events.resize(0);
 		from.nextAnimationLast = animationTime;
 		from.nextTrackLast = from.trackTime;
 
@@ -363,7 +362,7 @@ class AnimationState {
 			slot.attachmentState = this.unkeyedState + SETUP;
 	}
 
-	public function applyRotateTimeline(timeline:RotateTimeline, skeleton:Skeleton, time:Float, alpha:Float, blend:MixBlend, timelinesRotation:Vector<Float>,
+	public function applyRotateTimeline(timeline:RotateTimeline, skeleton:Skeleton, time:Float, alpha:Float, blend:MixBlend, timelinesRotation:Array<Float>,
 			i:Int, firstFrame:Bool) {
 		if (firstFrame)
 			timelinesRotation[i] = 0;
@@ -478,7 +477,7 @@ class AnimationState {
 		for (i in 0...tracks.length) {
 			clearTrack(i);
 		}
-		tracks.length = 0;
+		tracks.resize(0);
 		queue.drainDisabled = oldTrainDisabled;
 		queue.drain();
 	}
@@ -525,7 +524,7 @@ class AnimationState {
 				current.interruptAlpha *= Math.min(1, from.mixTime / from.mixDuration);
 			}
 
-			from.timelinesRotation.length = 0; // Reset rotation for mixing out, in case entry was mixed in.
+			from.timelinesRotation.resize(0); // Reset rotation for mixing out, in case entry was mixed in.
 		}
 
 		queue.start(current);
@@ -627,7 +626,7 @@ class AnimationState {
 	private function expandToIndex(index:Int):TrackEntry {
 		if (index < tracks.length)
 			return tracks[index];
-		tracks.length = index + 1;
+		tracks.resize(index + 1);
 		return null;
 	}
 
@@ -698,13 +697,13 @@ class AnimationState {
 
 	private function computeHold(entry:TrackEntry):Void {
 		var to:TrackEntry = entry.mixingTo;
-		var timelines:Vector<Timeline> = entry.animation.timelines;
+		var timelines:Array<Timeline> = entry.animation.timelines;
 		var timelinesCount:Int = entry.animation.timelines.length;
-		var timelineMode:Vector<Int> = entry.timelineMode;
-		timelineMode.length = timelinesCount;
-		entry.timelineHoldMix.length = 0;
-		var timelineHoldMix:Vector<TrackEntry> = entry.timelineHoldMix;
-		timelineHoldMix.length = timelinesCount;
+		var timelineMode:Array<Int> = entry.timelineMode;
+		timelineMode.resize(timelinesCount);
+		entry.timelineHoldMix.resize(0);
+		var timelineHoldMix:Array<TrackEntry> = entry.timelineHoldMix;
+		timelineHoldMix.resize(timelinesCount);
 
 		if (to != null && to.holdPrevious) {
 			for (i in 0...timelinesCount) {
@@ -717,7 +716,7 @@ class AnimationState {
 		for (i in 0...timelinesCount) {
 			continueOuter = false;
 			var timeline:Timeline = timelines[i];
-			var ids:Vector<String> = timeline.propertyIds;
+			var ids:Array<String> = timeline.propertyIds;
 			if (!propertyIDs.addAll(ids)) {
 				timelineMode[i] = SUBSEQUENT;
 			} else if (to == null
@@ -761,12 +760,12 @@ class AnimationState {
 	}
 
 	public function clearListeners():Void {
-		onStart.listeners.length = 0;
-		onInterrupt.listeners.length = 0;
-		onEnd.listeners.length = 0;
-		onDispose.listeners.length = 0;
-		onComplete.listeners.length = 0;
-		onEvent.listeners.length = 0;
+		onStart.listeners.resize(0);
+		onInterrupt.listeners.resize(0);
+		onEnd.listeners.resize(0);
+		onDispose.listeners.resize(0);
+		onComplete.listeners.resize(0);
+		onEvent.listeners.resize(0);
 	}
 
 	public function clearListenerNotifications():Void {
@@ -775,14 +774,14 @@ class AnimationState {
 }
 
 class StringSet {
-	private var entries:Dictionary<String, Bool> = new Dictionary<String, Bool>();
+	private var entries:StringMap<Bool> = new StringMap<Bool>();
 	private var size:Int = 0;
 
 	public function new() {}
 
 	public function add(value:String):Bool {
-		var contains:Bool = entries[value];
-		entries[value] = true;
+		var contains:Bool = entries.exists(value);
+		entries.set(value, true);
 		if (!contains) {
 			size++;
 			return true;
@@ -790,7 +789,7 @@ class StringSet {
 		return false;
 	}
 
-	public function addAll(values:Vector<String>):Bool {
+	public function addAll(values:Array<String>):Bool {
 		var oldSize:Int = size;
 		for (i in 0...values.length) {
 			add(values[i]);
@@ -799,11 +798,11 @@ class StringSet {
 	}
 
 	public function contains(value:String):Bool {
-		return entries[value];
+		return entries.exists(value);
 	}
 
 	public function clear():Void {
-		entries = new Dictionary<String, Bool>();
+		entries = new StringMap<Bool>();
 		size = 0;
 	}
 }

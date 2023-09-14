@@ -29,14 +29,12 @@
 
 package spine;
 
-import openfl.Vector;
-
 class RotateMode {
 	public static var tangent(default, never):RotateMode = new RotateMode("tangent");
 	public static var chain(default, never):RotateMode = new RotateMode("chain");
 	public static var chainScale(default, never):RotateMode = new RotateMode("chainScale");
 
-	public static var values(default, never):Vector<RotateMode> = Vector.ofArray([tangent, chain, chainScale]);
+	public static var values(default, never):Array<RotateMode> = [tangent, chain, chainScale];
 
 	public var name(default, null):String;
 

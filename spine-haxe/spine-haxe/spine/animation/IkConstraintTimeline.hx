@@ -29,7 +29,6 @@
 
 package spine.animation;
 
-import openfl.Vector;
 import spine.Event;
 import spine.IkConstraint;
 import spine.Skeleton;
@@ -46,7 +45,7 @@ class IkConstraintTimeline extends CurveTimeline {
 	public var ikConstraintIndex:Int = 0;
 
 	public function new(frameCount:Int, bezierCount:Int, ikConstraintIndex:Int) {
-		super(frameCount, bezierCount, Vector.ofArray([Property.ikConstraint + "|" + ikConstraintIndex]));
+		super(frameCount, bezierCount, [Property.ikConstraint + "|" + ikConstraintIndex]);
 		this.ikConstraintIndex = ikConstraintIndex;
 	}
 
@@ -65,7 +64,7 @@ class IkConstraintTimeline extends CurveTimeline {
 		frames[frame + STRETCH] = stretch ? 1 : 0;
 	}
 
-	public override function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Vector<Event>, alpha:Float, blend:MixBlend,
+	public override function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, blend:MixBlend,
 			direction:MixDirection):Void {
 		var constraint:IkConstraint = skeleton.ikConstraints[ikConstraintIndex];
 		if (!constraint.active)

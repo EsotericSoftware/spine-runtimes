@@ -29,7 +29,6 @@
 
 package spine.animation;
 
-import openfl.Vector;
 import spine.attachments.VertexAttachment;
 import spine.attachments.Attachment;
 
@@ -42,9 +41,9 @@ class SequenceTimeline extends Timeline implements SlotTimeline {
 	var attachment:HasTextureRegion;
 
 	public function new(frameCount:Int, slotIndex:Int, attachment:HasTextureRegion) {
-		super(frameCount, Vector.ofArray([
+		super(frameCount, [
 			Std.string(Property.sequence) + "|" + Std.string(slotIndex) + "|" + Std.string(attachment.sequence.id)
-		]));
+		]);
 		this.slotIndex = slotIndex;
 		this.attachment = attachment;
 	}
@@ -71,7 +70,7 @@ class SequenceTimeline extends Timeline implements SlotTimeline {
 		frames[frame + SequenceTimeline.DELAY] = delay;
 	}
 
-	public override function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Vector<Event>, alpha:Float, blend:MixBlend,
+	public override function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, blend:MixBlend,
 			direction:MixDirection):Void {
 		var slot = skeleton.slots[this.slotIndex];
 		if (!slot.bone.active)

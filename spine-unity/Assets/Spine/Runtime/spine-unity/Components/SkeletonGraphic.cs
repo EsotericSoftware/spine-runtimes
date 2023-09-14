@@ -842,6 +842,11 @@ namespace Spine.Unity {
 				SubmeshInstruction submeshInstructionItem = currentInstructions.submeshInstructions.Items[i];
 				Material submeshMaterial = submeshInstructionItem.material;
 				if (useOriginalTextureAndMaterial) {
+					if (submeshMaterial == null) {
+						usedMaterialItems[i] = null;
+						usedTextureItems[i] = null;
+						continue;
+					}
 					usedTextureItems[i] = submeshMaterial.mainTexture;
 					if (!hasBlendModeMaterials) {
 						usedMaterialItems[i] = this.materialForRendering;

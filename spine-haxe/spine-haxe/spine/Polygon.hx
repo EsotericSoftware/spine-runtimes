@@ -29,10 +29,8 @@
 
 package spine;
 
-import openfl.Vector;
-
 class Polygon {
-	public var vertices:Vector<Float> = new Vector<Float>();
+	public var vertices:Array<Float> = new Array<Float>();
 
 	public function new() {}
 

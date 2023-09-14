@@ -29,10 +29,8 @@
 
 package spine;
 
-import openfl.Vector;
-
 class PathConstraintData extends ConstraintData {
-	private var _bones:Vector<BoneData> = new Vector<BoneData>();
+	private var _bones:Array<BoneData> = new Array<BoneData>();
 
 	public var target:SlotData;
 	public var positionMode:PositionMode = PositionMode.fixed;
@@ -49,9 +47,9 @@ class PathConstraintData extends ConstraintData {
 		super(name, 0, false);
 	}
 
-	public var bones(get, never):Vector<BoneData>;
+	public var bones(get, never):Array<BoneData>;
 
-	private function get_bones():Vector<BoneData> {
+	private function get_bones():Array<BoneData> {
 		return _bones;
 	}
 }

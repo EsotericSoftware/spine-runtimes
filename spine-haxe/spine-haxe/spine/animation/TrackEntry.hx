@@ -29,7 +29,6 @@
 
 package spine.animation;
 
-import openfl.Vector;
 import spine.animation.Listeners.EventListeners;
 import spine.Poolable;
 
@@ -68,9 +67,9 @@ class TrackEntry implements Poolable {
 	public var interruptAlpha:Float = 0;
 	public var totalAlpha:Float = 0;
 	public var mixBlend:MixBlend = MixBlend.replace;
-	public var timelineMode:Vector<Int> = new Vector<Int>();
-	public var timelineHoldMix:Vector<TrackEntry> = new Vector<TrackEntry>();
-	public var timelinesRotation:Vector<Float> = new Vector<Float>();
+	public var timelineMode:Array<Int> = new Array<Int>();
+	public var timelineHoldMix:Array<TrackEntry> = new Array<TrackEntry>();
+	public var timelinesRotation:Array<Float> = new Array<Float>();
 	public var shortestRotation = false;
 
 	public function new() {}
@@ -105,18 +104,18 @@ class TrackEntry implements Poolable {
 		mixingFrom = null;
 		mixingTo = null;
 		animation = null;
-		onStart.listeners.length = 0;
-		onInterrupt.listeners.length = 0;
-		onEnd.listeners.length = 0;
-		onDispose.listeners.length = 0;
-		onComplete.listeners.length = 0;
-		onEvent.listeners.length = 0;
-		timelineMode.length = 0;
-		timelineHoldMix.length = 0;
-		timelinesRotation.length = 0;
+		onStart.listeners.resize(0);
+		onInterrupt.listeners.resize(0);
+		onEnd.listeners.resize(0);
+		onDispose.listeners.resize(0);
+		onComplete.listeners.resize(0);
+		onEvent.listeners.resize(0);
+		timelineMode.resize(0);
+		timelineHoldMix.resize(0);
+		timelinesRotation.resize(0);
 	}
 
 	public function resetRotationDirection():Void {
-		timelinesRotation.length = 0;
+		timelinesRotation.resize(0);
 	}
 }
