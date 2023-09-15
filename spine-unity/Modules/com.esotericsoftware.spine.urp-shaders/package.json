@@ -19,5 +19,12 @@
     "render pipeline",
     "shaders"
   ],
-  "hideInEditor": false
+  "hideInEditor": false,
+  "samples": [
+    {
+      "displayName": "Examples",
+      "description": "Contains examples for outlines in 2D and 3D",
+      "path": "Samples~/Examples"
+    }
+  ]
 }
