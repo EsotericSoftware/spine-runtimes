@@ -120,6 +120,18 @@ export class AssetManagerBase implements Disposable {
 		});
 	}
 
+	loadAudio (path: string,
+		success: (path: string, texture: Texture) => void = () => { },
+		error: (path: string, message: string) => void = () => { }) {
+		path = this.start(path);
+
+		this.downloader.downloadBinary(path, (data: Uint8Array): void => {
+			this.success(success, path, data.buffer);
+		}, (status: number, responseText: string): void => {
+			this.error(error, path, `Couldn't load binary ${path}: status ${status}, ${responseText}`);
+		});
+	}
+
 	loadTexture (path: string,
 		success: (path: string, texture: Texture) => void = () => { },
 		error: (path: string, message: string) => void = () => { }) {

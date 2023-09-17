@@ -25,6 +25,7 @@
 		<button id="screenshot">Screenshot</button>
 	</div>
 	<img id="screenshot-image" src="" style="width: 400px;">
+	<div id="container-raptor-audio" style="width:640px; height:380px"></div>
 </body>
 <script>
 	// Creates a new spine player. The debugRender option enables
@@ -76,6 +77,17 @@
 				document.getElementById("screenshot-image").src = player.canvas.toDataURL();
 			});
 		}
+	});
+
+	// Creates a new spine player with audio enabled.
+	new spine.SpinePlayer("container-raptor-audio", {
+		jsonUrl: "assets/raptor-pro.json",
+		atlasUrl: "assets/raptor-pma.atlas",
+		audioFolderPath: "assets/audio",
+		animation: "roar",
+		premultipliedAlpha: true,
+		backgroundColor: "#cccccc",
+		showControls: true
 	});
 </script>
 </body>
