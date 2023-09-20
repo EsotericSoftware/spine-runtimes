@@ -831,6 +831,24 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> skeleton_ref) {
 	skeleton_clipper->clipEnd();
 }
 
+void createLinesFromMesh(Vector<Vector2> &scratch_points, spine::Vector<unsigned short> &triangles, spine::Vector<float> *vertices) {
+	scratch_points.resize(0);
+	for (int i = 0; i < triangles.size(); i += 3) {
+		int i1 = triangles[i];
+		int i2 = triangles[i + 1];
+		int i3 = triangles[i + 2];
+		Vector2 v1(vertices->buffer()[i1 * 2], vertices->buffer()[i1 * 2 + 1]);
+		Vector2 v2(vertices->buffer()[i2 * 2], vertices->buffer()[i2 * 2 + 1]);
+		Vector2 v3(vertices->buffer()[i3 * 2], vertices->buffer()[i3 * 2 + 1]);
+		scratch_points.push_back(v1);
+		scratch_points.push_back(v2);
+		scratch_points.push_back(v2);
+		scratch_points.push_back(v3);
+		scratch_points.push_back(v3);
+		scratch_points.push_back(v1);
+	}
+}
+
 void SpineSprite::draw() {
 	if (!animation_state.is_valid() && !skeleton.is_valid()) return;
 	if (!Engine::get_singleton()->is_editor_hint() && !get_tree()->is_debugging_collisions_hint()) return;
@@ -857,6 +875,12 @@ void SpineSprite::draw() {
 			auto *vertices = &scratch_vertices;
 			vertices->setSize(8, 0);
 			region->computeWorldVertices(*slot, *vertices, 0);
+
+			// Render triangles.
+			createLinesFromMesh(scratch_points, quad_indices, vertices);
+			draw_polyline(scratch_points, debug_regions_color);
+
+			// Render hull.
 			scratch_points.resize(0);
 			for (int i = 0, j = 0; i < 4; i++, j += 2) {
 				float x = vertices->buffer()[j];
@@ -888,6 +912,12 @@ void SpineSprite::draw() {
 			auto *vertices = &scratch_vertices;
 			vertices->setSize(mesh->getWorldVerticesLength(), 0);
 			mesh->computeWorldVertices(*slot, *vertices);
+
+			// Render triangles.
+			createLinesFromMesh(scratch_points, mesh->getTriangles(), vertices);
+			draw_polyline(scratch_points, debug_meshes_color);
+
+			// Render hull
 			scratch_points.resize(0);
 			for (int i = 0, j = 0; i < mesh->getHullLength(); i++, j += 2) {
 				float x = vertices->buffer()[j];
