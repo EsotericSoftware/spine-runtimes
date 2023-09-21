@@ -451,8 +451,8 @@ jobs:
           ls -lahR
           mv godot.windows.editor.x86_64.mono.exe godot-$BRANCH-$GODOT_TAG-mono.exe
           mv godot.linuxbsd.editor.x86_64.mono godot-$BRANCH-$GODOT_TAG-mono
-          zip godot-editor-windows-mono.zip godot-$BRANCH-$GODOT_TAG-mono.exe GodotSharp
-          zip godot-editor-linux-mono.zip godot-$BRANCH-$GODOT_TAG-mono GodotSharp
+          zip -r godot-editor-windows-mono.zip godot-$BRANCH-$GODOT_TAG-mono.exe GodotSharp
+          zip -r godot-editor-linux-mono.zip godot-$BRANCH-$GODOT_TAG-mono GodotSharp
           mv godot-editor-macos.zip godot-editor-macos-mono.zip
           aws s3 cp godot-editor-windows-mono.zip s3://spine-godot/$BRANCH/$GODOT_TAG/
           aws s3 cp godot-editor-linux-mono.zip s3://spine-godot/$BRANCH/$GODOT_TAG/

@@ -1,0 +1,9 @@
+[gd_resource type="SpineSkeletonDataResource" load_steps=3 format=2]
+
+[ext_resource path="res://assets/raptor/raptor.atlas" type="SpineAtlasResource" id=1]
+[ext_resource path="res://assets/raptor/raptor-pro.skel" type="SpineSkeletonFileResource" id=2]
+
+[resource]
+atlas_res = ExtResource( 1 )
+skeleton_file_res = ExtResource( 2 )
+default_mix = 0.2
