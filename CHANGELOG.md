@@ -124,6 +124,7 @@
   * Shader macro `RETURN_UNLIT_IF_ADDITIVE_SLOT` in `spine-unity/Shaders/Sprite/CGIncludes/ShaderShared.cginc` has been deprecated and will be removed in spine-unity 4.2. Use RETURN_UNLIT_IF_ADDITIVE_SLOT_TINT instead.
 
 * **Restructuring (Non-Breaking)**
+  * Moved Spine URP Shaders Examples directory from the main package directory to Samples which can be installed via the Unity Package Manager. To import, select the `Spine Universal RP Shaders` package in the Package Manager window, expand `Samples` at the bottom and hit `Import` next to `Examples`. This follows the standard [samples guideline](https://docs.unity3d.com/Manual/cus-samples.html) and prevents warning messages about unexpectedly altered immutable assets.
 
 ### XNA/MonoGame
 * **Breaking change**: Removed spine-xna in favor of spine-monogame. See https://github.com/EsotericSoftware/spine-runtimes/issues/1949
