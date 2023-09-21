@@ -483,7 +483,6 @@ namespace Spine.Unity {
 
 		int GetConstraintLastPosIndex (int constraintIndex) {
 			ExposedList<TransformConstraint> constraints = skeletonComponent.Skeleton.TransformConstraints;
-			TransformConstraint targetConstraint = constraints.Items[constraintIndex];
 			return transformConstraintIndices.FindIndex(addedIndex => addedIndex == constraintIndex);
 		}
 

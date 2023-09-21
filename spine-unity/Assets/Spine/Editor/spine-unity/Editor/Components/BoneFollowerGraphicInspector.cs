@@ -99,8 +99,7 @@ namespace Spine.Unity.Editor {
 
 			Transform transform = skeletonGraphicComponent.transform;
 			Skeleton skeleton = skeletonGraphicComponent.Skeleton;
-			Canvas canvas = skeletonGraphicComponent.canvas;
-			float positionScale = canvas == null ? 1f : skeletonGraphicComponent.canvas.referencePixelsPerUnit;
+			float positionScale = skeletonGraphicComponent.MeshScale;
 
 			if (string.IsNullOrEmpty(boneName.stringValue)) {
 				SpineHandles.DrawBones(transform, skeleton, positionScale);
