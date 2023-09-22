@@ -40,7 +40,7 @@ int main(void) {
 	SFMLTextureLoader textureLoader;
 	Atlas *atlas = new Atlas(atlasFile, &textureLoader);
 	SkeletonData *skeletonData = nullptr;
-	if (strncmp(skeletonFile.buffer(), ".skel", skeletonFile.length()) > 0) {
+	if (strnstr(skeletonFile.buffer(), ".skel", skeletonFile.length())) {
 		SkeletonBinary binary(atlas);
 		binary.setScale(scale);
 		skeletonData = binary.readSkeletonDataFile(skeletonFile);
