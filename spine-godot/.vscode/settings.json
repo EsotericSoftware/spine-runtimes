@@ -1,4 +1,5 @@
 {
-    "cmake.configureOnOpen": false,
-    "C_Cpp.intelliSenseEngine": "disabled",
+  "cmake.configureOnOpen": false,
+  "C_Cpp.intelliSenseEngine": "disabled",
+  "dotnet.defaultSolution": "disable"
 }

@@ -1,4 +1,4 @@
-﻿#ifndef SKELETONLIT_FORWARD_PASS_URP_INCLUDED
+#ifndef SKELETONLIT_FORWARD_PASS_URP_INCLUDED
 #define SKELETONLIT_FORWARD_PASS_URP_INCLUDED
 
 #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/CommonMaterial.hlsl"
@@ -6,6 +6,7 @@
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 #include "SpineCoreShaders/Spine-Common.cginc"
 #include "Spine-Common-URP.hlsl"
+#include "SpineCoreShaders/Spine-Skeleton-Tint-Common.cginc"
 
 #if (defined(_MAIN_LIGHT_SHADOWS) || defined(MAIN_LIGHT_CALCULATE_SHADOWS)) && !defined(_RECEIVE_SHADOWS_OFF)
 #define SKELETONLIT_RECEIVE_SHADOWS
@@ -16,7 +17,10 @@ struct appdata {
 	float3 normal : NORMAL;
 	half4 color : COLOR;
 	float2 uv0 : TEXCOORD0;
-
+#if defined(_TINT_BLACK_ON)
+	float2 tintBlackRG : TEXCOORD1;
+	float2 tintBlackB : TEXCOORD2;
+#endif
 	UNITY_VERTEX_INPUT_INSTANCE_ID
 };
 
@@ -33,14 +37,16 @@ struct VertexOutput {
 	float3 positionWS : TEXCOORD3;
 	half3 normalWS : TEXCOORD4;
 #endif
-
+#if defined(_TINT_BLACK_ON)
+	float3 darkColor : TEXCOORD5;
+#endif
 	UNITY_VERTEX_OUTPUT_STEREO
 };
 
 half3 ProcessLight(float3 positionWS, half3 normalWS, uint meshRenderingLayers, int lightIndex)
 {
 	Light light = GetAdditionalLight(lightIndex, positionWS);
-#ifdef _LIGHT_LAYERS
+#ifdef USE_LIGHT_LAYERS
 	if (!IsMatchingLightLayer(light.layerMask, meshRenderingLayers))
 		return half3(0, 0, 0);
 #endif
@@ -119,6 +125,12 @@ VertexOutput vert(appdata v) {
 	o.normalWS = normalWS;
 #endif
 
+#if defined(_TINT_BLACK_ON)
+	color *= _Color;
+	o.darkColor = GammaToTargetSpace(
+		half3(v.tintBlackRG.r, v.tintBlackRG.g, v.tintBlackB.r)) + _Black.rgb;
+#endif
+
 	half3 shadowedColor;
 #if !defined(_LIGHT_AFFECTS_ADDITIVE)
 	if (color.a == 0) {
@@ -132,17 +144,26 @@ VertexOutput vert(appdata v) {
 #endif // !defined(_LIGHT_AFFECTS_ADDITIVE)
 
 	color.rgb *= LightweightLightVertexSimplified(positionWS, normalWS, shadowedColor);
-#if defined(SKELETONLIT_RECEIVE_SHADOWS)
-	o.shadowedColor = shadowedColor;
-#endif
 
 	// Note: ambient light is also handled via SH.
 	half3 vertexSH;
+#if IS_URP_15_OR_NEWER
+	#ifdef OUTPUT_SH4
+		OUTPUT_SH4(positionWS, normalWS.xyz, GetWorldSpaceNormalizeViewDir(positionWS), vertexSH);
+	#else
+		OUTPUT_SH(positionWS, normalWS.xyz, GetWorldSpaceNormalizeViewDir(positionWS), vertexSH);
+	#endif
+#else
 	OUTPUT_SH(normalWS.xyz, vertexSH);
-	color.rgb += SAMPLE_GI(input.lightmapUV, vertexSH, normalWS);
+#endif
+	half3 bakedGI = SAMPLE_GI(v.lightmapUV, vertexSH, normalWS);
+	color.rgb += bakedGI;
 	o.color = color;
 
 #if defined(SKELETONLIT_RECEIVE_SHADOWS)
+	shadowedColor += bakedGI;
+	o.shadowedColor = shadowedColor;
+	
 	VertexPositionInputs vertexInput;
 	vertexInput.positionWS = positionWS;
 	vertexInput.positionCS = o.pos;
@@ -158,12 +179,17 @@ half4 frag(VertexOutput i
 ) : SV_Target0
 {
 	half4 tex = tex2D(_MainTex, i.uv0);
-	#if defined(_STRAIGHT_ALPHA_INPUT)
+#if !defined(_TINT_BLACK_ON) && defined(_STRAIGHT_ALPHA_INPUT)
 	tex.rgb *= tex.a;
-	#endif
+#endif
 
-	if (i.color.a == 0)
+	if (i.color.a == 0)	{
+#if defined(_TINT_BLACK_ON)
+		return fragTintedColor(tex, i.darkColor, i.color, _Color.a, _Black.a);
+#else
 		return tex * i.color;
+#endif
+	}
 
 #if defined(_ADDITIONAL_LIGHTS) && USE_FORWARD_PLUS
 	// USE_FORWARD_PLUS lights need to be processed in fragment shader,
@@ -180,12 +206,16 @@ half4 frag(VertexOutput i
 	i.color.rgb = lerp(i.shadowedColor, i.color.rgb, shadowAttenuation);
 #endif
 
-#ifdef _WRITE_RENDERING_LAYERS
+#ifdef USE_WRITE_RENDERING_LAYERS
 	uint renderingLayers = GetMeshRenderingLayerBackwardsCompatible();
 	outRenderingLayers = float4(EncodeMeshRenderingLayer(renderingLayers), 0, 0, 0);
 #endif
 
+#if defined(_TINT_BLACK_ON)
+	return fragTintedColor(tex, i.darkColor, i.color, _Color.a, _Black.a);
+#else
 	return tex * i.color;
+#endif
 }
 
 #endif

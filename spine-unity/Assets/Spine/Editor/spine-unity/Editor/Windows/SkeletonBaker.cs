@@ -1,16 +1,16 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated September 24, 2021. Replaces all prior versions.
+ * Last updated July 28, 2023. Replaces all prior versions.
  *
- * Copyright (c) 2013-2021, Esoteric Software LLC
+ * Copyright (c) 2013-2023, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
  * conditions of Section 2 of the Spine Editor License Agreement:
  * http://esotericsoftware.com/spine-editor-license
  *
- * Otherwise, it is permitted to integrate the Spine Runtimes into software
- * or otherwise create derivative works of the Spine Runtimes (collectively,
+ * Otherwise, it is permitted to integrate the Spine Runtimes into software or
+ * otherwise create derivative works of the Spine Runtimes (collectively,
  * "Products"), provided that each user of the Products must obtain their own
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
@@ -23,8 +23,8 @@
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
  * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THE
+ * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #if UNITY_2018_3 || UNITY_2019 || UNITY_2018_3_OR_NEWER
@@ -848,7 +848,7 @@ namespace Spine.Unity.Editor {
 
 			keys.Add(new Keyframe(0, rotation, 0, 0));
 
-			int listIndex = 1;
+			int listIndex = 0;
 
 			float r = rotation;
 
@@ -865,7 +865,7 @@ namespace Spine.Unity.Editor {
 				animation.Apply(skeleton, 0, currentTime, true, null, 1f, MixBlend.Setup, MixDirection.In);
 				skeleton.UpdateWorldTransform();
 
-				int pIndex = listIndex - 1;
+				int pIndex = listIndex;
 
 				Keyframe pk = keys[pIndex];
 
@@ -919,16 +919,16 @@ namespace Spine.Unity.Editor {
 			xKeys.Add(new Keyframe(timeline.Frames[0], timeline.Frames[1] + boneData.X, 0, 0));
 			yKeys.Add(new Keyframe(timeline.Frames[0], timeline.Frames[2] + boneData.Y, 0, 0));
 
-			int listIndex = 1;
-			int frameIndex = 1;
+			int listIndex = 0;
+			int frameIndex = 0;
 			int f = TranslateTimeline.ENTRIES;
 			float[] frames = timeline.Frames;
 			skeleton.SetToSetupPose();
 			float lastTime = 0;
 			while (currentTime < endTime) {
-				int pIndex = listIndex - 1;
+				int pIndex = listIndex;
 
-				float curveType = timeline.GetCurveType(frameIndex - 1);
+				float curveType = timeline.GetCurveType(frameIndex);
 				if (curveType == 0) {
 					//linear
 					Keyframe px = xKeys[pIndex];
@@ -999,8 +999,8 @@ namespace Spine.Unity.Editor {
 
 						timeline.Apply(skeleton, lastTime, currentTime, null, 1, MixBlend.Setup, MixDirection.In);
 
-						px = xKeys[listIndex - 1];
-						py = yKeys[listIndex - 1];
+						px = xKeys[listIndex];
+						py = yKeys[listIndex];
 
 						float xOut = (bone.X - px.value) / (currentTime - px.time);
 						float yOut = (bone.Y - py.value) / (currentTime - py.time);
@@ -1011,8 +1011,8 @@ namespace Spine.Unity.Editor {
 						xKeys.Add(new Keyframe(currentTime, bone.X, xOut, 0));
 						yKeys.Add(new Keyframe(currentTime, bone.Y, yOut, 0));
 
-						xKeys[listIndex - 1] = px;
-						yKeys[listIndex - 1] = py;
+						xKeys[listIndex] = px;
+						yKeys[listIndex] = py;
 
 						listIndex++;
 						lastTime = currentTime;
@@ -1055,16 +1055,16 @@ namespace Spine.Unity.Editor {
 			List<Keyframe> keys = new List<Keyframe>();
 			keys.Add(new Keyframe(timeline.Frames[0], timeline.Frames[1] + boneDataOffset, 0, 0));
 
-			int listIndex = 1;
-			int frameIndex = 1;
+			int listIndex = 0;
+			int frameIndex = 0;
 			int f = TranslateXTimeline.ENTRIES;
 			float[] frames = timeline.Frames;
 			skeleton.SetToSetupPose();
 			float lastTime = 0;
 			while (currentTime < endTime) {
-				int pIndex = listIndex - 1;
+				int pIndex = listIndex;
 
-				float curveType = timeline.GetCurveType(frameIndex - 1);
+				float curveType = timeline.GetCurveType(frameIndex);
 				if (curveType == 0) {
 					//linear
 					Keyframe p = keys[pIndex];
@@ -1112,13 +1112,13 @@ namespace Spine.Unity.Editor {
 
 						timeline.Apply(skeleton, lastTime, currentTime, null, 1, MixBlend.Setup, MixDirection.In);
 
-						p = keys[listIndex - 1];
+						p = keys[listIndex];
 						float boneOffset = isXTimeline ? bone.X : bone.Y;
 						float valueOut = (boneOffset - p.value) / (currentTime - p.time);
 						p.outTangent = valueOut;
 						keys.Add(new Keyframe(currentTime, boneOffset, valueOut, 0));
 
-						keys[listIndex - 1] = p;
+						keys[listIndex] = p;
 
 						listIndex++;
 						lastTime = currentTime;
@@ -1155,15 +1155,15 @@ namespace Spine.Unity.Editor {
 			xKeys.Add(new Keyframe(timeline.Frames[0], timeline.Frames[1] * boneData.ScaleX, 0, 0));
 			yKeys.Add(new Keyframe(timeline.Frames[0], timeline.Frames[2] * boneData.ScaleY, 0, 0));
 
-			int listIndex = 1;
-			int frameIndex = 1;
+			int listIndex = 0;
+			int frameIndex = 0;
 			int f = ScaleTimeline.ENTRIES;
 			float[] frames = timeline.Frames;
 			skeleton.SetToSetupPose();
 			float lastTime = 0;
 			while (currentTime < endTime) {
-				int pIndex = listIndex - 1;
-				float curveType = timeline.GetCurveType(frameIndex - 1);
+				int pIndex = listIndex;
+				float curveType = timeline.GetCurveType(frameIndex);
 				if (curveType == 0) {
 					//linear
 					Keyframe px = xKeys[pIndex];
@@ -1234,8 +1234,8 @@ namespace Spine.Unity.Editor {
 
 						timeline.Apply(skeleton, lastTime, currentTime, null, 1, MixBlend.Setup, MixDirection.In);
 
-						px = xKeys[listIndex - 1];
-						py = yKeys[listIndex - 1];
+						px = xKeys[listIndex];
+						py = yKeys[listIndex];
 
 						float xOut = (bone.ScaleX - px.value) / (currentTime - px.time);
 						float yOut = (bone.ScaleY - py.value) / (currentTime - py.time);
@@ -1246,8 +1246,8 @@ namespace Spine.Unity.Editor {
 						xKeys.Add(new Keyframe(currentTime, bone.ScaleX, xOut, 0));
 						yKeys.Add(new Keyframe(currentTime, bone.ScaleY, yOut, 0));
 
-						xKeys[listIndex - 1] = px;
-						yKeys[listIndex - 1] = py;
+						xKeys[listIndex] = px;
+						yKeys[listIndex] = py;
 
 						listIndex++;
 						lastTime = currentTime;
@@ -1286,15 +1286,15 @@ namespace Spine.Unity.Editor {
 			List<Keyframe> keys = new List<Keyframe>();
 			keys.Add(new Keyframe(timeline.Frames[0], timeline.Frames[1] * boneDataOffset, 0, 0));
 
-			int listIndex = 1;
-			int frameIndex = 1;
+			int listIndex = 0;
+			int frameIndex = 0;
 			int f = ScaleXTimeline.ENTRIES;
 			float[] frames = timeline.Frames;
 			skeleton.SetToSetupPose();
 			float lastTime = 0;
 			while (currentTime < endTime) {
-				int pIndex = listIndex - 1;
-				float curveType = timeline.GetCurveType(frameIndex - 1);
+				int pIndex = listIndex;
+				float curveType = timeline.GetCurveType(frameIndex);
 				if (curveType == 0) {
 					//linear
 					Keyframe p = keys[pIndex];
@@ -1340,14 +1340,14 @@ namespace Spine.Unity.Editor {
 
 						timeline.Apply(skeleton, lastTime, currentTime, null, 1, MixBlend.Setup, MixDirection.In);
 
-						p = keys[listIndex - 1];
+						p = keys[listIndex];
 
 						float boneScale = isXTimeline ? bone.ScaleX : bone.ScaleY;
 						float valueOut = (boneScale - p.value) / (currentTime - p.time);
 						p.outTangent = valueOut;
 						keys.Add(new Keyframe(currentTime, boneScale, valueOut, 0));
 
-						keys[listIndex - 1] = p;
+						keys[listIndex] = p;
 
 						listIndex++;
 						lastTime = currentTime;
@@ -1382,16 +1382,16 @@ namespace Spine.Unity.Editor {
 
 			keys.Add(new Keyframe(timeline.Frames[0], rotation, 0, 0));
 
-			int listIndex = 1;
-			int frameIndex = 1;
+			int listIndex = 0;
+			int frameIndex = 0;
 			int f = 2;
 			float[] frames = timeline.Frames;
 			skeleton.SetToSetupPose();
 			float lastTime = 0;
 			float angle = rotation;
 			while (currentTime < endTime) {
-				int pIndex = listIndex - 1;
-				float curveType = timeline.GetCurveType(frameIndex - 1);
+				int pIndex = listIndex;
+				float curveType = timeline.GetCurveType(frameIndex);
 
 				if (curveType == 0) {
 					//linear
@@ -1464,7 +1464,7 @@ namespace Spine.Unity.Editor {
 
 						timeline.Apply(skeleton, lastTime, currentTime, null, 1, MixBlend.Setup, MixDirection.In);
 						skeleton.UpdateWorldTransform();
-						pk = keys[listIndex - 1];
+						pk = keys[listIndex];
 
 						rotation = bone.Rotation;
 						angle += Mathf.DeltaAngle(angle, rotation);
@@ -1476,7 +1476,7 @@ namespace Spine.Unity.Editor {
 
 						keys.Add(new Keyframe(currentTime, r, rOut, 0));
 
-						keys[listIndex - 1] = pk;
+						keys[listIndex] = pk;
 
 						listIndex++;
 						lastTime = currentTime;
@@ -1582,10 +1582,7 @@ namespace Spine.Unity.Editor {
 				}
 			}
 
-			float currentTime = timeline.Frames[0];
-			float endTime = frames[frames.Length - 1];
-			int f = 0;
-			while (currentTime < endTime) {
+			for (int f = 0, frameCount = frames.Length; f < frameCount; ++f) {
 				float time = frames[f];
 
 				int frameIndex = Search(frames, time);
@@ -1602,9 +1599,6 @@ namespace Spine.Unity.Editor {
 						}
 					}
 				}
-
-				currentTime = time;
-				f += 1;
 			}
 
 			foreach (KeyValuePair<string, AnimationCurve> pair in curveTable) {

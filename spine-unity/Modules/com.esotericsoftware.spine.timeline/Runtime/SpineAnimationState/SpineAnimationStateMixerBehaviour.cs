@@ -1,16 +1,16 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated September 24, 2021. Replaces all prior versions.
+ * Last updated July 28, 2023. Replaces all prior versions.
  *
- * Copyright (c) 2013-2022, Esoteric Software LLC
+ * Copyright (c) 2013-2023, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
  * conditions of Section 2 of the Spine Editor License Agreement:
  * http://esotericsoftware.com/spine-editor-license
  *
- * Otherwise, it is permitted to integrate the Spine Runtimes into software
- * or otherwise create derivative works of the Spine Runtimes (collectively,
+ * Otherwise, it is permitted to integrate the Spine Runtimes into software or
+ * otherwise create derivative works of the Spine Runtimes (collectively,
  * "Products"), provided that each user of the Products must obtain their own
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
@@ -23,11 +23,17 @@
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
  * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THE
+ * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#if UNITY_2019_1_OR_NEWER
+#define SPEED_INCLUDED_IN_CLIP_TIME
+#endif
+
+#if UNITY_EDITOR
 #define SPINE_EDITMODEPOSE
+#endif
 
 using System;
 using UnityEngine;
@@ -64,7 +70,8 @@ namespace Spine.Unity.Playables {
 		}
 
 		public override void OnGraphStop (Playable playable) {
-			if (!isPaused && endAtClipEnd)
+			bool isStoppedNotPaused = playable.GetGraph().IsPlaying(); // end of track was reached or graph stopped.
+			if (isStoppedNotPaused && endAtClipEnd)
 				HandleClipEnd();
 		}
 
@@ -161,7 +168,7 @@ namespace Spine.Unity.Playables {
 			for (int i = 0; i < inputCount; i++) {
 				float lastInputWeight = lastInputWeights[i];
 				float inputWeight = playable.GetInputWeight(i);
-				bool clipStarted = lastInputWeight == 0 && inputWeight > 0;
+				bool clipStarted = (inputWeight > 0) && (lastInputWeight == 0 || info.seekOccurred || info.timeLooped);
 				if (inputWeight > 0)
 					anyClipPlaying = true;
 				lastInputWeights[i] = inputWeight;
@@ -212,7 +219,11 @@ namespace Spine.Unity.Playables {
 						float clipSpeed = (float)clipPlayable.GetSpeed();
 						trackEntry.EventThreshold = clipData.eventThreshold;
 						trackEntry.DrawOrderThreshold = clipData.drawOrderThreshold;
-						trackEntry.TrackTime = (float)clipPlayable.GetTime() * clipSpeed * rootPlayableSpeed;
+#if SPEED_INCLUDED_IN_CLIP_TIME
+						trackEntry.TrackTime = (float)clipPlayable.GetTime();
+#else
+						trackEntry.TrackTime = (float)clipPlayable.GetTime() * rootPlayableSpeed * clipSpeed;
+#endif
 						trackEntry.TimeScale = clipSpeed * rootPlayableSpeed;
 						trackEntry.AttachmentThreshold = clipData.attachmentThreshold;
 						trackEntry.HoldPrevious = clipData.holdPrevious;
@@ -223,10 +234,9 @@ namespace Spine.Unity.Playables {
 
 						timelineStartedTrackEntry = trackEntry;
 					}
-					//else Debug.LogWarningFormat("Animation named '{0}' not found", clipData.animationName);
 				}
-
-				// Ensure that the first frame ends with an updated mesh.
+			}
+			if (numStartingClips > 0) {
 				if (skeletonAnimation) {
 					skeletonAnimation.Update(0);
 					skeletonAnimation.LateUpdate();
@@ -242,8 +252,11 @@ namespace Spine.Unity.Playables {
 		}
 
 #if SPINE_EDITMODEPOSE
+		/// <summary>Animation event callback for editor scripts when outside of play-mode.</summary>
+		public static event AnimationState.TrackEntryEventDelegate EditorEvent;
 
 		AnimationState dummyAnimationState;
+		ExposedList<Spine.Event> editorAnimationEvents = new ExposedList<Event>();
 
 		public void PreviewEditModePose (Playable playable,
 			ISkeletonComponent skeletonComponent, IAnimationStateComponent animationStateComponent,
@@ -251,6 +264,7 @@ namespace Spine.Unity.Playables {
 
 			if (Application.isPlaying) return;
 			if (animationStateComponent.IsNullOrDestroyed() || skeletonComponent == null) return;
+			editorAnimationEvents.Clear(false);
 
 			int inputCount = playable.GetInputCount();
 			float rootSpeed = GetRootPlayableSpeed(playable);
@@ -283,12 +297,20 @@ namespace Spine.Unity.Playables {
 					var fromClip = (ScriptPlayable<SpineAnimationStateBehaviour>)playable.GetInput(lastNonZeroWeightTrack - 1);
 					SpineAnimationStateBehaviour fromClipData = fromClip.GetBehaviour();
 					fromAnimation = fromClipData.animationReference != null ? fromClipData.animationReference.Animation : null;
+#if SPEED_INCLUDED_IN_CLIP_TIME
+					fromClipTime = (float)fromClip.GetTime();
+#else
 					fromClipTime = (float)fromClip.GetTime() * (float)fromClip.GetSpeed() * rootSpeed;
+#endif
 					fromClipLoop = fromClipData.loop;
 				}
 
 				Animation toAnimation = clipData.animationReference != null ? clipData.animationReference.Animation : null;
+#if SPEED_INCLUDED_IN_CLIP_TIME
+				float toClipTime = (float)inputPlayableClip.GetTime();
+#else
 				float toClipTime = (float)inputPlayableClip.GetTime() * (float)inputPlayableClip.GetSpeed() * rootSpeed;
+#endif
 				float mixDuration = clipData.mixDuration;
 
 				if (!clipData.customDuration && fromAnimation != null && toAnimation != null) {
@@ -325,18 +347,27 @@ namespace Spine.Unity.Playables {
 					}
 
 					// Apply Pose
+					dummyAnimationState.Event += EditorEvent;
 					dummyAnimationState.Update(0);
 					dummyAnimationState.Apply(skeleton);
+					dummyAnimationState.Event -= EditorEvent;
 				} else {
-					if (toAnimation != null)
-						toAnimation.Apply(skeleton, 0, toClipTime, clipData.loop, null, clipData.alpha, MixBlend.Setup, MixDirection.In);
+					if (toAnimation != null) {
+						toAnimation.Apply(skeleton, 0, toClipTime, clipData.loop, editorAnimationEvents, clipData.alpha, MixBlend.Setup, MixDirection.In);
+						if (EditorEvent != null) {
+							foreach (Spine.Event e in editorAnimationEvents) {
+								EditorEvent(null, e);
+							}
+						}
+					}
 				}
 
+				skeleton.UpdateWorldTransform();
 				if (skeletonAnimation) {
-					skeletonAnimation.Update(0);
+					skeletonAnimation.AfterAnimationApplied();
 					skeletonAnimation.LateUpdate();
 				} else if (skeletonGraphic) {
-					skeletonGraphic.Update(0);
+					skeletonGraphic.AfterAnimationApplied();
 					skeletonGraphic.LateUpdate();
 				}
 			}

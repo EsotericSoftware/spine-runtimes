@@ -1,16 +1,16 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated September 24, 2021. Replaces all prior versions.
+ * Last updated July 28, 2023. Replaces all prior versions.
  *
- * Copyright (c) 2013-2021, Esoteric Software LLC
+ * Copyright (c) 2013-2023, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
  * conditions of Section 2 of the Spine Editor License Agreement:
  * http://esotericsoftware.com/spine-editor-license
  *
- * Otherwise, it is permitted to integrate the Spine Runtimes into software
- * or otherwise create derivative works of the Spine Runtimes (collectively,
+ * Otherwise, it is permitted to integrate the Spine Runtimes into software or
+ * otherwise create derivative works of the Spine Runtimes (collectively,
  * "Products"), provided that each user of the Products must obtain their own
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
@@ -23,8 +23,8 @@
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
  * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THE
+ * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #if UNITY_2018_3 || UNITY_2019 || UNITY_2018_3_OR_NEWER
@@ -67,7 +67,30 @@ namespace Spine.Unity {
 		public bool startingLoop;
 		public float timeScale = 1f;
 		public bool freeze;
+		protected float meshScale = 1f;
+		public float MeshScale { get { return meshScale; } }
 
+		public enum LayoutMode {
+			None = 0,
+			WidthControlsHeight,
+			HeightControlsWidth,
+			FitInParent,
+			EnvelopeParent
+		}
+		public LayoutMode layoutScaleMode = LayoutMode.None;
+		[SerializeField] protected Vector2 referenceSize = Vector2.one;
+		[SerializeField] protected float referenceScale = 1f;
+#if UNITY_EDITOR
+		protected LayoutMode previousLayoutScaleMode = LayoutMode.None;
+		[SerializeField] protected Vector2 rectTransformSize = Vector2.zero;
+		[SerializeField] protected bool editReferenceRect = false;
+		protected bool previousEditReferenceRect = false;
+
+		public bool EditReferenceRect { get { return editReferenceRect; } set { editReferenceRect = value; } }
+		public Vector2 RectTransformSize { get { return rectTransformSize; } }
+#else
+		protected const bool EditReferenceRect = false;
+#endif
 		/// <summary>Update mode to optionally limit updates to e.g. only apply animations but not update the mesh.</summary>
 		public UpdateMode UpdateMode { get { return updateMode; } set { updateMode = value; } }
 		protected UpdateMode updateMode = UpdateMode.FullUpdate;
@@ -93,8 +116,10 @@ namespace Spine.Unity {
 		[SerializeField] protected List<Transform> separatorParts = new List<Transform>();
 		public List<Transform> SeparatorParts { get { return separatorParts; } }
 		public bool updateSeparatorPartLocation = true;
+		public bool updateSeparatorPartScale = false;
 
 		private bool wasUpdatedAfterInit = true;
+		private bool requiresInstructionUpate = true;
 		private Texture baseTexture = null;
 
 #if UNITY_EDITOR
@@ -256,7 +281,6 @@ namespace Spine.Unity {
 		}
 
 		protected override void Awake () {
-
 			base.Awake();
 			this.onCullStateChanged.AddListener(OnCullStateChanged);
 
@@ -271,8 +295,12 @@ namespace Spine.Unity {
 				}
 #endif
 				Initialize(false);
-				Rebuild(CanvasUpdate.PreRender);
+				if (this.IsValid) Rebuild(CanvasUpdate.PreRender);
 			}
+
+#if UNITY_EDITOR
+			InitLayoutScaleParameters();
+#endif
 		}
 
 		protected override void OnDestroy () {
@@ -282,8 +310,12 @@ namespace Spine.Unity {
 
 		public override void Rebuild (CanvasUpdate update) {
 			base.Rebuild(update);
+			if (!this.IsValid) return;
 			if (canvasRenderer.cull) return;
-			if (update == CanvasUpdate.PreRender) UpdateMeshToInstructions();
+			if (update == CanvasUpdate.PreRender) {
+				if (requiresInstructionUpate) PrepareInstructionsAndRenderers(isInRebuild: true);
+				UpdateMeshToInstructions();
+			}
 			if (allowMultipleCanvasRenderers) canvasRenderer.Clear();
 		}
 
@@ -296,6 +328,7 @@ namespace Spine.Unity {
 
 		public virtual void Update () {
 #if UNITY_EDITOR
+			UpdateReferenceRectSizes();
 			if (!Application.isPlaying) {
 				Update(0f);
 				return;
@@ -316,7 +349,6 @@ namespace Spine.Unity {
 			wasUpdatedAfterInit = true;
 			if (updateMode < UpdateMode.OnlyAnimationStatus)
 				return;
-
 			UpdateAnimationStatus(deltaTime);
 
 			if (updateMode == UpdateMode.OnlyAnimationStatus) {
@@ -358,6 +390,10 @@ namespace Spine.Unity {
 			else
 				state.ApplyEventTimelinesOnly(skeleton, issueEvents: true);
 
+			AfterAnimationApplied();
+		}
+
+		public void AfterAnimationApplied () {
 			if (UpdateLocal != null)
 				UpdateLocal(this);
 
@@ -373,14 +409,14 @@ namespace Spine.Unity {
 		}
 
 		public void LateUpdate () {
+			if (!this.IsValid) return;
 			// instantiation can happen from Update() after this component, leading to a missing Update() call.
 			if (!wasUpdatedAfterInit) Update(0);
 			if (freeze) return;
 			if (updateMode != UpdateMode.FullUpdate) return;
 
 			PrepareInstructionsAndRenderers();
-			if (OnInstructionsPrepared != null)
-				OnInstructionsPrepared(this.currentInstructions);
+
 			SetVerticesDirty(); // triggers Rebuild and avoids potential double-update in a single frame
 		}
 
@@ -427,9 +463,11 @@ namespace Spine.Unity {
 		public Skeleton Skeleton {
 			get {
 				Initialize(false);
+				requiresInstructionUpate = true;
 				return skeleton;
 			}
 			set {
+				requiresInstructionUpate = true;
 				skeleton = value;
 			}
 		}
@@ -547,13 +585,35 @@ namespace Spine.Unity {
 				0.5f - (center.y / size.y)
 			);
 
-			this.rectTransform.sizeDelta = size;
+			SetRectTransformSize(this, size);
 			this.rectTransform.pivot = p;
 
+			foreach (Transform separatorPart in separatorParts) {
+				RectTransform separatorTransform = separatorPart.GetComponent<RectTransform>();
+				if (separatorTransform) {
+					SetRectTransformSize(separatorTransform, size);
+					separatorTransform.pivot = p;
+				}
+			}
 			foreach (SkeletonSubmeshGraphic submeshGraphic in submeshGraphics) {
-				submeshGraphic.rectTransform.sizeDelta = size;
+				SetRectTransformSize(submeshGraphic, size);
 				submeshGraphic.rectTransform.pivot = p;
 			}
+		}
+
+		public static void SetRectTransformSize (Graphic target, Vector2 size) {
+			SetRectTransformSize(target.rectTransform, size);
+		}
+
+		public static void SetRectTransformSize (RectTransform targetRectTransform, Vector2 size) {
+			Vector2 parentSize = Vector2.zero;
+			if (targetRectTransform.parent != null) {
+				RectTransform parentTransform = targetRectTransform.parent.GetComponent<RectTransform>();
+				if (parentTransform)
+					parentSize = parentTransform.rect.size;
+			}
+			Vector2 anchorAreaSize = Vector2.Scale(targetRectTransform.anchorMax - targetRectTransform.anchorMin, parentSize);
+			targetRectTransform.sizeDelta = size - anchorAreaSize;
 		}
 
 		/// <summary>OnAnimationRebuild is raised after the SkeletonAnimation component is successfully initialized.</summary>
@@ -654,11 +714,12 @@ namespace Spine.Unity {
 				OnAnimationRebuild(this);
 		}
 
-		public void PrepareInstructionsAndRenderers () {
+		public void PrepareInstructionsAndRenderers (bool isInRebuild = false) {
+			requiresInstructionUpate = false;
 			if (!this.allowMultipleCanvasRenderers) {
 				MeshGenerator.GenerateSingleSubmeshInstruction(currentInstructions, skeleton, null);
 				if (canvasRenderers.Count > 0)
-					DisableUnusedCanvasRenderers(usedCount: 0);
+					DisableUnusedCanvasRenderers(usedCount: 0, isInRebuild: isInRebuild);
 				usedRenderersCount = 0;
 			} else {
 				MeshGenerator.GenerateSkeletonRendererInstruction(currentInstructions, skeleton, null,
@@ -671,8 +732,10 @@ namespace Spine.Unity {
 				EnsureMeshesCount(submeshCount);
 				EnsureUsedTexturesAndMaterialsCount(submeshCount);
 				EnsureSeparatorPartCount();
-				PrepareRendererGameObjects(currentInstructions);
+				PrepareRendererGameObjects(currentInstructions, isInRebuild);
 			}
+			if (OnInstructionsPrepared != null)
+				OnInstructionsPrepared(this.currentInstructions);
 		}
 
 		public void UpdateMesh () {
@@ -731,7 +794,13 @@ namespace Spine.Unity {
 				meshGenerator.BuildMeshWithArrays(currentInstructions, updateTriangles);
 			}
 
-			if (canvas != null) meshGenerator.ScaleVertexData(canvas.referencePixelsPerUnit);
+			meshScale = (canvas == null) ? 100 : canvas.referencePixelsPerUnit;
+			if (layoutScaleMode != LayoutMode.None) {
+				meshScale *= referenceScale;
+				if (!EditReferenceRect)
+					meshScale *= GetLayoutScale(layoutScaleMode);
+			}
+			meshGenerator.ScaleVertexData(meshScale);
 			if (OnPostProcessVertices != null) OnPostProcessVertices.Invoke(this.meshGenerator.Buffers);
 
 			Mesh mesh = smartMesh.mesh;
@@ -773,6 +842,11 @@ namespace Spine.Unity {
 				SubmeshInstruction submeshInstructionItem = currentInstructions.submeshInstructions.Items[i];
 				Material submeshMaterial = submeshInstructionItem.material;
 				if (useOriginalTextureAndMaterial) {
+					if (submeshMaterial == null) {
+						usedMaterialItems[i] = null;
+						usedTextureItems[i] = null;
+						continue;
+					}
 					usedTextureItems[i] = submeshMaterial.mainTexture;
 					if (!hasBlendModeMaterials) {
 						usedMaterialItems[i] = this.materialForRendering;
@@ -803,9 +877,12 @@ namespace Spine.Unity {
 		}
 
 		protected void UpdateMeshMultipleCanvasRenderers (SkeletonRendererInstruction currentInstructions) {
-			Canvas c = canvas;
-			float scale = (c == null) ? 100 : c.referencePixelsPerUnit;
-
+			meshScale = (canvas == null) ? 100 : canvas.referencePixelsPerUnit;
+			if (layoutScaleMode != LayoutMode.None) {
+				meshScale *= referenceScale;
+				if (!EditReferenceRect)
+					meshScale *= GetLayoutScale(layoutScaleMode);
+			}
 			// Generate meshes.
 			int submeshCount = currentInstructions.submeshInstructions.Count;
 			Mesh[] meshesItems = meshes.Items;
@@ -826,7 +903,7 @@ namespace Spine.Unity {
 				meshGenerator.AddSubmesh(submeshInstructionItem);
 
 				Mesh targetMesh = meshesItems[i];
-				meshGenerator.ScaleVertexData(scale);
+				meshGenerator.ScaleVertexData(meshScale);
 				if (OnPostProcessVertices != null) OnPostProcessVertices.Invoke(this.meshGenerator.Buffers);
 				meshGenerator.FillVertexData(targetMesh);
 				meshGenerator.FillTriangles(targetMesh);
@@ -877,30 +954,58 @@ namespace Spine.Unity {
 			}
 		}
 
-		protected void PrepareRendererGameObjects (SkeletonRendererInstruction currentInstructions) {
-			int submeshCount = currentInstructions.submeshInstructions.Count;
-			DisableUnusedCanvasRenderers(usedCount: submeshCount);
+		protected void PrepareRendererGameObjects (SkeletonRendererInstruction currentInstructions,
+			bool isInRebuild = false) {
 
-			int separatorSlotGroupIndex = 0;
-			int targetSiblingIndex = 0;
-			Transform parent = this.separatorSlots.Count == 0 ? this.transform : this.separatorParts[0];
+			int submeshCount = currentInstructions.submeshInstructions.Count;
+			DisableUnusedCanvasRenderers(usedCount: submeshCount, isInRebuild: isInRebuild);
+
+			Transform parent = this.separatorParts.Count == 0 ? this.transform : this.separatorParts[0];
 			if (updateSeparatorPartLocation) {
 				for (int p = 0; p < this.separatorParts.Count; ++p) {
-					separatorParts[p].position = this.transform.position;
-					separatorParts[p].rotation = this.transform.rotation;
+					Transform separatorPart = separatorParts[p];
+					if (separatorPart == null) continue;
+					separatorPart.position = this.transform.position;
+					separatorPart.rotation = this.transform.rotation;
+				}
+			}
+			if (updateSeparatorPartScale) {
+				Vector3 targetScale = this.transform.lossyScale;
+				for (int p = 0; p < this.separatorParts.Count; ++p) {
+					Transform separatorPart = separatorParts[p];
+					if (separatorPart == null) continue;
+					Transform partParent = separatorPart.parent;
+					Vector3 parentScale = partParent == null ? Vector3.one : partParent.lossyScale;
+					separatorPart.localScale = new Vector3(
+						parentScale.x == 0f ? 1f : targetScale.x / parentScale.x,
+						parentScale.y == 0f ? 1f : targetScale.y / parentScale.y,
+						parentScale.z == 0f ? 1f : targetScale.z / parentScale.z);
 				}
 			}
 
+			int separatorSlotGroupIndex = 0;
+			int targetSiblingIndex = 0;
 			for (int i = 0; i < submeshCount; i++) {
 				CanvasRenderer canvasRenderer = canvasRenderers[i];
-				if (i >= usedRenderersCount) {
-					canvasRenderer.gameObject.SetActive(true);
+				if (canvasRenderer != null) {
+					if (i >= usedRenderersCount)
+						canvasRenderer.gameObject.SetActive(true);
+
+					if (canvasRenderer.transform.parent != parent.transform && !isInRebuild)
+						canvasRenderer.transform.SetParent(parent.transform, false);
+
+					canvasRenderer.transform.SetSiblingIndex(targetSiblingIndex++);
 				}
-				if (canvasRenderer.transform.parent != parent.transform) {
-					canvasRenderer.transform.SetParent(parent.transform, false);
-					canvasRenderer.transform.localPosition = Vector3.zero;
+
+				SkeletonSubmeshGraphic submeshGraphic = submeshGraphics[i];
+				if (submeshGraphic != null) {
+					RectTransform dstTransform = submeshGraphic.rectTransform;
+					dstTransform.localPosition = Vector3.zero;
+					dstTransform.pivot = rectTransform.pivot;
+					dstTransform.anchorMin = Vector2.zero;
+					dstTransform.anchorMax = Vector2.one;
+					dstTransform.sizeDelta = Vector2.zero;
 				}
-				canvasRenderer.transform.SetSiblingIndex(targetSiblingIndex++);
 
 				SubmeshInstruction submeshInstructionItem = currentInstructions.submeshInstructions.Items[i];
 				if (submeshInstructionItem.forceSeparate) {
@@ -911,13 +1016,14 @@ namespace Spine.Unity {
 			usedRenderersCount = submeshCount;
 		}
 
-		protected void DisableUnusedCanvasRenderers (int usedCount) {
+		protected void DisableUnusedCanvasRenderers (int usedCount, bool isInRebuild = false) {
 #if UNITY_EDITOR
 			RemoveNullCanvasRenderers();
 #endif
 			for (int i = usedCount; i < canvasRenderers.Count; i++) {
 				canvasRenderers[i].Clear();
-				canvasRenderers[i].gameObject.SetActive(false);
+				if (!isInRebuild) // rebuild does not allow disabling Graphic and thus removing it from rebuild list.
+					canvasRenderers[i].gameObject.SetActive(false);
 			}
 		}
 
@@ -927,6 +1033,7 @@ namespace Spine.Unity {
 				for (int i = canvasRenderers.Count - 1; i >= 0; --i) {
 					if (canvasRenderers[i] == null) {
 						canvasRenderers.RemoveAt(i);
+						submeshGraphics.RemoveAt(i);
 					}
 				}
 			}
@@ -994,7 +1101,14 @@ namespace Spine.Unity {
 			for (int i = currentCount; i < targetCount; ++i) {
 				GameObject go = new GameObject(string.Format("{0}[{1}]", SeparatorPartGameObjectName, i), typeof(RectTransform));
 				go.transform.SetParent(this.transform, false);
-				go.transform.localPosition = Vector3.zero;
+
+				RectTransform dstTransform = go.transform.GetComponent<RectTransform>();
+				dstTransform.localPosition = Vector3.zero;
+				dstTransform.pivot = rectTransform.pivot;
+				dstTransform.anchorMin = Vector2.zero;
+				dstTransform.anchorMax = Vector2.one;
+				dstTransform.sizeDelta = Vector2.zero;
+
 				separatorParts.Add(go.transform);
 			}
 		}
@@ -1027,6 +1141,87 @@ namespace Spine.Unity {
 				}
 			}
 		}
+
+		protected void InitLayoutScaleParameters () {
+			previousLayoutScaleMode = layoutScaleMode;
+		}
+
+		protected void UpdateReferenceRectSizes () {
+			if (rectTransformSize == Vector2.zero)
+				rectTransformSize = GetCurrentRectSize();
+
+			HandleChangedEditReferenceRect();
+
+			if (layoutScaleMode != previousLayoutScaleMode) {
+				if (layoutScaleMode != LayoutMode.None) {
+					SetRectTransformSize(this, rectTransformSize);
+				} else {
+					rectTransformSize = referenceSize / referenceScale;
+					referenceScale = 1f;
+					SetRectTransformSize(this, rectTransformSize);
+				}
+			}
+			if (editReferenceRect || layoutScaleMode == LayoutMode.None) {
+				referenceSize = GetCurrentRectSize();
+			}
+			previousLayoutScaleMode = layoutScaleMode;
+		}
+
+		protected void HandleChangedEditReferenceRect () {
+			if (editReferenceRect == previousEditReferenceRect) return;
+			previousEditReferenceRect = editReferenceRect;
+
+			if (editReferenceRect) {
+				rectTransformSize = GetCurrentRectSize();
+				ResetRectToReferenceRectSize();
+			} else {
+				SetRectTransformSize(this, rectTransformSize);
+			}
+		}
+
+		public void ResetRectToReferenceRectSize () {
+			referenceScale = referenceScale * GetLayoutScale(previousLayoutScaleMode);
+			float referenceAspect = referenceSize.x / referenceSize.y;
+			Vector2 newSize = GetCurrentRectSize();
+
+			LayoutMode mode = previousLayoutScaleMode;
+			float frameAspect = newSize.x / newSize.y;
+			if (mode == LayoutMode.FitInParent)
+				mode = frameAspect > referenceAspect ? LayoutMode.HeightControlsWidth : LayoutMode.WidthControlsHeight;
+			else if (mode == LayoutMode.EnvelopeParent)
+				mode = frameAspect > referenceAspect ? LayoutMode.WidthControlsHeight : LayoutMode.HeightControlsWidth;
+
+			if (mode == LayoutMode.WidthControlsHeight)
+				newSize.y = newSize.x / referenceAspect;
+			else if (mode == LayoutMode.HeightControlsWidth)
+				newSize.x = newSize.y * referenceAspect;
+			SetRectTransformSize(this, newSize);
+		}
+
+		public Vector2 GetReferenceRectSize () {
+			return referenceSize * GetLayoutScale(layoutScaleMode);
+		}
 #endif
+
+		protected float GetLayoutScale (LayoutMode mode) {
+			Vector2 currentSize = GetCurrentRectSize();
+			float referenceAspect = referenceSize.x / referenceSize.y;
+			float frameAspect = currentSize.x / currentSize.y;
+			if (mode == LayoutMode.FitInParent)
+				mode = frameAspect > referenceAspect ? LayoutMode.HeightControlsWidth : LayoutMode.WidthControlsHeight;
+			else if (mode == LayoutMode.EnvelopeParent)
+				mode = frameAspect > referenceAspect ? LayoutMode.WidthControlsHeight : LayoutMode.HeightControlsWidth;
+
+			if (mode == LayoutMode.WidthControlsHeight) {
+				return currentSize.x / referenceSize.x;
+			} else if (mode == LayoutMode.HeightControlsWidth) {
+				return currentSize.y / referenceSize.y;
+			}
+			return 1f;
+		}
+
+		private Vector2 GetCurrentRectSize () {
+			return this.rectTransform.rect.size;
+		}
 	}
 }

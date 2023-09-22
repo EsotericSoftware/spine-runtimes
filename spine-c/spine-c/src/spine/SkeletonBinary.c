@@ -1,16 +1,16 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated September 24, 2021. Replaces all prior versions.
+ * Last updated July 28, 2023. Replaces all prior versions.
  *
- * Copyright (c) 2013-2021, Esoteric Software LLC
+ * Copyright (c) 2013-2023, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
  * conditions of Section 2 of the Spine Editor License Agreement:
  * http://esotericsoftware.com/spine-editor-license
  *
- * Otherwise, it is permitted to integrate the Spine Runtimes into software
- * or otherwise create derivative works of the Spine Runtimes (collectively,
+ * Otherwise, it is permitted to integrate the Spine Runtimes into software or
+ * otherwise create derivative works of the Spine Runtimes (collectively,
  * "Products"), provided that each user of the Products must obtain their own
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
@@ -23,8 +23,8 @@
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
  * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THE
+ * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #include <spine/Animation.h>
@@ -114,7 +114,7 @@ static int readInt(_dataInput *input) {
 
 static int readVarint(_dataInput *input, int /*bool*/ optimizePositive) {
 	unsigned char b = readByte(input);
-	uint32_t value = b & 0x7F;
+	int32_t value = b & 0x7F;
 	if (b & 0x80) {
 		b = readByte(input);
 		value |= (b & 0x7F) << 7;
@@ -124,13 +124,12 @@ static int readVarint(_dataInput *input, int /*bool*/ optimizePositive) {
 			if (b & 0x80) {
 				b = readByte(input);
 				value |= (b & 0x7F) << 21;
-				if (b & 0x80) value |= (uint32_t) (readByte(input) & 0x7F) << 28;
+				if (b & 0x80) value |= (readByte(input) & 0x7F) << 28;
 			}
 		}
 	}
-	if (!optimizePositive)
-		value = ((unsigned int) value >> 1) ^ (~(value & 1));
-	return (int) value;
+	if (!optimizePositive) value = (((unsigned int) value >> 1) ^ -(value & 1));
+	return value;
 }
 
 float readFloat(_dataInput *input) {
@@ -958,8 +957,8 @@ static void _readVertices(spSkeletonBinary *self, _dataInput *input, int *bonesC
 						  float **vertices, int *worldVerticesLength, int vertexCount) {
 	int i, ii;
 	int verticesLength = vertexCount << 1;
-	spFloatArray *weights = spFloatArray_create(8);
-	spIntArray *bones = spIntArray_create(8);
+	spFloatArray *weights = NULL;
+	spIntArray *bones = NULL;
 
 	*worldVerticesLength = verticesLength;
 
@@ -968,13 +967,11 @@ static void _readVertices(spSkeletonBinary *self, _dataInput *input, int *bonesC
 		*vertices = _readFloatArray(input, verticesLength, self->scale);
 		*bonesCount = 0;
 		*bones2 = NULL;
-		spFloatArray_dispose(weights);
-		spIntArray_dispose(bones);
 		return;
 	}
 
-	spFloatArray_ensureCapacity(weights, verticesLength * 3 * 3);
-	spIntArray_ensureCapacity(bones, verticesLength * 3);
+	weights = spFloatArray_create(verticesLength * 3 * 3);
+	bones = spIntArray_create(verticesLength * 3);
 
 	for (i = 0; i < vertexCount; ++i) {
 		int boneCount = readVarint(input, 1);
@@ -1031,7 +1028,10 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
 			{
 				spAttachment *attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name,
 																			   path, sequence);
-				spRegionAttachment *region = SUB_CAST(spRegionAttachment, attachment);
+				spRegionAttachment *region = NULL;
+				if (!attachment)
+					return NULL;
+				region = SUB_CAST(spRegionAttachment, attachment);
 				region->path = path;
 				region->rotation = rotation;
 				region->x = x;
@@ -1051,7 +1051,10 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
 			int vertexCount = readVarint(input, 1);
 			spAttachment *attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0,
 																		   NULL);
-			spVertexAttachment *vertexAttachment = SUB_CAST(spVertexAttachment, attachment);
+			spVertexAttachment *vertexAttachment = NULL;
+			if (!attachment)
+				return NULL;
+			vertexAttachment = SUB_CAST(spVertexAttachment, attachment);
 			_readVertices(self, input, &vertexAttachment->bonesCount, &vertexAttachment->bones,
 						  &vertexAttachment->verticesCount, &vertexAttachment->vertices,
 						  &vertexAttachment->worldVerticesLength, vertexCount);
@@ -1102,7 +1105,10 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
 
 			{
 				spAttachment *attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, path, sequence);
-				spMeshAttachment *mesh = SUB_CAST(spMeshAttachment, attachment);
+				spMeshAttachment *mesh = NULL;
+				if (!attachment)
+					return NULL;
+				mesh = SUB_CAST(spMeshAttachment, attachment);
 				mesh->path = path;
 				spColor_setFromColor(&mesh->color, &color);
 				mesh->regionUVs = regionUVs;
@@ -1151,7 +1157,10 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
 
 			{
 				spAttachment *attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, path, sequence);
-				spMeshAttachment *mesh = SUB_CAST(spMeshAttachment, attachment);
+				spMeshAttachment *mesh = NULL;
+				if (!attachment)
+					return NULL;
+				mesh = SUB_CAST(spMeshAttachment, attachment);
 				mesh->path = path;
 				spColor_setFromColor(&mesh->color, &color);
 				mesh->sequence = sequence;
@@ -1164,9 +1173,13 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
 		case SP_ATTACHMENT_PATH: {
 			spAttachment *attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0,
 																		   NULL);
-			spPathAttachment *path = SUB_CAST(spPathAttachment, attachment);
-			spVertexAttachment *vertexAttachment = SUPER(path);
+			spPathAttachment *path = NULL;
+			spVertexAttachment *vertexAttachment = NULL;
 			int vertexCount = 0;
+			if (!attachment)
+				return NULL;
+			path = SUB_CAST(spPathAttachment, attachment);
+			vertexAttachment = SUPER(path);
 			path->closed = readBoolean(input);
 			path->constantSpeed = readBoolean(input);
 			vertexCount = readVarint(input, 1);
@@ -1187,7 +1200,10 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
 		case SP_ATTACHMENT_POINT: {
 			spAttachment *attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0,
 																		   NULL);
-			spPointAttachment *point = SUB_CAST(spPointAttachment, attachment);
+			spPointAttachment *point = NULL;
+			if (!attachment)
+				return NULL;
+			point = SUB_CAST(spPointAttachment, attachment);
 			point->rotation = readFloat(input);
 			point->x = readFloat(input) * self->scale;
 			point->y = readFloat(input) * self->scale;
@@ -1203,8 +1219,12 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
 			int vertexCount = readVarint(input, 1);
 			spAttachment *attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0,
 																		   NULL);
-			spClippingAttachment *clip = SUB_CAST(spClippingAttachment, attachment);
-			spVertexAttachment *vertexAttachment = SUPER(clip);
+			spClippingAttachment *clip = NULL;
+			spVertexAttachment *vertexAttachment = NULL;
+			if (!attachment)
+				return NULL;
+			clip = SUB_CAST(spClippingAttachment, attachment);
+			vertexAttachment = SUPER(clip);
 			_readVertices(self, input, &vertexAttachment->bonesCount, &vertexAttachment->bones,
 						  &vertexAttachment->verticesCount, &vertexAttachment->vertices,
 						  &vertexAttachment->worldVerticesLength, vertexCount);
@@ -1253,7 +1273,9 @@ spSkin *spSkeletonBinary_readSkin(spSkeletonBinary *self, _dataInput *input, int
 			const char *name = readStringRef(input, skeletonData);
 			spAttachment *attachment = spSkeletonBinary_readAttachment(self, input, skin, slotIndex, name, skeletonData,
 																	   nonessential);
-			if (attachment) spSkin_setAttachment(skin, slotIndex, name, attachment);
+			if (!attachment)
+				return NULL;
+			spSkin_setAttachment(skin, slotIndex, name, attachment);
 		}
 	}
 	return skin;
@@ -1508,6 +1530,11 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 
 	/* Default skin. */
 	skeletonData->defaultSkin = spSkeletonBinary_readSkin(self, input, -1, skeletonData, nonessential);
+	if (self->attachmentLoader->error1) {
+		spSkeletonData_dispose(skeletonData);
+		_spSkeletonBinary_setError(self, self->attachmentLoader->error1, self->attachmentLoader->error2);
+		return NULL;
+	}
 	skeletonData->skinsCount = readVarint(input, 1);
 
 	if (skeletonData->defaultSkin)
@@ -1520,7 +1547,13 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 
 	/* Skins. */
 	for (i = skeletonData->defaultSkin ? 1 : 0; i < skeletonData->skinsCount; ++i) {
-		skeletonData->skins[i] = spSkeletonBinary_readSkin(self, input, 0, skeletonData, nonessential);
+		spSkin *skin = spSkeletonBinary_readSkin(self, input, 0, skeletonData, nonessential);
+		if (self->attachmentLoader->error1) {
+			spSkeletonData_dispose(skeletonData);
+			_spSkeletonBinary_setError(self, self->attachmentLoader->error1, self->attachmentLoader->error2);
+			return NULL;
+		}
+		skeletonData->skins[i] = skin;
 	}
 
 	/* Linked meshes. */
@@ -1575,6 +1608,7 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 		if (!animation) {
 			FREE(input);
 			spSkeletonData_dispose(skeletonData);
+			_spSkeletonBinary_setError(self, "Animation corrupted: ", name);
 			return NULL;
 		}
 		skeletonData->animations[i] = animation;

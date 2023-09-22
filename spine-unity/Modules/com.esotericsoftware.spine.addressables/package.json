@@ -1,0 +1,22 @@
+{
+	"name": "com.esotericsoftware.spine.addressables",
+	"displayName": "Spine Addressables Extensions [Experimental]",
+	"description": "This experimental plugin provides integration of Addressables on-demand texture loading for the spine-unity runtime.\nPlease be sure to test this package first and create backups of your project before using.\n\nUsage: First declare your target Material textures as addressable. Then select the SpineAtlasAsset, right-click the SpineAtlasAsset Inspector heading and select 'Add Addressables Loader'. This generates an 'AddressableTextureLoader' asset providing configuration parameters and sets up low-resolution placeholder textures which are automatically assigned in a pre-build step when building your game executable.\n\nPrerequisites:\nIt requires a working installation of the spine-unity runtime (via the spine-unity unitypackage), version 4.1.\n(See http://esotericsoftware.com/git/spine-runtimes/spine-unity)",
+	"version": "4.1.0-preview.1",
+	"unity": "2018.3",
+	"author": {
+		"name": "Esoteric Software",
+		"email": "contact@esotericsoftware.com",
+		"url": "http://esotericsoftware.com/"
+	},
+	"dependencies": {
+		"com.unity.addressables": "1.18.19",
+		"com.esotericsoftware.spine.spine-unity": "4.1.21",
+		"com.esotericsoftware.spine.on-demand-loading": "4.1.0"
+	},
+	"keywords": [
+		"spine",
+		"addressables",
+		"preview"
+	]
+}

@@ -18,6 +18,9 @@
 		},
 		{
 			"path": "./spine-threejs"
+		},
+		{
+			"path": "./spine-pixi"
 		}
 	]
 }

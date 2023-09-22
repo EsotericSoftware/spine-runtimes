@@ -1,16 +1,16 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated September 24, 2021. Replaces all prior versions.
+ * Last updated July 28, 2023. Replaces all prior versions.
  *
- * Copyright (c) 2013-2021, Esoteric Software LLC
+ * Copyright (c) 2013-2023, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
  * conditions of Section 2 of the Spine Editor License Agreement:
  * http://esotericsoftware.com/spine-editor-license
  *
- * Otherwise, it is permitted to integrate the Spine Runtimes into software
- * or otherwise create derivative works of the Spine Runtimes (collectively,
+ * Otherwise, it is permitted to integrate the Spine Runtimes into software or
+ * otherwise create derivative works of the Spine Runtimes (collectively,
  * "Products"), provided that each user of the Products must obtain their own
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
@@ -23,15 +23,22 @@
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
  * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THE
+ * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Disposable } from "@esotericsoftware/spine-core";
+import { BlendMode, Disposable } from "@esotericsoftware/spine-core";
 import { GLTexture } from "./GLTexture";
 import { Mesh, Position2Attribute, ColorAttribute, TexCoordAttribute, Color2Attribute } from "./Mesh";
 import { Shader } from "./Shader";
 import { ManagedWebGLRenderingContext } from "./WebGL";
+
+const GL_ONE = 1;
+const GL_ONE_MINUS_SRC_COLOR = 0x0301;
+const GL_SRC_ALPHA = 0x0302;
+const GL_ONE_MINUS_SRC_ALPHA = 0x0303;
+const GL_ONE_MINUS_DST_ALPHA = 0x0305;
+const GL_DST_COLOR = 0x0306;
 
 export class PolygonBatcher implements Disposable {
 	public static disableCulling = false;
@@ -39,7 +46,7 @@ export class PolygonBatcher implements Disposable {
 	private context: ManagedWebGLRenderingContext;
 	private drawCalls = 0;
 	private static globalDrawCalls = 0;
-	private isDrawing = false;
+	isDrawing = false;
 	private mesh: Mesh;
 	private shader: Shader | null = null;
 	private lastTexture: GLTexture | null = null;
@@ -80,16 +87,28 @@ export class PolygonBatcher implements Disposable {
 		}
 	}
 
-	setBlendMode (srcColorBlend: number, srcAlphaBlend: number, dstBlend: number) {
+	private static blendModesGL: { srcRgb: number, srcRgbPma: number, dstRgb: number, srcAlpha: number }[] = [
+		{ srcRgb: GL_SRC_ALPHA, srcRgbPma: GL_ONE, dstRgb: GL_ONE_MINUS_SRC_ALPHA, srcAlpha: GL_ONE },
+		{ srcRgb: GL_SRC_ALPHA, srcRgbPma: GL_ONE, dstRgb: GL_ONE, srcAlpha: GL_ONE },
+		{ srcRgb: GL_DST_COLOR, srcRgbPma: GL_DST_COLOR, dstRgb: GL_ONE_MINUS_SRC_ALPHA, srcAlpha: GL_ONE },
+		{ srcRgb: GL_ONE, srcRgbPma: GL_ONE, dstRgb: GL_ONE_MINUS_SRC_COLOR, srcAlpha: GL_ONE }
+	]
+
+	setBlendMode (blendMode: BlendMode, premultipliedAlpha: boolean) {
+		const blendModeGL = PolygonBatcher.blendModesGL[blendMode];
+		const srcColorBlend = premultipliedAlpha ? blendModeGL.srcRgbPma : blendModeGL.srcRgb;
+		const srcAlphaBlend = blendModeGL.srcAlpha;
+		const dstBlend = blendModeGL.dstRgb;
+
 		if (this.srcColorBlend == srcColorBlend && this.srcAlphaBlend == srcAlphaBlend && this.dstBlend == dstBlend) return;
 		this.srcColorBlend = srcColorBlend;
 		this.srcAlphaBlend = srcAlphaBlend;
 		this.dstBlend = dstBlend;
 		if (this.isDrawing) {
 			this.flush();
-			let gl = this.context.gl;
-			gl.blendFuncSeparate(srcColorBlend, dstBlend, srcAlphaBlend, dstBlend);
 		}
+		let gl = this.context.gl;
+		gl.blendFuncSeparate(srcColorBlend, dstBlend, srcAlphaBlend, dstBlend);
 	}
 
 	draw (texture: GLTexture, vertices: ArrayLike<number>, indices: Array<number>) {

@@ -1,16 +1,16 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated September 24, 2021. Replaces all prior versions.
+ * Last updated July 28, 2023. Replaces all prior versions.
  *
- * Copyright (c) 2013-2021, Esoteric Software LLC
+ * Copyright (c) 2013-2023, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
  * conditions of Section 2 of the Spine Editor License Agreement:
  * http://esotericsoftware.com/spine-editor-license
  *
- * Otherwise, it is permitted to integrate the Spine Runtimes into software
- * or otherwise create derivative works of the Spine Runtimes (collectively,
+ * Otherwise, it is permitted to integrate the Spine Runtimes into software or
+ * otherwise create derivative works of the Spine Runtimes (collectively,
  * "Products"), provided that each user of the Products must obtain their own
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
@@ -23,8 +23,8 @@
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
  * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THE
+ * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #pragma warning disable 0219
@@ -664,7 +664,7 @@ namespace Spine.Unity.Editor {
 				Material material = (Material)AssetDatabase.LoadAssetAtPath(materialPath, typeof(Material));
 
 				if (material == null) {
-					Shader defaultShader = Shader.Find(SpineEditorUtilities.Preferences.DefaultShader);
+					Shader defaultShader = GetDefaultShader();
 					material = defaultShader != null ? new Material(defaultShader) : null;
 					if (material) {
 						ApplyPMAOrStraightAlphaSettings(material, SpineEditorUtilities.Preferences.textureSettingsReference);
@@ -735,6 +735,13 @@ namespace Spine.Unity.Editor {
 			// asset returns null, regardless of refresh calls.
 			AtlasAssetBase loadedAtlas = (AtlasAssetBase)AssetDatabase.LoadAssetAtPath(atlasPath, typeof(AtlasAssetBase));
 			return loadedAtlas != null ? loadedAtlas : atlasAsset;
+		}
+
+		public static Shader GetDefaultShader () {
+			Shader shader = Shader.Find(SpineEditorUtilities.Preferences.DefaultShader);
+			if (shader == null) shader = Shader.Find("Spine/Skeleton");
+			if (shader == null) shader = Shader.Find("Standard");
+			return shader;
 		}
 
 		public static bool SpriteAtlasSettingsNeedAdjustment (UnityEngine.U2D.SpriteAtlas spriteAtlas) {
@@ -851,24 +858,24 @@ namespace Spine.Unity.Editor {
 
 			{
 				string pageName = "SpriteAtlas";
-
 				string materialPath = assetPath + "/" + primaryName + "_" + pageName + ".mat";
-				Material mat = AssetDatabase.LoadAssetAtPath<Material>(materialPath);
+				Material material = AssetDatabase.LoadAssetAtPath<Material>(materialPath);
 
-				if (mat == null) {
-					mat = new Material(Shader.Find(SpineEditorUtilities.Preferences.defaultShader));
-					ApplyPMAOrStraightAlphaSettings(mat, SpineEditorUtilities.Preferences.textureSettingsReference);
-					AssetDatabase.CreateAsset(mat, materialPath);
+				if (material == null) {
+					Shader defaultShader = GetDefaultShader();
+					material = defaultShader != null ? new Material(defaultShader) : null;
+					ApplyPMAOrStraightAlphaSettings(material, SpineEditorUtilities.Preferences.textureSettingsReference);
+					AssetDatabase.CreateAsset(material, materialPath);
 				} else {
-					vestigialMaterials.Remove(mat);
+					vestigialMaterials.Remove(material);
 				}
 
 				if (texture != null)
-					mat.mainTexture = texture;
+					material.mainTexture = texture;
 
-				EditorUtility.SetDirty(mat);
+				EditorUtility.SetDirty(material);
 				// note: don't call AssetDatabase.SaveAssets() since this would trigger OnPostprocessAllAssets() every time unnecessarily.
-				populatingMaterials.Add(mat); //atlasAsset.materials[i] = mat;
+				populatingMaterials.Add(material);
 			}
 
 			atlasAsset.materials = populatingMaterials.ToArray();

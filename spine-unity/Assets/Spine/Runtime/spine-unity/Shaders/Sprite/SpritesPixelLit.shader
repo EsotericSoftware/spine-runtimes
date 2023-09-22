@@ -38,6 +38,8 @@ Shader "Spine/Sprite/Pixel Lit"
 		_BlendAmount ("Blend", Range(0,1)) = 0.0
 
 		[MaterialToggle(_LIGHT_AFFECTS_ADDITIVE)] _LightAffectsAdditive("Light Affects Additive", Float) = 0
+		[MaterialToggle(_TINT_BLACK_ON)]  _TintBlack("Tint Black", Float) = 0
+		_Black("Dark Color", Color) = (0,0,0,0)
 
 		[HideInInspector] _SrcBlend ("__src", Float) = 1.0
 		[HideInInspector] _DstBlend ("__dst", Float) = 0.0
@@ -95,6 +97,7 @@ Shader "Spine/Sprite/Pixel Lit"
 				#pragma shader_feature _SPHERICAL_HARMONICS
 				#pragma shader_feature _FOG
 				#pragma shader_feature _LIGHT_AFFECTS_ADDITIVE
+				#pragma shader_feature _TINT_BLACK_ON
 
 				#pragma multi_compile_fwdbase
 				#pragma fragmentoption ARB_precision_hint_fastest

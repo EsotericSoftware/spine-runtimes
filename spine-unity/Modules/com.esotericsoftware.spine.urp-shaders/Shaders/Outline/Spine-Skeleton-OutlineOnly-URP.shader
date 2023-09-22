@@ -49,6 +49,7 @@ Shader "Universal Render Pipeline/Spine/Outline/Skeleton-OutlineOnly" {
 			#define fixed4 half4
 			#define fixed3 half3
 			#define fixed half
+			#define NO_CUTOFF_PARAM
 			#include "../Include/Spine-Input-Outline-URP.hlsl"
 			#include "../Include/Spine-Outline-Pass-URP.hlsl"
 			ENDHLSL

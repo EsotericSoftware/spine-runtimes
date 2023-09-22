@@ -1,0 +1,14 @@
+[remap]
+
+importer="spine.json"
+type="SpineSkeletonFileResource"
+uid="uid://ckitsrtfxmo2w"
+path="res://.godot/imported/mix-and-match-pro.spine-json-3655503b0d08b0b0590c6310da1ac47b.spjson"
+
+[deps]
+
+source_file="res://assets/mix-and-match/mix-and-match-pro.spine-json"
+dest_files=["res://.godot/imported/mix-and-match-pro.spine-json-3655503b0d08b0b0590c6310da1ac47b.spjson"]
+
+[params]
+

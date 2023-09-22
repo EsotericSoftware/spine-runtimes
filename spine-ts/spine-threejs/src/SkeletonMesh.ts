@@ -1,16 +1,16 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated September 24, 2021. Replaces all prior versions.
+ * Last updated July 28, 2023. Replaces all prior versions.
  *
- * Copyright (c) 2013-2021, Esoteric Software LLC
+ * Copyright (c) 2013-2023, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
  * conditions of Section 2 of the Spine Editor License Agreement:
  * http://esotericsoftware.com/spine-editor-license
  *
- * Otherwise, it is permitted to integrate the Spine Runtimes into software
- * or otherwise create derivative works of the Spine Runtimes (collectively,
+ * Otherwise, it is permitted to integrate the Spine Runtimes into software or
+ * otherwise create derivative works of the Spine Runtimes (collectively,
  * "Products"), provided that each user of the Products must obtain their own
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
@@ -23,16 +23,33 @@
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
  * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THE
+ * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { AnimationState, AnimationStateData, BlendMode, ClippingAttachment, Color, MeshAttachment, NumberArrayLike, RegionAttachment, Skeleton, SkeletonClipping, SkeletonData, TextureAtlasRegion, Utils, Vector2 } from "@esotericsoftware/spine-core";
+import {
+	AnimationState,
+	AnimationStateData,
+	BlendMode,
+	ClippingAttachment,
+	Color,
+	MeshAttachment,
+	NumberArrayLike,
+	RegionAttachment,
+	Skeleton,
+	SkeletonClipping,
+	SkeletonData,
+	TextureAtlasRegion,
+	Utils,
+	Vector2,
+} from "@esotericsoftware/spine-core";
 import { MeshBatcher } from "./MeshBatcher";
 import * as THREE from "three";
 import { ThreeJsTexture } from "./ThreeJsTexture";
 
-export type SkeletonMeshMaterialParametersCustomizer = (materialParameters: THREE.ShaderMaterialParameters) => void;
+export type SkeletonMeshMaterialParametersCustomizer = (
+	materialParameters: THREE.ShaderMaterialParameters
+) => void;
 
 export class SkeletonMeshMaterial extends THREE.ShaderMaterial {
 	constructor (customizer: SkeletonMeshMaterialParametersCustomizer) {
@@ -69,17 +86,17 @@ export class SkeletonMeshMaterial extends THREE.ShaderMaterial {
 			fragmentShader: fragmentShader,
 			side: THREE.DoubleSide,
 			transparent: true,
-			depthWrite: false,
-			alphaTest: 0.0
+			depthWrite: true,
+			alphaTest: 0.0,
 		};
 		customizer(parameters);
 		if (parameters.alphaTest && parameters.alphaTest > 0) {
-			parameters.defines = { "USE_SPINE_ALPHATEST": 1 };
+			parameters.defines = { USE_SPINE_ALPHATEST: 1 };
 			if (!parameters.uniforms) parameters.uniforms = {};
 			parameters.uniforms["alphaTest"] = { value: parameters.alphaTest };
 		}
 		super(parameters);
-	};
+	}
 }
 
 export class SkeletonMesh extends THREE.Object3D {
@@ -101,7 +118,12 @@ export class SkeletonMesh extends THREE.Object3D {
 	private vertices = Utils.newFloatArray(1024);
 	private tempColor = new Color();
 
-	constructor (skeletonData: SkeletonData, private materialCustomerizer: SkeletonMeshMaterialParametersCustomizer = (material) => { }) {
+	constructor (
+		skeletonData: SkeletonData,
+		private materialCustomerizer: SkeletonMeshMaterialParametersCustomizer = (
+			material
+		) => { }
+	) {
 		super();
 
 		this.skeleton = new Skeleton(skeletonData);
@@ -181,7 +203,7 @@ export class SkeletonMesh extends THREE.Object3D {
 				region.computeWorldVertices(slot, vertices, 0, vertexSize);
 				triangles = SkeletonMesh.QUAD_TRIANGLES;
 				uvs = region.uvs;
-				texture = <ThreeJsTexture>(<TextureAtlasRegion>region.region!.renderObject).page.texture;
+				texture = <ThreeJsTexture>region.region!.texture;
 			} else if (attachment instanceof MeshAttachment) {
 				let mesh = <MeshAttachment>attachment;
 				attachmentColor = mesh.color;
@@ -190,12 +212,19 @@ export class SkeletonMesh extends THREE.Object3D {
 				if (numFloats > vertices.length) {
 					vertices = this.vertices = Utils.newFloatArray(numFloats);
 				}
-				mesh.computeWorldVertices(slot, 0, mesh.worldVerticesLength, vertices, 0, vertexSize);
+				mesh.computeWorldVertices(
+					slot,
+					0,
+					mesh.worldVerticesLength,
+					vertices,
+					0,
+					vertexSize
+				);
 				triangles = mesh.triangles;
 				uvs = mesh.uvs;
-				texture = <ThreeJsTexture>(<TextureAtlasRegion>mesh.region!.renderObject).page.texture;
+				texture = <ThreeJsTexture>mesh.region!.texture;
 			} else if (attachment instanceof ClippingAttachment) {
-				let clip = <ClippingAttachment>(attachment);
+				let clip = <ClippingAttachment>attachment;
 				clipper.clipStart(slot, clip);
 				continue;
 			} else {
@@ -209,10 +238,12 @@ export class SkeletonMesh extends THREE.Object3D {
 				let slotColor = slot.color;
 				let alpha = skeletonColor.a * slotColor.a * attachmentColor.a;
 				let color = this.tempColor;
-				color.set(skeletonColor.r * slotColor.r * attachmentColor.r,
+				color.set(
+					skeletonColor.r * slotColor.r * attachmentColor.r,
 					skeletonColor.g * slotColor.g * attachmentColor.g,
 					skeletonColor.b * slotColor.b * attachmentColor.b,
-					alpha);
+					alpha
+				);
 
 				let finalVertices: NumberArrayLike;
 				let finalVerticesLength: number;
@@ -220,7 +251,16 @@ export class SkeletonMesh extends THREE.Object3D {
 				let finalIndicesLength: number;
 
 				if (clipper.isClipping()) {
-					clipper.clipTriangles(vertices, numFloats, triangles, triangles.length, uvs, color, tempLight, false);
+					clipper.clipTriangles(
+						vertices,
+						numFloats,
+						triangles,
+						triangles.length,
+						uvs,
+						color,
+						tempLight,
+						false
+					);
 					let clippedVertices = clipper.clippedVertices;
 					let clippedTriangles = clipper.clippedTriangles;
 					finalVertices = clippedVertices;
@@ -229,7 +269,11 @@ export class SkeletonMesh extends THREE.Object3D {
 					finalIndicesLength = clippedTriangles.length;
 				} else {
 					let verts = vertices;
-					for (let v = 2, u = 0, n = numFloats; v < n; v += vertexSize, u += 2) {
+					for (
+						let v = 2, u = 0, n = numFloats;
+						v < n;
+						v += vertexSize, u += 2
+					) {
 						verts[v] = color.r;
 						verts[v + 1] = color.g;
 						verts[v + 2] = color.b;
@@ -249,7 +293,12 @@ export class SkeletonMesh extends THREE.Object3D {
 				}
 
 				// Start new batch if this one can't hold vertices/indices
-				if (!batch.canBatch(finalVerticesLength / SkeletonMesh.VERTEX_SIZE, finalIndicesLength)) {
+				if (
+					!batch.canBatch(
+						finalVerticesLength / SkeletonMesh.VERTEX_SIZE,
+						finalIndicesLength
+					)
+				) {
 					batch.end();
 					batch = this.nextBatch();
 					batch.begin();
@@ -257,10 +306,19 @@ export class SkeletonMesh extends THREE.Object3D {
 
 				const slotBlendMode = slot.data.blendMode;
 				const slotTexture = texture.texture;
-				const materialGroup = batch.findMaterialGroup(slotTexture, slotBlendMode);
+				const materialGroup = batch.findMaterialGroup(
+					slotTexture,
+					slotBlendMode
+				);
 
 				batch.addMaterialGroup(finalIndicesLength, materialGroup);
-				batch.batch(finalVertices, finalVerticesLength, finalIndices, finalIndicesLength, z);
+				batch.batch(
+					finalVertices,
+					finalVerticesLength,
+					finalIndices,
+					finalIndicesLength,
+					z
+				);
 				z += zOffset;
 			}
 

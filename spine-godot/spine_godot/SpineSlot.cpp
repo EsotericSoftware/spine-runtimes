@@ -1,16 +1,16 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated January 1, 2020. Replaces all prior versions.
+ * Last updated July 28, 2023. Replaces all prior versions.
  *
- * Copyright (c) 2013-2020, Esoteric Software LLC
+ * Copyright (c) 2013-2023, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
  * conditions of Section 2 of the Spine Editor License Agreement:
  * http://esotericsoftware.com/spine-editor-license
  *
- * Otherwise, it is permitted to integrate the Spine Runtimes into software
- * or otherwise create derivative works of the Spine Runtimes (collectively,
+ * Otherwise, it is permitted to integrate the Spine Runtimes into software or
+ * otherwise create derivative works of the Spine Runtimes (collectively,
  * "Products"), provided that each user of the Products must obtain their own
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
@@ -23,8 +23,8 @@
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
  * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THE
+ * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #include "SpineSlot.h"
@@ -59,18 +59,28 @@ void SpineSlot::set_to_setup_pose() {
 
 Ref<SpineSlotData> SpineSlot::get_data() {
 	SPINE_CHECK(get_spine_object(), nullptr)
-	auto &slot_data = get_spine_object()->getData();
-	Ref<SpineSlotData> slot_data_ref(memnew(SpineSlotData));
-	slot_data_ref->set_spine_object(*get_spine_owner()->get_skeleton_data_res(), &slot_data);
-	return slot_data_ref;
+	if (_data.is_valid()) {
+		return _data;
+	} else {
+		auto &slot_data = get_spine_object()->getData();
+		Ref<SpineSlotData> slot_data_ref(memnew(SpineSlotData));
+		slot_data_ref->set_spine_object(*get_spine_owner()->get_skeleton_data_res(), &slot_data);
+		_data = slot_data_ref;
+		return slot_data_ref;
+	}
 }
 
 Ref<SpineBone> SpineSlot::get_bone() {
 	SPINE_CHECK(get_spine_object(), nullptr)
-	auto &bone = get_spine_object()->getBone();
-	Ref<SpineBone> bone_ref(memnew(SpineBone));
-	bone_ref->set_spine_object(get_spine_owner(), &bone);
-	return bone_ref;
+	if (_bone.is_valid()) {
+		return _bone;
+	} else {
+		auto &bone = get_spine_object()->getBone();
+		Ref<SpineBone> bone_ref(memnew(SpineBone));
+		bone_ref->set_spine_object(get_spine_owner(), &bone);
+		_bone = bone_ref;
+		return bone_ref;
+	}
 }
 
 Color SpineSlot::get_color() {

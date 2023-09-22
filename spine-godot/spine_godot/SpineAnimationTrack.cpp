@@ -1,4 +1,33 @@
-﻿#include "SpineAnimationTrack.h"
+/******************************************************************************
+ * Spine Runtimes License Agreement
+ * Last updated July 28, 2023. Replaces all prior versions.
+ *
+ * Copyright (c) 2013-2023, Esoteric Software LLC
+ *
+ * Integration of the Spine Runtimes into software or otherwise creating
+ * derivative works of the Spine Runtimes is permitted under the terms and
+ * conditions of Section 2 of the Spine Editor License Agreement:
+ * http://esotericsoftware.com/spine-editor-license
+ *
+ * Otherwise, it is permitted to integrate the Spine Runtimes into software or
+ * otherwise create derivative works of the Spine Runtimes (collectively,
+ * "Products"), provided that each user of the Products must obtain their own
+ * Spine Editor license and redistribution of the Products in any form must
+ * include this license and copyright notice.
+ *
+ * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+ * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THE
+ * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
+
+#include "SpineAnimationTrack.h"
 #if VERSION_MAJOR > 3
 #include "core/config/engine.h"
 #else
@@ -85,9 +114,9 @@ void SpineAnimationTrack::_notification(int what) {
 			sprite = Object::cast_to<SpineSprite>(get_parent());
 			if (sprite)
 #if VERSION_MAJOR > 3
-				sprite->connect("before_animation_state_update", callable_mp(this, &SpineAnimationTrack::update_animation_state));
+				sprite->connect(SNAME("before_animation_state_update"), callable_mp(this, &SpineAnimationTrack::update_animation_state));
 #else
-				sprite->connect("before_animation_state_update", this, "update_animation_state");
+				sprite->connect(SNAME("before_animation_state_update"), this, SNAME("update_animation_state"));
 #endif
 			NOTIFY_PROPERTY_LIST_CHANGED();
 			break;
@@ -99,9 +128,9 @@ void SpineAnimationTrack::_notification(int what) {
 		case NOTIFICATION_UNPARENTED: {
 			if (sprite) {
 #if VERSION_MAJOR > 3
-				sprite->disconnect("before_animation_state_update", callable_mp(this, &SpineAnimationTrack::update_animation_state));
+				sprite->disconnect(SNAME("before_animation_state_update"), callable_mp(this, &SpineAnimationTrack::update_animation_state));
 #else
-				sprite->disconnect("before_animation_state_update", this, "update_animation_state");
+				sprite->disconnect(SNAME("before_animation_state_update"), this, SNAME("update_animation_state"));
 #endif
 				sprite = nullptr;
 			}

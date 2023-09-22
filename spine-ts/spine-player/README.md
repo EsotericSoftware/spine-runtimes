@@ -1,3 +1,3 @@
 # spine-ts Player 
 
-Please see the top-level [README.md](../README.md) for more information.
+Please see the [Spine Web Player documentation](https://esotericsoftware.com/spine-player) for more information.

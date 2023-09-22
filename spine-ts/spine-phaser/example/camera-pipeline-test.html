@@ -5,15 +5,14 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="//cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
-    <script src="../dist/iife/spine-phaser.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.js"></script>
     <title>Spine Phaser Example</title>
 </head>
 
 <body>
     <h1>Camera pipeline test</h1>
     <script>
-        var config = {
+        const config = {
             type: Phaser.AUTO,
             width: 800,
             height: 600,
@@ -22,11 +21,11 @@
             scene: {
                 preload: preload,
                 create: create,
-            },
-            plugins: {
-                scene: [
-                    { key: "spine.SpinePlugin", plugin: spine.SpinePlugin, mapping: "spine" }
-                ]
+                pack: {
+                    files: [
+                        { type: "scenePlugin", key: "spine.SpinePlugin", url: "../dist/iife/spine-phaser.js", sceneKey: "spine" }
+                    ]
+                }
             }
         };
 
@@ -85,7 +84,7 @@
             }
         }
 
-        let game = new Phaser.Game(config);
+        const game = new Phaser.Game(config);
 
         function preload() {
             this.load.spineBinary("spineboy-data", "assets/spineboy-pro.skel");
@@ -99,9 +98,9 @@
             // FIXME: Need a dummy sprite so the MultiPipeline sets up state
             // so rendering the Spine sprite actually works. Unsure what state
             // is needed.
-            var s = this.add.sprite(0, 0, 'img');
+            this.add.sprite(0, 0, 'img');
 
-            let spineboy = this.add.spine(400, 300, 'spineboy-data', "spineboy-atlas");
+            const spineboy = this.add.spine(400, 300, 'spineboy-data', "spineboy-atlas");
             spineboy.scale = 0.5;
             spineboy.animationState.setAnimation(0, "walk", true);
 

@@ -1,16 +1,16 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated September 24, 2021. Replaces all prior versions.
+ * Last updated July 28, 2023. Replaces all prior versions.
  *
- * Copyright (c) 2013-2021, Esoteric Software LLC
+ * Copyright (c) 2013-2023, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
  * conditions of Section 2 of the Spine Editor License Agreement:
  * http://esotericsoftware.com/spine-editor-license
  *
- * Otherwise, it is permitted to integrate the Spine Runtimes into software
- * or otherwise create derivative works of the Spine Runtimes (collectively,
+ * Otherwise, it is permitted to integrate the Spine Runtimes into software or
+ * otherwise create derivative works of the Spine Runtimes (collectively,
  * "Products"), provided that each user of the Products must obtain their own
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
@@ -23,8 +23,8 @@
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
  * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THE
+ * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #include <spine/IkConstraint.h>
@@ -51,7 +51,7 @@ void IkConstraint::apply(Bone &bone, float targetX, float targetY, bool compress
 			ty = targetY - bone._worldY;
 			break;
 		case TransformMode_NoRotationOrReflection: {
-			float s = MathUtil::abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
+			float s = MathUtil::abs(pa * pd - pb * pc) / MathUtil::max(0.0001f, pa * pa + pc * pc);
 			float sa = pa / bone._skeleton.getScaleX();
 			float sc = pc / bone._skeleton.getScaleY();
 			pb = -sc * s * bone._skeleton.getScaleX();
@@ -61,8 +61,13 @@ void IkConstraint::apply(Bone &bone, float targetX, float targetY, bool compress
 		default:
 			float x = targetX - p->_worldX, y = targetY - p->_worldY;
 			float d = pa * pd - pb * pc;
-			tx = (x * pd - y * pb) / d - bone._ax;
-			ty = (y * pa - x * pc) / d - bone._ay;
+			if (MathUtil::abs(d) <= 0.0001f) {
+				tx = 0;
+				ty = 0;
+			} else {
+				tx = (x * pd - y * pb) / d - bone._ax;
+				ty = (y * pa - x * pc) / d - bone._ay;
+			}
 	}
 	rotationIK += MathUtil::atan2(ty, tx) * MathUtil::Rad_Deg;
 	if (bone._ascaleX < 0) rotationIK += 180;
@@ -140,7 +145,8 @@ void IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY
 	b = pp->_b;
 	c = pp->_c;
 	d = pp->_d;
-	id = 1 / (a * d - b * c);
+	id = a * d - b * c;
+	id = MathUtil::abs(id) <= 0.0001f ? 0 : 1 / id;
 	x = cwx - pp->_worldX;
 	y = cwy - pp->_worldY;
 	dx = (x * d - y * b) * id - px;

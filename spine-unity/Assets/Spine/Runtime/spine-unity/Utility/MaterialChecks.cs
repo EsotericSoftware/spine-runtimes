@@ -1,16 +1,16 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated September 24, 2021. Replaces all prior versions.
+ * Last updated July 28, 2023. Replaces all prior versions.
  *
- * Copyright (c) 2013-2021, Esoteric Software LLC
+ * Copyright (c) 2013-2023, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
  * conditions of Section 2 of the Spine Editor License Agreement:
  * http://esotericsoftware.com/spine-editor-license
  *
- * Otherwise, it is permitted to integrate the Spine Runtimes into software
- * or otherwise create derivative works of the Spine Runtimes (collectively,
+ * Otherwise, it is permitted to integrate the Spine Runtimes into software or
+ * otherwise create derivative works of the Spine Runtimes (collectively,
  * "Products"), provided that each user of the Products must obtain their own
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
@@ -23,8 +23,8 @@
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
  * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THE
+ * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 using System.Collections.Generic;
@@ -102,6 +102,10 @@ namespace Spine.Unity {
 			+ "a) disable 'CanvasGroup Compatible' at the Material or\n"
 			+ "b) enable 'Canvas Group Tint Black' at the SkeletonGraphic component under 'Advanced'.\n"
 			+ "You may want to duplicate the 'SkeletonGraphicTintBlack' material and change settings at the duplicate to not affect all instances.";
+		public static readonly string kCanvasGroupCompatiblePMAVertexMessage =
+			"\nWarning: 'CanvasGroup Compatible' is enabled at the Material and 'PMA Vertex Colors' is enabled at SkeletonGraphic!\n\nPlease\n"
+			+ "a) disable 'CanvasGroup Compatible' at the Material or\n"
+			+ "b) disable 'PMA Vertex Colors' at the SkeletonGraphic component under 'Advanced'.";
 
 		public static bool IsMaterialSetupProblematic (SkeletonRenderer renderer, ref string errorMessage) {
 			Material[] materials = renderer.GetComponent<Renderer>().sharedMaterials;
@@ -161,6 +165,10 @@ namespace Spine.Unity {
 					&& IsCanvasGroupCompatible(material)) {
 					isProblematic = true;
 					errorMessage += kCanvasGroupCompatibleDisabledMessage;
+				}
+				if (settings.pmaVertexColors == true && IsCanvasGroupCompatible(material)) {
+					isProblematic = true;
+					errorMessage += kCanvasGroupCompatiblePMAVertexMessage;
 				}
 			}
 			return isProblematic;

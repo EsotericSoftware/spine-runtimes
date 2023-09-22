@@ -1,16 +1,16 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated September 24, 2021. Replaces all prior versions.
+ * Last updated July 28, 2023. Replaces all prior versions.
  *
- * Copyright (c) 2013-2021, Esoteric Software LLC
+ * Copyright (c) 2013-2023, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
  * conditions of Section 2 of the Spine Editor License Agreement:
  * http://esotericsoftware.com/spine-editor-license
  *
- * Otherwise, it is permitted to integrate the Spine Runtimes into software
- * or otherwise create derivative works of the Spine Runtimes (collectively,
+ * Otherwise, it is permitted to integrate the Spine Runtimes into software or
+ * otherwise create derivative works of the Spine Runtimes (collectively,
  * "Products"), provided that each user of the Products must obtain their own
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
@@ -23,8 +23,8 @@
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
  * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THE
+ * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #if UNITY_2018_3 || UNITY_2019 || UNITY_2018_3_OR_NEWER
@@ -33,6 +33,10 @@
 
 #if UNITY_2018_2_OR_NEWER
 #define HAS_CULL_TRANSPARENT_MESH
+#endif
+
+#if UNITY_2017_2_OR_NEWER
+#define NEWPLAYMODECALLBACKS
 #endif
 
 using System.Reflection;
@@ -57,10 +61,11 @@ namespace Spine.Unity.Editor {
 		SerializedProperty additiveMaterial, multiplyMaterial, screenMaterial;
 		SerializedProperty skeletonDataAsset, initialSkinName;
 		SerializedProperty startingAnimation, startingLoop, timeScale, freeze,
-			updateTiming, updateWhenInvisible, unscaledTime, tintBlack;
+			updateTiming, updateWhenInvisible, unscaledTime, tintBlack, layoutScaleMode, editReferenceRect;
 		SerializedProperty initialFlipX, initialFlipY;
 		SerializedProperty meshGeneratorSettings;
-		SerializedProperty allowMultipleCanvasRenderers, separatorSlotNames, enableSeparatorSlots, updateSeparatorPartLocation;
+		SerializedProperty allowMultipleCanvasRenderers, separatorSlotNames, enableSeparatorSlots,
+			updateSeparatorPartLocation, updateSeparatorPartScale;
 		SerializedProperty raycastTarget, maskable;
 
 		readonly GUIContent UnscaledTimeLabel = new GUIContent("Unscaled Time",
@@ -76,8 +81,8 @@ namespace Spine.Unity.Editor {
 		protected bool TargetIsValid {
 			get {
 				if (serializedObject.isEditingMultipleObjects) {
-					foreach (UnityEngine.Object o in targets) {
-						SkeletonGraphic component = (SkeletonGraphic)o;
+					foreach (UnityEngine.Object c in targets) {
+						SkeletonGraphic component = (SkeletonGraphic)c;
 						if (!component.IsValid)
 							return false;
 					}
@@ -129,16 +134,49 @@ namespace Spine.Unity.Editor {
 			freeze = so.FindProperty("freeze");
 			updateTiming = so.FindProperty("updateTiming");
 			updateWhenInvisible = so.FindProperty("updateWhenInvisible");
+			layoutScaleMode = so.FindProperty("layoutScaleMode");
+			editReferenceRect = so.FindProperty("editReferenceRect");
 
 			meshGeneratorSettings = so.FindProperty("meshGenerator").FindPropertyRelative("settings");
 			meshGeneratorSettings.isExpanded = SkeletonRendererInspector.advancedFoldout;
 
 			allowMultipleCanvasRenderers = so.FindProperty("allowMultipleCanvasRenderers");
 			updateSeparatorPartLocation = so.FindProperty("updateSeparatorPartLocation");
+			updateSeparatorPartScale = so.FindProperty("updateSeparatorPartScale");
 			enableSeparatorSlots = so.FindProperty("enableSeparatorSlots");
 
 			separatorSlotNames = so.FindProperty("separatorSlotNames");
 			separatorSlotNames.isExpanded = true;
+
+#if NEWPLAYMODECALLBACKS
+			EditorApplication.playModeStateChanged += OnPlaymodeChanged;
+#else
+			EditorApplication.playmodeStateChanged += OnPlaymodeChanged;
+#endif
+		}
+
+		void OnDisable () {
+#if NEWPLAYMODECALLBACKS
+			EditorApplication.playModeStateChanged -= OnPlaymodeChanged;
+#else
+			EditorApplication.playmodeStateChanged -= OnPlaymodeChanged;
+#endif
+			DisableEditReferenceRectMode();
+		}
+
+#if NEWPLAYMODECALLBACKS
+		void OnPlaymodeChanged (PlayModeStateChange mode) {
+#else
+		void OnPlaymodeChanged () {
+#endif
+			DisableEditReferenceRectMode();
+		}
+
+		void DisableEditReferenceRectMode () {
+			foreach (UnityEngine.Object c in targets) {
+				SkeletonGraphic component = (SkeletonGraphic)c;
+				component.EditReferenceRect = false;
+			}
 		}
 
 		public override void OnInspectorGUI () {
@@ -268,7 +306,7 @@ namespace Spine.Unity.Editor {
 					}
 
 					EditorGUILayout.Space();
-					SeparatorsField(separatorSlotNames, enableSeparatorSlots, updateSeparatorPartLocation);
+					SeparatorsField(separatorSlotNames, enableSeparatorSlots, updateSeparatorPartLocation, updateSeparatorPartScale);
 				}
 			}
 
@@ -299,14 +337,29 @@ namespace Spine.Unity.Editor {
 			EditorGUILayout.PropertyField(raycastTarget);
 			if (maskable != null) EditorGUILayout.PropertyField(maskable);
 
-			EditorGUILayout.BeginHorizontal(GUILayout.Height(EditorGUIUtility.singleLineHeight + 5));
-			EditorGUILayout.PrefixLabel("Match RectTransform with Mesh");
-			if (GUILayout.Button("Match", EditorStyles.miniButton, GUILayout.Width(65f))) {
-				foreach (UnityEngine.Object skeletonGraphic in targets) {
-					MatchRectTransformWithBounds((SkeletonGraphic)skeletonGraphic);
-				}
+			EditorGUILayout.PropertyField(layoutScaleMode);
+
+			using (new EditorGUI.DisabledGroupScope(layoutScaleMode.intValue == 0)) {
+				EditorGUILayout.BeginHorizontal(GUILayout.Height(EditorGUIUtility.singleLineHeight + 5));
+				EditorGUILayout.PrefixLabel("Edit Layout Bounds");
+				editReferenceRect.boolValue = GUILayout.Toggle(editReferenceRect.boolValue,
+					EditorGUIUtility.IconContent("EditCollider"), EditorStyles.miniButton, GUILayout.Width(40f));
+				EditorGUILayout.EndHorizontal();
 			}
-			EditorGUILayout.EndHorizontal();
+			if (layoutScaleMode.intValue == 0) {
+				editReferenceRect.boolValue = false;
+			}
+
+			using (new EditorGUI.DisabledGroupScope(editReferenceRect.boolValue == false && layoutScaleMode.intValue != 0)) {
+				EditorGUILayout.BeginHorizontal(GUILayout.Height(EditorGUIUtility.singleLineHeight + 5));
+				EditorGUILayout.PrefixLabel("Match RectTransform with Mesh");
+				if (GUILayout.Button("Match", EditorStyles.miniButton, GUILayout.Width(65f))) {
+					foreach (UnityEngine.Object skeletonGraphic in targets) {
+						MatchRectTransformWithBounds((SkeletonGraphic)skeletonGraphic);
+					}
+				}
+				EditorGUILayout.EndHorizontal();
+			}
 
 			if (TargetIsValid && !isInspectingPrefab) {
 				EditorGUILayout.Space();
@@ -320,7 +373,6 @@ namespace Spine.Unity.Editor {
 			}
 
 			wasChanged |= EditorGUI.EndChangeCheck();
-
 			if (wasChanged) {
 				serializedObject.ApplyModifiedProperties();
 				slotsReapplyRequired = true;
@@ -346,6 +398,18 @@ namespace Spine.Unity.Editor {
 			return false;
 		}
 
+		protected void OnSceneGUI () {
+			SkeletonGraphic skeletonGraphic = (SkeletonGraphic)target;
+			if (skeletonGraphic.EditReferenceRect) {
+				SpineHandles.DrawRectTransformRect(skeletonGraphic, Color.gray);
+				SpineHandles.DrawReferenceRect(skeletonGraphic, Color.green);
+			} else {
+				SpineHandles.DrawReferenceRect(skeletonGraphic, Color.blue);
+			}
+
+
+		}
+
 		protected void AssignDefaultBlendModeMaterials () {
 			foreach (UnityEngine.Object target in targets) {
 				SkeletonGraphic skeletonGraphic = (SkeletonGraphic)target;
@@ -366,7 +430,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		public static void SeparatorsField (SerializedProperty separatorSlotNames, SerializedProperty enableSeparatorSlots,
-			SerializedProperty updateSeparatorPartLocation) {
+			SerializedProperty updateSeparatorPartLocation, SerializedProperty updateSeparatorPartScale) {
 
 			bool multi = separatorSlotNames.serializedObject.isEditingMultipleObjects;
 			bool hasTerminalSlot = false;
@@ -404,6 +468,7 @@ namespace Spine.Unity.Editor {
 
 				EditorGUILayout.PropertyField(enableSeparatorSlots, SpineInspectorUtility.TempContent("Enable Separation", tooltip: "Whether to enable separation at the above separator slots."));
 				EditorGUILayout.PropertyField(updateSeparatorPartLocation, SpineInspectorUtility.TempContent("Update Part Location", tooltip: "Update separator part GameObject location to match the position of the SkeletonGraphic. This can be helpful when re-parenting parts to a different GameObject."));
+				EditorGUILayout.PropertyField(updateSeparatorPartScale, SpineInspectorUtility.TempContent("Update Part Scale", tooltip: "Update separator part GameObject scale to match the scale (lossyScale) of the SkeletonGraphic. This can be helpful when re-parenting parts to a different GameObject."));
 			}
 		}
 

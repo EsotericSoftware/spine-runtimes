@@ -1,16 +1,16 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated September 24, 2021. Replaces all prior versions.
+ * Last updated July 28, 2023. Replaces all prior versions.
  *
- * Copyright (c) 2013-2021, Esoteric Software LLC
+ * Copyright (c) 2013-2023, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
  * conditions of Section 2 of the Spine Editor License Agreement:
  * http://esotericsoftware.com/spine-editor-license
  *
- * Otherwise, it is permitted to integrate the Spine Runtimes into software
- * or otherwise create derivative works of the Spine Runtimes (collectively,
+ * Otherwise, it is permitted to integrate the Spine Runtimes into software or
+ * otherwise create derivative works of the Spine Runtimes (collectively,
  * "Products"), provided that each user of the Products must obtain their own
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
@@ -23,11 +23,11 @@
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
  * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THE
+ * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Utils, Color, Skeleton, RegionAttachment, TextureAtlasRegion, BlendMode, MeshAttachment, Slot } from "@esotericsoftware/spine-core";
+import { Utils, Color, Skeleton, RegionAttachment, BlendMode, MeshAttachment, Slot, TextureRegion, TextureAtlasRegion } from "@esotericsoftware/spine-core";
 import { CanvasTexture } from "./CanvasTexture";
 
 const worldVertices = Utils.newFloatArray(8);
@@ -68,8 +68,9 @@ export class SkeletonRenderer {
 			let attachment = slot.getAttachment();
 			if (!(attachment instanceof RegionAttachment)) continue;
 			attachment.computeWorldVertices(slot, worldVertices, 0, 2);
-			let region: TextureAtlasRegion = <TextureAtlasRegion>attachment.region;
-			let image: HTMLImageElement = (<CanvasTexture>region.page.texture).getImage() as HTMLImageElement;
+			let region: TextureRegion = <TextureRegion>attachment.region;
+
+			let image: HTMLImageElement = (<CanvasTexture>region.texture).getImage() as HTMLImageElement;
 
 			let slotColor = slot.color;
 			let regionColor = attachment.color;
@@ -98,7 +99,7 @@ export class SkeletonRenderer {
 			ctx.translate(-w / 2, -h / 2);
 
 			ctx.globalAlpha = color.a;
-			ctx.drawImage(image, region.x, region.y, w, h, 0, 0, w, h);
+			ctx.drawImage(image, image.width * region.u, image.height * region.v, w, h, 0, 0, w, h);
 			if (this.debugRendering) ctx.strokeRect(0, 0, w, h);
 			ctx.restore();
 		}
@@ -124,14 +125,12 @@ export class SkeletonRenderer {
 				let regionAttachment = <RegionAttachment>attachment;
 				vertices = this.computeRegionVertices(slot, regionAttachment, false);
 				triangles = SkeletonRenderer.QUAD_TRIANGLES;
-				region = <TextureAtlasRegion>regionAttachment.region;
-				texture = (<CanvasTexture>region.page.texture).getImage() as HTMLImageElement;
+				texture = (<CanvasTexture>regionAttachment.region!.texture).getImage() as HTMLImageElement;
 			} else if (attachment instanceof MeshAttachment) {
 				let mesh = <MeshAttachment>attachment;
 				vertices = this.computeMeshVertices(slot, mesh, false);
 				triangles = mesh.triangles;
-				let region = (<TextureAtlasRegion>mesh.region!.renderObject);
-				texture = region.page.texture!.getImage() as HTMLImageElement;
+				texture = (<CanvasTexture>mesh.region!.texture).getImage() as HTMLImageElement;
 			} else
 				continue;
 

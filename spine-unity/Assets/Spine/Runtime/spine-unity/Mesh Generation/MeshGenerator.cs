@@ -1,16 +1,16 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated September 24, 2021. Replaces all prior versions.
+ * Last updated July 28, 2023. Replaces all prior versions.
  *
- * Copyright (c) 2013-2021, Esoteric Software LLC
+ * Copyright (c) 2013-2023, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
  * conditions of Section 2 of the Spine Editor License Agreement:
  * http://esotericsoftware.com/spine-editor-license
  *
- * Otherwise, it is permitted to integrate the Spine Runtimes into software
- * or otherwise create derivative works of the Spine Runtimes (collectively,
+ * Otherwise, it is permitted to integrate the Spine Runtimes into software or
+ * otherwise create derivative works of the Spine Runtimes (collectively,
  * "Products"), provided that each user of the Products must obtain their own
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
@@ -23,8 +23,8 @@
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
  * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THE
+ * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #if UNITY_2019_3_OR_NEWER
@@ -813,8 +813,8 @@ namespace Spine.Unity {
 									b2.x *= alpha;
 									b2.y = slot.Data.BlendMode == BlendMode.Additive ? 0 : alpha;
 								}
-								int meshVertexCount = meshAttachment.WorldVerticesLength;
-								for (int iii = 0; iii < meshVertexCount; iii += 2) {
+								int verticesArrayLength = meshAttachment.WorldVerticesLength;
+								for (int iii = 0; iii < verticesArrayLength; iii += 2) {
 									uv2i[vi] = rg;
 									uv3i[vi] = b2;
 									vi++;
@@ -886,8 +886,8 @@ namespace Spine.Unity {
 					} else { //if (settings.renderMeshes) {
 						MeshAttachment meshAttachment = attachment as MeshAttachment;
 						if (meshAttachment != null) {
-							int meshVertexCount = meshAttachment.WorldVerticesLength;
-							if (tempVerts.Length < meshVertexCount) this.tempVerts = tempVerts = new float[meshVertexCount];
+							int verticesArrayLength = meshAttachment.WorldVerticesLength;
+							if (tempVerts.Length < verticesArrayLength) this.tempVerts = tempVerts = new float[verticesArrayLength];
 							meshAttachment.ComputeWorldVertices(slot, tempVerts);
 
 							if (settings.pmaVertexColors) {
@@ -917,7 +917,7 @@ namespace Spine.Unity {
 								if (fy > bmax.y) bmax.y = fy;
 							}
 
-							for (int iii = 0; iii < meshVertexCount; iii += 2) {
+							for (int iii = 0; iii < verticesArrayLength; iii += 2) {
 								float x = tempVerts[iii], y = tempVerts[iii + 1];
 								vbi[vertexIndex].x = x; vbi[vertexIndex].y = y; vbi[vertexIndex].z = z;
 								cbi[vertexIndex] = color; ubi[vertexIndex].x = attachmentUVs[iii]; ubi[vertexIndex].y = attachmentUVs[iii + 1];

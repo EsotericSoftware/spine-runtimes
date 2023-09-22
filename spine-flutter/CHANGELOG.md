@@ -1,3 +1,15 @@
+# 4.1.5
+* Updated http dependency to 1.1.0
+
+# 4.1.4
+* Fixes for WASM/web builds.
+
+# 4.1.3
+* Fixes for Impeller.
+
+# 4.1.2
+* API documentation and minor cosmetics.
+
 # 4.1.1
 * Backport to 4.1 spine-runtimes branch.
 * Blend mode support.

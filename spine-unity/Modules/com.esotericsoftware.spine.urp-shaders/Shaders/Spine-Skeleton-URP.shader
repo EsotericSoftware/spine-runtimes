@@ -3,6 +3,10 @@ Shader "Universal Render Pipeline/Spine/Skeleton" {
 		_Cutoff("Shadow alpha cutoff", Range(0,1)) = 0.1
 		[NoScaleOffset] _MainTex("Main Texture", 2D) = "black" {}
 		[Toggle(_STRAIGHT_ALPHA_INPUT)] _StraightAlphaInput("Straight Alpha Texture", Int) = 0
+		[Toggle(_ZWRITE)] _ZWrite("Depth Write", Float) = 0.0
+		[MaterialToggle(_TINT_BLACK_ON)]  _TintBlack("Tint Black", Float) = 0
+		_Color("    Light Color", Color) = (1,1,1,1)
+		_Black("    Dark Color", Color) = (0,0,0,0)
 		[HideInInspector] _StencilRef("Stencil Reference", Float) = 1.0
 		[Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Comparison", Float) = 8 // Set to Always as default
 	}
@@ -26,7 +30,7 @@ Shader "Universal Render Pipeline/Spine/Skeleton" {
 			Name "Forward"
 			Tags{"LightMode" = "UniversalForward"}
 
-			ZWrite Off
+			ZWrite[_ZWrite]
 			Cull Off
 			Blend One OneMinusSrcAlpha
 
@@ -46,6 +50,7 @@ Shader "Universal Render Pipeline/Spine/Skeleton" {
 			//--------------------------------------
 			// Spine related keywords
 			#pragma shader_feature _ _STRAIGHT_ALPHA_INPUT
+			#pragma shader_feature _TINT_BLACK_ON
 			#pragma vertex vert
 			#pragma fragment frag
 

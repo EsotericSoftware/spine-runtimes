@@ -21,6 +21,7 @@
 		canvas = document.getElementById("canvas");
 		context = canvas.getContext("2d");
 		skeletonRenderer = new spine.SkeletonRenderer(context);
+		// skeletonRenderer.triangleRendering = true;
 
 		// Load the assets.
 		assetManager = new spine.AssetManager("https://esotericsoftware.com/files/examples/4.0/spineboy/export/");

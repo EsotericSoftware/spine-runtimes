@@ -38,8 +38,8 @@
   * `VertexAttachment::getDeformAttachment()` was renamed to `VertexAttachment::getTimelineAttachment()`.
   * `Skeleton::update()` has been removed.
   * `Skeleton::getTime()` has been removed.
-  * `VertexEffect` has been removed.  
-  
+  * `VertexEffect` has been removed.
+
 ### Cocos2d-x
 
 ### SFML
@@ -70,7 +70,7 @@
 
 ### Unity
 
-* **Officially supported Unity versions are 2017.1-2022.1**.
+* **Officially supported Unity versions are 2017.1-2023.1**.
 
 * **Additions**
   * `SpineAtlasAsset.CreateRuntimeInstance` methods now provide an optional `newCustomTextureLoader` parameter (defaults to `null`) which can be set to e.g. `(a) => new YourCustomTextureLoader(a)` to use your own `TextureLoader` subclass instead of `MaterialsTextureLoader`.
@@ -91,13 +91,29 @@
   * Added `SkeletonRootMotion` callback delegates `ProcessRootMotionOverride` and `PhysicsUpdateRootMotionOverride` to customize how root motion is applied. The new property `disableOnOverride` determines whether the callback will be issued in addition or instead of normally applying root motion. Added property `rootMotionScaleRotation` to allow scaling rotational root-motion to match e.g. a 90 degree rotation to a custom target angle.
   * Added outline shader parameter `Advanced - Opaque Alpha` which can be used to exclude problematic semi-transparent areas, which may receive an undesired large outline color overlay otherwise.
   * Added Spine Preferences setting `Prefabs` - `Optimize Preview Meshes`. When enabled, Spine prefab preview meshes will be removed in a pre-build step to reduce build size. This increases build time as all prefabs in the project will be processed. Defaults to false to not slow down builds substantially every time.
-  * Added Spine Preferences setting `Reload SkeletonData after Play`. When enabled, the shared `SkeletonData` of all skeletons in the active scene is reloaded (from the `.json` or `.skel.bytes` file) after exiting play-mode. You can disable this setting to avoid the reloading delay if you can ensure that there are no (accidental) modifications to the shared `SkeletonData` during play-mode (otherwise it would carry over its effect into subsequent plays). Defaults to `true` (the safe setting), which maintains existing behaviour. 
+  * Added Spine Preferences setting `Reload SkeletonData after Play`. When enabled, the shared `SkeletonData` of all skeletons in the active scene is reloaded (from the `.json` or `.skel.bytes` file) after exiting play-mode. You can disable this setting to avoid the reloading delay if you can ensure that there are no (accidental) modifications to the shared `SkeletonData` during play-mode (otherwise it would carry over its effect into subsequent plays). Defaults to `true` (the safe setting), which maintains existing behaviour.
   * Added `SkeletonAnimationMulti` sample component methods `SetActiveSkeleton(int index)` and getter property `SkeletonAnimations` to more easily apply changes at all SkeletonAnimation instances instead of only the active one.
   * PMA textures now have `sRGB (Color Texture)` disabled by default, the preset template `PMATexturePreset.preset` has been adjusted accordingly. As PMA textures are only allowed with Gamma color space, `sRGB (Color Texture)` shall be disabled to prevent border artifacts when mipmaps are enabled. In Gamma color space having this setting disabled has no drawbacks, only benefits.
   * `SkeletonRenderTexture` and `SkeletonGraphicRenderTexture` components now support automatic down-scaling when required size on screen exceeds `Max Render Texture Size`.
   * Added `Spine/SkeletonGraphic Fill` shader to provide functionality of `Spine/Skeleton Fill` shader for `SkeletonGraphic`.
   * Lit Spine URP shaders (`Universal Render Pipeline/Spine/Sprite` and `Universal Render Pipeline/Spine/Skeleton Lit`) now support `Forward+` rendering path as introduced by Unity 2022.2 and URP version 14.
- 
+  * `SkeletonGraphic` now supports automatic scaling based on its `RectTransform` bounds. Automatic scaling can be enabled by setting the added `Layout Scale Mode` Inspector property to either `Width Controls Height`, `Height Controls Width`, `FitInParent` or `EnvelopeParent`. It is set to `None` by default to keep previous behaviour and avoid breaking existing projects. To modify the reference layout bounds, hit the additional `Edit Layout Bounds` toggle button to switch into edit mode, adjust the bounds or hit `Match RectTransform with Mesh`, and hit the button again when done adjusting. The skeleton will now be scaled accordingly to fit the reference layout bounds to the object's `RectTransform`.
+  * Added previously missing unlit URP 2D shader variant, available under `Universal Render Pipeline/2D/Spine/Skeleton`.
+  * Added support for light cookies at `Universal Render Pipeline/Spine/Sprite` shader.
+  * Timeline extension package: An additional Spine preferences parameter `Timeline` - `Default Mix Duration` has been added, setting newly added `SpineAnimationStateClip` clips accordingly, defaults to false. This Spine preferences parameter can be enabled to default to the previous behaviour before this update.
+  * Tint Black: Added support for [Tint Black](http://en.esotericsoftware.com/spine-slots#Tint-black) functionality at all Spine URP shaders (2D and 3D shaders) and at all standard pipeline `Spine/Sprite` shaders. This feature can be enabled via the `Tint Black` material parameter in the Inspector. Note: The URP Sprite shaders provided in the Spine URP Shaders extension UPM package require the latest version of the spine-unity runtime (package version 4.1.12, 2023-05-31 or newer) to display the added material parameters in the Inspector GUI.
+  * Added `SkeletonGraphic.MeshScale` property to allow access to calculated mesh scale. `MeshScale` is based on (1) Canvas pixels per unit, and (2) `RectTransform` bounds when using `Layout Scale Mode` other than `None` at `SkeletonGraphic` which scales the skeleton mesh to fit the parent `RectTransform` bounds accordingly.
+  * Added `updateSeparatorPartScale` property to `SkeletonGraphic` to let render separator parts follow the scale (lossy scale) of the `SkeletonGraphic` GameObject. Defaults to `false` to maintain existing behaviour.
+  * Added experimental `EditorSkeletonPlayer` component to allow Editor playback of the initial animation set at `SkeletonAnimation` or `SkeletonGraphic` components. Add this component to your skeleton GameObject to enable the in-editor animation preview. Allows configurations for continuous playback when selected, deselected, and alternative single-frame preview by setting `Fixed Track Time` to any value other than 0. Limitations: At skeletons with variable material count the Inspector preview may be too unresponsive. It is then recommended to disable the `EditorSkeletonPlayer` component (at the top of the Inspector) to make it responsive again, then you can disable `Play When Selected` and re-enable the component to preview playback only when deselected.
+  * Added example component `RenderCombinedMesh` to render a combined mesh of multiple meshes or submeshes. This is required by `OutlineOnly` shaders to render a combined outline when using `SkeletonRenderSeparator` or multiple atlas pages which would normally lead to outlines around individual parts. To add a combined outline to your SkeletenRenderer:
+    1) Add a child GameObject and move it a bit back (e.g. position Z = 0.01).
+    2) Add a `RenderCombinedMesh` component, provided in the `Spine Examples/Scripts/Sample Components` directory.
+    3) Copy the original material, add *_Outline* to its name and set the shader to your outline-only shader like `Universal Render Pipeline/Spine/Outline/Skeleton-OutlineOnly` or `Spine/Outline/OutlineOnly-ZWrite`.
+    4) Assign this *_Outline* material at the new child GameObject's `MeshRenderer` component.
+    If you are using `SkeletonRenderSeparator` and need to enable and disable the `SkeletonRenderSeparator` component at runtime, you can increase the `RenderCombinedMesh` `Reference Renderers` array by one and assign the `SkeletonRenderer` itself at the last entry after the parts renderers. Disabled `MeshRenderer` components will be skipped when combining the final mesh, so the combined mesh is automatically filled from the desired active renderers.
+  * Timeline extension package: Added static `EditorEvent` callback to allow editor scripts to react to animation events outside of play-mode. Register to the events via `Spine.Unity.Playables.SpineAnimationStateMixerBehaviour.EditorEvent += YourCallback;`.
+  * URP Shaders: Added `Depth Write` property to shaders `Universal Render Pipeline/Spine/Skeleton` and `Universal Render Pipeline/Spine/Skeleton Lit`. Defaults to false to maintain existing behaviour.
+
 * **Breaking changes**
   * Made `SkeletonGraphic.unscaledTime` parameter protected, use the new property `UnscaledTime` instead.
   * `SkeletonGraphic` `OnRebuild` callback delegate is now issued after the skeleton has been initialized, before the `AnimationState` component is initialized. This makes behaviour consistent with `SkeletonAnimation` and `SkeletonMecanim` component behaviour. Use the new callback `OnAnimationRebuild` if you want to receive a callback after the `SkeletonGraphic` `AnimationState` has been initialized.
@@ -105,8 +121,10 @@
 * **Changes of default values**
 
 * **Deprecated**
+  * Shader macro `RETURN_UNLIT_IF_ADDITIVE_SLOT` in `spine-unity/Shaders/Sprite/CGIncludes/ShaderShared.cginc` has been deprecated and will be removed in spine-unity 4.2. Use RETURN_UNLIT_IF_ADDITIVE_SLOT_TINT instead.
 
 * **Restructuring (Non-Breaking)**
+  * Moved Spine URP Shaders Examples directory from the main package directory to Samples which can be installed via the Unity Package Manager. To import, select the `Spine Universal RP Shaders` package in the Package Manager window, expand `Samples` at the bottom and hit `Import` next to `Examples`. This follows the standard [samples guideline](https://docs.unity3d.com/Manual/cus-samples.html) and prevents warning messages about unexpectedly altered immutable assets.
 
 ### XNA/MonoGame
 * **Breaking change**: Removed spine-xna in favor of spine-monogame. See https://github.com/EsotericSoftware/spine-runtimes/issues/1949
@@ -143,10 +161,14 @@
   * `RegionAttachment#computeWorldVertices()` takes a `Slot` instead of a `Bone` as the first argument.
   * Removed `PlayerEditor`.
   * `VertexEffect` has been removed.
+  * Removed `RegionAttachment.rendererObject`.
+  * Renamed `TextureRegion.renderObject` to `TextureRegion.texture`.
+
 
 ### WebGL backend
   * `PolygonBatcher` can now disable culling automatically if the static variable `PolygonBatcher.disableCulling` is set to true.
   * Added `SpineCanvas`, a simpler way to render a scene via spine-webgl. See `spine-ts/spine-webgl/examples/barebones.html` and `spine-ts/spine-webgl/examples/mix-and-match.html`.
+  * Added `SpineCanavs.dispose()` to halt the updating and rendering of the canvas.
 
 ### Canvas backend
   * Improved example.
@@ -154,7 +176,7 @@
 ### Three.js backend
   * Added orbital controls to THREJS example.
   * `SkeletonMesh` takes an optional `SkeletonMeshMaterialCustomizer`, allowing modification of materials used by `SkeletonMesh`.
-  * Added `SkeletonMeshMaterial.alphaTest`, when > 0, alpha testing will be performed and fragments will not be written to the depth buffer, if depth writes are enabled. 
+  * Added `SkeletonMeshMaterial.alphaTest`, when > 0, alpha testing will be performed and fragments will not be written to the depth buffer, if depth writes are enabled.
 
 ### Player
   * Added `SpinePlayer.dispose()` to explicitely dispose of all resources the player holds on to.
@@ -528,6 +550,8 @@
 * Added mix-and-match example to demonstrate the new Skin API.
 * Materials on `SkeletonRendererComponent` are now blueprint read and writeable. This allows setting dynamic material instances at runtime.
 * Added `InitialSkin` property to `USpineWidget`. This allows previewing different skins in the UMG Designer. Initial skins can still be overridden via blueprint events such as `On Initialized`.
+* `USpineWidget` will now report its own desired size based on the setup pose dimensions of the skeleton. This is used when selecting `Size to content` on a `USpineWidget` in the designer.
+* Updated example project to UE 5.2.
 
 ## C# ##
 * **Breaking changes**

@@ -1,16 +1,16 @@
-﻿/******************************************************************************
-* Spine Runtimes License Agreement
- * Last updated January 1, 2020. Replaces all prior versions.
+/******************************************************************************
+ * Spine Runtimes License Agreement
+ * Last updated July 28, 2023. Replaces all prior versions.
  *
- * Copyright (c) 2013-2020, Esoteric Software LLC
+ * Copyright (c) 2013-2023, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
  * conditions of Section 2 of the Spine Editor License Agreement:
  * http://esotericsoftware.com/spine-editor-license
  *
- * Otherwise, it is permitted to integrate the Spine Runtimes into software
- * or otherwise create derivative works of the Spine Runtimes (collectively,
+ * Otherwise, it is permitted to integrate the Spine Runtimes into software or
+ * otherwise create derivative works of the Spine Runtimes (collectively,
  * "Products"), provided that each user of the Products must obtain their own
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
@@ -23,8 +23,8 @@
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
  * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THE
+ * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #ifndef SPINE_COMMON_H
@@ -56,6 +56,9 @@
 #define VARIANT_FLOAT Variant::REAL
 #define GDREGISTER_CLASS(x) ClassDB::register_class<x>()
 #define GEOMETRY2D Geometry
+#ifndef SNAME
+#define SNAME(m_arg) ([]() -> const StringName & { static StringName sname = _scs_create(m_arg); return sname; })()
+#endif
 #endif
 
 #define SPINE_CHECK(obj, ret)                      \
@@ -65,6 +68,7 @@
 	}
 
 #define SPINE_STRING(x) spine::String((x).utf8())
+#define SPINE_STRING_TMP(x) spine::String((x).utf8(), true, false)
 
 // Can't do template classes with Godot's object model :(
 class SpineObjectWrapper : public REFCOUNTED {
@@ -81,9 +85,9 @@ protected:
 	void spine_objects_invalidated() {
 		spine_object = nullptr;
 #if VERSION_MAJOR > 3
-		spine_owner->disconnect("_internal_spine_objects_invalidated", callable_mp(this, &SpineObjectWrapper::spine_objects_invalidated));
+		spine_owner->disconnect(SNAME("_internal_spine_objects_invalidated"), callable_mp(this, &SpineObjectWrapper::spine_objects_invalidated));
 #else
-		spine_owner->disconnect("_internal_spine_objects_invalidated", this, "_internal_spine_objects_invalidated");
+		spine_owner->disconnect(SNAME("_internal_spine_objects_invalidated"), this, SNAME("_internal_spine_objects_invalidated"));
 #endif
 	}
 
@@ -108,9 +112,9 @@ protected:
 		spine_owner = (Object *) _owner;
 		spine_object = _object;
 #if VERSION_MAJOR > 3
-		spine_owner->connect("_internal_spine_objects_invalidated", callable_mp(this, &SpineObjectWrapper::spine_objects_invalidated));
+		spine_owner->connect(SNAME("_internal_spine_objects_invalidated"), callable_mp(this, &SpineObjectWrapper::spine_objects_invalidated));
 #else
-		spine_owner->connect("_internal_spine_objects_invalidated", this, "_internal_spine_objects_invalidated");
+		spine_owner->connect(SNAME("_internal_spine_objects_invalidated"), this, SNAME("_internal_spine_objects_invalidated"));
 #endif
 	}
 

@@ -1,0 +1,5 @@
+vine.png
+	size: 128, 1024
+	filter: Linear, Linear
+vine
+	bounds: 2, 2, 68, 962

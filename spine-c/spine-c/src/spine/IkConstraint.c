@@ -1,16 +1,16 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated September 24, 2021. Replaces all prior versions.
+ * Last updated July 28, 2023. Replaces all prior versions.
  *
- * Copyright (c) 2013-2021, Esoteric Software LLC
+ * Copyright (c) 2013-2023, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
  * conditions of Section 2 of the Spine Editor License Agreement:
  * http://esotericsoftware.com/spine-editor-license
  *
- * Otherwise, it is permitted to integrate the Spine Runtimes into software
- * or otherwise create derivative works of the Spine Runtimes (collectively,
+ * Otherwise, it is permitted to integrate the Spine Runtimes into software or
+ * otherwise create derivative works of the Spine Runtimes (collectively,
  * "Products"), provided that each user of the Products must obtain their own
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
@@ -23,8 +23,8 @@
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
  * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THE
+ * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #include <float.h>
@@ -84,7 +84,7 @@ void spIkConstraint_apply1(spBone *bone, float targetX, float targetY, int /*boo
 			ty = targetY - bone->worldY;
 			break;
 		case SP_TRANSFORMMODE_NOROTATIONORREFLECTION: {
-			s = ABS(pa * pd - pb * pc) / (pa * pa + pc * pc);
+			s = ABS(pa * pd - pb * pc) / MAX(0.0001f, pa * pa + pc * pc);
 			sa = pa / bone->skeleton->scaleX;
 			sc = pc / bone->skeleton->scaleY;
 			pb = -sc * s * bone->skeleton->scaleX;
@@ -94,8 +94,13 @@ void spIkConstraint_apply1(spBone *bone, float targetX, float targetY, int /*boo
 		default: {
 			float x = targetX - p->worldX, y = targetY - p->worldY;
 			float d = pa * pd - pb * pc;
-			tx = (x * pd - y * pb) / d - bone->ax;
-			ty = (y * pa - x * pc) / d - bone->ay;
+			if (ABS(d) <= 0.0001f) {
+				tx = 0;
+				ty = 0;
+			} else {
+				tx = (x * pd - y * pb) / d - bone->ax;
+				ty = (y * pa - x * pc) / d - bone->ay;
+			}
 		}
 	}
 	rotationIK += ATAN2(ty, tx) * RAD_DEG;
@@ -177,7 +182,8 @@ void spIkConstraint_apply2(spBone *parent, spBone *child, float targetX, float t
 	b = pp->b;
 	c = pp->c;
 	d = pp->d;
-	id = 1 / (a * d - b * c);
+	id = a * d - b * c;
+	id = ABS(id) <= 0.0001f ? 0 : 1 / id;
 	x = cwx - pp->worldX;
 	y = cwy - pp->worldY;
 	dx = (x * d - y * b) * id - px;

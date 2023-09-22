@@ -1,16 +1,16 @@
 ///
 /// Spine Runtimes License Agreement
-/// Last updated September 24, 2021. Replaces all prior versions.
+/// Last updated July 28, 2023. Replaces all prior versions.
 ///
-/// Copyright (c) 2013-2021, Esoteric Software LLC
+/// Copyright (c) 2013-2023, Esoteric Software LLC
 ///
 /// Integration of the Spine Runtimes into software or otherwise creating
 /// derivative works of the Spine Runtimes is permitted under the terms and
 /// conditions of Section 2 of the Spine Editor License Agreement:
 /// http://esotericsoftware.com/spine-editor-license
 ///
-/// Otherwise, it is permitted to integrate the Spine Runtimes into software
-/// or otherwise create derivative works of the Spine Runtimes (collectively,
+/// Otherwise, it is permitted to integrate the Spine Runtimes into software or
+/// otherwise create derivative works of the Spine Runtimes (collectively,
 /// "Products"), provided that each user of the Products must obtain their own
 /// Spine Editor license and redistribution of the Products in any form must
 /// include this license and copyright notice.
@@ -23,8 +23,8 @@
 /// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
 /// BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
 /// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-/// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-/// THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THE
+/// SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///
 
 import 'dart:convert' as convert;
@@ -1597,8 +1597,8 @@ class RegionAttachment extends Attachment<spine_region_attachment> {
 
   Float32List getUVs() {
     final num = _bindings.spine_region_attachment_get_num_uvs(_attachment);
-    final offset = _bindings.spine_region_attachment_get_uvs(_attachment);
-    return offset.asTypedList(num);
+    final uvs = _bindings.spine_region_attachment_get_uvs(_attachment);
+    return uvs.asTypedList(num);
   }
 }
 
@@ -4071,7 +4071,21 @@ class RenderCommand {
       // is copied, so it doesn't matter that we free up the underlying memory on the next
       // render call. See the implementation of Vertices.raw() here:
       // https://github.com/flutter/engine/blob/5c60785b802ad2c8b8899608d949342d5c624952/lib/ui/painting/vertices.cc#L21
-      vertices = Vertices.raw(VertexMode.triangles, positions, textureCoordinates: uvs, colors: colors, indices: indices);
+      //
+      // Impeller is currently using a slow path when using vertex colors.
+      // See https://github.com/flutter/flutter/issues/127486
+      //
+      // We thus batch all meshes not only by atlas page and blend mode, but also vertex color.
+      // See spine_flutter.cpp, batch_commands().
+      //
+      // If the vertex color equals (1, 1, 1, 1), we do not store
+      // colors, which will trigger the fast path in Impeller. Otherwise we have to go the slow path, which
+      // has to render to an offscreen surface.
+      if (colors.isNotEmpty && colors[0] == -1) {
+        vertices = Vertices.raw(VertexMode.triangles, positions, textureCoordinates: uvs, indices: indices);
+      } else {
+        vertices = Vertices.raw(VertexMode.triangles, positions, textureCoordinates: uvs, colors: colors, indices: indices);
+      }
     } else {
       // On the web, rendering is done through CanvasKit, which requires copies of the native data.
       final positionsCopy = Float32List.fromList(positions);

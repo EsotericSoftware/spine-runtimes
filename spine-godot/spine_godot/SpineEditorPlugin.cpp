@@ -1,16 +1,16 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated January 1, 2020. Replaces all prior versions.
+ * Last updated July 28, 2023. Replaces all prior versions.
  *
- * Copyright (c) 2013-2020, Esoteric Software LLC
+ * Copyright (c) 2013-2023, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
  * conditions of Section 2 of the Spine Editor License Agreement:
  * http://esotericsoftware.com/spine-editor-license
  *
- * Otherwise, it is permitted to integrate the Spine Runtimes into software
- * or otherwise create derivative works of the Spine Runtimes (collectively,
+ * Otherwise, it is permitted to integrate the Spine Runtimes into software or
+ * otherwise create derivative works of the Spine Runtimes (collectively,
  * "Products"), provided that each user of the Products must obtain their own
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
@@ -23,8 +23,8 @@
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
  * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THE
+ * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #ifdef TOOLS_ENABLED
@@ -220,18 +220,18 @@ void SpineEditorPropertyAnimationMixes::update_property() {
 		hbox->add_child(delete_button);
 		delete_button->set_text("Remove");
 #if VERSION_MAJOR > 3
-		delete_button->connect("pressed", callable_mp(this, &SpineEditorPropertyAnimationMixes::delete_mix).bind(varray(i)));
+		delete_button->connect(SNAME("pressed"), callable_mp(this, &SpineEditorPropertyAnimationMixes::delete_mix).bind(varray(i)));
 #else
-		delete_button->connect("pressed", this, "delete_mix", varray(i));
+		delete_button->connect(SNAME("pressed"), this, SNAME("delete_mix"), varray(i));
 #endif
 	}
 
 	auto add_mix_button = memnew(Button);
 	add_mix_button->set_text("Add mix");
 #if VERSION_MAJOR > 3
-	add_mix_button->connect("pressed", callable_mp(this, &SpineEditorPropertyAnimationMixes::add_mix));
+	add_mix_button->connect(SNAME("pressed"), callable_mp(this, &SpineEditorPropertyAnimationMixes::add_mix));
 #else
-	add_mix_button->connect("pressed", this, "add_mix");
+	add_mix_button->connect(SNAME("pressed"), this, SNAME("add_mix"));
 #endif
 	container->add_child(add_mix_button);
 
@@ -312,9 +312,9 @@ void SpineEditorPropertyAnimationMix::update_property() {
 	from_enum->set_object_and_property(mix, "from");
 	from_enum->update_property();
 #if VERSION_MAJOR > 3
-	from_enum->connect("property_changed", callable_mp(this, &SpineEditorPropertyAnimationMix::data_changed));
+	from_enum->connect(SNAME("property_changed"), callable_mp(this, &SpineEditorPropertyAnimationMix::data_changed));
 #else
-	from_enum->connect("property_changed", this, "data_changed");
+	from_enum->connect(SNAME("property_changed"), this, SNAME("data_changed"));
 #endif
 	container->add_child(from_enum);
 
@@ -326,9 +326,9 @@ void SpineEditorPropertyAnimationMix::update_property() {
 	to_enum->set_object_and_property(mix, "to");
 	to_enum->update_property();
 #if VERSION_MAJOR > 3
-	to_enum->connect("property_changed", callable_mp(this, &SpineEditorPropertyAnimationMix::data_changed));
+	to_enum->connect(SNAME("property_changed"), callable_mp(this, &SpineEditorPropertyAnimationMix::data_changed));
 #else
-	to_enum->connect("property_changed", this, "data_changed");
+	to_enum->connect(SNAME("property_changed"), this, SNAME("data_changed"));
 #endif
 	container->add_child(to_enum);
 
@@ -340,9 +340,9 @@ void SpineEditorPropertyAnimationMix::update_property() {
 	mix_float->set_object_and_property(mix, "mix");
 	mix_float->update_property();
 #if VERSION_MAJOR > 3
-	mix_float->connect("property_changed", callable_mp(this, &SpineEditorPropertyAnimationMix::data_changed));
+	mix_float->connect(SNAME("property_changed"), callable_mp(this, &SpineEditorPropertyAnimationMix::data_changed));
 #else
-	mix_float->connect("property_changed", this, "data_changed");
+	mix_float->connect(SNAME("property_changed"), this, SNAME("data_changed"));
 #endif
 	container->add_child(mix_float);
 

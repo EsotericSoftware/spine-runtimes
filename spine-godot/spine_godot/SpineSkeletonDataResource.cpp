@@ -1,16 +1,16 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated January 1, 2020. Replaces all prior versions.
+ * Last updated July 28, 2023. Replaces all prior versions.
  *
- * Copyright (c) 2013-2020, Esoteric Software LLC
+ * Copyright (c) 2013-2023, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
  * conditions of Section 2 of the Spine Editor License Agreement:
  * http://esotericsoftware.com/spine-editor-license
  *
- * Otherwise, it is permitted to integrate the Spine Runtimes into software
- * or otherwise create derivative works of the Spine Runtimes (collectively,
+ * Otherwise, it is permitted to integrate the Spine Runtimes into software or
+ * otherwise create derivative works of the Spine Runtimes (collectively,
  * "Products"), provided that each user of the Products must obtain their own
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
@@ -23,8 +23,8 @@
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
  * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THE
+ * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #include "SpineSkeletonDataResource.h"
@@ -147,12 +147,12 @@ void SpineSkeletonDataResource::update_skeleton_data() {
 		animation_state_data = nullptr;
 	}
 
-	emit_signal("_internal_spine_objects_invalidated");
+	emit_signal(SNAME("_internal_spine_objects_invalidated"));
 
 	if (atlas_res.is_valid() && skeleton_file_res.is_valid()) {
 		load_resources(atlas_res->get_spine_atlas(), skeleton_file_res->get_json(), skeleton_file_res->get_binary());
 	}
-	emit_signal("skeleton_data_changed");
+	emit_signal(SNAME("skeleton_data_changed"));
 #ifdef TOOLS_ENABLED
 	NOTIFY_PROPERTY_LIST_CHANGED();
 #endif
@@ -295,7 +295,7 @@ void SpineSkeletonDataResource::update_mixes() {
 Ref<SpineAnimation> SpineSkeletonDataResource::find_animation(const String &animation_name) const {
 	SPINE_CHECK(skeleton_data, nullptr)
 	if (EMPTY(animation_name)) return nullptr;
-	auto animation = skeleton_data->findAnimation(SPINE_STRING(animation_name));
+	auto animation = skeleton_data->findAnimation(SPINE_STRING_TMP(animation_name));
 	if (!animation) return nullptr;
 	Ref<SpineAnimation> animation_ref(memnew(SpineAnimation));
 	animation_ref->set_spine_object(this, animation);
@@ -305,7 +305,7 @@ Ref<SpineAnimation> SpineSkeletonDataResource::find_animation(const String &anim
 Ref<SpineBoneData> SpineSkeletonDataResource::find_bone(const String &bone_name) const {
 	SPINE_CHECK(skeleton_data, nullptr)
 	if (EMPTY(bone_name)) return nullptr;
-	auto bone = skeleton_data->findBone(SPINE_STRING(bone_name));
+	auto bone = skeleton_data->findBone(SPINE_STRING_TMP(bone_name));
 	if (!bone) return nullptr;
 	Ref<SpineBoneData> bone_ref(memnew(SpineBoneData));
 	bone_ref->set_spine_object(this, bone);
@@ -315,7 +315,7 @@ Ref<SpineBoneData> SpineSkeletonDataResource::find_bone(const String &bone_name)
 Ref<SpineSlotData> SpineSkeletonDataResource::find_slot(const String &slot_name) const {
 	SPINE_CHECK(skeleton_data, nullptr)
 	if (EMPTY(slot_name)) return nullptr;
-	auto slot = skeleton_data->findSlot(SPINE_STRING(slot_name));
+	auto slot = skeleton_data->findSlot(SPINE_STRING_TMP(slot_name));
 	if (!slot) return nullptr;
 	Ref<SpineSlotData> slot_ref(memnew(SpineSlotData));
 	slot_ref->set_spine_object(this, slot);
@@ -325,7 +325,7 @@ Ref<SpineSlotData> SpineSkeletonDataResource::find_slot(const String &slot_name)
 Ref<SpineSkin> SpineSkeletonDataResource::find_skin(const String &skin_name) const {
 	SPINE_CHECK(skeleton_data, nullptr)
 	if (EMPTY(skin_name)) return nullptr;
-	auto skin = skeleton_data->findSkin(SPINE_STRING(skin_name));
+	auto skin = skeleton_data->findSkin(SPINE_STRING_TMP(skin_name));
 	if (!skin) return nullptr;
 	Ref<SpineSkin> skin_ref(memnew(SpineSkin));
 	skin_ref->set_spine_object(this, skin);
@@ -335,7 +335,7 @@ Ref<SpineSkin> SpineSkeletonDataResource::find_skin(const String &skin_name) con
 Ref<SpineEventData> SpineSkeletonDataResource::find_event(const String &event_data_name) const {
 	SPINE_CHECK(skeleton_data, nullptr)
 	if (EMPTY(event_data_name)) return nullptr;
-	auto event = skeleton_data->findEvent(SPINE_STRING(event_data_name));
+	auto event = skeleton_data->findEvent(SPINE_STRING_TMP(event_data_name));
 	if (!event) return nullptr;
 	Ref<SpineEventData> event_ref(memnew(SpineEventData));
 	event_ref->set_spine_object(this, event);
@@ -345,7 +345,7 @@ Ref<SpineEventData> SpineSkeletonDataResource::find_event(const String &event_da
 Ref<SpineIkConstraintData> SpineSkeletonDataResource::find_ik_constraint(const String &constraint_name) const {
 	SPINE_CHECK(skeleton_data, nullptr)
 	if (EMPTY(constraint_name)) return nullptr;
-	auto constraint = skeleton_data->findIkConstraint(SPINE_STRING(constraint_name));
+	auto constraint = skeleton_data->findIkConstraint(SPINE_STRING_TMP(constraint_name));
 	if (!constraint) return nullptr;
 	Ref<SpineIkConstraintData> constraint_ref(memnew(SpineIkConstraintData));
 	constraint_ref->set_spine_object(this, constraint);
@@ -355,7 +355,7 @@ Ref<SpineIkConstraintData> SpineSkeletonDataResource::find_ik_constraint(const S
 Ref<SpineTransformConstraintData> SpineSkeletonDataResource::find_transform_constraint(const String &constraint_name) const {
 	SPINE_CHECK(skeleton_data, nullptr)
 	if (EMPTY(constraint_name)) return nullptr;
-	auto constraint = skeleton_data->findTransformConstraint(SPINE_STRING(constraint_name));
+	auto constraint = skeleton_data->findTransformConstraint(SPINE_STRING_TMP(constraint_name));
 	if (!constraint) return nullptr;
 	Ref<SpineTransformConstraintData> constraint_ref(memnew(SpineTransformConstraintData));
 	constraint_ref->set_spine_object(this, constraint);
@@ -364,7 +364,7 @@ Ref<SpineTransformConstraintData> SpineSkeletonDataResource::find_transform_cons
 Ref<SpinePathConstraintData> SpineSkeletonDataResource::find_path_constraint(const String &constraint_name) const {
 	SPINE_CHECK(skeleton_data, nullptr)
 	if (EMPTY(constraint_name)) return nullptr;
-	auto constraint = skeleton_data->findPathConstraint(SPINE_STRING(constraint_name));
+	auto constraint = skeleton_data->findPathConstraint(SPINE_STRING_TMP(constraint_name));
 	if (constraint == nullptr) return nullptr;
 	Ref<SpinePathConstraintData> constraint_ref(memnew(SpinePathConstraintData));
 	constraint_ref->set_spine_object(this, constraint);

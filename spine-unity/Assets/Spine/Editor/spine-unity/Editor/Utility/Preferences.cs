@@ -1,16 +1,16 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated September 24, 2021. Replaces all prior versions.
+ * Last updated July 28, 2023. Replaces all prior versions.
  *
- * Copyright (c) 2013-2021, Esoteric Software LLC
+ * Copyright (c) 2013-2023, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
  * conditions of Section 2 of the Spine Editor License Agreement:
  * http://esotericsoftware.com/spine-editor-license
  *
- * Otherwise, it is permitted to integrate the Spine Runtimes into software
- * or otherwise create derivative works of the Spine Runtimes (collectively,
+ * Otherwise, it is permitted to integrate the Spine Runtimes into software or
+ * otherwise create derivative works of the Spine Runtimes (collectively,
  * "Products"), provided that each user of the Products must obtain their own
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
@@ -23,8 +23,8 @@
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
  * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THE
+ * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #pragma warning disable 0219
@@ -179,6 +179,8 @@ namespace Spine.Unity.Editor {
 			const string TIMELINE_USE_BLEND_DURATION_KEY = "SPINE_TIMELINE_USE_BLEND_DURATION_KEY";
 			public static bool timelineUseBlendDuration = SpinePreferences.DEFAULT_TIMELINE_USE_BLEND_DURATION;
 
+			const string TIMELINE_DEFAULT_MIX_DURATION_KEY = "SPINE_TIMELINE_DEFAULT_MIX_DURATION_KEY";
+			public static bool timelineDefaultMixDuration = SpinePreferences.DEFAULT_TIMELINE_DEFAULT_MIX_DURATION;
 
 			static bool preferencesLoaded = false;
 
@@ -203,6 +205,7 @@ namespace Spine.Unity.Editor {
 				textureImporterWarning = EditorPrefs.GetBool(TEXTUREIMPORTER_WARNING_KEY, SpinePreferences.DEFAULT_TEXTUREIMPORTER_WARNING);
 				componentMaterialWarning = EditorPrefs.GetBool(COMPONENTMATERIAL_WARNING_KEY, SpinePreferences.DEFAULT_COMPONENTMATERIAL_WARNING);
 				skeletonDataAssetNoFileError = EditorPrefs.GetBool(SKELETONDATA_ASSET_NO_FILE_ERROR_KEY, SpinePreferences.DEFAULT_SKELETONDATA_ASSET_NO_FILE_ERROR);
+				timelineDefaultMixDuration = EditorPrefs.GetBool(TIMELINE_DEFAULT_MIX_DURATION_KEY, SpinePreferences.DEFAULT_TIMELINE_DEFAULT_MIX_DURATION);
 				timelineUseBlendDuration = EditorPrefs.GetBool(TIMELINE_USE_BLEND_DURATION_KEY, SpinePreferences.DEFAULT_TIMELINE_USE_BLEND_DURATION);
 				handleScale = EditorPrefs.GetFloat(SCENE_ICONS_SCALE_KEY, SpinePreferences.DEFAULT_SCENE_ICONS_SCALE);
 				preferencesLoaded = true;
@@ -224,6 +227,7 @@ namespace Spine.Unity.Editor {
 				newPreferences.textureImporterWarning = EditorPrefs.GetBool(TEXTUREIMPORTER_WARNING_KEY, SpinePreferences.DEFAULT_TEXTUREIMPORTER_WARNING);
 				newPreferences.componentMaterialWarning = EditorPrefs.GetBool(COMPONENTMATERIAL_WARNING_KEY, SpinePreferences.DEFAULT_COMPONENTMATERIAL_WARNING);
 				newPreferences.skeletonDataAssetNoFileError = EditorPrefs.GetBool(SKELETONDATA_ASSET_NO_FILE_ERROR_KEY, SpinePreferences.DEFAULT_SKELETONDATA_ASSET_NO_FILE_ERROR);
+				newPreferences.timelineDefaultMixDuration = EditorPrefs.GetBool(TIMELINE_DEFAULT_MIX_DURATION_KEY, SpinePreferences.DEFAULT_TIMELINE_DEFAULT_MIX_DURATION);
 				newPreferences.timelineUseBlendDuration = EditorPrefs.GetBool(TIMELINE_USE_BLEND_DURATION_KEY, SpinePreferences.DEFAULT_TIMELINE_USE_BLEND_DURATION);
 				newPreferences.handleScale = EditorPrefs.GetFloat(SCENE_ICONS_SCALE_KEY, SpinePreferences.DEFAULT_SCENE_ICONS_SCALE);
 			}
@@ -243,6 +247,7 @@ namespace Spine.Unity.Editor {
 				EditorPrefs.SetBool(TEXTUREIMPORTER_WARNING_KEY, preferences.textureImporterWarning);
 				EditorPrefs.SetBool(COMPONENTMATERIAL_WARNING_KEY, preferences.componentMaterialWarning);
 				EditorPrefs.SetBool(SKELETONDATA_ASSET_NO_FILE_ERROR_KEY, preferences.skeletonDataAssetNoFileError);
+				EditorPrefs.SetBool(TIMELINE_DEFAULT_MIX_DURATION_KEY, preferences.timelineDefaultMixDuration);
 				EditorPrefs.SetBool(TIMELINE_USE_BLEND_DURATION_KEY, preferences.timelineUseBlendDuration);
 				EditorPrefs.SetFloat(SCENE_ICONS_SCALE_KEY, preferences.handleScale);
 			}
@@ -378,6 +383,7 @@ namespace Spine.Unity.Editor {
 				GUILayout.Space(20);
 				EditorGUILayout.LabelField("Timeline Extension", EditorStyles.boldLabel);
 				{
+					SpineEditorUtilities.BoolPrefsField(ref timelineDefaultMixDuration, TIMELINE_DEFAULT_MIX_DURATION_KEY, new GUIContent("Default Mix Duration", "When enabled, the clip uses the default mix duration by default, as specified at the SkeletonDataAsset."));
 					SpineEditorUtilities.BoolPrefsField(ref timelineUseBlendDuration, TIMELINE_USE_BLEND_DURATION_KEY, new GUIContent("Use Blend Duration", "When enabled, MixDuration will be synced with timeline clip transition duration 'Ease In Duration'."));
 				}
 			}

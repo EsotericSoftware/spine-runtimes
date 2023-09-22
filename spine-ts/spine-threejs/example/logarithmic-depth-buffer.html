@@ -1,0 +1,186 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>spine-threejs</title>
+    <script src="https://unpkg.com/three@0.141.0/build/three.js"></script>
+    <script src="../dist/iife/spine-threejs.js"></script>
+    <script src="./OrbitalControls.js"></script>
+  </head>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    body,
+    html {
+      height: 100%;
+    }
+
+    canvas {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+
+  <body>
+    <script>
+      (function () {
+        let scene, camera, renderer;
+        let geometry, material, mesh, skeletonMesh;
+        let assetManager;
+        let canvas;
+        let controls;
+        let lastFrameTime = Date.now() / 1000;
+
+        let baseUrl = "assets/";
+        let skeletonFile = "raptor-pro.json";
+        let atlasFile = skeletonFile
+          .replace("-pro", "")
+          .replace("-ess", "")
+          .replace(".json", ".atlas");
+        let animation = "walk";
+
+        function init() {
+          // create the THREE.JS camera, scene and renderer (WebGL)
+          let width = window.innerWidth,
+            height = window.innerHeight;
+          camera = new THREE.PerspectiveCamera(75, width / height, 1, 3000);
+          camera.position.y = 100;
+          camera.position.z = 400;
+          scene = new THREE.Scene();
+          renderer = new THREE.WebGLRenderer({ logarithmicDepthBuffer: true });
+          renderer.setSize(width, height);
+          document.body.appendChild(renderer.domElement);
+          canvas = renderer.domElement;
+          controls = new OrbitControls(camera, renderer.domElement);
+
+          // load the assets required to display the Raptor model
+          assetManager = new spine.AssetManager(baseUrl);
+          assetManager.loadText(skeletonFile);
+          assetManager.loadTextureAtlas(atlasFile);
+
+          requestAnimationFrame(load);
+        }
+
+        function load(name, scale) {
+          if (assetManager.isLoadingComplete()) {
+            // Add a box to the scene to which we attach the skeleton mesh
+            geometry = new THREE.BoxGeometry(200, 200, 200);
+            material = new THREE.MeshBasicMaterial({
+              color: 0xff0000,
+              wireframe: true,
+            });
+            mesh = new THREE.Mesh(geometry, material);
+            scene.add(mesh);
+
+            // Load the texture atlas using name.atlas and name.png from the AssetManager.
+            // The function passed to TextureAtlas is used to resolve relative paths.
+            atlas = assetManager.require(atlasFile);
+
+            // Create a AtlasAttachmentLoader that resolves region, mesh, boundingbox and path attachments
+            atlasLoader = new spine.AtlasAttachmentLoader(atlas);
+
+            // Create a SkeletonJson instance for parsing the .json file.
+            let skeletonJson = new spine.SkeletonJson(atlasLoader);
+
+            // Set the scale to apply during parsing, parse the file, and create a new skeleton.
+            skeletonJson.scale = 0.4;
+            let skeletonData = skeletonJson.readSkeletonData(
+              assetManager.require(skeletonFile)
+            );
+
+            // Create a SkeletonMesh from the data and attach it to the scene
+            // Provide a custom vertex/fragment shader pair that supports
+            // the logarithmic depth buffer.
+            // See https://discourse.threejs.org/t/shadermaterial-render-order-with-logarithmicdepthbuffer-is-wrong/49221/3
+            skeletonMesh = new spine.SkeletonMesh(
+              skeletonData,
+              (materialParameters) => {
+                materialParameters.vertexShader = `
+                attribute vec4 color;
+                varying vec2 vUv;
+                varying vec4 vColor;
+
+                #include <common>
+                #include <logdepthbuf_pars_vertex>
+
+                void main() {
+                  vUv = uv;
+                  vColor = color;
+                  gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0);
+                  #include <logdepthbuf_vertex>
+                }
+                `;
+
+                materialParameters.fragmentShader = `
+                uniform sampler2D map;
+                #ifdef USE_SPINE_ALPHATEST
+                uniform float alphaTest;
+                #endif
+                varying vec2 vUv;
+                varying vec4 vColor;
+
+                #include <common>
+                #include <logdepthbuf_pars_fragment>
+
+                void main(void) {
+                  #include <logdepthbuf_fragment>
+
+                  gl_FragColor = texture2D(map, vUv)*vColor;
+                  #ifdef USE_SPINE_ALPHATEST
+                  if (gl_FragColor.a < alphaTest) discard;
+                  #endif
+                }
+                `;
+              }
+            );
+            skeletonMesh.state.setAnimation(0, animation, true);
+            mesh.add(skeletonMesh);
+
+            requestAnimationFrame(render);
+          } else requestAnimationFrame(load);
+        }
+
+        let lastTime = Date.now();
+        function render() {
+          // calculate delta time for animation purposes
+          let now = Date.now() / 1000;
+          let delta = now - lastFrameTime;
+          lastFrameTime = now;
+
+          // resize canvas to use full page, adjust camera/renderer
+          resize();
+
+          // Update orbital controls
+          controls.update();
+
+          // update the animation
+          skeletonMesh.update(delta);
+
+          // render the scene
+          renderer.render(scene, camera);
+
+          requestAnimationFrame(render);
+        }
+
+        function resize() {
+          let w = window.innerWidth;
+          let h = window.innerHeight;
+          if (canvas.width != w || canvas.height != h) {
+            canvas.width = w;
+            canvas.height = h;
+          }
+
+          camera.aspect = w / h;
+          camera.updateProjectionMatrix();
+
+          renderer.setSize(w, h);
+        }
+
+        init();
+      })();
+    </script>
+  </body>
+</html>

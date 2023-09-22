@@ -1,16 +1,16 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated September 24, 2021. Replaces all prior versions.
+ * Last updated July 28, 2023. Replaces all prior versions.
  *
- * Copyright (c) 2013-2021, Esoteric Software LLC
+ * Copyright (c) 2013-2023, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
  * conditions of Section 2 of the Spine Editor License Agreement:
  * http://esotericsoftware.com/spine-editor-license
  *
- * Otherwise, it is permitted to integrate the Spine Runtimes into software
- * or otherwise create derivative works of the Spine Runtimes (collectively,
+ * Otherwise, it is permitted to integrate the Spine Runtimes into software or
+ * otherwise create derivative works of the Spine Runtimes (collectively,
  * "Products"), provided that each user of the Products must obtain their own
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
@@ -23,8 +23,8 @@
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
  * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THE
+ * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #ifndef SPINE_STRING_H
@@ -39,10 +39,11 @@
 namespace spine {
 	class SP_API String : public SpineObject {
 	public:
-		String() : _length(0), _buffer(NULL) {
+		String() : _length(0), _buffer(NULL), _tempowner(true) {
 		}
 
-		String(const char *chars, bool own = false) {
+		String(const char *chars, bool own = false, bool tofree = true) {
+			_tempowner = tofree;
 			if (!chars) {
 				_length = 0;
 				_buffer = NULL;
@@ -58,6 +59,7 @@ namespace spine {
 		}
 
 		String(const String &other) {
+			_tempowner = true;
 			if (!other._buffer) {
 				_length = 0;
 				_buffer = NULL;
@@ -82,7 +84,7 @@ namespace spine {
 
 		void own(const String &other) {
 			if (this == &other) return;
-			if (_buffer) {
+			if (_buffer && _tempowner) {
 				SpineExtension::free(_buffer, __FILE__, __LINE__);
 			}
 			_length = other._length;
@@ -93,7 +95,7 @@ namespace spine {
 
 		void own(const char *chars) {
 			if (_buffer == chars) return;
-			if (_buffer) {
+			if (_buffer && _tempowner) {
 				SpineExtension::free(_buffer, __FILE__, __LINE__);
 			}
 
@@ -113,7 +115,7 @@ namespace spine {
 
 		String &operator=(const String &other) {
 			if (this == &other) return *this;
-			if (_buffer) {
+			if (_buffer && _tempowner) {
 				SpineExtension::free(_buffer, __FILE__, __LINE__);
 			}
 			if (!other._buffer) {
@@ -129,7 +131,7 @@ namespace spine {
 
 		String &operator=(const char *chars) {
 			if (_buffer == chars) return *this;
-			if (_buffer) {
+			if (_buffer && _tempowner) {
 				SpineExtension::free(_buffer, __FILE__, __LINE__);
 			}
 			if (!chars) {
@@ -200,7 +202,7 @@ namespace spine {
 		}
 
 		~String() {
-			if (_buffer) {
+			if (_buffer && _tempowner) {
 				SpineExtension::free(_buffer, __FILE__, __LINE__);
 			}
 		}
@@ -208,6 +210,7 @@ namespace spine {
 	private:
 		mutable size_t _length;
 		mutable char *_buffer;
+		mutable bool _tempowner;
 	};
 }
 
