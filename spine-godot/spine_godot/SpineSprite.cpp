@@ -131,7 +131,7 @@ void SpineMesh2D::update_mesh(const Vector<Point2> &vertices,
 							  const Vector<int> &indices,
 							  SpineRendererObject *renderer_object) {
 #if VERSION_MAJOR > 3
-	if (!mesh.is_valid() || vertices.size() != num_vertices || indices.size() != num_indices || last_indices_id != indices_id) {
+	if (!mesh.is_valid() || vertices.size() != num_vertices || indices.size() != num_indices || indices_changed) {
 		if (mesh.is_valid()) {
 			RS::get_singleton()->free(mesh);
 		}
@@ -151,7 +151,7 @@ void SpineMesh2D::update_mesh(const Vector<Point2> &vertices,
 		num_indices = indices.size();
 		vertex_buffer = surface.vertex_data;
 		attribute_buffer = surface.attribute_data;
-		last_indices_id = indices_id;
+		indices_changed = false;
 	} else {
 		AABB aabb_new;
 		uint8_t *vertex_write_buffer = vertex_buffer.ptrw();
@@ -183,7 +183,7 @@ void SpineMesh2D::update_mesh(const Vector<Point2> &vertices,
 
 	RenderingServer::get_singleton()->canvas_item_add_mesh(this->get_canvas_item(), mesh, Transform2D(), Color(1, 1, 1, 1), renderer_object->canvas_texture->get_rid());
 #else
-	if (!mesh.is_valid() || vertices.size() != num_vertices || indices.size() != num_indices || last_indices_id != indices_id) {
+	if (!mesh.is_valid() || vertices.size() != num_vertices || indices.size() != num_indices || indices_changed) {
 		if (mesh.is_valid()) {
 			VS::get_singleton()->free(mesh);
 		}
@@ -203,7 +203,7 @@ void SpineMesh2D::update_mesh(const Vector<Point2> &vertices,
 		VS::get_singleton()->mesh_surface_make_offsets_from_format(mesh_surface_format, surface_vertex_len, surface_index_len, mesh_surface_offsets, mesh_stride);
 		num_vertices = vertices.size();
 		num_indices = indices.size();
-		last_indices_id = indices_id;
+		indices_changed = false;
 	} else {
 		AABB aabb_new;
 		PoolVector<uint8_t>::Write write_buffer = mesh_buffer.write();
@@ -769,15 +769,29 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> skeleton_ref) {
 			for (int j = 0; j < (int) num_vertices; j++) {
 				mesh_instance->colors.set(j, Color(tint.r, tint.g, tint.b, tint.a));
 			}
-			mesh_instance->indices.resize((int) indices->size());
-			for (int j = 0; j < (int) indices->size(); ++j) {
-				mesh_instance->indices.set(j, indices->buffer()[j]);
+
+			auto indices_changed = true;
+			if (mesh_instance->indices.size() == indices->size()) {
+				auto old_indices = mesh_instance->indices.ptr();
+				auto new_indices = indices->buffer();
+				for (int j = 0; j < (int) indices->size(); j++) {
+					if (old_indices[j] != new_indices[j]) {
+						indices_changed = true;
+						break;
+					}
+				}
+			}
+
+			if (indices_changed) {
+				mesh_instance->indices.resize((int) indices->size());
+				for (int j = 0; j < (int) indices->size(); ++j) {
+					mesh_instance->indices.set(j, indices->buffer()[j]);
+				}
+				mesh_instance->indices_changed = true;
 			}
 
 			mesh_instance->renderer_object = renderer_object;
-#if VERSION_MAJOR > 3
-			mesh_instance->indices_id = (uint64_t) indices;
-#endif
+
 			spine::BlendMode blend_mode = slot->getData().getBlendMode();
 			Ref<Material> custom_material;
 

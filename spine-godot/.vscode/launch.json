@@ -1,133 +1,113 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "type": "cppvsdbg",
-            "request": "launch",
-            "name": "debug scene v4",
-            "program": "godot/bin/godot.windows.editor.dev.x86_64.exe",
-            "args": [
-                "--path",
-                "example-v4",
-                "examples/01-helloworld/helloworld.tscn"
-            ],
-            "cwd": "${workspaceFolder}",
-            "preLaunchTask": "build-v4",
-            "linux": {
-                "type": "lldb",
-                "request": "launch",
-                "name": "debug scene v3",
-                "program": "${workspaceFolder}/godot/bin/godot.linux.editor.dev.x86_64",
-            },
-            "osx": {
-                "type": "lldb",
-                "request": "launch",
-                "name": "debug scene v3",
-                "program": "${workspaceFolder}/godot/bin/godot.macos.editor.dev.arm64",
-            },
-        },
-        {
-            "type": "cppvsdbg",
-            "request": "launch",
-            "name": "debug editor v4",
-            "program": "godot/bin/godot.windows.editor.dev.x86_64.exe",
-            "args": [
-                "-e",
-                "--path",
-                "example-v4",
-            ],
-            "cwd": "${workspaceFolder}",
-            "preLaunchTask": "build-v4",
-            "linux": {
-                "type": "lldb",
-                "request": "launch",
-                "name": "debug scene v3",
-                "program": "${workspaceFolder}/godot/bin/godot.linux.editor.dev.x86_64",
-            },
-            "osx": {
-                "type": "lldb",
-                "request": "launch",
-                "name": "debug scene v3",
-                "program": "${workspaceFolder}/godot/bin/godot.macos.editor.dev.arm64",
-            },
-        },
-        {
-            "type": "cppvsdbg",
-            "request": "launch",
-            "name": "debug editor v4 c#",
-            "program": "godot/bin/godot.windows.editor.dev.x86_64.mono.exe",
-            "args": [
-                "-e",
-                "--path",
-                "example-v4",
-            ],
-            "cwd": "${workspaceFolder}",
-            "preLaunchTask": "build-v4",
-            "linux": {
-                "type": "lldb",
-                "request": "launch",
-                "name": "debug editor v4",
-                "program": "${workspaceFolder}/godot/bin/godot.linux.editor.dev.x86_64",
-            },
-            "osx": {
-                "type": "lldb",
-                "request": "launch",
-                "name": "debug editor v4",
-                "program": "${workspaceFolder}/godot/bin/godot.macos.editor.dev.arm64.mono",
-            },
-        },
-        {
-            "type": "cppvsdbg",
-            "request": "launch",
-            "name": "debug scene v3",
-            "cwd": "${workspaceFolder}",
-            "program": "${workspaceFolder}/godot/bin/godot.windows.tools.64.exe",
-            "args": [
-                "--path",
-                "example",
-                "examples/01-helloworld/helloworld.tscn"
-            ],
-            "preLaunchTask": "build-v3",
-            "linux": {
-                "type": "cppdbg",
-                "request": "launch",
-                "name": "debug scene v3",
-                "program": "${workspaceFolder}/godot/bin/godot.linux.tools.64",
-            },
-            "osx": {
-                "type": "lldb",
-                "request": "launch",
-                "name": "debug scene v3",
-                "program": "${workspaceFolder}/godot/bin/godot.osx.tools.64",
-            },
-        },
-        {
-            "type": "cppvsdbg",
-            "request": "launch",
-            "name": "debug editor v3",
-            "program": "${workspaceFolder}/godot/bin/godot.windows.tools.64.exe",
-            "args": [
-                "-e",
-                "--path",
-                "example",
-            ],
-            "cwd": "${workspaceFolder}",
-            "preLaunchTask": "build-v3",
-            "linux": {
-                "type": "cppdbg",
-                "request": "launch",
-                "name": "debug editor v3",
-                "program": "${workspaceFolder}/godot/bin/godot.linux.tools.64",
-            },
-            "osx": {
-                "type": "lldb",
-                "request": "launch",
-                "name": "debug editor v3",
-                "program": "${workspaceFolder}/godot/bin/godot.osx.tools.64",
-            },
-        },
-    ]
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "cppvsdbg",
+      "request": "launch",
+      "name": "debug scene v4",
+      "program": "godot/bin/godot.windows.editor.dev.x86_64.exe",
+      "args": ["--path", "example-v4", "examples/07-slot-node/slot-node.tscn"],
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "build-v4",
+      "linux": {
+        "type": "lldb",
+        "request": "launch",
+        "name": "debug scene v3",
+        "program": "${workspaceFolder}/godot/bin/godot.linux.editor.dev.x86_64"
+      },
+      "osx": {
+        "type": "lldb",
+        "request": "launch",
+        "name": "debug scene v3",
+        "program": "${workspaceFolder}/godot/bin/godot.macos.editor.dev.arm64"
+      }
+    },
+    {
+      "type": "cppvsdbg",
+      "request": "launch",
+      "name": "debug editor v4",
+      "program": "godot/bin/godot.windows.editor.dev.x86_64.exe",
+      "args": ["-e", "--path", "example-v4"],
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "build-v4",
+      "linux": {
+        "type": "lldb",
+        "request": "launch",
+        "name": "debug scene v3",
+        "program": "${workspaceFolder}/godot/bin/godot.linux.editor.dev.x86_64"
+      },
+      "osx": {
+        "type": "lldb",
+        "request": "launch",
+        "name": "debug scene v3",
+        "program": "${workspaceFolder}/godot/bin/godot.macos.editor.dev.arm64"
+      }
+    },
+    {
+      "type": "cppvsdbg",
+      "request": "launch",
+      "name": "debug editor v4 c#",
+      "program": "godot/bin/godot.windows.editor.dev.x86_64.mono.exe",
+      "args": ["-e", "--path", "example-v4"],
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "build-v4",
+      "linux": {
+        "type": "lldb",
+        "request": "launch",
+        "name": "debug editor v4",
+        "program": "${workspaceFolder}/godot/bin/godot.linux.editor.dev.x86_64"
+      },
+      "osx": {
+        "type": "lldb",
+        "request": "launch",
+        "name": "debug editor v4",
+        "program": "${workspaceFolder}/godot/bin/godot.macos.editor.dev.arm64.mono"
+      }
+    },
+    {
+      "type": "cppvsdbg",
+      "request": "launch",
+      "name": "debug scene v3",
+      "cwd": "${workspaceFolder}",
+      "program": "${workspaceFolder}/godot/bin/godot.windows.tools.64.exe",
+      "args": ["--path", "example", "examples/01-helloworld/helloworld.tscn"],
+      "preLaunchTask": "build-v3",
+      "linux": {
+        "type": "cppdbg",
+        "request": "launch",
+        "name": "debug scene v3",
+        "program": "${workspaceFolder}/godot/bin/godot.linux.tools.64"
+      },
+      "osx": {
+        "type": "lldb",
+        "request": "launch",
+        "name": "debug scene v3",
+        "program": "${workspaceFolder}/godot/bin/godot.osx.tools.64"
+      }
+    },
+    {
+      "type": "cppvsdbg",
+      "request": "launch",
+      "name": "debug editor v3",
+      "program": "${workspaceFolder}/godot/bin/godot.windows.tools.64.exe",
+      "args": ["-e", "--path", "example"],
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "build-v3",
+      "linux": {
+        "type": "cppdbg",
+        "request": "launch",
+        "name": "debug editor v3",
+        "program": "${workspaceFolder}/godot/bin/godot.linux.tools.64"
+      },
+      "osx": {
+        "type": "lldb",
+        "request": "launch",
+        "name": "debug editor v3",
+        "program": "${workspaceFolder}/godot/bin/godot.osx.tools.64"
+      }
+    }
+  ]
 }
