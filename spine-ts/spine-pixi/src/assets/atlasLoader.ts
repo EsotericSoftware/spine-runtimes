@@ -29,7 +29,7 @@
 
 import { TextureAtlas } from "@esotericsoftware/spine-core";
 import { SpineTexture } from "../SpineTexture";
-import type { AssetExtension, LoadAsset, Loader } from "@pixi/assets";
+import type { AssetExtension, Loader } from "@pixi/assets";
 import { LoaderParserPriority, checkExtension } from "@pixi/assets";
 import type { Texture } from "@pixi/core";
 import { ExtensionType, settings, utils, BaseTexture, extensions } from "@pixi/core";
@@ -58,7 +58,7 @@ const spineTextureAtlasLoader: AssetExtension<RawAtlas | TextureAtlas, ISpineAtl
 			return txt;
 		},
 
-		testParse(asset: unknown, options: LoadAsset): Promise<boolean> {
+		testParse(asset: unknown, options: {src: string}): Promise<boolean> {
 			const isExtensionRight = checkExtension(options.src, ".atlas");
 			const isString = typeof asset === "string";
 
@@ -69,7 +69,7 @@ const spineTextureAtlasLoader: AssetExtension<RawAtlas | TextureAtlas, ISpineAtl
 			atlas.dispose();
 		},
 
-		async parse(asset: RawAtlas, options: LoadAsset, loader: Loader): Promise<TextureAtlas> {
+		async parse(asset: RawAtlas, options: {src: string, data: ISpineAtlasMetadata}, loader: Loader): Promise<TextureAtlas> {
 			const metadata: ISpineAtlasMetadata = options.data || {};
 			let basePath = utils.path.dirname(options.src);
 

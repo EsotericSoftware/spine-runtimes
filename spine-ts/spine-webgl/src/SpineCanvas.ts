@@ -32,12 +32,12 @@ import { TimeKeeper, AssetManager, ManagedWebGLRenderingContext, SceneRenderer, 
 /** An app running inside a {@link SpineCanvas}. The app life-cycle
  * is as follows:
  *
- * 1. `loadAssets()` is called. The app can queue assets for loading via {@link SpineCanvas#assetManager}.
+ * 1. `loadAssets()` is called. The app can queue assets for loading via {@link SpineCanvas.assetManager}.
  * 2. `initialize()` is called when all assets are loaded. The app can setup anything it needs to enter the main application logic.
  * 3. `update()` is called periodically at screen refresh rate. The app can update its state.
- * 4. `render()` is called periodically at screen refresh rate. The app can render its state via {@link SpineCanvas#renderer} or directly via the WebGL context in {@link SpineCanvas.gl}`
+ * 4. `render()` is called periodically at screen refresh rate. The app can render its state via {@link SpineCanvas.renderer} or directly via the WebGL context in {@link SpineCanvas.gl}.
  *
- * The `error()` method is called in case the assets could not be loaded.
+ * The `error()` method is called in case the assets could not be loaded. The `dispose()` method is called in case the canvas has been disposed via {@link SpineCanvas.dispose}.
  */
 export interface SpineCanvasApp {
 	loadAssets?(canvas: SpineCanvas): void;
@@ -45,6 +45,7 @@ export interface SpineCanvasApp {
 	update?(canvas: SpineCanvas, delta: number): void;
 	render?(canvas: SpineCanvas): void;
 	error?(canvas: SpineCanvas, errors: StringMap<string>): void;
+	dispose?(canvas: SpineCanvas): void;
 }
 
 /** Configuration passed to the {@link SpineCanvas} constructor */
@@ -75,8 +76,10 @@ export class SpineCanvas {
 	/** The input processor used to listen to mouse, touch, and keyboard events. */
 	readonly input: Input;
 
+	private disposed = false;
+
 	/** Constructs a new spine canvas, rendering to the provided HTML canvas. */
-	constructor (canvas: HTMLCanvasElement, config: SpineCanvasConfig) {
+	constructor (canvas: HTMLCanvasElement, private config: SpineCanvasConfig) {
 		if (!config.pathPrefix) config.pathPrefix = "";
 		if (!config.app) config.app = {
 			loadAssets: () => { },
@@ -84,6 +87,7 @@ export class SpineCanvas {
 			update: () => { },
 			render: () => { },
 			error: () => { },
+			dispose: () => { },
 		}
 		if (!config.webglConfig) config.webglConfig = { alpha: true };
 
@@ -97,6 +101,7 @@ export class SpineCanvas {
 		if (config.app.loadAssets) config.app.loadAssets(this);
 
 		let loop = () => {
+			if (this.disposed) return;
 			requestAnimationFrame(loop);
 			this.time.update();
 			if (config.app.update) config.app.update(this, this.time.delta);
@@ -104,6 +109,7 @@ export class SpineCanvas {
 		}
 
 		let waitForAssets = () => {
+			if (this.disposed) return;
 			if (this.assetManager.isLoadingComplete()) {
 				if (this.assetManager.hasErrors()) {
 					if (config.app.error) config.app.error(this, this.assetManager.getErrors());
@@ -122,5 +128,11 @@ export class SpineCanvas {
 	clear (r: number, g: number, b: number, a: number) {
 		this.gl.clearColor(r, g, b, a);
 		this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+	}
+
+	/** Disposes the app, so the update() and render() functions are no longer called. Calls the dispose() callback.*/
+	dispose() {
+		if (this.config.app.dispose) this.config.app.dispose(this);
+		this.disposed = true;
 	}
 }

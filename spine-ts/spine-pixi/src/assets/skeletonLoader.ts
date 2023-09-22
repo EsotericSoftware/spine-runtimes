@@ -27,7 +27,7 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import type { AssetExtension, LoadAsset } from "@pixi/assets";
+import type { AssetExtension } from "@pixi/assets";
 import { LoaderParserPriority, checkExtension } from "@pixi/assets";
 import { ExtensionType, settings, extensions } from "@pixi/core";
 
@@ -62,7 +62,7 @@ const spineLoaderExtension: AssetExtension<SkeletonJsonAsset | SkeletonBinaryAss
 
 			return buffer;
 		},
-		testParse(asset: unknown, options: LoadAsset): Promise<boolean> {
+		testParse(asset: unknown, options: {src: string}): Promise<boolean> {
 			const isJsonSpineModel = checkExtension(options.src, ".json") && isJson(asset);
 			const isBinarySpineModel = checkExtension(options.src, ".skel") && isBuffer(asset);
 
