@@ -73,7 +73,7 @@ Ref<SpineSlotData> SpineSlot::get_data() {
 Ref<SpineBone> SpineSlot::get_bone() {
 	SPINE_CHECK(get_spine_object(), nullptr)
 	if (_bone.is_valid()) {
-		return _data;
+		return _bone;
 	} else {
 		auto &bone = get_spine_object()->getBone();
 		Ref<SpineBone> bone_ref(memnew(SpineBone));
