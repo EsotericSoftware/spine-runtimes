@@ -143,7 +143,19 @@ class ExampleSelector extends StatelessWidget {
               );
             },
           ),
-          spacer
+          spacer,
+          ElevatedButton(
+            child: const Text('Flame: Dragon Example'),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute<void>(
+                  builder: (context) => SpineFlameGameWidget(DragonExample()),
+                ),
+              );
+            },
+          ),
+          spacer,
         ])));
   }
 }

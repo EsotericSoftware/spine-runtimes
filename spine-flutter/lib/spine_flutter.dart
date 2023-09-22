@@ -126,7 +126,7 @@ class Atlas {
     final numImagePaths = _bindings.spine_atlas_get_num_image_paths(atlas);
     for (int i = 0; i < numImagePaths; i++) {
       final Pointer<Utf8> atlasPageFile = _bindings.spine_atlas_get_image_path(atlas, i).cast();
-      final imagePath = path.join(atlasDir, atlasPageFile.toDartString());
+      final imagePath = atlasDir + "/" + atlasPageFile.toDartString();
       var imageData = await loadFile(imagePath);
       final Codec codec = await instantiateImageCodec(imageData);
       final FrameInfo frameInfo = await codec.getNextFrame();
