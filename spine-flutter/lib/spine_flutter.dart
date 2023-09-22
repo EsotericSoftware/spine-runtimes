@@ -807,7 +807,6 @@ class Bone {
   Vec2 worldToLocal(double worldX, double worldY) {
     final local = _bindings.spine_bone_world_to_local(_bone, worldX, worldY);
     final result = Vec2(_bindings.spine_vector_get_x(local), _bindings.spine_vector_get_y(local));
-    _allocator.free(local);
     return result;
   }
 
@@ -815,7 +814,6 @@ class Bone {
   Vec2 localToWorld(double localX, double localY) {
     final world = _bindings.spine_bone_local_to_world(_bone, localX, localY);
     final result = Vec2(_bindings.spine_vector_get_x(world), _bindings.spine_vector_get_y(world));
-    _allocator.free(world);
     return result;
   }
 
@@ -1871,7 +1869,6 @@ class PointAttachment extends Attachment<spine_point_attachment> {
   Vec2 computeWorldPosition(Bone bone) {
     final position = _bindings.spine_point_attachment_compute_world_position(_attachment, bone._bone);
     final result = Vec2(_bindings.spine_vector_get_x(position), _bindings.spine_vector_get_y(position));
-    _allocator.free(position);
     return result;
   }
 
@@ -2888,7 +2885,6 @@ class Skeleton {
     final nativeBounds = _bindings.spine_skeleton_get_bounds(_skeleton);
     final bounds = Bounds(_bindings.spine_bounds_get_x(nativeBounds), _bindings.spine_bounds_get_y(nativeBounds),
         _bindings.spine_bounds_get_width(nativeBounds), _bindings.spine_bounds_get_height(nativeBounds));
-    _allocator.free(nativeBounds);
     return bounds;
   }
 
