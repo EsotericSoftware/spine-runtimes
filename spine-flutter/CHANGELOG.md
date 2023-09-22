@@ -1,3 +1,9 @@
+# 4.2.16
+* Fixed bug in path handling on Windows.
+
+# 4.1.6
+* Fixed bug in path handling on Windows.
+
 # 4.2.15
 * Updated http dependency to 1.1.0
 
