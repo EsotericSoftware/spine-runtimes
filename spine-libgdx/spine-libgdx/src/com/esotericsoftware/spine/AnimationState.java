@@ -1132,6 +1132,13 @@ public class AnimationState {
 			return previous;
 		}
 
+		/** Returns true if this track entry has been applied at least once.
+		 * <p>
+		 * See {@link AnimationState#apply(Skeleton)}. */
+		public boolean wasApplied () {
+			return nextTrackLast != -1;
+		}
+
 		/** Returns true if at least one loop has been completed.
 		 * <p>
 		 * See {@link AnimationStateListener#complete(TrackEntry)}. */
