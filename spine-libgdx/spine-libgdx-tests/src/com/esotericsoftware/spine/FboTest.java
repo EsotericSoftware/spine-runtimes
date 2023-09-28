@@ -42,6 +42,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.ScreenUtils;
 
+import com.esotericsoftware.spine.Skeleton.Physics;
 import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
 
 /** Demonstrates rendering an animation to a frame buffer (FBO) and then rendering the FBO to the screen. */
@@ -75,7 +76,7 @@ public class FboTest extends ApplicationAdapter {
 		// Create a skeleton instance, set the position of its root bone, and update its world transform.
 		skeleton = new Skeleton(skeletonData);
 		skeleton.setPosition(250, 20);
-		skeleton.updateWorldTransform();
+		skeleton.updateWorldTransform(Physics.update);
 
 		// Create an FBO and a texture region with Y flipped.
 		fbo = new FrameBuffer(Pixmap.Format.RGBA8888, 512, 512, false);

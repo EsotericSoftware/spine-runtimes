@@ -39,6 +39,7 @@ import com.badlogic.gdx.utils.FloatArray;
 import com.esotericsoftware.spine.PathConstraintData.PositionMode;
 import com.esotericsoftware.spine.PathConstraintData.RotateMode;
 import com.esotericsoftware.spine.PathConstraintData.SpacingMode;
+import com.esotericsoftware.spine.Skeleton.Physics;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.PathAttachment;
 
@@ -101,7 +102,7 @@ public class PathConstraint implements Updatable {
 	}
 
 	/** Applies the constraint to the constrained bones. */
-	public void update () {
+	public void update (Physics physics) {
 		Attachment attachment = target.attachment;
 		if (!(attachment instanceof PathAttachment)) return;
 

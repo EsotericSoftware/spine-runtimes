@@ -34,6 +34,8 @@ import static com.esotericsoftware.spine.utils.SpineUtils.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
+import com.esotericsoftware.spine.Skeleton.Physics;
+
 /** Stores the current pose for a transform constraint. A transform constraint adjusts the world transform of the constrained
  * bones to match that of the target bone.
  * <p>
@@ -90,7 +92,7 @@ public class TransformConstraint implements Updatable {
 	}
 
 	/** Applies the constraint to the constrained bones. */
-	public void update () {
+	public void update (Physics physics) {
 		if (mixRotate == 0 && mixX == 0 && mixY == 0 && mixScaleX == 0 && mixScaleY == 0 && mixShearY == 0) return;
 		if (data.local) {
 			if (data.relative)

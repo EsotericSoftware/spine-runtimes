@@ -48,6 +48,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 import com.esotericsoftware.spine.Animation.MixBlend;
 import com.esotericsoftware.spine.Animation.MixDirection;
+import com.esotericsoftware.spine.Skeleton.Physics;
 import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
 
 /** Demonstrates rendering an animation to a frame buffer (FBO) and then writing each frame as a PNG. */
@@ -81,7 +82,7 @@ public class PngExportTest extends ApplicationAdapter {
 		// Create a skeleton instance, set the position of its root bone, and update its world transform.
 		skeleton = new Skeleton(skeletonData);
 		skeleton.setPosition(250, 20);
-		skeleton.updateWorldTransform();
+		skeleton.updateWorldTransform(Physics.update);
 
 		// Create an FBO and a texture region.
 		fbo = new FrameBuffer(Pixmap.Format.RGBA8888, 512, 512, false);
@@ -104,7 +105,7 @@ public class PngExportTest extends ApplicationAdapter {
 		int frame = 1;
 		while (time < animation.getDuration()) {
 			animation.apply(skeleton, time, time, false, null, 1, MixBlend.first, MixDirection.in);
-			skeleton.updateWorldTransform();
+			skeleton.updateWorldTransform(Physics.update);
 
 			// Render the skeleton to the FBO.
 			ScreenUtils.clear(0, 0, 0, 0);

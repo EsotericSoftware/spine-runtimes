@@ -36,6 +36,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 
+import com.esotericsoftware.spine.Skeleton.Physics;
 import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
 
 /** Demonstrates loading, animating, and rendering a skeleton.
@@ -86,7 +87,7 @@ public class SimpleTest1 extends ApplicationAdapter {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		state.apply(skeleton); // Poses skeleton using current animations. This sets the bones' local SRT.
-		skeleton.updateWorldTransform(); // Uses the bones' local SRT to compute their world SRT.
+		skeleton.updateWorldTransform(Physics.update); // Uses the bones' local SRT to compute their world SRT.
 
 		// Configure the camera, SpriteBatch, and SkeletonRendererDebug.
 		camera.update();

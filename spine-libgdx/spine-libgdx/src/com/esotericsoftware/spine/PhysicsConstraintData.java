@@ -36,9 +36,9 @@ import com.badlogic.gdx.utils.Array;
  * See <a href="http://esotericsoftware.com/spine-physics-constraints">Physics constraints</a> in the Spine User Guide. */
 public class PhysicsConstraintData extends ConstraintData {
 	final Array<BoneData> bones = new Array();
-	float speed = 1, mass = 1;
+	float speed = 1, mass = 1; // BOZO - Keep speed?
 	float strength, friction, damping, inertia, wind, gravity, mix;
-	boolean translate, rotate, scale, shear;
+	boolean x, y, rotate, scaleX, shearX;
 
 	public PhysicsConstraintData (String name) {
 		super(name);
@@ -113,12 +113,20 @@ public class PhysicsConstraintData extends ConstraintData {
 		this.gravity = gravity;
 	}
 
-	public boolean getTranslate () {
-		return translate;
+	public boolean getX () {
+		return x;
 	}
 
-	public void setTranslate (boolean translate) {
-		this.translate = translate;
+	public void setX (boolean x) {
+		this.x = x;
+	}
+
+	public boolean getY () {
+		return y;
+	}
+
+	public void setY (boolean y) {
+		this.y = y;
 	}
 
 	public boolean getRotate () {
@@ -129,20 +137,20 @@ public class PhysicsConstraintData extends ConstraintData {
 		this.rotate = rotate;
 	}
 
-	public boolean getScale () {
-		return scale;
+	public boolean getScaleX () {
+		return scaleX;
 	}
 
-	public void setScale (boolean scale) {
-		this.scale = scale;
+	public void setScaleX (boolean scaleX) {
+		this.scaleX = scaleX;
 	}
 
-	public boolean getShear () {
-		return shear;
+	public boolean getShearX () {
+		return shearX;
 	}
 
-	public void setShear (boolean shear) {
-		this.shear = shear;
+	public void setShearX (boolean shearX) {
+		this.shearX = shearX;
 	}
 
 	/** A percentage (0-1) that controls the mix between the constrained and unconstrained poses. */

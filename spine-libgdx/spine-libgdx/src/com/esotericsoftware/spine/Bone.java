@@ -38,6 +38,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Null;
 
 import com.esotericsoftware.spine.BoneData.TransformMode;
+import com.esotericsoftware.spine.Skeleton.Physics;
 
 /** Stores a bone's current pose.
  * <p>
@@ -82,7 +83,7 @@ public class Bone implements Updatable {
 	}
 
 	/** Computes the world transform using the parent bone and this bone's local applied transform. */
-	public void update () {
+	public void update (Physics physics) {
 		updateWorldTransform(ax, ay, arotation, ascaleX, ascaleY, ashearX, ashearY);
 	}
 
@@ -618,8 +619,8 @@ public class Bone implements Updatable {
 
 	/** Rotates the world transform the specified amount.
 	 * <p>
-	 * After changes are made to the world transform, {@link #updateAppliedTransform()} should be called and {@link #update()} will
-	 * need to be called on any child bones, recursively. */
+	 * After changes are made to the world transform, {@link #updateAppliedTransform()} should be called and
+	 * {@link #update(Physics)} will need to be called on any child bones, recursively. */
 	public void rotateWorld (float degrees) {
 		degrees *= degRad;
 		float sin = sin(degrees), cos = cos(degrees);

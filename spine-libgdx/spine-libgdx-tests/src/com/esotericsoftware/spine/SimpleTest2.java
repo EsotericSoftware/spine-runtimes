@@ -41,6 +41,7 @@ import com.badlogic.gdx.math.Vector3;
 
 import com.esotericsoftware.spine.AnimationState.AnimationStateListener;
 import com.esotericsoftware.spine.AnimationState.TrackEntry;
+import com.esotericsoftware.spine.Skeleton.Physics;
 import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
 import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
 
@@ -147,7 +148,7 @@ public class SimpleTest2 extends ApplicationAdapter {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		if (state.apply(skeleton)) // Poses skeleton using current animations. This sets the bones' local SRT.
-			skeleton.updateWorldTransform(); // Uses the bones' local SRT to compute their world SRT.
+			skeleton.updateWorldTransform(Physics.update); // Uses the bones' local SRT to compute their world SRT.
 
 		// Configure the camera, SpriteBatch, and SkeletonRendererDebug.
 		camera.update();

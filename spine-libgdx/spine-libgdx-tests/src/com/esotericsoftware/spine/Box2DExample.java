@@ -54,6 +54,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 import com.esotericsoftware.spine.Animation.MixBlend;
 import com.esotericsoftware.spine.Animation.MixDirection;
+import com.esotericsoftware.spine.Skeleton.Physics;
 import com.esotericsoftware.spine.attachments.AtlasAttachmentLoader;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.Sequence;
@@ -104,7 +105,7 @@ public class Box2DExample extends ApplicationAdapter {
 		skeleton = new Skeleton(skeletonData);
 		skeleton.x = -32;
 		skeleton.y = 1;
-		skeleton.updateWorldTransform();
+		skeleton.updateWorldTransform(Physics.update);
 
 		// See Box2DTest in libgdx for more detailed information about Box2D setup.
 		camera = new OrthographicCamera(48, 32);
@@ -150,7 +151,7 @@ public class Box2DExample extends ApplicationAdapter {
 
 		animation.apply(skeleton, time, time, true, events, 1, MixBlend.first, MixDirection.in);
 		skeleton.x += 8 * delta;
-		skeleton.updateWorldTransform();
+		skeleton.updateWorldTransform(Physics.update);
 		skeletonRenderer.draw(batch, skeleton);
 
 		batch.end();

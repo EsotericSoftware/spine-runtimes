@@ -39,6 +39,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 import com.esotericsoftware.spine.Animation.MixBlend;
 import com.esotericsoftware.spine.Animation.MixDirection;
+import com.esotericsoftware.spine.Skeleton.Physics;
 
 /** Demonstrates using the timeline API. See {@link SimpleTest1} for a higher level API using {@link AnimationState}.
  * <p>
@@ -79,7 +80,7 @@ public class TimelineApiTest extends ApplicationAdapter {
 		jumpAnimation = skeletonData.findAnimation("jump");
 
 		skeleton = new Skeleton(skeletonData);
-		skeleton.updateWorldTransform();
+		skeleton.updateWorldTransform(Physics.update);
 		skeleton.setPosition(-50, 20);
 	}
 
@@ -127,7 +128,7 @@ public class TimelineApiTest extends ApplicationAdapter {
 			walkAnimation.apply(skeleton, time, time, true, events, 1, MixBlend.first, MixDirection.in);
 		}
 
-		skeleton.updateWorldTransform();
+		skeleton.updateWorldTransform(Physics.update);
 
 		batch.begin();
 		renderer.draw(batch, skeleton);

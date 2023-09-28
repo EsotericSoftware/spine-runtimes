@@ -32,6 +32,8 @@ package com.esotericsoftware.spine;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Null;
 
+import com.esotericsoftware.spine.Skeleton.Physics;
+
 /** Stores the setup pose for a {@link Bone}. */
 public class BoneData {
 	final int index;
@@ -175,8 +177,8 @@ public class BoneData {
 		this.transformMode = transformMode;
 	}
 
-	/** When true, {@link Skeleton#updateWorldTransform()} only updates this bone if the {@link Skeleton#getSkin()} contains this
-	 * bone.
+	/** When true, {@link Skeleton#updateWorldTransform(Physics)} only updates this bone if the {@link Skeleton#getSkin()} contains
+	 * this bone.
 	 * <p>
 	 * See {@link Skin#getBones()}. */
 	public boolean getSkinRequired () {

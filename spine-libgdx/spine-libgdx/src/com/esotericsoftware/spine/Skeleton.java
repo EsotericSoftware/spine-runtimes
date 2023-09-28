@@ -384,7 +384,7 @@ public class Skeleton {
 	 * <p>
 	 * See <a href="http://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
 	 * Runtimes Guide. */
-	public void updateWorldTransform () {
+	public void updateWorldTransform (Physics physics) {
 		Object[] bones = this.bones.items;
 		for (int i = 0, n = this.bones.size; i < n; i++) {
 			Bone bone = (Bone)bones[i];
@@ -399,7 +399,7 @@ public class Skeleton {
 
 		Object[] updateCache = this.updateCache.items;
 		for (int i = 0, n = this.updateCache.size; i < n; i++)
-			((Updatable)updateCache[i]).update();
+			((Updatable)updateCache[i]).update(physics);
 	}
 
 	/** Temporarily sets the root bone as a child of the specified bone, then updates the world transform for each bone and applies
@@ -407,7 +407,7 @@ public class Skeleton {
 	 * <p>
 	 * See <a href="http://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
 	 * Runtimes Guide. */
-	public void updateWorldTransform (Bone parent) {
+	public void updateWorldTransform (Physics physics, Bone parent) {
 		if (parent == null) throw new IllegalArgumentException("parent cannot be null.");
 
 		Object[] bones = this.bones.items;
@@ -443,7 +443,7 @@ public class Skeleton {
 		Object[] updateCache = this.updateCache.items;
 		for (int i = 0, n = this.updateCache.size; i < n; i++) {
 			Updatable updatable = (Updatable)updateCache[i];
-			if (updatable != rootBone) updatable.update();
+			if (updatable != rootBone) updatable.update(physics);
 		}
 	}
 
@@ -832,5 +832,20 @@ public class Skeleton {
 
 	public String toString () {
 		return data.name != null ? data.name : super.toString();
+	}
+
+	/** Determines how physics and other non-deterministic updates are applied. */
+	static public enum Physics {
+		/** Physics are not updated or applied. */
+		none,
+
+		/** Physics are not updated but the pose from physics is applied. */
+		pose,
+
+		/** Physics are updated and the pose from physics is applied. */
+		update,
+
+		/** Physics are reset to the current pose. */
+		reset
 	}
 }

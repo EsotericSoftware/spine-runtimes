@@ -37,6 +37,8 @@ import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.ScreenUtils;
 
+import com.esotericsoftware.spine.Skeleton.Physics;
+
 /** Demonstrates applying multiple animations at once using {@link AnimationState} tracks. */
 public class SimpleTest3 extends ApplicationAdapter {
 	OrthographicCamera camera;
@@ -84,7 +86,7 @@ public class SimpleTest3 extends ApplicationAdapter {
 		ScreenUtils.clear(0, 0, 0, 0);
 
 		if (state.apply(skeleton)) // Poses skeleton using current animations. This sets the bones' local SRT.
-			skeleton.updateWorldTransform(); // Uses the bones' local SRT to compute their world SRT.
+			skeleton.updateWorldTransform(Physics.update); // Uses the bones' local SRT to compute their world SRT.
 
 		// Configure the camera, SpriteBatch, and SkeletonRendererDebug.
 		camera.update();

@@ -29,7 +29,15 @@
 
 package com.esotericsoftware.spine;
 
+import static com.badlogic.gdx.math.Interpolation.*;
+import static com.esotericsoftware.spine.utils.SpineUtils.*;
+
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+
+import com.esotericsoftware.spine.Skeleton.Physics;
+
+// BOZO - Physics steps/something in metrics view.
 
 /** Stores the current pose for a physics constraint. A physics constraint applies physics to bones.
  * <p>
@@ -37,6 +45,7 @@ import com.badlogic.gdx.utils.Array;
 public class PhysicsConstraint implements Updatable {
 	final PhysicsConstraintData data;
 	final Array<Bone> bones;
+	State[] states = {};
 	float mix;
 
 	boolean active;
@@ -66,19 +75,158 @@ public class PhysicsConstraint implements Updatable {
 		mix = constraint.mix;
 	}
 
-	public void setToSetupPose () {
+	/** Caches information about bones. Must be called if {@link PathConstraintData#getBones()} is modified. */
+	public void updateBones () {
+		int count = 0;
+		if (data.x) count = 1;
+		if (data.y) count++;
+		if (data.rotate) count++;
+		if (data.scaleX) count++;
+		if (data.shearX) count++;
+		count *= bones.size * 2;
+		if (states.length != count) {
+			states = new State[count];
+			for (int i = 0; i < count; i++)
+				states[i] = new State();
+		}
+	}
+
+	public void reset () {
 		remaining = 0;
 		lastTime = skeleton.time;
+
+		for (int i = 0, n = states.length; i < n; i++) {
+			State state = states[i];
+			state.last = false;
+			state.offset = 0;
+			state.velocity = 0;
+		}
+	}
+
+	public void setToSetupPose () {
+		reset();
 
 		PhysicsConstraintData data = this.data;
 		mix = data.mix;
 	}
 
 	/** Applies the constraint to the constrained bones. */
-	public void update () {
+	public void update (Physics physics) {
 		if (mix == 0) return;
 
-		// BOZO
+		data.rotate = true; // BOZO - Remove.
+		updateBones(); // BOZO - Remove.
+
+		Object[] bones = this.bones.items;
+		int boneCount = this.bones.size;
+
+		switch (physics) {
+		case none:
+			return;
+		case reset:
+			reset();
+			// Fall through.
+		case update:
+			for (int i = 0; i < boneCount; i++) {
+				Bone bone = (Bone)bones[i];
+				if (data.rotate) {
+					Vector2 tip = bone.localToWorld(new Vector2(bone.data.length, 0));
+					State state = states[i];
+					if (!state.last)
+						state.last = true;
+					else if (state.x != bone.worldX || state.y != bone.worldY) {
+						float angleToOldTip = new Vector2(state.tipx, state.tipy).sub(bone.worldX, bone.worldY).angleDeg()
+							+ state.offset - bone.getWorldRotationX();
+						angleToOldTip -= (16384 - (int)(16384.499999999996 - angleToOldTip / 360)) * 360;
+						state.offset = linear.apply(0, angleToOldTip, data.inertia);
+// if (angleToOldTip > 0.0001f || angleToOldTip < -0.0001f) //
+// System.out.println(angleToOldTip);
+// if (applyShear) {
+// if (rotationOffset > 0)
+// rotationOffset = Math.max(0, rotationOffset - shearOffset);
+// else
+// rotationOffset = Math.min(0, rotationOffset - shearOffset);
+// }
+					}
+					tip = bone.localToWorld(new Vector2(bone.data.length, 0));
+// if (bone.worldX!=271.64316f)
+// System.out.println(bone.worldX);
+					if (bone.worldY != 662.5888f) System.out.println(bone.worldY);
+// System.out.println(bone.worldY);
+					state.x = bone.worldX;
+					state.y = bone.worldY;
+					state.tipx = tip.x;
+					state.tipy = tip.y;
+				}
+				// BOZO - Update physics x, y, scaleX, shearX.
+			}
+		}
+
+		boolean angle = data.rotate || data.scaleX || data.shearX;
+
+		remaining += Math.max(skeleton.time - lastTime, 0);
+		lastTime = skeleton.time;
+
+		float step = 0.016f; // BOZO - Keep fixed step? Make it configurable?
+		float cos = 0, sin = 0;
+		while (remaining >= step) {
+			remaining -= step;
+
+			for (int i = 0; i < boneCount; i++) {
+				Bone bone = (Bone)bones[i];
+				if (angle) {
+					float r = bone.getWorldRotationX() * degRad;
+					cos = (float)Math.cos(r);
+					sin = (float)Math.sin(r);
+				}
+				if (data.rotate) {
+					State state = states[i];
+					// BOZO - Keep length affecting rotation? Calculate world length?
+					float windForce = bone.data.length * 0.5f * (-data.wind * sin - data.gravity * cos);
+					float springForce = state.offset * data.strength;
+					float frictionForce = data.friction * state.velocity;
+					state.velocity += (windForce - springForce - frictionForce) / data.mass;
+					state.offset += state.velocity * step;
+					state.velocity *= data.damping;
+				}
+			}
+		}
+
+		if (mix == 1) {
+			for (int i = 0; i < boneCount; i++) {
+				Bone bone = (Bone)bones[i];
+				if (angle) {
+					float r = bone.getWorldRotationX() * degRad;
+					cos = (float)Math.cos(r);
+					sin = (float)Math.sin(r);
+				}
+				if (data.rotate) {
+					State state = states[i];
+					bone.rotateWorld(state.offset);
+					bone.updateAppliedTransform();
+				}
+			}
+		} else {
+			// BOZO - PhysicsConstraint mix.
+		}
+	}
+
+	public void step () {
+		// BOZO - PhysicsConstraint#step.
+	}
+
+	/** The bones that will be modified by this physics constraint. */
+	public Array<Bone> getBones () {
+		return bones;
+	}
+
+	/** A percentage (0-1) that controls the mix between the constrained and unconstrained poses. */
+	public float getMix () {
+		return mix;
+	}
+
+	public void setMix (float mix) {
+		this.mix = mix;
 	}
 
 	public boolean isActive () {
@@ -92,5 +240,10 @@ public class PhysicsConstraint implements Updatable {
 
 	public String toString () {
 		return data.name;
+	}
+
+	static class State {
+		boolean last;
+		float x, y, tipx, tipy, offset, velocity;
 	}
 }

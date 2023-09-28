@@ -39,6 +39,8 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
 
+import com.esotericsoftware.spine.Skeleton.Physics;
+
 /** Boilerplate for basic skeleton rendering, used for various testing. */
 public class TestHarness extends ApplicationAdapter {
 // static String JSON = "coin/coin-pro.json";
@@ -79,7 +81,7 @@ public class TestHarness extends ApplicationAdapter {
 		// state.setAnimation(0, "rotate", false);
 		state.update(0);
 		state.apply(skeleton);
-		skeleton.updateWorldTransform();
+		skeleton.updateWorldTransform(Physics.update);
 	}
 
 	public void render () {
@@ -87,7 +89,7 @@ public class TestHarness extends ApplicationAdapter {
 			state.update(0.25f); // Update the animation time.
 		}
 		state.apply(skeleton); // Poses skeleton using current animations. This sets the bones' local SRT.
-		skeleton.updateWorldTransform(); // Uses the bones' local SRT to compute their world SRT.
+		skeleton.updateWorldTransform(Physics.update); // Uses the bones' local SRT to compute their world SRT.
 
 		ScreenUtils.clear(0, 0, 0, 0);
 

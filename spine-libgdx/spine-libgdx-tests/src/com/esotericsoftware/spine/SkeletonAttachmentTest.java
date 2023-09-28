@@ -37,6 +37,7 @@ import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.ScreenUtils;
 
+import com.esotericsoftware.spine.Skeleton.Physics;
 import com.esotericsoftware.spine.attachments.SkeletonAttachment;
 
 /** Demonstrates using {@link SkeletonAttachment} to use an entire skeleton as an attachment. */
@@ -93,11 +94,11 @@ public class SkeletonAttachmentTest extends ApplicationAdapter {
 	public void render () {
 		spineboyState.update(Gdx.graphics.getDeltaTime());
 		spineboyState.apply(spineboy);
-		spineboy.updateWorldTransform();
+		spineboy.updateWorldTransform(Physics.update);
 
 		goblinState.update(Gdx.graphics.getDeltaTime());
 		goblinState.apply(goblin);
-		goblin.updateWorldTransform(attachmentBone);
+		goblin.updateWorldTransform(Physics.update, attachmentBone);
 
 		ScreenUtils.clear(0, 0, 0, 0);
 

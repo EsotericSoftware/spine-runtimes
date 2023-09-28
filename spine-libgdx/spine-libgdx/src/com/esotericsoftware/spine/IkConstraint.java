@@ -33,6 +33,8 @@ import static com.esotericsoftware.spine.utils.SpineUtils.*;
 
 import com.badlogic.gdx.utils.Array;
 
+import com.esotericsoftware.spine.Skeleton.Physics;
+
 /** Stores the current pose for an IK constraint. An IK constraint adjusts the rotation of 1 or 2 constrained bones so the tip of
  * the last bone is as close to the target bone as possible.
  * <p>
@@ -87,7 +89,7 @@ public class IkConstraint implements Updatable {
 	}
 
 	/** Applies the constraint to the constrained bones. */
-	public void update () {
+	public void update (Physics physics) {
 		if (mix == 0) return;
 		Bone target = this.target;
 		Object[] bones = this.bones.items;
