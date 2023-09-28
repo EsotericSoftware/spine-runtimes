@@ -35,6 +35,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.BaseDrawable;
 import com.esotericsoftware.spine.AnimationState;
 import com.esotericsoftware.spine.Skeleton;
 import com.esotericsoftware.spine.SkeletonRenderer;
+import com.esotericsoftware.spine.Skeleton.Physics;
 
 /** A scene2d drawable that draws a skeleton. The animation state and skeleton must be updated each frame, or
  * {@link #update(float)} called each frame. */
@@ -64,10 +65,14 @@ public class SkeletonDrawable extends BaseDrawable {
 		int blendSrcAlpha = batch.getBlendSrcFuncAlpha(), blendDstAlpha = batch.getBlendDstFuncAlpha();
 
 		skeleton.setPosition(x, y);
-		skeleton.updateWorldTransform();
+		updateWorldTransform();
 		renderer.draw(batch, skeleton);
 
 		if (resetBlendFunction) batch.setBlendFunctionSeparate(blendSrc, blendDst, blendSrcAlpha, blendDstAlpha);
+	}
+
+	protected void updateWorldTransform () {
+		skeleton.updateWorldTransform(Physics.update);
 	}
 
 	public SkeletonRenderer getRenderer () {

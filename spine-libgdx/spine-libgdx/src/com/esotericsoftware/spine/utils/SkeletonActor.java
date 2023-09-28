@@ -35,6 +35,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 
 import com.esotericsoftware.spine.AnimationState;
 import com.esotericsoftware.spine.Skeleton;
+import com.esotericsoftware.spine.Skeleton.Physics;
 import com.esotericsoftware.spine.SkeletonRenderer;
 
 /** A scene2d actor that draws a skeleton. */
@@ -69,12 +70,16 @@ public class SkeletonActor extends Actor {
 		skeleton.getColor().a *= parentAlpha;
 
 		skeleton.setPosition(getX(), getY());
-		skeleton.updateWorldTransform();
+		updateWorldTransform();
 		renderer.draw(batch, skeleton);
 
 		if (resetBlendFunction) batch.setBlendFunctionSeparate(blendSrc, blendDst, blendSrcAlpha, blendDstAlpha);
 
 		color.a = oldAlpha;
+	}
+
+	protected void updateWorldTransform () {
+		skeleton.updateWorldTransform(Physics.update);
 	}
 
 	public SkeletonRenderer getRenderer () {
