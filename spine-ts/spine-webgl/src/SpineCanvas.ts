@@ -87,7 +87,7 @@ export class SpineCanvas {
 			update: () => { },
 			render: () => { },
 			error: () => { },
-			dispose: () => { },
+			dispose: () => { },
 		}
 		if (!config.webglConfig) config.webglConfig = { alpha: true };
 
@@ -131,7 +131,7 @@ export class SpineCanvas {
 	}
 
 	/** Disposes the app, so the update() and render() functions are no longer called. Calls the dispose() callback.*/
-	dispose() {
+	dispose () {
 		if (this.config.app.dispose) this.config.app.dispose(this);
 		this.disposed = true;
 	}
