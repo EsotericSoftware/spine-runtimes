@@ -1,16 +1,16 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated September 24, 2021. Replaces all prior versions.
+ * Last updated July 28, 2023. Replaces all prior versions.
  *
- * Copyright (c) 2013-2021, Esoteric Software LLC
+ * Copyright (c) 2013-2023, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
  * conditions of Section 2 of the Spine Editor License Agreement:
  * http://esotericsoftware.com/spine-editor-license
  *
- * Otherwise, it is permitted to integrate the Spine Runtimes into software
- * or otherwise create derivative works of the Spine Runtimes (collectively,
+ * Otherwise, it is permitted to integrate the Spine Runtimes into software or
+ * otherwise create derivative works of the Spine Runtimes (collectively,
  * "Products"), provided that each user of the Products must obtain their own
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
@@ -23,20 +23,18 @@
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
  * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THE
+ * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 package com.esotericsoftware.spine;
-
-import com.badlogic.gdx.utils.Array;
 
 /** Stores the setup pose for a {@link PhysicsConstraint}.
  * <p>
  * See <a href="http://esotericsoftware.com/spine-physics-constraints">Physics constraints</a> in the Spine User Guide. */
 public class PhysicsConstraintData extends ConstraintData {
-	final Array<BoneData> bones = new Array();
-	float speed = 1, mass = 1; // BOZO - Keep speed?
+	BoneData bone;
+	float step = 1 / 60f, mass = 1;
 	float strength, friction, damping, inertia, wind, gravity, mix;
 	boolean x, y, rotate, scaleX, shearX;
 
@@ -44,17 +42,21 @@ public class PhysicsConstraintData extends ConstraintData {
 		super(name);
 	}
 
-	/** The bones that are constrained by this physics constraint. */
-	public Array<BoneData> getBones () {
-		return bones;
+	/** The bone constrained by this physics constraint. */
+	public BoneData getBone () {
+		return bone;
 	}
 
-	public float getSpeed () {
-		return speed;
+	public void setBone (BoneData bone) {
+		this.bone = bone;
 	}
 
-	public void setSpeed (float speed) {
-		this.speed = speed;
+	public float getStep () {
+		return step;
+	}
+
+	public void setStep (float step) {
+		this.step = step;
 	}
 
 	public float getMass () {

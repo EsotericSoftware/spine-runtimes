@@ -341,25 +341,16 @@ public class Skeleton {
 		constraint.active = !constraint.data.skinRequired || (skin != null && skin.constraints.contains(constraint.data, true));
 		if (!constraint.active) return;
 
-		Object[] constrained = constraint.bones.items;
-		int boneCount = constraint.bones.size;
-		for (int i = 0; i < boneCount; i++) {
-			if (((Bone)constrained[i]).active) {
-				constraint.active = true;
-				break;
-			}
-		}
+		Bone bone = constraint.bone;
+		constraint.active = bone.active;
 		if (!constraint.active) return;
 
-		for (int i = 0; i < boneCount; i++)
-			sortBone((Bone)constrained[i]);
+		sortBone(bone);
 
 		updateCache.add(constraint);
 
-		for (int i = 0; i < boneCount; i++)
-			sortReset(((Bone)constrained[i]).children);
-		for (int i = 0; i < boneCount; i++)
-			((Bone)constrained[i]).sorted = true;
+		sortReset(bone.children);
+		bone.sorted = true;
 	}
 
 	private void sortBone (Bone bone) {
@@ -839,13 +830,13 @@ public class Skeleton {
 		/** Physics are not updated or applied. */
 		none,
 
-		/** Physics are not updated but the pose from physics is applied. */
-		pose,
+		/** Physics are reset to the current pose. */
+		reset,
 
 		/** Physics are updated and the pose from physics is applied. */
 		update,
 
-		/** Physics are reset to the current pose. */
-		reset
+		/** Physics are not updated but the pose from physics is applied. */
+		pose
 	}
 }
