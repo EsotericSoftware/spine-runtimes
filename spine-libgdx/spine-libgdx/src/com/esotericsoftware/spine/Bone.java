@@ -241,8 +241,6 @@ public class Bone implements Updatable {
 		return children;
 	}
 
-	/** Returns false when the bone has not been computed because {@link BoneData#getSkinRequired()} is true and the
-	 * {@link Skeleton#getSkin() active skin} does not {@link Skin#getBones() contain} this bone. */
 	public boolean isActive () {
 		return active;
 	}

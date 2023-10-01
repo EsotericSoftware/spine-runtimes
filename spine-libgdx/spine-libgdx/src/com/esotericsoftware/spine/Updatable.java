@@ -36,9 +36,12 @@ public interface Updatable {
 	/** @param physics Determines how physics and other non-deterministic updates are applied. */
 	public void update (Physics physics);
 
-	/** Returns false when this item has not been updated because a skin is required and the {@link Skeleton#getSkin() active skin}
-	 * does not contain this item.
+	/** Returns false when this item won't be updated by
+	 * {@link Skeleton#updateWorldTransform(com.esotericsoftware.spine.Skeleton.Physics)} because a skin is required and the
+	 * {@link Skeleton#getSkin() active skin} does not contain this item.
 	 * @see Skin#getBones()
-	 * @see Skin#getConstraints() */
+	 * @see Skin#getConstraints()
+	 * @see BoneData#getSkinRequired()
+	 * @see ConstraintData#getSkinRequired() */
 	public boolean isActive ();
 }
