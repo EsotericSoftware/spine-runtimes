@@ -121,12 +121,12 @@ public class PhysicsConstraint implements Updatable {
 			while (remaining >= step) {
 				remaining -= step;
 				if (x) {
-					xVelocity += (wind - xOffset * strength - friction * xVelocity) * mass;
+					xVelocity += (wind * 500 - xOffset * strength - xVelocity * friction) * mass;
 					xOffset += xVelocity * step;
 					xVelocity *= damping;
 				}
 				if (y) {
-					yVelocity += (-gravity - yOffset * strength - friction * yVelocity) * mass;
+					yVelocity += (-gravity * 500 - yOffset * strength - yVelocity * friction) * mass;
 					yOffset += yVelocity * step;
 					yVelocity *= damping;
 				}
@@ -134,17 +134,17 @@ public class PhysicsConstraint implements Updatable {
 					float r = br + rotateOffset * degRad;
 					cos = cos(r);
 					sin = sin(r);
-				}
-				if (rotateOrShear) {
-					rotateVelocity += (length * (-wind * sin - gravity * cos) - rotateOffset * strength - friction * rotateVelocity)
-						* mass;
-					rotateOffset += rotateVelocity * step;
-					rotateVelocity *= damping;
-				}
-				if (scaleX) {
-					scaleVelocity += (wind * cos - gravity * sin - scaleOffset * strength - friction * scaleVelocity) * mass;
-					scaleOffset += scaleVelocity * step;
-					scaleVelocity *= damping;
+					if (rotateOrShear) {
+						rotateVelocity += (length * (-wind * sin - gravity * cos) - rotateOffset * strength - rotateVelocity * friction)
+							* mass;
+						rotateOffset += rotateVelocity * step;
+						rotateVelocity *= damping;
+					}
+					if (scaleX) {
+						scaleVelocity += (wind * cos - gravity * sin - scaleOffset * strength - scaleVelocity * friction) * mass;
+						scaleOffset += scaleVelocity * step;
+						scaleVelocity *= damping;
+					}
 				}
 			}
 
@@ -192,16 +192,12 @@ public class PhysicsConstraint implements Updatable {
 
 		if (rotateOrShear) {
 			float r = rotateOffset * mix;
+			if (data.rotate) bone.rotateWorld(r);
 			if (data.shearX) {
-				if (data.rotate) {
-					r *= 0.5f;
-					bone.rotateWorld(r);
-				}
-				float t = (float)Math.tan(r * degRad);
+				float t = (float)Math.tan(r * 0.5f * degRad);
 				bone.b += bone.a * t;
 				bone.d += bone.c * t;
-			} else
-				bone.rotateWorld(r);
+			}
 		}
 		if (scaleX) {
 			float s = 1 + scaleOffset * mix;
