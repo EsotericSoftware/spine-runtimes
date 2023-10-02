@@ -109,6 +109,13 @@ namespace Spine.Unity {
 			UpdateAnimation();
 		}
 
+		/// <summary>Manual animation update. Required when <c>updateTiming</c> is set to <c>ManualUpdate</c>.</summary>
+		/// <param name="deltaTime">Ignored parameter.</param>
+		public virtual void Update (float deltaTime) {
+			if (!valid) return;
+			UpdateAnimation();
+		}
+
 		protected void UpdateAnimation () {
 			wasUpdatedAfterInit = true;
 
