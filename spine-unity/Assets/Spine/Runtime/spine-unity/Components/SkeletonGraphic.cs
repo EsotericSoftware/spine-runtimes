@@ -415,6 +415,9 @@ namespace Spine.Unity {
 			if (freeze) return;
 			if (updateMode != UpdateMode.FullUpdate) return;
 
+			if (updateTiming == UpdateTiming.InLateUpdate)
+				Update(unscaledTime ? Time.unscaledDeltaTime : Time.deltaTime);
+
 			PrepareInstructionsAndRenderers();
 
 			SetVerticesDirty(); // triggers Rebuild and avoids potential double-update in a single frame
