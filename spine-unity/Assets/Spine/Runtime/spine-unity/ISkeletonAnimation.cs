@@ -40,7 +40,8 @@ namespace Spine.Unity {
 	public enum UpdateTiming {
 		ManualUpdate = 0,
 		InUpdate,
-		InFixedUpdate
+		InFixedUpdate,
+		InLateUpdate
 	}
 
 	public delegate void ISkeletonAnimationDelegate (ISkeletonAnimation animated);
