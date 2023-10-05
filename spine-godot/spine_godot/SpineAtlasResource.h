@@ -76,6 +76,11 @@ public:
 	Array get_textures();
 
 	Array get_normal_maps();
+
+	void clear_native_data() {
+		this->atlas = nullptr;
+		this->texture_loader = nullptr;
+	}
 };
 
 class SpineAtlasResourceFormatLoader : public ResourceFormatLoader {

@@ -239,9 +239,8 @@ Error SpineAtlasResource::copy_from(const Ref<Resource> &p_resource) {
 	const Ref<SpineAtlasResource> &spineAtlas = static_cast<const Ref<SpineAtlasResource> &>(p_resource);
 	this->clear();
 	this->atlas = spineAtlas->atlas;
-	spineAtlas->atlas = nullptr;
 	this->texture_loader = spineAtlas->texture_loader;
-	spineAtlas->texture_loader = nullptr;
+	spineAtlas->clear_native_data();
 
 	this->source_path = spineAtlas->source_path;
 	this->atlas_data = spineAtlas->atlas_data;
