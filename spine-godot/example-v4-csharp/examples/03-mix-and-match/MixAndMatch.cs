@@ -21,7 +21,7 @@ public partial class MixAndMatch : SpineSprite
 
 		foreach (SpineSkinEntry entry in custom_skin.GetAttachments())
 		{
-			Console.WriteLine(entry.GetSlotIndex() + " " + entry.GetName());
+			GD.Print(entry.GetSlotIndex() + " " + entry.GetName());
 		}
 
 		GetAnimationState().SetAnimation("dance", true, 0);
