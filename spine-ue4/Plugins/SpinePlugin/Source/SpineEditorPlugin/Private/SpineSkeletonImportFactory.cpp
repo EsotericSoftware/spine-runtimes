@@ -76,10 +76,7 @@ void LoadAtlas(const FString &Filename, const FString &TargetPath) {
 }
 
 UObject *USpineSkeletonAssetFactory::FactoryCreateFile(UClass *InClass, UObject *InParent, FName InName, EObjectFlags Flags, const FString &Filename, const TCHAR *Parms, FFeedbackContext *Warn, bool &bOutOperationCanceled) {
-	FString name(InName.ToString());
-	name.Append("-data");
-
-	USpineSkeletonDataAsset *asset = NewObject<USpineSkeletonDataAsset>(InParent, InClass, FName(*name), Flags);
+	USpineSkeletonDataAsset *asset = NewObject<USpineSkeletonDataAsset>(InParent, InClass, InName, Flags);
 	TArray<uint8> rawData;
 	if (!FFileHelper::LoadFileToArray(rawData, *Filename, 0)) {
 		return nullptr;
