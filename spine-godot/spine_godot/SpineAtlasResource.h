@@ -69,6 +69,8 @@ public:
 
 	Error save_to_file(const String &path);// .spatlas
 
+	virtual Error copy_from(const Ref<Resource> &p_resource);
+
 	String get_source_path();
 
 	Array get_textures();

@@ -52,6 +52,8 @@ public:
 	Error load_from_file(const String &path);
 
 	Error save_to_file(const String &path);
+
+	virtual Error copy_from(const Ref<Resource> &p_resource);
 };
 
 class SpineSkeletonFileResourceFormatLoader : public ResourceFormatLoader {

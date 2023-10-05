@@ -122,6 +122,8 @@ void SpineAtlasResource::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "source_path"), "", "get_source_path");
 	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "textures"), "", "get_textures");
 	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "normal_maps"), "", "get_normal_maps");
+
+	ADD_SIGNAL(MethodInfo("skeleton_atlas_changed"));
 }
 
 SpineAtlasResource::SpineAtlasResource() : atlas(nullptr), texture_loader(nullptr), normal_map_prefix("n") {
@@ -227,6 +229,27 @@ Error SpineAtlasResource::save_to_file(const String &path) {
 	file->store_string(JSON::print(content));
 	file->close();
 #endif
+	return OK;
+}
+
+Error SpineAtlasResource::copy_from(const Ref<Resource> &p_resource) {
+	auto error = Resource::copy_from(p_resource);
+	if (error != OK) return error;
+
+	const Ref<SpineAtlasResource> &spineAtlas = static_cast<const Ref<SpineAtlasResource> &>(p_resource);
+	this->clear();
+	this->atlas = spineAtlas->atlas;
+	spineAtlas->atlas = nullptr;
+	this->texture_loader = spineAtlas->texture_loader;
+	spineAtlas->texture_loader = nullptr;
+
+	this->source_path = spineAtlas->source_path;
+	this->atlas_data = spineAtlas->atlas_data;
+	this->normal_map_prefix = spineAtlas->normal_map_prefix;
+	this->textures = spineAtlas->textures;
+	this->normal_maps = spineAtlas->normal_maps;
+	emit_signal(SNAME("skeleton_file_changed"));
+
 	return OK;
 }
 

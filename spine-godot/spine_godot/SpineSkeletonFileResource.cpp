@@ -28,6 +28,8 @@
  *****************************************************************************/
 
 #include "SpineSkeletonFileResource.h"
+#include "core/error/error_list.h"
+#include "core/error/error_macros.h"
 #if VERSION_MAJOR > 3
 #include "core/io/file_access.h"
 #else
@@ -85,6 +87,7 @@ static char *readString(BinaryInput *input) {
 }
 
 void SpineSkeletonFileResource::_bind_methods() {
+	ADD_SIGNAL(MethodInfo("skeleton_file_changed"));
 }
 
 static bool checkVersion(const char *version) {
@@ -154,6 +157,16 @@ Error SpineSkeletonFileResource::save_to_file(const String &path) {
 #else
 	file->close();
 #endif
+	return OK;
+}
+
+Error SpineSkeletonFileResource::copy_from(const Ref<Resource> &p_resource) {
+	auto error = Resource::copy_from(p_resource);
+	if (error != OK) return error;
+	const Ref<SpineSkeletonFileResource> &spineFile = static_cast<const Ref<SpineSkeletonFileResource> &>(p_resource);
+	this->json = spineFile->json;
+	this->binary = spineFile->binary;
+	emit_signal(SNAME("skeleton_file_changed"));
 	return OK;
 }
 

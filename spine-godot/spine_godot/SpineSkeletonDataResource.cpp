@@ -115,6 +115,7 @@ void SpineSkeletonDataResource::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_images_path"), &SpineSkeletonDataResource::get_images_path);
 	ClassDB::bind_method(D_METHOD("get_audio_path"), &SpineSkeletonDataResource::get_audio_path);
 	ClassDB::bind_method(D_METHOD("get_fps"), &SpineSkeletonDataResource::get_fps);
+	ClassDB::bind_method(D_METHOD("update_skeleton_data"), &SpineSkeletonDataResource::update_skeleton_data);
 
 	ADD_SIGNAL(MethodInfo("skeleton_data_changed"));
 	ADD_SIGNAL(MethodInfo("_internal_spine_objects_invalidated"));
@@ -190,6 +191,15 @@ bool SpineSkeletonDataResource::is_skeleton_data_loaded() const {
 
 void SpineSkeletonDataResource::set_atlas_res(const Ref<SpineAtlasResource> &atlas) {
 	atlas_res = atlas;
+	if (atlas_res.is_valid()) {
+#if VERSION_MAJOR > 3
+		if (!atlas_res->is_connected(SNAME("skeleton_atlas_changed"), callable_mp(this, &SpineSkeletonDataResource::update_skeleton_data)))
+			atlas_res->connect(SNAME("skeleton_atlas_changed"), callable_mp(this, &SpineSkeletonDataResource::update_skeleton_data));
+#else
+		if (!atlas_res->is_connected(SNAME("skeleton_atlas_changed"), this, SNAME("update_skeleton_data")))
+			atlas_res->connect(SNAME("skeleton_atlas_changed"), this, SNAME("update_skeleton_data"));
+#endif
+	}
 	update_skeleton_data();
 }
 
@@ -199,6 +209,15 @@ Ref<SpineAtlasResource> SpineSkeletonDataResource::get_atlas_res() {
 
 void SpineSkeletonDataResource::set_skeleton_file_res(const Ref<SpineSkeletonFileResource> &skeleton_file) {
 	skeleton_file_res = skeleton_file;
+	if (skeleton_file_res.is_valid()) {
+#if VERSION_MAJOR > 3
+		if (!skeleton_file_res->is_connected(SNAME("skeleton_file_changed"), callable_mp(this, &SpineSkeletonDataResource::update_skeleton_data)))
+			skeleton_file_res->connect(SNAME("skeleton_file_changed"), callable_mp(this, &SpineSkeletonDataResource::update_skeleton_data));
+#else
+		if (!skeleton_file_res->is_connected(SNAME("skeleton_file_changed"), this, SNAME("update_skeleton_data")))
+			skeleton_file_res->connect(SNAME("skeleton_file_changed"), this, SNAME("update_skeleton_data"));
+#endif
+	}
 	update_skeleton_data();
 }
 
