@@ -37,6 +37,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -92,7 +93,7 @@ namespace Spine.Unity.Editor {
 			/// When set to e.g. "_Addressable", the loader asset created for
 			/// the "Skeleton_Atlas" asset is named "Skeleton_Addressable".
 			/// </summary>
-			public string LoaderSuffix { get; }
+			public virtual string LoaderSuffix { get { return "_Loader"; } }
 
 			public abstract bool SetupOnDemandLoadingReference (
 				ref TargetReference targetTextureReference, Texture targetTexture);
@@ -237,7 +238,7 @@ namespace Spine.Unity.Editor {
 
 #if NEWPLAYMODECALLBACKS
 		static void OnPlaymodeChanged (PlayModeStateChange mode) {
-			bool assignTargetTextures = mode == PlayModeStateChange.ExitingPlayMode;
+			bool assignTargetTextures = mode == PlayModeStateChange.EnteredEditMode;
 #else
 		static void OnPlaymodeChanged () {
 			bool assignTargetTextures = !Application.isPlaying;
@@ -259,14 +260,23 @@ namespace Spine.Unity.Editor {
 
 		public static void AssignTargetTexturesAtLoader (OnDemandTextureLoader loader) {
 			List<Material> placeholderMaterials;
+			List<Material> nullTextureMaterials;
 			bool anyPlaceholdersAssigned = loader.HasPlaceholderTexturesAssigned(out placeholderMaterials);
-			if (anyPlaceholdersAssigned) {
-				Debug.Log("OnDemandTextureLoader detected placeholders assigned at one or more materials. Resetting to target textures.", loader);
+			bool anyMaterialNull = loader.HasNullMainTexturesAssigned(out nullTextureMaterials);
+			if (anyPlaceholdersAssigned || anyMaterialNull) {
+				Debug.Log("OnDemandTextureLoader detected placeholders assigned or null main textures at one or more materials. Resetting to target textures.", loader);
 				AssetDatabase.StartAssetEditing();
 				IEnumerable<Material> modifiedMaterials;
 				loader.AssignTargetTextures(out modifiedMaterials);
-				foreach (Material placeholderMaterial in placeholderMaterials) {
-					EditorUtility.SetDirty(placeholderMaterial);
+				if (placeholderMaterials != null) {
+					foreach (Material placeholderMaterial in placeholderMaterials) {
+						EditorUtility.SetDirty(placeholderMaterial);
+					}
+				}
+				if (nullTextureMaterials != null) {
+					foreach (Material nullTextureMaterial in nullTextureMaterials) {
+						EditorUtility.SetDirty(nullTextureMaterial);
+					}
 				}
 				AssetDatabase.StopAssetEditing();
 				AssetDatabase.SaveAssets();

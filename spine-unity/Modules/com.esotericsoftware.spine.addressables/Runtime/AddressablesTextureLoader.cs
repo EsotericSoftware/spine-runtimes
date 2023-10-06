@@ -76,13 +76,17 @@ namespace Spine.Unity {
 	[System.Serializable]
 	public class AddressablesTextureLoader : GenericOnDemandTextureLoader<AddressableTextureReference, AddressableRequest> {
 		public override void CreateTextureRequest (AddressableTextureReference targetReference,
-			MaterialOnDemandData materialData, int textureIndex, Material materialToUpdate) {
+			MaterialOnDemandData materialData, int textureIndex, Material materialToUpdate,
+			System.Action<Texture> onTextureLoaded) {
 
+			OnTextureRequested(materialToUpdate, textureIndex);
 			materialData.textureRequests[textureIndex].handle = targetReference.assetReference.LoadAssetAsync<Texture>();
 			materialData.textureRequests[textureIndex].handle.Completed += (obj) => {
 				if (obj.Status == AsyncOperationStatus.Succeeded) {
-					materialToUpdate.mainTexture = (Texture)targetReference.assetReference.Asset;
+					Texture loadedTexture = (Texture)targetReference.assetReference.Asset;
+					materialToUpdate.mainTexture = loadedTexture;
 					OnTextureLoaded(materialToUpdate, textureIndex);
+					if (onTextureLoaded != null) onTextureLoaded(loadedTexture);
 				}
 			};
 		}
