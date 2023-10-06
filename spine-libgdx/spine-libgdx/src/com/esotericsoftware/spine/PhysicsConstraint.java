@@ -39,11 +39,10 @@ import com.esotericsoftware.spine.Skeleton.Physics;
 public class PhysicsConstraint implements Updatable {
 	final PhysicsConstraintData data;
 	public Bone bone;
-
-	float mix;
+	float inertia, strength, damping, mass, wind, gravity, mix;
 
 	boolean reset = true;
-	float beforeX, beforeY, afterX, afterY, tipX, tipY;
+	float ux, uy, cx, cy, tx, ty;
 	float xOffset, xVelocity;
 	float yOffset, yVelocity;
 	float rotateOffset, rotateVelocity;
@@ -59,8 +58,13 @@ public class PhysicsConstraint implements Updatable {
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 		this.data = data;
 		this.skeleton = skeleton;
-
 		bone = skeleton.bones.get(data.bone.index);
+		inertia = data.inertia;
+		strength = data.strength;
+		damping = data.damping;
+		mass = data.mass;
+		wind = data.wind;
+		gravity = data.gravity;
 		mix = data.mix;
 	}
 
@@ -70,13 +74,18 @@ public class PhysicsConstraint implements Updatable {
 		data = constraint.data;
 		skeleton = constraint.skeleton;
 		bone = constraint.bone;
+		inertia = constraint.inertia;
+		strength = constraint.strength;
+		damping = constraint.damping;
+		mass = constraint.mass;
+		wind = constraint.wind;
+		gravity = constraint.gravity;
 		mix = constraint.mix;
 	}
 
 	public void reset () {
 		remaining = 0;
 		lastTime = skeleton.time;
-
 		reset = true;
 		xOffset = 0;
 		xVelocity = 0;
@@ -90,8 +99,13 @@ public class PhysicsConstraint implements Updatable {
 
 	public void setToSetupPose () {
 		reset();
-
 		PhysicsConstraintData data = this.data;
+		inertia = data.inertia;
+		strength = data.strength;
+		damping = data.damping;
+		mass = data.mass;
+		wind = data.wind;
+		gravity = data.gravity;
 		mix = data.mix;
 	}
 
@@ -100,109 +114,125 @@ public class PhysicsConstraint implements Updatable {
 		float mix = this.mix;
 		if (mix == 0) return;
 
-		boolean x = data.x, y = data.y, rotateOrShear = data.rotate || data.shearX, scaleX = data.scaleX;
+		boolean x = data.x, y = data.y, rotateOrShearX = data.rotate || data.shearX, scaleX = data.scaleX;
 		Bone bone = this.bone;
+		float l = bone.data.length;
 
 		switch (physics) {
 		case none:
 			return;
 		case reset:
 			reset();
-			break;
+			// Fall through.
 		case update:
 			remaining += Math.max(skeleton.time - lastTime, 0);
 			lastTime = skeleton.time;
 
-			float length = bone.data.length, br = atan2(bone.c, bone.a);
-			float wind = data.wind, gravity = data.gravity, strength = data.strength, friction = data.friction, mass = data.mass;
-			float damping = data.damping, step = data.step;
-			boolean angle = rotateOrShear || scaleX;
-			float cos = 0, sin = 0;
-			while (remaining >= step) {
-				remaining -= step;
-				if (x) {
-					xVelocity += (wind * 500 - xOffset * strength - xVelocity * friction) * mass;
-					xOffset += xVelocity * step;
-					xVelocity *= damping;
+			float step = data.step;
+			if (remaining >= step) {
+				float bx = bone.worldX, by = bone.worldY, ca = 0, c = 0, s = 0;
+				if (reset) {
+					reset = false;
+					ux = bx;
+					uy = by;
+				} else {
+					float i = this.inertia;
+					if (x) {
+						xOffset += (ux - bx) * i;
+						ux = bx;
+						bone.worldX += xOffset * mix;
+					}
+					if (y) {
+						yOffset += (uy - by) * i;
+						uy = by;
+						bone.worldY += yOffset * mix;
+					}
+					if (rotateOrShearX) {
+						ca = atan2(bone.c, bone.a);
+						float dx = cx - bone.worldX, dy = cy - bone.worldY, r = atan2(dy + ty, dx + tx) - ca - rotateOffset * mix;
+						rotateOffset += (r - (float)Math.ceil(r * invPI2 - 0.5f) * PI2) * i;
+						r = rotateOffset * mix + ca;
+						c = cos(r);
+						s = sin(r);
+						if (scaleX) scaleOffset += (dx * c + dy * s) * i / l;
+					} else if (scaleX) {
+						float r = rotateOffset * mix + atan2(bone.c, bone.a);
+						c = cos(r);
+						s = sin(r);
+						scaleOffset += ((cx - bone.worldX) * c + (cy - bone.worldY) * s) * i / l;
+					}
 				}
-				if (y) {
-					yVelocity += (-gravity * 500 - yOffset * strength - yVelocity * friction) * mass;
-					yOffset += yVelocity * step;
-					yVelocity *= damping;
-				}
-				if (angle) {
-					float r = br + rotateOffset * degRad;
-					cos = cos(r);
-					sin = sin(r);
-					if (rotateOrShear) {
-						rotateVelocity += (length * (-wind * sin - gravity * cos) - rotateOffset * strength - rotateVelocity * friction)
-							* mass;
-						rotateOffset += rotateVelocity * step;
-						rotateVelocity *= damping;
+				cx = bone.worldX;
+				cy = bone.worldY;
+
+				float strength = this.strength, mass = this.mass * step, wind = this.wind, gravity = this.gravity;
+				float damping = (float)Math.pow(this.damping, 60 * step);
+				while (true) {
+					remaining -= step;
+					if (x) {
+						xVelocity += (100 * wind - xOffset * strength) * mass;
+						xOffset += xVelocity * step;
+						xVelocity *= damping;
+					}
+					if (y) {
+						yVelocity += (-100 * gravity - yOffset * strength) * mass;
+						yOffset += yVelocity * step;
+						yVelocity *= damping;
 					}
 					if (scaleX) {
-						scaleVelocity += (wind * cos - gravity * sin - scaleOffset * strength - scaleVelocity * friction) * mass;
+						scaleVelocity += (wind * c - gravity * s - scaleOffset * strength) * mass;
 						scaleOffset += scaleVelocity * step;
 						scaleVelocity *= damping;
 					}
+					if (rotateOrShearX) {
+						rotateVelocity += (-0.01f * l * (wind * s + gravity * c) - rotateOffset * strength) * mass;
+						rotateOffset += rotateVelocity * step;
+						rotateVelocity *= damping;
+						if (remaining < step) break;
+						float r = rotateOffset * mix + ca;
+						c = cos(r);
+						s = sin(r);
+					} else if (remaining < step) //
+						break;
 				}
 			}
-
-			float bx = bone.worldX, by = bone.worldY;
-			if (reset)
-				reset = false;
-			else {
-				float i = data.inertia;
-				if (x) {
-					xOffset += (beforeX - bx) * i;
-					bone.worldX += xOffset * mix;
-				}
-				if (y) {
-					yOffset += (beforeY - by) * i;
-					bone.worldY += yOffset * mix;
-				}
-				if (rotateOrShear) {
-					if (length == 0)
-						rotateOffset = 0;
-					else {
-						float r = (atan2(afterY - bone.worldY + tipY, afterX - bone.worldX + tipX) - br) * radDeg;
-						rotateOffset += (r - (16384 - (int)(16384.499999999996 - r / 360)) * 360) * i;
-					}
-				}
-				if (scaleX) {
-					if (length == 0)
-						scaleOffset = 0;
-					else {
-						float r = br + rotateOffset * degRad;
-						scaleOffset += ((afterX - bone.worldX) * cos(r) + (afterY - bone.worldY) * sin(r)) * i / length;
-					}
-				}
-			}
-			beforeX = bx;
-			beforeY = by;
-			afterX = bone.worldX;
-			afterY = bone.worldY;
-			tipX = length * bone.a;
-			tipY = length * bone.c;
 			break;
 		case pose:
 			if (x) bone.worldX += xOffset * mix;
 			if (y) bone.worldY += yOffset * mix;
 		}
 
-		if (rotateOrShear) {
-			float r = rotateOffset * mix;
-			if (data.rotate) bone.rotateWorld(r);
-			if (data.shearX) {
-				float t = (float)Math.tan(r * 0.5f * degRad);
-				bone.b += bone.a * t;
-				bone.d += bone.c * t;
+		if (rotateOrShearX) {
+			float r = rotateOffset * mix, ra = bone.a, sin, cos;
+			if (data.rotate) {
+				if (data.shearX) {
+					r *= 0.5f;
+					sin = sin(r);
+					cos = cos(r);
+					bone.a = ra = cos * ra - sin * bone.c;
+					bone.c = sin * ra + cos * bone.c;
+				} else {
+					sin = sin(r);
+					cos = cos(r);
+				}
+				float rb = bone.b;
+				bone.b = cos * rb - sin * bone.d;
+				bone.d = sin * rb + cos * bone.d;
+			} else {
+				sin = sin(r);
+				cos = cos(r);
 			}
+			bone.a = cos * ra - sin * bone.c;
+			bone.c = sin * ra + cos * bone.c;
 		}
 		if (scaleX) {
 			float s = 1 + scaleOffset * mix;
 			bone.a *= s;
 			bone.c *= s;
+		}
+		if (physics == Physics.update) {
+			tx = l * bone.a;
+			ty = l * bone.c;
 		}
 		bone.updateAppliedTransform();
 	}
@@ -214,6 +244,55 @@ public class PhysicsConstraint implements Updatable {
 
 	public void setBone (Bone bone) {
 		this.bone = bone;
+	}
+
+	public float getInertia () {
+		return inertia;
+	}
+
+	public void setInertia (float inertia) {
+		this.inertia = inertia;
+	}
+
+	public float getStrength () {
+		return strength;
+	}
+
+	public void setStrength (float strength) {
+		this.strength = strength;
+	}
+
+	public float getDamping () {
+		return damping;
+	}
+
+	public void setDamping (float damping) {
+		this.damping = damping;
+	}
+
+	/** The inverse of the mass. */
+	public float getMass () {
+		return mass;
+	}
+
+	public void setMass (float mass) {
+		this.mass = mass;
+	}
+
+	public float getWind () {
+		return wind;
+	}
+
+	public void setWind (float wind) {
+		this.wind = wind;
+	}
+
+	public float getGravity () {
+		return gravity;
+	}
+
+	public void setGravity (float gravity) {
+		this.gravity = gravity;
 	}
 
 	/** A percentage (0-1) that controls the mix between the constrained and unconstrained poses. */

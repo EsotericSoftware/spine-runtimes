@@ -98,6 +98,8 @@ import com.esotericsoftware.spine.attachments.VertexAttachment;
  * <a href="http://esotericsoftware.com/spine-loading-skeleton-data#JSON-and-binary-data">JSON and binary data</a> in the Spine
  * Runtimes Guide. */
 public class SkeletonJson extends SkeletonLoader {
+	private final Array<LinkedMesh> linkedMeshes = new Array();
+
 	public SkeletonJson (AttachmentLoader attachmentLoader) {
 		super(attachmentLoader);
 	}
@@ -160,6 +162,8 @@ public class SkeletonJson extends SkeletonLoader {
 
 			String color = boneMap.getString("color", null);
 			if (color != null) Color.valueOf(color, data.getColor());
+
+			data.icon = boneMap.getString("icon", null);
 
 			skeletonData.bones.add(data);
 		}
@@ -876,6 +880,8 @@ public class SkeletonJson extends SkeletonLoader {
 				}
 			}
 		}
+
+		// BOZO - Physics timelines.
 
 		// Attachment timelines.
 		for (JsonValue attachmentsMap = map.getChild("attachments"); attachmentsMap != null; attachmentsMap = attachmentsMap.next) {

@@ -34,9 +34,8 @@ package com.esotericsoftware.spine;
  * See <a href="http://esotericsoftware.com/spine-physics-constraints">Physics constraints</a> in the Spine User Guide. */
 public class PhysicsConstraintData extends ConstraintData {
 	BoneData bone;
-	float step = 1 / 60f, mass = 1;
-	float strength, friction, damping, inertia, wind, gravity, mix;
 	boolean x, y, rotate, scaleX, shearX;
+	float step, inertia, strength, damping, friction, mass, wind, gravity, mix;
 
 	public PhysicsConstraintData (String name) {
 		super(name);
@@ -57,62 +56,6 @@ public class PhysicsConstraintData extends ConstraintData {
 
 	public void setStep (float step) {
 		this.step = step;
-	}
-
-	public float getMass () {
-		return mass;
-	}
-
-	public void setMass (float mass) {
-		this.mass = mass;
-	}
-
-	public float getStrength () {
-		return strength;
-	}
-
-	public void setStrength (float strength) {
-		this.strength = strength;
-	}
-
-	public float getFriction () {
-		return friction;
-	}
-
-	public void setFriction (float friction) {
-		this.friction = friction;
-	}
-
-	public float getDamping () {
-		return damping;
-	}
-
-	public void setDamping (float damping) {
-		this.damping = damping;
-	}
-
-	public float getInertia () {
-		return inertia;
-	}
-
-	public void setInertia (float inertia) {
-		this.inertia = inertia;
-	}
-
-	public float getWind () {
-		return wind;
-	}
-
-	public void setWind (float wind) {
-		this.wind = wind;
-	}
-
-	public float getGravity () {
-		return gravity;
-	}
-
-	public void setGravity (float gravity) {
-		this.gravity = gravity;
 	}
 
 	public boolean getX () {
@@ -153,6 +96,63 @@ public class PhysicsConstraintData extends ConstraintData {
 
 	public void setShearX (boolean shearX) {
 		this.shearX = shearX;
+	}
+
+	public float getInertia () {
+		return inertia;
+	}
+
+	public void setInertia (float inertia) {
+		this.inertia = inertia;
+	}
+
+	public float getStrength () {
+		return strength;
+	}
+
+	public void setStrength (float strength) {
+		this.strength = strength;
+	}
+
+	public float getDamping () {
+		return damping;
+	}
+
+	public void setDamping (float damping) {
+		this.damping = damping;
+	}
+
+	public float getFriction () {
+		return friction;
+	}
+
+	public void setFriction (float friction) {
+		this.friction = friction;
+	}
+
+	/** The inverse of the mass. */
+	public float getMass () {
+		return mass;
+	}
+
+	public void setMass (float mass) {
+		this.mass = mass;
+	}
+
+	public float getWind () {
+		return wind;
+	}
+
+	public void setWind (float wind) {
+		this.wind = wind;
+	}
+
+	public float getGravity () {
+		return gravity;
+	}
+
+	public void setGravity (float gravity) {
+		this.gravity = gravity;
 	}
 
 	/** A percentage (0-1) that controls the mix between the constrained and unconstrained poses. */

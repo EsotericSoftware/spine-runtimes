@@ -251,7 +251,7 @@ public class TransformConstraint implements Updatable {
 			float rotation = bone.arotation;
 			if (mixRotate != 0) {
 				float r = target.arotation - rotation + data.offsetRotation;
-				r -= (16384 - (int)(16384.499999999996 - r / 360)) * 360;
+				r -= (float)Math.ceil(r / 360 - 0.5f) * 360;
 				rotation += r * mixRotate;
 			}
 
@@ -268,7 +268,7 @@ public class TransformConstraint implements Updatable {
 			float shearY = bone.ashearY;
 			if (mixShearY != 0) {
 				float r = target.ashearY - shearY + data.offsetShearY;
-				r -= (16384 - (int)(16384.499999999996 - r / 360)) * 360;
+				r -= (float)Math.ceil(r / 360 - 0.5f) * 360;
 				shearY += r * mixShearY;
 			}
 

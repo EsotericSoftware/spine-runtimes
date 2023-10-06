@@ -33,9 +33,7 @@ import java.io.InputStream;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.utils.Array;
 
-import com.esotericsoftware.spine.SkeletonJson.LinkedMesh;
 import com.esotericsoftware.spine.attachments.AtlasAttachmentLoader;
 import com.esotericsoftware.spine.attachments.AttachmentLoader;
 
@@ -46,7 +44,6 @@ import com.esotericsoftware.spine.attachments.AttachmentLoader;
 abstract public class SkeletonLoader {
 	final AttachmentLoader attachmentLoader;
 	float scale = 1;
-	final Array<LinkedMesh> linkedMeshes = new Array();
 
 	/** Creates a skeleton loader that loads attachments using an {@link AtlasAttachmentLoader} with the specified atlas. */
 	public SkeletonLoader (TextureAtlas atlas) {

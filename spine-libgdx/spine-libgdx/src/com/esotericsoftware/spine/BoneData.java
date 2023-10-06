@@ -46,6 +46,7 @@ public class BoneData {
 
 	// Nonessential.
 	final Color color = new Color(0.61f, 0.61f, 0.61f, 1); // 9b9b9bff
+	@Null String icon;
 
 	public BoneData (int index, String name, @Null BoneData parent) {
 		if (index < 0) throw new IllegalArgumentException("index must be >= 0.");
@@ -193,6 +194,15 @@ public class BoneData {
 	 * rendered at runtime. */
 	public Color getColor () {
 		return color;
+	}
+
+	/** The bone icon as it was in Spine, or null if nonessential data was not exported. */
+	public @Null String getIcon () {
+		return icon;
+	}
+
+	public void setIcon (@Null String icon) {
+		this.icon = icon;
 	}
 
 	public String toString () {
