@@ -15,8 +15,8 @@ jobs:
         version:
           [
             {"tag": "4.0.4-stable", "version": "4.0.4.stable", "mono": false},
-            {"tag": "4.1.1-stable", "version": "4.1.1.stable", "mono": false},
-            {"tag": "4.1.1-stable", "version": "4.1.1.stable", "mono": true},
+            {"tag": "4.1.2-stable", "version": "4.1.2.stable", "mono": false},
+            {"tag": "4.1.2-stable", "version": "4.1.2.stable", "mono": true},
           ]
     uses: ./.github/workflows/spine-godot-v4.yml
     with:
