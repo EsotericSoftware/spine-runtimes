@@ -53,7 +53,9 @@ public:
 
 	Error save_to_file(const String &path);
 
+#if VERSION_MAJOR > 3
 	virtual Error copy_from(const Ref<Resource> &p_resource);
+#endif
 };
 
 class SpineSkeletonFileResourceFormatLoader : public ResourceFormatLoader {

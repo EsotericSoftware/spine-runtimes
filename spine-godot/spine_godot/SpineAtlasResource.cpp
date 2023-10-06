@@ -232,6 +232,7 @@ Error SpineAtlasResource::save_to_file(const String &path) {
 	return OK;
 }
 
+#if VERSION_MAJOR > 3
 Error SpineAtlasResource::copy_from(const Ref<Resource> &p_resource) {
 	auto error = Resource::copy_from(p_resource);
 	if (error != OK) return error;
@@ -251,6 +252,7 @@ Error SpineAtlasResource::copy_from(const Ref<Resource> &p_resource) {
 
 	return OK;
 }
+#endif
 
 #if VERSION_MAJOR > 3
 RES SpineAtlasResourceFormatLoader::load(const String &path, const String &original_path, Error *error, bool use_sub_threads, float *progress, CacheMode cache_mode) {

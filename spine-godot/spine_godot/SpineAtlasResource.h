@@ -45,8 +45,8 @@ class SpineAtlasResource : public Resource {
 protected:
 	static void _bind_methods();
 
-	spine::Atlas *atlas;
-	GodotSpineTextureLoader *texture_loader;
+	mutable spine::Atlas *atlas;
+	mutable GodotSpineTextureLoader *texture_loader;
 
 	String source_path;
 	String atlas_data;
@@ -69,7 +69,9 @@ public:
 
 	Error save_to_file(const String &path);// .spatlas
 
+#if VERSION_MAJOR > 3
 	virtual Error copy_from(const Ref<Resource> &p_resource);
+#endif
 
 	String get_source_path();
 
@@ -77,7 +79,7 @@ public:
 
 	Array get_normal_maps();
 
-	const void clear_native_data() {
+	void clear_native_data() const {
 		this->atlas = nullptr;
 		this->texture_loader = nullptr;
 	}

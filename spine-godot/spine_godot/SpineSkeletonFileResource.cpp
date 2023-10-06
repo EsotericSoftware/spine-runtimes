@@ -28,11 +28,13 @@
  *****************************************************************************/
 
 #include "SpineSkeletonFileResource.h"
+#if VERSION_MAJOR > 3
 #include "core/error/error_list.h"
 #include "core/error/error_macros.h"
-#if VERSION_MAJOR > 3
 #include "core/io/file_access.h"
 #else
+#include "core/error_list.h"
+#include "core/error_macros.h"
 #include "core/os/file_access.h"
 #endif
 #include <spine/Json.h>
@@ -160,6 +162,7 @@ Error SpineSkeletonFileResource::save_to_file(const String &path) {
 	return OK;
 }
 
+#if VERSION_MAJOR > 3
 Error SpineSkeletonFileResource::copy_from(const Ref<Resource> &p_resource) {
 	auto error = Resource::copy_from(p_resource);
 	if (error != OK) return error;
@@ -169,6 +172,7 @@ Error SpineSkeletonFileResource::copy_from(const Ref<Resource> &p_resource) {
 	emit_signal(SNAME("skeleton_file_changed"));
 	return OK;
 }
+#endif
 
 #if VERSION_MAJOR > 3
 RES SpineSkeletonFileResourceFormatLoader::load(const String &path, const String &original_path, Error *error, bool use_sub_threads, float *progress, CacheMode cache_mode) {
