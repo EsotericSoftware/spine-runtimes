@@ -79,7 +79,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 	SkeletonData skeletonData;
 	Skeleton skeleton;
 	AnimationState state;
-	FileHandle skeletonFile;
+	FileHandle skeletonFile, lastFile;
 	long skeletonModified, atlasModified;
 	float lastModifiedCheck, reloadTimer;
 	final StringBuilder status = new StringBuilder();
@@ -131,6 +131,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 		FileHandle oldSkeletonFile = this.skeletonFile;
 		this.skeletonFile = skeletonFile;
+		lastFile = skeletonFile;
 		reloadTimer = 0;
 
 		try {
