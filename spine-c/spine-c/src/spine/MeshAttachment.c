@@ -43,7 +43,6 @@ void _spMeshAttachment_dispose(spAttachment *attachment) {
 		FREE(self->edges);
 	} else
 		_spAttachment_deinit(attachment);
-	if (self->sequence) FREE(self->sequence);
 	FREE(self);
 }
 
