@@ -261,7 +261,7 @@ namespace Spine.Unity {
 		}
 
 		protected virtual Texture RequestLoadTexture (Material material, int materialIndex, int textureIndex,
-			System.Action<Texture>  onTextureLoaded) {
+			System.Action<Texture> onTextureLoaded) {
 
 			PlaceholderTextureMapping[] placeholderTextures = placeholderMap[materialIndex].textures;
 			TargetReference targetReference = placeholderTextures[textureIndex].targetTextureReference;

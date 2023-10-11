@@ -970,8 +970,7 @@ namespace Spine.Unity {
 						atlasAsset.RequireTextureLoaded(this.mainTexture, ref loadedTexture, null);
 						if (loadedTexture)
 							this.baseTexture = loadedTexture;
-					}
-					else {
+					} else {
 						Texture[] textureItems = usedTextures.Items;
 						for (int i = 0, count = usedTextures.Count; i < count; ++i) {
 							Texture loadedTexture = null;

@@ -1,5 +1,5 @@
 # spine-ue4
-The spine-ue4 runtime provides functionality to load, manipulate and render [Spine](http://esotericsoftware.com) skeletal animation data using [Unreal Engine 4.21+](https://www.unrealengine.com/). spine-ue4 is based on [spine-cpp](../spine-cpp).
+The spine-ue4 runtime provides functionality to load, manipulate and render [Spine](http://esotericsoftware.com) skeletal animation data using [Unreal Engine 4.27-5.2](https://www.unrealengine.com/). spine-ue4 is based on [spine-cpp](../spine-cpp).
 
 ## Licensing
 
@@ -34,7 +34,7 @@ See the [Spine Runtimes documentation](http://esotericsoftware.com/spine-documen
 ## Example
 ### [Please see the spine-ue4 guide for full documentation](http://esotericsoftware.com/spine-ue4)
 
-The Spine UE4 example works on all platforms supported by Unreal Engine. The samples require Unreal Engine 4.25+.
+The Spine UE4 example works on all platforms supported by Unreal Engine. The samples require Unreal Engine 4.27-5.2.
 
 1. Copy the `spine-cpp` folder from this repositories root directory to your `Plugins/SpinePlugin/Sources/SpinePlugin/Public/` directory. You can run the `setup.bat` or `setup.sh` scripts to accomplish this.
 2. Open the SpineUE4.uproject file with Unreal Editor

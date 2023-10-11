@@ -31,20 +31,18 @@
 #include "AssetTypeActions_Base.h"
 #include "SpineAtlasAsset.h"
 #include "SpineSkeletonDataAsset.h"
- 
-class FSpineAtlasAssetTypeActions : public FAssetTypeActions_Base
-{
+
+class FSpineAtlasAssetTypeActions : public FAssetTypeActions_Base {
 public:
-	UClass* GetSupportedClass() const override { return USpineAtlasAsset::StaticClass(); };
+	UClass *GetSupportedClass() const override { return USpineAtlasAsset::StaticClass(); };
 	FText GetName() const override { return INVTEXT("Spine atlas asset"); };
 	FColor GetTypeColor() const override { return FColor::Red; };
 	uint32 GetCategories() override { return EAssetTypeCategories::Misc; };
 };
 
-class FSpineSkeletonDataAssetTypeActions : public FAssetTypeActions_Base
-{
+class FSpineSkeletonDataAssetTypeActions : public FAssetTypeActions_Base {
 public:
-	UClass* GetSupportedClass() const override { return USpineSkeletonDataAsset::StaticClass(); };
+	UClass *GetSupportedClass() const override { return USpineSkeletonDataAsset::StaticClass(); };
 	FText GetName() const override { return INVTEXT("Spine data asset"); };
 	FColor GetTypeColor() const override { return FColor::Red; };
 	uint32 GetCategories() override { return EAssetTypeCategories::Misc; };
