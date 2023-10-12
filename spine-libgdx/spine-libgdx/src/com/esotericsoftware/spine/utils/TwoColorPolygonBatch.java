@@ -45,7 +45,6 @@ import com.badlogic.gdx.graphics.g2d.PolygonRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Affine2;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Null;
 
@@ -322,8 +321,8 @@ public class TwoColorPolygonBatch implements PolygonBatch {
 		final float worldOriginY = y + originY;
 		final float sX = width / textureRegion.getRegionWidth();
 		final float sY = height / textureRegion.getRegionHeight();
-		final float cos = MathUtils.cosDeg(rotation);
-		final float sin = MathUtils.sinDeg(rotation);
+		final float cos = cosDeg(rotation);
+		final float sin = sinDeg(rotation);
 
 		float fx, fy;
 		for (int i = 0; i < regionVerticesLength; i += 2) {
@@ -399,8 +398,8 @@ public class TwoColorPolygonBatch implements PolygonBatch {
 
 		// rotate
 		if (rotation != 0) {
-			final float cos = MathUtils.cosDeg(rotation);
-			final float sin = MathUtils.sinDeg(rotation);
+			final float cos = cosDeg(rotation);
+			final float sin = sinDeg(rotation);
 
 			x1 = cos * p1x - sin * p1y;
 			y1 = sin * p1x + cos * p1y;
@@ -1012,8 +1011,8 @@ public class TwoColorPolygonBatch implements PolygonBatch {
 
 		// rotate
 		if (rotation != 0) {
-			final float cos = MathUtils.cosDeg(rotation);
-			final float sin = MathUtils.sinDeg(rotation);
+			final float cos = cosDeg(rotation);
+			final float sin = sinDeg(rotation);
 
 			x1 = cos * p1x - sin * p1y;
 			y1 = sin * p1x + cos * p1y;
@@ -1148,8 +1147,8 @@ public class TwoColorPolygonBatch implements PolygonBatch {
 
 		// rotate
 		if (rotation != 0) {
-			final float cos = MathUtils.cosDeg(rotation);
-			final float sin = MathUtils.sinDeg(rotation);
+			final float cos = cosDeg(rotation);
+			final float sin = sinDeg(rotation);
 
 			x1 = cos * p1x - sin * p1y;
 			y1 = sin * p1x + cos * p1y;
