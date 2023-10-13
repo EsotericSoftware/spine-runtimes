@@ -109,6 +109,13 @@ namespace Spine.Unity {
 			UpdateAnimation();
 		}
 
+		/// <summary>Manual animation update. Required when <c>updateTiming</c> is set to <c>ManualUpdate</c>.</summary>
+		/// <param name="deltaTime">Ignored parameter.</param>
+		public virtual void Update (float deltaTime) {
+			if (!valid) return;
+			UpdateAnimation();
+		}
+
 		protected void UpdateAnimation () {
 			wasUpdatedAfterInit = true;
 
@@ -160,6 +167,8 @@ namespace Spine.Unity {
 		}
 
 		public override void LateUpdate () {
+			if (updateTiming == UpdateTiming.InLateUpdate && valid && translator != null && translator.Animator != null)
+				UpdateAnimation();
 			// instantiation can happen from Update() after this component, leading to a missing Update() call.
 			if (!wasUpdatedAfterInit) Update();
 			base.LateUpdate();

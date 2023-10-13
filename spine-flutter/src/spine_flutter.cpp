@@ -1473,8 +1473,9 @@ spine_path_constraint spine_skeleton_find_path_constraint(spine_skeleton skeleto
 	return (spine_path_constraint) _skeleton->findPathConstraint(constraintName);
 }
 
+_spine_bounds tmp_bounds;
 spine_bounds spine_skeleton_get_bounds(spine_skeleton skeleton) {
-	_spine_bounds *bounds = (_spine_bounds *) malloc(sizeof(_spine_bounds));
+	_spine_bounds *bounds = &tmp_bounds;
 	if (skeleton == nullptr) return (spine_bounds) bounds;
 	Skeleton *_skeleton = (Skeleton *) skeleton;
 	Vector<float> vertices;
@@ -2128,8 +2129,9 @@ void spine_bone_set_to_setup_pose(spine_bone bone) {
 	_bone->setToSetupPose();
 }
 
+_spine_vector tmp_vector;
 spine_vector spine_bone_world_to_local(spine_bone bone, float worldX, float worldY) {
-	_spine_vector *coords = SpineExtension::calloc<_spine_vector>(1, __FILE__, __LINE__);
+	_spine_vector *coords = &tmp_vector;
 	if (bone == nullptr) return (spine_vector) coords;
 	Bone *_bone = (Bone *) bone;
 	_bone->worldToLocal(worldX, worldY, coords->x, coords->y);
@@ -2137,7 +2139,7 @@ spine_vector spine_bone_world_to_local(spine_bone bone, float worldX, float worl
 }
 
 spine_vector spine_bone_local_to_world(spine_bone bone, float localX, float localY) {
-	_spine_vector *coords = SpineExtension::calloc<_spine_vector>(1, __FILE__, __LINE__);
+	_spine_vector *coords = &tmp_vector;
 	if (bone == nullptr) return (spine_vector) coords;
 	Bone *_bone = (Bone *) bone;
 	_bone->localToWorld(localX, localY, coords->x, coords->y);
@@ -2521,7 +2523,7 @@ void spine_attachment_dispose(spine_attachment attachment) {
 
 // PointAttachment
 spine_vector spine_point_attachment_compute_world_position(spine_point_attachment attachment, spine_bone bone) {
-	_spine_vector *result = SpineExtension::calloc<_spine_vector>(1, __FILE__, __LINE__);
+	_spine_vector *result = &tmp_vector;
 	if (attachment == nullptr) return (spine_vector) result;
 	PointAttachment *_attachment = (PointAttachment *) attachment;
 	_attachment->computeWorldPosition(*(Bone *) bone, result->x, result->y);

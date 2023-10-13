@@ -53,10 +53,6 @@ void USpineAtlasAsset::PostInitProperties() {
 }
 
 void USpineAtlasAsset::GetAssetRegistryTags(TArray<FAssetRegistryTag> &OutTags) const {
-	if (importData) {
-		OutTags.Add(FAssetRegistryTag(SourceFileTagName(), importData->GetSourceData().ToJson(), FAssetRegistryTag::TT_Hidden));
-	}
-
 	Super::GetAssetRegistryTags(OutTags);
 }
 

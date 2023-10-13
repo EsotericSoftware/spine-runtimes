@@ -164,6 +164,7 @@ namespace Spine.Unity {
 					if (placeholderMaterials == null) placeholderMaterials = new List<Material>();
 					placeholderMaterials.Add(material);
 				}
+				materialIndex++;
 			}
 			return anyPlaceholderAssigned;
 		}
@@ -180,8 +181,7 @@ namespace Spine.Unity {
 						atlasAsset, i + 1, targetMaterial), this);
 					return false;
 				}
-				Material ignoredArgument = null;
-				RequestLoadMaterialTextures(targetMaterial, ref ignoredArgument);
+				AssignTargetTextures(targetMaterial, i);
 				++i;
 			}
 			modifiedMaterials = atlasAsset.Materials;
@@ -223,7 +223,7 @@ namespace Spine.Unity {
 
 			int foundMaterialIndex = Array.FindIndex(placeholderMap, entry => entry.textures[textureIndex].placeholderTexture == currentTexture);
 			if (foundMaterialIndex >= 0)
-				RequestLoadTexture(material, foundMaterialIndex, textureIndex);
+				RequestLoadTexture(material, foundMaterialIndex, textureIndex, null);
 
 			int loadedMaterialIndex = Array.FindIndex(loadedDataAtMaterial, entry =>
 				entry.textureRequests[textureIndex].WasRequested &&
@@ -232,33 +232,69 @@ namespace Spine.Unity {
 				loadedDataAtMaterial[loadedMaterialIndex].lastFrameRequested = Time.frameCount;
 		}
 
-		protected virtual void RequestLoadTexture (Material material, int materialIndex, int textureIndex) {
+		public override void RequestLoadTexture (Texture placeholderTexture, ref Texture replacementTexture,
+			System.Action<Texture> onTextureLoaded = null) {
+
+			if (placeholderTexture == null) return;
+
+			Texture currentTexture = placeholderTexture;
+			int textureIndex = 0; // Todo: currently only main texture is supported.
+
+			int foundMaterialIndex = Array.FindIndex(placeholderMap, entry => entry.textures[textureIndex].placeholderTexture == currentTexture);
+			if (foundMaterialIndex >= 0) {
+				Material material = atlasAsset.Materials.ElementAt(foundMaterialIndex);
+				Texture loadedTexture = RequestLoadTexture(material, foundMaterialIndex, textureIndex, onTextureLoaded);
+				if (loadedTexture != null)
+					replacementTexture = loadedTexture;
+			}
+
+			int loadedMaterialIndex = Array.FindIndex(loadedDataAtMaterial, entry =>
+				entry.textureRequests[textureIndex].WasRequested &&
+				entry.textureRequests[textureIndex].IsTarget(placeholderTexture));
+			if (loadedMaterialIndex >= 0)
+				loadedDataAtMaterial[loadedMaterialIndex].lastFrameRequested = Time.frameCount;
+		}
+
+		protected void AssignTargetTextures (Material material, int materialIndex) {
+			int textureIndex = 0; // Todo: currently only main texture is supported.
+			RequestLoadTexture(material, materialIndex, textureIndex, null);
+		}
+
+		protected virtual Texture RequestLoadTexture (Material material, int materialIndex, int textureIndex,
+			System.Action<Texture> onTextureLoaded) {
+
 			PlaceholderTextureMapping[] placeholderTextures = placeholderMap[materialIndex].textures;
 			TargetReference targetReference = placeholderTextures[textureIndex].targetTextureReference;
 			loadedDataAtMaterial[materialIndex].lastFrameRequested = Time.frameCount;
 
 #if UNITY_EDITOR
 			if (!Application.isPlaying) {
-				if (targetReference.EditorTexture != null)
+				if (targetReference.EditorTexture != null) {
 					material.mainTexture = targetReference.EditorTexture;
-				return;
+					if (onTextureLoaded != null) onTextureLoaded(targetReference.EditorTexture);
+				}
+				return targetReference.EditorTexture;
 			}
 #endif
 			MaterialOnDemandData materialData = loadedDataAtMaterial[materialIndex];
 			if (materialData.textureRequests[textureIndex].WasRequested) {
 				Texture loadedTexture = GetAlreadyLoadedTexture(materialIndex, textureIndex);
-				if (loadedTexture != null)
+				if (loadedTexture != null) {
 					material.mainTexture = loadedTexture;
-				return;
+					if (onTextureLoaded != null) onTextureLoaded(loadedTexture);
+				}
+				return loadedTexture;
 			}
 
-			CreateTextureRequest(targetReference, materialData, textureIndex, material);
+			CreateTextureRequest(targetReference, materialData, textureIndex, material, onTextureLoaded);
+			return null;
 		}
 
 		public abstract Texture GetAlreadyLoadedTexture (int materialIndex, int textureIndex);
 
 		public abstract void CreateTextureRequest (TargetReference targetReference,
-			MaterialOnDemandData materialData, int textureIndex, Material materialToUpdate);
+			MaterialOnDemandData materialData, int textureIndex, Material materialToUpdate,
+			System.Action<Texture> onTextureLoaded);
 
 		public virtual void UnloadUnusedTextures () {
 			int currentFrameCount = Time.frameCount;

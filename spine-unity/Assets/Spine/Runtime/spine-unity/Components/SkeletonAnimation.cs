@@ -273,8 +273,12 @@ namespace Spine.Unity {
 		}
 
 		public override void LateUpdate () {
+			if (updateTiming == UpdateTiming.InLateUpdate && valid)
+				Update(unscaledTime ? Time.unscaledDeltaTime : Time.deltaTime);
+
 			// instantiation can happen from Update() after this component, leading to a missing Update() call.
 			if (!wasUpdatedAfterInit) Update(0);
+
 			base.LateUpdate();
 		}
 

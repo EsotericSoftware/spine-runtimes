@@ -114,7 +114,7 @@ class SimpleFlameExample extends FlameGame {
     // Load the Spineboy atlas and skeleton data from asset files
     // and create a SpineComponent from them, scaled down and
     // centered on the screen
-    spineboy = await SpineComponent.fromAssets("assets/spineboy.atlas", "assets/spineboy-pro.skel",
+    spineboy = await SpineComponent.fromAssets("assets/spineboy.atlas", "assets/spineboy-pro.json",
         scale: Vector2(0.4, 0.4), anchor: Anchor.center, position: Vector2(size.x / 2, size.y / 2));
 
     // Set the "walk" animation on track 0 in looping mode
@@ -126,6 +126,36 @@ class SimpleFlameExample extends FlameGame {
   void onDetach() {
     // Dispose the native resources that have been loaded for spineboy.
     spineboy.dispose();
+  }
+}
+
+class DragonExample extends FlameGame {
+  late final Atlas cachedAtlas;
+  late final SkeletonData cachedSkeletonData;
+  late final SpineComponent dragon;
+
+  @override
+  Future<void> onLoad() async {
+    cachedAtlas = await Atlas.fromAsset("assets/dragon.atlas");
+    cachedSkeletonData =  await SkeletonData.fromAsset(cachedAtlas, "assets/dragon-ess.json");
+    final drawable = SkeletonDrawable(cachedAtlas, cachedSkeletonData, false);
+    dragon = SpineComponent(
+      drawable,
+      scale: Vector2(0.4, 0.4),
+      anchor: Anchor.center,
+      position: Vector2(size.x / 2, size.y / 2 - 150),
+    );
+    // Set the "walk" animation on track 0 in looping mode
+    dragon.animationState.setAnimationByName(0, "flying", true);
+    await add(dragon);
+  }
+
+  @override
+  void onDetach() {
+    // Dispose the native resources that have been loaded for spineboy.
+    dragon.dispose();
+    cachedSkeletonData.dispose();
+    cachedAtlas.dispose();
   }
 }
 

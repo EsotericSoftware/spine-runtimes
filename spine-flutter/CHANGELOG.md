@@ -1,3 +1,9 @@
+# 4.1.7
+* Fix allocation patter for temporary structs on Windows, which resulted in a hard crash without a stack trace on the native side.
+
+# 4.1.6
+* Fixed bug in path handling on Windows.
+
 # 4.1.5
 * Updated http dependency to 1.1.0
 

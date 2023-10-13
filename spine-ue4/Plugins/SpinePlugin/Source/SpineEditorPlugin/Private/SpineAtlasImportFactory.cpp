@@ -28,11 +28,9 @@
  *****************************************************************************/
 
 #include "SpineAtlasImportFactory.h"
-#include "AssetRegistryModule.h"
 #include "AssetToolsModule.h"
-#include "Developer/AssetTools/Public/IAssetTools.h"
-#include "PackageTools.h"
 #include "SpineAtlasAsset.h"
+#include "Editor.h"
 
 #define LOCTEXT_NAMESPACE "Spine"
 
@@ -56,6 +54,9 @@ bool USpineAtlasAssetFactory::FactoryCanImport(const FString &Filename) {
 }
 
 UObject *USpineAtlasAssetFactory::FactoryCreateFile(UClass *InClass, UObject *InParent, FName InName, EObjectFlags Flags, const FString &Filename, const TCHAR *Parms, FFeedbackContext *Warn, bool &bOutOperationCanceled) {
+	FString FileExtension = FPaths::GetExtension(Filename);
+	GEditor->GetEditorSubsystem<UImportSubsystem>()->BroadcastAssetPreImport(this, InClass, InParent, InName, *FileExtension);
+
 	FString rawString;
 	if (!FFileHelper::LoadFileToString(rawString, *Filename)) {
 		return nullptr;
@@ -64,13 +65,12 @@ UObject *USpineAtlasAssetFactory::FactoryCreateFile(UClass *InClass, UObject *In
 	FString currentSourcePath, filenameNoExtension, unusedExtension;
 	const FString longPackagePath = FPackageName::GetLongPackagePath(InParent->GetOutermost()->GetPathName());
 	FPaths::Split(UFactory::GetCurrentFilename(), currentSourcePath, filenameNoExtension, unusedExtension);
-	FString name(InName.ToString());
-	name.Append("-atlas");
 
-	USpineAtlasAsset *asset = NewObject<USpineAtlasAsset>(InParent, InClass, FName(*name), Flags);
+	USpineAtlasAsset *asset = NewObject<USpineAtlasAsset>(InParent, InClass, InName, Flags);
 	asset->SetRawData(rawString);
 	asset->SetAtlasFileName(FName(*Filename));
 	LoadAtlas(asset, currentSourcePath, longPackagePath);
+	GEditor->GetEditorSubsystem<UImportSubsystem>()->BroadcastAssetPostImport(this, asset);
 	return asset;
 }
 
@@ -109,6 +109,7 @@ EReimportResult::Type USpineAtlasAssetFactory::Reimport(UObject *Obj) {
 	else
 		Obj->MarkPackageDirty();
 
+	GEditor->GetEditorSubsystem<UImportSubsystem>()->BroadcastAssetReimport(asset);
 	return EReimportResult::Succeeded;
 }
 

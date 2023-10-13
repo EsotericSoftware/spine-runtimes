@@ -28,16 +28,44 @@
  *****************************************************************************/
 
 #include "SpineEditorPlugin.h"
+#include "AssetTypeActions_Base.h"
+#include "SpineAtlasAsset.h"
+#include "SpineSkeletonDataAsset.h"
+
+class FSpineAtlasAssetTypeActions : public FAssetTypeActions_Base {
+public:
+	UClass *GetSupportedClass() const override { return USpineAtlasAsset::StaticClass(); };
+	FText GetName() const override { return INVTEXT("Spine atlas asset"); };
+	FColor GetTypeColor() const override { return FColor::Red; };
+	uint32 GetCategories() override { return EAssetTypeCategories::Misc; };
+};
+
+class FSpineSkeletonDataAssetTypeActions : public FAssetTypeActions_Base {
+public:
+	UClass *GetSupportedClass() const override { return USpineSkeletonDataAsset::StaticClass(); };
+	FText GetName() const override { return INVTEXT("Spine data asset"); };
+	FColor GetTypeColor() const override { return FColor::Red; };
+	uint32 GetCategories() override { return EAssetTypeCategories::Misc; };
+};
 
 class FSpineEditorPlugin : public ISpineEditorPlugin {
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
+	TSharedPtr<FSpineAtlasAssetTypeActions> SpineAtlasAssetTypeActions;
+	TSharedPtr<FSpineSkeletonDataAssetTypeActions> SpineSkeletonDataAssetTypeActions;
 };
 
 IMPLEMENT_MODULE(FSpineEditorPlugin, SpineEditorPlugin)
 
 void FSpineEditorPlugin::StartupModule() {
+	SpineAtlasAssetTypeActions = MakeShared<FSpineAtlasAssetTypeActions>();
+	FAssetToolsModule::GetModule().Get().RegisterAssetTypeActions(SpineAtlasAssetTypeActions.ToSharedRef());
+	SpineSkeletonDataAssetTypeActions = MakeShared<FSpineSkeletonDataAssetTypeActions>();
+	FAssetToolsModule::GetModule().Get().RegisterAssetTypeActions(SpineSkeletonDataAssetTypeActions.ToSharedRef());
 }
 
 void FSpineEditorPlugin::ShutdownModule() {
+	if (!FModuleManager::Get().IsModuleLoaded("AssetTools")) return;
+	FAssetToolsModule::GetModule().Get().UnregisterAssetTypeActions(SpineAtlasAssetTypeActions.ToSharedRef());
+	FAssetToolsModule::GetModule().Get().UnregisterAssetTypeActions(SpineSkeletonDataAssetTypeActions.ToSharedRef());
 }

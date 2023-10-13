@@ -71,6 +71,11 @@ namespace Spine.Unity {
 				onDemandTextureLoader.RequestLoadMaterialTextures(material, ref overrideMaterial);
 		}
 
+		public virtual void RequireTextureLoaded (Texture placeholderTexture, ref Texture replacementTexture, System.Action<Texture> onTextureLoaded) {
+			if (onDemandTextureLoader)
+				onDemandTextureLoader.RequestLoadTexture(placeholderTexture, ref replacementTexture, onTextureLoaded);
+		}
+
 		[SerializeField] protected LoadingMode textureLoadingMode = LoadingMode.Normal;
 		[SerializeField] protected OnDemandTextureLoader onDemandTextureLoader = null;
 #endif

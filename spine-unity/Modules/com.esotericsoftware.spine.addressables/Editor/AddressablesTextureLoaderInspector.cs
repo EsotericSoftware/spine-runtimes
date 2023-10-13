@@ -47,9 +47,10 @@ namespace Spine.Unity.Editor {
 
 	[CustomEditor(typeof(AddressablesTextureLoader)), CanEditMultipleObjects]
 	public class AddressablesTextureLoaderInspector : GenericTextureLoaderInspector {
-		public string LoaderSuffix { get { return "_Addressable"; } }
 
 		public class AddressablesMethodImplementations : StaticMethodImplementations {
+			public override string LoaderSuffix { get { return "_Addressable"; } }
+
 			public override GenericTextureLoader GetOrCreateLoader (string loaderPath) {
 				AddressablesTextureLoader loader = AssetDatabase.LoadAssetAtPath<AddressablesTextureLoader>(loaderPath);
 				if (loader == null) {

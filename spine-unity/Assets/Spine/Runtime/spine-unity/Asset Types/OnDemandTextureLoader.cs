@@ -51,6 +51,27 @@ namespace Spine.Unity {
 		/// <param name="placeholderMaterials">A newly created list of materials which has a placeholder texture assigned.</param>
 		/// <returns>True, if any placeholder texture is assigned at a Material of the associated AtlasAssetBase.</returns>
 		public abstract bool HasPlaceholderTexturesAssigned (out List<Material> placeholderMaterials);
+
+		/// <summary>
+		/// Returns whether any main texture is null at a Material of the associated AtlasAssetBase.
+		/// </summary>
+		/// <param name="nullTextureMaterials">A newly created list of materials which has a null main texture assigned.</param>
+		/// <returns>True, if any null main texture is assigned at a Material of the associated AtlasAssetBase.</returns>
+		public virtual bool HasNullMainTexturesAssigned (out List<Material> nullTextureMaterials) {
+			nullTextureMaterials = null;
+			if (!atlasAsset) return false;
+
+			bool anyNullTexture = false;
+			foreach (Material material in atlasAsset.Materials) {
+				if (material.mainTexture == null) {
+					anyNullTexture = true;
+					if (nullTextureMaterials == null) nullTextureMaterials = new List<Material>();
+					nullTextureMaterials.Add(material);
+				}
+			}
+			return anyNullTexture;
+		}
+
 		/// <summary>
 		/// Assigns previously setup target textures at each Material where placeholder textures are setup.</summary>
 		/// <returns>True on success, false if the target texture could not be assigned at any of the
@@ -60,13 +81,20 @@ namespace Spine.Unity {
 		public abstract void EndCustomTextureLoading ();
 		public abstract bool HasPlaceholderAssigned (Material material);
 		public abstract void RequestLoadMaterialTextures (Material material, ref Material overrideMaterial);
+		public abstract void RequestLoadTexture (Texture placeholderTexture, ref Texture replacementTexture,
+			System.Action<Texture> onTextureLoaded = null);
 		public abstract void Clear (bool clearAtlasAsset = false);
 
 		#region Event delegates
 		public delegate void TextureLoadDelegate (OnDemandTextureLoader loader, Material material, int textureIndex);
+		protected event TextureLoadDelegate onTextureRequested;
 		protected event TextureLoadDelegate onTextureLoaded;
 		protected event TextureLoadDelegate onTextureUnloaded;
 
+		public event TextureLoadDelegate TextureRequested {
+			add { onTextureRequested += value; }
+			remove { onTextureRequested -= value; }
+		}
 		public event TextureLoadDelegate TextureLoaded {
 			add { onTextureLoaded += value; }
 			remove { onTextureLoaded -= value; }
@@ -76,6 +104,10 @@ namespace Spine.Unity {
 			remove { onTextureUnloaded -= value; }
 		}
 
+		protected void OnTextureRequested (Material material, int textureIndex) {
+			if (onTextureRequested != null)
+				onTextureRequested(this, material, textureIndex);
+		}
 		protected void OnTextureLoaded (Material material, int textureIndex) {
 			if (onTextureLoaded != null)
 				onTextureLoaded(this, material, textureIndex);
