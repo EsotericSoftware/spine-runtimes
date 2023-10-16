@@ -181,6 +181,7 @@
   * Timeline extension package: Added static `EditorEvent` callback to allow editor scripts to react to animation events outside of play-mode. Register to the events via `Spine.Unity.Playables.SpineAnimationStateMixerBehaviour.EditorEvent += YourCallback;`.
   * URP Shaders: Added `Depth Write` property to shaders `Universal Render Pipeline/Spine/Skeleton` and `Universal Render Pipeline/Spine/Skeleton Lit`. Defaults to false to maintain existing behaviour.
   * Added `Animation Update` mode (called `UpdateTiming` in code) `In Late Update` for `SkeletonAnimation`, `SkeletonMecanim` and `SkeletonGraphic`. This allows you to update the `SkeletonMecanim` skeleton in the same frame that the Mecanim Animator updated its state, which happens between `Update` and `LateUpdate`.
+  * URP Shaders: Added URP "Blend Mode" shader variants for both URP 3D and URP 2D renderers. They are listed under shader name "Universal Render Pipeline/Spine/Blend Modes/" and "Universal Render Pipeline/2D/Spine/Blend Modes/" respectively.
 
 * **Breaking changes**
   * Made `SkeletonGraphic.unscaledTime` parameter protected, use the new property `UnscaledTime` instead.

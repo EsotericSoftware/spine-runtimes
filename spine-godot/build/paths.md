@@ -7,3 +7,6 @@
     * Template
         * Debug: godot.windows.template_debug.x86_64.exe
         * Release: godot.windows.template_release.x86_64.exe
+* macOS
+    * Editor
+        * Debug: 
