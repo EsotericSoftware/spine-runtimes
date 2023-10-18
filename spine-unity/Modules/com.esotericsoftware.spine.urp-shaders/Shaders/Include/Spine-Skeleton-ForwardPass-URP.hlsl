@@ -41,6 +41,8 @@ VertexOutput vert(appdata v) {
 	o.color *= _Color;
 	o.darkColor = GammaToTargetSpace(
 		half3(v.tintBlackRG.r, v.tintBlackRG.g, v.tintBlackB.r)) + _Black.rgb;
+#elif defined (APPLY_MATERIAL_TINT_COLOR)
+	o.color *= _Color;
 #endif
 	return o;
 }
