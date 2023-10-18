@@ -4,6 +4,8 @@
 		[NoScaleOffset] _MainTex ("MainTex", 2D) = "black" {}
 		[Toggle(_STRAIGHT_ALPHA_INPUT)] _StraightAlphaInput("Straight Alpha Texture", Int) = 0
 		_Cutoff ("Shadow alpha cutoff", Range(0,1)) = 0.1
+		[MaterialToggle(_TINT_BLACK_ON)]  _TintBlack("Tint Black", Float) = 0
+		_Black("    Dark Color", Color) = (0,0,0,0)
 		[HideInInspector] _StencilRef("Stencil Reference", Float) = 1.0
 		[HideInInspector][Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Comparison", Float) = 8 // Set to Always as default
 	}
@@ -28,9 +30,24 @@
 			Tags { "LightMode" = "Universal2D" }
 
 			HLSLPROGRAM
+			// Required to compile gles 2.0 with standard srp library
+			#pragma prefer_hlslcc gles
+			#pragma exclude_renderers d3d11_9x
+
+			// -------------------------------------
+			// Unity defined keywords
+			#pragma multi_compile_fog
+
+			//--------------------------------------
+			// GPU Instancing
+			#pragma multi_compile_instancing
+
+			//--------------------------------------
+			// Spine related keywords
+			#pragma shader_feature _ _STRAIGHT_ALPHA_INPUT
+			#pragma shader_feature _TINT_BLACK_ON
 			#pragma vertex vert
 			#pragma fragment frag
-			#pragma shader_feature _ _STRAIGHT_ALPHA_INPUT
 
 			#undef LIGHTMAP_ON
 
@@ -38,10 +55,10 @@
 			#define fixed4 half4
 			#define fixed3 half3
 			#define fixed half
-			#include "../../Include/Spine-Input-BlendModes-URP.hlsl"
-			#include "../../Include/Spine-BlendModes-NormalPass-URP.hlsl"
+			#define APPLY_MATERIAL_TINT_COLOR
+			#include "../../Include/Spine-Input-URP.hlsl"
+			#include "../../Include/Spine-Skeleton-ForwardPass-URP.hlsl"
 			ENDHLSL
 		}
 	}
-	CustomEditor "SpineShaderWithOutlineGUI"
 }
