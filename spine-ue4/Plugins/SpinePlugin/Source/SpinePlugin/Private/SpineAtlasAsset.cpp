@@ -62,6 +62,16 @@ void USpineAtlasAsset::Serialize(FArchive &Ar) {
 		importData = NewObject<UAssetImportData>(this, TEXT("AssetImportData"));
 }
 
+FPrimaryAssetId USpineAtlasAsset::GetPrimaryAssetId() const {
+	return FPrimaryAssetId("spine-atlas", GetFName());
+}
+
+void USpineAtlasAsset::PostLoadAssetRegistryTags(const FAssetData& InAssetData,
+	TArray<FAssetRegistryTag>& OutTagsAndValuesToUpdate) const
+{
+	UObject::PostLoadAssetRegistryTags(InAssetData, OutTagsAndValuesToUpdate);
+}
+
 #endif
 
 FName USpineAtlasAsset::GetAtlasFileName() const {
