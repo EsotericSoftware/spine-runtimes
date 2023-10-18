@@ -36,7 +36,7 @@
 // clang-format on
 
 UCLASS(BlueprintType, ClassGroup = (Spine))
-class SPINEPLUGIN_API USpineAtlasAsset : public UObject {
+class SPINEPLUGIN_API USpineAtlasAsset : public UPrimaryDataAsset {
 	GENERATED_BODY()
 
 public:
@@ -70,9 +70,7 @@ protected:
 	class UAssetImportData *importData;
 
 	virtual void PostInitProperties() override;
-	virtual void GetAssetRegistryTags(TArray<FAssetRegistryTag> &OutTags) const override;
 	virtual void Serialize(FArchive &Ar) override;
-	virtual FPrimaryAssetId GetPrimaryAssetId() const override;
 	virtual void PostLoadAssetRegistryTags(const FAssetData& InAssetData, TArray<FAssetRegistryTag>& OutTagsAndValuesToUpdate) const override;
 #endif
 };
