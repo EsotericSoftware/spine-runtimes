@@ -33,7 +33,7 @@
 
 static int /*bool*/ loadSequence(spAtlas *atlas, const char *basePath, spSequence *sequence) {
 	spTextureRegionArray *regions = sequence->regions;
-	char *path = CALLOC(char, strlen(basePath) + sequence->digits + 1);
+	char *path = CALLOC(char, strlen(basePath) + sequence->digits + 2);
 	int i;
 	for (i = 0; i < regions->size; i++) {
 		spSequence_getPath(sequence, basePath, i, path);
