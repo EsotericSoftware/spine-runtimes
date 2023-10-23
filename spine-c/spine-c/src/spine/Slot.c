@@ -40,7 +40,8 @@ spSlot *spSlot_create(spSlotData *data, spBone *bone) {
 	return self;
 }
 
-void spSlot_dispose(spSlot *self) {
+void spSlot_dispose(spSlot *self) {	
+	if (self->attachment) spAttachment_dispose(self->attachment);
 	FREE(self->deform);
 	FREE(self->darkColor);
 	FREE(self);
