@@ -67,6 +67,9 @@ void spSlot_setAttachment(spSlot *self, spAttachment *attachment) {
 		self->deformCount = 0;
 	}
 
+	if (attachment) attachment->refCount++;
+	if (self->attachment) spAttachment_dispose(self->attachment);
+
 	CONST_CAST(spAttachment *, self->attachment) = attachment;
 	self->sequenceIndex = -1;
 }
