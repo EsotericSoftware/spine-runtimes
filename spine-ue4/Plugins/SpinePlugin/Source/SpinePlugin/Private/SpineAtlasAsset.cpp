@@ -58,13 +58,13 @@ void USpineAtlasAsset::Serialize(FArchive &Ar) {
 		importData = NewObject<UAssetImportData>(this, TEXT("AssetImportData"));
 }
 
-void USpineAtlasAsset::PostLoadAssetRegistryTags(const FAssetData& InAssetData,
-	TArray<FAssetRegistryTag>& OutTagsAndValuesToUpdate) const {
+void USpineAtlasAsset::PostLoadAssetRegistryTags(const FAssetData &InAssetData,
+												 TArray<FAssetRegistryTag> &OutTagsAndValuesToUpdate) const {
 	// FIXME: this is a massive hack. It will set the PackageFlags of the FAssetData
 	// in the AssetRegistry to PKG_FilterEditorOnly so the content browser displays it.
 	// This is necessary in UE 5.3 due to a regression in ContentBrowserAssetDataCore::IsPrimaryAsset
 	// See https://github.com/EsotericSoftware/spine-runtimes/issues/2368
-	FAssetData& MutableAssetData = const_cast<FAssetData&>(InAssetData);
+	FAssetData &MutableAssetData = const_cast<FAssetData &>(InAssetData);
 	// MutableAssetData.PackageFlags = EPackageFlags::PKG_FilterEditorOnly;
 	UObject::PostLoadAssetRegistryTags(MutableAssetData, OutTagsAndValuesToUpdate);
 }
