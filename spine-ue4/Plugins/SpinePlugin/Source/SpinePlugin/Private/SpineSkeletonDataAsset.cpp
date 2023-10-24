@@ -81,13 +81,13 @@ void USpineSkeletonDataAsset::Serialize(FArchive &Ar) {
 }
 
 
-void USpineSkeletonDataAsset::PostLoadAssetRegistryTags(const FAssetData& InAssetData,
-	// FIXME: this is a massive hack. It will set the PackageFlags of the FAssetData
-	// in the AssetRegistry to PKG_FilterEditorOnly so the content browser displays it.
-	// This is necessary in UE 5.3 due to a regression in ContentBrowserAssetDataCore::IsPrimaryAsset
-	// See https://github.com/EsotericSoftware/spine-runtimes/issues/2368
-	TArray<FAssetRegistryTag>& OutTagsAndValuesToUpdate) const {
-	FAssetData& MutableAssetData = const_cast<FAssetData&>(InAssetData);
+void USpineSkeletonDataAsset::PostLoadAssetRegistryTags(const FAssetData &InAssetData,
+														// FIXME: this is a massive hack. It will set the PackageFlags of the FAssetData
+														// in the AssetRegistry to PKG_FilterEditorOnly so the content browser displays it.
+														// This is necessary in UE 5.3 due to a regression in ContentBrowserAssetDataCore::IsPrimaryAsset
+														// See https://github.com/EsotericSoftware/spine-runtimes/issues/2368
+														TArray<FAssetRegistryTag> &OutTagsAndValuesToUpdate) const {
+	FAssetData &MutableAssetData = const_cast<FAssetData &>(InAssetData);
 	// MutableAssetData.PackageFlags = EPackageFlags::PKG_FilterEditorOnly;
 	UObject::PostLoadAssetRegistryTags(MutableAssetData, OutTagsAndValuesToUpdate);
 }

@@ -1144,7 +1144,7 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 		TransformConstraintData *constraint = skeletonData->findTransformConstraint(constraintMap->_name);
 		int constraintIndex = skeletonData->_transformConstraints.indexOf(constraint);
 		TransformConstraintTimeline *timeline = new (__FILE__, __LINE__) TransformConstraintTimeline(
-				constraintMap->_size, constraintMap->_size << 2, constraintIndex);
+				constraintMap->_size, constraintMap->_size * 6, constraintIndex);
 
 		float time = Json::getFloat(keyMap, "time", 0);
 		float mixRotate = Json::getFloat(keyMap, "mixRotate", 1);
