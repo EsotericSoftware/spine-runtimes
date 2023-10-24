@@ -38,21 +38,22 @@ import starling.core.Starling;
 import starling.events.TouchEvent;
 import starling.events.TouchPhase;
 
-class SequenceExample extends Scene {
+class TankExample extends Scene {
 	var loadBinary = false;
 
 	public function load():Void {
-		var atlas = new TextureAtlas(Assets.getText("assets/dragon.atlas"), new StarlingTextureLoader("assets/dragon.atlas"));
-		var skeletondata = SkeletonData.from(loadBinary ? Assets.getBytes("assets/dragon-ess.skel") : Assets.getText("assets/dragon-ess.json"), atlas);
+		background.color = 0xffffffff;
+		var atlas = new TextureAtlas(Assets.getText("assets/tank.atlas"), new StarlingTextureLoader("assets/tank.atlas"));
+		var skeletondata = SkeletonData.from(loadBinary ? Assets.getBytes("assets/tank-pro.skel") : Assets.getText("assets/tank-pro.json"), atlas);
 		var animationStateData = new AnimationStateData(skeletondata);
 		animationStateData.defaultMix = 0.25;
 
 		var skeletonSprite = new SkeletonSprite(skeletondata, animationStateData);
 		var bounds = skeletonSprite.skeleton.getBounds();
-		skeletonSprite.scale = Starling.current.stage.stageWidth / bounds.width * 0.5;
+		skeletonSprite.scale = Starling.current.stage.stageWidth / bounds.width;
 		skeletonSprite.x = Starling.current.stage.stageWidth / 2;
 		skeletonSprite.y = Starling.current.stage.stageHeight * 0.5;
-		skeletonSprite.state.setAnimationByName(0, "flying", true);
+		skeletonSprite.state.setAnimationByName(0, "drive", true);
 
 		addChild(skeletonSprite);
 		juggler.add(skeletonSprite);
@@ -63,7 +64,7 @@ class SequenceExample extends Scene {
 	public function onTouch(e:TouchEvent) {
 		var touch = e.getTouch(this);
 		if (touch != null && touch.phase == TouchPhase.ENDED) {
-			SceneManager.getInstance().switchScene(new MixAndMatchExample());
+			SceneManager.getInstance().switchScene(new VineExample());
 		}
 	}
 }

@@ -193,6 +193,7 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 	gameDestroy () {
 		this.pluginManager.removeGameObject((window as any).SPINE_GAME_OBJECT_TYPE ? (window as any).SPINE_GAME_OBJECT_TYPE : SPINE_GAME_OBJECT_TYPE, true, true);
 		if (this.webGLRenderer) this.webGLRenderer.dispose();
+		SpinePlugin.gameWebGLRenderer = null;
 	}
 
 	/** Returns the TextureAtlas instance for the given key */

@@ -27,6 +27,7 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+import spine.Skin;
 import Scene.SceneManager;
 import openfl.utils.Assets;
 import spine.SkeletonData;
@@ -38,21 +39,34 @@ import starling.core.Starling;
 import starling.events.TouchEvent;
 import starling.events.TouchPhase;
 
-class SequenceExample extends Scene {
+class MixAndMatchExample extends Scene {
 	var loadBinary = false;
 
 	public function load():Void {
-		var atlas = new TextureAtlas(Assets.getText("assets/dragon.atlas"), new StarlingTextureLoader("assets/dragon.atlas"));
-		var skeletondata = SkeletonData.from(loadBinary ? Assets.getBytes("assets/dragon-ess.skel") : Assets.getText("assets/dragon-ess.json"), atlas);
-		var animationStateData = new AnimationStateData(skeletondata);
+		var atlas = new TextureAtlas(Assets.getText("assets/mix-and-match.atlas"), new StarlingTextureLoader("assets/mix-and-match.atlas"));
+		var data = SkeletonData.from(loadBinary ? Assets.getBytes("assets/mix-and-match-pro.skel") : Assets.getText("assets/mix-and-match-pro.json"), atlas);
+		var animationStateData = new AnimationStateData(data);
 		animationStateData.defaultMix = 0.25;
 
-		var skeletonSprite = new SkeletonSprite(skeletondata, animationStateData);
+		var skeletonSprite = new SkeletonSprite(data, animationStateData);
+		var customSkin = new Skin("custom");
+		var skinBase = data.findSkin("skin-base");
+		customSkin.addSkin(skinBase);
+		customSkin.addSkin(data.findSkin("nose/short"));
+		customSkin.addSkin(data.findSkin("eyelids/girly"));
+		customSkin.addSkin(data.findSkin("eyes/violet"));
+		customSkin.addSkin(data.findSkin("hair/brown"));
+		customSkin.addSkin(data.findSkin("clothes/hoodie-orange"));
+		customSkin.addSkin(data.findSkin("legs/pants-jeans"));
+		customSkin.addSkin(data.findSkin("accessories/bag"));
+		customSkin.addSkin(data.findSkin("accessories/hat-red-yellow"));
+		skeletonSprite.skeleton.skin = customSkin;
+
 		var bounds = skeletonSprite.skeleton.getBounds();
-		skeletonSprite.scale = Starling.current.stage.stageWidth / bounds.width * 0.5;
+		skeletonSprite.scale = Starling.current.stage.stageHeight / bounds.height * 0.5;
 		skeletonSprite.x = Starling.current.stage.stageWidth / 2;
-		skeletonSprite.y = Starling.current.stage.stageHeight * 0.5;
-		skeletonSprite.state.setAnimationByName(0, "flying", true);
+		skeletonSprite.y = Starling.current.stage.stageHeight * 0.9;
+		skeletonSprite.state.setAnimationByName(0, "dance", true);
 
 		addChild(skeletonSprite);
 		juggler.add(skeletonSprite);
@@ -63,7 +77,7 @@ class SequenceExample extends Scene {
 	public function onTouch(e:TouchEvent) {
 		var touch = e.getTouch(this);
 		if (touch != null && touch.phase == TouchPhase.ENDED) {
-			SceneManager.getInstance().switchScene(new MixAndMatchExample());
+			SceneManager.getInstance().switchScene(new TankExample());
 		}
 	}
 }
