@@ -103,6 +103,7 @@ class MeshAttachment extends VertexAttachment implements HasTextureRegion {
 					while (i < n) {
 						uvs[i] = u + (1 - regionUVs[i + 1]) * width;
 						uvs[i + 1] = v + regionUVs[i] * height;
+						i += 2;
 					}
 					return;
 			}
