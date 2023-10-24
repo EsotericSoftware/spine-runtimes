@@ -27,6 +27,7 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+import Scene.SceneManager;
 import openfl.utils.Assets;
 import spine.SkeletonData;
 import spine.animation.AnimationStateData;
@@ -57,13 +58,16 @@ class BasicExample extends Scene {
 		addChild(skeletonSprite);
 		juggler.add(skeletonSprite);
 
+		addText("Click anywhere for next scene");
+
 		addEventListener(TouchEvent.TOUCH, onTouch);
 	}
 
 	public function onTouch(e:TouchEvent) {
 		var touch = e.getTouch(this);
+		trace(touch);
 		if (touch != null && touch.phase == TouchPhase.ENDED) {
-			trace("Mouse clicked");
+			SceneManager.getInstance().switchScene(new SequenceExample());
 		}
 	}
 }

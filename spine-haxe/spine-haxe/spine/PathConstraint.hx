@@ -86,18 +86,16 @@ class PathConstraint implements Updatable {
 			return;
 
 		var data:PathConstraintData = _data;
-		var percentSpacing:Bool = data.spacingMode == SpacingMode.percent;
-		var rotateMode:RotateMode = data.rotateMode;
-		var fTangents:Bool = rotateMode == RotateMode.tangent,
-			fScale:Bool = rotateMode == RotateMode.chainScale;
-
+		var fTangents:Bool = data.rotateMode == RotateMode.tangent,
+			fScale:Bool = data.rotateMode == RotateMode.chainScale;
 		var boneCount:Int = _bones.length;
 		var spacesCount:Int = fTangents ? boneCount : boneCount + 1;
-		var bones:Array<Bone> = _bones;
-		_spaces.resize(spacesCount);
+		ArrayUtils.resize(_spaces, spacesCount, 0);
+		if (fScale) {
+			ArrayUtils.resize(_lengths, boneCount, 0);
+		}
 
-		if (fScale)
-			_lengths.resize(boneCount);
+		var bones:Array<Bone> = _bones;
 
 		var i:Int,
 			n:Int,
@@ -254,7 +252,7 @@ class PathConstraint implements Updatable {
 
 	private function computeWorldPositions(path:PathAttachment, spacesCount:Int, tangents:Bool):Array<Float> {
 		var position:Float = this.position;
-		_positions.resize(spacesCount * 3 + 2);
+		ArrayUtils.resize(_positions, spacesCount * 3 + 2, 0);
 		var out:Array<Float> = _positions, world:Array<Float>;
 		var closed:Bool = path.closed;
 		var verticesLength:Int = path.worldVerticesLength;
@@ -277,7 +275,7 @@ class PathConstraint implements Updatable {
 					multiplier = 1;
 			}
 
-			_world.resize(8);
+			ArrayUtils.resize(_world, 8, 0);
 			world = _world;
 			var i:Int = 0;
 			var o:Int = 0;
@@ -343,7 +341,7 @@ class PathConstraint implements Updatable {
 		// World vertices.
 		if (closed) {
 			verticesLength += 2;
-			_world.resize(verticesLength);
+			ArrayUtils.resize(_world, verticesLength, 0);
 			world = _world;
 			path.computeWorldVertices(target, 2, verticesLength - 4, world, 0, 2);
 			path.computeWorldVertices(target, 0, 2, world, verticesLength - 4, 2);
@@ -352,13 +350,13 @@ class PathConstraint implements Updatable {
 		} else {
 			curveCount--;
 			verticesLength -= 4;
-			_world.resize(verticesLength);
+			ArrayUtils.resize(_world, verticesLength, 0);
 			world = _world;
 			path.computeWorldVertices(target, 2, verticesLength, world, 0, 2);
 		}
 
 		// Curve lengths.
-		_curves.resize(curveCount);
+		ArrayUtils.resize(_curves, curveCount, 0);
 		var curves:Array<Float> = _curves;
 		var pathLength:Float = 0;
 		var x1:Float = world[0],

@@ -71,10 +71,10 @@ class NullAttachmentLoader : public AttachmentLoader {
 
 int main(void) {
 	String atlasFile("");
-	String skeletonFile("/Users/badlogic/Downloads/catsanddogs2.json");
+	String skeletonFile("/Users/badlogic/workspaces/spine-runtimes/spine-haxe/example/assets/vine-pro.json");
 	String animation = "";
 
-	float scale = 0.6f;
+	float scale = 1.0f;
 	SFMLTextureLoader textureLoader;
 	NullAttachmentLoader nullLoader;
 	Atlas *atlas = atlasFile.length() == 0 ? nullptr : new Atlas(atlasFile, &textureLoader);
@@ -103,6 +103,7 @@ int main(void) {
 
 	AnimationStateData stateData(skeletonData);
 	SkeletonDrawable drawable(skeletonData, &stateData);
+    drawable.skeleton->updateWorldTransform();
 	drawable.skeleton->setPosition(320, 590);
 	if (animation.length() > 0) drawable.state->setAnimation(0, animation, true);
 

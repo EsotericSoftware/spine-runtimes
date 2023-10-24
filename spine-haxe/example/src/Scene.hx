@@ -27,6 +27,9 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+import starling.display.Quad;
+import starling.geom.Rectangle;
+import starling.text.TextField;
 import starling.core.Starling;
 import starling.display.Sprite;
 
@@ -60,8 +63,14 @@ class SceneManager {
 abstract class Scene extends Sprite {
 	var juggler = new starling.animation.Juggler();
 
+	public var background:Quad;
+
 	public function new() {
 		super();
+		var stageWidth = Starling.current.stage.stageWidth;
+		var stageHeight = Starling.current.stage.stageHeight;
+		background = new Quad(stageWidth, stageHeight, 0x0);
+		this.addChild(background);
 		Starling.current.juggler.add(juggler);
 	}
 
@@ -71,5 +80,14 @@ abstract class Scene extends Sprite {
 		juggler.purge();
 		Starling.current.juggler.remove(juggler);
 		super.dispose();
+	}
+
+	public function addText(text:String) {
+		var textField = new TextField(200, 30, text);
+		textField.x = 10;
+		textField.y = 10;
+		textField.format.color = 0xffffffff;
+		addChild(textField);
+		return textField;
 	}
 }
