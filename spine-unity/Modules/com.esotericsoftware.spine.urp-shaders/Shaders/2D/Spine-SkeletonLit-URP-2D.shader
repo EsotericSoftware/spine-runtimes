@@ -244,5 +244,5 @@ Shader "Universal Render Pipeline/2D/Spine/Skeleton Lit" {
 			ENDHLSL
 		}
 	}
-	FallBack "Universal Render Pipeline/2D/Sprite-Lit-Default"
+	FallBack "Universal Render Pipeline/2D/Spine/Skeleton"
 }

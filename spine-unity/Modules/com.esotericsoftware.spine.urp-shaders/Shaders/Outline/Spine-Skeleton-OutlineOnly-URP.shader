@@ -56,6 +56,5 @@ Shader "Universal Render Pipeline/Spine/Outline/Skeleton-OutlineOnly" {
 		}
 	}
 
-	FallBack "Hidden/InternalErrorShader"
 	CustomEditor "SpineShaderWithOutlineGUI"
 }

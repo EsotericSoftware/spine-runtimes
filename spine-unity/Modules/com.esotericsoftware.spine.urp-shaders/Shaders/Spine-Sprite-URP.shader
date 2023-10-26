@@ -276,6 +276,6 @@ Shader "Universal Render Pipeline/Spine/Sprite"
 		}
 	}
 
-	FallBack "Hidden/InternalErrorShader"
+	FallBack "Universal Render Pipeline/Spine/Skeleton"
 	CustomEditor "SpineSpriteShaderGUI"
 }

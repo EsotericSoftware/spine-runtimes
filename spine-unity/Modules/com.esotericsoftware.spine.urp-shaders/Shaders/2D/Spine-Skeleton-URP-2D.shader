@@ -64,5 +64,5 @@ Shader "Universal Render Pipeline/2D/Spine/Skeleton" {
 		}
 	}
 
-	FallBack "Hidden/InternalErrorShader"
+	FallBack "Universal Render Pipeline/2D/Sprite-Unlit-Default"
 }
