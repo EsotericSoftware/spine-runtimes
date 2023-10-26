@@ -139,5 +139,5 @@ Shader "Universal Render Pipeline/Spine/Skeleton" {
 		}
 	}
 
-	FallBack "Hidden/InternalErrorShader"
+	FallBack "Universal Render Pipeline/Unlit"
 }
