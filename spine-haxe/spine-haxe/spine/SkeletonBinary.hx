@@ -1055,14 +1055,14 @@ class SkeletonBinary {
 								if (end == 0) {
 									if (weighted) {
 										deform = new Array<Float>();
-										deform.resize(deformLength);
+										ArrayUtils.resize(deform, deformLength, 0);
 									} else {
 										deform = vertices;
 									}
 								} else {
 									var v:Int, vn:Int;
 									deform = new Array<Float>();
-									deform.resize(deformLength);
+									ArrayUtils.resize(deform, deformLength, 0);
 									var start:Int = input.readInt(true);
 									end += start;
 									if (scale == 1) {

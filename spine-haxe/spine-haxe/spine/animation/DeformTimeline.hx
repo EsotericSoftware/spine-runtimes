@@ -156,7 +156,7 @@ class DeformTimeline extends CurveTimeline implements SlotTimeline {
 						deform.resize(0);
 						return;
 					}
-					deform.resize(vertexCount);
+					ArrayUtils.resize(deform, vertexCount, 0);
 					var vertexAttachment:VertexAttachment = cast(slotAttachment, VertexAttachment);
 					if (vertexAttachment.bones == null) {
 						// Unweighted vertex positions.
@@ -175,7 +175,7 @@ class DeformTimeline extends CurveTimeline implements SlotTimeline {
 			return;
 		}
 
-		deform.resize(vertexCount);
+		ArrayUtils.resize(deform, vertexCount, 0);
 		var setup:Float;
 		if (time >= frames[frames.length - 1]) // Time is after last frame.
 		{

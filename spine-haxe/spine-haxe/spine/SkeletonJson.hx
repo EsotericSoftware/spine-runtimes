@@ -979,13 +979,13 @@ class SkeletonJson {
 								if (verticesValue == null) {
 									if (weighted) {
 										deform = new Array<Float>();
-										deform.resize(deformLength);
+										ArrayUtils.resize(deform, deformLength, 0);
 									} else {
 										deform = vertices;
 									}
 								} else {
 									deform = new Array<Float>();
-									deform.resize(deformLength);
+									ArrayUtils.resize(deform, deformLength, 0);
 									var start:Int = getInt(keyMap, "offset");
 									var temp:Array<Float> = getFloatArray(keyMap, "vertices");
 									for (i in 0...temp.length) {
