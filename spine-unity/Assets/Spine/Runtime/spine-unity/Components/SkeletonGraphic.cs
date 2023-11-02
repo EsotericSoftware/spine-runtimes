@@ -604,6 +604,8 @@ namespace Spine.Unity {
 				SetRectTransformSize(submeshGraphic, size);
 				submeshGraphic.rectTransform.pivot = p;
 			}
+
+			this.referenceSize = size;
 		}
 
 		public static void SetRectTransformSize (Graphic target, Vector2 size) {
