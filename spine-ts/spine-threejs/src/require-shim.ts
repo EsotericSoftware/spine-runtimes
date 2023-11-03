@@ -31,7 +31,7 @@ declare global {
 	var require: any;
 }
 
-if (window.THREE) {
+if (typeof window !== 'undefined' && window.THREE) {
 	let prevRequire = window.require;
 	window.require = (x: string) => {
 		if (prevRequire) return prevRequire(x);
