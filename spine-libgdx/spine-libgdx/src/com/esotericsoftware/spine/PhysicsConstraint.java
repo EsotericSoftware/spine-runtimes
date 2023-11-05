@@ -209,8 +209,9 @@ public class PhysicsConstraint implements Updatable {
 					r *= 0.5f;
 					sin = sin(r);
 					cos = cos(r);
-					bone.a = ra = cos * ra - sin * bone.c;
+					bone.a = cos * ra - sin * bone.c;
 					bone.c = sin * ra + cos * bone.c;
+					ra = bone.a;
 				} else {
 					sin = sin(r);
 					cos = cos(r);
