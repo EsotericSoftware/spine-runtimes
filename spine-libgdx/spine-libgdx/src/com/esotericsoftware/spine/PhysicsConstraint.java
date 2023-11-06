@@ -202,40 +202,93 @@ public class PhysicsConstraint implements Updatable {
 			if (y) bone.worldY += yOffset * mix;
 		}
 
-		if (rotateOrShearX) {
-			float r = rotateOffset * mix, ra = bone.a, sin, cos;
-			if (data.rotate) {
-				if (data.shearX) {
-					r *= 0.5f;
-					sin = sin(r);
-					cos = cos(r);
-					bone.a = cos * ra - sin * bone.c;
-					bone.c = sin * ra + cos * bone.c;
-					ra = bone.a;
+		// Smoothing.
+		if (physics != Physics.none && false) {
+			float a = (Math.min(remaining / data.step, 1) - 1) * mix;
+			if (rotateOrShearX) {
+				float rotateOffset = rotateVelocityLast * a;
+				float r = rotateOffset * mix, ra = bone.a, sin, cos;
+				if (data.rotate) {
+					if (data.shearX) {
+						r *= 0.5f;
+						sin = sin(r);
+						cos = cos(r);
+						bone.a = cos * ra - sin * bone.c;
+						bone.c = sin * ra + cos * bone.c;
+						ra = bone.a;
+					} else {
+						sin = sin(r);
+						cos = cos(r);
+					}
+					float rb = bone.b;
+					bone.b = cos * rb - sin * bone.d;
+					bone.d = sin * rb + cos * bone.d;
 				} else {
 					sin = sin(r);
 					cos = cos(r);
 				}
-				float rb = bone.b;
-				bone.b = cos * rb - sin * bone.d;
-				bone.d = sin * rb + cos * bone.d;
-			} else {
-				sin = sin(r);
-				cos = cos(r);
+				bone.a = cos * ra - sin * bone.c;
+				bone.c = sin * ra + cos * bone.c;
 			}
-			bone.a = cos * ra - sin * bone.c;
-			bone.c = sin * ra + cos * bone.c;
+			if (scaleX) {
+			}
 		}
-		if (scaleX) {
-			float s = 1 + scaleOffset * mix;
-			bone.a *= s;
-			bone.c *= s;
+
+		if (false) {
+			// Local.
+			if (rotateOrShearX) {
+				float r = bone.worldToLocalRotation((atan2(bone.c, bone.a) + rotateOffset * mix) * radDeg) - bone.arotation;
+				if (data.rotate) {
+					if (data.shearX) {
+						r *= 0.5f;
+						bone.ashearX += r;
+					}
+					bone.arotation += r;
+				} else
+					bone.ashearX += r;
+			}
+			if (scaleX) bone.ascaleX *= 1 + scaleOffset * mix;
+			bone.update(null);
+			if (physics == Physics.update) {
+				tx = l * bone.a;
+				ty = l * bone.c;
+			}
+		} else {
+			if (rotateOrShearX) {
+				float r = rotateOffset * mix, ra = bone.a, sin, cos;
+				if (data.rotate) {
+					if (data.shearX) {
+						r *= 0.5f;
+						sin = sin(r);
+						cos = cos(r);
+						bone.a = cos * ra - sin * bone.c;
+						bone.c = sin * ra + cos * bone.c;
+						ra = bone.a;
+					} else {
+						sin = sin(r);
+						cos = cos(r);
+					}
+					float rb = bone.b;
+					bone.b = cos * rb - sin * bone.d;
+					bone.d = sin * rb + cos * bone.d;
+				} else {
+					sin = sin(r);
+					cos = cos(r);
+				}
+				bone.a = cos * ra - sin * bone.c;
+				bone.c = sin * ra + cos * bone.c;
+			}
+			if (scaleX) {
+				float s = 1 + scaleOffset * mix;
+				bone.a *= s;
+				bone.c *= s;
+			}
+			if (physics == Physics.update) {
+				tx = l * bone.a;
+				ty = l * bone.c;
+			}
+			bone.updateAppliedTransform();
 		}
-		if (physics == Physics.update) {
-			tx = l * bone.a;
-			ty = l * bone.c;
-		}
-		bone.updateAppliedTransform();
 	}
 
 	/** The bone constrained by this physics constraint. */
