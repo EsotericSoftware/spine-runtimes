@@ -27,14 +27,14 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Skin } from "../Skin";
-import { BoundingBoxAttachment } from "./BoundingBoxAttachment";
-import { ClippingAttachment } from "./ClippingAttachment";
-import { MeshAttachment } from "./MeshAttachment";
-import { PathAttachment } from "./PathAttachment";
-import { PointAttachment } from "./PointAttachment";
-import { RegionAttachment } from "./RegionAttachment";
-import { Sequence } from "./Sequence";
+import { Skin } from "../Skin.js";
+import { BoundingBoxAttachment } from "./BoundingBoxAttachment.js";
+import { ClippingAttachment } from "./ClippingAttachment.js";
+import { MeshAttachment } from "./MeshAttachment.js";
+import { PathAttachment } from "./PathAttachment.js";
+import { PointAttachment } from "./PointAttachment.js";
+import { RegionAttachment } from "./RegionAttachment.js";
+import { Sequence } from "./Sequence.js";
 
 /** The interface which can be implemented to customize creating and populating attachments.
  *

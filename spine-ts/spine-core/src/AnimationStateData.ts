@@ -27,9 +27,9 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Animation } from "./Animation";
-import { SkeletonData } from "./SkeletonData";
-import { StringMap } from "./Utils";
+import { Animation } from "./Animation.js";
+import { SkeletonData } from "./SkeletonData.js";
+import { StringMap } from "./Utils.js";
 
 
 /** Stores mix (crossfade) durations to be applied when {@link AnimationState} animations are changed. */

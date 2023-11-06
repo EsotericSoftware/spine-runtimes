@@ -27,15 +27,15 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { AttachmentLoader } from "./attachments/AttachmentLoader";
-import { BoundingBoxAttachment } from "./attachments/BoundingBoxAttachment";
-import { ClippingAttachment } from "./attachments/ClippingAttachment";
-import { MeshAttachment } from "./attachments/MeshAttachment";
-import { PathAttachment } from "./attachments/PathAttachment";
-import { PointAttachment } from "./attachments/PointAttachment";
-import { RegionAttachment } from "./attachments/RegionAttachment";
-import { Skin } from "./Skin";
-import { TextureAtlas } from "./TextureAtlas";
+import { AttachmentLoader } from "./attachments/AttachmentLoader.js";
+import { BoundingBoxAttachment } from "./attachments/BoundingBoxAttachment.js";
+import { ClippingAttachment } from "./attachments/ClippingAttachment.js";
+import { MeshAttachment } from "./attachments/MeshAttachment.js";
+import { PathAttachment } from "./attachments/PathAttachment.js";
+import { PointAttachment } from "./attachments/PointAttachment.js";
+import { RegionAttachment } from "./attachments/RegionAttachment.js";
+import { Skin } from "./Skin.js";
+import { TextureAtlas } from "./TextureAtlas.js";
 import { Sequence } from "./attachments/Sequence"
 
 /** An {@link AttachmentLoader} that configures attachments using texture regions from an {@link TextureAtlas}.

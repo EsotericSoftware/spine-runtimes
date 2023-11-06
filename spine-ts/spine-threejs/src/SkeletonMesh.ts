@@ -43,9 +43,9 @@ import {
 	Utils,
 	Vector2,
 } from "@esotericsoftware/spine-core";
-import { MeshBatcher } from "./MeshBatcher";
+import { MeshBatcher } from "./MeshBatcher.js";
 import * as THREE from "three";
-import { ThreeJsTexture } from "./ThreeJsTexture";
+import { ThreeJsTexture } from "./ThreeJsTexture.js";
 
 export type SkeletonMeshMaterialParametersCustomizer = (
 	materialParameters: THREE.ShaderMaterialParameters

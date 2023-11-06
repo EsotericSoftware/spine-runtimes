@@ -27,8 +27,8 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import type { IDarkTintElement } from "./DarkTintMesh";
-import { DarkTintBatchGeometry } from "./DarkTintBatchGeom";
+import type { IDarkTintElement } from "./DarkTintMesh.js";
+import { DarkTintBatchGeometry } from "./DarkTintBatchGeom.js";
 import type { ExtensionMetadata, Renderer, ViewableBuffer } from "@pixi/core";
 import { BatchRenderer, ExtensionType, BatchShaderGenerator, Color } from "@pixi/core";
 

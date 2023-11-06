@@ -27,19 +27,19 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Attachment } from "./attachments/Attachment";
-import { MeshAttachment } from "./attachments/MeshAttachment";
-import { PathAttachment } from "./attachments/PathAttachment";
-import { RegionAttachment } from "./attachments/RegionAttachment";
-import { Bone } from "./Bone";
-import { IkConstraint } from "./IkConstraint";
-import { PathConstraint } from "./PathConstraint";
-import { SkeletonData } from "./SkeletonData";
-import { Skin } from "./Skin";
-import { Slot } from "./Slot";
-import { TransformConstraint } from "./TransformConstraint";
-import { Updatable } from "./Updatable";
-import { Color, Utils, MathUtils, Vector2, NumberArrayLike } from "./Utils";
+import { Attachment } from "./attachments/Attachment.js";
+import { MeshAttachment } from "./attachments/MeshAttachment.js";
+import { PathAttachment } from "./attachments/PathAttachment.js";
+import { RegionAttachment } from "./attachments/RegionAttachment.js";
+import { Bone } from "./Bone.js";
+import { IkConstraint } from "./IkConstraint.js";
+import { PathConstraint } from "./PathConstraint.js";
+import { SkeletonData } from "./SkeletonData.js";
+import { Skin } from "./Skin.js";
+import { Slot } from "./Slot.js";
+import { TransformConstraint } from "./TransformConstraint.js";
+import { Updatable } from "./Updatable.js";
+import { Color, Utils, MathUtils, Vector2, NumberArrayLike } from "./Utils.js";
 
 /** Stores the current pose for a skeleton.
  *

@@ -27,8 +27,8 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Matrix4 } from "./Matrix4";
-import { Vector3 } from "./Vector3";
+import { Matrix4 } from "./Matrix4.js";
+import { Vector3 } from "./Vector3.js";
 
 export class OrthoCamera {
 	position = new Vector3(0, 0, 0);

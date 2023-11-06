@@ -28,9 +28,9 @@
  *****************************************************************************/
 
 import { Disposable, Color, Vector2, MathUtils } from "@esotericsoftware/spine-core";
-import { Mesh, Position2Attribute, ColorAttribute } from "./Mesh";
-import { Shader } from "./Shader";
-import { ManagedWebGLRenderingContext } from "./WebGL";
+import { Mesh, Position2Attribute, ColorAttribute } from "./Mesh.js";
+import { Shader } from "./Shader.js";
+import { ManagedWebGLRenderingContext } from "./WebGL.js";
 
 export class ShapeRenderer implements Disposable {
 	private context: ManagedWebGLRenderingContext;

@@ -27,9 +27,9 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Texture } from "./Texture";
-import { TextureAtlas } from "./TextureAtlas";
-import { Disposable, StringMap } from "./Utils";
+import { Texture } from "./Texture.js";
+import { TextureAtlas } from "./TextureAtlas.js";
+import { Disposable, StringMap } from "./Utils.js";
 
 export class AssetManagerBase implements Disposable {
 	private pathPrefix: string = "";

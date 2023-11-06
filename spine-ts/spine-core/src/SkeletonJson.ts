@@ -27,23 +27,23 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Animation, Timeline, AttachmentTimeline, RGBATimeline, RGBTimeline, AlphaTimeline, RGBA2Timeline, RGB2Timeline, RotateTimeline, TranslateTimeline, TranslateXTimeline, TranslateYTimeline, ScaleTimeline, ScaleXTimeline, ScaleYTimeline, ShearTimeline, ShearXTimeline, ShearYTimeline, IkConstraintTimeline, TransformConstraintTimeline, PathConstraintPositionTimeline, PathConstraintSpacingTimeline, PathConstraintMixTimeline, DeformTimeline, DrawOrderTimeline, EventTimeline, CurveTimeline1, CurveTimeline2, CurveTimeline } from "./Animation";
-import { VertexAttachment, Attachment } from "./attachments/Attachment";
-import { AttachmentLoader } from "./attachments/AttachmentLoader";
-import { MeshAttachment } from "./attachments/MeshAttachment";
-import { BoneData, TransformMode } from "./BoneData";
-import { EventData } from "./EventData";
-import { Event } from "./Event";
-import { IkConstraintData } from "./IkConstraintData";
-import { PathConstraintData, PositionMode, SpacingMode, RotateMode } from "./PathConstraintData";
-import { SkeletonData } from "./SkeletonData";
-import { Skin } from "./Skin";
-import { SlotData, BlendMode } from "./SlotData";
-import { TransformConstraintData } from "./TransformConstraintData";
-import { Utils, Color, NumberArrayLike } from "./Utils";
-import { Sequence, SequenceMode } from "./attachments/Sequence";
-import { SequenceTimeline } from "./Animation";
-import { HasTextureRegion } from "./attachments/HasTextureRegion";
+import { Animation, Timeline, AttachmentTimeline, RGBATimeline, RGBTimeline, AlphaTimeline, RGBA2Timeline, RGB2Timeline, RotateTimeline, TranslateTimeline, TranslateXTimeline, TranslateYTimeline, ScaleTimeline, ScaleXTimeline, ScaleYTimeline, ShearTimeline, ShearXTimeline, ShearYTimeline, IkConstraintTimeline, TransformConstraintTimeline, PathConstraintPositionTimeline, PathConstraintSpacingTimeline, PathConstraintMixTimeline, DeformTimeline, DrawOrderTimeline, EventTimeline, CurveTimeline1, CurveTimeline2, CurveTimeline } from "./Animation.js";
+import { VertexAttachment, Attachment } from "./attachments/Attachment.js";
+import { AttachmentLoader } from "./attachments/AttachmentLoader.js";
+import { MeshAttachment } from "./attachments/MeshAttachment.js";
+import { BoneData, TransformMode } from "./BoneData.js";
+import { EventData } from "./EventData.js";
+import { Event } from "./Event.js";
+import { IkConstraintData } from "./IkConstraintData.js";
+import { PathConstraintData, PositionMode, SpacingMode, RotateMode } from "./PathConstraintData.js";
+import { SkeletonData } from "./SkeletonData.js";
+import { Skin } from "./Skin.js";
+import { SlotData, BlendMode } from "./SlotData.js";
+import { TransformConstraintData } from "./TransformConstraintData.js";
+import { Utils, Color, NumberArrayLike } from "./Utils.js";
+import { Sequence, SequenceMode } from "./attachments/Sequence.js";
+import { SequenceTimeline } from "./Animation.js";
+import { HasTextureRegion } from "./attachments/HasTextureRegion.js";
 
 /** Loads skeleton data in the Spine JSON format.
  *

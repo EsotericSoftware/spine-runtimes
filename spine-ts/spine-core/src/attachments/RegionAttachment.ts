@@ -27,13 +27,13 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Bone } from "../Bone";
-import { TextureRegion } from "../Texture";
-import { Color, NumberArrayLike, Utils } from "../Utils";
-import { Attachment } from "./Attachment";
-import { HasTextureRegion } from "./HasTextureRegion";
-import { Sequence } from "./Sequence";
-import { Slot } from "../Slot";
+import { Bone } from "../Bone.js";
+import { TextureRegion } from "../Texture.js";
+import { Color, NumberArrayLike, Utils } from "../Utils.js";
+import { Attachment } from "./Attachment.js";
+import { HasTextureRegion } from "./HasTextureRegion.js";
+import { Sequence } from "./Sequence.js";
+import { Slot } from "../Slot.js";
 
 /** An attachment that displays a textured quadrilateral.
  *
@@ -65,7 +65,7 @@ export class RegionAttachment extends Attachment implements HasTextureRegion {
 
 	/** The name of the texture region for this attachment. */
 	path: string;
-	
+
 	region: TextureRegion | null = null;
 	sequence: Sequence | null = null;
 
@@ -194,7 +194,7 @@ export class RegionAttachment extends Attachment implements HasTextureRegion {
 
 	copy (): Attachment {
 		let copy = new RegionAttachment(this.name, this.path);
-		copy.region = this.region;		
+		copy.region = this.region;
 		copy.x = this.x;
 		copy.y = this.y;
 		copy.scaleX = this.scaleX;

@@ -28,7 +28,7 @@
  *****************************************************************************/
 
 import { AssetManagerBase, Downloader } from "@esotericsoftware/spine-core"
-import { ThreeJsTexture } from "./ThreeJsTexture";
+import { ThreeJsTexture } from "./ThreeJsTexture.js";
 
 export class AssetManager extends AssetManagerBase {
 	constructor (pathPrefix: string = "", downloader: Downloader = new Downloader()) {

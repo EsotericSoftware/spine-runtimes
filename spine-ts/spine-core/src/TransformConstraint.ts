@@ -27,11 +27,11 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Bone } from "./Bone";
-import { Skeleton } from "./Skeleton";
-import { TransformConstraintData } from "./TransformConstraintData";
-import { Updatable } from "./Updatable";
-import { Vector2, MathUtils } from "./Utils";
+import { Bone } from "./Bone.js";
+import { Skeleton } from "./Skeleton.js";
+import { TransformConstraintData } from "./TransformConstraintData.js";
+import { Updatable } from "./Updatable.js";
+import { Vector2, MathUtils } from "./Utils.js";
 
 
 /** Stores the current pose for a transform constraint. A transform constraint adjusts the world transform of the constrained

@@ -27,10 +27,10 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { TextureRegion } from "../Texture";
-import { Slot } from "../Slot";
-import { HasTextureRegion } from "./HasTextureRegion";
-import { Utils } from "../Utils";
+import { TextureRegion } from "../Texture.js";
+import { Slot } from "../Slot.js";
+import { HasTextureRegion } from "./HasTextureRegion.js";
+import { Utils } from "../Utils.js";
 
 
 export class Sequence {

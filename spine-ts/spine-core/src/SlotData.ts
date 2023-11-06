@@ -27,8 +27,8 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { BoneData } from "./BoneData";
-import { Color } from "./Utils";
+import { BoneData } from "./BoneData.js";
+import { Color } from "./Utils.js";
 
 /** Stores the setup pose for a {@link Slot}. */
 export class SlotData {

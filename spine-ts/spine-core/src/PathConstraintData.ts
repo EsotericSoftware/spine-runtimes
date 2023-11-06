@@ -27,9 +27,9 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { BoneData } from "./BoneData";
-import { ConstraintData } from "./ConstraintData";
-import { SlotData } from "./SlotData";
+import { BoneData } from "./BoneData.js";
+import { ConstraintData } from "./ConstraintData.js";
+import { SlotData } from "./SlotData.js";
 
 
 /** Stores the setup pose for a {@link PathConstraint}.

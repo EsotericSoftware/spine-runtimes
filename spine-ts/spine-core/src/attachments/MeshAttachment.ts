@@ -27,13 +27,13 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { TextureRegion } from "../Texture";
-import { TextureAtlasRegion } from "../TextureAtlas";
-import { Color, NumberArrayLike, Utils } from "../Utils";
-import { VertexAttachment, Attachment } from "./Attachment";
-import { HasTextureRegion } from "./HasTextureRegion";
-import { Sequence } from "./Sequence";
-import { Slot } from "../Slot";
+import { TextureRegion } from "../Texture.js";
+import { TextureAtlasRegion } from "../TextureAtlas.js";
+import { Color, NumberArrayLike, Utils } from "../Utils.js";
+import { VertexAttachment, Attachment } from "./Attachment.js";
+import { HasTextureRegion } from "./HasTextureRegion.js";
+import { Sequence } from "./Sequence.js";
+import { Slot } from "../Slot.js";
 
 /** An attachment that displays a textured mesh. A mesh has hull vertices and internal vertices within the hull. Holes are not
  * supported. Each vertex has UVs (texture coordinates) and triangles are used to map an image on to the mesh.

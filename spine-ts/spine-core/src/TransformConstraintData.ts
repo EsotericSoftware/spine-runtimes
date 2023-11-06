@@ -27,8 +27,8 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { ConstraintData } from "./ConstraintData";
-import { BoneData } from "./BoneData";
+import { ConstraintData } from "./ConstraintData.js";
+import { BoneData } from "./BoneData.js";
 
 /** Stores the setup pose for a {@link TransformConstraint}.
  *

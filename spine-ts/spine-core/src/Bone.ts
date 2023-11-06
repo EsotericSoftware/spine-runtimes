@@ -27,10 +27,10 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { BoneData, TransformMode } from "./BoneData";
-import { Skeleton } from "./Skeleton";
-import { Updatable } from "./Updatable";
-import { MathUtils, Vector2 } from "./Utils";
+import { BoneData, TransformMode } from "./BoneData.js";
+import { Skeleton } from "./Skeleton.js";
+import { Updatable } from "./Updatable.js";
+import { MathUtils, Vector2 } from "./Utils.js";
 
 /** Stores a bone's current pose.
  *

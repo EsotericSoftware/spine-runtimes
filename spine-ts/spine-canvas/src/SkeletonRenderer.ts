@@ -28,7 +28,7 @@
  *****************************************************************************/
 
 import { Utils, Color, Skeleton, RegionAttachment, BlendMode, MeshAttachment, Slot, TextureRegion, TextureAtlasRegion } from "@esotericsoftware/spine-core";
-import { CanvasTexture } from "./CanvasTexture";
+import { CanvasTexture } from "./CanvasTexture.js";
 
 const worldVertices = Utils.newFloatArray(8);
 

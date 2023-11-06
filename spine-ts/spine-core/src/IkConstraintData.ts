@@ -27,8 +27,8 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { BoneData } from "./BoneData";
-import { ConstraintData } from "./ConstraintData";
+import { BoneData } from "./BoneData.js";
+import { ConstraintData } from "./ConstraintData.js";
 
 
 /** Stores the setup pose for an {@link IkConstraint}.

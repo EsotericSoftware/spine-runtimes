@@ -27,13 +27,13 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { PathAttachment } from "./attachments/PathAttachment";
-import { Bone } from "./Bone";
-import { PathConstraintData, RotateMode, SpacingMode, PositionMode } from "./PathConstraintData";
-import { Skeleton } from "./Skeleton";
-import { Slot } from "./Slot";
-import { Updatable } from "./Updatable";
-import { Utils, MathUtils } from "./Utils";
+import { PathAttachment } from "./attachments/PathAttachment.js";
+import { Bone } from "./Bone.js";
+import { PathConstraintData, RotateMode, SpacingMode, PositionMode } from "./PathConstraintData.js";
+import { Skeleton } from "./Skeleton.js";
+import { Slot } from "./Slot.js";
+import { Updatable } from "./Updatable.js";
+import { Utils, MathUtils } from "./Utils.js";
 
 
 /** Stores the current pose for a path constraint. A path constraint adjusts the rotation, translation, and scale of the

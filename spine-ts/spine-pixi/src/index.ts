@@ -27,19 +27,19 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-export * from './require-shim';
-export * from './Spine';
-export * from './SpineDebugRenderer';
-export * from './SpineTexture';
-export * from './SlotMesh';
-export * from './DarkSlotMesh';
-export * from './assets/atlasLoader';
-export * from './assets/skeletonLoader';
-export * from './darkTintMesh/DarkTintBatchGeom';
-export * from './darkTintMesh/DarkTintGeom';
-export * from './darkTintMesh/DarkTintMaterial';
-export * from './darkTintMesh/DarkTintMesh';
-export * from './darkTintMesh/DarkTintRenderer';
+export * from './require-shim.js';
+export * from './Spine.js';
+export * from './SpineDebugRenderer.js';
+export * from './SpineTexture.js';
+export * from './SlotMesh.js';
+export * from './DarkSlotMesh.js';
+export * from './assets/atlasLoader.js';
+export * from './assets/skeletonLoader.js';
+export * from './darkTintMesh/DarkTintBatchGeom.js';
+export * from './darkTintMesh/DarkTintGeom.js';
+export * from './darkTintMesh/DarkTintMaterial.js';
+export * from './darkTintMesh/DarkTintMesh.js';
+export * from './darkTintMesh/DarkTintRenderer.js';
 export * from "@esotericsoftware/spine-core";
 
 

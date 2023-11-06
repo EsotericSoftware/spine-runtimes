@@ -28,7 +28,7 @@
  *****************************************************************************/
 
 import { Texture, Disposable, Restorable, TextureFilter, TextureWrap } from "@esotericsoftware/spine-core";
-import { ManagedWebGLRenderingContext } from "./WebGL";
+import { ManagedWebGLRenderingContext } from "./WebGL.js";
 
 export class GLTexture extends Texture implements Disposable, Restorable {
 	context: ManagedWebGLRenderingContext;

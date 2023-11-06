@@ -27,11 +27,11 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Attachment, VertexAttachment } from "./attachments/Attachment";
-import { Bone } from "./Bone";
-import { Skeleton } from "./Skeleton";
-import { SlotData } from "./SlotData";
-import { Color } from "./Utils";
+import { Attachment, VertexAttachment } from "./attachments/Attachment.js";
+import { Bone } from "./Bone.js";
+import { Skeleton } from "./Skeleton.js";
+import { SlotData } from "./SlotData.js";
+import { Color } from "./Utils.js";
 
 /** Stores a slot's current pose. Slots organize attachments for {@link Skeleton#drawOrder} purposes and provide a place to store
  * state for an attachment. State cannot be stored in an attachment itself because attachments are stateless and may be shared

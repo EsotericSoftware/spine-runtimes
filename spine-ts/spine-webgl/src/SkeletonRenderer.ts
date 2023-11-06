@@ -28,9 +28,9 @@
  *****************************************************************************/
 
 import { NumberArrayLike, Color, SkeletonClipping, Vector2, Utils, Skeleton, BlendMode, RegionAttachment, TextureAtlasRegion, MeshAttachment, ClippingAttachment } from "@esotericsoftware/spine-core";
-import { GLTexture } from "./GLTexture";
-import { PolygonBatcher } from "./PolygonBatcher";
-import { ManagedWebGLRenderingContext } from "./WebGL";
+import { GLTexture } from "./GLTexture.js";
+import { PolygonBatcher } from "./PolygonBatcher.js";
+import { ManagedWebGLRenderingContext } from "./WebGL.js";
 
 
 class Renderable {

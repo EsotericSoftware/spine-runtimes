@@ -27,12 +27,12 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Animation, MixBlend, AttachmentTimeline, MixDirection, RotateTimeline, DrawOrderTimeline, Timeline, EventTimeline } from "./Animation";
-import { AnimationStateData } from "./AnimationStateData";
-import { Skeleton } from "./Skeleton";
-import { Slot } from "./Slot";
-import { StringSet, Pool, Utils, MathUtils } from "./Utils";
-import { Event } from "./Event";
+import { Animation, MixBlend, AttachmentTimeline, MixDirection, RotateTimeline, DrawOrderTimeline, Timeline, EventTimeline } from "./Animation.js";
+import { AnimationStateData } from "./AnimationStateData.js";
+import { Skeleton } from "./Skeleton.js";
+import { Slot } from "./Slot.js";
+import { StringSet, Pool, Utils, MathUtils } from "./Utils.js";
+import { Event } from "./Event.js";
 
 
 /** Applies animations over time, queues animations for later playback, mixes (crossfading) between animations, and applies
