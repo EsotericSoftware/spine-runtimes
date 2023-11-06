@@ -43,5 +43,5 @@ export * from './darkTintMesh/DarkTintRenderer.js';
 export * from "@esotericsoftware/spine-core";
 
 
-import './assets/atlasLoader'; // Side effects install the loaders into pixi
-import './assets/skeletonLoader'; // Side effects install the loaders into pixi
+import './assets/atlasLoader.js'; // Side effects install the loaders into pixi
+import './assets/skeletonLoader.js'; // Side effects install the loaders into pixi

@@ -38,7 +38,7 @@ import {
 	VisibleMixin,
 	AlphaMixin,
 	OriginMixin,
-} from "./mixins";
+} from "./mixins.js";
 import {
 	AnimationState,
 	AnimationStateData,
