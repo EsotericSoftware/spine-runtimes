@@ -27,8 +27,8 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Skeleton } from "./Skeleton";
-import { MixBlend } from "./Animation";
+import { Skeleton } from "./Skeleton.js";
+import { MixBlend } from "./Animation.js";
 
 export interface StringMap<T> {
 	[key: string]: T;

@@ -27,8 +27,7 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Vector2 } from "@esotericsoftware/spine-core";
-import { Vector3 } from "./Vector3";
+import { Vector3 } from "./Vector3.js";
 
 export const M00 = 0;
 export const M01 = 4;

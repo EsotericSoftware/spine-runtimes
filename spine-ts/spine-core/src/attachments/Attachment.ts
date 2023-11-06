@@ -27,8 +27,8 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Slot } from "../Slot";
-import { NumberArrayLike, Utils } from "../Utils";
+import { Slot } from "../Slot.js";
+import { NumberArrayLike, Utils } from "../Utils.js";
 
 /** The base class for all attachments. */
 export abstract class Attachment {

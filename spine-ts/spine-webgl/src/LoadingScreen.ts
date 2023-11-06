@@ -28,8 +28,8 @@
  *****************************************************************************/
 
 import { BlendMode, Color, Disposable, TimeKeeper } from "@esotericsoftware/spine-core";
-import { GLTexture } from "./GLTexture";
-import { ResizeMode, SceneRenderer } from "./SceneRenderer";
+import { GLTexture } from "./GLTexture.js";
+import { ResizeMode, SceneRenderer } from "./SceneRenderer.js";
 
 let spinnerImage: HTMLImageElement;
 let logoImage: HTMLImageElement;

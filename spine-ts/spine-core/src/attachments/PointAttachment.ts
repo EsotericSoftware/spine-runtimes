@@ -27,9 +27,9 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Bone } from "../Bone";
-import { Color, Vector2, MathUtils } from "../Utils";
-import { VertexAttachment, Attachment } from "./Attachment";
+import { Bone } from "../Bone.js";
+import { Color, Vector2, MathUtils } from "../Utils.js";
+import { VertexAttachment, Attachment } from "./Attachment.js";
 
 /** An attachment which is a single point and a rotation. This can be used to spawn projectiles, particles, etc. A bone can be
  * used in similar ways, but a PointAttachment is slightly less expensive to compute and can be hidden, shown, and placed in a

@@ -27,7 +27,7 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { NumberArrayLike, Pool } from "./Utils";
+import { NumberArrayLike, Pool } from "./Utils.js";
 
 export class Triangulator {
 	private convexPolygons = new Array<Array<number>>();

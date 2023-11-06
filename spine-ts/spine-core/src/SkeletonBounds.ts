@@ -27,9 +27,9 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { BoundingBoxAttachment } from "./attachments/BoundingBoxAttachment";
-import { Skeleton } from "./Skeleton";
-import { NumberArrayLike, Pool, Utils } from "./Utils";
+import { BoundingBoxAttachment } from "./attachments/BoundingBoxAttachment.js";
+import { Skeleton } from "./Skeleton.js";
+import { NumberArrayLike, Pool, Utils } from "./Utils.js";
 
 /** Collects each visible {@link BoundingBoxAttachment} and computes the world vertices for its polygon. The polygon vertices are
  * provided along with convenience methods for doing hit detection. */

@@ -28,7 +28,7 @@
  *****************************************************************************/
 
 import { TextureAtlas } from "@esotericsoftware/spine-core";
-import { SpineTexture } from "../SpineTexture";
+import { SpineTexture } from "../SpineTexture.js";
 import type { AssetExtension, Loader } from "@pixi/assets";
 import { LoaderParserPriority, checkExtension } from "@pixi/assets";
 import type { Texture } from "@pixi/core";

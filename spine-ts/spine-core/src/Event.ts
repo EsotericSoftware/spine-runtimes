@@ -27,7 +27,7 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { EventData } from "./EventData";
+import { EventData } from "./EventData.js";
 
 /** Stores the current pose values for an {@link Event}.
  *

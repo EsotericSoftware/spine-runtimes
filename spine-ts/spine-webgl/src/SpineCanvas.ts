@@ -27,7 +27,7 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { TimeKeeper, AssetManager, ManagedWebGLRenderingContext, SceneRenderer, Input, StringMap } from "./";
+import { TimeKeeper, AssetManager, ManagedWebGLRenderingContext, SceneRenderer, Input, StringMap } from "./index.js";
 
 /** An app running inside a {@link SpineCanvas}. The app life-cycle
  * is as follows:

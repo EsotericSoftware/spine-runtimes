@@ -27,16 +27,16 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { VertexAttachment, Attachment } from "./attachments/Attachment";
-import { IkConstraint } from "./IkConstraint";
-import { PathConstraint } from "./PathConstraint";
-import { Skeleton } from "./Skeleton";
-import { Slot } from "./Slot";
-import { TransformConstraint } from "./TransformConstraint";
-import { StringSet, Utils, MathUtils, NumberArrayLike } from "./Utils";
-import { Event } from "./Event";
-import { HasTextureRegion } from "./attachments/HasTextureRegion";
-import { SequenceMode, SequenceModeValues } from "./attachments/Sequence";
+import { VertexAttachment, Attachment } from "./attachments/Attachment.js";
+import { IkConstraint } from "./IkConstraint.js";
+import { PathConstraint } from "./PathConstraint.js";
+import { Skeleton } from "./Skeleton.js";
+import { Slot } from "./Slot.js";
+import { TransformConstraint } from "./TransformConstraint.js";
+import { StringSet, Utils, MathUtils, NumberArrayLike } from "./Utils.js";
+import { Event } from "./Event.js";
+import { HasTextureRegion } from "./attachments/HasTextureRegion.js";
+import { SequenceMode, SequenceModeValues } from "./attachments/Sequence.js";
 
 /** A simple container for a list of timelines and a name. */
 export class Animation {

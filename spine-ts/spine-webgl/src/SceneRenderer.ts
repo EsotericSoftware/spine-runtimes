@@ -28,14 +28,14 @@
  *****************************************************************************/
 
 import { Color, Disposable, Skeleton, MathUtils, TextureAtlasRegion } from "@esotericsoftware/spine-core";
-import { OrthoCamera } from "./Camera";
-import { GLTexture } from "./GLTexture";
-import { PolygonBatcher } from "./PolygonBatcher";
-import { Shader } from "./Shader";
-import { ShapeRenderer } from "./ShapeRenderer";
-import { SkeletonDebugRenderer } from "./SkeletonDebugRenderer";
-import { SkeletonRenderer, VertexTransformer } from "./SkeletonRenderer";
-import { ManagedWebGLRenderingContext } from "./WebGL";
+import { OrthoCamera } from "./Camera.js";
+import { GLTexture } from "./GLTexture.js";
+import { PolygonBatcher } from "./PolygonBatcher.js";
+import { Shader } from "./Shader.js";
+import { ShapeRenderer } from "./ShapeRenderer.js";
+import { SkeletonDebugRenderer } from "./SkeletonDebugRenderer.js";
+import { SkeletonRenderer, VertexTransformer } from "./SkeletonRenderer.js";
+import { ManagedWebGLRenderingContext } from "./WebGL.js";
 ;
 
 const quad = [

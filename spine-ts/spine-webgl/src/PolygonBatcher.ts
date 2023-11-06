@@ -28,10 +28,10 @@
  *****************************************************************************/
 
 import { BlendMode, Disposable } from "@esotericsoftware/spine-core";
-import { GLTexture } from "./GLTexture";
-import { Mesh, Position2Attribute, ColorAttribute, TexCoordAttribute, Color2Attribute } from "./Mesh";
-import { Shader } from "./Shader";
-import { ManagedWebGLRenderingContext } from "./WebGL";
+import { GLTexture } from "./GLTexture.js";
+import { Mesh, Position2Attribute, ColorAttribute, TexCoordAttribute, Color2Attribute } from "./Mesh.js";
+import { Shader } from "./Shader.js";
+import { ManagedWebGLRenderingContext } from "./WebGL.js";
 
 const GL_ONE = 1;
 const GL_ONE_MINUS_SRC_COLOR = 0x0301;

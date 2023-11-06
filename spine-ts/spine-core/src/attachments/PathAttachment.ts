@@ -27,8 +27,8 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Color, Utils } from "../Utils";
-import { VertexAttachment, Attachment } from "./Attachment";
+import { Color, Utils } from "../Utils.js";
+import { VertexAttachment, Attachment } from "./Attachment.js";
 
 /** An attachment whose vertices make up a composite Bezier curve.
  *

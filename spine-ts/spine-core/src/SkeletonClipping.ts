@@ -27,10 +27,10 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { ClippingAttachment } from "./attachments/ClippingAttachment";
-import { Slot } from "./Slot";
-import { Triangulator } from "./Triangulator";
-import { Utils, Color, NumberArrayLike } from "./Utils";
+import { ClippingAttachment } from "./attachments/ClippingAttachment.js";
+import { Slot } from "./Slot.js";
+import { Triangulator } from "./Triangulator.js";
+import { Utils, Color, NumberArrayLike } from "./Utils.js";
 
 export class SkeletonClipping {
 	private triangulator = new Triangulator();

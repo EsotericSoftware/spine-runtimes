@@ -27,7 +27,7 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Color } from "./Utils";
+import { Color } from "./Utils.js";
 
 /** Stores the setup pose for a {@link Bone}. */
 export class BoneData {

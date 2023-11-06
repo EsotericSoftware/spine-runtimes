@@ -28,8 +28,8 @@
  *****************************************************************************/
 
 import { AssetManagerBase, Downloader } from "@esotericsoftware/spine-core"
-import { ManagedWebGLRenderingContext } from "./WebGL";
-import { GLTexture } from "./GLTexture";
+import { ManagedWebGLRenderingContext } from "./WebGL.js";
+import { GLTexture } from "./GLTexture.js";
 
 
 export class AssetManager extends AssetManagerBase {

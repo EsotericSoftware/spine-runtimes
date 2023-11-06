@@ -28,7 +28,7 @@
  *****************************************************************************/
 
 import { Disposable, Restorable } from "@esotericsoftware/spine-core";
-import { ManagedWebGLRenderingContext } from "./WebGL";
+import { ManagedWebGLRenderingContext } from "./WebGL.js";
 
 export class Shader implements Disposable, Restorable {
 	public static MVP_MATRIX = "u_projTrans";

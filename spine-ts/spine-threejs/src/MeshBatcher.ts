@@ -27,9 +27,9 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { SkeletonMeshMaterial, SkeletonMeshMaterialParametersCustomizer } from "./SkeletonMesh";
+import { SkeletonMeshMaterial, SkeletonMeshMaterialParametersCustomizer } from "./SkeletonMesh.js";
 import * as THREE from "three"
-import { ThreeJsTexture } from "./ThreeJsTexture";
+import { ThreeJsTexture } from "./ThreeJsTexture.js";
 import { BlendMode } from "@esotericsoftware/spine-core";
 
 export class MeshBatcher extends THREE.Mesh {

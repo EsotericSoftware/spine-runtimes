@@ -27,9 +27,9 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { SpineTexture } from "./SpineTexture";
+import { SpineTexture } from "./SpineTexture.js";
 import type { BlendMode, NumberArrayLike } from "@esotericsoftware/spine-core";
-import type { ISlotMesh } from "./Spine";
+import type { ISlotMesh } from "./Spine.js";
 import { Mesh, MeshGeometry, MeshMaterial } from "@pixi/mesh";
 import { Texture } from "@pixi/core";
 

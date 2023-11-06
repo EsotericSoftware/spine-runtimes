@@ -28,13 +28,13 @@
  *****************************************************************************/
 
 import { Animation } from "./Animation"
-import { BoneData } from "./BoneData";
-import { EventData } from "./EventData";
-import { IkConstraintData } from "./IkConstraintData";
-import { PathConstraintData } from "./PathConstraintData";
-import { Skin } from "./Skin";
-import { SlotData } from "./SlotData";
-import { TransformConstraintData } from "./TransformConstraintData";
+import { BoneData } from "./BoneData.js";
+import { EventData } from "./EventData.js";
+import { IkConstraintData } from "./IkConstraintData.js";
+import { PathConstraintData } from "./PathConstraintData.js";
+import { Skin } from "./Skin.js";
+import { SlotData } from "./SlotData.js";
+import { TransformConstraintData } from "./TransformConstraintData.js";
 
 /** Stores the setup pose and all of the stateless data for a skeleton.
  *

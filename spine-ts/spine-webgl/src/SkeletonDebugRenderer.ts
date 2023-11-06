@@ -28,8 +28,8 @@
  *****************************************************************************/
 
 import { Disposable, Color, SkeletonBounds, Utils, Skeleton, RegionAttachment, MeshAttachment, PathAttachment, ClippingAttachment } from "@esotericsoftware/spine-core";
-import { ShapeRenderer } from "./ShapeRenderer";
-import { ManagedWebGLRenderingContext } from "./WebGL";
+import { ShapeRenderer } from "./ShapeRenderer.js";
+import { ManagedWebGLRenderingContext } from "./WebGL.js";
 
 export class SkeletonDebugRenderer implements Disposable {
 	boneLineColor = new Color(1, 0, 0, 1);

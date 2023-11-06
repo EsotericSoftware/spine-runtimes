@@ -29,8 +29,8 @@
 
 import type { Texture, ColorSource, Renderer, BLEND_MODES } from "@pixi/core";
 import { Mesh } from "@pixi/mesh";
-import { DarkTintGeometry } from "./DarkTintGeom";
-import { DarkTintMaterial } from "./DarkTintMaterial";
+import { DarkTintGeometry } from "./DarkTintGeom.js";
+import { DarkTintMaterial } from "./DarkTintMaterial.js";
 
 export interface IDarkTintElement {
 	// eslint-disable-next-line @typescript-eslint/naming-convention

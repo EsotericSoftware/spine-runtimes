@@ -27,12 +27,12 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Attachment } from "./attachments/Attachment";
-import { MeshAttachment } from "./attachments/MeshAttachment";
-import { BoneData } from "./BoneData";
-import { ConstraintData } from "./ConstraintData";
-import { Skeleton } from "./Skeleton";
-import { StringMap } from "./Utils";
+import { Attachment } from "./attachments/Attachment.js";
+import { MeshAttachment } from "./attachments/MeshAttachment.js";
+import { BoneData } from "./BoneData.js";
+import { ConstraintData } from "./ConstraintData.js";
+import { Skeleton } from "./Skeleton.js";
+import { StringMap } from "./Utils.js";
 
 /** Stores an entry in the skin consisting of the slot index, name, and attachment **/
 export class SkinEntry {

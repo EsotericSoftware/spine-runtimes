@@ -27,9 +27,9 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { SlotData } from "../SlotData";
-import { Color } from "../Utils";
-import { VertexAttachment, Attachment } from "./Attachment";
+import { SlotData } from "../SlotData.js";
+import { Color } from "../Utils.js";
+import { VertexAttachment, Attachment } from "./Attachment.js";
 
 /** An attachment with vertices that make up a polygon used for clipping the rendering of other attachments. */
 export class ClippingAttachment extends VertexAttachment {

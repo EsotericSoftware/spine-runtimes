@@ -28,8 +28,8 @@
  *****************************************************************************/
 
 import { Disposable, Restorable } from "@esotericsoftware/spine-core";
-import { Shader } from "./Shader";
-import { ManagedWebGLRenderingContext } from "./WebGL";
+import { Shader } from "./Shader.js";
+import { ManagedWebGLRenderingContext } from "./WebGL.js";
 
 
 export class Mesh implements Disposable, Restorable {
