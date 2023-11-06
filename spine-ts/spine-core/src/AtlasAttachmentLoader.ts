@@ -36,7 +36,7 @@ import { PointAttachment } from "./attachments/PointAttachment.js";
 import { RegionAttachment } from "./attachments/RegionAttachment.js";
 import { Skin } from "./Skin.js";
 import { TextureAtlas } from "./TextureAtlas.js";
-import { Sequence } from "./attachments/Sequence"
+import { Sequence } from "./attachments/Sequence.js"
 
 /** An {@link AttachmentLoader} that configures attachments using texture regions from an {@link TextureAtlas}.
  *

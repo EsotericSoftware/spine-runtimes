@@ -30,7 +30,7 @@
 import { Container } from "@pixi/display";
 import { Graphics } from "@pixi/graphics";
 import { Text } from "@pixi/text";
-import type { Spine } from "./Spine";
+import type { Spine } from "./Spine.js";
 import type { AnimationStateListener } from "@esotericsoftware/spine-core";
 import { ClippingAttachment, MeshAttachment, PathAttachment, RegionAttachment, SkeletonBounds } from "@esotericsoftware/spine-core";
 

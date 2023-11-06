@@ -43,9 +43,9 @@ import {
 	Utils,
 	Vector2,
 } from "@esotericsoftware/spine-core";
-import type { SpineTexture } from "./SpineTexture";
-import { SlotMesh } from "./SlotMesh";
-import type { ISpineDebugRenderer } from "./SpineDebugRenderer";
+import type { SpineTexture } from "./SpineTexture.js";
+import { SlotMesh } from "./SlotMesh.js";
+import type { ISpineDebugRenderer } from "./SpineDebugRenderer.js";
 import { Assets } from "@pixi/assets";
 import type { IPointData } from "@pixi/core";
 import { Ticker, utils } from "@pixi/core";
