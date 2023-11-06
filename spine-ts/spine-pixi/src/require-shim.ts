@@ -32,7 +32,7 @@ declare global {
 	var PIXI: any;
 }
 
-if (window.PIXI) {
+if (typeof window !== 'undefined' && window.PIXI) {
 	let prevRequire = window.require;
 	window.require = (x: string) => {
 		if (prevRequire) return prevRequire(x);
