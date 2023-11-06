@@ -30,7 +30,7 @@
 declare global {
 	var require: any;
 }
-if (window.Phaser) {
+if (typeof window !== 'undefined' && window.Phaser) {
 	let prevRequire = window.require;
 	window.require = (x: string) => {
 		if (prevRequire) return prevRequire(x);
