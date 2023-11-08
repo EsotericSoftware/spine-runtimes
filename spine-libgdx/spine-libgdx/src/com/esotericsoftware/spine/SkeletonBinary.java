@@ -320,7 +320,6 @@ public class SkeletonBinary extends SkeletonLoader {
 				data.inertia = input.readFloat();
 				data.strength = input.readFloat();
 				data.damping = input.readFloat();
-				data.friction = input.readFloat();
 				data.mass = input.readFloat();
 				data.wind = input.readFloat();
 				data.gravity = input.readFloat();

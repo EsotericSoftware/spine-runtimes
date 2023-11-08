@@ -179,7 +179,7 @@ public class Animation {
 		event, drawOrder, //
 		ikConstraint, transformConstraint, //
 		pathConstraintPosition, pathConstraintSpacing, pathConstraintMix, //
-		physicsConstraintInertia, physicsConstraintStrength, physicsConstraintDamping, physicsConstraintFriction, //
+		physicsConstraintInertia, physicsConstraintStrength, physicsConstraintDamping, //
 		physicsConstraintMass, physicsConstraintWind, physicsConstraintGravity, physicsConstraintMix, //
 		sequence
 	}

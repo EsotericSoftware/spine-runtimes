@@ -268,6 +268,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 			delta = Math.min(delta, 0.032f) * ui.speedSlider.getValue();
 			state.update(delta);
 			state.apply(skeleton);
+			skeleton.update(delta);
 			skeleton.updateWorldTransform(Physics.update);
 
 			batch.begin();

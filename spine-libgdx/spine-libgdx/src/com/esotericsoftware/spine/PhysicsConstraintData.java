@@ -35,7 +35,7 @@ package com.esotericsoftware.spine;
 public class PhysicsConstraintData extends ConstraintData {
 	BoneData bone;
 	boolean x, y, rotate, scaleX, shearX;
-	float step, inertia, strength, damping, friction, mass, wind, gravity, mix;
+	float step, inertia, strength, damping, mass, wind, gravity, mix;
 
 	public PhysicsConstraintData (String name) {
 		super(name);
@@ -120,14 +120,6 @@ public class PhysicsConstraintData extends ConstraintData {
 
 	public void setDamping (float damping) {
 		this.damping = damping;
-	}
-
-	public float getFriction () {
-		return friction;
-	}
-
-	public void setFriction (float friction) {
-		this.friction = friction;
 	}
 
 	/** The inverse of the mass. */
