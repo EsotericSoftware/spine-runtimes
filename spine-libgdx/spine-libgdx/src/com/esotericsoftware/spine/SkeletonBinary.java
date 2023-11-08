@@ -211,6 +211,7 @@ public class SkeletonBinary extends SkeletonLoader {
 				if (nonessential) {
 					Color.rgba8888ToColor(data.color, input.readInt());
 					data.icon = input.readString();
+					data.visible = input.readBoolean();
 				}
 				bones[i] = data;
 			}
@@ -228,6 +229,7 @@ public class SkeletonBinary extends SkeletonLoader {
 
 				data.attachmentName = input.readStringRef();
 				data.blendMode = BlendMode.values[input.readInt(true)];
+				if (nonessential) data.visible = input.readBoolean();
 				slots[i] = data;
 			}
 

@@ -42,6 +42,9 @@ public class SlotData {
 	@Null String attachmentName;
 	BlendMode blendMode;
 
+	// Nonessential.
+	boolean visible = true;
+
 	public SlotData (int index, String name, BoneData boneData) {
 		if (index < 0) throw new IllegalArgumentException("index must be >= 0.");
 		if (name == null) throw new IllegalArgumentException("name cannot be null.");
@@ -99,6 +102,15 @@ public class SlotData {
 	public void setBlendMode (BlendMode blendMode) {
 		if (blendMode == null) throw new IllegalArgumentException("blendMode cannot be null.");
 		this.blendMode = blendMode;
+	}
+
+	/** False if the slot was hidden in Spine and nonessential data was exported. Does not affect runtime rendering. */
+	public boolean getVisible () {
+		return visible;
+	}
+
+	public void setVisible (boolean visible) {
+		this.visible = visible;
 	}
 
 	public String toString () {

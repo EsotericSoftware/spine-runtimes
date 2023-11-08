@@ -47,6 +47,7 @@ public class BoneData {
 	// Nonessential.
 	final Color color = new Color(0.61f, 0.61f, 0.61f, 1); // 9b9b9bff
 	@Null String icon;
+	boolean visible;
 
 	public BoneData (int index, String name, @Null BoneData parent) {
 		if (index < 0) throw new IllegalArgumentException("index must be >= 0.");
@@ -203,6 +204,15 @@ public class BoneData {
 
 	public void setIcon (@Null String icon) {
 		this.icon = icon;
+	}
+
+	/** False if the bone was hidden in Spine and nonessential data was exported. Does not affect runtime rendering. */
+	public boolean getVisible () {
+		return visible;
+	}
+
+	public void setVisible (boolean visible) {
+		this.visible = visible;
 	}
 
 	public String toString () {

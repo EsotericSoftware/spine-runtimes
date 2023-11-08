@@ -171,6 +171,7 @@ public class SkeletonJson extends SkeletonLoader {
 			if (color != null) Color.valueOf(color, data.getColor());
 
 			data.icon = boneMap.getString("icon", null);
+			data.visible = boneMap.getBoolean("visible", true);
 
 			skeletonData.bones.add(data);
 		}
@@ -191,6 +192,7 @@ public class SkeletonJson extends SkeletonLoader {
 
 			data.attachmentName = slotMap.getString("attachment", null);
 			data.blendMode = BlendMode.valueOf(slotMap.getString("blend", BlendMode.normal.name()));
+			data.visible = slotMap.getBoolean("visible", true);
 			skeletonData.slots.add(data);
 		}
 
@@ -351,6 +353,10 @@ public class SkeletonJson extends SkeletonLoader {
 					}
 				}
 			}
+
+			String color = skinMap.getString("color", null);
+			if (color != null) Color.valueOf(color, skin.getColor());
+
 			skeletonData.skins.add(skin);
 			if (skin.name.equals("default")) skeletonData.defaultSkin = skin;
 		}
