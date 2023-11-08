@@ -29,6 +29,7 @@
 
 package com.esotericsoftware.spine;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.OrderedSet;
@@ -46,6 +47,9 @@ public class Skin {
 	final Array<BoneData> bones = new Array(0);
 	final Array<ConstraintData> constraints = new Array(0);
 	private final SkinEntry lookup = new SkinEntry(0, "", null);
+
+	// Nonessential.
+	final Color color = new Color(0.99607843f, 0.61960787f, 0.30980393f, 1); // fe9e4fff
 
 	public Skin (String name) {
 		if (name == null) throw new IllegalArgumentException("name cannot be null.");
@@ -137,6 +141,11 @@ public class Skin {
 	/** The skin's name, which is unique across all skins in the skeleton. */
 	public String getName () {
 		return name;
+	}
+
+	/** The color of the skin as it was in Spine, or a default color if nonessential data was not exported. */
+	public Color getColor () {
+		return color;
 	}
 
 	public String toString () {

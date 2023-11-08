@@ -399,6 +399,9 @@ public class SkeletonBinary extends SkeletonLoader {
 			skin = new Skin("default");
 		} else {
 			skin = new Skin(input.readString());
+
+			if (nonessential) Color.rgba8888ToColor(skin.color, input.readInt());
+
 			Object[] bones = skin.bones.setSize(input.readInt(true)), items = skeletonData.bones.items;
 			for (int i = 0, n = skin.bones.size; i < n; i++)
 				bones[i] = items[input.readInt(true)];
