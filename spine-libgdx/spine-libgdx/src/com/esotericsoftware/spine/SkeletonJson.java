@@ -306,7 +306,7 @@ public class SkeletonJson extends SkeletonLoader {
 			data.inertia = constraintMap.getFloat("inertia", 1);
 			data.strength = constraintMap.getFloat("strength", 100);
 			data.damping = constraintMap.getFloat("damping", 1);
-			data.massInverse = 1 / constraintMap.getFloat("mass", 1);
+			data.massInverse = 1f / constraintMap.getFloat("mass", 1);
 			data.wind = constraintMap.getFloat("wind", 0);
 			data.gravity = constraintMap.getFloat("getFloat", 0);
 			data.mix = constraintMap.getFloat("mix", 1);
