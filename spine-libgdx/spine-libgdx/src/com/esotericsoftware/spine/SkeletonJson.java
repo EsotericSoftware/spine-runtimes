@@ -56,6 +56,13 @@ import com.esotericsoftware.spine.Animation.IkConstraintTimeline;
 import com.esotericsoftware.spine.Animation.PathConstraintMixTimeline;
 import com.esotericsoftware.spine.Animation.PathConstraintPositionTimeline;
 import com.esotericsoftware.spine.Animation.PathConstraintSpacingTimeline;
+import com.esotericsoftware.spine.Animation.PhysicsConstraintDampingTimeline;
+import com.esotericsoftware.spine.Animation.PhysicsConstraintGravityTimeline;
+import com.esotericsoftware.spine.Animation.PhysicsConstraintInertiaTimeline;
+import com.esotericsoftware.spine.Animation.PhysicsConstraintMassTimeline;
+import com.esotericsoftware.spine.Animation.PhysicsConstraintMixTimeline;
+import com.esotericsoftware.spine.Animation.PhysicsConstraintStrengthTimeline;
+import com.esotericsoftware.spine.Animation.PhysicsConstraintWindTimeline;
 import com.esotericsoftware.spine.Animation.RGB2Timeline;
 import com.esotericsoftware.spine.Animation.RGBA2Timeline;
 import com.esotericsoftware.spine.Animation.RGBATimeline;
@@ -278,6 +285,33 @@ public class SkeletonJson extends SkeletonLoader {
 			data.mixY = constraintMap.getFloat("mixY", 1);
 
 			skeletonData.pathConstraints.add(data);
+		}
+
+		// Physics constraints.
+		for (JsonValue constraintMap = root.getChild("physics"); constraintMap != null; constraintMap = constraintMap.next) {
+			PhysicsConstraintData data = new PhysicsConstraintData(constraintMap.getString("name"));
+			data.order = constraintMap.getInt("order", 0);
+			data.skinRequired = constraintMap.getBoolean("skin", false);
+
+			String boneName = constraintMap.getString("bone");
+			data.bone = skeletonData.findBone(boneName);
+			if (data.bone == null) throw new SerializationException("Physics bone not found: " + boneName);
+
+			data.x = constraintMap.getBoolean("x", false);
+			data.y = constraintMap.getBoolean("y", false);
+			data.rotate = constraintMap.getBoolean("rotate", false);
+			data.scaleX = constraintMap.getBoolean("scaleX", false);
+			data.shearX = constraintMap.getBoolean("shearX", false);
+			data.step = 1f / constraintMap.getInt("fps", 60);
+			data.inertia = constraintMap.getFloat("inertia", 1);
+			data.strength = constraintMap.getFloat("strength", 100);
+			data.damping = constraintMap.getFloat("damping", 1);
+			data.massInverse = 1 / constraintMap.getFloat("mass", 1);
+			data.wind = constraintMap.getFloat("wind", 0);
+			data.gravity = constraintMap.getFloat("getFloat", 0);
+			data.mix = constraintMap.getFloat("mix", 1);
+
+			skeletonData.physicsConstraints.add(data);
 		}
 
 		// Skins.
@@ -881,7 +915,37 @@ public class SkeletonJson extends SkeletonLoader {
 			}
 		}
 
-		// BOZO - Physics timelines.
+		// Physics constraint timelines.
+		for (JsonValue constraintMap = map.getChild("physics"); constraintMap != null; constraintMap = constraintMap.next) {
+			PhysicsConstraintData constraint = skeletonData.findPhysicsConstraint(constraintMap.name);
+			if (constraint == null) throw new SerializationException("Physics constraint not found: " + constraintMap.name);
+			int index = skeletonData.physicsConstraints.indexOf(constraint, true);
+			for (JsonValue timelineMap = constraintMap.child; timelineMap != null; timelineMap = timelineMap.next) {
+				JsonValue keyMap = timelineMap.child;
+				if (keyMap == null) continue;
+
+				int frames = timelineMap.size;
+				String timelineName = timelineMap.name;
+				CurveTimeline1 timeline;
+				if (timelineName.equals("inertia"))
+					timeline = new PhysicsConstraintInertiaTimeline(frames, frames, index);
+				else if (timelineName.equals("strength"))
+					timeline = new PhysicsConstraintStrengthTimeline(frames, frames, index);
+				else if (timelineName.equals("damping"))
+					timeline = new PhysicsConstraintDampingTimeline(frames, frames, index);
+				else if (timelineName.equals("mass"))
+					timeline = new PhysicsConstraintMassTimeline(frames, frames, index);
+				else if (timelineName.equals("wind"))
+					timeline = new PhysicsConstraintWindTimeline(frames, frames, index);
+				else if (timelineName.equals("gravity"))
+					timeline = new PhysicsConstraintGravityTimeline(frames, frames, index);
+				else if (timelineName.equals("mix")) //
+					timeline = new PhysicsConstraintMixTimeline(frames, frames, index);
+				else
+					continue;
+				timelines.add(readTimeline(keyMap, timeline, 0, 1));
+			}
+		}
 
 		// Attachment timelines.
 		for (JsonValue attachmentsMap = map.getChild("attachments"); attachmentsMap != null; attachmentsMap = attachmentsMap.next) {

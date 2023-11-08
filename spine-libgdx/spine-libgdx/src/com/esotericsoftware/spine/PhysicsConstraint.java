@@ -154,7 +154,6 @@ public class PhysicsConstraint implements Updatable {
 								xVelocity *= d;
 							}
 							if (y) {
-								System.out.println(massInverse);
 								yVelocity += (g - yOffset * e) * m;
 								yOffset += yVelocity * step;
 								yVelocity *= d;
