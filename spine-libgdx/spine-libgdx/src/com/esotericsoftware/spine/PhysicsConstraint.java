@@ -39,7 +39,7 @@ import com.esotericsoftware.spine.Skeleton.Physics;
 public class PhysicsConstraint implements Updatable {
 	final PhysicsConstraintData data;
 	public Bone bone;
-	float inertia, strength, damping, mass, wind, gravity, mix;
+	float inertia, strength, damping, massInverse, wind, gravity, mix;
 
 	boolean reset = true;
 	float ux, uy, cx, cy, tx, ty;
@@ -62,7 +62,7 @@ public class PhysicsConstraint implements Updatable {
 		inertia = data.inertia;
 		strength = data.strength;
 		damping = data.damping;
-		mass = data.mass;
+		massInverse = data.massInverse;
 		wind = data.wind;
 		gravity = data.gravity;
 		mix = data.mix;
@@ -77,7 +77,7 @@ public class PhysicsConstraint implements Updatable {
 		inertia = constraint.inertia;
 		strength = constraint.strength;
 		damping = constraint.damping;
-		mass = constraint.mass;
+		massInverse = constraint.massInverse;
 		wind = constraint.wind;
 		gravity = constraint.gravity;
 		mix = constraint.mix;
@@ -103,7 +103,7 @@ public class PhysicsConstraint implements Updatable {
 		inertia = data.inertia;
 		strength = data.strength;
 		damping = data.damping;
-		mass = data.mass;
+		massInverse = data.massInverse;
 		wind = data.wind;
 		gravity = data.gravity;
 		mix = data.mix;
@@ -134,7 +134,7 @@ public class PhysicsConstraint implements Updatable {
 				ux = bx;
 				uy = by;
 			} else {
-				float remaining = this.remaining, i = this.inertia, step = data.step;
+				float remaining = this.remaining, i = inertia, step = data.step;
 				if (x || y) {
 					if (x) {
 						xOffset += (ux - bx) * i;
@@ -145,8 +145,8 @@ public class PhysicsConstraint implements Updatable {
 						uy = by;
 					}
 					if (remaining >= step) {
-						float m = this.mass * step, e = this.strength, w = wind * 100, g = gravity * -100;
-						float d = (float)Math.pow(this.damping, 60 * step);
+						float m = massInverse * step, e = strength, w = wind * 100, g = gravity * -100;
+						float d = (float)Math.pow(damping, 60 * step);
 						do {
 							if (x) {
 								xVelocity += (w - xOffset * e) * m;
@@ -154,6 +154,7 @@ public class PhysicsConstraint implements Updatable {
 								xVelocity *= d;
 							}
 							if (y) {
+								System.out.println(massInverse);
 								yVelocity += (g - yOffset * e) * m;
 								yOffset += yVelocity * step;
 								yVelocity *= d;
@@ -180,8 +181,8 @@ public class PhysicsConstraint implements Updatable {
 					}
 					remaining = this.remaining;
 					if (remaining >= step) {
-						float m = this.mass * step, e = this.strength, w = wind, g = gravity;
-						float d = (float)Math.pow(this.damping, 60 * step);
+						float m = massInverse * step, e = strength, w = wind, g = gravity;
+						float d = (float)Math.pow(damping, 60 * step);
 						while (true) {
 							remaining -= step;
 							if (scaleX) {
@@ -281,13 +282,12 @@ public class PhysicsConstraint implements Updatable {
 		this.damping = damping;
 	}
 
-	/** The inverse of the mass. */
-	public float getMass () {
-		return mass;
+	public float getMassInverse () {
+		return massInverse;
 	}
 
-	public void setMass (float mass) {
-		this.mass = mass;
+	public void setMassInverse (float massInverse) {
+		this.massInverse = massInverse;
 	}
 
 	public float getWind () {

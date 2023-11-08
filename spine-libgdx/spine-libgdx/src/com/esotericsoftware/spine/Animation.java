@@ -2303,7 +2303,7 @@ public class Animation {
 		}
 	}
 
-	/** Changes a physics constraint's {@link PhysicsConstraint#getMass()}. */
+	/** Changes a physics constraint's {@link PhysicsConstraint#getMassInverse()}. The timeline values are not inverted. */
 	static public class PhysicsConstraintMassTimeline extends PhysicsConstraintTimeline {
 		public PhysicsConstraintMassTimeline (int frameCount, int bezierCount, int physicsConstraintIndex) {
 			super(frameCount, bezierCount, physicsConstraintIndex, Property.physicsConstraintMass);
@@ -2313,7 +2313,10 @@ public class Animation {
 			MixDirection direction) {
 
 			PhysicsConstraint constraint = skeleton.physicsConstraints.get(constraintIndex);
-			if (constraint.active) constraint.mass = getAbsoluteValue(time, alpha, blend, constraint.mass, constraint.data.mass);
+			if (constraint.active) {
+				constraint.massInverse = 1
+					/ getAbsoluteValue(time, alpha, blend, 1 / constraint.massInverse, 1 / constraint.data.massInverse);
+			}
 		}
 	}
 
