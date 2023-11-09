@@ -113,8 +113,7 @@ class SkeletonViewerUI {
 	CheckBox debugPathsCheckbox = new CheckBox("Paths", skin);
 	CheckBox debugPointsCheckbox = new CheckBox("Points", skin);
 	CheckBox debugClippingCheckbox = new CheckBox("Clipping", skin);
-	CheckBox debugPhysicsCheckbox = new CheckBox("Physics", skin);
-
+	
 	CheckBox pmaCheckbox = new CheckBox("Premultiplied", skin);
 
 	CheckBox linearCheckbox = new CheckBox("Linear", skin);
@@ -260,7 +259,7 @@ class SkeletonViewerUI {
 		root.add();
 		root.add(table(debugPathsCheckbox, debugPointsCheckbox, debugClippingCheckbox)).row();
 		root.add();
-		root.add(table(debugMeshHullCheckbox, debugMeshTrianglesCheckbox, debugPhysicsCheckbox)).row();
+		root.add(table(debugMeshHullCheckbox, debugMeshTrianglesCheckbox)).row();
 		root.add("Atlas alpha:");
 		{
 			Table table = table();
@@ -632,7 +631,6 @@ class SkeletonViewerUI {
 		debugPathsCheckbox.addListener(savePrefsListener);
 		debugPointsCheckbox.addListener(savePrefsListener);
 		debugClippingCheckbox.addListener(savePrefsListener);
-		debugPhysicsCheckbox.addListener(savePrefsListener);
 		pmaCheckbox.addListener(savePrefsListener);
 		linearCheckbox.addListener(savePrefsListener);
 		bonesSetupPoseButton.addListener(savePrefsListener);
@@ -705,7 +703,6 @@ class SkeletonViewerUI {
 		prefs.putBoolean("debugPaths", debugPathsCheckbox.isChecked());
 		prefs.putBoolean("debugPoints", debugPointsCheckbox.isChecked());
 		prefs.putBoolean("debugClipping", debugClippingCheckbox.isChecked());
-		prefs.putBoolean("debugPhysics", debugPhysicsCheckbox.isChecked());
 		prefs.putBoolean("premultiplied", pmaCheckbox.isChecked());
 		prefs.putBoolean("linear", linearCheckbox.isChecked());
 		if (bonesSetupPoseButton.isChecked())
@@ -748,7 +745,6 @@ class SkeletonViewerUI {
 			debugPathsCheckbox.setChecked(prefs.getBoolean("debugPaths", true));
 			debugPointsCheckbox.setChecked(prefs.getBoolean("debugPoints", true));
 			debugClippingCheckbox.setChecked(prefs.getBoolean("debugClipping", true));
-			debugPhysicsCheckbox.setChecked(prefs.getBoolean("debugPhysics", true));
 			pmaCheckbox.setChecked(prefs.getBoolean("premultiplied", true));
 			linearCheckbox.setChecked(prefs.getBoolean("linear", true));
 			String setupPose = prefs.getString("setupPose", "");
