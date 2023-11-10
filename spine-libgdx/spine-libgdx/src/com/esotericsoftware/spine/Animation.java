@@ -179,8 +179,8 @@ public class Animation {
 		event, drawOrder, //
 		ikConstraint, transformConstraint, //
 		pathConstraintPosition, pathConstraintSpacing, pathConstraintMix, //
-		physicsConstraintInertia, physicsConstraintStrength, physicsConstraintDamping, //
-		physicsConstraintMass, physicsConstraintWind, physicsConstraintGravity, physicsConstraintMix, //
+		physicsConstraintInertia, physicsConstraintStrength, physicsConstraintDamping, physicsConstraintMass, //
+		physicsConstraintWind, physicsConstraintGravity, physicsConstraintMix, physicsConstraintReset, //
 		sequence
 	}
 
@@ -1790,7 +1790,7 @@ public class Animation {
 			float[] frames = this.frames;
 			int frameCount = frames.length;
 
-			if (lastTime > time) { // Fire events after last time for looped animations.
+			if (lastTime > time) { // Apply after lastTime for looped animations.
 				apply(skeleton, lastTime, Integer.MAX_VALUE, firedEvents, alpha, blend, direction);
 				lastTime = -1f;
 			} else if (lastTime >= frames[frameCount - 1]) // Last time is after last frame.
@@ -2360,6 +2360,67 @@ public class Animation {
 
 			PhysicsConstraint constraint = skeleton.physicsConstraints.get(constraintIndex);
 			if (constraint.active) constraint.mix = getAbsoluteValue(time, alpha, blend, constraint.mix, constraint.data.mix);
+		}
+	}
+
+	/** Resets a physics constraint when specific animation times are reached. */
+	static public class PhysicsConstraintResetTimeline extends Timeline {
+		static private final String[] propertyIds = {Integer.toString(Property.physicsConstraintReset.ordinal())};
+
+		final int constraintIndex;
+
+		/** @param physicsConstraintIndex -1 for all physics constraints in the skeleton. */
+		public PhysicsConstraintResetTimeline (int frameCount, int physicsConstraintIndex) {
+			super(frameCount, propertyIds);
+			constraintIndex = physicsConstraintIndex;
+		}
+
+		/** The index of the physics constraint in {@link Skeleton#getPhysicsConstraints()} that will be reset by this timeline, or
+		 * -1 if all physics constraints in the skeleton will be reset. */
+		public int getPhysicsConstraintIndex () {
+			return constraintIndex;
+		}
+
+		public int getFrameCount () {
+			return frames.length;
+		}
+
+		/** Sets the time for the specified frame.
+		 * @param frame Between 0 and <code>frameCount</code>, inclusive. */
+		public void setFrame (int frame, float time) {
+			frames[frame] = time;
+		}
+
+		/** Resets the physics constraint when frames > <code>lastTime</code> and <= <code>time</code>. */
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> firedEvents, float alpha,
+			MixBlend blend, MixDirection direction) {
+
+			PhysicsConstraint constraint = null;
+			if (constraintIndex != -1) {
+				constraint = skeleton.physicsConstraints.get(constraintIndex);
+				if (!constraint.active) return;
+			}
+
+			float[] frames = this.frames;
+
+			if (lastTime > time) { // Apply after lastTime for looped animations.
+				apply(skeleton, lastTime, Integer.MAX_VALUE, null, alpha, blend, direction);
+				lastTime = -1f;
+			} else if (lastTime >= frames[frames.length - 1]) // Last time is after last frame.
+				return;
+			if (time < frames[0]) return;
+
+			if (lastTime < frames[0] || time >= frames[search(frames, lastTime) + 1]) {
+				if (constraint != null)
+					constraint.reset();
+				else {
+					Object[] constraints = skeleton.physicsConstraints.items;
+					for (int i = 0, n = skeleton.physicsConstraints.size; i < n; i++) {
+						constraint = (PhysicsConstraint)constraints[i];
+						if (constraint.active) constraint.reset();
+					}
+				}
+			}
 		}
 	}
 
