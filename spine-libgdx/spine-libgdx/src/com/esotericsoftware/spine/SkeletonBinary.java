@@ -313,11 +313,11 @@ public class SkeletonBinary extends SkeletonLoader {
 				data.bone = (BoneData)bones[input.readInt(true)];
 				int flags = input.read();
 				data.skinRequired = (flags & 1) != 0;
-				data.x = (flags & 2) != 0;
-				data.y = (flags & 4) != 0;
-				data.rotate = (flags & 8) != 0;
-				data.scaleX = (flags & 16) != 0;
-				data.shearX = (flags & 32) != 0;
+				if ((flags & 2) != 0) data.x = input.readFloat();
+				if ((flags & 4) != 0) data.y = input.readFloat();
+				if ((flags & 8) != 0) data.rotate = input.readFloat();
+				if ((flags & 16) != 0) data.scaleX = input.readFloat();
+				if ((flags & 32) != 0) data.shearX = input.readFloat();
 				data.step = 1f / input.readByte();
 				data.inertia = input.readFloat();
 				data.strength = input.readFloat();

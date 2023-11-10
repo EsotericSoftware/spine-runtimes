@@ -34,7 +34,7 @@ package com.esotericsoftware.spine;
  * See <a href="http://esotericsoftware.com/spine-physics-constraints">Physics constraints</a> in the Spine User Guide. */
 public class PhysicsConstraintData extends ConstraintData {
 	BoneData bone;
-	boolean x, y, rotate, scaleX, shearX;
+	float x, y, rotate, scaleX, shearX;
 	float step, inertia, strength, damping, massInverse, wind, gravity, mix;
 
 	public PhysicsConstraintData (String name) {
@@ -58,43 +58,43 @@ public class PhysicsConstraintData extends ConstraintData {
 		this.step = step;
 	}
 
-	public boolean getX () {
+	public float getX () {
 		return x;
 	}
 
-	public void setX (boolean x) {
+	public void setX (float x) {
 		this.x = x;
 	}
 
-	public boolean getY () {
+	public float getY () {
 		return y;
 	}
 
-	public void setY (boolean y) {
+	public void setY (float y) {
 		this.y = y;
 	}
 
-	public boolean getRotate () {
+	public float getRotate () {
 		return rotate;
 	}
 
-	public void setRotate (boolean rotate) {
+	public void setRotate (float rotate) {
 		this.rotate = rotate;
 	}
 
-	public boolean getScaleX () {
+	public float getScaleX () {
 		return scaleX;
 	}
 
-	public void setScaleX (boolean scaleX) {
+	public void setScaleX (float scaleX) {
 		this.scaleX = scaleX;
 	}
 
-	public boolean getShearX () {
+	public float getShearX () {
 		return shearX;
 	}
 
-	public void setShearX (boolean shearX) {
+	public void setShearX (float shearX) {
 		this.shearX = shearX;
 	}
 

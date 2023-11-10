@@ -299,11 +299,11 @@ public class SkeletonJson extends SkeletonLoader {
 			data.bone = skeletonData.findBone(boneName);
 			if (data.bone == null) throw new SerializationException("Physics bone not found: " + boneName);
 
-			data.x = constraintMap.getBoolean("x", false);
-			data.y = constraintMap.getBoolean("y", false);
-			data.rotate = constraintMap.getBoolean("rotate", false);
-			data.scaleX = constraintMap.getBoolean("scaleX", false);
-			data.shearX = constraintMap.getBoolean("shearX", false);
+			data.x = constraintMap.getFloat("x", 0);
+			data.y = constraintMap.getFloat("y", 0);
+			data.rotate = constraintMap.getFloat("rotate", 0);
+			data.scaleX = constraintMap.getFloat("scaleX", 0);
+			data.shearX = constraintMap.getFloat("shearX", 0);
 			data.step = 1f / constraintMap.getInt("fps", 60);
 			data.inertia = constraintMap.getFloat("inertia", 1);
 			data.strength = constraintMap.getFloat("strength", 100);

@@ -114,7 +114,7 @@ public class PhysicsConstraint implements Updatable {
 		float mix = this.mix;
 		if (mix == 0) return;
 
-		boolean x = data.x, y = data.y, rotateOrShearX = data.rotate || data.shearX, scaleX = data.scaleX;
+		boolean x = data.x > 0, y = data.y > 0, rotateOrShearX = data.rotate > 0 || data.shearX > 0, scaleX = data.scaleX > 0;
 		Bone bone = this.bone;
 		float l = bone.data.length;
 
@@ -161,8 +161,8 @@ public class PhysicsConstraint implements Updatable {
 							remaining -= step;
 						} while (remaining >= step);
 					}
-					if (x) bone.worldX += xOffset * mix;
-					if (y) bone.worldY += yOffset * mix;
+					if (x) bone.worldX += xOffset * mix * data.x;
+					if (y) bone.worldY += yOffset * mix * data.y;
 				}
 				if (rotateOrShearX || scaleX) {
 					float ca = atan2(bone.c, bone.a), c, s;
@@ -212,36 +212,36 @@ public class PhysicsConstraint implements Updatable {
 			cy = bone.worldY;
 			break;
 		case pose:
-			if (x) bone.worldX += xOffset * mix;
-			if (y) bone.worldY += yOffset * mix;
+			if (x) bone.worldX += xOffset * mix * data.x;
+			if (y) bone.worldY += yOffset * mix * data.y;
 		}
 
 		if (rotateOrShearX) {
 			float r = rotateOffset * mix, a = bone.a, s, c;
-			if (data.rotate) {
-				if (data.shearX) {
+			if (data.rotate > 0) {
+				if (data.shearX > 0) {
 					r *= 0.5f;
-					s = sin(r);
-					c = cos(r);
+					s = sin(r * data.shearX);
+					c = cos(r * data.shearX);
 					bone.a = c * a - s * bone.c;
 					bone.c = s * a + c * bone.c;
 					a = bone.a;
 				} else {
-					s = sin(r);
-					c = cos(r);
+					s = sin(r * data.rotate);
+					c = cos(r * data.rotate);
 				}
 				float b = bone.b;
 				bone.b = c * b - s * bone.d;
 				bone.d = s * b + c * bone.d;
 			} else {
-				s = sin(r);
-				c = cos(r);
+				s = sin(r * data.shearX);
+				c = cos(r * data.shearX);
 			}
 			bone.a = c * a - s * bone.c;
 			bone.c = s * a + c * bone.c;
 		}
 		if (scaleX) {
-			float s = 1 + scaleOffset * mix;
+			float s = 1 + scaleOffset * mix * data.scaleX;
 			bone.a *= s;
 			bone.c *= s;
 		}
