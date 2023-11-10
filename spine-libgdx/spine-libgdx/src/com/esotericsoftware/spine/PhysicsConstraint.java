@@ -172,11 +172,15 @@ public class PhysicsConstraint implements Updatable {
 						r = rotateOffset * mix + ca;
 						c = cos(r);
 						s = sin(r);
-						if (scaleX) scaleOffset += (dx * c + dy * s) * i / (l * bone.getWorldScaleX());
+						if (scaleX) {
+							r = l * bone.getWorldScaleX();
+							if (r > 0) scaleOffset += (dx * c + dy * s) * i / r;
+						}
 					} else {
 						c = cos(ca);
 						s = sin(ca);
-						scaleOffset += ((cx - bone.worldX) * c + (cy - bone.worldY) * s) * i / (l * bone.getWorldScaleX());
+						float r = l * bone.getWorldScaleX();
+						if (r > 0) scaleOffset += ((cx - bone.worldX) * c + (cy - bone.worldY) * s) * i / r;
 					}
 					remaining = this.remaining;
 					if (remaining >= step) {
