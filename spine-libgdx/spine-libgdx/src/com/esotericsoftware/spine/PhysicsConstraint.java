@@ -98,7 +98,6 @@ public class PhysicsConstraint implements Updatable {
 	}
 
 	public void setToSetupPose () {
-		reset();
 		PhysicsConstraintData data = this.data;
 		inertia = data.inertia;
 		strength = data.strength;
