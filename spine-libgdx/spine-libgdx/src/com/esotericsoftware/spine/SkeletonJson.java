@@ -61,6 +61,7 @@ import com.esotericsoftware.spine.Animation.PhysicsConstraintGravityTimeline;
 import com.esotericsoftware.spine.Animation.PhysicsConstraintInertiaTimeline;
 import com.esotericsoftware.spine.Animation.PhysicsConstraintMassTimeline;
 import com.esotericsoftware.spine.Animation.PhysicsConstraintMixTimeline;
+import com.esotericsoftware.spine.Animation.PhysicsConstraintResetTimeline;
 import com.esotericsoftware.spine.Animation.PhysicsConstraintStrengthTimeline;
 import com.esotericsoftware.spine.Animation.PhysicsConstraintWindTimeline;
 import com.esotericsoftware.spine.Animation.RGB2Timeline;
@@ -310,7 +311,7 @@ public class SkeletonJson extends SkeletonLoader {
 			data.damping = constraintMap.getFloat("damping", 1);
 			data.massInverse = 1f / constraintMap.getFloat("mass", 1);
 			data.wind = constraintMap.getFloat("wind", 0);
-			data.gravity = constraintMap.getFloat("getFloat", 0);
+			data.gravity = constraintMap.getFloat("gravity", 0);
 			data.mix = constraintMap.getFloat("mix", 1);
 
 			skeletonData.physicsConstraints.add(data);
@@ -932,6 +933,14 @@ public class SkeletonJson extends SkeletonLoader {
 
 				int frames = timelineMap.size;
 				String timelineName = timelineMap.name;
+				if (timelineName.equals("reset")) {
+					PhysicsConstraintResetTimeline timeline = new PhysicsConstraintResetTimeline(timelineMap.size, index);
+					for (int frame = 0; keyMap != null; keyMap = keyMap.next, frame++)
+						timeline.setFrame(frame, keyMap.getFloat("time", 0));
+					timelines.add(timeline);
+					continue;
+				}
+
 				CurveTimeline1 timeline;
 				if (timelineName.equals("inertia"))
 					timeline = new PhysicsConstraintInertiaTimeline(frames, frames, index);
@@ -1023,15 +1032,25 @@ public class SkeletonJson extends SkeletonLoader {
 			}
 		}
 
+		// Physics constraint reset all timeline.
+		JsonValue resetMap = map.get("physicsReset");
+		if (resetMap != null) {
+			PhysicsConstraintResetTimeline timeline = new PhysicsConstraintResetTimeline(resetMap.size, -1);
+			int frame = 0;
+			for (JsonValue keyMap = resetMap.child; keyMap != null; keyMap = keyMap.next, frame++)
+				timeline.setFrame(frame, keyMap.getFloat("time", 0));
+			timelines.add(timeline);
+		}
+
 		// Draw order timeline.
-		JsonValue drawOrdersMap = map.get("drawOrder");
-		if (drawOrdersMap != null) {
-			DrawOrderTimeline timeline = new DrawOrderTimeline(drawOrdersMap.size);
+		JsonValue drawOrderMap = map.get("drawOrder");
+		if (drawOrderMap != null) {
+			DrawOrderTimeline timeline = new DrawOrderTimeline(drawOrderMap.size);
 			int slotCount = skeletonData.slots.size;
 			int frame = 0;
-			for (JsonValue drawOrderMap = drawOrdersMap.child; drawOrderMap != null; drawOrderMap = drawOrderMap.next, frame++) {
+			for (JsonValue keyMap = drawOrderMap.child; keyMap != null; keyMap = keyMap.next, frame++) {
 				int[] drawOrder = null;
-				JsonValue offsets = drawOrderMap.get("offsets");
+				JsonValue offsets = keyMap.get("offsets");
 				if (offsets != null) {
 					drawOrder = new int[slotCount];
 					for (int i = slotCount - 1; i >= 0; i--)
@@ -1054,7 +1073,7 @@ public class SkeletonJson extends SkeletonLoader {
 					for (int i = slotCount - 1; i >= 0; i--)
 						if (drawOrder[i] == -1) drawOrder[i] = unchanged[--unchangedIndex];
 				}
-				timeline.setFrame(frame, drawOrderMap.getFloat("time", 0), drawOrder);
+				timeline.setFrame(frame, keyMap.getFloat("time", 0), drawOrder);
 			}
 			timelines.add(timeline);
 		}
@@ -1064,16 +1083,16 @@ public class SkeletonJson extends SkeletonLoader {
 		if (eventsMap != null) {
 			EventTimeline timeline = new EventTimeline(eventsMap.size);
 			int frame = 0;
-			for (JsonValue eventMap = eventsMap.child; eventMap != null; eventMap = eventMap.next, frame++) {
-				EventData eventData = skeletonData.findEvent(eventMap.getString("name"));
-				if (eventData == null) throw new SerializationException("Event not found: " + eventMap.getString("name"));
-				Event event = new Event(eventMap.getFloat("time", 0), eventData);
-				event.intValue = eventMap.getInt("int", eventData.intValue);
-				event.floatValue = eventMap.getFloat("float", eventData.floatValue);
-				event.stringValue = eventMap.getString("string", eventData.stringValue);
+			for (JsonValue keyMap = eventsMap.child; keyMap != null; keyMap = keyMap.next, frame++) {
+				EventData eventData = skeletonData.findEvent(keyMap.getString("name"));
+				if (eventData == null) throw new SerializationException("Event not found: " + keyMap.getString("name"));
+				Event event = new Event(keyMap.getFloat("time", 0), eventData);
+				event.intValue = keyMap.getInt("int", eventData.intValue);
+				event.floatValue = keyMap.getFloat("float", eventData.floatValue);
+				event.stringValue = keyMap.getString("string", eventData.stringValue);
 				if (event.getData().audioPath != null) {
-					event.volume = eventMap.getFloat("volume", eventData.volume);
-					event.balance = eventMap.getFloat("balance", eventData.balance);
+					event.volume = keyMap.getFloat("volume", eventData.volume);
+					event.balance = keyMap.getFloat("balance", eventData.balance);
 				}
 				timeline.setFrame(frame, event);
 			}

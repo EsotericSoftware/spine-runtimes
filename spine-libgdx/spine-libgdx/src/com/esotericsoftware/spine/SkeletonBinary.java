@@ -60,6 +60,7 @@ import com.esotericsoftware.spine.Animation.PhysicsConstraintGravityTimeline;
 import com.esotericsoftware.spine.Animation.PhysicsConstraintInertiaTimeline;
 import com.esotericsoftware.spine.Animation.PhysicsConstraintMassTimeline;
 import com.esotericsoftware.spine.Animation.PhysicsConstraintMixTimeline;
+import com.esotericsoftware.spine.Animation.PhysicsConstraintResetTimeline;
 import com.esotericsoftware.spine.Animation.PhysicsConstraintStrengthTimeline;
 import com.esotericsoftware.spine.Animation.PhysicsConstraintWindTimeline;
 import com.esotericsoftware.spine.Animation.RGB2Timeline;
@@ -134,6 +135,7 @@ public class SkeletonBinary extends SkeletonLoader {
 	static public final int PHYSICS_WIND = 5;
 	static public final int PHYSICS_GRAVITY = 6;
 	static public final int PHYSICS_MIX = 7;
+	static public final int PHYSICS_RESET = 8;
 
 	static public final int CURVE_LINEAR = 0;
 	static public final int CURVE_STEPPED = 1;
@@ -959,7 +961,15 @@ public class SkeletonBinary extends SkeletonLoader {
 		for (int i = 0, n = input.readInt(true); i < n; i++) {
 			int index = input.readInt(true);
 			for (int ii = 0, nn = input.readInt(true); ii < nn; ii++) {
-				int type = input.readByte(), frameCount = input.readInt(true), bezierCount = input.readInt(true);
+				int type = input.readByte(), frameCount = input.readInt(true);
+				if (type == PHYSICS_RESET) {
+					PhysicsConstraintResetTimeline timeline = new PhysicsConstraintResetTimeline(frameCount, index);
+					for (int frame = 0; frame < frameCount; frame++)
+						timeline.setFrame(frame, input.readFloat());
+					timelines.add(timeline);
+					continue;
+				}
+				int bezierCount = input.readInt(true);
 				switch (type) {
 				case PHYSICS_INERTIA:
 					readTimeline(input, timelines, new PhysicsConstraintInertiaTimeline(frameCount, bezierCount, index), 1);
@@ -1054,6 +1064,15 @@ public class SkeletonBinary extends SkeletonLoader {
 					}
 				}
 			}
+		}
+
+		// Physics constraint reset all timeline.
+		int resetCount = input.readInt(true);
+		if (resetCount > 0) {
+			PhysicsConstraintResetTimeline timeline = new PhysicsConstraintResetTimeline(resetCount, -1);
+			for (int i = 0; i < resetCount; i++)
+				timeline.setFrame(i, input.readFloat());
+			timelines.add(timeline);
 		}
 
 		// Draw order timeline.

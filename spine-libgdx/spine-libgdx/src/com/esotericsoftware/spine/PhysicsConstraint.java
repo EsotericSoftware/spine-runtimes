@@ -217,28 +217,34 @@ public class PhysicsConstraint implements Updatable {
 		}
 
 		if (rotateOrShearX) {
-			float r = rotateOffset * mix, a = bone.a, s, c;
-			if (data.rotate > 0) {
-				if (data.shearX > 0) {
-					r *= 0.5f;
-					s = sin(r * data.shearX);
-					c = cos(r * data.shearX);
-					bone.a = c * a - s * bone.c;
-					bone.c = s * a + c * bone.c;
-					a = bone.a;
-				} else {
-					s = sin(r * data.rotate);
-					c = cos(r * data.rotate);
+			float o = rotateOffset * mix, s, c, a;
+			if (data.shearX > 0) {
+				float r = 0;
+				if (data.rotate > 0) {
+					r = o * data.rotate;
+					s = sin(r);
+					c = cos(r);
+					a = bone.b;
+					bone.b = c * a - s * bone.d;
+					bone.d = s * a + c * bone.d;
 				}
-				float b = bone.b;
-				bone.b = c * b - s * bone.d;
-				bone.d = s * b + c * bone.d;
+				r += o * data.shearX;
+				s = sin(r);
+				c = cos(r);
+				a = bone.a;
+				bone.a = c * a - s * bone.c;
+				bone.c = s * a + c * bone.c;
 			} else {
-				s = sin(r * data.shearX);
-				c = cos(r * data.shearX);
+				o *= data.rotate;
+				s = sin(o);
+				c = cos(o);
+				a = bone.a;
+				bone.a = c * a - s * bone.c;
+				bone.c = s * a + c * bone.c;
+				a = bone.b;
+				bone.b = c * a - s * bone.d;
+				bone.d = s * a + c * bone.d;
 			}
-			bone.a = c * a - s * bone.c;
-			bone.c = s * a + c * bone.c;
 		}
 		if (scaleX) {
 			float s = 1 + scaleOffset * mix * data.scaleX;
