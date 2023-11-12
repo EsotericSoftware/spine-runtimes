@@ -250,7 +250,7 @@ public class PhysicsConstraint implements Updatable {
 			bone.a *= s;
 			bone.c *= s;
 		}
-		if (physics == Physics.update) {
+		if (physics != Physics.pose) {
 			tx = l * bone.a;
 			ty = l * bone.c;
 		}
