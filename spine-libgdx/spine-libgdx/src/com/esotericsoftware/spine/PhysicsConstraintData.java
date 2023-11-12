@@ -36,6 +36,7 @@ public class PhysicsConstraintData extends ConstraintData {
 	BoneData bone;
 	float x, y, rotate, scaleX, shearX;
 	float step, inertia, strength, damping, massInverse, wind, gravity, mix;
+	boolean inertiaGlobal, strengthGlobal, dampingGlobal, massGlobal, windGlobal, gravityGlobal, mixGlobal;
 
 	public PhysicsConstraintData (String name) {
 		super(name);
@@ -153,5 +154,61 @@ public class PhysicsConstraintData extends ConstraintData {
 
 	public void setMix (float mix) {
 		this.mix = mix;
+	}
+
+	public boolean getInertiaGlobal () {
+		return inertiaGlobal;
+	}
+
+	public void setInertiaGlobal (boolean inertiaGlobal) {
+		this.inertiaGlobal = inertiaGlobal;
+	}
+
+	public boolean getStrengthGlobal () {
+		return strengthGlobal;
+	}
+
+	public void setStrengthGlobal (boolean strengthGlobal) {
+		this.strengthGlobal = strengthGlobal;
+	}
+
+	public boolean getDampingGlobal () {
+		return dampingGlobal;
+	}
+
+	public void setDampingGlobal (boolean dampingGlobal) {
+		this.dampingGlobal = dampingGlobal;
+	}
+
+	public boolean getMassGlobal () {
+		return massGlobal;
+	}
+
+	public void setMassGlobal (boolean massGlobal) {
+		this.massGlobal = massGlobal;
+	}
+
+	public boolean getWindGlobal () {
+		return windGlobal;
+	}
+
+	public void setWindGlobal (boolean windGlobal) {
+		this.windGlobal = windGlobal;
+	}
+
+	public boolean getGravityGlobal () {
+		return gravityGlobal;
+	}
+
+	public void setGravityGlobal (boolean gravityGlobal) {
+		this.gravityGlobal = gravityGlobal;
+	}
+
+	public boolean getMixGlobal () {
+		return mixGlobal;
+	}
+
+	public void setMixGlobal (boolean mixGlobal) {
+		this.mixGlobal = mixGlobal;
 	}
 }

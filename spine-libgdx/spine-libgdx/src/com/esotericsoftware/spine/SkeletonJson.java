@@ -313,6 +313,13 @@ public class SkeletonJson extends SkeletonLoader {
 			data.wind = constraintMap.getFloat("wind", 0);
 			data.gravity = constraintMap.getFloat("gravity", 0);
 			data.mix = constraintMap.getFloat("mix", 1);
+			data.inertiaGlobal = constraintMap.getBoolean("inertiaGlobal", false);
+			data.strengthGlobal = constraintMap.getBoolean("strengthGlobal", false);
+			data.dampingGlobal = constraintMap.getBoolean("dampingGlobal", false);
+			data.massGlobal = constraintMap.getBoolean("massGlobal", false);
+			data.windGlobal = constraintMap.getBoolean("windGlobal", false);
+			data.gravityGlobal = constraintMap.getBoolean("gravityGlobal", false);
+			data.mixGlobal = constraintMap.getBoolean("mixGlobal", false);
 
 			skeletonData.physicsConstraints.add(data);
 		}
@@ -924,9 +931,12 @@ public class SkeletonJson extends SkeletonLoader {
 
 		// Physics constraint timelines.
 		for (JsonValue constraintMap = map.getChild("physics"); constraintMap != null; constraintMap = constraintMap.next) {
-			PhysicsConstraintData constraint = skeletonData.findPhysicsConstraint(constraintMap.name);
-			if (constraint == null) throw new SerializationException("Physics constraint not found: " + constraintMap.name);
-			int index = skeletonData.physicsConstraints.indexOf(constraint, true);
+			int index = -1;
+			if (!constraintMap.name.isEmpty()) {
+				PhysicsConstraintData constraint = skeletonData.findPhysicsConstraint(constraintMap.name);
+				if (constraint == null) throw new SerializationException("Physics constraint not found: " + constraintMap.name);
+				index = skeletonData.physicsConstraints.indexOf(constraint, true);
+			}
 			for (JsonValue timelineMap = constraintMap.child; timelineMap != null; timelineMap = timelineMap.next) {
 				JsonValue keyMap = timelineMap.child;
 				if (keyMap == null) continue;
@@ -1030,16 +1040,6 @@ public class SkeletonJson extends SkeletonLoader {
 					}
 				}
 			}
-		}
-
-		// Physics constraint reset all timeline.
-		JsonValue resetMap = map.get("physicsReset");
-		if (resetMap != null) {
-			PhysicsConstraintResetTimeline timeline = new PhysicsConstraintResetTimeline(resetMap.size, -1);
-			int frame = 0;
-			for (JsonValue keyMap = resetMap.child; keyMap != null; keyMap = keyMap.next, frame++)
-				timeline.setFrame(frame, keyMap.getFloat("time", 0));
-			timelines.add(timeline);
 		}
 
 		// Draw order timeline.

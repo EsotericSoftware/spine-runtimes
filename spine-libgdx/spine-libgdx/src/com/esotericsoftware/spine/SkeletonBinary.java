@@ -328,6 +328,14 @@ public class SkeletonBinary extends SkeletonLoader {
 				data.wind = input.readFloat();
 				data.gravity = input.readFloat();
 				data.mix = input.readFloat();
+				flags = input.read();
+				if ((flags & 1) != 0) data.inertiaGlobal = true;
+				if ((flags & 2) != 0) data.strengthGlobal = true;
+				if ((flags & 4) != 0) data.dampingGlobal = true;
+				if ((flags & 8) != 0) data.massGlobal = true;
+				if ((flags & 16) != 0) data.windGlobal = true;
+				if ((flags & 32) != 0) data.gravityGlobal = true;
+				if ((flags & 64) != 0) data.mixGlobal = true;
 				o[i] = data;
 			}
 
@@ -959,7 +967,7 @@ public class SkeletonBinary extends SkeletonLoader {
 
 		// Physics timelines.
 		for (int i = 0, n = input.readInt(true); i < n; i++) {
-			int index = input.readInt(true);
+			int index = input.readInt(true) - 1;
 			for (int ii = 0, nn = input.readInt(true); ii < nn; ii++) {
 				int type = input.readByte(), frameCount = input.readInt(true);
 				if (type == PHYSICS_RESET) {
@@ -1064,15 +1072,6 @@ public class SkeletonBinary extends SkeletonLoader {
 					}
 				}
 			}
-		}
-
-		// Physics constraint reset all timeline.
-		int resetCount = input.readInt(true);
-		if (resetCount > 0) {
-			PhysicsConstraintResetTimeline timeline = new PhysicsConstraintResetTimeline(resetCount, -1);
-			for (int i = 0; i < resetCount; i++)
-				timeline.setFrame(i, input.readFloat());
-			timelines.add(timeline);
 		}
 
 		// Draw order timeline.

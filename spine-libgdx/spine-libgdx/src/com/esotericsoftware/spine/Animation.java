@@ -460,6 +460,20 @@ public class Animation {
 			return current + (value - current) * alpha;
 		}
 
+		public float getAbsoluteValue (float time, float alpha, MixBlend blend, float current, float setup, float value) {
+			if (time < frames[0]) {
+				switch (blend) {
+				case setup:
+					return setup;
+				case first:
+					return current + (setup - current) * alpha;
+				}
+				return current;
+			}
+			if (blend == MixBlend.setup) return setup + (value - setup) * alpha;
+			return current + (value - current) * alpha;
+		}
+
 		public float getScaleValue (float time, float alpha, MixBlend blend, MixDirection direction, float current, float setup) {
 			float[] frames = this.frames;
 			if (time < frames[0]) {
@@ -2242,20 +2256,48 @@ public class Animation {
 		}
 	}
 
-	/** The base class for {@link PhysicsConstraint} timelines. */
+	/** The base class for most {@link PhysicsConstraint} timelines. */
 	static public abstract class PhysicsConstraintTimeline extends CurveTimeline1 {
 		final int constraintIndex;
 
+		/** @param physicsConstraintIndex -1 for all physics constraints in the skeleton. */
 		public PhysicsConstraintTimeline (int frameCount, int bezierCount, int physicsConstraintIndex, Property property) {
 			super(frameCount, bezierCount, property.ordinal() + "|" + physicsConstraintIndex);
 			constraintIndex = physicsConstraintIndex;
 		}
 
 		/** The index of the physics constraint in {@link Skeleton#getPhysicsConstraints()} that will be changed when this timeline
-		 * is applied. */
+		 * is applied, or -1 if all physics constraints in the skeleton will be changed. */
 		public int getPhysicsConstraintIndex () {
 			return constraintIndex;
 		}
+
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
+			MixDirection direction) {
+
+			PhysicsConstraint constraint;
+			if (constraintIndex == -1) {
+				float value = time >= frames[0] ? getCurveValue(time) : 0;
+			
+				Object[] constraints = skeleton.physicsConstraints.items;
+				for (int i = 0, n = skeleton.physicsConstraints.size; i < n; i++) {
+					constraint = (PhysicsConstraint)constraints[i];
+					if (constraint.active && global(constraint.data))
+						set(constraint, getAbsoluteValue(time, alpha, blend, get(constraint), setup(constraint), value));
+				}
+			} else {
+				constraint = skeleton.physicsConstraints.get(constraintIndex);
+				if (constraint.active) set(constraint, getAbsoluteValue(time, alpha, blend, get(constraint), setup(constraint)));
+			}
+		}
+
+		abstract protected float setup (PhysicsConstraint constraint);
+
+		abstract protected float get (PhysicsConstraint constraint);
+
+		abstract protected void set (PhysicsConstraint constraint, float value);
+
+		abstract protected boolean global (PhysicsConstraintData constraint);
 	}
 
 	/** Changes a physics constraint's {@link PhysicsConstraint#getInertia()}. */
@@ -2264,12 +2306,20 @@ public class Animation {
 			super(frameCount, bezierCount, physicsConstraintIndex, Property.physicsConstraintInertia);
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
-			MixDirection direction) {
+		protected float setup (PhysicsConstraint constraint) {
+			return constraint.data.inertia;
+		}
 
-			PhysicsConstraint constraint = skeleton.physicsConstraints.get(constraintIndex);
-			if (constraint.active)
-				constraint.inertia = getAbsoluteValue(time, alpha, blend, constraint.inertia, constraint.data.inertia);
+		protected float get (PhysicsConstraint constraint) {
+			return constraint.inertia;
+		}
+
+		protected void set (PhysicsConstraint constraint, float value) {
+			constraint.inertia = value;
+		}
+
+		protected boolean global (PhysicsConstraintData constraint) {
+			return constraint.inertiaGlobal;
 		}
 	}
 
@@ -2279,12 +2329,20 @@ public class Animation {
 			super(frameCount, bezierCount, physicsConstraintIndex, Property.physicsConstraintStrength);
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
-			MixDirection direction) {
+		protected float setup (PhysicsConstraint constraint) {
+			return constraint.data.strength;
+		}
 
-			PhysicsConstraint constraint = skeleton.physicsConstraints.get(constraintIndex);
-			if (constraint.active)
-				constraint.strength = getAbsoluteValue(time, alpha, blend, constraint.strength, constraint.data.strength);
+		protected float get (PhysicsConstraint constraint) {
+			return constraint.strength;
+		}
+
+		protected void set (PhysicsConstraint constraint, float value) {
+			constraint.strength = value;
+		}
+
+		protected boolean global (PhysicsConstraintData constraint) {
+			return constraint.strengthGlobal;
 		}
 	}
 
@@ -2294,12 +2352,20 @@ public class Animation {
 			super(frameCount, bezierCount, physicsConstraintIndex, Property.physicsConstraintDamping);
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
-			MixDirection direction) {
+		protected float setup (PhysicsConstraint constraint) {
+			return constraint.data.damping;
+		}
 
-			PhysicsConstraint constraint = skeleton.physicsConstraints.get(constraintIndex);
-			if (constraint.active)
-				constraint.damping = getAbsoluteValue(time, alpha, blend, constraint.damping, constraint.data.damping);
+		protected float get (PhysicsConstraint constraint) {
+			return constraint.damping;
+		}
+
+		protected void set (PhysicsConstraint constraint, float value) {
+			constraint.damping = value;
+		}
+
+		protected boolean global (PhysicsConstraintData constraint) {
+			return constraint.dampingGlobal;
 		}
 	}
 
@@ -2309,14 +2375,20 @@ public class Animation {
 			super(frameCount, bezierCount, physicsConstraintIndex, Property.physicsConstraintMass);
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
-			MixDirection direction) {
+		protected float setup (PhysicsConstraint constraint) {
+			return 1 / constraint.data.massInverse;
+		}
 
-			PhysicsConstraint constraint = skeleton.physicsConstraints.get(constraintIndex);
-			if (constraint.active) {
-				constraint.massInverse = 1
-					/ getAbsoluteValue(time, alpha, blend, 1 / constraint.massInverse, 1 / constraint.data.massInverse);
-			}
+		protected float get (PhysicsConstraint constraint) {
+			return 1 / constraint.massInverse;
+		}
+
+		protected void set (PhysicsConstraint constraint, float value) {
+			constraint.massInverse = 1 / value;
+		}
+
+		protected boolean global (PhysicsConstraintData constraint) {
+			return constraint.massGlobal;
 		}
 	}
 
@@ -2326,11 +2398,20 @@ public class Animation {
 			super(frameCount, bezierCount, physicsConstraintIndex, Property.physicsConstraintWind);
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
-			MixDirection direction) {
+		protected float setup (PhysicsConstraint constraint) {
+			return constraint.data.wind;
+		}
 
-			PhysicsConstraint constraint = skeleton.physicsConstraints.get(constraintIndex);
-			if (constraint.active) constraint.wind = getAbsoluteValue(time, alpha, blend, constraint.wind, constraint.data.wind);
+		protected float get (PhysicsConstraint constraint) {
+			return constraint.wind;
+		}
+
+		protected void set (PhysicsConstraint constraint, float value) {
+			constraint.wind = value;
+		}
+
+		protected boolean global (PhysicsConstraintData constraint) {
+			return constraint.windGlobal;
 		}
 	}
 
@@ -2340,12 +2421,20 @@ public class Animation {
 			super(frameCount, bezierCount, physicsConstraintIndex, Property.physicsConstraintGravity);
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
-			MixDirection direction) {
+		protected float setup (PhysicsConstraint constraint) {
+			return constraint.data.gravity;
+		}
 
-			PhysicsConstraint constraint = skeleton.physicsConstraints.get(constraintIndex);
-			if (constraint.active)
-				constraint.gravity = getAbsoluteValue(time, alpha, blend, constraint.gravity, constraint.data.gravity);
+		protected float get (PhysicsConstraint constraint) {
+			return constraint.gravity;
+		}
+
+		protected void set (PhysicsConstraint constraint, float value) {
+			constraint.gravity = value;
+		}
+
+		protected boolean global (PhysicsConstraintData constraint) {
+			return constraint.gravityGlobal;
 		}
 	}
 
@@ -2355,11 +2444,20 @@ public class Animation {
 			super(frameCount, bezierCount, physicsConstraintIndex, Property.physicsConstraintMix);
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
-			MixDirection direction) {
+		protected float setup (PhysicsConstraint constraint) {
+			return constraint.data.mix;
+		}
 
-			PhysicsConstraint constraint = skeleton.physicsConstraints.get(constraintIndex);
-			if (constraint.active) constraint.mix = getAbsoluteValue(time, alpha, blend, constraint.mix, constraint.data.mix);
+		protected float get (PhysicsConstraint constraint) {
+			return constraint.mix;
+		}
+
+		protected void set (PhysicsConstraint constraint, float value) {
+			constraint.mix = value;
+		}
+
+		protected boolean global (PhysicsConstraintData constraint) {
+			return constraint.mixGlobal;
 		}
 	}
 
@@ -2375,8 +2473,8 @@ public class Animation {
 			constraintIndex = physicsConstraintIndex;
 		}
 
-		/** The index of the physics constraint in {@link Skeleton#getPhysicsConstraints()} that will be reset by this timeline, or
-		 * -1 if all physics constraints in the skeleton will be reset. */
+		/** The index of the physics constraint in {@link Skeleton#getPhysicsConstraints()} that will be reset when this timeline is
+		 * applied, or -1 if all physics constraints in the skeleton will be reset. */
 		public int getPhysicsConstraintIndex () {
 			return constraintIndex;
 		}
