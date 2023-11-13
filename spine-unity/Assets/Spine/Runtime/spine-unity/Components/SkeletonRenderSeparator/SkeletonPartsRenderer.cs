@@ -85,6 +85,10 @@ namespace Spine.Unity {
 			}
 		}
 
+		void OnDestroy () {
+			if (buffers != null) buffers.Dispose();
+		}
+
 		public void ClearMesh () {
 			LazyIntialize();
 			meshFilter.sharedMesh = null;
