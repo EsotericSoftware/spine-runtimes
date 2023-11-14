@@ -40,7 +40,7 @@ namespace Spine.Unity.Examples {
 		[System.Serializable]
 		public class SlotRegionPair {
 			[SpineSlot] public string slot;
-			[SpineAtlasRegion] public string region;
+			[SpineAtlasRegion("atlasAsset")] public string region;//Explicitly specify 'SpineAtlasAsset' as a variable named 'atlasAsset'.
 		}
 
 		[SerializeField] protected SpineAtlasAsset atlasAsset;
