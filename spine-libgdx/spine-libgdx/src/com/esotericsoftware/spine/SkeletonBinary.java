@@ -426,7 +426,7 @@ public class SkeletonBinary extends SkeletonLoader {
 			items = skeletonData.pathConstraints.items;
 			for (int i = 0, n = input.readInt(true); i < n; i++)
 				skin.constraints.add((ConstraintData)items[input.readInt(true)]);
-			items = skeletonData.pathConstraints.items;
+			items = skeletonData.physicsConstraints.items;
 			for (int i = 0, n = input.readInt(true); i < n; i++)
 				skin.constraints.add((ConstraintData)items[input.readInt(true)]);
 			skin.constraints.shrink();

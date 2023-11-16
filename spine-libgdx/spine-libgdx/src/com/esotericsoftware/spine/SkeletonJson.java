@@ -348,6 +348,11 @@ public class SkeletonJson extends SkeletonLoader {
 				if (constraint == null) throw new SerializationException("Skin path constraint not found: " + entry);
 				skin.constraints.add(constraint);
 			}
+			for (JsonValue entry = skinMap.getChild("physics"); entry != null; entry = entry.next) {
+				PhysicsConstraintData constraint = skeletonData.findPhysicsConstraint(entry.asString());
+				if (constraint == null) throw new SerializationException("Skin physics constraint not found: " + entry);
+				skin.constraints.add(constraint);
+			}
 			skin.constraints.shrink();
 			for (JsonValue slotEntry = skinMap.getChild("attachments"); slotEntry != null; slotEntry = slotEntry.next) {
 				SlotData slot = skeletonData.findSlot(slotEntry.name);
