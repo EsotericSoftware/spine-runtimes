@@ -770,7 +770,7 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> skeleton_ref) {
 				mesh_instance->colors.set(j, Color(tint.r, tint.g, tint.b, tint.a));
 			}
 
-			auto indices_changed = true;
+			auto indices_changed = false;
 			if (mesh_instance->indices.size() == indices->size()) {
 				auto old_indices = mesh_instance->indices.ptr();
 				auto new_indices = indices->buffer();
@@ -780,6 +780,8 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> skeleton_ref) {
 						break;
 					}
 				}
+			} else {
+				indices_changed = true;
 			}
 
 			if (indices_changed) {
