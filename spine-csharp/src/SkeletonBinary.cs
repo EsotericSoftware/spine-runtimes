@@ -431,7 +431,7 @@ namespace Spine {
 			int flags = input.ReadByte();
 			string name = (flags & 8) != 0 ? input.ReadStringRef() : attachmentName;
 
-			switch ((AttachmentType)(flags & 0b111)) {
+			switch ((AttachmentType)(flags & 0x7)) { // 0b111
 			case AttachmentType.Region: {
 				string path = (flags & 16) != 0 ? input.ReadStringRef() : null;
 				uint color = (flags & 32) != 0 ? (uint)input.ReadInt() : 0xffffffff;
