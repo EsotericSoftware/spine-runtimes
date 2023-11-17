@@ -45,7 +45,7 @@ namespace Spine {
 		internal readonly ExposedList<ConstraintData> constraints = new ExposedList<ConstraintData>();
 
 		public string Name { get { return name; } }
-		///<summary>Returns all attachments contained in this skin.</summary>
+		/// <summary>Returns all attachments contained in this skin.</summary>
 		public ICollection<SkinEntry> Attachments { get { return attachments.Values; } }
 		public ExposedList<BoneData> Bones { get { return bones; } }
 		public ExposedList<ConstraintData> Constraints { get { return constraints; } }
@@ -62,7 +62,7 @@ namespace Spine {
 			attachments[new SkinKey(slotIndex, name)] = new SkinEntry(slotIndex, name, attachment);
 		}
 
-		///<summary>Adds all attachments, bones, and constraints from the specified skin to this skin.</summary>
+		/// <summary>Adds all attachments, bones, and constraints from the specified skin to this skin.</summary>
 		public void AddSkin (Skin skin) {
 			foreach (BoneData data in skin.bones)
 				if (!bones.Contains(data)) bones.Add(data);
@@ -76,7 +76,7 @@ namespace Spine {
 			}
 		}
 
-		///<summary>Adds all attachments from the specified skin to this skin. Attachments are deep copied.</summary>
+		/// <summary>Adds all attachments from the specified skin to this skin. Attachments are deep copied.</summary>
 		public void CopySkin (Skin skin) {
 			foreach (BoneData data in skin.bones)
 				if (!bones.Contains(data)) bones.Add(data);
@@ -118,7 +118,7 @@ namespace Spine {
 			}
 		}
 
-		///<summary>Clears all attachments, bones, and constraints.</summary>
+		/// <summary>Clears all attachments, bones, and constraints.</summary>
 		public void Clear () {
 			attachments.Clear();
 			bones.Clear();

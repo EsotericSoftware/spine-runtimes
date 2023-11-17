@@ -45,13 +45,13 @@ namespace Spine {
 		/// <summary> The constraint's name, which is unique across all constraints in the skeleton of the same type.</summary>
 		public string Name { get { return name; } }
 
-		///<summary>The ordinal of this constraint for the order a skeleton's constraints will be applied by
-		/// <see cref="Skeleton.UpdateWorldTransform()"/>.</summary>
+		/// <summary>The ordinal of this constraint for the order a skeleton's constraints will be applied by
+		/// <see cref="Skeleton.UpdateWorldTransform(Skeleton.Physics)"/>.</summary>
 		public int Order { get { return order; } set { order = value; } }
 
-		///<summary>When true, <see cref="Skeleton.UpdateWorldTransform()"/> only updates this constraint if the <see cref="Skeleton.Skin"/> contains
-		/// this constraint.</summary>
-		///<seealso cref="Skin.Constraints"/>
+		/// <summary>When true, <see cref="Skeleton.UpdateWorldTransform(Skeleton.Physics)"/> only updates this constraint if the <see cref="Skeleton.Skin"/>
+		/// contains this constraint.</summary>
+		/// <seealso cref="Skin.Constraints"/>
 		public bool SkinRequired { get { return skinRequired; } set { skinRequired = value; } }
 
 		override public string ToString () {

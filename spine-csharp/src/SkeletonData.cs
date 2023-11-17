@@ -51,8 +51,8 @@ namespace Spine {
 		internal float fps;
 		internal string imagesPath, audioPath;
 
-		///<summary>The skeleton's name, which by default is the name of the skeleton data file when possible, or null when a name hasn't been
-		///set.</summary>
+		/// <summary>The skeleton's name, which by default is the name of the skeleton data file when possible, or null when a name hasn't been
+		/// set.</summary>
 		public string Name { get { return name; } set { name = value; } }
 
 		/// <summary>The skeleton's bones, sorted parent first. The root bone is always the first bone.</summary>
@@ -90,8 +90,8 @@ namespace Spine {
 		/// <summary>The Spine version used to export this data, or null.</summary>
 		public string Version { get { return version; } set { version = value; } }
 
-		///<summary>The skeleton data hash. This value will change if any of the skeleton data has changed.
-		///May be null.</summary>
+		/// <summary>The skeleton data hash. This value will change if any of the skeleton data has changed.
+		/// May be null.</summary>
 		public string Hash { get { return hash; } set { hash = value; } }
 
 		public string ImagesPath { get { return imagesPath; } set { imagesPath = value; } }
@@ -217,7 +217,7 @@ namespace Spine {
 		/// <returns>May be null.</returns>
 		public PhysicsConstraintData FindPhysicsConstraint (String constraintName) {
 			if (constraintName == null) throw new ArgumentNullException("constraintName", "constraintName cannot be null.");
-			Object[] physicsConstraints = this.physicsConstraints.Items;
+			PhysicsConstraintData[] physicsConstraints = this.physicsConstraints.Items;
 			for (int i = 0, n = this.physicsConstraints.Count; i < n; i++) {
 				PhysicsConstraintData constraint = (PhysicsConstraintData)physicsConstraints[i];
 				if (constraint.name.Equals(constraintName)) return constraint;

@@ -56,7 +56,7 @@ namespace Spine {
 		/// <summary>Local Y translation.</summary>
 		public float Y { get { return y; } set { y = value; } }
 
-		/// <summary>Local rotation.</summary>
+		/// <summary>Local rotation in degrees, counter clockwise.</summary>
 		public float Rotation { get { return rotation; } set { rotation = value; } }
 
 		/// <summary>Local scaleX.</summary>
@@ -74,8 +74,8 @@ namespace Spine {
 		/// <summary>The transform mode for how parent world transforms affect this bone.</summary>
 		public TransformMode TransformMode { get { return transformMode; } set { transformMode = value; } }
 
-		///<summary>When true, <see cref="Skeleton.UpdateWorldTransform()"/> only updates this bone if the <see cref="Skeleton.Skin"/> contains this
-		/// bone.</summary>
+		/// <summary>When true, <see cref="Skeleton.UpdateWorldTransform(Skeleton.Physics)"/> only updates this bone if the <see cref="Skeleton.Skin"/> contains
+		/// this bone.</summary>
 		/// <seealso cref="Skin.Bones"/>
 		public bool SkinRequired { get { return skinRequired; } set { skinRequired = value; } }
 

@@ -197,7 +197,7 @@ namespace Spine {
 			base.ComputeWorldVertices(slot, start, count, worldVertices, offset, stride);
 		}
 
-		///<summary>Returns a new mesh with this mesh set as the <see cref="ParentMesh"/>.
+		/// <summary>Returns a new mesh with this mesh set as the <see cref="ParentMesh"/>.
 		public MeshAttachment NewLinkedMesh () {
 			MeshAttachment mesh = new MeshAttachment(Name);
 

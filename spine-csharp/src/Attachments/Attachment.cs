@@ -50,7 +50,7 @@ namespace Spine {
 			return Name;
 		}
 
-		///<summary>Returns a copy of the attachment.</summary>
+		/// <summary>Returns a copy of the attachment.</summary>
 		public abstract Attachment Copy ();
 	}
 }

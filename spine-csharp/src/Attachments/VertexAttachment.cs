@@ -47,7 +47,7 @@ namespace Spine {
 		public int[] Bones { get { return bones; } set { bones = value; } }
 		public float[] Vertices { get { return vertices; } set { vertices = value; } }
 		public int WorldVerticesLength { get { return worldVerticesLength; } set { worldVerticesLength = value; } }
-		///<summary>Timelines for the timeline attachment are also applied to this attachment.
+		/// <summary>Timelines for the timeline attachment are also applied to this attachment.
 		/// May be null if no attachment-specific timelines should be applied.</summary>
 		public VertexAttachment TimelineAttachment { get { return timelineAttachment; } set { timelineAttachment = value; } }
 

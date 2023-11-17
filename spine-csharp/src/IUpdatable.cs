@@ -28,15 +28,20 @@
  *****************************************************************************/
 
 namespace Spine {
+	using Physics = Skeleton.Physics;
 
-	///<summary>The interface for items updated by <see cref="Skeleton.UpdateWorldTransform()"/>.</summary>
+	/// <summary>The interface for items updated by <see cref="Skeleton.UpdateWorldTransform(Physics)"/>.</summary>
 	public interface IUpdatable {
-		void Update ();
+		/// <param name="physics">Determines how physics and other non-deterministic updates are applied.</param>
+		void Update (Physics physics);
 
-		///<summary>Returns false when this item has not been updated because a skin is required and the <see cref="Skeleton.Skin">active
-		/// skin</see> does not contain this item.</summary>
+		/// <summary>Returns false when this item won't be updated by
+		/// <see cref="Skeleton.UpdateWorldTransform(Skeleton.Physics)"/> because a skin is required and the
+		/// <see cref="Skeleton.Skin">active skin</see> does not contain this item.</summary>
 		/// <seealso cref="Skin.Bones"/>
 		/// <seealso cref="Skin.Constraints"/>
+		/// <seealso cref="BoneData.SkinRequired"/>
+		/// <seealso cref="ConstraintData.SkinRequired"/>
 		bool Active { get; }
 	}
 }

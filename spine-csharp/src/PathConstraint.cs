@@ -30,6 +30,7 @@
 using System;
 
 namespace Spine {
+	using Physics = Skeleton.Physics;
 
 	/// <summary>
 	/// <para>
@@ -57,9 +58,11 @@ namespace Spine {
 			if (data == null) throw new ArgumentNullException("data", "data cannot be null.");
 			if (skeleton == null) throw new ArgumentNullException("skeleton", "skeleton cannot be null.");
 			this.data = data;
+
 			bones = new ExposedList<Bone>(data.Bones.Count);
 			foreach (BoneData boneData in data.bones)
 				bones.Add(skeleton.bones.Items[boneData.index]);
+
 			target = skeleton.slots.Items[data.target.index];
 			position = data.position;
 			spacing = data.spacing;
@@ -69,14 +72,12 @@ namespace Spine {
 		}
 
 		/// <summary>Copy constructor.</summary>
-		public PathConstraint (PathConstraint constraint, Skeleton skeleton) {
+		public PathConstraint (PathConstraint constraint) {
 			if (constraint == null) throw new ArgumentNullException("constraint cannot be null.");
-			if (skeleton == null) throw new ArgumentNullException("skeleton cannot be null.");
 			data = constraint.data;
-			bones = new ExposedList<Bone>(constraint.bones.Count);
-			foreach (Bone bone in constraint.bones)
-				bones.Add(skeleton.bones.Items[bone.data.index]);
-			target = skeleton.slots.Items[constraint.target.data.index];
+			bones = new ExposedList<Bone>(constraint.Bones.Count);
+			bones.AddRange(constraint.Bones);
+			target = constraint.target;
 			position = constraint.position;
 			spacing = constraint.spacing;
 			mixRotate = constraint.mixRotate;
@@ -89,7 +90,16 @@ namespace Spine {
 				a[i] = val;
 		}
 
-		public void Update () {
+		public void SetToSetupPose () {
+			PathConstraintData data = this.data;
+			position = data.position;
+			spacing = data.spacing;
+			mixRotate = data.mixRotate;
+			mixX = data.mixX;
+			mixY = data.mixY;
+		}
+
+		public void Update (Physics physics) {
 			PathAttachment attachment = target.Attachment as PathAttachment;
 			if (attachment == null) return;
 
@@ -108,12 +118,8 @@ namespace Spine {
 					for (int i = 0, n = spacesCount - 1; i < n; i++) {
 						Bone bone = bonesItems[i];
 						float setupLength = bone.data.length;
-						if (setupLength < PathConstraint.Epsilon)
-							lengths[i] = 0;
-						else {
-							float x = setupLength * bone.a, y = setupLength * bone.c;
-							lengths[i] = (float)Math.Sqrt(x * x + y * y);
-						}
+						float x = setupLength * bone.a, y = setupLength * bone.c;
+						lengths[i] = (float)Math.Sqrt(x * x + y * y);
 					}
 				}
 				ArraysFill(spaces, 1, spacesCount, spacing);
