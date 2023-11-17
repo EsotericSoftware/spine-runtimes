@@ -3,69 +3,63 @@ spineboy.png
 	filter: Linear, Linear
 	pma: true
 eye_indifferent
-	bounds: 2, 460, 93, 89
+	bounds: 550, 694, 93, 89
 eye_surprised
-	bounds: 462, 492, 93, 89
+	bounds: 834, 856, 93, 89
 front_bracer
-	bounds: 907, 472, 58, 80
-	rotate: 90
+	bounds: 678, 774, 58, 80
 front_fist_closed
-	bounds: 652, 499, 75, 82
-front_fist_open
-	bounds: 729, 470, 86, 87
+	bounds: 466, 593, 75, 82
 	rotate: 90
+front_fist_open
+	bounds: 550, 605, 86, 87
 front_foot
-	bounds: 2, 551, 126, 69
+	bounds: 550, 785, 126, 69
 front_foot_bend1
-	bounds: 952, 689, 128, 70
+	bounds: 375, 492, 128, 70
 	rotate: 90
 front_foot_bend2
-	bounds: 911, 594, 108, 93
+	bounds: 275, 330, 108, 93
+	rotate: 90
 front_shin
-	bounds: 766, 735, 82, 184
-	rotate: 90
+	bounds: 466, 670, 82, 184
 front_thigh
-	bounds: 249, 572, 48, 112
-	rotate: 90
+	bounds: 214, 208, 48, 112
 front_upper_arm
-	bounds: 363, 566, 54, 97
-	rotate: 90
+	bounds: 214, 109, 54, 97
 goggles
-	bounds: 466, 583, 261, 166
+	bounds: 466, 856, 261, 166
 gun
-	bounds: 766, 819, 210, 203
+	bounds: 2, 117, 210, 203
 head
-	bounds: 466, 751, 271, 298
-	rotate: 90
+	bounds: 2, 322, 271, 298
 mouth_grind
-	bounds: 355, 505, 93, 59
+	bounds: 929, 896, 93, 59
 mouth_oooo
-	bounds: 557, 522, 93, 59
+	bounds: 929, 835, 93, 59
 mouth_smile
-	bounds: 557, 461, 93, 59
+	bounds: 447, 532, 93, 59
 muzzle
 	bounds: 2, 622, 462, 400
 neck
-	bounds: 978, 986, 36, 41
-	rotate: 90
+	bounds: 796, 819, 36, 41
 rear_bracer
-	bounds: 652, 441, 56, 72
-	rotate: 90
+	bounds: 738, 788, 56, 72
 rear_foot
-	bounds: 909, 532, 113, 60
+	bounds: 2, 2, 113, 60
+	rotate: 90
 rear_foot_bend1
-	bounds: 130, 554, 117, 66
+	bounds: 64, 49, 117, 66
 rear_foot_bend2
-	bounds: 130, 469, 103, 83
+	bounds: 729, 862, 103, 83
 rear_shin
-	bounds: 729, 558, 75, 178
+	bounds: 729, 947, 75, 178
 	rotate: 90
 rear_thigh
-	bounds: 249, 505, 65, 104
+	bounds: 909, 957, 65, 104
 	rotate: 90
 rear_upper_arm
-	bounds: 818, 509, 47, 87
+	bounds: 447, 483, 47, 87
 	rotate: 90
 torso
-	bounds: 729, 635, 98, 180
-	rotate: 90
+	bounds: 275, 440, 98, 180

@@ -1357,7 +1357,7 @@ namespace Spine.Unity.Editor {
 			newSkeletonAnimation.loop = SpineEditorUtilities.Preferences.defaultInstantiateLoop;
 			newSkeletonAnimation.state.Update(0);
 			newSkeletonAnimation.state.Apply(newSkeletonAnimation.skeleton);
-			newSkeletonAnimation.skeleton.UpdateWorldTransform();
+			newSkeletonAnimation.skeleton.UpdateWorldTransform(Skeleton.Physics.Update);
 
 			return newSkeletonAnimation;
 		}
@@ -1440,7 +1440,7 @@ namespace Spine.Unity.Editor {
 				throw e;
 			}
 
-			newSkeletonMecanim.skeleton.UpdateWorldTransform();
+			newSkeletonMecanim.skeleton.UpdateWorldTransform(Skeleton.Physics.Update);
 			newSkeletonMecanim.LateUpdate();
 
 			return newSkeletonMecanim;

@@ -269,7 +269,7 @@ namespace Spine.Unity.Examples {
 				t.position -= offset;
 
 			UpdateSpineSkeleton(null);
-			skeleton.UpdateWorldTransform();
+			skeleton.UpdateWorldTransform(Skeleton.Physics.Update);
 		}
 
 		/// <summary>Removes the ragdoll instance and effect from the animated skeleton.</summary>

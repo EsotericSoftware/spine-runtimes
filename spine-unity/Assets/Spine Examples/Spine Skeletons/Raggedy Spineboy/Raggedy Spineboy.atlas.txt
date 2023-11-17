@@ -3,14 +3,11 @@ Raggedy Spineboy.png
 	filter: Linear, Linear
 	pma: true
 arm
-	bounds: 2, 140, 71, 75
-	rotate: 90
+	bounds: 140, 178, 71, 75
 head
-	bounds: 2, 2, 136, 187
-	rotate: 90
+	bounds: 2, 66, 136, 187
 leg
-	bounds: 2, 213, 36, 99
-	rotate: 90
+	bounds: 140, 77, 36, 99
 torso
-	bounds: 103, 187, 62, 95
+	bounds: 2, 2, 62, 95
 	rotate: 90

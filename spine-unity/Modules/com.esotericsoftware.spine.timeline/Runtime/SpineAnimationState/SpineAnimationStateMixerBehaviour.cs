@@ -362,7 +362,7 @@ namespace Spine.Unity.Playables {
 					}
 				}
 
-				skeleton.UpdateWorldTransform();
+				skeleton.UpdateWorldTransform(Skeleton.Physics.Update);
 				if (skeletonAnimation) {
 					skeletonAnimation.AfterAnimationApplied();
 					skeletonAnimation.LateUpdate();

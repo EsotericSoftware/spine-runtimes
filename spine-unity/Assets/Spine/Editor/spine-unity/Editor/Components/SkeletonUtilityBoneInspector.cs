@@ -213,7 +213,7 @@ namespace Spine.Unity.Editor {
 								GUILayout.Space(30);
 								string buttonLabel = box.IsWeighted() ? box.Name + " (!)" : box.Name;
 								if (GUILayout.Button(buttonLabel, GUILayout.Width(200))) {
-									utilityBone.bone.Skeleton.UpdateWorldTransform();
+									utilityBone.bone.Skeleton.UpdateWorldTransform(Skeleton.Physics.Update);
 									Transform bbTransform = utilityBone.transform.Find("[BoundingBox]" + box.Name); // Use FindChild in older versions of Unity.
 									if (bbTransform != null) {
 										PolygonCollider2D originalCollider = bbTransform.GetComponent<PolygonCollider2D>();

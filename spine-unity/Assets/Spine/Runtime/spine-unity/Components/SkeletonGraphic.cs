@@ -357,7 +357,7 @@ namespace Spine.Unity {
 				state.ApplyEventTimelinesOnly(skeleton, issueEvents: false);
 				return;
 			}
-			ApplyAnimation();
+			ApplyAnimation(deltaTime);
 		}
 
 		protected void SyncSubmeshGraphicsWithCanvasRenderers () {
@@ -383,7 +383,7 @@ namespace Spine.Unity {
 			state.Update(deltaTime);
 		}
 
-		protected void ApplyAnimation () {
+		protected void ApplyAnimation (float deltaTime) {
 			if (BeforeApply != null)
 				BeforeApply(this);
 
@@ -392,6 +392,7 @@ namespace Spine.Unity {
 			else
 				state.ApplyEventTimelinesOnly(skeleton, issueEvents: true);
 
+			skeleton.Update(deltaTime);
 			AfterAnimationApplied();
 		}
 
@@ -399,15 +400,19 @@ namespace Spine.Unity {
 			if (UpdateLocal != null)
 				UpdateLocal(this);
 
-			skeleton.UpdateWorldTransform();
+			UpdateWorldTransform();
 
 			if (UpdateWorld != null) {
 				UpdateWorld(this);
-				skeleton.UpdateWorldTransform();
+				UpdateWorldTransform();
 			}
 
 			if (UpdateComplete != null)
 				UpdateComplete(this);
+		}
+
+		protected void UpdateWorldTransform () {
+			skeleton.UpdateWorldTransform(Skeleton.Physics.Update);
 		}
 
 		public void LateUpdate () {

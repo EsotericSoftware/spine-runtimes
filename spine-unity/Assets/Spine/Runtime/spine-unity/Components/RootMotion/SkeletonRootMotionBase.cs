@@ -213,7 +213,7 @@ namespace Spine.Unity {
 				Vector2 parentBoneScale;
 				GetScaleAffectingRootMotion(out parentBoneScale);
 				ClearEffectiveBoneOffsets(parentBoneScale);
-				skeletonComponent.Skeleton.UpdateWorldTransform();
+				skeletonComponent.Skeleton.UpdateWorldTransform(Skeleton.Physics.Update);
 			}
 			ClearRigidbodyTempMovement();
 
@@ -605,7 +605,7 @@ namespace Spine.Unity {
 				// apply the constraint and sets Bone.ax, Bone.ay and Bone.arotation values.
 				/// Update is based on Bone.x, Bone.y and Bone.rotation, so skeleton.UpdateWorldTransform()
 				/// can be called afterwards without having a different starting point.
-				constraint.Update();
+				constraint.Update(Skeleton.Physics.Update);
 			}
 		}
 

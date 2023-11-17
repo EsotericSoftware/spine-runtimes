@@ -101,32 +101,32 @@ namespace Spine.Unity {
 
 		public virtual void Update () {
 			if (!valid || updateTiming != UpdateTiming.InUpdate) return;
-			UpdateAnimation();
+			UpdateAnimation(Time.deltaTime);
 		}
 
 		public virtual void FixedUpdate () {
 			if (!valid || updateTiming != UpdateTiming.InFixedUpdate) return;
-			UpdateAnimation();
+			UpdateAnimation(Time.deltaTime);
 		}
 
 		/// <summary>Manual animation update. Required when <c>updateTiming</c> is set to <c>ManualUpdate</c>.</summary>
 		/// <param name="deltaTime">Ignored parameter.</param>
 		public virtual void Update (float deltaTime) {
 			if (!valid) return;
-			UpdateAnimation();
+			UpdateAnimation(deltaTime);
 		}
 
-		protected void UpdateAnimation () {
+		protected void UpdateAnimation (float deltaTime) {
 			wasUpdatedAfterInit = true;
 
 			// animation status is kept by Mecanim Animator component
 			if (updateMode <= UpdateMode.OnlyAnimationStatus)
 				return;
 
-			ApplyAnimation();
+			ApplyAnimation(deltaTime);
 		}
 
-		protected void ApplyAnimation () {
+		protected void ApplyAnimation (float deltaTime) {
 			if (_BeforeApply != null)
 				_BeforeApply(this);
 
@@ -148,27 +148,28 @@ namespace Spine.Unity {
 #else
 			translator.Apply(skeleton);
 #endif
+			skeleton.Update(deltaTime);
+			AfterAnimationApplied();
+		}
 
-			// UpdateWorldTransform and Bone Callbacks
-			{
-				if (_UpdateLocal != null)
-					_UpdateLocal(this);
+		public void AfterAnimationApplied () {
+			if (_UpdateLocal != null)
+				_UpdateLocal(this);
 
-				skeleton.UpdateWorldTransform();
+			UpdateWorldTransform();
 
-				if (_UpdateWorld != null) {
-					_UpdateWorld(this);
-					skeleton.UpdateWorldTransform();
-				}
-
-				if (_UpdateComplete != null)
-					_UpdateComplete(this);
+			if (_UpdateWorld != null) {
+				_UpdateWorld(this);
+				UpdateWorldTransform();
 			}
+
+			if (_UpdateComplete != null)
+				_UpdateComplete(this);
 		}
 
 		public override void LateUpdate () {
 			if (updateTiming == UpdateTiming.InLateUpdate && valid && translator != null && translator.Animator != null)
-				UpdateAnimation();
+				UpdateAnimation(Time.deltaTime);
 			// instantiation can happen from Update() after this component, leading to a missing Update() call.
 			if (!wasUpdatedAfterInit) Update();
 			base.LateUpdate();

@@ -532,7 +532,7 @@ namespace Spine.Unity.Editor {
 			graphic.Initialize(false);
 			if (skin != null) graphic.Skeleton.SetSkin(skin);
 			graphic.initialSkinName = skin.Name;
-			graphic.Skeleton.UpdateWorldTransform();
+			graphic.Skeleton.UpdateWorldTransform(Skeleton.Physics.Update);
 			graphic.UpdateMesh();
 			return graphic;
 		}

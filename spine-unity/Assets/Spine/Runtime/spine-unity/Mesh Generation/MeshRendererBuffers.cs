@@ -107,7 +107,7 @@ namespace Spine.Unity {
 			doubleBufferedMesh = null;
 		}
 
-		///<summary>This is a Mesh that also stores the instructions SkeletonRenderer generated for it.</summary>
+		/// <summary>This is a Mesh that also stores the instructions SkeletonRenderer generated for it.</summary>
 		public class SmartMesh : IDisposable {
 			public Mesh mesh = SpineMesh.NewSkeletonMesh();
 			public SkeletonRendererInstruction instructionUsed = new SkeletonRendererInstruction();
