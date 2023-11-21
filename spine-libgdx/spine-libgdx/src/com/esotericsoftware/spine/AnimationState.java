@@ -1181,8 +1181,10 @@ public class AnimationState {
 		 * <p>
 		 * When using {@link AnimationState#addAnimation(int, Animation, boolean, float)} with a <code>delay</code> <= 0, the
 		 * {@link #getDelay()} is set using the mix duration from the {@link AnimationStateData}. If <code>mixDuration</code> is set
-		 * afterward, the delay may need to be adjusted. For example:
-		 * <code>entry.delay = entry.previous.getTrackComplete() - entry.mixDuration;</code> */
+		 * afterward, the delay may need to be adjusted. For example:<br>
+		 * <code>entry.delay = entry.previous.getTrackComplete() - entry.mixDuration;</code><br>
+		 * Alternatively, {@link #setMixDuration(float, float)} can be used to recompute the delay:<br>
+		 * <code>entry.setMixDuration(0.25f, 0);</code> */
 		public float getMixDuration () {
 			return mixDuration;
 		}
