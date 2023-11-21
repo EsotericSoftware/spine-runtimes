@@ -71,9 +71,15 @@ namespace Spine.Unity.Editor {
 		/// Called via InitializeOnLoad attribute upon Editor startup or compilation.
 		/// </summary>
 		static GenericOnDemandTextureLoaderInspector () {
+			RegisterPlayModeChangedCallbacks();
+		}
+
+		public static void RegisterPlayModeChangedCallbacks () {
 #if NEWPLAYMODECALLBACKS
+			EditorApplication.playModeStateChanged -= OnPlaymodeChanged;
 			EditorApplication.playModeStateChanged += OnPlaymodeChanged;
 #else
+			EditorApplication.playmodeStateChanged -= OnPlaymodeChanged;
 			EditorApplication.playmodeStateChanged += OnPlaymodeChanged;
 #endif
 		}
