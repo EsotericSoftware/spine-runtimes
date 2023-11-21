@@ -45,8 +45,17 @@ namespace Spine.Unity.Editor {
 	using PlaceholderMaterialMapping = AddressablesTextureLoader.PlaceholderMaterialMapping;
 	using PlaceholderTextureMapping = AddressablesTextureLoader.PlaceholderTextureMapping;
 
+	[InitializeOnLoad]
 	[CustomEditor(typeof(AddressablesTextureLoader)), CanEditMultipleObjects]
 	public class AddressablesTextureLoaderInspector : GenericTextureLoaderInspector {
+
+		// Note: This static ctor ensures the generic base class method RegisterPlayModeChangedCallbacks is
+		// definitely called via InitializeOnLoad. Otherwise problems arose where the base class static ctor code
+		// is not executed (related to being a generic class).
+		static AddressablesTextureLoaderInspector () {
+			// The call below is necessary, otherwise the static GenericTextureLoaderInspector ctor is not called.
+			GenericTextureLoaderInspector.RegisterPlayModeChangedCallbacks();
+		}
 
 		public class AddressablesMethodImplementations : StaticMethodImplementations {
 			public override string LoaderSuffix { get { return "_Addressable"; } }
