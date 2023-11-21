@@ -216,12 +216,12 @@ public class AnimationState {
 			MixBlend blend = i == 0 ? MixBlend.first : current.mixBlend;
 
 			// Apply mixing from entries first.
-			float mix = current.alpha;
+			float alpha = current.alpha;
 			if (current.mixingFrom != null)
-				mix *= applyMixingFrom(current, skeleton, blend);
+				alpha *= applyMixingFrom(current, skeleton, blend);
 			else if (current.trackTime >= current.trackEnd && current.next == null) //
-				mix = 0; // Set to setup pose the last time the entry will be applied.
-			boolean attachments = mix < current.attachmentThreshold;
+				alpha = 0; // Set to setup pose the last time the entry will be applied.
+			boolean attachments = alpha >= current.alphaAttachmentThreshold;
 
 			// Apply current entry.
 			float animationLast = current.animationLast, animationTime = current.getAnimationTime(), applyTime = animationTime;
@@ -232,14 +232,14 @@ public class AnimationState {
 			}
 			int timelineCount = current.animation.timelines.size;
 			Object[] timelines = current.animation.timelines.items;
-			if ((i == 0 && mix == 1) || blend == MixBlend.add) {
+			if ((i == 0 && alpha == 1) || blend == MixBlend.add) {
 				if (i == 0) attachments = true;
 				for (int ii = 0; ii < timelineCount; ii++) {
 					Object timeline = timelines[ii];
 					if (timeline instanceof AttachmentTimeline)
 						applyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, blend, attachments);
 					else
-						((Timeline)timeline).apply(skeleton, animationLast, applyTime, applyEvents, mix, blend, MixDirection.in);
+						((Timeline)timeline).apply(skeleton, animationLast, applyTime, applyEvents, alpha, blend, MixDirection.in);
 				}
 			} else {
 				int[] timelineMode = current.timelineMode.items;
@@ -253,12 +253,12 @@ public class AnimationState {
 					Timeline timeline = (Timeline)timelines[ii];
 					MixBlend timelineBlend = timelineMode[ii] == SUBSEQUENT ? blend : MixBlend.setup;
 					if (!shortestRotation && timeline instanceof RotateTimeline) {
-						applyRotateTimeline((RotateTimeline)timeline, skeleton, applyTime, mix, timelineBlend, timelinesRotation,
+						applyRotateTimeline((RotateTimeline)timeline, skeleton, applyTime, alpha, timelineBlend, timelinesRotation,
 							ii << 1, firstFrame);
 					} else if (timeline instanceof AttachmentTimeline)
 						applyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, blend, attachments);
 					else
-						timeline.apply(skeleton, animationLast, applyTime, applyEvents, mix, timelineBlend, MixDirection.in);
+						timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, timelineBlend, MixDirection.in);
 				}
 			}
 			queueEvents(current, animationTime);
@@ -299,7 +299,7 @@ public class AnimationState {
 			if (blend != MixBlend.first) blend = from.mixBlend; // Track 0 ignores track mix blend.
 		}
 
-		boolean attachments = mix < from.attachmentThreshold, drawOrder = mix < from.drawOrderThreshold;
+		boolean attachments = mix < from.mixAttachmentThreshold, drawOrder = mix < from.mixDrawOrderThreshold;
 		int timelineCount = from.animation.timelines.size;
 		Object[] timelines = from.animation.timelines.items;
 		float alphaHold = from.alpha * to.interruptAlpha, alphaMix = alphaHold * (1 - mix);
@@ -358,7 +358,8 @@ public class AnimationState {
 					applyRotateTimeline((RotateTimeline)timeline, skeleton, applyTime, alpha, timelineBlend, timelinesRotation, i << 1,
 						firstFrame);
 				} else if (timeline instanceof AttachmentTimeline)
-					applyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, timelineBlend, attachments);
+					applyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, timelineBlend,
+						attachments && alpha >= from.alphaAttachmentThreshold);
 				else {
 					if (drawOrder && timeline instanceof DrawOrderTimeline && timelineBlend == MixBlend.setup)
 						direction = MixDirection.in;
@@ -713,8 +714,9 @@ public class AnimationState {
 		entry.shortestRotation = false;
 
 		entry.eventThreshold = 0;
-		entry.attachmentThreshold = 0;
-		entry.drawOrderThreshold = 0;
+		entry.alphaAttachmentThreshold = 0;
+		entry.mixAttachmentThreshold = 0;
+		entry.mixDrawOrderThreshold = 0;
 
 		entry.animationStart = 0;
 		entry.animationEnd = animation.getDuration();
@@ -884,7 +886,7 @@ public class AnimationState {
 		@Null AnimationStateListener listener;
 		int trackIndex;
 		boolean loop, holdPrevious, reverse, shortestRotation;
-		float eventThreshold, attachmentThreshold, drawOrderThreshold;
+		float eventThreshold, mixAttachmentThreshold, alphaAttachmentThreshold, mixDrawOrderThreshold;
 		float animationStart, animationEnd, animationLast, nextAnimationLast;
 		float delay, trackTime, trackLast, nextTrackLast, trackEnd, timeScale;
 		float alpha, mixTime, mixDuration, interruptAlpha, totalAlpha;
@@ -1097,26 +1099,36 @@ public class AnimationState {
 			this.eventThreshold = eventThreshold;
 		}
 
+		/** When {@link #getAlpha()} is greater than <code>alphaAttachmentThreshold</code>, attachment timelines are applied.
+		 * Defaults to 0, so attachment timelines are always applied. */
+		public float getAlphaAttachmentThreshold () {
+			return alphaAttachmentThreshold;
+		}
+
+		public void setAlphaAttachmentThreshold (float alphaAttachmentThreshold) {
+			this.alphaAttachmentThreshold = alphaAttachmentThreshold;
+		}
+
 		/** When the mix percentage ({@link #getMixTime()} / {@link #getMixDuration()}) is less than the
-		 * <code>attachmentThreshold</code>, attachment timelines are applied while this animation is being mixed out. Defaults to
-		 * 0, so attachment timelines are not applied while this animation is being mixed out. */
-		public float getAttachmentThreshold () {
-			return attachmentThreshold;
+		 * <code>mixAttachmentThreshold</code>, attachment timelines are applied while this animation is being mixed out. Defaults
+		 * to 0, so attachment timelines are not applied while this animation is being mixed out. */
+		public float getMixAttachmentThreshold () {
+			return mixAttachmentThreshold;
 		}
 
-		public void setAttachmentThreshold (float attachmentThreshold) {
-			this.attachmentThreshold = attachmentThreshold;
+		public void setMixAttachmentThreshold (float mixAttachmentThreshold) {
+			this.mixAttachmentThreshold = mixAttachmentThreshold;
 		}
 
 		/** When the mix percentage ({@link #getMixTime()} / {@link #getMixDuration()}) is less than the
-		 * <code>drawOrderThreshold</code>, draw order timelines are applied while this animation is being mixed out. Defaults to 0,
-		 * so draw order timelines are not applied while this animation is being mixed out. */
-		public float getDrawOrderThreshold () {
-			return drawOrderThreshold;
+		 * <code>mixDrawOrderThreshold</code>, draw order timelines are applied while this animation is being mixed out. Defaults to
+		 * 0, so draw order timelines are not applied while this animation is being mixed out. */
+		public float getMixDrawOrderThreshold () {
+			return mixDrawOrderThreshold;
 		}
 
-		public void setDrawOrderThreshold (float drawOrderThreshold) {
-			this.drawOrderThreshold = drawOrderThreshold;
+		public void setMixDrawOrderThreshold (float mixDrawOrderThreshold) {
+			this.mixDrawOrderThreshold = mixDrawOrderThreshold;
 		}
 
 		/** The animation queued to start after this animation, or null if there is none. <code>next</code> makes up a doubly linked
