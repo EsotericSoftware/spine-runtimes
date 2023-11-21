@@ -46,7 +46,7 @@ namespace Spine.Unity.Editor {
 	/// [SUPPORTS]
 	/// Linear, Constant, and Bezier Curves*
 	/// Inverse Kinematics*
-	/// Disbled Inherit Rotation, unless combined with negative scale
+	/// Disabled Inherit Rotation, unless combined with negative scale
 	/// Translate Timeline
 	/// Rotate Timeline
 	/// Scale Timeline**
