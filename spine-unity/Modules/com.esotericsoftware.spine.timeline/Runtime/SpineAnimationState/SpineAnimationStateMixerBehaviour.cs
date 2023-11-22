@@ -230,7 +230,7 @@ namespace Spine.Unity.Playables {
 						trackEntry.Alpha = clipData.alpha;
 
 						if (clipData.customDuration)
-							trackEntry.MixDuration = customMixDuration / rootPlayableSpeed;
+							trackEntry.SetMixDuration(customMixDuration / rootPlayableSpeed, 0f);
 
 						timelineStartedTrackEntry = trackEntry;
 					}

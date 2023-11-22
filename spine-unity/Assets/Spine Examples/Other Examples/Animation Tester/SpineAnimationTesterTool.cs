@@ -141,7 +141,7 @@ namespace Spine.Unity.Examples {
 
 						if (trackEntry != null) {
 							if (control.useCustomMixDuration)
-								trackEntry.MixDuration = control.mixDuration;
+								trackEntry.SetMixDuration(control.mixDuration, 0f); // use SetMixDuration(mixDuration, delay) to update delay correctly
 
 							if (useOverrideAttachmentThreshold)
 								trackEntry.MixAttachmentThreshold = attachmentThreshold;

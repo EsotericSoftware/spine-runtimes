@@ -125,13 +125,13 @@ namespace Spine.Unity.Examples {
 			// Play the shoot animation on track 1.
 			TrackEntry shootTrack = skeletonAnimation.AnimationState.SetAnimation(1, shoot, false);
 			shootTrack.MixAttachmentThreshold = 1f;
-			shootTrack.MixDuration = 0f;
+			shootTrack.SetMixDuration(0f, 0f);
 			skeletonAnimation.state.AddEmptyAnimation(1, 0.5f, 0.1f);
 
 			// Play the aim animation on track 2 to aim at the mouse target.
 			TrackEntry aimTrack = skeletonAnimation.AnimationState.SetAnimation(2, aim, false);
 			aimTrack.MixAttachmentThreshold = 1f;
-			aimTrack.MixDuration = 0f;
+			aimTrack.SetMixDuration(0f, 0f);
 			skeletonAnimation.state.AddEmptyAnimation(2, 0.5f, 0.1f);
 
 			gunSource.pitch = GetRandomPitch(gunsoundPitchOffset);
@@ -144,7 +144,7 @@ namespace Spine.Unity.Examples {
 			// Play the aim animation on track 2 to aim at the mouse target.
 			TrackEntry aimTrack = skeletonAnimation.AnimationState.SetAnimation(2, aim, true);
 			aimTrack.MixAttachmentThreshold = 1f;
-			aimTrack.MixDuration = 0f;
+			aimTrack.SetMixDuration(0f, 0f); // use SetMixDuration(mixDuration, delay) to update delay correctly
 		}
 
 		public void StopPlayingAim () {
