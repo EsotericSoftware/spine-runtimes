@@ -164,11 +164,12 @@ public class PhysicsConstraint implements Updatable {
 					if (y) bone.worldY += yOffset * mix * data.y;
 				}
 				if (rotateOrShearX || scaleX) {
-					float ca = atan2(bone.c, bone.a), c, s;
+					float ca = atan2(bone.c, bone.a), c, s, mr = 0;
 					if (rotateOrShearX) {
-						float dx = cx - bone.worldX, dy = cy - bone.worldY, r = atan2(dy + ty, dx + tx) - ca - rotateOffset * mix;
+						mr = mix * data.rotate;
+						float dx = cx - bone.worldX, dy = cy - bone.worldY, r = atan2(dy + ty, dx + tx) - ca - rotateOffset * mr;
 						rotateOffset += (r - (float)Math.ceil(r * invPI2 - 0.5f) * PI2) * i;
-						r = rotateOffset * mix + ca;
+						r = rotateOffset * mr + ca;
 						c = cos(r);
 						s = sin(r);
 						if (scaleX) {
@@ -197,7 +198,7 @@ public class PhysicsConstraint implements Updatable {
 								rotateOffset += rotateVelocity * step;
 								rotateVelocity *= d;
 								if (remaining < step) break;
-								float r = rotateOffset * mix + ca;
+								float r = rotateOffset * mr + ca;
 								c = cos(r);
 								s = sin(r);
 							} else if (remaining < step) //
