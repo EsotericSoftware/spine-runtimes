@@ -22,7 +22,10 @@
 ## C#
 
 * **Additions**
+  ** Added [`TrackEntry.AlphaAttachmentThreshold`](http://esotericsoftware.com/spine-api-reference#TrackEntry-alphaAttachmentThreshold).
+
 * **Breaking changes**
+  *  Renamed `TrackEntry` `AttachmentThreshold` to `MixAttachmentThreshold`, renamed `DrawOrderThreshold` to `MixDrawOrderThreshold`.
 
 ### Unity
 
