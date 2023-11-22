@@ -166,11 +166,12 @@ namespace Spine {
 						if (y) bone.worldY += yOffset * mix * data.y;
 					}
 					if (rotateOrShearX || scaleX) {
-						float ca = (float)Math.Atan2(bone.c, bone.a), c, s;
+						float ca = (float)Math.Atan2(bone.c, bone.a), c, s, mr = 0;
 						if (rotateOrShearX) {
-							float dx = cx - bone.worldX, dy = cy - bone.worldY, r = (float)Math.Atan2(dy + ty, dx + tx) - ca - rotateOffset * mix;
+							mr = mix * data.rotate;
+							float dx = cx - bone.worldX, dy = cy - bone.worldY, r = (float)Math.Atan2(dy + ty, dx + tx) - ca - rotateOffset * mr;
 							rotateOffset += (r - (float)Math.Ceiling(r * MathUtils.InvPI2 - 0.5f) * MathUtils.PI2) * i;
-							r = rotateOffset * mix + ca;
+							r = rotateOffset * mr + ca;
 							c = (float)Math.Cos(r);
 							s = (float)Math.Sin(r);
 							if (scaleX) {
@@ -199,7 +200,7 @@ namespace Spine {
 									rotateOffset += rotateVelocity * step;
 									rotateVelocity *= d;
 									if (remaining < step) break;
-									float r = rotateOffset * mix + ca;
+									float r = rotateOffset * mr + ca;
 									c = (float)Math.Cos(r);
 									s = (float)Math.Sin(r);
 								} else if (remaining < step) //
