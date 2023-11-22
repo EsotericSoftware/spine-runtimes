@@ -29,7 +29,7 @@
 
 import { Bone } from "../Bone.js";
 import { TextureRegion } from "../Texture.js";
-import { Color, NumberArrayLike, Utils } from "../Utils.js";
+import { Color, MathUtils, NumberArrayLike, Utils } from "../Utils.js";
 import { Attachment } from "./Attachment.js";
 import { HasTextureRegion } from "./HasTextureRegion.js";
 import { Sequence } from "./Sequence.js";
@@ -107,7 +107,7 @@ export class RegionAttachment extends Attachment implements HasTextureRegion {
 		let localY = -this.height / 2 * this.scaleY + this.region.offsetY * regionScaleY;
 		let localX2 = localX + this.region.width * regionScaleX;
 		let localY2 = localY + this.region.height * regionScaleY;
-		let radians = this.rotation * Math.PI / 180;
+		let radians = this.rotation * MathUtils.degRad;
 		let cos = Math.cos(radians);
 		let sin = Math.sin(radians);
 		let x = this.x, y = this.y;

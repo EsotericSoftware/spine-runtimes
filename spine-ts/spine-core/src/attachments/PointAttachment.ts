@@ -56,10 +56,10 @@ export class PointAttachment extends VertexAttachment {
 	}
 
 	computeWorldRotation (bone: Bone) {
-		let cos = MathUtils.cosDeg(this.rotation), sin = MathUtils.sinDeg(this.rotation);
-		let x = cos * bone.a + sin * bone.b;
-		let y = cos * bone.c + sin * bone.d;
-		return Math.atan2(y, x) * MathUtils.radDeg;
+		const r = this.rotation * MathUtils.degRad, cos = Math.cos(r), sin = Math.sin(r);
+		const x = cos * bone.a + sin * bone.b;
+		const y = cos * bone.c + sin * bone.d;
+		return MathUtils.atan2Deg(y, x);		
 	}
 
 	copy (): Attachment {
