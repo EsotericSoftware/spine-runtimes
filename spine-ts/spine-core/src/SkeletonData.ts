@@ -32,6 +32,7 @@ import { BoneData } from "./BoneData.js";
 import { EventData } from "./EventData.js";
 import { IkConstraintData } from "./IkConstraintData.js";
 import { PathConstraintData } from "./PathConstraintData.js";
+import { PhysicsConstraintData } from "./PhysicsConstraintData.js";
 import { Skin } from "./Skin.js";
 import { SlotData } from "./SlotData.js";
 import { TransformConstraintData } from "./TransformConstraintData.js";
@@ -72,6 +73,9 @@ export class SkeletonData {
 
 	/** The skeleton's path constraints. */
 	pathConstraints = new Array<PathConstraintData>();
+
+	/** The skeleton's physics constraints. */
+	physicsConstraints = new Array<PhysicsConstraintData>();
 
 	/** The X coordinate of the skeleton's axis aligned bounding box in the setup pose. */
 	x: number = 0;
@@ -171,9 +175,9 @@ export class SkeletonData {
 	 * @return May be null. */
 	findIkConstraint (constraintName: string) {
 		if (!constraintName) throw new Error("constraintName cannot be null.");
-		let ikConstraints = this.ikConstraints;
+		const ikConstraints = this.ikConstraints;
 		for (let i = 0, n = ikConstraints.length; i < n; i++) {
-			let constraint = ikConstraints[i];
+			const constraint = ikConstraints[i];
 			if (constraint.name == constraintName) return constraint;
 		}
 		return null;
@@ -184,9 +188,9 @@ export class SkeletonData {
 	 * @return May be null. */
 	findTransformConstraint (constraintName: string) {
 		if (!constraintName) throw new Error("constraintName cannot be null.");
-		let transformConstraints = this.transformConstraints;
+		const transformConstraints = this.transformConstraints;
 		for (let i = 0, n = transformConstraints.length; i < n; i++) {
-			let constraint = transformConstraints[i];
+			const constraint = transformConstraints[i];
 			if (constraint.name == constraintName) return constraint;
 		}
 		return null;
@@ -197,9 +201,22 @@ export class SkeletonData {
 	 * @return May be null. */
 	findPathConstraint (constraintName: string) {
 		if (!constraintName) throw new Error("constraintName cannot be null.");
-		let pathConstraints = this.pathConstraints;
+		const pathConstraints = this.pathConstraints;
 		for (let i = 0, n = pathConstraints.length; i < n; i++) {
-			let constraint = pathConstraints[i];
+			const constraint = pathConstraints[i];
+			if (constraint.name == constraintName) return constraint;
+		}
+		return null;
+	}
+
+	/** Finds a physics constraint by comparing each physics constraint's name. It is more efficient to cache the results of this method
+	 * than to call it multiple times.
+	 * @return May be null. */
+	findPhysicsConstraint (constraintName: string) {
+		if (!constraintName) throw new Error("constraintName cannot be null.");
+		const physicsConstraints = this.physicsConstraints;
+		for (let i = 0, n = physicsConstraints.length; i < n; i++) {
+			const constraint = physicsConstraints[i];
 			if (constraint.name == constraintName) return constraint;
 		}
 		return null;

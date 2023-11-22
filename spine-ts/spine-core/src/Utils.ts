@@ -179,6 +179,7 @@ export class Color {
 export class MathUtils {
 	static PI = 3.1415927;
 	static PI2 = MathUtils.PI * 2;
+	static invPI2 = 1 / MathUtils.PI2;
 	static radiansToDegrees = 180 / MathUtils.PI;
 	static radDeg = MathUtils.radiansToDegrees;
 	static degreesToRadians = MathUtils.PI / 180;
@@ -196,6 +197,10 @@ export class MathUtils {
 
 	static sinDeg (degrees: number) {
 		return Math.sin(degrees * MathUtils.degRad);
+	}
+
+	static atan2Deg(y: number, x: number) {
+		return Math.atan2(y, x) * MathUtils.degRad;
 	}
 
 	static signum (value: number): number {

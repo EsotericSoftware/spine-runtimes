@@ -32,7 +32,7 @@ import { MeshAttachment } from "./attachments/MeshAttachment.js";
 import { BoneData } from "./BoneData.js";
 import { ConstraintData } from "./ConstraintData.js";
 import { Skeleton } from "./Skeleton.js";
-import { StringMap } from "./Utils.js";
+import { Color, StringMap } from "./Utils.js";
 
 /** Stores an entry in the skin consisting of the slot index, name, and attachment **/
 export class SkinEntry {
@@ -50,6 +50,9 @@ export class Skin {
 	attachments = new Array<StringMap<Attachment>>();
 	bones = Array<BoneData>();
 	constraints = new Array<ConstraintData>();
+
+	/** The color of the skin as it was in Spine, or a default color if nonessential data was not exported. */
+	color = new Color(0.99607843, 0.61960787, 0.30980393, 1); // fe9e4fff
 
 	constructor (name: string) {
 		if (!name) throw new Error("name cannot be null.");

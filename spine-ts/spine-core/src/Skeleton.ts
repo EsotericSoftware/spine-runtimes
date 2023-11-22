@@ -34,6 +34,7 @@ import { RegionAttachment } from "./attachments/RegionAttachment.js";
 import { Bone } from "./Bone.js";
 import { IkConstraint } from "./IkConstraint.js";
 import { PathConstraint } from "./PathConstraint.js";
+import { PhysicsConstraint } from "./PhysicsConstraint.js";
 import { SkeletonData } from "./SkeletonData.js";
 import { Skin } from "./Skin.js";
 import { Slot } from "./Slot.js";
@@ -68,6 +69,10 @@ export class Skeleton {
 	/** The skeleton's path constraints. */
 	pathConstraints: Array<PathConstraint>;
 
+
+	/** The skeleton's physics constraints. */
+	physicsConstraints: Array<PhysicsConstraint>;
+
 	/** The list of bones and constraints, sorted in the order they should be updated, as computed by {@link #updateCache()}. */
 	_updateCache = new Array<Updatable>();
 
@@ -98,6 +103,11 @@ export class Skeleton {
 
 	/** Sets the skeleton Y position, which is added to the root bone worldY position. */
 	y = 0;
+
+	/** Returns the skeleton's time. This is used for time-based manipulations, such as {@link PhysicsConstraint}.
+	 * <p>
+	 * See {@link #update(float)}. */
+	time = 0;
 
 	constructor (data: SkeletonData) {
 		if (!data) throw new Error("data cannot be null.");
@@ -145,6 +155,12 @@ export class Skeleton {
 			this.pathConstraints.push(new PathConstraint(pathConstraintData, this));
 		}
 
+		this.physicsConstraints = new Array<PhysicsConstraint>();
+		for (let i = 0; i < data.physicsConstraints.length; i++) {
+			let physicsConstraintData = data.physicsConstraints[i];
+			this.physicsConstraints.push(new PhysicsConstraint(physicsConstraintData, this));
+		}
+
 		this.color = new Color(1, 1, 1, 1);
 		this.updateCache();
 	}
@@ -178,8 +194,9 @@ export class Skeleton {
 		let ikConstraints = this.ikConstraints;
 		let transformConstraints = this.transformConstraints;
 		let pathConstraints = this.pathConstraints;
-		let ikCount = ikConstraints.length, transformCount = transformConstraints.length, pathCount = pathConstraints.length;
-		let constraintCount = ikCount + transformCount + pathCount;
+		let physicsConstraints = this.physicsConstraints;
+		let ikCount = ikConstraints.length, transformCount = transformConstraints.length, pathCount = pathConstraints.length, physicsCount = this.physicsConstraints.length;
+		let constraintCount = ikCount + transformCount + pathCount + physicsCount;
 
 		outer:
 		for (let i = 0; i < constraintCount; i++) {
@@ -201,6 +218,13 @@ export class Skeleton {
 				let constraint = pathConstraints[ii];
 				if (constraint.data.order == i) {
 					this.sortPathConstraint(constraint);
+					continue outer;
+				}
+			}
+			for (let ii = 0; ii < physicsCount; ii++) {
+				const constraint = physicsConstraints[ii];
+				if (constraint.data.order == i) {
+					this.sortPhysicsConstraint(constraint);
 					continue outer;
 				}
 			}
@@ -316,6 +340,22 @@ export class Skeleton {
 		}
 	}
 
+	sortPhysicsConstraint (constraint: PhysicsConstraint) {
+		constraint.active = !constraint.data.skinRequired || (this.skin != null && Utils.contains(this.skin.constraints, constraint.data, true));
+		if (!constraint.active) return;
+
+		const bone = constraint.bone;
+		constraint.active = bone.active;
+		if (!constraint.active) return;
+
+		this.sortBone(bone);
+
+		this._updateCache.push(constraint);
+
+		this.sortReset(bone.children);
+		bone.sorted = true;
+	}
+
 	sortBone (bone: Bone) {
 		if (!bone) return;
 		if (bone.sorted) return;
@@ -338,7 +378,7 @@ export class Skeleton {
 	 *
 	 * See [World transforms](http://esotericsoftware.com/spine-runtime-skeletons#World-transforms) in the Spine
 	 * Runtimes Guide. */
-	updateWorldTransform () {
+	updateWorldTransform (physics: Physics) {
 		let bones = this.bones;
 		for (let i = 0, n = bones.length; i < n; i++) {
 			let bone = bones[i];
@@ -353,10 +393,10 @@ export class Skeleton {
 
 		let updateCache = this._updateCache;
 		for (let i = 0, n = updateCache.length; i < n; i++)
-			updateCache[i].update();
+			updateCache[i].update(physics);
 	}
 
-	updateWorldTransformWith (parent: Bone) {
+	updateWorldTransformWith (physics: Physics, parent: Bone) {
 		// Apply the parent bone transform to the root bone. The root bone always inherits scale, rotation and reflection.
 		let rootBone = this.getRootBone();
 		if (!rootBone) throw new Error("Root bone must not be null.");
@@ -364,11 +404,12 @@ export class Skeleton {
 		rootBone.worldX = pa * this.x + pb * this.y + parent.worldX;
 		rootBone.worldY = pc * this.x + pd * this.y + parent.worldY;
 
-		let rotationY = rootBone.rotation + 90 + rootBone.shearY;
-		let la = MathUtils.cosDeg(rootBone.rotation + rootBone.shearX) * rootBone.scaleX;
-		let lb = MathUtils.cosDeg(rotationY) * rootBone.scaleY;
-		let lc = MathUtils.sinDeg(rootBone.rotation + rootBone.shearX) * rootBone.scaleX;
-		let ld = MathUtils.sinDeg(rotationY) * rootBone.scaleY;
+		const rx = (rootBone.rotation + rootBone.shearX) * MathUtils.degRad;
+		const ry = (rootBone.rotation + 90 + rootBone.shearY) * MathUtils.degRad;
+		const la = Math.cos(rx) * rootBone.scaleX;
+		const lb = Math.cos(ry) * rootBone.scaleY;
+		const lc = Math.sin(rx) * rootBone.scaleX;
+		const ld = Math.sin(ry) * rootBone.scaleY;
 		rootBone.a = (pa * la + pb * lc) * this.scaleX;
 		rootBone.b = (pa * lb + pb * ld) * this.scaleX;
 		rootBone.c = (pc * la + pd * lc) * this.scaleY;
@@ -378,7 +419,7 @@ export class Skeleton {
 		let updateCache = this._updateCache;
 		for (let i = 0, n = updateCache.length; i < n; i++) {
 			let updatable = updateCache[i];
-			if (updatable != rootBone) updatable.update();
+			if (updatable != rootBone) updatable.update(physics);
 		}
 	}
 
@@ -390,42 +431,11 @@ export class Skeleton {
 
 	/** Sets the bones and constraints to their setup pose values. */
 	setBonesToSetupPose () {
-		let bones = this.bones;
-		for (let i = 0, n = bones.length; i < n; i++)
-			bones[i].setToSetupPose();
-
-		let ikConstraints = this.ikConstraints;
-		for (let i = 0, n = ikConstraints.length; i < n; i++) {
-			let constraint = ikConstraints[i];
-			constraint.mix = constraint.data.mix;
-			constraint.softness = constraint.data.softness;
-			constraint.bendDirection = constraint.data.bendDirection;
-			constraint.compress = constraint.data.compress;
-			constraint.stretch = constraint.data.stretch;
-		}
-
-		let transformConstraints = this.transformConstraints;
-		for (let i = 0, n = transformConstraints.length; i < n; i++) {
-			let constraint = transformConstraints[i];
-			let data = constraint.data;
-			constraint.mixRotate = data.mixRotate;
-			constraint.mixX = data.mixX;
-			constraint.mixY = data.mixY;
-			constraint.mixScaleX = data.mixScaleX;
-			constraint.mixScaleY = data.mixScaleY;
-			constraint.mixShearY = data.mixShearY;
-		}
-
-		let pathConstraints = this.pathConstraints;
-		for (let i = 0, n = pathConstraints.length; i < n; i++) {
-			let constraint = pathConstraints[i];
-			let data = constraint.data;
-			constraint.position = data.position;
-			constraint.spacing = data.spacing;
-			constraint.mixRotate = data.mixRotate;
-			constraint.mixX = data.mixX;
-			constraint.mixY = data.mixY;
-		}
+		for (const bone of this.bones) bone.setToSetupPose();
+		for (const constraint of this.ikConstraints) constraint.setToSetupPose();
+		for (const constraint of this.transformConstraints) constraint.setToSetupPose();
+		for (const constraint of this.pathConstraints) constraint.setToSetupPose();
+		for (const constraint of this.physicsConstraints) constraint.setToSetupPose();
 	}
 
 	/** Sets the slots and draw order to their setup pose values. */
@@ -560,12 +570,7 @@ export class Skeleton {
 	 * @return May be null. */
 	findIkConstraint (constraintName: string) {
 		if (!constraintName) throw new Error("constraintName cannot be null.");
-		let ikConstraints = this.ikConstraints;
-		for (let i = 0, n = ikConstraints.length; i < n; i++) {
-			let ikConstraint = ikConstraints[i];
-			if (ikConstraint.data.name == constraintName) return ikConstraint;
-		}
-		return null;
+		return this.ikConstraints.find((constraint) => constraint.data.name == constraintName) ?? null;
 	}
 
 	/** Finds a transform constraint by comparing each transform constraint's name. It is more efficient to cache the results of
@@ -573,12 +578,7 @@ export class Skeleton {
 	 * @return May be null. */
 	findTransformConstraint (constraintName: string) {
 		if (!constraintName) throw new Error("constraintName cannot be null.");
-		let transformConstraints = this.transformConstraints;
-		for (let i = 0, n = transformConstraints.length; i < n; i++) {
-			let constraint = transformConstraints[i];
-			if (constraint.data.name == constraintName) return constraint;
-		}
-		return null;
+		return this.transformConstraints.find((constraint) => constraint.data.name == constraintName) ?? null;
 	}
 
 	/** Finds a path constraint by comparing each path constraint's name. It is more efficient to cache the results of this method
@@ -586,12 +586,14 @@ export class Skeleton {
 	 * @return May be null. */
 	findPathConstraint (constraintName: string) {
 		if (!constraintName) throw new Error("constraintName cannot be null.");
-		let pathConstraints = this.pathConstraints;
-		for (let i = 0, n = pathConstraints.length; i < n; i++) {
-			let constraint = pathConstraints[i];
-			if (constraint.data.name == constraintName) return constraint;
-		}
-		return null;
+		return this.pathConstraints.find((constraint) => constraint.data.name == constraintName) ?? null;
+	}
+
+	/** Finds a physics constraint by comparing each physics constraint's name. It is more efficient to cache the results of this
+	 * method than to call it repeatedly. */
+	findPhysicsConstraint (constraintName: string) {
+		if (constraintName == null) throw new Error("constraintName cannot be null.");
+		return this.physicsConstraints.find((constraint) => constraint.data.name == constraintName) ?? null;
 	}
 
 	/** Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose as `{ x: number, y: number, width: number, height: number }`.
@@ -641,4 +643,24 @@ export class Skeleton {
 		offset.set(minX, minY);
 		size.set(maxX - minX, maxY - minY);
 	}
+
+	/** Increments the skeleton's {@link #time}. */
+	update (delta: number) {
+		this.time += delta;
+	}
+}
+
+/** Determines how physics and other non-deterministic updates are applied. */
+export enum Physics {
+	/** Physics are not updated or applied. */
+	none,
+
+	/** Physics are reset to the current pose. */
+	reset,
+
+	/** Physics are updated and the pose from physics is applied. */
+	update,
+
+	/** Physics are not updated but the pose from physics is applied. */
+	pose
 }

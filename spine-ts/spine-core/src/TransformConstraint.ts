@@ -28,7 +28,7 @@
  *****************************************************************************/
 
 import { Bone } from "./Bone.js";
-import { Skeleton } from "./Skeleton.js";
+import { Physics, Skeleton } from "./Skeleton.js";
 import { TransformConstraintData } from "./TransformConstraintData.js";
 import { Updatable } from "./Updatable.js";
 import { Vector2, MathUtils } from "./Utils.js";
@@ -79,7 +79,17 @@ export class TransformConstraint implements Updatable {
 		return this.active;
 	}
 
-	update () {
+	setToSetupPose () {
+		const data = this.data;
+		this.mixRotate = data.mixRotate;
+		this.mixX = data.mixX;
+		this.mixY = data.mixY;
+		this.mixScaleX = data.mixScaleX;
+		this.mixScaleY = data.mixScaleY;
+		this.mixShearY = data.mixShearY;
+	}
+
+	update (physics: Physics) {
 		if (this.mixRotate == 0 && this.mixX == 0 && this.mixY == 0 && this.mixScaleX == 0 && this.mixScaleY == 0 && this.mixShearY == 0) return;
 
 		if (this.data.local) {
@@ -240,7 +250,7 @@ export class TransformConstraint implements Updatable {
 			let rotation = bone.arotation;
 			if (mixRotate != 0) {
 				let r = target.arotation - rotation + this.data.offsetRotation;
-				r -= (16384 - ((16384.499999999996 - r / 360) | 0)) * 360;
+				r -= Math.ceil(r / 360 - 0.5) * 360;
 				rotation += r * mixRotate;
 			}
 
@@ -257,7 +267,7 @@ export class TransformConstraint implements Updatable {
 			let shearY = bone.ashearY;
 			if (mixShearY != 0) {
 				let r = target.ashearY - shearY + this.data.offsetShearY;
-				r -= (16384 - ((16384.499999999996 - r / 360) | 0)) * 360;
+				r -= Math.ceil(r / 360 - 0.5) * 360;
 				shearY += r * mixShearY;
 			}
 

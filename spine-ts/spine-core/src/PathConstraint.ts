@@ -30,7 +30,7 @@
 import { PathAttachment } from "./attachments/PathAttachment.js";
 import { Bone } from "./Bone.js";
 import { PathConstraintData, RotateMode, SpacingMode, PositionMode } from "./PathConstraintData.js";
-import { Skeleton } from "./Skeleton.js";
+import { Physics, Skeleton } from "./Skeleton.js";
 import { Slot } from "./Slot.js";
 import { Updatable } from "./Updatable.js";
 import { Utils, MathUtils } from "./Utils.js";
@@ -95,7 +95,16 @@ export class PathConstraint implements Updatable {
 		return this.active;
 	}
 
-	update () {
+	setToSetupPose () {
+		const data = this.data;
+		this.position = data.position;
+		this.spacing = data.spacing;
+		this.mixRotate = data.mixRotate;
+		this.mixX = data.mixX;
+		this.mixY = data.mixY;
+	}
+
+	update (physics: Physics) {
 		let attachment = this.target.getAttachment();
 		if (!(attachment instanceof PathAttachment)) return;
 
@@ -116,12 +125,8 @@ export class PathConstraint implements Updatable {
 					for (let i = 0, n = spacesCount - 1; i < n; i++) {
 						let bone = bones[i];
 						let setupLength = bone.data.length;
-						if (setupLength < PathConstraint.epsilon)
-							lengths[i] = 0;
-						else {
-							let x = setupLength * bone.a, y = setupLength * bone.c;
-							lengths[i] = Math.sqrt(x * x + y * y);
-						}
+						let x = setupLength * bone.a, y = setupLength * bone.c;
+						lengths[i] = Math.sqrt(x * x + y * y);
 					}
 				}
 				Utils.arrayFill(spaces, 1, spacesCount, spacing);

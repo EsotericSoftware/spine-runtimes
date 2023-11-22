@@ -28,45 +28,44 @@
  *****************************************************************************/
 
 import { BoneData } from "./BoneData.js";
-import { Color } from "./Utils.js";
+import { ConstraintData } from "./ConstraintData.js";
 
-/** Stores the setup pose for a {@link Slot}. */
-export class SlotData {
-	/** The index of the slot in {@link Skeleton#getSlots()}. */
-	index: number = 0;
 
-	/** The name of the slot, which is unique across all slots in the skeleton. */
-	name: string;
+/** Stores the setup pose for a {@link PhysicsConstraint}.
+ * <p>
+ * See <a href="http://esotericsoftware.com/spine-physics-constraints">Physics constraints</a> in the Spine User Guide. */
+export class  PhysicsConstraintData extends ConstraintData {
+	private _bone: BoneData | null = null;
+	/** The bone constrained by this physics constraint. */
+	public set bone (boneData: BoneData) { this._bone = boneData; }
+	public get bone () {
+		if (!this._bone) throw new Error("BoneData not set.")
+		else return this._bone;
+	}
 
-	/** The bone this slot belongs to. */
-	boneData: BoneData;
+	x = 0;
+	y = 0;
+	rotate = 0;
+	scaleX = 1;
+	shearX = 1;
+	step = 0;
+	inertia = 0;
+	strength = 0;
+	damping = 0;
+	massInverse = 0;
+	wind = 0;
+	gravity = 0;
+	/** A percentage (0-1) that controls the mix between the constrained and unconstrained poses. */
+	mix = 0;
+	inertiaGlobal = false;
+	strengthGlobal = false;
+	dampingGlobal = false;
+	massGlobal = false;
+	windGlobal = false;
+	gravityGlobal = false;
+	mixGlobal = false;
 
-	/** The color used to tint the slot's attachment. If {@link #getDarkColor()} is set, this is used as the light color for two
-	 * color tinting. */
-	color = new Color(1, 1, 1, 1);
-
-	/** The dark color used to tint the slot's attachment for two color tinting, or null if two color tinting is not used. The dark
-	 * color's alpha is not used. */
-	darkColor: Color | null = null;
-
-	/** The name of the attachment that is visible for this slot in the setup pose, or null if no attachment is visible. */
-	attachmentName: string | null = null;
-
-	/** The blend mode for drawing the slot's attachment. */
-	blendMode: BlendMode = BlendMode.Normal;
-
-	/** False if the slot was hidden in Spine and nonessential data was exported. Does not affect runtime rendering. */
-	visible = true;
-
-	constructor (index: number, name: string, boneData: BoneData) {
-		if (index < 0) throw new Error("index must be >= 0.");
-		if (!name) throw new Error("name cannot be null.");
-		if (!boneData) throw new Error("boneData cannot be null.");
-		this.index = index;
-		this.name = name;
-		this.boneData = boneData;
+	constructor (name: string) {
+		super(name, 0, false);
 	}
 }
-
-/** Determines how images are blended with existing pixels when drawn. */
-export enum BlendMode { Normal, Additive, Multiply, Screen }

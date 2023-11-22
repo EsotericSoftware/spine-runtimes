@@ -30,7 +30,7 @@
 import { Bone } from "./Bone.js";
 import { TransformMode } from "./BoneData.js";
 import { IkConstraintData } from "./IkConstraintData.js";
-import { Skeleton } from "./Skeleton.js";
+import { Physics, Skeleton } from "./Skeleton.js";
 import { Updatable } from "./Updatable.js";
 import { MathUtils } from "./Utils.js";
 
@@ -90,7 +90,16 @@ export class IkConstraint implements Updatable {
 		return this.active;
 	}
 
-	update () {
+	setToSetupPose () {
+		const data = this.data;
+		this.mix = data.mix;
+		this.softness = data.softness;
+		this.bendDirection = data.bendDirection;
+		this.compress = data.compress;
+		this.stretch = data.stretch;
+	}
+
+	update (physics: Physics) {
 		if (this.mix == 0) return;
 		let target = this.target;
 		let bones = this.bones;
@@ -149,11 +158,14 @@ export class IkConstraint implements Updatable {
 					tx = targetX - bone.worldX;
 					ty = targetY - bone.worldY;
 			}
-			let b = bone.data.length * sx, dd = Math.sqrt(tx * tx + ty * ty);
-			if ((compress && dd < b) || (stretch && dd > b) && b > 0.0001) {
-				let s = (dd / b - 1) * alpha + 1;
-				sx *= s;
-				if (uniform) sy *= s;
+			const b = bone.data.length * sx;
+			if (b > 0.0001) {
+				const dd = tx * tx + ty * ty;
+				if ((compress && dd < b * b) || (stretch && dd > b * b)) {
+					const s = (Math.sqrt(dd) / b - 1) * alpha + 1;
+					sx *= s;
+					if (uniform) sy *= s;
+				}
 			}
 		}
 		bone.updateWorldTransformWith(bone.ax, bone.ay, bone.arotation + rotationIK * alpha, sx, sy, bone.ashearX,

@@ -173,11 +173,13 @@ export class AnimationState {
 			let blend: MixBlend = i == 0 ? MixBlend.first : current.mixBlend;
 
 			// Apply mixing from entries first.
-			let mix = current.alpha;
+			let alpha = current.alpha;
 			if (current.mixingFrom)
-				mix *= this.applyMixingFrom(current, skeleton, blend);
+				alpha *= this.applyMixingFrom(current, skeleton, blend);
 			else if (current.trackTime >= current.trackEnd && !current.next)
-				mix = 0;
+				alpha = 0;
+			let attachments = alpha >= current.alphaAttachmentThreshold;
+
 
 			// Apply current entry.
 			let animationLast = current.animationLast, animationTime = current.getAnimationTime(), applyTime = animationTime;
@@ -188,17 +190,18 @@ export class AnimationState {
 			}
 			let timelines = current.animation!.timelines;
 			let timelineCount = timelines.length;
-			if ((i == 0 && mix == 1) || blend == MixBlend.add) {
+			if ((i == 0 && alpha == 1) || blend == MixBlend.add) {
+				if (i == 0) attachments = true;
 				for (let ii = 0; ii < timelineCount; ii++) {
 					// Fixes issue #302 on IOS9 where mix, blend sometimes became undefined and caused assets
 					// to sometimes stop rendering when using color correction, as their RGBA values become NaN.
 					// (https://github.com/pixijs/pixi-spine/issues/302)
-					Utils.webkit602BugfixHelper(mix, blend);
+					Utils.webkit602BugfixHelper(alpha, blend);
 					var timeline = timelines[ii];
 					if (timeline instanceof AttachmentTimeline)
-						this.applyAttachmentTimeline(timeline, skeleton, applyTime, blend, true);
+						this.applyAttachmentTimeline(timeline, skeleton, applyTime, blend, attachments);
 					else
-						timeline.apply(skeleton, animationLast, applyTime, applyEvents, mix, blend, MixDirection.mixIn);
+						timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, blend, MixDirection.mixIn);
 				}
 			} else {
 				let timelineMode = current.timelineMode;
@@ -211,13 +214,13 @@ export class AnimationState {
 					let timeline = timelines[ii];
 					let timelineBlend = timelineMode[ii] == SUBSEQUENT ? blend : MixBlend.setup;
 					if (!shortestRotation && timeline instanceof RotateTimeline) {
-						this.applyRotateTimeline(timeline, skeleton, applyTime, mix, timelineBlend, current.timelinesRotation, ii << 1, firstFrame);
+						this.applyRotateTimeline(timeline, skeleton, applyTime, alpha, timelineBlend, current.timelinesRotation, ii << 1, firstFrame);
 					} else if (timeline instanceof AttachmentTimeline) {
-						this.applyAttachmentTimeline(timeline, skeleton, applyTime, blend, true);
+						this.applyAttachmentTimeline(timeline, skeleton, applyTime, blend, attachments);
 					} else {
 						// This fixes the WebKit 602 specific issue described at http://esotericsoftware.com/forum/iOS-10-disappearing-graphics-10109
-						Utils.webkit602BugfixHelper(mix, blend);
-						timeline.apply(skeleton, animationLast, applyTime, applyEvents, mix, timelineBlend, MixDirection.mixIn);
+						Utils.webkit602BugfixHelper(alpha, blend);
+						timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, timelineBlend, MixDirection.mixIn);
 					}
 				}
 			}
@@ -259,7 +262,7 @@ export class AnimationState {
 			if (blend != MixBlend.first) blend = from.mixBlend;
 		}
 
-		let attachments = mix < from.attachmentThreshold, drawOrder = mix < from.drawOrderThreshold;
+		let attachments = mix < from.mixAttachmentThreshold, drawOrder = mix < from.mixDrawOrderThreshold;
 		let timelines = from.animation!.timelines;
 		let timelineCount = timelines.length;
 		let alphaHold = from.alpha * to.interruptAlpha, alphaMix = alphaHold * (1 - mix);
@@ -316,7 +319,7 @@ export class AnimationState {
 				if (!shortestRotation && timeline instanceof RotateTimeline)
 					this.applyRotateTimeline(timeline, skeleton, applyTime, alpha, timelineBlend, from.timelinesRotation, i << 1, firstFrame);
 				else if (timeline instanceof AttachmentTimeline)
-					this.applyAttachmentTimeline(timeline, skeleton, applyTime, timelineBlend, attachments);
+					this.applyAttachmentTimeline(timeline, skeleton, applyTime, timelineBlend, attachments && alpha >= from.alphaAttachmentThreshold);
 				else {
 					// This fixes the WebKit 602 specific issue described at http://esotericsoftware.com/forum/iOS-10-disappearing-graphics-10109
 					Utils.webkit602BugfixHelper(alpha, blend);
@@ -385,7 +388,7 @@ export class AnimationState {
 
 		// Mix between rotations using the direction of the shortest route on the first frame while detecting crosses.
 		let total = 0, diff = r2 - r1;
-		diff -= (16384 - ((16384.499999999996 - diff / 360) | 0)) * 360;
+		diff -= Math.ceil(diff / 360 - 0.5) * 360;
 		if (diff == 0) {
 			total = timelinesRotation[i];
 		} else {
@@ -661,8 +664,9 @@ export class AnimationState {
 		entry.shortestRotation = false;
 
 		entry.eventThreshold = 0;
-		entry.attachmentThreshold = 0;
-		entry.drawOrderThreshold = 0;
+		entry.alphaAttachmentThreshold = 0;
+		entry.mixAttachmentThreshold = 0;
+		entry.mixDrawOrderThreshold = 0;
 
 		entry.animationStart = 0;
 		entry.animationEnd = animation.duration;
@@ -843,12 +847,16 @@ export class TrackEntry {
 	/** When the mix percentage ({@link #mixtime} / {@link #mixDuration}) is less than the
 	 * `attachmentThreshold`, attachment timelines are applied while this animation is being mixed out. Defaults to
 	 * 0, so attachment timelines are not applied while this animation is being mixed out. */
-	attachmentThreshold: number = 0;
+	mixAttachmentThreshold: number = 0;
 
-	/** When the mix percentage ({@link #mixTime} / {@link #mixDuration}) is less than the
-	 * `drawOrderThreshold`, draw order timelines are applied while this animation is being mixed out. Defaults to 0,
-	 * so draw order timelines are not applied while this animation is being mixed out. */
-	drawOrderThreshold: number = 0;
+	/** When {@link #getAlpha()} is greater than <code>alphaAttachmentThreshold</code>, attachment timelines are applied.
+	 * Defaults to 0, so attachment timelines are always applied. */
+	alphaAttachmentThreshold: number = 0;
+
+	/** When the mix percentage ({@link #getMixTime()} / {@link #getMixDuration()}) is less than the
+	 * <code>mixDrawOrderThreshold</code>, draw order timelines are applied while this animation is being mixed out. Defaults to
+	 * 0, so draw order timelines are not applied while this animation is being mixed out. */
+	mixDrawOrderThreshold: number = 0;
 
 	/** Seconds when this animation starts, both initially and after looping. Defaults to 0.
 	 *
@@ -930,7 +938,17 @@ export class TrackEntry {
 	 * When using {@link AnimationState#addAnimation()} with a `delay` <= 0, note the
 	 * {@link #delay} is set using the mix duration from the {@link AnimationStateData}, not a mix duration set
 	 * afterward. */
-	mixDuration: number = 0; interruptAlpha: number = 0; totalAlpha: number = 0;
+	_mixDuration: number = 0; interruptAlpha: number = 0; totalAlpha: number = 0;
+
+	get mixDuration () {
+		return this._mixDuration;
+	}
+
+	set mixDuration (mixDuration: number) {
+		this.mixDuration = mixDuration;
+		if (this.previous != null && this.delay <= 0) this.delay += this.previous.getTrackComplete() - mixDuration;
+		this.delay = this.delay;
+	}
 
 	/** Controls how properties keyed in the animation are mixed with lower tracks. Defaults to {@link MixBlend#replace}, which
 	 * replaces the values from the lower tracks with the animation values. {@link MixBlend#add} adds the animation values to
@@ -997,6 +1015,13 @@ export class TrackEntry {
 			if (this.trackTime < duration) return duration; // Before duration.
 		}
 		return this.trackTime; // Next update.
+	}
+
+	/** Returns true if this track entry has been applied at least once.
+	 * <p>
+	 * See {@link AnimationState#apply(Skeleton)}. */
+	wasApplied () {
+		return this.nextTrackLast != -1;
 	}
 }
 
