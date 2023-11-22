@@ -144,10 +144,10 @@ namespace Spine.Unity.Examples {
 								trackEntry.MixDuration = control.mixDuration;
 
 							if (useOverrideAttachmentThreshold)
-								trackEntry.AttachmentThreshold = attachmentThreshold;
+								trackEntry.MixAttachmentThreshold = attachmentThreshold;
 
 							if (useOverrideDrawOrderThreshold)
-								trackEntry.DrawOrderThreshold = drawOrderThreshold;
+								trackEntry.MixDrawOrderThreshold = drawOrderThreshold;
 						}
 
 						// Don't parse more than one animation per track.

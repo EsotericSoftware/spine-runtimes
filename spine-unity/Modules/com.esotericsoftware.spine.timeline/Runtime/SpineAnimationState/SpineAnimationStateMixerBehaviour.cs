@@ -218,14 +218,14 @@ namespace Spine.Unity.Playables {
 
 						float clipSpeed = (float)clipPlayable.GetSpeed();
 						trackEntry.EventThreshold = clipData.eventThreshold;
-						trackEntry.DrawOrderThreshold = clipData.drawOrderThreshold;
+						trackEntry.MixDrawOrderThreshold = clipData.drawOrderThreshold;
 #if SPEED_INCLUDED_IN_CLIP_TIME
 						trackEntry.TrackTime = (float)clipPlayable.GetTime();
 #else
 						trackEntry.TrackTime = (float)clipPlayable.GetTime() * rootPlayableSpeed * clipSpeed;
 #endif
 						trackEntry.TimeScale = clipSpeed * rootPlayableSpeed;
-						trackEntry.AttachmentThreshold = clipData.attachmentThreshold;
+						trackEntry.MixAttachmentThreshold = clipData.attachmentThreshold;
 						trackEntry.HoldPrevious = clipData.holdPrevious;
 						trackEntry.Alpha = clipData.alpha;
 

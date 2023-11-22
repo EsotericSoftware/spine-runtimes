@@ -124,13 +124,13 @@ namespace Spine.Unity.Examples {
 		public void PlayShoot () {
 			// Play the shoot animation on track 1.
 			TrackEntry shootTrack = skeletonGraphic.AnimationState.SetAnimation(1, shoot, false);
-			shootTrack.AttachmentThreshold = 1f;
+			shootTrack.MixAttachmentThreshold = 1f;
 			shootTrack.MixDuration = 0f;
 			skeletonGraphic.AnimationState.AddEmptyAnimation(1, 0.5f, 0.1f);
 
 			// Play the aim animation on track 2 to aim at the mouse target.
 			TrackEntry aimTrack = skeletonGraphic.AnimationState.SetAnimation(2, aim, false);
-			aimTrack.AttachmentThreshold = 1f;
+			aimTrack.MixAttachmentThreshold = 1f;
 			aimTrack.MixDuration = 0f;
 			skeletonGraphic.AnimationState.AddEmptyAnimation(2, 0.5f, 0.1f);
 
@@ -143,7 +143,7 @@ namespace Spine.Unity.Examples {
 		public void StartPlayingAim () {
 			// Play the aim animation on track 2 to aim at the mouse target.
 			TrackEntry aimTrack = skeletonGraphic.AnimationState.SetAnimation(2, aim, true);
-			aimTrack.AttachmentThreshold = 1f;
+			aimTrack.MixAttachmentThreshold = 1f;
 			aimTrack.MixDuration = 0f;
 		}
 
