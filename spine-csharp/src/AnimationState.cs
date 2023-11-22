@@ -241,12 +241,12 @@ namespace Spine {
 				MixBlend blend = i == 0 ? MixBlend.First : current.mixBlend;
 
 				// Apply mixing from entries first.
-				float mix = current.alpha;
+				float alpha = current.alpha;
 				if (current.mixingFrom != null)
-					mix *= ApplyMixingFrom(current, skeleton, blend);
+					alpha *= ApplyMixingFrom(current, skeleton, blend);
 				else if (current.trackTime >= current.trackEnd && current.next == null) //
-					mix = 0; // Set to setup pose the last time the entry will be applied.
-				bool attachments = mix < current.attachmentThreshold;
+					alpha = 0; // Set to setup pose the last time the entry will be applied.
+				bool attachments = alpha >= current.alphaAttachmentThreshold;
 
 				// Apply current entry.
 				float animationLast = current.animationLast, animationTime = current.AnimationTime, applyTime = animationTime;
@@ -258,14 +258,14 @@ namespace Spine {
 
 				int timelineCount = current.animation.timelines.Count;
 				Timeline[] timelines = current.animation.timelines.Items;
-				if ((i == 0 && mix == 1) || blend == MixBlend.Add) {
+				if ((i == 0 && alpha == 1) || blend == MixBlend.Add) {
 					if (i == 0) attachments = true;
 					for (int ii = 0; ii < timelineCount; ii++) {
 						Timeline timeline = timelines[ii];
 						if (timeline is AttachmentTimeline)
 							ApplyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, blend, attachments);
 						else
-							timeline.Apply(skeleton, animationLast, applyTime, applyEvents, mix, blend, MixDirection.In);
+							timeline.Apply(skeleton, animationLast, applyTime, applyEvents, alpha, blend, MixDirection.In);
 					}
 				} else {
 					int[] timelineMode = current.timelineMode.Items;
@@ -280,12 +280,12 @@ namespace Spine {
 						MixBlend timelineBlend = timelineMode[ii] == AnimationState.Subsequent ? blend : MixBlend.Setup;
 						RotateTimeline rotateTimeline = timeline as RotateTimeline;
 						if (!shortestRotation && rotateTimeline != null)
-							ApplyRotateTimeline(rotateTimeline, skeleton, applyTime, mix, timelineBlend, timelinesRotation,
+							ApplyRotateTimeline(rotateTimeline, skeleton, applyTime, alpha, timelineBlend, timelinesRotation,
 												ii << 1, firstFrame);
 						else if (timeline is AttachmentTimeline)
 							ApplyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, blend, attachments);
 						else
-							timeline.Apply(skeleton, animationLast, applyTime, applyEvents, mix, timelineBlend, MixDirection.In);
+							timeline.Apply(skeleton, animationLast, applyTime, applyEvents, alpha, timelineBlend, MixDirection.In);
 					}
 				}
 				QueueEvents(current, animationTime);
@@ -367,7 +367,7 @@ namespace Spine {
 				if (blend != MixBlend.First) blend = from.mixBlend; // Track 0 ignores track mix blend.
 			}
 
-			bool attachments = mix < from.attachmentThreshold, drawOrder = mix < from.drawOrderThreshold;
+			bool attachments = mix < from.mixAttachmentThreshold, drawOrder = mix < from.mixDrawOrderThreshold;
 			int timelineCount = from.animation.timelines.Count;
 			Timeline[] timelines = from.animation.timelines.Items;
 			float alphaHold = from.alpha * to.interruptAlpha, alphaMix = alphaHold * (1 - mix);
@@ -427,7 +427,8 @@ namespace Spine {
 						ApplyRotateTimeline(rotateTimeline, skeleton, applyTime, alpha, timelineBlend, timelinesRotation, i << 1,
 							firstFrame);
 					} else if (timeline is AttachmentTimeline) {
-						ApplyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, timelineBlend, attachments);
+						ApplyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, timelineBlend,
+							attachments && alpha >= from.alphaAttachmentThreshold);
 					} else {
 						if (drawOrder && timeline is DrawOrderTimeline && timelineBlend == MixBlend.Setup)
 							direction = MixDirection.In;
@@ -830,8 +831,9 @@ namespace Spine {
 			entry.holdPrevious = false;
 
 			entry.eventThreshold = 0;
-			entry.attachmentThreshold = 0;
-			entry.drawOrderThreshold = 0;
+			entry.alphaAttachmentThreshold = 0;
+			entry.mixAttachmentThreshold = 0;
+			entry.mixDrawOrderThreshold = 0;
 
 			entry.animationStart = 0;
 			entry.animationEnd = animation.Duration;
@@ -999,7 +1001,7 @@ namespace Spine {
 		internal int trackIndex;
 
 		internal bool loop, holdPrevious, reverse, shortestRotation;
-		internal float eventThreshold, attachmentThreshold, drawOrderThreshold;
+		internal float eventThreshold, mixAttachmentThreshold, alphaAttachmentThreshold, mixDrawOrderThreshold;
 		internal float animationStart, animationEnd, animationLast, nextAnimationLast;
 		internal float delay, trackTime, trackLast, nextTrackLast, trackEnd, timeScale = 1f;
 		internal float alpha, mixTime, mixDuration, interruptAlpha, totalAlpha;
@@ -1171,19 +1173,24 @@ namespace Spine {
 		/// </summary>
 		public float EventThreshold { get { return eventThreshold; } set { eventThreshold = value; } }
 
-		/// <summary>
-		/// When the mix percentage (<see cref="TrackEntry.MixTime"/> / <see cref="TrackEntry.MixDuration"/>) is less than the
-		/// <code>AttachmentThreshold</code>, attachment timelines are applied while this animation is being mixed out. Defaults to
-		/// 0, so attachment timelines are not applied while this animation is being mixed out.
+		/// When <see cref="Alpha"/> is greater than <code>AlphaAttachmentThreshold</code>, attachment timelines are applied.
+		/// Defaults to 0, so attachment timelines are always applied.
 		/// </summary>
-		public float AttachmentThreshold { get { return attachmentThreshold; } set { attachmentThreshold = value; } }
+		public float AlphaAttachmentThreshold { get { return alphaAttachmentThreshold; } set { alphaAttachmentThreshold = value; } }
 
 		/// <summary>
 		/// When the mix percentage (<see cref="TrackEntry.MixTime"/> / <see cref="TrackEntry.MixDuration"/>) is less than the
-		/// <code>DrawOrderThreshold</code>, draw order timelines are applied while this animation is being mixed out. Defaults to 0,
-		/// so draw order timelines are not applied while this animation is being mixed out.
+		/// <code>MixAttachmentThreshold</code>, attachment timelines are applied while this animation is being mixed out. Defaults
+		/// to 0, so attachment timelines are not applied while this animation is being mixed out.
 		/// </summary>
-		public float DrawOrderThreshold { get { return drawOrderThreshold; } set { drawOrderThreshold = value; } }
+		public float MixAttachmentThreshold { get { return mixAttachmentThreshold; } set { mixAttachmentThreshold = value; } }
+
+		/// <summary>
+		/// When the mix percentage (<see cref="TrackEntry.MixTime"/> / <see cref="TrackEntry.MixDuration"/>) is less than the
+		/// <code>MixDrawOrderThreshold</code>, draw order timelines are applied while this animation is being mixed out. Defaults to
+		/// 0, so draw order timelines are not applied while this animation is being mixed out.
+		/// </summary>
+		public float MixDrawOrderThreshold { get { return mixDrawOrderThreshold; } set { mixDrawOrderThreshold = value; } }
 
 		/// <summary>
 		/// The animation queued to start after this animation, or null if there is none. <code>next</code> makes up a doubly linked
@@ -1225,9 +1232,11 @@ namespace Spine {
 		/// <para>
 		/// When using <seealso cref="AnimationState.AddAnimation(int, Animation, bool, float)"/> with a <code>Delay</code> &lt;= 0, the
 		/// <see cref="TrackEntry.Delay"/> is set using the mix duration from the <see cref=" AnimationStateData"/>. If <code>mixDuration</code> is set
-		/// afterward, the delay may need to be adjusted. For example:
-		/// <code>entry.Delay = entry.previous.TrackComplete - entry.MixDuration;</code>
-		/// </para></summary>
+		/// afterward, the delay may need to be adjusted. For example:</para>
+		/// <para><code>entry.Delay = entry.previous.TrackComplete - entry.MixDuration;</code></para>
+		/// <para>Alternatively, <see cref="SetMixDuration(float, float)"/> can be used to recompute the delay:</para>
+		/// <para><code>entry.SetMixDuration(0.25f, 0);</code></para>
+		/// </summary>
 		public float MixDuration { get { return mixDuration; } set { mixDuration = value; } }
 
 		/// <summary>Sets both <see cref="MixDuration"/> and <see cref="Delay"/>.</summary>
