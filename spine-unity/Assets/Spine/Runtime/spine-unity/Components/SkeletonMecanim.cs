@@ -127,7 +127,7 @@ namespace Spine.Unity {
 			ApplyAnimation();
 		}
 
-		protected void ApplyAnimation () {
+		public virtual void ApplyAnimation () {
 			if (_BeforeApply != null)
 				_BeforeApply(this);
 
@@ -152,7 +152,7 @@ namespace Spine.Unity {
 			AfterAnimationApplied();
 		}
 
-		public void AfterAnimationApplied () {
+		public virtual void AfterAnimationApplied () {
 			if (_UpdateLocal != null)
 				_UpdateLocal(this);
 
