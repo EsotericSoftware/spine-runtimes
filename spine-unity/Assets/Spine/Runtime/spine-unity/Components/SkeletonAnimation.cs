@@ -236,15 +236,16 @@ namespace Spine.Unity {
 				state.ApplyEventTimelinesOnly(skeleton, issueEvents: false);
 				return;
 			}
-			ApplyAnimation(deltaTime);
+			ApplyAnimation();
 		}
 
 		protected void UpdateAnimationStatus (float deltaTime) {
 			deltaTime *= timeScale;
 			state.Update(deltaTime);
+			skeleton.Update(deltaTime);
 		}
 
-		protected void ApplyAnimation (float deltaTime) {
+		protected void ApplyAnimation () {
 			if (_BeforeApply != null)
 				_BeforeApply(this);
 
@@ -253,7 +254,6 @@ namespace Spine.Unity {
 			else
 				state.ApplyEventTimelinesOnly(skeleton, issueEvents: true);
 
-			skeleton.Update(deltaTime);
 			AfterAnimationApplied();
 		}
 

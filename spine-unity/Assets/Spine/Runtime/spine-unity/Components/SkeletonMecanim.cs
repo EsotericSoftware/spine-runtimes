@@ -123,10 +123,11 @@ namespace Spine.Unity {
 			if (updateMode <= UpdateMode.OnlyAnimationStatus)
 				return;
 
-			ApplyAnimation(deltaTime);
+			skeleton.Update(deltaTime);
+			ApplyAnimation();
 		}
 
-		protected void ApplyAnimation (float deltaTime) {
+		protected void ApplyAnimation () {
 			if (_BeforeApply != null)
 				_BeforeApply(this);
 
@@ -148,7 +149,6 @@ namespace Spine.Unity {
 #else
 			translator.Apply(skeleton);
 #endif
-			skeleton.Update(deltaTime);
 			AfterAnimationApplied();
 		}
 
