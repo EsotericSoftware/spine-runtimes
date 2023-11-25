@@ -339,8 +339,8 @@ public class Skeleton {
 
 	private void sortPhysicsConstraint (PhysicsConstraint constraint) {
 		Bone bone = constraint.bone;
-		constraint.active = bone.active && !constraint.data.skinRequired
-			|| (skin != null && skin.constraints.contains(constraint.data, true));
+		constraint.active = bone.active
+			&& (!constraint.data.skinRequired || (skin != null && skin.constraints.contains(constraint.data, true)));
 		if (!constraint.active) return;
 
 		sortBone(bone);
