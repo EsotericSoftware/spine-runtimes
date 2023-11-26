@@ -27,7 +27,7 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Animation, AnimationState, AnimationStateData, AtlasAttachmentLoader, Bone, Color, Disposable, Downloader, MathUtils, MixBlend, MixDirection, Skeleton, SkeletonBinary, SkeletonData, SkeletonJson, StringMap, TextureAtlas, TextureFilter, TimeKeeper, TrackEntry, Vector2 } from "@esotericsoftware/spine-core"
+import { Animation, AnimationState, AnimationStateData, AtlasAttachmentLoader, Bone, Color, Disposable, Downloader, MathUtils, MixBlend, MixDirection, Physics, Skeleton, SkeletonBinary, SkeletonData, SkeletonJson, StringMap, TextureAtlas, TextureFilter, TimeKeeper, TrackEntry, Vector2 } from "@esotericsoftware/spine-core"
 import { AssetManager, GLTexture, Input, LoadingScreen, ManagedWebGLRenderingContext, ResizeMode, SceneRenderer, Vector3 } from "@esotericsoftware/spine-webgl"
 
 export interface SpinePlayerConfig {
@@ -370,7 +370,7 @@ export class SpinePlayer implements Disposable {
 				let time = animationDuration * percentage;
 				this.animationState!.update(time - this.playTime);
 				this.animationState!.apply(this.skeleton!);
-				this.skeleton!.updateWorldTransform();
+				this.skeleton!.updateWorldTransform(Physics.update);
 				this.playTime = time;
 			};
 
@@ -542,7 +542,7 @@ export class SpinePlayer implements Disposable {
 			} else {
 				entry = this.animationState.setEmptyAnimation(0);
 				entry.trackEnd = 100000000;
-				this.skeleton.updateWorldTransform();
+				this.skeleton.updateWorldTransform(Physics.update);
 				this.setViewport(entry.animation!);
 				this.pause();
 			}
@@ -769,7 +769,7 @@ export class SpinePlayer implements Disposable {
 
 		for (let i = 0; i < steps; i++, time += stepTime) {
 			animation.apply(this.skeleton!, time, time, false, [], 1, MixBlend.setup, MixDirection.mixIn);
-			this.skeleton!.updateWorldTransform();
+			this.skeleton!.updateWorldTransform(Physics.update);
 			this.skeleton!.getBounds(offset, size);
 
 			if (!isNaN(offset.x) && !isNaN(offset.y) && !isNaN(size.x) && !isNaN(size.y)) {
@@ -817,7 +817,7 @@ export class SpinePlayer implements Disposable {
 				if (!this.paused) {
 					this.animationState!.update(playDelta);
 					this.animationState!.apply(skeleton);
-					skeleton.updateWorldTransform();
+					skeleton.updateWorldTransform(Physics.update);
 
 					if (config.showControls) {
 						this.playTime += playDelta;

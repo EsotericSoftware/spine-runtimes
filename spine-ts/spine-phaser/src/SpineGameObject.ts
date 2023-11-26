@@ -44,6 +44,7 @@ import {
 	AnimationStateData,
 	Bone,
 	MathUtils,
+	Physics,
 	Skeleton,
 	Skin,
 	Vector2,
@@ -75,7 +76,7 @@ export class SetupPoseBoundsProvider implements SpineGameObjectBoundsProvider {
 		// reconstruct that state.
 		const skeleton = new Skeleton(gameObject.skeleton.data);
 		skeleton.setToSetupPose();
-		skeleton.updateWorldTransform();
+		skeleton.updateWorldTransform(Physics.update);
 		const bounds = skeleton.getBoundsRect();
 		return bounds.width == Number.NEGATIVE_INFINITY
 			? { x: 0, y: 0, width: 0, height: 0 }
@@ -125,7 +126,7 @@ export class SkinsAndAnimationBoundsProvider
 		const animation =
 			this.animation != null ? data.findAnimation(this.animation!) : null;
 		if (animation == null) {
-			skeleton.updateWorldTransform();
+			skeleton.updateWorldTransform(Physics.update);
 			const bounds = skeleton.getBoundsRect();
 			return bounds.width == Number.NEGATIVE_INFINITY
 				? { x: 0, y: 0, width: 0, height: 0 }
@@ -141,7 +142,7 @@ export class SkinsAndAnimationBoundsProvider
 			for (let i = 0; i < steps; i++) {
 				animationState.update(i > 0 ? this.timeStep : 0);
 				animationState.apply(skeleton);
-				skeleton.updateWorldTransform();
+				skeleton.updateWorldTransform(Physics.update);
 
 				const bounds = skeleton.getBoundsRect();
 				minX = Math.min(minX, bounds.x);
@@ -218,7 +219,7 @@ export class SpineGameObject extends DepthMixin(
 		this.skeleton = this.plugin.createSkeleton(dataKey, atlasKey);
 		this.animationStateData = new AnimationStateData(this.skeleton.data);
 		this.animationState = new AnimationState(this.animationStateData);
-		this.skeleton.updateWorldTransform();
+		this.skeleton.updateWorldTransform(Physics.update);
 		this.updateSize();
 	}
 
@@ -283,7 +284,7 @@ export class SpineGameObject extends DepthMixin(
 		this.animationState.update(delta / 1000);
 		this.animationState.apply(this.skeleton);
 		this.beforeUpdateWorldTransforms(this);
-		this.skeleton.updateWorldTransform();
+		this.skeleton.updateWorldTransform(Physics.update);
 		this.afterUpdateWorldTransforms(this);
 	}
 
@@ -387,7 +388,7 @@ export class SpineGameObject extends DepthMixin(
 		skeleton.scaleY = transform.scaleY;
 		let root = skeleton.getRootBone()!;
 		root.rotation = -MathUtils.radiansToDegrees * transform.rotationNormalized;
-		this.skeleton.updateWorldTransform();
+		this.skeleton.updateWorldTransform(Physics.update);
 
 		context.save();
 		skeletonRenderer.draw(skeleton);

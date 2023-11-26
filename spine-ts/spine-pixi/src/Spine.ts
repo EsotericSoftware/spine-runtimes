@@ -35,6 +35,7 @@ import {
 	ClippingAttachment,
 	Color,
 	MeshAttachment,
+	Physics,
 	RegionAttachment,
 	Skeleton,
 	SkeletonBinary,
@@ -123,7 +124,7 @@ export class Spine extends Container {
 		this.autoUpdate = options?.autoUpdate ?? true;
 		this.slotMeshFactory = options?.slotMeshFactory ?? ((): ISlotMesh => new SlotMesh());
 		this.skeleton.setToSetupPose();
-		this.skeleton.updateWorldTransform();
+		this.skeleton.updateWorldTransform(Physics.update);
 	}
 
 	public update (deltaSeconds: number): void {
@@ -149,7 +150,7 @@ export class Spine extends Container {
 		// if I ever create the linked spines, this will be useful.
 
 		this.state.apply(this.skeleton);
-		this.skeleton.updateWorldTransform();
+		this.skeleton.updateWorldTransform(Physics.update);
 		this.updateGeometry();
 		this.sortChildren();
 	}
