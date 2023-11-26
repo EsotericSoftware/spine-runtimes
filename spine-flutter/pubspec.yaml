@@ -8,23 +8,23 @@ documentation: https://esotericsoftware.com/spine-flutter
 
 environment:
   sdk: '>=2.17.6 <4.0.0'
-  flutter: ">=3.10.5"
+  flutter: ">=3.16.0 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  ffi: ^2.0.1
+  ffi: ^2.1.0
   web_ffi_fork: ^0.7.4
   inject_js: ^2.0.0
   js: ^0.6.5
-  meta: ^1.8.0
+  meta: ^1.10.0
   http: ^1.1.0
   path: ^1.8.2
-  raw_image_provider: ^0.2.0
+  crypto: ^3.0.3
 
 dev_dependencies:
-  ffigen: ^9.0.1
-  flutter_lints: ^2.0.0
+  ffigen: ^10.0.0
+  flutter_lints: ^3.0.1
 
 flutter:
   plugin:
