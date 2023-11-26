@@ -30,7 +30,7 @@ var skinsDemo = function (canvas, bgColor) {
 		state = new spine.AnimationState(stateData);
 		setupAnimations(state);
 		state.apply(skeleton);
-		skeleton.updateWorldTransform();
+		skeleton.updateWorldTransform(spine.Physics.update);
 		offset = new spine.Vector2();
 		bounds = new spine.Vector2();
 		skeleton.getBounds(offset, bounds, []);
@@ -185,7 +185,7 @@ var skinsDemo = function (canvas, bgColor) {
 
 		state.update(delta);
 		state.apply(skeleton);
-		skeleton.updateWorldTransform();
+		skeleton.updateWorldTransform(spine.Physics.update);
 
 		renderer.begin();
 		renderer.drawSkeleton(skeleton, true);

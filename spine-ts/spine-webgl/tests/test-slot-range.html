@@ -51,7 +51,7 @@
 
 			var offset = new spine.Vector2();
 			var size = new spine.Vector2();
-			spineBoy.skeleton.updateWorldTransform();
+			spineBoy.skeleton.updateWorldTransform(spine.Physics.update);
 			spineBoy.skeleton.getBounds(offset, size, []);
 			renderer.camera.position.x = offset.x + size.x / 2;
 			renderer.camera.position.y = offset.y + size.y / 2;
@@ -76,7 +76,7 @@
 		// Update Spineboy first
 		spineBoy.animationState.update(time.delta);
 		spineBoy.animationState.apply(spineBoy.skeleton);
-		spineBoy.skeleton.updateWorldTransform();
+		spineBoy.skeleton.updateWorldTransform(spine.Physics.update);
 
 		// Next figure out the world location of the bone
 		// we attach the vine to, and apply it to the vine's
@@ -89,7 +89,7 @@
 		vineRoot.rotation = gun.getWorldRotationX();
 		vine.animationState.update(time.delta);
 		vine.animationState.apply(vine.skeleton);
-		vine.skeleton.updateWorldTransform();
+		vine.skeleton.updateWorldTransform(spine.Physics.update);
 
 		// Find the two slots inbetween we want to render the vine
 		var gunSlot = spineBoy.skeleton.findSlot("gun");

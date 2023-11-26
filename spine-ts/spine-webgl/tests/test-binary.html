@@ -105,7 +105,7 @@
 			var skeleton = skeletons[i].skeleton;
 			state.update(delta);
 			state.apply(skeleton);
-			skeleton.updateWorldTransform();
+			skeleton.updateWorldTransform(spine.Physics.update);
 		}
 		updateMean.addValue(Date.now() - start);
 		start = Date.now();

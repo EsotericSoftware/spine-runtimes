@@ -133,7 +133,7 @@ class App {
         // Calculate the bounds of the skeleton
         this.animationState.update(0);
         this.animationState.apply(this.skeleton);
-        this.skeleton.updateWorldTransform();
+        this.skeleton.updateWorldTransform(spine.Physics.update);
         let offset = new spine.Vector2(), size = new spine.Vector2();
         this.skeleton.getBounds(offset, size);
 
@@ -151,7 +151,7 @@ class App {
     update(canvas, delta) {
         this.animationState.update(delta);
         this.animationState.apply(this.skeleton);
-        this.skeleton.updateWorldTransform();
+        this.skeleton.updateWorldTransform(spine.Physics.update);
     }
 
     render(canvas) {

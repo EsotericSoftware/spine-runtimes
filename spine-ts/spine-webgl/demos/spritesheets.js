@@ -34,7 +34,7 @@ var spritesheetsDemo = function (canvas, bgColor) {
 		animationState = new spine.AnimationState(stateData);
 		animationState.setAnimation(0, "walk", true);
 		animationState.apply(skeleton);
-		skeleton.updateWorldTransform();
+		skeleton.updateWorldTransform(spine.Physics.update);
 		offset = new spine.Vector2();
 		bounds = new spine.Vector2();
 		skeleton.getBounds(offset, bounds, []);
@@ -116,13 +116,13 @@ var spritesheetsDemo = function (canvas, bgColor) {
 			walkAnim.apply(skeletonSeq, walkLastTime, newWalkTime, true, null, 1, spine.MixBlend.setup, spine.MixDirection.mixIn);
 			walkLastTime = newWalkTime;
 		}
-		skeletonSeq.updateWorldTransform();
+		skeletonSeq.updateWorldTransform(spine.Physics.update);
 
 		animationState.update(delta);
 		var current = animationState.getCurrent(0);
 		if (current.animation.name == "walk") current.trackTime = walkLastTimePrecise;
 		animationState.apply(skeleton);
-		skeleton.updateWorldTransform();
+		skeleton.updateWorldTransform(spine.Physics.update);
 
 		gl.clearColor(bgColor.r, bgColor.g, bgColor.b, bgColor.a);
 		gl.clear(gl.COLOR_BUFFER_BIT);

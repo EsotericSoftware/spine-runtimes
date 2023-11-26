@@ -78,7 +78,7 @@
 				let skeleton = this.skeletons[i];
 				state.update(delta);
 				state.apply(skeleton);
-				skeleton.updateWorldTransform();
+				skeleton.updateWorldTransform(spine.Physics.update);
 			}
 		}
 

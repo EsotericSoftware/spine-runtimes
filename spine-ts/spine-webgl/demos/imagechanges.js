@@ -46,7 +46,7 @@ var imageChangesDemo = function (canvas, bgColor) {
 				var time = animationDuration * percent;
 				active.state.update(time - active.playTime);
 				active.state.apply(active.skeleton);
-				active.skeleton.updateWorldTransform();
+				active.skeleton.updateWorldTransform(spine.Physics.update);
 				active.playTime = time;
 			}
 		};
@@ -77,7 +77,7 @@ var imageChangesDemo = function (canvas, bgColor) {
 		var anim = skeletonData.findAnimation(animation);
 		state.setAnimation(0, animation, true);
 		state.apply(skeleton);
-		skeleton.updateWorldTransform();
+		skeleton.updateWorldTransform(spine.Physics.update);
 		var offset = new spine.Vector2();
 		var size = new spine.Vector2();
 		skeleton.getBounds(offset, size, []);
@@ -142,7 +142,7 @@ var imageChangesDemo = function (canvas, bgColor) {
 
 			state.update(delta);
 			state.apply(skeleton);
-			skeleton.updateWorldTransform();
+			skeleton.updateWorldTransform(spine.Physics.update);
 		}
 
 		renderer.begin();

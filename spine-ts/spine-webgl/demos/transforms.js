@@ -33,13 +33,13 @@ var transformsDemo = function (canvas, bgColor) {
 		var skeletonData = skeletonJson.readSkeletonData(assetManager.get("demos.json").transforms);
 		skeleton = new spine.Skeleton(skeletonData);
 		skeleton.setToSetupPose();
-		skeleton.updateWorldTransform();
+		skeleton.updateWorldTransform(spine.Physics.update);
 		var offset = new spine.Vector2();
 		bounds = new spine.Vector2();
 		skeleton.getBounds(offset, bounds, []);
 		state = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
 		skeleton.setToSetupPose();
-		skeleton.updateWorldTransform();
+		skeleton.updateWorldTransform(spine.Physics.update);
 		rotateHandle = skeleton.findBone("rotate-handle");
 
 		renderer.camera.position.x = offset.x + bounds.x / 2;
@@ -114,7 +114,7 @@ var transformsDemo = function (canvas, bgColor) {
 	function render() {
 		timeKeeper.update();
 		var delta = timeKeeper.delta;
-		skeleton.updateWorldTransform();
+		skeleton.updateWorldTransform(spine.Physics.update);
 
 		renderer.camera.viewportWidth = bounds.x * 1.6;
 		renderer.camera.viewportHeight = bounds.y * 1.2;

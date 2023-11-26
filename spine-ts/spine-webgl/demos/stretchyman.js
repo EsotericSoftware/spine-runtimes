@@ -39,7 +39,7 @@ var stretchymanDemo = function (canvas, bgColor) {
 		var skeletonData = skeletonJson.readSkeletonData(assetManager.get("demos.json").stretchyman);
 		skeleton = new spine.Skeleton(skeletonData);
 		skeleton.setToSetupPose();
-		skeleton.updateWorldTransform();
+		skeleton.updateWorldTransform(spine.Physics.update);
 		var offset = new spine.Vector2();
 		bounds = new spine.Vector2();
 		skeleton.getBounds(offset, bounds, []);
@@ -126,7 +126,7 @@ var stretchymanDemo = function (canvas, bgColor) {
 		var angle = Math.atan2(headControl.worldY - hipControl.worldY, headControl.worldX - hipControl.worldX) * spine.MathUtils.radDeg;
 		angle = (angle - 90) * 2.5;
 		head.rotation = head.data.rotation + Math.min(90, Math.abs(angle)) * Math.sign(angle);
-		skeleton.updateWorldTransform();
+		skeleton.updateWorldTransform(spine.Physics.update);
 
 		renderer.camera.viewportWidth = bounds.x * 1.2;
 		renderer.camera.viewportHeight = bounds.y * 1.5;

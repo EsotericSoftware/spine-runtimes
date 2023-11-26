@@ -61,7 +61,7 @@
 		update(canvas, delta) {
 			this.state.update(delta);
 			this.state.apply(this.skeleton);
-			this.skeleton.updateWorldTransform();
+			this.skeleton.updateWorldTransform(spine.Physics.update);
 		}
 
 		render(canvas) {

@@ -23,7 +23,7 @@ var tankDemo = function (canvas, bgColor) {
 		state = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
 		state.setAnimation(0, "drive", true);
 		state.apply(skeleton);
-		skeleton.updateWorldTransform();
+		skeleton.updateWorldTransform(spine.Physics.update);
 		offset = new spine.Vector2();
 		bounds = new spine.Vector2();
 		offset.x = -1204.22;
@@ -58,7 +58,7 @@ var tankDemo = function (canvas, bgColor) {
 				var time = animationDuration * percent;
 				state.update(time - playTime);
 				state.apply(skeleton);
-				skeleton.updateWorldTransform();
+				skeleton.updateWorldTransform(spine.Physics.update);
 				playTime = time;
 			}
 		};
@@ -84,7 +84,7 @@ var tankDemo = function (canvas, bgColor) {
 
 			state.update(delta);
 			state.apply(skeleton);
-			skeleton.updateWorldTransform();
+			skeleton.updateWorldTransform(spine.Physics.update);
 		}
 
 		offset.x = skeleton.findBone("tankRoot").worldX;

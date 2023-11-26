@@ -38,7 +38,7 @@
 		// Instantiate a new skeleton based on the atlas and skeleton data.
 		skeleton = new spine.Skeleton(skeletonData);
 		skeleton.setToSetupPose();
-		skeleton.updateWorldTransform();
+		skeleton.updateWorldTransform(spine.Physics.update);
 		bounds = skeleton.getBoundsRect();
 
 		// Setup an animation state with a default mix of 0.2 seconds.
@@ -78,7 +78,7 @@
 		// world transforms and render the skeleton.
 		animationState.update(delta);
 		animationState.apply(skeleton);
-		skeleton.updateWorldTransform();
+		skeleton.updateWorldTransform(spine.Physics.update);
 		skeletonRenderer.draw(skeleton);
 
 		requestAnimationFrame(render);

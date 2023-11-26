@@ -32,7 +32,7 @@ var transitionsDemo = function (canvas, loadingComplete, bgColor) {
 		setAnimations(stateNoMix, -0.25, 0);
 
 		state.apply(skeleton);
-		skeleton.updateWorldTransform();
+		skeleton.updateWorldTransform(spine.Physics.update);
 		bounds = { offset: new spine.Vector2(), size: new spine.Vector2() };
 		skeleton.getBounds(bounds.offset, bounds.size, []);
 		setupInput();
@@ -108,14 +108,14 @@ var transitionsDemo = function (canvas, loadingComplete, bgColor) {
 		renderer.begin();
 		state.update(delta);
 		state.apply(skeleton);
-		skeleton.updateWorldTransform();
+		skeleton.updateWorldTransform(spine.Physics.update);
 		skeleton.x = -200;
 		skeleton.y = -100;
 		renderer.drawSkeleton(skeleton, true);
 
 		stateNoMix.update(delta);
 		stateNoMix.apply(skeletonNoMix);
-		skeletonNoMix.updateWorldTransform();
+		skeletonNoMix.updateWorldTransform(spine.Physics.update);
 		skeletonNoMix.x = size.x + 45;
 		skeletonNoMix.y = -100;
 		renderer.drawSkeleton(skeletonNoMix, true);

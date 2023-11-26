@@ -52,7 +52,7 @@
 				// Apply the animation state to the skeleton.
 				this.animationState.apply(this.skeleton);
 				// Let the skeleton update the transforms of its bones.
-				this.skeleton.updateWorldTransform();
+				this.skeleton.updateWorldTransform(spine.Physics.update);
 			}
 
 			render(canvas) {

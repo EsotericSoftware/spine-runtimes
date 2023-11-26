@@ -83,7 +83,7 @@
 				state.setAnimation(0, ANIMATION, true);
 				skeleton.x = 0;
 				skeleton.y = 0;
-				skeleton.updateWorldTransform();
+				skeleton.updateWorldTransform(spine.Physics.update);
 				skeletons.push({ skeleton: skeleton, state: state });
 			}
 
@@ -104,7 +104,7 @@
 			var skeleton = skeletons[i].skeleton;
 			state.update(delta);
 			state.apply(skeleton);
-			skeleton.updateWorldTransform();
+			skeleton.updateWorldTransform(spine.Physics.update);
 		}
 		updateMean.addValue(Date.now() - start);
 		start = Date.now();

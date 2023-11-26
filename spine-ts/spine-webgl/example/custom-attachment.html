@@ -16,7 +16,7 @@
 				this.animationState = null;
 			}
 
-			loadAssets(canvas) {				
+			loadAssets(canvas) {
 				canvas.assetManager.loadBinary("assets/spineboy-pro.skel");
 				canvas.assetManager.loadTextureAtlas("assets/spineboy-pma.atlas");
 				canvas.assetManager.loadTexture("head.png");
@@ -45,7 +45,7 @@
 				this.animationState.setAnimation(0, "run", true);
 
 				// Get the custom head image from the asset manager and create an
-				// attachment from it.				
+				// attachment from it.
 				let texture = assetManager.require("head.png");
 				let textureRegion = {
 					texture: texture,
@@ -54,12 +54,12 @@
 					degrees: 0,
 					offsetX: 0, offsetY: 0,
 					originalWidth: texture.getImage().width, originalHeight: texture.getImage().height
-				};				
+				};
 				let headSlot = this.skeleton.findSlot("head");
-				let newHeadAttachment = headSlot.getAttachment().copy();				
+				let newHeadAttachment = headSlot.getAttachment().copy();
 				newHeadAttachment.region = textureRegion;
 				newHeadAttachment.updateRegion();
-				headSlot.setAttachment(newHeadAttachment);			
+				headSlot.setAttachment(newHeadAttachment);
 			}
 
 			update(canvas, delta) {
@@ -68,7 +68,7 @@
 				// Apply the animation state to the skeleton.
 				this.animationState.apply(this.skeleton);
 				// Let the skeleton update the transforms of its bones.
-				this.skeleton.updateWorldTransform();
+				this.skeleton.updateWorldTransform(spine.Physics.update);
 			}
 
 			render(canvas) {

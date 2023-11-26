@@ -18,39 +18,39 @@
                 this.draggedBone = null;
             }
 
-            loadAssets(canvas) {				
-                canvas.assetManager.loadBinary("assets/stretchyman-pro.skel");				
+            loadAssets(canvas) {
+                canvas.assetManager.loadBinary("assets/stretchyman-pro.skel");
                 canvas.assetManager.loadTextureAtlas("assets/stretchyman-pma.atlas");
             }
 
             initialize(canvas) {
                 let assetManager = canvas.assetManager;
-                var atlas = assetManager.require("assets/stretchyman-pma.atlas");				
-                var atlasLoader = new spine.AtlasAttachmentLoader(atlas);				
-                var skeletonBinary = new spine.SkeletonBinary(atlasLoader);				
+                var atlas = assetManager.require("assets/stretchyman-pma.atlas");
+                var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
+                var skeletonBinary = new spine.SkeletonBinary(atlasLoader);
                 skeletonBinary.scale = 1;
                 var skeletonData = skeletonBinary.readSkeletonData(assetManager.require("assets/stretchyman-pro.skel"));
-                this.skeleton = new spine.Skeleton(skeletonData);				
+                this.skeleton = new spine.Skeleton(skeletonData);
                 var animationStateData = new spine.AnimationStateData(skeletonData);
-                this.animationState = new spine.AnimationState(animationStateData);				
+                this.animationState = new spine.AnimationState(animationStateData);
 
                 // Find the bones that should be draggable
-                let draggableBoneNames = [            
+                let draggableBoneNames = [
                     "back-leg-ik-target",
                     "front-leg-ik-target",
                     "back-arm-ik-target",
-                    "front-arm-ik-target",            
+                    "front-arm-ik-target",
                     "hip",
                     "neck2"
-                ];                
-                for (let boneName of draggableBoneNames) {                    
+                ];
+                for (let boneName of draggableBoneNames) {
                     let bone = this.skeleton.findBone(boneName);
-                    if (bone == null) throw Error("Couldn't find bone " + boneName);            
+                    if (bone == null) throw Error("Couldn't find bone " + boneName);
                     this.draggableBones.push(bone)
                 }
 
-                // Setup an input listener on the canvas to process touch/mouse events.        
-                canvas.input.addListener({            
+                // Setup an input listener on the canvas to process touch/mouse events.
+                canvas.input.addListener({
                     down: (x, y) => {
                         // Calculate the mouse position in the coordinate space of the camera, aka world space.
                         // The skeleton and its bones live in the same coordinate space.
@@ -74,7 +74,7 @@
                         // The skeleton and its bones live in this coordinate space.
                         let mousePosition = new spine.Vector3(x, y);
                         canvas.renderer.camera.screenToWorld(mousePosition, canvas.htmlCanvas.clientWidth, canvas.htmlCanvas.clientHeight);
-                        
+
                         if (this.selectedBone.parent != null) {
                             // If the bone to be dragged has a parent, transform the mouse world position to
                             // the parent bone's coordinate system, and set the bone's position accordingly.
@@ -92,26 +92,26 @@
                 })
             }
 
-            update(canvas, delta) {				
-                this.animationState.update(delta);				
-                this.animationState.apply(this.skeleton);				
-                this.skeleton.updateWorldTransform();
+            update(canvas, delta) {
+                this.animationState.update(delta);
+                this.animationState.apply(this.skeleton);
+                this.skeleton.updateWorldTransform(spine.Physics.update);
             }
 
             render(canvas) {
-                let renderer = canvas.renderer;				
-                renderer.resize(spine.ResizeMode.Expand);				
+                let renderer = canvas.renderer;
+                renderer.resize(spine.ResizeMode.Expand);
                 canvas.clear(0.2, 0.2, 0.2, 1);
-                
-                renderer.begin();				
+
+                renderer.begin();
                 renderer.drawSkeleton(this.skeleton, true);
 
                 // Draw a circle with a radius of 20 pixels around each draggable bone
                 let boneColor = new spine.Color(1, 0, 0, 0.5);
                 let selectedBoneColor = new spine.Color(0, 1, 0, 0.5);
-                for (let bone of this.draggableBones) {            
+                for (let bone of this.draggableBones) {
                     renderer.circle(true, bone.worldX, bone.worldY, 20, bone == this.selectedBone ? selectedBoneColor : boneColor);
-                }	        
+                }
 
                 renderer.end();
             }

@@ -23,7 +23,7 @@ var clippingDemo = function (canvas, bgColor) {
 		state = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
 		state.setAnimation(0, "portal", true);
 		state.apply(skeleton);
-		skeleton.updateWorldTransform();
+		skeleton.updateWorldTransform(spine.Physics.update);
 		var offset = new spine.Vector2();
 		bounds = new spine.Vector2();
 		skeleton.getBounds(offset, bounds, []);
@@ -57,7 +57,7 @@ var clippingDemo = function (canvas, bgColor) {
 				var time = animationDuration * percent;
 				state.update(time - playTime);
 				state.apply(skeleton);
-				skeleton.updateWorldTransform();
+				skeleton.updateWorldTransform(spine.Physics.update);
 				playTime = time;
 			}
 		};
@@ -88,7 +88,7 @@ var clippingDemo = function (canvas, bgColor) {
 
 			state.update(delta);
 			state.apply(skeleton);
-			skeleton.updateWorldTransform();
+			skeleton.updateWorldTransform(spine.Physics.update);
 		}
 
 		renderer.camera.viewportWidth = bounds.x * 1.6;

@@ -59,7 +59,7 @@ var additiveBlendingDemo = function (canvas, bgColor) {
 		down.alpha = 0;
 
 		state.apply(skeleton);
-		skeleton.updateWorldTransform();
+		skeleton.updateWorldTransform(spine.Physics.update);
 		var offset = new spine.Vector2();
 		bounds = new spine.Vector2();
 		skeleton.getBounds(offset, bounds, []);
@@ -122,7 +122,7 @@ var additiveBlendingDemo = function (canvas, bgColor) {
 
 		state.update(delta);
 		state.apply(skeleton);
-		skeleton.updateWorldTransform();
+		skeleton.updateWorldTransform(spine.Physics.update);
 
 		renderer.camera.viewportWidth = bounds.x * 1.4;
 		renderer.camera.viewportHeight = bounds.y * 1.4;

@@ -111,7 +111,7 @@
 				}
 				this.skeleton.setSkin(newSkin);
 				this.skeleton.setToSetupPose();
-				this.skeleton.updateWorldTransform();
+				this.skeleton.updateWorldTransform(spine.Physics.update);
 
 				// Calculate the bounds so we can center and zoom
 				// the camera such that the skeleton is in full view.
@@ -149,7 +149,7 @@
 					// to the setup pose and calculate the world transforms
 					this.skeleton.setSkin(skin);
 					this.skeleton.setToSetupPose();
-					this.skeleton.updateWorldTransform();
+					this.skeleton.updateWorldTransform(spine.Physics.update);
 
 					// Calculate the bounding box enclosing the skeleton.
 					let offset = new spine.Vector2(), size = new spine.Vector2();
@@ -158,7 +158,7 @@
 					// Position the renderer camera on the center of the bounds, and
 					// set the zoom so the full skin is visible within the 300x300
 					// rendering area. We leave 10% of empty space around a skin in the
-					// thumbnail, hence the multiplication of 1.1 for the zoom factor.					
+					// thumbnail, hence the multiplication of 1.1 for the zoom factor.
 					camera.position.x = offset.x + size.x / 2;
 					camera.position.y = offset.y + size.y / 2;
 					camera.zoom = size.x > size.y ? size.x / THUMBNAIL_SIZE * 1.1 : size.y / THUMBNAIL_SIZE * 1.1;
@@ -214,7 +214,7 @@
 			update(canvas, delta) {
 				this.state.update(delta);
 				this.state.apply(this.skeleton);
-				this.skeleton.updateWorldTransform();
+				this.skeleton.updateWorldTransform(spine.Physics.update);
 			}
 
 			render(canvas) {

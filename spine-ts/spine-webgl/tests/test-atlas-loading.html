@@ -33,7 +33,7 @@
             animationState = new spine.AnimationState(animationStateData);
             var offset = new spine.Vector2();
             var size = new spine.Vector2();
-            skeleton.updateWorldTransform();
+            skeleton.updateWorldTransform(spine.Physics.update);
             skeleton.getBounds(offset, size, []);
             renderer.camera.position.x = offset.x + size.x / 2;
             renderer.camera.position.y = offset.y + size.y / 2;
@@ -57,7 +57,7 @@
         time.update();
         animationState.update(time.delta);
         animationState.apply(skeleton);
-        skeleton.updateWorldTransform();
+        skeleton.updateWorldTransform(spine.Physics.update);
 
         renderer.begin();
         renderer.drawSkeleton(skeleton, true);

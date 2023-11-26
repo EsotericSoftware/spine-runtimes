@@ -31,14 +31,14 @@ var vineDemo = function (canvas, bgColor) {
 		var skeletonData = skeletonJson.readSkeletonData(assetManager.get("demos.json").vine);
 		skeleton = new spine.Skeleton(skeletonData);
 		skeleton.setToSetupPose();
-		skeleton.updateWorldTransform();
+		skeleton.updateWorldTransform(spine.Physics.update);
 		var offset = new spine.Vector2();
 		bounds = new spine.Vector2();
 		skeleton.getBounds(offset, bounds, []);
 		state = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
 		state.setAnimation(0, "animation", true);
 		state.apply(skeleton);
-		skeleton.updateWorldTransform();
+		skeleton.updateWorldTransform(spine.Physics.update);
 
 		renderer.camera.position.x = offset.x + bounds.x / 2;
 		renderer.camera.position.y = offset.y + bounds.y / 2;
@@ -70,7 +70,7 @@ var vineDemo = function (canvas, bgColor) {
 				time = animationDuration * percent;
 				state.update(time - playTime);
 				state.apply(skeleton);
-				skeleton.updateWorldTransform();
+				skeleton.updateWorldTransform(spine.Physics.update);
 				playTime = time;
 			}
 		};
@@ -117,7 +117,7 @@ var vineDemo = function (canvas, bgColor) {
 			state.apply(skeleton);
 		}
 
-		skeleton.updateWorldTransform();
+		skeleton.updateWorldTransform(spine.Physics.update);
 
 		renderer.camera.viewportWidth = bounds.x * 1.2;
 		renderer.camera.viewportHeight = bounds.y * 1.2;
