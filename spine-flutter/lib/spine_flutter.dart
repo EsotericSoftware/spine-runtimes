@@ -38,11 +38,12 @@ import 'package:flutter/rendering.dart' as rendering;
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
-import 'package:raw_image_provider/raw_image_provider.dart';
+
 
 import 'ffi_proxy.dart';
 import 'init.dart' if (dart.library.html) 'init_web.dart';
 import 'spine_flutter_bindings_generated.dart';
+import 'raw_image_provider.dart';
 
 export 'spine_widget.dart';
 

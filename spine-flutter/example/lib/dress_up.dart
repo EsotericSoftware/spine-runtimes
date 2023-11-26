@@ -27,10 +27,10 @@
 /// SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///
 
+import 'package:spine_flutter/raw_image_provider.dart';
 import 'package:spine_flutter/spine_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart' as painting;
-import 'package:raw_image_provider/raw_image_provider.dart';
 
 class DressUp extends StatefulWidget {
   const DressUp({Key? key}) : super(key: key);
