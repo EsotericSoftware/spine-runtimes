@@ -387,11 +387,9 @@ namespace Spine {
 		}
 
 		private void SortPhysicsConstraint (PhysicsConstraint constraint) {
-			constraint.active = !constraint.data.skinRequired || (skin != null && skin.constraints.Contains(constraint.data));
-			if (!constraint.active) return;
-
 			Bone bone = constraint.bone;
-			constraint.active = bone.active;
+			constraint.active = bone.active
+				&& (!constraint.data.skinRequired || (skin != null && skin.constraints.Contains(constraint.data)));
 			if (!constraint.active) return;
 
 			SortBone(bone);
