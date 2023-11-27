@@ -70,11 +70,12 @@ class NullAttachmentLoader : public AttachmentLoader {
 };
 
 int main(void) {
-	String atlasFile("");
-	String skeletonFile("/Users/badlogic/workspaces/spine-runtimes/spine-haxe/example/assets/vine-pro.json");
+	String atlasFile("/Users/badlogic/Desktop/basemodel-male/basemodel-male.atlas");
+	String skeletonFile("/Users/badlogic/Desktop/basemodel-male/basemodel-male.skel");
 	String animation = "";
+    String skin = "BasicBody";
 
-	float scale = 1.0f;
+	float scale = 0.1f;
 	SFMLTextureLoader textureLoader;
 	NullAttachmentLoader nullLoader;
 	Atlas *atlas = atlasFile.length() == 0 ? nullptr : new Atlas(atlasFile, &textureLoader);
@@ -106,6 +107,7 @@ int main(void) {
     drawable.skeleton->updateWorldTransform();
 	drawable.skeleton->setPosition(320, 590);
 	if (animation.length() > 0) drawable.state->setAnimation(0, animation, true);
+    if (skin.length() > 0) drawable.skeleton->setSkin(skin);
 
 	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - testbed");
 	window.setFramerateLimit(60);
