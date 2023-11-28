@@ -206,7 +206,7 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 			atlas = new TextureAtlas(atlasFile.data);
 			if (this.isWebGL) {
 				let gl = this.gl!;
-				gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+				if (GLTexture.DISABLE_UNPACK_PREMULTIPLIED_ALPHA_WEBGL) gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
 				for (let atlasPage of atlas.pages) {
 					atlasPage.setTexture(new GLTexture(gl, this.game.textures.get(atlasKey + "!" + atlasPage.name).getSourceImage() as HTMLImageElement | ImageBitmap, false));
 				}
