@@ -114,9 +114,9 @@ protected:
 	class UAssetImportData *importData = nullptr;
 
 	virtual void PostInitProperties() override;
-	virtual void GetAssetRegistryTags(TArray<FAssetRegistryTag> &OutTags) const override;
+	virtual void
+	GetAssetRegistryTags(TArray<FAssetRegistryTag> &OutTags) const override;
 	virtual void Serialize(FArchive &Ar) override;
-	virtual void PostLoadAssetRegistryTags(const FAssetData &InAssetData, TArray<FAssetRegistryTag> &OutTagsAndValuesToUpdate) const override;
 #endif
 
 	void LoadInfo();

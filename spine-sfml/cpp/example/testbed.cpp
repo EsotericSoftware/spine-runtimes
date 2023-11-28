@@ -73,7 +73,7 @@ int main(void) {
 	String atlasFile("/Users/badlogic/Desktop/basemodel-male/basemodel-male.atlas");
 	String skeletonFile("/Users/badlogic/Desktop/basemodel-male/basemodel-male.skel");
 	String animation = "";
-    String skin = "BasicBody";
+	String skin = "BasicBody";
 
 	float scale = 0.1f;
 	SFMLTextureLoader textureLoader;
@@ -104,10 +104,10 @@ int main(void) {
 
 	AnimationStateData stateData(skeletonData);
 	SkeletonDrawable drawable(skeletonData, &stateData);
-    drawable.skeleton->updateWorldTransform();
+	drawable.skeleton->updateWorldTransform();
 	drawable.skeleton->setPosition(320, 590);
 	if (animation.length() > 0) drawable.state->setAnimation(0, animation, true);
-    if (skin.length() > 0) drawable.skeleton->setSkin(skin);
+	if (skin.length() > 0) drawable.skeleton->setSkin(skin);
 
 	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - testbed");
 	window.setFramerateLimit(60);
