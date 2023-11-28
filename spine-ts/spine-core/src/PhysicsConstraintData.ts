@@ -34,7 +34,7 @@ import { ConstraintData } from "./ConstraintData.js";
 /** Stores the setup pose for a {@link PhysicsConstraint}.
  * <p>
  * See <a href="http://esotericsoftware.com/spine-physics-constraints">Physics constraints</a> in the Spine User Guide. */
-export class  PhysicsConstraintData extends ConstraintData {
+export class PhysicsConstraintData extends ConstraintData {
 	private _bone: BoneData | null = null;
 	/** The bone constrained by this physics constraint. */
 	public set bone (boneData: BoneData) { this._bone = boneData; }

@@ -76,7 +76,7 @@ export class PhysicsConstraint implements Updatable {
 	remaining = 0;
 	lastTime = 0;
 
-	constructor(data: PhysicsConstraintData, skeleton: Skeleton) {
+	constructor (data: PhysicsConstraintData, skeleton: Skeleton) {
 		this.data = data;
 		this.skeleton = skeleton;
 		this.bone = skeleton.bones[data.bone.index];
@@ -128,102 +128,102 @@ export class PhysicsConstraint implements Updatable {
 		const l = bone.data.length;
 
 		switch (physics) {
-		case Physics.none:
-			return;
-		case Physics.reset:
-			this.reset();
+			case Physics.none:
+				return;
+			case Physics.reset:
+				this.reset();
 			// Fall through.
-		case Physics.update:
-			this.remaining += Math.max(this.skeleton.time - this.lastTime, 0);
-			this.lastTime = this.skeleton.time;
+			case Physics.update:
+				this.remaining += Math.max(this.skeleton.time - this.lastTime, 0);
+				this.lastTime = this.skeleton.time;
 
-			const bx = bone.worldX, by = bone.worldY;
-			if (this._reset) {
-				this._reset = false;
-				this.ux = bx;
-				this.uy = by;
-			} else {
-				let remaining = this.remaining, i = this.inertia, step = this.data.step;
-				if (x || y) {
-					if (x) {
-						this.xOffset += (this.ux - bx) * i;
-						this.ux = bx;
-					}
-					if (y) {
-						this.yOffset += (this.uy - by) * i;
-						this.uy = by;
-					}
-					if (remaining >= step) {
-						const m = this.massInverse * step, e = this.strength, w = this.wind * 100, g = this.gravity * -100;
-						const d = Math.pow(this.damping, 60 * step);
-						do {
-							if (x) {
-								this.xVelocity += (w - this.xOffset * e) * m;
-								this.xOffset += this.xVelocity * step;
-								this.xVelocity *= d;
-							}
-							if (y) {
-								this.yVelocity += (g - this.yOffset * e) * m;
-								this.yOffset += this.yVelocity * step;
-								this.yVelocity *= d;
-							}
-							remaining -= step;
-						} while (remaining >= step);
-					}
-					if (x) bone.worldX += this.xOffset * mix * this.data.x;
-					if (y) bone.worldY += this.yOffset * mix * this.data.y;
-				}
-				if (rotateOrShearX || scaleX) {
-					let ca = Math.atan2(bone.c, bone.a), c = 0, s = 0, mr = 0;
-					if (rotateOrShearX) {
-						mr = mix * this.data.rotate;
-						let dx = this.cx - bone.worldX, dy = this.cy - bone.worldY, r = Math.atan2(dy + this.ty, dx + this.tx) - ca - this.rotateOffset * mr;
-						this.rotateOffset += (r - Math.ceil(r * MathUtils.invPI2 - 0.5) * MathUtils.PI2) * i;
-						r = this.rotateOffset * mr + ca;
-						c = Math.cos(r);
-						s = Math.sin(r);
-						if (scaleX) {
-							r = l * bone.getWorldScaleX();
-							if (r > 0) this.scaleOffset += (dx * c + dy * s) * i / r;
+				const bx = bone.worldX, by = bone.worldY;
+				if (this._reset) {
+					this._reset = false;
+					this.ux = bx;
+					this.uy = by;
+				} else {
+					let remaining = this.remaining, i = this.inertia, step = this.data.step;
+					if (x || y) {
+						if (x) {
+							this.xOffset += (this.ux - bx) * i;
+							this.ux = bx;
 						}
-					} else {
-						c = Math.cos(ca);
-						s = Math.sin(ca);
-						const r = l * bone.getWorldScaleX();
-						if (r > 0) this.scaleOffset += ((this.cx - bone.worldX) * c + (this.cy - bone.worldY) * s) * i / r;
+						if (y) {
+							this.yOffset += (this.uy - by) * i;
+							this.uy = by;
+						}
+						if (remaining >= step) {
+							const m = this.massInverse * step, e = this.strength, w = this.wind * 100, g = this.gravity * -100;
+							const d = Math.pow(this.damping, 60 * step);
+							do {
+								if (x) {
+									this.xVelocity += (w - this.xOffset * e) * m;
+									this.xOffset += this.xVelocity * step;
+									this.xVelocity *= d;
+								}
+								if (y) {
+									this.yVelocity += (g - this.yOffset * e) * m;
+									this.yOffset += this.yVelocity * step;
+									this.yVelocity *= d;
+								}
+								remaining -= step;
+							} while (remaining >= step);
+						}
+						if (x) bone.worldX += this.xOffset * mix * this.data.x;
+						if (y) bone.worldY += this.yOffset * mix * this.data.y;
 					}
-					remaining = this.remaining;
-					if (remaining >= step) {
-						const m = this.massInverse * step, e = this.strength, w = this.wind, g = this.gravity;
-						const d = Math.pow(this.damping, 60 * step);
-						while (true) {
-							remaining -= step;
+					if (rotateOrShearX || scaleX) {
+						let ca = Math.atan2(bone.c, bone.a), c = 0, s = 0, mr = 0;
+						if (rotateOrShearX) {
+							mr = mix * this.data.rotate;
+							let dx = this.cx - bone.worldX, dy = this.cy - bone.worldY, r = Math.atan2(dy + this.ty, dx + this.tx) - ca - this.rotateOffset * mr;
+							this.rotateOffset += (r - Math.ceil(r * MathUtils.invPI2 - 0.5) * MathUtils.PI2) * i;
+							r = this.rotateOffset * mr + ca;
+							c = Math.cos(r);
+							s = Math.sin(r);
 							if (scaleX) {
-								this.scaleVelocity += (w * c - g * s - this.scaleOffset * e) * m;
-								this.scaleOffset += this.scaleVelocity * step;
-								this.scaleVelocity *= d;
+								r = l * bone.getWorldScaleX();
+								if (r > 0) this.scaleOffset += (dx * c + dy * s) * i / r;
 							}
-							if (rotateOrShearX) {
-								this.rotateVelocity += (-0.01 * l * (w * s + g * c) - this.rotateOffset * e) * m;
-								this.rotateOffset += this.rotateVelocity * step;
-								this.rotateVelocity *= d;
-								if (remaining < step) break;
-								const r = this.rotateOffset * mr + ca;
-								c = Math.cos(r);
-								s = Math.sin(r);
-							} else if (remaining < step) //
-								break;
+						} else {
+							c = Math.cos(ca);
+							s = Math.sin(ca);
+							const r = l * bone.getWorldScaleX();
+							if (r > 0) this.scaleOffset += ((this.cx - bone.worldX) * c + (this.cy - bone.worldY) * s) * i / r;
+						}
+						remaining = this.remaining;
+						if (remaining >= step) {
+							const m = this.massInverse * step, e = this.strength, w = this.wind, g = this.gravity;
+							const d = Math.pow(this.damping, 60 * step);
+							while (true) {
+								remaining -= step;
+								if (scaleX) {
+									this.scaleVelocity += (w * c - g * s - this.scaleOffset * e) * m;
+									this.scaleOffset += this.scaleVelocity * step;
+									this.scaleVelocity *= d;
+								}
+								if (rotateOrShearX) {
+									this.rotateVelocity += (-0.01 * l * (w * s + g * c) - this.rotateOffset * e) * m;
+									this.rotateOffset += this.rotateVelocity * step;
+									this.rotateVelocity *= d;
+									if (remaining < step) break;
+									const r = this.rotateOffset * mr + ca;
+									c = Math.cos(r);
+									s = Math.sin(r);
+								} else if (remaining < step) //
+									break;
+							}
 						}
 					}
+					this.remaining = remaining;
 				}
-				this.remaining = remaining;
-			}
-			this.cx = bone.worldX;
-			this.cy = bone.worldY;
-			break;
-		case Physics.pose:
-			if (x) bone.worldX += this.xOffset * mix * this.data.x;
-			if (y) bone.worldY += this.yOffset * mix * this.data.y;
+				this.cx = bone.worldX;
+				this.cy = bone.worldY;
+				break;
+			case Physics.pose:
+				if (x) bone.worldX += this.xOffset * mix * this.data.x;
+				if (y) bone.worldY += this.yOffset * mix * this.data.y;
 		}
 
 		if (rotateOrShearX) {

@@ -2278,7 +2278,7 @@ public class Animation {
 			PhysicsConstraint constraint;
 			if (constraintIndex == -1) {
 				float value = time >= frames[0] ? getCurveValue(time) : 0;
-			
+
 				Object[] constraints = skeleton.physicsConstraints.items;
 				for (int i = 0, n = skeleton.physicsConstraints.size; i < n; i++) {
 					constraint = (PhysicsConstraint)constraints[i];

@@ -199,7 +199,7 @@ export class MathUtils {
 		return Math.sin(degrees * MathUtils.degRad);
 	}
 
-	static atan2Deg(y: number, x: number) {
+	static atan2Deg (y: number, x: number) {
 		return Math.atan2(y, x) * MathUtils.degRad;
 	}
 

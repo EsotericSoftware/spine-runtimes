@@ -113,7 +113,7 @@ class SkeletonViewerUI {
 	CheckBox debugPathsCheckbox = new CheckBox("Paths", skin);
 	CheckBox debugPointsCheckbox = new CheckBox("Points", skin);
 	CheckBox debugClippingCheckbox = new CheckBox("Clipping", skin);
-	
+
 	CheckBox pmaCheckbox = new CheckBox("Premultiplied", skin);
 
 	CheckBox linearCheckbox = new CheckBox("Linear", skin);

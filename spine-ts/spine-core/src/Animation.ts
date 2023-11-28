@@ -350,20 +350,20 @@ export abstract class CurveTimeline1 extends CurveTimeline {
 	getRelativeValue (time: number, alpha: number, blend: MixBlend, current: number, setup: number) {
 		if (time < this.frames[0]) {
 			switch (blend) {
-			case MixBlend.setup:
-				return setup;
-			case MixBlend.first:
-				return current + (setup - current) * alpha;
+				case MixBlend.setup:
+					return setup;
+				case MixBlend.first:
+					return current + (setup - current) * alpha;
 			}
 			return current;
 		}
 		let value = this.getCurveValue(time);
 		switch (blend) {
-		case MixBlend.setup:
-			return setup + value * alpha;
-		case MixBlend.first:
-		case MixBlend.replace:
-			value += setup - current;
+			case MixBlend.setup:
+				return setup + value * alpha;
+			case MixBlend.first:
+			case MixBlend.replace:
+				value += setup - current;
 		}
 		return current + value * alpha;
 	}
@@ -371,10 +371,10 @@ export abstract class CurveTimeline1 extends CurveTimeline {
 	getAbsoluteValue (time: number, alpha: number, blend: MixBlend, current: number, setup: number) {
 		if (time < this.frames[0]) {
 			switch (blend) {
-			case MixBlend.setup:
-				return setup;
-			case MixBlend.first:
-				return current + (setup - current) * alpha;
+				case MixBlend.setup:
+					return setup;
+				case MixBlend.first:
+					return current + (setup - current) * alpha;
 			}
 			return current;
 		}
@@ -383,13 +383,13 @@ export abstract class CurveTimeline1 extends CurveTimeline {
 		return current + (value - current) * alpha;
 	}
 
-	getAbsoluteValue2 (time: number, alpha: number, blend: MixBlend , current: number, setup: number, value: number) {
+	getAbsoluteValue2 (time: number, alpha: number, blend: MixBlend, current: number, setup: number, value: number) {
 		if (time < this.frames[0]) {
 			switch (blend) {
-			case MixBlend.setup:
-				return setup;
-			case MixBlend.first:
-				return current + (setup - current) * alpha;
+				case MixBlend.setup:
+					return setup;
+				case MixBlend.first:
+					return current + (setup - current) * alpha;
 			}
 			return current;
 		}
@@ -401,10 +401,10 @@ export abstract class CurveTimeline1 extends CurveTimeline {
 		const frames = this.frames;
 		if (time < frames[0]) {
 			switch (blend) {
-			case MixBlend.setup:
-				return setup;
-			case MixBlend.first:
-				return current + (setup - current) * alpha;
+				case MixBlend.setup:
+					return setup;
+				case MixBlend.first:
+					return current + (setup - current) * alpha;
 			}
 			return current;
 		}
@@ -416,22 +416,22 @@ export abstract class CurveTimeline1 extends CurveTimeline {
 		// Mixing out uses sign of setup or current pose, else use sign of key.
 		if (direction == MixDirection.mixOut) {
 			switch (blend) {
-			case MixBlend.setup:
-				return setup + (Math.abs(value) * MathUtils.signum(setup) - setup) * alpha;
-			case MixBlend.first:
-			case MixBlend.replace:
-				return current + (Math.abs(value) * MathUtils.signum(current) - current) * alpha;
+				case MixBlend.setup:
+					return setup + (Math.abs(value) * MathUtils.signum(setup) - setup) * alpha;
+				case MixBlend.first:
+				case MixBlend.replace:
+					return current + (Math.abs(value) * MathUtils.signum(current) - current) * alpha;
 			}
 		} else {
 			let s = 0;
 			switch (blend) {
-			case MixBlend.setup:
-				s = Math.abs(setup) * MathUtils.signum(value);
-				return s + (value - s) * alpha;
-			case MixBlend.first:
-			case MixBlend.replace:
-				s = Math.abs(current) * MathUtils.signum(value);
-				return s + (value - s) * alpha;
+				case MixBlend.setup:
+					s = Math.abs(setup) * MathUtils.signum(value);
+					return s + (value - s) * alpha;
+				case MixBlend.first:
+				case MixBlend.replace:
+					s = Math.abs(current) * MathUtils.signum(value);
+					return s + (value - s) * alpha;
 			}
 		}
 		return current + (value - setup) * alpha;
@@ -2024,220 +2024,220 @@ export abstract class PhysicsConstraintTimeline extends CurveTimeline1 {
 	abstract global (constraint: PhysicsConstraintData): boolean;
 }
 
-	/** Changes a physics constraint's {@link PhysicsConstraint#getInertia()}. */
-	export class PhysicsConstraintInertiaTimeline extends PhysicsConstraintTimeline {
-		constructor (frameCount: number, bezierCount: number, physicsConstraintIndex: number, property: number) {
-			super(frameCount, bezierCount, physicsConstraintIndex, Property.physicsConstraintInertia);
-		}
-
-		setup (constraint: PhysicsConstraint): number {
-			return constraint.data.inertia;
-		}
-
-		get (constraint: PhysicsConstraint): number {
-			return constraint.inertia;
-		}
-
-		set (constraint: PhysicsConstraint, value: number): void {
-			constraint.inertia = value;
-		}
-
-		global (constraint: PhysicsConstraintData): boolean {
-			return constraint.inertiaGlobal;
-		}
+/** Changes a physics constraint's {@link PhysicsConstraint#getInertia()}. */
+export class PhysicsConstraintInertiaTimeline extends PhysicsConstraintTimeline {
+	constructor (frameCount: number, bezierCount: number, physicsConstraintIndex: number, property: number) {
+		super(frameCount, bezierCount, physicsConstraintIndex, Property.physicsConstraintInertia);
 	}
 
-	/** Changes a physics constraint's {@link PhysicsConstraint#getStrength()}. */
-	export class PhysicsConstraintStrengthTimeline extends PhysicsConstraintTimeline {
-		constructor (frameCount: number, bezierCount: number, physicsConstraintIndex: number, property: number) {
-			super(frameCount, bezierCount, physicsConstraintIndex, Property.physicsConstraintStrength);
-		}
-
-		setup (constraint: PhysicsConstraint): number {
-			return constraint.data.strength;
-		}
-
-		get (constraint: PhysicsConstraint): number {
-			return constraint.strength;
-		}
-
-		set (constraint: PhysicsConstraint, value: number): void {
-			constraint.strength = value;
-		}
-
-		global (constraint: PhysicsConstraintData): boolean {
-			return constraint.strengthGlobal;
-		}
+	setup (constraint: PhysicsConstraint): number {
+		return constraint.data.inertia;
 	}
 
-	/** Changes a physics constraint's {@link PhysicsConstraint#getDamping()}. */
-	export class PhysicsConstraintDampingTimeline extends PhysicsConstraintTimeline {
-		constructor (frameCount: number, bezierCount: number, physicsConstraintIndex: number, property: number) {
-			super(frameCount, bezierCount, physicsConstraintIndex, Property.physicsConstraintDamping);
-		}
-
-		setup (constraint: PhysicsConstraint): number {
-			return constraint.data.damping;
-		}
-
-		get (constraint: PhysicsConstraint): number {
-			return constraint.damping;
-		}
-
-		set (constraint: PhysicsConstraint, value: number): void {
-			constraint.damping = value;
-		}
-
-		global (constraint: PhysicsConstraintData): boolean {
-			return constraint.dampingGlobal;
-		}
+	get (constraint: PhysicsConstraint): number {
+		return constraint.inertia;
 	}
 
-	/** Changes a physics constraint's {@link PhysicsConstraint#getMassInverse()}. The timeline values are not inverted. */
-	export class PhysicsConstraintMassTimeline extends PhysicsConstraintTimeline {
-		constructor (frameCount: number, bezierCount: number, physicsConstraintIndex: number, property: number) {
-			super(frameCount, bezierCount, physicsConstraintIndex, Property.physicsConstraintMass);
-		}
-
-		setup (constraint: PhysicsConstraint): number {
-			return 1 / constraint.data.massInverse;
-		}
-
-		get (constraint: PhysicsConstraint): number {
-			return 1 / constraint.massInverse;
-		}
-
-		set (constraint: PhysicsConstraint, value: number): void {
-			constraint.massInverse = 1 / value;
-		}
-
-		global (constraint: PhysicsConstraintData): boolean {
-			return constraint.massGlobal;
-		}
+	set (constraint: PhysicsConstraint, value: number): void {
+		constraint.inertia = value;
 	}
 
-	/** Changes a physics constraint's {@link PhysicsConstraint#getWind()}. */
-	export class PhysicsConstraintWindTimeline extends PhysicsConstraintTimeline {
-		constructor (frameCount: number, bezierCount: number, physicsConstraintIndex: number, property: number) {
-			super(frameCount, bezierCount, physicsConstraintIndex, Property.physicsConstraintWind);
-		}
+	global (constraint: PhysicsConstraintData): boolean {
+		return constraint.inertiaGlobal;
+	}
+}
 
-		setup (constraint: PhysicsConstraint): number {
-			return constraint.data.wind;
-		}
-
-		get (constraint: PhysicsConstraint): number {
-			return constraint.wind;
-		}
-
-		set (constraint: PhysicsConstraint, value: number): void {
-			constraint.wind = value;
-		}
-
-		global (constraint: PhysicsConstraintData): boolean {
-			return constraint.windGlobal;
-		}
+/** Changes a physics constraint's {@link PhysicsConstraint#getStrength()}. */
+export class PhysicsConstraintStrengthTimeline extends PhysicsConstraintTimeline {
+	constructor (frameCount: number, bezierCount: number, physicsConstraintIndex: number, property: number) {
+		super(frameCount, bezierCount, physicsConstraintIndex, Property.physicsConstraintStrength);
 	}
 
-	/** Changes a physics constraint's {@link PhysicsConstraint#getGravity()}. */
-	export class PhysicsConstraintGravityTimeline extends PhysicsConstraintTimeline {
-		constructor (frameCount: number, bezierCount: number, physicsConstraintIndex: number, property: number) {
-			super(frameCount, bezierCount, physicsConstraintIndex, Property.physicsConstraintGravity);
-		}
-
-		setup (constraint: PhysicsConstraint): number {
-			return constraint.data.gravity;
-		}
-
-		get (constraint: PhysicsConstraint): number {
-			return constraint.gravity;
-		}
-
-		set (constraint: PhysicsConstraint, value: number): void {
-			constraint.gravity = value;
-		}
-
-		global (constraint: PhysicsConstraintData): boolean {
-			return constraint.gravityGlobal;
-		}
+	setup (constraint: PhysicsConstraint): number {
+		return constraint.data.strength;
 	}
 
-	/** Changes a physics constraint's {@link PhysicsConstraint#getMix()}. */
-	export class PhysicsConstraintMixTimeline extends PhysicsConstraintTimeline {
-		constructor (frameCount: number, bezierCount: number, physicsConstraintIndex: number, property: number) {
-			super(frameCount, bezierCount, physicsConstraintIndex, Property.physicsConstraintMix);
-		}
-
-		setup (constraint: PhysicsConstraint): number {
-			return constraint.data.mix;
-		}
-
-		get (constraint: PhysicsConstraint): number {
-			return constraint.mix;
-		}
-
-		set (constraint: PhysicsConstraint, value: number): void {
-			constraint.mix = value;
-		}
-
-		global (constraint: PhysicsConstraintData): boolean {
-			return constraint.mixGlobal;
-		}
+	get (constraint: PhysicsConstraint): number {
+		return constraint.strength;
 	}
 
-	/** Resets a physics constraint when specific animation times are reached. */
-	export class PhysicsConstraintResetTimeline extends Timeline {
-		private static propertyIds: string[] = [Property.physicsConstraintReset.toString()];
+	set (constraint: PhysicsConstraint, value: number): void {
+		constraint.strength = value;
+	}
 
-		/** The index of the physics constraint in {@link Skeleton#getPhysicsConstraints()} that will be reset when this timeline is
-		* applied, or -1 if all physics constraints in the skeleton will be reset. */
-		constraintIndex: number;
+	global (constraint: PhysicsConstraintData): boolean {
+		return constraint.strengthGlobal;
+	}
+}
 
-		/** @param physicsConstraintIndex -1 for all physics constraints in the skeleton. */
-		constructor (frameCount: number, physicsConstraintIndex: number) {
-			super(frameCount, PhysicsConstraintResetTimeline.propertyIds);
-			this.constraintIndex = physicsConstraintIndex;
+/** Changes a physics constraint's {@link PhysicsConstraint#getDamping()}. */
+export class PhysicsConstraintDampingTimeline extends PhysicsConstraintTimeline {
+	constructor (frameCount: number, bezierCount: number, physicsConstraintIndex: number, property: number) {
+		super(frameCount, bezierCount, physicsConstraintIndex, Property.physicsConstraintDamping);
+	}
+
+	setup (constraint: PhysicsConstraint): number {
+		return constraint.data.damping;
+	}
+
+	get (constraint: PhysicsConstraint): number {
+		return constraint.damping;
+	}
+
+	set (constraint: PhysicsConstraint, value: number): void {
+		constraint.damping = value;
+	}
+
+	global (constraint: PhysicsConstraintData): boolean {
+		return constraint.dampingGlobal;
+	}
+}
+
+/** Changes a physics constraint's {@link PhysicsConstraint#getMassInverse()}. The timeline values are not inverted. */
+export class PhysicsConstraintMassTimeline extends PhysicsConstraintTimeline {
+	constructor (frameCount: number, bezierCount: number, physicsConstraintIndex: number, property: number) {
+		super(frameCount, bezierCount, physicsConstraintIndex, Property.physicsConstraintMass);
+	}
+
+	setup (constraint: PhysicsConstraint): number {
+		return 1 / constraint.data.massInverse;
+	}
+
+	get (constraint: PhysicsConstraint): number {
+		return 1 / constraint.massInverse;
+	}
+
+	set (constraint: PhysicsConstraint, value: number): void {
+		constraint.massInverse = 1 / value;
+	}
+
+	global (constraint: PhysicsConstraintData): boolean {
+		return constraint.massGlobal;
+	}
+}
+
+/** Changes a physics constraint's {@link PhysicsConstraint#getWind()}. */
+export class PhysicsConstraintWindTimeline extends PhysicsConstraintTimeline {
+	constructor (frameCount: number, bezierCount: number, physicsConstraintIndex: number, property: number) {
+		super(frameCount, bezierCount, physicsConstraintIndex, Property.physicsConstraintWind);
+	}
+
+	setup (constraint: PhysicsConstraint): number {
+		return constraint.data.wind;
+	}
+
+	get (constraint: PhysicsConstraint): number {
+		return constraint.wind;
+	}
+
+	set (constraint: PhysicsConstraint, value: number): void {
+		constraint.wind = value;
+	}
+
+	global (constraint: PhysicsConstraintData): boolean {
+		return constraint.windGlobal;
+	}
+}
+
+/** Changes a physics constraint's {@link PhysicsConstraint#getGravity()}. */
+export class PhysicsConstraintGravityTimeline extends PhysicsConstraintTimeline {
+	constructor (frameCount: number, bezierCount: number, physicsConstraintIndex: number, property: number) {
+		super(frameCount, bezierCount, physicsConstraintIndex, Property.physicsConstraintGravity);
+	}
+
+	setup (constraint: PhysicsConstraint): number {
+		return constraint.data.gravity;
+	}
+
+	get (constraint: PhysicsConstraint): number {
+		return constraint.gravity;
+	}
+
+	set (constraint: PhysicsConstraint, value: number): void {
+		constraint.gravity = value;
+	}
+
+	global (constraint: PhysicsConstraintData): boolean {
+		return constraint.gravityGlobal;
+	}
+}
+
+/** Changes a physics constraint's {@link PhysicsConstraint#getMix()}. */
+export class PhysicsConstraintMixTimeline extends PhysicsConstraintTimeline {
+	constructor (frameCount: number, bezierCount: number, physicsConstraintIndex: number, property: number) {
+		super(frameCount, bezierCount, physicsConstraintIndex, Property.physicsConstraintMix);
+	}
+
+	setup (constraint: PhysicsConstraint): number {
+		return constraint.data.mix;
+	}
+
+	get (constraint: PhysicsConstraint): number {
+		return constraint.mix;
+	}
+
+	set (constraint: PhysicsConstraint, value: number): void {
+		constraint.mix = value;
+	}
+
+	global (constraint: PhysicsConstraintData): boolean {
+		return constraint.mixGlobal;
+	}
+}
+
+/** Resets a physics constraint when specific animation times are reached. */
+export class PhysicsConstraintResetTimeline extends Timeline {
+	private static propertyIds: string[] = [Property.physicsConstraintReset.toString()];
+
+	/** The index of the physics constraint in {@link Skeleton#getPhysicsConstraints()} that will be reset when this timeline is
+	* applied, or -1 if all physics constraints in the skeleton will be reset. */
+	constraintIndex: number;
+
+	/** @param physicsConstraintIndex -1 for all physics constraints in the skeleton. */
+	constructor (frameCount: number, physicsConstraintIndex: number) {
+		super(frameCount, PhysicsConstraintResetTimeline.propertyIds);
+		this.constraintIndex = physicsConstraintIndex;
+	}
+
+	getFrameCount () {
+		return this.frames.length;
+	}
+
+	/** Sets the time for the specified frame.
+	 * @param frame Between 0 and <code>frameCount</code>, inclusive. */
+	setFrame (frame: number, time: number) {
+		this.frames[frame] = time;
+	}
+
+	/** Resets the physics constraint when frames > <code>lastTime</code> and <= <code>time</code>. */
+	apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
+
+		let constraint: PhysicsConstraint | undefined;
+		if (this.constraintIndex != -1) {
+			constraint = skeleton.physicsConstraints[this.constraintIndex];
+			if (!constraint.active) return;
 		}
 
-		getFrameCount () {
-			return this.frames.length;
-		}
+		const frames = this.frames;
 
-		/** Sets the time for the specified frame.
-		 * @param frame Between 0 and <code>frameCount</code>, inclusive. */
-		setFrame (frame: number, time: number) {
-			this.frames[frame] = time;
-		}
+		if (lastTime > time) { // Apply after lastTime for looped animations.
+			this.apply(skeleton, lastTime, Number.MAX_VALUE, [], alpha, blend, direction);
+			lastTime = -1;
+		} else if (lastTime >= frames[frames.length - 1]) // Last time is after last frame.
+			return;
+		if (time < frames[0]) return;
 
-		/** Resets the physics constraint when frames > <code>lastTime</code> and <= <code>time</code>. */
-		apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
-
-			let constraint: PhysicsConstraint | undefined;
-			if (this.constraintIndex != -1) {
-				constraint = skeleton.physicsConstraints[this.constraintIndex];
-				if (!constraint.active) return;
-			}
-
-			const frames = this.frames;
-
-			if (lastTime > time) { // Apply after lastTime for looped animations.
-				this.apply(skeleton, lastTime, Number.MAX_VALUE, [], alpha, blend, direction);
-				lastTime = -1;
-			} else if (lastTime >= frames[frames.length - 1]) // Last time is after last frame.
-				return;
-			if (time < frames[0]) return;
-
-			if (lastTime < frames[0] || time >= frames[Timeline.search1(frames, lastTime) + 1]) {
-				if (constraint != null)
-					constraint.reset();
-				else {
-					for (const constraint of skeleton.physicsConstraints) {
-						if (constraint.active) constraint.reset();
-					}
+		if (lastTime < frames[0] || time >= frames[Timeline.search1(frames, lastTime) + 1]) {
+			if (constraint != null)
+				constraint.reset();
+			else {
+				for (const constraint of skeleton.physicsConstraints) {
+					if (constraint.active) constraint.reset();
 				}
 			}
 		}
 	}
+}
 
 /** Changes a slot's {@link Slot#getSequenceIndex()} for an attachment's {@link Sequence}. */
 export class SequenceTimeline extends Timeline implements SlotTimeline {
