@@ -191,8 +191,8 @@ public class IkConstraint implements Updatable {
 		float rotationIK = -bone.ashearX - bone.arotation, tx, ty;
 		switch (bone.data.transformMode) {
 		case onlyTranslation:
-			tx = targetX - bone.worldX;
-			ty = targetY - bone.worldY;
+			tx = (targetX - bone.worldX) * Math.signum(bone.skeleton.scaleX);
+			ty = (targetY - bone.worldY) * Math.signum(bone.skeleton.scaleY);
 			break;
 		case noRotationOrReflection:
 			float s = Math.abs(pa * pd - pb * pc) / Math.max(0.0001f, pa * pa + pc * pc);

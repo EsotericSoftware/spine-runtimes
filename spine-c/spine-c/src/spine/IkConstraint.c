@@ -80,8 +80,8 @@ void spIkConstraint_apply1(spBone *bone, float targetX, float targetY, int /*boo
 
 	switch (bone->data->transformMode) {
 		case SP_TRANSFORMMODE_ONLYTRANSLATION:
-			tx = targetX - bone->worldX;
-			ty = targetY - bone->worldY;
+			tx = (targetX - bone->worldX) * SIGNUM(bone->skeleton->scaleX);
+			ty = (targetY - bone->worldY) * SIGNUM(bone->skeleton->scaleY);
 			break;
 		case SP_TRANSFORMMODE_NOROTATIONORREFLECTION: {
 			s = ABS(pa * pd - pb * pc) / MAX(0.0001f, pa * pa + pc * pc);

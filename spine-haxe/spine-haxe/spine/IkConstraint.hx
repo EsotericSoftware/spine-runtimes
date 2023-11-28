@@ -95,8 +95,8 @@ class IkConstraint implements Updatable {
 			ty:Float = 0;
 		switch (bone.data.transformMode) {
 			case TransformMode.onlyTranslation:
-				tx = targetX - bone.worldX;
-				ty = targetY - bone.worldY;
+				tx = (targetX - bone.worldX) * MathUtils.signum(bone.skeleton.scaleX);
+				ty = (targetY - bone.worldY) * MathUtils.signum(bone.skeleton.scaleY);
 			case TransformMode.noRotationOrReflection:
 				var s = Math.abs(pa * pd - pb * pc) / Math.max(0.0001, pa * pa + pc * pc);
 				var sa:Float = pa / bone.skeleton.scaleX;
