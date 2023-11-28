@@ -168,8 +168,8 @@ namespace Spine {
 
 			switch (bone.data.transformMode) {
 			case TransformMode.OnlyTranslation:
-				tx = targetX - bone.worldX;
-				ty = targetY - bone.worldY;
+				tx = (targetX - bone.worldX) * Math.Sign(bone.skeleton.ScaleX);
+				ty = (targetY - bone.worldY) * Math.Sign(bone.skeleton.ScaleY);
 				break;
 			case TransformMode.NoRotationOrReflection: {
 				float s = Math.Abs(pa * pd - pb * pc) / Math.Max(0.0001f, pa * pa + pc * pc);
