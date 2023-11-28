@@ -71,6 +71,5 @@ protected:
 
 	virtual void PostInitProperties() override;
 	virtual void Serialize(FArchive &Ar) override;
-	virtual void PostLoadAssetRegistryTags(const FAssetData &InAssetData, TArray<FAssetRegistryTag> &OutTagsAndValuesToUpdate) const override;
 #endif
 };
