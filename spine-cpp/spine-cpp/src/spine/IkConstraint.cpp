@@ -47,8 +47,8 @@ void IkConstraint::apply(Bone &bone, float targetX, float targetY, bool compress
 
 	switch (bone._data.getTransformMode()) {
 		case TransformMode_OnlyTranslation:
-			tx = targetX - bone._worldX;
-			ty = targetY - bone._worldY;
+			tx = (targetX - bone._worldX) * MathUtil::sign(bone.getSkeleton().getScaleX());
+			ty = (targetY - bone._worldY) * MathUtil::sign(bone.getSkeleton().getScaleY());
 			break;
 		case TransformMode_NoRotationOrReflection: {
 			float s = MathUtil::abs(pa * pd - pb * pc) / MathUtil::max(0.0001f, pa * pa + pc * pc);
