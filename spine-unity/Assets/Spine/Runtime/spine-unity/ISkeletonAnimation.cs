@@ -63,6 +63,8 @@ namespace Spine.Unity {
 		event UpdateBonesDelegate UpdateComplete;
 		Skeleton Skeleton { get; }
 		UpdateTiming UpdateTiming { get; set; }
+		Skeleton.Physics MainPhysicsUpdate { get; set; }
+		Skeleton.Physics AdditionalPhysicsUpdate { get; set; }
 	}
 
 	/// <summary>Holds a reference to a SkeletonDataAsset.</summary>

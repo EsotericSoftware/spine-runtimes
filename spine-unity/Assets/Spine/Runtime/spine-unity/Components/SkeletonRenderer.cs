@@ -423,7 +423,7 @@ namespace Spine.Unity {
 			// Generate mesh once, required to update mesh bounds for visibility
 			UpdateMode updateModeSaved = updateMode;
 			updateMode = UpdateMode.FullUpdate;
-			UpdateWorldTransform();
+			UpdateWorldTransform(Skeleton.Physics.Update);
 			LateUpdate();
 			updateMode = updateModeSaved;
 
@@ -439,8 +439,8 @@ namespace Spine.Unity {
 #endif
 		}
 
-		protected virtual void UpdateWorldTransform () {
-			skeleton.UpdateWorldTransform(Skeleton.Physics.Update);
+		protected virtual void UpdateWorldTransform (Skeleton.Physics physics) {
+			skeleton.UpdateWorldTransform(physics);
 		}
 
 		/// <summary>

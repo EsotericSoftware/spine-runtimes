@@ -213,7 +213,7 @@ namespace Spine.Unity {
 				Vector2 parentBoneScale;
 				GetScaleAffectingRootMotion(out parentBoneScale);
 				ClearEffectiveBoneOffsets(parentBoneScale);
-				skeletonComponent.Skeleton.UpdateWorldTransform(Skeleton.Physics.Update);
+				skeletonComponent.Skeleton.UpdateWorldTransform(Skeleton.Physics.Pose);
 			}
 			ClearRigidbodyTempMovement();
 
