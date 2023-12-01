@@ -39,6 +39,7 @@ rm -rf ../vine/export/*
 rm -rf ../owl/export/*
 rm -rf ../mix-and-match/export/*
 rm -rf ../chibi-stickers/export/*
+rm -rf ../sack/export/*
 
 echo ""
 echo "Exporting assets..."
@@ -84,6 +85,11 @@ echo "Exporting assets..."
 -i ../chibi-stickers/chibi-stickers-pro.spine -o ../chibi-stickers/export -e binary.json \
 -i ../chibi-stickers/images -o ../chibi-stickers/export -n chibi-stickers -p atlas-0.5.json \
 -i ../chibi-stickers/images -o ../chibi-stickers/export -n chibi-stickers-pma -p atlas-0.5-pma.json \
+\
+-i ../sack/sack-pro.spine -o ../sack/export -e json.json \
+-i ../sack/sack-pro.spine -o ../sack/export -e binary.json \
+-i ../sack/images -o ../sack/export -n sack -p atlas-0.5.json \
+-i ../sack/images -o ../sack/export -n sack-pma -p atlas-0.5-pma.json \
 \
 -i ../owl/owl-pro.spine -o ../owl/export -e json.json \
 -i ../owl/owl-pro.spine -o ../owl/export -e binary.json \
