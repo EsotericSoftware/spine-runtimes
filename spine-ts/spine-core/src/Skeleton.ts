@@ -342,7 +342,7 @@ export class Skeleton {
 
 	sortPhysicsConstraint (constraint: PhysicsConstraint) {
 		const bone = constraint.bone;
-		constraint.active = bone.active && !constraint.data.skinRequired || (this.skin != null && Utils.contains(this.skin.constraints, constraint.data, true));
+		constraint.active = bone.active && (!constraint.data.skinRequired || (this.skin != null && Utils.contains(this.skin.constraints, constraint.data, true)));
 		if (!constraint.active) return;
 
 		this.sortBone(bone);
