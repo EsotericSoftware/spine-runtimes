@@ -387,6 +387,11 @@ cp -f ../mix-and-match/export/mix-and-match-pro.skel "$ROOT/spine-ts/spine-phase
 cp -f ../mix-and-match/export/mix-and-match-pma.atlas "$ROOT/spine-ts/spine-phaser/example/assets/"
 cp -f ../mix-and-match/export/mix-and-match-pma.png "$ROOT/spine-ts/spine-phaser/example/assets/"
 
+cp -f ../sack/export/sack-pro.json "$ROOT/spine-ts/spine-webgl/example/assets/"
+cp -f ../sack/export/sack-pro.skel "$ROOT/spine-ts/spine-webgl/example/assets/"
+cp -f ../sack/export/sack-pma.atlas "$ROOT/spine-ts/spine-webgl/example/assets/"
+cp -f ../sack/export/sack-pma.png "$ROOT/spine-ts/spine-webgl/example/assets/"
+
 rm "$ROOT/spine-ts/spine-pixi/example/assets/"*
 cp -f ../raptor/export/raptor-pro.json "$ROOT/spine-ts/spine-pixi/example/assets/"
 cp -f ../raptor/export/raptor.atlas "$ROOT/spine-ts/spine-pixi/example/assets/"
