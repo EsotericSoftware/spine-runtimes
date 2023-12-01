@@ -361,12 +361,15 @@ namespace Spine.Unity.AttachmentTools {
 						originalAttachment.Copy();
 					IHasTextureRegion newTextureAttachment = (IHasTextureRegion)newAttachment;
 					AtlasRegion region = newTextureAttachment.Region as AtlasRegion;
+					if (region == null && originalTextureAttachment.Sequence != null)
+						region = (AtlasRegion)originalTextureAttachment.Sequence.Regions[0];
+
 					int existingIndex;
 					if (existingRegions.TryGetValue(region, out existingIndex)) {
 						regionIndices.Add(existingIndex);
 					} else {
-						Sequence originalSequence = originalTextureAttachment.Sequence;
 						existingRegions.Add(region, newRegionIndex);
+						Sequence originalSequence = originalTextureAttachment.Sequence;
 						if (originalSequence != null) {
 							newTextureAttachment.Sequence = new Sequence(originalSequence);
 							for (int i = 0, regionCount = originalSequence.Regions.Length; i < regionCount; ++i) {
