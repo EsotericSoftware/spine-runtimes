@@ -2026,7 +2026,7 @@ export abstract class PhysicsConstraintTimeline extends CurveTimeline1 {
 
 /** Changes a physics constraint's {@link PhysicsConstraint#getInertia()}. */
 export class PhysicsConstraintInertiaTimeline extends PhysicsConstraintTimeline {
-	constructor (frameCount: number, bezierCount: number, physicsConstraintIndex: number, property: number) {
+	constructor (frameCount: number, bezierCount: number, physicsConstraintIndex: number) {
 		super(frameCount, bezierCount, physicsConstraintIndex, Property.physicsConstraintInertia);
 	}
 
@@ -2049,7 +2049,7 @@ export class PhysicsConstraintInertiaTimeline extends PhysicsConstraintTimeline 
 
 /** Changes a physics constraint's {@link PhysicsConstraint#getStrength()}. */
 export class PhysicsConstraintStrengthTimeline extends PhysicsConstraintTimeline {
-	constructor (frameCount: number, bezierCount: number, physicsConstraintIndex: number, property: number) {
+	constructor (frameCount: number, bezierCount: number, physicsConstraintIndex: number) {
 		super(frameCount, bezierCount, physicsConstraintIndex, Property.physicsConstraintStrength);
 	}
 
@@ -2072,7 +2072,7 @@ export class PhysicsConstraintStrengthTimeline extends PhysicsConstraintTimeline
 
 /** Changes a physics constraint's {@link PhysicsConstraint#getDamping()}. */
 export class PhysicsConstraintDampingTimeline extends PhysicsConstraintTimeline {
-	constructor (frameCount: number, bezierCount: number, physicsConstraintIndex: number, property: number) {
+	constructor (frameCount: number, bezierCount: number, physicsConstraintIndex: number) {
 		super(frameCount, bezierCount, physicsConstraintIndex, Property.physicsConstraintDamping);
 	}
 
@@ -2095,7 +2095,7 @@ export class PhysicsConstraintDampingTimeline extends PhysicsConstraintTimeline 
 
 /** Changes a physics constraint's {@link PhysicsConstraint#getMassInverse()}. The timeline values are not inverted. */
 export class PhysicsConstraintMassTimeline extends PhysicsConstraintTimeline {
-	constructor (frameCount: number, bezierCount: number, physicsConstraintIndex: number, property: number) {
+	constructor (frameCount: number, bezierCount: number, physicsConstraintIndex: number) {
 		super(frameCount, bezierCount, physicsConstraintIndex, Property.physicsConstraintMass);
 	}
 
@@ -2118,7 +2118,7 @@ export class PhysicsConstraintMassTimeline extends PhysicsConstraintTimeline {
 
 /** Changes a physics constraint's {@link PhysicsConstraint#getWind()}. */
 export class PhysicsConstraintWindTimeline extends PhysicsConstraintTimeline {
-	constructor (frameCount: number, bezierCount: number, physicsConstraintIndex: number, property: number) {
+	constructor (frameCount: number, bezierCount: number, physicsConstraintIndex: number) {
 		super(frameCount, bezierCount, physicsConstraintIndex, Property.physicsConstraintWind);
 	}
 
@@ -2141,7 +2141,7 @@ export class PhysicsConstraintWindTimeline extends PhysicsConstraintTimeline {
 
 /** Changes a physics constraint's {@link PhysicsConstraint#getGravity()}. */
 export class PhysicsConstraintGravityTimeline extends PhysicsConstraintTimeline {
-	constructor (frameCount: number, bezierCount: number, physicsConstraintIndex: number, property: number) {
+	constructor (frameCount: number, bezierCount: number, physicsConstraintIndex: number) {
 		super(frameCount, bezierCount, physicsConstraintIndex, Property.physicsConstraintGravity);
 	}
 
@@ -2164,7 +2164,7 @@ export class PhysicsConstraintGravityTimeline extends PhysicsConstraintTimeline 
 
 /** Changes a physics constraint's {@link PhysicsConstraint#getMix()}. */
 export class PhysicsConstraintMixTimeline extends PhysicsConstraintTimeline {
-	constructor (frameCount: number, bezierCount: number, physicsConstraintIndex: number, property: number) {
+	constructor (frameCount: number, bezierCount: number, physicsConstraintIndex: number) {
 		super(frameCount, bezierCount, physicsConstraintIndex, Property.physicsConstraintMix);
 	}
 

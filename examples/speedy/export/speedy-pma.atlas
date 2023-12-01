@@ -3,71 +3,70 @@ speedy-pma.png
 	filter: Linear, Linear
 	pma: true
 belt-ends
-	bounds: 648, 5, 45, 56
+	bounds: 965, 81, 45, 56
 	rotate: 90
 hair-1
-	bounds: 422, 3, 82, 39
+	bounds: 635, 87, 82, 39
 hair-2
-	bounds: 572, 2, 74, 43
+	bounds: 719, 83, 74, 43
 head
 	bounds: 2, 2, 116, 124
 hood-end1a
-	bounds: 377, 42, 23, 84
+	bounds: 879, 103, 23, 84
+	rotate: 90
 hood-end1b
-	bounds: 572, 47, 28, 79
+	bounds: 795, 67, 28, 79
+	rotate: 90
 hood-end1c
-	bounds: 120, 3, 31, 70
+	bounds: 636, 24, 31, 70
 	rotate: 90
 hood-end1d
-	bounds: 447, 44, 29, 82
+	bounds: 795, 97, 29, 82
+	rotate: 90
 hood-end1e
-	bounds: 264, 4, 35, 78
+	bounds: 248, 2, 35, 78
 	rotate: 90
 hood-end1f
-	bounds: 657, 55, 39, 71
+	bounds: 509, 42, 39, 71
+	rotate: 90
 hood-end2a
-	bounds: 344, 9, 30, 76
+	bounds: 120, 9, 30, 76
 	rotate: 90
 hood-end2b
-	bounds: 698, 55, 38, 71
-hood-end2c
-	bounds: 506, 2, 42, 64
+	bounds: 509, 2, 38, 71
 	rotate: 90
+hood-end2c
+	bounds: 337, 18, 42, 64
 hood-end2d
-	bounds: 602, 50, 23, 76
+	bounds: 712, 58, 23, 76
+	rotate: 90
 hood-end2e
-	bounds: 627, 52, 28, 74
+	bounds: 636, 57, 28, 74
+	rotate: 90
 hood-end2f
-	bounds: 192, 3, 31, 70
+	bounds: 879, 70, 31, 70
 	rotate: 90
 left-foot
-	bounds: 478, 46, 80, 47
+	bounds: 199, 2, 80, 47
 	rotate: 90
 left-foot-bent01
-	bounds: 208, 39, 87, 43
-	rotate: 90
+	bounds: 248, 39, 87, 43
 left-foot-bent02
-	bounds: 402, 44, 82, 43
-	rotate: 90
+	bounds: 470, 83, 82, 43
 left-foot-side
-	bounds: 120, 36, 90, 42
-	rotate: 90
+	bounds: 199, 84, 90, 42
 left-hand
-	bounds: 796, 73, 52, 53
+	bounds: 582, 28, 52, 53
 right-foot
-	bounds: 738, 60, 66, 56
-	rotate: 90
+	bounds: 381, 25, 66, 56
 right-foot-bent01
-	bounds: 332, 41, 85, 43
-	rotate: 90
+	bounds: 383, 83, 85, 43
 right-foot-bent02
-	bounds: 527, 47, 79, 43
-	rotate: 90
+	bounds: 554, 83, 79, 43
 right-foot-side
-	bounds: 164, 36, 90, 42
-	rotate: 90
+	bounds: 291, 84, 90, 42
 right-hand
-	bounds: 738, 2, 56, 58
+	bounds: 449, 25, 56, 58
 	rotate: 90
 torso
-	bounds: 253, 41, 77, 85
+	bounds: 120, 41, 77, 85

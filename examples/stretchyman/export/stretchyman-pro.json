@@ -1,7 +1,7 @@
 {
 "skeleton": {
-	"hash": "8oGZUTwZfVI",
-	"spine": "4.1.20",
+	"hash": "ZCd/c3RDCPk",
+	"spine": "4.2.09-beta",
 	"x": -100.47,
 	"y": -9.21,
 	"width": 260.65,
@@ -11,7 +11,7 @@
 },
 "bones": [
 	{ "name": "root" },
-	{ "name": "back-arm-ik-target", "parent": "root", "x": 103.52, "y": 345.27, "color": "ff3f00ff" },
+	{ "name": "back-arm-ik-target", "parent": "root", "x": 103.52, "y": 345.27, "color": "ff3f00ff", "icon": "ik" },
 	{ "name": "hip", "parent": "root", "x": 28.61, "y": 289.9, "color": "ffbd00ff" },
 	{
 		"name": "spine1",
@@ -117,7 +117,7 @@
 		"transform": "noScale",
 		"color": "ff0000ff"
 	},
-	{ "name": "back-leg-ik-target", "parent": "root", "x": 46.15, "y": 8.68, "color": "ff3f00ff" },
+	{ "name": "back-leg-ik-target", "parent": "root", "x": 46.15, "y": 8.68, "color": "ff3f00ff", "icon": "ik" },
 	{
 		"name": "back-leg-ik1",
 		"parent": "hip",
@@ -202,7 +202,7 @@
 	},
 	{ "name": "belly", "parent": "spine1", "x": 35.94, "y": -37.69, "color": "ffbd00ff" },
 	{ "name": "butt", "parent": "hip", "x": -32.67, "y": -1.88, "color": "ffbd00ff" },
-	{ "name": "front-arm-ik-target", "parent": "root", "x": -92.44, "y": 331.78, "color": "ff3f00ff" },
+	{ "name": "front-arm-ik-target", "parent": "root", "x": -92.44, "y": 331.78, "color": "ff3f00ff", "icon": "ik" },
 	{
 		"name": "front-arm-ik1",
 		"parent": "spine4",
@@ -263,7 +263,7 @@
 	},
 	{ "name": "front-foot2", "parent": "front-foot1", "length": 29.12, "rotation": 9.61, "x": 26.3, "color": "50ff00ff" },
 	{ "name": "front-foot3", "parent": "front-foot2", "length": 23.49, "rotation": 8.91, "x": 29.12, "color": "50ff00ff" },
-	{ "name": "front-leg-ik-target", "parent": "root", "x": -37.74, "y": 5.03, "color": "ff3f00ff" },
+	{ "name": "front-leg-ik-target", "parent": "root", "x": -37.74, "y": 5.03, "color": "ff3f00ff", "icon": "ik" },
 	{
 		"name": "front-leg-ik1",
 		"parent": "hip",
@@ -577,7 +577,7 @@
 			"hip": {
 				"translate": [
 					{},
-					{ "time": 1, "y": -1.98 },
+					{ "time": 1, "y": -4.42 },
 					{ "time": 2 }
 				]
 			}

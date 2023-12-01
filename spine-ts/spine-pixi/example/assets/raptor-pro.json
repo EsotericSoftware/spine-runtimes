@@ -1,7 +1,7 @@
 {
 "skeleton": {
-	"hash": "AAVlM3uJh3s",
-	"spine": "4.1.17",
+	"hash": "PPErx2B6aMg",
+	"spine": "4.2.09-beta",
 	"x": -809.16,
 	"y": -73.54,
 	"width": 1287.65,
@@ -129,8 +129,8 @@
 		"y": -0.01,
 		"color": "e07800ff"
 	},
-	{ "name": "back-foot-target", "parent": "root", "x": 33.44, "y": 30.82, "color": "ff3f00ff" },
-	{ "name": "back-leg-target", "parent": "back-foot-target", "x": -127.51, "y": 75.99, "color": "ff3f00ff" },
+	{ "name": "back-foot-target", "parent": "root", "x": 33.44, "y": 30.82, "color": "ff3f00ff", "icon": "ik" },
+	{ "name": "back-leg-target", "parent": "back-foot-target", "x": -127.51, "y": 75.99, "color": "ff3f00ff", "icon": "ik" },
 	{
 		"name": "back-leg1",
 		"parent": "hip",
@@ -309,8 +309,16 @@
 		"y": 0.2,
 		"color": "15ff00ff"
 	},
-	{ "name": "front-foot-target", "parent": "root", "rotation": -6.96, "x": -45.8, "y": -28.67, "color": "ff3f00ff" },
-	{ "name": "front-leg-target", "parent": "front-foot-target", "x": -106.06, "y": 115.58, "color": "ff3f00ff" },
+	{
+		"name": "front-foot-target",
+		"parent": "root",
+		"rotation": -6.96,
+		"x": -45.8,
+		"y": -28.67,
+		"color": "ff3f00ff",
+		"icon": "ik"
+	},
+	{ "name": "front-leg-target", "parent": "front-foot-target", "x": -106.06, "y": 115.58, "color": "ff3f00ff", "icon": "ik" },
 	{
 		"name": "front-leg1",
 		"parent": "hip",
@@ -512,8 +520,24 @@
 		"y": -0.21,
 		"color": "fff200ff"
 	},
-	{ "name": "head-control", "parent": "head", "rotation": -95.04, "x": 42.32, "y": -220.33, "color": "219517ff" },
-	{ "name": "leg-control", "parent": "front-leg1", "rotation": 53.14, "x": 172.97, "y": 4.16, "color": "1d8020ff" }
+	{
+		"name": "head-control",
+		"parent": "head",
+		"rotation": -95.04,
+		"x": 42.32,
+		"y": -220.33,
+		"color": "219517ff",
+		"icon": "arrows"
+	},
+	{
+		"name": "leg-control",
+		"parent": "front-leg1",
+		"rotation": 53.14,
+		"x": 172.97,
+		"y": 4.16,
+		"color": "1d8020ff",
+		"icon": "arrows"
+	}
 ],
 "slots": [
 	{ "name": "back-hand", "bone": "back-hand2", "attachment": "back-hand" },

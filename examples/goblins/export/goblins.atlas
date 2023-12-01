@@ -2,95 +2,100 @@ goblins.png
 	size: 1024, 128
 	filter: Linear, Linear
 dagger
-	bounds: 2, 18, 26, 108
+	bounds: 372, 100, 26, 108
+	rotate: 90
 goblin/eyes-closed
-	bounds: 2, 4, 34, 12
+	bounds: 2, 7, 34, 12
 goblin/head
-	bounds: 113, 23, 103, 66
-	rotate: 90
+	bounds: 107, 36, 103, 66
 goblin/left-arm
-	bounds: 937, 89, 37, 35
-	rotate: 90
+	bounds: 901, 56, 37, 35
 goblin/left-foot
-	bounds: 609, 61, 65, 31
-	rotate: 90
+	bounds: 929, 95, 65, 31
 goblin/left-hand
-	bounds: 840, 21, 36, 41
+	bounds: 452, 2, 36, 41
 goblin/left-lower-leg
-	bounds: 504, 56, 33, 70
+	bounds: 713, 93, 33, 70
+	rotate: 90
 goblin/left-shoulder
-	bounds: 745, 17, 29, 44
+	bounds: 610, 44, 29, 44
 goblin/left-upper-leg
-	bounds: 397, 53, 33, 73
+	bounds: 638, 93, 33, 73
+	rotate: 90
 goblin/neck
-	bounds: 862, 85, 36, 41
+	bounds: 490, 2, 36, 41
 goblin/pelvis
-	bounds: 776, 18, 62, 43
+	bounds: 482, 45, 62, 43
 goblin/right-arm
-	bounds: 181, 5, 23, 50
+	bounds: 690, 2, 23, 50
 	rotate: 90
 goblin/right-foot
-	bounds: 747, 63, 63, 33
-	rotate: 90
+	bounds: 771, 58, 63, 33
 goblin/right-hand
-	bounds: 878, 3, 36, 37
+	bounds: 940, 56, 36, 37
 goblin/right-lower-leg
-	bounds: 321, 50, 36, 76
-goblin/right-shoulder
-	bounds: 663, 14, 39, 45
-goblin/right-upper-leg
-	bounds: 675, 63, 34, 63
-goblin/torso
-	bounds: 181, 30, 68, 96
-goblin/undie-straps
-	bounds: 38, 2, 55, 19
-goblin/undies
-	bounds: 974, 97, 36, 29
-goblingirl/eyes-closed
-	bounds: 397, 30, 37, 21
-goblingirl/head
-	bounds: 30, 23, 103, 81
+	bounds: 482, 90, 36, 76
 	rotate: 90
+goblin/right-shoulder
+	bounds: 602, 3, 39, 45
+	rotate: 90
+goblin/right-upper-leg
+	bounds: 641, 57, 34, 63
+	rotate: 90
+goblin/torso
+	bounds: 212, 34, 68, 96
+	rotate: 90
+goblin/undie-straps
+	bounds: 380, 5, 55, 19
+goblin/undies
+	bounds: 174, 5, 36, 29
+goblingirl/eyes-closed
+	bounds: 269, 11, 37, 21
+goblingirl/head
+	bounds: 2, 21, 103, 81
 goblingirl/left-arm
-	bounds: 916, 8, 37, 35
+	bounds: 978, 56, 37, 35
 	rotate: 90
 goblingirl/left-foot
-	bounds: 642, 61, 65, 31
-	rotate: 90
+	bounds: 107, 3, 65, 31
 goblingirl/left-hand
-	bounds: 900, 86, 35, 40
+	bounds: 565, 2, 35, 40
 goblingirl/left-lower-leg
-	bounds: 539, 56, 33, 70
+	bounds: 785, 93, 33, 70
+	rotate: 90
 goblingirl/left-shoulder
-	bounds: 633, 13, 28, 46
+	bounds: 690, 27, 28, 46
+	rotate: 90
 goblingirl/left-upper-leg
-	bounds: 574, 56, 33, 70
+	bounds: 857, 93, 33, 70
+	rotate: 90
 goblingirl/neck
-	bounds: 878, 42, 35, 41
+	bounds: 528, 2, 35, 41
 goblingirl/pelvis
-	bounds: 817, 64, 62, 43
-	rotate: 90
+	bounds: 546, 45, 62, 43
 goblingirl/right-arm
-	bounds: 603, 4, 28, 50
+	bounds: 452, 48, 28, 50
 goblingirl/right-foot
-	bounds: 782, 63, 63, 33
-	rotate: 90
+	bounds: 836, 58, 63, 33
 goblingirl/right-hand
-	bounds: 915, 47, 36, 37
+	bounds: 771, 20, 36, 37
+	rotate: 90
 goblingirl/right-lower-leg
-	bounds: 359, 50, 36, 76
+	bounds: 560, 90, 36, 76
+	rotate: 90
 goblingirl/right-shoulder
-	bounds: 704, 16, 39, 45
+	bounds: 649, 10, 39, 45
 goblingirl/right-upper-leg
-	bounds: 711, 63, 34, 63
+	bounds: 706, 57, 34, 63
+	rotate: 90
 goblingirl/torso
-	bounds: 251, 30, 68, 96
+	bounds: 310, 2, 68, 96
 goblingirl/undie-straps
-	bounds: 95, 2, 55, 19
+	bounds: 212, 13, 55, 19
 goblingirl/undies
-	bounds: 974, 66, 36, 29
+	bounds: 810, 27, 36, 29
 shield
-	bounds: 432, 54, 70, 72
+	bounds: 380, 26, 70, 72
 spear
-	bounds: 233, 6, 22, 368
+	bounds: 2, 104, 22, 368
 	rotate: 90

@@ -1,7 +1,7 @@
 {
 "skeleton": {
-	"hash": "ulJOWXMG9PE",
-	"spine": "4.1.17",
+	"hash": "DdDstJX8qPU",
+	"spine": "4.2.09-beta",
 	"x": -5852.65,
 	"y": -348.5,
 	"width": 7202.61,
@@ -23,7 +23,7 @@
 	{ "name": "antenna5", "parent": "antenna4", "length": 42, "x": 42, "color": "ffee00ff" },
 	{ "name": "antenna6", "parent": "antenna5", "length": 42, "x": 42, "color": "ffee00ff" },
 	{ "name": "cannon-connector", "parent": "guntower", "x": -235.05, "y": 96.07 },
-	{ "name": "cannon-target", "parent": "tank-root", "x": -2276.67, "y": 400.17, "color": "0096ffff" },
+	{ "name": "cannon-target", "parent": "tank-root", "x": -2276.67, "y": 400.17, "color": "0096ffff", "icon": "arrows" },
 	{ "name": "cannon", "parent": "cannon-connector", "length": 946.68, "rotation": 180, "color": "ff4000ff" },
 	{
 		"name": "machinegun-mount",
@@ -34,7 +34,7 @@
 		"y": 218.33,
 		"color": "15ff00ff"
 	},
-	{ "name": "machinegun-target", "parent": "tank-root", "x": -2272.76, "y": 607.77, "color": "0096ffff" },
+	{ "name": "machinegun-target", "parent": "tank-root", "x": -2272.76, "y": 607.77, "color": "0096ffff", "icon": "ik" },
 	{
 		"name": "machinegun",
 		"parent": "machinegun-mount",
@@ -53,9 +53,10 @@
 		"y": 405.76,
 		"scaleX": -6.5,
 		"scaleY": 6.5,
-		"color": "ff4000ff"
+		"color": "ff4000ff",
+		"icon": "particles"
 	},
-	{ "name": "smoke-glow", "parent": "smoke-root", "x": 62.92, "y": -0.71, "color": "ff4000ff" },
+	{ "name": "smoke-glow", "parent": "smoke-root", "x": 62.92, "y": -0.71, "color": "ff4000ff", "icon": "particles" },
 	{
 		"name": "smoke1",
 		"parent": "smoke-root",
@@ -64,7 +65,8 @@
 		"y": -1.55,
 		"scaleX": 1.6484,
 		"scaleY": 1.6484,
-		"color": "ff4000ff"
+		"color": "ff4000ff",
+		"icon": "particles"
 	},
 	{
 		"name": "smoke10",
@@ -74,7 +76,8 @@
 		"y": 2.48,
 		"scaleX": 3.9011,
 		"scaleY": 2.8523,
-		"color": "ff4000ff"
+		"color": "ff4000ff",
+		"icon": "particles"
 	},
 	{
 		"name": "smoke11",
@@ -84,7 +87,8 @@
 		"y": 2.48,
 		"scaleX": 3.9011,
 		"scaleY": 2.8523,
-		"color": "ff4000ff"
+		"color": "ff4000ff",
+		"icon": "particles"
 	},
 	{
 		"name": "smoke12",
@@ -94,7 +98,8 @@
 		"y": 2.48,
 		"scaleX": 3.9011,
 		"scaleY": 2.8523,
-		"color": "ff4000ff"
+		"color": "ff4000ff",
+		"icon": "particles"
 	},
 	{
 		"name": "smoke13",
@@ -104,7 +109,8 @@
 		"y": -1.55,
 		"scaleX": 1.6484,
 		"scaleY": 1.6484,
-		"color": "ff4000ff"
+		"color": "ff4000ff",
+		"icon": "particles"
 	},
 	{
 		"name": "smoke14",
@@ -114,7 +120,8 @@
 		"y": -1.55,
 		"scaleX": 1.6484,
 		"scaleY": 1.6484,
-		"color": "ff4000ff"
+		"color": "ff4000ff",
+		"icon": "particles"
 	},
 	{
 		"name": "smoke15",
@@ -124,7 +131,8 @@
 		"y": -1.55,
 		"scaleX": 1.6484,
 		"scaleY": 1.6484,
-		"color": "ff4000ff"
+		"color": "ff4000ff",
+		"icon": "particles"
 	},
 	{
 		"name": "smoke16",
@@ -134,7 +142,8 @@
 		"y": -1.55,
 		"scaleX": 1.6484,
 		"scaleY": 1.6484,
-		"color": "ff4000ff"
+		"color": "ff4000ff",
+		"icon": "particles"
 	},
 	{
 		"name": "smoke17",
@@ -144,7 +153,8 @@
 		"y": -1.55,
 		"scaleX": 1.6484,
 		"scaleY": 1.6484,
-		"color": "ff4000ff"
+		"color": "ff4000ff",
+		"icon": "particles"
 	},
 	{
 		"name": "smoke18",
@@ -154,7 +164,8 @@
 		"y": -1.55,
 		"scaleX": 1.6484,
 		"scaleY": 1.6484,
-		"color": "ff4000ff"
+		"color": "ff4000ff",
+		"icon": "particles"
 	},
 	{
 		"name": "smoke2",
@@ -164,7 +175,8 @@
 		"y": 29.7,
 		"scaleX": 3.3345,
 		"scaleY": 3.3345,
-		"color": "ff4000ff"
+		"color": "ff4000ff",
+		"icon": "particles"
 	},
 	{
 		"name": "smoke20",
@@ -174,7 +186,8 @@
 		"y": -1.55,
 		"scaleX": 1.6484,
 		"scaleY": 1.6484,
-		"color": "ff4000ff"
+		"color": "ff4000ff",
+		"icon": "particles"
 	},
 	{
 		"name": "smoke21",
@@ -184,7 +197,8 @@
 		"y": -1.55,
 		"scaleX": 1.6484,
 		"scaleY": 1.6484,
-		"color": "ff4000ff"
+		"color": "ff4000ff",
+		"icon": "particles"
 	},
 	{
 		"name": "smoke22",
@@ -194,7 +208,8 @@
 		"y": -1.55,
 		"scaleX": 1.6484,
 		"scaleY": 1.6484,
-		"color": "ff4000ff"
+		"color": "ff4000ff",
+		"icon": "particles"
 	},
 	{
 		"name": "smoke23",
@@ -204,7 +219,8 @@
 		"y": -1.55,
 		"scaleX": 1.6484,
 		"scaleY": 1.6484,
-		"color": "ff4000ff"
+		"color": "ff4000ff",
+		"icon": "particles"
 	},
 	{
 		"name": "smoke24",
@@ -214,7 +230,8 @@
 		"y": -1.55,
 		"scaleX": 1.6484,
 		"scaleY": 1.6484,
-		"color": "ff4000ff"
+		"color": "ff4000ff",
+		"icon": "particles"
 	},
 	{
 		"name": "smoke25",
@@ -224,7 +241,8 @@
 		"y": -1.55,
 		"scaleX": 1.6484,
 		"scaleY": 1.6484,
-		"color": "ff4000ff"
+		"color": "ff4000ff",
+		"icon": "particles"
 	},
 	{
 		"name": "smoke26",
@@ -234,7 +252,8 @@
 		"y": -1.55,
 		"scaleX": 1.6484,
 		"scaleY": 1.6484,
-		"color": "ff4000ff"
+		"color": "ff4000ff",
+		"icon": "particles"
 	},
 	{
 		"name": "smoke27",
@@ -244,7 +263,8 @@
 		"y": -1.55,
 		"scaleX": 1.6484,
 		"scaleY": 1.6484,
-		"color": "ff4000ff"
+		"color": "ff4000ff",
+		"icon": "particles"
 	},
 	{
 		"name": "smoke3",
@@ -254,7 +274,8 @@
 		"y": -17.5,
 		"scaleX": 3.0415,
 		"scaleY": 4.157,
-		"color": "ff4000ff"
+		"color": "ff4000ff",
+		"icon": "particles"
 	},
 	{
 		"name": "smoke4",
@@ -264,7 +285,8 @@
 		"y": 8.01,
 		"scaleX": 2.1808,
 		"scaleY": 2.9807,
-		"color": "ff4000ff"
+		"color": "ff4000ff",
+		"icon": "particles"
 	},
 	{
 		"name": "smoke5",
@@ -274,7 +296,8 @@
 		"y": 59.88,
 		"scaleX": 4.5119,
 		"scaleY": 2.9725,
-		"color": "ff4000ff"
+		"color": "ff4000ff",
+		"icon": "particles"
 	},
 	{
 		"name": "smoke6",
@@ -284,7 +307,8 @@
 		"y": 25.65,
 		"scaleX": 3.7912,
 		"scaleY": 3.0552,
-		"color": "ff4000ff"
+		"color": "ff4000ff",
+		"icon": "particles"
 	},
 	{
 		"name": "smoke7",
@@ -294,7 +318,8 @@
 		"y": -50.47,
 		"scaleX": 4.8523,
 		"scaleY": 3.6528,
-		"color": "ff4000ff"
+		"color": "ff4000ff",
+		"icon": "particles"
 	},
 	{
 		"name": "smoke8",
@@ -304,7 +329,8 @@
 		"y": -42.55,
 		"scaleX": 4.0006,
 		"scaleY": 3.4796,
-		"color": "ff4000ff"
+		"color": "ff4000ff",
+		"icon": "particles"
 	},
 	{
 		"name": "smoke9",
@@ -314,7 +340,8 @@
 		"y": -8.73,
 		"scaleX": 4.2074,
 		"scaleY": 3.0762,
-		"color": "ff4000ff"
+		"color": "ff4000ff",
+		"icon": "particles"
 	},
 	{ "name": "tank-glow", "parent": "tank-root", "x": -247.72, "y": 404.37, "scaleX": 1.0582, "scaleY": 0.6785 },
 	{

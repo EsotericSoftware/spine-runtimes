@@ -1,7 +1,7 @@
 {
 "skeleton": {
-	"hash": "yMOXnDA9zko",
-	"spine": "4.1.17",
+	"hash": "KgyftX4a7I4",
+	"spine": "4.2.09-beta",
 	"x": -180,
 	"y": -37.5,
 	"width": 360,
@@ -11,18 +11,34 @@
 },
 "bones": [
 	{ "name": "root" },
-	{ "name": "hips", "parent": "root", "y": 155.08, "color": "ffcb42ff" },
+	{ "name": "hips", "parent": "root", "y": 155.08, "color": "ffcb42ff", "icon": "diamondB" },
 	{ "name": "body-up", "parent": "hips", "length": 116.24, "rotation": 90, "color": "ffcb42ff" },
 	{ "name": "head-base", "parent": "body-up", "length": 243.86, "x": 117.28, "color": "ffc20aff" },
 	{ "name": "leg-r", "parent": "hips", "x": -42.43, "y": 10.89, "color": "ba2c2cff" },
 	{ "name": "leg-up-r", "parent": "leg-r", "length": 82.42, "rotation": -90, "color": "ba2c2cff" },
-	{ "name": "leg-target-r", "parent": "root", "rotation": -90, "x": -42.43, "y": 1.14, "color": "ba2c2cff" },
+	{
+		"name": "leg-target-r",
+		"parent": "root",
+		"rotation": -90,
+		"x": -42.43,
+		"y": 1.14,
+		"color": "ba2c2cff",
+		"icon": "ik"
+	},
 	{ "name": "leg-down-r", "parent": "leg-up-r", "length": 82.42, "x": 82.42, "color": "ba2c2cff" },
 	{ "name": "arm-holder-r", "parent": "body-up", "x": 104.34, "y": -46.44, "color": "227bdbff" },
 	{ "name": "arm-up-r", "parent": "arm-holder-r", "length": 69.47, "rotation": -180, "color": "227bdbff" },
 	{ "name": "arm-down-r", "parent": "arm-up-r", "length": 69.47, "x": 69.47, "color": "227bdbff" },
-	{ "name": "face-holder", "parent": "head-base", "x": 103.25, "color": "abe323ff" },
-	{ "name": "eye-r", "parent": "face-holder", "x": -1.13, "y": -73.48, "scaleY": -1, "color": "7bffccff" },
+	{ "name": "face-holder", "parent": "head-base", "x": 103.25, "color": "abe323ff", "icon": "arrowsB" },
+	{
+		"name": "eye-r",
+		"parent": "face-holder",
+		"x": -1.13,
+		"y": -73.48,
+		"scaleY": -1,
+		"color": "7bffccff",
+		"icon": "eye"
+	},
 	{
 		"name": "eyebrow-r",
 		"parent": "eye-r",
@@ -33,8 +49,8 @@
 		"color": "ffc237ff"
 	},
 	{ "name": "hair-front", "parent": "head-base", "length": 154.37, "x": 217.23, "skin": true, "color": "89f541a3" },
-	{ "name": "mouth", "parent": "face-holder", "rotation": -90, "x": -19.03 },
-	{ "name": "eye-l", "parent": "face-holder", "x": -1.13, "y": 73.48, "color": "7bffccff" },
+	{ "name": "mouth", "parent": "face-holder", "rotation": -90, "x": -19.03, "icon": "mouth" },
+	{ "name": "eye-l", "parent": "face-holder", "x": -1.13, "y": 73.48, "color": "7bffccff", "icon": "eye" },
 	{
 		"name": "eyebrow-l",
 		"parent": "eye-l",
@@ -47,14 +63,22 @@
 	{ "name": "leg-l", "parent": "hips", "x": 42.43, "y": 10.89, "scaleX": -1, "color": "4b308fff" },
 	{ "name": "leg-up-l", "parent": "leg-l", "length": 82.42, "rotation": -90, "color": "4b308fff" },
 	{ "name": "leg-down-l", "parent": "leg-up-l", "length": 82.42, "x": 82.42, "color": "4b308fff" },
-	{ "name": "leg-target-l", "parent": "root", "rotation": 90, "x": 42.43, "y": 1.14, "color": "4b308fff" },
+	{
+		"name": "leg-target-l",
+		"parent": "root",
+		"rotation": 90,
+		"x": 42.43,
+		"y": 1.14,
+		"color": "4b308fff",
+		"icon": "ik"
+	},
 	{ "name": "arm-holder-l", "parent": "body-up", "x": 104.34, "y": 46.44, "scaleY": -1, "color": "ff4646ff" },
 	{ "name": "arm-up-l", "parent": "arm-holder-l", "length": 69.47, "rotation": -180, "color": "ff4646ff" },
 	{ "name": "arm-down-l", "parent": "arm-up-l", "length": 69.47, "x": 69.47, "color": "ff4646ff" },
-	{ "name": "head-inverse", "parent": "head-base", "x": 160.07, "color": "fc0c0c6a" },
-	{ "name": "effect-head", "parent": "root", "x": -118.11, "y": 376.01, "color": "279ba7ff" },
-	{ "name": "eye-animator-l", "parent": "eye-l", "color": "ffc142ff" },
-	{ "name": "eye-animator-r", "parent": "eye-r", "color": "ffc142ff" },
+	{ "name": "head-inverse", "parent": "head-base", "x": 160.07, "color": "fc0c0c6a", "icon": "warning" },
+	{ "name": "effect-head", "parent": "root", "x": -118.11, "y": 376.01, "color": "279ba7ff", "icon": "particles" },
+	{ "name": "eye-animator-l", "parent": "eye-l", "color": "ffc142ff", "icon": "gear" },
+	{ "name": "eye-animator-r", "parent": "eye-r", "color": "ffc142ff", "icon": "gear" },
 	{
 		"name": "skirt-side-rotator-r",
 		"parent": "body-up",
@@ -65,7 +89,7 @@
 		"skin": true,
 		"color": "b35affa2"
 	},
-	{ "name": "skirt-side-r", "parent": "skirt-side-rotator-r", "x": 141.46, "skin": true, "color": "b35affa2" },
+	{ "name": "skirt-side-r", "parent": "skirt-side-rotator-r", "x": 141.46, "skin": true, "color": "b35affa2", "icon": "arrowLeftRight" },
 	{
 		"name": "skirt-side-rotator-l",
 		"parent": "body-up",
@@ -76,11 +100,19 @@
 		"skin": true,
 		"color": "b35affa2"
 	},
-	{ "name": "skirt-side-l", "parent": "skirt-side-rotator-l", "x": 142.13, "skin": true, "color": "b35affa2" },
-	{ "name": "skirt-middle", "parent": "body-up", "x": -26.36, "y": 0.2, "skin": true, "color": "b35affa2" },
-	{ "name": "small-drop-line1", "parent": "root", "x": -54.33, "y": 448.98, "color": "3a98a5ff" },
-	{ "name": "small-drop-line2", "parent": "root", "x": -54.33, "y": 448.98, "color": "3a98a5ff" },
-	{ "name": "small-drop-line3", "parent": "root", "x": -54.33, "y": 448.98, "color": "3a98a5ff" },
+	{ "name": "skirt-side-l", "parent": "skirt-side-rotator-l", "x": 142.13, "skin": true, "color": "b35affa2", "icon": "arrowLeftRight" },
+	{
+		"name": "skirt-middle",
+		"parent": "body-up",
+		"x": -26.36,
+		"y": 0.2,
+		"skin": true,
+		"color": "b35affa2",
+		"icon": "arrowLeftRight"
+	},
+	{ "name": "small-drop-line1", "parent": "root", "x": -54.33, "y": 448.98, "color": "3a98a5ff", "icon": "particles" },
+	{ "name": "small-drop-line2", "parent": "root", "x": -54.33, "y": 448.98, "color": "3a98a5ff", "icon": "particles" },
+	{ "name": "small-drop-line3", "parent": "root", "x": -54.33, "y": 448.98, "color": "3a98a5ff", "icon": "particles" },
 	{
 		"name": "hair-back-long-middle",
 		"parent": "head-base",
