@@ -57,6 +57,7 @@
 * **Breaking changes**
   * Changed `SpineShaderWithOutlineGUI` outline related methods from `private` to `protected virtual` to allow for custom shader GUI subclasses to switch to different outline shaders.
   * Changed `BoneFollower` and `BoneFollowerGraphic` methods `LateUpdate` and `Initialize` to `virtual` to allow easier overriding for e.g. positional offset in custom subclasses.
+  * `MeshGenerator` received a new optimization option to avoid rendering fully transparent attachments at slot alpha 0 by default. Comment out `#define SLOT_ALPHA_DISABLES_ATTACHMENT` in `MeshGenerator.cs` to revert to previous behaviour. You may only need this option disabled when utilizing a custom shader which uses vertex color alpha for purposes other than transparency.
   
 * **Changes of default values**
 

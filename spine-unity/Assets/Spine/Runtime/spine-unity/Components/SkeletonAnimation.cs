@@ -83,15 +83,11 @@ namespace Spine.Unity {
 		/// </summary>
 		public event UpdateBonesDelegate UpdateLocal { add { _UpdateLocal += value; } remove { _UpdateLocal -= value; } }
 
-		/// <summary><para>
+		/// <summary>
 		/// Occurs after the Skeleton's bone world space values are resolved (including all constraints).
 		/// Using this callback will cause the world space values to be solved an extra time.
 		/// Use this callback if want to use bone world space values, and also set bone local values.
-		/// </para><para>
-		/// When used in combination with PhysicsConstraints at your skeleton, you might want to consider adjusting
-		/// <see cref="MainPhysicsUpdate"/> and <see cref="AdditionalPhysicsUpdate"/> to save updates by setting one to
-		/// <see cref="Skeleton.Physics.Pose"/>.
-		/// </para></summary>
+		/// </summary>
 		public event UpdateBonesDelegate UpdateWorld { add { _UpdateWorld += value; } remove { _UpdateWorld -= value; } }
 
 		/// <summary>
@@ -109,15 +105,6 @@ namespace Spine.Unity {
 		/// Instance SkeletonAnimation.timeScale will still be applied.</summary>
 		[SerializeField] protected bool unscaledTime;
 		public bool UnscaledTime { get { return unscaledTime; } set { unscaledTime = value; } }
-
-		protected Skeleton.Physics mainPhysicsUpdate = Skeleton.Physics.Update;
-		protected Skeleton.Physics additionalPhysicsUpdate = Skeleton.Physics.Update;
-		/// <summary>Physics update mode used in the main call to skeleton.UpdateWorldTransform().</summary>
-		public Skeleton.Physics MainPhysicsUpdate { get { return mainPhysicsUpdate; } set { mainPhysicsUpdate = value; } }
-		/// <summary>Physics update mode used at optional additional calls to skeleton.UpdateWorldTransform(),
-		/// such as after the <see cref="UpdateWorld"/> callback if a method is subscribed at the UpdateWorld delegate.
-		/// </summary>
-		public Skeleton.Physics AdditionalPhysicsUpdate { get { return additionalPhysicsUpdate; } set { additionalPhysicsUpdate = value; } }
 		#endregion
 
 		#region Serialized state and Beginner API
@@ -278,11 +265,12 @@ namespace Spine.Unity {
 			if (_UpdateLocal != null)
 				_UpdateLocal(this);
 
-			UpdateWorldTransform(mainPhysicsUpdate);
-
-			if (_UpdateWorld != null) {
+			if (_UpdateWorld == null) {
+				UpdateWorldTransform(Skeleton.Physics.Update);
+			} else {
+				UpdateWorldTransform(Skeleton.Physics.Pose);
 				_UpdateWorld(this);
-				UpdateWorldTransform(additionalPhysicsUpdate);
+				UpdateWorldTransform(Skeleton.Physics.Update);
 			}
 
 			if (_UpdateComplete != null) {

@@ -403,11 +403,12 @@ namespace Spine.Unity {
 			if (UpdateLocal != null)
 				UpdateLocal(this);
 
-			UpdateWorldTransform(mainPhysicsUpdate);
-
-			if (UpdateWorld != null) {
+			if (UpdateWorld == null) {
+				UpdateWorldTransform(Skeleton.Physics.Update);
+			} else {
+				UpdateWorldTransform(Skeleton.Physics.Pose);
 				UpdateWorld(this);
-				UpdateWorldTransform(additionalPhysicsUpdate);
+				UpdateWorldTransform(Skeleton.Physics.Update);
 			}
 
 			if (UpdateComplete != null)
@@ -643,15 +644,6 @@ namespace Spine.Unity {
 
 		[SerializeField] protected bool unscaledTime;
 		public bool UnscaledTime { get { return unscaledTime; } set { unscaledTime = value; } }
-
-		protected Skeleton.Physics mainPhysicsUpdate = Skeleton.Physics.Update;
-		protected Skeleton.Physics additionalPhysicsUpdate = Skeleton.Physics.Update;
-		/// <summary>Physics update mode used in the main call to skeleton.UpdateWorldTransform().</summary>
-		public Skeleton.Physics MainPhysicsUpdate { get { return mainPhysicsUpdate; } set { mainPhysicsUpdate = value; } }
-		/// <summary>Physics update mode used at optional additional calls to skeleton.UpdateWorldTransform(),
-		/// such as after the <see cref="UpdateWorld"/> callback if a method is subscribed at the UpdateWorld delegate.
-		/// </summary>
-		public Skeleton.Physics AdditionalPhysicsUpdate { get { return additionalPhysicsUpdate; } set { additionalPhysicsUpdate = value; } }
 
 		/// <summary> Occurs after the vertex data populated every frame, before the vertices are pushed into the mesh.</summary>
 		public event Spine.Unity.MeshGeneratorDelegate OnPostProcessVertices;
