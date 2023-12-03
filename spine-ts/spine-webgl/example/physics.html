@@ -53,6 +53,7 @@
 				this.animationState.apply(this.skeleton);
 				// Let the skeleton update the transforms of its bones.
 				this.skeleton.updateWorldTransform(spine.Physics.update);
+				this.skeleton.update(delta);
 			}
 
 			render(canvas) {

@@ -335,7 +335,7 @@ export class SkeletonBinary {
 				skin.constraints.push(skeletonData.transformConstraints[input.readInt(true)]);
 			for (let i = 0, n = input.readInt(true); i < n; i++)
 				skin.constraints.push(skeletonData.pathConstraints[input.readInt(true)]);
-				for (let i = 0, n = input.readInt(true); i < n; i++)
+			for (let i = 0, n = input.readInt(true); i < n; i++)
 				skin.constraints.push(skeletonData.physicsConstraints[input.readInt(true)]);
 
 			slotCount = input.readInt(true);
@@ -345,7 +345,8 @@ export class SkeletonBinary {
 			let slotIndex = input.readInt(true);
 			for (let ii = 0, nn = input.readInt(true); ii < nn; ii++) {
 				let name = input.readStringRef();
-				if (!name) throw new Error("Attachment name must not be null");
+				if (!name)
+					throw new Error("Attachment name must not be null");
 				let attachment = this.readAttachment(input, skeletonData, skin, slotIndex, name, nonessential);
 				if (attachment) skin.setAttachment(slotIndex, name, attachment);
 			}
@@ -353,7 +354,7 @@ export class SkeletonBinary {
 		return skin;
 	}
 
-	private readAttachment (input: BinaryInput, skeletonData: SkeletonData, skin: Skin, slotIndex: number, attachmentName: string, nonessential: boolean): Attachment | null {
+	private readAttachment (input: BinaryInput, skeletonData: SkeletonData, skin: Skin, slotIndex: number, attachmentName: string | null | undefined, nonessential: boolean): Attachment | null {
 		let scale = this.scale;
 
 		let flags = input.readByte();
