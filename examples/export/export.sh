@@ -40,6 +40,7 @@ rm -rf ../owl/export/*
 rm -rf ../mix-and-match/export/*
 rm -rf ../chibi-stickers/export/*
 rm -rf ../sack/export/*
+rm -rf ../celestial-circus/export/*
 
 echo ""
 echo "Exporting assets..."
@@ -90,6 +91,11 @@ echo "Exporting assets..."
 -i ../sack/sack-pro.spine -o ../sack/export -e binary.json \
 -i ../sack/images -o ../sack/export -n sack -p atlas-0.5.json \
 -i ../sack/images -o ../sack/export -n sack-pma -p atlas-0.5-pma.json \
+\
+-i ../celestial-circus/celestial-circus-pro.spine -o ../celestial-circus/export -e json.json \
+-i ../celestial-circus/celestial-circus-pro.spine -o ../celestial-circus/export -e binary.json \
+-i ../celestial-circus/images -o ../celestial-circus/export -n celestial-circus -p atlas-0.5.json \
+-i ../celestial-circus/images -o ../celestial-circus/export -n celestial-circus-pma -p atlas-0.5-pma.json \
 \
 -i ../owl/owl-pro.spine -o ../owl/export -e json.json \
 -i ../owl/owl-pro.spine -o ../owl/export -e binary.json \

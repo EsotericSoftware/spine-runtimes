@@ -35,6 +35,20 @@ cp -f ../mix-and-match/export/*.json "$ROOT/spine-libgdx/spine-libgdx-tests/asse
 cp -f ../mix-and-match/export/*.skel "$ROOT/spine-libgdx/spine-libgdx-tests/assets/mix-and-match/"
 cp -f ../mix-and-match/export/*-pma.* "$ROOT/spine-libgdx/spine-libgdx-tests/assets/mix-and-match/"
 
+rm -f "$ROOT/spine-libgdx/spine-libgdx-tests/assets/sack/"*
+mkdir -p "$ROOT/spine-libgdx/spine-libgdx-tests/assets/sack/"
+cp -f ../sack/export/sack-pro.json "$ROOT/spine-libgdx/spine-libgdx-tests/assets/sack/"
+cp -f ../sack/export/sack-pro.skel "$ROOT/spine-libgdx/spine-libgdx-tests/assets/sack/"
+cp -f ../sack/export/sack-pma.atlas "$ROOT/spine-libgdx/spine-libgdx-tests/assets/sack/"
+cp -f ../sack/export/sack-pma.png "$ROOT/spine-libgdx/spine-libgdx-tests/assets/sack/"
+
+rm -f "$ROOT/spine-libgdx/spine-libgdx-tests/assets/celestial-circus/"*
+mkdir -p "$ROOT/spine-libgdx/spine-libgdx-tests/assets/celestial-circus/"
+cp -f ../celestial-circus/export/celestial-circus-pro.json "$ROOT/spine-libgdx/spine-libgdx-tests/assets/celestial-circus/"
+cp -f ../celestial-circus/export/celestial-circus-pro.skel "$ROOT/spine-libgdx/spine-libgdx-tests/assets/celestial-circus/"
+cp -f ../celestial-circus/export/celestial-circus-pma.atlas "$ROOT/spine-libgdx/spine-libgdx-tests/assets/celestial-circus/"
+cp -f ../celestial-circus/export/celestial-circus-pma.png "$ROOT/spine-libgdx/spine-libgdx-tests/assets/celestial-circus/"
+
 echo "spine-cocos2d-objc"
 rm "$ROOT/spine-cocos2d-objc/Resources/"*
 
@@ -391,6 +405,8 @@ cp -f ../sack/export/sack-pro.json "$ROOT/spine-ts/spine-webgl/example/assets/"
 cp -f ../sack/export/sack-pro.skel "$ROOT/spine-ts/spine-webgl/example/assets/"
 cp -f ../sack/export/sack-pma.atlas "$ROOT/spine-ts/spine-webgl/example/assets/"
 cp -f ../sack/export/sack-pma.png "$ROOT/spine-ts/spine-webgl/example/assets/"
+
+cp -f ../celestial-circus/export/* "$ROOT/spine-ts/spine-webgl/example/assets/"
 
 rm "$ROOT/spine-ts/spine-pixi/example/assets/"*
 cp -f ../raptor/export/raptor-pro.json "$ROOT/spine-ts/spine-pixi/example/assets/"
