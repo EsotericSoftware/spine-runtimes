@@ -36,7 +36,7 @@
 				var skeletonBinary = new spine.SkeletonBinary(atlasLoader);
 
 				// Set the scale to apply during parsing, parse the file, and create a new skeleton.
-				skeletonBinary.scale = 1;
+				skeletonBinary.scale = 0.2;
 				var skeletonData = skeletonBinary.readSkeletonData(assetManager.require("assets/sack-pro.skel"));
 				this.skeleton = new spine.Skeleton(skeletonData);
 
@@ -51,9 +51,9 @@
 				this.animationState.update(delta);
 				// Apply the animation state to the skeleton.
 				this.animationState.apply(this.skeleton);
-				// Let the skeleton update the transforms of its bones.
-				this.skeleton.updateWorldTransform(spine.Physics.update);
+				// Let the skeleton update the transforms of its bones and apply physics
 				this.skeleton.update(delta);
+				this.skeleton.updateWorldTransform(spine.Physics.update);
 			}
 
 			render(canvas) {
