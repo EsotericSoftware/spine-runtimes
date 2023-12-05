@@ -31,10 +31,13 @@ package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.FloatArray;
 import com.esotericsoftware.spine.Skeleton.Physics;
 import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
 
@@ -50,6 +53,9 @@ public class PhysicsTest2 extends ApplicationAdapter {
 	Skeleton skeleton;
 	AnimationState state;
 
+	float lastX = 0;
+	float lastY = 0;
+
 	public void create () {
 		camera = new OrthographicCamera();
 		batch = new TwoColorPolygonBatch();
@@ -61,16 +67,31 @@ public class PhysicsTest2 extends ApplicationAdapter {
 
 		atlas = new TextureAtlas(Gdx.files.internal("celestial-circus/celestial-circus-pma.atlas"));
 		SkeletonBinary binary = new SkeletonBinary(atlas); // This loads skeleton JSON data, which is stateless.
-		binary.setScale(0.2f); // Load the skeleton at 60% the size it was in Spine.
+		binary.setScale(0.1f); // Load the skeleton at 60% the size it was in Spine.
 		SkeletonData skeletonData = binary.readSkeletonData(Gdx.files.internal("celestial-circus/celestial-circus-pro.skel"));
 
 		skeleton = new Skeleton(skeletonData); // Skeleton holds skeleton state (bone positions, slot attachments, etc).
-		skeleton.setPosition(250, 100);
+		skeleton.setPosition(320, 100);
 
 		AnimationStateData stateData = new AnimationStateData(skeletonData); // Defines mixing (crossfading) between animations.
 		state = new AnimationState(stateData); // Holds the animation state for a skeleton (current animation, time, etc).
-		state.setAnimation(0, "swing", true);
-		state.setAnimation(1, "eyeblink-long", true);
+
+		Gdx.input.setInputProcessor(new InputAdapter() {
+			public boolean touchDown (int screenX, int screenY, int pointer, int button) {
+				lastX = screenX;
+				lastY = screenY;
+				return false;
+			}
+
+			@Override
+			public boolean touchDragged(int screenX, int screenY, int pointer) {
+				skeleton.x += screenX - lastX;
+				skeleton.y += lastY - screenY;
+				lastX = screenX;
+				lastY = screenY;
+				return false;
+			}
+		});
 	}
 
 	public void render () {
@@ -92,7 +113,7 @@ public class PhysicsTest2 extends ApplicationAdapter {
 		renderer.draw(batch, skeleton); // Draw the skeleton images.
 		batch.end();
 
-		debugRenderer.draw(skeleton); // Draw debug lines.
+		// debugRenderer.draw(skeleton); // Draw debug lines.
 	}
 
 	public void resize (int width, int height) {
