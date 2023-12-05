@@ -1,4 +1,9 @@
+<!DOCTYPE html>
 <html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
 <script src="../dist/iife/spine-webgl.js"></script>
 <style>
 	* {
@@ -8,13 +13,14 @@
 </style>
 
 <body>
-	<span style="position: fixed; z-index: 10; top: 0; left: 0; color: white; padding: 1em;">Click and drag anywhere</span>
-	<canvas id="canvas" style="position: absolute; width: 100%; height: 100%;"></canvas>
+	<span id="label" style="position: fixed; z-index: 10; top: 0; left: 0; color: white; padding: 1em;"></span>
+	<canvas id="canvas" style="position: absolute; width: 100%; height: 100vh;"></canvas>
 	<script>
 		class App {
 			constructor() {
 				this.skeleton = null;
 				this.animationState = null;
+				this.label = document.body.querySelector("#label");
 			}
 
 			loadAssets(canvas) {
@@ -92,6 +98,8 @@
 				// Let the skeleton update the transforms of its bones and apply physics
 				this.skeleton.update(delta);
 				this.skeleton.updateWorldTransform(spine.Physics.update);
+
+				this.label.innerText = "Click and drag anywhere (" + canvas.time.framesPerSecond.toFixed(2) + " fps)";
 			}
 
 			render(canvas) {
