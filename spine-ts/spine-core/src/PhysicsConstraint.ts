@@ -176,7 +176,7 @@ export class PhysicsConstraint implements Updatable {
 					if (rotateOrShearX || scaleX) {
 						let ca = Math.atan2(bone.c, bone.a), c = 0, s = 0, mr = 0;
 						if (rotateOrShearX) {
-							mr = mix * this.data.rotate;
+							mr = (this.data.rotate + this.data.shearX) * mix;
 							let dx = this.cx - bone.worldX, dy = this.cy - bone.worldY, r = Math.atan2(dy + this.ty, dx + this.tx) - ca - this.rotateOffset * mr;
 							this.rotateOffset += (r - Math.ceil(r * MathUtils.invPI2 - 0.5) * MathUtils.PI2) * i;
 							r = this.rotateOffset * mr + ca;
