@@ -8,6 +8,7 @@
 </style>
 
 <body>
+	<span style="position: fixed; z-index: 10; top: 0; left: 0; color: white; padding: 1em;">Click and drag anywhere</span>
 	<canvas id="canvas" style="position: absolute; width: 100%; height: 100%;"></canvas>
 	<script>
 		class App {
@@ -43,8 +44,44 @@
 				// Create an AnimationState, and set the "run" animation in looping mode.
 				var animationStateData = new spine.AnimationStateData(skeletonData);
 				this.animationState = new spine.AnimationState(animationStateData);
-				this.animationState.setAnimation(0, "swing", true);
-				this.animationState.setAnimation(1, "eyeblink-long", true);
+				this.animationState.setAnimation(0, "eyeblink-long", true);
+
+				// Center the camera on the skeleton
+				const offset = new spine.Vector2();
+				const size = new spine.Vector2();
+				this.skeleton.setToSetupPose();
+				this.skeleton.update(0);
+				this.skeleton.updateWorldTransform(spine.Physics.update);
+				this.skeleton.getBounds(offset, size);
+				canvas.renderer.camera.position.x = offset.x + size.x / 2;
+				canvas.renderer.camera.position.y = offset.y + size.y / 2;
+
+				// Setup an input listener on the canvas to process touch/mouse events. Allow drawing the skeleton around
+				// by clicking and dragging anywhere on the canvas.
+				let lastX = -1, lastY = -1;
+                canvas.input.addListener({
+                    down: (x, y) => {
+                        // Calculate the mouse position in the coordinate space of the camera, aka world space.
+                        // The skeleton and its bones live in the same coordinate space.
+                        let mousePosition = new spine.Vector3(x, y);
+                        canvas.renderer.camera.screenToWorld(mousePosition, canvas.htmlCanvas.clientWidth, canvas.htmlCanvas.clientHeight);
+
+                        lastX = mousePosition.x;
+						lastY = mousePosition.y;
+                    },
+                    dragged: (x, y) => {
+                        // Calculate the mouse position in the coordinate space of the camera, aka world space.
+                        // The skeleton and its bones live in this coordinate space.
+                        let mousePosition = new spine.Vector3(x, y);
+                        canvas.renderer.camera.screenToWorld(mousePosition, canvas.htmlCanvas.clientWidth, canvas.htmlCanvas.clientHeight);
+
+						this.skeleton.x += mousePosition.x - lastX;
+						this.skeleton.y += mousePosition.y - lastY;
+
+						lastX = mousePosition.x;
+						lastY = mousePosition.y;
+                    }
+                })
 			}
 
 			update(canvas, delta) {
