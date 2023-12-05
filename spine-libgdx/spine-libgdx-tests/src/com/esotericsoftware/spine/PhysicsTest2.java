@@ -36,8 +36,7 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.FloatArray;
+
 import com.esotericsoftware.spine.Skeleton.Physics;
 import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
 
@@ -80,16 +79,15 @@ public class PhysicsTest2 extends ApplicationAdapter {
 			public boolean touchDown (int screenX, int screenY, int pointer, int button) {
 				lastX = screenX;
 				lastY = screenY;
-				return false;
+				return true;
 			}
 
-			@Override
-			public boolean touchDragged(int screenX, int screenY, int pointer) {
+			public boolean touchDragged (int screenX, int screenY, int pointer) {
 				skeleton.x += screenX - lastX;
 				skeleton.y += lastY - screenY;
 				lastX = screenX;
 				lastY = screenY;
-				return false;
+				return true;
 			}
 		});
 	}
