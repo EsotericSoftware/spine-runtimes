@@ -44,10 +44,7 @@ cp -f ../sack/export/sack-pma.png "$ROOT/spine-libgdx/spine-libgdx-tests/assets/
 
 rm -f "$ROOT/spine-libgdx/spine-libgdx-tests/assets/celestial-circus/"*
 mkdir -p "$ROOT/spine-libgdx/spine-libgdx-tests/assets/celestial-circus/"
-cp -f ../celestial-circus/export/celestial-circus-pro.json "$ROOT/spine-libgdx/spine-libgdx-tests/assets/celestial-circus/"
-cp -f ../celestial-circus/export/celestial-circus-pro.skel "$ROOT/spine-libgdx/spine-libgdx-tests/assets/celestial-circus/"
-cp -f ../celestial-circus/export/celestial-circus-pma.atlas "$ROOT/spine-libgdx/spine-libgdx-tests/assets/celestial-circus/"
-cp -f ../celestial-circus/export/celestial-circus-pma.png "$ROOT/spine-libgdx/spine-libgdx-tests/assets/celestial-circus/"
+cp -f ../celestial-circus/export/* "$ROOT/spine-libgdx/spine-libgdx-tests/assets/celestial-circus/"
 
 echo "spine-cocos2d-objc"
 rm "$ROOT/spine-cocos2d-objc/Resources/"*
