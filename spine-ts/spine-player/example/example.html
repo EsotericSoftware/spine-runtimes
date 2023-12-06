@@ -6,18 +6,12 @@
 	<script src="../dist/iife/spine-player.js"></script>
 	<link rel="stylesheet" href="../css/spine-player.css">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="../../index.css" />
 </head>
 
-<style>
-	body {
-		background: gray;
-		margin: 0px;
-	}
-</style>
-
-<body>
-	<div id="container" style="width:640px; height:380px"></div>
-	<div id="container-raptor" style="width:640px; height:380px"></div>
+<body class="flex flex-col justify-center items-center">
+	<div id="container" style="max-width:640px; aspect-ratio: 16/9"></div>
+	<div id="container-raptor" style="max-width:640px; aspect-ratio: 16/9"></div>
 	<div>
 		<button id="walk">Walk</button>
 		<button id="jump">Jump</button>

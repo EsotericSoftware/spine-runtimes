@@ -90,7 +90,7 @@ body { margin: 0px; }
 	private render (parent: HTMLElement) {
 		let dom = /*html*/`
 				<div style="display: flex; flex-direction: column; width: 100%; height: 100%;">
-					<div style="width: 100%; height: 50%;"></div>
+					<div style="width: 100%; height: 50%"></div>
 					<iframe style="width: 100%; height: 50%; outline: none; border: none;"></iframe>
 				</div>
 			`;
@@ -112,6 +112,7 @@ body { margin: 0px; }
 				this.startPlayer();
 			});
 
+			codeElement.children[0].style.height = "100%";
 			this.setCode(SpinePlayerEditor.DEFAULT_CODE);
 		})
 	}

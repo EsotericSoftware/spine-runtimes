@@ -6,20 +6,12 @@
 	<script src="../dist/iife/spine-player.js"></script>
 	<link rel="stylesheet" href="../css/spine-player.css">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="../../index.css" />
 </head>
 
-<style>
-	body {
-		background: gray;
-		margin: 0px;
-	}
-</style>
-
-<body>
+<body class="flex flex-col" style="gap: 1em;">
 	<div id="container" style="width:640px; height:380px"></div>
-	<div>
-		<button id="dispose">Dispose</button>
-	</div>
+	<button id="dispose" style="align-self: flex-start;">Dispose</button>
 </body>
 <script>
 	var player = createPlayer();
@@ -42,7 +34,7 @@
 			},
 			showControls: true
 		});
-	}	
+	}
 </script>
 </body>
 
