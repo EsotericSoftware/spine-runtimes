@@ -29,25 +29,25 @@
 
 declare function CodeMirror (el: Element, config: any): void;
 
-function loadScript(url: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-        const script = document.createElement('script');
-        script.src = url;
-        script.onload = () => resolve();
-        script.onerror = () => reject(new Error(`Script load error for ${url}`));
-        document.head.appendChild(script);
-    });
+function loadScript (url: string): Promise<void> {
+	return new Promise((resolve, reject) => {
+		const script = document.createElement('script');
+		script.src = url;
+		script.onload = () => resolve();
+		script.onerror = () => reject(new Error(`Script load error for ${url}`));
+		document.head.appendChild(script);
+	});
 }
 
-function loadCss(url: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-        const link = document.createElement('link');
-        link.href = url;
-        link.rel = 'stylesheet';
-        link.onload = () => resolve();
-        link.onerror = () => reject(new Error(`CSS load error for ${url}`));
-        document.head.appendChild(link);
-    });
+function loadCss (url: string): Promise<void> {
+	return new Promise((resolve, reject) => {
+		const link = document.createElement('link');
+		link.href = url;
+		link.rel = 'stylesheet';
+		link.onload = () => resolve();
+		link.onerror = () => reject(new Error(`CSS load error for ${url}`));
+		document.head.appendChild(link);
+	});
 }
 
 export class SpinePlayerEditor {
@@ -82,7 +82,7 @@ body { margin: 0px; }
 		this.load();
 	}
 
-	private async load() {
+	private async load () {
 		await Promise.all([loadScript("https://www.unpkg.com/codemirror@5.51.0/lib/codemirror.js"), loadCss("https://www.unpkg.com/codemirror@5.51.0/lib/codemirror.css")]);
 		this.render(this.parent);
 	}

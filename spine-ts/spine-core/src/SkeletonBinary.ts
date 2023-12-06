@@ -940,26 +940,26 @@ export class SkeletonBinary {
 				}
 				const bezierCount = input.readInt(true);
 				switch (type) {
-				case PHYSICS_INERTIA:
-					timelines.push(readTimeline1(input, new PhysicsConstraintInertiaTimeline(frameCount, bezierCount, index), 1));
-					break;
-				case PHYSICS_STRENGTH:
-					timelines.push(readTimeline1(input, new PhysicsConstraintStrengthTimeline(frameCount, bezierCount, index), 1));
-					break;
-				case PHYSICS_DAMPING:
-					timelines.push(readTimeline1(input, new PhysicsConstraintDampingTimeline(frameCount, bezierCount, index), 1));
-					break;
-				case PHYSICS_MASS:
-					timelines.push(readTimeline1(input, new PhysicsConstraintMassTimeline(frameCount, bezierCount, index), 1));
-					break;
-				case PHYSICS_WIND:
-					timelines.push(readTimeline1(input, new PhysicsConstraintWindTimeline(frameCount, bezierCount, index), 1));
-					break;
-				case PHYSICS_GRAVITY:
-					timelines.push(readTimeline1(input, new PhysicsConstraintGravityTimeline(frameCount, bezierCount, index), 1));
-					break;
-				case PHYSICS_MIX:
-					timelines.push(readTimeline1(input, new PhysicsConstraintMixTimeline(frameCount, bezierCount, index), 1));
+					case PHYSICS_INERTIA:
+						timelines.push(readTimeline1(input, new PhysicsConstraintInertiaTimeline(frameCount, bezierCount, index), 1));
+						break;
+					case PHYSICS_STRENGTH:
+						timelines.push(readTimeline1(input, new PhysicsConstraintStrengthTimeline(frameCount, bezierCount, index), 1));
+						break;
+					case PHYSICS_DAMPING:
+						timelines.push(readTimeline1(input, new PhysicsConstraintDampingTimeline(frameCount, bezierCount, index), 1));
+						break;
+					case PHYSICS_MASS:
+						timelines.push(readTimeline1(input, new PhysicsConstraintMassTimeline(frameCount, bezierCount, index), 1));
+						break;
+					case PHYSICS_WIND:
+						timelines.push(readTimeline1(input, new PhysicsConstraintWindTimeline(frameCount, bezierCount, index), 1));
+						break;
+					case PHYSICS_GRAVITY:
+						timelines.push(readTimeline1(input, new PhysicsConstraintGravityTimeline(frameCount, bezierCount, index), 1));
+						break;
+					case PHYSICS_MIX:
+						timelines.push(readTimeline1(input, new PhysicsConstraintMixTimeline(frameCount, bezierCount, index), 1));
 				}
 			}
 		}
