@@ -1,35 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="//cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.js"></script>
+    <link rel="stylesheet" href="../../index.css" />
     <title>Spine Phaser Example</title>
-</head>
+  </head>
 
-<body>
+  <body class="p-4 flex flex-col items-center">
     <h1>Camera pipeline test</h1>
     <script>
-        const config = {
-            type: Phaser.AUTO,
-            width: 800,
-            height: 600,
-            type: Phaser.WEBGL,
-            backgroundColor: '#cdcdcd',
-            scene: {
-                preload: preload,
-                create: create,
-                pack: {
-                    files: [
-                        { type: "scenePlugin", key: "spine.SpinePlugin", url: "../dist/iife/spine-phaser.js", sceneKey: "spine" }
-                    ]
-                }
-            }
-        };
+      const config = {
+        type: Phaser.AUTO,
+        width: 800,
+        height: 600,
+        type: Phaser.WEBGL,
+        backgroundColor: "#cdcdcd",
+        scene: {
+          preload: preload,
+          create: create,
+          pack: {
+            files: [
+              {
+                type: "scenePlugin",
+                key: "spine.SpinePlugin",
+                url: "../dist/iife/spine-phaser.js",
+                sceneKey: "spine",
+              },
+            ],
+          },
+        },
+      };
 
-        const fragShader = `
+      const fragShader = `
         #define SHADER_NAME PLASMA_FS
 
         precision mediump float;
@@ -59,54 +64,55 @@
         }
         `;
 
-        class PlasmaPostFX extends Phaser.Renderer.WebGL.Pipelines.PostFXPipeline {
-            constructor(game) {
-                super({
-                    game,
-                    name: 'PlasmaPostFX',
-                    fragShader,
-                    uniforms: [
-                        'uMainSampler',
-                        'uTime',
-                        'uResolution'
-                    ]
-                });
-            }
-
-            onPreRender() {
-                this.set1f('uTime', this.game.loop.time / 1000);
-            }
-
-            onDraw(renderTarget) {
-                this.set2f('uResolution', renderTarget.width, renderTarget.height);
-
-                this.bindAndDraw(renderTarget);
-            }
+      class PlasmaPostFX extends Phaser.Renderer.WebGL.Pipelines
+        .PostFXPipeline {
+        constructor(game) {
+          super({
+            game,
+            name: "PlasmaPostFX",
+            fragShader,
+            uniforms: ["uMainSampler", "uTime", "uResolution"],
+          });
         }
 
-        const game = new Phaser.Game(config);
-
-        function preload() {
-            this.load.spineBinary("spineboy-data", "assets/spineboy-pro.skel");
-            this.load.spineAtlas("spineboy-atlas", "assets/spineboy-pma.atlas");
-            this.load.image("img", "assets/raptor-pma.png")
+        onPreRender() {
+          this.set1f("uTime", this.game.loop.time / 1000);
         }
 
-        function create() {
-            this.renderer.pipelines.addPostPipeline('PlasmaPostFX', PlasmaPostFX);
+        onDraw(renderTarget) {
+          this.set2f("uResolution", renderTarget.width, renderTarget.height);
 
-            // FIXME: Need a dummy sprite so the MultiPipeline sets up state
-            // so rendering the Spine sprite actually works. Unsure what state
-            // is needed.
-            this.add.sprite(0, 0, 'img');
-
-            const spineboy = this.add.spine(400, 300, 'spineboy-data', "spineboy-atlas");
-            spineboy.scale = 0.5;
-            spineboy.animationState.setAnimation(0, "walk", true);
-
-            this.cameras.main.setPostPipeline("PlasmaPostFX");
+          this.bindAndDraw(renderTarget);
         }
+      }
+
+      const game = new Phaser.Game(config);
+
+      function preload() {
+        this.load.spineBinary("spineboy-data", "assets/spineboy-pro.skel");
+        this.load.spineAtlas("spineboy-atlas", "assets/spineboy-pma.atlas");
+        this.load.image("img", "assets/raptor-pma.png");
+      }
+
+      function create() {
+        this.renderer.pipelines.addPostPipeline("PlasmaPostFX", PlasmaPostFX);
+
+        // FIXME: Need a dummy sprite so the MultiPipeline sets up state
+        // so rendering the Spine sprite actually works. Unsure what state
+        // is needed.
+        this.add.sprite(0, 0, "img");
+
+        const spineboy = this.add.spine(
+          400,
+          300,
+          "spineboy-data",
+          "spineboy-atlas"
+        );
+        spineboy.scale = 0.5;
+        spineboy.animationState.setAnimation(0, "walk", true);
+
+        this.cameras.main.setPostPipeline("PlasmaPostFX");
+      }
     </script>
-</body>
-
+  </body>
 </html>
