@@ -66,6 +66,7 @@ protected:
 	PackedByteArray vertex_buffer;
 	PackedByteArray attribute_buffer;
 	uint32_t vertex_stride;
+	uint32_t normal_tangent_stride;
 	uint32_t attribute_stride;
 #else
 	RID mesh;

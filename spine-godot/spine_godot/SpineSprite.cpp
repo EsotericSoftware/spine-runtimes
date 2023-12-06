@@ -146,7 +146,7 @@ void SpineMesh2D::update_mesh(const Vector<Point2> &vertices,
 		uint32_t skin_stride;
 		RS::get_singleton()->mesh_create_surface_data_from_arrays(&surface, (RS::PrimitiveType) Mesh::PRIMITIVE_TRIANGLES, arrays, TypedArray<Array>(), Dictionary(), Mesh::ArrayFormat::ARRAY_FLAG_USE_DYNAMIC_UPDATE);
 		RS::get_singleton()->mesh_add_surface(mesh, surface);
-		RS::get_singleton()->mesh_surface_make_offsets_from_format(surface.format, surface.vertex_count, surface.index_count, surface_offsets, vertex_stride, attribute_stride, skin_stride);
+		RS::get_singleton()->mesh_surface_make_offsets_from_format(surface.format, surface.vertex_count, surface.index_count, surface_offsets, vertex_stride, normal_tangent_stride, attribute_stride, skin_stride);
 		num_vertices = vertices.size();
 		num_indices = indices.size();
 		vertex_buffer = surface.vertex_data;
