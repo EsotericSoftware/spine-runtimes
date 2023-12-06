@@ -152,6 +152,9 @@ export interface SpinePlayerConfig {
 	/* Optional: Callback at the start of each frame, before the skeleton is posed or drawn. Default: none */
 	frame?: (player: SpinePlayer, delta: number) => void
 
+	/* Optional: Callback to update the skeleton's world transform. Default: player.skeleton.updateWorldTransform(spine.Physics.update) is called */
+	updateWorldTransform?: (player: SpinePlayer, delta: number) => void
+
 	/* Optional: Callback after the skeleton is posed each frame, before it is drawn. Default: none */
 	update?: (player: SpinePlayer, delta: number) => void
 
@@ -815,9 +818,13 @@ export class SpinePlayer implements Disposable {
 
 				// Update animation time and pose the skeleton.
 				if (!this.paused) {
+					skeleton.update(playDelta);
 					this.animationState!.update(playDelta);
 					this.animationState!.apply(skeleton);
-					skeleton.updateWorldTransform(Physics.update);
+					if (config.updateWorldTransform)
+						config.updateWorldTransform(this, playDelta);
+					else
+						skeleton.updateWorldTransform(Physics.update);
 
 					if (config.showControls) {
 						this.playTime += playDelta;
