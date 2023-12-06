@@ -373,6 +373,7 @@ export class SpinePlayer implements Disposable {
 				let time = animationDuration * percentage;
 				this.animationState!.update(time - this.playTime);
 				this.animationState!.apply(this.skeleton!);
+				this.skeleton!.update(time - this.playTime);
 				this.skeleton!.updateWorldTransform(Physics.update);
 				this.playTime = time;
 			};
