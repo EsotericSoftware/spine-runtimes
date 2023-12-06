@@ -5,8 +5,10 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<script src="../dist/iife/spine-player.js"></script>
 		<link rel="stylesheet" href="../dist/spine-player.css">
+		<link rel="stylesheet" href="../../index.css">
 	</head>
 <body style="margin:0">
+	<span class="overlay">Drag the swinging lady</span>
 	<div id="player" style="position: absolute; width: 100%; height: 100vh;">
 	</div>
 	<script>
@@ -28,12 +30,9 @@
 						player.skeleton.getRootBone().x += mouse.x - last.x;
 						player.skeleton.getRootBone().y += mouse.y - last.y;
 						last.setFrom(mouse);
-					}
+					},
+					up: () => player.paused = false
 				});
 			},
-			frame: function (player, delta) {
-				player.skeleton.update(player.time.delta);
-				player.skeleton.updateWorldTransform(spine.Physics.update);
-			}
 		});</script>
 	</body></html>
