@@ -70,7 +70,7 @@ namespace Spine {
 			mix = data.mix;
 		}
 
-		/** Copy constructor. */
+		/// <summary>Copy constructor.</summary>
 		public PhysicsConstraint (PhysicsConstraint constraint) {
 			if (constraint == null) throw new ArgumentNullException("constraint", "constraint cannot be null.");
 			data = constraint.data;
@@ -274,7 +274,7 @@ namespace Spine {
 		public bool Active { get { return active; } }
 
 
-		/** The physics constraint's setup pose data. */
+		/// <summary>The physics constraint's setup pose data.</summary>
 		public PhysicsConstraintData getData () {
 			return data;
 		}
