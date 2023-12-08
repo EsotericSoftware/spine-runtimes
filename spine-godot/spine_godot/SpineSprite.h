@@ -66,6 +66,7 @@ protected:
 	PackedByteArray vertex_buffer;
 	PackedByteArray attribute_buffer;
 	uint32_t vertex_stride;
+	uint32_t normal_tangent_stride;
 	uint32_t attribute_stride;
 #else
 	RID mesh;
@@ -80,7 +81,7 @@ protected:
 
 public:
 #if VERSION_MAJOR > 3
-	SpineMesh2D() : renderer_object(nullptr), indices_changed(true), num_vertices(0), num_indices(0), vertex_stride(0), attribute_stride(0){};
+	SpineMesh2D() : renderer_object(nullptr), indices_changed(true), num_vertices(0), num_indices(0), vertex_stride(0), normal_tangent_stride(0), attribute_stride(0){};
 	~SpineMesh2D() {
 		if (mesh.is_valid()) {
 			RS::get_singleton()->free(mesh);
