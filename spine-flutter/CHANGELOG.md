@@ -1,3 +1,6 @@
+# 4.1.12
+# FilterQuality for texture atlas pages is now set to medium. It is configurable via `Atlas.filterQuality`. See https://github.com/EsotericSoftware/spine-runtimes/issues/2362
+
 # 4.1.11
 # Fixed clipping bug, see https://github.com/EsotericSoftware/spine-runtimes/issues/2431
 

@@ -101,6 +101,7 @@ class Vec2 {
 /// Use the static methods [fromAsset], [fromFile], and [fromHttp] to load an atlas. Call [dispose]
 /// when the atlas is no longer in use to release its resources.
 class Atlas {
+  static FilterQuality filterQuality = FilterQuality.medium;
   final spine_atlas _atlas;
   final List<Image> atlasPages;
   final List<Map<BlendMode, Paint>> atlasPagePaints;
@@ -138,7 +139,7 @@ class Atlas {
         paints[blendMode] = Paint()
           ..shader = ImageShader(image, TileMode.clamp, TileMode.clamp, Matrix4
               .identity()
-              .storage, filterQuality: FilterQuality.high)
+              .storage, filterQuality: Atlas.filterQuality)
           ..isAntiAlias = true
           ..blendMode = blendMode.canvasBlendMode;
       }
