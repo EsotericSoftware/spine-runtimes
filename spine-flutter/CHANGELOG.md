@@ -12,17 +12,17 @@
 * Fixes compilation errors due to API change in Flutter 3.16.0, see [this issue](https://github.com/EsotericSoftware/spine-runtimes/issues/2420). **Note**: Depending on this version requires your project to depend on Flutter >= 3.16.0 as well.
 
 # 4.1.12
-# FilterQuality for texture atlas pages is now set to medium. It is configurable via `Atlas.filterQuality`. See https://github.com/EsotericSoftware/spine-runtimes/issues/2362
-# Track Entry listeners are now invoked properly, see https://github.com/EsotericSoftware/spine-runtimes/issues/2349
+* FilterQuality for texture atlas pages is now set to medium. It is configurable via `Atlas.filterQuality`. See https://github.com/EsotericSoftware/spine-runtimes/issues/2362
+* Track Entry listeners are now invoked properly, see https://github.com/EsotericSoftware/spine-runtimes/issues/2349
 
 # 4.1.11
-# Fixed clipping bug, see https://github.com/EsotericSoftware/spine-runtimes/issues/2431
+* Fixed clipping bug, see https://github.com/EsotericSoftware/spine-runtimes/issues/2431
 
 # 4.1.10
-# Update WASM binaries
+* Update WASM binaries
 
 # 4.1.9
-# Fixes #2412, single bone, translation only IK constraints did not take skeleton scale into account.
+*Fixes #2412, single bone, translation only IK constraints did not take skeleton scale into account.
 
 # 4.1.8
 * Fixes compilation errors due to API change in Flutter 3.16.0, see [this issue](https://github.com/EsotericSoftware/spine-runtimes/issues/2420). **Note**: Depending on this version requires your project to depend on Flutter >= 3.16.0 as well.
