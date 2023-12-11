@@ -1,9 +1,9 @@
 #4.2.21
-# FilterQuality for texture atlas pages is now set to medium. It is configurable via `Atlas.filterQuality`. See https://github.com/EsotericSoftware/spine-runtimes/issues/2362
-# Track Entry listeners are now invoked properly, see https://github.com/EsotericSoftware/spine-runtimes/issues/2349
+* FilterQuality for texture atlas pages is now set to medium. It is configurable via `Atlas.filterQuality`. See https://github.com/EsotericSoftware/spine-runtimes/issues/2362
+* Track Entry listeners are now invoked properly, see https://github.com/EsotericSoftware/spine-runtimes/issues/2349
 
 # 4.2.20
-# Fixed clipping bug, see https://github.com/EsotericSoftware/spine-runtimes/issues/2431
+* Fixed clipping bug, see https://github.com/EsotericSoftware/spine-runtimes/issues/2431
 
 # 4.2.19
 * Fixes #2412, single bone, translation only IK constraints did not take skeleton scale into account.
