@@ -101,6 +101,7 @@ class Vec2 {
 /// Use the static methods [fromAsset], [fromFile], and [fromHttp] to load an atlas. Call [dispose]
 /// when the atlas is no longer in use to release its resources.
 class Atlas {
+  static FilterQuality filterQuality = FilterQuality.medium;
   final spine_atlas _atlas;
   final List<Image> atlasPages;
   final List<Map<BlendMode, Paint>> atlasPagePaints;
@@ -138,7 +139,7 @@ class Atlas {
         paints[blendMode] = Paint()
           ..shader = ImageShader(image, TileMode.clamp, TileMode.clamp, Matrix4
               .identity()
-              .storage, filterQuality: FilterQuality.high)
+              .storage, filterQuality: Atlas.filterQuality)
           ..isAntiAlias = true
           ..blendMode = blendMode.canvasBlendMode;
       }
@@ -3706,7 +3707,7 @@ class AnimationState {
         final nativeEvent = _bindings.spine_animation_state_events_get_event(_events, i);
         final event = nativeEvent.address == nullptr.address ? null : Event._(nativeEvent);
         if (_trackEntryListeners.containsKey(nativeEntry)) {
-          _trackEntryListeners[entry]?.call(type, entry, event);
+          _trackEntryListeners[nativeEntry]?.call(type, entry, event);
         }
         if (_stateListener != null) {
           _stateListener?.call(type, entry, event);
