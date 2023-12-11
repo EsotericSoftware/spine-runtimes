@@ -1,3 +1,6 @@
+# 4.2.20
+# Fixed clipping bug, see https://github.com/EsotericSoftware/spine-runtimes/issues/2431
+
 # 4.2.19
 * Fixes #2412, single bone, translation only IK constraints did not take skeleton scale into account.
 
