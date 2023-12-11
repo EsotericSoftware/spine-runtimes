@@ -732,7 +732,10 @@ spine_render_command spine_skeleton_drawable_render(spine_skeleton_drawable draw
 	for (unsigned i = 0; i < skeleton->getSlots().size(); ++i) {
 		Slot &slot = *skeleton->getDrawOrder()[i];
 		Attachment *attachment = slot.getAttachment();
-		if (!attachment) continue;
+		if (!attachment) {
+            clipper.clipEnd(slot);
+            continue;
+        }
 
 		// Early out if the slot color is 0 or the bone is not active
 		if (slot.getColor().a == 0 || !slot.getBone().isActive()) {

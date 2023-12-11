@@ -4,6 +4,9 @@
 # 4.2.18
 * Fixes compilation errors due to API change in Flutter 3.16.0, see [this issue](https://github.com/EsotericSoftware/spine-runtimes/issues/2420). **Note**: Depending on this version requires your project to depend on Flutter >= 3.16.0 as well.
 
+# 4.1.11
+# Fixed clipping bug, see https://github.com/EsotericSoftware/spine-runtimes/issues/2431
+
 # 4.1.10
 # Update WASM binaries
 
