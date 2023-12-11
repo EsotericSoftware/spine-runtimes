@@ -75,9 +75,9 @@ void spSkeletonDrawable_draw(spSkeletonDrawable *self, struct SDL_Renderer *rend
 		spSlot *slot = skeleton->drawOrder[i];
 		spAttachment *attachment = slot->attachment;
 		if (!attachment) {
-            spSkeletonClipping_clipEnd(clipper, slot);
-            continue;
-        }
+			spSkeletonClipping_clipEnd(clipper, slot);
+			continue;
+		}
 
 		// Early out if the slot color is 0 or the bone is not active
 		if (slot->color.a == 0 || !slot->bone->active) {
