@@ -3707,7 +3707,7 @@ class AnimationState {
         final nativeEvent = _bindings.spine_animation_state_events_get_event(_events, i);
         final event = nativeEvent.address == nullptr.address ? null : Event._(nativeEvent);
         if (_trackEntryListeners.containsKey(nativeEntry)) {
-          _trackEntryListeners[entry]?.call(type, entry, event);
+          _trackEntryListeners[nativeEntry]?.call(type, entry, event);
         }
         if (_stateListener != null) {
           _stateListener?.call(type, entry, event);
