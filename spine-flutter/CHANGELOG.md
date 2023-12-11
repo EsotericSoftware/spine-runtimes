@@ -1,3 +1,6 @@
+# 4.1.11
+# Fixed clipping bug, see https://github.com/EsotericSoftware/spine-runtimes/issues/2431
+
 # 4.1.10
 # Update WASM binaries
 
