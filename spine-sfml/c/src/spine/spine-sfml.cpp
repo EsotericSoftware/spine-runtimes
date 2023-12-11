@@ -169,9 +169,9 @@ namespace spine {
 			spSlot *slot = skeleton->drawOrder[i];
 			spAttachment *attachment = slot->attachment;
 			if (!attachment) {
-                spSkeletonClipping_clipEnd(clipper, slot);
-                continue;
-            }
+				spSkeletonClipping_clipEnd(clipper, slot);
+				continue;
+			}
 
 			// Early out if slot is invisible
 			if (slot->color.a == 0 || !slot->bone->active) {

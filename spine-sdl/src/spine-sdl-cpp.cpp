@@ -71,9 +71,9 @@ void SkeletonDrawable::draw(SDL_Renderer *renderer) {
 		Slot &slot = *skeleton->getDrawOrder()[i];
 		Attachment *attachment = slot.getAttachment();
 		if (!attachment) {
-            clipper.clipEnd(slot);
-            continue;
-        }
+			clipper.clipEnd(slot);
+			continue;
+		}
 
 		// Early out if the slot color is 0 or the bone is not active
 		if (slot.getColor().a == 0 || !slot.getBone().isActive()) {
