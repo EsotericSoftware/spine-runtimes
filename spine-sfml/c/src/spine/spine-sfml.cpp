@@ -168,7 +168,10 @@ namespace spine {
 		for (int i = 0; i < skeleton->slotsCount; ++i) {
 			spSlot *slot = skeleton->drawOrder[i];
 			spAttachment *attachment = slot->attachment;
-			if (!attachment) continue;
+			if (!attachment) {
+                spSkeletonClipping_clipEnd(clipper, slot);
+                continue;
+            }
 
 			// Early out if slot is invisible
 			if (slot->color.a == 0 || !slot->bone->active) {
