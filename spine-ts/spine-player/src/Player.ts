@@ -40,6 +40,9 @@ export interface SpinePlayerConfig {
 	/* The URL of the skeleton binary file (.skel). Undefined if jsonUrl is given. */
 	binaryUrl?: string
 
+	/* The scale when loading the skeleton data. Default: 1 */
+	scale?: number
+
 	/* The URL of the skeleton atlas file (.atlas). Atlas page images are automatically resolved. */
 	atlasUrl?: string
 
@@ -284,6 +287,7 @@ export class SpinePlayer implements Disposable {
 		if (!config) throw new Error("A configuration object must be passed to to new SpinePlayer().");
 		if ((config as any).skelUrl) config.binaryUrl = (config as any).skelUrl;
 		if (!config.jsonUrl && !config.binaryUrl) throw new Error("A URL must be specified for the skeleton JSON or binary file.");
+		if (!config.scale) config.scale = 1;
 		if (!config.atlasUrl) throw new Error("A URL must be specified for the atlas file.");
 		if (!config.backgroundColor) config.backgroundColor = config.alpha ? "00000000" : "000000";
 		if (!config.fullScreenBackgroundColor) config.fullScreenBackgroundColor = config.backgroundColor;
@@ -460,29 +464,25 @@ export class SpinePlayer implements Disposable {
 
 		// Load skeleton data.
 		let skeletonData: SkeletonData;
-		if (config.jsonUrl) {
-			try {
-				let jsonData = this.assetManager!.remove(config.jsonUrl);
-				if (!jsonData) throw new Error("Empty JSON data.");
+		try {
+			let loader: any, data: any, attachmentLoader = new AtlasAttachmentLoader(atlas);
+			if (config.jsonUrl) {
+				data = this.assetManager!.remove(config.jsonUrl);
+				if (!data) throw new Error("Empty JSON data.");
 				if (config.jsonField) {
-					jsonData = jsonData[config.jsonField];
-					if (!jsonData) throw new Error("JSON field does not exist: " + config.jsonField);
+					data = data[config.jsonField];
+					if (!data) throw new Error("JSON field does not exist: " + config.jsonField);
 				}
-				let json = new SkeletonJson(new AtlasAttachmentLoader(atlas));
-				skeletonData = json.readSkeletonData(jsonData);
-			} catch (e) {
-				this.showError(`Error: Could not load skeleton JSON.\n${(e as any).message}`, e as any);
-				return;
+				loader = new SkeletonJson(attachmentLoader);
+			} else {
+				data = this.assetManager!.remove(config.binaryUrl!);
+				loader = new SkeletonBinary(attachmentLoader);
 			}
-		} else {
-			let binaryData = this.assetManager!.remove(config.binaryUrl!);
-			let binary = new SkeletonBinary(new AtlasAttachmentLoader(atlas));
-			try {
-				skeletonData = binary.readSkeletonData(binaryData);
-			} catch (e) {
-				this.showError(`Error: Could not load skeleton binary.\n${(e as any).message}`, e as any);
-				return;
-			}
+			loader.scale = config.scale;
+			skeletonData = loader.readSkeletonData(data);
+		} catch (e) {
+			this.showError(`Error: Could not load skeleton data.\n${(e as any).message}`, e as any);
+			return;
 		}
 		this.skeleton = new Skeleton(skeletonData);
 		let stateData = new AnimationStateData(skeletonData);
