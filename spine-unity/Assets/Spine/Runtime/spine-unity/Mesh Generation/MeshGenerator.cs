@@ -491,6 +491,8 @@ namespace Spine.Unity {
 			SubmeshInstruction[] wsii = workingSubmeshInstructions.Items;
 			for (int i = 0; i < workingSubmeshInstructions.Count; i++) {
 				Material material = wsii[i].material;
+				if (material == null) continue;
+
 				Material overrideMaterial;
 				if (customMaterialOverride.TryGetValue(material, out overrideMaterial))
 					wsii[i].material = overrideMaterial;
