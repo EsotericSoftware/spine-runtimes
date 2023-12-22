@@ -209,16 +209,22 @@ namespace spine {
 		/// When the mix percentage (mix time / mix duration) is less than the attachment threshold, attachment timelines for the
 		/// animation being mixed out will be applied. Defaults to 0, so attachment timelines are not applied for an animation being
 		/// mixed out.
-		float getAttachmentThreshold();
+		float getMixAttachmentThreshold();
 
-		void setAttachmentThreshold(float inValue);
+		void setMixAttachmentThreshold(float inValue);
+
+        /// When getAlpha() is greater than alphaAttachmentThreshold, attachment timelines are applied.
+	    /// Defaults to 0, so attachment timelines are always applied. */
+        float getAlphaAttachmentThreshold();
+
+        void setAlphaAttachmentThreshold(float inValue);
 
 		/// When the mix percentage (mix time / mix duration) is less than the draw order threshold, draw order timelines for the
 		/// animation being mixed out will be applied. Defaults to 0, so draw order timelines are not applied for an animation being
 		/// mixed out.
-		float getDrawOrderThreshold();
+		float getMixDrawOrderThreshold();
 
-		void setDrawOrderThreshold(float inValue);
+		void setMixDrawOrderThreshold(float inValue);
 
 		/// The animation queued to start after this animation, or NULL.
 		TrackEntry *getNext();
@@ -271,6 +277,8 @@ namespace spine {
 
 		void setListener(AnimationStateListenerObject *listener);
 
+        bool wasApplied();
+
 	private:
 		Animation *_animation;
 		TrackEntry *_previous;
@@ -280,7 +288,7 @@ namespace spine {
 		int _trackIndex;
 
 		bool _loop, _holdPrevious, _reverse, _shortestRotation;
-		float _eventThreshold, _attachmentThreshold, _drawOrderThreshold;
+		float _eventThreshold, _mixAttachmentThreshold, _alphaAttachmentThreshold, _mixDrawOrderThreshold;
 		float _animationStart, _animationEnd, _animationLast, _nextAnimationLast;
 		float _delay, _trackTime, _trackLast, _nextTrackLast, _trackEnd, _timeScale;
 		float _alpha, _mixTime, _mixDuration, _interruptAlpha, _totalAlpha;

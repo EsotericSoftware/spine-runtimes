@@ -51,7 +51,7 @@ namespace spine {
 	public:
 		TransformConstraint(TransformConstraintData &data, Skeleton &skeleton);
 
-		virtual void update();
+		virtual void update(Physics physics);
 
 		virtual int getOrder();
 
@@ -90,6 +90,8 @@ namespace spine {
 		bool isActive();
 
 		void setActive(bool inValue);
+
+        void setToSetupPose();
 
 	private:
 		TransformConstraintData &_data;

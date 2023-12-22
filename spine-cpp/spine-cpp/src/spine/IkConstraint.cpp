@@ -84,12 +84,16 @@ void IkConstraint::apply(Bone &bone, float targetX, float targetY, bool compress
 				ty = targetY - bone._worldY;
 			default:;
 		}
-		float b = bone._data.getLength() * sx, dd = MathUtil::sqrt(tx * tx + ty * ty);
-		if (((compress && dd < b) || (stretch && dd > b)) && (b > 0.0001f)) {
-			float s = (dd / b - 1) * alpha + 1;
-			sx *= s;
-			if (uniform) sy *= s;
-		}
+
+        float b = bone._data.getLength() * sx;
+        if (b > 0.0001) {
+            float dd = tx * tx + ty * ty;
+            if ((compress && dd < b * b) || (stretch && dd > b * b)) {
+                float s = (MathUtil::sqrt(dd) / b - 1) * alpha + 1;
+                sx *= s;
+                if (uniform) sy *= s;
+            }
+        }
 	}
 	bone.updateWorldTransform(bone._ax, bone._ay, bone._arotation + rotationIK * alpha, sx, sy, bone._ashearX,
 							  bone._ashearY);
@@ -279,7 +283,7 @@ IkConstraint::IkConstraint(IkConstraintData &data, Skeleton &skeleton) : Updatab
 	}
 }
 
-void IkConstraint::update() {
+void IkConstraint::update(Physics physics) {
 	if (_mix == 0) return;
 	switch (_bones.size()) {
 		case 1: {
@@ -362,4 +366,13 @@ float IkConstraint::getSoftness() {
 
 void IkConstraint::setSoftness(float inValue) {
 	_softness = inValue;
+}
+
+void IkConstraint::setToSetupPose() {
+    auto data = this->_data;
+    this->_mix = data._mix;
+    this->_softness = data._softness;
+    this->_bendDirection = data._bendDirection;
+    this->_compress = data._compress;
+    this->_stretch = data._stretch;
 }

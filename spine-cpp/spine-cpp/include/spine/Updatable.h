@@ -32,6 +32,7 @@
 
 #include <spine/RTTI.h>
 #include <spine/SpineObject.h>
+#include <spine/Physics.h>
 
 namespace spine {
 	class SP_API Updatable : public SpineObject {
@@ -42,7 +43,7 @@ namespace spine {
 
 		virtual ~Updatable();
 
-		virtual void update() = 0;
+		virtual void update(Physics physics) = 0;
 
 		virtual bool isActive() = 0;
 

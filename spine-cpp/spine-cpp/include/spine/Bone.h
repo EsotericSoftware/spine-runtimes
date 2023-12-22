@@ -57,6 +57,8 @@ namespace spine {
 
 		friend class PathConstraint;
 
+        friend class PhysicsConstraint;
+
 		friend class Skeleton;
 
 		friend class RegionAttachment;
@@ -104,7 +106,7 @@ namespace spine {
 		Bone(BoneData &data, Skeleton &skeleton, Bone *parent = NULL);
 
 		/// Same as updateWorldTransform. This method exists for Bone to implement Spine::Updatable.
-		virtual void update();
+		virtual void update(Physics physics);
 
 		/// Computes the world transform using the parent bone and this bone's local transform.
 		void updateWorldTransform();

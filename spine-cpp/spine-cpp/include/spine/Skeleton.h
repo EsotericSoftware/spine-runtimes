@@ -49,6 +49,8 @@ namespace spine {
 
 	class PathConstraint;
 
+    class PhysicsConstraint;
+
 	class TransformConstraint;
 
 	class Skin;
@@ -220,6 +222,12 @@ namespace spine {
 
 		void setScaleY(float inValue);
 
+        float getTime();
+
+        float setTime(float time);
+
+        void update(float delta);
+
 	private:
 		SkeletonData *_data;
 		Vector<Bone *> _bones;
@@ -233,10 +241,13 @@ namespace spine {
 		Color _color;
 		float _scaleX, _scaleY;
 		float _x, _y;
+        float _time;
 
 		void sortIkConstraint(IkConstraint *constraint);
 
 		void sortPathConstraint(PathConstraint *constraint);
+
+        void sortPhysicsConstraint(PhysicsConstraint *constraint);
 
 		void sortTransformConstraint(TransformConstraint *constraint);
 

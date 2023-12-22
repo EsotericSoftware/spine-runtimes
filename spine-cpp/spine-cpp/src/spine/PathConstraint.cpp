@@ -66,7 +66,7 @@ PathConstraint::PathConstraint(PathConstraintData &data, Skeleton &skeleton) : U
 	_segments.setSize(10, 0);
 }
 
-void PathConstraint::update() {
+void PathConstraint::update(Physics physics) {
 	Attachment *baseAttachment = _target->getAttachment();
 	if (baseAttachment == NULL || !baseAttachment->getRTTI().instanceOf(PathAttachment::rtti)) {
 		return;
@@ -91,13 +91,11 @@ void PathConstraint::update() {
 					Bone *boneP = _bones[i];
 					Bone &bone = *boneP;
 					float setupLength = bone._data.getLength();
-					if (setupLength < PathConstraint::EPSILON) {
-						_lengths[i] = 0;
-					} else {
-						float x = setupLength * bone._a, y = setupLength * bone._c;
-						_lengths[i] = MathUtil::sqrt(x * x + y * y);
-					}
-				}
+                    float x = setupLength * bone._a;
+                    float y = setupLength * bone._c;
+                    _lengths[i] = MathUtil::sqrt(x * x + y * y);
+
+                }
 			}
 			for (size_t i = 1; i < spacesCount; ++i) {
 				_spaces[i] = spacing;
@@ -579,4 +577,13 @@ bool PathConstraint::isActive() {
 
 void PathConstraint::setActive(bool inValue) {
 	_active = inValue;
+}
+
+void PathConstraint::setToSetupPose() {
+    auto data = this->_data;
+    this->_position = data._position;
+    this->_spacing = data._spacing;
+    this->_mixRotate = data._mixRotate;
+    this->_mixX = data._mixX;
+    this->_mixY = data._mixY;
 }

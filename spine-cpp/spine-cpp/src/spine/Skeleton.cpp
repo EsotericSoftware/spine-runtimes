@@ -59,7 +59,8 @@ Skeleton::Skeleton(SkeletonData *skeletonData) : _data(skeletonData),
 												 _scaleX(1),
 												 _scaleY(1),
 												 _x(0),
-												 _y(0) {
+												 _y(0),
+                                                 _time(0){
 	_bones.ensureCapacity(_data->getBones().size());
 	for (size_t i = 0; i < _data->getBones().size(); ++i) {
 		BoneData *data = _data->getBones()[i];
@@ -682,4 +683,16 @@ void Skeleton::sortReset(Vector<Bone *> &bones) {
 		if (bone->_sorted) sortReset(bone->getChildren());
 		bone->_sorted = false;
 	}
+}
+
+float Skeleton::getTime() {
+    return _time;
+}
+
+float Skeleton::setTime(float time) {
+    _time = time;
+}
+
+void Skeleton::update(float delta) {
+    _time += delta;
 }

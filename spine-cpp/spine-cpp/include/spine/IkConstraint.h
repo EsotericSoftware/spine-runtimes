@@ -64,7 +64,7 @@ namespace spine {
 
 		IkConstraint(IkConstraintData &data, Skeleton &skeleton);
 
-		virtual void update();
+		virtual void update(Physics physics);
 
 		virtual int getOrder();
 
@@ -99,6 +99,8 @@ namespace spine {
 		bool isActive();
 
 		void setActive(bool inValue);
+
+        void setToSetupPose();
 
 	private:
 		IkConstraintData &_data;

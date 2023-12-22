@@ -125,6 +125,14 @@ namespace spine {
 
 		Color &getColor();
 
+        const String &getIcon();
+
+        void setIcon(const String &icon);
+
+        bool isVisible();
+
+        void setVisible(bool inValue);
+
 	private:
 		const int _index;
 		const String _name;
@@ -134,6 +142,8 @@ namespace spine {
 		TransformMode _transformMode;
 		bool _skinRequired;
 		Color _color;
+        String _icon;
+        bool _visible;
 	};
 }
 

@@ -40,7 +40,8 @@ SlotData::SlotData(int index, const String &name, BoneData &boneData) : _index(i
 																		_darkColor(0, 0, 0, 0),
 																		_hasDarkColor(false),
 																		_attachmentName(),
-																		_blendMode(BlendMode_Normal) {
+																		_blendMode(BlendMode_Normal),
+                                                                        _visible(true) {
 	assert(_index >= 0);
 	assert(_name.length() > 0);
 }
@@ -87,4 +88,12 @@ BlendMode SlotData::getBlendMode() {
 
 void SlotData::setBlendMode(BlendMode inValue) {
 	_blendMode = inValue;
+}
+
+bool SlotData::isVisible() {
+    return _visible;
+}
+
+void SlotData::setVisible(bool inValue) {
+    this->_visible = inValue;
 }

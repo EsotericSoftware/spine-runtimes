@@ -26,101 +26,24 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THE
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
+#ifndef Spine_Physics_h
+#define Spine_Physics_h
 
-#ifndef Spine_SlotData_h
-#define Spine_SlotData_h
-
-#include <spine/BlendMode.h>
-#include <spine/SpineObject.h>
-#include <spine/SpineString.h>
-#include <spine/Color.h>
-
+/** Determines how physics and other non-deterministic updates are applied. */
 namespace spine {
-	class BoneData;
+    enum Physics {
+        /** Physics are not updated or applied. */
+        none,
 
-	class SP_API SlotData : public SpineObject {
-		friend class SkeletonBinary;
+        /** Physics are reset to the current pose. */
+        reset,
 
-		friend class SkeletonJson;
+        /** Physics are updated and the pose from physics is applied. */
+        update,
 
-		friend class AttachmentTimeline;
-
-		friend class RGBATimeline;
-
-		friend class RGBTimeline;
-
-		friend class AlphaTimeline;
-
-		friend class RGBA2Timeline;
-
-		friend class RGB2Timeline;
-
-		friend class DeformTimeline;
-
-		friend class DrawOrderTimeline;
-
-		friend class EventTimeline;
-
-		friend class IkConstraintTimeline;
-
-		friend class PathConstraintMixTimeline;
-
-		friend class PathConstraintPositionTimeline;
-
-		friend class PathConstraintSpacingTimeline;
-
-		friend class ScaleTimeline;
-
-		friend class ShearTimeline;
-
-		friend class TransformConstraintTimeline;
-
-		friend class TranslateTimeline;
-
-		friend class TwoColorTimeline;
-
-	public:
-		SlotData(int index, const String &name, BoneData &boneData);
-
-		int getIndex();
-
-		const String &getName();
-
-		BoneData &getBoneData();
-
-		Color &getColor();
-
-		Color &getDarkColor();
-
-		bool hasDarkColor();
-
-		void setHasDarkColor(bool inValue);
-
-		/// May be empty.
-		const String &getAttachmentName();
-
-		void setAttachmentName(const String &inValue);
-
-		BlendMode getBlendMode();
-
-		void setBlendMode(BlendMode inValue);
-
-        bool isVisible();
-
-        void setVisible(bool inValue);
-
-	private:
-		const int _index;
-		String _name;
-		BoneData &_boneData;
-		Color _color;
-		Color _darkColor;
-
-		bool _hasDarkColor;
-		String _attachmentName;
-		BlendMode _blendMode;
-        bool _visible;
-	};
+        /** Physics are not updated but the pose from physics is applied. */
+        pose
+    };
 }
 
-#endif /* Spine_SlotData_h */
+#endif

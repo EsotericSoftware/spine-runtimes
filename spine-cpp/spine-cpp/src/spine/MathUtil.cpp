@@ -40,6 +40,7 @@ using namespace spine;
 
 const float MathUtil::Pi = 3.1415926535897932385f;
 const float MathUtil::Pi_2 = 3.1415926535897932385f * 2;
+const float MathUtil::InvPi_2 = 1 / MathUtil::Pi_2;
 const float MathUtil::Deg_Rad = (3.1415926535897932385f / 180.0f);
 const float MathUtil::Rad_Deg = (180.0f / 3.1415926535897932385f);
 
@@ -64,6 +65,10 @@ float MathUtil::fmod(float a, float b) {
 /// degrees), largest error of 0.00488 radians (0.2796 degrees).
 float MathUtil::atan2(float y, float x) {
 	return (float) ::atan2(y, x);
+}
+
+float MathUtil::atan2Deg(float x, float y) {
+    return MathUtil::atan2(x, y) * MathUtil::Deg_Rad;
 }
 
 /// Returns the cosine in radians from a lookup table.
@@ -121,4 +126,8 @@ float MathUtil::randomTriangular(float min, float max, float mode) {
 
 float MathUtil::pow(float a, float b) {
 	return (float) ::pow(a, b);
+}
+
+float MathUtil::ceil(float v) {
+    return ::ceil(v);
 }

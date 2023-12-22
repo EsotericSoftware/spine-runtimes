@@ -45,12 +45,10 @@ void PointAttachment::computeWorldPosition(Bone &bone, float &ox, float &oy) {
 }
 
 float PointAttachment::computeWorldRotation(Bone &bone) {
-	float cos = MathUtil::cosDeg(_rotation);
-	float sin = MathUtil::sinDeg(_rotation);
-	float ix = cos * bone._a + sin * bone._b;
-	float iy = cos * bone._c + sin * bone._d;
-
-	return MathUtil::atan2(iy, ix) * MathUtil::Rad_Deg;
+    float r = _rotation * MathUtil::Deg_Rad, cosine = MathUtil::cos(r), sine = MathUtil::sin(r);
+    float x = cosine * bone._a + sine * bone._b;
+    float y = cosine * bone._c + sine * bone._d;
+    return MathUtil::atan2Deg(y, x);
 }
 
 float PointAttachment::getX() {

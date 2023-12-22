@@ -61,7 +61,7 @@ TransformConstraint::TransformConstraint(TransformConstraintData &data, Skeleton
 	}
 }
 
-void TransformConstraint::update() {
+void TransformConstraint::update(Physics physics) {
 	if (_mixRotate == 0 && _mixX == 0 && _mixY == 0 && _mixScaleX == 0 && _mixScaleY == 0 && _mixShearY == 0) return;
 
 	if (_data.isLocal()) {
@@ -287,7 +287,7 @@ void TransformConstraint::applyAbsoluteLocal() {
 		float rotation = bone._arotation;
 		if (mixRotate != 0) {
 			float r = target._arotation - rotation + _data._offsetRotation;
-			r -= (16384 - (int) (16384.499999999996 - r / 360)) * 360;
+			r -= MathUtil::ceil(r / 360 - 0.5) * 360;
 			rotation += r * mixRotate;
 		}
 
@@ -304,7 +304,7 @@ void TransformConstraint::applyAbsoluteLocal() {
 		float shearY = bone._ashearY;
 		if (mixShearY != 0) {
 			float r = target._ashearY - shearY + _data._offsetShearY;
-			r -= (16384 - (int) (16384.499999999996 - r / 360)) * 360;
+			r -= MathUtil::ceil(r / 360 - 0.5) * 360;
 			bone._shearY += r * mixShearY;
 		}
 
@@ -337,4 +337,14 @@ bool TransformConstraint::isActive() {
 
 void TransformConstraint::setActive(bool inValue) {
 	_active = inValue;
+}
+
+void TransformConstraint::setToSetupPose() {
+	auto data = this->_data;
+	this->_mixRotate = data._mixRotate;
+	this->_mixX = data._mixX;
+	this->_mixY = data._mixY;
+	this->_mixScaleX = data._mixScaleX;
+	this->_mixScaleY = data._mixScaleY;
+	this->_mixShearY = data._mixShearY;
 }

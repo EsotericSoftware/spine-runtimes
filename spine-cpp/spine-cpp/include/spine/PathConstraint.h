@@ -59,7 +59,7 @@ namespace spine {
 	public:
 		PathConstraint(PathConstraintData &data, Skeleton &skeleton);
 
-		virtual void update();
+		virtual void update(Physics physics);
 
 		virtual int getOrder();
 
@@ -94,6 +94,8 @@ namespace spine {
 		bool isActive();
 
 		void setActive(bool inValue);
+
+        void setToSetupPose();
 
 	private:
 		static const float EPSILON;
