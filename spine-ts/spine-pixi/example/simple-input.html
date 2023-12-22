@@ -9,18 +9,7 @@
   </head>
 
   <body>
-    <!-- Creates a transparent logging overlay. -->
-    <div id="log" class="overlay" style="user-select: none;" max-height: 300px; overflow: auto;>
-    </div>
-
     <script>
-      function log(message) {
-        const log = document.querySelector("#log");
-        log.innerText += message + "\n";
-        log.scrollTop = log.scrollHeight;
-        console.log(message);
-      }
-
       (async function () {
         var app = new PIXI.Application({
           width: window.innerWidth,
@@ -38,43 +27,35 @@
         PIXI.Assets.add("spineboyAtlas", "./assets/spineboy-pma.atlas");
         await PIXI.Assets.load(["spineboyData", "spineboyAtlas"]);
 
-        // Create the Spine display object
+        // Create the spine display object
         const spineboy = spine.Spine.from("spineboyData", "spineboyAtlas", {
           scale: 0.5,
         });
 
-        // Set animation "run" on track 0, looped.
+        // Set the default animation and the 
+        // default mix for transitioning between animations.
         spineboy.state.setAnimation(0, "run", true);
-
-         // Set callbacks to receive animation state events.
-         spineboy.state.addListener({
-          start: (entry) => log(`Started animation ${entry.animation.name}`),
-          interrupt: (entry) => log(`Interrupted animation ${entry.animation.name}`),
-          end: (entry) => log(`Ended animation ${entry.animation.name}`),
-          dispose: (entry) => log(`Disposed animation ${entry.animation.name}`),
-          complete: (entry) => log(`Completed animation ${entry.animation.name}`),
-        });
-
-        // Add a custom event listener along with an
-        // unlooped animation to see the custom event logged.
-        const trackEntry = spineboy.state.addAnimation(0, "walk", false, 3);
-        trackEntry.listener = {
-          event: (entry, event) =>
-          log(`Custom event for ${entry.animation.name}: ${event.data.name}`),
-        };
-        
-        spineboy.state.addAnimation(0, "run", true, 0);
-
-        // Set the default mix time to use when transitioning
-        // from one animation to the next.
         spineboy.state.data.defaultMix = 0.2;
 
         // Center the spine object on screen.
         spineboy.x = window.innerWidth / 2;
         spineboy.y = window.innerHeight / 2 + spineboy.getBounds().height / 2;
 
+        // Make it so that you can interact with Spineboy.
+        // Also, handle the case that you click or tap on the screen.
+        // The callback function definition can be seen below.
+        spineboy.eventMode = 'static';
+        spineboy.on('pointerdown', onClick);
+
         // Add the display object to the stage.
         app.stage.addChild(spineboy);
+
+        // This callback function handles what happens 
+        // when you click or tap on the screen.
+        function onClick() {
+            spineboy.state.addAnimation(0, "jump", false, 0);
+            spineboy.state.addAnimation(0, "idle", true, 0);
+        }
       })();
     </script>
   </body>
