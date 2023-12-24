@@ -826,7 +826,7 @@ public class Animation {
 			MixDirection direction) {
 
 			Bone bone = skeleton.bones.get(boneIndex);
-			if (bone.active) bone.scaleY = getScaleValue(time, alpha, blend, direction, bone.scaleX, bone.data.scaleY);
+			if (bone.active) bone.scaleY = getScaleValue(time, alpha, blend, direction, bone.scaleY, bone.data.scaleY);
 		}
 	}
 
