@@ -13,7 +13,7 @@ In most cases, the `spine-player` module is best suited for your needs. Please r
 
 For documentation of the core API in `spine-core`, please refer to our [Spine Runtimes Guide](http://esotericsoftware.com/spine-runtimes-guide).
 
-For module specific APIs in `spine-canvas`, `spine-webgl`, and `spine-threejs`, please refer to the [Examples](#examples) in the respecitve `spine-<modulename>/example` folder. For `spine-webgl` specifically, we have provided additional [demos](spine-webgl/demos), which you can also [view online](http://de.esotericsoftware.com/spine-demos).
+For module specific APIs in `spine-canvas`, `spine-webgl`, and `spine-threejs`, please refer to the [Examples](#examples) in the respecitve `spine-<modulename>/example` folder. For `spine-webgl` specifically, we have provided additional [demos](spine-webgl/demos), which you can also [view online](http://esotericsoftware.com/spine-demos).
 
 ## Licensing
 
