@@ -551,7 +551,7 @@ class SkeletonData {
 enum BlendMode {
   normal(0, rendering.BlendMode.srcOver),
   additive(1, rendering.BlendMode.plus),
-  multiply(2, rendering.BlendMode.modulate),
+  multiply(2, rendering.BlendMode.multiply),
   screen(3, rendering.BlendMode.screen);
 
   final int value;
