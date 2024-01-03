@@ -112,7 +112,7 @@ body { margin: 0px; }
 				this.startPlayer();
 			});
 
-			codeElement.children[0].style.height = "100%";
+			(codeElement.children[0] as HTMLElement).style.height = "100%";
 			this.setCode(SpinePlayerEditor.DEFAULT_CODE);
 		})
 	}
