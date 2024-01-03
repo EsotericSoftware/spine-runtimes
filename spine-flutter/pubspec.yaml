@@ -1,6 +1,6 @@
 name: spine_flutter
 description: The official Spine Flutter Runtime to load, display and interact with Spine animations.
-version: 4.1.12
+version: 4.1.13
 homepage: https://esotericsoftware.com
 repository: https://github.com/esotericsoftware/spine-runtimes
 issue_tracker: https://github.com/esotericsoftware/spine-runtimes/issues

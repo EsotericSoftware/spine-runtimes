@@ -1,3 +1,6 @@
+# 4.1.13
+* Fix multiply blend mode, see https://esotericsoftware.com/forum/d/25369-spine-flutter-slot%E6%B7%B7%E5%90%88%E6%A8%A1%E5%BC%8F%E5%90%8Ealpha%E4%B8%A2%E5%A4%B1/2
+
 # 4.1.12
 * FilterQuality for texture atlas pages is now set to medium. It is configurable via `Atlas.filterQuality`. See https://github.com/EsotericSoftware/spine-runtimes/issues/2362
 * Track Entry listeners are now invoked properly, see https://github.com/EsotericSoftware/spine-runtimes/issues/2349
