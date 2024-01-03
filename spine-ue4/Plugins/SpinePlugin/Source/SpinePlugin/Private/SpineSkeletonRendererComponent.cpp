@@ -33,6 +33,9 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "spine/spine.h"
 #include "UObject/ConstructorHelpers.h"
+#if ENGINE_MAJOR_VERSION >= 5
+#include "PhysicsEngine/BodySetup.h"
+#endif
 
 #define LOCTEXT_NAMESPACE "Spine"
 
