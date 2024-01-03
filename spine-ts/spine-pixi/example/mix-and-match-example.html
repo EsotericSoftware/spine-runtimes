@@ -1,0 +1,68 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>spine-pixi</title>
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@7.2.4/dist/pixi.min.js"></script>
+    <script src="../dist/iife/spine-pixi.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tweakpane@3.1.9/dist/tweakpane.min.js"></script>
+    <link rel="stylesheet" href="../../index.css">
+  </head>
+
+  <body>
+    <script>
+      (async function () {
+        var app = new PIXI.Application({
+          width: window.innerWidth,
+          height: window.innerHeight,
+          resolution: window.devicePixelRatio || 1,
+          autoDensity: true,
+          resizeTo: window,
+          backgroundColor: 0x2c3e50,
+          hello: true,
+        });
+        document.body.appendChild(app.view);
+
+        // Pre-load the skeleton data and atlas. You can also load .json skeleton data.
+        PIXI.Assets.add("mixAndMatchData", "./assets/mix-and-match-pro.skel");
+        PIXI.Assets.add("mixAndMatchAtlas", "./assets/mix-and-match-pma.atlas");
+        await PIXI.Assets.load(["mixAndMatchData", "mixAndMatchAtlas"]);
+
+        // Create the Spine display object
+        const mixAndMatch = spine.Spine.from("mixAndMatchData", "mixAndMatchAtlas", {
+          scale: 0.5,
+        });
+
+        // Set the default mix time to use when transitioning
+        // from one animation to the next.
+        mixAndMatch.state.data.defaultMix = 0.2;
+
+        // Center the spine object on screen.
+        mixAndMatch.x = window.innerWidth / 2;
+        mixAndMatch.y = window.innerHeight / 2 + mixAndMatch.getBounds().height / 2;
+
+        // Add animations.
+        mixAndMatch.state.setAnimation(0, "walk", true);
+        mixAndMatch.state.addAnimation(0, "dance", true, 1.0);
+        mixAndMatch.state.addAnimation(0, "walk", true, 1.0);
+
+        // Add a custom skin
+        const skeletonData = mixAndMatch.skeleton.data;
+        const skin = new spine.Skin("custom");
+        skin.addSkin(skeletonData.findSkin("nose/short"));
+        skin.addSkin(skeletonData.findSkin("skin-base"));
+        skin.addSkin(skeletonData.findSkin("eyes/violet"));
+        skin.addSkin(skeletonData.findSkin("hair/brown"));
+        skin.addSkin(skeletonData.findSkin("clothes/hoodie-orange"));
+        skin.addSkin(skeletonData.findSkin("legs/pants-jeans"));
+        skin.addSkin(skeletonData.findSkin("accessories/bag"));
+        skin.addSkin(skeletonData.findSkin("accessories/hat-red-yellow"));
+        skin.addSkin(skeletonData.findSkin("eyelids/girly"));
+        mixAndMatch.skeleton.setSkin(skin);
+        mixAndMatch.skeleton.setSlotsToSetupPose();
+
+        // Add the display object to the stage.
+        app.stage.addChild(mixAndMatch);
+      })();
+    </script>
+  </body>
+</html>
