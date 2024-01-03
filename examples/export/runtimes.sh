@@ -296,6 +296,13 @@ cp -f ../mix-and-match/export/mix-and-match-pro.skel "$ROOT/spine-sfml/cpp/data/
 cp -f ../mix-and-match/export/mix-and-match-pma.atlas "$ROOT/spine-sfml/cpp/data/"
 cp -f ../mix-and-match/export/mix-and-match-pma.png "$ROOT/spine-sfml/cpp/data/"
 
+cp -f ../sack/export/sack-pro.json "$ROOT/spine-sfml/cpp/data/"
+cp -f ../sack/export/sack-pro.skel "$ROOT/spine-sfml/cpp/data/"
+cp -f ../sack/export/sack-pma.atlas "$ROOT/spine-sfml/cpp/data/"
+cp -f ../sack/export/sack-pma.png "$ROOT/spine-sfml/cpp/data/"
+
+cp -f ../celestial-circus/export/* "$ROOT/spine-sfml/cpp/data/"
+
 echo "spine-ts"
 rm "$ROOT/spine-ts/spine-webgl/example/assets/"*
 cp -f ../coin/export/coin-pro.json "$ROOT/spine-ts/spine-webgl/example/assets/"
