@@ -318,12 +318,12 @@ void PhysicsConstraint::update(Physics physics) {
     float l = bone->_data.getLength();
 
     switch (physics) {
-        case Physics::none:
+        case Physics::Physics_None:
             return;
-        case Physics::reset:
+        case Physics::Physics_Reset:
             reset();
             // Fall through.
-        case Physics::update: {
+        case Physics::Physics_Update: {
             _remaining += MathUtil::max(_skeleton.getTime() - _lastTime, 0.0f);
             _lastTime = _skeleton.getTime();
 
@@ -416,7 +416,7 @@ void PhysicsConstraint::update(Physics physics) {
             _cy = bone->_worldY;
             break;
         }
-        case Physics::pose: {
+        case Physics::Physics_Pose: {
             if (x) bone->_worldX += _xOffset * mix * _data._x;
             if (y) bone->_worldY += _yOffset * mix * _data._y;
             break;
@@ -458,7 +458,7 @@ void PhysicsConstraint::update(Physics physics) {
         bone->_a *= s;
         bone->_c *= s;
     }
-    if (physics != Physics::pose) {
+    if (physics != Physics::Physics_Pose) {
         _tx = l * bone->_a;
         _ty = l * bone->_c;
     }

@@ -37,7 +37,7 @@ void spBone_setYDown(int value) {
 	yDown = value;
 }
 
-int spBone_isYDown() {
+int spBone_isYDown(void) {
 	return yDown;
 }
 
@@ -261,26 +261,31 @@ void spBone_updateAppliedTransform(spBone *self) {
 				break;
 			}
 			case SP_TRANSFORMMODE_NOSCALE:
-			case SP_TRANSFORMMODE_NOSCALEORREFLECTION:
-				cosine = COS_DEG(self->rotation), sine = SIN_DEG(self->rotation);
-				pa = (pa * cosine + pb * sine) / self->skeleton->scaleX;
-				pc = (pc * cosine + pd * sine) / self->skeleton->scaleY;
-				s = SQRT(pa * pa + pc * pc);
-				if (s > 0.00001f) s = 1 / s;
-				pa *= s;
-				pc *= s;
-				s = SQRT(pa * pa + pc * pc);
-				if (self->data->transformMode == SP_TRANSFORMMODE_NOSCALE &&
-					pid < 0 != (self->skeleton->scaleX < 0 != self->skeleton->scaleY < 0))
-					s = -s;
-				r = PI / 2 + ATAN2(pc, pa);
-				pb = COS(r) * s;
-				pd = SIN(r) * s;
-				pid = 1 / (pa * pd - pb * pc);
-				ia = pd * pid;
-				ib = pb * pid;
-				ic = pc * pid;
-				id = pa * pid;
+			case SP_TRANSFORMMODE_NOSCALEORREFLECTION: {
+                cosine = COS_DEG(self->rotation), sine = SIN_DEG(self->rotation);
+                pa = (pa * cosine + pb * sine) / self->skeleton->scaleX;
+                pc = (pc * cosine + pd * sine) / self->skeleton->scaleY;
+                s = SQRT(pa * pa + pc * pc);
+                if (s > 0.00001f) s = 1 / s;
+                pa *= s;
+                pc *= s;
+                s = SQRT(pa * pa + pc * pc);
+                if (self->data->transformMode == SP_TRANSFORMMODE_NOSCALE &&
+                    pid < 0 != (self->skeleton->scaleX < 0 != self->skeleton->scaleY < 0))
+                    s = -s;
+                r = PI / 2 + ATAN2(pc, pa);
+                pb = COS(r) * s;
+                pd = SIN(r) * s;
+                pid = 1 / (pa * pd - pb * pc);
+                ia = pd * pid;
+                ib = pb * pid;
+                ic = pc * pid;
+                id = pa * pid;
+                break;
+            }
+            case SP_TRANSFORMMODE_ONLYTRANSLATION:
+            case SP_TRANSFORMMODE_NORMAL:
+                break;
 		}
 		ra = ia * self->a - ib * self->c;
 		rb = ia * self->b - ib * self->d;

@@ -149,7 +149,7 @@ SP_API float spTrackEntry_getTrackComplete(spTrackEntry *entry);
 SP_API void spAnimationState_clearNext(spAnimationState *self, spTrackEntry *entry);
 
 /** Use this to dispose static memory before your app exits to appease your memory leak detector*/
-SP_API void spAnimationState_disposeStatics();
+SP_API void spAnimationState_disposeStatics(void);
 
 #ifdef __cplusplus
 }

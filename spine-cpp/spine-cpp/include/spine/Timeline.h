@@ -77,7 +77,7 @@ namespace spine {
 	protected:
 		void setPropertyIds(PropertyId propertyIds[], size_t propertyIdsCount);
 
-		Vector <PropertyId> _propertyIds;
+        Vector <PropertyId> _propertyIds;
 		Vector<float> _frames;
 		size_t _frameEntries;
 	};

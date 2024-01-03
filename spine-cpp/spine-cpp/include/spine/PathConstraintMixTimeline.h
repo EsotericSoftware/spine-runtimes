@@ -33,7 +33,6 @@
 #include <spine/CurveTimeline.h>
 
 namespace spine {
-#define SP_PATHCONSTRAINTMIXTIMELINE_ENTRIES 5
 
 	class SP_API PathConstraintMixTimeline : public CurveTimeline {
 		friend class SkeletonBinary;
@@ -52,12 +51,12 @@ namespace spine {
 		/// Sets the time and mixes of the specified keyframe.
 		void setFrame(int frameIndex, float time, float mixRotate, float mixX, float mixY);
 
-		int getPathConstraintIndex() { return _pathConstraintIndex; }
+		int getPathConstraintIndex() { return _constraintIndex; }
 
-		void setPathConstraintIndex(int inValue) { _pathConstraintIndex = inValue; }
+		void setPathConstraintIndex(int inValue) { _constraintIndex = inValue; }
 
 	private:
-		int _pathConstraintIndex;
+		int _constraintIndex;
 
 		static const int ENTRIES = 4;
 		static const int ROTATE = 1;

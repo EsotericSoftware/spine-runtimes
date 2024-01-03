@@ -52,12 +52,12 @@ namespace spine {
 		apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha, MixBlend blend,
 			  MixDirection direction);
 
-		int getPathConstraintIndex() { return _pathConstraintIndex; }
+		int getPathConstraintIndex() { return _constraintIndex; }
 
-		void setPathConstraintIndex(int inValue) { _pathConstraintIndex = inValue; }
+		void setPathConstraintIndex(int inValue) { _constraintIndex = inValue; }
 
 	protected:
-		int _pathConstraintIndex;
+		int _constraintIndex;
 	};
 }
 

@@ -31,7 +31,7 @@
 #include <spine/extension.h>
 #include <string.h>
 
-spSkeletonData *spSkeletonData_create() {
+spSkeletonData *spSkeletonData_create(void) {
 	return NEW(spSkeletonData);
 }
 

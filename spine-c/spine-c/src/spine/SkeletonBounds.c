@@ -89,7 +89,7 @@ typedef struct {
 	int capacity;
 } _spSkeletonBounds;
 
-spSkeletonBounds *spSkeletonBounds_create() {
+spSkeletonBounds *spSkeletonBounds_create(void) {
 	return SUPER(NEW(_spSkeletonBounds));
 }
 

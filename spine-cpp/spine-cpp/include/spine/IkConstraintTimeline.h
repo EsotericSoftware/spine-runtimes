@@ -51,12 +51,12 @@ namespace spine {
 		/// Sets the time, mix and bend direction of the specified keyframe.
 		void setFrame(int frame, float time, float mix, float softness, int bendDirection, bool compress, bool stretch);
 
-		int getIkConstraintIndex() { return _ikConstraintIndex; }
+		int getIkConstraintIndex() { return _constraintIndex; }
 
-		void setIkConstraintIndex(int inValue) { _ikConstraintIndex = inValue; }
+		void setIkConstraintIndex(int inValue) { _constraintIndex = inValue; }
 
 	private:
-		int _ikConstraintIndex;
+		int _constraintIndex;
 
 		static const int ENTRIES = 6;
 		static const int MIX = 1;

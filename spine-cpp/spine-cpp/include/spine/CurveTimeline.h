@@ -76,6 +76,14 @@ namespace spine {
 
 		float getCurveValue(float time);
 
+        float getRelativeValue(float time, float alpha, MixBlend blend, float current, float setup);
+
+        float getAbsoluteValue(float time, float alpha, MixBlend blend, float current, float setup);
+
+        float getAbsoluteValue (float time, float alpha, MixBlend blend, float current, float setup, float value);
+
+        float getScaleValue (float time, float alpha, MixBlend blend, MixDirection direction, float current, float setup);
+
 	protected:
 		static const int ENTRIES = 2;
 		static const int VALUE = 1;

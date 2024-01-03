@@ -104,8 +104,7 @@ int main(void) {
 
 	AnimationStateData stateData(skeletonData);
 	SkeletonDrawable drawable(skeletonData, &stateData);
-    drawable.skeleton->getRootBone()->update(Physics::update);
-	drawable.skeleton->updateWorldTransform(Physics::update);
+	drawable.skeleton->updateWorldTransform(Physics_Update);
 	drawable.skeleton->setPosition(320, 960);
 	if (animation.length() > 0) drawable.state->setAnimation(0, animation, true);
 	if (skin.length() > 0) drawable.skeleton->setSkin(skin);

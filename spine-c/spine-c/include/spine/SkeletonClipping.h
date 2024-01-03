@@ -52,7 +52,7 @@ typedef struct spSkeletonClipping {
 	spArrayFloatArray *clippingPolygons;
 } spSkeletonClipping;
 
-SP_API spSkeletonClipping *spSkeletonClipping_create();
+SP_API spSkeletonClipping *spSkeletonClipping_create(void);
 
 SP_API int spSkeletonClipping_clipStart(spSkeletonClipping *self, spSlot *slot, spClippingAttachment *clip);
 

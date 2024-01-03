@@ -115,7 +115,7 @@ void spAtlasPage_dispose(spAtlasPage *self) {
 
 /**/
 
-spAtlasRegion *spAtlasRegion_create() {
+spAtlasRegion *spAtlasRegion_create(void) {
 	spAtlasRegion *region = NEW(spAtlasRegion);
 	region->keyValues = spKeyValueArray_create(2);
 	return region;

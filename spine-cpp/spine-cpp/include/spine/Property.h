@@ -52,7 +52,15 @@ namespace spine {
 		Property_PathConstraintPosition = 1 << 16,
 		Property_PathConstraintSpacing = 1 << 17,
 		Property_PathConstraintMix = 1 << 18,
-		Property_Sequence = 1 << 19
+        Property_PhysicsConstraintInertia = 1 << 19,
+        Property_PhysicsConstraintStrength = 1 << 20,
+        Property_PhysicsConstraintDamping = 1 << 21,
+        Property_PhysicsConstraintMass = 1 << 22,
+        Property_PhysicsConstraintWind = 1 << 23,
+        Property_PhysicsConstraintGravity = 1 << 24,
+        Property_PhysicsConstraintMix = 1 << 25,
+        Property_PhysicsConstraintReset = 1 << 26,
+		Property_Sequence = 1 << 27
 	};
 }
 

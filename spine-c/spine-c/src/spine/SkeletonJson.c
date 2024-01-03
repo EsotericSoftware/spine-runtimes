@@ -988,7 +988,7 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 		MALLOC_STR(skeletonData->version, Json_getString(skeleton, "spine", "0"));
 		if (!string_starts_with(skeletonData->version, SPINE_VERSION_STRING)) {
 			char errorMsg[255];
-			sprintf(errorMsg, "Skeleton version %s does not match runtime version %s", skeletonData->version, SPINE_VERSION_STRING);
+			snprintf(errorMsg, 255, "Skeleton version %s does not match runtime version %s", skeletonData->version, SPINE_VERSION_STRING);
 			_spSkeletonJson_setError(self, 0, errorMsg, NULL);
 			return NULL;
 		}

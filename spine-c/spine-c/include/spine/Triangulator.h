@@ -49,7 +49,7 @@ typedef struct spTriangulator {
 	spArrayShortArray *polygonIndicesPool;
 } spTriangulator;
 
-SP_API spTriangulator *spTriangulator_create();
+SP_API spTriangulator *spTriangulator_create(void);
 
 SP_API spShortArray *spTriangulator_triangulate(spTriangulator *self, spFloatArray *verticesArray);
 

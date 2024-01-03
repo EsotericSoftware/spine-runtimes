@@ -47,7 +47,7 @@ TransformConstraintTimeline::TransformConstraintTimeline(size_t frameCount, size
 														 int transformConstraintIndex) : CurveTimeline(frameCount,
 																									   TransformConstraintTimeline::ENTRIES,
 																									   bezierCount),
-																						 _transformConstraintIndex(
+                                                                                         _constraintIndex(
 																								 transformConstraintIndex) {
 	PropertyId ids[] = {((PropertyId) Property_TransformConstraint << 32) | transformConstraintIndex};
 	setPropertyIds(ids, 1);
@@ -59,7 +59,7 @@ void TransformConstraintTimeline::apply(Skeleton &skeleton, float lastTime, floa
 	SP_UNUSED(pEvents);
 	SP_UNUSED(direction);
 
-	TransformConstraint *constraintP = skeleton._transformConstraints[_transformConstraintIndex];
+	TransformConstraint *constraintP = skeleton._transformConstraints[_constraintIndex];
 	TransformConstraint &constraint = *constraintP;
 	if (!constraint.isActive()) return;
 

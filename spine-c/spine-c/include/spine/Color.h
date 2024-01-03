@@ -41,7 +41,7 @@ typedef struct spColor {
 } spColor;
 
 /* @param attachmentName May be 0 for no setup pose attachment. */
-SP_API spColor *spColor_create();
+SP_API spColor *spColor_create(void);
 
 SP_API void spColor_dispose(spColor *self);
 

@@ -31,7 +31,7 @@
 #include <spine/extension.h>
 #include <stdio.h>
 
-spTriangulator *spTriangulator_create() {
+spTriangulator *spTriangulator_create(void) {
 	spTriangulator *triangulator = CALLOC(spTriangulator, 1);
 
 	triangulator->convexPolygons = spArrayFloatArray_create(16);

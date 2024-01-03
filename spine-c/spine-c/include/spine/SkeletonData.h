@@ -81,7 +81,7 @@ typedef struct spSkeletonData {
 	spPathConstraintData **pathConstraints;
 } spSkeletonData;
 
-SP_API spSkeletonData *spSkeletonData_create();
+SP_API spSkeletonData *spSkeletonData_create(void);
 
 SP_API void spSkeletonData_dispose(spSkeletonData *self);
 

@@ -58,27 +58,7 @@ void PathConstraintSpacingTimeline::apply(Skeleton &skeleton, float lastTime, fl
 	SP_UNUSED(pEvents);
 	SP_UNUSED(direction);
 
-	PathConstraint *constraintP = skeleton._pathConstraints[_pathConstraintIndex];
-	PathConstraint &constraint = *constraintP;
-	if (!constraint.isActive()) return;
-
-	if (time < _frames[0]) {
-		switch (blend) {
-			case MixBlend_Setup:
-				constraint._spacing = constraint._data._spacing;
-				return;
-			case MixBlend_First:
-				constraint._spacing += (constraint._data._spacing - constraint._spacing) * alpha;
-				return;
-			default:
-				return;
-		}
-	}
-
-	float spacing = getCurveValue(time);
-
-	if (blend == MixBlend_Setup)
-		constraint._spacing = constraint._data._spacing + (spacing - constraint._data._spacing) * alpha;
-	else
-		constraint._spacing += (spacing - constraint._spacing) * alpha;
+	PathConstraint *constraint = skeleton._pathConstraints[_pathConstraintIndex];
+    if (constraint->_active)
+        constraint->_spacing = getAbsoluteValue(time, alpha, blend, constraint->_spacing, constraint->_data._spacing);
 }

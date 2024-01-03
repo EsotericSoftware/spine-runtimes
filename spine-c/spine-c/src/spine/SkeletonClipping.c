@@ -30,7 +30,7 @@
 #include <spine/SkeletonClipping.h>
 #include <spine/extension.h>
 
-spSkeletonClipping *spSkeletonClipping_create() {
+spSkeletonClipping *spSkeletonClipping_create(void) {
 	spSkeletonClipping *clipping = CALLOC(spSkeletonClipping, 1);
 
 	clipping->triangulator = spTriangulator_create();

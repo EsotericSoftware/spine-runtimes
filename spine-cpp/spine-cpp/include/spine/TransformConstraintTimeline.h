@@ -51,12 +51,12 @@ namespace spine {
 		void setFrame(size_t frameIndex, float time, float mixRotate, float mixX, float mixY, float mixScaleX,
 					  float mixScaleY, float mixShearY);
 
-		int getTransformConstraintIndex() { return _transformConstraintIndex; }
+		int getTransformConstraintIndex() { return _constraintIndex; }
 
-		void setTransformConstraintIndex(int inValue) { _transformConstraintIndex = inValue; }
+		void setTransformConstraintIndex(int inValue) { _constraintIndex = inValue; }
 
 	private:
-		int _transformConstraintIndex;
+		int _constraintIndex;
 
 		static const int ENTRIES = 7;
 		static const int ROTATE = 1;

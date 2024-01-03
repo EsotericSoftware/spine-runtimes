@@ -102,7 +102,7 @@ static char *string_append(char *str, const char *b) {
 
 static char *string_append_int(char *str, int value) {
 	char intStr[20];
-	sprintf(intStr, "%i", value);
+	snprintf(intStr, 20, "%i", value);
 	return string_append(str, intStr);
 }
 

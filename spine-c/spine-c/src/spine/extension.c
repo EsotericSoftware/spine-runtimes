@@ -30,7 +30,7 @@
 #include <spine/extension.h>
 #include <stdio.h>
 
-float _spInternalRandom() {
+float _spInternalRandom(void) {
 	return rand() / (float) RAND_MAX;
 }
 
@@ -42,7 +42,7 @@ static void *(*debugMallocFunc)(size_t size, const char *file, int line) = NULL;
 
 static void (*freeFunc)(void *ptr) = free;
 
-static float (*randomFunc)() = _spInternalRandom;
+static float (*randomFunc)(void) = _spInternalRandom;
 
 void *_spMalloc(size_t size, const char *file, int line) {
 	if (debugMallocFunc)
@@ -65,7 +65,7 @@ void _spFree(void *ptr) {
 	freeFunc(ptr);
 }
 
-float _spRandom() {
+float _spRandom(void) {
 	return randomFunc();
 }
 
@@ -85,7 +85,7 @@ void _spSetFree(void (*free)(void *ptr)) {
 	freeFunc = free;
 }
 
-void _spSetRandom(float (*random)()) {
+void _spSetRandom(float (*random)(void)) {
 	randomFunc = random;
 }
 

@@ -175,7 +175,7 @@ void *_spRealloc(void *ptr, size_t size);
 
 void _spFree(void *ptr);
 
-float _spRandom();
+float _spRandom(void);
 
 SP_API void _spSetMalloc(void *(*_malloc)(size_t size));
 
@@ -185,7 +185,7 @@ SP_API void _spSetRealloc(void *(*_realloc)(void *ptr, size_t size));
 
 SP_API void _spSetFree(void (*_free)(void *ptr));
 
-SP_API void _spSetRandom(float (*_random)());
+SP_API void _spSetRandom(float (*_random)(void));
 
 char *_spReadFile(const char *path, int *length);
 

@@ -62,7 +62,7 @@ typedef struct spSkeletonBounds {
 	float minX, minY, maxX, maxY;
 } spSkeletonBounds;
 
-SP_API spSkeletonBounds *spSkeletonBounds_create();
+SP_API spSkeletonBounds *spSkeletonBounds_create(void);
 
 SP_API void spSkeletonBounds_dispose(spSkeletonBounds *self);
 

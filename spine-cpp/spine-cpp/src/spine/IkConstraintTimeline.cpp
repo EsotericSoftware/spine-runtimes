@@ -44,7 +44,7 @@ using namespace spine;
 RTTI_IMPL(IkConstraintTimeline, CurveTimeline)
 
 IkConstraintTimeline::IkConstraintTimeline(size_t frameCount, size_t bezierCount, int ikConstraintIndex)
-	: CurveTimeline(frameCount, IkConstraintTimeline::ENTRIES, bezierCount), _ikConstraintIndex(ikConstraintIndex) {
+	: CurveTimeline(frameCount, IkConstraintTimeline::ENTRIES, bezierCount), _constraintIndex(ikConstraintIndex) {
 	PropertyId ids[] = {((PropertyId) Property_IkConstraint << 32) | ikConstraintIndex};
 	setPropertyIds(ids, 1);
 }
@@ -54,7 +54,7 @@ void IkConstraintTimeline::apply(Skeleton &skeleton, float lastTime, float time,
 	SP_UNUSED(lastTime);
 	SP_UNUSED(pEvents);
 
-	IkConstraint *constraintP = skeleton._ikConstraints[_ikConstraintIndex];
+	IkConstraint *constraintP = skeleton._ikConstraints[_constraintIndex];
 	IkConstraint &constraint = *constraintP;
 	if (!constraint.isActive()) return;
 

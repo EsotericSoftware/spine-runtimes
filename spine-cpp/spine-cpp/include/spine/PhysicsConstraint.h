@@ -45,6 +45,24 @@ namespace spine {
 
         friend class Skeleton;
 
+        friend class PhysicsConstraintTimeline;
+
+        friend class PhysicsConstraintInertiaTimeline;
+
+        friend class PhysicsConstraintStrengthTimeline;
+
+        friend class PhysicsConstraintDampingTimeline;
+
+        friend class PhysicsConstraintMassTimeline;
+
+        friend class PhysicsConstraintWindTimeline;
+
+        friend class PhysicsConstraintGravityTimeline;
+
+        friend class PhysicsConstraintMixTimeline;
+
+        friend class PhysicsConstraintResetTimeline;
+
     RTTI_DECL
 
     public:

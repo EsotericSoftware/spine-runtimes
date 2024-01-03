@@ -1325,7 +1325,7 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 	skeletonData = spSkeletonData_create();
 	lowHash = readInt(input);
 	highHash = readInt(input);
-	sprintf(buffer, "%x%x", highHash, lowHash);
+	snprintf(buffer, 32, "%x%x", highHash, lowHash);
 	buffer[31] = 0;
 	MALLOC_STR(skeletonData->hash, buffer);
 
@@ -1336,7 +1336,7 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 	} else {
 		if (!string_starts_with(skeletonData->version, SPINE_VERSION_STRING)) {
 			char errorMsg[255];
-			sprintf(errorMsg, "Skeleton version %s does not match runtime version %s", skeletonData->version, SPINE_VERSION_STRING);
+			snprintf(errorMsg, 255, "Skeleton version %s does not match runtime version %s", skeletonData->version, SPINE_VERSION_STRING);
 			_spSkeletonBinary_setError(self, errorMsg, NULL);
 			return NULL;
 		}

@@ -44,7 +44,7 @@ _SP_ARRAY_IMPLEMENT_TYPE(spTrackEntryArray, spTrackEntry *)
 
 static spAnimation *SP_EMPTY_ANIMATION = 0;
 
-void spAnimationState_disposeStatics() {
+void spAnimationState_disposeStatics(void) {
 	if (SP_EMPTY_ANIMATION) spAnimation_dispose(SP_EMPTY_ANIMATION);
 	SP_EMPTY_ANIMATION = 0;
 }

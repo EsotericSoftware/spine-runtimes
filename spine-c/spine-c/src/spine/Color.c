@@ -30,7 +30,7 @@
 #include <spine/Color.h>
 #include <spine/extension.h>
 
-spColor *spColor_create() {
+spColor *spColor_create(void) {
 	return MALLOC(spColor, 1);
 }
 

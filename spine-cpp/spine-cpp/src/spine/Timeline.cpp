@@ -70,5 +70,4 @@ namespace spine {
 	float Timeline::getDuration() {
 		return _frames[_frames.size() - getFrameEntries()];
 	}
-
 }// namespace spine

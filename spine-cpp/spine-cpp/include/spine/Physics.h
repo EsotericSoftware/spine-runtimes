@@ -33,16 +33,16 @@
 namespace spine {
     enum Physics {
         /** Physics are not updated or applied. */
-        none,
+        Physics_None,
 
         /** Physics are reset to the current pose. */
-        reset,
+        Physics_Reset,
 
         /** Physics are updated and the pose from physics is applied. */
-        update,
+        Physics_Update,
 
         /** Physics are not updated but the pose from physics is applied. */
-        pose
+        Physics_Pose
     };
 }
 

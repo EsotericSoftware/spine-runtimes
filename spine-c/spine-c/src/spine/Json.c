@@ -122,7 +122,6 @@ static const char *parse_number(Json *item, const char *num) {
 	if (*ptr == 'e' || *ptr == 'E') {
 		double exponent = 0;
 		int expNegative = 0;
-		int n = 0;
 		++ptr;
 
 		if (*ptr == '-') {
@@ -135,7 +134,6 @@ static const char *parse_number(Json *item, const char *num) {
 		while (*ptr >= '0' && *ptr <= '9') {
 			exponent = (exponent * 10.0) + (*ptr - '0');
 			++ptr;
-			++n;
 		}
 
 		if (expNegative)
