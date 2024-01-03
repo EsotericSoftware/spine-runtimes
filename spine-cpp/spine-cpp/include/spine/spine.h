@@ -72,6 +72,8 @@
 #include <spine/PathConstraintMixTimeline.h>
 #include <spine/PathConstraintPositionTimeline.h>
 #include <spine/PathConstraintSpacingTimeline.h>
+#include <spine/PhysicsConstraintData.h>
+#include <spine/PhysicsConstraint.h>
 #include <spine/PointAttachment.h>
 #include <spine/Pool.h>
 #include <spine/PositionMode.h>

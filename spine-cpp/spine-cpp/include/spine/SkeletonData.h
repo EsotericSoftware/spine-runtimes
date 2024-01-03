@@ -50,6 +50,8 @@ namespace spine {
 
 	class PathConstraintData;
 
+    class PhysicsConstraintData;
+
 /// Stores the setup pose and all of the stateless data for a skeleton.
 	class SP_API SkeletonData : public SpineObject {
 		friend class SkeletonBinary;
@@ -89,6 +91,9 @@ namespace spine {
 		/// @return May be NULL.
 		PathConstraintData *findPathConstraint(const String &constraintName);
 
+        /// @return May be NULL.
+        PhysicsConstraintData *findPhysicsConstraint(const String &constraintName);
+
 		const String &getName();
 
 		void setName(const String &inValue);
@@ -117,6 +122,8 @@ namespace spine {
 		Vector<TransformConstraintData *> &getTransformConstraints();
 
 		Vector<PathConstraintData *> &getPathConstraints();
+
+        Vector<PhysicsConstraintData *> &getPhysicsConstraints();
 
 		float getX();
 
@@ -167,6 +174,7 @@ namespace spine {
 		Vector<IkConstraintData *> _ikConstraints;
 		Vector<TransformConstraintData *> _transformConstraints;
 		Vector<PathConstraintData *> _pathConstraints;
+        Vector<PhysicsConstraintData *> _physicsConstraints;
 		float _x, _y, _width, _height;
 		String _version;
 		String _hash;

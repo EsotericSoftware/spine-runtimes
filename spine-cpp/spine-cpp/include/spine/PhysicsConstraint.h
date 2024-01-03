@@ -43,96 +43,101 @@ namespace spine {
 
     class SP_API PhysicsConstraint : public Updatable {
 
+        friend class Skeleton;
+
     RTTI_DECL
+
     public:
-        explicit PhysicsConstraint(PhysicsConstraintData& data, Skeleton& skeleton);
+        PhysicsConstraint(PhysicsConstraintData& data, Skeleton& skeleton);
+
+        PhysicsConstraintData &getData();
 
         void setBone(Bone* bone);
-        Bone* getBone() const;
+        Bone* getBone();
 
         void setInertia(float value);
-        float getInertia() const;
+        float getInertia();
 
         void setStrength(float value);
-        float getStrength() const;
+        float getStrength();
 
         void setDamping(float value);
-        float getDamping() const;
+        float getDamping();
 
         void setMassInverse(float value);
-        float getMassInverse() const;
+        float getMassInverse();
 
         void setWind(float value);
-        float getWind() const;
+        float getWind();
 
         void setGravity(float value);
-        float getGravity() const;
+        float getGravity();
 
         void setMix(float value);
-        float getMix() const;
+        float getMix();
 
         void setReset(bool value);
-        bool getReset() const;
+        bool getReset();
 
         void setUx(float value);
-        float getUx() const;
+        float getUx();
 
         void setUy(float value);
-        float getUy() const;
+        float getUy();
 
         void setCx(float value);
-        float getCx() const;
+        float getCx();
 
         void setCy(float value);
-        float getCy() const;
+        float getCy();
 
         void setTx(float value);
-        float getTx() const;
+        float getTx();
 
         void setTy(float value);
-        float getTy() const;
+        float getTy();
 
         void setXOffset(float value);
-        float getXOffset() const;
+        float getXOffset();
 
         void setXVelocity(float value);
-        float getXVelocity() const;
+        float getXVelocity();
 
         void setYOffset(float value);
-        float getYOffset() const;
+        float getYOffset();
 
         void setYVelocity(float value);
-        float getYVelocity() const;
+        float getYVelocity();
 
         void setRotateOffset(float value);
-        float getRotateOffset() const;
+        float getRotateOffset();
 
         void setRotateVelocity(float value);
-        float getRotateVelocity() const;
+        float getRotateVelocity();
 
         void setScaleOffset(float value);
-        float getScaleOffset() const;
+        float getScaleOffset();
 
         void setScaleVelocity(float value);
-        float getScaleVelocity() const;
+        float getScaleVelocity();
 
         void setActive(bool value);
-        bool isActive() const;
+        bool isActive();
 
         void setRemaining(float value);
-        float getRemaining() const;
+        float getRemaining();
 
         void setLastTime(float value);
-        float getLastTime() const;
+        float getLastTime();
 
         void reset();
 
         void setToSetupPose();
 
-        void update(Physics physics) override;
+        virtual void update(Physics physics);
 
     private:
-        const PhysicsConstraintData& _data;
+        PhysicsConstraintData& _data;
         Bone* _bone;
 
         float _inertia;

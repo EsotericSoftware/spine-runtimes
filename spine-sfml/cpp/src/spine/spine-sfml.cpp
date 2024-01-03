@@ -49,7 +49,7 @@ namespace spine {
 
 	SkeletonDrawable::SkeletonDrawable(SkeletonData *skeletonData, AnimationStateData *stateData) : timeScale(1),
 																									vertexArray(new VertexArray(Triangles, skeletonData->getBones().size() * 4)),
-																									worldVertices(), clipper() {
+																									worldVertices(), clipper(), usePremultipliedAlpha(false) {
 		Bone::setYDown(true);
 		worldVertices.ensureCapacity(SPINE_MESH_VERTEX_COUNT_MAX);
 		skeleton = new (__FILE__, __LINE__) Skeleton(skeletonData);
@@ -76,10 +76,10 @@ namespace spine {
 		delete skeleton;
 	}
 
-	void SkeletonDrawable::update(float deltaTime) {
+	void SkeletonDrawable::update(float deltaTime, Physics physics) {
 		state->update(deltaTime * timeScale);
 		state->apply(*skeleton);
-		skeleton->updateWorldTransform();
+		skeleton->updateWorldTransform(physics);
 	}
 
 	void SkeletonDrawable::draw(RenderTarget &target, RenderStates states) const {

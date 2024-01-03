@@ -283,7 +283,7 @@ IkConstraint::IkConstraint(IkConstraintData &data, Skeleton &skeleton) : Updatab
 	}
 }
 
-void IkConstraint::update(Physics physics) {
+void IkConstraint::update(Physics) {
 	if (_mix == 0) return;
 	switch (_bones.size()) {
 		case 1: {
@@ -369,7 +369,7 @@ void IkConstraint::setSoftness(float inValue) {
 }
 
 void IkConstraint::setToSetupPose() {
-    auto data = this->_data;
+    IkConstraintData &data = this->_data;
     this->_mix = data._mix;
     this->_softness = data._softness;
     this->_bendDirection = data._bendDirection;

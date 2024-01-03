@@ -66,7 +66,7 @@ PathConstraint::PathConstraint(PathConstraintData &data, Skeleton &skeleton) : U
 	_segments.setSize(10, 0);
 }
 
-void PathConstraint::update(Physics physics) {
+void PathConstraint::update(Physics) {
 	Attachment *baseAttachment = _target->getAttachment();
 	if (baseAttachment == NULL || !baseAttachment->getRTTI().instanceOf(PathAttachment::rtti)) {
 		return;
@@ -580,7 +580,7 @@ void PathConstraint::setActive(bool inValue) {
 }
 
 void PathConstraint::setToSetupPose() {
-    auto data = this->_data;
+    PathConstraintData &data = this->_data;
     this->_position = data._position;
     this->_spacing = data._spacing;
     this->_mixRotate = data._mixRotate;

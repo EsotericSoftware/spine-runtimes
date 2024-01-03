@@ -75,7 +75,7 @@ Bone::Bone(BoneData &data, Skeleton &skeleton, Bone *parent) : Updatable(),
 	setToSetupPose();
 }
 
-void Bone::update(Physics physics) {
+void Bone::update(Physics) {
 	updateWorldTransform(_ax, _ay, _arotation, _ascaleX, _ascaleY, _ashearX, _ashearY);
 }
 
@@ -96,7 +96,7 @@ void Bone::updateWorldTransform(float x, float y, float rotation, float scaleX, 
 	_ashearY = shearY;
 
 	if (!parent) { /* Root bone. */
-        auto skeleton = this->_skeleton;
+        Skeleton &skeleton = this->_skeleton;
         float sx = skeleton.getScaleX();
         float sy = skeleton.getScaleY();
         float rx = (rotation + shearX) * MathUtil::Deg_Rad;
@@ -522,7 +522,7 @@ void Bone::updateAppliedTransform() {
                 break;
             }
             case TransformMode_NoScale:
-            case TransformMode_NoScaleOrReflection:
+            case TransformMode_NoScaleOrReflection: {
                 float cos = MathUtil::cosDeg(_rotation), sin = MathUtil::sinDeg(_rotation);
                 pa = (pa * cos + pb * sin) / _skeleton.getScaleX();
                 pc = (pc * cos + pd * sin) / _skeleton.getScaleY();
@@ -531,7 +531,9 @@ void Bone::updateAppliedTransform() {
                 pa *= s;
                 pc *= s;
                 s = MathUtil::sqrt(pa * pa + pc * pc);
-                if (_data.getTransformMode() == TransformMode_NoScale && pid < 0 != (_skeleton.getScaleX() < 0 != _skeleton.getScaleY() < 0)) s = -s;
+                if (_data.getTransformMode() == TransformMode_NoScale &&
+                    pid < 0 != (_skeleton.getScaleX() < 0 != _skeleton.getScaleY() < 0))
+                    s = -s;
                 float r = MathUtil::Pi / 2 + MathUtil::atan2(pc, pa);
                 pb = MathUtil::cos(r) * s;
                 pd = MathUtil::sin(r) * s;
@@ -540,6 +542,10 @@ void Bone::updateAppliedTransform() {
                 ib = pb * pid;
                 ic = pc * pid;
                 id = pa * pid;
+                break;
+            }
+            case TransformMode_Normal:
+            case TransformMode_OnlyTranslation:
                 break;
         }
         ra = ia * _a - ib * _c;

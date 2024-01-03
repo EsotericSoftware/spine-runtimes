@@ -33,6 +33,7 @@
 #include <spine/Bone.h>
 #include <spine/IkConstraint.h>
 #include <spine/PathConstraint.h>
+#include <spine/PhysicsConstraint.h>
 #include <spine/SkeletonData.h>
 #include <spine/Skin.h>
 #include <spine/Slot.h>
@@ -43,6 +44,7 @@
 #include <spine/MeshAttachment.h>
 #include <spine/PathAttachment.h>
 #include <spine/PathConstraintData.h>
+#include <spine/PhysicsConstraintData.h>
 #include <spine/RegionAttachment.h>
 #include <spine/SlotData.h>
 #include <spine/TransformConstraintData.h>
@@ -116,6 +118,15 @@ Skeleton::Skeleton(SkeletonData *skeletonData) : _data(skeletonData),
 		_pathConstraints.add(constraint);
 	}
 
+    _physicsConstraints.ensureCapacity(_data->getPhysicsConstraints().size());
+    for (size_t i = 0; i < _data->getPhysicsConstraints().size(); ++i) {
+        PhysicsConstraintData *data = _data->getPhysicsConstraints()[i];
+
+        PhysicsConstraint *constraint = new (__FILE__, __LINE__) PhysicsConstraint(*data, *this);
+
+        _physicsConstraints.add(constraint);
+    }
+
 	updateCache();
 }
 
@@ -151,8 +162,9 @@ void Skeleton::updateCache() {
 	size_t ikCount = _ikConstraints.size();
 	size_t transformCount = _transformConstraints.size();
 	size_t pathCount = _pathConstraints.size();
+    size_t physicsCount = _physicsConstraints.size();
 
-	size_t constraintCount = ikCount + transformCount + pathCount;
+	size_t constraintCount = ikCount + transformCount + pathCount + physicsCount;
 
 	size_t i = 0;
 continue_outer:
@@ -183,6 +195,15 @@ continue_outer:
 				goto continue_outer;
 			}
 		}
+
+        for (size_t ii = 0; ii < pathCount; ++ii) {
+            PhysicsConstraint *constraint = _physicsConstraints[ii];
+            if (constraint->getData().getOrder() == i) {
+                sortPhysicsConstraint(constraint);
+                i++;
+                goto continue_outer;
+            }
+        }
 	}
 
 	size_t n = _bones.size();
@@ -206,7 +227,7 @@ void Skeleton::printUpdateCache() {
 	}
 }
 
-void Skeleton::updateWorldTransform() {
+void Skeleton::updateWorldTransform(Physics physics) {
 	for (size_t i = 0, n = _bones.size(); i < n; i++) {
 		Bone *bone = _bones[i];
 		bone->_ax = bone->_x;
@@ -219,32 +240,34 @@ void Skeleton::updateWorldTransform() {
 	}
 
 	for (size_t i = 0, n = _updateCache.size(); i < n; ++i) {
-		_updateCache[i]->update();
+		Updatable *updatable = _updateCache[i];
+        updatable->update(physics);
 	}
 }
 
-void Skeleton::updateWorldTransform(Bone *parent) {
+void Skeleton::updateWorldTransform(Physics physics, Bone *parent) {
 	// Apply the parent bone transform to the root bone. The root bone always inherits scale, rotation and reflection.
-	Bone &rootBone = *getRootBone();
+	Bone *rootBone = getRootBone();
 	float pa = parent->_a, pb = parent->_b, pc = parent->_c, pd = parent->_d;
-	rootBone._worldX = pa * _x + pb * _y + parent->_worldX;
-	rootBone._worldY = pc * _x + pd * _y + parent->_worldY;
+	rootBone->_worldX = pa * _x + pb * _y + parent->_worldX;
+	rootBone->_worldY = pc * _x + pd * _y + parent->_worldY;
 
-	float rotationY = rootBone._rotation + 90 + rootBone._shearY;
-	float la = MathUtil::cosDeg(rootBone._rotation + rootBone._shearX) * rootBone._scaleX;
-	float lb = MathUtil::cosDeg(rotationY) * rootBone._scaleY;
-	float lc = MathUtil::sinDeg(rootBone._rotation + rootBone._shearX) * rootBone._scaleX;
-	float ld = MathUtil::sinDeg(rotationY) * rootBone._scaleY;
-	rootBone._a = (pa * la + pb * lc) * _scaleX;
-	rootBone._b = (pa * lb + pb * ld) * _scaleX;
-	rootBone._c = (pc * la + pd * lc) * _scaleY;
-	rootBone._d = (pc * lb + pd * ld) * _scaleY;
+    float rx = (rootBone->_rotation + rootBone->_shearX) * MathUtil::Deg_Rad;
+    float ry = (rootBone->_rotation + 90 + rootBone->_shearY) * MathUtil::Deg_Rad;
+    float la = MathUtil::cos(rx) * rootBone->_scaleX;
+    float lb = MathUtil::cos(ry) * rootBone->_scaleY;
+    float lc = MathUtil::sin(rx) * rootBone->_scaleX;
+    float ld = MathUtil::sin(ry) * rootBone->_scaleY;
+	rootBone->_a = (pa * la + pb * lc) * _scaleX;
+	rootBone->_b = (pa * lb + pb * ld) * _scaleX;
+	rootBone->_c = (pc * la + pd * lc) * _scaleY;
+	rootBone->_d = (pc * lb + pd * ld) * _scaleY;
 
 	// Update everything except root bone.
 	Bone *rb = getRootBone();
 	for (size_t i = 0, n = _updateCache.size(); i < n; i++) {
 		Updatable *updatable = _updateCache[i];
-		if (updatable != rb) updatable->update();
+		if (updatable != rb) updatable->update(physics);
 	}
 }
 
@@ -259,40 +282,20 @@ void Skeleton::setBonesToSetupPose() {
 	}
 
 	for (size_t i = 0, n = _ikConstraints.size(); i < n; ++i) {
-		IkConstraint *constraintP = _ikConstraints[i];
-		IkConstraint &constraint = *constraintP;
-
-		constraint._bendDirection = constraint._data._bendDirection;
-		constraint._compress = constraint._data._compress;
-		constraint._stretch = constraint._data._stretch;
-		constraint._mix = constraint._data._mix;
-		constraint._softness = constraint._data._softness;
+		_ikConstraints[i]->setToSetupPose();
 	}
 
 	for (size_t i = 0, n = _transformConstraints.size(); i < n; ++i) {
-		TransformConstraint *constraintP = _transformConstraints[i];
-		TransformConstraint &constraint = *constraintP;
-		TransformConstraintData &constraintData = constraint._data;
-
-		constraint._mixRotate = constraintData._mixRotate;
-		constraint._mixX = constraintData._mixX;
-		constraint._mixY = constraintData._mixY;
-		constraint._mixScaleX = constraintData._mixScaleX;
-		constraint._mixScaleY = constraintData._mixScaleY;
-		constraint._mixShearY = constraintData._mixShearY;
+		_transformConstraints[i]->setToSetupPose();
 	}
 
 	for (size_t i = 0, n = _pathConstraints.size(); i < n; ++i) {
-		PathConstraint *constraintP = _pathConstraints[i];
-		PathConstraint &constraint = *constraintP;
-		PathConstraintData &constraintData = constraint._data;
-
-		constraint._position = constraintData._position;
-		constraint._spacing = constraintData._spacing;
-		constraint._mixRotate = constraintData._mixRotate;
-		constraint._mixX = constraintData._mixX;
-		constraint._mixY = constraintData._mixY;
+		_pathConstraints[i]->setToSetupPose();
 	}
+
+    for (size_t i = 0, n = _physicsConstraints.size(); i < n; ++i) {
+        _physicsConstraints[i]->setToSetupPose();
+    }
 }
 
 void Skeleton::setSlotsToSetupPose() {
@@ -640,6 +643,18 @@ void Skeleton::sortTransformConstraint(TransformConstraint *constraint) {
 		constrained[i]->_sorted = true;
 }
 
+void Skeleton::sortPhysicsConstraint(PhysicsConstraint *constraint) {
+    Bone *bone = constraint->getBone();
+    constraint->_active = bone->_active && (!constraint->_data.isSkinRequired() ||
+                                                           (_skin && _skin->_constraints.contains(&constraint->_data)));
+    if (!constraint->_active) return;
+
+    sortBone(bone);
+    _updateCache.add(constraint);
+    sortReset(bone->getChildren());
+    bone->_sorted = true;
+}
+
 void Skeleton::sortPathConstraintAttachment(Skin *skin, size_t slotIndex, Bone &slotBone) {
 	Skin::AttachmentMap::Entries attachments = skin->getAttachments();
 
@@ -689,10 +704,11 @@ float Skeleton::getTime() {
     return _time;
 }
 
-float Skeleton::setTime(float time) {
+void Skeleton::setTime(float time) {
     _time = time;
 }
 
 void Skeleton::update(float delta) {
     _time += delta;
 }
+

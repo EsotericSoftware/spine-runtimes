@@ -39,7 +39,7 @@ using namespace spine;
 
 template<typename T, typename... Args>
 unique_ptr<T> make_unique_test(Args &&...args) {
-	return unique_ptr<T>(new T(forward<Args>(args)...));
+	return unique_ptr<T>(new T(std::forward<Args>(args)...));
 }
 
 void callback(AnimationState *state, EventType type, TrackEntry *entry, Event *event) {
@@ -124,7 +124,7 @@ void spineboy(SkeletonData *skeletonData, Atlas *atlas) {
 	skeleton->setToSetupPose();
 
 	skeleton->setPosition(320, 590);
-	skeleton->updateWorldTransform();
+	skeleton->updateWorldTransform(Physics::update);
 
 	Slot *headSlot = skeleton->findSlot("head");
 
@@ -227,7 +227,7 @@ void ikDemo(SkeletonData *skeletonData, Atlas *atlas) {
 		// Calculate final world transform with the
 		// crosshair bone set to the mouse cursor
 		// position.
-		drawable.skeleton->updateWorldTransform();
+		drawable.skeleton->updateWorldTransform(Physics::update);
 
 		window.clear();
 		window.draw(drawable);
@@ -246,7 +246,7 @@ void goblins(SkeletonData *skeletonData, Atlas *atlas) {
 	skeleton->setSkin("goblingirl");
 	skeleton->setSlotsToSetupPose();
 	skeleton->setPosition(320, 590);
-	skeleton->updateWorldTransform();
+	skeleton->updateWorldTransform(Physics::update);
 
 	drawable.state->setAnimation(0, "walk", true);
 
@@ -281,7 +281,7 @@ void raptor(SkeletonData *skeletonData, Atlas *atlas) {
 
 	Skeleton *skeleton = drawable.skeleton;
 	skeleton->setPosition(320, 590);
-	skeleton->updateWorldTransform();
+	skeleton->updateWorldTransform(Physics::update);
 
 	drawable.state->setAnimation(0, "walk", true);
 	drawable.state->addAnimation(1, "gun-grab", false, 2);
@@ -314,7 +314,7 @@ void tank(SkeletonData *skeletonData, Atlas *atlas) {
 
 	Skeleton *skeleton = drawable.skeleton;
 	skeleton->setPosition(500, 590);
-	skeleton->updateWorldTransform();
+	skeleton->updateWorldTransform(Physics::update);
 
 	drawable.state->setAnimation(0, "drive", true);
 
@@ -345,7 +345,7 @@ void vine(SkeletonData *skeletonData, Atlas *atlas) {
 
 	Skeleton *skeleton = drawable.skeleton;
 	skeleton->setPosition(320, 590);
-	skeleton->updateWorldTransform();
+	skeleton->updateWorldTransform(Physics::update);
 
 	drawable.state->setAnimation(0, "grow", true);
 
@@ -378,7 +378,7 @@ void stretchyman(SkeletonData *skeletonData, Atlas *atlas) {
 	Skeleton *skeleton = drawable.skeleton;
 
 	skeleton->setPosition(100, 590);
-	skeleton->updateWorldTransform();
+	skeleton->updateWorldTransform(Physics::update);
 
 	drawable.state->setAnimation(0, "sneak", true);
 
@@ -411,7 +411,7 @@ void stretchymanStrechyIk(SkeletonData *skeletonData, Atlas *atlas) {
 	Skeleton *skeleton = drawable->skeleton;
 
 	skeleton->setPosition(100, 590);
-	skeleton->updateWorldTransform();
+	skeleton->updateWorldTransform(Physics::update);
 
 	drawable->state->setAnimation(0, "sneak", true);
 
@@ -445,7 +445,7 @@ void coin(SkeletonData *skeletonData, Atlas *atlas) {
 
 	Skeleton *skeleton = drawable.skeleton;
 	skeleton->setPosition(320, 320);
-	skeleton->updateWorldTransform();
+	skeleton->updateWorldTransform(Physics::update);
 
 	drawable.state->setAnimation(0, "animation", true);
 
@@ -479,7 +479,7 @@ void dragon(SkeletonData *skeletonData, Atlas *atlas) {
 
 	Skeleton *skeleton = drawable.skeleton;
 	skeleton->setPosition(320, 320);
-	skeleton->updateWorldTransform();
+	skeleton->updateWorldTransform(Physics::update);
 
 	drawable.state->setAnimation(0, "flying", true);
 
@@ -513,7 +513,7 @@ void owl(SkeletonData *skeletonData, Atlas *atlas) {
 
 	Skeleton *skeleton = drawable.skeleton;
 	skeleton->setPosition(320, 400);
-	skeleton->updateWorldTransform();
+	skeleton->updateWorldTransform(Physics::update);
 
 	drawable.state->setAnimation(0, "idle", true);
 	drawable.state->setAnimation(1, "blink", true);
@@ -588,7 +588,7 @@ void mixAndMatch(SkeletonData *skeletonData, Atlas *atlas) {
 	skeleton->setSlotsToSetupPose();
 
 	skeleton->setPosition(320, 590);
-	skeleton->updateWorldTransform();
+	skeleton->updateWorldTransform(Physics::update);
 
 	drawable.state->setAnimation(0, "dance", true);
 
@@ -626,7 +626,7 @@ void test(SkeletonData *skeletonData, Atlas *atlas) {
 	for (int i = 0; i < 1; i++) {
 		animationState.update(d);
 		animationState.apply(skeleton);
-		skeleton.updateWorldTransform();
+		skeleton.updateWorldTransform(Physics::update);
 		d += 0.1f;
 	}
 }

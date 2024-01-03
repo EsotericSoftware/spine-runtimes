@@ -35,47 +35,47 @@ using namespace spine;
 
 class NullTextureLoader : public TextureLoader {
 public:
-	virtual void load(AtlasPage &page, const String &path) {}
+	virtual void load(AtlasPage &, const String &) {}
 
-	virtual void unload(void *texture) {}
+	virtual void unload(void *) {}
 };
 
 class NullAttachmentLoader : public AttachmentLoader {
-	virtual RegionAttachment *newRegionAttachment(Skin &skin, const String &name, const String &path, Sequence *sequence) {
+	virtual RegionAttachment *newRegionAttachment(Skin &, const String &name, const String &, Sequence *) {
 		return new (__FILE__, __LINE__) RegionAttachment(name);
 	}
 
-	virtual MeshAttachment *newMeshAttachment(Skin &skin, const String &name, const String &path, Sequence *sequence) {
+	virtual MeshAttachment *newMeshAttachment(Skin &, const String &name, const String &, Sequence *) {
 		return new (__FILE__, __LINE__) MeshAttachment(name);
 	}
 
-	virtual BoundingBoxAttachment *newBoundingBoxAttachment(Skin &skin, const String &name) {
+	virtual BoundingBoxAttachment *newBoundingBoxAttachment(Skin &, const String &name) {
 		return new (__FILE__, __LINE__) BoundingBoxAttachment(name);
 	}
 
-	virtual PathAttachment *newPathAttachment(Skin &skin, const String &name) {
+	virtual PathAttachment *newPathAttachment(Skin &, const String &name) {
 		return new (__FILE__, __LINE__) PathAttachment(name);
 	}
 
-	virtual PointAttachment *newPointAttachment(Skin &skin, const String &name) {
+	virtual PointAttachment *newPointAttachment(Skin &, const String &name) {
 		return new (__FILE__, __LINE__) PointAttachment(name);
 	}
 
-	virtual ClippingAttachment *newClippingAttachment(Skin &skin, const String &name) {
+	virtual ClippingAttachment *newClippingAttachment(Skin &, const String &name) {
 		return new (__FILE__, __LINE__) ClippingAttachment(name);
 	}
 
-	virtual void configureAttachment(Attachment *attachment) {
+	virtual void configureAttachment(Attachment *) {
 	}
 };
 
 int main(void) {
-	String atlasFile("/Users/badlogic/Desktop/basemodel-male/basemodel-male.atlas");
-	String skeletonFile("/Users/badlogic/Desktop/basemodel-male/basemodel-male.skel");
-	String animation = "";
-	String skin = "BasicBody";
+	String atlasFile("data/sack-pma.atlas");
+	String skeletonFile("data/sack-pro.json");
+	String animation = "walk";
+	String skin = "";
 
-	float scale = 0.1f;
+	float scale = 0.6f;
 	SFMLTextureLoader textureLoader;
 	NullAttachmentLoader nullLoader;
 	Atlas *atlas = atlasFile.length() == 0 ? nullptr : new Atlas(atlasFile, &textureLoader);
@@ -104,12 +104,13 @@ int main(void) {
 
 	AnimationStateData stateData(skeletonData);
 	SkeletonDrawable drawable(skeletonData, &stateData);
-	drawable.skeleton->updateWorldTransform();
-	drawable.skeleton->setPosition(320, 590);
+    drawable.skeleton->getRootBone()->update(Physics::update);
+	drawable.skeleton->updateWorldTransform(Physics::update);
+	drawable.skeleton->setPosition(320, 960);
 	if (animation.length() > 0) drawable.state->setAnimation(0, animation, true);
 	if (skin.length() > 0) drawable.skeleton->setSkin(skin);
 
-	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - testbed");
+	sf::RenderWindow window(sf::VideoMode(1024, 1024), "Spine SFML - testbed");
 	window.setFramerateLimit(60);
 	sf::Event event;
 	sf::Clock deltaClock;

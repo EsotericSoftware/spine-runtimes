@@ -40,9 +40,7 @@ RTTI_IMPL(PhysicsConstraint, Updatable)
 
 PhysicsConstraint::PhysicsConstraint(PhysicsConstraintData& data, Skeleton& skeleton)
         : _data(data), _skeleton(skeleton) {
-    // Assuming 'bones' is a vector or similar container in 'Skeleton'
-    // and 'index' is an accessible member of 'BoneData' in 'PhysicsConstraintData'
-    _bone = skeleton.getBones()[data.getBone()->getIndex()];  // Adjust based on actual data structure
+    _bone = skeleton.getBones()[data.getBone()->getIndex()];
 
     _inertia = data.getInertia();
     _strength = data.getStrength();
@@ -72,11 +70,15 @@ PhysicsConstraint::PhysicsConstraint(PhysicsConstraintData& data, Skeleton& skel
     _lastTime = 0;
 }
 
+PhysicsConstraintData &PhysicsConstraint::getData() {
+    return _data;
+}
+
 void PhysicsConstraint::setBone(Bone* bone) {
     _bone = bone;
 }
 
-Bone* PhysicsConstraint::getBone() const {
+Bone* PhysicsConstraint::getBone(){
     return _bone;
 }
 
@@ -84,7 +86,7 @@ void PhysicsConstraint::setInertia(float value) {
     _inertia = value;
 }
 
-float PhysicsConstraint::getInertia() const {
+float PhysicsConstraint::getInertia(){
     return _inertia;
 }
 
@@ -92,7 +94,7 @@ void PhysicsConstraint::setStrength(float value) {
     _strength = value;
 }
 
-float PhysicsConstraint::getStrength() const {
+float PhysicsConstraint::getStrength(){
     return _strength;
 }
 
@@ -100,7 +102,7 @@ void PhysicsConstraint::setDamping(float value) {
     _damping = value;
 }
 
-float PhysicsConstraint::getDamping() const {
+float PhysicsConstraint::getDamping(){
     return _damping;
 }
 
@@ -108,7 +110,7 @@ void PhysicsConstraint::setMassInverse(float value) {
     _massInverse = value;
 }
 
-float PhysicsConstraint::getMassInverse() const {
+float PhysicsConstraint::getMassInverse(){
     return _massInverse;
 }
 
@@ -116,7 +118,7 @@ void PhysicsConstraint::setWind(float value) {
     _wind = value;
 }
 
-float PhysicsConstraint::getWind() const {
+float PhysicsConstraint::getWind(){
     return _wind;
 }
 
@@ -124,7 +126,7 @@ void PhysicsConstraint::setGravity(float value) {
     _gravity = value;
 }
 
-float PhysicsConstraint::getGravity() const {
+float PhysicsConstraint::getGravity(){
     return _gravity;
 }
 
@@ -132,7 +134,7 @@ void PhysicsConstraint::setMix(float value) {
     _mix = value;
 }
 
-float PhysicsConstraint::getMix() const {
+float PhysicsConstraint::getMix(){
     return _mix;
 }
 
@@ -140,7 +142,7 @@ void PhysicsConstraint::setReset(bool value) {
     _reset = value;
 }
 
-bool PhysicsConstraint::getReset() const {
+bool PhysicsConstraint::getReset(){
     return _reset;
 }
 
@@ -148,7 +150,7 @@ void PhysicsConstraint::setUx(float value) {
     _ux = value;
 }
 
-float PhysicsConstraint::getUx() const {
+float PhysicsConstraint::getUx(){
     return _ux;
 }
 
@@ -156,7 +158,7 @@ void PhysicsConstraint::setUy(float value) {
     _uy = value;
 }
 
-float PhysicsConstraint::getUy() const {
+float PhysicsConstraint::getUy(){
     return _uy;
 }
 
@@ -164,7 +166,7 @@ void PhysicsConstraint::setCx(float value) {
     _cx = value;
 }
 
-float PhysicsConstraint::getCx() const {
+float PhysicsConstraint::getCx(){
     return _cx;
 }
 
@@ -172,7 +174,7 @@ void PhysicsConstraint::setCy(float value) {
     _cy = value;
 }
 
-float PhysicsConstraint::getCy() const {
+float PhysicsConstraint::getCy(){
     return _cy;
 }
 
@@ -180,7 +182,7 @@ void PhysicsConstraint::setTx(float value) {
     _tx = value;
 }
 
-float PhysicsConstraint::getTx() const {
+float PhysicsConstraint::getTx(){
     return _tx;
 }
 
@@ -188,7 +190,7 @@ void PhysicsConstraint::setTy(float value) {
     _ty = value;
 }
 
-float PhysicsConstraint::getTy() const {
+float PhysicsConstraint::getTy(){
     return _ty;
 }
 
@@ -196,7 +198,7 @@ void PhysicsConstraint::setXOffset(float value) {
     _xOffset = value;
 }
 
-float PhysicsConstraint::getXOffset() const {
+float PhysicsConstraint::getXOffset(){
     return _xOffset;
 }
 
@@ -204,7 +206,7 @@ void PhysicsConstraint::setXVelocity(float value) {
     _xVelocity = value;
 }
 
-float PhysicsConstraint::getXVelocity() const {
+float PhysicsConstraint::getXVelocity(){
     return _xVelocity;
 }
 
@@ -212,7 +214,7 @@ void PhysicsConstraint::setYOffset(float value) {
     _yOffset = value;
 }
 
-float PhysicsConstraint::getYOffset() const {
+float PhysicsConstraint::getYOffset(){
     return _yOffset;
 }
 
@@ -220,7 +222,7 @@ void PhysicsConstraint::setYVelocity(float value) {
     _yVelocity = value;
 }
 
-float PhysicsConstraint::getYVelocity() const {
+float PhysicsConstraint::getYVelocity(){
     return _yVelocity;
 }
 
@@ -228,7 +230,7 @@ void PhysicsConstraint::setRotateOffset(float value) {
     _rotateOffset = value;
 }
 
-float PhysicsConstraint::getRotateOffset() const {
+float PhysicsConstraint::getRotateOffset(){
     return _rotateOffset;
 }
 
@@ -236,7 +238,7 @@ void PhysicsConstraint::setRotateVelocity(float value) {
     _rotateVelocity = value;
 }
 
-float PhysicsConstraint::getRotateVelocity() const {
+float PhysicsConstraint::getRotateVelocity(){
     return _rotateVelocity;
 }
 
@@ -244,7 +246,7 @@ void PhysicsConstraint::setScaleOffset(float value) {
     _scaleOffset = value;
 }
 
-float PhysicsConstraint::getScaleOffset() const {
+float PhysicsConstraint::getScaleOffset(){
     return _scaleOffset;
 }
 
@@ -252,7 +254,7 @@ void PhysicsConstraint::setScaleVelocity(float value) {
     _scaleVelocity = value;
 }
 
-float PhysicsConstraint::getScaleVelocity() const {
+float PhysicsConstraint::getScaleVelocity(){
     return _scaleVelocity;
 }
 
@@ -260,7 +262,7 @@ void PhysicsConstraint::setActive(bool value) {
     _active = value;
 }
 
-bool PhysicsConstraint::isActive() const {
+bool PhysicsConstraint::isActive(){
     return _active;
 }
 
@@ -268,7 +270,7 @@ void PhysicsConstraint::setRemaining(float value) {
     _remaining = value;
 }
 
-float PhysicsConstraint::getRemaining() const {
+float PhysicsConstraint::getRemaining(){
     return _remaining;
 }
 
@@ -276,13 +278,13 @@ void PhysicsConstraint::setLastTime(float value) {
     _lastTime = value;
 }
 
-float PhysicsConstraint::getLastTime() const {
+float PhysicsConstraint::getLastTime(){
     return _lastTime;
 }
 
 void PhysicsConstraint::reset() {
     _remaining = 0;
-    _lastTime = _skeleton.getTime();  // Assuming Skeleton has a method getTime()
+    _lastTime = _skeleton.getTime();
     _reset = true;
     _xOffset = 0;
     _xVelocity = 0;
@@ -313,7 +315,7 @@ void PhysicsConstraint::update(Physics physics) {
     bool scaleX = _data._scaleX > 0;
 
     Bone* bone = _bone;
-    float l = bone->_data.getLength();  // Direct access to Bone's length
+    float l = bone->_data.getLength();
 
     switch (physics) {
         case Physics::none:

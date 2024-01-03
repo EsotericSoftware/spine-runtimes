@@ -61,7 +61,7 @@ TransformConstraint::TransformConstraint(TransformConstraintData &data, Skeleton
 	}
 }
 
-void TransformConstraint::update(Physics physics) {
+void TransformConstraint::update(Physics) {
 	if (_mixRotate == 0 && _mixX == 0 && _mixY == 0 && _mixScaleX == 0 && _mixScaleY == 0 && _mixShearY == 0) return;
 
 	if (_data.isLocal()) {
@@ -340,7 +340,7 @@ void TransformConstraint::setActive(bool inValue) {
 }
 
 void TransformConstraint::setToSetupPose() {
-	auto data = this->_data;
+	TransformConstraintData &data = this->_data;
 	this->_mixRotate = data._mixRotate;
 	this->_mixX = data._mixX;
 	this->_mixY = data._mixY;

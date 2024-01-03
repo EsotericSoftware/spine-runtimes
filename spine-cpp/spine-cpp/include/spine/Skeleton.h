@@ -35,6 +35,7 @@
 #include <spine/SpineObject.h>
 #include <spine/SpineString.h>
 #include <spine/Color.h>
+#include <spine/Physics.h>
 
 namespace spine {
 	class SkeletonData;
@@ -125,10 +126,13 @@ namespace spine {
 
 		void printUpdateCache();
 
-		/// Updates the world transform for each bone and applies constraints.
-		void updateWorldTransform();
+        /// Updates the world transform for each bone and applies all constraints.
+        ///
+        /// See [World transforms](http://esotericsoftware.com/spine-runtime-skeletons#World-transforms) in the Spine
+        /// Runtimes Guide.
+		void updateWorldTransform(Physics physics);
 
-		void updateWorldTransform(Bone *parent);
+		void updateWorldTransform(Physics physics, Bone *parent);
 
 		/// Sets the bones, constraints, and slots to their setup pose values.
 		void setToSetupPose();
@@ -174,6 +178,9 @@ namespace spine {
 		/// @return May be NULL.
 		PathConstraint *findPathConstraint(const String &constraintName);
 
+        /// @return May be NULL.
+        PhysicsConstraint *findPhysicsConstraint(const String &constraintName);
+
 		/// Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose.
 		/// @param outX The horizontal distance between the skeleton origin and the left side of the AABB.
 		/// @param outY The vertical distance between the skeleton origin and the bottom side of the AABB.
@@ -200,6 +207,8 @@ namespace spine {
 
 		Vector<TransformConstraint *> &getTransformConstraints();
 
+        Vector<PhysicsConstraint *> &getPhysicsConstraints();
+
 		Skin *getSkin();
 
 		Color &getColor();
@@ -224,7 +233,7 @@ namespace spine {
 
         float getTime();
 
-        float setTime(float time);
+        void setTime(float time);
 
         void update(float delta);
 
@@ -236,6 +245,7 @@ namespace spine {
 		Vector<IkConstraint *> _ikConstraints;
 		Vector<TransformConstraint *> _transformConstraints;
 		Vector<PathConstraint *> _pathConstraints;
+        Vector<PhysicsConstraint *> _physicsConstraints;
 		Vector<Updatable *> _updateCache;
 		Skin *_skin;
 		Color _color;
