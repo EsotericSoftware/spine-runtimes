@@ -99,6 +99,7 @@ export class SlotMesh extends Mesh implements ISlotMesh {
 		SlotMesh.auxColor[3] = finalVertices[5];
 
 		this.tint = SlotMesh.auxColor;
+		this.alpha = SlotMesh.auxColor[3];
 		this.blendMode = SpineTexture.toPixiBlending(slotBlendMode);
 
 		if (this.geometry.indexBuffer.data.length !== finalIndices.length) {
