@@ -856,7 +856,7 @@ namespace Spine {
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
 									MixDirection direction) {
 			Bone bone = skeleton.bones.Items[boneIndex];
-			if (bone.active) bone.scaleY = GetScaleValue(time, alpha, blend, direction, bone.scaleX, bone.data.scaleY);
+			if (bone.active) bone.scaleY = GetScaleValue(time, alpha, blend, direction, bone.scaleY, bone.data.scaleY);
 		}
 	}
 
