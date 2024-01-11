@@ -312,8 +312,8 @@ namespace Spine {
 				data.strength = input.ReadFloat();
 				data.damping = input.ReadFloat();
 				data.massInverse = input.ReadFloat();
-				data.wind = input.ReadFloat();
-				data.gravity = input.ReadFloat();
+				data.wind = input.ReadFloat() * scale;
+				data.gravity = input.ReadFloat() * scale;
 				data.mix = input.ReadFloat();
 				flags = input.Read();
 				if ((flags & 1) != 0) data.inertiaGlobal = true;
@@ -997,10 +997,10 @@ namespace Spine {
 						ReadTimeline(input, timelines, new PhysicsConstraintMassTimeline(frameCount, bezierCount, index), 1);
 						break;
 					case PHYSICS_WIND:
-						ReadTimeline(input, timelines, new PhysicsConstraintWindTimeline(frameCount, bezierCount, index), 1);
+						ReadTimeline(input, timelines, new PhysicsConstraintWindTimeline(frameCount, bezierCount, index), scale);
 						break;
 					case PHYSICS_GRAVITY:
-						ReadTimeline(input, timelines, new PhysicsConstraintGravityTimeline(frameCount, bezierCount, index), 1);
+						ReadTimeline(input, timelines, new PhysicsConstraintGravityTimeline(frameCount, bezierCount, index), scale);
 						break;
 					case PHYSICS_MIX:
 						ReadTimeline(input, timelines, new PhysicsConstraintMixTimeline(frameCount, bezierCount, index), 1);

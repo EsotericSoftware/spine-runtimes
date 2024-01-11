@@ -299,8 +299,8 @@ namespace Spine {
 					data.strength = GetFloat(constraintMap, "strength", 100);
 					data.damping = GetFloat(constraintMap, "damping", 1);
 					data.massInverse = 1f / GetFloat(constraintMap, "mass", 1);
-					data.wind = GetFloat(constraintMap, "wind", 0);
-					data.gravity = GetFloat(constraintMap, "gravity", 0);
+					data.wind = GetFloat(constraintMap, "wind", 0) * scale;
+					data.gravity = GetFloat(constraintMap, "gravity", 0) * scale;
 					data.mix = GetFloat(constraintMap, "mix", 1);
 					data.inertiaGlobal = GetBoolean(constraintMap, "inertiaGlobal", false);
 					data.strengthGlobal = GetBoolean(constraintMap, "strengthGlobal", false);
@@ -1036,6 +1036,7 @@ namespace Spine {
 						}
 
 						CurveTimeline1 timeline;
+						float timelineScale = 1.0f;
 						if (timelineName == "inertia")
 							timeline = new PhysicsConstraintInertiaTimeline(frames, frames, index);
 						else if (timelineName == "strength")
@@ -1044,15 +1045,19 @@ namespace Spine {
 							timeline = new PhysicsConstraintDampingTimeline(frames, frames, index);
 						else if (timelineName == "mass")
 							timeline = new PhysicsConstraintMassTimeline(frames, frames, index);
-						else if (timelineName == "wind")
+						else if (timelineName == "wind") {
 							timeline = new PhysicsConstraintWindTimeline(frames, frames, index);
-						else if (timelineName == "gravity")
+							timelineScale = scale;
+						}
+						else if (timelineName == "gravity") {
 							timeline = new PhysicsConstraintGravityTimeline(frames, frames, index);
+							timelineScale = scale;
+						}
 						else if (timelineName == "mix") //
 							timeline = new PhysicsConstraintMixTimeline(frames, frames, index);
 						else
 							continue;
-						timelines.Add(ReadTimeline(ref keyMapEnumerator, timeline, 0, 1));
+						timelines.Add(ReadTimeline(ref keyMapEnumerator, timeline, 0, timelineScale));
 					}
 				}
 			}
