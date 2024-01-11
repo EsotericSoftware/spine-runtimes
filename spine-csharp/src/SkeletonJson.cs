@@ -1048,12 +1048,10 @@ namespace Spine {
 						else if (timelineName == "wind") {
 							timeline = new PhysicsConstraintWindTimeline(frames, frames, index);
 							timelineScale = scale;
-						}
-						else if (timelineName == "gravity") {
+						} else if (timelineName == "gravity") {
 							timeline = new PhysicsConstraintGravityTimeline(frames, frames, index);
 							timelineScale = scale;
-						}
-						else if (timelineName == "mix") //
+						} else if (timelineName == "mix") //
 							timeline = new PhysicsConstraintMixTimeline(frames, frames, index);
 						else
 							continue;
