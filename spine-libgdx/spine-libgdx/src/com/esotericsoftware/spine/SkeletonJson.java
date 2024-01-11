@@ -310,8 +310,8 @@ public class SkeletonJson extends SkeletonLoader {
 			data.strength = constraintMap.getFloat("strength", 100);
 			data.damping = constraintMap.getFloat("damping", 1);
 			data.massInverse = 1f / constraintMap.getFloat("mass", 1);
-			data.wind = constraintMap.getFloat("wind", 0);
-			data.gravity = constraintMap.getFloat("gravity", 0);
+			data.wind = constraintMap.getFloat("wind", 0) * scale;
+			data.gravity = constraintMap.getFloat("gravity", 0) * scale;
 			data.mix = constraintMap.getFloat("mix", 1);
 			data.inertiaGlobal = constraintMap.getBoolean("inertiaGlobal", false);
 			data.strengthGlobal = constraintMap.getBoolean("strengthGlobal", false);
@@ -957,6 +957,7 @@ public class SkeletonJson extends SkeletonLoader {
 				}
 
 				CurveTimeline1 timeline;
+				float timelineScale = 1.0f;
 				if (timelineName.equals("inertia"))
 					timeline = new PhysicsConstraintInertiaTimeline(frames, frames, index);
 				else if (timelineName.equals("strength"))
@@ -965,15 +966,17 @@ public class SkeletonJson extends SkeletonLoader {
 					timeline = new PhysicsConstraintDampingTimeline(frames, frames, index);
 				else if (timelineName.equals("mass"))
 					timeline = new PhysicsConstraintMassTimeline(frames, frames, index);
-				else if (timelineName.equals("wind"))
+				else if (timelineName.equals("wind")) {
 					timeline = new PhysicsConstraintWindTimeline(frames, frames, index);
-				else if (timelineName.equals("gravity"))
+					timelineScale = scale;
+				} else if (timelineName.equals("gravity")) {
 					timeline = new PhysicsConstraintGravityTimeline(frames, frames, index);
-				else if (timelineName.equals("mix")) //
+					timelineScale = scale;
+				} else if (timelineName.equals("mix")) //
 					timeline = new PhysicsConstraintMixTimeline(frames, frames, index);
 				else
 					continue;
-				timelines.add(readTimeline(keyMap, timeline, 0, 1));
+				timelines.add(readTimeline(keyMap, timeline, 0, timelineScale));
 			}
 		}
 
