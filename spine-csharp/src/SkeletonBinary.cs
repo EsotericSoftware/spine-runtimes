@@ -872,7 +872,7 @@ namespace Spine {
 				float time = input.ReadFloat(), mix = input.ReadFloat(), softness = input.ReadFloat() * scale;
 				for (int frame = 0, bezier = 0; ; frame++) {
 					int flags = input.Read();
-					timeline.SetFrame(frame, time, mix, softness, input.ReadByte(), (flags & 1) != 0, (flags & 2) != 0);
+					timeline.SetFrame(frame, time, mix, softness, input.ReadSByte(), (flags & 1) != 0, (flags & 2) != 0);
 					if (frame == frameLast) break;
 					float time2 = input.ReadFloat(), mix2 = input.ReadFloat(), softness2 = input.ReadFloat() * scale;
 					switch (input.ReadByte()) {
