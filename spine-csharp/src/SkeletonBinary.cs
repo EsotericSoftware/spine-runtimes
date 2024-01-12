@@ -307,7 +307,7 @@ namespace Spine {
 				if ((flags & 8) != 0) data.rotate = input.ReadFloat();
 				if ((flags & 16) != 0) data.scaleX = input.ReadFloat();
 				if ((flags & 32) != 0) data.shearX = input.ReadFloat();
-				data.step = 1f / input.ReadByte();
+				data.step = 1f / input.ReadUByte();
 				data.inertia = input.ReadFloat();
 				data.strength = input.ReadFloat();
 				data.damping = input.ReadFloat();
@@ -428,7 +428,7 @@ namespace Spine {
 			String attachmentName, bool nonessential) {
 			float scale = this.scale;
 
-			int flags = input.ReadByte();
+			int flags = input.ReadUByte();
 			string name = (flags & 8) != 0 ? input.ReadStringRef() : attachmentName;
 
 			switch ((AttachmentType)(flags & 0x7)) { // 0b111
@@ -658,7 +658,7 @@ namespace Spine {
 			for (int i = 0, n = input.ReadInt(true); i < n; i++) {
 				int slotIndex = input.ReadInt(true);
 				for (int ii = 0, nn = input.ReadInt(true); ii < nn; ii++) {
-					int timelineType = input.ReadByte(), frameCount = input.ReadInt(true), frameLast = frameCount - 1;
+					int timelineType = input.ReadUByte(), frameCount = input.ReadInt(true), frameLast = frameCount - 1;
 					switch (timelineType) {
 					case SLOT_ATTACHMENT: {
 						AttachmentTimeline timeline = new AttachmentTimeline(frameCount, slotIndex);
@@ -678,7 +678,7 @@ namespace Spine {
 							float time2 = input.ReadFloat();
 							float r2 = input.Read() / 255f, g2 = input.Read() / 255f;
 							float b2 = input.Read() / 255f, a2 = input.Read() / 255f;
-							switch (input.ReadByte()) {
+							switch (input.ReadUByte()) {
 							case CURVE_STEPPED:
 								timeline.SetStepped(frame);
 								break;
@@ -707,7 +707,7 @@ namespace Spine {
 							if (frame == frameLast) break;
 							float time2 = input.ReadFloat();
 							float r2 = input.Read() / 255f, g2 = input.Read() / 255f, b2 = input.Read() / 255f;
-							switch (input.ReadByte()) {
+							switch (input.ReadUByte()) {
 							case CURVE_STEPPED:
 								timeline.SetStepped(frame);
 								break;
@@ -738,7 +738,7 @@ namespace Spine {
 							float nr = input.Read() / 255f, ng = input.Read() / 255f;
 							float nb = input.Read() / 255f, na = input.Read() / 255f;
 							float nr2 = input.Read() / 255f, ng2 = input.Read() / 255f, nb2 = input.Read() / 255f;
-							switch (input.ReadByte()) {
+							switch (input.ReadUByte()) {
 							case CURVE_STEPPED:
 								timeline.SetStepped(frame);
 								break;
@@ -775,7 +775,7 @@ namespace Spine {
 							float time2 = input.ReadFloat();
 							float nr = input.Read() / 255f, ng = input.Read() / 255f, nb = input.Read() / 255f;
 							float nr2 = input.Read() / 255f, ng2 = input.Read() / 255f, nb2 = input.Read() / 255f;
-							switch (input.ReadByte()) {
+							switch (input.ReadUByte()) {
 							case CURVE_STEPPED:
 								timeline.SetStepped(frame);
 								break;
@@ -807,7 +807,7 @@ namespace Spine {
 							if (frame == frameLast) break;
 							float time2 = input.ReadFloat();
 							float a2 = input.Read() / 255f;
-							switch (input.ReadByte()) {
+							switch (input.ReadUByte()) {
 							case CURVE_STEPPED:
 								timeline.SetStepped(frame);
 								break;
@@ -829,7 +829,7 @@ namespace Spine {
 			for (int i = 0, n = input.ReadInt(true); i < n; i++) {
 				int boneIndex = input.ReadInt(true);
 				for (int ii = 0, nn = input.ReadInt(true); ii < nn; ii++) {
-					int type = input.ReadByte(), frameCount = input.ReadInt(true), bezierCount = input.ReadInt(true);
+					int type = input.ReadUByte(), frameCount = input.ReadInt(true), bezierCount = input.ReadInt(true);
 					switch (type) {
 					case BONE_ROTATE:
 						ReadTimeline(input, timelines, new RotateTimeline(frameCount, bezierCount, boneIndex), 1);
@@ -875,7 +875,7 @@ namespace Spine {
 					timeline.SetFrame(frame, time, mix, softness, input.ReadSByte(), (flags & 1) != 0, (flags & 2) != 0);
 					if (frame == frameLast) break;
 					float time2 = input.ReadFloat(), mix2 = input.ReadFloat(), softness2 = input.ReadFloat() * scale;
-					switch (input.ReadByte()) {
+					switch (input.ReadUByte()) {
 					case CURVE_STEPPED:
 						timeline.SetStepped(frame);
 						break;
@@ -902,7 +902,7 @@ namespace Spine {
 					if (frame == frameLast) break;
 					float time2 = input.ReadFloat(), mixRotate2 = input.ReadFloat(), mixX2 = input.ReadFloat(), mixY2 = input.ReadFloat(),
 					mixScaleX2 = input.ReadFloat(), mixScaleY2 = input.ReadFloat(), mixShearY2 = input.ReadFloat();
-					switch (input.ReadByte()) {
+					switch (input.ReadUByte()) {
 					case CURVE_STEPPED:
 						timeline.SetStepped(frame);
 						break;
@@ -931,7 +931,7 @@ namespace Spine {
 				int index = input.ReadInt(true);
 				PathConstraintData data = skeletonData.pathConstraints.Items[index];
 				for (int ii = 0, nn = input.ReadInt(true); ii < nn; ii++) {
-					int type = input.ReadByte(), frameCount = input.ReadInt(true), bezierCount = input.ReadInt(true);
+					int type = input.ReadUByte(), frameCount = input.ReadInt(true), bezierCount = input.ReadInt(true);
 					switch (type) {
 					case PATH_POSITION:
 						ReadTimeline(input, timelines, new PathConstraintPositionTimeline(frameCount, bezierCount, index),
@@ -949,7 +949,7 @@ namespace Spine {
 							if (frame == frameLast) break;
 							float time2 = input.ReadFloat(), mixRotate2 = input.ReadFloat(), mixX2 = input.ReadFloat(),
 								mixY2 = input.ReadFloat();
-							switch (input.ReadByte()) {
+							switch (input.ReadUByte()) {
 							case CURVE_STEPPED:
 								timeline.SetStepped(frame);
 								break;
@@ -974,7 +974,7 @@ namespace Spine {
 			for (int i = 0, n = input.ReadInt(true); i < n; i++) {
 				int index = input.ReadInt(true) - 1;
 				for (int ii = 0, nn = input.ReadInt(true); ii < nn; ii++) {
-					int type = input.ReadByte(), frameCount = input.ReadInt(true);
+					int type = input.ReadUByte(), frameCount = input.ReadInt(true);
 					if (type == PHYSICS_RESET) {
 						PhysicsConstraintResetTimeline timeline = new PhysicsConstraintResetTimeline(frameCount, index);
 						for (int frame = 0; frame < frameCount; frame++)
@@ -1019,7 +1019,7 @@ namespace Spine {
 						Attachment attachment = skin.GetAttachment(slotIndex, attachmentName);
 						if (attachment == null) throw new SerializationException("Timeline attachment not found: " + attachmentName);
 
-						int timelineType = input.ReadByte(), frameCount = input.ReadInt(true), frameLast = frameCount - 1;
+						int timelineType = input.ReadUByte(), frameCount = input.ReadInt(true), frameLast = frameCount - 1;
 						switch (timelineType) {
 						case ATTACHMENT_DEFORM: {
 							VertexAttachment vertexAttachment = (VertexAttachment)attachment;
@@ -1054,7 +1054,7 @@ namespace Spine {
 								timeline.SetFrame(frame, time, deform);
 								if (frame == frameLast) break;
 								float time2 = input.ReadFloat();
-								switch (input.ReadByte()) {
+								switch (input.ReadUByte()) {
 								case CURVE_STEPPED:
 									timeline.SetStepped(frame);
 									break;
@@ -1150,7 +1150,7 @@ namespace Spine {
 				timeline.SetFrame(frame, time, value);
 				if (frame == frameLast) break;
 				float time2 = input.ReadFloat(), value2 = input.ReadFloat() * scale;
-				switch (input.ReadByte()) {
+				switch (input.ReadUByte()) {
 				case CURVE_STEPPED:
 					timeline.SetStepped(frame);
 					break;
@@ -1171,7 +1171,7 @@ namespace Spine {
 				timeline.SetFrame(frame, time, value1, value2);
 				if (frame == frameLast) break;
 				float time2 = input.ReadFloat(), nvalue1 = input.ReadFloat() * scale, nvalue2 = input.ReadFloat() * scale;
-				switch (input.ReadByte()) {
+				switch (input.ReadUByte()) {
 				case CURVE_STEPPED:
 					timeline.SetStepped(frame);
 					break;
@@ -1214,10 +1214,14 @@ namespace Spine {
 				return input.ReadByte();
 			}
 
-			public byte ReadByte () {
+			/// <summary>Explicit unsigned byte variant to prevent pitfalls porting Java reference implementation
+			/// where byte is signed vs C# where byte is unsigned.</summary>
+			public byte ReadUByte () {
 				return (byte)input.ReadByte();
 			}
 
+			/// <summary>Explicit signed byte variant to prevent pitfalls porting Java reference implementation
+			/// where byte is signed vs C# where byte is unsigned.</summary>
 			public sbyte ReadSByte () {
 				int value = input.ReadByte();
 				if (value == -1) throw new EndOfStreamException();
