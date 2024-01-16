@@ -55,5 +55,5 @@ void RotateTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vecto
 	SP_UNUSED(direction);
 
 	Bone *bone = skeleton._bones[_boneIndex];
-    if (bone->isActive()) bone->_rotation = getRelativeValue(time, alpha, blend, bone->_rotation, bone->getData()._rotation);
+	if (bone->isActive()) bone->_rotation = getRelativeValue(time, alpha, blend, bone->_rotation, bone->getData()._rotation);
 }

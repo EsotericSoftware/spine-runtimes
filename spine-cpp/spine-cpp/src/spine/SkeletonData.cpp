@@ -67,7 +67,7 @@ SkeletonData::~SkeletonData() {
 	ContainerUtil::cleanUpVectorOfPointers(_ikConstraints);
 	ContainerUtil::cleanUpVectorOfPointers(_transformConstraints);
 	ContainerUtil::cleanUpVectorOfPointers(_pathConstraints);
-    ContainerUtil::cleanUpVectorOfPointers(_physicsConstraints);
+	ContainerUtil::cleanUpVectorOfPointers(_physicsConstraints);
 	for (size_t i = 0; i < _strings.size(); i++) {
 		SpineExtension::free(_strings[i], __FILE__, __LINE__);
 	}
@@ -106,7 +106,7 @@ PathConstraintData *SkeletonData::findPathConstraint(const String &constraintNam
 }
 
 PhysicsConstraintData *SkeletonData::findPhysicsConstraint(const String &constraintName) {
-    return ContainerUtil::findWithName(_physicsConstraints, constraintName);
+	return ContainerUtil::findWithName(_physicsConstraints, constraintName);
 }
 
 const String &SkeletonData::getName() {
@@ -158,7 +158,7 @@ Vector<PathConstraintData *> &SkeletonData::getPathConstraints() {
 }
 
 Vector<PhysicsConstraintData *> &SkeletonData::getPhysicsConstraints() {
-    return _physicsConstraints;
+	return _physicsConstraints;
 }
 
 float SkeletonData::getX() {

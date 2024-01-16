@@ -46,7 +46,7 @@ RTTI_IMPL(PathConstraintPositionTimeline, CurveTimeline1)
 PathConstraintPositionTimeline::PathConstraintPositionTimeline(size_t frameCount, size_t bezierCount,
 															   int pathConstraintIndex) : CurveTimeline1(frameCount,
 																										 bezierCount),
-                                                                                          _constraintIndex(
+																						  _constraintIndex(
 																								  pathConstraintIndex) {
 	PropertyId ids[] = {((PropertyId) Property_PathConstraintPosition << 32) | pathConstraintIndex};
 	setPropertyIds(ids, 1);
@@ -62,5 +62,5 @@ void PathConstraintPositionTimeline::apply(Skeleton &skeleton, float lastTime, f
 	SP_UNUSED(direction);
 
 	PathConstraint *constraint = skeleton._pathConstraints[_constraintIndex];
-    if (constraint->_active) constraint->_position = getAbsoluteValue(time, alpha, blend, constraint->_position, constraint->_data._position);
+	if (constraint->_active) constraint->_position = getAbsoluteValue(time, alpha, blend, constraint->_position, constraint->_data._position);
 }

@@ -170,7 +170,7 @@ void ScaleXTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vecto
 	SP_UNUSED(pEvents);
 
 	Bone *bone = skeleton._bones[_boneIndex];
-    if (bone->_active) bone->_scaleX = getScaleValue(time, alpha, blend, direction, bone->_scaleX, bone->_data._scaleX);
+	if (bone->_active) bone->_scaleX = getScaleValue(time, alpha, blend, direction, bone->_scaleX, bone->_data._scaleX);
 }
 
 RTTI_IMPL(ScaleYTimeline, CurveTimeline1)
@@ -190,5 +190,5 @@ void ScaleYTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vecto
 	SP_UNUSED(pEvents);
 
 	Bone *bone = skeleton._bones[_boneIndex];
-    if (bone->_active) bone->_scaleY = getScaleValue(time, alpha, blend, direction, bone->_scaleX, bone->_data._scaleY);
+	if (bone->_active) bone->_scaleY = getScaleValue(time, alpha, blend, direction, bone->_scaleX, bone->_data._scaleY);
 }

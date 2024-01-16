@@ -91,11 +91,10 @@ void PathConstraint::update(Physics) {
 					Bone *boneP = _bones[i];
 					Bone &bone = *boneP;
 					float setupLength = bone._data.getLength();
-                    float x = setupLength * bone._a;
-                    float y = setupLength * bone._c;
-                    _lengths[i] = MathUtil::sqrt(x * x + y * y);
-
-                }
+					float x = setupLength * bone._a;
+					float y = setupLength * bone._c;
+					_lengths[i] = MathUtil::sqrt(x * x + y * y);
+				}
 			}
 			for (size_t i = 1; i < spacesCount; ++i) {
 				_spaces[i] = spacing;
@@ -580,10 +579,10 @@ void PathConstraint::setActive(bool inValue) {
 }
 
 void PathConstraint::setToSetupPose() {
-    PathConstraintData &data = this->_data;
-    this->_position = data._position;
-    this->_spacing = data._spacing;
-    this->_mixRotate = data._mixRotate;
-    this->_mixX = data._mixX;
-    this->_mixY = data._mixY;
+	PathConstraintData &data = this->_data;
+	this->_position = data._position;
+	this->_spacing = data._spacing;
+	this->_mixRotate = data._mixRotate;
+	this->_mixX = data._mixX;
+	this->_mixY = data._mixY;
 }

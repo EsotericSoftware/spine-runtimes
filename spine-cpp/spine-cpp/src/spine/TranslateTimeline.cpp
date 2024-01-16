@@ -136,7 +136,7 @@ void TranslateXTimeline::apply(Skeleton &skeleton, float lastTime, float time, V
 	SP_UNUSED(direction);
 
 	Bone *bone = skeleton._bones[_boneIndex];
-    if (bone->_active) bone->_x = getRelativeValue(time, alpha, blend, bone->_x, bone->_data._x);
+	if (bone->_active) bone->_x = getRelativeValue(time, alpha, blend, bone->_x, bone->_data._x);
 }
 
 RTTI_IMPL(TranslateYTimeline, CurveTimeline1)
@@ -158,5 +158,5 @@ void TranslateYTimeline::apply(Skeleton &skeleton, float lastTime, float time, V
 	SP_UNUSED(direction);
 
 	Bone *bone = skeleton._bones[_boneIndex];
-    if (bone->_active) bone->_y = getRelativeValue(time, alpha, blend, bone->_y, bone->_data._y);
+	if (bone->_active) bone->_y = getRelativeValue(time, alpha, blend, bone->_y, bone->_data._y);
 }

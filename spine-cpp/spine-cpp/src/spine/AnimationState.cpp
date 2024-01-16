@@ -211,7 +211,7 @@ float TrackEntry::getTrackComplete() {
 }
 
 bool TrackEntry::wasApplied() {
-    return _nextTrackLast != -1;
+	return _nextTrackLast != -1;
 }
 
 EventQueueEntry::EventQueueEntry(EventType eventType, TrackEntry *trackEntry, Event *event) : _type(eventType),
@@ -438,14 +438,14 @@ bool AnimationState::apply(Skeleton &skeleton) {
 		// apply mixing from entries first.
 		float alpha = current._alpha;
 		if (current._mixingFrom != NULL) {
-            alpha *= applyMixingFrom(currentP, skeleton, blend);
+			alpha *= applyMixingFrom(currentP, skeleton, blend);
 		} else if (current._trackTime >= current._trackEnd && current._next == NULL) {
-            alpha = 0;// Set to setup pose the last time the entry will be applied.
+			alpha = 0;// Set to setup pose the last time the entry will be applied.
 		}
-        bool attachments = alpha >= current._alphaAttachmentThreshold;
+		bool attachments = alpha >= current._alphaAttachmentThreshold;
 
 
-        // apply current entry.
+		// apply current entry.
 		float animationLast = current._animationLast, animationTime = current.getAnimationTime();
 		float applyTime = animationTime;
 		Vector<Event *> *applyEvents = &_events;
@@ -456,8 +456,8 @@ bool AnimationState::apply(Skeleton &skeleton) {
 		size_t timelineCount = current._animation->_timelines.size();
 		Vector<Timeline *> &timelines = current._animation->_timelines;
 		if ((i == 0 && alpha == 1) || blend == MixBlend_Add) {
-            if (i == 0) attachments = true;
-            for (size_t ii = 0; ii < timelineCount; ++ii) {
+			if (i == 0) attachments = true;
+			for (size_t ii = 0; ii < timelineCount; ++ii) {
 				Timeline *timeline = timelines[ii];
 				if (timeline->getRTTI().isExactly(AttachmentTimeline::rtti))
 					applyAttachmentTimeline(static_cast<AttachmentTimeline *>(timeline), skeleton, applyTime, blend,
@@ -481,13 +481,13 @@ bool AnimationState::apply(Skeleton &skeleton) {
 
 				if (!shortestRotation && timeline->getRTTI().isExactly(RotateTimeline::rtti))
 					applyRotateTimeline(static_cast<RotateTimeline *>(timeline), skeleton, applyTime, alpha,
-                                        timelineBlend, timelinesRotation, ii << 1, firstFrame);
+										timelineBlend, timelinesRotation, ii << 1, firstFrame);
 				else if (timeline->getRTTI().isExactly(AttachmentTimeline::rtti))
 					applyAttachmentTimeline(static_cast<AttachmentTimeline *>(timeline), skeleton, applyTime,
 											timelineBlend, true);
 				else
 					timeline->apply(skeleton, animationLast, applyTime, applyEvents, alpha, timelineBlend,
-                                    MixDirection_In);
+									MixDirection_In);
 			}
 		}
 
@@ -744,8 +744,8 @@ void AnimationState::applyRotateTimeline(RotateTimeline *rotateTimeline, Skeleto
 
 	// Mix between rotations using the direction of the shortest route on the first frame while detecting crosses.
 	float total, diff = r2 - r1;
-    diff -= MathUtil::ceil(diff / 360 - 0.5) * 360;
-    if (diff == 0) {
+	diff -= MathUtil::ceil(diff / 360 - 0.5) * 360;
+	if (diff == 0) {
 		total = timelinesRotation[i];
 	} else {
 		float lastTotal, lastDiff;
@@ -885,7 +885,7 @@ float AnimationState::applyMixingFrom(TrackEntry *to, Skeleton &skeleton, MixBle
 									timelinesRotation, i << 1, firstFrame);
 			} else if (timeline->getRTTI().isExactly(AttachmentTimeline::rtti)) {
 				applyAttachmentTimeline(static_cast<AttachmentTimeline *>(timeline), skeleton, applyTime, timelineBlend,
-                                        attachments && alpha >= from->_alphaAttachmentThreshold);
+										attachments && alpha >= from->_alphaAttachmentThreshold);
 			} else {
 				if (drawOrder && timeline->getRTTI().isExactly(DrawOrderTimeline::rtti) &&
 					timelineBlend == MixBlend_Setup)
@@ -986,7 +986,7 @@ TrackEntry *AnimationState::newTrackEntry(size_t trackIndex, Animation *animatio
 
 	entry._eventThreshold = 0;
 	entry._mixAttachmentThreshold = 0;
-    entry._alphaAttachmentThreshold = 0;
+	entry._alphaAttachmentThreshold = 0;
 	entry._mixDrawOrderThreshold = 0;
 
 	entry._animationStart = 0;

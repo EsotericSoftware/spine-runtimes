@@ -38,429 +38,429 @@ using namespace spine;
 
 RTTI_IMPL(PhysicsConstraint, Updatable)
 
-PhysicsConstraint::PhysicsConstraint(PhysicsConstraintData& data, Skeleton& skeleton)
-        : _data(data), _skeleton(skeleton) {
-    _bone = skeleton.getBones()[data.getBone()->getIndex()];
+PhysicsConstraint::PhysicsConstraint(PhysicsConstraintData &data, Skeleton &skeleton)
+	: _data(data), _skeleton(skeleton) {
+	_bone = skeleton.getBones()[data.getBone()->getIndex()];
 
-    _inertia = data.getInertia();
-    _strength = data.getStrength();
-    _damping = data.getDamping();
-    _massInverse = data.getMassInverse();
-    _wind = data.getWind();
-    _gravity = data.getGravity();
-    _mix = data.getMix();
+	_inertia = data.getInertia();
+	_strength = data.getStrength();
+	_damping = data.getDamping();
+	_massInverse = data.getMassInverse();
+	_wind = data.getWind();
+	_gravity = data.getGravity();
+	_mix = data.getMix();
 
-    _reset = true;
-    _ux = 0;
-    _uy = 0;
-    _cx = 0;
-    _cy = 0;
-    _tx = 0;
-    _ty = 0;
-    _xOffset = 0;
-    _xVelocity = 0;
-    _yOffset = 0;
-    _yVelocity = 0;
-    _rotateOffset = 0;
-    _rotateVelocity = 0;
-    _scaleOffset = 0;
-    _scaleVelocity = 0;
-    _active = false;
-    _remaining = 0;
-    _lastTime = 0;
+	_reset = true;
+	_ux = 0;
+	_uy = 0;
+	_cx = 0;
+	_cy = 0;
+	_tx = 0;
+	_ty = 0;
+	_xOffset = 0;
+	_xVelocity = 0;
+	_yOffset = 0;
+	_yVelocity = 0;
+	_rotateOffset = 0;
+	_rotateVelocity = 0;
+	_scaleOffset = 0;
+	_scaleVelocity = 0;
+	_active = false;
+	_remaining = 0;
+	_lastTime = 0;
 }
 
 PhysicsConstraintData &PhysicsConstraint::getData() {
-    return _data;
+	return _data;
 }
 
-void PhysicsConstraint::setBone(Bone* bone) {
-    _bone = bone;
+void PhysicsConstraint::setBone(Bone *bone) {
+	_bone = bone;
 }
 
-Bone* PhysicsConstraint::getBone(){
-    return _bone;
+Bone *PhysicsConstraint::getBone() {
+	return _bone;
 }
 
 void PhysicsConstraint::setInertia(float value) {
-    _inertia = value;
+	_inertia = value;
 }
 
-float PhysicsConstraint::getInertia(){
-    return _inertia;
+float PhysicsConstraint::getInertia() {
+	return _inertia;
 }
 
 void PhysicsConstraint::setStrength(float value) {
-    _strength = value;
+	_strength = value;
 }
 
-float PhysicsConstraint::getStrength(){
-    return _strength;
+float PhysicsConstraint::getStrength() {
+	return _strength;
 }
 
 void PhysicsConstraint::setDamping(float value) {
-    _damping = value;
+	_damping = value;
 }
 
-float PhysicsConstraint::getDamping(){
-    return _damping;
+float PhysicsConstraint::getDamping() {
+	return _damping;
 }
 
 void PhysicsConstraint::setMassInverse(float value) {
-    _massInverse = value;
+	_massInverse = value;
 }
 
-float PhysicsConstraint::getMassInverse(){
-    return _massInverse;
+float PhysicsConstraint::getMassInverse() {
+	return _massInverse;
 }
 
 void PhysicsConstraint::setWind(float value) {
-    _wind = value;
+	_wind = value;
 }
 
-float PhysicsConstraint::getWind(){
-    return _wind;
+float PhysicsConstraint::getWind() {
+	return _wind;
 }
 
 void PhysicsConstraint::setGravity(float value) {
-    _gravity = value;
+	_gravity = value;
 }
 
-float PhysicsConstraint::getGravity(){
-    return _gravity;
+float PhysicsConstraint::getGravity() {
+	return _gravity;
 }
 
 void PhysicsConstraint::setMix(float value) {
-    _mix = value;
+	_mix = value;
 }
 
-float PhysicsConstraint::getMix(){
-    return _mix;
+float PhysicsConstraint::getMix() {
+	return _mix;
 }
 
 void PhysicsConstraint::setReset(bool value) {
-    _reset = value;
+	_reset = value;
 }
 
-bool PhysicsConstraint::getReset(){
-    return _reset;
+bool PhysicsConstraint::getReset() {
+	return _reset;
 }
 
 void PhysicsConstraint::setUx(float value) {
-    _ux = value;
+	_ux = value;
 }
 
-float PhysicsConstraint::getUx(){
-    return _ux;
+float PhysicsConstraint::getUx() {
+	return _ux;
 }
 
 void PhysicsConstraint::setUy(float value) {
-    _uy = value;
+	_uy = value;
 }
 
-float PhysicsConstraint::getUy(){
-    return _uy;
+float PhysicsConstraint::getUy() {
+	return _uy;
 }
 
 void PhysicsConstraint::setCx(float value) {
-    _cx = value;
+	_cx = value;
 }
 
-float PhysicsConstraint::getCx(){
-    return _cx;
+float PhysicsConstraint::getCx() {
+	return _cx;
 }
 
 void PhysicsConstraint::setCy(float value) {
-    _cy = value;
+	_cy = value;
 }
 
-float PhysicsConstraint::getCy(){
-    return _cy;
+float PhysicsConstraint::getCy() {
+	return _cy;
 }
 
 void PhysicsConstraint::setTx(float value) {
-    _tx = value;
+	_tx = value;
 }
 
-float PhysicsConstraint::getTx(){
-    return _tx;
+float PhysicsConstraint::getTx() {
+	return _tx;
 }
 
 void PhysicsConstraint::setTy(float value) {
-    _ty = value;
+	_ty = value;
 }
 
-float PhysicsConstraint::getTy(){
-    return _ty;
+float PhysicsConstraint::getTy() {
+	return _ty;
 }
 
 void PhysicsConstraint::setXOffset(float value) {
-    _xOffset = value;
+	_xOffset = value;
 }
 
-float PhysicsConstraint::getXOffset(){
-    return _xOffset;
+float PhysicsConstraint::getXOffset() {
+	return _xOffset;
 }
 
 void PhysicsConstraint::setXVelocity(float value) {
-    _xVelocity = value;
+	_xVelocity = value;
 }
 
-float PhysicsConstraint::getXVelocity(){
-    return _xVelocity;
+float PhysicsConstraint::getXVelocity() {
+	return _xVelocity;
 }
 
 void PhysicsConstraint::setYOffset(float value) {
-    _yOffset = value;
+	_yOffset = value;
 }
 
-float PhysicsConstraint::getYOffset(){
-    return _yOffset;
+float PhysicsConstraint::getYOffset() {
+	return _yOffset;
 }
 
 void PhysicsConstraint::setYVelocity(float value) {
-    _yVelocity = value;
+	_yVelocity = value;
 }
 
-float PhysicsConstraint::getYVelocity(){
-    return _yVelocity;
+float PhysicsConstraint::getYVelocity() {
+	return _yVelocity;
 }
 
 void PhysicsConstraint::setRotateOffset(float value) {
-    _rotateOffset = value;
+	_rotateOffset = value;
 }
 
-float PhysicsConstraint::getRotateOffset(){
-    return _rotateOffset;
+float PhysicsConstraint::getRotateOffset() {
+	return _rotateOffset;
 }
 
 void PhysicsConstraint::setRotateVelocity(float value) {
-    _rotateVelocity = value;
+	_rotateVelocity = value;
 }
 
-float PhysicsConstraint::getRotateVelocity(){
-    return _rotateVelocity;
+float PhysicsConstraint::getRotateVelocity() {
+	return _rotateVelocity;
 }
 
 void PhysicsConstraint::setScaleOffset(float value) {
-    _scaleOffset = value;
+	_scaleOffset = value;
 }
 
-float PhysicsConstraint::getScaleOffset(){
-    return _scaleOffset;
+float PhysicsConstraint::getScaleOffset() {
+	return _scaleOffset;
 }
 
 void PhysicsConstraint::setScaleVelocity(float value) {
-    _scaleVelocity = value;
+	_scaleVelocity = value;
 }
 
-float PhysicsConstraint::getScaleVelocity(){
-    return _scaleVelocity;
+float PhysicsConstraint::getScaleVelocity() {
+	return _scaleVelocity;
 }
 
 void PhysicsConstraint::setActive(bool value) {
-    _active = value;
+	_active = value;
 }
 
-bool PhysicsConstraint::isActive(){
-    return _active;
+bool PhysicsConstraint::isActive() {
+	return _active;
 }
 
 void PhysicsConstraint::setRemaining(float value) {
-    _remaining = value;
+	_remaining = value;
 }
 
-float PhysicsConstraint::getRemaining(){
-    return _remaining;
+float PhysicsConstraint::getRemaining() {
+	return _remaining;
 }
 
 void PhysicsConstraint::setLastTime(float value) {
-    _lastTime = value;
+	_lastTime = value;
 }
 
-float PhysicsConstraint::getLastTime(){
-    return _lastTime;
+float PhysicsConstraint::getLastTime() {
+	return _lastTime;
 }
 
 void PhysicsConstraint::reset() {
-    _remaining = 0;
-    _lastTime = _skeleton.getTime();
-    _reset = true;
-    _xOffset = 0;
-    _xVelocity = 0;
-    _yOffset = 0;
-    _yVelocity = 0;
-    _rotateOffset = 0;
-    _rotateVelocity = 0;
-    _scaleOffset = 0;
-    _scaleVelocity = 0;
+	_remaining = 0;
+	_lastTime = _skeleton.getTime();
+	_reset = true;
+	_xOffset = 0;
+	_xVelocity = 0;
+	_yOffset = 0;
+	_yVelocity = 0;
+	_rotateOffset = 0;
+	_rotateVelocity = 0;
+	_scaleOffset = 0;
+	_scaleVelocity = 0;
 }
 
 void PhysicsConstraint::setToSetupPose() {
-    _inertia = _data.getInertia();
-    _strength = _data.getStrength();
-    _damping = _data.getDamping();
-    _massInverse = _data.getMassInverse();
-    _wind = _data.getWind();
-    _gravity = _data.getGravity();
-    _mix = _data.getMix();
+	_inertia = _data.getInertia();
+	_strength = _data.getStrength();
+	_damping = _data.getDamping();
+	_massInverse = _data.getMassInverse();
+	_wind = _data.getWind();
+	_gravity = _data.getGravity();
+	_mix = _data.getMix();
 }
 void PhysicsConstraint::update(Physics physics) {
-    float mix = _mix;
-    if (mix == 0) return;
+	float mix = _mix;
+	if (mix == 0) return;
 
-    bool x = _data._x > 0;
-    bool y = _data._y > 0;
-    bool rotateOrShearX = _data._rotate > 0 || _data._shearX > 0;
-    bool scaleX = _data._scaleX > 0;
+	bool x = _data._x > 0;
+	bool y = _data._y > 0;
+	bool rotateOrShearX = _data._rotate > 0 || _data._shearX > 0;
+	bool scaleX = _data._scaleX > 0;
 
-    Bone* bone = _bone;
-    float l = bone->_data.getLength();
+	Bone *bone = _bone;
+	float l = bone->_data.getLength();
 
-    switch (physics) {
-        case Physics::Physics_None:
-            return;
-        case Physics::Physics_Reset:
-            reset();
-            // Fall through.
-        case Physics::Physics_Update: {
-            _remaining += MathUtil::max(_skeleton.getTime() - _lastTime, 0.0f);
-            _lastTime = _skeleton.getTime();
+	switch (physics) {
+		case Physics::Physics_None:
+			return;
+		case Physics::Physics_Reset:
+			reset();
+			// Fall through.
+		case Physics::Physics_Update: {
+			_remaining += MathUtil::max(_skeleton.getTime() - _lastTime, 0.0f);
+			_lastTime = _skeleton.getTime();
 
-            float bx = bone->_worldX, by = bone->_worldY;
-            if (_reset) {
-                _reset = false;
-                _ux = bx;
-                _uy = by;
-            } else {
-                float remaining = _remaining, i = _inertia, step = _data._step;
-                if (x || y) {
-                    if (x) {
-                        _xOffset += (_ux - bx) * i;
-                        _ux = bx;
-                    }
-                    if (y) {
-                        _yOffset += (_uy - by) * i;
-                        _uy = by;
-                    }
-                    if (remaining >= step) {
-                        float m = _massInverse * step, e = _strength, w = _wind * 100, g = _gravity * -100;
-                        float d = MathUtil::pow(_damping, 60 * step);
-                        do {
-                            if (x) {
-                                _xVelocity += (w - _xOffset * e) * m;
-                                _xOffset += _xVelocity * step;
-                                _xVelocity *= d;
-                            }
-                            if (y) {
-                                _yVelocity += (g - _yOffset * e) * m;
-                                _yOffset += _yVelocity * step;
-                                _yVelocity *= d;
-                            }
-                            remaining -= step;
-                        } while (remaining >= step);
-                    }
-                    if (x) bone->_worldX += _xOffset * mix * _data._x;
-                    if (y) bone->_worldY += _yOffset * mix * _data._y;
-                }
+			float bx = bone->_worldX, by = bone->_worldY;
+			if (_reset) {
+				_reset = false;
+				_ux = bx;
+				_uy = by;
+			} else {
+				float remaining = _remaining, i = _inertia, step = _data._step;
+				if (x || y) {
+					if (x) {
+						_xOffset += (_ux - bx) * i;
+						_ux = bx;
+					}
+					if (y) {
+						_yOffset += (_uy - by) * i;
+						_uy = by;
+					}
+					if (remaining >= step) {
+						float m = _massInverse * step, e = _strength, w = _wind * 100, g = _gravity * -100;
+						float d = MathUtil::pow(_damping, 60 * step);
+						do {
+							if (x) {
+								_xVelocity += (w - _xOffset * e) * m;
+								_xOffset += _xVelocity * step;
+								_xVelocity *= d;
+							}
+							if (y) {
+								_yVelocity += (g - _yOffset * e) * m;
+								_yOffset += _yVelocity * step;
+								_yVelocity *= d;
+							}
+							remaining -= step;
+						} while (remaining >= step);
+					}
+					if (x) bone->_worldX += _xOffset * mix * _data._x;
+					if (y) bone->_worldY += _yOffset * mix * _data._y;
+				}
 
-                if (rotateOrShearX || scaleX) {
-                    float ca = MathUtil::atan2(bone->_c, bone->_a), c = 0, s = 0, mr = 0;
-                    if (rotateOrShearX) {
-                        mr = (_data._rotate + _data._shearX) * mix;
-                        float dx = _cx - bone->_worldX, dy = _cy - bone->_worldY;
-                        float r = MathUtil::atan2(dy + _ty, dx + _tx) - ca - _rotateOffset * mr;
-                        _rotateOffset += (r - MathUtil::ceil(r * MathUtil::InvPi_2 - 0.5) * MathUtil::Pi_2) * i;
-                        r = _rotateOffset * mr + ca;
-                        c = MathUtil::cos(r);
-                        s = MathUtil::sin(r);
-                        if (scaleX) {
-                            r = l * bone->getWorldScaleX();
-                            if (r > 0) _scaleOffset += (dx * c + dy * s) * i / r;
-                        }
-                    } else {
-                        c = MathUtil::cos(ca);
-                        s = MathUtil::sin(ca);
-                        float r = l * bone->getWorldScaleX();
-                        if (r > 0) _scaleOffset += ((this->_cx - bone->_worldX) * c + (this->_cy - bone->_worldY) * s) * i / r;
-                    }
+				if (rotateOrShearX || scaleX) {
+					float ca = MathUtil::atan2(bone->_c, bone->_a), c = 0, s = 0, mr = 0;
+					if (rotateOrShearX) {
+						mr = (_data._rotate + _data._shearX) * mix;
+						float dx = _cx - bone->_worldX, dy = _cy - bone->_worldY;
+						float r = MathUtil::atan2(dy + _ty, dx + _tx) - ca - _rotateOffset * mr;
+						_rotateOffset += (r - MathUtil::ceil(r * MathUtil::InvPi_2 - 0.5) * MathUtil::Pi_2) * i;
+						r = _rotateOffset * mr + ca;
+						c = MathUtil::cos(r);
+						s = MathUtil::sin(r);
+						if (scaleX) {
+							r = l * bone->getWorldScaleX();
+							if (r > 0) _scaleOffset += (dx * c + dy * s) * i / r;
+						}
+					} else {
+						c = MathUtil::cos(ca);
+						s = MathUtil::sin(ca);
+						float r = l * bone->getWorldScaleX();
+						if (r > 0) _scaleOffset += ((this->_cx - bone->_worldX) * c + (this->_cy - bone->_worldY) * s) * i / r;
+					}
 
-                    remaining = _remaining;
-                    if (remaining >= step) {
-                        float m = _massInverse * step, e = _strength;
-                        float d = MathUtil::pow(_damping, 60 * step);
-                        while(true) {
-                            remaining -= step;
-                            if (scaleX) {
-                                _scaleVelocity += (_wind * c - _gravity * s - _scaleOffset * e) * m;
-                                _scaleOffset += _scaleVelocity * step;
-                                _scaleVelocity *= d;
-                            }
-                            if (rotateOrShearX) {
-                                _rotateVelocity += (-0.01f * l * (_wind * s + _gravity * c) - _rotateOffset * e) * m;
-                                _rotateOffset += _rotateVelocity * step;
-                                _rotateVelocity *= d;
-                                if (remaining < step) break;
-                                float r = _rotateOffset * mr + ca;
-                                c = MathUtil::cos(r);
-                                s = MathUtil::sin(r);
-                            } else if (remaining < step) //
-                                break;
-                        }
-                    }
-                }
-                _remaining = remaining;
-            }
+					remaining = _remaining;
+					if (remaining >= step) {
+						float m = _massInverse * step, e = _strength;
+						float d = MathUtil::pow(_damping, 60 * step);
+						while (true) {
+							remaining -= step;
+							if (scaleX) {
+								_scaleVelocity += (_wind * c - _gravity * s - _scaleOffset * e) * m;
+								_scaleOffset += _scaleVelocity * step;
+								_scaleVelocity *= d;
+							}
+							if (rotateOrShearX) {
+								_rotateVelocity += (-0.01f * l * (_wind * s + _gravity * c) - _rotateOffset * e) * m;
+								_rotateOffset += _rotateVelocity * step;
+								_rotateVelocity *= d;
+								if (remaining < step) break;
+								float r = _rotateOffset * mr + ca;
+								c = MathUtil::cos(r);
+								s = MathUtil::sin(r);
+							} else if (remaining < step)//
+								break;
+						}
+					}
+				}
+				_remaining = remaining;
+			}
 
-            _cx = bone->_worldX;
-            _cy = bone->_worldY;
-            break;
-        }
-        case Physics::Physics_Pose: {
-            if (x) bone->_worldX += _xOffset * mix * _data._x;
-            if (y) bone->_worldY += _yOffset * mix * _data._y;
-            break;
-        }
-    }
+			_cx = bone->_worldX;
+			_cy = bone->_worldY;
+			break;
+		}
+		case Physics::Physics_Pose: {
+			if (x) bone->_worldX += _xOffset * mix * _data._x;
+			if (y) bone->_worldY += _yOffset * mix * _data._y;
+			break;
+		}
+	}
 
-    if (rotateOrShearX) {
-        float o = _rotateOffset * mix, s = 0, c = 0, a = 0;
-        if (_data._shearX > 0) {
-            float r = 0;
-            if (_data._rotate > 0) {
-                r = o * _data._rotate;
-                s = MathUtil::sin(r);
-                c = MathUtil::cos(r);
-                a = bone->_b;
-                bone->_b = c * a - s * bone->_d;
-                bone->_d = s * a + c * bone->_d;
-            }
-            r += o * _data._shearX;
-            s = MathUtil::sin(r);
-            c = MathUtil::cos(r);
-            a = bone->_a;
-            bone->_a = c * a - s * bone->_c;
-            bone->_c = s * a + c * bone->_c;
-        } else {
-            o *= _data._rotate;
-            s = MathUtil::sin(o);
-            c = MathUtil::cos(o);
-            a = bone->_a;
-            bone->_a = c * a - s * bone->_c;
-            bone->_c = s * a + c * bone->_c;
-            a = bone->_b;
-            bone->_b = c * a - s * bone->_d;
-            bone->_d = s * a + c * bone->_d;
-        }
-    }
-    if (scaleX) {
-        float s = 1 + _scaleOffset * mix * _data._scaleX;
-        bone->_a *= s;
-        bone->_c *= s;
-    }
-    if (physics != Physics::Physics_Pose) {
-        _tx = l * bone->_a;
-        _ty = l * bone->_c;
-    }
-    bone->updateAppliedTransform();
+	if (rotateOrShearX) {
+		float o = _rotateOffset * mix, s = 0, c = 0, a = 0;
+		if (_data._shearX > 0) {
+			float r = 0;
+			if (_data._rotate > 0) {
+				r = o * _data._rotate;
+				s = MathUtil::sin(r);
+				c = MathUtil::cos(r);
+				a = bone->_b;
+				bone->_b = c * a - s * bone->_d;
+				bone->_d = s * a + c * bone->_d;
+			}
+			r += o * _data._shearX;
+			s = MathUtil::sin(r);
+			c = MathUtil::cos(r);
+			a = bone->_a;
+			bone->_a = c * a - s * bone->_c;
+			bone->_c = s * a + c * bone->_c;
+		} else {
+			o *= _data._rotate;
+			s = MathUtil::sin(o);
+			c = MathUtil::cos(o);
+			a = bone->_a;
+			bone->_a = c * a - s * bone->_c;
+			bone->_c = s * a + c * bone->_c;
+			a = bone->_b;
+			bone->_b = c * a - s * bone->_d;
+			bone->_d = s * a + c * bone->_d;
+		}
+	}
+	if (scaleX) {
+		float s = 1 + _scaleOffset * mix * _data._scaleX;
+		bone->_a *= s;
+		bone->_c *= s;
+	}
+	if (physics != Physics::Physics_Pose) {
+		_tx = l * bone->_a;
+		_ty = l * bone->_c;
+	}
+	bone->updateAppliedTransform();
 }

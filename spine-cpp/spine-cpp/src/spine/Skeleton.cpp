@@ -62,7 +62,7 @@ Skeleton::Skeleton(SkeletonData *skeletonData) : _data(skeletonData),
 												 _scaleY(1),
 												 _x(0),
 												 _y(0),
-                                                 _time(0){
+												 _time(0) {
 	_bones.ensureCapacity(_data->getBones().size());
 	for (size_t i = 0; i < _data->getBones().size(); ++i) {
 		BoneData *data = _data->getBones()[i];
@@ -118,14 +118,14 @@ Skeleton::Skeleton(SkeletonData *skeletonData) : _data(skeletonData),
 		_pathConstraints.add(constraint);
 	}
 
-    _physicsConstraints.ensureCapacity(_data->getPhysicsConstraints().size());
-    for (size_t i = 0; i < _data->getPhysicsConstraints().size(); ++i) {
-        PhysicsConstraintData *data = _data->getPhysicsConstraints()[i];
+	_physicsConstraints.ensureCapacity(_data->getPhysicsConstraints().size());
+	for (size_t i = 0; i < _data->getPhysicsConstraints().size(); ++i) {
+		PhysicsConstraintData *data = _data->getPhysicsConstraints()[i];
 
-        PhysicsConstraint *constraint = new (__FILE__, __LINE__) PhysicsConstraint(*data, *this);
+		PhysicsConstraint *constraint = new (__FILE__, __LINE__) PhysicsConstraint(*data, *this);
 
-        _physicsConstraints.add(constraint);
-    }
+		_physicsConstraints.add(constraint);
+	}
 
 	updateCache();
 }
@@ -162,7 +162,7 @@ void Skeleton::updateCache() {
 	size_t ikCount = _ikConstraints.size();
 	size_t transformCount = _transformConstraints.size();
 	size_t pathCount = _pathConstraints.size();
-    size_t physicsCount = _physicsConstraints.size();
+	size_t physicsCount = _physicsConstraints.size();
 
 	size_t constraintCount = ikCount + transformCount + pathCount + physicsCount;
 
@@ -196,14 +196,14 @@ continue_outer:
 			}
 		}
 
-        for (size_t ii = 0; ii < pathCount; ++ii) {
-            PhysicsConstraint *constraint = _physicsConstraints[ii];
-            if (constraint->getData().getOrder() == i) {
-                sortPhysicsConstraint(constraint);
-                i++;
-                goto continue_outer;
-            }
-        }
+		for (size_t ii = 0; ii < pathCount; ++ii) {
+			PhysicsConstraint *constraint = _physicsConstraints[ii];
+			if (constraint->getData().getOrder() == i) {
+				sortPhysicsConstraint(constraint);
+				i++;
+				goto continue_outer;
+			}
+		}
 	}
 
 	size_t n = _bones.size();
@@ -241,7 +241,7 @@ void Skeleton::updateWorldTransform(Physics physics) {
 
 	for (size_t i = 0, n = _updateCache.size(); i < n; ++i) {
 		Updatable *updatable = _updateCache[i];
-        updatable->update(physics);
+		updatable->update(physics);
 	}
 }
 
@@ -252,12 +252,12 @@ void Skeleton::updateWorldTransform(Physics physics, Bone *parent) {
 	rootBone->_worldX = pa * _x + pb * _y + parent->_worldX;
 	rootBone->_worldY = pc * _x + pd * _y + parent->_worldY;
 
-    float rx = (rootBone->_rotation + rootBone->_shearX) * MathUtil::Deg_Rad;
-    float ry = (rootBone->_rotation + 90 + rootBone->_shearY) * MathUtil::Deg_Rad;
-    float la = MathUtil::cos(rx) * rootBone->_scaleX;
-    float lb = MathUtil::cos(ry) * rootBone->_scaleY;
-    float lc = MathUtil::sin(rx) * rootBone->_scaleX;
-    float ld = MathUtil::sin(ry) * rootBone->_scaleY;
+	float rx = (rootBone->_rotation + rootBone->_shearX) * MathUtil::Deg_Rad;
+	float ry = (rootBone->_rotation + 90 + rootBone->_shearY) * MathUtil::Deg_Rad;
+	float la = MathUtil::cos(rx) * rootBone->_scaleX;
+	float lb = MathUtil::cos(ry) * rootBone->_scaleY;
+	float lc = MathUtil::sin(rx) * rootBone->_scaleX;
+	float ld = MathUtil::sin(ry) * rootBone->_scaleY;
 	rootBone->_a = (pa * la + pb * lc) * _scaleX;
 	rootBone->_b = (pa * lb + pb * ld) * _scaleX;
 	rootBone->_c = (pc * la + pd * lc) * _scaleY;
@@ -293,9 +293,9 @@ void Skeleton::setBonesToSetupPose() {
 		_pathConstraints[i]->setToSetupPose();
 	}
 
-    for (size_t i = 0, n = _physicsConstraints.size(); i < n; ++i) {
-        _physicsConstraints[i]->setToSetupPose();
-    }
+	for (size_t i = 0, n = _physicsConstraints.size(); i < n; ++i) {
+		_physicsConstraints[i]->setToSetupPose();
+	}
 }
 
 void Skeleton::setSlotsToSetupPose() {
@@ -644,15 +644,15 @@ void Skeleton::sortTransformConstraint(TransformConstraint *constraint) {
 }
 
 void Skeleton::sortPhysicsConstraint(PhysicsConstraint *constraint) {
-    Bone *bone = constraint->getBone();
-    constraint->_active = bone->_active && (!constraint->_data.isSkinRequired() ||
-                                                           (_skin && _skin->_constraints.contains(&constraint->_data)));
-    if (!constraint->_active) return;
+	Bone *bone = constraint->getBone();
+	constraint->_active = bone->_active && (!constraint->_data.isSkinRequired() ||
+											(_skin && _skin->_constraints.contains(&constraint->_data)));
+	if (!constraint->_active) return;
 
-    sortBone(bone);
-    _updateCache.add(constraint);
-    sortReset(bone->getChildren());
-    bone->_sorted = true;
+	sortBone(bone);
+	_updateCache.add(constraint);
+	sortReset(bone->getChildren());
+	bone->_sorted = true;
 }
 
 void Skeleton::sortPathConstraintAttachment(Skin *skin, size_t slotIndex, Bone &slotBone) {
@@ -701,14 +701,13 @@ void Skeleton::sortReset(Vector<Bone *> &bones) {
 }
 
 float Skeleton::getTime() {
-    return _time;
+	return _time;
 }
 
 void Skeleton::setTime(float time) {
-    _time = time;
+	_time = time;
 }
 
 void Skeleton::update(float delta) {
-    _time += delta;
+	_time += delta;
 }
-

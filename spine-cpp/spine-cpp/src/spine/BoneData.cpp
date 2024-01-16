@@ -47,8 +47,8 @@ BoneData::BoneData(int index, const String &name, BoneData *parent) : _index(ind
 																	  _transformMode(TransformMode_Normal),
 																	  _skinRequired(false),
 																	  _color(),
-                                                                      _icon(),
-                                                                      _visible(true){
+																	  _icon(),
+																	  _visible(true) {
 	assert(index >= 0);
 	assert(_name.length() > 0);
 }
@@ -150,18 +150,17 @@ Color &BoneData::getColor() {
 }
 
 const String &BoneData::getIcon() {
-    return _icon;
+	return _icon;
 }
 
 void BoneData::setIcon(const String &icon) {
-    this->_icon = icon;
+	this->_icon = icon;
 }
 
 bool BoneData::isVisible() {
-    return _visible;
+	return _visible;
 }
 
 void BoneData::setVisible(bool inValue) {
-    this->_visible = inValue;
+	this->_visible = inValue;
 }
-

@@ -47,7 +47,7 @@ TransformConstraintTimeline::TransformConstraintTimeline(size_t frameCount, size
 														 int transformConstraintIndex) : CurveTimeline(frameCount,
 																									   TransformConstraintTimeline::ENTRIES,
 																									   bezierCount),
-                                                                                         _constraintIndex(
+																						 _constraintIndex(
 																								 transformConstraintIndex) {
 	PropertyId ids[] = {((PropertyId) Property_TransformConstraint << 32) | transformConstraintIndex};
 	setPropertyIds(ids, 1);

@@ -136,7 +136,7 @@ void ShearXTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vecto
 	SP_UNUSED(direction);
 
 	Bone *bone = skeleton._bones[_boneIndex];
-    if (bone->_active) bone->_shearX = getRelativeValue(time, alpha, blend, bone->_shearX, bone->_data._shearX);
+	if (bone->_active) bone->_shearX = getRelativeValue(time, alpha, blend, bone->_shearX, bone->_data._shearX);
 }
 
 RTTI_IMPL(ShearYTimeline, CurveTimeline1)
@@ -158,5 +158,5 @@ void ShearYTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vecto
 	SP_UNUSED(direction);
 
 	Bone *bone = skeleton._bones[_boneIndex];
-    if (bone->_active) bone->_shearY = getRelativeValue(time, alpha, blend, bone->_shearX, bone->_data._shearY);
+	if (bone->_active) bone->_shearY = getRelativeValue(time, alpha, blend, bone->_shearX, bone->_data._shearY);
 }

@@ -68,7 +68,7 @@ float MathUtil::atan2(float y, float x) {
 }
 
 float MathUtil::atan2Deg(float x, float y) {
-    return MathUtil::atan2(x, y) * MathUtil::Deg_Rad;
+	return MathUtil::atan2(x, y) * MathUtil::Deg_Rad;
 }
 
 /// Returns the cosine in radians from a lookup table.
@@ -129,5 +129,5 @@ float MathUtil::pow(float a, float b) {
 }
 
 float MathUtil::ceil(float v) {
-    return ::ceil(v);
+	return ::ceil(v);
 }
