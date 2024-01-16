@@ -239,8 +239,8 @@ export class SkeletonBinary {
 			data.strength = input.readFloat();
 			data.damping = input.readFloat();
 			data.massInverse = input.readFloat();
-			data.wind = input.readFloat();
-			data.gravity = input.readFloat();
+			data.wind = input.readFloat() * scale;
+			data.gravity = input.readFloat() * scale;
 			data.mix = input.readFloat();
 			flags = input.readByte();
 			if ((flags & 1) != 0) data.inertiaGlobal = true;
@@ -953,10 +953,10 @@ export class SkeletonBinary {
 						timelines.push(readTimeline1(input, new PhysicsConstraintMassTimeline(frameCount, bezierCount, index), 1));
 						break;
 					case PHYSICS_WIND:
-						timelines.push(readTimeline1(input, new PhysicsConstraintWindTimeline(frameCount, bezierCount, index), 1));
+						timelines.push(readTimeline1(input, new PhysicsConstraintWindTimeline(frameCount, bezierCount, index), scale));
 						break;
 					case PHYSICS_GRAVITY:
-						timelines.push(readTimeline1(input, new PhysicsConstraintGravityTimeline(frameCount, bezierCount, index), 1));
+						timelines.push(readTimeline1(input, new PhysicsConstraintGravityTimeline(frameCount, bezierCount, index), scale));
 						break;
 					case PHYSICS_MIX:
 						timelines.push(readTimeline1(input, new PhysicsConstraintMixTimeline(frameCount, bezierCount, index), 1));

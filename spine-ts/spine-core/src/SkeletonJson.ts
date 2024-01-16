@@ -258,8 +258,8 @@ export class SkeletonJson {
 				data.strength = getValue(constraintMap, "strength", 100);
 				data.damping = getValue(constraintMap, "damping", 1);
 				data.massInverse = 1 / getValue(constraintMap, "mass", 1);
-				data.wind = getValue(constraintMap, "wind", 0);
-				data.gravity = getValue(constraintMap, "gravity", 0);
+				data.wind = getValue(constraintMap, "wind", 0) * scale;
+				data.gravity = getValue(constraintMap, "gravity", 0) * scale;
 				data.mix = getValue(constraintMap, "mix", 1);
 				data.inertiaGlobal = getValue(constraintMap, "inertiaGlobal", false);
 				data.strengthGlobal = getValue(constraintMap, "strengthGlobal", false);
@@ -911,6 +911,7 @@ export class SkeletonJson {
 					}
 
 					let timeline;
+					let timelineScale = 1;
 					if (timelineName == "inertia")
 						timeline = new PhysicsConstraintInertiaTimeline(frames, frames, constraintIndex);
 					else if (timelineName == "strength")
@@ -919,15 +920,19 @@ export class SkeletonJson {
 						timeline = new PhysicsConstraintDampingTimeline(frames, frames, constraintIndex);
 					else if (timelineName == "mass")
 						timeline = new PhysicsConstraintMassTimeline(frames, frames, constraintIndex);
-					else if (timelineName == "wind")
+					else if (timelineName == "wind") {
 						timeline = new PhysicsConstraintWindTimeline(frames, frames, constraintIndex);
-					else if (timelineName == "gravity")
+						timelineScale = scale;
+					}
+					else if (timelineName == "gravity") {
 						timeline = new PhysicsConstraintGravityTimeline(frames, frames, constraintIndex);
+						timelineScale = scale;
+					}
 					else if (timelineName == "mix") //
 						timeline = new PhysicsConstraintMixTimeline(frames, frames, constraintIndex);
 					else
 						continue;
-					timelines.push(readTimeline1(timelineMap, timeline, 0, 1));
+					timelines.push(readTimeline1(timelineMap, timeline, 0, timelineScale));
 				}
 			}
 		}
