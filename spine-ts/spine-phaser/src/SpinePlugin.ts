@@ -348,7 +348,7 @@ class SpineAtlasFile extends Phaser.Loader.MultiFile {
 					}
 				}
 
-				let basePath = file.src.match(/^.*\//);
+				let basePath = file.src.match(/^.*\//) ?? "";
 				for (var i = 0; i < textures.length; i++) {
 					var url = basePath + textures[i];
 					var key = file.key + "!" + textures[i];
