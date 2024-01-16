@@ -45,6 +45,8 @@ void SpineBoneNode::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_debug_color"), &SpineBoneNode::set_debug_color);
 	ClassDB::bind_method(D_METHOD("get_debug_color"), &SpineBoneNode::get_debug_color);
 	ClassDB::bind_method(D_METHOD("_on_world_transforms_changed", "spine_sprite"), &SpineBoneNode::on_world_transforms_changed);
+	ClassDB::bind_method(D_METHOD("find_bone"), &SpineBoneNode::find_bone);
+	ClassDB::bind_method(D_METHOD("find_sprite"), &SpineBoneNode::find_parent_sprite);
 
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "bone_mode", PROPERTY_HINT_ENUM, "Follow,Drive"), "set_bone_mode", "get_bone_mode");
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "enabled"), "set_enabled", "get_enabled");
