@@ -1,19 +1,16 @@
 {
-	"compilerOptions": {
-		"target": "ESNext",
-		"module": "ESNext",
-		"noImplicitAny": true,
-		"preserveConstEnums": true,
-		"inlineSourceMap": true,
-		"esModuleInterop": true,
-		"lib": [
-			"DOM",
-			"ES2015",
-			"ScriptHost"
-		],
-		"declaration": true,
-		"composite": true,
-		"moduleResolution": "node",
-		"strict": true,
-	}
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "noImplicitAny": true,
+    "preserveConstEnums": true,
+    "inlineSourceMap": true,
+    "esModuleInterop": true,
+    "lib": ["DOM", "ES2015", "ScriptHost"],
+    "declaration": true,
+    "composite": true,
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "strict": true
+  }
 }
