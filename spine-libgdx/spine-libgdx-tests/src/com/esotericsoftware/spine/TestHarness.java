@@ -43,9 +43,6 @@ import com.esotericsoftware.spine.Skeleton.Physics;
 
 /** Boilerplate for basic skeleton rendering, used for various testing. */
 public class TestHarness extends ApplicationAdapter {
-// static String JSON = "coin/coin-pro.json";
-// static String ATLAS = "coin/coin-pma.atlas";
-
 	static String JSON = "raptor/raptor-pro.json";
 	static String ATLAS = "raptor/raptor-pma.atlas";
 
@@ -85,10 +82,11 @@ public class TestHarness extends ApplicationAdapter {
 	}
 
 	public void render () {
-		if (Gdx.input.justTouched()) {
-			state.update(0.25f); // Update the animation time.
-		}
+		float delta = 0;
+		if (Gdx.input.justTouched()) delta = 0.25f;
+		state.update(delta); // Update the animation time.
 		state.apply(skeleton); // Poses skeleton using current animations. This sets the bones' local SRT.
+		skeleton.update(delta); // Advance the skeleton time. This is needed when the skeleton has physics.
 		skeleton.updateWorldTransform(Physics.update); // Uses the bones' local SRT to compute their world SRT.
 
 		ScreenUtils.clear(0, 0, 0, 0);

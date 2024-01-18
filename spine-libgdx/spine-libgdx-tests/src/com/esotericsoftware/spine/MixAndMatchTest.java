@@ -89,11 +89,13 @@ public class MixAndMatchTest extends ApplicationAdapter {
 	}
 
 	public void render () {
-		state.update(Gdx.graphics.getDeltaTime()); // Update the animation time.
+		float delta = Gdx.graphics.getDeltaTime();
+		state.update(delta); // Update the animation time.
 
 		ScreenUtils.clear(0, 0, 0, 0);
 
 		state.apply(skeleton); // Poses skeleton using current animations. This sets the bones' local SRT.
+		skeleton.update(delta);
 		skeleton.updateWorldTransform(Physics.update); // Uses the bones' local SRT to compute their world SRT.
 
 		// Configure the camera, and PolygonSpriteBatch

@@ -79,39 +79,29 @@ public class IKTest extends ApplicationAdapter {
 		// Queue the "walk" animation on the first track.
 		state.setAnimation(0, "walk", true);
 
-		// Queue the "aim" animation on a higher track.
-		// It consists of a single frame that positions
-		// the back arm and gun such that they point at
-		// the "crosshair" bone. By setting this
-		// animation on a higher track, it overrides
-		// any changes to the back arm and gun made
-		// by the walk animation, allowing us to
-		// mix the two. The mouse position following
-		// is performed in the render() method below.
+		// Queue the "aim" animation on a higher track. It consists of a single frame that positions the back arm and gun such that
+		// they point at the "crosshair" bone. By setting this animation on a higher track, it overrides any changes to the back arm
+		// and gun made by the walk animation, allowing us to mix the two. The mouse position following is performed in the render()
+		// method below.
 		state.setAnimation(1, "aim", true);
 	}
 
 	public void render () {
-		// Update and apply the animations to the skeleton,
-		// then calculate the world transforms of every bone.
-		// This is needed so we can call Bone#worldToLocal()
-		// later.
-		state.update(Gdx.graphics.getDeltaTime());
+		// Update and apply the animations to the skeleton, then calculate the world transforms of every bone. This is needed so we
+		// can call Bone#worldToLocal() later.
+		float delta = Gdx.graphics.getDeltaTime();
+		state.update(delta);
 		state.apply(skeleton);
-		skeleton.updateWorldTransform(Physics.update);
+		skeleton.update(delta);
+		// This example has no physics, but if it did we first pose the skeleton without physics.
+		skeleton.updateWorldTransform(Physics.pose);
 
-		// Position the "crosshair" bone at the mouse
-		// location. We do this before calling
-		// skeleton.updateWorldTransform() below, so
-		// our change is incorporated before the IK
-		// constraint is applied.
+		// Position the "crosshair" bone at the mouse location. We do this before calling skeleton.updateWorldTransform() below, so
+		// our change is incorporated before the IK constraint is applied.
 		//
-		// When setting the crosshair bone position
-		// to the mouse position, we need to translate
-		// from "mouse space" to "camera space"
-		// and then to "local bone space". Note that the local
-		// bone space is calculated using the bone's parent
-		// worldToLocal() function!
+		// When setting the crosshair bone position to the mouse position, we need to translate from "mouse space" to "camera space"
+		// and then to "local bone space". Note that the local bone space is calculated using the bone's parent worldToLocal()
+		// function!
 		cameraCoords.set(Gdx.input.getX(), Gdx.input.getY(), 0);
 		camera.unproject(cameraCoords); // mouse space to camera space
 
@@ -120,13 +110,10 @@ public class IKTest extends ApplicationAdapter {
 		crosshair.getParent().worldToLocal(boneCoords); // camera space to local bone space
 		crosshair.setPosition(boneCoords.x, boneCoords.y); // override the crosshair position
 
-		// Calculate final world transform with the
-		// crosshair bone set to the mouse cursor
-		// position.
+		// Calculate final world transform with the crosshair bone set to the mouse cursor position. Update physics this time.
 		skeleton.updateWorldTransform(Physics.update);
 
-		// Clear the screen, update the camera and
-		// render the skeleton.
+		// Clear the screen, update the camera and render the skeleton.
 		ScreenUtils.clear(0, 0, 0, 0);
 		camera.update();
 

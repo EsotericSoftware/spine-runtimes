@@ -84,6 +84,7 @@ public class BonePlotting {
 			float time = 0;
 			while (time < animation.getDuration()) {
 				animation.apply(skeleton, time, time, false, null, 1, MixBlend.first, MixDirection.in);
+				skeleton.update(fps);
 				skeleton.updateWorldTransform(Physics.update);
 
 				System.out.println(animation.getName() + "," //

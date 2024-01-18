@@ -105,6 +105,7 @@ public class PngExportTest extends ApplicationAdapter {
 		int frame = 1;
 		while (time < animation.getDuration()) {
 			animation.apply(skeleton, time, time, false, null, 1, MixBlend.first, MixDirection.in);
+			skeleton.update(fps);
 			skeleton.updateWorldTransform(Physics.update);
 
 			// Render the skeleton to the FBO.

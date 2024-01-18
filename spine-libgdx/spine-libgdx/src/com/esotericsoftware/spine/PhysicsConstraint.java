@@ -108,6 +108,9 @@ public class PhysicsConstraint implements Updatable {
 		mix = data.mix;
 	}
 
+	public void translate () {
+	}
+
 	/** Applies the constraint to the constrained bones. */
 	public void update (Physics physics) {
 		float mix = this.mix;

@@ -128,6 +128,7 @@ public class TimelineApiTest extends ApplicationAdapter {
 			walkAnimation.apply(skeleton, time, time, true, events, 1, MixBlend.first, MixDirection.in);
 		}
 
+		skeleton.update(delta);
 		skeleton.updateWorldTransform(Physics.update);
 
 		batch.begin();

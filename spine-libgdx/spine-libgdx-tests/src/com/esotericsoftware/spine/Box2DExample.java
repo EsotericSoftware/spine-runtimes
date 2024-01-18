@@ -151,6 +151,7 @@ public class Box2DExample extends ApplicationAdapter {
 
 		animation.apply(skeleton, time, time, true, events, 1, MixBlend.first, MixDirection.in);
 		skeleton.x += 8 * delta;
+		skeleton.update(delta);
 		skeleton.updateWorldTransform(Physics.update);
 		skeletonRenderer.draw(batch, skeleton);
 

@@ -92,12 +92,15 @@ public class SkeletonAttachmentTest extends ApplicationAdapter {
 	}
 
 	public void render () {
-		spineboyState.update(Gdx.graphics.getDeltaTime());
+		float delta = Gdx.graphics.getDeltaTime();
+		spineboyState.update(delta);
 		spineboyState.apply(spineboy);
+		spineboy.update(delta);
 		spineboy.updateWorldTransform(Physics.update);
 
 		goblinState.update(Gdx.graphics.getDeltaTime());
 		goblinState.apply(goblin);
+		goblin.update(delta);
 		goblin.updateWorldTransform(Physics.update, attachmentBone);
 
 		ScreenUtils.clear(0, 0, 0, 0);
