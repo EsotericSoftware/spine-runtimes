@@ -143,10 +143,12 @@ public class SimpleTest2 extends ApplicationAdapter {
 	}
 
 	public void render () {
-		state.update(Gdx.graphics.getDeltaTime()); // Update the animation time.
+		float delta = Gdx.graphics.getDeltaTime();
+		state.update(delta); // Update the animation time.
 
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+		skeleton.update(delta); // Advance the skeleton time. This is needed when the skeleton has physics.
 		if (state.apply(skeleton)) // Poses skeleton using current animations. This sets the bones' local SRT.
 			skeleton.updateWorldTransform(Physics.update); // Uses the bones' local SRT to compute their world SRT.
 
