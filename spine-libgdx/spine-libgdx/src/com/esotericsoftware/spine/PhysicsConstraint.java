@@ -108,7 +108,22 @@ public class PhysicsConstraint implements Updatable {
 		mix = data.mix;
 	}
 
-	public void translate () {
+	/** Translates the physics constraint so next {@link #update(Physics)} forces are applied as if the bone moved an additional
+	 * amount in world space. */
+	public void translate (float x, float y) {
+		ux -= x;
+		uy -= y;
+		cx -= x;
+		cy -= y;
+	}
+
+	/** Rotates the physics constraint so next {@link #update(Physics)} forces are applied as if the bone rotated an additional
+	 * amount in world space. */
+	public void rotate (float degrees) {
+		float r = degrees * degRad, cos = cos(r), sin = sin(r);
+		r = tx * cos - ty * sin;
+		ty = tx * sin + ty * cos;
+		tx = r;
 	}
 
 	/** Applies the constraint to the constrained bones. */

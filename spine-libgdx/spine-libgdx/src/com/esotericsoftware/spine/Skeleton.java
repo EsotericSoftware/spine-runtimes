@@ -803,6 +803,20 @@ public class Skeleton {
 		this.y = y;
 	}
 
+	/** Calls {@link PhysicsConstraint#translate(float, float)} for each physics constraint. */
+	public void physicsTranslate (float x, float y) {
+		Object[] physicsConstraints = this.physicsConstraints.items;
+		for (int i = 0, n = this.physicsConstraints.size; i < n; i++)
+			((PhysicsConstraint)physicsConstraints[i]).translate(x, y);
+	}
+
+	/** Calls {@link PhysicsConstraint#rotate(float)} for each physics constraint. */
+	public void physicsRotate (float degrees) {
+		Object[] physicsConstraints = this.physicsConstraints.items;
+		for (int i = 0, n = this.physicsConstraints.size; i < n; i++)
+			((PhysicsConstraint)physicsConstraints[i]).rotate(degrees);
+	}
+
 	/** Returns the skeleton's time. This is used for time-based manipulations, such as {@link PhysicsConstraint}.
 	 * <p>
 	 * See {@link #update(float)}. */
