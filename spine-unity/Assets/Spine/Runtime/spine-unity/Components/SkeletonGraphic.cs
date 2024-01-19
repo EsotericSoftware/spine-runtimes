@@ -381,6 +381,15 @@ namespace Spine.Unity {
 			state.Update(deltaTime);
 			skeleton.Update(deltaTime);
 
+			if (Application.isPlaying) {
+				Vector2 position = new Vector2(transform.position.x, transform.position.z);
+				Vector2 positionDelta = (position - lastPosition) / meshScale;
+				positionDelta.x /= transform.lossyScale.x;
+				positionDelta.y /= transform.lossyScale.z;
+				skeleton.PhysicsTranslate(positionDelta.x, positionDelta.y);
+				lastPosition = position;
+			}
+
 			if (updateMode == UpdateMode.OnlyAnimationStatus) {
 				state.ApplyEventTimelinesOnly(skeleton, issueEvents: false);
 				return;
@@ -474,6 +483,7 @@ namespace Spine.Unity {
 
 		#region API
 		protected Skeleton skeleton;
+
 		public Skeleton Skeleton {
 			get {
 				Initialize(false);
@@ -517,6 +527,9 @@ namespace Spine.Unity {
 				return state;
 			}
 		}
+
+		/// <summary>Used for applying Transform translation to skeleton physics.</summary>
+		protected Vector2 lastPosition;
 
 		[SerializeField] protected Spine.Unity.MeshGenerator meshGenerator = new MeshGenerator();
 		public Spine.Unity.MeshGenerator MeshGenerator { get { return this.meshGenerator; } }

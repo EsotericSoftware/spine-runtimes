@@ -286,6 +286,9 @@ namespace Spine.Unity {
 				return skeleton;
 			}
 		}
+
+		/// <summary>Used for applying Transform translation to skeleton physics.</summary>
+		protected Vector2 lastPosition;
 		#endregion
 
 		public delegate void SkeletonRendererDelegate (SkeletonRenderer skeletonRenderer);
@@ -424,6 +427,7 @@ namespace Spine.Unity {
 			UpdateMode updateModeSaved = updateMode;
 			updateMode = UpdateMode.FullUpdate;
 			UpdateWorldTransform(Skeleton.Physics.Update);
+			lastPosition = this.transform.position;
 			LateUpdate();
 			updateMode = updateModeSaved;
 

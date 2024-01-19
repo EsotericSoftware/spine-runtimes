@@ -125,6 +125,16 @@ namespace Spine.Unity {
 				return;
 
 			skeleton.Update(deltaTime);
+
+			if (Application.isPlaying) {
+				Vector2 position = new Vector2(transform.position.x, transform.position.z);
+				Vector2 positionDelta = position - lastPosition;
+				positionDelta.x /= transform.lossyScale.x;
+				positionDelta.y /= transform.lossyScale.z;
+				skeleton.PhysicsTranslate(positionDelta.x, positionDelta.y);
+				lastPosition = position;
+			}
+
 			ApplyAnimation();
 		}
 
