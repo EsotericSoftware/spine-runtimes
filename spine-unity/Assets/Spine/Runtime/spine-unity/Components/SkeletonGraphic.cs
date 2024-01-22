@@ -382,12 +382,19 @@ namespace Spine.Unity {
 			skeleton.Update(deltaTime);
 
 			if (Application.isPlaying) {
-				Vector2 position = new Vector2(transform.position.x, transform.position.y);
-				Vector2 positionDelta = (position - lastPosition) / meshScale;
-				positionDelta.x /= transform.lossyScale.x;
-				positionDelta.y /= transform.lossyScale.y;
-				skeleton.PhysicsTranslate(positionDelta.x, positionDelta.y);
-				lastPosition = position;
+				if (applyTranslationToPhysics) {
+					Vector2 position = new Vector2(transform.position.x, transform.position.y);
+					Vector2 positionDelta = (position - lastPosition) / meshScale;
+					positionDelta.x /= transform.lossyScale.x;
+					positionDelta.y /= transform.lossyScale.y;
+					skeleton.PhysicsTranslate(positionDelta.x, positionDelta.y);
+					lastPosition = position;
+				}
+				if (applyRotationToPhysics) {
+					float rotation = this.transform.rotation.eulerAngles.z;
+					skeleton.PhysicsRotate(0, 0, rotation - lastRotation);
+					lastRotation = rotation;
+				}
 			}
 
 			if (updateMode == UpdateMode.OnlyAnimationStatus) {
@@ -528,8 +535,22 @@ namespace Spine.Unity {
 			}
 		}
 
-		/// <summary>Used for applying Transform translation to skeleton physics.</summary>
+		/// <summary>When enabled, Transform translation is applied to skeleton PhysicsConstraints.</summary>
+		public bool applyTranslationToPhysics = true;
+		/// <summary>When enabled, Transform rotation is applied to skeleton PhysicsConstraints.</summary>
+		public bool applyRotationToPhysics = true;
+
+		/// <summary>Used for applying Transform translation to skeleton PhysicsConstraints.</summary>
 		protected Vector2 lastPosition;
+		/// <summary>Used for applying Transform rotation to skeleton PhysicsConstraints.</summary>
+		protected float lastRotation;
+
+		public void ResetLastPosition () { lastPosition = this.transform.position; }
+		public void ResetLastRotation () { lastRotation = this.transform.rotation.eulerAngles.z; }
+		public void ResetLastPositionAndRotation () {
+			lastPosition = this.transform.position;
+			lastRotation = this.transform.rotation.eulerAngles.z;
+		}
 
 		[SerializeField] protected Spine.Unity.MeshGenerator meshGenerator = new MeshGenerator();
 		public Spine.Unity.MeshGenerator MeshGenerator { get { return this.meshGenerator; } }
@@ -690,6 +711,8 @@ namespace Spine.Unity {
 		}
 
 		public void Initialize (bool overwrite) {
+			ResetLastPositionAndRotation();
+
 			if (this.IsValid && !overwrite) return;
 #if UNITY_EDITOR
 			if (BuildUtilities.IsInSkeletonAssetBuildPreProcessing)

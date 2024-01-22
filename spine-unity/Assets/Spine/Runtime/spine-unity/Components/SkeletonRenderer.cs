@@ -286,9 +286,25 @@ namespace Spine.Unity {
 				return skeleton;
 			}
 		}
+		#endregion
 
-		/// <summary>Used for applying Transform translation to skeleton physics.</summary>
+		#region Physics
+		/// <summary>When enabled, Transform translation is applied to skeleton PhysicsConstraints.</summary>
+		public bool applyTranslationToPhysics = true;
+		/// <summary>When enabled, Transform rotation is applied to skeleton PhysicsConstraints.</summary>
+		public bool applyRotationToPhysics = true;
+
+		/// <summary>Used for applying Transform translation to skeleton PhysicsConstraints.</summary>
 		protected Vector2 lastPosition;
+		/// <summary>Used for applying Transform rotation to skeleton PhysicsConstraints.</summary>
+		protected float lastRotation;
+
+		public void ResetLastPosition () { lastPosition = this.transform.position; }
+		public void ResetLastRotation () { lastRotation = this.transform.rotation.eulerAngles.z; }
+		public void ResetLastPositionAndRotation () {
+			lastPosition = this.transform.position;
+			lastRotation = this.transform.rotation.eulerAngles.z;
+		}
 		#endregion
 
 		public delegate void SkeletonRendererDelegate (SkeletonRenderer skeletonRenderer);
@@ -380,6 +396,8 @@ namespace Spine.Unity {
 		/// Initialize this component. Attempts to load the SkeletonData and creates the internal Skeleton object and buffers.</summary>
 		/// <param name="overwrite">If set to <c>true</c>, it will overwrite internal objects if they were already generated. Otherwise, the initialized component will ignore subsequent calls to initialize.</param>
 		public virtual void Initialize (bool overwrite, bool quiet = false) {
+			ResetLastPositionAndRotation();
+
 			if (valid && !overwrite)
 				return;
 #if UNITY_EDITOR
@@ -427,7 +445,6 @@ namespace Spine.Unity {
 			UpdateMode updateModeSaved = updateMode;
 			updateMode = UpdateMode.FullUpdate;
 			UpdateWorldTransform(Skeleton.Physics.Update);
-			lastPosition = this.transform.position;
 			LateUpdate();
 			updateMode = updateModeSaved;
 
