@@ -80,7 +80,7 @@ public class SkeletonData {
 
 	// --- Slots.
 
-	/** The skeleton's slots. */
+	/** The skeleton's slots in the setup pose draw order. */
 	public Array<SlotData> getSlots () {
 		return slots;
 	}

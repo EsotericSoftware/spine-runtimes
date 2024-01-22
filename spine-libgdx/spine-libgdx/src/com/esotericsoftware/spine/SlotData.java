@@ -44,6 +44,7 @@ public class SlotData {
 
 	// Nonessential.
 	boolean visible = true;
+	String path;
 
 	public SlotData (int index, String name, BoneData boneData) {
 		if (index < 0) throw new IllegalArgumentException("index must be >= 0.");
@@ -111,6 +112,15 @@ public class SlotData {
 
 	public void setVisible (boolean visible) {
 		this.visible = visible;
+	}
+
+	/** The folders for this slot in the draw order, delimited by <code>/</code>, or null if nonessential data was not exported. */
+	public @Null String getPath () {
+		return path;
+	}
+
+	public void setPath (String path) {
+		this.path = path;
 	}
 
 	public String toString () {
