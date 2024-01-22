@@ -484,12 +484,12 @@ namespace Spine {
 		}
 
 		/// <summary>
-		/// Calls <see cref="PhysicsConstraint.Rotate(float)"/> for each physics constraint.
+		/// Calls <see cref="PhysicsConstraint.Rotate(float, float, float)"/> for each physics constraint.
 		/// </summary>
-		public void PhysicsRotate (float degrees) {
+		public void PhysicsRotate (float x, float y, float degrees) {
 			PhysicsConstraint[] physicsConstraints = this.physicsConstraints.Items;
 			for (int i = 0, n = this.physicsConstraints.Count; i < n; i++)
-				physicsConstraints[i].Rotate(degrees);
+				physicsConstraints[i].Rotate(r, y, degrees);
 		}
 
 		/// <summary>Increments the skeleton's <see cref="time"/>.</summary>

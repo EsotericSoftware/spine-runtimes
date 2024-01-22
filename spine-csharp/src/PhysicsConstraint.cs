@@ -122,14 +122,13 @@ namespace Spine {
 		}
 
 		/// <summary>
-		/// Rotates the physics constraint so next <see cref="Update(Physics)"/> forces are applied as if the bone rotated an additional
-		/// amount in world space.
+		/// Rotates the physics constraint so next <see cref="Update(Physics)"/> forces are applied as if the bone rotated around the
+		/// specified point in world space.
 		/// </summary>
-		public void Rotate (float degrees) {
+		public void Rotate (float x, float y, float degrees) {
 			float r = degrees * MathUtils.DegRad, cos = (float)Math.Cos(r), sin = (float)Math.Sin(r);
-			r = tx * cos - ty * sin;
-			ty = tx * sin + ty * cos;
-			tx = r;
+			float dx = cx - x, dy = cy - y;
+			Translate(dx * cos - dy * sin - dx, dx * sin + dy * cos - dy);
 		}
 
 		/// <summary>Applies the constraint to the constrained bones.</summary>
