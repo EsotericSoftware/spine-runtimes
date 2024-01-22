@@ -127,10 +127,10 @@ namespace Spine.Unity {
 			skeleton.Update(deltaTime);
 
 			if (Application.isPlaying) {
-				Vector2 position = new Vector2(transform.position.x, transform.position.z);
+				Vector2 position = new Vector2(transform.position.x, transform.position.y);
 				Vector2 positionDelta = position - lastPosition;
 				positionDelta.x /= transform.lossyScale.x;
-				positionDelta.y /= transform.lossyScale.z;
+				positionDelta.y /= transform.lossyScale.y;
 				skeleton.PhysicsTranslate(positionDelta.x, positionDelta.y);
 				lastPosition = position;
 			}
