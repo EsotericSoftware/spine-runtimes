@@ -117,13 +117,12 @@ public class PhysicsConstraint implements Updatable {
 		cy -= y;
 	}
 
-	/** Rotates the physics constraint so next {@link #update(Physics)} forces are applied as if the bone rotated an additional
-	 * amount in world space. */
-	public void rotate (float degrees) {
+	/** Rotates the physics constraint so next {@link #update(Physics)} forces are applied as if the bone rotated around the
+	 * specified point in world space. */
+	public void rotate (float x, float y, float degrees) {
 		float r = degrees * degRad, cos = cos(r), sin = sin(r);
-		r = tx * cos - ty * sin;
-		ty = tx * sin + ty * cos;
-		tx = r;
+		float dx = cx - x, dy = cy - y;
+		translate(dx * cos - dy * sin - dx, dx * sin + dy * cos - dy);
 	}
 
 	/** Applies the constraint to the constrained bones. */

@@ -810,11 +810,11 @@ public class Skeleton {
 			((PhysicsConstraint)physicsConstraints[i]).translate(x, y);
 	}
 
-	/** Calls {@link PhysicsConstraint#rotate(float)} for each physics constraint. */
-	public void physicsRotate (float degrees) {
+	/** Calls {@link PhysicsConstraint#rotate(float, float, float)} for each physics constraint. */
+	public void physicsRotate (float x, float y, float degrees) {
 		Object[] physicsConstraints = this.physicsConstraints.items;
 		for (int i = 0, n = this.physicsConstraints.size; i < n; i++)
-			((PhysicsConstraint)physicsConstraints[i]).rotate(degrees);
+			((PhysicsConstraint)physicsConstraints[i]).rotate(x, y, degrees);
 	}
 
 	/** Returns the skeleton's time. This is used for time-based manipulations, such as {@link PhysicsConstraint}.
