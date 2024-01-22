@@ -199,7 +199,15 @@ namespace Spine {
 			// Slots.
 			SlotData[] slots = skeletonData.slots.Resize(n = input.ReadInt(true)).Items;
 			for (int i = 0; i < n; i++) {
-				String slotName = input.ReadString();
+				String slotName = input.ReadString(); //, path = null;
+				if (nonessential) {
+					int slash = slotName.LastIndexOf('/');
+					if (slash != -1) {
+						//path = slotName.Substring(0, slash);
+						slotName = slotName.Substring(slash + 1);
+					}
+				}
+
 				BoneData boneData = bones[input.ReadInt(true)];
 				SlotData slotData = new SlotData(i, slotName, boneData);
 				int color = input.ReadInt();
@@ -218,7 +226,9 @@ namespace Spine {
 
 				slotData.attachmentName = input.ReadStringRef();
 				slotData.blendMode = (BlendMode)input.ReadInt(true);
-				if (nonessential) input.ReadBoolean(); // if (nonessential) data.visible = input.readBoolean();
+				if (nonessential) {
+					input.ReadBoolean(); // data.visible = input.readBoolean(); data.path = path;
+				}
 				slots[i] = slotData;
 			}
 

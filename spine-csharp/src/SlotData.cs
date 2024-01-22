@@ -40,6 +40,10 @@ namespace Spine {
 		internal string attachmentName;
 		internal BlendMode blendMode;
 
+		// Nonessential.
+		// bool visible = true;
+		// string path;
+
 		/// <summary>The index of the slot in <see cref="Skeleton.Slots"/>.</summary>
 		public int Index { get { return index; } }
 		/// <summary>The name of the slot, which is unique across all slots in the skeleton.</summary>

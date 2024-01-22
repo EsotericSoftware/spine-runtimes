@@ -58,6 +58,7 @@ namespace Spine {
 		/// <summary>The skeleton's bones, sorted parent first. The root bone is always the first bone.</summary>
 		public ExposedList<BoneData> Bones { get { return bones; } }
 
+		/// <summary>The skeleton's slots in the setup pose draw order.</summary>
 		public ExposedList<SlotData> Slots { get { return slots; } }
 
 		/// <summary>All skins, including the default skin.</summary>

@@ -143,7 +143,13 @@ namespace Spine {
 			// Slots.
 			if (root.ContainsKey("slots")) {
 				foreach (Dictionary<string, Object> slotMap in (List<Object>)root["slots"]) {
-					string slotName = (string)slotMap["name"];
+					string slotName = (string)slotMap["name"]; //, path = null;
+					int slash = slotName.LastIndexOf('/');
+					if (slash != -1) {
+						//path = slotName.Substring(0, slash);
+						slotName = slotName.Substring(slash + 1);
+					}
+
 					string boneName = (string)slotMap["bone"];
 					BoneData boneData = skeletonData.FindBone(boneName);
 					if (boneData == null) throw new Exception("Slot bone not found: " + boneName);
@@ -170,6 +176,8 @@ namespace Spine {
 						data.blendMode = (BlendMode)Enum.Parse(typeof(BlendMode), (string)slotMap["blend"], true);
 					else
 						data.blendMode = BlendMode.Normal;
+					//data.visible = slotMap.getBoolean("visible", true);
+					//data.path = path;
 					skeletonData.slots.Add(data);
 				}
 			}
