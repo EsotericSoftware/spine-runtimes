@@ -3010,7 +3010,7 @@ class Skeleton {
   /// <p>
   /// Bones that do not inherit translation are still affected by this property.
   double getY() {
-    return _bindings.spine_skeleton_get_x(_skeleton);
+    return _bindings.spine_skeleton_get_y(_skeleton);
   }
 
   void setY(double y) {
@@ -3032,7 +3032,7 @@ class Skeleton {
   ///
   /// Bones that do not inherit scale are still affected by this property.
   double getScaleY() {
-    return _bindings.spine_skeleton_get_scale_x(_skeleton);
+    return _bindings.spine_skeleton_get_scale_y(_skeleton);
   }
 
   void setScaleY(double scaleY) {
