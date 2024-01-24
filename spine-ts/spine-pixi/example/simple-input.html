@@ -34,7 +34,7 @@
 
         // Set the default animation and the 
         // default mix for transitioning between animations.
-        spineboy.state.setAnimation(0, "run", true);
+        spineboy.state.setAnimation(0, "hoverboard", true);
         spineboy.state.data.defaultMix = 0.2;
 
         // Center the spine object on screen.
@@ -42,20 +42,57 @@
         spineboy.y = window.innerHeight / 2 + spineboy.getBounds().height / 2;
 
         // Make it so that you can interact with Spineboy.
-        // Also, handle the case that you click or tap on the screen.
-        // The callback function definition can be seen below.
+        // Handle the case that you click/tap the screen.
         spineboy.eventMode = 'static';
         spineboy.on('pointerdown', onClick);
-
+        
         // Add the display object to the stage.
         app.stage.addChild(spineboy);
-
-        // This callback function handles what happens 
-        // when you click or tap on the screen.
-        function onClick() {
-            spineboy.state.addAnimation(0, "jump", false, 0);
-            spineboy.state.addAnimation(0, "idle", true, 0);
+        
+        // Add variables for movement, speed.
+        let moveLeft = false;
+        let moveRight = false;
+        const speed = 5;
+        
+        // Handle the case that the keyboard keys specified below are pressed.
+        function onKeyDown(key) {
+          if (key.code === "ArrowLeft" || key.code === "KeyA") {
+            moveLeft = true;
+            spineboy.skeleton.scaleX = -1;
+          } else if (key.code === "ArrowRight" || key.code === "KeyD") {
+            moveRight = true;
+            spineboy.skeleton.scaleX = 1;
+          }
         }
+
+        // Handle when the keys are released, if they were pressed.
+        function onKeyUp(key) {
+          if (key.code === "ArrowLeft" || key.code === "KeyA") {
+            moveLeft = false;
+          } else if (key.code === "ArrowRight" || key.code === "KeyD") {
+            moveRight = false;
+          }
+        }
+
+        // Handle if you click/tap the screen.
+        function onClick() {
+          spineboy.state.setAnimation(1, "shoot", false, 0);
+        }
+        
+        // Add event listeners so that the window will correctly handle input.
+        window.addEventListener("keydown", onKeyDown);
+        window.addEventListener("keyup", onKeyUp);
+
+        // Update the application to move Spineboy if input is detected.
+        app.ticker.add(() => {
+          if (moveLeft) {
+            spineboy.x -= speed;
+          }
+          if (moveRight) {
+            spineboy.x += speed;
+          }
+        });
+        
       })();
     </script>
   </body>
