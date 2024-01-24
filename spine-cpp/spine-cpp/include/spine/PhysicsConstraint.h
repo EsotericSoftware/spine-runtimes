@@ -154,6 +154,10 @@ namespace spine {
 
         virtual void update(Physics physics);
 
+        void translate(float x, float y);
+
+        void rotate(float x, float y, float degrees);
+
     private:
         PhysicsConstraintData& _data;
         Bone* _bone;

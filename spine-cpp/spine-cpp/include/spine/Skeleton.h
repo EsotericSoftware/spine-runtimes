@@ -237,6 +237,13 @@ namespace spine {
 
         void update(float delta);
 
+        /// Rotates the physics constraint so next {@link #update(Physics)} forces are applied as if the bone rotated around the
+	    /// specified point in world space.
+        void physicsTranslate(float x, float y);
+
+        /// Calls {@link PhysicsConstraint#rotate(float, float, float)} for each physics constraint. */
+        void physicsRotate(float x, float y, float degrees);
+
 	private:
 		SkeletonData *_data;
 		Vector<Bone *> _bones;

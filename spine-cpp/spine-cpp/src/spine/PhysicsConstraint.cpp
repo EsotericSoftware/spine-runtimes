@@ -464,3 +464,19 @@ void PhysicsConstraint::update(Physics physics) {
 	}
 	bone->updateAppliedTransform();
 }
+
+void PhysicsConstraint::rotate(float x, float y, float degrees) {
+    float r = degrees * MathUtil::Deg_Rad, cos = MathUtil::cos(r), sin = MathUtil::sin(r);
+    r = _tx * cos - _ty * sin;
+    _ty = _tx * sin + _ty * cos;
+    _tx = r;
+    float dx = _cx - x, dy = _cy - y;
+    translate(dx * cos - dy * sin - dx, dx * sin + dy * cos - dy);
+}
+
+void PhysicsConstraint::translate(float x, float y) {
+    _ux -= x;
+    _uy -= y;
+    _cx -= x;
+    _cy -= y;
+}
