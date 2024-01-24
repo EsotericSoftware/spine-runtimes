@@ -267,4 +267,22 @@ export class PhysicsConstraint implements Updatable {
 		}
 		bone.updateAppliedTransform();
 	}
+
+	translate (x: number, y: number) {
+		this.ux -= x;
+		this.uy -= y;
+		this.cx -= x;
+		this.cy -= y;
+	}
+
+	/** Rotates the physics constraint so next {@link #update(Physics)} forces are applied as if the bone rotated around the
+	 * specified point in world space. */
+	rotate (x: number, y: number, degrees: number) {
+		let r = degrees * MathUtils.degRad, cos = Math.cos(r), sin = Math.sin(r);
+		r = this.tx * cos - this.ty * sin;
+		this.ty = this.tx * sin + this.ty * cos;
+		this.tx = r;
+		const dx = this.cx - x, dy = this.cy - y;
+		this.translate(dx * cos - dy * sin - dx, dx * sin + dy * cos - dy);
+	}
 }

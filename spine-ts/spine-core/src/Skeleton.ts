@@ -646,6 +646,19 @@ export class Skeleton {
 	update (delta: number) {
 		this.time += delta;
 	}
+
+	physicsTranslate (x: number, y: number) {
+		const physicsConstraints = this.physicsConstraints;
+		for (let i = 0, n = physicsConstraints.length; i < n; i++)
+			physicsConstraints[i].translate(x, y);
+	}
+
+	/** Calls {@link PhysicsConstraint#rotate(float, float, float)} for each physics constraint. */
+	physicsRotate (x: number, y: number, degrees: number) {
+		const physicsConstraints = this.physicsConstraints;
+		for (let i = 0, n = physicsConstraints.length; i < n; i++)
+			physicsConstraints[i].rotate(x, y, degrees);
+	}
 }
 
 /** Determines how physics and other non-deterministic updates are applied. */
