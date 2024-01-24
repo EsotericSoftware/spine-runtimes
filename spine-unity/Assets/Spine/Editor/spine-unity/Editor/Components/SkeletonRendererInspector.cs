@@ -68,6 +68,7 @@ namespace Spine.Unity.Editor {
 		protected SerializedProperty normals, tangents, zSpacing, pmaVertexColors, tintBlack; // MeshGenerator settings
 		protected SerializedProperty maskInteraction;
 		protected SerializedProperty maskMaterialsNone, maskMaterialsInside, maskMaterialsOutside;
+		protected SerializedProperty applyTranslationToPhysics, applyRotationToPhysics;
 		protected SpineInspectorUtility.SerializedSortingProperties sortingProperties;
 		protected bool wasInitParameterChanged = false;
 		protected bool requireRepaint = false;
@@ -86,6 +87,11 @@ namespace Spine.Unity.Editor {
 		protected GUIContent NormalsLabel, TangentsLabel, MaskInteractionLabel;
 		protected GUIContent MaskMaterialsHeadingLabel, MaskMaterialsNoneLabel, MaskMaterialsInsideLabel, MaskMaterialsOutsideLabel;
 		protected GUIContent SetMaterialButtonLabel, ClearMaterialButtonLabel, DeleteMaterialButtonLabel;
+
+		readonly GUIContent ApplyTranslationToPhysicsLabel = new GUIContent ("Transform Translation",
+			"When enabled, the GameObject Transform translation movement is applied to PhysicsConstraints of the skeleton.");
+		readonly GUIContent ApplyRotationToPhysicsLabel = new GUIContent ("Transform Rotation",
+			"When enabled, the GameObject Transform rotation movement is applied to PhysicsConstraints of the skeleton.");
 
 		const string ReloadButtonString = "Reload";
 		static GUILayoutOption reloadButtonWidth;
@@ -161,6 +167,8 @@ namespace Spine.Unity.Editor {
 			maskMaterialsNone = so.FindProperty("maskMaterials.materialsMaskDisabled");
 			maskMaterialsInside = so.FindProperty("maskMaterials.materialsInsideMask");
 			maskMaterialsOutside = so.FindProperty("maskMaterials.materialsOutsideMask");
+			applyTranslationToPhysics = so.FindProperty("applyTranslationToPhysics");
+			applyRotationToPhysics = so.FindProperty("applyRotationToPhysics");
 
 			separatorSlotNames = so.FindProperty("separatorSlotNames");
 			separatorSlotNames.isExpanded = true;
@@ -406,6 +414,11 @@ namespace Spine.Unity.Editor {
 														differentMaskModesSelected, allowDelete: true, isActiveMaterial: activeMaskInteractionValue == (int)SpriteMaskInteraction.VisibleOutsideMask);
 						}
 #endif
+						using (new SpineInspectorUtility.LabelWidthScope()) {
+							EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("Physics Constraints", SpineEditorUtilities.Icons.constraintPhysics), EditorStyles.boldLabel);
+							EditorGUILayout.PropertyField(applyTranslationToPhysics, ApplyTranslationToPhysicsLabel);
+							EditorGUILayout.PropertyField(applyRotationToPhysics, ApplyRotationToPhysicsLabel);
+						}
 
 						EditorGUILayout.Space();
 

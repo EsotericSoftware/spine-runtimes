@@ -53,6 +53,7 @@
   * Added `Animation Update` mode (called `UpdateTiming` in code) `In Late Update` for `SkeletonAnimation`, `SkeletonMecanim` and `SkeletonGraphic`. This allows you to update the `SkeletonMecanim` skeleton in the same frame that the Mecanim Animator updated its state, which happens between `Update` and `LateUpdate`.
   * URP Shaders: Added URP "Blend Mode" shader variants for both URP 3D and URP 2D renderers. They are listed under shader name "Universal Render Pipeline/Spine/Blend Modes/" and "Universal Render Pipeline/2D/Spine/Blend Modes/" respectively.
   * URP Shaders: Added support for [Tint Black](http://en.esotericsoftware.com/spine-slots#Tint-black) functionality at "Blend Modes" Spine URP shaders (2D and 3D shaders).
+  * PhysicsConstraints: Skeleton GameObjects now automatically apply Transform translation and rotation to the skeleton's `PhysicsConstraints`. You can disable applying translation or rotation at the Skeleton component Inspector under `Advanced - Physics Constraints` `Transform Translation` and `Transform Rotation`, or by setting the properties `applyTranslationToPhysics` and `applyRotationToPhysics` at the skeleton component via code.
 
 * **Breaking changes**
   * Changed `SpineShaderWithOutlineGUI` outline related methods from `private` to `protected virtual` to allow for custom shader GUI subclasses to switch to different outline shaders.

@@ -62,6 +62,7 @@ namespace Spine.Unity.Editor {
 		SerializedProperty skeletonDataAsset, initialSkinName;
 		SerializedProperty startingAnimation, startingLoop, timeScale, freeze,
 			updateTiming, updateWhenInvisible, unscaledTime, tintBlack, layoutScaleMode, editReferenceRect;
+		SerializedProperty applyTranslationToPhysics, applyRotationToPhysics;
 		SerializedProperty initialFlipX, initialFlipY;
 		SerializedProperty meshGeneratorSettings;
 		SerializedProperty allowMultipleCanvasRenderers, separatorSlotNames, enableSeparatorSlots,
@@ -72,6 +73,10 @@ namespace Spine.Unity.Editor {
 			"If enabled, AnimationState uses unscaled game time (Time.unscaledDeltaTime), " +
 				"running animations independent of e.g. game pause (Time.timeScale). " +
 				"Instance SkeletonAnimation.timeScale will still be applied.");
+		readonly GUIContent ApplyTranslationToPhysicsLabel = new GUIContent("Transform Translation",
+			"When enabled, the GameObject Transform translation movement is applied to PhysicsConstraints of the skeleton.");
+		readonly GUIContent ApplyRotationToPhysicsLabel = new GUIContent("Transform Rotation",
+			"When enabled, the GameObject Transform rotation movement is applied to PhysicsConstraints of the skeleton.");
 
 		SkeletonGraphic thisSkeletonGraphic;
 		protected bool isInspectingPrefab;
@@ -136,6 +141,8 @@ namespace Spine.Unity.Editor {
 			updateWhenInvisible = so.FindProperty("updateWhenInvisible");
 			layoutScaleMode = so.FindProperty("layoutScaleMode");
 			editReferenceRect = so.FindProperty("editReferenceRect");
+			applyTranslationToPhysics = so.FindProperty("applyTranslationToPhysics");
+			applyRotationToPhysics = so.FindProperty("applyRotationToPhysics");
 
 			meshGeneratorSettings = so.FindProperty("meshGenerator").FindPropertyRelative("settings");
 			meshGeneratorSettings.isExpanded = SkeletonRendererInspector.advancedFoldout;
@@ -307,6 +314,13 @@ namespace Spine.Unity.Editor {
 
 					EditorGUILayout.Space();
 					SeparatorsField(separatorSlotNames, enableSeparatorSlots, updateSeparatorPartLocation, updateSeparatorPartScale);
+
+					EditorGUILayout.Space();
+					using (new SpineInspectorUtility.LabelWidthScope()) {
+						EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("Physics Constraints", SpineEditorUtilities.Icons.constraintPhysics), EditorStyles.boldLabel);
+						EditorGUILayout.PropertyField(applyTranslationToPhysics, ApplyTranslationToPhysicsLabel);
+						EditorGUILayout.PropertyField(applyRotationToPhysics, ApplyRotationToPhysicsLabel);
+					}
 				}
 			}
 

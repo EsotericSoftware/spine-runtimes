@@ -70,6 +70,7 @@ namespace Spine.Unity.Editor {
 			public static Texture2D constraintTransform;
 			public static Texture2D constraintPath;
 			public static Texture2D constraintIK;
+			public static Texture2D constraintPhysics;
 			public static Texture2D warning;
 			public static Texture2D skeletonUtility;
 			public static Texture2D hingeChain;
@@ -113,6 +114,7 @@ namespace Spine.Unity.Editor {
 				constraintTransform = LoadIcon("icon-constraintTransform.png");
 				constraintPath = LoadIcon("icon-constraintPath.png");
 				constraintIK = LoadIcon("icon-constraintIK.png");
+				constraintPhysics = LoadIcon("icon-constraintPhysics.png");
 
 				warning = LoadIcon("icon-warning.png");
 				skeletonUtility = LoadIcon("icon-skeletonUtility.png");
