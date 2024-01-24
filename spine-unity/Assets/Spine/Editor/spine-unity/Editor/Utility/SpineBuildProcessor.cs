@@ -31,6 +31,10 @@
 #define HAS_BUILD_PROCESS_WITH_REPORT
 #endif
 
+#if UNITY_2021_2_OR_NEWER
+#define HAS_BUILD_PLAYER_PROCESSOR
+#endif
+
 #if UNITY_2020_2_OR_NEWER
 #define HAS_ON_POSTPROCESS_PREFAB
 #endif
@@ -258,26 +262,43 @@ namespace Spine.Unity.Editor {
 		}
 	}
 
-	public class SpineBuildPreprocessor :
-#if HAS_BUILD_PROCESS_WITH_REPORT
-		IPreprocessBuildWithReport
-#else
-		IPreprocessBuild
-#endif
-	{
+#if HAS_BUILD_PLAYER_PROCESSOR
+	/// <summary>
+	/// Build Preprocessor for Unity 2021.2 and newer.
+	/// Unfortunately BuildPlayerProcessors seem to be executed before IPreprocessBuildWithReport regardless of
+	/// callbackOrder, thus requiring use of this base class to call pre-build hooks before Addressables or
+	/// Asset Bundles are built.
+	/// </summary>
+	public class SpineBuildPreprocessor : UnityEditor.Build.BuildPlayerProcessor {
+		public override int callbackOrder {
+			get { return -2000; }
+		}
+
+		public override void PrepareForBuild (BuildPlayerContext buildPlayerContext) {
+			SpineBuildProcessor.PreprocessBuild();
+		}
+	}
+#elif HAS_BUILD_PROCESS_WITH_REPORT
+	public class SpineBuildPreprocessor : IPreprocessBuildWithReport {
 		public int callbackOrder {
 			get { return -2000; }
 		}
-#if HAS_BUILD_PROCESS_WITH_REPORT
+
 		void IPreprocessBuildWithReport.OnPreprocessBuild (BuildReport report) {
 			SpineBuildProcessor.PreprocessBuild();
 		}
+	}
 #else
+	public class SpineBuildPreprocessor : IPreprocessBuild {
+		public int callbackOrder {
+			get { return -2000; }
+		}
+
 		void IPreprocessBuild.OnPreprocessBuild (BuildTarget target, string path) {
 			SpineBuildProcessor.PreprocessBuild();
 		}
-#endif
 	}
+#endif
 
 	public class SpineBuildPostprocessor :
 #if HAS_BUILD_PROCESS_WITH_REPORT
