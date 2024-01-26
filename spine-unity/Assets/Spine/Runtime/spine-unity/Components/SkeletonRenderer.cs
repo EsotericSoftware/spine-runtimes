@@ -396,8 +396,6 @@ namespace Spine.Unity {
 		/// Initialize this component. Attempts to load the SkeletonData and creates the internal Skeleton object and buffers.</summary>
 		/// <param name="overwrite">If set to <c>true</c>, it will overwrite internal objects if they were already generated. Otherwise, the initialized component will ignore subsequent calls to initialize.</param>
 		public virtual void Initialize (bool overwrite, bool quiet = false) {
-			ResetLastPositionAndRotation();
-
 			if (valid && !overwrite)
 				return;
 #if UNITY_EDITOR
@@ -433,6 +431,8 @@ namespace Spine.Unity {
 				ScaleX = initialFlipX ? -1 : 1,
 				ScaleY = initialFlipY ? -1 : 1
 			};
+
+			ResetLastPositionAndRotation();
 
 			if (!string.IsNullOrEmpty(initialSkinName) && !string.Equals(initialSkinName, "default", System.StringComparison.Ordinal))
 				skeleton.SetSkin(initialSkinName);

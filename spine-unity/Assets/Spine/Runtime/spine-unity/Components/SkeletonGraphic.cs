@@ -711,8 +711,6 @@ namespace Spine.Unity {
 		}
 
 		public void Initialize (bool overwrite) {
-			ResetLastPositionAndRotation();
-
 			if (this.IsValid && !overwrite) return;
 #if UNITY_EDITOR
 			if (BuildUtilities.IsInSkeletonAssetBuildPreProcessing)
@@ -732,6 +730,8 @@ namespace Spine.Unity {
 			InitMeshBuffers();
 			baseTexture = skeletonDataAsset.atlasAssets[0].PrimaryMaterial.mainTexture;
 			canvasRenderer.SetTexture(this.mainTexture); // Needed for overwriting initializations.
+
+			ResetLastPositionAndRotation();
 
 			// Set the initial Skin and Animation
 			if (!string.IsNullOrEmpty(initialSkinName))
