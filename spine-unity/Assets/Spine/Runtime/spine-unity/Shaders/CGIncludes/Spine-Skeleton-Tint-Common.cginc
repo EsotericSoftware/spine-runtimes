@@ -6,7 +6,7 @@ float4 fragTintedColor(float4 texColor, float3 darkTintColor, float4 lightTintCo
 	float a = texColor.a * lightTintColorPMA.a;
 
 #if !defined(_STRAIGHT_ALPHA_INPUT)
-	float3 texDarkColor = (texColor.a - texColor.rgb);
+	float3 texDarkColor = max(0.0, a - texColor.rgb);
 #else
 	float3 texDarkColor = (1 - texColor.rgb);
 #endif
