@@ -395,9 +395,11 @@ namespace Spine.Unity {
 					Vector2 position = GetPhysicsTransformPosition();
 					Vector2 positionDelta = (position - lastPosition) / meshScale;
 					if (physicsMovementRelativeTo != null) {
-						positionDelta *= physicsMovementRelativeTo.lossyScale;
+						positionDelta.x *= physicsMovementRelativeTo.lossyScale.x;
+						positionDelta.y *= physicsMovementRelativeTo.lossyScale.y;
 					}
-					positionDelta /= transform.lossyScale;
+					positionDelta.x /= transform.lossyScale.x;
+					positionDelta.y /= transform.lossyScale.y;
 					skeleton.PhysicsTranslate(positionDelta.x, positionDelta.y);
 					lastPosition = position;
 				}
