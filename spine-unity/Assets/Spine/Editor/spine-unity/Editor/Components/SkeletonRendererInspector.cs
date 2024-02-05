@@ -68,7 +68,7 @@ namespace Spine.Unity.Editor {
 		protected SerializedProperty normals, tangents, zSpacing, pmaVertexColors, tintBlack; // MeshGenerator settings
 		protected SerializedProperty maskInteraction;
 		protected SerializedProperty maskMaterialsNone, maskMaterialsInside, maskMaterialsOutside;
-		protected SerializedProperty applyTranslationToPhysics, applyRotationToPhysics;
+		protected SerializedProperty applyTranslationToPhysics, applyRotationToPhysics, physicsMovementRelativeTo;
 		protected SpineInspectorUtility.SerializedSortingProperties sortingProperties;
 		protected bool wasInitParameterChanged = false;
 		protected bool requireRepaint = false;
@@ -88,10 +88,12 @@ namespace Spine.Unity.Editor {
 		protected GUIContent MaskMaterialsHeadingLabel, MaskMaterialsNoneLabel, MaskMaterialsInsideLabel, MaskMaterialsOutsideLabel;
 		protected GUIContent SetMaterialButtonLabel, ClearMaterialButtonLabel, DeleteMaterialButtonLabel;
 
-		readonly GUIContent ApplyTranslationToPhysicsLabel = new GUIContent ("Transform Translation",
+		readonly GUIContent ApplyTranslationToPhysicsLabel = new GUIContent("Transform Translation",
 			"When enabled, the GameObject Transform translation movement is applied to PhysicsConstraints of the skeleton.");
-		readonly GUIContent ApplyRotationToPhysicsLabel = new GUIContent ("Transform Rotation",
+		readonly GUIContent ApplyRotationToPhysicsLabel = new GUIContent("Transform Rotation",
 			"When enabled, the GameObject Transform rotation movement is applied to PhysicsConstraints of the skeleton.");
+		readonly GUIContent PhysicsMovementRelativeToLabel = new GUIContent("Movement relative to",
+			"Reference transform relative to which physics movement will be calculated, or null to use world location.");
 
 		const string ReloadButtonString = "Reload";
 		static GUILayoutOption reloadButtonWidth;
@@ -169,6 +171,7 @@ namespace Spine.Unity.Editor {
 			maskMaterialsOutside = so.FindProperty("maskMaterials.materialsOutsideMask");
 			applyTranslationToPhysics = so.FindProperty("applyTranslationToPhysics");
 			applyRotationToPhysics = so.FindProperty("applyRotationToPhysics");
+			physicsMovementRelativeTo = so.FindProperty("physicsMovementRelativeTo");
 
 			separatorSlotNames = so.FindProperty("separatorSlotNames");
 			separatorSlotNames.isExpanded = true;
@@ -418,6 +421,7 @@ namespace Spine.Unity.Editor {
 							EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("Physics Constraints", SpineEditorUtilities.Icons.constraintPhysics), EditorStyles.boldLabel);
 							EditorGUILayout.PropertyField(applyTranslationToPhysics, ApplyTranslationToPhysicsLabel);
 							EditorGUILayout.PropertyField(applyRotationToPhysics, ApplyRotationToPhysicsLabel);
+							EditorGUILayout.PropertyField(physicsMovementRelativeTo, PhysicsMovementRelativeToLabel);
 						}
 
 						EditorGUILayout.Space();

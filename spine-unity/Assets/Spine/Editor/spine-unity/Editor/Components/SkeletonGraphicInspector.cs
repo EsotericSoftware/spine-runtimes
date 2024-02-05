@@ -62,7 +62,7 @@ namespace Spine.Unity.Editor {
 		SerializedProperty skeletonDataAsset, initialSkinName;
 		SerializedProperty startingAnimation, startingLoop, timeScale, freeze,
 			updateTiming, updateWhenInvisible, unscaledTime, tintBlack, layoutScaleMode, editReferenceRect;
-		SerializedProperty applyTranslationToPhysics, applyRotationToPhysics;
+		SerializedProperty applyTranslationToPhysics, applyRotationToPhysics, physicsMovementRelativeTo;
 		SerializedProperty initialFlipX, initialFlipY;
 		SerializedProperty meshGeneratorSettings;
 		SerializedProperty allowMultipleCanvasRenderers, separatorSlotNames, enableSeparatorSlots,
@@ -77,6 +77,8 @@ namespace Spine.Unity.Editor {
 			"When enabled, the GameObject Transform translation movement is applied to PhysicsConstraints of the skeleton.");
 		readonly GUIContent ApplyRotationToPhysicsLabel = new GUIContent("Transform Rotation",
 			"When enabled, the GameObject Transform rotation movement is applied to PhysicsConstraints of the skeleton.");
+		readonly GUIContent PhysicsMovementRelativeToLabel = new GUIContent("Movement relative to",
+			"Reference transform relative to which physics movement will be calculated, or null to use world location.");
 
 		SkeletonGraphic thisSkeletonGraphic;
 		protected bool isInspectingPrefab;
@@ -143,6 +145,7 @@ namespace Spine.Unity.Editor {
 			editReferenceRect = so.FindProperty("editReferenceRect");
 			applyTranslationToPhysics = so.FindProperty("applyTranslationToPhysics");
 			applyRotationToPhysics = so.FindProperty("applyRotationToPhysics");
+			physicsMovementRelativeTo = so.FindProperty("physicsMovementRelativeTo");
 
 			meshGeneratorSettings = so.FindProperty("meshGenerator").FindPropertyRelative("settings");
 			meshGeneratorSettings.isExpanded = SkeletonRendererInspector.advancedFoldout;
@@ -320,6 +323,7 @@ namespace Spine.Unity.Editor {
 						EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("Physics Constraints", SpineEditorUtilities.Icons.constraintPhysics), EditorStyles.boldLabel);
 						EditorGUILayout.PropertyField(applyTranslationToPhysics, ApplyTranslationToPhysicsLabel);
 						EditorGUILayout.PropertyField(applyRotationToPhysics, ApplyRotationToPhysicsLabel);
+						EditorGUILayout.PropertyField(physicsMovementRelativeTo, PhysicsMovementRelativeToLabel);
 					}
 				}
 			}

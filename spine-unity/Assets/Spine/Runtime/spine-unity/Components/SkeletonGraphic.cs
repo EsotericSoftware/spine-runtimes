@@ -389,7 +389,7 @@ namespace Spine.Unity {
 			}
 		}
 
-		public virtual void ApplyTransformMovementToPhysics() {
+		public virtual void ApplyTransformMovementToPhysics () {
 			if (Application.isPlaying) {
 				if (applyTranslationToPhysics) {
 					Vector2 position = GetPhysicsTransformPosition();
