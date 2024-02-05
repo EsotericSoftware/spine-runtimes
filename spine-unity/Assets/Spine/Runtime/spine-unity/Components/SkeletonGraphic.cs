@@ -572,12 +572,24 @@ namespace Spine.Unity {
 		/// <summary>When enabled, Transform rotation is applied to skeleton PhysicsConstraints.</summary>
 		public bool applyRotationToPhysics = true;
 		/// <summary>Reference transform relative to which physics movement will be calculated, or null to use world location.</summary>
-		public Transform physicsMovementRelativeTo = null;
+		[SerializeField] protected Transform physicsMovementRelativeTo = null;
 
 		/// <summary>Used for applying Transform translation to skeleton PhysicsConstraints.</summary>
 		protected Vector2 lastPosition;
 		/// <summary>Used for applying Transform rotation to skeleton PhysicsConstraints.</summary>
 		protected float lastRotation;
+
+		/// <summary>Reference transform relative to which physics movement will be calculated, or null to use world location.</summary>
+		public Transform PhysicsMovementRelativeTo {
+			get {
+				return physicsMovementRelativeTo;
+			}
+			set {
+				physicsMovementRelativeTo = value;
+				if (applyTranslationToPhysics) ResetLastPosition();
+				if (applyRotationToPhysics) ResetLastRotation();
+			}
+		}
 
 		public void ResetLastPosition () {
 			lastPosition = GetPhysicsTransformPosition();
