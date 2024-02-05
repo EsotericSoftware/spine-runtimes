@@ -243,21 +243,7 @@ namespace Spine.Unity {
 			state.Update(deltaTime);
 			skeleton.Update(deltaTime);
 
-			if (Application.isPlaying) {
-				if (applyTranslationToPhysics) {
-					Vector2 position = new Vector2(transform.position.x, transform.position.y);
-					Vector2 positionDelta = position - lastPosition;
-					positionDelta.x /= transform.lossyScale.x;
-					positionDelta.y /= transform.lossyScale.y;
-					skeleton.PhysicsTranslate(positionDelta.x, positionDelta.y);
-					lastPosition = position;
-				}
-				if (applyRotationToPhysics) {
-					float rotation = this.transform.rotation.eulerAngles.z;
-					skeleton.PhysicsRotate(0, 0, rotation - lastRotation);
-					lastRotation = rotation;
-				}
-			}
+			ApplyTransformMovementToPhysics();
 
 			if (updateMode == UpdateMode.OnlyAnimationStatus) {
 				state.ApplyEventTimelinesOnly(skeleton, issueEvents: false);

@@ -381,25 +381,55 @@ namespace Spine.Unity {
 			state.Update(deltaTime);
 			skeleton.Update(deltaTime);
 
-			if (Application.isPlaying) {
-				if (applyTranslationToPhysics) {
-					Vector2 position = new Vector2(transform.position.x, transform.position.y);
-					Vector2 positionDelta = (position - lastPosition) / meshScale;
-					positionDelta.x /= transform.lossyScale.x;
-					positionDelta.y /= transform.lossyScale.y;
-					skeleton.PhysicsTranslate(positionDelta.x, positionDelta.y);
-					lastPosition = position;
-				}
-				if (applyRotationToPhysics) {
-					float rotation = this.transform.rotation.eulerAngles.z;
-					skeleton.PhysicsRotate(0, 0, rotation - lastRotation);
-					lastRotation = rotation;
-				}
-			}
+			ApplyTransformMovementToPhysics();
 
 			if (updateMode == UpdateMode.OnlyAnimationStatus) {
 				state.ApplyEventTimelinesOnly(skeleton, issueEvents: false);
 				return;
+			}
+		}
+
+		public virtual void ApplyTransformMovementToPhysics() {
+			if (Application.isPlaying) {
+				if (applyTranslationToPhysics) {
+					Vector2 position = GetPhysicsTransformPosition();
+					Vector2 positionDelta = (position - lastPosition) / meshScale;
+					if (physicsMovementRelativeTo != null) {
+						positionDelta *= physicsMovementRelativeTo.lossyScale;
+					}
+					positionDelta /= transform.lossyScale;
+					skeleton.PhysicsTranslate(positionDelta.x, positionDelta.y);
+					lastPosition = position;
+				}
+				if (applyRotationToPhysics) {
+					float rotation = GetPhysicsTransformRotation();
+					skeleton.PhysicsRotate(0, 0, rotation - lastRotation);
+					lastRotation = rotation;
+				}
+			}
+		}
+
+		protected Vector2 GetPhysicsTransformPosition () {
+			if (physicsMovementRelativeTo == null) {
+				return transform.position;
+			} else {
+				if (physicsMovementRelativeTo == transform.parent)
+					return transform.localPosition;
+				else
+					return physicsMovementRelativeTo.InverseTransformPoint(transform.position);
+			}
+		}
+
+		protected float GetPhysicsTransformRotation () {
+			if (physicsMovementRelativeTo == null) {
+				return this.transform.rotation.eulerAngles.z;
+			} else {
+				if (physicsMovementRelativeTo == this.transform.parent)
+					return this.transform.localRotation.eulerAngles.z;
+				else {
+					Quaternion relative = Quaternion.Inverse(physicsMovementRelativeTo.rotation) * this.transform.rotation;
+					return relative.eulerAngles.z;
+				}
 			}
 		}
 
@@ -539,17 +569,25 @@ namespace Spine.Unity {
 		public bool applyTranslationToPhysics = true;
 		/// <summary>When enabled, Transform rotation is applied to skeleton PhysicsConstraints.</summary>
 		public bool applyRotationToPhysics = true;
+		/// <summary>Reference transform relative to which physics movement will be calculated, or null to use world location.</summary>
+		public Transform physicsMovementRelativeTo = null;
 
 		/// <summary>Used for applying Transform translation to skeleton PhysicsConstraints.</summary>
 		protected Vector2 lastPosition;
 		/// <summary>Used for applying Transform rotation to skeleton PhysicsConstraints.</summary>
 		protected float lastRotation;
 
-		public void ResetLastPosition () { lastPosition = this.transform.position; }
-		public void ResetLastRotation () { lastRotation = this.transform.rotation.eulerAngles.z; }
+		public void ResetLastPosition () {
+			lastPosition = GetPhysicsTransformPosition();
+		}
+
+		public void ResetLastRotation () {
+			lastRotation = GetPhysicsTransformRotation();
+		}
+
 		public void ResetLastPositionAndRotation () {
-			lastPosition = this.transform.position;
-			lastRotation = this.transform.rotation.eulerAngles.z;
+			lastPosition = GetPhysicsTransformPosition();
+			lastRotation = GetPhysicsTransformRotation();
 		}
 
 		[SerializeField] protected Spine.Unity.MeshGenerator meshGenerator = new MeshGenerator();

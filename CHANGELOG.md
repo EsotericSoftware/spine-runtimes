@@ -55,6 +55,7 @@
   * URP Shaders: Added support for [Tint Black](http://en.esotericsoftware.com/spine-slots#Tint-black) functionality at "Blend Modes" Spine URP shaders (2D and 3D shaders).
   * PhysicsConstraints: Skeleton GameObjects now automatically apply Transform translation and rotation to the skeleton's `PhysicsConstraints`. You can disable applying translation or rotation at the Skeleton component Inspector under `Advanced - Physics Constraints` `Transform Translation` and `Transform Rotation`, or by setting the properties `applyTranslationToPhysics` and `applyRotationToPhysics` at the skeleton component via code.
   * Added `Physics Constraints` example scene (located in `Spine Examples/Other Examples`) together with `celestial-circus` example skeleton assets. This scene demonstrates Transform movement automatically affecting physics constraints of a skeleton.
+  * PhysicsConstraints: Skeleton components now allow you to use relative instead of world-space Transform movement (with `applyTranslationToPhysics` and `applyRotationToPhysics`) by assigning a Transform (typically the parent) to the new `Movement relative to` property. Leave this property at `null` (the default) to use world-space Transform movement for physics.
 
 * **Breaking changes**
   * Changed `SpineShaderWithOutlineGUI` outline related methods from `private` to `protected virtual` to allow for custom shader GUI subclasses to switch to different outline shaders.
