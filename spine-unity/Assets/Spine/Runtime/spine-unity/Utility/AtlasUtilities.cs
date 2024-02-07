@@ -782,7 +782,7 @@ namespace Spine.Unity.AttachmentTools {
 				// at a 270 degree region, u2/v2 deltas and atlas width/height are swapped, and delta-v is negative.
 				float du = uvRect.width; // u2 - u;
 				float dv = uvRect.height; // v - v2;
-				float atlasAspectRatio = page.width / page.height;
+				float atlasAspectRatio = (float)page.width / (float)page.height;
 				u2 = u + (dv / atlasAspectRatio);
 				v2 = v - (du * atlasAspectRatio);
 			}
