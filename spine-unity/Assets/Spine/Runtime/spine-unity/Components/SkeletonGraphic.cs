@@ -391,21 +391,22 @@ namespace Spine.Unity {
 
 		public virtual void ApplyTransformMovementToPhysics () {
 			if (Application.isPlaying) {
-				if (applyTranslationToPhysics) {
+				if (physicsPositionInheritanceFactor != Vector2.zero) {
 					Vector2 position = GetPhysicsTransformPosition();
 					Vector2 positionDelta = (position - lastPosition) / meshScale;
 					if (physicsMovementRelativeTo != null) {
 						positionDelta.x *= physicsMovementRelativeTo.lossyScale.x;
 						positionDelta.y *= physicsMovementRelativeTo.lossyScale.y;
 					}
-					positionDelta.x /= transform.lossyScale.x;
-					positionDelta.y /= transform.lossyScale.y;
+					positionDelta.x *= physicsPositionInheritanceFactor.x / transform.lossyScale.x;
+					positionDelta.y *= physicsPositionInheritanceFactor.y / transform.lossyScale.y;
+
 					skeleton.PhysicsTranslate(positionDelta.x, positionDelta.y);
 					lastPosition = position;
 				}
-				if (applyRotationToPhysics) {
+				if (physicsRotationInheritanceFactor != 0f) {
 					float rotation = GetPhysicsTransformRotation();
-					skeleton.PhysicsRotate(0, 0, rotation - lastRotation);
+					skeleton.PhysicsRotate(0, 0, physicsRotationInheritanceFactor * (rotation - lastRotation));
 					lastRotation = rotation;
 				}
 			}
@@ -567,10 +568,10 @@ namespace Spine.Unity {
 			}
 		}
 
-		/// <summary>When enabled, Transform translation is applied to skeleton PhysicsConstraints.</summary>
-		[SerializeField] protected bool applyTranslationToPhysics = true;
-		/// <summary>When enabled, Transform rotation is applied to skeleton PhysicsConstraints.</summary>
-		[SerializeField] protected bool applyRotationToPhysics = true;
+		/// <seealso cref="PhysicsPositionInheritanceFactor"/>
+		[SerializeField] protected Vector2 physicsPositionInheritanceFactor = Vector2.one;
+		/// <seealso cref="PhysicsRotationInheritanceFactor"/>
+		[SerializeField] protected float physicsRotationInheritanceFactor = 1.0f;
 		/// <summary>Reference transform relative to which physics movement will be calculated, or null to use world location.</summary>
 		[SerializeField] protected Transform physicsMovementRelativeTo = null;
 
@@ -579,25 +580,33 @@ namespace Spine.Unity {
 		/// <summary>Used for applying Transform rotation to skeleton PhysicsConstraints.</summary>
 		protected float lastRotation;
 
-		/// <summary>When enabled, Transform translation is applied to skeleton PhysicsConstraints.</summary>
-		public bool ApplyTranslationToPhysics {
+		/// <summary>When set to non-zero, Transform position movement in X and Y direction
+		/// is applied to skeleton PhysicsConstraints, multiplied by this scale factor.
+		/// Typical values are <c>Vector2.one</c> to apply XY movement 1:1,
+		/// <c>Vector2(2f, 2f)</c> to apply movement with double intensity,
+		/// <c>Vector2(1f, 0f)</c> to apply only horizontal movement, or
+		/// <c>Vector2.zero</c> to not apply any Transform position movement at all.</summary>
+		public Vector2 PhysicsPositionInheritanceFactor {
 			get {
-				return applyTranslationToPhysics;
+				return physicsPositionInheritanceFactor;
 			}
 			set {
-				if (value && !applyTranslationToPhysics) ResetLastPosition();
-				applyTranslationToPhysics = value;
+				if (physicsPositionInheritanceFactor == Vector2.zero && value != Vector2.zero) ResetLastPosition();
+				physicsPositionInheritanceFactor = value;
 			}
 		}
 
-		/// <summary>When enabled, Transform rotation is applied to skeleton PhysicsConstraints.</summary>
-		public bool ApplyRotationToPhysics {
+		/// <summary>When set to non-zero, Transform rotation movement is applied to skeleton PhysicsConstraints,
+		/// multiplied by this scale factor. Typical values are <c>1</c> to apply movement 1:1,
+		/// <c>2</c> to apply movement with double intensity, or
+		/// <c>0</c> to not apply any Transform rotation movement at all.</summary>
+		public float PhysicsRotationInheritanceFactor {
 			get {
-				return applyRotationToPhysics;
+				return physicsRotationInheritanceFactor;
 			}
 			set {
-				if (value && !applyRotationToPhysics) ResetLastRotation();
-				applyRotationToPhysics = value;
+				if (physicsRotationInheritanceFactor == 0f && value != 0f) ResetLastRotation();
+				physicsRotationInheritanceFactor = value;
 			}
 		}
 
@@ -608,8 +617,8 @@ namespace Spine.Unity {
 			}
 			set {
 				physicsMovementRelativeTo = value;
-				if (applyTranslationToPhysics) ResetLastPosition();
-				if (applyRotationToPhysics) ResetLastRotation();
+				if (physicsPositionInheritanceFactor != Vector2.zero) ResetLastPosition();
+				if (physicsRotationInheritanceFactor != 0f) ResetLastRotation();
 			}
 		}
 

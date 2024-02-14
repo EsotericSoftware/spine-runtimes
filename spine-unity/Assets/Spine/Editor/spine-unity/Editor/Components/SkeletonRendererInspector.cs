@@ -68,7 +68,7 @@ namespace Spine.Unity.Editor {
 		protected SerializedProperty normals, tangents, zSpacing, pmaVertexColors, tintBlack; // MeshGenerator settings
 		protected SerializedProperty maskInteraction;
 		protected SerializedProperty maskMaterialsNone, maskMaterialsInside, maskMaterialsOutside;
-		protected SerializedProperty applyTranslationToPhysics, applyRotationToPhysics, physicsMovementRelativeTo;
+		protected SerializedProperty physicsPositionInheritanceFactor, physicsRotationInheritanceFactor, physicsMovementRelativeTo;
 		protected SpineInspectorUtility.SerializedSortingProperties sortingProperties;
 		protected bool wasInitParameterChanged = false;
 		protected bool requireRepaint = false;
@@ -88,10 +88,20 @@ namespace Spine.Unity.Editor {
 		protected GUIContent MaskMaterialsHeadingLabel, MaskMaterialsNoneLabel, MaskMaterialsInsideLabel, MaskMaterialsOutsideLabel;
 		protected GUIContent SetMaterialButtonLabel, ClearMaterialButtonLabel, DeleteMaterialButtonLabel;
 
-		readonly GUIContent ApplyTranslationToPhysicsLabel = new GUIContent("Transform Translation",
-			"When enabled, the GameObject Transform translation movement is applied to PhysicsConstraints of the skeleton.");
-		readonly GUIContent ApplyRotationToPhysicsLabel = new GUIContent("Transform Rotation",
-			"When enabled, the GameObject Transform rotation movement is applied to PhysicsConstraints of the skeleton.");
+		readonly GUIContent PhysicsPositionInheritanceFactorLabel = new GUIContent("Position",
+			"When set to non-zero, Transform position movement in X and Y direction is applied to skeleton " +
+			"PhysicsConstraints, multiplied by these " +
+			"\nX and Y scale factors to the right. Typical values are " +
+			"\n(1,1) to apply XY movement normally, " +
+			"\n(2,2) to apply movement with double intensity, " +
+			"\n(1,0) to apply only horizontal movement, or" +
+			"\n(0,0) to not apply any Transform position movement at all.");
+		readonly GUIContent PhysicsRotationInheritanceFactorLabel = new GUIContent("Rotation",
+			"When set to non-zero, Transform rotation movement is applied to skeleton PhysicsConstraints, " +
+			"multiplied by this scale factor to the right. Typical values are " +
+			"\n1 to apply movement normally, " +
+			"\n2 to apply movement with double intensity, or " +
+			"\n0 to not apply any Transform rotation movement at all.");
 		readonly GUIContent PhysicsMovementRelativeToLabel = new GUIContent("Movement relative to",
 			"Reference transform relative to which physics movement will be calculated, or null to use world location.");
 
@@ -169,8 +179,8 @@ namespace Spine.Unity.Editor {
 			maskMaterialsNone = so.FindProperty("maskMaterials.materialsMaskDisabled");
 			maskMaterialsInside = so.FindProperty("maskMaterials.materialsInsideMask");
 			maskMaterialsOutside = so.FindProperty("maskMaterials.materialsOutsideMask");
-			applyTranslationToPhysics = so.FindProperty("applyTranslationToPhysics");
-			applyRotationToPhysics = so.FindProperty("applyRotationToPhysics");
+			physicsPositionInheritanceFactor = so.FindProperty("physicsPositionInheritanceFactor");
+			physicsRotationInheritanceFactor = so.FindProperty("physicsRotationInheritanceFactor");
 			physicsMovementRelativeTo = so.FindProperty("physicsMovementRelativeTo");
 
 			separatorSlotNames = so.FindProperty("separatorSlotNames");
@@ -418,9 +428,16 @@ namespace Spine.Unity.Editor {
 						}
 #endif
 						using (new SpineInspectorUtility.LabelWidthScope()) {
-							EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("Physics Constraints", SpineEditorUtilities.Icons.constraintPhysics), EditorStyles.boldLabel);
-							EditorGUILayout.PropertyField(applyTranslationToPhysics, ApplyTranslationToPhysicsLabel);
-							EditorGUILayout.PropertyField(applyRotationToPhysics, ApplyRotationToPhysicsLabel);
+							EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("Physics Inheritance", SpineEditorUtilities.Icons.constraintPhysics), EditorStyles.boldLabel);
+
+							using (new GUILayout.HorizontalScope()) {
+								EditorGUILayout.LabelField(PhysicsPositionInheritanceFactorLabel, GUILayout.Width(EditorGUIUtility.labelWidth));
+								int savedIndentLevel = EditorGUI.indentLevel;
+								EditorGUI.indentLevel = 0;
+								EditorGUILayout.PropertyField(physicsPositionInheritanceFactor, GUIContent.none, GUILayout.MinWidth(60));
+								EditorGUI.indentLevel = savedIndentLevel;
+							}
+							EditorGUILayout.PropertyField(physicsRotationInheritanceFactor, PhysicsRotationInheritanceFactorLabel);
 							EditorGUILayout.PropertyField(physicsMovementRelativeTo, PhysicsMovementRelativeToLabel);
 						}
 
