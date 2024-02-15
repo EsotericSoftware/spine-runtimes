@@ -358,12 +358,12 @@ namespace Spine.Unity.Editor {
 
 					EditorGUILayout.LabelField("Physics Inheritance");
 					using (new SpineInspectorUtility.IndentScope()) {
-						float positionX = preferences.defaultPhysicsPositionInheritance.x;
-						float positionY = preferences.defaultPhysicsPositionInheritance.y;
+						float positionX = defaultPhysicsPositionInheritance.x;
+						float positionY = defaultPhysicsPositionInheritance.y;
 						SpineEditorUtilities.FloatPrefsField(ref positionX, DEFAULT_PHYSICS_POSITION_INHERITANCE_X_KEY, new GUIContent("Default Position X", "The Default Physics Inheritance - Position X factor."));
 						SpineEditorUtilities.FloatPrefsField(ref positionY, DEFAULT_PHYSICS_POSITION_INHERITANCE_Y_KEY, new GUIContent("Default Position Y", "The Default Physics Inheritance - Position Y factor."));
 						defaultPhysicsPositionInheritance = new Vector2(positionX, positionY);
-						SpineEditorUtilities.FloatPrefsField(ref defaultPhysicsRotationInheritance, DEFAULT_PHYSICS_ROTATION_INHERITANCE_Y_KEY, new GUIContent("Default Rotation", "The Default Physics Inheritance - Rotation factor."));
+						SpineEditorUtilities.FloatPrefsField(ref defaultPhysicsRotationInheritance, DEFAULT_PHYSICS_ROTATION_INHERITANCE_KEY, new GUIContent("Default Rotation", "The Default Physics Inheritance - Rotation factor."));
 					}
 				}
 
