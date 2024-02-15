@@ -115,6 +115,13 @@ namespace Spine.Unity.Editor {
 			const string DEFAULT_INSTANTIATE_LOOP_KEY = "SPINE_DEFAULT_INSTANTIATE_LOOP";
 			public static bool defaultInstantiateLoop = SpinePreferences.DEFAULT_DEFAULT_INSTANTIATE_LOOP;
 
+			const string DEFAULT_PHYSICS_POSITION_INHERITANCE_X_KEY = "SPINE_DEFAULT_PHYSICS_POSITION_INHERITANCE_X";
+			const string DEFAULT_PHYSICS_POSITION_INHERITANCE_Y_KEY = "SPINE_DEFAULT_PHYSICS_POSITION_INHERITANCE_Y";
+			public static Vector2 defaultPhysicsPositionInheritance = SpinePreferences.DEFAULT_DEFAULT_PHYSICS_POSITION_INHERITANCE;
+
+			const string DEFAULT_PHYSICS_ROTATION_INHERITANCE_KEY = "SPINE_DEFAULT_PHYSICS_ROTATION_INHERITANCE";
+			public static float defaultPhysicsRotationInheritance = SpinePreferences.DEFAULT_DEFAULT_PHYSICS_ROTATION_INHERITANCE;
+
 			const string SHOW_HIERARCHY_ICONS_KEY = "SPINE_SHOW_HIERARCHY_ICONS";
 			public static bool showHierarchyIcons = SpinePreferences.DEFAULT_SHOW_HIERARCHY_ICONS;
 
@@ -191,6 +198,10 @@ namespace Spine.Unity.Editor {
 				defaultMix = EditorPrefs.GetFloat(DEFAULT_MIX_KEY, SpinePreferences.DEFAULT_DEFAULT_MIX);
 				defaultScale = EditorPrefs.GetFloat(DEFAULT_SCALE_KEY, SpinePreferences.DEFAULT_DEFAULT_SCALE);
 				defaultZSpacing = EditorPrefs.GetFloat(DEFAULT_ZSPACING_KEY, SpinePreferences.DEFAULT_DEFAULT_ZSPACING);
+				defaultInstantiateLoop = EditorPrefs.GetBool(DEFAULT_INSTANTIATE_LOOP_KEY, SpinePreferences.DEFAULT_DEFAULT_INSTANTIATE_LOOP);
+				defaultPhysicsPositionInheritance.x = EditorPrefs.GetFloat(DEFAULT_PHYSICS_POSITION_INHERITANCE_X_KEY, SpinePreferences.DEFAULT_DEFAULT_PHYSICS_POSITION_INHERITANCE.x);
+				defaultPhysicsPositionInheritance.y = EditorPrefs.GetFloat(DEFAULT_PHYSICS_POSITION_INHERITANCE_Y_KEY, SpinePreferences.DEFAULT_DEFAULT_PHYSICS_POSITION_INHERITANCE.y);
+				defaultPhysicsRotationInheritance = EditorPrefs.GetFloat(DEFAULT_PHYSICS_ROTATION_INHERITANCE_KEY, SpinePreferences.DEFAULT_DEFAULT_PHYSICS_ROTATION_INHERITANCE);
 				defaultShader = EditorPrefs.GetString(DEFAULT_SHADER_KEY, SpinePreferences.DEFAULT_DEFAULT_SHADER);
 				showHierarchyIcons = EditorPrefs.GetBool(SHOW_HIERARCHY_ICONS_KEY, SpinePreferences.DEFAULT_SHOW_HIERARCHY_ICONS);
 				reloadAfterPlayMode = EditorPrefs.GetBool(RELOAD_AFTER_PLAYMODE_KEY, SpinePreferences.DEFAULT_RELOAD_AFTER_PLAYMODE);
@@ -216,6 +227,10 @@ namespace Spine.Unity.Editor {
 				newPreferences.defaultMix = EditorPrefs.GetFloat(DEFAULT_MIX_KEY, SpinePreferences.DEFAULT_DEFAULT_MIX);
 				newPreferences.defaultScale = EditorPrefs.GetFloat(DEFAULT_SCALE_KEY, SpinePreferences.DEFAULT_DEFAULT_SCALE);
 				newPreferences.defaultZSpacing = EditorPrefs.GetFloat(DEFAULT_ZSPACING_KEY, SpinePreferences.DEFAULT_DEFAULT_ZSPACING);
+				newPreferences.defaultInstantiateLoop = EditorPrefs.GetBool(DEFAULT_INSTANTIATE_LOOP_KEY, SpinePreferences.DEFAULT_DEFAULT_INSTANTIATE_LOOP);
+				newPreferences.defaultPhysicsPositionInheritance.x = EditorPrefs.GetFloat(DEFAULT_PHYSICS_POSITION_INHERITANCE_X_KEY, SpinePreferences.DEFAULT_DEFAULT_PHYSICS_POSITION_INHERITANCE.x);
+				newPreferences.defaultPhysicsPositionInheritance.y = EditorPrefs.GetFloat(DEFAULT_PHYSICS_POSITION_INHERITANCE_Y_KEY, SpinePreferences.DEFAULT_DEFAULT_PHYSICS_POSITION_INHERITANCE.y);
+				newPreferences.defaultPhysicsRotationInheritance = EditorPrefs.GetFloat(DEFAULT_PHYSICS_ROTATION_INHERITANCE_KEY, SpinePreferences.DEFAULT_DEFAULT_PHYSICS_ROTATION_INHERITANCE);
 				newPreferences.defaultShader = EditorPrefs.GetString(DEFAULT_SHADER_KEY, SpinePreferences.DEFAULT_DEFAULT_SHADER);
 				newPreferences.showHierarchyIcons = EditorPrefs.GetBool(SHOW_HIERARCHY_ICONS_KEY, SpinePreferences.DEFAULT_SHOW_HIERARCHY_ICONS);
 				newPreferences.reloadAfterPlayMode = EditorPrefs.GetBool(RELOAD_AFTER_PLAYMODE_KEY, SpinePreferences.DEFAULT_RELOAD_AFTER_PLAYMODE);
@@ -236,6 +251,10 @@ namespace Spine.Unity.Editor {
 				EditorPrefs.SetFloat(DEFAULT_MIX_KEY, preferences.defaultMix);
 				EditorPrefs.SetFloat(DEFAULT_SCALE_KEY, preferences.defaultScale);
 				EditorPrefs.SetFloat(DEFAULT_ZSPACING_KEY, preferences.defaultZSpacing);
+				EditorPrefs.SetBool(DEFAULT_INSTANTIATE_LOOP_KEY, preferences.defaultInstantiateLoop);
+				EditorPrefs.SetFloat(DEFAULT_PHYSICS_POSITION_INHERITANCE_X_KEY, preferences.defaultPhysicsPositionInheritance.x);
+				EditorPrefs.SetFloat(DEFAULT_PHYSICS_POSITION_INHERITANCE_Y_KEY, preferences.defaultPhysicsPositionInheritance.y);
+				EditorPrefs.SetFloat(DEFAULT_PHYSICS_ROTATION_INHERITANCE_KEY, preferences.defaultPhysicsRotationInheritance);
 				EditorPrefs.SetString(DEFAULT_SHADER_KEY, preferences.defaultShader);
 				EditorPrefs.SetBool(SHOW_HIERARCHY_ICONS_KEY, preferences.showHierarchyIcons);
 				EditorPrefs.SetBool(RELOAD_AFTER_PLAYMODE_KEY, preferences.reloadAfterPlayMode);
@@ -336,6 +355,16 @@ namespace Spine.Unity.Editor {
 						EditorPrefs.SetFloat(DEFAULT_ZSPACING_KEY, defaultZSpacing);
 
 					SpineEditorUtilities.BoolPrefsField(ref defaultInstantiateLoop, DEFAULT_INSTANTIATE_LOOP_KEY, new GUIContent("Default Loop", "Spawn Spine GameObjects with loop enabled."));
+
+					EditorGUILayout.LabelField("Physics Inheritance");
+					using (new SpineInspectorUtility.IndentScope()) {
+						float positionX = preferences.defaultPhysicsPositionInheritance.x;
+						float positionY = preferences.defaultPhysicsPositionInheritance.y;
+						SpineEditorUtilities.FloatPrefsField(ref positionX, DEFAULT_PHYSICS_POSITION_INHERITANCE_X_KEY, new GUIContent("Default Position X", "The Default Physics Inheritance - Position X factor."));
+						SpineEditorUtilities.FloatPrefsField(ref positionY, DEFAULT_PHYSICS_POSITION_INHERITANCE_Y_KEY, new GUIContent("Default Position Y", "The Default Physics Inheritance - Position Y factor."));
+						defaultPhysicsPositionInheritance = new Vector2(positionX, positionY);
+						SpineEditorUtilities.FloatPrefsField(ref defaultPhysicsRotationInheritance, DEFAULT_PHYSICS_ROTATION_INHERITANCE_Y_KEY, new GUIContent("Default Rotation", "The Default Physics Inheritance - Rotation factor."));
+					}
 				}
 
 				EditorGUILayout.Space();

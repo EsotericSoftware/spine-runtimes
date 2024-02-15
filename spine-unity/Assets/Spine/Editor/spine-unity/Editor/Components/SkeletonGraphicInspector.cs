@@ -76,7 +76,7 @@ namespace Spine.Unity.Editor {
 		readonly GUIContent PhysicsPositionInheritanceFactorLabel = new GUIContent("Position",
 			"When set to non-zero, Transform position movement in X and Y direction is applied to skeleton " +
 			"PhysicsConstraints, multiplied by these " +
-			"\nX and Y scale factors to the right. Typical values are " +
+			"\nX and Y scale factors to the right. Typical (X,Y) values are " +
 			"\n(1,1) to apply XY movement normally, " +
 			"\n(2,2) to apply movement with double intensity, " +
 			"\n(1,0) to apply only horizontal movement, or" +
@@ -564,6 +564,8 @@ namespace Spine.Unity.Editor {
 			graphic.MeshGenerator.settings.zSpacing = SpineEditorUtilities.Preferences.defaultZSpacing;
 
 			graphic.startingLoop = SpineEditorUtilities.Preferences.defaultInstantiateLoop;
+			graphic.PhysicsPositionInheritanceFactor = SpineEditorUtilities.Preferences.defaultPhysicsPositionInheritance;
+			graphic.PhysicsRotationInheritanceFactor = SpineEditorUtilities.Preferences.defaultPhysicsRotationInheritance;
 			graphic.Initialize(false);
 			if (skin != null) graphic.Skeleton.SetSkin(skin);
 			graphic.initialSkinName = skin.Name;

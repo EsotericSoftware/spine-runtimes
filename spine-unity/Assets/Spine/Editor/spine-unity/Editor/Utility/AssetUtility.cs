@@ -1301,6 +1301,8 @@ namespace Spine.Unity.Editor {
 			skeletonRenderer.pmaVertexColors = pmaVertexColors;
 			skeletonRenderer.tintBlack = tintBlack;
 			skeletonRenderer.zSpacing = SpineEditorUtilities.Preferences.defaultZSpacing;
+			skeletonRenderer.PhysicsPositionInheritanceFactor = SpineEditorUtilities.Preferences.defaultPhysicsPositionInheritance;
+			skeletonRenderer.PhysicsRotationInheritanceFactor = SpineEditorUtilities.Preferences.defaultPhysicsRotationInheritance;
 
 			SkeletonData data = skeletonDataAsset.GetSkeletonData(false);
 			bool noSkins = data.DefaultSkin == null && (data.Skins == null || data.Skins.Count == 0); // Support attachmentless/skinless SkeletonData.

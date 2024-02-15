@@ -56,6 +56,7 @@
   * PhysicsConstraints: Skeleton GameObjects now automatically apply Transform translation and rotation to the skeleton's `PhysicsConstraints`. You can disable applying translation or rotation at the Skeleton component Inspector under `Advanced - Physics Inheritance` by setting `Position` to (0,0)and `Rotation` to 0, or by setting the properties `physicsPositionInheritanceFactor` to `Vector2.zero` and `physicsRotationInheritanceFactor` to `0` at the skeleton component via code.
   * Added `Physics Constraints` example scene (located in `Spine Examples/Other Examples`) together with `celestial-circus` example skeleton assets. This scene demonstrates Transform movement automatically affecting physics constraints of a skeleton.
   * PhysicsConstraints: Skeleton components now allow you to use relative instead of world-space Transform movement by assigning a Transform (typically the parent) to the new `Movement relative to` property. Leave this property at `null` (the default) to use world-space Transform movement for physics.
+  * PhysicsConstraints: Added Spine Preferences settings `Editor Instantiation` - `Physics Inheritance` - `Default Position` and `Default Rotation` to initialize skeletons physics settings with the desired Transform position and rotation inheritance factors when added to a scene via drag-and-drop.
   
 * **Breaking changes**
   * Changed `SpineShaderWithOutlineGUI` outline related methods from `private` to `protected virtual` to allow for custom shader GUI subclasses to switch to different outline shaders.

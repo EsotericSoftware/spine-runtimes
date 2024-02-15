@@ -77,6 +77,12 @@ namespace Spine.Unity.Editor {
 		internal const bool DEFAULT_DEFAULT_INSTANTIATE_LOOP = true;
 		public bool defaultInstantiateLoop = DEFAULT_DEFAULT_INSTANTIATE_LOOP;
 
+		internal static readonly Vector2 DEFAULT_DEFAULT_PHYSICS_POSITION_INHERITANCE = Vector2.one;
+		public Vector2 defaultPhysicsPositionInheritance = DEFAULT_DEFAULT_PHYSICS_POSITION_INHERITANCE;
+
+		internal const float DEFAULT_DEFAULT_PHYSICS_ROTATION_INHERITANCE = 1f;
+		public float defaultPhysicsRotationInheritance = DEFAULT_DEFAULT_PHYSICS_ROTATION_INHERITANCE;
+
 		internal const bool DEFAULT_SHOW_HIERARCHY_ICONS = true;
 		public bool showHierarchyIcons = DEFAULT_SHOW_HIERARCHY_ICONS;
 
@@ -314,6 +320,11 @@ namespace Spine.Unity.Editor {
 				{
 					EditorGUILayout.Slider(settings.FindProperty("defaultZSpacing"), -0.1f, 0f, new GUIContent("Default Slot Z-Spacing"));
 					EditorGUILayout.PropertyField(settings.FindProperty("defaultInstantiateLoop"), new GUIContent("Default Loop", "Spawn Spine GameObjects with loop enabled."));
+					EditorGUILayout.LabelField("Physics Inheritance");
+					using (new SpineInspectorUtility.IndentScope()) {
+						EditorGUILayout.PropertyField(settings.FindProperty("defaultPhysicsPositionInheritance"), new GUIContent("Default Position", "The Default Physics Inheritance - Position factor."));
+						EditorGUILayout.PropertyField(settings.FindProperty("defaultPhysicsRotationInheritance"), new GUIContent("Default Rotation", "The Default Physics Inheritance - Rotation factor."));
+					}
 				}
 
 				EditorGUILayout.Space();
