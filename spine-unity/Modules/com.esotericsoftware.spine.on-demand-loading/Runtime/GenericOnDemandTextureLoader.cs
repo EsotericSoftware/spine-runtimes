@@ -194,7 +194,13 @@ namespace Spine.Unity {
 				loadedDataAtMaterial = new MaterialOnDemandData[placeholderMap.Length];
 				for (int i = 0, count = loadedDataAtMaterial.Length; i < count; ++i) {
 					loadedDataAtMaterial[i].lastFrameRequested = -1;
-					int texturesAtMaterial = placeholderMap[i].textures.Length;
+
+					var textures = placeholderMap[i].textures;
+					if (textures == null) {
+						continue;
+					}
+
+					int texturesAtMaterial = textures.Length;
 					loadedDataAtMaterial[i].textureRequests = new TextureRequest[texturesAtMaterial];
 				}
 			}
