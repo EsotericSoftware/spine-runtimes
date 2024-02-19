@@ -264,6 +264,10 @@ namespace Spine.Unity {
 			System.Action<Texture> onTextureLoaded) {
 
 			PlaceholderTextureMapping[] placeholderTextures = placeholderMap[materialIndex].textures;
+			if (placeholderTextures == null || textureIndex >= placeholderTextures.Length) {
+				return null;
+			}
+
 			TargetReference targetReference = placeholderTextures[textureIndex].targetTextureReference;
 			loadedDataAtMaterial[materialIndex].lastFrameRequested = Time.frameCount;
 
