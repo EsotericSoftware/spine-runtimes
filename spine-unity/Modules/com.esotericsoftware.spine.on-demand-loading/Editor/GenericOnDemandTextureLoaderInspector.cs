@@ -374,7 +374,12 @@ namespace Spine.Unity.Editor {
 
 		public void DeletePlaceholderTextures (GenericOnDemandTextureLoader<TargetReference, TextureRequest> loader) {
 			foreach (var materialMap in loader.placeholderMap) {
-				Texture texture = materialMap.textures[0].placeholderTexture;
+				var textures = materialMap.textures;
+				if (textures == null || textures.Length == 0) {
+					continue;
+				}
+
+				Texture texture = textures[0].placeholderTexture;
 				if (texture)
 					AssetDatabase.DeleteAsset(AssetDatabase.GetAssetPath(texture));
 			}
