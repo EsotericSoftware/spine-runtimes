@@ -1863,6 +1863,12 @@ spine_blend_mode spine_slot_data_get_blend_mode(spine_slot_data slot) {
 	return (spine_blend_mode) _slot->getBlendMode();
 }
 
+void spine_slot_data_set_blend_mode(spine_slot_data slot, spine_blend_mode blendMode) {
+	if (slot == nullptr) return;
+	SlotData *_slot = (SlotData *) slot;
+	_slot->setBlendMode((BlendMode) blendMode);
+}
+
 // Slot
 void spine_slot_set_to_setup_pose(spine_slot slot) {
 	if (slot == nullptr) return;
