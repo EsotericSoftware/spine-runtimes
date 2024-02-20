@@ -203,6 +203,9 @@ namespace Spine.Unity.Editor {
 					importer.SaveAndReimport();
 
 					if (resizePhysically) {
+						bool hasOverridesToEnable =
+							TextureImporterUtils.TryDisableOverrides(importer, out List<string> disabledPlatforms);
+
 						Texture2D texture2D = AssetDatabase.LoadAssetAtPath<Texture2D>(texturePath);
 						if (texture2D) {
 							Color[] maxTextureSizePixels = texture2D.GetPixels();
@@ -222,6 +225,10 @@ namespace Spine.Unity.Editor {
 
 							EditorUtility.SetDirty(nonCompressedTexture);
 							AssetDatabase.SaveAssets();
+						}
+
+						if (hasOverridesToEnable) {
+							TextureImporterUtils.EnableOverrides(importer, disabledPlatforms);
 						}
 					}
 					placeholderTexture = AssetDatabase.LoadAssetAtPath<Texture>(texturePath);
