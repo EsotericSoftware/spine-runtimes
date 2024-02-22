@@ -61,6 +61,7 @@ public class JsonRollback {
 		String version = args[1];
 		if (!version.equals("2.1") && !version.equals("3.7") && !version.equals("3.8")) {
 			System.out.println("ERROR: Target version must be: 2.1, 3.7, or 3.8");
+			System.out.println("Use the Spine editor JSON export to for versions 4.0+.");
 			System.out.println("Usage: <inputFile> <toVersion> [outputFile]");
 			System.exit(0);
 		}
