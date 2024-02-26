@@ -39,7 +39,7 @@ namespace Spine.Unity.Editor {
 	/// </summary>
 	public static class TextureImporterUtility {
 
-		private static IEnumerable<string> GetAllPlatforms() {
+		private static IEnumerable<string> GetAllPlatforms () {
 			BuildTarget[] buildTargets = (BuildTarget[])Enum.GetValues(typeof(BuildTarget));
 			var platformNames = buildTargets.Select(x => x.ToString()).ToList();
 
@@ -54,7 +54,7 @@ namespace Spine.Unity.Editor {
 		/// <param name="disabledPlatforms">A list populated with platforms where overrides were previously enabled and
 		/// which have now been disabled.</param>
 		/// <returns>True if an override has been disabled for any platform, false otherwise.</returns>
-		public static bool DisableOverrides(TextureImporter importer, out List<string> disabledPlatforms) {
+		public static bool DisableOverrides (TextureImporter importer, out List<string> disabledPlatforms) {
 			IEnumerable<string> platforms = GetAllPlatforms();
 			disabledPlatforms = new List<string>();
 
@@ -78,7 +78,7 @@ namespace Spine.Unity.Editor {
 		/// <summary>Enables Texture Import settings platform overrides for given platforms.</summary>
 		/// <param name="importer">The TextureImporter wrapper of the target texture asset.</param>
 		/// <param name="platformsToEnable">A list of platforms for which overrides shall be enabled.</param>
-		public static void EnableOverrides(TextureImporter importer, List<string> platformsToEnable) {
+		public static void EnableOverrides (TextureImporter importer, List<string> platformsToEnable) {
 			if (platformsToEnable.Count == 0)
 				return;
 
