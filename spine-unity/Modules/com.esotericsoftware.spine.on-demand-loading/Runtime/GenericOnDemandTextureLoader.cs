@@ -195,10 +195,9 @@ namespace Spine.Unity {
 				for (int i = 0, count = loadedDataAtMaterial.Length; i < count; ++i) {
 					loadedDataAtMaterial[i].lastFrameRequested = -1;
 
-					var textures = placeholderMap[i].textures;
-					if (textures == null) {
+					PlaceholderTextureMapping[] textures = placeholderMap[i].textures;
+					if (textures == null)
 						continue;
-					}
 
 					int texturesAtMaterial = textures.Length;
 					loadedDataAtMaterial[i].textureRequests = new TextureRequest[texturesAtMaterial];
@@ -270,9 +269,8 @@ namespace Spine.Unity {
 			System.Action<Texture> onTextureLoaded) {
 
 			PlaceholderTextureMapping[] placeholderTextures = placeholderMap[materialIndex].textures;
-			if (placeholderTextures == null || textureIndex >= placeholderTextures.Length) {
+			if (placeholderTextures == null || textureIndex >= placeholderTextures.Length)
 				return null;
-			}
 
 			TargetReference targetReference = placeholderTextures[textureIndex].targetTextureReference;
 			loadedDataAtMaterial[materialIndex].lastFrameRequested = Time.frameCount;

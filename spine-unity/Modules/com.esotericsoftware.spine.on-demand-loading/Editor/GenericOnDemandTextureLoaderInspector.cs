@@ -186,7 +186,8 @@ namespace Spine.Unity.Editor {
 				}
 
 				string originalTextureName = System.IO.Path.GetFileNameWithoutExtension(originalPath);
-				string texturePath = string.Format("{0}/{1}.png", dataPath, loader.GetPlaceholderTextureName(originalTextureName));
+				string texturePath = string.Format("{0}/{1}.png",
+					dataPath, loader.GetPlaceholderTextureName(originalTextureName));
 				Texture placeholderTexture = AssetDatabase.LoadAssetAtPath<Texture>(texturePath);
 				if (placeholderTexture == null) {
 					AssetDatabase.CopyAsset(originalPath, texturePath);
@@ -203,33 +204,30 @@ namespace Spine.Unity.Editor {
 					importer.SaveAndReimport();
 
 					if (resizePhysically) {
-						bool hasOverridesToEnable =
-							TextureImporterUtils.TryDisableOverrides(importer, out List<string> disabledPlatforms);
+						bool hasOverrides = TextureImporterUtility.DisableOverrides(importer, out List<string> disabledPlatforms);
 
 						Texture2D texture2D = AssetDatabase.LoadAssetAtPath<Texture2D>(texturePath);
 						if (texture2D) {
 							Color[] maxTextureSizePixels = texture2D.GetPixels();
 
-							// SetPixels works only for non-compressed textures using certain formats.
-							var nonCompressedTexture =
+							// SetPixels supports only uncompressed textures using certain formats.
+							Texture2D uncompressedTexture =
 								new Texture2D(texture2D.width, texture2D.height, TextureFormat.RGBA32, false);
+							uncompressedTexture.SetPixels(maxTextureSizePixels);
 
-							nonCompressedTexture.SetPixels(maxTextureSizePixels);
-
-							var bytes = nonCompressedTexture.EncodeToPNG();
+							byte[] bytes = uncompressedTexture.EncodeToPNG();
 							string targetPath = Application.dataPath + "/../" + texturePath;
 							System.IO.File.WriteAllBytes(targetPath, bytes);
 
 							importer.isReadable = false;
 							importer.SaveAndReimport();
 
-							EditorUtility.SetDirty(nonCompressedTexture);
+							EditorUtility.SetDirty(uncompressedTexture);
 							AssetDatabase.SaveAssets();
 						}
 
-						if (hasOverridesToEnable) {
-							TextureImporterUtils.EnableOverrides(importer, disabledPlatforms);
-						}
+						if (hasOverrides)
+							TextureImporterUtility.EnableOverrides(importer, disabledPlatforms);
 					}
 					placeholderTexture = AssetDatabase.LoadAssetAtPath<Texture>(texturePath);
 				}
@@ -390,9 +388,8 @@ namespace Spine.Unity.Editor {
 		public void DeletePlaceholderTextures (GenericOnDemandTextureLoader<TargetReference, TextureRequest> loader) {
 			foreach (var materialMap in loader.placeholderMap) {
 				var textures = materialMap.textures;
-				if (textures == null || textures.Length == 0) {
+				if (textures == null || textures.Length == 0)
 					continue;
-				}
 
 				Texture texture = textures[0].placeholderTexture;
 				if (texture)
