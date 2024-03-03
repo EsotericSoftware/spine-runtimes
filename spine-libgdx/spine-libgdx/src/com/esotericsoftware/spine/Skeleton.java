@@ -59,9 +59,7 @@ public class Skeleton {
 	final Array<Updatable> updateCache = new Array();
 	@Null Skin skin;
 	final Color color;
-	float x, y;
-	float scaleX = 1, scaleY = 1;
-	float time;
+	float x, y, scaleX = 1, scaleY = 1, time;
 
 	public Skeleton (SkeletonData data) {
 		if (data == null) throw new IllegalArgumentException("data cannot be null.");

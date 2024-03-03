@@ -174,6 +174,7 @@ public class SkeletonBinary extends SkeletonLoader {
 			skeletonData.y = input.readFloat();
 			skeletonData.width = input.readFloat();
 			skeletonData.height = input.readFloat();
+			skeletonData.referenceScale = input.readFloat() * scale;
 
 			boolean nonessential = input.readBoolean();
 			if (nonessential) {
@@ -336,8 +337,8 @@ public class SkeletonBinary extends SkeletonLoader {
 				data.strength = input.readFloat();
 				data.damping = input.readFloat();
 				data.massInverse = input.readFloat();
-				data.wind = input.readFloat() * scale;
-				data.gravity = input.readFloat() * scale;
+				data.wind = input.readFloat();
+				data.gravity = input.readFloat();
 				data.mix = input.readFloat();
 				flags = input.read();
 				if ((flags & 1) != 0) data.inertiaGlobal = true;

@@ -143,6 +143,7 @@ public class SkeletonJson extends SkeletonLoader {
 			skeletonData.y = skeletonMap.getFloat("y", 0);
 			skeletonData.width = skeletonMap.getFloat("width", 0);
 			skeletonData.height = skeletonMap.getFloat("height", 0);
+			skeletonData.referenceScale = skeletonMap.getFloat("referenceScale", 100) * scale;
 			skeletonData.fps = skeletonMap.getFloat("fps", 30);
 			skeletonData.imagesPath = skeletonMap.getString("images", null);
 			skeletonData.audioPath = skeletonMap.getString("audio", null);
@@ -317,9 +318,9 @@ public class SkeletonJson extends SkeletonLoader {
 			data.inertia = constraintMap.getFloat("inertia", 1);
 			data.strength = constraintMap.getFloat("strength", 100);
 			data.damping = constraintMap.getFloat("damping", 1);
-			data.massInverse = 1f / constraintMap.getFloat("mass", 1);
-			data.wind = constraintMap.getFloat("wind", 0) * scale;
-			data.gravity = constraintMap.getFloat("gravity", 0) * scale;
+			data.massInverse = 1 / constraintMap.getFloat("mass", 1);
+			data.wind = constraintMap.getFloat("wind", 0);
+			data.gravity = constraintMap.getFloat("gravity", 0);
 			data.mix = constraintMap.getFloat("mix", 1);
 			data.inertiaGlobal = constraintMap.getBoolean("inertiaGlobal", false);
 			data.strengthGlobal = constraintMap.getBoolean("strengthGlobal", false);
