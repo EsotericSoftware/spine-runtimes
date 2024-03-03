@@ -283,8 +283,8 @@ public class SkeletonData {
 		this.height = height;
 	}
 
-	/** Baseline scale factor for applying distance-dependent effects on non-scalable properties, such as angle or scale. Default
-	 * is 100. */
+	/** Baseline scale factor for applying physics and other effects based on distance to non-scalable properties, such as angle or
+	 * scale. Default is 100. */
 	public float getReferenceScale () {
 		return referenceScale;
 	}
