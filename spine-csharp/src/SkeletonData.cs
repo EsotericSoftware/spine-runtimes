@@ -44,7 +44,7 @@ namespace Spine {
 		internal ExposedList<TransformConstraintData> transformConstraints = new ExposedList<TransformConstraintData>();
 		internal ExposedList<PathConstraintData> pathConstraints = new ExposedList<PathConstraintData>();
 		internal ExposedList<PhysicsConstraintData> physicsConstraints = new ExposedList<PhysicsConstraintData>();
-		internal float x, y, width, height;
+		internal float x, y, width, height, referenceScale = 100;
 		internal string version, hash;
 
 		// Nonessential.
@@ -88,6 +88,11 @@ namespace Spine {
 		public float Y { get { return y; } set { y = value; } }
 		public float Width { get { return width; } set { width = value; } }
 		public float Height { get { return height; } set { height = value; } }
+
+		/// <summary> Baseline scale factor for applying distance-dependent effects on non-scalable properties, such as angle or scale. Default
+		/// is 100.</summary>
+		public float ReferenceScale { get { return referenceScale; } set { referenceScale = value; } }
+
 		/// <summary>The Spine version used to export this data, or null.</summary>
 		public string Version { get { return version; } set { version = value; } }
 

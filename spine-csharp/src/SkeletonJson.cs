@@ -108,6 +108,7 @@ namespace Spine {
 				skeletonData.y = GetFloat(skeletonMap, "y", 0);
 				skeletonData.width = GetFloat(skeletonMap, "width", 0);
 				skeletonData.height = GetFloat(skeletonMap, "height", 0);
+				skeletonData.referenceScale = GetFloat(skeletonMap, "referenceScale", 100) * scale;
 				skeletonData.fps = GetFloat(skeletonMap, "fps", 30);
 				skeletonData.imagesPath = GetString(skeletonMap, "images", null);
 				skeletonData.audioPath = GetString(skeletonMap, "audio", null);
@@ -307,8 +308,8 @@ namespace Spine {
 					data.strength = GetFloat(constraintMap, "strength", 100);
 					data.damping = GetFloat(constraintMap, "damping", 1);
 					data.massInverse = 1f / GetFloat(constraintMap, "mass", 1);
-					data.wind = GetFloat(constraintMap, "wind", 0) * scale;
-					data.gravity = GetFloat(constraintMap, "gravity", 0) * scale;
+					data.wind = GetFloat(constraintMap, "wind", 0);
+					data.gravity = GetFloat(constraintMap, "gravity", 0);
 					data.mix = GetFloat(constraintMap, "mix", 1);
 					data.inertiaGlobal = GetBoolean(constraintMap, "inertiaGlobal", false);
 					data.strengthGlobal = GetBoolean(constraintMap, "strengthGlobal", false);
@@ -1044,7 +1045,6 @@ namespace Spine {
 						}
 
 						CurveTimeline1 timeline;
-						float timelineScale = 1.0f;
 						if (timelineName == "inertia")
 							timeline = new PhysicsConstraintInertiaTimeline(frames, frames, index);
 						else if (timelineName == "strength")
@@ -1055,15 +1055,13 @@ namespace Spine {
 							timeline = new PhysicsConstraintMassTimeline(frames, frames, index);
 						else if (timelineName == "wind") {
 							timeline = new PhysicsConstraintWindTimeline(frames, frames, index);
-							timelineScale = scale;
 						} else if (timelineName == "gravity") {
 							timeline = new PhysicsConstraintGravityTimeline(frames, frames, index);
-							timelineScale = scale;
 						} else if (timelineName == "mix") //
 							timeline = new PhysicsConstraintMixTimeline(frames, frames, index);
 						else
 							continue;
-						timelines.Add(ReadTimeline(ref keyMapEnumerator, timeline, 0, timelineScale));
+						timelines.Add(ReadTimeline(ref keyMapEnumerator, timeline, 0, 1));
 					}
 				}
 			}

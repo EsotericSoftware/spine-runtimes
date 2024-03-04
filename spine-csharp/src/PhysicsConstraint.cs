@@ -156,7 +156,7 @@ namespace Spine {
 					ux = bx;
 					uy = by;
 				} else {
-					float remaining = this.remaining, i = inertia, step = data.step;
+					float a = this.remaining, i = inertia, t = data.step, f = skeleton.data.referenceScale;
 					if (x || y) {
 						if (x) {
 							xOffset += (ux - bx) * i;
@@ -166,22 +166,22 @@ namespace Spine {
 							yOffset += (uy - by) * i;
 							uy = by;
 						}
-						if (remaining >= step) {
-							float m = massInverse * step, e = strength, w = wind * 100, g = gravity * -100;
-							float d = (float)Math.Pow(damping, 60 * step);
+						if (a >= t) {
+							float m = massInverse * t, e = strength, w = wind * f, g = gravity * f;
+							float d = (float)Math.Pow(damping, 60 * t);
 							do {
 								if (x) {
 									xVelocity += (w - xOffset * e) * m;
-									xOffset += xVelocity * step;
+									xOffset += xVelocity * t;
 									xVelocity *= d;
 								}
 								if (y) {
-									yVelocity += (g - yOffset * e) * m;
-									yOffset += yVelocity * step;
+									yVelocity -= (g + yOffset * e) * m;
+									yOffset += yVelocity * t;
 									yVelocity *= d;
 								}
-								remaining -= step;
-							} while (remaining >= step);
+								a -= t;
+							} while (a >= t);
 						}
 						if (x) bone.worldX += xOffset * mix * data.x;
 						if (y) bone.worldY += yOffset * mix * data.y;
@@ -205,31 +205,31 @@ namespace Spine {
 							float r = l * bone.WorldScaleX;
 							if (r > 0) scaleOffset += ((cx - bone.worldX) * c + (cy - bone.worldY) * s) * i / r;
 						}
-						remaining = this.remaining;
-						if (remaining >= step) {
-							float m = massInverse * step, e = strength, w = wind, g = gravity;
-							float d = (float)Math.Pow(damping, 60 * step);
+						a = this.remaining;
+						if (a >= t) {
+							float m = massInverse * t, e = strength, w = wind, g = gravity;
+							float d = (float)Math.Pow(damping, 60 * t), h = l / f;
 							while (true) {
-								remaining -= step;
+								a -= t;
 								if (scaleX) {
 									scaleVelocity += (w * c - g * s - scaleOffset * e) * m;
-									scaleOffset += scaleVelocity * step;
+									scaleOffset += scaleVelocity * t;
 									scaleVelocity *= d;
 								}
 								if (rotateOrShearX) {
-									rotateVelocity += (-0.01f * l * (w * s + g * c) - rotateOffset * e) * m;
-									rotateOffset += rotateVelocity * step;
+									rotateVelocity -= ((w * s + g * c) * h + rotateOffset * e) * m;
+									rotateOffset += rotateVelocity * t;
 									rotateVelocity *= d;
-									if (remaining < step) break;
+									if (a < t) break;
 									float r = rotateOffset * mr + ca;
 									c = (float)Math.Cos(r);
 									s = (float)Math.Sin(r);
-								} else if (remaining < step) //
+								} else if (a < t) //
 									break;
 							}
 						}
 					}
-					this.remaining = remaining;
+					this.remaining = a;
 				}
 				cx = bone.worldX;
 				cy = bone.worldY;
