@@ -150,7 +150,7 @@ public class PhysicsConstraint implements Updatable {
 				ux = bx;
 				uy = by;
 			} else {
-				float a = this.remaining, i = inertia, t = data.step, f = skeleton.data.referenceScale;
+				float a = remaining, i = inertia, t = data.step, f = skeleton.data.referenceScale, d = -1;
 				if (x || y) {
 					if (x) {
 						xOffset += (ux - bx) * i;
@@ -161,8 +161,8 @@ public class PhysicsConstraint implements Updatable {
 						uy = by;
 					}
 					if (a >= t) {
+						d = (float)Math.pow(damping, 60 * t);
 						float m = massInverse * t, e = strength, w = wind * f, g = gravity * f;
-						float d = (float)Math.pow(damping, 60 * t);
 						do {
 							if (x) {
 								xVelocity += (w - xOffset * e) * m;
@@ -199,10 +199,10 @@ public class PhysicsConstraint implements Updatable {
 						float r = l * bone.getWorldScaleX();
 						if (r > 0) scaleOffset += ((cx - bone.worldX) * c + (cy - bone.worldY) * s) * i / r;
 					}
-					a = this.remaining;
+					a = remaining;
 					if (a >= t) {
-						float m = massInverse * t, e = strength, w = wind, g = gravity;
-						float d = (float)Math.pow(damping, 60 * t), h = l / f;
+						if (d == -1) d = (float)Math.pow(damping, 60 * t);
+						float m = massInverse * t, e = strength, w = wind, g = gravity, h = l / f;
 						while (true) {
 							a -= t;
 							if (scaleX) {
@@ -223,7 +223,7 @@ public class PhysicsConstraint implements Updatable {
 						}
 					}
 				}
-				this.remaining = a;
+				remaining = a;
 			}
 			cx = bone.worldX;
 			cy = bone.worldY;
