@@ -966,7 +966,6 @@ public class SkeletonJson extends SkeletonLoader {
 				}
 
 				CurveTimeline1 timeline;
-				float timelineScale = 1.0f;
 				if (timelineName.equals("inertia"))
 					timeline = new PhysicsConstraintInertiaTimeline(frames, frames, index);
 				else if (timelineName.equals("strength"))
@@ -975,17 +974,15 @@ public class SkeletonJson extends SkeletonLoader {
 					timeline = new PhysicsConstraintDampingTimeline(frames, frames, index);
 				else if (timelineName.equals("mass"))
 					timeline = new PhysicsConstraintMassTimeline(frames, frames, index);
-				else if (timelineName.equals("wind")) {
+				else if (timelineName.equals("wind"))
 					timeline = new PhysicsConstraintWindTimeline(frames, frames, index);
-					timelineScale = scale;
-				} else if (timelineName.equals("gravity")) {
+				else if (timelineName.equals("gravity"))
 					timeline = new PhysicsConstraintGravityTimeline(frames, frames, index);
-					timelineScale = scale;
-				} else if (timelineName.equals("mix")) //
+				else if (timelineName.equals("mix"))
 					timeline = new PhysicsConstraintMixTimeline(frames, frames, index);
 				else
 					continue;
-				timelines.add(readTimeline(keyMap, timeline, 0, timelineScale));
+				timelines.add(readTimeline(keyMap, timeline, 0, 1));
 			}
 		}
 

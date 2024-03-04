@@ -1004,10 +1004,10 @@ public class SkeletonBinary extends SkeletonLoader {
 					readTimeline(input, timelines, new PhysicsConstraintMassTimeline(frameCount, bezierCount, index), 1);
 					break;
 				case PHYSICS_WIND:
-					readTimeline(input, timelines, new PhysicsConstraintWindTimeline(frameCount, bezierCount, index), scale);
+					readTimeline(input, timelines, new PhysicsConstraintWindTimeline(frameCount, bezierCount, index), 1);
 					break;
 				case PHYSICS_GRAVITY:
-					readTimeline(input, timelines, new PhysicsConstraintGravityTimeline(frameCount, bezierCount, index), scale);
+					readTimeline(input, timelines, new PhysicsConstraintGravityTimeline(frameCount, bezierCount, index), 1);
 					break;
 				case PHYSICS_MIX:
 					readTimeline(input, timelines, new PhysicsConstraintMixTimeline(frameCount, bezierCount, index), 1);
