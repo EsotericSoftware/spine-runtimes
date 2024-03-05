@@ -353,7 +353,8 @@ VertexOutput vert(VertexInput input)
 	output.pos = calculateLocalPos(input.vertex);
 	output.color = calculateVertexColor(input.color);
 #if defined(_TINT_BLACK_ON)
-	output.darkColor = GammaToTargetSpace(half3(input.tintBlackRG.r, input.tintBlackRG.g, input.tintBlackB.r)) + _Black.rgb;
+	output.darkColor = GammaToTargetSpace(half3(input.tintBlackRG.r, input.tintBlackRG.g, input.tintBlackB.r))
+		+ (_Black.rgb * input.color.a);
 #endif
 	output.texcoord = float3(calculateTextureCoord(input.texcoord), 0);
 

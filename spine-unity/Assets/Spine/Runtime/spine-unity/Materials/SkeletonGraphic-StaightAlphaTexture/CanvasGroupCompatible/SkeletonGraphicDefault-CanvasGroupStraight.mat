@@ -4,11 +4,12 @@
 Material:
   serializedVersion: 6
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_Name: SkeletonGraphicTintBlackOutline
-  m_Shader: {fileID: 4800000, guid: d55d64dd09c46af40a319933a62fa1b2, type: 3}
-  m_ShaderKeywords: _USE8NEIGHBOURHOOD_ON
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: SkeletonGraphicDefault-CanvasGroupStraight
+  m_Shader: {fileID: 4800000, guid: fa95b0fb6983c0f40a152e6f9aa82bfb, type: 3}
+  m_ShaderKeywords: _CANVAS_GROUP_COMPATIBLE _STRAIGHT_ALPHA_INPUT
   m_LightmapFlags: 5
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -18,6 +19,10 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _AlphaTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _BumpMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -55,17 +60,20 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
+    - PixelSnap: 0
     - _BumpScale: 1
     - _CanvasGroupCompatible: 1
     - _ColorMask: 15
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
+    - _EnableExternalAlpha: 0
     - _Glossiness: 0.5
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
     - _OutlineMipLevel: 0
+    - _OutlineOpaqueAlpha: 1
     - _OutlineReferenceTexWidth: 1024
     - _OutlineSmoothness: 1
     - _OutlineWidth: 3
@@ -76,14 +84,16 @@ Material:
     - _StencilOp: 0
     - _StencilReadMask: 255
     - _StencilWriteMask: 255
-    - _StraightAlphaInput: 0
+    - _StraightAlphaInput: 1
     - _ThresholdEnd: 0.25
     - _UVSec: 0
     - _Use8Neighbourhood: 1
     - _UseUIAlphaClip: 0
     - _ZWrite: 1
     m_Colors:
-    - _Black: {r: 0, g: 0, b: 0, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _Flip: {r: 1, g: 1, b: 1, a: 1}
     - _OutlineColor: {r: 1, g: 1, b: 0, a: 1}
+    - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
+  m_BuildTextureStacks: []

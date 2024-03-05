@@ -79,7 +79,7 @@ Shader "Spine/Skeleton Tint" {
 
 			float4 frag (VertexOutput i) : SV_Target {
 				float4 texColor = tex2D(_MainTex, i.uv);
-				return fragTintedColor(texColor, _Black.rgb, i.vertexColor, _Color.a, _Black.a);
+				return fragTintedColor(texColor, _Black.rgb * i.vertexColor.a, i.vertexColor, _Color.a, _Black.a);
 			}
 			ENDCG
 		}

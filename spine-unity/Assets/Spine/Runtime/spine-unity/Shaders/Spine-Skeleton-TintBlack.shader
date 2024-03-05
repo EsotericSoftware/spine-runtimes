@@ -78,7 +78,8 @@ Shader "Spine/Skeleton Tint Black" {
 				o.pos = UnityObjectToClipPos(v.vertex); // Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
 				o.uv = v.uv;
 				o.vertexColor = PMAGammaToTargetSpace(v.vertexColor) * float4(_Color.rgb * _Color.a, _Color.a); // Combine a PMA version of _Color with vertexColor.
-				o.darkColor = GammaToTargetSpace(float3(v.uv1.r, v.uv1.g, v.uv2.r)) + _Black.rgb;
+				o.darkColor = GammaToTargetSpace(float3(v.uv1.r, v.uv1.g, v.uv2.r))
+					+ (_Black.rgb * v.vertexColor.a);
 				return o;
 			}
 

@@ -67,7 +67,7 @@ VertexOutputSpriteURP2D CombinedShapeLightVertex(VertexInput input)
 	output.vertexColor = calculateVertexColor(input.color);
 #if defined(_TINT_BLACK_ON)
 	output.darkColor = GammaToTargetSpace(
-		half3(input.tintBlackRG.r, input.tintBlackRG.g, input.tintBlackB.r)) + _Black.rgb;
+		half3(input.tintBlackRG.r, input.tintBlackRG.g, input.tintBlackB.r)) + (_Black.rgb * input.color.a);
 #endif
 
 	output.texcoord = float3(calculateTextureCoord(input.texcoord), 0);

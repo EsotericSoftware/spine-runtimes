@@ -57,13 +57,17 @@
   * Added `Physics Constraints` example scene (located in `Spine Examples/Other Examples`) together with `celestial-circus` example skeleton assets. This scene demonstrates Transform movement automatically affecting physics constraints of a skeleton.
   * PhysicsConstraints: Skeleton components now allow you to use relative instead of world-space Transform movement by assigning a Transform (typically the parent) to the new `Movement relative to` property. Leave this property at `null` (the default) to use world-space Transform movement for physics.
   * PhysicsConstraints: Added Spine Preferences settings `Editor Instantiation` - `Physics Inheritance` - `Default Position` and `Default Rotation` to initialize skeletons physics settings with the desired Transform position and rotation inheritance factors when added to a scene via drag-and-drop.
+  * SkeletonGraphic: Added Tint Black blend mode shaders `Spine/SkeletonGraphic Tint Black Additive`, `Spine/SkeletonGraphic Tint Black Multiply` and `Spine/SkeletonGraphic Tint Black Screen`.
+  * SkeletonGraphic: Added pre-defined SkeletonGraphic material sets for main workflow parameters in folders `spine-unity/Materials` instead of requiring manual copies:
+    `SkeletonGraphic-PMATexture` containing materials for premultiplied-alpha texture workflow (`Straight Alpha Texture` disabled) and `SkeletonGraphic-StaightAlphaTexture` containing materials for straight alpha texture workflow (`Straight Alpha Texture` enabled). These directories contain a set of materials with `CanvasGroup Compatible` disabled for usage with `Advanced - PMA Vertex Color` enabled at the component. Each directory also provides a subdirectory `CanvasGroupCompatible` with materials with `CanvasGroup Compatible` enabled for usage with `CanvasGroup` alpha (requiring `Advanced - PMA Vertex Color` disabled at the component).
   
 * **Breaking changes**
   * Changed `SpineShaderWithOutlineGUI` outline related methods from `private` to `protected virtual` to allow for custom shader GUI subclasses to switch to different outline shaders.
   * Changed `BoneFollower` and `BoneFollowerGraphic` methods `LateUpdate` and `Initialize` to `virtual` to allow easier overriding for e.g. positional offset in custom subclasses.
   * `MeshGenerator` received a new optimization option to avoid rendering fully transparent attachments at slot alpha 0 by default. Comment out `#define SLOT_ALPHA_DISABLES_ATTACHMENT` in `MeshGenerator.cs` to revert to previous behaviour. You may only need this option disabled when utilizing a custom shader which uses vertex color alpha for purposes other than transparency.
   * PhysicsConstraints: bool properties `ApplyTranslationToPhysics` and `ApplyRotationToPhysics` were changed to `Vector2 PhysicsPositionInheritanceFactor` and `float PhysicsRotationInheritanceFactor` to allow the Transform movement the be scaled by a factor before being applied to the skeleton. You can set the properties to `Vector2.zero` and `0` respectively to disable applying any Transform movement at all. The `Advanced` Inspector section `Physics Constraints` was renamed to `Physics Inheritance`, the properties in the section are now called `Position` and `Rotation`.
-  
+  * SkeletonGraphic Materials: Since the addition of new material sets for the `CanvasGroupCompatible` parameters, the default SkeletonGraphic materials all have `CanvasGroup Compatible` disabled. Please assign the respective material from the `CanvasGroupCompatible` material subdirectory if you want `CanvasGroup Compatible` enabled at your SkeletonGraphic.
+
 * **Changes of default values**
 
 * **Deprecated**

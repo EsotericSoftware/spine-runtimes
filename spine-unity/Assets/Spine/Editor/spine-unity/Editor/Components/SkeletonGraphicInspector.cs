@@ -590,29 +590,41 @@ namespace Spine.Unity.Editor {
 		}
 
 		public static Material DefaultSkeletonGraphicMaterial {
-			get { return FirstMaterialWithName("SkeletonGraphicDefault"); }
+			get { return MaterialWithName("SkeletonGraphicDefault"); }
 		}
 
 		public static Material DefaultSkeletonGraphicAdditiveMaterial {
-			get { return FirstMaterialWithName("SkeletonGraphicAdditive"); }
+			get { return MaterialWithName("SkeletonGraphicAdditive"); }
 		}
 
 		public static Material DefaultSkeletonGraphicMultiplyMaterial {
-			get { return FirstMaterialWithName("SkeletonGraphicMultiply"); }
+			get { return MaterialWithName("SkeletonGraphicMultiply"); }
 		}
 
 		public static Material DefaultSkeletonGraphicScreenMaterial {
-			get { return FirstMaterialWithName("SkeletonGraphicScreen"); }
+			get { return MaterialWithName("SkeletonGraphicScreen"); }
 		}
 
-		protected static Material FirstMaterialWithName (string name) {
+		protected static Material MaterialWithName (string name) {
 			string[] guids = AssetDatabase.FindAssets(name + " t:material");
 			if (guids.Length <= 0) return null;
 
-			string firstAssetPath = AssetDatabase.GUIDToAssetPath(guids[0]);
-			if (string.IsNullOrEmpty(firstAssetPath)) return null;
+			int closestNameDistance = int.MaxValue;
+			int closestNameIndex = 0;
+			for (int i = 0; i < guids.Length; ++i) {
+				string assetPath = AssetDatabase.GUIDToAssetPath(guids[i]);
+				string assetName = System.IO.Path.GetFileNameWithoutExtension(assetPath);
+				int distance = string.CompareOrdinal(assetName, name);
+				if (distance < closestNameDistance) {
+					closestNameDistance = distance;
+					closestNameIndex = i;
+				}
+			}
 
-			Material firstMaterial = AssetDatabase.LoadAssetAtPath<Material>(firstAssetPath);
+			string foundAssetPath = AssetDatabase.GUIDToAssetPath(guids[closestNameIndex]);
+			if (string.IsNullOrEmpty(foundAssetPath)) return null;
+
+			Material firstMaterial = AssetDatabase.LoadAssetAtPath<Material>(foundAssetPath);
 			return firstMaterial;
 		}
 

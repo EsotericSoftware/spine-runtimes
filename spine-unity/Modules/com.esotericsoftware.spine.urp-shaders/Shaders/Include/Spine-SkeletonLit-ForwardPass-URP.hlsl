@@ -128,7 +128,7 @@ VertexOutput vert(appdata v) {
 #if defined(_TINT_BLACK_ON)
 	color *= _Color;
 	o.darkColor = GammaToTargetSpace(
-		half3(v.tintBlackRG.r, v.tintBlackRG.g, v.tintBlackB.r)) + _Black.rgb;
+		half3(v.tintBlackRG.r, v.tintBlackRG.g, v.tintBlackB.r)) + (_Black.rgb * v.color.a);
 #endif
 
 	half3 shadowedColor;
