@@ -35,7 +35,7 @@ namespace Spine {
 	/// </summary>
 	public class PhysicsConstraintData : ConstraintData {
 		internal BoneData bone;
-		internal float x, y, rotate, scaleX, shearX;
+		internal float x, y, rotate, scaleX, shearX, limit;
 		internal float step, inertia, strength, damping, massInverse, wind, gravity, mix;
 		internal bool inertiaGlobal, strengthGlobal, dampingGlobal, massGlobal, windGlobal, gravityGlobal, mixGlobal;
 
@@ -51,6 +51,7 @@ namespace Spine {
 		public float Rotate { get { return rotate; } set { rotate = value; } }
 		public float ScaleX { get { return scaleX; } set { scaleX = value; } }
 		public float ShearX { get { return shearX; } set { shearX = value; } }
+		public float Limit { get { return limit; } set { limit = value; } }
 		public float Inertia { get { return inertia; } set { inertia = value; } }
 		public float Strength { get { return strength; } set { strength = value; } }
 		public float Damping { get { return damping; } set { damping = value; } }

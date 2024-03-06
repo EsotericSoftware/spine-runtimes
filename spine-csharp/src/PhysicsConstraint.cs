@@ -156,14 +156,16 @@ namespace Spine {
 					ux = bx;
 					uy = by;
 				} else {
-					float a = this.remaining, i = inertia, t = data.step, f = skeleton.data.referenceScale;
+					float a = this.remaining, i = inertia, q = data.limit, t = data.step, f = skeleton.data.referenceScale;
 					if (x || y) {
 						if (x) {
-							xOffset += (ux - bx) * i;
+							float u = (ux - bx) * i;
+							xOffset += u > q ? q : u < -q ? -q : u;
 							ux = bx;
 						}
 						if (y) {
-							yOffset += (uy - by) * i;
+							float u = (uy - by) * i;
+							yOffset += u > q ? q : u < -q ? -q : u;
 							uy = by;
 						}
 						if (a >= t) {
@@ -190,7 +192,10 @@ namespace Spine {
 						float ca = (float)Math.Atan2(bone.c, bone.a), c, s, mr = 0;
 						if (rotateOrShearX) {
 							mr = (data.rotate + data.shearX) * mix;
-							float dx = cx - bone.worldX, dy = cy - bone.worldY, r = (float)Math.Atan2(dy + ty, dx + tx) - ca - rotateOffset * mr;
+							float dx = cx - bone.worldX, dy = cy - bone.worldY;
+							float r = (float)Math.Atan2((dy > q ? q : dy < -q ? -q : dy) + ty, (dx > q ? q : dx < -q ? -q : dx) + tx) - ca
+								- rotateOffset * mr;
+
 							rotateOffset += (r - (float)Math.Ceiling(r * MathUtils.InvPI2 - 0.5f) * MathUtils.PI2) * i;
 							r = rotateOffset * mr + ca;
 							c = (float)Math.Cos(r);

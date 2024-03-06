@@ -242,14 +242,14 @@ namespace Spine {
 				for (int ii = 0; ii < nn; ii++)
 					constraintBones[ii] = bones[input.ReadInt(true)];
 				data.target = bones[input.ReadInt(true)];
-				data.mix = input.ReadFloat();
-				data.softness = input.ReadFloat() * scale;
 				int flags = input.Read();
 				data.skinRequired = (flags & 1) != 0;
 				data.bendDirection = (flags & 2) != 0 ? 1 : -1;
 				data.compress = (flags & 4) != 0;
 				data.stretch = (flags & 8) != 0;
 				data.uniform = (flags & 16) != 0;
+				if ((flags & 32) != 0) data.mix = (flags & 64) != 0 ? input.ReadFloat() : 1;
+				if ((flags & 128) != 0) data.softness = input.ReadFloat() * scale;
 				o[i] = data;
 			}
 
@@ -266,18 +266,19 @@ namespace Spine {
 				data.skinRequired = (flags & 1) != 0;
 				data.local = (flags & 2) != 0;
 				data.relative = (flags & 4) != 0;
-				data.offsetRotation = input.ReadFloat();
-				data.offsetX = input.ReadFloat() * scale;
-				data.offsetY = input.ReadFloat() * scale;
-				data.offsetScaleX = input.ReadFloat();
-				data.offsetScaleY = input.ReadFloat();
-				data.offsetShearY = input.ReadFloat();
-				data.mixRotate = input.ReadFloat();
-				data.mixX = input.ReadFloat();
-				data.mixY = input.ReadFloat();
-				data.mixScaleX = input.ReadFloat();
-				data.mixScaleY = input.ReadFloat();
-				data.mixShearY = input.ReadFloat();
+				if ((flags & 8) != 0) data.offsetRotation = input.ReadFloat();
+				if ((flags & 16) != 0) data.offsetX = input.ReadFloat() * scale;
+				if ((flags & 32) != 0) data.offsetY = input.ReadFloat() * scale;
+				if ((flags & 64) != 0) data.offsetScaleX = input.ReadFloat();
+				if ((flags & 128) != 0) data.offsetScaleY = input.ReadFloat();
+				flags = input.Read();
+				if ((flags & 1) != 0) data.offsetShearY = input.ReadFloat();
+				if ((flags & 2) != 0) data.mixRotate = input.ReadFloat();
+				if ((flags & 4) != 0) data.mixX = input.ReadFloat();
+				if ((flags & 8) != 0) data.mixY = input.ReadFloat();
+				if ((flags & 16) != 0) data.mixScaleX = input.ReadFloat();
+				if ((flags & 32) != 0) data.mixScaleY = input.ReadFloat();
+				if ((flags & 64) != 0) data.mixShearY = input.ReadFloat();
 				o[i] = data;
 			}
 
@@ -291,10 +292,12 @@ namespace Spine {
 				for (int ii = 0; ii < nn; ii++)
 					constraintBones[ii] = bones[input.ReadInt(true)];
 				data.target = slots[input.ReadInt(true)];
-				data.positionMode = (PositionMode)Enum.GetValues(typeof(PositionMode)).GetValue(input.ReadInt(true));
-				data.spacingMode = (SpacingMode)Enum.GetValues(typeof(SpacingMode)).GetValue(input.ReadInt(true));
-				data.rotateMode = (RotateMode)Enum.GetValues(typeof(RotateMode)).GetValue(input.ReadInt(true));
-				data.offsetRotation = input.ReadFloat();
+				int flags = input.Read();
+				data.positionMode = (PositionMode)Enum.GetValues(typeof(PositionMode)).GetValue(flags & 1);
+				data.spacingMode = (SpacingMode)Enum.GetValues(typeof(SpacingMode)).GetValue((flags >> 1) & 3);
+				data.rotateMode = (RotateMode)Enum.GetValues(typeof(RotateMode)).GetValue((flags >> 3) & 3);
+				if ((flags & 128) != 0) data.offsetRotation = input.ReadFloat();
+
 				data.position = input.ReadFloat();
 				if (data.positionMode == PositionMode.Fixed) data.position *= scale;
 				data.spacing = input.ReadFloat();
@@ -318,14 +321,14 @@ namespace Spine {
 				if ((flags & 8) != 0) data.rotate = input.ReadFloat();
 				if ((flags & 16) != 0) data.scaleX = input.ReadFloat();
 				if ((flags & 32) != 0) data.shearX = input.ReadFloat();
+				data.limit = ((flags & 64) != 0 ? input.ReadFloat() : 500) * scale;
 				data.step = 1f / input.ReadUByte();
 				data.inertia = input.ReadFloat();
 				data.strength = input.ReadFloat();
 				data.damping = input.ReadFloat();
-				data.massInverse = input.ReadFloat();
+				data.massInverse = (flags & 128) != 0 ? input.ReadFloat() : 1;
 				data.wind = input.ReadFloat();
 				data.gravity = input.ReadFloat();
-				data.mix = input.ReadFloat();
 				flags = input.Read();
 				if ((flags & 1) != 0) data.inertiaGlobal = true;
 				if ((flags & 2) != 0) data.strengthGlobal = true;
@@ -334,6 +337,7 @@ namespace Spine {
 				if ((flags & 16) != 0) data.windGlobal = true;
 				if ((flags & 32) != 0) data.gravityGlobal = true;
 				if ((flags & 64) != 0) data.mixGlobal = true;
+				data.mix = (flags & 128) != 0 ? input.ReadFloat() : 1;
 				o[i] = data;
 			}
 
@@ -447,7 +451,7 @@ namespace Spine {
 				string path = (flags & 16) != 0 ? input.ReadStringRef() : null;
 				uint color = (flags & 32) != 0 ? (uint)input.ReadInt() : 0xffffffff;
 				Sequence sequence = (flags & 64) != 0 ? ReadSequence(input) : null;
-				float rotation = input.ReadFloat();
+				float rotation = (flags & 128) != 0 ? input.ReadFloat() : 0;
 				float x = input.ReadFloat();
 				float y = input.ReadFloat();
 				float scaleX = input.ReadFloat();
@@ -880,17 +884,20 @@ namespace Spine {
 			for (int i = 0, n = input.ReadInt(true); i < n; i++) {
 				int index = input.ReadInt(true), frameCount = input.ReadInt(true), frameLast = frameCount - 1;
 				IkConstraintTimeline timeline = new IkConstraintTimeline(frameCount, input.ReadInt(true), index);
-				float time = input.ReadFloat(), mix = input.ReadFloat(), softness = input.ReadFloat() * scale;
+				int flags = input.Read();
+				float time = input.ReadFloat(), mix = (flags & 1) != 0 ? ((flags & 2) != 0 ? input.ReadFloat() : 1) : 0;
+				float softness = (flags & 4) != 0 ? input.ReadFloat() * scale : 0;
 				for (int frame = 0, bezier = 0; ; frame++) {
-					int flags = input.Read();
-					timeline.SetFrame(frame, time, mix, softness, input.ReadSByte(), (flags & 1) != 0, (flags & 2) != 0);
+					timeline.SetFrame(frame, time, mix, softness, (flags & 8) != 0 ? 1 : -1, (flags & 16) != 0, (flags & 32) != 0);
+
 					if (frame == frameLast) break;
-					float time2 = input.ReadFloat(), mix2 = input.ReadFloat(), softness2 = input.ReadFloat() * scale;
-					switch (input.ReadUByte()) {
-					case CURVE_STEPPED:
+					//float time2 = input.ReadFloat(), mix2 = input.ReadFloat(), softness2 = input.ReadFloat() * scale;
+					flags = input.Read();
+					float time2 = input.ReadFloat(), mix2 = (flags & 1) != 0 ? ((flags & 2) != 0 ? input.ReadFloat() : 1) : 0;
+					float softness2 = (flags & 4) != 0 ? input.ReadFloat() * scale : 0;
+					if ((flags & 64) != 0)
 						timeline.SetStepped(frame);
-						break;
-					case CURVE_BEZIER:
+					else if ((flags & 128) != 0) {
 						SetBezier(input, timeline, bezier++, frame, 0, time, time2, mix, mix2, 1);
 						SetBezier(input, timeline, bezier++, frame, 1, time, time2, softness, softness2, scale);
 						break;

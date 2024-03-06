@@ -303,6 +303,7 @@ namespace Spine {
 					data.rotate = GetFloat(constraintMap, "rotate", 0);
 					data.scaleX = GetFloat(constraintMap, "scaleX", 0);
 					data.shearX = GetFloat(constraintMap, "shearX", 0);
+					data.limit = GetFloat(constraintMap, "limit", 500) * scale;
 					data.step = 1f / GetInt(constraintMap, "fps", 60);
 					data.inertia = GetFloat(constraintMap, "inertia", 1);
 					data.strength = GetFloat(constraintMap, "strength", 100);
