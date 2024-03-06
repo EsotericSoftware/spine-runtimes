@@ -37,9 +37,9 @@ import com.badlogic.gdx.utils.Array;
 public class IkConstraintData extends ConstraintData {
 	final Array<BoneData> bones = new Array();
 	BoneData target;
-	int bendDirection = 1;
+	int bendDirection;
 	boolean compress, stretch, uniform;
-	float mix = 1, softness;
+	float mix, softness;
 
 	public IkConstraintData (String name) {
 		super(name);

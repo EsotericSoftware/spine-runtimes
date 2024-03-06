@@ -150,14 +150,16 @@ public class PhysicsConstraint implements Updatable {
 				ux = bx;
 				uy = by;
 			} else {
-				float a = remaining, i = inertia, t = data.step, f = skeleton.data.referenceScale, d = -1;
+				float a = remaining, i = inertia, q = data.limit, t = data.step, f = skeleton.data.referenceScale, d = -1;
 				if (x || y) {
 					if (x) {
-						xOffset += (ux - bx) * i;
+						float u = (ux - bx) * i;
+						xOffset += u > q ? q : u < -q ? -q : u;
 						ux = bx;
 					}
 					if (y) {
-						yOffset += (uy - by) * i;
+						float u = (uy - by) * i;
+						yOffset += u > q ? q : u < -q ? -q : u;
 						uy = by;
 					}
 					if (a >= t) {
@@ -184,7 +186,9 @@ public class PhysicsConstraint implements Updatable {
 					float ca = atan2(bone.c, bone.a), c, s, mr = 0;
 					if (rotateOrShearX) {
 						mr = (data.rotate + data.shearX) * mix;
-						float dx = cx - bone.worldX, dy = cy - bone.worldY, r = atan2(dy + ty, dx + tx) - ca - rotateOffset * mr;
+						float dx = cx - bone.worldX, dy = cy - bone.worldY;
+						float r = atan2((dy > q ? q : dy < -q ? -q : dy) + ty, (dx > q ? q : dx < -q ? -q : dx) + tx) - ca
+							- rotateOffset * mr;
 						rotateOffset += (r - (float)Math.ceil(r * invPI2 - 0.5f) * PI2) * i;
 						r = rotateOffset * mr + ca;
 						c = cos(r);

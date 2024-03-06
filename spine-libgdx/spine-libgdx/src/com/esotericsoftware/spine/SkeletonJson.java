@@ -314,6 +314,7 @@ public class SkeletonJson extends SkeletonLoader {
 			data.rotate = constraintMap.getFloat("rotate", 0);
 			data.scaleX = constraintMap.getFloat("scaleX", 0);
 			data.shearX = constraintMap.getFloat("shearX", 0);
+			data.limit = constraintMap.getFloat("limit", 500) * scale;
 			data.step = 1f / constraintMap.getInt("fps", 60);
 			data.inertia = constraintMap.getFloat("inertia", 1);
 			data.strength = constraintMap.getFloat("strength", 100);
