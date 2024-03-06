@@ -334,7 +334,7 @@ public class SkeletonBinary extends SkeletonLoader {
 				if ((flags & 8) != 0) data.rotate = input.readFloat();
 				if ((flags & 16) != 0) data.scaleX = input.readFloat();
 				if ((flags & 32) != 0) data.shearX = input.readFloat();
-				data.limit = ((flags & 64) != 0 ? input.readFloat() : 500) * scale;
+				data.limit = ((flags & 64) != 0 ? input.readFloat() : 5000) * scale;
 				data.step = 1f / input.readByte();
 				data.inertia = input.readFloat();
 				data.strength = input.readFloat();
