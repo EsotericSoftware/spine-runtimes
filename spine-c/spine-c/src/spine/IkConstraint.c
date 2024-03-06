@@ -246,8 +246,9 @@ void spIkConstraint_apply2(spBone *parent, spBone *child, float targetX, float t
 			r0 = q / c2;
 			r1 = c0 / q;
 			r = ABS(r0) < ABS(r1) ? r0 : r1;
-			if (r * r <= dd) {
-				y = SQRT(dd - r * r) * bendDir;
+			y = dd - r * r;
+			if (y > 0) {
+				y = SQRT(y) * bendDir;
 				a1 = ta - ATAN2(y, r);
 				a2 = ATAN2(y / psy, (r - l1) / psx);
 				goto break_outer;
