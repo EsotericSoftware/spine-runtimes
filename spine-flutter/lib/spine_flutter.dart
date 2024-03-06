@@ -183,6 +183,11 @@ class Atlas {
     for (final image in atlasPages) {
       image.dispose();
     }
+    for (final map in atlasPagePaints) {
+      map.values.forEach((element) {
+        element.shader?.dispose();
+      });
+    }
   }
 }
 
