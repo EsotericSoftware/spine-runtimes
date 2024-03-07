@@ -321,7 +321,7 @@ namespace Spine {
 				if ((flags & 8) != 0) data.rotate = input.ReadFloat();
 				if ((flags & 16) != 0) data.scaleX = input.ReadFloat();
 				if ((flags & 32) != 0) data.shearX = input.ReadFloat();
-				data.limit = ((flags & 64) != 0 ? input.ReadFloat() : 500) * scale;
+				data.limit = ((flags & 64) != 0 ? input.ReadFloat() : 5000) * scale;
 				data.step = 1f / input.ReadUByte();
 				data.inertia = input.ReadFloat();
 				data.strength = input.ReadFloat();

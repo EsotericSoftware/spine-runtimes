@@ -147,7 +147,8 @@ namespace Spine {
 				Reset();
 				goto case Physics.Update; // Fall through.
 			case Physics.Update:
-				remaining += Math.Max(skeleton.time - lastTime, 0);
+				float delta = Math.Max(skeleton.time - lastTime, 0);
+				remaining += delta;
 				lastTime = skeleton.time;
 
 				float bx = bone.worldX, by = bone.worldY;
@@ -156,7 +157,7 @@ namespace Spine {
 					ux = bx;
 					uy = by;
 				} else {
-					float a = this.remaining, i = inertia, q = data.limit, t = data.step, f = skeleton.data.referenceScale;
+					float a = this.remaining, i = inertia, q = data.limit * delta, t = data.step, f = skeleton.data.referenceScale;
 					if (x || y) {
 						if (x) {
 							float u = (ux - bx) * i;
@@ -190,12 +191,18 @@ namespace Spine {
 					}
 					if (rotateOrShearX || scaleX) {
 						float ca = (float)Math.Atan2(bone.c, bone.a), c, s, mr = 0;
+						float dx = cx - bone.worldX, dy = cy - bone.worldY;
+						if (dx > q)
+							dx = q;
+						else if (dx < -q)
+							dx = -q;
+						if (dy > q)
+							dy = q;
+						else if (dy < -q)
+							dy = -q;
 						if (rotateOrShearX) {
 							mr = (data.rotate + data.shearX) * mix;
-							float dx = cx - bone.worldX, dy = cy - bone.worldY;
-							float r = (float)Math.Atan2((dy > q ? q : dy < -q ? -q : dy) + ty, (dx > q ? q : dx < -q ? -q : dx) + tx) - ca
-								- rotateOffset * mr;
-
+							float r = (float)Math.Atan2(dy + ty, dx + tx) - ca - rotateOffset * mr;
 							rotateOffset += (r - (float)Math.Ceiling(r * MathUtils.InvPI2 - 0.5f) * MathUtils.PI2) * i;
 							r = rotateOffset * mr + ca;
 							c = (float)Math.Cos(r);
@@ -208,7 +215,7 @@ namespace Spine {
 							c = (float)Math.Cos(ca);
 							s = (float)Math.Sin(ca);
 							float r = l * bone.WorldScaleX;
-							if (r > 0) scaleOffset += ((cx - bone.worldX) * c + (cy - bone.worldY) * s) * i / r;
+							if (r > 0) scaleOffset += (dx * c + dy * s) * i / r;
 						}
 						a = this.remaining;
 						if (a >= t) {
