@@ -184,6 +184,7 @@ namespace Spine.Unity {
 			if (BuildUtilities.IsInSkeletonAssetBuildPreProcessing)
 				return;
 #endif
+			state = null; // prevent applying leftover AnimationState
 			base.Initialize(overwrite, quiet);
 
 			if (!valid)
