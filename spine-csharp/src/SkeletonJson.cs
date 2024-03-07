@@ -1335,8 +1335,8 @@ namespace Spine {
 		}
 
 		static float ToColor (string hexString, int colorIndex, int expectedLength = 8) {
-			if (hexString.Length != expectedLength)
-				throw new ArgumentException("Color hexidecimal length must be " + expectedLength + ", recieved: " + hexString, "hexString");
+			if (hexString.Length < expectedLength)
+				throw new ArgumentException("Color hexadecimal length must be " + expectedLength + ", received: " + hexString, "hexString");
 			return Convert.ToInt32(hexString.Substring(colorIndex * 2, 2), 16) / (float)255;
 		}
 
