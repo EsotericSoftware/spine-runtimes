@@ -72,11 +72,11 @@ mouth
 	rotate: 90
 nose
 	bounds: 279, 15, 8, 9
+nose-highlight
+	bounds: 551, 171, 5, 6
 nose-shadow
 	bounds: 834, 341, 9, 10
 	rotate: 90
-nose.-highlight
-	bounds: 551, 171, 5, 6
 pupil-back
 	bounds: 505, 699, 13, 18
 	rotate: 90
