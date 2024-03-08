@@ -991,6 +991,20 @@ namespace Spine.Unity {
 #if UNITY_EDITOR
 			RemoveNullCanvasRenderers();
 #endif
+			foreach (var currentCanvasRenderer in canvasRenderers) {
+				if (!currentCanvasRenderer.TryGetComponent<SkeletonSubmeshGraphic>(out var submeshGraphic)) {
+					AddNewSubmeshGraphic(currentCanvasRenderer.gameObject);
+					continue;
+				}
+
+				if (!submeshGraphics.Contains(submeshGraphic)) {
+					submeshGraphics.Add(submeshGraphic);
+					continue;
+				}
+
+				AddNewSubmeshGraphic(currentCanvasRenderer.gameObject);
+			}
+
 			int currentCount = canvasRenderers.Count;
 			for (int i = currentCount; i < targetCount; ++i) {
 				GameObject go = new GameObject(string.Format("Renderer{0}", i), typeof(RectTransform));
@@ -998,15 +1012,19 @@ namespace Spine.Unity {
 				go.transform.localPosition = Vector3.zero;
 				CanvasRenderer canvasRenderer = go.AddComponent<CanvasRenderer>();
 				canvasRenderers.Add(canvasRenderer);
-				SkeletonSubmeshGraphic submeshGraphic = go.AddComponent<SkeletonSubmeshGraphic>();
-				submeshGraphic.maskable = this.maskable;
-				submeshGraphic.raycastTarget = false;
-				submeshGraphic.rectTransform.pivot = rectTransform.pivot;
-				submeshGraphic.rectTransform.anchorMin = Vector2.zero;
-				submeshGraphic.rectTransform.anchorMax = Vector2.one;
-				submeshGraphic.rectTransform.sizeDelta = Vector2.zero;
-				submeshGraphics.Add(submeshGraphic);
+				AddNewSubmeshGraphic(canvasRenderer.gameObject);
 			}
+		}
+
+		private void AddNewSubmeshGraphic(GameObject targetGameObject) {
+			SkeletonSubmeshGraphic submeshGraphic = targetGameObject.AddComponent<SkeletonSubmeshGraphic>();
+			submeshGraphic.maskable = this.maskable;
+			submeshGraphic.raycastTarget = false;
+			submeshGraphic.rectTransform.pivot = rectTransform.pivot;
+			submeshGraphic.rectTransform.anchorMin = Vector2.zero;
+			submeshGraphic.rectTransform.anchorMax = Vector2.one;
+			submeshGraphic.rectTransform.sizeDelta = Vector2.zero;
+			submeshGraphics.Add(submeshGraphic);
 		}
 
 		protected void PrepareRendererGameObjects (SkeletonRendererInstruction currentInstructions,
