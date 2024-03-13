@@ -44,18 +44,20 @@ VertexOutput vert(VertexInput IN) {
 	OUT.texcoord = IN.texcoord;
 
 	OUT.darkColor = float4(IN.uv1.r, IN.uv1.g, IN.uv2.r, IN.uv2.g);
-	OUT.darkColor.rgb = GammaToTargetSpace(OUT.darkColor.rgb) + (_Black.rgb * IN.color.a);
 
 #ifdef _CANVAS_GROUP_COMPATIBLE
 	// CanvasGroup alpha multiplies existing vertex color alpha, but
 	// does not premultiply it to rgb components. This causes problems
 	// with additive blending (alpha = 0), which is why we store the
-	// alpha value in uv2.g (darkColor.a).
-	float originalAlpha = OUT.darkColor.a;
-	OUT.canvasAlpha = (originalAlpha == 0) ? IN.color.a : IN.color.a / originalAlpha;
+	// alpha value in uv2.g (darkColor.a) and store 1.0 in vertex color alpha.
+	float originalAlpha = IN.uv2.g;
+	OUT.canvasAlpha = IN.color.a;
 #else
 	float originalAlpha = IN.color.a;
 #endif
+
+	OUT.darkColor.rgb = GammaToTargetSpace(OUT.darkColor.rgb) + (_Black.rgb * originalAlpha);
+
 	// Note: CanvasRenderer performs a GammaToTargetSpace conversion on vertex color already,
 	// however incorrectly assuming straight alpha color.
 	float4 vertexColor = PMAGammaToTargetSpace(half4(TargetToGammaSpace(IN.color.rgb), originalAlpha));

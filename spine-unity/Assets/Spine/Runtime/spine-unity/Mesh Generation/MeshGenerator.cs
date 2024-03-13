@@ -619,13 +619,12 @@ namespace Spine.Unity {
 					color.r = (byte)(skeletonR * slot.R * c.r * color.a);
 					color.g = (byte)(skeletonG * slot.G * c.g * color.a);
 					color.b = (byte)(skeletonB * slot.B * c.b * color.a);
-					if (slot.Data.BlendMode == BlendMode.Additive) {
-						if (canvasGroupTintBlack)
-							tintBlackAlpha = 0;
-						else
+					if (canvasGroupTintBlack) {
+						tintBlackAlpha = (slot.Data.BlendMode == BlendMode.Additive) ? 0 : colorA;
+						color.a = 255;
+					} else {
+						if (slot.Data.BlendMode == BlendMode.Additive)
 							color.a = 0;
-					} else if (canvasGroupTintBlack) { // other blend modes
-						tintBlackAlpha = colorA;
 					}
 				} else {
 					color.a = (byte)(skeletonA * slot.A * c.a * 255);
@@ -882,7 +881,9 @@ namespace Spine.Unity {
 							color.r = (byte)(r * slot.R * regionAttachment.R * color.a);
 							color.g = (byte)(g * slot.G * regionAttachment.G * color.a);
 							color.b = (byte)(b * slot.B * regionAttachment.B * color.a);
-							if (slot.Data.BlendMode == BlendMode.Additive && !canvasGroupTintBlack) color.a = 0;
+							if (canvasGroupTintBlack) color.a = 255;
+							else if (slot.Data.BlendMode == BlendMode.Additive) color.a = 0;
+
 						} else {
 							color.a = (byte)(a * slot.A * regionAttachment.A * 255);
 							color.r = (byte)(r * slot.R * regionAttachment.R * 255);
@@ -929,7 +930,8 @@ namespace Spine.Unity {
 								color.r = (byte)(r * slot.R * meshAttachment.R * color.a);
 								color.g = (byte)(g * slot.G * meshAttachment.G * color.a);
 								color.b = (byte)(b * slot.B * meshAttachment.B * color.a);
-								if (slot.Data.BlendMode == BlendMode.Additive && !canvasGroupTintBlack) color.a = 0;
+								if (canvasGroupTintBlack) color.a = 255;
+								else if (slot.Data.BlendMode == BlendMode.Additive) color.a = 0;
 							} else {
 								color.a = (byte)(a * slot.A * meshAttachment.A * 255);
 								color.r = (byte)(r * slot.R * meshAttachment.R * 255);
