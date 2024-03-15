@@ -12,7 +12,6 @@ Material:
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
-  - _CANVAS_GROUP_COMPATIBLE
   - _STRAIGHT_ALPHA_INPUT
   m_InvalidKeywords:
   - _USE8NEIGHBOURHOOD_ON
@@ -65,7 +64,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _BumpScale: 1
-    - _CanvasGroupCompatible: 1
+    - _CanvasGroupCompatible: 0
     - _ColorMask: 15
     - _Cutoff: 0.5
     - _DarkColorAlphaAdditive: 0
