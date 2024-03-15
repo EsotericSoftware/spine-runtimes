@@ -80,17 +80,16 @@ namespace Spine.Unity {
 		[System.Serializable]
 		public struct Settings {
 			public bool useClipping;
-			[Space]
 			[Range(-0.1f, 0f)] public float zSpacing;
-			[Space]
-			[Header("Vertex Data")]
-			public bool pmaVertexColors;
 			public bool tintBlack;
-			[Tooltip("Enable when using Additive blend mode at SkeletonGraphic under a CanvasGroup. " +
-				"When enabled, Additive alpha value is stored at uv2.g instead of color.a to capture CanvasGroup modifying color.a.")]
-			public bool canvasGroupTintBlack;
-			public bool calculateTangents;
+			[UnityEngine.Serialization.FormerlySerializedAs("canvasGroupTintBlack")]
+			[Tooltip("Enable when using SkeletonGraphic under a CanvasGroup. " +
+				"When enabled, PMA Vertex Color alpha value is stored at uv2.g instead of color.a to capture " +
+				"CanvasGroup modifying color.a. Also helps to detect correct parameter setting combinations.")]
+			public bool canvasGroupCompatible;
+			public bool pmaVertexColors;
 			public bool addNormals;
+			public bool calculateTangents;
 			public bool immutableTriangles;
 
 			static public Settings Default {
@@ -548,7 +547,7 @@ namespace Spine.Unity {
 #else
 			bool useClipping = settings.useClipping;
 #endif
-			bool canvasGroupTintBlack = settings.tintBlack && settings.canvasGroupTintBlack;
+			bool canvasGroupTintBlack = settings.tintBlack && settings.canvasGroupCompatible;
 
 			if (useClipping) {
 				if (instruction.preActiveClippingSlotSource >= 0) {
@@ -758,7 +757,7 @@ namespace Spine.Unity {
 		// Use this faster method when no clipping is involved.
 		public void BuildMeshWithArrays (SkeletonRendererInstruction instruction, bool updateTriangles) {
 			Settings settings = this.settings;
-			bool canvasGroupTintBlack = settings.tintBlack && settings.canvasGroupTintBlack;
+			bool canvasGroupTintBlack = settings.tintBlack && settings.canvasGroupCompatible;
 			int totalVertexCount = instruction.rawVertexCount;
 
 			// Add data to vertex buffers

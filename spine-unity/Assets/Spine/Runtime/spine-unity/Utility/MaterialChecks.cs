@@ -79,29 +79,31 @@ namespace Spine.Unity {
 			+ "This will lead to incorrect rendering on some devices.\n\n"
 			+ "Please change the assigned Material to e.g. 'SkeletonGraphicDefault' or change the used shader to one of the 'Spine/SkeletonGraphic *' shaders.\n\n"
 			+ "Note that 'Spine/SkeletonGraphic *' shall still be used when using URP.\n";
-		public static readonly string kNoSkeletonGraphicTintBlackMaterialMessage =
-			"\nWarning: Only enable 'Canvas Group Tint Black' when using a 'SkeletonGraphic Tint Black' shader!\n"
-			+ "This will lead to incorrect rendering.\n\nPlease\n"
-			+ "a) disable 'Canvas Group Tint Black' under 'Advanced' or\n"
+		public static readonly string kSkeletonGraphicTintBlackMaterialRequiredMessage =
+			"\nWarning: Only enable 'Tint Black' when using a 'SkeletonGraphic Tint Black' shader!\n"
+			+ "Otherwise this will lead to incorrect rendering.\n\nPlease\n"
+			+ "a) disable 'Tint Black' under 'Advanced' or\n"
 			+ "b) use a 'SkeletonGraphic Tint Black' Material if you need Tint Black on a CanvasGroup.\n";
 
-		public static readonly string kTintBlackMessage =
+		public static readonly string kTintBlackRequiredMessage =
 			"\nWarning: 'Advanced - Tint Black' required when using any 'Tint Black' shader!\n\nPlease\n"
 			+ "a) enable 'Tint Black' at the SkeletonRenderer/SkeletonGraphic component under 'Advanced' or\n"
 			+ "b) use a different shader at the Material.\n";
 		public static readonly string kCanvasTintBlackMessage =
 			"\nWarning: Canvas 'Additional Shader Channels' 'uv1' and 'uv2' are required when 'Advanced - Tint Black' is enabled!\n\n"
 			+ "Please enable both 'uv1' and 'uv2' channels at the parent Canvas component parameter 'Additional Shader Channels'.\n";
-		public static readonly string kCanvasGroupCompatibleMessage =
-			"\nWarning: 'Canvas Group Tint Black' is enabled at SkeletonGraphic but not 'CanvasGroup Compatible' at the Material!\n\nPlease\n"
-			+ "a) enable 'CanvasGroup Compatible' at the Material or\n"
-			+ "b) disable 'Canvas Group Tint Black' at the SkeletonGraphic component under 'Advanced'.\n"
-			+ "You may want to duplicate the 'SkeletonGraphicTintBlack' material and change settings at the duplicate to not affect all instances.";
-		public static readonly string kCanvasGroupTintBlackDisabledMessage =
-			"\nWarning: 'CanvasGroup Compatible' is enabled at the Material but 'Canvas Group Tint Black' is disabled at SkeletonGraphic!\n\nPlease\n"
+		public static readonly string kCanvasGroupCompatibleMaterialRequiredMessage =
+			"\nWarning: 'CanvasGroup Compatible' is enabled at SkeletonGraphic but not at the Material!\n\nPlease\n"
+			+ "a) use a Material with 'CanvasGroup Compatible' enabled or\n"
+			+ "b) disable 'CanvasGroup Compatible' at the SkeletonGraphic component under 'Advanced'.\n"
+			+ "You can find CanvasGroup Compatible 'SkeletonGraphicTintBlack' materials in the\n"
+			+ "'CanvasGroupCompatible' subfolder of 'SkeletonGraphic-PMATexture' or 'SkeletonGraphic-StraightAlphaTexture'.";
+		public static readonly string kCanvasGroupRequiredMessage =
+			"\nWarning: 'CanvasGroup Compatible' is enabled at the Material but disabled at SkeletonGraphic!\n\nPlease\n"
 			+ "a) disable 'CanvasGroup Compatible' at the Material or\n"
-			+ "b) enable 'Canvas Group Tint Black' at the SkeletonGraphic component under 'Advanced'.\n"
-			+ "You may want to duplicate the 'SkeletonGraphicTintBlack' material and change settings at the duplicate to not affect all instances.";
+			+ "b) enable 'CanvasGroup Compatible' at the SkeletonGraphic component under 'Advanced'.\n"
+			+ "You can find CanvasGroup Compatible 'SkeletonGraphicTintBlack' materials in the\n"
+			+ "'CanvasGroupCompatible' subfolder of 'SkeletonGraphic-PMATexture' or 'SkeletonGraphic-StraightAlphaTexture'.";
 		public static readonly string kCanvasGroupCompatiblePMAVertexMessage =
 			"\nWarning: 'CanvasGroup Compatible' is enabled at the Material and 'PMA Vertex Colors' is enabled at SkeletonGraphic!\n\nPlease\n"
 			+ "a) disable 'CanvasGroup Compatible' at the Material or\n"
@@ -126,7 +128,7 @@ namespace Spine.Unity {
 				}
 				if (renderer.tintBlack == false && RequiresTintBlack(material)) {
 					isProblematic = true;
-					errorMessage += kTintBlackMessage;
+					errorMessage += kTintBlackRequiredMessage;
 				}
 			}
 			return isProblematic;
@@ -145,29 +147,26 @@ namespace Spine.Unity {
 					isProblematic = true;
 					errorMessage += kNoSkeletonGraphicMaterialMessage;
 				}
-				if (settings.tintBlack == false && RequiresTintBlack(material)) {
+				bool isTintBlackMaterial = IsSkeletonGraphicTintBlackMaterial(material);
+				if (settings.tintBlack != isTintBlackMaterial) {
 					isProblematic = true;
-					errorMessage += kTintBlackMessage;
+					errorMessage += (settings.tintBlack == false) ?
+						kTintBlackRequiredMessage : kSkeletonGraphicTintBlackMaterialRequiredMessage;
 				}
+
 				if (settings.tintBlack == true && CanvasNotSetupForTintBlack(skeletonGraphic)) {
 					isProblematic = true;
 					errorMessage += kCanvasTintBlackMessage;
 				}
-				if (settings.canvasGroupTintBlack == true && !IsSkeletonGraphicTintBlackMaterial(material)) {
-					isProblematic = true;
-					errorMessage += kNoSkeletonGraphicTintBlackMaterialMessage;
-				}
+
 				bool isCanvasGroupCompatible = IsCanvasGroupCompatible(material);
-				if (settings.canvasGroupTintBlack == true && !isCanvasGroupCompatible) {
+				if (settings.canvasGroupCompatible != isCanvasGroupCompatible) {
 					isProblematic = true;
-					errorMessage += kCanvasGroupCompatibleMessage;
+					errorMessage += (settings.canvasGroupCompatible == false) ?
+						kCanvasGroupRequiredMessage : kCanvasGroupCompatibleMaterialRequiredMessage;
 				}
-				if (settings.tintBlack == true && settings.canvasGroupTintBlack == false && isCanvasGroupCompatible) {
-					isProblematic = true;
-					errorMessage += kCanvasGroupTintBlackDisabledMessage;
-				}
-				if (settings.pmaVertexColors == true && settings.canvasGroupTintBlack == false
-					&& isCanvasGroupCompatible) {
+
+				if (settings.pmaVertexColors == true && settings.canvasGroupCompatible == true && settings.tintBlack == false) {
 					isProblematic = true;
 					errorMessage += kCanvasGroupCompatiblePMAVertexMessage;
 				}
@@ -202,7 +201,6 @@ namespace Spine.Unity {
 			}
 			return true;
 		}
-
 
 		public static bool UsesSpineShader (Material material) {
 			return material.shader.name.Contains("Spine/");
