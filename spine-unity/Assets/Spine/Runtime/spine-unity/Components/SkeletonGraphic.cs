@@ -540,7 +540,7 @@ namespace Spine.Unity {
 			if (mesh == null) {
 				return false;
 			}
-			if (mesh.vertexCount == 0) {
+			if (mesh.vertexCount == 0 || mesh.bounds.size == Vector3.zero) {
 				this.rectTransform.sizeDelta = new Vector2(50f, 50f);
 				this.rectTransform.pivot = new Vector2(0.5f, 0.5f);
 				return false;
@@ -572,7 +572,7 @@ namespace Spine.Unity {
 				}
 			}
 
-			if (!anyBoundsAdded) {
+			if (!anyBoundsAdded || combinedBounds.size == Vector3.zero) {
 				this.rectTransform.sizeDelta = new Vector2(50f, 50f);
 				this.rectTransform.pivot = new Vector2(0.5f, 0.5f);
 				return false;
