@@ -1,3 +1,6 @@
+# 4.1.14
+* Temporary "fix" for https://github.com/EsotericSoftware/spine-runtimes/issues/2479. It appears the canvaskit backend of Flutter has a bug. We currently do not set a `FilterQuality` anymore. The Flutter rendering backend is supposed to pick a good one depending the platform. Users can still set `FilterQuality` globally via `Atlas.filterQuality` as before.
+
 # 4.1.13
 * Fix multiply blend mode, see https://esotericsoftware.com/forum/d/25369-spine-flutter-slot%E6%B7%B7%E5%90%88%E6%A8%A1%E5%BC%8F%E5%90%8Ealpha%E4%B8%A2%E5%A4%B1/2
 
