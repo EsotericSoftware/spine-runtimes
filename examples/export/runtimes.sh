@@ -46,6 +46,14 @@ rm -f "$ROOT/spine-libgdx/spine-libgdx-tests/assets/celestial-circus/"*
 mkdir -p "$ROOT/spine-libgdx/spine-libgdx-tests/assets/celestial-circus/"
 cp -f ../celestial-circus/export/* "$ROOT/spine-libgdx/spine-libgdx-tests/assets/celestial-circus/"
 
+rm -f "$ROOT/spine-libgdx/spine-libgdx-tests/assets/snowglobe/"*
+mkdir -p "$ROOT/spine-libgdx/spine-libgdx-tests/assets/snowglobe/"
+cp -f ../snowglobe/export/* "$ROOT/spine-libgdx/spine-libgdx-tests/assets/snowglobe/"
+
+rm -f "$ROOT/spine-libgdx/spine-libgdx-tests/assets/cloud-pot/"*
+mkdir -p "$ROOT/spine-libgdx/spine-libgdx-tests/assets/cloud-pot/"
+cp -f ../cloud-pot/export/* "$ROOT/spine-libgdx/spine-libgdx-tests/assets/cloud-pot/"
+
 echo "spine-cocos2d-objc"
 rm "$ROOT/spine-cocos2d-objc/Resources/"*
 
