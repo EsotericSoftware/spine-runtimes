@@ -310,6 +310,15 @@ cp -f ../coin/export/coin-pro.skel "$ROOT/spine-ts/spine-webgl/example/assets/"
 cp -f ../coin/export/coin-pma.atlas "$ROOT/spine-ts/spine-webgl/example/assets/"
 cp -f ../coin/export/coin-pma.png "$ROOT/spine-ts/spine-webgl/example/assets/"
 
+cp -f ../cloud-pot/export/cloud-pot.json "$ROOT/spine-ts/spine-webgl/example/assets/"
+cp -f ../cloud-pot/export/cloud-pot.skel "$ROOT/spine-ts/spine-webgl/example/assets/"
+cp -f ../cloud-pot/export/cloud-pot-pma.atlas "$ROOT/spine-ts/spine-webgl/example/assets/"
+cp -f ../cloud-pot/export/cloud-pot-pma.png "$ROOT/spine-ts/spine-webgl/example/assets/"
+
+cp -f ../snowglobe/export/snowglobe-pro.json "$ROOT/spine-ts/spine-webgl/example/assets/"
+cp -f ../snowglobe/export/snowglobe-pro.skel "$ROOT/spine-ts/spine-webgl/example/assets/"
+cp -f ../snowglobe/export/snowglobe-pma* "$ROOT/spine-ts/spine-webgl/example/assets/"
+
 cp -f ../goblins/export/goblins-pro.json "$ROOT/spine-ts/spine-webgl/example/assets/"
 cp -f ../goblins/export/goblins-pro.skel "$ROOT/spine-ts/spine-webgl/example/assets/"
 cp -f ../goblins/export/goblins-pma.atlas "$ROOT/spine-ts/spine-webgl/example/assets/"
