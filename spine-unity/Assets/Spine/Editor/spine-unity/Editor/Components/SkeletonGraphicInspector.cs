@@ -155,7 +155,7 @@ namespace Spine.Unity.Editor {
 
 			// MaskableGraphic
 			material = so.FindProperty("m_Material");
-			color = so.FindProperty("m_Color");
+			color = so.FindProperty("m_SkeletonColor");
 			raycastTarget = so.FindProperty("m_RaycastTarget");
 			maskable = so.FindProperty("m_Maskable");
 

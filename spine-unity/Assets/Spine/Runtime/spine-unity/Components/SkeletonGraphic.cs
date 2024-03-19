@@ -60,6 +60,13 @@ namespace Spine.Unity {
 		public Material multiplyMaterial;
 		public Material screenMaterial;
 
+		/// <summary>Own color to replace <c>Graphic.m_Color</c>.</summary>
+		[UnityEngine.Serialization.FormerlySerializedAs("m_Color")]
+		[SerializeField] protected Color m_SkeletonColor = Color.white;
+		/// <summary>Sets the color of the skeleton. Does not call <see cref="Rebuild"/> and <see cref="UpdateMesh"/>
+		/// unnecessarily as <c>Graphic.color</c> would otherwise do.</summary>
+		override public Color color { get { return m_SkeletonColor; } set { m_SkeletonColor = value; } }
+
 		[SpineSkin(dataField: "skeletonDataAsset", defaultAsEmptyString: true)]
 		public string initialSkinName;
 		public bool initialFlipX, initialFlipY;
