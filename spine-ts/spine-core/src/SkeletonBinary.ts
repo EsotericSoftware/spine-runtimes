@@ -852,7 +852,7 @@ export class SkeletonBinary {
 				const softness2 = (flags & 4) != 0 ? input.readFloat() * scale : 0;
 				if ((flags & 64) != 0) {
 					timeline.setStepped(frame);
-				} else if ((flags & 128) != 0) {
+				} else if ((flags & 128) != 0) {
 					setBezier(input, timeline, bezier++, frame, 0, time, time2, mix, mix2, 1);
 					setBezier(input, timeline, bezier++, frame, 1, time, time2, softness, softness2, scale);
 				}
