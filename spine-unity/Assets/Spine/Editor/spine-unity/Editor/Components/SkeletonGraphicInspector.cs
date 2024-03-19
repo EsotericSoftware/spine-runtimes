@@ -752,7 +752,7 @@ namespace Spine.Unity.Editor {
 			Material newMaterial = MaterialWithName(materialName);
 
 			if (newMaterial != null) {
-				switch(blendMode) {
+				switch (blendMode) {
 				case BlendMode.Additive:
 					skeletonGraphic.additiveMaterial = newMaterial;
 					break;
