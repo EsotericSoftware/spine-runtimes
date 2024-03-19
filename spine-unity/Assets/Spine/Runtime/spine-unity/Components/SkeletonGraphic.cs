@@ -121,7 +121,6 @@ namespace Spine.Unity {
 		public bool updateSeparatorPartScale = false;
 
 		private bool wasUpdatedAfterInit = true;
-		private bool requiresInstructionUpate = true;
 		private Texture baseTexture = null;
 
 #if UNITY_EDITOR
@@ -315,7 +314,7 @@ namespace Spine.Unity {
 			if (!this.IsValid) return;
 			if (canvasRenderer.cull) return;
 			if (update == CanvasUpdate.PreRender) {
-				if (requiresInstructionUpate) PrepareInstructionsAndRenderers(isInRebuild: true);
+				PrepareInstructionsAndRenderers(isInRebuild: true);
 				UpdateMeshToInstructions();
 			}
 			if (allowMultipleCanvasRenderers) canvasRenderer.Clear();
@@ -478,9 +477,7 @@ namespace Spine.Unity {
 			if (updateTiming == UpdateTiming.InLateUpdate)
 				Update(unscaledTime ? Time.unscaledDeltaTime : Time.deltaTime);
 
-			PrepareInstructionsAndRenderers();
-
-			SetVerticesDirty(); // triggers Rebuild and avoids potential double-update in a single frame
+			UpdateMesh();
 		}
 
 		protected void OnCullStateChanged (bool culled) {
@@ -527,11 +524,9 @@ namespace Spine.Unity {
 		public Skeleton Skeleton {
 			get {
 				Initialize(false);
-				requiresInstructionUpate = true;
 				return skeleton;
 			}
 			set {
-				requiresInstructionUpate = true;
 				skeleton = value;
 			}
 		}
@@ -850,7 +845,6 @@ namespace Spine.Unity {
 		}
 
 		public void PrepareInstructionsAndRenderers (bool isInRebuild = false) {
-			requiresInstructionUpate = false;
 			if (!this.allowMultipleCanvasRenderers) {
 				MeshGenerator.GenerateSingleSubmeshInstruction(currentInstructions, skeleton, null);
 				if (canvasRenderers.Count > 0)
