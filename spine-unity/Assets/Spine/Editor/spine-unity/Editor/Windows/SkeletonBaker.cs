@@ -130,6 +130,8 @@ namespace Spine.Unity.Editor {
 				}
 			}
 
+			SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(true);
+
 			foreach (Animation animations in data.Animations) {
 				string animationName = animations.Name; // Review for unsafe names. Requires runtime implementation too.
 				spineAnimationTable.Add(animationName, animations);
@@ -144,6 +146,7 @@ namespace Spine.Unity.Editor {
 				}
 
 				AnimationClip clip = unityAnimationClipTable[animationName];
+				clip.frameRate = skeletonData.Fps;
 				clip.SetCurve("", typeof(GameObject), "dummy", AnimationCurve.Linear(0, 0, animations.Duration, 0));
 				AnimationClipSettings settings = AnimationUtility.GetAnimationClipSettings(clip);
 				settings.stopTime = animations.Duration;
