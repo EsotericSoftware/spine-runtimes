@@ -1,7 +1,7 @@
 {
 "skeleton": {
-	"hash": "uc1U6822rJs",
-	"spine": "4.2.32-beta",
+	"hash": "MxRmZm5xinM",
+	"spine": "4.2.43-beta",
 	"x": -95.43,
 	"y": -18.79,
 	"width": 196.03,
@@ -801,7 +801,6 @@
 				"rotate": [
 					{ "value": 52.51 },
 					{ "time": 0.0667, "value": 3.67 },
-					{ "time": 0.0667, "value": 0.85 },
 					{ "time": 0.1333, "value": 5.42 },
 					{ "time": 0.4333, "value": -126.4 },
 					{ "time": 0.5667, "value": -105.72 },
