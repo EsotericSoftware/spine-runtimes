@@ -47,7 +47,7 @@ export class IkConstraintData extends ConstraintData {
 	}
 
 	/** Controls the bend direction of the IK bones, either 1 or -1. */
-	bendDirection = 1;
+	bendDirection = 0;
 
 	/** When true and only a single bone is being constrained, if the target is too close, the bone is scaled to reach it. */
 	compress = false;
@@ -61,7 +61,7 @@ export class IkConstraintData extends ConstraintData {
 	uniform = false;
 
 	/** A percentage (0-1) that controls the mix between the constrained and unconstrained rotations. */
-	mix = 1;
+	mix = 0;
 
 	/** For two bone IK, the distance from the maximum reach of the bones that rotation will slow. */
 	softness = 0;

@@ -54,7 +54,7 @@ export class Skeleton {
 	/** The skeleton's bones, sorted parent first. The root bone is always the first bone. */
 	bones: Array<Bone>;
 
-	/** The skeleton's slots. */
+	/** The skeleton's slots in the setup pose draw order. */
 	slots: Array<Slot>;
 
 	/** The skeleton's slots in the order they should be drawn. The returned array may be modified to change the draw order. */

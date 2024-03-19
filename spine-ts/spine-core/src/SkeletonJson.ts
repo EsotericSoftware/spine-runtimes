@@ -79,8 +79,10 @@ export class SkeletonJson {
 			skeletonData.y = skeletonMap.y;
 			skeletonData.width = skeletonMap.width;
 			skeletonData.height = skeletonMap.height;
+			skeletonData.referenceScale = getValue(skeletonMap, "referenceScale", 100) * scale;
 			skeletonData.fps = skeletonMap.fps;
-			skeletonData.imagesPath = skeletonMap.images;
+			skeletonData.imagesPath = skeletonMap.images ?? null;
+			skeletonData.audioPath = skeletonMap.audio ?? null;
 		}
 
 		// Bones
@@ -114,9 +116,16 @@ export class SkeletonJson {
 		if (root.slots) {
 			for (let i = 0; i < root.slots.length; i++) {
 				let slotMap = root.slots[i];
+				let path: string | null = null;
+				let slotName = slotMap.name;
+				const slash = slotName.lastIndexOf('/');
+				if (slash != -1) {
+					path = slotName.substring(0, slash);
+					slotName = slotName.substring(slash + 1);
+				}
 				let boneData = skeletonData.findBone(slotMap.bone);
-				if (!boneData) throw new Error(`Couldn't find bone ${slotMap.bone} for slot ${slotMap.name}`);
-				let data = new SlotData(skeletonData.slots.length, slotMap.name, boneData);
+				if (!boneData) throw new Error(`Couldn't find bone ${slotMap.bone} for slot ${slotName}`);
+				let data = new SlotData(skeletonData.slots.length, slotName, boneData);
 
 				let color: string = getValue(slotMap, "color", null);
 				if (color) data.color.setFromString(color);
@@ -126,6 +135,8 @@ export class SkeletonJson {
 
 				data.attachmentName = getValue(slotMap, "attachment", null);
 				data.blendMode = Utils.enumValue(BlendMode, getValue(slotMap, "blend", "normal"));
+				data.visible = getValue(slotMap, "visible", true);
+				data.path = path;
 				skeletonData.slots.push(data);
 			}
 		}
@@ -253,13 +264,14 @@ export class SkeletonJson {
 				data.rotate = getValue(constraintMap, "rotate", 0);
 				data.scaleX = getValue(constraintMap, "scaleX", 0);
 				data.shearX = getValue(constraintMap, "shearX", 0);
+				data.limit = getValue(constraintMap, "limit", 5000) * scale;
 				data.step = 1 / getValue(constraintMap, "fps", 60);
 				data.inertia = getValue(constraintMap, "inertia", 1);
 				data.strength = getValue(constraintMap, "strength", 100);
 				data.damping = getValue(constraintMap, "damping", 1);
 				data.massInverse = 1 / getValue(constraintMap, "mass", 1);
-				data.wind = getValue(constraintMap, "wind", 0) * scale;
-				data.gravity = getValue(constraintMap, "gravity", 0) * scale;
+				data.wind = getValue(constraintMap, "wind", 0);
+				data.gravity = getValue(constraintMap, "gravity", 0);
 				data.mix = getValue(constraintMap, "mix", 1);
 				data.inertiaGlobal = getValue(constraintMap, "inertiaGlobal", false);
 				data.strengthGlobal = getValue(constraintMap, "strengthGlobal", false);
@@ -911,7 +923,6 @@ export class SkeletonJson {
 					}
 
 					let timeline;
-					let timelineScale = 1;
 					if (timelineName == "inertia")
 						timeline = new PhysicsConstraintInertiaTimeline(frames, frames, constraintIndex);
 					else if (timelineName == "strength")
@@ -920,19 +931,15 @@ export class SkeletonJson {
 						timeline = new PhysicsConstraintDampingTimeline(frames, frames, constraintIndex);
 					else if (timelineName == "mass")
 						timeline = new PhysicsConstraintMassTimeline(frames, frames, constraintIndex);
-					else if (timelineName == "wind") {
+					else if (timelineName == "wind")
 						timeline = new PhysicsConstraintWindTimeline(frames, frames, constraintIndex);
-						timelineScale = scale;
-					}
-					else if (timelineName == "gravity") {
+					else if (timelineName == "gravity")
 						timeline = new PhysicsConstraintGravityTimeline(frames, frames, constraintIndex);
-						timelineScale = scale;
-					}
 					else if (timelineName == "mix") //
 						timeline = new PhysicsConstraintMixTimeline(frames, frames, constraintIndex);
 					else
 						continue;
-					timelines.push(readTimeline1(timelineMap, timeline, 0, timelineScale));
+					timelines.push(readTimeline1(timelineMap, timeline, 0, 1));
 				}
 			}
 		}
