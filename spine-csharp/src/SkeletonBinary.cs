@@ -891,7 +891,6 @@ namespace Spine {
 					timeline.SetFrame(frame, time, mix, softness, (flags & 8) != 0 ? 1 : -1, (flags & 16) != 0, (flags & 32) != 0);
 
 					if (frame == frameLast) break;
-					//float time2 = input.ReadFloat(), mix2 = input.ReadFloat(), softness2 = input.ReadFloat() * scale;
 					flags = input.Read();
 					float time2 = input.ReadFloat(), mix2 = (flags & 1) != 0 ? ((flags & 2) != 0 ? input.ReadFloat() : 1) : 0;
 					float softness2 = (flags & 4) != 0 ? input.ReadFloat() * scale : 0;
@@ -900,7 +899,6 @@ namespace Spine {
 					else if ((flags & 128) != 0) {
 						SetBezier(input, timeline, bezier++, frame, 0, time, time2, mix, mix2, 1);
 						SetBezier(input, timeline, bezier++, frame, 1, time, time2, softness, softness2, scale);
-						break;
 					}
 					time = time2;
 					mix = mix2;
