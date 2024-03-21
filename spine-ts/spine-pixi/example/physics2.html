@@ -1,0 +1,143 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>spine-pixi</title>
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@7.2.4/dist/pixi.min.js"></script>
+    <script src="../dist/iife/spine-pixi.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tweakpane@3.1.9/dist/tweakpane.min.js"></script>
+    <link rel="stylesheet" href="../../index.css">
+  </head>
+
+  <body>
+    <script>
+      (async function () {
+        var app = new PIXI.Application({
+          width: window.innerWidth,
+          height: window.innerHeight,
+          resolution: window.devicePixelRatio || 1,
+          autoDensity: true,
+          resizeTo: window,
+          backgroundColor: 0x333333,
+          hello: true,
+        });
+        document.body.appendChild(app.view);
+
+        // Pre-load the skeleton data and atlas. You can also load .json skeleton data.
+        PIXI.Assets.add("girlData", "./assets/celestial-circus-pro.skel");
+        PIXI.Assets.add("girlAtlas", "./assets/celestial-circus-pma.atlas");
+        await PIXI.Assets.load(["girlData", "girlAtlas"]);
+
+        // Create the spine display object
+        const girl = spine.Spine.from("girlData", "girlAtlas", {
+          scale: 0.20,
+        });
+
+        // Center the spine object on screen.
+        girl.x = window.innerWidth / 2;
+        girl.y = window.innerHeight / 2 + girl.getBounds().height / 4;
+
+        // Set animation "eyeblink-long" on track 0, looped.
+        girl.state.setAnimation(0, "eyeblink-long", true);
+
+        // Add the display object to the stage.
+        app.stage.addChild(girl);
+
+        // Make the stage interactive and register pointer events
+        app.stage.eventMode = "dynamic";
+        app.stage.hitArea = app.screen;
+        let isDragging = false;
+        let lastX = -1, lastY = -1;
+
+        app.stage.on("pointerdown", (e) => {
+          isDragging = true;
+          let mousePosition = new spine.Vector2(e.data.global.x, e.data.global.y);
+          lastX = mousePosition.x;
+          lastY = mousePosition.y;
+        });
+
+        app.stage.on("pointermove", (e) => {
+          if (isDragging) {
+            let mousePosition = new spine.Vector2(e.data.global.x, e.data.global.y);
+
+            girl.skeleton.x += mousePosition.x - lastX;
+            girl.skeleton.y += mousePosition.y - lastY;
+
+            lastX = mousePosition.x;
+            lastY = mousePosition.y;
+          }
+        });
+
+        const endDrag = () => (isDragging = false);
+        app.stage.on("pointerup", endDrag);
+        app.stage.on("pointerupoutside", endDrag);
+        document.addEventListener('fullscreenchange', () => {
+          endDrag();
+        });
+
+        const buttonContainer = new PIXI.Container();
+        buttonContainer.position.set(0, 0);
+
+        const buttonBackground = new PIXI.Graphics();
+        buttonBackground.beginFill(0x000000); // Button background color
+        buttonBackground.drawRoundedRect(0, 0, 140, 100, 5); // Button dimensions
+        buttonBackground.endFill();
+        buttonContainer.addChild(buttonBackground);
+        buttonContainer.alpha = 0.7;
+
+        const fontStyle = {
+          fill: 0xdddddd,
+          fontFamily: 'sans-serif',
+          fontSize: 16,
+        };
+
+        // Create the text label for the heading
+        const textHeading = new PIXI.Text("Drag anywhere", fontStyle); // Button text and color
+        textHeading.position.set(15, 15); // Set the position of the text within the button
+        buttonContainer.addChild(textHeading);
+
+        // Create the text label for the FPS counter
+        const textFps = new PIXI.Text("0 fps", fontStyle);
+        textFps.position.set(15, 40);
+        buttonContainer.addChild(textFps);
+
+        // Create the text label for the button toggle fullscreen
+        const textButton = new PIXI.Text("Fullscreen", fontStyle); // Button text and color
+        textButton.position.set(15, 65); // Set the position of the text within the button
+        buttonContainer.addChild(textButton);
+
+        // Add the button container to the stage
+        app.stage.addChild(buttonContainer);
+
+        buttonContainer.interactive = true;
+        buttonContainer.buttonMode = true;
+
+        let fsEnabled = false;
+        buttonContainer.on('pointerdown', () => {
+          if (fsEnabled) {
+            document.exitFullscreen();
+            textButton.text = "Fullscreen";
+          } else {
+            app.renderer.view.requestFullscreen();
+            textButton.text = "Windowed";
+          }
+          fsEnabled = !fsEnabled;
+        });
+
+        app.ticker.add(throttle(() => textFps.text = app.ticker.FPS.toFixed(2) + " fps", 250));
+      })();
+
+      const throttle = (func, delay) => {
+        let lastCall = 0;
+
+        return (...args) => {
+          const now = Date.now();
+
+          if (now - lastCall >= delay) {
+            func.apply(this, args);
+            lastCall = now;
+          }
+        };
+      }
+    </script>
+  </body>
+</html>

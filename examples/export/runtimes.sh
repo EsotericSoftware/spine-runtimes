@@ -450,6 +450,22 @@ cp -f ../mix-and-match/export/mix-and-match-pro.skel "$ROOT/spine-ts/spine-pixi/
 cp -f ../mix-and-match/export/mix-and-match-pma.atlas "$ROOT/spine-ts/spine-pixi/example/assets/"
 cp -f ../mix-and-match/export/mix-and-match-pma.png "$ROOT/spine-ts/spine-pixi/example/assets/"
 
+cp -f ../celestial-circus/export/* "$ROOT/spine-ts/spine-pixi/example/assets/"
+
+cp -f ../cloud-pot/export/cloud-pot.json "$ROOT/spine-ts/spine-pixi/example/assets/"
+cp -f ../cloud-pot/export/cloud-pot.skel "$ROOT/spine-ts/spine-pixi/example/assets/"
+cp -f ../cloud-pot/export/cloud-pot-pma.atlas "$ROOT/spine-ts/spine-pixi/example/assets/"
+cp -f ../cloud-pot/export/cloud-pot-pma.png "$ROOT/spine-ts/spine-pixi/example/assets/"
+
+cp -f ../sack/export/sack-pro.json "$ROOT/spine-ts/spine-pixi/example/assets/"
+cp -f ../sack/export/sack-pro.skel "$ROOT/spine-ts/spine-pixi/example/assets/"
+cp -f ../sack/export/sack-pma.atlas "$ROOT/spine-ts/spine-pixi/example/assets/"
+cp -f ../sack/export/sack-pma.png "$ROOT/spine-ts/spine-pixi/example/assets/"
+
+cp -f ../snowglobe/export/snowglobe-pro.json "$ROOT/spine-ts/spine-pixi/example/assets/"
+cp -f ../snowglobe/export/snowglobe-pro.skel "$ROOT/spine-ts/spine-pixi/example/assets/"
+cp -f ../snowglobe/export/snowglobe-pma* "$ROOT/spine-ts/spine-pixi/example/assets/"
+
 echo "spine-monogame"
 rm "$ROOT/spine-monogame/spine-monogame-example/data/"*
 cp -f ../coin/export/coin-pro.json "$ROOT/spine-monogame/spine-monogame-example/data/"

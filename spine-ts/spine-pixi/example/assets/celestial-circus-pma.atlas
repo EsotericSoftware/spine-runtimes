@@ -1,0 +1,170 @@
+celestial-circus-pma.png
+	size: 1024, 1024
+	filter: Linear, Linear
+	pma: true
+	scale: 0.5
+arm-back-down
+	bounds: 944, 3, 48, 103
+arm-front-down
+	bounds: 241, 56, 45, 98
+bench
+	bounds: 2, 94, 237, 60
+body-bottom
+	bounds: 674, 8, 193, 156
+	rotate: 90
+collar
+	bounds: 822, 352, 59, 33
+ear
+	bounds: 997, 185, 25, 35
+eye-back-shadow
+	bounds: 1004, 978, 18, 12
+eye-front-shadow
+	bounds: 1004, 992, 30, 18
+	rotate: 90
+eye-reflex-back
+	bounds: 822, 341, 10, 9
+eye-reflex-front
+	bounds: 525, 699, 13, 9
+	rotate: 90
+eye-white-back
+	bounds: 956, 963, 16, 20
+eye-white-front
+	bounds: 551, 179, 28, 22
+eyelashes-down-back
+	bounds: 980, 325, 14, 7
+	rotate: 90
+eyelashes-down-front
+	bounds: 979, 1003, 19, 8
+	rotate: 90
+eyelashes-top-back
+	bounds: 997, 118, 23, 12
+	rotate: 90
+eyelashes-top-front
+	bounds: 956, 985, 37, 21
+	rotate: 90
+feathers-front
+	bounds: 2, 2, 90, 108
+	rotate: 90
+fringe-middle-back
+	bounds: 980, 222, 42, 65
+fringe-side-back
+	bounds: 944, 222, 34, 117
+fringe-side-front
+	bounds: 989, 289, 33, 116
+hair-back-1
+	bounds: 289, 2, 166, 383
+	rotate: 90
+hair-back-2
+	bounds: 887, 341, 100, 356
+hair-back-4
+	bounds: 832, 11, 110, 328
+hair-hat-shadow
+	bounds: 944, 108, 112, 51
+	rotate: 90
+hat-front
+	bounds: 112, 22, 121, 70
+leg-front
+	bounds: 554, 699, 323, 400
+	rotate: 90
+logo-brooch
+	bounds: 505, 170, 20, 31
+mouth
+	bounds: 279, 26, 28, 8
+	rotate: 90
+nose
+	bounds: 279, 15, 8, 9
+nose-highlight
+	bounds: 551, 171, 5, 6
+nose-shadow
+	bounds: 834, 341, 9, 10
+	rotate: 90
+pupil-back
+	bounds: 505, 699, 13, 18
+	rotate: 90
+pupil-front
+	bounds: 112, 5, 15, 22
+	rotate: 90
+rope-back
+	bounds: 989, 407, 13, 615
+rope-front
+	bounds: 989, 407, 13, 615
+skirt
+	bounds: 2, 714, 550, 308
+sock-bow
+	bounds: 235, 14, 42, 40
+spine-logo-body
+	bounds: 997, 143, 16, 40
+star-big
+	bounds: 527, 171, 22, 30
+star-medium
+	bounds: 1015, 173, 7, 10
+star-small
+	bounds: 674, 2, 4, 6
+	rotate: 90
+underskirt
+	bounds: 2, 156, 556, 285
+	rotate: 90
+underskirt-back
+	bounds: 289, 170, 542, 214
+	rotate: 90
+wing-back
+	bounds: 505, 203, 182, 315
+	rotate: 90
+wing-front
+	bounds: 505, 387, 380, 310
+
+celestial-circus-pma_2.png
+	size: 1024, 1024
+	filter: Linear, Linear
+	pma: true
+	scale: 0.5
+arm-back-up
+	bounds: 490, 683, 104, 145
+	rotate: 90
+arm-front-up
+	bounds: 162, 23, 96, 145
+body-top
+	bounds: 2, 2, 158, 166
+chest
+	bounds: 744, 878, 130, 117
+cloud-back
+	bounds: 490, 789, 252, 206
+cloud-front
+	bounds: 2, 170, 406, 245
+	rotate: 90
+face
+	bounds: 876, 879, 116, 128
+	rotate: 90
+feathers-back
+	bounds: 266, 578, 57, 57
+fringe-middle-front
+	bounds: 260, 105, 75, 63
+glove-bottom-back
+	bounds: 325, 584, 64, 51
+glove-bottom-front
+	bounds: 391, 585, 59, 61
+	rotate: 90
+hair-back-3
+	bounds: 249, 241, 87, 335
+hair-back-5
+	bounds: 378, 646, 110, 349
+hair-back-6
+	bounds: 266, 637, 110, 358
+hand-back
+	bounds: 573, 622, 75, 59
+hand-front
+	bounds: 637, 712, 67, 75
+hat-back
+	bounds: 260, 23, 80, 56
+	rotate: 90
+head-back
+	bounds: 744, 768, 128, 108
+jabot
+	bounds: 249, 170, 88, 69
+leg-back
+	bounds: 2, 578, 262, 417
+neck
+	bounds: 338, 511, 49, 71
+rope-front-bottom
+	bounds: 490, 628, 53, 81
+	rotate: 90

@@ -49,6 +49,7 @@
 
                 // Make the stage interactive and register pointer events
                 app.stage.eventMode = "dynamic";
+                app.stage.hitArea = app.screen;
                 let isDragging = false;
 
                 app.stage.on("pointerdown", (e) => {
