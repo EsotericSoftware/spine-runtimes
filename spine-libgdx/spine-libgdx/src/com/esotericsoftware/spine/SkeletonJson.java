@@ -53,6 +53,7 @@ import com.esotericsoftware.spine.Animation.DeformTimeline;
 import com.esotericsoftware.spine.Animation.DrawOrderTimeline;
 import com.esotericsoftware.spine.Animation.EventTimeline;
 import com.esotericsoftware.spine.Animation.IkConstraintTimeline;
+import com.esotericsoftware.spine.Animation.InheritTimeline;
 import com.esotericsoftware.spine.Animation.PathConstraintMixTimeline;
 import com.esotericsoftware.spine.Animation.PathConstraintPositionTimeline;
 import com.esotericsoftware.spine.Animation.PathConstraintSpacingTimeline;
@@ -81,7 +82,7 @@ import com.esotericsoftware.spine.Animation.TransformConstraintTimeline;
 import com.esotericsoftware.spine.Animation.TranslateTimeline;
 import com.esotericsoftware.spine.Animation.TranslateXTimeline;
 import com.esotericsoftware.spine.Animation.TranslateYTimeline;
-import com.esotericsoftware.spine.BoneData.TransformMode;
+import com.esotericsoftware.spine.BoneData.Inherit;
 import com.esotericsoftware.spine.PathConstraintData.PositionMode;
 import com.esotericsoftware.spine.PathConstraintData.RotateMode;
 import com.esotericsoftware.spine.PathConstraintData.SpacingMode;
@@ -166,7 +167,7 @@ public class SkeletonJson extends SkeletonLoader {
 			data.scaleY = boneMap.getFloat("scaleY", 1);
 			data.shearX = boneMap.getFloat("shearX", 0);
 			data.shearY = boneMap.getFloat("shearY", 0);
-			data.transformMode = TransformMode.valueOf(boneMap.getString("transform", TransformMode.normal.name()));
+			data.inherit = Inherit.valueOf(boneMap.getString("inherit", Inherit.normal.name()));
 			data.skinRequired = boneMap.getBoolean("skin", false);
 
 			String color = boneMap.getString("color", null);
@@ -812,7 +813,14 @@ public class SkeletonJson extends SkeletonLoader {
 					timelines.add(readTimeline(keyMap, new ShearXTimeline(frames, frames, bone.index), 0, 1));
 				else if (timelineName.equals("sheary"))
 					timelines.add(readTimeline(keyMap, new ShearYTimeline(frames, frames, bone.index), 0, 1));
-				else
+				else if (timelineName.equals("inherit")) {
+					InheritTimeline timeline = new InheritTimeline(frames, bone.index);
+					for (int frame = 0; keyMap != null; keyMap = keyMap.next, frame++) {
+						float time = keyMap.getFloat("time", 0);
+						timeline.setFrame(frame, time, Inherit.valueOf(keyMap.getString("inherit", Inherit.normal.name())));
+					}
+					timelines.add(timeline);
+				} else
 					throw new RuntimeException("Invalid timeline type for a bone: " + timelineName + " (" + boneMap.name + ")");
 			}
 		}

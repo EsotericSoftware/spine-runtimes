@@ -52,6 +52,7 @@ import com.esotericsoftware.spine.Animation.DeformTimeline;
 import com.esotericsoftware.spine.Animation.DrawOrderTimeline;
 import com.esotericsoftware.spine.Animation.EventTimeline;
 import com.esotericsoftware.spine.Animation.IkConstraintTimeline;
+import com.esotericsoftware.spine.Animation.InheritTimeline;
 import com.esotericsoftware.spine.Animation.PathConstraintMixTimeline;
 import com.esotericsoftware.spine.Animation.PathConstraintPositionTimeline;
 import com.esotericsoftware.spine.Animation.PathConstraintSpacingTimeline;
@@ -80,7 +81,7 @@ import com.esotericsoftware.spine.Animation.TransformConstraintTimeline;
 import com.esotericsoftware.spine.Animation.TranslateTimeline;
 import com.esotericsoftware.spine.Animation.TranslateXTimeline;
 import com.esotericsoftware.spine.Animation.TranslateYTimeline;
-import com.esotericsoftware.spine.BoneData.TransformMode;
+import com.esotericsoftware.spine.BoneData.Inherit;
 import com.esotericsoftware.spine.PathConstraintData.PositionMode;
 import com.esotericsoftware.spine.PathConstraintData.RotateMode;
 import com.esotericsoftware.spine.PathConstraintData.SpacingMode;
@@ -113,6 +114,7 @@ public class SkeletonBinary extends SkeletonLoader {
 	static public final int BONE_SHEAR = 7;
 	static public final int BONE_SHEARX = 8;
 	static public final int BONE_SHEARY = 9;
+	static public final int BONE_INHERIT = 10;
 
 	static public final int SLOT_ATTACHMENT = 0;
 	static public final int SLOT_RGBA = 1;
@@ -209,7 +211,7 @@ public class SkeletonBinary extends SkeletonLoader {
 				data.shearX = input.readFloat();
 				data.shearY = input.readFloat();
 				data.length = input.readFloat() * scale;
-				data.transformMode = TransformMode.values[input.readInt(true)];
+				data.inherit = Inherit.values[input.readByte()];
 				data.skinRequired = input.readBoolean();
 				if (nonessential) {
 					Color.rgba8888ToColor(data.color, input.readInt());
@@ -844,7 +846,15 @@ public class SkeletonBinary extends SkeletonLoader {
 		for (int i = 0, n = input.readInt(true); i < n; i++) {
 			int boneIndex = input.readInt(true);
 			for (int ii = 0, nn = input.readInt(true); ii < nn; ii++) {
-				int type = input.readByte(), frameCount = input.readInt(true), bezierCount = input.readInt(true);
+				int type = input.readByte(), frameCount = input.readInt(true);
+				if (type == BONE_INHERIT) {
+					InheritTimeline timeline = new InheritTimeline(frameCount, boneIndex);
+					for (int frame = 0; frame < frameCount; frame++)
+						timeline.setFrame(frame, input.readFloat(), Inherit.values[input.readByte()]);
+					timelines.add(timeline);
+					continue;
+				}
+				int bezierCount = input.readInt(true);
 				switch (type) {
 				case BONE_ROTATE:
 					readTimeline(input, timelines, new RotateTimeline(frameCount, bezierCount, boneIndex), 1);

@@ -39,6 +39,7 @@ import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.ObjectSet;
 
+import com.esotericsoftware.spine.BoneData.Inherit;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.HasTextureRegion;
 import com.esotericsoftware.spine.attachments.Sequence;
@@ -173,7 +174,7 @@ public class Animation {
 	}
 
 	static private enum Property {
-		rotate, x, y, scaleX, scaleY, shearX, shearY, //
+		rotate, x, y, scaleX, scaleY, shearX, shearY, inherit, //
 		rgb, alpha, rgb2, //
 		attachment, deform, //
 		event, drawOrder, //
@@ -941,6 +942,50 @@ public class Animation {
 
 			Bone bone = skeleton.bones.get(boneIndex);
 			if (bone.active) bone.shearY = getRelativeValue(time, alpha, blend, bone.shearX, bone.data.shearY);
+		}
+	}
+
+	/** Changes a bone's {@link Bone#getInherit()}. */
+	static public class InheritTimeline extends Timeline implements BoneTimeline {
+		static public final int ENTRIES = 2;
+		static private final int INHERIT = 1;
+
+		final int boneIndex;
+
+		public InheritTimeline (int frameCount, int boneIndex) {
+			super(frameCount, Property.inherit.ordinal() + "|" + boneIndex);
+			this.boneIndex = boneIndex;
+		}
+
+		public int getBoneIndex () {
+			return boneIndex;
+		}
+
+		public int getFrameEntries () {
+			return ENTRIES;
+		}
+
+		/** Sets the transform mode for the specified frame.
+		 * @param frame Between 0 and <code>frameCount</code>, inclusive.
+		 * @param time The frame time in seconds. */
+		public void setFrame (int frame, float time, Inherit inherit) {
+			frame *= ENTRIES;
+			frames[frame] = time;
+			frames[frame + INHERIT] = inherit.ordinal();
+		}
+
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
+			MixDirection direction) {
+
+			Bone bone = skeleton.bones.get(boneIndex);
+			if (!bone.active) return;
+
+			float[] frames = this.frames;
+			if (time < frames[0]) {
+				if (blend == setup || blend == first) bone.inherit = bone.data.inherit;
+				return;
+			}
+			bone.inherit = Inherit.values[(int)frames[search(frames, time, ENTRIES) + INHERIT]];
 		}
 	}
 
