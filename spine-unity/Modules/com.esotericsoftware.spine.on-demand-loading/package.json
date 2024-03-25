@@ -2,7 +2,7 @@
 	"name": "com.esotericsoftware.spine.on-demand-loading",
 	"displayName": "Spine On-Demand Loading Extensions [Experimental]",
 	"description": "This experimental plugin provides a generic basic implementation of on-demand texture loading for the spine-unity runtime. You might want to use the available com.esotericsoftware.spine.addressables package which depends on this package.\nPlease be sure to test this package first and create backups of your project before using.\n\nPrerequisites:\nIt requires a working installation of the spine-unity runtime (via the spine-unity unitypackage), version 4.2.\n(See http://esotericsoftware.com/git/spine-runtimes/spine-unity)",
-	"version": "4.2.0-preview.3",
+	"version": "4.2.0-preview.4",
 	"unity": "2018.3",
 	"author": {
 		"name": "Esoteric Software",

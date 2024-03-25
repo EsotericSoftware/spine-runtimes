@@ -101,7 +101,7 @@ class Vec2 {
 /// Use the static methods [fromAsset], [fromFile], and [fromHttp] to load an atlas. Call [dispose]
 /// when the atlas is no longer in use to release its resources.
 class Atlas {
-  static FilterQuality filterQuality = FilterQuality.medium;
+  static FilterQuality filterQuality = FilterQuality.none;
   final spine_atlas _atlas;
   final List<Image> atlasPages;
   final List<Map<BlendMode, Paint>> atlasPagePaints;
@@ -183,6 +183,7 @@ class Atlas {
     for (final image in atlasPages) {
       image.dispose();
     }
+    atlasPagePaints.clear();
   }
 }
 

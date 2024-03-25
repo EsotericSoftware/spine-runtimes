@@ -186,7 +186,8 @@ namespace Spine.Unity.Editor {
 				}
 
 				string originalTextureName = System.IO.Path.GetFileNameWithoutExtension(originalPath);
-				string texturePath = string.Format("{0}/{1}.png", dataPath, loader.GetPlaceholderTextureName(originalTextureName));
+				string texturePath = string.Format("{0}/{1}.png",
+					dataPath, loader.GetPlaceholderTextureName(originalTextureName));
 				Texture placeholderTexture = AssetDatabase.LoadAssetAtPath<Texture>(texturePath);
 				if (placeholderTexture == null) {
 					AssetDatabase.CopyAsset(originalPath, texturePath);
@@ -203,18 +204,30 @@ namespace Spine.Unity.Editor {
 					importer.SaveAndReimport();
 
 					if (resizePhysically) {
+						bool hasOverrides = TextureImporterUtility.DisableOverrides(importer, out List<string> disabledPlatforms);
+
 						Texture2D texture2D = AssetDatabase.LoadAssetAtPath<Texture2D>(texturePath);
 						if (texture2D) {
 							Color[] maxTextureSizePixels = texture2D.GetPixels();
-							texture2D.SetPixels(maxTextureSizePixels);
 
-							var bytes = texture2D.EncodeToPNG();
+							// SetPixels supports only uncompressed textures using certain formats.
+							Texture2D uncompressedTexture =
+								new Texture2D(texture2D.width, texture2D.height, TextureFormat.RGBA32, false);
+							uncompressedTexture.SetPixels(maxTextureSizePixels);
+
+							byte[] bytes = uncompressedTexture.EncodeToPNG();
 							string targetPath = Application.dataPath + "/../" + texturePath;
 							System.IO.File.WriteAllBytes(targetPath, bytes);
-							texture2D.Apply(updateMipmaps: true, makeNoLongerReadable: true);
-							EditorUtility.SetDirty(texture2D);
+
+							importer.isReadable = false;
+							importer.SaveAndReimport();
+
+							EditorUtility.SetDirty(uncompressedTexture);
 							AssetDatabase.SaveAssets();
 						}
+
+						if (hasOverrides)
+							TextureImporterUtility.EnableOverrides(importer, disabledPlatforms);
 					}
 					placeholderTexture = AssetDatabase.LoadAssetAtPath<Texture>(texturePath);
 				}
@@ -374,7 +387,11 @@ namespace Spine.Unity.Editor {
 
 		public void DeletePlaceholderTextures (GenericOnDemandTextureLoader<TargetReference, TextureRequest> loader) {
 			foreach (var materialMap in loader.placeholderMap) {
-				Texture texture = materialMap.textures[0].placeholderTexture;
+				var textures = materialMap.textures;
+				if (textures == null || textures.Length == 0)
+					continue;
+
+				Texture texture = textures[0].placeholderTexture;
 				if (texture)
 					AssetDatabase.DeleteAsset(AssetDatabase.GetAssetPath(texture));
 			}

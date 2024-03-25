@@ -48,7 +48,7 @@ public class SkeletonData {
 	final Array<TransformConstraintData> transformConstraints = new Array();
 	final Array<PathConstraintData> pathConstraints = new Array();
 	final Array<PhysicsConstraintData> physicsConstraints = new Array();
-	float x, y, width, height;
+	float x, y, width, height, referenceScale = 100;
 	@Null String version, hash;
 
 	// Nonessential.
@@ -281,6 +281,16 @@ public class SkeletonData {
 
 	public void setHeight (float height) {
 		this.height = height;
+	}
+
+	/** Baseline scale factor for applying physics and other effects based on distance to non-scalable properties, such as angle or
+	 * scale. Default is 100. */
+	public float getReferenceScale () {
+		return referenceScale;
+	}
+
+	public void setReferenceScale (float referenceScale) {
+		this.referenceScale = referenceScale;
 	}
 
 	/** The Spine version used to export the skeleton data, or null. */

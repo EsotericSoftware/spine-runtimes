@@ -137,7 +137,9 @@ export class Spine extends Container {
 
 	protected internalUpdate (_deltaFrame: number, deltaSeconds?: number): void {
 		// Because reasons, pixi uses deltaFrames at 60fps. We ignore the default deltaFrames and use the deltaSeconds from pixi ticker.
-		this.state.update(deltaSeconds ?? Ticker.shared.deltaMS / 1000);
+		const delta = deltaSeconds ?? Ticker.shared.deltaMS / 1000;
+		this.state.update(delta);
+		this.skeleton.update(delta);
 	}
 
 	public override updateTransform (): void {

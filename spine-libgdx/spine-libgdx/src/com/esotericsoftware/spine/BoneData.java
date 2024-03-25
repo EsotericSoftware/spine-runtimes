@@ -41,7 +41,7 @@ public class BoneData {
 	@Null final BoneData parent;
 	float length;
 	float x, y, rotation, scaleX = 1, scaleY = 1, shearX, shearY;
-	TransformMode transformMode = TransformMode.normal;
+	Inherit inherit = Inherit.normal;
 	boolean skinRequired;
 
 	// Nonessential.
@@ -169,14 +169,14 @@ public class BoneData {
 		this.shearY = shearY;
 	}
 
-	/** The transform mode for how parent world transforms affect this bone. */
-	public TransformMode getTransformMode () {
-		return transformMode;
+	/** Determines how parent world transforms affect this bone. */
+	public Inherit getInherit () {
+		return inherit;
 	}
 
-	public void setTransformMode (TransformMode transformMode) {
-		if (transformMode == null) throw new IllegalArgumentException("transformMode cannot be null.");
-		this.transformMode = transformMode;
+	public void setInherit (Inherit inherit) {
+		if (inherit == null) throw new IllegalArgumentException("inherit cannot be null.");
+		this.inherit = inherit;
 	}
 
 	/** When true, {@link Skeleton#updateWorldTransform(Physics)} only updates this bone if the {@link Skeleton#getSkin()} contains
@@ -220,9 +220,9 @@ public class BoneData {
 	}
 
 	/** Determines how a bone inherits world transforms from parent bones. */
-	static public enum TransformMode {
+	static public enum Inherit {
 		normal, onlyTranslation, noRotationOrReflection, noScale, noScaleOrReflection;
 
-		static public final TransformMode[] values = TransformMode.values();
+		static public final Inherit[] values = Inherit.values();
 	}
 }

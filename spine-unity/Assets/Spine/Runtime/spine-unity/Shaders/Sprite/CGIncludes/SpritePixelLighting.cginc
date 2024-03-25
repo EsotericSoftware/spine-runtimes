@@ -148,7 +148,8 @@ VertexOutput vert(VertexInput v)
 	output.pos = calculateLocalPos(v.vertex);
 	output.color = calculateVertexColor(v.color);
 #if defined(_TINT_BLACK_ON)
-	output.darkColor = GammaToTargetSpace(half3(v.tintBlackRG.r, v.tintBlackRG.g, v.tintBlackB.r)) + _Black.rgb;
+	output.darkColor = GammaToTargetSpace(half3(v.tintBlackRG.r, v.tintBlackRG.g, v.tintBlackB.r))
+		+ (_Black.rgb * v.color.a);
 #endif
 	output.texcoord = calculateTextureCoord(v.texcoord);
 	output.posWorld = calculateWorldPos(v.vertex);

@@ -1,7 +1,7 @@
 {
 "skeleton": {
-	"hash": "Efa1/KeUOoY",
-	"spine": "4.2.09-beta",
+	"hash": "1GKrwevyJb4",
+	"spine": "4.2.43-beta",
 	"x": -85.7,
 	"y": -0.02,
 	"width": 321.77,
@@ -309,7 +309,7 @@
 	},
 	{
 		"name": "weapon/morningstar",
-		"bones": [ "weapon-morningstar", "weapon-morningstar-physics1", "weapon-morningstar-physics3", "chain2", "chain1", "chain8", "weapon-morningstar-physics2", "chain3", "chain4", "chain5", "weapon-morningstar-physics4", "chain6", "chain7" ],
+		"bones": [ "chain1", "chain2", "chain3", "chain4", "chain5", "chain6", "chain7", "chain8", "weapon-morningstar", "weapon-morningstar-physics1", "weapon-morningstar-physics2", "weapon-morningstar-physics3", "weapon-morningstar-physics4" ],
 		"path": [ "weapon-morningstar" ]
 	},
 	{

@@ -46,6 +46,14 @@ rm -f "$ROOT/spine-libgdx/spine-libgdx-tests/assets/celestial-circus/"*
 mkdir -p "$ROOT/spine-libgdx/spine-libgdx-tests/assets/celestial-circus/"
 cp -f ../celestial-circus/export/* "$ROOT/spine-libgdx/spine-libgdx-tests/assets/celestial-circus/"
 
+rm -f "$ROOT/spine-libgdx/spine-libgdx-tests/assets/snowglobe/"*
+mkdir -p "$ROOT/spine-libgdx/spine-libgdx-tests/assets/snowglobe/"
+cp -f ../snowglobe/export/* "$ROOT/spine-libgdx/spine-libgdx-tests/assets/snowglobe/"
+
+rm -f "$ROOT/spine-libgdx/spine-libgdx-tests/assets/cloud-pot/"*
+mkdir -p "$ROOT/spine-libgdx/spine-libgdx-tests/assets/cloud-pot/"
+cp -f ../cloud-pot/export/* "$ROOT/spine-libgdx/spine-libgdx-tests/assets/cloud-pot/"
+
 echo "spine-cocos2d-objc"
 rm "$ROOT/spine-cocos2d-objc/Resources/"*
 
@@ -310,6 +318,15 @@ cp -f ../coin/export/coin-pro.skel "$ROOT/spine-ts/spine-webgl/example/assets/"
 cp -f ../coin/export/coin-pma.atlas "$ROOT/spine-ts/spine-webgl/example/assets/"
 cp -f ../coin/export/coin-pma.png "$ROOT/spine-ts/spine-webgl/example/assets/"
 
+cp -f ../cloud-pot/export/cloud-pot.json "$ROOT/spine-ts/spine-webgl/example/assets/"
+cp -f ../cloud-pot/export/cloud-pot.skel "$ROOT/spine-ts/spine-webgl/example/assets/"
+cp -f ../cloud-pot/export/cloud-pot-pma.atlas "$ROOT/spine-ts/spine-webgl/example/assets/"
+cp -f ../cloud-pot/export/cloud-pot-pma.png "$ROOT/spine-ts/spine-webgl/example/assets/"
+
+cp -f ../snowglobe/export/snowglobe-pro.json "$ROOT/spine-ts/spine-webgl/example/assets/"
+cp -f ../snowglobe/export/snowglobe-pro.skel "$ROOT/spine-ts/spine-webgl/example/assets/"
+cp -f ../snowglobe/export/snowglobe-pma* "$ROOT/spine-ts/spine-webgl/example/assets/"
+
 cp -f ../goblins/export/goblins-pro.json "$ROOT/spine-ts/spine-webgl/example/assets/"
 cp -f ../goblins/export/goblins-pro.skel "$ROOT/spine-ts/spine-webgl/example/assets/"
 cp -f ../goblins/export/goblins-pma.atlas "$ROOT/spine-ts/spine-webgl/example/assets/"
@@ -432,6 +449,22 @@ cp -f ../stretchyman/export/stretchyman-pma.png "$ROOT/spine-ts/spine-pixi/examp
 cp -f ../mix-and-match/export/mix-and-match-pro.skel "$ROOT/spine-ts/spine-pixi/example/assets/"
 cp -f ../mix-and-match/export/mix-and-match-pma.atlas "$ROOT/spine-ts/spine-pixi/example/assets/"
 cp -f ../mix-and-match/export/mix-and-match-pma.png "$ROOT/spine-ts/spine-pixi/example/assets/"
+
+cp -f ../celestial-circus/export/* "$ROOT/spine-ts/spine-pixi/example/assets/"
+
+cp -f ../cloud-pot/export/cloud-pot.json "$ROOT/spine-ts/spine-pixi/example/assets/"
+cp -f ../cloud-pot/export/cloud-pot.skel "$ROOT/spine-ts/spine-pixi/example/assets/"
+cp -f ../cloud-pot/export/cloud-pot-pma.atlas "$ROOT/spine-ts/spine-pixi/example/assets/"
+cp -f ../cloud-pot/export/cloud-pot-pma.png "$ROOT/spine-ts/spine-pixi/example/assets/"
+
+cp -f ../sack/export/sack-pro.json "$ROOT/spine-ts/spine-pixi/example/assets/"
+cp -f ../sack/export/sack-pro.skel "$ROOT/spine-ts/spine-pixi/example/assets/"
+cp -f ../sack/export/sack-pma.atlas "$ROOT/spine-ts/spine-pixi/example/assets/"
+cp -f ../sack/export/sack-pma.png "$ROOT/spine-ts/spine-pixi/example/assets/"
+
+cp -f ../snowglobe/export/snowglobe-pro.json "$ROOT/spine-ts/spine-pixi/example/assets/"
+cp -f ../snowglobe/export/snowglobe-pro.skel "$ROOT/spine-ts/spine-pixi/example/assets/"
+cp -f ../snowglobe/export/snowglobe-pma* "$ROOT/spine-ts/spine-pixi/example/assets/"
 
 echo "spine-monogame"
 rm "$ROOT/spine-monogame/spine-monogame-example/data/"*

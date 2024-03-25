@@ -33,6 +33,7 @@ import static com.esotericsoftware.spine.utils.SpineUtils.*;
 
 import com.badlogic.gdx.utils.Array;
 
+import com.esotericsoftware.spine.BoneData.Inherit;
 import com.esotericsoftware.spine.Skeleton.Physics;
 
 /** Stores the current pose for an IK constraint. An IK constraint adjusts the rotation of 1 or 2 constrained bones so the tip of
@@ -189,7 +190,7 @@ public class IkConstraint implements Updatable {
 		Bone p = bone.parent;
 		float pa = p.a, pb = p.b, pc = p.c, pd = p.d;
 		float rotationIK = -bone.ashearX - bone.arotation, tx, ty;
-		switch (bone.data.transformMode) {
+		switch (bone.inherit) {
 		case onlyTranslation:
 			tx = (targetX - bone.worldX) * Math.signum(bone.skeleton.scaleX);
 			ty = (targetY - bone.worldY) * Math.signum(bone.skeleton.scaleY);
@@ -221,7 +222,7 @@ public class IkConstraint implements Updatable {
 			rotationIK += 360;
 		float sx = bone.ascaleX, sy = bone.ascaleY;
 		if (compress || stretch) {
-			switch (bone.data.transformMode) {
+			switch (bone.inherit) {
 			case noScale:
 			case noScaleOrReflection:
 				tx = targetX - bone.worldX;
@@ -246,6 +247,7 @@ public class IkConstraint implements Updatable {
 		float softness, float alpha) {
 		if (parent == null) throw new IllegalArgumentException("parent cannot be null.");
 		if (child == null) throw new IllegalArgumentException("child cannot be null.");
+		if (parent.inherit != Inherit.normal || child.inherit != Inherit.normal) return;
 		float px = parent.ax, py = parent.ay, psx = parent.ascaleX, psy = parent.ascaleY, sx = psx, sy = psy, csx = child.ascaleX;
 		int os1, os2, s2;
 		if (psx < 0) {

@@ -37,7 +37,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Null;
 
-import com.esotericsoftware.spine.BoneData.TransformMode;
+import com.esotericsoftware.spine.BoneData.Inherit;
 import com.esotericsoftware.spine.Skeleton.Physics;
 
 /** Stores a bone's current pose.
@@ -54,6 +54,7 @@ public class Bone implements Updatable {
 	float ax, ay, arotation, ascaleX, ascaleY, ashearX, ashearY;
 	float a, b, worldX;
 	float c, d, worldY;
+	Inherit inherit;
 
 	boolean sorted, active;
 
@@ -80,6 +81,7 @@ public class Bone implements Updatable {
 		scaleY = bone.scaleY;
 		shearX = bone.shearX;
 		shearY = bone.shearY;
+		inherit = bone.inherit;
 	}
 
 	/** Computes the world transform using the parent bone and this bone's local applied transform. */
@@ -127,7 +129,7 @@ public class Bone implements Updatable {
 		worldX = pa * x + pb * y + parent.worldX;
 		worldY = pc * x + pd * y + parent.worldY;
 
-		switch (data.transformMode) {
+		switch (inherit) {
 		case normal: {
 			float rx = (rotation + shearX) * degRad;
 			float ry = (rotation + 90 + shearY) * degRad;
@@ -187,8 +189,7 @@ public class Bone implements Updatable {
 			za *= s;
 			zc *= s;
 			s = (float)Math.sqrt(za * za + zc * zc);
-			if (data.transformMode == TransformMode.noScale
-				&& (pa * pd - pb * pc < 0) != (skeleton.scaleX < 0 != skeleton.scaleY < 0)) s = -s;
+			if (inherit == Inherit.noScale && (pa * pd - pb * pc < 0) != (skeleton.scaleX < 0 != skeleton.scaleY < 0)) s = -s;
 			rotation = PI / 2 + atan2(zc, za);
 			float zb = cos(rotation) * s;
 			float zd = sin(rotation) * s;
@@ -219,6 +220,7 @@ public class Bone implements Updatable {
 		scaleY = data.scaleY;
 		shearX = data.shearX;
 		shearY = data.shearY;
+		inherit = data.inherit;
 	}
 
 	/** The bone's setup pose data. */
@@ -325,6 +327,16 @@ public class Bone implements Updatable {
 		this.shearY = shearY;
 	}
 
+	/** Controls how parent world transforms affect this bone. */
+	public Inherit getInherit () {
+		return inherit;
+	}
+
+	public void setInherit (Inherit inherit) {
+		if (inherit == null) throw new IllegalArgumentException("inherit cannot be null.");
+		this.inherit = inherit;
+	}
+
 	// -- Applied transform
 
 	/** The applied local x translation. */
@@ -420,13 +432,13 @@ public class Bone implements Updatable {
 		ay = (dy * id - dx * ic);
 
 		float ra, rb, rc, rd;
-		if (data.transformMode == TransformMode.onlyTranslation) {
+		if (inherit == Inherit.onlyTranslation) {
 			ra = a;
 			rb = b;
 			rc = c;
 			rd = d;
 		} else {
-			switch (data.transformMode) {
+			switch (inherit) {
 			case noRotationOrReflection: {
 				float s = Math.abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
 				float sa = pa / skeleton.scaleX;
@@ -448,7 +460,7 @@ public class Bone implements Updatable {
 				pa *= s;
 				pc *= s;
 				s = (float)Math.sqrt(pa * pa + pc * pc);
-				if (data.transformMode == TransformMode.noScale && pid < 0 != (skeleton.scaleX < 0 != skeleton.scaleY < 0)) s = -s;
+				if (inherit == Inherit.noScale && pid < 0 != (skeleton.scaleX < 0 != skeleton.scaleY < 0)) s = -s;
 				r = PI / 2 + atan2(pc, pa);
 				pb = cos(r) * s;
 				pd = sin(r) * s;

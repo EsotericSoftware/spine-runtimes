@@ -80,17 +80,16 @@ namespace Spine.Unity {
 		[System.Serializable]
 		public struct Settings {
 			public bool useClipping;
-			[Space]
 			[Range(-0.1f, 0f)] public float zSpacing;
-			[Space]
-			[Header("Vertex Data")]
-			public bool pmaVertexColors;
 			public bool tintBlack;
-			[Tooltip("Enable when using Additive blend mode at SkeletonGraphic under a CanvasGroup. " +
-				"When enabled, Additive alpha value is stored at uv2.g instead of color.a to capture CanvasGroup modifying color.a.")]
-			public bool canvasGroupTintBlack;
-			public bool calculateTangents;
+			[UnityEngine.Serialization.FormerlySerializedAs("canvasGroupTintBlack")]
+			[Tooltip("Enable when using SkeletonGraphic under a CanvasGroup. " +
+				"When enabled, PMA Vertex Color alpha value is stored at uv2.g instead of color.a to capture " +
+				"CanvasGroup modifying color.a. Also helps to detect correct parameter setting combinations.")]
+			public bool canvasGroupCompatible;
+			public bool pmaVertexColors;
 			public bool addNormals;
+			public bool calculateTangents;
 			public bool immutableTriangles;
 
 			static public Settings Default {
@@ -548,7 +547,7 @@ namespace Spine.Unity {
 #else
 			bool useClipping = settings.useClipping;
 #endif
-			bool canvasGroupTintBlack = settings.tintBlack && settings.canvasGroupTintBlack;
+			bool canvasGroupTintBlack = settings.tintBlack && settings.canvasGroupCompatible;
 
 			if (useClipping) {
 				if (instruction.preActiveClippingSlotSource >= 0) {
@@ -619,13 +618,12 @@ namespace Spine.Unity {
 					color.r = (byte)(skeletonR * slot.R * c.r * color.a);
 					color.g = (byte)(skeletonG * slot.G * c.g * color.a);
 					color.b = (byte)(skeletonB * slot.B * c.b * color.a);
-					if (slot.Data.BlendMode == BlendMode.Additive) {
-						if (canvasGroupTintBlack)
-							tintBlackAlpha = 0;
-						else
+					if (canvasGroupTintBlack) {
+						tintBlackAlpha = (slot.Data.BlendMode == BlendMode.Additive) ? 0 : colorA;
+						color.a = 255;
+					} else {
+						if (slot.Data.BlendMode == BlendMode.Additive)
 							color.a = 0;
-					} else if (canvasGroupTintBlack) { // other blend modes
-						tintBlackAlpha = colorA;
 					}
 				} else {
 					color.a = (byte)(skeletonA * slot.A * c.a * 255);
@@ -759,7 +757,7 @@ namespace Spine.Unity {
 		// Use this faster method when no clipping is involved.
 		public void BuildMeshWithArrays (SkeletonRendererInstruction instruction, bool updateTriangles) {
 			Settings settings = this.settings;
-			bool canvasGroupTintBlack = settings.tintBlack && settings.canvasGroupTintBlack;
+			bool canvasGroupTintBlack = settings.tintBlack && settings.canvasGroupCompatible;
 			int totalVertexCount = instruction.rawVertexCount;
 
 			// Add data to vertex buffers
@@ -882,7 +880,9 @@ namespace Spine.Unity {
 							color.r = (byte)(r * slot.R * regionAttachment.R * color.a);
 							color.g = (byte)(g * slot.G * regionAttachment.G * color.a);
 							color.b = (byte)(b * slot.B * regionAttachment.B * color.a);
-							if (slot.Data.BlendMode == BlendMode.Additive && !canvasGroupTintBlack) color.a = 0;
+							if (canvasGroupTintBlack) color.a = 255;
+							else if (slot.Data.BlendMode == BlendMode.Additive) color.a = 0;
+
 						} else {
 							color.a = (byte)(a * slot.A * regionAttachment.A * 255);
 							color.r = (byte)(r * slot.R * regionAttachment.R * 255);
@@ -929,7 +929,8 @@ namespace Spine.Unity {
 								color.r = (byte)(r * slot.R * meshAttachment.R * color.a);
 								color.g = (byte)(g * slot.G * meshAttachment.G * color.a);
 								color.b = (byte)(b * slot.B * meshAttachment.B * color.a);
-								if (slot.Data.BlendMode == BlendMode.Additive && !canvasGroupTintBlack) color.a = 0;
+								if (canvasGroupTintBlack) color.a = 255;
+								else if (slot.Data.BlendMode == BlendMode.Additive) color.a = 0;
 							} else {
 								color.a = (byte)(a * slot.A * meshAttachment.A * 255);
 								color.r = (byte)(r * slot.R * meshAttachment.R * 255);

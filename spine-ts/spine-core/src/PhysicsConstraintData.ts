@@ -48,6 +48,7 @@ export class PhysicsConstraintData extends ConstraintData {
 	rotate = 0;
 	scaleX = 0;
 	shearX = 0;
+	limit = 0;
 	step = 0;
 	inertia = 0;
 	strength = 0;

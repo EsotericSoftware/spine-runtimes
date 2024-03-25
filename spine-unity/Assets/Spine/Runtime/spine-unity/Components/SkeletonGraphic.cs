@@ -60,6 +60,13 @@ namespace Spine.Unity {
 		public Material multiplyMaterial;
 		public Material screenMaterial;
 
+		/// <summary>Own color to replace <c>Graphic.m_Color</c>.</summary>
+		[UnityEngine.Serialization.FormerlySerializedAs("m_Color")]
+		[SerializeField] protected Color m_SkeletonColor = Color.white;
+		/// <summary>Sets the color of the skeleton. Does not call <see cref="Rebuild"/> and <see cref="UpdateMesh"/>
+		/// unnecessarily as <c>Graphic.color</c> would otherwise do.</summary>
+		override public Color color { get { return m_SkeletonColor; } set { m_SkeletonColor = value; } }
+
 		[SpineSkin(dataField: "skeletonDataAsset", defaultAsEmptyString: true)]
 		public string initialSkinName;
 		public bool initialFlipX, initialFlipY;
@@ -121,7 +128,6 @@ namespace Spine.Unity {
 		public bool updateSeparatorPartScale = false;
 
 		private bool wasUpdatedAfterInit = true;
-		private bool requiresInstructionUpate = true;
 		private Texture baseTexture = null;
 
 #if UNITY_EDITOR
@@ -315,7 +321,7 @@ namespace Spine.Unity {
 			if (!this.IsValid) return;
 			if (canvasRenderer.cull) return;
 			if (update == CanvasUpdate.PreRender) {
-				if (requiresInstructionUpate) PrepareInstructionsAndRenderers(isInRebuild: true);
+				PrepareInstructionsAndRenderers(isInRebuild: true);
 				UpdateMeshToInstructions();
 			}
 			if (allowMultipleCanvasRenderers) canvasRenderer.Clear();
@@ -478,9 +484,7 @@ namespace Spine.Unity {
 			if (updateTiming == UpdateTiming.InLateUpdate)
 				Update(unscaledTime ? Time.unscaledDeltaTime : Time.deltaTime);
 
-			PrepareInstructionsAndRenderers();
-
-			SetVerticesDirty(); // triggers Rebuild and avoids potential double-update in a single frame
+			UpdateMesh();
 		}
 
 		protected void OnCullStateChanged (bool culled) {
@@ -527,11 +531,9 @@ namespace Spine.Unity {
 		public Skeleton Skeleton {
 			get {
 				Initialize(false);
-				requiresInstructionUpate = true;
 				return skeleton;
 			}
 			set {
-				requiresInstructionUpate = true;
 				skeleton = value;
 			}
 		}
@@ -666,7 +668,7 @@ namespace Spine.Unity {
 			if (mesh == null) {
 				return false;
 			}
-			if (mesh.vertexCount == 0) {
+			if (mesh.vertexCount == 0 || mesh.bounds.size == Vector3.zero) {
 				this.rectTransform.sizeDelta = new Vector2(50f, 50f);
 				this.rectTransform.pivot = new Vector2(0.5f, 0.5f);
 				return false;
@@ -698,7 +700,7 @@ namespace Spine.Unity {
 				}
 			}
 
-			if (!anyBoundsAdded) {
+			if (!anyBoundsAdded || combinedBounds.size == Vector3.zero) {
 				this.rectTransform.sizeDelta = new Vector2(50f, 50f);
 				this.rectTransform.pivot = new Vector2(0.5f, 0.5f);
 				return false;
@@ -850,7 +852,6 @@ namespace Spine.Unity {
 		}
 
 		public void PrepareInstructionsAndRenderers (bool isInRebuild = false) {
-			requiresInstructionUpate = false;
 			if (!this.allowMultipleCanvasRenderers) {
 				MeshGenerator.GenerateSingleSubmeshInstruction(currentInstructions, skeleton, null);
 				if (canvasRenderers.Count > 0)

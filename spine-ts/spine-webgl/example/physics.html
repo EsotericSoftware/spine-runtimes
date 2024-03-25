@@ -45,7 +45,7 @@
 				var skeletonData = skeletonBinary.readSkeletonData(assetManager.require("assets/sack-pro.skel"));
 				this.skeleton = new spine.Skeleton(skeletonData);
 
-				// Create an AnimationState, and set the "run" animation in looping mode.
+				// Create an AnimationState, and set the "FOA" animation in looping mode.
 				var animationStateData = new spine.AnimationStateData(skeletonData);
 				this.animationState = new spine.AnimationState(animationStateData);
 				this.animationState.setAnimation(0, "FOA", true);

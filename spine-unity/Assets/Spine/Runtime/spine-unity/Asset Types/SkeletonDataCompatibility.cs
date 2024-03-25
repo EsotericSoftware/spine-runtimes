@@ -163,6 +163,12 @@ namespace Spine.Unity {
 
 		public static bool IsJsonFile (TextAsset file) {
 			byte[] content = file.bytes;
+
+			// check for binary skeleton version number string, starts after 8 byte hash
+			char majorVersionChar = compatibleBinaryVersions[0][0].ToString()[0];
+			if (content.Length > 10 && content[9] == majorVersionChar && content[10] == '.')
+				return false;
+
 			const int maxCharsToCheck = 256;
 			int numCharsToCheck = Math.Min(content.Length, maxCharsToCheck);
 			int i = 0;

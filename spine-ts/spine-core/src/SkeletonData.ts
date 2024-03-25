@@ -49,8 +49,9 @@ export class SkeletonData {
 	/** The skeleton's bones, sorted parent first. The root bone is always the first bone. */
 	bones = new Array<BoneData>(); // Ordered parents first.
 
-	/** The skeleton's slots. */
+	/** The skeleton's slots in the setup pose draw order. */
 	slots = new Array<SlotData>(); // Setup pose draw order.
+
 	skins = new Array<Skin>();
 
 	/** The skeleton's default skin. By default this skin contains all attachments that were not in a skin in Spine.
@@ -88,6 +89,10 @@ export class SkeletonData {
 
 	/** The height of the skeleton's axis aligned bounding box in the setup pose. */
 	height: number = 0;
+
+	/** Baseline scale factor for applying distance-dependent effects on non-scalable properties, such as angle or scale. Default
+	 * is 100. */
+	referenceScale = 100;
 
 	/** The Spine version used to export the skeleton data, or null. */
 	version: string | null = null;

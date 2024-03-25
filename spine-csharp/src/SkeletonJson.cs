@@ -108,6 +108,7 @@ namespace Spine {
 				skeletonData.y = GetFloat(skeletonMap, "y", 0);
 				skeletonData.width = GetFloat(skeletonMap, "width", 0);
 				skeletonData.height = GetFloat(skeletonMap, "height", 0);
+				skeletonData.referenceScale = GetFloat(skeletonMap, "referenceScale", 100) * scale;
 				skeletonData.fps = GetFloat(skeletonMap, "fps", 30);
 				skeletonData.imagesPath = GetString(skeletonMap, "images", null);
 				skeletonData.audioPath = GetString(skeletonMap, "audio", null);
@@ -302,13 +303,14 @@ namespace Spine {
 					data.rotate = GetFloat(constraintMap, "rotate", 0);
 					data.scaleX = GetFloat(constraintMap, "scaleX", 0);
 					data.shearX = GetFloat(constraintMap, "shearX", 0);
+					data.limit = GetFloat(constraintMap, "limit", 5000) * scale;
 					data.step = 1f / GetInt(constraintMap, "fps", 60);
 					data.inertia = GetFloat(constraintMap, "inertia", 1);
 					data.strength = GetFloat(constraintMap, "strength", 100);
 					data.damping = GetFloat(constraintMap, "damping", 1);
 					data.massInverse = 1f / GetFloat(constraintMap, "mass", 1);
-					data.wind = GetFloat(constraintMap, "wind", 0) * scale;
-					data.gravity = GetFloat(constraintMap, "gravity", 0) * scale;
+					data.wind = GetFloat(constraintMap, "wind", 0);
+					data.gravity = GetFloat(constraintMap, "gravity", 0);
 					data.mix = GetFloat(constraintMap, "mix", 1);
 					data.inertiaGlobal = GetBoolean(constraintMap, "inertiaGlobal", false);
 					data.strengthGlobal = GetBoolean(constraintMap, "strengthGlobal", false);
@@ -1044,7 +1046,6 @@ namespace Spine {
 						}
 
 						CurveTimeline1 timeline;
-						float timelineScale = 1.0f;
 						if (timelineName == "inertia")
 							timeline = new PhysicsConstraintInertiaTimeline(frames, frames, index);
 						else if (timelineName == "strength")
@@ -1053,17 +1054,15 @@ namespace Spine {
 							timeline = new PhysicsConstraintDampingTimeline(frames, frames, index);
 						else if (timelineName == "mass")
 							timeline = new PhysicsConstraintMassTimeline(frames, frames, index);
-						else if (timelineName == "wind") {
+						else if (timelineName == "wind")
 							timeline = new PhysicsConstraintWindTimeline(frames, frames, index);
-							timelineScale = scale;
-						} else if (timelineName == "gravity") {
+						else if (timelineName == "gravity")
 							timeline = new PhysicsConstraintGravityTimeline(frames, frames, index);
-							timelineScale = scale;
-						} else if (timelineName == "mix") //
+						else if (timelineName == "mix") //
 							timeline = new PhysicsConstraintMixTimeline(frames, frames, index);
 						else
 							continue;
-						timelines.Add(ReadTimeline(ref keyMapEnumerator, timeline, 0, timelineScale));
+						timelines.Add(ReadTimeline(ref keyMapEnumerator, timeline, 0, 1));
 					}
 				}
 			}
@@ -1336,8 +1335,8 @@ namespace Spine {
 		}
 
 		static float ToColor (string hexString, int colorIndex, int expectedLength = 8) {
-			if (hexString.Length != expectedLength)
-				throw new ArgumentException("Color hexidecimal length must be " + expectedLength + ", recieved: " + hexString, "hexString");
+			if (hexString.Length < expectedLength)
+				throw new ArgumentException("Color hexadecimal length must be " + expectedLength + ", received: " + hexString, "hexString");
 			return Convert.ToInt32(hexString.Substring(colorIndex * 2, 2), 16) / (float)255;
 		}
 

@@ -141,7 +141,8 @@ public class PhysicsConstraint implements Updatable {
 			reset();
 			// Fall through.
 		case update:
-			remaining += Math.max(skeleton.time - lastTime, 0);
+			float delta = Math.max(skeleton.time - lastTime, 0);
+			remaining += delta;
 			lastTime = skeleton.time;
 
 			float bx = bone.worldX, by = bone.worldY;
@@ -150,41 +151,52 @@ public class PhysicsConstraint implements Updatable {
 				ux = bx;
 				uy = by;
 			} else {
-				float remaining = this.remaining, i = inertia, step = data.step;
+				float a = remaining, i = inertia, q = data.limit * delta, t = data.step, f = skeleton.data.referenceScale, d = -1;
 				if (x || y) {
 					if (x) {
-						xOffset += (ux - bx) * i;
+						float u = (ux - bx) * i;
+						xOffset += u > q ? q : u < -q ? -q : u;
 						ux = bx;
 					}
 					if (y) {
-						yOffset += (uy - by) * i;
+						float u = (uy - by) * i;
+						yOffset += u > q ? q : u < -q ? -q : u;
 						uy = by;
 					}
-					if (remaining >= step) {
-						float m = massInverse * step, e = strength, w = wind * 100, g = gravity * -100;
-						float d = (float)Math.pow(damping, 60 * step);
+					if (a >= t) {
+						d = (float)Math.pow(damping, 60 * t);
+						float m = massInverse * t, e = strength, w = wind * f, g = gravity * f;
 						do {
 							if (x) {
 								xVelocity += (w - xOffset * e) * m;
-								xOffset += xVelocity * step;
+								xOffset += xVelocity * t;
 								xVelocity *= d;
 							}
 							if (y) {
-								yVelocity += (g - yOffset * e) * m;
-								yOffset += yVelocity * step;
+								yVelocity -= (g + yOffset * e) * m;
+								yOffset += yVelocity * t;
 								yVelocity *= d;
 							}
-							remaining -= step;
-						} while (remaining >= step);
+							a -= t;
+						} while (a >= t);
 					}
 					if (x) bone.worldX += xOffset * mix * data.x;
 					if (y) bone.worldY += yOffset * mix * data.y;
 				}
 				if (rotateOrShearX || scaleX) {
 					float ca = atan2(bone.c, bone.a), c, s, mr = 0;
+					float dx = cx - bone.worldX, dy = cy - bone.worldY;
+					if (dx > q)
+						dx = q;
+					else if (dx < -q) //
+						dx = -q;
+					if (dy > q)
+						dy = q;
+					else if (dy < -q) //
+						dy = -q;
 					if (rotateOrShearX) {
 						mr = (data.rotate + data.shearX) * mix;
-						float dx = cx - bone.worldX, dy = cy - bone.worldY, r = atan2(dy + ty, dx + tx) - ca - rotateOffset * mr;
+						float r = atan2(dy + ty, dx + tx) - ca - rotateOffset * mr;
 						rotateOffset += (r - (float)Math.ceil(r * invPI2 - 0.5f) * PI2) * i;
 						r = rotateOffset * mr + ca;
 						c = cos(r);
@@ -197,33 +209,33 @@ public class PhysicsConstraint implements Updatable {
 						c = cos(ca);
 						s = sin(ca);
 						float r = l * bone.getWorldScaleX();
-						if (r > 0) scaleOffset += ((cx - bone.worldX) * c + (cy - bone.worldY) * s) * i / r;
+						if (r > 0) scaleOffset += (dx * c + dy * s) * i / r;
 					}
-					remaining = this.remaining;
-					if (remaining >= step) {
-						float m = massInverse * step, e = strength, w = wind, g = gravity;
-						float d = (float)Math.pow(damping, 60 * step);
+					a = remaining;
+					if (a >= t) {
+						if (d == -1) d = (float)Math.pow(damping, 60 * t);
+						float m = massInverse * t, e = strength, w = wind, g = gravity, h = l / f;
 						while (true) {
-							remaining -= step;
+							a -= t;
 							if (scaleX) {
 								scaleVelocity += (w * c - g * s - scaleOffset * e) * m;
-								scaleOffset += scaleVelocity * step;
+								scaleOffset += scaleVelocity * t;
 								scaleVelocity *= d;
 							}
 							if (rotateOrShearX) {
-								rotateVelocity += (-0.01f * l * (w * s + g * c) - rotateOffset * e) * m;
-								rotateOffset += rotateVelocity * step;
+								rotateVelocity -= ((w * s + g * c) * h + rotateOffset * e) * m;
+								rotateOffset += rotateVelocity * t;
 								rotateVelocity *= d;
-								if (remaining < step) break;
+								if (a < t) break;
 								float r = rotateOffset * mr + ca;
 								c = cos(r);
 								s = sin(r);
-							} else if (remaining < step) //
+							} else if (a < t) //
 								break;
 						}
 					}
 				}
-				this.remaining = remaining;
+				remaining = a;
 			}
 			cx = bone.worldX;
 			cy = bone.worldY;

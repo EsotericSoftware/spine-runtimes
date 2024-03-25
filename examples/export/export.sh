@@ -6,7 +6,7 @@ set -e
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 cd "$SCRIPT_DIR"
 
-SPINE_EXE="C:/Program Files/Spine/Spine.com"
+SPINE_EXE="C:/Dev/spine/other/installs/Spine/Spine.com"
 if [ ! -f "$SPINE_EXE" ]; then
    SPINE_EXE="/mnt/c/Program Files/Spine/Spine.com"
 fi
@@ -41,6 +41,8 @@ rm -rf ../mix-and-match/export/*
 rm -rf ../chibi-stickers/export/*
 rm -rf ../sack/export/*
 rm -rf ../celestial-circus/export/*
+rm -rf ../snowglobe/export/*
+rm -rf ../cloud-pot/export/*
 
 echo ""
 echo "Exporting assets..."
@@ -96,6 +98,16 @@ echo "Exporting assets..."
 -i ../celestial-circus/celestial-circus-pro.spine -o ../celestial-circus/export -e binary.json \
 -i ../celestial-circus/images -o ../celestial-circus/export -n celestial-circus -p atlas-0.5.json \
 -i ../celestial-circus/images -o ../celestial-circus/export -n celestial-circus-pma -p atlas-0.5-pma.json \
+\
+-i ../snowglobe/snowglobe-pro.spine -o ../snowglobe/export -e json.json \
+-i ../snowglobe/snowglobe-pro.spine -o ../snowglobe/export -e binary.json \
+-i ../snowglobe/images -o ../snowglobe/export -n snowglobe -p atlas-0.5.json \
+-i ../snowglobe/images -o ../snowglobe/export -n snowglobe-pma -p atlas-0.5-pma.json \
+\
+-i ../cloud-pot/cloud-pot-pro.spine -o ../cloud-pot/export -e json.json \
+-i ../cloud-pot/cloud-pot-pro.spine -o ../cloud-pot/export -e binary.json \
+-i ../cloud-pot/images -o ../cloud-pot/export -n cloud-pot -p atlas-0.5.json \
+-i ../cloud-pot/images -o ../cloud-pot/export -n cloud-pot-pma -p atlas-0.5-pma.json \
 \
 -i ../owl/owl-pro.spine -o ../owl/export -e json.json \
 -i ../owl/owl-pro.spine -o ../owl/export -e binary.json \

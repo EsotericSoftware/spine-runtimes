@@ -713,13 +713,13 @@ void Skeleton::update(float delta) {
 }
 
 void Skeleton::physicsTranslate(float x, float y) {
-    for (int i = 0; i < (int)_physicsConstraints.size(); i++) {
-        _physicsConstraints[i]->translate(x, y);
-    }
+	for (int i = 0; i < (int) _physicsConstraints.size(); i++) {
+		_physicsConstraints[i]->translate(x, y);
+	}
 }
 
 void Skeleton::physicsRotate(float x, float y, float degrees) {
-    for (int i = 0; i < (int)_physicsConstraints.size(); i++) {
-        _physicsConstraints[i]->rotate(x, y, degrees);
-    }
+	for (int i = 0; i < (int) _physicsConstraints.size(); i++) {
+		_physicsConstraints[i]->rotate(x, y, degrees);
+	}
 }

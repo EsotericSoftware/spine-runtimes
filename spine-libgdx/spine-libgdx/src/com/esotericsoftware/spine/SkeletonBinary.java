@@ -52,6 +52,7 @@ import com.esotericsoftware.spine.Animation.DeformTimeline;
 import com.esotericsoftware.spine.Animation.DrawOrderTimeline;
 import com.esotericsoftware.spine.Animation.EventTimeline;
 import com.esotericsoftware.spine.Animation.IkConstraintTimeline;
+import com.esotericsoftware.spine.Animation.InheritTimeline;
 import com.esotericsoftware.spine.Animation.PathConstraintMixTimeline;
 import com.esotericsoftware.spine.Animation.PathConstraintPositionTimeline;
 import com.esotericsoftware.spine.Animation.PathConstraintSpacingTimeline;
@@ -80,7 +81,7 @@ import com.esotericsoftware.spine.Animation.TransformConstraintTimeline;
 import com.esotericsoftware.spine.Animation.TranslateTimeline;
 import com.esotericsoftware.spine.Animation.TranslateXTimeline;
 import com.esotericsoftware.spine.Animation.TranslateYTimeline;
-import com.esotericsoftware.spine.BoneData.TransformMode;
+import com.esotericsoftware.spine.BoneData.Inherit;
 import com.esotericsoftware.spine.PathConstraintData.PositionMode;
 import com.esotericsoftware.spine.PathConstraintData.RotateMode;
 import com.esotericsoftware.spine.PathConstraintData.SpacingMode;
@@ -113,6 +114,7 @@ public class SkeletonBinary extends SkeletonLoader {
 	static public final int BONE_SHEAR = 7;
 	static public final int BONE_SHEARX = 8;
 	static public final int BONE_SHEARY = 9;
+	static public final int BONE_INHERIT = 10;
 
 	static public final int SLOT_ATTACHMENT = 0;
 	static public final int SLOT_RGBA = 1;
@@ -174,6 +176,7 @@ public class SkeletonBinary extends SkeletonLoader {
 			skeletonData.y = input.readFloat();
 			skeletonData.width = input.readFloat();
 			skeletonData.height = input.readFloat();
+			skeletonData.referenceScale = input.readFloat() * scale;
 
 			boolean nonessential = input.readBoolean();
 			if (nonessential) {
@@ -208,7 +211,7 @@ public class SkeletonBinary extends SkeletonLoader {
 				data.shearX = input.readFloat();
 				data.shearY = input.readFloat();
 				data.length = input.readFloat() * scale;
-				data.transformMode = TransformMode.values[input.readInt(true)];
+				data.inherit = Inherit.values[input.readByte()];
 				data.skinRequired = input.readBoolean();
 				if (nonessential) {
 					Color.rgba8888ToColor(data.color, input.readInt());
@@ -255,14 +258,14 @@ public class SkeletonBinary extends SkeletonLoader {
 				for (int ii = 0; ii < nn; ii++)
 					constraintBones[ii] = bones[input.readInt(true)];
 				data.target = (BoneData)bones[input.readInt(true)];
-				data.mix = input.readFloat();
-				data.softness = input.readFloat() * scale;
 				int flags = input.read();
 				data.skinRequired = (flags & 1) != 0;
 				data.bendDirection = (flags & 2) != 0 ? 1 : -1;
 				data.compress = (flags & 4) != 0;
 				data.stretch = (flags & 8) != 0;
 				data.uniform = (flags & 16) != 0;
+				if ((flags & 32) != 0) data.mix = (flags & 64) != 0 ? input.readFloat() : 1;
+				if ((flags & 128) != 0) data.softness = input.readFloat() * scale;
 				o[i] = data;
 			}
 
@@ -279,18 +282,19 @@ public class SkeletonBinary extends SkeletonLoader {
 				data.skinRequired = (flags & 1) != 0;
 				data.local = (flags & 2) != 0;
 				data.relative = (flags & 4) != 0;
-				data.offsetRotation = input.readFloat();
-				data.offsetX = input.readFloat() * scale;
-				data.offsetY = input.readFloat() * scale;
-				data.offsetScaleX = input.readFloat();
-				data.offsetScaleY = input.readFloat();
-				data.offsetShearY = input.readFloat();
-				data.mixRotate = input.readFloat();
-				data.mixX = input.readFloat();
-				data.mixY = input.readFloat();
-				data.mixScaleX = input.readFloat();
-				data.mixScaleY = input.readFloat();
-				data.mixShearY = input.readFloat();
+				if ((flags & 8) != 0) data.offsetRotation = input.readFloat();
+				if ((flags & 16) != 0) data.offsetX = input.readFloat() * scale;
+				if ((flags & 32) != 0) data.offsetY = input.readFloat() * scale;
+				if ((flags & 64) != 0) data.offsetScaleX = input.readFloat();
+				if ((flags & 128) != 0) data.offsetScaleY = input.readFloat();
+				flags = input.read();
+				if ((flags & 1) != 0) data.offsetShearY = input.readFloat();
+				if ((flags & 2) != 0) data.mixRotate = input.readFloat();
+				if ((flags & 4) != 0) data.mixX = input.readFloat();
+				if ((flags & 8) != 0) data.mixY = input.readFloat();
+				if ((flags & 16) != 0) data.mixScaleX = input.readFloat();
+				if ((flags & 32) != 0) data.mixScaleY = input.readFloat();
+				if ((flags & 64) != 0) data.mixShearY = input.readFloat();
 				o[i] = data;
 			}
 
@@ -304,10 +308,11 @@ public class SkeletonBinary extends SkeletonLoader {
 				for (int ii = 0; ii < nn; ii++)
 					constraintBones[ii] = bones[input.readInt(true)];
 				data.target = (SlotData)slots[input.readInt(true)];
-				data.positionMode = PositionMode.values[input.readInt(true)];
-				data.spacingMode = SpacingMode.values[input.readInt(true)];
-				data.rotateMode = RotateMode.values[input.readInt(true)];
-				data.offsetRotation = input.readFloat();
+				int flags = input.read();
+				data.positionMode = PositionMode.values[flags & 1];
+				data.spacingMode = SpacingMode.values[(flags >> 1) & 3];
+				data.rotateMode = RotateMode.values[(flags >> 3) & 3];
+				if ((flags & 128) != 0) data.offsetRotation = input.readFloat();
 				data.position = input.readFloat();
 				if (data.positionMode == PositionMode.fixed) data.position *= scale;
 				data.spacing = input.readFloat();
@@ -331,14 +336,14 @@ public class SkeletonBinary extends SkeletonLoader {
 				if ((flags & 8) != 0) data.rotate = input.readFloat();
 				if ((flags & 16) != 0) data.scaleX = input.readFloat();
 				if ((flags & 32) != 0) data.shearX = input.readFloat();
-				data.step = 1f / input.readByte();
+				data.limit = ((flags & 64) != 0 ? input.readFloat() : 5000) * scale;
+				data.step = 1f / input.readUnsignedByte();
 				data.inertia = input.readFloat();
 				data.strength = input.readFloat();
 				data.damping = input.readFloat();
-				data.massInverse = input.readFloat();
-				data.wind = input.readFloat() * scale;
-				data.gravity = input.readFloat() * scale;
-				data.mix = input.readFloat();
+				data.massInverse = (flags & 128) != 0 ? input.readFloat() : 1;
+				data.wind = input.readFloat();
+				data.gravity = input.readFloat();
 				flags = input.read();
 				if ((flags & 1) != 0) data.inertiaGlobal = true;
 				if ((flags & 2) != 0) data.strengthGlobal = true;
@@ -347,6 +352,7 @@ public class SkeletonBinary extends SkeletonLoader {
 				if ((flags & 16) != 0) data.windGlobal = true;
 				if ((flags & 32) != 0) data.gravityGlobal = true;
 				if ((flags & 64) != 0) data.mixGlobal = true;
+				data.mix = (flags & 128) != 0 ? input.readFloat() : 1;
 				o[i] = data;
 			}
 
@@ -467,7 +473,7 @@ public class SkeletonBinary extends SkeletonLoader {
 			String path = (flags & 16) != 0 ? input.readStringRef() : null;
 			int color = (flags & 32) != 0 ? input.readInt() : 0xffffffff;
 			Sequence sequence = (flags & 64) != 0 ? readSequence(input) : null;
-			float rotation = input.readFloat();
+			float rotation = (flags & 128) != 0 ? input.readFloat() : 0;
 			float x = input.readFloat();
 			float y = input.readFloat();
 			float scaleX = input.readFloat();
@@ -840,7 +846,15 @@ public class SkeletonBinary extends SkeletonLoader {
 		for (int i = 0, n = input.readInt(true); i < n; i++) {
 			int boneIndex = input.readInt(true);
 			for (int ii = 0, nn = input.readInt(true); ii < nn; ii++) {
-				int type = input.readByte(), frameCount = input.readInt(true), bezierCount = input.readInt(true);
+				int type = input.readByte(), frameCount = input.readInt(true);
+				if (type == BONE_INHERIT) {
+					InheritTimeline timeline = new InheritTimeline(frameCount, boneIndex);
+					for (int frame = 0; frame < frameCount; frame++)
+						timeline.setFrame(frame, input.readFloat(), Inherit.values[input.readByte()]);
+					timelines.add(timeline);
+					continue;
+				}
+				int bezierCount = input.readInt(true);
 				switch (type) {
 				case BONE_ROTATE:
 					readTimeline(input, timelines, new RotateTimeline(frameCount, bezierCount, boneIndex), 1);
@@ -879,17 +893,18 @@ public class SkeletonBinary extends SkeletonLoader {
 		for (int i = 0, n = input.readInt(true); i < n; i++) {
 			int index = input.readInt(true), frameCount = input.readInt(true), frameLast = frameCount - 1;
 			IkConstraintTimeline timeline = new IkConstraintTimeline(frameCount, input.readInt(true), index);
-			float time = input.readFloat(), mix = input.readFloat(), softness = input.readFloat() * scale;
+			int flags = input.read();
+			float time = input.readFloat(), mix = (flags & 1) != 0 ? ((flags & 2) != 0 ? input.readFloat() : 1) : 0;
+			float softness = (flags & 4) != 0 ? input.readFloat() * scale : 0;
 			for (int frame = 0, bezier = 0;; frame++) {
-				int flags = input.read();
-				timeline.setFrame(frame, time, mix, softness, input.readByte(), (flags & 1) != 0, (flags & 2) != 0);
+				timeline.setFrame(frame, time, mix, softness, (flags & 8) != 0 ? 1 : -1, (flags & 16) != 0, (flags & 32) != 0);
 				if (frame == frameLast) break;
-				float time2 = input.readFloat(), mix2 = input.readFloat(), softness2 = input.readFloat() * scale;
-				switch (input.readByte()) {
-				case CURVE_STEPPED:
+				flags = input.read();
+				float time2 = input.readFloat(), mix2 = (flags & 1) != 0 ? ((flags & 2) != 0 ? input.readFloat() : 1) : 0;
+				float softness2 = (flags & 4) != 0 ? input.readFloat() * scale : 0;
+				if ((flags & 64) != 0)
 					timeline.setStepped(frame);
-					break;
-				case CURVE_BEZIER:
+				else if ((flags & 128) != 0) {
 					setBezier(input, timeline, bezier++, frame, 0, time, time2, mix, mix2, 1);
 					setBezier(input, timeline, bezier++, frame, 1, time, time2, softness, softness2, scale);
 				}
@@ -1003,10 +1018,10 @@ public class SkeletonBinary extends SkeletonLoader {
 					readTimeline(input, timelines, new PhysicsConstraintMassTimeline(frameCount, bezierCount, index), 1);
 					break;
 				case PHYSICS_WIND:
-					readTimeline(input, timelines, new PhysicsConstraintWindTimeline(frameCount, bezierCount, index), scale);
+					readTimeline(input, timelines, new PhysicsConstraintWindTimeline(frameCount, bezierCount, index), 1);
 					break;
 				case PHYSICS_GRAVITY:
-					readTimeline(input, timelines, new PhysicsConstraintGravityTimeline(frameCount, bezierCount, index), scale);
+					readTimeline(input, timelines, new PhysicsConstraintGravityTimeline(frameCount, bezierCount, index), 1);
 					break;
 				case PHYSICS_MIX:
 					readTimeline(input, timelines, new PhysicsConstraintMixTimeline(frameCount, bezierCount, index), 1);

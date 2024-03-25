@@ -1,7 +1,7 @@
 {
 "skeleton": {
-	"hash": "SvPpD4qESzE",
-	"spine": "4.2.09-beta",
+	"hash": "j/WfoneLp+Y",
+	"spine": "4.2.43-beta",
 	"x": -265.35,
 	"y": -64.53,
 	"width": 519,
@@ -161,36 +161,182 @@
 		"bone": "belly",
 		"x": 1,
 		"y": 1,
+		"limit": 5000,
 		"inertia": 0.5,
 		"damping": 0.85
 	},
-	{ "name": "bone", "order": 4, "bone": "bone", "rotate": 1, "inertia": 0.5, "damping": 0.15 },
-	{ "name": "bone2", "order": 8, "bone": "bone2", "rotate": 1, "inertia": 0.5, "damping": 0.15 },
-	{ "name": "bone2b", "order": 9, "bone": "bone2b", "rotate": 1, "inertia": 0.5, "damping": 0.15 },
-	{ "name": "bone2c", "order": 10, "bone": "bone2c", "rotate": 1, "inertia": 0.5, "damping": 0.15 },
-	{ "name": "bone2d", "order": 11, "bone": "bone2d", "rotate": 1, "inertia": 0.5, "damping": 0.15 },
-	{ "name": "bone3", "order": 12, "bone": "bone3", "rotate": 1, "inertia": 0.5, "damping": 0.15 },
-	{ "name": "bone3b", "order": 13, "bone": "bone3b", "rotate": 1, "inertia": 0.5, "damping": 0.15 },
-	{ "name": "bone3c", "order": 14, "bone": "bone3c", "rotate": 1, "inertia": 0.5, "damping": 0.15 },
-	{ "name": "bone3d", "order": 15, "bone": "bone3d", "rotate": 1, "inertia": 0.5, "damping": 0.15 },
-	{ "name": "bone4", "order": 5, "bone": "bone4", "rotate": 1, "inertia": 0.5, "damping": 0.15 },
-	{ "name": "bone5", "order": 6, "bone": "bone5", "rotate": 1, "inertia": 0.5, "damping": 0.15 },
-	{ "name": "bone6", "order": 7, "bone": "bone6", "rotate": 1, "inertia": 0.5, "damping": 0.15 },
+	{
+		"name": "bone",
+		"order": 4,
+		"bone": "bone",
+		"rotate": 1,
+		"limit": 5000,
+		"inertia": 0.5,
+		"damping": 0.15
+	},
+	{
+		"name": "bone2",
+		"order": 8,
+		"bone": "bone2",
+		"rotate": 1,
+		"limit": 5000,
+		"inertia": 0.5,
+		"damping": 0.15
+	},
+	{
+		"name": "bone2b",
+		"order": 9,
+		"bone": "bone2b",
+		"rotate": 1,
+		"limit": 5000,
+		"inertia": 0.5,
+		"damping": 0.15
+	},
+	{
+		"name": "bone2c",
+		"order": 10,
+		"bone": "bone2c",
+		"rotate": 1,
+		"limit": 5000,
+		"inertia": 0.5,
+		"damping": 0.15
+	},
+	{
+		"name": "bone2d",
+		"order": 11,
+		"bone": "bone2d",
+		"rotate": 1,
+		"limit": 5000,
+		"inertia": 0.5,
+		"damping": 0.15
+	},
+	{
+		"name": "bone3",
+		"order": 12,
+		"bone": "bone3",
+		"rotate": 1,
+		"limit": 5000,
+		"inertia": 0.5,
+		"damping": 0.15
+	},
+	{
+		"name": "bone3b",
+		"order": 13,
+		"bone": "bone3b",
+		"rotate": 1,
+		"limit": 5000,
+		"inertia": 0.5,
+		"damping": 0.15
+	},
+	{
+		"name": "bone3c",
+		"order": 14,
+		"bone": "bone3c",
+		"rotate": 1,
+		"limit": 5000,
+		"inertia": 0.5,
+		"damping": 0.15
+	},
+	{
+		"name": "bone3d",
+		"order": 15,
+		"bone": "bone3d",
+		"rotate": 1,
+		"limit": 5000,
+		"inertia": 0.5,
+		"damping": 0.15
+	},
+	{
+		"name": "bone4",
+		"order": 5,
+		"bone": "bone4",
+		"rotate": 1,
+		"limit": 5000,
+		"inertia": 0.5,
+		"damping": 0.15
+	},
+	{
+		"name": "bone5",
+		"order": 6,
+		"bone": "bone5",
+		"rotate": 1,
+		"limit": 5000,
+		"inertia": 0.5,
+		"damping": 0.15
+	},
+	{
+		"name": "bone6",
+		"order": 7,
+		"bone": "bone6",
+		"rotate": 1,
+		"limit": 5000,
+		"inertia": 0.5,
+		"damping": 0.15
+	},
 	{
 		"name": "cape-front",
 		"order": 23,
 		"bone": "cape-front",
 		"x": 1,
 		"y": 1,
+		"limit": 5000,
 		"inertia": 0.5,
 		"damping": 0.85
 	},
-	{ "name": "cape-front2", "order": 19, "bone": "cape-front2", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
-	{ "name": "cape-front3", "order": 20, "bone": "cape-front3", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
-	{ "name": "cape-front4", "order": 21, "bone": "cape-front4", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
-	{ "name": "cape-front5", "order": 22, "bone": "cape-front5", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
-	{ "name": "corner-top-back-ear", "order": 17, "bone": "corner-top-back-ear", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
-	{ "name": "corner-top-front-ear", "order": 16, "bone": "corner-top-front-ear", "rotate": 1, "inertia": 0.5, "damping": 0.85 }
+	{
+		"name": "cape-front2",
+		"order": 19,
+		"bone": "cape-front2",
+		"rotate": 1,
+		"limit": 5000,
+		"inertia": 0.5,
+		"damping": 0.85
+	},
+	{
+		"name": "cape-front3",
+		"order": 20,
+		"bone": "cape-front3",
+		"rotate": 1,
+		"limit": 5000,
+		"inertia": 0.5,
+		"damping": 0.85
+	},
+	{
+		"name": "cape-front4",
+		"order": 21,
+		"bone": "cape-front4",
+		"rotate": 1,
+		"limit": 5000,
+		"inertia": 0.5,
+		"damping": 0.85
+	},
+	{
+		"name": "cape-front5",
+		"order": 22,
+		"bone": "cape-front5",
+		"rotate": 1,
+		"limit": 5000,
+		"inertia": 0.5,
+		"damping": 0.85
+	},
+	{
+		"name": "corner-top-back-ear",
+		"order": 17,
+		"bone": "corner-top-back-ear",
+		"rotate": 1,
+		"limit": 5000,
+		"inertia": 0.5,
+		"damping": 0.85
+	},
+	{
+		"name": "corner-top-front-ear",
+		"order": 16,
+		"bone": "corner-top-front-ear",
+		"rotate": 1,
+		"limit": 5000,
+		"inertia": 0.5,
+		"damping": 0.85
+	}
 ],
 "skins": [
 	{

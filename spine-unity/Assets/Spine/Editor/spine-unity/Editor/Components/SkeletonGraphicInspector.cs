@@ -61,13 +61,40 @@ namespace Spine.Unity.Editor {
 		SerializedProperty additiveMaterial, multiplyMaterial, screenMaterial;
 		SerializedProperty skeletonDataAsset, initialSkinName;
 		SerializedProperty startingAnimation, startingLoop, timeScale, freeze,
-			updateTiming, updateWhenInvisible, unscaledTime, tintBlack, layoutScaleMode, editReferenceRect;
+			updateTiming, updateWhenInvisible, unscaledTime, layoutScaleMode, editReferenceRect;
 		SerializedProperty physicsPositionInheritanceFactor, physicsRotationInheritanceFactor, physicsMovementRelativeTo;
 		SerializedProperty initialFlipX, initialFlipY;
 		SerializedProperty meshGeneratorSettings;
+		SerializedProperty useClipping, zSpacing, tintBlack, canvasGroupCompatible, pmaVertexColors, addNormals, calculateTangents, immutableTriangles;
+
 		SerializedProperty allowMultipleCanvasRenderers, separatorSlotNames, enableSeparatorSlots,
 			updateSeparatorPartLocation, updateSeparatorPartScale;
 		SerializedProperty raycastTarget, maskable;
+
+		readonly GUIContent UseClippingLabel = new GUIContent("Use Clipping",
+			"When disabled, clipping attachments are ignored. This may be used to save performance.");
+		readonly GUIContent ZSpacingLabel = new GUIContent("Z Spacing",
+			"A value other than 0 adds a space between each rendered attachment to prevent Z Fighting when using shaders" +
+			" that read or write to the depth buffer. Large values may cause unwanted parallax and spaces depending on " +
+			"camera setup.");
+		readonly GUIContent TintBlackLabel = new GUIContent("Tint Black (!)",
+			"Adds black tint vertex data to the mesh as UV2 and UV3. Black tinting requires that the shader interpret " +
+			"UV2 and UV3 as black tint colors for this effect to work. You may then want to use the " +
+			"[Spine/SkeletonGraphic Tint Black] shader.");
+		readonly GUIContent CanvasGroupCompatibleLabel = new GUIContent("CanvasGroup Compatible",
+			"Enable when using SkeletonGraphic under a CanvasGroup. " +
+			"When enabled, PMA Vertex Color alpha value is stored at uv2.g instead of color.a to capture " +
+			"CanvasGroup modifying color.a. Also helps to detect correct parameter setting combinations.");
+		readonly GUIContent PMAVertexColorsLabel = new GUIContent("PMA Vertex Colors",
+			"Use this if you are using the default Spine/Skeleton shader or any premultiply-alpha shader.");
+		readonly GUIContent AddNormalsLabel = new GUIContent("Add Normals",
+			"Use this if your shader requires vertex normals. A more efficient solution for 2D setups is to modify the " +
+			"shader to assume a single normal value for the whole mesh.");
+		readonly GUIContent CalculateTangentsLabel = new GUIContent("Solve Tangents",
+			"Calculates the tangents per frame. Use this if you are using lit shaders (usually with normal maps) that " +
+			"require vertex tangents.");
+		readonly GUIContent ImmutableTrianglesLabel = new GUIContent("Immutable Triangles",
+			"Enable to optimize rendering for skeletons that never change attachment visbility");
 
 		readonly GUIContent UnscaledTimeLabel = new GUIContent("Unscaled Time",
 			"If enabled, AnimationState uses unscaled game time (Time.unscaledDeltaTime), " +
@@ -128,7 +155,7 @@ namespace Spine.Unity.Editor {
 
 			// MaskableGraphic
 			material = so.FindProperty("m_Material");
-			color = so.FindProperty("m_Color");
+			color = so.FindProperty("m_SkeletonColor");
 			raycastTarget = so.FindProperty("m_RaycastTarget");
 			maskable = so.FindProperty("m_Maskable");
 
@@ -159,6 +186,15 @@ namespace Spine.Unity.Editor {
 
 			meshGeneratorSettings = so.FindProperty("meshGenerator").FindPropertyRelative("settings");
 			meshGeneratorSettings.isExpanded = SkeletonRendererInspector.advancedFoldout;
+
+			useClipping = meshGeneratorSettings.FindPropertyRelative("useClipping");
+			zSpacing = meshGeneratorSettings.FindPropertyRelative("zSpacing");
+			tintBlack = meshGeneratorSettings.FindPropertyRelative("tintBlack");
+			canvasGroupCompatible = meshGeneratorSettings.FindPropertyRelative("canvasGroupCompatible");
+			pmaVertexColors = meshGeneratorSettings.FindPropertyRelative("pmaVertexColors");
+			calculateTangents = meshGeneratorSettings.FindPropertyRelative("calculateTangents");
+			addNormals = meshGeneratorSettings.FindPropertyRelative("addNormals");
+			immutableTriangles = meshGeneratorSettings.FindPropertyRelative("immutableTriangles");
 
 			allowMultipleCanvasRenderers = so.FindProperty("allowMultipleCanvasRenderers");
 			updateSeparatorPartLocation = so.FindProperty("updateSeparatorPartLocation");
@@ -238,8 +274,18 @@ namespace Spine.Unity.Editor {
 				return;
 			}
 
-			EditorGUILayout.PropertyField(material);
-			EditorGUILayout.PropertyField(color);
+			using (new SpineInspectorUtility.LabelWidthScope(100)) {
+				using (new EditorGUILayout.HorizontalScope()) {
+					EditorGUILayout.PropertyField(material);
+					if (GUILayout.Button("Detect", EditorStyles.miniButton, GUILayout.Width(67f))) {
+						Undo.RecordObjects(targets, "Detect Material");
+						foreach (UnityEngine.Object skeletonGraphic in targets) {
+							DetectMaterial((SkeletonGraphic)skeletonGraphic);
+						}
+					}
+				}
+				EditorGUILayout.PropertyField(color);
+			}
 
 			string errorMessage = null;
 			if (SpineEditorUtilities.Preferences.componentMaterialWarning &&
@@ -258,55 +304,65 @@ namespace Spine.Unity.Editor {
 
 			using (new SpineInspectorUtility.BoxScope()) {
 
-				EditorGUILayout.PropertyField(meshGeneratorSettings, SpineInspectorUtility.TempContent("Advanced..."), includeChildren: true);
+				EditorGUILayout.PropertyField(meshGeneratorSettings, SpineInspectorUtility.TempContent("Advanced..."), includeChildren: false);
 				SkeletonRendererInspector.advancedFoldout = meshGeneratorSettings.isExpanded;
-
 				if (meshGeneratorSettings.isExpanded) {
 					EditorGUILayout.Space();
 					using (new SpineInspectorUtility.IndentScope()) {
-						EditorGUILayout.BeginHorizontal();
-						EditorGUILayout.PropertyField(allowMultipleCanvasRenderers, SpineInspectorUtility.TempContent("Multiple CanvasRenderers"));
+						DrawMeshSettings();
+						EditorGUILayout.Space();
 
-						if (GUILayout.Button(new GUIContent("Trim Renderers", "Remove currently unused CanvasRenderer GameObjects. These will be regenerated whenever needed."),
-							EditorStyles.miniButton, GUILayout.Width(100f))) {
+						using (new SpineInspectorUtility.LabelWidthScope()) {
 
-							foreach (UnityEngine.Object skeletonGraphic in targets) {
-								((SkeletonGraphic)skeletonGraphic).TrimRenderers();
-							}
-						}
-						EditorGUILayout.EndHorizontal();
+							EditorGUILayout.BeginHorizontal();
+							EditorGUILayout.PropertyField(allowMultipleCanvasRenderers, SpineInspectorUtility.TempContent("Multiple CanvasRenderers"));
 
-						BlendModeMaterials blendModeMaterials = thisSkeletonGraphic.skeletonDataAsset.blendModeMaterials;
-						if (allowMultipleCanvasRenderers.boolValue == true && blendModeMaterials.RequiresBlendModeMaterials) {
-							using (new SpineInspectorUtility.IndentScope()) {
-								EditorGUILayout.BeginHorizontal();
-								EditorGUILayout.LabelField("Blend Mode Materials", EditorStyles.boldLabel);
+							if (GUILayout.Button(new GUIContent("Trim Renderers", "Remove currently unused CanvasRenderer GameObjects. These will be regenerated whenever needed."),
+								EditorStyles.miniButton, GUILayout.Width(100f))) {
 
-								if (GUILayout.Button(new GUIContent("Assign Default", "Assign default Blend Mode Materials."),
-									EditorStyles.miniButton, GUILayout.Width(100f))) {
-									AssignDefaultBlendModeMaterials();
+								Undo.RecordObjects(targets, "Trim Renderers");
+								foreach (UnityEngine.Object skeletonGraphic in targets) {
+									((SkeletonGraphic)skeletonGraphic).TrimRenderers();
 								}
-								EditorGUILayout.EndHorizontal();
-
-								bool usesAdditiveMaterial = blendModeMaterials.applyAdditiveMaterial;
-								bool pmaVertexColors = thisSkeletonGraphic.MeshGenerator.settings.pmaVertexColors;
-								if (pmaVertexColors)
-									using (new EditorGUI.DisabledGroupScope(true)) {
-										EditorGUILayout.LabelField("Additive Material - Unused with PMA Vertex Colors", EditorStyles.label);
-									}
-								else if (usesAdditiveMaterial)
-									EditorGUILayout.PropertyField(additiveMaterial, SpineInspectorUtility.TempContent("Additive Material", null, "SkeletonGraphic Material for 'Additive' blend mode slots. Unused when 'PMA Vertex Colors' is enabled."));
-								else
-									using (new EditorGUI.DisabledGroupScope(true)) {
-										EditorGUILayout.LabelField("No Additive Mat - 'Apply Additive Material' disabled at SkeletonDataAsset", EditorStyles.label);
-									}
-								EditorGUILayout.PropertyField(multiplyMaterial, SpineInspectorUtility.TempContent("Multiply Material", null, "SkeletonGraphic Material for 'Multiply' blend mode slots."));
-								EditorGUILayout.PropertyField(screenMaterial, SpineInspectorUtility.TempContent("Screen Material", null, "SkeletonGraphic Material for 'Screen' blend mode slots."));
 							}
-						}
+							EditorGUILayout.EndHorizontal();
 
-						EditorGUILayout.PropertyField(updateTiming, UpdateTimingLabel);
-						EditorGUILayout.PropertyField(updateWhenInvisible);
+							BlendModeMaterials blendModeMaterials = thisSkeletonGraphic.skeletonDataAsset.blendModeMaterials;
+							if (allowMultipleCanvasRenderers.boolValue == true && blendModeMaterials.RequiresBlendModeMaterials) {
+								using (new SpineInspectorUtility.IndentScope()) {
+									EditorGUILayout.BeginHorizontal();
+									EditorGUILayout.LabelField("Blend Mode Materials", EditorStyles.boldLabel);
+
+									if (GUILayout.Button(new GUIContent("Detect", "Auto-Assign Blend Mode Materials according to Vertex Data and Texture settings."),
+										EditorStyles.miniButton, GUILayout.Width(100f))) {
+
+										Undo.RecordObjects(targets, "Detect Blend Mode Materials");
+										foreach (UnityEngine.Object skeletonGraphic in targets) {
+											DetectBlendModeMaterials((SkeletonGraphic)skeletonGraphic);
+										}
+									}
+									EditorGUILayout.EndHorizontal();
+
+									bool usesAdditiveMaterial = blendModeMaterials.applyAdditiveMaterial;
+									bool pmaVertexColors = thisSkeletonGraphic.MeshGenerator.settings.pmaVertexColors;
+									if (pmaVertexColors)
+										using (new EditorGUI.DisabledGroupScope(true)) {
+											EditorGUILayout.LabelField("Additive Material - Unused with PMA Vertex Colors", EditorStyles.label);
+										}
+									else if (usesAdditiveMaterial)
+										EditorGUILayout.PropertyField(additiveMaterial, SpineInspectorUtility.TempContent("Additive Material", null, "SkeletonGraphic Material for 'Additive' blend mode slots. Unused when 'PMA Vertex Colors' is enabled."));
+									else
+										using (new EditorGUI.DisabledGroupScope(true)) {
+											EditorGUILayout.LabelField("No Additive Mat - 'Apply Additive Material' disabled at SkeletonDataAsset", EditorStyles.label);
+										}
+									EditorGUILayout.PropertyField(multiplyMaterial, SpineInspectorUtility.TempContent("Multiply Material", null, "SkeletonGraphic Material for 'Multiply' blend mode slots."));
+									EditorGUILayout.PropertyField(screenMaterial, SpineInspectorUtility.TempContent("Screen Material", null, "SkeletonGraphic Material for 'Screen' blend mode slots."));
+								}
+							}
+
+							EditorGUILayout.PropertyField(updateTiming, UpdateTimingLabel);
+							EditorGUILayout.PropertyField(updateWhenInvisible);
+						}
 
 						// warning box
 						if (isSeparationEnabledButNotMultipleRenderers) {
@@ -424,6 +480,67 @@ namespace Spine.Unity.Editor {
 			}
 		}
 
+		protected void DrawMeshSettings () {
+			EditorGUILayout.PropertyField(useClipping, UseClippingLabel);
+			const float MinZSpacing = -0.1f;
+			const float MaxZSpacing = 0f;
+			EditorGUILayout.Slider(zSpacing, MinZSpacing, MaxZSpacing, ZSpacingLabel);
+			EditorGUILayout.Space();
+
+			using (new SpineInspectorUtility.LabelWidthScope()) {
+				EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("Vertex Data", SpineInspectorUtility.UnityIcon<MeshFilter>()), EditorStyles.boldLabel);
+
+				using (new EditorGUILayout.HorizontalScope()) {
+					EditorGUILayout.PropertyField(tintBlack, TintBlackLabel);
+					if (GUILayout.Button("Detect", EditorStyles.miniButton, GUILayout.Width(65f))) {
+						Undo.RecordObjects(targets, "Detect Tint Black");
+						foreach (UnityEngine.Object skeletonGraphic in targets) {
+							DetectTintBlack((SkeletonGraphic)skeletonGraphic);
+						}
+					}
+				}
+				using (new EditorGUILayout.HorizontalScope()) {
+					EditorGUILayout.PropertyField(canvasGroupCompatible, CanvasGroupCompatibleLabel);
+					if (GUILayout.Button("Detect", EditorStyles.miniButton, GUILayout.Width(65f))) {
+						Undo.RecordObjects(targets, "Detect CanvasGroup Compatible");
+						foreach (UnityEngine.Object skeletonGraphic in targets) {
+							DetectCanvasGroupCompatible((SkeletonGraphic)skeletonGraphic);
+						}
+					}
+				}
+				using (new EditorGUILayout.HorizontalScope()) {
+					EditorGUILayout.PropertyField(pmaVertexColors, PMAVertexColorsLabel);
+					if (GUILayout.Button("Detect", EditorStyles.miniButton, GUILayout.Width(65f))) {
+						Undo.RecordObjects(targets, "Detect PMA Vertex Colors");
+						foreach (UnityEngine.Object skeletonGraphic in targets) {
+							DetectPMAVertexColors((SkeletonGraphic)skeletonGraphic);
+						}
+					}
+				}
+				using (new EditorGUILayout.HorizontalScope()) {
+					GUILayout.FlexibleSpace();
+					if (GUILayout.Button("Detect Settings", EditorStyles.miniButton, GUILayout.Width(100f))) {
+						Undo.RecordObjects(targets, "Detect Settings");
+						foreach (UnityEngine.Object skeletonGraphic in targets) {
+							DetectTintBlack((SkeletonGraphic)skeletonGraphic);
+							DetectCanvasGroupCompatible((SkeletonGraphic)skeletonGraphic);
+							DetectPMAVertexColors((SkeletonGraphic)skeletonGraphic);
+						}
+					}
+					if (GUILayout.Button("Detect Material", EditorStyles.miniButton, GUILayout.Width(100f))) {
+						Undo.RecordObjects(targets, "Detect Material");
+						foreach (UnityEngine.Object skeletonGraphic in targets) {
+							DetectMaterial((SkeletonGraphic)skeletonGraphic);
+						}
+					}
+				}
+
+				EditorGUILayout.PropertyField(addNormals, AddNormalsLabel);
+				EditorGUILayout.PropertyField(calculateTangents, CalculateTangentsLabel);
+				EditorGUILayout.PropertyField(immutableTriangles, ImmutableTrianglesLabel);
+			}
+		}
+
 		protected bool SkeletonHasMultipleSubmeshes () {
 			foreach (UnityEngine.Object target in targets) {
 				SkeletonGraphic skeletonGraphic = (SkeletonGraphic)target;
@@ -440,17 +557,6 @@ namespace Spine.Unity.Editor {
 				SpineHandles.DrawReferenceRect(skeletonGraphic, Color.green);
 			} else {
 				SpineHandles.DrawReferenceRect(skeletonGraphic, Color.blue);
-			}
-
-
-		}
-
-		protected void AssignDefaultBlendModeMaterials () {
-			foreach (UnityEngine.Object target in targets) {
-				SkeletonGraphic skeletonGraphic = (SkeletonGraphic)target;
-				skeletonGraphic.additiveMaterial = DefaultSkeletonGraphicAdditiveMaterial;
-				skeletonGraphic.multiplyMaterial = DefaultSkeletonGraphicMultiplyMaterial;
-				skeletonGraphic.screenMaterial = DefaultSkeletonGraphicScreenMaterial;
 			}
 		}
 
@@ -501,11 +607,165 @@ namespace Spine.Unity.Editor {
 				} else
 					EditorGUILayout.PropertyField(separatorSlotNames, new GUIContent(separatorSlotNames.displayName + string.Format("{0} [{1}]", terminalSlotWarning, separatorSlotNames.arraySize), SeparatorsDescription), true);
 
-				EditorGUILayout.PropertyField(enableSeparatorSlots, SpineInspectorUtility.TempContent("Enable Separation", tooltip: "Whether to enable separation at the above separator slots."));
-				EditorGUILayout.PropertyField(updateSeparatorPartLocation, SpineInspectorUtility.TempContent("Update Part Location", tooltip: "Update separator part GameObject location to match the position of the SkeletonGraphic. This can be helpful when re-parenting parts to a different GameObject."));
-				EditorGUILayout.PropertyField(updateSeparatorPartScale, SpineInspectorUtility.TempContent("Update Part Scale", tooltip: "Update separator part GameObject scale to match the scale (lossyScale) of the SkeletonGraphic. This can be helpful when re-parenting parts to a different GameObject."));
+				using (new SpineInspectorUtility.LabelWidthScope()) {
+					EditorGUILayout.PropertyField(enableSeparatorSlots, SpineInspectorUtility.TempContent("Enable Separation", tooltip: "Whether to enable separation at the above separator slots."));
+					EditorGUILayout.PropertyField(updateSeparatorPartLocation, SpineInspectorUtility.TempContent("Update Part Location", tooltip: "Update separator part GameObject location to match the position of the SkeletonGraphic. This can be helpful when re-parenting parts to a different GameObject."));
+					EditorGUILayout.PropertyField(updateSeparatorPartScale, SpineInspectorUtility.TempContent("Update Part Scale", tooltip: "Update separator part GameObject scale to match the scale (lossyScale) of the SkeletonGraphic. This can be helpful when re-parenting parts to a different GameObject."));
+				}
 			}
 		}
+
+		#region Auto Detect Setting
+		static void DetectTintBlack (SkeletonGraphic skeletonGraphic) {
+			bool requiresTintBlack = HasTintBlackSlot(skeletonGraphic);
+			if (requiresTintBlack)
+				Debug.Log(string.Format("Found Tint-Black slot at '{0}'", skeletonGraphic));
+			else
+				Debug.Log(string.Format("No Tint-Black slot found at '{0}'", skeletonGraphic));
+			skeletonGraphic.MeshGenerator.settings.tintBlack = requiresTintBlack;
+		}
+
+		static bool HasTintBlackSlot (SkeletonGraphic skeletonGraphic) {
+			SlotData[] slotsItems = skeletonGraphic.SkeletonData.Slots.Items;
+			for (int i = 0, count = skeletonGraphic.SkeletonData.Slots.Count; i < count; ++i) {
+				SlotData slotData = slotsItems[i];
+				if (slotData.HasSecondColor)
+					return true;
+			}
+			return false;
+		}
+
+		static void DetectCanvasGroupCompatible (SkeletonGraphic skeletonGraphic) {
+			bool requiresCanvasGroupCompatible = IsBelowCanvasGroup(skeletonGraphic);
+			if (requiresCanvasGroupCompatible)
+				Debug.Log(string.Format("Skeleton is a child of CanvasGroup: '{0}'", skeletonGraphic));
+			else
+				Debug.Log(string.Format("Skeleton is not a child of CanvasGroup: '{0}'", skeletonGraphic));
+			skeletonGraphic.MeshGenerator.settings.canvasGroupCompatible = requiresCanvasGroupCompatible;
+		}
+
+		static bool IsBelowCanvasGroup (SkeletonGraphic skeletonGraphic) {
+			return skeletonGraphic.gameObject.GetComponentInParent<CanvasGroup>() != null;
+		}
+
+		static void DetectPMAVertexColors (SkeletonGraphic skeletonGraphic) {
+			MeshGenerator.Settings settings = skeletonGraphic.MeshGenerator.settings;
+			bool usesSpineShader = MaterialChecks.UsesSpineShader(skeletonGraphic.material);
+			if (!usesSpineShader) {
+				Debug.Log(string.Format("Skeleton is not using a Spine shader, thus the shader is likely " +
+					"not using PMA vertex color: '{0}'", skeletonGraphic));
+				skeletonGraphic.MeshGenerator.settings.pmaVertexColors = false;
+				return;
+			}
+
+			bool requiresPMAVertexColorsDisabled = settings.canvasGroupCompatible && !settings.tintBlack;
+			if (requiresPMAVertexColorsDisabled) {
+				Debug.Log(string.Format("Skeleton requires PMA Vertex Colors disabled: '{0}'", skeletonGraphic));
+				skeletonGraphic.MeshGenerator.settings.pmaVertexColors = false;
+			} else {
+				Debug.Log(string.Format("Skeleton requires or permits PMA Vertex Colors enabled: '{0}'", skeletonGraphic));
+				skeletonGraphic.MeshGenerator.settings.pmaVertexColors = true;
+			}
+		}
+
+		static bool IsSkeletonTexturePMA (SkeletonGraphic skeletonGraphic, out bool detectionSucceeded) {
+			Texture texture = skeletonGraphic.mainTexture;
+			string texturePath = AssetDatabase.GetAssetPath(texture.GetInstanceID());
+			TextureImporter importer = (TextureImporter)TextureImporter.GetAtPath(texturePath);
+			if (importer.alphaIsTransparency != importer.sRGBTexture) {
+				Debug.LogWarning(string.Format("Texture '{0}' at skeleton '{1}' is neither configured correctly for " +
+					"PMA nor Straight Alpha.", texture, skeletonGraphic), texture);
+				detectionSucceeded = false;
+				return false;
+			}
+			detectionSucceeded = true;
+			bool isPMATexture = !importer.alphaIsTransparency && !importer.sRGBTexture;
+			return isPMATexture;
+		}
+
+		static void DetectMaterial (SkeletonGraphic skeletonGraphic) {
+			MeshGenerator.Settings settings = skeletonGraphic.MeshGenerator.settings;
+
+			bool detectionSucceeded;
+			bool usesPMATexture = IsSkeletonTexturePMA(skeletonGraphic, out detectionSucceeded);
+			if (!detectionSucceeded) {
+				Debug.LogWarning(string.Format("Unable to assign Material for skeleton '{0}'.", skeletonGraphic), skeletonGraphic);
+				return;
+			}
+
+			Material newMaterial = null;
+			if (usesPMATexture) {
+				if (settings.tintBlack) {
+					if (settings.canvasGroupCompatible)
+						newMaterial = MaterialWithName("SkeletonGraphicTintBlack-CanvasGroup");
+					else
+						newMaterial = MaterialWithName("SkeletonGraphicTintBlack");
+				} else { // not tintBlack
+					if (settings.canvasGroupCompatible)
+						newMaterial = MaterialWithName("SkeletonGraphicDefault-CanvasGroup");
+					else
+						newMaterial = MaterialWithName("SkeletonGraphicDefault");
+				}
+			} else { // straight alpha texture
+				if (settings.tintBlack) {
+					if (settings.canvasGroupCompatible)
+						newMaterial = MaterialWithName("SkeletonGraphicTintBlack-CanvasGroupStraight");
+					else
+						newMaterial = MaterialWithName("SkeletonGraphicTintBlack-Straight");
+				} else { // not tintBlack
+					if (settings.canvasGroupCompatible)
+						newMaterial = MaterialWithName("SkeletonGraphicDefault-CanvasGroupStraight");
+					else
+						newMaterial = MaterialWithName("SkeletonGraphicDefault-Straight");
+				}
+			}
+			if (newMaterial != null) {
+				Debug.Log(string.Format("Assigning material '{0}' at skeleton '{1}'",
+					newMaterial, skeletonGraphic), newMaterial);
+				skeletonGraphic.material = newMaterial;
+			}
+		}
+
+		static void DetectBlendModeMaterials (SkeletonGraphic skeletonGraphic) {
+			bool detectionSucceeded;
+			bool usesPMATexture = IsSkeletonTexturePMA(skeletonGraphic, out detectionSucceeded);
+			if (!detectionSucceeded) {
+				Debug.LogWarning(string.Format("Unable to assign Blend Mode materials for skeleton '{0}'.", skeletonGraphic), skeletonGraphic);
+				return;
+			}
+			DetectBlendModeMaterial(skeletonGraphic, BlendMode.Additive, usesPMATexture);
+			DetectBlendModeMaterial(skeletonGraphic, BlendMode.Multiply, usesPMATexture);
+			DetectBlendModeMaterial(skeletonGraphic, BlendMode.Screen, usesPMATexture);
+		}
+
+		static void DetectBlendModeMaterial (SkeletonGraphic skeletonGraphic, BlendMode blendMode, bool usesPMATexture) {
+			MeshGenerator.Settings settings = skeletonGraphic.MeshGenerator.settings;
+
+			string optionalTintBlack = settings.tintBlack ? "TintBlack" : "";
+			string blendModeString = blendMode.ToString();
+			string optionalDash = settings.canvasGroupCompatible || !usesPMATexture ? "-" : "";
+			string optionalCanvasGroup = settings.canvasGroupCompatible ? "CanvasGroup" : "";
+			string optionalStraight = !usesPMATexture ? "Straight" : "";
+
+			string materialName = string.Format("SkeletonGraphic{0}{1}{2}{3}{4}",
+				optionalTintBlack, blendModeString, optionalDash, optionalCanvasGroup, optionalStraight);
+			Material newMaterial = MaterialWithName(materialName);
+
+			if (newMaterial != null) {
+				switch (blendMode) {
+				case BlendMode.Additive:
+					skeletonGraphic.additiveMaterial = newMaterial;
+					break;
+				case BlendMode.Multiply:
+					skeletonGraphic.multiplyMaterial = newMaterial;
+					break;
+				case BlendMode.Screen:
+					skeletonGraphic.screenMaterial = newMaterial;
+					break;
+				}
+			}
+		}
+		#endregion
 
 		#region Menus
 		[MenuItem("CONTEXT/SkeletonGraphic/Match RectTransform with Mesh Bounds")]
@@ -590,29 +850,41 @@ namespace Spine.Unity.Editor {
 		}
 
 		public static Material DefaultSkeletonGraphicMaterial {
-			get { return FirstMaterialWithName("SkeletonGraphicDefault"); }
+			get { return MaterialWithName("SkeletonGraphicDefault"); }
 		}
 
 		public static Material DefaultSkeletonGraphicAdditiveMaterial {
-			get { return FirstMaterialWithName("SkeletonGraphicAdditive"); }
+			get { return MaterialWithName("SkeletonGraphicAdditive"); }
 		}
 
 		public static Material DefaultSkeletonGraphicMultiplyMaterial {
-			get { return FirstMaterialWithName("SkeletonGraphicMultiply"); }
+			get { return MaterialWithName("SkeletonGraphicMultiply"); }
 		}
 
 		public static Material DefaultSkeletonGraphicScreenMaterial {
-			get { return FirstMaterialWithName("SkeletonGraphicScreen"); }
+			get { return MaterialWithName("SkeletonGraphicScreen"); }
 		}
 
-		protected static Material FirstMaterialWithName (string name) {
+		protected static Material MaterialWithName (string name) {
 			string[] guids = AssetDatabase.FindAssets(name + " t:material");
 			if (guids.Length <= 0) return null;
 
-			string firstAssetPath = AssetDatabase.GUIDToAssetPath(guids[0]);
-			if (string.IsNullOrEmpty(firstAssetPath)) return null;
+			int closestNameDistance = int.MaxValue;
+			int closestNameIndex = 0;
+			for (int i = 0; i < guids.Length; ++i) {
+				string assetPath = AssetDatabase.GUIDToAssetPath(guids[i]);
+				string assetName = System.IO.Path.GetFileNameWithoutExtension(assetPath);
+				int distance = string.CompareOrdinal(assetName, name);
+				if (distance < closestNameDistance) {
+					closestNameDistance = distance;
+					closestNameIndex = i;
+				}
+			}
 
-			Material firstMaterial = AssetDatabase.LoadAssetAtPath<Material>(firstAssetPath);
+			string foundAssetPath = AssetDatabase.GUIDToAssetPath(guids[closestNameIndex]);
+			if (string.IsNullOrEmpty(foundAssetPath)) return null;
+
+			Material firstMaterial = AssetDatabase.LoadAssetAtPath<Material>(foundAssetPath);
 			return firstMaterial;
 		}
 
