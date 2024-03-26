@@ -26,13 +26,13 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THE
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
-
 import { TextureAtlas } from "@esotericsoftware/spine-core";
 import { SpineTexture } from "../SpineTexture.js";
 import type { AssetExtension, Loader } from "@pixi/assets";
+import { Assets } from "@pixi/assets";
 import { LoaderParserPriority, checkExtension } from "@pixi/assets";
 import type { Texture } from "@pixi/core";
-import { ExtensionType, settings, utils, BaseTexture, extensions } from "@pixi/core";
+import { ALPHA_MODES, ExtensionType, settings, utils, BaseTexture, extensions } from "@pixi/core";
 
 type RawAtlas = string;
 
@@ -77,7 +77,7 @@ const spineTextureAtlasLoader: AssetExtension<RawAtlas | TextureAtlas, ISpineAtl
 				basePath += "/";
 			}
 
-			// Retval is going to be a texture atlas. However we need to wait for it's callback to resolve this promise.
+			// Retval is going to be a texture atlas. However, we need to wait for its callback to resolve this promise.
 			const retval = new TextureAtlas(asset);
 
 			// If the user gave me only one texture, that one is assumed to be the "first" texture in the atlas
@@ -90,6 +90,17 @@ const spineTextureAtlasLoader: AssetExtension<RawAtlas | TextureAtlas, ISpineAtl
 			// we will wait for all promises for the textures at the same time at the end.
 			const textureLoadingPromises = [];
 
+
+			// setting preferCreateImageBitmap to false for loadTextures loader to allow loading PMA images
+			let oldPreferCreateImageBitmap = true;
+			for (const parser of loader.parsers) {
+				if (parser.name == "loadTextures") {
+					oldPreferCreateImageBitmap = parser.config?.preferCreateImageBitmap;
+					break;
+				}
+			}
+			Assets.setPreferences({ preferCreateImageBitmap: false });
+
 			// fill the pages
 			for (const page of retval.pages) {
 				const pageName = page.name;
@@ -98,14 +109,19 @@ const spineTextureAtlasLoader: AssetExtension<RawAtlas | TextureAtlas, ISpineAtl
 					page.setTexture(SpineTexture.from(providedPage));
 				} else {
 					const url: string = providedPage ?? utils.path.normalize([...basePath.split(utils.path.sep), pageName].join(utils.path.sep));
-					const pixiPromise = loader.load<Texture>({ src: url, data: metadata.imageMetadata }).then((texture) => {
-						page.setTexture(SpineTexture.from(texture.baseTexture));
-					});
+					const assetsToLoadIn = { src: url, data: { ...metadata.imageMetadata, ...{ alphaMode: page.pma ? ALPHA_MODES.PMA : ALPHA_MODES.UNPACK } } };
+					const pixiPromise = loader.load<Texture>(assetsToLoadIn)
+						.then((texture) => {
+							page.setTexture(SpineTexture.from(texture.baseTexture));
+						});
 					textureLoadingPromises.push(pixiPromise);
 				}
 			}
 
 			await Promise.all(textureLoadingPromises);
+
+			// restoring preferCreateImageBitmap old value for loadTextures loader
+			Assets.setPreferences({ preferCreateImageBitmap: oldPreferCreateImageBitmap });
 
 			return retval;
 		},
