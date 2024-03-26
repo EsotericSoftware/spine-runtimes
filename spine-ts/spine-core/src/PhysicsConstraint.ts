@@ -158,7 +158,7 @@ export class PhysicsConstraint implements Updatable {
 						}
 						if (a >= t) {
 							d = Math.pow(this.damping, 60 * t);
-							const m = this.massInverse * t, e = this.strength, w = this.wind * f, g = this.gravity * f;
+							const m = this.massInverse * t, e = this.strength, w = this.wind * f, g = (Skeleton.yDown ? -this.gravity : this.gravity) * f;
 							do {
 								if (x) {
 									this.xVelocity += (w - this.xOffset * e) * m;
@@ -207,7 +207,7 @@ export class PhysicsConstraint implements Updatable {
 						a = this.remaining;
 						if (a >= t) {
 							if (d == -1) d = Math.pow(this.damping, 60 * t);
-							const m = this.massInverse * t, e = this.strength, w = this.wind, g = this.gravity, h = l / f;
+							const m = this.massInverse * t, e = this.strength, w = this.wind, g = (Skeleton.yDown ? -this.gravity : this.gravity), h = l / f;
 							while (true) {
 								a -= t;
 								if (scaleX) {
