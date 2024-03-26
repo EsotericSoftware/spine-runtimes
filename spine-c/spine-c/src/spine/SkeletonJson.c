@@ -1063,7 +1063,6 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 	slots = Json_getItem(root, "slots");
 	if (slots) {
 		Json *slotMap;
-		skeletonData->slotsCount = slots->size;
 		skeletonData->slots = MALLOC(spSlotData *, slots->size);
 		for (slotMap = slots->child, i = 0; slotMap; slotMap = slotMap->next, ++i) {
 			spSlotData *data;
@@ -1114,6 +1113,7 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 			}
 
 			skeletonData->slots[i] = data;
+			skeletonData->slotsCount++;
 		}
 	}
 
