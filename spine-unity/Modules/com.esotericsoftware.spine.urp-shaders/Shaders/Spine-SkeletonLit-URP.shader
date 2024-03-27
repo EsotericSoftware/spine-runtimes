@@ -44,13 +44,13 @@ Shader "Universal Render Pipeline/Spine/Skeleton Lit" {
 
 			// -------------------------------------
 			// Lightweight Pipeline keywords
-			#pragma multi_compile _ _MAIN_LIGHT_SHADOWS
-			#pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
+			#pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
 			#pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
 			#pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
 			#pragma multi_compile _ _SHADOWS_SOFT
 			#pragma multi_compile _ _MIXED_LIGHTING_SUBTRACTIVE
 			#pragma multi_compile _ _LIGHT_AFFECTS_ADDITIVE
+			#pragma multi_compile_fragment _ _LIGHT_COOKIES
 			#pragma shader_feature _TINT_BLACK_ON
 			// Farward+ renderer keywords
 			#pragma multi_compile_fragment _ _LIGHT_LAYERS
