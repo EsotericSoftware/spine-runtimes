@@ -327,7 +327,7 @@ public class Bone implements Updatable {
 		this.shearY = shearY;
 	}
 
-	/** Controls how parent world transforms affect this bone. */
+	/** Determines how parent world transforms affect this bone. */
 	public Inherit getInherit () {
 		return inherit;
 	}
