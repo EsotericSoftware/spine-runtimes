@@ -325,8 +325,8 @@ namespace Spine {
 			result.x = pa * boneData.X + pb * boneData.Y + parentMatrix.x;
 			result.y = pc * boneData.X + pd * boneData.Y + parentMatrix.y;
 
-			switch (boneData.TransformMode) {
-			case TransformMode.Normal: {
+			switch (boneData.Inherit) {
+			case Inherit.Normal: {
 				float rotationY = boneData.Rotation + 90 + boneData.ShearY;
 				float la = MathUtils.CosDeg(boneData.Rotation + boneData.ShearX) * boneData.ScaleX;
 				float lb = MathUtils.CosDeg(rotationY) * boneData.ScaleY;
@@ -338,7 +338,7 @@ namespace Spine {
 				result.d = pc * lb + pd * ld;
 				break;
 			}
-			case TransformMode.OnlyTranslation: {
+			case Inherit.OnlyTranslation: {
 				float rotationY = boneData.Rotation + 90 + boneData.ShearY;
 				result.a = MathUtils.CosDeg(boneData.Rotation + boneData.ShearX) * boneData.ScaleX;
 				result.b = MathUtils.CosDeg(rotationY) * boneData.ScaleY;
@@ -346,7 +346,7 @@ namespace Spine {
 				result.d = MathUtils.SinDeg(rotationY) * boneData.ScaleY;
 				break;
 			}
-			case TransformMode.NoRotationOrReflection: {
+			case Inherit.NoRotationOrReflection: {
 				float s = pa * pa + pc * pc, prx;
 				if (s > 0.0001f) {
 					s = Math.Abs(pa * pd - pb * pc) / s;
@@ -370,8 +370,8 @@ namespace Spine {
 				result.d = pc * lb + pd * ld;
 				break;
 			}
-			case TransformMode.NoScale:
-			case TransformMode.NoScaleOrReflection: {
+			case Inherit.NoScale:
+			case Inherit.NoScaleOrReflection: {
 				float cos = MathUtils.CosDeg(boneData.Rotation), sin = MathUtils.SinDeg(boneData.Rotation);
 				float za = pa * cos + pb * sin;
 				float zc = pc * cos + pd * sin;
@@ -388,7 +388,7 @@ namespace Spine {
 				float lb = MathUtils.CosDeg(90 + boneData.ShearY) * boneData.ScaleY;
 				float lc = MathUtils.SinDeg(boneData.ShearX) * boneData.ScaleX;
 				float ld = MathUtils.SinDeg(90 + boneData.ShearY) * boneData.ScaleY;
-				if (boneData.TransformMode != TransformMode.NoScaleOrReflection ? pa * pd - pb * pc < 0 : false) {
+				if (boneData.Inherit != Inherit.NoScaleOrReflection ? pa * pd - pb * pc < 0 : false) {
 					zb = -zb;
 					zd = -zd;
 				}
@@ -446,15 +446,13 @@ namespace Spine {
 			return va.Bones != null && va.Bones.Length > 0;
 		}
 
-		#region Transform Modes
-		public static bool InheritsRotation (this TransformMode mode) {
-			const int RotationBit = 0;
-			return ((int)mode & (1U << RotationBit)) == 0;
+		#region Inherit Modes
+		public static bool InheritsRotation (this Inherit mode) {
+			return mode == Inherit.Normal || mode == Inherit.NoScale || mode == Inherit.NoScaleOrReflection;
 		}
 
-		public static bool InheritsScale (this TransformMode mode) {
-			const int ScaleBit = 1;
-			return ((int)mode & (1U << ScaleBit)) == 0;
+		public static bool InheritsScale (this Inherit mode) {
+			return mode == Inherit.Normal || mode == Inherit.NoRotationOrReflection;
 		}
 		#endregion
 	}

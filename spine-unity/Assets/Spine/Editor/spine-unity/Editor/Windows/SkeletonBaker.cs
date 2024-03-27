@@ -329,13 +329,13 @@ namespace Spine.Unity.Editor {
 
 					boneTransform.parent = parentTransform;
 					boneTransform.localPosition = new Vector3(boneData.X, boneData.Y, 0);
-					TransformMode tm = boneData.TransformMode;
-					if (tm.InheritsRotation())
+					Inherit inherit = boneData.Inherit;
+					if (inherit.InheritsRotation())
 						boneTransform.localRotation = Quaternion.Euler(0, 0, boneData.Rotation);
 					else
 						boneTransform.rotation = Quaternion.Euler(0, 0, boneData.Rotation);
 
-					if (tm.InheritsScale())
+					if (inherit.InheritsScale())
 						boneTransform.localScale = new Vector3(boneData.ScaleX, boneData.ScaleY, 1);
 				}
 
@@ -774,7 +774,7 @@ namespace Spine.Unity.Editor {
 			}
 
 			foreach (Bone b in skeleton.Bones) {
-				if (!b.Data.TransformMode.InheritsRotation()) {
+				if (!b.Data.Inherit.InheritsRotation()) {
 					int index = b.Data.Index;
 					if (ignoreRotateTimelineIndexes.Contains(index) == false) {
 						ignoreRotateTimelineIndexes.Add(index);
@@ -832,7 +832,7 @@ namespace Spine.Unity.Editor {
 
 		static void BakeBoneConstraints (Bone bone, Spine.Animation animation, AnimationClip clip) {
 			Skeleton skeleton = bone.Skeleton;
-			bool inheritRotation = bone.Data.TransformMode.InheritsRotation();
+			bool inheritRotation = bone.Data.Inherit.InheritsRotation();
 
 			animation.Apply(skeleton, 0, 0, false, null, 1f, MixBlend.Setup, MixDirection.In);
 			skeleton.UpdateWorldTransform(Skeleton.Physics.Update);

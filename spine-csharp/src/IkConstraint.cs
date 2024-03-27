@@ -175,12 +175,12 @@ namespace Spine {
 			float rotationIK = -bone.ashearX - bone.arotation;
 			float tx = 0, ty = 0;
 
-			switch (bone.data.transformMode) {
-			case TransformMode.OnlyTranslation:
+			switch (bone.inherit) {
+			case Inherit.OnlyTranslation:
 				tx = (targetX - bone.worldX) * Math.Sign(bone.skeleton.ScaleX);
 				ty = (targetY - bone.worldY) * Math.Sign(bone.skeleton.ScaleY);
 				break;
-			case TransformMode.NoRotationOrReflection: {
+			case Inherit.NoRotationOrReflection: {
 				float s = Math.Abs(pa * pd - pb * pc) / Math.Max(0.0001f, pa * pa + pc * pc);
 				float sa = pa / bone.skeleton.scaleX;
 				float sc = pc / bone.skeleton.scaleY;
@@ -212,9 +212,9 @@ namespace Spine {
 
 			float sx = bone.ascaleX, sy = bone.ascaleY;
 			if (compress || stretch) {
-				switch (bone.data.transformMode) {
-				case TransformMode.NoScale:
-				case TransformMode.NoScaleOrReflection:
+				switch (bone.inherit) {
+				case Inherit.NoScale:
+				case Inherit.NoScaleOrReflection:
 					tx = targetX - bone.worldX;
 					ty = targetY - bone.worldY;
 					break;
@@ -238,6 +238,7 @@ namespace Spine {
 			float softness, float alpha) {
 			if (parent == null) throw new ArgumentNullException("parent", "parent cannot be null.");
 			if (child == null) throw new ArgumentNullException("child", "child cannot be null.");
+			if (parent.inherit != Inherit.Normal || child.inherit != Inherit.Normal) return;
 			float px = parent.ax, py = parent.ay, psx = parent.ascaleX, psy = parent.ascaleY, sx = psx, sy = psy, csx = child.ascaleX;
 			int os1, os2, s2;
 			if (psx < 0) {

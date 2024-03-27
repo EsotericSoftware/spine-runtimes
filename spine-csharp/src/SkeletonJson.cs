@@ -133,8 +133,8 @@ namespace Spine {
 					data.shearX = GetFloat(boneMap, "shearX", 0);
 					data.shearY = GetFloat(boneMap, "shearY", 0);
 
-					string tm = GetString(boneMap, "transform", TransformMode.Normal.ToString());
-					data.transformMode = (TransformMode)Enum.Parse(typeof(TransformMode), tm, true);
+					string inheritString = GetString(boneMap, "inherit", Inherit.Normal.ToString());
+					data.inherit = (Inherit)Enum.Parse(typeof(Inherit), inheritString, true);
 					data.skinRequired = GetBoolean(boneMap, "skin", false);
 
 					skeletonData.bones.Add(data);
@@ -874,7 +874,19 @@ namespace Spine {
 							timelines.Add(ReadTimeline(ref keyMapEnumerator, new ShearXTimeline(frames, frames, boneIndex), 0, 1));
 						else if (timelineName == "sheary")
 							timelines.Add(ReadTimeline(ref keyMapEnumerator, new ShearYTimeline(frames, frames, boneIndex), 0, 1));
-						else
+						else if (timelineName == "inherit") {
+							InheritTimeline timeline = new InheritTimeline(frames, boneIndex);
+							for (int frame = 0; ; frame++) {
+								Dictionary<string, object> keyMap = (Dictionary<string, Object>)keyMapEnumerator.Current;
+								float time = GetFloat(keyMap, "time", 0);
+								Inherit inherit = (Inherit)Enum.Parse(typeof(Inherit), GetString(keyMap, "inherit", Inherit.Normal.ToString()), true);
+								timeline.SetFrame(frame, time, inherit);
+								if (!keyMapEnumerator.MoveNext()) {
+									break;
+								}
+							}
+							timelines.Add(timeline);
+						} else
 							throw new Exception("Invalid timeline type for a bone: " + timelineName + " (" + boneName + ")");
 					}
 				}

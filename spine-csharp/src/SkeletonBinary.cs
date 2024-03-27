@@ -53,6 +53,7 @@ namespace Spine {
 		public const int BONE_SHEAR = 7;
 		public const int BONE_SHEARX = 8;
 		public const int BONE_SHEARY = 9;
+		public const int BONE_INHERIT = 10;
 
 		public const int SLOT_ATTACHMENT = 0;
 		public const int SLOT_RGBA = 1;
@@ -118,14 +119,6 @@ namespace Spine {
 		}
 #endif // WINDOWS_STOREAPP
 
-		public static readonly TransformMode[] TransformModeValues = {
-			TransformMode.Normal,
-			TransformMode.OnlyTranslation,
-			TransformMode.NoRotationOrReflection,
-			TransformMode.NoScale,
-			TransformMode.NoScaleOrReflection
-		};
-
 		/// <summary>Returns the version string of binary skeleton data.</summary>
 		public static string GetVersionString (Stream file) {
 			if (file == null) throw new ArgumentNullException("file");
@@ -187,7 +180,7 @@ namespace Spine {
 				data.shearX = input.ReadFloat();
 				data.shearY = input.ReadFloat();
 				data.Length = input.ReadFloat() * scale;
-				data.transformMode = TransformModeValues[input.ReadInt(true)];
+				data.inherit = InheritEnum.Values[input.ReadInt(true)];
 				data.skinRequired = input.ReadBoolean();
 				if (nonessential) { // discard non-essential data
 					input.ReadInt(); // Color.rgba8888ToColor(data.color, input.readInt());
@@ -844,7 +837,15 @@ namespace Spine {
 			for (int i = 0, n = input.ReadInt(true); i < n; i++) {
 				int boneIndex = input.ReadInt(true);
 				for (int ii = 0, nn = input.ReadInt(true); ii < nn; ii++) {
-					int type = input.ReadUByte(), frameCount = input.ReadInt(true), bezierCount = input.ReadInt(true);
+					int type = input.ReadUByte(), frameCount = input.ReadInt(true);
+					if (type == BONE_INHERIT) {
+						InheritTimeline timeline = new InheritTimeline(frameCount, boneIndex);
+						for (int frame = 0; frame < frameCount; frame++)
+							timeline.SetFrame(frame, input.ReadFloat(), InheritEnum.Values[input.ReadUByte()]);
+						timelines.Add(timeline);
+						continue;
+					}
+					int bezierCount = input.ReadInt(true);
 					switch (type) {
 					case BONE_ROTATE:
 						ReadTimeline(input, timelines, new RotateTimeline(frameCount, bezierCount, boneIndex), 1);

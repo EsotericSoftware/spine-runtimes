@@ -176,7 +176,7 @@ namespace Spine {
 	}
 
 	public enum Property {
-		Rotate = 0, X, Y, ScaleX, ScaleY, ShearX, ShearY, //
+		Rotate = 0, X, Y, ScaleX, ScaleY, ShearX, ShearY, Inherit, //
 		RGB, Alpha, RGB2, //
 		Attachment, Deform, //
 		Event, DrawOrder, //
@@ -977,6 +977,53 @@ namespace Spine {
 									MixDirection direction) {
 			Bone bone = skeleton.bones.Items[boneIndex];
 			if (bone.active) bone.shearY = GetRelativeValue(time, alpha, blend, bone.shearX, bone.data.shearY);
+		}
+	}
+
+	/// <summary>Changes a bone's <see cref="Bone.Inherit"/>.</summary>
+
+	public class InheritTimeline : Timeline, IBoneTimeline {
+		public const int ENTRIES = 2;
+		public const int INHERIT = 1;
+
+		readonly int boneIndex;
+
+		public InheritTimeline (int frameCount, int boneIndex)
+			: base(frameCount, (int)Property.Inherit + "|" + boneIndex) {
+			this.boneIndex = boneIndex;
+		}
+
+		public int BoneIndex {
+			get {
+				return boneIndex;
+			}
+		}
+
+		public override int FrameEntries {
+			get { return ENTRIES; }
+		}
+
+		/// <summary>Sets the transform mode for the specified frame.</summary>
+		/// <param name="frame">Between 0 and <code>frameCount</code>, inclusive.</param>
+		/// <param name="time">The frame time in seconds.</param>
+		public void SetFrame (int frame, float time, Inherit inherit) {
+			frame *= ENTRIES;
+			frames[frame] = time;
+			frames[frame + INHERIT] = (int)inherit;
+		}
+
+		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
+									MixDirection direction) {
+
+			Bone bone = skeleton.bones.Items[boneIndex];
+			if (!bone.active) return;
+
+			float[] frames = this.frames;
+			if (time < frames[0]) {
+				if (blend == MixBlend.Setup || blend == MixBlend.First) bone.inherit = bone.data.inherit;
+				return;
+			}
+			bone.inherit = InheritEnum.Values[(int)frames[Search(frames, time, ENTRIES) + INHERIT]];
 		}
 	}
 
