@@ -941,7 +941,7 @@ public class Animation {
 			MixDirection direction) {
 
 			Bone bone = skeleton.bones.get(boneIndex);
-			if (bone.active) bone.shearY = getRelativeValue(time, alpha, blend, bone.shearX, bone.data.shearY);
+			if (bone.active) bone.shearY = getRelativeValue(time, alpha, blend, bone.shearY, bone.data.shearY);
 		}
 	}
 
