@@ -57,6 +57,12 @@
     <Compile Include="..\..\spine-csharp\src\IkConstraintData.cs">
       <Link>spine-csharp\IkConstraintData.cs</Link>
     </Compile>
+    <Compile Include="..\..\spine-csharp\src\PhysicsConstraint.cs">
+      <Link>spine-csharp\PhysicsConstraint.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\PhysicsConstraintData.cs">
+      <Link>spine-csharp\PhysicsConstraintData.cs</Link>
+    </Compile>
     <Compile Include="..\..\spine-csharp\src\IUpdatable.cs">
       <Link>spine-csharp\IUpdatable.cs</Link>
     </Compile>

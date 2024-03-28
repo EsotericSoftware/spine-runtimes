@@ -90,9 +90,10 @@ namespace Spine {
 			// to the skeleton
 			state.Update(deltaTime);
 			state.Apply(skeleton);
+			skeleton.Update(deltaTime);
 
 			// Update the transformations of bones and other parts of the skeleton
-			skeleton.UpdateWorldTransform();
+			skeleton.UpdateWorldTransform(Skeleton.Physics.Update);
 
 			// Clear the screen and setup the projection matrix of the skeleton renderer
 			game.GraphicsDevice.Clear(Color.Black);
@@ -143,8 +144,9 @@ namespace Spine {
 		public override void Render (float deltaTime) {
 			state.Update(deltaTime);
 			state.Apply(skeleton);
+			skeleton.Update(deltaTime);
 
-			skeleton.UpdateWorldTransform();
+			skeleton.UpdateWorldTransform(Skeleton.Physics.Update);
 
 			// Clear the screen and setup the projection matrix of the custom effect through the
 			// "Projection" parameter.
@@ -200,7 +202,9 @@ namespace Spine {
 		public override void Render (float deltaTime) {
 			state.Update(deltaTime);
 			state.Apply(skeleton);
-			skeleton.UpdateWorldTransform();
+			skeleton.Update(deltaTime);
+
+			skeleton.UpdateWorldTransform(Skeleton.Physics.Update);
 
 			game.GraphicsDevice.Clear(Color.Black);
 			((BasicEffect)skeletonRenderer.Effect).Projection = Matrix.CreateOrthographicOffCenter(0, game.GraphicsDevice.Viewport.Width, game.GraphicsDevice.Viewport.Height, 0, 1, 0);
@@ -229,7 +233,7 @@ namespace Spine {
 			SkeletonJson json = new SkeletonJson(atlas);
 			json.Scale = 0.5f;
 			SkeletonData skeletonData = json.ReadSkeletonData("data/mix-and-match-pro.json");
-
+			
 			skeleton = new Skeleton(skeletonData);
 			AnimationStateData stateData = new AnimationStateData(skeleton.Data);
 			state = new AnimationState(stateData);
@@ -259,7 +263,9 @@ namespace Spine {
 		public override void Render (float deltaTime) {
 			state.Update(deltaTime);
 			state.Apply(skeleton);
-			skeleton.UpdateWorldTransform();
+			skeleton.Update(deltaTime);
+
+			skeleton.UpdateWorldTransform(Skeleton.Physics.Pose);
 
 			game.GraphicsDevice.Clear(Color.Black);
 			((BasicEffect)skeletonRenderer.Effect).Projection = Matrix.CreateOrthographicOffCenter(0, game.GraphicsDevice.Viewport.Width, game.GraphicsDevice.Viewport.Height, 0, 1, 0);
