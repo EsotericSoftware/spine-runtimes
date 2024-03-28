@@ -39,6 +39,7 @@ import { HasTextureRegion } from "./attachments/HasTextureRegion.js";
 import { SequenceMode, SequenceModeValues } from "./attachments/Sequence.js";
 import { PhysicsConstraint } from "./PhysicsConstraint.js";
 import { PhysicsConstraintData } from "./PhysicsConstraintData.js";
+import { Inherit } from "./BoneData.js";
 
 /** A simple container for a list of timelines and a name. */
 export class Animation {
@@ -134,34 +135,35 @@ const Property = {
 	scaleY: 4,
 	shearX: 5,
 	shearY: 6,
+	inherit: 7,
 
-	rgb: 7,
-	alpha: 8,
-	rgb2: 9,
+	rgb: 8,
+	alpha: 9,
+	rgb2: 10,
 
-	attachment: 10,
-	deform: 11,
+	attachment: 11,
+	deform: 12,
 
-	event: 12,
-	drawOrder: 13,
+	event: 13,
+	drawOrder: 14,
 
-	ikConstraint: 14,
-	transformConstraint: 15,
+	ikConstraint: 15,
+	transformConstraint: 16,
 
-	pathConstraintPosition: 16,
-	pathConstraintSpacing: 17,
-	pathConstraintMix: 18,
+	pathConstraintPosition: 17,
+	pathConstraintSpacing: 18,
+	pathConstraintMix: 19,
 
-	physicsConstraintInertia: 19,
-	physicsConstraintStrength: 20,
-	physicsConstraintDamping: 21,
-	physicsConstraintMass: 22,
-	physicsConstraintWind: 23,
-	physicsConstraintGravity: 24,
-	physicsConstraintMix: 25,
-	physicsConstraintReset: 26,
+	physicsConstraintInertia: 20,
+	physicsConstraintStrength: 21,
+	physicsConstraintDamping: 22,
+	physicsConstraintMass: 23,
+	physicsConstraintWind: 24,
+	physicsConstraintGravity: 25,
+	physicsConstraintMix: 26,
+	physicsConstraintReset: 27,
 
-	sequence: 27,
+	sequence: 28,
 }
 
 /** The interface for all timelines. */
@@ -804,7 +806,41 @@ export class ShearYTimeline extends CurveTimeline1 implements BoneTimeline {
 
 	apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 		let bone = skeleton.bones[this.boneIndex];
-		if (bone.active) bone.shearY = this.getRelativeValue(time, alpha, blend, bone.shearX, bone.data.shearY);
+		if (bone.active) bone.shearY = this.getRelativeValue(time, alpha, blend, bone.shearY, bone.data.shearY);
+	}
+}
+
+export class InheritTimeline extends Timeline implements BoneTimeline {
+	boneIndex = 0;
+
+	constructor (frameCount: number, boneIndex: number) {
+		super(frameCount, [Property.inherit + "|" + boneIndex]);
+		this.boneIndex = boneIndex;
+	}
+
+	public getFrameEntries () {
+		return 2/*ENTRIES*/;
+	}
+
+	/** Sets the transform mode for the specified frame.
+	 * @param frame Between 0 and <code>frameCount</code>, inclusive.
+	 * @param time The frame time in seconds. */
+	public setFrame (frame: number, time: number, inherit: Inherit) {
+		frame *= 2/*ENTRIES*/;
+		this.frames[frame] = time;
+		this.frames[frame + 1/*INHERIT*/] = inherit;
+	}
+
+	public apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
+		let bone = skeleton.bones[this.boneIndex];
+		if (!bone.active) return;
+
+		let frames = this.frames;
+		if (time < frames[0]) {
+			if (blend == MixBlend.setup || blend == MixBlend.first) bone.inherit = bone.data.inherit;
+			return;
+		}
+		bone.inherit = this.frames[Timeline.search(frames, time, 2/*ENTRIES*/) + 1/*INHERIT*/];
 	}
 }
 

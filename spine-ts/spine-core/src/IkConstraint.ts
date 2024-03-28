@@ -28,7 +28,7 @@
  *****************************************************************************/
 
 import { Bone } from "./Bone.js";
-import { TransformMode } from "./BoneData.js";
+import { Inherit } from "./BoneData.js";
 import { IkConstraintData } from "./IkConstraintData.js";
 import { Physics, Skeleton } from "./Skeleton.js";
 import { Updatable } from "./Updatable.js";
@@ -120,12 +120,12 @@ export class IkConstraint implements Updatable {
 		let pa = p.a, pb = p.b, pc = p.c, pd = p.d;
 		let rotationIK = -bone.ashearX - bone.arotation, tx = 0, ty = 0;
 
-		switch (bone.data.transformMode) {
-			case TransformMode.OnlyTranslation:
+		switch (bone.inherit) {
+			case Inherit.OnlyTranslation:
 				tx = (targetX - bone.worldX) * MathUtils.signum(bone.skeleton.scaleX);
 				ty = (targetY - bone.worldY) * MathUtils.signum(bone.skeleton.scaleY);
 				break;
-			case TransformMode.NoRotationOrReflection:
+			case Inherit.NoRotationOrReflection:
 				let s = Math.abs(pa * pd - pb * pc) / Math.max(0.0001, pa * pa + pc * pc);
 				let sa = pa / bone.skeleton.scaleX;
 				let sc = pc / bone.skeleton.scaleY;
@@ -152,9 +152,9 @@ export class IkConstraint implements Updatable {
 			rotationIK += 360;
 		let sx = bone.ascaleX, sy = bone.ascaleY;
 		if (compress || stretch) {
-			switch (bone.data.transformMode) {
-				case TransformMode.NoScale:
-				case TransformMode.NoScaleOrReflection:
+			switch (bone.inherit) {
+				case Inherit.NoScale:
+				case Inherit.NoScaleOrReflection:
 					tx = targetX - bone.worldX;
 					ty = targetY - bone.worldY;
 			}
@@ -175,6 +175,7 @@ export class IkConstraint implements Updatable {
 	/** Applies 2 bone IK. The target is specified in the world coordinate system.
 	 * @param child A direct descendant of the parent bone. */
 	apply2 (parent: Bone, child: Bone, targetX: number, targetY: number, bendDir: number, stretch: boolean, uniform: boolean, softness: number, alpha: number) {
+		if (parent.inherit != Inherit.Normal || child.inherit != Inherit.Normal) return;
 		let px = parent.ax, py = parent.ay, psx = parent.ascaleX, psy = parent.ascaleY, sx = psx, sy = psy, csx = child.ascaleX;
 		let os1 = 0, os2 = 0, s2 = 0;
 		if (psx < 0) {

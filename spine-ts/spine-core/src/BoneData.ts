@@ -65,7 +65,7 @@ export class BoneData {
 	shearY = 0;
 
 	/** The transform mode for how parent world transforms affect this bone. */
-	transformMode = TransformMode.Normal;
+	inherit = Inherit.Normal;
 
 	/** When true, {@link Skeleton#updateWorldTransform()} only updates this bone if the {@link Skeleton#skin} contains this
 	  * bone.
@@ -92,4 +92,4 @@ export class BoneData {
 }
 
 /** Determines how a bone inherits world transforms from parent bones. */
-export enum TransformMode { Normal, OnlyTranslation, NoRotationOrReflection, NoScale, NoScaleOrReflection }
+export enum Inherit { Normal, OnlyTranslation, NoRotationOrReflection, NoScale, NoScaleOrReflection }

@@ -46,7 +46,7 @@ import { Color, Utils, MathUtils, Vector2, NumberArrayLike } from "./Utils.js";
  *
  * See [Instance objects](http://esotericsoftware.com/spine-runtime-architecture#Instance-objects) in the Spine Runtimes Guide. */
 export class Skeleton {
-	static yDown = false;;
+	static yDown = false;
 
 	/** The skeleton's setup pose data. */
 	data: SkeletonData;

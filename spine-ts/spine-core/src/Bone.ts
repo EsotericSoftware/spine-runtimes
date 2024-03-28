@@ -27,7 +27,7 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { BoneData, TransformMode } from "./BoneData.js";
+import { BoneData, Inherit } from "./BoneData.js";
 import { Physics, Skeleton } from "./Skeleton.js";
 import { Updatable } from "./Updatable.js";
 import { MathUtils, Vector2 } from "./Utils.js";
@@ -110,6 +110,8 @@ export class Bone implements Updatable {
 	/** The world Y position. If changed, {@link #updateAppliedTransform()} should be called. */
 	worldX = 0;
 
+	inherit: Inherit = Inherit.Normal;
+
 	sorted = false;
 	active = false;
 
@@ -174,8 +176,8 @@ export class Bone implements Updatable {
 		this.worldX = pa * x + pb * y + parent.worldX;
 		this.worldY = pc * x + pd * y + parent.worldY;
 
-		switch (this.data.transformMode) {
-			case TransformMode.Normal: {
+		switch (this.inherit) {
+			case Inherit.Normal: {
 				const rx = (rotation + shearX) * MathUtils.degRad;
 				const ry = (rotation + 90 + shearY) * MathUtils.degRad;
 				const la = Math.cos(rx) * scaleX;
@@ -188,7 +190,7 @@ export class Bone implements Updatable {
 				this.d = pc * lb + pd * ld;
 				return;
 			}
-			case TransformMode.OnlyTranslation: {
+			case Inherit.OnlyTranslation: {
 				const rx = (rotation + shearX) * MathUtils.degRad;
 				const ry = (rotation + 90 + shearY) * MathUtils.degRad;
 				this.a = Math.cos(rx) * scaleX;
@@ -197,7 +199,7 @@ export class Bone implements Updatable {
 				this.d = Math.sin(ry) * scaleY;
 				break;
 			}
-			case TransformMode.NoRotationOrReflection: {
+			case Inherit.NoRotationOrReflection: {
 				let s = pa * pa + pc * pc;
 				let prx = 0;
 				if (s > 0.0001) {
@@ -224,8 +226,8 @@ export class Bone implements Updatable {
 				this.d = pc * lb + pd * ld;
 				break;
 			}
-			case TransformMode.NoScale:
-			case TransformMode.NoScaleOrReflection: {
+			case Inherit.NoScale:
+			case Inherit.NoScaleOrReflection: {
 				rotation *= MathUtils.degRad;
 				const cos = Math.cos(rotation), sin = Math.sin(rotation);
 				let za = (pa * cos + pb * sin) / this.skeleton.scaleX;
@@ -235,7 +237,7 @@ export class Bone implements Updatable {
 				za *= s;
 				zc *= s;
 				s = Math.sqrt(za * za + zc * zc);
-				if (this.data.transformMode == TransformMode.NoScale
+				if (this.inherit == Inherit.NoScale
 					&& (pa * pd - pb * pc < 0) != (this.skeleton.scaleX < 0 != this.skeleton.scaleY < 0)) s = -s;
 				rotation = Math.PI / 2 + Math.atan2(zc, za);
 				const zb = Math.cos(rotation) * s;
@@ -269,6 +271,7 @@ export class Bone implements Updatable {
 		this.scaleY = data.scaleY;
 		this.shearX = data.shearX;
 		this.shearY = data.shearY;
+		this.inherit = data.inherit;
 	}
 
 	/** Computes the applied transform values from the world transform.
@@ -299,14 +302,14 @@ export class Bone implements Updatable {
 		this.ay = (dy * id - dx * ic);
 
 		let ra, rb, rc, rd;
-		if (this.data.transformMode == TransformMode.OnlyTranslation) {
+		if (this.inherit == Inherit.OnlyTranslation) {
 			ra = this.a;
 			rb = this.b;
 			rc = this.c;
 			rd = this.d;
 		} else {
-			switch (this.data.transformMode) {
-				case TransformMode.NoRotationOrReflection: {
+			switch (this.inherit) {
+				case Inherit.NoRotationOrReflection: {
 					let s = Math.abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
 					let sa = pa / this.skeleton.scaleX;
 					let sc = pc / this.skeleton.scaleY;
@@ -317,8 +320,8 @@ export class Bone implements Updatable {
 					ib = pb * pid;
 					break;
 				}
-				case TransformMode.NoScale:
-				case TransformMode.NoScaleOrReflection:
+				case Inherit.NoScale:
+				case Inherit.NoScaleOrReflection:
 					let cos = MathUtils.cosDeg(this.rotation), sin = MathUtils.sinDeg(this.rotation);
 					pa = (pa * cos + pb * sin) / this.skeleton.scaleX;
 					pc = (pc * cos + pd * sin) / this.skeleton.scaleY;
@@ -327,7 +330,7 @@ export class Bone implements Updatable {
 					pa *= s;
 					pc *= s;
 					s = Math.sqrt(pa * pa + pc * pc);
-					if (this.data.transformMode == TransformMode.NoScale && pid < 0 != (this.skeleton.scaleX < 0 != this.skeleton.scaleY < 0)) s = -s;
+					if (this.inherit == Inherit.NoScale && pid < 0 != (this.skeleton.scaleX < 0 != this.skeleton.scaleY < 0)) s = -s;
 					let r = MathUtils.PI / 2 + Math.atan2(pc, pa);
 					pb = Math.cos(r) * s;
 					pd = Math.sin(r) * s;

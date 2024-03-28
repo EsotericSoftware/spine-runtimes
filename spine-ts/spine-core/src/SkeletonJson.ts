@@ -27,11 +27,11 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Animation, Timeline, AttachmentTimeline, RGBATimeline, RGBTimeline, AlphaTimeline, RGBA2Timeline, RGB2Timeline, RotateTimeline, TranslateTimeline, TranslateXTimeline, TranslateYTimeline, ScaleTimeline, ScaleXTimeline, ScaleYTimeline, ShearTimeline, ShearXTimeline, ShearYTimeline, IkConstraintTimeline, TransformConstraintTimeline, PathConstraintPositionTimeline, PathConstraintSpacingTimeline, PathConstraintMixTimeline, DeformTimeline, DrawOrderTimeline, EventTimeline, CurveTimeline1, CurveTimeline2, CurveTimeline, PhysicsConstraintResetTimeline, PhysicsConstraintInertiaTimeline, PhysicsConstraintStrengthTimeline, PhysicsConstraintDampingTimeline, PhysicsConstraintMassTimeline, PhysicsConstraintWindTimeline, PhysicsConstraintGravityTimeline, PhysicsConstraintMixTimeline } from "./Animation.js";
+import { Animation, Timeline, InheritTimeline, AttachmentTimeline, RGBATimeline, RGBTimeline, AlphaTimeline, RGBA2Timeline, RGB2Timeline, RotateTimeline, TranslateTimeline, TranslateXTimeline, TranslateYTimeline, ScaleTimeline, ScaleXTimeline, ScaleYTimeline, ShearTimeline, ShearXTimeline, ShearYTimeline, IkConstraintTimeline, TransformConstraintTimeline, PathConstraintPositionTimeline, PathConstraintSpacingTimeline, PathConstraintMixTimeline, DeformTimeline, DrawOrderTimeline, EventTimeline, CurveTimeline1, CurveTimeline2, CurveTimeline, PhysicsConstraintResetTimeline, PhysicsConstraintInertiaTimeline, PhysicsConstraintStrengthTimeline, PhysicsConstraintDampingTimeline, PhysicsConstraintMassTimeline, PhysicsConstraintWindTimeline, PhysicsConstraintGravityTimeline, PhysicsConstraintMixTimeline } from "./Animation.js";
 import { VertexAttachment, Attachment } from "./attachments/Attachment.js";
 import { AttachmentLoader } from "./attachments/AttachmentLoader.js";
 import { MeshAttachment } from "./attachments/MeshAttachment.js";
-import { BoneData, TransformMode } from "./BoneData.js";
+import { BoneData, Inherit } from "./BoneData.js";
 import { EventData } from "./EventData.js";
 import { Event } from "./Event.js";
 import { IkConstraintData } from "./IkConstraintData.js";
@@ -102,7 +102,7 @@ export class SkeletonJson {
 				data.scaleY = getValue(boneMap, "scaleY", 1);
 				data.shearX = getValue(boneMap, "shearX", 0);
 				data.shearY = getValue(boneMap, "shearY", 0);
-				data.transformMode = Utils.enumValue(TransformMode, getValue(boneMap, "transform", "Normal"));
+				data.inherit = Utils.enumValue(Inherit, getValue(boneMap, "inherit", "Normal"));
 				data.skinRequired = getValue(boneMap, "skin", false);
 
 				let color = getValue(boneMap, "color", null);
@@ -739,6 +739,13 @@ export class SkeletonJson {
 					} else if (timelineName === "sheary") {
 						let timeline = new ShearYTimeline(frames, frames, boneIndex);
 						timelines.push(readTimeline1(timelineMap, timeline, 0, 1));
+					} else if (timelineName === "inherit") {
+						let timeline = new InheritTimeline(frames, bone.index);
+						for (let frame = 0; frame < timelineMap.length; frame++) {
+							let aFrame = timelineMap[frame];
+							timeline.setFrame(frame, getValue(aFrame, "time", 0), Utils.enumValue(Inherit, getValue(aFrame, "inherit", "Normal")));
+						}
+						timelines.push(timeline);
 					}
 				}
 			}

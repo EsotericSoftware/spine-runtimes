@@ -27,7 +27,7 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Animation, Timeline, AttachmentTimeline, RGBATimeline, RGBTimeline, RGBA2Timeline, RGB2Timeline, AlphaTimeline, RotateTimeline, TranslateTimeline, TranslateXTimeline, TranslateYTimeline, ScaleTimeline, ScaleXTimeline, ScaleYTimeline, ShearTimeline, ShearXTimeline, ShearYTimeline, IkConstraintTimeline, TransformConstraintTimeline, PathConstraintPositionTimeline, PathConstraintSpacingTimeline, PathConstraintMixTimeline, DeformTimeline, DrawOrderTimeline, EventTimeline, CurveTimeline1, CurveTimeline2, CurveTimeline, SequenceTimeline, PhysicsConstraintResetTimeline, PhysicsConstraintInertiaTimeline, PhysicsConstraintStrengthTimeline, PhysicsConstraintDampingTimeline, PhysicsConstraintMassTimeline, PhysicsConstraintWindTimeline, PhysicsConstraintGravityTimeline, PhysicsConstraintMixTimeline } from "./Animation.js";
+import { Animation, Timeline, InheritTimeline, AttachmentTimeline, RGBATimeline, RGBTimeline, RGBA2Timeline, RGB2Timeline, AlphaTimeline, RotateTimeline, TranslateTimeline, TranslateXTimeline, TranslateYTimeline, ScaleTimeline, ScaleXTimeline, ScaleYTimeline, ShearTimeline, ShearXTimeline, ShearYTimeline, IkConstraintTimeline, TransformConstraintTimeline, PathConstraintPositionTimeline, PathConstraintSpacingTimeline, PathConstraintMixTimeline, DeformTimeline, DrawOrderTimeline, EventTimeline, CurveTimeline1, CurveTimeline2, CurveTimeline, SequenceTimeline, PhysicsConstraintResetTimeline, PhysicsConstraintInertiaTimeline, PhysicsConstraintStrengthTimeline, PhysicsConstraintDampingTimeline, PhysicsConstraintMassTimeline, PhysicsConstraintWindTimeline, PhysicsConstraintGravityTimeline, PhysicsConstraintMixTimeline } from "./Animation.js";
 import { VertexAttachment, Attachment } from "./attachments/Attachment.js";
 import { AttachmentLoader } from "./attachments/AttachmentLoader.js";
 import { HasTextureRegion } from "./attachments/HasTextureRegion.js";
@@ -113,7 +113,7 @@ export class SkeletonBinary {
 			data.shearX = input.readFloat();
 			data.shearY = input.readFloat();
 			data.length = input.readFloat() * scale;
-			data.transformMode = input.readInt(true);
+			data.inherit = input.readByte();
 			data.skinRequired = input.readBoolean();
 			if (nonessential) {
 				Color.rgba8888ToColor(data.color, input.readInt32());
@@ -248,7 +248,7 @@ export class SkeletonBinary {
 			if ((flags & 16) != 0) data.scaleX = input.readFloat();
 			if ((flags & 32) != 0) data.shearX = input.readFloat();
 			data.limit = ((flags & 64) != 0 ? input.readFloat() : 5000) * scale;
-			data.step = 1 / input.readByte();
+			data.step = 1 / input.readUnsignedByte();
 			data.inertia = input.readFloat();
 			data.strength = input.readFloat();
 			data.damping = input.readFloat();
@@ -802,7 +802,16 @@ export class SkeletonBinary {
 		for (let i = 0, n = input.readInt(true); i < n; i++) {
 			let boneIndex = input.readInt(true);
 			for (let ii = 0, nn = input.readInt(true); ii < nn; ii++) {
-				let type = input.readByte(), frameCount = input.readInt(true), bezierCount = input.readInt(true);
+				let type = input.readByte(), frameCount = input.readInt(true);
+				if (type == BONE_INHERIT) {
+					let timeline = new InheritTimeline(frameCount, boneIndex);
+					for (let frame = 0; frame < frameCount; frame++) {
+						timeline.setFrame(frame, input.readFloat(), input.readByte());
+					}
+					timelines.push(timeline);
+					continue;
+				}
+				let bezierCount = input.readInt(true);
 				switch (type) {
 					case BONE_ROTATE:
 						timelines.push(readTimeline1(input, new RotateTimeline(frameCount, bezierCount, boneIndex), 1));
@@ -1286,6 +1295,7 @@ const BONE_SCALEY = 6;
 const BONE_SHEAR = 7;
 const BONE_SHEARX = 8;
 const BONE_SHEARY = 9;
+const BONE_INHERIT = 10;
 
 const SLOT_ATTACHMENT = 0;
 const SLOT_RGBA = 1;
