@@ -187,6 +187,34 @@ namespace spine {
 			return true;
 		}
 
+        int lastIndexOf(const char c) {
+            for (int i = length() - 1; i >= 0; i--) {
+                if (buffer()[i] == c) return i;
+            }
+            return -1;
+        }
+
+        String substring(int startIndex, int length) const {
+            if (startIndex < 0 || startIndex >= _length || length < 0 || startIndex + length > _length) {
+                return String();
+            }
+            char* subStr = SpineExtension::calloc<char>(length + 1, __FILE__, __LINE__);
+            memcpy(subStr, _buffer + startIndex, length);
+            subStr[length] = '\0';
+            return String(subStr, true, true);
+        }
+
+        String substring(int startIndex) const {
+            if (startIndex < 0 || startIndex >= _length) {
+                return String();
+            }
+            int length = _length - startIndex;
+            char* subStr = SpineExtension::calloc<char>(length + 1, __FILE__, __LINE__);
+            memcpy(subStr, _buffer + startIndex, length);
+            subStr[length] = '\0';
+            return String(subStr, true, true);
+        }
+
 		friend bool operator==(const String &a, const String &b) {
 			if (a._buffer == b._buffer) return true;
 			if (a._length != b._length) return false;

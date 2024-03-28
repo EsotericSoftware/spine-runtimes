@@ -161,7 +161,8 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 		skeletonData->_y = Json::getFloat(skeleton, "y", 0);
 		skeletonData->_width = Json::getFloat(skeleton, "width", 0);
 		skeletonData->_height = Json::getFloat(skeleton, "height", 0);
-		skeletonData->_fps = Json::getFloat(skeleton, "fps", 30);
+        skeletonData->_referenceScale = Json::getFloat(skeleton, "referenceScale", 100) * _scale;
+        skeletonData->_fps = Json::getFloat(skeleton, "fps", 30);
 		skeletonData->_audioPath = Json::getString(skeleton, "audio", 0);
 		skeletonData->_imagesPath = Json::getString(skeleton, "images", 0);
 	}
@@ -211,6 +212,9 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 		const char *color = Json::getString(boneMap, "color", NULL);
 		if (color) toColor(data->getColor(), color, true);
 
+        data->_icon = Json::getString(boneMap, "icon", "");
+        data->_visible = Json::getBoolean(boneMap, "visible", true);
+
 		skeletonData->_bones[i] = data;
 		bonesCount++;
 	}
@@ -235,7 +239,14 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 				return NULL;
 			}
 
-			data = new (__FILE__, __LINE__) SlotData(i, Json::getString(slotMap, "name", 0), *boneData);
+            String pathName = "";
+            String slotName = String(Json::getString(slotMap, "name", 0));
+            int slash = slotName.lastIndexOf('/');
+            if (slash != -1) {
+                pathName = slotName.substring(0, slash);
+                slotName = slotName.substring(slash + 1);
+            }
+			data = new (__FILE__, __LINE__) SlotData(i, slotName, *boneData);
 
 			color = Json::getString(slotMap, "color", 0);
 			if (color) {
@@ -267,7 +278,8 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 				else if (strcmp(item->_valueString, "screen") == 0)
 					data->_blendMode = BlendMode_Screen;
 			}
-
+            data->_visible = Json::getBoolean(slotMap, "visible", true);
+            data->_path = pathName;
 			skeletonData->_slots[i] = data;
 		}
 	}
