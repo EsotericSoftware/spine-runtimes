@@ -181,7 +181,7 @@ namespace Spine {
 			Bone parent = this.parent;
 			if (parent == null) { // Root bone.
 				Skeleton skeleton = this.skeleton;
-				float sx = skeleton.scaleX, sy = skeleton.scaleY;
+				float sx = skeleton.scaleX, sy = skeleton.ScaleY;
 				float rx = (rotation + shearX) * MathUtils.DegRad;
 				float ry = (rotation + 90 + shearY) * MathUtils.DegRad;
 				a = (float)Math.Cos(rx) * scaleX * sx;
@@ -225,7 +225,7 @@ namespace Spine {
 				if (s > 0.0001f) {
 					s = Math.Abs(pa * pd - pb * pc) / s;
 					pa /= skeleton.scaleX;
-					pc /= skeleton.scaleY;
+					pc /= skeleton.ScaleY;
 					pb = pc * s;
 					pd = pa * s;
 					prx = MathUtils.Atan2Deg(pc, pa);
@@ -251,13 +251,13 @@ namespace Spine {
 				rotation *= MathUtils.DegRad;
 				float cos = (float)Math.Cos(rotation), sin = (float)Math.Sin(rotation);
 				float za = (pa * cos + pb * sin) / skeleton.scaleX;
-				float zc = (pc * cos + pd * sin) / skeleton.scaleY;
+				float zc = (pc * cos + pd * sin) / skeleton.ScaleY;
 				float s = (float)Math.Sqrt(za * za + zc * zc);
 				if (s > 0.00001f) s = 1 / s;
 				za *= s;
 				zc *= s;
 				s = (float)Math.Sqrt(za * za + zc * zc);
-				if (inherit == Inherit.NoScale && (pa * pd - pb * pc < 0) != (skeleton.scaleX < 0 != skeleton.scaleY < 0)) s = -s;
+				if (inherit == Inherit.NoScale && (pa * pd - pb * pc < 0) != (skeleton.scaleX < 0 != skeleton.ScaleY < 0)) s = -s;
 				rotation = MathUtils.PI / 2 + MathUtils.Atan2(zc, za);
 				float zb = (float)Math.Cos(rotation) * s;
 				float zd = (float)Math.Sin(rotation) * s;
@@ -276,8 +276,8 @@ namespace Spine {
 			}
 			a *= skeleton.scaleX;
 			b *= skeleton.scaleX;
-			c *= skeleton.scaleY;
-			d *= skeleton.scaleY;
+			c *= skeleton.ScaleY;
+			d *= skeleton.ScaleY;
 		}
 
 		/// <summary>Sets this bone's local transform to the setup pose.</summary>
@@ -287,7 +287,7 @@ namespace Spine {
 			y = data.y;
 			rotation = data.rotation;
 			scaleX = data.scaleX;
-			scaleY = data.scaleY;
+			scaleY = data.ScaleY;
 			shearX = data.shearX;
 			shearY = data.shearY;
 			inherit = data.inherit;
@@ -335,9 +335,9 @@ namespace Spine {
 				case Inherit.NoRotationOrReflection: {
 					float s = Math.Abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
 					float sa = pa / skeleton.scaleX;
-					float sc = pc / skeleton.scaleY;
+					float sc = pc / skeleton.ScaleY;
 					pb = -sc * s * skeleton.scaleX;
-					pd = sa * s * skeleton.scaleY;
+					pd = sa * s * skeleton.ScaleY;
 					pid = 1 / (pa * pd - pb * pc);
 					ia = pd * pid;
 					ib = pb * pid;
@@ -347,13 +347,13 @@ namespace Spine {
 				case Inherit.NoScaleOrReflection: {
 					float r = rotation * MathUtils.DegRad, cos = (float)Math.Cos(r), sin = (float)Math.Sin(r);
 					pa = (pa * cos + pb * sin) / skeleton.scaleX;
-					pc = (pc * cos + pd * sin) / skeleton.scaleY;
+					pc = (pc * cos + pd * sin) / skeleton.ScaleY;
 					float s = (float)Math.Sqrt(pa * pa + pc * pc);
 					if (s > 0.00001f) s = 1 / s;
 					pa *= s;
 					pc *= s;
 					s = (float)Math.Sqrt(pa * pa + pc * pc);
-					if (inherit == Inherit.NoScale && pid < 0 != (skeleton.scaleX < 0 != skeleton.scaleY < 0)) s = -s;
+					if (inherit == Inherit.NoScale && pid < 0 != (skeleton.scaleX < 0 != skeleton.ScaleY < 0)) s = -s;
 					r = MathUtils.PI / 2 + MathUtils.Atan2(pc, pa);
 					pb = (float)Math.Cos(r) * s;
 					pd = (float)Math.Sin(r) * s;

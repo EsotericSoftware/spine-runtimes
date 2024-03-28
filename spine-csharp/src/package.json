@@ -2,7 +2,7 @@
 	"name": "com.esotericsoftware.spine.spine-csharp",
 	"displayName": "spine-csharp Runtime",
 	"description": "This plugin provides the spine-csharp core runtime.",
-	"version": "4.2.16",
+	"version": "4.2.17",
 	"unity": "2018.3",
 	"author": {
 		"name": "Esoteric Software",

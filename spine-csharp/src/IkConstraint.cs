@@ -183,9 +183,9 @@ namespace Spine {
 			case Inherit.NoRotationOrReflection: {
 				float s = Math.Abs(pa * pd - pb * pc) / Math.Max(0.0001f, pa * pa + pc * pc);
 				float sa = pa / bone.skeleton.scaleX;
-				float sc = pc / bone.skeleton.scaleY;
+				float sc = pc / bone.skeleton.ScaleY;
 				pb = -sc * s * bone.skeleton.scaleX;
-				pd = sa * s * bone.skeleton.scaleY;
+				pd = sa * s * bone.skeleton.ScaleY;
 				rotationIK += MathUtils.Atan2Deg(sc, sa);
 				goto default; // Fall through.
 			}
