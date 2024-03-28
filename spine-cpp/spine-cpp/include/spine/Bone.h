@@ -33,6 +33,7 @@
 #include <spine/Updatable.h>
 #include <spine/SpineObject.h>
 #include <spine/Vector.h>
+#include <spine/Inherit.h>
 
 namespace spine {
 	class BoneData;
@@ -95,6 +96,8 @@ namespace spine {
 
 		friend class TranslateYTimeline;
 
+        friend class InheritTimeline;
+
 	RTTI_DECL
 
 	public:
@@ -125,7 +128,11 @@ namespace spine {
 
 		void worldToLocal(float worldX, float worldY, float &outLocalX, float &outLocalY);
 
+        void worldToParent(float worldX, float worldY, float &outParentX, float &outParentY);
+
 		void localToWorld(float localX, float localY, float &outWorldX, float &outWorldY);
+
+        void parentToWorld(float worldX, float worldY, float &outX, float &outY);
 
 		float worldToLocalRotation(float worldRotation);
 
@@ -255,6 +262,10 @@ namespace spine {
 
 		void setActive(bool inValue);
 
+        Inherit getInherit() { return _inherit; }
+
+        void setInherit(Inherit inValue) { _inherit = inValue; }
+
 	private:
 		static bool yDown;
 
@@ -268,6 +279,7 @@ namespace spine {
 		float _c, _d, _worldY;
 		bool _sorted;
 		bool _active;
+        Inherit _inherit;
 	};
 }
 

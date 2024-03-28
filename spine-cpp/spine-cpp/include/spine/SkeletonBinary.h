@@ -30,7 +30,7 @@
 #ifndef Spine_SkeletonBinary_h
 #define Spine_SkeletonBinary_h
 
-#include <spine/TransformMode.h>
+#include <spine/Inherit.h>
 #include <spine/Vector.h>
 #include <spine/SpineObject.h>
 #include <spine/SpineString.h>

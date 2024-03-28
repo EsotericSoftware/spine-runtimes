@@ -60,6 +60,7 @@
 #include <spine/IkConstraint.h>
 #include <spine/IkConstraintData.h>
 #include <spine/IkConstraintTimeline.h>
+#include <spine/InheritTimeline.h>
 #include <spine/Json.h>
 #include <spine/LinkedMesh.h>
 #include <spine/MathUtil.h>
@@ -101,7 +102,7 @@
 #include <spine/TransformConstraint.h>
 #include <spine/TransformConstraintData.h>
 #include <spine/TransformConstraintTimeline.h>
-#include <spine/TransformMode.h>
+#include <spine/Inherit.h>
 #include <spine/TranslateTimeline.h>
 #include <spine/Triangulator.h>
 #include <spine/Updatable.h>

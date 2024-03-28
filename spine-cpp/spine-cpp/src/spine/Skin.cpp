@@ -88,7 +88,7 @@ Skin::AttachmentMap::Entries Skin::AttachmentMap::getEntries() {
 	return Skin::AttachmentMap::Entries(_buckets);
 }
 
-Skin::Skin(const String &name) : _name(name), _attachments() {
+Skin::Skin(const String &name) : _name(name), _attachments(), _color(0.99607843f, 0.61960787f, 0.30980393f, 1) {
 	assert(_name.length() > 0);
 }
 

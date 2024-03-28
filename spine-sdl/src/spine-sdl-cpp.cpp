@@ -54,7 +54,8 @@ SkeletonDrawable::~SkeletonDrawable() {
 void SkeletonDrawable::update(float delta) {
 	animationState->update(delta);
 	animationState->apply(*skeleton);
-	skeleton->updateWorldTransform();
+    skeleton->update(delta);
+	skeleton->updateWorldTransform(Physics_Update);
 }
 
 void SkeletonDrawable::draw(SDL_Renderer *renderer) {

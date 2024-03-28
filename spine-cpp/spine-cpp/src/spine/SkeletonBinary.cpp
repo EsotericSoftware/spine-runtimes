@@ -157,7 +157,7 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 		data->_shearX = readFloat(input);
 		data->_shearY = readFloat(input);
 		data->_length = readFloat(input) * _scale;
-		data->_transformMode = static_cast<TransformMode>(readVarint(input, true));
+		data->_inherit = static_cast<Inherit>(readVarint(input, true));
 		data->_skinRequired = readBoolean(input);
 		if (nonessential) {
 			readColor(input, data->getColor());

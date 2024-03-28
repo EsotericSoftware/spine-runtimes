@@ -93,7 +93,7 @@ void SequenceTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vec
 	int index = modeAndIndex >> 4, count = (int) sequence->getRegions().size();
 	int mode = modeAndIndex & 0xf;
 	if (mode != SequenceMode::hold) {
-		index += (int) (((time - before) / delay + 0.00001));
+		index += (int) (((time - before) / delay + 0.0001));
 		switch (mode) {
 			case SequenceMode::once:
 				index = MathUtil::min(count - 1, index);

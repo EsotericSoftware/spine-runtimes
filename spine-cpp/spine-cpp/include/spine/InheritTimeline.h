@@ -27,17 +27,42 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_TransformMode_h
-#define Spine_TransformMode_h
+#ifndef Spine_InheritTimeline_h
+#define Spine_InheritTimeline_h
+
+#include <spine/Timeline.h>
+
+#include <spine/Animation.h>
+#include <spine/Property.h>
+#include <spine/Inherit.h>
 
 namespace spine {
-	enum TransformMode {
-		TransformMode_Normal = 0,
-		TransformMode_OnlyTranslation,
-		TransformMode_NoRotationOrReflection,
-		TransformMode_NoScale,
-		TransformMode_NoScaleOrReflection
+
+	class SP_API InheritTimeline : public Timeline {
+		friend class SkeletonBinary;
+
+		friend class SkeletonJson;
+
+	RTTI_DECL
+
+	public:
+		explicit InheritTimeline(size_t frameCount, int boneIndex);
+
+		virtual ~InheritTimeline();
+
+        void setFrame(int frame, float time, Inherit inherit);
+
+		virtual void
+		apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha, MixBlend blend,
+			  MixDirection direction);
+
+		int getBoneIndex() { return _boneIndex; }
+
+		void setBoneIndex(int inValue) { _boneIndex = inValue; }
+
+	private:
+		int _boneIndex;
 	};
 }
 
-#endif /* Spine_TransformMode_h */
+#endif /* Spine_InheritTimeline_h */

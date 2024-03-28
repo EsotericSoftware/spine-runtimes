@@ -45,18 +45,18 @@ void IkConstraint::apply(Bone &bone, float targetX, float targetY, bool compress
 	float rotationIK = -bone._ashearX - bone._arotation;
 	float tx = 0, ty = 0;
 
-	switch (bone._data.getTransformMode()) {
-		case TransformMode_OnlyTranslation:
+	switch (bone._data.getInherit()) {
+		case Inherit_OnlyTranslation:
 			tx = (targetX - bone._worldX) * MathUtil::sign(bone.getSkeleton().getScaleX());
 			ty = (targetY - bone._worldY) * MathUtil::sign(bone.getSkeleton().getScaleY());
 			break;
-		case TransformMode_NoRotationOrReflection: {
+		case Inherit_NoRotationOrReflection: {
 			float s = MathUtil::abs(pa * pd - pb * pc) / MathUtil::max(0.0001f, pa * pa + pc * pc);
 			float sa = pa / bone._skeleton.getScaleX();
 			float sc = pc / bone._skeleton.getScaleY();
 			pb = -sc * s * bone._skeleton.getScaleX();
 			pd = sa * s * bone._skeleton.getScaleY();
-			rotationIK += MathUtil::atan2(sc, sa) * MathUtil::Rad_Deg;
+			rotationIK += MathUtil::atan2Deg(sc, sa);
 		}
 		default:
 			float x = targetX - p->_worldX, y = targetY - p->_worldY;
@@ -69,7 +69,7 @@ void IkConstraint::apply(Bone &bone, float targetX, float targetY, bool compress
 				ty = (y * pa - x * pc) / d - bone._ay;
 			}
 	}
-	rotationIK += MathUtil::atan2(ty, tx) * MathUtil::Rad_Deg;
+	rotationIK += MathUtil::atan2Deg(ty, tx);
 	if (bone._ascaleX < 0) rotationIK += 180;
 	if (rotationIK > 180) rotationIK -= 360;
 	else if (rotationIK < -180)
@@ -77,9 +77,9 @@ void IkConstraint::apply(Bone &bone, float targetX, float targetY, bool compress
 	float sx = bone._ascaleX;
 	float sy = bone._ascaleY;
 	if (compress || stretch) {
-		switch (bone._data.getTransformMode()) {
-			case TransformMode_NoScale:
-			case TransformMode_NoScaleOrReflection:
+		switch (bone._data.getInherit()) {
+			case Inherit_NoScale:
+			case Inherit_NoScaleOrReflection:
 				tx = targetX - bone._worldX;
 				ty = targetY - bone._worldY;
 			default:;

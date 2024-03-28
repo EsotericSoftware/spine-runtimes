@@ -163,7 +163,6 @@ void Skeleton::updateCache() {
 	size_t transformCount = _transformConstraints.size();
 	size_t pathCount = _pathConstraints.size();
 	size_t physicsCount = _physicsConstraints.size();
-
 	size_t constraintCount = ikCount + transformCount + pathCount + physicsCount;
 
 	size_t i = 0;
@@ -508,6 +507,10 @@ Vector<PathConstraint *> &Skeleton::getPathConstraints() {
 
 Vector<TransformConstraint *> &Skeleton::getTransformConstraints() {
 	return _transformConstraints;
+}
+
+Vector<PhysicsConstraint *> &Skeleton::getPhysicsConstraints() {
+    return _physicsConstraints;
 }
 
 Skin *Skeleton::getSkin() {

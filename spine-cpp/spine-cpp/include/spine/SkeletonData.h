@@ -141,6 +141,10 @@ namespace spine {
 
 		void setHeight(float inValue);
 
+        float getReferenceScale();
+
+        void setReferenceScale(float inValue);
+
 		/// The Spine version used to export this data, or NULL.
 		const String &getVersion();
 
@@ -176,6 +180,7 @@ namespace spine {
 		Vector<PathConstraintData *> _pathConstraints;
         Vector<PhysicsConstraintData *> _physicsConstraints;
 		float _x, _y, _width, _height;
+        float _referenceScale;
 		String _version;
 		String _hash;
 		Vector<char *> _strings;

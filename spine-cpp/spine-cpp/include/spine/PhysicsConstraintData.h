@@ -76,6 +76,10 @@ namespace spine {
 
         float getShearX() const;
 
+        void setLimit(float limit);
+
+        float getLimit() const;
+
         void setStep(float step);
 
         float getStep() const;
@@ -138,7 +142,7 @@ namespace spine {
 
 	private:
 		BoneData *_bone;
-        float _x, _y, _rotate, _scaleX, _shearX;
+        float _x, _y, _rotate, _scaleX, _shearX, _limit;
         float _step, _inertia, _strength, _damping, _massInverse, _wind, _gravity, _mix;
         bool _inertiaGlobal, _strengthGlobal, _dampingGlobal, _massGlobal, _windGlobal, _gravityGlobal, _mixGlobal;
 	};

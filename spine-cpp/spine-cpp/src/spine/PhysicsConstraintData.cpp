@@ -39,7 +39,7 @@ RTTI_IMPL(PhysicsConstraintData, ConstraintData)
 
 PhysicsConstraintData::PhysicsConstraintData(const String &name) : ConstraintData(name),
 																   _bone(nullptr),
-																   _x(0), _y(0), _rotate(0), _scaleX(0), _shearX(0),
+																   _x(0), _y(0), _rotate(0), _scaleX(0), _shearX(0), _limit(0),
 																   _step(0), _inertia(0), _strength(0), _damping(0), _massInverse(0), _wind(0), _gravity(0), _mix(0),
 																   _inertiaGlobal(false), _strengthGlobal(false), _dampingGlobal(false), _massGlobal(false),
 																   _windGlobal(false), _gravityGlobal(false), _mixGlobal(false) {
@@ -92,6 +92,14 @@ void PhysicsConstraintData::setShearX(float shearX) {
 
 float PhysicsConstraintData::getShearX() const {
 	return _shearX;
+}
+
+void PhysicsConstraintData::setLimit(float limit) {
+    _limit = limit;
+}
+
+float PhysicsConstraintData::getLimit() const {
+    return _limit;
 }
 
 void PhysicsConstraintData::setStep(float step) {

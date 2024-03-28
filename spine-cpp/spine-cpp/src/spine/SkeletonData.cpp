@@ -49,6 +49,7 @@ SkeletonData::SkeletonData() : _name(),
 							   _y(0),
 							   _width(0),
 							   _height(0),
+							   _referenceScale(100),
 							   _version(),
 							   _hash(),
 							   _fps(0),
@@ -191,6 +192,14 @@ float SkeletonData::getHeight() {
 
 void SkeletonData::setHeight(float inValue) {
 	_height = inValue;
+}
+
+float SkeletonData::getReferenceScale() {
+	return _referenceScale;
+}
+
+void SkeletonData::setReferenceScale(float inValue) {
+	_referenceScale = inValue;
 }
 
 const String &SkeletonData::getVersion() {

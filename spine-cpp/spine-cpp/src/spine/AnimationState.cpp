@@ -162,6 +162,12 @@ float TrackEntry::getMixDuration() { return _mixDuration; }
 
 void TrackEntry::setMixDuration(float inValue) { _mixDuration = inValue; }
 
+void TrackEntry::setMixDuration(float mixDuration, float delay) {
+    _mixDuration = mixDuration;
+    if (_previous && delay <= 0) delay += _previous->getTrackComplete() - mixDuration;
+    this->_delay = delay;
+}
+
 TrackEntry *TrackEntry::getMixingFrom() { return _mixingFrom; }
 
 TrackEntry *TrackEntry::getMixingTo() { return _mixingTo; }
@@ -484,7 +490,7 @@ bool AnimationState::apply(Skeleton &skeleton) {
 										timelineBlend, timelinesRotation, ii << 1, firstFrame);
 				else if (timeline->getRTTI().isExactly(AttachmentTimeline::rtti))
 					applyAttachmentTimeline(static_cast<AttachmentTimeline *>(timeline), skeleton, applyTime,
-											timelineBlend, true);
+											blend, attachments);
 				else
 					timeline->apply(skeleton, animationLast, applyTime, applyEvents, alpha, timelineBlend,
 									MixDirection_In);
@@ -928,10 +934,16 @@ void AnimationState::queueEvents(TrackEntry *entry, float animationTime) {
 
 	// Queue complete if completed a loop iteration or the animation.
 	bool complete = false;
-	if (entry->_loop)
-		complete = duration == 0 || (trackLastWrapped > MathUtil::fmod(entry->_trackTime, duration));
-	else
-		complete = animationTime >= animationEnd && entry->_animationLast < animationEnd;
+	if (entry->_loop) {
+        if (duration == 0)
+            complete = true;
+        else {
+            int cycles = (int) (entry->_trackTime / duration);
+            complete = cycles > 0 && cycles > (int) (entry->_trackLast / duration);
+        }
+    } else {
+        complete = animationTime >= animationEnd && entry->_animationLast < animationEnd;
+    }
 	if (complete) _queue->complete(entry);
 
 	// Queue events after complete.
@@ -985,8 +997,8 @@ TrackEntry *AnimationState::newTrackEntry(size_t trackIndex, Animation *animatio
 	entry._shortestRotation = false;
 
 	entry._eventThreshold = 0;
-	entry._mixAttachmentThreshold = 0;
 	entry._alphaAttachmentThreshold = 0;
+    entry._mixAttachmentThreshold = 0;
 	entry._mixDrawOrderThreshold = 0;
 
 	entry._animationStart = 0;

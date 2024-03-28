@@ -158,5 +158,5 @@ void ShearYTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vecto
 	SP_UNUSED(direction);
 
 	Bone *bone = skeleton._bones[_boneIndex];
-	if (bone->_active) bone->_shearY = getRelativeValue(time, alpha, blend, bone->_shearX, bone->_data._shearY);
+	if (bone->_active) bone->_shearY = getRelativeValue(time, alpha, blend, bone->_shearY, bone->_data._shearY);
 }

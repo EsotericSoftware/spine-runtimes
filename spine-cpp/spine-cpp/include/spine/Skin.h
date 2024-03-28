@@ -32,6 +32,7 @@
 
 #include <spine/Vector.h>
 #include <spine/SpineString.h>
+#include <spine/Color.h>
 
 namespace spine {
 	class Attachment;
@@ -153,11 +154,14 @@ namespace spine {
 
 		Vector<ConstraintData *> &getConstraints();
 
+        Color &getColor() { return _color; }
+
 	private:
 		const String _name;
 		AttachmentMap _attachments;
 		Vector<BoneData *> _bones;
 		Vector<ConstraintData *> _constraints;
+        Color _color;
 
 		/// Attach all attachments from this skin if the corresponding attachment from the old skin is currently attached.
 		void attachAll(Skeleton &skeleton, Skin &oldSkin);

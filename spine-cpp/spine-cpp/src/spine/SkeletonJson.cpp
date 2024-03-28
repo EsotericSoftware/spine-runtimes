@@ -194,17 +194,17 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 		data->_scaleY = Json::getFloat(boneMap, "scaleY", 1);
 		data->_shearX = Json::getFloat(boneMap, "shearX", 0);
 		data->_shearY = Json::getFloat(boneMap, "shearY", 0);
-		transformMode = Json::getString(boneMap, "transform", "normal");
-		data->_transformMode = TransformMode_Normal;
-		if (strcmp(transformMode, "normal") == 0) data->_transformMode = TransformMode_Normal;
+		transformMode = Json::getString(boneMap, "inherit", "normal");
+		data->_inherit = Inherit_Normal;
+		if (strcmp(transformMode, "normal") == 0) data->_inherit = Inherit_Normal;
 		else if (strcmp(transformMode, "onlyTranslation") == 0)
-			data->_transformMode = TransformMode_OnlyTranslation;
+			data->_inherit = Inherit_OnlyTranslation;
 		else if (strcmp(transformMode, "noRotationOrReflection") == 0)
-			data->_transformMode = TransformMode_NoRotationOrReflection;
+			data->_inherit = Inherit_NoRotationOrReflection;
 		else if (strcmp(transformMode, "noScale") == 0)
-			data->_transformMode = TransformMode_NoScale;
+			data->_inherit = Inherit_NoScale;
 		else if (strcmp(transformMode, "noScaleOrReflection") == 0)
-			data->_transformMode = TransformMode_NoScaleOrReflection;
+			data->_inherit = Inherit_NoScaleOrReflection;
 		data->_skinRequired = Json::getBoolean(boneMap, "skin", false);
 
 		const char *color = Json::getString(boneMap, "color", NULL);

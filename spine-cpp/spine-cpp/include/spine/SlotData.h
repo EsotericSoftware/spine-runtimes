@@ -109,6 +109,10 @@ namespace spine {
 
         void setVisible(bool inValue);
 
+        String &getPath() { return _path; }
+
+        void setPath(const String &inValue) { _path = inValue; }
+
 	private:
 		const int _index;
 		String _name;
@@ -120,6 +124,7 @@ namespace spine {
 		String _attachmentName;
 		BlendMode _blendMode;
         bool _visible;
+        String _path;
 	};
 }
 

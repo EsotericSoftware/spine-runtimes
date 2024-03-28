@@ -250,6 +250,8 @@ namespace spine {
 
 		void setMixDuration(float inValue);
 
+        void setMixDuration(float mixDuration, float delay);
+
 		MixBlend getMixBlend();
 
 		void setMixBlend(MixBlend blend);
@@ -277,6 +279,9 @@ namespace spine {
 
 		void setListener(AnimationStateListenerObject *listener);
 
+        /// Returns true if this track entry has been applied at least once.
+        ///
+        /// See AnimationState::apply(Skeleton).
         bool wasApplied();
 
 	private:
