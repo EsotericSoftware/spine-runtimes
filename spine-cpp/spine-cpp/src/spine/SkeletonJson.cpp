@@ -51,6 +51,7 @@
 #include <spine/EventTimeline.h>
 #include <spine/IkConstraintData.h>
 #include <spine/IkConstraintTimeline.h>
+#include <spine/InheritTimeline.h>
 #include <spine/MeshAttachment.h>
 #include <spine/PathAttachment.h>
 #include <spine/PathConstraintData.h>
@@ -171,7 +172,7 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 	int bonesCount = 0;
 	for (boneMap = bones->_child, i = 0; boneMap; boneMap = boneMap->_next, ++i) {
 		BoneData *data;
-		const char *transformMode;
+		const char *inherit;
 
 		BoneData *parent = 0;
 		const char *parentName = Json::getString(boneMap, "parent", 0);
@@ -194,16 +195,16 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 		data->_scaleY = Json::getFloat(boneMap, "scaleY", 1);
 		data->_shearX = Json::getFloat(boneMap, "shearX", 0);
 		data->_shearY = Json::getFloat(boneMap, "shearY", 0);
-		transformMode = Json::getString(boneMap, "inherit", "normal");
+		inherit = Json::getString(boneMap, "inherit", "normal");
 		data->_inherit = Inherit_Normal;
-		if (strcmp(transformMode, "normal") == 0) data->_inherit = Inherit_Normal;
-		else if (strcmp(transformMode, "onlyTranslation") == 0)
+		if (strcmp(inherit, "normal") == 0) data->_inherit = Inherit_Normal;
+		else if (strcmp(inherit, "onlyTranslation") == 0)
 			data->_inherit = Inherit_OnlyTranslation;
-		else if (strcmp(transformMode, "noRotationOrReflection") == 0)
+		else if (strcmp(inherit, "noRotationOrReflection") == 0)
 			data->_inherit = Inherit_NoRotationOrReflection;
-		else if (strcmp(transformMode, "noScale") == 0)
+		else if (strcmp(inherit, "noScale") == 0)
 			data->_inherit = Inherit_NoScale;
-		else if (strcmp(transformMode, "noScaleOrReflection") == 0)
+		else if (strcmp(inherit, "noScaleOrReflection") == 0)
 			data->_inherit = Inherit_NoScaleOrReflection;
 		data->_skinRequired = Json::getBoolean(boneMap, "skin", false);
 
@@ -1085,7 +1086,27 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 				ShearYTimeline *timeline = new (__FILE__, __LINE__) ShearYTimeline(frames,
 																				   frames, boneIndex);
 				timelines.add(readTimeline(timelineMap->_child, timeline, 0, 1));
-			} else {
+			} else if (strcmp(timelineMap->_name, "inherit") == 0) {
+                InheritTimeline *timeline = new (__FILE__, __LINE__) InheritTimeline(frames, boneIndex);
+                for (frame = 0;; frame++) {
+                    float time = Json::getFloat(keyMap, "time", 0);
+                    const char *value = Json::getString(keyMap, "value", "normal");
+                    Inherit inherit = Inherit_Normal;
+                    if (strcmp(value, "normal") == 0) inherit = Inherit_Normal;
+                    else if (strcmp(value, "onlyTranslation") == 0)
+                        inherit = Inherit_OnlyTranslation;
+                    else if (strcmp(value, "noRotationOrReflection") == 0)
+                        inherit = Inherit_NoRotationOrReflection;
+                    else if (strcmp(value, "noScale") == 0)
+                        inherit = Inherit_NoScale;
+                    else if (strcmp(value, "noScaleOrReflection") == 0)
+                        inherit = Inherit_NoScaleOrReflection;
+                    timeline->setFrame(frame, time, inherit);
+                    nextMap = keyMap->_next;
+                    if (!nextMap) break;
+                }
+                timelines.add(timeline);
+            }else {
 				ContainerUtil::cleanUpVectorOfPointers(timelines);
 				setError(NULL, "Invalid timeline type for a bone: ", timelineMap->_name);
 				return NULL;
