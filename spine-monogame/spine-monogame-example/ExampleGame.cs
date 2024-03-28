@@ -233,7 +233,7 @@ namespace Spine {
 			SkeletonJson json = new SkeletonJson(atlas);
 			json.Scale = 0.5f;
 			SkeletonData skeletonData = json.ReadSkeletonData("data/mix-and-match-pro.json");
-			
+
 			skeleton = new Skeleton(skeletonData);
 			AnimationStateData stateData = new AnimationStateData(skeleton.Data);
 			state = new AnimationState(stateData);
