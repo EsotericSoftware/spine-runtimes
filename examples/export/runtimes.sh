@@ -156,10 +156,6 @@ cp -f ../raptor/export/raptor.png "$ROOT/spine-godot/example/assets/raptor/"
 cp -f ../raptor/manual-maps/raptor-normals.png "$ROOT/spine-godot/example/assets/raptor/n_raptor.png"
 cp -f ../raptor/manual-maps/light-sprite.png "$ROOT/spine-godot/example/assets/raptor/light-sprite.png"
 
-#cp -f ../../spine-unity/Assets/Spine\ Examples/Spine\ Skeletons/Raggedy\ Spineboy/raggedy\ spineboy.json "$ROOT/spine-godot/example/assets/raggedyspineboy/"
-#cp -f ../../spine-unity/Assets/Spine\ Examples/Spine\ Skeletons/Raggedy\ Spineboy/Raggedy\ Spineboy.atlas.txt "$ROOT/spine-godot/example/assets/raggedyspineboy/Raggedy Spineboy.atlas"
-#cp -f ../../spine-unity/Assets/Spine\ Examples/Spine\ Skeletons/Raggedy\ Spineboy/Raggedy\ Spineboy.png "$ROOT/spine-godot/example/assets/raggedyspineboy/"
-
 rm -f "$ROOT"/spine-godot/example-v4/assets/spineboy/*.atlas
 rm -f "$ROOT"/spine-godot/example-v4/assets/spineboy/*.png
 rm -f "$ROOT"/spine-godot/example-v4/assets/spineboy/*.spine-json
@@ -189,10 +185,6 @@ cp -f ../raptor/export/raptor.atlas "$ROOT/spine-godot/example-v4/assets/raptor/
 cp -f ../raptor/export/raptor.png "$ROOT/spine-godot/example-v4/assets/raptor/"
 cp -f ../raptor/manual-maps/raptor-normals.png "$ROOT/spine-godot/example-v4/assets/raptor/n_raptor.png"
 cp -f ../raptor/manual-maps/light-sprite.png "$ROOT/spine-godot/example-v4/assets/raptor/light-sprite.png"
-
-#cp -f ../../spine-unity/Assets/Spine\ Examples/Spine\ Skeletons/Raggedy\ Spineboy/raggedy\ spineboy.json "$ROOT/spine-godot/example-v4/assets/raggedyspineboy/"
-#cp -f ../../spine-unity/Assets/Spine\ Examples/Spine\ Skeletons/Raggedy\ Spineboy/Raggedy\ Spineboy.atlas.txt "$ROOT/spine-godot/example-v4/assets/raggedyspineboy/Raggedy Spineboy.atlas"
-#cp -f ../../spine-unity/Assets/Spine\ Examples/Spine\ Skeletons/Raggedy\ Spineboy/Raggedy\ Spineboy.png "$ROOT/spine-godot/example-v4/assets/raggedyspineboy/"
 
 echo "spine-sdl"
 rm -f "$ROOT/spine-sdl/data/"*
@@ -492,6 +484,20 @@ cp -f ../mix-and-match/export/mix-and-match-pro.json "$ROOT/spine-monogame/spine
 cp -f ../mix-and-match/export/mix-and-match.atlas "$ROOT/spine-monogame/spine-monogame-example/data/"
 cp -f ../mix-and-match/export/mix-and-match.png "$ROOT/spine-monogame/spine-monogame-example/data/"
 
+cp -f ../celestial-circus/export/celestial-circus-pro.json "$ROOT/spine-monogame/spine-monogame-example/data/"
+cp -f ../celestial-circus/export/celestial-circus.atlas "$ROOT/spine-monogame/spine-monogame-example/data/"
+cp -f ../celestial-circus/export/celestial-circus.png "$ROOT/spine-monogame/spine-monogame-example/data/"
+cp -f ../celestial-circus/export/celestial-circus_*.png "$ROOT/spine-monogame/spine-monogame-example/data/"
+
+cp -f ../snowglobe/export/snowglobe-pro.skel "$ROOT/spine-monogame/spine-monogame-example/data/"
+cp -f ../snowglobe/export/snowglobe.atlas "$ROOT/spine-monogame/spine-monogame-example/data/"
+cp -f ../snowglobe/export/snowglobe.png "$ROOT/spine-monogame/spine-monogame-example/data/"
+cp -f ../snowglobe/export/snowglobe_*.png "$ROOT/spine-monogame/spine-monogame-example/data/"
+
+cp -f ../cloud-pot/export/cloud-pot.skel "$ROOT/spine-monogame/spine-monogame-example/data/"
+cp -f ../cloud-pot/export/cloud-pot.atlas "$ROOT/spine-monogame/spine-monogame-example/data/"
+cp -f ../cloud-pot/export/cloud-pot.png "$ROOT/spine-monogame/spine-monogame-example/data/"
+
 echo "spine-haxe"
 rm "$ROOT/spine-haxe/example/assets/"*
 cp -f ../coin/export/coin-pro.json "$ROOT/spine-haxe/example/assets/"
@@ -729,6 +735,21 @@ cp -f $UNITY_SOURCE_DIR/whirlyblendmodes/export/whirlyblendmodes.json "$UNITY_TA
 cp -f $UNITY_SOURCE_DIR/whirlyblendmodes/export/whirlyblendmodes-pma.atlas "$UNITY_TARGET_DIR/whirlyblendmodes.atlas.txt"
 $sed -i 's/whirlyblendmodes-pma.png/whirlyblendmodes.png/g' "$UNITY_TARGET_DIR/whirlyblendmodes.atlas.txt"
 cp -f $UNITY_SOURCE_DIR/whirlyblendmodes/export/whirlyblendmodes-pma.png "$UNITY_TARGET_DIR/whirlyblendmodes.png"
+
+UNITY_TARGET_DIR="$ROOT/spine-unity/Assets/Spine Examples/Spine Skeletons/celestial-circus"
+cp -f ../celestial-circus/export/celestial-circus-pro.json "$UNITY_TARGET_DIR/"
+cp -f ../celestial-circus/export/celestial-circus-pma.atlas "$UNITY_TARGET_DIR/celestial-circus-pma.atlas.txt"
+cp -f ../celestial-circus/export/celestial-circus-pma*.png "$UNITY_TARGET_DIR/"
+
+UNITY_TARGET_DIR="$ROOT/spine-unity/Assets/Spine Examples/Spine Skeletons/snowglobe"
+cp -f ../snowglobe/export/snowglobe-pro.skel "$UNITY_TARGET_DIR/snowglobe-pro.skel.bytes"
+cp -f ../snowglobe/export/snowglobe-pma.atlas "$UNITY_TARGET_DIR/snowglobe-pma.atlas.txt"
+cp -f ../snowglobe/export/snowglobe-pma*.png "$UNITY_TARGET_DIR/"
+
+UNITY_TARGET_DIR="$ROOT/spine-unity/Assets/Spine Examples/Spine Skeletons/cloud-pot"
+cp -f ../cloud-pot/export/cloud-pot.skel "$UNITY_TARGET_DIR/cloud-pot.skel.bytes"
+cp -f ../cloud-pot/export/cloud-pot-pma.atlas "$UNITY_TARGET_DIR/cloud-pot-pma.atlas.txt"
+cp -f ../cloud-pot/export/cloud-pot-pma.png "$UNITY_TARGET_DIR/"
 
 echo "--"
 echo "Note regarding spine-xna and spine-unity:"

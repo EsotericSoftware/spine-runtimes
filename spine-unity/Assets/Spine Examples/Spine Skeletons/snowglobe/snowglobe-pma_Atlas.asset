@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6b194f808b1af6499c93410e504af42, type: 3}
+  m_Name: snowglobe-pma_Atlas
+  m_EditorClassIdentifier: 
+  textureLoadingMode: 0
+  onDemandTextureLoader: {fileID: 0}
+  atlasFile: {fileID: 4900000, guid: 3468b7c9da7e9b442a522d337ab1fe7c, type: 3}
+  materials:
+  - {fileID: 2100000, guid: bc273223b04e8cb4dbbc77a27f38cc65, type: 2}
+  - {fileID: 2100000, guid: c0f19210b249a30418ba777c6dbdd1f3, type: 2}
+  - {fileID: 2100000, guid: decd34b04cd07554a9bcd2e85dde7b03, type: 2}
+  - {fileID: 2100000, guid: 2944e525a4bfee14b8c5067246eb3e39, type: 2}
+  - {fileID: 2100000, guid: 30c7a85032064f0468da374e72de22b0, type: 2}
