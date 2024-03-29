@@ -1,7 +1,7 @@
 {
 "skeleton": {
 	"hash": "FwuU0d2nzEU",
-	"spine": "4.2.43-beta",
+	"spine": "4.2.56-beta",
 	"x": -809.16,
 	"y": -73.54,
 	"width": 1287.65,
@@ -90,7 +90,7 @@
 		"rotation": -133.55,
 		"x": 232.68,
 		"y": 245.85,
-		"transform": "noScale",
+		"inherit": "noScale",
 		"color": "ff3f00ff"
 	},
 	{
@@ -174,7 +174,7 @@
 		"rotation": -6.14,
 		"x": 84.5,
 		"y": -0.35,
-		"transform": "noRotationOrReflection",
+		"inherit": "noRotationOrReflection",
 		"color": "e07800ff"
 	},
 	{
@@ -193,7 +193,7 @@
 		"rotation": 27.78,
 		"x": -0.03,
 		"y": 0.05,
-		"transform": "noRotationOrReflection",
+		"inherit": "noRotationOrReflection",
 		"color": "e07800ff"
 	},
 	{ "name": "spineboy-back-foot-target", "parent": "saddle", "x": -30.44, "y": -100.08, "color": "ff3f00ff" },
@@ -231,7 +231,7 @@
 		"rotation": 11.66,
 		"x": 25.68,
 		"y": -0.77,
-		"transform": "noScale",
+		"inherit": "noScale",
 		"color": "e7ff00ff"
 	},
 	{
@@ -364,7 +364,7 @@
 		"y": -0.02,
 		"scaleX": 0.731,
 		"scaleY": 0.823,
-		"transform": "onlyTranslation",
+		"inherit": "onlyTranslation",
 		"color": "15ff00ff"
 	},
 	{
@@ -395,7 +395,7 @@
 		"y": -2.77,
 		"scaleX": 1.0004,
 		"scaleY": 1.0004,
-		"transform": "onlyTranslation",
+		"inherit": "onlyTranslation",
 		"color": "14ff00ff"
 	},
 	{ "name": "spineboy-front-foot-target", "parent": "saddle", "x": -50.71, "y": -96.93, "color": "ff3f00ff" },
