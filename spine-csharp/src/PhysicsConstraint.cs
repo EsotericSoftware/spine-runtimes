@@ -170,7 +170,7 @@ namespace Spine {
 							uy = by;
 						}
 						if (a >= t) {
-							float m = massInverse * t, e = strength, w = wind * f, g = gravity * f;
+							float m = massInverse * t, e = strength, w = wind * f, g = (Bone.yDown ? -gravity : gravity) * f;
 							float d = (float)Math.Pow(damping, 60 * t);
 							do {
 								if (x) {
@@ -219,7 +219,7 @@ namespace Spine {
 						}
 						a = this.remaining;
 						if (a >= t) {
-							float m = massInverse * t, e = strength, w = wind, g = gravity;
+							float m = massInverse * t, e = strength, w = wind, g = (Bone.yDown ? -gravity : gravity);
 							float d = (float)Math.Pow(damping, 60 * t), h = l / f;
 							while (true) {
 								a -= t;
