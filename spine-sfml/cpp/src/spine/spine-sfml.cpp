@@ -79,6 +79,7 @@ namespace spine {
 	void SkeletonDrawable::update(float deltaTime, Physics physics) {
 		state->update(deltaTime * timeScale);
 		state->apply(*skeleton);
+        skeleton->update(deltaTime * timeScale);
 		skeleton->updateWorldTransform(physics);
 	}
 

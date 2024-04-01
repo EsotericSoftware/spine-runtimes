@@ -37,11 +37,11 @@ RTTI_IMPL(IkConstraintData, ConstraintData)
 
 IkConstraintData::IkConstraintData(const String &name) : ConstraintData(name),
 														 _target(NULL),
-														 _bendDirection(1),
+														 _bendDirection(0),
 														 _compress(false),
 														 _stretch(false),
 														 _uniform(false),
-														 _mix(1),
+														 _mix(0),
 														 _softness(0) {
 }
 

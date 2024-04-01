@@ -45,7 +45,7 @@ void IkConstraint::apply(Bone &bone, float targetX, float targetY, bool compress
 	float rotationIK = -bone._ashearX - bone._arotation;
 	float tx = 0, ty = 0;
 
-	switch (bone._data.getInherit()) {
+	switch (bone._inherit) {
 		case Inherit_OnlyTranslation:
 			tx = (targetX - bone._worldX) * MathUtil::sign(bone.getSkeleton().getScaleX());
 			ty = (targetY - bone._worldY) * MathUtil::sign(bone.getSkeleton().getScaleY());
@@ -77,7 +77,7 @@ void IkConstraint::apply(Bone &bone, float targetX, float targetY, bool compress
 	float sx = bone._ascaleX;
 	float sy = bone._ascaleY;
 	if (compress || stretch) {
-		switch (bone._data.getInherit()) {
+		switch (bone._inherit) {
 			case Inherit_NoScale:
 			case Inherit_NoScaleOrReflection:
 				tx = targetX - bone._worldX;
@@ -109,7 +109,8 @@ void IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY
 	Bone *pp = parent.getParent();
 	float tx, ty, dx, dy, dd, l1, l2, a1, a2, r, td, sd, p;
 	float id, x, y;
-	px = parent._ax;
+    if (parent._inherit != Inherit_Normal || child._inherit != Inherit_Normal) return;
+    px = parent._ax;
 	py = parent._ay;
 	psx = parent._ascaleX;
 	psy = parent._ascaleY;

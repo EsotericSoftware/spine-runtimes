@@ -611,6 +611,40 @@ void mixAndMatch(SkeletonData *skeletonData, Atlas *atlas) {
 	}
 }
 
+void celestialCircus(SkeletonData *skeletonData, Atlas *atlas) {
+    SP_UNUSED(atlas);
+
+    SkeletonDrawable drawable(skeletonData);
+    drawable.timeScale = 1;
+    drawable.setUsePremultipliedAlpha(true);
+
+    Skeleton *skeleton = drawable.skeleton;
+    skeleton->setPosition(320, 480);
+    skeleton->updateWorldTransform(Physics_Update);
+
+    drawable.state->setAnimation(0, "swing", true);
+
+    sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - celestial circus");
+    window.setFramerateLimit(60);
+    sf::Event event;
+    sf::Clock deltaClock;
+
+    while (window.isOpen()) {
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) window.close();
+        }
+
+        float delta = deltaClock.getElapsedTime().asSeconds();
+        deltaClock.restart();
+
+        drawable.update(delta);
+
+        window.clear();
+        window.draw(drawable);
+        window.display();
+    }
+}
+
 /**
  * Used for debugging purposes during runtime development
  */
@@ -636,11 +670,11 @@ DebugExtension dbgExtension(SpineExtension::getInstance());
 int main() {
 	SpineExtension::setInstance(&dbgExtension);
 
+    testcase(ikDemo, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.6f);
+    testcase(celestialCircus, "data/celestial-circus-pro.json", "data/celestial-circus-pro.skel", "data/celestial-circus-pma.atlas", 0.2f);
 	testcase(vine, "data/vine-pro.json", "data/vine-pro.skel", "data/vine-pma.atlas", 0.5f);
 	testcase(dragon, "data/dragon-ess.json", "data/dragon-ess.skel", "data/dragon-pma.atlas", 0.6f);
-	testcase(vine, "data/vine-pro.json", "data/vine-pro.skel", "data/vine-pma.atlas", 0.5f);
 	testcase(owl, "data/owl-pro.json", "data/owl-pro.skel", "data/owl-pma.atlas", 0.5f);
-	testcase(ikDemo, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.6f);
 	testcase(mixAndMatch, "data/mix-and-match-pro.json", "data/mix-and-match-pro.skel", "data/mix-and-match-pma.atlas", 0.5f);
 	testcase(coin, "data/coin-pro.json", "data/coin-pro.skel", "data/coin-pma.atlas", 0.5f);
 	testcase(spineboy, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.6f);

@@ -37,6 +37,8 @@ namespace spine {
 	/// The interface for all constraints.
 	class SP_API ConstraintData : public SpineObject {
 
+        friend class SkeletonBinary;
+
 	RTTI_DECL
 
 	public:

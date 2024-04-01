@@ -195,7 +195,7 @@ namespace spine {
         }
 
         String substring(int startIndex, int length) const {
-            if (startIndex < 0 || startIndex >= _length || length < 0 || startIndex + length > _length) {
+            if (startIndex < 0 || startIndex >= (int)_length || length < 0 || startIndex + length > (int)_length) {
                 return String();
             }
             char* subStr = SpineExtension::calloc<char>(length + 1, __FILE__, __LINE__);
@@ -205,7 +205,7 @@ namespace spine {
         }
 
         String substring(int startIndex) const {
-            if (startIndex < 0 || startIndex >= _length) {
+            if (startIndex < 0 || startIndex >= (int)_length) {
                 return String();
             }
             int length = _length - startIndex;

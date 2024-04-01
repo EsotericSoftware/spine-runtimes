@@ -75,6 +75,7 @@ namespace spine {
 		static const int BONE_SHEAR = 7;
 		static const int BONE_SHEARX = 8;
 		static const int BONE_SHEARY = 9;
+        static const int BONE_INHERIT = 10;
 
 		static const int SLOT_ATTACHMENT = 0;
 		static const int SLOT_RGBA = 1;
@@ -89,6 +90,15 @@ namespace spine {
 		static const int PATH_POSITION = 0;
 		static const int PATH_SPACING = 1;
 		static const int PATH_MIX = 2;
+
+        static const int PHYSICS_INERTIA = 0;
+        static const int PHYSICS_STRENGTH = 1;
+        static const int PHYSICS_DAMPING = 2;
+        static const int PHYSICS_MASS = 4;
+        static const int PHYSICS_WIND = 5;
+        static const int PHYSICS_GRAVITY = 6;
+        static const int PHYSICS_MIX = 7;
+        static const int PHYSICS_RESET = 8;
 
 		static const int CURVE_LINEAR = 0;
 		static const int CURVE_STEPPED = 1;
@@ -147,11 +157,11 @@ namespace spine {
 		Attachment *readAttachment(DataInput *input, Skin *skin, int slotIndex, const String &attachmentName,
 								   SkeletonData *skeletonData, bool nonessential);
 
-		void readVertices(DataInput *input, Vector<float> &vertices, Vector<int> &bones, int vertexCount);
+		int readVertices(DataInput *input, Vector<float> &vertices, Vector<int> &bones, bool weighted);
 
 		void readFloatArray(DataInput *input, int n, float scale, Vector<float> &array);
 
-		void readShortArray(DataInput *input, Vector<unsigned short> &array);
+		void readShortArray(DataInput *input, Vector<unsigned short> &array, int n);
 
 		Animation *readAnimation(const String &name, DataInput *input, SkeletonData *skeletonData);
 
@@ -159,9 +169,9 @@ namespace spine {
 		setBezier(DataInput *input, CurveTimeline *timeline, int bezier, int frame, int value, float time1, float time2,
 				  float value1, float value2, float scale);
 
-		Timeline *readTimeline(DataInput *input, CurveTimeline1 *timeline, float scale);
+		void readTimeline(DataInput *input, Vector<Timeline*> &timelines, CurveTimeline1 *timeline, float scale);
 
-		Timeline *readTimeline2(DataInput *input, CurveTimeline2 *timeline, float scale);
+		void readTimeline2(DataInput *input, Vector<Timeline*> &timelines, CurveTimeline2 *timeline, float scale);
 	};
 }
 

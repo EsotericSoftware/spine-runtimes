@@ -58,6 +58,7 @@
 #include <spine/PathConstraintMixTimeline.h>
 #include <spine/PathConstraintPositionTimeline.h>
 #include <spine/PathConstraintSpacingTimeline.h>
+#include <spine/PhysicsConstraintData.h>
 #include <spine/PointAttachment.h>
 #include <spine/RegionAttachment.h>
 #include <spine/RotateTimeline.h>
@@ -133,7 +134,7 @@ SkeletonData *SkeletonJson::readSkeletonDataFile(const String &path) {
 SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 	int i, ii;
 	SkeletonData *skeletonData;
-	Json *root, *skeleton, *bones, *boneMap, *ik, *transform, *path, *slots, *skins, *animations, *events;
+	Json *root, *skeleton, *bones, *boneMap, *ik, *transform, *path, *physics, *slots, *skins, *animations, *events;
 
 	_error = "";
 	_linkedMeshes.clear();
@@ -455,6 +456,54 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 		}
 	}
 
+    /* Physics constraints */
+    physics = Json::getItem(root, "physics");
+    if (physics) {
+        Json *constraintMap;
+        skeletonData->_physicsConstraints.ensureCapacity(physics->_size);
+        skeletonData->_physicsConstraints.setSize(physics->_size, 0);
+        for (constraintMap = physics->_child, i = 0; constraintMap; constraintMap = constraintMap->_next, ++i) {
+            const char *name;
+
+            PhysicsConstraintData *data = new (__FILE__, __LINE__) PhysicsConstraintData(
+                    Json::getString(constraintMap, "name", 0));
+            data->setOrder(Json::getInt(constraintMap, "order", 0));
+            data->setSkinRequired(Json::getBoolean(constraintMap, "skin", false));
+
+            name = Json::getString(constraintMap, "bone", 0);
+            data->_bone = skeletonData->findBone(name);
+            if (!data->_bone) {
+                delete skeletonData;
+                setError(root, "Physics bone not found: ", name);
+                return NULL;
+            }
+
+            data->_x = Json::getFloat(constraintMap, "x", 0);
+            data->_y = Json::getFloat(constraintMap, "y", 0);
+            data->_rotate = Json::getFloat(constraintMap, "rotate", 0);
+            data->_scaleX = Json::getFloat(constraintMap, "scaleX", 0);
+            data->_shearX = Json::getFloat(constraintMap, "shearX", 0);
+            data->_limit = Json::getFloat(constraintMap, "limit", 5000) * _scale;
+            data->_step = 1.0f / Json::getInt(constraintMap, "fps", 60);
+            data->_inertia = Json::getFloat(constraintMap, "inertia", 1);
+            data->_strength = Json::getFloat(constraintMap, "strength", 100);
+            data->_damping = Json::getFloat(constraintMap, "damping", 1);
+            data->_massInverse = 1 / Json::getFloat(constraintMap, "mass", 1);
+            data->_wind = Json::getFloat(constraintMap, "wind", 0);
+            data->_gravity = Json::getFloat(constraintMap, "gravity", 0);
+            data->_mix = Json::getFloat(constraintMap, "mix", 1);
+            data->_inertiaGlobal = Json::getBoolean(constraintMap, "inertiaGlobal", false);
+            data->_strengthGlobal = Json::getBoolean(constraintMap, "strengthGlobal", false);
+            data->_dampingGlobal = Json::getBoolean(constraintMap, "dampingGlobal", false);
+            data->_massGlobal = Json::getBoolean(constraintMap, "massGlobal", false);
+            data->_windGlobal = Json::getBoolean(constraintMap, "windGlobal", false);
+            data->_gravityGlobal = Json::getBoolean(constraintMap, "gravityGlobal", false);
+            data->_mixGlobal = Json::getBoolean(constraintMap, "mixGlobal", false);
+
+            skeletonData->_physicsConstraints[i] = data;
+        }
+    }
+
 	/* Skins. */
 	skins = Json::getItem(root, "skins");
 	if (skins) {
@@ -519,6 +568,19 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 					skin->getConstraints().add(data);
 				}
 			}
+
+            item = Json::getItem(skinMap, "physics");
+            if (item) {
+                for (item = item->_child; item; item = item->_next) {
+                    PhysicsConstraintData *data = skeletonData->findPhysicsConstraint(item->_valueString);
+                    if (!data) {
+                        delete skeletonData;
+                        setError(root, String("Skin physics constraint not found: "), item->_valueString);
+                        return NULL;
+                    }
+                    skin->getConstraints().add(data);
+                }
+            }
 
 			skeletonData->_skins[skinsIndex++] = skin;
 			if (strcmp(Json::getString(skinMap, "name", ""), "default") == 0) {

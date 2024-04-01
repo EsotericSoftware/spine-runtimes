@@ -136,6 +136,7 @@ Skeleton::~Skeleton() {
 	ContainerUtil::cleanUpVectorOfPointers(_ikConstraints);
 	ContainerUtil::cleanUpVectorOfPointers(_transformConstraints);
 	ContainerUtil::cleanUpVectorOfPointers(_pathConstraints);
+    ContainerUtil::cleanUpVectorOfPointers(_physicsConstraints);
 }
 
 void Skeleton::updateCache() {
@@ -195,7 +196,7 @@ continue_outer:
 			}
 		}
 
-		for (size_t ii = 0; ii < pathCount; ++ii) {
+		for (size_t ii = 0; ii < physicsCount; ++ii) {
 			PhysicsConstraint *constraint = _physicsConstraints[ii];
 			if (constraint->getData().getOrder() == i) {
 				sortPhysicsConstraint(constraint);
@@ -222,7 +223,9 @@ void Skeleton::printUpdateCache() {
 			printf("ik constraint %s\n", ((IkConstraint *) updatable)->getData().getName().buffer());
 		} else if (updatable->getRTTI().isExactly(PathConstraint::rtti)) {
 			printf("path constraint %s\n", ((PathConstraint *) updatable)->getData().getName().buffer());
-		}
+		} else if (updatable->getRTTI().isExactly(PhysicsConstraint::rtti)) {
+            printf("physics constraint %s\n", ((PhysicsConstraint *) updatable)->getData().getName().buffer());
+        }
 	}
 }
 

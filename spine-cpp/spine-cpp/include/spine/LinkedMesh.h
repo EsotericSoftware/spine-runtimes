@@ -42,12 +42,16 @@ namespace spine {
 		friend class SkeletonJson;
 
 	public:
-		LinkedMesh(MeshAttachment *mesh, const String &skin, size_t slotIndex, const String &parent,
+		LinkedMesh(MeshAttachment *mesh, const int skinIndex, size_t slotIndex, const String &parent,
 				   bool inheritTimeline);
+
+        LinkedMesh(MeshAttachment *mesh, const String &skin, size_t slotIndex, const String &parent,
+                   bool inheritTimeline);
 
 	private:
 		MeshAttachment *_mesh;
-		String _skin;
+		int _skinIndex;
+        String _skin;
 		size_t _slotIndex;
 		String _parent;
 		bool _inheritTimeline;
