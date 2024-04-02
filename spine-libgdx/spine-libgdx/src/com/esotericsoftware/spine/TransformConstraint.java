@@ -249,11 +249,7 @@ public class TransformConstraint implements Updatable {
 			Bone bone = (Bone)bones[i];
 
 			float rotation = bone.arotation;
-			if (mixRotate != 0) {
-				float r = target.arotation - rotation + data.offsetRotation;
-				r -= (float)Math.ceil(r / 360 - 0.5f) * 360;
-				rotation += r * mixRotate;
-			}
+			if (mixRotate != 0) rotation += (target.arotation - rotation + data.offsetRotation) * mixRotate;
 
 			float x = bone.ax, y = bone.ay;
 			x += (target.ax - x + data.offsetX) * mixX;
@@ -266,11 +262,7 @@ public class TransformConstraint implements Updatable {
 				scaleY = (scaleY + (target.ascaleY - scaleY + data.offsetScaleY) * mixScaleY) / scaleY;
 
 			float shearY = bone.ashearY;
-			if (mixShearY != 0) {
-				float r = target.ashearY - shearY + data.offsetShearY;
-				r -= (float)Math.ceil(r / 360 - 0.5f) * 360;
-				shearY += r * mixShearY;
-			}
+			if (mixShearY != 0) shearY += (target.ashearY - shearY + data.offsetShearY) * mixShearY;
 
 			bone.updateWorldTransform(x, y, rotation, scaleX, scaleY, bone.ashearX, shearY);
 		}
