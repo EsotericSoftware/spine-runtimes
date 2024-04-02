@@ -205,7 +205,7 @@ namespace Spine.Unity {
 
 		public bool defaultAsEmptyString = false;
 
-		public SpineSkin (string startsWith = "", string dataField = "", bool includeNone = true, bool fallbackToTextField = false, bool defaultAsEmptyString = false) {
+		public SpineSkin (string startsWith = "", string dataField = "", bool includeNone = false, bool fallbackToTextField = false, bool defaultAsEmptyString = false) {
 			this.startsWith = startsWith;
 			this.dataField = dataField;
 			this.includeNone = includeNone;

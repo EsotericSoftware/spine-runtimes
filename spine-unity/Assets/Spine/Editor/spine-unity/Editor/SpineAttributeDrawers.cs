@@ -284,6 +284,9 @@ namespace Spine.Unity.Editor {
 			menu.AddDisabledItem(new GUIContent(skeletonDataAsset.name));
 			menu.AddSeparator("");
 
+			if (targetAttribute.includeNone)
+				menu.AddItem(new GUIContent(NoneStringConstant), !property.hasMultipleDifferentValues && string.IsNullOrEmpty(property.stringValue), HandleSelect, new SpineDrawerValuePair(string.Empty, property));
+
 			for (int i = 0; i < data.Skins.Count; i++) {
 				string name = data.Skins.Items[i].Name;
 				if (name.StartsWith(targetAttribute.startsWith, StringComparison.Ordinal)) {
