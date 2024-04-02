@@ -1,7 +1,7 @@
 {
 "skeleton": {
 	"hash": "XrCABmFcV0A",
-	"spine": "4.2.43-beta",
+	"spine": "4.2.61-beta",
 	"x": -221.22,
 	"y": -8.55,
 	"width": 371.09,
@@ -68,7 +68,7 @@
 		"rotation": -2.21,
 		"x": 78.69,
 		"y": 1.6,
-		"transform": "noScale",
+		"inherit": "noScale",
 		"color": "00ff04ff"
 	},
 	{

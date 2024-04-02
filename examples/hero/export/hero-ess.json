@@ -1,7 +1,7 @@
 {
 "skeleton": {
 	"hash": "AksZhY5c66s",
-	"spine": "4.2.43-beta",
+	"spine": "4.2.61-beta",
 	"x": -87.83,
 	"y": 0.01,
 	"width": 319.3,
@@ -28,7 +28,7 @@
 		"rotation": -90.96,
 		"x": 28.17,
 		"y": -0.49,
-		"transform": "noRotationOrReflection"
+		"inherit": "noRotationOrReflection"
 	},
 	{
 		"name": "foot2",
@@ -37,7 +37,7 @@
 		"rotation": -90.42,
 		"x": 25.55,
 		"y": 0.28,
-		"transform": "noRotationOrReflection"
+		"inherit": "noRotationOrReflection"
 	},
 	{ "name": "forearm1", "parent": "upperarm1", "length": 22.06, "rotation": 30.56, "x": 23.97, "y": 5.16 },
 	{ "name": "forearm2", "parent": "upperarm2", "length": 15.3, "rotation": 6.8, "x": 28.74, "y": -0.9 },

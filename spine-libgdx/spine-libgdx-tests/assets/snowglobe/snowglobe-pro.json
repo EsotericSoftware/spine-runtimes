@@ -1,7 +1,7 @@
 {
 "skeleton": {
-	"hash": "4dMUS3BMKfE",
-	"spine": "4.2.43-beta",
+	"hash": "7c5zrxkBXpw",
+	"spine": "4.2.61-beta",
 	"x": -938.98,
 	"y": -1030.95,
 	"width": 1839,
@@ -43,13 +43,13 @@
 	{ "name": "glove-l", "parent": "arm-l-elbow", "x": -21.88, "y": 16.97, "color": "1d53ffff", "icon": "handRight" },
 	{ "name": "red-gift-scale", "parent": "globe-texture", "color": "af81ccff" },
 	{ "name": "red-gift-rotator", "parent": "red-gift-scale", "color": "af81ccff" },
-	{ "name": "red-present-container", "parent": "red-gift-rotator", "x": 0.66, "y": 753.24, "transform": "onlyTranslation", "color": "abe323ff" },
+	{ "name": "red-present-container", "parent": "red-gift-rotator", "x": 0.66, "y": 753.24, "inherit": "onlyTranslation", "color": "abe323ff" },
 	{ "name": "red-present-control", "parent": "red-present-container", "x": -1.61, "y": -108.25, "color": "abe323ff", "icon": "arrowsB" },
 	{ "name": "blue-gift-scale", "parent": "globe-texture", "color": "af81ccff" },
 	{ "name": "blue-gift-rotator", "parent": "blue-gift-scale", "x": -85.11, "y": 97.27, "color": "af81ccff" },
-	{ "name": "blue-present-container", "parent": "blue-gift-rotator", "x": 472.85, "y": 194.01, "transform": "onlyTranslation", "color": "8bff21ff" },
+	{ "name": "blue-present-container", "parent": "blue-gift-rotator", "x": 472.85, "y": 194.01, "inherit": "onlyTranslation", "color": "8bff21ff" },
 	{ "name": "blue-present-control", "parent": "blue-present-container", "x": -2.67, "y": 20.44, "color": "8bff21ff", "icon": "arrowsB" },
-	{ "name": "green-present-container", "parent": "red-gift-rotator", "x": -535.33, "y": -278.19, "transform": "onlyTranslation", "color": "abe323ff" },
+	{ "name": "green-present-container", "parent": "red-gift-rotator", "x": -535.33, "y": -278.19, "inherit": "onlyTranslation", "color": "abe323ff" },
 	{ "name": "green-present-control", "parent": "green-present-container", "x": 1.1, "y": 109.78, "color": "abe323ff", "icon": "arrowsB" },
 	{ "name": "blue-present-inverse", "parent": "blue-present-container", "x": -0.64, "y": 130.04, "color": "ff0000ff", "icon": "warning" },
 	{
@@ -125,31 +125,31 @@
 	},
 	{ "name": "snow-scale", "parent": "globe-texture", "rotation": -22.81, "scaleY": 0.6733, "color": "af81ccff" },
 	{ "name": "snow-rotator", "parent": "snow-scale", "color": "af81ccff" },
-	{ "name": "snow-holder", "parent": "snow-rotator", "x": -217.19, "y": 675.51, "transform": "onlyTranslation", "color": "af81ccff" },
-	{ "name": "snow-holder2", "parent": "snow-rotator", "x": 487.41, "y": -233.55, "transform": "onlyTranslation", "color": "af81ccff" },
-	{ "name": "snow-holder3", "parent": "snow-rotator", "x": 429.83, "y": 570.54, "transform": "onlyTranslation", "color": "af81ccff" },
-	{ "name": "snow-holder4", "parent": "snow-rotator", "x": -536.03, "y": 77.92, "transform": "onlyTranslation", "color": "af81ccff" },
-	{ "name": "snow-holder5", "parent": "snow-rotator", "x": -217.19, "y": -772.65, "transform": "onlyTranslation", "color": "af81ccff" },
+	{ "name": "snow-holder", "parent": "snow-rotator", "x": -217.19, "y": 675.51, "inherit": "onlyTranslation", "color": "af81ccff" },
+	{ "name": "snow-holder2", "parent": "snow-rotator", "x": 487.41, "y": -233.55, "inherit": "onlyTranslation", "color": "af81ccff" },
+	{ "name": "snow-holder3", "parent": "snow-rotator", "x": 429.83, "y": 570.54, "inherit": "onlyTranslation", "color": "af81ccff" },
+	{ "name": "snow-holder4", "parent": "snow-rotator", "x": -536.03, "y": 77.92, "inherit": "onlyTranslation", "color": "af81ccff" },
+	{ "name": "snow-holder5", "parent": "snow-rotator", "x": -217.19, "y": -772.65, "inherit": "onlyTranslation", "color": "af81ccff" },
 	{ "name": "snow-scale2", "parent": "globe-texture", "rotation": 14.31, "scaleY": 0.6733, "color": "af81ccff" },
 	{ "name": "snow-rotator2", "parent": "snow-scale2", "color": "af81ccff" },
-	{ "name": "snow-holder6", "parent": "snow-rotator2", "x": -217.19, "y": 675.51, "transform": "onlyTranslation", "color": "af81ccff" },
-	{ "name": "snow-holder7", "parent": "snow-rotator2", "x": 487.41, "y": -233.55, "transform": "onlyTranslation", "color": "af81ccff" },
-	{ "name": "snow-holder8", "parent": "snow-rotator2", "x": 429.83, "y": 570.54, "transform": "onlyTranslation", "color": "af81ccff" },
-	{ "name": "snow-holder9", "parent": "snow-rotator2", "x": -536.03, "y": 77.92, "transform": "onlyTranslation", "color": "af81ccff" },
-	{ "name": "snow-holder10", "parent": "snow-rotator2", "x": -217.19, "y": -772.65, "transform": "onlyTranslation", "color": "af81ccff" },
-	{ "name": "snow-holder11", "parent": "snow-rotator", "x": -708.87, "y": -219.33, "transform": "onlyTranslation", "color": "af81ccff" },
+	{ "name": "snow-holder6", "parent": "snow-rotator2", "x": -217.19, "y": 675.51, "inherit": "onlyTranslation", "color": "af81ccff" },
+	{ "name": "snow-holder7", "parent": "snow-rotator2", "x": 487.41, "y": -233.55, "inherit": "onlyTranslation", "color": "af81ccff" },
+	{ "name": "snow-holder8", "parent": "snow-rotator2", "x": 429.83, "y": 570.54, "inherit": "onlyTranslation", "color": "af81ccff" },
+	{ "name": "snow-holder9", "parent": "snow-rotator2", "x": -536.03, "y": 77.92, "inherit": "onlyTranslation", "color": "af81ccff" },
+	{ "name": "snow-holder10", "parent": "snow-rotator2", "x": -217.19, "y": -772.65, "inherit": "onlyTranslation", "color": "af81ccff" },
+	{ "name": "snow-holder11", "parent": "snow-rotator", "x": -708.87, "y": -219.33, "inherit": "onlyTranslation", "color": "af81ccff" },
 	{
 		"name": "snow-holder12",
 		"parent": "snow-rotator",
 		"rotation": -42.71,
 		"x": -605.45,
 		"y": 81.9,
-		"transform": "onlyTranslation",
+		"inherit": "onlyTranslation",
 		"color": "af81ccff"
 	},
-	{ "name": "snow-holder13", "parent": "snow-rotator", "x": 367.91, "y": -412.8, "transform": "onlyTranslation", "color": "af81ccff" },
-	{ "name": "snow-holder14", "parent": "snow-rotator2", "x": -333.61, "y": -365.81, "transform": "onlyTranslation", "color": "af81ccff" },
-	{ "name": "snow-holder15", "parent": "snow-rotator2", "x": 440.09, "y": -442.62, "transform": "onlyTranslation", "color": "af81ccff" },
+	{ "name": "snow-holder13", "parent": "snow-rotator", "x": 367.91, "y": -412.8, "inherit": "onlyTranslation", "color": "af81ccff" },
+	{ "name": "snow-holder14", "parent": "snow-rotator2", "x": -333.61, "y": -365.81, "inherit": "onlyTranslation", "color": "af81ccff" },
+	{ "name": "snow-holder15", "parent": "snow-rotator2", "x": 440.09, "y": -442.62, "inherit": "onlyTranslation", "color": "af81ccff" },
 	{
 		"name": "shoelace",
 		"parent": "leg-knee-r",
@@ -380,6 +380,7 @@
 		"bone": "arm-l-elbow",
 		"x": 0.5385,
 		"y": 0.6368,
+		"limit": 500,
 		"inertia": 0.5,
 		"damping": 0.85
 	},
@@ -389,18 +390,44 @@
 		"bone": "arm-r-elbow",
 		"x": 0.5385,
 		"y": 0.6368,
+		"limit": 500,
 		"inertia": 0.5,
 		"damping": 0.85
 	},
-	{ "name": "arm-up-l2", "order": 24, "bone": "arm-up-l2", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
-	{ "name": "arm-up-r2", "order": 21, "bone": "arm-up-r2", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
-	{ "name": "body", "order": 4, "bone": "body", "rotate": 0.3889, "inertia": 0.5, "damping": 0.85 },
+	{
+		"name": "arm-up-l2",
+		"order": 24,
+		"bone": "arm-up-l2",
+		"rotate": 1,
+		"limit": 500,
+		"inertia": 0.5,
+		"damping": 0.85
+	},
+	{
+		"name": "arm-up-r2",
+		"order": 21,
+		"bone": "arm-up-r2",
+		"rotate": 1,
+		"limit": 500,
+		"inertia": 0.5,
+		"damping": 0.85
+	},
+	{
+		"name": "body",
+		"order": 4,
+		"bone": "body",
+		"rotate": 0.3889,
+		"limit": 500,
+		"inertia": 0.5,
+		"damping": 0.85
+	},
 	{
 		"name": "body-top",
 		"order": 5,
 		"bone": "body-top",
 		"x": 0.4573,
 		"y": 0.4658,
+		"limit": 500,
 		"inertia": 0.362,
 		"strength": 112.9,
 		"damping": 0.85
@@ -411,6 +438,7 @@
 		"bone": "glove-l",
 		"x": 0.5385,
 		"y": 0.6368,
+		"limit": 500,
 		"inertia": 0.5,
 		"damping": 0.85
 	},
@@ -420,20 +448,62 @@
 		"bone": "glove-r",
 		"x": 0.5385,
 		"y": 0.6368,
+		"limit": 500,
 		"inertia": 0.5,
 		"damping": 0.85
 	},
-	{ "name": "hair-l", "order": 40, "bone": "hair-l", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
-	{ "name": "hair-r", "order": 39, "bone": "hair-r", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
-	{ "name": "hat", "order": 36, "bone": "hat", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
-	{ "name": "hat2", "order": 37, "bone": "hat2", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
-	{ "name": "hat3", "order": 38, "bone": "hat3", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
+	{
+		"name": "hair-l",
+		"order": 40,
+		"bone": "hair-l",
+		"rotate": 1,
+		"limit": 500,
+		"inertia": 0.5,
+		"damping": 0.85
+	},
+	{
+		"name": "hair-r",
+		"order": 39,
+		"bone": "hair-r",
+		"rotate": 1,
+		"limit": 500,
+		"inertia": 0.5,
+		"damping": 0.85
+	},
+	{
+		"name": "hat",
+		"order": 36,
+		"bone": "hat",
+		"rotate": 1,
+		"limit": 500,
+		"inertia": 0.5,
+		"damping": 0.85
+	},
+	{
+		"name": "hat2",
+		"order": 37,
+		"bone": "hat2",
+		"rotate": 1,
+		"limit": 500,
+		"inertia": 0.5,
+		"damping": 0.85
+	},
+	{
+		"name": "hat3",
+		"order": 38,
+		"bone": "hat3",
+		"rotate": 1,
+		"limit": 500,
+		"inertia": 0.5,
+		"damping": 0.85
+	},
 	{
 		"name": "head-base",
 		"order": 6,
 		"bone": "head-base",
 		"x": 0.3248,
 		"y": 0.3248,
+		"limit": 500,
 		"inertia": 0.362,
 		"damping": 0.85
 	},
@@ -443,6 +513,7 @@
 		"bone": "hips",
 		"x": 1,
 		"y": 1,
+		"limit": 500,
 		"inertia": 0.227,
 		"strength": 74.8,
 		"damping": 0.9141
@@ -453,6 +524,7 @@
 		"bone": "leg-knee-l",
 		"x": 1,
 		"y": 1,
+		"limit": 500,
 		"inertia": 0.5,
 		"damping": 0.85
 	},
@@ -462,17 +534,35 @@
 		"bone": "leg-knee-r",
 		"x": 1,
 		"y": 1,
+		"limit": 500,
 		"inertia": 0.5,
 		"damping": 0.85
 	},
-	{ "name": "leg-up-l", "order": 16, "bone": "leg-up-l", "rotate": 0.4402, "inertia": 0.5, "damping": 0.908 },
-	{ "name": "leg-up-r", "order": 11, "bone": "leg-up-r", "rotate": 1, "inertia": 0.5, "damping": 0.816 },
+	{
+		"name": "leg-up-l",
+		"order": 16,
+		"bone": "leg-up-l",
+		"rotate": 0.4402,
+		"limit": 500,
+		"inertia": 0.5,
+		"damping": 0.908
+	},
+	{
+		"name": "leg-up-r",
+		"order": 11,
+		"bone": "leg-up-r",
+		"rotate": 1,
+		"limit": 500,
+		"inertia": 0.5,
+		"damping": 0.816
+	},
 	{
 		"name": "nose",
 		"order": 7,
 		"bone": "nose",
 		"x": 0.6532,
 		"y": 0.6127,
+		"limit": 500,
 		"inertia": 0.2353,
 		"damping": 0.85
 	},
@@ -482,16 +572,26 @@
 		"bone": "shoe-l",
 		"x": 1,
 		"y": 1,
+		"limit": 500,
 		"inertia": 0.2549,
 		"damping": 0.85
 	},
-	{ "name": "shoe-l-rotator", "order": 19, "bone": "shoe-l-rotator", "rotate": 0.5128, "inertia": 0.2059, "damping": 0.85 },
+	{
+		"name": "shoe-l-rotator",
+		"order": 19,
+		"bone": "shoe-l-rotator",
+		"rotate": 0.5128,
+		"limit": 500,
+		"inertia": 0.2059,
+		"damping": 0.85
+	},
 	{
 		"name": "shoe-l-tip",
 		"order": 20,
 		"bone": "shoe-l-tip",
 		"x": 0.3121,
 		"y": 0.3353,
+		"limit": 500,
 		"inertia": 0.2941,
 		"damping": 0.85
 	},
@@ -501,16 +601,26 @@
 		"bone": "shoe-r",
 		"x": 1,
 		"y": 1,
+		"limit": 500,
 		"inertia": 0.3333,
 		"damping": 0.85
 	},
-	{ "name": "shoe-r-rotator", "order": 14, "bone": "shoe-r-rotator", "rotate": 0.5214, "inertia": 0.5, "damping": 0.85 },
+	{
+		"name": "shoe-r-rotator",
+		"order": 14,
+		"bone": "shoe-r-rotator",
+		"rotate": 0.5214,
+		"limit": 500,
+		"inertia": 0.5,
+		"damping": 0.85
+	},
 	{
 		"name": "shoe-r-tip",
 		"order": 15,
 		"bone": "shoe-r-tip",
 		"x": 0.5085,
 		"y": 0.4872,
+		"limit": 500,
 		"inertia": 0.3333,
 		"damping": 0.85
 	},
@@ -520,6 +630,7 @@
 		"bone": "snowball-perspective",
 		"x": 0.5043,
 		"y": 0.4744,
+		"limit": 500,
 		"inertia": 0.5,
 		"damping": 0.85
 	},
@@ -588,6 +699,7 @@
 		"bone": "scarf-end-l",
 		"x": 1,
 		"y": 1,
+		"limit": 500,
 		"inertia": 0.5,
 		"strength": 70,
 		"damping": 0.79
@@ -598,6 +710,7 @@
 		"bone": "scarf-end-r",
 		"x": 1,
 		"y": 1,
+		"limit": 500,
 		"inertia": 0.5,
 		"strength": 69.9,
 		"damping": 0.7853
@@ -608,6 +721,7 @@
 		"bone": "scarf-ribbon-top-l",
 		"x": 1,
 		"y": 1,
+		"limit": 500,
 		"inertia": 0.5,
 		"damping": 0.85
 	},
@@ -617,19 +731,100 @@
 		"bone": "scarf-ribbon-top-r",
 		"x": 1,
 		"y": 1,
+		"limit": 500,
 		"inertia": 0.5,
 		"damping": 0.85
 	},
-	{ "name": "shoelaces/shoelace", "order": 41, "bone": "shoelace", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
-	{ "name": "shoelaces/shoelace2", "order": 46, "bone": "shoelace2", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
-	{ "name": "shoelaces/shoelace3", "order": 42, "bone": "shoelace3", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
-	{ "name": "shoelaces/shoelace4", "order": 45, "bone": "shoelace4", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
-	{ "name": "shoelaces/shoelace5", "order": 44, "bone": "shoelace5", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
-	{ "name": "shoelaces/shoelace6", "order": 43, "bone": "shoelace6", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
-	{ "name": "shoelaces/shoelace7", "order": 47, "bone": "shoelace7", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
-	{ "name": "shoelaces/shoelace8", "order": 50, "bone": "shoelace8", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
-	{ "name": "shoelaces/shoelace9", "order": 48, "bone": "shoelace9", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
-	{ "name": "shoelaces/shoelace10", "order": 49, "bone": "shoelace10", "rotate": 1, "inertia": 0.5, "damping": 0.85 }
+	{
+		"name": "shoelaces/shoelace",
+		"order": 41,
+		"bone": "shoelace",
+		"rotate": 1,
+		"limit": 500,
+		"inertia": 0.5,
+		"damping": 0.85
+	},
+	{
+		"name": "shoelaces/shoelace2",
+		"order": 46,
+		"bone": "shoelace2",
+		"rotate": 1,
+		"limit": 500,
+		"inertia": 0.5,
+		"damping": 0.85
+	},
+	{
+		"name": "shoelaces/shoelace3",
+		"order": 42,
+		"bone": "shoelace3",
+		"rotate": 1,
+		"limit": 500,
+		"inertia": 0.5,
+		"damping": 0.85
+	},
+	{
+		"name": "shoelaces/shoelace4",
+		"order": 45,
+		"bone": "shoelace4",
+		"rotate": 1,
+		"limit": 500,
+		"inertia": 0.5,
+		"damping": 0.85
+	},
+	{
+		"name": "shoelaces/shoelace5",
+		"order": 44,
+		"bone": "shoelace5",
+		"rotate": 1,
+		"limit": 500,
+		"inertia": 0.5,
+		"damping": 0.85
+	},
+	{
+		"name": "shoelaces/shoelace6",
+		"order": 43,
+		"bone": "shoelace6",
+		"rotate": 1,
+		"limit": 500,
+		"inertia": 0.5,
+		"damping": 0.85
+	},
+	{
+		"name": "shoelaces/shoelace7",
+		"order": 47,
+		"bone": "shoelace7",
+		"rotate": 1,
+		"limit": 500,
+		"inertia": 0.5,
+		"damping": 0.85
+	},
+	{
+		"name": "shoelaces/shoelace8",
+		"order": 50,
+		"bone": "shoelace8",
+		"rotate": 1,
+		"limit": 500,
+		"inertia": 0.5,
+		"damping": 0.85
+	},
+	{
+		"name": "shoelaces/shoelace9",
+		"order": 48,
+		"bone": "shoelace9",
+		"rotate": 1,
+		"limit": 500,
+		"inertia": 0.5,
+		"damping": 0.85
+	},
+	{
+		"name": "shoelaces/shoelace10",
+		"order": 49,
+		"bone": "shoelace10",
+		"rotate": 1,
+		"limit": 500,
+		"inertia": 0.5,
+		"damping": 0.85
+	}
 ],
 "skins": [
 	{

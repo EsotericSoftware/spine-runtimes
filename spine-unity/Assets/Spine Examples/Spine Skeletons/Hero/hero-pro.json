@@ -1,7 +1,7 @@
 {
 "skeleton": {
 	"hash": "1GKrwevyJb4",
-	"spine": "4.2.43-beta",
+	"spine": "4.2.61-beta",
 	"x": -85.7,
 	"y": -0.02,
 	"width": 321.77,
@@ -34,7 +34,7 @@
 		"rotation": -90.96,
 		"x": 28.17,
 		"y": -0.49,
-		"transform": "noRotationOrReflection"
+		"inherit": "noRotationOrReflection"
 	},
 	{ "name": "right-ground", "parent": "root", "x": 28.12, "y": 0.26, "color": "ff0000ff" },
 	{ "name": "right-ankle", "parent": "right-ground", "y": 31.79, "color": "ff3f00ff" },
@@ -47,7 +47,7 @@
 		"rotation": -90.42,
 		"x": 25.55,
 		"y": 0.28,
-		"transform": "noRotationOrReflection"
+		"inherit": "noRotationOrReflection"
 	},
 	{ "name": "upper-arm1", "parent": "body", "length": 19.36, "rotation": 130.11, "x": 52.5, "y": 41.85 },
 	{ "name": "forearm1", "parent": "upper-arm1", "length": 22.06, "rotation": 30.56, "x": 23.97, "y": 5.16 },

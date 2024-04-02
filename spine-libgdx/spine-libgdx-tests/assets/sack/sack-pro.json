@@ -1,7 +1,7 @@
 {
 "skeleton": {
-	"hash": "j/WfoneLp+Y",
-	"spine": "4.2.43-beta",
+	"hash": "fEcHMEFOADA",
+	"spine": "4.2.61-beta",
 	"x": -265.35,
 	"y": -64.53,
 	"width": 519,
@@ -12,11 +12,11 @@
 "bones": [
 	{ "name": "root" },
 	{ "name": "sack", "parent": "root", "length": 322.76, "rotation": 89.96, "x": 0.18, "y": 25.57 },
-	{ "name": "sack2", "parent": "sack", "length": 322.76, "x": 322.76, "transform": "noScale", "color": "e00000ff" },
+	{ "name": "sack2", "parent": "sack", "length": 322.76, "x": 322.76, "inherit": "noScale", "color": "e00000ff" },
 	{ "name": "corner-bottom-front", "parent": "sack", "x": -27.68, "y": 176.2, "color": "abe323ff" },
-	{ "name": "corner-bottom-front-ear", "parent": "corner-bottom-front", "length": 80.17, "rotation": 130.72, "transform": "noScale" },
+	{ "name": "corner-bottom-front-ear", "parent": "corner-bottom-front", "length": 80.17, "rotation": 130.72, "inherit": "noScale" },
 	{ "name": "corner-bottom-back", "parent": "sack", "x": 52.37, "y": -165.74 },
-	{ "name": "corner-bottom-back-ear", "parent": "corner-bottom-back", "length": 44.62, "rotation": -117.89, "transform": "noScale" },
+	{ "name": "corner-bottom-back-ear", "parent": "corner-bottom-back", "length": 44.62, "rotation": -117.89, "inherit": "noScale" },
 	{ "name": "corner-top-back", "parent": "sack2", "x": 302.43, "y": -121.61 },
 	{ "name": "corner-top-back-ear", "parent": "corner-top-back", "length": 63.54, "rotation": -18.26, "color": "abe323ff" },
 	{ "name": "corner-top-front", "parent": "sack2", "x": 311.75, "y": 118.27, "color": "abe323ff" },
@@ -161,182 +161,36 @@
 		"bone": "belly",
 		"x": 1,
 		"y": 1,
-		"limit": 5000,
 		"inertia": 0.5,
 		"damping": 0.85
 	},
-	{
-		"name": "bone",
-		"order": 4,
-		"bone": "bone",
-		"rotate": 1,
-		"limit": 5000,
-		"inertia": 0.5,
-		"damping": 0.15
-	},
-	{
-		"name": "bone2",
-		"order": 8,
-		"bone": "bone2",
-		"rotate": 1,
-		"limit": 5000,
-		"inertia": 0.5,
-		"damping": 0.15
-	},
-	{
-		"name": "bone2b",
-		"order": 9,
-		"bone": "bone2b",
-		"rotate": 1,
-		"limit": 5000,
-		"inertia": 0.5,
-		"damping": 0.15
-	},
-	{
-		"name": "bone2c",
-		"order": 10,
-		"bone": "bone2c",
-		"rotate": 1,
-		"limit": 5000,
-		"inertia": 0.5,
-		"damping": 0.15
-	},
-	{
-		"name": "bone2d",
-		"order": 11,
-		"bone": "bone2d",
-		"rotate": 1,
-		"limit": 5000,
-		"inertia": 0.5,
-		"damping": 0.15
-	},
-	{
-		"name": "bone3",
-		"order": 12,
-		"bone": "bone3",
-		"rotate": 1,
-		"limit": 5000,
-		"inertia": 0.5,
-		"damping": 0.15
-	},
-	{
-		"name": "bone3b",
-		"order": 13,
-		"bone": "bone3b",
-		"rotate": 1,
-		"limit": 5000,
-		"inertia": 0.5,
-		"damping": 0.15
-	},
-	{
-		"name": "bone3c",
-		"order": 14,
-		"bone": "bone3c",
-		"rotate": 1,
-		"limit": 5000,
-		"inertia": 0.5,
-		"damping": 0.15
-	},
-	{
-		"name": "bone3d",
-		"order": 15,
-		"bone": "bone3d",
-		"rotate": 1,
-		"limit": 5000,
-		"inertia": 0.5,
-		"damping": 0.15
-	},
-	{
-		"name": "bone4",
-		"order": 5,
-		"bone": "bone4",
-		"rotate": 1,
-		"limit": 5000,
-		"inertia": 0.5,
-		"damping": 0.15
-	},
-	{
-		"name": "bone5",
-		"order": 6,
-		"bone": "bone5",
-		"rotate": 1,
-		"limit": 5000,
-		"inertia": 0.5,
-		"damping": 0.15
-	},
-	{
-		"name": "bone6",
-		"order": 7,
-		"bone": "bone6",
-		"rotate": 1,
-		"limit": 5000,
-		"inertia": 0.5,
-		"damping": 0.15
-	},
+	{ "name": "bone", "order": 4, "bone": "bone", "rotate": 1, "inertia": 0.5, "damping": 0.15 },
+	{ "name": "bone2", "order": 8, "bone": "bone2", "rotate": 1, "inertia": 0.5, "damping": 0.15 },
+	{ "name": "bone2b", "order": 9, "bone": "bone2b", "rotate": 1, "inertia": 0.5, "damping": 0.15 },
+	{ "name": "bone2c", "order": 10, "bone": "bone2c", "rotate": 1, "inertia": 0.5, "damping": 0.15 },
+	{ "name": "bone2d", "order": 11, "bone": "bone2d", "rotate": 1, "inertia": 0.5, "damping": 0.15 },
+	{ "name": "bone3", "order": 12, "bone": "bone3", "rotate": 1, "inertia": 0.5, "damping": 0.15 },
+	{ "name": "bone3b", "order": 13, "bone": "bone3b", "rotate": 1, "inertia": 0.5, "damping": 0.15 },
+	{ "name": "bone3c", "order": 14, "bone": "bone3c", "rotate": 1, "inertia": 0.5, "damping": 0.15 },
+	{ "name": "bone3d", "order": 15, "bone": "bone3d", "rotate": 1, "inertia": 0.5, "damping": 0.15 },
+	{ "name": "bone4", "order": 5, "bone": "bone4", "rotate": 1, "inertia": 0.5, "damping": 0.15 },
+	{ "name": "bone5", "order": 6, "bone": "bone5", "rotate": 1, "inertia": 0.5, "damping": 0.15 },
+	{ "name": "bone6", "order": 7, "bone": "bone6", "rotate": 1, "inertia": 0.5, "damping": 0.15 },
 	{
 		"name": "cape-front",
 		"order": 23,
 		"bone": "cape-front",
 		"x": 1,
 		"y": 1,
-		"limit": 5000,
 		"inertia": 0.5,
 		"damping": 0.85
 	},
-	{
-		"name": "cape-front2",
-		"order": 19,
-		"bone": "cape-front2",
-		"rotate": 1,
-		"limit": 5000,
-		"inertia": 0.5,
-		"damping": 0.85
-	},
-	{
-		"name": "cape-front3",
-		"order": 20,
-		"bone": "cape-front3",
-		"rotate": 1,
-		"limit": 5000,
-		"inertia": 0.5,
-		"damping": 0.85
-	},
-	{
-		"name": "cape-front4",
-		"order": 21,
-		"bone": "cape-front4",
-		"rotate": 1,
-		"limit": 5000,
-		"inertia": 0.5,
-		"damping": 0.85
-	},
-	{
-		"name": "cape-front5",
-		"order": 22,
-		"bone": "cape-front5",
-		"rotate": 1,
-		"limit": 5000,
-		"inertia": 0.5,
-		"damping": 0.85
-	},
-	{
-		"name": "corner-top-back-ear",
-		"order": 17,
-		"bone": "corner-top-back-ear",
-		"rotate": 1,
-		"limit": 5000,
-		"inertia": 0.5,
-		"damping": 0.85
-	},
-	{
-		"name": "corner-top-front-ear",
-		"order": 16,
-		"bone": "corner-top-front-ear",
-		"rotate": 1,
-		"limit": 5000,
-		"inertia": 0.5,
-		"damping": 0.85
-	}
+	{ "name": "cape-front2", "order": 19, "bone": "cape-front2", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
+	{ "name": "cape-front3", "order": 20, "bone": "cape-front3", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
+	{ "name": "cape-front4", "order": 21, "bone": "cape-front4", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
+	{ "name": "cape-front5", "order": 22, "bone": "cape-front5", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
+	{ "name": "corner-top-back-ear", "order": 17, "bone": "corner-top-back-ear", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
+	{ "name": "corner-top-front-ear", "order": 16, "bone": "corner-top-front-ear", "rotate": 1, "inertia": 0.5, "damping": 0.85 }
 ],
 "skins": [
 	{

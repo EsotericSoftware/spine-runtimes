@@ -303,6 +303,10 @@ cp -f ../sack/export/sack-pma.png "$ROOT/spine-sfml/cpp/data/"
 
 cp -f ../celestial-circus/export/* "$ROOT/spine-sfml/cpp/data/"
 
+cp -f ../snowglobe/export/* "$ROOT/spine-sfml/cpp/data/"
+
+cp -f ../cloud-pot/export/* "$ROOT/spine-sfml/cpp/data/"
+
 echo "spine-ts"
 rm "$ROOT/spine-ts/spine-webgl/example/assets/"*
 cp -f ../coin/export/coin-pro.json "$ROOT/spine-ts/spine-webgl/example/assets/"

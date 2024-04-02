@@ -645,6 +645,108 @@ void celestialCircus(SkeletonData *skeletonData, Atlas *atlas) {
     }
 }
 
+void sack(SkeletonData *skeletonData, Atlas *atlas) {
+    SP_UNUSED(atlas);
+
+    SkeletonDrawable drawable(skeletonData);
+    drawable.timeScale = 1;
+    drawable.setUsePremultipliedAlpha(true);
+
+    Skeleton *skeleton = drawable.skeleton;
+    skeleton->setPosition(320, 480);
+    skeleton->updateWorldTransform(Physics_Update);
+
+    drawable.state->setAnimation(0, "walk", true);
+
+    sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - sack");
+    window.setFramerateLimit(60);
+    sf::Event event;
+    sf::Clock deltaClock;
+
+    while (window.isOpen()) {
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) window.close();
+        }
+
+        float delta = deltaClock.getElapsedTime().asSeconds();
+        deltaClock.restart();
+
+        drawable.update(delta);
+
+        window.clear();
+        window.draw(drawable);
+        window.display();
+    }
+}
+
+void snowglobe(SkeletonData *skeletonData, Atlas *atlas) {
+    SP_UNUSED(atlas);
+
+    SkeletonDrawable drawable(skeletonData);
+    drawable.timeScale = 1;
+    drawable.setUsePremultipliedAlpha(true);
+
+    Skeleton *skeleton = drawable.skeleton;
+    skeleton->setPosition(320, 480);
+    skeleton->updateWorldTransform(Physics_Update);
+
+    drawable.state->setAnimation(0, "shake", true);
+
+    sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - snowglobe");
+    window.setFramerateLimit(60);
+    sf::Event event;
+    sf::Clock deltaClock;
+
+    while (window.isOpen()) {
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) window.close();
+        }
+
+        float delta = deltaClock.getElapsedTime().asSeconds();
+        deltaClock.restart();
+
+        drawable.update(delta);
+
+        window.clear();
+        window.draw(drawable);
+        window.display();
+    }
+}
+
+void cloudpot(SkeletonData *skeletonData, Atlas *atlas) {
+    SP_UNUSED(atlas);
+
+    SkeletonDrawable drawable(skeletonData);
+    drawable.timeScale = 1;
+    drawable.setUsePremultipliedAlpha(true);
+
+    Skeleton *skeleton = drawable.skeleton;
+    skeleton->setPosition(320, 480);
+    skeleton->updateWorldTransform(Physics_Update);
+
+    drawable.state->setAnimation(0, "playing-in-the-rain", true);
+
+    sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - cloudpot");
+    window.setFramerateLimit(60);
+    sf::Event event;
+    sf::Clock deltaClock;
+
+    while (window.isOpen()) {
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) window.close();
+        }
+
+        float delta = deltaClock.getElapsedTime().asSeconds();
+        deltaClock.restart();
+
+        drawable.update(delta);
+
+        window.clear();
+        window.draw(drawable);
+        window.display();
+    }
+}
+
 /**
  * Used for debugging purposes during runtime development
  */
@@ -670,17 +772,19 @@ DebugExtension dbgExtension(SpineExtension::getInstance());
 int main() {
 	SpineExtension::setInstance(&dbgExtension);
 
-    testcase(ikDemo, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.6f);
+    testcase(cloudpot, "data/cloud-pot.json", "data/cloud-pot.skel", "data/cloud-pot-pma.atlas", 0.2);
+    testcase(sack, "data/sack-pro.json", "data/sack-pro.skel", "data/sack-pma.atlas", 0.2f);
     testcase(celestialCircus, "data/celestial-circus-pro.json", "data/celestial-circus-pro.skel", "data/celestial-circus-pma.atlas", 0.2f);
+    testcase(snowglobe, "data/snowglobe-pro.json", "data/snowglobe-pro.skel", "data/snowglobe-pma.atlas", 0.2f);
+    testcase(spineboy, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.62f);
+    testcase(ikDemo, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.6f);
 	testcase(vine, "data/vine-pro.json", "data/vine-pro.skel", "data/vine-pma.atlas", 0.5f);
 	testcase(dragon, "data/dragon-ess.json", "data/dragon-ess.skel", "data/dragon-pma.atlas", 0.6f);
 	testcase(owl, "data/owl-pro.json", "data/owl-pro.skel", "data/owl-pma.atlas", 0.5f);
 	testcase(mixAndMatch, "data/mix-and-match-pro.json", "data/mix-and-match-pro.skel", "data/mix-and-match-pma.atlas", 0.5f);
 	testcase(coin, "data/coin-pro.json", "data/coin-pro.skel", "data/coin-pma.atlas", 0.5f);
-	testcase(spineboy, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.6f);
 	testcase(raptor, "data/raptor-pro.json", "data/raptor-pro.skel", "data/raptor-pma.atlas", 0.5f);
 	testcase(tank, "data/tank-pro.json", "data/tank-pro.skel", "data/tank-pma.atlas", 0.2f);
-	testcase(raptor, "data/raptor-pro.json", "data/raptor-pro.skel", "data/raptor-pma.atlas", 0.5f);
 	testcase(goblins, "data/goblins-pro.json", "data/goblins-pro.skel", "data/goblins-pma.atlas", 1.4f);
 	testcase(stretchyman, "data/stretchyman-pro.json", "data/stretchyman-pro.skel", "data/stretchyman-pma.atlas", 0.6f);
 

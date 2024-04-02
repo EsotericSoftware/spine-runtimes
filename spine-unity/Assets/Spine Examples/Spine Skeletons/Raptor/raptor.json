@@ -1,7 +1,7 @@
 {
 "skeleton": {
 	"hash": "DnQ5Q3tz46g",
-	"spine": "4.2.43-beta",
+	"spine": "4.2.61-beta",
 	"x": -402.84,
 	"y": -35.99,
 	"width": 611.87,
@@ -110,7 +110,7 @@
 		"rotation": 9.21,
 		"x": 21.84,
 		"y": 0.03,
-		"transform": "noRotationOrReflection",
+		"inherit": "noRotationOrReflection",
 		"color": "ffffffff"
 	},
 	{ "name": "spineboy_rear_arm_goal", "parent": "saddle", "x": -15.22, "y": -50.04, "color": "ff3f00ff" },
@@ -226,7 +226,7 @@
 		"y": -0.01,
 		"scaleX": 0.731,
 		"scaleY": 0.823,
-		"transform": "noRotationOrReflection",
+		"inherit": "noRotationOrReflection",
 		"color": "15ff00ff"
 	},
 	{
@@ -237,7 +237,7 @@
 		"x": 24.85,
 		"y": 10.33,
 		"scaleX": 1.155,
-		"transform": "noRotationOrReflection",
+		"inherit": "noRotationOrReflection",
 		"color": "15ff00ff"
 	},
 	{
@@ -256,7 +256,7 @@
 		"rotation": 13.9,
 		"x": 19.99,
 		"y": -0.45,
-		"transform": "noRotationOrReflection",
+		"inherit": "noRotationOrReflection",
 		"color": "ffffffff"
 	},
 	{ "name": "spineboy_front_arm_goal", "parent": "saddle", "x": -25.35, "y": -48.47, "color": "ff3f00ff" },
@@ -314,7 +314,7 @@
 		"rotation": -140.14,
 		"x": 14.69,
 		"y": -20.08,
-		"transform": "noScale",
+		"inherit": "noScale",
 		"color": "ffff00ff"
 	},
 	{
@@ -372,7 +372,7 @@
 		"rotation": -6.14,
 		"x": 42.25,
 		"y": -0.17,
-		"transform": "noRotationOrReflection",
+		"inherit": "noRotationOrReflection",
 		"color": "e07800ff"
 	},
 	{

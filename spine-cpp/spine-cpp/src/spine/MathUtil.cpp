@@ -67,8 +67,8 @@ float MathUtil::atan2(float y, float x) {
 	return (float) ::atan2(y, x);
 }
 
-float MathUtil::atan2Deg(float x, float y) {
-	return MathUtil::atan2(x, y) * MathUtil::Deg_Rad;
+float MathUtil::atan2Deg(float y, float x) {
+	return MathUtil::atan2(y, x) * MathUtil::Rad_Deg;
 }
 
 /// Returns the cosine in radians from a lookup table.

@@ -59,6 +59,7 @@
 #include <spine/PathConstraintPositionTimeline.h>
 #include <spine/PathConstraintSpacingTimeline.h>
 #include <spine/PhysicsConstraintData.h>
+#include <spine/PhysicsConstraintTimeline.h>
 #include <spine/PointAttachment.h>
 #include <spine/RegionAttachment.h>
 #include <spine/RotateTimeline.h>
@@ -488,7 +489,7 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
             data->_inertia = Json::getFloat(constraintMap, "inertia", 1);
             data->_strength = Json::getFloat(constraintMap, "strength", 100);
             data->_damping = Json::getFloat(constraintMap, "damping", 1);
-            data->_massInverse = 1 / Json::getFloat(constraintMap, "mass", 1);
+            data->_massInverse = 1.0f / Json::getFloat(constraintMap, "mass", 1);
             data->_wind = Json::getFloat(constraintMap, "wind", 0);
             data->_gravity = Json::getFloat(constraintMap, "gravity", 0);
             data->_mix = Json::getFloat(constraintMap, "mix", 1);
@@ -955,6 +956,7 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 	Json *ik = Json::getItem(root, "ik");
 	Json *transform = Json::getItem(root, "transform");
 	Json *paths = Json::getItem(root, "path");
+    Json *physics = Json::getItem(root, "physics");
 	Json *attachments = Json::getItem(root, "attachments");
 	Json *drawOrder = Json::getItem(root, "drawOrder");
 	Json *events = Json::getItem(root, "events");
@@ -1348,6 +1350,54 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 			}
 		}
 	}
+
+    /** Physics constraint timelines. */
+    for (Json *constraintMap = physics ? physics->_child : 0; constraintMap; constraintMap = constraintMap->_next) {
+        int index = -1;
+        if (constraintMap->_name && strlen(constraintMap->_name) > 0) {
+            PhysicsConstraintData *constraint = skeletonData->findPhysicsConstraint(constraintMap->_name);
+            if (!constraint) {
+                ContainerUtil::cleanUpVectorOfPointers(timelines);
+                setError(NULL, "Physics constraint not found: ", constraintMap->_name);
+                return NULL;
+            }
+            index = skeletonData->_physicsConstraints.indexOf(constraint);
+        }
+        for (Json *timelineMap = constraintMap->_child; timelineMap; timelineMap = timelineMap->_next) {
+            keyMap = timelineMap->_child;
+            if (keyMap == NULL) continue;
+            const char *timelineName = timelineMap->_name;
+            int frames = timelineMap->_size;
+            if (strcmp(timelineName, "reset") == 0) {
+                PhysicsConstraintResetTimeline *timeline = new (__FILE__, __LINE__) PhysicsConstraintResetTimeline(frames, index);
+                for (int frame = 0; keyMap != nullptr; keyMap = keyMap->_next, frame++) {
+                    timeline->setFrame(frame, Json::getFloat(keyMap, "time", 0));
+                }
+                timelines.add(timeline);
+                continue;
+            }
+
+            CurveTimeline1 *timeline = nullptr;
+            if (strcmp(timelineName, "inertia") == 0) {
+                timeline = new PhysicsConstraintInertiaTimeline(frames, frames, index);
+            } else if (strcmp(timelineName, "strength") == 0) {
+                timeline = new PhysicsConstraintStrengthTimeline(frames, frames, index);
+            } else if (strcmp(timelineName, "damping") == 0) {
+                timeline = new PhysicsConstraintDampingTimeline(frames, frames, index);
+            } else if (strcmp(timelineName, "mass") == 0) {
+                timeline = new PhysicsConstraintMassTimeline(frames, frames, index);
+            } else if (strcmp(timelineName, "wind") == 0) {
+                timeline = new PhysicsConstraintWindTimeline(frames, frames, index);
+            } else if (strcmp(timelineName, "gravity") == 0) {
+                timeline = new PhysicsConstraintGravityTimeline(frames, frames, index);
+            } else if (strcmp(timelineName, "mix") == 0) {
+                timeline = new PhysicsConstraintMixTimeline(frames, frames, index);
+            } else {
+                continue;
+            }
+            timelines.add(readTimeline(keyMap, timeline, 0, 1));
+        }
+    }
 
 	/** Attachment timelines. */
 	for (Json *attachmenstMap = attachments ? attachments->_child : NULL; attachmenstMap; attachmenstMap = attachmenstMap->_next) {

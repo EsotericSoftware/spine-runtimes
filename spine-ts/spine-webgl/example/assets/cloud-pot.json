@@ -1,7 +1,7 @@
 {
 "skeleton": {
-	"hash": "8KUEsGZLqgM",
-	"spine": "4.2.43-beta",
+	"hash": "CKnF82un6n8",
+	"spine": "4.2.61-beta",
 	"x": -345,
 	"y": -272846.84,
 	"width": 756,
@@ -126,7 +126,6 @@
 		"bone": "cloud",
 		"x": 1,
 		"y": 1,
-		"limit": 5000,
 		"inertia": 0.5,
 		"strength": 172.8,
 		"damping": 0.8571,
@@ -138,6 +137,7 @@
 		"bone": "cloud-face",
 		"x": 0.1923,
 		"y": 0.141,
+		"limit": 500,
 		"inertia": 0.5,
 		"damping": 0.15
 	},
@@ -147,6 +147,7 @@
 		"bone": "pot-face",
 		"x": 0.1667,
 		"y": 0.1026,
+		"limit": 500,
 		"inertia": 0.5,
 		"strength": 137.3,
 		"damping": 0.6078
@@ -157,6 +158,7 @@
 		"bone": "cloud-base-1",
 		"x": 1,
 		"y": 1,
+		"limit": 500,
 		"inertia": 0.3741,
 		"strength": 134.7,
 		"damping": 0.8163,
@@ -192,6 +194,7 @@
 		"bone": "cloud-base-4",
 		"x": 1,
 		"y": 1,
+		"limit": 500,
 		"inertia": 0.3741,
 		"strength": 134.7,
 		"damping": 0.8163,
@@ -275,6 +278,7 @@
 		"bone": "leaf-big",
 		"rotate": 0.7532,
 		"shearX": 0.2468,
+		"limit": 500,
 		"inertia": 0.5,
 		"strength": 160.5,
 		"damping": 0.8367,
@@ -285,6 +289,7 @@
 		"order": 22,
 		"bone": "leaf-big-tip",
 		"rotate": 1,
+		"limit": 500,
 		"inertia": 0.5,
 		"strength": 160.5,
 		"damping": 0.8367,
@@ -295,6 +300,7 @@
 		"order": 15,
 		"bone": "leaf-small",
 		"rotate": 0.6026,
+		"limit": 500,
 		"inertia": 0.5,
 		"strength": 160.5,
 		"damping": 0.8367,
@@ -305,6 +311,7 @@
 		"order": 19,
 		"bone": "petal-1",
 		"rotate": 1,
+		"limit": 500,
 		"inertia": 0.5,
 		"strength": 164.6,
 		"damping": 0.6531,
@@ -315,6 +322,7 @@
 		"order": 21,
 		"bone": "petal-2",
 		"rotate": 1,
+		"limit": 500,
 		"inertia": 0.5,
 		"strength": 164.6,
 		"damping": 0.6531,
@@ -325,6 +333,7 @@
 		"order": 20,
 		"bone": "petal-3",
 		"rotate": 1,
+		"limit": 500,
 		"inertia": 0.5,
 		"strength": 164.6,
 		"damping": 0.7823,
@@ -369,7 +378,6 @@
 		"bone": "rain-blue",
 		"x": 1,
 		"y": 1,
-		"limit": 5000,
 		"strength": 0,
 		"gravity": 70
 	},
@@ -379,7 +387,6 @@
 		"bone": "rain-color",
 		"x": 1,
 		"y": 1,
-		"limit": 5000,
 		"strength": 0,
 		"gravity": 70
 	},
@@ -389,19 +396,10 @@
 		"bone": "rain-green",
 		"x": 1,
 		"y": 1,
-		"limit": 5000,
 		"strength": 0,
 		"gravity": 70
 	},
-	{
-		"name": "rain/rain-white",
-		"bone": "rain-white",
-		"x": 1,
-		"y": 1,
-		"limit": 5000,
-		"strength": 0,
-		"gravity": 70
-	}
+	{ "name": "rain/rain-white", "bone": "rain-white", "x": 1, "y": 1, "strength": 0, "gravity": 70 }
 ],
 "skins": [
 	{

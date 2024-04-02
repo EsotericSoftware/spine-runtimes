@@ -1,7 +1,7 @@
 {
 "skeleton": {
 	"hash": "pvgSVWzpY9U",
-	"spine": "4.2.43-beta",
+	"spine": "4.2.61-beta",
 	"x": -188.63,
 	"y": -7.94,
 	"width": 418.45,
@@ -58,7 +58,7 @@
 		"rotation": -0.85,
 		"x": 51.17,
 		"y": 0.24,
-		"transform": "noRotationOrReflection",
+		"inherit": "noRotationOrReflection",
 		"color": "ff000dff"
 	},
 	{ "name": "board-ik", "parent": "root", "x": -131.78, "y": 69.09, "color": "4c56ffff", "icon": "arrows" },
@@ -161,7 +161,7 @@
 		"rotation": -1.68,
 		"x": 41.42,
 		"y": -0.09,
-		"transform": "noRotationOrReflection",
+		"inherit": "noRotationOrReflection",
 		"color": "00ff04ff"
 	},
 	{ "name": "back-shoulder", "parent": "torso3", "rotation": -104.11, "x": 7.32, "y": -19.22, "color": "ff000dff" },
@@ -231,8 +231,8 @@
 		"y": -0.04,
 		"color": "e0da19ff"
 	},
-	{ "name": "hoverboard-thruster-front", "parent": "hoverboard-controller", "rotation": -29.2, "x": 95.77, "y": -2.99, "transform": "noRotationOrReflection" },
-	{ "name": "hoverboard-thruster-rear", "parent": "hoverboard-controller", "rotation": -29.2, "x": -76.47, "y": -4.88, "transform": "noRotationOrReflection" },
+	{ "name": "hoverboard-thruster-front", "parent": "hoverboard-controller", "rotation": -29.2, "x": 95.77, "y": -2.99, "inherit": "noRotationOrReflection" },
+	{ "name": "hoverboard-thruster-rear", "parent": "hoverboard-controller", "rotation": -29.2, "x": -76.47, "y": -4.88, "inherit": "noRotationOrReflection" },
 	{ "name": "hoverglow-front", "parent": "hoverboard-thruster-front", "rotation": 0.17, "x": -1.78, "y": -37.79 },
 	{ "name": "hoverglow-rear", "parent": "hoverboard-thruster-rear", "rotation": 0.17, "x": 1.06, "y": -35.66 },
 	{

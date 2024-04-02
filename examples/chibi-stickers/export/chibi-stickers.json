@@ -1,7 +1,7 @@
 {
 "skeleton": {
 	"hash": "5SlwDA/FRms",
-	"spine": "4.2.43-beta",
+	"spine": "4.2.61-beta",
 	"x": -180,
 	"y": -37.5,
 	"width": 360,
@@ -119,7 +119,7 @@
 		"length": 258.56,
 		"rotation": -90,
 		"x": 156.74,
-		"transform": "noRotationOrReflection",
+		"inherit": "noRotationOrReflection",
 		"skin": true,
 		"color": "89f541a3"
 	},

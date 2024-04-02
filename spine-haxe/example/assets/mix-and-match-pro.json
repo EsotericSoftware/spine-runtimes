@@ -1,7 +1,7 @@
 {
 "skeleton": {
 	"hash": "4fumZThfQpw",
-	"spine": "4.2.43-beta",
+	"spine": "4.2.61-beta",
 	"x": -240.58,
 	"y": -3.38,
 	"width": 410.36,
@@ -98,7 +98,7 @@
 		"rotation": -90.56,
 		"x": -51.95,
 		"y": -259.13,
-		"transform": "noRotationOrReflection",
+		"inherit": "noRotationOrReflection",
 		"color": "d130ffff",
 		"icon": "ik"
 	},
@@ -516,7 +516,7 @@
 		"rotation": -90.56,
 		"x": 38.54,
 		"y": -259.75,
-		"transform": "noRotationOrReflection",
+		"inherit": "noRotationOrReflection",
 		"color": "d130ffff",
 		"icon": "ik"
 	},

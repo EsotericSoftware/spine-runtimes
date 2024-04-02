@@ -1,7 +1,7 @@
 {
 "skeleton": {
 	"hash": "CNp43FaCQIg",
-	"spine": "4.2.43-beta",
+	"spine": "4.2.61-beta",
 	"x": -100.47,
 	"y": -9.21,
 	"width": 260.65,
@@ -58,7 +58,7 @@
 		"rotation": -154.36,
 		"x": 16,
 		"y": -4.58,
-		"transform": "noScale",
+		"inherit": "noScale",
 		"color": "ff0000ff"
 	},
 	{
@@ -96,7 +96,7 @@
 		"rotation": -6.56,
 		"x": -34.01,
 		"y": -279.68,
-		"transform": "onlyTranslation",
+		"inherit": "onlyTranslation",
 		"color": "ff0000ff"
 	},
 	{
@@ -105,7 +105,7 @@
 		"length": 32.29,
 		"rotation": 4.34,
 		"x": 33.24,
-		"transform": "noScale",
+		"inherit": "noScale",
 		"color": "ff0000ff"
 	},
 	{
@@ -114,7 +114,7 @@
 		"length": 15.87,
 		"rotation": 10.06,
 		"x": 32.29,
-		"transform": "noScale",
+		"inherit": "noScale",
 		"color": "ff0000ff"
 	},
 	{ "name": "back-leg-ik-target", "parent": "root", "x": 46.15, "y": 8.68, "color": "ff3f00ff", "icon": "ik" },
@@ -220,7 +220,7 @@
 		"rotation": 118.58,
 		"x": 27.13,
 		"y": 4.9,
-		"transform": "noScale",
+		"inherit": "noScale",
 		"color": "4eff00ff"
 	},
 	{
@@ -248,7 +248,7 @@
 		"length": 46.32,
 		"rotation": 16.09,
 		"x": 29.18,
-		"transform": "noScale",
+		"inherit": "noScale",
 		"color": "4eff00ff"
 	},
 	{
@@ -258,7 +258,7 @@
 		"rotation": -10.98,
 		"x": -77.05,
 		"y": -285.04,
-		"transform": "onlyTranslation",
+		"inherit": "onlyTranslation",
 		"color": "50ff00ff"
 	},
 	{ "name": "front-foot2", "parent": "front-foot1", "length": 29.12, "rotation": 9.61, "x": 26.3, "color": "50ff00ff" },
@@ -371,7 +371,7 @@
 		"rotation": 6.98,
 		"x": 15.82,
 		"y": 0.22,
-		"transform": "noScale",
+		"inherit": "noScale",
 		"color": "ffbd00ff"
 	}
 ],
