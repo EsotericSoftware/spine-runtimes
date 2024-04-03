@@ -11,6 +11,9 @@ if [ ! -f "$SPINE_EXE" ]; then
    SPINE_EXE="/mnt/c/Program Files/Spine/Spine.com"
 fi
 if [ ! -f "$SPINE_EXE" ]; then
+   SPINE_EXE="C:/Program Files/Spine/Spine.com"
+fi
+if [ ! -f "$SPINE_EXE" ]; then
 	SPINE_EXE="/Applications/Spine.app/Contents/MacOS/Spine"
 fi
 echo "Spine exe: $SPINE_EXE"

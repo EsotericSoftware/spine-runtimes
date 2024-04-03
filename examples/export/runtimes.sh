@@ -758,6 +758,11 @@ cp -f ../cloud-pot/export/cloud-pot.skel "$UNITY_TARGET_DIR/cloud-pot.skel.bytes
 cp -f ../cloud-pot/export/cloud-pot-pma.atlas "$UNITY_TARGET_DIR/cloud-pot-pma.atlas.txt"
 cp -f ../cloud-pot/export/cloud-pot-pma.png "$UNITY_TARGET_DIR/"
 
+UNITY_TARGET_DIR="$ROOT/spine-unity/Assets/Spine Examples/Spine Skeletons/sack"
+cp -f ../sack/export/sack-pro.skel "$UNITY_TARGET_DIR/sack-pro.skel.bytes"
+cp -f ../sack/export/sack-pma.atlas "$UNITY_TARGET_DIR/sack-pma.atlas.txt"
+cp -f ../sack/export/sack-pma.png "$UNITY_TARGET_DIR/"
+
 echo "--"
 echo "Note regarding spine-xna and spine-unity:"
 echo "Some textures (normalmap, emission, rim-mask) need manual update."
