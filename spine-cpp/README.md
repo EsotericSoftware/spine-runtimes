@@ -24,6 +24,7 @@ spine-cpp supports all spine features.
 2. Copy the contents of the `spine-cpp/spine-cpp/src` and `spine-cpp/spine-cpp/include` directories into your project. Be sure your header search is configured to find the contents of the `spine-cpp/spine-cpp/include` directory. Note that the includes use `spine/Xxx.h`, so the `spine` directory cannot be omitted when copying the files.
 
 ## Usage
+
 ### [Please see the spine-cpp guide for full documentation](http://esotericsoftware.com/spine-cpp)
 
 ## Extension
@@ -51,4 +52,4 @@ class MyTextureLoader : public spine::TextureLoader
 
 - [spine-sfml](../spine-sfml/cpp)
 - [spine-cocos2dx](../spine-cocos2dx)
-- [spine-ue4](../spine-ue4)
+- [spine-ue](../spine-ue)

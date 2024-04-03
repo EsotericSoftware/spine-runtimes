@@ -118,19 +118,19 @@ spine-threejs/spine-js/spine.js
 
 spine-ts/.vscode/*
 
-spine-ue4/Binaries
-spine-ue4/Intermediate
-spine-ue4/Saved
-spine-ue4/SpineUE4.xcworkspace
-spine-ue4/Plugins/SpinePlugin/Source/SpinePlugin/Public/spine-c
-spine-ue4/Plugins/SpinePlugin/Source/SpinePlugin/Public/spine-cpp
-spine-ue4/Plugins/SpinePlugin/Binaries
-spine-ue4/SpineUE4.VC.opendb
-spine-ue4/SpineUE4.VC.db
-spine-ue4/SpineUE4.sln
-spine-ue4/SpineUE4.VC.db
-spine-ue4/.vs/
-spine-ue4/SpineUE4.VC.VC.opendb
+spine-ue/Binaries
+spine-ue/Intermediate
+spine-ue/Saved
+spine-ue/SpineUE4.xcworkspace
+spine-ue/Plugins/SpinePlugin/Source/SpinePlugin/Public/spine-c
+spine-ue/Plugins/SpinePlugin/Source/SpinePlugin/Public/spine-cpp
+spine-ue/Plugins/SpinePlugin/Binaries
+spine-ue/SpineUE4.VC.opendb
+spine-ue/SpineUE4.VC.db
+spine-ue/SpineUE4.sln
+spine-ue/SpineUE4.VC.db
+spine-ue/.vs/
+spine-ue/SpineUE4.VC.VC.opendb
 
 .gradle/
 *.iml
@@ -197,6 +197,6 @@ spine-flutter/macos/Classes/spine-cpp
 spine-flutter/src/spine-cpp
 spine-godot/godot-nuget
 spine-godot/godot-spine-csharp
-spine-ue4/Plugins/Developer
+spine-ue/Plugins/Developer
 spine-haxe/export
 spine-godot/example-v4-csharp/.godot

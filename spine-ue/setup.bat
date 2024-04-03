@@ -4,6 +4,6 @@ xcopy /E /I ..\spine-cpp\spine-cpp Plugins\SpinePlugin\Source\SpinePlugin\Public
 goto done
 
 :error
-@echo Couldn^'t setup spine-ue4
+@echo Couldn^'t setup spine-ue
 
 :done
