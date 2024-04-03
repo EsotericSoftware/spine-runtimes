@@ -1,10 +1,12 @@
 #
-# First download and extract SFML 2.5.1 for the respective OS we are on
+# First download and extract SFML 2.6.1 for the respective OS we are on
 #
 set(DEPS_DIR "${CMAKE_CURRENT_LIST_DIR}/dependencies/")
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    set(SFML_URL "https://www.sfml-dev.org/files/SFML-2.5.1-macOS-clang.tar.gz")
-    set(SFML_DIR ${DEPS_DIR}/SFML-2.5.1-macos-clang)
+	set(CMAKE_OSX_ARCHITECTURES x86_64)
+	set(ONLY_ACTIVE_ARCH NO)
+    set(SFML_URL "https://www.sfml-dev.org/files/SFML-2.6.1-macOS-clang-64-bit.tar.gz")
+    set(SFML_DIR ${DEPS_DIR}/SFML-2.6.1-macOS-clang-64-bit)
 	if (NOT EXISTS "${SFML_DIR}")
 		message("Downloading SFML for Mac OS X")
 		file(DOWNLOAD "${SFML_URL}" "${DEPS_DIR}/sfml.tar.gz")
@@ -12,7 +14,7 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 			COMMAND ${CMAKE_COMMAND} -E tar xzf  ${DEPS_DIR}/sfml.tar.gz
 			WORKING_DIRECTORY ${DEPS_DIR}
     	)
-		# copy freetype over to Frameworks/ so rpath resoultion works
+		# copy freetype over to Frameworks/ so rpath resolution works
 		execute_process(
 				COMMAND ${CMAKE_COMMAND} -E copy_directory ${SFML_DIR}/extlibs/freetype.framework ${SFML_DIR}/Frameworks/freetype.framework
 				WORKING_DIRECTORY ${SFML_DIR}

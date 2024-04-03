@@ -1370,7 +1370,7 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
             int frames = timelineMap->_size;
             if (strcmp(timelineName, "reset") == 0) {
                 PhysicsConstraintResetTimeline *timeline = new (__FILE__, __LINE__) PhysicsConstraintResetTimeline(frames, index);
-                for (int frame = 0; keyMap != nullptr; keyMap = keyMap->_next, frame++) {
+                for (frame = 0; keyMap != nullptr; keyMap = keyMap->_next, frame++) {
                     timeline->setFrame(frame, Json::getFloat(keyMap, "time", 0));
                 }
                 timelines.add(timeline);

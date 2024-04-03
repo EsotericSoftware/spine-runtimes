@@ -30,14 +30,14 @@ See the [Spine Runtimes documentation](http://esotericsoftware.com/spine-documen
 The Spine SFML example works on Windows, Linux and Mac OS X.
 
 ### Windows
-1. Install [Visual Studio 2015 Community](https://www.visualstudio.com/en-us/downloads/download-visual-studio-vs.aspx). Make sure you install support for C++ as well as th Windows SDK for XP/7/8.
+1. Install [Visual Studio 2022 Community](https://www.visualstudio.com/en-us/downloads/download-visual-studio-vs.aspx). Make sure you install support for C++ as well as th Windows SDK for XP/7/8.
 2. Install CMake via the [Windows installer package](https://cmake.org/download/).
 3. Download the Spine Runtimes repository using git (`git clone https://github.com/esotericsoftware/spine-runtimes`) or download it as a zip via the download button above.
 4. Run CMake GUI from the start menu
 5. Click `Browse Source` and select the directory `spine-runtimes`
 6. Click `Browse Build` and select the `spine-runtimes/spine-sfml/build` directory. You can create the `build` folder directly in the file dialog via `New Folder`.
-7. Click `Configure`. Then click `Generate`. This will create a Visual Studio 2015 solution file called `spine.sln` in `spine-runtimes/spine-sfml/build` and also download the SFML dependencies.
-8. Open the `spine.sln` file in Visual Studio 2015
+7. Click `Configure`. Check `SPINE_SFML`. Then click `Generate`. This will create a Visual Studio 2015 solution file called `spine.sln` in `spine-runtimes/spine-sfml/build` and also download the SFML dependencies.
+8. Open the `spine.sln` file in Visual Studio 2022
 9. Right click the `spine-sfml-example` project in the solution explorer and select `Set as Startup Project` from the context menu
 10. Right click the `spine-sfml-example` project in the solution explorer and select `Properties` from the context menu
 11. Select `Debugging` in the left-hand list, then set `Working Directory` to `$(OutputPath)`
