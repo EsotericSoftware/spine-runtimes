@@ -41,9 +41,6 @@ using namespace spine;
 
 RTTI_IMPL(InheritTimeline, Timeline)
 
-#define ENTRIES 2
-#define INHERIT 1
-
 InheritTimeline::InheritTimeline(size_t frameCount, int boneIndex) : Timeline(frameCount, ENTRIES),
                                                                      _boneIndex(boneIndex) {
 	PropertyId ids[] = {((PropertyId) Property_Inherit << 32) | boneIndex };

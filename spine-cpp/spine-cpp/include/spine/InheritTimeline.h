@@ -62,6 +62,9 @@ namespace spine {
 
 	private:
 		int _boneIndex;
+
+        static const int ENTRIES = 2;
+        static const int INHERIT = 1;
 	};
 }
 
