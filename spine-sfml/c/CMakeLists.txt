@@ -32,10 +32,10 @@ elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 		)
 	endif()
 else()
-	set(SFML_URL "https://www.sfml-dev.org/files/SFML-2.5.1-windows-vc14-32-bit.zip")
-	set(SFML_DIR ${DEPS_DIR}/SFML-2.5.1)
+	set(SFML_URL "https://www.sfml-dev.org/files/SFML-2.6.1-windows-vc17-64-bit.zip")
+	set(SFML_DIR ${DEPS_DIR}/SFML-2.6.1)
 	if (NOT EXISTS ${SFML_DIR})
-		message("Downloading SFML for Windows 32-bit")
+		message("Downloading SFML for Windows 64-bit")
 		file(DOWNLOAD "${SFML_URL}" "${DEPS_DIR}/sfml.zip")
 		execute_process(
 				COMMAND ${CMAKE_COMMAND} -E tar x  ${DEPS_DIR}/sfml.zip
