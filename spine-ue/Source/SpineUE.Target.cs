@@ -3,12 +3,12 @@
 using UnrealBuildTool;
 using System.Collections.Generic;
 
-public class SpineUE4Target : TargetRules
+public class SpineUETarget : TargetRules
 {
-	public SpineUE4Target(TargetInfo Target) : base(Target)
+	public SpineUETarget(TargetInfo Target) : base(Target)
 	{
 		DefaultBuildSettings = BuildSettingsVersion.V2;
 		Type = TargetType.Game;
-		ExtraModuleNames.AddRange(new string[] { "SpineUE4" });
+		ExtraModuleNames.AddRange(new string[] { "SpineUE" });
 	}
 }

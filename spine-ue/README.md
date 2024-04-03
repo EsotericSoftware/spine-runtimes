@@ -40,4 +40,4 @@ See the [Spine Runtimes documentation](http://esotericsoftware.com/spine-documen
 The Spine UE4 example works on all platforms supported by Unreal Engine. The samples require Unreal Engine 4.27-5.3.
 
 1. Copy the `spine-cpp` folder from this repositories root directory to your `Plugins/SpinePlugin/Sources/SpinePlugin/Public/` directory. You can run the `setup.bat` or `setup.sh` scripts to accomplish this.
-2. Open the SpineUE4.uproject file with Unreal Editor
+2. Open the SpineUE.uproject file with Unreal Editor
