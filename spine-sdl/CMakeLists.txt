@@ -10,7 +10,7 @@ else()
 endif()
 
 include(FetchContent)
-FetchContent_Declare(SDL GIT_REPOSITORY https://github.com/libsdl-org/SDL GIT_TAG release-2.0.22)
+FetchContent_Declare(SDL GIT_REPOSITORY https://github.com/libsdl-org/SDL GIT_TAG release-2.30.2)
 FetchContent_MakeAvailable(SDL)
 
 include_directories(src)
