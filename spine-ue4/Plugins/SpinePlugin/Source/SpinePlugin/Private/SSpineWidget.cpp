@@ -63,7 +63,7 @@ void SSpineWidget::SetData(USpineWidget *Widget) {
 	if (widget && widget->skeleton && widget->Atlas) {
 		Skeleton *skeleton = widget->skeleton;
 		skeleton->setToSetupPose();
-		skeleton->updateWorldTransform();
+		skeleton->updateWorldTransform(Physics_None);
 		Vector<float> scratchBuffer;
 		float x, y, w, h;
 		skeleton->getBounds(x, y, w, h, scratchBuffer);

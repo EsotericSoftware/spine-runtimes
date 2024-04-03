@@ -1,103 +1,95 @@
 spineboy-pro.png
-	size: 2048, 1024
+	size: 1024, 256
 	filter: Linear, Linear
 	pma: true
+	scale: 0.5
 crosshair
-	bounds: 1053, 13, 89, 89
-dust01
-	bounds: 1239, 11, 96, 73
-	rotate: 90
-dust02
-	bounds: 1409, 44, 86, 88
-dust03
-	bounds: 1831, 416, 62, 52
+	bounds: 352, 7, 45, 45
 eye-indifferent
-	bounds: 1144, 18, 93, 89
+	bounds: 862, 105, 47, 45
 eye-surprised
-	bounds: 1314, 43, 93, 89
+	bounds: 505, 79, 47, 45
 front-bracer
-	bounds: 1749, 410, 58, 80
-	rotate: 90
+	bounds: 826, 66, 29, 40
 front-fist-closed
-	bounds: 1592, 396, 75, 82
+	bounds: 786, 65, 38, 41
 front-fist-open
-	bounds: 1504, 391, 86, 87
-front-foot
-	bounds: 580, 33, 126, 69
-front-shin
-	bounds: 496, 51, 82, 184
-front-thigh
-	bounds: 1504, 277, 48, 112
-front-upper-arm
-	bounds: 1554, 292, 54, 97
-goggles
-	bounds: 1136, 109, 261, 166
+	bounds: 710, 51, 43, 44
 	rotate: 90
+front-foot
+	bounds: 210, 6, 63, 35
+front-shin
+	bounds: 665, 128, 41, 92
+	rotate: 90
+front-thigh
+	bounds: 2, 2, 23, 56
+	rotate: 90
+front-upper-arm
+	bounds: 250, 205, 23, 49
+goggles
+	bounds: 665, 171, 131, 83
 gun
-	bounds: 1463, 480, 210, 203
+	bounds: 798, 152, 105, 102
 head
-	bounds: 1753, 724, 271, 298
+	bounds: 2, 27, 136, 149
 hoverboard-board
-	bounds: 2, 83, 492, 152
+	bounds: 2, 178, 246, 76
 hoverboard-thruster
-	bounds: 1207, 372, 60, 64
+	bounds: 722, 96, 30, 32
 	rotate: 90
 hoverglow-small
-	bounds: 2, 6, 274, 75
+	bounds: 275, 81, 137, 38
 mouth-grind
-	bounds: 1610, 301, 93, 59
-	rotate: 90
+	bounds: 614, 97, 47, 30
 mouth-oooo
-	bounds: 1486, 139, 93, 59
-	rotate: 90
+	bounds: 612, 65, 47, 30
 mouth-smile
-	bounds: 1497, 44, 93, 59
-	rotate: 90
+	bounds: 661, 64, 47, 30
 muzzle-glow
-	bounds: 1304, 234, 198, 198
+	bounds: 382, 54, 25, 25
 muzzle-ring
-	bounds: 278, 32, 49, 209
+	bounds: 275, 54, 25, 105
 	rotate: 90
 muzzle01
-	bounds: 667, 673, 542, 349
+	bounds: 911, 95, 67, 40
+	rotate: 90
 muzzle02
-	bounds: 1211, 685, 540, 337
+	bounds: 792, 108, 68, 42
 muzzle03
-	bounds: 2, 597, 663, 425
+	bounds: 956, 171, 83, 53
+	rotate: 90
 muzzle04
-	bounds: 2, 237, 596, 358
+	bounds: 275, 7, 75, 45
 muzzle05
-	bounds: 667, 372, 538, 299
+	bounds: 140, 3, 68, 38
 neck
-	bounds: 1504, 234, 36, 41
+	bounds: 250, 182, 18, 21
 portal-bg
-	bounds: 600, 104, 266, 266
+	bounds: 140, 43, 133, 133
 portal-flare1
-	bounds: 940, 42, 111, 60
+	bounds: 554, 65, 56, 30
 portal-flare2
-	bounds: 600, 375, 114, 61
+	bounds: 759, 112, 57, 31
 	rotate: 90
 portal-flare3
-	bounds: 708, 43, 115, 59
+	bounds: 554, 97, 58, 30
 portal-shade
-	bounds: 868, 104, 266, 266
+	bounds: 275, 121, 133, 133
 portal-streaks1
-	bounds: 1753, 470, 252, 256
-	rotate: 90
-portsl-streaks2
-	bounds: 1211, 434, 250, 249
+	bounds: 410, 126, 126, 128
+portal-streaks2
+	bounds: 538, 129, 125, 125
 rear-bracer
-	bounds: 1675, 447, 56, 72
-	rotate: 90
+	bounds: 857, 67, 28, 36
 rear-foot
-	bounds: 825, 42, 113, 60
+	bounds: 663, 96, 57, 30
 rear-shin
-	bounds: 1675, 505, 75, 178
+	bounds: 414, 86, 38, 89
+	rotate: 90
 rear-thigh
-	bounds: 600, 491, 65, 104
+	bounds: 756, 63, 28, 47
 rear-upper-arm
-	bounds: 489, 2, 47, 87
+	bounds: 60, 5, 20, 44
 	rotate: 90
 torso
-	bounds: 1304, 134, 98, 180
-	rotate: 90
+	bounds: 905, 164, 49, 90

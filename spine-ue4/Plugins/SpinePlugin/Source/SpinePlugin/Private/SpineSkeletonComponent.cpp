@@ -174,7 +174,7 @@ void USpineSkeletonComponent::SetBoneWorldPosition(const FString &BoneName, cons
 void USpineSkeletonComponent::UpdateWorldTransform() {
 	CheckState();
 	if (skeleton) {
-		skeleton->updateWorldTransform();
+		skeleton->updateWorldTransform(Physics_Update);
 	}
 }
 
@@ -301,7 +301,7 @@ void USpineSkeletonComponent::InternalTick(float DeltaTime, bool CallDelegates, 
 
 	if (skeleton) {
 		if (CallDelegates) BeforeUpdateWorldTransform.Broadcast(this);
-		skeleton->updateWorldTransform();
+		skeleton->updateWorldTransform(Physics_Update);
 		if (CallDelegates) AfterUpdateWorldTransform.Broadcast(this);
 	}
 }

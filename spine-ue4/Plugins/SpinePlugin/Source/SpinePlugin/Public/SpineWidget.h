@@ -103,7 +103,7 @@ public:
 	bool SetAttachment(const FString slotName, const FString attachmentName);
 
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
-	void UpdateWorldTransform(spine::Physics physics);
+	void UpdateWorldTransform();
 
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
 	void SetToSetupPose();

@@ -102,17 +102,24 @@ public:
 	}
 
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|TrackEntry")
-	float GetAttachmentThreshold() { return entry ? entry->getAttachmentThreshold() : 0; }
+	float GetAlphaAttachmentThreshold() { return entry ? entry->getAlphaAttachmentThreshold() : 0; }
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|TrackEntry")
-	void SetAttachmentThreshold(float attachmentThreshold) {
-		if (entry) entry->setAttachmentThreshold(attachmentThreshold);
+	void SetAlphaAttachmentThreshold(float attachmentThreshold) {
+		if (entry) entry->setAlphaAttachmentThreshold(attachmentThreshold);
 	}
 
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|TrackEntry")
-	float GetDrawOrderThreshold() { return entry ? entry->getDrawOrderThreshold() : 0; }
+	float GetMixDrawOrderThreshold() { return entry ? entry->getMixDrawOrderThreshold() : 0; }
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|TrackEntry")
-	void SetDrawOrderThreshold(float drawOrderThreshold) {
-		if (entry) entry->setDrawOrderThreshold(drawOrderThreshold);
+	void SetMixDrawOrderThreshold(float drawOrderThreshold) {
+		if (entry) entry->setMixDrawOrderThreshold(drawOrderThreshold);
+	}
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|TrackEntry")
+	float GetMixAttachmentThreshold() { return entry ? entry->getMixAttachmentThreshold() : 0; }
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|TrackEntry")
+	void SetMixAttachmentThreshold(float drawOrderThreshold) {
+		if (entry) entry->setMixAttachmentThreshold(drawOrderThreshold);
 	}
 
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|TrackEntry")

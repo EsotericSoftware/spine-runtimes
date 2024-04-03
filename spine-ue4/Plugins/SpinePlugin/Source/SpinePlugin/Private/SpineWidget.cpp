@@ -270,10 +270,10 @@ bool USpineWidget::SetAttachment(const FString slotName, const FString attachmen
 	return false;
 }
 
-void USpineWidget::UpdateWorldTransform(spine::Physics physics) {
+void USpineWidget::UpdateWorldTransform() {
 	CheckState();
 	if (skeleton) {
-		skeleton->updateWorldTransform(physics);
+		skeleton->updateWorldTransform(Physics_Update);
 	}
 }
 
