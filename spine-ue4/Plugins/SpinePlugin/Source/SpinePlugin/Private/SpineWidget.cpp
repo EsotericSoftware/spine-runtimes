@@ -134,7 +134,7 @@ void USpineWidget::Tick(float DeltaTime, bool CallDelegates) {
 		state->update(DeltaTime);
 		state->apply(*skeleton);
 		if (CallDelegates) BeforeUpdateWorldTransform.Broadcast(this);
-		skeleton->updateWorldTransform();
+		skeleton->updateWorldTransform(Physics_Update);
 		if (CallDelegates) AfterUpdateWorldTransform.Broadcast(this);
 	}
 }
@@ -169,7 +169,7 @@ void USpineWidget::CheckState() {
 				state->setListener(callbackWidget);
 				trackEntries.Empty();
 				skeleton->setToSetupPose();
-				skeleton->updateWorldTransform();
+				skeleton->updateWorldTransform(Physics_Update);
 				slateWidget->SetData(this);
 			}
 		}
@@ -270,10 +270,10 @@ bool USpineWidget::SetAttachment(const FString slotName, const FString attachmen
 	return false;
 }
 
-void USpineWidget::UpdateWorldTransform() {
+void USpineWidget::UpdateWorldTransform(spine::Physics physics) {
 	CheckState();
 	if (skeleton) {
-		skeleton->updateWorldTransform();
+		skeleton->updateWorldTransform(physics);
 	}
 }
 
@@ -414,7 +414,7 @@ void USpineWidget::SetPlaybackTime(float InPlaybackTime, bool bCallDelegates) {
 		if (bCallDelegates) {
 			BeforeUpdateWorldTransform.Broadcast(this);
 		}
-		skeleton->updateWorldTransform();
+		skeleton->updateWorldTransform(Physics_Update);
 		if (bCallDelegates) {
 			AfterUpdateWorldTransform.Broadcast(this);
 		}

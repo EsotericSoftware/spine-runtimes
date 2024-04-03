@@ -110,6 +110,7 @@ void USpineSkeletonAnimationComponent::InternalTick(float DeltaTime, bool CallDe
 		state->update(DeltaTime);
 		state->apply(*skeleton);
 		if (CallDelegates) BeforeUpdateWorldTransform.Broadcast(this);
+		skeleton->update(DeltaTime);
 		skeleton->updateWorldTransform();
 		if (CallDelegates) AfterUpdateWorldTransform.Broadcast(this);
 	}
@@ -191,7 +192,7 @@ void USpineSkeletonAnimationComponent::SetPlaybackTime(float InPlaybackTime, boo
 		if (bCallDelegates) {
 			BeforeUpdateWorldTransform.Broadcast(this);
 		}
-		skeleton->updateWorldTransform();
+		skeleton->updateWorldTransform(Physics_Update);
 		if (bCallDelegates) {
 			AfterUpdateWorldTransform.Broadcast(this);
 		}
