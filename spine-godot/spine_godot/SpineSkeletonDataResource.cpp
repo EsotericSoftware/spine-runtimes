@@ -380,12 +380,23 @@ Ref<SpineTransformConstraintData> SpineSkeletonDataResource::find_transform_cons
 	constraint_ref->set_spine_object(this, constraint);
 	return constraint_ref;
 }
+
 Ref<SpinePathConstraintData> SpineSkeletonDataResource::find_path_constraint(const String &constraint_name) const {
 	SPINE_CHECK(skeleton_data, nullptr)
 	if (EMPTY(constraint_name)) return nullptr;
 	auto constraint = skeleton_data->findPathConstraint(SPINE_STRING_TMP(constraint_name));
 	if (constraint == nullptr) return nullptr;
 	Ref<SpinePathConstraintData> constraint_ref(memnew(SpinePathConstraintData));
+	constraint_ref->set_spine_object(this, constraint);
+	return constraint_ref;
+}
+
+Ref<SpinePhysicsConstraintData> SpineSkeletonDataResource::find_physics_constraint(const String &constraint_name) const {
+	SPINE_CHECK(skeleton_data, nullptr)
+	if (EMPTY(constraint_name)) return nullptr;
+	auto constraint = skeleton_data->findPhysicsConstraint(SPINE_STRING_TMP(constraint_name));
+	if (constraint == nullptr) return nullptr;
+	Ref<SpinePhysicsConstraintData> constraint_ref(memnew(SpinePhysicsConstraintData));
 	constraint_ref->set_spine_object(this, constraint);
 	return constraint_ref;
 }
@@ -507,6 +518,19 @@ Array SpineSkeletonDataResource::get_path_constraints() const {
 	result.resize((int) constraints.size());
 	for (int i = 0; i < constraints.size(); ++i) {
 		Ref<SpinePathConstraintData> constraint_ref(memnew(SpinePathConstraintData));
+		constraint_ref->set_spine_object(this, constraints[i]);
+		result[i] = constraint_ref;
+	}
+	return result;
+}
+
+Array SpineSkeletonDataResource::get_physics_constraints() const {
+	Array result;
+	SPINE_CHECK(skeleton_data, result)
+	auto constraints = skeleton_data->getPhysicsConstraints();
+	result.resize((int) constraints.size());
+	for (int i = 0; i < constraints.size(); ++i) {
+		Ref<SpinePhysicsConstraintData> constraint_ref(memnew(SpinePhysicsConstraintData));
 		constraint_ref->set_spine_object(this, constraints[i]);
 		result[i] = constraint_ref;
 	}

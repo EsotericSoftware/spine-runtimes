@@ -28,6 +28,7 @@
  *****************************************************************************/
 
 #include "SpineBone.h"
+#include "SpineConstant.h"
 #include "SpineSprite.h"
 #include "SpineSkeleton.h"
 #include "SpineCommon.h"
@@ -36,7 +37,9 @@ void SpineBone::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("update_world_transform"), &SpineBone::update_world_transform);
 	ClassDB::bind_method(D_METHOD("set_to_setup_pose"), &SpineBone::set_to_setup_pose);
 	ClassDB::bind_method(D_METHOD("world_to_local", "world_position"), &SpineBone::world_to_local);
+	ClassDB::bind_method(D_METHOD("world_to_parent", "world_position"), &SpineBone::world_to_parent);
 	ClassDB::bind_method(D_METHOD("local_to_world", "local_position"), &SpineBone::local_to_world);
+	ClassDB::bind_method(D_METHOD("parent_to_world", "local_position"), &SpineBone::parent_to_world);
 	ClassDB::bind_method(D_METHOD("world_to_local_rotation", "world_rotation"), &SpineBone::world_to_local_rotation);
 	ClassDB::bind_method(D_METHOD("local_to_world_rotation", "local_rotation"), &SpineBone::local_to_world_rotation);
 	ClassDB::bind_method(D_METHOD("rotate_world"), &SpineBone::rotate_world);
@@ -91,6 +94,8 @@ void SpineBone::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_world_scale_y"), &SpineBone::get_world_scale_y);
 	ClassDB::bind_method(D_METHOD("is_active"), &SpineBone::is_active);
 	ClassDB::bind_method(D_METHOD("set_active", "v"), &SpineBone::set_active);
+	ClassDB::bind_method(D_METHOD("set_inherit", "v"), &SpineBone::set_inherit);
+	ClassDB::bind_method(D_METHOD("get_inherit"), &SpineBone::get_inherit);
 	ClassDB::bind_method(D_METHOD("get_transform"), &SpineBone::get_transform);
 	ClassDB::bind_method(D_METHOD("set_transform", "local_transform"), &SpineBone::set_transform);
 	ClassDB::bind_method(D_METHOD("get_global_transform"), &SpineBone::get_global_transform);
@@ -114,10 +119,24 @@ Vector2 SpineBone::world_to_local(Vector2 world_position) {
 	return Vector2(x, y);
 }
 
+Vector2 SpineBone::world_to_parent(Vector2 world_position) {
+	SPINE_CHECK(get_spine_object(), Vector2())
+	float x, y;
+	get_spine_object()->worldToParent(world_position.x, world_position.y, x, y);
+	return Vector2(x, y);
+}
+
 Vector2 SpineBone::local_to_world(Vector2 local_position) {
 	SPINE_CHECK(get_spine_object(), Vector2())
 	float x, y;
 	get_spine_object()->localToWorld(local_position.x, local_position.y, x, y);
+	return Vector2(x, y);
+}
+
+Vector2 SpineBone::parent_to_world(Vector2 local_position) {
+	SPINE_CHECK(get_spine_object(), Vector2())
+	float x, y;
+	get_spine_object()->parentToWorld(local_position.x, local_position.y, x, y);
 	return Vector2(x, y);
 }
 
@@ -405,6 +424,16 @@ bool SpineBone::is_active() {
 void SpineBone::set_active(bool v) {
 	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setActive(v);
+}
+
+SpineConstant::Inherit SpineBone::get_inherit() {
+	SPINE_CHECK(get_spine_object(), SpineConstant::Inherit_Normal);
+	return (SpineConstant::Inherit) get_spine_object()->getInherit();
+}
+
+void SpineBone::set_inherit(SpineConstant::Inherit inherit) {
+	SPINE_CHECK(get_spine_object(), );
+	get_spine_object()->setInherit((spine::Inherit) inherit);
 }
 
 Transform2D SpineBone::get_transform() {

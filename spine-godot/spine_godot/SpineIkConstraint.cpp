@@ -55,7 +55,7 @@ void SpineIkConstraint::_bind_methods() {
 
 void SpineIkConstraint::update() {
 	SPINE_CHECK(get_spine_object(), )
-	get_spine_object()->update();
+	get_spine_object()->update(spine::Physics_Update);
 }
 
 int SpineIkConstraint::get_order() {

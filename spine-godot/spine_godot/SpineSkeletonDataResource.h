@@ -38,6 +38,7 @@
 #include "SpineIkConstraintData.h"
 #include "SpineTransformConstraintData.h"
 #include "SpinePathConstraintData.h"
+#include "SpinePhysicsConstraintData.h"
 #include "SpineEventData.h"
 
 class SpineAnimationMix : public Resource {
@@ -137,6 +138,8 @@ public:
 
 	Ref<SpinePathConstraintData> find_path_constraint(const String &constraint_name) const;
 
+	Ref<SpinePhysicsConstraintData> find_physics_constraint(const String &constraint_name) const;
+
 	String get_skeleton_name() const;
 
 	Array get_bones() const;
@@ -158,6 +161,8 @@ public:
 	Array get_transform_constraints() const;
 
 	Array get_path_constraints() const;
+
+	Array get_physics_constraints() const;
 
 	float get_x() const;
 

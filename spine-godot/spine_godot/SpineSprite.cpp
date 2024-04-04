@@ -441,7 +441,7 @@ void SpineSprite::on_skeleton_data_changed() {
 
 		animation_state->update(0);
 		animation_state->apply(skeleton);
-		skeleton->update_world_transform();
+		skeleton->update_world_transform(SpineConstant::Physics_Update);
 		generate_meshes_for_slots(skeleton);
 
 		if (update_mode == SpineConstant::UpdateMode_Process) {
@@ -675,10 +675,11 @@ void SpineSprite::update_skeleton(float delta) {
 	emit_signal(SNAME("before_animation_state_apply"), this);
 	animation_state->apply(skeleton);
 	emit_signal(SNAME("before_world_transforms_change"), this);
-	skeleton->update_world_transform();
+	skeleton->update(delta);
+	skeleton->update_world_transform(SpineConstant::Physics_Update);
 	modified_bones = false;
 	emit_signal(SNAME("world_transforms_changed"), this);
-	if (modified_bones) skeleton->update_world_transform();
+	if (modified_bones) skeleton->update_world_transform(SpineConstant::Physics_Update);
 	sort_slot_nodes();
 	update_meshes(skeleton);
 #if VERSION_MAJOR > 3

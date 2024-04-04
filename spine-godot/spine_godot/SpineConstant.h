@@ -73,12 +73,12 @@ public:
 		Property_Sequence = 1 << 19
 	};
 
-	enum TransformMode {
-		TransformMode_Normal = 0,
-		TransformMode_OnlyTranslation,
-		TransformMode_NoRotationOrReflection,
-		TransformMode_NoScale,
-		TransformMode_NoScaleOrReflection
+	enum Inherit {
+		Inherit_Normal = 0,
+		Inherit_OnlyTranslation,
+		Inherit_NoRotationOrReflection,
+		Inherit_NoScale,
+		Inherit_NoScaleOrReflection
 	};
 
 	enum PositionMode {
@@ -115,15 +115,23 @@ public:
 		BoneMode_Follow,
 		BoneMode_Drive
 	};
+
+	enum Physics {
+		Physics_None,
+		Physics_Reset,
+		Physics_Update,
+		Physics_Pose
+	};
 };
 
 VARIANT_ENUM_CAST(SpineConstant::MixBlend)
 VARIANT_ENUM_CAST(SpineConstant::MixDirection)
 VARIANT_ENUM_CAST(SpineConstant::PropertyId)
-VARIANT_ENUM_CAST(SpineConstant::TransformMode)
+VARIANT_ENUM_CAST(SpineConstant::Inherit)
 VARIANT_ENUM_CAST(SpineConstant::PositionMode)
 VARIANT_ENUM_CAST(SpineConstant::SpacingMode)
 VARIANT_ENUM_CAST(SpineConstant::RotateMode)
 VARIANT_ENUM_CAST(SpineConstant::BlendMode)
 VARIANT_ENUM_CAST(SpineConstant::UpdateMode)
 VARIANT_ENUM_CAST(SpineConstant::BoneMode)
+VARIANT_ENUM_CAST(SpineConstant::Physics)

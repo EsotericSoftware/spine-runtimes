@@ -181,7 +181,7 @@ void SpineBoneNode::init_transform(SpineSprite *sprite) {
 	if (!sprite) return;
 	if (bone_mode == SpineConstant::BoneMode_Drive) return;
 	sprite->get_skeleton()->set_to_setup_pose();
-	sprite->get_skeleton()->update_world_transform();
+	sprite->get_skeleton()->update_world_transform(SpineConstant::Physics_Update);
 	Transform2D global_transform = sprite->get_global_bone_transform(bone_name);
 	set_global_transform(global_transform);
 	update_transform(sprite);
@@ -259,7 +259,7 @@ void SpineBoneNode::set_enabled(bool _enabled) {
 		auto sprite = find_parent_sprite();
 		if (!sprite) return;
 		sprite->get_skeleton()->set_to_setup_pose();
-		sprite->get_skeleton()->update_world_transform();
+		sprite->get_skeleton()->update_world_transform(SpineConstant::Physics_Update);
 	}
 }
 

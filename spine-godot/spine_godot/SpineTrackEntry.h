@@ -103,13 +103,17 @@ public:
 
 	void set_event_threshold(float v);
 
-	float get_attachment_threshold();
+	float get_mix_attachment_threshold();
 
-	void set_attachment_threshold(float v);
+	void set_mix_attachment_threshold(float v);
 
-	float get_draw_order_threshold();
+	float get_mix_draw_order_threshold();
 
-	void set_draw_order_threshold(float v);
+	void set_mix_draw_order_threshold(float v);
+
+	float get_alpha_attachment_threshold();
+
+	void set_alpha_attachment_threshold(float v);
 
 	Ref<SpineTrackEntry> get_next();
 
@@ -123,6 +127,8 @@ public:
 
 	void set_mix_duration(float v);
 
+	void set_mix_duration_and_delay(float v, float delay);
+
 	SpineConstant::MixBlend get_mix_blend();
 
 	void set_mix_blend(SpineConstant::MixBlend v);
@@ -134,4 +140,6 @@ public:
 	void reset_rotation_directions();
 
 	float get_track_complete();
+
+	bool was_applied();
 };

@@ -50,12 +50,15 @@ void SpineBoneData::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_shear_x", "v"), &SpineBoneData::set_shear_x);
 	ClassDB::bind_method(D_METHOD("get_shear_y"), &SpineBoneData::get_shear_y);
 	ClassDB::bind_method(D_METHOD("set_shear_y", "v"), &SpineBoneData::set_shear_y);
-	ClassDB::bind_method(D_METHOD("get_transform_mode"), &SpineBoneData::get_transform_mode);
-	ClassDB::bind_method(D_METHOD("set_transform_mode", "v"), &SpineBoneData::set_transform_mode);
+	ClassDB::bind_method(D_METHOD("get_inherit"), &SpineBoneData::get_inherit);
+	ClassDB::bind_method(D_METHOD("set_inherit", "v"), &SpineBoneData::set_inherit);
 	ClassDB::bind_method(D_METHOD("is_skin_required"), &SpineBoneData::is_skin_required);
 	ClassDB::bind_method(D_METHOD("set_skin_required", "v"), &SpineBoneData::set_skin_required);
 	ClassDB::bind_method(D_METHOD("get_color"), &SpineBoneData::get_color);
 	ClassDB::bind_method(D_METHOD("set_color", "v"), &SpineBoneData::set_color);
+	ClassDB::bind_method(D_METHOD("get_icon"), &SpineBoneData::get_icon);
+	ClassDB::bind_method(D_METHOD("set_visible", "v"), &SpineBoneData::set_visible);
+	ClassDB::bind_method(D_METHOD("is_visible"), &SpineBoneData::is_visible);
 }
 
 int SpineBoneData::get_index() {
@@ -157,14 +160,14 @@ void SpineBoneData::set_shear_y(float v) {
 	get_spine_object()->setShearY(v);
 }
 
-SpineConstant::TransformMode SpineBoneData::get_transform_mode() {
-	SPINE_CHECK(get_spine_object(), SpineConstant::TransformMode::TransformMode_Normal)
-	return (SpineConstant::TransformMode) get_spine_object()->getTransformMode();
+SpineConstant::Inherit SpineBoneData::get_inherit() {
+	SPINE_CHECK(get_spine_object(), SpineConstant::Inherit::Inherit_Normal)
+	return (SpineConstant::Inherit) get_spine_object()->getInherit();
 }
 
-void SpineBoneData::set_transform_mode(SpineConstant::TransformMode v) {
+void SpineBoneData::set_inherit(SpineConstant::Inherit v) {
 	SPINE_CHECK(get_spine_object(), )
-	get_spine_object()->setTransformMode((spine::TransformMode) v);
+	get_spine_object()->setInherit((spine::Inherit) v);
 }
 
 bool SpineBoneData::is_skin_required() {
@@ -186,4 +189,19 @@ Color SpineBoneData::get_color() {
 void SpineBoneData::set_color(Color color) {
 	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->getColor().set(color.r, color.g, color.b, color.a);
+}
+
+String SpineBoneData::get_icon() {
+	SPINE_CHECK(get_spine_object(), "")
+	return get_spine_object()->getIcon().buffer();
+}
+
+bool SpineBoneData::is_visible() {
+	SPINE_CHECK(get_spine_object(), true)
+	return get_spine_object()->isVisible();
+}
+
+void SpineBoneData::set_visible(bool v) {
+	SPINE_CHECK(get_spine_object(), )
+	get_spine_object()->setVisible(v);
 }

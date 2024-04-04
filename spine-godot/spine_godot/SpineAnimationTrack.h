@@ -50,8 +50,8 @@ protected:
 	bool shortest_rotation;
 	float time_scale;
 	float alpha;
-	float attachment_threshold;
-	float draw_order_threshold;
+	float mix_attachment_threshold;
+	float mix_draw_order_threshold;
 	SpineConstant::MixBlend mix_blend;
 	bool blend_tree_mode;
 	bool debug;
@@ -113,13 +113,13 @@ public:
 
 	float get_alpha();
 
-	void set_attachment_threshold(float _attachment_threshold);
+	void set_mix_attachment_threshold(float _mix_attachment_threshold);
 
-	float get_attachment_threshold();
+	float get_mix_attachment_threshold();
 
-	void set_draw_order_threshold(float _draw_order_threshold);
+	void set_mix_draw_order_threshold(float _mix_draw_order_threshold);
 
-	float get_draw_order_threshold();
+	float get_mix_draw_order_threshold();
 
 	void set_mix_blend(SpineConstant::MixBlend _blend);
 

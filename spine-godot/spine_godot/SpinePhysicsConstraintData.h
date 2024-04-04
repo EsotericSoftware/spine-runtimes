@@ -29,72 +29,60 @@
 
 #pragma once
 
-#include "SpineCommon.h"
-#include "SpineConstant.h"
-#include <spine/BoneData.h>
+#include "SpineConstraintData.h"
+#include "SpineBoneData.h"
+#include <spine/PhysicsConstraintData.h>
 
-class SpineSkeletonDataResource;
+class SpinePhysicsConstraintData : public SpineConstraintData {
+	GDCLASS(SpinePhysicsConstraintData, SpineConstraintData)
 
-class SpineBoneData : public SpineSkeletonDataResourceOwnedObject<spine::BoneData> {
-	GDCLASS(SpineBoneData, SpineObjectWrapper)
+	spine::PhysicsConstraintData *get_spine_constraint_data() { return (spine::PhysicsConstraintData *) SpineConstraintData::get_spine_object(); }
 
 protected:
 	static void _bind_methods();
 
 public:
-	int get_index();
-
-	String get_bone_name();
-
-	Ref<SpineBoneData> get_parent();
-
-	float get_length();
-
-	void set_length(float v);
+	Ref<SpineBoneData> get_bone();
 
 	float get_x();
 
-	void set_x(float v);
-
 	float get_y();
 
-	void set_y(float v);
-
-	float get_rotation();
-
-	void set_rotation(float v);
+	float get_rotate();
 
 	float get_scale_x();
 
-	void set_scale_x(float v);
-
-	float get_scale_y();
-
-	void set_scale_y(float v);
-
 	float get_shear_x();
 
-	void set_shear_x(float v);
+	float get_limit();
 
-	float get_shear_y();
+	float get_step();
 
-	void set_shear_y(float v);
+	float get_inertia();
 
-	SpineConstant::Inherit get_inherit();
+	float get_strength();
 
-	void set_inherit(SpineConstant::Inherit v);
+	float get_damping();
 
-	bool is_skin_required();
+	float get_mass_inverse();
 
-	void set_skin_required(bool v);
+	float get_wind();
 
-	Color get_color();
+	float get_gravity();
 
-	void set_color(Color color);
+	float get_mix();
 
-	String get_icon();
+	bool is_inertia_global();
 
-	bool is_visible();
+	bool is_strength_global();
 
-	void set_visible(bool v);
+	bool is_damping_global();
+
+	bool is_mass_global();
+
+	bool is_wind_global();
+
+	bool is_gravity_global();
+
+	bool is_mix_global();
 };

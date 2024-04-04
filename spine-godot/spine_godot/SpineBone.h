@@ -31,6 +31,7 @@
 
 #include "SpineCommon.h"
 #include "SpineBoneData.h"
+#include "SpineConstant.h"
 #include "scene/2d/node_2d.h"
 #include <spine/Bone.h>
 
@@ -50,7 +51,11 @@ public:
 
 	Vector2 world_to_local(Vector2 world_position);
 
+	Vector2 world_to_parent(Vector2 world_position);
+
 	Vector2 local_to_world(Vector2 local_position);
+
+	Vector2 parent_to_world(Vector2 local_position);
 
 	float world_to_local_rotation(float world_rotation);
 
@@ -159,6 +164,10 @@ public:
 	bool is_active();
 
 	void set_active(bool v);
+
+	SpineConstant::Inherit get_inherit();
+
+	void set_inherit(SpineConstant::Inherit inherit);
 
 	// External feature functions
 	void apply_world_transform_2d(const Variant &o);
