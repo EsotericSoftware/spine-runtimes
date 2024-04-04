@@ -415,6 +415,12 @@ spine_path_constraint_data spine_skeleton_data_find_path_constraint(spine_skelet
 	return (spine_path_constraint_data) _data->findPathConstraint(name);
 }
 
+spine_physics_constraint_data spine_skeleton_data_find_physics_constraint(spine_skeleton_data data, const utf8 *name) {
+	if (data == nullptr) return nullptr;
+	SkeletonData *_data = (SkeletonData *) data;
+	return (spine_physics_constraint_data) _data->findPhysicsConstraint(name);
+}
+
 const utf8 *spine_skeleton_data_get_name(spine_skeleton_data data) {
 	if (data == nullptr) return nullptr;
 	SkeletonData *_data = (SkeletonData *) data;
@@ -529,6 +535,18 @@ spine_path_constraint_data *spine_skeleton_data_get_path_constraints(spine_skele
 	return (spine_path_constraint_data *) _data->getPathConstraints().buffer();
 }
 
+int32_t spine_skeleton_data_get_num_physics_constraints(spine_skeleton_data data) {
+	if (data == nullptr) return 0;
+	SkeletonData *_data = (SkeletonData *) data;
+	return (int32_t) _data->getPhysicsConstraints().size();
+}
+
+spine_physics_constraint_data *spine_skeleton_data_get_physics_constraints(spine_skeleton_data data) {
+	if (data == nullptr) return nullptr;
+	SkeletonData *_data = (SkeletonData *) data;
+	return (spine_physics_constraint_data *) _data->getPhysicsConstraints().buffer();
+}
+
 float spine_skeleton_data_get_x(spine_skeleton_data data) {
 	if (data == nullptr) return 0;
 	SkeletonData *_data = (SkeletonData *) data;
@@ -605,6 +623,12 @@ float spine_skeleton_data_get_fps(spine_skeleton_data data) {
 	if (data == nullptr) return 0;
 	SkeletonData *_data = (SkeletonData *) data;
 	return _data->getFps();
+}
+
+float spine_skeleton_data_get_reference_scale(spine_skeleton_data data) {
+	if (data == nullptr) return 0;
+	SkeletonData *_data = (SkeletonData *) data;
+	return _data->getReferenceScale();
 }
 
 void spine_skeleton_data_dispose(spine_skeleton_data data) {
@@ -1279,28 +1303,40 @@ void spine_track_entry_set_event_threshold(spine_track_entry entry, float eventT
 	_entry->setEventThreshold(eventThreshold);
 }
 
-float spine_track_entry_get_attachment_threshold(spine_track_entry entry) {
+float spine_track_entry_get_alpha_attachment_threshold(spine_track_entry entry) {
 	if (entry == nullptr) return 0;
 	TrackEntry *_entry = (TrackEntry *) entry;
-	return _entry->getAttachmentThreshold();
+	return _entry->getAlphaAttachmentThreshold();
 }
 
-void spine_track_entry_set_attachment_threshold(spine_track_entry entry, float attachmentThreshold) {
+void spine_track_entry_set_alpha_attachment_threshold(spine_track_entry entry, float attachmentThreshold) {
 	if (entry == nullptr) return;
 	TrackEntry *_entry = (TrackEntry *) entry;
-	_entry->setAttachmentThreshold(attachmentThreshold);
+	_entry->setAlphaAttachmentThreshold(attachmentThreshold);
 }
 
-float spine_track_entry_get_draw_order_threshold(spine_track_entry entry) {
+float spine_track_entry_get_mix_attachment_threshold(spine_track_entry entry) {
 	if (entry == nullptr) return 0;
 	TrackEntry *_entry = (TrackEntry *) entry;
-	return _entry->getDrawOrderThreshold();
+	return _entry->getMixAttachmentThreshold();
 }
 
-void spine_track_entry_set_draw_order_threshold(spine_track_entry entry, float drawOrderThreshold) {
+void spine_track_entry_set_mix_attachment_threshold(spine_track_entry entry, float attachmentThreshold) {
 	if (entry == nullptr) return;
 	TrackEntry *_entry = (TrackEntry *) entry;
-	_entry->setDrawOrderThreshold(drawOrderThreshold);
+	_entry->setMixAttachmentThreshold(attachmentThreshold);
+}
+
+float spine_track_entry_get_mix_draw_order_threshold(spine_track_entry entry) {
+	if (entry == nullptr) return 0;
+	TrackEntry *_entry = (TrackEntry *) entry;
+	return _entry->getMixDrawOrderThreshold();
+}
+
+void spine_track_entry_set_mix_draw_order_threshold(spine_track_entry entry, float drawOrderThreshold) {
+	if (entry == nullptr) return;
+	TrackEntry *_entry = (TrackEntry *) entry;
+	_entry->setMixDrawOrderThreshold(drawOrderThreshold);
 }
 
 spine_track_entry spine_track_entry_get_next(spine_track_entry entry) {
@@ -1383,18 +1419,18 @@ void spine_skeleton_update_cache(spine_skeleton skeleton) {
 	_skeleton->updateCache();
 }
 
-void spine_skeleton_update_world_transform(spine_skeleton skeleton) {
+void spine_skeleton_update_world_transform(spine_skeleton skeleton, spine_physics physics) {
 	if (skeleton == nullptr) return;
 	Skeleton *_skeleton = (Skeleton *) skeleton;
-	_skeleton->updateWorldTransform();
+	_skeleton->updateWorldTransform((spine::Physics)physics);
 }
 
-void spine_skeleton_update_world_transform_bone(spine_skeleton skeleton, spine_bone parent) {
+void spine_skeleton_update_world_transform_bone(spine_skeleton skeleton, spine_physics physics, spine_bone parent) {
 	if (skeleton == nullptr) return;
 	if (parent == nullptr) return;
 	Skeleton *_skeleton = (Skeleton *) skeleton;
 	Bone *_bone = (Bone *) parent;
-	_skeleton->updateWorldTransform(_bone);
+	_skeleton->updateWorldTransform((spine::Physics)physics, _bone);
 }
 
 void spine_skeleton_set_to_setup_pose(spine_skeleton skeleton) {
@@ -1474,6 +1510,12 @@ spine_path_constraint spine_skeleton_find_path_constraint(spine_skeleton skeleto
 	if (skeleton == nullptr) return nullptr;
 	Skeleton *_skeleton = (Skeleton *) skeleton;
 	return (spine_path_constraint) _skeleton->findPathConstraint(constraintName);
+}
+
+spine_physics_constraint spine_skeleton_find_physics_constraint(spine_skeleton skeleton, const utf8 *constraintName) {
+	if (skeleton == nullptr) return nullptr;
+	Skeleton *_skeleton = (Skeleton *) skeleton;
+	return (spine_physics_constraint) _skeleton->findPhysicsConstraint(constraintName);
 }
 
 _spine_bounds tmp_bounds;
@@ -1570,6 +1612,18 @@ spine_path_constraint *spine_skeleton_get_path_constraints(spine_skeleton skelet
 	return (spine_path_constraint *) _skeleton->getPathConstraints().buffer();
 }
 
+int32_t spine_skeleton_get_num_physics_constraints(spine_skeleton skeleton) {
+	if (skeleton == nullptr) return 0;
+	Skeleton *_skeleton = (Skeleton *) skeleton;
+	return (int32_t) _skeleton->getPhysicsConstraints().size();
+}
+
+spine_physics_constraint *spine_skeleton_get_physics_constraints(spine_skeleton skeleton) {
+	if (skeleton == nullptr) return nullptr;
+	Skeleton *_skeleton = (Skeleton *) skeleton;
+	return (spine_physics_constraint *) _skeleton->getPhysicsConstraints().buffer();
+}
+
 spine_skin spine_skeleton_get_skin(spine_skeleton skeleton) {
 	if (skeleton == nullptr) return nullptr;
 	Skeleton *_skeleton = (Skeleton *) skeleton;
@@ -1642,8 +1696,25 @@ void spine_skeleton_set_scale_y(spine_skeleton skeleton, float scaleY) {
 	_skeleton->setScaleY(scaleY);
 }
 
-// EventData
+float spine_skeleton_get_time(spine_skeleton skeleton) {
+	if (skeleton == nullptr) return 0;
+	Skeleton *_skeleton = (Skeleton *) skeleton;
+	return _skeleton->getTime();
+}
 
+void spine_skeleton_set_time(spine_skeleton skeleton, float time) {
+	if (skeleton == nullptr) return;
+	Skeleton *_skeleton = (Skeleton *) skeleton;
+	_skeleton->setTime(time);
+}
+
+void spine_skeleton_update(spine_skeleton skeleton, float delta) {
+	if (skeleton == nullptr) return;
+	Skeleton *_skeleton = (Skeleton *) skeleton;
+	_skeleton->update(delta);
+}
+
+// EventData
 const utf8 *spine_event_data_get_name(spine_event_data event) {
 	if (event == nullptr) return nullptr;
 	EventData *_event = (EventData *) event;
@@ -1869,6 +1940,18 @@ void spine_slot_data_set_blend_mode(spine_slot_data slot, spine_blend_mode blend
 	_slot->setBlendMode((BlendMode) blendMode);
 }
 
+int32_t spine_slot_data_is_visible(spine_slot_data slot) {
+	if (slot == nullptr) return false;
+	SlotData *_slot = (SlotData *) slot;
+	return _slot->isVisible();
+}
+
+void spine_slot_data_set_visible(spine_slot_data slot, int32_t visible) {
+	if (slot == nullptr) return;
+	SlotData *_slot = (SlotData *) slot;
+	_slot->setVisible(visible);
+}
+
 // Slot
 void spine_slot_set_to_setup_pose(spine_slot slot) {
 	if (slot == nullptr) return;
@@ -2063,16 +2146,16 @@ void spine_bone_data_set_shear_y(spine_bone_data data, float y) {
 	_data->setShearY(y);
 }
 
-spine_transform_mode spine_bone_data_get_transform_mode(spine_bone_data data) {
-	if (data == nullptr) return SPINE_TRANSFORM_MODE_NORMAL;
+spine_inherit spine_bone_data_get_inherit(spine_bone_data data) {
+	if (data == nullptr) return SPINE_INHERIT_NORMAL;
 	BoneData *_data = (BoneData *) data;
-	return (spine_transform_mode) _data->getTransformMode();
+	return (spine_inherit) _data->getInherit();
 }
 
-void spine_bone_data_set_transform_mode(spine_bone_data data, spine_transform_mode mode) {
+void spine_bone_data_set_inherit(spine_bone_data data, spine_inherit inherit) {
 	if (data == nullptr) return;
 	BoneData *_data = (BoneData *) data;
-	_data->setTransformMode((TransformMode) mode);
+	_data->setInherit((Inherit) inherit);
 }
 
 int32_t spine_bone_data_is_skin_required(spine_bone_data data) {
@@ -2099,6 +2182,18 @@ void spine_bone_data_set_color(spine_bone_data data, float r, float g, float b, 
 	_data->getColor().set(r, g, b, a);
 }
 
+int32_t spine_bone_data_is_visible(spine_bone_data data) {
+	if (data == nullptr) return false;
+	BoneData *_data = (BoneData *) data;
+	return _data->isVisible();
+}
+
+void spine_bone_data_set_visible(spine_bone_data data, int32_t isVisible) {
+	if (data == nullptr) return;
+	BoneData *_data = (BoneData *) data;
+	_data->setVisible(isVisible);
+}
+
 // Bone
 void spine_bone_set_is_y_down(int32_t yDown) {
 	Bone::setYDown(yDown);
@@ -2111,7 +2206,7 @@ int32_t spine_bone_get_is_y_down() {
 void spine_bone_update(spine_bone bone) {
 	if (bone == nullptr) return;
 	Bone *_bone = (Bone *) bone;
-	_bone->update();
+	_bone->update(spine::Physics_Update);
 }
 
 void spine_bone_update_world_transform(spine_bone bone) {
@@ -2147,11 +2242,27 @@ spine_vector spine_bone_world_to_local(spine_bone bone, float worldX, float worl
 	return (spine_vector) coords;
 }
 
+spine_vector spine_bone_world_to_parent(spine_bone bone, float worldX, float worldY) {
+	_spine_vector *coords = &tmp_vector;
+	if (bone == nullptr) return (spine_vector) coords;
+	Bone *_bone = (Bone *) bone;
+	_bone->worldToParent(worldX, worldY, coords->x, coords->y);
+	return (spine_vector) coords;
+}
+
 spine_vector spine_bone_local_to_world(spine_bone bone, float localX, float localY) {
 	_spine_vector *coords = &tmp_vector;
 	if (bone == nullptr) return (spine_vector) coords;
 	Bone *_bone = (Bone *) bone;
 	_bone->localToWorld(localX, localY, coords->x, coords->y);
+	return (spine_vector) coords;
+}
+
+spine_vector spine_bone_parent_to_world(spine_bone bone, float localX, float localY) {
+	_spine_vector *coords = &tmp_vector;
+	if (bone == nullptr) return (spine_vector) coords;
+	Bone *_bone = (Bone *) bone;
+	_bone->parentToWorld(localX, localY, coords->x, coords->y);
 	return (spine_vector) coords;
 }
 
@@ -2489,6 +2600,18 @@ void spine_bone_set_is_active(spine_bone bone, int32_t isActive) {
 	if (bone == nullptr) return;
 	Bone *_bone = (Bone *) bone;
 	_bone->setActive(isActive);
+}
+
+spine_inherit spine_bone_get_inherit(spine_bone bone) {
+	if (bone == nullptr) return SPINE_INHERIT_NORMAL;
+	Bone *_bone = (Bone *) bone;
+	return (spine_inherit)_bone->getInherit();
+}
+
+void spine_bone_set_inherit(spine_bone bone, spine_inherit inherit) {
+	if (bone == nullptr) return;
+	Bone *_bone = (Bone *) bone;
+	_bone->setInherit((spine::Inherit)inherit);
 }
 
 // Attachment
@@ -3279,7 +3402,7 @@ void spine_ik_constraint_data_set_softness(spine_ik_constraint_data data, float 
 void spine_ik_constraint_update(spine_ik_constraint constraint) {
 	if (constraint == nullptr) return;
 	IkConstraint *_constraint = (IkConstraint *) constraint;
-	_constraint->update();
+	_constraint->update(spine::Physics_Update);
 }
 
 int32_t spine_ik_constraint_get_order(spine_ik_constraint constraint) {
@@ -3587,7 +3710,7 @@ void spine_transform_constraint_data_set_is_local(spine_transform_constraint_dat
 void spine_transform_constraint_update(spine_transform_constraint constraint) {
 	if (constraint == nullptr) return;
 	TransformConstraint *_constraint = (TransformConstraint *) constraint;
-	_constraint->update();
+	_constraint->update(spine::Physics_Update);
 }
 
 int32_t spine_transform_constraint_get_order(spine_transform_constraint constraint) {
@@ -3847,7 +3970,7 @@ void spine_path_constraint_data_set_mix_y(spine_path_constraint_data data, float
 void spine_path_constraint_update(spine_path_constraint constraint) {
 	if (constraint == nullptr) return;
 	PathConstraint *_constraint = (PathConstraint *) constraint;
-	_constraint->update();
+	_constraint->update(spine::Physics_Update);
 }
 
 int32_t spine_path_constraint_get_order(spine_path_constraint constraint) {
@@ -3956,6 +4079,608 @@ void spine_path_constraint_set_is_active(spine_path_constraint constraint, int32
 	if (constraint == nullptr) return;
 	PathConstraint *_constraint = (PathConstraint *) constraint;
 	_constraint->setActive(isActive);
+}
+
+// PhysicsConstraintData
+void spine_physics_constraint_data_set_bone(spine_physics_constraint_data data, spine_bone_data bone) {
+	if (data == nullptr) return;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	_data->setBone((BoneData *) bone);
+}
+
+spine_bone_data spine_physics_constraint_data_get_bone(spine_physics_constraint_data data) {
+	if (data == nullptr) return nullptr;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	return (spine_bone_data) _data->getBone();
+}
+
+void spine_physics_constraint_data_set_x(spine_physics_constraint_data data, float x) {
+	if (data == nullptr) return;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	_data->setX(x);
+}
+
+float spine_physics_constraint_data_get_x(spine_physics_constraint_data data) {
+	if (data == nullptr) return 0.0f;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	return _data->getX();
+}
+
+void spine_physics_constraint_data_set_y(spine_physics_constraint_data data, float y) {
+	if (data == nullptr) return;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	_data->setY(y);
+}
+
+float spine_physics_constraint_data_get_y(spine_physics_constraint_data data) {
+	if (data == nullptr) return 0.0f;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	return _data->getY();
+}
+
+void spine_physics_constraint_data_set_rotate(spine_physics_constraint_data data, float rotate) {
+	if (data == nullptr) return;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	_data->setRotate(rotate);
+}
+
+float spine_physics_constraint_data_get_rotate(spine_physics_constraint_data data) {
+	if (data == nullptr) return 0.0f;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	return _data->getRotate();
+}
+
+void spine_physics_constraint_data_set_scale_x(spine_physics_constraint_data data, float scaleX) {
+	if (data == nullptr) return;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	_data->setScaleX(scaleX);
+}
+
+float spine_physics_constraint_data_get_scale_x(spine_physics_constraint_data data) {
+	if (data == nullptr) return 0.0f;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	return _data->getScaleX();
+}
+
+void spine_physics_constraint_data_set_shear_x(spine_physics_constraint_data data, float shearX) {
+	if (data == nullptr) return;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	_data->setShearX(shearX);
+}
+
+float spine_physics_constraint_data_get_shear_x(spine_physics_constraint_data data) {
+	if (data == nullptr) return 0.0f;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	return _data->getShearX();
+}
+
+void spine_physics_constraint_data_set_limit(spine_physics_constraint_data data, float limit) {
+	if (data == nullptr) return;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	_data->setLimit(limit);
+}
+
+float spine_physics_constraint_data_get_limit(spine_physics_constraint_data data) {
+	if (data == nullptr) return 0.0f;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	return _data->getLimit();
+}
+
+void spine_physics_constraint_data_set_step(spine_physics_constraint_data data, float step) {
+	if (data == nullptr) return;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	_data->setStep(step);
+}
+
+float spine_physics_constraint_data_get_step(spine_physics_constraint_data data) {
+	if (data == nullptr) return 0.0f;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	return _data->getStep();
+}
+
+void spine_physics_constraint_data_set_inertia(spine_physics_constraint_data data, float inertia) {
+	if (data == nullptr) return;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	_data->setInertia(inertia);
+}
+
+float spine_physics_constraint_data_get_inertia(spine_physics_constraint_data data) {
+	if (data == nullptr) return 0.0f;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	return _data->getInertia();
+}
+
+void spine_physics_constraint_data_set_strength(spine_physics_constraint_data data, float strength) {
+	if (data == nullptr) return;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	_data->setStrength(strength);
+}
+
+float spine_physics_constraint_data_get_strength(spine_physics_constraint_data data) {
+	if (data == nullptr) return 0.0f;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	return _data->getStrength();
+}
+
+void spine_physics_constraint_data_set_damping(spine_physics_constraint_data data, float damping) {
+	if (data == nullptr) return;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	_data->setDamping(damping);
+}
+
+float spine_physics_constraint_data_get_damping(spine_physics_constraint_data data) {
+	if (data == nullptr) return 0.0f;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	return _data->getDamping();
+}
+
+void spine_physics_constraint_data_set_mass_inverse(spine_physics_constraint_data data, float massInverse) {
+	if (data == nullptr) return;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	_data->setMassInverse(massInverse);
+}
+
+float spine_physics_constraint_data_get_mass_inverse(spine_physics_constraint_data data) {
+	if (data == nullptr) return 0.0f;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	return _data->getMassInverse();
+}
+
+void spine_physics_constraint_data_set_wind(spine_physics_constraint_data data, float wind) {
+	if (data == nullptr) return;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	_data->setWind(wind);
+}
+
+float spine_physics_constraint_data_get_wind(spine_physics_constraint_data data) {
+	if (data == nullptr) return 0.0f;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	return _data->getWind();
+}
+
+void spine_physics_constraint_data_set_gravity(spine_physics_constraint_data data, float gravity) {
+	if (data == nullptr) return;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	_data->setGravity(gravity);
+}
+
+float spine_physics_constraint_data_get_gravity(spine_physics_constraint_data data) {
+	if (data == nullptr) return 0.0f;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	return _data->getGravity();
+}
+
+void spine_physics_constraint_data_set_mix(spine_physics_constraint_data data, float mix) {
+	if (data == nullptr) return;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	_data->setMix(mix);
+}
+
+float spine_physics_constraint_data_get_mix(spine_physics_constraint_data data) {
+	if (data == nullptr) return 0.0f;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	return _data->getMix();
+}
+
+void spine_physics_constraint_data_set_inertia_global(spine_physics_constraint_data data, int32_t inertiaGlobal) {
+	if (data == nullptr) return;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	_data->setInertiaGlobal(inertiaGlobal);
+}
+
+int32_t spine_physics_constraint_data_is_inertia_global(spine_physics_constraint_data data) {
+	if (data == nullptr) return false;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	return _data->isInertiaGlobal();
+}
+
+void spine_physics_constraint_data_set_strength_global(spine_physics_constraint_data data, int32_t strengthGlobal) {
+	if (data == nullptr) return;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	_data->setStrengthGlobal(strengthGlobal);
+}
+
+int32_t spine_physics_constraint_data_is_strength_global(spine_physics_constraint_data data) {
+	if (data == nullptr) return false;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	return _data->isStrengthGlobal();
+}
+
+void spine_physics_constraint_data_set_damping_global(spine_physics_constraint_data data, int32_t dampingGlobal) {
+	if (data == nullptr) return;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	_data->setDampingGlobal(dampingGlobal);
+}
+
+int32_t spine_physics_constraint_data_is_damping_global(spine_physics_constraint_data data) {
+	if (data == nullptr) return false;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	return _data->isDampingGlobal();
+}
+
+void spine_physics_constraint_data_set_mass_global(spine_physics_constraint_data data, int32_t massGlobal) {
+	if (data == nullptr) return;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	_data->setMassGlobal(massGlobal);
+}
+
+int32_t spine_physics_constraint_data_is_mass_global(spine_physics_constraint_data data) {
+	if (data == nullptr) return false;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	return _data->isMassGlobal();
+}
+
+void spine_physics_constraint_data_set_wind_global(spine_physics_constraint_data data, int32_t windGlobal) {
+	if (data == nullptr) return;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	_data->setWindGlobal(windGlobal);
+}
+
+int32_t spine_physics_constraint_data_is_wind_global(spine_physics_constraint_data data) {
+	if (data == nullptr) return false;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	return _data->isWindGlobal();
+}
+
+void spine_physics_constraint_data_set_gravity_global(spine_physics_constraint_data data, int32_t gravityGlobal) {
+	if (data == nullptr) return;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	_data->setGravityGlobal(gravityGlobal);
+}
+
+int32_t spine_physics_constraint_data_is_gravity_global(spine_physics_constraint_data data) {
+	if (data == nullptr) return false;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	return _data->isGravityGlobal();
+}
+
+void spine_physics_constraint_data_set_mix_global(spine_physics_constraint_data data, int32_t mixGlobal) {
+	if (data == nullptr) return;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	_data->setMixGlobal(mixGlobal);
+}
+
+int32_t spine_physics_constraint_data_is_mix_global(spine_physics_constraint_data data) {
+	if (data == nullptr) return false;
+	PhysicsConstraintData *_data = (PhysicsConstraintData *) data;
+	return _data->isMixGlobal();
+}
+
+// PhysicsConstraint
+void spine_physics_constraint_set_bone(spine_physics_constraint constraint, spine_bone bone) {
+	if (constraint == nullptr) return;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	_constraint->setBone((Bone*)bone);
+}
+
+spine_bone spine_physics_constraint_get_bone(spine_physics_constraint constraint) {
+	if (constraint == nullptr) return nullptr;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	return (spine_bone)_constraint->getBone();
+}
+
+void spine_physics_constraint_set_inertia(spine_physics_constraint constraint, float value) {
+	if (constraint == nullptr) return;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	_constraint->setInertia(value);
+}
+
+float spine_physics_constraint_get_inertia(spine_physics_constraint constraint) {
+	if (constraint == nullptr) return 0.0f;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	return _constraint->getInertia();
+}
+
+void spine_physics_constraint_set_strength(spine_physics_constraint constraint, float value) {
+	if (constraint == nullptr) return;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	_constraint->setStrength(value);
+}
+
+float spine_physics_constraint_get_strength(spine_physics_constraint constraint) {
+	if (constraint == nullptr) return 0.0f;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	return _constraint->getStrength();
+}
+
+void spine_physics_constraint_set_damping(spine_physics_constraint constraint, float value) {
+	if (constraint == nullptr) return;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	_constraint->setDamping(value);
+}
+
+float spine_physics_constraint_get_damping(spine_physics_constraint constraint) {
+	if (constraint == nullptr) return 0.0f;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	return _constraint->getDamping();
+}
+
+void spine_physics_constraint_set_mass_inverse(spine_physics_constraint constraint, float value) {
+	if (constraint == nullptr) return;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	_constraint->setMassInverse(value);
+}
+
+float spine_physics_constraint_get_mass_inverse(spine_physics_constraint constraint) {
+	if (constraint == nullptr) return 0.0f;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	return _constraint->getMassInverse();
+}
+
+void spine_physics_constraint_set_wind(spine_physics_constraint constraint, float value) {
+	if (constraint == nullptr) return;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	_constraint->setWind(value);
+}
+
+float spine_physics_constraint_get_wind(spine_physics_constraint constraint) {
+	if (constraint == nullptr) return 0.0f;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	return _constraint->getWind();
+}
+
+void spine_physics_constraint_set_gravity(spine_physics_constraint constraint, float value) {
+	if (constraint == nullptr) return;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	_constraint->setGravity(value);
+}
+
+float spine_physics_constraint_get_gravity(spine_physics_constraint constraint) {
+	if (constraint == nullptr) return 0.0f;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	return _constraint->getGravity();
+}
+
+void spine_physics_constraint_set_mix(spine_physics_constraint constraint, float value) {
+	if (constraint == nullptr) return;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	_constraint->setMix(value);
+}
+
+float spine_physics_constraint_get_mix(spine_physics_constraint constraint) {
+	if (constraint == nullptr) return 0.0f;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	return _constraint->getMix();
+}
+
+void spine_physics_constraint_set_reset(spine_physics_constraint constraint, int32_t value) {
+	if (constraint == nullptr) return;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	_constraint->setReset(value);
+}
+
+int32_t spine_physics_constraint_get_reset(spine_physics_constraint constraint) {
+	if (constraint == nullptr) return false;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	return _constraint->getReset();
+}
+
+void spine_physics_constraint_set_ux(spine_physics_constraint constraint, float value) {
+	if (constraint == nullptr) return;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	_constraint->setUx(value);
+}
+
+float spine_physics_constraint_get_ux(spine_physics_constraint constraint) {
+	if (constraint == nullptr) return 0.0f;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	return _constraint->getUx();
+}
+
+void spine_physics_constraint_set_uy(spine_physics_constraint constraint, float value) {
+	if (constraint == nullptr) return;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	_constraint->setUy(value);
+}
+
+float spine_physics_constraint_get_uy(spine_physics_constraint constraint) {
+	if (constraint == nullptr) return 0.0f;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	return _constraint->getUy();
+}
+
+void spine_physics_constraint_set_cx(spine_physics_constraint constraint, float value) {
+	if (constraint == nullptr) return;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	_constraint->setCx(value);
+}
+
+float spine_physics_constraint_get_cx(spine_physics_constraint constraint) {
+	if (constraint == nullptr) return 0.0f;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	return _constraint->getCx();
+}
+
+void spine_physics_constraint_set_cy(spine_physics_constraint constraint, float value) {
+	if (constraint == nullptr) return;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	_constraint->setCy(value);
+}
+
+float spine_physics_constraint_get_cy(spine_physics_constraint constraint) {
+	if (constraint == nullptr) return 0.0f;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	return _constraint->getCy();
+}
+
+void spine_physics_constraint_set_tx(spine_physics_constraint constraint, float value) {
+	if (constraint == nullptr) return;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	_constraint->setTx(value);
+}
+
+float spine_physics_constraint_get_tx(spine_physics_constraint constraint) {
+	if (constraint == nullptr) return 0.0f;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	return _constraint->getTx();
+}
+
+void spine_physics_constraint_set_ty(spine_physics_constraint constraint, float value) {
+	if (constraint == nullptr) return;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	_constraint->setTy(value);
+}
+
+float spine_physics_constraint_get_ty(spine_physics_constraint constraint) {
+	if (constraint == nullptr) return 0.0f;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	return _constraint->getTy();
+}
+
+void spine_physics_constraint_set_x_offset(spine_physics_constraint constraint, float value) {
+	if (constraint == nullptr) return;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	_constraint->setXOffset(value);
+}
+
+float spine_physics_constraint_get_x_offset(spine_physics_constraint constraint) {
+	if (constraint == nullptr) return 0.0f;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	return _constraint->getXOffset();
+}
+
+void spine_physics_constraint_set_x_velocity(spine_physics_constraint constraint, float value) {
+	if (constraint == nullptr) return;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	_constraint->setXVelocity(value);
+}
+
+float spine_physics_constraint_get_x_velocity(spine_physics_constraint constraint) {
+	if (constraint == nullptr) return 0.0f;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	return _constraint->getXVelocity();
+}
+
+void spine_physics_constraint_set_y_offset(spine_physics_constraint constraint, float value) {
+	if (constraint == nullptr) return;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	_constraint->setYOffset(value);
+}
+
+float spine_physics_constraint_get_y_offset(spine_physics_constraint constraint) {
+	if (constraint == nullptr) return 0.0f;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	return _constraint->getYOffset();
+}
+
+void spine_physics_constraint_set_y_velocity(spine_physics_constraint constraint, float value) {
+	if (constraint == nullptr) return;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	_constraint->setYVelocity(value);
+}
+
+float spine_physics_constraint_get_y_velocity(spine_physics_constraint constraint) {
+	if (constraint == nullptr) return 0.0f;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	return _constraint->getYVelocity();
+}
+
+void spine_physics_constraint_set_rotate_offset(spine_physics_constraint constraint, float value) {
+	if (constraint == nullptr) return;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	_constraint->setRotateOffset(value);
+}
+
+float spine_physics_constraint_get_rotate_offset(spine_physics_constraint constraint) {
+	if (constraint == nullptr) return 0.0f;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	return _constraint->getRotateOffset();
+}
+
+void spine_physics_constraint_set_rotate_velocity(spine_physics_constraint constraint, float value) {
+	if (constraint == nullptr) return;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	_constraint->setRotateVelocity(value);
+}
+
+float spine_physics_constraint_get_rotate_velocity(spine_physics_constraint constraint) {
+	if (constraint == nullptr) return 0.0f;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	return _constraint->getRotateVelocity();
+}
+
+void spine_physics_constraint_set_scale_offset(spine_physics_constraint constraint, float value) {
+	if (constraint == nullptr) return;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	_constraint->setScaleOffset(value);
+}
+
+float spine_physics_constraint_get_scale_offset(spine_physics_constraint constraint) {
+	if (constraint == nullptr) return 0.0f;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	return _constraint->getScaleOffset();
+}
+
+void spine_physics_constraint_set_scale_velocity(spine_physics_constraint constraint, float value) {
+	if (constraint == nullptr) return;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	_constraint->setScaleVelocity(value);
+}
+
+float spine_physics_constraint_get_scale_velocity(spine_physics_constraint constraint) {
+	if (constraint == nullptr) return 0.0f;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	return _constraint->getScaleVelocity();
+}
+
+void spine_physics_constraint_set_active(spine_physics_constraint constraint, int32_t value) {
+	if (constraint == nullptr) return;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	_constraint->setActive(value);
+}
+
+int32_t spine_physics_constraint_is_active(spine_physics_constraint constraint) {
+	if (constraint == nullptr) return false;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	return _constraint->isActive();
+}
+
+void spine_physics_constraint_set_remaining(spine_physics_constraint constraint, float value) {
+	if (constraint == nullptr) return;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	_constraint->setRemaining(value);
+}
+
+float spine_physics_constraint_get_remaining(spine_physics_constraint constraint) {
+	if (constraint == nullptr) return 0.0f;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	return _constraint->getRemaining();
+}
+
+void spine_physics_constraint_set_last_time(spine_physics_constraint constraint, float value) {
+	if (constraint == nullptr) return;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	_constraint->setLastTime(value);
+}
+
+float spine_physics_constraint_get_last_time(spine_physics_constraint constraint) {
+	if (constraint == nullptr) return 0.0f;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	return _constraint->getLastTime();
+}
+
+void spine_physics_constraint_reset(spine_physics_constraint constraint) {
+	if (constraint == nullptr) return;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)constraint;
+	_constraint->reset();
+}
+
+void spine_physics_constraint_update(spine_physics_constraint data, spine_physics physics) {
+	if (data == nullptr) return;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)data;
+	_constraint->update((spine::Physics)physics);
+}
+
+void spine_physics_constraint_translate(spine_physics_constraint data, float x, float y) {
+	if (data == nullptr) return;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)data;
+	_constraint->translate(x, y);
+}
+
+void spine_physics_constraint_rotate(spine_physics_constraint data, float x, float y, float degrees) {
+	if (data == nullptr) return;
+	PhysicsConstraint *_constraint = (PhysicsConstraint *)data;
+	_constraint->rotate(x, y, degrees);
 }
 
 // Sequence

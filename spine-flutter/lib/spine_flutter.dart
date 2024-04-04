@@ -563,7 +563,7 @@ enum BlendMode {
 
 /// Determines how a bone inherits world transforms from parent bones. See [Transform inheritance](esotericsoftware.com/spine-bones#Transform-inheritance)
 /// in the Spine User Guide.
-enum TransformMode {
+enum Inherit {
   normal(0),
   onlyTranslation(1),
   noRotationOrReflection(2),
@@ -572,7 +572,19 @@ enum TransformMode {
 
   final int value;
 
-  const TransformMode(this.value);
+  const Inherit(this.value);
+}
+
+/// Determines how physics and other non-deterministic updates are applied.
+enum Physics {
+  none(0),
+  reset(1),
+  update(2),
+  pose(3);
+
+  final int value;
+
+  const Physics(this.value);
 }
 
 /// Controls how the first bone is positioned along the path.
@@ -710,14 +722,14 @@ class BoneData {
     _bindings.spine_bone_data_set_shear_y(_data, shearY);
   }
 
-  /// The [TransformMode] for how parent world transforms affect this bone.
-  TransformMode getTransformMode() {
-    final nativeMode = _bindings.spine_bone_data_get_transform_mode(_data);
-    return TransformMode.values[nativeMode];
+  /// The [Inherit] for how parent world transforms affect this bone.
+  Inherit getInherit() {
+    final nativeMode = _bindings.spine_bone_data_get_inherit(_data);
+    return Inherit.values[nativeMode];
   }
 
-  void setTransformMode(TransformMode mode) {
-    _bindings.spine_bone_data_set_transform_mode(_data, mode.value);
+  void setInherit(Inherit inherit) {
+    _bindings.spine_bone_data_set_inherit(_data, inherit.value);
   }
 
   /// When true, [Skeleton.updateWorldTransform] only updates this bone if the [Skeleton.getSkin] contains this bone.
@@ -2746,8 +2758,8 @@ class Skeleton {
   ///
   /// See [World transforms](http://esotericsoftware.com/spine-runtime-skeletons#World-transforms) in the Spine
   /// Runtimes Guide.
-  void updateWorldTransform() {
-    _bindings.spine_skeleton_update_world_transform(_skeleton);
+  void updateWorldTransform(Physics physics) {
+    _bindings.spine_skeleton_update_world_transform(_skeleton, physics.value);
   }
 
   /// Temporarily sets the root bone as a child of the specified bone, then updates the world transform for each bone and applies
@@ -2755,8 +2767,8 @@ class Skeleton {
   ///
   /// See [World transforms](http://esotericsoftware.com/spine-runtime-skeletons#World-transforms) in the Spine
   /// Runtimes Guide.
-  void updateWorldTransformBone(Bone parent) {
-    _bindings.spine_skeleton_update_world_transform_bone(_skeleton, parent._bone);
+  void updateWorldTransformBone(Physics physics, Bone parent) {
+    _bindings.spine_skeleton_update_world_transform_bone(_skeleton, physics.value, parent._bone);
   }
 
   /// Sets the bones, constraints, slots, and draw order to their setup pose values.
@@ -3039,6 +3051,18 @@ class Skeleton {
   void setScaleY(double scaleY) {
     _bindings.spine_skeleton_set_scale_y(_skeleton, scaleY);
   }
+
+  double getTime() {
+    return _bindings.spine_skeleton_get_time(_skeleton);
+  }
+
+  void setTime(double time) {
+    return _bindings.spine_skeleton_set_time(_skeleton, time);
+  }
+
+  void update(double delta) {
+    _bindings.spine_skeleton_update(_skeleton, delta);
+  }
 }
 
 /// Stores a list of timelines to animate a skeleton's pose over time.
@@ -3297,26 +3321,39 @@ class TrackEntry {
     _bindings.spine_track_entry_set_event_threshold(_entry, eventThreshold);
   }
 
+  /// Values less than 1 mix this animation with the last skeleton pose. Defaults to 1, which overwrites the last skeleton pose with
+  /// this animation.
+  ///
+  /// Typically track 0 is used to completely pose the skeleton, then alpha can be used on higher tracks. It doesn't make sense
+  /// to use alpha on track 0 if the skeleton pose is from the last frame render.
+  double getAlphaAttachmentThreshold() {
+    return _bindings.spine_track_entry_get_alpha_attachment_threshold(_entry);
+  }
+
+  void setAlphaAttachmentThreshold(double attachmentThreshold) {
+    _bindings.spine_track_entry_set_alpha_attachment_threshold(_entry, attachmentThreshold);
+  }
+
   /// When the mix percentage ([getMixTime] / [getMixDuration]) is less than the
   /// <code>attachmentThreshold</code>, attachment timelines are applied while this animation is being mixed out. Defaults to
   /// 0, so attachment timelines are not applied while this animation is being mixed out.
-  double getAttachmentThreshold() {
-    return _bindings.spine_track_entry_get_attachment_threshold(_entry);
+  double getMixAttachmentThreshold() {
+    return _bindings.spine_track_entry_get_mix_attachment_threshold(_entry);
   }
 
-  void setAttachmentThreshold(double attachmentThreshold) {
-    _bindings.spine_track_entry_set_attachment_threshold(_entry, attachmentThreshold);
+  void setMixAttachmentThreshold(double attachmentThreshold) {
+    _bindings.spine_track_entry_set_mix_attachment_threshold(_entry, attachmentThreshold);
   }
 
   /// When the mix percentage ([getMixTime] / [getMixDuration]) is less than the
   /// <code>drawOrderThreshold</code>, draw order timelines are applied while this animation is being mixed out. Defaults to 0,
   /// so draw order timelines are not applied while this animation is being mixed out.
-  double getDrawOrderThreshold() {
-    return _bindings.spine_track_entry_get_draw_order_threshold(_entry);
+  double getMixDrawOrderThreshold() {
+    return _bindings.spine_track_entry_get_mix_draw_order_threshold(_entry);
   }
 
-  void setDrawOrderThreshold(double drawOrderThreshold) {
-    _bindings.spine_track_entry_set_draw_order_threshold(_entry, drawOrderThreshold);
+  void setMixDrawOrderThreshold(double drawOrderThreshold) {
+    _bindings.spine_track_entry_set_mix_draw_order_threshold(_entry, drawOrderThreshold);
   }
 
   /// The animation queued to start after this animation, or null if there is none. <code>next</code> makes up a doubly linked
@@ -3917,7 +3954,7 @@ class SkeletonDrawable {
     animationStateData = AnimationStateData._(_bindings.spine_skeleton_drawable_get_animation_state_data(_drawable));
     animationState = AnimationState._(_bindings.spine_skeleton_drawable_get_animation_state(_drawable),
         _bindings.spine_skeleton_drawable_get_animation_state_events(_drawable));
-    skeleton.updateWorldTransform();
+    skeleton.updateWorldTransform(Physics.none);
   }
 
   /// Constructs a new skeleton drawable from the [atlasFile] and [skeletonFile] from the root asset bundle
@@ -3956,7 +3993,8 @@ class SkeletonDrawable {
     if (_disposed) return;
     animationState.update(delta);
     animationState.apply(skeleton);
-    skeleton.updateWorldTransform();
+    skeleton.update(delta);
+    skeleton.updateWorldTransform(Physics.update);
   }
 
   /// Renders to current skeleton pose to a list of [RenderCommand] instances. The render commands

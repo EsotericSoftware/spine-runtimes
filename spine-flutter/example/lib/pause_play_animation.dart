@@ -65,7 +65,7 @@ class PlayPauseAnimationState extends State<PlayPauseAnimation> {
       appBar: AppBar(title: const Text('Play/Pause')),
       body: SpineWidget.fromAsset(
         "assets/dragon.atlas",
-        "assets/dragon-ess.json",
+        "assets/dragon-ess.skel",
         controller,
         boundsProvider: SkinAndAnimationBounds(animation: "flying"),
       ),

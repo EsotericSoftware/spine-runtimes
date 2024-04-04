@@ -57,7 +57,8 @@ class DressUpState extends State<DressUp> {
         var skeleton = drawable.skeleton;
         skeleton.setSkin(skin);
         skeleton.setToSetupPose();
-        skeleton.updateWorldTransform();
+        skeleton.update(0);
+        skeleton.updateWorldTransform(Physics.update);
         _skinImages[skin.getName()] = await drawable.renderToRawImageData(thumbnailSize, thumbnailSize, 0xffffffff);
         _selectedSkins[skin.getName()] = false;
       }

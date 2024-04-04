@@ -137,7 +137,7 @@ class DragonExample extends FlameGame {
   @override
   Future<void> onLoad() async {
     cachedAtlas = await Atlas.fromAsset("assets/dragon.atlas");
-    cachedSkeletonData =  await SkeletonData.fromAsset(cachedAtlas, "assets/dragon-ess.json");
+    cachedSkeletonData =  await SkeletonData.fromAsset(cachedAtlas, "assets/dragon-ess.skel");
     final drawable = SkeletonDrawable(cachedAtlas, cachedSkeletonData, false);
     dragon = SpineComponent(
       drawable,
