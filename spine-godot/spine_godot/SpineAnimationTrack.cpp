@@ -85,8 +85,8 @@ void SpineAnimationTrack::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "shortest_rotation"), "set_shortest_rotation", "get_shortest_rotation");
 	ADD_PROPERTY(PropertyInfo(Variant::VARIANT_FLOAT, "time_scale"), "set_time_scale", "get_time_scale");
 	ADD_PROPERTY(PropertyInfo(Variant::VARIANT_FLOAT, "alpha"), "set_alpha", "get_alpha");
-	ADD_PROPERTY(PropertyInfo(Variant::VARIANT_FLOAT, "attachment_threshold"), "set_attachment_threshold", "get_attachment_threshold");
-	ADD_PROPERTY(PropertyInfo(Variant::VARIANT_FLOAT, "draw_order_threshold"), "set_draw_order_threshold", "get_draw_order_threshold");
+	ADD_PROPERTY(PropertyInfo(Variant::VARIANT_FLOAT, "attachment_threshold"), "set_mix_attachment_threshold", "get_mix_attachment_threshold");
+	ADD_PROPERTY(PropertyInfo(Variant::VARIANT_FLOAT, "draw_order_threshold"), "set_mix_draw_order_threshold", "get_mix_draw_order_threshold");
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "mix_blend", PROPERTY_HINT_ENUM, "Setup,First,Replace,Add"), "set_mix_blend", "get_mix_blend");
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "blend_tree_mode"), "set_blend_tree_mode", "get_blend_tree_mode");
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "debug"), "set_debug", "get_debug");
