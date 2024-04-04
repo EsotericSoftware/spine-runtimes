@@ -72,7 +72,7 @@ Bone::Bone(BoneData &data, Skeleton &skeleton, Bone *parent) : Updatable(),
 															   _worldY(0),
 															   _sorted(false),
 															   _active(false),
-                                                               _inherit(Inherit_Normal){
+															   _inherit(Inherit_Normal) {
 	setToSetupPose();
 }
 
@@ -214,7 +214,7 @@ void Bone::setToSetupPose() {
 	_scaleY = data.getScaleY();
 	_shearX = data.getShearX();
 	_shearY = data.getShearY();
-    _inherit = data.getInherit();
+	_inherit = data.getInherit();
 }
 
 void Bone::worldToLocal(float worldX, float worldY, float &outLocalX, float &outLocalY) {
@@ -232,12 +232,12 @@ void Bone::worldToLocal(float worldX, float worldY, float &outLocalX, float &out
 }
 
 void Bone::worldToParent(float worldX, float worldY, float &outParentX, float &outParentY) {
-    if (!_parent) {
-        outParentX = worldX;
-        outParentY = worldY;
-    } else {
-        _parent->worldToLocal(worldX, worldY, outParentX, outParentY);
-    }
+	if (!_parent) {
+		outParentX = worldX;
+		outParentY = worldY;
+	} else {
+		_parent->worldToLocal(worldX, worldY, outParentX, outParentY);
+	}
 }
 
 void Bone::localToWorld(float localX, float localY, float &outWorldX, float &outWorldY) {
@@ -246,24 +246,24 @@ void Bone::localToWorld(float localX, float localY, float &outWorldX, float &out
 }
 
 void Bone::parentToWorld(float worldX, float worldY, float &outX, float &outY) {
-    if (!_parent) {
-        outX = worldX;
-        outY = worldY;
-    } else {
-        _parent->localToWorld(worldX, worldY, outX, outY);
-    }
+	if (!_parent) {
+		outX = worldX;
+		outY = worldY;
+	} else {
+		_parent->localToWorld(worldX, worldY, outX, outY);
+	}
 }
 
 float Bone::worldToLocalRotation(float worldRotation) {
-    worldRotation *= MathUtil::Deg_Rad;
-    float sine = MathUtil::sin(worldRotation), cosine = MathUtil::cos(worldRotation);
-    return MathUtil::atan2Deg(_a * sine - _c * cosine, _d * cosine - _b * sine) + _rotation - _shearX;
+	worldRotation *= MathUtil::Deg_Rad;
+	float sine = MathUtil::sin(worldRotation), cosine = MathUtil::cos(worldRotation);
+	return MathUtil::atan2Deg(_a * sine - _c * cosine, _d * cosine - _b * sine) + _rotation - _shearX;
 }
 
 float Bone::localToWorldRotation(float localRotation) {
-    localRotation = (localRotation - _rotation - _shearX) * MathUtil::Deg_Rad;
-    float sine = MathUtil::sin(localRotation), cosine = MathUtil::cos(localRotation);
-    return MathUtil::atan2Deg(cosine * _c + sine * _d, cosine * _a + sine * _b);
+	localRotation = (localRotation - _rotation - _shearX) * MathUtil::Deg_Rad;
+	float sine = MathUtil::sin(localRotation), cosine = MathUtil::cos(localRotation);
+	return MathUtil::atan2Deg(cosine * _c + sine * _d, cosine * _a + sine * _b);
 }
 
 void Bone::rotateWorld(float degrees) {
@@ -540,7 +540,7 @@ void Bone::updateAppliedTransform() {
 			case Inherit_NoScale:
 			case Inherit_NoScaleOrReflection: {
 				float r = _rotation * MathUtil::Deg_Rad;
-                float cos = MathUtil::cos(r), sin = MathUtil::sin(r);
+				float cos = MathUtil::cos(r), sin = MathUtil::sin(r);
 				pa = (pa * cos + pb * sin) / _skeleton.getScaleX();
 				pc = (pc * cos + pd * sin) / _skeleton.getScaleY();
 				float s = MathUtil::sqrt(pa * pa + pc * pc);

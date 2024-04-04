@@ -10,5 +10,5 @@
  */
 UCLASS()
 class SPINEUE_API ASpineUEGameMode : public AGameMode {
-  GENERATED_BODY()
+	GENERATED_BODY()
 };

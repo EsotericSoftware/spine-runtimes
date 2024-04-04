@@ -50,7 +50,7 @@ namespace spine {
 	SkeletonDrawable::SkeletonDrawable(SkeletonData *skeletonData, AnimationStateData *stateData) : timeScale(1),
 																									vertexArray(new VertexArray(Triangles, skeletonData->getBones().size() * 4)),
 																									worldVertices(), clipper(), usePremultipliedAlpha(false) {
-        Bone::setYDown(true);
+		Bone::setYDown(true);
 		worldVertices.ensureCapacity(SPINE_MESH_VERTEX_COUNT_MAX);
 		skeleton = new (__FILE__, __LINE__) Skeleton(skeletonData);
 		tempUvs.ensureCapacity(16);
@@ -79,7 +79,7 @@ namespace spine {
 	void SkeletonDrawable::update(float deltaTime, Physics physics) {
 		state->update(deltaTime * timeScale);
 		state->apply(*skeleton);
-        skeleton->update(deltaTime * timeScale);
+		skeleton->update(deltaTime * timeScale);
 		skeleton->updateWorldTransform(physics);
 	}
 

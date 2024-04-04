@@ -109,8 +109,8 @@ void IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY
 	Bone *pp = parent.getParent();
 	float tx, ty, dx, dy, dd, l1, l2, a1, a2, r, td, sd, p;
 	float id, x, y;
-    if (parent._inherit != Inherit_Normal || child._inherit != Inherit_Normal) return;
-    px = parent._ax;
+	if (parent._inherit != Inherit_Normal || child._inherit != Inherit_Normal) return;
+	px = parent._ax;
 	py = parent._ay;
 	psx = parent._ascaleX;
 	psy = parent._ascaleY;

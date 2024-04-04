@@ -95,11 +95,11 @@ float PhysicsConstraintData::getShearX() const {
 }
 
 void PhysicsConstraintData::setLimit(float limit) {
-    _limit = limit;
+	_limit = limit;
 }
 
 float PhysicsConstraintData::getLimit() const {
-    return _limit;
+	return _limit;
 }
 
 void PhysicsConstraintData::setStep(float step) {

@@ -324,7 +324,7 @@ void PhysicsConstraint::update(Physics physics) {
 			reset();
 			// Fall through.
 		case Physics::Physics_Update: {
-            float delta = MathUtil::max(_skeleton.getTime() - _lastTime, 0.0f);
+			float delta = MathUtil::max(_skeleton.getTime() - _lastTime, 0.0f);
 			_remaining += delta;
 			_lastTime = _skeleton.getTime();
 
@@ -334,92 +334,94 @@ void PhysicsConstraint::update(Physics physics) {
 				_ux = bx;
 				_uy = by;
 			} else {
-                float a = _remaining, i = _inertia, q = _data._limit * delta, t = _data._step, f = _skeleton.getData()->getReferenceScale(), d = -1;
+				float a = _remaining, i = _inertia, q = _data._limit * delta, t = _data._step, f = _skeleton.getData()->getReferenceScale(), d = -1;
 				if (x || y) {
-                    if (x) {
-                        float u = (_ux - bx) * i;
-                        _xOffset += u > q ? q : u < -q ? -q : u;
-                        _ux = bx;
-                    }
-                    if (y) {
-                        float u = (_uy - by) * i;
-                        _yOffset += u > q ? q : u < -q ? -q : u;
-                        _uy = by;
-                    }
+					if (x) {
+						float u = (_ux - bx) * i;
+						_xOffset += u > q ? q : u < -q ? -q
+													   : u;
+						_ux = bx;
+					}
+					if (y) {
+						float u = (_uy - by) * i;
+						_yOffset += u > q ? q : u < -q ? -q
+													   : u;
+						_uy = by;
+					}
 					if (a >= t) {
-                        d = MathUtil::pow(_damping, 60 * t);
-                        float m = _massInverse * t, e = _strength, w = _wind * f, g = _gravity * f * (Bone::yDown ? -1 : 1);
-                        do {
-                            if (x) {
-                                _xVelocity += (w - _xOffset * e) * m;
-                                _xOffset += _xVelocity * t;
-                                _xVelocity *= d;
-                            }
-                            if (y) {
-                                _yVelocity -= (g + _yOffset * e) * m;
-                                _yOffset += _yVelocity * t;
-                                _yVelocity *= d;
-                            }
-                            a -= t;
-                        } while (a >= t);
+						d = MathUtil::pow(_damping, 60 * t);
+						float m = _massInverse * t, e = _strength, w = _wind * f, g = _gravity * f * (Bone::yDown ? -1 : 1);
+						do {
+							if (x) {
+								_xVelocity += (w - _xOffset * e) * m;
+								_xOffset += _xVelocity * t;
+								_xVelocity *= d;
+							}
+							if (y) {
+								_yVelocity -= (g + _yOffset * e) * m;
+								_yOffset += _yVelocity * t;
+								_yVelocity *= d;
+							}
+							a -= t;
+						} while (a >= t);
 					}
 					if (x) bone->_worldX += _xOffset * mix * _data._x;
 					if (y) bone->_worldY += _yOffset * mix * _data._y;
 				}
 
-                if (rotateOrShearX || scaleX) {
-                    float ca = MathUtil::atan2(bone->_c, bone->_a), c, s, mr = 0;
-                    float dx = _cx - bone->_worldX, dy = _cy - bone->_worldY;
-                    if (dx > q)
-                        dx = q;
-                    else if (dx < -q) //
-                        dx = -q;
-                    if (dy > q)
-                        dy = q;
-                    else if (dy < -q) //
-                        dy = -q;
-                    if (rotateOrShearX) {
-                        mr = (_data._rotate + _data._shearX) * mix;
-                        float r = MathUtil::atan2(dy + _ty, dx + _tx) - ca - _rotateOffset * mr;
-                        _rotateOffset += (r - MathUtil::ceil(r * MathUtil::InvPi_2 - 0.5f) * MathUtil::Pi_2) * i;
-                        r = _rotateOffset * mr + ca;
-                        c = MathUtil::cos(r);
-                        s = MathUtil::sin(r);
-                        if (scaleX) {
-                            r = l * bone->getWorldScaleX();
-                            if (r > 0) _scaleOffset += (dx * c + dy * s) * i / r;
-                        }
-                    } else {
-                        c = MathUtil::cos(ca);
-                        s = MathUtil::sin(ca);
-                        float r = l * bone->getWorldScaleX();
-                        if (r > 0) _scaleOffset += (dx * c + dy * s) * i / r;
-                    }
-                    a = _remaining;
-                    if (a >= t) {
-                        if (d == -1) d = MathUtil::pow(_damping, 60 * t);
-                        float m = _massInverse * t, e = _strength, w = _wind, g = _gravity, h = l / f;
-                        while (true) {
-                            a -= t;
-                            if (scaleX) {
-                                _scaleVelocity += (w * c - g * s - _scaleOffset * e) * m;
-                                _scaleOffset += _scaleVelocity * t;
-                                _scaleVelocity *= d;
-                            }
-                            if (rotateOrShearX) {
-                                _rotateVelocity -= ((w * s + g * c) * h + _rotateOffset * e) * m;
-                                _rotateOffset += _rotateVelocity * t;
-                                _rotateVelocity *= d;
-                                if (a < t) break;
-                                float r = _rotateOffset * mr + ca;
-                                c = MathUtil::cos(r);
-                                s = MathUtil::sin(r);
-                            } else if (a < t) //
-                                break;
-                        }
-                    }
-                }
-                _remaining = a;
+				if (rotateOrShearX || scaleX) {
+					float ca = MathUtil::atan2(bone->_c, bone->_a), c, s, mr = 0;
+					float dx = _cx - bone->_worldX, dy = _cy - bone->_worldY;
+					if (dx > q)
+						dx = q;
+					else if (dx < -q)//
+						dx = -q;
+					if (dy > q)
+						dy = q;
+					else if (dy < -q)//
+						dy = -q;
+					if (rotateOrShearX) {
+						mr = (_data._rotate + _data._shearX) * mix;
+						float r = MathUtil::atan2(dy + _ty, dx + _tx) - ca - _rotateOffset * mr;
+						_rotateOffset += (r - MathUtil::ceil(r * MathUtil::InvPi_2 - 0.5f) * MathUtil::Pi_2) * i;
+						r = _rotateOffset * mr + ca;
+						c = MathUtil::cos(r);
+						s = MathUtil::sin(r);
+						if (scaleX) {
+							r = l * bone->getWorldScaleX();
+							if (r > 0) _scaleOffset += (dx * c + dy * s) * i / r;
+						}
+					} else {
+						c = MathUtil::cos(ca);
+						s = MathUtil::sin(ca);
+						float r = l * bone->getWorldScaleX();
+						if (r > 0) _scaleOffset += (dx * c + dy * s) * i / r;
+					}
+					a = _remaining;
+					if (a >= t) {
+						if (d == -1) d = MathUtil::pow(_damping, 60 * t);
+						float m = _massInverse * t, e = _strength, w = _wind, g = _gravity, h = l / f;
+						while (true) {
+							a -= t;
+							if (scaleX) {
+								_scaleVelocity += (w * c - g * s - _scaleOffset * e) * m;
+								_scaleOffset += _scaleVelocity * t;
+								_scaleVelocity *= d;
+							}
+							if (rotateOrShearX) {
+								_rotateVelocity -= ((w * s + g * c) * h + _rotateOffset * e) * m;
+								_rotateOffset += _rotateVelocity * t;
+								_rotateVelocity *= d;
+								if (a < t) break;
+								float r = _rotateOffset * mr + ca;
+								c = MathUtil::cos(r);
+								s = MathUtil::sin(r);
+							} else if (a < t)//
+								break;
+						}
+					}
+				}
+				_remaining = a;
 			}
 
 			_cx = bone->_worldX;
@@ -476,9 +478,9 @@ void PhysicsConstraint::update(Physics physics) {
 }
 
 void PhysicsConstraint::rotate(float x, float y, float degrees) {
-    float r = degrees * MathUtil::Deg_Rad, cos = MathUtil::cos(r), sin = MathUtil::sin(r);
-    float dx = _cx - x, dy = _cy - y;
-    translate(dx * cos - dy * sin - dx, dx * sin + dy * cos - dy);
+	float r = degrees * MathUtil::Deg_Rad, cos = MathUtil::cos(r), sin = MathUtil::sin(r);
+	float dx = _cx - x, dy = _cy - y;
+	translate(dx * cos - dy * sin - dx, dx * sin + dy * cos - dy);
 }
 
 void PhysicsConstraint::translate(float x, float y) {

@@ -34,21 +34,21 @@
 using namespace spine;
 
 BoneData::BoneData(int index, const String &name, BoneData *parent) : _index(index),
-                                                                      _name(name),
-                                                                      _parent(parent),
-                                                                      _length(0),
-                                                                      _x(0),
-                                                                      _y(0),
-                                                                      _rotation(0),
-                                                                      _scaleX(1),
-                                                                      _scaleY(1),
-                                                                      _shearX(0),
-                                                                      _shearY(0),
-                                                                      _inherit(Inherit_Normal),
-                                                                      _skinRequired(false),
-                                                                      _color(),
-                                                                      _icon(),
-                                                                      _visible(true) {
+																	  _name(name),
+																	  _parent(parent),
+																	  _length(0),
+																	  _x(0),
+																	  _y(0),
+																	  _rotation(0),
+																	  _scaleX(1),
+																	  _scaleY(1),
+																	  _shearX(0),
+																	  _shearY(0),
+																	  _inherit(Inherit_Normal),
+																	  _skinRequired(false),
+																	  _color(),
+																	  _icon(),
+																	  _visible(true) {
 	assert(index >= 0);
 	assert(_name.length() > 0);
 }
@@ -134,7 +134,7 @@ Inherit BoneData::getInherit() {
 }
 
 void BoneData::setInherit(Inherit inValue) {
-    _inherit = inValue;
+	_inherit = inValue;
 }
 
 bool BoneData::isSkinRequired() {

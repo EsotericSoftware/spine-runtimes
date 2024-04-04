@@ -54,7 +54,7 @@ SkeletonDrawable::~SkeletonDrawable() {
 void SkeletonDrawable::update(float delta, Physics physics) {
 	animationState->update(delta);
 	animationState->apply(*skeleton);
-    skeleton->update(delta);
+	skeleton->update(delta);
 	skeleton->updateWorldTransform(physics);
 }
 
