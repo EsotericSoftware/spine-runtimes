@@ -7,7 +7,7 @@
 script = ExtResource("1")
 
 [node name="Spineboy" type="SpineSprite" parent="."]
-position = Vector2(481, 457)
+position = Vector2(147, 493)
 scale = Vector2(0.5, 0.5)
 skeleton_data_res = ExtResource("2")
 preview_skin = "Default"

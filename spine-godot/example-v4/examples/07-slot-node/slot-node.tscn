@@ -19,7 +19,7 @@ preview_time = 0.0
 
 [node name="GunSlot" type="SpineSlotNode" parent="Spineboy"]
 show_behind_parent = true
-position = Vector2(40.8753, -276.036)
+position = Vector2(40.8752, -276.036)
 rotation = 0.837234
 scale = Vector2(1, 1)
 slot_name = "gun"
@@ -49,7 +49,6 @@ texture = ExtResource("4")
 show_behind_parent = true
 position = Vector2(-29.0298, -241.577)
 rotation = 0.995187
-scale = Vector2(1, 1)
 slot_name = "front-fist"
 
 [node name="TinySpineboy" type="SpineSprite" parent="Spineboy/FrontFistSlot"]
