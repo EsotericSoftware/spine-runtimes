@@ -99,8 +99,8 @@ echo "Exporting assets..."
 \
 -i ../celestial-circus/celestial-circus-pro.spine -o ../celestial-circus/export -e json.json \
 -i ../celestial-circus/celestial-circus-pro.spine -o ../celestial-circus/export -e binary.json \
--i ../celestial-circus/images -o ../celestial-circus/export -n celestial-circus -p atlas-0.5.json \
--i ../celestial-circus/images -o ../celestial-circus/export -n celestial-circus-pma -p atlas-0.5-pma.json \
+-i ../celestial-circus/images -o ../celestial-circus/export -n celestial-circus -p atlas-0.4.json \
+-i ../celestial-circus/images -o ../celestial-circus/export -n celestial-circus-pma -p atlas-0.4-pma.json \
 \
 -i ../snowglobe/snowglobe-pro.spine -o ../snowglobe/export -e json.json \
 -i ../snowglobe/snowglobe-pro.spine -o ../snowglobe/export -e binary.json \
