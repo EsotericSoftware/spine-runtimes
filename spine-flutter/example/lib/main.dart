@@ -36,6 +36,7 @@ import 'dress_up.dart';
 import 'flame_example.dart';
 import 'ik_following.dart';
 import 'pause_play_animation.dart';
+import 'physics.dart';
 import 'simple_animation.dart';
 
 class ExampleSelector extends StatelessWidget {
@@ -119,6 +120,18 @@ class ExampleSelector extends StatelessWidget {
               );
             },
           ),
+              spacer,
+              ElevatedButton(
+                child: const Text('Physics'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (context) => const PhysicsTest(),
+                    ),
+                  );
+                },
+              ),
           spacer,
           ElevatedButton(
             child: const Text('Flame: Simple Example'),

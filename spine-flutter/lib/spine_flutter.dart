@@ -3008,6 +3008,12 @@ class Skeleton {
     _bindings.spine_skeleton_set_position(_skeleton, x, y);
   }
 
+  Vec2 getPosition() {
+    final x = _bindings.spine_skeleton_get_x(_skeleton);
+    final y = _bindings.spine_skeleton_get_y(_skeleton);
+    return Vec2(x, y);
+  }
+
   /// Sets the skeleton X position, which is added to the root bone worldX position.
   ///
   /// Bones that do not inherit translation are still affected by this property.

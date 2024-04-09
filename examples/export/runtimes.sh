@@ -124,6 +124,10 @@ cp -f ../dragon/export/dragon.atlas "$ROOT/spine-flutter/example/assets/"
 cp -f ../dragon/export/dragon.png "$ROOT/spine-flutter/example/assets/"
 cp -f ../dragon/export/dragon_*.png "$ROOT/spine-flutter/example/assets/"
 
+cp -f ../celestial-circus/export/celestial-circus-pro.skel "$ROOT/spine-flutter/example/assets/"
+cp -f ../celestial-circus/export/celestial-circus.atlas "$ROOT/spine-flutter/example/assets/"
+cp -f ../celestial-circus/export/celestial-circus.png "$ROOT/spine-flutter/example/assets/"
+
 echo "spine-godot"
 rm -f "$ROOT"/spine-godot/example/assets/spineboy/*.atlas
 rm -f "$ROOT"/spine-godot/example/assets/spineboy/*.png
