@@ -1,0 +1,14 @@
+[remap]
+
+importer="spine.atlas"
+type="SpineAtlasResource"
+path="res://.import/celestial-circus.atlas-8277f39286d729eed930dc8584632c9d.spatlas"
+
+[deps]
+
+source_file="res://assets/celestial-circus/celestial-circus.atlas"
+dest_files=[ "res://.import/celestial-circus.atlas-8277f39286d729eed930dc8584632c9d.spatlas" ]
+
+[params]
+
+normal_map_prefix="n"

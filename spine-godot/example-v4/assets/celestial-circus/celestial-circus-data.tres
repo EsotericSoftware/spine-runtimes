@@ -1,0 +1,8 @@
+[gd_resource type="SpineSkeletonDataResource" load_steps=3 format=3 uid="uid://d1ordmjpe5kt7"]
+
+[ext_resource type="SpineAtlasResource" uid="uid://syvy0bxbnwgi" path="res://assets/celestial-circus/celestial-circus.atlas" id="1_fs1an"]
+[ext_resource type="SpineSkeletonFileResource" uid="uid://doan7yl2by7vm" path="res://assets/celestial-circus/celestial-circus.skel" id="2_sbom4"]
+
+[resource]
+atlas_res = ExtResource("1_fs1an")
+skeleton_file_res = ExtResource("2_sbom4")

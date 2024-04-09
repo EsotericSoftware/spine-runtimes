@@ -1,0 +1,14 @@
+[remap]
+
+importer="spine.skel"
+type="SpineSkeletonFileResource"
+uid="uid://rr3h7cd7a3d5"
+path="res://.godot/imported/celestial-circus.skel-57e15df02c4ab2ec1bbb6a38273235f3.spskel"
+
+[deps]
+
+source_file="res://assets/celestial-circus/celestial-circus.skel"
+dest_files=["res://.godot/imported/celestial-circus.skel-57e15df02c4ab2ec1bbb6a38273235f3.spskel"]
+
+[params]
+
