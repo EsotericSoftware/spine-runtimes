@@ -1,0 +1,13 @@
+[remap]
+
+importer="spine.skel"
+type="SpineSkeletonFileResource"
+path="res://.import/celestial-circus.skel-57e15df02c4ab2ec1bbb6a38273235f3.spskel"
+
+[deps]
+
+source_file="res://assets/celestial-circus/celestial-circus.skel"
+dest_files=[ "res://.import/celestial-circus.skel-57e15df02c4ab2ec1bbb6a38273235f3.spskel" ]
+
+[params]
+
