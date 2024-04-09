@@ -27,83 +27,53 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include "IKExample.h"
 #include "PhysicsExample.h"
+#include "SpineboyExample.h"
 
 USING_NS_CC;
 using namespace spine;
 
-// This example demonstrates how to set the position
-// of a bone based on the touch position, which in
-// turn will make an IK chain follow that bone
-// smoothly.
-Scene *IKExample::scene() {
+Scene *PhysicsExample::scene() {
 	Scene *scene = Scene::create();
-	scene->addChild(IKExample::create());
+	scene->addChild(PhysicsExample::create());
 	return scene;
 }
 
-bool IKExample::init() {
+bool PhysicsExample::init() {
 	if (!LayerColor::initWithColor(Color4B(128, 128, 128, 255))) return false;
 
 	// Load the Spineboy skeleton and create a SkeletonAnimation node from it
 	// centered on the screen.
-	skeletonNode = SkeletonAnimation::createWithJsonFile("spineboy-pro.json", "spineboy.atlas", 0.6f);
-	skeletonNode->setPosition(Vec2(_contentSize.width / 2, 20));
+	skeletonNode = SkeletonAnimation::createWithBinaryFile("celestial-circus-pro.skel", "celestial-circus.atlas", 0.2f);
+	skeletonNode->setPosition(Vec2(_contentSize.width / 2, 200));
 	addChild(skeletonNode);
 
 	// Queue the "walk" animation on the first track.
-	skeletonNode->setAnimation(0, "walk", true);
-
-	// Queue the "aim" animation on a higher track.
-	// It consists of a single frame that positions
-	// the back arm and gun such that they point at
-	// the "crosshair" bone. By setting this
-	// animation on a higher track, it overrides
-	// any changes to the back arm and gun made
-	// by the walk animation, allowing us to
-	// mix the two. The mouse position following
-	// is performed in the lambda below.
-	skeletonNode->setAnimation(1, "aim", true);
+	// skeletonNode->setAnimation(0, "walk", true);
 
 	// Next we setup a listener that receives and stores
-	// the current mouse location. The location is converted
-	// to the skeleton's coordinate system.
+	// the current mouse location and updates the skeleton position
+    // accordingly.
 	EventListenerMouse *mouseListener = EventListenerMouse::create();
 	mouseListener->onMouseMove = [this](cocos2d::Event *event) -> void {
 		// convert the mosue location to the skeleton's coordinate space
 		// and store it.
 		EventMouse *mouseEvent = dynamic_cast<EventMouse *>(event);
-		position = skeletonNode->convertToNodeSpace(mouseEvent->getLocationInView());
+		Vec2 mousePosition = skeletonNode->convertToNodeSpace(mouseEvent->getLocationInView());
+        if (firstUpdate) {
+            firstUpdate = false;
+            lastMousePosition = mousePosition;
+            return;
+        }
+        Vec2 delta = mousePosition - lastMousePosition;
+        skeletonNode->getSkeleton()->physicsTranslate(-delta.x, -delta.y);
+        lastMousePosition = mousePosition;
 	};
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(mouseListener, this);
 
-	// Position the "crosshair" bone at the mouse
-	// location.
-	//
-	// When setting the crosshair bone position
-	// to the mouse position, we need to translate
-	// from "skeleton space" to "local bone space".
-	// Note that the local bone space is calculated
-	// using the bone's parent worldToLocal() function!
-	//
-	// After updating the bone position based on the
-	// converted mouse location, we call updateWorldTransforms()
-	// again so the change of the IK target position is
-	// applied to the rest of the skeleton.
-	skeletonNode->setPostUpdateWorldTransformsListener([this](SkeletonAnimation *node) -> void {
-		Bone *crosshair = node->findBone("crosshair");// The bone should be cached
-		float localX = 0, localY = 0;
-		crosshair->getParent()->worldToLocal(position.x, position.y, localX, localY);
-		crosshair->setX(localX);
-		crosshair->setY(localY);
-
-		node->getSkeleton()->updateWorldTransform(spine::Physics_Update);
-	});
-
 	EventListenerTouchOneByOne *listener = EventListenerTouchOneByOne::create();
 	listener->onTouchBegan = [this](Touch *touch, cocos2d::Event *event) -> bool {
-		Director::getInstance()->replaceScene(PhysicsExample::scene());
+		Director::getInstance()->replaceScene(SpineboyExample::scene());
 		return true;
 	};
 
@@ -114,5 +84,5 @@ bool IKExample::init() {
 	return true;
 }
 
-void IKExample::update(float deltaTime) {
+void PhysicsExample::update(float deltaTime) {
 }

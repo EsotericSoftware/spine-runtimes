@@ -71,7 +71,7 @@ namespace spine {
 		bool getDebugBoundingRectEnabled() const;
 
 		// --- Convenience methods for common Skeleton_* functions.
-		void updateWorldTransform();
+		void updateWorldTransform(spine::Physics physics);
 
 		void setToSetupPose();
 		void setBonesToSetupPose();

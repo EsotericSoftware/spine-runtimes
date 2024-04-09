@@ -138,7 +138,8 @@ namespace spine {
 		if (_preUpdateListener) _preUpdateListener(this);
 		_state->update(deltaTime);
 		_state->apply(*_skeleton);
-		_skeleton->updateWorldTransform();
+        _skeleton->update(deltaTime);
+		_skeleton->updateWorldTransform(Physics_Update);
 		if (_postUpdateListener) _postUpdateListener(this);
 	}
 

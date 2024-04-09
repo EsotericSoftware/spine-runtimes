@@ -108,6 +108,10 @@ cp -f ../mix-and-match/export/mix-and-match-pro.skel "$ROOT/spine-cocos2dx/examp
 cp -f ../mix-and-match/export/mix-and-match.atlas "$ROOT/spine-cocos2dx/example/Resources/common/"
 cp -f ../mix-and-match/export/mix-and-match.png "$ROOT/spine-cocos2dx/example/Resources/common/"
 
+cp -f ../celestial-circus/export/celestial-circus-pro.skel "$ROOT/spine-cocos2dx/example/Resources/common/"
+cp -f ../celestial-circus/export/celestial-circus.atlas "$ROOT/spine-cocos2dx/example/Resources/common/"
+cp -f ../celestial-circus/export/celestial-circus.png "$ROOT/spine-cocos2dx/example/Resources/common/"
+
 echo "spine-flutter"
 rm -rf "$ROOT/spine-flutter/example/assets/"*
 cp -f ../spineboy/export/spineboy-pro.json "$ROOT/spine-flutter/example/assets/"

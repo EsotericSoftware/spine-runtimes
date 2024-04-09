@@ -188,7 +188,7 @@ namespace spine {
 		}
 
         int lastIndexOf(const char c) {
-            for (int i = length() - 1; i >= 0; i--) {
+            for (int i = (int)length() - 1; i >= 0; i--) {
                 if (buffer()[i] == c) return i;
             }
             return -1;
@@ -208,7 +208,7 @@ namespace spine {
             if (startIndex < 0 || startIndex >= (int)_length) {
                 return String();
             }
-            int length = _length - startIndex;
+            int length = (int)_length - startIndex;
             char* subStr = SpineExtension::calloc<char>(length + 1, __FILE__, __LINE__);
             memcpy(subStr, _buffer + startIndex, length);
             subStr[length] = '\0';

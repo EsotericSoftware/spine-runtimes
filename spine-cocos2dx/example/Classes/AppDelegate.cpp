@@ -33,8 +33,7 @@
 #include <vector>
 
 #include "AppMacros.h"
-#include "IKExample.h"
-#include "SequenceExample.h"
+#include "PhysicsExample.h"
 #include <spine/Debug.h>
 #include <spine/spine-cocos2dx.h>
 
@@ -111,7 +110,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
 
 	// create a scene. it's an autorelease object
 	//auto scene = RaptorExample::scene();
-	auto scene = SequenceExample::scene();
+	auto scene = PhysicsExample::scene();
 
 	// run
 	director->runWithScene(scene);

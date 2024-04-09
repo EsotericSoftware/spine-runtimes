@@ -95,7 +95,7 @@ namespace spine {
 		setTwoColorTint(false);
 
 		_skeleton->setToSetupPose();
-		_skeleton->updateWorldTransform();
+		_skeleton->updateWorldTransform(Physics_Update);
 	}
 
 	void SkeletonRenderer::setupGLProgramState(bool twoColorTintEnabled) {
@@ -671,8 +671,8 @@ namespace spine {
 
 	// --- Convenience methods for Skeleton_* functions.
 
-	void SkeletonRenderer::updateWorldTransform() {
-		_skeleton->updateWorldTransform();
+	void SkeletonRenderer::updateWorldTransform(Physics physics) {
+		_skeleton->updateWorldTransform(physics);
 	}
 
 	void SkeletonRenderer::setToSetupPose() {
