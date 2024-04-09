@@ -1,0 +1,31 @@
+[gd_scene load_steps=4 format=3 uid="uid://re2mg31p3vln"]
+
+[ext_resource type="Script" path="res://examples/12-physics/physics.cs" id="1_t1cxt"]
+[ext_resource type="SpineSkeletonDataResource" uid="uid://ivqmuytdfvde" path="res://assets/celestial-circus/celestial-circus-data.tres" id="2_t2blj"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_do8w3"]
+size = Vector2(270, 573)
+
+[node name="Node2D" type="Node2D"]
+script = ExtResource("1_t1cxt")
+
+[node name="celestial-circus" type="SpineSprite" parent="."]
+position = Vector2(600, 485)
+scale = Vector2(0.25, 0.25)
+skeleton_data_res = ExtResource("2_t2blj")
+preview_skin = "Default"
+preview_animation = "-- Empty --"
+preview_frame = false
+preview_time = 0.0
+
+[node name="Area2D" type="Area2D" parent="celestial-circus"]
+show_behind_parent = true
+scale = Vector2(4, 4)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="celestial-circus/Area2D"]
+show_behind_parent = true
+position = Vector2(0, -158.5)
+shape = SubResource("RectangleShape2D_do8w3")
+
+[connection signal="mouse_entered" from="celestial-circus/Area2D" to="." method="_on_area_2d_mouse_entered"]
+[connection signal="mouse_exited" from="celestial-circus/Area2D" to="." method="_on_area_2d_mouse_exited"]
