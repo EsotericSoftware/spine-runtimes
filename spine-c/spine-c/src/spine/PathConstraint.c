@@ -39,9 +39,9 @@
 spPathConstraint *spPathConstraint_create(spPathConstraintData *data, const spSkeleton *skeleton) {
 	int i;
 	spPathConstraint *self = NEW(spPathConstraint);
-	CONST_CAST(spPathConstraintData *, self->data) = data;
+	self->data = data;
 	self->bonesCount = data->bonesCount;
-	CONST_CAST(spBone **, self->bones) = MALLOC(spBone *, self->bonesCount);
+	self->bones = MALLOC(spBone *, self->bonesCount);
 	for (i = 0; i < self->bonesCount; ++i)
 		self->bones[i] = spSkeleton_findBone(skeleton, self->data->bones[i]->name);
 	self->target = spSkeleton_findSlot(skeleton, self->data->target->name);
@@ -179,15 +179,15 @@ void spPathConstraint_update(spPathConstraint *self) {
 	}
 	for (i = 0, p = 3; i < boneCount; i++, p += 3) {
 		spBone *bone = bones[i];
-		CONST_CAST(float, bone->worldX) += (boneX - bone->worldX) * mixX;
-		CONST_CAST(float, bone->worldY) += (boneY - bone->worldY) * mixY;
+		bone->worldX += (boneX - bone->worldX) * mixX;
+		bone->worldY += (boneY - bone->worldY) * mixY;
 		x = positions[p], y = positions[p + 1], dx = x - boneX, dy = y - boneY;
 		if (scale) {
 			length = lengths[i];
 			if (length != 0) {
 				s = (SQRT(dx * dx + dy * dy) / length - 1) * mixRotate + 1;
-				CONST_CAST(float, bone->a) *= s;
-				CONST_CAST(float, bone->c) *= s;
+				bone->a *= s;
+				bone->c *= s;
 			}
 		}
 		boneX = x;
@@ -216,10 +216,10 @@ void spPathConstraint_update(spPathConstraint *self) {
 			r *= mixRotate;
 			cosine = COS(r);
 			sine = SIN(r);
-			CONST_CAST(float, bone->a) = cosine * a - sine * c;
-			CONST_CAST(float, bone->b) = cosine * b - sine * d;
-			CONST_CAST(float, bone->c) = sine * a + cosine * c;
-			CONST_CAST(float, bone->d) = sine * b + cosine * d;
+			bone->a = cosine * a - sine * c;
+			bone->b = cosine * b - sine * d;
+			bone->c = sine * a + cosine * c;
+			bone->d = sine * b + cosine * d;
 		}
 		spBone_updateAppliedTransform(bone);
 	}

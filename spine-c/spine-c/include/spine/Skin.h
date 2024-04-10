@@ -55,7 +55,7 @@ _SP_ARRAY_DECLARE_TYPE(spTransformConstraintDataArray, spTransformConstraintData
 _SP_ARRAY_DECLARE_TYPE(spPathConstraintDataArray, spPathConstraintData*)
 
 typedef struct spSkin {
-	const char *const name;
+	const char *name;
 
 	spBoneDataArray *bones;
 	spIkConstraintDataArray *ikConstraints;

@@ -37,7 +37,7 @@ extern "C" {
 #endif
 
 typedef struct spEventData {
-	const char *const name;
+	const char *name;
 	int intValue;
 	float floatValue;
 	const char *stringValue;

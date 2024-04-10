@@ -41,9 +41,9 @@ extern "C" {
 struct spSkeleton;
 
 typedef struct spTransformConstraint {
-	spTransformConstraintData *const data;
+	spTransformConstraintData *data;
 	int bonesCount;
-	spBone **const bones;
+	spBone **bones;
 	spBone *target;
 	float mixRotate, mixX, mixY, mixScaleX, mixScaleY, mixShearY;
 	int /*boolean*/ active;

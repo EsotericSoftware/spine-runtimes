@@ -43,9 +43,9 @@ extern "C" {
 struct spSkeleton;
 
 typedef struct spPathConstraint {
-	spPathConstraintData *const data;
+	spPathConstraintData *data;
 	int bonesCount;
-	spBone **const bones;
+	spBone **bones;
 	spSlot *target;
 	float position, spacing;
 	float mixRotate, mixX, mixY;

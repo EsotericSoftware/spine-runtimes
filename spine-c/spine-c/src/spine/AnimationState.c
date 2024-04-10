@@ -251,7 +251,7 @@ spAnimationState *spAnimationState_create(spAnimationStateData *data) {
 	internal = NEW(_spAnimationState);
 	self = SUPER(internal);
 
-	CONST_CAST(spAnimationStateData *, self->data) = data;
+	self->data = data;
 	self->timeScale = 1;
 
 	internal->queue = _spEventQueue_create(internal);

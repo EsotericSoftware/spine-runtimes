@@ -32,8 +32,8 @@
 
 spSlot *spSlot_create(spSlotData *data, spBone *bone) {
 	spSlot *self = NEW(spSlot);
-	CONST_CAST(spSlotData *, self->data) = data;
-	CONST_CAST(spBone *, self->bone) = bone;
+	self->data = data;
+	self->bone = bone;
 	spColor_setFromFloats(&self->color, 1, 1, 1, 1);
 	self->darkColor = data->darkColor == 0 ? 0 : spColor_create();
 	spSlot_setToSetupPose(self);
@@ -67,7 +67,7 @@ void spSlot_setAttachment(spSlot *self, spAttachment *attachment) {
 		self->deformCount = 0;
 	}
 
-	CONST_CAST(spAttachment *, self->attachment) = attachment;
+	self->attachment = attachment;
 	self->sequenceIndex = -1;
 }
 
@@ -80,7 +80,7 @@ void spSlot_setToSetupPose(spSlot *self) {
 	else {
 		spAttachment *attachment = spSkeleton_getAttachmentForSlotIndex(
 				self->bone->skeleton, self->data->index, self->data->attachmentName);
-		CONST_CAST(spAttachment *, self->attachment) = 0;
+        self->attachment = 0;
 		spSlot_setAttachment(self, attachment);
 	}
 }

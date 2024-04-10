@@ -43,11 +43,11 @@ extern "C" {
 #endif
 
 typedef struct spSkeleton {
-	spSkeletonData *const data;
+	spSkeletonData *data;
 
 	int bonesCount;
 	spBone **bones;
-	spBone *const root;
+	spBone *root;
 
 	int slotsCount;
 	spSlot **slots;
@@ -62,10 +62,12 @@ typedef struct spSkeleton {
 	int pathConstraintsCount;
 	spPathConstraint **pathConstraints;
 
-	spSkin *const skin;
+	spSkin *skin;
 	spColor color;
 	float scaleX, scaleY;
 	float x, y;
+
+    float time;
 } spSkeleton;
 
 SP_API spSkeleton *spSkeleton_create(spSkeletonData *data);
@@ -76,7 +78,9 @@ SP_API void spSkeleton_dispose(spSkeleton *self);
  * are added or removed. */
 SP_API void spSkeleton_updateCache(spSkeleton *self);
 
-SP_API void spSkeleton_updateWorldTransform(const spSkeleton *self);
+SP_API void spSkeleton_updateWorldTransform(const spSkeleton *self, spPhysics physics);
+
+SP_API void spSkeleton_update(spSkeleton *self, float delta);
 
 /* Sets the bones, constraints, and slots to their setup pose values. */
 SP_API void spSkeleton_setToSetupPose(const spSkeleton *self);

@@ -45,7 +45,7 @@ struct spAtlasAttachmentLoader;
 typedef struct spSkeletonBinary {
 	float scale;
 	spAttachmentLoader *attachmentLoader;
-	const char *const error;
+	const char *error;
 } spSkeletonBinary;
 
 SP_API spSkeletonBinary *spSkeletonBinary_createWithLoader(spAttachmentLoader *attachmentLoader);

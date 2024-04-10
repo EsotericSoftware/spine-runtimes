@@ -149,10 +149,11 @@ namespace spine {
 		spColorArray_dispose(tempColors);
 	}
 
-	void SkeletonDrawable::update(float deltaTime) {
+	void SkeletonDrawable::update(float deltaTime, spPhysics physics) {
 		spAnimationState_update(state, deltaTime * timeScale);
 		spAnimationState_apply(state, skeleton);
-		spSkeleton_updateWorldTransform(skeleton);
+        spSkeleton_update(skeleton, deltaTime * timeScale);
+		spSkeleton_updateWorldTransform(skeleton, physics);
 	}
 
 	void SkeletonDrawable::draw(RenderTarget &target, RenderStates states) const {

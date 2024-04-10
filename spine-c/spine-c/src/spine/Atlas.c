@@ -97,7 +97,7 @@ spKeyValue spKeyValueArray_peek(spKeyValueArray *self) { return self->items[self
 
 spAtlasPage *spAtlasPage_create(spAtlas *atlas, const char *name) {
 	spAtlasPage *self = NEW(spAtlasPage);
-	CONST_CAST(spAtlas *, self->atlas) = atlas;
+	self->atlas = atlas;
 	MALLOC_STR(self->name, name);
 	self->minFilter = SP_ATLAS_NEAREST;
 	self->magFilter = SP_ATLAS_NEAREST;

@@ -39,9 +39,9 @@ extern "C" {
 #endif
 
 typedef struct spAnimationStateData {
-	spSkeletonData *const skeletonData;
+	spSkeletonData *skeletonData;
 	float defaultMix;
-	const void *const entries;
+	const void *entries;
 } spAnimationStateData;
 
 SP_API spAnimationStateData *spAnimationStateData_create(spSkeletonData *skeletonData);

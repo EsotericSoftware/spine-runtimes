@@ -61,7 +61,7 @@ struct spMeshAttachment {
 
 	int hullLength;
 
-	spMeshAttachment *const parentMesh;
+	spMeshAttachment *parentMesh;
 
 	/* Nonessential. */
 	int edgesCount;

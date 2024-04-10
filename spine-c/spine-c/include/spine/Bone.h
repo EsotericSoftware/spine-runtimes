@@ -32,6 +32,7 @@
 
 #include <spine/dll.h>
 #include <spine/BoneData.h>
+#include <spine/Physics.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,19 +42,21 @@ struct spSkeleton;
 
 typedef struct spBone spBone;
 struct spBone {
-	spBoneData *const data;
-	struct spSkeleton *const skeleton;
-	spBone *const parent;
+	spBoneData *data;
+	struct spSkeleton *skeleton;
+	spBone *parent;
 	int childrenCount;
-	spBone **const children;
+	spBone **children;
 	float x, y, rotation, scaleX, scaleY, shearX, shearY;
 	float ax, ay, arotation, ascaleX, ascaleY, ashearX, ashearY;
 
-	float const a, b, worldX;
-	float const c, d, worldY;
+	float a, b, worldX;
+	float c, d, worldY;
 
 	int/*bool*/ sorted;
 	int/*bool*/ active;
+
+    spInherit inherit;
 };
 
 SP_API void spBone_setYDown(int/*bool*/yDown);
@@ -86,7 +89,11 @@ SP_API void spBone_updateAppliedTransform(spBone *self);
 
 SP_API void spBone_worldToLocal(spBone *self, float worldX, float worldY, float *localX, float *localY);
 
+SP_API void spBone_worldToParent(spBone *self, float worldX, float worldY, float *parentX, float *parentY);
+
 SP_API void spBone_localToWorld(spBone *self, float localX, float localY, float *worldX, float *worldY);
+
+SP_API void spBone_localToParent(spBone *self, float localX, float localY, float *parentX, float *parentY);
 
 SP_API float spBone_worldToLocalRotation(spBone *self, float worldRotation);
 

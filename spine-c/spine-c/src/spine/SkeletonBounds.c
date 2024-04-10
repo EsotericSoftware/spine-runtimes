@@ -34,7 +34,7 @@
 spPolygon *spPolygon_create(int capacity) {
 	spPolygon *self = NEW(spPolygon);
 	self->capacity = capacity;
-	CONST_CAST(float *, self->vertices) = MALLOC(float, capacity);
+	self->vertices = MALLOC(float, capacity);
 	return self;
 }
 

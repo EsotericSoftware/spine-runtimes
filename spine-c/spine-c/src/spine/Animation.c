@@ -1679,7 +1679,7 @@ spAttachmentTimeline *spAttachmentTimeline_create(int framesCount, int slotIndex
 	ids[0] = ((spPropertyId) SP_PROPERTY_ATTACHMENT << 32) | slotIndex;
 	_spTimeline_init(SUPER(self), framesCount, 1, ids, 1, SP_TIMELINE_ATTACHMENT, _spAttachmentTimeline_dispose,
 					 _spAttachmentTimeline_apply, 0);
-	CONST_CAST(char **, self->attachmentNames) = CALLOC(char *, framesCount);
+	self->attachmentNames = CALLOC(char *, framesCount);
 	self->slotIndex = slotIndex;
 	return self;
 }
@@ -1983,8 +1983,8 @@ spDeformTimeline *spDeformTimeline_create(int framesCount, int frameVerticesCoun
 	ids[0] = ((spPropertyId) SP_PROPERTY_DEFORM << 32) | ((slotIndex << 16 | attachment->id) & 0xffffffff);
 	_spCurveTimeline_init(SUPER(self), framesCount, 1, bezierCount, ids, 1, SP_TIMELINE_DEFORM,
 						  _spDeformTimeline_dispose, _spDeformTimeline_apply, _spDeformTimeline_setBezier);
-	CONST_CAST(float **, self->frameVertices) = CALLOC(float *, framesCount);
-	CONST_CAST(int, self->frameVerticesCount) = frameVerticesCount;
+	self->frameVertices = CALLOC(float *, framesCount);
+	self->frameVerticesCount = frameVerticesCount;
 	self->slotIndex = slotIndex;
 	self->attachment = SUPER(attachment);
 	return self;
@@ -1998,7 +1998,7 @@ void spDeformTimeline_setFrame(spDeformTimeline *self, int frame, float time, fl
 		self->frameVertices[frame] = 0;
 	else {
 		self->frameVertices[frame] = MALLOC(float, self->frameVerticesCount);
-		memcpy(CONST_CAST(float *, self->frameVertices[frame]), vertices, self->frameVerticesCount * sizeof(float));
+		memcpy(self->frameVertices[frame], vertices, self->frameVerticesCount * sizeof(float));
 	}
 }
 
@@ -2171,7 +2171,7 @@ spEventTimeline *spEventTimeline_create(int framesCount) {
 	ids[0] = (spPropertyId) SP_PROPERTY_EVENT << 32;
 	_spTimeline_init(SUPER(self), framesCount, 1, ids, 1, SP_TIMELINE_EVENT, _spEventTimeline_dispose,
 					 _spEventTimeline_apply, 0);
-	CONST_CAST(spEvent **, self->events) = CALLOC(spEvent *, framesCount);
+	self->events = CALLOC(spEvent *, framesCount);
 	return self;
 }
 
@@ -2234,8 +2234,8 @@ spDrawOrderTimeline *spDrawOrderTimeline_create(int framesCount, int slotsCount)
 	_spTimeline_init(SUPER(self), framesCount, 1, ids, 1, SP_TIMELINE_DRAWORDER, _spDrawOrderTimeline_dispose,
 					 _spDrawOrderTimeline_apply, 0);
 
-	CONST_CAST(int **, self->drawOrders) = CALLOC(int *, framesCount);
-	CONST_CAST(int, self->slotsCount) = slotsCount;
+	self->drawOrders = CALLOC(int *, framesCount);
+	self->slotsCount = slotsCount;
 
 	return self;
 }
@@ -2248,7 +2248,7 @@ void spDrawOrderTimeline_setFrame(spDrawOrderTimeline *self, int frame, float ti
 		self->drawOrders[frame] = 0;
 	else {
 		self->drawOrders[frame] = MALLOC(int, self->slotsCount);
-		memcpy(CONST_CAST(int *, self->drawOrders[frame]), drawOrder, self->slotsCount * sizeof(int));
+		memcpy( self->drawOrders[frame], drawOrder, self->slotsCount * sizeof(int));
 	}
 }
 

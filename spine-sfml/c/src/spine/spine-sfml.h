@@ -52,7 +52,7 @@ namespace spine {
 		SkeletonDrawable(spSkeletonData *skeleton, spAnimationStateData *stateData = 0);
 		~SkeletonDrawable();
 
-		void update(float deltaTime);
+		void update(float deltaTime, spPhysics physics);
 
 		virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
 

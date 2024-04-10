@@ -38,8 +38,8 @@ extern "C" {
 #endif
 
 typedef struct spEvent {
-	spEventData *const data;
-	float const time;
+	spEventData *data;
+	float time;
 	int intValue;
 	float floatValue;
 	const char *stringValue;

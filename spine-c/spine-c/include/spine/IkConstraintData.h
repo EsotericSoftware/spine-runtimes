@@ -38,7 +38,7 @@ extern "C" {
 #endif
 
 typedef struct spIkConstraintData {
-	const char *const name;
+	const char *name;
 	int order;
 	int /*boolean*/ skinRequired;
 	int bonesCount;

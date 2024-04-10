@@ -41,7 +41,7 @@ extern "C" {
 struct spSkeleton;
 
 typedef struct spIkConstraint {
-	spIkConstraintData *const data;
+	spIkConstraintData *data;
 
 	int bonesCount;
 	spBone **bones;

@@ -46,6 +46,7 @@
 #include <spine/MeshAttachment.h>
 #include <spine/BoundingBoxAttachment.h>
 #include <spine/ClippingAttachment.h>
+#include <spine/Physics.h>
 #include <spine/PointAttachment.h>
 #include <spine/Skeleton.h>
 #include <spine/SkeletonBounds.h>

@@ -81,9 +81,6 @@
 /* Cast to a sub class. Not type safe, use with care. */
 #define SUB_CAST(TYPE, VALUE) ((TYPE*)VALUE)
 
-/* Casts away const. Can be used as an lvalue. Not type safe, use with care. */
-#define CONST_CAST(TYPE, VALUE) (*(TYPE*)&VALUE)
-
 /* Gets the vtable for the specified type. Not type safe, use with care. */
 #define VTABLE(TYPE, VALUE) ((_##TYPE##Vtable*)((TYPE*)VALUE)->vtable)
 
@@ -91,7 +88,7 @@
 #define FREE(VALUE) _spFree((void*)VALUE)
 
 /* Allocates a new char[], assigns it to TO, and copies FROM to it. Can be used on const types. */
-#define MALLOC_STR(TO, FROM) strcpy(CONST_CAST(char*, TO) = (char*)MALLOC(char, strlen(FROM) + 1), FROM)
+#define MALLOC_STR(TO, FROM) strcpy(TO = (char*)MALLOC(char, strlen(FROM) + 1), FROM)
 
 #define PI 3.1415926535897932385f
 #define PI2 (PI * 2)

@@ -166,7 +166,7 @@ void spMeshAttachment_updateRegion(spMeshAttachment *self) {
 }
 
 void spMeshAttachment_setParentMesh(spMeshAttachment *self, spMeshAttachment *parentMesh) {
-	CONST_CAST(spMeshAttachment *, self->parentMesh) = parentMesh;
+	self->parentMesh = parentMesh;
 	if (parentMesh) {
 		self->super.bones = parentMesh->super.bones;
 		self->super.bonesCount = parentMesh->super.bonesCount;

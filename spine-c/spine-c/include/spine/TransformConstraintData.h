@@ -38,11 +38,11 @@ extern "C" {
 #endif
 
 typedef struct spTransformConstraintData {
-	const char *const name;
+	const char *name;
 	int order;
 	int/*bool*/ skinRequired;
 	int bonesCount;
-	spBoneData **const bones;
+	spBoneData **bones;
 	spBoneData *target;
 	float mixRotate, mixX, mixY, mixScaleX, mixScaleY, mixShearY;
 	float offsetRotation, offsetX, offsetY, offsetScaleX, offsetScaleY, offsetShearY;

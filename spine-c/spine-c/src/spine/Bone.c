@@ -43,11 +43,13 @@ int spBone_isYDown(void) {
 
 spBone *spBone_create(spBoneData *data, spSkeleton *skeleton, spBone *parent) {
 	spBone *self = NEW(spBone);
-	CONST_CAST(spBoneData *, self->data) = data;
-	CONST_CAST(spSkeleton *, self->skeleton) = skeleton;
-	CONST_CAST(spBone *, self->parent) = parent;
-	CONST_CAST(float, self->a) = 1.0f;
-	CONST_CAST(float, self->d) = 1.0f;
+	self->data = data;
+	self->skeleton = skeleton;
+	self->parent = parent;
+	self->a = 1.0f;
+	self->d = 1.0f;
+    self->active = -1;
+    self->inherit = SP_INHERIT_NORMAL;
 	spBone_setToSetupPose(self);
 	return self;
 }
@@ -68,8 +70,8 @@ void spBone_updateWorldTransform(spBone *self) {
 
 void spBone_updateWorldTransformWith(spBone *self, float x, float y, float rotation, float scaleX, float scaleY,
 									 float shearX, float shearY) {
-	float cosine, sine;
-	float pa, pb, pc, pd;
+    float cosine, sine;
+    float pa, pb, pc, pd;
 	spBone *parent = self->parent;
 	float sx = self->skeleton->scaleX;
 	float sy = self->skeleton->scaleY * (spBone_isYDown() ? -1 : 1);
@@ -84,12 +86,12 @@ void spBone_updateWorldTransformWith(spBone *self, float x, float y, float rotat
 
 	if (!parent) { /* Root bone. */
 		float rotationY = rotation + 90 + shearY;
-		CONST_CAST(float, self->a) = COS_DEG(rotation + shearX) * scaleX * sx;
-		CONST_CAST(float, self->b) = COS_DEG(rotationY) * scaleY * sx;
-		CONST_CAST(float, self->c) = SIN_DEG(rotation + shearX) * scaleX * sy;
-		CONST_CAST(float, self->d) = SIN_DEG(rotationY) * scaleY * sy;
-		CONST_CAST(float, self->worldX) = x * sx + self->skeleton->x;
-		CONST_CAST(float, self->worldY) = y * sy + self->skeleton->y;
+		self->a = COS_DEG(rotation + shearX) * scaleX * sx;
+		self->b = COS_DEG(rotationY) * scaleY * sx;
+		self->c = SIN_DEG(rotation + shearX) * scaleX * sy;
+		self->d = SIN_DEG(rotationY) * scaleY * sy;
+		self->worldX = x * sx + self->skeleton->x;
+		self->worldY = y * sy + self->skeleton->y;
 		return;
 	}
 
@@ -98,31 +100,31 @@ void spBone_updateWorldTransformWith(spBone *self, float x, float y, float rotat
 	pc = parent->c;
 	pd = parent->d;
 
-	CONST_CAST(float, self->worldX) = pa * x + pb * y + parent->worldX;
-	CONST_CAST(float, self->worldY) = pc * x + pd * y + parent->worldY;
+	self->worldX = pa * x + pb * y + parent->worldX;
+	self->worldY = pc * x + pd * y + parent->worldY;
 
-	switch (self->data->transformMode) {
-		case SP_TRANSFORMMODE_NORMAL: {
+	switch (self->data->inherit) {
+		case SP_INHERIT_NORMAL: {
 			float rotationY = rotation + 90 + shearY;
 			float la = COS_DEG(rotation + shearX) * scaleX;
 			float lb = COS_DEG(rotationY) * scaleY;
 			float lc = SIN_DEG(rotation + shearX) * scaleX;
 			float ld = SIN_DEG(rotationY) * scaleY;
-			CONST_CAST(float, self->a) = pa * la + pb * lc;
-			CONST_CAST(float, self->b) = pa * lb + pb * ld;
-			CONST_CAST(float, self->c) = pc * la + pd * lc;
-			CONST_CAST(float, self->d) = pc * lb + pd * ld;
+			self->a = pa * la + pb * lc;
+			self->b = pa * lb + pb * ld;
+			self->c = pc * la + pd * lc;
+			self->d = pc * lb + pd * ld;
 			return;
 		}
-		case SP_TRANSFORMMODE_ONLYTRANSLATION: {
+		case SP_INHERIT_ONLYTRANSLATION: {
 			float rotationY = rotation + 90 + shearY;
-			CONST_CAST(float, self->a) = COS_DEG(rotation + shearX) * scaleX;
-			CONST_CAST(float, self->b) = COS_DEG(rotationY) * scaleY;
-			CONST_CAST(float, self->c) = SIN_DEG(rotation + shearX) * scaleX;
-			CONST_CAST(float, self->d) = SIN_DEG(rotationY) * scaleY;
+			self->a = COS_DEG(rotation + shearX) * scaleX;
+			self->b = COS_DEG(rotationY) * scaleY;
+			self->c = SIN_DEG(rotation + shearX) * scaleX;
+			self->d = SIN_DEG(rotationY) * scaleY;
 			break;
 		}
-		case SP_TRANSFORMMODE_NOROTATIONORREFLECTION: {
+		case SP_INHERIT_NOROTATIONORREFLECTION: {
 			float s = pa * pa + pc * pc;
 			float prx, rx, ry, la, lb, lc, ld;
 			if (s > 0.0001f) {
@@ -143,14 +145,14 @@ void spBone_updateWorldTransformWith(spBone *self, float x, float y, float rotat
 			lb = COS_DEG(ry) * scaleY;
 			lc = SIN_DEG(rx) * scaleX;
 			ld = SIN_DEG(ry) * scaleY;
-			CONST_CAST(float, self->a) = pa * la - pb * lc;
-			CONST_CAST(float, self->b) = pa * lb - pb * ld;
-			CONST_CAST(float, self->c) = pc * la + pd * lc;
-			CONST_CAST(float, self->d) = pc * lb + pd * ld;
+			self->a = pa * la - pb * lc;
+			self->b = pa * lb - pb * ld;
+			self->c = pc * la + pd * lc;
+			self->d = pc * lb + pd * ld;
 			break;
 		}
-		case SP_TRANSFORMMODE_NOSCALE:
-		case SP_TRANSFORMMODE_NOSCALEORREFLECTION: {
+		case SP_INHERIT_NOSCALE:
+		case SP_INHERIT_NOSCALEORREFLECTION: {
 			float za, zc, s;
 			float r, zb, zd, la, lb, lc, ld;
 			cosine = COS_DEG(rotation);
@@ -162,7 +164,7 @@ void spBone_updateWorldTransformWith(spBone *self, float x, float y, float rotat
 			za *= s;
 			zc *= s;
 			s = SQRT(za * za + zc * zc);
-			if (self->data->transformMode == SP_TRANSFORMMODE_NOSCALE && (pa * pd - pb * pc < 0) != (sx < 0 != sy < 0))
+			if (self->data->inherit == SP_INHERIT_NOSCALE && (pa * pd - pb * pc < 0) != (sx < 0 != sy < 0))
 				s = -s;
 			r = PI / 2 + ATAN2(zc, za);
 			zb = COS(r) * s;
@@ -171,17 +173,17 @@ void spBone_updateWorldTransformWith(spBone *self, float x, float y, float rotat
 			lb = COS_DEG(90 + shearY) * scaleY;
 			lc = SIN_DEG(shearX) * scaleX;
 			ld = SIN_DEG(90 + shearY) * scaleY;
-			CONST_CAST(float, self->a) = za * la + zb * lc;
-			CONST_CAST(float, self->b) = za * lb + zb * ld;
-			CONST_CAST(float, self->c) = zc * la + zd * lc;
-			CONST_CAST(float, self->d) = zc * lb + zd * ld;
+			self->a = za * la + zb * lc;
+			self->b = za * lb + zb * ld;
+			self->c = zc * la + zd * lc;
+			self->d = zc * lb + zd * ld;
 		}
 	}
 
-	CONST_CAST(float, self->a) *= sx;
-	CONST_CAST(float, self->b) *= sx;
-	CONST_CAST(float, self->c) *= sy;
-	CONST_CAST(float, self->d) *= sy;
+	self->a *= sx;
+	self->b *= sx;
+	self->c *= sy;
+	self->d *= sy;
 }
 
 void spBone_setToSetupPose(spBone *self) {
@@ -242,14 +244,14 @@ void spBone_updateAppliedTransform(spBone *self) {
 	self->ax = (dx * ia - dy * ib);
 	self->ay = (dy * id - dx * ic);
 
-	if (self->data->transformMode == SP_TRANSFORMMODE_ONLYTRANSLATION) {
+	if (self->data->inherit == SP_INHERIT_ONLYTRANSLATION) {
 		ra = self->a;
 		rb = self->b;
 		rc = self->c;
 		rd = self->d;
 	} else {
-		switch (self->data->transformMode) {
-			case SP_TRANSFORMMODE_NOROTATIONORREFLECTION: {
+		switch (self->data->inherit) {
+			case SP_INHERIT_NOROTATIONORREFLECTION: {
 				s = ABS(pa * pd - pb * pc) / (pa * pa + pc * pc);
 				sa = pa / self->skeleton->scaleX;
 				sc = pc / self->skeleton->scaleY;
@@ -260,8 +262,8 @@ void spBone_updateAppliedTransform(spBone *self) {
 				ib = pb * pid;
 				break;
 			}
-			case SP_TRANSFORMMODE_NOSCALE:
-			case SP_TRANSFORMMODE_NOSCALEORREFLECTION: {
+			case SP_INHERIT_NOSCALE:
+			case SP_INHERIT_NOSCALEORREFLECTION: {
 				cosine = COS_DEG(self->rotation), sine = SIN_DEG(self->rotation);
 				pa = (pa * cosine + pb * sine) / self->skeleton->scaleX;
 				pc = (pc * cosine + pd * sine) / self->skeleton->scaleY;
@@ -270,7 +272,7 @@ void spBone_updateAppliedTransform(spBone *self) {
 				pa *= s;
 				pc *= s;
 				s = SQRT(pa * pa + pc * pc);
-				if (self->data->transformMode == SP_TRANSFORMMODE_NOSCALE &&
+				if (self->data->inherit == SP_INHERIT_NOSCALE &&
 					pid < 0 != (self->skeleton->scaleX < 0 != self->skeleton->scaleY < 0))
 					s = -s;
 				r = PI / 2 + ATAN2(pc, pa);
@@ -283,8 +285,8 @@ void spBone_updateAppliedTransform(spBone *self) {
 				id = pa * pid;
 				break;
 			}
-			case SP_TRANSFORMMODE_ONLYTRANSLATION:
-			case SP_TRANSFORMMODE_NORMAL:
+			case SP_INHERIT_ONLYTRANSLATION:
+			case SP_INHERIT_NORMAL:
 				break;
 		}
 		ra = ia * self->a - ib * self->c;
@@ -340,8 +342,8 @@ float spBone_localToWorldRotation(spBone *self, float localRotation) {
 void spBone_rotateWorld(spBone *self, float degrees) {
 	float a = self->a, b = self->b, c = self->c, d = self->d;
 	float cosine = COS_DEG(degrees), sine = SIN_DEG(degrees);
-	CONST_CAST(float, self->a) = cosine * a - sine * c;
-	CONST_CAST(float, self->b) = cosine * b - sine * d;
-	CONST_CAST(float, self->c) = sine * a + cosine * c;
-	CONST_CAST(float, self->d) = sine * b + cosine * d;
+	self->a = cosine * a - sine * c;
+	self->b = cosine * b - sine * d;
+	self->c = sine * a + cosine * c;
+	self->d = sine * b + cosine * d;
 }

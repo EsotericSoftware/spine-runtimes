@@ -51,7 +51,7 @@ _SP_ARRAY_DECLARE_TYPE(spPropertyIdArray, spPropertyId)
 _SP_ARRAY_DECLARE_TYPE(spTimelineArray, spTimeline*)
 
 typedef struct spAnimation {
-	const char *const name;
+	const char *name;
 	float duration;
 
 	spTimelineArray *timelines;
@@ -375,7 +375,7 @@ spRGB2Timeline_setFrame(spRGB2Timeline *self, int frameIndex, float time, float 
 typedef struct spAttachmentTimeline {
 	spTimeline super;
 	int slotIndex;
-	const char **const attachmentNames;
+	const char **attachmentNames;
 } spAttachmentTimeline;
 
 SP_API spAttachmentTimeline *spAttachmentTimeline_create(int framesCount, int SlotIndex);
@@ -388,8 +388,8 @@ spAttachmentTimeline_setFrame(spAttachmentTimeline *self, int frameIndex, float 
 
 typedef struct spDeformTimeline {
 	spCurveTimeline super;
-	int const frameVerticesCount;
-	const float **const frameVertices;
+	int frameVerticesCount;
+	const float **frameVertices;
 	int slotIndex;
 	spAttachment *attachment;
 } spDeformTimeline;
@@ -418,7 +418,7 @@ SP_API void spSequenceTimeline_setFrame(spSequenceTimeline *self, int frameIndex
 
 typedef struct spEventTimeline {
 	spTimeline super;
-	spEvent **const events;
+	spEvent **events;
 } spEventTimeline;
 
 SP_API spEventTimeline *spEventTimeline_create(int framesCount);
@@ -429,8 +429,8 @@ SP_API void spEventTimeline_setFrame(spEventTimeline *self, int frameIndex, spEv
 
 typedef struct spDrawOrderTimeline {
 	spTimeline super;
-	const int **const drawOrders;
-	int const slotsCount;
+	const int **drawOrders;
+	int slotsCount;
 } spDrawOrderTimeline;
 
 SP_API spDrawOrderTimeline *spDrawOrderTimeline_create(int framesCount, int slotsCount);

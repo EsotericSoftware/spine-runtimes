@@ -1319,7 +1319,7 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 	input->end = binary + length;
 
 	FREE(self->error);
-	CONST_CAST(char *, self->error) = 0;
+	self->error = 0;
 	internal->linkedMeshCount = 0;
 
 	skeletonData = spSkeletonData_create();
@@ -1391,19 +1391,19 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 		mode = readVarint(input, 1);
 		switch (mode) {
 			case 0:
-				data->transformMode = SP_TRANSFORMMODE_NORMAL;
+				data->inherit = SP_INHERIT_NORMAL;
 				break;
 			case 1:
-				data->transformMode = SP_TRANSFORMMODE_ONLYTRANSLATION;
+				data->inherit = SP_INHERIT_ONLYTRANSLATION;
 				break;
 			case 2:
-				data->transformMode = SP_TRANSFORMMODE_NOROTATIONORREFLECTION;
+				data->inherit = SP_INHERIT_NOROTATIONORREFLECTION;
 				break;
 			case 3:
-				data->transformMode = SP_TRANSFORMMODE_NOSCALE;
+				data->inherit = SP_INHERIT_NOSCALE;
 				break;
 			case 4:
-				data->transformMode = SP_TRANSFORMMODE_NOSCALEORREFLECTION;
+				data->inherit = SP_INHERIT_NOSCALEORREFLECTION;
 				break;
 		}
 		data->skinRequired = readBoolean(input);
@@ -1477,7 +1477,7 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 		data->skinRequired = readBoolean(input);
 		FREE(name);
 		data->bonesCount = readVarint(input, 1);
-		CONST_CAST(spBoneData **, data->bones) = MALLOC(spBoneData *, data->bonesCount);
+		data->bones = MALLOC(spBoneData *, data->bonesCount);
 		for (ii = 0; ii < data->bonesCount; ++ii)
 			data->bones[ii] = skeletonData->bones[readVarint(input, 1)];
 		data->target = skeletonData->bones[readVarint(input, 1)];
@@ -1509,7 +1509,7 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 		data->skinRequired = readBoolean(input);
 		FREE(name);
 		data->bonesCount = readVarint(input, 1);
-		CONST_CAST(spBoneData **, data->bones) = MALLOC(spBoneData *, data->bonesCount);
+		data->bones = MALLOC(spBoneData *, data->bonesCount);
 		for (ii = 0; ii < data->bonesCount; ++ii)
 			data->bones[ii] = skeletonData->bones[readVarint(input, 1)];
 		data->target = skeletonData->slots[readVarint(input, 1)];

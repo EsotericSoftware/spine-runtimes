@@ -39,7 +39,7 @@ extern "C" {
 #endif
 
 typedef struct spPolygon {
-	float *const vertices;
+	float *vertices;
 	int count;
 	int capacity;
 } spPolygon;

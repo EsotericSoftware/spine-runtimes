@@ -58,7 +58,7 @@ spSkeleton *spSkeleton_create(spSkeletonData *data) {
 
 	_spSkeleton *internal = NEW(_spSkeleton);
 	spSkeleton *self = SUPER(internal);
-	CONST_CAST(spSkeletonData *, self->data) = data;
+	self->data = data;
 
 	self->bonesCount = self->data->bonesCount;
 	self->bones = MALLOC(spBone *, self->bonesCount);
@@ -79,7 +79,7 @@ spSkeleton *spSkeleton_create(spSkeletonData *data) {
 	for (i = 0; i < self->bonesCount; ++i) {
 		spBoneData *boneData = self->data->bones[i];
 		spBone *bone = self->bones[i];
-		CONST_CAST(spBone **, bone->children) = MALLOC(spBone *, childrenCounts[boneData->index]);
+        bone->children = MALLOC(spBone *, childrenCounts[boneData->index]);
 	}
 	for (i = 0; i < self->bonesCount; ++i) {
 		spBone *bone = self->bones[i];
@@ -87,7 +87,7 @@ spSkeleton *spSkeleton_create(spSkeletonData *data) {
 		if (parent)
 			parent->children[parent->childrenCount++] = bone;
 	}
-	CONST_CAST(spBone *, self->root) = (self->bonesCount > 0 ? self->bones[0] : NULL);
+	self->root = (self->bonesCount > 0 ? self->bones[0] : NULL);
 
 	self->slotsCount = data->slotsCount;
 	self->slots = MALLOC(spSlot *, self->slotsCount);
@@ -119,6 +119,8 @@ spSkeleton *spSkeleton_create(spSkeletonData *data) {
 
 	self->scaleX = 1;
 	self->scaleY = 1;
+
+    self->time = 0;
 
 	spSkeleton_updateCache(self);
 
@@ -399,7 +401,7 @@ continue_outer:
 		_sortBone(internal, self->bones[i]);
 }
 
-void spSkeleton_updateWorldTransform(const spSkeleton *self) {
+void spSkeleton_updateWorldTransform(const spSkeleton *self, spPhysics physics) {
 	int i, n;
 	_spSkeleton *internal = SUB_CAST(_spSkeleton, self);
 
@@ -433,6 +435,10 @@ void spSkeleton_updateWorldTransform(const spSkeleton *self) {
 	}
 }
 
+void spSkeleton_update(spSkeleton *self, float delta) {
+    self->time += delta;
+}
+
 void spSkeleton_updateWorldTransformWith(const spSkeleton *self, const spBone *parent) {
 	/* Apply the parent bone transform to the root bone. The root bone always inherits scale, rotation and reflection. */
 	int i;
@@ -440,18 +446,18 @@ void spSkeleton_updateWorldTransformWith(const spSkeleton *self, const spBone *p
 	_spSkeleton *internal = SUB_CAST(_spSkeleton, self);
 	spBone *rootBone = self->root;
 	float pa = parent->a, pb = parent->b, pc = parent->c, pd = parent->d;
-	CONST_CAST(float, rootBone->worldX) = pa * self->x + pb * self->y + parent->worldX;
-	CONST_CAST(float, rootBone->worldY) = pc * self->x + pd * self->y + parent->worldY;
+	rootBone->worldX = pa * self->x + pb * self->y + parent->worldX;
+	rootBone->worldY = pc * self->x + pd * self->y + parent->worldY;
 
 	rotationY = rootBone->rotation + 90 + rootBone->shearY;
 	la = COS_DEG(rootBone->rotation + rootBone->shearX) * rootBone->scaleX;
 	lb = COS_DEG(rotationY) * rootBone->scaleY;
 	lc = SIN_DEG(rootBone->rotation + rootBone->shearX) * rootBone->scaleX;
 	ld = SIN_DEG(rotationY) * rootBone->scaleY;
-	CONST_CAST(float, rootBone->a) = (pa * la + pb * lc) * self->scaleX;
-	CONST_CAST(float, rootBone->b) = (pa * lb + pb * ld) * self->scaleX;
-	CONST_CAST(float, rootBone->c) = (pc * la + pd * lc) * self->scaleY;
-	CONST_CAST(float, rootBone->d) = (pc * lb + pd * ld) * self->scaleY;
+	rootBone->a = (pa * la + pb * lc) * self->scaleX;
+	rootBone->b = (pa * lb + pb * ld) * self->scaleX;
+	rootBone->c = (pc * la + pd * lc) * self->scaleY;
+	rootBone->d = (pc * lb + pd * ld) * self->scaleY;
 
 	/* Update everything except root bone. */
 	for (i = 0; i < internal->updateCacheCount; ++i) {
@@ -564,7 +570,7 @@ void spSkeleton_setSkin(spSkeleton *self, spSkin *newSkin) {
 			}
 		}
 	}
-	CONST_CAST(spSkin *, self->skin) = newSkin;
+	self->skin = newSkin;
 	spSkeleton_updateCache(self);
 }
 

@@ -34,7 +34,7 @@
 spTransformConstraint *spTransformConstraint_create(spTransformConstraintData *data, const spSkeleton *skeleton) {
 	int i;
 	spTransformConstraint *self = NEW(spTransformConstraint);
-	CONST_CAST(spTransformConstraintData *, self->data) = data;
+	self->data = data;
 	self->mixRotate = data->mixRotate;
 	self->mixX = data->mixX;
 	self->mixY = data->mixY;
@@ -42,7 +42,7 @@ spTransformConstraint *spTransformConstraint_create(spTransformConstraintData *d
 	self->mixScaleY = data->mixScaleY;
 	self->mixShearY = data->mixShearY;
 	self->bonesCount = data->bonesCount;
-	CONST_CAST(spBone **, self->bones) = MALLOC(spBone *, self->bonesCount);
+	self->bones = MALLOC(spBone *, self->bonesCount);
 	for (i = 0; i < self->bonesCount; ++i)
 		self->bones[i] = spSkeleton_findBone(skeleton, self->data->bones[i]->name);
 	self->target = spSkeleton_findBone(skeleton, self->data->target->name);
@@ -77,29 +77,29 @@ void _spTransformConstraint_applyAbsoluteWorld(spTransformConstraint *self) {
 			r *= mixRotate;
 			cosine = COS(r);
 			sine = SIN(r);
-			CONST_CAST(float, bone->a) = cosine * a - sine * c;
-			CONST_CAST(float, bone->b) = cosine * b - sine * d;
-			CONST_CAST(float, bone->c) = sine * a + cosine * c;
-			CONST_CAST(float, bone->d) = sine * b + cosine * d;
+			bone->a = cosine * a - sine * c;
+			bone->b = cosine * b - sine * d;
+			bone->c = sine * a + cosine * c;
+			bone->d = sine * b + cosine * d;
 		}
 
 		if (translate) {
 			spBone_localToWorld(target, self->data->offsetX, self->data->offsetY, &x, &y);
-			CONST_CAST(float, bone->worldX) += (x - bone->worldX) * mixX;
-			CONST_CAST(float, bone->worldY) += (y - bone->worldY) * mixY;
+			bone->worldX += (x - bone->worldX) * mixX;
+			bone->worldY += (y - bone->worldY) * mixY;
 		}
 
 		if (mixScaleX > 0) {
 			s = SQRT(bone->a * bone->a + bone->c * bone->c);
 			if (s != 0) s = (s + (SQRT(ta * ta + tc * tc) - s + self->data->offsetScaleX) * mixScaleX) / s;
-			CONST_CAST(float, bone->a) *= s;
-			CONST_CAST(float, bone->c) *= s;
+			bone->a *= s;
+			bone->c *= s;
 		}
 		if (mixScaleY != 0) {
 			s = SQRT(bone->b * bone->b + bone->d * bone->d);
 			if (s != 0) s = (s + (SQRT(tb * tb + td * td) - s + self->data->offsetScaleY) * mixScaleY) / s;
-			CONST_CAST(float, bone->b) *= s;
-			CONST_CAST(float, bone->d) *= s;
+			bone->b *= s;
+			bone->d *= s;
 		}
 
 		if (mixShearY > 0) {
@@ -111,8 +111,8 @@ void _spTransformConstraint_applyAbsoluteWorld(spTransformConstraint *self) {
 			else if (r < -PI)
 				r += PI2;
 			r = by + (r + offsetShearY) * mixShearY;
-			CONST_CAST(float, bone->b) = COS(r) * s;
-			CONST_CAST(float, bone->d) = SIN(r) * s;
+			bone->b = COS(r) * s;
+			bone->d = SIN(r) * s;
 		}
 		spBone_updateAppliedTransform(bone);
 	}
@@ -141,27 +141,27 @@ void _spTransformConstraint_applyRelativeWorld(spTransformConstraint *self) {
 			r *= mixRotate;
 			cosine = COS(r);
 			sine = SIN(r);
-			CONST_CAST(float, bone->a) = cosine * a - sine * c;
-			CONST_CAST(float, bone->b) = cosine * b - sine * d;
-			CONST_CAST(float, bone->c) = sine * a + cosine * c;
-			CONST_CAST(float, bone->d) = sine * b + cosine * d;
+			bone->a = cosine * a - sine * c;
+			bone->b = cosine * b - sine * d;
+			bone->c = sine * a + cosine * c;
+			bone->d = sine * b + cosine * d;
 		}
 
 		if (translate != 0) {
 			spBone_localToWorld(target, self->data->offsetX, self->data->offsetY, &x, &y);
-			CONST_CAST(float, bone->worldX) += (x * mixX);
-			CONST_CAST(float, bone->worldY) += (y * mixY);
+			bone->worldX += (x * mixX);
+			bone->worldY += (y * mixY);
 		}
 
 		if (mixScaleX != 0) {
 			s = (SQRT(ta * ta + tc * tc) - 1 + self->data->offsetScaleX) * mixScaleX + 1;
-			CONST_CAST(float, bone->a) *= s;
-			CONST_CAST(float, bone->c) *= s;
+			bone->a *= s;
+			bone->c *= s;
 		}
 		if (mixScaleY > 0) {
 			s = (SQRT(tb * tb + td * td) - 1 + self->data->offsetScaleY) * mixScaleY + 1;
-			CONST_CAST(float, bone->b) *= s;
-			CONST_CAST(float, bone->d) *= s;
+			bone->b *= s;
+			bone->d *= s;
 		}
 
 		if (mixShearY > 0) {
@@ -172,8 +172,8 @@ void _spTransformConstraint_applyRelativeWorld(spTransformConstraint *self) {
 			b = bone->b, d = bone->d;
 			r = ATAN2(d, b) + (r - PI / 2 + offsetShearY) * mixShearY;
 			s = SQRT(b * b + d * d);
-			CONST_CAST(float, bone->b) = COS(r) * s;
-			CONST_CAST(float, bone->d) = SIN(r) * s;
+			bone->b = COS(r) * s;
+			bone->d = SIN(r) * s;
 		}
 
 		spBone_updateAppliedTransform(bone);

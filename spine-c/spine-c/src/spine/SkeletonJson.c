@@ -971,7 +971,7 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 	_spSkeletonJson *internal = SUB_CAST(_spSkeletonJson, self);
 
 	FREE(self->error);
-	CONST_CAST(char *, self->error) = 0;
+	self->error = 0;
 	internal->linkedMeshCount = 0;
 
 	root = Json_create(json);
@@ -1040,16 +1040,16 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 		data->shearX = Json_getFloat(boneMap, "shearX", 0);
 		data->shearY = Json_getFloat(boneMap, "shearY", 0);
 		transformMode = Json_getString(boneMap, "transform", "normal");
-		data->transformMode = SP_TRANSFORMMODE_NORMAL;
-		if (strcmp(transformMode, "normal") == 0) data->transformMode = SP_TRANSFORMMODE_NORMAL;
+		data->inherit = SP_INHERIT_NORMAL;
+		if (strcmp(transformMode, "normal") == 0) data->inherit = SP_INHERIT_NORMAL;
 		else if (strcmp(transformMode, "onlyTranslation") == 0)
-			data->transformMode = SP_TRANSFORMMODE_ONLYTRANSLATION;
+			data->inherit = SP_INHERIT_ONLYTRANSLATION;
 		else if (strcmp(transformMode, "noRotationOrReflection") == 0)
-			data->transformMode = SP_TRANSFORMMODE_NOROTATIONORREFLECTION;
+			data->inherit = SP_INHERIT_NOROTATIONORREFLECTION;
 		else if (strcmp(transformMode, "noScale") == 0)
-			data->transformMode = SP_TRANSFORMMODE_NOSCALE;
+			data->inherit = SP_INHERIT_NOSCALE;
 		else if (strcmp(transformMode, "noScaleOrReflection") == 0)
-			data->transformMode = SP_TRANSFORMMODE_NOSCALEORREFLECTION;
+			data->inherit = SP_INHERIT_NOSCALEORREFLECTION;
 		data->skinRequired = Json_getInt(boneMap, "skin", 0) ? 1 : 0;
 
 		color = Json_getString(boneMap, "color", 0);
@@ -1177,7 +1177,7 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 
 			boneMap = Json_getItem(constraintMap, "bones");
 			data->bonesCount = boneMap->size;
-			CONST_CAST(spBoneData **, data->bones) = MALLOC(spBoneData *, boneMap->size);
+			data->bones = MALLOC(spBoneData *, boneMap->size);
 			for (boneMap = boneMap->child, ii = 0; boneMap; boneMap = boneMap->next, ++ii) {
 				data->bones[ii] = spSkeletonData_findBone(skeletonData, boneMap->valueString);
 				if (!data->bones[ii]) {
@@ -1231,7 +1231,7 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 
 			boneMap = Json_getItem(constraintMap, "bones");
 			data->bonesCount = boneMap->size;
-			CONST_CAST(spBoneData **, data->bones) = MALLOC(spBoneData *, boneMap->size);
+			data->bones = MALLOC(spBoneData *, boneMap->size);
 			for (boneMap = boneMap->child, ii = 0; boneMap; boneMap = boneMap->next, ++ii) {
 				data->bones[ii] = spSkeletonData_findBone(skeletonData, boneMap->valueString);
 				if (!data->bones[ii]) {

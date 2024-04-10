@@ -71,7 +71,7 @@ void _FromEntry_dispose(_FromEntry *self) {
 
 spAnimationStateData *spAnimationStateData_create(spSkeletonData *skeletonData) {
 	spAnimationStateData *self = NEW(spAnimationStateData);
-	CONST_CAST(spSkeletonData *, self->skeletonData) = skeletonData;
+	self->skeletonData = skeletonData;
 	return self;
 }
 
@@ -128,7 +128,7 @@ void spAnimationStateData_setMix(spAnimationStateData *self, spAnimation *from, 
 	if (!fromEntry) {
 		fromEntry = _FromEntry_create(from);
 		fromEntry->next = (_FromEntry *) self->entries;
-		CONST_CAST(_FromEntry *, self->entries) = fromEntry;
+		self->entries = fromEntry;
 	}
 	toEntry = _ToEntry_create(to, duration);
 	toEntry->next = fromEntry->toEntries;

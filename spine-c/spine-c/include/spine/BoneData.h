@@ -38,23 +38,25 @@ extern "C" {
 #endif
 
 typedef enum {
-	SP_TRANSFORMMODE_NORMAL,
-	SP_TRANSFORMMODE_ONLYTRANSLATION,
-	SP_TRANSFORMMODE_NOROTATIONORREFLECTION,
-	SP_TRANSFORMMODE_NOSCALE,
-	SP_TRANSFORMMODE_NOSCALEORREFLECTION
-} spTransformMode;
+	SP_INHERIT_NORMAL,
+	SP_INHERIT_ONLYTRANSLATION,
+	SP_INHERIT_NOROTATIONORREFLECTION,
+	SP_INHERIT_NOSCALE,
+	SP_INHERIT_NOSCALEORREFLECTION
+} spInherit;
 
 typedef struct spBoneData spBoneData;
 struct spBoneData {
-	const int index;
-	const char *const name;
-	spBoneData *const parent;
+	int index;
+	const char *name;
+	spBoneData *parent;
 	float length;
 	float x, y, rotation, scaleX, scaleY, shearX, shearY;
-	spTransformMode transformMode;
+	spInherit inherit;
 	int/*bool*/ skinRequired;
 	spColor color;
+    const char *icon;
+    int/*bool*/ visible;
 };
 
 SP_API spBoneData *spBoneData_create(int index, const char *name, spBoneData *parent);

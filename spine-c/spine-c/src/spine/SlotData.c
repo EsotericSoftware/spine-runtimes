@@ -32,9 +32,9 @@
 
 spSlotData *spSlotData_create(const int index, const char *name, spBoneData *boneData) {
 	spSlotData *self = NEW(spSlotData);
-	CONST_CAST(int, self->index) = index;
+	self->index = index;
 	MALLOC_STR(self->name, name);
-	CONST_CAST(spBoneData *, self->boneData) = boneData;
+	self->boneData = boneData;
 	spColor_setFromFloats(&self->color, 1, 1, 1, 1);
 	return self;
 }
@@ -51,5 +51,5 @@ void spSlotData_setAttachmentName(spSlotData *self, const char *attachmentName) 
 	if (attachmentName)
 		MALLOC_STR(self->attachmentName, attachmentName);
 	else
-		CONST_CAST(char *, self->attachmentName) = 0;
+		self->attachmentName = 0;
 }

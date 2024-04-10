@@ -49,9 +49,9 @@ typedef enum {
 } spAttachmentType;
 
 typedef struct spAttachment {
-	const char *const name;
-	const spAttachmentType type;
-	const void *const vtable;
+	const char *name;
+	spAttachmentType type;
+	const void *vtable;
 	int refCount;
 	struct spAttachmentLoader *attachmentLoader;
 } spAttachment;

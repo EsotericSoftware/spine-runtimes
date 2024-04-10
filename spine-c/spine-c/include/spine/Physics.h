@@ -27,24 +27,22 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include <spine/BoneData.h>
-#include <spine/extension.h>
+#ifndef SPINE_PHYSICS_H_
+#define SPINE_PHYSICS_H_
 
-spBoneData *spBoneData_create(int index, const char *name, spBoneData *parent) {
-	spBoneData *self = NEW(spBoneData);
-	self->index = index;
-	MALLOC_STR(self->name, name);
-	self->parent = parent;
-	self->scaleX = 1;
-	self->scaleY = 1;
-	self->inherit = SP_INHERIT_NORMAL;
-    self->icon = NULL;
-    self->visible = -1;
-    return self;
-}
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-void spBoneData_dispose(spBoneData *self) {
-	FREE(self->name);
-    FREE(self->icon);
-	FREE(self);
+typedef enum {
+    SP_PHYSICS_NONE,
+    SP_PHYSICS_RESET,
+    SP_PHYSICS_UPDATE,
+    SP_PHYSICS_POSE
+} spPhysics;
+
+#ifdef __cplusplus
 }
+#endif
+
+#endif

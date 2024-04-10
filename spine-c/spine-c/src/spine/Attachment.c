@@ -40,12 +40,12 @@ typedef struct _spAttachmentVtable {
 void _spAttachment_init(spAttachment *self, const char *name, spAttachmentType type, /**/
 						void (*dispose)(spAttachment *self), spAttachment *(*copy)(spAttachment *self)) {
 
-	CONST_CAST(_spAttachmentVtable *, self->vtable) = NEW(_spAttachmentVtable);
+	self->vtable = NEW(_spAttachmentVtable);
 	VTABLE(spAttachment, self)->dispose = dispose;
 	VTABLE(spAttachment, self)->copy = copy;
 
 	MALLOC_STR(self->name, name);
-	CONST_CAST(spAttachmentType, self->type) = type;
+	self->type = type;
 }
 
 void _spAttachment_deinit(spAttachment *self) {

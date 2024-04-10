@@ -40,8 +40,8 @@ extern "C" {
 #endif
 
 typedef struct spSlot {
-	spSlotData *const data;
-	spBone *const bone;
+	spSlotData *data;
+	spBone *bone;
 	spColor color;
 	spColor *darkColor;
 	spAttachment *attachment;

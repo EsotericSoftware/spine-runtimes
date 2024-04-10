@@ -83,7 +83,7 @@ struct spTrackEntry {
 };
 
 struct spAnimationState {
-	spAnimationStateData *const data;
+	spAnimationStateData *data;
 
 	int tracksCount;
 	spTrackEntry **tracks;
