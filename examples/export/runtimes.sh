@@ -303,6 +303,17 @@ cp -f ../mix-and-match/export/mix-and-match-pro.skel "$ROOT/spine-sfml/c/data/"
 cp -f ../mix-and-match/export/mix-and-match-pma.atlas "$ROOT/spine-sfml/c/data/"
 cp -f ../mix-and-match/export/mix-and-match-pma.png "$ROOT/spine-sfml/c/data/"
 
+cp -f ../sack/export/sack-pro.json "$ROOT/spine-sfml/c/data/"
+cp -f ../sack/export/sack-pro.skel "$ROOT/spine-sfml/c/data/"
+cp -f ../sack/export/sack-pma.atlas "$ROOT/spine-sfml/c/data/"
+cp -f ../sack/export/sack-pma.png "$ROOT/spine-sfml/c/data/"
+
+cp -f ../celestial-circus/export/* "$ROOT/spine-sfml/c/data/"
+
+cp -f ../snowglobe/export/* "$ROOT/spine-sfml/c/data/"
+
+cp -f ../cloud-pot/export/* "$ROOT/spine-sfml/c/data/"
+
 echo "spine-sfml-cpp"
 rm "$ROOT/spine-sfml/cpp/data/"*
 cp -f ../coin/export/coin-pro.json "$ROOT/spine-sfml/cpp/data/"
