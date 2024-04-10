@@ -1164,7 +1164,7 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 				timelines.add(readTimeline(timelineMap->_child, timeline, 0, 1));
 			} else if (strcmp(timelineMap->_name, "inherit") == 0) {
 				InheritTimeline *timeline = new (__FILE__, __LINE__) InheritTimeline(frames, boneIndex);
-                keyMap = timelineMap->_child;
+				keyMap = timelineMap->_child;
 				for (frame = 0;; frame++) {
 					float time = Json::getFloat(keyMap, "time", 0);
 					const char *value = Json::getString(keyMap, "value", "normal");

@@ -45,7 +45,7 @@ public:
 
 private:
 	spine::SkeletonAnimation *skeletonNode;
-    bool firstUpdate = true;
+	bool firstUpdate = true;
 	cocos2d::Vec2 lastMousePosition;
 };
 

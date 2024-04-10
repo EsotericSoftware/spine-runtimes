@@ -53,21 +53,21 @@ bool PhysicsExample::init() {
 
 	// Next we setup a listener that receives and stores
 	// the current mouse location and updates the skeleton position
-    // accordingly.
+	// accordingly.
 	EventListenerMouse *mouseListener = EventListenerMouse::create();
 	mouseListener->onMouseMove = [this](cocos2d::Event *event) -> void {
 		// convert the mosue location to the skeleton's coordinate space
 		// and store it.
 		EventMouse *mouseEvent = dynamic_cast<EventMouse *>(event);
 		Vec2 mousePosition = skeletonNode->convertToNodeSpace(mouseEvent->getLocationInView());
-        if (firstUpdate) {
-            firstUpdate = false;
-            lastMousePosition = mousePosition;
-            return;
-        }
-        Vec2 delta = mousePosition - lastMousePosition;
-        skeletonNode->getSkeleton()->physicsTranslate(-delta.x, -delta.y);
-        lastMousePosition = mousePosition;
+		if (firstUpdate) {
+			firstUpdate = false;
+			lastMousePosition = mousePosition;
+			return;
+		}
+		Vec2 delta = mousePosition - lastMousePosition;
+		skeletonNode->getSkeleton()->physicsTranslate(-delta.x, -delta.y);
+		lastMousePosition = mousePosition;
 	};
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(mouseListener, this);
 

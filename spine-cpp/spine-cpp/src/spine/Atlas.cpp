@@ -192,7 +192,7 @@ struct AtlasInput {
 		line.end = index;
 		if (index != end) index++;
 		line = line.trim();
-		line.length = (int)(end - start);
+		line.length = (int) (end - start);
 		return &line;
 	}
 
