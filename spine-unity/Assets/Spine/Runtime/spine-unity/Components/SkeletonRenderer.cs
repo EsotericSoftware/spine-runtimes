@@ -822,7 +822,12 @@ namespace Spine.Unity {
 			Material[] originalMaterials = maskMaterials.materialsMaskDisabled;
 			materialsToFill = new Material[originalMaterials.Length];
 			for (int i = 0; i < originalMaterials.Length; i++) {
-				Material newMaterial = new Material(originalMaterials[i]);
+				Material originalMaterial = originalMaterials[i];
+				if (originalMaterial == null) {
+					materialsToFill[i] = null;
+					continue;
+				}
+				Material newMaterial = new Material(originalMaterial);
 				newMaterial.SetFloat(STENCIL_COMP_PARAM_ID, (int)maskFunction);
 				materialsToFill[i] = newMaterial;
 			}

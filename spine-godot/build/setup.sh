@@ -8,7 +8,7 @@ if [ $# -lt 2 ] || [ $# -gt 4 ]; then
 	echo "Usage: ./setup.sh <Godot branch or tag> <dev:true|false> <mono:true|false>? <godot-repository>?"
 	echo
 	echo "e.g.:"
-	echo "       ./setup.sh 4.1.3-stable true"
+	echo "       ./setup.sh 4.2.1-stable true"
 	echo "       ./setup.sh master false true"
 	echo "       ./setup.sh master false false https://github.com/my-github-username/godot.git"
 	echo
