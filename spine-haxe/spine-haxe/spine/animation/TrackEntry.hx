@@ -49,8 +49,9 @@ class TrackEntry implements Poolable {
 	public var reverse:Bool = false;
 	public var holdPrevious:Bool = false;
 	public var eventThreshold:Float = 0;
-	public var attachmentThreshold:Float = 0;
-	public var drawOrderThreshold:Float = 0;
+	public var mixAttachmentThreshold:Float = 0;
+	public var alphaAttachmentThreshold:Float = 0;
+	public var mixDrawOrderThreshold:Float = 0;
 	public var animationStart:Float = 0;
 	public var animationEnd:Float = 0;
 	public var animationLast:Float = 0;
@@ -63,7 +64,7 @@ class TrackEntry implements Poolable {
 	public var timeScale:Float = 0;
 	public var alpha:Float = 0;
 	public var mixTime:Float = 0;
-	public var mixDuration:Float = 0;
+	@:isVar public var mixDuration(get, set):Float = 0;
 	public var interruptAlpha:Float = 0;
 	public var totalAlpha:Float = 0;
 	public var mixBlend:MixBlend = MixBlend.replace;
@@ -71,6 +72,16 @@ class TrackEntry implements Poolable {
 	public var timelineHoldMix:Array<TrackEntry> = new Array<TrackEntry>();
 	public var timelinesRotation:Array<Float> = new Array<Float>();
 	public var shortestRotation = false;
+
+	function get_mixDuration():Float {
+		return mixDuration;
+	}
+
+	function set_mixDuration(mixDuration:Float):Float {
+		this.mixDuration = mixDuration;
+		if (previous != null && delay <= 0) delay += previous.getTrackComplete() - mixDuration;
+		return mixDuration;
+	}
 
 	public function new() {}
 
@@ -96,6 +107,13 @@ class TrackEntry implements Poolable {
 				return duration; // Before duration.
 		}
 		return trackTime; // Next update.
+	}
+
+	/** Returns true if this track entry has been applied at least once.
+	 * <p>
+	 * See {@link AnimationState#apply(Skeleton)}. */
+	 public function wasApplied () {
+		return nextTrackLast != -1;
 	}
 
 	public function reset():Void {

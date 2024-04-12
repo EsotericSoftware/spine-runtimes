@@ -177,8 +177,7 @@ class DeformTimeline extends CurveTimeline implements SlotTimeline {
 
 		ArrayUtils.resize(deform, vertexCount, 0);
 		var setup:Float;
-		if (time >= frames[frames.length - 1]) // Time is after last frame.
-		{
+		if (time >= frames[frames.length - 1]) {
 			var lastVertices:Array<Float> = vertices[frames.length - 1];
 			if (alpha == 1) {
 				if (blend == MixBlend.add) {

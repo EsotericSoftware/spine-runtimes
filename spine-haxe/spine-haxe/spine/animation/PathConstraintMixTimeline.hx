@@ -39,12 +39,12 @@ class PathConstraintMixTimeline extends CurveTimeline {
 	private static inline var X:Int = 2;
 	private static inline var Y:Int = 3;
 
-	/** The index of the path constraint slot in {@link Skeleton#getPathConstraints()} that will be changed. */
-	public var pathConstraintIndex:Int = 0;
+	/** The index of the path constraint in {@link Skeleton#getPathConstraints()} when this timeline is applied. */
+	public var constraintIndex:Int = 0;
 
 	public function new(frameCount:Int, bezierCount:Int, pathConstraintIndex:Int) {
 		super(frameCount, bezierCount, [Property.pathConstraintMix + "|" + pathConstraintIndex]);
-		this.pathConstraintIndex = pathConstraintIndex;
+		this.constraintIndex = pathConstraintIndex;
 	}
 
 	public override function getFrameEntries():Int {
@@ -61,7 +61,7 @@ class PathConstraintMixTimeline extends CurveTimeline {
 
 	public override function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, blend:MixBlend,
 			direction:MixDirection):Void {
-		var constraint:PathConstraint = skeleton.pathConstraints[pathConstraintIndex];
+		var constraint:PathConstraint = skeleton.pathConstraints[constraintIndex];
 		if (!constraint.active)
 			return;
 

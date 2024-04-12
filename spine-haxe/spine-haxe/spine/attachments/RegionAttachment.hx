@@ -83,7 +83,7 @@ class RegionAttachment extends Attachment implements HasTextureRegion {
 		var localY = -height / 2 * scaleY + region.offsetY * regionScaleY;
 		var localX2 = localX + region.width * regionScaleX;
 		var localY2 = localY + region.height * regionScaleY;
-		var radians = rotation * Math.PI / 180;
+		var radians = rotation * MathUtils.degRad;
 		var cos = Math.cos(radians);
 		var sin = Math.sin(radians);
 		var x = this.x, y = this.y;

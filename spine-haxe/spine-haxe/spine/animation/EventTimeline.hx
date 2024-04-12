@@ -60,7 +60,7 @@ class EventTimeline extends Timeline {
 
 		var frameCount:Int = frames.length;
 
-		if (lastTime > time) // Fire events after last time for looped animations.
+		if (lastTime > time) // Apply events after lastTime for looped animations.
 		{
 			apply(skeleton, lastTime, 2147483647, events, alpha, blend, direction);
 			lastTime = -1;
@@ -69,10 +69,7 @@ class EventTimeline extends Timeline {
 			return;
 		}
 
-		if (time < frames[0]) // Time is before first frame.
-		{
-			return;
-		}
+		if (time < frames[0]) return;
 
 		var frame:Int;
 		var i:Int = 0;

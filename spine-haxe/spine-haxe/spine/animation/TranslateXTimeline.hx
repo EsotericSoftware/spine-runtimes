@@ -48,27 +48,6 @@ class TranslateXTimeline extends CurveTimeline1 implements BoneTimeline {
 	public override function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, blend:MixBlend,
 			direction:MixDirection):Void {
 		var bone:Bone = skeleton.bones[boneIndex];
-		if (!bone.active)
-			return;
-
-		if (time < frames[0]) {
-			switch (blend) {
-				case MixBlend.setup:
-					bone.x = bone.data.x;
-				case MixBlend.first:
-					bone.x += (bone.data.x - bone.x) * alpha;
-			}
-			return;
-		}
-
-		var x:Float = getCurveValue(time);
-		switch (blend) {
-			case MixBlend.setup:
-				bone.x = bone.data.x + x * alpha;
-			case MixBlend.first, MixBlend.replace:
-				bone.x += (bone.data.x + x - bone.x) * alpha;
-			case MixBlend.add:
-				bone.x += x * alpha;
-		}
+		if (bone.active) bone.x = getRelativeValue(time, alpha, blend, bone.x, bone.data.x);
 	}
 }

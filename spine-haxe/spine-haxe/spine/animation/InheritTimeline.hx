@@ -27,48 +27,47 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-package spine;
+package spine.animation;
 
-class MathUtils {
-	static public var PI:Float = Math.PI;
-	static public var PI2:Float = Math.PI * 2;
-	static public var invPI2 = 1 / MathUtils.PI2;
-	static public var radDeg:Float = 180 / Math.PI;
-	static public var degRad:Float = Math.PI / 180;
+import spine.Bone;
+import spine.Event;
+import spine.Skeleton;
 
-	static public function cosDeg(degrees:Float):Float {
-		return Math.cos(degrees * degRad);
+class InheritTimeline extends Timeline implements BoneTimeline {
+	public static inline var ENTRIES:Int = 2;
+	private static inline var INHERIT:Int = 1;
+
+	private var boneIndex:Int = 0;
+
+	public function new(frameCount:Int, boneIndex:Int) {
+		super(frameCount, [Property.inherit + "|" + boneIndex]);
+		this.boneIndex = boneIndex;
 	}
 
-	static public function sinDeg(degrees:Float):Float {
-		return Math.sin(degrees * degRad);
+	public override function getFrameEntries():Int {
+		return ENTRIES;
 	}
 
-	static public function atan2Deg (y:Float, x:Float):Float {
-		return Math.atan2(y, x) * MathUtils.degRad;
+	public function getBoneIndex():Int {
+		return boneIndex;
 	}
 
-	static public function clamp(value:Float, min:Float, max:Float):Float {
-		if (value < min)
-			return min;
-		if (value > max)
-			return max;
-		return value;
+	public function setFrame(frame:Int, time:Float, inherit: Inherit):Void {
+		frame *= ENTRIES;
+		frames[frame] = time;
+		frames[frame + INHERIT] = inherit.ordinal;
 	}
 
-	static public function signum(value:Float):Float {
-		return value > 0 ? 1 : value < 0 ? -1 : 0;
-	}
+	override public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, blend:MixBlend,
+			direction:MixDirection):Void {
+		var bone:Bone = skeleton.bones[boneIndex];
+		if (!bone.active) return;
 
-	static public function randomTriangular(min:Float, max:Float):Float {
-		return randomTriangularWith(min, max, (min + max) * 0.5);
-	}
-
-	static public function randomTriangularWith(min:Float, max:Float, mode:Float):Float {
-		var u:Float = Math.random();
-		var d:Float = max - min;
-		if (u <= (mode - min) / d)
-			return min + Math.sqrt(u * d * (mode - min));
-		return max - Math.sqrt((1 - u) * d * (max - mode));
+		var frames:Array<Float> = frames;
+		if (time < frames[0]) {
+			if (blend == MixBlend.setup || blend == MixBlend.first) bone.inherit = bone.data.inherit;
+			return;
+		}
+		bone.inherit = Inherit.values[Std.int(frames[Timeline.search(frames, time, ENTRIES) + INHERIT])];
 	}
 }

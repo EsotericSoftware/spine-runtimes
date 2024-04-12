@@ -127,6 +127,7 @@ class SkeletonBinary {
 		skeletonData.y = input.readFloat();
 		skeletonData.width = input.readFloat();
 		skeletonData.height = input.readFloat();
+		skeletonData.referenceScale = input.readFloat() * scale;
 
 		var nonessential:Bool = input.readBoolean();
 		if (nonessential) {
@@ -158,7 +159,7 @@ class SkeletonBinary {
 			boneData.shearX = input.readFloat();
 			boneData.shearY = input.readFloat();
 			boneData.length = input.readFloat() * scale;
-			boneData.transformMode = TransformMode.values[input.readInt(true)];
+			boneData.inherit = Inherit.values[input.readInt(true)];
 			boneData.skinRequired = input.readBoolean();
 			if (nonessential)
 				boneData.color.setFromRgba8888(input.readInt32());

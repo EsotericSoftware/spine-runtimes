@@ -31,6 +31,7 @@ package spine.attachments;
 
 import spine.Color;
 import spine.atlas.TextureAtlasRegion;
+import spine.atlas.TextureAtlasPage;
 
 class MeshAttachment extends VertexAttachment implements HasTextureRegion {
 	public var region:TextureRegion;
@@ -66,9 +67,8 @@ class MeshAttachment extends VertexAttachment implements HasTextureRegion {
 		var n = uvs.length;
 		var u = region.u, v = region.v, width:Float = 0, height:Float = 0;
 		if (Std.isOfType(region, TextureAtlasRegion)) {
-			var atlasRegion:TextureAtlasRegion = cast(region, TextureAtlasRegion);
-			var textureWidth = atlasRegion.page.width,
-				textureHeight = atlasRegion.page.height;
+			var atlasRegion:TextureAtlasRegion = cast(region, TextureAtlasRegion), page:TextureAtlasPage = atlasRegion.page;
+			var textureWidth = page.width, textureHeight = page.height;
 			switch (atlasRegion.degrees) {
 				case 90:
 					u -= (region.originalHeight - region.offsetY - region.height) / textureWidth;

@@ -41,12 +41,12 @@ class IkConstraintTimeline extends CurveTimeline {
 	private static inline var COMPRESS:Int = 4;
 	private static inline var STRETCH:Int = 5;
 
-	/** The index of the IK constraint slot in {@link Skeleton#ikConstraints} that will be changed. */
-	public var ikConstraintIndex:Int = 0;
+	/** The index of the IK constraint in {@link Skeleton#ikConstraints} when this timeline is applied. */
+	public var constraintIndex:Int = 0;
 
 	public function new(frameCount:Int, bezierCount:Int, ikConstraintIndex:Int) {
 		super(frameCount, bezierCount, [Property.ikConstraint + "|" + ikConstraintIndex]);
-		this.ikConstraintIndex = ikConstraintIndex;
+		this.constraintIndex = ikConstraintIndex;
 	}
 
 	public override function getFrameEntries():Int {
@@ -66,7 +66,7 @@ class IkConstraintTimeline extends CurveTimeline {
 
 	public override function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, blend:MixBlend,
 			direction:MixDirection):Void {
-		var constraint:IkConstraint = skeleton.ikConstraints[ikConstraintIndex];
+		var constraint:IkConstraint = skeleton.ikConstraints[constraintIndex];
 		if (!constraint.active)
 			return;
 

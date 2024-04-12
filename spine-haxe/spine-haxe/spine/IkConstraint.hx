@@ -64,7 +64,16 @@ class IkConstraint implements Updatable {
 		return active;
 	}
 
-	public function update():Void {
+	public function setToSetupPose () {
+		var data:IkConstraintData = _data;
+		mix = data.mix;
+		softness = data.softness;
+		bendDirection = data.bendDirection;
+		compress = data.compress;
+		stretch = data.stretch;
+	}
+
+	public function update(physics:Physics):Void {
 		if (mix == 0)
 			return;
 		switch (bones.length) {
@@ -93,11 +102,11 @@ class IkConstraint implements Updatable {
 		var rotationIK:Float = -bone.ashearX - bone.arotation,
 			tx:Float = 0,
 			ty:Float = 0;
-		switch (bone.data.transformMode) {
-			case TransformMode.onlyTranslation:
+		switch (bone.inherit) {
+			case Inherit.onlyTranslation:
 				tx = (targetX - bone.worldX) * MathUtils.signum(bone.skeleton.scaleX);
 				ty = (targetY - bone.worldY) * MathUtils.signum(bone.skeleton.scaleY);
-			case TransformMode.noRotationOrReflection:
+			case Inherit.noRotationOrReflection:
 				var s = Math.abs(pa * pd - pb * pc) / Math.max(0.0001, pa * pa + pc * pc);
 				var sa:Float = pa / bone.skeleton.scaleX;
 				var sc:Float = pc / bone.skeleton.scaleY;
@@ -108,6 +117,7 @@ class IkConstraint implements Updatable {
 				var d:Float = pa * pd - pb * pc;
 				tx = (x * pd - y * pb) / d - bone.ax;
 				ty = (y * pa - x * pc) / d - bone.ay;
+				// TODO: this should fall-through!
 			default:
 				var x:Float = targetX - p.worldX, y:Float = targetY - p.worldY;
 				var d:Float = pa * pd - pb * pc;
@@ -130,18 +140,19 @@ class IkConstraint implements Updatable {
 		var sx:Float = bone.ascaleX;
 		var sy:Float = bone.ascaleY;
 		if (compress || stretch) {
-			switch (bone.data.transformMode) {
-				case TransformMode.noScale, TransformMode.noScaleOrReflection:
+			switch (bone.inherit) {
+				case Inherit.noScale, Inherit.noScaleOrReflection:
 					tx = targetX - bone.worldX;
 					ty = targetY - bone.worldY;
 			}
-			var b:Float = bone.data.length * sx,
-				dd:Float = Math.sqrt(tx * tx + ty * ty);
-			if ((compress && dd < b) || (stretch && dd > b) && b > 0.0001) {
-				var ss:Float = (dd / b - 1) * alpha + 1;
-				sx *= ss;
-				if (uniform)
-					sy *= ss;
+			var b:Float = bone.data.length * sx;
+			if (b > 0.0001) {
+				var	dd:Float = tx * tx + ty * ty;
+				if ((compress && dd < b * b) || (stretch && dd > b * b)) {
+					var s:Float = (Math.sqrt(dd) / b - 1) * alpha + 1;
+					sx *= s;
+					if (uniform) sy *= s;
+				}
 			}
 		}
 		bone.updateWorldTransformWith(bone.ax, bone.ay, bone.arotation + rotationIK * alpha, sx, sy, bone.ashearX, bone.ashearY);
@@ -152,6 +163,7 @@ class IkConstraint implements Updatable {
 	 * @param child Any descendant bone of the parent. */
 	static public function apply2(parent:Bone, child:Bone, targetX:Float, targetY:Float, bendDir:Int, stretch:Bool, uniform:Bool, softness:Float,
 			alpha:Float):Void {
+		if (parent.inherit != Inherit.normal || child.inherit != Inherit.normal) return;
 		var px:Float = parent.ax;
 		var py:Float = parent.ay;
 		var psx:Float = parent.ascaleX;

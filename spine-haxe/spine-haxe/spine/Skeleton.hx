@@ -40,11 +40,12 @@ class Skeleton {
 	private var _data:SkeletonData;
 
 	public var bones:Array<Bone>;
-	public var slots:Array<Slot>;
+	public var slots:Array<Slot>; // Setup pose draw order.
 	public var drawOrder:Array<Slot>;
 	public var ikConstraints:Array<IkConstraint>;
 	public var transformConstraints:Array<TransformConstraint>;
 	public var pathConstraints:Array<PathConstraint>;
+	public var physicsConstraints:Array<PhysicsConstraint>;
 
 	private var _updateCache:Array<Updatable> = new Array<Updatable>();
 	private var _skin:Skin;
@@ -54,6 +55,7 @@ class Skeleton {
 	public var scaleY:Float = 1;
 	public var x:Float = 0;
 	public var y:Float = 0;
+	public var time:Float = 0;
 
 	public function new(data:SkeletonData) {
 		if (data == null) {
@@ -98,6 +100,11 @@ class Skeleton {
 			pathConstraints.push(new PathConstraint(pathConstraintData, this));
 		}
 
+		physicsConstraints = new Array<PhysicsConstraint>();
+		for (physicConstraintData in data.physicsConstraints) {
+			physicsConstraints.push(new PhysicsConstraint(physicConstraintData, this));
+		}
+
 		updateCache();
 	}
 
@@ -127,7 +134,8 @@ class Skeleton {
 		var ikCount:Int = ikConstraints.length;
 		var transformCount:Int = transformConstraints.length;
 		var pathCount:Int = pathConstraints.length;
-		var constraintCount:Int = ikCount + transformCount + pathCount;
+		var physicCount:Int = physicsConstraints.length;
+		var constraintCount:Int = ikCount + transformCount + pathCount + physicCount;
 
 		var continueOuter:Bool;
 		for (i in 0...constraintCount) {
@@ -153,6 +161,14 @@ class Skeleton {
 			for (pathConstraint in pathConstraints) {
 				if (pathConstraint.data.order == i) {
 					sortPathConstraint(pathConstraint);
+					break;
+				}
+			}
+			if (continueOuter)
+				continue;
+			for (physicConstraint in physicsConstraints) {
+				if (physicConstraint.data.order == i) {
+					sortPhysicsConstraint(physicConstraint);
 					break;
 				}
 			}
@@ -294,6 +310,19 @@ class Skeleton {
 		}
 	}
 
+	private function sortPhysicsConstraint (constraint: PhysicsConstraint) {
+		var bone:Bone = constraint.bone;
+		constraint.active = bone.active && (!constraint.data.skinRequired || (skin != null && contains(skin.constraints, constraint.data)));
+		if (!constraint.active) return;
+
+		sortBone(bone);
+
+		_updateCache.push(constraint);
+
+		sortReset(bone.children);
+		bone.sorted = true;
+	}
+
 	private function sortBone(bone:Bone):Void {
 		if (bone.sorted)
 			return;
@@ -315,7 +344,8 @@ class Skeleton {
 	}
 
 	/** Updates the world transform for each bone and applies constraints. */
-	public function updateWorldTransform():Void {
+	public function updateWorldTransform(physics:Physics):Void {
+		if (physics == null) throw new SpineException("physics is undefined");
 		for (bone in bones) {
 			bone.ax = bone.x;
 			bone.ay = bone.y;
@@ -327,11 +357,11 @@ class Skeleton {
 		}
 
 		for (updatable in _updateCache) {
-			updatable.update();
+			updatable.update(physics);
 		}
 	}
 
-	public function updateWorldTransformWith(parent:Bone):Void {
+	public function updateWorldTransformWith(physics:Physics, parent:Bone):Void {
 		// Apply the parent bone transform to the root bone. The root bone always inherits scale, rotation and reflection.
 		var rootBone:Bone = rootBone;
 		var pa:Float = parent.a,
@@ -341,11 +371,12 @@ class Skeleton {
 		rootBone.worldX = pa * x + pb * y + parent.worldX;
 		rootBone.worldY = pc * x + pd * y + parent.worldY;
 
-		var rotationY:Float = rootBone.rotation + 90 + rootBone.shearY;
-		var la:Float = MathUtils.cosDeg(rootBone.rotation + rootBone.shearX) * rootBone.scaleX;
-		var lb:Float = MathUtils.cosDeg(rotationY) * rootBone.scaleY;
-		var lc:Float = MathUtils.sinDeg(rootBone.rotation + rootBone.shearX) * rootBone.scaleX;
-		var ld:Float = MathUtils.sinDeg(rotationY) * rootBone.scaleY;
+		var rx:Float = (rootBone.rotation + rootBone.shearX) * MathUtils.degRad;
+		var ry:Float = (rootBone.rotation + 90 + rootBone.shearY) * MathUtils.degRad;
+		var la:Float = Math.cos(rx) * rootBone.scaleX;
+		var lb:Float = Math.cos(ry) * rootBone.scaleY;
+		var lc:Float = Math.sin(rx) * rootBone.scaleX;
+		var ld:Float = Math.sin(ry) * rootBone.scaleY;
 		rootBone.a = (pa * la + pb * lc) * scaleX;
 		rootBone.b = (pa * lb + pb * ld) * scaleX;
 		rootBone.c = (pc * la + pd * lc) * scaleY;
@@ -354,7 +385,7 @@ class Skeleton {
 		// Update everything except root bone.
 		for (updatable in _updateCache) {
 			if (updatable != rootBone)
-				updatable.update();
+				updatable.update(physics);
 		}
 	}
 
@@ -366,34 +397,11 @@ class Skeleton {
 
 	/** Sets the bones and constraints to their setup pose values. */
 	public function setBonesToSetupPose():Void {
-		for (bone in bones) {
-			bone.setToSetupPose();
-		}
-
-		for (ikConstraint in ikConstraints) {
-			ikConstraint.mix = ikConstraint.data.mix;
-			ikConstraint.softness = ikConstraint.data.softness;
-			ikConstraint.bendDirection = ikConstraint.data.bendDirection;
-			ikConstraint.compress = ikConstraint.data.compress;
-			ikConstraint.stretch = ikConstraint.data.stretch;
-		}
-
-		for (transformConstraint in transformConstraints) {
-			transformConstraint.mixRotate = transformConstraint.data.mixRotate;
-			transformConstraint.mixX = transformConstraint.data.mixX;
-			transformConstraint.mixY = transformConstraint.data.mixY;
-			transformConstraint.mixScaleX = transformConstraint.data.mixScaleX;
-			transformConstraint.mixScaleY = transformConstraint.data.mixScaleY;
-			transformConstraint.mixShearY = transformConstraint.data.mixShearY;
-		}
-
-		for (pathConstraint in pathConstraints) {
-			pathConstraint.position = pathConstraint.data.position;
-			pathConstraint.spacing = pathConstraint.data.spacing;
-			pathConstraint.mixRotate = pathConstraint.data.mixRotate;
-			pathConstraint.mixX = pathConstraint.data.mixX;
-			pathConstraint.mixY = pathConstraint.data.mixY;
-		}
+		for (bone in this.bones) bone.setToSetupPose();
+		for (constraint in this.ikConstraints) constraint.setToSetupPose();
+		for (constraint in this.transformConstraints) constraint.setToSetupPose();
+		for (constraint in this.pathConstraints) constraint.setToSetupPose();
+		for (constraint in this.physicsConstraints) constraint.setToSetupPose();
 	}
 
 	public function setSlotsToSetupPose():Void {
@@ -585,6 +593,17 @@ class Skeleton {
 		return null;
 	}
 
+	/** @return May be null. */
+	public function findPhysicsConstraint(constraintName:String):PhysicsConstraint {
+		if (constraintName == null)
+			throw new SpineException("constraintName cannot be null.");
+		for (physicsConstraint in physicsConstraints) {
+			if (physicsConstraint.data.name == constraintName)
+				return physicsConstraint;
+		}
+		return null;
+	}
+
 	public function toString():String {
 		return _data.name != null ? _data.name : "Skeleton?";
 	}
@@ -631,5 +650,19 @@ class Skeleton {
 		_bounds.width = maxX - minX;
 		_bounds.height = maxY - minY;
 		return _bounds;
+	}
+
+	public function update (delta:Float):Void {
+		time += delta;
+	}
+
+	public function physicsTranslate (x:Float, y:Float):Void {
+		for (physicsConstraint in physicsConstraints)
+			physicsConstraint.translate(x, y);
+	}
+
+	public function physicsRotate (x:Float, y:Float, degrees:Float):Void {
+		for (physicsConstraint in physicsConstraints)
+			physicsConstraint.rotate(x, y, degrees);
 	}
 }

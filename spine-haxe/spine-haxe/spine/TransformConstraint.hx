@@ -68,7 +68,17 @@ class TransformConstraint implements Updatable {
 		return active;
 	}
 
-	public function update():Void {
+	public function setToSetupPose () {
+		var data:TransformConstraintData = _data;
+		mixRotate = data.mixRotate;
+		mixX = data.mixX;
+		mixY = data.mixY;
+		mixScaleX = data.mixScaleX;
+		mixScaleY = data.mixScaleY;
+		mixShearY = data.mixShearY;
+	}
+
+	public function update(physics:Physics):Void {
 		if (mixRotate == 0 && mixX == 0 && mixY == 0 && mixScaleX == 0 && mixScaleY == 0 && mixShearY == 0)
 			return;
 
@@ -226,11 +236,7 @@ class TransformConstraint implements Updatable {
 	public function applyAbsoluteLocal():Void {
 		for (bone in bones) {
 			var rotation:Float = bone.arotation;
-			if (mixRotate != 0) {
-				var r:Float = target.arotation - rotation + _data.offsetRotation;
-				r -= (16384 - (Std.int(16384.499999999996 - r / 360) | 0)) * 360;
-				rotation += r * mixRotate;
-			}
+			if (mixRotate != 0) rotation += (target.arotation - rotation + _data.offsetRotation) * mixRotate;
 
 			var x:Float = bone.ax, y:Float = bone.ay;
 			x += (target.ax - x + _data.offsetX) * mixX;
@@ -245,11 +251,7 @@ class TransformConstraint implements Updatable {
 			}
 
 			var shearY:Float = bone.ashearY;
-			if (mixShearY != 0) {
-				var r:Float = target.ashearY - shearY + _data.offsetShearY;
-				r -= (16384 - (Std.int(16384.499999999996 - r / 360) | 0)) * 360;
-				bone.shearY += r * mixShearY;
-			}
+			if (mixShearY != 0) shearY += (target.ashearY - shearY + _data.offsetShearY) * mixShearY;
 
 			bone.updateWorldTransformWith(x, y, rotation, scaleX, scaleY, bone.ashearX, shearY);
 		}

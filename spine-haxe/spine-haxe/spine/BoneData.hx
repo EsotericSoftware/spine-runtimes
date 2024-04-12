@@ -42,9 +42,11 @@ class BoneData {
 	public var scaleY:Float = 1;
 	public var shearX:Float = 0;
 	public var shearY:Float = 0;
-	public var transformMode:TransformMode = TransformMode.normal;
+	public var inherit:Inherit = Inherit.normal;
 	public var skinRequired:Bool = false;
 	public var color:Color = new Color(0, 0, 0, 0);
+	public var icon:String;
+	public var visible:Bool = false;
 
 	/** @param parent May be null. */
 	public function new(index:Int, name:String, parent:BoneData) {
@@ -65,7 +67,7 @@ class BoneData {
 
 	public var name(get, never):String;
 
-	private function get_name():String {
+	function get_name():String {
 		return _name;
 	}
 

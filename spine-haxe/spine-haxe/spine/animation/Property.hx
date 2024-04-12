@@ -37,25 +37,35 @@ class Property {
 	public static inline var scaleY:Int = 4;
 	public static inline var shearX:Int = 5;
 	public static inline var shearY:Int = 6;
+	public static inline var inherit:Int = 7;
 
-	public static inline var rgb:Int = 7;
-	public static inline var alpha:Int = 8;
-	public static inline var rgb2:Int = 9;
+	public static inline var rgb:Int = 8;
+	public static inline var alpha:Int = 9;
+	public static inline var rgb2:Int = 10;
 
-	public static inline var attachment:Int = 10;
-	public static inline var deform:Int = 11;
+	public static inline var attachment:Int = 11;
+	public static inline var deform:Int = 12;
 
-	public static inline var event:Int = 12;
-	public static inline var drawOrder:Int = 13;
+	public static inline var event:Int = 13;
+	public static inline var drawOrder:Int = 14;
 
-	public static inline var ikConstraint:Int = 14;
-	public static inline var transformConstraint:Int = 15;
+	public static inline var ikConstraint:Int = 15;
+	public static inline var transformConstraint:Int = 16;
 
-	public static inline var pathConstraintPosition:Int = 16;
-	public static inline var pathConstraintSpacing:Int = 17;
-	public static inline var pathConstraintMix:Int = 18;
+	public static inline var pathConstraintPosition:Int = 17;
+	public static inline var pathConstraintSpacing:Int = 18;
+	public static inline var pathConstraintMix:Int = 19;
 
-	public static inline var sequence:Int = 19;
+	public static inline var physicsConstraintInertia:Int = 20;
+	public static inline var physicsConstraintStrength:Int = 21;
+	public static inline var physicsConstraintDamping:Int = 22;
+	public static inline var physicsConstraintMass:Int = 23;
+	public static inline var physicsConstraintWind:Int = 24;
+	public static inline var physicsConstraintGravity:Int = 25;
+	public static inline var physicsConstraintMix:Int = 26;
+	public static inline var physicsConstraintReset:Int = 27;
+
+	public static inline var sequence:Int = 28;
 
 	public function new() {}
 }

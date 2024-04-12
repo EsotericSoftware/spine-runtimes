@@ -48,27 +48,6 @@ class ShearYTimeline extends CurveTimeline1 implements BoneTimeline {
 	override public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, blend:MixBlend,
 			direction:MixDirection):Void {
 		var bone:Bone = skeleton.bones[boneIndex];
-		if (!bone.active)
-			return;
-
-		if (time < frames[0]) {
-			switch (blend) {
-				case MixBlend.setup:
-					bone.shearY = bone.data.shearY;
-				case MixBlend.first:
-					bone.shearY += (bone.data.shearY - bone.shearY) * alpha;
-			}
-			return;
-		}
-
-		var y:Float = getCurveValue(time);
-		switch (blend) {
-			case MixBlend.setup:
-				bone.shearY = bone.data.shearY + y * alpha;
-			case MixBlend.first, MixBlend.replace:
-				bone.shearY += (bone.data.shearY + y - bone.shearY) * alpha;
-			case MixBlend.add:
-				bone.shearY += y * alpha;
-		}
+		if (bone.active) bone.shearY = getRelativeValue(time, alpha, blend, bone.shearY, bone.data.shearY);
 	}
 }

@@ -50,11 +50,10 @@ class PointAttachment extends VertexAttachment {
 	}
 
 	public function computeWorldRotation(bone:Bone):Float {
-		var cos:Float = MathUtils.cosDeg(this.rotation),
-			sin:Float = MathUtils.sinDeg(this.rotation);
+		var r:Float = this.rotation * MathUtils.degRad, cos:Float = Math.cos(r), sin:Float = Math.sin(r);
 		var x:Float = cos * bone.a + sin * bone.b;
 		var y:Float = cos * bone.c + sin * bone.d;
-		return Math.atan2(y, x) * MathUtils.radDeg;
+		return MathUtils.atan2Deg(y, x);
 	}
 
 	override public function copy():Attachment {

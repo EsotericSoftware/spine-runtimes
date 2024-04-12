@@ -76,7 +76,7 @@ class SkeletonSprite extends DisplayObject implements IAnimatable {
 		super();
 		Bone.yDown = true;
 		_skeleton = new Skeleton(skeletonData);
-		_skeleton.updateWorldTransform();
+		_skeleton.updateWorldTransform(Physics.update);
 		_state = new AnimationState(animationStateData != null ? animationStateData : new AnimationStateData(skeletonData));
 	}
 
@@ -340,7 +340,9 @@ class SkeletonSprite extends DisplayObject implements IAnimatable {
 	public function advanceTime(time:Float):Void {
 		_state.update(time);
 		_state.apply(skeleton);
-		skeleton.updateWorldTransform();
+		skeleton.update(time);
+		skeleton.updateWorldTransform(Physics.update);
+
 		this.setRequiresRedraw();
 	}
 }

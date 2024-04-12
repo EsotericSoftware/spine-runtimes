@@ -61,8 +61,7 @@ class AlphaTimeline extends CurveTimeline1 implements SlotTimeline {
 			return;
 
 		var color:Color = slot.color;
-		if (time < frames[0]) // Time is before first frame.
-		{
+		if (time < frames[0]) {
 			var setup:Color = slot.data.color;
 			switch (blend) {
 				case MixBlend.setup:

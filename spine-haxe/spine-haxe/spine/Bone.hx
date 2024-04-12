@@ -57,158 +57,9 @@ class Bone implements Updatable {
 	public var d:Float = 0;
 	public var worldX:Float = 0;
 	public var worldY:Float = 0;
+	public var inherit:Inherit = Inherit.normal;
 	public var sorted:Bool = false;
 	public var active:Bool = false;
-
-	/** @param parent May be null. */
-	public function new(data:BoneData, skeleton:Skeleton, parent:Bone) {
-		if (data == null)
-			throw new SpineException("data cannot be null.");
-		if (skeleton == null)
-			throw new SpineException("skeleton cannot be null.");
-		_data = data;
-		_skeleton = skeleton;
-		_parent = parent;
-		setToSetupPose();
-	}
-
-	public function isActive():Bool {
-		return active;
-	}
-
-	/** Same as updateWorldTransform(). This method exists for Bone to implement Updatable. */
-	public function update():Void {
-		updateWorldTransformWith(ax, ay, arotation, ascaleX, ascaleY, ashearX, ashearY);
-	}
-
-	/** Computes the world SRT using the parent bone and this bone's local SRT. */
-	public function updateWorldTransform():Void {
-		updateWorldTransformWith(x, y, rotation, scaleX, scaleY, shearX, shearY);
-	}
-
-	/** Computes the world SRT using the parent bone and the specified local SRT. */
-	public function updateWorldTransformWith(x:Float, y:Float, rotation:Float, scaleX:Float, scaleY:Float, shearX:Float, shearY:Float):Void {
-		ax = x;
-		ay = y;
-		arotation = rotation;
-		ascaleX = scaleX;
-		ascaleY = scaleY;
-		ashearX = shearX;
-		ashearY = shearY;
-
-		var rotationY:Float = 0;
-		var la:Float = 0;
-		var lb:Float = 0;
-		var lc:Float = 0;
-		var ld:Float = 0;
-		var sin:Float = 0;
-		var cos:Float = 0;
-		var s:Float = 0;
-		var sx:Float = skeleton.scaleX;
-		var sy:Float = skeleton.scaleY * (yDown ? -1 : 1);
-
-		var parent:Bone = _parent;
-		if (parent == null) {
-			// Root bone.
-			rotationY = rotation + 90 + shearY;
-			a = MathUtils.cosDeg(rotation + shearX) * scaleX * sx;
-			b = MathUtils.cosDeg(rotationY) * scaleY * sx;
-			c = MathUtils.sinDeg(rotation + shearX) * scaleX * sy;
-			d = MathUtils.sinDeg(rotationY) * scaleY * sy;
-			worldX = x * sx + skeleton.x;
-			worldY = y * sy + skeleton.y;
-			return;
-		}
-
-		var pa:Float = parent.a,
-			pb:Float = parent.b,
-			pc:Float = parent.c,
-			pd:Float = parent.d;
-		worldX = pa * x + pb * y + parent.worldX;
-		worldY = pc * x + pd * y + parent.worldY;
-
-		switch (data.transformMode) {
-			case TransformMode.normal:
-				rotationY = rotation + 90 + shearY;
-				la = MathUtils.cosDeg(rotation + shearX) * scaleX;
-				lb = MathUtils.cosDeg(rotationY) * scaleY;
-				lc = MathUtils.sinDeg(rotation + shearX) * scaleX;
-				ld = MathUtils.sinDeg(rotationY) * scaleY;
-				a = pa * la + pb * lc;
-				b = pa * lb + pb * ld;
-				c = pc * la + pd * lc;
-				d = pc * lb + pd * ld;
-				return;
-			case TransformMode.onlyTranslation:
-				rotationY = rotation + 90 + shearY;
-				a = MathUtils.cosDeg(rotation + shearX) * scaleX;
-				b = MathUtils.cosDeg(rotationY) * scaleY;
-				c = MathUtils.sinDeg(rotation + shearX) * scaleX;
-				d = MathUtils.sinDeg(rotationY) * scaleY;
-			case TransformMode.noRotationOrReflection:
-				s = pa * pa + pc * pc;
-				var prx:Float = 0;
-				if (s > 0.0001) {
-					s = Math.abs(pa * pd - pb * pc) / s;
-					pb = pc * s;
-					pd = pa * s;
-					prx = Math.atan2(pc, pa) * MathUtils.radDeg;
-				} else {
-					pa = 0;
-					pc = 0;
-					prx = 90 - Math.atan2(pd, pb) * MathUtils.radDeg;
-				}
-				var rx:Float = rotation + shearX - prx;
-				var ry:Float = rotation + shearY - prx + 90;
-				la = MathUtils.cosDeg(rx) * scaleX;
-				lb = MathUtils.cosDeg(ry) * scaleY;
-				lc = MathUtils.sinDeg(rx) * scaleX;
-				ld = MathUtils.sinDeg(ry) * scaleY;
-				a = pa * la - pb * lc;
-				b = pa * lb - pb * ld;
-				c = pc * la + pd * lc;
-				d = pc * lb + pd * ld;
-			case TransformMode.noScale, TransformMode.noScaleOrReflection:
-				cos = MathUtils.cosDeg(rotation);
-				sin = MathUtils.sinDeg(rotation);
-				var za:Float = (pa * cos + pb * sin) / sx;
-				var zc:Float = (pc * cos + pd * sin) / sy;
-				s = Math.sqrt(za * za + zc * zc);
-				if (s > 0.00001)
-					s = 1 / s;
-				za *= s;
-				zc *= s;
-				s = Math.sqrt(za * za + zc * zc);
-				if (data.transformMode == TransformMode.noScale && ((pa * pd - pb * pc < 0) != ((sx < 0) != (sy < 0)))) {
-					s = -s;
-				}
-				var r:Float = Math.PI / 2 + Math.atan2(zc, za);
-				var zb:Float = Math.cos(r) * s;
-				var zd:Float = Math.sin(r) * s;
-				la = MathUtils.cosDeg(shearX) * scaleX;
-				lb = MathUtils.cosDeg(90 + shearY) * scaleY;
-				lc = MathUtils.sinDeg(shearX) * scaleX;
-				ld = MathUtils.sinDeg(90 + shearY) * scaleY;
-				a = za * la + zb * lc;
-				b = za * lb + zb * ld;
-				c = zc * la + zd * lc;
-				d = zc * lb + zd * ld;
-		}
-		a *= sx;
-		b *= sx;
-		c *= sy;
-		d *= sy;
-	}
-
-	public function setToSetupPose():Void {
-		x = data.x;
-		y = data.y;
-		rotation = data.rotation;
-		scaleX = data.scaleX;
-		scaleY = data.scaleY;
-		shearX = data.shearX;
-		shearY = data.shearY;
-	}
 
 	public var data(get, never):BoneData;
 
@@ -232,6 +83,248 @@ class Bone implements Updatable {
 
 	private function get_children():Array<Bone> {
 		return _children;
+	}
+
+	/** @param parent May be null. */
+	public function new(data:BoneData, skeleton:Skeleton, parent:Bone) {
+		if (data == null)
+			throw new SpineException("data cannot be null.");
+		if (skeleton == null)
+			throw new SpineException("skeleton cannot be null.");
+		_data = data;
+		_skeleton = skeleton;
+		_parent = parent;
+		setToSetupPose();
+	}
+
+	public function isActive():Bool {
+		return active;
+	}
+
+	/** Same as updateWorldTransform(). This method exists for Bone to implement Updatable. */
+	public function update(physics:Physics):Void {
+		updateWorldTransformWith(ax, ay, arotation, ascaleX, ascaleY, ashearX, ashearY);
+	}
+
+	/** Computes the world SRT using the parent bone and this bone's local SRT. */
+	public function updateWorldTransform():Void {
+		updateWorldTransformWith(x, y, rotation, scaleX, scaleY, shearX, shearY);
+	}
+
+	/** Computes the world SRT using the parent bone and the specified local SRT. */
+	public function updateWorldTransformWith(x:Float, y:Float, rotation:Float, scaleX:Float, scaleY:Float, shearX:Float, shearY:Float):Void {
+		ax = x;
+		ay = y;
+		arotation = rotation;
+		ascaleX = scaleX;
+		ascaleY = scaleY;
+		ashearX = shearX;
+		ashearY = shearY;
+
+		var la:Float = 0;
+		var lb:Float = 0;
+		var lc:Float = 0;
+		var ld:Float = 0;
+		var sin:Float = 0;
+		var cos:Float = 0;
+		var s:Float = 0;
+		var sx:Float = skeleton.scaleX;
+		var sy:Float = skeleton.scaleY * (yDown ? -1 : 1);
+
+		var parent:Bone = _parent;
+		if (parent == null) {
+			// Root bone.
+			var rx:Float = (rotation + shearX) * MathUtils.degRad;
+			var ry:Float = (rotation + 90 + shearY) * MathUtils.degRad;
+			a = Math.cos(rx) * scaleX * sx;
+			b = Math.cos(ry) * scaleY * sx;
+			c = Math.sin(rx) * scaleX * sy;
+			d = Math.sin(ry) * scaleY * sy;
+			worldX = x * sx + skeleton.x;
+			worldY = y * sy + skeleton.y;
+			return;
+		}
+
+		var pa:Float = parent.a,
+			pb:Float = parent.b,
+			pc:Float = parent.c,
+			pd:Float = parent.d;
+		worldX = pa * x + pb * y + parent.worldX;
+		worldY = pc * x + pd * y + parent.worldY;
+
+		switch (data.inherit) {
+			case Inherit.normal:
+				var rx:Float = (rotation + shearX) * MathUtils.degRad;
+				var ry:Float = (rotation + 90 + shearY) * MathUtils.degRad;
+				la = Math.cos(rx) * scaleX;
+				lb = Math.cos(ry) * scaleY;
+				lc = Math.sin(rx) * scaleX;
+				ld = Math.sin(ry) * scaleY;
+				a = pa * la + pb * lc;
+				b = pa * lb + pb * ld;
+				c = pc * la + pd * lc;
+				d = pc * lb + pd * ld;
+				return;
+			case Inherit.onlyTranslation:
+				var rx:Float = (rotation + shearX) * MathUtils.degRad;
+				var ry:Float = (rotation + 90 + shearY) * MathUtils.degRad;
+				a = Math.cos(rx) * scaleX;
+				b = Math.cos(ry) * scaleY;
+				c = Math.sin(rx) * scaleX;
+				d = Math.sin(ry) * scaleY;
+			case Inherit.noRotationOrReflection:
+				s = pa * pa + pc * pc;
+				var prx:Float = 0;
+				if (s > 0.0001) {
+					s = Math.abs(pa * pd - pb * pc) / s;
+					pb = pc * s;
+					pd = pa * s;
+					prx = Math.atan2(pc, pa) * MathUtils.radDeg;
+				} else {
+					pa = 0;
+					pc = 0;
+					prx = 90 - Math.atan2(pd, pb) * MathUtils.radDeg;
+				}
+				var rx:Float = (rotation + shearX - prx) * MathUtils.degRad;
+				var ry:Float = (rotation + shearY - prx + 90) * MathUtils.degRad;
+				la = Math.cos(rx) * scaleX;
+				lb = Math.cos(ry) * scaleY;
+				lc = Math.sin(rx) * scaleX;
+				ld = Math.sin(ry) * scaleY;
+				a = pa * la - pb * lc;
+				b = pa * lb - pb * ld;
+				c = pc * la + pd * lc;
+				d = pc * lb + pd * ld;
+			case Inherit.noScale, Inherit.noScaleOrReflection:
+				rotation *= MathUtils.degRad;
+				cos = Math.cos(rotation);
+				sin = Math.sin(rotation);
+				var za:Float = (pa * cos + pb * sin) / sx;
+				var zc:Float = (pc * cos + pd * sin) / sy;
+				s = Math.sqrt(za * za + zc * zc);
+				if (s > 0.00001)
+					s = 1 / s;
+				za *= s;
+				zc *= s;
+				s = Math.sqrt(za * za + zc * zc);
+				if (data.inherit == Inherit.noScale && ((pa * pd - pb * pc < 0) != ((sx < 0) != (sy < 0)))) {
+					s = -s;
+				}
+				rotation = Math.PI / 2 + Math.atan2(zc, za);
+				var zb:Float = Math.cos(rotation) * s;
+				var zd:Float = Math.sin(rotation) * s;
+				shearX *= MathUtils.degRad;
+				shearY = (90 + shearY) * MathUtils.degRad;
+				la = Math.cos(shearX) * scaleX;
+				lb = Math.cos(shearY) * scaleY;
+				lc = Math.sin(shearX) * scaleX;
+				ld = Math.sin(shearY) * scaleY;
+				a = za * la + zb * lc;
+				b = za * lb + zb * ld;
+				c = zc * la + zd * lc;
+				d = zc * lb + zd * ld;
+		}
+		a *= sx;
+		b *= sx;
+		c *= sy;
+		d *= sy;
+	}
+
+	public function setToSetupPose():Void {
+		x = data.x;
+		y = data.y;
+		rotation = data.rotation;
+		scaleX = data.scaleX;
+		scaleY = data.scaleY;
+		shearX = data.shearX;
+		shearY = data.shearY;
+		inherit = data.inherit;
+	}
+
+	/** Computes the individual applied transform values from the world transform. This can be useful to perform processing using
+	 * the applied transform after the world transform has been modified directly (eg, by a constraint).
+	 * <p>
+	 * Some information is ambiguous in the world transform, such as -1,-1 scale versus 180 rotation. */
+	public function updateAppliedTransform():Void {
+		var parent:Bone = parent;
+		if (parent == null) {
+			ax = worldX - skeleton.x;
+			ay = worldY - skeleton.y;
+			arotation = Math.atan2(c, a) * MathUtils.radDeg;
+			ascaleX = Math.sqrt(a * a + c * c);
+			ascaleY = Math.sqrt(b * b + d * d);
+			ashearX = 0;
+			ashearY = Math.atan2(a * b + c * d, a * d - b * c) * MathUtils.radDeg;
+			return;
+		}
+		var pa:Float = parent.a,
+			pb:Float = parent.b,
+			pc:Float = parent.c,
+			pd:Float = parent.d;
+		var pid:Float = 1 / (pa * pd - pb * pc);
+		var ia:Float = pd * pid,
+			ib:Float = pb * pid,
+			ic:Float = pc * pid,
+			id:Float = pa * pid;
+		var dx:Float = worldX - parent.worldX,
+			dy:Float = worldY - parent.worldY;
+		ax = (dx * ia - dy * ib);
+		ay = (dy * id - dx * ic);
+		var ra:Float, rb:Float, rc:Float, rd:Float;
+		if (inherit == Inherit.onlyTranslation) {
+			ra = a;
+			rb = b;
+			rc = c;
+			rd = d;
+		} else {
+			switch (inherit) {
+				case Inherit.noRotationOrReflection:
+					var s:Float = Math.abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
+					var sa:Float = pa / skeleton.scaleX;
+					var sc:Float = pc / skeleton.scaleY;
+					pb = -sc * s * skeleton.scaleX;
+					pd = sa * s * skeleton.scaleY;
+					pid = 1 / (pa * pd - pb * pc);
+					ia = pd * pid;
+					ib = pb * pid;
+				case Inherit.noScale | Inherit.noScaleOrReflection:
+					var cos:Float = MathUtils.cosDeg(rotation), sin:Float = MathUtils.sinDeg(rotation);
+					pa = (pa * cos + pb * sin) / skeleton.scaleX;
+					pc = (pc * cos + pd * sin) / skeleton.scaleY;
+					var s:Float = Math.sqrt(pa * pa + pc * pc);
+					if (s > 0.00001) s = 1 / s;
+					pa *= s;
+					pc *= s;
+					s = Math.sqrt(pa * pa + pc * pc);
+					if (inherit == Inherit.noScale && pid < 0 != ((skeleton.scaleX < 0) != (skeleton.scaleY < 0))) s = -s;
+					var r:Float = MathUtils.PI / 2 + Math.atan2(pc, pa);
+					pb = Math.cos(r) * s;
+					pd = Math.sin(r) * s;
+					pid = 1 / (pa * pd - pb * pc);
+					ia = pd * pid;
+					ib = pb * pid;
+					ic = pc * pid;
+					id = pa * pid;
+			}
+			ra = ia * a - ib * c;
+			rb = ia * b - ib * d;
+			rc = id * c - ic * a;
+			rd = id * d - ic * b;
+		}
+
+		ashearX = 0;
+		ascaleX = Math.sqrt(ra * ra + rc * rc);
+		if (scaleX > 0.0001) {
+			var det:Float = ra * rd - rb * rc;
+			ascaleY = det / ascaleX;
+			ashearY = -Math.atan2(ra * rb + rc * rd, det) * MathUtils.radDeg;
+			arotation = Math.atan2(rc, ra) * MathUtils.radDeg;
+		} else {
+			ascaleX = 0;
+			ascaleY = Math.sqrt(rb * rb + rd * rd);
+			ashearY = 0;
+			arotation = 90 - Math.atan2(rd, rb) * MathUtils.radDeg;
+		}
 	}
 
 	public var worldRotationX(get, never):Float;
@@ -258,66 +351,32 @@ class Bone implements Updatable {
 		return Math.sqrt(b * b + d * d);
 	}
 
-	/** Computes the individual applied transform values from the world transform. This can be useful to perform processing using
-	 * the applied transform after the world transform has been modified directly (eg, by a constraint).
-	 * <p>
-	 * Some information is ambiguous in the world transform, such as -1,-1 scale versus 180 rotation. */
-	public function updateAppliedTransform():Void {
-		var parent:Bone = parent;
-		if (parent == null) {
-			ax = worldX - skeleton.x;
-			ay = worldY - skeleton.y;
-			arotation = Math.atan2(c, a) * MathUtils.radDeg;
-			ascaleX = Math.sqrt(a * a + c * c);
-			ascaleY = Math.sqrt(b * b + d * d);
-			ashearX = 0;
-			ashearY = Math.atan2(a * b + c * d, a * d - b * c) * MathUtils.radDeg;
-			return;
-		}
-		var pa:Float = parent.a,
-			pb:Float = parent.b,
-			pc:Float = parent.c,
-			pd:Float = parent.d;
-		var pid:Float = 1 / (pa * pd - pb * pc);
-		var dx:Float = worldX - parent.worldX,
-			dy:Float = worldY - parent.worldY;
-		ax = (dx * pd * pid - dy * pb * pid);
-		ay = (dy * pa * pid - dx * pc * pid);
-		var ia:Float = pid * pd;
-		var id:Float = pid * pa;
-		var ib:Float = pid * pb;
-		var ic:Float = pid * pc;
-		var ra:Float = ia * a - ib * c;
-		var rb:Float = ia * b - ib * d;
-		var rc:Float = id * c - ic * a;
-		var rd:Float = id * d - ic * b;
-		ashearX = 0;
-		ascaleX = Math.sqrt(ra * ra + rc * rc);
-		if (scaleX > 0.0001) {
-			var det:Float = ra * rd - rb * rc;
-			ascaleY = det / ascaleX;
-			ashearY = Math.atan2(ra * rb + rc * rd, det) * MathUtils.radDeg;
-			arotation = Math.atan2(rc, ra) * MathUtils.radDeg;
-		} else {
-			ascaleX = 0;
-			ascaleY = Math.sqrt(rb * rb + rd * rd);
-			ashearY = 0;
-			arotation = 90 - Math.atan2(rd, rb) * MathUtils.radDeg;
-		}
+	private function worldToParent(world: Array<Float>):Array<Float> {
+		if (world == null)
+			throw new SpineException("world cannot be null.");
+		return parent == null ? world : parent.worldToLocal(world);
 	}
 
-	public function worldToLocal(world:Array<Float>):Void {
+	private function parentToWorld(world: Array<Float>):Array<Float> {
+		if (world == null)
+			throw new SpineException("world cannot be null.");
+		return parent == null ? world : parent.localToWorld(world);
+	}
+
+	public function worldToLocal(world:Array<Float>):Array<Float> {
 		var a:Float = a, b:Float = b, c:Float = c, d:Float = d;
 		var invDet:Float = 1 / (a * d - b * c);
 		var x:Float = world[0] - worldX, y:Float = world[1] - worldY;
 		world[0] = (x * d * invDet - y * b * invDet);
 		world[1] = (y * a * invDet - x * c * invDet);
+		return world;
 	}
 
-	public function localToWorld(local:Array<Float>):Void {
+	public function localToWorld(local:Array<Float>):Array<Float> {
 		var localX:Float = local[0], localY:Float = local[1];
 		local[0] = localX * a + localY * b + worldX;
 		local[1] = localX * c + localY * d + worldY;
+		return local;
 	}
 
 	public function worldToLocalRotation(worldRotation:Float):Float {
@@ -334,16 +393,13 @@ class Bone implements Updatable {
 	}
 
 	public function rotateWorld(degrees:Float):Void {
-		var a:Float = this.a,
-			b:Float = this.b,
-			c:Float = this.c,
-			d:Float = this.d;
-		var cos:Float = MathUtils.cosDeg(degrees),
-			sin:Float = MathUtils.sinDeg(degrees);
-		this.a = cos * a - sin * c;
-		this.b = cos * b - sin * d;
-		this.c = sin * a + cos * c;
-		this.d = sin * b + cos * d;
+		degrees *= MathUtils.degRad;
+		var sin:Float = Math.sin(degrees), cos:Float = Math.cos(degrees);
+		var ra:Float = a, rb:Float = b;
+		a = cos * ra - sin * c;
+		b = cos * rb - sin * d;
+		c = sin * ra + cos * c;
+		d = sin * rb + cos * d;
 	}
 
 	public function toString():String {

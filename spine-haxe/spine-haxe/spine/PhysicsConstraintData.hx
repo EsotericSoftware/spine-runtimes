@@ -29,46 +29,32 @@
 
 package spine;
 
-class MathUtils {
-	static public var PI:Float = Math.PI;
-	static public var PI2:Float = Math.PI * 2;
-	static public var invPI2 = 1 / MathUtils.PI2;
-	static public var radDeg:Float = 180 / Math.PI;
-	static public var degRad:Float = Math.PI / 180;
-
-	static public function cosDeg(degrees:Float):Float {
-		return Math.cos(degrees * degRad);
+class PhysicsConstraintData extends ConstraintData {
+	public var bone:BoneData;
+	public var x:Float = 0;
+	public var y:Float = 0;
+	public var rotate:Float = 0;
+	public var scaleX:Float = 0;
+	public var shearX:Float = 0;
+	public var limit:Float = 0;
+	public var step:Float = 0;
+	public var inertia:Float = 0;
+	public var strength:Float = 0;
+	public var damping:Float = 0;
+	public var massInverse:Float = 0;
+	public var wind:Float = 0;
+	public var gravity:Float = 0;
+	public var mix:Float = 0;
+	public var inertiaGlobal:Bool = false;
+	public var strengthGlobal:Bool = false;
+	public var dampingGlobal:Bool = false;
+	public var massGlobal:Bool = false;
+	public var windGlobal:Bool = false;
+	public var gravityGlobal:Bool = false;
+	public var mixGlobal:Bool = false;
+	
+	public function new(name:String) {
+		super(name, 0, false);
 	}
 
-	static public function sinDeg(degrees:Float):Float {
-		return Math.sin(degrees * degRad);
-	}
-
-	static public function atan2Deg (y:Float, x:Float):Float {
-		return Math.atan2(y, x) * MathUtils.degRad;
-	}
-
-	static public function clamp(value:Float, min:Float, max:Float):Float {
-		if (value < min)
-			return min;
-		if (value > max)
-			return max;
-		return value;
-	}
-
-	static public function signum(value:Float):Float {
-		return value > 0 ? 1 : value < 0 ? -1 : 0;
-	}
-
-	static public function randomTriangular(min:Float, max:Float):Float {
-		return randomTriangularWith(min, max, (min + max) * 0.5);
-	}
-
-	static public function randomTriangularWith(min:Float, max:Float, mode:Float):Float {
-		var u:Float = Math.random();
-		var d:Float = max - min;
-		if (u <= (mode - min) / d)
-			return min + Math.sqrt(u * d * (mode - min));
-		return max - Math.sqrt((1 - u) * d * (max - mode));
-	}
 }

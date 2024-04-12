@@ -29,26 +29,42 @@
 
 package spine.animation;
 
-import spine.Bone;
 import spine.Event;
+import spine.PathConstraint;
 import spine.Skeleton;
 
-class RotateTimeline extends CurveTimeline1 implements BoneTimeline {
-	public var boneIndex:Int = 0;
+/** The base class for most {@link PhysicsConstraint} timelines. */
+abstract class PhysicsConstraintTimeline extends CurveTimeline1 {
+	/** The index of the physics constraint in {@link Skeleton#getPhysicsConstraints()} that will be changed when this timeline
+	 * is applied, or -1 if all physics constraints in the skeleton will be changed. */
+	public var constraintIndex:Int = 0;
 
-	public function new(frameCount:Int, bezierCount:Int, boneIndex:Int) {
-		super(frameCount, bezierCount, [Property.rotate + "|" + boneIndex]);
-		this.boneIndex = boneIndex;
+	/** @param physicsConstraintIndex -1 for all physics constraints in the skeleton. */
+	public function new(frameCount:Int, bezierCount:Int, physicsConstraintIndex:Int, property:Int) {
+		super(frameCount, bezierCount, [property + "|" + physicsConstraintIndex]);
+		constraintIndex = physicsConstraintIndex;
 	}
 
-	public function getBoneIndex():Int {
-		return boneIndex;
+	public override function apply (skeleton:Skeleton, lastTime:Float, time:Float, firedEvents:Array<Event>, alpha:Float, blend:MixBlend, direction:MixDirection):Void {
+		var constraint:PhysicsConstraint;
+		if (constraintIndex == -1) {
+			var value:Float = time >= frames[0] ? getCurveValue(time) : 0;
+
+			for (constraint in skeleton.physicsConstraints) {
+				if (constraint.active && global(constraint.data))
+					set(constraint, getAbsoluteValue2(time, alpha, blend, get(constraint), setup(constraint), value));
+			}
+		} else {
+			constraint = skeleton.physicsConstraints[constraintIndex];
+			if (constraint.active) set(constraint, getAbsoluteValue(time, alpha, blend, get(constraint), setup(constraint)));
+		}
 	}
 
-	override public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, blend:MixBlend,
-			direction:MixDirection):Void {
-		var bone:Bone = skeleton.bones[boneIndex];
-		if (bone.active)
-			bone.rotation = getRelativeValue(time, alpha, blend, bone.rotation, bone.data.rotation);
-	}
+	abstract public function setup (constraint: PhysicsConstraint):Float;
+
+	abstract public function get (constraint: PhysicsConstraint):Float;
+
+	abstract public function set (constraint: PhysicsConstraint, value:Float):Void;
+
+	abstract public function global (constraint: PhysicsConstraintData):Bool;
 }

@@ -78,7 +78,16 @@ class PathConstraint implements Updatable {
 		return active;
 	}
 
-	public function update():Void {
+	public function setToSetupPose () {
+		var data:PathConstraintData = _data;
+		position = data.position;
+		spacing = data.spacing;
+		mixRotate = data.mixRotate;
+		mixX = data.mixX;
+		mixY = data.mixY;
+	}
+
+	public function update(physics:Physics):Void {
 		var attachment:PathAttachment = cast(target.attachment, PathAttachment);
 		if (attachment == null)
 			return;
@@ -111,13 +120,9 @@ class PathConstraint implements Updatable {
 					for (i in 0...n) {
 						bone = bones[i];
 						setupLength = bone.data.length;
-						if (setupLength < PathConstraint.epsilon) {
-							_lengths[i] = 0;
-						} else {
-							x = setupLength * bone.a;
-							y = setupLength * bone.c;
-							_lengths[i] = Math.sqrt(x * x + y * y);
-						}
+						x = setupLength * bone.a;
+						y = setupLength * bone.c;
+						_lengths[i] = Math.sqrt(x * x + y * y);
 					}
 				}
 				for (i in 1...spacesCount) {

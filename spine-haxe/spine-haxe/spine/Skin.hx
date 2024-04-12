@@ -39,6 +39,7 @@ class Skin {
 	private var _attachments:Array<StringMap<Attachment>> = new Array<StringMap<Attachment>>();
 	private var _bones:Array<BoneData> = new Array<BoneData>();
 	private var _constraints:Array<ConstraintData> = new Array<ConstraintData>();
+	private var _color:Color = new Color(0.99607843, 0.61960787, 0.30980393, 1); // fe9e4fff
 
 	public function new(name:String) {
 		if (name == null)
@@ -206,6 +207,12 @@ class Skin {
 
 	private function get_name():String {
 		return _name;
+	}
+
+	public var color(get, never):Color;
+
+	private function get_color():Color {
+		return _color;
 	}
 
 	/*

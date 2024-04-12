@@ -41,9 +41,19 @@ import spine.animation.DeformTimeline;
 import spine.animation.DrawOrderTimeline;
 import spine.animation.EventTimeline;
 import spine.animation.IkConstraintTimeline;
+import spine.animation.InheritTimeline;
 import spine.animation.PathConstraintMixTimeline;
 import spine.animation.PathConstraintPositionTimeline;
 import spine.animation.PathConstraintSpacingTimeline;
+import spine.animation.PhysicsConstraintResetTimeline;
+import spine.animation.PhysicsConstraintInertiaTimeline;
+import spine.animation.PhysicsConstraintStrengthTimeline;
+import spine.animation.PhysicsConstraintDampingTimeline;
+import spine.animation.PhysicsConstraintMassTimeline;
+import spine.animation.PhysicsConstraintWindTimeline;
+import spine.animation.PhysicsConstraintGravityTimeline;
+import spine.animation.PhysicsConstraintMixTimeline;
+import spine.animation.PhysicsConstraintTimeline;
 import spine.animation.RGB2Timeline;
 import spine.animation.RGBA2Timeline;
 import spine.animation.RGBATimeline;
@@ -99,8 +109,10 @@ class SkeletonJson {
 			skeletonData.y = getFloat(skeletonMap, "y");
 			skeletonData.width = getFloat(skeletonMap, "width");
 			skeletonData.height = getFloat(skeletonMap, "height");
+			skeletonData.referenceScale = getFloat(skeletonMap, "referenceScale", 100);
 			skeletonData.fps = getFloat(skeletonMap, "fps");
 			skeletonData.imagesPath = getString(skeletonMap, "images", "");
+			skeletonData.audioPath = getString(skeletonMap, "audio", "");
 		}
 
 		// Bones.
@@ -122,8 +134,8 @@ class SkeletonJson {
 			boneData.scaleY = getFloat(boneMap, "scaleY", 1);
 			boneData.shearX = getFloat(boneMap, "shearX");
 			boneData.shearY = getFloat(boneMap, "shearY");
-			boneData.transformMode = Reflect.hasField(boneMap,
-				"transform") ? TransformMode.fromName(Reflect.getProperty(boneMap, "transform")) : TransformMode.normal;
+			boneData.inherit = Reflect.hasField(boneMap,
+				"inherit") ? Inherit.fromName(Reflect.getProperty(boneMap, "inherit")) : Inherit.normal;
 			boneData.skinRequired = Reflect.hasField(boneMap, "skin") ? cast(Reflect.getProperty(boneMap, "skin"), Bool) : false;
 
 			var color:String = Reflect.getProperty(boneMap, "color");
@@ -136,7 +148,14 @@ class SkeletonJson {
 
 		// Slots.
 		for (slotMap in cast(Reflect.getProperty(root, "slots"), Array<Dynamic>)) {
+			var path:String = null;
 			var slotName:String = Reflect.getProperty(slotMap, "name");
+			var slash:Int = slotName.lastIndexOf('/');
+			if (slash != -1) {
+				path = slotName.substring(0, slash);
+				slotName = slotName.substring(slash + 1);
+			}
+
 			var boneName:String = Reflect.getProperty(slotMap, "bone");
 			boneData = skeletonData.findBone(boneName);
 			if (boneData == null)
@@ -156,6 +175,8 @@ class SkeletonJson {
 
 			slotData.attachmentName = Reflect.getProperty(slotMap, "attachment");
 			slotData.blendMode = Reflect.hasField(slotMap, "blend") ? BlendMode.fromName(Reflect.getProperty(slotMap, "blend")) : BlendMode.normal;
+			slotData.visible = getValue(slotMap, "visible", true);
+			slotData.path = path;
 			skeletonData.slots.push(slotData);
 		}
 
@@ -270,6 +291,45 @@ class SkeletonJson {
 			}
 		}
 
+		// Physics constraints.
+		if (Reflect.hasField(root, "physics")) {
+			for (constraintMap in cast(Reflect.getProperty(root, "physics"), Array<Dynamic>)) {
+				var physicsData:PhysicsConstraintData = new PhysicsConstraintData(Reflect.getProperty(constraintMap, "name"));
+				physicsData.order = getInt(constraintMap, "order");
+				physicsData.skinRequired = Reflect.hasField(constraintMap, "skin") ? cast(Reflect.getProperty(constraintMap, "skin"), Bool) : false;
+
+				var boneName:String = Reflect.getProperty(constraintMap, "bone");
+				var bone = skeletonData.findBone(boneName);
+				if (bone == null)
+					throw new SpineException("Physics constraint bone not found: " + boneName);
+				physicsData.bone = bone;
+
+				physicsData.x = getFloat(constraintMap, "x");
+				physicsData.y = getFloat(constraintMap, "y");
+				physicsData.rotate = getFloat(constraintMap, "rotate");
+				physicsData.scaleX = getFloat(constraintMap, "scaleX");
+				physicsData.shearX = getFloat(constraintMap, "shearX");
+				physicsData.limit = getFloat(constraintMap, "limit", 5000) * scale;
+				physicsData.step = 1 / getFloat(constraintMap, "fps", 60);
+				physicsData.inertia = getFloat(constraintMap, "inertia", 1);
+				physicsData.strength = getFloat(constraintMap, "strength", 100);
+				physicsData.damping = getFloat(constraintMap, "damping", 1);
+				physicsData.massInverse = 1 / getFloat(constraintMap, "mass", 1);
+				physicsData.wind = getFloat(constraintMap, "wind");
+				physicsData.gravity = getFloat(constraintMap, "gravity");
+				physicsData.mix = getValue(constraintMap, "mix", 1);
+				physicsData.inertiaGlobal = Reflect.hasField(constraintMap, "inertiaGlobal") ? cast(Reflect.getProperty(constraintMap, "inertiaGlobal"), Bool) : false;
+				physicsData.strengthGlobal = Reflect.hasField(constraintMap, "strengthGlobal") ? cast(Reflect.getProperty(constraintMap, "strengthGlobal"), Bool) : false;
+				physicsData.dampingGlobal = Reflect.hasField(constraintMap, "dampingGlobal") ? cast(Reflect.getProperty(constraintMap, "dampingGlobal"), Bool) : false;
+				physicsData.dampingGlobal = Reflect.hasField(constraintMap, "dampingGlobal") ? cast(Reflect.getProperty(constraintMap, "dampingGlobal"), Bool) : false;
+				physicsData.windGlobal = Reflect.hasField(constraintMap, "windGlobal") ? cast(Reflect.getProperty(constraintMap, "windGlobal"), Bool) : false;
+				physicsData.gravityGlobal = Reflect.hasField(constraintMap, "gravityGlobal") ? cast(Reflect.getProperty(constraintMap, "gravityGlobal"), Bool) : false;
+				physicsData.mixGlobal = Reflect.hasField(constraintMap, "mixGlobal") ? cast(Reflect.getProperty(constraintMap, "mixGlobal"), Bool) : false;
+
+				skeletonData.physicsConstraints.push(physicsData);
+			}
+		}
+
 		// Skins.
 		if (Reflect.hasField(root, "skins")) {
 			for (skinMap in cast(Reflect.getProperty(root, "skins"), Array<Dynamic>)) {
@@ -311,6 +371,16 @@ class SkeletonJson {
 						var constraint:ConstraintData = skeletonData.findPathConstraint(path[ii]);
 						if (constraint == null)
 							throw new SpineException("Skin path constraint not found: " + path[ii]);
+						skin.constraints.push(constraint);
+					}
+				}
+
+				if (Reflect.hasField(skinMap, "physics")) {
+					var physics:Array<Dynamic> = cast(Reflect.getProperty(skinMap, "physics"), Array<Dynamic>);
+					for (ii in 0...physics.length) {
+						var constraint:ConstraintData = skeletonData.findPhysicsConstraint(physics[ii]);
+						if (constraint == null)
+							throw new SpineException("Skin physics constraint not found: " + physics[ii]);
 						skin.constraints.push(constraint);
 					}
 				}
@@ -759,6 +829,13 @@ class SkeletonJson {
 				} else if (timelineName == "sheary") {
 					var shearYTimeline:ShearYTimeline = new ShearYTimeline(timelineMap.length, timelineMap.length, boneIndex);
 					timelines.push(readTimeline(timelineMap, shearYTimeline, 0, 1));
+				} else if (timelineName == "inherit") {
+					var inheritTimeline:InheritTimeline = new InheritTimeline(timelineMap.length, boneIndex);
+					for (frame in 0...timelineMap.length) {
+						var aFrame:Dynamic = timelineMap[frame];
+						inheritTimeline.setFrame(frame, getFloat(aFrame, "time"), Inherit.fromName(getValue(aFrame, "inherit", "Normal")));
+					}
+					timelines.push(inheritTimeline);
 				} else {
 					throw new SpineException("Invalid timeline type for a bone: " + timelineName + " (" + boneName + ")");
 				}
@@ -935,6 +1012,50 @@ class SkeletonJson {
 
 					timelines.push(mixTimeline);
 				}
+			}
+		}
+
+		// Physics constraint timelines.
+		var physics:Dynamic = Reflect.getProperty(map, "physics");
+		for (physicsName in Reflect.fields(physics)) {
+			var constraintIndex:Int = skeletonData.findPhysicsConstraintIndex(physicsName);
+			if (constraintIndex == -1)
+				throw new SpineException("Physics constraint not found: " + physicsName);
+
+			var physicsMap:Dynamic = Reflect.field(physics, physicsName);
+			for (timelineName in Reflect.fields(physicsMap)) {
+				timelineMap = Reflect.field(physicsMap, timelineName);
+				keyMap = timelineMap[0];
+				if (keyMap == null)
+					continue;
+
+				var frames:Int = timelineMap.length;
+				if (timelineName == "reset") {
+					var timeline:PhysicsConstraintResetTimeline = new PhysicsConstraintResetTimeline(frames, constraintIndex);
+					for (frame => keyMap in timelineMap)
+						timeline.setFrame(frame, getFloat(keyMap, "time"));
+					timelines.push(timeline);
+					continue;
+				}
+
+				var timeline:PhysicsConstraintTimeline;
+					if (timelineName == "inertia")
+						timeline = new PhysicsConstraintInertiaTimeline(frames, frames, constraintIndex);
+					else if (timelineName == "strength")
+						timeline = new PhysicsConstraintStrengthTimeline(frames, frames, constraintIndex);
+					else if (timelineName == "damping")
+						timeline = new PhysicsConstraintDampingTimeline(frames, frames, constraintIndex);
+					else if (timelineName == "mass")
+						timeline = new PhysicsConstraintMassTimeline(frames, frames, constraintIndex);
+					else if (timelineName == "wind")
+						timeline = new PhysicsConstraintWindTimeline(frames, frames, constraintIndex);
+					else if (timelineName == "gravity")
+						timeline = new PhysicsConstraintGravityTimeline(frames, frames, constraintIndex);
+					else if (timelineName == "mix") //
+						timeline = new PhysicsConstraintMixTimeline(frames, frames, constraintIndex);
+					else
+						continue;
+				timelines.push(readTimeline(timelineMap, timeline, 0, 1));
 			}
 		}
 

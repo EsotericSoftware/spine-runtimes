@@ -29,46 +29,28 @@
 
 package spine;
 
-class MathUtils {
-	static public var PI:Float = Math.PI;
-	static public var PI2:Float = Math.PI * 2;
-	static public var invPI2 = 1 / MathUtils.PI2;
-	static public var radDeg:Float = 180 / Math.PI;
-	static public var degRad:Float = Math.PI / 180;
+class Inherit {
+	public static var normal(default, never):Inherit = new Inherit(0, "normal");
+	public static var onlyTranslation(default, never):Inherit = new Inherit(1, "onlyTranslation");
+	public static var noRotationOrReflection(default, never):Inherit = new Inherit(2, "noRotationOrReflection");
+	public static var noScale(default, never):Inherit = new Inherit(3, "noScale");
+	public static var noScaleOrReflection(default, never):Inherit = new Inherit(4, "noScaleOrReflection");
 
-	static public function cosDeg(degrees:Float):Float {
-		return Math.cos(degrees * degRad);
+	public static var values:Array<Inherit> = [normal, onlyTranslation, noRotationOrReflection, noScale, noScaleOrReflection];
+
+	public var ordinal(default, null):Int;
+	public var name(default, null):String;
+
+	public function new(ordinal:Int, name:String) {
+		this.ordinal = ordinal;
+		this.name = name;
 	}
 
-	static public function sinDeg(degrees:Float):Float {
-		return Math.sin(degrees * degRad);
-	}
-
-	static public function atan2Deg (y:Float, x:Float):Float {
-		return Math.atan2(y, x) * MathUtils.degRad;
-	}
-
-	static public function clamp(value:Float, min:Float, max:Float):Float {
-		if (value < min)
-			return min;
-		if (value > max)
-			return max;
-		return value;
-	}
-
-	static public function signum(value:Float):Float {
-		return value > 0 ? 1 : value < 0 ? -1 : 0;
-	}
-
-	static public function randomTriangular(min:Float, max:Float):Float {
-		return randomTriangularWith(min, max, (min + max) * 0.5);
-	}
-
-	static public function randomTriangularWith(min:Float, max:Float, mode:Float):Float {
-		var u:Float = Math.random();
-		var d:Float = max - min;
-		if (u <= (mode - min) / d)
-			return min + Math.sqrt(u * d * (mode - min));
-		return max - Math.sqrt((1 - u) * d * (max - mode));
+	public static function fromName(name:String):Inherit {
+		for (value in values) {
+			if (value.name == name)
+				return value;
+		}
+		return null;
 	}
 }

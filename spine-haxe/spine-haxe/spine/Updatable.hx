@@ -30,7 +30,7 @@
 package spine;
 
 interface Updatable {
-	function update():Void;
+	function update(physics:Physics):Void;
 
 	function isActive():Bool;
 }

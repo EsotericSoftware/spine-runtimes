@@ -48,10 +48,12 @@ class SkeletonData {
 	public var ikConstraints:Array<IkConstraintData> = new Array<IkConstraintData>();
 	public var transformConstraints:Array<TransformConstraintData> = new Array<TransformConstraintData>();
 	public var pathConstraints:Array<PathConstraintData> = new Array<PathConstraintData>();
+	public var physicsConstraints:Array<PhysicsConstraintData> = new Array<PhysicsConstraintData>();
 	public var x:Float = 0;
 	public var y:Float = 0;
 	public var width:Float = 0;
 	public var height:Float = 0;
+	public var referenceScale:Float = 100;
 	public var version:String;
 	public var hash:String;
 	public var fps:Float = 0;
@@ -209,6 +211,31 @@ class SkeletonData {
 			throw new SpineException("pathConstraintName cannot be null.");
 		for (i in 0...pathConstraints.length) {
 			if (pathConstraints[i].name == pathConstraintName)
+				return i;
+		}
+		return -1;
+	}
+
+	// --- Physics constraints.
+
+	/** @return May be null. */
+	public function findPhysicsConstraint(constraintName:String):PhysicsConstraintData {
+		if (constraintName == null)
+			throw new SpineException("physicsConstraintName cannot be null.");
+		for (i in 0...physicsConstraints.length) {
+			var constraint:PhysicsConstraintData = physicsConstraints[i];
+			if (constraint.name == constraintName)
+				return constraint;
+		}
+		return null;
+	}
+	
+	/** @return -1 if the path constraint was not found. */
+	public function findPhysicsConstraintIndex(constraintName:String):Int {
+		if (constraintName == null)
+			throw new SpineException("constraintName cannot be null.");
+		for (i in 0...physicsConstraints.length) {
+			if (physicsConstraints[i].name == constraintName)
 				return i;
 		}
 		return -1;

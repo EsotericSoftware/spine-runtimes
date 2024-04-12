@@ -44,11 +44,11 @@ class TransformConstraintTimeline extends CurveTimeline {
 	private static inline var SHEARY:Int = 6;
 
 	/** The index of the transform constraint slot in {@link Skeleton#transformConstraints} that will be changed. */
-	public var transformConstraintIndex:Int = 0;
+	public var constraintIndex:Int = 0;
 
 	public function new(frameCount:Int, bezierCount:Int, transformConstraintIndex:Int) {
 		super(frameCount, bezierCount, [Property.transformConstraint + "|" + transformConstraintIndex]);
-		this.transformConstraintIndex = transformConstraintIndex;
+		this.constraintIndex = transformConstraintIndex;
 	}
 
 	public override function getFrameEntries():Int {
@@ -69,7 +69,7 @@ class TransformConstraintTimeline extends CurveTimeline {
 
 	override public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, blend:MixBlend,
 			direction:MixDirection):Void {
-		var constraint:TransformConstraint = skeleton.transformConstraints[transformConstraintIndex];
+		var constraint:TransformConstraint = skeleton.transformConstraints[constraintIndex];
 		if (!constraint.active)
 			return;
 

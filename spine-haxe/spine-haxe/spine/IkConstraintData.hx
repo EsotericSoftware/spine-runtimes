@@ -32,8 +32,8 @@ package spine;
 class IkConstraintData extends ConstraintData {
 	public var bones:Array<BoneData> = new Array<BoneData>();
 	public var target:BoneData;
-	public var mix:Float = 1;
-	public var bendDirection:Int = 1;
+	public var mix:Float = 0;
+	public var bendDirection:Int = 0;
 	public var compress:Bool = false;
 	public var stretch:Bool = false;
 	public var uniform:Bool = false;
