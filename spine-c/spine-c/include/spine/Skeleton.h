@@ -130,6 +130,10 @@ SP_API spPathConstraint *spSkeleton_findPathConstraint(const spSkeleton *self, c
 /* Returns 0 if the physics constraint was not found. */
 SP_API spPhysicsConstraint *spSkeleton_findPhysicsConstraint(const spSkeleton *self, const char *constraintName);
 
+SP_API void spSkeleton_physicsTranslate(spSkeleton *self, float x, float y);
+
+SP_API void spSkeleton_physicsRotate(spSkeleton *self, float x, float y, float degrees);
+
 #ifdef __cplusplus
 }
 #endif

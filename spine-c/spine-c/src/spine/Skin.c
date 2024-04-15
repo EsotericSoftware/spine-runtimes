@@ -39,6 +39,8 @@ _SP_ARRAY_IMPLEMENT_TYPE(spTransformConstraintDataArray, spTransformConstraintDa
 
 _SP_ARRAY_IMPLEMENT_TYPE(spPathConstraintDataArray, spPathConstraintData *)
 
+_SP_ARRAY_IMPLEMENT_TYPE(spPhysicsConstraintDataArray, spPhysicsConstraintData *)
+
 _Entry *_Entry_create(int slotIndex, const char *name, spAttachment *attachment) {
 	_Entry *self = NEW(_Entry);
 	self->slotIndex = slotIndex;
@@ -72,6 +74,7 @@ spSkin *spSkin_create(const char *name) {
 	self->ikConstraints = spIkConstraintDataArray_create(4);
 	self->transformConstraints = spTransformConstraintDataArray_create(4);
 	self->pathConstraints = spPathConstraintDataArray_create(4);
+    self->physicsConstraints = spPhysicsConstraintDataArray_create(4);
     spColor_setFromFloats(&self->color, 0.99607843f, 0.61960787f, 0.30980393f, 1);
 	return self;
 }
@@ -104,6 +107,7 @@ void spSkin_dispose(spSkin *self) {
 	spIkConstraintDataArray_dispose(self->ikConstraints);
 	spTransformConstraintDataArray_dispose(self->transformConstraints);
 	spPathConstraintDataArray_dispose(self->pathConstraints);
+    spPhysicsConstraintDataArray_dispose(self->physicsConstraints);
 	FREE(self->name);
 	FREE(self);
 }
@@ -198,6 +202,11 @@ void spSkin_addSkin(spSkin *self, const spSkin *other) {
 			spPathConstraintDataArray_add(self->pathConstraints, other->pathConstraints->items[i]);
 	}
 
+    for (i = 0; i < other->physicsConstraints->size; i++) {
+        if (!spPhysicsConstraintDataArray_contains(self->physicsConstraints, other->physicsConstraints->items[i]))
+            spPhysicsConstraintDataArray_add(self->physicsConstraints, other->physicsConstraints->items[i]);
+    }
+
 	entry = spSkin_getAttachments(other);
 	while (entry) {
 		spSkin_setAttachment(self, entry->slotIndex, entry->name, entry->attachment);
@@ -228,6 +237,11 @@ void spSkin_copySkin(spSkin *self, const spSkin *other) {
 		if (!spPathConstraintDataArray_contains(self->pathConstraints, other->pathConstraints->items[i]))
 			spPathConstraintDataArray_add(self->pathConstraints, other->pathConstraints->items[i]);
 	}
+
+    for (i = 0; i < other->physicsConstraints->size; i++) {
+        if (!spPhysicsConstraintDataArray_contains(self->physicsConstraints, other->physicsConstraints->items[i]))
+            spPhysicsConstraintDataArray_add(self->physicsConstraints, other->physicsConstraints->items[i]);
+    }
 
 	entry = spSkin_getAttachments(other);
 	while (entry) {
@@ -279,4 +293,5 @@ void spSkin_clear(spSkin *self) {
 	spIkConstraintDataArray_clear(self->ikConstraints);
 	spTransformConstraintDataArray_clear(self->transformConstraints);
 	spPathConstraintDataArray_clear(self->pathConstraints);
+    spPhysicsConstraintDataArray_clear(self->physicsConstraints);
 }

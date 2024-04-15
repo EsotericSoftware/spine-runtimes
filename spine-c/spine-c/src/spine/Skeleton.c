@@ -60,6 +60,11 @@ spSkeleton *spSkeleton_create(spSkeletonData *data) {
 	_spSkeleton *internal = NEW(_spSkeleton);
 	spSkeleton *self = SUPER(internal);
 	self->data = data;
+	self->skin = NULL;
+	spColor_setFromFloats(&self->color, 1, 1, 1, 1);
+	self->scaleX = 1;
+	self->scaleY = 1;
+	self->time = 0;
 
 	self->bonesCount = self->data->bonesCount;
 	self->bones = MALLOC(spBone *, self->bonesCount);
@@ -116,6 +121,12 @@ spSkeleton *spSkeleton_create(spSkeletonData *data) {
 	for (i = 0; i < self->data->pathConstraintsCount; i++)
 		self->pathConstraints[i] = spPathConstraint_create(self->data->pathConstraints[i], self);
 
+	self->physicsConstraintsCount = data->physicsConstraintsCount;
+	self->physicsConstraints = MALLOC(spPhysicsConstraint *, self->physicsConstraintsCount);
+	for (i = 0; i < self->data->physicsConstraintsCount; i++)
+		self->physicsConstraints[i] = spPhysicsConstraint_create(self->data->physicsConstraints[i], self);
+
+
 	spColor_setFromFloats(&self->color, 1, 1, 1, 1);
 
 	self->scaleX = 1;
@@ -155,6 +166,10 @@ void spSkeleton_dispose(spSkeleton *self) {
 	for (i = 0; i < self->pathConstraintsCount; i++)
 		spPathConstraint_dispose(self->pathConstraints[i]);
 	FREE(self->pathConstraints);
+
+	for (i = 0; i < self->physicsConstraintsCount; i++)
+		spPhysicsConstraint_dispose(self->physicsConstraints[i]);
+	FREE(self->physicsConstraints);
 
 	FREE(self->drawOrder);
 	FREE(self);
@@ -324,17 +339,35 @@ static void _sortTransformConstraint(_spSkeleton *const internal, spTransformCon
 		constrained[i]->sorted = 1;
 }
 
+static void _sortPhysicsConstraint(_spSkeleton *const internal, spPhysicsConstraint *constraint) {
+	spBone *bone = constraint->bone;
+	constraint->active = constraint->bone->active && (!constraint->data->skinRequired || (internal->super.skin != 0 &&
+																						spPhysicsConstraintDataArray_contains(
+																								internal->super.skin->physicsConstraints,
+																								constraint->data)));
+	if (!constraint->active)
+		return;
+
+	_sortBone(internal, bone);
+	_addToUpdateCache(internal, SP_UPDATE_PHYSICS_CONSTRAINT, constraint);
+
+	_sortReset(bone->children, bone->childrenCount);
+	bone->sorted = -1;
+}
+
 void spSkeleton_updateCache(spSkeleton *self) {
 	int i, ii;
 	spBone **bones;
 	spIkConstraint **ikConstraints;
 	spPathConstraint **pathConstraints;
 	spTransformConstraint **transformConstraints;
-	int ikCount, transformCount, pathCount, constraintCount;
+	spPhysicsConstraint **physicsConstraints;
+	int ikCount, transformCount, pathCount, physicsCount, constraintCount;
 	_spSkeleton *internal = SUB_CAST(_spSkeleton, self);
 
 	internal->updateCacheCapacity =
-			self->bonesCount + self->ikConstraintsCount + self->transformConstraintsCount + self->pathConstraintsCount;
+			self->bonesCount + self->ikConstraintsCount + self->transformConstraintsCount + self->pathConstraintsCount +
+			 self->physicsConstraintsCount;
 	FREE(internal->updateCache);
 	internal->updateCache = MALLOC(_spUpdate, internal->updateCacheCapacity);
 	internal->updateCacheCount = 0;
@@ -362,10 +395,12 @@ void spSkeleton_updateCache(spSkeleton *self) {
 	ikConstraints = self->ikConstraints;
 	transformConstraints = self->transformConstraints;
 	pathConstraints = self->pathConstraints;
+	physicsConstraints = self->physicsConstraints;
 	ikCount = self->ikConstraintsCount;
 	transformCount = self->transformConstraintsCount;
 	pathCount = self->pathConstraintsCount;
-	constraintCount = ikCount + transformCount + pathCount;
+	physicsCount = self->physicsConstraintsCount;
+	constraintCount = ikCount + transformCount + pathCount + physicsCount;
 
 	i = 0;
 continue_outer:
@@ -392,6 +427,15 @@ continue_outer:
 			spPathConstraint *pathConstraint = pathConstraints[ii];
 			if (pathConstraint->data->order == i) {
 				_sortPathConstraint(internal, pathConstraint);
+				i++;
+				goto continue_outer;
+			}
+		}
+
+		for (ii = 0; ii < physicsCount; ii++) {
+			spPhysicsConstraint *physicsConstraint = physicsConstraints[ii];
+			if (physicsConstraint->data->order == i) {
+				_sortPhysicsConstraint(internal, physicsConstraint);
 				i++;
 				goto continue_outer;
 			}
@@ -495,33 +539,19 @@ void spSkeleton_setBonesToSetupPose(const spSkeleton *self) {
 		spBone_setToSetupPose(self->bones[i]);
 
 	for (i = 0; i < self->ikConstraintsCount; ++i) {
-		spIkConstraint *ikConstraint = self->ikConstraints[i];
-		ikConstraint->bendDirection = ikConstraint->data->bendDirection;
-		ikConstraint->compress = ikConstraint->data->compress;
-		ikConstraint->stretch = ikConstraint->data->stretch;
-		ikConstraint->softness = ikConstraint->data->softness;
-		ikConstraint->mix = ikConstraint->data->mix;
+		spIkConstraint_setToSetupPose(self->ikConstraints[i]);
 	}
 
 	for (i = 0; i < self->transformConstraintsCount; ++i) {
-		spTransformConstraint *constraint = self->transformConstraints[i];
-		spTransformConstraintData *data = constraint->data;
-		constraint->mixRotate = data->mixRotate;
-		constraint->mixX = data->mixX;
-		constraint->mixY = data->mixY;
-		constraint->mixScaleX = data->mixScaleX;
-		constraint->mixScaleY = data->mixScaleY;
-		constraint->mixShearY = data->mixShearY;
+		spTransformConstraint_setToSetupPose(self->transformConstraints[i]);
 	}
 
 	for (i = 0; i < self->pathConstraintsCount; ++i) {
-		spPathConstraint *constraint = self->pathConstraints[i];
-		spPathConstraintData *data = constraint->data;
-		constraint->position = data->position;
-		constraint->spacing = data->spacing;
-		constraint->mixRotate = data->mixRotate;
-		constraint->mixX = data->mixX;
-		constraint->mixY = data->mixY;
+		spPathConstraint_setToSetupPose(self->pathConstraints[i]);
+	}
+
+	for (i = 0; i < self->physicsConstraintsCount; ++i) {
+		spPhysicsConstraint_setToSetupPose(self->physicsConstraints[i]);
 	}
 }
 
@@ -644,4 +674,16 @@ spPhysicsConstraint *spSkeleton_findPhysicsConstraint(const spSkeleton *self, co
 	for (i = 0; i < self->physicsConstraintsCount; ++i)
 		if (strcmp(self->physicsConstraints[i]->data->name, constraintName) == 0) return self->physicsConstraints[i];
 	return 0;
+}
+
+void spSkeleton_physicsTranslate(spSkeleton *self, float x, float y) {
+	for (int i = 0; i < (int) self->physicsConstraintsCount; i++) {
+		spPhysicsConstraint_translate(self->physicsConstraints[i], x, y);
+	}
+}
+
+void spSkeleton_physicsRotate(spSkeleton *self, float x, float y, float degrees) {
+	for (int i = 0; i < (int) self->physicsConstraintsCount; i++) {
+		spPhysicsConstraint_rotate(self->physicsConstraints[i], x, y, degrees);
+	}
 }

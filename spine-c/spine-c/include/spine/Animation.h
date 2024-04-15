@@ -101,8 +101,17 @@ typedef enum {
 	SP_TIMELINE_TRANSLATE,
 	SP_TIMELINE_DEFORM,
 	SP_TIMELINE_SEQUENCE,
+    SP_TIMELINE_INHERIT,
 	SP_TIMELINE_IKCONSTRAINT,
 	SP_TIMELINE_PATHCONSTRAINTMIX,
+    SP_TIMELINE_PHYSICSCONSTRAINT_INERTIA,
+    SP_TIMELINE_PHYSICSCONSTRAINT_STRENGTH,
+    SP_TIMELINE_PHYSICSCONSTRAINT_DAMPING,
+    SP_TIMELINE_PHYSICSCONSTRAINT_MASS,
+    SP_TIMELINE_PHYSICSCONSTRAINT_WIND,
+    SP_TIMELINE_PHYSICSCONSTRAINT_GRAVITY,
+    SP_TIMELINE_PHYSICSCONSTRAINT_MIX,
+    SP_TIMELINE_PHYSICSCONSTRAINT_RESET,
 	SP_TIMELINE_RGB2,
 	SP_TIMELINE_RGBA2,
 	SP_TIMELINE_RGBA,
@@ -122,19 +131,28 @@ typedef enum {
 	SP_PROPERTY_SCALEY = 1 << 4,
 	SP_PROPERTY_SHEARX = 1 << 5,
 	SP_PROPERTY_SHEARY = 1 << 6,
-	SP_PROPERTY_RGB = 1 << 7,
-	SP_PROPERTY_ALPHA = 1 << 8,
-	SP_PROPERTY_RGB2 = 1 << 9,
-	SP_PROPERTY_ATTACHMENT = 1 << 10,
-	SP_PROPERTY_DEFORM = 1 << 11,
-	SP_PROPERTY_EVENT = 1 << 12,
-	SP_PROPERTY_DRAWORDER = 1 << 13,
-	SP_PROPERTY_IKCONSTRAINT = 1 << 14,
-	SP_PROPERTY_TRANSFORMCONSTRAINT = 1 << 15,
-	SP_PROPERTY_PATHCONSTRAINT_POSITION = 1 << 16,
-	SP_PROPERTY_PATHCONSTRAINT_SPACING = 1 << 17,
-	SP_PROPERTY_PATHCONSTRAINT_MIX = 1 << 18,
-	SP_PROPERTY_SEQUENCE = 1 << 19
+    SP_PROPERTY_INHERIT = 1 << 7,
+	SP_PROPERTY_RGB = 1 << 8,
+	SP_PROPERTY_ALPHA = 1 << 9,
+	SP_PROPERTY_RGB2 = 1 << 10,
+	SP_PROPERTY_ATTACHMENT = 1 << 11,
+	SP_PROPERTY_DEFORM = 1 << 12,
+	SP_PROPERTY_EVENT = 1 << 13,
+	SP_PROPERTY_DRAWORDER = 1 << 14,
+	SP_PROPERTY_IKCONSTRAINT = 1 << 15,
+	SP_PROPERTY_TRANSFORMCONSTRAINT = 1 << 16,
+	SP_PROPERTY_PATHCONSTRAINT_POSITION = 1 << 17,
+	SP_PROPERTY_PATHCONSTRAINT_SPACING = 1 << 18,
+	SP_PROPERTY_PATHCONSTRAINT_MIX = 1 << 19,
+    SP_PROPERTY_PHYSICSCONSTRAINT_INERTIA = 1 << 20,
+    SP_PROPERTY_PHYSICSCONSTRAINT_STRENGTH = 1 << 21,
+    SP_PROPERTY_PHYSICSCONSTRAINT_DAMPING = 1 << 22,
+    SP_PROPERTY_PHYSICSCONSTRAINT_MASS = 1 << 23,
+    SP_PROPERTY_PHYSICSCONSTRAINT_WIND = 1 << 24,
+    SP_PROPERTY_PHYSICSCONSTRAINT_GRAVITY = 1 << 25,
+    SP_PROPERTY_PHYSICSCONSTRAINT_MIX = 1 << 26,
+    SP_PROPERTY_PHYSICSCONSTRAINT_RESET = 1 << 27,
+	SP_PROPERTY_SEQUENCE = 1 << 28
 } spProperty;
 
 #define SP_MAX_PROPERTY_IDS 3
@@ -195,6 +213,14 @@ typedef struct spCurveTimeline spCurveTimeline1;
 SP_API void spCurveTimeline1_setFrame(spCurveTimeline1 *self, int frame, float time, float value);
 
 SP_API float spCurveTimeline1_getCurveValue(spCurveTimeline1 *self, float time);
+
+SP_API float spCurveTimeline1_getRelativeValue(spCurveTimeline1 *timeline, float time, float alpha, spMixBlend blend, float current, float setup);
+
+SP_API float spCurveTimeline1_getAbsoluteValue(spCurveTimeline1 *timeline, float time, float alpha, spMixBlend blend, float current, float setup);
+
+SP_API float spCurveTimeline1_getAbsoluteValue2(spCurveTimeline1 *timeline, float time, float alpha, spMixBlend blend, float current, float setup, float value);
+
+SP_API float spCurveTimeline1_getScaleValue (spCurveTimeline1 *timeline, float time, float alpha, spMixBlend blend, spMixDirection direction, float current, float setup);
 
 typedef struct spCurveTimeline spCurveTimeline2;
 
@@ -439,6 +465,18 @@ SP_API void spDrawOrderTimeline_setFrame(spDrawOrderTimeline *self, int frameInd
 
 /**/
 
+typedef struct spInheritTimeline {
+    spTimeline super;
+    int boneIndex;
+} spInheritTimeline;
+
+SP_API spInheritTimeline *spInheritTimeline_create(int framesCount, int boneIndex);
+
+SP_API void spInheritTimeline_setFrame(spDrawOrderTimeline *self, int frameIndex, float time, spInherit inherit);
+
+
+/**/
+
 typedef struct spIkConstraintTimeline {
 	spCurveTimeline super;
 	int ikConstraintIndex;
@@ -507,6 +545,27 @@ spPathConstraintMixTimeline_setFrame(spPathConstraintMixTimeline *self, int fram
 									 float mixX, float mixY);
 
 /**/
+
+typedef struct spPhysicsConstraintTimeline {
+    spCurveTimeline super;
+    int physicsConstraintIndex;
+} spPhysicsConstraintTimeline;
+
+SP_API spPhysicsConstraintTimeline *
+spPhysicsConstraintTimeline_create(int framesCount, int bezierCount, int physicsConstraintIndex, spTimelineType type);
+
+SP_API void spPhysicsConstraintTimeline_setFrame(spPhysicsConstraintTimeline *self, int frame, float time, float value);
+
+/**/
+
+typedef struct spPhysicsConstraintResetTimeline {
+    spTimeline super;
+    int physicsConstraintIndex;
+} spPhysicsConstraintResetTimeline;
+
+SP_API spPhysicsConstraintResetTimeline *spPhysicsConstraintResetTimeline_create(int framesCount, int boneIndex);
+
+SP_API void spPhysicsConstraintResetTimeline_setFrame(spPhysicsConstraintResetTimeline *self, int frameIndex, float time);
 
 #ifdef __cplusplus
 }

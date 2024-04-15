@@ -56,6 +56,8 @@ SP_API void spTransformConstraint_dispose(spTransformConstraint *self);
 
 SP_API void spTransformConstraint_update(spTransformConstraint *self);
 
+SP_API void spTransformConstraint_setToSetupPose(spTransformConstraint *self);
+
 #ifdef __cplusplus
 }
 #endif
