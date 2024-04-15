@@ -49,7 +49,7 @@ struct spMeshAttachment {
 	spTextureRegion *region;
 	spSequence *sequence;
 
-	const char *path;
+	char *path;
 
 	float *regionUVs;
 	float *uvs;

@@ -1765,7 +1765,7 @@ void _spDeformTimeline_apply(
 	const float *nextVertices;
 	float *frames;
 	int framesCount;
-	const float **frameVertices;
+	float **frameVertices;
 	float *deformArray;
 	spDeformTimeline *self = (spDeformTimeline *) timeline;
 

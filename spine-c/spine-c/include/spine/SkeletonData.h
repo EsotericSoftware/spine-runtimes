@@ -39,15 +39,17 @@
 #include <spine/IkConstraintData.h>
 #include <spine/TransformConstraintData.h>
 #include <spine/PathConstraintData.h>
+#include <spine/PhysicsConstraintData.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 typedef struct spSkeletonData {
-	const char *version;
-	const char *hash;
+	char *version;
+	char *hash;
 	float x, y, width, height;
+    float referenceScale;
 	float fps;
 	const char *imagesPath;
 	const char *audioPath;
@@ -79,6 +81,9 @@ typedef struct spSkeletonData {
 
 	int pathConstraintsCount;
 	spPathConstraintData **pathConstraints;
+
+    int physicsConstraintsCount;
+    spPhysicsConstraintData **physicsConstraints;
 } spSkeletonData;
 
 SP_API spSkeletonData *spSkeletonData_create(void);
@@ -101,6 +106,8 @@ SP_API spTransformConstraintData *
 spSkeletonData_findTransformConstraint(const spSkeletonData *self, const char *constraintName);
 
 SP_API spPathConstraintData *spSkeletonData_findPathConstraint(const spSkeletonData *self, const char *constraintName);
+
+SP_API spPhysicsConstraintData *spSkeletonData_findPhysicsConstraint(const spSkeletonData *self, const char *constraintName);
 
 #ifdef __cplusplus
 }

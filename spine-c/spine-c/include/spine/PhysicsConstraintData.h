@@ -27,30 +27,32 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include <spine/SlotData.h>
-#include <spine/extension.h>
+#ifndef SPINE_PHYSICSCONSTRAINTDATA_H_
+#define SPINE_PHYSICSCONSTRAINTDATA_H_
 
-spSlotData *spSlotData_create(const int index, const char *name, spBoneData *boneData) {
-	spSlotData *self = NEW(spSlotData);
-	self->index = index;
-	MALLOC_STR(self->name, name);
-	self->boneData = boneData;
-	spColor_setFromFloats(&self->color, 1, 1, 1, 1);
-    self->visible = -1;
-	return self;
-}
+#include <spine/dll.h>
+#include <spine/BoneData.h>
 
-void spSlotData_dispose(spSlotData *self) {
-	FREE(self->name);
-	FREE(self->attachmentName);
-	FREE(self->darkColor);
-	FREE(self);
-}
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-void spSlotData_setAttachmentName(spSlotData *self, const char *attachmentName) {
-	FREE(self->attachmentName);
-	if (attachmentName)
-		MALLOC_STR(self->attachmentName, attachmentName);
-	else
-		self->attachmentName = 0;
+typedef struct spPhysicsConstraintData {
+	char *name;
+	int order;
+	int/*bool*/ skinRequired;
+    spBoneData *bone;
+    float x, y, rotate, scaleX, shearX, limit;
+    float step, inertia, strength, damping, massInverse, wind, gravity, mix;
+    int/*bool*/ inertiaGlobal, strengthGlobal, dampingGlobal, massGlobal, windGlobal, gravityGlobal, mixGlobal;
+} spPhysicsConstraintData;
+
+SP_API spPhysicsConstraintData *spPhysicsConstraintData_create(const char *name);
+
+SP_API void spPhysicsConstraintData_dispose(spPhysicsConstraintData *self);
+
+#ifdef __cplusplus
 }
+#endif
+
+#endif /* SPINE_PHYSICSCONSTRAINTDATA_H_ */

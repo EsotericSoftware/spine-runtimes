@@ -70,8 +70,8 @@ typedef enum {
 
 typedef struct spAtlasPage spAtlasPage;
 struct spAtlasPage {
-	const spAtlas *atlas;
-	const char *name;
+	spAtlas *atlas;
+	char *name;
 	spAtlasFormat format;
 	spAtlasFilter minFilter, magFilter;
 	spAtlasWrap uWrap, vWrap;

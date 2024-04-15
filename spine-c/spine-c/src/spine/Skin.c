@@ -42,7 +42,7 @@ _SP_ARRAY_IMPLEMENT_TYPE(spPathConstraintDataArray, spPathConstraintData *)
 _Entry *_Entry_create(int slotIndex, const char *name, spAttachment *attachment) {
 	_Entry *self = NEW(_Entry);
 	self->slotIndex = slotIndex;
-	MALLOC_STR(self->name, name);
+	MALLOC_STR(self->name, (char *)name);
 	self->attachment = attachment;
 	return self;
 }
@@ -67,11 +67,12 @@ static void _SkinHashTableEntry_dispose(_SkinHashTableEntry *self) {
 
 spSkin *spSkin_create(const char *name) {
 	spSkin *self = SUPER(NEW(_spSkin));
-	MALLOC_STR(self->name, name);
+	MALLOC_STR(self->name, (char*)name);
 	self->bones = spBoneDataArray_create(4);
 	self->ikConstraints = spIkConstraintDataArray_create(4);
 	self->transformConstraints = spTransformConstraintDataArray_create(4);
 	self->pathConstraints = spPathConstraintDataArray_create(4);
+    spColor_setFromFloats(&self->color, 0.99607843f, 0.61960787f, 0.30980393f, 1);
 	return self;
 }
 

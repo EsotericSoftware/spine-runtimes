@@ -37,6 +37,7 @@
 #include <spine/IkConstraint.h>
 #include <spine/TransformConstraint.h>
 #include <spine/PathConstraint.h>
+#include <spine/PhysicsConstraint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -61,6 +62,9 @@ typedef struct spSkeleton {
 
 	int pathConstraintsCount;
 	spPathConstraint **pathConstraints;
+
+    int physicsConstraintsCount;
+    spPhysicsConstraint **physicsConstraints;
 
 	spSkin *skin;
 	spColor color;
@@ -122,6 +126,9 @@ SP_API spTransformConstraint *spSkeleton_findTransformConstraint(const spSkeleto
 
 /* Returns 0 if the path constraint was not found. */
 SP_API spPathConstraint *spSkeleton_findPathConstraint(const spSkeleton *self, const char *constraintName);
+
+/* Returns 0 if the physics constraint was not found. */
+SP_API spPhysicsConstraint *spSkeleton_findPhysicsConstraint(const spSkeleton *self, const char *constraintName);
 
 #ifdef __cplusplus
 }

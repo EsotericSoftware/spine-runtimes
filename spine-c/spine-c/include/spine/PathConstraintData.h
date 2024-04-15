@@ -51,7 +51,7 @@ typedef enum {
 } spRotateMode;
 
 typedef struct spPathConstraintData {
-	const char *name;
+	char *name;
 	int order;
 	int/*bool*/ skinRequired;
 	int bonesCount;

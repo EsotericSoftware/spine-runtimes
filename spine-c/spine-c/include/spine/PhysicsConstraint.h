@@ -27,30 +27,71 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include <spine/SlotData.h>
-#include <spine/extension.h>
+#ifndef SPINE_PHYSICSCONSTRAINT_H_
+#define SPINE_PHYSICSCONSTRAINT_H_
 
-spSlotData *spSlotData_create(const int index, const char *name, spBoneData *boneData) {
-	spSlotData *self = NEW(spSlotData);
-	self->index = index;
-	MALLOC_STR(self->name, name);
-	self->boneData = boneData;
-	spColor_setFromFloats(&self->color, 1, 1, 1, 1);
-    self->visible = -1;
-	return self;
-}
+#include <spine/dll.h>
+#include <spine/PhysicsConstraintData.h>
+#include <spine/Bone.h>
+#include <spine/Physics.h>
 
-void spSlotData_dispose(spSlotData *self) {
-	FREE(self->name);
-	FREE(self->attachmentName);
-	FREE(self->darkColor);
-	FREE(self);
-}
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-void spSlotData_setAttachmentName(spSlotData *self, const char *attachmentName) {
-	FREE(self->attachmentName);
-	if (attachmentName)
-		MALLOC_STR(self->attachmentName, attachmentName);
-	else
-		self->attachmentName = 0;
+typedef struct spPhysicsConstraint {
+    spPhysicsConstraintData *data;
+    spBone* bone;
+
+    float inertia;
+    float strength;
+    float damping;
+    float massInverse;
+    float wind;
+    float gravity;
+    float mix;
+
+    int/*bool*/ reset;
+    float ux;
+    float uy;
+    float cx;
+    float cy;
+    float tx;
+    float ty;
+    float xOffset;
+    float xVelocity;
+    float yOffset;
+    float yVelocity;
+    float rotateOffset;
+    float rotateVelocity;
+    float scaleOffset;
+    float scaleVelocity;
+
+    int/*bool*/ active;
+
+    struct spSkeleton *skeleton;
+    float remaining;
+    float lastTime;
+
+} spPhysicsConstraint;
+
+SP_API spPhysicsConstraint *
+spPhysicsConstraint_create(spPhysicsConstraintData *data, struct spSkeleton *skeleton);
+
+SP_API void spPhysicsConstraint_dispose(spPhysicsConstraint *self);
+
+SP_API void spPhysicsConstraint_reset(spPhysicsConstraint *self);
+
+SP_API void spPhysicsConstraint_setToSetupPose(spPhysicsConstraint *self);
+
+SP_API void spPhysicsConstraint_update(spPhysicsConstraint *self, spPhysics physics);
+
+SP_API void spPhysicsConstraint_rotate(spPhysicsConstraint *self, float x, float y, float degrees);
+
+SP_API void spPhysicsConstraint_translate(spPhysicsConstraint *self, float x, float y);
+
+#ifdef __cplusplus
 }
+#endif
+
+#endif /* SPINE_PHYSICSCONSTRAINT_H_ */

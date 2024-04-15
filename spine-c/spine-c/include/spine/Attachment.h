@@ -49,7 +49,7 @@ typedef enum {
 } spAttachmentType;
 
 typedef struct spAttachment {
-	const char *name;
+	char *name;
 	spAttachmentType type;
 	const void *vtable;
 	int refCount;

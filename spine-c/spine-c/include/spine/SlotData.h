@@ -44,12 +44,13 @@ typedef enum {
 
 typedef struct spSlotData {
 	int index;
-	const char *name;
-	const spBoneData *boneData;
-	const char *attachmentName;
+	char *name;
+	spBoneData *boneData;
+	char *attachmentName;
 	spColor color;
 	spColor *darkColor;
 	spBlendMode blendMode;
+    int/*bool*/ visible;
 } spSlotData;
 
 SP_API spSlotData *spSlotData_create(const int index, const char *name, spBoneData *boneData);

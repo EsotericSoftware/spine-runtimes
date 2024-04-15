@@ -42,7 +42,7 @@ extern "C" {
 
 typedef struct spRegionAttachment {
 	spAttachment super;
-	const char *path;
+	char *path;
 	float x, y, scaleX, scaleY, rotation, width, height;
 	spColor color;
 

@@ -48,7 +48,7 @@ typedef enum {
 typedef struct spBoneData spBoneData;
 struct spBoneData {
 	int index;
-	const char *name;
+	char *name;
 	spBoneData *parent;
 	float length;
 	float x, y, rotation, scaleX, scaleY, shearX, shearY;

@@ -42,21 +42,9 @@ typedef struct spEvent {
 	float time;
 	int intValue;
 	float floatValue;
-	const char *stringValue;
+	char *stringValue;
 	float volume;
 	float balance;
-
-#ifdef __cplusplus
-	spEvent() :
-		data(0),
-		time(0),
-		intValue(0),
-		floatValue(0),
-		stringValue(0),
-		volume(0),
-		balance(0) {
-	}
-#endif
 } spEvent;
 
 SP_API spEvent *spEvent_create(float time, spEventData *data);

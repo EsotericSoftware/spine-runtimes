@@ -38,7 +38,7 @@ extern "C" {
 #endif
 
 typedef struct spTransformConstraintData {
-	const char *name;
+	char *name;
 	int order;
 	int/*bool*/ skinRequired;
 	int bonesCount;

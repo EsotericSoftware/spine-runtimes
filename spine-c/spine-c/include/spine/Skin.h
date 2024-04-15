@@ -55,12 +55,13 @@ _SP_ARRAY_DECLARE_TYPE(spTransformConstraintDataArray, spTransformConstraintData
 _SP_ARRAY_DECLARE_TYPE(spPathConstraintDataArray, spPathConstraintData*)
 
 typedef struct spSkin {
-	const char *name;
+	char *name;
 
 	spBoneDataArray *bones;
 	spIkConstraintDataArray *ikConstraints;
 	spTransformConstraintDataArray *transformConstraints;
 	spPathConstraintDataArray *pathConstraints;
+    spColor color;
 } spSkin;
 
 /* Private structs, needed by Skeleton */
@@ -68,7 +69,7 @@ typedef struct _Entry _Entry;
 typedef struct _Entry spSkinEntry;
 struct _Entry {
 	int slotIndex;
-	const char *name;
+	char *name;
 	spAttachment *attachment;
 	_Entry *next;
 };

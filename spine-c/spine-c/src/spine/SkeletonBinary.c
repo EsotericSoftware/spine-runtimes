@@ -1005,13 +1005,13 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
 
 	switch (type) {
 		case SP_ATTACHMENT_REGION: {
-			const char *path = readStringRef(input, skeletonData);
+			char *path = readStringRef(input, skeletonData);
 			float rotation, x, y, scaleX, scaleY, width, height;
 			spColor color;
 			spSequence *sequence;
 			if (!path) MALLOC_STR(path, name);
 			else {
-				const char *tmp = 0;
+				char *tmp = 0;
 				MALLOC_STR(tmp, path);
 				path = tmp;
 			}
@@ -1067,7 +1067,7 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
 		}
 		case SP_ATTACHMENT_MESH: {
 			int vertexCount;
-			const char *path = readStringRef(input, skeletonData);
+			char *path = readStringRef(input, skeletonData);
 			spColor color;
 			float *regionUVs;
 			unsigned short *triangles;
@@ -1085,7 +1085,7 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
 			float height = 0;
 			if (!path) MALLOC_STR(path, name);
 			else {
-				const char *tmp = 0;
+				char *tmp = 0;
 				MALLOC_STR(tmp, path);
 				path = tmp;
 			}
@@ -1137,10 +1137,10 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
 			const char *parent;
 			int inheritTimeline;
 			spSequence *sequence;
-			const char *path = readStringRef(input, skeletonData);
+			char *path = readStringRef(input, skeletonData);
 			if (!path) MALLOC_STR(path, name);
 			else {
-				const char *tmp = 0;
+				char *tmp = 0;
 				MALLOC_STR(tmp, path);
 				path = tmp;
 			}

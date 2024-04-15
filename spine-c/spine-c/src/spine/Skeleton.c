@@ -36,7 +36,8 @@ typedef enum {
 	SP_UPDATE_BONE,
 	SP_UPDATE_IK_CONSTRAINT,
 	SP_UPDATE_PATH_CONSTRAINT,
-	SP_UPDATE_TRANSFORM_CONSTRAINT
+	SP_UPDATE_TRANSFORM_CONSTRAINT,
+	SP_UPDATE_PHYSICS_CONSTRAINT
 } _spUpdateType;
 
 typedef struct {
@@ -431,6 +432,8 @@ void spSkeleton_updateWorldTransform(const spSkeleton *self, spPhysics physics) 
 			case SP_UPDATE_PATH_CONSTRAINT:
 				spPathConstraint_update((spPathConstraint *) update->object);
 				break;
+			case SP_UPDATE_PHYSICS_CONSTRAINT:
+				spPhysicsConstraint_update((spPhysicsConstraint *) update->object, physics);
 		}
 	}
 }
@@ -439,7 +442,7 @@ void spSkeleton_update(spSkeleton *self, float delta) {
     self->time += delta;
 }
 
-void spSkeleton_updateWorldTransformWith(const spSkeleton *self, const spBone *parent) {
+void spSkeleton_updateWorldTransformWith(const spSkeleton *self, const spBone *parent, spPhysics physics) {
 	/* Apply the parent bone transform to the root bone. The root bone always inherits scale, rotation and reflection. */
 	int i;
 	float rotationY, la, lb, lc, ld;
@@ -475,6 +478,8 @@ void spSkeleton_updateWorldTransformWith(const spSkeleton *self, const spBone *p
 			case SP_UPDATE_PATH_CONSTRAINT:
 				spPathConstraint_update((spPathConstraint *) update->object);
 				break;
+			case SP_UPDATE_PHYSICS_CONSTRAINT:
+				spPhysicsConstraint_update((spPhysicsConstraint *) update->object, physics);
 		}
 	}
 }
@@ -630,5 +635,13 @@ spPathConstraint *spSkeleton_findPathConstraint(const spSkeleton *self, const ch
 	int i;
 	for (i = 0; i < self->pathConstraintsCount; ++i)
 		if (strcmp(self->pathConstraints[i]->data->name, constraintName) == 0) return self->pathConstraints[i];
+	return 0;
+}
+
+
+spPhysicsConstraint *spSkeleton_findPhysicsConstraint(const spSkeleton *self, const char *constraintName) {
+	int i;
+	for (i = 0; i < self->physicsConstraintsCount; ++i)
+		if (strcmp(self->physicsConstraints[i]->data->name, constraintName) == 0) return self->physicsConstraints[i];
 	return 0;
 }

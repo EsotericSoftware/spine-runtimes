@@ -46,7 +46,7 @@ struct spAtlasAttachmentLoader;
 typedef struct spSkeletonJson {
 	float scale;
 	spAttachmentLoader *attachmentLoader;
-	const char *error;
+	char *error;
 } spSkeletonJson;
 
 SP_API spSkeletonJson *spSkeletonJson_createWithLoader(spAttachmentLoader *attachmentLoader);
