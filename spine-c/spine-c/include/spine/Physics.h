@@ -34,11 +34,16 @@
 extern "C" {
 #endif
 
+/** Determines how physics and other non-deterministic updates are applied. */
 typedef enum {
-    SP_PHYSICS_NONE,
-    SP_PHYSICS_RESET,
-    SP_PHYSICS_UPDATE,
-    SP_PHYSICS_POSE
+  /** Physics are not updated or applied. */
+  SP_PHYSICS_NONE,
+  /** Physics are reset to the current pose. */
+  SP_PHYSICS_RESET,
+  /** Physics are updated and the pose from physics is applied. */
+  SP_PHYSICS_UPDATE,
+  /** Physics are not updated but the pose from physics is applied. */
+  SP_PHYSICS_POSE
 } spPhysics;
 
 #ifdef __cplusplus
