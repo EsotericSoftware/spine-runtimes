@@ -472,7 +472,7 @@ typedef struct spInheritTimeline {
 
 SP_API spInheritTimeline *spInheritTimeline_create(int framesCount, int boneIndex);
 
-SP_API void spInheritTimeline_setFrame(spDrawOrderTimeline *self, int frameIndex, float time, spInherit inherit);
+SP_API void spInheritTimeline_setFrame(spInheritTimeline *self, int frameIndex, float time, spInherit inherit);
 
 
 /**/

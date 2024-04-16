@@ -2194,7 +2194,7 @@ spInheritTimeline *spInheritTimeline_create(int framesCount, int boneIndex) {
     return self;
 }
 
-void spInheritTimeline_setFrame(spDrawOrderTimeline *self, int frame, float time, spInherit inherit) {
+void spInheritTimeline_setFrame(spInheritTimeline *self, int frame, float time, spInherit inherit) {
     frame *= 2;
     self->super.frames->items[frame] = time;
     self->super.frames->items[frame + 1] = inherit;
@@ -2857,6 +2857,6 @@ spPhysicsConstraintResetTimeline *spPhysicsConstraintResetTimeline_create(int fr
     return self;
 }
 
-void spPhysicsResetTimeline_setFrame(spPhysicsConstraintResetTimeline *self, int frame, float time) {
+void spPhysicsConstraintResetTimeline_setFrame(spPhysicsConstraintResetTimeline *self, int frame, float time) {
     self->super.frames->items[frame] = time;
 }

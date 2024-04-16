@@ -51,6 +51,7 @@ typedef struct spSlotData {
 	spColor *darkColor;
 	spBlendMode blendMode;
     int/*bool*/ visible;
+    char *path;
 } spSlotData;
 
 SP_API spSlotData *spSlotData_create(const int index, const char *name, spBoneData *boneData);

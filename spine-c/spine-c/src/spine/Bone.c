@@ -71,7 +71,9 @@ void spBone_updateWorldTransform(spBone *self) {
 void spBone_updateWorldTransformWith(spBone *self, float x, float y, float rotation, float scaleX, float scaleY,
 									 float shearX, float shearY) {
     float pa, pb, pc, pd;
-	spBone *parent = self->parent;
+    float sx = self->skeleton->scaleX;
+    float sy = self->skeleton->scaleY * (spBone_isYDown() ? -1 : 1);
+    spBone *parent = self->parent;
 
 	self->ax = x;
 	self->ay = y;
@@ -82,14 +84,14 @@ void spBone_updateWorldTransformWith(spBone *self, float x, float y, float rotat
 	self->ashearY = shearY;
 
 	if (!parent) { /* Root bone. */
-        float sx = self->skeleton->scaleX;
-        float sy = self->skeleton->scaleY;
         float rx = (rotation + shearX) * DEG_RAD;
         float ry = (rotation + 90 + shearY) * DEG_RAD;
         self->a = COS(rx) * scaleX * sx;
         self->b = COS(ry) * scaleY * sx;
         self->c = SIN(rx) * scaleX * sy;
         self->d = SIN(ry) * scaleY * sy;
+        self->worldX = x * sx + self->skeleton->x;
+        self->worldY = y * sy + self->skeleton->y;
 		return;
 	}
 
@@ -129,8 +131,8 @@ void spBone_updateWorldTransformWith(spBone *self, float x, float y, float rotat
 			float prx;
 			if (s > 0.0001f) {
 				s = ABS(pa * pd - pb * pc) / s;
-				pa /= self->skeleton->scaleX;
-				pc /= self->skeleton->scaleY;
+				pa /= sx;
+				pc /= sy;
 				pb = pc * s;
 				pd = pa * s;
 				prx = ATAN2DEG(pc, pa);
@@ -156,10 +158,10 @@ void spBone_updateWorldTransformWith(spBone *self, float x, float y, float rotat
             rotation *= DEG_RAD;
             float cosine = COS(rotation);
             float sine = SIN(rotation);
-            float za = (pa * cosine + pb * sine) / self->skeleton->scaleX;
-            float zc = (pc * cosine + pd * sine) / self->skeleton->scaleY;
+            float za = (pa * cosine + pb * sine) / sx;
+            float zc = (pc * cosine + pd * sine) / sy;
             float s = SQRT(za * za + zc * zc);
-			if (self->data->inherit == SP_INHERIT_NOSCALE && (pa * pd - pb * pc < 0) != (self->skeleton->scaleX < 0 != self->skeleton->scaleY < 0))
+			if (self->data->inherit == SP_INHERIT_NOSCALE && (pa * pd - pb * pc < 0) != (sx < 0 != sy < 0))
 				s = -s;
             rotation = PI / 2 + ATAN2(zc, za);
             float zb = COS(rotation) * s;
@@ -177,10 +179,10 @@ void spBone_updateWorldTransformWith(spBone *self, float x, float y, float rotat
 		}
 	}
 
-	self->a *= self->skeleton->scaleX;
-	self->b *= self->skeleton->scaleX;
-	self->c *= self->skeleton->scaleY;
-	self->d *= self->skeleton->scaleY;
+	self->a *= sx;
+	self->b *= sx;
+	self->c *= sy;
+	self->d *= sy;
 }
 
 void spBone_setToSetupPose(spBone *self) {
@@ -223,6 +225,8 @@ void spBone_updateAppliedTransform(spBone *self) {
 	float s, sa, sc;
 	float cosine, sine;
 
+    float yDownScale = spBone_isYDown() ? -1 : 1;
+
 	spBone *parent = self->parent;
 	if (!parent) {
 		self->ax = self->worldX - self->skeleton->x;
@@ -252,9 +256,9 @@ void spBone_updateAppliedTransform(spBone *self) {
 			case SP_INHERIT_NOROTATIONORREFLECTION: {
 				s = ABS(pa * pd - pb * pc) / (pa * pa + pc * pc);
 				sa = pa / self->skeleton->scaleX;
-				sc = pc / self->skeleton->scaleY;
+				sc = pc / self->skeleton->scaleY * yDownScale;
 				pb = -sc * s * self->skeleton->scaleX;
-				pd = sa * s * self->skeleton->scaleY;
+				pd = sa * s * self->skeleton->scaleY * yDownScale;
 				pid = 1 / (pa * pd - pb * pc);
 				ia = pd * pid;
 				ib = pb * pid;
@@ -265,14 +269,14 @@ void spBone_updateAppliedTransform(spBone *self) {
                 float r = self->rotation * DEG_RAD;
 				cosine = COS(r), sine = SIN(r);
 				pa = (pa * cosine + pb * sine) / self->skeleton->scaleX;
-				pc = (pc * cosine + pd * sine) / self->skeleton->scaleY;
+				pc = (pc * cosine + pd * sine) / self->skeleton->scaleY * yDownScale;
 				s = SQRT(pa * pa + pc * pc);
 				if (s > 0.00001) s = 1 / s;
 				pa *= s;
 				pc *= s;
 				s = SQRT(pa * pa + pc * pc);
 				if (self->inherit == SP_INHERIT_NOSCALE &&
-					pid < 0 != (self->skeleton->scaleX < 0 != self->skeleton->scaleY < 0))
+					pid < 0 != (self->skeleton->scaleX < 0 != (self->skeleton->scaleY * yDownScale) < 0))
 					s = -s;
 				r = PI / 2 + ATAN2(pc, pa);
 				pb = COS(r) * s;
