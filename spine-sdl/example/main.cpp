@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
 	drawable.animationState->getData()->setDefaultMix(0.2f);
 	drawable.skeleton->setPosition(400, 500);
 	drawable.skeleton->setToSetupPose();
-	drawable.update(0);
+	drawable.update(0, spine::Physics_Update);
 	drawable.animationState->setAnimation(0, "portal", true);
 	drawable.animationState->addAnimation(0, "run", true, 0);
 
@@ -79,7 +79,7 @@ int main(int argc, char **argv) {
 		double deltaTime = (now - lastFrameTime) / (double) SDL_GetPerformanceFrequency();
 		lastFrameTime = now;
 
-		drawable.update(deltaTime);
+		drawable.update(deltaTime, spine::Physics_Update);
 		drawable.draw(renderer);
 
 		SDL_RenderPresent(renderer);

@@ -40,7 +40,7 @@ namespace spine {
 
 		~SkeletonDrawable();
 
-		void update(float delta);
+		void update(float delta, Physics physics);
 
 		void draw(SDL_Renderer *renderer);
 

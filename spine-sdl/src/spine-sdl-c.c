@@ -59,10 +59,10 @@ void spSkeletonDrawable_dispose(spSkeletonDrawable *self) {
 	FREE(self);
 }
 
-void spSkeletonDrawable_update(spSkeletonDrawable *self, float delta) {
+void spSkeletonDrawable_update(spSkeletonDrawable *self, float delta, spPhysics physics) {
 	spAnimationState_update(self->animationState, delta);
 	spAnimationState_apply(self->animationState, self->skeleton);
-	spSkeleton_updateWorldTransform(self->skeleton);
+	spSkeleton_updateWorldTransform(self->skeleton, physics);
 }
 
 void spSkeletonDrawable_draw(spSkeletonDrawable *self, struct SDL_Renderer *renderer) {

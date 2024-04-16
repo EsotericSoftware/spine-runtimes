@@ -57,7 +57,7 @@ int main() {
 	drawable->skeleton->x = 400;
 	drawable->skeleton->y = 500;
 	spSkeleton_setToSetupPose(drawable->skeleton);
-	spSkeletonDrawable_update(drawable, 0);
+	spSkeletonDrawable_update(drawable, 0, SP_PHYSICS_UPDATE);
 	spAnimationState_setAnimationByName(drawable->animationState, 0, "portal", 0);
 	spAnimationState_addAnimationByName(drawable->animationState, 0, "run", -1, 0);
 
@@ -79,7 +79,7 @@ int main() {
 		double deltaTime = (now - lastFrameTime) / (double) SDL_GetPerformanceFrequency();
 		lastFrameTime = now;
 
-		spSkeletonDrawable_update(drawable, deltaTime);
+		spSkeletonDrawable_update(drawable, deltaTime, SP_PHYSICS_UPDATE);
 		spSkeletonDrawable_draw(drawable, renderer);
 
 		SDL_RenderPresent(renderer);
