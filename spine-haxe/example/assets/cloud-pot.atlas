@@ -1,116 +1,85 @@
 cloud-pot.png
-size:4096,512
-filter:MipMapLinearLinear,MipMapLinearLinear
+	size: 1024, 512
+	filter: Linear, Linear
+	scale: 0.5
 cloud-base-1
-bounds:1109,8,458,415
-offsets:5,1,465,420
+	bounds: 2, 300, 233, 210
 cloud-base-10
-bounds:279,175,190,199
-offsets:2,1,193,201
+	bounds: 214, 113, 97, 101
 cloud-base-2
-bounds:1575,10,416,413
-offsets:3,1,420,415
+	bounds: 2, 90, 210, 208
 cloud-base-3
-bounds:2331,91,332,324
-offsets:16,1,349,327
-rotate:90
+	bounds: 237, 346, 175, 164
 cloud-base-4
-bounds:1999,78,345,324
-offsets:6,1,352,326
-rotate:90
+	bounds: 414, 347, 176, 163
 cloud-base-5
-bounds:3496,137,286,248
-offsets:2,1,289,250
-rotate:90
+	bounds: 313, 89, 145, 125
 cloud-base-6
-bounds:2663,104,319,269
-offsets:2,1,322,272
-rotate:90
+	bounds: 744, 374, 161, 136
 cloud-base-7
-bounds:2940,128,287,295
-offsets:12,1,300,297
+	bounds: 592, 361, 150, 149
 cloud-base-8
-bounds:3235,123,300,253
-offsets:6,1,307,256
-rotate:90
+	bounds: 237, 216, 154, 128
 cloud-base-9
-bounds:3752,209,211,214
-offsets:2,1,214,216
+	bounds: 907, 402, 107, 108
 cloud-cheeks
-bounds:548,227,433,156
-offsets:1,1,435,158
+	bounds: 2, 9, 218, 79
 cloud-eyes-closed
-bounds:279,382,261,41
-offsets:1,1,263,43
+	bounds: 744, 350, 132, 22
 cloud-eyes-open
-bounds:8,374,263,49
-offsets:1,1,265,51
+	bounds: 592, 333, 133, 26
 cloud-eyes-reflex
-bounds:548,391,237,32
-offsets:1,1,239,34
+	bounds: 393, 224, 120, 17
+	rotate: 90
 cloud-mouth-closed
-bounds:166,336,95,30
-offsets:1,1,97,32
+	bounds: 907, 374, 49, 16
 cloud-mouth-open
-bounds:3971,307,116,68
-offsets:1,1,118,70
-rotate:90
+	bounds: 222, 15, 59, 35
 leaf-big
-bounds:989,359,40,98
-rotate:90
+	bounds: 214, 218, 20, 49
 leaf-small
-bounds:989,319,32,57
-offsets:1,1,34,59
-rotate:90
+	bounds: 958, 373, 17, 30
+	rotate: 90
 petal-1
-bounds:477,292,50,34
-offsets:1,1,52,36
+	bounds: 283, 2, 26, 18
 petal-2
-bounds:166,296,54,32
-offsets:1,1,56,34
+	bounds: 283, 22, 28, 17
+	rotate: 90
 petal-3
-bounds:477,334,56,40
-offsets:1,1,58,42
+	bounds: 214, 269, 29, 21
+	rotate: 90
 pot-base
-bounds:8,250,150,116
-offsets:1,1,152,118
+	bounds: 222, 52, 76, 59
 pot-eyes-closed
-bounds:1011,408,90,15
-offsets:1,1,92,17
+	bounds: 878, 363, 46, 9
 pot-eyes-open
-bounds:989,291,78,20
-offsets:1,1,80,22
+	bounds: 222, 2, 40, 11
 pot-mouth-open
-bounds:4047,394,25,29
-offsets:1,1,27,31
+	bounds: 990, 374, 14, 16
 pot-mouth-pouty
-bounds:228,287,33,17
-offsets:1,1,35,19
+	bounds: 300, 93, 18, 10
+	rotate: 90
 pot-mouth-smile
-bounds:3971,281,25,18
-offsets:1,1,27,20
+	bounds: 300, 77, 14, 10
+	rotate: 90
 pot-mouth-smile-big
-bounds:228,312,37,16
-offsets:1,1,39,18
+	bounds: 878, 352, 20, 9
 rain-blue
-bounds:4047,310,21,34
-offsets:1,1,23,36
+	bounds: 926, 360, 12, 18
+	rotate: 90
 rain-color
-bounds:4047,270,16,32
-offsets:1,1,18,34
+	bounds: 264, 4, 9, 17
+	rotate: 90
 rain-green
-bounds:4047,352,21,34
-offsets:1,1,23,36
+	bounds: 900, 349, 12, 18
+	rotate: 90
 rain-white
-bounds:1054,330,21,42
-offsets:1,1,23,44
-rotate:90
+	bounds: 727, 337, 12, 22
 rain-white-reflex
-bounds:4080,406,8,17
-offsets:1,1,10,19
+	bounds: 2, 2, 5, 10
+	rotate: 90
 stem
-bounds:793,407,16,210
-rotate:90
+	bounds: 907, 392, 8, 105
+	rotate: 90
 stem-end
-bounds:1075,298,23,24
-offsets:1,1,25,26
+	bounds: 300, 62, 13, 13

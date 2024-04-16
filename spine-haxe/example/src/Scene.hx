@@ -28,7 +28,6 @@
 *****************************************************************************/
 
 import starling.display.Quad;
-import starling.geom.Rectangle;
 import starling.text.TextField;
 import starling.core.Starling;
 import starling.display.Sprite;
@@ -82,10 +81,10 @@ abstract class Scene extends Sprite {
 		super.dispose();
 	}
 
-	public function addText(text:String) {
-		var textField = new TextField(200, 30, text);
-		textField.x = 10;
-		textField.y = 10;
+	public function addText(text:String, x:Int = 10, y:Int = 10) {
+		var textField = new TextField(250, 30, text);
+		textField.x = x;
+		textField.y = y;
 		textField.format.color = 0xffffffff;
 		addChild(textField);
 		return textField;

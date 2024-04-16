@@ -27,28 +27,52 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+import spine.BlendMode;
 import Scene.SceneManager;
-import openfl.display.Sprite;
-import openfl.geom.Rectangle;
+import openfl.utils.Assets;
+import spine.SkeletonData;
+import spine.Physics;
+import spine.animation.AnimationStateData;
+import spine.atlas.TextureAtlas;
+import spine.starling.SkeletonSprite;
+import spine.starling.StarlingTextureLoader;
 import starling.core.Starling;
-import starling.events.Event;
+import starling.events.TouchEvent;
+import starling.events.TouchPhase;
 
-class Main extends Sprite {
-	private var starlingSingleton:Starling;
+class CloudPotExample extends Scene {
+	var loadBinary = false;
 
-	public function new() {
-		super();
+	public function load():Void {
+		background.color = 0x333333;
 
-		starlingSingleton = new Starling(starling.display.Sprite, stage, new Rectangle(0, 0, 800, 600));
-		starlingSingleton.supportHighResolutions = true;
-		starlingSingleton.addEventListener(Event.ROOT_CREATED, onStarlingRootCreated);
+		var atlas = new TextureAtlas(Assets.getText("assets/cloud-pot.atlas"), new StarlingTextureLoader("assets/cloud-pot.atlas"));
+		var skeletondata = SkeletonData.from(Assets.getText("assets/cloud-pot.json"), atlas);
+
+		var animationStateData = new AnimationStateData(skeletondata);
+		animationStateData.defaultMix = 0.25;
+
+		var skeletonSprite = new SkeletonSprite(skeletondata, animationStateData);
+		skeletonSprite.skeleton.updateWorldTransform(Physics.update);
+		var bounds = skeletonSprite.skeleton.getBounds();
+
+		
+		skeletonSprite.scale = 0.2;
+		skeletonSprite.x = Starling.current.stage.stageWidth / 2;
+		skeletonSprite.y = Starling.current.stage.stageHeight / 2;
+		
+		skeletonSprite.state.setAnimationByName(0, "playing-in-the-rain", true);
+
+		addChild(skeletonSprite);
+		juggler.add(skeletonSprite);
+
+		addEventListener(TouchEvent.TOUCH, onTouch);
 	}
 
-	private function onStarlingRootCreated(event:Event):Void {
-		starlingSingleton.removeEventListener(Event.ROOT_CREATED, onStarlingRootCreated);
-		starlingSingleton.start();
-		Starling.current.stage.color = 0x000000;
-
-		SceneManager.getInstance().switchScene(new BasicExample());
+	public function onTouch(e:TouchEvent) {
+		var touch = e.getTouch(this);
+		if (touch != null && touch.phase == TouchPhase.ENDED) {
+			SceneManager.getInstance().switchScene(new BasicExample());
+		}
 	}
 }

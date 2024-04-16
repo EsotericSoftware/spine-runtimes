@@ -102,6 +102,19 @@ class IkConstraint implements Updatable {
 		var rotationIK:Float = -bone.ashearX - bone.arotation,
 			tx:Float = 0,
 			ty:Float = 0;
+
+		function switchDefault() {
+			var x:Float = targetX - p.worldX, y:Float = targetY - p.worldY;
+			var d:Float = pa * pd - pb * pc;
+			if (Math.abs(d) <= 0.0001) {
+				tx = 0;
+				ty = 0;
+			} else {
+				tx = (x * pd - y * pb) / d - bone.ax;
+				ty = (y * pa - x * pc) / d - bone.ay;
+			}
+		}
+
 		switch (bone.inherit) {
 			case Inherit.onlyTranslation:
 				tx = (targetX - bone.worldX) * MathUtils.signum(bone.skeleton.scaleX);
@@ -117,17 +130,9 @@ class IkConstraint implements Updatable {
 				var d:Float = pa * pd - pb * pc;
 				tx = (x * pd - y * pb) / d - bone.ax;
 				ty = (y * pa - x * pc) / d - bone.ay;
-				// TODO: this should fall-through!
+				switchDefault(); // Fall through.
 			default:
-				var x:Float = targetX - p.worldX, y:Float = targetY - p.worldY;
-				var d:Float = pa * pd - pb * pc;
-				if (Math.abs(d) <= 0.0001) {
-					tx = 0;
-					ty = 0;
-				} else {
-					tx = (x * pd - y * pb) / d - bone.ax;
-					ty = (y * pa - x * pc) / d - bone.ay;
-				}
+				switchDefault();
 		}
 
 		rotationIK += Math.atan2(ty, tx) * MathUtils.radDeg;

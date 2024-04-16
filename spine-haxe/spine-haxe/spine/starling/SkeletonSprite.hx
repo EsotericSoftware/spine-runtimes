@@ -342,7 +342,6 @@ class SkeletonSprite extends DisplayObject implements IAnimatable {
 		_state.apply(skeleton);
 		skeleton.update(time);
 		skeleton.updateWorldTransform(Physics.update);
-
 		this.setRequiresRedraw();
 	}
 }

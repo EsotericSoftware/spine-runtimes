@@ -45,15 +45,15 @@ import spine.animation.InheritTimeline;
 import spine.animation.PathConstraintMixTimeline;
 import spine.animation.PathConstraintPositionTimeline;
 import spine.animation.PathConstraintSpacingTimeline;
-import spine.animation.PhysicsConstraintResetTimeline;
-import spine.animation.PhysicsConstraintInertiaTimeline;
-import spine.animation.PhysicsConstraintStrengthTimeline;
 import spine.animation.PhysicsConstraintDampingTimeline;
-import spine.animation.PhysicsConstraintMassTimeline;
-import spine.animation.PhysicsConstraintWindTimeline;
 import spine.animation.PhysicsConstraintGravityTimeline;
+import spine.animation.PhysicsConstraintInertiaTimeline;
+import spine.animation.PhysicsConstraintMassTimeline;
 import spine.animation.PhysicsConstraintMixTimeline;
+import spine.animation.PhysicsConstraintResetTimeline;
+import spine.animation.PhysicsConstraintStrengthTimeline;
 import spine.animation.PhysicsConstraintTimeline;
+import spine.animation.PhysicsConstraintWindTimeline;
 import spine.animation.RGB2Timeline;
 import spine.animation.RGBA2Timeline;
 import spine.animation.RGBATimeline;
@@ -1018,10 +1018,12 @@ class SkeletonJson {
 		// Physics constraint timelines.
 		var physics:Dynamic = Reflect.getProperty(map, "physics");
 		for (physicsName in Reflect.fields(physics)) {
-			var constraintIndex:Int = skeletonData.findPhysicsConstraintIndex(physicsName);
-			if (constraintIndex == -1)
-				throw new SpineException("Physics constraint not found: " + physicsName);
-
+			var constraintIndex:Int = -1;
+			if (physicsName.length > 0) {
+				constraintIndex = skeletonData.findPhysicsConstraintIndex(physicsName);
+				if (constraintIndex == -1)
+					throw new SpineException("Physics constraint not found: " + physicsName);
+			}
 			var physicsMap:Dynamic = Reflect.field(physics, physicsName);
 			for (timelineName in Reflect.fields(physicsMap)) {
 				timelineMap = Reflect.field(physicsMap, timelineName);

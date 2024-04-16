@@ -624,6 +624,22 @@ cp -f ../mix-and-match/export/mix-and-match-pro.skel "$ROOT/spine-haxe/example/a
 cp -f ../mix-and-match/export/mix-and-match.atlas "$ROOT/spine-haxe/example/assets/"
 cp -f ../mix-and-match/export/mix-and-match.png "$ROOT/spine-haxe/example/assets/"
 
+cp -f ../celestial-circus/export/* "$ROOT/spine-haxe/example/assets/"
+
+cp -f ../cloud-pot/export/cloud-pot.json "$ROOT/spine-haxe/example/assets/"
+cp -f ../cloud-pot/export/cloud-pot.skel "$ROOT/spine-haxe/example/assets/"
+cp -f ../cloud-pot/export/cloud-pot.atlas "$ROOT/spine-haxe/example/assets/"
+cp -f ../cloud-pot/export/cloud-pot.png "$ROOT/spine-haxe/example/assets/"
+
+cp -f ../sack/export/sack-pro.json "$ROOT/spine-haxe/example/assets/"
+cp -f ../sack/export/sack-pro.skel "$ROOT/spine-haxe/example/assets/"
+cp -f ../sack/export/sack.atlas "$ROOT/spine-haxe/example/assets/"
+cp -f ../sack/export/sack.png "$ROOT/spine-haxe/example/assets/"
+
+cp -f ../snowglobe/export/snowglobe-pro.json "$ROOT/spine-haxe/example/assets/"
+cp -f ../snowglobe/export/snowglobe-pro.skel "$ROOT/spine-haxe/example/assets/"
+cp -f ../snowglobe/export/snowglobe* "$ROOT/spine-haxe/example/assets/"
+
 echo "spine-ue"
 rm -f "$ROOT/spine-ue/Content/GettingStarted/Assets/Raptor/raptor.json"
 rm -f "$ROOT/spine-ue/Content/GettingStarted/Assets/Raptor/raptor-pro.json"

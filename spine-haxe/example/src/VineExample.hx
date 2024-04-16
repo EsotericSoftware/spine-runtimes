@@ -27,7 +27,6 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-import spine.BlendMode;
 import Scene.SceneManager;
 import openfl.utils.Assets;
 import spine.SkeletonData;
@@ -45,31 +44,17 @@ class VineExample extends Scene {
 
 	public function load():Void {
 		background.color = 0xffffffff;
-
-		// var atlas = new TextureAtlas(Assets.getText("assets/cloud-pot.atlas"), new StarlingTextureLoader("assets/cloud-pot.atlas"));
-		// var skeletondata = SkeletonData.from(Assets.getText("assets/cloud-pot.json"), atlas);
-
-		var atlas = new TextureAtlas(Assets.getText("assets/sack-pma.atlas"), new StarlingTextureLoader("assets/sack-pma.atlas"));
-		var skeletondata = SkeletonData.from(Assets.getText("assets/sack-pro.json"), atlas);
-
+		var atlas = new TextureAtlas(Assets.getText("assets/vine.atlas"), new StarlingTextureLoader("assets/vine.atlas"));
+		var skeletondata = SkeletonData.from(loadBinary ? Assets.getBytes("assets/vine-pro.skel") : Assets.getText("assets/vine-pro.json"), atlas);
 		var animationStateData = new AnimationStateData(skeletondata);
 		animationStateData.defaultMix = 0.25;
 
 		var skeletonSprite = new SkeletonSprite(skeletondata, animationStateData);
-		skeletonSprite.skeleton.updateWorldTransform(Physics.update);
+		skeletonSprite.skeleton.updateWorldTransform(Physics.none);
 		var bounds = skeletonSprite.skeleton.getBounds();
-
-		
-		skeletonSprite.scale = 0.2;
+		skeletonSprite.scale = Starling.current.stage.stageWidth / bounds.width;
 		skeletonSprite.x = Starling.current.stage.stageWidth / 2;
-		skeletonSprite.y = Starling.current.stage.stageHeight/ 2;
-		
-		trace(skeletonSprite);
-
-		// skeletonSprite.state.setAnimationByName(0, "playing-in-the-rain", true);
-		
-		
-		skeletonSprite.state.setAnimationByName(0, "cape-follow-example", true);
+		skeletonSprite.y = Starling.current.stage.stageHeight * 0.5;
 
 		addChild(skeletonSprite);
 		juggler.add(skeletonSprite);
@@ -80,7 +65,8 @@ class VineExample extends Scene {
 	public function onTouch(e:TouchEvent) {
 		var touch = e.getTouch(this);
 		if (touch != null && touch.phase == TouchPhase.ENDED) {
-			// SceneManager.getInstance().switchScene(new BasicExample());
+			SceneManager.getInstance().switchScene(new SackExample());
 		}
 	}
 }
+

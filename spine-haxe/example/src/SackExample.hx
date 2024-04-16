@@ -28,27 +28,52 @@
 *****************************************************************************/
 
 import Scene.SceneManager;
-import openfl.display.Sprite;
-import openfl.geom.Rectangle;
+import openfl.utils.Assets;
+import spine.SkeletonData;
+import spine.Physics;
+import spine.animation.AnimationStateData;
+import spine.atlas.TextureAtlas;
+import spine.starling.SkeletonSprite;
+import spine.starling.StarlingTextureLoader;
 import starling.core.Starling;
-import starling.events.Event;
+import starling.events.TouchEvent;
+import starling.events.TouchPhase;
 
-class Main extends Sprite {
-	private var starlingSingleton:Starling;
+class SackExample extends Scene {
+	var loadBinary = false;
 
-	public function new() {
-		super();
+	public function load():Void {
+		background.color = 0x333333;
 
-		starlingSingleton = new Starling(starling.display.Sprite, stage, new Rectangle(0, 0, 800, 600));
-		starlingSingleton.supportHighResolutions = true;
-		starlingSingleton.addEventListener(Event.ROOT_CREATED, onStarlingRootCreated);
+		var atlas = new TextureAtlas(Assets.getText("assets/sack.atlas"), new StarlingTextureLoader("assets/sack.atlas"));
+		var skeletondata = SkeletonData.from(Assets.getText("assets/sack-pro.json"), atlas);
+
+		var animationStateData = new AnimationStateData(skeletondata);
+		animationStateData.defaultMix = 0.25;
+
+		var skeletonSprite = new SkeletonSprite(skeletondata, animationStateData);
+		skeletonSprite.skeleton.updateWorldTransform(Physics.update);
+		var bounds = skeletonSprite.skeleton.getBounds();
+
+		
+		skeletonSprite.scale = 0.2;
+		skeletonSprite.x = Starling.current.stage.stageWidth / 2;
+		skeletonSprite.y = Starling.current.stage.stageHeight/ 2;
+		
+		trace(skeletonSprite);
+
+		skeletonSprite.state.setAnimationByName(0, "cape-follow-example", true);
+
+		addChild(skeletonSprite);
+		juggler.add(skeletonSprite);
+
+		addEventListener(TouchEvent.TOUCH, onTouch);
 	}
 
-	private function onStarlingRootCreated(event:Event):Void {
-		starlingSingleton.removeEventListener(Event.ROOT_CREATED, onStarlingRootCreated);
-		starlingSingleton.start();
-		Starling.current.stage.color = 0x000000;
-
-		SceneManager.getInstance().switchScene(new BasicExample());
+	public function onTouch(e:TouchEvent) {
+		var touch = e.getTouch(this);
+		if (touch != null && touch.phase == TouchPhase.ENDED) {
+			SceneManager.getInstance().switchScene(new CelestialCircusExample());
+		}
 	}
 }

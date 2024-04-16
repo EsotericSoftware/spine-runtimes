@@ -27,9 +27,11 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+import spine.BlendMode;
 import Scene.SceneManager;
 import openfl.utils.Assets;
 import spine.SkeletonData;
+import spine.Physics;
 import spine.animation.AnimationStateData;
 import spine.atlas.TextureAtlas;
 import spine.starling.SkeletonSprite;
@@ -38,35 +40,56 @@ import starling.core.Starling;
 import starling.events.TouchEvent;
 import starling.events.TouchPhase;
 
-class BasicExample extends Scene {
+class CelestialCircusExample extends Scene {
 	var loadBinary = true;
 
+	var skeletonSprite:SkeletonSprite;
+	private var movement = new openfl.geom.Point();
+
 	public function load():Void {
-		var atlas = new TextureAtlas(Assets.getText("assets/raptor.atlas"), new StarlingTextureLoader("assets/raptor-pro.atlas"));
-		var skeletondata = SkeletonData.from(loadBinary ? Assets.getBytes("assets/raptor-pro.skel") : Assets.getText("assets/raptor-pro.json"), atlas);
+		background.color = 0x333333;
+
+		var atlas = new TextureAtlas(Assets.getText("assets/celestial-circus.atlas"), new StarlingTextureLoader("assets/celestial-circus.atlas"));
+		var skeletondata = SkeletonData.from(loadBinary ? Assets.getBytes("assets/celestial-circus-pro.skel") : Assets.getText("assets/celestial-circus-pro.json"), atlas);
+
 		var animationStateData = new AnimationStateData(skeletondata);
 		animationStateData.defaultMix = 0.25;
 
-		var skeletonSprite = new SkeletonSprite(skeletondata, animationStateData);
+		skeletonSprite = new SkeletonSprite(skeletondata, animationStateData);
+		skeletonSprite.skeleton.updateWorldTransform(Physics.update);
 		var bounds = skeletonSprite.skeleton.getBounds();
-		skeletonSprite.scale = Starling.current.stage.stageWidth / bounds.width * 0.5;
+		
+		skeletonSprite.scale = 0.2;
 		skeletonSprite.x = Starling.current.stage.stageWidth / 2;
-		skeletonSprite.y = Starling.current.stage.stageHeight * 0.9;
+		skeletonSprite.y = Starling.current.stage.stageHeight / 1.5;
+		
+		skeletonSprite.state.setAnimationByName(0, "eyeblink-long", true);
 
-		skeletonSprite.state.setAnimationByName(0, "walk", true);
+		addText("Drag Celeste to move her around");
+		addText("Click background for next scene", 10, 30);
 
 		addChild(skeletonSprite);
 		juggler.add(skeletonSprite);
-
-		addText("Click anywhere for next scene");
 
 		addEventListener(TouchEvent.TOUCH, onTouch);
 	}
 
 	public function onTouch(e:TouchEvent) {
-		var touch = e.getTouch(this);
-		if (touch != null && touch.phase == TouchPhase.ENDED) {
-			SceneManager.getInstance().switchScene(new SequenceExample());
+		var skeletonTouch = e.getTouch(skeletonSprite);
+		if (skeletonTouch != null) {
+			if (skeletonTouch.phase == TouchPhase.MOVED) {
+				skeletonTouch.getMovement(this, movement);
+				skeletonSprite.skeleton.x += movement.x / skeletonSprite.scale;
+				skeletonSprite.skeleton.y += movement.y / skeletonSprite.scale;
+			}
+		} else {
+			var sceneTouch = e.getTouch(this);
+			if (sceneTouch != null && sceneTouch.phase == TouchPhase.ENDED) {
+				SceneManager.getInstance().switchScene(new SnowglobeExample());
+			}
 		}
+
+		
 	}
+
 }
