@@ -723,7 +723,6 @@ void cloudpot(SkeletonData *skeletonData, Atlas *atlas) {
 	Skeleton *skeleton = drawable.skeleton;
 	skeleton->setPosition(320, 480);
 	skeleton->updateWorldTransform(Physics_Update);
-
 	drawable.state->setAnimation(0, "playing-in-the-rain", true);
 
 	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - cloudpot");
@@ -776,6 +775,7 @@ int main() {
 	testcase(sack, "data/sack-pro.json", "data/sack-pro.skel", "data/sack-pma.atlas", 0.2f);
 	testcase(celestialCircus, "data/celestial-circus-pro.json", "data/celestial-circus-pro.skel", "data/celestial-circus-pma.atlas", 0.2f);
 	testcase(snowglobe, "data/snowglobe-pro.json", "data/snowglobe-pro.skel", "data/snowglobe-pma.atlas", 0.2f);
+    testcase(dragon, "data/dragon-ess.json", "data/dragon-ess.skel", "data/dragon-pma.atlas", 0.6f);
 	testcase(spineboy, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.62f);
 	testcase(ikDemo, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.6f);
 	testcase(vine, "data/vine-pro.json", "data/vine-pro.skel", "data/vine-pma.atlas", 0.5f);

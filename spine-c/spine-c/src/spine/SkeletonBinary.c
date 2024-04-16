@@ -85,6 +85,28 @@ static char *string_substring(const char *str, int start, int end) {
     return substr;
 }
 
+
+static int string_starts_with(const char *str, const char *needle) {
+    int lenStr, lenNeedle, i;
+    if (!str) return 0;
+    lenStr = strlen(str);
+    lenNeedle = strlen(needle);
+    if (lenStr < lenNeedle) return 0;
+    for (i = 0; i < lenNeedle; i++) {
+        if (str[i] != needle[i]) return 0;
+    }
+    return -1;
+}
+
+static char *string_copy(const char *str) {
+    if (str == NULL) return NULL;
+    int len = strlen(str);
+    char *tmp = malloc(len + 1);
+    strncpy(tmp, str, len);
+    tmp[len] = '\0';
+    return tmp;
+}
+
 spSkeletonBinary *spSkeletonBinary_createWithLoader(spAttachmentLoader *attachmentLoader) {
 	spSkeletonBinary *self = SUPER(NEW(_spSkeletonBinary));
 	self->scale = 1;
@@ -254,9 +276,7 @@ static void readColor(_dataInput *input, float *r, float *g, float *b, float *a)
 #define PHYSICS_RESET 8
 
 static spSequence *readSequence(_dataInput *input) {
-	spSequence *sequence = NULL;
-	if (!readBoolean(input)) return NULL;
-	sequence = spSequence_create(readVarint(input, -1));
+	spSequence *sequence = spSequence_create(readVarint(input, -1));
 	sequence->start = readVarint(input, -1);
 	sequence->digits = readVarint(input, -1);
 	sequence->setupIndex = readVarint(input, -1);
@@ -954,21 +974,16 @@ static spAnimation *_spSkeletonBinary_readAnimation(spSkeletonBinary *self, cons
 			memset(drawOrder, -1, sizeof(int) * skeletonData->slotsCount);
 			for (ii = 0; ii < offsetCount; ++ii) {
 				int slotIndex = readVarint(input, 1);
-				/* Collect unchanged items. */
 				while (originalIndex != slotIndex)
 					unchanged[unchangedIndex++] = originalIndex++;
-				/* Set changed items. */
 				drawOrder[originalIndex + readVarint(input, 1)] = originalIndex;
 				++originalIndex;
 			}
-			/* Collect remaining unchanged items. */
 			while (originalIndex < skeletonData->slotsCount)
 				unchanged[unchangedIndex++] = originalIndex++;
-			/* Fill in unchanged items. */
 			for (ii = skeletonData->slotsCount - 1; ii >= 0; ii--)
 				if (drawOrder[ii] == -1) drawOrder[ii] = unchanged[--unchangedIndex];
 			FREE(unchanged);
-			/* TODO Avoid copying of drawOrder inside */
 			spDrawOrderTimeline_setFrame(timeline, i, time, drawOrder);
 			FREE(drawOrder);
 		}
@@ -987,9 +1002,9 @@ static spAnimation *_spSkeletonBinary_readAnimation(spSkeletonBinary *self, cons
 			event->floatValue = readFloat(input);
             const char *event_stringValue = readString(input);
             if (event_stringValue == NULL) {
-                event->stringValue = eventData->stringValue;
+                event->stringValue = string_copy(eventData->stringValue);
             } else {
-                event->stringValue = MALLOC_STR(event->stringValue, event_stringValue);
+                event->stringValue = string_copy(event_stringValue);
                 FREE(event_stringValue);
             }
 
@@ -1041,22 +1056,25 @@ static int _readVertices(_dataInput *input, float **vertices, int *verticesLengt
         return *verticesLength;
     }
 
-    *vertices = MALLOC(float, *verticesLength * 3 * 3);
-    *bones = MALLOC(int, *verticesLength * 3);
+    float *v = MALLOC(float, (*verticesLength) * 3 * 3);
+    int *b = MALLOC(int, (*verticesLength) * 3);
     int boneIdx = 0;
     int vertexIdx = 0;
     for (int i = 0; i < vertexCount; ++i) {
         int boneCount = readVarint(input, 1);
-        *bones[boneIdx++] = boneCount;
+        b[boneIdx++] = boneCount;
         for (int ii = 0; ii < boneCount; ++ii) {
-            *bones[boneIdx++] = readVarint(input, 1);
-            *vertices[vertexIdx++] = readFloat(input) * scale;
-            *vertices[vertexIdx++] = readFloat(input) * scale;
-            *vertices[vertexIdx++] = readFloat(input);
+            b[boneIdx++] = readVarint(input, 1);
+            v[vertexIdx++] = readFloat(input) * scale;
+            v[vertexIdx++] = readFloat(input) * scale;
+            v[vertexIdx++] = readFloat(input);
         }
     }
+    *vertices = v;
+    *bones = b;
     *bonesCount = boneIdx;
-    return *verticesLength;
+    *verticesLength = vertexIdx;
+    return vertexCount << 1;
 }
 
 spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput *input,
@@ -1069,6 +1087,7 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
     switch (type) {
 		case SP_ATTACHMENT_REGION: {
             char *path = (flags & 16) != 0 ? readStringRef(input, skeletonData) : (char*)name;
+            path = string_copy(path);
             spColor color;
             spColor_setFromFloats(&color, 1, 1, 1, 1);
             if ((flags & 32) != 0) readColor(input, &color.r, &color.g, &color.b, &color.a);
@@ -1124,6 +1143,7 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
             int edgesCount = 0;
 
             char* path = (flags & 16) != 0 ? readStringRef(input, skeletonData) : (char*)name;
+            path = string_copy(path);
             spColor color;
             spColor_setFromFloats(&color, 1, 1, 1, 1);
             if ((flags & 32) != 0) readColor(input, &color.r, &color.g, &color.b, &color.a);
@@ -1167,7 +1187,8 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
             return attachment;
 		}
 		case SP_ATTACHMENT_LINKED_MESH: {
-            const char *path = (flags & 16) != 0 ? readStringRef(input, skeletonData) : name;
+            char *path = (flags & 16) != 0 ? readStringRef(input, skeletonData) : (char*)name;
+            path = string_copy(path);
             spColor color;
             spColor_setFromFloats(&color, 1, 1, 1, 1);
             if ((flags & 32) != 0) readColor(input, &color.r, &color.g, &color.b, &color.a);
@@ -1317,18 +1338,6 @@ spSkeletonData *spSkeletonBinary_readSkeletonDataFile(spSkeletonBinary *self, co
 	skeletonData = spSkeletonBinary_readSkeletonData(self, (unsigned char *) binary, length);
 	FREE(binary);
 	return skeletonData;
-}
-
-static int string_starts_with(const char *str, const char *needle) {
-	int lenStr, lenNeedle, i;
-	if (!str) return 0;
-	lenStr = strlen(str);
-	lenNeedle = strlen(needle);
-	if (lenStr < lenNeedle) return 0;
-	for (i = 0; i < lenNeedle; i++) {
-		if (str[i] != needle[i]) return 0;
-	}
-	return -1;
 }
 
 spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const unsigned char *binary,

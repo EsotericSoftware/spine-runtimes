@@ -651,7 +651,6 @@ void testMixAndMatch(spSkeletonData *skeletonData, spAtlas *atlas) {
 void cloudpot(spSkeletonData *skeletonData, spAtlas *atlas) {
     UNUSED(atlas);
 
-
     SkeletonDrawable *drawable = new SkeletonDrawable(skeletonData);
     drawable->timeScale = 1;
     drawable->setUsePremultipliedAlpha(true);
