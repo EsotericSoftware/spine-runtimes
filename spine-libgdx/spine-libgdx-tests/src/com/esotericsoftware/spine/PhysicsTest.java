@@ -69,7 +69,7 @@ public class PhysicsTest extends ApplicationAdapter {
 
 		AnimationStateData stateData = new AnimationStateData(skeletonData); // Defines mixing (crossfading) between animations.
 		state = new AnimationState(stateData); // Holds the animation state for a skeleton (current animation, time, etc).
-		state.setAnimation(0, "FOA", true);
+		state.setAnimation(0, "walk", true);
 	}
 
 	public void render () {
