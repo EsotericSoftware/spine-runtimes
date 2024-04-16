@@ -344,7 +344,6 @@ namespace Spine {
 		Atlas atlas;
 		Skeleton skeleton;
 		AnimationState state;
-		Vector2 previousPosition;
 
 		public PhysicsScreenCelestial (Example game) : base(game) {
 			atlas = new Atlas("data/celestial-circus.atlas", new XnaTextureLoader(game.GraphicsDevice));
