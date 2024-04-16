@@ -193,8 +193,8 @@ void _spTransformConstraint_applyAbsoluteLocal(spTransformConstraint *self) {
 		rotation = bone->arotation;
 		if (mixRotate != 0) {
 			r = target->arotation - rotation + self->data->offsetRotation;
-            r -= CEIL(r / 360 - 0.5) * 360;
-            rotation += r * mixRotate;
+			r -= CEIL(r / 360 - 0.5) * 360;
+			rotation += r * mixRotate;
 		}
 
 		x = bone->ax, y = bone->ay;
@@ -210,8 +210,8 @@ void _spTransformConstraint_applyAbsoluteLocal(spTransformConstraint *self) {
 		shearY = bone->ashearY;
 		if (mixShearY != 0) {
 			r = target->ashearY - shearY + self->data->offsetShearY;
-            r -= CEIL(r / 360 - 0.5) * 360;
-            shearY += r * mixShearY;
+			r -= CEIL(r / 360 - 0.5) * 360;
+			shearY += r * mixShearY;
 		}
 
 		spBone_updateWorldTransformWith(bone, x, y, rotation, scaleX, scaleY, bone->ashearX, shearY);
@@ -259,11 +259,11 @@ void spTransformConstraint_update(spTransformConstraint *self) {
 }
 
 void spTransformConstraint_setToSetupPose(spTransformConstraint *self) {
-    spTransformConstraintData *data = self->data;
-    self->mixRotate = data->mixRotate;
-    self->mixX = data->mixX;
-    self->mixY = data->mixY;
-    self->mixScaleX = data->mixScaleX;
-    self->mixScaleY = data->mixScaleY;
-    self->mixShearY = data->mixShearY;
+	spTransformConstraintData *data = self->data;
+	self->mixRotate = data->mixRotate;
+	self->mixX = data->mixX;
+	self->mixY = data->mixY;
+	self->mixScaleX = data->mixScaleX;
+	self->mixScaleY = data->mixScaleY;
+	self->mixShearY = data->mixShearY;
 }

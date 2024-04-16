@@ -32,7 +32,7 @@
 #include "SpineSprite.h"
 
 void SpineSkeleton::_bind_methods() {
-	ClassDB::bind_method(D_METHOD("update_world_transform"), &SpineSkeleton::update_world_transform);
+	ClassDB::bind_method(D_METHOD("update_world_transform", "physics"), &SpineSkeleton::update_world_transform);
 	ClassDB::bind_method(D_METHOD("set_to_setup_pose"), &SpineSkeleton::set_to_setup_pose);
 	ClassDB::bind_method(D_METHOD("set_bones_to_setup_pose"), &SpineSkeleton::set_bones_to_setup_pose);
 	ClassDB::bind_method(D_METHOD("set_slots_to_setup_pose"), &SpineSkeleton::set_slots_to_setup_pose);

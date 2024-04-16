@@ -152,7 +152,7 @@ namespace spine {
 	void SkeletonDrawable::update(float deltaTime, spPhysics physics) {
 		spAnimationState_update(state, deltaTime * timeScale);
 		spAnimationState_apply(state, skeleton);
-        spSkeleton_update(skeleton, deltaTime * timeScale);
+		spSkeleton_update(skeleton, deltaTime * timeScale);
 		spSkeleton_updateWorldTransform(skeleton, physics);
 	}
 

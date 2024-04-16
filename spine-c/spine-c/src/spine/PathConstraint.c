@@ -117,9 +117,9 @@ void spPathConstraint_update(spPathConstraint *self) {
 				for (i = 0, n = spacesCount - 1; i < n; i++) {
 					spBone *bone = bones[i];
 					setupLength = bone->data->length;
-                    x = setupLength * bone->a;
-                    y = setupLength * bone->c;
-                    lengths[i] = SQRT(x * x + y * y);
+					x = setupLength * bone->a;
+					y = setupLength * bone->c;
+					lengths[i] = SQRT(x * x + y * y);
 				}
 			}
 			for (i = 1, n = spacesCount; i < n; i++) spaces[i] = spacing;
@@ -222,12 +222,12 @@ void spPathConstraint_update(spPathConstraint *self) {
 }
 
 void spPathConstraint_setToSetupPose(spPathConstraint *self) {
-    spPathConstraintData *data = self->data;
-    self->position = data->position;
-    self->spacing = data->spacing;
-    self->mixRotate = data->mixRotate;
-    self->mixX = data->mixX;
-    self->mixY = data->mixY;
+	spPathConstraintData *data = self->data;
+	self->position = data->position;
+	self->spacing = data->spacing;
+	self->mixRotate = data->mixRotate;
+	self->mixX = data->mixX;
+	self->mixY = data->mixY;
 }
 
 static void _addBeforePosition(float p, float *temp, int i, float *out, int o) {

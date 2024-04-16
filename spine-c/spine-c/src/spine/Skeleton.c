@@ -85,7 +85,7 @@ spSkeleton *spSkeleton_create(spSkeletonData *data) {
 	for (i = 0; i < self->bonesCount; ++i) {
 		spBoneData *boneData = self->data->bones[i];
 		spBone *bone = self->bones[i];
-        bone->children = MALLOC(spBone *, childrenCounts[boneData->index]);
+		bone->children = MALLOC(spBone *, childrenCounts[boneData->index]);
 	}
 	for (i = 0; i < self->bonesCount; ++i) {
 		spBone *bone = self->bones[i];
@@ -132,7 +132,7 @@ spSkeleton *spSkeleton_create(spSkeletonData *data) {
 	self->scaleX = 1;
 	self->scaleY = 1;
 
-    self->time = 0;
+	self->time = 0;
 
 	spSkeleton_updateCache(self);
 
@@ -342,9 +342,9 @@ static void _sortTransformConstraint(_spSkeleton *const internal, spTransformCon
 static void _sortPhysicsConstraint(_spSkeleton *const internal, spPhysicsConstraint *constraint) {
 	spBone *bone = constraint->bone;
 	constraint->active = constraint->bone->active && (!constraint->data->skinRequired || (internal->super.skin != 0 &&
-																						spPhysicsConstraintDataArray_contains(
-																								internal->super.skin->physicsConstraints,
-																								constraint->data)));
+																						  spPhysicsConstraintDataArray_contains(
+																								  internal->super.skin->physicsConstraints,
+																								  constraint->data)));
 	if (!constraint->active)
 		return;
 
@@ -367,7 +367,7 @@ void spSkeleton_updateCache(spSkeleton *self) {
 
 	internal->updateCacheCapacity =
 			self->bonesCount + self->ikConstraintsCount + self->transformConstraintsCount + self->pathConstraintsCount +
-			 self->physicsConstraintsCount;
+			self->physicsConstraintsCount;
 	FREE(internal->updateCache);
 	internal->updateCache = MALLOC(_spUpdate, internal->updateCacheCapacity);
 	internal->updateCacheCount = 0;
@@ -483,7 +483,7 @@ void spSkeleton_updateWorldTransform(const spSkeleton *self, spPhysics physics) 
 }
 
 void spSkeleton_update(spSkeleton *self, float delta) {
-    self->time += delta;
+	self->time += delta;
 }
 
 void spSkeleton_updateWorldTransformWith(const spSkeleton *self, const spBone *parent, spPhysics physics) {

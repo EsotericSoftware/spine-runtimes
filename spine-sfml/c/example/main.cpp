@@ -649,146 +649,146 @@ void testMixAndMatch(spSkeletonData *skeletonData, spAtlas *atlas) {
 }
 
 void cloudpot(spSkeletonData *skeletonData, spAtlas *atlas) {
-    UNUSED(atlas);
+	UNUSED(atlas);
 
-    SkeletonDrawable *drawable = new SkeletonDrawable(skeletonData);
-    drawable->timeScale = 1;
-    drawable->setUsePremultipliedAlpha(true);
+	SkeletonDrawable *drawable = new SkeletonDrawable(skeletonData);
+	drawable->timeScale = 1;
+	drawable->setUsePremultipliedAlpha(true);
 
-    spSkeleton *skeleton = drawable->skeleton;
-    skeleton->x = 320;
-    skeleton->y = 480;
-    spSkeleton_updateWorldTransform(skeleton, SP_PHYSICS_UPDATE);
-    spAnimationState_setAnimationByName(drawable->state, 0, "playing-in-the-rain", true);
+	spSkeleton *skeleton = drawable->skeleton;
+	skeleton->x = 320;
+	skeleton->y = 480;
+	spSkeleton_updateWorldTransform(skeleton, SP_PHYSICS_UPDATE);
+	spAnimationState_setAnimationByName(drawable->state, 0, "playing-in-the-rain", true);
 
-    sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - cloudpot");
-    window.setFramerateLimit(60);
-    sf::Event event;
-    sf::Clock deltaClock;
+	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - cloudpot");
+	window.setFramerateLimit(60);
+	sf::Event event;
+	sf::Clock deltaClock;
 
-    while (window.isOpen()) {
-        while (window.pollEvent(event))
-            if (event.type == sf::Event::Closed) window.close();
+	while (window.isOpen()) {
+		while (window.pollEvent(event))
+			if (event.type == sf::Event::Closed) window.close();
 
-        float delta = deltaClock.getElapsedTime().asSeconds();
-        deltaClock.restart();
+		float delta = deltaClock.getElapsedTime().asSeconds();
+		deltaClock.restart();
 
-        drawable->update(delta, SP_PHYSICS_UPDATE);
+		drawable->update(delta, SP_PHYSICS_UPDATE);
 
-        window.clear();
-        window.draw(*drawable);
-        window.display();
-    }
+		window.clear();
+		window.draw(*drawable);
+		window.display();
+	}
 }
 
 void sack(spSkeletonData *skeletonData, spAtlas *atlas) {
-    UNUSED(atlas);
+	UNUSED(atlas);
 
 
-    SkeletonDrawable *drawable = new SkeletonDrawable(skeletonData);
-    drawable->timeScale = 1;
-    drawable->setUsePremultipliedAlpha(true);
+	SkeletonDrawable *drawable = new SkeletonDrawable(skeletonData);
+	drawable->timeScale = 1;
+	drawable->setUsePremultipliedAlpha(true);
 
-    spSkeleton *skeleton = drawable->skeleton;
-    skeleton->x = 320;
-    skeleton->y = 480;
-    spSkeleton_updateWorldTransform(skeleton, SP_PHYSICS_UPDATE);
-    spAnimationState_setAnimationByName(drawable->state, 0, "walk", true);
+	spSkeleton *skeleton = drawable->skeleton;
+	skeleton->x = 320;
+	skeleton->y = 480;
+	spSkeleton_updateWorldTransform(skeleton, SP_PHYSICS_UPDATE);
+	spAnimationState_setAnimationByName(drawable->state, 0, "walk", true);
 
-    sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - sack");
-    window.setFramerateLimit(60);
-    sf::Event event;
-    sf::Clock deltaClock;
+	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - sack");
+	window.setFramerateLimit(60);
+	sf::Event event;
+	sf::Clock deltaClock;
 
-    while (window.isOpen()) {
-        while (window.pollEvent(event))
-            if (event.type == sf::Event::Closed) window.close();
+	while (window.isOpen()) {
+		while (window.pollEvent(event))
+			if (event.type == sf::Event::Closed) window.close();
 
-        float delta = deltaClock.getElapsedTime().asSeconds();
-        deltaClock.restart();
+		float delta = deltaClock.getElapsedTime().asSeconds();
+		deltaClock.restart();
 
-        drawable->update(delta, SP_PHYSICS_UPDATE);
+		drawable->update(delta, SP_PHYSICS_UPDATE);
 
-        window.clear();
-        window.draw(*drawable);
-        window.display();
-    }
+		window.clear();
+		window.draw(*drawable);
+		window.display();
+	}
 }
 
 void snowglobe(spSkeletonData *skeletonData, spAtlas *atlas) {
-    UNUSED(atlas);
+	UNUSED(atlas);
 
 
-    SkeletonDrawable *drawable = new SkeletonDrawable(skeletonData);
-    drawable->timeScale = 1;
-    drawable->setUsePremultipliedAlpha(true);
+	SkeletonDrawable *drawable = new SkeletonDrawable(skeletonData);
+	drawable->timeScale = 1;
+	drawable->setUsePremultipliedAlpha(true);
 
-    spSkeleton *skeleton = drawable->skeleton;
-    skeleton->x = 320;
-    skeleton->y = 480;
-    spSkeleton_updateWorldTransform(skeleton, SP_PHYSICS_UPDATE);
-    spAnimationState_setAnimationByName(drawable->state, 0, "shake", true);
+	spSkeleton *skeleton = drawable->skeleton;
+	skeleton->x = 320;
+	skeleton->y = 480;
+	spSkeleton_updateWorldTransform(skeleton, SP_PHYSICS_UPDATE);
+	spAnimationState_setAnimationByName(drawable->state, 0, "shake", true);
 
-    sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - snowglobe");
-    window.setFramerateLimit(60);
-    sf::Event event;
-    sf::Clock deltaClock;
+	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - snowglobe");
+	window.setFramerateLimit(60);
+	sf::Event event;
+	sf::Clock deltaClock;
 
-    while (window.isOpen()) {
-        while (window.pollEvent(event))
-            if (event.type == sf::Event::Closed) window.close();
+	while (window.isOpen()) {
+		while (window.pollEvent(event))
+			if (event.type == sf::Event::Closed) window.close();
 
-        float delta = deltaClock.getElapsedTime().asSeconds();
-        deltaClock.restart();
+		float delta = deltaClock.getElapsedTime().asSeconds();
+		deltaClock.restart();
 
-        drawable->update(delta, SP_PHYSICS_UPDATE);
+		drawable->update(delta, SP_PHYSICS_UPDATE);
 
-        window.clear();
-        window.draw(*drawable);
-        window.display();
-    }
+		window.clear();
+		window.draw(*drawable);
+		window.display();
+	}
 }
 
 void celestialCircus(spSkeletonData *skeletonData, spAtlas *atlas) {
-    UNUSED(atlas);
+	UNUSED(atlas);
 
 
-    SkeletonDrawable *drawable = new SkeletonDrawable(skeletonData);
-    drawable->timeScale = 1;
-    drawable->setUsePremultipliedAlpha(true);
+	SkeletonDrawable *drawable = new SkeletonDrawable(skeletonData);
+	drawable->timeScale = 1;
+	drawable->setUsePremultipliedAlpha(true);
 
-    spSkeleton *skeleton = drawable->skeleton;
-    skeleton->x = 320;
-    skeleton->y = 480;
-    spSkeleton_updateWorldTransform(skeleton, SP_PHYSICS_UPDATE);
-    spAnimationState_setAnimationByName(drawable->state, 0, "swing", true);
+	spSkeleton *skeleton = drawable->skeleton;
+	skeleton->x = 320;
+	skeleton->y = 480;
+	spSkeleton_updateWorldTransform(skeleton, SP_PHYSICS_UPDATE);
+	spAnimationState_setAnimationByName(drawable->state, 0, "swing", true);
 
-    sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - celestrial circus");
-    window.setFramerateLimit(60);
-    sf::Event event;
-    sf::Clock deltaClock;
+	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - celestrial circus");
+	window.setFramerateLimit(60);
+	sf::Event event;
+	sf::Clock deltaClock;
 
-    while (window.isOpen()) {
-        while (window.pollEvent(event))
-            if (event.type == sf::Event::Closed) window.close();
+	while (window.isOpen()) {
+		while (window.pollEvent(event))
+			if (event.type == sf::Event::Closed) window.close();
 
-        float delta = deltaClock.getElapsedTime().asSeconds();
-        deltaClock.restart();
+		float delta = deltaClock.getElapsedTime().asSeconds();
+		deltaClock.restart();
 
-        drawable->update(delta, SP_PHYSICS_UPDATE);
+		drawable->update(delta, SP_PHYSICS_UPDATE);
 
-        window.clear();
-        window.draw(*drawable);
-        window.display();
-    }
+		window.clear();
+		window.draw(*drawable);
+		window.display();
+	}
 }
 
 int main() {
-    testcase(cloudpot, "data/cloud-pot.json", "data/cloud-pot.skel", "data/cloud-pot-pma.atlas", 0.2);
-    testcase(sack, "data/sack-pro.json", "data/sack-pro.skel", "data/sack-pma.atlas", 0.2f);
-    testcase(celestialCircus, "data/celestial-circus-pro.json", "data/celestial-circus-pro.skel", "data/celestial-circus-pma.atlas", 0.2f);
-    testcase(snowglobe, "data/snowglobe-pro.json", "data/snowglobe-pro.skel", "data/snowglobe-pma.atlas", 0.2f);
-    testcase(raptor, "data/raptor-pro.json", "data/raptor-pro.skel", "data/raptor-pma.atlas", 0.5f);
+	testcase(cloudpot, "data/cloud-pot.json", "data/cloud-pot.skel", "data/cloud-pot-pma.atlas", 0.2);
+	testcase(sack, "data/sack-pro.json", "data/sack-pro.skel", "data/sack-pma.atlas", 0.2f);
+	testcase(celestialCircus, "data/celestial-circus-pro.json", "data/celestial-circus-pro.skel", "data/celestial-circus-pma.atlas", 0.2f);
+	testcase(snowglobe, "data/snowglobe-pro.json", "data/snowglobe-pro.skel", "data/snowglobe-pma.atlas", 0.2f);
+	testcase(raptor, "data/raptor-pro.json", "data/raptor-pro.skel", "data/raptor-pma.atlas", 0.5f);
 	testcase(dragon, "data/dragon-ess.json", "data/dragon-ess.skel", "data/dragon-pma.atlas", 0.6f);
 	testcase(ikDemo, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.6f);
 	testcase(spineboy, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.6f);

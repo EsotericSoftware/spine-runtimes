@@ -31,30 +31,30 @@
 #include <spine/extension.h>
 
 spPhysicsConstraintData *spPhysicsConstraintData_create(const char *name) {
-    spPhysicsConstraintData *self = NEW(spPhysicsConstraintData);
+	spPhysicsConstraintData *self = NEW(spPhysicsConstraintData);
 	MALLOC_STR(self->name, name);
-    self->bone = NULL;
-    self->x = 0;
-    self->y = 0;
-    self->rotate = 0;
-    self->scaleX = 0;
-    self->shearX = 0;
-    self->limit = 0;
-    self->step = 0;
-    self->inertia = 0;
-    self->strength = 0;
-    self->damping = 0;
-    self->massInverse = 0;
-    self->wind = 0;
-    self->gravity = 0;
-    self->mix = 0;
-    self->inertiaGlobal = 0;
-    self->strengthGlobal = 0;
-    self->dampingGlobal = 0;
-    self->massGlobal = 0;
-    self->windGlobal = 0;
-    self->gravityGlobal = 0;
-    self->mixGlobal = 0;
+	self->bone = NULL;
+	self->x = 0;
+	self->y = 0;
+	self->rotate = 0;
+	self->scaleX = 0;
+	self->shearX = 0;
+	self->limit = 0;
+	self->step = 0;
+	self->inertia = 0;
+	self->strength = 0;
+	self->damping = 0;
+	self->massInverse = 0;
+	self->wind = 0;
+	self->gravity = 0;
+	self->mix = 0;
+	self->inertiaGlobal = 0;
+	self->strengthGlobal = 0;
+	self->dampingGlobal = 0;
+	self->massGlobal = 0;
+	self->windGlobal = 0;
+	self->gravityGlobal = 0;
+	self->mixGlobal = 0;
 	return self;
 }
 

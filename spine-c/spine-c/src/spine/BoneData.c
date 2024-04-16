@@ -38,13 +38,13 @@ spBoneData *spBoneData_create(int index, const char *name, spBoneData *parent) {
 	self->scaleX = 1;
 	self->scaleY = 1;
 	self->inherit = SP_INHERIT_NORMAL;
-    self->icon = NULL;
-    self->visible = -1;
-    return self;
+	self->icon = NULL;
+	self->visible = -1;
+	return self;
 }
 
 void spBoneData_dispose(spBoneData *self) {
 	FREE(self->name);
-    FREE(self->icon);
+	FREE(self->icon);
 	FREE(self);
 }

@@ -36,7 +36,7 @@ spSlotData *spSlotData_create(const int index, const char *name, spBoneData *bon
 	MALLOC_STR(self->name, name);
 	self->boneData = boneData;
 	spColor_setFromFloats(&self->color, 1, 1, 1, 1);
-    self->visible = -1;
+	self->visible = -1;
 	return self;
 }
 

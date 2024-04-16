@@ -58,8 +58,8 @@ void spPointAttachment_computeWorldPosition(spPointAttachment *self, spBone *bon
 }
 
 float spPointAttachment_computeWorldRotation(spPointAttachment *self, spBone *bone) {
-    float r = self->rotation * DEG_RAD, cosine = COS(r), sine = SIN(r);
-    float x = cosine * bone->a + sine * bone->b;
-    float y = cosine * bone->c + sine * bone->d;
-    return ATAN2DEG(y, x);
+	float r = self->rotation * DEG_RAD, cosine = COS(r), sine = SIN(r);
+	float x = cosine * bone->a + sine * bone->b;
+	float y = cosine * bone->c + sine * bone->d;
+	return ATAN2DEG(y, x);
 }

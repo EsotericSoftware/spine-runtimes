@@ -58,53 +58,53 @@ typedef struct {
 } _spSkeletonBinary;
 
 static int string_lastIndexOf(const char *str, char needle) {
-    if (!str) return -1;
-    int lastIndex = -1;
-    for (int i = 0; str[i] != '\0'; i++) {
-        if (str[i] == needle) {
-            lastIndex = i;
-        }
-    }
-    return lastIndex;
+	if (!str) return -1;
+	int lastIndex = -1;
+	for (int i = 0; str[i] != '\0'; i++) {
+		if (str[i] == needle) {
+			lastIndex = i;
+		}
+	}
+	return lastIndex;
 }
 
 static char *string_substring(const char *str, int start, int end) {
-    if (str == NULL || start > end || start < 0) {
-        return NULL;
-    }
+	if (str == NULL || start > end || start < 0) {
+		return NULL;
+	}
 
-    int len = end - start;
-    char *substr = MALLOC(char, len + 1);
-    if (substr == NULL) {
-        return NULL;
-    }
+	int len = end - start;
+	char *substr = MALLOC(char, len + 1);
+	if (substr == NULL) {
+		return NULL;
+	}
 
-    strncpy(substr, str + start, len);
-    substr[len] = '\0';
+	strncpy(substr, str + start, len);
+	substr[len] = '\0';
 
-    return substr;
+	return substr;
 }
 
 
 static int string_starts_with(const char *str, const char *needle) {
-    int lenStr, lenNeedle, i;
-    if (!str) return 0;
-    lenStr = strlen(str);
-    lenNeedle = strlen(needle);
-    if (lenStr < lenNeedle) return 0;
-    for (i = 0; i < lenNeedle; i++) {
-        if (str[i] != needle[i]) return 0;
-    }
-    return -1;
+	int lenStr, lenNeedle, i;
+	if (!str) return 0;
+	lenStr = strlen(str);
+	lenNeedle = strlen(needle);
+	if (lenStr < lenNeedle) return 0;
+	for (i = 0; i < lenNeedle; i++) {
+		if (str[i] != needle[i]) return 0;
+	}
+	return -1;
 }
 
 static char *string_copy(const char *str) {
-    if (str == NULL) return NULL;
-    int len = strlen(str);
-    char *tmp = malloc(len + 1);
-    strncpy(tmp, str, len);
-    tmp[len] = '\0';
-    return tmp;
+	if (str == NULL) return NULL;
+	int len = strlen(str);
+	char *tmp = malloc(len + 1);
+	strncpy(tmp, str, len);
+	tmp[len] = '\0';
+	return tmp;
 }
 
 spSkeletonBinary *spSkeletonBinary_createWithLoader(spAttachmentLoader *attachmentLoader) {
@@ -314,7 +314,7 @@ static void readTimeline(_dataInput *input, spTimelineArray *timelines, spCurveT
 		time = time2;
 		value = value2;
 	}
-    spTimelineArray_add(timelines, SUPER(timeline));
+	spTimelineArray_add(timelines, SUPER(timeline));
 }
 
 static void readTimeline2(_dataInput *input, spTimelineArray *timelines, spCurveTimeline2 *timeline, float scale) {
@@ -610,60 +610,60 @@ static spAnimation *_spSkeletonBinary_readAnimation(spSkeletonBinary *self, cons
 		for (ii = 0, nn = readVarint(input, 1); ii < nn; ++ii) {
 			unsigned char timelineType = readByte(input);
 			int frameCount = readVarint(input, 1);
-            if (timelineType == BONE_INHERIT) {
-                spInheritTimeline *timeline = spInheritTimeline_create(frameCount, boneIndex);
-                for (frame = 0; frame < frameCount; frame++) {
-                    float time = readFloat(input);
-                    spInherit inherit = readByte(input);
-                    spInheritTimeline_setFrame(timeline, frame, time, inherit);
-                }
-                spTimelineArray_add(timelines, SUPER(timeline));
-                continue;
-            }
+			if (timelineType == BONE_INHERIT) {
+				spInheritTimeline *timeline = spInheritTimeline_create(frameCount, boneIndex);
+				for (frame = 0; frame < frameCount; frame++) {
+					float time = readFloat(input);
+					spInherit inherit = readByte(input);
+					spInheritTimeline_setFrame(timeline, frame, time, inherit);
+				}
+				spTimelineArray_add(timelines, SUPER(timeline));
+				continue;
+			}
 			int bezierCount = readVarint(input, 1);
 			switch (timelineType) {
 				case BONE_ROTATE:
 					readTimeline(input, timelines, SUPER(spRotateTimeline_create(frameCount, bezierCount, boneIndex)),
-											1);
+								 1);
 					break;
 				case BONE_TRANSLATE:
-					readTimeline2(input,timelines,
-											 SUPER(spTranslateTimeline_create(frameCount, bezierCount, boneIndex)),
-											 scale);
+					readTimeline2(input, timelines,
+								  SUPER(spTranslateTimeline_create(frameCount, bezierCount, boneIndex)),
+								  scale);
 					break;
 				case BONE_TRANSLATEX:
 					readTimeline(input, timelines,
-											SUPER(spTranslateXTimeline_create(frameCount, bezierCount, boneIndex)),
-											scale);
+								 SUPER(spTranslateXTimeline_create(frameCount, bezierCount, boneIndex)),
+								 scale);
 					break;
 				case BONE_TRANSLATEY:
 					readTimeline(input, timelines,
-											SUPER(spTranslateYTimeline_create(frameCount, bezierCount, boneIndex)),
-											scale);
+								 SUPER(spTranslateYTimeline_create(frameCount, bezierCount, boneIndex)),
+								 scale);
 					break;
 				case BONE_SCALE:
 					readTimeline2(input, timelines, SUPER(spScaleTimeline_create(frameCount, bezierCount, boneIndex)),
-											 1);
+								  1);
 					break;
 				case BONE_SCALEX:
 					readTimeline(input, timelines, SUPER(spScaleXTimeline_create(frameCount, bezierCount, boneIndex)),
-											1);
+								 1);
 					break;
 				case BONE_SCALEY:
 					readTimeline(input, timelines, SUPER(spScaleYTimeline_create(frameCount, bezierCount, boneIndex)),
-											1);
+								 1);
 					break;
 				case BONE_SHEAR:
 					readTimeline2(input, timelines, SUPER(spShearTimeline_create(frameCount, bezierCount, boneIndex)),
-											 1);
+								  1);
 					break;
 				case BONE_SHEARX:
 					readTimeline(input, timelines, SUPER(spShearXTimeline_create(frameCount, bezierCount, boneIndex)),
-											1);
+								 1);
 					break;
 				case BONE_SHEARY:
 					readTimeline(input, timelines, SUPER(spShearYTimeline_create(frameCount, bezierCount, boneIndex)),
-											1);
+								 1);
 					break;
 				default: {
 					for (iii = 0; iii < timelines->size; ++iii)
@@ -684,20 +684,20 @@ static spAnimation *_spSkeletonBinary_readAnimation(spSkeletonBinary *self, cons
 		int frameLast = frameCount - 1;
 		int bezierCount = readVarint(input, 1);
 		spIkConstraintTimeline *timeline = spIkConstraintTimeline_create(frameCount, bezierCount, index);
-        int flags = readByte(input);
-        float time = readFloat(input), mix = (flags & 1) != 0 ? ((flags & 2) != 0 ? readFloat(input) : 1) : 0;
-        float softness = (flags & 4) != 0 ? readFloat(input) * scale : 0;
+		int flags = readByte(input);
+		float time = readFloat(input), mix = (flags & 1) != 0 ? ((flags & 2) != 0 ? readFloat(input) : 1) : 0;
+		float softness = (flags & 4) != 0 ? readFloat(input) * scale : 0;
 		for (frame = 0, bezier = 0;; frame++) {
-            spIkConstraintTimeline_setFrame(timeline, frame, time, mix, softness, (flags & 8) != 0 ? 1 : -1, (flags & 16) != 0, (flags & 32) != 0);
+			spIkConstraintTimeline_setFrame(timeline, frame, time, mix, softness, (flags & 8) != 0 ? 1 : -1, (flags & 16) != 0, (flags & 32) != 0);
 			if (frame == frameLast) break;
-            flags = readByte(input);
-            float time2 = readFloat(input), mix2 = (flags & 1) != 0 ? ((flags & 2) != 0 ? readFloat(input) : 1) : 0;
-            float softness2 = (flags & 4) != 0 ? readFloat(input) * scale : 0;
-            if ((flags & 64) != 0)
-                spCurveTimeline_setStepped(SUPER(timeline), frame);
-            else if ((flags & 128) != 0) {
-                setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 0, time, time2, mix, mix2, 1);
-                setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 1, time, time2, softness, softness2, scale);
+			flags = readByte(input);
+			float time2 = readFloat(input), mix2 = (flags & 1) != 0 ? ((flags & 2) != 0 ? readFloat(input) : 1) : 0;
+			float softness2 = (flags & 4) != 0 ? readFloat(input) * scale : 0;
+			if ((flags & 64) != 0)
+				spCurveTimeline_setStepped(SUPER(timeline), frame);
+			else if ((flags & 128) != 0) {
+				setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 0, time, time2, mix, mix2, 1);
+				setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 1, time, time2, softness, softness2, scale);
 			}
 			time = time2;
 			mix = mix2;
@@ -766,19 +766,19 @@ static spAnimation *_spSkeletonBinary_readAnimation(spSkeletonBinary *self, cons
 			switch (type) {
 				case PATH_POSITION: {
 					readTimeline(input, timelines, SUPER(spPathConstraintPositionTimeline_create(frameCount, bezierCount, index)),
-																data->positionMode == SP_POSITION_MODE_FIXED ? scale
-																											 : 1);
+								 data->positionMode == SP_POSITION_MODE_FIXED ? scale
+																			  : 1);
 					break;
 				}
 				case PATH_SPACING: {
 					readTimeline(input, timelines,
-																SUPER(spPathConstraintSpacingTimeline_create(frameCount,
-																											 bezierCount,
-																											 index)),
-																data->spacingMode == SP_SPACING_MODE_LENGTH ||
-																				data->spacingMode == SP_SPACING_MODE_FIXED
-																		? scale
-																		: 1);
+								 SUPER(spPathConstraintSpacingTimeline_create(frameCount,
+																			  bezierCount,
+																			  index)),
+								 data->spacingMode == SP_SPACING_MODE_LENGTH ||
+												 data->spacingMode == SP_SPACING_MODE_FIXED
+										 ? scale
+										 : 1);
 					break;
 				}
 				case PATH_MIX: {
@@ -821,43 +821,43 @@ static spAnimation *_spSkeletonBinary_readAnimation(spSkeletonBinary *self, cons
 		}
 	}
 
-    for (i = 0, n = readVarint(input, 1); i < n; i++) {
-        int index = readVarint(input, 1) - 1;
-        for (ii = 0, nn = readVarint(input, 1); ii < nn; ii++) {
-            int type = readByte(input);
-            int frameCount = readVarint(input, 1);
-            if (type == PHYSICS_RESET) {
-                spPhysicsConstraintResetTimeline *timeline = spPhysicsConstraintResetTimeline_create(frameCount, index);
-                for (frame = 0; frame < frameCount; frame++)
-                    spPhysicsConstraintResetTimeline_setFrame(timeline, frame, readFloat(input));
-                spTimelineArray_add(timelines, SUPER(timeline));
-                continue;
-            }
-            int bezierCount = readVarint(input, 1);
-            switch (type) {
-                case PHYSICS_INERTIA:
-                    readTimeline(input, timelines, SUPER(spPhysicsConstraintTimeline_create(frameCount, bezierCount, index, SP_TIMELINE_PHYSICSCONSTRAINT_INERTIA)), 1);
-                    break;
-                case PHYSICS_STRENGTH:
-                    readTimeline(input, timelines, SUPER(spPhysicsConstraintTimeline_create(frameCount, bezierCount, index, SP_TIMELINE_PHYSICSCONSTRAINT_STRENGTH)), 1);
-                    break;
-                case PHYSICS_DAMPING:
-                    readTimeline(input, timelines, SUPER(spPhysicsConstraintTimeline_create(frameCount, bezierCount, index, SP_TIMELINE_PHYSICSCONSTRAINT_DAMPING)), 1);
-                    break;
-                case PHYSICS_MASS:
-                    readTimeline(input, timelines, SUPER(spPhysicsConstraintTimeline_create(frameCount, bezierCount, index, SP_TIMELINE_PHYSICSCONSTRAINT_MASS)), 1);
-                    break;
-                case PHYSICS_WIND:
-                    readTimeline(input, timelines, SUPER(spPhysicsConstraintTimeline_create(frameCount, bezierCount, index, SP_TIMELINE_PHYSICSCONSTRAINT_WIND)), 1);
-                    break;
-                case PHYSICS_GRAVITY:
-                    readTimeline(input, timelines, SUPER(spPhysicsConstraintTimeline_create(frameCount, bezierCount, index, SP_TIMELINE_PHYSICSCONSTRAINT_GRAVITY)), 1);
-                    break;
-                case PHYSICS_MIX:
-                    readTimeline(input, timelines, SUPER(spPhysicsConstraintTimeline_create(frameCount, bezierCount, index, SP_TIMELINE_PHYSICSCONSTRAINT_MIX)), 1);
-            }
-        }
-    }
+	for (i = 0, n = readVarint(input, 1); i < n; i++) {
+		int index = readVarint(input, 1) - 1;
+		for (ii = 0, nn = readVarint(input, 1); ii < nn; ii++) {
+			int type = readByte(input);
+			int frameCount = readVarint(input, 1);
+			if (type == PHYSICS_RESET) {
+				spPhysicsConstraintResetTimeline *timeline = spPhysicsConstraintResetTimeline_create(frameCount, index);
+				for (frame = 0; frame < frameCount; frame++)
+					spPhysicsConstraintResetTimeline_setFrame(timeline, frame, readFloat(input));
+				spTimelineArray_add(timelines, SUPER(timeline));
+				continue;
+			}
+			int bezierCount = readVarint(input, 1);
+			switch (type) {
+				case PHYSICS_INERTIA:
+					readTimeline(input, timelines, SUPER(spPhysicsConstraintTimeline_create(frameCount, bezierCount, index, SP_TIMELINE_PHYSICSCONSTRAINT_INERTIA)), 1);
+					break;
+				case PHYSICS_STRENGTH:
+					readTimeline(input, timelines, SUPER(spPhysicsConstraintTimeline_create(frameCount, bezierCount, index, SP_TIMELINE_PHYSICSCONSTRAINT_STRENGTH)), 1);
+					break;
+				case PHYSICS_DAMPING:
+					readTimeline(input, timelines, SUPER(spPhysicsConstraintTimeline_create(frameCount, bezierCount, index, SP_TIMELINE_PHYSICSCONSTRAINT_DAMPING)), 1);
+					break;
+				case PHYSICS_MASS:
+					readTimeline(input, timelines, SUPER(spPhysicsConstraintTimeline_create(frameCount, bezierCount, index, SP_TIMELINE_PHYSICSCONSTRAINT_MASS)), 1);
+					break;
+				case PHYSICS_WIND:
+					readTimeline(input, timelines, SUPER(spPhysicsConstraintTimeline_create(frameCount, bezierCount, index, SP_TIMELINE_PHYSICSCONSTRAINT_WIND)), 1);
+					break;
+				case PHYSICS_GRAVITY:
+					readTimeline(input, timelines, SUPER(spPhysicsConstraintTimeline_create(frameCount, bezierCount, index, SP_TIMELINE_PHYSICSCONSTRAINT_GRAVITY)), 1);
+					break;
+				case PHYSICS_MIX:
+					readTimeline(input, timelines, SUPER(spPhysicsConstraintTimeline_create(frameCount, bezierCount, index, SP_TIMELINE_PHYSICSCONSTRAINT_MIX)), 1);
+			}
+		}
+	}
 
 	/* Attachment timelines. */
 	for (i = 0, n = readVarint(input, 1); i < n; ++i) {
@@ -1000,13 +1000,13 @@ static spAnimation *_spSkeletonBinary_readAnimation(spSkeletonBinary *self, cons
 			spEvent *event = spEvent_create(time, eventData);
 			event->intValue = readVarint(input, 0);
 			event->floatValue = readFloat(input);
-            const char *event_stringValue = readString(input);
-            if (event_stringValue == NULL) {
-                event->stringValue = string_copy(eventData->stringValue);
-            } else {
-                event->stringValue = string_copy(event_stringValue);
-                FREE(event_stringValue);
-            }
+			const char *event_stringValue = readString(input);
+			if (event_stringValue == NULL) {
+				event->stringValue = string_copy(eventData->stringValue);
+			} else {
+				event->stringValue = string_copy(event_stringValue);
+				FREE(event_stringValue);
+			}
 
 			if (eventData->audioPath) {
 				event->volume = readFloat(input);
@@ -1046,81 +1046,81 @@ static unsigned short *_readShortArray(_dataInput *input, int n) {
 	return array;
 }
 
-static int _readVertices(_dataInput *input, float **vertices, int *verticesLength, int **bones, int *bonesCount, int/*bool*/ weighted, float scale) {
-    int vertexCount = readVarint(input, 1);
-    *verticesLength = vertexCount << 1;
-    if (!weighted) {
-        *vertices = _readFloatArray(input, *verticesLength, scale);
-        *bones = NULL;
-        *bonesCount = 0;
-        return *verticesLength;
-    }
+static int _readVertices(_dataInput *input, float **vertices, int *verticesLength, int **bones, int *bonesCount, int /*bool*/ weighted, float scale) {
+	int vertexCount = readVarint(input, 1);
+	*verticesLength = vertexCount << 1;
+	if (!weighted) {
+		*vertices = _readFloatArray(input, *verticesLength, scale);
+		*bones = NULL;
+		*bonesCount = 0;
+		return *verticesLength;
+	}
 
-    float *v = MALLOC(float, (*verticesLength) * 3 * 3);
-    int *b = MALLOC(int, (*verticesLength) * 3);
-    int boneIdx = 0;
-    int vertexIdx = 0;
-    for (int i = 0; i < vertexCount; ++i) {
-        int boneCount = readVarint(input, 1);
-        b[boneIdx++] = boneCount;
-        for (int ii = 0; ii < boneCount; ++ii) {
-            b[boneIdx++] = readVarint(input, 1);
-            v[vertexIdx++] = readFloat(input) * scale;
-            v[vertexIdx++] = readFloat(input) * scale;
-            v[vertexIdx++] = readFloat(input);
-        }
-    }
-    *vertices = v;
-    *bones = b;
-    *bonesCount = boneIdx;
-    *verticesLength = vertexIdx;
-    return vertexCount << 1;
+	float *v = MALLOC(float, (*verticesLength) * 3 * 3);
+	int *b = MALLOC(int, (*verticesLength) * 3);
+	int boneIdx = 0;
+	int vertexIdx = 0;
+	for (int i = 0; i < vertexCount; ++i) {
+		int boneCount = readVarint(input, 1);
+		b[boneIdx++] = boneCount;
+		for (int ii = 0; ii < boneCount; ++ii) {
+			b[boneIdx++] = readVarint(input, 1);
+			v[vertexIdx++] = readFloat(input) * scale;
+			v[vertexIdx++] = readFloat(input) * scale;
+			v[vertexIdx++] = readFloat(input);
+		}
+	}
+	*vertices = v;
+	*bones = b;
+	*bonesCount = boneIdx;
+	*verticesLength = vertexIdx;
+	return vertexCount << 1;
 }
 
 spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput *input,
 											  spSkin *skin, int slotIndex, const char *attachmentName,
 											  spSkeletonData *skeletonData, int /*bool*/ nonessential) {
-    int flags = readByte(input);
+	int flags = readByte(input);
 	const char *name = (flags & 8) != 0 ? readStringRef(input, skeletonData) : attachmentName;
-    spAttachmentType type = (flags & 0x7);
+	spAttachmentType type = (flags & 0x7);
 
-    switch (type) {
+	switch (type) {
 		case SP_ATTACHMENT_REGION: {
-            char *path = (flags & 16) != 0 ? readStringRef(input, skeletonData) : (char*)name;
-            path = string_copy(path);
-            spColor color;
-            spColor_setFromFloats(&color, 1, 1, 1, 1);
-            if ((flags & 32) != 0) readColor(input, &color.r, &color.g, &color.b, &color.a);
-            spSequence *sequence = (flags & 64) != 0 ? readSequence(input) : NULL;
-            float rotation = (flags & 128) != 0 ? readFloat(input) : 0;
-            float x = readFloat(input) * self->scale;
+			char *path = (flags & 16) != 0 ? readStringRef(input, skeletonData) : (char *) name;
+			path = string_copy(path);
+			spColor color;
+			spColor_setFromFloats(&color, 1, 1, 1, 1);
+			if ((flags & 32) != 0) readColor(input, &color.r, &color.g, &color.b, &color.a);
+			spSequence *sequence = (flags & 64) != 0 ? readSequence(input) : NULL;
+			float rotation = (flags & 128) != 0 ? readFloat(input) : 0;
+			float x = readFloat(input) * self->scale;
 			float y = readFloat(input) * self->scale;
 			float scaleX = readFloat(input);
 			float scaleY = readFloat(input);
 			float width = readFloat(input) * self->scale;
 			float height = readFloat(input) * self->scale;
-            spRegionAttachment *region = SUB_CAST(spRegionAttachment, spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name,
-                                                                           path, sequence));
-            region->path = path;
-            region->rotation = rotation;
-            region->x = x;
-            region->y = y;
-            region->scaleX = scaleX;
-            region->scaleY = scaleY;
-            region->width = width;
-            region->height = height;
-            spColor_setFromColor(&region->color, &color);
-            region->sequence = sequence;
-            if (sequence == NULL) spRegionAttachment_updateRegion(region);
-            spAttachmentLoader_configureAttachment(self->attachmentLoader, SUPER(region));
-            return SUPER(region);
+			spRegionAttachment *region = SUB_CAST(spRegionAttachment, spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name,
+																										  path, sequence));
+			region->path = path;
+			region->rotation = rotation;
+			region->x = x;
+			region->y = y;
+			region->scaleX = scaleX;
+			region->scaleY = scaleY;
+			region->width = width;
+			region->height = height;
+			spColor_setFromColor(&region->color, &color);
+			region->sequence = sequence;
+			if (sequence == NULL) spRegionAttachment_updateRegion(region);
+			spAttachmentLoader_configureAttachment(self->attachmentLoader, SUPER(region));
+			return SUPER(region);
 		}
 		case SP_ATTACHMENT_BOUNDING_BOX: {
 			spBoundingBoxAttachment *box = SUB_CAST(spBoundingBoxAttachment, spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0,
-																		   NULL));
+																												 NULL));
 			if (!box) return NULL;
-            _readVertices(input, &box->super.vertices, &box->super.verticesCount, &box->super.bones, &box->super.bonesCount, (flags & 16) != 0, self->scale);
-            box->super.worldVerticesLength = box->super.verticesCount;
+			_readVertices(input, &box->super.vertices, &box->super.verticesCount, &box->super.bones, &box->super.bonesCount, (flags & 16) != 0, self->scale);
+			box->super.worldVerticesLength = box->super.verticesCount;
 			if (nonessential) {
 				readColor(input, &box->color.r, &box->color.g, &box->color.b, &box->color.a);
 			}
@@ -1128,96 +1128,96 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
 			return SUPER(SUPER(box));
 		}
 		case SP_ATTACHMENT_MESH: {
-            float *uvs = NULL;
-            int uvsCount = 0;
-            unsigned short *triangles = NULL;
-            int trianglesCount = 0;
-            float *vertices = NULL;
-            int verticesCount = 0;
-            int *bones = NULL;
-            int bonesCount = 0;
-            int hullLength = 0;
-            float width = 0;
-            float height = 0;
-            unsigned short *edges = NULL;
-            int edgesCount = 0;
+			float *uvs = NULL;
+			int uvsCount = 0;
+			unsigned short *triangles = NULL;
+			int trianglesCount = 0;
+			float *vertices = NULL;
+			int verticesCount = 0;
+			int *bones = NULL;
+			int bonesCount = 0;
+			int hullLength = 0;
+			float width = 0;
+			float height = 0;
+			unsigned short *edges = NULL;
+			int edgesCount = 0;
 
-            char* path = (flags & 16) != 0 ? readStringRef(input, skeletonData) : (char*)name;
-            path = string_copy(path);
-            spColor color;
-            spColor_setFromFloats(&color, 1, 1, 1, 1);
-            if ((flags & 32) != 0) readColor(input, &color.r, &color.g, &color.b, &color.a);
-            spSequence *sequence = (flags & 64) != 0 ? readSequence(input) : NULL;
-            hullLength = readVarint(input, 1);
-            int verticesLength = _readVertices(input, &vertices, &verticesCount, &bones, &bonesCount, (flags & 128) != 0, self->scale);
-            uvsCount = verticesLength;
-            uvs = _readFloatArray(input, uvsCount, 1);
-            trianglesCount = (verticesLength - hullLength - 2) * 3;
-            triangles = _readShortArray(input, trianglesCount);
+			char *path = (flags & 16) != 0 ? readStringRef(input, skeletonData) : (char *) name;
+			path = string_copy(path);
+			spColor color;
+			spColor_setFromFloats(&color, 1, 1, 1, 1);
+			if ((flags & 32) != 0) readColor(input, &color.r, &color.g, &color.b, &color.a);
+			spSequence *sequence = (flags & 64) != 0 ? readSequence(input) : NULL;
+			hullLength = readVarint(input, 1);
+			int verticesLength = _readVertices(input, &vertices, &verticesCount, &bones, &bonesCount, (flags & 128) != 0, self->scale);
+			uvsCount = verticesLength;
+			uvs = _readFloatArray(input, uvsCount, 1);
+			trianglesCount = (verticesLength - hullLength - 2) * 3;
+			triangles = _readShortArray(input, trianglesCount);
 
-            if (nonessential) {
-                edgesCount = readVarint(input, 1);
-                edges = _readShortArray(input, edgesCount);
-                width = readFloat(input);
-                height = readFloat(input);
-            }
+			if (nonessential) {
+				edgesCount = readVarint(input, 1);
+				edges = _readShortArray(input, edgesCount);
+				width = readFloat(input);
+				height = readFloat(input);
+			}
 
 
-            spAttachment *attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, path, sequence);
-            if (!attachment) return NULL;
-            spMeshAttachment *mesh = SUB_CAST(spMeshAttachment, attachment);
-            mesh->path = path;
-            spColor_setFromColor(&mesh->color, &color);
-            mesh->regionUVs = uvs;
-            mesh->triangles = triangles;
-            mesh->trianglesCount = trianglesCount;
-            mesh->super.vertices = vertices;
-            mesh->super.verticesCount = verticesCount;
-            mesh->super.bones = bones;
-            mesh->super.bonesCount = bonesCount;
-            mesh->super.worldVerticesLength = verticesLength;
-            mesh->hullLength = hullLength;
-            mesh->edges = edges;
-            mesh->edgesCount = edgesCount;
-            mesh->width = width;
-            mesh->height = height;
-            mesh->sequence = sequence;
-            if (sequence == NULL) spMeshAttachment_updateRegion(mesh);
-            spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
-            return attachment;
+			spAttachment *attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, path, sequence);
+			if (!attachment) return NULL;
+			spMeshAttachment *mesh = SUB_CAST(spMeshAttachment, attachment);
+			mesh->path = path;
+			spColor_setFromColor(&mesh->color, &color);
+			mesh->regionUVs = uvs;
+			mesh->triangles = triangles;
+			mesh->trianglesCount = trianglesCount;
+			mesh->super.vertices = vertices;
+			mesh->super.verticesCount = verticesCount;
+			mesh->super.bones = bones;
+			mesh->super.bonesCount = bonesCount;
+			mesh->super.worldVerticesLength = verticesLength;
+			mesh->hullLength = hullLength;
+			mesh->edges = edges;
+			mesh->edgesCount = edgesCount;
+			mesh->width = width;
+			mesh->height = height;
+			mesh->sequence = sequence;
+			if (sequence == NULL) spMeshAttachment_updateRegion(mesh);
+			spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
+			return attachment;
 		}
 		case SP_ATTACHMENT_LINKED_MESH: {
-            char *path = (flags & 16) != 0 ? readStringRef(input, skeletonData) : (char*)name;
-            path = string_copy(path);
-            spColor color;
-            spColor_setFromFloats(&color, 1, 1, 1, 1);
-            if ((flags & 32) != 0) readColor(input, &color.r, &color.g, &color.b, &color.a);
-            spSequence *sequence = (flags & 64) != 0 ? readSequence(input) : NULL;
-            int/*bool*/ inheritTimelines = (flags & 128) != 0;
-            int skinIndex = readVarint(input, 1);
-            char *parent = readStringRef(input, skeletonData);
-            float width = 0, height = 0;
-            if (nonessential) {
-                width = readFloat(input) * self->scale;
-                height = readFloat(input) * self->scale;
-            }
-            spAttachment *attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, path, sequence);
-            spMeshAttachment *mesh = NULL;
-            if (!attachment)
-                return NULL;
-            mesh = SUB_CAST(spMeshAttachment, attachment);
-            mesh->path = (char*)path;
-            if (mesh->path) {
-                char *tmp = NULL;
-                MALLOC_STR(tmp, mesh->path);
-                mesh->path = tmp;
-            }
-            spColor_setFromColor(&mesh->color, &color);
-            mesh->sequence = sequence;
-            mesh->width = width;
-            mesh->height = height;
-            _spSkeletonBinary_addLinkedMesh(self, mesh, skinIndex, slotIndex, parent, inheritTimelines);
-            return attachment;
+			char *path = (flags & 16) != 0 ? readStringRef(input, skeletonData) : (char *) name;
+			path = string_copy(path);
+			spColor color;
+			spColor_setFromFloats(&color, 1, 1, 1, 1);
+			if ((flags & 32) != 0) readColor(input, &color.r, &color.g, &color.b, &color.a);
+			spSequence *sequence = (flags & 64) != 0 ? readSequence(input) : NULL;
+			int /*bool*/ inheritTimelines = (flags & 128) != 0;
+			int skinIndex = readVarint(input, 1);
+			char *parent = readStringRef(input, skeletonData);
+			float width = 0, height = 0;
+			if (nonessential) {
+				width = readFloat(input) * self->scale;
+				height = readFloat(input) * self->scale;
+			}
+			spAttachment *attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, path, sequence);
+			spMeshAttachment *mesh = NULL;
+			if (!attachment)
+				return NULL;
+			mesh = SUB_CAST(spMeshAttachment, attachment);
+			mesh->path = (char *) path;
+			if (mesh->path) {
+				char *tmp = NULL;
+				MALLOC_STR(tmp, mesh->path);
+				mesh->path = tmp;
+			}
+			spColor_setFromColor(&mesh->color, &color);
+			mesh->sequence = sequence;
+			mesh->width = width;
+			mesh->height = height;
+			_spSkeletonBinary_addLinkedMesh(self, mesh, skinIndex, slotIndex, parent, inheritTimelines);
+			return attachment;
 		}
 		case SP_ATTACHMENT_PATH: {
 			spAttachment *attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0,
@@ -1226,11 +1226,11 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
 			if (!attachment)
 				return NULL;
 			path = SUB_CAST(spPathAttachment, attachment);
-            path->closed = (flags & 16) != 0;
-            path->constantSpeed = (flags & 32) != 0;
-            int verticesLength = _readVertices(input, &path->super.vertices, &path->super.verticesCount, &path->super.bones, &path->super.bonesCount, (flags & 64) != 0, self->scale);
-            path->super.worldVerticesLength = verticesLength;
-            path->lengthsLength = verticesLength / 6;
+			path->closed = (flags & 16) != 0;
+			path->constantSpeed = (flags & 32) != 0;
+			int verticesLength = _readVertices(input, &path->super.vertices, &path->super.verticesCount, &path->super.bones, &path->super.bonesCount, (flags & 64) != 0, self->scale);
+			path->super.worldVerticesLength = verticesLength;
+			path->lengthsLength = verticesLength / 6;
 			path->lengths = MALLOC(float, path->lengthsLength);
 			for (int i = 0; i < path->lengthsLength; ++i) {
 				path->lengths[i] = readFloat(input) * self->scale;
@@ -1266,8 +1266,8 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
 			if (!attachment)
 				return NULL;
 			clip = SUB_CAST(spClippingAttachment, attachment);
-            int verticesLength = _readVertices(input, &clip->super.vertices, &clip->super.verticesCount, &clip->super.bones, &clip->super.bonesCount, (flags & 16) != 0, self->scale);
-            clip->super.worldVerticesLength = verticesLength;
+			int verticesLength = _readVertices(input, &clip->super.vertices, &clip->super.verticesCount, &clip->super.bones, &clip->super.bonesCount, (flags & 16) != 0, self->scale);
+			clip->super.worldVerticesLength = verticesLength;
 			if (nonessential) {
 				readColor(input, &clip->color.r, &clip->color.g, &clip->color.b, &clip->color.a);
 			}
@@ -1290,10 +1290,10 @@ spSkin *spSkeletonBinary_readSkin(spSkeletonBinary *self, _dataInput *input, int
 		if (slotCount == 0) return NULL;
 		skin = spSkin_create("default");
 	} else {
-        char *name = readString(input);
+		char *name = readString(input);
 		skin = spSkin_create(name);
-        FREE(name);
-        if (nonessential) readColor(input, &skin->color.r, &skin->color.g, &skin->color.b, &skin->color.a);
+		FREE(name);
+		if (nonessential) readColor(input, &skin->color.r, &skin->color.g, &skin->color.b, &skin->color.a);
 		for (i = 0, n = readVarint(input, 1); i < n; i++)
 			spBoneDataArray_add(skin->bones, skeletonData->bones[readVarint(input, 1)]);
 
@@ -1307,10 +1307,10 @@ spSkin *spSkeletonBinary_readSkin(spSkeletonBinary *self, _dataInput *input, int
 		for (i = 0, n = readVarint(input, 1); i < n; i++)
 			spPathConstraintDataArray_add(skin->pathConstraints, skeletonData->pathConstraints[readVarint(input, 1)]);
 
-        for (i = 0, n = readVarint(input, 1); i < n; i++)
-            spPhysicsConstraintDataArray_add(skin->physicsConstraints, skeletonData->physicsConstraints[readVarint(input, 1)]);
+		for (i = 0, n = readVarint(input, 1); i < n; i++)
+			spPhysicsConstraintDataArray_add(skin->physicsConstraints, skeletonData->physicsConstraints[readVarint(input, 1)]);
 
-        slotCount = readVarint(input, 1);
+		slotCount = readVarint(input, 1);
 	}
 
 	for (i = 0; i < slotCount; ++i) {
@@ -1380,7 +1380,7 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 	skeletonData->y = readFloat(input);
 	skeletonData->width = readFloat(input);
 	skeletonData->height = readFloat(input);
-    skeletonData->referenceScale = readFloat(input);
+	skeletonData->referenceScale = readFloat(input);
 
 	nonessential = readBoolean(input);
 
@@ -1424,8 +1424,8 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 		data->skinRequired = readBoolean(input);
 		if (nonessential) {
 			readColor(input, &data->color.r, &data->color.g, &data->color.b, &data->color.a);
-            data->icon = readString(input);
-            data->visible = readBoolean(input);
+			data->icon = readString(input);
+			data->visible = readBoolean(input);
 		}
 		skeletonData->bones[i] = data;
 	}
@@ -1435,14 +1435,14 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 	skeletonData->slots = MALLOC(spSlotData *, skeletonData->slotsCount);
 	for (i = 0; i < skeletonData->slotsCount; ++i) {
 		char *slotName = readString(input);
-        char *pathName = NULL;
-        if (nonessential) {
-            int slash = string_lastIndexOf(slotName, '/');
-            if (slash != -1) {
-                pathName = string_substring(slotName, 0, slash);
-                slotName = string_substring(slotName, slash + 1, strlen(slotName));
-            }
-        }
+		char *pathName = NULL;
+		if (nonessential) {
+			int slash = string_lastIndexOf(slotName, '/');
+			if (slash != -1) {
+				pathName = string_substring(slotName, 0, slash);
+				slotName = string_substring(slotName, slash + 1, strlen(slotName));
+			}
+		}
 		spBoneData *boneData = skeletonData->bones[readVarint(input, 1)];
 		spSlotData *slotData = spSlotData_create(i, slotName, boneData);
 		FREE(slotName);
@@ -1460,10 +1460,10 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 		else
 			slotData->attachmentName = 0;
 		slotData->blendMode = (spBlendMode) readVarint(input, 1);
-        if (nonessential) {
-            slotData->visible = readBoolean(input);
-            slotData->path = pathName;
-        }
+		if (nonessential) {
+			slotData->visible = readBoolean(input);
+			slotData->path = pathName;
+		}
 		skeletonData->slots[i] = slotData;
 	}
 
@@ -1473,23 +1473,23 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 	for (i = 0; i < skeletonData->ikConstraintsCount; ++i) {
 		const char *name = readString(input);
 		spIkConstraintData *data = spIkConstraintData_create(name);
-        FREE(name);
+		FREE(name);
 		data->order = readVarint(input, 1);
 		data->bonesCount = readVarint(input, 1);
 		data->bones = MALLOC(spBoneData *, data->bonesCount);
 		for (ii = 0; ii < data->bonesCount; ++ii)
 			data->bones[ii] = skeletonData->bones[readVarint(input, 1)];
 		data->target = skeletonData->bones[readVarint(input, 1)];
-        int flags = readByte(input);
-        data->skinRequired = (flags & 1) != 0;
-        data->bendDirection = (flags & 2) != 0 ? 1 : -1;
-        data->compress = (flags & 4) != 0;
-        data->stretch = (flags & 8) != 0;
-        data->uniform = (flags & 16) != 0;
-        if ((flags & 32) != 0) data->mix = (flags & 64) != 0 ? readFloat(input) : 1;
-        if ((flags & 128) != 0) data->softness = readFloat(input) * self->scale;
+		int flags = readByte(input);
+		data->skinRequired = (flags & 1) != 0;
+		data->bendDirection = (flags & 2) != 0 ? 1 : -1;
+		data->compress = (flags & 4) != 0;
+		data->stretch = (flags & 8) != 0;
+		data->uniform = (flags & 16) != 0;
+		if ((flags & 32) != 0) data->mix = (flags & 64) != 0 ? readFloat(input) : 1;
+		if ((flags & 128) != 0) data->softness = readFloat(input) * self->scale;
 
-        skeletonData->ikConstraints[i] = data;
+		skeletonData->ikConstraints[i] = data;
 	}
 
 	/* Transform constraints. */
@@ -1499,32 +1499,32 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 	for (i = 0; i < skeletonData->transformConstraintsCount; ++i) {
 		const char *name = readString(input);
 		spTransformConstraintData *data = spTransformConstraintData_create(name);
-        FREE(name);
+		FREE(name);
 		data->order = readVarint(input, 1);
 		data->bonesCount = readVarint(input, 1);
 		data->bones = MALLOC(spBoneData *, data->bonesCount);
 		for (ii = 0; ii < data->bonesCount; ++ii)
 			data->bones[ii] = skeletonData->bones[readVarint(input, 1)];
 		data->target = skeletonData->bones[readVarint(input, 1)];
-        int flags = readByte(input);
-        data->skinRequired = (flags & 1) != 0;
-        data->local = (flags & 2) != 0;
-        data->relative = (flags & 4) != 0;
-        if ((flags & 8) != 0) data->offsetRotation = readFloat(input);
-        if ((flags & 16) != 0) data->offsetX = readFloat(input) * self->scale;
-        if ((flags & 32) != 0) data->offsetY = readFloat(input) * self->scale;
-        if ((flags & 64) != 0) data->offsetScaleX = readFloat(input);
-        if ((flags & 128) != 0) data->offsetScaleY = readFloat(input);
-        flags = readByte(input);
-        if ((flags & 1) != 0) data->offsetShearY = readFloat(input);
-        if ((flags & 2) != 0) data->mixRotate = readFloat(input);
-        if ((flags & 4) != 0) data->mixX = readFloat(input);
-        if ((flags & 8) != 0) data->mixY = readFloat(input);
-        if ((flags & 16) != 0) data->mixScaleX = readFloat(input);
-        if ((flags & 32) != 0) data->mixScaleY = readFloat(input);
-        if ((flags & 64) != 0) data->mixShearY = readFloat(input);
+		int flags = readByte(input);
+		data->skinRequired = (flags & 1) != 0;
+		data->local = (flags & 2) != 0;
+		data->relative = (flags & 4) != 0;
+		if ((flags & 8) != 0) data->offsetRotation = readFloat(input);
+		if ((flags & 16) != 0) data->offsetX = readFloat(input) * self->scale;
+		if ((flags & 32) != 0) data->offsetY = readFloat(input) * self->scale;
+		if ((flags & 64) != 0) data->offsetScaleX = readFloat(input);
+		if ((flags & 128) != 0) data->offsetScaleY = readFloat(input);
+		flags = readByte(input);
+		if ((flags & 1) != 0) data->offsetShearY = readFloat(input);
+		if ((flags & 2) != 0) data->mixRotate = readFloat(input);
+		if ((flags & 4) != 0) data->mixX = readFloat(input);
+		if ((flags & 8) != 0) data->mixY = readFloat(input);
+		if ((flags & 16) != 0) data->mixScaleX = readFloat(input);
+		if ((flags & 32) != 0) data->mixScaleY = readFloat(input);
+		if ((flags & 64) != 0) data->mixShearY = readFloat(input);
 
-        skeletonData->transformConstraints[i] = data;
+		skeletonData->transformConstraints[i] = data;
 	}
 
 	/* Path constraints */
@@ -1533,7 +1533,7 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 	for (i = 0; i < skeletonData->pathConstraintsCount; ++i) {
 		const char *name = readString(input);
 		spPathConstraintData *data = spPathConstraintData_create(name);
-        FREE(name);
+		FREE(name);
 		data->order = readVarint(input, 1);
 		data->skinRequired = readBoolean(input);
 		data->bonesCount = readVarint(input, 1);
@@ -1541,12 +1541,12 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 		for (ii = 0; ii < data->bonesCount; ++ii)
 			data->bones[ii] = skeletonData->bones[readVarint(input, 1)];
 		data->target = skeletonData->slots[readVarint(input, 1)];
-        int flags = readByte(input);
-        data->positionMode = (flags & 1);
-        data->spacingMode = ((flags >> 1) & 3);
-        data->rotateMode = ((flags >> 3) & 3);
-        if ((flags & 128) != 0) data->offsetRotation = readFloat(input);
-        data->position = readFloat(input);
+		int flags = readByte(input);
+		data->positionMode = (flags & 1);
+		data->spacingMode = ((flags >> 1) & 3);
+		data->rotateMode = ((flags >> 3) & 3);
+		if ((flags & 128) != 0) data->offsetRotation = readFloat(input);
+		data->position = readFloat(input);
 		if (data->positionMode == SP_POSITION_MODE_FIXED) data->position *= self->scale;
 		data->spacing = readFloat(input);
 		if (data->spacingMode == SP_SPACING_MODE_LENGTH || data->spacingMode == SP_SPACING_MODE_FIXED)
@@ -1557,41 +1557,41 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 		skeletonData->pathConstraints[i] = data;
 	}
 
-    // Physics constraints.
-    skeletonData->physicsConstraintsCount = readVarint(input, 1);
-    skeletonData->physicsConstraints = MALLOC(spPhysicsConstraintData *, skeletonData->physicsConstraintsCount);
-    for (i = 0; i < skeletonData->physicsConstraintsCount; i++) {
-        const char *name = readString(input);
-        spPhysicsConstraintData *data = spPhysicsConstraintData_create(name);
-        FREE(name);
-        data->order = readVarint(input, 1);
-        data->bone = skeletonData->bones[readVarint(input, 1)];
-        int flags = readByte(input);
-        data->skinRequired = (flags & 1) != 0;
-        if ((flags & 2) != 0) data->x = readFloat(input);
-        if ((flags & 4) != 0) data->y = readFloat(input);
-        if ((flags & 8) != 0) data->rotate = readFloat(input);
-        if ((flags & 16) != 0) data->scaleX = readFloat(input);
-        if ((flags & 32) != 0) data->shearX = readFloat(input);
-        data->limit = ((flags & 64) != 0 ? readFloat(input) : 5000) * self->scale;
-        data->step = 1.f / readByte(input);
-        data->inertia = readFloat(input);
-        data->strength = readFloat(input);
-        data->damping = readFloat(input);
-        data->massInverse = (flags & 128) != 0 ? readFloat(input) : 1;
-        data->wind = readFloat(input);
-        data->gravity = readFloat(input);
-        flags = readByte(input);
-        if ((flags & 1) != 0) data->inertiaGlobal = -1;
-        if ((flags & 2) != 0) data->strengthGlobal = -1;
-        if ((flags & 4) != 0) data->dampingGlobal = -1;
-        if ((flags & 8) != 0) data->massGlobal = -1;
-        if ((flags & 16) != 0) data->windGlobal = -1;
-        if ((flags & 32) != 0) data->gravityGlobal = -1;
-        if ((flags & 64) != 0) data->mixGlobal = -1;
-        data->mix = (flags & 128) != 0 ? readFloat(input) : 1;
-        skeletonData->physicsConstraints[i] = data;
-    }
+	// Physics constraints.
+	skeletonData->physicsConstraintsCount = readVarint(input, 1);
+	skeletonData->physicsConstraints = MALLOC(spPhysicsConstraintData *, skeletonData->physicsConstraintsCount);
+	for (i = 0; i < skeletonData->physicsConstraintsCount; i++) {
+		const char *name = readString(input);
+		spPhysicsConstraintData *data = spPhysicsConstraintData_create(name);
+		FREE(name);
+		data->order = readVarint(input, 1);
+		data->bone = skeletonData->bones[readVarint(input, 1)];
+		int flags = readByte(input);
+		data->skinRequired = (flags & 1) != 0;
+		if ((flags & 2) != 0) data->x = readFloat(input);
+		if ((flags & 4) != 0) data->y = readFloat(input);
+		if ((flags & 8) != 0) data->rotate = readFloat(input);
+		if ((flags & 16) != 0) data->scaleX = readFloat(input);
+		if ((flags & 32) != 0) data->shearX = readFloat(input);
+		data->limit = ((flags & 64) != 0 ? readFloat(input) : 5000) * self->scale;
+		data->step = 1.f / readByte(input);
+		data->inertia = readFloat(input);
+		data->strength = readFloat(input);
+		data->damping = readFloat(input);
+		data->massInverse = (flags & 128) != 0 ? readFloat(input) : 1;
+		data->wind = readFloat(input);
+		data->gravity = readFloat(input);
+		flags = readByte(input);
+		if ((flags & 1) != 0) data->inertiaGlobal = -1;
+		if ((flags & 2) != 0) data->strengthGlobal = -1;
+		if ((flags & 4) != 0) data->dampingGlobal = -1;
+		if ((flags & 8) != 0) data->massGlobal = -1;
+		if ((flags & 16) != 0) data->windGlobal = -1;
+		if ((flags & 32) != 0) data->gravityGlobal = -1;
+		if ((flags & 64) != 0) data->mixGlobal = -1;
+		data->mix = (flags & 128) != 0 ? readFloat(input) : 1;
+		skeletonData->physicsConstraints[i] = data;
+	}
 
 	/* Default skin. */
 	skeletonData->defaultSkin = spSkeletonBinary_readSkin(self, input, -1, skeletonData, nonessential);
@@ -1624,14 +1624,14 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 	/* Linked meshes. */
 	for (i = 0; i < internal->linkedMeshCount; ++i) {
 		_spLinkedMesh *linkedMesh = internal->linkedMeshes + i;
-        spSkin *skin = skeletonData->skins[linkedMesh->skinIndex];
+		spSkin *skin = skeletonData->skins[linkedMesh->skinIndex];
 		if (!skin) {
 			FREE(input);
 			spSkeletonData_dispose(skeletonData);
 			_spSkeletonBinary_setError(self, "Skin not found", "");
 			return NULL;
 		}
-        spAttachment *parent = spSkin_getAttachment(skin, linkedMesh->slotIndex, linkedMesh->parent);
+		spAttachment *parent = spSkin_getAttachment(skin, linkedMesh->slotIndex, linkedMesh->parent);
 		if (!parent) {
 			FREE(input);
 			spSkeletonData_dispose(skeletonData);
@@ -1651,7 +1651,7 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 	for (i = 0; i < skeletonData->eventsCount; ++i) {
 		const char *name = readString(input);
 		spEventData *eventData = spEventData_create(name);
-        FREE(name);
+		FREE(name);
 		eventData->intValue = readVarint(input, 0);
 		eventData->floatValue = readFloat(input);
 		eventData->stringValue = readString(input);

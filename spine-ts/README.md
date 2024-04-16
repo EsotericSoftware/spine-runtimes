@@ -8,10 +8,14 @@ up into multiple modules:
 1. `spine-canvas/`, a self-contained Canvas backend, built on the core classes.
 1. `spine-threejs/`, a self-contained THREE.JS backend, built on the core classes.
 1. `spine-player/`, a self-contained player to easily display Spine animations on your website, built on the core classes and WebGL backend.
+1. `spine-phaser/`, a Phaser backend, built on the core classes.
+1. `spine-pixi/`, a Pixi backend, built on the core classes.
 
 In most cases, the `spine-player` module is best suited for your needs. Please refer to the [Spine Web Player documentation](https://esotericsoftware.com/spine-player) for more information.
 
 For documentation of the core API in `spine-core`, please refer to our [Spine Runtimes Guide](http://esotericsoftware.com/spine-runtimes-guide).
+
+For documentation of spine-phaser, please refer to our [spine-phaser Guide](https://esotericsoftware.com/spine-phaser).
 
 For module specific APIs in `spine-canvas`, `spine-webgl`, and `spine-threejs`, please refer to the [Examples](#examples) in the respecitve `spine-<modulename>/example` folder. For `spine-webgl` specifically, we have provided additional [demos](spine-webgl/demos), which you can also [view online](http://esotericsoftware.com/spine-demos).
 
@@ -45,20 +49,26 @@ You can include a module in your project via a `<script>` tag from the [unpkg](h
 
 ```
 // spine-ts Core
-<script src="https://unpkg.com/@esotericsoftware/spine-core@4.0.*/dist/iife/spine-core.js"></script>
+<script src="https://unpkg.com/@esotericsoftware/spine-core@4.2.*/dist/iife/spine-core.js"></script>
 
 // spine-ts Canvas
-<script src="https://unpkg.com/@esotericsoftware/spine-canvas@4.0.*/dist/iife/spine-canvas.js"></script>
+<script src="https://unpkg.com/@esotericsoftware/spine-canvas@4.2.*/dist/iife/spine-canvas.js"></script>
 
 // spine-ts WebGL
-<script src="https://unpkg.com/@esotericsoftware/spine-webgl@4.0.*/dist/iife/spine-webgl.js"></script>
+<script src="https://unpkg.com/@esotericsoftware/spine-webgl@4.2.*/dist/iife/spine-webgl.js"></script>
 
 // spine-ts Player, which requires a spine-player.css as well
-<script src="https://unpkg.com/@esotericsoftware/spine-player@4.0.*/dist/iife/spine-player.js"></script>
+<script src="https://unpkg.com/@esotericsoftware/spine-player@4.2.*/dist/iife/spine-player.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/@esotericsoftware/spine-player@4.0.*/dist/spine-player.css">
 
 // spine-ts ThreeJS
-<script src="https://unpkg.com/@esotericsoftware/spine-threejs@4.0.*/dist/iife/spine-threejs.js"></script>
+<script src="https://unpkg.com/@esotericsoftware/spine-threejs@4.2.*/dist/iife/spine-threejs.js"></script>
+
+// spine-phaser
+<script src="https://unpkg.com/@esotericsoftware/spine-phaser@4.2.*/dist/iife/spine-phaser.js"></script>
+
+// spine-pixi
+<script src="https://unpkg.com/@esotericsoftware/spine-pixi@4.2.*/dist/iife/spine-pixi.js"></script>
 ```
 
 We also provide `js.map` source maps. They will be automatically fetched from unpkg when debugging code of a spine-module in Chrome, Firefox, or Safari, mapping the JavaScript code back to its original TypeScript sources.
@@ -75,6 +85,8 @@ npm install @esotericsoftware/spine-canvas
 npm install @esotericsoftware/spine-webgl
 npm install @esotericsoftware/spine-player
 npm install @esotericsoftware/spine-threejs
+npm install @esotericsoftware/spine-phaser
+npm install @esotericsoftware/spine-pixi
 ```
 
 spine-ts modules are provided in the [ECMAScript format](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules), which can be consumed natively by all modern browsers, or bundled by tools like [webpack](https://webpack.js.org/), [Babel](https://babeljs.io/), [Parcel](https://parceljs.org/), or [esbuild](https://esbuild.github.io/). You can import functions and classes from a spine-ts module in your JavaScript or TypeScript code using the `import` syntax to get access to all exported constants, functions, and classes of a module:

@@ -399,10 +399,10 @@ int spAnimationState_apply(spAnimationState *self, spSkeleton *skeleton) {
 		/* Apply mixing from entries first. */
 		alpha = current->alpha;
 		if (current->mixingFrom)
-            alpha *= _spAnimationState_applyMixingFrom(self, current, skeleton, blend);
+			alpha *= _spAnimationState_applyMixingFrom(self, current, skeleton, blend);
 		else if (current->trackTime >= current->trackEnd && current->next == 0)
-            alpha = 0;
-        int/*bool*/ attachments = alpha >= current->alphaAttachmentThreshold;
+			alpha = 0;
+		int /*bool*/ attachments = alpha >= current->alphaAttachmentThreshold;
 
 		/* Apply current entry. */
 		animationLast = current->animationLast;
@@ -422,7 +422,7 @@ int spAnimationState_apply(spAnimationState *self, spSkeleton *skeleton) {
 					_spAnimationState_applyAttachmentTimeline(self, timeline, skeleton, applyTime, blend, attachments);
 				} else {
 					spTimeline_apply(timelines[ii], skeleton, animationLast, applyTime, applyEvents,
-                                     &internal->eventsCount, alpha, blend, SP_MIX_DIRECTION_IN);
+									 &internal->eventsCount, alpha, blend, SP_MIX_DIRECTION_IN);
 				}
 			}
 		} else {
@@ -438,12 +438,12 @@ int spAnimationState_apply(spAnimationState *self, spSkeleton *skeleton) {
 				timelineBlend = timelineMode->items[ii] == SUBSEQUENT ? blend : SP_MIX_BLEND_SETUP;
 				if (!shortestRotation && timeline->type == SP_TIMELINE_ROTATE)
 					_spAnimationState_applyRotateTimeline(self, timeline, skeleton, applyTime, alpha, timelineBlend,
-                                                          timelinesRotation, ii << 1, firstFrame);
+														  timelinesRotation, ii << 1, firstFrame);
 				else if (timeline->type == SP_TIMELINE_ATTACHMENT)
 					_spAnimationState_applyAttachmentTimeline(self, timeline, skeleton, applyTime, timelineBlend, attachments);
 				else
 					spTimeline_apply(timeline, skeleton, animationLast, applyTime, applyEvents, &internal->eventsCount,
-                                     alpha, timelineBlend, SP_MIX_DIRECTION_IN);
+									 alpha, timelineBlend, SP_MIX_DIRECTION_IN);
 			}
 		}
 		_spAnimationState_queueEvents(self, current, animationTime);
@@ -665,8 +665,8 @@ void _spAnimationState_applyRotateTimeline(spAnimationState *self, spTimeline *t
 
 	/* Mix between rotations using the direction of the shortest route on the first frame while detecting crosses. */
 	diff = r2 - r1;
-    diff -= CEIL(diff / 360 - 0.5) * 360;
-    if (diff == 0) {
+	diff -= CEIL(diff / 360 - 0.5) * 360;
+	if (diff == 0) {
 		total = timelinesRotation[i];
 	} else {
 		float lastTotal, lastDiff, loops;
@@ -716,15 +716,15 @@ void _spAnimationState_queueEvents(spAnimationState *self, spTrackEntry *entry, 
 
 	/* Queue complete if completed a loop iteration or the animation. */
 	if (entry->loop) {
-        if (duration == 0)
-            complete = -1;
-        else {
-            int cycles = (int) (entry->trackTime / duration);
-            complete = cycles > 0 && cycles > (int) (entry->trackLast / duration);
-        }
-    } else {
-        complete = (animationTime >= animationEnd && entry->animationLast < animationEnd);
-    }
+		if (duration == 0)
+			complete = -1;
+		else {
+			int cycles = (int) (entry->trackTime / duration);
+			complete = cycles > 0 && cycles > (int) (entry->trackLast / duration);
+		}
+	} else {
+		complete = (animationTime >= animationEnd && entry->animationLast < animationEnd);
+	}
 	if (complete) _spEventQueue_complete(internal->queue, entry);
 
 	/* Queue events after complete. */
@@ -918,7 +918,7 @@ _spAnimationState_trackEntry(spAnimationState *self, int trackIndex, spAnimation
 
 	entry->eventThreshold = 0;
 	entry->mixAttachmentThreshold = 0;
-    entry->alphaAttachmentThreshold = 0;
+	entry->alphaAttachmentThreshold = 0;
 	entry->mixDrawOrderThreshold = 0;
 
 	entry->animationStart = 0;
@@ -1060,13 +1060,13 @@ float spTrackEntry_getTrackComplete(spTrackEntry *entry) {
 }
 
 void spTrackEntry_setMixDuration(spTrackEntry *entry, float mixDuration, float delay) {
-    entry->mixDuration = mixDuration;
-    if (entry->previous && delay <= 0) delay += spTrackEntry_getTrackComplete(entry) - mixDuration;
-    entry->delay = delay;
+	entry->mixDuration = mixDuration;
+	if (entry->previous && delay <= 0) delay += spTrackEntry_getTrackComplete(entry) - mixDuration;
+	entry->delay = delay;
 }
 
 int spTrackEntry_wasApplied(spTrackEntry *entry) {
-    return entry->nextTrackLast != -1;
+	return entry->nextTrackLast != -1;
 }
 
 void _spTrackEntry_computeHold(spTrackEntry *entry, spAnimationState *state) {

@@ -48,8 +48,8 @@ spBone *spBone_create(spBoneData *data, spSkeleton *skeleton, spBone *parent) {
 	self->parent = parent;
 	self->a = 1.0f;
 	self->d = 1.0f;
-    self->active = -1;
-    self->inherit = SP_INHERIT_NORMAL;
+	self->active = -1;
+	self->inherit = SP_INHERIT_NORMAL;
 	spBone_setToSetupPose(self);
 	return self;
 }
@@ -70,10 +70,10 @@ void spBone_updateWorldTransform(spBone *self) {
 
 void spBone_updateWorldTransformWith(spBone *self, float x, float y, float rotation, float scaleX, float scaleY,
 									 float shearX, float shearY) {
-    float pa, pb, pc, pd;
-    float sx = self->skeleton->scaleX;
-    float sy = self->skeleton->scaleY * (spBone_isYDown() ? -1 : 1);
-    spBone *parent = self->parent;
+	float pa, pb, pc, pd;
+	float sx = self->skeleton->scaleX;
+	float sy = self->skeleton->scaleY * (spBone_isYDown() ? -1 : 1);
+	spBone *parent = self->parent;
 
 	self->ax = x;
 	self->ay = y;
@@ -84,14 +84,14 @@ void spBone_updateWorldTransformWith(spBone *self, float x, float y, float rotat
 	self->ashearY = shearY;
 
 	if (!parent) { /* Root bone. */
-        float rx = (rotation + shearX) * DEG_RAD;
-        float ry = (rotation + 90 + shearY) * DEG_RAD;
-        self->a = COS(rx) * scaleX * sx;
-        self->b = COS(ry) * scaleY * sx;
-        self->c = SIN(rx) * scaleX * sy;
-        self->d = SIN(ry) * scaleY * sy;
-        self->worldX = x * sx + self->skeleton->x;
-        self->worldY = y * sy + self->skeleton->y;
+		float rx = (rotation + shearX) * DEG_RAD;
+		float ry = (rotation + 90 + shearY) * DEG_RAD;
+		self->a = COS(rx) * scaleX * sx;
+		self->b = COS(ry) * scaleY * sx;
+		self->c = SIN(rx) * scaleX * sy;
+		self->d = SIN(ry) * scaleY * sy;
+		self->worldX = x * sx + self->skeleton->x;
+		self->worldY = y * sy + self->skeleton->y;
 		return;
 	}
 
@@ -105,12 +105,12 @@ void spBone_updateWorldTransformWith(spBone *self, float x, float y, float rotat
 
 	switch (self->inherit) {
 		case SP_INHERIT_NORMAL: {
-            float rx = (rotation + shearX) * DEG_RAD;
-            float ry = (rotation + 90 + shearY) * DEG_RAD;
-            float la = COS(rx) * scaleX;
-            float lb = COS(ry) * scaleY;
-            float lc = SIN(rx) * scaleX;
-            float ld = SIN(ry) * scaleY;
+			float rx = (rotation + shearX) * DEG_RAD;
+			float ry = (rotation + 90 + shearY) * DEG_RAD;
+			float la = COS(rx) * scaleX;
+			float lb = COS(ry) * scaleY;
+			float lc = SIN(rx) * scaleX;
+			float ld = SIN(ry) * scaleY;
 			self->a = pa * la + pb * lc;
 			self->b = pa * lb + pb * ld;
 			self->c = pc * la + pd * lc;
@@ -118,12 +118,12 @@ void spBone_updateWorldTransformWith(spBone *self, float x, float y, float rotat
 			return;
 		}
 		case SP_INHERIT_ONLYTRANSLATION: {
-            float rx = (rotation + shearX) * DEG_RAD;
-            float ry = (rotation + 90 + shearY) * DEG_RAD;
-            self->a = COS(rx) * scaleX;
-            self->b = COS(ry) * scaleY;
-            self->c = SIN(rx) * scaleX;
-            self->d = SIN(ry) * scaleY;
+			float rx = (rotation + shearX) * DEG_RAD;
+			float ry = (rotation + 90 + shearY) * DEG_RAD;
+			self->a = COS(rx) * scaleX;
+			self->b = COS(ry) * scaleY;
+			self->c = SIN(rx) * scaleX;
+			self->d = SIN(ry) * scaleY;
 			break;
 		}
 		case SP_INHERIT_NOROTATIONORREFLECTION: {
@@ -141,12 +141,12 @@ void spBone_updateWorldTransformWith(spBone *self, float x, float y, float rotat
 				pc = 0;
 				prx = 90 - ATAN2DEG(pd, pb);
 			}
-            float rx = (rotation + shearX - prx) *DEG_RAD;
-            float ry = (rotation + shearY - prx + 90) *DEG_RAD;
-            float la = COS(rx) * scaleX;
-            float lb = COS(ry) * scaleY;
-            float lc = SIN(rx) * scaleX;
-            float ld = SIN(ry) * scaleY;
+			float rx = (rotation + shearX - prx) * DEG_RAD;
+			float ry = (rotation + shearY - prx + 90) * DEG_RAD;
+			float la = COS(rx) * scaleX;
+			float lb = COS(ry) * scaleY;
+			float lc = SIN(rx) * scaleX;
+			float ld = SIN(ry) * scaleY;
 			self->a = pa * la - pb * lc;
 			self->b = pa * lb - pb * ld;
 			self->c = pc * la + pd * lc;
@@ -155,23 +155,23 @@ void spBone_updateWorldTransformWith(spBone *self, float x, float y, float rotat
 		}
 		case SP_INHERIT_NOSCALE:
 		case SP_INHERIT_NOSCALEORREFLECTION: {
-            rotation *= DEG_RAD;
-            float cosine = COS(rotation);
-            float sine = SIN(rotation);
-            float za = (pa * cosine + pb * sine) / sx;
-            float zc = (pc * cosine + pd * sine) / sy;
-            float s = SQRT(za * za + zc * zc);
+			rotation *= DEG_RAD;
+			float cosine = COS(rotation);
+			float sine = SIN(rotation);
+			float za = (pa * cosine + pb * sine) / sx;
+			float zc = (pc * cosine + pd * sine) / sy;
+			float s = SQRT(za * za + zc * zc);
 			if (self->data->inherit == SP_INHERIT_NOSCALE && (pa * pd - pb * pc < 0) != (sx < 0 != sy < 0))
 				s = -s;
-            rotation = PI / 2 + ATAN2(zc, za);
-            float zb = COS(rotation) * s;
-            float zd = SIN(rotation) * s;
-            shearX *= DEG_RAD;
-            shearY = (90 + shearY) * DEG_RAD;
-            float la = COS(shearX) * scaleX;
-            float lb = COS(shearY) * scaleY;
-            float lc = SIN(shearX) * scaleX;
-            float ld = SIN(shearY) * scaleY;
+			rotation = PI / 2 + ATAN2(zc, za);
+			float zb = COS(rotation) * s;
+			float zd = SIN(rotation) * s;
+			shearX *= DEG_RAD;
+			shearY = (90 + shearY) * DEG_RAD;
+			float la = COS(shearX) * scaleX;
+			float lb = COS(shearY) * scaleY;
+			float lc = SIN(shearX) * scaleX;
+			float ld = SIN(shearY) * scaleY;
 			self->a = za * la + zb * lc;
 			self->b = za * lb + zb * ld;
 			self->c = zc * la + zd * lc;
@@ -193,7 +193,7 @@ void spBone_setToSetupPose(spBone *self) {
 	self->scaleY = self->data->scaleY;
 	self->shearX = self->data->shearX;
 	self->shearY = self->data->shearY;
-    self->inherit = self->data->inherit;
+	self->inherit = self->data->inherit;
 }
 
 float spBone_getWorldRotationX(spBone *self) {
@@ -225,7 +225,7 @@ void spBone_updateAppliedTransform(spBone *self) {
 	float s, sa, sc;
 	float cosine, sine;
 
-    float yDownScale = spBone_isYDown() ? -1 : 1;
+	float yDownScale = spBone_isYDown() ? -1 : 1;
 
 	spBone *parent = self->parent;
 	if (!parent) {
@@ -266,7 +266,7 @@ void spBone_updateAppliedTransform(spBone *self) {
 			}
 			case SP_INHERIT_NOSCALE:
 			case SP_INHERIT_NOSCALEORREFLECTION: {
-                float r = self->rotation * DEG_RAD;
+				float r = self->rotation * DEG_RAD;
 				cosine = COS(r), sine = SIN(r);
 				pa = (pa * cosine + pb * sine) / self->skeleton->scaleX;
 				pc = (pc * cosine + pd * sine) / self->skeleton->scaleY * yDownScale;
@@ -321,12 +321,12 @@ void spBone_worldToLocal(spBone *self, float worldX, float worldY, float *localX
 }
 
 void spBone_worldToParent(spBone *self, float worldX, float worldY, float *localX, float *localY) {
-    if (self->parent == NULL) {
-        *localX = worldX;
-        *localY = worldY;
-    } else {
-        spBone_worldToLocal(self->parent, worldX, worldY, localX, localY);
-    }
+	if (self->parent == NULL) {
+		*localX = worldX;
+		*localY = worldY;
+	} else {
+		spBone_worldToLocal(self->parent, worldX, worldY, localX, localY);
+	}
 }
 
 void spBone_localToWorld(spBone *self, float localX, float localY, float *worldX, float *worldY) {
@@ -336,33 +336,32 @@ void spBone_localToWorld(spBone *self, float localX, float localY, float *worldX
 }
 
 void spBone_parentToWorld(spBone *self, float localX, float localY, float *worldX, float *worldY) {
-    if (self->parent != NULL) {
-        *worldX = localX;
-        *worldY = localY;
-    } else {
-        spBone_localToWorld(self->parent, localX, localY, worldX, worldY);
-    }
+	if (self->parent != NULL) {
+		*worldX = localX;
+		*worldY = localY;
+	} else {
+		spBone_localToWorld(self->parent, localX, localY, worldX, worldY);
+	}
 }
 
 float spBone_worldToLocalRotation(spBone *self, float worldRotation) {
-    worldRotation *= DEG_RAD;
-    float sine = SIN(worldRotation), cosine = COS(worldRotation);
-    return ATAN2DEG(self->a * sine - self->c * cosine, self->d * cosine - self->b * sine) + self->rotation - self->shearX;
+	worldRotation *= DEG_RAD;
+	float sine = SIN(worldRotation), cosine = COS(worldRotation);
+	return ATAN2DEG(self->a * sine - self->c * cosine, self->d * cosine - self->b * sine) + self->rotation - self->shearX;
 }
 
 float spBone_localToWorldRotation(spBone *self, float localRotation) {
-    localRotation = (localRotation - self->rotation - self->shearX) * DEG_RAD;
-    float sine = SIN(localRotation), cosine = COS(localRotation);
-    return ATAN2DEG(cosine * self->c + sine * self->d, cosine * self->a + sine * self->b);
-
+	localRotation = (localRotation - self->rotation - self->shearX) * DEG_RAD;
+	float sine = SIN(localRotation), cosine = COS(localRotation);
+	return ATAN2DEG(cosine * self->c + sine * self->d, cosine * self->a + sine * self->b);
 }
 
 void spBone_rotateWorld(spBone *self, float degrees) {
-    degrees *= DEG_RAD;
-    float sine = SIN(degrees), cosine = COS(degrees);
-    float ra = self->a, rb = self->b;
-    self->a = cosine * ra - sine * self->c;
-    self->b = cosine * rb - sine * self->d;
-    self->c = sine * ra + cosine * self->c;
-    self->d = sine * rb + cosine * self->d;
+	degrees *= DEG_RAD;
+	float sine = SIN(degrees), cosine = COS(degrees);
+	float ra = self->a, rb = self->b;
+	self->a = cosine * ra - sine * self->c;
+	self->b = cosine * rb - sine * self->d;
+	self->c = sine * ra + cosine * self->c;
+	self->d = sine * rb + cosine * self->d;
 }

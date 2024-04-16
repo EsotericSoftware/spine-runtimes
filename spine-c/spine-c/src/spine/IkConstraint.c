@@ -72,11 +72,11 @@ void spIkConstraint_update(spIkConstraint *self) {
 }
 
 void spIkConstraint_setToSetupPose(spIkConstraint *self) {
-    self->bendDirection = self->data->bendDirection;
-    self->compress = self->data->compress;
-    self->stretch = self->data->stretch;
-    self->softness = self->data->softness;
-    self->mix = self->data->mix;
+	self->bendDirection = self->data->bendDirection;
+	self->compress = self->data->compress;
+	self->stretch = self->data->stretch;
+	self->softness = self->data->softness;
+	self->mix = self->data->mix;
 }
 
 void spIkConstraint_apply1(spBone *bone, float targetX, float targetY, int /*boolean*/ compress, int /*boolean*/ stretch,

@@ -138,6 +138,7 @@ export class SkeletonMesh extends THREE.Object3D {
 
 		state.update(deltaTime);
 		state.apply(skeleton);
+		skeleton.update(deltaTime);
 		skeleton.updateWorldTransform(Physics.update);
 
 		this.updateGeometry();

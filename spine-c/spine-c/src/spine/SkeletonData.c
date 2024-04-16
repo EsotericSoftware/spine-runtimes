@@ -74,9 +74,9 @@ void spSkeletonData_dispose(spSkeletonData *self) {
 		spPathConstraintData_dispose(self->pathConstraints[i]);
 	FREE(self->pathConstraints);
 
-    for (i = 0; i < self->physicsConstraintsCount; i++)
-        spPhysicsConstraintData_dispose(self->physicsConstraints[i]);
-    FREE(self->physicsConstraints);
+	for (i = 0; i < self->physicsConstraintsCount; i++)
+		spPhysicsConstraintData_dispose(self->physicsConstraints[i]);
+	FREE(self->physicsConstraints);
 
 	FREE(self->hash);
 	FREE(self->version);
@@ -144,8 +144,8 @@ spPathConstraintData *spSkeletonData_findPathConstraint(const spSkeletonData *se
 }
 
 spPhysicsConstraintData *spSkeletonData_findPhysicsConstraint(const spSkeletonData *self, const char *constraintName) {
-    int i;
-    for (i = 0; i < self->physicsConstraintsCount; ++i)
-        if (strcmp(self->physicsConstraints[i]->name, constraintName) == 0) return self->physicsConstraints[i];
-    return 0;
+	int i;
+	for (i = 0; i < self->physicsConstraintsCount; ++i)
+		if (strcmp(self->physicsConstraints[i]->name, constraintName) == 0) return self->physicsConstraints[i];
+	return 0;
 }
