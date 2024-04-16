@@ -492,6 +492,22 @@ cp -f ../mix-and-match/export/mix-and-match-pro.skel "$ROOT/spine-ts/spine-phase
 cp -f ../mix-and-match/export/mix-and-match-pma.atlas "$ROOT/spine-ts/spine-phaser/example/assets/"
 cp -f ../mix-and-match/export/mix-and-match-pma.png "$ROOT/spine-ts/spine-phaser/example/assets/"
 
+cp -f ../celestial-circus/export/* "$ROOT/spine-ts/spine-phaser/example/assets/"
+
+cp -f ../cloud-pot/export/cloud-pot.json "$ROOT/spine-ts/spine-phaser/example/assets/"
+cp -f ../cloud-pot/export/cloud-pot.skel "$ROOT/spine-ts/spine-phaser/example/assets/"
+cp -f ../cloud-pot/export/cloud-pot.atlas "$ROOT/spine-ts/spine-phaser/example/assets/"
+cp -f ../cloud-pot/export/cloud-pot.png "$ROOT/spine-ts/spine-phaser/example/assets/"
+
+cp -f ../sack/export/sack-pro.json "$ROOT/spine-ts/spine-phaser/example/assets/"
+cp -f ../sack/export/sack-pro.skel "$ROOT/spine-ts/spine-phaser/example/assets/"
+cp -f ../sack/export/sack.atlas "$ROOT/spine-ts/spine-phaser/example/assets/"
+cp -f ../sack/export/sack.png "$ROOT/spine-ts/spine-phaser/example/assets/"
+
+cp -f ../snowglobe/export/snowglobe-pro.json "$ROOT/spine-ts/spine-phaser/example/assets/"
+cp -f ../snowglobe/export/snowglobe-pro.skel "$ROOT/spine-ts/spine-phaser/example/assets/"
+cp -f ../snowglobe/export/snowglobe* "$ROOT/spine-ts/spine-phaser/example/assets/"
+
 rm "$ROOT/spine-ts/spine-pixi/example/assets/"*
 cp -f ../raptor/export/raptor-pro.json "$ROOT/spine-ts/spine-pixi/example/assets/"
 cp -f ../raptor/export/raptor.atlas "$ROOT/spine-ts/spine-pixi/example/assets/"

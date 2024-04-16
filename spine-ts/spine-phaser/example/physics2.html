@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.js"></script>
+    <script src="../dist/iife/spine-phaser.js"></script>
+    <link rel="stylesheet" href="../../index.css" />
+    <title>Spine Phaser Example</title>
+  </head>
+
+  <body class="p-4 flex flex-col items-center">
+    <h1>Physics example 2 - Drag physics</h1>
+  </body>
+  <script>
+    class BasicExample extends Phaser.Scene {
+      preload() {
+        this.load.spineBinary("celestial-circus-data", "assets/celestial-circus-pro.skel");
+        this.load.spineAtlas("celestial-circus-atlas", "assets/celestial-circus-pma.atlas");
+      }
+
+      create() {
+        const gameObject = this.add.spine(
+          400,
+          350,
+          "celestial-circus-data",
+          "celestial-circus-atlas"
+        );
+        gameObject.setInteractive();
+        this.input.setDraggable(gameObject);
+        gameObject.displayWidth = 150;
+        gameObject.displayHeight = (gameObject.height / gameObject.width) * 150;
+        gameObject.animationState.setAnimation(0, "eyeblink-long", true);
+
+        let lastX, lastY;
+        gameObject.on('dragstart', (pointer, dragX, dragY) => {
+          lastX = gameObject.input.dragStartX;
+          lastY = gameObject.input.dragStartY;
+        })
+
+        gameObject.on('drag', (pointer, dragX, dragY) => {
+          gameObject.x += (dragX - lastX);
+          gameObject.y += (dragY - lastY);
+          gameObject.skeleton.physicsTranslate((dragX - lastX) / gameObject.scale, (dragY - lastY) / gameObject.scale)
+          lastX = dragX;
+          lastY = dragY;
+        })
+      }
+    }
+
+    new Phaser.Game({
+      type: Phaser.AUTO,
+      width: 800,
+      height: 600,
+      type: Phaser.WEBGL,
+      scene: [BasicExample],
+      plugins: {
+        scene: [
+          {
+            key: "spine.SpinePlugin",
+            plugin: spine.SpinePlugin,
+            mapping: "spine",
+          },
+        ],
+      },
+    });
+  </script>
+</html>

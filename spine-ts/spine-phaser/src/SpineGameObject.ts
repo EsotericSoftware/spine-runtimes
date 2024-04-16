@@ -140,8 +140,10 @@ export class SkinsAndAnimationBoundsProvider
 			animationState.setAnimationWith(0, animation, false);
 			const steps = Math.max(animation.duration / this.timeStep, 1.0);
 			for (let i = 0; i < steps; i++) {
-				animationState.update(i > 0 ? this.timeStep : 0);
+				const delta = i > 0 ? this.timeStep : 0;
+				animationState.update(delta);
 				animationState.apply(skeleton);
+				skeleton.update(delta);
 				skeleton.updateWorldTransform(Physics.update);
 
 				const bounds = skeleton.getBoundsRect();
@@ -284,6 +286,7 @@ export class SpineGameObject extends DepthMixin(
 		this.animationState.update(delta / 1000);
 		this.animationState.apply(this.skeleton);
 		this.beforeUpdateWorldTransforms(this);
+		this.skeleton.update(delta / 1000);
 		this.skeleton.updateWorldTransform(Physics.update);
 		this.afterUpdateWorldTransforms(this);
 	}

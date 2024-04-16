@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.js"></script>
+    <script src="../dist/iife/spine-phaser.js"></script>
+    <link rel="stylesheet" href="../../index.css" />
+    <title>Spine Phaser Example</title>
+  </head>
+
+  <body class="p-4 flex flex-col items-center">
+    <h1>Physics example</h1>
+  </body>
+  <script>
+    class BasicExample extends Phaser.Scene {
+      preload() {
+        this.load.spineBinary("sack-data", "assets/sack-pro.skel");
+        this.load.spineAtlas("sack-atlas", "assets/sack.atlas");
+      }
+
+      create() {
+        const gameObject = this.add.spine(
+          275,
+          500,
+          "sack-data",
+          "sack-atlas"
+        );
+        gameObject.displayWidth = 150;
+        gameObject.displayHeight = (gameObject.height / gameObject.width) * 150;
+        gameObject.animationState.setAnimation(0, "cape-follow-example", true);
+      }
+    }
+
+    new Phaser.Game({
+      type: Phaser.AUTO,
+      width: 800,
+      height: 600,
+      type: Phaser.WEBGL,
+      scene: [BasicExample],
+      plugins: {
+        scene: [
+          {
+            key: "spine.SpinePlugin",
+            plugin: spine.SpinePlugin,
+            mapping: "spine",
+          },
+        ],
+      },
+    });
+  </script>
+</html>

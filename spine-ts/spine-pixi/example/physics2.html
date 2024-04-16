@@ -58,10 +58,9 @@
         app.stage.on("pointermove", (e) => {
           if (isDragging) {
             let mousePosition = new spine.Vector2(e.data.global.x, e.data.global.y);
-
-            girl.skeleton.x += mousePosition.x - lastX;
-            girl.skeleton.y += mousePosition.y - lastY;
-
+            girl.x += mousePosition.x - lastX;
+            girl.y += mousePosition.y - lastY;
+            girl.skeleton.physicsTranslate(mousePosition.x - lastX, mousePosition.y - lastY);
             lastX = mousePosition.x;
             lastY = mousePosition.y;
           }
