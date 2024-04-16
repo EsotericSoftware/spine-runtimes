@@ -113,7 +113,6 @@
 ## C#
 
 - **Additions**
-
   - Added [`TrackEntry.AlphaAttachmentThreshold`](http://esotericsoftware.com/spine-api-reference#TrackEntry-alphaAttachmentThreshold).
 
 - **Breaking changes**
@@ -173,6 +172,15 @@
 - **Restructuring (Non-Breaking)**
 
 ### XNA/MonoGame
+- **Additions**
+  - Apply external movement to physics: If you are not directly modifying `Skeleton.X` or `Skeleton.Y`, you can apply external game object movement to skeleton physics as follows:
+    Add a `Vector2 lastPosition;` member variable to your class interacting with the skeleton. Then call e.g. the following code each frame:
+    ```
+    Vector2 currentPosition = <current world position>;
+    Vector2 externalPositionDelta = currentPosition - lastPosition;
+    skeleton.PhysicsTranslate(externalPositionDelta.x, externalPositionDelta.y);
+    lastPosition = currentPosition;
+    ```
 
 ## Java
 
