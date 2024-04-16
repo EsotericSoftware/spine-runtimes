@@ -19,7 +19,7 @@ fi
 echo "Spine exe: $SPINE_EXE"
 
 if [ "$#" -eq 0 ]; then
-	echo "Enter the Spine editor version to use for the export (eg 4.1.xx):"
+	echo "Enter the Spine editor version to use for the export (eg 4.2.xx):"
 	read version
 else
 	version=${1%/}

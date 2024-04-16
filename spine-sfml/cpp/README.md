@@ -3,6 +3,7 @@
 The spine-sfml runtime provides functionality to load, manipulate and render [Spine](http://esotericsoftware.com) skeletal animation data using [SFML](http://www.sfml-dev.org/). spine-sfml is based on [spine-cpp](../../spine-cpp).
 
 ## Licensing
+
 You are welcome to evaluate the Spine Runtimes and the examples we provide in this repository free of charge.
 
 You can integrate the Spine Runtimes into your software free of charge, but users of your software must have their own [Spine license](https://esotericsoftware.com/spine-purchase). Please make your users aware of this requirement! This option is often chosen by those making development tools, such as an SDK, game toolkit, or software library.
@@ -13,11 +14,12 @@ For the official legal terms governing the Spine Runtimes, please read the [Spin
 
 ## Spine version
 
-spine-sfml works with data exported from Spine 4.1.xx.
+spine-sfml works with data exported from Spine 4.2.xx.
 
 spine-sfml supports all Spine features except two color tinting.
 
 ## Usage
+
 1. Create a new SFML project. See the [SFML documentation](http://www.sfml-dev.org/tutorials/2.1/) or have a look at the example in this repository.
 2. Download the Spine Runtimes source using git (`git clone https://github.com/esotericsoftware/spine-runtimes`) or download it as a zip via the download button above.
 3. Add the sources from `spine-cpp/spine-cpp/src/spine` and `spine-sfml/src/spine` to your project
@@ -26,9 +28,11 @@ spine-sfml supports all Spine features except two color tinting.
 See the [Spine Runtimes documentation](http://esotericsoftware.com/spine-documentation#runtimesTitle) on how to use the APIs or check out the Spine SFML example.
 
 ## Example
+
 The Spine SFML example works on Windows, Linux and Mac OS X.
 
 ### Windows
+
 1. Install [Visual Studio 2022 Community](https://www.visualstudio.com/en-us/downloads/download-visual-studio-vs.aspx). Make sure you install support for C++ as well as th Windows SDK for XP/7/8.
 2. Install CMake via the [Windows installer package](https://cmake.org/download/).
 3. Download the Spine Runtimes repository using git (`git clone https://github.com/esotericsoftware/spine-runtimes`) or download it as a zip via the download button above.
@@ -45,6 +49,7 @@ The Spine SFML example works on Windows, Linux and Mac OS X.
 The entire example code is contained in [main.cpp](example/main.cpp)
 
 ### Linux
+
 1. Install the SFML dependencies, e.g. on Ubuntu/Debian via `sudo apt install libsfml-dev`
 2. Install CMake, e.g. on Ubuntu/Debian via `sudo apt-get install -y cmake`
 3. Download the Spine Runtimes repository using git (`git clone https://github.com/esotericsoftware/spine-runtimes`) or download it as a zip via the download button above.
@@ -54,15 +59,16 @@ The entire example code is contained in [main.cpp](example/main.cpp)
 7. Run the example by `cd spine-sfml && ./spine-sfml-example`
 
 ### Mac OS X
+
 1. Install [Xcode](https://developer.apple.com/xcode/)
 2. Install [Homebrew](http://brew.sh/)
 3. Open a terminal and install CMake via `brew install cmake`
-3. Download the Spine Runtimes repository using git (`git clone https://github.com/esotericsoftware/spine-runtimes`) or download it as a zip via the download button above.
-4. Open a terminal, and `cd` into the `spine-runtimes/spine-sfml` folder
-5. Type `mkdir build && cd build && cmake -G Xcode ../..` to generate an Xcode project called `spine.xcodeproj`
-6. Open the Xcode project in `spine-runtimes/spine-sfml/build/`
-7. In Xcode, set the active scheme from `ALL_BUILD` to `spine-sfml-example`
-8. Click the `Run` button or type `CMD+R` to run the example
+4. Download the Spine Runtimes repository using git (`git clone https://github.com/esotericsoftware/spine-runtimes`) or download it as a zip via the download button above.
+5. Open a terminal, and `cd` into the `spine-runtimes/spine-sfml` folder
+6. Type `mkdir build && cd build && cmake -G Xcode ../..` to generate an Xcode project called `spine.xcodeproj`
+7. Open the Xcode project in `spine-runtimes/spine-sfml/build/`
+8. In Xcode, set the active scheme from `ALL_BUILD` to `spine-sfml-example`
+9. Click the `Run` button or type `CMD+R` to run the example
 
 ## Notes
 

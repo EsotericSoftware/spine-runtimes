@@ -14,7 +14,7 @@ For the official legal terms governing the Spine Runtimes, please read the [Spin
 
 ## Spine version
 
-spine-c works with data exported from Spine 4.1.xx.
+spine-c works with data exported from Spine 4.2.xx.
 
 spine-c supports all Spine features.
 
@@ -26,6 +26,7 @@ spine-c supports all Spine features.
 If `SPINE_SHORT_NAMES` is defined, the `sp` prefix for all structs and functions is optional. Only use this if the spine-c names won't cause a conflict.
 
 ## Usage
+
 ### [Please see the spine-c guide for full documentation](http://esotericsoftware.com/spine-c)
 
 ## Extension

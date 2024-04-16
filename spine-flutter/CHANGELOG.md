@@ -1,3 +1,6 @@
+# 4.2.23
+- Physics support
+
 # 4.2.22
 
 - Fix multiply blend mode, see https://esotericsoftware.com/forum/d/25369-spine-flutter-slot%E6%B7%B7%E5%90%88%E6%A8%A1%E5%BC%8F%E5%90%8Ealpha%E4%B8%A2%E5%A4%B1/2

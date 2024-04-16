@@ -14,14 +14,16 @@ For the official legal terms governing the Spine Runtimes, please read the [Spin
 
 ## Spine version
 
-spine-libgdx works with data exported from Spine 4.1.xx.
+spine-libgdx works with data exported from Spine 4.2.xx.
 
 spine-libgdx supports all Spine features and is the reference runtime implementation.
 
 ## Setup
+
 The simplest way to add `spine-libgdx` to your libGDX project is to copy the contents of the `spine-libgdx/src` folder to your project's source folder. However, this is not the recommended approach. Generally, you want to use `spine-libgdx` by depending on it via `Maven` or `Gradle`.
 
 ## Maven & Gradle
+
 The spine-libgdx runtime is released to Maven Central through SonaType. We also deploy snapshot builds on every commit to the repository via [GitHub Actions](https://github.com/EsotericSoftware/spine-runtimes/actions).
 
 ### Versions
@@ -42,6 +44,7 @@ Up until Spine 4.0, the version number is composed of the editor number at the t
 Starting from Spine 4.1, the version number is composed of the corresponding editor `major.minor` version, and runtime update version for the runtime. E.g. `4.1.10` means editor version 4.1, runtime update version 10. All runtime versions are compatible with the exports from the correspongind `major.minor` editor version.
 
 ### Maven
+
 To add the spine-libgdx runtime to your Maven project, add this dependency:
 
 ```
@@ -64,6 +67,7 @@ For SNAPSHOT versions, add the SonaType Snapshot repository to your `pom.xml`:
 ```
 
 ### Gradle
+
 To add the spine-libgdx runtime to your libGDX Gradle project, add the following dependencies to the `core` project in the `build.gradle` file at the root of your libGDX project:
 
 ```
@@ -80,11 +84,13 @@ project(":core") {
 ```
 
 ## Running the examples
+
 Clone this repository and load the `spine-libgdx/build.gradle` file with IntelliJ IDEA or Eclipse. Alterantively, you can run `./gradlew eclipse` on the command line to generate Eclipse projects without having to use the Gradle build.
 
 The `spine-libgdx-tests` project has various examples you can inspect and run.
 
 ## Building SkeletonViewer
+
 To build SkeletonViewer, run:
 
 ```

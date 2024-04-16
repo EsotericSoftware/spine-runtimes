@@ -27,7 +27,7 @@ For the official legal terms governing the Spine Runtimes, please read the [Spin
 
 ## Spine version
 
-spine-ts works with data exported from Spine 4.1.xx.
+spine-ts works with data exported from Spine 4.2.xx.
 
 The spine-ts WebGL and Player backends support all Spine features.
 
@@ -37,9 +37,10 @@ spine-ts THREE.JS does not support two color tinting. The THREE.JS backend provi
 
 ## Usage
 
-All spine-ts modules are published to [npm](http://npmjs.com) for consumption via vanilla JavaScript as well as 
+All spine-ts modules are published to [npm](http://npmjs.com) for consumption via vanilla JavaScript as well as
 
 ## Usage in vanilla JavaScript
+
 You can include a module in your project via a `<script>` tag from the [unpkg](https://unpkg.com/) CDN, specifying the version as part of the URL. In the examples below, the version is `4.0.*`, which fetches the latest patch release, and which will work with all exports from Spine Editor version `4.0.x`.
 
 ```
@@ -65,6 +66,7 @@ We also provide `js.map` source maps. They will be automatically fetched from un
 We provide minified versions of each module, which can be used by replacing the `.js` file suffix with `.min.js` in the unpkg URLs.
 
 ## Usage via NPM or Yarn
+
 If your project dependencies are managed through NPM or Yarn, you can add spine-ts modules the usual way:
 
 ```
@@ -96,12 +98,14 @@ npm run dev
 This will compile the modules and start a server that serves the example pages at http://127.0.0.1:8080. When you make changes to the source code of either the modules and the examples, the source get recompiled, and the open page in the browser is reloaded automatically.
 
 ## Development setup
+
 spine-ts is developed with TypeScript, we thus recommend the following development environment when working on its sources:
 
 2. Install a [Git Client](https://git-fork.com/) and make sure it's available on the command line.
 1. Install [NPM](https://nodejs.org/en/download/) and make sure it's available on the command line.
-2. Install [Visual Studio Code](https://code.visualstudio.com/).
-3. Open a terminal and execute
+1. Install [Visual Studio Code](https://code.visualstudio.com/).
+1. Open a terminal and execute
+
 ```
 git clone https://github.com/esotericsoftware/spine-runtimes
 cd spine-runtimes/spine-ts

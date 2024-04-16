@@ -14,7 +14,7 @@ For the official legal terms governing the Spine Runtimes, please read the [Spin
 
 ## Spine version
 
-spine-monogame works with data exported from Spine 4.1.xx.
+spine-monogame works with data exported from Spine 4.2.xx.
 
 spine-monogame supports all Spine features.
 
@@ -28,7 +28,7 @@ Note: `spine-monogame` references source files from `spine-csharp/src`.
 
 ## Example
 
-1. Follow the [MonoGame Getting Started Guide](https://docs.monogame.net/articles/getting_started/0_getting_started.html) on how to setup your development environment for MonoGame. Make sure to also install the optional dependencies allowing compilation of shaders. 
+1. Follow the [MonoGame Getting Started Guide](https://docs.monogame.net/articles/getting_started/0_getting_started.html) on how to setup your development environment for MonoGame. Make sure to also install the optional dependencies allowing compilation of shaders.
 1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip via the download button above.
 1. Open the `spine-monogame.sln` Solution in the IDE you choose based on the `Monogame Getting Started Guide`.
 1. Set the `spine-monogame-example` project as the startup project, and ensure the working directory is set to `spine-runtimes/spine-monogame/spine-monogame-example` when running or debugging the project.

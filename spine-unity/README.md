@@ -14,7 +14,7 @@ For the official legal terms governing the Spine Runtimes, please read the [Spin
 
 ## Spine version
 
-spine-unity works with data exported from Spine 4.1.xx.
+spine-unity works with data exported from Spine 4.2.xx.
 
 spine-unity supports all Spine features.
 
