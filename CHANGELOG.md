@@ -25,7 +25,8 @@
   ** Added [`TrackEntry.AlphaAttachmentThreshold`](http://esotericsoftware.com/spine-api-reference#TrackEntry-alphaAttachmentThreshold).
 
 * **Breaking changes**
-  *  Renamed `TrackEntry` `AttachmentThreshold` to `MixAttachmentThreshold`, renamed `DrawOrderThreshold` to `MixDrawOrderThreshold`.
+  * Renamed `TrackEntry` `AttachmentThreshold` to `MixAttachmentThreshold`, renamed `DrawOrderThreshold` to `MixDrawOrderThreshold`.
+  * Changed signature of `Skeleton.UpdateWorldTransform()` to `UpdateWorldTransform(Skeleton.Physics physics)`. The default replacement for `skeleton.UpdateWorldTransform()` calls is `skeleton.UpdateWorldTransform(Skeleton.Physics.Update)`. If you are certain that a subsequent call to `skeleton.UpdateWorldTransform(Skeleton.Physics.Update)` follows in the same frame, you can pass `Skeleton.Physics.Pose` as argument instead of `Skeleton.Physics.Update`.
 
 ### Unity
 
