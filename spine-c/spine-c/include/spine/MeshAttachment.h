@@ -65,7 +65,7 @@ struct spMeshAttachment {
 
 	/* Nonessential. */
 	int edgesCount;
-	int *edges;
+	unsigned short *edges;
 	float width, height;
 };
 

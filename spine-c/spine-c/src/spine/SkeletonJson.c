@@ -756,7 +756,7 @@ static spAnimation *_spSkeletonJson_readAnimation(spSkeletonJson *self, Json *ro
                 continue;
             }
 
-            spCurveTimeline1 *timeline = NULL;
+            spPhysicsConstraintTimeline *timeline = NULL;
             if (strcmp(timelineName, "inertia") == 0) {
                 timeline = spPhysicsConstraintTimeline_create(frames, frames, index, SP_TIMELINE_PHYSICSCONSTRAINT_INERTIA);
             } else if (strcmp(timelineName, "strength") == 0) {
@@ -774,7 +774,7 @@ static spAnimation *_spSkeletonJson_readAnimation(spSkeletonJson *self, Json *ro
             } else {
                 continue;
             }
-            spTimelineArray_add(timelines, readTimeline(keyMap, timeline, 0, 1));
+            spTimelineArray_add(timelines, readTimeline(keyMap, SUPER(timeline), 0, 1));
         }
     }
 
@@ -1659,9 +1659,9 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 									entry = Json_getItem(attachmentMap, "edges");
 									if (entry) {
 										mesh->edgesCount = entry->size;
-										mesh->edges = MALLOC(int, entry->size);
+										mesh->edges = MALLOC(unsigned short, entry->size);
 										for (entry = entry->child, ii = 0; entry; entry = entry->next, ++ii)
-											mesh->edges[ii] = entry->valueInt;
+											mesh->edges[ii] = (unsigned short)entry->valueInt;
 									}
 
 									spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
