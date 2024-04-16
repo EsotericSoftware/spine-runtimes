@@ -314,8 +314,13 @@ namespace Spine {
 			state.Update(deltaTime);
 			skeleton.Update(deltaTime);
 			// Note: if you are not directly modifying skeleton.X or .Y, you can apply external
-			// physics movement via the following line:
+			// movement to physics via the following code:
+			// Vector2 lastPosition; // add as a member variable
+			// ..
+			// Vector2 currentPosition = <current world position>;
+			// Vector2 externalPositionDelta = currentPosition - lastPosition;
 			// skeleton.PhysicsTranslate(externalPositionDelta.x, externalPositionDelta.y);
+			// lastPosition = currentPosition;
 
 			state.Apply(skeleton);
 			skeleton.UpdateWorldTransform(Skeleton.Physics.Update);
@@ -367,8 +372,13 @@ namespace Spine {
 			state.Update(deltaTime);
 			skeleton.Update(deltaTime);
 			// Note: if you are not directly modifying skeleton.X or .Y, you can apply external
-			// physics movement via the following line:
+			// movement to physics via the following code:
+			// Vector2 lastPosition; // add as a member variable
+			// ..
+			// Vector2 currentPosition = <current world position>;
+			// Vector2 externalPositionDelta = currentPosition - lastPosition;
 			// skeleton.PhysicsTranslate(externalPositionDelta.x, externalPositionDelta.y);
+			// lastPosition = currentPosition;
 
 			state.Apply(skeleton);
 			skeleton.UpdateWorldTransform(Skeleton.Physics.Update);
