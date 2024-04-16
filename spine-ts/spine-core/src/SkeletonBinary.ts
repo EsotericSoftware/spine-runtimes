@@ -531,7 +531,6 @@ export class SkeletonBinary {
 	}
 
 	private readSequence (input: BinaryInput) {
-		if (!input.readBoolean()) return null;
 		let sequence = new Sequence(input.readInt(true));
 		sequence.start = input.readInt(true);
 		sequence.digits = input.readInt(true);

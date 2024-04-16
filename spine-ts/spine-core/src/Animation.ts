@@ -708,7 +708,7 @@ export class ScaleYTimeline extends CurveTimeline1 implements BoneTimeline {
 
 	apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 		let bone = skeleton.bones[this.boneIndex];
-		if (bone.active) bone.scaleY = this.getScaleValue(time, alpha, blend, direction, bone.scaleX, bone.data.scaleY);
+		if (bone.active) bone.scaleY = this.getScaleValue(time, alpha, blend, direction, bone.scaleY, bone.data.scaleY);
 	}
 }
 
@@ -1694,7 +1694,7 @@ export class DrawOrderTimeline extends Timeline {
 /** Changes an IK constraint's {@link IkConstraint#mix}, {@link IkConstraint#softness},
  * {@link IkConstraint#bendDirection}, {@link IkConstraint#stretch}, and {@link IkConstraint#compress}. */
 export class IkConstraintTimeline extends CurveTimeline {
-	/** The index of the IK constraint in {@link Skeleton#getIkConstraints()} that will be changed when this timeline is */
+	/** The index of the IK constraint in {@link Skeleton#getIkConstraints()} that will be changed when this timeline is applied */
 	constraintIndex: number = 0;
 
 	constructor (frameCount: number, bezierCount: number, ikConstraintIndex: number) {

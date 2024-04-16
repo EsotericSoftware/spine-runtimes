@@ -246,8 +246,8 @@ export class SkeletonJson {
 			}
 		}
 
+		// Physics constraints.
 		if (root.physics) {
-			// Physics constraints.
 			for (let i = 0; i < root.physics.length; i++) {
 				const constraintMap = root.physics[i];
 				const data = new PhysicsConstraintData(constraintMap.name);
