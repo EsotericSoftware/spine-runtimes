@@ -35,14 +35,24 @@
 
         let lastX, lastY;
         gameObject.on('dragstart', (pointer, dragX, dragY) => {
-          lastX = gameObject.input.dragStartX;
-          lastY = gameObject.input.dragStartY;
+          lastX = dragX;
+          lastY = dragY;
         })
 
         gameObject.on('drag', (pointer, dragX, dragY) => {
-          gameObject.x += (dragX - lastX);
-          gameObject.y += (dragY - lastY);
-          gameObject.skeleton.physicsTranslate((dragX - lastX) / gameObject.scale, (dragY - lastY) / gameObject.scale)
+          // moving gameObject in its space
+          gameObject.x += dragX - lastX;
+          gameObject.y += dragY - lastY;
+
+          // converting drag movement to skeleton space
+          const pointBefore = { x: lastX, y: lastY };
+          const pointAfter = { x: dragX, y: dragY };
+          gameObject.phaserWorldCoordinatesToSkeleton(pointBefore);
+          gameObject.phaserWorldCoordinatesToSkeleton(pointAfter);
+
+          // transfer drag effect on physics contraints using physicsTranslate (we won't move the skeleton)
+          gameObject.skeleton.physicsTranslate(pointAfter.x - pointBefore.x, pointAfter.y - pointBefore.y);
+
           lastX = dragX;
           lastY = dragY;
         })
