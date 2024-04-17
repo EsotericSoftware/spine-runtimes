@@ -35,8 +35,8 @@
 
         let lastX, lastY;
         gameObject.on('dragstart', (pointer, dragX, dragY) => {
-          lastX = dragX;
-          lastY = dragY;
+          lastX = gameObject.input.dragStartX;
+          lastY = gameObject.input.dragStartY;
         })
 
         gameObject.on('drag', (pointer, dragX, dragY) => {
