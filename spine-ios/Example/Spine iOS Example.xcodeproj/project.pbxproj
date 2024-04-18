@@ -11,6 +11,15 @@
 		924C0C182BCFCF21004E63F7 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924C0C172BCFCF21004E63F7 /* ContentView.swift */; };
 		924C0C1A2BCFCF22004E63F7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 924C0C192BCFCF22004E63F7 /* Assets.xcassets */; };
 		928A8CC22BCFE7DF00D9D35B /* Spine in Frameworks */ = {isa = PBXBuildFile; productRef = 928A8CC12BCFE7DF00D9D35B /* Spine */; };
+		92921E532BCFEEC2002E2FC4 /* spineboy.mesh in Resources */ = {isa = PBXBuildFile; fileRef = 92921E512BCFEEC2002E2FC4 /* spineboy.mesh */; };
+		92921E542BCFEEC2002E2FC4 /* spineboy.png in Resources */ = {isa = PBXBuildFile; fileRef = 92921E522BCFEEC2002E2FC4 /* spineboy.png */; };
+		92FFE53B2BD018CA00C64889 /* AAPLShaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 92FFE53A2BD018CA00C64889 /* AAPLShaders.metal */; };
+		92FFE5462BD15AF700C64889 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 92FFE5452BD15AF700C64889 /* README.md */; };
+		92FFE5492BD15B1A00C64889 /* SpineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92FFE5482BD15B1A00C64889 /* SpineView.swift */; };
+		92FFE54A2BD15B1A00C64889 /* SpineViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92FFE5472BD15B1A00C64889 /* SpineViewController.swift */; };
+		92FFE54D2BD15B2000C64889 /* SpineRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92FFE54C2BD15B2000C64889 /* SpineRenderer.swift */; };
+		92FFE54E2BD15B2000C64889 /* RenderCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92FFE54B2BD15B2000C64889 /* RenderCommand.swift */; };
+		92FFE5522BD15B2F00C64889 /* BlendMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92FFE5512BD15B2F00C64889 /* BlendMode.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -19,6 +28,15 @@
 		924C0C172BCFCF21004E63F7 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		924C0C192BCFCF22004E63F7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		924C0C1B2BCFCF22004E63F7 /* SpineiOSExample.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SpineiOSExample.entitlements; sourceTree = "<group>"; };
+		92921E512BCFEEC2002E2FC4 /* spineboy.mesh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = spineboy.mesh; sourceTree = "<group>"; };
+		92921E522BCFEEC2002E2FC4 /* spineboy.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spineboy.png; sourceTree = "<group>"; };
+		92FFE53A2BD018CA00C64889 /* AAPLShaders.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = AAPLShaders.metal; sourceTree = "<group>"; };
+		92FFE5452BD15AF700C64889 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		92FFE5472BD15B1A00C64889 /* SpineViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpineViewController.swift; sourceTree = "<group>"; };
+		92FFE5482BD15B1A00C64889 /* SpineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpineView.swift; sourceTree = "<group>"; };
+		92FFE54B2BD15B2000C64889 /* RenderCommand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderCommand.swift; sourceTree = "<group>"; };
+		92FFE54C2BD15B2000C64889 /* SpineRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpineRenderer.swift; sourceTree = "<group>"; };
+		92FFE5512BD15B2F00C64889 /* BlendMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlendMode.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,12 +71,24 @@
 		924C0C142BCFCF21004E63F7 /* Spine iOS Example */ = {
 			isa = PBXGroup;
 			children = (
+				92FFE5442BD15AE400C64889 /* spine-ios */,
+				92921E502BCFEEA1002E2FC4 /* Assets */,
 				924C0C152BCFCF21004E63F7 /* SpineExampleApp.swift */,
 				924C0C172BCFCF21004E63F7 /* ContentView.swift */,
+				92FFE53A2BD018CA00C64889 /* AAPLShaders.metal */,
 				924C0C192BCFCF22004E63F7 /* Assets.xcassets */,
 				924C0C1B2BCFCF22004E63F7 /* SpineiOSExample.entitlements */,
 			);
 			path = "Spine iOS Example";
+			sourceTree = "<group>";
+		};
+		92921E502BCFEEA1002E2FC4 /* Assets */ = {
+			isa = PBXGroup;
+			children = (
+				92921E512BCFEEC2002E2FC4 /* spineboy.mesh */,
+				92921E522BCFEEC2002E2FC4 /* spineboy.png */,
+			);
+			path = Assets;
 			sourceTree = "<group>";
 		};
 		92CE2BE32BCFE57600E9B376 /* Frameworks */ = {
@@ -66,6 +96,19 @@
 			children = (
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		92FFE5442BD15AE400C64889 /* spine-ios */ = {
+			isa = PBXGroup;
+			children = (
+				92FFE5452BD15AF700C64889 /* README.md */,
+				92FFE5482BD15B1A00C64889 /* SpineView.swift */,
+				92FFE5472BD15B1A00C64889 /* SpineViewController.swift */,
+				92FFE5512BD15B2F00C64889 /* BlendMode.swift */,
+				92FFE54B2BD15B2000C64889 /* RenderCommand.swift */,
+				92FFE54C2BD15B2000C64889 /* SpineRenderer.swift */,
+			);
+			path = "spine-ios";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -133,6 +176,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				924C0C1A2BCFCF22004E63F7 /* Assets.xcassets in Resources */,
+				92921E532BCFEEC2002E2FC4 /* spineboy.mesh in Resources */,
+				92FFE5462BD15AF700C64889 /* README.md in Resources */,
+				92921E542BCFEEC2002E2FC4 /* spineboy.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -143,7 +189,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				92FFE54D2BD15B2000C64889 /* SpineRenderer.swift in Sources */,
+				92FFE5492BD15B1A00C64889 /* SpineView.swift in Sources */,
+				92FFE54A2BD15B1A00C64889 /* SpineViewController.swift in Sources */,
+				92FFE53B2BD018CA00C64889 /* AAPLShaders.metal in Sources */,
+				92FFE5522BD15B2F00C64889 /* BlendMode.swift in Sources */,
 				924C0C182BCFCF21004E63F7 /* ContentView.swift in Sources */,
+				92FFE54E2BD15B2000C64889 /* RenderCommand.swift in Sources */,
 				924C0C162BCFCF21004E63F7 /* SpineExampleApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

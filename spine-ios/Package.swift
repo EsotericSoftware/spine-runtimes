@@ -18,7 +18,14 @@ let package = Package(
     targets: [
         .target(
             name: "Spine",
+            dependencies: [
+                "SpineSharedStructs"
+            ],
             path: "Sources/Spine"
+        ),
+        .systemLibrary(
+            name: "SpineSharedStructs",
+            path: "Sources/SpineSharedStructs"
         )
     ]
 )
