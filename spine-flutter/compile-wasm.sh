@@ -22,7 +22,7 @@ em++ \
 	--no-entry \
 	--extern-pre-js pre.js \
 	-s EXPORT_NAME=libspine_flutter \
-	src/spine_flutter.cpp `find src/spine-cpp/src -type f` \
+	src/spine-cpp-lite/spine-cpp-lite.cpp `find src/spine-cpp/src -type f` \
 	-o lib/assets/libspine_flutter.js
 	ls -lah lib/assets
 rm pre.js
