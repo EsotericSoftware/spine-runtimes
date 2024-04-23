@@ -336,7 +336,7 @@ export class SpinePlayer implements Disposable {
 			this.sceneRenderer = new SceneRenderer(this.canvas, this.context, true);
 			if (config.showLoading) this.loadingScreen = new LoadingScreen(this.sceneRenderer);
 		} catch (e) {
-			this.showError("Sorry, your browser does not support WebG, or you have disabled WebGL in your browser settingsL.\nPlease use the latest version of Firefox, Chrome, Edge, or Safari.", e as any);
+			this.showError("Sorry, your browser does not support WebG, or you have disabled WebGL in your browser settings.\nPlease use the latest version of Firefox, Chrome, Edge, or Safari.", e as any);
 			return null;
 		}
 
