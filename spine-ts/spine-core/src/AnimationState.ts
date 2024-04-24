@@ -441,7 +441,7 @@ export class AnimationState {
 				complete = true;
 			else {
 				const cycles = Math.floor(entry.trackTime / duration);
-				complete = cycles > 0 && cycles > Math.floor(entry.trackTime / duration);
+				complete = cycles > 0 && cycles > Math.floor(entry.trackLast / duration);
 			}
 		} else
 			complete = animationTime >= animationEnd && entry.animationLast < animationEnd;
