@@ -14,18 +14,30 @@ let package = Package(
             name: "Spine",
             targets: ["Spine"]
         ),
+        .library(
+            name: "SpineWrapper",
+            targets: ["SpineWrapper"]
+        )
     ],
     targets: [
         .target(
             name: "Spine",
             dependencies: [
-                "SpineSharedStructs"
+                "SpineWrapper", "SpineSharedStructs"
             ],
-            path: "Sources/Spine"
+            path: "Sources/Spine",
+            swiftSettings: [
+                .interoperabilityMode(.Cxx)
+            ]
+        ),
+        .target(
+            name: "SpineWrapper",
+            path: "Sources/SpineWrapper"
         ),
         .systemLibrary(
             name: "SpineSharedStructs",
             path: "Sources/SpineSharedStructs"
         )
-    ]
+    ],
+    cxxLanguageStandard: .cxx11
 )

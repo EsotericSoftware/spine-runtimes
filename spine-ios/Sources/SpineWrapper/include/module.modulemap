@@ -1,0 +1,4 @@
+module SpineWrapper {
+    header "spine-cpp-light.h"
+    export *
+}
