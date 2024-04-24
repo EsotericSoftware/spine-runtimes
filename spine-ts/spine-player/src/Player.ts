@@ -936,6 +936,11 @@ export class SpinePlayer implements Disposable {
 		}
 	}
 
+	startRendering () {
+		this.stopRequestAnimationFrame = false;
+		requestAnimationFrame(() => this.drawFrame());
+	}
+
 	stopRendering () {
 		this.stopRequestAnimationFrame = true;
 	}
