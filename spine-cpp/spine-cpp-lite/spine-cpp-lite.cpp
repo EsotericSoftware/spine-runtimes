@@ -27,7 +27,7 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include "spine_flutter.h"
+#include "spine-cpp-light.h"
 #include <spine/spine.h>
 #include <spine/Version.h>
 #include <spine/Debug.h>
@@ -64,7 +64,7 @@ public:
 	}
 
 	~BlockAllocator() {
-		for (int i = 0; i < blocks.size(); i++) {
+		for (int i = 0, n = (int) blocks.size(); i < n; i++) {
 			SpineExtension::free(blocks[i].memory, __FILE__, __LINE__);
 		}
 	}
@@ -82,7 +82,7 @@ public:
 
 	void compress() {
 		int totalSize = 0;
-		for (int i = 0; i < blocks.size(); i++) {
+		for (int i = 0, n = blocks.size(); i < n; i++) {
 			totalSize += blocks[i].size;
 			SpineExtension::free(blocks[i].memory, __FILE__, __LINE__);
 		}
@@ -115,6 +115,7 @@ struct EventListener : public AnimationStateListenerObject {
 
 	void callback(AnimationState *state, EventType type, TrackEntry *entry, Event *event) {
 		events.add(AnimationStateEvent(type, entry, event));
+		SP_UNUSED(state);
 	}
 };
 
@@ -715,8 +716,8 @@ static _spine_render_command *batch_commands(BlockAllocator &allocator, Vector<_
 	int i = 1;
 	int numVertices = first->numVertices;
 	int numIndices = first->numIndices;
-	while (i <= commands.size()) {
-		_spine_render_command *cmd = i < commands.size() ? commands[i] : nullptr;
+	while (i <= (int) commands.size()) {
+		_spine_render_command *cmd = i < (int) commands.size() ? commands[i] : nullptr;
 		if (cmd != nullptr && cmd->atlasPage == first->atlasPage &&
 			cmd->blendMode == first->blendMode &&
 			cmd->colors[0] == first->colors[0] &&
@@ -731,7 +732,7 @@ static _spine_render_command *batch_commands(BlockAllocator &allocator, Vector<_
 				last->next = batched;
 				last = batched;
 			}
-			if (i == commands.size()) break;
+			if (i == (int) commands.size()) break;
 			first = commands[i];
 			startIndex = i;
 			numVertices = first->numVertices;
@@ -1097,21 +1098,21 @@ spine_event_type spine_animation_state_events_get_event_type(spine_animation_sta
 	if (events == nullptr) return SPINE_EVENT_TYPE_DISPOSE;
 	if (index < 0) return SPINE_EVENT_TYPE_DISPOSE;
 	EventListener *_events = (EventListener *) events;
-	if (index >= _events->events.size()) return SPINE_EVENT_TYPE_DISPOSE;
+	if (index >= (int) _events->events.size()) return SPINE_EVENT_TYPE_DISPOSE;
 	return (spine_event_type) _events->events[index].type;
 }
 
 spine_track_entry spine_animation_state_events_get_track_entry(spine_animation_state_events events, int32_t index) {
 	if (events == nullptr) return nullptr;
 	EventListener *_events = (EventListener *) events;
-	if (index >= _events->events.size()) return nullptr;
+	if (index >= (int) _events->events.size()) return nullptr;
 	return (spine_track_entry) _events->events[index].entry;
 }
 
 spine_event spine_animation_state_events_get_event(spine_animation_state_events events, int32_t index) {
 	if (events == nullptr) return nullptr;
 	EventListener *_events = (EventListener *) events;
-	if (index >= _events->events.size()) return nullptr;
+	if (index >= (int) _events->events.size()) return nullptr;
 	return (spine_event) _events->events[index].event;
 }
 

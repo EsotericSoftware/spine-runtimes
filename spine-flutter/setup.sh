@@ -7,4 +7,5 @@ pushd $dir > /dev/null
 cp -r ../spine-cpp/spine-cpp ios/Classes
 cp -r ../spine-cpp/spine-cpp macos/Classes
 cp -r ../spine-cpp/spine-cpp src
+cp -r ../spine-cpp/spine-cpp-lite src
 popd
