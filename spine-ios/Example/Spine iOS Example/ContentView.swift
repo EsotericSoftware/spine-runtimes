@@ -10,7 +10,7 @@ import Spine
 
 struct ContentView: View {
     var body: some View {
-        SpineView(mesh: "spineboy")
+        SpineView(mesh: "spineboy-mesh")
     }
 }
 
