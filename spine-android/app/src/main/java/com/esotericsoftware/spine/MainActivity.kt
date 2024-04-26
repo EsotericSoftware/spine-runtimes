@@ -34,7 +34,6 @@ fun AppContent() {
             color = MaterialTheme.colorScheme.background
         ) {
             Box {
-                BackgroundImage()
                 SpineViewComposable()
             }
         }
@@ -50,15 +49,5 @@ fun SpineViewComposable(modifier: Modifier = Modifier.fillMaxSize()) {
             }
         },
         modifier = modifier
-    )
-}
-
-@Composable
-fun BackgroundImage() {
-    val image: Painter = painterResource(id = com.esotericsoftware.spine.R.drawable.img) // Replace with your image resource
-    Image(
-        painter = image,
-        contentDescription = null,
-        modifier = Modifier.fillMaxSize()
     )
 }
