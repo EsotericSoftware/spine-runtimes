@@ -489,7 +489,7 @@ namespace Spine {
 		public void PhysicsRotate (float x, float y, float degrees) {
 			PhysicsConstraint[] physicsConstraints = this.physicsConstraints.Items;
 			for (int i = 0, n = this.physicsConstraints.Count; i < n; i++)
-				physicsConstraints[i].Rotate(r, y, degrees);
+				physicsConstraints[i].Rotate(x, y, degrees);
 		}
 
 		/// <summary>Increments the skeleton's <see cref="time"/>.</summary>
