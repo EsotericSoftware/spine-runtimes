@@ -58,7 +58,9 @@ public class PhysicsConstraint implements Updatable {
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 		this.data = data;
 		this.skeleton = skeleton;
+
 		bone = skeleton.bones.get(data.bone.index);
+
 		inertia = data.inertia;
 		strength = data.strength;
 		damping = data.damping;
@@ -69,11 +71,9 @@ public class PhysicsConstraint implements Updatable {
 	}
 
 	/** Copy constructor. */
-	public PhysicsConstraint (PhysicsConstraint constraint) {
-		if (constraint == null) throw new IllegalArgumentException("constraint cannot be null.");
-		data = constraint.data;
-		skeleton = constraint.skeleton;
-		bone = constraint.bone;
+	public PhysicsConstraint (PhysicsConstraint constraint, Skeleton skeleton) {
+		this(constraint.data, skeleton);
+
 		inertia = constraint.inertia;
 		strength = constraint.strength;
 		damping = constraint.damping;

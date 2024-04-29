@@ -72,6 +72,7 @@ public class PathConstraint implements Updatable {
 			bones.add(skeleton.bones.get(boneData.index));
 
 		target = skeleton.slots.get(data.target.index);
+
 		position = data.position;
 		spacing = data.spacing;
 		mixRotate = data.mixRotate;
@@ -80,11 +81,9 @@ public class PathConstraint implements Updatable {
 	}
 
 	/** Copy constructor. */
-	public PathConstraint (PathConstraint constraint) {
-		if (constraint == null) throw new IllegalArgumentException("constraint cannot be null.");
-		data = constraint.data;
-		bones = new Array(constraint.bones);
-		target = constraint.target;
+	public PathConstraint (PathConstraint constraint, Skeleton skeleton) {
+		this(constraint.data, skeleton);
+
 		position = constraint.position;
 		spacing = constraint.spacing;
 		mixRotate = constraint.mixRotate;
