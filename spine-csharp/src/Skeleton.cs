@@ -187,19 +187,19 @@ namespace Spine {
 
 			ikConstraints = new ExposedList<IkConstraint>(skeleton.ikConstraints.Count);
 			foreach (IkConstraint ikConstraint in skeleton.ikConstraints)
-				ikConstraints.Add(new IkConstraint(ikConstraint));
+				ikConstraints.Add(new IkConstraint(ikConstraint, skeleton));
 
 			transformConstraints = new ExposedList<TransformConstraint>(skeleton.transformConstraints.Count);
 			foreach (TransformConstraint transformConstraint in skeleton.transformConstraints)
-				transformConstraints.Add(new TransformConstraint(transformConstraint));
+				transformConstraints.Add(new TransformConstraint(transformConstraint, skeleton));
 
 			pathConstraints = new ExposedList<PathConstraint>(skeleton.pathConstraints.Count);
 			foreach (PathConstraint pathConstraint in skeleton.pathConstraints)
-				pathConstraints.Add(new PathConstraint(pathConstraint));
+				pathConstraints.Add(new PathConstraint(pathConstraint, skeleton));
 
 			physicsConstraints = new ExposedList<PhysicsConstraint>(skeleton.physicsConstraints.Count);
 			foreach (PhysicsConstraint physicsConstraint in skeleton.physicsConstraints)
-				physicsConstraints.Add(new PhysicsConstraint(physicsConstraint));
+				physicsConstraints.Add(new PhysicsConstraint(physicsConstraint, skeleton));
 
 			skin = skeleton.skin;
 			r = skeleton.r;
