@@ -27,7 +27,7 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include "spine-cpp-light.h"
+#include "spine-cpp-lite.h"
 #include <spine/spine.h>
 #include <spine/Version.h>
 #include <spine/Debug.h>

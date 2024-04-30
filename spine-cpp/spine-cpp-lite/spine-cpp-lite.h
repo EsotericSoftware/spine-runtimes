@@ -27,29 +27,29 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef SPINE_FLUTTER
-#define SPINE_FLUTTER
+#ifndef SPINE_CPP_LITE
+#define SPINE_CPP_LITE
 
 #include <stdint.h>
 
 #ifdef __cplusplus
 #if _WIN32
-#define SPINE_FLUTTER_EXPORT extern "C" __declspec(dllexport)
+#define SPINE_CPP_LITE_EXPORT extern "C" __declspec(dllexport)
 #else
 #ifdef __EMSCRIPTEN__
-#define SPINE_FLUTTER_EXPORT extern "C" __attribute__((used))
+#define SPINE_CPP_LITE_EXPORT extern "C" __attribute__((used))
 #else
 #define SPINE_CPP_LITE_EXPORT extern "C"
 #endif
 #endif
 #else
 #if _WIN32
-#define SPINE_FLUTTER_EXPORT __declspec(dllexport)
+#define SPINE_CPP_LITE_EXPORT __declspec(dllexport)
 #else
 #ifdef __EMSCRIPTEN__
-#define SPINE_FLUTTER_EXPORT __attribute__((used))
+#define SPINE_CPP_LITE_EXPORT __attribute__((used))
 #else
-#define SPINE_FLUTTER_EXPORT
+#define SPINE_CPP_LITE_EXPORT
 #endif
 #endif
 #endif
