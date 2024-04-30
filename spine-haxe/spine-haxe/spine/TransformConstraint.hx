@@ -51,17 +51,19 @@ class TransformConstraint implements Updatable {
 		if (skeleton == null)
 			throw new SpineException("skeleton cannot be null.");
 		_data = data;
+
+		_bones = new Array<Bone>();
+		for (boneData in data.bones) {
+			_bones.push(skeleton.findBone(boneData.name));
+		}
+		target = skeleton.findBone(data.target.name);
+
 		mixRotate = data.mixRotate;
 		mixX = data.mixX;
 		mixY = data.mixY;
 		mixScaleX = data.mixScaleX;
 		mixScaleY = data.mixScaleY;
 		mixShearY = data.mixShearY;
-		_bones = new Array<Bone>();
-		for (boneData in data.bones) {
-			_bones.push(skeleton.findBone(boneData.name));
-		}
-		target = skeleton.findBone(data.target.name);
 	}
 
 	public function isActive():Bool {

@@ -47,17 +47,18 @@ class IkConstraint implements Updatable {
 		if (skeleton == null)
 			throw new SpineException("skeleton cannot be null.");
 		_data = data;
-		mix = data.mix;
-		softness = data.softness;
-		bendDirection = data.bendDirection;
-		compress = data.compress;
-		stretch = data.stretch;
 
 		bones = new Array<Bone>();
 		for (boneData in data.bones) {
 			bones.push(skeleton.findBone(boneData.name));
 		}
 		target = skeleton.findBone(data.target.name);
+
+		mix = data.mix;
+		softness = data.softness;
+		bendDirection = data.bendDirection;
+		compress = data.compress;
+		stretch = data.stretch;
 	}
 
 	public function isActive():Bool {

@@ -62,11 +62,13 @@ class PathConstraint implements Updatable {
 		if (skeleton == null)
 			throw new SpineException("skeleton cannot be null.");
 		_data = data;
+
 		_bones = new Array<Bone>();
 		for (boneData in data.bones) {
 			_bones.push(skeleton.findBone(boneData.name));
 		}
 		target = skeleton.findSlot(data.target.name);
+
 		position = data.position;
 		spacing = data.spacing;
 		mixRotate = data.mixRotate;
