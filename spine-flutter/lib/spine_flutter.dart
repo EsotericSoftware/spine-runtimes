@@ -50,8 +50,8 @@ export 'spine_widget.dart';
 late SpineFlutterBindings _bindings;
 late Allocator _allocator;
 
-Future<void> initSpineFlutter({bool enableMemoryDebugging = false}) async {
-  final ffi = await initSpineFlutterFFI();
+Future<void> initSpineFlutter({bool useStaticLinkage = false, bool enableMemoryDebugging = false}) async {
+  final ffi = await initSpineFlutterFFI(useStaticLinkage);
   _bindings = SpineFlutterBindings(ffi.dylib);
   _allocator = ffi.allocator;
   if (enableMemoryDebugging) _bindings.spine_enable_debug_extension(-1);
