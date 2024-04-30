@@ -232,9 +232,11 @@ SpineConstant::BoneMode SpineBoneNode::get_bone_mode() {
 }
 
 void SpineBoneNode::set_bone_mode(SpineConstant::BoneMode _bone_mode) {
-	bone_mode = _bone_mode;
-	SpineSprite *sprite = find_parent_sprite();
-	init_transform(sprite);
+	if (bone_mode != _bone_mode) {
+		bone_mode = _bone_mode;
+		SpineSprite *sprite = find_parent_sprite();
+		init_transform(sprite);
+	}
 }
 
 void SpineBoneNode::set_debug_thickness(float _thickness) {
