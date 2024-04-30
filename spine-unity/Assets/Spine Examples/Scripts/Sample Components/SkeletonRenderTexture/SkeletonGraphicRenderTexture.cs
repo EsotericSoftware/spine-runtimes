@@ -40,7 +40,7 @@ namespace Spine.Unity.Examples {
 
 	/// <summary>
 	/// When enabled, this component renders a skeleton to a RenderTexture and
-	/// then draws this RenderTexture at a UI RawImage quad of the same size.
+	/// then draws this RenderTexture at a UI SkeletonSubmeshGraphic quad of the same size.
 	/// This allows changing transparency at a single quad, which produces a more
 	/// natural fadeout effect.
 	/// Note: It is recommended to keep this component disabled as much as possible
@@ -64,7 +64,7 @@ namespace Spine.Unity.Examples {
 		protected SkeletonGraphic skeletonGraphic;
 		public List<TextureMaterialPair> meshRendererMaterialForTexture = new List<TextureMaterialPair>();
 		protected CanvasRenderer quadCanvasRenderer;
-		protected RawImage quadRawImage;
+		protected SkeletonSubmeshGraphic quadMaskableGraphic;
 		protected readonly Vector3[] worldCorners = new Vector3[4];
 
 		protected override void Awake () {
@@ -79,10 +79,10 @@ namespace Spine.Unity.Examples {
 		}
 
 		void CreateQuadChild () {
-			quad = new GameObject(this.name + " RenderTexture", typeof(CanvasRenderer), typeof(RawImage));
+			quad = new GameObject(this.name + " RenderTexture", typeof(CanvasRenderer), typeof(SkeletonSubmeshGraphic));
 			quad.transform.SetParent(this.transform.parent, false);
 			quadCanvasRenderer = quad.GetComponent<CanvasRenderer>();
-			quadRawImage = quad.GetComponent<RawImage>();
+			quadMaskableGraphic = quad.GetComponent<SkeletonSubmeshGraphic>();
 
 			quadMesh = new Mesh();
 			quadMesh.MarkDynamic();
@@ -212,12 +212,12 @@ namespace Spine.Unity.Examples {
 		}
 
 		protected void SetupQuad () {
-			quadRawImage.texture = this.renderTexture;
-			quadRawImage.color = color;
+			quadCanvasRenderer.SetMaterial(Canvas.GetDefaultCanvasMaterial(), this.renderTexture);
+			quadMaskableGraphic.color = color;
 			quadCanvasRenderer.SetColor(color);
 
 			RectTransform srcRectTransform = skeletonGraphic.rectTransform;
-			RectTransform dstRectTransform = quadRawImage.rectTransform;
+			RectTransform dstRectTransform = quadMaskableGraphic.rectTransform;
 
 			dstRectTransform.anchorMin = srcRectTransform.anchorMin;
 			dstRectTransform.anchorMax = srcRectTransform.anchorMax;

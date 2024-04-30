@@ -165,6 +165,7 @@
   - SkeletonGraphic Materials: Since the addition of new material sets for the `CanvasGroupCompatible` parameters, the default SkeletonGraphic materials all have `CanvasGroup Compatible` disabled. Please assign the respective material from the `CanvasGroupCompatible` material subdirectory if you want `CanvasGroup Compatible` enabled at your SkeletonGraphic.
   - SkeletonGraphic: The parameter `SkeletonGraphic.MeshGenerator.settings.canvasGroupTintBlack` was changed to `canvasGroupCompatible` to help with auto-detecting correct Vertex Data and Material settings. Set the parameter to true if the SkeletonGraphic component is located below a `CanvasGroup` component. The parameter value is automatically migrated from `canvasGroupTintBlack`.
   - Inspector: String attribute `SpineSkin()` now allows to include `<None>` in the list of parameters. Previously the `includeNone=true` parameter of the `SpineSkin()` attribute defaulted to `true` but was ignored. Now it defaults to `false` and has an effect on the list. Only the Inspector GUI is affected by this behaviour change.
+  - `SkeletonGraphicRenderTexture` example component: `protected RawImage quadRawImage` was changed to `protected SkeletonSubmeshGraphic quadMaskableGraphic` for a bugfix. This is only relevant for subclasses of `SkeletonGraphicRenderTexture` or when querying the `RawImage` component via e.g. `skeletonGraphicRenderTexture.quad.GetComponent<RawImage>()`.
 
 - **Changes of default values**
 
