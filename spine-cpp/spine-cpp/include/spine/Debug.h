@@ -110,7 +110,15 @@ namespace spine {
 		}
 
 		virtual char *_readFile(const String &path, int *length) {
-			return _extension->_readFile(path, length);
+            auto data = _extension->_readFile(path, length);
+
+            if (_allocated.count(data) == 0) {
+                _allocated[data] = Allocation(data, sizeof(char) * (*length), nullptr, 0);
+                _allocations++;
+                _usedMemory += sizeof(char) * (*length);
+            }
+
+            return data;
 		}
 
 		size_t getUsedMemory() {
