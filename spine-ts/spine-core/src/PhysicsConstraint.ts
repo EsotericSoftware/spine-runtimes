@@ -79,7 +79,9 @@ export class PhysicsConstraint implements Updatable {
 	constructor (data: PhysicsConstraintData, skeleton: Skeleton) {
 		this.data = data;
 		this.skeleton = skeleton;
+
 		this.bone = skeleton.bones[data.bone.index];
+
 		this.inertia = data.inertia;
 		this.strength = data.strength;
 		this.damping = data.damping;

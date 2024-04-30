@@ -69,11 +69,6 @@ export class IkConstraint implements Updatable {
 		if (!data) throw new Error("data cannot be null.");
 		if (!skeleton) throw new Error("skeleton cannot be null.");
 		this.data = data;
-		this.mix = data.mix;
-		this.softness = data.softness;
-		this.bendDirection = data.bendDirection;
-		this.compress = data.compress;
-		this.stretch = data.stretch;
 
 		this.bones = new Array<Bone>();
 		for (let i = 0; i < data.bones.length; i++) {
@@ -83,7 +78,13 @@ export class IkConstraint implements Updatable {
 		}
 		let target = skeleton.findBone(data.target.name);
 		if (!target) throw new Error(`Couldn't find bone ${data.target.name}`);
+
 		this.target = target;
+		this.mix = data.mix;
+		this.softness = data.softness;
+		this.bendDirection = data.bendDirection;
+		this.compress = data.compress;
+		this.stretch = data.stretch;
 	}
 
 	isActive () {
