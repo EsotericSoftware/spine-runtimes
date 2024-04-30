@@ -64,6 +64,7 @@ namespace Spine {
 				bones.Add(skeleton.bones.Items[boneData.index]);
 
 			target = skeleton.slots.Items[data.target.index];
+
 			position = data.position;
 			spacing = data.spacing;
 			mixRotate = data.mixRotate;
@@ -72,12 +73,9 @@ namespace Spine {
 		}
 
 		/// <summary>Copy constructor.</summary>
-		public PathConstraint (PathConstraint constraint) {
-			if (constraint == null) throw new ArgumentNullException("constraint cannot be null.");
-			data = constraint.data;
-			bones = new ExposedList<Bone>(constraint.Bones.Count);
-			bones.AddRange(constraint.Bones);
-			target = constraint.target;
+		public PathConstraint (PathConstraint constraint, Skeleton skeleton)
+			: this(constraint.data, skeleton) {
+
 			position = constraint.position;
 			spacing = constraint.spacing;
 			mixRotate = constraint.mixRotate;

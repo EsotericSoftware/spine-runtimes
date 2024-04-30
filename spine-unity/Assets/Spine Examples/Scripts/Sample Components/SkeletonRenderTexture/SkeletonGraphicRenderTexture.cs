@@ -195,7 +195,8 @@ namespace Spine.Unity.Examples {
 
 		protected void RenderSingleMeshToRenderTexture (Mesh mesh, Material graphicMaterial, Texture texture) {
 			Material meshRendererMaterial = MeshRendererMaterialForTexture(texture);
-			commandBuffer.DrawMesh(mesh, transform.localToWorldMatrix, meshRendererMaterial, 0, -1);
+			foreach (int shaderPass in shaderPasses)
+				commandBuffer.DrawMesh(mesh, transform.localToWorldMatrix, meshRendererMaterial, 0, shaderPass);
 			Graphics.ExecuteCommandBuffer(commandBuffer);
 		}
 
@@ -204,7 +205,8 @@ namespace Spine.Unity.Examples {
 
 			for (int i = 0; i < meshCount; ++i) {
 				Material meshRendererMaterial = MeshRendererMaterialForTexture(textures[i]);
-				commandBuffer.DrawMesh(meshes[i], transform.localToWorldMatrix, meshRendererMaterial, 0, -1);
+				foreach (int shaderPass in shaderPasses)
+					commandBuffer.DrawMesh(meshes[i], transform.localToWorldMatrix, meshRendererMaterial, 0, shaderPass);
 			}
 			Graphics.ExecuteCommandBuffer(commandBuffer);
 		}

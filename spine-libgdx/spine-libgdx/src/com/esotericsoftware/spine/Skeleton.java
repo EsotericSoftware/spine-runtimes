@@ -139,19 +139,19 @@ public class Skeleton {
 
 		ikConstraints = new Array(skeleton.ikConstraints.size);
 		for (IkConstraint ikConstraint : skeleton.ikConstraints)
-			ikConstraints.add(new IkConstraint(ikConstraint));
+			ikConstraints.add(new IkConstraint(ikConstraint, skeleton));
 
 		transformConstraints = new Array(skeleton.transformConstraints.size);
 		for (TransformConstraint transformConstraint : skeleton.transformConstraints)
-			transformConstraints.add(new TransformConstraint(transformConstraint));
+			transformConstraints.add(new TransformConstraint(transformConstraint, skeleton));
 
 		pathConstraints = new Array(skeleton.pathConstraints.size);
 		for (PathConstraint pathConstraint : skeleton.pathConstraints)
-			pathConstraints.add(new PathConstraint(pathConstraint));
+			pathConstraints.add(new PathConstraint(pathConstraint, skeleton));
 
 		physicsConstraints = new Array(skeleton.physicsConstraints.size);
 		for (PhysicsConstraint physicsConstraint : skeleton.physicsConstraints)
-			physicsConstraints.add(new PhysicsConstraint(physicsConstraint));
+			physicsConstraints.add(new PhysicsConstraint(physicsConstraint, skeleton));
 
 		skin = skeleton.skin;
 		color = new Color(skeleton.color);
