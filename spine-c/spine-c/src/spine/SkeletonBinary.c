@@ -1369,6 +1369,8 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 		skeletonData->version = 0;
 	} else {
 		if (!string_starts_with(skeletonData->version, SPINE_VERSION_STRING)) {
+			FREE(input);
+			spSkeletonData_dispose(skeletonData);
 			char errorMsg[255];
 			snprintf(errorMsg, 255, "Skeleton version %s does not match runtime version %s", skeletonData->version, SPINE_VERSION_STRING);
 			_spSkeletonBinary_setError(self, errorMsg, NULL);
@@ -1596,6 +1598,8 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 	/* Default skin. */
 	skeletonData->defaultSkin = spSkeletonBinary_readSkin(self, input, -1, skeletonData, nonessential);
 	if (self->attachmentLoader->error1) {
+		FREE(input);
+		spSkin_dispose(skeletonData->defaultSkin);
 		spSkeletonData_dispose(skeletonData);
 		_spSkeletonBinary_setError(self, self->attachmentLoader->error1, self->attachmentLoader->error2);
 		return NULL;
@@ -1614,6 +1618,8 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 	for (i = skeletonData->defaultSkin ? 1 : 0; i < skeletonData->skinsCount; ++i) {
 		spSkin *skin = spSkeletonBinary_readSkin(self, input, 0, skeletonData, nonessential);
 		if (self->attachmentLoader->error1) {
+			FREE(input);
+			skeletonData->skinsCount = i + 1;
 			spSkeletonData_dispose(skeletonData);
 			_spSkeletonBinary_setError(self, self->attachmentLoader->error1, self->attachmentLoader->error2);
 			return NULL;
@@ -1672,6 +1678,7 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 		FREE(name);
 		if (!animation) {
 			FREE(input);
+			skeletonData->animationsCount = i + 1;
 			spSkeletonData_dispose(skeletonData);
 			_spSkeletonBinary_setError(self, "Animation corrupted: ", name);
 			return NULL;
