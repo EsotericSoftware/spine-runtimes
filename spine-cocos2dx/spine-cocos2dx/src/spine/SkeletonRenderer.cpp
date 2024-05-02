@@ -460,17 +460,11 @@ namespace spine {
 					trianglesTwoColor.indices = twoColorBatch->allocateIndices(trianglesTwoColor.indexCount);
 					memcpy(trianglesTwoColor.indices, _clipper->getClippedTriangles().buffer(), sizeof(unsigned short) * _clipper->getClippedTriangles().size());
 
-#if COCOS2D_VERSION < 0x00040000
-					TwoColorTrianglesCommand *batchedTriangles = lastTwoColorTrianglesCommand = twoColorBatch->addCommand(renderer, _globalZOrder, texture->getName(), _glProgramState, blendFunc, trianglesTwoColor, transform, transformFlags);
-#else
-					TwoColorTrianglesCommand *batchedTriangles = lastTwoColorTrianglesCommand = twoColorBatch->addCommand(renderer, _globalZOrder, texture, _programState, blendFunc, trianglesTwoColor, transform, transformFlags);
-#endif
-
 					const float *verts = _clipper->getClippedVertices().buffer();
 					const float *uvs = _clipper->getClippedUVs().buffer();
 
-                    V3F_C4B_C4B_T2F *vertex = batchedTriangles->getTriangles().verts;
-                    for (int v = 0, vn = batchedTriangles->getTriangles().vertCount, vv = 0; v < vn; ++v, vv += 2, ++vertex) {
+                    V3F_C4B_C4B_T2F *vertex = trianglesTwoColor.verts;
+                    for (int v = 0, vn = trianglesTwoColor.vertCount, vv = 0; v < vn; ++v, vv += 2, ++vertex) {
                         vertex->position.x = verts[vv];
                         vertex->position.y = verts[vv + 1];
                         vertex->texCoords.u = uvs[vv];
@@ -478,19 +472,24 @@ namespace spine {
                         vertex->color = color4B;
                         vertex->color2 = darkColor4B;
                     }
-				} else {
 
 #if COCOS2D_VERSION < 0x00040000
-					TwoColorTrianglesCommand *batchedTriangles = lastTwoColorTrianglesCommand = twoColorBatch->addCommand(renderer, _globalZOrder, texture->getName(), _glProgramState, blendFunc, trianglesTwoColor, transform, transformFlags);
+                    TwoColorTrianglesCommand *batchedTriangles = lastTwoColorTrianglesCommand = twoColorBatch->addCommand(renderer, _globalZOrder, texture->getName(), _glProgramState, blendFunc, trianglesTwoColor, transform, transformFlags);
 #else
-					TwoColorTrianglesCommand *batchedTriangles = lastTwoColorTrianglesCommand = twoColorBatch->addCommand(renderer, _globalZOrder, texture, _programState, blendFunc, trianglesTwoColor, transform, transformFlags);
+                    lastTwoColorTrianglesCommand = twoColorBatch->addCommand(renderer, _globalZOrder, texture, _programState, blendFunc, trianglesTwoColor, transform, transformFlags);
 #endif
-
-                    V3F_C4B_C4B_T2F *vertex = batchedTriangles->getTriangles().verts;
-                    for (int v = 0, vn = batchedTriangles->getTriangles().vertCount; v < vn; ++v, ++vertex) {
-                        vertex->color = color4B;
+				} else {
+                    V3F_C4B_C4B_T2F* vertex = trianglesTwoColor.verts;
+                    for (int v = 0, vn = trianglesTwoColor.vertCount; v < vn; ++v, ++vertex)
+                    {
+                        vertex->color  = color4B;
                         vertex->color2 = darkColor4B;
                     }
+#if COCOS2D_VERSION < 0x00040000
+                    lastTwoColorTrianglesCommand = twoColorBatch->addCommand(renderer, _globalZOrder, texture->getName(), _glProgramState, blendFunc, trianglesTwoColor, transform, transformFlags);
+#else
+                    lastTwoColorTrianglesCommand = twoColorBatch->addCommand(renderer, _globalZOrder, texture, _programState, blendFunc, trianglesTwoColor, transform, transformFlags);
+#endif
 				}
 			}
 			_clipper->clipEnd(*slot);
