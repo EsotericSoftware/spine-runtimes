@@ -46,7 +46,6 @@ import com.esotericsoftware.spine.utils.SkeletonClipping;
  * See <a href="http://esotericsoftware.com/spine-runtime-architecture#Instance-objects">Instance objects</a> in the Spine
  * Runtimes Guide. */
 public class Skeleton {
-	static private final SkeletonClipping clipper = new SkeletonClipping();
 	static private final short[] quadTriangles = {0, 1, 2, 2, 3, 0};
 	final SkeletonData data;
 	final Array<Bone> bones;
@@ -689,6 +688,16 @@ public class Skeleton {
 	 * @param size An output value, the width and height of the AABB.
 	 * @param temp Working memory to temporarily store attachments' computed world vertices. */
 	public void getBounds (Vector2 offset, Vector2 size, FloatArray temp) {
+		getBounds(offset, size, temp, null);
+	}
+
+	/** Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose. Optionally applies
+	 * clipping.
+	 * @param offset An output value, the distance from the skeleton origin to the bottom left corner of the AABB.
+	 * @param size An output value, the width and height of the AABB.
+	 * @param temp Working memory to temporarily store attachments' computed world vertices.
+	 * @param clipper {@link SkeletonClipping} to use. If <code>null</code>, no clipping is applied. */
+	public void getBounds (Vector2 offset, Vector2 size, FloatArray temp, SkeletonClipping clipper) {
 		if (offset == null) throw new IllegalArgumentException("offset cannot be null.");
 		if (size == null) throw new IllegalArgumentException("size cannot be null.");
 		if (temp == null) throw new IllegalArgumentException("temp cannot be null.");
@@ -713,13 +722,13 @@ public class Skeleton {
 				vertices = temp.setSize(verticesLength);
 				mesh.computeWorldVertices(slot, 0, verticesLength, vertices, 0, 2);
 				triangles = mesh.getTriangles();
-			} else if (attachment instanceof ClippingAttachment) {
+			} else if (attachment instanceof ClippingAttachment && clipper != null) {
 				ClippingAttachment clip = (ClippingAttachment)attachment;
 				clipper.clipStart(slot, clip);
 				continue;
 			}
 			if (vertices != null) {
-				if (clipper.isClipping()) {
+				if (clipper != null && clipper.isClipping()) {
 					clipper.clipTriangles(vertices, verticesLength, triangles, triangles.length);
 					vertices = clipper.getClippedVertices().items;
 					verticesLength = clipper.getClippedVertices().size;
@@ -732,9 +741,9 @@ public class Skeleton {
 					maxY = Math.max(maxY, y);
 				}
 			}
-			clipper.clipEnd(slot);
+			if (clipper != null) clipper.clipEnd(slot);
 		}
-		clipper.clipEnd();
+		if (clipper != null) clipper.clipEnd();
 		offset.set(minX, minY);
 		size.set(maxX - minX, maxY - minY);
 	}
