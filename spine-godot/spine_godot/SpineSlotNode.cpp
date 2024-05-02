@@ -101,7 +101,7 @@ void SpineSlotNode::_notification(int what) {
 void SpineSlotNode::_get_property_list(List<PropertyInfo> *list) const {
 	Vector<String> slot_names;
 	SpineSprite *sprite = cast_to<SpineSprite>(get_parent());
-	if (sprite) sprite->get_skeleton_data_res()->get_slot_names(slot_names);
+	if (sprite && sprite->get_skeleton_data_res().is_valid()) sprite->get_skeleton_data_res()->get_slot_names(slot_names);
 	else
 		slot_names.push_back(slot_name);
 	auto element = list->front();
