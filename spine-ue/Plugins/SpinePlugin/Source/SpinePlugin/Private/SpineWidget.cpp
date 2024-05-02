@@ -134,6 +134,7 @@ void USpineWidget::Tick(float DeltaTime, bool CallDelegates) {
 		state->update(DeltaTime);
 		state->apply(*skeleton);
 		if (CallDelegates) BeforeUpdateWorldTransform.Broadcast(this);
+		skeleton->update(DeltaTime);
 		skeleton->updateWorldTransform(Physics_Update);
 		if (CallDelegates) AfterUpdateWorldTransform.Broadcast(this);
 	}
