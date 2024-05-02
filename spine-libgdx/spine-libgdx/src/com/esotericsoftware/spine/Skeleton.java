@@ -38,16 +38,16 @@ import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.Null;
 
 import com.esotericsoftware.spine.Skin.SkinEntry;
-import com.esotericsoftware.spine.attachments.Attachment;
-import com.esotericsoftware.spine.attachments.MeshAttachment;
-import com.esotericsoftware.spine.attachments.PathAttachment;
-import com.esotericsoftware.spine.attachments.RegionAttachment;
+import com.esotericsoftware.spine.attachments.*;
+import com.esotericsoftware.spine.utils.SkeletonClipping;
 
 /** Stores the current pose for a skeleton.
  * <p>
  * See <a href="http://esotericsoftware.com/spine-runtime-architecture#Instance-objects">Instance objects</a> in the Spine
  * Runtimes Guide. */
 public class Skeleton {
+	static private final SkeletonClipping clipper = new SkeletonClipping();
+	static private final short[] quadTriangles = {0, 1, 2, 2, 3, 0};
 	final SkeletonData data;
 	final Array<Bone> bones;
 	final Array<Slot> slots;
@@ -699,19 +699,31 @@ public class Skeleton {
 			if (!slot.bone.active) continue;
 			int verticesLength = 0;
 			float[] vertices = null;
+			short[] triangles = null;
 			Attachment attachment = slot.attachment;
 			if (attachment instanceof RegionAttachment) {
 				RegionAttachment region = (RegionAttachment)attachment;
 				verticesLength = 8;
 				vertices = temp.setSize(8);
 				region.computeWorldVertices(slot, vertices, 0, 2);
+				triangles = quadTriangles;
 			} else if (attachment instanceof MeshAttachment) {
 				MeshAttachment mesh = (MeshAttachment)attachment;
 				verticesLength = mesh.getWorldVerticesLength();
 				vertices = temp.setSize(verticesLength);
 				mesh.computeWorldVertices(slot, 0, verticesLength, vertices, 0, 2);
+				triangles = mesh.getTriangles();
+			} else if (attachment instanceof ClippingAttachment) {
+				ClippingAttachment clip = (ClippingAttachment)attachment;
+				clipper.clipStart(slot, clip);
+				continue;
 			}
 			if (vertices != null) {
+				if (clipper.isClipping()) {
+					clipper.clipTriangles(vertices, verticesLength, triangles, triangles.length);
+					vertices = clipper.getClippedVertices().items;
+					verticesLength = clipper.getClippedVertices().size;
+				}
 				for (int ii = 0; ii < verticesLength; ii += 2) {
 					float x = vertices[ii], y = vertices[ii + 1];
 					minX = Math.min(minX, x);
@@ -720,7 +732,9 @@ public class Skeleton {
 					maxY = Math.max(maxY, y);
 				}
 			}
+			clipper.clipEnd(slot);
 		}
+		clipper.clipEnd();
 		offset.set(minX, minY);
 		size.set(maxX - minX, maxY - minY);
 	}
