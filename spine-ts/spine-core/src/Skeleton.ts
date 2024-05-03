@@ -28,6 +28,7 @@
  *****************************************************************************/
 
 import { Attachment } from "./attachments/Attachment.js";
+import { ClippingAttachment } from "./attachments/ClippingAttachment.js";
 import { MeshAttachment } from "./attachments/MeshAttachment.js";
 import { PathAttachment } from "./attachments/PathAttachment.js";
 import { RegionAttachment } from "./attachments/RegionAttachment.js";
@@ -35,6 +36,7 @@ import { Bone } from "./Bone.js";
 import { IkConstraint } from "./IkConstraint.js";
 import { PathConstraint } from "./PathConstraint.js";
 import { PhysicsConstraint } from "./PhysicsConstraint.js";
+import { SkeletonClipping } from "./SkeletonClipping.js";
 import { SkeletonData } from "./SkeletonData.js";
 import { Skin } from "./Skin.js";
 import { Slot } from "./Slot.js";
@@ -46,6 +48,7 @@ import { Color, Utils, MathUtils, Vector2, NumberArrayLike } from "./Utils.js";
  *
  * See [Instance objects](http://esotericsoftware.com/spine-runtime-architecture#Instance-objects) in the Spine Runtimes Guide. */
 export class Skeleton {
+	private static quadTriangles = [0, 1, 2, 2, 3, 0];
 	static yDown = false;
 
 	/** The skeleton's setup pose data. */
@@ -606,8 +609,9 @@ export class Skeleton {
 	/** Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose.
 	 * @param offset An output value, the distance from the skeleton origin to the bottom left corner of the AABB.
 	 * @param size An output value, the width and height of the AABB.
-	 * @param temp Working memory to temporarily store attachments' computed world vertices. */
-	getBounds (offset: Vector2, size: Vector2, temp: Array<number> = new Array<number>(2)) {
+	 * @param temp Working memory to temporarily store attachments' computed world vertices.
+	 * @param clipper {@link SkeletonClipping} to use. If <code>null</code>, no clipping is applied. */
+	getBounds (offset: Vector2, size: Vector2, temp: Array<number> = new Array<number>(2), clipper: SkeletonClipping | null = null) {
 		if (!offset) throw new Error("offset cannot be null.");
 		if (!size) throw new Error("size cannot be null.");
 		let drawOrder = this.drawOrder;
@@ -617,18 +621,29 @@ export class Skeleton {
 			if (!slot.bone.active) continue;
 			let verticesLength = 0;
 			let vertices: NumberArrayLike | null = null;
+			let triangles: NumberArrayLike | null = null;
 			let attachment = slot.getAttachment();
 			if (attachment instanceof RegionAttachment) {
 				verticesLength = 8;
 				vertices = Utils.setArraySize(temp, verticesLength, 0);
-				(<RegionAttachment>attachment).computeWorldVertices(slot, vertices, 0, 2);
+				attachment.computeWorldVertices(slot, vertices, 0, 2);
+				triangles = Skeleton.quadTriangles;
 			} else if (attachment instanceof MeshAttachment) {
 				let mesh = (<MeshAttachment>attachment);
 				verticesLength = mesh.worldVerticesLength;
 				vertices = Utils.setArraySize(temp, verticesLength, 0);
 				mesh.computeWorldVertices(slot, 0, verticesLength, vertices, 0, 2);
+				triangles = mesh.triangles;
+			} else if (attachment instanceof ClippingAttachment && clipper != null) {
+				clipper.clipStart(slot, attachment);
+				continue;
 			}
-			if (vertices) {
+			if (vertices && triangles) {
+				if (clipper != null && clipper.isClipping()) {
+					clipper.clipTriangles(vertices, verticesLength, triangles, triangles.length);
+					vertices = clipper.clippedVertices;
+					verticesLength = clipper.clippedVertices.length;
+				}
 				for (let ii = 0, nn = vertices.length; ii < nn; ii += 2) {
 					let x = vertices[ii], y = vertices[ii + 1];
 					minX = Math.min(minX, x);
@@ -637,7 +652,9 @@ export class Skeleton {
 					maxY = Math.max(maxY, y);
 				}
 			}
+			if (clipper != null) clipper.clipEndWithSlot(slot);
 		}
+		if (clipper != null) clipper.clipEnd();
 		offset.set(minX, minY);
 		size.set(maxX - minX, maxY - minY);
 	}

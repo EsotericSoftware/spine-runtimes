@@ -75,6 +75,7 @@ export class PathConstraint implements Updatable {
 		if (!data) throw new Error("data cannot be null.");
 		if (!skeleton) throw new Error("skeleton cannot be null.");
 		this.data = data;
+
 		this.bones = new Array<Bone>();
 		for (let i = 0, n = data.bones.length; i < n; i++) {
 			let bone = skeleton.findBone(data.bones[i].name);
@@ -84,6 +85,7 @@ export class PathConstraint implements Updatable {
 		let target = skeleton.findSlot(data.target.name);
 		if (!target) throw new Error(`Couldn't find target bone ${data.target.name}`);
 		this.target = target;
+
 		this.position = data.position;
 		this.spacing = data.spacing;
 		this.mixRotate = data.mixRotate;

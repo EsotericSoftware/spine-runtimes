@@ -58,12 +58,7 @@ export class TransformConstraint implements Updatable {
 		if (!data) throw new Error("data cannot be null.");
 		if (!skeleton) throw new Error("skeleton cannot be null.");
 		this.data = data;
-		this.mixRotate = data.mixRotate;
-		this.mixX = data.mixX;
-		this.mixY = data.mixY;
-		this.mixScaleX = data.mixScaleX;
-		this.mixScaleY = data.mixScaleY;
-		this.mixShearY = data.mixShearY;
+
 		this.bones = new Array<Bone>();
 		for (let i = 0; i < data.bones.length; i++) {
 			let bone = skeleton.findBone(data.bones[i].name);
@@ -73,6 +68,13 @@ export class TransformConstraint implements Updatable {
 		let target = skeleton.findBone(data.target.name);
 		if (!target) throw new Error(`Couldn't find target bone ${data.target.name}.`);
 		this.target = target;
+
+		this.mixRotate = data.mixRotate;
+		this.mixX = data.mixX;
+		this.mixY = data.mixY;
+		this.mixScaleX = data.mixScaleX;
+		this.mixScaleY = data.mixScaleY;
+		this.mixShearY = data.mixShearY;
 	}
 
 	isActive () {

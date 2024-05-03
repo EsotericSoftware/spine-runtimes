@@ -38,16 +38,15 @@ import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.Null;
 
 import com.esotericsoftware.spine.Skin.SkinEntry;
-import com.esotericsoftware.spine.attachments.Attachment;
-import com.esotericsoftware.spine.attachments.MeshAttachment;
-import com.esotericsoftware.spine.attachments.PathAttachment;
-import com.esotericsoftware.spine.attachments.RegionAttachment;
+import com.esotericsoftware.spine.attachments.*;
+import com.esotericsoftware.spine.utils.SkeletonClipping;
 
 /** Stores the current pose for a skeleton.
  * <p>
  * See <a href="http://esotericsoftware.com/spine-runtime-architecture#Instance-objects">Instance objects</a> in the Spine
  * Runtimes Guide. */
 public class Skeleton {
+	static private final short[] quadTriangles = {0, 1, 2, 2, 3, 0};
 	final SkeletonData data;
 	final Array<Bone> bones;
 	final Array<Slot> slots;
@@ -139,19 +138,19 @@ public class Skeleton {
 
 		ikConstraints = new Array(skeleton.ikConstraints.size);
 		for (IkConstraint ikConstraint : skeleton.ikConstraints)
-			ikConstraints.add(new IkConstraint(ikConstraint));
+			ikConstraints.add(new IkConstraint(ikConstraint, skeleton));
 
 		transformConstraints = new Array(skeleton.transformConstraints.size);
 		for (TransformConstraint transformConstraint : skeleton.transformConstraints)
-			transformConstraints.add(new TransformConstraint(transformConstraint));
+			transformConstraints.add(new TransformConstraint(transformConstraint, skeleton));
 
 		pathConstraints = new Array(skeleton.pathConstraints.size);
 		for (PathConstraint pathConstraint : skeleton.pathConstraints)
-			pathConstraints.add(new PathConstraint(pathConstraint));
+			pathConstraints.add(new PathConstraint(pathConstraint, skeleton));
 
 		physicsConstraints = new Array(skeleton.physicsConstraints.size);
 		for (PhysicsConstraint physicsConstraint : skeleton.physicsConstraints)
-			physicsConstraints.add(new PhysicsConstraint(physicsConstraint));
+			physicsConstraints.add(new PhysicsConstraint(physicsConstraint, skeleton));
 
 		skin = skeleton.skin;
 		color = new Color(skeleton.color);
@@ -689,6 +688,16 @@ public class Skeleton {
 	 * @param size An output value, the width and height of the AABB.
 	 * @param temp Working memory to temporarily store attachments' computed world vertices. */
 	public void getBounds (Vector2 offset, Vector2 size, FloatArray temp) {
+		getBounds(offset, size, temp, null);
+	}
+
+	/** Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose. Optionally applies
+	 * clipping.
+	 * @param offset An output value, the distance from the skeleton origin to the bottom left corner of the AABB.
+	 * @param size An output value, the width and height of the AABB.
+	 * @param temp Working memory to temporarily store attachments' computed world vertices.
+	 * @param clipper {@link SkeletonClipping} to use. If <code>null</code>, no clipping is applied. */
+	public void getBounds (Vector2 offset, Vector2 size, FloatArray temp, SkeletonClipping clipper) {
 		if (offset == null) throw new IllegalArgumentException("offset cannot be null.");
 		if (size == null) throw new IllegalArgumentException("size cannot be null.");
 		if (temp == null) throw new IllegalArgumentException("temp cannot be null.");
@@ -699,19 +708,31 @@ public class Skeleton {
 			if (!slot.bone.active) continue;
 			int verticesLength = 0;
 			float[] vertices = null;
+			short[] triangles = null;
 			Attachment attachment = slot.attachment;
 			if (attachment instanceof RegionAttachment) {
 				RegionAttachment region = (RegionAttachment)attachment;
 				verticesLength = 8;
 				vertices = temp.setSize(8);
 				region.computeWorldVertices(slot, vertices, 0, 2);
+				triangles = quadTriangles;
 			} else if (attachment instanceof MeshAttachment) {
 				MeshAttachment mesh = (MeshAttachment)attachment;
 				verticesLength = mesh.getWorldVerticesLength();
 				vertices = temp.setSize(verticesLength);
 				mesh.computeWorldVertices(slot, 0, verticesLength, vertices, 0, 2);
+				triangles = mesh.getTriangles();
+			} else if (attachment instanceof ClippingAttachment && clipper != null) {
+				ClippingAttachment clip = (ClippingAttachment)attachment;
+				clipper.clipStart(slot, clip);
+				continue;
 			}
 			if (vertices != null) {
+				if (clipper != null && clipper.isClipping()) {
+					clipper.clipTriangles(vertices, verticesLength, triangles, triangles.length);
+					vertices = clipper.getClippedVertices().items;
+					verticesLength = clipper.getClippedVertices().size;
+				}
 				for (int ii = 0; ii < verticesLength; ii += 2) {
 					float x = vertices[ii], y = vertices[ii + 1];
 					minX = Math.min(minX, x);
@@ -720,7 +741,9 @@ public class Skeleton {
 					maxY = Math.max(maxY, y);
 				}
 			}
+			if (clipper != null) clipper.clipEnd(slot);
 		}
+		if (clipper != null) clipper.clipEnd();
 		offset.set(minX, minY);
 		size.set(maxX - minX, maxY - minY);
 	}

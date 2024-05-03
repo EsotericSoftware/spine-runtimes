@@ -357,4 +357,10 @@ public class SkeletonRenderer {
 		pmaColors = pmaColorsAndBlendModes;
 		pmaBlendModes = pmaColorsAndBlendModes;
 	}
+
+	/** Returns the {@link SkeletonClipping} used by this renderer for use with e.g.
+	 * {@link Skeleton#getBounds(com.badlogic.gdx.math.Vector2, com.badlogic.gdx.math.Vector2, FloatArray, SkeletonClipping)} **/
+	public SkeletonClipping getSkeletonClipping () {
+		return clipper;
+	}
 }

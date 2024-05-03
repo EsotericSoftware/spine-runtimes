@@ -205,4 +205,9 @@ export class SkeletonRenderer {
 		}
 		clipper.clipEnd();
 	}
+
+	/** Returns the {@link SkeletonClipping} used by this renderer for use with e.g. {@link Skeleton.getBounds} **/
+	public getSkeletonClipping (): SkeletonClipping {
+		return this.clipper;
+	}
 }

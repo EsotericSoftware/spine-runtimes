@@ -101,7 +101,7 @@ static int string_starts_with(const char *str, const char *needle) {
 static char *string_copy(const char *str) {
 	if (str == NULL) return NULL;
 	int len = strlen(str);
-	char *tmp = malloc(len + 1);
+	char *tmp = (char *) malloc(len + 1);
 	strncpy(tmp, str, len);
 	tmp[len] = '\0';
 	return tmp;
@@ -614,7 +614,7 @@ static spAnimation *_spSkeletonBinary_readAnimation(spSkeletonBinary *self, cons
 				spInheritTimeline *timeline = spInheritTimeline_create(frameCount, boneIndex);
 				for (frame = 0; frame < frameCount; frame++) {
 					float time = readFloat(input);
-					spInherit inherit = readByte(input);
+					spInherit inherit = (spInherit) readByte(input);
 					spInheritTimeline_setFrame(timeline, frame, time, inherit);
 				}
 				spTimelineArray_add(timelines, SUPER(timeline));
@@ -1082,7 +1082,7 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
 											  spSkeletonData *skeletonData, int /*bool*/ nonessential) {
 	int flags = readByte(input);
 	const char *name = (flags & 8) != 0 ? readStringRef(input, skeletonData) : attachmentName;
-	spAttachmentType type = (flags & 0x7);
+	spAttachmentType type = (spAttachmentType) (flags & 0x7);
 
 	switch (type) {
 		case SP_ATTACHMENT_REGION: {
@@ -1369,6 +1369,8 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 		skeletonData->version = 0;
 	} else {
 		if (!string_starts_with(skeletonData->version, SPINE_VERSION_STRING)) {
+			FREE(input);
+			spSkeletonData_dispose(skeletonData);
 			char errorMsg[255];
 			snprintf(errorMsg, 255, "Skeleton version %s does not match runtime version %s", skeletonData->version, SPINE_VERSION_STRING);
 			_spSkeletonBinary_setError(self, errorMsg, NULL);
@@ -1420,7 +1422,7 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 		data->shearX = readFloat(input);
 		data->shearY = readFloat(input);
 		data->length = readFloat(input) * self->scale;
-		data->inherit = readVarint(input, 1);
+		data->inherit = (spInherit) readVarint(input, 1);
 		data->skinRequired = readBoolean(input);
 		if (nonessential) {
 			readColor(input, &data->color.r, &data->color.g, &data->color.b, &data->color.a);
@@ -1542,9 +1544,9 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 			data->bones[ii] = skeletonData->bones[readVarint(input, 1)];
 		data->target = skeletonData->slots[readVarint(input, 1)];
 		int flags = readByte(input);
-		data->positionMode = (flags & 1);
-		data->spacingMode = ((flags >> 1) & 3);
-		data->rotateMode = ((flags >> 3) & 3);
+		data->positionMode = (spPositionMode) (flags & 1);
+		data->spacingMode = (spSpacingMode) ((flags >> 1) & 3);
+		data->rotateMode = (spRotateMode) ((flags >> 3) & 3);
 		if ((flags & 128) != 0) data->offsetRotation = readFloat(input);
 		data->position = readFloat(input);
 		if (data->positionMode == SP_POSITION_MODE_FIXED) data->position *= self->scale;
@@ -1596,6 +1598,8 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 	/* Default skin. */
 	skeletonData->defaultSkin = spSkeletonBinary_readSkin(self, input, -1, skeletonData, nonessential);
 	if (self->attachmentLoader->error1) {
+		FREE(input);
+		spSkin_dispose(skeletonData->defaultSkin);
 		spSkeletonData_dispose(skeletonData);
 		_spSkeletonBinary_setError(self, self->attachmentLoader->error1, self->attachmentLoader->error2);
 		return NULL;
@@ -1614,6 +1618,8 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 	for (i = skeletonData->defaultSkin ? 1 : 0; i < skeletonData->skinsCount; ++i) {
 		spSkin *skin = spSkeletonBinary_readSkin(self, input, 0, skeletonData, nonessential);
 		if (self->attachmentLoader->error1) {
+			FREE(input);
+			skeletonData->skinsCount = i + 1;
 			spSkeletonData_dispose(skeletonData);
 			_spSkeletonBinary_setError(self, self->attachmentLoader->error1, self->attachmentLoader->error2);
 			return NULL;
@@ -1672,6 +1678,7 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 		FREE(name);
 		if (!animation) {
 			FREE(input);
+			skeletonData->animationsCount = i + 1;
 			spSkeletonData_dispose(skeletonData);
 			_spSkeletonBinary_setError(self, "Animation corrupted: ", name);
 			return NULL;

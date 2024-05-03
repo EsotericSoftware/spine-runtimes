@@ -53,6 +53,10 @@ class SpineFlutterFFI {
   SpineFlutterFFI(this.dylib, this.allocator);
 }
 
-Future<SpineFlutterFFI> initSpineFlutterFFI() async {
-  return SpineFlutterFFI(_dylib, malloc);
+Future<SpineFlutterFFI> initSpineFlutterFFI(bool useStaticLinkage) async {
+  if (useStaticLinkage) {
+    return SpineFlutterFFI(DynamicLibrary.process(), malloc);
+  } else {
+    return SpineFlutterFFI(_dylib, malloc);
+  }
 }

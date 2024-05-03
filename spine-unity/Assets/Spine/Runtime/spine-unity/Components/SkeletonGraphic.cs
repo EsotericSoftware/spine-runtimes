@@ -645,6 +645,11 @@ namespace Spine.Unity {
 		readonly ExposedList<Material> usedMaterials = new ExposedList<Material>();
 		readonly ExposedList<Texture> usedTextures = new ExposedList<Texture>();
 
+		/// <summary>Returns the <see cref="SkeletonClipping"/> used by this renderer for use with e.g.
+		/// <see cref="Skeleton.GetBounds(out float, out float, out float, out float, ref float[], SkeletonClipping)"/>
+		/// </summary>
+		public SkeletonClipping SkeletonClipping { get { return meshGenerator.SkeletonClipping; } }
+
 		public ExposedList<Mesh> MeshesMultipleCanvasRenderers { get { return meshes; } }
 		public ExposedList<Material> MaterialsMultipleCanvasRenderers { get { return usedMaterials; } }
 		public ExposedList<Texture> TexturesMultipleCanvasRenderers { get { return usedTextures; } }

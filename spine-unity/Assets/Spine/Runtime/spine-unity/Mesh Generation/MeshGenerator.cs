@@ -156,6 +156,11 @@ namespace Spine.Unity {
 			}
 		}
 
+		/// <summary>Returns the <see cref="SkeletonClipping"/> used by this mesh generator for use with e.g.
+		/// <see cref="Skeleton.GetBounds(out float, out float, out float, out float, ref float[], SkeletonClipping)"/>
+		/// </summary>
+		public SkeletonClipping SkeletonClipping { get { return clipper; } }
+
 		public MeshGenerator () {
 			submeshes.TrimExcess();
 		}

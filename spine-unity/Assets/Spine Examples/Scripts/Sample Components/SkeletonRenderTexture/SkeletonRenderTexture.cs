@@ -186,9 +186,11 @@ namespace Spine.Unity.Examples {
 			meshRenderer.GetPropertyBlock(propertyBlock);
 			meshRenderer.GetSharedMaterials(materials);
 
-			for (int i = 0; i < materials.Count; i++)
-				commandBuffer.DrawMesh(meshFilter.sharedMesh, transform.localToWorldMatrix,
-					materials[i], meshRenderer.subMeshStartIndex + i, -1, propertyBlock);
+			for (int i = 0; i < materials.Count; i++) {
+				foreach (int shaderPass in shaderPasses)
+					commandBuffer.DrawMesh(meshFilter.sharedMesh, transform.localToWorldMatrix,
+						materials[i], meshRenderer.subMeshStartIndex + i, shaderPass, propertyBlock);
+			}
 			Graphics.ExecuteCommandBuffer(commandBuffer);
 		}
 

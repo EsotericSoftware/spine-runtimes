@@ -51,27 +51,25 @@ namespace Spine {
 			if (data == null) throw new ArgumentNullException("data", "data cannot be null.");
 			if (skeleton == null) throw new ArgumentNullException("skeleton", "skeleton cannot be null.");
 			this.data = data;
-			mixRotate = data.mixRotate;
-			mixX = data.mixX;
-			mixY = data.mixY;
-			mixScaleX = data.mixScaleX;
-			mixScaleY = data.mixScaleY;
-			mixShearY = data.mixShearY;
 
 			bones = new ExposedList<Bone>();
 			foreach (BoneData boneData in data.bones)
 				bones.Add(skeleton.bones.Items[boneData.index]);
 
 			target = skeleton.bones.Items[data.target.index];
+
+			mixRotate = data.mixRotate;
+			mixX = data.mixX;
+			mixY = data.mixY;
+			mixScaleX = data.mixScaleX;
+			mixScaleY = data.mixScaleY;
+			mixShearY = data.mixShearY;
 		}
 
 		/// <summary>Copy constructor.</summary>
-		public TransformConstraint (TransformConstraint constraint) {
-			if (constraint == null) throw new ArgumentNullException("constraint cannot be null.");
-			data = constraint.data;
-			bones = new ExposedList<Bone>(constraint.Bones.Count);
-			bones.AddRange(constraint.Bones);
-			target = constraint.target;
+		public TransformConstraint (TransformConstraint constraint, Skeleton skeleton)
+			: this(constraint.data, skeleton) {
+
 			mixRotate = constraint.mixRotate;
 			mixX = constraint.mixX;
 			mixY = constraint.mixY;

@@ -60,7 +60,9 @@ namespace Spine {
 			if (skeleton == null) throw new ArgumentNullException("skeleton", "skeleton cannot be null.");
 			this.data = data;
 			this.skeleton = skeleton;
+
 			bone = skeleton.bones.Items[data.bone.index];
+
 			inertia = data.inertia;
 			strength = data.strength;
 			damping = data.damping;
@@ -71,11 +73,9 @@ namespace Spine {
 		}
 
 		/// <summary>Copy constructor.</summary>
-		public PhysicsConstraint (PhysicsConstraint constraint) {
-			if (constraint == null) throw new ArgumentNullException("constraint", "constraint cannot be null.");
-			data = constraint.data;
-			skeleton = constraint.skeleton;
-			bone = constraint.bone;
+		public PhysicsConstraint (PhysicsConstraint constraint, Skeleton skeleton)
+			: this(constraint.data, skeleton) {
+
 			inertia = constraint.inertia;
 			strength = constraint.strength;
 			damping = constraint.damping;
