@@ -80,7 +80,90 @@ export class SkeletonClipping {
 		return this.clipAttachment != null;
 	}
 
-	clipTriangles (vertices: NumberArrayLike, verticesLength: number, triangles: NumberArrayLike, trianglesLength: number, uvs: NumberArrayLike,
+	clipTriangles(vertices: NumberArrayLike, verticesLength: number, triangles: NumberArrayLike, trianglesLength: number): void;
+    clipTriangles(vertices: NumberArrayLike, verticesLength: number, triangles: NumberArrayLike, trianglesLength: number, uvs: NumberArrayLike,
+		light: Color, dark: Color, twoColor: boolean): void;
+    clipTriangles(vertices: NumberArrayLike, verticesLength: number, triangles: NumberArrayLike, trianglesLength: number, uvs?: NumberArrayLike,
+		light?: Color, dark?: Color, twoColor?: boolean): void {
+
+		if (uvs && light && dark && typeof twoColor === 'boolean')
+			this.clipTrianglesRender(vertices, verticesLength, triangles, trianglesLength, uvs, light, dark, twoColor);
+		else
+			this.clipTrianglesNoRender(vertices, verticesLength, triangles, trianglesLength);
+	}
+	private clipTrianglesNoRender (vertices: NumberArrayLike, verticesLength: number, triangles: NumberArrayLike, trianglesLength: number) {
+
+		let clipOutput = this.clipOutput, clippedVertices = this.clippedVertices;
+		let clippedTriangles = this.clippedTriangles;
+		let polygons = this.clippingPolygons!;
+		let polygonsCount = polygons.length;
+		let vertexSize = 2;
+
+		let index = 0;
+		clippedVertices.length = 0;
+		clippedTriangles.length = 0;
+		outer:
+		for (let i = 0; i < trianglesLength; i += 3) {
+			let vertexOffset = triangles[i] << 1;
+			let x1 = vertices[vertexOffset], y1 = vertices[vertexOffset + 1];
+
+			vertexOffset = triangles[i + 1] << 1;
+			let x2 = vertices[vertexOffset], y2 = vertices[vertexOffset + 1];
+
+			vertexOffset = triangles[i + 2] << 1;
+			let x3 = vertices[vertexOffset], y3 = vertices[vertexOffset + 1];
+
+			for (let p = 0; p < polygonsCount; p++) {
+				let s = clippedVertices.length;
+				if (this.clip(x1, y1, x2, y2, x3, y3, polygons[p], clipOutput)) {
+					let clipOutputLength = clipOutput.length;
+					if (clipOutputLength == 0) continue;
+
+					let clipOutputCount = clipOutputLength >> 1;
+					let clipOutputItems = this.clipOutput;
+					let clippedVerticesItems = Utils.setArraySize(clippedVertices, s + clipOutputCount * vertexSize);
+					for (let ii = 0; ii < clipOutputLength; ii += 2) {
+						let x = clipOutputItems[ii], y = clipOutputItems[ii + 1];
+						clippedVerticesItems[s] = x;
+						clippedVerticesItems[s + 1] = y;
+						s += 2;
+					}
+
+					s = clippedTriangles.length;
+					let clippedTrianglesItems = Utils.setArraySize(clippedTriangles, s + 3 * (clipOutputCount - 2));
+					clipOutputCount--;
+					for (let ii = 1; ii < clipOutputCount; ii++) {
+						clippedTrianglesItems[s] = index;
+						clippedTrianglesItems[s + 1] = (index + ii);
+						clippedTrianglesItems[s + 2] = (index + ii + 1);
+						s += 3;
+					}
+					index += clipOutputCount + 1;
+
+				} else {
+					let clippedVerticesItems = Utils.setArraySize(clippedVertices, s + 3 * vertexSize);
+					clippedVerticesItems[s] = x1;
+					clippedVerticesItems[s + 1] = y1;
+
+					clippedVerticesItems[s + 2] = x2;
+					clippedVerticesItems[s + 3] = y2;
+
+					clippedVerticesItems[s + 4] = x3;
+					clippedVerticesItems[s + 5] = y3;
+
+					s = clippedTriangles.length;
+					let clippedTrianglesItems = Utils.setArraySize(clippedTriangles, s + 3);
+					clippedTrianglesItems[s] = index;
+					clippedTrianglesItems[s + 1] = (index + 1);
+					clippedTrianglesItems[s + 2] = (index + 2);
+					index += 3;
+					continue outer;
+				}
+			}
+		}
+	}
+
+	private clipTrianglesRender (vertices: NumberArrayLike, verticesLength: number, triangles: NumberArrayLike, trianglesLength: number, uvs: NumberArrayLike,
 		light: Color, dark: Color, twoColor: boolean) {
 
 		let clipOutput = this.clipOutput, clippedVertices = this.clippedVertices;
