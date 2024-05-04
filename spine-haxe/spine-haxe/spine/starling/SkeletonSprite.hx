@@ -66,7 +66,7 @@ class SkeletonSprite extends DisplayObject implements IAnimatable {
 
 	private var _smoothing:String = "bilinear";
 
-	private static var clipper:SkeletonClipping = new SkeletonClipping();
+	public static var clipper(default, never):SkeletonClipping = new SkeletonClipping();
 	private static var QUAD_INDICES:Array<Int> = [0, 1, 2, 2, 3, 0];
 
 	private var tempLight:spine.Color = new spine.Color(0, 0, 0);
