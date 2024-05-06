@@ -771,10 +771,11 @@ export class SpinePlayer implements Disposable {
 		let minX = 100000000, maxX = -100000000, minY = 100000000, maxY = -100000000;
 		let offset = new Vector2(), size = new Vector2();
 
+		const tempArray = new Array<number>(2);
 		for (let i = 0; i < steps; i++, time += stepTime) {
 			animation.apply(this.skeleton!, time, time, false, [], 1, MixBlend.setup, MixDirection.mixIn);
 			this.skeleton!.updateWorldTransform(Physics.update);
-			this.skeleton!.getBounds(offset, size);
+			this.skeleton!.getBounds(offset, size, tempArray, this.sceneRenderer!.skeletonRenderer.getSkeletonClipping());
 
 			if (!isNaN(offset.x) && !isNaN(offset.y) && !isNaN(size.x) && !isNaN(size.y)) {
 				minX = Math.min(offset.x, minX);

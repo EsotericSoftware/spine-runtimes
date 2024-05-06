@@ -204,7 +204,7 @@ public class SkeletonRenderer {
 					| (int)(r * slotColor.r * color.r * multiplier));
 
 				if (clipper.isClipping()) {
-					clipper.clipTriangles(vertices, verticesLength, triangles, triangles.length, uvs, c, 0, false);
+					clipper.clipTriangles(vertices, triangles, triangles.length, uvs, c, 0, false);
 					FloatArray clippedVertices = clipper.getClippedVertices();
 					ShortArray clippedTriangles = clipper.getClippedTriangles();
 					batch.draw(texture, clippedVertices.items, 0, clippedVertices.size, clippedTriangles.items, 0,
@@ -311,7 +311,7 @@ public class SkeletonRenderer {
 						| (int)(red * darkColor.r));
 
 				if (clipper.isClipping()) {
-					clipper.clipTriangles(vertices, verticesLength, triangles, triangles.length, uvs, light, dark, true);
+					clipper.clipTriangles(vertices, triangles, triangles.length, uvs, light, dark, true);
 					FloatArray clippedVertices = clipper.getClippedVertices();
 					ShortArray clippedTriangles = clipper.getClippedTriangles();
 					batch.drawTwoColor(texture, clippedVertices.items, 0, clippedVertices.size, clippedTriangles.items, 0,
@@ -356,5 +356,11 @@ public class SkeletonRenderer {
 	public void setPremultipliedAlpha (boolean pmaColorsAndBlendModes) {
 		pmaColors = pmaColorsAndBlendModes;
 		pmaBlendModes = pmaColorsAndBlendModes;
+	}
+
+	/** Returns the {@link SkeletonClipping} used by this renderer for use with e.g.
+	 * {@link Skeleton#getBounds(com.badlogic.gdx.math.Vector2, com.badlogic.gdx.math.Vector2, FloatArray, SkeletonClipping)} **/
+	public SkeletonClipping getSkeletonClipping () {
+		return clipper;
 	}
 }

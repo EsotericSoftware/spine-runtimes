@@ -44,7 +44,7 @@ class SpineFlutterFFI {
   SpineFlutterFFI(this.dylib, this.allocator);
 }
 
-Future<SpineFlutterFFI> initSpineFlutterFFI() async {
+Future<SpineFlutterFFI> initSpineFlutterFFI(bool useStaticLinkage) async {
   if (_module == null) {
     Memory.init();
 

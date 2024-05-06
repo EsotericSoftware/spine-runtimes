@@ -67,7 +67,9 @@ class PhysicsConstraint implements Updatable {
 	public function new(data: PhysicsConstraintData, skeleton: Skeleton) {
 		_data = data;
 		_skeleton = skeleton;
+
 		_bone = skeleton.bones[data.bone.index];
+
 		inertia = data.inertia;
 		strength = data.strength;
 		damping = data.damping;

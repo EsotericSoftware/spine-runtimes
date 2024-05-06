@@ -41,6 +41,11 @@ namespace Spine {
 		private const int BR = 3;
 
 		SkeletonClipping clipper = new SkeletonClipping();
+		/// <summary>Returns the <see cref="SkeletonClipping"/> used by this renderer for use with e.g.
+		/// <see cref="Skeleton.GetBounds(out float, out float, out float, out float, ref float[], SkeletonClipping)"/>
+		/// </summary>
+		public SkeletonClipping SkeletonClipping { get { return clipper; } }
+
 		GraphicsDevice device;
 		MeshBatcher batcher;
 		public MeshBatcher Batcher { get { return batcher; } }

@@ -33,6 +33,7 @@
 #include "SpineSkeleton.h"
 #include "SpineRendererObject.h"
 #include "SpineSlotNode.h"
+#include "core/os/memory.h"
 
 #if VERSION_MAJOR > 3
 #include "core/config/engine.h"
@@ -1047,14 +1048,6 @@ void SpineSprite::draw() {
 	}
 
 #if TOOLS_ENABLED
-	Ref<Font> default_font;
-	auto control = memnew(Control);
-#if VERSION_MAJOR > 3
-	default_font = control->get_theme_default_font();
-#else
-	default_font = control->get_font(SNAME("font"), SNAME("Label"));
-#endif
-	memfree(control);
 
 	float editor_scale = EditorInterface::get_singleton()->get_editor_scale();
 	float inverse_zoom = 1 / get_viewport()->get_global_canvas_transform().get_scale().x * editor_scale;
@@ -1073,6 +1066,15 @@ void SpineSprite::draw() {
 
 	auto global_scale = get_global_scale();
 	draw_set_transform(mouse_position + Vector2(20, 0), -get_global_rotation(), Vector2(inverse_zoom * (1 / global_scale.x), inverse_zoom * (1 / global_scale.y)));
+
+	Ref<Font> default_font;
+	auto control = memnew(Control);
+#if VERSION_MAJOR > 3
+	default_font = control->get_theme_default_font();
+#else
+	default_font = control->get_font(SNAME("font"), SNAME("Label"));
+#endif
+	memdelete(control);
 
 #if VERSION_MAJOR > 3
 	float line_height = default_font->get_height(Font::DEFAULT_FONT_SIZE) + default_font->get_descent(Font::DEFAULT_FONT_SIZE);
