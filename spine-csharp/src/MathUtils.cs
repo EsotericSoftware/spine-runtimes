@@ -78,6 +78,10 @@ namespace Spine {
 			return sin[(int)((degrees + 90) * DegToIndex) & SIN_MASK];
 		}
 
+		static public float Atan2Deg (float y, float x) {
+			return Atan2(y, x) * RadDeg;
+		}
+
 		/// <summary>Returns atan2 in radians, faster but less accurate than Math.Atan2. Average error of 0.00231 radians (0.1323
 		/// degrees), largest error of 0.00488 radians (0.2796 degrees).</summary>
 		static public float Atan2 (float y, float x) {
