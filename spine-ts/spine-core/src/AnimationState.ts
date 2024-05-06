@@ -953,10 +953,10 @@ export class TrackEntry {
 		this._mixDuration = mixDuration;
 	}
 
-	setMixDurationWithDelta(mixDuration: number, delay: number) {
+	setMixDurationWithDelay(mixDuration: number, delay: number) {
 		this._mixDuration = mixDuration;
-		if (this.previous != null && this.delay <= 0) this.delay += this.previous.getTrackComplete() - delay;
-		this.delay = this.delay;
+		if (this.previous != null && delay <= 0) delay += this.previous.getTrackComplete() - mixDuration;
+		this.delay = delay;
 	}
 
 	/** Controls how properties keyed in the animation are mixed with lower tracks. Defaults to {@link MixBlend#replace}, which
