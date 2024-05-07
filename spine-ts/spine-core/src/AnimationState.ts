@@ -953,7 +953,7 @@ export class TrackEntry {
 		this._mixDuration = mixDuration;
 	}
 
-	setMixDurationWithDelay(mixDuration: number, delay: number) {
+	setMixDurationWithDelay (mixDuration: number, delay: number) {
 		this._mixDuration = mixDuration;
 		if (this.previous != null && delay <= 0) delay += this.previous.getTrackComplete() - mixDuration;
 		this.delay = delay;
