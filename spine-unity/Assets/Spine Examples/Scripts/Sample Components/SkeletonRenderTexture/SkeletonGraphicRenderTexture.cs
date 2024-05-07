@@ -89,8 +89,10 @@ namespace Spine.Unity.Examples {
 			quadMesh.name = "RenderTexture Quad";
 			quadMesh.hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor;
 
-			if (quadMaterial == null)
+			if (quadMaterial == null) {
 				quadMaterial = new Material(Shader.Find("Spine/SkeletonGraphic"));
+				quadMaterial.EnableKeyword("_CANVAS_GROUP_COMPATIBLE");
+			}
 		}
 
 		void Reset () {
