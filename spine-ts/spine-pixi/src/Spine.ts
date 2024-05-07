@@ -46,6 +46,7 @@ import {
 } from "@esotericsoftware/spine-core";
 import type { SpineTexture } from "./SpineTexture.js";
 import { SlotMesh } from "./SlotMesh.js";
+import { DarkSlotMesh } from "./DarkSlotMesh.js";
 import type { ISpineDebugRenderer } from "./SpineDebugRenderer.js";
 import { Assets } from "@pixi/assets";
 import type { IPointData } from "@pixi/core";
@@ -85,7 +86,7 @@ export class Spine extends Container {
 		this._debug = value;
 	}
 
-	protected slotMeshFactory: () => ISlotMesh;
+	protected slotMeshFactory: () => ISlotMesh = ((): ISlotMesh => new SlotMesh());
 
 	private autoUpdateWarned: boolean = false;
 	private _autoUpdate: boolean = true;
@@ -122,9 +123,22 @@ export class Spine extends Container {
 		const animData = new AnimationStateData(skeletonData);
 		this.state = new AnimationState(animData);
 		this.autoUpdate = options?.autoUpdate ?? true;
-		this.slotMeshFactory = options?.slotMeshFactory ?? ((): ISlotMesh => new SlotMesh());
+		this.initializeMeshFactory(options);
 		this.skeleton.setToSetupPose();
 		this.skeleton.updateWorldTransform(Physics.update);
+	}
+
+	private initializeMeshFactory(options?: ISpineOptions) {
+		if (options?.slotMeshFactory) {
+			this.slotMeshFactory = options?.slotMeshFactory;
+		} else {
+			for (let i = 0; i < this.skeleton.slots.length; i++) {
+				if (this.skeleton.slots[i].data.darkColor) {
+					this.slotMeshFactory = options?.slotMeshFactory ?? ((): ISlotMesh => new DarkSlotMesh());
+					break;
+				}
+			}
+		}
 	}
 
 	public update (deltaSeconds: number): void {

@@ -30,7 +30,7 @@
 import type { IDarkTintElement } from "./DarkTintMesh.js";
 import { DarkTintBatchGeometry } from "./DarkTintBatchGeom.js";
 import type { ExtensionMetadata, Renderer, ViewableBuffer } from "@pixi/core";
-import { BatchRenderer, ExtensionType, BatchShaderGenerator, Color } from "@pixi/core";
+import { extensions, BatchRenderer, ExtensionType, BatchShaderGenerator, Color } from "@pixi/core";
 
 const vertex = `
 precision highp float;
@@ -117,3 +117,5 @@ export class DarkTintRenderer extends BatchRenderer {
 		}
 	}
 }
+
+extensions.add(DarkTintRenderer);
