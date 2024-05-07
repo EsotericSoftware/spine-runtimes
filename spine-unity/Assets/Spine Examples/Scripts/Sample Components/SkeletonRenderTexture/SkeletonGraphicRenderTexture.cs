@@ -88,6 +88,9 @@ namespace Spine.Unity.Examples {
 			quadMesh.MarkDynamic();
 			quadMesh.name = "RenderTexture Quad";
 			quadMesh.hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor;
+
+			if (quadMaterial == null)
+				quadMaterial = new Material(Shader.Find("Spine/SkeletonGraphic"));
 		}
 
 		void Reset () {
@@ -101,6 +104,14 @@ namespace Spine.Unity.Examples {
 					}
 				}
 			}
+
+#if UNITY_EDITOR
+			string[] assets = UnityEditor.AssetDatabase.FindAssets("t:material RenderQuadGraphicMaterial");
+			if (assets.Length > 0) {
+				string materialPath = UnityEditor.AssetDatabase.GUIDToAssetPath(assets[0]);
+				quadMaterial = UnityEditor.AssetDatabase.LoadAssetAtPath<Material>(materialPath);
+			}
+#endif
 		}
 
 		void OnEnable () {
@@ -212,7 +223,7 @@ namespace Spine.Unity.Examples {
 		}
 
 		protected void SetupQuad () {
-			quadCanvasRenderer.SetMaterial(Canvas.GetDefaultCanvasMaterial(), this.renderTexture);
+			quadCanvasRenderer.SetMaterial(quadMaterial, this.renderTexture);
 			quadMaskableGraphic.color = color;
 			quadCanvasRenderer.SetColor(color);
 

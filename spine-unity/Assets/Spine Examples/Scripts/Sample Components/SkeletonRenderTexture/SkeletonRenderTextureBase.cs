@@ -42,6 +42,7 @@ namespace Spine.Unity.Examples {
 		public Color color = Color.white;
 		public int maxRenderTextureSize = 1024;
 		public GameObject quad;
+		public Material quadMaterial;
 		protected Mesh quadMesh;
 		public RenderTexture renderTexture;
 		public Camera targetCamera;
