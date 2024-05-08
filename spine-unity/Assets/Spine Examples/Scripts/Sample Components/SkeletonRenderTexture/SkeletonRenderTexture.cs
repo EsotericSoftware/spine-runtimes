@@ -52,7 +52,6 @@ namespace Spine.Unity.Examples {
 	[RequireComponent(typeof(SkeletonRenderer))]
 	public class SkeletonRenderTexture : SkeletonRenderTextureBase {
 #if HAS_GET_SHARED_MATERIALS
-		public Material quadMaterial;
 		protected SkeletonRenderer skeletonRenderer;
 		protected MeshRenderer meshRenderer;
 		protected MeshFilter meshFilter;

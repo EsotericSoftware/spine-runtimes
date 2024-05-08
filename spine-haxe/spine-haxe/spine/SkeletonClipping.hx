@@ -84,7 +84,91 @@ class SkeletonClipping {
 		return clipAttachment != null;
 	}
 
-	public function clipTriangles(vertices:Array<Float>, triangles:Array<Int>, trianglesLength:Float, uvs:Array<Float>):Void {
+	private function clipTrianglesNoRender(vertices:Array<Float>, triangles:Array<Int>, trianglesLength:Float):Void {
+		var polygonsCount:Int = clippingPolygons.length;
+		var index:Int = 0;
+		clippedVertices.resize(0);
+		clippedUvs.resize(0);
+		clippedTriangles.resize(0);
+		var i:Int = 0;
+		while (i < trianglesLength) {
+			var vertexOffset:Int = triangles[i] << 1;
+			var x1:Float = vertices[vertexOffset],
+				y1:Float = vertices[vertexOffset + 1];
+
+			vertexOffset = triangles[i + 1] << 1;
+			var x2:Float = vertices[vertexOffset],
+				y2:Float = vertices[vertexOffset + 1];
+
+			vertexOffset = triangles[i + 2] << 1;
+			var x3:Float = vertices[vertexOffset],
+				y3:Float = vertices[vertexOffset + 1];
+
+			for (p in 0...polygonsCount) {
+				var s:Int = clippedVertices.length;
+				var clippedVerticesItems:Array<Float>;
+				var clippedTrianglesItems:Array<Int>;
+				if (this.clip(x1, y1, x2, y2, x3, y3, clippingPolygons[p], clipOutput)) {
+					var clipOutputLength:Int = clipOutput.length;
+					if (clipOutputLength == 0)
+						continue;
+
+					var clipOutputCount:Int = clipOutputLength >> 1;
+					var clipOutputItems:Array<Float> = clipOutput;
+					clippedVerticesItems = clippedVertices;
+					clippedVerticesItems.resize(s + clipOutputLength);
+					var ii:Int = 0;
+					while (ii < clipOutputLength) {
+						var x:Float = clipOutputItems[ii],
+							y:Float = clipOutputItems[ii + 1];
+						clippedVerticesItems[s] = x;
+						clippedVerticesItems[s + 1] = y;
+						s += 2;
+						ii += 2;
+					}
+
+					s = clippedTriangles.length;
+					clippedTrianglesItems = clippedTriangles;
+					clippedTrianglesItems.resize(s + 3 * (clipOutputCount - 2));
+					clipOutputCount--;
+					for (ii in 1...clipOutputCount) {
+						clippedTrianglesItems[s] = index;
+						clippedTrianglesItems[s + 1] = (index + ii);
+						clippedTrianglesItems[s + 2] = (index + ii + 1);
+						s += 3;
+					}
+					index += clipOutputCount + 1;
+				} else {
+					clippedVerticesItems = clippedVertices;
+					clippedVerticesItems.resize(s + 3 * 2);
+					clippedVerticesItems[s] = x1;
+					clippedVerticesItems[s + 1] = y1;
+					clippedVerticesItems[s + 2] = x2;
+					clippedVerticesItems[s + 3] = y2;
+					clippedVerticesItems[s + 4] = x3;
+					clippedVerticesItems[s + 5] = y3;
+
+					s = clippedTriangles.length;
+					clippedTrianglesItems = clippedTriangles;
+					clippedTrianglesItems.resize(s + 3);
+					clippedTrianglesItems[s] = index;
+					clippedTrianglesItems[s + 1] = (index + 1);
+					clippedTrianglesItems[s + 2] = (index + 2);
+					index += 3;
+					break;
+				}
+			}
+
+			i += 3;
+		}
+	}
+
+	public function clipTriangles(vertices:Array<Float>, triangles:Array<Int>, trianglesLength:Float, uvs:Array<Float> = null):Void {
+		if (uvs == null) {
+			clipTrianglesNoRender(vertices, triangles, trianglesLength);
+			return;
+		}
+
 		var polygonsCount:Int = clippingPolygons.length;
 		var index:Int = 0;
 		clippedVertices.resize(0);

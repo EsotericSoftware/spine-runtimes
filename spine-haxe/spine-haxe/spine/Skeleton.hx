@@ -32,11 +32,13 @@ package spine;
 import lime.math.Rectangle;
 import haxe.ds.StringMap;
 import spine.attachments.Attachment;
+import spine.attachments.ClippingAttachment;
 import spine.attachments.MeshAttachment;
 import spine.attachments.PathAttachment;
 import spine.attachments.RegionAttachment;
 
 class Skeleton {
+	private static var quadTriangles:Array<Int> = [0, 1, 2, 2, 3, 0];
 	private var _data:SkeletonData;
 
 	public var bones:Array<Bone>;
@@ -611,7 +613,7 @@ class Skeleton {
 	private var _tempVertices = new Array<Float>();
 	private var _bounds = new Rectangle();
 
-	public function getBounds():Rectangle {
+	public function getBounds(clipper: SkeletonClipping = null):Rectangle {
 		var minX:Float = Math.POSITIVE_INFINITY;
 		var minY:Float = Math.POSITIVE_INFINITY;
 		var maxX:Float = Math.NEGATIVE_INFINITY;
@@ -619,20 +621,33 @@ class Skeleton {
 		for (slot in drawOrder) {
 			var verticesLength:Int = 0;
 			var vertices:Array<Float> = null;
+			var triangles:Array<Int> = null;
 			var attachment:Attachment = slot.attachment;
+
 			if (Std.isOfType(attachment, RegionAttachment)) {
 				verticesLength = 8;
 				_tempVertices.resize(verticesLength);
 				vertices = _tempVertices;
 				cast(attachment, RegionAttachment).computeWorldVertices(slot, vertices, 0, 2);
+				triangles = Skeleton.quadTriangles;
 			} else if (Std.isOfType(attachment, MeshAttachment)) {
 				var mesh:MeshAttachment = cast(attachment, MeshAttachment);
 				verticesLength = mesh.worldVerticesLength;
 				_tempVertices.resize(verticesLength);
 				vertices = _tempVertices;
 				mesh.computeWorldVertices(slot, 0, verticesLength, vertices, 0, 2);
+				triangles = mesh.triangles;
+			} else if (Std.isOfType(attachment, ClippingAttachment) && clipper != null) {
+				clipper.clipStart(slot, cast(attachment, ClippingAttachment));
+				continue;
 			}
+
 			if (vertices != null) {
+				if (clipper != null && clipper.isClipping()) {
+					clipper.clipTriangles(vertices, triangles, triangles.length);
+					vertices = clipper.clippedVertices;
+					verticesLength = clipper.clippedVertices.length;
+				}
 				var ii:Int = 0;
 				var nn:Int = vertices.length;
 				while (ii < nn) {
@@ -644,7 +659,9 @@ class Skeleton {
 					ii += 2;
 				}
 			}
+			if (clipper != null) clipper.clipEndWithSlot(slot);
 		}
+		if (clipper != null) clipper.clipEnd();
 		_bounds.x = minX;
 		_bounds.y = minY;
 		_bounds.width = maxX - minX;

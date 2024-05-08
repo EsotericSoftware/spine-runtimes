@@ -239,6 +239,7 @@ namespace Spine.Unity {
 					Initialize(false);
 					if (meshRenderer)
 						meshRenderer.enabled = false;
+					updateMode = UpdateMode.FullUpdate;
 				}
 			}
 			remove {
@@ -405,7 +406,8 @@ namespace Spine.Unity {
 
 		public virtual void Awake () {
 			Initialize(false);
-			updateMode = updateWhenInvisible;
+			if (generateMeshOverride == null || !disableRenderingOnOverride)
+				updateMode = updateWhenInvisible;
 		}
 
 #if UNITY_EDITOR && CONFIGURABLE_ENTER_PLAY_MODE

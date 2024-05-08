@@ -73,6 +73,7 @@ namespace Spine.Unity {
 		[Tooltip("Copies MeshRenderer flags into each parts renderer")]
 		public bool copyMeshRendererFlags = true;
 		public List<Spine.Unity.SkeletonPartsRenderer> partsRenderers = new List<SkeletonPartsRenderer>();
+		[System.NonSerialized] public bool isVisible = true;
 
 #if UNITY_EDITOR
 		void Reset () {
@@ -197,6 +198,10 @@ namespace Spine.Unity {
 				skeletonRenderer.LateUpdateMesh();
 		}
 
+		public void Update () {
+			UpdateVisibility();
+		}
+
 		public void OnDisable () {
 			if (skeletonRenderer == null) return;
 #if SPINE_OPTIONAL_RENDEROVERRIDE
@@ -204,6 +209,24 @@ namespace Spine.Unity {
 #endif
 			skeletonRenderer.LateUpdateMesh();
 			ClearPartsRendererMeshes();
+		}
+
+		public void UpdateVisibility () {
+			foreach (SkeletonPartsRenderer partsRenderer in partsRenderers) {
+				if (partsRenderer == null) continue;
+
+				if (partsRenderer.MeshRenderer.isVisible) {
+					if (!isVisible) {
+						skeletonRenderer.OnBecameVisible();
+						isVisible = true;
+					}
+					return;
+				}
+			}
+			if (isVisible) {
+				isVisible = false;
+				skeletonRenderer.OnBecameInvisible();
+			}
 		}
 
 		MaterialPropertyBlock copiedBlock;
