@@ -23,20 +23,20 @@ struct SpineExampleApp: App {
                 print(atlas)
                 
                 let skeletonDataFromJson = try SkeletonData.fromAsset(
-                    atlas: atlas,
+                    atlas: atlas.0,
                     skeletonFile: "spineboy-pro.json"
                 )
                 print(skeletonDataFromJson)
                 
                 let skeletonDataFromBinary = try SkeletonData.fromAsset(
-                    atlas: atlas,
+                    atlas: atlas.0,
                     skeletonFile: "spineboy-pro.skel"
                 )
                 print(skeletonDataFromBinary)
                 
                 // Dispose
                 
-                atlas.dispose()
+                atlas.0.dispose()
                 skeletonDataFromJson.dispose()
                 skeletonDataFromBinary.dispose()
             } catch {
