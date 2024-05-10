@@ -47,12 +47,16 @@ namespace spine {
 		Skeleton *skeleton;
 		AnimationState *animationState;
 
+		void setUsePremultipliedAlpha(bool usePMA) { usePremultipliedAlpha = usePMA; };
+		bool getUsePremultipliedAlpha() { return usePremultipliedAlpha; };
+
 	private:
 		bool ownsAnimationStateData;
 		SkeletonClipping clipper;
 		Vector<float> worldVertices;
 		Vector<SDL_Vertex> sdlVertices;
 		Vector<int> sdlIndices;
+		bool usePremultipliedAlpha;
 	};
 
 	class SDLTextureLoader : public spine::TextureLoader {
