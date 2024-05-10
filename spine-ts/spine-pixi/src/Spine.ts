@@ -128,7 +128,7 @@ export class Spine extends Container {
 		this.skeleton.updateWorldTransform(Physics.update);
 	}
 
-	private initializeMeshFactory(options?: ISpineOptions) {
+	private initializeMeshFactory (options?: ISpineOptions) {
 		if (options?.slotMeshFactory) {
 			this.slotMeshFactory = options?.slotMeshFactory;
 		} else {
