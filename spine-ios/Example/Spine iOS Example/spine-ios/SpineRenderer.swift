@@ -8,21 +8,33 @@
 import Foundation
 import MetalKit
 import SpineSharedStructs
+import Spine
+import SpineWrapper
+
+protocol SpineRendererDelegate: AnyObject {
+    func spineRenderer(_ spineRenderer: SpineRenderer, needsUpdate delta: TimeInterval)
+}
+
+protocol SpineRendererDataSource: AnyObject {
+    func isPlaying(_ spineRenderer: SpineRenderer) -> Bool
+    func renderCommands(_ spineRenderer: SpineRenderer) -> [RenderCommand]
+}
 
 final class SpineRenderer: NSObject, MTKViewDelegate {
     
-    let mtkView: MTKView
-    let renderCommand: RenderCommand
     let device: MTLDevice
-    let texture: MTLTexture?
+    let textures: [MTLTexture]
     let pipelineState: MTLRenderPipelineState
     let commandQueue: MTLCommandQueue
     
     var viewPortSize = vector_uint2(0, 0)
     
-    init(mtkView: MTKView, renderCommand: RenderCommand, imageURL: URL) throws {
-        self.mtkView = mtkView
-        self.renderCommand = renderCommand
+    private var lastDraw: CFTimeInterval = 0
+    
+    weak var dataSource: SpineRendererDataSource?
+    weak var delegate: SpineRendererDelegate?
+    
+    init(mtkView: MTKView, atlasPages: [CGImage]) throws {
         
         let device = mtkView.device!
         self.device = device
@@ -30,21 +42,23 @@ final class SpineRenderer: NSObject, MTKViewDelegate {
         let defaultLibrary = device.makeDefaultLibrary()
         let textureLoader = MTKTextureLoader(device: device)
         
-        texture = try textureLoader.newTexture(
-            URL: imageURL,
-            options: [
-                .textureUsage: NSNumber(value: MTLTextureUsage.shaderRead.rawValue),
-                .SRGB: false,
-            ]
-        )
+        textures = try atlasPages.map {
+            try textureLoader.newTexture(
+                cgImage: $0,
+                options: [
+                    .textureUsage: NSNumber(value: MTLTextureUsage.shaderRead.rawValue),
+                    .SRGB: false,
+                ]
+            )
+        }
         
         let pipelineStateDescriptor = MTLRenderPipelineDescriptor()
         pipelineStateDescriptor.vertexFunction = defaultLibrary?.makeFunction(name: "vertexShader")
         pipelineStateDescriptor.fragmentFunction = defaultLibrary?.makeFunction(name: "fragmentShader")
         pipelineStateDescriptor.colorAttachments[0].pixelFormat = mtkView.colorPixelFormat
         pipelineStateDescriptor.colorAttachments[0].apply(
-            blendMode: renderCommand.blendMode,
-            with: renderCommand.premultipliedAlpha
+            blendMode: SPINE_BLEND_MODE_NORMAL, // TODO: renderCommand.blendMode ?,
+            with: true // TODO Use renderCommand.premultipliedAlpha ?
         )
         
         pipelineState = try device.makeRenderPipelineState(descriptor: pipelineStateDescriptor)
@@ -56,8 +70,12 @@ final class SpineRenderer: NSObject, MTKViewDelegate {
     }
     
     func draw(in view: MTKView) {
-        let vertices = Array(renderCommand.getVertices())
-        let verticesBufferSize = MemoryLayout<AAPLVertex>.stride * vertices.count
+        guard dataSource?.isPlaying(self) ?? false else {
+            return
+        }
+        
+        callNeedsUpdate()
+        let renderCommands = dataSource?.renderCommands(self) ?? []
         
         guard let commandBuffer = commandQueue.makeCommandBuffer() else {
             return
@@ -70,6 +88,34 @@ final class SpineRenderer: NSObject, MTKViewDelegate {
         guard let renderEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor) else {
             return
         }
+        
+        for renderCommand in renderCommands {
+            draw(renderCommand: renderCommand, renderEncoder: renderEncoder, in: view)
+        }
+        
+        renderEncoder.endEncoding()
+        view.currentDrawable.flatMap {
+            commandBuffer.present($0)
+        }
+        commandBuffer.commit()
+    }
+    
+    private func callNeedsUpdate() {
+        if lastDraw == 0 {
+            lastDraw = CACurrentMediaTime()
+        }
+        let delta = CACurrentMediaTime() - lastDraw
+        delegate?.spineRenderer(self, needsUpdate: delta)
+        lastDraw = CACurrentMediaTime()
+    }
+    
+    private func draw(renderCommand: RenderCommand, renderEncoder: MTLRenderCommandEncoder, in view: MTKView) {
+        let vertices = Array(renderCommand.getVertices())
+        
+        guard !vertices.isEmpty else {
+            return
+        }
+        let verticesBufferSize = MemoryLayout<AAPLVertex>.stride * vertices.count
         
         guard let vertexBuffer = device.makeBuffer(length: verticesBufferSize, options: .storageModeShared) else {
             return
@@ -100,9 +146,10 @@ final class SpineRenderer: NSObject, MTKViewDelegate {
             index: Int(AAPLVertexInputIndexViewportSize.rawValue)
         )
         
-        if let texture {
+        let textureIndex = Int(renderCommand.atlasPage)
+        if textures.indices.contains(textureIndex) {
             renderEncoder.setFragmentTexture(
-                texture,
+                textures[textureIndex],
                 index: Int(AAPLTextureIndexBaseColor.rawValue)
             )
         }
@@ -112,12 +159,6 @@ final class SpineRenderer: NSObject, MTKViewDelegate {
             vertexStart: 0,
             vertexCount: vertices.count
         )
-
-        renderEncoder.endEncoding()
-        view.currentDrawable.flatMap {
-            commandBuffer.present($0)
-        }
-        commandBuffer.commit()
     }
 }
 
@@ -134,23 +175,27 @@ fileprivate extension MTLRenderPipelineColorAttachmentDescriptor {
 fileprivate extension BlendMode {
     func sourceRGBBlendFactor(premultipliedAlpha: Bool) -> MTLBlendFactor {
         switch self {
-        case .normal, .additive:
+        case SPINE_BLEND_MODE_NORMAL, SPINE_BLEND_MODE_ADDITIVE:
             return premultipliedAlpha ? .one : .sourceAlpha
-        case .multiply:
+        case SPINE_BLEND_MODE_MULTIPLY:
             return .destinationColor
-        case .screen:
+        case SPINE_BLEND_MODE_SCREEN:
             return .one
+        default:
+            return .one // Should never be called
         }
     }
     
     var destinationRGBBlendFactor: MTLBlendFactor {
         switch self {
-        case .normal, .multiply:
+        case SPINE_BLEND_MODE_NORMAL, SPINE_BLEND_MODE_ADDITIVE:
             return .oneMinusSourceAlpha
-        case .additive:
+        case SPINE_BLEND_MODE_MULTIPLY:
             return .one
-        case .screen:
+        case SPINE_BLEND_MODE_SCREEN:
             return .oneMinusSourceColor
+        default:
+            return .one // Should never be called
         }
     }
 }

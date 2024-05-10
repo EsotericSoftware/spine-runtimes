@@ -7,21 +7,24 @@
 
 import UIKit
 import MetalKit
+import Spine
 
 public final class SpineViewController: UIViewController {
     
-    private let meshURL: URL
-    private let imageURL: URL
-    
     private var renderer: SpineRenderer?
+    
     private var mtkView: MTKView {
         return view as! MTKView
     }
     
-    public init(mesh name: String, bundle: Bundle = .main) {
-        meshURL = bundle.url(forResource: name, withExtension: "mesh")!
-        imageURL = bundle.url(forResource: name, withExtension: "png")!
-        
+    private let atlasFile: String
+    private let skeletonFile: String
+    private let controller: SpineController
+    
+    public init(atlasFile: String, skeletonFile: String, controller: SpineController) {
+        self.atlasFile = atlasFile
+        self.skeletonFile = skeletonFile
+        self.controller = controller
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -39,15 +42,31 @@ public final class SpineViewController: UIViewController {
         mtkView.device = MTLCreateSystemDefaultDevice()
         mtkView.clearColor = MTLClearColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 1.0)
         
-        do {
-            let renderCommand = RenderCommand(
-                mesh: try String(contentsOf: meshURL, encoding: .utf8),
-                blendMode: .normal,
-                premultipliedAlpha: true
+        load()
+    }
+    
+    private func load() {
+        Task.detached(priority: .high) {
+            try await self.controller.initialize(
+                atlasFile: self.atlasFile,
+                skeletonFile: self.skeletonFile
             )
-            renderer = try SpineRenderer(mtkView: mtkView, renderCommand: renderCommand, imageURL: imageURL)
+            await MainActor.run {
+                self.initRenderer(
+                    atlasPages: self.controller.drawable.atlasPages
+                )
+            }
+        }
+    }
+    
+    private func initRenderer(atlasPages: [CGImage]) {
+        do {
+            renderer = try SpineRenderer(mtkView: mtkView, atlasPages: atlasPages)
             renderer?.mtkView(mtkView, drawableSizeWillChange: mtkView.drawableSize)
-            mtkView.delegate = renderer;
+            renderer?.delegate = controller
+            renderer?.dataSource = controller
+            
+            mtkView.delegate = renderer
         } catch {
             print(error)
         }

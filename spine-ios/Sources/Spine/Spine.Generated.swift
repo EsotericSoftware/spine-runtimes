@@ -1268,10 +1268,6 @@ public final class SkeletonDrawable: NSObject {
         return .init(spine_skeleton_drawable_get_animation_state_events(wrappee))
     }
 
-    public func render() -> RenderCommand {
-        return .init(spine_skeleton_drawable_render(wrappee))
-    }
-
     public func dispose() {
         if disposed { return }
         disposed = true
@@ -1828,18 +1824,6 @@ public final class RenderCommand: NSObject {
         super.init()
     }
 
-    public var positions: Float? {
-        return spine_render_command_get_positions(wrappee).flatMap { $0.pointee }
-    }
-
-    public var uvs: Float? {
-        return spine_render_command_get_uvs(wrappee).flatMap { $0.pointee }
-    }
-
-    public var colors: Int32? {
-        return spine_render_command_get_colors(wrappee).flatMap { $0.pointee }
-    }
-
     public var indices: [UInt16] {
         let num = Int(spine_render_command_get_num_indices(wrappee))
         let ptr = spine_render_command_get_indices(wrappee)
@@ -1859,7 +1843,6 @@ public final class RenderCommand: NSObject {
     public var next: RenderCommand {
         return .init(spine_render_command_get_next(wrappee))
     }
-
 }
 
 @objc(SpineSkeletonData)
@@ -2755,7 +2738,6 @@ public final class Animation: NSObject {
     public var duration: Float {
         return spine_animation_get_duration(wrappee)
     }
-
 }
 
 @objc(SpineSkeleton)
@@ -2779,7 +2761,7 @@ public final class Skeleton: NSObject {
     public var data: SkeletonData {
         return .init(spine_skeleton_get_data(wrappee))
     }
-
+    
     public var bones: [Bone] {
         let num = Int(spine_skeleton_get_num_bones(wrappee))
         let ptr = spine_skeleton_get_bones(wrappee)

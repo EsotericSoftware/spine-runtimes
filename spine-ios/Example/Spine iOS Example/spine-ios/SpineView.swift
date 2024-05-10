@@ -6,20 +6,27 @@
 //
 
 import SwiftUI
+import Spine
 
 public struct SpineView: UIViewControllerRepresentable {
     public typealias UIViewControllerType = SpineViewController
     
-    public let mesh: String
-    public let bundle: Bundle
+    private let atlasFile: String
+    private let skeletonFile: String
+    private let controller: SpineController
     
-    public init(mesh: String, bundle: Bundle = .main) {
-        self.mesh = mesh
-        self.bundle = bundle
+    public init(atlasFile: String, skeletonFile: String, controller: SpineController) {
+        self.atlasFile = atlasFile
+        self.skeletonFile = skeletonFile
+        self.controller = controller
     }
     
     public func makeUIViewController(context: Context) -> SpineViewController {
-        return SpineViewController(mesh: mesh, bundle: bundle)
+        return SpineViewController(
+            atlasFile: atlasFile,
+            skeletonFile: skeletonFile,
+            controller: controller
+        )
     }
     
     public func updateUIViewController(_ uiViewController: SpineViewController, context: Context) {
