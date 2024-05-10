@@ -52,7 +52,7 @@ cpus=2
 if [ "$OSTYPE" == "msys" ]; then
 	os="windows"
 	cpus=$NUMBER_OF_PROCESSORS
-	target="$target vsproj=yes livepp=$LIVEPP"
+	target="$target"
 	godot_exe="godot.windows.editor$dev_extension.x86_64$mono_extension.exe"
 	godot_exe_host=$godot_exe
 elif [[ "$OSTYPE" == "darwin"* ]]; then
