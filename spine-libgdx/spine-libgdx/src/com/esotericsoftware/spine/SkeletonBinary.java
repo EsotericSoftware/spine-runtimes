@@ -224,15 +224,7 @@ public class SkeletonBinary extends SkeletonLoader {
 			// Slots.
 			Object[] slots = skeletonData.slots.setSize(n = input.readInt(true));
 			for (int i = 0; i < n; i++) {
-				String slotName = input.readString(), path = null;
-				if (nonessential) {
-					int slash = slotName.lastIndexOf('/');
-					if (slash != -1) {
-						path = slotName.substring(0, slash);
-						slotName = slotName.substring(slash + 1);
-					}
-				}
-
+				String slotName = input.readString();
 				BoneData boneData = (BoneData)bones[input.readInt(true)];
 				SlotData data = new SlotData(i, slotName, boneData);
 				Color.rgba8888ToColor(data.color, input.readInt());
@@ -242,10 +234,7 @@ public class SkeletonBinary extends SkeletonLoader {
 
 				data.attachmentName = input.readStringRef();
 				data.blendMode = BlendMode.values[input.readInt(true)];
-				if (nonessential) {
-					data.visible = input.readBoolean();
-					data.path = path;
-				}
+				if (nonessential) data.visible = input.readBoolean();
 				slots[i] = data;
 			}
 
