@@ -62,6 +62,8 @@ USpineSkeletonRendererComponent::USpineSkeletonRendererComponent(const FObjectIn
 	TextureParameterName = FName(TEXT("SpriteTexture"));
 
 	worldVertices.ensureCapacity(1024 * 2);
+
+	SetTickGroup(TG_EndPhysics);
 }
 
 void USpineSkeletonRendererComponent::FinishDestroy() {
