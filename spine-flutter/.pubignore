@@ -1,3 +1,4 @@
 !src/spine-cpp
+!src/spine-cpp-lite
 !ios/Classes/spine-cpp
 !macos/Classes/spine-cpp
