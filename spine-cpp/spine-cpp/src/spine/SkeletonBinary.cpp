@@ -176,14 +176,6 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 	skeletonData->_slots.setSize(slotsCount, 0);
 	for (int i = 0; i < slotsCount; ++i) {
 		String slotName = String(readString(input), true);
-		String pathName = "";
-		if (nonessential) {
-			int slash = slotName.lastIndexOf('/');
-			if (slash != -1) {
-				pathName = slotName.substring(0, slash);
-				slotName = slotName.substring(slash + 1);
-			}
-		}
 		BoneData *boneData = skeletonData->_bones[readVarint(input, true)];
 		SlotData *slotData = new (__FILE__, __LINE__) SlotData(i, slotName, *boneData);
 
@@ -200,7 +192,6 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 		slotData->_blendMode = static_cast<BlendMode>(readVarint(input, true));
 		if (nonessential) {
 			slotData->_visible = readBoolean(input);
-			slotData->_path = pathName;
 		}
 		skeletonData->_slots[i] = slotData;
 	}

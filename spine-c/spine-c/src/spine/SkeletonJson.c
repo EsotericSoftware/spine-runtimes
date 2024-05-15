@@ -1041,34 +1041,6 @@ static int string_starts_with(const char *str, const char *needle) {
 	return -1;
 }
 
-static int string_lastIndexOf(const char *str, char needle) {
-	if (!str) return -1;
-	int lastIndex = -1;
-	for (int i = 0; str[i] != '\0'; i++) {
-		if (str[i] == needle) {
-			lastIndex = i;
-		}
-	}
-	return lastIndex;
-}
-
-static char *string_substring(const char *str, int start, int end) {
-	if (str == NULL || start > end || start < 0) {
-		return NULL;
-	}
-
-	int len = end - start;
-	char *substr = MALLOC(char, len + 1);
-	if (substr == NULL) {
-		return NULL;
-	}
-
-	strncpy(substr, str + start, len);
-	substr[len] = '\0';
-
-	return substr;
-}
-
 spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char *json) {
 	int i, ii;
 	spSkeletonData *skeletonData;
@@ -1192,13 +1164,7 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 				return NULL;
 			}
 
-			char *pathName = NULL;
 			char *slotName = (char *) Json_getString(slotMap, "name", NULL);
-			int slash = string_lastIndexOf(slotName, '/');
-			if (slash != -1) {
-				pathName = string_substring(slotName, 0, slash);
-				slotName = string_substring(slotName, slash + 1, strlen(slotName));
-			}
 			data = spSlotData_create(i, slotName, boneData);
 
 			color = Json_getString(slotMap, "color", 0);
@@ -1234,7 +1200,6 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 			}
 
 			data->visible = Json_getInt(slotMap, "visible", -1);
-			data->path = pathName;
 			skeletonData->slots[i] = data;
 			skeletonData->slotsCount++;
 		}
