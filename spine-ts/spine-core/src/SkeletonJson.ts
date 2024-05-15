@@ -116,13 +116,8 @@ export class SkeletonJson {
 		if (root.slots) {
 			for (let i = 0; i < root.slots.length; i++) {
 				let slotMap = root.slots[i];
-				let path: string | null = null;
 				let slotName = slotMap.name;
-				const slash = slotName.lastIndexOf('/');
-				if (slash != -1) {
-					path = slotName.substring(0, slash);
-					slotName = slotName.substring(slash + 1);
-				}
+
 				let boneData = skeletonData.findBone(slotMap.bone);
 				if (!boneData) throw new Error(`Couldn't find bone ${slotMap.bone} for slot ${slotName}`);
 				let data = new SlotData(skeletonData.slots.length, slotName, boneData);
@@ -136,7 +131,6 @@ export class SkeletonJson {
 				data.attachmentName = getValue(slotMap, "attachment", null);
 				data.blendMode = Utils.enumValue(BlendMode, getValue(slotMap, "blend", "normal"));
 				data.visible = getValue(slotMap, "visible", true);
-				data.path = path;
 				skeletonData.slots.push(data);
 			}
 		}
