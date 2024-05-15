@@ -150,11 +150,6 @@ class SkeletonJson {
 		for (slotMap in cast(Reflect.getProperty(root, "slots"), Array<Dynamic>)) {
 			var path:String = null;
 			var slotName:String = Reflect.getProperty(slotMap, "name");
-			var slash:Int = slotName.lastIndexOf('/');
-			if (slash != -1) {
-				path = slotName.substring(0, slash);
-				slotName = slotName.substring(slash + 1);
-			}
 
 			var boneName:String = Reflect.getProperty(slotMap, "bone");
 			boneData = skeletonData.findBone(boneName);
@@ -176,7 +171,6 @@ class SkeletonJson {
 			slotData.attachmentName = Reflect.getProperty(slotMap, "attachment");
 			slotData.blendMode = Reflect.hasField(slotMap, "blend") ? BlendMode.fromName(Reflect.getProperty(slotMap, "blend")) : BlendMode.normal;
 			slotData.visible = getValue(slotMap, "visible", true);
-			slotData.path = path;
 			skeletonData.slots.push(slotData);
 		}
 
