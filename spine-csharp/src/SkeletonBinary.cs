@@ -193,14 +193,7 @@ namespace Spine {
 			// Slots.
 			SlotData[] slots = skeletonData.slots.Resize(n = input.ReadInt(true)).Items;
 			for (int i = 0; i < n; i++) {
-				String slotName = input.ReadString(); //, path = null;
-				if (nonessential) {
-					int slash = slotName.LastIndexOf('/');
-					if (slash != -1) {
-						//path = slotName.Substring(0, slash);
-						slotName = slotName.Substring(slash + 1);
-					}
-				}
+				String slotName = input.ReadString();
 
 				BoneData boneData = bones[input.ReadInt(true)];
 				SlotData slotData = new SlotData(i, slotName, boneData);
