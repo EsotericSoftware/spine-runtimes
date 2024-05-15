@@ -724,6 +724,7 @@ SPINE_CPP_LITE_EXPORT int32_t spine_skin_get_num_bones(spine_skin skin);
 SPINE_CPP_LITE_EXPORT spine_bone_data *spine_skin_get_bones(spine_skin skin);
 SPINE_CPP_LITE_EXPORT int32_t spine_skin_get_num_constraints(spine_skin skin);
 SPINE_CPP_LITE_EXPORT spine_constraint_data *spine_skin_get_constraints(spine_skin skin);
+// @ignore
 SPINE_CPP_LITE_EXPORT spine_skin spine_skin_create(const utf8 *name);
 SPINE_CPP_LITE_EXPORT void spine_skin_dispose(spine_skin skin);
 

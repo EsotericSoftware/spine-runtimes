@@ -8,3 +8,4 @@
 - Load `Atlas` & `SkeletonData` (#4)
 - Generate Swift classes from `spine-cpp-lite.h` (#5)
 - Draw `SkeletonData` render commands (#6)
+- Add `BoundsProvider` (#7)

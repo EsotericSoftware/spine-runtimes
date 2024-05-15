@@ -8,7 +8,8 @@
 typedef enum AAPLVertexInputIndex
 {
     AAPLVertexInputIndexVertices     = 0,
-    AAPLVertexInputIndexViewportSize = 1,
+    AAPLVertexInputIndexTransform    = 1,
+    AAPLVertexInputIndexViewportSize = 2,
 } AAPLVertexInputIndex;
 
 // Texture index values shared between shader and C code to ensure Metal shader buffer inputs match
@@ -28,5 +29,11 @@ typedef struct
     vector_float4 color;
     vector_float2 uv;
 } AAPLVertex;
+
+typedef struct {
+    vector_float2 translation;
+    vector_float2 scale;
+    vector_float2 offset;
+} AAPLTransform;
 
 #endif /* SpineSharedStructs_h */

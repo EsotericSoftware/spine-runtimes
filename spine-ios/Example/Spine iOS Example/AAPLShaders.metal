@@ -18,7 +18,8 @@ using namespace metal;
 typedef enum AAPLVertexInputIndex
 {
     AAPLVertexInputIndexVertices     = 0,
-    AAPLVertexInputIndexViewportSize = 1,
+    AAPLVertexInputIndexTransform    = 1,
+    AAPLVertexInputIndexViewportSize = 2,
 } AAPLVertexInputIndex;
 
 // Texture index values shared between shader and C code to ensure Metal shader buffer inputs match
@@ -38,6 +39,12 @@ typedef struct
     vector_float4 color;
     vector_float2 uv;
 } AAPLVertex;
+
+typedef struct {
+    vector_float2 translation;
+    vector_float2 scale;
+    vector_float2 offset;
+} AAPLTransform;
 
 // Vertex shader outputs and fragment shader inputs
 struct RasterizerData
@@ -59,6 +66,7 @@ struct RasterizerData
 vertex RasterizerData
 vertexShader(uint vertexID [[vertex_id]],
              constant AAPLVertex *vertices [[buffer(AAPLVertexInputIndexVertices)]],
+             constant AAPLTransform *transform [[buffer(AAPLVertexInputIndexTransform)]],
              constant vector_uint2 *viewportSizePointer [[buffer(AAPLVertexInputIndexViewportSize)]])
 {
     RasterizerData out;
@@ -71,10 +79,12 @@ vertexShader(uint vertexID [[vertex_id]],
     // Get the viewport size and cast to float.
     vector_float2 viewportSize = vector_float2(*viewportSizePointer);
     
-    // To convert from positions in pixel space to positions in clip-space,
-    //  divide the pixel coordinates by half the size of the viewport.
     out.position = vector_float4(0.0, 0.0, 0.0, 1.0);
-    out.position.xy = pixelSpacePosition / (viewportSize / 2.0) * 8; // TODO: Scaling
+    
+    out.position.xy = pixelSpacePosition;
+    out.position.xy *= transform->scale;
+    out.position.xy += transform->translation * transform->scale + transform->offset;
+    out.position.xy /= viewportSize / 2;
     out.position.y *= -1;
     
     // Pass the input color directly to the rasterizer.

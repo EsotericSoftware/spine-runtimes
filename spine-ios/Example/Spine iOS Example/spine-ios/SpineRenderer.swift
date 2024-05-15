@@ -17,31 +17,43 @@ protocol SpineRendererDelegate: AnyObject {
 
 protocol SpineRendererDataSource: AnyObject {
     func isPlaying(_ spineRenderer: SpineRenderer) -> Bool
+    func skeletonDrawable(_ spineRenderer: SpineRenderer) -> SkeletonDrawableWrapper
     func renderCommands(_ spineRenderer: SpineRenderer) -> [RenderCommand]
 }
 
 final class SpineRenderer: NSObject, MTKViewDelegate {
+    private let contentMode: Spine.ContentMode
+    private let alignment: Spine.Alignment
+    private let boundsProvider: BoundsProvider
+    private let device: MTLDevice
+    private let textures: [MTLTexture]
+    private let pipelineState: MTLRenderPipelineState
+    private let commandQueue: MTLCommandQueue
     
-    let device: MTLDevice
-    let textures: [MTLTexture]
-    let pipelineState: MTLRenderPipelineState
-    let commandQueue: MTLCommandQueue
-    
-    var viewPortSize = vector_uint2(0, 0)
-    
+    private var size: CGSize = .zero
+    private var viewPortSize = vector_uint2(0, 0)
+    private var transform = AAPLTransform(
+        translation: vector_float2(0, 0),
+        scale: vector_float2(1, 1),
+        offset: vector_float2(0, 0)
+    )
     private var lastDraw: CFTimeInterval = 0
     
     weak var dataSource: SpineRendererDataSource?
     weak var delegate: SpineRendererDelegate?
     
-    init(mtkView: MTKView, atlasPages: [CGImage]) throws {
-        
+    init(
+        mtkView: MTKView,
+        atlasPages: [CGImage],
+        contentMode: Spine.ContentMode,
+        alignment: Spine.Alignment,
+        boundsProvider: BoundsProvider
+    ) throws {
         let device = mtkView.device!
         self.device = device
         
         let defaultLibrary = device.makeDefaultLibrary()
         let textureLoader = MTKTextureLoader(device: device)
-        
         textures = try atlasPages.map {
             try textureLoader.newTexture(
                 cgImage: $0,
@@ -51,6 +63,9 @@ final class SpineRenderer: NSObject, MTKViewDelegate {
                 ]
             )
         }
+        self.contentMode = contentMode
+        self.alignment = alignment
+        self.boundsProvider = boundsProvider
         
         let pipelineStateDescriptor = MTLRenderPipelineDescriptor()
         pipelineStateDescriptor.vertexFunction = defaultLibrary?.makeFunction(name: "vertexShader")
@@ -60,17 +75,25 @@ final class SpineRenderer: NSObject, MTKViewDelegate {
             blendMode: SPINE_BLEND_MODE_NORMAL, // TODO: renderCommand.blendMode ?,
             with: true // TODO Use renderCommand.premultipliedAlpha ?
         )
-        
         pipelineState = try device.makeRenderPipelineState(descriptor: pipelineStateDescriptor)
         commandQueue = device.makeCommandQueue()!
     }
     
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
+        self.size = size
         viewPortSize = vector_uint2(UInt32(size.width), UInt32(size.height))
+        if let drawable = dataSource?.skeletonDrawable(self) {
+            setTransform(
+                bounds: boundsProvider.computeBounds(for: drawable),
+                contentMode: contentMode,
+                alignment: alignment
+            )
+        }
     }
     
     func draw(in view: MTKView) {
         guard dataSource?.isPlaying(self) ?? false else {
+            lastDraw = CACurrentMediaTime()
             return
         }
         
@@ -98,6 +121,33 @@ final class SpineRenderer: NSObject, MTKViewDelegate {
             commandBuffer.present($0)
         }
         commandBuffer.commit()
+    }
+    
+    private func setTransform(bounds: CGRect, contentMode: Spine.ContentMode, alignment: Spine.Alignment) {
+        let x = -bounds.minX - bounds.width / 2.0
+        let y = -bounds.minY - bounds.height / 2.0
+        
+        var scaleX: CGFloat = 1.0
+        var scaleY: CGFloat = 1.0
+        
+        switch contentMode {
+        case .fit:
+            scaleX = min(size.width / bounds.width, size.height / bounds.height)
+            scaleY = scaleX
+        case .fill:
+            scaleX = max(size.width / bounds.width, size.height / bounds.height)
+            scaleY = scaleX
+        }
+        
+        let offset = CGPoint.zero
+        let offsetX = (size.width - bounds.width * scaleY) / 2 * alignment.x
+        let offsetY = (size.height - bounds.height * scaleY) / 2 * alignment.y
+        
+        transform = AAPLTransform(
+            translation: vector_float2(Float(x), Float(y)),
+            scale: vector_float2(Float(scaleX), Float(scaleY)),
+            offset: vector_float2(Float(offsetX), Float(offsetY))
+        )
     }
     
     private func callNeedsUpdate() {
@@ -139,6 +189,11 @@ final class SpineRenderer: NSObject, MTKViewDelegate {
             vertexBuffer,
             offset: 0,
             index: Int(AAPLVertexInputIndexVertices.rawValue)
+        )
+        renderEncoder.setVertexBytes(
+            &transform,
+            length: MemoryLayout.size(ofValue: transform),
+            index: Int(AAPLVertexInputIndexTransform.rawValue)
         )
         renderEncoder.setVertexBytes(
             &viewPortSize,

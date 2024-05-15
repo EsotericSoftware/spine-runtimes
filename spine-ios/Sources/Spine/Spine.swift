@@ -2,19 +2,16 @@ import SpineWrapper
 import SwiftUI
 import Foundation
 
-public class Spine {
-    
-    public static var version: String {
-        return "\(majorVersion).\(minorVersion)"
-    }
-    
-    public static var majorVersion: Int32 {
-        return spine_major_version()
-    }
-    
-    public static var minorVersion: Int32 {
-        return spine_minor_version()
-    }
+public var version: String {
+    return "\(majorVersion).\(minorVersion)"
+}
+
+public var majorVersion: Int {
+    return Int(spine_major_version())
+}
+
+public var minorVersion: Int {
+    return Int(spine_minor_version())
 }
 
 /// Atlas data loaded from a `.atlas` file and its corresponding `.png` files. For each atlas image,
@@ -205,6 +202,8 @@ public final class SkeletonDrawableWrapper {
             throw "Could not load native animation state"
         }
         animationState = AnimationState(nativeAnimationState)
+        
+        skeleton.updateWorldTransform(physics: SPINE_PHYSICS_NONE)
     }
     
     /// Updates the [AnimationState] using the [delta] time given in seconds, applies the
@@ -276,7 +275,26 @@ public extension RenderCommand {
     }
 }
 
+public extension Skin {
+    public static func create(name: String) -> Skin {
+        return Skin(spine_skin_create(name))
+    }
+}
+
+
+
 // Helper
+
+extension CGRect {
+    init(bounds: Bounds) {
+        self = CGRect(
+            x: CGFloat(bounds.x),
+            y: CGFloat(bounds.y),
+            width: CGFloat(bounds.width),
+            height: CGFloat(bounds.height)
+        )
+    }
+}
 
 extension Bundle {
     func loadFileUrl(fileName: String) throws -> URL {

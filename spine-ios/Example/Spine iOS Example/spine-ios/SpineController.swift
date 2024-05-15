@@ -56,7 +56,7 @@ public final class SpineController: ObservableObject {
         isPlaying = true
     }
     
-    internal func initialize(atlasFile: String, skeletonFile: String) async throws {
+    internal func load(atlasFile: String, skeletonFile: String) async throws {
         let atlasAndPages = try await Atlas.fromAsset(atlasFile)
         try await MainActor.run {
             let skeletonData = try SkeletonData.fromAsset(
@@ -69,9 +69,11 @@ public final class SpineController: ObservableObject {
                 skeletonData: skeletonData
             )
             self.drawable = skeletonDrawableWrapper
-            
-            onInitialized(self)
         }
+    }
+    
+    internal func initialize() {
+        onInitialized(self)
     }
 }
 
@@ -85,6 +87,10 @@ extension SpineController: SpineRendererDataSource {
     
     func isPlaying(_ spineRenderer: SpineRenderer) -> Bool {
         return isPlaying
+    }
+    
+    func skeletonDrawable(_ spineRenderer: SpineRenderer) -> SkeletonDrawableWrapper {
+        return drawable
     }
     
     func renderCommands(_ spineRenderer: SpineRenderer) -> [RenderCommand] {

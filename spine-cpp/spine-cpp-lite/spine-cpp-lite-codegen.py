@@ -398,6 +398,9 @@ class SwiftFunctionWriter:
       if not self.spine_function.return_type == "void":
         function_string += f" -> {swift_return_type}"
 
+      if "find_" in function_name:
+         function_string += "?"
+
       return function_string
 
 class SwiftObjectWriter:

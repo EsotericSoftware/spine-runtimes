@@ -16,8 +16,6 @@ struct SimpleAnimation: View {
     init() {
         _controller = StateObject(
             wrappedValue: SpineController { controller in
-                controller.skeleton.scaleX = 0.2
-                controller.skeleton.scaleY = 0.2
                 _ = controller.animationState.setAnimationByName(
                     trackIndex: 0,
                     animationName: "walk",
@@ -31,7 +29,9 @@ struct SimpleAnimation: View {
         SpineView(
             atlasFile: "spineboy.atlas",
             skeletonFile: "spineboy-pro.skel",
-            controller: controller
+            controller: controller,
+            contentMode: .fit,
+            alignment: .center
         )
         .navigationTitle("Simple Animation")
         .navigationBarTitleDisplayMode(.inline)

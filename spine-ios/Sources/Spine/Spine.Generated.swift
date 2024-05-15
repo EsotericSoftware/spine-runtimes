@@ -1843,6 +1843,7 @@ public final class RenderCommand: NSObject {
     public var next: RenderCommand {
         return .init(spine_render_command_get_next(wrappee))
     }
+
 }
 
 @objc(SpineSkeletonData)
@@ -1997,39 +1998,39 @@ public final class SkeletonData: NSObject {
         }
     }
 
-    public func findBone(name: String?) -> BoneData {
+    public func findBone(name: String?) -> BoneData? {
         return .init(spine_skeleton_data_find_bone(wrappee, name))
     }
 
-    public func findSlot(name: String?) -> SlotData {
+    public func findSlot(name: String?) -> SlotData? {
         return .init(spine_skeleton_data_find_slot(wrappee, name))
     }
 
-    public func findSkin(name: String?) -> Skin {
+    public func findSkin(name: String?) -> Skin? {
         return .init(spine_skeleton_data_find_skin(wrappee, name))
     }
 
-    public func findEvent(name: String?) -> EventData {
+    public func findEvent(name: String?) -> EventData? {
         return .init(spine_skeleton_data_find_event(wrappee, name))
     }
 
-    public func findAnimation(name: String?) -> Animation {
+    public func findAnimation(name: String?) -> Animation? {
         return .init(spine_skeleton_data_find_animation(wrappee, name))
     }
 
-    public func findIkConstraint(name: String?) -> IkConstraintData {
+    public func findIkConstraint(name: String?) -> IkConstraintData? {
         return .init(spine_skeleton_data_find_ik_constraint(wrappee, name))
     }
 
-    public func findTransformConstraint(name: String?) -> TransformConstraintData {
+    public func findTransformConstraint(name: String?) -> TransformConstraintData? {
         return .init(spine_skeleton_data_find_transform_constraint(wrappee, name))
     }
 
-    public func findPathConstraint(name: String?) -> PathConstraintData {
+    public func findPathConstraint(name: String?) -> PathConstraintData? {
         return .init(spine_skeleton_data_find_path_constraint(wrappee, name))
     }
 
-    public func findPhysicsConstraint(name: String?) -> PhysicsConstraintData {
+    public func findPhysicsConstraint(name: String?) -> PhysicsConstraintData? {
         return .init(spine_skeleton_data_find_physics_constraint(wrappee, name))
     }
 
@@ -2738,6 +2739,7 @@ public final class Animation: NSObject {
     public var duration: Float {
         return spine_animation_get_duration(wrappee)
     }
+
 }
 
 @objc(SpineSkeleton)
@@ -2761,7 +2763,7 @@ public final class Skeleton: NSObject {
     public var data: SkeletonData {
         return .init(spine_skeleton_get_data(wrappee))
     }
-    
+
     public var bones: [Bone] {
         let num = Int(spine_skeleton_get_num_bones(wrappee))
         let ptr = spine_skeleton_get_bones(wrappee)
@@ -2822,12 +2824,13 @@ public final class Skeleton: NSObject {
         return .init(spine_skeleton_get_color(wrappee))
     }
 
-    public var skin: Skin {
+    // TODO: This is manually overwritten as it crashes when it's null
+    public var skin: Skin? {
         get {
-            return .init(spine_skeleton_get_skin(wrappee))
+            return spine_skeleton_get_skin(wrappee).flatMap { .init($0) }
         }
         set {
-            spine_skeleton_set_skin(wrappee, newValue.wrappee)
+            spine_skeleton_set_skin(wrappee, newValue?.wrappee)
         }
     }
 
@@ -2900,11 +2903,11 @@ public final class Skeleton: NSObject {
         spine_skeleton_set_slots_to_setup_pose(wrappee)
     }
 
-    public func findBone(boneName: String?) -> Bone {
+    public func findBone(boneName: String?) -> Bone? {
         return .init(spine_skeleton_find_bone(wrappee, boneName))
     }
 
-    public func findSlot(slotName: String?) -> Slot {
+    public func findSlot(slotName: String?) -> Slot? {
         return .init(spine_skeleton_find_slot(wrappee, slotName))
     }
 
@@ -2920,19 +2923,19 @@ public final class Skeleton: NSObject {
         spine_skeleton_set_attachment(wrappee, slotName, attachmentName)
     }
 
-    public func findIkConstraint(constraintName: String?) -> IkConstraint {
+    public func findIkConstraint(constraintName: String?) -> IkConstraint? {
         return .init(spine_skeleton_find_ik_constraint(wrappee, constraintName))
     }
 
-    public func findTransformConstraint(constraintName: String?) -> TransformConstraint {
+    public func findTransformConstraint(constraintName: String?) -> TransformConstraint? {
         return .init(spine_skeleton_find_transform_constraint(wrappee, constraintName))
     }
 
-    public func findPathConstraint(constraintName: String?) -> PathConstraint {
+    public func findPathConstraint(constraintName: String?) -> PathConstraint? {
         return .init(spine_skeleton_find_path_constraint(wrappee, constraintName))
     }
 
-    public func findPhysicsConstraint(constraintName: String?) -> PhysicsConstraint {
+    public func findPhysicsConstraint(constraintName: String?) -> PhysicsConstraint? {
         return .init(spine_skeleton_find_physics_constraint(wrappee, constraintName))
     }
 
@@ -3619,10 +3622,6 @@ public final class Skin: NSObject {
 
     public func copySkin(other: Skin) {
         spine_skin_copy_skin(wrappee, other.wrappee)
-    }
-
-    public func create(name: String?) -> Skin {
-        return .init(spine_skin_create(name))
     }
 
     public func dispose() {

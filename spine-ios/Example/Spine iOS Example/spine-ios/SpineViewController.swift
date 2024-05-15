@@ -21,10 +21,26 @@ public final class SpineViewController: UIViewController {
     private let skeletonFile: String
     private let controller: SpineController
     
-    public init(atlasFile: String, skeletonFile: String, controller: SpineController) {
+    private let contentMode: Spine.ContentMode
+    private let alignment: Spine.Alignment
+    private let boundsProvider: BoundsProvider
+    
+    public init(
+        atlasFile: String,
+        skeletonFile: String,
+        controller: SpineController,
+        contentMode: Spine.ContentMode? = nil,
+        alignment: Spine.Alignment? = nil,
+        boundsProvider: BoundsProvider? = nil
+    ) {
         self.atlasFile = atlasFile
         self.skeletonFile = skeletonFile
         self.controller = controller
+        
+        self.contentMode = contentMode ?? .fit
+        self.alignment = alignment ?? .center
+        self.boundsProvider = boundsProvider ?? SetupPoseBounds()
+        
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -47,7 +63,7 @@ public final class SpineViewController: UIViewController {
     
     private func load() {
         Task.detached(priority: .high) {
-            try await self.controller.initialize(
+            try await self.controller.load(
                 atlasFile: self.atlasFile,
                 skeletonFile: self.skeletonFile
             )
@@ -55,16 +71,24 @@ public final class SpineViewController: UIViewController {
                 self.initRenderer(
                     atlasPages: self.controller.drawable.atlasPages
                 )
+                self.controller.initialize()
             }
         }
     }
     
     private func initRenderer(atlasPages: [CGImage]) {
         do {
-            renderer = try SpineRenderer(mtkView: mtkView, atlasPages: atlasPages)
-            renderer?.mtkView(mtkView, drawableSizeWillChange: mtkView.drawableSize)
+            renderer = try SpineRenderer(
+                mtkView: mtkView,
+                atlasPages: atlasPages,
+                contentMode: contentMode,
+                alignment: alignment,
+                boundsProvider: boundsProvider
+            )
             renderer?.delegate = controller
             renderer?.dataSource = controller
+            
+            renderer?.mtkView(mtkView, drawableSizeWillChange: mtkView.drawableSize)
             
             mtkView.delegate = renderer
         } catch {
