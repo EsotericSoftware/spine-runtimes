@@ -4,7 +4,7 @@ public class SpineUEEditorTarget : TargetRules
 {
 	public SpineUEEditorTarget(TargetInfo target) : base(target)
 	{
-		DefaultBuildSettings = BuildSettingsVersion.V2;
+		DefaultBuildSettings = BuildSettingsVersion.Latest;
 		Type = TargetType.Editor;
 		ExtraModuleNames.AddRange(new string[] { "SpineUE" });
 	}

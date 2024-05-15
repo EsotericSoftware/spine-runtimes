@@ -1,3 +1,6 @@
+# 4.2.25
+- Switch to spine-cpp-lite
+
 # 4.2.24
 - Support static linking of native library, see https://github.com/EsotericSoftware/spine-runtimes/issues/2438
 
