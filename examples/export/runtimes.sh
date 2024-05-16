@@ -54,29 +54,6 @@ rm -f "$ROOT/spine-libgdx/spine-libgdx-tests/assets/cloud-pot/"*
 mkdir -p "$ROOT/spine-libgdx/spine-libgdx-tests/assets/cloud-pot/"
 cp -f ../cloud-pot/export/* "$ROOT/spine-libgdx/spine-libgdx-tests/assets/cloud-pot/"
 
-echo "spine-cocos2d-objc"
-rm "$ROOT/spine-cocos2d-objc/Resources/"*
-
-cp -f ../coin/export/coin-pro.json "$ROOT/spine-cocos2d-objc/Resources/"
-cp -f ../coin/export/coin.atlas "$ROOT/spine-cocos2d-objc/Resources/"
-cp -f ../coin/export/coin.png "$ROOT/spine-cocos2d-objc/Resources/"
-
-cp -f ../goblins/export/goblins-pro.json "$ROOT/spine-cocos2d-objc/Resources/"
-cp -f ../goblins/export/goblins.atlas "$ROOT/spine-cocos2d-objc/Resources/"
-cp -f ../goblins/export/goblins.png "$ROOT/spine-cocos2d-objc/Resources/"
-
-cp -f ../raptor/export/raptor-pro.json "$ROOT/spine-cocos2d-objc/Resources/"
-cp -f ../raptor/export/raptor.atlas "$ROOT/spine-cocos2d-objc/Resources/"
-cp -f ../raptor/export/raptor.png "$ROOT/spine-cocos2d-objc/Resources/"
-
-cp -f ../spineboy/export/spineboy-pro.json "$ROOT/spine-cocos2d-objc/Resources/"
-cp -f ../spineboy/export/spineboy.atlas "$ROOT/spine-cocos2d-objc/Resources/"
-cp -f ../spineboy/export/spineboy.png "$ROOT/spine-cocos2d-objc/Resources/"
-
-cp -f ../tank/export/tank-pro.json "$ROOT/spine-cocos2d-objc/Resources/"
-cp -f ../tank/export/tank.atlas "$ROOT/spine-cocos2d-objc/Resources/"
-cp -f ../tank/export/tank.png "$ROOT/spine-cocos2d-objc/Resources/"
-
 echo "spine-cocos2dx"
 rm -rf "$ROOT/spine-cocos2dx/example/Resources/common/"*
 
