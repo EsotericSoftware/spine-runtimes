@@ -241,13 +241,7 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 				return NULL;
 			}
 
-			String pathName = "";
 			String slotName = String(Json::getString(slotMap, "name", 0));
-			int slash = slotName.lastIndexOf('/');
-			if (slash != -1) {
-				pathName = slotName.substring(0, slash);
-				slotName = slotName.substring(slash + 1);
-			}
 			data = new (__FILE__, __LINE__) SlotData(i, slotName, *boneData);
 
 			color = Json::getString(slotMap, "color", 0);
@@ -281,7 +275,6 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 					data->_blendMode = BlendMode_Screen;
 			}
 			data->_visible = Json::getBoolean(slotMap, "visible", true);
-			data->_path = pathName;
 			skeletonData->_slots[i] = data;
 		}
 	}

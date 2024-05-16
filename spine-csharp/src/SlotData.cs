@@ -42,7 +42,6 @@ namespace Spine {
 
 		// Nonessential.
 		// bool visible = true;
-		// string path;
 
 		/// <summary>The index of the slot in <see cref="Skeleton.Slots"/>.</summary>
 		public int Index { get { return index; } }

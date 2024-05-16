@@ -57,35 +57,6 @@ typedef struct {
 	_spLinkedMesh *linkedMeshes;
 } _spSkeletonBinary;
 
-static int string_lastIndexOf(const char *str, char needle) {
-	if (!str) return -1;
-	int lastIndex = -1;
-	for (int i = 0; str[i] != '\0'; i++) {
-		if (str[i] == needle) {
-			lastIndex = i;
-		}
-	}
-	return lastIndex;
-}
-
-static char *string_substring(const char *str, int start, int end) {
-	if (str == NULL || start > end || start < 0) {
-		return NULL;
-	}
-
-	int len = end - start;
-	char *substr = MALLOC(char, len + 1);
-	if (substr == NULL) {
-		return NULL;
-	}
-
-	strncpy(substr, str + start, len);
-	substr[len] = '\0';
-
-	return substr;
-}
-
-
 static int string_starts_with(const char *str, const char *needle) {
 	int lenStr, lenNeedle, i;
 	if (!str) return 0;
@@ -1437,14 +1408,6 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 	skeletonData->slots = MALLOC(spSlotData *, skeletonData->slotsCount);
 	for (i = 0; i < skeletonData->slotsCount; ++i) {
 		char *slotName = readString(input);
-		char *pathName = NULL;
-		if (nonessential) {
-			int slash = string_lastIndexOf(slotName, '/');
-			if (slash != -1) {
-				pathName = string_substring(slotName, 0, slash);
-				slotName = string_substring(slotName, slash + 1, strlen(slotName));
-			}
-		}
 		spBoneData *boneData = skeletonData->bones[readVarint(input, 1)];
 		spSlotData *slotData = spSlotData_create(i, slotName, boneData);
 		FREE(slotName);
@@ -1464,7 +1427,6 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 		slotData->blendMode = (spBlendMode) readVarint(input, 1);
 		if (nonessential) {
 			slotData->visible = readBoolean(input);
-			slotData->path = pathName;
 		}
 		skeletonData->slots[i] = slotData;
 	}
