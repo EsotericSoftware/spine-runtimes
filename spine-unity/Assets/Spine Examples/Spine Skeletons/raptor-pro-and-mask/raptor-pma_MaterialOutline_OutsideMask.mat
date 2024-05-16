@@ -7,13 +7,13 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: celestial-circus-pma_celestial-circus-pma_2
-  m_Shader: {fileID: 4800000, guid: 1e8a610c9e01c3648bac42585e5fc676, type: 3}
+  m_Name: raptor-pma_MaterialOutline_OutsideMask
+  m_Shader: {fileID: 4800000, guid: 28b5cf4804845fe4b868531fd0bb81d5, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
-  m_InvalidKeywords:
+  m_ValidKeywords:
   - _USE8NEIGHBOURHOOD_ON
+  m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -25,7 +25,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 8886530b53e6e0b49a44e30b265bbd87, type: 3}
+        m_Texture: {fileID: 2800000, guid: c1a5fbc2700be764fa3c6c44b2ed67a0, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
@@ -35,8 +35,8 @@ Material:
     - _OutlineOpaqueAlpha: 1
     - _OutlineReferenceTexWidth: 1024
     - _OutlineSmoothness: 1
-    - _OutlineWidth: 3
-    - _StencilComp: 8
+    - _OutlineWidth: 2.5
+    - _StencilComp: 5
     - _StencilRef: 1
     - _StraightAlphaInput: 0
     - _ThresholdEnd: 0.25
