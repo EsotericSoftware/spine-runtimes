@@ -23,14 +23,14 @@ class AnimationStateEvents extends StatelessWidget {
       controller.animationState.setListener((type, trackEntry, event) {
         if (type == EventType.event) {
           print(
-              "User event: { name: ${event?.getData().getName()}, intValue: ${event?.getIntValue()}, floatValue: intValue: ${event?.getFloatValue()}, stringValue: ${event?.getStringValue()} }");
+              "User event: { name: ${event?.getData().getName()}, intValue: ${event?.getIntValue()}, floatValue: ${event?.getFloatValue()}, stringValue: ${event?.getStringValue()} }");
         }
       });
       print("Current: ${controller.animationState.getCurrent(0)?.getAnimation().getName()}");
     });
 
     return Scaffold(
-        appBar: AppBar(title: const Text('Spineboy')),
+        appBar: AppBar(title: const Text('Animation State Listener')),
         body: Column(children: [
           const Text("See output in console!"),
           Expanded(child: SpineWidget.fromAsset("assets/spineboy.atlas", "assets/spineboy-pro.skel", controller))

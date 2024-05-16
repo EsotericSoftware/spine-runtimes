@@ -407,16 +407,22 @@ public final class AnimationStateEvents: NSObject {
         super.init()
     }
 
+    @discardableResult
     public func getEventType(index: Int32) -> EventType {
         return spine_animation_state_events_get_event_type(wrappee, index)
     }
 
+    @discardableResult
     public func getTrackEntry(index: Int32) -> TrackEntry {
         return .init(spine_animation_state_events_get_track_entry(wrappee, index))
     }
 
-    public func getEvent(index: Int32) -> Event {
-        return .init(spine_animation_state_events_get_event(wrappee, index))
+    // TODO: This is manually overwritten as it crashes when it's null
+    @discardableResult
+    public func getEvent(index: Int32) -> Event? {
+        return spine_animation_state_events_get_event(wrappee, index).flatMap {
+            .init($0)
+        }
     }
 
     public func reset() {
@@ -666,6 +672,7 @@ public final class AnimationStateData: NSObject {
         spine_animation_state_data_set_mix(wrappee, from.wrappee, to.wrappee, duration)
     }
 
+    @discardableResult
     public func getMix(from: Animation, to: Animation) -> Float {
         return spine_animation_state_data_get_mix(wrappee, from.wrappee, to.wrappee)
     }
@@ -674,6 +681,7 @@ public final class AnimationStateData: NSObject {
         spine_animation_state_data_set_mix_by_name(wrappee, fromName, toName, duration)
     }
 
+    @discardableResult
     public func getMixByName(fromName: String?, toName: String?) -> Float {
         return spine_animation_state_data_get_mix_by_name(wrappee, fromName, toName)
     }
@@ -1317,10 +1325,12 @@ public final class PointAttachment: NSObject {
         }
     }
 
+    @discardableResult
     public func computeWorldPosition(bone: Bone) -> Vector {
         return .init(spine_point_attachment_compute_world_position(wrappee, bone.wrappee))
     }
 
+    @discardableResult
     public func computeWorldRotation(bone: Bone) -> Float {
         return spine_point_attachment_compute_world_rotation(wrappee, bone.wrappee)
     }
@@ -1618,7 +1628,6 @@ public final class PathConstraint: NSObject {
 public final class AnimationState: NSObject {
 
     internal let wrappee: spine_animation_state
-    internal var disposed = false
 
     internal init(_ wrappee: spine_animation_state) {
         self.wrappee = wrappee
@@ -1654,38 +1663,39 @@ public final class AnimationState: NSObject {
         spine_animation_state_clear_track(wrappee, trackIndex)
     }
 
+    @discardableResult
     public func setAnimationByName(trackIndex: Int32, animationName: String?, loop: Bool) -> TrackEntry {
         return .init(spine_animation_state_set_animation_by_name(wrappee, trackIndex, animationName, loop ? -1 : 0))
     }
 
+    @discardableResult
     public func setAnimation(trackIndex: Int32, animation: Animation, loop: Bool) -> TrackEntry {
         return .init(spine_animation_state_set_animation(wrappee, trackIndex, animation.wrappee, loop ? -1 : 0))
     }
 
+    @discardableResult
     public func addAnimationByName(trackIndex: Int32, animationName: String?, loop: Bool, delay: Float) -> TrackEntry {
         return .init(spine_animation_state_add_animation_by_name(wrappee, trackIndex, animationName, loop ? -1 : 0, delay))
     }
 
+    @discardableResult
     public func addAnimation(trackIndex: Int32, animation: Animation, loop: Bool, delay: Float) -> TrackEntry {
         return .init(spine_animation_state_add_animation(wrappee, trackIndex, animation.wrappee, loop ? -1 : 0, delay))
     }
 
+    @discardableResult
     public func setEmptyAnimation(trackIndex: Int32, mixDuration: Float) -> TrackEntry {
         return .init(spine_animation_state_set_empty_animation(wrappee, trackIndex, mixDuration))
     }
 
+    @discardableResult
     public func addEmptyAnimation(trackIndex: Int32, mixDuration: Float, delay: Float) -> TrackEntry {
         return .init(spine_animation_state_add_empty_animation(wrappee, trackIndex, mixDuration, delay))
     }
 
+    @discardableResult
     public func getCurrent(trackIndex: Int32) -> TrackEntry {
         return .init(spine_animation_state_get_current(wrappee, trackIndex))
-    }
-
-    public func disposeTrackEntry(entry: TrackEntry) {
-        if disposed { return }
-        disposed = true
-        spine_animation_state_dispose_track_entry(wrappee, entry.wrappee)
     }
 
     public func setEmptyAnimations(mixDuration: Float) {
@@ -1998,38 +2008,47 @@ public final class SkeletonData: NSObject {
         }
     }
 
+    @discardableResult
     public func findBone(name: String?) -> BoneData? {
         return .init(spine_skeleton_data_find_bone(wrappee, name))
     }
 
+    @discardableResult
     public func findSlot(name: String?) -> SlotData? {
         return .init(spine_skeleton_data_find_slot(wrappee, name))
     }
 
+    @discardableResult
     public func findSkin(name: String?) -> Skin? {
         return .init(spine_skeleton_data_find_skin(wrappee, name))
     }
 
+    @discardableResult
     public func findEvent(name: String?) -> EventData? {
         return .init(spine_skeleton_data_find_event(wrappee, name))
     }
 
+    @discardableResult
     public func findAnimation(name: String?) -> Animation? {
         return .init(spine_skeleton_data_find_animation(wrappee, name))
     }
 
+    @discardableResult
     public func findIkConstraint(name: String?) -> IkConstraintData? {
         return .init(spine_skeleton_data_find_ik_constraint(wrappee, name))
     }
 
+    @discardableResult
     public func findTransformConstraint(name: String?) -> TransformConstraintData? {
         return .init(spine_skeleton_data_find_transform_constraint(wrappee, name))
     }
 
+    @discardableResult
     public func findPathConstraint(name: String?) -> PathConstraintData? {
         return .init(spine_skeleton_data_find_path_constraint(wrappee, name))
     }
 
+    @discardableResult
     public func findPhysicsConstraint(name: String?) -> PhysicsConstraintData? {
         return .init(spine_skeleton_data_find_physics_constraint(wrappee, name))
     }
@@ -2148,6 +2167,7 @@ public final class SkinEntries: NSObject {
         super.init()
     }
 
+    @discardableResult
     public func getEntry(index: Int32) -> SkinEntry {
         return .init(spine_skin_entries_get_entry(wrappee, index))
     }
@@ -2402,6 +2422,7 @@ public final class Attachment: NSObject {
         return spine_attachment_get_type(wrappee)
     }
 
+    @discardableResult
     public func copy() -> Attachment {
         return .init(spine_attachment_copy(wrappee))
     }
@@ -2903,18 +2924,22 @@ public final class Skeleton: NSObject {
         spine_skeleton_set_slots_to_setup_pose(wrappee)
     }
 
+    @discardableResult
     public func findBone(boneName: String?) -> Bone? {
         return .init(spine_skeleton_find_bone(wrappee, boneName))
     }
 
+    @discardableResult
     public func findSlot(slotName: String?) -> Slot? {
         return .init(spine_skeleton_find_slot(wrappee, slotName))
     }
 
+    @discardableResult
     public func getAttachmentByName(slotName: String?, attachmentName: String?) -> Attachment {
         return .init(spine_skeleton_get_attachment_by_name(wrappee, slotName, attachmentName))
     }
 
+    @discardableResult
     public func getAttachment(slotIndex: Int32, attachmentName: String?) -> Attachment {
         return .init(spine_skeleton_get_attachment(wrappee, slotIndex, attachmentName))
     }
@@ -2923,18 +2948,22 @@ public final class Skeleton: NSObject {
         spine_skeleton_set_attachment(wrappee, slotName, attachmentName)
     }
 
+    @discardableResult
     public func findIkConstraint(constraintName: String?) -> IkConstraint? {
         return .init(spine_skeleton_find_ik_constraint(wrappee, constraintName))
     }
 
+    @discardableResult
     public func findTransformConstraint(constraintName: String?) -> TransformConstraint? {
         return .init(spine_skeleton_find_transform_constraint(wrappee, constraintName))
     }
 
+    @discardableResult
     public func findPathConstraint(constraintName: String?) -> PathConstraint? {
         return .init(spine_skeleton_find_path_constraint(wrappee, constraintName))
     }
 
+    @discardableResult
     public func findPhysicsConstraint(constraintName: String?) -> PhysicsConstraint? {
         return .init(spine_skeleton_find_physics_constraint(wrappee, constraintName))
     }
@@ -3015,6 +3044,7 @@ public final class Sequence: NSObject {
         spine_sequence_apply(wrappee, slot.wrappee, attachment.wrappee)
     }
 
+    @discardableResult
     public func getPath(basePath: String?, index: Int32) -> String? {
         return spine_sequence_get_path(wrappee, basePath, index).flatMap { String(cString: $0) }
     }
@@ -3149,10 +3179,12 @@ public final class Atlas: NSObject {
         return spine_atlas_get_error(wrappee).flatMap { String(cString: $0) }
     }
 
+    @discardableResult
     public func load(atlasData: String?) -> Atlas {
         return .init(spine_atlas_load(atlasData))
     }
 
+    @discardableResult
     public func getImagePath(index: Int32) -> String? {
         return spine_atlas_get_image_path(wrappee, index).flatMap { String(cString: $0) }
     }
@@ -3473,26 +3505,32 @@ public final class Bone: NSObject {
         spine_bone_set_to_setup_pose(wrappee)
     }
 
+    @discardableResult
     public func worldToLocal(worldX: Float, worldY: Float) -> Vector {
         return .init(spine_bone_world_to_local(wrappee, worldX, worldY))
     }
 
+    @discardableResult
     public func worldToParent(worldX: Float, worldY: Float) -> Vector {
         return .init(spine_bone_world_to_parent(wrappee, worldX, worldY))
     }
 
+    @discardableResult
     public func localToWorld(localX: Float, localY: Float) -> Vector {
         return .init(spine_bone_local_to_world(wrappee, localX, localY))
     }
 
+    @discardableResult
     public func parentToWorld(localX: Float, localY: Float) -> Vector {
         return .init(spine_bone_parent_to_world(wrappee, localX, localY))
     }
 
+    @discardableResult
     public func worldToLocalRotation(worldRotation: Float) -> Float {
         return spine_bone_world_to_local_rotation(wrappee, worldRotation)
     }
 
+    @discardableResult
     public func localToWorldRotation(localRotation: Float) -> Float {
         return spine_bone_local_to_world_rotation(wrappee, localRotation)
     }
@@ -3563,6 +3601,7 @@ public final class Slot: NSObject {
         spine_slot_set_dark_color(wrappee, r, g, b, a)
     }
 
+    @discardableResult
     public func hasDarkColor() -> Bool {
         return spine_slot_has_dark_color(wrappee) != 0
     }
@@ -3608,6 +3647,7 @@ public final class Skin: NSObject {
         spine_skin_set_attachment(wrappee, slotIndex, name, attachment.wrappee)
     }
 
+    @discardableResult
     public func getAttachment(slotIndex: Int32, name: String?) -> Attachment {
         return .init(spine_skin_get_attachment(wrappee, slotIndex, name))
     }

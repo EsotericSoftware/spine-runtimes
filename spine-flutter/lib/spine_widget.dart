@@ -657,7 +657,7 @@ class _SpineRenderObject extends RenderBox {
       ..translate(offsetX, offsetY)
       ..scale(scaleX, scaleY)
       ..translate(x, y);
-    _controller._setCoordinateTransform(x + offsetX / scaleY, y + offsetY / scaleY, scaleX, scaleY);
+    _controller._setCoordinateTransform(x + offsetX / scaleX, y + offsetY / scaleY, scaleX, scaleY);
   }
 
   @override

@@ -45,4 +45,4 @@ flutter:
     - lib/assets/libspine_flutter.js
     - lib/assets/libspine_flutter.wasm
     - src/spine-cpp-lite/spine-cpp-lite.cpp
-    - src/spine-cpp-lite/spine-cpp-lite.h
+    - ../spine-cpp/spine-cpp-lite/spine-cpp-lite.h

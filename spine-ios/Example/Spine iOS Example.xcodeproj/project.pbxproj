@@ -22,10 +22,12 @@
 		920BD12A2BEBDCD80050A5A9 /* dragon_3.png in Resources */ = {isa = PBXBuildFile; fileRef = 920BD1232BEBDCD80050A5A9 /* dragon_3.png */; };
 		920BD12B2BEBDCD80050A5A9 /* dragon.png in Resources */ = {isa = PBXBuildFile; fileRef = 920BD1242BEBDCD80050A5A9 /* dragon.png */; };
 		920BD12C2BEBDCD80050A5A9 /* dragon.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 920BD1252BEBDCD80050A5A9 /* dragon.atlas */; };
+		922839DF2BF4F7D8006DA9F6 /* AnimationStateEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922839DE2BF4F7D8006DA9F6 /* AnimationStateEvents.swift */; };
 		924C0C162BCFCF21004E63F7 /* SpineExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924C0C152BCFCF21004E63F7 /* SpineExampleApp.swift */; };
 		924C0C182BCFCF21004E63F7 /* SimpleAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924C0C172BCFCF21004E63F7 /* SimpleAnimation.swift */; };
 		924C0C1A2BCFCF22004E63F7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 924C0C192BCFCF22004E63F7 /* Assets.xcassets */; };
 		928A8CC22BCFE7DF00D9D35B /* Spine in Frameworks */ = {isa = PBXBuildFile; productRef = 928A8CC12BCFE7DF00D9D35B /* Spine */; };
+		92FE93292BF4AB9600CCDF48 /* IKFollowing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92FE93282BF4AB9600CCDF48 /* IKFollowing.swift */; };
 		92FFE53B2BD018CA00C64889 /* AAPLShaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 92FFE53A2BD018CA00C64889 /* AAPLShaders.metal */; };
 		92FFE5462BD15AF700C64889 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 92FFE5452BD15AF700C64889 /* README.md */; };
 		92FFE5492BD15B1A00C64889 /* SpineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92FFE5482BD15B1A00C64889 /* SpineView.swift */; };
@@ -49,11 +51,13 @@
 		920BD1232BEBDCD80050A5A9 /* dragon_3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dragon_3.png; sourceTree = "<group>"; };
 		920BD1242BEBDCD80050A5A9 /* dragon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dragon.png; sourceTree = "<group>"; };
 		920BD1252BEBDCD80050A5A9 /* dragon.atlas */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dragon.atlas; sourceTree = "<group>"; };
+		922839DE2BF4F7D8006DA9F6 /* AnimationStateEvents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationStateEvents.swift; sourceTree = "<group>"; };
 		924C0C122BCFCF21004E63F7 /* Spine iOS Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Spine iOS Example.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		924C0C152BCFCF21004E63F7 /* SpineExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpineExampleApp.swift; sourceTree = "<group>"; };
 		924C0C172BCFCF21004E63F7 /* SimpleAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleAnimation.swift; sourceTree = "<group>"; };
 		924C0C192BCFCF22004E63F7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		924C0C1B2BCFCF22004E63F7 /* SpineiOSExample.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SpineiOSExample.entitlements; sourceTree = "<group>"; };
+		92FE93282BF4AB9600CCDF48 /* IKFollowing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IKFollowing.swift; sourceTree = "<group>"; };
 		92FFE53A2BD018CA00C64889 /* AAPLShaders.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = AAPLShaders.metal; sourceTree = "<group>"; };
 		92FFE5452BD15AF700C64889 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		92FFE5472BD15B1A00C64889 /* SpineViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpineViewController.swift; sourceTree = "<group>"; };
@@ -124,6 +128,8 @@
 				920BD11A2BEBDBA60050A5A9 /* MainView.swift */,
 				924C0C172BCFCF21004E63F7 /* SimpleAnimation.swift */,
 				920BD11C2BEBDC380050A5A9 /* PlayPauseAnimation.swift */,
+				922839DE2BF4F7D8006DA9F6 /* AnimationStateEvents.swift */,
+				92FE93282BF4AB9600CCDF48 /* IKFollowing.swift */,
 				92FFE53A2BD018CA00C64889 /* AAPLShaders.metal */,
 				924C0C192BCFCF22004E63F7 /* Assets.xcassets */,
 				924C0C1B2BCFCF22004E63F7 /* SpineiOSExample.entitlements */,
@@ -249,10 +255,12 @@
 			files = (
 				92FFE54D2BD15B2000C64889 /* SpineRenderer.swift in Sources */,
 				920BD11B2BEBDBA60050A5A9 /* MainView.swift in Sources */,
+				92FE93292BF4AB9600CCDF48 /* IKFollowing.swift in Sources */,
 				920BD11D2BEBDC380050A5A9 /* PlayPauseAnimation.swift in Sources */,
 				92FFE5492BD15B1A00C64889 /* SpineView.swift in Sources */,
 				92FFE54A2BD15B1A00C64889 /* SpineViewController.swift in Sources */,
 				920BD1102BEBA5480050A5A9 /* SpineController.swift in Sources */,
+				922839DF2BF4F7D8006DA9F6 /* AnimationStateEvents.swift in Sources */,
 				92FFE53B2BD018CA00C64889 /* AAPLShaders.metal in Sources */,
 				920BD10E2BEBA4390050A5A9 /* RenderCommand+Vertices.swift in Sources */,
 				924C0C182BCFCF21004E63F7 /* SimpleAnimation.swift in Sources */,

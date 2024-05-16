@@ -17,8 +17,14 @@ struct MainView: View {
             NavigationLink("Play/Pause") {
                 PlayPauseAnimation()
             }
+            NavigationLink("Animation State Listener") {
+                AnimationStateEvents()
+            }
+            NavigationLink("IK Following") {
+                IKFollowing()
+            }
         }
-        .navigationTitle("Spine iOS Example")
+        .navigationTitle("Spine Examples")
     }
 }
 

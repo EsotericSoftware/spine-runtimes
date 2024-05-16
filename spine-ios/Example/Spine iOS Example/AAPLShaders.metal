@@ -105,6 +105,6 @@ fragmentShader(RasterizerData in [[stage_in]],
     // Sample the texture to obtain a color
     const half4 colorSample = colorTexture.sample(textureSampler, in.textureCoordinate);
     
-    return float4(colorSample); // * in.color; TODO: mix texture with color
+    return float4(colorSample) * in.color;
 }
 

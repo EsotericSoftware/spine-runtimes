@@ -15,13 +15,13 @@ struct SimpleAnimation: View {
     
     init() {
         _controller = StateObject(
-            wrappedValue: SpineController { controller in
-                _ = controller.animationState.setAnimationByName(
+            wrappedValue: SpineController(onInitialized: { controller in
+                controller.animationState.setAnimationByName(
                     trackIndex: 0,
                     animationName: "walk",
                     loop: true
                 )
-            }
+            })
         )
     }
     

@@ -375,8 +375,14 @@ class SwiftFunctionWriter:
       return property_string
 
     def write_method_signature(self, function_name, swift_return_type):
-      function_string = f"public func {snake_to_camel(function_name)}"
+      function_string = ""
 
+      if not self.spine_function.return_type == "void":
+         function_string += "@discardableResult"
+         function_string += "\n"
+         function_string += inset
+      
+      function_string += f"public func {snake_to_camel(function_name)}"
       function_string += "("
       
       spine_params = self.spine_function.parameters;

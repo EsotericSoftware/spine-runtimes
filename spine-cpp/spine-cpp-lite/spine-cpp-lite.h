@@ -333,6 +333,7 @@ SPINE_CPP_LITE_EXPORT void spine_animation_state_set_time_scale(spine_animation_
 // OMITTED enableQueue()
 // OMITTED setManualTrackEntryDisposal()
 // OMITTED getManualTrackEntryDisposal()
+// @ignore
 SPINE_CPP_LITE_EXPORT void spine_animation_state_dispose_track_entry(spine_animation_state state, spine_track_entry entry);
 
 SPINE_CPP_LITE_EXPORT int32_t spine_animation_state_events_get_num_events(spine_animation_state_events events);
