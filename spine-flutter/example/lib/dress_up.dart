@@ -69,6 +69,7 @@ class DressUpState extends State<DressUp> {
 
   void _toggleSkin(String skinName) {
     _selectedSkins[skinName] = !_selectedSkins[skinName]!;
+    _drawable.skeleton.setSkinByName("default");
     if (_customSkin != null) _customSkin?.dispose();
     _customSkin = Skin("custom-skin");
     for (var skinName in _selectedSkins.keys) {
@@ -78,7 +79,7 @@ class DressUpState extends State<DressUp> {
       }
     }
     _drawable.skeleton.setSkin(_customSkin!);
-    _drawable.skeleton.setToSetupPose();
+    _drawable.skeleton.setSlotsToSetupPose();
   }
 
   @override

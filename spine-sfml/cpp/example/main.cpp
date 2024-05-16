@@ -573,19 +573,11 @@ void mixAndMatch(SkeletonData *skeletonData, Atlas *atlas) {
 
 	Skeleton *skeleton = drawable.skeleton;
 
-	Skin skin("mix-and-match");
-	skin.addSkin(skeletonData->findSkin("skin-base"));
-	skin.addSkin(skeletonData->findSkin("nose/short"));
-	skin.addSkin(skeletonData->findSkin("eyelids/girly"));
-	skin.addSkin(skeletonData->findSkin("eyes/violet"));
-	skin.addSkin(skeletonData->findSkin("hair/brown"));
-	skin.addSkin(skeletonData->findSkin("clothes/hoodie-orange"));
-	skin.addSkin(skeletonData->findSkin("legs/pants-jeans"));
-	skin.addSkin(skeletonData->findSkin("accessories/bag"));
-	skin.addSkin(skeletonData->findSkin("accessories/hat-red-yellow"));
-
-	skeleton->setSkin(&skin);
-	skeleton->setSlotsToSetupPose();
+	Skin *skin = new Skin("mix-and-match");
+    skin->addSkin(skeletonData->findSkin("full-skins/girl"));
+    skin->addSkin(skeletonData->findSkin("accessories/cape-blue"));
+	skeleton->setSkin(skin);
+	skeleton->setToSetupPose();
 
 	skeleton->setPosition(320, 590);
 	skeleton->updateWorldTransform(Physics_Update);
@@ -596,9 +588,21 @@ void mixAndMatch(SkeletonData *skeletonData, Atlas *atlas) {
 	window.setFramerateLimit(60);
 	sf::Event event;
 	sf::Clock deltaClock;
+    bool isCapeEquipped = true;
 	while (window.isOpen()) {
-		while (window.pollEvent(event))
-			if (event.type == sf::Event::Closed) window.close();
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) window.close();
+            if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
+                skeleton->setSkin(nullptr);
+                delete skin;
+                isCapeEquipped = !isCapeEquipped;
+                skin = new Skin("mix-and-match");
+                skin->addSkin(skeletonData->findSkin("full-skins/girl"));
+                if (isCapeEquipped) skin->addSkin(skeletonData->findSkin("accessories/cape-blue"));
+                skeleton->setSkin(skin);
+                skeleton->setSlotsToSetupPose();
+            }
+        }
 
 		float delta = deltaClock.getElapsedTime().asSeconds();
 		deltaClock.restart();
@@ -609,6 +613,8 @@ void mixAndMatch(SkeletonData *skeletonData, Atlas *atlas) {
 		window.draw(drawable);
 		window.display();
 	}
+
+    delete skin;
 }
 
 void celestialCircus(SkeletonData *skeletonData, Atlas *atlas) {
@@ -771,6 +777,7 @@ DebugExtension dbgExtension(SpineExtension::getInstance());
 int main() {
 	SpineExtension::setInstance(&dbgExtension);
 
+    testcase(mixAndMatch, "data/mix-and-match-pro.json", "data/mix-and-match-pro.skel", "data/mix-and-match-pma.atlas", 0.5f);
 	testcase(cloudpot, "data/cloud-pot.json", "data/cloud-pot.skel", "data/cloud-pot-pma.atlas", 0.2);
 	testcase(sack, "data/sack-pro.json", "data/sack-pro.skel", "data/sack-pma.atlas", 0.2f);
 	testcase(celestialCircus, "data/celestial-circus-pro.json", "data/celestial-circus-pro.skel", "data/celestial-circus-pma.atlas", 0.2f);
@@ -781,7 +788,6 @@ int main() {
 	testcase(vine, "data/vine-pro.json", "data/vine-pro.skel", "data/vine-pma.atlas", 0.5f);
 	testcase(dragon, "data/dragon-ess.json", "data/dragon-ess.skel", "data/dragon-pma.atlas", 0.6f);
 	testcase(owl, "data/owl-pro.json", "data/owl-pro.skel", "data/owl-pma.atlas", 0.5f);
-	testcase(mixAndMatch, "data/mix-and-match-pro.json", "data/mix-and-match-pro.skel", "data/mix-and-match-pma.atlas", 0.5f);
 	testcase(coin, "data/coin-pro.json", "data/coin-pro.skel", "data/coin-pma.atlas", 0.5f);
 	testcase(raptor, "data/raptor-pro.json", "data/raptor-pro.skel", "data/raptor-pma.atlas", 0.5f);
 	testcase(tank, "data/tank-pro.json", "data/tank-pro.skel", "data/tank-pma.atlas", 0.2f);
