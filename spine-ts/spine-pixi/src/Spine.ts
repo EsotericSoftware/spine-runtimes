@@ -432,6 +432,13 @@ export class Spine extends Container {
 		Spine.skeletonCache[cacheKey] = skeletonData;
 		return new this(skeletonData, options);
 	}
+
+	public get tint (): number {
+		return this.skeleton.color.toRgb888();
+	}
+	public set tint (value: number) {
+		Color.rgb888ToColor(this.skeleton.color, value);
+	}
 }
 
 Skeleton.yDown = true;
