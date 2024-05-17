@@ -171,6 +171,13 @@ export class Color {
 		color.b = ((value & 0x000000ff)) / 255;
 	}
 
+	toRgb888 () {
+		function hex(x: number) {
+			return ("0" + (x * 255).toString(16)).slice(-2);
+		}
+		return Number("0x" + hex(this.r) + hex(this.g) + hex(this.b));
+	}
+
 	static fromString (hex: string): Color {
 		return new Color().setFromString(hex);
 	}
