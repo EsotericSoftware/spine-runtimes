@@ -172,9 +172,7 @@ export class Color {
 	}
 
 	toRgb888 () {
-		function hex(x: number) {
-			return ("0" + (x * 255).toString(16)).slice(-2);
-		}
+		const hex = (x: number) => ("0" + (x * 255).toString(16)).slice(-2);
 		return Number("0x" + hex(this.r) + hex(this.g) + hex(this.b));
 	}
 
