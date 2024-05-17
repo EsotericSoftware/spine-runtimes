@@ -574,8 +574,8 @@ void mixAndMatch(SkeletonData *skeletonData, Atlas *atlas) {
 	Skeleton *skeleton = drawable.skeleton;
 
 	Skin *skin = new Skin("mix-and-match");
-    skin->addSkin(skeletonData->findSkin("full-skins/girl"));
-    skin->addSkin(skeletonData->findSkin("accessories/cape-blue"));
+	skin->addSkin(skeletonData->findSkin("full-skins/girl"));
+	skin->addSkin(skeletonData->findSkin("accessories/cape-blue"));
 	skeleton->setSkin(skin);
 	skeleton->setToSetupPose();
 
@@ -588,21 +588,21 @@ void mixAndMatch(SkeletonData *skeletonData, Atlas *atlas) {
 	window.setFramerateLimit(60);
 	sf::Event event;
 	sf::Clock deltaClock;
-    bool isCapeEquipped = true;
+	bool isCapeEquipped = true;
 	while (window.isOpen()) {
-        while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed) window.close();
-            if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
-                skeleton->setSkin(nullptr);
-                delete skin;
-                isCapeEquipped = !isCapeEquipped;
-                skin = new Skin("mix-and-match");
-                skin->addSkin(skeletonData->findSkin("full-skins/girl"));
-                if (isCapeEquipped) skin->addSkin(skeletonData->findSkin("accessories/cape-blue"));
-                skeleton->setSkin(skin);
-                skeleton->setSlotsToSetupPose();
-            }
-        }
+		while (window.pollEvent(event)) {
+			if (event.type == sf::Event::Closed) window.close();
+			if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
+				skeleton->setSkin(nullptr);
+				delete skin;
+				isCapeEquipped = !isCapeEquipped;
+				skin = new Skin("mix-and-match");
+				skin->addSkin(skeletonData->findSkin("full-skins/girl"));
+				if (isCapeEquipped) skin->addSkin(skeletonData->findSkin("accessories/cape-blue"));
+				skeleton->setSkin(skin);
+				skeleton->setSlotsToSetupPose();
+			}
+		}
 
 		float delta = deltaClock.getElapsedTime().asSeconds();
 		deltaClock.restart();
@@ -614,7 +614,7 @@ void mixAndMatch(SkeletonData *skeletonData, Atlas *atlas) {
 		window.display();
 	}
 
-    delete skin;
+	delete skin;
 }
 
 void celestialCircus(SkeletonData *skeletonData, Atlas *atlas) {
@@ -777,7 +777,7 @@ DebugExtension dbgExtension(SpineExtension::getInstance());
 int main() {
 	SpineExtension::setInstance(&dbgExtension);
 
-    testcase(mixAndMatch, "data/mix-and-match-pro.json", "data/mix-and-match-pro.skel", "data/mix-and-match-pma.atlas", 0.5f);
+	testcase(mixAndMatch, "data/mix-and-match-pro.json", "data/mix-and-match-pro.skel", "data/mix-and-match-pma.atlas", 0.5f);
 	testcase(cloudpot, "data/cloud-pot.json", "data/cloud-pot.skel", "data/cloud-pot-pma.atlas", 0.2);
 	testcase(sack, "data/sack-pro.json", "data/sack-pro.skel", "data/sack-pma.atlas", 0.2f);
 	testcase(celestialCircus, "data/celestial-circus-pro.json", "data/celestial-circus-pro.skel", "data/celestial-circus-pma.atlas", 0.2f);
