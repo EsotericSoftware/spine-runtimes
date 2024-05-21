@@ -54,7 +54,7 @@ int main() {
 	spAnimationStateData *animationStateData = spAnimationStateData_create(skeletonData);
 	animationStateData->defaultMix = 0.2f;
 	spSkeletonDrawable *drawable = spSkeletonDrawable_create(skeletonData, animationStateData);
-    drawable->usePremultipliedAlpha = -1;
+	drawable->usePremultipliedAlpha = -1;
 	drawable->skeleton->x = 400;
 	drawable->skeleton->y = 500;
 	spSkeleton_setToSetupPose(drawable->skeleton);

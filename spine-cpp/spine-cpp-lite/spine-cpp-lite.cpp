@@ -1525,7 +1525,7 @@ spine_bounds spine_skeleton_get_bounds(spine_skeleton skeleton) {
 	if (skeleton == nullptr) return (spine_bounds) bounds;
 	Skeleton *_skeleton = (Skeleton *) skeleton;
 	Vector<float> vertices;
-    SkeletonClipping clipper;
+	SkeletonClipping clipper;
 
 	_skeleton->getBounds(bounds->x, bounds->y, bounds->width, bounds->height, vertices, &clipper);
 	return (spine_bounds) bounds;

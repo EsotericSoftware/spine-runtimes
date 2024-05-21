@@ -43,7 +43,7 @@ _SP_ARRAY_DECLARE_TYPE(spSdlVertexArray, struct SDL_Vertex)
 typedef struct spSkeletonDrawable {
 	spSkeleton *skeleton;
 	spAnimationState *animationState;
-    int usePremultipliedAlpha;
+	int usePremultipliedAlpha;
 
 	spSkeletonClipping *clipper;
 	spFloatArray *worldVertices;

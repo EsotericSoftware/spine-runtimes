@@ -46,7 +46,7 @@ namespace spine {
 
 		Skeleton *skeleton;
 		AnimationState *animationState;
-        bool usePremultipliedAlpha;
+		bool usePremultipliedAlpha;
 
 	private:
 		bool ownsAnimationStateData;
