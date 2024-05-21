@@ -30,6 +30,7 @@
 #pragma once
 
 #include "SpineCommon.h"
+#include "spine/Attachment.h"
 #include <spine/spine.h>
 
 class SpineSkeletonDataResource;
@@ -46,4 +47,10 @@ public:
 	String get_attachment_name();
 
 	Ref<SpineAttachment> copy();
+
+	void set_spine_object(const SpineSkeletonDataResource *_owner, spine::Attachment *_object) {
+		if (get_spine_object()) get_spine_object()->dereference();
+		_set_spine_object_internal(_owner, _object);
+		if (_object) _object->reference();
+	}
 };

@@ -145,7 +145,7 @@ class SpineSkeletonDataResource;
 template<typename OBJECT>
 class SpineSkeletonDataResourceOwnedObject : public SpineObjectWrapper {
 public:
-	void set_spine_object(const SpineSkeletonDataResource *_owner, OBJECT *_object) {
+	virtual void set_spine_object(const SpineSkeletonDataResource *_owner, OBJECT *_object) {
 		_set_spine_object_internal(_owner, _object);
 	}
 
