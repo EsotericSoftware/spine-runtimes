@@ -47,13 +47,14 @@ int main() {
 		return -1;
 	}
 
-	spAtlas *atlas = spAtlas_createFromFile("data/spineboy.atlas", renderer);
+	spAtlas *atlas = spAtlas_createFromFile("data/spineboy-pma.atlas", renderer);
 	spSkeletonJson *json = spSkeletonJson_create(atlas);
 	json->scale = 0.5f;
 	spSkeletonData *skeletonData = spSkeletonJson_readSkeletonDataFile(json, "data/spineboy-pro.json");
 	spAnimationStateData *animationStateData = spAnimationStateData_create(skeletonData);
 	animationStateData->defaultMix = 0.2f;
 	spSkeletonDrawable *drawable = spSkeletonDrawable_create(skeletonData, animationStateData);
+    drawable->usePremultipliedAlpha = -1;
 	drawable->skeleton->x = 400;
 	drawable->skeleton->y = 500;
 	spSkeleton_setToSetupPose(drawable->skeleton);

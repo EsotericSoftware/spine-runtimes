@@ -164,38 +164,37 @@ void SkeletonDrawable::draw(SDL_Renderer *renderer) {
 
 		if (!usePremultipliedAlpha) {
 			switch (slot.getData().getBlendMode()) {
-			case BlendMode_Normal:
-				SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-				break;
-			case BlendMode_Multiply:
-				SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_MOD);
-				break;
-			case BlendMode_Additive:
-				SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_ADD);
-				break;
-			case BlendMode_Screen:
-				SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-				break;
+				case BlendMode_Normal:
+					SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+					break;
+				case BlendMode_Multiply:
+					SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_MOD);
+					break;
+				case BlendMode_Additive:
+					SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_ADD);
+					break;
+				case BlendMode_Screen:
+					SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+					break;
 			}
-		}
-		else {
+		} else {
 			SDL_BlendMode target;
 			switch (slot.getData().getBlendMode()) {
-			case BlendMode_Normal:
-				target = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
-				SDL_SetTextureBlendMode(texture, target);
-				break;
-			case BlendMode_Multiply:
-				SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_MOD);
-				break;
-			case BlendMode_Additive:
-				target = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD);
-				SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_ADD);
-				break;
-			case BlendMode_Screen:
-				target = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
-				SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-				break;
+				case BlendMode_Normal:
+					target = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
+					SDL_SetTextureBlendMode(texture, target);
+					break;
+				case BlendMode_Multiply:
+					SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_MOD);
+					break;
+				case BlendMode_Additive:
+					target = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD);
+					SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_ADD);
+					break;
+				case BlendMode_Screen:
+					target = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
+					SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+					break;
 			}
 		}
 
