@@ -58,9 +58,9 @@ int main(int argc, char **argv) {
 	drawable.animationState->getData()->setDefaultMix(0.2f);
 	drawable.skeleton->setPosition(400, 500);
 	drawable.skeleton->setToSetupPose();
-	drawable.update(0, spine::Physics_Update);
 	drawable.animationState->setAnimation(0, "portal", true);
 	drawable.animationState->addAnimation(0, "run", true, 0);
+    drawable.update(0, spine::Physics_Update);
 
 	bool quit = false;
 	uint64_t lastFrameTime = SDL_GetPerformanceCounter();
