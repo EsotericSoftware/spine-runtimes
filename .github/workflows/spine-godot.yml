@@ -24,7 +24,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup python and scons
-        uses: ./.github/actions/setup-godot-deps
+        uses: ./.github/actions/setup-godot-deps-3
 
       - name: Build Godot artifact
         shell: bash
@@ -46,7 +46,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup python and scons
-        uses: ./.github/actions/setup-godot-deps
+        uses: ./.github/actions/setup-godot-deps-3
 
       - name: Build Godot artifact
         shell: bash
@@ -70,7 +70,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup python and scons
-        uses: ./.github/actions/setup-godot-deps
+        uses: ./.github/actions/setup-godot-deps-3
 
       - name: Build Godot artifact
         shell: bash
@@ -95,7 +95,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup python and scons
-        uses: ./.github/actions/setup-godot-deps
+        uses: ./.github/actions/setup-godot-deps-3
 
       - name: Build Godot artifact
         run: |
@@ -116,7 +116,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup python and scons
-        uses: ./.github/actions/setup-godot-deps
+        uses: ./.github/actions/setup-godot-deps-3
 
       - name: Build Godot artifact
         run: |
@@ -137,7 +137,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup python and scons
-        uses: ./.github/actions/setup-godot-deps
+        uses: ./.github/actions/setup-godot-deps-3
 
       - name: Build Godot artifact
         run: |
@@ -166,7 +166,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup python and scons
-        uses: ./.github/actions/setup-godot-deps
+        uses: ./.github/actions/setup-godot-deps-3
 
       - name: Build Godot artifact
         shell: bash
@@ -206,7 +206,7 @@ jobs:
           java-version: 11
 
       - name: Setup python and scons
-        uses: ./.github/actions/setup-godot-deps
+        uses: ./.github/actions/setup-godot-deps-3
 
       - name: Build Godot artifact
         shell: bash
@@ -249,7 +249,7 @@ jobs:
           emcc -v
 
       - name: Setup python and scons
-        uses: ./.github/actions/setup-godot-deps
+        uses: ./.github/actions/setup-godot-deps-3
 
       - name: Build Godot artifact
         run: |
