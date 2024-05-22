@@ -20,6 +20,9 @@ struct MainView: View {
             NavigationLink("Animation State Listener") {
                 AnimationStateEvents()
             }
+            NavigationLink("Dress Up") {
+                DressUp()
+            }
             NavigationLink("IK Following") {
                 IKFollowing()
             }

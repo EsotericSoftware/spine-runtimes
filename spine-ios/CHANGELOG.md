@@ -10,3 +10,4 @@
 - Draw `SkeletonData` render commands (#6)
 - Add `BoundsProvider` (#7)
 - Support `SpineController` & `Event` callbacks (#8)
+- Support `DressUp` sample (#9)

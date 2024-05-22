@@ -8,46 +8,99 @@
 import SwiftUI
 import Spine
 
-public struct SpineView: UIViewControllerRepresentable {
-    public typealias UIViewControllerType = SpineViewController
+public struct SpineView: UIViewRepresentable {
     
-    private let atlasFile: String
-    private let skeletonFile: String
+    public typealias UIViewType = SpineUIView
+
+    private let atlasFile: String?
+    private let skeletonFile: String?
+    private let drawable: SkeletonDrawableWrapper?
+    
     private let controller: SpineController
-    
-    private let contentMode: Spine.ContentMode
+    private let mode: Spine.ContentMode
     private let alignment: Spine.Alignment
     private let boundsProvider: BoundsProvider
     
     public init(
+        controller: SpineController = SpineController(),
+        mode: Spine.ContentMode = .fit,
+        alignment: Spine.Alignment = .center,
+        boundsProvider: BoundsProvider = SetupPoseBounds(),
+        backgroundColor: UIColor = .white
+    ) {
+        self.atlasFile = nil
+        self.skeletonFile = nil
+        self.drawable = nil
+        self.controller = controller
+        self.mode = mode
+        self.alignment = alignment
+        self.boundsProvider = boundsProvider
+    }
+    
+    public init(
+        drawable: SkeletonDrawableWrapper,
+        controller: SpineController = SpineController(),
+        mode: Spine.ContentMode = .fit,
+        alignment: Spine.Alignment = .center,
+        boundsProvider: BoundsProvider = SetupPoseBounds(),
+        backgroundColor: UIColor = .white
+    ) {
+        self.atlasFile = nil
+        self.skeletonFile = nil
+        self.drawable = drawable
+        self.controller = controller
+        self.mode = mode
+        self.alignment = alignment
+        self.boundsProvider = boundsProvider
+    }
+    
+    public init(
         atlasFile: String,
         skeletonFile: String,
-        controller: SpineController,
-        contentMode: Spine.ContentMode? = nil,
-        alignment: Spine.Alignment? = nil,
-        boundsProvider: BoundsProvider? = nil
+        controller: SpineController = SpineController(),
+        mode: Spine.ContentMode = .fit,
+        alignment: Spine.Alignment = .center,
+        boundsProvider: BoundsProvider = SetupPoseBounds(),
+        backgroundColor: UIColor = .white
     ) {
         self.atlasFile = atlasFile
         self.skeletonFile = skeletonFile
+        self.drawable = nil
         self.controller = controller
-        
-        self.contentMode = contentMode ?? .fit
-        self.alignment = alignment ?? .center
-        self.boundsProvider = boundsProvider ?? SetupPoseBounds()
+        self.mode = mode
+        self.alignment = alignment
+        self.boundsProvider = boundsProvider
     }
     
-    public func makeUIViewController(context: Context) -> SpineViewController {
-        return SpineViewController(
-            atlasFile: atlasFile,
-            skeletonFile: skeletonFile,
-            controller: controller,
-            contentMode: contentMode,
-            alignment: alignment,
-            boundsProvider: boundsProvider
-        )
+    public func makeUIView(context: Context) -> SpineUIView {
+        if let atlasFile, let skeletonFile {
+            return SpineUIView(
+                atlasFile: atlasFile,
+                skeletonFile: skeletonFile,
+                controller: controller,
+                mode: mode,
+                alignment: alignment,
+                boundsProvider: boundsProvider
+            )
+        } else if let drawable {
+            return SpineUIView(
+                drawable: drawable,
+                controller: controller,
+                mode: mode,
+                alignment: alignment,
+                boundsProvider: boundsProvider
+            )
+        } else {
+            return SpineUIView(
+                controller: controller,
+                mode: mode,
+                alignment: alignment,
+                boundsProvider: boundsProvider
+            )
+        }
     }
     
-    public func updateUIViewController(_ uiViewController: SpineViewController, context: Context) {
-        //
+    public func updateUIView(_ uiView: SpineUIView, context: Context) {
+        // Stub
     }
 }

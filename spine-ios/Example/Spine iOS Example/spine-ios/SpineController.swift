@@ -15,13 +15,14 @@ public typealias SpineControllerCallback = (_ controller: SpineController) -> Vo
 
 public final class SpineController: ObservableObject {
     
-    public private(set) var drawable: SkeletonDrawableWrapper!
+    public internal(set) var drawable: SkeletonDrawableWrapper!
     
     private let onInitialized: SpineControllerCallback?
     private let onBeforeUpdateWorldTransforms: SpineControllerCallback?
     private let onAfterUpdateWorldTransforms: SpineControllerCallback?
     private let onBeforePaint: SpineControllerCallback?
     private let onAfterPaint: SpineControllerCallback?
+    private let disposeOnDeInit: Bool
     
     private var scaleX: CGFloat = 1
     private var scaleY: CGFloat = 1
@@ -36,17 +37,21 @@ public final class SpineController: ObservableObject {
         onBeforeUpdateWorldTransforms: SpineControllerCallback? = nil,
         onAfterUpdateWorldTransforms: SpineControllerCallback? = nil,
         onBeforePaint: SpineControllerCallback? = nil,
-        onAfterPaint: SpineControllerCallback? = nil
+        onAfterPaint: SpineControllerCallback? = nil,
+        disposeOnDeInit: Bool = true
     ) {
         self.onInitialized = onInitialized
         self.onBeforeUpdateWorldTransforms = onBeforeUpdateWorldTransforms
         self.onAfterUpdateWorldTransforms = onAfterUpdateWorldTransforms
         self.onBeforePaint = onBeforePaint
         self.onAfterPaint = onAfterPaint
+        self.disposeOnDeInit = disposeOnDeInit
     }
     
     deinit {
-        drawable?.dispose()
+        if disposeOnDeInit {
+            drawable?.dispose() // TODO move drawable out of view?
+        }
     }
     
     public var atlas: Atlas {

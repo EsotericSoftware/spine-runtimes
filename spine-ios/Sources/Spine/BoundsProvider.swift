@@ -49,7 +49,7 @@ public final class SkinAndAnimationBounds: BoundsProvider {
     /// the bounding box of the skeleton. If no skins are given, the default skin is used.
     /// The [stepTime], given in seconds, defines at what interval the bounds should be sampled
     /// across the entire animation.
-    public init(animation: String, skins: [String]? = nil, let stepTime: TimeInterval = 0.1) {
+    public init(animation: String? = nil, skins: [String]? = nil, let stepTime: TimeInterval = 0.1) {
         self.animation = animation
         if let skins, !skins.isEmpty {
             self.skins = skins
@@ -60,11 +60,11 @@ public final class SkinAndAnimationBounds: BoundsProvider {
     }
     
     public func computeBounds(for drawable: SkeletonDrawableWrapper) -> CGRect {
-        let data = drawable.skeleton.data
+        let data = drawable.skeletonData
         let oldSkin: Skin? = drawable.skeleton.skin
         let customSkin = Skin.create(name: "custom-skin")
         for skinName in skins {
-            let skin = data.findSkin(name: skinName) // TODO: Introduce optionsals where needed
+            let skin = data.findSkin(name: skinName)
             if let skin = data.findSkin(name: skinName) {
                 customSkin.addSkin(other: skin)
             }
@@ -95,14 +95,14 @@ public final class SkinAndAnimationBounds: BoundsProvider {
             maxX = minX + bounds.width
             maxY = minY + bounds.height
         }
-        drawable.skeleton.setSkinByName(skinName: "default");
-        drawable.animationState.clearTracks();
+        drawable.skeleton.setSkinByName(skinName: "default")
+        drawable.animationState.clearTracks()
         
         if let oldSkin {
             drawable.skeleton.skin = oldSkin
         }
         drawable.skeleton.setToSetupPose()
-        drawable.update(delta: 0);
+        drawable.update(delta: 0)
         customSkin.dispose()
         return CGRectMake(CGFloat(minX), CGFloat(minY), CGFloat(maxX - minX), CGFloat(maxY - minY))
       }

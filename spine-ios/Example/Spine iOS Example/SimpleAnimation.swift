@@ -30,7 +30,7 @@ struct SimpleAnimation: View {
             atlasFile: "spineboy.atlas",
             skeletonFile: "spineboy-pro.skel",
             controller: controller,
-            contentMode: .fit,
+            mode: .fit,
             alignment: .center
         )
         .navigationTitle("Simple Animation")

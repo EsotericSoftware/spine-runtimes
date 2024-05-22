@@ -216,10 +216,6 @@ public extension Skin {
     }
 }
 
-public extension AnimationState {
-    
-}
-
 // Helper
 
 extension CGRect {

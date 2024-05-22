@@ -33,7 +33,8 @@ def read_spine_function_declarations(data):
     lines = declarations_section.split('\n')
 
     filtered_lines = []
-    ignore_next = False;
+    ignore_next = False
+    next_returns_optional = False
     for line in lines:
       if ignore_next:
          ignore_next = False
@@ -41,13 +42,18 @@ def read_spine_function_declarations(data):
       
       line = line.strip()
 
+      if next_returns_optional:
+        next_returns_optional = False
+        line = line + "?"
+      
       if not line.strip().startswith('//') and line.strip() != '':
         filtered_lines.append(line)
-        ignore_next = False
 
       if line.startswith('//') and '@ignore' in line:
-        ignore_next = True;
-
+        ignore_next = True
+      elif line.startswith('//') and '@optional' in line:
+        next_returns_optional = True
+    
     function_declaration = [
         line.replace('SPINE_CPP_LITE_EXPORT', '').strip()
         for line in filtered_lines
@@ -72,16 +78,17 @@ class SpineObject:
         return f"SpineObject: name: {self.name}, functions: {self.functions}"
     
 class SpineFunction:
-    def __init__(self, return_type, name, parameters):
+    def __init__(self, return_type, name, parameters, returns_optional):
         self.return_type = return_type
         self.name = name
         self.parameters = parameters
+        self.returns_optional = returns_optional
 
     def isReturningSpineClass(self):
        return self.return_type.startswith("spine_") and self.return_type != "spine_bool"  and self.return_type not in enums
 
     def __str__(self):
-        return f"SpineFunction(return_type: {self.return_type}, name: {self.name}, parameters: {self.parameters})"
+        return f"SpineFunction(return_type: {self.return_type}, name: {self.name}, parameters: {self.parameters}, returns_optional: {self.returns_optional})"
     
     def __repr__(self):
         return self.__str__()
@@ -101,9 +108,11 @@ class SpineParam:
         return self.__str__()
 
 def parse_function_declaration(declaration):
-    # Strip semicolon and extra whitespace
-    declaration = declaration.strip(';').strip()
+    returns_optional = declaration.endswith("?")
 
+    # Strip semicolon and extra whitespace
+    declaration = declaration.strip('?').strip(';').strip()
+    
     # Use regex to split the declaration into parts
     # Regex explanation:
   # ^([\w\s\*]+?)\s+ - Capture the return type, possibly including spaces and asterisks (non-greedy)
@@ -136,7 +145,8 @@ def parse_function_declaration(declaration):
     return SpineFunction(
         return_type = return_type.strip(),
         name = function_name.strip(),
-        parameters = parameters
+        parameters = parameters,
+        returns_optional = returns_optional
     )
 
 types = read_spine_types(file_contents)
@@ -207,10 +217,11 @@ class SwiftParamWriter:
         return f"{snake_to_camel(self.param.name)}: {type}"
 
 class SwiftFunctionBodyWriter:
-  def __init__(self, spine_object, spine_function, is_setter):
+  def __init__(self, spine_object, spine_function, is_setter, is_getter_optional):
       self.spine_object = spine_object
       self.spine_function = spine_function
       self.is_setter = is_setter
+      self.is_getter_optional = is_getter_optional
 
   def write(self):
     body = ""
@@ -235,12 +246,23 @@ class SwiftFunctionBodyWriter:
         body += "return "
 
       if self.spine_function.isReturningSpineClass():
-        body += ".init("
-        body += function_call
-        if self.spine_function.return_type in enums:
-          body += ".rawValue)"
+
+        function_prefix = f"{self.spine_object.name}_"
+        function_name = self.spine_function.name.replace(function_prefix, "", 1)
+
+        if "find_" in function_name or self.spine_function.returns_optional:
+          body += function_call
+          body += ".flatMap { .init($0"
+          if self.spine_function.return_type in enums:
+            body += ".rawValue"
+          body += ") }"
         else:
+          body += ".init("
+          body += function_call
+          if self.spine_function.return_type in enums:
+            body += ".rawValue"
           body += ")"
+          
       else:
         body += function_call
       
@@ -263,6 +285,8 @@ class SwiftFunctionBodyWriter:
       
       if self.is_setter and len(spine_params_with_ivar_name) == 2:
         spine_params_with_ivar_name[1].name = "newValue"
+        if self.is_getter_optional:
+            spine_params_with_ivar_name[1].name += "?"
       
       swift_param_names = []
       for idx, spine_param in enumerate(spine_params_with_ivar_name):
@@ -350,7 +374,7 @@ class SwiftFunctionWriter:
         if self.spine_setter_function:
           function_string += inset
         
-        function_string += SwiftFunctionBodyWriter(spine_object = self.spine_object, spine_function = self.spine_function, is_setter=False).write()
+        function_string += SwiftFunctionBodyWriter(spine_object = self.spine_object, spine_function = self.spine_function, is_setter=False, is_getter_optional=False).write()
 
         if self.spine_setter_function:
            function_string += "\n"
@@ -359,7 +383,7 @@ class SwiftFunctionWriter:
            function_string += inset + inset + "set {"
            function_string += "\n"
            function_string += inset + inset + inset
-           function_string += SwiftFunctionBodyWriter(spine_object = self.spine_object, spine_function = self.spine_setter_function, is_setter=True).write()
+           function_string += SwiftFunctionBodyWriter(spine_object = self.spine_object, spine_function = self.spine_setter_function, is_setter=True, is_getter_optional=self.spine_function.returns_optional).write()
            function_string += "\n"
            function_string += inset + inset + "}"
 
@@ -372,17 +396,21 @@ class SwiftFunctionWriter:
     def write_computed_property_signature(self, function_name, swift_return_type):
       property_name = snake_to_camel(function_name.replace("get_", ""))
       property_string = f"public var {property_name}: {swift_return_type}"
+      if self.spine_function.returns_optional:
+        property_string += "?"
       return property_string
 
     def write_method_signature(self, function_name, swift_return_type):
-      function_string = ""
 
+      function_string = ""
+      
       if not self.spine_function.return_type == "void":
          function_string += "@discardableResult"
          function_string += "\n"
          function_string += inset
-      
+
       function_string += f"public func {snake_to_camel(function_name)}"
+
       function_string += "("
       
       spine_params = self.spine_function.parameters;
@@ -404,7 +432,7 @@ class SwiftFunctionWriter:
       if not self.spine_function.return_type == "void":
         function_string += f" -> {swift_return_type}"
 
-      if "find_" in function_name:
+      if "find_" in function_name or self.spine_function.returns_optional:
          function_string += "?"
 
       return function_string

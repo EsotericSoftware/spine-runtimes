@@ -339,6 +339,7 @@ SPINE_CPP_LITE_EXPORT void spine_animation_state_dispose_track_entry(spine_anima
 SPINE_CPP_LITE_EXPORT int32_t spine_animation_state_events_get_num_events(spine_animation_state_events events);
 SPINE_CPP_LITE_EXPORT spine_event_type spine_animation_state_events_get_event_type(spine_animation_state_events events, int32_t index);
 SPINE_CPP_LITE_EXPORT spine_track_entry spine_animation_state_events_get_track_entry(spine_animation_state_events events, int32_t index);
+// @optional
 SPINE_CPP_LITE_EXPORT spine_event spine_animation_state_events_get_event(spine_animation_state_events events, int32_t index);
 SPINE_CPP_LITE_EXPORT void spine_animation_state_events_reset(spine_animation_state_events events);
 
@@ -429,6 +430,7 @@ SPINE_CPP_LITE_EXPORT int32_t spine_skeleton_get_num_path_constraints(spine_skel
 SPINE_CPP_LITE_EXPORT spine_path_constraint *spine_skeleton_get_path_constraints(spine_skeleton skeleton);
 SPINE_CPP_LITE_EXPORT int32_t spine_skeleton_get_num_physics_constraints(spine_skeleton skeleton);
 SPINE_CPP_LITE_EXPORT spine_physics_constraint *spine_skeleton_get_physics_constraints(spine_skeleton skeleton);
+// @optional
 SPINE_CPP_LITE_EXPORT spine_skin spine_skeleton_get_skin(spine_skeleton skeleton);
 SPINE_CPP_LITE_EXPORT spine_color spine_skeleton_get_color(spine_skeleton skeleton);
 SPINE_CPP_LITE_EXPORT void spine_skeleton_set_color(spine_skeleton skeleton, float r, float g, float b, float a);
