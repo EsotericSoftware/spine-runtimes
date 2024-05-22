@@ -1,7 +1,7 @@
 {
 "skeleton": {
 	"hash": "7c5zrxkBXpw",
-	"spine": "4.2.64-beta",
+	"spine": "4.2.22",
 	"x": -938.98,
 	"y": -1030.95,
 	"width": 1839,
@@ -872,7 +872,7 @@
 			"globe-texture-strong": {
 				"globe-texture-strong": { "x": 0.5, "y": 599.62, "width": 1759, "height": 1761 }
 			},
-			"blue-present-base": {
+			"blue-present/blue-present-base": {
 				"blue-present-base": {
 					"type": "mesh",
 					"uvs": [ 0.50853, 0, 1, 0.18835, 0.96801, 0.73665, 0.51693, 1, 0.48629, 1, 0.03326, 0.73855, 0, 0.18837, 0.49146, 0, 0.49911, 0.39604 ],
@@ -884,7 +884,7 @@
 					"height": 277
 				}
 			},
-			"blue-present-decoration": {
+			"blue-present/blue-present-decoration": {
 				"blue-present-decoration": {
 					"type": "mesh",
 					"uvs": [ 0.66739, 1, 0.45154, 1, 0.13592, 0.89585, 0, 0.64975, 0, 0.4514, 0.08513, 0.13368, 0.39168, 0, 0.57851, 0, 0.81795, 0.10796, 1, 0.38712, 1, 0.57078, 0.89957, 0.83892, 0.49689, 0.47528 ],
@@ -896,7 +896,7 @@
 					"height": 80
 				}
 			},
-			"green-present-base": {
+			"green-present/green-present-base": {
 				"green-present-base": {
 					"type": "mesh",
 					"uvs": [ 0.51279, 0, 0.99938, 0.1886, 0.96979, 0.73536, 0.51655, 1, 0.48608, 1, 0.0268, 0.73758, 1.0E-5, 0.18489, 0.49056, 0, 0.49869, 0.40079 ],
@@ -908,7 +908,7 @@
 					"height": 277
 				}
 			},
-			"green-present-decoration": {
+			"green-present/green-present-decoration": {
 				"green-present-decoration": {
 					"type": "mesh",
 					"uvs": [ 0.6665, 0.99999, 0.42715, 0.99999, 0.13617, 0.8864, 0, 0.65593, 0, 0.42309, 0.09393, 0.10947, 0.40369, 0, 0.58437, 0, 0.81903, 0.12134, 1, 0.39933, 1, 0.60604, 0.88709, 0.83175, 0.49286, 0.48011 ],
@@ -920,7 +920,7 @@
 					"height": 80
 				}
 			},
-			"red-present-base": {
+			"red-present/red-present-base": {
 				"red-present-base": {
 					"type": "mesh",
 					"uvs": [ 0.51918, 0, 0.99886, 0.18782, 0.96906, 0.73897, 0.51437, 1, 0.48538, 1, 0.03065, 0.73666, 0.00102, 0.18575, 0.49272, 0, 0.4956, 0.39969 ],
@@ -932,7 +932,7 @@
 					"height": 277
 				}
 			},
-			"red-present-decoration": {
+			"red-present/red-present-decoration": {
 				"red-present-decoration": {
 					"type": "mesh",
 					"uvs": [ 0.46117, 1, 0.15983, 0.92289, 0, 0.67469, 0, 0.43201, 0.09257, 0.13969, 0.39121, 0, 0.57955, 0, 0.82707, 0.13418, 1, 0.38513, 1, 0.61127, 0.9024, 0.85946, 0.63067, 1, 0.49614, 0.47062 ],
@@ -944,25 +944,25 @@
 					"height": 80
 				}
 			},
-			"snow": {
+			"snow/snow": {
 				"snow": { "x": -492, "y": 1041.62, "width": 54, "height": 55 }
 			},
-			"snow2": {
+			"snow/snow2": {
 				"snow": { "scaleX": 0.5337, "scaleY": 0.5337, "rotation": -27.83, "width": 54, "height": 55 }
 			},
-			"snow3": {
+			"snow/snow3": {
 				"snow": { "scaleX": 0.5337, "scaleY": 0.5337, "rotation": -27.83, "width": 54, "height": 55 }
 			},
-			"snow4": {
+			"snow/snow4": {
 				"snow": { "scaleX": 0.5337, "scaleY": 0.5337, "rotation": -27.83, "width": 54, "height": 55 }
 			},
-			"snow5": {
+			"snow/snow5": {
 				"snow": { "scaleX": 0.5337, "scaleY": 0.5337, "rotation": -27.83, "width": 54, "height": 55 }
 			},
-			"snow6": {
+			"snow/snow6": {
 				"snow": { "scaleX": 0.5337, "scaleY": 0.5337, "rotation": -27.83, "width": 54, "height": 55 }
 			},
-			"snow7": {
+			"snow/snow7": {
 				"snow": {
 					"x": 58.21,
 					"y": 106.44,
@@ -973,7 +973,7 @@
 					"height": 55
 				}
 			},
-			"snow8": {
+			"snow/snow8": {
 				"snow": {
 					"x": 123.14,
 					"y": -91.47,
@@ -984,7 +984,7 @@
 					"height": 55
 				}
 			},
-			"snow9": {
+			"snow/snow9": {
 				"snow": {
 					"x": -58.21,
 					"y": -176.29,
@@ -995,7 +995,7 @@
 					"height": 55
 				}
 			},
-			"snow10": {
+			"snow/snow10": {
 				"snow": {
 					"x": -219.53,
 					"y": 59.87,
@@ -1006,10 +1006,10 @@
 					"height": 55
 				}
 			},
-			"snow11": {
+			"snow/snow11": {
 				"snow": { "scaleX": 0.5337, "scaleY": 0.5337, "rotation": -27.83, "width": 54, "height": 55 }
 			},
-			"snow12": {
+			"snow/snow12": {
 				"snow": {
 					"x": 123.14,
 					"y": -91.47,
@@ -1020,10 +1020,10 @@
 					"height": 55
 				}
 			},
-			"snow13": {
+			"snow/snow13": {
 				"snow": { "scaleX": 0.5337, "scaleY": 0.5337, "rotation": -27.83, "width": 54, "height": 55 }
 			},
-			"snow14": {
+			"snow/snow14": {
 				"snow": {
 					"x": -219.53,
 					"y": 59.87,
@@ -1034,10 +1034,10 @@
 					"height": 55
 				}
 			},
-			"snow15": {
+			"snow/snow15": {
 				"snow": { "scaleX": 0.5337, "scaleY": 0.5337, "rotation": -27.83, "width": 54, "height": 55 }
 			},
-			"snow16": {
+			"snow/snow16": {
 				"snow": {
 					"x": -58.21,
 					"y": -176.29,
@@ -1048,10 +1048,10 @@
 					"height": 55
 				}
 			},
-			"snow17": {
+			"snow/snow17": {
 				"snow": { "scaleX": 0.5337, "scaleY": 0.5337, "rotation": -27.83, "width": 54, "height": 55 }
 			},
-			"snow18": {
+			"snow/snow18": {
 				"snow": {
 					"x": 58.21,
 					"y": 106.44,
@@ -1062,13 +1062,13 @@
 					"height": 55
 				}
 			},
-			"snow19": {
+			"snow/snow19": {
 				"snow": { "scaleX": 0.5337, "scaleY": 0.5337, "rotation": -27.83, "width": 54, "height": 55 }
 			},
-			"snow20": {
+			"snow/snow20": {
 				"snow": { "scaleX": 0.5337, "scaleY": 0.5337, "rotation": -27.83, "width": 54, "height": 55 }
 			},
-			"snow21": {
+			"snow/snow21": {
 				"snow": {
 					"x": 62.06,
 					"y": -107.37,
@@ -1079,10 +1079,10 @@
 					"height": 55
 				}
 			},
-			"snow22": {
+			"snow/snow22": {
 				"snow": { "scaleX": 0.5337, "scaleY": 0.5337, "rotation": -27.83, "width": 54, "height": 55 }
 			},
-			"snow23": {
+			"snow/snow23": {
 				"snow": {
 					"x": 58.21,
 					"y": 106.44,
@@ -1093,10 +1093,10 @@
 					"height": 55
 				}
 			},
-			"snow24": {
+			"snow/snow24": {
 				"snow": { "scaleX": 0.5337, "scaleY": 0.5337, "rotation": -27.83, "width": 54, "height": 55 }
 			},
-			"snow25": {
+			"snow/snow25": {
 				"snow": {
 					"x": -219.53,
 					"y": 59.87,
@@ -1107,10 +1107,10 @@
 					"height": 55
 				}
 			},
-			"snow26": {
+			"snow/snow26": {
 				"snow": { "scaleX": 0.5337, "scaleY": 0.5337, "rotation": -27.83, "width": 54, "height": 55 }
 			},
-			"snow27": {
+			"snow/snow27": {
 				"snow": {
 					"x": -219.53,
 					"y": 59.87,
@@ -1121,10 +1121,10 @@
 					"height": 55
 				}
 			},
-			"snow28": {
+			"snow/snow28": {
 				"snow": { "scaleX": 0.5337, "scaleY": 0.5337, "rotation": -27.83, "width": 54, "height": 55 }
 			},
-			"snow29": {
+			"snow/snow29": {
 				"snow": {
 					"x": -219.53,
 					"y": 59.87,
@@ -1135,7 +1135,7 @@
 					"height": 55
 				}
 			},
-			"hair-front": {
+			"spineboy/hair/hair-front": {
 				"hair-front": {
 					"type": "mesh",
 					"uvs": [ 0.71107, 0.16147, 0.81377, 0.42273, 0.88628, 0.78595, 0.99999, 0.85225, 1, 0.99999, 0.79392, 0.99999, 0.68706, 0.86986, 0.54078, 0.88496, 0.34143, 0.80748, 0, 0.52075, 0, 0.23603, 0.21536, 0, 0.4925, 0.00704, 0.1679, 0.33789, 0.3548, 0.41858, 0.63776, 0.42627, 0.39245, 0.59918, 0.54041, 0.60302, 0.66113, 0.61455, 0.22111, 0.58765 ],
@@ -1147,7 +1147,7 @@
 					"height": 202
 				}
 			},
-			"hair-side": {
+			"spineboy/hair/hair-side": {
 				"hair-side": {
 					"type": "mesh",
 					"uvs": [ 1, 0.34837, 0.47104, 0.99999, 0, 1, 0.18033, 1.0E-5, 1, 0 ],
@@ -1159,7 +1159,7 @@
 					"height": 106
 				}
 			},
-			"hair-side2": {
+			"spineboy/hair/hair-side2": {
 				"hair-side": {
 					"type": "mesh",
 					"uvs": [ 1, 0.34837, 0.47104, 0.99999, 0, 1, 0.18033, 1.0E-5, 1, 0 ],
@@ -1171,7 +1171,7 @@
 					"height": 106
 				}
 			},
-			"hair-strand-1": {
+			"spineboy/hair/hair-strand-1": {
 				"hair-strand-1": {
 					"type": "mesh",
 					"uvs": [ 1, 1, 0, 1, 0, 0, 1, 0 ],
@@ -1183,7 +1183,7 @@
 					"height": 130
 				}
 			},
-			"hair-strand-2": {
+			"spineboy/hair/hair-strand-2": {
 				"hair-strand-2": {
 					"type": "mesh",
 					"uvs": [ 1, 1, 0, 1, 0, 0, 1, 0 ],
@@ -1195,7 +1195,7 @@
 					"height": 131
 				}
 			},
-			"hair-strand-3": {
+			"spineboy/hair/hair-strand-3": {
 				"hair-strand-3": {
 					"type": "mesh",
 					"uvs": [ 1, 1, 0, 1, 0, 0, 1, 0 ],
@@ -1207,7 +1207,7 @@
 					"height": 105
 				}
 			},
-			"hair-strand-4": {
+			"spineboy/hair/hair-strand-4": {
 				"hair-strand-4": {
 					"type": "mesh",
 					"uvs": [ 0.22258, 0, 0.54021, 0.34357, 0.8482, 0.67671, 1, 0.8409, 1, 0.99999, 0.89105, 0.99169, 0.59668, 0.72304, 0.28439, 0.43803, 0.02942, 0.20532, 0, 1.0E-5 ],
@@ -1219,7 +1219,7 @@
 					"height": 138
 				}
 			},
-			"hair-strand-5": {
+			"spineboy/hair/hair-strand-5": {
 				"hair-strand-5": {
 					"type": "mesh",
 					"uvs": [ 1, 1, 0, 1, 0, 0, 1, 0 ],
@@ -1231,7 +1231,7 @@
 					"height": 94
 				}
 			},
-			"hair-strand-6": {
+			"spineboy/hair/hair-strand-6": {
 				"hair-strand-6": {
 					"type": "mesh",
 					"uvs": [ 1, 1, 0, 1, 0, 0, 1, 0 ],
@@ -1243,7 +1243,7 @@
 					"height": 69
 				}
 			},
-			"scarf-end-l": {
+			"spineboy/scarf/scarf-end-l": {
 				"scarf-end-l": {
 					"type": "mesh",
 					"uvs": [ 0.4734, 0.20703, 1, 0.62461, 1, 1, 0.53345, 0.99994, 0.25171, 0.67741, 1.0E-5, 0.38928, 0, 0, 0.23817, 0.02989, 0.80823, 0.57127, 0.64116, 0.48909, 0.45462, 0.34715, 0.73524, 0.88317, 0.5633, 0.79912, 0.35405, 0.61983 ],
@@ -1255,7 +1255,7 @@
 					"height": 218
 				}
 			},
-			"scarf-end-r": {
+			"spineboy/scarf/scarf-end-r": {
 				"scarf-end-r": {
 					"type": "mesh",
 					"uvs": [ 0.99999, 0.28626, 0.76567, 0.6287, 0.47657, 0.99999, 0, 1, 0, 0.37436, 0.44822, 0.34612, 0.76738, 0, 1, 0, 0.34323, 0.78347, 0.15263, 0.79785, 0.1891, 0.48977, 0.3597, 0.51236, 0.52677, 0.67872, 0.90209, 0.23509, 0.475, 0.48361, 0.81149, 0.09954 ],
@@ -1267,13 +1267,13 @@
 					"height": 173
 				}
 			},
-			"scarf-pompom-l": {
+			"spineboy/scarf/scarf-pompom-l": {
 				"scarf-pompom-l": { "x": -4.02, "y": -1.27, "width": 99, "height": 91 }
 			},
-			"scarf-pompom-r": {
+			"spineboy/scarf/scarf-pompom-r": {
 				"scarf-pompom-r": { "x": 8.48, "y": -6.33, "width": 97, "height": 94 }
 			},
-			"scarf-ribbon-bottom-l": {
+			"spineboy/scarf/scarf-ribbon-bottom-l": {
 				"scarf-ribbon-bottom-l": {
 					"type": "mesh",
 					"uvs": [ 0.91085, 0.2271, 1, 0.18972, 1, 1, 0.55658, 1, 0, 0.40781, 0, 0, 0.43499, 0, 0.64238, 0.33966, 0.71966, 0.78323, 0.58978, 0.64736, 0.38873, 0.31128 ],
@@ -1285,7 +1285,7 @@
 					"height": 105
 				}
 			},
-			"scarf-ribbon-bottom-r": {
+			"spineboy/scarf/scarf-ribbon-bottom-r": {
 				"scarf-ribbon-bottom-r": {
 					"type": "mesh",
 					"uvs": [ 1, 0.32594, 0.99999, 0.64132, 0.38718, 1, 0, 1, 0, 0, 0.8313, 0, 1, 0, 0.3046, 0.70624, 0.11244, 0.56197, 0.12619, 0.21274 ],
@@ -1297,7 +1297,7 @@
 					"height": 114
 				}
 			},
-			"scarf-ribbon-middle-l": {
+			"spineboy/scarf/scarf-ribbon-middle-l": {
 				"scarf-ribbon-middle-l": {
 					"type": "mesh",
 					"uvs": [ 1, 1, 0, 1, 0, 0, 1, 0, 0.70215, 0.39649, 0.67578, 0.61507, 0.49163, 0.73933 ],
@@ -1309,7 +1309,7 @@
 					"height": 180
 				}
 			},
-			"scarf-ribbon-middle-r": {
+			"spineboy/scarf/scarf-ribbon-middle-r": {
 				"scarf-ribbon-middle-r": {
 					"type": "mesh",
 					"uvs": [ 1, 1, 0, 1, 0, 0, 1, 0, 0.35576, 0.65533, 0.29901, 0.25743, 0.45967, 0.85661 ],
@@ -1321,7 +1321,7 @@
 					"height": 177
 				}
 			},
-			"scarf-ribbon-top-l": {
+			"spineboy/scarf/scarf-ribbon-top-l": {
 				"scarf-ribbon-top-l": {
 					"type": "mesh",
 					"uvs": [ 1, 1, 0, 1, 0, 0, 1, 0, 0.83108, 0.33574, 0.51831, 0.33138, 0.85066, 0.73438, 0.96801, 0.74159 ],
@@ -1333,7 +1333,7 @@
 					"height": 115
 				}
 			},
-			"scarf-ribbon-top-r": {
+			"spineboy/scarf/scarf-ribbon-top-r": {
 				"scarf-ribbon-top-r": {
 					"type": "mesh",
 					"uvs": [ 1, 1, 0, 1, 0, 0, 1, 0, 0.07535, 0.38381, 0.37604, 0.36481 ],
@@ -1345,13 +1345,13 @@
 					"height": 105
 				}
 			},
-			"arm-down-l": {
+			"spineboy/arm-down-l": {
 				"arm-down-l": { "x": -19.99, "y": 17.79, "rotation": 94.56, "width": 112, "height": 108 }
 			},
-			"arm-down-l-fuzzy": {
+			"spineboy/arm-down-l-fuzzy": {
 				"arm-down-l-fuzzy": { "x": 4.64, "y": -8.49, "rotation": 94.56, "width": 113, "height": 118 }
 			},
-			"arm-down-r": {
+			"spineboy/arm-down-r": {
 				"arm-down-r": {
 					"type": "mesh",
 					"uvs": [ 1, 1, 0, 1, 0, 0, 1, 0, 0.22928, 0.20267, 0.7513, 0.4204, 0.16814, 0.57114, 0.69251, 0.74532 ],
@@ -1363,10 +1363,10 @@
 					"height": 106
 				}
 			},
-			"arm-down-r-fuzzy": {
+			"spineboy/arm-down-r-fuzzy": {
 				"arm-down-r-fuzzy": { "x": 7.4, "y": 6.44, "rotation": 111.25, "width": 122, "height": 132 }
 			},
-			"arm-up-l": {
+			"spineboy/arm-up-l": {
 				"arm-up-l": {
 					"type": "mesh",
 					"uvs": [ 1, 1, 0, 1, 0, 0, 1, 0, 0.3591, 0.14081, 0.2538, 0.81668, 0.71162, 0.14276, 0.57427, 0.82837 ],
@@ -1378,7 +1378,7 @@
 					"height": 228
 				}
 			},
-			"arm-up-r": {
+			"spineboy/arm-up-r": {
 				"arm-up-r": {
 					"type": "mesh",
 					"uvs": [ 1, 0.31848, 0.5165, 1, 0, 1, 0, 0.68696, 0.42176, 0, 1, 0, 0.12481, 0.80136, 0.61573, 0.10829, 0.39034, 0.86452, 0.84729, 0.17657 ],
@@ -1390,7 +1390,7 @@
 					"height": 208
 				}
 			},
-			"body": {
+			"spineboy/body": {
 				"body": {
 					"type": "mesh",
 					"uvs": [ 0.99999, 0.40382, 0.96426, 0.52521, 0.91782, 0.68301, 0.88764, 0.78553, 0.82452, 0.99999, 0, 1, 1.0E-5, 0.60681, 0.05298, 0.48377, 0.10509, 0.36272, 0.16052, 0.23394, 0.26122, 1.0E-5, 1, 0, 0.36992, 0.38991, 0.77511, 0.46373, 0.20672, 0.77067, 0.6513, 0.86262, 0.26441, 0.64504, 0.33194, 0.50776, 0.73009, 0.60101, 0.68225, 0.73829 ],
@@ -1402,7 +1402,7 @@
 					"height": 302
 				}
 			},
-			"ear-l": {
+			"spineboy/ear-l": {
 				"ear-l": {
 					"type": "mesh",
 					"uvs": [ 1, 0.25439, 0.59936, 1, 0, 1, 0, 0.40911, 0.83452, 0, 1, 0, 0.3097, 0.69014, 0.9263, 0.1344 ],
@@ -1414,7 +1414,7 @@
 					"height": 99
 				}
 			},
-			"ear-r": {
+			"spineboy/ear-r": {
 				"ear-r": {
 					"type": "mesh",
 					"uvs": [ 1, 1, 0, 1, 0, 0, 1, 0, 0.43294, 0.44023, 0.6716, 0.76972 ],
@@ -1426,13 +1426,13 @@
 					"height": 132
 				}
 			},
-			"eye-reflex-l": {
+			"spineboy/eye-reflex-l": {
 				"eye-reflex-l": { "x": 70.7, "y": 9.01, "width": 24, "height": 26 }
 			},
-			"eye-reflex-r": {
+			"spineboy/eye-reflex-r": {
 				"eye-reflex-r": { "x": -85.3, "y": 22.01, "width": 20, "height": 24 }
 			},
-			"eye-white-l": {
+			"spineboy/eye-white-l": {
 				"eye-white-l": {
 					"type": "mesh",
 					"uvs": [ 1, 1, 0, 1, 0, 0, 1, 0 ],
@@ -1444,7 +1444,7 @@
 					"height": 85
 				}
 			},
-			"eye-white-l2": {
+			"spineboy/eye-white-l2": {
 				"eye-white-l": {
 					"type": "mesh",
 					"uvs": [ 1, 1, 0, 1, 0, 0, 1, 0 ],
@@ -1456,7 +1456,7 @@
 					"height": 85
 				}
 			},
-			"eye-white-r": {
+			"spineboy/eye-white-r": {
 				"eye-white-r": {
 					"type": "mesh",
 					"uvs": [ 1, 1, 0, 1, 0, 0, 1, 0 ],
@@ -1468,7 +1468,7 @@
 					"height": 96
 				}
 			},
-			"eye-white-r2": {
+			"spineboy/eye-white-r2": {
 				"eye-white-r": {
 					"type": "mesh",
 					"uvs": [ 1, 1, 0, 1, 0, 0, 1, 0 ],
@@ -1480,7 +1480,7 @@
 					"height": 96
 				}
 			},
-			"eyelashes-l": {
+			"spineboy/eyelashes-l": {
 				"eyelashes-l": {
 					"type": "mesh",
 					"uvs": [ 0.2372, 0.38742, 0.37158, 0.22968, 0.53232, 0.11449, 0.69207, 0, 0.85866, 0, 0.99999, 0.1265, 0.9752, 0.25688, 0.82976, 0.10239, 0.6813, 0.14216, 0.60109, 0.21003, 0.47393, 0.31763, 0.35663, 0.49265, 0.21713, 0.70079, 0.1628, 0.8083, 0.06594, 1, 1.0E-5, 1, 0, 0.81483, 0.04492, 0.69556, 0.10057, 0.54782 ],
@@ -1492,7 +1492,7 @@
 					"height": 79
 				}
 			},
-			"eyelashes-r": {
+			"spineboy/eyelashes-r": {
 				"eyelashes-r": {
 					"type": "mesh",
 					"uvs": [ 0.31674, 0, 0.47408, 0, 0.58539, 0.11318, 0.682, 0.21141, 0.79148, 0.32272, 0.89887, 0.43191, 0.9521, 0.60429, 0.98849, 0.72215, 0.98304, 1, 0.91058, 1, 0.85091, 0.76776, 0.7934, 0.63242, 0.73491, 0.49475, 0.64614, 0.39742, 0.53997, 0.28099, 0.43829, 0.19769, 0.34, 0.11716, 0.17764, 0.2005, 0, 0.37269, 0, 0.31373, 0.11001, 0.10017 ],
@@ -1504,7 +1504,7 @@
 					"height": 94
 				}
 			},
-			"gift-base": {
+			"spineboy/gift-base": {
 				"gift-base": {
 					"type": "mesh",
 					"uvs": [ 0.35756, 0.94449, 1.0E-5, 0.70989, 0.1241, 0, 0.58753, 0, 1, 0.2512, 0.99999, 0.31643, 0.77744, 1 ],
@@ -1516,7 +1516,7 @@
 					"height": 209
 				}
 			},
-			"gift-decoration": {
+			"spineboy/gift-decoration": {
 				"gift-decoration": {
 					"type": "mesh",
 					"uvs": [ 1, 1, 0, 1, 0, 0, 1, 0 ],
@@ -1528,25 +1528,25 @@
 					"height": 80
 				}
 			},
-			"glove-fingers-l": {
+			"spineboy/glove-fingers-l": {
 				"glove-fingers-l": { "x": 5.92, "y": 13.18, "rotation": 94.56, "width": 78, "height": 102 }
 			},
-			"glove-fingers-r": {
+			"spineboy/glove-fingers-r": {
 				"glove-fingers-r": { "x": 2.48, "y": 6.67, "rotation": 111.25, "width": 82, "height": 111 }
 			},
-			"glove-l": {
+			"spineboy/glove-l": {
 				"glove-l": { "x": -1.42, "y": 17.11, "rotation": 94.56, "width": 79, "height": 122 }
 			},
-			"glove-r": {
+			"spineboy/glove-r": {
 				"glove-r": { "x": -4.54, "y": 1.26, "rotation": 111.25, "width": 87, "height": 130 }
 			},
-			"glove-shadow-l": {
+			"spineboy/glove-shadow-l": {
 				"glove-shadow-l": { "x": 18.1, "y": -7.41, "rotation": 94.56, "width": 55, "height": 113 }
 			},
-			"glove-shadow-r": {
+			"spineboy/glove-shadow-r": {
 				"glove-shadow-r": { "x": 11.23, "y": 18.65, "rotation": 111.25, "width": 76, "height": 124 }
 			},
-			"hat": {
+			"spineboy/hat": {
 				"hat": {
 					"type": "mesh",
 					"uvs": [ 0.52004, 0.10532, 0.68467, 0.21125, 0.8019, 0.34533, 0.90194, 0.45977, 0.97481, 0.54312, 1, 0.71252, 0.96244, 0.85248, 0.65088, 1, 0.34533, 1, 0, 0.84576, 0, 0.65074, 0.13207, 0.51285, 0.20789, 0.39358, 0.27592, 0.28656, 0.31485, 0.17297, 0.27247, 0.08157, 0.10739, 0.1163, 0.1406, 0.12061, 0.19897, 0.10447, 0.27138, 0.1265, 0.274, 0.20855, 0.17878, 0.24469, 0.11055, 0.20605, 0.05218, 0.16499, 0.03611, 0.09819, 0.08273, 0.04778, 0.19875, 0, 0.35926, 0.00187, 0.30969, 0.53587, 0.33624, 0.43235, 0.74459, 0.52183, 0.71172, 0.42098, 0.42359, 0.23708, 0.40072, 0.1148, 0.57233, 0.20584, 0.63765, 0.32983, 0.37113, 0.35903 ],
@@ -1558,7 +1558,7 @@
 					"height": 441
 				}
 			},
-			"head-base": {
+			"spineboy/head-base": {
 				"head-base": {
 					"type": "mesh",
 					"uvs": [ 0.75, 1, 0.25, 1, 0, 0.75, 0, 0.25, 0.25, 0, 0.75, 0, 1, 0.25, 1, 0.75, 0.5, 0.75, 0.29386, 0.76762, 0.79086, 0.48938, 0.5, 0.5, 0.26002, 0.45978, 0.88435, 0.4671, 0.49577, 0.28896, 0.63253, 0.75027, 0.32554, 0.72619, 0.68973, 0.74485, 0.15329, 0.39932, 0.33266, 0.58577, 0.69936, 0.59439, 0.72031, 0.77865, 0.19834, 0.77583, 0.12476, 0.72297, 0.07524, 0.61019, 0.08585, 0.49671, 0.83854, 0.78996, 0.90787, 0.73427, 0.94608, 0.63489, 0.93617, 0.55326, 0.91592, 0.73936, 0.85236, 0.81173, 0.96215, 0.63656, 0.97948, 0.54591, 0.72216, 0.83025, 0.63679, 0.54313, 0.75434, 0.42552, 0.39998, 0.54631, 0.31788, 0.41129, 0.16924, 0.34789, 0.0415, 0.6223, 0.09251, 0.73845, 0.18034, 0.81825, 0.05455, 0.45327, 0.69368, 0.90872, 0.33312, 0.91056, 0.51479, 0.95304, 0.37761, 0.83115, 0.66865, 0.83115, 0.52684, 0.87824, 0.33138, 0.65955, 0.29093, 0.51192, 0.20151, 0.40841, 0.67579, 0.69193, 0.68388, 0.63721, 0.74009, 0.54812, 0.7733, 0.50994, 0.84739, 0.46031, 0.78218, 0.79196 ],
@@ -1570,7 +1570,7 @@
 					"height": 269
 				}
 			},
-			"iris-l": {
+			"spineboy/iris-l": {
 				"iris-l": {
 					"type": "mesh",
 					"uvs": [ 1, 1, 0, 1, 0, 0, 1, 0 ],
@@ -1582,7 +1582,7 @@
 					"height": 81
 				}
 			},
-			"iris-r": {
+			"spineboy/iris-r": {
 				"iris-r": {
 					"type": "mesh",
 					"uvs": [ 1, 1, 0, 1, 0, 0, 1, 0 ],
@@ -1594,7 +1594,7 @@
 					"height": 81
 				}
 			},
-			"leg-down-l": {
+			"spineboy/leg-down-l": {
 				"leg-down-l": {
 					"type": "mesh",
 					"uvs": [ 0.96841, 0.70287, 0.53786, 1, 0.31884, 1, 0, 1, 0, 0.40396, 0.60137, 1.0E-5, 1, 0, 0.10357, 0.59475, 0.75174, 0.2153, 0.15271, 0.80038, 0.85119, 0.53964 ],
@@ -1606,7 +1606,7 @@
 					"height": 101
 				}
 			},
-			"leg-down-r": {
+			"spineboy/leg-down-r": {
 				"leg-down-r": {
 					"type": "mesh",
 					"uvs": [ 0.26439, 0, 0.99347, 0.55042, 1, 1, 0.48857, 1, 0, 0.23406, 1.4E-4, 2.0E-5, 0.131, 0.12257, 0.63326, 0.8625, 0.29584, 0.09035, 0.90243, 0.6964 ],
@@ -1618,7 +1618,7 @@
 					"height": 205
 				}
 			},
-			"leg-up-l": {
+			"spineboy/leg-up-l": {
 				"leg-up-l": {
 					"type": "mesh",
 					"uvs": [ 0.94975, 0.99999, 0.01117, 0.99999, 0, 0, 1, 0, 0.22104, 0.87502, 0.31036, 0.14253, 0.61184, 0.88117, 0.757, 0.14622 ],
@@ -1630,10 +1630,10 @@
 					"height": 293
 				}
 			},
-			"leg-up-l-fuzzy": {
+			"spineboy/leg-up-l-fuzzy": {
 				"leg-up-l-fuzzy": { "x": 4.7, "y": -27.19, "rotation": 93.08, "width": 146, "height": 130 }
 			},
-			"leg-up-r": {
+			"spineboy/leg-up-r": {
 				"leg-up-r": {
 					"type": "mesh",
 					"uvs": [ 0.99999, 0.30846, 0.4712, 0.83821, 0, 0.82645, 0, 0.62125, 0.37002, 0.00452, 1, 0, 0.12939, 0.67007, 0.37247, 0.7463, 0.52713, 0.10047, 0.85492, 0.19848 ],
@@ -1645,10 +1645,10 @@
 					"height": 279
 				}
 			},
-			"leg-up-r-fuzzy": {
+			"spineboy/leg-up-r-fuzzy": {
 				"leg-up-r-fuzzy": { "x": -21.42, "y": -16.05, "rotation": 112.6, "width": 129, "height": 142 }
 			},
-			"mouth": {
+			"spineboy/mouth": {
 				"mouth": {
 					"type": "mesh",
 					"uvs": [ 1, 1, 0, 1, 0, 0, 1, 0 ],
@@ -1660,10 +1660,10 @@
 					"height": 26
 				}
 			},
-			"neck-scarf": {
+			"spineboy/neck-scarf": {
 				"neck-scarf": { "x": 4.62, "y": 28.43, "width": 284, "height": 227 }
 			},
-			"nose": {
+			"spineboy/nose": {
 				"nose": {
 					"type": "mesh",
 					"uvs": [ 1, 1, 0, 1, 0, 0, 1, 0 ],
@@ -1675,7 +1675,7 @@
 					"height": 28
 				}
 			},
-			"nose-shadow": {
+			"spineboy/nose-shadow": {
 				"nose-shadow": {
 					"type": "mesh",
 					"uvs": [ 1, 1, 0, 1, 0, 0, 1, 0 ],
@@ -1687,16 +1687,16 @@
 					"height": 29
 				}
 			},
-			"pupil-l": {
+			"spineboy/pupil-l": {
 				"pupil-l": { "x": -0.71, "y": -0.68, "width": 63, "height": 63 }
 			},
-			"pupil-r": {
+			"spineboy/pupil-r": {
 				"pupil-r": { "x": -2.86, "y": -0.89, "width": 63, "height": 63 }
 			},
-			"scarf-shadow": {
+			"spineboy/scarf-shadow": {
 				"scarf-shadow": { "x": -10.38, "y": -22.07, "width": 298, "height": 148 }
 			},
-			"shoe-l": {
+			"spineboy/shoe-l": {
 				"shoe-l": {
 					"type": "mesh",
 					"uvs": [ 1, 0.20875, 0.84568, 0.68848, 0.7435, 0.99999, 0.03754, 1, 1.0E-5, 0.62071, 0.11887, 0.17003, 0.34409, 1.0E-5, 0.97497, 1.0E-5, 0.32113, 0.17541, 0.25857, 0.70246, 0.74238, 0.18294, 0.6965, 0.70676, 0.42331, 0.84982 ],
@@ -1708,7 +1708,7 @@
 					"height": 190
 				}
 			},
-			"shoe-r": {
+			"spineboy/shoe-r": {
 				"shoe-r": {
 					"type": "mesh",
 					"uvs": [ 1, 0.38031, 0.91953, 0.76989, 0.76433, 0.99999, 0, 1, 0, 0.672, 0.12133, 0.29588, 0.25839, 0, 0.87936, 1.0E-5, 0.2538, 0.73871, 0.75215, 0.7689, 0.38391, 0.30664, 0.84543, 0.3229 ],
@@ -1720,7 +1720,7 @@
 					"height": 186
 				}
 			},
-			"shoelace": {
+			"spineboy/shoelace": {
 				"shoelace": {
 					"type": "mesh",
 					"uvs": [ 1, 1, 0, 1, 0, 0, 1, 0 ],
@@ -1732,7 +1732,7 @@
 					"height": 36
 				}
 			},
-			"shoelace2": {
+			"spineboy/shoelace2": {
 				"shoelace": {
 					"type": "mesh",
 					"uvs": [ 1, 1, 0, 1, 0, 0, 1, 0 ],
@@ -1744,7 +1744,7 @@
 					"height": 36
 				}
 			},
-			"string": {
+			"spineboy/string": {
 				"string": {
 					"type": "mesh",
 					"uvs": [ 1, 1, 0, 1, 0, 0.8, 0, 0.6, 0, 0.4, 0, 0.2, 0, 0, 1, 0, 1, 0.2, 1, 0.4, 1, 0.6, 1, 0.8 ],
@@ -1756,7 +1756,7 @@
 					"height": 106
 				}
 			},
-			"string2": {
+			"spineboy/string2": {
 				"string": {
 					"type": "mesh",
 					"uvs": [ 1, 1, 0, 1, 0, 0.8, 0, 0.6, 0, 0.4, 0, 0.2, 0, 0, 1, 0, 1, 0.2, 1, 0.4, 1, 0.6, 1, 0.8 ],
@@ -1768,7 +1768,7 @@
 					"height": 106
 				}
 			},
-			"string3": {
+			"spineboy/string3": {
 				"string": {
 					"type": "mesh",
 					"uvs": [ 1, 1, 0, 1, 0, 0.8, 0, 0.6, 0, 0.4, 0, 0.2, 0, 0, 1, 0, 1, 0.2, 1, 0.4, 1, 0.6, 1, 0.8 ],
@@ -1780,7 +1780,7 @@
 					"height": 106
 				}
 			},
-			"string4": {
+			"spineboy/string4": {
 				"string": {
 					"type": "mesh",
 					"uvs": [ 1, 1, 0, 1, 0, 0.8, 0, 0.6, 0, 0.4, 0, 0.2, 0, 0, 1, 0, 1, 0.2, 1, 0.4, 1, 0.6, 1, 0.8 ],
@@ -2345,25 +2345,25 @@
 		"drawOrder": [
 			{
 				"offsets": [
-					{ "slot": "red-present-base", "offset": -98 },
-					{ "slot": "red-present-decoration", "offset": -98 },
-					{ "slot": "blue-present-base", "offset": -98 },
-					{ "slot": "blue-present-decoration", "offset": -98 }
+					{ "slot": "red-present/red-present-base", "offset": -98 },
+					{ "slot": "red-present/red-present-decoration", "offset": -98 },
+					{ "slot": "blue-present/blue-present-base", "offset": -98 },
+					{ "slot": "blue-present/blue-present-decoration", "offset": -98 }
 				]
 			},
 			{ "time": 0.5667 },
 			{
 				"time": 1.0333,
 				"offsets": [
-					{ "slot": "green-present-base", "offset": -71 },
-					{ "slot": "green-present-decoration", "offset": -71 }
+					{ "slot": "green-present/green-present-base", "offset": -71 },
+					{ "slot": "green-present/green-present-decoration", "offset": -71 }
 				]
 			},
 			{
 				"time": 1.8,
 				"offsets": [
-					{ "slot": "red-present-base", "offset": -98 },
-					{ "slot": "red-present-decoration", "offset": -98 }
+					{ "slot": "red-present/red-present-base", "offset": -98 },
+					{ "slot": "red-present/red-present-decoration", "offset": -98 }
 				]
 			}
 		]
@@ -2884,25 +2884,25 @@
 		"drawOrder": [
 			{
 				"offsets": [
-					{ "slot": "red-present-base", "offset": -98 },
-					{ "slot": "red-present-decoration", "offset": -98 },
-					{ "slot": "blue-present-base", "offset": -98 },
-					{ "slot": "blue-present-decoration", "offset": -98 }
+					{ "slot": "red-present/red-present-base", "offset": -98 },
+					{ "slot": "red-present/red-present-decoration", "offset": -98 },
+					{ "slot": "blue-present/blue-present-base", "offset": -98 },
+					{ "slot": "blue-present/blue-present-decoration", "offset": -98 }
 				]
 			},
 			{ "time": 0.5667 },
 			{
 				"time": 1.0333,
 				"offsets": [
-					{ "slot": "green-present-base", "offset": -71 },
-					{ "slot": "green-present-decoration", "offset": -71 }
+					{ "slot": "green-present/green-present-base", "offset": -71 },
+					{ "slot": "green-present/green-present-decoration", "offset": -71 }
 				]
 			},
 			{
 				"time": 1.8,
 				"offsets": [
-					{ "slot": "red-present-base", "offset": -98 },
-					{ "slot": "red-present-decoration", "offset": -98 }
+					{ "slot": "red-present/red-present-base", "offset": -98 },
+					{ "slot": "red-present/red-present-decoration", "offset": -98 }
 				]
 			}
 		]

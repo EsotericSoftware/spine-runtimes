@@ -1,3 +1,6 @@
+# 4.2.26
+- `Skeleton.getBounds()` takes clipping into consideration.
+
 # 4.2.25
 - Switch to spine-cpp-lite
 

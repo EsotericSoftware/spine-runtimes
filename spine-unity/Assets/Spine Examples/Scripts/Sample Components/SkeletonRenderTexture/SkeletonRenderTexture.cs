@@ -128,6 +128,11 @@ namespace Spine.Unity.Examples {
 		}
 
 		void RenderOntoQuad (SkeletonRenderer skeletonRenderer) {
+			Vector3 size = meshFilter.sharedMesh.bounds.size;
+			if (size.x == 0f || size.y == 0f) {
+				AssignNullMeshAtQuad();
+				return;
+			}
 			PrepareForMesh();
 			RenderToRenderTexture();
 			AssignAtQuad();
@@ -197,6 +202,10 @@ namespace Spine.Unity.Examples {
 			quadMeshFilter.mesh = quadMesh;
 			quadMeshRenderer.sharedMaterial.mainTexture = this.renderTexture;
 			quadMeshRenderer.sharedMaterial.color = color;
+		}
+
+		protected void AssignNullMeshAtQuad () {
+			quadMeshFilter.mesh = null;
 		}
 #endif
 	}

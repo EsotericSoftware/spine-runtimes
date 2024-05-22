@@ -916,7 +916,7 @@ export class SkeletonJson {
 
 					let frames = timelineMap.length;
 					if (timelineName == "reset") {
-						const timeline = new PhysicsConstraintResetTimeline(timelineMap.size, constraintIndex);
+						const timeline = new PhysicsConstraintResetTimeline(frames, constraintIndex);
 						for (let frame = 0; keyMap != null; keyMap = timelineMap[frame + 1], frame++)
 							timeline.setFrame(frame, getValue(keyMap, "time", 0));
 						timelines.push(timeline);

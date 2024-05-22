@@ -30,6 +30,7 @@
 #include "SpineSkeleton.h"
 #include "SpineCommon.h"
 #include "SpineSprite.h"
+#include <spine/SkeletonClipping.h>
 
 void SpineSkeleton::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("update_world_transform", "physics"), &SpineSkeleton::update_world_transform);
@@ -222,7 +223,8 @@ Ref<SpinePhysicsConstraint> SpineSkeleton::find_physics_constraint(const String 
 Rect2 SpineSkeleton::get_bounds() {
 	SPINE_CHECK(skeleton, Rect2(0, 0, 0, 0))
 	float x, y, w, h;
-	skeleton->getBounds(x, y, w, h, bounds_vertex_buffer);
+	spine::SkeletonClipping clipper;
+	skeleton->getBounds(x, y, w, h, bounds_vertex_buffer, &clipper);
 	return Rect2(x, y, w, h);
 }
 

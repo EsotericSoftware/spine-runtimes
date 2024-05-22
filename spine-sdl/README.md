@@ -20,7 +20,7 @@ For the official legal terms governing the Spine Runtimes, please read the [Spin
 
 spine-sdl works with data exported from Spine 4.2.xx.
 
-spine-sdl supports all Spine features except premultiplied alpha, screen blend mode, and two color tinting.
+spine-sdl supports all Spine features except screen blend mode and two color tinting.
 
 ## Usage
 

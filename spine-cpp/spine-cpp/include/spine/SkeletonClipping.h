@@ -48,6 +48,9 @@ namespace spine {
 
 		void clipEnd();
 
+        void
+        clipTriangles(float *vertices, unsigned short *triangles, size_t trianglesLength);
+
 		void
 		clipTriangles(float *vertices, unsigned short *triangles, size_t trianglesLength, float *uvs, size_t stride);
 

@@ -47,18 +47,32 @@ import {
 import type { SpineTexture } from "./SpineTexture.js";
 import { SlotMesh } from "./SlotMesh.js";
 import { DarkSlotMesh } from "./DarkSlotMesh.js";
-import type { ISpineDebugRenderer } from "./SpineDebugRenderer.js";
+import type { ISpineDebugRenderer, SpineDebugRenderer } from "./SpineDebugRenderer.js";
 import { Assets } from "@pixi/assets";
 import type { IPointData } from "@pixi/core";
-import { Ticker, utils } from "@pixi/core";
+import { Ticker } from "@pixi/core";
 import type { IDestroyOptions, DisplayObject } from "@pixi/display";
 import { Container } from "@pixi/display";
 
+/**
+ * Options to configure a {@link Spine} game object.
+ */
 export interface ISpineOptions {
+	/**  Set the {@link Spine.autoUpdate} value. If omitted, it is set to `true`. */
 	autoUpdate?: boolean;
+	/**  The value passed to the skeleton reader. If omitted, 1 is passed. See {@link SkeletonBinary.scale} for details. */
+	scale?: number;
+	/** 
+	 * A factory to override the default ones to render Spine meshes ({@link DarkSlotMesh} or {@link SlotMesh}).
+	 * If omitted, a factory returning a ({@link DarkSlotMesh} or {@link SlotMesh}) will be used depending on the presence of
+	 * a dark tint mesh in the skeleton.
+	 * */
 	slotMeshFactory?: () => ISlotMesh;
 }
 
+/**
+ * AnimationStateListener {@link https://en.esotericsoftware.com/spine-api-reference#AnimationStateListener events} exposed for Pixi.
+ */
 export interface SpineEvents {
 	complete: [trackEntry: TrackEntry];
 	dispose: [trackEntry: TrackEntry];
@@ -68,14 +82,23 @@ export interface SpineEvents {
 	start: [trackEntry: TrackEntry];
 }
 
+/**
+ * The class to instantiate a {@link Spine} game object in Pixi.
+ * The static method {@link Spine.from} should be used to instantiate a Spine game object.
+ */
 export class Spine extends Container {
+	/** The skeleton for this Spine game object. */
 	public skeleton: Skeleton;
+	/** The animation state for this Spine game object. */
 	public state: AnimationState;
 
 	private _debug?: ISpineDebugRenderer | undefined = undefined;
 	public get debug (): ISpineDebugRenderer | undefined {
 		return this._debug;
 	}
+	/** Pass a {@link SpineDebugRenderer} or create your own {@link ISpineDebugRenderer} to render bones, meshes, ...
+	 * @example spineGO.debug = new SpineDebugRenderer();
+	 */
 	public set debug (value: ISpineDebugRenderer | undefined) {
 		if (this._debug) {
 			this._debug.unregisterSpine(this);
@@ -86,13 +109,14 @@ export class Spine extends Container {
 		this._debug = value;
 	}
 
-	protected slotMeshFactory: () => ISlotMesh = ((): ISlotMesh => new SlotMesh());
+	protected slotMeshFactory: () => ISlotMesh = () => new SlotMesh();
 
 	private autoUpdateWarned: boolean = false;
 	private _autoUpdate: boolean = true;
 	public get autoUpdate (): boolean {
 		return this._autoUpdate;
 	}
+	/** When `true`, the Spine AnimationState and the Skeleton will be automatically updated using the {@link Ticker.shared} instance. */
 	public set autoUpdate (value: boolean) {
 		if (value) {
 			Ticker.shared.add(this.internalUpdate, this);
@@ -115,7 +139,6 @@ export class Spine extends Container {
 	private lightColor = new Color();
 	private darkColor = new Color();
 
-
 	constructor (skeletonData: SkeletonData, options?: ISpineOptions) {
 		super();
 
@@ -134,13 +157,14 @@ export class Spine extends Container {
 		} else {
 			for (let i = 0; i < this.skeleton.slots.length; i++) {
 				if (this.skeleton.slots[i].data.darkColor) {
-					this.slotMeshFactory = options?.slotMeshFactory ?? ((): ISlotMesh => new DarkSlotMesh());
+					this.slotMeshFactory = options?.slotMeshFactory ?? (() => new DarkSlotMesh());
 					break;
 				}
 			}
 		}
 	}
 
+	/** If {@link Spine.autoUpdate} is `false`, this method allows to update the AnimationState and the Skeleton with the given delta. */
 	public update (deltaSeconds: number): void {
 		if (this.autoUpdate && !this.autoUpdateWarned) {
 			console.warn("You are calling update on a Spine instance that has autoUpdate set to true. This is probably not what you want.");
@@ -156,6 +180,7 @@ export class Spine extends Container {
 		this.skeleton.update(delta);
 	}
 
+	/** Before rendering, apply the state change to the Spine AnimationState and update the skeleton transform, then call the {@link Container.updateTransform}. */
 	public override updateTransform (): void {
 		this.updateSpineTransform();
 		this.debug?.renderDebug(this);
@@ -171,6 +196,7 @@ export class Spine extends Container {
 		this.sortChildren();
 	}
 
+	/** Destroy Spine game object elements, then call the {@link Container.destroy} with the given options */
 	public override destroy (options?: boolean | IDestroyOptions | undefined): void {
 		for (const [, mesh] of this.meshesCache) {
 			mesh?.destroy();
@@ -320,13 +346,19 @@ export class Spine extends Container {
 		Spine.clipper.clipEnd();
 	}
 
+	/** 
+	 * Set the position of the bone given in input through a {@link IPointData}.
+	 * @param bone: the bone name or the bone instance to set the position
+	 * @param outPos: the new position of the bone.
+	 * @throws {Error}: if the given bone is not found in the skeleton, an error is thrown
+	 */
 	public setBonePosition (bone: string | Bone, position: IPointData): void {
 		const boneAux = bone;
 		if (typeof bone === "string") {
 			bone = this.skeleton.findBone(bone)!;
 		}
 
-		if (!bone) throw Error(`Cant set bone position, bone ${String(boneAux)} not found`);
+		if (!bone) throw Error(`Cannot set bone position, bone ${String(boneAux)} not found`);
 		Spine.vectorAux.set(position.x, position.y);
 
 		if (bone.parent) {
@@ -340,6 +372,12 @@ export class Spine extends Container {
 		}
 	}
 
+	/** 
+	 * Return the position of the bone given in input into an {@link IPointData}.
+	 * @param bone: the bone name or the bone instance to get the position from
+	 * @param outPos: an optional {@link IPointData} to use to return the bone position, rathern than instantiating a new object.
+	 * @returns {IPointData | undefined}: the position of the bone, or undefined if no matching bone is found in the skeleton
+	 */
 	public getBonePosition (bone: string | Bone, outPos?: IPointData): IPointData | undefined {
 		const boneAux = bone;
 		if (typeof bone === "string") {
@@ -347,7 +385,7 @@ export class Spine extends Container {
 		}
 
 		if (!bone) {
-			console.error(`Cant set bone position! Bone ${String(boneAux)} not found`);
+			console.error(`Cannot get bone position! Bone ${String(boneAux)} not found`);
 			return outPos;
 		}
 
@@ -360,9 +398,26 @@ export class Spine extends Container {
 		return outPos;
 	}
 
+	/** A cache containing skeleton data and atlases already loaded by {@link Spine.from}. */
 	public static readonly skeletonCache: Record<string, SkeletonData> = Object.create(null);
 
-	public static from (skeletonAssetName: string, atlasAssetName: string, options?: ISpineOptions & { scale?: number }): Spine {
+	/** 
+	 * Use this method to instantiate a Spine game object.
+	 * Before instantiating a Spine game object, the skeleton (`.skel` or `.json`) and the atlas text files must be loaded into the Assets. For example:
+	 * ```
+	 * PIXI.Assets.add("sackData", "./assets/sack-pro.skel");
+	 * PIXI.Assets.add("sackAtlas", "./assets/sack-pma.atlas");
+	 * await PIXI.Assets.load(["sackData", "sackAtlas"]);
+	 * ```
+	 * Once a Spine game object is created, its skeleton data is cached into {@link Spine.skeletonCache} using the key:
+	 * `${skeletonAssetName}-${atlasAssetName}-${options?.scale ?? 1}`
+	 * 
+	 * @param skeletonAssetName - the asset name for the skeleton `.skel` or `.json` file previously loaded into the Assets
+	 * @param atlasAssetName - the asset name for the atlas file previously loaded into the Assets
+	 * @param options - Options to configure the Spine game object
+	 * @returns {Spine} The Spine game object instantiated
+	 */
+	public static from (skeletonAssetName: string, atlasAssetName: string, options?: ISpineOptions): Spine {
 		const cacheKey = `${skeletonAssetName}-${atlasAssetName}-${options?.scale ?? 1}`;
 		let skeletonData = Spine.skeletonCache[cacheKey];
 		if (skeletonData) {
@@ -377,10 +432,20 @@ export class Spine extends Container {
 		Spine.skeletonCache[cacheKey] = skeletonData;
 		return new this(skeletonData, options);
 	}
+
+	public get tint (): number {
+		return this.skeleton.color.toRgb888();
+	}
+	public set tint (value: number) {
+		Color.rgb888ToColor(this.skeleton.color, value);
+	}
 }
 
 Skeleton.yDown = true;
 
+/**
+ * Represents the mesh type used in a Spine objects. Available implementations are {@link DarkSlotMesh} and {@link SlotMesh}.
+ */
 export interface ISlotMesh extends DisplayObject {
 	name: string;
 	updateFromSpineData (

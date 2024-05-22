@@ -39,6 +39,8 @@
 // Comment out this line to revert to previous behaviour.
 // You may only need this option disabled when utilizing a custom shader which
 // uses vertex color alpha for purposes other than transparency.
+//
+// Important Note: When disabling this define, also disable the one in SkeletonRenderInstruction.cs
 #define SLOT_ALPHA_DISABLES_ATTACHMENT
 
 using System;

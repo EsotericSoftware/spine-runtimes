@@ -48,18 +48,19 @@ int main(int argc, char **argv) {
 	}
 
 	spine::SDLTextureLoader textureLoader(renderer);
-	spine::Atlas atlas("data/spineboy.atlas", &textureLoader);
+	spine::Atlas atlas("data/spineboy-pma.atlas", &textureLoader);
 	spine::AtlasAttachmentLoader attachmentLoader(&atlas);
 	spine::SkeletonJson json(&attachmentLoader);
 	json.setScale(0.5f);
 	spine::SkeletonData *skeletonData = json.readSkeletonDataFile("data/spineboy-pro.json");
 	spine::SkeletonDrawable drawable(skeletonData);
+	drawable.usePremultipliedAlpha = true;
 	drawable.animationState->getData()->setDefaultMix(0.2f);
 	drawable.skeleton->setPosition(400, 500);
 	drawable.skeleton->setToSetupPose();
-	drawable.update(0, spine::Physics_Update);
 	drawable.animationState->setAnimation(0, "portal", true);
 	drawable.animationState->addAnimation(0, "run", true, 0);
+	drawable.update(0, spine::Physics_Update);
 
 	bool quit = false;
 	uint64_t lastFrameTime = SDL_GetPerformanceCounter();

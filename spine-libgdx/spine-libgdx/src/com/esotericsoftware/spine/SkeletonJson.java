@@ -960,7 +960,7 @@ public class SkeletonJson extends SkeletonLoader {
 				int frames = timelineMap.size;
 				String timelineName = timelineMap.name;
 				if (timelineName.equals("reset")) {
-					PhysicsConstraintResetTimeline timeline = new PhysicsConstraintResetTimeline(timelineMap.size, index);
+					PhysicsConstraintResetTimeline timeline = new PhysicsConstraintResetTimeline(frames, index);
 					for (int frame = 0; keyMap != null; keyMap = keyMap.next, frame++)
 						timeline.setFrame(frame, keyMap.getFloat("time", 0));
 					timelines.add(timeline);

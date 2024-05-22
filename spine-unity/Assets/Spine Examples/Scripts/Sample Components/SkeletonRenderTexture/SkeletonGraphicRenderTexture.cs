@@ -67,6 +67,19 @@ namespace Spine.Unity.Examples {
 		protected SkeletonSubmeshGraphic quadMaskableGraphic;
 		protected readonly Vector3[] worldCorners = new Vector3[4];
 
+		public void ResetMeshRendererMaterials () {
+			meshRendererMaterialForTexture.Clear();
+			AtlasAssetBase[] atlasAssets = skeletonGraphic.SkeletonDataAsset.atlasAssets;
+			for (int i = 0; i < atlasAssets.Length; ++i) {
+				foreach (Material material in atlasAssets[i].Materials) {
+					if (material.mainTexture != null) {
+						meshRendererMaterialForTexture.Add(
+							new TextureMaterialPair(material.mainTexture, material));
+					}
+				}
+			}
+		}
+
 		protected override void Awake () {
 			base.Awake();
 			skeletonGraphic = this.GetComponent<SkeletonGraphic>();
@@ -97,16 +110,7 @@ namespace Spine.Unity.Examples {
 
 		void Reset () {
 			skeletonGraphic = this.GetComponent<SkeletonGraphic>();
-			AtlasAssetBase[] atlasAssets = skeletonGraphic.SkeletonDataAsset.atlasAssets;
-			for (int i = 0; i < atlasAssets.Length; ++i) {
-				foreach (Material material in atlasAssets[i].Materials) {
-					if (material.mainTexture != null) {
-						meshRendererMaterialForTexture.Add(
-							new TextureMaterialPair(material.mainTexture, material));
-					}
-				}
-			}
-
+			ResetMeshRendererMaterials();
 #if UNITY_EDITOR
 			string[] assets = UnityEditor.AssetDatabase.FindAssets("t:material RenderQuadGraphicMaterial");
 			if (assets.Length > 0) {
@@ -122,6 +126,7 @@ namespace Spine.Unity.Examples {
 			skeletonGraphic.AssignMeshOverrideMultipleRenderers += RenderMultipleMeshesToRenderTexture;
 			skeletonGraphic.disableMeshAssignmentOnOverride = true;
 			skeletonGraphic.OnMeshAndMaterialsUpdated += RenderOntoQuad;
+			skeletonGraphic.OnAnimationRebuild += OnRebuild;
 			List<CanvasRenderer> canvasRenderers = skeletonGraphic.canvasRenderers;
 			for (int i = 0; i < canvasRenderers.Count; ++i)
 				canvasRenderers[i].cull = true;
@@ -136,6 +141,7 @@ namespace Spine.Unity.Examples {
 			skeletonGraphic.AssignMeshOverrideMultipleRenderers -= RenderMultipleMeshesToRenderTexture;
 			skeletonGraphic.disableMeshAssignmentOnOverride = false;
 			skeletonGraphic.OnMeshAndMaterialsUpdated -= RenderOntoQuad;
+			skeletonGraphic.OnAnimationRebuild -= OnRebuild;
 			List<CanvasRenderer> canvasRenderers = skeletonGraphic.canvasRenderers;
 			for (int i = 0; i < canvasRenderers.Count; ++i)
 				canvasRenderers[i].cull = false;
@@ -154,6 +160,10 @@ namespace Spine.Unity.Examples {
 
 		void RenderOntoQuad (SkeletonGraphic skeletonRenderer) {
 			AssignAtQuad();
+		}
+
+		void OnRebuild (ISkeletonAnimation skeletonGraphic) {
+			ResetMeshRendererMaterials();
 		}
 
 		protected void PrepareForMesh () {
@@ -207,6 +217,7 @@ namespace Spine.Unity.Examples {
 		}
 
 		protected void RenderSingleMeshToRenderTexture (Mesh mesh, Material graphicMaterial, Texture texture) {
+			if (mesh.subMeshCount == 0) return;
 			Material meshRendererMaterial = MeshRendererMaterialForTexture(texture);
 			foreach (int shaderPass in shaderPasses)
 				commandBuffer.DrawMesh(mesh, transform.localToWorldMatrix, meshRendererMaterial, 0, shaderPass);
@@ -217,9 +228,12 @@ namespace Spine.Unity.Examples {
 			Mesh[] meshes, Material[] graphicMaterials, Texture[] textures) {
 
 			for (int i = 0; i < meshCount; ++i) {
+				Mesh mesh = meshes[i];
+				if (mesh.subMeshCount == 0) continue;
+
 				Material meshRendererMaterial = MeshRendererMaterialForTexture(textures[i]);
 				foreach (int shaderPass in shaderPasses)
-					commandBuffer.DrawMesh(meshes[i], transform.localToWorldMatrix, meshRendererMaterial, 0, shaderPass);
+					commandBuffer.DrawMesh(mesh, transform.localToWorldMatrix, meshRendererMaterial, 0, shaderPass);
 			}
 			Graphics.ExecuteCommandBuffer(commandBuffer);
 		}
