@@ -141,18 +141,18 @@ Shader "Universal Render Pipeline/2D/Spine/Skeleton Lit" {
 				// un-premultiply for additive lights in CombinedShapeLightShared, reapply afterwards
 				main.rgb = main.a == 0 ? main.rgb : main.rgb / main.a;
 			#else
+				#if !defined(_LIGHT_AFFECTS_ADDITIVE)
+				if (i.color.a == 0) {
+					return tex * i.color; // unlit additive, directly return PMA color
+				}
+				#endif
+
 				#if !defined(_STRAIGHT_ALPHA_INPUT)
 				// un-premultiply for additive lights in CombinedShapeLightShared, reapply afterwards
 				tex.rgb = tex.a == 0 ? tex.rgb : tex.rgb / tex.a;
 				#endif
 				half4 main = tex * i.color;
-
-				#if !defined(_LIGHT_AFFECTS_ADDITIVE)
-				if (i.color.a == 0)
-					return half4(main.rgb * main.a, main.a);
-				#endif
 			#endif
-
 				half4 mask = SAMPLE_TEXTURE2D(_MaskTex, sampler_MaskTex, i.uv);
 			#if UNITY_VERSION  < 202120
 				return half4(CombinedShapeLightShared(half4(main.rgb, 1), mask, i.lightingUV).rgb * main.a, main.a);
