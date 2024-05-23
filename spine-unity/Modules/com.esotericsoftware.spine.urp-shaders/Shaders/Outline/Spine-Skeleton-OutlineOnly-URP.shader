@@ -6,6 +6,7 @@ Shader "Universal Render Pipeline/Spine/Outline/Skeleton-OutlineOnly" {
 
 		// Outline properties are drawn via custom editor.
 		[HideInInspector] _OutlineWidth("Outline Width", Range(0,8)) = 3.0
+		[HideInInspector][MaterialToggle(_USE_SCREENSPACE_OUTLINE_WIDTH)] _UseScreenSpaceOutlineWidth("Width in Screen Space", Float) = 0
 		[HideInInspector] _OutlineColor("Outline Color", Color) = (1,1,0,1)
 		[HideInInspector] _OutlineReferenceTexWidth("Reference Texture Width", Int) = 1024
 		[HideInInspector] _ThresholdEnd("Outline Threshold", Range(0,1)) = 0.25
@@ -44,6 +45,7 @@ Shader "Universal Render Pipeline/Spine/Outline/Skeleton-OutlineOnly" {
 			#pragma vertex vertOutline
 			#pragma fragment fragOutline
 			#pragma shader_feature _ _USE8NEIGHBOURHOOD_ON
+			#pragma shader_feature _ _USE_SCREENSPACE_OUTLINE_WIDTH
 
 			#define USE_URP
 			#define fixed4 half4

@@ -39,6 +39,7 @@ public class SpineShaderWithOutlineGUI : ShaderGUI {
 	bool _showStencilSettings = false;
 
 	MaterialProperty _OutlineWidth = null;
+	MaterialProperty _UseScreenSpaceOutlineWidth = null;
 	MaterialProperty _OutlineColor = null;
 	MaterialProperty _OutlineReferenceTexWidth = null;
 	MaterialProperty _ThresholdEnd = null;
@@ -51,6 +52,7 @@ public class SpineShaderWithOutlineGUI : ShaderGUI {
 
 	static GUIContent _EnableOutlineText = new GUIContent("Outline", "Enable outline rendering. Draws an outline by sampling 4 or 8 neighbourhood pixels at a given distance specified via 'Outline Width'.");
 	static GUIContent _OutlineWidthText = new GUIContent("Outline Width", "");
+	static GUIContent _UseScreenSpaceOutlineWidthText = new GUIContent("Width in Screen Space", "Enable to keep the outline width constant in screen space instead of texture space. Requires more expensive computations.");
 	static GUIContent _OutlineColorText = new GUIContent("Outline Color", "");
 	static GUIContent _OutlineReferenceTexWidthText = new GUIContent("Reference Texture Width", "");
 	static GUIContent _ThresholdEndText = new GUIContent("Outline Threshold", "");
@@ -87,6 +89,7 @@ public class SpineShaderWithOutlineGUI : ShaderGUI {
 	protected virtual void FindProperties (MaterialProperty[] props) {
 
 		_OutlineWidth = FindProperty("_OutlineWidth", props, false);
+		_UseScreenSpaceOutlineWidth = FindProperty("_UseScreenSpaceOutlineWidth", props, false);
 		_OutlineReferenceTexWidth = FindProperty("_OutlineReferenceTexWidth", props, false);
 		_OutlineColor = FindProperty("_OutlineColor", props, false);
 		_ThresholdEnd = FindProperty("_ThresholdEnd", props, false);
@@ -151,6 +154,8 @@ public class SpineShaderWithOutlineGUI : ShaderGUI {
 
 		if (isOutlineEnabled) {
 			_materialEditor.ShaderProperty(_OutlineWidth, _OutlineWidthText);
+			if (_UseScreenSpaceOutlineWidth != null)
+				_materialEditor.ShaderProperty(_UseScreenSpaceOutlineWidth, _UseScreenSpaceOutlineWidthText);
 			_materialEditor.ShaderProperty(_OutlineColor, _OutlineColorText);
 
 			_showAdvancedOutlineSettings = EditorGUILayout.Foldout(_showAdvancedOutlineSettings, _OutlineAdvancedText);
