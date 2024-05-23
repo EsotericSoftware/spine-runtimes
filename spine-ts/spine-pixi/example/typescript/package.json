@@ -1,15 +1,16 @@
 {
-    "name": "name",
-    "description": "description",
-    "authors": "author",
+    "name": "spine-pixi-ts-example",
+    "description": "Spine pixi ts example",
+    "author": "Esoteric Software LLC",
+    "license": "LicenseRef-LICENSE",
     "version": "1.0.0",    
     "scripts": {
         "build":"npx esbuild index.ts --bundle --sourcemap --outfile=build/index.js",
         "dev": "npx concurrently \"npx live-server --no-browser\" \"npm run build -- --watch\""   
     },
     "dependencies": {
-        "@esotericsoftware/spine-phaser": "~4.2.43",
-        "phaser": "3.60.0"
+        "@esotericsoftware/spine-pixi": "~4.2.43",
+        "pixi.js": "^7.2.4"
     },
     "devDependencies": {
         "esbuild": "0.17.17",
