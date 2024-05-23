@@ -1,12 +1,4 @@
-//
-//  File.swift
-//  
-//
-//  Created by Denis Andrašec on 17.04.24.
-//
-
 import SwiftUI
-import Spine
 
 public struct SpineView: UIViewRepresentable {
     

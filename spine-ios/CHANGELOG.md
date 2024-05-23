@@ -13,3 +13,4 @@
 - Support `DressUp` sample (#9)
 - Add `Physics` sample (#10)
 - Add `DebugRendering` sample (#11)
+- Move remaining files to SPM package (#12)

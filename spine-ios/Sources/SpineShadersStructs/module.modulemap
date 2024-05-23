@@ -1,0 +1,4 @@
+module SpineShadersStructs {
+    header "../Spine/Metal/SpineShadersStructs.h"
+    export *
+}

@@ -1,15 +1,8 @@
-//
-//  SpineRenderer.swift
-//  Spine iOS Example
-//
-//  Created by Denis Andrašec on 17.04.24.
-//
-
 import Foundation
 import MetalKit
-import SpineSharedStructs
+import SpineShadersStructs
 import Spine
-import SpineWrapper
+import SpineCppLite
 
 protocol SpineRendererDelegate: AnyObject {
     func spineRendererWillUpdate(_ spineRenderer: SpineRenderer)
@@ -36,7 +29,7 @@ final class SpineRenderer: NSObject, MTKViewDelegate {
     
     private var sizeInPoints: CGSize = .zero
     private var viewPortSize = vector_uint2(0, 0)
-    private var transform = AAPLTransform(
+    private var transform = SpineTransform(
         translation: vector_float2(0, 0),
         scale: vector_float2(1, 1),
         offset: vector_float2(0, 0)
@@ -53,7 +46,7 @@ final class SpineRenderer: NSObject, MTKViewDelegate {
         let device = spineView.device!
         self.device = device
         
-        let defaultLibrary = device.makeDefaultLibrary()
+        let defaultLibrary = try device.makeDefaultLibrary(bundle: .module)
         let textureLoader = MTKTextureLoader(device: device)
         textures = try atlasPages.map {
             try textureLoader.newTexture(
@@ -67,8 +60,8 @@ final class SpineRenderer: NSObject, MTKViewDelegate {
         
         // TODO: Create pipeline state for all blend mode / premultiplied combinations and choose the correct one when drawing vertices
         let pipelineStateDescriptor = MTLRenderPipelineDescriptor()
-        pipelineStateDescriptor.vertexFunction = defaultLibrary?.makeFunction(name: "vertexShader")
-        pipelineStateDescriptor.fragmentFunction = defaultLibrary?.makeFunction(name: "fragmentShader")
+        pipelineStateDescriptor.vertexFunction = defaultLibrary.makeFunction(name: "vertexShader")
+        pipelineStateDescriptor.fragmentFunction = defaultLibrary.makeFunction(name: "fragmentShader")
         pipelineStateDescriptor.colorAttachments[0].pixelFormat = spineView.colorPixelFormat
         pipelineStateDescriptor.colorAttachments[0].apply(
             blendMode: SPINE_BLEND_MODE_NORMAL,
@@ -139,7 +132,7 @@ final class SpineRenderer: NSObject, MTKViewDelegate {
         let offsetX = abs(sizeInPoints.width - bounds.width * scaleX) / 2 * alignment.x
         let offsetY = abs(sizeInPoints.height - bounds.height * scaleY) / 2 * alignment.y
         
-        transform = AAPLTransform(
+        transform = SpineTransform(
             translation: vector_float2(Float(x), Float(y)),
             scale: vector_float2(Float(scaleX * UIScreen.main.scale), Float(scaleY * UIScreen.main.scale)),
             offset: vector_float2(Float(offsetX * UIScreen.main.scale), Float(offsetY * UIScreen.main.scale))
@@ -172,7 +165,7 @@ final class SpineRenderer: NSObject, MTKViewDelegate {
         guard !vertices.isEmpty else {
             return
         }
-        let verticesBufferSize = MemoryLayout<AAPLVertex>.stride * vertices.count
+        let verticesBufferSize = MemoryLayout<SpineVertex>.stride * vertices.count
         
         guard let vertexBuffer = device.makeBuffer(length: verticesBufferSize, options: .storageModeShared) else {
             return
@@ -195,24 +188,24 @@ final class SpineRenderer: NSObject, MTKViewDelegate {
         renderEncoder.setVertexBuffer(
             vertexBuffer,
             offset: 0,
-            index: Int(AAPLVertexInputIndexVertices.rawValue)
+            index: Int(SpineVertexInputIndexVertices.rawValue)
         )
         renderEncoder.setVertexBytes(
             &transform,
             length: MemoryLayout.size(ofValue: transform),
-            index: Int(AAPLVertexInputIndexTransform.rawValue)
+            index: Int(SpineVertexInputIndexTransform.rawValue)
         )
         renderEncoder.setVertexBytes(
             &viewPortSize,
             length: MemoryLayout.size(ofValue: viewPortSize),
-            index: Int(AAPLVertexInputIndexViewportSize.rawValue)
+            index: Int(SpineVertexInputIndexViewportSize.rawValue)
         )
         
         let textureIndex = Int(renderCommand.atlasPage)
         if textures.indices.contains(textureIndex) {
             renderEncoder.setFragmentTexture(
                 textures[textureIndex],
-                index: Int(AAPLTextureIndexBaseColor.rawValue)
+                index: Int(SpineTextureIndexBaseColor.rawValue)
             )
         }
         

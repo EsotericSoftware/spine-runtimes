@@ -1,4 +1,4 @@
-import SpineWrapper
+import SpineCppLite
 import SwiftUI
 import Foundation
 

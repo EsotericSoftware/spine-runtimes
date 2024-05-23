@@ -1,4 +1,0 @@
-module SpineSharedStructs {
-    header "../Spine/Metal/SpineSharedStructs.h"
-    export *
-}

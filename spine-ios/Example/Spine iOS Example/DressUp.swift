@@ -7,7 +7,7 @@
 
 import SwiftUI
 import Spine
-import SpineWrapper
+import SpineCppLite
 
 struct DressUp: View {
     

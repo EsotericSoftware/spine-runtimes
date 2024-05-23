@@ -1,17 +1,10 @@
-//
-//  RenderCommand+Vertices.swift
-//  Spine iOS Example
-//
-//  Created by Denis Andrašec on 08.05.24.
-//
-
 import Spine
-import SpineSharedStructs
+import SpineShadersStructs
 import Foundation
 
 extension RenderCommand {
-    func getVertices() -> [AAPLVertex] {
-        var vertices = [AAPLVertex]()
+    func getVertices() -> [SpineVertex] {
+        var vertices = [SpineVertex]()
         
         let indices = indices
         let positions = positions
@@ -30,7 +23,7 @@ extension RenderCommand {
             let uvY = uvs[yIndex]
             let color = extractRGBA(from: colors[index])
             
-            let vertex = AAPLVertex(
+            let vertex = SpineVertex(
                 position: vector_float2(positionX, positionY),
                 color: color,
                 uv: vector_float2(uvX, uvY)

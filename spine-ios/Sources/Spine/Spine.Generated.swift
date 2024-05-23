@@ -1,5 +1,5 @@
 import Foundation
-import SpineWrapper
+import SpineCppLite
 
 public typealias BlendMode = spine_blend_mode
 public typealias MixBlend = spine_mix_blend
