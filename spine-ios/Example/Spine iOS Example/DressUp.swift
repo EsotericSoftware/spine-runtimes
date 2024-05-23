@@ -79,8 +79,13 @@ final class DressUpModel: ObservableObject {
     init() {
         controller = SpineController(
             onInitialized: { controller in
-                controller.animationState.setAnimationByName(trackIndex: 0, animationName: "dance", loop: true)
-            }
+                controller.animationState.setAnimationByName(
+                    trackIndex: 0,
+                    animationName: "dance",
+                    loop: true
+                )
+            },
+            disposeOnDeInit: false
         )
         Task.detached(priority: .high) {
             let drawable = try await SkeletonDrawableWrapper.fromAsset(
@@ -119,7 +124,6 @@ final class DressUpModel: ObservableObject {
             toggleSkin(skinName: skinName, drawable: drawable)
         }
     }
-    
     
     func toggleSkin(skinName: String, drawable: SkeletonDrawableWrapper) {
         selectedSkins[skinName] = !(selectedSkins[skinName] ?? false)

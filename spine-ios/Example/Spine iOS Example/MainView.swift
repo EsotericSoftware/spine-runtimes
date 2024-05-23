@@ -9,7 +9,6 @@ import SwiftUI
 
 struct MainView: View {
     var body: some View {
-        
         List {
             NavigationLink("SimpleAnimation") {
                 SimpleAnimation()
@@ -26,11 +25,16 @@ struct MainView: View {
             NavigationLink("IK Following") {
                 IKFollowing()
             }
+            NavigationLink("Physics") {
+                Physics()
+            }
         }
         .navigationTitle("Spine Examples")
     }
 }
 
 #Preview {
-    MainView()
+    NavigationStack {
+        MainView()
+    }
 }

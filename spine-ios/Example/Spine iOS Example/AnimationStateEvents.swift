@@ -58,4 +58,3 @@ struct AnimationStateEvents: View {
 #Preview {
     AnimationStateEvents()
 }
-

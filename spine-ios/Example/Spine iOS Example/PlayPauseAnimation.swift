@@ -9,6 +9,7 @@ import SwiftUI
 import Spine
 
 struct PlayPauseAnimation: View {
+    
     @StateObject
     var controller: SpineController
     

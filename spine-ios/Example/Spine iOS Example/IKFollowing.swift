@@ -32,8 +32,9 @@ struct IKFollowing: View {
         .gesture(
             DragGesture(minimumDistance: 0)
                 .onChanged { gesture in
-                    // TODO: Fix incorrect y offset in SpineRenderer or AAPLShaders
-                    model.crossHairPosition = model.controller.toSkeletonCoordinates(position: gesture.location)
+                    model.crossHairPosition = model.controller.toSkeletonCoordinates(
+                        position: gesture.location
+                    )
                 }
         )
         .navigationTitle("IK Following")
@@ -43,33 +44,34 @@ struct IKFollowing: View {
 
 #Preview {
     IKFollowing()
+        .previewInterfaceOrientation(.landscapeLeft)
 }
 
 final class IKFollowingModel: ObservableObject {
     
     @Published
-    var controller: SpineController
+    var controller: SpineController!
     
     @Published
     var crossHairPosition: CGPoint?
     
     init() {
-        weak var weakSelf: IKFollowingModel?
         controller = SpineController(
             onInitialized: { controller in
-                _ = controller.animationState.setAnimationByName(
+                controller.animationState.setAnimationByName(
                     trackIndex: 0,
                     animationName: "walk",
                     loop: true
                 )
-                _ = controller.animationState.setAnimationByName(
+                controller.animationState.setAnimationByName(
                     trackIndex: 1,
                     animationName: "aim",
                     loop: true
                 )
             },
-            onAfterUpdateWorldTransforms: { controller in
-                guard let worldPosition = weakSelf?.crossHairPosition else {
+            onAfterUpdateWorldTransforms: { 
+                [weak self] controller in guard let self else { return }
+                guard let worldPosition = self.crossHairPosition else {
                     return
                 }
                 let bone = controller.skeleton.findBone(boneName: "crosshair")!
@@ -79,6 +81,5 @@ final class IKFollowingModel: ObservableObject {
                 bone.y = position.y
             }
         )
-        weakSelf = self
     }
 }

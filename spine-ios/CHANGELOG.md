@@ -11,3 +11,4 @@
 - Add `BoundsProvider` (#7)
 - Support `SpineController` & `Event` callbacks (#8)
 - Support `DressUp` sample (#9)
+- Add `Physics` sample (#10)

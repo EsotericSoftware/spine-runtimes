@@ -28,6 +28,7 @@ public final class SpineController: ObservableObject {
     private var scaleY: CGFloat = 1
     private var offsetX: CGFloat = 0
     private var offsetY: CGFloat = 0
+    private var size: CGSize = .zero
     
     @Published
     public private(set) var isPlaying: Bool = true
@@ -84,7 +85,10 @@ public final class SpineController: ObservableObject {
     public func toSkeletonCoordinates(position: CGPoint) -> CGPoint {
         let x = position.x;
         let y = position.y;
-        return CGPoint(x: x / scaleX - offsetX, y: y / scaleY - offsetY)
+        return CGPoint(
+            x: (x - size.width / 2) / scaleX - offsetX,
+            y: (y - size.height / 2) / scaleY - offsetY
+        )
     }
     
     public func pause() {
@@ -138,11 +142,12 @@ extension SpineController: SpineRendererDelegate {
         onAfterPaint?(self)
     }
     
-    func spineRendererDidUpdate(_ spineRenderer: SpineRenderer, scaleX: CGFloat, scaleY: CGFloat, offsetX: CGFloat, offsetY: CGFloat) {
+    func spineRendererDidUpdate(_ spineRenderer: SpineRenderer, scaleX: CGFloat, scaleY: CGFloat, offsetX: CGFloat, offsetY: CGFloat, size: CGSize) {
         self.scaleX = scaleX
         self.scaleY = scaleY
         self.offsetX = offsetX
         self.offsetY = offsetY
+        self.size = size
     }
 }
 

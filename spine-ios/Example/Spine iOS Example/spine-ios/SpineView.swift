@@ -20,6 +20,7 @@ public struct SpineView: UIViewRepresentable {
     private let mode: Spine.ContentMode
     private let alignment: Spine.Alignment
     private let boundsProvider: BoundsProvider
+    private let backgroundColor: UIColor
     
     public init(
         controller: SpineController = SpineController(),
@@ -35,6 +36,7 @@ public struct SpineView: UIViewRepresentable {
         self.mode = mode
         self.alignment = alignment
         self.boundsProvider = boundsProvider
+        self.backgroundColor = backgroundColor
     }
     
     public init(
@@ -52,6 +54,7 @@ public struct SpineView: UIViewRepresentable {
         self.mode = mode
         self.alignment = alignment
         self.boundsProvider = boundsProvider
+        self.backgroundColor = backgroundColor
     }
     
     public init(
@@ -70,6 +73,7 @@ public struct SpineView: UIViewRepresentable {
         self.mode = mode
         self.alignment = alignment
         self.boundsProvider = boundsProvider
+        self.backgroundColor = backgroundColor
     }
     
     public func makeUIView(context: Context) -> SpineUIView {
@@ -80,7 +84,8 @@ public struct SpineView: UIViewRepresentable {
                 controller: controller,
                 mode: mode,
                 alignment: alignment,
-                boundsProvider: boundsProvider
+                boundsProvider: boundsProvider,
+                backgroundColor: backgroundColor
             )
         } else if let drawable {
             return SpineUIView(
@@ -88,14 +93,16 @@ public struct SpineView: UIViewRepresentable {
                 controller: controller,
                 mode: mode,
                 alignment: alignment,
-                boundsProvider: boundsProvider
+                boundsProvider: boundsProvider,
+                backgroundColor: backgroundColor
             )
         } else {
             return SpineUIView(
                 controller: controller,
                 mode: mode,
                 alignment: alignment,
-                boundsProvider: boundsProvider
+                boundsProvider: boundsProvider,
+                backgroundColor: backgroundColor
             )
         }
     }

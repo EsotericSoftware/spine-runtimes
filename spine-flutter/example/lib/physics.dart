@@ -41,7 +41,6 @@ class PhysicsState extends State<PhysicsTest> {
   late SpineWidgetController controller;
   Offset? mousePosition;
   Offset? lastMousePosition;
-  Offset? delta;
 
   @override
   void initState() {
