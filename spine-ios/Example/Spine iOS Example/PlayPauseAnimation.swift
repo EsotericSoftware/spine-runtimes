@@ -11,19 +11,15 @@ import Spine
 struct PlayPauseAnimation: View {
     
     @StateObject
-    var controller: SpineController
-    
-    init() {
-        _controller = StateObject(
-            wrappedValue: SpineController(onInitialized: { controller in
-                controller.animationState.setAnimationByName(
-                    trackIndex: 0,
-                    animationName: "flying",
-                    loop: true
-                )
-            })
-        )
-    }
+    var controller = SpineController(
+        onInitialized: { controller in
+            controller.animationState.setAnimationByName(
+                trackIndex: 0,
+                animationName: "flying",
+                loop: true
+            )
+        }
+    )
     
     var body: some View {
         SpineView(

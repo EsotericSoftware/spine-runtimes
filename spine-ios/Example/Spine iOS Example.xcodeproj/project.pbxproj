@@ -37,6 +37,7 @@
 		9270C1742BFE389600BD25BC /* celestial-circus-pro.skel in Resources */ = {isa = PBXBuildFile; fileRef = 9270C1712BFE389600BD25BC /* celestial-circus-pro.skel */; };
 		9270C1752BFE389600BD25BC /* celestial-circus.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 9270C1722BFE389600BD25BC /* celestial-circus.atlas */; };
 		928A8CC22BCFE7DF00D9D35B /* Spine in Frameworks */ = {isa = PBXBuildFile; productRef = 928A8CC12BCFE7DF00D9D35B /* Spine */; };
+		92D7DDA82BFF3C8800EB9E3A /* DebugRendering.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92D7DDA72BFF3C8800EB9E3A /* DebugRendering.swift */; };
 		92FE93292BF4AB9600CCDF48 /* IKFollowing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92FE93282BF4AB9600CCDF48 /* IKFollowing.swift */; };
 		92FFE53B2BD018CA00C64889 /* AAPLShaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 92FFE53A2BD018CA00C64889 /* AAPLShaders.metal */; };
 		92FFE5462BD15AF700C64889 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 92FFE5452BD15AF700C64889 /* README.md */; };
@@ -76,6 +77,7 @@
 		9270C1702BFE389600BD25BC /* celestial-circus.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "celestial-circus.png"; sourceTree = "<group>"; };
 		9270C1712BFE389600BD25BC /* celestial-circus-pro.skel */ = {isa = PBXFileReference; lastKnownFileType = file; path = "celestial-circus-pro.skel"; sourceTree = "<group>"; };
 		9270C1722BFE389600BD25BC /* celestial-circus.atlas */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "celestial-circus.atlas"; sourceTree = "<group>"; };
+		92D7DDA72BFF3C8800EB9E3A /* DebugRendering.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugRendering.swift; sourceTree = "<group>"; };
 		92FE93282BF4AB9600CCDF48 /* IKFollowing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IKFollowing.swift; sourceTree = "<group>"; };
 		92FFE53A2BD018CA00C64889 /* AAPLShaders.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = AAPLShaders.metal; sourceTree = "<group>"; };
 		92FFE5452BD15AF700C64889 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -157,6 +159,7 @@
 				924C0C172BCFCF21004E63F7 /* SimpleAnimation.swift */,
 				920BD11C2BEBDC380050A5A9 /* PlayPauseAnimation.swift */,
 				922839DE2BF4F7D8006DA9F6 /* AnimationStateEvents.swift */,
+				92D7DDA72BFF3C8800EB9E3A /* DebugRendering.swift */,
 				921C1EAE2BF609F60001A0BA /* DressUp.swift */,
 				92FE93282BF4AB9600CCDF48 /* IKFollowing.swift */,
 				9270C16D2BFE356000BD25BC /* Physics.swift */,
@@ -306,6 +309,7 @@
 				92FFE54D2BD15B2000C64889 /* SpineRenderer.swift in Sources */,
 				9270C16E2BFE356000BD25BC /* Physics.swift in Sources */,
 				920BD11B2BEBDBA60050A5A9 /* MainView.swift in Sources */,
+				92D7DDA82BFF3C8800EB9E3A /* DebugRendering.swift in Sources */,
 				92FE93292BF4AB9600CCDF48 /* IKFollowing.swift in Sources */,
 				920BD11D2BEBDC380050A5A9 /* PlayPauseAnimation.swift in Sources */,
 				921C1EAF2BF609F60001A0BA /* DressUp.swift in Sources */,

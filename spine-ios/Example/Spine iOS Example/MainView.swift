@@ -19,6 +19,9 @@ struct MainView: View {
             NavigationLink("Animation State Listener") {
                 AnimationStateEvents()
             }
+            NavigationLink("Debug Rendering") {
+                DebugRendering()
+            }
             NavigationLink("Dress Up") {
                 DressUp()
             }

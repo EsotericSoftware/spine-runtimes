@@ -11,17 +11,8 @@ import Spine
 struct IKFollowing: View {
     
     @StateObject
-    var model: IKFollowingModel
-    
-    @State
-    var crossHairPosition: CGPoint?
-    
-    init() {
-        _model = StateObject(
-            wrappedValue: IKFollowingModel()
-        )
-    }
-    
+    var model = IKFollowingModel()
+        
     var body: some View {
         SpineView(
             atlasFile: "spineboy.atlas",

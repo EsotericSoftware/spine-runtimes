@@ -25,7 +25,7 @@ public final class SpineUIView: MTKView {
         mode: Spine.ContentMode = .fit,
         alignment: Spine.Alignment = .center,
         boundsProvider: BoundsProvider = SetupPoseBounds(),
-        backgroundColor: UIColor = .white
+        backgroundColor: UIColor = .clear
     ) {
         self.controller = controller
         self.mode = mode
@@ -34,6 +34,7 @@ public final class SpineUIView: MTKView {
         
         super.init(frame: .zero, device: MTLCreateSystemDefaultDevice())
         clearColor = MTLClearColor(backgroundColor)
+        isOpaque = backgroundColor != .clear
     }
     
     convenience init(
@@ -43,7 +44,7 @@ public final class SpineUIView: MTKView {
         mode: Spine.ContentMode = .fit,
         alignment: Spine.Alignment = .center,
         boundsProvider: BoundsProvider = SetupPoseBounds(),
-        backgroundColor: UIColor = .white
+        backgroundColor: UIColor = .clear
     ) {
         self.init(controller: controller, mode: mode, alignment: alignment, boundsProvider: boundsProvider, backgroundColor: backgroundColor)
         Task.detached(priority: .high) {
@@ -61,7 +62,7 @@ public final class SpineUIView: MTKView {
         mode: Spine.ContentMode = .fit,
         alignment: Spine.Alignment = .center,
         boundsProvider: BoundsProvider = SetupPoseBounds(),
-        backgroundColor: UIColor = .white
+        backgroundColor: UIColor = .clear
     ) {
         self.init(controller: controller, mode: mode, alignment: alignment, boundsProvider: boundsProvider, backgroundColor: backgroundColor)
         do {
@@ -113,7 +114,7 @@ extension SkeletonDrawableWrapper {
     
     func renderToImage(size: CGSize, backgroundColor: UIColor) throws -> CGImage? {
         let spineView = SpineUIView(
-            controller: SpineController(disposeOnDeInit: false), // Doesn't own the drawable
+            controller: SpineController(disposeDrawableOnDeInit: false), // Doesn't own the drawable
             backgroundColor: backgroundColor
         )
         spineView.frame = CGRect(origin: .zero, size: size)

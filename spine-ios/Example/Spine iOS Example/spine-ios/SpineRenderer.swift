@@ -221,6 +221,7 @@ final class SpineRenderer: NSObject, MTKViewDelegate {
             vertexStart: 0,
             vertexCount: vertices.count
         )
+        
     }
 }
 

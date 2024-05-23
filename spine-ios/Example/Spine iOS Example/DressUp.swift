@@ -12,13 +12,7 @@ import SpineWrapper
 struct DressUp: View {
     
     @StateObject
-    var model: DressUpModel
-    
-    init() {
-        _model = StateObject(
-            wrappedValue: DressUpModel()
-        )
-    }
+    var model = DressUpModel()
     
     var body: some View {
         HStack(spacing: 0) {
@@ -85,7 +79,7 @@ final class DressUpModel: ObservableObject {
                     loop: true
                 )
             },
-            disposeOnDeInit: false
+            disposeDrawableOnDeInit: false
         )
         Task.detached(priority: .high) {
             let drawable = try await SkeletonDrawableWrapper.fromAsset(

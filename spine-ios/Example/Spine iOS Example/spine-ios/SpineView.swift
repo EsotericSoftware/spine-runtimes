@@ -27,7 +27,7 @@ public struct SpineView: UIViewRepresentable {
         mode: Spine.ContentMode = .fit,
         alignment: Spine.Alignment = .center,
         boundsProvider: BoundsProvider = SetupPoseBounds(),
-        backgroundColor: UIColor = .white
+        backgroundColor: UIColor = .clear
     ) {
         self.atlasFile = nil
         self.skeletonFile = nil
@@ -45,7 +45,7 @@ public struct SpineView: UIViewRepresentable {
         mode: Spine.ContentMode = .fit,
         alignment: Spine.Alignment = .center,
         boundsProvider: BoundsProvider = SetupPoseBounds(),
-        backgroundColor: UIColor = .white
+        backgroundColor: UIColor = .clear
     ) {
         self.atlasFile = nil
         self.skeletonFile = nil
@@ -64,7 +64,7 @@ public struct SpineView: UIViewRepresentable {
         mode: Spine.ContentMode = .fit,
         alignment: Spine.Alignment = .center,
         boundsProvider: BoundsProvider = SetupPoseBounds(),
-        backgroundColor: UIColor = .white
+        backgroundColor: UIColor = .clear
     ) {
         self.atlasFile = atlasFile
         self.skeletonFile = skeletonFile

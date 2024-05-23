@@ -11,16 +11,7 @@ import Spine
 struct Physics: View {
     
     @StateObject
-    var model: PhysicsModel
-    
-    @State
-    var crossHairPosition: CGPoint?
-    
-    init() {
-        _model = StateObject(
-            wrappedValue: PhysicsModel()
-        )
-    }
+    var model = PhysicsModel()
     
     var body: some View {
         SpineView(
@@ -33,7 +24,6 @@ struct Physics: View {
                 .onChanged { gesture in
                     model.updateBonePosition(position: gesture.location)
                 }
-            
         )
         .navigationTitle("Physics (drag anywhere)")
         .navigationBarTitleDisplayMode(.inline)

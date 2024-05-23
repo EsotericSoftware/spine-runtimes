@@ -22,16 +22,18 @@ public final class SpineController: ObservableObject {
     private let onAfterUpdateWorldTransforms: SpineControllerCallback?
     private let onBeforePaint: SpineControllerCallback?
     private let onAfterPaint: SpineControllerCallback?
-    private let disposeOnDeInit: Bool
+    private let disposeDrawableOnDeInit: Bool
     
     private var scaleX: CGFloat = 1
     private var scaleY: CGFloat = 1
     private var offsetX: CGFloat = 0
     private var offsetY: CGFloat = 0
-    private var size: CGSize = .zero
     
     @Published
     public private(set) var isPlaying: Bool = true
+    
+    @Published
+    public private(set) var viewSize: CGSize = .zero
     
     public init(
         onInitialized: SpineControllerCallback? = nil,
@@ -39,18 +41,18 @@ public final class SpineController: ObservableObject {
         onAfterUpdateWorldTransforms: SpineControllerCallback? = nil,
         onBeforePaint: SpineControllerCallback? = nil,
         onAfterPaint: SpineControllerCallback? = nil,
-        disposeOnDeInit: Bool = true
+        disposeDrawableOnDeInit: Bool = true
     ) {
         self.onInitialized = onInitialized
         self.onBeforeUpdateWorldTransforms = onBeforeUpdateWorldTransforms
         self.onAfterUpdateWorldTransforms = onAfterUpdateWorldTransforms
         self.onBeforePaint = onBeforePaint
         self.onAfterPaint = onAfterPaint
-        self.disposeOnDeInit = disposeOnDeInit
+        self.disposeDrawableOnDeInit = disposeDrawableOnDeInit
     }
     
     deinit {
-        if disposeOnDeInit {
+        if disposeDrawableOnDeInit {
             drawable?.dispose() // TODO move drawable out of view?
         }
     }
@@ -79,15 +81,21 @@ public final class SpineController: ObservableObject {
         drawable.animationStateWrapper
     }
     
-    /// Transforms the coordinates given in the [SpineWidget] coordinate system in [position] to
-    /// the skeleton coordinate system. See the `IKFollowing.swift` example how to use this
-    /// to move a bone based on user touch input.
     public func toSkeletonCoordinates(position: CGPoint) -> CGPoint {
         let x = position.x;
         let y = position.y;
         return CGPoint(
-            x: (x - size.width / 2) / scaleX - offsetX,
-            y: (y - size.height / 2) / scaleY - offsetY
+            x: (x - viewSize.width / 2) / scaleX - offsetX,
+            y: (y - viewSize.height / 2) / scaleY - offsetY
+        )
+    }
+    
+    public func fromSkeletonCoordinates(position: CGPoint) -> CGPoint {
+        let x = position.x;
+        let y = position.y;
+        return CGPoint(
+            x: (x + offsetX) * scaleX,
+            y: (y + offsetY) * scaleY
         )
     }
     
@@ -147,7 +155,7 @@ extension SpineController: SpineRendererDelegate {
         self.scaleY = scaleY
         self.offsetX = offsetX
         self.offsetY = offsetY
-        self.size = size
+        self.viewSize = size
     }
 }
 

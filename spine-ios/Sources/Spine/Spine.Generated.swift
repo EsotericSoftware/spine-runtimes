@@ -3534,7 +3534,6 @@ public final class Bone: NSObject {
     public func rotateWorld(degrees: Float) {
         spine_bone_rotate_world(wrappee, degrees)
     }
-
 }
 
 @objc(SpineSlot)
