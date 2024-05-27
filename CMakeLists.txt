@@ -14,7 +14,7 @@ if(MSVC)
 	set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
 	set (CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS}")
 else()
-	set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wunused-value -Wno-variadic-macros -Wextra -pedantic -Wshadow -std=c89")
+	set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wunused-value -Wno-variadic-macros -Wextra -pedantic -Wshadow -std=c99")
 	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wunused-value -Wno-variadic-macros -Wextra -Wnon-virtual-dtor -pedantic -Wshadow -std=c++11 -fno-exceptions -fno-rtti")
 
 	if (${SPINE_SANITIZE})
