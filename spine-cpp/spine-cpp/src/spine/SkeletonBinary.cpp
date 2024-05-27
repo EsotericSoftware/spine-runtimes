@@ -324,6 +324,12 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 		skeletonData->_skins.add(defaultSkin);
 	}
 
+    if (!this->getError().isEmpty()) {
+        delete input;
+        delete skeletonData;
+        return NULL;
+    }
+
 	/* Skins. */
 	for (size_t i = 0, n = (size_t) readVarint(input, true); i < n; ++i) {
 		Skin *skin = readSkin(input, false, skeletonData, nonessential);
