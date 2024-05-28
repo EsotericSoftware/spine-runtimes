@@ -30,13 +30,12 @@
         app.stage
           .on('pointerup', endDrag)
           .on('pointerupoutside', endDrag)
-          .on('pointermove', (e) => {
+          .on('pointermove', ({ x, y }) => {
             if (dragObject) {
-                let mousePosition = new spine.Vector2(e.data.global.x, e.data.global.y);
-                dragObject.x += mousePosition.x - lastX;
-                dragObject.y += mousePosition.y - lastY;
-                lastX = mousePosition.x;
-                lastY = mousePosition.y;
+                dragObject.x += x - lastX;
+                dragObject.y += y - lastY;
+                lastX = x;
+                lastY = y;
             }
           });
 
@@ -86,16 +85,15 @@
           app.stage.addChild(control);
 
           control.interactive = "static";
-          control.on('pointerdown', (e) => {
+          control.on('pointerdown', ({ x, y }) => {
             dragObject = control;
-            let mousePosition = new spine.Vector2(e.data.global.x, e.data.global.y);
-            lastX = mousePosition.x;
-            lastY = mousePosition.y;
+            lastX = x;
+            lastY = y;
           })
         }
 
         PIXI.Ticker.shared.add(() => {
-          let point = { x: 0, y: 0 };
+          const point = { x: 0, y: 0 };
           for (let { bone, control } of controlBones) {
             point.x = control.x;
             point.y = control.y;

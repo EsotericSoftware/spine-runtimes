@@ -415,8 +415,7 @@ export class Spine extends Container {
 
 	/** Converts a point from the Pixi world coordinate system to the skeleton coordinate system. */
 	pixiWorldCoordinatesToSkeleton (point: { x: number; y: number }) {
-		let transform = this.worldTransform.clone();
-		transform = transform.invert();
+		let transform = this.worldTransform.clone().invert();
 		let a = transform.a,
 			b = transform.b,
 			c = transform.c,
