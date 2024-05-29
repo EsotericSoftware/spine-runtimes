@@ -260,24 +260,30 @@ namespace Spine.Unity.Examples {
 			commandBuffer.SetRenderTarget(renderTexture);
 			commandBuffer.ClearRenderTarget(true, true, Color.clear);
 
-			Rect canvasRect = skeletonGraphic.canvas.pixelRect;
-
-			Matrix4x4 projectionMatrix = Matrix4x4.Ortho(
-				canvasRect.x, canvasRect.x + canvasRect.width,
-				canvasRect.y, canvasRect.y + canvasRect.height,
-				float.MinValue, float.MaxValue);
+			Vector2 targetViewportSize = new Vector2(
+				screenSpaceMax.x - screenSpaceMin.x,
+				screenSpaceMax.y - screenSpaceMin.y);
 
 			RenderMode canvasRenderMode = skeletonGraphic.canvas.renderMode;
 			if (canvasRenderMode == RenderMode.ScreenSpaceOverlay) {
+				Rect canvasRect = skeletonGraphic.canvas.pixelRect;
+				canvasRect.x += screenSpaceMin.x;
+				canvasRect.y += screenSpaceMin.y;
+				canvasRect.width = targetViewportSize.x;
+				canvasRect.height = targetViewportSize.y;
+				Matrix4x4 projectionMatrix = Matrix4x4.Ortho(
+					canvasRect.x, canvasRect.x + canvasRect.width,
+					canvasRect.y, canvasRect.y + canvasRect.height,
+					float.MinValue, float.MaxValue);
 				commandBuffer.SetViewMatrix(Matrix4x4.identity);
 				commandBuffer.SetProjectionMatrix(projectionMatrix);
 			} else {
 				commandBuffer.SetViewMatrix(targetCamera.worldToCameraMatrix);
-				commandBuffer.SetProjectionMatrix(targetCamera.projectionMatrix);
+				Matrix4x4 projectionMatrix = CalculateProjectionMatrix(targetCamera,
+					screenSpaceMin, screenSpaceMax, skeletonGraphic.canvas.pixelRect.size);
+				commandBuffer.SetProjectionMatrix(projectionMatrix);
 			}
-
-			Vector2 targetCameraViewportSize = targetCamera.pixelRect.size;
-			Rect viewportRect = new Rect(-screenSpaceMin * downScaleFactor, targetCameraViewportSize * downScaleFactor);
+			Rect viewportRect = new Rect(Vector2.zero, targetViewportSize * downScaleFactor);
 			commandBuffer.SetViewport(viewportRect);
 		}
 

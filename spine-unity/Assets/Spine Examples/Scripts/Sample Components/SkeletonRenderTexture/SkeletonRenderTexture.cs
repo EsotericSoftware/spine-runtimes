@@ -179,10 +179,16 @@ namespace Spine.Unity.Examples {
 			commandBuffer.SetRenderTarget(renderTexture);
 			commandBuffer.ClearRenderTarget(true, true, Color.clear);
 
-			commandBuffer.SetProjectionMatrix(targetCamera.projectionMatrix);
 			commandBuffer.SetViewMatrix(targetCamera.worldToCameraMatrix);
-			Vector2 targetCameraViewportSize = targetCamera.pixelRect.size;
-			Rect viewportRect = new Rect(-screenSpaceMin * downScaleFactor, targetCameraViewportSize * downScaleFactor);
+
+			Matrix4x4 projectionMatrix = CalculateProjectionMatrix(targetCamera,
+				screenSpaceMin, screenSpaceMax, targetCamera.pixelRect.size);
+			commandBuffer.SetProjectionMatrix(projectionMatrix);
+
+			Vector2 targetViewportSize = new Vector2(
+				screenSpaceMax.x - screenSpaceMin.x,
+				screenSpaceMax.y - screenSpaceMin.y);
+			Rect viewportRect = new Rect(Vector2.zero, targetViewportSize * downScaleFactor);
 			commandBuffer.SetViewport(viewportRect);
 		}
 
