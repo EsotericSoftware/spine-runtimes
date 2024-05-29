@@ -398,6 +398,46 @@ export class Spine extends Container {
 		return outPos;
 	}
 
+	/** Converts a point from the skeleton coordinate system to the Pixi world coordinate system. */
+	skeletonToPixiWorldCoordinates (point: { x: number; y: number }) {
+		let transform = this.worldTransform;
+		let a = transform.a,
+			b = transform.b,
+			c = transform.c,
+			d = transform.d,
+			tx = transform.tx,
+			ty = transform.ty;
+		let x = point.x;
+		let y = point.y;
+		point.x = x * a + y * c + tx;
+		point.y = x * b + y * d + ty;
+	}
+
+	/** Converts a point from the Pixi world coordinate system to the skeleton coordinate system. */
+	pixiWorldCoordinatesToSkeleton (point: { x: number; y: number }) {
+		let transform = this.worldTransform.clone().invert();
+		let a = transform.a,
+			b = transform.b,
+			c = transform.c,
+			d = transform.d,
+			tx = transform.tx,
+			ty = transform.ty;
+		let x = point.x;
+		let y = point.y;
+		point.x = x * a + y * c + tx;
+		point.y = x * b + y * d + ty;
+	}
+
+	/** Converts a point from the Pixi world coordinate system to the bone's local coordinate system. */
+	pixiWorldCoordinatesToBone (point: { x: number; y: number }, bone: Bone) {
+		this.pixiWorldCoordinatesToSkeleton(point);
+		if (bone.parent) {
+			bone.parent.worldToLocal(point as Vector2);
+		} else {
+			bone.worldToLocal(point as Vector2);
+		}
+	}
+
 	/** A cache containing skeleton data and atlases already loaded by {@link Spine.from}. */
 	public static readonly skeletonCache: Record<string, SkeletonData> = Object.create(null);
 
