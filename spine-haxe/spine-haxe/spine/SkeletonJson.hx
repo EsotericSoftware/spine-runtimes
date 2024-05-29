@@ -497,7 +497,7 @@ class SkeletonJson {
 				mesh.sequence = sequence;
 
 				if (Reflect.field(map, "parent") != null) {
-					var inheritTimelines:Bool = map.hasOwnProperty("timelines") ? cast(Reflect.field(map, "timelines"), Bool) : true;
+					var inheritTimelines:Bool = Reflect.hasField(map, "timelines") ? cast(Reflect.field(map, "timelines"), Bool) : true;
 					linkedMeshes.push(new LinkedMesh(mesh, Reflect.field(map, "skin"), slotIndex, Reflect.field(map, "parent"), inheritTimelines));
 					return mesh;
 				}
@@ -523,8 +523,8 @@ class SkeletonJson {
 				var path:PathAttachment = attachmentLoader.newPathAttachment(skin, name);
 				if (path == null)
 					return null;
-				path.closed = map.hasOwnProperty("closed") ? cast(Reflect.field(map, "closed"), Bool) : false;
-				path.constantSpeed = map.hasOwnProperty("constantSpeed") ? cast(Reflect.field(map, "constantSpeed"), Bool) : true;
+				path.closed = Reflect.hasField(map, "closed") ? cast(Reflect.field(map, "closed"), Bool) : false;
+				path.constantSpeed = Reflect.hasField(map, "constantSpeed") ? cast(Reflect.field(map, "constantSpeed"), Bool) : true;
 				var vertexCount:Int = Std.parseInt(Reflect.field(map, "vertexCount"));
 				readVertices(map, path, vertexCount << 1);
 				var lengths:Array<Float> = new Array<Float>();
@@ -1320,7 +1320,7 @@ class SkeletonJson {
 	}
 
 	static private function getValue(map:Dynamic, name:String, defaultValue:Dynamic):Dynamic {
-		if (map.hasOwnProperty(name))
+		if (Reflect.hasField(map, name))
 			return Reflect.field(map, name);
 		return defaultValue;
 	}
