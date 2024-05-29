@@ -449,6 +449,8 @@ class SwiftObjectWriter:
         
         object_string = f"@objc(Spine{class_name})"
         object_string += "\n"
+        object_string += "@objcMembers"
+        object_string += "\n"
         object_string += f"public final class {class_name}: NSObject"
         object_string += " {"
         object_string += "\n"

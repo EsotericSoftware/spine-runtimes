@@ -3,7 +3,9 @@ import SpineCppLite
 
 public typealias AnimationStateListener = (_ type: EventType, _ entry: TrackEntry, _ event: Event?) -> Void
 
-public final class AnimationStateWrapper {
+@objc(SpineAnimationStateWrapper)
+@objcMembers
+public final class AnimationStateWrapper: NSObject {
     
     public let animationState: AnimationState
     public let aninationStateEvents: AnimationStateEvents
@@ -15,6 +17,7 @@ public final class AnimationStateWrapper {
     public init(animationState: AnimationState, aninationStateEvents: AnimationStateEvents) {
         self.animationState = animationState
         self.aninationStateEvents = aninationStateEvents
+        super.init()
     }
     
     public func setTrackEntryListener(entry: TrackEntry, listener: AnimationStateListener?) {

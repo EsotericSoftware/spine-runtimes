@@ -22,7 +22,7 @@ public var minorVersion: Int {
 /// when the atlas is no longer in use to release its resources.
 public extension Atlas {
     
-    private static func fromData(data: Data, loadFile: (_ name: String) async throws -> Data) async throws -> (Atlas, [CGImage]) {
+    private static func fromData(data: Data, loadFile: (_ name: String) async throws -> Data) async throws -> (Atlas, [UIImage]) {
         guard let atlasData = String(data: data, encoding: .utf8) as? NSString else {
             throw "Couldn't read atlas bytes as utf8 string"
         }
@@ -37,7 +37,7 @@ public extension Atlas {
             throw "Couldn't load atlas: \(message)"
         }
         
-        var atlasPages = [CGImage]()
+        var atlasPages = [UIImage]()
         let numImagePaths = spine_atlas_get_num_image_paths(atlas);
         
         for i in 0..<numImagePaths {
@@ -46,7 +46,7 @@ public extension Atlas {
             }
             let atlasPageFile = String(cString: atlasPageFilePointer)
             let imageData = try await loadFile(atlasPageFile)
-            guard let image = UIImage(data: imageData)?.cgImage else {
+            guard let image = UIImage(data: imageData) else {
                 continue
             }
             atlasPages.append(image)
@@ -58,7 +58,7 @@ public extension Atlas {
     /// Loads an [Atlas] from the file [atlasFileName] in the main bundle or the optionally provided [bundle].
     ///
     /// Throws an [Exception] in case the atlas could not be loaded.
-    public static func fromBundle(_ atlasFileName: String, bundle: Bundle = .main) async throws -> (Atlas, [CGImage]) {
+    public static func fromBundle(_ atlasFileName: String, bundle: Bundle = .main) async throws -> (Atlas, [UIImage]) {
         let data = try await FileSource.bundle(fileName: atlasFileName, bundle: bundle).load()
         return try await Self.fromData(data: data) { name in
             return try await FileSource.bundle(fileName: name, bundle: bundle).load()
@@ -68,7 +68,7 @@ public extension Atlas {
     /// Loads an [Atlas] from the file [atlasFileName].
     ///
     /// Throws an [Exception] in case the atlas could not be loaded.
-    public static func fromFile(_ atlasFile: URL) async throws -> (Atlas, [CGImage]) {
+    public static func fromFile(_ atlasFile: URL) async throws -> (Atlas, [UIImage]) {
         let data = try await FileSource.file(atlasFile).load()
         return try await Self.fromData(data: data) { name in
             let dir = atlasFile.deletingLastPathComponent()
@@ -80,7 +80,7 @@ public extension Atlas {
     /// Loads an [Atlas] from the URL [atlasURL].
     ///
     /// Throws an [Exception] in case the atlas could not be loaded.
-    public static func fromHttp(_ atlasURL: URL) async throws -> (Atlas, [CGImage]) {
+    public static func fromHttp(_ atlasURL: URL) async throws -> (Atlas, [UIImage]) {
         let data = try await FileSource.http(atlasURL).load()
         return try await Self.fromData(data: data) { name in
             let dir = atlasURL.deletingLastPathComponent()

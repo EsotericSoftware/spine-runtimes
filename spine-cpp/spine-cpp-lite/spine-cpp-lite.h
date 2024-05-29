@@ -608,6 +608,7 @@ SPINE_CPP_LITE_EXPORT void spine_bone_set_inherit(spine_bone data, spine_inherit
 
 SPINE_CPP_LITE_EXPORT const utf8 *spine_attachment_get_name(spine_attachment attachment);
 SPINE_CPP_LITE_EXPORT spine_attachment_type spine_attachment_get_type(spine_attachment attachment);
+// @ignore
 SPINE_CPP_LITE_EXPORT spine_attachment spine_attachment_copy(spine_attachment attachment);
 SPINE_CPP_LITE_EXPORT void spine_attachment_dispose(spine_attachment attachment);
 

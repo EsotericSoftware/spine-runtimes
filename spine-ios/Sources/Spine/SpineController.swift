@@ -5,7 +5,8 @@ import UIKit
 
 public typealias SpineControllerCallback = (_ controller: SpineController) -> Void
 
-public final class SpineController: ObservableObject {
+@objcMembers
+public final class SpineController: NSObject, ObservableObject {
     
     public internal(set) var drawable: SkeletonDrawableWrapper!
     
@@ -41,6 +42,7 @@ public final class SpineController: ObservableObject {
         self.onBeforePaint = onBeforePaint
         self.onAfterPaint = onAfterPaint
         self.disposeDrawableOnDeInit = disposeDrawableOnDeInit
+        super.init()
     }
     
     deinit {

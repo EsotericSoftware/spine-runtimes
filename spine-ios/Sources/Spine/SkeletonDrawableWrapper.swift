@@ -2,11 +2,14 @@ import Foundation
 import Spine
 import SpineCppLite
 import CoreGraphics
+import UIKit
 
-public final class SkeletonDrawableWrapper {
+@objc(SpineSkeletonDrawableWrapper)
+@objcMembers
+public final class SkeletonDrawableWrapper: NSObject {
     
     public let atlas: Atlas
-    public let atlasPages: [CGImage]
+    public let atlasPages: [UIImage]
     public let skeletonData: SkeletonData
     
     public let skeletonDrawable: SkeletonDrawable
@@ -31,7 +34,7 @@ public final class SkeletonDrawableWrapper {
         )
     }
     
-    public init(atlas: Atlas, atlasPages: [CGImage], skeletonData: SkeletonData) throws {
+    public init(atlas: Atlas, atlasPages: [UIImage], skeletonData: SkeletonData) throws {
         self.atlas = atlas
         self.atlasPages = atlasPages
         self.skeletonData = skeletonData
@@ -60,6 +63,7 @@ public final class SkeletonDrawableWrapper {
             aninationStateEvents: skeletonDrawable.animationStateEvents
         )
         skeleton.updateWorldTransform(physics: SPINE_PHYSICS_NONE)
+        super.init()
     }
     
     /// Updates the [AnimationState] using the [delta] time given in seconds, applies the

@@ -1,10 +1,3 @@
-//
-//  DressUp.swift
-//  Spine iOS Example
-//
-//  Created by Denis Andrašec on 16.05.24.
-//
-
 import SwiftUI
 import Spine
 import SpineCppLite

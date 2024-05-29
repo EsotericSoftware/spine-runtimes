@@ -13,6 +13,7 @@ public typealias RotateMode = spine_rotate_mode
 public typealias Physics = spine_physics
 
 @objc(SpineTransformConstraintData)
+@objcMembers
 public final class TransformConstraintData: NSObject {
 
     internal let wrappee: spine_transform_constraint_data
@@ -168,6 +169,7 @@ public final class TransformConstraintData: NSObject {
 }
 
 @objc(SpineBoundingBoxAttachment)
+@objcMembers
 public final class BoundingBoxAttachment: NSObject {
 
     internal let wrappee: spine_bounding_box_attachment
@@ -188,6 +190,7 @@ public final class BoundingBoxAttachment: NSObject {
 }
 
 @objc(SpinePhysicsConstraintData)
+@objcMembers
 public final class PhysicsConstraintData: NSObject {
 
     internal let wrappee: spine_physics_constraint_data
@@ -398,6 +401,7 @@ public final class PhysicsConstraintData: NSObject {
 }
 
 @objc(SpineAnimationStateEvents)
+@objcMembers
 public final class AnimationStateEvents: NSObject {
 
     internal let wrappee: spine_animation_state_events
@@ -429,6 +433,7 @@ public final class AnimationStateEvents: NSObject {
 }
 
 @objc(SpineTransformConstraint)
+@objcMembers
 public final class TransformConstraint: NSObject {
 
     internal let wrappee: spine_transform_constraint
@@ -533,6 +538,7 @@ public final class TransformConstraint: NSObject {
 }
 
 @objc(SpinePathConstraintData)
+@objcMembers
 public final class PathConstraintData: NSObject {
 
     internal let wrappee: spine_path_constraint_data
@@ -643,6 +649,7 @@ public final class PathConstraintData: NSObject {
 }
 
 @objc(SpineAnimationStateData)
+@objcMembers
 public final class AnimationStateData: NSObject {
 
     internal let wrappee: spine_animation_state_data
@@ -690,6 +697,7 @@ public final class AnimationStateData: NSObject {
 }
 
 @objc(SpineSkeletonDataResult)
+@objcMembers
 public final class SkeletonDataResult: NSObject {
 
     internal let wrappee: spine_skeleton_data_result
@@ -717,6 +725,7 @@ public final class SkeletonDataResult: NSObject {
 }
 
 @objc(SpineClippingAttachment)
+@objcMembers
 public final class ClippingAttachment: NSObject {
 
     internal let wrappee: spine_clipping_attachment
@@ -746,6 +755,7 @@ public final class ClippingAttachment: NSObject {
 }
 
 @objc(SpineIkConstraintData)
+@objcMembers
 public final class IkConstraintData: NSObject {
 
     internal let wrappee: spine_ik_constraint_data
@@ -829,6 +839,7 @@ public final class IkConstraintData: NSObject {
 }
 
 @objc(SpinePhysicsConstraint)
+@objcMembers
 public final class PhysicsConstraint: NSObject {
 
     internal let wrappee: spine_physics_constraint
@@ -1091,6 +1102,7 @@ public final class PhysicsConstraint: NSObject {
 }
 
 @objc(SpineRegionAttachment)
+@objcMembers
 public final class RegionAttachment: NSObject {
 
     internal let wrappee: spine_region_attachment
@@ -1206,6 +1218,7 @@ public final class RegionAttachment: NSObject {
 }
 
 @objc(SpineVertexAttachment)
+@objcMembers
 public final class VertexAttachment: NSObject {
 
     internal let wrappee: spine_vertex_attachment
@@ -1247,6 +1260,7 @@ public final class VertexAttachment: NSObject {
 }
 
 @objc(SpineSkeletonDrawable)
+@objcMembers
 public final class SkeletonDrawable: NSObject {
 
     internal let wrappee: spine_skeleton_drawable
@@ -1282,6 +1296,7 @@ public final class SkeletonDrawable: NSObject {
 }
 
 @objc(SpinePointAttachment)
+@objcMembers
 public final class PointAttachment: NSObject {
 
     internal let wrappee: spine_point_attachment
@@ -1339,6 +1354,7 @@ public final class PointAttachment: NSObject {
 }
 
 @objc(SpineMeshAttachment)
+@objcMembers
 public final class MeshAttachment: NSObject {
 
     internal let wrappee: spine_mesh_attachment
@@ -1443,6 +1459,7 @@ public final class MeshAttachment: NSObject {
 }
 
 @objc(SpinePathAttachment)
+@objcMembers
 public final class PathAttachment: NSObject {
 
     internal let wrappee: spine_path_attachment
@@ -1489,6 +1506,7 @@ public final class PathAttachment: NSObject {
 }
 
 @objc(SpineConstraintData)
+@objcMembers
 public final class ConstraintData: NSObject {
 
     internal let wrappee: spine_constraint_data
@@ -1527,6 +1545,7 @@ public final class ConstraintData: NSObject {
 }
 
 @objc(SpinePathConstraint)
+@objcMembers
 public final class PathConstraint: NSObject {
 
     internal let wrappee: spine_path_constraint
@@ -1622,6 +1641,7 @@ public final class PathConstraint: NSObject {
 }
 
 @objc(SpineAnimationState)
+@objcMembers
 public final class AnimationState: NSObject {
 
     internal let wrappee: spine_animation_state
@@ -1702,6 +1722,7 @@ public final class AnimationState: NSObject {
 }
 
 @objc(SpineTextureRegion)
+@objcMembers
 public final class TextureRegion: NSObject {
 
     internal let wrappee: spine_texture_region
@@ -1822,6 +1843,7 @@ public final class TextureRegion: NSObject {
 }
 
 @objc(SpineRenderCommand)
+@objcMembers
 public final class RenderCommand: NSObject {
 
     internal let wrappee: spine_render_command
@@ -1854,6 +1876,7 @@ public final class RenderCommand: NSObject {
 }
 
 @objc(SpineSkeletonData)
+@objcMembers
 public final class SkeletonData: NSObject {
 
     internal let wrappee: spine_skeleton_data
@@ -2059,6 +2082,7 @@ public final class SkeletonData: NSObject {
 }
 
 @objc(SpineIkConstraint)
+@objcMembers
 public final class IkConstraint: NSObject {
 
     internal let wrappee: spine_ik_constraint
@@ -2154,6 +2178,7 @@ public final class IkConstraint: NSObject {
 }
 
 @objc(SpineSkinEntries)
+@objcMembers
 public final class SkinEntries: NSObject {
 
     internal let wrappee: spine_skin_entries
@@ -2178,6 +2203,7 @@ public final class SkinEntries: NSObject {
 }
 
 @objc(SpineTrackEntry)
+@objcMembers
 public final class TrackEntry: NSObject {
 
     internal let wrappee: spine_track_entry
@@ -2401,6 +2427,7 @@ public final class TrackEntry: NSObject {
 }
 
 @objc(SpineAttachment)
+@objcMembers
 public final class Attachment: NSObject {
 
     internal let wrappee: spine_attachment
@@ -2419,11 +2446,6 @@ public final class Attachment: NSObject {
         return spine_attachment_get_type(wrappee)
     }
 
-    @discardableResult
-    public func copy() -> Attachment {
-        return .init(spine_attachment_copy(wrappee))
-    }
-
     public func dispose() {
         if disposed { return }
         disposed = true
@@ -2433,6 +2455,7 @@ public final class Attachment: NSObject {
 }
 
 @objc(SpineConstraint)
+@objcMembers
 public final class Constraint: NSObject {
 
     internal let wrappee: spine_constraint
@@ -2445,6 +2468,7 @@ public final class Constraint: NSObject {
 }
 
 @objc(SpineEventData)
+@objcMembers
 public final class EventData: NSObject {
 
     internal let wrappee: spine_event_data
@@ -2510,6 +2534,7 @@ public final class EventData: NSObject {
 }
 
 @objc(SpineSkinEntry)
+@objcMembers
 public final class SkinEntry: NSObject {
 
     internal let wrappee: spine_skin_entry
@@ -2534,6 +2559,7 @@ public final class SkinEntry: NSObject {
 }
 
 @objc(SpineBoneData)
+@objcMembers
 public final class BoneData: NSObject {
 
     internal let wrappee: spine_bone_data
@@ -2665,6 +2691,7 @@ public final class BoneData: NSObject {
 }
 
 @objc(SpineSlotData)
+@objcMembers
 public final class SlotData: NSObject {
 
     internal let wrappee: spine_slot_data
@@ -2741,6 +2768,7 @@ public final class SlotData: NSObject {
 }
 
 @objc(SpineAnimation)
+@objcMembers
 public final class Animation: NSObject {
 
     internal let wrappee: spine_animation
@@ -2761,6 +2789,7 @@ public final class Animation: NSObject {
 }
 
 @objc(SpineSkeleton)
+@objcMembers
 public final class Skeleton: NSObject {
 
     internal let wrappee: spine_skeleton
@@ -2983,6 +3012,7 @@ public final class Skeleton: NSObject {
 }
 
 @objc(SpineSequence)
+@objcMembers
 public final class Sequence: NSObject {
 
     internal let wrappee: spine_sequence
@@ -3048,6 +3078,7 @@ public final class Sequence: NSObject {
 }
 
 @objc(SpineBounds)
+@objcMembers
 public final class Bounds: NSObject {
 
     internal let wrappee: spine_bounds
@@ -3076,6 +3107,7 @@ public final class Bounds: NSObject {
 }
 
 @objc(SpineVector)
+@objcMembers
 public final class Vector: NSObject {
 
     internal let wrappee: spine_vector
@@ -3096,6 +3128,7 @@ public final class Vector: NSObject {
 }
 
 @objc(SpineEvent)
+@objcMembers
 public final class Event: NSObject {
 
     internal let wrappee: spine_event
@@ -3161,6 +3194,7 @@ public final class Event: NSObject {
 }
 
 @objc(SpineAtlas)
+@objcMembers
 public final class Atlas: NSObject {
 
     internal let wrappee: spine_atlas
@@ -3198,6 +3232,7 @@ public final class Atlas: NSObject {
 }
 
 @objc(SpineColor)
+@objcMembers
 public final class Color: NSObject {
 
     internal let wrappee: spine_color
@@ -3226,6 +3261,7 @@ public final class Color: NSObject {
 }
 
 @objc(SpineBone)
+@objcMembers
 public final class Bone: NSObject {
 
     internal let wrappee: spine_bone
@@ -3542,6 +3578,7 @@ public final class Bone: NSObject {
 }
 
 @objc(SpineSlot)
+@objcMembers
 public final class Slot: NSObject {
 
     internal let wrappee: spine_slot
@@ -3609,6 +3646,7 @@ public final class Slot: NSObject {
 }
 
 @objc(SpineSkin)
+@objcMembers
 public final class Skin: NSObject {
 
     internal let wrappee: spine_skin

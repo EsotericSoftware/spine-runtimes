@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9205FCD42C0760B1006EE07E /* SimpleAnimationViewControllerRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9205FCD32C0760B1006EE07E /* SimpleAnimationViewControllerRepresentable.swift */; };
 		920BD1162BEBC52D0050A5A9 /* spineboy-pro.skel in Resources */ = {isa = PBXBuildFile; fileRef = 920BD1122BEBC52D0050A5A9 /* spineboy-pro.skel */; };
 		920BD1182BEBC52D0050A5A9 /* spineboy-pro.json in Resources */ = {isa = PBXBuildFile; fileRef = 920BD1142BEBC52D0050A5A9 /* spineboy-pro.json */; };
 		920BD1192BEBC52D0050A5A9 /* spineboy.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 920BD1152BEBC52D0050A5A9 /* spineboy.atlas */; };
@@ -24,6 +25,7 @@
 		921C1EBB2BF60AE90001A0BA /* mix-and-match.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 921C1EB82BF60AE90001A0BA /* mix-and-match.atlas */; };
 		921C1EBC2BF60AE90001A0BA /* mix-and-match.png in Resources */ = {isa = PBXBuildFile; fileRef = 921C1EB92BF60AE90001A0BA /* mix-and-match.png */; };
 		922839DF2BF4F7D8006DA9F6 /* AnimationStateEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922839DE2BF4F7D8006DA9F6 /* AnimationStateEvents.swift */; };
+		9240C26E2C0754DD003EE243 /* SimpleAnimationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9240C26D2C0754DD003EE243 /* SimpleAnimationViewController.m */; };
 		924C0C162BCFCF21004E63F7 /* SpineExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924C0C152BCFCF21004E63F7 /* SpineExampleApp.swift */; };
 		924C0C182BCFCF21004E63F7 /* SimpleAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924C0C172BCFCF21004E63F7 /* SimpleAnimation.swift */; };
 		924C0C1A2BCFCF22004E63F7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 924C0C192BCFCF22004E63F7 /* Assets.xcassets */; };
@@ -38,6 +40,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		9205FCD32C0760B1006EE07E /* SimpleAnimationViewControllerRepresentable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleAnimationViewControllerRepresentable.swift; sourceTree = "<group>"; };
 		920BD1122BEBC52D0050A5A9 /* spineboy-pro.skel */ = {isa = PBXFileReference; lastKnownFileType = file; path = "spineboy-pro.skel"; sourceTree = "<group>"; };
 		920BD1142BEBC52D0050A5A9 /* spineboy-pro.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "spineboy-pro.json"; sourceTree = "<group>"; };
 		920BD1152BEBC52D0050A5A9 /* spineboy.atlas */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = spineboy.atlas; sourceTree = "<group>"; };
@@ -55,6 +58,9 @@
 		921C1EB82BF60AE90001A0BA /* mix-and-match.atlas */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "mix-and-match.atlas"; sourceTree = "<group>"; };
 		921C1EB92BF60AE90001A0BA /* mix-and-match.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "mix-and-match.png"; sourceTree = "<group>"; };
 		922839DE2BF4F7D8006DA9F6 /* AnimationStateEvents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationStateEvents.swift; sourceTree = "<group>"; };
+		9240C26B2C0754DC003EE243 /* Spine iOS Example-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Spine iOS Example-Bridging-Header.h"; sourceTree = "<group>"; };
+		9240C26C2C0754DD003EE243 /* SimpleAnimationViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SimpleAnimationViewController.h; sourceTree = "<group>"; };
+		9240C26D2C0754DD003EE243 /* SimpleAnimationViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SimpleAnimationViewController.m; sourceTree = "<group>"; };
 		924C0C122BCFCF21004E63F7 /* Spine iOS Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Spine iOS Example.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		924C0C152BCFCF21004E63F7 /* SpineExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpineExampleApp.swift; sourceTree = "<group>"; };
 		924C0C172BCFCF21004E63F7 /* SimpleAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleAnimation.swift; sourceTree = "<group>"; };
@@ -140,6 +146,9 @@
 				924C0C152BCFCF21004E63F7 /* SpineExampleApp.swift */,
 				920BD11A2BEBDBA60050A5A9 /* MainView.swift */,
 				924C0C172BCFCF21004E63F7 /* SimpleAnimation.swift */,
+				9205FCD32C0760B1006EE07E /* SimpleAnimationViewControllerRepresentable.swift */,
+				9240C26C2C0754DD003EE243 /* SimpleAnimationViewController.h */,
+				9240C26D2C0754DD003EE243 /* SimpleAnimationViewController.m */,
 				920BD11C2BEBDC380050A5A9 /* PlayPauseAnimation.swift */,
 				922839DE2BF4F7D8006DA9F6 /* AnimationStateEvents.swift */,
 				92D7DDA72BFF3C8800EB9E3A /* DebugRendering.swift */,
@@ -148,6 +157,7 @@
 				9270C16D2BFE356000BD25BC /* Physics.swift */,
 				924C0C192BCFCF22004E63F7 /* Assets.xcassets */,
 				924C0C1B2BCFCF22004E63F7 /* SpineiOSExample.entitlements */,
+				9240C26B2C0754DC003EE243 /* Spine iOS Example-Bridging-Header.h */,
 			);
 			path = "Spine iOS Example";
 			sourceTree = "<group>";
@@ -215,6 +225,7 @@
 				TargetAttributes = {
 					924C0C112BCFCF21004E63F7 = {
 						CreatedOnToolsVersion = 15.2;
+						LastSwiftMigration = 1520;
 					};
 				};
 			};
@@ -272,11 +283,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9205FCD42C0760B1006EE07E /* SimpleAnimationViewControllerRepresentable.swift in Sources */,
 				9270C16E2BFE356000BD25BC /* Physics.swift in Sources */,
 				920BD11B2BEBDBA60050A5A9 /* MainView.swift in Sources */,
 				92D7DDA82BFF3C8800EB9E3A /* DebugRendering.swift in Sources */,
 				92FE93292BF4AB9600CCDF48 /* IKFollowing.swift in Sources */,
 				920BD11D2BEBDC380050A5A9 /* PlayPauseAnimation.swift in Sources */,
+				9240C26E2C0754DD003EE243 /* SimpleAnimationViewController.m in Sources */,
 				921C1EAF2BF609F60001A0BA /* DressUp.swift in Sources */,
 				922839DF2BF4F7D8006DA9F6 /* AnimationStateEvents.swift in Sources */,
 				924C0C182BCFCF21004E63F7 /* SimpleAnimation.swift in Sources */,
@@ -410,6 +423,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "Spine iOS Example/SpineiOSExample.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -440,7 +454,9 @@
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Spine iOS Example/Spine iOS Example-Bridging-Header.h";
 				SWIFT_OBJC_INTEROP_MODE = objcxx;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -451,6 +467,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "Spine iOS Example/SpineiOSExample.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -481,6 +498,7 @@
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Spine iOS Example/Spine iOS Example-Bridging-Header.h";
 				SWIFT_OBJC_INTEROP_MODE = objcxx;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

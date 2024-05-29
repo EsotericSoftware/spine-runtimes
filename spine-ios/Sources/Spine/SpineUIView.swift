@@ -1,6 +1,7 @@
 import UIKit
 import MetalKit
 
+@objc
 public final class SpineUIView: MTKView {
     
     let controller: SpineController
@@ -11,7 +12,7 @@ public final class SpineUIView: MTKView {
     internal var computedBounds: CGRect = .zero
     internal var renderer: SpineRenderer?
     
-    init(
+    @objc public init(
         controller: SpineController = SpineController(),
         mode: Spine.ContentMode = .fit,
         alignment: Spine.Alignment = .center,
@@ -28,7 +29,9 @@ public final class SpineUIView: MTKView {
         isOpaque = backgroundColor != .clear
     }
     
-    convenience init(
+    
+    
+    public convenience init(
         from source: SpineViewSource,
         controller: SpineController = SpineController(),
         mode: Spine.ContentMode = .fit,
@@ -45,6 +48,54 @@ public final class SpineUIView: MTKView {
                 print(error)
             }
         }
+    }
+    
+    @objc public convenience init(
+        atlasFileName: String,
+        skeletonFileName: String,
+        bundle: Bundle = .main,
+        controller: SpineController = SpineController(),
+        mode: Spine.ContentMode = .fit,
+        alignment: Spine.Alignment = .center,
+        boundsProvider: BoundsProvider = SetupPoseBounds(),
+        backgroundColor: UIColor = .clear
+    ) {
+        self.init(from: .bundle(atlasFileName: atlasFileName, skeletonFileName: skeletonFileName, bundle: bundle), controller: controller, mode: mode, alignment: alignment, boundsProvider: boundsProvider, backgroundColor: backgroundColor)
+    }
+    
+    @objc public convenience init(
+        atlasFile: URL,
+        skeletonFile: URL,
+        controller: SpineController = SpineController(),
+        mode: Spine.ContentMode = .fit,
+        alignment: Spine.Alignment = .center,
+        boundsProvider: BoundsProvider = SetupPoseBounds(),
+        backgroundColor: UIColor = .clear
+    ) {
+        self.init(from: .file(atlasFile: atlasFile, skeletonFile: skeletonFile), controller: controller, mode: mode, alignment: alignment, boundsProvider: boundsProvider, backgroundColor: backgroundColor)
+    }
+    
+    @objc public convenience init(
+        atlasURL: URL,
+        skeletonURL: URL,
+        controller: SpineController = SpineController(),
+        mode: Spine.ContentMode = .fit,
+        alignment: Spine.Alignment = .center,
+        boundsProvider: BoundsProvider = SetupPoseBounds(),
+        backgroundColor: UIColor = .clear
+    ) {
+        self.init(from: .http(atlasURL: atlasURL, skeletonURL: skeletonURL), controller: controller, mode: mode, alignment: alignment, boundsProvider: boundsProvider, backgroundColor: backgroundColor)
+    }
+    
+    @objc public convenience init(
+        drawable: SkeletonDrawableWrapper,
+        controller: SpineController = SpineController(),
+        mode: Spine.ContentMode = .fit,
+        alignment: Spine.Alignment = .center,
+        boundsProvider: BoundsProvider = SetupPoseBounds(),
+        backgroundColor: UIColor = .clear
+    ) {
+        self.init(from: .drawable(drawable), controller: controller, mode: mode, alignment: alignment, boundsProvider: boundsProvider, backgroundColor: backgroundColor)
     }
     
     public override init(frame frameRect: CGRect, device: MTLDevice?) {
@@ -67,7 +118,7 @@ extension SpineUIView {
         controller.initialize()
     }
     
-    private func initRenderer(atlasPages: [CGImage]) throws {
+    private func initRenderer(atlasPages: [UIImage]) throws {
         renderer = try SpineRenderer(spineView: self, atlasPages: atlasPages, pma: controller.drawable.atlas.isPma)
         renderer?.delegate = controller
         renderer?.dataSource = controller

@@ -41,7 +41,7 @@ final class SpineRenderer: NSObject, MTKViewDelegate {
     
     init(
         spineView: SpineUIView,
-        atlasPages: [CGImage],
+        atlasPages: [UIImage],
         pma: Bool
     ) throws {
         let device = spineView.device!
@@ -49,15 +49,17 @@ final class SpineRenderer: NSObject, MTKViewDelegate {
         
         let defaultLibrary = try device.makeDefaultLibrary(bundle: .module)
         let textureLoader = MTKTextureLoader(device: device)
-        textures = try atlasPages.map {
-            try textureLoader.newTexture(
-                cgImage: $0,
-                options: [
-                    .textureUsage: NSNumber(value: MTLTextureUsage.shaderRead.rawValue),
-                    .SRGB: false,
-                ]
-            )
-        }
+        textures = try atlasPages
+            .compactMap { $0.cgImage }
+            .map {
+                try textureLoader.newTexture(
+                    cgImage: $0,
+                    options: [
+                        .textureUsage: NSNumber(value: MTLTextureUsage.shaderRead.rawValue),
+                        .SRGB: false,
+                    ]
+                )
+            }
         
         let blendModes = [
             SPINE_BLEND_MODE_NORMAL,

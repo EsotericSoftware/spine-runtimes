@@ -1,10 +1,3 @@
-//
-//  IKFollowing.swift
-//  Spine iOS Example
-//
-//  Created by Denis Andrašec on 15.05.24.
-//
-
 import SwiftUI
 import Spine
 

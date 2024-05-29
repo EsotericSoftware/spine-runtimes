@@ -3,15 +3,20 @@ import CoreGraphics
 
 /// Base class for bounds providers. A bounds provider calculates the axis aligned bounding box
 /// used to scale and fit a skeleton inside the bounds of a [SpineWidget].
+@objc
 public protocol BoundsProvider {
     func computeBounds(for drawable: SkeletonDrawableWrapper) -> CGRect
 }
 
 /// A [BoundsProvider] that calculates the bounding box of the skeleton based on the visible
 /// attachments in the setup pose.
-public final class SetupPoseBounds: BoundsProvider {
+@objc(SpineSetupPoseBounds)
+@objcMembers
+public final class SetupPoseBounds: NSObject, BoundsProvider {
     
-    public init() {}
+    public override init() {
+        super.init()
+    }
 
     public func computeBounds(for drawable: SkeletonDrawableWrapper) -> CGRect {
         return CGRect(bounds: drawable.skeleton.bounds)
@@ -19,7 +24,9 @@ public final class SetupPoseBounds: BoundsProvider {
 }
 
 /// A [BoundsProvider] that returns fixed bounds.
-public final class RawBounds: BoundsProvider {
+@objc(SpineRawBounds)
+@objcMembers
+public final class RawBounds: NSObject, BoundsProvider {
     public let x: Double
     public let y: Double
     public let width: Double
@@ -30,6 +37,7 @@ public final class RawBounds: BoundsProvider {
         self.y = y
         self.width = width
         self.height = height
+        super.init()
     }
 
     public func computeBounds(for drawable: SkeletonDrawableWrapper) -> CGRect {
@@ -39,7 +47,9 @@ public final class RawBounds: BoundsProvider {
 
 /// A [BoundsProvider] that calculates the bounding box needed for a combination of skins
 /// and an animation.
-public final class SkinAndAnimationBounds: BoundsProvider {
+@objc(SpineSkinAndAnimationBounds)
+@objcMembers
+public final class SkinAndAnimationBounds: NSObject, BoundsProvider {
     
     private let animation: String?
     private let skins: [String]
@@ -57,6 +67,7 @@ public final class SkinAndAnimationBounds: BoundsProvider {
             self.skins = ["default"]
         }
         self.stepTime = stepTime
+        super.init()
     }
     
     public func computeBounds(for drawable: SkeletonDrawableWrapper) -> CGRect {
@@ -108,12 +119,14 @@ public final class SkinAndAnimationBounds: BoundsProvider {
       }
 }
 
-public enum ContentMode {
+@objc
+public enum ContentMode: Int {
     case fit
     case fill
 }
 
-public enum Alignment {
+@objc
+public enum Alignment: Int {
     case topLeft
     case topCenter
     case topRight

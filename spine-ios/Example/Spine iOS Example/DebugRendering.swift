@@ -1,10 +1,3 @@
-//
-//  DebugRendering.swift
-//  Spine iOS Example
-//
-//  Created by Denis Andrašec on 23.05.24.
-//
-
 import SwiftUI
 import Spine
 
