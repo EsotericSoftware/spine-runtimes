@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		920BD1162BEBC52D0050A5A9 /* spineboy-pro.skel in Resources */ = {isa = PBXBuildFile; fileRef = 920BD1122BEBC52D0050A5A9 /* spineboy-pro.skel */; };
-		920BD1172BEBC52D0050A5A9 /* spineboy.png in Resources */ = {isa = PBXBuildFile; fileRef = 920BD1132BEBC52D0050A5A9 /* spineboy.png */; };
 		920BD1182BEBC52D0050A5A9 /* spineboy-pro.json in Resources */ = {isa = PBXBuildFile; fileRef = 920BD1142BEBC52D0050A5A9 /* spineboy-pro.json */; };
 		920BD1192BEBC52D0050A5A9 /* spineboy.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 920BD1152BEBC52D0050A5A9 /* spineboy.atlas */; };
 		920BD11B2BEBDBA60050A5A9 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920BD11A2BEBDBA60050A5A9 /* MainView.swift */; };
@@ -28,6 +27,7 @@
 		924C0C162BCFCF21004E63F7 /* SpineExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924C0C152BCFCF21004E63F7 /* SpineExampleApp.swift */; };
 		924C0C182BCFCF21004E63F7 /* SimpleAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924C0C172BCFCF21004E63F7 /* SimpleAnimation.swift */; };
 		924C0C1A2BCFCF22004E63F7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 924C0C192BCFCF22004E63F7 /* Assets.xcassets */; };
+		925315522BFF994400C96F75 /* spineboy.png in Resources */ = {isa = PBXBuildFile; fileRef = 925315512BFF994400C96F75 /* spineboy.png */; };
 		9270C16E2BFE356000BD25BC /* Physics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9270C16D2BFE356000BD25BC /* Physics.swift */; };
 		9270C1732BFE389600BD25BC /* celestial-circus.png in Resources */ = {isa = PBXBuildFile; fileRef = 9270C1702BFE389600BD25BC /* celestial-circus.png */; };
 		9270C1742BFE389600BD25BC /* celestial-circus-pro.skel in Resources */ = {isa = PBXBuildFile; fileRef = 9270C1712BFE389600BD25BC /* celestial-circus-pro.skel */; };
@@ -39,7 +39,6 @@
 
 /* Begin PBXFileReference section */
 		920BD1122BEBC52D0050A5A9 /* spineboy-pro.skel */ = {isa = PBXFileReference; lastKnownFileType = file; path = "spineboy-pro.skel"; sourceTree = "<group>"; };
-		920BD1132BEBC52D0050A5A9 /* spineboy.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spineboy.png; sourceTree = "<group>"; };
 		920BD1142BEBC52D0050A5A9 /* spineboy-pro.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "spineboy-pro.json"; sourceTree = "<group>"; };
 		920BD1152BEBC52D0050A5A9 /* spineboy.atlas */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = spineboy.atlas; sourceTree = "<group>"; };
 		920BD11A2BEBDBA60050A5A9 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
@@ -61,6 +60,7 @@
 		924C0C172BCFCF21004E63F7 /* SimpleAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleAnimation.swift; sourceTree = "<group>"; };
 		924C0C192BCFCF22004E63F7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		924C0C1B2BCFCF22004E63F7 /* SpineiOSExample.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SpineiOSExample.entitlements; sourceTree = "<group>"; };
+		925315512BFF994400C96F75 /* spineboy.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spineboy.png; sourceTree = "<group>"; };
 		9270C16D2BFE356000BD25BC /* Physics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Physics.swift; sourceTree = "<group>"; };
 		9270C1702BFE389600BD25BC /* celestial-circus.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "celestial-circus.png"; sourceTree = "<group>"; };
 		9270C1712BFE389600BD25BC /* celestial-circus-pro.skel */ = {isa = PBXFileReference; lastKnownFileType = file; path = "celestial-circus-pro.skel"; sourceTree = "<group>"; };
@@ -84,8 +84,8 @@
 		920BD1112BEBC52D0050A5A9 /* spineboy */ = {
 			isa = PBXGroup;
 			children = (
+				925315512BFF994400C96F75 /* spineboy.png */,
 				920BD1122BEBC52D0050A5A9 /* spineboy-pro.skel */,
-				920BD1132BEBC52D0050A5A9 /* spineboy.png */,
 				920BD1142BEBC52D0050A5A9 /* spineboy-pro.json */,
 				920BD1152BEBC52D0050A5A9 /* spineboy.atlas */,
 			);
@@ -252,8 +252,8 @@
 				9270C1742BFE389600BD25BC /* celestial-circus-pro.skel in Resources */,
 				921C1EBB2BF60AE90001A0BA /* mix-and-match.atlas in Resources */,
 				9270C1732BFE389600BD25BC /* celestial-circus.png in Resources */,
+				925315522BFF994400C96F75 /* spineboy.png in Resources */,
 				920BD1192BEBC52D0050A5A9 /* spineboy.atlas in Resources */,
-				920BD1172BEBC52D0050A5A9 /* spineboy.png in Resources */,
 				920BD1292BEBDCD80050A5A9 /* dragon-ess.skel in Resources */,
 				920BD1162BEBC52D0050A5A9 /* spineboy-pro.skel in Resources */,
 				920BD12B2BEBDCD80050A5A9 /* dragon.png in Resources */,
@@ -320,6 +320,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COMPRESS_PNG_FILES = NO;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -343,6 +344,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				STRIP_PNG_TEXT = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -381,6 +383,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COMPRESS_PNG_FILES = NO;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
@@ -397,6 +400,7 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				STRIP_PNG_TEXT = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 			};
 			name = Release;

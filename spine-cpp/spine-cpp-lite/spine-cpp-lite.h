@@ -210,6 +210,7 @@ SPINE_CPP_LITE_EXPORT float spine_vector_get_y(spine_vector vector);
 SPINE_CPP_LITE_EXPORT spine_atlas spine_atlas_load(const utf8 *atlasData);
 SPINE_CPP_LITE_EXPORT int32_t spine_atlas_get_num_image_paths(spine_atlas atlas);
 SPINE_CPP_LITE_EXPORT utf8 *spine_atlas_get_image_path(spine_atlas atlas, int32_t index);
+SPINE_CPP_LITE_EXPORT spine_bool spine_atlas_is_pma(spine_atlas atlas);
 SPINE_CPP_LITE_EXPORT utf8 *spine_atlas_get_error(spine_atlas atlas);
 SPINE_CPP_LITE_EXPORT void spine_atlas_dispose(spine_atlas atlas);
 

@@ -3171,6 +3171,10 @@ public final class Atlas: NSObject {
         super.init()
     }
 
+    public var isPma: Bool {
+        return spine_atlas_is_pma(wrappee) != 0
+    }
+
     public var error: String? {
         return spine_atlas_get_error(wrappee).flatMap { String(cString: $0) }
     }
@@ -3534,6 +3538,7 @@ public final class Bone: NSObject {
     public func rotateWorld(degrees: Float) {
         spine_bone_rotate_world(wrappee, degrees)
     }
+
 }
 
 @objc(SpineSlot)

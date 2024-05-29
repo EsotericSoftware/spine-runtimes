@@ -295,6 +295,16 @@ int32_t spine_atlas_get_num_image_paths(spine_atlas atlas) {
 	return ((_spine_atlas *) atlas)->numImagePaths;
 }
 
+spine_bool spine_atlas_is_pma(spine_atlas atlas) {
+	if (!atlas) return 0;
+	Atlas *_atlas = static_cast<Atlas *>(((_spine_atlas *) atlas)->atlas);
+	if (_atlas->getPages().size() > 0) {
+		return _atlas->getPages()[0]->pma;
+	} else {
+		return 0;
+	}
+}
+
 utf8 *spine_atlas_get_image_path(spine_atlas atlas, int32_t index) {
 	if (!atlas) return nullptr;
 	return ((_spine_atlas *) atlas)->imagePaths[index];

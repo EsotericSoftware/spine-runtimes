@@ -99,13 +99,14 @@ public final class SpineController: ObservableObject {
         isPlaying = true
     }
     
-    internal func load(atlasFile: String, skeletonFile: String) async throws {
-        let atlasAndPages = try await Atlas.fromAsset(atlasFile)
+    internal func load(atlasFile: String, skeletonFile: String, bundle: Bundle = .main) async throws {
+        let atlasAndPages = try await Atlas.fromBundle(atlasFile, bundle: bundle)
+        let skeletonData = try await SkeletonData.fromBundle(
+            atlas: atlasAndPages.0,
+            skeletonFileName: skeletonFile,
+            bundle: bundle
+        )
         try await MainActor.run {
-            let skeletonData = try SkeletonData.fromAsset(
-                atlas: atlasAndPages.0,
-                skeletonFile: skeletonFile
-            )
             let skeletonDrawableWrapper = try SkeletonDrawableWrapper(
                 atlas: atlasAndPages.0,
                 atlasPages: atlasAndPages.1,

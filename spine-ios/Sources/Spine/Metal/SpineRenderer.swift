@@ -24,7 +24,6 @@ final class SpineRenderer: NSObject, MTKViewDelegate {
     
     private let device: MTLDevice
     private let textures: [MTLTexture]
-    private let pipelineState: MTLRenderPipelineState
     private let commandQueue: MTLCommandQueue
     
     private var sizeInPoints: CGSize = .zero
@@ -35,13 +34,15 @@ final class SpineRenderer: NSObject, MTKViewDelegate {
         offset: vector_float2(0, 0)
     )
     private var lastDraw: CFTimeInterval = 0
+    private var pipelineStatesByBlendMode = [Int: MTLRenderPipelineState]()
     
     weak var dataSource: SpineRendererDataSource?
     weak var delegate: SpineRendererDelegate?
     
     init(
         spineView: SpineUIView,
-        atlasPages: [CGImage]
+        atlasPages: [CGImage],
+        pma: Bool
     ) throws {
         let device = spineView.device!
         self.device = device
@@ -58,16 +59,23 @@ final class SpineRenderer: NSObject, MTKViewDelegate {
             )
         }
         
-        // TODO: Create pipeline state for all blend mode / premultiplied combinations and choose the correct one when drawing vertices
-        let pipelineStateDescriptor = MTLRenderPipelineDescriptor()
-        pipelineStateDescriptor.vertexFunction = defaultLibrary.makeFunction(name: "vertexShader")
-        pipelineStateDescriptor.fragmentFunction = defaultLibrary.makeFunction(name: "fragmentShader")
-        pipelineStateDescriptor.colorAttachments[0].pixelFormat = spineView.colorPixelFormat
-        pipelineStateDescriptor.colorAttachments[0].apply(
-            blendMode: SPINE_BLEND_MODE_NORMAL,
-            with: true
-        )
-        pipelineState = try device.makeRenderPipelineState(descriptor: pipelineStateDescriptor)
+        let blendModes = [
+            SPINE_BLEND_MODE_NORMAL,
+            SPINE_BLEND_MODE_ADDITIVE,
+            SPINE_BLEND_MODE_MULTIPLY,
+            SPINE_BLEND_MODE_SCREEN
+        ]
+        for blendMode in blendModes {
+            let descriptor = MTLRenderPipelineDescriptor()
+            descriptor.vertexFunction = defaultLibrary.makeFunction(name: "vertexShader")
+            descriptor.fragmentFunction = defaultLibrary.makeFunction(name: "fragmentShader")
+            descriptor.colorAttachments[0].pixelFormat = spineView.colorPixelFormat
+            descriptor.colorAttachments[0].apply(
+                blendMode: blendMode,
+                with: pma
+            )
+            pipelineStatesByBlendMode[Int(blendMode.rawValue)] = try device.makeRenderPipelineState(descriptor: descriptor)
+        }
         commandQueue = device.makeCommandQueue()!
     }
     
@@ -167,7 +175,8 @@ final class SpineRenderer: NSObject, MTKViewDelegate {
         }
         let verticesBufferSize = MemoryLayout<SpineVertex>.stride * vertices.count
         
-        guard let vertexBuffer = device.makeBuffer(length: verticesBufferSize, options: .storageModeShared) else {
+        guard let vertexBuffer = device.makeBuffer(length: verticesBufferSize, options: .storageModeShared),
+            let pipelineState = getPipelineState(blendMode: renderCommand.blendMode) else {
             return
         }
         
@@ -214,7 +223,10 @@ final class SpineRenderer: NSObject, MTKViewDelegate {
             vertexStart: 0,
             vertexCount: vertices.count
         )
-        
+    }
+    
+    private func getPipelineState(blendMode: BlendMode) -> MTLRenderPipelineState? {
+        pipelineStatesByBlendMode[Int(blendMode.rawValue)]
     }
 }
 

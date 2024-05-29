@@ -23,8 +23,11 @@ struct PlayPauseAnimation: View {
     
     var body: some View {
         SpineView(
-            atlasFile: "dragon.atlas",
-            skeletonFile: "dragon-ess.skel",
+            from: .bundle(atlasFileName: "dragon.atlas", skeletonFileName: "dragon-ess.skel"),
+//            from: .http(
+//                atlasURL: URL(string: "https://github.com/denrase/spine-runtimes/raw/spine-ios/spine-ios/Example/Spine%20iOS%20Example/Assets/dragon/dragon.atlas")!,
+//                skeletonURL:  URL(string: "https://github.com/denrase/spine-runtimes/raw/spine-ios/spine-ios/Example/Spine%20iOS%20Example/Assets/dragon/dragon-ess.skel")!
+//            ),
             controller: controller,
             boundsProvider: SkinAndAnimationBounds(animation: "flying")
         )

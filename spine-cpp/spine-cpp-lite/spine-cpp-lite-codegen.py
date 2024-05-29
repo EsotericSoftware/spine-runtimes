@@ -541,7 +541,7 @@ class SwiftEnumWriter:
        return f"public typealias {snake_to_title(self.spine_enum.replace("spine_", ""))} = {self.spine_enum}"
 
 print("import Foundation")
-print("import SpineWrapper")
+print("import SpineCppLite")
 print("")
 
 for enum in enums:

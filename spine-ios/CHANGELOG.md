@@ -14,3 +14,4 @@
 - Add `Physics` sample (#10)
 - Add `DebugRendering` sample (#11)
 - Move remaining files to SPM package (#12)
+- Load assets from different sources (#13)

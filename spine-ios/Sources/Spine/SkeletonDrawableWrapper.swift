@@ -17,20 +17,18 @@ public final class SkeletonDrawableWrapper {
     
     internal var disposed = false
     
-    public static func fromAsset(atlasFile: String, skeletonFile: String, bundle: Bundle = .main) async throws -> SkeletonDrawableWrapper {
-        let atlasAndPages = try await Atlas.fromAsset(atlasFile, bundle: bundle)
-        return try await MainActor.run {
-            let skeletonData = try SkeletonData.fromAsset(
-                atlas: atlasAndPages.0,
-                skeletonFile: skeletonFile,
-                bundle: bundle
-            )
-            return try SkeletonDrawableWrapper(
-                atlas: atlasAndPages.0,
-                atlasPages: atlasAndPages.1,
-                skeletonData: skeletonData
-            )
-        }
+    public static func fromBundle(atlasFileName: String, skeletonFileName: String, bundle: Bundle = .main) async throws -> SkeletonDrawableWrapper {
+        let atlasAndPages = try await Atlas.fromBundle(atlasFileName, bundle: bundle)
+        let skeletonData = try await SkeletonData.fromBundle(
+            atlas: atlasAndPages.0,
+            skeletonFileName: skeletonFileName,
+            bundle: bundle
+        )
+        return try SkeletonDrawableWrapper(
+            atlas: atlasAndPages.0,
+            atlasPages: atlasAndPages.1,
+            skeletonData: skeletonData
+        )
     }
     
     public init(atlas: Atlas, atlasPages: [CGImage], skeletonData: SkeletonData) throws {

@@ -1,6 +1,6 @@
-import SpineCppLite
-import SwiftUI
 import Foundation
+import SwiftUI
+import SpineCppLite
 
 public var version: String {
     return "\(majorVersion).\(minorVersion)"
@@ -22,12 +22,10 @@ public var minorVersion: Int {
 /// when the atlas is no longer in use to release its resources.
 public extension Atlas {
     
-    private static func load(atlasFileName: String, loadFile: (_ name: String) async throws -> Data) async throws -> (Atlas, [CGImage]) {
-        let atlasBytes = try await loadFile(atlasFileName)
-        guard let atlasData = String(data: atlasBytes, encoding: .utf8) as? NSString else {
-            throw "Couldn't read atlas bytes"
+    private static func fromData(data: Data, loadFile: (_ name: String) async throws -> Data) async throws -> (Atlas, [CGImage]) {
+        guard let atlasData = String(data: data, encoding: .utf8) as? NSString else {
+            throw "Couldn't read atlas bytes as utf8 string"
         }
-        
         let atlasDataNative = UnsafeMutablePointer<CChar>(mutating: atlasData.utf8String)
         guard let atlas = spine_atlas_load(atlasDataNative) else {
             throw "Couldn't load atlas data"
@@ -54,32 +52,41 @@ public extension Atlas {
             atlasPages.append(image)
         }
         
-        // TODO: Paint in Swift?
-        
         return (Atlas(atlas), atlasPages)
     }
     
     /// Loads an [Atlas] from the file [atlasFileName] in the main bundle or the optionally provided [bundle].
     ///
     /// Throws an [Exception] in case the atlas could not be loaded.
-    public static func fromAsset(_ atlasFileName: String, bundle: Bundle = .main) async throws -> (Atlas, [CGImage]) {
-        return try await Self.load(atlasFileName: atlasFileName) { name in
-            return try bundle.loadAsData(fileName: name)
+    public static func fromBundle(_ atlasFileName: String, bundle: Bundle = .main) async throws -> (Atlas, [CGImage]) {
+        let data = try await FileSource.bundle(fileName: atlasFileName, bundle: bundle).load()
+        return try await Self.fromData(data: data) { name in
+            return try await FileSource.bundle(fileName: name, bundle: bundle).load()
         }
     }
     
     /// Loads an [Atlas] from the file [atlasFileName].
     ///
     /// Throws an [Exception] in case the atlas could not be loaded.
-    public static func fromFile(_ atlasFileName: String) async throws -> (Atlas, [Image]) {
-        throw "Not implemented"
+    public static func fromFile(_ atlasFile: URL) async throws -> (Atlas, [CGImage]) {
+        let data = try await FileSource.file(atlasFile).load()
+        return try await Self.fromData(data: data) { name in
+            let dir = atlasFile.deletingLastPathComponent()
+            let file = dir.appendingPathComponent(name)
+            return try await FileSource.file(file).load()
+        }
     }
         
     /// Loads an [Atlas] from the URL [atlasURL].
     ///
     /// Throws an [Exception] in case the atlas could not be loaded.
-    public static func fromHttp(_ atlasURL: String) async throws -> (Atlas, [Image]) {
-        throw "Not implemented"
+    public static func fromHttp(_ atlasURL: URL) async throws -> (Atlas, [CGImage]) {
+        let data = try await FileSource.http(atlasURL).load()
+        return try await Self.fromData(data: data) { name in
+            let dir = atlasURL.deletingLastPathComponent()
+            let file = dir.appendingPathComponent(name)
+            return try await FileSource.http(file).load()
+        }
     }
 }
 
@@ -138,30 +145,45 @@ public extension SkeletonData {
     /// Uses the provided [atlas] to resolve attachment images.
     ///
     /// Throws an [Exception] in case the skeleton data could not be loaded.
-    public static func fromAsset(atlas: Atlas, skeletonFile: String, bundle: Bundle = .main) throws -> SkeletonData {
-        let data = try bundle.loadAsData(fileName: skeletonFile)
-        if skeletonFile.hasSuffix(".json") {
-            guard let json = String(data: data, encoding: .utf8) else {
-                throw "Couldn't read skeleton data json string"
-            }
-            return try fromJson(atlas: atlas, json: json)
-        } else {
-            return try fromBinary(atlas: atlas, binary: data)
-        }
+    public static func fromBundle(atlas: Atlas, skeletonFileName: String, bundle: Bundle = .main) async throws -> SkeletonData {
+        return try fromBinary(
+            atlas: atlas,
+            binary: try await FileSource.bundle(fileName: skeletonFileName, bundle: bundle).load(),
+            isJson: skeletonFileName.hasSuffix(".json")
+        )
     }
     
     /// Loads a [SkeletonData] from the file [skeletonFile]. Uses the provided [atlas] to resolve attachment images.
     ///
     /// Throws an [Exception] in case the skeleton data could not be loaded.
-    public static func fromFile(atlas: Atlas, skeletonFile: String, bundle: Bundle = .main) throws -> SkeletonData {
-        throw "Not implemented"
+    public static func fromFile(atlas: Atlas, skeletonFile: URL) async throws -> SkeletonData {
+        return try fromBinary(
+            atlas: atlas,
+            binary: try await FileSource.file(skeletonFile).load(),
+            isJson: skeletonFile.absoluteString.hasSuffix(".json")
+        )
     }
     
     /// Loads a [SkeletonData] from the URL [skeletonURL]. Uses the provided [atlas] to resolve attachment images.
     ///
     /// Throws an [Exception] in case the skeleton data could not be loaded.
-    public static func fromHttp(atlas: Atlas, skeletonURL: URL) throws -> SkeletonData {
-        throw "Not implemented"
+    public static func fromHttp(atlas: Atlas, skeletonURL: URL) async throws -> SkeletonData {
+        return try fromBinary(
+            atlas: atlas,
+            binary: try await FileSource.http(skeletonURL).load(),
+            isJson: skeletonURL.absoluteString.hasSuffix(".json")
+        )
+    }
+    
+    private static func fromBinary(atlas: Atlas, binary: Data, isJson: Bool) throws -> SkeletonData {
+        if isJson {
+            guard let json = String(data: binary, encoding: .utf8) else {
+                throw "Couldn't read skeleton data json string"
+            }
+            return try fromJson(atlas: atlas, json: json)
+        } else {
+            return try fromBinary(atlas: atlas, binary: binary)
+        }
     }
 }
 
@@ -229,23 +251,33 @@ extension CGRect {
     }
 }
 
-extension Bundle {
-    func loadFileUrl(fileName: String) throws -> URL {
-        let components = fileName.split(separator: ".")
-        guard components.count > 1, let ext = components.last else {
-            throw "Provide both file name and file extension"
-        }
-        let name = components.dropLast(1).joined(separator: ".")
-        
-        guard let fileUrl = url(forResource: name, withExtension: String(ext)) else {
-            throw "Could not load file with name \(name)"
-        }
-        return fileUrl
-    }
+internal enum FileSource {
+    case bundle(fileName: String, bundle: Bundle = .main)
+    case file(URL)
+    case http(URL)
     
-    func loadAsData(fileName: String) throws -> Data {
-        let fileUrl = try loadFileUrl(fileName: fileName)
-        return try Data(contentsOf: fileUrl, options: [])
+    internal func load() async throws -> Data {
+        switch self {
+        case .bundle(let fileName, let bundle):
+            let components = fileName.split(separator: ".")
+            guard components.count > 1, let ext = components.last else {
+                throw "Provide both file name and file extension"
+            }
+            let name = components.dropLast(1).joined(separator: ".")
+            
+            guard let fileUrl = bundle.url(forResource: name, withExtension: String(ext)) else {
+                throw "Could not load file with name \(name) from bundle"
+            }
+            return try Data(contentsOf: fileUrl, options: [])
+        case .file(let fileUrl):
+            return try Data(contentsOf: fileUrl, options: [])
+        case .http(let url):
+            let (temp, response) = try await URLSession.shared.download(from: url)
+            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+                throw URLError(.badServerResponse)
+            }
+            return try Data(contentsOf: temp, options: [])
+        }
     }
 }
 

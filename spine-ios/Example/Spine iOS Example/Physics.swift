@@ -15,8 +15,7 @@ struct Physics: View {
     
     var body: some View {
         SpineView(
-            atlasFile: "celestial-circus.atlas",
-            skeletonFile: "celestial-circus-pro.skel",
+            from: .bundle(atlasFileName: "celestial-circus.atlas", skeletonFileName: "celestial-circus-pro.skel"),
             controller: model.controller
         )
         .gesture(

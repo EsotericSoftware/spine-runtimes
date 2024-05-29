@@ -35,7 +35,7 @@ struct DressUp: View {
             
             if let drawable = model.drawable {
                 SpineView(
-                    drawable: drawable,
+                    from: .drawable(drawable),
                     controller: model.controller,
                     boundsProvider: SkinAndAnimationBounds(skins: ["full-skins/girl"])
                 )
@@ -82,9 +82,9 @@ final class DressUpModel: ObservableObject {
             disposeDrawableOnDeInit: false
         )
         Task.detached(priority: .high) {
-            let drawable = try await SkeletonDrawableWrapper.fromAsset(
-                atlasFile: "mix-and-match.atlas",
-                skeletonFile: "mix-and-match-pro.skel"
+            let drawable = try await SkeletonDrawableWrapper.fromBundle(
+                atlasFileName: "mix-and-match.atlas",
+                skeletonFileName: "mix-and-match-pro.skel"
             )
             try await MainActor.run {
                 for skin in drawable.skeletonData.skins {

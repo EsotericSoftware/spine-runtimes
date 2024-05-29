@@ -29,8 +29,7 @@ public final class SpineUIView: MTKView {
     }
     
     convenience init(
-        atlasFile: String,
-        skeletonFile: String,
+        from source: SpineViewSource,
         controller: SpineController = SpineController(),
         mode: Spine.ContentMode = .fit,
         alignment: Spine.Alignment = .center,
@@ -40,26 +39,11 @@ public final class SpineUIView: MTKView {
         self.init(controller: controller, mode: mode, alignment: alignment, boundsProvider: boundsProvider, backgroundColor: backgroundColor)
         Task.detached(priority: .high) {
             do {
-                try await self.load(atlasFile: atlasFile, skeletonFile: skeletonFile)
+                let drawable = try await source.loadDrawable()
+                try await self.load(drawable: drawable)
             } catch {
                 print(error)
             }
-        }
-    }
-    
-    convenience init(
-        drawable: SkeletonDrawableWrapper,
-        controller: SpineController = SpineController(),
-        mode: Spine.ContentMode = .fit,
-        alignment: Spine.Alignment = .center,
-        boundsProvider: BoundsProvider = SetupPoseBounds(),
-        backgroundColor: UIColor = .clear
-    ) {
-        self.init(controller: controller, mode: mode, alignment: alignment, boundsProvider: boundsProvider, backgroundColor: backgroundColor)
-        do {
-            try load(drawable: drawable)
-        } catch {
-            print(error)
         }
     }
     
@@ -73,15 +57,6 @@ public final class SpineUIView: MTKView {
 }
 
 extension SpineUIView {
-    internal func load(atlasFile: String, skeletonFile: String) async throws {
-        try await self.controller.load(
-            atlasFile: atlasFile,
-            skeletonFile: skeletonFile
-        )
-        try await MainActor.run {
-            try self.load(drawable: self.controller.drawable)
-        }
-    }
     
     internal func load(drawable: SkeletonDrawableWrapper) throws {
         controller.drawable = drawable
@@ -93,10 +68,58 @@ extension SpineUIView {
     }
     
     private func initRenderer(atlasPages: [CGImage]) throws {
-        renderer = try SpineRenderer(spineView: self, atlasPages: atlasPages)
+        renderer = try SpineRenderer(spineView: self, atlasPages: atlasPages, pma: controller.drawable.atlas.isPma)
         renderer?.delegate = controller
         renderer?.dataSource = controller
         renderer?.mtkView(self, drawableSizeWillChange: drawableSize)
         delegate = renderer
+    }
+}
+
+public enum SpineViewSource {
+    case bundle(atlasFileName: String, skeletonFileName: String, bundle: Bundle = .main)
+    case file(atlasFile: URL, skeletonFile: URL)
+    case http(atlasURL: URL, skeletonURL: URL)
+    case drawable(SkeletonDrawableWrapper)
+    
+    func loadDrawable() async throws -> SkeletonDrawableWrapper {
+        switch self {
+        case .bundle(let atlasFileName, let skeletonFileName, let bundle):
+            let atlasAndPages = try await Atlas.fromBundle(atlasFileName, bundle: bundle)
+            let skeletonData = try await SkeletonData.fromBundle(
+                atlas: atlasAndPages.0,
+                skeletonFileName: skeletonFileName,
+                bundle: bundle
+            )
+            return try SkeletonDrawableWrapper(
+                atlas: atlasAndPages.0,
+                atlasPages: atlasAndPages.1,
+                skeletonData: skeletonData
+            )
+        case .file(let atlasFile, let skeletonFile):
+            let atlasAndPages = try await Atlas.fromFile(atlasFile)
+            let skeletonData = try await SkeletonData.fromFile(
+                atlas: atlasAndPages.0,
+                skeletonFile: skeletonFile
+            )
+            return try SkeletonDrawableWrapper(
+                atlas: atlasAndPages.0,
+                atlasPages: atlasAndPages.1,
+                skeletonData: skeletonData
+            )
+        case .http(let atlasURL, let skeletonURL):
+            let atlasAndPages = try await Atlas.fromHttp(atlasURL)
+            let skeletonData = try await SkeletonData.fromHttp(
+                atlas: atlasAndPages.0,
+                skeletonURL: skeletonURL
+            )
+            return try SkeletonDrawableWrapper(
+                atlas: atlasAndPages.0,
+                atlasPages: atlasAndPages.1,
+                skeletonData: skeletonData
+            )
+        case .drawable(let skeletonDrawableWrapper):
+            return skeletonDrawableWrapper
+        }
     }
 }
