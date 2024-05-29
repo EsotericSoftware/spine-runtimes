@@ -400,32 +400,12 @@ export class Spine extends Container {
 
 	/** Converts a point from the skeleton coordinate system to the Pixi world coordinate system. */
 	skeletonToPixiWorldCoordinates (point: { x: number; y: number }) {
-		let transform = this.worldTransform;
-		let a = transform.a,
-			b = transform.b,
-			c = transform.c,
-			d = transform.d,
-			tx = transform.tx,
-			ty = transform.ty;
-		let x = point.x;
-		let y = point.y;
-		point.x = x * a + y * c + tx;
-		point.y = x * b + y * d + ty;
+		this.worldTransform.apply(point, point);
 	}
 
 	/** Converts a point from the Pixi world coordinate system to the skeleton coordinate system. */
 	pixiWorldCoordinatesToSkeleton (point: { x: number; y: number }) {
-		let transform = this.worldTransform.clone().invert();
-		let a = transform.a,
-			b = transform.b,
-			c = transform.c,
-			d = transform.d,
-			tx = transform.tx,
-			ty = transform.ty;
-		let x = point.x;
-		let y = point.y;
-		point.x = x * a + y * c + tx;
-		point.y = x * b + y * d + ty;
+		this.worldTransform.applyInverse(point, point);
 	}
 
 	/** Converts a point from the Pixi world coordinate system to the bone's local coordinate system. */
