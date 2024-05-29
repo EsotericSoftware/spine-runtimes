@@ -97,7 +97,7 @@ class AnimationBoundExample extends Scene {
 	public function onTouch(e:TouchEvent) {
 		var touch = e.getTouch(this);
 		if (touch != null && touch.phase == TouchPhase.ENDED) {
-			SceneManager.getInstance().switchScene(new BasicExample());
+			SceneManager.getInstance().switchScene(new StretcyhmanExample());
 		}
 	}
 }

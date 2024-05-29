@@ -75,6 +75,9 @@ class SkeletonSprite extends DisplayObject implements IAnimatable {
 	private var tempLight:spine.Color = new spine.Color(0, 0, 0);
 	private var tempDark:spine.Color = new spine.Color(0, 0, 0);
 
+	public var beforeUpdateWorldTransforms: SkeletonSprite -> Void = function(_) {};
+	public var afterUpdateWorldTransforms: SkeletonSprite -> Void = function(_) {};
+
 	public function new(skeletonData:SkeletonData, animationStateData:AnimationStateData = null) {
 		super();
 		Bone.yDown = true;
@@ -370,8 +373,47 @@ class SkeletonSprite extends DisplayObject implements IAnimatable {
 	public function advanceTime(time:Float):Void {
 		_state.update(time);
 		_state.apply(skeleton);
+		this.beforeUpdateWorldTransforms(this);
 		skeleton.update(time);
 		skeleton.updateWorldTransform(Physics.update);
+		this.afterUpdateWorldTransforms(this);
 		this.setRequiresRedraw();
+	}
+
+	public function skeletonToHaxeWorldCoordinates(point:Array<Float>):Void {
+		var transform = this.transformationMatrix;
+		var a = transform.a,
+			b = transform.b,
+			c = transform.c,
+			d = transform.d,
+			tx = transform.tx,
+			ty = transform.ty;
+			var x = point[0];
+			var y = point[1];
+			point[0] = x * a + y * c + tx;
+			point[1] = x * b + y * d + ty;
+	}
+
+	public function haxeWorldCoordinatesToSkeleton(point:Array<Float>):Void {
+		var transform = this.transformationMatrix.clone().invert();
+		var a = transform.a,
+			b = transform.b,
+			c = transform.c,
+			d = transform.d,
+			tx = transform.tx,
+			ty = transform.ty;
+		var x = point[0];
+		var y = point[1];
+		point[0] = x * a + y * c + tx;
+		point[1] = x * b + y * d + ty;
+	}
+
+	public function haxeWorldCoordinatesToBone(point:Array<Float>, bone: Bone):Void {
+		this.haxeWorldCoordinatesToSkeleton(point);
+		if (bone.parent != null) {
+			bone.parent.worldToLocal(point);
+		} else {
+			bone.worldToLocal(point);
+		}
 	}
 }
