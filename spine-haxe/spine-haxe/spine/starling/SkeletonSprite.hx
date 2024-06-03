@@ -327,7 +327,7 @@ class SkeletonSprite extends DisplayObject implements IAnimatable {
 		var steps = 100, time = 0.;
 		var stepTime = animation.duration != 0 ? animation.duration / steps : 0;
 		var minX = 100000000., maxX = -100000000., minY = 100000000., maxY = -100000000.;
-		
+
 		var bound:lime.math.Rectangle;
 		for (i in 0...steps) {
 			animation.apply(_skeleton, time , time, false, [], 1, MixBlend.setup, MixDirection.mixIn);
