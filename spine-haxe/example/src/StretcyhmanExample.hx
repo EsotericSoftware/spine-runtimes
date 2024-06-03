@@ -137,7 +137,7 @@ class StretcyhmanExample extends Scene {
 		if (touchBackground) {
 			var sceneTouch = e.getTouch(this);
 			if (sceneTouch != null && sceneTouch.phase == TouchPhase.ENDED) {
-				SceneManager.getInstance().switchScene(new BasicExample());
+				SceneManager.getInstance().switchScene(new EventsExample());
 			}
 		}
 	}
