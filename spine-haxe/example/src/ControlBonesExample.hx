@@ -40,7 +40,7 @@ import starling.events.TouchEvent;
 import starling.events.TouchPhase;
 import starling.display.Canvas;
 
-class StretcyhmanExample extends Scene {
+class ControlBonesExample extends Scene {
 	var loadBinary = true;
 	
 	var skeletonSprite:SkeletonSprite;

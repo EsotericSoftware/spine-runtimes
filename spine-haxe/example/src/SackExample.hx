@@ -53,15 +53,11 @@ class SackExample extends Scene {
 
 		var skeletonSprite = new SkeletonSprite(skeletondata, animationStateData);
 		skeletonSprite.skeleton.updateWorldTransform(Physics.update);
-		var bounds = skeletonSprite.skeleton.getBounds();
-
 		
 		skeletonSprite.scale = 0.2;
 		skeletonSprite.x = Starling.current.stage.stageWidth / 2;
 		skeletonSprite.y = Starling.current.stage.stageHeight/ 2;
 		
-		trace(skeletonSprite);
-
 		skeletonSprite.state.setAnimationByName(0, "cape-follow-example", true);
 
 		addChild(skeletonSprite);
