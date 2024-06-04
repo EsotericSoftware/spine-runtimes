@@ -1214,6 +1214,12 @@ namespace Spine {
 			get { return nextTrackLast != -1; }
 		}
 
+		/// <summary>Returns true if the next track entry has been applied at least once.</summary>
+		/// <seealso cref="AnimationState.Apply(Skeleton)"/>
+		public bool WasNextApplied {
+            get { return next != null && System.MathF.Abs(nextTrackLast - next.delay) >= float.Epsilon; }
+        }
+
 		/// <summary>
 		/// Returns true if at least one loop has been completed.</summary>
 		/// <seealso cref="TrackEntry.Complete"/>
