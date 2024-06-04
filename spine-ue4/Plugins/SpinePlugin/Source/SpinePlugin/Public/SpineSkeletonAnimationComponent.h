@@ -212,6 +212,8 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Components|Spine|TrackEntry")
 	FSpineAnimationDisposeDelegate AnimationDispose;
 
+	virtual void BeginDestroy() override;
+
 protected:
 	spine::TrackEntry *entry = nullptr;
 };

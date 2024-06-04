@@ -82,6 +82,13 @@ void USpineSkeletonAnimationComponent::BeginPlay() {
 	trackEntries.Empty();
 }
 
+void UTrackEntry::BeginDestroy() {
+	if (entry) {
+		entry->setRendererObject(nullptr);
+	}
+	Super::BeginDestroy();
+}
+
 void USpineSkeletonAnimationComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) {
 	Super::Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
