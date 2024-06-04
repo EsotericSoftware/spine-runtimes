@@ -27,7 +27,9 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-import Scene.SceneManager;
+package starlingExamples;
+
+import starlingExamples.Scene.SceneManager;
 import openfl.utils.Assets;
 import spine.SkeletonData;
 import spine.Physics;
@@ -56,17 +58,17 @@ class AnimationBoundExample extends Scene {
 
 		skeletonSpriteClipping = new SkeletonSprite(skeletondata, animationStateDataClipping);
 		skeletonSpriteClipping.skeleton.updateWorldTransform(Physics.update);
-		
+
 		skeletonSpriteClipping.scale = scale;
 		skeletonSpriteClipping.x = Starling.current.stage.stageWidth / 3 * 2;
 		skeletonSpriteClipping.y = Starling.current.stage.stageHeight / 2;
-		
+
 		var animationClipping = skeletonSpriteClipping.state.setAnimationByName(0, "portal", true).animation;
 		var animationBoundClipping = skeletonSpriteClipping.getAnimationBounds(animationClipping, true);
 		var quad:Quad = new Quad(animationBoundClipping.width * scale, animationBoundClipping.height * scale, 0xc70000);
         quad.x = skeletonSpriteClipping.x + animationBoundClipping.x * scale;
         quad.y = skeletonSpriteClipping.y + animationBoundClipping.y * scale;
-		
+
 		var animationStateDataNoClipping = new AnimationStateData(skeletondata);
 		animationStateDataNoClipping.defaultMix = 0.25;
 		skeletonSpriteNoClipping = new SkeletonSprite(skeletondata, animationStateDataNoClipping);
@@ -83,7 +85,7 @@ class AnimationBoundExample extends Scene {
 
 		addChild(quad);
 		addChild(quadNoClipping);
-		addChild(skeletonSpriteClipping);		
+		addChild(skeletonSpriteClipping);
 		addChild(skeletonSpriteNoClipping);
 		addText("Animation bound without clipping", 75, 350);
 		addText("Animation bound with clipping", 370, 350);

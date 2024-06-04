@@ -27,46 +27,19 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-import Scene.SceneManager;
-import openfl.utils.Assets;
-import spine.SkeletonData;
-import spine.Physics;
-import spine.animation.AnimationStateData;
-import spine.atlas.TextureAtlas;
-import spine.starling.SkeletonSprite;
-import spine.starling.StarlingTextureLoader;
-import starling.core.Starling;
-import starling.events.TouchEvent;
-import starling.events.TouchPhase;
+package;
 
-class VineExample extends Scene {
-	var loadBinary = false;
+import flixelExamples.FlixelState;
+import flixel.FlxG;
+import flixel.FlxGame;
+import openfl.display.Sprite;
 
-	public function load():Void {
-		background.color = 0xffffffff;
-		var atlas = new TextureAtlas(Assets.getText("assets/vine.atlas"), new StarlingTextureLoader("assets/vine.atlas"));
-		var skeletondata = SkeletonData.from(loadBinary ? Assets.getBytes("assets/vine-pro.skel") : Assets.getText("assets/vine-pro.json"), atlas);
-		var animationStateData = new AnimationStateData(skeletondata);
-		animationStateData.defaultMix = 0.25;
-
-		var skeletonSprite = new SkeletonSprite(skeletondata, animationStateData);
-		skeletonSprite.skeleton.updateWorldTransform(Physics.none);
-		var bounds = skeletonSprite.skeleton.getBounds();
-		skeletonSprite.scale = Starling.current.stage.stageWidth / bounds.width;
-		skeletonSprite.x = Starling.current.stage.stageWidth / 2;
-		skeletonSprite.y = Starling.current.stage.stageHeight * 0.5;
-
-		addChild(skeletonSprite);
-		juggler.add(skeletonSprite);
-
-		addEventListener(TouchEvent.TOUCH, onTouch);
-	}
-
-	public function onTouch(e:TouchEvent) {
-		var touch = e.getTouch(this);
-		if (touch != null && touch.phase == TouchPhase.ENDED) {
-			SceneManager.getInstance().switchScene(new SackExample());
-		}
+class MainFlixel extends Sprite
+{
+	public function new()
+	{
+		super();
+		addChild(new FlxGame(640, 480, FlixelState));
+		FlxG.autoPause = false;
 	}
 }
-

@@ -2,11 +2,14 @@
 <project>
 
 	<meta title="spine-haxe-example" package="spine" version="4.1.0" company="Esoteric Software" />
-	<app main="Main" path="export" file="SpineHaxeExample" />
+	<!-- <app main="Main" path="export" file="SpineHaxeExample" /> -->
+	<!-- <app main="MainStarling" path="export" file="SpineHaxeExample" /> -->
+	<app main="MainFlixel" path="export" file="SpineHaxeExample" />
 	<window allow-high-dpi="true" />
 
 	<haxelib name="openfl" />
 	<haxelib name="starling" />
+	<haxelib name="flixel" />
 	<haxelib name="spine-haxe" />
 
 	<source path="example/src" />

@@ -27,10 +27,12 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-import spine.Skin;
-import Scene.SceneManager;
+package starlingExamples;
+
+import starlingExamples.Scene.SceneManager;
 import openfl.utils.Assets;
 import spine.SkeletonData;
+import spine.Physics;
 import spine.animation.AnimationStateData;
 import spine.atlas.TextureAtlas;
 import spine.starling.SkeletonSprite;
@@ -39,34 +41,26 @@ import starling.core.Starling;
 import starling.events.TouchEvent;
 import starling.events.TouchPhase;
 
-class MixAndMatchExample extends Scene {
+class SackExample extends Scene {
 	var loadBinary = false;
 
 	public function load():Void {
-		var atlas = new TextureAtlas(Assets.getText("assets/mix-and-match.atlas"), new StarlingTextureLoader("assets/mix-and-match.atlas"));
-		var data = SkeletonData.from(loadBinary ? Assets.getBytes("assets/mix-and-match-pro.skel") : Assets.getText("assets/mix-and-match-pro.json"), atlas);
-		var animationStateData = new AnimationStateData(data);
+		background.color = 0x333333;
+
+		var atlas = new TextureAtlas(Assets.getText("assets/sack.atlas"), new StarlingTextureLoader("assets/sack.atlas"));
+		var skeletondata = SkeletonData.from(Assets.getText("assets/sack-pro.json"), atlas);
+
+		var animationStateData = new AnimationStateData(skeletondata);
 		animationStateData.defaultMix = 0.25;
 
-		var skeletonSprite = new SkeletonSprite(data, animationStateData);
-		var customSkin = new Skin("custom");
-		var skinBase = data.findSkin("skin-base");
-		customSkin.addSkin(skinBase);
-		customSkin.addSkin(data.findSkin("nose/short"));
-		customSkin.addSkin(data.findSkin("eyelids/girly"));
-		customSkin.addSkin(data.findSkin("eyes/violet"));
-		customSkin.addSkin(data.findSkin("hair/brown"));
-		customSkin.addSkin(data.findSkin("clothes/hoodie-orange"));
-		customSkin.addSkin(data.findSkin("legs/pants-jeans"));
-		customSkin.addSkin(data.findSkin("accessories/bag"));
-		customSkin.addSkin(data.findSkin("accessories/hat-red-yellow"));
-		skeletonSprite.skeleton.skin = customSkin;
+		var skeletonSprite = new SkeletonSprite(skeletondata, animationStateData);
+		skeletonSprite.skeleton.updateWorldTransform(Physics.update);
 
-		var bounds = skeletonSprite.skeleton.getBounds();
-		skeletonSprite.scale = Starling.current.stage.stageHeight / bounds.height * 0.5;
+		skeletonSprite.scale = 0.2;
 		skeletonSprite.x = Starling.current.stage.stageWidth / 2;
-		skeletonSprite.y = Starling.current.stage.stageHeight * 0.9;
-		skeletonSprite.state.setAnimationByName(0, "dance", true);
+		skeletonSprite.y = Starling.current.stage.stageHeight/ 2;
+
+		skeletonSprite.state.setAnimationByName(0, "cape-follow-example", true);
 
 		addChild(skeletonSprite);
 		juggler.add(skeletonSprite);
@@ -77,7 +71,7 @@ class MixAndMatchExample extends Scene {
 	public function onTouch(e:TouchEvent) {
 		var touch = e.getTouch(this);
 		if (touch != null && touch.phase == TouchPhase.ENDED) {
-			SceneManager.getInstance().switchScene(new TankExample());
+			SceneManager.getInstance().switchScene(new CelestialCircusExample());
 		}
 	}
 }

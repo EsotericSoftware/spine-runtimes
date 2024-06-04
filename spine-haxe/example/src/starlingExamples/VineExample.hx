@@ -27,9 +27,12 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-import Scene.SceneManager;
+package starlingExamples;
+
+import starlingExamples.Scene.SceneManager;
 import openfl.utils.Assets;
 import spine.SkeletonData;
+import spine.Physics;
 import spine.animation.AnimationStateData;
 import spine.atlas.TextureAtlas;
 import spine.starling.SkeletonSprite;
@@ -38,27 +41,25 @@ import starling.core.Starling;
 import starling.events.TouchEvent;
 import starling.events.TouchPhase;
 
-class BasicExample extends Scene {
-	var loadBinary = true;
+class VineExample extends Scene {
+	var loadBinary = false;
 
 	public function load():Void {
-		var atlas = new TextureAtlas(Assets.getText("assets/raptor.atlas"), new StarlingTextureLoader("assets/raptor-pro.atlas"));
-		var skeletondata = SkeletonData.from(loadBinary ? Assets.getBytes("assets/raptor-pro.skel") : Assets.getText("assets/raptor-pro.json"), atlas);
+		background.color = 0xffffffff;
+		var atlas = new TextureAtlas(Assets.getText("assets/vine.atlas"), new StarlingTextureLoader("assets/vine.atlas"));
+		var skeletondata = SkeletonData.from(loadBinary ? Assets.getBytes("assets/vine-pro.skel") : Assets.getText("assets/vine-pro.json"), atlas);
 		var animationStateData = new AnimationStateData(skeletondata);
 		animationStateData.defaultMix = 0.25;
 
 		var skeletonSprite = new SkeletonSprite(skeletondata, animationStateData);
+		skeletonSprite.skeleton.updateWorldTransform(Physics.none);
 		var bounds = skeletonSprite.skeleton.getBounds();
-		skeletonSprite.scale = Starling.current.stage.stageWidth / bounds.width * 0.5;
+		skeletonSprite.scale = Starling.current.stage.stageWidth / bounds.width;
 		skeletonSprite.x = Starling.current.stage.stageWidth / 2;
-		skeletonSprite.y = Starling.current.stage.stageHeight * 0.9;
-
-		skeletonSprite.state.setAnimationByName(0, "walk", true);
+		skeletonSprite.y = Starling.current.stage.stageHeight * 0.5;
 
 		addChild(skeletonSprite);
 		juggler.add(skeletonSprite);
-
-		addText("Click anywhere for next scene");
 
 		addEventListener(TouchEvent.TOUCH, onTouch);
 	}
@@ -66,7 +67,8 @@ class BasicExample extends Scene {
 	public function onTouch(e:TouchEvent) {
 		var touch = e.getTouch(this);
 		if (touch != null && touch.phase == TouchPhase.ENDED) {
-			SceneManager.getInstance().switchScene(new SequenceExample());
+			SceneManager.getInstance().switchScene(new SackExample());
 		}
 	}
 }
+

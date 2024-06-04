@@ -27,66 +27,54 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-import starling.display.Quad;
-import starling.text.TextField;
+package starlingExamples;
+
+import spine.BlendMode;
+import starlingExamples.Scene.SceneManager;
+import openfl.utils.Assets;
+import spine.SkeletonData;
+import spine.Physics;
+import spine.animation.AnimationStateData;
+import spine.atlas.TextureAtlas;
+import spine.starling.SkeletonSprite;
+import spine.starling.StarlingTextureLoader;
 import starling.core.Starling;
-import starling.display.Sprite;
+import starling.events.TouchEvent;
+import starling.events.TouchPhase;
 
-class SceneManager {
-	private static var instance:SceneManager;
+class CloudPotExample extends Scene {
+	var loadBinary = false;
 
-	private var currentScene:Sprite;
+	public function load():Void {
+		background.color = 0x333333;
 
-	private function new() {
-		// Singleton pattern to ensure only one instance of SceneManager
+		var atlas = new TextureAtlas(Assets.getText("assets/cloud-pot.atlas"), new StarlingTextureLoader("assets/cloud-pot.atlas"));
+		var skeletondata = SkeletonData.from(Assets.getText("assets/cloud-pot.json"), atlas);
+
+		var animationStateData = new AnimationStateData(skeletondata);
+		animationStateData.defaultMix = 0.25;
+
+		var skeletonSprite = new SkeletonSprite(skeletondata, animationStateData);
+		skeletonSprite.skeleton.updateWorldTransform(Physics.update);
+		var bounds = skeletonSprite.skeleton.getBounds();
+
+
+		skeletonSprite.scale = 0.2;
+		skeletonSprite.x = Starling.current.stage.stageWidth / 2;
+		skeletonSprite.y = Starling.current.stage.stageHeight / 2;
+
+		skeletonSprite.state.setAnimationByName(0, "playing-in-the-rain", true);
+
+		addChild(skeletonSprite);
+		juggler.add(skeletonSprite);
+
+		addEventListener(TouchEvent.TOUCH, onTouch);
 	}
 
-	public static function getInstance():SceneManager {
-		if (instance == null) {
-			instance = new SceneManager();
+	public function onTouch(e:TouchEvent) {
+		var touch = e.getTouch(this);
+		if (touch != null && touch.phase == TouchPhase.ENDED) {
+			SceneManager.getInstance().switchScene(new AnimationBoundExample());
 		}
-		return instance;
-	}
-
-	public function switchScene(newScene:Scene):Void {
-		if (currentScene != null) {
-			currentScene.dispose();
-			currentScene.removeFromParent(true);
-		}
-		currentScene = newScene;
-		starling.core.Starling.current.stage.addChild(currentScene);
-		newScene.load();
-	}
-}
-
-abstract class Scene extends Sprite {
-	var juggler = new starling.animation.Juggler();
-
-	public var background:Quad;
-
-	public function new() {
-		super();
-		var stageWidth = Starling.current.stage.stageWidth;
-		var stageHeight = Starling.current.stage.stageHeight;
-		background = new Quad(stageWidth, stageHeight, 0x0);
-		this.addChild(background);
-		Starling.current.juggler.add(juggler);
-	}
-
-	abstract public function load():Void;
-
-	public override function dispose():Void {
-		juggler.purge();
-		Starling.current.juggler.remove(juggler);
-		super.dispose();
-	}
-
-	public function addText(text:String, x:Int = 10, y:Int = 10) {
-		var textField = new TextField(250, 30, text);
-		textField.x = x;
-		textField.y = y;
-		textField.format.color = 0xffffffff;
-		addChild(textField);
-		return textField;
 	}
 }

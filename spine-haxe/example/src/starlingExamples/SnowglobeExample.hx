@@ -27,8 +27,9 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-import spine.BlendMode;
-import Scene.SceneManager;
+package starlingExamples;
+
+import starlingExamples.Scene.SceneManager;
 import openfl.utils.Assets;
 import spine.SkeletonData;
 import spine.Physics;
@@ -40,14 +41,14 @@ import starling.core.Starling;
 import starling.events.TouchEvent;
 import starling.events.TouchPhase;
 
-class CloudPotExample extends Scene {
+class SnowglobeExample extends Scene {
 	var loadBinary = false;
 
 	public function load():Void {
 		background.color = 0x333333;
 
-		var atlas = new TextureAtlas(Assets.getText("assets/cloud-pot.atlas"), new StarlingTextureLoader("assets/cloud-pot.atlas"));
-		var skeletondata = SkeletonData.from(Assets.getText("assets/cloud-pot.json"), atlas);
+		var atlas = new TextureAtlas(Assets.getText("assets/snowglobe.atlas"), new StarlingTextureLoader("assets/snowglobe.atlas"));
+		var skeletondata = SkeletonData.from(Assets.getText("assets/snowglobe-pro.json"), atlas);
 
 		var animationStateData = new AnimationStateData(skeletondata);
 		animationStateData.defaultMix = 0.25;
@@ -56,12 +57,12 @@ class CloudPotExample extends Scene {
 		skeletonSprite.skeleton.updateWorldTransform(Physics.update);
 		var bounds = skeletonSprite.skeleton.getBounds();
 
-		
-		skeletonSprite.scale = 0.2;
+
+		skeletonSprite.scale = 0.15;
 		skeletonSprite.x = Starling.current.stage.stageWidth / 2;
-		skeletonSprite.y = Starling.current.stage.stageHeight / 2;
-		
-		skeletonSprite.state.setAnimationByName(0, "playing-in-the-rain", true);
+		skeletonSprite.y = Starling.current.stage.stageHeight/ 1.5;
+
+		skeletonSprite.state.setAnimationByName(0, "shake", true);
 
 		addChild(skeletonSprite);
 		juggler.add(skeletonSprite);
@@ -72,7 +73,7 @@ class CloudPotExample extends Scene {
 	public function onTouch(e:TouchEvent) {
 		var touch = e.getTouch(this);
 		if (touch != null && touch.phase == TouchPhase.ENDED) {
-			SceneManager.getInstance().switchScene(new AnimationBoundExample());
+			SceneManager.getInstance().switchScene(new CloudPotExample());
 		}
 	}
 }

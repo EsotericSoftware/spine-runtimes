@@ -27,8 +27,9 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-import spine.animation.TrackEntry;
-import Scene.SceneManager;
+package starlingExamples;
+
+import starlingExamples.Scene.SceneManager;
 import openfl.utils.Assets;
 import spine.SkeletonData;
 import spine.animation.AnimationStateData;
@@ -36,71 +37,35 @@ import spine.atlas.TextureAtlas;
 import spine.starling.SkeletonSprite;
 import spine.starling.StarlingTextureLoader;
 import starling.core.Starling;
-import starling.display.DisplayObjectContainer;
 import starling.events.TouchEvent;
 import starling.events.TouchPhase;
-import starling.text.TextField;
 
-class EventsExample extends Scene {
-	var loadBinary = true;
+class SequenceExample extends Scene {
+	var loadBinary = false;
 
 	public function load():Void {
-		var atlas = new TextureAtlas(Assets.getText("assets/spineboy.atlas"), new StarlingTextureLoader("assets/spineboy-pro.atlas"));
-		var skeletondata = SkeletonData.from(loadBinary ? Assets.getBytes("assets/spineboy-pro.skel") : Assets.getText("assets/spineboy-pro.json"), atlas, .5);
+		var atlas = new TextureAtlas(Assets.getText("assets/dragon.atlas"), new StarlingTextureLoader("assets/dragon.atlas"));
+		var skeletondata = SkeletonData.from(loadBinary ? Assets.getBytes("assets/dragon-ess.skel") : Assets.getText("assets/dragon-ess.json"), atlas);
 		var animationStateData = new AnimationStateData(skeletondata);
 		animationStateData.defaultMix = 0.25;
 
 		var skeletonSprite = new SkeletonSprite(skeletondata, animationStateData);
+		var bounds = skeletonSprite.skeleton.getBounds();
+		skeletonSprite.scale = Starling.current.stage.stageWidth / bounds.width * 0.5;
 		skeletonSprite.x = Starling.current.stage.stageWidth / 2;
-		skeletonSprite.y = Starling.current.stage.stageHeight * 0.8;
-
-		// add callback to the AnimationState
-		skeletonSprite.state.onStart.add(entry -> log('Started animation ${entry.animation.name}'));
-		skeletonSprite.state.onInterrupt.add(entry -> log('Interrupted animation ${entry.animation.name}'));
-		skeletonSprite.state.onEnd.add(entry -> log('Ended animation ${entry.animation.name}'));
-		skeletonSprite.state.onDispose.add(entry -> log('Disposed animation ${entry.animation.name}'));
-		skeletonSprite.state.onComplete.add(entry -> log('Completed animation ${entry.animation.name}'));
-
-		// add callback to the TrackEntry
-		skeletonSprite.state.setAnimationByName(0, "walk", true);
-		var trackEntry = skeletonSprite.state.addAnimationByName(0, "run", true, 3);
-		trackEntry.onEvent.add(
-			(entry, event) -> log('Custom event for ${entry.animation.name}: ${event.data.name}'));
+		skeletonSprite.y = Starling.current.stage.stageHeight * 0.5;
+		skeletonSprite.state.setAnimationByName(0, "flying", true);
 
 		addChild(skeletonSprite);
 		juggler.add(skeletonSprite);
 
-		addText("Click anywhere for next scene");
-
-		addChild(textContainer);
-
 		addEventListener(TouchEvent.TOUCH, onTouch);
-	}
-
-	private var textContainer = new DisplayObjectContainer();
-	private var logs = new Array<TextField>();
-	private var logsNumber = 0;
-	private var yOffset = 12;
-	private function log(text:String) {
-		var length = logs.length;
-		var newLog = new TextField(250, 30, text);
-		newLog.x = 550;
-		newLog.y = 20 + yOffset * logsNumber++;
-		newLog.format.color = 0xffffffff;
-		textContainer.addChild(newLog);
-		if (logs.length < 45) {
-			logs.push(newLog);
-		} else {
-			logs.shift().dispose();
-			logs.push(newLog);
-			textContainer.y -= yOffset;
-		}
 	}
 
 	public function onTouch(e:TouchEvent) {
 		var touch = e.getTouch(this);
 		if (touch != null && touch.phase == TouchPhase.ENDED) {
-			SceneManager.getInstance().switchScene(new BasicExample());
+			SceneManager.getInstance().switchScene(new MixAndMatchExample());
 		}
 	}
 }

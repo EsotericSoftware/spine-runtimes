@@ -59,6 +59,9 @@ class Skeleton {
 	public var y:Float = 0;
 	public var time:Float = 0;
 
+	public var flipX:Bool = false;
+	public var flipY:Bool = false;
+
 	public function new(data:SkeletonData) {
 		if (data == null) {
 			throw new SpineException("data cannot be null.");
