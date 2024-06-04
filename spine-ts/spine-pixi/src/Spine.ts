@@ -62,7 +62,7 @@ export interface ISpineOptions {
 	autoUpdate?: boolean;
 	/**  The value passed to the skeleton reader. If omitted, 1 is passed. See {@link SkeletonBinary.scale} for details. */
 	scale?: number;
-	/** 
+	/**
 	 * A factory to override the default ones to render Spine meshes ({@link DarkSlotMesh} or {@link SlotMesh}).
 	 * If omitted, a factory returning a ({@link DarkSlotMesh} or {@link SlotMesh}) will be used depending on the presence of
 	 * a dark tint mesh in the skeleton.
@@ -177,23 +177,17 @@ export class Spine extends Container {
 		// Because reasons, pixi uses deltaFrames at 60fps. We ignore the default deltaFrames and use the deltaSeconds from pixi ticker.
 		const delta = deltaSeconds ?? Ticker.shared.deltaMS / 1000;
 		this.state.update(delta);
+		this.state.apply(this.skeleton);
 		this.skeleton.update(delta);
+		this.skeleton.updateWorldTransform(Physics.update);
 	}
 
-	/** Before rendering, apply the state change to the Spine AnimationState and update the skeleton transform, then call the {@link Container.updateTransform}. */
+	/** Render the meshes based on the current skeleton state, render debug information, then call {@link Container.updateTransform}. */
 	public override updateTransform (): void {
-		this.updateSpineTransform();
+		this.renderMeshes();
+		this.sortChildren();
 		this.debug?.renderDebug(this);
 		super.updateTransform();
-	}
-
-	protected updateSpineTransform (): void {
-		// if I ever create the linked spines, this will be useful.
-
-		this.state.apply(this.skeleton);
-		this.skeleton.updateWorldTransform(Physics.update);
-		this.updateGeometry();
-		this.sortChildren();
 	}
 
 	/** Destroy Spine game object elements, then call the {@link Container.destroy} with the given options */
@@ -232,7 +226,7 @@ export class Spine extends Container {
 
 	private verticesCache: NumberArrayLike = Utils.newFloatArray(1024);
 
-	private updateGeometry (): void {
+	private renderMeshes (): void {
 		this.resetMeshes();
 
 		let triangles: Array<number> | null = null;
@@ -346,7 +340,7 @@ export class Spine extends Container {
 		Spine.clipper.clipEnd();
 	}
 
-	/** 
+	/**
 	 * Set the position of the bone given in input through a {@link IPointData}.
 	 * @param bone: the bone name or the bone instance to set the position
 	 * @param outPos: the new position of the bone.
@@ -372,7 +366,7 @@ export class Spine extends Container {
 		}
 	}
 
-	/** 
+	/**
 	 * Return the position of the bone given in input into an {@link IPointData}.
 	 * @param bone: the bone name or the bone instance to get the position from
 	 * @param outPos: an optional {@link IPointData} to use to return the bone position, rathern than instantiating a new object.
@@ -421,7 +415,7 @@ export class Spine extends Container {
 	/** A cache containing skeleton data and atlases already loaded by {@link Spine.from}. */
 	public static readonly skeletonCache: Record<string, SkeletonData> = Object.create(null);
 
-	/** 
+	/**
 	 * Use this method to instantiate a Spine game object.
 	 * Before instantiating a Spine game object, the skeleton (`.skel` or `.json`) and the atlas text files must be loaded into the Assets. For example:
 	 * ```
@@ -431,7 +425,7 @@ export class Spine extends Container {
 	 * ```
 	 * Once a Spine game object is created, its skeleton data is cached into {@link Spine.skeletonCache} using the key:
 	 * `${skeletonAssetName}-${atlasAssetName}-${options?.scale ?? 1}`
-	 * 
+	 *
 	 * @param skeletonAssetName - the asset name for the skeleton `.skel` or `.json` file previously loaded into the Assets
 	 * @param atlasAssetName - the asset name for the atlas file previously loaded into the Assets
 	 * @param options - Options to configure the Spine game object
