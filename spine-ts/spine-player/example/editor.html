@@ -1,24 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="../dist/iife/spine-player.js"></script>
-    <link rel="stylesheet" href="../../index.css" />
-    <title>Spine Player Editor</title>
-  </head>
-  <body class="flex flex-col w-full h-screen items-center">
-    <div id="editor" class="w-full h-full flex-grow"></div>
 
-    <script>
-      var code =
-        '<script src="https://unpkg.com/@esotericsoftware/spine-player@4.1.*/dist/iife/spine-player.js"></' +
-        'script>\n<link rel="stylesheet" href="https://unpkg.com/@esotericsoftware/spine-player@4.1.*/dist/spine-player.css">\n\n<div id="player-container" style="width: 100%; height: 100vh;"></div>\n\n<script>\nnew spine.SpinePlayer("player-container", {\n	jsonUrl: "http://esotericsoftware.com/files/examples/4.1/spineboy/export/spineboy-pro.json",\n	atlasUrl: "http://esotericsoftware.com/files/examples/4.1/spineboy/export/spineboy.atlas"\n});\n</' +
-        "script>".trim();
-      spine.SpinePlayerEditor.DEFAULT_CODE = code;
-      var player = new spine.SpinePlayerEditor(
-        document.getElementById("editor")
-      );
-    </script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="../dist/iife/spine-player.js"></script>
+  <link rel="stylesheet" href="../../index.css" />
+  <title>Spine Player Editor</title>
+</head>
+
+<body class="flex flex-col w-full h-screen items-center">
+  <div id="editor" class="w-full h-full flex-grow"></div>
+
+  <script>
+    var code =
+      '<script src="https://unpkg.com/@esotericsoftware/spine-player@4.2.*/dist/iife/spine-player.js"></' +
+      'script>\n<link rel="stylesheet" href="https://unpkg.com/@esotericsoftware/spine-player@4.1.*/dist/spine-player.css">\n\n<div id="player-container" style="width: 100%; height: 100vh;"></div>\n\n<script>\nnew spine.SpinePlayer("player-container", {\n	skeleton: "http://esotericsoftware.com/files/examples/4.1/spineboy/export/spineboy-pro.json",\n	atlas: "http://esotericsoftware.com/files/examples/4.1/spineboy/export/spineboy.atlas"\n});\n</' +
+      "script>".trim();
+    spine.SpinePlayerEditor.DEFAULT_CODE = code;
+    var player = new spine.SpinePlayerEditor(
+      document.getElementById("editor")
+    );
+  </script>
+</body>
+
 </html>

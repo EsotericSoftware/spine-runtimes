@@ -31,23 +31,29 @@ import { Animation, AnimationState, AnimationStateData, AtlasAttachmentLoader, B
 import { AssetManager, GLTexture, Input, LoadingScreen, ManagedWebGLRenderingContext, ResizeMode, SceneRenderer, Vector3 } from "@esotericsoftware/spine-webgl"
 
 export interface SpinePlayerConfig {
-	/* The URL of the skeleton JSON file (.json). Undefined if binaryUrl is given. */
+	/* The URL of the skeleton JSON (.json) or binary (.skel) file */
+	skeleton?: string;
+
+	/* @deprecated Use skeleton instead. The URL of the skeleton JSON file (.json). Undefined if binaryUrl is given. */
 	jsonUrl?: string
 
 	/* Optional: The name of a field in the JSON that holds the skeleton data. Default: none */
 	jsonField?: string
 
-	/* The URL of the skeleton binary file (.skel). Undefined if jsonUrl is given. */
+	/* @deprecated Use skeleton instead. The URL of the skeleton binary file (.skel). Undefined if jsonUrl is given. */
 	binaryUrl?: string
 
 	/* The scale when loading the skeleton data. Default: 1 */
 	scale?: number
 
-	/* The URL of the skeleton atlas file (.atlas). Atlas page images are automatically resolved. */
+	/* @deprecated Use atlas instead. The URL of the skeleton atlas file (.atlas). Atlas page images are automatically resolved. */
 	atlasUrl?: string
 
-	/* Raw data URIs, mapping a path to base64 encoded raw data. When player's asset manager resolves the jsonUrl, binaryUrl,
-	   atlasUrl, or the image paths referenced in the atlas, it will first look for that path in the raw data URIs. This
+	/* The URL of the skeleton atlas file (.atlas). Atlas page images are automatically resolved. */
+	atlas?: string;
+
+	/* Raw data URIs, mapping a path to base64 encoded raw data. When player's asset manager resolves the skeleton,
+	   atlas, or the image paths referenced in the atlas, it will first look for that path in the raw data URIs. This
 	   allows embedding assets directly in HTML/JS. Default: none */
 	rawDataURIs?: StringMap<string>
 
@@ -285,10 +291,14 @@ export class SpinePlayer implements Disposable {
 
 	private validateConfig (config: SpinePlayerConfig) {
 		if (!config) throw new Error("A configuration object must be passed to to new SpinePlayer().");
-		if ((config as any).skelUrl) config.binaryUrl = (config as any).skelUrl;
-		if (!config.jsonUrl && !config.binaryUrl) throw new Error("A URL must be specified for the skeleton JSON or binary file.");
+		if (!config.skeleton && !config.jsonUrl && !config.binaryUrl) throw new Error("A URL must be specified for the skeleton JSON or binary file.");
 		if (!config.scale) config.scale = 1;
-		if (!config.atlasUrl) throw new Error("A URL must be specified for the atlas file.");
+		if (!config.atlas && !config.atlasUrl) throw new Error("A URL must be specified for the atlas file.");
+
+		if (config.jsonUrl && !config.skeleton) config.skeleton = config.jsonUrl;
+		if (config.binaryUrl && !config.skeleton) config.skeleton = config.binaryUrl;
+		if (config.atlasUrl && !config.atlas) config.atlas = config.atlasUrl;
+
 		if (!config.backgroundColor) config.backgroundColor = config.alpha ? "00000000" : "000000";
 		if (!config.fullScreenBackgroundColor) config.fullScreenBackgroundColor = config.backgroundColor;
 		if (config.backgroundImage && !config.backgroundImage.url) config.backgroundImage = undefined;
@@ -346,11 +356,11 @@ export class SpinePlayer implements Disposable {
 			for (let path in config.rawDataURIs)
 				this.assetManager.setRawDataURI(path, config.rawDataURIs[path]);
 		}
-		if (config.jsonUrl)
-			this.assetManager.loadJson(config.jsonUrl);
+		if (config.skeleton!.endsWith(".json"))
+			this.assetManager.loadJson(config.skeleton!);
 		else
-			this.assetManager.loadBinary(config.binaryUrl!);
-		this.assetManager.loadTextureAtlas(config.atlasUrl!);
+			this.assetManager.loadBinary(config.skeleton!);
+		this.assetManager.loadTextureAtlas(config.atlas!);
 		if (config.backgroundImage) this.assetManager.loadTexture(config.backgroundImage.url);
 
 		// Setup the UI elements.
@@ -442,7 +452,7 @@ export class SpinePlayer implements Disposable {
 		let config = this.config;
 
 		// Configure filtering, don't use mipmaps in WebGL1 if the atlas page is non-POT
-		let atlas = this.assetManager!.require(config.atlasUrl!) as TextureAtlas;
+		let atlas = this.assetManager!.require(config.atlas!) as TextureAtlas;
 		let gl = this.context!.gl, anisotropic = gl.getExtension("EXT_texture_filter_anisotropic");
 		let isWebGL1 = gl.getParameter(gl.VERSION).indexOf("WebGL 1.0") != -1;
 		for (let page of atlas.pages) {
@@ -466,8 +476,8 @@ export class SpinePlayer implements Disposable {
 		let skeletonData: SkeletonData;
 		try {
 			let loader: any, data: any, attachmentLoader = new AtlasAttachmentLoader(atlas);
-			if (config.jsonUrl) {
-				data = this.assetManager!.remove(config.jsonUrl);
+			if (config.skeleton!.endsWith(".json")) {
+				data = this.assetManager!.remove(config.skeleton!);
 				if (!data) throw new Error("Empty JSON data.");
 				if (config.jsonField) {
 					data = data[config.jsonField];
@@ -475,7 +485,7 @@ export class SpinePlayer implements Disposable {
 				}
 				loader = new SkeletonJson(attachmentLoader);
 			} else {
-				data = this.assetManager!.remove(config.binaryUrl!);
+				data = this.assetManager!.remove(config.skeleton!);
 				loader = new SkeletonBinary(attachmentLoader);
 			}
 			loader.scale = config.scale;
