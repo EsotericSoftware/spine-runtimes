@@ -34,6 +34,7 @@ import {
 	AtlasAttachmentLoader,
 	ClippingAttachment,
 	Color,
+	MathUtils,
 	MeshAttachment,
 	Physics,
 	RegionAttachment,
@@ -224,8 +225,78 @@ export class Spine extends Container {
 		}
 	}
 
-	private verticesCache: NumberArrayLike = Utils.newFloatArray(1024);
+	private slotsObject = new Map<Slot, DisplayObject>();
+	private getSlotFromRef (slotRef: number | string | Slot): Slot {
+		let slot: Slot | null;
+		if (typeof slotRef === 'number') slot = this.skeleton.slots[slotRef];
+		else if (typeof slotRef === 'string') slot = this.skeleton.findSlot(slotRef);
+		else slot = slotRef;
 
+		if (!slot) throw new Error(`No slot found with the given slot reference: ${slotRef}`);
+
+		return slot;
+	}
+	/**
+	 * Add a pixi DisplayObject as a child of the Spine object.
+	 * The DisplayObject will be rendered coherently with the draw order of the slot.
+	 * If an attachment is active on the slot, the pixi DisplayObject will be rendered on top of it.
+	 * If the DisplayObject is already attached to the given slot, nothing will happen.
+	 * If the DisplayObject is already attached to another slot, it will be removed from that slot
+	 * before adding it to the given one.
+	 * If another DisplayObject is already attached to this slot, the old one will be removed from this
+	 * slot before adding it to the current one.
+	 * @param slotRef - The slot index, or the slot name, or the Slot where the pixi object will be added to.
+	 * @param pixiObject - The pixi DisplayObject to add.
+	 */
+	addSlotObject (slotRef: number | string | Slot, pixiObject: DisplayObject): void {
+		let slot = this.getSlotFromRef(slotRef);
+		let oldPixiObject = this.slotsObject.get(slot);
+
+		// search if the pixiObject was already in another slotObject
+		if (!oldPixiObject) {
+			for (const [slot, oldPixiObjectAnotherSlot] of this.slotsObject) {
+				if (oldPixiObjectAnotherSlot === pixiObject) {
+					this.removeSlotObject(slot, pixiObject);
+					break;
+				}
+			}
+		}
+
+		if (oldPixiObject === pixiObject) return;
+		if (oldPixiObject) this.removeChild(oldPixiObject);
+
+		this.slotsObject.set(slot, pixiObject);
+		this.addChild(pixiObject);
+	}
+	/**
+	 * Return the DisplayObject connected to the given slot, if any.
+	 * Otherwise return undefined
+	 * @param pixiObject - The slot index, or the slot name, or the Slot to get the DisplayObject from.
+	 * @returns a DisplayObject if any, undefined otherwise.
+	 */
+	getSlotObject (slotRef: number | string | Slot): DisplayObject | undefined {
+		return this.slotsObject.get(this.getSlotFromRef(slotRef));
+	}
+	/**
+	 * Remove a slot object from the given slot.
+	 * If `pixiObject` is passed and attached to the given slot, remove it from the slot.
+	 * If `pixiObject` is not passed and the given slot has an attached DisplayObject, remove it from the slot.
+	 * @param slotRef - The slot index, or the slot name, or the Slot where the pixi object will be remove from.
+	 * @param pixiObject - Optional, The pixi DisplayObject to remove.
+	 */
+	removeSlotObject (slotRef: number | string | Slot, pixiObject?: DisplayObject): void {
+		let slot = this.getSlotFromRef(slotRef);
+		let slotObject = this.slotsObject.get(slot);
+		if (!slotObject) return;
+
+		// if pixiObject is passed, remove only if it is equal to the given one
+		if (pixiObject && pixiObject !== slotObject) return;
+
+		this.removeChild(slotObject);
+		this.slotsObject.delete(slot);
+	}
+
+	private verticesCache: NumberArrayLike = Utils.newFloatArray(1024);
 	private renderMeshes (): void {
 		this.resetMeshes();
 
@@ -233,8 +304,18 @@ export class Spine extends Container {
 		let uvs: NumberArrayLike | null = null;
 		const drawOrder = this.skeleton.drawOrder;
 
-		for (let i = 0, n = drawOrder.length; i < n; i++) {
+		for (let i = 0, n = drawOrder.length, slotObjectsCounter = 0; i < n; i++) {
 			const slot = drawOrder[i];
+
+			// render pixi object on the current slot on top of the slot attachment
+			let pixiObject = this.slotsObject.get(slot);
+			let zIndex = i + slotObjectsCounter;
+			if (pixiObject) {
+				pixiObject.setTransform(slot.bone.worldX, slot.bone.worldY, slot.bone.getWorldScaleX(), slot.bone.getWorldScaleX(), slot.bone.getWorldRotationX() * MathUtils.degRad);
+				pixiObject.zIndex = zIndex + 1;
+				slotObjectsCounter++;
+			}
+
 			const useDarkColor = slot.darkColor != null;
 			const vertexSize = Spine.clipper.isClipping() ? 2 : useDarkColor ? Spine.DARK_VERTEX_SIZE : Spine.VERTEX_SIZE;
 			if (!slot.bone.active) {
@@ -331,7 +412,7 @@ export class Spine extends Container {
 				}
 
 				const mesh = this.getMeshForSlot(slot);
-				mesh.zIndex = i;
+				mesh.zIndex = zIndex;
 				mesh.updateFromSpineData(texture, slot.data.blendMode, slot.data.name, finalVertices, finalVerticesLength, finalIndices, finalIndicesLength, useDarkColor);
 			}
 
