@@ -158,6 +158,7 @@
   - `SkeletonRenderTexture` example components now provide a `shaderPasses` parameter to customize which passes are rendered to the `RenderTexture`. It defaults to `-1` for all passes to keep the existing behaviour. You might want to set it to `0` to only render the first pass e.g. to avoid issues when using a URP shader at the original skeleton.
   - `SkeletonGraphicRenderTexture` example component now also received a `quadMaterial` property, defaulting to the newly added Material asset `RenderQuadGraphicMaterial` which applies proper premultiplied-alpha blending of the render texture. The `quadMaterial` member variable was moved from `SkeletonRenderTexture` to the common base class `SkeletonRenderTextureBase`.
   - All Spine Outline shaders, including the URP outline shader, now provide an additional parameter `Width in Screen Space`. Enable it to keep the outline width constant in screen space instead of texture space. Requires more expensive computations, so enable only where necessary. Defaults to `disabled` to maintain existing behaviour.
+  - Added support for BlendModeMaterials at runtime instantiation from files via an additional method `SkeletonDataAsset.SetupRuntimeBlendModeMaterials`. See example scene `Spine Examples/Other Examples/Instantiate from Script` for a usage example.
 
 - **Breaking changes**
 
