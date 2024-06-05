@@ -46,7 +46,6 @@
 
         // Create the spine display object
         const stretchyman = spine.Spine.from("stretchymanData", "stretchymanAtlas", { 
-          autoUpdate: false,
           scale: 0.75,
          });
 
@@ -92,8 +91,8 @@
           })
         }
 
-        PIXI.Ticker.shared.add(() => {
-          const point = { x: 0, y: 0 };
+        const point = { x: 0, y: 0 };
+        stretchyman.beforeUpdateWorldTransforms = () => {
           for (let { bone, control } of controlBones) {
             point.x = control.x;
             point.y = control.y;
@@ -101,9 +100,7 @@
             bone.x = point.x;
             bone.y = point.y;
           }
-          stretchyman.update(PIXI.Ticker.shared.deltaMS / 1000);
-        })
-        
+        };
       })();
     </script>
   </body>

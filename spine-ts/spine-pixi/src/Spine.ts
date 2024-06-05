@@ -112,6 +112,9 @@ export class Spine extends Container {
 
 	protected slotMeshFactory: () => ISlotMesh = () => new SlotMesh();
 
+	beforeUpdateWorldTransforms: (object: Spine) => void = () => { };
+	afterUpdateWorldTransforms: (object: Spine) => void = () => { };
+
 	private autoUpdateWarned: boolean = false;
 	private _autoUpdate: boolean = true;
 	public get autoUpdate (): boolean {
@@ -179,8 +182,10 @@ export class Spine extends Container {
 		const delta = deltaSeconds ?? Ticker.shared.deltaMS / 1000;
 		this.state.update(delta);
 		this.state.apply(this.skeleton);
+		this.beforeUpdateWorldTransforms(this);
 		this.skeleton.update(delta);
 		this.skeleton.updateWorldTransform(Physics.update);
+		this.afterUpdateWorldTransforms(this);
 	}
 
 	/** Render the meshes based on the current skeleton state, render debug information, then call {@link Container.updateTransform}. */
