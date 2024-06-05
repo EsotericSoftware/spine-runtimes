@@ -199,6 +199,7 @@ export class Spine extends Container {
 		this.state.clearListeners();
 		this.debug = undefined;
 		this.meshesCache.clear();
+		this.slotsObject.clear();
 		super.destroy(options);
 	}
 
