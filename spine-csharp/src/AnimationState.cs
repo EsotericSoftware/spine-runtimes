@@ -1217,7 +1217,7 @@ namespace Spine {
 		/// <summary>Returns true if the next track entry is about to be applied on the next update call.</summary>
 		/// <seealso cref="AnimationState.Apply(Skeleton)"/>
 		public bool WillNextBeAppliedOnUpdate {
-            get { return next != null && System.MathF.Abs(nextTrackLast - next.delay) >= float.Epsilon; }
+            get { return next != null && System.MathF.Abs(nextTrackLast - next.delay) < float.Epsilon; }
         }
 
 		/// <summary>
