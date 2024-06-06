@@ -473,7 +473,7 @@ namespace Spine.Unity {
 			if (skeletonDataAsset == null)
 				return;
 
-			SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(false);
+			SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(quiet);
 			if (skeletonData == null) return;
 			valid = true;
 
