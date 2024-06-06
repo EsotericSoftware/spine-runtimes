@@ -54,6 +54,7 @@ import type { IPointData } from "@pixi/core";
 import { Ticker } from "@pixi/core";
 import type { IDestroyOptions, DisplayObject } from "@pixi/display";
 import { Container } from "@pixi/display";
+import { Graphics } from "@pixi/graphics";
 
 /**
  * Options to configure a {@link Spine} game object.
@@ -205,6 +206,13 @@ export class Spine extends Container {
 		this.debug = undefined;
 		this.meshesCache.clear();
 		this.slotsObject.clear();
+
+		for (let maskKey in this.clippingSlotToPixiMasks) {
+			const mask = this.clippingSlotToPixiMasks[maskKey];
+			mask.destroy();
+			delete this.clippingSlotToPixiMasks[maskKey];
+		}
+
 		super.destroy(options);
 	}
 
@@ -231,7 +239,7 @@ export class Spine extends Container {
 		}
 	}
 
-	private slotsObject = new Map<Slot, DisplayObject>();
+	private slotsObject = new Map<Slot, Container>();
 	private getSlotFromRef (slotRef: number | string | Slot): Slot {
 		let slot: Slot | null;
 		if (typeof slotRef === 'number') slot = this.skeleton.slots[slotRef];
@@ -243,54 +251,52 @@ export class Spine extends Container {
 		return slot;
 	}
 	/**
-	 * Add a pixi DisplayObject as a child of the Spine object.
-	 * The DisplayObject will be rendered coherently with the draw order of the slot.
-	 * If an attachment is active on the slot, the pixi DisplayObject will be rendered on top of it.
-	 * If the DisplayObject is already attached to the given slot, nothing will happen.
-	 * If the DisplayObject is already attached to another slot, it will be removed from that slot
+	 * Add a pixi Container as a child of the Spine object.
+	 * The Container will be rendered coherently with the draw order of the slot.
+	 * If an attachment is active on the slot, the pixi Container will be rendered on top of it.
+	 * If the Container is already attached to the given slot, nothing will happen.
+	 * If the Container is already attached to another slot, it will be removed from that slot
 	 * before adding it to the given one.
-	 * If another DisplayObject is already attached to this slot, the old one will be removed from this
+	 * If another Container is already attached to this slot, the old one will be removed from this
 	 * slot before adding it to the current one.
 	 * @param slotRef - The slot index, or the slot name, or the Slot where the pixi object will be added to.
-	 * @param pixiObject - The pixi DisplayObject to add.
+	 * @param pixiObject - The pixi Container to add.
 	 */
-	addSlotObject (slotRef: number | string | Slot, pixiObject: DisplayObject): void {
+	addSlotObject (slotRef: number | string | Slot, pixiObject: Container): void {
 		let slot = this.getSlotFromRef(slotRef);
 		let oldPixiObject = this.slotsObject.get(slot);
+		if (oldPixiObject === pixiObject) return;
 
 		// search if the pixiObject was already in another slotObject
-		if (!oldPixiObject) {
-			for (const [slot, oldPixiObjectAnotherSlot] of this.slotsObject) {
-				if (oldPixiObjectAnotherSlot === pixiObject) {
-					this.removeSlotObject(slot, pixiObject);
-					break;
-				}
+		for (const [otherSlot, oldPixiObjectAnotherSlot] of this.slotsObject) {
+			if (otherSlot !== slot && oldPixiObjectAnotherSlot === pixiObject) {
+				this.removeSlotObject(otherSlot, pixiObject);
+				break;
 			}
 		}
 
-		if (oldPixiObject === pixiObject) return;
 		if (oldPixiObject) this.removeChild(oldPixiObject);
 
 		this.slotsObject.set(slot, pixiObject);
 		this.addChild(pixiObject);
 	}
 	/**
-	 * Return the DisplayObject connected to the given slot, if any.
+	 * Return the Container connected to the given slot, if any.
 	 * Otherwise return undefined
-	 * @param pixiObject - The slot index, or the slot name, or the Slot to get the DisplayObject from.
-	 * @returns a DisplayObject if any, undefined otherwise.
+	 * @param pixiObject - The slot index, or the slot name, or the Slot to get the Container from.
+	 * @returns a Container if any, undefined otherwise.
 	 */
-	getSlotObject (slotRef: number | string | Slot): DisplayObject | undefined {
+	getSlotObject (slotRef: number | string | Slot): Container | undefined {
 		return this.slotsObject.get(this.getSlotFromRef(slotRef));
 	}
 	/**
 	 * Remove a slot object from the given slot.
 	 * If `pixiObject` is passed and attached to the given slot, remove it from the slot.
-	 * If `pixiObject` is not passed and the given slot has an attached DisplayObject, remove it from the slot.
+	 * If `pixiObject` is not passed and the given slot has an attached Container, remove it from the slot.
 	 * @param slotRef - The slot index, or the slot name, or the Slot where the pixi object will be remove from.
-	 * @param pixiObject - Optional, The pixi DisplayObject to remove.
+	 * @param pixiObject - Optional, The pixi Container to remove.
 	 */
-	removeSlotObject (slotRef: number | string | Slot, pixiObject?: DisplayObject): void {
+	removeSlotObject (slotRef: number | string | Slot, pixiObject?: Container): void {
 		let slot = this.getSlotFromRef(slotRef);
 		let slotObject = this.slotsObject.get(slot);
 		if (!slotObject) return;
@@ -303,11 +309,45 @@ export class Spine extends Container {
 	}
 
 	private verticesCache: NumberArrayLike = Utils.newFloatArray(1024);
+	private clippingSlotToPixiMasks: Record<string, Graphics> = {};
+	private pixiMaskCleanup (slot: Slot) {
+		let mask = this.clippingSlotToPixiMasks[slot.data.name];
+		if (mask) {
+			delete this.clippingSlotToPixiMasks[slot.data.name];
+			mask.destroy();
+		}
+	}
+	private updatePixiObject (pixiObject: Container, slot: Slot, zIndex: number) {
+		pixiObject.setTransform(slot.bone.worldX, slot.bone.worldY, slot.bone.getWorldScaleX(), slot.bone.getWorldScaleX(), slot.bone.getWorldRotationX() * MathUtils.degRad);
+		pixiObject.zIndex = zIndex + 1;
+		pixiObject.alpha = this.skeleton.color.a * slot.color.a;
+	}
+	private updateAndSetPixiMask (pixiMaskSource: PixiMaskSource | null, pixiObject: Container) {
+		if (Spine.clipper.isClipping() && pixiMaskSource) {
+			let mask = this.clippingSlotToPixiMasks[pixiMaskSource.slot.data.name] as Graphics;
+			if (!mask) {
+				mask = new Graphics();
+				this.clippingSlotToPixiMasks[pixiMaskSource.slot.data.name] = mask;
+				this.addChild(mask);
+			}
+			if (!pixiMaskSource.computed) {
+				pixiMaskSource.computed = true;
+				const clippingAttachment = pixiMaskSource.slot.attachment as ClippingAttachment;
+				const world = Array.from(clippingAttachment.vertices);
+				clippingAttachment.computeWorldVertices(pixiMaskSource.slot, 0, clippingAttachment.worldVerticesLength, world, 0, 2);
+				mask.clear().lineStyle(0).beginFill(0x000000).drawPolygon(world);
+			}
+			pixiObject.mask = mask;
+		} else if (pixiObject.mask) {
+			pixiObject.mask = null;
+		}
+	}
 	private renderMeshes (): void {
 		this.resetMeshes();
 
 		let triangles: Array<number> | null = null;
 		let uvs: NumberArrayLike | null = null;
+		let pixiMaskSource: PixiMaskSource | null = null;
 		const drawOrder = this.skeleton.drawOrder;
 
 		for (let i = 0, n = drawOrder.length, slotObjectsCounter = 0; i < n; i++) {
@@ -317,15 +357,16 @@ export class Spine extends Container {
 			let pixiObject = this.slotsObject.get(slot);
 			let zIndex = i + slotObjectsCounter;
 			if (pixiObject) {
-				pixiObject.setTransform(slot.bone.worldX, slot.bone.worldY, slot.bone.getWorldScaleX(), slot.bone.getWorldScaleX(), slot.bone.getWorldRotationX() * MathUtils.degRad);
-				pixiObject.zIndex = zIndex + 1;
+				this.updatePixiObject(pixiObject, slot, zIndex + 1);
 				slotObjectsCounter++;
+				this.updateAndSetPixiMask(pixiMaskSource, pixiObject);
 			}
 
 			const useDarkColor = slot.darkColor != null;
 			const vertexSize = Spine.clipper.isClipping() ? 2 : useDarkColor ? Spine.DARK_VERTEX_SIZE : Spine.VERTEX_SIZE;
 			if (!slot.bone.active) {
 				Spine.clipper.clipEndWithSlot(slot);
+				this.pixiMaskCleanup(slot);
 				continue;
 			}
 			const attachment = slot.getAttachment();
@@ -353,9 +394,11 @@ export class Spine extends Container {
 				texture = <SpineTexture>mesh.region?.texture;
 			} else if (attachment instanceof ClippingAttachment) {
 				Spine.clipper.clipStart(slot, attachment);
+				pixiMaskSource = { slot, computed: false };
 				continue;
 			} else {
 				Spine.clipper.clipEndWithSlot(slot);
+				this.pixiMaskCleanup(slot);
 				continue;
 			}
 			if (texture != null) {
@@ -423,6 +466,7 @@ export class Spine extends Container {
 			}
 
 			Spine.clipper.clipEndWithSlot(slot);
+			this.pixiMaskCleanup(slot);
 		}
 		Spine.clipper.clipEnd();
 	}
@@ -540,6 +584,11 @@ export class Spine extends Container {
 	public set tint (value: number) {
 		Color.rgb888ToColor(this.skeleton.color, value);
 	}
+}
+
+type PixiMaskSource = {
+	slot: Slot,
+	computed: boolean, // prevent to reculaculate vertices for a mask clipping multiple pixi objects
 }
 
 Skeleton.yDown = true;
