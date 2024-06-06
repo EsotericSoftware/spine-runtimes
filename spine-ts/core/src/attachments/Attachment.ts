@@ -128,7 +128,9 @@ module spine {
 					n += v;
 					for (; v < n; v++, b += 3, f += 2) {
 						let bone = skeletonBones[bones[v]];
-						let vx = vertices[b] + deform[f], vy = vertices[b + 1] + deform[f + 1], weight = vertices[b + 2];
+						let dfx = deform[f];
+                        			let dfy = deform[f + 1];
+                        			let vx = vertices[b] + (dfx ? dfx : 0), vy = vertices[b + 1] + (dfy ? dfy : 0), weight = vertices[b + 2];
 						wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
 						wy += (vx * bone.c + vy * bone.d + bone.worldY) * weight;
 					}
