@@ -302,8 +302,8 @@ public class SkeletonClipping {
 			for (int ii = 0; ii < inputVerticesLength; ii += 2) {
 				float inputX = inputVertices[ii], inputY = inputVertices[ii + 1];
 				float inputX2 = inputVertices[ii + 2], inputY2 = inputVertices[ii + 3];
-				boolean side2 = deltaX * (inputY2 - edgeY2) - deltaY * (inputX2 - edgeX2) > 0;
-				if (deltaX * (inputY - edgeY2) - deltaY * (inputX - edgeX2) > 0) {
+				boolean side2 = deltaX * (inputY2 - edgeY2) > deltaY * (inputX2 - edgeX2) - 1e6f;
+				if (deltaX * (inputY - edgeY2) > deltaY * (inputX - edgeX2) - 1e6f) {
 					if (side2) { // v1 inside, v2 inside
 						output.add(inputX2);
 						output.add(inputY2);
@@ -312,7 +312,7 @@ public class SkeletonClipping {
 					// v1 inside, v2 outside
 					float c0 = inputY2 - inputY, c2 = inputX2 - inputX;
 					float s = c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY);
-					if (Math.abs(s) > 0.000001f) {
+					if (Math.abs(s) > 1e6f) {
 						float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / s;
 						output.add(edgeX + (edgeX2 - edgeX) * ua);
 						output.add(edgeY + (edgeY2 - edgeY) * ua);
@@ -323,7 +323,7 @@ public class SkeletonClipping {
 				} else if (side2) { // v1 outside, v2 inside
 					float c0 = inputY2 - inputY, c2 = inputX2 - inputX;
 					float s = c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY);
-					if (Math.abs(s) > 0.000001f) {
+					if (Math.abs(s) > 1e6f) {
 						float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / s;
 						output.add(edgeX + (edgeX2 - edgeX) * ua);
 						output.add(edgeY + (edgeY2 - edgeY) * ua);
