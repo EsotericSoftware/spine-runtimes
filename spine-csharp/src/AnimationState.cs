@@ -1214,6 +1214,14 @@ namespace Spine {
 			get { return nextTrackLast != -1; }
 		}
 
+		/// <summary>Returns true if there is a <see cref="Next"/> track entry that will become the current track entry during the
+		/// next <see cref="AnimationState.Update(float)"/>.</summary>
+		public bool IsNextReady {
+			get {
+				return (next != null) && (nextTrackLast - next.delay >= 0);
+			}
+		}
+
 		/// <summary>
 		/// Returns true if at least one loop has been completed.</summary>
 		/// <seealso cref="TrackEntry.Complete"/>
