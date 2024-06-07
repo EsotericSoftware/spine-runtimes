@@ -152,11 +152,17 @@ namespace Spine.Unity.Examples {
 #endif
 			ownMeshFilter.sharedMesh = referenceMeshFilter.sharedMesh;
 
+#if HAS_GET_SHARED_MATERIALS
+			referenceRenderer.GetSharedMaterials(parentMaterials);
+			int parentMaterialsCount = parentMaterials.Count;
+#else
 			Material[] parentMaterials = referenceRenderer.sharedMaterials;
-			if (sharedMaterials.Length != parentMaterials.Length) {
-				sharedMaterials = new Material[parentMaterials.Length];
+			int parentMaterialsCount = parentMaterials.Length;
+#endif
+			if (sharedMaterials.Length != parentMaterialsCount) {
+				sharedMaterials = new Material[parentMaterialsCount];
 			}
-			for (int i = 0; i < parentMaterials.Length; ++i) {
+			for (int i = 0; i < parentMaterialsCount; ++i) {
 				Material parentMaterial = parentMaterials[i];
 				if (replacementMaterialDict.ContainsKey(parentMaterial)) {
 					sharedMaterials[i] = replacementMaterialDict[parentMaterial];
