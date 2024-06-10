@@ -259,49 +259,49 @@ namespace Spine {
 			input.Add(y1);
 			output.Clear();
 
-			float[] clippingVertices = clippingArea.Items;
 			int clippingVerticesLast = clippingArea.Count - 4;
+			float[] clippingVertices = clippingArea.Items;
 			for (int i = 0; ; i += 2) {
 				float edgeX = clippingVertices[i], edgeY = clippingVertices[i + 1];
-				float edgeX2 = clippingVertices[i + 2], edgeY2 = clippingVertices[i + 3];
-				float deltaX = edgeX - edgeX2, deltaY = edgeY - edgeY2;
+				float ex = edgeX - clippingVertices[i + 2], ey = edgeY - clippingVertices[i + 3];
 
+				int outputStart = output.Count;
 				float[] inputVertices = input.Items;
-				int inputVerticesLength = input.Count - 2, outputStart = output.Count;
-				for (int ii = 0; ii < inputVerticesLength; ii += 2) {
+				for (int ii = 0, nn = input.Count - 2; ii < nn;) {
+
 					float inputX = inputVertices[ii], inputY = inputVertices[ii + 1];
-					float inputX2 = inputVertices[ii + 2], inputY2 = inputVertices[ii + 3];
-					bool side2 = deltaX * (inputY2 - edgeY2) - deltaY * (inputX2 - edgeX2) > 0;
-					if (deltaX * (inputY - edgeY2) - deltaY * (inputX - edgeX2) > 0) {
-						if (side2) { // v1 inside, v2 inside
+					ii += 2;
+					float inputX2 = inputVertices[ii], inputY2 = inputVertices[ii + 1];
+					bool s2 = ey * (edgeX - inputX2) > ex * (edgeY - inputY2);
+					float s1 = ey * (edgeX - inputX) - ex * (edgeY - inputY);
+					if (s1 > 0) {
+						if (s2) { // v1 inside, v2 inside
 							output.Add(inputX2);
 							output.Add(inputY2);
 							continue;
 						}
 						// v1 inside, v2 outside
-						float c0 = inputY2 - inputY, c2 = inputX2 - inputX;
-						float s = c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY);
-						if (Math.Abs(s) > 0.000001f) {
-							float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / s;
-							output.Add(edgeX + (edgeX2 - edgeX) * ua);
-							output.Add(edgeY + (edgeY2 - edgeY) * ua);
+						float ix = inputX2 - inputX, iy = inputY2 - inputY, t = s1 / (ix * ey - iy * ex);
+						if (t >= 0 && t <= 1) {
+							output.Add(inputX + ix * t);
+							output.Add(inputY + iy * t);
 						} else {
-							output.Add(edgeX);
-							output.Add(edgeY);
+							output.Add(inputX2);
+							output.Add(inputY2);
+							continue;
 						}
-					} else if (side2) { // v1 outside, v2 inside
-						float c0 = inputY2 - inputY, c2 = inputX2 - inputX;
-						float s = c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY);
-						if (Math.Abs(s) > 0.000001f) {
-							float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / s;
-							output.Add(edgeX + (edgeX2 - edgeX) * ua);
-							output.Add(edgeY + (edgeY2 - edgeY) * ua);
+					} else if (s2) { // v1 outside, v2 inside
+						float ix = inputX2 - inputX, iy = inputY2 - inputY, t = s1 / (ix * ey - iy * ex);
+						if (t >= 0 && t <= 1) {
+							output.Add(inputX + ix * t);
+							output.Add(inputY + iy * t);
+							output.Add(inputX2);
+							output.Add(inputY2);
 						} else {
-							output.Add(edgeX);
-							output.Add(edgeY);
+							output.Add(inputX2);
+							output.Add(inputY2);
+							continue;
 						}
-						output.Add(inputX2);
-						output.Add(inputY2);
 					}
 					clipped = true;
 				}
