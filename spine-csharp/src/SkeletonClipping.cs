@@ -78,7 +78,7 @@ namespace Spine {
 			clippingPolygon.Clear();
 		}
 
-		public void ClipTriangles (float[] vertices, int verticesLength, int[] triangles, int trianglesLength) {
+		public void ClipTriangles (float[] vertices, int[] triangles, int trianglesLength) {
 			ExposedList<float> clipOutput = this.clipOutput, clippedVertices = this.clippedVertices;
 			ExposedList<int> clippedTriangles = this.clippedTriangles;
 			ExposedList<float>[] polygons = clippingPolygons.Items;
@@ -87,7 +87,6 @@ namespace Spine {
 			int index = 0;
 			clippedVertices.Clear();
 			clippedTriangles.Clear();
-			//outer:
 			for (int i = 0; i < trianglesLength; i += 3) {
 				int vertexOffset = triangles[i] << 1;
 				float x1 = vertices[vertexOffset], y1 = vertices[vertexOffset + 1];
@@ -107,21 +106,19 @@ namespace Spine {
 						int clipOutputCount = clipOutputLength >> 1;
 						float[] clipOutputItems = clipOutput.Items;
 						float[] clippedVerticesItems = clippedVertices.Resize(s + clipOutputCount * 2).Items;
-						for (int ii = 0; ii < clipOutputLength; ii += 2) {
+						for (int ii = 0; ii < clipOutputLength; ii += 2, s += 2) {
 							float x = clipOutputItems[ii], y = clipOutputItems[ii + 1];
 							clippedVerticesItems[s] = x;
-							clippedVerticesItems[s + 1] = y;
-							s += 2;
+							clippedVerticesItems[s + 1] = y;;
 						}
 
 						s = clippedTriangles.Count;
 						int[] clippedTrianglesItems = clippedTriangles.Resize(s + 3 * (clipOutputCount - 2)).Items;
 						clipOutputCount--;
-						for (int ii = 1; ii < clipOutputCount; ii++) {
+						for (int ii = 1; ii < clipOutputCount; ii++, s += 3) {
 							clippedTrianglesItems[s] = index;
 							clippedTrianglesItems[s + 1] = index + ii;
 							clippedTrianglesItems[s + 2] = index + ii + 1;
-							s += 3;
 						}
 						index += clipOutputCount + 1;
 					} else {
@@ -139,13 +136,13 @@ namespace Spine {
 						clippedTrianglesItems[s + 1] = index + 1;
 						clippedTrianglesItems[s + 2] = index + 2;
 						index += 3;
-						break; //continue outer;
+						break;
 					}
 				}
 			}
 		}
 
-		public void ClipTriangles (float[] vertices, int verticesLength, int[] triangles, int trianglesLength, float[] uvs) {
+		public void ClipTriangles (float[] vertices, int[] triangles, int trianglesLength, float[] uvs) {
 			ExposedList<float> clipOutput = this.clipOutput, clippedVertices = this.clippedVertices;
 			ExposedList<int> clippedTriangles = this.clippedTriangles;
 			ExposedList<float>[] polygons = clippingPolygons.Items;
@@ -155,7 +152,7 @@ namespace Spine {
 			clippedVertices.Clear();
 			clippedUVs.Clear();
 			clippedTriangles.Clear();
-			//outer:
+
 			for (int i = 0; i < trianglesLength; i += 3) {
 				int vertexOffset = triangles[i] << 1;
 				float x1 = vertices[vertexOffset], y1 = vertices[vertexOffset + 1];
@@ -181,7 +178,7 @@ namespace Spine {
 						float[] clipOutputItems = clipOutput.Items;
 						float[] clippedVerticesItems = clippedVertices.Resize(s + clipOutputCount * 2).Items;
 						float[] clippedUVsItems = clippedUVs.Resize(s + clipOutputCount * 2).Items;
-						for (int ii = 0; ii < clipOutputLength; ii += 2) {
+						for (int ii = 0; ii < clipOutputLength; ii += 2, s += 2) {
 							float x = clipOutputItems[ii], y = clipOutputItems[ii + 1];
 							clippedVerticesItems[s] = x;
 							clippedVerticesItems[s + 1] = y;
@@ -191,17 +188,15 @@ namespace Spine {
 							float c = 1 - a - b;
 							clippedUVsItems[s] = u1 * a + u2 * b + u3 * c;
 							clippedUVsItems[s + 1] = v1 * a + v2 * b + v3 * c;
-							s += 2;
 						}
 
 						s = clippedTriangles.Count;
 						int[] clippedTrianglesItems = clippedTriangles.Resize(s + 3 * (clipOutputCount - 2)).Items;
 						clipOutputCount--;
-						for (int ii = 1; ii < clipOutputCount; ii++) {
+						for (int ii = 1; ii < clipOutputCount; ii++, s += 3) {
 							clippedTrianglesItems[s] = index;
 							clippedTrianglesItems[s + 1] = index + ii;
 							clippedTrianglesItems[s + 2] = index + ii + 1;
-							s += 3;
 						}
 						index += clipOutputCount + 1;
 					} else {
@@ -227,7 +222,7 @@ namespace Spine {
 						clippedTrianglesItems[s + 1] = index + 1;
 						clippedTrianglesItems[s + 2] = index + 2;
 						index += 3;
-						break; //continue outer;
+						break;
 					}
 				}
 			}
