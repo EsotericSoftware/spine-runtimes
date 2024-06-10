@@ -109,7 +109,7 @@ namespace Spine {
 						for (int ii = 0; ii < clipOutputLength; ii += 2, s += 2) {
 							float x = clipOutputItems[ii], y = clipOutputItems[ii + 1];
 							clippedVerticesItems[s] = x;
-							clippedVerticesItems[s + 1] = y;;
+							clippedVerticesItems[s + 1] = y;
 						}
 
 						s = clippedTriangles.Count;
