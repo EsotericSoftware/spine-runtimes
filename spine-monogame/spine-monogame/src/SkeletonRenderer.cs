@@ -206,7 +206,7 @@ namespace Spine {
 
 				// clip
 				if (clipper.IsClipping) {
-					clipper.ClipTriangles(vertices, verticesCount << 1, indices, indicesCount, uvs);
+					clipper.ClipTriangles(vertices, indices, indicesCount, uvs);
 					vertices = clipper.ClippedVertices.Items;
 					verticesCount = clipper.ClippedVertices.Count >> 1;
 					indices = clipper.ClippedTriangles.Items;
