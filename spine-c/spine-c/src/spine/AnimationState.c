@@ -1069,6 +1069,10 @@ int spTrackEntry_wasApplied(spTrackEntry *entry) {
 	return entry->nextTrackLast != -1;
 }
 
+int spTrackEntry_isNextReady(spTrackEntry *entry) {
+    return entry->next != NULL && entry->nextTrackLast - entry->next->delay >= 0;
+}
+
 void _spTrackEntry_computeHold(spTrackEntry *entry, spAnimationState *state) {
 	spTrackEntry *to;
 	spTimeline **timelines;

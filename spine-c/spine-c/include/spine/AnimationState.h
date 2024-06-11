@@ -150,6 +150,8 @@ SP_API void spTrackEntry_setMixDuration(spTrackEntry *entry, float mixDuration, 
 
 SP_API int/*bool*/ spTrackEntry_wasApplied(spTrackEntry *entry);
 
+SP_API int/*bool*/ spTrackEntry_isNextReady(spTrackEntry *entry);
+
 SP_API void spAnimationState_clearNext(spAnimationState *self, spTrackEntry *entry);
 
 /** Use this to dispose static memory before your app exits to appease your memory leak detector*/

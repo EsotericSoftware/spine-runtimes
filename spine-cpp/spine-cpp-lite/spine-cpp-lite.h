@@ -371,6 +371,8 @@ SPINE_CPP_LITE_EXPORT spine_track_entry spine_track_entry_get_mixing_from(spine_
 SPINE_CPP_LITE_EXPORT spine_track_entry spine_track_entry_get_mixing_to(spine_track_entry entry);
 SPINE_CPP_LITE_EXPORT void spine_track_entry_reset_rotation_directions(spine_track_entry entry);
 SPINE_CPP_LITE_EXPORT float spine_track_entry_get_track_complete(spine_track_entry entry);
+SPINE_CPP_LITE_EXPORT float spine_track_entry_was_applied(spine_track_entry entry);
+SPINE_CPP_LITE_EXPORT float spine_track_entry_is_next_ready(spine_track_entry entry);
 // OMITTED setListener()
 // OMITTED setListener()
 

@@ -284,6 +284,12 @@ namespace spine {
         /// See AnimationState::apply(Skeleton).
         bool wasApplied();
 
+        /// Returns true if there is a getNext() track entry that is ready to become the current track entry during the
+        /// next AnimationState::update(float)}
+        bool isNextReady () {
+            return _next != NULL && _nextTrackLast - _next->_delay >= 0;
+        }
+
 	private:
 		Animation *_animation;
 		TrackEntry *_previous;
