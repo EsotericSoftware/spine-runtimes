@@ -292,56 +292,53 @@ bool SkeletonClipping::clip(float x1, float y1, float x2, float y2, float x3, fl
 	input->add(y1);
 	output->clear();
 
-	Vector<float> &clippingVertices = *clippingArea;
 	size_t clippingVerticesLast = clippingArea->size() - 4;
+    Vector<float> &clippingVertices = *clippingArea;
 	for (size_t i = 0;; i += 2) {
 		float edgeX = clippingVertices[i], edgeY = clippingVertices[i + 1];
-		float edgeX2 = clippingVertices[i + 2], edgeY2 = clippingVertices[i + 3];
-		float deltaX = edgeX - edgeX2, deltaY = edgeY - edgeY2;
+		float ex = edgeX - clippingVertices[i + 2], ey = edgeY - clippingVertices[i + 3];
 
+        size_t outputStart = output->size();
 		Vector<float> &inputVertices = *input;
-		size_t inputVerticesLength = input->size() - 2, outputStart = output->size();
-		for (size_t ii = 0; ii < inputVerticesLength; ii += 2) {
-			float inputX = inputVertices[ii], inputY = inputVertices[ii + 1];
-			float inputX2 = inputVertices[ii + 2], inputY2 = inputVertices[ii + 3];
-			bool side2 = deltaX * (inputY2 - edgeY2) - deltaY * (inputX2 - edgeX2) > 0;
-			if (deltaX * (inputY - edgeY2) - deltaY * (inputX - edgeX2) > 0) {
-				if (side2) {
-					// v1 inside, v2 inside
-					output->add(inputX2);
-					output->add(inputY2);
-					continue;
-				}
-				// v1 inside, v2 outside
-				float c0 = inputY2 - inputY, c2 = inputX2 - inputX;
-				float s = c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY);
-				if (MathUtil::abs(s) > 0.000001f) {
-					float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / s;
-					output->add(edgeX + (edgeX2 - edgeX) * ua);
-					output->add(edgeY + (edgeY2 - edgeY) * ua);
-				} else {
-					output->add(edgeX);
-					output->add(edgeY);
-				}
-			} else if (side2) {
-				// v1 outside, v2 inside
-				float c0 = inputY2 - inputY, c2 = inputX2 - inputX;
-				float s = c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY);
-				if (MathUtil::abs(s) > 0.000001f) {
-					float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / s;
-					output->add(edgeX + (edgeX2 - edgeX) * ua);
-					output->add(edgeY + (edgeY2 - edgeY) * ua);
-				} else {
-					output->add(edgeX);
-					output->add(edgeY);
-				}
-				output->add(inputX2);
-				output->add(inputY2);
-			}
-			clipped = true;
-		}
+        for (size_t ii = 0, nn = input->size() - 2; ii < nn;) {
+            float inputX = inputVertices[ii], inputY = inputVertices[ii + 1];
+            ii += 2;
+            float inputX2 = inputVertices[ii], inputY2 = inputVertices[ii + 1];
+            float s2 = ey * (edgeX - inputX2) > ex * (edgeY - inputY2);
+            float s1 = ey * (edgeX - inputX) - ex * (edgeY - inputY);
+            if (s1 > 0) {
+                if (s2) { // v1 inside, v2 inside
+                    output->add(inputX2);
+                    output->add(inputY2);
+                    continue;
+                }
+                // v1 inside, v2 outside
+                float ix = inputX2 - inputX, iy = inputY2 - inputY, t = s1 / (ix * ey - iy * ex);
+                if (t >= 0 && t <= 1) {
+                    output->add(inputX + ix * t);
+                    output->add(inputY + iy * t);
+                } else {
+                    output->add(inputX2);
+                    output->add(inputY2);
+                }
+            } else if (s2) { // v1 outside, v2 inside
+                float ix = inputX2 - inputX, iy = inputY2 - inputY, t = s1 / (ix * ey - iy * ex);
+                if (t >= 0 && t <= 1) {
+                    output->add(inputX + ix * t);
+                    output->add(inputY + iy * t);
+                    output->add(inputX2);
+                    output->add(inputY2);
+                } else {
+                    output->add(inputX2);
+                    output->add(inputY2);
+                    continue;
+                }
+            }
+            clipped = true;
+        }
 
-		if (outputStart == output->size()) {
+
+        if (outputStart == output->size()) {
 			// All edges outside.
 			originalOutput->clear();
 			return true;
