@@ -483,6 +483,7 @@ class _SpineRenderObject extends RenderBox {
   Bounds _bounds;
   bool _sizedByBounds;
   bool _disposed = false;
+  bool _firstUpdated = false;
 
   _SpineRenderObject(this._skeletonDrawable, this._controller, this._fit, this._alignment, this._bounds, this._sizedByBounds);
 
@@ -618,6 +619,7 @@ class _SpineRenderObject extends RenderBox {
       markNeedsPaint();
       _scheduleFrame();
     }
+    _firstUpdated = true;
   }
 
   void _setCanvasTransform(Canvas canvas, Offset offset) {
@@ -669,9 +671,11 @@ class _SpineRenderObject extends RenderBox {
     canvas.save();
     _setCanvasTransform(canvas, offset);
 
-    _controller.onBeforePaint?.call(_controller, canvas);
-    final commands = _skeletonDrawable.renderToCanvas(canvas);
-    _controller.onAfterPaint?.call(_controller, canvas, commands);
+    if (_firstUpdated) {
+      _controller.onBeforePaint?.call(_controller, canvas);
+      final commands = _skeletonDrawable.renderToCanvas(canvas);
+      _controller.onAfterPaint?.call(_controller, canvas, commands);
+    }
 
     canvas.restore();
   }
