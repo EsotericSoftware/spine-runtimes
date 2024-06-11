@@ -80,29 +80,27 @@ export class SkeletonClipping {
 		return this.clipAttachment != null;
 	}
 
-	clipTriangles (vertices: NumberArrayLike, verticesLength: number, triangles: NumberArrayLike, trianglesLength: number): void;
-	clipTriangles (vertices: NumberArrayLike, verticesLength: number, triangles: NumberArrayLike, trianglesLength: number, uvs: NumberArrayLike,
+	clipTriangles (vertices: NumberArrayLike, triangles: NumberArrayLike, trianglesLength: number): void;
+	clipTriangles (vertices: NumberArrayLike, triangles: NumberArrayLike, trianglesLength: number, uvs: NumberArrayLike,
 		light: Color, dark: Color, twoColor: boolean): void;
-	clipTriangles (vertices: NumberArrayLike, verticesLength: number, triangles: NumberArrayLike, trianglesLength: number, uvs?: NumberArrayLike,
+	clipTriangles (vertices: NumberArrayLike, triangles: NumberArrayLike, trianglesLength: number, uvs?: NumberArrayLike,
 		light?: Color, dark?: Color, twoColor?: boolean): void {
 
 		if (uvs && light && dark && typeof twoColor === 'boolean')
-			this.clipTrianglesRender(vertices, verticesLength, triangles, trianglesLength, uvs, light, dark, twoColor);
+			this.clipTrianglesRender(vertices, triangles, trianglesLength, uvs, light, dark, twoColor);
 		else
-			this.clipTrianglesNoRender(vertices, verticesLength, triangles, trianglesLength);
+			this.clipTrianglesNoRender(vertices, triangles, trianglesLength);
 	}
-	private clipTrianglesNoRender (vertices: NumberArrayLike, verticesLength: number, triangles: NumberArrayLike, trianglesLength: number) {
+	private clipTrianglesNoRender (vertices: NumberArrayLike, triangles: NumberArrayLike, trianglesLength: number) {
 
 		let clipOutput = this.clipOutput, clippedVertices = this.clippedVertices;
 		let clippedTriangles = this.clippedTriangles;
 		let polygons = this.clippingPolygons!;
 		let polygonsCount = polygons.length;
-		let vertexSize = 2;
 
 		let index = 0;
 		clippedVertices.length = 0;
 		clippedTriangles.length = 0;
-		outer:
 		for (let i = 0; i < trianglesLength; i += 3) {
 			let vertexOffset = triangles[i] << 1;
 			let x1 = vertices[vertexOffset], y1 = vertices[vertexOffset + 1];
@@ -121,27 +119,25 @@ export class SkeletonClipping {
 
 					let clipOutputCount = clipOutputLength >> 1;
 					let clipOutputItems = this.clipOutput;
-					let clippedVerticesItems = Utils.setArraySize(clippedVertices, s + clipOutputCount * vertexSize);
-					for (let ii = 0; ii < clipOutputLength; ii += 2) {
+					let clippedVerticesItems = Utils.setArraySize(clippedVertices, s + clipOutputCount * 2);
+					for (let ii = 0; ii < clipOutputLength; ii += 2, s += 2) {
 						let x = clipOutputItems[ii], y = clipOutputItems[ii + 1];
 						clippedVerticesItems[s] = x;
 						clippedVerticesItems[s + 1] = y;
-						s += 2;
 					}
 
 					s = clippedTriangles.length;
 					let clippedTrianglesItems = Utils.setArraySize(clippedTriangles, s + 3 * (clipOutputCount - 2));
 					clipOutputCount--;
-					for (let ii = 1; ii < clipOutputCount; ii++) {
+					for (let ii = 1; ii < clipOutputCount; ii++, s += 3) {
 						clippedTrianglesItems[s] = index;
 						clippedTrianglesItems[s + 1] = (index + ii);
 						clippedTrianglesItems[s + 2] = (index + ii + 1);
-						s += 3;
 					}
 					index += clipOutputCount + 1;
 
 				} else {
-					let clippedVerticesItems = Utils.setArraySize(clippedVertices, s + 3 * vertexSize);
+					let clippedVerticesItems = Utils.setArraySize(clippedVertices, s + 3 * 2);
 					clippedVerticesItems[s] = x1;
 					clippedVerticesItems[s + 1] = y1;
 
@@ -157,13 +153,13 @@ export class SkeletonClipping {
 					clippedTrianglesItems[s + 1] = (index + 1);
 					clippedTrianglesItems[s + 2] = (index + 2);
 					index += 3;
-					continue outer;
+					break;
 				}
 			}
 		}
 	}
 
-	private clipTrianglesRender (vertices: NumberArrayLike, verticesLength: number, triangles: NumberArrayLike, trianglesLength: number, uvs: NumberArrayLike,
+	private clipTrianglesRender (vertices: NumberArrayLike, triangles: NumberArrayLike, trianglesLength: number, uvs: NumberArrayLike,
 		light: Color, dark: Color, twoColor: boolean) {
 
 		let clipOutput = this.clipOutput, clippedVertices = this.clippedVertices;
@@ -175,7 +171,6 @@ export class SkeletonClipping {
 		let index = 0;
 		clippedVertices.length = 0;
 		clippedTriangles.length = 0;
-		outer:
 		for (let i = 0; i < trianglesLength; i += 3) {
 			let vertexOffset = triangles[i] << 1;
 			let x1 = vertices[vertexOffset], y1 = vertices[vertexOffset + 1];
@@ -200,7 +195,7 @@ export class SkeletonClipping {
 					let clipOutputCount = clipOutputLength >> 1;
 					let clipOutputItems = this.clipOutput;
 					let clippedVerticesItems = Utils.setArraySize(clippedVertices, s + clipOutputCount * vertexSize);
-					for (let ii = 0; ii < clipOutputLength; ii += 2) {
+					for (let ii = 0; ii < clipOutputLength; ii += 2, s += vertexSize) {
 						let x = clipOutputItems[ii], y = clipOutputItems[ii + 1];
 						clippedVerticesItems[s] = x;
 						clippedVerticesItems[s + 1] = y;
@@ -220,17 +215,15 @@ export class SkeletonClipping {
 							clippedVerticesItems[s + 10] = dark.b;
 							clippedVerticesItems[s + 11] = dark.a;
 						}
-						s += vertexSize;
 					}
 
 					s = clippedTriangles.length;
 					let clippedTrianglesItems = Utils.setArraySize(clippedTriangles, s + 3 * (clipOutputCount - 2));
 					clipOutputCount--;
-					for (let ii = 1; ii < clipOutputCount; ii++) {
+					for (let ii = 1; ii < clipOutputCount; ii++, s += 3) {
 						clippedTrianglesItems[s] = index;
 						clippedTrianglesItems[s + 1] = (index + ii);
 						clippedTrianglesItems[s + 2] = (index + ii + 1);
-						s += 3;
 					}
 					index += clipOutputCount + 1;
 
@@ -304,7 +297,7 @@ export class SkeletonClipping {
 					clippedTrianglesItems[s + 1] = (index + 1);
 					clippedTrianglesItems[s + 2] = (index + 2);
 					index += 3;
-					continue outer;
+					break;
 				}
 			}
 		}
@@ -363,6 +356,7 @@ export class SkeletonClipping {
 					} else {
 						output.push(inputX2);
 						output.push(inputY2);
+						continue;
 					}
 				} else if (s2) { // v1 outside, v2 inside
 					let ix = inputX2 - inputX, iy = inputY2 - inputY, t = s1 / (ix * ey - iy * ex);

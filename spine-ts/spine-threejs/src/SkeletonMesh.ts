@@ -255,7 +255,6 @@ export class SkeletonMesh extends THREE.Object3D {
 				if (clipper.isClipping()) {
 					clipper.clipTriangles(
 						vertices,
-						numFloats,
 						triangles,
 						triangles.length,
 						uvs,

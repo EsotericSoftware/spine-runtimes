@@ -381,7 +381,7 @@ export class Spine extends Container {
 				let finalIndicesLength: number;
 
 				if (Spine.clipper.isClipping()) {
-					Spine.clipper.clipTriangles(this.verticesCache, numFloats, triangles, triangles.length, uvs, this.lightColor, this.darkColor, useDarkColor);
+					Spine.clipper.clipTriangles(this.verticesCache, triangles, triangles.length, uvs, this.lightColor, this.darkColor, useDarkColor);
 
 					finalVertices = Spine.clipper.clippedVertices;
 					finalVerticesLength = finalVertices.length;
