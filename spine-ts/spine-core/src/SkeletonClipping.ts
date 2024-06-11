@@ -335,49 +335,47 @@ export class SkeletonClipping {
 		input.push(y1);
 		output.length = 0;
 
-		let clippingVertices = clippingArea;
 		let clippingVerticesLast = clippingArea.length - 4;
+		let clippingVertices = clippingArea;
 		for (let i = 0; ; i += 2) {
 			let edgeX = clippingVertices[i], edgeY = clippingVertices[i + 1];
-			let edgeX2 = clippingVertices[i + 2], edgeY2 = clippingVertices[i + 3];
-			let deltaX = edgeX - edgeX2, deltaY = edgeY - edgeY2;
+			let ex = edgeX - clippingVertices[i + 2], ey = edgeY - clippingVertices[i + 3];
 
+			let outputStart = output.length;
 			let inputVertices = input;
-			let inputVerticesLength = input.length - 2, outputStart = output.length;
-			for (let ii = 0; ii < inputVerticesLength; ii += 2) {
+			for (let ii = 0, nn = input.length - 2; ii < nn;) {
 				let inputX = inputVertices[ii], inputY = inputVertices[ii + 1];
-				let inputX2 = inputVertices[ii + 2], inputY2 = inputVertices[ii + 3];
-				let side2 = deltaX * (inputY2 - edgeY2) - deltaY * (inputX2 - edgeX2) > 0;
-				if (deltaX * (inputY - edgeY2) - deltaY * (inputX - edgeX2) > 0) {
-					if (side2) { // v1 inside, v2 inside
+				ii += 2;
+				let inputX2 = inputVertices[ii], inputY2 = inputVertices[ii + 1];
+				let s2 = ey * (edgeX - inputX2) > ex * (edgeY - inputY2);
+				let s1 = ey * (edgeX - inputX) - ex * (edgeY - inputY);
+				if (s1 > 0) {
+					if (s2) { // v1 inside, v2 inside
 						output.push(inputX2);
 						output.push(inputY2);
 						continue;
 					}
 					// v1 inside, v2 outside
-					let c0 = inputY2 - inputY, c2 = inputX2 - inputX;
-					let s = c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY);
-					if (Math.abs(s) > 0.000001) {
-						let ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / s;
-						output.push(edgeX + (edgeX2 - edgeX) * ua);
-						output.push(edgeY + (edgeY2 - edgeY) * ua);
+					let ix = inputX2 - inputX, iy = inputY2 - inputY, t = s1 / (ix * ey - iy * ex);
+					if (t >= 0 && t <= 1) {
+						output.push(inputX + ix * t);
+						output.push(inputY + iy * t);
 					} else {
-						output.push(edgeX);
-						output.push(edgeY);
+						output.push(inputX2);
+						output.push(inputY2);
 					}
-				} else if (side2) { // v1 outside, v2 inside
-					let c0 = inputY2 - inputY, c2 = inputX2 - inputX;
-					let s = c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY);
-					if (Math.abs(s) > 0.000001) {
-						let ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / s;
-						output.push(edgeX + (edgeX2 - edgeX) * ua);
-						output.push(edgeY + (edgeY2 - edgeY) * ua);
+				} else if (s2) { // v1 outside, v2 inside
+					let ix = inputX2 - inputX, iy = inputY2 - inputY, t = s1 / (ix * ey - iy * ex);
+					if (t >= 0 && t <= 1) {
+						output.push(inputX + ix * t);
+						output.push(inputY + iy * t);
+						output.push(inputX2);
+						output.push(inputY2);
 					} else {
-						output.push(edgeX);
-						output.push(edgeY);
+						output.push(inputX2);
+						output.push(inputY2);
+						continue;
 					}
-					output.push(inputX2);
-					output.push(inputY2);
 				}
 				clipped = true;
 			}
