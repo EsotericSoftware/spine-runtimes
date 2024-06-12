@@ -29,6 +29,10 @@
 
 #pragma warning disable 0219
 
+#if UNITY_2021_3_OR_NEWER
+#define FREE_MOVE_HANDLE_HAS_NO_ROTATION_PARAM
+#endif
+
 #define SPINE_SKELETONMECANIM
 
 using System.Collections.Generic;
@@ -519,7 +523,12 @@ namespace Spine.Unity.Editor {
 			Vector2 scaledOffset = skeletonGraphic.GetScaledPivotOffset();
 			Vector3 worldSpaceOffset = skeletonGraphic.transform.TransformPoint(scaledOffset);
 			EditorGUI.BeginChangeCheck();
+
+#if FREE_MOVE_HANDLE_HAS_NO_ROTATION_PARAM
 			Vector3 newWorldSpacePosition = Handles.FreeMoveHandle(worldSpaceOffset, controlSize, snap, Handles.CircleHandleCap);
+#else
+			Vector3 newWorldSpacePosition = Handles.FreeMoveHandle(worldSpaceOffset, Quaternion.identity, controlSize, snap, Handles.CircleHandleCap);
+#endif
 			if (EditorGUI.EndChangeCheck()) {
 				Undo.RecordObject(skeletonGraphic, "Change Offset to Pivot");
 				Vector3 localScaledOffset = skeletonGraphic.transform.InverseTransformPoint(newWorldSpacePosition);
