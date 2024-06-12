@@ -37,25 +37,19 @@ using UnityEditor;
 using UnityEngine;
 
 namespace Spine.Unity.Editor {
+	using TemplateMaterials = BlendModeMaterials.TemplateMaterials;
 
 	public class BlendModeMaterialsUtility {
 
-		public const string MATERIAL_SUFFIX_MULTIPLY = "-Multiply";
-		public const string MATERIAL_SUFFIX_SCREEN = "-Screen";
-		public const string MATERIAL_SUFFIX_ADDITIVE = "-Additive";
+		public const string MATERIAL_SUFFIX_MULTIPLY = BlendModeMaterials.MATERIAL_SUFFIX_MULTIPLY;
+		public const string MATERIAL_SUFFIX_SCREEN = BlendModeMaterials.MATERIAL_SUFFIX_SCREEN;
+		public const string MATERIAL_SUFFIX_ADDITIVE = BlendModeMaterials.MATERIAL_SUFFIX_ADDITIVE;
 
 #if UPGRADE_ALL_BLEND_MODE_MATERIALS
 		public const bool ShallUpgradeBlendModeMaterials = true;
 #else
 		public const bool ShallUpgradeBlendModeMaterials = false;
 #endif
-
-		protected class TemplateMaterials {
-			public Material multiplyTemplate;
-			public Material screenTemplate;
-			public Material additiveTemplate;
-		};
-
 		public static void UpgradeBlendModeMaterials (SkeletonDataAsset skeletonDataAsset) {
 			SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(true);
 			if (skeletonData == null)
@@ -158,72 +152,11 @@ namespace Spine.Unity.Editor {
 		protected static bool CreateAndAssignMaterials (SkeletonDataAsset skeletonDataAsset,
 			TemplateMaterials templateMaterials, ref bool anyReplacementMaterialsChanged) {
 
-			bool anyCreationFailed = false;
-			BlendModeMaterials blendModeMaterials = skeletonDataAsset.blendModeMaterials;
-			bool applyAdditiveMaterial = blendModeMaterials.applyAdditiveMaterial;
-
-			List<Skin.SkinEntry> skinEntries = new List<Skin.SkinEntry>();
-
-			SpineEditorUtilities.ClearSkeletonDataAsset(skeletonDataAsset);
-			skeletonDataAsset.isUpgradingBlendModeMaterials = true;
-			SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(true);
-
-			SlotData[] slotsItems = skeletonData.Slots.Items;
-			for (int slotIndex = 0, slotCount = skeletonData.Slots.Count; slotIndex < slotCount; slotIndex++) {
-				SlotData slot = slotsItems[slotIndex];
-				if (slot.BlendMode == BlendMode.Normal) continue;
-				if (!applyAdditiveMaterial && slot.BlendMode == BlendMode.Additive) continue;
-
-				List<BlendModeMaterials.ReplacementMaterial> replacementMaterials = null;
-				Material materialTemplate = null;
-				string materialSuffix = null;
-				switch (slot.BlendMode) {
-				case BlendMode.Multiply:
-					replacementMaterials = blendModeMaterials.multiplyMaterials;
-					materialTemplate = templateMaterials.multiplyTemplate;
-					materialSuffix = MATERIAL_SUFFIX_MULTIPLY;
-					break;
-				case BlendMode.Screen:
-					replacementMaterials = blendModeMaterials.screenMaterials;
-					materialTemplate = templateMaterials.screenTemplate;
-					materialSuffix = MATERIAL_SUFFIX_SCREEN;
-					break;
-				case BlendMode.Additive:
-					replacementMaterials = blendModeMaterials.additiveMaterials;
-					materialTemplate = templateMaterials.additiveTemplate;
-					materialSuffix = MATERIAL_SUFFIX_ADDITIVE;
-					break;
-				}
-
-				skinEntries.Clear();
-				foreach (Skin skin in skeletonData.Skins)
-					skin.GetAttachments(slotIndex, skinEntries);
-
-				foreach (Skin.SkinEntry entry in skinEntries) {
-					IHasTextureRegion renderableAttachment = entry.Attachment as IHasTextureRegion;
-					if (renderableAttachment != null) {
-						AtlasRegion originalRegion = (AtlasRegion)renderableAttachment.Region;
-						if (originalRegion != null) {
-							anyCreationFailed |= CreateForRegion(
-								ref replacementMaterials, ref anyReplacementMaterialsChanged,
-								originalRegion, materialTemplate, materialSuffix, skeletonDataAsset);
-						} else {
-							Sequence sequence = renderableAttachment.Sequence;
-							if (sequence != null && sequence.Regions != null) {
-								for (int i = 0, count = sequence.Regions.Length; i < count; ++i) {
-									originalRegion = (AtlasRegion)sequence.Regions[i];
-									anyCreationFailed |= CreateForRegion(
-										ref replacementMaterials, ref anyReplacementMaterialsChanged,
-										originalRegion, materialTemplate, materialSuffix, skeletonDataAsset);
-								}
-							}
-						}
-					}
-				}
-			}
-			skeletonDataAsset.isUpgradingBlendModeMaterials = false;
-			EditorUtility.SetDirty(skeletonDataAsset);
-			return !anyCreationFailed;
+			return BlendModeMaterials.CreateAndAssignMaterials(skeletonDataAsset,
+				templateMaterials, ref anyReplacementMaterialsChanged,
+				SpineEditorUtilities.ClearSkeletonDataAsset,
+				EditorUtility.SetDirty,
+				CreateForRegion);
 		}
 
 		protected static bool CreateForRegion (ref List<BlendModeMaterials.ReplacementMaterial> replacementMaterials,

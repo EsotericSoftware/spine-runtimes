@@ -113,6 +113,7 @@
 ## C#
 
 - **Additions**
+
   - Added [`TrackEntry.AlphaAttachmentThreshold`](http://esotericsoftware.com/spine-api-reference#TrackEntry-alphaAttachmentThreshold).
 
 - **Breaking changes**
@@ -156,7 +157,8 @@
   - SkeletonGraphic: Added auto-detect functionality for parameters `Advanced` - `Tint Black`, `CanvasGroup Compatible` and `PMA Vertex Color`. If unsure which settings are correct, hit the `Detect` button next to each parameter, in top to bottom order, or the `Detect Settings` to detect all three. Also added automatic material assignment via a `Detect Material` button in the `Advanced` section and a `Detect` button next to the `Material` property at the top of the component Inspector, as well as next to the `Blend Mode Materials` section when using multiple canvas renderers with blend modes. The suitable material is selected based on these three settings, combined with texture settings (PMA or straight alpha texture settings). If you receive incorrect results, likely your texture settings are incorrectly setup for your PMA or Straight alpha texture export settings.
   - `SkeletonRenderTexture` example components now provide a `shaderPasses` parameter to customize which passes are rendered to the `RenderTexture`. It defaults to `-1` for all passes to keep the existing behaviour. You might want to set it to `0` to only render the first pass e.g. to avoid issues when using a URP shader at the original skeleton.
   - `SkeletonGraphicRenderTexture` example component now also received a `quadMaterial` property, defaulting to the newly added Material asset `RenderQuadGraphicMaterial` which applies proper premultiplied-alpha blending of the render texture. The `quadMaterial` member variable was moved from `SkeletonRenderTexture` to the common base class `SkeletonRenderTextureBase`.
-  - All Spine Outline shaders, including the URP outline shader, now provide an additional parameter `Width in Screen Space`. Enable it to keep the outline width constant in screen space instead of texture space. Requires more expensive computations, so enable only where necessary.  Defaults to `disabled` to maintain existing behaviour.
+  - All Spine Outline shaders, including the URP outline shader, now provide an additional parameter `Width in Screen Space`. Enable it to keep the outline width constant in screen space instead of texture space. Requires more expensive computations, so enable only where necessary. Defaults to `disabled` to maintain existing behaviour.
+  - Added support for BlendModeMaterials at runtime instantiation from files via an additional method `SkeletonDataAsset.SetupRuntimeBlendModeMaterials`. See example scene `Spine Examples/Other Examples/Instantiate from Script` for a usage example.
 
 - **Breaking changes**
 
@@ -176,6 +178,7 @@
 - **Restructuring (Non-Breaking)**
 
 ### XNA/MonoGame
+
 - **Additions**
   - Apply external movement to physics: If you are not directly modifying `Skeleton.X` or `Skeleton.Y`, you can apply external game object movement to skeleton physics as follows:
     Add a `Vector2 lastPosition;` member variable to your class interacting with the skeleton. Then call e.g. the following code each frame:
@@ -263,6 +266,8 @@
 - Added physics support
 - Added `scale` field to configuration which defines the scale to load the skeleton at
 - Added `updateWorldTransform` field to configuration which expects a function that updates the skeleton. Defaults to player.skeleton.updateWorldTransform(spine.Physics.update)
+- Added `skeleton` to `SpinePlayerConfig` to specify the URL of the skeleton .json or .skel file. Deprecated `jsonURL` and `binaryURL`. The old fields can still be used, but will be removed in Spine 4.3
+- Added `atlas` to `SpinePlayerConfig` to specify the URL of the .atlas file. Deprecated `atlasURL`. The old field can still be used, but will be removed in Spine 4.3.
 
 ### Pixi
 

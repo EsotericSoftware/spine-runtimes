@@ -1422,6 +1422,18 @@ float spine_track_entry_get_track_complete(spine_track_entry entry) {
 	return _entry->getTrackComplete();
 }
 
+spine_bool spine_track_entry_was_applied(spine_track_entry entry) {
+    if (entry == nullptr) return false;
+    TrackEntry *_entry = (TrackEntry *) entry;
+    return _entry->wasApplied();
+}
+
+spine_bool spine_track_entry_is_next_ready(spine_track_entry entry) {
+    if (entry == nullptr) return false;
+    TrackEntry *_entry = (TrackEntry *) entry;
+    return _entry->isNextReady();
+}
+
 // Skeleton
 
 void spine_skeleton_update_cache(spine_skeleton skeleton) {

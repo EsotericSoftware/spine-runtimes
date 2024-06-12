@@ -88,7 +88,6 @@ class SkeletonClipping {
 		var polygonsCount:Int = clippingPolygons.length;
 		var index:Int = 0;
 		clippedVertices.resize(0);
-		clippedUvs.resize(0);
 		clippedTriangles.resize(0);
 		var i:Int = 0;
 		while (i < trianglesLength) {
@@ -301,67 +300,65 @@ class SkeletonClipping {
 		input.push(y1);
 		output.resize(0);
 
-		var clippingVertices:Array<Float> = clippingArea;
 		var clippingVerticesLast:Int = clippingArea.length - 4;
-		var c0:Float, c2:Float, s:Float, ua:Float;
+		var clippingVertices:Array<Float> = clippingArea;
+		var ix:Float, iy:Float, t:Float;
 		var i:Int = 0;
 		var n:Int = 0;
 		while (true) {
 			var edgeX:Float = clippingVertices[i],
 				edgeY:Float = clippingVertices[i + 1];
-			var edgeX2:Float = clippingVertices[i + 2],
-				edgeY2:Float = clippingVertices[i + 3];
-			var deltaX:Float = edgeX - edgeX2, deltaY:Float = edgeY - edgeY2;
+			var ex:Float = edgeX - clippingVertices[i + 2],
+				ey:Float = edgeY - clippingVertices[i + 3];
 
+			var outputStart:Int = output.length;
 			var inputVertices:Array<Float> = input;
-			var inputVerticesLength:Int = input.length - 2,
-				outputStart:Int = output.length;
 			var ii:Int = 0;
-			while (ii < inputVerticesLength) {
+			var nn:Int = input.length - 2;
+			while (ii < nn) {
 				var inputX:Float = inputVertices[ii],
 					inputY:Float = inputVertices[ii + 1];
-				var inputX2:Float = inputVertices[ii + 2],
-					inputY2:Float = inputVertices[ii + 3];
-				var side2:Bool = deltaX * (inputY2 - edgeY2) - deltaY * (inputX2 - edgeX2) > 0;
-				if (deltaX * (inputY - edgeY2) - deltaY * (inputX - edgeX2) > 0) {
-					if (side2) {
+				ii += 2;
+				var inputX2:Float = inputVertices[ii],
+					inputY2:Float = inputVertices[ii + 1];
+				var s2:Bool = ey * (edgeX - inputX2) > ex * (edgeY - inputY2);
+				var s1:Float = ey * (edgeX - inputX) - ex * (edgeY - inputY);
+				if (s1 > 0) {
+					if (s2) {
 						// v1 inside, v2 inside
 						output.push(inputX2);
 						output.push(inputY2);
-						ii += 2;
 						continue;
 					}
 					// v1 inside, v2 outside
-					c0 = inputY2 - inputY;
-					c2 = inputX2 - inputX;
-					s = c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY);
-					if (Math.abs(s) > 0.000001) {
-						ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / s;
-						output.push(edgeX + (edgeX2 - edgeX) * ua);
-						output.push(edgeY + (edgeY2 - edgeY) * ua);
+					ix = inputX2 - inputX;
+					iy = inputY2 - inputY;
+					t = s1 / (ix * ey - iy * ex);
+					if (t >= 0 && t <= 1) {
+						output.push(inputX + ix * t);
+						output.push(inputY + iy * t);
 					} else {
-						output.push(edgeX);
-						output.push(edgeY);
+						output.push(inputX2);
+						output.push(inputY2);
+						continue;
 					}
-				} else if (side2) {
+				} else if (s2) {
 					// v1 outside, v2 inside
-					c0 = inputY2 - inputY;
-					c2 = inputX2 - inputX;
-					s = c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY);
-					if (Math.abs(s) > 0.000001) {
-						ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / s;
-						output.push(edgeX + (edgeX2 - edgeX) * ua);
-						output.push(edgeY + (edgeY2 - edgeY) * ua);
+					ix = inputX2 - inputX;
+					iy = inputY2 - inputY;
+					t = s1 / (ix * ey - iy * ex);
+					if (t >= 0 && t <= 1) {
+						output.push(inputX + ix * t);
+						output.push(inputY + iy * t);
+						output.push(inputX2);
+						output.push(inputY2);
 					} else {
-						output.push(edgeX);
-						output.push(edgeY);
+						output.push(inputX2);
+						output.push(inputY2);
+						continue;
 					}
-					output.push(inputX2);
-					output.push(inputY2);
 				}
 				clipped = true;
-
-				ii += 2;
 			}
 
 			if (outputStart == output.length) {

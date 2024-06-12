@@ -1,3 +1,6 @@
+# 4.2.27
+- Fixes clipping in case of colinear clipping edges.
+
 # 4.2.26
 - `Skeleton.getBounds()` takes clipping into consideration.
 

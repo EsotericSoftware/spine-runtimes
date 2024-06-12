@@ -1,0 +1,125 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>spine-pixi</title>
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@7.2.4/dist/pixi.min.js"></script>
+    <script src="../dist/iife/spine-pixi.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tweakpane@3.1.9/dist/tweakpane.min.js"></script>
+    <link rel="stylesheet" href="../../index.css">
+  </head>
+
+  <body>
+    <script>
+      (async function () {
+        var app = new PIXI.Application({
+          width: window.innerWidth,
+          height: window.innerHeight,
+          resolution: window.devicePixelRatio || 1,
+          autoDensity: true,
+          resizeTo: window,
+          backgroundColor: 0x2c3e50,
+          hello: true,
+        });
+        document.body.appendChild(app.view);
+
+        // Pre-load the skeleton data and atlas. You can also load .json skeleton data.
+        PIXI.Assets.add("spineboyData", "./assets/spineboy-pro.skel");
+        PIXI.Assets.add("spineboyAtlas", "./assets/spineboy-pma.atlas");
+        await PIXI.Assets.load(["spineboyData", "spineboyAtlas"]);
+
+        // Create the spine display object
+        const spineboy = spine.Spine.from("spineboyData", "spineboyAtlas", {
+          scale: 0.5,
+        });
+
+        // Set the default mix time to use when transitioning
+        // from one animation to the next.
+        spineboy.state.data.defaultMix = 0.2;
+
+        // Center the spine object on screen.
+        spineboy.x = window.innerWidth / 2;
+        spineboy.y = window.innerHeight / 2 + spineboy.getBounds().height / 2;
+
+        // Set animation "run" on track 0, looped.
+        spineboy.state.setAnimation(0, "walk", true);
+
+        // Add the display object to the stage.
+        app.stage.addChild(spineboy);
+
+        const logo1 = PIXI.Sprite.from('assets/spine_logo.png');
+        const logo2 = PIXI.Sprite.from('assets/spine_logo.png');
+        const logo3 = PIXI.Sprite.from('assets/spine_logo.png');
+        const logo4 = PIXI.Sprite.from('assets/spine_logo.png');
+        const text = new PIXI.Text('Spine Text');
+
+        // putting logo1 on top of the gun
+        spineboy.addSlotObject("gun", logo1);
+
+        // putting logo2 on top of the hand using slot directly and remove the attachment hand
+        let frontFist;
+        setTimeout(() => {
+          frontFist = spineboy.skeleton.findSlot("front-fist");
+          spineboy.addSlotObject(frontFist, logo2);
+          frontFist.setAttachment(null);
+        }, 2000)
+
+        // scaling the bone, will scale the pixi object too
+        setTimeout(() => {
+          frontFist.bone.scaleX = .5
+          frontFist.bone.scaleY = .5
+        }, 3000)
+
+        // adding a pixi text in a slot using slot index
+        let mouth;
+        setTimeout(() => {
+          mouth = spineboy.skeleton.findSlot("mouth");
+          spineboy.addSlotObject(mouth, text);
+        }, 4000)
+
+        // adding one display object to an already "occupied" slot will remove the old one,
+        // and move the given one to the slot
+        setTimeout(() => {
+          spineboy.addSlotObject(mouth, logo1);
+        }, 5000)
+
+        // adding multiple DisplayObjects to a slot using a Container to control their offset, size, ...
+        setTimeout(() => {
+          const container = new PIXI.Container();
+          container.addChild(logo3, logo4);
+          logo3.y = 20;
+          logo3.scale.set(.5);
+          logo4.scale.set(.5);
+          logo4.tint = 0xFF5500;
+          spineboy.addSlotObject("gun", container);
+        }, 6000)
+
+        // removing the container won't automatically destroy the displayObject contained, so take care of them
+        setTimeout(() => {
+          const container = new PIXI.Container();
+          spineboy.removeSlotObject("gun");
+          logo3.destroy();
+          logo4.destroy();
+        }, 7000)
+
+        // removing a specific slot object, that is not in that slot do nothing
+        setTimeout(() => {
+          const container = new PIXI.Container();
+          spineboy.removeSlotObject(frontFist, text);
+          text.destroy();
+        }, 8000)
+
+        // removing a specific slot object
+        setTimeout(() => {
+          const container = new PIXI.Container();
+          spineboy.removeSlotObject(frontFist, logo2);
+          logo2.destroy();
+        }, 9000)
+
+        // resetting the slot with the original attachment
+        setTimeout(() => {
+          frontFist.setToSetupPose();
+        }, 10000)
+      })();
+    </script>
+  </body>
+</html>

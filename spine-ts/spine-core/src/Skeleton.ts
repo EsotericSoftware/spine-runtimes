@@ -640,7 +640,7 @@ export class Skeleton {
 			}
 			if (vertices && triangles) {
 				if (clipper != null && clipper.isClipping()) {
-					clipper.clipTriangles(vertices, verticesLength, triangles, triangles.length);
+					clipper.clipTriangles(vertices, triangles, triangles.length);
 					vertices = clipper.clippedVertices;
 					verticesLength = clipper.clippedVertices.length;
 				}

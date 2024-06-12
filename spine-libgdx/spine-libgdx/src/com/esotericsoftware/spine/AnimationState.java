@@ -1156,6 +1156,12 @@ public class AnimationState {
 			return nextTrackLast != -1;
 		}
 
+		/** Returns true if there is a {@link #getNext()} track entry and it will become the current track entry during the next
+		 * {@link AnimationState#update(float)}. */
+		public boolean isNextReady () {
+			return next != null && nextTrackLast - next.delay >= 0;
+		}
+
 		/** Returns true if at least one loop has been completed.
 		 * <p>
 		 * See {@link AnimationStateListener#complete(TrackEntry)}. */

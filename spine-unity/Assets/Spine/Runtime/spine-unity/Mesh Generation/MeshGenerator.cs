@@ -640,7 +640,7 @@ namespace Spine.Unity {
 				}
 
 				if (useClipping && clipper.IsClipping) {
-					clipper.ClipTriangles(workingVerts, attachmentVertexCount << 1, attachmentTriangleIndices, attachmentIndexCount, uvs);
+					clipper.ClipTriangles(workingVerts, attachmentTriangleIndices, attachmentIndexCount, uvs);
 					workingVerts = clipper.ClippedVertices.Items;
 					attachmentVertexCount = clipper.ClippedVertices.Count >> 1;
 					attachmentTriangleIndices = clipper.ClippedTriangles.Items;

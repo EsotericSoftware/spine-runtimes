@@ -85,7 +85,8 @@ namespace Spine.Unity {
 		}
 
 		/// <summary>
-		/// Creates a runtime SkeletonDataAsset.</summary>
+		/// Creates a runtime SkeletonDataAsset.
+		/// If you require blend mode materials, call <see cref="SetupRuntimeBlendModeMaterials"/> afterwards.</summary>
 		public static SkeletonDataAsset CreateRuntimeInstance (TextAsset skeletonDataFile, AtlasAssetBase[] atlasAssets, bool initialize, float scale = 0.01f) {
 			SkeletonDataAsset skeletonDataAsset = ScriptableObject.CreateInstance<SkeletonDataAsset>();
 			skeletonDataAsset.Clear();
@@ -97,6 +98,19 @@ namespace Spine.Unity {
 				skeletonDataAsset.GetSkeletonData(true);
 
 			return skeletonDataAsset;
+		}
+
+		/// <summary>If this SkeletonDataAsset has been created via <see cref="CreateRuntimeInstance"/>,
+		/// this method sets up blend mode materials for it.</summary>
+		public void SetupRuntimeBlendModeMaterials (bool applyAdditiveMaterial,
+			BlendModeMaterials.TemplateMaterials templateMaterials) {
+			blendModeMaterials.applyAdditiveMaterial = applyAdditiveMaterial;
+			blendModeMaterials.UpdateBlendmodeMaterialsRequiredState(GetSkeletonData(true));
+			bool anyMaterialsChanged = false;
+			BlendModeMaterials.CreateAndAssignMaterials(this, templateMaterials, ref anyMaterialsChanged);
+
+			Clear();
+			GetSkeletonData(true);
 		}
 		#endregion
 
