@@ -29,7 +29,7 @@
 
 #pragma warning disable 0219
 
-#if UNITY_2021_3_OR_NEWER
+#if UNITY_2022_1_OR_NEWER
 #define FREE_MOVE_HANDLE_HAS_NO_ROTATION_PARAM
 #endif
 
