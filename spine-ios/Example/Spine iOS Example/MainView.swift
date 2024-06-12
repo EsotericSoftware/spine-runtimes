@@ -42,7 +42,7 @@ struct MainView: View {
                     Spacer()
                     Text("Spine \(Spine.version)")
                         .font(.footnote)
-                        .foregroundStyle(.secondary)
+                        .foregroundColor(.secondary)
                     Spacer()
                 }
             }
@@ -52,7 +52,7 @@ struct MainView: View {
 }
 
 #Preview {
-    NavigationStack {
+    NavigationView {
         MainView()
     }
 }

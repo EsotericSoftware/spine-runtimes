@@ -1,0 +1,455 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		029E40AACC629A2B19C75855 /* Pods_Spine_iOS_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63A23DBBF6B9A1877F1E82A7 /* Pods_Spine_iOS_Example.framework */; };
+		9281EF152C07885C00BE19F5 /* Spine_iOS_ExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9281EF142C07885C00BE19F5 /* Spine_iOS_ExampleApp.swift */; };
+		9281EF192C07885D00BE19F5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9281EF182C07885D00BE19F5 /* Assets.xcassets */; };
+		9281EF1C2C07885D00BE19F5 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9281EF1B2C07885D00BE19F5 /* Preview Assets.xcassets */; };
+		92BFC4B62C11BCA10051F2EA /* spineboy-pro.skel in Resources */ = {isa = PBXBuildFile; fileRef = 92BFC4B22C11BCA10051F2EA /* spineboy-pro.skel */; };
+		92BFC4B72C11BCA10051F2EA /* spineboy-pro.json in Resources */ = {isa = PBXBuildFile; fileRef = 92BFC4B32C11BCA10051F2EA /* spineboy-pro.json */; };
+		92BFC4B82C11BCA10051F2EA /* spineboy.png in Resources */ = {isa = PBXBuildFile; fileRef = 92BFC4B42C11BCA10051F2EA /* spineboy.png */; };
+		92BFC4B92C11BCA10051F2EA /* spineboy.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 92BFC4B52C11BCA10051F2EA /* spineboy.atlas */; };
+		92BFC4BB2C11BCC50051F2EA /* SimpleAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92BFC4BA2C11BCC50051F2EA /* SimpleAnimation.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		63A23DBBF6B9A1877F1E82A7 /* Pods_Spine_iOS_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Spine_iOS_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		7C440864BA6BF0A3BA8297E4 /* Pods-Spine iOS Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Spine iOS Example.debug.xcconfig"; path = "Target Support Files/Pods-Spine iOS Example/Pods-Spine iOS Example.debug.xcconfig"; sourceTree = "<group>"; };
+		9206EF0B2C119BC500320243 /* SpineCppLite.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SpineCppLite.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		9281EF112C07885C00BE19F5 /* Spine iOS Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Spine iOS Example.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9281EF142C07885C00BE19F5 /* Spine_iOS_ExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spine_iOS_ExampleApp.swift; sourceTree = "<group>"; };
+		9281EF182C07885D00BE19F5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		9281EF1B2C07885D00BE19F5 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		92BFC4B22C11BCA10051F2EA /* spineboy-pro.skel */ = {isa = PBXFileReference; lastKnownFileType = file; path = "spineboy-pro.skel"; sourceTree = "<group>"; };
+		92BFC4B32C11BCA10051F2EA /* spineboy-pro.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "spineboy-pro.json"; sourceTree = "<group>"; };
+		92BFC4B42C11BCA10051F2EA /* spineboy.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spineboy.png; sourceTree = "<group>"; };
+		92BFC4B52C11BCA10051F2EA /* spineboy.atlas */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = spineboy.atlas; sourceTree = "<group>"; };
+		92BFC4BA2C11BCC50051F2EA /* SimpleAnimation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SimpleAnimation.swift; path = "Spine iOS Example/SimpleAnimation.swift"; sourceTree = SOURCE_ROOT; };
+		F571992938153AF59959A005 /* Pods-Spine iOS Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Spine iOS Example.release.xcconfig"; path = "Target Support Files/Pods-Spine iOS Example/Pods-Spine iOS Example.release.xcconfig"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		9281EF0E2C07885C00BE19F5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				029E40AACC629A2B19C75855 /* Pods_Spine_iOS_Example.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		646ABFDC442BA39836A04383 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				7C440864BA6BF0A3BA8297E4 /* Pods-Spine iOS Example.debug.xcconfig */,
+				F571992938153AF59959A005 /* Pods-Spine iOS Example.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		9281EF082C07885C00BE19F5 = {
+			isa = PBXGroup;
+			children = (
+				9281EF132C07885C00BE19F5 /* Spine iOS Example */,
+				9281EF122C07885C00BE19F5 /* Products */,
+				646ABFDC442BA39836A04383 /* Pods */,
+				F18879239F06E7487AA7C894 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		9281EF122C07885C00BE19F5 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				9281EF112C07885C00BE19F5 /* Spine iOS Example.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		9281EF132C07885C00BE19F5 /* Spine iOS Example */ = {
+			isa = PBXGroup;
+			children = (
+				92BFC4B12C11BC840051F2EA /* spineboy */,
+				9281EF142C07885C00BE19F5 /* Spine_iOS_ExampleApp.swift */,
+				92BFC4BA2C11BCC50051F2EA /* SimpleAnimation.swift */,
+				9281EF182C07885D00BE19F5 /* Assets.xcassets */,
+				9281EF1A2C07885D00BE19F5 /* Preview Content */,
+			);
+			path = "Spine iOS Example";
+			sourceTree = "<group>";
+		};
+		9281EF1A2C07885D00BE19F5 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				9281EF1B2C07885D00BE19F5 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		92BFC4B12C11BC840051F2EA /* spineboy */ = {
+			isa = PBXGroup;
+			children = (
+				92BFC4B32C11BCA10051F2EA /* spineboy-pro.json */,
+				92BFC4B22C11BCA10051F2EA /* spineboy-pro.skel */,
+				92BFC4B52C11BCA10051F2EA /* spineboy.atlas */,
+				92BFC4B42C11BCA10051F2EA /* spineboy.png */,
+			);
+			path = spineboy;
+			sourceTree = "<group>";
+		};
+		F18879239F06E7487AA7C894 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				9206EF0B2C119BC500320243 /* SpineCppLite.framework */,
+				63A23DBBF6B9A1877F1E82A7 /* Pods_Spine_iOS_Example.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		9281EF102C07885C00BE19F5 /* Spine iOS Example */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9281EF1F2C07885D00BE19F5 /* Build configuration list for PBXNativeTarget "Spine iOS Example" */;
+			buildPhases = (
+				4CE732AF2F7C247F187833EC /* [CP] Check Pods Manifest.lock */,
+				9281EF0D2C07885C00BE19F5 /* Sources */,
+				9281EF0E2C07885C00BE19F5 /* Frameworks */,
+				9281EF0F2C07885C00BE19F5 /* Resources */,
+				A39FE6D793C3DED23C563AA5 /* [CP] Embed Pods Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Spine iOS Example";
+			productName = "Spine iOS Example";
+			productReference = 9281EF112C07885C00BE19F5 /* Spine iOS Example.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		9281EF092C07885C00BE19F5 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1520;
+				LastUpgradeCheck = 1520;
+				TargetAttributes = {
+					9281EF102C07885C00BE19F5 = {
+						CreatedOnToolsVersion = 15.2;
+					};
+				};
+			};
+			buildConfigurationList = 9281EF0C2C07885C00BE19F5 /* Build configuration list for PBXProject "Spine iOS Example" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 9281EF082C07885C00BE19F5;
+			productRefGroup = 9281EF122C07885C00BE19F5 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				9281EF102C07885C00BE19F5 /* Spine iOS Example */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		9281EF0F2C07885C00BE19F5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				92BFC4B72C11BCA10051F2EA /* spineboy-pro.json in Resources */,
+				9281EF1C2C07885D00BE19F5 /* Preview Assets.xcassets in Resources */,
+				92BFC4B62C11BCA10051F2EA /* spineboy-pro.skel in Resources */,
+				9281EF192C07885D00BE19F5 /* Assets.xcassets in Resources */,
+				92BFC4B92C11BCA10051F2EA /* spineboy.atlas in Resources */,
+				92BFC4B82C11BCA10051F2EA /* spineboy.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		4CE732AF2F7C247F187833EC /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Spine iOS Example-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		A39FE6D793C3DED23C563AA5 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Spine iOS Example/Pods-Spine iOS Example-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Spine iOS Example/Pods-Spine iOS Example-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Spine iOS Example/Pods-Spine iOS Example-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		9281EF0D2C07885C00BE19F5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				92BFC4BB2C11BCC50051F2EA /* SimpleAnimation.swift in Sources */,
+				9281EF152C07885C00BE19F5 /* Spine_iOS_ExampleApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		9281EF1D2C07885D00BE19F5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		9281EF1E2C07885D00BE19F5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		9281EF202C07885D00BE19F5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7C440864BA6BF0A3BA8297E4 /* Pods-Spine iOS Example.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				COMPRESS_PNG_FILES = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Spine iOS Example/Preview Content\"";
+				DEVELOPMENT_TEAM = 9ZFD4KCY8F;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.esotericsoftware.spine-ios-example.Spine-iOS-Example";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRIP_PNG_TEXT = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_INTEROP_MODE = objcxx;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		9281EF212C07885D00BE19F5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F571992938153AF59959A005 /* Pods-Spine iOS Example.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				COMPRESS_PNG_FILES = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Spine iOS Example/Preview Content\"";
+				DEVELOPMENT_TEAM = 9ZFD4KCY8F;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.esotericsoftware.spine-ios-example.Spine-iOS-Example";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRIP_PNG_TEXT = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_INTEROP_MODE = objcxx;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		9281EF0C2C07885C00BE19F5 /* Build configuration list for PBXProject "Spine iOS Example" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9281EF1D2C07885D00BE19F5 /* Debug */,
+				9281EF1E2C07885D00BE19F5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9281EF1F2C07885D00BE19F5 /* Build configuration list for PBXNativeTarget "Spine iOS Example" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9281EF202C07885D00BE19F5 /* Debug */,
+				9281EF212C07885D00BE19F5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 9281EF092C07885C00BE19F5 /* Project object */;
+}

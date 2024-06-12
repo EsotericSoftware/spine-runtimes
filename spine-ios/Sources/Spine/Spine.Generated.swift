@@ -2249,6 +2249,10 @@ public final class TrackEntry: NSObject {
         return spine_track_entry_get_track_complete(wrappee)
     }
 
+    public var isNextReady: Bool {
+        return spine_track_entry_is_next_ready(wrappee) != 0
+    }
+
     public var loop: Bool {
         get {
             return spine_track_entry_get_loop(wrappee) != 0
@@ -2422,6 +2426,11 @@ public final class TrackEntry: NSObject {
 
     public func resetRotationDirections() {
         spine_track_entry_reset_rotation_directions(wrappee)
+    }
+
+    @discardableResult
+    public func wasApplied() -> Bool {
+        return spine_track_entry_was_applied(wrappee) != 0
     }
 
 }

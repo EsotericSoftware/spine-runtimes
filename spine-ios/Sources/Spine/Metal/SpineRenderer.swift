@@ -47,7 +47,14 @@ final class SpineRenderer: NSObject, MTKViewDelegate {
         let device = spineView.device!
         self.device = device
         
-        let defaultLibrary = try device.makeDefaultLibrary(bundle: .module)
+        let bundle: Bundle
+        #if SWIFT_PACKAGE // SPM
+        bundle = .module
+        #else // CocoaPods
+        bundle = Bundle(for: SpineRenderer.self)
+        #endif
+        
+        let defaultLibrary = try device.makeDefaultLibrary(bundle: bundle)
         let textureLoader = MTKTextureLoader(device: device)
         textures = try atlasPages
             .compactMap { $0.cgImage }

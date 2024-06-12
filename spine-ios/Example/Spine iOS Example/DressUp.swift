@@ -19,7 +19,6 @@ struct DressUp: View {
                             .frame(width: model.thumbnailSize.width, height: model.thumbnailSize.height)
                             .grayscale(model.selectedSkins[skinName] == true ? 0.0 : 1.0)
                     }
-                    .listRowSeparator(.hidden)
                 }
             }
             .listStyle(.plain)

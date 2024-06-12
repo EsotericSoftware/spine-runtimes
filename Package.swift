@@ -6,17 +6,13 @@ import PackageDescription
 let package = Package(
     name: "spine-ios",
     platforms: [
-        .iOS(.v16)
+        .iOS(.v13)
     ],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
             name: "Spine",
             targets: ["Spine"]
-        ),
-        .library(
-            name: "SpineCppLite",
-            targets: ["SpineCppLite"]
         )
     ],
     targets: [
@@ -25,18 +21,18 @@ let package = Package(
             dependencies: [
                 "SpineCppLite", "SpineShadersStructs"
             ],
-            path: "Sources/Spine",
+            path: "spine-ios/Sources/Spine",
             swiftSettings: [
                 .interoperabilityMode(.Cxx)
             ]
         ),
         .target(
             name: "SpineCppLite",
-            path: "Sources/SpineCppLite"
+            path: "spine-ios/Sources/SpineCppLite"
         ),
         .systemLibrary(
             name: "SpineShadersStructs",
-            path: "Sources/SpineShadersStructs"
+            path: "spine-ios/Sources/SpineShadersStructs"
         )
     ],
     cxxLanguageStandard: .cxx11

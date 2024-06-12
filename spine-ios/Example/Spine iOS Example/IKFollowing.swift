@@ -26,8 +26,12 @@ struct IKFollowing: View {
 }
 
 #Preview {
-    IKFollowing()
-        .previewInterfaceOrientation(.landscapeLeft)
+    if #available(iOS 15.0, *) {
+        IKFollowing()
+            .previewInterfaceOrientation(.landscapeLeft)
+    } else {
+        IKFollowing()
+    }
 }
 
 final class IKFollowingModel: ObservableObject {

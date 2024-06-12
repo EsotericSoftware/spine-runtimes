@@ -22,7 +22,7 @@ public var minorVersion: Int {
 /// when the atlas is no longer in use to release its resources.
 public extension Atlas {
     
-    private static func fromData(data: Data, loadFile: (_ name: String) async throws -> Data) async throws -> (Atlas, [UIImage]) {
+    static func fromData(data: Data, loadFile: (_ name: String) async throws -> Data) async throws -> (Atlas, [UIImage]) {
         guard let atlasData = String(data: data, encoding: .utf8) as? NSString else {
             throw "Couldn't read atlas bytes as utf8 string"
         }
@@ -58,7 +58,7 @@ public extension Atlas {
     /// Loads an [Atlas] from the file [atlasFileName] in the main bundle or the optionally provided [bundle].
     ///
     /// Throws an [Exception] in case the atlas could not be loaded.
-    public static func fromBundle(_ atlasFileName: String, bundle: Bundle = .main) async throws -> (Atlas, [UIImage]) {
+    static func fromBundle(_ atlasFileName: String, bundle: Bundle = .main) async throws -> (Atlas, [UIImage]) {
         let data = try await FileSource.bundle(fileName: atlasFileName, bundle: bundle).load()
         return try await Self.fromData(data: data) { name in
             return try await FileSource.bundle(fileName: name, bundle: bundle).load()
@@ -68,7 +68,7 @@ public extension Atlas {
     /// Loads an [Atlas] from the file [atlasFileName].
     ///
     /// Throws an [Exception] in case the atlas could not be loaded.
-    public static func fromFile(_ atlasFile: URL) async throws -> (Atlas, [UIImage]) {
+    static func fromFile(_ atlasFile: URL) async throws -> (Atlas, [UIImage]) {
         let data = try await FileSource.file(atlasFile).load()
         return try await Self.fromData(data: data) { name in
             let dir = atlasFile.deletingLastPathComponent()
@@ -80,7 +80,7 @@ public extension Atlas {
     /// Loads an [Atlas] from the URL [atlasURL].
     ///
     /// Throws an [Exception] in case the atlas could not be loaded.
-    public static func fromHttp(_ atlasURL: URL) async throws -> (Atlas, [UIImage]) {
+    static func fromHttp(_ atlasURL: URL) async throws -> (Atlas, [UIImage]) {
         let data = try await FileSource.http(atlasURL).load()
         return try await Self.fromData(data: data) { name in
             let dir = atlasURL.deletingLastPathComponent()
@@ -96,7 +96,7 @@ public extension SkeletonData {
     /// images.
     ///
     /// Throws an [Exception] in case the atlas could not be loaded.
-    public static func fromJson(atlas: Atlas, json: String) throws -> SkeletonData {
+    static func fromJson(atlas: Atlas, json: String) throws -> SkeletonData {
         let jsonNative = UnsafeMutablePointer<CChar>(mutating: (json as NSString).utf8String)
         guard let result = spine_skeleton_data_load_json(atlas.wrappee, jsonNative) else {
             throw "Couldn't load skeleton data json"
@@ -117,7 +117,7 @@ public extension SkeletonData {
     /// images.
     ///
     /// Throws an [Exception] in case the skeleton data could not be loaded.
-    public static func fromBinary(atlas: Atlas, binary: Data) throws -> SkeletonData {
+    static func fromBinary(atlas: Atlas, binary: Data) throws -> SkeletonData {
         let binaryNative = try binary.withUnsafeBytes { unsafeBytes in
             guard let bytes = unsafeBytes.bindMemory(to: UInt8.self).baseAddress else {
                 throw "Couldn't read atlas binary"
@@ -145,7 +145,7 @@ public extension SkeletonData {
     /// Uses the provided [atlas] to resolve attachment images.
     ///
     /// Throws an [Exception] in case the skeleton data could not be loaded.
-    public static func fromBundle(atlas: Atlas, skeletonFileName: String, bundle: Bundle = .main) async throws -> SkeletonData {
+    static func fromBundle(atlas: Atlas, skeletonFileName: String, bundle: Bundle = .main) async throws -> SkeletonData {
         return try fromBinary(
             atlas: atlas,
             binary: try await FileSource.bundle(fileName: skeletonFileName, bundle: bundle).load(),
@@ -156,7 +156,7 @@ public extension SkeletonData {
     /// Loads a [SkeletonData] from the file [skeletonFile]. Uses the provided [atlas] to resolve attachment images.
     ///
     /// Throws an [Exception] in case the skeleton data could not be loaded.
-    public static func fromFile(atlas: Atlas, skeletonFile: URL) async throws -> SkeletonData {
+    static func fromFile(atlas: Atlas, skeletonFile: URL) async throws -> SkeletonData {
         return try fromBinary(
             atlas: atlas,
             binary: try await FileSource.file(skeletonFile).load(),
@@ -167,7 +167,7 @@ public extension SkeletonData {
     /// Loads a [SkeletonData] from the URL [skeletonURL]. Uses the provided [atlas] to resolve attachment images.
     ///
     /// Throws an [Exception] in case the skeleton data could not be loaded.
-    public static func fromHttp(atlas: Atlas, skeletonURL: URL) async throws -> SkeletonData {
+    static func fromHttp(atlas: Atlas, skeletonURL: URL) async throws -> SkeletonData {
         return try fromBinary(
             atlas: atlas,
             binary: try await FileSource.http(skeletonURL).load(),
@@ -189,7 +189,7 @@ public extension SkeletonData {
 
 public extension SkeletonDrawable {
     
-    public func render() -> [RenderCommand] {
+    func render() -> [RenderCommand] {
         var commands = [RenderCommand]()
         if disposed { return commands }
         
@@ -209,23 +209,23 @@ public extension SkeletonDrawable {
 
 public extension RenderCommand {
     
-    internal var numVertices: Int {
+    var numVertices: Int {
         Int(spine_render_command_get_num_vertices(wrappee))
     }
     
-    public var positions: [Float] {
+    var positions: [Float] {
         let num = numVertices * 2
         let ptr = spine_render_command_get_positions(wrappee)
         return (0..<num).compactMap { ptr?[$0] }
     }
     
-    public var uvs: [Float] {
+    var uvs: [Float] {
         let num = numVertices * 2
         let ptr = spine_render_command_get_uvs(wrappee)
         return (0..<num).compactMap { ptr?[$0] }
     }
     
-    public var colors: [Int32] {
+    var colors: [Int32] {
         let num = numVertices
         let ptr = spine_render_command_get_colors(wrappee)
         return (0..<num).compactMap { ptr?[$0] }
@@ -233,7 +233,7 @@ public extension RenderCommand {
 }
 
 public extension Skin {
-    public static func create(name: String) -> Skin {
+    static func create(name: String) -> Skin {
         return Skin(spine_skin_create(name))
     }
 }
@@ -251,7 +251,7 @@ extension CGRect {
     }
 }
 
-internal enum FileSource {
+enum FileSource {
     case bundle(fileName: String, bundle: Bundle = .main)
     case file(URL)
     case http(URL)
@@ -272,11 +272,36 @@ internal enum FileSource {
         case .file(let fileUrl):
             return try Data(contentsOf: fileUrl, options: [])
         case .http(let url):
-            let (temp, response) = try await URLSession.shared.download(from: url)
-            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-                throw URLError(.badServerResponse)
+            if #available(iOS 15.0, *) {
+                let (temp, response) = try await URLSession.shared.download(from: url)
+                guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+                    throw URLError(.badServerResponse)
+                }
+                return try Data(contentsOf: temp, options: [])
+            } else {
+                return try await withCheckedThrowingContinuation { continuation in
+                    let task = URLSession.shared.downloadTask(with: url) { temp, response, error in
+                        if let error {
+                            continuation.resume(throwing: error)
+                        } else {
+                            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+                                continuation.resume(throwing: URLError(.badServerResponse))
+                                return
+                            }
+                            guard let temp else {
+                                continuation.resume(throwing: "Could not download file.")
+                                return
+                            }
+                            do {
+                                continuation.resume(returning: try Data(contentsOf: temp, options: []))
+                            } catch {
+                                continuation.resume(throwing: error)
+                            }
+                        }
+                    }
+                    task.resume()
+                }
             }
-            return try Data(contentsOf: temp, options: [])
         }
     }
 }

@@ -30,6 +30,7 @@
 		924C0C182BCFCF21004E63F7 /* SimpleAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924C0C172BCFCF21004E63F7 /* SimpleAnimation.swift */; };
 		924C0C1A2BCFCF22004E63F7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 924C0C192BCFCF22004E63F7 /* Assets.xcassets */; };
 		925315522BFF994400C96F75 /* spineboy.png in Resources */ = {isa = PBXBuildFile; fileRef = 925315512BFF994400C96F75 /* spineboy.png */; };
+		925CB7E92C19BC5A00C8F47F /* Spine in Frameworks */ = {isa = PBXBuildFile; productRef = 925CB7E82C19BC5A00C8F47F /* Spine */; };
 		9270C16E2BFE356000BD25BC /* Physics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9270C16D2BFE356000BD25BC /* Physics.swift */; };
 		9270C1732BFE389600BD25BC /* celestial-circus.png in Resources */ = {isa = PBXBuildFile; fileRef = 9270C1702BFE389600BD25BC /* celestial-circus.png */; };
 		9270C1742BFE389600BD25BC /* celestial-circus-pro.skel in Resources */ = {isa = PBXBuildFile; fileRef = 9270C1712BFE389600BD25BC /* celestial-circus-pro.skel */; };
@@ -80,6 +81,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				925CB7E92C19BC5A00C8F47F /* Spine in Frameworks */,
 				928A8CC22BCFE7DF00D9D35B /* Spine in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -208,6 +210,7 @@
 			name = "Spine iOS Example";
 			packageProductDependencies = (
 				928A8CC12BCFE7DF00D9D35B /* Spine */,
+				925CB7E82C19BC5A00C8F47F /* Spine */,
 			);
 			productName = "Spine iOS Example";
 			productReference = 924C0C122BCFCF21004E63F7 /* Spine iOS Example.app */;
@@ -239,7 +242,7 @@
 			);
 			mainGroup = 924C0C092BCFCF21004E63F7;
 			packageReferences = (
-				928A8CC02BCFE7DF00D9D35B /* XCLocalSwiftPackageReference ".." */,
+				925CB7E72C19BC5A00C8F47F /* XCLocalSwiftPackageReference "../.." */,
 			);
 			productRefGroup = 924C0C132BCFCF21004E63F7 /* Products */;
 			projectDirPath = "";
@@ -443,7 +446,7 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.2;
@@ -487,7 +490,7 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.2;
@@ -529,13 +532,17 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		928A8CC02BCFE7DF00D9D35B /* XCLocalSwiftPackageReference ".." */ = {
+		925CB7E72C19BC5A00C8F47F /* XCLocalSwiftPackageReference "../.." */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = ..;
+			relativePath = ../..;
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		925CB7E82C19BC5A00C8F47F /* Spine */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Spine;
+		};
 		928A8CC12BCFE7DF00D9D35B /* Spine */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Spine;

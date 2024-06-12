@@ -16,3 +16,4 @@
 - Move remaining files to SPM package (#12)
 - Load assets from different sources (#13)
 - Add `Obj-C` + `UIKit` sample (#14)
+- Support CocoaPods (#15)

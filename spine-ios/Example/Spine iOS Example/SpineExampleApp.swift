@@ -6,7 +6,7 @@ struct SpineExampleApp: App {
     
     var body: some Scene {
         WindowGroup {
-            NavigationStack {
+            NavigationView {
                 MainView()
             }
         }
