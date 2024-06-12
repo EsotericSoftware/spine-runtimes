@@ -1065,6 +1065,20 @@ namespace Spine.Unity {
 			meshBoundsThickness *= scale;
 		}
 
+		public void ScaleAndOffsetVertexData (float scale, Vector2 offset2D) {
+			Vector3 offset = new Vector3(offset2D.x, offset2D.y);
+			Vector3[] vbi = vertexBuffer.Items;
+			for (int i = 0, n = vertexBuffer.Count; i < n; i++) {
+				vbi[i] = vbi[i] * scale + offset;
+			}
+
+			meshBoundsMin *= scale;
+			meshBoundsMax *= scale;
+			meshBoundsMin += offset2D;
+			meshBoundsMax += offset2D;
+			meshBoundsThickness *= scale;
+		}
+
 		public Bounds GetMeshBounds () {
 			if (float.IsInfinity(meshBoundsMin.x)) { // meshBoundsMin.x == BoundsMinDefault // == doesn't work on float Infinity constants.
 				return new Bounds();
