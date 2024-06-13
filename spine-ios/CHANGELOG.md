@@ -18,3 +18,4 @@
 - Add `Obj-C` + `UIKit` sample (#14)
 - Support CocoaPods (#15)
 - Metal Best Practices (#16)
+- Annotate functions that should return optional (#17)

@@ -25,7 +25,7 @@ struct AnimationStateEvents: View {
                     print("User event: { name: \(event.data.name ?? "--"), intValue: \(event.intValue), floatValue: \(event.floatValue), stringValue: \(event.stringValue ?? "--") }")
                 }
             }
-            let current = controller.animationState.getCurrent(trackIndex: 0).animation.name ?? "--"
+            let current = controller.animationState.getCurrent(trackIndex: 0)?.animation.name ?? "--"
             print("Current: \(current)")
         }
     )

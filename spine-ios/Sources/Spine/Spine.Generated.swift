@@ -739,12 +739,12 @@ public final class ClippingAttachment: NSObject {
         return .init(spine_clipping_attachment_get_color(wrappee))
     }
 
-    public var endSlot: SlotData {
+    public var endSlot: SlotData? {
         get {
-            return .init(spine_clipping_attachment_get_end_slot(wrappee))
+            return spine_clipping_attachment_get_end_slot(wrappee).flatMap { .init($0) }
         }
         set {
-            spine_clipping_attachment_set_end_slot(wrappee, newValue.wrappee)
+            spine_clipping_attachment_set_end_slot(wrappee, newValue?.wrappee)
         }
     }
 
@@ -1120,12 +1120,12 @@ public final class RegionAttachment: NSObject {
         return spine_region_attachment_get_path(wrappee).flatMap { String(cString: $0) }
     }
 
-    public var region: TextureRegion {
-        return .init(spine_region_attachment_get_region(wrappee))
+    public var region: TextureRegion? {
+        return spine_region_attachment_get_region(wrappee).flatMap { .init($0) }
     }
 
-    public var sequence: Sequence {
-        return .init(spine_region_attachment_get_sequence(wrappee))
+    public var sequence: Sequence? {
+        return spine_region_attachment_get_sequence(wrappee).flatMap { .init($0) }
     }
 
     public var offset: [Float?] {
@@ -1248,12 +1248,12 @@ public final class VertexAttachment: NSObject {
         }
     }
 
-    public var timelineAttachment: Attachment {
+    public var timelineAttachment: Attachment? {
         get {
-            return .init(spine_vertex_attachment_get_timeline_attachment(wrappee))
+            return spine_vertex_attachment_get_timeline_attachment(wrappee).flatMap { .init($0) }
         }
         set {
-            spine_vertex_attachment_set_timeline_attachment(wrappee, newValue.wrappee)
+            spine_vertex_attachment_set_timeline_attachment(wrappee, newValue?.wrappee)
         }
     }
 
@@ -1400,8 +1400,8 @@ public final class MeshAttachment: NSObject {
         return .init(spine_mesh_attachment_get_region(wrappee))
     }
 
-    public var sequence: Sequence {
-        return .init(spine_mesh_attachment_get_sequence(wrappee))
+    public var sequence: Sequence? {
+        return spine_mesh_attachment_get_sequence(wrappee).flatMap { .init($0) }
     }
 
     public var edges: [UInt16] {
@@ -1421,12 +1421,12 @@ public final class MeshAttachment: NSObject {
         }
     }
 
-    public var parentMesh: MeshAttachment {
+    public var parentMesh: MeshAttachment? {
         get {
-            return .init(spine_mesh_attachment_get_parent_mesh(wrappee))
+            return spine_mesh_attachment_get_parent_mesh(wrappee).flatMap { .init($0) }
         }
         set {
-            spine_mesh_attachment_set_parent_mesh(wrappee, newValue.wrappee)
+            spine_mesh_attachment_set_parent_mesh(wrappee, newValue?.wrappee)
         }
     }
 
@@ -1711,8 +1711,8 @@ public final class AnimationState: NSObject {
     }
 
     @discardableResult
-    public func getCurrent(trackIndex: Int32) -> TrackEntry {
-        return .init(spine_animation_state_get_current(wrappee, trackIndex))
+    public func getCurrent(trackIndex: Int32) -> TrackEntry? {
+        return spine_animation_state_get_current(wrappee, trackIndex).flatMap { .init($0) }
     }
 
     public func setEmptyAnimations(mixDuration: Float) {
@@ -1983,12 +1983,12 @@ public final class SkeletonData: NSObject {
         return spine_skeleton_data_get_reference_scale(wrappee)
     }
 
-    public var defaultSkin: Skin {
+    public var defaultSkin: Skin? {
         get {
-            return .init(spine_skeleton_data_get_default_skin(wrappee))
+            return spine_skeleton_data_get_default_skin(wrappee).flatMap { .init($0) }
         }
         set {
-            spine_skeleton_data_set_default_skin(wrappee, newValue.wrappee)
+            spine_skeleton_data_set_default_skin(wrappee, newValue?.wrappee)
         }
     }
 
@@ -2229,20 +2229,20 @@ public final class TrackEntry: NSObject {
         return spine_track_entry_get_animation_time(wrappee)
     }
 
-    public var next: TrackEntry {
-        return .init(spine_track_entry_get_next(wrappee))
+    public var next: TrackEntry? {
+        return spine_track_entry_get_next(wrappee).flatMap { .init($0) }
     }
 
     public var isComplete: Bool {
         return spine_track_entry_is_complete(wrappee) != 0
     }
 
-    public var mixingFrom: TrackEntry {
-        return .init(spine_track_entry_get_mixing_from(wrappee))
+    public var mixingFrom: TrackEntry? {
+        return spine_track_entry_get_mixing_from(wrappee).flatMap { .init($0) }
     }
 
-    public var mixingTo: TrackEntry {
-        return .init(spine_track_entry_get_mixing_to(wrappee))
+    public var mixingTo: TrackEntry? {
+        return spine_track_entry_get_mixing_to(wrappee).flatMap { .init($0) }
     }
 
     public var trackComplete: Float {
@@ -2586,8 +2586,8 @@ public final class BoneData: NSObject {
         return spine_bone_data_get_name(wrappee).flatMap { String(cString: $0) }
     }
 
-    public var parent: BoneData {
-        return .init(spine_bone_data_get_parent(wrappee))
+    public var parent: BoneData? {
+        return spine_bone_data_get_parent(wrappee).flatMap { .init($0) }
     }
 
     public var color: Color {
@@ -2812,12 +2812,12 @@ public final class Skeleton: NSObject {
         return .init(spine_skeleton_get_bounds(wrappee))
     }
 
-    public var rootBone: Bone {
-        return .init(spine_skeleton_get_root_bone(wrappee))
+    public var rootBone: Bone? {
+        return spine_skeleton_get_root_bone(wrappee).flatMap { .init($0) }
     }
 
-    public var data: SkeletonData {
-        return .init(spine_skeleton_get_data(wrappee))
+    public var data: SkeletonData? {
+        return spine_skeleton_get_data(wrappee).flatMap { .init($0) }
     }
 
     public var bones: [Bone] {
@@ -2969,13 +2969,13 @@ public final class Skeleton: NSObject {
     }
 
     @discardableResult
-    public func getAttachmentByName(slotName: String?, attachmentName: String?) -> Attachment {
-        return .init(spine_skeleton_get_attachment_by_name(wrappee, slotName, attachmentName))
+    public func getAttachmentByName(slotName: String?, attachmentName: String?) -> Attachment? {
+        return spine_skeleton_get_attachment_by_name(wrappee, slotName, attachmentName).flatMap { .init($0) }
     }
 
     @discardableResult
-    public func getAttachment(slotIndex: Int32, attachmentName: String?) -> Attachment {
-        return .init(spine_skeleton_get_attachment(wrappee, slotIndex, attachmentName))
+    public func getAttachment(slotIndex: Int32, attachmentName: String?) -> Attachment? {
+        return spine_skeleton_get_attachment(wrappee, slotIndex, attachmentName).flatMap { .init($0) }
     }
 
     public func setAttachment(slotName: String?, attachmentName: String?) {
@@ -3300,8 +3300,8 @@ public final class Bone: NSObject {
         return .init(spine_bone_get_skeleton(wrappee))
     }
 
-    public var parent: Bone {
-        return .init(spine_bone_get_parent(wrappee))
+    public var parent: Bone? {
+        return spine_bone_get_parent(wrappee).flatMap { .init($0) }
     }
 
     public var children: [Bone] {
@@ -3617,12 +3617,12 @@ public final class Slot: NSObject {
         return .init(spine_slot_get_dark_color(wrappee))
     }
 
-    public var attachment: Attachment {
+    public var attachment: Attachment? {
         get {
-            return .init(spine_slot_get_attachment(wrappee))
+            return spine_slot_get_attachment(wrappee).flatMap { .init($0) }
         }
         set {
-            spine_slot_set_attachment(wrappee, newValue.wrappee)
+            spine_slot_set_attachment(wrappee, newValue?.wrappee)
         }
     }
 
@@ -3695,8 +3695,8 @@ public final class Skin: NSObject {
     }
 
     @discardableResult
-    public func getAttachment(slotIndex: Int32, name: String?) -> Attachment {
-        return .init(spine_skin_get_attachment(wrappee, slotIndex, name))
+    public func getAttachment(slotIndex: Int32, name: String?) -> Attachment? {
+        return spine_skin_get_attachment(wrappee, slotIndex, name).flatMap { .init($0) }
     }
 
     public func removeAttachment(slotIndex: Int32, name: String?) {

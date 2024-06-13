@@ -62,10 +62,11 @@ final class IKFollowingModel: ObservableObject {
                     return
                 }
                 let bone = controller.skeleton.findBone(boneName: "crosshair")!
-                let parent = bone.parent
-                let position = parent.worldToLocal(worldX: Float(worldPosition.x), worldY:  Float(worldPosition.y))
-                bone.x = position.x
-                bone.y = position.y
+                if let parent = bone.parent {
+                    let position = parent.worldToLocal(worldX: Float(worldPosition.x), worldY:  Float(worldPosition.y))
+                    bone.x = position.x
+                    bone.y = position.y
+                }
             }
         )
     }
