@@ -11,13 +11,17 @@ public struct SpineView: UIViewRepresentable {
     private let boundsProvider: BoundsProvider
     private let backgroundColor: UIColor
     
+    @Binding
+    private var isRendering: Bool?
+    
     public init(
         from source: SpineViewSource,
         controller: SpineController = SpineController(),
         mode: Spine.ContentMode = .fit,
         alignment: Spine.Alignment = .center,
         boundsProvider: BoundsProvider = SetupPoseBounds(),
-        backgroundColor: UIColor = .clear
+        backgroundColor: UIColor = .clear,
+        isRendering: Binding<Bool?> = .constant(nil)
     ) {
         self.source = source
         self.controller = controller
@@ -25,6 +29,7 @@ public struct SpineView: UIViewRepresentable {
         self.alignment = alignment
         self.boundsProvider = boundsProvider
         self.backgroundColor = backgroundColor
+        _isRendering = isRendering
     }
     
     public func makeUIView(context: Context) -> SpineUIView {
@@ -39,6 +44,8 @@ public struct SpineView: UIViewRepresentable {
     }
     
     public func updateUIView(_ uiView: SpineUIView, context: Context) {
-        // Stub
+        if let isRendering {
+            uiView.isRendering = isRendering
+        }
     }
 }

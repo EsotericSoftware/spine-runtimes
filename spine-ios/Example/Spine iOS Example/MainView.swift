@@ -26,6 +26,9 @@ struct MainView: View {
                 NavigationLink("Physics") {
                     Physics()
                 }
+                NavigationLink("Disable Rendering") {
+                    DisableRendering()
+                }
             } header: {
                 Text("Swift + SwiftUI")
             }

@@ -103,6 +103,12 @@ public final class SpineUIView: MTKView {
     required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented. Use init() instead.")
     }
+    
+    /// Enable/disable rendering
+    public var isRendering: Bool {
+        get { !super.isPaused }
+        set { super.isPaused = !newValue }
+    }
 }
 
 extension SpineUIView {

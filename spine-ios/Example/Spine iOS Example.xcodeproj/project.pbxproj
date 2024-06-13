@@ -30,6 +30,7 @@
 		924C0C182BCFCF21004E63F7 /* SimpleAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924C0C172BCFCF21004E63F7 /* SimpleAnimation.swift */; };
 		924C0C1A2BCFCF22004E63F7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 924C0C192BCFCF22004E63F7 /* Assets.xcassets */; };
 		925315522BFF994400C96F75 /* spineboy.png in Resources */ = {isa = PBXBuildFile; fileRef = 925315512BFF994400C96F75 /* spineboy.png */; };
+		92579E772C1B0E9500FDC7D5 /* DisableRendering.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92579E762C1B0E9500FDC7D5 /* DisableRendering.swift */; };
 		925CB7E92C19BC5A00C8F47F /* Spine in Frameworks */ = {isa = PBXBuildFile; productRef = 925CB7E82C19BC5A00C8F47F /* Spine */; };
 		9270C16E2BFE356000BD25BC /* Physics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9270C16D2BFE356000BD25BC /* Physics.swift */; };
 		9270C1732BFE389600BD25BC /* celestial-circus.png in Resources */ = {isa = PBXBuildFile; fileRef = 9270C1702BFE389600BD25BC /* celestial-circus.png */; };
@@ -68,6 +69,7 @@
 		924C0C192BCFCF22004E63F7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		924C0C1B2BCFCF22004E63F7 /* SpineiOSExample.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SpineiOSExample.entitlements; sourceTree = "<group>"; };
 		925315512BFF994400C96F75 /* spineboy.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spineboy.png; sourceTree = "<group>"; };
+		92579E762C1B0E9500FDC7D5 /* DisableRendering.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DisableRendering.swift; sourceTree = "<group>"; };
 		9270C16D2BFE356000BD25BC /* Physics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Physics.swift; sourceTree = "<group>"; };
 		9270C1702BFE389600BD25BC /* celestial-circus.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "celestial-circus.png"; sourceTree = "<group>"; };
 		9270C1712BFE389600BD25BC /* celestial-circus-pro.skel */ = {isa = PBXFileReference; lastKnownFileType = file; path = "celestial-circus-pro.skel"; sourceTree = "<group>"; };
@@ -157,6 +159,7 @@
 				921C1EAE2BF609F60001A0BA /* DressUp.swift */,
 				92FE93282BF4AB9600CCDF48 /* IKFollowing.swift */,
 				9270C16D2BFE356000BD25BC /* Physics.swift */,
+				92579E762C1B0E9500FDC7D5 /* DisableRendering.swift */,
 				924C0C192BCFCF22004E63F7 /* Assets.xcassets */,
 				924C0C1B2BCFCF22004E63F7 /* SpineiOSExample.entitlements */,
 				9240C26B2C0754DC003EE243 /* Spine iOS Example-Bridging-Header.h */,
@@ -297,6 +300,7 @@
 				922839DF2BF4F7D8006DA9F6 /* AnimationStateEvents.swift in Sources */,
 				924C0C182BCFCF21004E63F7 /* SimpleAnimation.swift in Sources */,
 				924C0C162BCFCF21004E63F7 /* SpineExampleApp.swift in Sources */,
+				92579E772C1B0E9500FDC7D5 /* DisableRendering.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

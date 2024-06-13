@@ -17,6 +17,8 @@ public final class SpineController: NSObject, ObservableObject {
     private let onAfterPaint: SpineControllerCallback?
     private let disposeDrawableOnDeInit: Bool
     
+    private var displayLink: CADisplayLink?
+    
     private var scaleX: CGFloat = 1
     private var scaleY: CGFloat = 1
     private var offsetX: CGFloat = 0
@@ -42,13 +44,17 @@ public final class SpineController: NSObject, ObservableObject {
         self.onBeforePaint = onBeforePaint
         self.onAfterPaint = onAfterPaint
         self.disposeDrawableOnDeInit = disposeDrawableOnDeInit
+        
         super.init()
+        
+        addDisplayLinkIfNeeded()
     }
     
     deinit {
         if disposeDrawableOnDeInit {
             drawable?.dispose() // TODO move drawable out of view?
         }
+        removeDisplayLink()
     }
     
     public var atlas: Atlas {
@@ -121,21 +127,40 @@ public final class SpineController: NSObject, ObservableObject {
     internal func initialize() {
         onInitialized?(self)
     }
+    
+    internal var lastUpdate: CFTimeInterval = 0
+    
+    @objc private func updateDrawable() {
+        guard isPlaying else {
+            lastUpdate = CACurrentMediaTime()
+            return
+        }
+        
+        if lastUpdate == 0 {
+            lastUpdate = CACurrentMediaTime()
+        }
+        let delta = CACurrentMediaTime() - lastUpdate
+        onBeforeUpdateWorldTransforms?(self)
+        drawable?.update(delta: Float(delta))
+        lastUpdate = CACurrentMediaTime()
+        onAfterUpdateWorldTransforms?(self)
+    }
+    
+    private func addDisplayLinkIfNeeded() {
+        guard displayLink == nil else {
+            return
+        }
+        displayLink = CADisplayLink(target: self, selector: #selector(updateDrawable))
+        displayLink?.add(to: .current, forMode: .common)
+    }
+
+    private func removeDisplayLink() {
+        displayLink?.remove(from: .current, forMode: .common)
+        displayLink = nil
+    }
 }
 
 extension SpineController: SpineRendererDelegate {
-    
-    func spineRendererWillUpdate(_ spineRenderer: SpineRenderer) {
-        onBeforeUpdateWorldTransforms?(self)
-    }
-    
-    func spineRenderer(_ spineRenderer: SpineRenderer, needsUpdate delta: TimeInterval) {
-        drawable?.update(delta: Float(delta))
-    }
-    
-    func spineRendererDidUpdate(_ spineRenderer: SpineRenderer) {
-        onAfterUpdateWorldTransforms?(self)
-    }
     
     func spineRendererWillDraw(_ spineRenderer: SpineRenderer) {
         onBeforePaint?(self)

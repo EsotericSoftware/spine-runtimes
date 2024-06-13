@@ -5,9 +5,6 @@ import Spine
 import SpineCppLite
 
 protocol SpineRendererDelegate: AnyObject {
-    func spineRendererWillUpdate(_ spineRenderer: SpineRenderer)
-    func spineRenderer(_ spineRenderer: SpineRenderer, needsUpdate delta: TimeInterval)
-    func spineRendererDidUpdate(_ spineRenderer: SpineRenderer)
     
     func spineRendererWillDraw(_ spineRenderer: SpineRenderer)
     func spineRendererDidDraw(_ spineRenderer: SpineRenderer)
@@ -33,7 +30,6 @@ final class SpineRenderer: NSObject, MTKViewDelegate {
         scale: vector_float2(1, 1),
         offset: vector_float2(0, 0)
     )
-    private var lastDraw: CFTimeInterval = 0
     private var pipelineStatesByBlendMode = [Int: MTLRenderPipelineState]()
     
     private static let numberOfBuffers = 3
@@ -114,11 +110,8 @@ final class SpineRenderer: NSObject, MTKViewDelegate {
     
     func draw(in view: MTKView) {
         guard dataSource?.isPlaying(self) ?? false else {
-            lastDraw = CACurrentMediaTime()
             return
         }
-        
-        callNeedsUpdate()
         
         // Tripple Buffering
         // Source: https://developer.apple.com/library/archive/documentation/3DDrawing/Conceptual/MTLBestPracticesGuide/TripleBuffering.html#//apple_ref/doc/uid/TP40016642-CH5-SW1
@@ -180,18 +173,7 @@ final class SpineRenderer: NSObject, MTKViewDelegate {
             size: sizeInPoints
         )
     }
-    
-    private func callNeedsUpdate() {
-        if lastDraw == 0 {
-            lastDraw = CACurrentMediaTime()
-        }
-        let delta = CACurrentMediaTime() - lastDraw
-        delegate?.spineRendererWillUpdate(self)
-        delegate?.spineRenderer(self, needsUpdate: delta)
-        lastDraw = CACurrentMediaTime()
-        delegate?.spineRendererDidUpdate(self)
-    }
-    
+        
     private func draw(renderCommands: [RenderCommand], renderEncoder: MTLRenderCommandEncoder, in view: MTKView) {
         let allVertices = renderCommands.map { renderCommand in
             Array(renderCommand.getVertices())
