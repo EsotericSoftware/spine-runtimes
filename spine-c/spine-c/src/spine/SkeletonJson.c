@@ -535,7 +535,7 @@ static spAnimation *_spSkeletonJson_readAnimation(spSkeletonJson *self, Json *ro
 				keyMap = timelineMap->child;
 				for (frame = 0;; frame++) {
 					float time = Json_getFloat(keyMap, "time", 0);
-					const char *value = Json_getString(keyMap, "value", "normal");
+					const char *value = Json_getString(keyMap, "inherit", "normal");
 					spInherit inherit = SP_INHERIT_NORMAL;
 					if (strcmp(value, "normal") == 0) inherit = SP_INHERIT_NORMAL;
 					else if (strcmp(value, "onlyTranslation") == 0)
