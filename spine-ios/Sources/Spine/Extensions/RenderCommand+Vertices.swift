@@ -6,9 +6,10 @@ extension RenderCommand {
         var vertices = [SpineVertex]()
         
         let indices = indices
-        let positions = positions
-        let uvs = uvs
-        let colors = colors
+        let numVertices = numVertices
+        let positions = positions(numVertices: numVertices)
+        let uvs = uvs(numVertices: numVertices)
+        let colors = colors(numVertices: numVertices)
         
         for i in 0..<indices.count {
             let index = Int(indices[i])

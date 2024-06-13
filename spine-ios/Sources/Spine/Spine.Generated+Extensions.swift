@@ -213,19 +213,19 @@ public extension RenderCommand {
         Int(spine_render_command_get_num_vertices(wrappee))
     }
     
-    var positions: [Float] {
+    func positions(numVertices: Int) -> [Float] {
         let num = numVertices * 2
         let ptr = spine_render_command_get_positions(wrappee)
         return (0..<num).compactMap { ptr?[$0] }
     }
     
-    var uvs: [Float] {
+    func uvs(numVertices: Int) -> [Float] {
         let num = numVertices * 2
         let ptr = spine_render_command_get_uvs(wrappee)
         return (0..<num).compactMap { ptr?[$0] }
     }
     
-    var colors: [Int32] {
+    func colors(numVertices: Int) ->[Int32] {
         let num = numVertices
         let ptr = spine_render_command_get_colors(wrappee)
         return (0..<num).compactMap { ptr?[$0] }

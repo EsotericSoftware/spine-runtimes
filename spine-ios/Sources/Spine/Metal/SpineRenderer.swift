@@ -36,16 +36,25 @@ final class SpineRenderer: NSObject, MTKViewDelegate {
     private var lastDraw: CFTimeInterval = 0
     private var pipelineStatesByBlendMode = [Int: MTLRenderPipelineState]()
     
+    private static let numberOfBuffers = 3
+    private static let defaultBufferSize = 32 * 1024 // 32KB
+    
+    private var buffers = [MTLBuffer]()
+    private let bufferingSemaphore = DispatchSemaphore(value: SpineRenderer.numberOfBuffers)
+    private var currentBufferIndex: Int = 0
+    
     weak var dataSource: SpineRendererDataSource?
     weak var delegate: SpineRendererDelegate?
     
     init(
-        spineView: SpineUIView,
+        device: MTLDevice,
+        commandQueue: MTLCommandQueue,
+        pixelFormat: MTLPixelFormat,
         atlasPages: [UIImage],
         pma: Bool
     ) throws {
-        let device = spineView.device!
         self.device = device
+        self.commandQueue = commandQueue
         
         let bundle: Bundle
         #if SWIFT_PACKAGE // SPM
@@ -78,14 +87,17 @@ final class SpineRenderer: NSObject, MTKViewDelegate {
             let descriptor = MTLRenderPipelineDescriptor()
             descriptor.vertexFunction = defaultLibrary.makeFunction(name: "vertexShader")
             descriptor.fragmentFunction = defaultLibrary.makeFunction(name: "fragmentShader")
-            descriptor.colorAttachments[0].pixelFormat = spineView.colorPixelFormat
+            descriptor.colorAttachments[0].pixelFormat = pixelFormat
             descriptor.colorAttachments[0].apply(
                 blendMode: blendMode,
                 with: pma
             )
             pipelineStatesByBlendMode[Int(blendMode.rawValue)] = try device.makeRenderPipelineState(descriptor: descriptor)
         }
-        commandQueue = device.makeCommandQueue()!
+        
+        super.init()
+                
+        increaseBuffersSize(to: SpineRenderer.defaultBufferSize)
     }
     
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
@@ -108,6 +120,11 @@ final class SpineRenderer: NSObject, MTKViewDelegate {
         
         callNeedsUpdate()
         
+        // Tripple Buffering
+        // Source: https://developer.apple.com/library/archive/documentation/3DDrawing/Conceptual/MTLBestPracticesGuide/TripleBuffering.html#//apple_ref/doc/uid/TP40016642-CH5-SW1
+        bufferingSemaphore.wait()
+        currentBufferIndex = (currentBufferIndex + 1) % SpineRenderer.numberOfBuffers
+        
         guard let renderCommands = dataSource?.renderCommands(self),
               let commandBuffer = commandQueue.makeCommandBuffer(),
               let renderPassDescriptor = view.currentRenderPassDescriptor,
@@ -116,18 +133,17 @@ final class SpineRenderer: NSObject, MTKViewDelegate {
         }
         
         delegate?.spineRendererWillDraw(self)
-        for renderCommand in renderCommands {
-            draw(renderCommand: renderCommand, renderEncoder: renderEncoder, in: view)
-        }
+        draw(renderCommands: renderCommands, renderEncoder: renderEncoder, in: view)
         delegate?.spineRendererDidDraw(self)
         
         renderEncoder.endEncoding()
         view.currentDrawable.flatMap {
             commandBuffer.present($0)
         }
+        commandBuffer.addCompletedHandler { [bufferingSemaphore] _ in
+            bufferingSemaphore.signal()
+        }
         commandBuffer.commit()
-        
-        commandBuffer.waitUntilCompleted()
     }
     
     private func setTransform(bounds: CGRect, mode: Spine.ContentMode, alignment: Spine.Alignment) {
@@ -176,17 +192,23 @@ final class SpineRenderer: NSObject, MTKViewDelegate {
         delegate?.spineRendererDidUpdate(self)
     }
     
-    private func draw(renderCommand: RenderCommand, renderEncoder: MTLRenderCommandEncoder, in view: MTKView) {
-        let vertices = Array(renderCommand.getVertices())
+    private func draw(renderCommands: [RenderCommand], renderEncoder: MTLRenderCommandEncoder, in view: MTKView) {
+        let allVertices = renderCommands.map { renderCommand in
+            Array(renderCommand.getVertices())
+        }
+        let vertices = allVertices.flatMap { $0 }
+        let verticesSize = MemoryLayout<SpineVertex>.stride * vertices.count
         
-        guard !vertices.isEmpty else {
+        guard verticesSize > 0 else {
             return
         }
-        let verticesBufferSize = MemoryLayout<SpineVertex>.stride * vertices.count
         
-        guard let vertexBuffer = device.makeBuffer(length: verticesBufferSize, options: .storageModeShared),
-            let pipelineState = getPipelineState(blendMode: renderCommand.blendMode) else {
-            return
+        var vertexBuffer = buffers[currentBufferIndex]
+        var vertexBufferSize = vertexBuffer.length
+        
+        if vertexBufferSize < verticesSize {
+            increaseBuffersSize(to: verticesSize)
+            vertexBuffer = buffers[currentBufferIndex]
         }
         
         renderEncoder.setViewport(
@@ -199,9 +221,8 @@ final class SpineRenderer: NSObject, MTKViewDelegate {
                 zfar: 1.0
             )
         )
-        renderEncoder.setRenderPipelineState(pipelineState)
         
-        memcpy(vertexBuffer.contents(), vertices, verticesBufferSize)
+        memcpy(vertexBuffer.contents(), vertices, verticesSize)
         
         renderEncoder.setVertexBuffer(
             vertexBuffer,
@@ -219,23 +240,42 @@ final class SpineRenderer: NSObject, MTKViewDelegate {
             index: Int(SpineVertexInputIndexViewportSize.rawValue)
         )
         
-        let textureIndex = Int(renderCommand.atlasPage)
-        if textures.indices.contains(textureIndex) {
-            renderEncoder.setFragmentTexture(
-                textures[textureIndex],
-                index: Int(SpineTextureIndexBaseColor.rawValue)
+        // Buffer Bindings
+        // https://developer.apple.com/library/archive/documentation/3DDrawing/Conceptual/MTLBestPracticesGuide/BufferBindings.html#//apple_ref/doc/uid/TP40016642-CH28-SW3
+        var vertexStart = 0
+        for (index, renderCommand) in renderCommands.enumerated() {
+            guard let pipelineState = getPipelineState(blendMode: renderCommand.blendMode) else {
+                continue
+            }
+            renderEncoder.setRenderPipelineState(pipelineState)
+            
+            let vertices = allVertices[index]
+            
+            let textureIndex = Int(renderCommand.atlasPage)
+            if textures.indices.contains(textureIndex) {
+                renderEncoder.setFragmentTexture(
+                    textures[textureIndex],
+                    index: Int(SpineTextureIndexBaseColor.rawValue)
+                )
+            }
+            
+            renderEncoder.drawPrimitives(
+                type: .triangle,
+                vertexStart: vertexStart,
+                vertexCount: vertices.count
             )
+            vertexStart += vertices.count
         }
-        
-        renderEncoder.drawPrimitives(
-            type: .triangle,
-            vertexStart: 0,
-            vertexCount: vertices.count
-        )
     }
     
     private func getPipelineState(blendMode: BlendMode) -> MTLRenderPipelineState? {
         pipelineStatesByBlendMode[Int(blendMode.rawValue)]
+    }
+    
+    private func increaseBuffersSize(to size: Int) {
+        buffers = (0 ..< SpineRenderer.numberOfBuffers).map { _ in
+            device.makeBuffer(length: size, options: .storageModeShared)!
+        }
     }
 }
 

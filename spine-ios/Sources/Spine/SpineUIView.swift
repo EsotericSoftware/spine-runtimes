@@ -24,12 +24,10 @@ public final class SpineUIView: MTKView {
         self.alignment = alignment
         self.boundsProvider = boundsProvider
         
-        super.init(frame: .zero, device: MTLCreateSystemDefaultDevice())
+        super.init(frame: .zero, device: SpineObjects.shared.device)
         clearColor = MTLClearColor(backgroundColor)
         isOpaque = backgroundColor != .clear
     }
-    
-    
     
     public convenience init(
         from source: SpineViewSource,
@@ -119,7 +117,13 @@ extension SpineUIView {
     }
     
     private func initRenderer(atlasPages: [UIImage]) throws {
-        renderer = try SpineRenderer(spineView: self, atlasPages: atlasPages, pma: controller.drawable.atlas.isPma)
+        renderer = try SpineRenderer(
+            device: SpineObjects.shared.device,
+            commandQueue: SpineObjects.shared.commandQueue,
+            pixelFormat: colorPixelFormat,
+            atlasPages: atlasPages,
+            pma: controller.drawable.atlas.isPma
+        )
         renderer?.delegate = controller
         renderer?.dataSource = controller
         renderer?.mtkView(self, drawableSizeWillChange: drawableSize)
