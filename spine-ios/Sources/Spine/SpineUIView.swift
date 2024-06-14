@@ -188,7 +188,12 @@ public final class SpineUIView: MTKView {
     /// Disable or enable rendering. Disable it when the spine view is out of bounds and you want to preserve CPU/GPU resources.
     public var isRendering: Bool {
         get { !super.isPaused }
-        set { super.isPaused = !newValue }
+        set {
+            super.isPaused = !newValue
+            if !isPaused {
+                renderer?.lastDraw = CACurrentMediaTime()
+            }
+        }
     }
 }
 

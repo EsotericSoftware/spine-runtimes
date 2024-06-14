@@ -22,6 +22,8 @@ public extension SkeletonDrawableWrapper {
         spineView.contentScaleFactor = scaleFactor
         
         try spineView.load(drawable: self)
+        spineView.renderer?.waitUntilCompleted = true
+        
         spineView.delegate?.draw(in: spineView)
         
         guard let texture = spineView.currentDrawable?.texture else {
