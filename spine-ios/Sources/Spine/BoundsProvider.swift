@@ -2,13 +2,13 @@ import Foundation
 import CoreGraphics
 
 /// Base class for bounds providers. A bounds provider calculates the axis aligned bounding box
-/// used to scale and fit a skeleton inside the bounds of a [SpineWidget].
-@objc
+/// used to scale and fit a skeleton inside the bounds of a ``SpineUIView``.
+@objc(SpineBoundsProvider)
 public protocol BoundsProvider {
     func computeBounds(for drawable: SkeletonDrawableWrapper) -> CGRect
 }
 
-/// A [BoundsProvider] that calculates the bounding box of the skeleton based on the visible
+/// A ``BoundsProvider`` that calculates the bounding box of the skeleton based on the visible
 /// attachments in the setup pose.
 @objc(SpineSetupPoseBounds)
 @objcMembers
@@ -23,7 +23,7 @@ public final class SetupPoseBounds: NSObject, BoundsProvider {
     }
 }
 
-/// A [BoundsProvider] that returns fixed bounds.
+/// A ``BoundsProvider`` that returns fixed bounds.
 @objc(SpineRawBounds)
 @objcMembers
 public final class RawBounds: NSObject, BoundsProvider {
@@ -45,7 +45,7 @@ public final class RawBounds: NSObject, BoundsProvider {
     }
 }
 
-/// A [BoundsProvider] that calculates the bounding box needed for a combination of skins
+/// A ``BoundsProvider`` that calculates the bounding box needed for a combination of skins
 /// and an animation.
 @objc(SpineSkinAndAnimationBounds)
 @objcMembers
@@ -55,9 +55,9 @@ public final class SkinAndAnimationBounds: NSObject, BoundsProvider {
     private let skins: [String]
     private let stepTime: TimeInterval;
 
-    /// Constructs a new provider that will use the given [skins] and [animation] to calculate
+    /// Constructs a new provider that will use the given `skins` and `animation` to calculate
     /// the bounding box of the skeleton. If no skins are given, the default skin is used.
-    /// The [stepTime], given in seconds, defines at what interval the bounds should be sampled
+    /// The `stepTime`, given in seconds, defines at what interval the bounds should be sampled
     /// across the entire animation.
     public init(animation: String? = nil, skins: [String]? = nil, let stepTime: TimeInterval = 0.1) {
         self.animation = animation
@@ -119,12 +119,14 @@ public final class SkinAndAnimationBounds: NSObject, BoundsProvider {
       }
 }
 
+/// How a view should be inscribed into another view.
 @objc
 public enum ContentMode: Int {
-    case fit
-    case fill
+    case fit /// As large as possible while still containing the source view entirely within the target view.
+    case fill /// Fill the target view by distorting the source's aspect ratio.
 }
 
+/// How a view should aligned withing another view.
 @objc
 public enum Alignment: Int {
     case topLeft
@@ -137,7 +139,7 @@ public enum Alignment: Int {
     case bottomCenter
     case bottomRight
     
-    public var x: CGFloat {
+    internal var x: CGFloat {
         switch self {
         case .topLeft, .centerLeft, .bottomLeft: return -1.0
         case .topCenter, .center, .bottomCenter: return 0.0
@@ -145,7 +147,7 @@ public enum Alignment: Int {
         }
     }
     
-    public var y: CGFloat {
+    internal var y: CGFloat {
         switch self {
         case .topLeft, .topCenter, .topRight: return -1.0
         case .centerLeft, .center, .centerRight: return 0.0

@@ -57,5 +57,5 @@ struct DisableRendering: View {
 }
 
 #Preview {
-    SimpleAnimation()
+    DisableRendering()
 }

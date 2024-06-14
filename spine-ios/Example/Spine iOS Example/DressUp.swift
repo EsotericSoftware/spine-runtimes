@@ -89,7 +89,8 @@ final class DressUpModel: ObservableObject {
                     try skin.name.flatMap { skinName in
                         self.skinImages[skinName] = try drawable.renderToImage(
                             size: self.thumbnailSize,
-                            backgroundColor: .white
+                            backgroundColor: .white,
+                            scaleFactor: UIScreen.main.scale
                         )
                         self.selectedSkins[skinName] = false
                     }

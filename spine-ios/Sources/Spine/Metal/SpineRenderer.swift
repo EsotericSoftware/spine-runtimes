@@ -17,7 +17,7 @@ protocol SpineRendererDataSource: AnyObject {
     func renderCommands(_ spineRenderer: SpineRenderer) -> [RenderCommand]
 }
 
-final class SpineRenderer: NSObject, MTKViewDelegate {
+internal final class SpineRenderer: NSObject, MTKViewDelegate {
     
     private let device: MTLDevice
     private let textures: [MTLTexture]
@@ -42,7 +42,7 @@ final class SpineRenderer: NSObject, MTKViewDelegate {
     weak var dataSource: SpineRendererDataSource?
     weak var delegate: SpineRendererDelegate?
     
-    init(
+    internal init(
         device: MTLDevice,
         commandQueue: MTLCommandQueue,
         pixelFormat: MTLPixelFormat,

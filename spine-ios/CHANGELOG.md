@@ -20,3 +20,4 @@
 - Metal Best Practices (#16)
 - Annotate functions that should return optional (#17)
 - Add option to disable drawing when out of viewport (#18)
+- Add docs for public Spine classes/methods (#19)
