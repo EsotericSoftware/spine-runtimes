@@ -291,6 +291,7 @@ export class SpinePlayer implements Disposable {
 
 	private validateConfig (config: SpinePlayerConfig) {
 		if (!config) throw new Error("A configuration object must be passed to to new SpinePlayer().");
+		if ((config as any).skelUrl) config.skeleton = (config as any).skelUrl;
 		if (!config.skeleton && !config.jsonUrl && !config.binaryUrl) throw new Error("A URL must be specified for the skeleton JSON or binary file.");
 		if (!config.scale) config.scale = 1;
 		if (!config.atlas && !config.atlasUrl) throw new Error("A URL must be specified for the atlas file.");
