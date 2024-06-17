@@ -99,6 +99,7 @@ export class DarkSlotMesh extends DarkTintMesh implements ISlotMesh {
 			this.tint = DarkSlotMesh.auxColor;
 		}
 		this.blendMode = SpineTexture.toPixiBlending(slotBlendMode);
+		this.alpha = DarkSlotMesh.auxColor[3];
 
 		if (this.geometry.indexBuffer.data.length !== finalIndices.length) {
 			this.geometry.indexBuffer.data = new Uint32Array(finalIndices);

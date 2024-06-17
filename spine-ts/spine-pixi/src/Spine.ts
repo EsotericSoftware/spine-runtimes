@@ -338,6 +338,20 @@ export class Spine extends Container {
 			pixiObject.mask = null;
 		}
 	}
+
+	/* 
+	* Colors in pixi are premultiplied.
+	* Pixi blending modes are modified to work with premultiplied colors. We cannot create custom blending modes.
+	* Textures are loaded as premultiplied (see assers/atlasLoader.ts: alphaMode: `page.pma ? ALPHA_MODES.PMA : ALPHA_MODES.UNPACK`):
+	* - textures non premultiplied are premultiplied on GPU on upload
+	* - textures premultiplied are uploaded on GPU as is since they are already premultiplied
+	* 
+	* We need to take this into consideration and calculates final colors for both light and dark color as if textures were always premultiplied.
+	* This implies for example that alpha for dark tint is always 1. This is way in DarkTintRenderer we have only the alpha of the light color.
+	* We implies alpha of dark color as 1 and just respective alpha byte to 1.
+	* (see DarkTintRenderer: const darkargb = (0xFF << 24) | darkTintRGB;)
+	* If we ever want to load texture as non premultiplied on GPU, we must add a new dark alpha parameter to the TintMaterial and set the alpha.
+	*/
 	private renderMeshes (): void {
 		this.resetMeshes();
 
@@ -403,15 +417,20 @@ export class Spine extends Container {
 				const slotColor = slot.color;
 				const alpha = skeletonColor.a * slotColor.a * attachmentColor.a;
 				this.lightColor.set(
-					skeletonColor.r * slotColor.r * attachmentColor.r,
-					skeletonColor.g * slotColor.g * attachmentColor.g,
-					skeletonColor.b * slotColor.b * attachmentColor.b,
+					skeletonColor.r * slotColor.r * attachmentColor.r * alpha,
+					skeletonColor.g * slotColor.g * attachmentColor.g * alpha,
+					skeletonColor.b * slotColor.b * attachmentColor.b * alpha,
 					alpha
 				);
 				if (slot.darkColor != null) {
-					this.darkColor.setFromColor(slot.darkColor);
+					this.darkColor.set(
+						slot.darkColor.r * alpha,
+						slot.darkColor.g * alpha,
+						slot.darkColor.b * alpha,
+						1,
+					);
 				} else {
-					this.darkColor.set(0, 0, 0, 0);
+					this.darkColor.set(0, 0, 0, 1);
 				}
 
 				let finalVertices: NumberArrayLike;
@@ -443,6 +462,7 @@ export class Spine extends Container {
 							verts[tempV++] = this.darkColor.r;
 							verts[tempV++] = this.darkColor.g;
 							verts[tempV++] = this.darkColor.b;
+							verts[tempV++] = this.darkColor.a;
 						}
 					}
 					finalVertices = this.verticesCache;
