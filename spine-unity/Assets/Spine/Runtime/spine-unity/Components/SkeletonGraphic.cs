@@ -77,7 +77,9 @@ namespace Spine.Unity {
 		public float timeScale = 1f;
 		public bool freeze;
 		protected float meshScale = 1f;
+		protected Vector2 meshOffset = Vector2.zero;
 		public float MeshScale { get { return meshScale; } }
+		public Vector2 MeshOffset { get { return meshOffset; } }
 
 		public enum LayoutMode {
 			None = 0,
@@ -88,6 +90,8 @@ namespace Spine.Unity {
 		}
 		public LayoutMode layoutScaleMode = LayoutMode.None;
 		[SerializeField] protected Vector2 referenceSize = Vector2.one;
+		/// <summary>Offset relative to the pivot position, before potential layout scale is applied.</summary>
+		[SerializeField] protected Vector2 pivotOffset = Vector2.zero;
 		[SerializeField] protected float referenceScale = 1f;
 #if UNITY_EDITOR
 		protected LayoutMode previousLayoutScaleMode = LayoutMode.None;
@@ -939,10 +943,19 @@ namespace Spine.Unity {
 			meshScale = (canvas == null) ? 100 : canvas.referencePixelsPerUnit;
 			if (layoutScaleMode != LayoutMode.None) {
 				meshScale *= referenceScale;
-				if (!EditReferenceRect)
-					meshScale *= GetLayoutScale(layoutScaleMode);
+				float layoutScale = GetLayoutScale(layoutScaleMode);
+				if (!EditReferenceRect) {
+					meshScale *= layoutScale;
+				}
+				meshOffset = pivotOffset * layoutScale;
+			} else {
+				meshOffset = pivotOffset;
 			}
-			meshGenerator.ScaleVertexData(meshScale);
+			if (meshOffset == Vector2.zero)
+				meshGenerator.ScaleVertexData(meshScale);
+			else
+				meshGenerator.ScaleAndOffsetVertexData(meshScale, meshOffset);
+
 			if (OnPostProcessVertices != null) OnPostProcessVertices.Invoke(this.meshGenerator.Buffers);
 
 			Mesh mesh = smartMesh.mesh;
@@ -1030,8 +1043,13 @@ namespace Spine.Unity {
 			meshScale = (canvas == null) ? 100 : canvas.referencePixelsPerUnit;
 			if (layoutScaleMode != LayoutMode.None) {
 				meshScale *= referenceScale;
-				if (!EditReferenceRect)
-					meshScale *= GetLayoutScale(layoutScaleMode);
+				float layoutScale = GetLayoutScale(layoutScaleMode);
+				if (!EditReferenceRect) {
+					meshScale *= layoutScale;
+				}
+				meshOffset = pivotOffset * layoutScale;
+			} else {
+				meshOffset = pivotOffset;
 			}
 			// Generate meshes.
 			int submeshCount = currentInstructions.submeshInstructions.Count;
@@ -1052,7 +1070,10 @@ namespace Spine.Unity {
 				meshGenerator.AddSubmesh(submeshInstructionItem);
 
 				Mesh targetMesh = meshesItems[i];
-				meshGenerator.ScaleVertexData(meshScale);
+				if (meshOffset == Vector2.zero)
+					meshGenerator.ScaleVertexData(meshScale);
+				else
+					meshGenerator.ScaleAndOffsetVertexData(meshScale, meshOffset);
 				if (OnPostProcessVertices != null) OnPostProcessVertices.Invoke(this.meshGenerator.Buffers);
 				meshGenerator.FillVertexData(targetMesh);
 				meshGenerator.FillTriangles(targetMesh);
@@ -1351,9 +1372,9 @@ namespace Spine.Unity {
 					SetRectTransformSize(this, rectTransformSize);
 				}
 			}
-			if (editReferenceRect || layoutScaleMode == LayoutMode.None) {
+			if (editReferenceRect || layoutScaleMode == LayoutMode.None)
 				referenceSize = GetCurrentRectSize();
-			}
+
 			previousLayoutScaleMode = layoutScaleMode;
 		}
 
@@ -1374,13 +1395,7 @@ namespace Spine.Unity {
 			float referenceAspect = referenceSize.x / referenceSize.y;
 			Vector2 newSize = GetCurrentRectSize();
 
-			LayoutMode mode = previousLayoutScaleMode;
-			float frameAspect = newSize.x / newSize.y;
-			if (mode == LayoutMode.FitInParent)
-				mode = frameAspect > referenceAspect ? LayoutMode.HeightControlsWidth : LayoutMode.WidthControlsHeight;
-			else if (mode == LayoutMode.EnvelopeParent)
-				mode = frameAspect > referenceAspect ? LayoutMode.WidthControlsHeight : LayoutMode.HeightControlsWidth;
-
+			LayoutMode mode = GetEffectiveLayoutMode(previousLayoutScaleMode);
 			if (mode == LayoutMode.WidthControlsHeight)
 				newSize.y = newSize.x / referenceAspect;
 			else if (mode == LayoutMode.HeightControlsWidth)
@@ -1391,9 +1406,36 @@ namespace Spine.Unity {
 		public Vector2 GetReferenceRectSize () {
 			return referenceSize * GetLayoutScale(layoutScaleMode);
 		}
-#endif
 
+		public Vector2 GetPivotOffset () {
+			return pivotOffset;
+		}
+
+		public Vector2 GetScaledPivotOffset () {
+			return pivotOffset * GetLayoutScale(layoutScaleMode);
+		}
+
+		public void SetScaledPivotOffset (Vector2 pivotOffsetScaled) {
+			pivotOffset = pivotOffsetScaled / GetLayoutScale(layoutScaleMode);
+		}
+#endif
 		protected float GetLayoutScale (LayoutMode mode) {
+			Vector2 currentSize = GetCurrentRectSize();
+			mode = GetEffectiveLayoutMode(mode);
+			if (mode == LayoutMode.WidthControlsHeight) {
+				return currentSize.x / referenceSize.x;
+			} else if (mode == LayoutMode.HeightControlsWidth) {
+				return currentSize.y / referenceSize.y;
+			}
+			return 1f;
+		}
+
+		/// <summary>
+		/// <c>LayoutMode FitInParent</c> and <c>EnvelopeParent</c> actually result in
+		/// <c>HeightControlsWidth</c> or <c>WidthControlsHeight</c> depending on the actual vs reference aspect ratio.
+		/// This method returns the respective <c>LayoutMode</c> of the two for any given input <c>mode</c>.
+		/// </summary>
+		protected LayoutMode GetEffectiveLayoutMode (LayoutMode mode) {
 			Vector2 currentSize = GetCurrentRectSize();
 			float referenceAspect = referenceSize.x / referenceSize.y;
 			float frameAspect = currentSize.x / currentSize.y;
@@ -1401,13 +1443,7 @@ namespace Spine.Unity {
 				mode = frameAspect > referenceAspect ? LayoutMode.HeightControlsWidth : LayoutMode.WidthControlsHeight;
 			else if (mode == LayoutMode.EnvelopeParent)
 				mode = frameAspect > referenceAspect ? LayoutMode.WidthControlsHeight : LayoutMode.HeightControlsWidth;
-
-			if (mode == LayoutMode.WidthControlsHeight) {
-				return currentSize.x / referenceSize.x;
-			} else if (mode == LayoutMode.HeightControlsWidth) {
-				return currentSize.y / referenceSize.y;
-			}
-			return 1f;
+			return mode;
 		}
 
 		private Vector2 GetCurrentRectSize () {

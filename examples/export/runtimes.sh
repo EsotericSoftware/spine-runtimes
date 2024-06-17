@@ -489,6 +489,7 @@ rm "$ROOT/spine-ts/spine-pixi/example/assets/"*
 cp -f ../raptor/export/raptor-pro.json "$ROOT/spine-ts/spine-pixi/example/assets/"
 cp -f ../raptor/export/raptor.atlas "$ROOT/spine-ts/spine-pixi/example/assets/"
 cp -f ../raptor/export/raptor.png "$ROOT/spine-ts/spine-pixi/example/assets/"
+cp -f ../raptor/images/raptor-jaw-tooth.png "$ROOT/spine-ts/spine-pixi/example/assets/"
 
 cp -f ../spineboy/export/spineboy-pro.json "$ROOT/spine-ts/spine-pixi/example/assets/"
 cp -f ../spineboy/export/spineboy-pro.skel "$ROOT/spine-ts/spine-pixi/example/assets/"
