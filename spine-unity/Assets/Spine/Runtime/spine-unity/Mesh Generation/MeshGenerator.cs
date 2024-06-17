@@ -43,6 +43,22 @@
 // Important Note: When disabling this define, also disable the one in SkeletonRenderInstruction.cs
 #define SLOT_ALPHA_DISABLES_ATTACHMENT
 
+// Note: This define below enables a bugfix where when Linear color space is used and `PMA vertex colors` enabled,
+// additive slots add a too dark (too transparent) color value.
+//
+// If you want the old incorrect behaviour (darker additive slots) or are not using Linear but Gamma color space,
+// you can comment-out the define below to deactivate the fix or just to skip unnecessary instructions.
+//
+// Details:
+// Alpha-premultiplication of vertex colors happens in gamma-space, and vertexColor.a is set to 0 at additive slots.
+// In the shader, gamma space vertex color has to be transformed from gamma space to linear space.
+// Unfortunately vertexColorGamma.rgb=(rgb*a) while the desired color in linear space would be
+// vertexColorLinear.rgb = GammaToLinear(rgb)*a = GammaToLinear(vertexColorGamma.rgb/a),
+// but unfortunately 'a' is unknown as vertexColorGamma.a = 0 at additive slots.
+// Thus the define below enables a fix where 'a' is transformed via
+// a=LinearToGamma(a), so that the subsequent GammaToLinear() operation is canceled out on 'a'.
+#define LINEAR_COLOR_SPACE_FIX_ADDITIVE_ALPHA
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -549,6 +565,10 @@ namespace Spine.Unity {
 			float zSpacing = settings.zSpacing;
 			bool pmaVertexColors = settings.pmaVertexColors;
 			bool tintBlack = settings.tintBlack;
+#if LINEAR_COLOR_SPACE_FIX_ADDITIVE_ALPHA
+			bool linearColorSpace = QualitySettings.activeColorSpace == ColorSpace.Linear;
+#endif
+
 #if SPINE_TRIANGLECHECK
 			bool useClipping = settings.useClipping && instruction.hasClipping;
 #else
@@ -620,16 +640,21 @@ namespace Spine.Unity {
 
 				float tintBlackAlpha = 1.0f;
 				if (pmaVertexColors) {
-					float colorA = skeletonA * slot.A * c.a;
-					color.a = (byte)(colorA * 255);
+					float alpha = skeletonA * slot.A * c.a;
+					bool isAdditiveSlot = slot.Data.BlendMode == BlendMode.Additive;
+#if LINEAR_COLOR_SPACE_FIX_ADDITIVE_ALPHA
+					if (linearColorSpace && isAdditiveSlot)
+						alpha = Mathf.LinearToGammaSpace(alpha); // compensate GammaToLinear performed in shader
+#endif
+					color.a = (byte)(alpha * 255);
 					color.r = (byte)(skeletonR * slot.R * c.r * color.a);
 					color.g = (byte)(skeletonG * slot.G * c.g * color.a);
 					color.b = (byte)(skeletonB * slot.B * c.b * color.a);
 					if (canvasGroupTintBlack) {
-						tintBlackAlpha = (slot.Data.BlendMode == BlendMode.Additive) ? 0 : colorA;
+						tintBlackAlpha = isAdditiveSlot ? 0 : alpha;
 						color.a = 255;
 					} else {
-						if (slot.Data.BlendMode == BlendMode.Additive)
+						if (isAdditiveSlot)
 							color.a = 0;
 					}
 				} else {
@@ -656,6 +681,11 @@ namespace Spine.Unity {
 						float b2 = slot.B2;
 						if (pmaVertexColors) {
 							float alpha = skeletonA * slot.A * c.a;
+#if LINEAR_COLOR_SPACE_FIX_ADDITIVE_ALPHA
+							bool isAdditiveSlot = slot.Data.BlendMode == BlendMode.Additive;
+							if (linearColorSpace && isAdditiveSlot)
+								alpha = Mathf.LinearToGammaSpace(alpha); // compensate GammaToLinear performed in shader
+#endif
 							r2 *= alpha;
 							g2 *= alpha;
 							b2 *= alpha;
@@ -767,6 +797,9 @@ namespace Spine.Unity {
 			bool canvasGroupTintBlack = settings.tintBlack && settings.canvasGroupCompatible;
 			int totalVertexCount = instruction.rawVertexCount;
 
+#if LINEAR_COLOR_SPACE_FIX_ADDITIVE_ALPHA
+			bool linearColorSpace = QualitySettings.activeColorSpace == ColorSpace.Linear;
+#endif
 			// Add data to vertex buffers
 			{
 				if (totalVertexCount > vertexBuffer.Items.Length) { // Manual ExposedList.Resize()
@@ -830,10 +863,15 @@ namespace Spine.Unity {
 						if (regionAttachment != null) {
 							if (settings.pmaVertexColors) {
 								float alpha = a * slot.A * regionAttachment.A;
+								bool isAdditiveSlot = slot.Data.BlendMode == BlendMode.Additive;
+#if LINEAR_COLOR_SPACE_FIX_ADDITIVE_ALPHA
+								if (linearColorSpace && isAdditiveSlot)
+									alpha = Mathf.LinearToGammaSpace(alpha); // compensate GammaToLinear performed in shader
+#endif
 								rg.x *= alpha;
 								rg.y *= alpha;
 								b2.x *= alpha;
-								b2.y = slot.Data.BlendMode == BlendMode.Additive ? 0 : alpha;
+								b2.y = isAdditiveSlot ? 0 : alpha;
 							}
 							uv2i[vi] = rg; uv2i[vi + 1] = rg; uv2i[vi + 2] = rg; uv2i[vi + 3] = rg;
 							uv3i[vi] = b2; uv3i[vi + 1] = b2; uv3i[vi + 2] = b2; uv3i[vi + 3] = b2;
@@ -843,10 +881,15 @@ namespace Spine.Unity {
 							if (meshAttachment != null) {
 								if (settings.pmaVertexColors) {
 									float alpha = a * slot.A * meshAttachment.A;
+									bool isAdditiveSlot = slot.Data.BlendMode == BlendMode.Additive;
+#if LINEAR_COLOR_SPACE_FIX_ADDITIVE_ALPHA
+									if (linearColorSpace && isAdditiveSlot)
+										alpha = Mathf.LinearToGammaSpace(alpha); // compensate GammaToLinear performed in shader
+#endif
 									rg.x *= alpha;
 									rg.y *= alpha;
 									b2.x *= alpha;
-									b2.y = slot.Data.BlendMode == BlendMode.Additive ? 0 : alpha;
+									b2.y = isAdditiveSlot ? 0 : alpha;
 								}
 								int verticesArrayLength = meshAttachment.WorldVerticesLength;
 								for (int iii = 0; iii < verticesArrayLength; iii += 2) {
@@ -883,12 +926,18 @@ namespace Spine.Unity {
 						vbi[vertexIndex + 3].x = x3; vbi[vertexIndex + 3].y = y3; vbi[vertexIndex + 3].z = z;
 
 						if (settings.pmaVertexColors) {
-							color.a = (byte)(a * slot.A * regionAttachment.A * 255);
+							float alpha = a * slot.A * regionAttachment.A;
+							bool isAdditiveSlot = slot.Data.BlendMode == BlendMode.Additive;
+#if LINEAR_COLOR_SPACE_FIX_ADDITIVE_ALPHA
+							if (linearColorSpace && isAdditiveSlot)
+								alpha = Mathf.LinearToGammaSpace(alpha); // compensate GammaToLinear performed in shader
+#endif
+							color.a = (byte)(alpha * 255);
 							color.r = (byte)(r * slot.R * regionAttachment.R * color.a);
 							color.g = (byte)(g * slot.G * regionAttachment.G * color.a);
 							color.b = (byte)(b * slot.B * regionAttachment.B * color.a);
 							if (canvasGroupTintBlack) color.a = 255;
-							else if (slot.Data.BlendMode == BlendMode.Additive) color.a = 0;
+							else if (isAdditiveSlot) color.a = 0;
 
 						} else {
 							color.a = (byte)(a * slot.A * regionAttachment.A * 255);
@@ -932,12 +981,18 @@ namespace Spine.Unity {
 							meshAttachment.ComputeWorldVertices(slot, tempVerts);
 
 							if (settings.pmaVertexColors) {
-								color.a = (byte)(a * slot.A * meshAttachment.A * 255);
+								float alpha = a * slot.A * meshAttachment.A;
+								bool isAdditiveSlot = slot.Data.BlendMode == BlendMode.Additive;
+#if LINEAR_COLOR_SPACE_FIX_ADDITIVE_ALPHA
+								if (linearColorSpace && isAdditiveSlot)
+									alpha = Mathf.LinearToGammaSpace(alpha); // compensate GammaToLinear performed in shader
+#endif
+								color.a = (byte)(alpha * 255);
 								color.r = (byte)(r * slot.R * meshAttachment.R * color.a);
 								color.g = (byte)(g * slot.G * meshAttachment.G * color.a);
 								color.b = (byte)(b * slot.B * meshAttachment.B * color.a);
 								if (canvasGroupTintBlack) color.a = 255;
-								else if (slot.Data.BlendMode == BlendMode.Additive) color.a = 0;
+								else if (isAdditiveSlot) color.a = 0;
 							} else {
 								color.a = (byte)(a * slot.A * meshAttachment.A * 255);
 								color.r = (byte)(r * slot.R * meshAttachment.R * 255);
