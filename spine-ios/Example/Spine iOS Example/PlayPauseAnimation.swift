@@ -2,7 +2,7 @@ import SwiftUI
 import Spine
 
 struct PlayPauseAnimation: View {
-    
+
     @StateObject
     var controller = SpineController(
         onInitialized: { controller in
@@ -13,13 +13,13 @@ struct PlayPauseAnimation: View {
             )
         }
     )
-    
+
     var body: some View {
         SpineView(
             from: .bundle(atlasFileName: "dragon.atlas", skeletonFileName: "dragon-ess.skel"),
 //            from: .http(
-//                atlasURL: URL(string: "https://github.com/denrase/spine-runtimes/raw/spine-ios/spine-ios/Example/Spine%20iOS%20Example/Assets/dragon/dragon.atlas")!,
-//                skeletonURL:  URL(string: "https://github.com/denrase/spine-runtimes/raw/spine-ios/spine-ios/Example/Spine%20iOS%20Example/Assets/dragon/dragon-ess.skel")!
+//                atlasURL: URL(string: "https://github.com/esotericsoftware/spine-runtimes/raw/spine-ios/spine-ios/Example/Spine%20iOS%20Example/Assets/dragon/dragon.atlas")!,
+//                skeletonURL:  URL(string: "https://github.com/esotericsoftware/spine-runtimes/raw/spine-ios/spine-ios/Example/Spine%20iOS%20Example/Assets/dragon/dragon-ess.skel")!
 //            ),
             controller: controller,
             boundsProvider: SkinAndAnimationBounds(animation: "flying")

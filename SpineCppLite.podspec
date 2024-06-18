@@ -14,7 +14,7 @@ Spine runtimes for iOS.
   s.license             = { :file => 'LICENSE' }
   s.platform            = :ios, '13.0'
 
-  s.source              = { :git => 'https://github.com/denrase/spine-runtimes.git', :branch => 'cocoapods' }
+  s.source              = { :git => 'https://github.com/esotericsoftware/spine-runtimes.git', :branch => 'cocoapods' }
   s.source_files        =  'spine-cpp/spine-cpp/**/*.{h,cpp}', 'spine-cpp/spine-cpp-lite/*.{h,cpp}'
   s.module_map          = 'spine-cpp/spine-cpp-lite/module.modulemap'
   s.pod_target_xcconfig = {

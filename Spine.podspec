@@ -13,11 +13,11 @@ Spine runtimes for iOS.
   s.author           = { "Esoteric Software LLC  " => "https://esotericsoftware.com" }
   s.license          = { :file => 'LICENSE' }
 
-  s.source           = { :git => 'https://github.com/denrase/spine-runtimes.git', :branch => 'cocoapods' }
+  s.source           = { :git => 'https://github.com/esotericsoftware/spine-runtimes.git', :branch => 'cocoapods' }
   s.source_files     = 'spine-ios/Sources/Spine/**/*.{swift,metal}'
   s.platform         = :ios, '13.0'
-  
-  s.xcconfig = { 
+
+  s.xcconfig = {
     'HEADER_SEARCH_PATHS' => '"$(PODS_ROOT)/SpineCppLite/spine-cpp/spine-cpp/include" "$(PODS_ROOT)/SpineCppLite/spine-cpp/spine-cpp-lite"'
   }
 
