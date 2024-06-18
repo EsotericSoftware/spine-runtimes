@@ -59,6 +59,8 @@
 	} name##_wrapper;               \
 	typedef name##_wrapper *name;
 
+// @start: opaque_types
+
 SPINE_OPAQUE_TYPE(spine_skeleton)
 SPINE_OPAQUE_TYPE(spine_skeleton_data)
 SPINE_OPAQUE_TYPE(spine_bone)
@@ -103,7 +105,11 @@ SPINE_OPAQUE_TYPE(spine_skeleton_drawable)
 SPINE_OPAQUE_TYPE(spine_skin_entry)
 SPINE_OPAQUE_TYPE(spine_skin_entries)
 
+// @end: opaque_types
+
 typedef char utf8;
+
+// @start: enums
 
 typedef enum spine_blend_mode {
 	SPINE_BLEND_MODE_NORMAL = 0,
@@ -177,7 +183,11 @@ typedef enum spine_physics {
 
 } spine_physics;
 
+// @end: enums
+
 typedef int32_t spine_bool;
+
+// @start: function_declarations
 
 SPINE_CPP_LITE_EXPORT int32_t spine_major_version();
 SPINE_CPP_LITE_EXPORT int32_t spine_minor_version();
@@ -200,10 +210,13 @@ SPINE_CPP_LITE_EXPORT float spine_vector_get_y(spine_vector vector);
 SPINE_CPP_LITE_EXPORT spine_atlas spine_atlas_load(const utf8 *atlasData);
 SPINE_CPP_LITE_EXPORT int32_t spine_atlas_get_num_image_paths(spine_atlas atlas);
 SPINE_CPP_LITE_EXPORT utf8 *spine_atlas_get_image_path(spine_atlas atlas, int32_t index);
+SPINE_CPP_LITE_EXPORT spine_bool spine_atlas_is_pma(spine_atlas atlas);
 SPINE_CPP_LITE_EXPORT utf8 *spine_atlas_get_error(spine_atlas atlas);
 SPINE_CPP_LITE_EXPORT void spine_atlas_dispose(spine_atlas atlas);
 
+// @ignore
 SPINE_CPP_LITE_EXPORT spine_skeleton_data_result spine_skeleton_data_load_json(spine_atlas atlas, const utf8 *skeletonData);
+// @ignore
 SPINE_CPP_LITE_EXPORT spine_skeleton_data_result spine_skeleton_data_load_binary(spine_atlas atlas, const uint8_t *skeletonData, int32_t length);
 SPINE_CPP_LITE_EXPORT utf8 *spine_skeleton_data_result_get_error(spine_skeleton_data_result result);
 SPINE_CPP_LITE_EXPORT spine_skeleton_data spine_skeleton_data_result_get_data(spine_skeleton_data_result result);
@@ -217,6 +230,7 @@ SPINE_CPP_LITE_EXPORT spine_ik_constraint_data spine_skeleton_data_find_ik_const
 SPINE_CPP_LITE_EXPORT spine_transform_constraint_data spine_skeleton_data_find_transform_constraint(spine_skeleton_data data, const utf8 *name);
 SPINE_CPP_LITE_EXPORT spine_path_constraint_data spine_skeleton_data_find_path_constraint(spine_skeleton_data data, const utf8 *name);
 SPINE_CPP_LITE_EXPORT spine_physics_constraint_data spine_skeleton_data_find_physics_constraint(spine_skeleton_data data, const utf8 *name);
+// @optiona;
 SPINE_CPP_LITE_EXPORT const utf8 *spine_skeleton_data_get_name(spine_skeleton_data data);
 // OMITTED setName()
 SPINE_CPP_LITE_EXPORT int32_t spine_skeleton_data_get_num_bones(spine_skeleton_data data);
@@ -225,6 +239,7 @@ SPINE_CPP_LITE_EXPORT int32_t spine_skeleton_data_get_num_slots(spine_skeleton_d
 SPINE_CPP_LITE_EXPORT spine_slot_data *spine_skeleton_data_get_slots(spine_skeleton_data data);
 SPINE_CPP_LITE_EXPORT int32_t spine_skeleton_data_get_num_skins(spine_skeleton_data data);
 SPINE_CPP_LITE_EXPORT spine_skin *spine_skeleton_data_get_skins(spine_skeleton_data data);
+// @optional
 SPINE_CPP_LITE_EXPORT spine_skin spine_skeleton_data_get_default_skin(spine_skeleton_data data);
 SPINE_CPP_LITE_EXPORT void spine_skeleton_data_set_default_skin(spine_skeleton_data data, spine_skin skin);
 SPINE_CPP_LITE_EXPORT int32_t spine_skeleton_data_get_num_events(spine_skeleton_data data);
@@ -248,7 +263,8 @@ SPINE_CPP_LITE_EXPORT void spine_skeleton_data_set_width(spine_skeleton_data dat
 SPINE_CPP_LITE_EXPORT float spine_skeleton_data_get_height(spine_skeleton_data data);
 SPINE_CPP_LITE_EXPORT void spine_skeleton_data_set_height(spine_skeleton_data data, float height);
 SPINE_CPP_LITE_EXPORT const utf8 *spine_skeleton_data_get_version(spine_skeleton_data data);
-// OMITTED setVersion()
+// OMITTED setVersion() 
+// @ignore
 SPINE_CPP_LITE_EXPORT const utf8 *spine_skeleton_data_get_hash(spine_skeleton_data data);
 // OMITTED setHash()
 SPINE_CPP_LITE_EXPORT const utf8 *spine_skeleton_data_get_images_path(spine_skeleton_data data);
@@ -260,7 +276,9 @@ SPINE_CPP_LITE_EXPORT float spine_skeleton_data_get_fps(spine_skeleton_data data
 SPINE_CPP_LITE_EXPORT float spine_skeleton_data_get_reference_scale(spine_skeleton_data data);
 SPINE_CPP_LITE_EXPORT void spine_skeleton_data_dispose(spine_skeleton_data data);
 
+// @ignore
 SPINE_CPP_LITE_EXPORT spine_skeleton_drawable spine_skeleton_drawable_create(spine_skeleton_data skeletonData);
+// @ignore
 SPINE_CPP_LITE_EXPORT spine_render_command spine_skeleton_drawable_render(spine_skeleton_drawable drawable);
 SPINE_CPP_LITE_EXPORT void spine_skeleton_drawable_dispose(spine_skeleton_drawable drawable);
 SPINE_CPP_LITE_EXPORT spine_skeleton spine_skeleton_drawable_get_skeleton(spine_skeleton_drawable drawable);
@@ -268,8 +286,11 @@ SPINE_CPP_LITE_EXPORT spine_animation_state spine_skeleton_drawable_get_animatio
 SPINE_CPP_LITE_EXPORT spine_animation_state_data spine_skeleton_drawable_get_animation_state_data(spine_skeleton_drawable drawable);
 SPINE_CPP_LITE_EXPORT spine_animation_state_events spine_skeleton_drawable_get_animation_state_events(spine_skeleton_drawable drawable);
 
+// @ignore
 SPINE_CPP_LITE_EXPORT float *spine_render_command_get_positions(spine_render_command command);
+// @ignore
 SPINE_CPP_LITE_EXPORT float *spine_render_command_get_uvs(spine_render_command command);
+// @ignore
 SPINE_CPP_LITE_EXPORT int32_t *spine_render_command_get_colors(spine_render_command command);
 SPINE_CPP_LITE_EXPORT int32_t spine_render_command_get_num_vertices(spine_render_command command);
 SPINE_CPP_LITE_EXPORT uint16_t *spine_render_command_get_indices(spine_render_command command);
@@ -305,6 +326,7 @@ SPINE_CPP_LITE_EXPORT spine_track_entry spine_animation_state_add_animation(spin
 SPINE_CPP_LITE_EXPORT spine_track_entry spine_animation_state_set_empty_animation(spine_animation_state state, int32_t trackIndex, float mixDuration);
 SPINE_CPP_LITE_EXPORT spine_track_entry spine_animation_state_add_empty_animation(spine_animation_state state, int32_t trackIndex, float mixDuration, float delay);
 SPINE_CPP_LITE_EXPORT void spine_animation_state_set_empty_animations(spine_animation_state state, float mixDuration);
+// @optional
 SPINE_CPP_LITE_EXPORT spine_track_entry spine_animation_state_get_current(spine_animation_state state, int32_t trackIndex);
 SPINE_CPP_LITE_EXPORT spine_animation_state_data spine_animation_state_get_data(spine_animation_state state);
 SPINE_CPP_LITE_EXPORT float spine_animation_state_get_time_scale(spine_animation_state state);
@@ -315,11 +337,13 @@ SPINE_CPP_LITE_EXPORT void spine_animation_state_set_time_scale(spine_animation_
 // OMITTED enableQueue()
 // OMITTED setManualTrackEntryDisposal()
 // OMITTED getManualTrackEntryDisposal()
+// @ignore
 SPINE_CPP_LITE_EXPORT void spine_animation_state_dispose_track_entry(spine_animation_state state, spine_track_entry entry);
 
 SPINE_CPP_LITE_EXPORT int32_t spine_animation_state_events_get_num_events(spine_animation_state_events events);
 SPINE_CPP_LITE_EXPORT spine_event_type spine_animation_state_events_get_event_type(spine_animation_state_events events, int32_t index);
 SPINE_CPP_LITE_EXPORT spine_track_entry spine_animation_state_events_get_track_entry(spine_animation_state_events events, int32_t index);
+// @optional
 SPINE_CPP_LITE_EXPORT spine_event spine_animation_state_events_get_event(spine_animation_state_events events, int32_t index);
 SPINE_CPP_LITE_EXPORT void spine_animation_state_events_reset(spine_animation_state_events events);
 
@@ -359,6 +383,7 @@ SPINE_CPP_LITE_EXPORT float spine_track_entry_get_mix_attachment_threshold(spine
 SPINE_CPP_LITE_EXPORT void spine_track_entry_set_mix_attachment_threshold(spine_track_entry entry, float attachmentThreshold);
 SPINE_CPP_LITE_EXPORT float spine_track_entry_get_mix_draw_order_threshold(spine_track_entry entry);
 SPINE_CPP_LITE_EXPORT void spine_track_entry_set_mix_draw_order_threshold(spine_track_entry entry, float drawOrderThreshold);
+// @optional
 SPINE_CPP_LITE_EXPORT spine_track_entry spine_track_entry_get_next(spine_track_entry entry);
 SPINE_CPP_LITE_EXPORT spine_bool spine_track_entry_is_complete(spine_track_entry entry);
 SPINE_CPP_LITE_EXPORT float spine_track_entry_get_mix_time(spine_track_entry entry);
@@ -367,7 +392,9 @@ SPINE_CPP_LITE_EXPORT float spine_track_entry_get_mix_duration(spine_track_entry
 SPINE_CPP_LITE_EXPORT void spine_track_entry_set_mix_duration(spine_track_entry entry, float mixDuration);
 SPINE_CPP_LITE_EXPORT spine_mix_blend spine_track_entry_get_mix_blend(spine_track_entry entry);
 SPINE_CPP_LITE_EXPORT void spine_track_entry_set_mix_blend(spine_track_entry entry, spine_mix_blend mixBlend);
+// @optional
 SPINE_CPP_LITE_EXPORT spine_track_entry spine_track_entry_get_mixing_from(spine_track_entry entry);
+// @optional
 SPINE_CPP_LITE_EXPORT spine_track_entry spine_track_entry_get_mixing_to(spine_track_entry entry);
 SPINE_CPP_LITE_EXPORT void spine_track_entry_reset_rotation_directions(spine_track_entry entry);
 SPINE_CPP_LITE_EXPORT float spine_track_entry_get_track_complete(spine_track_entry entry);
@@ -387,7 +414,9 @@ SPINE_CPP_LITE_EXPORT spine_bone spine_skeleton_find_bone(spine_skeleton skeleto
 SPINE_CPP_LITE_EXPORT spine_slot spine_skeleton_find_slot(spine_skeleton skeleton, const utf8 *slotName);
 SPINE_CPP_LITE_EXPORT void spine_skeleton_set_skin_by_name(spine_skeleton skeleton, const utf8 *skinName);
 SPINE_CPP_LITE_EXPORT void spine_skeleton_set_skin(spine_skeleton skeleton, spine_skin skin);
+// @optional
 SPINE_CPP_LITE_EXPORT spine_attachment spine_skeleton_get_attachment_by_name(spine_skeleton skeleton, const utf8 *slotName, const utf8 *attachmentName);
+// @optional
 SPINE_CPP_LITE_EXPORT spine_attachment spine_skeleton_get_attachment(spine_skeleton skeleton, int32_t slotIndex, const utf8 *attachmentName);
 SPINE_CPP_LITE_EXPORT void spine_skeleton_set_attachment(spine_skeleton skeleton, const utf8 *slotName, const utf8 *attachmentName);
 SPINE_CPP_LITE_EXPORT spine_ik_constraint spine_skeleton_find_ik_constraint(spine_skeleton skeleton, const utf8 *constraintName);
@@ -395,7 +424,9 @@ SPINE_CPP_LITE_EXPORT spine_transform_constraint spine_skeleton_find_transform_c
 SPINE_CPP_LITE_EXPORT spine_path_constraint spine_skeleton_find_path_constraint(spine_skeleton skeleton, const utf8 *constraintName);
 SPINE_CPP_LITE_EXPORT spine_physics_constraint spine_skeleton_find_physics_constraint(spine_skeleton skeleton, const utf8 *constraintName);
 SPINE_CPP_LITE_EXPORT spine_bounds spine_skeleton_get_bounds(spine_skeleton skeleton);
+// @optional
 SPINE_CPP_LITE_EXPORT spine_bone spine_skeleton_get_root_bone(spine_skeleton skeleton);
+// @optional
 SPINE_CPP_LITE_EXPORT spine_skeleton_data spine_skeleton_get_data(spine_skeleton skeleton);
 SPINE_CPP_LITE_EXPORT int32_t spine_skeleton_get_num_bones(spine_skeleton skeleton);
 SPINE_CPP_LITE_EXPORT spine_bone *spine_skeleton_get_bones(spine_skeleton skeleton);
@@ -412,6 +443,7 @@ SPINE_CPP_LITE_EXPORT int32_t spine_skeleton_get_num_path_constraints(spine_skel
 SPINE_CPP_LITE_EXPORT spine_path_constraint *spine_skeleton_get_path_constraints(spine_skeleton skeleton);
 SPINE_CPP_LITE_EXPORT int32_t spine_skeleton_get_num_physics_constraints(spine_skeleton skeleton);
 SPINE_CPP_LITE_EXPORT spine_physics_constraint *spine_skeleton_get_physics_constraints(spine_skeleton skeleton);
+// @optional
 SPINE_CPP_LITE_EXPORT spine_skin spine_skeleton_get_skin(spine_skeleton skeleton);
 SPINE_CPP_LITE_EXPORT spine_color spine_skeleton_get_color(spine_skeleton skeleton);
 SPINE_CPP_LITE_EXPORT void spine_skeleton_set_color(spine_skeleton skeleton, float r, float g, float b, float a);
@@ -462,7 +494,7 @@ SPINE_CPP_LITE_EXPORT spine_color spine_slot_data_get_color(spine_slot_data slot
 SPINE_CPP_LITE_EXPORT void spine_slot_data_set_color(spine_slot_data slot, float r, float g, float b, float a);
 SPINE_CPP_LITE_EXPORT spine_color spine_slot_data_get_dark_color(spine_slot_data slot);
 SPINE_CPP_LITE_EXPORT void spine_slot_data_set_dark_color(spine_slot_data slot, float r, float g, float b, float a);
-SPINE_CPP_LITE_EXPORT spine_bool spine_slot_data_has_dark_color(spine_slot_data slot);
+SPINE_CPP_LITE_EXPORT spine_bool spine_slot_data_get_has_dark_color(spine_slot_data slot);
 SPINE_CPP_LITE_EXPORT void spine_slot_data_set_has_dark_color(spine_slot_data slot, spine_bool hasDarkColor);
 SPINE_CPP_LITE_EXPORT const utf8 *spine_slot_data_get_attachment_name(spine_slot_data slot);
 SPINE_CPP_LITE_EXPORT void spine_slot_data_set_attachment_name(spine_slot_data slot, const utf8 *attachmentName);
@@ -481,6 +513,7 @@ SPINE_CPP_LITE_EXPORT void spine_slot_set_color(spine_slot slot, float r, float 
 SPINE_CPP_LITE_EXPORT spine_color spine_slot_get_dark_color(spine_slot slot);
 SPINE_CPP_LITE_EXPORT void spine_slot_set_dark_color(spine_slot slot, float r, float g, float b, float a);
 SPINE_CPP_LITE_EXPORT spine_bool spine_slot_has_dark_color(spine_slot slot);
+// @optional
 SPINE_CPP_LITE_EXPORT spine_attachment spine_slot_get_attachment(spine_slot slot);
 SPINE_CPP_LITE_EXPORT void spine_slot_set_attachment(spine_slot slot, spine_attachment attachment);
 // OMITTED getDeform()
@@ -489,6 +522,7 @@ SPINE_CPP_LITE_EXPORT void spine_slot_set_sequence_index(spine_slot slot, int32_
 
 SPINE_CPP_LITE_EXPORT int32_t spine_bone_data_get_index(spine_bone_data data);
 SPINE_CPP_LITE_EXPORT const utf8 *spine_bone_data_get_name(spine_bone_data data);
+// @optional
 SPINE_CPP_LITE_EXPORT spine_bone_data spine_bone_data_get_parent(spine_bone_data data);
 SPINE_CPP_LITE_EXPORT float spine_bone_data_get_length(spine_bone_data data);
 SPINE_CPP_LITE_EXPORT void spine_bone_data_set_length(spine_bone_data data, float length);
@@ -508,7 +542,7 @@ SPINE_CPP_LITE_EXPORT float spine_bone_data_get_shear_y(spine_bone_data data);
 SPINE_CPP_LITE_EXPORT void spine_bone_data_set_shear_y(spine_bone_data data, float shearY);
 SPINE_CPP_LITE_EXPORT spine_inherit spine_bone_data_get_inherit(spine_bone_data data);
 SPINE_CPP_LITE_EXPORT void spine_bone_data_set_inherit(spine_bone_data data, spine_inherit inherit);
-SPINE_CPP_LITE_EXPORT spine_bool spine_bone_data_is_skin_required(spine_bone_data data);
+SPINE_CPP_LITE_EXPORT spine_bool spine_bone_data_get_is_skin_required(spine_bone_data data);
 SPINE_CPP_LITE_EXPORT void spine_bone_data_set_is_skin_required(spine_bone_data data, spine_bool isSkinRequired);
 SPINE_CPP_LITE_EXPORT spine_color spine_bone_data_get_color(spine_bone_data data);
 SPINE_CPP_LITE_EXPORT void spine_bone_data_set_color(spine_bone_data data, float r, float g, float b, float a);
@@ -534,6 +568,7 @@ SPINE_CPP_LITE_EXPORT float spine_bone_get_world_to_local_rotation_x(spine_bone 
 SPINE_CPP_LITE_EXPORT float spine_bone_get_world_to_local_rotation_y(spine_bone bone);
 SPINE_CPP_LITE_EXPORT spine_bone_data spine_bone_get_data(spine_bone bone);
 SPINE_CPP_LITE_EXPORT spine_skeleton spine_bone_get_skeleton(spine_bone bone);
+// @optional
 SPINE_CPP_LITE_EXPORT spine_bone spine_bone_get_parent(spine_bone bone);
 SPINE_CPP_LITE_EXPORT int32_t spine_bone_get_num_children(spine_bone bone);
 SPINE_CPP_LITE_EXPORT spine_bone *spine_bone_get_children(spine_bone bone);
@@ -588,6 +623,7 @@ SPINE_CPP_LITE_EXPORT void spine_bone_set_inherit(spine_bone data, spine_inherit
 
 SPINE_CPP_LITE_EXPORT const utf8 *spine_attachment_get_name(spine_attachment attachment);
 SPINE_CPP_LITE_EXPORT spine_attachment_type spine_attachment_get_type(spine_attachment attachment);
+// @ignore
 SPINE_CPP_LITE_EXPORT spine_attachment spine_attachment_copy(spine_attachment attachment);
 SPINE_CPP_LITE_EXPORT void spine_attachment_dispose(spine_attachment attachment);
 
@@ -603,6 +639,7 @@ SPINE_CPP_LITE_EXPORT spine_color spine_point_attachment_get_color(spine_point_a
 SPINE_CPP_LITE_EXPORT void spine_point_attachment_set_color(spine_point_attachment attachment, float r, float g, float b, float a);
 
 SPINE_CPP_LITE_EXPORT void spine_region_attachment_update_region(spine_region_attachment attachment);
+// @ignore
 SPINE_CPP_LITE_EXPORT void spine_region_attachment_compute_world_vertices(spine_region_attachment attachment, spine_slot slot, float *worldVertices);
 SPINE_CPP_LITE_EXPORT float spine_region_attachment_get_x(spine_region_attachment attachment);
 SPINE_CPP_LITE_EXPORT void spine_region_attachment_set_x(spine_region_attachment attachment, float x);
@@ -622,8 +659,10 @@ SPINE_CPP_LITE_EXPORT spine_color spine_region_attachment_get_color(spine_region
 SPINE_CPP_LITE_EXPORT void spine_region_attachment_set_color(spine_region_attachment attachment, float r, float g, float b, float a);
 SPINE_CPP_LITE_EXPORT const utf8 *spine_region_attachment_get_path(spine_region_attachment attachment);
 // OMITTED setPath()
+// @optional
 SPINE_CPP_LITE_EXPORT spine_texture_region spine_region_attachment_get_region(spine_region_attachment attachment);
 // OMITTED setRegion()
+// @optional
 SPINE_CPP_LITE_EXPORT spine_sequence spine_region_attachment_get_sequence(spine_region_attachment attachment);
 // OMITTED setSequence()
 SPINE_CPP_LITE_EXPORT int32_t spine_region_attachment_get_num_offset(spine_region_attachment attachment);
@@ -632,12 +671,14 @@ SPINE_CPP_LITE_EXPORT int32_t spine_region_attachment_get_num_uvs(spine_region_a
 SPINE_CPP_LITE_EXPORT float *spine_region_attachment_get_uvs(spine_region_attachment attachment);
 
 SPINE_CPP_LITE_EXPORT int32_t spine_vertex_attachment_get_world_vertices_length(spine_vertex_attachment attachment);
+// @ignore
 SPINE_CPP_LITE_EXPORT void spine_vertex_attachment_compute_world_vertices(spine_vertex_attachment attachment, spine_slot slot, float *worldVertices);
 // OMITTED getId()
 SPINE_CPP_LITE_EXPORT int32_t spine_vertex_attachment_get_num_bones(spine_vertex_attachment attachment);
 SPINE_CPP_LITE_EXPORT int32_t *spine_vertex_attachment_get_bones(spine_vertex_attachment attachment);
 SPINE_CPP_LITE_EXPORT int32_t spine_vertex_attachment_get_num_vertices(spine_vertex_attachment attachment);
 SPINE_CPP_LITE_EXPORT float *spine_vertex_attachment_get_vertices(spine_vertex_attachment attachment);
+// @optional
 SPINE_CPP_LITE_EXPORT spine_attachment spine_vertex_attachment_get_timeline_attachment(spine_vertex_attachment timelineAttachment);
 SPINE_CPP_LITE_EXPORT void spine_vertex_attachment_set_timeline_attachment(spine_vertex_attachment attachment, spine_attachment timelineAttachment);
 // OMITTED copyTo()
@@ -657,8 +698,10 @@ SPINE_CPP_LITE_EXPORT const utf8 *spine_mesh_attachment_get_path(spine_mesh_atta
 // OMITTED setPath()
 SPINE_CPP_LITE_EXPORT spine_texture_region spine_mesh_attachment_get_region(spine_mesh_attachment attachment);
 // OMITTED setRegion()
+// @optional
 SPINE_CPP_LITE_EXPORT spine_sequence spine_mesh_attachment_get_sequence(spine_mesh_attachment attachment);
 // OMITTED setSequence()
+// @optional
 SPINE_CPP_LITE_EXPORT spine_mesh_attachment spine_mesh_attachment_get_parent_mesh(spine_mesh_attachment attachment);
 SPINE_CPP_LITE_EXPORT void spine_mesh_attachment_set_parent_mesh(spine_mesh_attachment attachment, spine_mesh_attachment parentMesh);
 SPINE_CPP_LITE_EXPORT int32_t spine_mesh_attachment_get_num_edges(spine_mesh_attachment attachment);
@@ -669,6 +712,7 @@ SPINE_CPP_LITE_EXPORT float spine_mesh_attachment_get_height(spine_mesh_attachme
 SPINE_CPP_LITE_EXPORT void spine_mesh_attachment_set_height(spine_mesh_attachment attachment, float height);
 // OMITTED newLinkedMesh()
 
+// @optional
 SPINE_CPP_LITE_EXPORT spine_slot_data spine_clipping_attachment_get_end_slot(spine_clipping_attachment attachment);
 SPINE_CPP_LITE_EXPORT void spine_clipping_attachment_set_end_slot(spine_clipping_attachment attachment, spine_slot_data endSlot);
 SPINE_CPP_LITE_EXPORT spine_color spine_clipping_attachment_get_color(spine_clipping_attachment attachment);
@@ -687,6 +731,7 @@ SPINE_CPP_LITE_EXPORT spine_color spine_path_attachment_get_color(spine_path_att
 SPINE_CPP_LITE_EXPORT void spine_path_attachment_set_color(spine_path_attachment attachment, float r, float g, float b, float a);
 
 SPINE_CPP_LITE_EXPORT void spine_skin_set_attachment(spine_skin skin, int32_t slotIndex, const utf8 *name, spine_attachment attachment);
+// @optional
 SPINE_CPP_LITE_EXPORT spine_attachment spine_skin_get_attachment(spine_skin skin, int32_t slotIndex, const utf8 *name);
 SPINE_CPP_LITE_EXPORT void spine_skin_remove_attachment(spine_skin skin, int32_t slotIndex, const utf8 *name);
 // OMITTED findNamesForSlot()
@@ -706,6 +751,7 @@ SPINE_CPP_LITE_EXPORT int32_t spine_skin_get_num_bones(spine_skin skin);
 SPINE_CPP_LITE_EXPORT spine_bone_data *spine_skin_get_bones(spine_skin skin);
 SPINE_CPP_LITE_EXPORT int32_t spine_skin_get_num_constraints(spine_skin skin);
 SPINE_CPP_LITE_EXPORT spine_constraint_data *spine_skin_get_constraints(spine_skin skin);
+// @ignore
 SPINE_CPP_LITE_EXPORT spine_skin spine_skin_create(const utf8 *name);
 SPINE_CPP_LITE_EXPORT void spine_skin_dispose(spine_skin skin);
 
@@ -808,6 +854,7 @@ SPINE_CPP_LITE_EXPORT float spine_transform_constraint_get_mix_shear_y(spine_tra
 SPINE_CPP_LITE_EXPORT void spine_transform_constraint_set_mix_shear_y(spine_transform_constraint constraint, float mixShearY);
 SPINE_CPP_LITE_EXPORT spine_bool spine_transform_constraint_get_is_active(spine_transform_constraint constraint);
 SPINE_CPP_LITE_EXPORT void spine_transform_constraint_set_is_active(spine_transform_constraint constraint, spine_bool isActive);
+
 // OMITTED setToSetupPose()
 
 SPINE_CPP_LITE_EXPORT int32_t spine_path_constraint_data_get_num_bones(spine_path_constraint_data data);
@@ -951,7 +998,7 @@ SPINE_CPP_LITE_EXPORT void spine_physics_constraint_set_remaining(spine_physics_
 SPINE_CPP_LITE_EXPORT float spine_physics_constraint_get_remaining(spine_physics_constraint constraint);
 SPINE_CPP_LITE_EXPORT void spine_physics_constraint_set_last_time(spine_physics_constraint constraint, float value);
 SPINE_CPP_LITE_EXPORT float spine_physics_constraint_get_last_time(spine_physics_constraint constraint);
-SPINE_CPP_LITE_EXPORT void spine_physics_constraint_reset(spine_physics_constraint constraint);
+SPINE_CPP_LITE_EXPORT void spine_physics_constraint_reset_fully(spine_physics_constraint constraint);
 // Omitted setToSetupPose()
 SPINE_CPP_LITE_EXPORT void spine_physics_constraint_update(spine_physics_constraint data, spine_physics physics);
 SPINE_CPP_LITE_EXPORT void spine_physics_constraint_translate(spine_physics_constraint data, float x, float y);
@@ -996,5 +1043,7 @@ SPINE_CPP_LITE_EXPORT int32_t spine_texture_region_get_original_width(spine_text
 SPINE_CPP_LITE_EXPORT void spine_texture_region_set_original_width(spine_texture_region textureRegion, int32_t originalWidth);
 SPINE_CPP_LITE_EXPORT int32_t spine_texture_region_get_original_height(spine_texture_region textureRegion);
 SPINE_CPP_LITE_EXPORT void spine_texture_region_set_original_height(spine_texture_region textureRegion, int32_t originalHeight);
+
+// @end: function_declarations
 
 #endif

@@ -1,0 +1,11 @@
+# Uncomment the next line to define a global platform for your project
+platform :ios, '13.0'
+
+target 'Spine iOS Example' do
+  # Comment the next line if you don't want to use dynamic frameworks
+  use_frameworks!
+
+  pod 'Spine', :podspec => 'https://raw.githubusercontent.com/denrase/spine-runtimes/cocoapods/Spine.podspec'
+  pod 'SpineCppLite', :podspec => 'https://raw.githubusercontent.com/denrase/spine-runtimes/cocoapods/SpineCppLite.podspec'
+  pod 'SpineShadersStructs', :podspec => 'https://raw.githubusercontent.com/denrase/spine-runtimes/cocoapods/SpineShadersStructs.podspec'
+end

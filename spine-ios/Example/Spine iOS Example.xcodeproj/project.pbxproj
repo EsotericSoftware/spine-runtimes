@@ -1,0 +1,557 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 60;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		9205FCD42C0760B1006EE07E /* SimpleAnimationViewControllerRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9205FCD32C0760B1006EE07E /* SimpleAnimationViewControllerRepresentable.swift */; };
+		920BD1162BEBC52D0050A5A9 /* spineboy-pro.skel in Resources */ = {isa = PBXBuildFile; fileRef = 920BD1122BEBC52D0050A5A9 /* spineboy-pro.skel */; };
+		920BD1182BEBC52D0050A5A9 /* spineboy-pro.json in Resources */ = {isa = PBXBuildFile; fileRef = 920BD1142BEBC52D0050A5A9 /* spineboy-pro.json */; };
+		920BD1192BEBC52D0050A5A9 /* spineboy.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 920BD1152BEBC52D0050A5A9 /* spineboy.atlas */; };
+		920BD11B2BEBDBA60050A5A9 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920BD11A2BEBDBA60050A5A9 /* MainView.swift */; };
+		920BD11D2BEBDC380050A5A9 /* PlayPauseAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920BD11C2BEBDC380050A5A9 /* PlayPauseAnimation.swift */; };
+		920BD1262BEBDCD80050A5A9 /* dragon_4.png in Resources */ = {isa = PBXBuildFile; fileRef = 920BD11F2BEBDCD80050A5A9 /* dragon_4.png */; };
+		920BD1272BEBDCD80050A5A9 /* dragon_5.png in Resources */ = {isa = PBXBuildFile; fileRef = 920BD1202BEBDCD80050A5A9 /* dragon_5.png */; };
+		920BD1282BEBDCD80050A5A9 /* dragon_2.png in Resources */ = {isa = PBXBuildFile; fileRef = 920BD1212BEBDCD80050A5A9 /* dragon_2.png */; };
+		920BD1292BEBDCD80050A5A9 /* dragon-ess.skel in Resources */ = {isa = PBXBuildFile; fileRef = 920BD1222BEBDCD80050A5A9 /* dragon-ess.skel */; };
+		920BD12A2BEBDCD80050A5A9 /* dragon_3.png in Resources */ = {isa = PBXBuildFile; fileRef = 920BD1232BEBDCD80050A5A9 /* dragon_3.png */; };
+		920BD12B2BEBDCD80050A5A9 /* dragon.png in Resources */ = {isa = PBXBuildFile; fileRef = 920BD1242BEBDCD80050A5A9 /* dragon.png */; };
+		920BD12C2BEBDCD80050A5A9 /* dragon.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 920BD1252BEBDCD80050A5A9 /* dragon.atlas */; };
+		921C1EAF2BF609F60001A0BA /* DressUp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921C1EAE2BF609F60001A0BA /* DressUp.swift */; };
+		921C1EBA2BF60AE90001A0BA /* mix-and-match-pro.skel in Resources */ = {isa = PBXBuildFile; fileRef = 921C1EB72BF60AE90001A0BA /* mix-and-match-pro.skel */; };
+		921C1EBB2BF60AE90001A0BA /* mix-and-match.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 921C1EB82BF60AE90001A0BA /* mix-and-match.atlas */; };
+		921C1EBC2BF60AE90001A0BA /* mix-and-match.png in Resources */ = {isa = PBXBuildFile; fileRef = 921C1EB92BF60AE90001A0BA /* mix-and-match.png */; };
+		922839DF2BF4F7D8006DA9F6 /* AnimationStateEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922839DE2BF4F7D8006DA9F6 /* AnimationStateEvents.swift */; };
+		9240C26E2C0754DD003EE243 /* SimpleAnimationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9240C26D2C0754DD003EE243 /* SimpleAnimationViewController.m */; };
+		924C0C162BCFCF21004E63F7 /* SpineExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924C0C152BCFCF21004E63F7 /* SpineExampleApp.swift */; };
+		924C0C182BCFCF21004E63F7 /* SimpleAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924C0C172BCFCF21004E63F7 /* SimpleAnimation.swift */; };
+		924C0C1A2BCFCF22004E63F7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 924C0C192BCFCF22004E63F7 /* Assets.xcassets */; };
+		925315522BFF994400C96F75 /* spineboy.png in Resources */ = {isa = PBXBuildFile; fileRef = 925315512BFF994400C96F75 /* spineboy.png */; };
+		92579E772C1B0E9500FDC7D5 /* DisableRendering.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92579E762C1B0E9500FDC7D5 /* DisableRendering.swift */; };
+		925CB7E92C19BC5A00C8F47F /* Spine in Frameworks */ = {isa = PBXBuildFile; productRef = 925CB7E82C19BC5A00C8F47F /* Spine */; };
+		9270C16E2BFE356000BD25BC /* Physics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9270C16D2BFE356000BD25BC /* Physics.swift */; };
+		9270C1732BFE389600BD25BC /* celestial-circus.png in Resources */ = {isa = PBXBuildFile; fileRef = 9270C1702BFE389600BD25BC /* celestial-circus.png */; };
+		9270C1742BFE389600BD25BC /* celestial-circus-pro.skel in Resources */ = {isa = PBXBuildFile; fileRef = 9270C1712BFE389600BD25BC /* celestial-circus-pro.skel */; };
+		9270C1752BFE389600BD25BC /* celestial-circus.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 9270C1722BFE389600BD25BC /* celestial-circus.atlas */; };
+		928A8CC22BCFE7DF00D9D35B /* Spine in Frameworks */ = {isa = PBXBuildFile; productRef = 928A8CC12BCFE7DF00D9D35B /* Spine */; };
+		92D7DDA82BFF3C8800EB9E3A /* DebugRendering.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92D7DDA72BFF3C8800EB9E3A /* DebugRendering.swift */; };
+		92FE93292BF4AB9600CCDF48 /* IKFollowing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92FE93282BF4AB9600CCDF48 /* IKFollowing.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		9205FCD32C0760B1006EE07E /* SimpleAnimationViewControllerRepresentable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleAnimationViewControllerRepresentable.swift; sourceTree = "<group>"; };
+		920BD1122BEBC52D0050A5A9 /* spineboy-pro.skel */ = {isa = PBXFileReference; lastKnownFileType = file; path = "spineboy-pro.skel"; sourceTree = "<group>"; };
+		920BD1142BEBC52D0050A5A9 /* spineboy-pro.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "spineboy-pro.json"; sourceTree = "<group>"; };
+		920BD1152BEBC52D0050A5A9 /* spineboy.atlas */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = spineboy.atlas; sourceTree = "<group>"; };
+		920BD11A2BEBDBA60050A5A9 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
+		920BD11C2BEBDC380050A5A9 /* PlayPauseAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayPauseAnimation.swift; sourceTree = "<group>"; };
+		920BD11F2BEBDCD80050A5A9 /* dragon_4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dragon_4.png; sourceTree = "<group>"; };
+		920BD1202BEBDCD80050A5A9 /* dragon_5.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dragon_5.png; sourceTree = "<group>"; };
+		920BD1212BEBDCD80050A5A9 /* dragon_2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dragon_2.png; sourceTree = "<group>"; };
+		920BD1222BEBDCD80050A5A9 /* dragon-ess.skel */ = {isa = PBXFileReference; lastKnownFileType = file; path = "dragon-ess.skel"; sourceTree = "<group>"; };
+		920BD1232BEBDCD80050A5A9 /* dragon_3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dragon_3.png; sourceTree = "<group>"; };
+		920BD1242BEBDCD80050A5A9 /* dragon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dragon.png; sourceTree = "<group>"; };
+		920BD1252BEBDCD80050A5A9 /* dragon.atlas */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dragon.atlas; sourceTree = "<group>"; };
+		921C1EAE2BF609F60001A0BA /* DressUp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DressUp.swift; sourceTree = "<group>"; };
+		921C1EB72BF60AE90001A0BA /* mix-and-match-pro.skel */ = {isa = PBXFileReference; lastKnownFileType = file; path = "mix-and-match-pro.skel"; sourceTree = "<group>"; };
+		921C1EB82BF60AE90001A0BA /* mix-and-match.atlas */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "mix-and-match.atlas"; sourceTree = "<group>"; };
+		921C1EB92BF60AE90001A0BA /* mix-and-match.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "mix-and-match.png"; sourceTree = "<group>"; };
+		922839DE2BF4F7D8006DA9F6 /* AnimationStateEvents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationStateEvents.swift; sourceTree = "<group>"; };
+		9240C26B2C0754DC003EE243 /* Spine iOS Example-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Spine iOS Example-Bridging-Header.h"; sourceTree = "<group>"; };
+		9240C26C2C0754DD003EE243 /* SimpleAnimationViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SimpleAnimationViewController.h; sourceTree = "<group>"; };
+		9240C26D2C0754DD003EE243 /* SimpleAnimationViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SimpleAnimationViewController.m; sourceTree = "<group>"; };
+		924C0C122BCFCF21004E63F7 /* Spine iOS Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Spine iOS Example.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		924C0C152BCFCF21004E63F7 /* SpineExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpineExampleApp.swift; sourceTree = "<group>"; };
+		924C0C172BCFCF21004E63F7 /* SimpleAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleAnimation.swift; sourceTree = "<group>"; };
+		924C0C192BCFCF22004E63F7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		924C0C1B2BCFCF22004E63F7 /* SpineiOSExample.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SpineiOSExample.entitlements; sourceTree = "<group>"; };
+		925315512BFF994400C96F75 /* spineboy.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spineboy.png; sourceTree = "<group>"; };
+		92579E762C1B0E9500FDC7D5 /* DisableRendering.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DisableRendering.swift; sourceTree = "<group>"; };
+		9270C16D2BFE356000BD25BC /* Physics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Physics.swift; sourceTree = "<group>"; };
+		9270C1702BFE389600BD25BC /* celestial-circus.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "celestial-circus.png"; sourceTree = "<group>"; };
+		9270C1712BFE389600BD25BC /* celestial-circus-pro.skel */ = {isa = PBXFileReference; lastKnownFileType = file; path = "celestial-circus-pro.skel"; sourceTree = "<group>"; };
+		9270C1722BFE389600BD25BC /* celestial-circus.atlas */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "celestial-circus.atlas"; sourceTree = "<group>"; };
+		92D7DDA72BFF3C8800EB9E3A /* DebugRendering.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugRendering.swift; sourceTree = "<group>"; };
+		92FE93282BF4AB9600CCDF48 /* IKFollowing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IKFollowing.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		924C0C0F2BCFCF21004E63F7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				925CB7E92C19BC5A00C8F47F /* Spine in Frameworks */,
+				928A8CC22BCFE7DF00D9D35B /* Spine in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		920BD1112BEBC52D0050A5A9 /* spineboy */ = {
+			isa = PBXGroup;
+			children = (
+				925315512BFF994400C96F75 /* spineboy.png */,
+				920BD1122BEBC52D0050A5A9 /* spineboy-pro.skel */,
+				920BD1142BEBC52D0050A5A9 /* spineboy-pro.json */,
+				920BD1152BEBC52D0050A5A9 /* spineboy.atlas */,
+			);
+			path = spineboy;
+			sourceTree = "<group>";
+		};
+		920BD11E2BEBDCD80050A5A9 /* dragon */ = {
+			isa = PBXGroup;
+			children = (
+				920BD11F2BEBDCD80050A5A9 /* dragon_4.png */,
+				920BD1202BEBDCD80050A5A9 /* dragon_5.png */,
+				920BD1212BEBDCD80050A5A9 /* dragon_2.png */,
+				920BD1222BEBDCD80050A5A9 /* dragon-ess.skel */,
+				920BD1232BEBDCD80050A5A9 /* dragon_3.png */,
+				920BD1242BEBDCD80050A5A9 /* dragon.png */,
+				920BD1252BEBDCD80050A5A9 /* dragon.atlas */,
+			);
+			path = dragon;
+			sourceTree = "<group>";
+		};
+		921C1EB02BF60AA40001A0BA /* mixandmatch */ = {
+			isa = PBXGroup;
+			children = (
+				921C1EB72BF60AE90001A0BA /* mix-and-match-pro.skel */,
+				921C1EB82BF60AE90001A0BA /* mix-and-match.atlas */,
+				921C1EB92BF60AE90001A0BA /* mix-and-match.png */,
+			);
+			path = mixandmatch;
+			sourceTree = "<group>";
+		};
+		924C0C092BCFCF21004E63F7 = {
+			isa = PBXGroup;
+			children = (
+				924C0C142BCFCF21004E63F7 /* Spine iOS Example */,
+				924C0C132BCFCF21004E63F7 /* Products */,
+				92CE2BE32BCFE57600E9B376 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		924C0C132BCFCF21004E63F7 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				924C0C122BCFCF21004E63F7 /* Spine iOS Example.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		924C0C142BCFCF21004E63F7 /* Spine iOS Example */ = {
+			isa = PBXGroup;
+			children = (
+				92921E502BCFEEA1002E2FC4 /* Assets */,
+				924C0C152BCFCF21004E63F7 /* SpineExampleApp.swift */,
+				920BD11A2BEBDBA60050A5A9 /* MainView.swift */,
+				924C0C172BCFCF21004E63F7 /* SimpleAnimation.swift */,
+				9205FCD32C0760B1006EE07E /* SimpleAnimationViewControllerRepresentable.swift */,
+				9240C26C2C0754DD003EE243 /* SimpleAnimationViewController.h */,
+				9240C26D2C0754DD003EE243 /* SimpleAnimationViewController.m */,
+				920BD11C2BEBDC380050A5A9 /* PlayPauseAnimation.swift */,
+				922839DE2BF4F7D8006DA9F6 /* AnimationStateEvents.swift */,
+				92D7DDA72BFF3C8800EB9E3A /* DebugRendering.swift */,
+				921C1EAE2BF609F60001A0BA /* DressUp.swift */,
+				92FE93282BF4AB9600CCDF48 /* IKFollowing.swift */,
+				9270C16D2BFE356000BD25BC /* Physics.swift */,
+				92579E762C1B0E9500FDC7D5 /* DisableRendering.swift */,
+				924C0C192BCFCF22004E63F7 /* Assets.xcassets */,
+				924C0C1B2BCFCF22004E63F7 /* SpineiOSExample.entitlements */,
+				9240C26B2C0754DC003EE243 /* Spine iOS Example-Bridging-Header.h */,
+			);
+			path = "Spine iOS Example";
+			sourceTree = "<group>";
+		};
+		9270C16F2BFE387600BD25BC /* celestial */ = {
+			isa = PBXGroup;
+			children = (
+				9270C1712BFE389600BD25BC /* celestial-circus-pro.skel */,
+				9270C1722BFE389600BD25BC /* celestial-circus.atlas */,
+				9270C1702BFE389600BD25BC /* celestial-circus.png */,
+			);
+			path = celestial;
+			sourceTree = "<group>";
+		};
+		92921E502BCFEEA1002E2FC4 /* Assets */ = {
+			isa = PBXGroup;
+			children = (
+				9270C16F2BFE387600BD25BC /* celestial */,
+				921C1EB02BF60AA40001A0BA /* mixandmatch */,
+				920BD11E2BEBDCD80050A5A9 /* dragon */,
+				920BD1112BEBC52D0050A5A9 /* spineboy */,
+			);
+			path = Assets;
+			sourceTree = "<group>";
+		};
+		92CE2BE32BCFE57600E9B376 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		924C0C112BCFCF21004E63F7 /* Spine iOS Example */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 924C0C212BCFCF22004E63F7 /* Build configuration list for PBXNativeTarget "Spine iOS Example" */;
+			buildPhases = (
+				924C0C0E2BCFCF21004E63F7 /* Sources */,
+				924C0C0F2BCFCF21004E63F7 /* Frameworks */,
+				924C0C102BCFCF21004E63F7 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Spine iOS Example";
+			packageProductDependencies = (
+				928A8CC12BCFE7DF00D9D35B /* Spine */,
+				925CB7E82C19BC5A00C8F47F /* Spine */,
+			);
+			productName = "Spine iOS Example";
+			productReference = 924C0C122BCFCF21004E63F7 /* Spine iOS Example.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		924C0C0A2BCFCF21004E63F7 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1520;
+				LastUpgradeCheck = 1520;
+				TargetAttributes = {
+					924C0C112BCFCF21004E63F7 = {
+						CreatedOnToolsVersion = 15.2;
+						LastSwiftMigration = 1520;
+					};
+				};
+			};
+			buildConfigurationList = 924C0C0D2BCFCF21004E63F7 /* Build configuration list for PBXProject "Spine iOS Example" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 924C0C092BCFCF21004E63F7;
+			packageReferences = (
+				925CB7E72C19BC5A00C8F47F /* XCLocalSwiftPackageReference "../.." */,
+			);
+			productRefGroup = 924C0C132BCFCF21004E63F7 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				924C0C112BCFCF21004E63F7 /* Spine iOS Example */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		924C0C102BCFCF21004E63F7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				920BD12A2BEBDCD80050A5A9 /* dragon_3.png in Resources */,
+				924C0C1A2BCFCF22004E63F7 /* Assets.xcassets in Resources */,
+				920BD1282BEBDCD80050A5A9 /* dragon_2.png in Resources */,
+				920BD1182BEBC52D0050A5A9 /* spineboy-pro.json in Resources */,
+				9270C1752BFE389600BD25BC /* celestial-circus.atlas in Resources */,
+				9270C1742BFE389600BD25BC /* celestial-circus-pro.skel in Resources */,
+				921C1EBB2BF60AE90001A0BA /* mix-and-match.atlas in Resources */,
+				9270C1732BFE389600BD25BC /* celestial-circus.png in Resources */,
+				925315522BFF994400C96F75 /* spineboy.png in Resources */,
+				920BD1192BEBC52D0050A5A9 /* spineboy.atlas in Resources */,
+				920BD1292BEBDCD80050A5A9 /* dragon-ess.skel in Resources */,
+				920BD1162BEBC52D0050A5A9 /* spineboy-pro.skel in Resources */,
+				920BD12B2BEBDCD80050A5A9 /* dragon.png in Resources */,
+				920BD1272BEBDCD80050A5A9 /* dragon_5.png in Resources */,
+				921C1EBC2BF60AE90001A0BA /* mix-and-match.png in Resources */,
+				920BD1262BEBDCD80050A5A9 /* dragon_4.png in Resources */,
+				920BD12C2BEBDCD80050A5A9 /* dragon.atlas in Resources */,
+				921C1EBA2BF60AE90001A0BA /* mix-and-match-pro.skel in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		924C0C0E2BCFCF21004E63F7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9205FCD42C0760B1006EE07E /* SimpleAnimationViewControllerRepresentable.swift in Sources */,
+				9270C16E2BFE356000BD25BC /* Physics.swift in Sources */,
+				920BD11B2BEBDBA60050A5A9 /* MainView.swift in Sources */,
+				92D7DDA82BFF3C8800EB9E3A /* DebugRendering.swift in Sources */,
+				92FE93292BF4AB9600CCDF48 /* IKFollowing.swift in Sources */,
+				920BD11D2BEBDC380050A5A9 /* PlayPauseAnimation.swift in Sources */,
+				9240C26E2C0754DD003EE243 /* SimpleAnimationViewController.m in Sources */,
+				921C1EAF2BF609F60001A0BA /* DressUp.swift in Sources */,
+				922839DF2BF4F7D8006DA9F6 /* AnimationStateEvents.swift in Sources */,
+				924C0C182BCFCF21004E63F7 /* SimpleAnimation.swift in Sources */,
+				924C0C162BCFCF21004E63F7 /* SpineExampleApp.swift in Sources */,
+				92579E772C1B0E9500FDC7D5 /* DisableRendering.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		924C0C1F2BCFCF22004E63F7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COMPRESS_PNG_FILES = NO;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				STRIP_PNG_TEXT = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		924C0C202BCFCF22004E63F7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COMPRESS_PNG_FILES = NO;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				STRIP_PNG_TEXT = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		924C0C222BCFCF22004E63F7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = "Spine iOS Example/SpineiOSExample.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = 9ZFD4KCY8F;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "";
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 14.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.esotericsoftware.spine-ios-example";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Spine iOS Example/Spine iOS Example-Bridging-Header.h";
+				SWIFT_OBJC_INTEROP_MODE = objcxx;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		924C0C232BCFCF22004E63F7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = "Spine iOS Example/SpineiOSExample.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = 9ZFD4KCY8F;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "";
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 14.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.esotericsoftware.spine-ios-example";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Spine iOS Example/Spine iOS Example-Bridging-Header.h";
+				SWIFT_OBJC_INTEROP_MODE = objcxx;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		924C0C0D2BCFCF21004E63F7 /* Build configuration list for PBXProject "Spine iOS Example" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				924C0C1F2BCFCF22004E63F7 /* Debug */,
+				924C0C202BCFCF22004E63F7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		924C0C212BCFCF22004E63F7 /* Build configuration list for PBXNativeTarget "Spine iOS Example" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				924C0C222BCFCF22004E63F7 /* Debug */,
+				924C0C232BCFCF22004E63F7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		925CB7E72C19BC5A00C8F47F /* XCLocalSwiftPackageReference "../.." */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../..;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		925CB7E82C19BC5A00C8F47F /* Spine */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Spine;
+		};
+		928A8CC12BCFE7DF00D9D35B /* Spine */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Spine;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 924C0C0A2BCFCF21004E63F7 /* Project object */;
+}
