@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name                = 'SpineShadersStructs'
-  s.version             = '0.0.1'
+  s.version             = '4.2.0'
   s.summary             = 'Metal shaders structs for spine'
   s.description         = <<-DESC
 Metal shaders structs for spine.

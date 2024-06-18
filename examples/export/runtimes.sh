@@ -109,6 +109,30 @@ cp -f ../celestial-circus/export/celestial-circus-pro.skel "$ROOT/spine-flutter/
 cp -f ../celestial-circus/export/celestial-circus.atlas "$ROOT/spine-flutter/example/assets/"
 cp -f ../celestial-circus/export/celestial-circus.png "$ROOT/spine-flutter/example/assets/"
 
+echo "spine-ios"
+cp -f ../celestial-circus/export/celestial-circus-pro.skel "$ROOT/spine-ios/Example/Spine iOS Example/Assets/celestial/"
+cp -f ../celestial-circus/export/celestial-circus.atlas "$ROOT/spine-ios/Example/Spine iOS Example/Assets/celestial/"
+cp -f ../celestial-circus/export/celestial-circus.png "$ROOT/spine-ios/Example/Spine iOS Example/Assets/celestial/"
+
+cp -f ../dragon/export/dragon-ess.skel "$ROOT/spine-ios/Example/Spine iOS Example/Assets/dragon/"
+cp -f ../dragon/export/dragon.atlas "$ROOT/spine-ios/Example/Spine iOS Example/Assets/dragon/"
+cp -f ../dragon/export/dragon.png "$ROOT/spine-ios/Example/Spine iOS Example/Assets/dragon/"
+cp -f ../dragon/export/dragon_*.png "$ROOT/spine-ios/Example/Spine iOS Example/Assets/dragon/"
+
+cp -f ../mix-and-match/export/mix-and-match-pro.skel "$ROOT/spine-ios/Example/Spine iOS Example/Assets/mixandmatch/"
+cp -f ../mix-and-match/export/mix-and-match.atlas "$ROOT/spine-ios/Example/Spine iOS Example/Assets/mixandmatch/"
+cp -f ../mix-and-match/export/mix-and-match.png "$ROOT/spine-ios/Example/Spine iOS Example/Assets/mixandmatch/"
+
+cp -f ../spineboy/export/spineboy-pro.json "$ROOT/spine-ios/Example/Spine iOS Example/Assets/spineboy/"
+cp -f ../spineboy/export/spineboy-pro.skel "$ROOT/spine-ios/Example/Spine iOS Example/Assets/spineboy/"
+cp -f ../spineboy/export/spineboy.atlas "$ROOT/spine-ios/Example/Spine iOS Example/Assets/spineboy/"
+cp -f ../spineboy/export/spineboy.png "$ROOT/spine-ios/Example/Spine iOS Example/Assets/spineboy/"
+
+cp -f ../spineboy/export/spineboy-pro.json "$ROOT/spine-ios/Example - Cocoapods/Spine iOS Example/spineboy/"
+cp -f ../spineboy/export/spineboy-pro.skel "$ROOT/spine-ios/Example - Cocoapods/Spine iOS Example/spineboy/"
+cp -f ../spineboy/export/spineboy.atlas "$ROOT/spine-ios/Example - Cocoapods/Spine iOS Example/spineboy/"
+cp -f ../spineboy/export/spineboy.png "$ROOT/spine-ios/Example - Cocoapods/Spine iOS Example/spineboy/"
+
 echo "spine-godot"
 rm -f "$ROOT"/spine-godot/example/assets/spineboy/*.atlas
 rm -f "$ROOT"/spine-godot/example/assets/spineboy/*.png
