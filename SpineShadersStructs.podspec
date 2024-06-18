@@ -14,7 +14,7 @@ Metal shaders structs for spine.
   s.license             = { :file => 'LICENSE' }
   s.platform            = :ios, '13.0'
 
-  s.source              = { :git => 'https://github.com/esotericsoftware/spine-runtimes.git', :branch => 'cocoapods' }
+  s.source              = { :git => 'https://github.com/esotericsoftware/spine-runtimes.git', :branch => '4.2' }
   s.source_files        = 'spine-ios/Sources/SpineShadersStructs/*.{h,cpp}'
 
   s.pod_target_xcconfig = {
