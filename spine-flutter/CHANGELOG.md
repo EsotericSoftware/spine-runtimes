@@ -1,3 +1,6 @@
+# 4.2.29
+- Fix issue in pubspec.yaml related to C++ include paths.
+
 # 4.2.28
 - Fix incompatibility with Gradle 8.x. See https://github.com/EsotericSoftware/spine-runtimes/issues/2553
 
