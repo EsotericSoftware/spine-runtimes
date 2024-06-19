@@ -1,3 +1,6 @@
+# 4.2.28
+- Fix incompatibility with Gradle 8.x. See https://github.com/EsotericSoftware/spine-runtimes/issues/2553
+
 # 4.2.27
 - Fixes clipping in case of colinear clipping edges.
 
