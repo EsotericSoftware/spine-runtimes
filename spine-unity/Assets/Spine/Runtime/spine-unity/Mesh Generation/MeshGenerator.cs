@@ -31,6 +31,12 @@
 #define MESH_SET_TRIANGLES_PROVIDES_LENGTH_PARAM
 #endif
 
+#if !UNITY_2020_1_OR_NEWER
+// Note: on Unity 2019.4 or older, e.g. operator* was not inlined via AggressiveInlining and at least with some
+// configurations will lead to unnecessary overhead.
+#define MANUALLY_INLINE_VECTOR_OPERATORS
+#endif
+
 // Not for optimization. Do not disable.
 #define SPINE_TRIANGLECHECK // Avoid calling SetTriangles at the cost of checking for mesh differences (vertex counts, memberwise attachment list compare) every frame.
 //#define SPINE_DEBUG
@@ -1112,7 +1118,13 @@ namespace Spine.Unity {
 		public void ScaleVertexData (float scale) {
 			Vector3[] vbi = vertexBuffer.Items;
 			for (int i = 0, n = vertexBuffer.Count; i < n; i++) {
-				vbi[i] *= scale; // vbi[i].x *= scale; vbi[i].y *= scale;
+#if MANUALLY_INLINE_VECTOR_OPERATORS
+				vbi[i].x *= scale;
+				vbi[i].y *= scale;
+				vbi[i].z *= scale;
+#else
+				vbi[i] *= scale;
+#endif
 			}
 
 			meshBoundsMin *= scale;
@@ -1124,7 +1136,13 @@ namespace Spine.Unity {
 			Vector3 offset = new Vector3(offset2D.x, offset2D.y);
 			Vector3[] vbi = vertexBuffer.Items;
 			for (int i = 0, n = vertexBuffer.Count; i < n; i++) {
+#if MANUALLY_INLINE_VECTOR_OPERATORS
+				vbi[i].x = vbi[i].x * scale + offset.x;
+				vbi[i].y = vbi[i].y * scale + offset.y;
+				vbi[i].z = vbi[i].z * scale + offset.z;
+#else
 				vbi[i] = vbi[i] * scale + offset;
+#endif
 			}
 
 			meshBoundsMin *= scale;
@@ -1184,9 +1202,9 @@ namespace Spine.Unity {
 				}
 			}
 		}
-		#endregion
+#endregion
 
-		#region Step 3 : Transfer vertex and triangle data to UnityEngine.Mesh
+#region Step 3 : Transfer vertex and triangle data to UnityEngine.Mesh
 		public void FillVertexData (Mesh mesh) {
 			Vector3[] vbi = vertexBuffer.Items;
 			Vector2[] ubi = uvBuffer.Items;
@@ -1266,7 +1284,7 @@ namespace Spine.Unity {
 				mesh.SetTriangles(submeshesItems[i].Items, i, false);
 #endif
 		}
-		#endregion
+#endregion
 
 		public void EnsureVertexCapacity (int minimumVertexCount, bool inlcudeTintBlack = false, bool includeTangents = false, bool includeNormals = false) {
 			if (minimumVertexCount > vertexBuffer.Items.Length) {
@@ -1314,7 +1332,7 @@ namespace Spine.Unity {
 			if (tangents != null) Array.Resize(ref tangents, vbiLength);
 		}
 
-		#region TangentSolver2D
+#region TangentSolver2D
 		// Thanks to contributions from forum user ToddRivers
 
 		/// <summary>Step 1 of solving tangents. Ensure you have buffers of the correct size.</summary>
@@ -1401,9 +1419,9 @@ namespace Spine.Unity {
 				tangents[i] = tangent;
 			}
 		}
-		#endregion
+#endregion
 
-		#region AttachmentRendering
+#region AttachmentRendering
 		static List<Vector3> AttachmentVerts = new List<Vector3>();
 		static List<Vector2> AttachmentUVs = new List<Vector2>();
 		static List<Color32> AttachmentColors32 = new List<Color32>();
@@ -1515,6 +1533,6 @@ namespace Spine.Unity {
 			AttachmentColors32.Clear();
 			AttachmentIndices.Clear();
 		}
-		#endregion
+#endregion
 	}
 }
