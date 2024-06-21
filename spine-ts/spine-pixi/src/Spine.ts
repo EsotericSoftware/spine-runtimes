@@ -123,7 +123,12 @@ export class Spine extends Container {
 	}
 	/** When `true`, the Spine AnimationState and the Skeleton will be automatically updated using the {@link Ticker.shared} instance. */
 	public set autoUpdate (value: boolean) {
-		if (value) this.autoUpdateWarned = false;
+		if (value) {
+			Ticker.shared.add(this.internalUpdate, this);
+			this.autoUpdateWarned = false;
+		} else {
+			Ticker.shared.remove(this.internalUpdate, this);
+		}
 		this._autoUpdate = value;
 	}
 
@@ -166,14 +171,14 @@ export class Spine extends Container {
 
 	/** If {@link Spine.autoUpdate} is `false`, this method allows to update the AnimationState and the Skeleton with the given delta. */
 	public update (deltaSeconds: number): void {
-		if (this._autoUpdate && !this.autoUpdateWarned) {
+		if (this.autoUpdate && !this.autoUpdateWarned) {
 			console.warn("You are calling update on a Spine instance that has autoUpdate set to true. This is probably not what you want.");
 			this.autoUpdateWarned = true;
 		}
-		this.internalUpdate(deltaSeconds);
+		this.internalUpdate(0, deltaSeconds);
 	}
 
-	protected internalUpdate (deltaSeconds?: number): void {
+	protected internalUpdate (_deltaFrame: number, deltaSeconds?: number): void {
 		// Because reasons, pixi uses deltaFrames at 60fps. We ignore the default deltaFrames and use the deltaSeconds from pixi ticker.
 		const delta = deltaSeconds ?? Ticker.shared.deltaMS / 1000;
 		this.state.update(delta);
@@ -186,7 +191,6 @@ export class Spine extends Container {
 
 	/** Render the meshes based on the current skeleton state, render debug information, then call {@link Container.updateTransform}. */
 	public override updateTransform (): void {
-		if (this._autoUpdate) this.internalUpdate();
 		this.renderMeshes();
 		this.sortChildren();
 		this.debug?.renderDebug(this);
