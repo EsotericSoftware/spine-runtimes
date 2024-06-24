@@ -1202,9 +1202,9 @@ namespace Spine.Unity {
 				}
 			}
 		}
-#endregion
+		#endregion
 
-#region Step 3 : Transfer vertex and triangle data to UnityEngine.Mesh
+		#region Step 3 : Transfer vertex and triangle data to UnityEngine.Mesh
 		public void FillVertexData (Mesh mesh) {
 			Vector3[] vbi = vertexBuffer.Items;
 			Vector2[] ubi = uvBuffer.Items;
@@ -1284,7 +1284,7 @@ namespace Spine.Unity {
 				mesh.SetTriangles(submeshesItems[i].Items, i, false);
 #endif
 		}
-#endregion
+		#endregion
 
 		public void EnsureVertexCapacity (int minimumVertexCount, bool inlcudeTintBlack = false, bool includeTangents = false, bool includeNormals = false) {
 			if (minimumVertexCount > vertexBuffer.Items.Length) {
@@ -1332,7 +1332,7 @@ namespace Spine.Unity {
 			if (tangents != null) Array.Resize(ref tangents, vbiLength);
 		}
 
-#region TangentSolver2D
+		#region TangentSolver2D
 		// Thanks to contributions from forum user ToddRivers
 
 		/// <summary>Step 1 of solving tangents. Ensure you have buffers of the correct size.</summary>
@@ -1419,9 +1419,9 @@ namespace Spine.Unity {
 				tangents[i] = tangent;
 			}
 		}
-#endregion
+		#endregion
 
-#region AttachmentRendering
+		#region AttachmentRendering
 		static List<Vector3> AttachmentVerts = new List<Vector3>();
 		static List<Vector2> AttachmentUVs = new List<Vector2>();
 		static List<Color32> AttachmentColors32 = new List<Color32>();
@@ -1533,6 +1533,6 @@ namespace Spine.Unity {
 			AttachmentColors32.Clear();
 			AttachmentIndices.Clear();
 		}
-#endregion
+		#endregion
 	}
 }
