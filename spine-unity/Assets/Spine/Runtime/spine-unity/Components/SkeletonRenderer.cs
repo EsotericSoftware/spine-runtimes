@@ -146,7 +146,7 @@ namespace Spine.Unity {
 
 		/// <summary>Slots that determine where the render is split. This is used by components such as SkeletonRenderSeparator so that the skeleton can be rendered by two separate renderers on different GameObjects.</summary>
 		[System.NonSerialized] public readonly List<Slot> separatorSlots = new List<Slot>();
-
+		[System.NonSerialized] public List<Material> sharedMaterialCache = new List<Material>();
 		// Render Settings
 		[Range(-0.1f, 0f)] public float zSpacing;
 		/// <summary>Use Spine's clipping feature. If false, ClippingAttachments will be ignored.</summary>
@@ -702,7 +702,8 @@ namespace Spine.Unity {
 #endif
 
 #if PER_MATERIAL_PROPERTY_BLOCKS
-			if (fixDrawOrder && meshRenderer.sharedMaterials.Length > 2) {
+			meshRenderer.GetSharedMaterials(sharedMaterialCache);
+			if (fixDrawOrder && sharedMaterialCache.Count > 2) {
 				SetMaterialSettingsToFixDrawOrder();
 			}
 #endif
@@ -869,8 +870,8 @@ namespace Spine.Unity {
 		private bool HasAnyStencilComp0Material () {
 			if (meshRenderer == null)
 				return false;
-
-			foreach (Material material in meshRenderer.sharedMaterials) {
+			meshRenderer.GetSharedMaterials(sharedMaterialCache);
+			foreach (Material material in sharedMaterialCache) {
 				if (material != null && material.HasProperty(STENCIL_COMP_PARAM_ID)) {
 					float currentCompValue = material.GetFloat(STENCIL_COMP_PARAM_ID);
 					if (currentCompValue == 0)
@@ -888,12 +889,14 @@ namespace Spine.Unity {
 			foreach (AtlasAssetBase atlasAsset in skeletonDataAsset.atlasAssets) {
 				if (atlasAsset.TextureLoadingMode != AtlasAssetBase.LoadingMode.Normal) {
 					atlasAsset.BeginCustomTextureLoading();
-					for (int i = 0, count = meshRenderer.sharedMaterials.Length; i < count; ++i) {
+					meshRenderer.GetSharedMaterials(sharedMaterialCache);
+					for (int i = 0, count = sharedMaterialCache.Count; i < count; ++i) {
 						Material overrideMaterial = null;
-						atlasAsset.RequireTexturesLoaded(meshRenderer.sharedMaterials[i], ref overrideMaterial);
+						atlasAsset.RequireTexturesLoaded(sharedMaterialCache[i], ref overrideMaterial);
 						if (overrideMaterial != null)
-							meshRenderer.sharedMaterials[i] = overrideMaterial;
+							sharedMaterialCache[i] = overrideMaterial;
 					}
+					meshRenderer.SetSharedMaterials(sharedMaterialCache);
 					atlasAsset.EndCustomTextureLoading();
 				}
 			}
@@ -918,8 +921,9 @@ namespace Spine.Unity {
 				meshRenderer.GetPropertyBlock(reusedPropertyBlock);
 			}
 
-			for (int i = 0; i < meshRenderer.sharedMaterials.Length; ++i) {
-				if (!meshRenderer.sharedMaterials[i])
+			meshRenderer.GetSharedMaterials(sharedMaterialCache);
+			for (int i = 0; i < sharedMaterialCache.Count; ++i) {
+				if (!sharedMaterialCache[i])
 					continue;
 
 				if (!hasPerRendererBlock) meshRenderer.GetPropertyBlock(reusedPropertyBlock, i);
@@ -928,8 +932,9 @@ namespace Spine.Unity {
 				reusedPropertyBlock.SetFloat(SUBMESH_DUMMY_PARAM_ID, i);
 				meshRenderer.SetPropertyBlock(reusedPropertyBlock, i);
 
-				meshRenderer.sharedMaterials[i].enableInstancing = false;
+				sharedMaterialCache[i].enableInstancing = false;
 			}
+			meshRenderer.SetSharedMaterials(sharedMaterialCache);
 		}
 #endif
 	}
