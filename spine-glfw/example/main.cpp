@@ -35,8 +35,8 @@ int main() {
     spine_bone_set_is_y_down(true);
 
     // Load the atlas and the skeleton data
-    atlas_t *atlas = atlas_load("/Users/badlogic/workspaces/spine-runtimes/examples/spineboy/export/spineboy.atlas");
-    spine_skeleton_data skeleton_data = skeleton_data_load("/Users/badlogic/workspaces/spine-runtimes/examples/spineboy/export/spineboy-pro.json", atlas);
+    atlas_t *atlas = atlas_load("data/spineboy-pma.atlas");
+    spine_skeleton_data skeleton_data = skeleton_data_load("data/spineboy-pro.json", atlas);
 
     // Create a skeleton drawable from the data, set the skeleton's position to the bottom center of
     // the screen and scale it to make it smaller.

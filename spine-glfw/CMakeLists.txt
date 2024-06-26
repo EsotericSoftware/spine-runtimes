@@ -54,6 +54,7 @@ target_link_libraries(spine-glfw-example PRIVATE glfw)
 target_link_libraries(spine-glfw-example PRIVATE OpenGL::GL)
 target_link_libraries(spine-glfw-example LINK_PUBLIC spine-glfw)
 target_link_libraries(spine-glfw-example PRIVATE glbinding::glbinding)
+set_property(TARGET spine-glfw-example PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/spine-glfw")
 
 # copy data to build directory
 add_custom_command(TARGET spine-glfw-example PRE_BUILD
