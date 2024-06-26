@@ -99,9 +99,8 @@ export class DarkTintRenderer extends BatchRenderer {
 		const vertexData = element.vertexData;
 		const textureId = element._texture.baseTexture._batchLocation;
 		const worldAlpha = Math.min(element.worldAlpha, 1.0);
-		const missingAlphaInPMAColor = worldAlpha / element.alpha;
-		const argb = Color.shared.setValue(element._tintRGB).premultiply(missingAlphaInPMAColor, true).toPremultiplied(worldAlpha, false);
-		const darkargb = Color.shared.setValue(element._darkTintRGB).premultiply(missingAlphaInPMAColor, true).toPremultiplied(1, false);
+		const argb = Color.shared.setValue(element._tintRGB).toPremultiplied(worldAlpha, true);
+		const darkargb = Color.shared.setValue(element._darkTintRGB).premultiply(worldAlpha, true).toPremultiplied(1, false);
 
 		// lets not worry about tint! for now..
 		for (let i = 0; i < vertexData.length; i += 2) {
