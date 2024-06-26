@@ -292,6 +292,8 @@ SPINE_CPP_LITE_EXPORT float *spine_render_command_get_positions(spine_render_com
 SPINE_CPP_LITE_EXPORT float *spine_render_command_get_uvs(spine_render_command command);
 // @ignore
 SPINE_CPP_LITE_EXPORT int32_t *spine_render_command_get_colors(spine_render_command command);
+// @ignore
+SPINE_CPP_LITE_EXPORT int32_t *spine_render_command_get_dark_colors(spine_render_command command);
 SPINE_CPP_LITE_EXPORT int32_t spine_render_command_get_num_vertices(spine_render_command command);
 SPINE_CPP_LITE_EXPORT uint16_t *spine_render_command_get_indices(spine_render_command command);
 SPINE_CPP_LITE_EXPORT int32_t spine_render_command_get_num_indices(spine_render_command command);
@@ -452,6 +454,7 @@ SPINE_CPP_LITE_EXPORT float spine_skeleton_get_x(spine_skeleton skeleton);
 SPINE_CPP_LITE_EXPORT void spine_skeleton_set_x(spine_skeleton skeleton, float x);
 SPINE_CPP_LITE_EXPORT float spine_skeleton_get_y(spine_skeleton skeleton);
 SPINE_CPP_LITE_EXPORT void spine_skeleton_set_y(spine_skeleton skeleton, float y);
+SPINE_CPP_LITE_EXPORT void spine_skeleton_set_scale(spine_skeleton skeleton, float scaleX, float scaleY);
 SPINE_CPP_LITE_EXPORT float spine_skeleton_get_scale_x(spine_skeleton skeleton);
 SPINE_CPP_LITE_EXPORT void spine_skeleton_set_scale_x(spine_skeleton skeleton, float scaleX);
 SPINE_CPP_LITE_EXPORT float spine_skeleton_get_scale_y(spine_skeleton skeleton);

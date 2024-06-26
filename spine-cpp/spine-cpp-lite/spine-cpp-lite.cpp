@@ -135,6 +135,7 @@ typedef struct _spine_render_command {
 	float *positions;
 	float *uvs;
 	int32_t *colors;
+    int32_t *darkColors;
 	int32_t numVertices;
 	uint16_t *indices;
 	int32_t numIndices;
@@ -653,6 +654,7 @@ static _spine_render_command *spine_render_command_create(BlockAllocator &alloca
 	cmd->positions = allocator.allocate<float>(numVertices << 1);
 	cmd->uvs = allocator.allocate<float>(numVertices << 1);
 	cmd->colors = allocator.allocate<int32_t>(numVertices);
+    cmd->darkColors = allocator.allocate<int32_t>(numVertices);
 	cmd->numVertices = numVertices;
 	cmd->indices = allocator.allocate<uint16_t>(numIndices);
 	cmd->numIndices = numIndices;
@@ -697,6 +699,7 @@ static _spine_render_command *batch_sub_commands(BlockAllocator &allocator, Vect
 	float *positions = batched->positions;
 	float *uvs = batched->uvs;
 	int32_t *colors = batched->colors;
+    int32_t *darkColors = batched->darkColors;
 	uint16_t *indices = batched->indices;
 	int indicesOffset = 0;
 	for (int i = first; i <= last; i++) {
@@ -704,12 +707,14 @@ static _spine_render_command *batch_sub_commands(BlockAllocator &allocator, Vect
 		memcpy(positions, cmd->positions, sizeof(float) * 2 * cmd->numVertices);
 		memcpy(uvs, cmd->uvs, sizeof(float) * 2 * cmd->numVertices);
 		memcpy(colors, cmd->colors, sizeof(int32_t) * cmd->numVertices);
+        memcpy(darkColors, cmd->darkColors, sizeof(int32_t) * cmd->numVertices);
 		for (int ii = 0; ii < cmd->numIndices; ii++)
 			indices[ii] = cmd->indices[ii] + indicesOffset;
 		indicesOffset += cmd->numVertices;
 		positions += 2 * cmd->numVertices;
 		uvs += 2 * cmd->numVertices;
 		colors += cmd->numVertices;
+        darkColors += cmd->numVertices;
 		indices += cmd->numIndices;
 	}
 	return batched;
@@ -728,9 +733,16 @@ static _spine_render_command *batch_commands(BlockAllocator &allocator, Vector<_
 	int numIndices = first->numIndices;
 	while (i <= (int) commands.size()) {
 		_spine_render_command *cmd = i < (int) commands.size() ? commands[i] : nullptr;
+
+        if (cmd && cmd->numVertices == 0 && cmd->numIndices == 0) {
+            i++;
+            continue;
+        }
+
 		if (cmd != nullptr && cmd->atlasPage == first->atlasPage &&
 			cmd->blendMode == first->blendMode &&
 			cmd->colors[0] == first->colors[0] &&
+            cmd->darkColors[0] == first->darkColors[0] &&
 			numIndices + cmd->numIndices < 0xffff) {
 			numVertices += cmd->numVertices;
 			numIndices += cmd->numIndices;
@@ -836,6 +848,11 @@ spine_render_command spine_skeleton_drawable_render(spine_skeleton_drawable draw
 		uint8_t b = static_cast<uint8_t>(skeleton->getColor().b * slot.getColor().b * attachmentColor->b * 255);
 		uint8_t a = static_cast<uint8_t>(skeleton->getColor().a * slot.getColor().a * attachmentColor->a * 255);
 		uint32_t color = (a << 24) | (r << 16) | (g << 8) | b;
+        uint32_t darkColor = 0xff000000;
+        if (slot.hasDarkColor()) {
+            Color &slotDarkColor = slot.getDarkColor();
+            darkColor = 0xff000000 | (static_cast<uint8_t>(slotDarkColor.r * 255) << 16)| (static_cast<uint8_t>(slotDarkColor.g * 255) << 8)| static_cast<uint8_t>(slotDarkColor.b * 255);
+        }
 
 		if (clipper.isClipping()) {
 			clipper.clipTriangles(*worldVertices, *indices, *uvs, 2);
@@ -850,7 +867,10 @@ spine_render_command spine_skeleton_drawable_render(spine_skeleton_drawable draw
 		_drawable->renderCommands.add(cmd);
 		memcpy(cmd->positions, vertices->buffer(), (verticesCount << 1) * sizeof(float));
 		memcpy(cmd->uvs, uvs->buffer(), (verticesCount << 1) * sizeof(float));
-		for (int ii = 0; ii < verticesCount; ii++) cmd->colors[ii] = color;
+		for (int ii = 0; ii < verticesCount; ii++) {
+            cmd->colors[ii] = color;
+            cmd->darkColors[ii] = darkColor;
+        }
 		memcpy(cmd->indices, indices->buffer(), indices->size() * sizeof(uint16_t));
 		clipper.clipEnd(slot);
 	}
@@ -893,6 +913,11 @@ float *spine_render_command_get_uvs(spine_render_command command) {
 int32_t *spine_render_command_get_colors(spine_render_command command) {
 	if (!command) return nullptr;
 	return ((_spine_render_command *) command)->colors;
+}
+
+int32_t *spine_render_command_get_dark_colors(spine_render_command command) {
+    if (!command) return nullptr;
+    return ((_spine_render_command *) command)->darkColors;
 }
 
 int32_t spine_render_command_get_num_vertices(spine_render_command command) {
@@ -1695,6 +1720,13 @@ void spine_skeleton_set_y(spine_skeleton skeleton, float y) {
 	if (skeleton == nullptr) return;
 	Skeleton *_skeleton = (Skeleton *) skeleton;
 	_skeleton->setY(y);
+}
+
+void spine_skeleton_set_scale(spine_skeleton skeleton, float scaleX, float scaleY) {
+    if (skeleton == nullptr) return;
+    Skeleton *_skeleton = (Skeleton *) skeleton;
+    _skeleton->setScaleX(scaleX);
+    _skeleton->setScaleY(scaleY);
 }
 
 float spine_skeleton_get_scale_x(spine_skeleton skeleton) {

@@ -15,7 +15,7 @@ add_library(spine-cpp STATIC ${SOURCES} ${INCLUDES})
 target_include_directories(spine-cpp PUBLIC spine-cpp/include)
 
 add_library(spine-cpp-lite STATIC ${SOURCES} ${INCLUDES} spine-cpp-lite/spine-cpp-lite.cpp)
-target_include_directories(spine-cpp-lite PUBLIC spine-cpp/include)
+target_include_directories(spine-cpp-lite PUBLIC spine-cpp/include spine-cpp-lite)
 
 # Install target
 install(TARGETS spine-cpp EXPORT spine-cpp_TARGETS DESTINATION dist/lib)
