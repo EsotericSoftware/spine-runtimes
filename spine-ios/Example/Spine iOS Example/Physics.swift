@@ -7,16 +7,19 @@ struct Physics: View {
     var model = PhysicsModel()
     
     var body: some View {
-        SpineView(
-            from: .bundle(atlasFileName: "celestial-circus.atlas", skeletonFileName: "celestial-circus-pro.skel"),
-            controller: model.controller
-        )
-        .gesture(
-            DragGesture(minimumDistance: 0)
-                .onChanged { gesture in
-                    model.updateBonePosition(position: gesture.location)
-                }
-        )
+		ZStack {
+			Color(red: 51 / 255, green: 51 / 255, blue: 51 / 255).ignoresSafeArea()
+			SpineView(
+				from: .bundle(atlasFileName: "celestial-circus-pma.atlas", skeletonFileName: "celestial-circus-pro.skel"),
+				controller: model.controller
+			)
+			.gesture(
+				DragGesture(minimumDistance: 0)
+					.onChanged { gesture in
+						model.updateBonePosition(position: gesture.location)
+					}
+			)
+		}
         .navigationTitle("Physics (drag anywhere)")
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -42,11 +45,11 @@ final class PhysicsModel: ObservableObject {
             onInitialized: { controller in
                 controller.animationState.setAnimationByName(
                     trackIndex: 0,
-                    animationName: "eyeblink-long",
+                    animationName: "eyeblink",
                     loop: true
                 )
                 controller.animationState.setAnimationByName(
-                    trackIndex: 0,
+                    trackIndex: 1,
                     animationName: "wings-and-feet",
                     loop: true
                 )

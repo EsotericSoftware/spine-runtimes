@@ -75,7 +75,7 @@ final class DressUpModel: ObservableObject {
         )
         Task.detached(priority: .high) {
             let drawable = try await SkeletonDrawableWrapper.fromBundle(
-                atlasFileName: "mix-and-match.atlas",
+                atlasFileName: "mix-and-match-pma.atlas",
                 skeletonFileName: "mix-and-match-pro.skel"
             )
             try await MainActor.run {

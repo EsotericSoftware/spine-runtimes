@@ -8,18 +8,20 @@
 
 /* Begin PBXBuildFile section */
 		029E40AACC629A2B19C75855 /* Pods_Spine_iOS_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63A23DBBF6B9A1877F1E82A7 /* Pods_Spine_iOS_Example.framework */; };
+		76381FE22C2EF6100087712B /* spineboy-pma.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 76381FE02C2EF6100087712B /* spineboy-pma.atlas */; };
+		76381FE32C2EF6100087712B /* spineboy-pma.png in Resources */ = {isa = PBXBuildFile; fileRef = 76381FE12C2EF6100087712B /* spineboy-pma.png */; };
 		9281EF152C07885C00BE19F5 /* Spine_iOS_ExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9281EF142C07885C00BE19F5 /* Spine_iOS_ExampleApp.swift */; };
 		9281EF192C07885D00BE19F5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9281EF182C07885D00BE19F5 /* Assets.xcassets */; };
 		9281EF1C2C07885D00BE19F5 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9281EF1B2C07885D00BE19F5 /* Preview Assets.xcassets */; };
 		92BFC4B62C11BCA10051F2EA /* spineboy-pro.skel in Resources */ = {isa = PBXBuildFile; fileRef = 92BFC4B22C11BCA10051F2EA /* spineboy-pro.skel */; };
 		92BFC4B72C11BCA10051F2EA /* spineboy-pro.json in Resources */ = {isa = PBXBuildFile; fileRef = 92BFC4B32C11BCA10051F2EA /* spineboy-pro.json */; };
-		92BFC4B82C11BCA10051F2EA /* spineboy.png in Resources */ = {isa = PBXBuildFile; fileRef = 92BFC4B42C11BCA10051F2EA /* spineboy.png */; };
-		92BFC4B92C11BCA10051F2EA /* spineboy.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 92BFC4B52C11BCA10051F2EA /* spineboy.atlas */; };
 		92BFC4BB2C11BCC50051F2EA /* SimpleAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92BFC4BA2C11BCC50051F2EA /* SimpleAnimation.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		63A23DBBF6B9A1877F1E82A7 /* Pods_Spine_iOS_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Spine_iOS_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		76381FE02C2EF6100087712B /* spineboy-pma.atlas */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "spineboy-pma.atlas"; sourceTree = "<group>"; };
+		76381FE12C2EF6100087712B /* spineboy-pma.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "spineboy-pma.png"; sourceTree = "<group>"; };
 		7C440864BA6BF0A3BA8297E4 /* Pods-Spine iOS Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Spine iOS Example.debug.xcconfig"; path = "Target Support Files/Pods-Spine iOS Example/Pods-Spine iOS Example.debug.xcconfig"; sourceTree = "<group>"; };
 		9206EF0B2C119BC500320243 /* SpineCppLite.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SpineCppLite.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9281EF112C07885C00BE19F5 /* Spine iOS Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Spine iOS Example.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -28,8 +30,6 @@
 		9281EF1B2C07885D00BE19F5 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		92BFC4B22C11BCA10051F2EA /* spineboy-pro.skel */ = {isa = PBXFileReference; lastKnownFileType = file; path = "spineboy-pro.skel"; sourceTree = "<group>"; };
 		92BFC4B32C11BCA10051F2EA /* spineboy-pro.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "spineboy-pro.json"; sourceTree = "<group>"; };
-		92BFC4B42C11BCA10051F2EA /* spineboy.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spineboy.png; sourceTree = "<group>"; };
-		92BFC4B52C11BCA10051F2EA /* spineboy.atlas */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = spineboy.atlas; sourceTree = "<group>"; };
 		92BFC4BA2C11BCC50051F2EA /* SimpleAnimation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SimpleAnimation.swift; path = "Spine iOS Example/SimpleAnimation.swift"; sourceTree = SOURCE_ROOT; };
 		F571992938153AF59959A005 /* Pods-Spine iOS Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Spine iOS Example.release.xcconfig"; path = "Target Support Files/Pods-Spine iOS Example/Pods-Spine iOS Example.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -96,10 +96,10 @@
 		92BFC4B12C11BC840051F2EA /* spineboy */ = {
 			isa = PBXGroup;
 			children = (
+				76381FE02C2EF6100087712B /* spineboy-pma.atlas */,
+				76381FE12C2EF6100087712B /* spineboy-pma.png */,
 				92BFC4B32C11BCA10051F2EA /* spineboy-pro.json */,
 				92BFC4B22C11BCA10051F2EA /* spineboy-pro.skel */,
-				92BFC4B52C11BCA10051F2EA /* spineboy.atlas */,
-				92BFC4B42C11BCA10051F2EA /* spineboy.png */,
 			);
 			path = spineboy;
 			sourceTree = "<group>";
@@ -176,9 +176,9 @@
 				92BFC4B72C11BCA10051F2EA /* spineboy-pro.json in Resources */,
 				9281EF1C2C07885D00BE19F5 /* Preview Assets.xcassets in Resources */,
 				92BFC4B62C11BCA10051F2EA /* spineboy-pro.skel in Resources */,
+				76381FE22C2EF6100087712B /* spineboy-pma.atlas in Resources */,
 				9281EF192C07885D00BE19F5 /* Assets.xcassets in Resources */,
-				92BFC4B92C11BCA10051F2EA /* spineboy.atlas in Resources */,
-				92BFC4B82C11BCA10051F2EA /* spineboy.png in Resources */,
+				76381FE32C2EF6100087712B /* spineboy-pma.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -8,7 +8,7 @@ struct IKFollowing: View {
         
     var body: some View {
         SpineView(
-            from: .bundle(atlasFileName: "spineboy.atlas", skeletonFileName: "spineboy-pro.skel"),
+            from: .bundle(atlasFileName: "spineboy-pma.atlas", skeletonFileName: "spineboy-pro.skel"),
             controller: model.controller,
             alignment: .centerLeft
         )

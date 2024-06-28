@@ -1,6 +1,7 @@
-celestial-circus.png
+celestial-circus-pma.png
 	size: 1024, 1024
 	filter: Linear, Linear
+	pma: true
 	scale: 0.4
 arm-back-down
 	bounds: 324, 401, 38, 82

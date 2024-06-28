@@ -7,10 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		76381FCE2C2EF4030087712B /* celestial-circus-pma.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 76381FCC2C2EF4030087712B /* celestial-circus-pma.atlas */; };
+		76381FCF2C2EF4030087712B /* celestial-circus-pma.png in Resources */ = {isa = PBXBuildFile; fileRef = 76381FCD2C2EF4030087712B /* celestial-circus-pma.png */; };
+		76381FD72C2EF4F10087712B /* spineboy-pma.png in Resources */ = {isa = PBXBuildFile; fileRef = 76381FD12C2EF4F00087712B /* spineboy-pma.png */; };
+		76381FDB2C2EF4F10087712B /* spineboy-pma.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 76381FD52C2EF4F00087712B /* spineboy-pma.atlas */; };
+		76381FDE2C2EF53A0087712B /* mix-and-match-pma.png in Resources */ = {isa = PBXBuildFile; fileRef = 76381FDC2C2EF53A0087712B /* mix-and-match-pma.png */; };
+		76381FDF2C2EF53A0087712B /* mix-and-match-pma.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 76381FDD2C2EF53A0087712B /* mix-and-match-pma.atlas */; };
 		9205FCD42C0760B1006EE07E /* SimpleAnimationViewControllerRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9205FCD32C0760B1006EE07E /* SimpleAnimationViewControllerRepresentable.swift */; };
 		920BD1162BEBC52D0050A5A9 /* spineboy-pro.skel in Resources */ = {isa = PBXBuildFile; fileRef = 920BD1122BEBC52D0050A5A9 /* spineboy-pro.skel */; };
 		920BD1182BEBC52D0050A5A9 /* spineboy-pro.json in Resources */ = {isa = PBXBuildFile; fileRef = 920BD1142BEBC52D0050A5A9 /* spineboy-pro.json */; };
-		920BD1192BEBC52D0050A5A9 /* spineboy.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 920BD1152BEBC52D0050A5A9 /* spineboy.atlas */; };
 		920BD11B2BEBDBA60050A5A9 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920BD11A2BEBDBA60050A5A9 /* MainView.swift */; };
 		920BD11D2BEBDC380050A5A9 /* PlayPauseAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920BD11C2BEBDC380050A5A9 /* PlayPauseAnimation.swift */; };
 		920BD1262BEBDCD80050A5A9 /* dragon_4.png in Resources */ = {isa = PBXBuildFile; fileRef = 920BD11F2BEBDCD80050A5A9 /* dragon_4.png */; };
@@ -22,30 +27,30 @@
 		920BD12C2BEBDCD80050A5A9 /* dragon.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 920BD1252BEBDCD80050A5A9 /* dragon.atlas */; };
 		921C1EAF2BF609F60001A0BA /* DressUp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921C1EAE2BF609F60001A0BA /* DressUp.swift */; };
 		921C1EBA2BF60AE90001A0BA /* mix-and-match-pro.skel in Resources */ = {isa = PBXBuildFile; fileRef = 921C1EB72BF60AE90001A0BA /* mix-and-match-pro.skel */; };
-		921C1EBB2BF60AE90001A0BA /* mix-and-match.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 921C1EB82BF60AE90001A0BA /* mix-and-match.atlas */; };
-		921C1EBC2BF60AE90001A0BA /* mix-and-match.png in Resources */ = {isa = PBXBuildFile; fileRef = 921C1EB92BF60AE90001A0BA /* mix-and-match.png */; };
 		922839DF2BF4F7D8006DA9F6 /* AnimationStateEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922839DE2BF4F7D8006DA9F6 /* AnimationStateEvents.swift */; };
 		9240C26E2C0754DD003EE243 /* SimpleAnimationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9240C26D2C0754DD003EE243 /* SimpleAnimationViewController.m */; };
 		924C0C162BCFCF21004E63F7 /* SpineExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924C0C152BCFCF21004E63F7 /* SpineExampleApp.swift */; };
 		924C0C182BCFCF21004E63F7 /* SimpleAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924C0C172BCFCF21004E63F7 /* SimpleAnimation.swift */; };
 		924C0C1A2BCFCF22004E63F7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 924C0C192BCFCF22004E63F7 /* Assets.xcassets */; };
-		925315522BFF994400C96F75 /* spineboy.png in Resources */ = {isa = PBXBuildFile; fileRef = 925315512BFF994400C96F75 /* spineboy.png */; };
 		92579E772C1B0E9500FDC7D5 /* DisableRendering.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92579E762C1B0E9500FDC7D5 /* DisableRendering.swift */; };
 		925CB7E92C19BC5A00C8F47F /* Spine in Frameworks */ = {isa = PBXBuildFile; productRef = 925CB7E82C19BC5A00C8F47F /* Spine */; };
 		9270C16E2BFE356000BD25BC /* Physics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9270C16D2BFE356000BD25BC /* Physics.swift */; };
-		9270C1732BFE389600BD25BC /* celestial-circus.png in Resources */ = {isa = PBXBuildFile; fileRef = 9270C1702BFE389600BD25BC /* celestial-circus.png */; };
 		9270C1742BFE389600BD25BC /* celestial-circus-pro.skel in Resources */ = {isa = PBXBuildFile; fileRef = 9270C1712BFE389600BD25BC /* celestial-circus-pro.skel */; };
-		9270C1752BFE389600BD25BC /* celestial-circus.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 9270C1722BFE389600BD25BC /* celestial-circus.atlas */; };
 		928A8CC22BCFE7DF00D9D35B /* Spine in Frameworks */ = {isa = PBXBuildFile; productRef = 928A8CC12BCFE7DF00D9D35B /* Spine */; };
 		92D7DDA82BFF3C8800EB9E3A /* DebugRendering.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92D7DDA72BFF3C8800EB9E3A /* DebugRendering.swift */; };
 		92FE93292BF4AB9600CCDF48 /* IKFollowing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92FE93282BF4AB9600CCDF48 /* IKFollowing.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		76381FCC2C2EF4030087712B /* celestial-circus-pma.atlas */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "celestial-circus-pma.atlas"; sourceTree = "<group>"; };
+		76381FCD2C2EF4030087712B /* celestial-circus-pma.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "celestial-circus-pma.png"; sourceTree = "<group>"; };
+		76381FD12C2EF4F00087712B /* spineboy-pma.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "spineboy-pma.png"; sourceTree = "<group>"; };
+		76381FD52C2EF4F00087712B /* spineboy-pma.atlas */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "spineboy-pma.atlas"; sourceTree = "<group>"; };
+		76381FDC2C2EF53A0087712B /* mix-and-match-pma.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "mix-and-match-pma.png"; sourceTree = "<group>"; };
+		76381FDD2C2EF53A0087712B /* mix-and-match-pma.atlas */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "mix-and-match-pma.atlas"; sourceTree = "<group>"; };
 		9205FCD32C0760B1006EE07E /* SimpleAnimationViewControllerRepresentable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleAnimationViewControllerRepresentable.swift; sourceTree = "<group>"; };
 		920BD1122BEBC52D0050A5A9 /* spineboy-pro.skel */ = {isa = PBXFileReference; lastKnownFileType = file; path = "spineboy-pro.skel"; sourceTree = "<group>"; };
 		920BD1142BEBC52D0050A5A9 /* spineboy-pro.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "spineboy-pro.json"; sourceTree = "<group>"; };
-		920BD1152BEBC52D0050A5A9 /* spineboy.atlas */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = spineboy.atlas; sourceTree = "<group>"; };
 		920BD11A2BEBDBA60050A5A9 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		920BD11C2BEBDC380050A5A9 /* PlayPauseAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayPauseAnimation.swift; sourceTree = "<group>"; };
 		920BD11F2BEBDCD80050A5A9 /* dragon_4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dragon_4.png; sourceTree = "<group>"; };
@@ -57,8 +62,6 @@
 		920BD1252BEBDCD80050A5A9 /* dragon.atlas */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dragon.atlas; sourceTree = "<group>"; };
 		921C1EAE2BF609F60001A0BA /* DressUp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DressUp.swift; sourceTree = "<group>"; };
 		921C1EB72BF60AE90001A0BA /* mix-and-match-pro.skel */ = {isa = PBXFileReference; lastKnownFileType = file; path = "mix-and-match-pro.skel"; sourceTree = "<group>"; };
-		921C1EB82BF60AE90001A0BA /* mix-and-match.atlas */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "mix-and-match.atlas"; sourceTree = "<group>"; };
-		921C1EB92BF60AE90001A0BA /* mix-and-match.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "mix-and-match.png"; sourceTree = "<group>"; };
 		922839DE2BF4F7D8006DA9F6 /* AnimationStateEvents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationStateEvents.swift; sourceTree = "<group>"; };
 		9240C26B2C0754DC003EE243 /* Spine iOS Example-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Spine iOS Example-Bridging-Header.h"; sourceTree = "<group>"; };
 		9240C26C2C0754DD003EE243 /* SimpleAnimationViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SimpleAnimationViewController.h; sourceTree = "<group>"; };
@@ -68,12 +71,9 @@
 		924C0C172BCFCF21004E63F7 /* SimpleAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleAnimation.swift; sourceTree = "<group>"; };
 		924C0C192BCFCF22004E63F7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		924C0C1B2BCFCF22004E63F7 /* SpineiOSExample.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SpineiOSExample.entitlements; sourceTree = "<group>"; };
-		925315512BFF994400C96F75 /* spineboy.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spineboy.png; sourceTree = "<group>"; };
 		92579E762C1B0E9500FDC7D5 /* DisableRendering.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DisableRendering.swift; sourceTree = "<group>"; };
 		9270C16D2BFE356000BD25BC /* Physics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Physics.swift; sourceTree = "<group>"; };
-		9270C1702BFE389600BD25BC /* celestial-circus.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "celestial-circus.png"; sourceTree = "<group>"; };
 		9270C1712BFE389600BD25BC /* celestial-circus-pro.skel */ = {isa = PBXFileReference; lastKnownFileType = file; path = "celestial-circus-pro.skel"; sourceTree = "<group>"; };
-		9270C1722BFE389600BD25BC /* celestial-circus.atlas */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "celestial-circus.atlas"; sourceTree = "<group>"; };
 		92D7DDA72BFF3C8800EB9E3A /* DebugRendering.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugRendering.swift; sourceTree = "<group>"; };
 		92FE93282BF4AB9600CCDF48 /* IKFollowing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IKFollowing.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -94,10 +94,10 @@
 		920BD1112BEBC52D0050A5A9 /* spineboy */ = {
 			isa = PBXGroup;
 			children = (
-				925315512BFF994400C96F75 /* spineboy.png */,
+				76381FD52C2EF4F00087712B /* spineboy-pma.atlas */,
+				76381FD12C2EF4F00087712B /* spineboy-pma.png */,
 				920BD1122BEBC52D0050A5A9 /* spineboy-pro.skel */,
 				920BD1142BEBC52D0050A5A9 /* spineboy-pro.json */,
-				920BD1152BEBC52D0050A5A9 /* spineboy.atlas */,
 			);
 			path = spineboy;
 			sourceTree = "<group>";
@@ -119,9 +119,9 @@
 		921C1EB02BF60AA40001A0BA /* mixandmatch */ = {
 			isa = PBXGroup;
 			children = (
+				76381FDD2C2EF53A0087712B /* mix-and-match-pma.atlas */,
+				76381FDC2C2EF53A0087712B /* mix-and-match-pma.png */,
 				921C1EB72BF60AE90001A0BA /* mix-and-match-pro.skel */,
-				921C1EB82BF60AE90001A0BA /* mix-and-match.atlas */,
-				921C1EB92BF60AE90001A0BA /* mix-and-match.png */,
 			);
 			path = mixandmatch;
 			sourceTree = "<group>";
@@ -170,9 +170,9 @@
 		9270C16F2BFE387600BD25BC /* celestial */ = {
 			isa = PBXGroup;
 			children = (
+				76381FCC2C2EF4030087712B /* celestial-circus-pma.atlas */,
+				76381FCD2C2EF4030087712B /* celestial-circus-pma.png */,
 				9270C1712BFE389600BD25BC /* celestial-circus-pro.skel */,
-				9270C1722BFE389600BD25BC /* celestial-circus.atlas */,
-				9270C1702BFE389600BD25BC /* celestial-circus.png */,
 			);
 			path = celestial;
 			sourceTree = "<group>";
@@ -265,18 +265,18 @@
 				924C0C1A2BCFCF22004E63F7 /* Assets.xcassets in Resources */,
 				920BD1282BEBDCD80050A5A9 /* dragon_2.png in Resources */,
 				920BD1182BEBC52D0050A5A9 /* spineboy-pro.json in Resources */,
-				9270C1752BFE389600BD25BC /* celestial-circus.atlas in Resources */,
+				76381FCE2C2EF4030087712B /* celestial-circus-pma.atlas in Resources */,
+				76381FCF2C2EF4030087712B /* celestial-circus-pma.png in Resources */,
 				9270C1742BFE389600BD25BC /* celestial-circus-pro.skel in Resources */,
-				921C1EBB2BF60AE90001A0BA /* mix-and-match.atlas in Resources */,
-				9270C1732BFE389600BD25BC /* celestial-circus.png in Resources */,
-				925315522BFF994400C96F75 /* spineboy.png in Resources */,
-				920BD1192BEBC52D0050A5A9 /* spineboy.atlas in Resources */,
+				76381FDE2C2EF53A0087712B /* mix-and-match-pma.png in Resources */,
 				920BD1292BEBDCD80050A5A9 /* dragon-ess.skel in Resources */,
+				76381FDB2C2EF4F10087712B /* spineboy-pma.atlas in Resources */,
 				920BD1162BEBC52D0050A5A9 /* spineboy-pro.skel in Resources */,
 				920BD12B2BEBDCD80050A5A9 /* dragon.png in Resources */,
 				920BD1272BEBDCD80050A5A9 /* dragon_5.png in Resources */,
-				921C1EBC2BF60AE90001A0BA /* mix-and-match.png in Resources */,
+				76381FDF2C2EF53A0087712B /* mix-and-match-pma.atlas in Resources */,
 				920BD1262BEBDCD80050A5A9 /* dragon_4.png in Resources */,
+				76381FD72C2EF4F10087712B /* spineboy-pma.png in Resources */,
 				920BD12C2BEBDCD80050A5A9 /* dragon.atlas in Resources */,
 				921C1EBA2BF60AE90001A0BA /* mix-and-match-pro.skel in Resources */,
 			);

@@ -1,6 +1,7 @@
-spineboy.png
+spineboy-pma.png
 	size: 1024, 256
 	filter: Linear, Linear
+	pma: true
 	scale: 0.5
 crosshair
 	bounds: 352, 7, 45, 45

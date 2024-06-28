@@ -27,7 +27,7 @@ struct DisableRendering: View {
                 }
                 
                 SpineView(
-                    from: .bundle(atlasFileName: "spineboy.atlas", skeletonFileName: "spineboy-pro.skel"),
+                    from: .bundle(atlasFileName: "spineboy-pma.atlas", skeletonFileName: "spineboy-pro.skel"),
                     controller: controller,
                     isRendering: $isRendering
                 )

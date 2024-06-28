@@ -34,7 +34,7 @@ struct AnimationStateEvents: View {
         VStack {
             Text("See output in console!")
             SpineView(
-                from: .bundle(atlasFileName: "spineboy.atlas", skeletonFileName: "spineboy-pro.skel"),
+                from: .bundle(atlasFileName: "spineboy-pma.atlas", skeletonFileName: "spineboy-pro.skel"),
                 controller: controller
             )
         }

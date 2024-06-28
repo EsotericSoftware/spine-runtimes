@@ -10,7 +10,7 @@ struct DebugRendering: View {
         ZStack {
             Color.red.ignoresSafeArea()
             SpineView(
-                from: .bundle(atlasFileName: "spineboy.atlas", skeletonFileName: "spineboy-pro.skel"),
+                from: .bundle(atlasFileName: "spineboy-pma.atlas", skeletonFileName: "spineboy-pro.skel"),
                 controller: model.controller,
                 mode: .fit,
                 alignment: .center
