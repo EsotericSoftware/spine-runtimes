@@ -190,7 +190,7 @@ internal final class SpineRenderer: NSObject, MTKViewDelegate {
             lastDraw = CACurrentMediaTime()
         }
         let delta = CACurrentMediaTime() - lastDraw
-        delegate?.spineRendererWillUpdate(self)
+         delegate?.spineRendererWillUpdate(self)
         delegate?.spineRenderer(self, needsUpdate: delta)
         lastDraw = CACurrentMediaTime()
         delegate?.spineRendererDidUpdate(self)
@@ -283,40 +283,75 @@ internal final class SpineRenderer: NSObject, MTKViewDelegate {
     }
 }
 
-fileprivate extension MTLRenderPipelineColorAttachmentDescriptor {
-    
-    func apply(blendMode: BlendMode, with premultipliedAlpha: Bool) {
-        isBlendingEnabled = true
-        sourceRGBBlendFactor = blendMode.sourceRGBBlendFactor(premultipliedAlpha: premultipliedAlpha)
-        destinationRGBBlendFactor = blendMode.destinationRGBBlendFactor
-        destinationAlphaBlendFactor = .oneMinusSourceAlpha
-    }
+fileprivate extension BlendMode {
+	func sourceRGBBlendFactor(premultipliedAlpha: Bool) -> MTLBlendFactor {
+		switch self {
+		case SPINE_BLEND_MODE_NORMAL:
+			return premultipliedAlpha ? .one : .sourceAlpha
+		case SPINE_BLEND_MODE_ADDITIVE:
+			return .sourceAlpha
+		case SPINE_BLEND_MODE_MULTIPLY:
+			return .destinationColor
+		case SPINE_BLEND_MODE_SCREEN:
+			return .one
+		default:
+			return .one // Should never be called
+		}
+	}
+	
+	func sourceAlphaBlendFactor(premultipliedAlpha: Bool) -> MTLBlendFactor {
+		switch self {
+		case SPINE_BLEND_MODE_NORMAL:
+			return premultipliedAlpha ? .one : .sourceAlpha
+		case SPINE_BLEND_MODE_ADDITIVE:
+			return .sourceAlpha
+		case SPINE_BLEND_MODE_MULTIPLY:
+			return .oneMinusSourceAlpha
+		case SPINE_BLEND_MODE_SCREEN:
+			return .oneMinusSourceColor
+		default:
+			return .one // Should never be called
+		}
+	}
+
+	var destinationRGBBlendFactor: MTLBlendFactor {
+		switch self {
+		case SPINE_BLEND_MODE_NORMAL:
+			return .oneMinusSourceAlpha
+		case SPINE_BLEND_MODE_ADDITIVE:
+			return .one
+		case SPINE_BLEND_MODE_MULTIPLY:
+			return .oneMinusSourceAlpha
+		case SPINE_BLEND_MODE_SCREEN:
+			return .oneMinusSourceColor
+		default:
+			return .one // Should never be called
+		}
+	}
+
+	var destinationAlphaBlendFactor: MTLBlendFactor {
+		switch self {
+		case SPINE_BLEND_MODE_NORMAL:
+			return .oneMinusSourceAlpha
+		case SPINE_BLEND_MODE_ADDITIVE:
+			return .one
+		case SPINE_BLEND_MODE_MULTIPLY:
+			return .oneMinusSourceAlpha
+		case SPINE_BLEND_MODE_SCREEN:
+			return .oneMinusSourceColor
+		default:
+			return .one // Should never be called
+		}
+	}
 }
 
-fileprivate extension BlendMode {
-    func sourceRGBBlendFactor(premultipliedAlpha: Bool) -> MTLBlendFactor {
-        switch self {
-        case SPINE_BLEND_MODE_NORMAL, SPINE_BLEND_MODE_ADDITIVE:
-            return premultipliedAlpha ? .one : .sourceAlpha
-        case SPINE_BLEND_MODE_MULTIPLY:
-            return .destinationColor
-        case SPINE_BLEND_MODE_SCREEN:
-            return .one
-        default:
-            return .one // Should never be called
-        }
-    }
-    
-    var destinationRGBBlendFactor: MTLBlendFactor {
-        switch self {
-        case SPINE_BLEND_MODE_NORMAL, SPINE_BLEND_MODE_ADDITIVE:
-            return .oneMinusSourceAlpha
-        case SPINE_BLEND_MODE_MULTIPLY:
-            return .one
-        case SPINE_BLEND_MODE_SCREEN:
-            return .oneMinusSourceColor
-        default:
-            return .one // Should never be called
-        }
-    }
+fileprivate extension MTLRenderPipelineColorAttachmentDescriptor {
+	
+	func apply(blendMode: BlendMode, with premultipliedAlpha: Bool) {
+		isBlendingEnabled = true
+		sourceRGBBlendFactor = blendMode.sourceRGBBlendFactor(premultipliedAlpha: premultipliedAlpha)
+		sourceAlphaBlendFactor = blendMode.sourceAlphaBlendFactor(premultipliedAlpha: premultipliedAlpha)
+		destinationRGBBlendFactor = blendMode.destinationRGBBlendFactor
+		destinationAlphaBlendFactor = blendMode.destinationAlphaBlendFactor
+	}
 }
