@@ -3010,6 +3010,10 @@ public final class Skeleton: NSObject {
         spine_skeleton_set_position(wrappee, x, y)
     }
 
+    public func setScale(scaleX: Float, scaleY: Float) {
+        spine_skeleton_set_scale(wrappee, scaleX, scaleY)
+    }
+
     public func update(delta: Float) {
         spine_skeleton_update(wrappee, delta)
     }
