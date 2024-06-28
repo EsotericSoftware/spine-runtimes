@@ -149,50 +149,50 @@ _clip(spSkeletonClipping *self, float x1, float y1, float x2, float y2, float x3
 	spFloatArray_clear(output);
 
 	clippingVerticesLast = clippingArea->size - 4;
-    clippingVertices = clippingArea->items;
+	clippingVertices = clippingArea->items;
 	for (int i = 0;; i += 2) {
 		spFloatArray *temp;
 		float edgeX = clippingVertices[i], edgeY = clippingVertices[i + 1];
 		float ex = edgeX - clippingVertices[i + 2], ey = edgeY - clippingVertices[i + 3];
 
-        int outputStart = output->size;
+		int outputStart = output->size;
 		float *inputVertices = input->items;
-		for (int ii = 0, nn =  input->size - 2; ii < nn;) {
-            float inputX = inputVertices[ii], inputY = inputVertices[ii + 1];
-            ii += 2;
-            float inputX2 = inputVertices[ii], inputY2 = inputVertices[ii + 1];
-            float s2 = ey * (edgeX - inputX2) > ex * (edgeY - inputY2);
-            float s1 = ey * (edgeX - inputX) - ex * (edgeY - inputY);
-            if (s1 > 0) {
-                if (s2) { // v1 inside, v2 inside
-                    spFloatArray_add(output, inputX2);
-                    spFloatArray_add(output, inputY2);
-                    continue;
-                }
-                // v1 inside, v2 outside
-                float ix = inputX2 - inputX, iy = inputY2 - inputY, t = s1 / (ix * ey - iy * ex);
-                if (t >= 0 && t <= 1) {
-                    spFloatArray_add(output, inputX + ix * t);
-                    spFloatArray_add(output, inputY + iy * t);
-                } else {
-                    spFloatArray_add(output, inputX2);
-                    spFloatArray_add(output, inputY2);
-                }
-            } else if (s2) { // v1 outside, v2 inside
-                float ix = inputX2 - inputX, iy = inputY2 - inputY, t = s1 / (ix * ey - iy * ex);
-                if (t >= 0 && t <= 1) {
-                    spFloatArray_add(output, inputX + ix * t);
-                    spFloatArray_add(output, inputY + iy * t);
-                    spFloatArray_add(output, inputX2);
-                    spFloatArray_add(output, inputY2);
-                } else {
-                    spFloatArray_add(output, inputX2);
-                    spFloatArray_add(output, inputY2);
-                    continue;
-                }
-            }
-            clipped = -1;
-        }
+		for (int ii = 0, nn = input->size - 2; ii < nn;) {
+			float inputX = inputVertices[ii], inputY = inputVertices[ii + 1];
+			ii += 2;
+			float inputX2 = inputVertices[ii], inputY2 = inputVertices[ii + 1];
+			float s2 = ey * (edgeX - inputX2) > ex * (edgeY - inputY2);
+			float s1 = ey * (edgeX - inputX) - ex * (edgeY - inputY);
+			if (s1 > 0) {
+				if (s2) {// v1 inside, v2 inside
+					spFloatArray_add(output, inputX2);
+					spFloatArray_add(output, inputY2);
+					continue;
+				}
+				// v1 inside, v2 outside
+				float ix = inputX2 - inputX, iy = inputY2 - inputY, t = s1 / (ix * ey - iy * ex);
+				if (t >= 0 && t <= 1) {
+					spFloatArray_add(output, inputX + ix * t);
+					spFloatArray_add(output, inputY + iy * t);
+				} else {
+					spFloatArray_add(output, inputX2);
+					spFloatArray_add(output, inputY2);
+				}
+			} else if (s2) {// v1 outside, v2 inside
+				float ix = inputX2 - inputX, iy = inputY2 - inputY, t = s1 / (ix * ey - iy * ex);
+				if (t >= 0 && t <= 1) {
+					spFloatArray_add(output, inputX + ix * t);
+					spFloatArray_add(output, inputY + iy * t);
+					spFloatArray_add(output, inputX2);
+					spFloatArray_add(output, inputY2);
+				} else {
+					spFloatArray_add(output, inputX2);
+					spFloatArray_add(output, inputY2);
+					continue;
+				}
+			}
+			clipped = -1;
+		}
 
 		if (outputStart == output->size) {
 			spFloatArray_clear(originalOutput);
