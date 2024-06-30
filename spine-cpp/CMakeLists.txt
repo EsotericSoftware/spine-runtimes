@@ -1,11 +1,7 @@
-if(MSVC)
-	message("MSCV detected")
-	set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
-	set (CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS}")
-else()
-	set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -pedantic -std=c89")
-	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wnon-virtual-dtor -pedantic -std=c++11 -fno-exceptions -fno-rtti")
-endif()
+cmake_minimum_required(VERSION 3.10)
+project(spine-cpp)
+
+include(${CMAKE_SOURCE_DIR}/../flags.cmake)
 
 include_directories(include)
 file(GLOB INCLUDES "spine-cpp/include/**/*.h")
