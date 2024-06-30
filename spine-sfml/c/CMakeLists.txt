@@ -1,3 +1,8 @@
+cmake_minimum_required(VERSION 3.10)
+project(spine-sfml)
+
+# Default flags
+include(${CMAKE_CURRENT_LIST_DIR}/../../flags.cmake)
 #
 # First download and extract SFML 2.5.1 for the respective OS we are on
 #
@@ -43,6 +48,9 @@ else()
 		)
 	endif()
 endif()
+
+# Add spine-c
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../../spine-c ${CMAKE_BINARY_DIR}/spine-c-build)
 
 # Define spine-sfml library
 include_directories(src ${SFML_DIR}/include)

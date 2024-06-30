@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(spine-glfw)
+project(spine-sdl)
 
 # Default flags
 include(${CMAKE_SOURCE_DIR}/../flags.cmake)
