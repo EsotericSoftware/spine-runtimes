@@ -201,3 +201,4 @@ spine-ue/Plugins/Developer
 spine-haxe/export
 spine-godot/example-v4-csharp/.godot
 spine-flutter/src/spine-cpp-lite
+spine-sdl/.vs
