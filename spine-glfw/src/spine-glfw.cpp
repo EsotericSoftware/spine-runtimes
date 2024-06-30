@@ -200,7 +200,7 @@ void texture_dispose(texture_t texture) {
 }
 
 void matrix_ortho_projection(float *matrix, float width, float height) {
-    std::memset(matrix, 0, 16 * sizeof(float));
+    memset(matrix, 0, 16 * sizeof(float));
 
     float left = 0.0f;
     float right = width;
