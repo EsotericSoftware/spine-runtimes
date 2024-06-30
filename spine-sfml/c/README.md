@@ -33,10 +33,10 @@ The Spine SFML example works on Windows, Linux and Mac OS X.
 
 ### Windows
 
-1. Install [Visual Studio 2022 Community](https://www.visualstudio.com/en-us/downloads/download-visual-studio-vs.aspx). Make sure you install support for C++, CMake, as well as th Windows SDK for XP/7/8.
-2. Download the Spine Runtimes repository using git (`git clone https://github.com/esotericsoftware/spine-runtimes`) or download it as a zip via the download button above.
-
-The entire example code is contained in [main.cpp](example/main.cpp#L61)
+1. Install [Visual Studio 2022 Community](https://www.visualstudio.com/en-us/downloads/download-visual-studio-vs.aspx). Make sure you install support for C++, CMake as well as th Windows SDK for XP/7/8.
+1. Open Visual Studio and open the `spine-sfml/c` folder via the `Open a local folder` button
+1. Let CMake finish, then select `spine-sfml-cpp-example.exe` as the start-up project
+1. Start debugging to run the example
 
 ### Linux
 
@@ -46,7 +46,7 @@ The entire example code is contained in [main.cpp](example/main.cpp#L61)
 4. Open a terminal, and `cd` into the `spine-runtimes/spine-sfml/c` folder
 5. Type `mkdir build && cd build && cmake ..` to generate Make files
 6. Type `make -j8` to compile the example
-7. Run the example by `./spine-sfml-c-example`
+7. Run the example via `./spine-sfml-c-example`
 
 ### Mac OS X
 
