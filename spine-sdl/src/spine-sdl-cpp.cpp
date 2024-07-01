@@ -33,10 +33,11 @@
 #define STB_IMAGE_IMPLEMENTATION
 
 #include <stb_image.h>
+#include <spine/Debug.h>
 
 using namespace spine;
 
-SkeletonRenderer skeletonRenderer;
+SkeletonRenderer *skeletonRenderer = nullptr;
 
 SkeletonDrawable::SkeletonDrawable(SkeletonData *skeletonData, AnimationStateData *animationStateData) {
 	Bone::setYDown(true);
@@ -61,14 +62,15 @@ void SkeletonDrawable::update(float delta, Physics physics) {
 }
 
 inline void toSDLColor(uint32_t color, SDL_Color *sdlColor) {
-    sdlColor->r = (color >> 24) & 0xFF;
-    sdlColor->g = (color >> 16) & 0xFF;
-    sdlColor->b = (color >> 8) & 0xFF;
-    sdlColor->a = color & 0xFF;
+    sdlColor->a = (color >> 24) & 0xFF;
+    sdlColor->r = (color >> 16) & 0xFF;
+    sdlColor->g = (color >> 8) & 0xFF;
+    sdlColor->b = color & 0xFF;
 }
 
 void SkeletonDrawable::draw(SDL_Renderer *renderer) {
-    RenderCommand *command = skeletonRenderer.render(*skeleton);
+    if (!skeletonRenderer) skeletonRenderer = new (__FILE__, __LINE__) SkeletonRenderer();
+    RenderCommand *command = skeletonRenderer->render(*skeleton);
     while(command) {
         float *positions = command->positions;
         float *uvs = command->uvs;

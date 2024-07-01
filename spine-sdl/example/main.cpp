@@ -29,64 +29,74 @@
 
 #include <spine-sdl-cpp.h>
 #include <SDL.h>
+#include <spine/Debug.h>
 #undef main
+spine::DebugExtension dbgExtension(spine::SpineExtension::getInstance());
+extern spine::SkeletonRenderer *skeletonRenderer;
 
-int main(int argc, char **argv) {
-	if (SDL_Init(SDL_INIT_VIDEO)) {
-		printf("Error: %s", SDL_GetError());
-		return -1;
-	}
-	SDL_Window *window = SDL_CreateWindow("Spine SDL", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600, 0);
-	if (!window) {
-		printf("Error: %s", SDL_GetError());
-		return -1;
-	}
-	SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-	if (!renderer) {
-		printf("Error: %s", SDL_GetError());
-		return -1;
-	}
+int main() {
+    spine::SpineExtension::setInstance(&dbgExtension);
+    {
+        if (SDL_Init(SDL_INIT_VIDEO)) {
+            printf("Error: %s", SDL_GetError());
+            return -1;
+        }
+        SDL_Window *window = SDL_CreateWindow("Spine SDL", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600,
+                                              0);
+        if (!window) {
+            printf("Error: %s", SDL_GetError());
+            return -1;
+        }
+        SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+        if (!renderer) {
+            printf("Error: %s", SDL_GetError());
+            return -1;
+        }
 
-	spine::SDLTextureLoader textureLoader(renderer);
-	spine::Atlas atlas("data/spineboy-pma.atlas", &textureLoader);
-	spine::AtlasAttachmentLoader attachmentLoader(&atlas);
-	spine::SkeletonJson json(&attachmentLoader);
-	json.setScale(0.5f);
-	spine::SkeletonData *skeletonData = json.readSkeletonDataFile("data/spineboy-pro.json");
-	spine::SkeletonDrawable drawable(skeletonData);
-	drawable.usePremultipliedAlpha = true;
-	drawable.animationState->getData()->setDefaultMix(0.2f);
-	drawable.skeleton->setPosition(400, 500);
-	drawable.skeleton->setToSetupPose();
-	drawable.animationState->setAnimation(0, "portal", true);
-	drawable.animationState->addAnimation(0, "run", true, 0);
-	drawable.update(0, spine::Physics_Update);
+        spine::SDLTextureLoader textureLoader(renderer);
+        spine::Atlas atlas("data/spineboy-pma.atlas", &textureLoader);
+        spine::AtlasAttachmentLoader attachmentLoader(&atlas);
+        spine::SkeletonJson json(&attachmentLoader);
+        json.setScale(0.5f);
+        spine::SkeletonData *skeletonData = json.readSkeletonDataFile("data/spineboy-pro.json");
+        spine::SkeletonDrawable drawable(skeletonData);
+        drawable.usePremultipliedAlpha = true;
+        drawable.animationState->getData()->setDefaultMix(0.2f);
+        drawable.skeleton->setPosition(400, 500);
+        drawable.skeleton->setToSetupPose();
+        drawable.animationState->setAnimation(0, "portal", true);
+        drawable.animationState->addAnimation(0, "run", true, 0);
+        drawable.update(0, spine::Physics_Update);
 
-	bool quit = false;
-	uint64_t lastFrameTime = SDL_GetPerformanceCounter();
-	while (!quit) {
-		SDL_Event event;
-		while (SDL_PollEvent(&event) != 0) {
-			if (event.type == SDL_QUIT) {
-				quit = true;
-				break;
-			}
-		}
+        bool quit = false;
+        uint64_t lastFrameTime = SDL_GetPerformanceCounter();
+        while (!quit) {
+            SDL_Event event;
+            while (SDL_PollEvent(&event) != 0) {
+                if (event.type == SDL_QUIT) {
+                    quit = true;
+                    break;
+                }
+            }
 
-		SDL_SetRenderDrawColor(renderer, 94, 93, 96, 255);
-		SDL_RenderClear(renderer);
+            SDL_SetRenderDrawColor(renderer, 94, 93, 96, 255);
+            SDL_RenderClear(renderer);
 
-		uint64_t now = SDL_GetPerformanceCounter();
-		double deltaTime = (now - lastFrameTime) / (double) SDL_GetPerformanceFrequency();
-		lastFrameTime = now;
+            uint64_t now = SDL_GetPerformanceCounter();
+            double deltaTime = (now - lastFrameTime) / (double) SDL_GetPerformanceFrequency();
+            lastFrameTime = now;
 
-		drawable.update(deltaTime, spine::Physics_Update);
-		drawable.draw(renderer);
+            drawable.update(deltaTime, spine::Physics_Update);
+            drawable.draw(renderer);
 
-		SDL_RenderPresent(renderer);
-	}
+            SDL_RenderPresent(renderer);
+        }
 
-	SDL_DestroyWindow(window);
-	SDL_Quit();
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        delete skeletonData;
+    }
+    delete skeletonRenderer;
+    dbgExtension.reportLeaks();
 	return 0;
 }
