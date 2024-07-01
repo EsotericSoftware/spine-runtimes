@@ -90,13 +90,13 @@ void SkeletonDrawable::draw(RenderTarget &target, RenderStates states) const {
     if (!skeletonRenderer) skeletonRenderer = new (__FILE__, __LINE__) SkeletonRenderer();
     RenderCommand *command = skeletonRenderer->render(*skeleton);
     while (command) {
-        Texture *texture = (Texture *)command->texture;
-        Vector2u size = texture->getSize();
         Vertex vertex;
         float *positions = command->positions;
         float *uvs = command->uvs;
         uint32_t *colors = command->colors;
         uint16_t *indices = command->indices;
+        Texture *texture = (Texture *)command->texture;
+        Vector2u size = texture->getSize();
         for (int i = 0, n = command->numIndices; i < n; ++i) {
             int ii = indices[i];
             int index = ii << 1;

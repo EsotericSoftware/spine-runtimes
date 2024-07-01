@@ -50,7 +50,6 @@ namespace spine {
 			String path = sequence->getPath(basePath, i);
 			regions[i] = atlas->findRegion(path);
 			if (!regions[i]) return false;
-			regions[i]->rendererObject = regions[i];
 		}
 		return true;
 	}
