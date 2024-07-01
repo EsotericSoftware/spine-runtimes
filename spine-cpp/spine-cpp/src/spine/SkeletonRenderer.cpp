@@ -55,8 +55,8 @@ static RenderCommand *createRenderCommand(BlockAllocator &allocator, int numVert
     RenderCommand *cmd = allocator.allocate<RenderCommand>(1);
     cmd->positions = allocator.allocate<float>(numVertices << 1);
     cmd->uvs = allocator.allocate<float>(numVertices << 1);
-    cmd->colors = allocator.allocate<int32_t>(numVertices);
-    cmd->darkColors = allocator.allocate<int32_t>(numVertices);
+    cmd->colors = allocator.allocate<uint32_t>(numVertices);
+    cmd->darkColors = allocator.allocate<uint32_t>(numVertices);
     cmd->numVertices = numVertices;
     cmd->indices = allocator.allocate<uint16_t>(numIndices);
     cmd->numIndices = numIndices;
@@ -70,8 +70,8 @@ static RenderCommand *batchSubCommands(BlockAllocator &allocator, Vector<RenderC
     RenderCommand *batched = createRenderCommand(allocator, numVertices, numIndices, commands[first]->blendMode, commands[first]->texture);
     float *positions = batched->positions;
     float *uvs = batched->uvs;
-    int32_t *colors = batched->colors;
-    int32_t *darkColors = batched->darkColors;
+    uint32_t *colors = batched->colors;
+    uint32_t *darkColors = batched->darkColors;
     uint16_t *indices = batched->indices;
     int indicesOffset = 0;
     for (int i = first; i <= last; i++) {

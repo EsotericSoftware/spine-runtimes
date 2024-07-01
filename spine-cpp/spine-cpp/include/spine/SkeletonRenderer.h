@@ -39,8 +39,8 @@ namespace spine {
     struct SP_API RenderCommand {
         float *positions;
         float *uvs;
-        int32_t *colors;
-        int32_t *darkColors;
+        uint32_t *colors;
+        uint32_t *darkColors;
         int32_t numVertices;
         uint16_t *indices;
         int32_t numIndices;
