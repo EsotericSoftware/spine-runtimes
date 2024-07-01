@@ -34,228 +34,106 @@
 #endif
 
 using namespace sf;
+using namespace spine;
 
-sf::BlendMode normal = sf::BlendMode(sf::BlendMode::SrcAlpha, sf::BlendMode::OneMinusSrcAlpha);
-sf::BlendMode additive = sf::BlendMode(sf::BlendMode::SrcAlpha, sf::BlendMode::One);
-sf::BlendMode multiply = sf::BlendMode(sf::BlendMode::DstColor, sf::BlendMode::OneMinusSrcAlpha);
-sf::BlendMode screen = sf::BlendMode(sf::BlendMode::One, sf::BlendMode::OneMinusSrcColor);
+sf::BlendMode blendModes[] = {
+        sf::BlendMode(sf::BlendMode::SrcAlpha, sf::BlendMode::OneMinusSrcAlpha),
+        sf::BlendMode(sf::BlendMode::SrcAlpha, sf::BlendMode::One),
+        sf::BlendMode(sf::BlendMode::DstColor, sf::BlendMode::OneMinusSrcAlpha),
+        sf::BlendMode(sf::BlendMode::One, sf::BlendMode::OneMinusSrcColor)
+};
 
-sf::BlendMode normalPma = sf::BlendMode(sf::BlendMode::One, sf::BlendMode::OneMinusSrcAlpha);
-sf::BlendMode additivePma = sf::BlendMode(sf::BlendMode::One, sf::BlendMode::One);
-sf::BlendMode multiplyPma = sf::BlendMode(sf::BlendMode::DstColor, sf::BlendMode::OneMinusSrcAlpha);
-sf::BlendMode screenPma = sf::BlendMode(sf::BlendMode::One, sf::BlendMode::OneMinusSrcColor);
+sf::BlendMode blendModesPma[] = {
+        sf::BlendMode(sf::BlendMode::One, sf::BlendMode::OneMinusSrcAlpha),
+        sf::BlendMode(sf::BlendMode::One, sf::BlendMode::One),
+        sf::BlendMode(sf::BlendMode::DstColor, sf::BlendMode::OneMinusSrcAlpha),
+        sf::BlendMode(sf::BlendMode::One, sf::BlendMode::OneMinusSrcColor),
+};
 
-namespace spine {
+SkeletonRenderer *skeletonRenderer = nullptr;
 
-	SkeletonDrawable::SkeletonDrawable(SkeletonData *skeletonData, AnimationStateData *stateData) : timeScale(1),
-																									vertexArray(new VertexArray(Triangles, skeletonData->getBones().size() * 4)),
-																									worldVertices(), clipper(), usePremultipliedAlpha(false) {
-		Bone::setYDown(true);
-		worldVertices.ensureCapacity(SPINE_MESH_VERTEX_COUNT_MAX);
-		skeleton = new (__FILE__, __LINE__) Skeleton(skeletonData);
-		tempUvs.ensureCapacity(16);
-		tempColors.ensureCapacity(16);
+SkeletonDrawable::SkeletonDrawable(SkeletonData *skeletonData, AnimationStateData *stateData) : timeScale(1),
+                                                                                                usePremultipliedAlpha(false),
+                                                                                                vertexArray(new VertexArray(Triangles, skeletonData->getBones().size() * 4)) {
+    Bone::setYDown(true);
+    skeleton = new (__FILE__, __LINE__) Skeleton(skeletonData);
+    ownsAnimationStateData = stateData == 0;
+    if (ownsAnimationStateData) stateData = new (__FILE__, __LINE__) AnimationStateData(skeletonData);
+    state = new (__FILE__, __LINE__) AnimationState(stateData);
+}
 
-		ownsAnimationStateData = stateData == 0;
-		if (ownsAnimationStateData) stateData = new (__FILE__, __LINE__) AnimationStateData(skeletonData);
+SkeletonDrawable::~SkeletonDrawable() {
+    delete vertexArray;
+    if (ownsAnimationStateData) delete state->getData();
+    delete state;
+    delete skeleton;
+}
 
-		state = new (__FILE__, __LINE__) AnimationState(stateData);
+void SkeletonDrawable::update(float deltaTime, Physics physics) {
+    state->update(deltaTime * timeScale);
+    state->apply(*skeleton);
+    skeleton->update(deltaTime * timeScale);
+    skeleton->updateWorldTransform(physics);
+}
 
-		quadIndices.add(0);
-		quadIndices.add(1);
-		quadIndices.add(2);
-		quadIndices.add(2);
-		quadIndices.add(3);
-		quadIndices.add(0);
-	}
+inline void toSFMLColor(uint32_t color, sf::Color *sfmlColor) {
+    sfmlColor->a = (color >> 24) & 0xFF;
+    sfmlColor->r = (color >> 16) & 0xFF;
+    sfmlColor->g = (color >> 8) & 0xFF;
+    sfmlColor->b = color & 0xFF;
+}
 
-	SkeletonDrawable::~SkeletonDrawable() {
-		delete vertexArray;
-		if (ownsAnimationStateData) delete state->getData();
-		delete state;
-		delete skeleton;
-	}
+void SkeletonDrawable::draw(RenderTarget &target, RenderStates states) const {
+    states.texture = NULL;
+    vertexArray->clear();
 
-	void SkeletonDrawable::update(float deltaTime, Physics physics) {
-		state->update(deltaTime * timeScale);
-		state->apply(*skeleton);
-		skeleton->update(deltaTime * timeScale);
-		skeleton->updateWorldTransform(physics);
-	}
+    if (!skeletonRenderer) skeletonRenderer = new (__FILE__, __LINE__) SkeletonRenderer();
+    RenderCommand *command = skeletonRenderer->render(*skeleton);
+    while (command) {
+        Texture *texture = (Texture *)command->texture;
+        Vector2u size = texture->getSize();
+        Vertex vertex;
+        float *positions = command->positions;
+        float *uvs = command->uvs;
+        uint32_t *colors = command->colors;
+        uint16_t *indices = command->indices;
+        for (int i = 0, n = command->numIndices; i < n; ++i) {
+            int ii = indices[i];
+            int index = ii << 1;
+            vertex.position.x = positions[index];
+            vertex.position.y = positions[index + 1];
+            vertex.texCoords.x = uvs[index] * size.x;
+            vertex.texCoords.y = uvs[index + 1] * size.y;
+            toSFMLColor(colors[ii], &vertex.color);
+            vertexArray->append(vertex);
+        }
+        BlendMode blendMode = command->blendMode;
+        states.blendMode = usePremultipliedAlpha ? blendModesPma[blendMode] : blendModes[blendMode];
+        states.texture = texture;
+        target.draw(*vertexArray, states);
+        vertexArray->clear();
 
-	void SkeletonDrawable::draw(RenderTarget &target, RenderStates states) const {
-		vertexArray->clear();
-		states.texture = NULL;
+        command = command->next;
+    }
+}
 
-		// Early out if skeleton is invisible
-		if (skeleton->getColor().a == 0) return;
+void SFMLTextureLoader::load(AtlasPage &page, const String &path) {
+    Texture *texture = new Texture();
+    if (!texture->loadFromFile(path.buffer())) return;
 
-		sf::Vertex vertex;
-		Texture *texture = NULL;
-		for (unsigned i = 0; i < skeleton->getSlots().size(); ++i) {
-			Slot &slot = *skeleton->getDrawOrder()[i];
-			Attachment *attachment = slot.getAttachment();
-			if (!attachment) {
-				clipper.clipEnd(slot);
-				continue;
-			}
+    if (page.magFilter == TextureFilter_Linear) texture->setSmooth(true);
+    if (page.uWrap == TextureWrap_Repeat && page.vWrap == TextureWrap_Repeat) texture->setRepeated(true);
 
-			// Early out if the slot color is 0 or the bone is not active
-			if (slot.getColor().a == 0 || !slot.getBone().isActive()) {
-				clipper.clipEnd(slot);
-				continue;
-			}
+    page.texture = texture;
+    Vector2u size = texture->getSize();
+    page.width = size.x;
+    page.height = size.y;
+}
 
-			Vector<float> *vertices = &worldVertices;
-			Vector<float> *uvs = NULL;
-			Vector<unsigned short> *indices = NULL;
-			int indicesCount = 0;
-			Color *attachmentColor;
+void SFMLTextureLoader::unload(void *texture) {
+    delete (Texture *) texture;
+}
 
-			if (attachment->getRTTI().isExactly(RegionAttachment::rtti)) {
-				RegionAttachment *regionAttachment = (RegionAttachment *) attachment;
-				attachmentColor = &regionAttachment->getColor();
-
-				// Early out if the slot color is 0
-				if (attachmentColor->a == 0) {
-					clipper.clipEnd(slot);
-					continue;
-				}
-
-				worldVertices.setSize(8, 0);
-				regionAttachment->computeWorldVertices(slot, worldVertices, 0, 2);
-				uvs = &regionAttachment->getUVs();
-				indices = &quadIndices;
-				indicesCount = 6;
-				texture = (Texture *) ((AtlasRegion *) regionAttachment->getRegion())->page->texture;
-
-			} else if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
-				MeshAttachment *mesh = (MeshAttachment *) attachment;
-				attachmentColor = &mesh->getColor();
-
-				// Early out if the slot color is 0
-				if (attachmentColor->a == 0) {
-					clipper.clipEnd(slot);
-					continue;
-				}
-
-				worldVertices.setSize(mesh->getWorldVerticesLength(), 0);
-				mesh->computeWorldVertices(slot, 0, mesh->getWorldVerticesLength(), worldVertices.buffer(), 0, 2);
-				uvs = &mesh->getUVs();
-				indices = &mesh->getTriangles();
-				indicesCount = mesh->getTriangles().size();
-				texture = (Texture *) ((AtlasRegion *) mesh->getRegion())->page->texture;
-
-			} else if (attachment->getRTTI().isExactly(ClippingAttachment::rtti)) {
-				ClippingAttachment *clip = (ClippingAttachment *) slot.getAttachment();
-				clipper.clipStart(slot, clip);
-				continue;
-			} else
-				continue;
-
-			Uint8 r = static_cast<Uint8>(skeleton->getColor().r * slot.getColor().r * attachmentColor->r * 255);
-			Uint8 g = static_cast<Uint8>(skeleton->getColor().g * slot.getColor().g * attachmentColor->g * 255);
-			Uint8 b = static_cast<Uint8>(skeleton->getColor().b * slot.getColor().b * attachmentColor->b * 255);
-			Uint8 a = static_cast<Uint8>(skeleton->getColor().a * slot.getColor().a * attachmentColor->a * 255);
-			vertex.color.r = r;
-			vertex.color.g = g;
-			vertex.color.b = b;
-			vertex.color.a = a;
-
-			Color light;
-			light.r = r / 255.0f;
-			light.g = g / 255.0f;
-			light.b = b / 255.0f;
-			light.a = a / 255.0f;
-
-			sf::BlendMode blend;
-			if (!usePremultipliedAlpha) {
-				switch (slot.getData().getBlendMode()) {
-					case BlendMode_Normal:
-						blend = normal;
-						break;
-					case BlendMode_Additive:
-						blend = additive;
-						break;
-					case BlendMode_Multiply:
-						blend = multiply;
-						break;
-					case BlendMode_Screen:
-						blend = screen;
-						break;
-					default:
-						blend = normal;
-				}
-			} else {
-				switch (slot.getData().getBlendMode()) {
-					case BlendMode_Normal:
-						blend = normalPma;
-						break;
-					case BlendMode_Additive:
-						blend = additivePma;
-						break;
-					case BlendMode_Multiply:
-						blend = multiplyPma;
-						break;
-					case BlendMode_Screen:
-						blend = screenPma;
-						break;
-					default:
-						blend = normalPma;
-				}
-			}
-
-			if (states.texture == 0) states.texture = texture;
-
-			if (states.blendMode != blend || states.texture != texture) {
-				target.draw(*vertexArray, states);
-				vertexArray->clear();
-				states.blendMode = blend;
-				states.texture = texture;
-			}
-
-			if (clipper.isClipping()) {
-				clipper.clipTriangles(worldVertices, *indices, *uvs, 2);
-				vertices = &clipper.getClippedVertices();
-				uvs = &clipper.getClippedUVs();
-				indices = &clipper.getClippedTriangles();
-				indicesCount = clipper.getClippedTriangles().size();
-			}
-
-			Vector2u size = texture->getSize();
-
-			for (int ii = 0; ii < indicesCount; ++ii) {
-				int index = (*indices)[ii] << 1;
-				vertex.position.x = (*vertices)[index];
-				vertex.position.y = (*vertices)[index + 1];
-				vertex.texCoords.x = (*uvs)[index] * size.x;
-				vertex.texCoords.y = (*uvs)[index + 1] * size.y;
-				vertexArray->append(vertex);
-			}
-			clipper.clipEnd(slot);
-		}
-		target.draw(*vertexArray, states);
-		clipper.clipEnd();
-	}
-
-	void SFMLTextureLoader::load(AtlasPage &page, const String &path) {
-		Texture *texture = new Texture();
-		if (!texture->loadFromFile(path.buffer())) return;
-
-		if (page.magFilter == TextureFilter_Linear) texture->setSmooth(true);
-		if (page.uWrap == TextureWrap_Repeat && page.vWrap == TextureWrap_Repeat) texture->setRepeated(true);
-
-		page.texture = texture;
-		Vector2u size = texture->getSize();
-		page.width = size.x;
-		page.height = size.y;
-	}
-
-	void SFMLTextureLoader::unload(void *texture) {
-		delete (Texture *) texture;
-	}
-
-	SpineExtension *getDefaultExtension() {
-		return new DefaultSpineExtension();
-	}
-}// namespace spine
+SpineExtension *spine::getDefaultExtension() {
+    return new DefaultSpineExtension();
+}

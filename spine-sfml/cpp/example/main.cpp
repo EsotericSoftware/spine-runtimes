@@ -773,6 +773,7 @@ void test(SkeletonData *skeletonData, Atlas *atlas) {
 }
 
 DebugExtension dbgExtension(SpineExtension::getInstance());
+extern spine::SkeletonRenderer *skeletonRenderer;
 
 int main() {
 	SpineExtension::setInstance(&dbgExtension);
@@ -794,6 +795,7 @@ int main() {
 	testcase(goblins, "data/goblins-pro.json", "data/goblins-pro.skel", "data/goblins-pma.atlas", 1.4f);
 	testcase(stretchyman, "data/stretchyman-pro.json", "data/stretchyman-pro.skel", "data/stretchyman-pma.atlas", 0.6f);
 
+    delete skeletonRenderer;
 	dbgExtension.reportLeaks();
 	return 0;
 }
