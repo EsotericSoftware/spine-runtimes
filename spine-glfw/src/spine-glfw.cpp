@@ -1,10 +1,16 @@
 #include "spine-glfw.h"
-#include <stdio.h>
+#include <cstdio>
 #include <glbinding/gl/gl.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
 using namespace gl;
+using namespace spine;
+
+/// Set the default extension used for memory allocations and file I/O
+SpineExtension *spine::getDefaultExtension() {
+    return new spine::DefaultSpineExtension();
+}
 
 /// A blend mode, see https://en.esotericsoftware.com/spine-slots#Blending
 /// Encodes the OpenGL source and destination blend function for both premultiplied and
@@ -50,7 +56,7 @@ mesh_t *mesh_create() {
 
     glBindVertexArray(0);
 
-    mesh_t *mesh = (mesh_t*)malloc(sizeof(mesh_t));
+    auto *mesh = (mesh_t*)malloc(sizeof(mesh_t));
     mesh->vao = vao;
     mesh->vbo = vbo;
     mesh->num_vertices = 0;
@@ -63,10 +69,10 @@ void mesh_update(mesh_t *mesh, vertex_t *vertices, int num_vertices, uint16_t *i
     glBindVertexArray(mesh->vao);
 
     glBindBuffer(GL_ARRAY_BUFFER, mesh->vbo);
-    glBufferData(GL_ARRAY_BUFFER, num_vertices * sizeof(vertex_t), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)(num_vertices * sizeof(vertex_t)), vertices, GL_STATIC_DRAW);
     mesh->num_vertices = num_vertices;
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, num_indices * sizeof(uint16_t), indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr)(num_indices * sizeof(uint16_t)), indices, GL_STATIC_DRAW);
     mesh->num_indices = num_indices;
 
     glBindVertexArray(0);
@@ -74,7 +80,7 @@ void mesh_update(mesh_t *mesh, vertex_t *vertices, int num_vertices, uint16_t *i
 
 void mesh_draw(mesh_t *mesh) {
     glBindVertexArray(mesh->vao);
-    glDrawElements(GL_TRIANGLES, mesh->num_indices, GL_UNSIGNED_SHORT, 0);
+    glDrawElements(GL_TRIANGLES, mesh->num_indices, GL_UNSIGNED_SHORT, nullptr);
     glBindVertexArray(0);
 }
 
@@ -218,99 +224,12 @@ void matrix_ortho_projection(float *matrix, float width, float height) {
     matrix[15] = 1.0f;
 }
 
-const uint8_t *file_read(const char *path, int *length) {
-    uint8_t *data;
-    FILE *file = fopen(path, "rb");
-    if (!file) return 0;
-    fseek(file, 0, SEEK_END);
-    *length = (int) ftell(file);
-    fseek(file, 0, SEEK_SET);
-    data = (uint8_t*)(malloc(*length + 1));
-    fread(data, 1, *length, file);
-    fclose(file);
-    data[*length] = 0;
-    return data;
+void GlTextureLoader::load(spine::AtlasPage &page, const spine::String &path) {
+    page.texture = (void *)(uintptr_t)texture_load(path.buffer());
 }
 
-atlas_t *atlas_load(const char *file_path) {
-    int length = 0;
-    utf8 *atlas_data = (utf8*)file_read(file_path, &length);
-    if (!atlas_data) {
-        printf("Could not load atlas %s\n", file_path);
-        return nullptr;
-    }
-
-    spine_atlas spine_atlas = spine_atlas_load(atlas_data);
-    free(atlas_data);
-    if (!spine_atlas) {
-        printf("Could not load atlas %s\n", file_path);
-        return nullptr;
-    }
-    atlas_t *atlas = (atlas_t*)malloc(sizeof(atlas_t));
-    atlas->atlas = spine_atlas;
-    int num_textures = spine_atlas_get_num_image_paths(spine_atlas);
-    atlas->textures = (texture_t*)malloc(sizeof(texture_t) * num_textures);
-    memset(atlas->textures, 0, sizeof(texture_t) * num_textures);
-
-    char parent_dir[1024];
-    strncpy(parent_dir, file_path, sizeof(parent_dir));
-    char *last_slash = strrchr(parent_dir, '/');
-    if (last_slash) {
-        *(last_slash + 1) = '\0';
-    } else {
-        parent_dir[0] = '\0';
-    }
-
-    for (int i = 0; i < num_textures; i++) {
-        char *relative_path = spine_atlas_get_image_path(spine_atlas, i);
-        char full_path[1024];
-        snprintf(full_path, sizeof(full_path), "%s%s", parent_dir, relative_path);
-        texture_t texture = texture_load(full_path);
-        if (!texture) {
-            printf("Could not load atlas texture %s\n", full_path);
-            atlas_dispose(atlas);
-            return nullptr;
-        }
-        atlas->textures[i] = texture;
-    }
-
-    return atlas;
-}
-
-void atlas_dispose(atlas_t *atlas) {
-    for (int i = 0; i < spine_atlas_get_num_image_paths(atlas->atlas); i++) {
-        texture_dispose(atlas->textures[i]);
-    }
-    spine_atlas_dispose(atlas->atlas);
-    free(atlas->textures);
-    free(atlas);
-}
-
-spine_skeleton_data skeleton_data_load(const char *file_path, atlas_t *atlas) {
-    int length = 0;
-    uint8_t *data = (uint8_t*)file_read(file_path, &length);
-    if (!data) {
-        printf("Could not load skeleton data file %s\n", file_path);
-        return nullptr;
-    }
-
-    spine_skeleton_data_result result;
-    const char *ext = strrchr(file_path, '.');
-    if (ext && strcmp(ext, ".skel") == 0) {
-        result = spine_skeleton_data_load_binary(atlas->atlas, data, length);
-    } else {
-        result = spine_skeleton_data_load_json(atlas->atlas, (utf8*)data);
-    }
-    free(data);
-
-    if (spine_skeleton_data_result_get_error(result)) {
-        printf("Could not load skeleton data file %s:\n%s\n", file_path, spine_skeleton_data_result_get_error(result));
-        spine_skeleton_data_result_dispose(result);
-        return nullptr;
-    }
-    spine_skeleton_data skeleton_data = spine_skeleton_data_result_get_data(result);
-    spine_skeleton_data_result_dispose(result);
-    return skeleton_data;
+void GlTextureLoader::unload(void *texture) {
+    texture_dispose((texture_t)(uintptr_t)texture);
 }
 
 renderer_t *renderer_create() {
@@ -350,38 +269,39 @@ renderer_t *renderer_create() {
     )");
     if (!shader) return nullptr;
     mesh_t *mesh = mesh_create();
-    renderer_t *renderer = (renderer_t*)malloc(sizeof(renderer_t));
+    auto *renderer = (renderer_t*)malloc(sizeof(renderer_t));
     renderer->shader = shader;
     renderer->mesh = mesh;
     renderer->vertex_buffer_size = 0;
     renderer->vertex_buffer = nullptr;
+    renderer->renderer = new SkeletonRenderer();
     return renderer;
 }
 
 void renderer_set_viewport_size(renderer_t *renderer, int width, int height) {
     float matrix[16];
-    matrix_ortho_projection(matrix, width, height);
+    matrix_ortho_projection(matrix, (float)width, (float)height);
     shader_use(renderer->shader);
     shader_set_matrix4(renderer->shader, "uMatrix", matrix);
 }
 
-void renderer_draw(renderer_t *renderer, spine_skeleton_drawable drawable, atlas_t *atlas) {
+void renderer_draw(renderer_t *renderer, Skeleton *skeleton, bool premultipliedAlpha) {
     shader_use(renderer->shader);
     shader_set_int(renderer->shader, "uTexture", 0);
-    gl::glEnable(gl::GLenum::GL_BLEND);
+    glEnable(GL_BLEND);
 
-    spine_render_command command = spine_skeleton_drawable_render(drawable);
+    RenderCommand *command = renderer->renderer->render(*skeleton);
     while (command) {
-        int num_command_vertices = spine_render_command_get_num_vertices(command);
+        int num_command_vertices = command->numVertices;
         if (renderer->vertex_buffer_size < num_command_vertices) {
             renderer->vertex_buffer_size = num_command_vertices;
             free(renderer->vertex_buffer);
             renderer->vertex_buffer = (vertex_t *)malloc(sizeof(vertex_t) * renderer->vertex_buffer_size);
         }
-        float *positions = spine_render_command_get_positions(command);
-        float *uvs = spine_render_command_get_uvs(command);
-        int32_t *colors = spine_render_command_get_colors(command);
-        int32_t *darkColors = spine_render_command_get_dark_colors(command);
+        float *positions = command->positions;
+        float *uvs = command->uvs;
+        int32_t *colors = command->colors;
+        int32_t *darkColors = command->darkColors;
         for (int i = 0, j = 0; i < num_command_vertices; i++, j += 2) {
             vertex_t *vertex = &renderer->vertex_buffer[i];
             vertex->x = positions[j];
@@ -393,18 +313,18 @@ void renderer_draw(renderer_t *renderer, spine_skeleton_drawable drawable, atlas
             uint32_t darkColor = darkColors[i];
             vertex->darkColor = (darkColor & 0xFF00FF00) | ((darkColor & 0x00FF0000) >> 16) | ((darkColor & 0x000000FF) << 16);
         }
-        int num_command_indices = spine_render_command_get_num_indices(command);
-        uint16_t *indices = spine_render_command_get_indices(command);
+        int num_command_indices = command->numIndices;
+        uint16_t *indices = command->indices;
         mesh_update(renderer->mesh, renderer->vertex_buffer, num_command_vertices, indices, num_command_indices);
 
-        blend_mode_t blend_mode = blend_modes[spine_render_command_get_blend_mode(command)];
-        gl::glBlendFuncSeparate(spine_atlas_is_pma(atlas->atlas) ? (gl::GLenum)blend_mode.source_color_pma : (gl::GLenum)blend_mode.source_color, (gl::GLenum)blend_mode.dest_color, (gl::GLenum)blend_mode.source_alpha, (gl::GLenum)blend_mode.dest_color);
+        blend_mode_t blend_mode = blend_modes[command->blendMode];
+        glBlendFuncSeparate(premultipliedAlpha ? (GLenum)blend_mode.source_color_pma : (GLenum)blend_mode.source_color, (GLenum)blend_mode.dest_color, (GLenum)blend_mode.source_alpha, (GLenum)blend_mode.dest_color);
 
-        texture_t texture = atlas->textures[spine_render_command_get_atlas_page(command)];
+        auto texture = (texture_t)(uintptr_t)command->texture;
         texture_use(texture);
 
         mesh_draw(renderer->mesh);
-        command = spine_render_command_get_next(command);
+        command = command->next;
     }
 }
 
@@ -412,5 +332,6 @@ void renderer_dispose(renderer_t *renderer) {
     shader_dispose(renderer->shader);
     mesh_dispose(renderer->mesh);
     free(renderer->vertex_buffer);
+    delete renderer->renderer;
     free(renderer);
 }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdint.h>
-#include <spine-cpp-lite.h>
+#include <spine/spine.h>
 
 /// A vertex of a mesh generated from a Spine skeleton
 struct vertex_t {
@@ -59,21 +59,12 @@ void texture_use(texture_t texture);
 /// Disposes the texture
 void texture_dispose(texture_t texture);
 
-/// Helper struct that contains a Spine atlas and the textures for each
-/// atlas page
-typedef struct {
-    spine_atlas atlas;
-    texture_t *textures;
-} atlas_t;
-
-/// Loads the .atlas file and its associated atlas pages as OpenGL textures
-atlas_t *atlas_load(const char *file_path);
-
-/// Disposes the atlas data and its associated OpenGL textures
-void atlas_dispose(atlas_t *atlas);
-
-/// Loads the skeleton data from the .skel or .json file using the given atlas
-spine_skeleton_data skeleton_data_load(const char *file_path, atlas_t *atlas);
+/// A TextureLoader implementation for OpenGL. Use this with spine::Atlas.
+class GlTextureLoader: public spine::TextureLoader {
+public:
+    void load(spine::AtlasPage &page, const spine::String &path);
+    void unload(void *texture);
+};
 
 /// Renderer capable of rendering a spine_skeleton_drawable, using a shader, a mesh, and a
 /// temporary CPU-side vertex buffer used to update the GPU-side mesh
@@ -82,6 +73,7 @@ typedef struct {
     mesh_t *mesh;
     int vertex_buffer_size;
     vertex_t *vertex_buffer;
+    spine::SkeletonRenderer *renderer;
 } renderer_t;
 
 /// Creates a new renderer
@@ -90,9 +82,9 @@ renderer_t *renderer_create();
 /// Sets the viewport size for the 2D orthographic projection
 void renderer_set_viewport_size(renderer_t *renderer, int width, int height);
 
-/// Draws the given skeleton drawbale. The atlas must be the atlas from which the drawable
+/// Draws the given skeleton. The atlas must be the atlas from which the drawable
 /// was constructed.
-void renderer_draw(renderer_t *renderer, spine_skeleton_drawable drawable, atlas_t *atlas);
+void renderer_draw(renderer_t *renderer, spine::Skeleton *skeleton, bool premultipliedAlpha);
 
 /// Disposes the renderer
 void renderer_dispose(renderer_t *renderer);

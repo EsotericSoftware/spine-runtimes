@@ -4,7 +4,7 @@ project(spine-glfw)
 # Default flags
 include(${CMAKE_SOURCE_DIR}/../flags.cmake)
 
-# Add spine-cpp and spine-cpp-lite
+# Add spine-cpp
 add_subdirectory(${CMAKE_SOURCE_DIR}/../spine-cpp ${CMAKE_BINARY_DIR}/spine-cpp-build)
 
 include(FetchContent)
@@ -41,7 +41,7 @@ find_package(OpenGL REQUIRED)
 # spine-glfw library
 add_library(spine-glfw STATIC src/spine-glfw.cpp src/spine-glfw.h src/stb_image.h)
 target_link_libraries(spine-glfw PRIVATE glbinding::glbinding)
-target_link_libraries(spine-glfw LINK_PUBLIC spine-cpp spine-cpp-lite)
+target_link_libraries(spine-glfw LINK_PUBLIC spine-cpp)
 
 # Example
 add_executable(spine-glfw-example example/main.cpp)
