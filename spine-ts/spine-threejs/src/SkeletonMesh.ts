@@ -97,6 +97,8 @@ export class SkeletonMeshMaterial extends THREE.ShaderMaterial {
 			parameters.uniforms["alphaTest"] = { value: parameters.alphaTest };
 		}
 		super(parameters);
+		// non-pma textures are premultiply on upload, so we set premultipliedAlpha to true
+		this.premultipliedAlpha = true;
 	}
 }
 
@@ -241,9 +243,9 @@ export class SkeletonMesh extends THREE.Object3D {
 				let alpha = skeletonColor.a * slotColor.a * attachmentColor.a;
 				let color = this.tempColor;
 				color.set(
-					skeletonColor.r * slotColor.r * attachmentColor.r,
-					skeletonColor.g * slotColor.g * attachmentColor.g,
-					skeletonColor.b * slotColor.b * attachmentColor.b,
+					skeletonColor.r * slotColor.r * attachmentColor.r * alpha,
+					skeletonColor.g * slotColor.g * attachmentColor.g * alpha,
+					skeletonColor.b * slotColor.b * attachmentColor.b * alpha,
 					alpha
 				);
 

@@ -456,6 +456,7 @@ rm "$ROOT/spine-ts/spine-threejs/example/assets/"*
 cp -f ../raptor/export/raptor-pro.json "$ROOT/spine-ts/spine-threejs/example/assets/"
 cp -f ../raptor/export/raptor.atlas "$ROOT/spine-ts/spine-threejs/example/assets/"
 cp -f ../raptor/export/raptor.png "$ROOT/spine-ts/spine-threejs/example/assets/"
+cp -f ../celestial-circus/export/* "$ROOT/spine-ts/spine-threejs/example/assets/"
 
 rm "$ROOT/spine-ts/spine-player/example/assets/"*
 cp -f ../raptor/export/raptor-pro.json "$ROOT/spine-ts/spine-player/example/assets/"

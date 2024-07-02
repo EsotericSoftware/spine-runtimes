@@ -29,7 +29,7 @@
 
 import { SkeletonMeshMaterial, SkeletonMeshMaterialParametersCustomizer } from "./SkeletonMesh.js";
 import * as THREE from "three"
-import { ThreeJsTexture } from "./ThreeJsTexture.js";
+import { ThreeJsTexture, ThreeBlendOptions } from "./ThreeJsTexture.js";
 import { BlendMode } from "@esotericsoftware/spine-core";
 
 export class MeshBatcher extends THREE.Mesh {
@@ -163,7 +163,7 @@ export class MeshBatcher extends THREE.Mesh {
 	}
 
 	findMaterialGroup (slotTexture: THREE.Texture, slotBlendMode: BlendMode) {
-		const blending = ThreeJsTexture.toThreeJsBlending(slotBlendMode);
+		const blendingObject = ThreeJsTexture.toThreeJsBlending(slotBlendMode);
 		let group = -1;
 
 		if (Array.isArray(this.material)) {
@@ -171,17 +171,23 @@ export class MeshBatcher extends THREE.Mesh {
 				const meshMaterial = this.material[i] as SkeletonMeshMaterial;
 
 				if (!meshMaterial.uniforms.map.value) {
-					updateMeshMaterial(meshMaterial, slotTexture, blending);
+					updateMeshMaterial(meshMaterial, slotTexture, blendingObject);
 					return i;
 				}
 
-				if (meshMaterial.uniforms.map.value === slotTexture && meshMaterial.blending === blending) {
+				if (meshMaterial.uniforms.map.value === slotTexture
+					&& blendingObject.blending === meshMaterial.blending
+					&& (blendingObject.blendSrc === undefined || blendingObject.blendSrc === meshMaterial.blendSrc)
+					&& (blendingObject.blendDst === undefined || blendingObject.blendDst === meshMaterial.blendDst)
+					&& (blendingObject.blendSrcAlpha === undefined || blendingObject.blendSrcAlpha === meshMaterial.blendSrcAlpha)
+					&& (blendingObject.blendDstAlpha === undefined || blendingObject.blendDstAlpha === meshMaterial.blendDstAlpha)
+				) {
 					return i;
 				}
 			}
 
 			const meshMaterial = new SkeletonMeshMaterial(this.materialCustomizer);
-			updateMeshMaterial(meshMaterial, slotTexture, blending);
+			updateMeshMaterial(meshMaterial, slotTexture, blendingObject);
 			this.material.push(meshMaterial);
 			group = this.material.length - 1;
 		} else {
@@ -192,10 +198,8 @@ export class MeshBatcher extends THREE.Mesh {
 	}
 }
 
-function updateMeshMaterial (meshMaterial: SkeletonMeshMaterial, slotTexture: THREE.Texture, blending: THREE.Blending) {
+function updateMeshMaterial (meshMaterial: SkeletonMeshMaterial, slotTexture: THREE.Texture, blending: ThreeBlendOptions) {
 	meshMaterial.uniforms.map.value = slotTexture;
-	meshMaterial.blending = blending;
-	meshMaterial.blendDst = blending === THREE.CustomBlending ? THREE.OneMinusSrcColorFactor : THREE.OneMinusSrcAlphaFactor;
-	meshMaterial.blendSrc = blending === THREE.CustomBlending ? THREE.OneFactor : THREE.SrcAlphaFactor;
+	Object.assign(meshMaterial, blending);
 	meshMaterial.needsUpdate = true;
 }
