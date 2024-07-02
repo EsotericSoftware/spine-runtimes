@@ -62,76 +62,76 @@ void SkeletonDrawable::update(float delta, Physics physics) {
 }
 
 inline void toSDLColor(uint32_t color, SDL_Color *sdlColor) {
-    sdlColor->a = (color >> 24) & 0xFF;
-    sdlColor->r = (color >> 16) & 0xFF;
-    sdlColor->g = (color >> 8) & 0xFF;
-    sdlColor->b = color & 0xFF;
+	sdlColor->a = (color >> 24) & 0xFF;
+	sdlColor->r = (color >> 16) & 0xFF;
+	sdlColor->g = (color >> 8) & 0xFF;
+	sdlColor->b = color & 0xFF;
 }
 
 void SkeletonDrawable::draw(SDL_Renderer *renderer) {
-    if (!skeletonRenderer) skeletonRenderer = new (__FILE__, __LINE__) SkeletonRenderer();
-    RenderCommand *command = skeletonRenderer->render(*skeleton);
-    while(command) {
-        float *positions = command->positions;
-        float *uvs = command->uvs;
-        uint32_t *colors = command->colors;
-        sdlVertices.clear();
-        for (int ii = 0; ii < command->numVertices << 1; ii += 2) {
-            SDL_Vertex sdlVertex;
-            sdlVertex.position.x = positions[ii];
-            sdlVertex.position.y = positions[ii + 1];
-            sdlVertex.tex_coord.x = uvs[ii];
-            sdlVertex.tex_coord.y = uvs[ii + 1];
-            toSDLColor(colors[ii >> 1], &sdlVertex.color);
-            sdlVertices.add(sdlVertex);
-        }
-        sdlIndices.clear();
-        uint16_t *indices = command->indices;
-        for (int ii = 0; ii < command->numIndices; ii++)
-            sdlIndices.add(indices[ii]);
+	if (!skeletonRenderer) skeletonRenderer = new (__FILE__, __LINE__) SkeletonRenderer();
+	RenderCommand *command = skeletonRenderer->render(*skeleton);
+	while (command) {
+		float *positions = command->positions;
+		float *uvs = command->uvs;
+		uint32_t *colors = command->colors;
+		sdlVertices.clear();
+		for (int ii = 0; ii < command->numVertices << 1; ii += 2) {
+			SDL_Vertex sdlVertex;
+			sdlVertex.position.x = positions[ii];
+			sdlVertex.position.y = positions[ii + 1];
+			sdlVertex.tex_coord.x = uvs[ii];
+			sdlVertex.tex_coord.y = uvs[ii + 1];
+			toSDLColor(colors[ii >> 1], &sdlVertex.color);
+			sdlVertices.add(sdlVertex);
+		}
+		sdlIndices.clear();
+		uint16_t *indices = command->indices;
+		for (int ii = 0; ii < command->numIndices; ii++)
+			sdlIndices.add(indices[ii]);
 
-        BlendMode blendMode = command->blendMode;
-        SDL_Texture *texture = (SDL_Texture *)command->texture;
-        if (!usePremultipliedAlpha) {
-            switch (blendMode) {
-                case BlendMode_Normal:
-                    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-                    break;
-                case BlendMode_Multiply:
-                    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_MOD);
-                    break;
-                case BlendMode_Additive:
-                    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_ADD);
-                    break;
-                case BlendMode_Screen:
-                    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-                    break;
-            }
-        } else {
-            SDL_BlendMode target;
-            switch (blendMode) {
-                case BlendMode_Normal:
-                    target = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
-                    SDL_SetTextureBlendMode(texture, target);
-                    break;
-                case BlendMode_Multiply:
-                    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_MOD);
-                    break;
-                case BlendMode_Additive:
-                    target = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD);
-                    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_ADD);
-                    break;
-                case BlendMode_Screen:
-                    target = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
-                    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-                    break;
-            }
-        }
+		BlendMode blendMode = command->blendMode;
+		SDL_Texture *texture = (SDL_Texture *) command->texture;
+		if (!usePremultipliedAlpha) {
+			switch (blendMode) {
+				case BlendMode_Normal:
+					SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+					break;
+				case BlendMode_Multiply:
+					SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_MOD);
+					break;
+				case BlendMode_Additive:
+					SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_ADD);
+					break;
+				case BlendMode_Screen:
+					SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+					break;
+			}
+		} else {
+			SDL_BlendMode target;
+			switch (blendMode) {
+				case BlendMode_Normal:
+					target = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
+					SDL_SetTextureBlendMode(texture, target);
+					break;
+				case BlendMode_Multiply:
+					SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_MOD);
+					break;
+				case BlendMode_Additive:
+					target = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD);
+					SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_ADD);
+					break;
+				case BlendMode_Screen:
+					target = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
+					SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+					break;
+			}
+		}
 
-        SDL_RenderGeometry(renderer, texture, sdlVertices.buffer(), sdlVertices.size(), sdlIndices.buffer(),
-                           command->numIndices);
-        command = command->next;
-    }
+		SDL_RenderGeometry(renderer, texture, sdlVertices.buffer(), sdlVertices.size(), sdlIndices.buffer(),
+						   command->numIndices);
+		command = command->next;
+	}
 }
 
 SDL_Texture *loadTexture(SDL_Renderer *renderer, const String &path) {

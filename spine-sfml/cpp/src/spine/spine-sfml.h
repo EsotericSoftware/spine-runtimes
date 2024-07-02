@@ -62,7 +62,7 @@ namespace spine {
 	private:
 		bool ownsAnimationStateData;
 		mutable bool usePremultipliedAlpha;
-        sf::VertexArray *vertexArray;
+		sf::VertexArray *vertexArray;
 	};
 
 	class SFMLTextureLoader : public TextureLoader {

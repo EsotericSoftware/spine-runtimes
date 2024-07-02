@@ -81,7 +81,7 @@ public:
 	}
 
 	void compress() {
-        if (blocks.size() == 1) return;
+		if (blocks.size() == 1) return;
 		int totalSize = 0;
 		for (int i = 0, n = blocks.size(); i < n; i++) {
 			totalSize += blocks[i].size;
