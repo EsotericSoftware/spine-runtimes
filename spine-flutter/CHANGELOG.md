@@ -1,3 +1,6 @@
+# 4.2.39
+- Switch to spine-cpp SkeletonRenderer
+
 # 4.2.29
 - Fix issue in pubspec.yaml related to C++ include paths.
 
