@@ -79,7 +79,7 @@ namespace spine {
         void compress() {
             if (blocks.size() == 1) return;
             int totalSize = 0;
-            for (int i = 0, n = blocks.size(); i < n; i++) {
+            for (int i = 0, n = (int)blocks.size(); i < n; i++) {
                 totalSize += blocks[i].size;
                 SpineExtension::free(blocks[i].memory, __FILE__, __LINE__);
             }

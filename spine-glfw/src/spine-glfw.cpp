@@ -300,8 +300,8 @@ void renderer_draw(renderer_t *renderer, Skeleton *skeleton, bool premultipliedA
 		}
 		float *positions = command->positions;
 		float *uvs = command->uvs;
-		int32_t *colors = command->colors;
-		int32_t *darkColors = command->darkColors;
+		uint32_t *colors = command->colors;
+		uint32_t *darkColors = command->darkColors;
 		for (int i = 0, j = 0; i < num_command_vertices; i++, j += 2) {
 			vertex_t *vertex = &renderer->vertex_buffer[i];
 			vertex->x = positions[j];

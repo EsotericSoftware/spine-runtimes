@@ -280,13 +280,9 @@ void Atlas::load(const char *begin, int length, const char *dir, bool createText
 				}
 			}
 
-			if (createTexture) {
-				if (_textureLoader) _textureLoader->load(*page, String(path));
-				SpineExtension::free(path, __FILE__, __LINE__);
-			} else {
-				page->texturePath = String(path, true);
-			}
 			page->index = (int) _pages.size();
+			if (createTexture && _textureLoader) _textureLoader->load(*page, String(path));
+			page->texturePath = String(path, true);
 			_pages.add(page);
 		} else {
 			AtlasRegion *region = new (__FILE__, __LINE__) AtlasRegion();

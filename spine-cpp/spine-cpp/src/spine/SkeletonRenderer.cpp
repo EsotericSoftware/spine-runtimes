@@ -32,7 +32,6 @@
 #include <spine/Slot.h>
 #include <spine/SlotData.h>
 #include <spine/RegionAttachment.h>
-#include <spine/Atlas.h>
 #include <spine/MeshAttachment.h>
 #include <spine/ClippingAttachment.h>
 #include <spine/Bone.h>
@@ -136,7 +135,6 @@ static RenderCommand *batchCommands(BlockAllocator &allocator, Vector<RenderComm
 	}
 	return root;
 }
-
 
 RenderCommand *SkeletonRenderer::render(Skeleton &skeleton) {
 	_allocator.compress();
