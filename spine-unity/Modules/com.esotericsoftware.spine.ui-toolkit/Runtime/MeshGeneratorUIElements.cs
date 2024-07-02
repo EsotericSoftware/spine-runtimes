@@ -31,10 +31,10 @@
 #define HAS_NATIVE_COLLECTIONS
 #endif
 
-using UnityEngine;
 using System;
 using System.Collections.Generic;
 using Unity.Collections;
+using UnityEngine;
 
 namespace Spine.Unity {
 
