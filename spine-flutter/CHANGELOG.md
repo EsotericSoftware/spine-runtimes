@@ -1,4 +1,4 @@
-# 4.2.39
+# 4.2.30
 - Switch to spine-cpp SkeletonRenderer
 
 # 4.2.29
