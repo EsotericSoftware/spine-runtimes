@@ -27,7 +27,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    SpineUIView *spineView = [[SpineUIView alloc] initWithAtlasFileName:@"spineboy.atlas"
+    SpineUIView *spineView = [[SpineUIView alloc] initWithAtlasFileName:@"spineboy-pma.atlas"
                                                        skeletonFileName:@"spineboy-pro.skel"
                                                                  bundle:[NSBundle mainBundle]
                                                              controller:self.spineController
