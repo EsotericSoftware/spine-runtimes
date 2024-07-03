@@ -2,7 +2,7 @@ group = "com.esotericsoftware.spine"
 version = "4.2.0"
 
 ext {
-    libgdxVersion = "1.12.1"
+    libgdxVersion = "1.12.2-SNAPSHOT"
     javaVersion = 8
 }
 

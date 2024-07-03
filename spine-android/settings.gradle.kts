@@ -16,6 +16,9 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven {
+            url = uri("https://oss.sonatype.org/content/repositories/snapshots")
+        }
     }
 }
 
@@ -25,10 +28,10 @@ includeBuild("../spine-libgdx") {
         substitute(module("com.esotericsoftware.spine:spine-libgdx")).using(project(":spine-libgdx"))
     }
 }
-includeBuild("../../libgdx") {
-    dependencySubstitution {
-        substitute(module("com.badlogicgames.gdx:gdx")).using(project(":gdx"))
-    }
-}
+//includeBuild("../../libgdx") {
+//    dependencySubstitution {
+//        substitute(module("com.badlogicgames.gdx:gdx")).using(project(":gdx"))
+//    }
+//}
 include(":app")
 include(":spine-android")
