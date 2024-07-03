@@ -53,17 +53,14 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 
 	public SpineView (Context context) {
 		super(context);
-		init();
 	}
 
 	public SpineView (Context context, AttributeSet attrs) {
 		super(context, attrs);
-		init();
 	}
 
 	public SpineView (Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
-		init();
 	}
 
 	public void loadFromAsset(String atlasFileName, String skeletonFileName, SpineController controller) {
@@ -82,9 +79,7 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 		this.controller = controller;
 		AndroidSkeletonDrawable skeletonDrawable = new AndroidSkeletonDrawable(atlas, data);
 		controller.init(skeletonDrawable);
-	}
 
-	private void init () {
 		Choreographer.getInstance().postFrameCallback(this);
 	}
 
@@ -99,7 +94,7 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 		renderer.render(canvas, controller.getSkeleton(), 500f, 1000f);
 	}
 
-	// FrameCallback
+	// Choreographer.FrameCallback
 
 	@Override
 	public void doFrame (long frameTimeNanos) {
