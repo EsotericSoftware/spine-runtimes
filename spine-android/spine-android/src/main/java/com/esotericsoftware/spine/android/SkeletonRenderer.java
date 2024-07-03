@@ -205,15 +205,12 @@ public class SkeletonRenderer {
 		return commandList;
 	}
 
-	public void render (Canvas canvas, Skeleton skeleton, float x, float y) {
-		canvas.save();
-		canvas.translate(x, y);
+	public void render (Canvas canvas, Skeleton skeleton) {
 		Array<RenderCommand> commands = render(skeleton);
 		for (int i = 0; i < commands.size; i++) {
 			RenderCommand command = commands.get(i);
 			canvas.drawVertices(Canvas.VertexMode.TRIANGLES, command.vertices.size, command.vertices.items, 0, command.uvs.items, 0,
 				command.colors.items, 0, command.indices.items, 0, command.indices.size, command.texture.getPaint(command.blendMode));
 		}
-		canvas.restore();
 	}
 }

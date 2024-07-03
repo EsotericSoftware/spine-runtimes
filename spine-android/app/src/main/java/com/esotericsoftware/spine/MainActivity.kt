@@ -46,11 +46,7 @@ fun SpineViewComposable(modifier: Modifier = Modifier.fillMaxSize()) {
                     "spineboy.atlas",
                     "spineboy-pro.json",
                     SpineController {
-                        it.skeleton.scaleY = -1f
-                        it.skeleton.setToSetupPose()
-
-                        it.animationStateData.defaultMix = 0.2f
-                        it.animationState.setAnimation(0, "hoverboard", true)
+                        it.animationState.setAnimation(0, "walk", true)
                     }
                 )
             }

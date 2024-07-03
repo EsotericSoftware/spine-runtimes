@@ -29,6 +29,11 @@
 
 package com.esotericsoftware.spine.android;
 
+import com.badlogic.gdx.math.Vector2;
+import com.esotericsoftware.spine.android.bounds.Alignment;
+import com.esotericsoftware.spine.android.bounds.Bounds;
+import com.esotericsoftware.spine.android.bounds.BoundsProvider;
+import com.esotericsoftware.spine.android.bounds.SetupPoseBounds;
 import com.esotericsoftware.spine.android.utils.AndroidSkeletonDrawableLoader;
 
 import android.content.Context;
@@ -47,8 +52,20 @@ import java.net.URL;
 public class SpineView extends View implements Choreographer.FrameCallback {
 	private long lastTime = 0;
 	private float delta = 0;
+	private float offsetX = 0;
+	private float offsetY = 0;
+	private float scaleX = 1;
+	private float scaleY = 1;
+	private float x = 0;
+	private float y = 0;
+
 	SkeletonRenderer renderer = new SkeletonRenderer();
 	SpineController controller;
+
+	BoundsProvider boundsProvider = new SetupPoseBounds();
+
+	Bounds computedBounds = new Bounds();
+	Alignment alignment = Alignment.CENTER;
 
 	public SpineView (Context context) {
 		super(context);
@@ -82,6 +99,9 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 		Thread backgroundThread = new Thread(() -> {
 			final AndroidSkeletonDrawable skeletonDrawable = loader.load();
 			mainHandler.post(() -> {
+				computedBounds = boundsProvider.computeBounds(skeletonDrawable);
+				updateCanvasTransform();
+
 				controller.init(skeletonDrawable);
 				Choreographer.getInstance().postFrameCallback(SpineView.this);
 			});
@@ -98,9 +118,31 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 
 		controller.getDrawable().update(delta);
 
-		// TODO: Calculate scaling + position
+		canvas.save();
+		canvas.translate(offsetX, offsetY);
+		canvas.scale(scaleX, scaleY * -1);
+		canvas.translate(x, y);
 
-		renderer.render(canvas, controller.getSkeleton(), 500f, 1000f);
+		renderer.render(canvas, controller.getSkeleton());
+
+		canvas.restore();
+	}
+
+	@Override
+	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+		super.onSizeChanged(w, h, oldw, oldh);
+		updateCanvasTransform();
+	}
+
+	private void updateCanvasTransform() {
+		x = (float) (-computedBounds.getX() - computedBounds.getWidth() / 2.0 - (alignment.getX() * computedBounds.getWidth() / 2.0));
+		y = (float) (-computedBounds.getY() - computedBounds.getHeight() / 2.0 - (alignment.getY() * computedBounds.getHeight() / 2.0));
+
+		// contain
+		scaleX = scaleY = (float) Math.min(getWidth() / computedBounds.getWidth(), getHeight() / computedBounds.getHeight());
+
+		offsetX = (float) (getWidth() / 2.0 + (alignment.getX() * getWidth() / 2.0));
+		offsetY = (float) (getHeight() / 2.0 + (alignment.getY() * getHeight() / 2.0));
 	}
 
 	// Choreographer.FrameCallback
