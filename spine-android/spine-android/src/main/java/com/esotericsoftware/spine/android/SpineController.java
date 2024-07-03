@@ -50,6 +50,10 @@ public class SpineController {
         return drawable;
     }
 
+    public boolean isInitialized() {
+        return drawable != null;
+    };
+
     public boolean isPlaying() {
         return playing;
     }
