@@ -4,6 +4,7 @@ import com.esotericsoftware.spine.AnimationState;
 import com.esotericsoftware.spine.AnimationStateData;
 import com.esotericsoftware.spine.Skeleton;
 import com.esotericsoftware.spine.SkeletonData;
+import com.esotericsoftware.spine.android.utils.SpineControllerCallback;
 
 public class SpineController {
     private final SpineControllerCallback onInitialized;

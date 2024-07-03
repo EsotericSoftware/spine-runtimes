@@ -29,17 +29,9 @@
 
 package com.esotericsoftware.spine.android;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import com.esotericsoftware.spine.SkeletonBinary;
-import com.esotericsoftware.spine.SkeletonData;
+import com.esotericsoftware.spine.android.utils.AndroidSkeletonDrawableLoader;
 
 import android.content.Context;
-import android.content.res.AssetManager;
 import android.graphics.Canvas;
 import android.os.Handler;
 import android.os.Looper;
@@ -48,6 +40,9 @@ import android.view.Choreographer;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+
+import java.io.File;
+import java.net.URL;
 
 public class SpineView extends View implements Choreographer.FrameCallback {
 	private long lastTime = 0;
@@ -69,28 +64,28 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 
 	public void loadFromAsset(String atlasFileName, String skeletonFileName, SpineController controller) {
 		this.controller = controller;
+		loadFrom(() -> AndroidSkeletonDrawable.fromAsset(atlasFileName, skeletonFileName, getContext()));
+	}
 
+	public void loadFromFile(File atlasFile, File skeletonFile, SpineController controller) {
+		this.controller = controller;
+		loadFrom(() -> AndroidSkeletonDrawable.fromFile(atlasFile, skeletonFile));
+	}
+
+	public void loadFromHttp(URL atlasUrl, URL skeletonUrl, SpineController controller) {
+		this.controller = controller;
+		loadFrom(() -> AndroidSkeletonDrawable.fromHttp(atlasUrl, skeletonUrl));
+	}
+
+	private void loadFrom(AndroidSkeletonDrawableLoader loader) {
 		Handler mainHandler = new Handler(Looper.getMainLooper());
 		Thread backgroundThread = new Thread(() -> {
-			AssetManager assetManager = getContext().getAssets();
-			AndroidTextureAtlas atlas = AndroidTextureAtlas.loadFromAssets(atlasFileName, assetManager);
-			AndroidAtlasAttachmentLoader attachmentLoader = new AndroidAtlasAttachmentLoader(atlas);
-
-			SkeletonBinary binary = new SkeletonBinary(attachmentLoader);
-			SkeletonData data;
-			try (InputStream in = new BufferedInputStream(assetManager.open(skeletonFileName))) {
-				data = binary.readSkeletonData(in);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-
+			final AndroidSkeletonDrawable skeletonDrawable = loader.load();
 			mainHandler.post(() -> {
-				final AndroidSkeletonDrawable skeletonDrawable = new AndroidSkeletonDrawable(atlas, data);
 				controller.init(skeletonDrawable);
-
 				Choreographer.getInstance().postFrameCallback(SpineView.this);
 			});
-        });
+		});
 		backgroundThread.start();
 	}
 

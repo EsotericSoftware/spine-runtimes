@@ -30,8 +30,10 @@
 package com.esotericsoftware.spine.android;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
@@ -39,9 +41,12 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas.TextureAtlasData;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Null;
 
+import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+
+import kotlin.NotImplementedError;
 
 public class AndroidTextureAtlas {
 	private static interface BitmapLoader {
@@ -92,35 +97,41 @@ public class AndroidTextureAtlas {
 		return regions;
 	}
 
-	static public AndroidTextureAtlas loadFromAssets (String atlasFile, AssetManager assetManager) {
+	static public AndroidTextureAtlas fromAsset(String atlasFileName, Context context) {
 		TextureAtlasData data = new TextureAtlasData();
+		AssetManager assetManager = context.getAssets();
 
 		try {
 			FileHandle inputFile = new FileHandle() {
 				@Override
 				public InputStream read () {
 					try {
-						return assetManager.open(atlasFile);
+						return assetManager.open(atlasFileName);
 					} catch (IOException e) {
 						throw new RuntimeException(e);
 					}
 				}
 			};
-			data.load(inputFile, new FileHandle(atlasFile).parent(), false);
+			data.load(inputFile, new FileHandle(atlasFileName).parent(), false);
 		} catch (Throwable t) {
 			throw new RuntimeException(t);
 		}
 
-		return new AndroidTextureAtlas(data, new BitmapLoader() {
-			@Override
-			public Bitmap load (String path) {
-				path = path.startsWith("/") ? path.substring(1) : path;
-				try (InputStream in = new BufferedInputStream(assetManager.open(path))) {
-					return BitmapFactory.decodeStream(in);
-				} catch (Throwable t) {
-					throw new RuntimeException(t);
-				}
-			}
-		});
+		return new AndroidTextureAtlas(data, path -> {
+            path = path.startsWith("/") ? path.substring(1) : path;
+            try (InputStream in = new BufferedInputStream(assetManager.open(path))) {
+                return BitmapFactory.decodeStream(in);
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
+        });
+	}
+
+	static public AndroidTextureAtlas fromFile(File atlasFile) {
+		throw new NotImplementedError("TODO");
+	}
+
+	static public AndroidTextureAtlas fromHttp(URL atlasUrl) {
+		throw new NotImplementedError("TODO");
 	}
 }

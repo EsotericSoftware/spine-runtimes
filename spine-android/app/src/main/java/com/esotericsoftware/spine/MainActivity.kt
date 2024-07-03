@@ -44,7 +44,7 @@ fun SpineViewComposable(modifier: Modifier = Modifier.fillMaxSize()) {
             SpineView(ctx).apply {
                 loadFromAsset(
                     "spineboy.atlas",
-                    "spineboy-pro.skel",
+                    "spineboy-pro.json",
                     SpineController {
                         it.skeleton.scaleY = -1f
                         it.skeleton.setToSetupPose()
