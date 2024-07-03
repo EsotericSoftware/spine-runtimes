@@ -33,12 +33,14 @@ import * as THREE from "three";
 export class ThreeJsTexture extends Texture {
 	texture: THREE.Texture;
 
-	constructor (image: HTMLImageElement | ImageBitmap) {
+	constructor (image: HTMLImageElement | ImageBitmap, pma = false) {
 		super(image);
 		if (image instanceof ImageBitmap)
 			this.texture = new THREE.CanvasTexture(image);
 		else
 			this.texture = new THREE.Texture(image);
+		// if the texture is not pma, we ask to threejs to premultiply on upload
+		this.texture.premultiplyAlpha = !pma;
 		this.texture.flipY = false;
 		this.texture.needsUpdate = true;
 	}
@@ -74,11 +76,31 @@ export class ThreeJsTexture extends Texture {
 		else throw new Error("Unknown texture wrap: " + wrap);
 	}
 
-	static toThreeJsBlending (blend: BlendMode) {
-		if (blend === BlendMode.Normal) return THREE.NormalBlending;
-		else if (blend === BlendMode.Additive) return THREE.AdditiveBlending;
-		else if (blend === BlendMode.Multiply) return THREE.MultiplyBlending;
-		else if (blend === BlendMode.Screen) return THREE.CustomBlending;
+	static toThreeJsBlending (blend: BlendMode): ThreeBlendOptions {
+		if (blend === BlendMode.Normal) return { blending: THREE.NormalBlending };
+		else if (blend === BlendMode.Additive) return { blending: THREE.AdditiveBlending };
+		else if (blend === BlendMode.Multiply) return {
+			blending: THREE.CustomBlending,
+			blendSrc: THREE.DstColorFactor,
+			blendDst: THREE.OneMinusSrcAlphaFactor,
+			blendSrcAlpha: THREE.OneFactor,
+			blendDstAlpha: THREE.OneMinusSrcAlphaFactor,
+		}
+		else if (blend === BlendMode.Screen) return {
+			blending: THREE.CustomBlending,
+			blendSrc: THREE.OneFactor,
+			blendDst: THREE.OneMinusSrcColorFactor,
+			blendSrcAlpha: THREE.OneFactor,
+			blendDstAlpha: THREE.OneMinusSrcColorFactor,
+		}
 		else throw new Error("Unknown blendMode: " + blend);
 	}
+}
+
+export type ThreeBlendOptions = {
+	blending: THREE.Blending,
+	blendSrc?: THREE.BlendingDstFactor,
+	blendDst?: THREE.BlendingDstFactor,
+	blendSrcAlpha?: THREE.BlendingDstFactor,
+	blendDstAlpha?: THREE.BlendingDstFactor,
 }

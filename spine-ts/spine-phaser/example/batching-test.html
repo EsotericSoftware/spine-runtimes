@@ -1,75 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="//cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.js"></script>
-    <link rel="stylesheet" href="../../index.css" />
-    <title>Spine Phaser Example</title>
-  </head>
 
-  <body class="p-4 flex flex-col items-center">
-    <h1>Batching test</h1>
-  </body>
-  <script>
-    const config = {
-      type: Phaser.AUTO,
-      width: 800,
-      height: 600,
-      type: Phaser.WEBGL,
-      scene: {
-        preload: preload,
-        create: create,
-        update: update,
-        pack: {
-          files: [
-            {
-              type: "scenePlugin",
-              key: "spine.SpinePlugin",
-              url: "../dist/iife/spine-phaser.js",
-              sceneKey: "spine",
-            },
-          ],
-        },
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="//cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.js"></script>
+  <link rel="stylesheet" href="../../index.css" />
+  <title>Spine Phaser Example</title>
+</head>
+
+<body class="p-4 flex flex-col items-center">
+  <h1>Batching test</h1>
+</body>
+<script>
+  const config = {
+    type: Phaser.AUTO,
+    width: 800,
+    height: 600,
+    type: Phaser.WEBGL,
+    scene: {
+      preload: preload,
+      create: create,
+      update: update,
+      pack: {
+        files: [
+          {
+            type: "scenePlugin",
+            key: "spine.SpinePlugin",
+            url: "../dist/iife/spine-phaser.js",
+            sceneKey: "spine",
+          },
+        ],
       },
-    };
+    },
+  };
 
-    const game = new Phaser.Game(config);
-    let debug;
+  const game = new Phaser.Game(config);
+  let debug;
 
-    function preload() {
-      this.load.spineJson("raptor-data", "assets/raptor-pro.json");
-      this.load.spineAtlas("raptor-atlas", "assets/raptor-pma.atlas");
-      this.load.spineBinary("spineboy-data", "assets/spineboy-pro.skel");
-      this.load.spineAtlas("spineboy-atlas", "assets/spineboy-pma.atlas");
-    }
+  function preload() {
+    this.load.spineJson("raptor-data", "assets/raptor-pro.json");
+    this.load.spineAtlas("raptor-atlas", "assets/raptor-pma.atlas");
+    this.load.spineBinary("spineboy-data", "assets/spineboy-pro.skel");
+    this.load.spineAtlas("spineboy-atlas", "assets/spineboy-pma.atlas");
+  }
 
-    function create() {
-      const plugin = this.spine;
-      let x = 25;
-      let y = 60;
-      for (let j = 0; j < 10; j++, y += 600 / 10) {
-        for (let i = 0; i < 20; i++, x += 800 / 20) {
-          const obj =
-            Math.random() > 0.5
-              ? this.add.spine(x, y, "spineboy-data", "spineboy-atlas")
-              : this.add.spine(x, y, "raptor-data", "raptor-atlas");
-          obj.animationState.setAnimation(0, "walk", true);
-          obj.scale = 0.1;
-        }
-        x = 25;
+  function create() {
+    const plugin = this.spine;
+    let x = 25;
+    let y = 60;
+    let n = 0;
+    for (let j = 0; j < 10; j++, y += 600 / 10) {
+      for (let i = 0; i < 20; i++, x += 800 / 20) {
+        const obj =
+          Math.random() > 0.5
+            ? this.add.spine(x, y, "spineboy-data", "spineboy-atlas")
+            : this.add.spine(x, y, "raptor-data", "raptor-atlas");
+        obj.animationState.setAnimation(0, "walk", true);
+        obj.scale = 0.1;
+        n++;
       }
-      debug = this.add.text(0, 600 - 40, "FPS: ");
+      x = 25;
     }
+    debug = this.add.text(0, 600 - 40, "FPS: ");
+    this.add.text(0, 600 - 60, "Skeletons: " + n);
+  }
 
-    function update() {
-      debug.setText(
-        "draw calls: " +
-          spine.PolygonBatcher.getAndResetGlobalDrawCalls() +
-          "\ndelta: " +
-          game.loop.delta
-      );
-    }
-  </script>
+  function update() {
+    debug.setText(
+      "draw calls: " +
+      spine.PolygonBatcher.getAndResetGlobalDrawCalls() +
+      "\ndelta: " +
+      game.loop.delta
+    );
+  }
+</script>
+
 </html>

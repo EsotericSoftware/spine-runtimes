@@ -400,7 +400,7 @@ void PhysicsConstraint::update(Physics physics) {
 					a = _remaining;
 					if (a >= t) {
 						if (d == -1) d = MathUtil::pow(_damping, 60 * t);
-						float m = _massInverse * t, e = _strength, w = _wind, g = _gravity, h = l / f;
+						float m = _massInverse * t, e = _strength, w = _wind, g = _gravity * (Bone::yDown ? -1 : 1), h = l / f;
 						while (true) {
 							a -= t;
 							if (scaleX) {

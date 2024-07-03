@@ -290,49 +290,48 @@ public class SkeletonClipping {
 		input.add(y1);
 		output.clear();
 
-		float[] clippingVertices = clippingArea.items;
 		int clippingVerticesLast = clippingArea.size - 4;
+		float[] clippingVertices = clippingArea.items;
 		for (int i = 0;; i += 2) {
 			float edgeX = clippingVertices[i], edgeY = clippingVertices[i + 1];
-			float edgeX2 = clippingVertices[i + 2], edgeY2 = clippingVertices[i + 3];
-			float deltaX = edgeX - edgeX2, deltaY = edgeY - edgeY2;
+			float ex = edgeX - clippingVertices[i + 2], ey = edgeY - clippingVertices[i + 3];
 
+			int outputStart = output.size;
 			float[] inputVertices = input.items;
-			int inputVerticesLength = input.size - 2, outputStart = output.size;
-			for (int ii = 0; ii < inputVerticesLength; ii += 2) {
+			for (int ii = 0, nn = input.size - 2; ii < nn;) {
 				float inputX = inputVertices[ii], inputY = inputVertices[ii + 1];
-				float inputX2 = inputVertices[ii + 2], inputY2 = inputVertices[ii + 3];
-				boolean side2 = deltaX * (inputY2 - edgeY2) - deltaY * (inputX2 - edgeX2) > 0;
-				if (deltaX * (inputY - edgeY2) - deltaY * (inputX - edgeX2) > 0) {
-					if (side2) { // v1 inside, v2 inside
+				ii += 2;
+				float inputX2 = inputVertices[ii], inputY2 = inputVertices[ii + 1];
+				boolean s2 = ey * (edgeX - inputX2) > ex * (edgeY - inputY2);
+				float s1 = ey * (edgeX - inputX) - ex * (edgeY - inputY);
+				if (s1 > 0) {
+					if (s2) { // v1 inside, v2 inside
 						output.add(inputX2);
 						output.add(inputY2);
 						continue;
 					}
 					// v1 inside, v2 outside
-					float c0 = inputY2 - inputY, c2 = inputX2 - inputX;
-					float s = c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY);
-					if (Math.abs(s) > 0.000001f) {
-						float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / s;
-						output.add(edgeX + (edgeX2 - edgeX) * ua);
-						output.add(edgeY + (edgeY2 - edgeY) * ua);
+					float ix = inputX2 - inputX, iy = inputY2 - inputY, t = s1 / (ix * ey - iy * ex);
+					if (t >= 0 && t <= 1) {
+						output.add(inputX + ix * t);
+						output.add(inputY + iy * t);
 					} else {
-						output.add(edgeX);
-						output.add(edgeY);
+						output.add(inputX2);
+						output.add(inputY2);
+						continue;
 					}
-				} else if (side2) { // v1 outside, v2 inside
-					float c0 = inputY2 - inputY, c2 = inputX2 - inputX;
-					float s = c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY);
-					if (Math.abs(s) > 0.000001f) {
-						float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / s;
-						output.add(edgeX + (edgeX2 - edgeX) * ua);
-						output.add(edgeY + (edgeY2 - edgeY) * ua);
+				} else if (s2) { // v1 outside, v2 inside
+					float ix = inputX2 - inputX, iy = inputY2 - inputY, t = s1 / (ix * ey - iy * ex);
+					if (t >= 0 && t <= 1) {
+						output.add(inputX + ix * t);
+						output.add(inputY + iy * t);
+						output.add(inputX2);
+						output.add(inputY2);
 					} else {
-						output.add(edgeX);
-						output.add(edgeY);
+						output.add(inputX2);
+						output.add(inputY2);
+						continue;
 					}
-					output.add(inputX2);
-					output.add(inputY2);
 				}
 				clipped = true;
 			}

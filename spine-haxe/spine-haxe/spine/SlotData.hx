@@ -39,7 +39,6 @@ class SlotData {
 	public var attachmentName:String;
 	public var blendMode:BlendMode = BlendMode.normal;
 	public var visible:Bool = true;
-	public var path:String = null;
 
 	public function new(index:Int, name:String, boneData:BoneData) {
 		if (index < 0)

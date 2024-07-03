@@ -157,6 +157,10 @@ namespace Spine.Unity {
 			return spineGameObjectTransform.TransformPoint(new Vector3(bone.WorldX * positionScale, bone.WorldY * positionScale));
 		}
 
+		public static Vector3 GetWorldPosition (this Bone bone, UnityEngine.Transform spineGameObjectTransform, float positionScale, Vector2 positionOffset) {
+			return spineGameObjectTransform.TransformPoint(new Vector3(bone.WorldX * positionScale + positionOffset.x, bone.WorldY * positionScale + positionOffset.y));
+		}
+
 		/// <summary>Gets a skeleton space UnityEngine.Quaternion representation of bone.WorldRotationX.</summary>
 		public static Quaternion GetQuaternion (this Bone bone) {
 			float halfRotation = Mathf.Atan2(bone.C, bone.A) * 0.5f;

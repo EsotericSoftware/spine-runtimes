@@ -42,6 +42,7 @@ spSkeletonDrawable *spSkeletonDrawable_create(spSkeletonData *skeletonData, spAn
 	spSkeletonDrawable *self = NEW(spSkeletonDrawable);
 	self->skeleton = spSkeleton_create(skeletonData);
 	self->animationState = spAnimationState_create(animationStateData);
+	self->usePremultipliedAlpha = 0;
 	self->sdlIndices = spIntArray_create(12);
 	self->sdlVertices = spSdlVertexArray_create(12);
 	self->worldVertices = spFloatArray_create(12);
@@ -163,19 +164,40 @@ void spSkeletonDrawable_draw(spSkeletonDrawable *self, struct SDL_Renderer *rend
 		for (int ii = 0; ii < (int) indicesCount; ii++)
 			spIntArray_add(self->sdlIndices, indices[ii]);
 
-		switch (slot->data->blendMode) {
-			case SP_BLEND_MODE_NORMAL:
-				SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-				break;
-			case SP_BLEND_MODE_MULTIPLY:
-				SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_MOD);
-				break;
-			case SP_BLEND_MODE_ADDITIVE:
-				SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_ADD);
-				break;
-			case SP_BLEND_MODE_SCREEN:
-				SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-				break;
+		if (!self->usePremultipliedAlpha) {
+			switch (slot->data->blendMode) {
+				case SP_BLEND_MODE_NORMAL:
+					SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+					break;
+				case SP_BLEND_MODE_MULTIPLY:
+					SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_MOD);
+					break;
+				case SP_BLEND_MODE_ADDITIVE:
+					SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_ADD);
+					break;
+				case SP_BLEND_MODE_SCREEN:
+					SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+					break;
+			}
+		} else {
+			SDL_BlendMode target;
+			switch (slot->data->blendMode) {
+				case SP_BLEND_MODE_NORMAL:
+					target = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
+					SDL_SetTextureBlendMode(texture, target);
+					break;
+				case SP_BLEND_MODE_MULTIPLY:
+					SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_MOD);
+					break;
+				case SP_BLEND_MODE_ADDITIVE:
+					target = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD);
+					SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_ADD);
+					break;
+				case SP_BLEND_MODE_SCREEN:
+					target = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
+					SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+					break;
+			}
 		}
 
 		SDL_RenderGeometry(renderer, texture, self->sdlVertices->items, self->sdlVertices->size, self->sdlIndices->items,

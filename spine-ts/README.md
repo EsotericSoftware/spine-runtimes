@@ -15,7 +15,9 @@ In most cases, the `spine-player` module is best suited for your needs. Please r
 
 For documentation of the core API in `spine-core`, please refer to our [Spine Runtimes Guide](http://esotericsoftware.com/spine-runtimes-guide).
 
-For documentation of spine-phaser, please refer to our [spine-phaser Guide](https://esotericsoftware.com/spine-phaser).
+For documentation of `spine-phaser`, please refer to our [spine-phaser Guide](https://esotericsoftware.com/spine-phaser).
+
+For documentation of `spine-pixi`, please refer to our [spine-pixi Guide](https://esotericsoftware.com/spine-pixi).
 
 For module specific APIs in `spine-canvas`, `spine-webgl`, and `spine-threejs`, please refer to the [Examples](#examples) in the respecitve `spine-<modulename>/example` folder. For `spine-webgl` specifically, we have provided additional [demos](spine-webgl/demos), which you can also [view online](http://esotericsoftware.com/spine-demos).
 

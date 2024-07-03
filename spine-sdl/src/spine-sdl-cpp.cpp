@@ -33,8 +33,11 @@
 #define STB_IMAGE_IMPLEMENTATION
 
 #include <stb_image.h>
+#include <spine/Debug.h>
 
 using namespace spine;
+
+SkeletonRenderer *skeletonRenderer = nullptr;
 
 SkeletonDrawable::SkeletonDrawable(SkeletonData *skeletonData, AnimationStateData *animationStateData) {
 	Bone::setYDown(true);
@@ -58,130 +61,77 @@ void SkeletonDrawable::update(float delta, Physics physics) {
 	skeleton->updateWorldTransform(physics);
 }
 
+inline void toSDLColor(uint32_t color, SDL_Color *sdlColor) {
+	sdlColor->a = (color >> 24) & 0xFF;
+	sdlColor->r = (color >> 16) & 0xFF;
+	sdlColor->g = (color >> 8) & 0xFF;
+	sdlColor->b = color & 0xFF;
+}
+
 void SkeletonDrawable::draw(SDL_Renderer *renderer) {
-	Vector<unsigned short> quadIndices;
-	quadIndices.add(0);
-	quadIndices.add(1);
-	quadIndices.add(2);
-	quadIndices.add(2);
-	quadIndices.add(3);
-	quadIndices.add(0);
-	SDL_Texture *texture;
-	SDL_Vertex sdlVertex;
-	for (unsigned i = 0; i < skeleton->getSlots().size(); ++i) {
-		Slot &slot = *skeleton->getDrawOrder()[i];
-		Attachment *attachment = slot.getAttachment();
-		if (!attachment) {
-			clipper.clipEnd(slot);
-			continue;
-		}
-
-		// Early out if the slot color is 0 or the bone is not active
-		if (slot.getColor().a == 0 || !slot.getBone().isActive()) {
-			clipper.clipEnd(slot);
-			continue;
-		}
-
-		Vector<float> *vertices = &worldVertices;
-		int verticesCount = 0;
-		Vector<float> *uvs = NULL;
-		Vector<unsigned short> *indices;
-		int indicesCount = 0;
-		Color *attachmentColor;
-
-		if (attachment->getRTTI().isExactly(RegionAttachment::rtti)) {
-			RegionAttachment *regionAttachment = (RegionAttachment *) attachment;
-			attachmentColor = &regionAttachment->getColor();
-
-			// Early out if the slot color is 0
-			if (attachmentColor->a == 0) {
-				clipper.clipEnd(slot);
-				continue;
-			}
-
-			worldVertices.setSize(8, 0);
-			regionAttachment->computeWorldVertices(slot, worldVertices, 0, 2);
-			verticesCount = 4;
-			uvs = &regionAttachment->getUVs();
-			indices = &quadIndices;
-			indicesCount = 6;
-			texture = (SDL_Texture *) regionAttachment->getRegion()->rendererObject;
-
-		} else if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
-			MeshAttachment *mesh = (MeshAttachment *) attachment;
-			attachmentColor = &mesh->getColor();
-
-			// Early out if the slot color is 0
-			if (attachmentColor->a == 0) {
-				clipper.clipEnd(slot);
-				continue;
-			}
-
-			worldVertices.setSize(mesh->getWorldVerticesLength(), 0);
-			mesh->computeWorldVertices(slot, 0, mesh->getWorldVerticesLength(), worldVertices.buffer(), 0, 2);
-			texture = (SDL_Texture *) mesh->getRegion()->rendererObject;
-			verticesCount = mesh->getWorldVerticesLength() >> 1;
-			uvs = &mesh->getUVs();
-			indices = &mesh->getTriangles();
-			indicesCount = indices->size();
-
-		} else if (attachment->getRTTI().isExactly(ClippingAttachment::rtti)) {
-			ClippingAttachment *clip = (ClippingAttachment *) slot.getAttachment();
-			clipper.clipStart(slot, clip);
-			continue;
-		} else
-			continue;
-
-		Uint8 r = static_cast<Uint8>(skeleton->getColor().r * slot.getColor().r * attachmentColor->r * 255);
-		Uint8 g = static_cast<Uint8>(skeleton->getColor().g * slot.getColor().g * attachmentColor->g * 255);
-		Uint8 b = static_cast<Uint8>(skeleton->getColor().b * slot.getColor().b * attachmentColor->b * 255);
-		Uint8 a = static_cast<Uint8>(skeleton->getColor().a * slot.getColor().a * attachmentColor->a * 255);
-		sdlVertex.color.r = r;
-		sdlVertex.color.g = g;
-		sdlVertex.color.b = b;
-		sdlVertex.color.a = a;
-
-		if (clipper.isClipping()) {
-			clipper.clipTriangles(worldVertices, *indices, *uvs, 2);
-			vertices = &clipper.getClippedVertices();
-			verticesCount = clipper.getClippedVertices().size() >> 1;
-			uvs = &clipper.getClippedUVs();
-			indices = &clipper.getClippedTriangles();
-			indicesCount = clipper.getClippedTriangles().size();
-		}
-
+	if (!skeletonRenderer) skeletonRenderer = new (__FILE__, __LINE__) SkeletonRenderer();
+	RenderCommand *command = skeletonRenderer->render(*skeleton);
+	while (command) {
+		float *positions = command->positions;
+		float *uvs = command->uvs;
+		uint32_t *colors = command->colors;
 		sdlVertices.clear();
-		for (int ii = 0; ii < verticesCount << 1; ii += 2) {
-			sdlVertex.position.x = (*vertices)[ii];
-			sdlVertex.position.y = (*vertices)[ii + 1];
-			sdlVertex.tex_coord.x = (*uvs)[ii];
-			sdlVertex.tex_coord.y = (*uvs)[ii + 1];
+		for (int ii = 0; ii < command->numVertices << 1; ii += 2) {
+			SDL_Vertex sdlVertex;
+			sdlVertex.position.x = positions[ii];
+			sdlVertex.position.y = positions[ii + 1];
+			sdlVertex.tex_coord.x = uvs[ii];
+			sdlVertex.tex_coord.y = uvs[ii + 1];
+			toSDLColor(colors[ii >> 1], &sdlVertex.color);
 			sdlVertices.add(sdlVertex);
 		}
 		sdlIndices.clear();
-		for (int ii = 0; ii < (int) indices->size(); ii++)
-			sdlIndices.add((*indices)[ii]);
+		uint16_t *indices = command->indices;
+		for (int ii = 0; ii < command->numIndices; ii++)
+			sdlIndices.add(indices[ii]);
 
-		switch (slot.getData().getBlendMode()) {
-			case BlendMode_Normal:
-				SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-				break;
-			case BlendMode_Multiply:
-				SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_MOD);
-				break;
-			case BlendMode_Additive:
-				SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_ADD);
-				break;
-			case BlendMode_Screen:
-				SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-				break;
+		BlendMode blendMode = command->blendMode;
+		SDL_Texture *texture = (SDL_Texture *) command->texture;
+		if (!usePremultipliedAlpha) {
+			switch (blendMode) {
+				case BlendMode_Normal:
+					SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+					break;
+				case BlendMode_Multiply:
+					SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_MOD);
+					break;
+				case BlendMode_Additive:
+					SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_ADD);
+					break;
+				case BlendMode_Screen:
+					SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+					break;
+			}
+		} else {
+			SDL_BlendMode target;
+			switch (blendMode) {
+				case BlendMode_Normal:
+					target = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
+					SDL_SetTextureBlendMode(texture, target);
+					break;
+				case BlendMode_Multiply:
+					SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_MOD);
+					break;
+				case BlendMode_Additive:
+					target = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD);
+					SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_ADD);
+					break;
+				case BlendMode_Screen:
+					target = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
+					SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+					break;
+			}
 		}
 
 		SDL_RenderGeometry(renderer, texture, sdlVertices.buffer(), sdlVertices.size(), sdlIndices.buffer(),
-						   indicesCount);
-		clipper.clipEnd(slot);
+						   command->numIndices);
+		command = command->next;
 	}
-	clipper.clipEnd();
 }
 
 SDL_Texture *loadTexture(SDL_Renderer *renderer, const String &path) {

@@ -8,7 +8,7 @@
         "dev": "npx concurrently \"npx live-server --no-browser\" \"npm run build -- --watch\""   
     },
     "dependencies": {
-        "@esotericsoftware/spine-phaser": "~4.1.31",
+        "@esotericsoftware/spine-phaser": "~4.2.43",
         "phaser": "3.60.0"
     },
     "devDependencies": {

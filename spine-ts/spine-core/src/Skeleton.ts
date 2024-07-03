@@ -379,7 +379,7 @@ export class Skeleton {
 	 * See [World transforms](http://esotericsoftware.com/spine-runtime-skeletons#World-transforms) in the Spine
 	 * Runtimes Guide. */
 	updateWorldTransform (physics: Physics) {
-		if (!physics) throw new Error("physics is undefined");
+		if (physics === undefined || physics === null) throw new Error("physics is undefined");
 		let bones = this.bones;
 		for (let i = 0, n = bones.length; i < n; i++) {
 			let bone = bones[i];
@@ -640,7 +640,7 @@ export class Skeleton {
 			}
 			if (vertices && triangles) {
 				if (clipper != null && clipper.isClipping()) {
-					clipper.clipTriangles(vertices, verticesLength, triangles, triangles.length);
+					clipper.clipTriangles(vertices, triangles, triangles.length);
 					vertices = clipper.clippedVertices;
 					verticesLength = clipper.clippedVertices.length;
 				}

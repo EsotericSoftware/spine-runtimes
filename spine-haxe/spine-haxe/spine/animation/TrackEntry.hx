@@ -112,8 +112,14 @@ class TrackEntry implements Poolable {
 	/** Returns true if this track entry has been applied at least once.
 	 * <p>
 	 * See {@link AnimationState#apply(Skeleton)}. */
-	 public function wasApplied () {
+	public function wasApplied() {
 		return nextTrackLast != -1;
+	}
+
+	/** Returns true if there is a {@link #getNext()} track entry and it will become the current track entry during the next
+	* {@link AnimationState#update(float)}. */
+	public function isNextReady():Bool {
+		return next != null && nextTrackLast - next.delay >= 0;
 	}
 
 	public function reset():Void {

@@ -128,14 +128,6 @@ export class SkeletonBinary {
 		for (let i = 0; i < n; i++) {
 			let slotName = input.readString();
 			if (!slotName) throw new Error("Slot name must not be null.");
-			let path: string | null = null;
-			if (nonessential) {
-				const slash = slotName!.lastIndexOf('/');
-				if (slash != -1) {
-					path = slotName.substring(0, slash);
-					slotName = slotName.substring(slash + 1);
-				}
-			}
 			let boneData = skeletonData.bones[input.readInt(true)];
 			let data = new SlotData(i, slotName, boneData);
 			Color.rgba8888ToColor(data.color, input.readInt32());
@@ -145,10 +137,7 @@ export class SkeletonBinary {
 
 			data.attachmentName = input.readStringRef();
 			data.blendMode = input.readInt(true);
-			if (nonessential) {
-				data.visible = input.readBoolean();
-				data.path = path;
-			}
+			if (nonessential) data.visible = input.readBoolean();
 			skeletonData.slots.push(data);
 		}
 

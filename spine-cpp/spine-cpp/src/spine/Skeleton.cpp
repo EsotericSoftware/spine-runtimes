@@ -41,6 +41,7 @@
 
 #include <spine/BoneData.h>
 #include <spine/IkConstraintData.h>
+#include <spine/ClippingAttachment.h>
 #include <spine/MeshAttachment.h>
 #include <spine/PathAttachment.h>
 #include <spine/PathConstraintData.h>
@@ -48,6 +49,7 @@
 #include <spine/RegionAttachment.h>
 #include <spine/SlotData.h>
 #include <spine/TransformConstraintData.h>
+#include <spine/SkeletonClipping.h>
 
 #include <spine/ContainerUtil.h>
 
@@ -457,6 +459,13 @@ Skeleton::findPhysicsConstraint(const String &constraintName) {
 
 void Skeleton::getBounds(float &outX, float &outY, float &outWidth,
 						 float &outHeight, Vector<float> &outVertexBuffer) {
+	getBounds(outX, outY, outWidth, outHeight, outVertexBuffer, NULL);
+}
+
+static unsigned short quadIndices[] = {0, 1, 2, 2, 3, 0};
+
+void Skeleton::getBounds(float &outX, float &outY, float &outWidth,
+						 float &outHeight, Vector<float> &outVertexBuffer, SkeletonClipping *clipper) {
 	float minX = FLT_MAX;
 	float minY = FLT_MAX;
 	float maxX = -FLT_MAX;
@@ -468,6 +477,8 @@ void Skeleton::getBounds(float &outX, float &outY, float &outWidth,
 			continue;
 		size_t verticesLength = 0;
 		Attachment *attachment = slot->getAttachment();
+		unsigned short *triangles = NULL;
+		size_t trianglesLength = 0;
 
 		if (attachment != NULL &&
 			attachment->getRTTI().instanceOf(RegionAttachment::rtti)) {
@@ -479,6 +490,8 @@ void Skeleton::getBounds(float &outX, float &outY, float &outWidth,
 				outVertexBuffer.setSize(8, 0);
 			}
 			regionAttachment->computeWorldVertices(*slot, outVertexBuffer, 0);
+			triangles = quadIndices;
+			trianglesLength = 6;
 		} else if (attachment != NULL &&
 				   attachment->getRTTI().instanceOf(MeshAttachment::rtti)) {
 			MeshAttachment *mesh = static_cast<MeshAttachment *>(attachment);
@@ -490,18 +503,33 @@ void Skeleton::getBounds(float &outX, float &outY, float &outWidth,
 
 			mesh->computeWorldVertices(*slot, 0, verticesLength,
 									   outVertexBuffer.buffer(), 0);
+			triangles = mesh->getTriangles().buffer();
+			trianglesLength = mesh->getTriangles().size();
+		} else if (attachment != NULL &&
+				   attachment->getRTTI().instanceOf(ClippingAttachment::rtti) && clipper != NULL) {
+			clipper->clipStart(*slot, static_cast<ClippingAttachment *>(attachment));
 		}
 
-		for (size_t ii = 0; ii < verticesLength; ii += 2) {
-			float vx = outVertexBuffer[ii];
-			float vy = outVertexBuffer[ii + 1];
+		if (verticesLength > 0) {
+			float *vertices = outVertexBuffer.buffer();
+			if (clipper != NULL && clipper->isClipping()) {
+				clipper->clipTriangles(outVertexBuffer.buffer(), triangles, trianglesLength);
+				vertices = clipper->getClippedVertices().buffer();
+				verticesLength = clipper->getClippedVertices().size();
+			}
+			for (size_t ii = 0; ii < verticesLength; ii += 2) {
+				float vx = vertices[ii];
+				float vy = vertices[ii + 1];
 
-			minX = MathUtil::min(minX, vx);
-			minY = MathUtil::min(minY, vy);
-			maxX = MathUtil::max(maxX, vx);
-			maxY = MathUtil::max(maxY, vy);
+				minX = MathUtil::min(minX, vx);
+				minY = MathUtil::min(minY, vy);
+				maxX = MathUtil::max(maxX, vx);
+				maxY = MathUtil::max(maxY, vy);
+			}
 		}
+		if (clipper != NULL) clipper->clipEnd(*slot);
 	}
+	if (clipper != NULL) clipper->clipEnd();
 
 	outX = minX;
 	outY = minY;

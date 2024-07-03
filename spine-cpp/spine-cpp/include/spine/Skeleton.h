@@ -58,6 +58,8 @@ namespace spine {
 
 	class Attachment;
 
+    class SkeletonClipping;
+
 	class SP_API Skeleton : public SpineObject {
 		friend class AnimationState;
 
@@ -187,7 +189,9 @@ namespace spine {
 		/// @param outWidth The width of the AABB
 		/// @param outHeight The height of the AABB.
 		/// @param outVertexBuffer Reference to hold a Vector of floats. This method will assign it with new floats as needed.
-		void getBounds(float &outX, float &outY, float &outWidth, float &outHeight, Vector<float> &outVertexBuffer);
+		// @param clipping Pointer to a SkeletonClipping instance or NULL. If a clipper is given, clipping attachments will be taken into account.
+        void getBounds(float &outX, float &outY, float &outWidth, float &outHeight, Vector<float> &outVertexBuffer);
+		void getBounds(float &outX, float &outY, float &outWidth, float &outHeight, Vector<float> &outVertexBuffer, SkeletonClipping *clipper);
 
 		Bone *getRootBone();
 

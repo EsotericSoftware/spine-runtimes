@@ -24,8 +24,8 @@
 	// Creates a new spine player. The debugRender option enables
 	// rendering of viewports and padding for debugging purposes.
 	new spine.SpinePlayer("container", {
-		skelUrl: "assets/spineboy-pro.skel",
-		atlasUrl: "assets/spineboy-pma.atlas",
+		skeleton: "assets/spineboy-pro.skel",
+		atlas: "assets/spineboy-pma.atlas",
 		animation: "run",
 		premultipliedAlpha: true,
 		backgroundColor: "#cccccc",
@@ -42,8 +42,8 @@
 	// so content from the website shines through. Hides the controls.
 	// Instead, the user can control the animation via buttons.
 	var jsControlledPlayer = new spine.SpinePlayer("container-raptor", {
-		jsonUrl: "assets/raptor-pro.json",
-		atlasUrl: "assets/raptor-pma.atlas",
+		skeleton: "assets/raptor-pro.json",
+		atlas: "assets/raptor-pma.atlas",
 		animation: "walk",
 		showControls: false,
 		premultipliedAlpha: true,

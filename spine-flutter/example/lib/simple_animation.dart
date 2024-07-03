@@ -37,8 +37,12 @@ class SimpleAnimation extends StatelessWidget {
   Widget build(BuildContext context) {
     reportLeaks();
     final controller = SpineWidgetController(onInitialized: (controller) {
-      // Set the walk animation on track 0, let it loop
-      controller.animationState.setAnimationByName(0, "walk", true);
+      // Set the default mixing time between animations
+      controller.animationState.getData().setDefaultMix(0.2);
+      // Set the portal animation on track 0
+      controller.animationState.setAnimationByName(0, "portal", true);
+      // Queue the run animation after the portal animation
+      controller.animationState.addAnimationByName(0, "run", true, 0);
     });
 
     return Scaffold(

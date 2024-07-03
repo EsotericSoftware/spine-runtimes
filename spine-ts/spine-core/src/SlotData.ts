@@ -58,10 +58,6 @@ export class SlotData {
 	/** False if the slot was hidden in Spine and nonessential data was exported. Does not affect runtime rendering. */
 	visible = true;
 
-	/** The folders for this slot in the draw order, delimited by <code>/</code>, or null if nonessential data was not exported. */
-	path: string | null = null;
-
-
 	constructor (index: number, name: string, boneData: BoneData) {
 		if (index < 0) throw new Error("index must be >= 0.");
 		if (!name) throw new Error("name cannot be null.");

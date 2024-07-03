@@ -113,6 +113,7 @@
 ## C#
 
 - **Additions**
+
   - Added [`TrackEntry.AlphaAttachmentThreshold`](http://esotericsoftware.com/spine-api-reference#TrackEntry-alphaAttachmentThreshold).
 
 - **Breaking changes**
@@ -155,6 +156,10 @@
     `SkeletonGraphic-PMATexture` containing materials for premultiplied-alpha texture workflow (`Straight Alpha Texture` disabled) and `SkeletonGraphic-StaightAlphaTexture` containing materials for straight alpha texture workflow (`Straight Alpha Texture` enabled). These directories contain a set of materials with `CanvasGroup Compatible` disabled for usage with `Advanced - PMA Vertex Color` enabled at the component. Each directory also provides a subdirectory `CanvasGroupCompatible` with materials with `CanvasGroup Compatible` enabled for usage with `CanvasGroup` alpha (requiring `Advanced - PMA Vertex Color` disabled at the component).
   - SkeletonGraphic: Added auto-detect functionality for parameters `Advanced` - `Tint Black`, `CanvasGroup Compatible` and `PMA Vertex Color`. If unsure which settings are correct, hit the `Detect` button next to each parameter, in top to bottom order, or the `Detect Settings` to detect all three. Also added automatic material assignment via a `Detect Material` button in the `Advanced` section and a `Detect` button next to the `Material` property at the top of the component Inspector, as well as next to the `Blend Mode Materials` section when using multiple canvas renderers with blend modes. The suitable material is selected based on these three settings, combined with texture settings (PMA or straight alpha texture settings). If you receive incorrect results, likely your texture settings are incorrectly setup for your PMA or Straight alpha texture export settings.
   - `SkeletonRenderTexture` example components now provide a `shaderPasses` parameter to customize which passes are rendered to the `RenderTexture`. It defaults to `-1` for all passes to keep the existing behaviour. You might want to set it to `0` to only render the first pass e.g. to avoid issues when using a URP shader at the original skeleton.
+  - `SkeletonGraphicRenderTexture` example component now also received a `quadMaterial` property, defaulting to the newly added Material asset `RenderQuadGraphicMaterial` which applies proper premultiplied-alpha blending of the render texture. The `quadMaterial` member variable was moved from `SkeletonRenderTexture` to the common base class `SkeletonRenderTextureBase`.
+  - All Spine Outline shaders, including the URP outline shader, now provide an additional parameter `Width in Screen Space`. Enable it to keep the outline width constant in screen space instead of texture space. Requires more expensive computations, so enable only where necessary. Defaults to `disabled` to maintain existing behaviour.
+  - Added support for BlendModeMaterials at runtime instantiation from files via an additional method `SkeletonDataAsset.SetupRuntimeBlendModeMaterials`. See example scene `Spine Examples/Other Examples/Instantiate from Script` for a usage example.
+  - SkeletonGraphic: You can now offset the skeleton mesh relative to the pivot via a newly added green circle handle. This allows you to e.g. frame only the face of a skeleton inside a masked frame. Previously offsetting the pivot downwards fails when `Layout Scale Mode` scales the mesh smaller and towards the pivot (e.g. the feet) and thus out of the frame. Now you can keep the pivot in the center of the `RectTransform` while offsetting only the mesh downwards, keeping the desired skeleton area (e.g. the face) centered while resizing. Moving the new larger green circle handle moves the mesh offset, while moving the blue pivot circle handle moves the pivot as usual.
 
 - **Breaking changes**
 
@@ -166,6 +171,8 @@
   - SkeletonGraphic: The parameter `SkeletonGraphic.MeshGenerator.settings.canvasGroupTintBlack` was changed to `canvasGroupCompatible` to help with auto-detecting correct Vertex Data and Material settings. Set the parameter to true if the SkeletonGraphic component is located below a `CanvasGroup` component. The parameter value is automatically migrated from `canvasGroupTintBlack`.
   - Inspector: String attribute `SpineSkin()` now allows to include `<None>` in the list of parameters. Previously the `includeNone=true` parameter of the `SpineSkin()` attribute defaulted to `true` but was ignored. Now it defaults to `false` and has an effect on the list. Only the Inspector GUI is affected by this behaviour change.
   - `SkeletonGraphicRenderTexture` example component: `protected RawImage quadRawImage` was changed to `protected SkeletonSubmeshGraphic quadMaskableGraphic` for a bugfix. This is only relevant for subclasses of `SkeletonGraphicRenderTexture` or when querying the `RawImage` component via e.g. `skeletonGraphicRenderTexture.quad.GetComponent<RawImage>()`.
+  - Fixed a bug where when Linear color space is used and `PMA vertex colors` enabled, additive slots add a too dark (too transparent) color value. If you want the old incorrect behaviour (darker additive slots) or are not using Linear but Gamma color space, you can comment-out the define `LINEAR_COLOR_SPACE_FIX_ADDITIVE_ALPHA` in `MeshGenerator.cs` to deactivate the fix or just to skip unnecessary instructions.
+
 
 - **Changes of default values**
 
@@ -174,6 +181,7 @@
 - **Restructuring (Non-Breaking)**
 
 ### XNA/MonoGame
+
 - **Additions**
   - Apply external movement to physics: If you are not directly modifying `Skeleton.X` or `Skeleton.Y`, you can apply external game object movement to skeleton physics as follows:
     Add a `Vector2 lastPosition;` member variable to your class interacting with the skeleton. Then call e.g. the following code each frame:
@@ -261,6 +269,8 @@
 - Added physics support
 - Added `scale` field to configuration which defines the scale to load the skeleton at
 - Added `updateWorldTransform` field to configuration which expects a function that updates the skeleton. Defaults to player.skeleton.updateWorldTransform(spine.Physics.update)
+- Added `skeleton` to `SpinePlayerConfig` to specify the URL of the skeleton .json or .skel file. Deprecated `jsonURL` and `binaryURL`. The old fields can still be used, but will be removed in Spine 4.3
+- Added `atlas` to `SpinePlayerConfig` to specify the URL of the .atlas file. Deprecated `atlasURL`. The old field can still be used, but will be removed in Spine 4.3.
 
 ### Pixi
 

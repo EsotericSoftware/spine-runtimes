@@ -7,7 +7,7 @@ public class SpineUETarget : TargetRules
 {
 	public SpineUETarget(TargetInfo Target) : base(Target)
 	{
-		DefaultBuildSettings = BuildSettingsVersion.V2;
+		DefaultBuildSettings = BuildSettingsVersion.Latest;
 		Type = TargetType.Game;
 		ExtraModuleNames.AddRange(new string[] { "SpineUE" });
 	}

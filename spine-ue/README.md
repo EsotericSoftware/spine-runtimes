@@ -1,6 +1,6 @@
 # spine-ue
 
-The spine-ue runtime provides functionality to load, manipulate and render [Spine](http://esotericsoftware.com) skeletal animation data using [Unreal Engine 4.27-5.3](https://www.unrealengine.com/). spine-ue is based on [spine-cpp](../spine-cpp).
+The spine-ue runtime provides functionality to load, manipulate and render [Spine](http://esotericsoftware.com) skeletal animation data using [Unreal Engine 4.27-5.4](https://www.unrealengine.com/). spine-ue is based on [spine-cpp](../spine-cpp).
 
 ## Licensing
 

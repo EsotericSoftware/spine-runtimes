@@ -1,7 +1,7 @@
 {
 "skeleton": {
 	"hash": "CKnF82un6n8",
-	"spine": "4.2.64-beta",
+	"spine": "4.2.22",
 	"x": -345,
 	"y": -272846.84,
 	"width": 756,
@@ -405,51 +405,51 @@
 	{
 		"name": "default",
 		"attachments": {
-			"cloud-base-1": {
+			"cloud/cloud-base/cloud-base-1": {
 				"cloud-base-1": { "width": 465, "height": 420 }
 			},
-			"cloud-base-2": {
+			"cloud/cloud-base/cloud-base-2": {
 				"cloud-base-2": { "width": 420, "height": 415 }
 			},
-			"cloud-base-3": {
+			"cloud/cloud-base/cloud-base-3": {
 				"cloud-base-3": { "width": 349, "height": 327 }
 			},
-			"cloud-base-4": {
+			"cloud/cloud-base/cloud-base-4": {
 				"cloud-base-4": { "width": 352, "height": 326 }
 			},
-			"cloud-base-5": {
+			"cloud/cloud-base/cloud-base-5": {
 				"cloud-base-5": { "width": 289, "height": 250 }
 			},
-			"cloud-base-6": {
+			"cloud/cloud-base/cloud-base-6": {
 				"cloud-base-6": { "width": 322, "height": 272 }
 			},
-			"cloud-base-7": {
+			"cloud/cloud-base/cloud-base-7": {
 				"cloud-base-7": { "width": 300, "height": 297 }
 			},
-			"cloud-base-8": {
+			"cloud/cloud-base/cloud-base-8": {
 				"cloud-base-8": { "width": 307, "height": 256 }
 			},
-			"cloud-base-9": {
+			"cloud/cloud-base/cloud-base-9": {
 				"cloud-base-9": { "width": 214, "height": 216 }
 			},
-			"cloud-base-10": {
+			"cloud/cloud-base/cloud-base-10": {
 				"cloud-base-10": { "width": 193, "height": 201 }
 			},
-			"cloud-cheeks": {
+			"cloud/cloud-cheeks": {
 				"cloud-cheeks": { "x": -19, "y": -53.93, "width": 435, "height": 158 }
 			},
-			"cloud-eyes": {
+			"cloud/cloud-eyes": {
 				"cloud-eyes-closed": { "x": -10, "y": -5.43, "width": 263, "height": 43 },
 				"cloud-eyes-open": { "x": -8, "y": -4.43, "width": 265, "height": 51 }
 			},
-			"cloud-eyes-reflex": {
+			"cloud/cloud-eyes-reflex": {
 				"cloud-eyes-reflex": { "x": -10, "y": 2.07, "width": 239, "height": 34 }
 			},
-			"cloud-mouth": {
+			"cloud/cloud-mouth": {
 				"cloud-mouth-closed": { "y": -14.93, "width": 97, "height": 32 },
 				"cloud-mouth-open": { "x": -0.5, "y": -27.93, "width": 118, "height": 70 }
 			},
-			"leaf-big": {
+			"flower/leaf-big": {
 				"leaf-big": {
 					"type": "mesh",
 					"uvs": [ 1, 1, 0, 1, 0, 0.75, 0, 0.5, 0, 0.25, 0, 0, 1, 0, 1, 0.25, 1, 0.5, 1, 0.75 ],
@@ -461,19 +461,19 @@
 					"height": 98
 				}
 			},
-			"leaf-small": {
+			"flower/leaf-small": {
 				"leaf-small": { "x": 25.02, "y": 0.4, "rotation": -91.36, "width": 34, "height": 59 }
 			},
-			"petal-1": {
+			"flower/petal-1": {
 				"petal-1": { "x": 18.88, "y": -4.54, "rotation": -160.18, "width": 52, "height": 36 }
 			},
-			"petal-2": {
+			"flower/petal-2": {
 				"petal-2": { "x": 21.96, "y": 2.06, "rotation": -9.66, "width": 56, "height": 34 }
 			},
-			"petal-3": {
+			"flower/petal-3": {
 				"petal-3": { "x": 16.97, "y": -5.71, "rotation": -91.03, "width": 58, "height": 42 }
 			},
-			"stem": {
+			"flower/stem": {
 				"stem": {
 					"type": "mesh",
 					"uvs": [ 1, 1, 0, 1, 0, 0.90909, 0, 0.81818, 0, 0.72727, 0, 0.63636, 0, 0.54545, 0, 0.45455, 0, 0.36364, 0, 0.27273, 0, 0.18182, 0, 0.09091, 0, 0, 1, 0, 1, 0.09091, 1, 0.18182, 1, 0.27273, 1, 0.36364, 1, 0.45455, 1, 0.54545, 1, 0.63636, 1, 0.72727, 1, 0.81818, 1, 0.90909 ],
@@ -485,35 +485,35 @@
 					"height": 210
 				}
 			},
-			"stem-end": {
+			"flower/stem-end": {
 				"stem-end": { "x": 25.8, "y": -0.26, "rotation": -90, "width": 25, "height": 26 }
 			},
-			"pot-base": {
+			"pot/pot-base": {
 				"pot-base": { "x": 5, "y": 42, "width": 152, "height": 118 }
 			},
-			"pot-eyes": {
+			"pot/pot-eyes": {
 				"pot-eyes-closed": { "x": -0.94, "y": 2.34, "width": 92, "height": 17 },
 				"pot-eyes-open": { "x": 0.06, "y": 3.84, "width": 80, "height": 22 }
 			},
-			"pot-mouth": {
+			"pot/pot-mouth": {
 				"pot-mouth-open": { "x": -1.44, "y": -13.66, "width": 27, "height": 31 },
 				"pot-mouth-pouty": { "x": 0.56, "y": -12.66, "width": 35, "height": 19 },
 				"pot-mouth-smile": { "x": 0.56, "y": -12.16, "width": 27, "height": 20 },
 				"pot-mouth-smile-big": { "x": 1.56, "y": -9.16, "width": 39, "height": 18 }
 			},
-			"rain-blue": {
+			"rain/rain-blue": {
 				"rain-blue": { "width": 23, "height": 36 }
 			},
-			"rain-color": {
+			"rain/rain-color": {
 				"rain-color": { "width": 18, "height": 34 }
 			},
-			"rain-green": {
+			"rain/rain-green": {
 				"rain-green": { "width": 23, "height": 36 }
 			},
-			"rain-white": {
+			"rain/rain-white": {
 				"rain-white": { "width": 23, "height": 44 }
 			},
-			"rain-white-reflex": {
+			"rain/rain-white-reflex": {
 				"rain-white-reflex": { "x": -0.5, "y": 3.5, "width": 10, "height": 19 }
 			}
 		}
@@ -522,7 +522,7 @@
 "animations": {
 	"playing-in-the-rain": {
 		"slots": {
-			"cloud-eyes": {
+			"cloud/cloud-eyes": {
 				"attachment": [
 					{ "time": 0.2, "name": "cloud-eyes-closed" },
 					{ "time": 0.9, "name": "cloud-eyes-open" },
@@ -534,13 +534,13 @@
 					{ "time": 4.1, "name": "cloud-eyes-open" }
 				]
 			},
-			"cloud-mouth": {
+			"cloud/cloud-mouth": {
 				"attachment": [
 					{ "time": 0.2, "name": "cloud-mouth-open" },
 					{ "time": 0.9, "name": "cloud-mouth-closed" }
 				]
 			},
-			"pot-eyes": {
+			"pot/pot-eyes": {
 				"attachment": [
 					{ "time": 0.1333, "name": "pot-eyes-closed" },
 					{ "time": 0.3, "name": "pot-eyes-open" },
@@ -552,7 +552,7 @@
 					{ "time": 3.6667, "name": "pot-eyes-open" }
 				]
 			},
-			"pot-mouth": {
+			"pot/pot-mouth": {
 				"attachment": [
 					{ "time": 0.1333, "name": "pot-mouth-open" },
 					{ "time": 0.3, "name": "pot-mouth-smile-big" },

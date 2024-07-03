@@ -10,7 +10,7 @@ if [ ! "$#" -eq 1 ]; then
 	echo "e.g.:"
 	echo "       ./build.sh release_debug"
 	echo "       ./build.sh debug"
-	echo	
+	echo
 	exit 1
 fi
 
@@ -37,7 +37,7 @@ fi
 echo "CPUS: $cpus"
 
 pushd ../godot
-if [ `uname` == 'Darwin' ] && [ $dev = "false" ]; then	
+if [ `uname` == 'Darwin' ] && [ $dev = "false" ]; then
 	scons $target arch=x86_64 compiledb=yes custom_modules="../spine_godot" --jobs=$cpus
 	scons $target arch=arm64 compiledb=yes custom_modules="../spine_godot" --jobs=$cpus
 
@@ -53,14 +53,14 @@ if [ `uname` == 'Darwin' ] && [ $dev = "false" ]; then
 		lipo -create godot.osx.opt.tools.x86_64 godot.osx.opt.tools.arm64 -output godot.osx.opt.tools.universal
 		strip -S -x godot.osx.opt.tools.universal
 		cp godot.osx.opt.tools.universal Godot.app/Contents/MacOS/Godot
-	fi	
-	chmod +x Godot.app/Contents/MacOS/Godot	
+	fi
+	chmod +x Godot.app/Contents/MacOS/Godot
 	popd
 else
-	if [ "$OSTYPE" = "msys" ]; then
+	if [ "$OSTYPE" = "msys" ] || [ "$RUNNER_OS" = "Windows" ]; then
 		target="$target vsproj=yes livepp=$LIVEPP"
 	fi
-	scons $target compiledb=yes custom_modules="../spine_godot" --jobs=$cpus	
+	scons $target compiledb=yes custom_modules="../spine_godot" --jobs=$cpus
 	cp compile_commands.json ../build
 	if [ -f "bin/godot.x11.opt.tools.64" ]; then
 		strip bin/godot.x11.opt.tools.64

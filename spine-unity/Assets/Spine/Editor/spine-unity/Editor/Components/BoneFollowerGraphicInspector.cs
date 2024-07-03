@@ -100,17 +100,19 @@ namespace Spine.Unity.Editor {
 			Transform transform = skeletonGraphicComponent.transform;
 			Skeleton skeleton = skeletonGraphicComponent.Skeleton;
 			float positionScale = skeletonGraphicComponent.MeshScale;
+			Vector2 positionOffset = skeletonGraphicComponent.GetScaledPivotOffset();
 
 			if (string.IsNullOrEmpty(boneName.stringValue)) {
-				SpineHandles.DrawBones(transform, skeleton, positionScale);
-				SpineHandles.DrawBoneNames(transform, skeleton, positionScale);
+				SpineHandles.DrawBones(transform, skeleton, positionScale, positionOffset);
+				SpineHandles.DrawBoneNames(transform, skeleton, positionScale, positionOffset);
 				Handles.Label(tbf.transform.position, "No bone selected", EditorStyles.helpBox);
 			} else {
 				Bone targetBone = tbf.bone;
 				if (targetBone == null) return;
 
-				SpineHandles.DrawBoneWireframe(transform, targetBone, SpineHandles.TransformContraintColor, positionScale);
-				Handles.Label(targetBone.GetWorldPosition(transform, positionScale), targetBone.Data.Name, SpineHandles.BoneNameStyle);
+				SpineHandles.DrawBoneWireframe(transform, targetBone, SpineHandles.TransformContraintColor, positionScale, positionOffset);
+				Handles.Label(targetBone.GetWorldPosition(transform, positionScale, positionOffset),
+					targetBone.Data.Name, SpineHandles.BoneNameStyle);
 			}
 		}
 

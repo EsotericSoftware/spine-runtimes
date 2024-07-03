@@ -46,11 +46,10 @@ namespace spine {
 
 		Skeleton *skeleton;
 		AnimationState *animationState;
+		bool usePremultipliedAlpha;
 
 	private:
 		bool ownsAnimationStateData;
-		SkeletonClipping clipper;
-		Vector<float> worldVertices;
 		Vector<SDL_Vertex> sdlVertices;
 		Vector<int> sdlIndices;
 	};

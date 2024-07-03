@@ -9,7 +9,11 @@
       "request": "launch",
       "name": "debug scene v4",
       "program": "godot/bin/godot.windows.editor.dev.x86_64.exe",
-      "args": ["--path", "example-v4", "examples/07-slot-node/slot-node.tscn"],
+      "args": [
+        "--path",
+        "example-v4",
+        "examples/03-mix-and-match/mix-and-match.tscn"
+      ],
       "cwd": "${workspaceFolder}",
       "preLaunchTask": "build-v4",
       "linux": {

@@ -254,7 +254,7 @@ void USpineSkeletonComponent::SetSlotColor(const FString SlotName, const FColor 
 	if (skeleton) {
 		Slot *slot = skeleton->findSlot(TCHAR_TO_UTF8(*SlotName));
 		if (slot) {
-			slot->getColor().set(color.R, color.B, color.G, color.A);
+			slot->getColor().set(color.R / 255.f, color.G / 255.f, color.B / 255.f, color.A / 255.f);
 		}
 	}
 }

@@ -42,6 +42,7 @@ namespace Spine.Unity.Examples {
 		public Color color = Color.white;
 		public int maxRenderTextureSize = 1024;
 		public GameObject quad;
+		public Material quadMaterial;
 		protected Mesh quadMesh;
 		public RenderTexture renderTexture;
 		public Camera targetCamera;
@@ -119,6 +120,45 @@ namespace Spine.Unity.Examples {
 				renderTexture.filterMode = FilterMode.Point;
 				allocatedRenderTextureSize = textureSize;
 			}
+		}
+
+		protected Matrix4x4 CalculateProjectionMatrix (Camera targetCamera,
+			Vector3 screenSpaceMin, Vector3 screenSpaceMax, Vector2 fullSizePixels) {
+			if (targetCamera.orthographic)
+				return CalculateOrthoMatrix(targetCamera, screenSpaceMin, screenSpaceMax, fullSizePixels);
+			else
+				return CalculatePerspectiveMatrix(targetCamera, screenSpaceMin, screenSpaceMax, fullSizePixels);
+		}
+
+		protected Matrix4x4 CalculateOrthoMatrix (Camera targetCamera,
+			Vector3 screenSpaceMin, Vector3 screenSpaceMax, Vector2 fullSizePixels) {
+
+			Vector2 cameraSize = new Vector2(
+					targetCamera.orthographicSize * 2.0f * targetCamera.aspect,
+					targetCamera.orthographicSize * 2.0f);
+			Vector2 min = new Vector2(screenSpaceMin.x, screenSpaceMin.y) / fullSizePixels;
+			Vector2 max = new Vector2(screenSpaceMax.x, screenSpaceMax.y) / fullSizePixels;
+			Vector2 centerOffset = new Vector2(-0.5f, -0.5f);
+			min = (min + centerOffset) * cameraSize;
+			max = (max + centerOffset) * cameraSize;
+
+			return Matrix4x4.Ortho(min.x, max.x, min.y, max.y, float.MinValue, float.MaxValue);
+		}
+
+		protected Matrix4x4 CalculatePerspectiveMatrix (Camera targetCamera,
+			Vector3 screenSpaceMin, Vector3 screenSpaceMax, Vector2 fullSizePixels) {
+
+			FrustumPlanes frustumPlanes = targetCamera.projectionMatrix.decomposeProjection;
+			Vector2 planesSize = new Vector2(
+				frustumPlanes.right - frustumPlanes.left,
+				frustumPlanes.top - frustumPlanes.bottom);
+			Vector2 min = new Vector2(screenSpaceMin.x, screenSpaceMin.y) / fullSizePixels * planesSize;
+			Vector2 max = new Vector2(screenSpaceMax.x, screenSpaceMax.y) / fullSizePixels * planesSize;
+			frustumPlanes.right = frustumPlanes.left + max.x;
+			frustumPlanes.top = frustumPlanes.bottom + max.y;
+			frustumPlanes.left += min.x;
+			frustumPlanes.bottom += min.y;
+			return Matrix4x4.Frustum(frustumPlanes);
 		}
 
 		protected void AssignAtQuad () {

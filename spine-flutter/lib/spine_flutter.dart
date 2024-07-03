@@ -128,7 +128,7 @@ class Atlas {
     final numImagePaths = _bindings.spine_atlas_get_num_image_paths(atlas);
     for (int i = 0; i < numImagePaths; i++) {
       final Pointer<Utf8> atlasPageFile = _bindings.spine_atlas_get_image_path(atlas, i).cast();
-      final imagePath = atlasDir + "/" + atlasPageFile.toDartString();
+      final imagePath = "$atlasDir/${atlasPageFile.toDartString()}";
       var imageData = await loadFile(imagePath);
       final Codec codec = await instantiateImageCodec(imageData);
       final FrameInfo frameInfo = await codec.getNextFrame();
@@ -1494,7 +1494,7 @@ abstract class Attachment<T extends Pointer> {
 ///
 /// See [Region attachments](http://esotericsoftware.com/spine-regions) in the Spine User Guide.
 class RegionAttachment extends Attachment<spine_region_attachment> {
-  RegionAttachment._(spine_region_attachment attachment) : super._(attachment);
+  RegionAttachment._(super.attachment) : super._();
 
   /// Transforms and returns the attachment's four vertices to world coordinates. If the attachment has a [Sequence], the region may
   /// be changed.
@@ -1618,7 +1618,7 @@ class RegionAttachment extends Attachment<spine_region_attachment> {
 /// Base class for an attachment with vertices that are transformed by one or more bones and can be deformed by a slot's
 /// [Slot.getDeform].
 class VertexAttachment<T extends Pointer> extends Attachment<T> {
-  VertexAttachment._(T attachment) : super._(attachment);
+  VertexAttachment._(super.attachment) : super._();
 
   /// Transforms and returns the attachment's local [getVertices] to world coordinates. If the slot's [Slot.getDeform] is
   /// not empty, it is used to deform the vertices.
@@ -1813,7 +1813,7 @@ class ClippingAttachment extends VertexAttachment<spine_clipping_attachment> {
 /// See [SkeletonBounds] and [Bounding boxes](http://esotericsoftware.com/spine-bounding-boxes) in the Spine User
 /// Guide.
 class BoundingBoxAttachment extends VertexAttachment<spine_bounding_box_attachment> {
-  BoundingBoxAttachment._(spine_bounding_box_attachment attachment) : super._(attachment);
+  BoundingBoxAttachment._(super.attachment) : super._();
 
   /// The color of the bounding box as it was in Spine, or a default color if nonessential data was not exported. Bounding boxes
   /// are not usually rendered at runtime.
@@ -1832,7 +1832,7 @@ class BoundingBoxAttachment extends VertexAttachment<spine_bounding_box_attachme
 ///
 /// See [PathConstraint] and [Paths](http://esotericsoftware.com/spine-paths) in the Spine User Guide.
 class PathAttachment extends VertexAttachment<spine_path_attachment> {
-  PathAttachment._(spine_path_attachment attachment) : super._(attachment);
+  PathAttachment._(super.attachment) : super._();
 
   /// The lengths along the path in the setup pose from the start of the path to the end of each Bezier curve.
   Float32List getLengths() {
@@ -1879,7 +1879,7 @@ class PathAttachment extends VertexAttachment<spine_path_attachment> {
 ///
 /// See [Point Attachments](http://esotericsoftware.com/spine-point-attachments) in the Spine User Guide.
 class PointAttachment extends Attachment<spine_point_attachment> {
-  PointAttachment._(spine_point_attachment attachment) : super._(attachment);
+  PointAttachment._(super.attachment) : super._();
 
   Vec2 computeWorldPosition(Bone bone) {
     final position = _bindings.spine_point_attachment_compute_world_position(_attachment, bone._bone);
@@ -2095,7 +2095,7 @@ class ConstraintData<T extends Pointer> {
 ///
 /// See [IK constraints](http://esotericsoftware.com/spine-ik-constraints) in the Spine User Guide.
 class IkConstraintData extends ConstraintData<spine_ik_constraint_data> {
-  IkConstraintData._(spine_ik_constraint_data data) : super._(data);
+  IkConstraintData._(super.data) : super._();
 
   /// The bones that are constrained by this IK constraint.
   List<BoneData> getBones() {
@@ -2285,7 +2285,7 @@ class IkConstraint {
 ///
 /// See [Transform constraints](http://esotericsoftware.com/spine-transform-constraints) in the Spine User Guide.
 class TransformConstraintData extends ConstraintData<spine_transform_constraint_data> {
-  TransformConstraintData._(spine_transform_constraint_data data) : super._(data);
+  TransformConstraintData._(super.data) : super._();
 
   /// The bones that will be modified by this transform constraint.
   List<BoneData> getBones() {
@@ -2543,7 +2543,7 @@ class TransformConstraint {
 ///
 /// See [Path constraints](http://esotericsoftware.com/spine-path-constraints) in the Spine User Guide.
 class PathConstraintData extends ConstraintData<spine_path_constraint_data> {
-  PathConstraintData._(spine_path_constraint_data data) : super._(data);
+  PathConstraintData._(super.data) : super._();
 
   /// The bones that will be modified by this path constraint.
   List<BoneData> getBones() {
@@ -3099,7 +3099,7 @@ enum MixBlend {
 
   /// Transitions from the current value to the timeline value. Before the first frame, transitions from the current value to
   /// the setup value. Timelines which perform instant transitions, such as {@link DrawOrderTimeline} or
-  /// {@link AttachmentTimeline}, use the setup value before the first frame.
+  /// {link AttachmentTimeline}, use the setup value before the first frame.
   /// <p>
   /// <code>first</code> is intended for the first animations applied, not for animations layered on top of those.
   first(1),
@@ -3456,6 +3456,14 @@ class TrackEntry {
   /// animation will reach its next [getAnimationEnd] (the next loop completion).
   double getTrackComplete() {
     return _bindings.spine_track_entry_get_track_complete(_entry);
+  }
+
+  bool wasApplied() {
+    return _bindings.spine_track_entry_was_applied(_entry) == -1;
+  }
+
+  bool isNextReady() {
+    return _bindings.spine_track_entry_is_next_ready(_entry) == -1;
   }
 
   /// The listener for events generated by this track entry, or null.

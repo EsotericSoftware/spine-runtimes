@@ -181,13 +181,7 @@ public class SkeletonJson extends SkeletonLoader {
 
 		// Slots.
 		for (JsonValue slotMap = root.getChild("slots"); slotMap != null; slotMap = slotMap.next) {
-			String slotName = slotMap.getString("name"), path = null;
-			int slash = slotName.lastIndexOf('/');
-			if (slash != -1) {
-				path = slotName.substring(0, slash);
-				slotName = slotName.substring(slash + 1);
-			}
-
+			String slotName = slotMap.getString("name");
 			String boneName = slotMap.getString("bone");
 			BoneData boneData = skeletonData.findBone(boneName);
 			if (boneData == null) throw new SerializationException("Slot bone not found: " + boneName);
@@ -203,7 +197,6 @@ public class SkeletonJson extends SkeletonLoader {
 			data.attachmentName = slotMap.getString("attachment", null);
 			data.blendMode = BlendMode.valueOf(slotMap.getString("blend", BlendMode.normal.name()));
 			data.visible = slotMap.getBoolean("visible", true);
-			data.path = path;
 			skeletonData.slots.add(data);
 		}
 
@@ -967,7 +960,7 @@ public class SkeletonJson extends SkeletonLoader {
 				int frames = timelineMap.size;
 				String timelineName = timelineMap.name;
 				if (timelineName.equals("reset")) {
-					PhysicsConstraintResetTimeline timeline = new PhysicsConstraintResetTimeline(timelineMap.size, index);
+					PhysicsConstraintResetTimeline timeline = new PhysicsConstraintResetTimeline(frames, index);
 					for (int frame = 0; keyMap != null; keyMap = keyMap.next, frame++)
 						timeline.setFrame(frame, keyMap.getFloat("time", 0));
 					timelines.add(timeline);

@@ -1032,6 +1032,12 @@ export class TrackEntry {
 	wasApplied () {
 		return this.nextTrackLast != -1;
 	}
+
+	/** Returns true if there is a {@link #getNext()} track entry and it will become the current track entry during the next
+	 * {@link AnimationState#update(float)}. */
+	isNextReady () {
+		return this.next != null && this.nextTrackLast - this.next.delay >= 0;
+	}
 }
 
 export class EventQueue {

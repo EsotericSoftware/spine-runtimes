@@ -78,10 +78,13 @@ namespace Spine.Unity {
 		/// atlas asset JSON file. When procedurally creating textures, each <c>Texture.name</c>
 		/// needs to be set to the atlas page texture filename without the .png extension,
 		/// e.g. 'my_skeleton' if the png filename listed in the atlas asset file is 'my_skeleton.png'.</param>
+		/// <param name="renameMaterial">If true, newly created materials will be renamed to the atlas texture page name.
+		/// If false, the materials keep the name of the <c>materialPropertySource</c> material they are copied from.</param>
 		/// <seealso cref="SpineAtlasAsset.CreateRuntimeInstance(TextAsset, Material[], bool, Func{SpineAtlasAsset, TextureLoader})"/>
 		public static SpineAtlasAsset CreateRuntimeInstance (TextAsset atlasText, Texture2D[] textures,
 			Material materialPropertySource, bool initialize,
-			Func<SpineAtlasAsset, TextureLoader> newCustomTextureLoader = null) {
+			Func<SpineAtlasAsset, TextureLoader> newCustomTextureLoader = null,
+			bool renameMaterial = false) {
 
 			// Get atlas page names.
 			string atlasString = atlasText.text;
@@ -106,6 +109,8 @@ namespace Spine.Unity {
 						// Match found.
 						mat = new Material(materialPropertySource);
 						mat.mainTexture = textures[j];
+						if (renameMaterial)
+							mat.name = pageName;
 						break;
 					}
 				}

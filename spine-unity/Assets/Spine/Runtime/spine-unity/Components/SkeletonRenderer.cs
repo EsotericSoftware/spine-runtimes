@@ -473,7 +473,7 @@ namespace Spine.Unity {
 			if (skeletonDataAsset == null)
 				return;
 
-			SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(false);
+			SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(quiet);
 			if (skeletonData == null) return;
 			valid = true;
 
@@ -522,12 +522,14 @@ namespace Spine.Unity {
 				if (physicsPositionInheritanceFactor != Vector2.zero) {
 					Vector2 position = GetPhysicsTransformPosition();
 					Vector2 positionDelta = position - lastPosition;
+
+					positionDelta = transform.InverseTransformVector(positionDelta);
 					if (physicsMovementRelativeTo != null) {
-						positionDelta.x *= physicsMovementRelativeTo.lossyScale.x;
-						positionDelta.y *= physicsMovementRelativeTo.lossyScale.y;
+						positionDelta = physicsMovementRelativeTo.TransformVector(positionDelta);
 					}
-					positionDelta.x *= physicsPositionInheritanceFactor.x / transform.lossyScale.x;
-					positionDelta.y *= physicsPositionInheritanceFactor.y / transform.lossyScale.y;
+					positionDelta.x *= physicsPositionInheritanceFactor.x;
+					positionDelta.y *= physicsPositionInheritanceFactor.y;
+
 					skeleton.PhysicsTranslate(positionDelta.x, positionDelta.y);
 					lastPosition = position;
 				}

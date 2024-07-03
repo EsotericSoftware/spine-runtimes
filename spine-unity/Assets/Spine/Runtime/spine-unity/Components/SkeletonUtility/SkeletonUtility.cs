@@ -159,6 +159,38 @@ namespace Spine.Unity {
 
 			if (skeletonGraphic != null) {
 				positionScale = skeletonGraphic.MeshScale;
+				lastPositionScale = positionScale;
+				if (boneRoot) {
+					positionOffset = skeletonGraphic.MeshOffset;
+					if (positionOffset != Vector2.zero) {
+						boneRoot.localPosition = positionOffset;
+					}
+				}
+			}
+		}
+
+		void UpdateToMeshScaleAndOffset (MeshGeneratorBuffers ignoredParameter) {
+			if (skeletonGraphic == null) return;
+
+			positionScale = skeletonGraphic.MeshScale;
+			if (boneRoot) {
+				positionOffset = skeletonGraphic.MeshOffset;
+				if (positionOffset != Vector2.zero) {
+					boneRoot.localPosition = positionOffset;
+				}
+			}
+
+			// Note: skeletonGraphic.MeshScale and MeshOffset can be one frame behind in Update() above.
+			// Unfortunately update order is:
+			// 1. SkeletonGraphic.Update updating skeleton bones and calling UpdateWorld callback,
+			//    calling SkeletonUtilityBone.DoUpdate() reading hierarchy.PositionScale.
+			// 2. Layout change triggers SkeletonGraphic.Rebuild, updating MeshScale and MeshOffset.
+			// Thus to prevent a one-frame-behind offset after a layout change affecting mesh scale,
+			// we have to re-evaluate the callbacks via the lines below.
+			if (lastPositionScale != positionScale) {
+				UpdateLocal(skeletonAnimation);
+				UpdateWorld(skeletonAnimation);
+				UpdateComplete(skeletonAnimation);
 			}
 		}
 
@@ -169,7 +201,6 @@ namespace Spine.Unity {
 		private ISkeletonComponent skeletonComponent;
 		[System.NonSerialized] public List<SkeletonUtilityBone> boneComponents = new List<SkeletonUtilityBone>();
 		[System.NonSerialized] public List<SkeletonUtilityConstraint> constraintComponents = new List<SkeletonUtilityConstraint>();
-
 
 		public ISkeletonComponent SkeletonComponent {
 			get {
@@ -197,8 +228,11 @@ namespace Spine.Unity {
 		}
 
 		public float PositionScale { get { return positionScale; } }
+		public Vector2 PositionOffset { get { return positionOffset; } }
 
 		float positionScale = 1.0f;
+		float lastPositionScale = 1.0f;
+		Vector2 positionOffset = Vector2.zero;
 		bool hasOverrideBones;
 		bool hasConstraints;
 		bool needToReprocessBones;
@@ -232,6 +266,8 @@ namespace Spine.Unity {
 			} else if (skeletonGraphic != null) {
 				skeletonGraphic.OnRebuild -= HandleRendererReset;
 				skeletonGraphic.OnRebuild += HandleRendererReset;
+				skeletonGraphic.OnPostProcessVertices -= UpdateToMeshScaleAndOffset;
+				skeletonGraphic.OnPostProcessVertices += UpdateToMeshScaleAndOffset;
 			}
 
 			if (skeletonAnimation != null) {
@@ -250,8 +286,10 @@ namespace Spine.Unity {
 		void OnDisable () {
 			if (skeletonRenderer != null)
 				skeletonRenderer.OnRebuild -= HandleRendererReset;
-			if (skeletonGraphic != null)
+			if (skeletonGraphic != null) {
 				skeletonGraphic.OnRebuild -= HandleRendererReset;
+				skeletonGraphic.OnPostProcessVertices -= UpdateToMeshScaleAndOffset;
+			}
 
 			if (skeletonAnimation != null) {
 				skeletonAnimation.UpdateLocal -= UpdateLocal;
@@ -449,7 +487,7 @@ namespace Spine.Unity {
 
 			if (mode == SkeletonUtilityBone.Mode.Override) {
 				if (rot) goTransform.localRotation = Quaternion.Euler(0, 0, b.bone.AppliedRotation);
-				if (pos) goTransform.localPosition = new Vector3(b.bone.X * positionScale, b.bone.Y * positionScale, 0);
+				if (pos) goTransform.localPosition = new Vector3(b.bone.X * positionScale + positionOffset.x, b.bone.Y * positionScale + positionOffset.y, 0);
 				goTransform.localScale = new Vector3(b.bone.ScaleX, b.bone.ScaleY, 0);
 			}
 

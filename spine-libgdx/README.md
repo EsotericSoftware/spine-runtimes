@@ -51,7 +51,7 @@ To add the spine-libgdx runtime to your Maven project, add this dependency:
 <dependency>
 	<groupId>com.esotericsoftware.spine</groupId>
 	<artifactId>spine-libgdx</artifactId>
-	<version>4.0.18.1</version>
+	<version>4.2.0</version>
 </dependency>
 ```
 
@@ -78,7 +78,7 @@ project(":core") {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
 
-        compile "com.esotericsoftware.spine:spine-libgdx:4.0.18.1"
+        compile "com.esotericsoftware.spine:spine-libgdx:4.2.0"
     }
 }
 ```

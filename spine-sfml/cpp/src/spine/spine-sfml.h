@@ -45,7 +45,6 @@ namespace spine {
 		Skeleton *skeleton;
 		AnimationState *state;
 		float timeScale;
-		sf::VertexArray *vertexArray;
 
 		SkeletonDrawable(SkeletonData *skeleton, AnimationStateData *stateData = 0);
 
@@ -61,13 +60,9 @@ namespace spine {
 		bool getUsePremultipliedAlpha() { return usePremultipliedAlpha; };
 
 	private:
-		mutable bool ownsAnimationStateData;
-		mutable Vector<float> worldVertices;
-		mutable Vector<float> tempUvs;
-		mutable Vector<Color> tempColors;
-		mutable Vector<unsigned short> quadIndices;
-		mutable SkeletonClipping clipper;
+		bool ownsAnimationStateData;
 		mutable bool usePremultipliedAlpha;
+		sf::VertexArray *vertexArray;
 	};
 
 	class SFMLTextureLoader : public TextureLoader {

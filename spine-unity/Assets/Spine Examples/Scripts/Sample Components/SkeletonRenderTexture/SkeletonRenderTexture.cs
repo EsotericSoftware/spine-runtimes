@@ -52,7 +52,6 @@ namespace Spine.Unity.Examples {
 	[RequireComponent(typeof(SkeletonRenderer))]
 	public class SkeletonRenderTexture : SkeletonRenderTextureBase {
 #if HAS_GET_SHARED_MATERIALS
-		public Material quadMaterial;
 		protected SkeletonRenderer skeletonRenderer;
 		protected MeshRenderer meshRenderer;
 		protected MeshFilter meshFilter;
@@ -129,6 +128,11 @@ namespace Spine.Unity.Examples {
 		}
 
 		void RenderOntoQuad (SkeletonRenderer skeletonRenderer) {
+			Vector3 size = meshFilter.sharedMesh.bounds.size;
+			if (size.x == 0f || size.y == 0f) {
+				AssignNullMeshAtQuad();
+				return;
+			}
 			PrepareForMesh();
 			RenderToRenderTexture();
 			AssignAtQuad();
@@ -175,10 +179,16 @@ namespace Spine.Unity.Examples {
 			commandBuffer.SetRenderTarget(renderTexture);
 			commandBuffer.ClearRenderTarget(true, true, Color.clear);
 
-			commandBuffer.SetProjectionMatrix(targetCamera.projectionMatrix);
 			commandBuffer.SetViewMatrix(targetCamera.worldToCameraMatrix);
-			Vector2 targetCameraViewportSize = targetCamera.pixelRect.size;
-			Rect viewportRect = new Rect(-screenSpaceMin * downScaleFactor, targetCameraViewportSize * downScaleFactor);
+
+			Matrix4x4 projectionMatrix = CalculateProjectionMatrix(targetCamera,
+				screenSpaceMin, screenSpaceMax, targetCamera.pixelRect.size);
+			commandBuffer.SetProjectionMatrix(projectionMatrix);
+
+			Vector2 targetViewportSize = new Vector2(
+				screenSpaceMax.x - screenSpaceMin.x,
+				screenSpaceMax.y - screenSpaceMin.y);
+			Rect viewportRect = new Rect(Vector2.zero, targetViewportSize * downScaleFactor);
 			commandBuffer.SetViewport(viewportRect);
 		}
 
@@ -198,6 +208,10 @@ namespace Spine.Unity.Examples {
 			quadMeshFilter.mesh = quadMesh;
 			quadMeshRenderer.sharedMaterial.mainTexture = this.renderTexture;
 			quadMeshRenderer.sharedMaterial.color = color;
+		}
+
+		protected void AssignNullMeshAtQuad () {
+			quadMeshFilter.mesh = null;
 		}
 #endif
 	}

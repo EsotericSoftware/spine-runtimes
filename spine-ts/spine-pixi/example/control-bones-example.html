@@ -1,0 +1,107 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>spine-pixi</title>
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@7.4.2/dist/pixi.min.js"></script>
+    <script src="../dist/iife/spine-pixi.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tweakpane@3.1.9/dist/tweakpane.min.js"></script>
+    <link rel="stylesheet" href="../../index.css">
+  </head>
+
+  <body>
+    <script>
+      (async function () {
+        var app = new PIXI.Application({
+          width: window.innerWidth,
+          height: window.innerHeight,
+          resolution: window.devicePixelRatio || 1,
+          autoDensity: true,
+          resizeTo: window,
+          backgroundColor: 0x2c3e50,
+          hello: true,
+        });
+        document.body.appendChild(app.view);
+
+        app.stage.eventMode = 'static';
+        app.stage.hitArea = app.screen;
+        let dragObject = null;
+        let lastX = -1, lastY = -1;
+        const endDrag = () => (dragObject = null);
+        app.stage
+          .on('pointerup', endDrag)
+          .on('pointerupoutside', endDrag)
+          .on('pointermove', ({ x, y }) => {
+            if (dragObject) {
+                dragObject.x += x - lastX;
+                dragObject.y += y - lastY;
+                lastX = x;
+                lastY = y;
+            }
+          });
+
+        // Pre-load the skeleton data and atlas. You can also load .json skeleton data.
+        PIXI.Assets.add("stretchymanData", "./assets/stretchyman-pro.skel");
+        PIXI.Assets.add("stretchymanAtlas", "./assets/stretchyman-pma.atlas");
+        await PIXI.Assets.load(["stretchymanData", "stretchymanAtlas"]);
+
+        // Create the spine display object
+        const stretchyman = spine.Spine.from("stretchymanData", "stretchymanAtlas", { 
+          scale: 0.75,
+         });
+
+        // Set the default mix time to use when transitioning
+        // from one animation to the next.
+        stretchyman.state.data.defaultMix = 0.2;
+
+        // Center the spine object on screen.
+        stretchyman.x = window.innerWidth / 2;
+        stretchyman.y = window.innerHeight / 2 + stretchyman.getBounds().height / 2;
+
+        // Set animation "run" on track 0, looped.
+        stretchyman.state.setAnimation(0, "idle", true);
+        app.stage.addChild(stretchyman);
+        stretchyman.updateTransform();
+
+        const controlBoneNames = [
+          "back-arm-ik-target",
+          "back-leg-ik-target",
+          "front-arm-ik-target",
+          "front-leg-ik-target",
+        ];
+        const controlBones = [];
+
+        for (var i = 0; i < controlBoneNames.length; i++) {
+          const bone = stretchyman.skeleton.findBone(controlBoneNames[i]);
+          const point = { x: bone.worldX, y: bone.worldY };
+          stretchyman.skeletonToPixiWorldCoordinates(point);
+
+          const control = new PIXI.Graphics()
+            .beginFill('ff00ff')
+            .drawCircle(0, 0, 6);
+          control.x = point.x;
+          control.y = point.y;
+          controlBones.push({ bone, control });
+          app.stage.addChild(control);
+
+          control.interactive = "static";
+          control.on('pointerdown', ({ x, y }) => {
+            dragObject = control;
+            lastX = x;
+            lastY = y;
+          })
+        }
+
+        const point = { x: 0, y: 0 };
+        stretchyman.beforeUpdateWorldTransforms = () => {
+          for (let { bone, control } of controlBones) {
+            point.x = control.x;
+            point.y = control.y;
+            stretchyman.pixiWorldCoordinatesToBone(point, bone);
+            bone.x = point.x;
+            bone.y = point.y;
+          }
+        };
+      })();
+    </script>
+  </body>
+</html>

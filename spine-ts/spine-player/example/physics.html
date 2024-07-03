@@ -1,47 +1,50 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="../dist/iife/spine-player.js"></script>
-    <link rel="stylesheet" href="../dist/spine-player.css" />
-    <link rel="stylesheet" href="../../index.css" />
-  </head>
-  <body style="margin: 0">
-    <span class="overlay">Drag the swinging lady</span>
-    <div id="player" style="width: 100%; height: 100vh"></div>
-    <script>
-      var mouse = new spine.Vector3(),
-        last = new spine.Vector3();
-      new spine.SpinePlayer("player", {
-        skelUrl: "assets/celestial-circus-pro.skel",
-        atlasUrl: "assets/celestial-circus-pma.atlas",
-        showControls: true,
-        animation: "swing",
-        success: (player) => {
-          new spine.Input(player.canvas).addListener({
-            down: (x, y) => {
-              player.sceneRenderer.camera.screenToWorld(
-                mouse.set(x, y, 0),
-                player.canvas.clientWidth,
-                player.canvas.clientHeight
-              );
-              last.setFrom(mouse);
-            },
-            dragged: (x, y) => {
-              player.sceneRenderer.camera.screenToWorld(
-                mouse.set(x, y, 0),
-                player.canvas.clientWidth,
-                player.canvas.clientHeight
-              );
-              player.skeleton.getRootBone().x += mouse.x - last.x;
-              player.skeleton.getRootBone().y += mouse.y - last.y;
-              last.setFrom(mouse);
-            },
-            up: () => (player.paused = false),
-          });
-        },
-      });
-    </script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="../dist/iife/spine-player.js"></script>
+  <link rel="stylesheet" href="../dist/spine-player.css" />
+  <link rel="stylesheet" href="../../index.css" />
+</head>
+
+<body style="margin: 0">
+  <span class="overlay">Drag the swinging lady</span>
+  <div id="player" style="width: 100%; height: 100vh"></div>
+  <script>
+    var mouse = new spine.Vector3(),
+      last = new spine.Vector3();
+    new spine.SpinePlayer("player", {
+      skeleton: "assets/celestial-circus-pro.skel",
+      url: "assets/celestial-circus-pma.atlas",
+      showControls: true,
+      animation: "swing",
+      success: (player) => {
+        new spine.Input(player.canvas).addListener({
+          down: (x, y) => {
+            player.sceneRenderer.camera.screenToWorld(
+              mouse.set(x, y, 0),
+              player.canvas.clientWidth,
+              player.canvas.clientHeight
+            );
+            last.setFrom(mouse);
+          },
+          dragged: (x, y) => {
+            player.sceneRenderer.camera.screenToWorld(
+              mouse.set(x, y, 0),
+              player.canvas.clientWidth,
+              player.canvas.clientHeight
+            );
+            player.skeleton.getRootBone().x += mouse.x - last.x;
+            player.skeleton.getRootBone().y += mouse.y - last.y;
+            last.setFrom(mouse);
+          },
+          up: () => (player.paused = false),
+        });
+      },
+    });
+  </script>
+</body>
+
 </html>

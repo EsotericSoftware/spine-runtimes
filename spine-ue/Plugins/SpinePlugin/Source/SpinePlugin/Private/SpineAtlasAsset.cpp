@@ -93,6 +93,17 @@ void USpineAtlasAsset::BeginDestroy() {
 	Super::BeginDestroy();
 }
 
+class UETextureLoader : public TextureLoader {
+	void load(AtlasPage &page, const String &path) {
+		page.texture = (void*)(uintptr_t)page.index;
+	}
+
+	void unload(void *texture) {
+	}
+};
+
+UETextureLoader textureLoader;
+
 Atlas *USpineAtlasAsset::GetAtlas() {
 	if (!atlas) {
 		if (atlas) {
@@ -102,13 +113,7 @@ Atlas *USpineAtlasAsset::GetAtlas() {
 		std::string t = TCHAR_TO_UTF8(*rawData);
 
 		atlas = new (__FILE__, __LINE__)
-				Atlas(t.c_str(), strlen(t.c_str()), "", nullptr);
-		Vector<AtlasPage *> &pages = atlas->getPages();
-		for (size_t i = 0, n = pages.size(), j = 0; i < n; i++) {
-			AtlasPage *page = pages[i];
-			if (atlasPages.Num() > 0 && atlasPages.Num() > (int32) i)
-				page->texture = atlasPages[j++];
-		}
+				Atlas(t.c_str(), strlen(t.c_str()), "", &textureLoader);
 	}
 	return this->atlas;
 }

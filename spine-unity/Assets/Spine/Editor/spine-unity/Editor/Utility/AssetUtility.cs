@@ -642,6 +642,7 @@ namespace Spine.Unity.Editor {
 			}
 
 			List<Material> populatingMaterials = new List<Material>(pageFiles.Count);
+			string materialDirectory = GetMaterialDirectory(assetPath, vestigialMaterials);
 
 			for (int i = 0; i < pageFiles.Count; i++) {
 				string texturePath = assetPath + "/" + pageFiles[i];
@@ -660,9 +661,8 @@ namespace Spine.Unity.Editor {
 				if (pageName == primaryName && pageFiles.Count == 1)
 					pageName = "Material";
 
-				string materialPath = assetPath + "/" + primaryName + "_" + pageName + ".mat";
+				string materialPath = materialDirectory + "/" + primaryName + "_" + pageName + ".mat";
 				Material material = (Material)AssetDatabase.LoadAssetAtPath(materialPath, typeof(Material));
-
 				if (material == null) {
 					Shader defaultShader = GetDefaultShader();
 					material = defaultShader != null ? new Material(defaultShader) : null;
@@ -836,7 +836,6 @@ namespace Spine.Unity.Editor {
 
 			string primaryName = spriteAtlas.name;
 			string assetPath = Path.GetDirectoryName(AssetDatabase.GetAssetPath(spriteAtlas)).Replace('\\', '/');
-
 			string atlasPath = assetPath + "/" + primaryName + SpriteAtlasSuffix + ".asset";
 
 			SpineSpriteAtlasAsset atlasAsset = AssetDatabase.LoadAssetAtPath<SpineSpriteAtlasAsset>(atlasPath);
@@ -898,6 +897,15 @@ namespace Spine.Unity.Editor {
 
 			protectFromStackGarbageCollection.Remove(atlasAsset);
 			return (AtlasAssetBase)AssetDatabase.LoadAssetAtPath(atlasPath, typeof(AtlasAssetBase));
+		}
+
+		static string GetMaterialDirectory (string assetPath, List<Material> previousMaterials) {
+			if (previousMaterials.Count > 0 && previousMaterials[0] != null) {
+				string materialPath = AssetDatabase.GetAssetPath(previousMaterials[0]);
+				string materialDirectory = Path.GetDirectoryName(materialPath).Replace('\\', '/');
+				return materialDirectory;
+			}
+			return assetPath;
 		}
 
 		static bool SetDefaultTextureSettings (string texturePath, SpineAtlasAsset atlasAsset) {

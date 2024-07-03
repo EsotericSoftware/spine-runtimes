@@ -140,17 +140,19 @@ namespace Spine.Unity {
 			if (thisTransform == null) return;
 
 			float scale = skeletonGraphic.MeshScale;
+			Vector2 offset = skeletonGraphic.MeshOffset;
 
 			float additionalFlipScale = 1;
 			if (skeletonTransformIsParent) {
 				// Recommended setup: Use local transform properties if Spine GameObject is the immediate parent
-				thisTransform.localPosition = new Vector3(followXYPosition ? bone.WorldX * scale : thisTransform.localPosition.x,
-														followXYPosition ? bone.WorldY * scale : thisTransform.localPosition.y,
+				thisTransform.localPosition = new Vector3(followXYPosition ? bone.WorldX * scale + offset.x : thisTransform.localPosition.x,
+														followXYPosition ? bone.WorldY * scale + offset.y : thisTransform.localPosition.y,
 														followZPosition ? 0f : thisTransform.localPosition.z);
 				if (followBoneRotation) thisTransform.localRotation = bone.GetQuaternion();
 			} else {
 				// For special cases: Use transform world properties if transform relationship is complicated
-				Vector3 targetWorldPosition = skeletonTransform.TransformPoint(new Vector3(bone.WorldX * scale, bone.WorldY * scale, 0f));
+				Vector3 targetWorldPosition = skeletonTransform.TransformPoint(
+					new Vector3(bone.WorldX * scale + offset.x, bone.WorldY * scale + offset.y, 0f));
 				if (!followZPosition) targetWorldPosition.z = thisTransform.position.z;
 				if (!followXYPosition) {
 					targetWorldPosition.x = thisTransform.position.x;

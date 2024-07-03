@@ -43,6 +43,7 @@ export interface IDarkTintElement {
 	_tintRGB: number;
 	// eslint-disable-next-line @typescript-eslint/naming-convention
 	_darkTintRGB: number;
+	alpha: number;
 	blendMode: BLEND_MODES;
 }
 

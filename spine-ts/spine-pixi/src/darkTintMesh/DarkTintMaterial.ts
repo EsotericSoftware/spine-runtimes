@@ -191,11 +191,8 @@ export class DarkTintMaterial extends Shader {
 	public update(): void {
 		if (this._colorDirty) {
 			this._colorDirty = false;
-			const baseTexture = this.texture.baseTexture;
-			const applyToChannels = baseTexture.alphaMode as unknown as boolean;
-
-			Color.shared.setValue(this._tintColor).premultiply(this._alpha, applyToChannels).toArray(this.uniforms.uColor);
-			Color.shared.setValue(this._darkTintColor).premultiply(this._alpha, applyToChannels).toArray(this.uniforms.uDarkColor);
+			Color.shared.setValue(this._tintColor).premultiply(this._alpha, true).toArray(this.uniforms.uColor);
+			Color.shared.setValue(this._darkTintColor).premultiply(this._alpha, true).premultiply(1, false).toArray(this.uniforms.uDarkColor);
 		}
 		if (this.uvMatrix.update()) {
 			this.uniforms.uTextureMatrix = this.uvMatrix.mapCoord;

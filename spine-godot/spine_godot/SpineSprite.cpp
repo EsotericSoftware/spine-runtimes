@@ -610,6 +610,7 @@ bool SpineSprite::_get(const StringName &property, Variant &value) const {
 }
 
 static void update_preview_animation(SpineSprite *sprite, const String &skin, const String &animation, bool frame, float time) {
+	if (!Engine::get_singleton()->is_editor_hint()) return;
 	if (!sprite->get_skeleton().is_valid()) return;
 
 	if (EMPTY(skin) || skin == "Default") {

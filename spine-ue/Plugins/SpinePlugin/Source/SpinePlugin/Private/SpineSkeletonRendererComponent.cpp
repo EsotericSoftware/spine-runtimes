@@ -62,6 +62,8 @@ USpineSkeletonRendererComponent::USpineSkeletonRendererComponent(const FObjectIn
 	TextureParameterName = FName(TEXT("SpriteTexture"));
 
 	worldVertices.ensureCapacity(1024 * 2);
+
+	SetTickGroup(TG_EndPhysics);
 }
 
 void USpineSkeletonRendererComponent::FinishDestroy() {
@@ -266,14 +268,7 @@ void USpineSkeletonRendererComponent::UpdateMesh(USpineSkeletonComponent *compon
 		// to the correct skeleton data yet, we won't find any regions.
 		// ignore regions for which we can't find a material
 		UMaterialInstanceDynamic *material = nullptr;
-		int foundPageIndex = -1;
-		for (int pageIndex = 0; pageIndex < component->Atlas->atlasPages.Num(); pageIndex++) {
-			AtlasPage *page = component->Atlas->GetAtlas()->getPages()[pageIndex];
-			if (attachmentAtlasRegion->page == page) {
-				foundPageIndex = pageIndex;
-				break;
-			}
-		}
+		int foundPageIndex = (int)(intptr_t)attachmentAtlasRegion->rendererObject;
 		if (foundPageIndex == -1) {
 			clipper.clipEnd(*slot);
 			continue;

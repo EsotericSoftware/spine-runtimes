@@ -193,14 +193,7 @@ class SkeletonBinary {
 		n = input.readInt(true);
 		for (i in 0...n) {
 			var slotName:String = input.readString();
-			var path:String = null;
-			if (nonessential) {
-				var slash:Int = slotName.lastIndexOf('/');
-				if (slash != -1) {
-					path = slotName.substring(0, slash);
-					slotName = slotName.substring(slash + 1);
-				}
-			}
+
 			var slotBoneData:BoneData = skeletonData.bones[input.readInt(true)];
 			var slotData:SlotData = new SlotData(i, slotName, slotBoneData);
 			slotData.color.setFromRgba8888(input.readInt32());
@@ -213,10 +206,7 @@ class SkeletonBinary {
 
 			slotData.attachmentName = input.readStringRef();
 			slotData.blendMode = BlendMode.values[input.readInt(true)];
-			if (nonessential) {
-				slotData.visible = input.readBoolean();
-				slotData.path = path;
-			}
+			if (nonessential) slotData.visible = input.readBoolean();
 			skeletonData.slots.push(slotData);
 		}
 

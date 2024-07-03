@@ -38,11 +38,17 @@ namespace Spine.Unity {
 		static AtlasRegion EmptyRegion {
 			get {
 				if (emptyRegion == null) {
+					Shader hiddenShader = Shader.Find("Spine/Special/HiddenPass");
+					if (hiddenShader == null) {
+						Debug.LogError("Shader \"Spine/Special/HiddenPass\" not found while loading SkeletonDataAsset" +
+							" with 0 Atlas Assets. Please add this shader to Project Settings - Graphics - Always" +
+							" Included Shaders, or make sure your SkeletonDataAssets all have an AtlasAsset assigned.");
+					}
 					emptyRegion = new AtlasRegion {
 						name = "Empty AtlasRegion",
 						page = new AtlasPage {
 							name = "Empty AtlasPage",
-							rendererObject = new Material(Shader.Find("Spine/Special/HiddenPass")) { name = "NoRender Material" }
+							rendererObject = new Material(hiddenShader) { name = "NoRender Material" }
 						}
 					};
 				}

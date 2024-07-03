@@ -165,7 +165,7 @@ export class SkeletonRenderer {
 				}
 
 				if (clipper.isClipping()) {
-					clipper.clipTriangles(renderable.vertices, renderable.numFloats, triangles, triangles.length, uvs, finalColor, darkColor, twoColorTint);
+					clipper.clipTriangles(renderable.vertices, triangles, triangles.length, uvs, finalColor, darkColor, twoColorTint);
 					let clippedVertices = new Float32Array(clipper.clippedVertices);
 					let clippedTriangles = clipper.clippedTriangles;
 					if (transformer) transformer(clippedVertices, clippedVertices.length, vertexSize);

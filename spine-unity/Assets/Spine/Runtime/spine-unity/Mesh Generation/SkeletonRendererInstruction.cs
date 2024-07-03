@@ -31,6 +31,10 @@
 #define SPINE_TRIANGLECHECK // Avoid calling SetTriangles at the cost of checking for mesh differences (vertex counts, memberwise attachment list compare) every frame.
 //#define SPINE_DEBUG
 
+// Important Note: When disabling this define, also disable the one in MeshGenerator.cs
+// For details, see MeshGenerator.cs.
+#define SLOT_ALPHA_DISABLES_ATTACHMENT
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -95,7 +99,14 @@ namespace Spine.Unity {
 			Slot[] drawOrderItems = instructionsItems[0].skeleton.DrawOrder.Items;
 			for (int i = 0; i < attachmentCount; i++) {
 				Slot slot = drawOrderItems[startSlot + i];
-				if (!slot.Bone.Active) continue;
+				if (!slot.Bone.Active
+#if SLOT_ALPHA_DISABLES_ATTACHMENT
+					|| slot.A == 0f
+#endif
+					) {
+					attachmentsItems[i] = null;
+					continue;
+				}
 				attachmentsItems[i] = slot.Attachment;
 			}
 

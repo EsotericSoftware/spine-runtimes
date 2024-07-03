@@ -1,3 +1,21 @@
+# 4.2.30
+- Switch to spine-cpp SkeletonRenderer
+
+# 4.2.29
+- Fix issue in pubspec.yaml related to C++ include paths.
+
+# 4.2.28
+- Fix incompatibility with Gradle 8.x. See https://github.com/EsotericSoftware/spine-runtimes/issues/2553
+
+# 4.2.27
+- Fixes clipping in case of colinear clipping edges.
+
+# 4.2.26
+- `Skeleton.getBounds()` takes clipping into consideration.
+
+# 4.2.25
+- Switch to spine-cpp-lite
+
 # 4.2.24
 - Support static linking of native library, see https://github.com/EsotericSoftware/spine-runtimes/issues/2438
 
