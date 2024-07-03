@@ -39,7 +39,6 @@ namespace Spine.Unity {
 
 	[UxmlElement]
 	public partial class SpineVisualElement : VisualElement {
-		public new class UxmlFactory : UxmlFactory<SpineVisualElement, UxmlTraits> { }
 
 		[SpineAnimation(dataField: "SkeletonDataAsset", avoidGenericMenu: true)]
 		[UxmlAttribute]
