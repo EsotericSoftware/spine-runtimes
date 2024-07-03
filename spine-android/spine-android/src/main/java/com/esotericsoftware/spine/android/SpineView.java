@@ -116,7 +116,9 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 			return;
 		}
 
-		controller.getDrawable().update(delta);
+		if (controller.isPlaying()) {
+			controller.getDrawable().update(delta);
+		}
 
 		canvas.save();
 		canvas.translate(offsetX, offsetY);
