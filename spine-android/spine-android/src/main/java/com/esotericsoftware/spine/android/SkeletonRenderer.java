@@ -205,8 +205,7 @@ public class SkeletonRenderer {
 		return commandList;
 	}
 
-	public void render (Canvas canvas, Skeleton skeleton) {
-		Array<RenderCommand> commands = render(skeleton);
+	public void render (Canvas canvas, Array<RenderCommand> commands) {
 		for (int i = 0; i < commands.size; i++) {
 			RenderCommand command = commands.get(i);
 			canvas.drawVertices(Canvas.VertexMode.TRIANGLES, command.vertices.size, command.vertices.items, 0, command.uvs.items, 0,

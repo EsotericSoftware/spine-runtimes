@@ -1,13 +1,17 @@
 package com.esotericsoftware.spine.android;
 
+import android.graphics.Canvas;
 import android.graphics.Point;
 
 import androidx.annotation.Nullable;
 
+import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.spine.AnimationState;
 import com.esotericsoftware.spine.AnimationStateData;
 import com.esotericsoftware.spine.Skeleton;
 import com.esotericsoftware.spine.SkeletonData;
+import com.esotericsoftware.spine.android.utils.SpineControllerAfterPaintCallback;
+import com.esotericsoftware.spine.android.utils.SpineControllerBeforePaintCallback;
 import com.esotericsoftware.spine.android.utils.SpineControllerCallback;
 
 public class SpineController {
@@ -16,6 +20,8 @@ public class SpineController {
         private SpineControllerCallback onInitialized;
         private SpineControllerCallback onBeforeUpdateWorldTransforms;
         private SpineControllerCallback onAfterUpdateWorldTransforms;
+        private SpineControllerBeforePaintCallback onBeforePaint;
+        private SpineControllerAfterPaintCallback onAfterPaint;
 
         public Builder setOnInitialized(SpineControllerCallback onInitialized) {
             this.onInitialized = onInitialized;
@@ -32,11 +38,23 @@ public class SpineController {
             return this;
         }
 
+        public Builder setOnBeforePaint(SpineControllerBeforePaintCallback onBeforePaint) {
+            this.onBeforePaint = onBeforePaint;
+            return this;
+        }
+
+        public Builder setOnAfterPaint(SpineControllerAfterPaintCallback onAfterPaint) {
+            this.onAfterPaint = onAfterPaint;
+            return this;
+        }
+
         public SpineController build() {
             SpineController spineController = new SpineController();
             spineController.onInitialized = onInitialized;
             spineController.onBeforeUpdateWorldTransforms = onBeforeUpdateWorldTransforms;
             spineController.onAfterUpdateWorldTransforms = onAfterUpdateWorldTransforms;
+            spineController.onBeforePaint = onBeforePaint;
+            spineController.onAfterPaint = onAfterPaint;
             return spineController;
         }
     }
@@ -44,6 +62,8 @@ public class SpineController {
     private @Nullable SpineControllerCallback onInitialized;
     private @Nullable SpineControllerCallback onBeforeUpdateWorldTransforms;
     private @Nullable SpineControllerCallback onAfterUpdateWorldTransforms;
+    private @Nullable SpineControllerBeforePaintCallback onBeforePaint;
+    private @Nullable SpineControllerAfterPaintCallback onAfterPaint;
     private AndroidSkeletonDrawable drawable;
     private boolean playing = true;
     private double offsetX = 0;
@@ -83,7 +103,7 @@ public class SpineController {
         return drawable.getAnimationState();
     }
 
-    AndroidSkeletonDrawable getDrawable() {
+    public AndroidSkeletonDrawable getDrawable() {
         if (drawable == null) throw new RuntimeException("Controller is not initialized yet.");
         return drawable;
     }
@@ -126,6 +146,18 @@ public class SpineController {
     protected void callOnAfterUpdateWorldTransforms() {
         if (onAfterUpdateWorldTransforms != null) {
             onAfterUpdateWorldTransforms.execute(this);
+        }
+    }
+
+    protected void callOnBeforePaint(Canvas canvas) {
+        if (onBeforePaint != null) {
+            onBeforePaint.execute(this, canvas);
+        }
+    }
+
+    protected void callOnAfterPaint(Canvas canvas, Array<SkeletonRenderer.RenderCommand> renderCommands) {
+        if (onAfterPaint != null) {
+            onAfterPaint.execute(this, canvas, renderCommands);
         }
     }
 }

@@ -29,7 +29,7 @@
 
 package com.esotericsoftware.spine.android;
 
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.spine.android.bounds.Alignment;
 import com.esotericsoftware.spine.android.bounds.Bounds;
 import com.esotericsoftware.spine.android.bounds.BoundsProvider;
@@ -153,11 +153,15 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 		}
 
 		canvas.save();
+
 		canvas.translate(offsetX, offsetY);
 		canvas.scale(scaleX, scaleY * -1);
 		canvas.translate(x, y);
 
-		renderer.render(canvas, controller.getSkeleton());
+		controller.callOnBeforePaint(canvas);
+		Array<SkeletonRenderer.RenderCommand> commands = renderer.render(controller.getSkeleton());
+		renderer.render(canvas, commands);
+		controller.callOnAfterPaint(canvas, commands);
 
 		canvas.restore();
 	}

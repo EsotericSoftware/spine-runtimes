@@ -61,6 +61,7 @@ fun AppContent() {
                                 Destination.SimpleAnimation,
                                 Destination.PlayPause,
                                 Destination.AnimationStateEvents,
+                                Destination.DebugRendering,
                                 Destination.IKFollowing,
                                 Destination.Physics
                             ),
@@ -85,6 +86,12 @@ fun AppContent() {
                     Destination.AnimationStateEvents.route
                 ) {
                     AnimationState(navController)
+                }
+
+                composable(
+                    Destination.DebugRendering.route
+                ) {
+                    DebugRendering(navController)
                 }
 
                 composable(
@@ -134,6 +141,7 @@ sealed class Destination(val route: String, val title: String) {
     data object Samples: Destination("samples", "Spine Android Examples")
     data object SimpleAnimation : Destination("simpleAnimation", "Simple Animation")
     data object PlayPause : Destination("playPause", "Play/Pause")
+    data object DebugRendering: Destination("debugRendering", "Debug Renderer")
     data object AnimationStateEvents : Destination("animationStateEvents", "Animation State Listener")
     data object IKFollowing : Destination("ikFollowing", "IK Following")
     data object Physics: Destination("physics", "Physics (drag anywhere)")
