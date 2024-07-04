@@ -40,9 +40,11 @@ fun SimpleAnimation(nav: NavHostController) {
                     loadFromAsset(
                         "spineboy.atlas",
                         "spineboy-pro.json",
-                        SpineController {
-                            it.animationState.setAnimation(0, "walk", true)
-                        }
+                        SpineController.Builder()
+                            .setOnInitialized {
+                                it.animationState.setAnimation(0, "walk", true)
+                            }
+                            .build()
                     )
                 }
             },

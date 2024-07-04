@@ -147,7 +147,9 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 		}
 
 		if (controller.isPlaying()) {
+            controller.callOnBeforeUpdateWorldTransforms();
 			controller.getDrawable().update(delta);
+			controller.callOnAfterUpdateWorldTransforms();
 		}
 
 		canvas.save();
@@ -175,6 +177,8 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 
 		offsetX = (float) (getWidth() / 2.0 + (alignment.getX() * getWidth() / 2.0));
 		offsetY = (float) (getHeight() / 2.0 + (alignment.getY() * getHeight() / 2.0));
+
+		controller.setCoordinateTransform(x + offsetX / scaleX, y + offsetY / scaleY, scaleX, scaleY);
 	}
 
 	// Choreographer.FrameCallback

@@ -59,7 +59,8 @@ fun AppContent() {
                             navController,
                             listOf(
                                 Destination.SimpleAnimation,
-                                Destination.PlayPause
+                                Destination.PlayPause,
+                                Destination.IKFollowing
                             ),
                             paddingValues
                         )
@@ -76,6 +77,12 @@ fun AppContent() {
                     Destination.PlayPause.route
                 ) {
                     PlayPause(navController)
+                }
+
+                composable(
+                    Destination.IKFollowing.route
+                ) {
+                    IKFollowing(navController)
                 }
             }
         }
@@ -113,4 +120,5 @@ sealed class Destination(val route: String, val title: String) {
     data object Samples: Destination("samples", "Spine Android Examples")
     data object SimpleAnimation : Destination("simpleAnimation", "Simple Animation")
     data object PlayPause : Destination("playPause", "Play/Pause")
+    data object IKFollowing : Destination("ikFollowing", "IK Following")
 }
