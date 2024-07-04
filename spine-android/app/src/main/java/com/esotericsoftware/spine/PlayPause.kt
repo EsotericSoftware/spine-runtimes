@@ -18,6 +18,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
 import com.esotericsoftware.spine.android.SpineController
 import com.esotericsoftware.spine.android.SpineView
+import com.esotericsoftware.spine.android.bounds.SkinAndAnimationBounds
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,16 +59,18 @@ fun PlayPause(
 
         AndroidView(
             factory = { ctx ->
-                SpineView(ctx).apply {
-                    loadFromAsset(
-                        "dragon.atlas",
-                        "dragon-ess.skel",
-                        controller
-                    )
-                }
+                SpineView.Builder(ctx)
+                    .setBoundsProvider(SkinAndAnimationBounds("flying"))
+                    .build()
+                    .apply {
+                        loadFromAsset(
+                            "dragon.atlas",
+                            "dragon-ess.skel",
+                            controller
+                        )
+                    }
             },
             modifier = Modifier.padding(paddingValues)
         )
     }
-
 }

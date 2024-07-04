@@ -50,6 +50,35 @@ import java.io.File;
 import java.net.URL;
 
 public class SpineView extends View implements Choreographer.FrameCallback {
+
+	public static class Builder {
+		private final Context context;
+
+		private BoundsProvider boundsProvider = new SetupPoseBounds();
+		private Alignment alignment = Alignment.CENTER;
+
+		public Builder(Context context) {
+			this.context = context;
+		}
+
+		public Builder setBoundsProvider(BoundsProvider boundsProvider) {
+			this.boundsProvider = boundsProvider;
+			return this;
+		}
+
+		public Builder setAlignment(Alignment alignment) {
+			this.alignment = alignment;
+			return this;
+		}
+
+		public SpineView build() {
+			SpineView spineView = new SpineView(context);
+			spineView.boundsProvider = boundsProvider;
+			spineView.alignment = alignment;
+			return spineView;
+		}
+	}
+
 	private long lastTime = 0;
 	private float delta = 0;
 	private float offsetX = 0;
@@ -59,12 +88,13 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 	private float x = 0;
 	private float y = 0;
 
-	SkeletonRenderer renderer = new SkeletonRenderer();
+	private final SkeletonRenderer renderer = new SkeletonRenderer();
+	private Bounds computedBounds = new Bounds();
+
 	SpineController controller;
 
 	BoundsProvider boundsProvider = new SetupPoseBounds();
 
-	Bounds computedBounds = new Bounds();
 	Alignment alignment = Alignment.CENTER;
 
 	public SpineView (Context context) {

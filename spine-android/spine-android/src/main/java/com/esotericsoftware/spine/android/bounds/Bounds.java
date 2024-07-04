@@ -1,5 +1,9 @@
 package com.esotericsoftware.spine.android.bounds;
 
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.FloatArray;
+import com.esotericsoftware.spine.Skeleton;
+
 public class Bounds {
     private double x;
     private double y;
@@ -18,6 +22,19 @@ public class Bounds {
         this.y = y;
         this.width = width;
         this.height = height;
+    }
+
+    public Bounds(Skeleton skeleton) {
+        Vector2 offset = new Vector2(0, 0);
+        Vector2 size = new Vector2(0, 0);
+        FloatArray floatArray = new FloatArray();
+
+        skeleton.getBounds(offset, size, floatArray);
+
+        x = offset.x;
+        y = offset.y;
+        width = size.x;
+        height = size.y;
     }
 
     public double getX() {
