@@ -55,7 +55,7 @@ fun IKFollowing(nav: NavHostController) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = Destination.SimpleAnimation.title) },
+                title = { Text(text = Destination.IKFollowing.title) },
                 navigationIcon = {
                     IconButton({ nav.navigateUp() }) {
                         Icon(
