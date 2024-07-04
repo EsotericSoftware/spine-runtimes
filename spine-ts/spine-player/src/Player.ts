@@ -817,8 +817,8 @@ export class SpinePlayer implements Disposable {
 			let delta = this.time.delta;
 
 			// Load the skeleton if the assets are ready.
-			let loading = this.assetManager!.isLoadingComplete();
-			if (!this.skeleton && loading) this.loadSkeleton();
+			let loading = !this.assetManager!.isLoadingComplete();
+			if (!this.skeleton && !loading) this.loadSkeleton();
 			let skeleton = this.skeleton!;
 			let config = this.config!;
 			if (skeleton) {
@@ -940,7 +940,7 @@ export class SpinePlayer implements Disposable {
 			// Draw the loading screen.
 			if (config.showLoading) {
 				this.loadingScreen!.backgroundColor.setFromColor(bg);
-				this.loadingScreen!.draw(loading);
+				this.loadingScreen!.draw(!loading);
 			}
 			if (loading && config.loading) config.loading(this, delta);
 		} catch (e) {
