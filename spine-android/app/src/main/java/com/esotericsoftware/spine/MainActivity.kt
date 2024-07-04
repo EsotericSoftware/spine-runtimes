@@ -61,7 +61,8 @@ fun AppContent() {
                                 Destination.SimpleAnimation,
                                 Destination.PlayPause,
                                 Destination.AnimationStateEvents,
-                                Destination.IKFollowing
+                                Destination.IKFollowing,
+                                Destination.Physics
                             ),
                             paddingValues
                         )
@@ -90,6 +91,12 @@ fun AppContent() {
                     Destination.IKFollowing.route
                 ) {
                     IKFollowing(navController)
+                }
+
+                composable(
+                    Destination.Physics.route
+                ) {
+                    Physics(navController)
                 }
             }
         }
@@ -129,4 +136,5 @@ sealed class Destination(val route: String, val title: String) {
     data object PlayPause : Destination("playPause", "Play/Pause")
     data object AnimationStateEvents : Destination("animationStateEvents", "Animation State Listener")
     data object IKFollowing : Destination("ikFollowing", "IK Following")
+    data object Physics: Destination("physics", "Physics (drag anywhere)")
 }
