@@ -87,6 +87,8 @@ namespace Spine.Unity {
 					materialToUpdate.mainTexture = loadedTexture;
 					OnTextureLoaded(materialToUpdate, textureIndex);
 					if (onTextureLoaded != null) onTextureLoaded(loadedTexture);
+				} else {
+					OnTextureLoadFailed(materialToUpdate, textureIndex);
 				}
 			};
 		}
