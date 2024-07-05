@@ -32,7 +32,9 @@
 #include "SpineCommon.h"
 
 #if VERSION_MAJOR > 3
+#ifndef SPINE_GODOT_EXTENSION
 #include "modules/register_module_types.h"
+#endif
 void initialize_spine_godot_module(ModuleInitializationLevel level);
 void uninitialize_spine_godot_module(ModuleInitializationLevel level);
 #else

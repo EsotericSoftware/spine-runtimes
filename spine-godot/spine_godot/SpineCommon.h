@@ -30,6 +30,28 @@
 #ifndef SPINE_COMMON_H
 #define SPINE_COMMON_H
 
+#ifdef SPINE_GODOT_EXTENSION
+#include <godot_cpp/core/version.hpp>
+#include <godot_cpp/classes/ref_counted.hpp>
+#include <godot_cpp/variant/string_name.hpp>
+using namespace godot;
+#define REFCOUNTED RefCounted
+#define EMPTY(x) ((x).is_empty())
+#define EMPTY_PTR(x) ((x)->is_empty())
+#define SSIZE(x) ((x).length())
+#define INSTANTIATE(x) (x).instantiate()
+#define NOTIFY_PROPERTY_LIST_CHANGED() notify_property_list_changed()
+#define VARIANT_FLOAT Variant::FLOAT
+#define PROPERTY_USAGE_NOEDITOR PROPERTY_USAGE_NO_EDITOR
+#define RES Ref<Resource>
+#define REF Ref<RefCounted>
+#define GEOMETRY2D Geometry2D
+#define VERSION_MAJOR GODOT_VERSION_MAJOR
+#define VERSION_MINOR GODOT_VERSION_MINOR
+// FIXME this doesn't do the same as the engine SNAME in terms of caching
+#define SNAME(name) StringName(name)
+#define RS RenderingServer
+#else
 #include "core/version.h"
 #if VERSION_MAJOR > 3
 #include "core/core_bind.h"
@@ -37,6 +59,7 @@
 #define REFCOUNTED RefCounted
 #define EMPTY(x) ((x).is_empty())
 #define EMPTY_PTR(x) ((x)->is_empty())
+#define SSIZE(x) ((x).size())
 #define INSTANTIATE(x) (x).instantiate()
 #define NOTIFY_PROPERTY_LIST_CHANGED() notify_property_list_changed()
 #define VARIANT_FLOAT Variant::FLOAT
@@ -51,6 +74,7 @@
 #define REFCOUNTED Reference
 #define EMPTY(x) ((x).empty())
 #define EMPTY_PTR(x) ((x)->empty())
+#define SSIZE(x) ((x).size())
 #define INSTANTIATE(x) (x).instance()
 #define NOTIFY_PROPERTY_LIST_CHANGED() property_list_changed_notify()
 #define VARIANT_FLOAT Variant::REAL
@@ -58,6 +82,7 @@
 #define GEOMETRY2D Geometry
 #ifndef SNAME
 #define SNAME(m_arg) ([]() -> const StringName & { static StringName sname = _scs_create(m_arg); return sname; })()
+#endif
 #endif
 #endif
 

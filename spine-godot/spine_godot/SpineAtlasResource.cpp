@@ -29,8 +29,15 @@
 
 #include "SpineAtlasResource.h"
 #include "SpineRendererObject.h"
+
+#ifdef SPINE_GODOT_EXTENSION
+#include <godot_cpp/classes/json.hpp>
+#include <godot_cpp/classes/texture.hpp>
+#include <godot_cpp/classes/file_access.hpp>
+#else
 #include "core/io/json.h"
 #include "scene/resources/texture.h"
+#endif
 #include <spine/TextureLoader.h>
 
 class GodotSpineTextureLoader : public spine::TextureLoader {
@@ -44,16 +51,16 @@ public:
 	}
 
 	static String fix_path(const String &path) {
-		if (path.size() > 5 && path[4] == '/' && path[5] == '/') return path;
+		if (SSIZE(path) > 5 && path[4] == '/' && path[5] == '/') return path;
 		const String prefix = "res:/";
 		auto i = path.find(prefix);
-		auto sub_str_pos = i + prefix.size() - 1;
+		auto sub_str_pos = i + SSIZE(prefix) - 1;
 		if (sub_str_pos < 0) return path;
 		auto res = path.substr(sub_str_pos);
 
 		if (!EMPTY(res)) {
 			if (res[0] != '/') {
-				return prefix + "/" + res;
+				return prefix + String("/") + res;
 			} else {
 				return prefix + res;
 			}
@@ -65,10 +72,15 @@ public:
 		Error error = OK;
 		auto fixed_path = fix_path(String(path.buffer()));
 
+#if SPINE_GODOT_EXTENSION
+		// FIXME no error parameter
+		Ref<Texture2D> texture = ResourceLoader::get_singleton()->load(fixed_path, "", ResourceLoader::CACHE_MODE_REUSE);
+#else
 #if VERSION_MAJOR > 3
 		Ref<Texture2D> texture = ResourceLoader::load(fixed_path, "", ResourceFormatLoader::CACHE_MODE_REUSE, &error);
 #else
 		Ref<Texture> texture = ResourceLoader::load(fixed_path, "", false, &error);
+#endif
 #endif
 		if (error != OK || !texture.is_valid()) {
 			ERR_PRINT(vformat("Can't load texture: \"%s\"", String(path.buffer())));
@@ -85,11 +97,19 @@ public:
 		renderer_object->normal_map = Ref<Texture>(nullptr);
 
 		String new_path = vformat("%s/%s_%s", fixed_path.get_base_dir(), normal_map_prefix, fixed_path.get_file());
+#if SPINE_GODOT_EXTENSION
+		if (ResourceLoader::get_singleton()->exists(new_path)) {
+			Ref<Texture> normal_map = ResourceLoader::get_singleton()->load(new_path);
+			normal_maps->append(normal_map);
+			renderer_object->normal_map = normal_map;
+		}
+#else
 		if (ResourceLoader::exists(new_path)) {
 			Ref<Texture> normal_map = ResourceLoader::load(new_path);
 			normal_maps->append(normal_map);
 			renderer_object->normal_map = normal_map;
 		}
+#endif
 
 #if VERSION_MAJOR > 3
 		renderer_object->canvas_texture.instantiate();

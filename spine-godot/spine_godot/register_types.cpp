@@ -28,7 +28,10 @@
  *****************************************************************************/
 
 #include "SpineCommon.h"
+#ifdef SPINE_GODOT_EXTENSION
+#else
 #include "modules/register_module_types.h"
+#endif
 #include "register_types.h"
 #include "SpineAtlasResource.h"
 #include "SpineSkeletonFileResource.h"

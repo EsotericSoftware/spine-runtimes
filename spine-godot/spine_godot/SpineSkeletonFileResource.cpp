@@ -28,6 +28,10 @@
  *****************************************************************************/
 
 #include "SpineSkeletonFileResource.h"
+#ifdef SPINE_GODOT_EXTENSION
+#include <godot_cpp/core/error_macros.hpp>
+#include <godot_cpp/classes/file_access.hpp>
+#else
 #if VERSION_MAJOR > 3
 #include "core/error/error_list.h"
 #include "core/error/error_macros.h"
@@ -36,6 +40,7 @@
 #include "core/error_list.h"
 #include "core/error_macros.h"
 #include "core/os/file_access.h"
+#endif
 #endif
 #include <spine/Json.h>
 #include <spine/Version.h>

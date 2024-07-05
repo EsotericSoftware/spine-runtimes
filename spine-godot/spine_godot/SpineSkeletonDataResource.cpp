@@ -29,7 +29,6 @@
 
 #include "SpineSkeletonDataResource.h"
 #include "SpineCommon.h"
-#include "core/io/marshalls.h"
 
 void SpineAnimationMix::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_from", "from"),

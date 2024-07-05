@@ -31,7 +31,15 @@
 
 #include "SpineSkeleton.h"
 #include "SpineAnimationState.h"
+#ifdef SPINE_GODOT_EXTENSION
+#include "SpineCommon.h"
+#include <godot_cpp/classes/node2d.hpp>
+#include <godot_cpp/templates/vector.hpp>
+#include <godot_cpp/classes/rendering_server.hpp>
+#include <godot_cpp/classes/canvas_item_material.hpp>
+#else
 #include "scene/2d/node_2d.h"
+#endif
 
 class SpineSlotNode;
 
@@ -84,7 +92,11 @@ public:
 	SpineMesh2D() : renderer_object(nullptr), indices_changed(true), num_vertices(0), num_indices(0), vertex_stride(0), normal_tangent_stride(0), attribute_stride(0){};
 	~SpineMesh2D() {
 		if (mesh.is_valid()) {
+#ifdef SPINE_GODOT_EXTENSION
+			RS::get_singleton()->free_rid(mesh);
+#else
 			RS::get_singleton()->free(mesh);
+#endif
 		}
 	}
 #else
@@ -160,7 +172,7 @@ protected:
 	void draw();
 	void draw_bone(spine::Bone *bone, const Color &color);
 
-	void callback(spine::AnimationState *state, spine::EventType type, spine::TrackEntry *entry, spine::Event *event);
+	void callback(spine::AnimationState *state, spine::EventType type, spine::TrackEntry *entry, spine::Event *event) override;
 
 public:
 	SpineSprite();

@@ -30,10 +30,19 @@
 #pragma once
 
 #include "SpineCommon.h"
+#ifdef SPINE_GODOT_EXTENSION
+#include <godot_cpp/classes/resource.hpp>
+#include <godot_cpp/classes/resource_loader.hpp>
+#include <godot_cpp/classes/resource_format_loader.hpp>
+#include <godot_cpp/classes/resource_saver.hpp>
+#include <godot_cpp/classes/resource_format_saver.hpp>
+#include <spine/Atlas.h>
+#else
 #include "core/io/resource_loader.h"
 #include "core/io/resource_saver.h"
 #include "core/io/image_loader.h"
 #include <spine/Atlas.h>
+#endif
 
 class GodotSpineTextureLoader;
 
@@ -89,6 +98,15 @@ class SpineAtlasResourceFormatLoader : public ResourceFormatLoader {
 	GDCLASS(SpineAtlasResourceFormatLoader, ResourceFormatLoader)
 
 public:
+#ifdef SPINE_GODOT_EXTENSION
+	PackedStringArray _get_recognized_extensions();
+
+	bool _handles_type(const StringName &type);
+
+	String _get_resource_type(const String &path);
+
+	Variant _load(const String &path, const String &original_path, bool use_sub_threads, int32_t cache_mode);
+#else
 #if VERSION_MAJOR > 3
 	RES load(const String &path, const String &original_path, Error *error, bool use_sub_threads, float *progress, CacheMode cache_mode) override;
 #else
@@ -100,12 +118,18 @@ public:
 	bool handles_type(const String &type) const override;
 
 	String get_resource_type(const String &path) const override;
+#endif
 };
 
 class SpineAtlasResourceFormatSaver : public ResourceFormatSaver {
 	GDCLASS(SpineAtlasResourceFormatSaver, ResourceFormatSaver)
 
 public:
+#ifdef SPINE_GODOT_EXTENSION
+	Error _save(const Ref<Resource> &resource, const String &path, uint32_t flags) override;
+	bool _recognize(const Ref<Resource> &resource);
+	PackedStringArray _get_recognized_extensions(const Ref<Resource> &resource);
+#else
 #if VERSION_MAJOR > 3
 	Error save(const RES &resource, const String &path, uint32_t flags) override;
 #else
@@ -115,4 +139,5 @@ public:
 	void get_recognized_extensions(const RES &resource, List<String> *extensions) const override;
 
 	bool recognize(const RES &resource) const override;
+#endif
 };
