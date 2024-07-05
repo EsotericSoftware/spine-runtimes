@@ -209,7 +209,7 @@ namespace Spine.Unity.Editor {
 
 		protected virtual void PopulatePopupList (ref List<GUIContent> contentList, ref List<string> valueList,
 			Texture2D image, SerializedProperty property, T targetAttribute, SkeletonData data) {
-			contentList.Add(new GUIContent ("Type Not Supported"));
+			contentList.Add(new GUIContent("Type Not Supported"));
 			valueList.Add(string.Empty);
 		}
 
