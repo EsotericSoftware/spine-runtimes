@@ -28,13 +28,13 @@
  *****************************************************************************/
 
 export abstract class Texture {
-	protected _image: HTMLImageElement | ImageBitmap;
+	protected _image: HTMLImageElement | ImageBitmap | any;
 
-	constructor (image: HTMLImageElement | ImageBitmap) {
+	constructor (image: HTMLImageElement | ImageBitmap | any) {
 		this._image = image;
 	}
 
-	getImage (): HTMLImageElement | ImageBitmap {
+	getImage (): HTMLImageElement | ImageBitmap | any {
 		return this._image;
 	}
 
