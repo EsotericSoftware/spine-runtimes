@@ -1,7 +1,7 @@
 {
   "name": "com.esotericsoftware.spine.ui-toolkit",
   "displayName": "Spine UI Toolkit [Experimental]",
-  "description": "This plugin provides UI Toolkit integration for the spine-unity runtime.\n\nPrerequisites:\nIt requires a working installation of the spine-unity runtime, version 4.2.\n(See http://esotericsoftware.com/git/spine-runtimes/spine-unity)",
+  "description": "This plugin provides UI Toolkit integration for the spine-unity runtime.\n\nPrerequisites:\nIt requires a working installation of the spine-unity runtime, version 4.2.75 or newer.\n(See http://esotericsoftware.com/git/spine-runtimes/spine-unity)",
   "version": "4.2.0-preview.1",
   "unity": "2023.2",
   "author": {
@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "com.unity.modules.uielements": "1.0.0",
-    "com.esotericsoftware.spine.spine-unity": "4.2.21"
+    "com.esotericsoftware.spine.spine-unity": "4.2.75"
   },
   "keywords": [
     "spine",
