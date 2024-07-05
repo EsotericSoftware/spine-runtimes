@@ -1,6 +1,6 @@
 {
   "name": "@esotericsoftware/spine-canvaskit",
-  "version": "4.2.48",
+  "version": "4.2.49",
   "description": "The official Spine Runtimes for CanvasKit for NodeJS",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

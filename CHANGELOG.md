@@ -173,7 +173,6 @@
   - `SkeletonGraphicRenderTexture` example component: `protected RawImage quadRawImage` was changed to `protected SkeletonSubmeshGraphic quadMaskableGraphic` for a bugfix. This is only relevant for subclasses of `SkeletonGraphicRenderTexture` or when querying the `RawImage` component via e.g. `skeletonGraphicRenderTexture.quad.GetComponent<RawImage>()`.
   - Fixed a bug where when Linear color space is used and `PMA vertex colors` enabled, additive slots add a too dark (too transparent) color value. If you want the old incorrect behaviour (darker additive slots) or are not using Linear but Gamma color space, you can comment-out the define `LINEAR_COLOR_SPACE_FIX_ADDITIVE_ALPHA` in `MeshGenerator.cs` to deactivate the fix or just to skip unnecessary instructions.
 
-
 - **Changes of default values**
 
 - **Deprecated**
@@ -259,6 +258,10 @@
 - Added physics examples
 
 ### Canvas backend
+
+### CanvasKit backend
+
+- Added spine-canvaskit runtime. See https://esotericsoftware.com/spine-canvaskit
 
 ### Three.js backend
 
