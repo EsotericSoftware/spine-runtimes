@@ -50,7 +50,7 @@ fun DressUp(nav: NavHostController) {
 
     val drawable = remember {
         AndroidSkeletonDrawable.fromAsset(
-            "mix-and-match-pma.atlas",
+            "mix-and-match.atlas",
             "mix-and-match-pro.skel",
             context
         )

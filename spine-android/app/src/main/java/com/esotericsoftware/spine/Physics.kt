@@ -102,6 +102,10 @@ fun Physics(nav: NavHostController) {
                             invertedYDragPosition
                         )
                     },
+                    onDragEnd = { ->
+                        mousePosition.value = null;
+                        lastMousePosition.value = null;
+                    }
                 )
             }
         ) {
@@ -109,7 +113,7 @@ fun Physics(nav: NavHostController) {
                 factory = { ctx ->
                     SpineView(ctx).apply {
                         loadFromAsset(
-                            "celestial-circus-pma.atlas",
+                            "celestial-circus.atlas",
                             "celestial-circus-pro.skel",
                             controller
                         )

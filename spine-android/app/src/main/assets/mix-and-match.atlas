@@ -1,7 +1,6 @@
-mix-and-match-pma.png
+mix-and-match.png
 	size: 1024, 512
 	filter: Linear, Linear
-	pma: true
 	scale: 0.5
 base-head
 	bounds: 118, 70, 95, 73

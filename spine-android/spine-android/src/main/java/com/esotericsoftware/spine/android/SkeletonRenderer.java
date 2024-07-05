@@ -102,12 +102,13 @@ public class SkeletonRenderer {
 			if (attachment == null) {
 				continue;
 			}
+
 			if (attachment instanceof RegionAttachment) {
 				RegionAttachment region = (RegionAttachment)attachment;
 				verticesLength = vertexSize << 2;
+				if (region.getSequence() != null) region.getSequence().apply(slot, region);
 				AndroidTexture texture = (AndroidTexture)region.getRegion().getTexture();
 				BlendMode blendMode = slot.getData().getBlendMode();
-
 				if (command.blendMode == null && command.texture == null) {
 					command.blendMode = blendMode;
 					command.texture = texture;
@@ -126,10 +127,10 @@ public class SkeletonRenderer {
 				uvs = region.getUVs();
 				indices = quadTriangles;
 				color = region.getColor();
-
 			} else if (attachment instanceof MeshAttachment) {
 				MeshAttachment mesh = (MeshAttachment)attachment;
 				verticesLength = mesh.getWorldVerticesLength();
+				if (mesh.getSequence() != null) mesh.getSequence().apply(slot, mesh);
 				AndroidTexture texture = (AndroidTexture)mesh.getRegion().getTexture();
 				BlendMode blendMode = slot.getData().getBlendMode();
 
@@ -208,12 +209,6 @@ public class SkeletonRenderer {
 	public void render (Canvas canvas, Array<RenderCommand> commands) {
 		for (int i = 0; i < commands.size; i++) {
 			RenderCommand command = commands.get(i);
-
-			// TODO Fix issue with dressup rendering
-			if (command.blendMode == null) {
-				continue;
-			}
-
 			canvas.drawVertices(Canvas.VertexMode.TRIANGLES, command.vertices.size, command.vertices.items, 0, command.uvs.items, 0,
 				command.colors.items, 0, command.indices.items, 0, command.indices.size, command.texture.getPaint(command.blendMode));
 		}

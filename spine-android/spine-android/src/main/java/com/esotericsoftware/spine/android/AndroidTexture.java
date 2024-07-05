@@ -57,7 +57,7 @@ public class AndroidTexture extends Texture {
 				paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER));
 				break;
 			case multiply:
-				paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.MULTIPLY));
+				paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER));
 				break;
 			case additive:
 				paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.ADD));
