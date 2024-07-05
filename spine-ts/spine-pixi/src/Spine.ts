@@ -199,6 +199,7 @@ export class Spine extends Container {
 
 	/** Destroy Spine game object elements, then call the {@link Container.destroy} with the given options */
 	public override destroy (options?: boolean | IDestroyOptions | undefined): void {
+		if (this.autoUpdate) this.autoUpdate = false;
 		for (const [, mesh] of this.meshesCache) {
 			mesh?.destroy();
 		}
