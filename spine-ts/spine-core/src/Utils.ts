@@ -90,11 +90,6 @@ export class StringSet {
 export type NumberArrayLike = Array<number> | Float32Array;
 export type IntArrayLike = Array<number> | Int16Array;
 
-/*export interface NumberArrayLike {
-	readonly length: number;
-	[n: number]: number;
-}*/
-
 export interface Disposable {
 	dispose (): void;
 }

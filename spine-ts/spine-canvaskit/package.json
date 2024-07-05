@@ -1,0 +1,41 @@
+{
+  "name": "@esotericsoftware/spine-canvaskit",
+  "version": "4.2.48",
+  "description": "The official Spine Runtimes for CanvasKit for NodeJS",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/esotericsoftware/spine-runtimes.git"
+  },
+  "keywords": [
+    "gamedev",
+    "animations",
+    "2d",
+    "spine",
+    "game-dev",
+    "runtimes",
+    "skeletal"
+  ],
+  "author": "Esoteric Software LLC",
+  "license": "LicenseRef-LICENSE",
+  "bugs": {
+    "url": "https://github.com/esotericsoftware/spine-runtimes/issues"
+  },
+  "homepage": "https://github.com/esotericsoftware/spine-runtimes#readme",
+  "dependencies": {
+    "@esotericsoftware/spine-core": "4.2.48",
+    "canvaskit-wasm": "0.39.1"
+  },
+  "devDependencies": {
+    "@pdf-lib/upng": "1.0.1",
+    "@types/node": "20.14.9"
+  }
+}

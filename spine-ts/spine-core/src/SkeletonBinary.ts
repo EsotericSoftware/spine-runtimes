@@ -64,7 +64,7 @@ export class SkeletonBinary {
 		this.attachmentLoader = attachmentLoader;
 	}
 
-	readSkeletonData (binary: Uint8Array): SkeletonData {
+	readSkeletonData (binary: Uint8Array | ArrayBuffer): SkeletonData {
 		let scale = this.scale;
 
 		let skeletonData = new SkeletonData();
@@ -1115,7 +1115,7 @@ export class SkeletonBinary {
 }
 
 export class BinaryInput {
-	constructor (data: Uint8Array, public strings = new Array<string>(), private index: number = 0, private buffer = new DataView(data.buffer)) {
+	constructor (data: Uint8Array | ArrayBuffer, public strings = new Array<string>(), private index: number = 0, private buffer = new DataView(data instanceof ArrayBuffer ? data : data.buffer)) {
 	}
 
 	readByte (): number {

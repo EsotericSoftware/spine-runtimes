@@ -1,26 +1,29 @@
 {
-	"files": [],
-	"references": [
-		{
-			"path": "./spine-core"
-		},
-		{
-			"path": "./spine-canvas"
-		},
-		{
-			"path": "./spine-webgl"
-		},
-		{
-			"path": "./spine-phaser"
-		},
-		{
-			"path": "./spine-player"
-		},
-		{
-			"path": "./spine-threejs"
-		},
-		{
-			"path": "./spine-pixi"
-		}
-	]
+  "files": [],
+  "references": [
+    {
+      "path": "./spine-core"
+    },
+    {
+      "path": "./spine-canvas"
+    },
+    {
+      "path": "./spine-canvaskit"
+    },
+    {
+      "path": "./spine-webgl"
+    },
+    {
+      "path": "./spine-phaser"
+    },
+    {
+      "path": "./spine-player"
+    },
+    {
+      "path": "./spine-threejs"
+    },
+    {
+      "path": "./spine-pixi"
+    }
+  ]
 }

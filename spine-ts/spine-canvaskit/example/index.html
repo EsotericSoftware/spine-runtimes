@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../../index.css">
+    <script src="https://unpkg.com/canvaskit-wasm@latest/bin/canvaskit.js"></script>
+    <script src="../dist/iife/spine-canvaskit.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body class="p-4 flex flex-col items-center">
+    <h1>CanvasKit Example</h1>
+    <canvas id=foo width=600 height=400 style="margin: 0 auto;"></canvas>
+</body>
+
+<script type="module">
+    // Function to read file contents from a path, used to load texture atlas and skeleton file.
+    async function readFile(path) {
+        const response = await fetch(path);
+        if (!response.ok) throw new Error("Could not load file " + path);
+        return await response.arrayBuffer();
+    }
+
+
+    // Initialize CanvasKit and create a surface from the Canvas element to draw to
+    const ck = await CanvasKitInit();
+    const surface = ck.MakeCanvasSurface('foo');
+
+    // Load the texture atlas
+    const atlas = await spine.loadTextureAtlas(ck, "assets/spineboy.atlas", readFile);
+
+    // Load skeleton data
+    const binary = new spine.SkeletonBinary(new spine.AtlasAttachmentLoader(atlas));
+    const skeletonData = binary.readSkeletonData(await readFile("assets/spineboy-pro.skel"));
+
+    // Create a skeleton and scale and position it.
+    const skeleton = new spine.Skeleton(skeletonData);
+    skeleton.scaleX = skeleton.scaleY = 0.4;
+    skeleton.x = 300;
+    skeleton.y = 380;
+    skeleton.setToSetupPose();
+
+    // Create an animation state to apply and mix one or more animations
+    const animationState = new spine.AnimationState(new spine.AnimationStateData(skeletonData));
+    animationState.setAnimation(0, "hoverboard", true);
+
+    // Create a skeleton renderer to render the skeleton with to the canvas
+    const renderer = new spine.SkeletonRenderer(ck);
+
+    let lastTime = performance.now();
+    // Rendering loop
+    function drawFrame(canvas) {
+        canvas.clear(ck.Color(52, 52, 54, 1));
+
+        // Calculate the time that's passed between now and the last frame
+        const now = performance.now();
+        const deltaTime = (now - lastTime) / 1000;
+        lastTime = now;
+
+        // Update and apply the animations to the skeleton
+        animationState.update(deltaTime);
+        animationState.apply(skeleton);
+
+        // Update the skeleton time for physics, and its world transforms
+        skeleton.update(deltaTime);
+        skeleton.updateWorldTransform(spine.Physics.update);
+        renderer.render(canvas, skeleton);
+        surface.requestAnimationFrame(drawFrame);
+    }
+    surface.requestAnimationFrame(drawFrame);
+</script>
+
+</html>
