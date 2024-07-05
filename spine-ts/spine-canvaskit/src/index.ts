@@ -73,9 +73,9 @@ function bufferToUtf8String(buffer: any) {
 export async function loadTextureAtlas(ck: CanvasKit, atlasFile: string, readFile: (path: string) => Promise<Buffer>): Promise<TextureAtlas> {
     const atlas = new TextureAtlas(bufferToUtf8String(await readFile(atlasFile)));
     const slashIndex = atlasFile.lastIndexOf("/");
-    const parentDir = slashIndex >= 0 ? atlasFile.substring(0, slashIndex + 1) : "";
+    const parentDir = slashIndex >= 0 ? atlasFile.substring(0, slashIndex + 1) + "/" : "";
     for (const page of atlas.pages) {
-        const texture = await CanvasKitTexture.fromFile(ck, parentDir + "/" + page.name, readFile);
+        const texture = await CanvasKitTexture.fromFile(ck, parentDir + page.name, readFile);
         page.setTexture(texture);
     }
     return atlas;
