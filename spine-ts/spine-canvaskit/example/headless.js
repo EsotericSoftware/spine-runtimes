@@ -3,7 +3,7 @@ import { fileURLToPath } from 'url';
 import path from 'path';
 import CanvasKitInit from "canvaskit-wasm/bin/canvaskit.js";
 import UPNG from "@pdf-lib/upng"
-import {loadTextureAtlas, SkeletonRenderer, Skeleton, SkeletonBinary, AnimationState, AnimationStateData, AtlasAttachmentLoader, Physics} from "../dist/index.js"
+import {loadTextureAtlas, SkeletonRenderer, Skeleton, SkeletonBinary, AnimationState, AnimationStateData, AtlasAttachmentLoader, Physics, loadSkeletonData, SkeletonDrawable} from "../dist/index.js"
 
 // Get the current directory
 const __filename = fileURLToPath(import.meta.url);
@@ -22,21 +22,21 @@ async function main() {
     // Load atlas
     const atlas = await loadTextureAtlas(ck, __dirname + "/assets/spineboy.atlas", async (path) => fs.readFileSync(path));
 
-    // Load skeleton data
-    const binary = new SkeletonBinary(new AtlasAttachmentLoader(atlas));
-    const skeletonData = binary.readSkeletonData(fs.readFileSync(__dirname + "/assets/spineboy-pro.skel"));
+    // Load the skeleton data
+    const skeletonData = await loadSkeletonData(__dirname + "/assets/spineboy-pro.skel", atlas, async (path) => fs.readFileSync(path));
 
-    // Create a skeleton and scale and position it.
-    const skeleton = new Skeleton(skeletonData);
-    skeleton.scaleX = skeleton.scaleY = 0.5;
-    skeleton.x = 300;
-    skeleton.y = 380;
+    // Create a SkeletonDrawable
+    const drawable = new SkeletonDrawable(skeletonData);
 
-    // Create an animation state to apply and mix one or more animations
-    const animationState = new AnimationState(new AnimationStateData(skeletonData));
-    animationState.setAnimation(0, "hoverboard", true);
+    // Scale and position the skeleton
+    drawable.skeleton.x = 300;
+    drawable.skeleton.y = 380;
+    drawable.skeleton.scaleX = drawable.skeleton.scaleY = 0.5;
 
-    // Create a skeleton renderer to render the skeleton with to the canvas
+    // Set the "hoverboard" animation on track one
+    drawable.animationState.setAnimation(0, "hoverboard", true);
+
+    // Create a skeleton renderer to render the skeleton to the canvas with
     const renderer = new SkeletonRenderer(ck);
 
     // Render the full animation in 1/30 second steps (30fps) and save it to an APNG
@@ -50,16 +50,12 @@ async function main() {
         // Clear the canvas
         canvas.clear(ck.WHITE);
 
-        // Update and apply the animations to the skeleton
-        animationState.update(deltaTime);
-        animationState.apply(skeleton);
-
-        // Update the skeleton time for physics, and its world transforms
-        skeleton.update(deltaTime);
-        skeleton.updateWorldTransform(Physics.update);
+        // Update the drawable, which will advance the animation(s)
+        // apply them to the skeleton, and update the skeleton's pose.
+        drawable.update(deltaTime);
 
         // Render the skeleton to the canvas
-        renderer.render(canvas, skeleton)
+        renderer.render(canvas, drawable)
 
         // Read the pixels of the current frame and store it.
         canvas.readPixels(0, 0, imageInfo, pixelArray);

@@ -37,19 +37,16 @@
     const atlas = await spine.loadTextureAtlas(ck, "assets/spineboy.atlas", readFile);
 
     // Load skeleton data
-    const binary = new spine.SkeletonBinary(new spine.AtlasAttachmentLoader(atlas));
-    const skeletonData = binary.readSkeletonData(await readFile("assets/spineboy-pro.skel"));
+    const skeletonData = await spine.loadSkeletonData("assets/spineboy-pro.skel", atlas, readFile);
 
-    // Create a skeleton and scale and position it.
-    const skeleton = new spine.Skeleton(skeletonData);
-    skeleton.scaleX = skeleton.scaleY = 0.4;
-    skeleton.x = 300;
-    skeleton.y = 380;
-    skeleton.setToSetupPose();
+    // Create a drawable and scale and position the skeleton
+    const drawable = new spine.SkeletonDrawable(skeletonData);
+    drawable.skeleton.scaleX = drawable.skeleton.scaleY = 0.4;
+    drawable.skeleton.x = 300;
+    drawable.skeleton.y = 380;
 
-    // Create an animation state to apply and mix one or more animations
-    const animationState = new spine.AnimationState(new spine.AnimationStateData(skeletonData));
-    animationState.setAnimation(0, "hoverboard", true);
+    // Set the "hoverboard" animation on the first track of the animation state.
+    drawable.animationState.setAnimation(0, "hoverboard", true);
 
     // Create a skeleton renderer to render the skeleton with to the canvas
     const renderer = new spine.SkeletonRenderer(ck);
@@ -64,14 +61,14 @@
         const deltaTime = (now - lastTime) / 1000;
         lastTime = now;
 
-        // Update and apply the animations to the skeleton
-        animationState.update(deltaTime);
-        animationState.apply(skeleton);
+        // Update the drawable, which will advance the animation(s)
+        // apply them to the skeleton, and update the skeleton's pose.
+        drawable.update(deltaTime);
 
-        // Update the skeleton time for physics, and its world transforms
-        skeleton.update(deltaTime);
-        skeleton.updateWorldTransform(spine.Physics.update);
-        renderer.render(canvas, skeleton);
+        // Render the skeleton to the canvas
+        renderer.render(canvas, drawable);
+
+        // Request the next frame
         surface.requestAnimationFrame(drawFrame);
     }
     surface.requestAnimationFrame(drawFrame);

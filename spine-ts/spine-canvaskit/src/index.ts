@@ -1,7 +1,7 @@
 export * from "@esotericsoftware/spine-core";
 
-import { BlendMode, ClippingAttachment, Color, MeshAttachment, NumberArrayLike, RegionAttachment, Skeleton, SkeletonClipping, Texture, TextureAtlas, TextureFilter, TextureWrap, Utils } from "@esotericsoftware/spine-core";
-import { Canvas, CanvasKit, Image, Paint, Shader, BlendMode as CanvasKitBlendMode } from "canvaskit-wasm";
+import { AnimationState, AnimationStateData, AtlasAttachmentLoader, BlendMode, ClippingAttachment, Color, MeshAttachment, NumberArrayLike, Physics, RegionAttachment, Skeleton, SkeletonBinary, SkeletonClipping, SkeletonData, SkeletonJson, Texture, TextureAtlas, TextureFilter, TextureWrap, Utils } from "@esotericsoftware/spine-core";
+import { Canvas, Surface, CanvasKit, Image, Paint, Shader, BlendMode as CanvasKitBlendMode } from "canvaskit-wasm";
 
 Skeleton.yDown = true;
 
@@ -18,7 +18,17 @@ function toCkBlendMode(ck: CanvasKit, blendMode: BlendMode) {
     }
 }
 
-export class CanvasKitTexture extends Texture {
+function bufferToUtf8String(buffer: any) {
+    if (typeof Buffer !== 'undefined') {
+        return buffer.toString('utf-8');
+      } else if (typeof TextDecoder !== 'undefined') {
+        return new TextDecoder('utf-8').decode(buffer);
+      } else {
+        throw new Error('Unsupported environment');
+      }
+}
+
+class CanvasKitTexture extends Texture {
     getImage(): CanvasKitImage {
         return this._image;
     }
@@ -60,16 +70,10 @@ export class CanvasKitTexture extends Texture {
     }
 }
 
-function bufferToUtf8String(buffer: any) {
-    if (typeof Buffer !== 'undefined') {
-        return buffer.toString('utf-8');
-      } else if (typeof TextDecoder !== 'undefined') {
-        return new TextDecoder('utf-8').decode(buffer);
-      } else {
-        throw new Error('Unsupported environment');
-      }
-}
-
+/**
+ * Loads a {@link TextureAtlas} and its atlas page images from the given file path using the `readFile(path: string): Promise<Buffer>` function.
+ * Throws an `Error` if the file or one of the atlas page images could not be loaded.
+ */
 export async function loadTextureAtlas(ck: CanvasKit, atlasFile: string, readFile: (path: string) => Promise<Buffer>): Promise<TextureAtlas> {
     const atlas = new TextureAtlas(bufferToUtf8String(await readFile(atlasFile)));
     const slashIndex = atlasFile.lastIndexOf("/");
@@ -81,6 +85,51 @@ export async function loadTextureAtlas(ck: CanvasKit, atlasFile: string, readFil
     return atlas;
 }
 
+/**
+ * Loads a {@link SkeletonData} from the given file path (`.json` or `.skel`) using the `readFile(path: string): Promise<Buffer>` function.
+ * Attachments will be looked up in the provided atlas.
+ */
+export async function loadSkeletonData(skeletonFile: string, atlas: TextureAtlas, readFile: (path: string) => Promise<Buffer>): Promise<SkeletonData> {
+    const attachmentLoader = new AtlasAttachmentLoader(atlas);
+    const loader = skeletonFile.endsWith(".json") ? new SkeletonJson(attachmentLoader) : new SkeletonBinary(attachmentLoader);
+    const skeletonData = loader.readSkeletonData(await readFile(skeletonFile));
+    return skeletonData;
+}
+
+/**
+ * Manages a {@link Skeleton} and its associated {@link AnimationState}. A drawable is constructed from a {@link SkeletonData}, which can
+ * be shared by any number of drawables.
+ */
+export class SkeletonDrawable {
+    public readonly skeleton: Skeleton;
+    public readonly animationState: AnimationState;
+
+    /**
+     * Constructs a new drawble from the skeleton data.
+     */
+    constructor(skeletonData: SkeletonData) {
+        this.skeleton = new Skeleton(skeletonData);
+        this.animationState = new AnimationState(new AnimationStateData(skeletonData));
+    }
+
+    /**
+     * Updates the animation state and skeleton time by the delta time. Applies the
+     * animations to the skeleton and calculates the final pose of the skeleton.
+     *
+     * @param deltaTime the time since the last update in seconds
+     * @param physicsUpdate optional {@link Physics} update mode.
+     */
+    update(deltaTime: number, physicsUpdate: Physics = Physics.update) {
+        this.animationState.update(deltaTime);
+        this.skeleton.update(deltaTime);
+        this.animationState.apply(this.skeleton);
+        this.skeleton.updateWorldTransform(physicsUpdate);
+    }
+}
+
+/**
+ * Renders a {@link Skeleton} or {@link SkeletonDrawable} to a CanvasKit {@link Canvas}.
+ */
 export class SkeletonRenderer {
     private clipper = new SkeletonClipping();
     private tempColor = new Color();
@@ -88,9 +137,20 @@ export class SkeletonRenderer {
     private static QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
     private scratchPositions = Utils.newFloatArray(100);
     private scratchColors = Utils.newFloatArray(100);
+
+    /**
+     * Creates a new skeleton renderer.
+     * @param ck the {@link CanvasKit} instance returned by `CanvasKitInit()`.
+     */
     constructor(private ck: CanvasKit) {}
 
-    render(canvas: Canvas, skeleton: Skeleton) {
+    /**
+     * Renders a skeleton or skeleton drawable in its current pose to the canvas.
+     * @param canvas the canvas to render to.
+     * @param skeleton the skeleton or drawable to render.
+     */
+    render(canvas: Canvas, skeleton: Skeleton | SkeletonDrawable) {
+        if (skeleton instanceof SkeletonDrawable) skeleton = skeleton.skeleton;
         let clipper = this.clipper;
 		let drawOrder = skeleton.drawOrder;
 		let skeletonColor = skeleton.color;
