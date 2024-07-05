@@ -124,6 +124,11 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 		loadFrom(() -> AndroidSkeletonDrawable.fromHttp(atlasUrl, skeletonUrl));
 	}
 
+	public void loadFromDrawable(AndroidSkeletonDrawable drawable, SpineController controller) {
+		this.controller = controller;
+		loadFrom(() -> drawable);
+	}
+
 	private void loadFrom(AndroidSkeletonDrawableLoader loader) {
 		Handler mainHandler = new Handler(Looper.getMainLooper());
 		Thread backgroundThread = new Thread(() -> {

@@ -208,6 +208,12 @@ public class SkeletonRenderer {
 	public void render (Canvas canvas, Array<RenderCommand> commands) {
 		for (int i = 0; i < commands.size; i++) {
 			RenderCommand command = commands.get(i);
+
+			// TODO Fix issue with dressup rendering
+			if (command.blendMode == null) {
+				continue;
+			}
+
 			canvas.drawVertices(Canvas.VertexMode.TRIANGLES, command.vertices.size, command.vertices.items, 0, command.uvs.items, 0,
 				command.colors.items, 0, command.indices.items, 0, command.indices.size, command.texture.getPaint(command.blendMode));
 		}

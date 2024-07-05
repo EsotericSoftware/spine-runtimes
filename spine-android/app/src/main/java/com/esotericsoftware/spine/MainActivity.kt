@@ -62,6 +62,7 @@ fun AppContent() {
                                 Destination.PlayPause,
                                 Destination.AnimationStateEvents,
                                 Destination.DebugRendering,
+                                Destination.DressUp,
                                 Destination.IKFollowing,
                                 Destination.Physics
                             ),
@@ -92,6 +93,12 @@ fun AppContent() {
                     Destination.DebugRendering.route
                 ) {
                     DebugRendering(navController)
+                }
+
+                composable(
+                    Destination.DressUp.route
+                ) {
+                    DressUp(navController)
                 }
 
                 composable(
@@ -143,6 +150,7 @@ sealed class Destination(val route: String, val title: String) {
     data object PlayPause : Destination("playPause", "Play/Pause")
     data object DebugRendering: Destination("debugRendering", "Debug Renderer")
     data object AnimationStateEvents : Destination("animationStateEvents", "Animation State Listener")
+    data object DressUp : Destination("dressUp", "Dress Up")
     data object IKFollowing : Destination("ikFollowing", "IK Following")
     data object Physics: Destination("physics", "Physics (drag anywhere)")
 }
