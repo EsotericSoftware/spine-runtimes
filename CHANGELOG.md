@@ -421,6 +421,7 @@
 
   - Made `SkeletonGraphic.unscaledTime` parameter protected, use the new property `UnscaledTime` instead.
   - `SkeletonGraphic` `OnRebuild` callback delegate is now issued after the skeleton has been initialized, before the `AnimationState` component is initialized. This makes behaviour consistent with `SkeletonAnimation` and `SkeletonMecanim` component behaviour. Use the new callback `OnAnimationRebuild` if you want to receive a callback after the `SkeletonGraphic` `AnimationState` has been initialized.
+  - Changed name of prefab skeleton meshes stored at prefabs from `Skeleton Prefab Mesh "name"` to `Skeleton Prefab Mesh [name]` to avoid issues with quotes in mesh asset names (see [this issue](https://github.com/EsotericSoftware/spine-runtimes/issues/2572)). Likely this change poses no problems at all, however if you are parsing the prefab's mesh name for whatever reason, be sure to adjust the pattern accordingly.
 
 - **Changes of default values**
 
