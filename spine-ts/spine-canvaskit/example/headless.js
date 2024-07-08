@@ -1,7 +1,7 @@
 import * as fs from "fs"
 import { fileURLToPath } from 'url';
 import path from 'path';
-import CanvasKitInit from "canvaskit-wasm/bin/canvaskit.js";
+import CanvasKitInit from "canvaskit-wasm";
 import UPNG from "@pdf-lib/upng"
 import {loadTextureAtlas, SkeletonRenderer, Skeleton, SkeletonBinary, AnimationState, AnimationStateData, AtlasAttachmentLoader, Physics, loadSkeletonData, SkeletonDrawable} from "../dist/index.js"
 
@@ -17,7 +17,6 @@ async function main() {
     const ck = await CanvasKitInit();
     const surface = ck.MakeSurface(600, 400);
     if (!surface) throw new Error();
-    const canvas = surface.getCanvas();
 
     // Load atlas
     const atlas = await loadTextureAtlas(ck, __dirname + "/assets/spineboy.atlas", async (path) => fs.readFileSync(path));
@@ -47,6 +46,9 @@ async function main() {
     const imageInfo = { width: 600, height: 400, colorType: ck.ColorType.RGBA_8888, alphaType: ck.AlphaType.Unpremul, colorSpace: ck.ColorSpace.SRGB };
     const pixelArray = ck.Malloc(Uint8Array, imageInfo.width * imageInfo.height * 4);
     for (let time = 0; time <= animationDuration; time += deltaTime) {
+        // Get the canvas object to render to the surface to
+        const canvas = surface.getCanvas();
+
         // Clear the canvas
         canvas.clear(ck.WHITE);
 

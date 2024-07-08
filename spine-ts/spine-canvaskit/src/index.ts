@@ -51,7 +51,7 @@ class CanvasKitTexture extends Texture {
         this._image = null;
     }
 
-    static async fromFile(ck: CanvasKit, path: string, readFile: (path: string) => Promise<Buffer>): Promise<CanvasKitTexture> {
+    static async fromFile(ck: CanvasKit, path: string, readFile: (path: string) => Promise<any>): Promise<CanvasKitTexture> {
         const imgData = await readFile(path);
         if (!imgData) throw new Error(`Could not load image ${path}`);
         const image = ck.MakeImageFromEncoded(imgData);
