@@ -56,7 +56,7 @@
 
     // Set the skin and the skeleton to the setup pose
     drawable.skeleton.setSkin(skin);
-    drawable.skeleton.setToSetupPose();
+    drawable.skeleton.setSlotsToSetupPose();
 
     const renderer = new spine.SkeletonRenderer(ck);
     let lastTime = performance.now();
