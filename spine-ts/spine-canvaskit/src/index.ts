@@ -137,6 +137,7 @@ export class SkeletonRenderer {
     private static QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
     private scratchPositions = Utils.newFloatArray(100);
     private scratchColors = Utils.newFloatArray(100);
+    private scratchUVs = Utils.newFloatArray(100);
 
     /**
      * Creates a new skeleton renderer.
@@ -220,7 +221,7 @@ export class SkeletonRenderer {
                     colors[i + 3] = finalColor.a;
                 }
 
-                const scaledUvs = new Array<number>(uvs.length);
+                const scaledUvs = this.scratchUVs.length < uvs.length ? Utils.newFloatArray(uvs.length) : this.scratchUVs;
                 const width = texture.getImage().image.width();
                 const height = texture.getImage().image.height();
                 for (let i = 0; i < uvs.length; i+=2) {
@@ -231,6 +232,7 @@ export class SkeletonRenderer {
                 const blendMode = slot.data.blendMode;
                 const vertices = this.ck.MakeVertices(this.ck.VertexMode.Triangles, positions, scaledUvs, colors, triangles, false);
                 canvas.drawVertices(vertices, this.ck.BlendMode.Modulate, texture.getImage().paintPerBlendMode.get(blendMode)!);
+                vertices.delete();
 			}
 
 			clipper.clipEndWithSlot(slot);
