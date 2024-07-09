@@ -64,7 +64,7 @@ export class SkeletonBinary {
 		this.attachmentLoader = attachmentLoader;
 	}
 
-	readSkeletonData (binary: Uint8Array | ArrayBuffer): SkeletonData {
+	readSkeletonData (binary: Uint8Array | ArrayBuffer): SkeletonData {
 		let scale = this.scale;
 
 		let skeletonData = new SkeletonData();

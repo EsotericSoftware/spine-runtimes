@@ -34,7 +34,6 @@
     canvasElement.width = canvasElement.clientWidth * dpr;
     canvasElement.height = canvasElement.clientHeight * dpr;
 
-
     // Initialize CanvasKit and create a surface from the Canvas element to draw to
     const ck = await CanvasKitInit();
     const surface = ck.MakeCanvasSurface('foo');

@@ -268,7 +268,7 @@ void USpineSkeletonRendererComponent::UpdateMesh(USpineSkeletonComponent *compon
 		// to the correct skeleton data yet, we won't find any regions.
 		// ignore regions for which we can't find a material
 		UMaterialInstanceDynamic *material = nullptr;
-		int foundPageIndex = (int)(intptr_t)attachmentAtlasRegion->rendererObject;
+		int foundPageIndex = (int) (intptr_t) attachmentAtlasRegion->rendererObject;
 		if (foundPageIndex == -1) {
 			clipper.clipEnd(*slot);
 			continue;
