@@ -1,0 +1,18 @@
+name: Build spine-haxe
+
+on:
+  push:
+    paths:
+      - 'spine-haxe/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build spine-haxe
+      working-directory: spine-haxe
+      env:
+        HAXE_UPDATE_URL: ${{secrets.HAXE_UPDATE_URL}}
+      run: ./build.sh
