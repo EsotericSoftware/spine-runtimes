@@ -49,6 +49,9 @@ VertexOutput vert(appdata v) {
 
 half4 frag(VertexOutput i) : SV_Target{
 	float4 texColor = tex2D(_MainTex, i.uv0);
+#if defined(_ZWRITE)
+	clip(texColor.a * i.color.a - _Cutoff);
+#endif
 #if defined(_TINT_BLACK_ON)
 	return fragTintedColor(texColor, i.darkColor, i.color, _Color.a, _Black.a);
 #else

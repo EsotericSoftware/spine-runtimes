@@ -51,6 +51,7 @@ Shader "Universal Render Pipeline/Spine/Skeleton" {
 			// Spine related keywords
 			#pragma shader_feature _ _STRAIGHT_ALPHA_INPUT
 			#pragma shader_feature _TINT_BLACK_ON
+			#pragma shader_feature _ZWRITE
 			#pragma vertex vert
 			#pragma fragment frag
 
