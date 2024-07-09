@@ -12,7 +12,7 @@ function toCkBlendMode(ck: CanvasKit, blendMode: BlendMode) {
     switch(blendMode) {
         case BlendMode.Normal: return ck.BlendMode.SrcOver;
         case BlendMode.Additive: return ck.BlendMode.Plus;
-        case BlendMode.Multiply: return ck.BlendMode.Modulate;
+        case BlendMode.Multiply: return ck.BlendMode.SrcOver;
         case BlendMode.Screen: return ck.BlendMode.Screen;
         default: return ck.BlendMode.SrcOver;
     }
@@ -92,7 +92,11 @@ export async function loadTextureAtlas(ck: CanvasKit, atlasFile: string, readFil
 export async function loadSkeletonData(skeletonFile: string, atlas: TextureAtlas, readFile: (path: string) => Promise<Buffer>): Promise<SkeletonData> {
     const attachmentLoader = new AtlasAttachmentLoader(atlas);
     const loader = skeletonFile.endsWith(".json") ? new SkeletonJson(attachmentLoader) : new SkeletonBinary(attachmentLoader);
-    const skeletonData = loader.readSkeletonData(await readFile(skeletonFile));
+    let data = await readFile(skeletonFile);
+    if (skeletonFile.endsWith(".json")) {
+        data = bufferToUtf8String(data);
+    }
+    const skeletonData = loader.readSkeletonData(data);
     return skeletonData;
 }
 

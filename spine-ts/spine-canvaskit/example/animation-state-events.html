@@ -18,7 +18,7 @@
 <body class="p-4 flex flex-col items-center">
     <h1>Animation State Events</h1>
     <p class="mb-4">Open the console in the developer tools to view events logs.</p>
-    <canvas id=foo width=600 height=400 style="margin: 0 auto;"></canvas>
+    <canvas id=foo style="margin: 0 auto; width: 600px; height: 400px;"></canvas>
 </body>
 
 <script type="module">
@@ -28,8 +28,14 @@
         return await response.arrayBuffer();
     }
 
+    const canvasElement = document.querySelector("#foo");
+    const dpr = window.devicePixelRatio || 1;
+    canvasElement.width = canvasElement.clientWidth * dpr;
+    canvasElement.height = canvasElement.clientHeight * dpr;
+
     const ck = await CanvasKitInit();
     const surface = ck.MakeCanvasSurface('foo');
+    surface.getCanvas().scale(dpr, dpr);
 
     const atlas = await spine.loadTextureAtlas(ck, "assets/spineboy.atlas", readFile);
     const skeletonData = await spine.loadSkeletonData("assets/spineboy-pro.skel", atlas, readFile);

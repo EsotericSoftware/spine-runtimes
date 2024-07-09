@@ -18,7 +18,7 @@
 <body class="p-4 flex flex-col items-center">
     <h1>Micro Benchmark</h1>
     <div id="timing"></div>
-    <canvas id=foo width=600 height=400 style="margin: 0 auto;"></canvas>
+    <canvas id=foo style="margin: 0 auto; width: 600px; height: 400px;"></canvas>
 </body>
 
 <script type="module">
@@ -28,13 +28,19 @@
         return await response.arrayBuffer();
     }
 
+    const canvasElement = document.querySelector("#foo");
+    const dpr = window.devicePixelRatio || 1;
+    canvasElement.width = canvasElement.clientWidth * dpr;
+    canvasElement.height = canvasElement.clientHeight * dpr;
+
     const ck = await CanvasKitInit();
     const surface = ck.MakeCanvasSurface('foo');
+    surface.getCanvas().scale(dpr, dpr);
 
     const atlas = await spine.loadTextureAtlas(ck, "assets/spineboy.atlas", readFile);
     const skeletonData = await spine.loadSkeletonData("assets/spineboy-pro.skel", atlas, readFile);
 
-    // Instantiate 100 skeletons, randomly placed and scaled.
+    // Instantiate 100 drawables, randomly placed and scaled.
     const drawables = [];
     for (let i = 0; i < 100; i++) {
         const drawable = new spine.SkeletonDrawable(skeletonData);

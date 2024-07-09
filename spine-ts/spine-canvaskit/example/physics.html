@@ -16,7 +16,8 @@
 </head>
 
 <body class="p-4 flex flex-col items-center">
-    <h1>Skins Mix &amp; Match Example</h1>
+    <h1>IK Following</h1>
+    <p class="mb-4">Drag anywhere</p>
     <canvas id=foo style="margin: 0 auto; width: 600px; height: 400px;"></canvas>
 </body>
 
@@ -36,36 +37,54 @@
     const surface = ck.MakeCanvasSurface('foo');
     surface.getCanvas().scale(dpr, dpr);
 
-    const atlas = await spine.loadTextureAtlas(ck, "assets/mix-and-match.atlas", readFile);
-    const skeletonData = await spine.loadSkeletonData("assets/mix-and-match-pro.skel", atlas, readFile);
-
+    const atlas = await spine.loadTextureAtlas(ck, "assets/celestial-circus.atlas", readFile);
+    const skeletonData = await spine.loadSkeletonData("assets/celestial-circus-pro.json", atlas, readFile);
     const drawable = new spine.SkeletonDrawable(skeletonData);
-    drawable.skeleton.scaleX = drawable.skeleton.scaleY = 0.4;
+    drawable.skeleton.scaleX = drawable.skeleton.scaleY = 0.15;
     drawable.skeleton.x = 300;
-    drawable.skeleton.y = 380;
+    drawable.skeleton.y = 300;
 
-    drawable.animationState.setAnimation(0, "dance", true);
+    // Set the blink animation on track 0
+    drawable.animationState.setAnimation(0, "eyeblink-long", true);
 
-    // Create a custom, empty skin
-    const skin = new spine.Skin("custom");
+    // Set up touch and mouse listeners on the canvas element
+    // and set the touch/mouse coordinate on the aim bone
+    let mouseDown = false;
+    let lastX = -1, lastY = -1;
+    canvasElement.addEventListener("touchmove", (ev) => drag(ev.changedTouches[0].clientX, ev.changedTouches[0].clientY));
+    canvasElement.addEventListener("mousedown", (ev) => {
+        mouseDown = true;
+        drag(ev.clientX, ev.clientY);
+    });
+    canvasElement.addEventListener("mouseup", () => {
+        mouseDown = false;
+        lastX = -1; lastY = -1;
+    })
+    canvasElement.addEventListener("mousemove", (ev) => {
+        if (mouseDown) drag(ev.clientX, ev.clientY);
+    })
 
-    // Add other skins to the custom skin
-    skin.addSkin(skeletonData.findSkin("skin-base"));
-    skin.addSkin(skeletonData.findSkin("nose/short"));
-    skin.addSkin(skeletonData.findSkin("eyelids/girly"));
-    skin.addSkin(skeletonData.findSkin("eyes/violet"));
-    skin.addSkin(skeletonData.findSkin("hair/brown"));
-    skin.addSkin(skeletonData.findSkin("clothes/hoodie-orange"));
-    skin.addSkin(skeletonData.findSkin("legs/pants-jeans"));
-    skin.addSkin(skeletonData.findSkin("accessories/bag"));
-    skin.addSkin(skeletonData.findSkin("accessories/hat-red-yellow"));
+    // Move the skeleton around based on the distance between
+    // the last touch/mouse location and the current touch/mouse location.
+    const drag = (touchX, touchY) => {
+        const clientRect = canvasElement.getBoundingClientRect();
+        let x = touchX - clientRect.left;
+        let y = touchY - clientRect.top;
+        if (lastX == -1 && lastY == -1) {
+            lastX = x;
+            lastY = y;
+            return;
+        }
 
-    // Set the skin and the skeleton to the setup pose
-    drawable.skeleton.setSkin(skin);
-    drawable.skeleton.setSlotsToSetupPose();
+        drawable.skeleton.x += (x - lastX);
+        drawable.skeleton.y += (y - lastY);
+        lastX = x;
+        lastY = y;
+    }
 
     const renderer = new spine.SkeletonRenderer(ck);
     let lastTime = performance.now();
+
     function drawFrame(canvas) {
         canvas.clear(ck.Color(52, 52, 54, 1));
 
