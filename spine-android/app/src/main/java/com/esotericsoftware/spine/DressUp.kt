@@ -1,10 +1,13 @@
 package com.esotericsoftware.spine
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -23,9 +26,11 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.ImageBitmap
@@ -135,11 +140,13 @@ fun DressUp(nav: NavHostController) {
     ) { paddingValues ->
         Row(
             modifier = Modifier
-                .width(thumbnailSize.dp)
-                .verticalScroll(rememberScrollState())
                 .padding(paddingValues)
         ) {
-            Column {
+            Column(
+                modifier = Modifier
+                    .width(thumbnailSize.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
                 skinImages.keys.forEach { skinName ->
                     Box(modifier = Modifier
                         .clickable {
@@ -160,12 +167,16 @@ fun DressUp(nav: NavHostController) {
                     }
                 }
             }
-            AndroidView(
-                factory = { context ->
-                    SpineView.loadFromDrawable(drawable, context, controller)
-                },
-                modifier = Modifier.padding(paddingValues)
-            )
+            Column(
+                modifier = Modifier
+                    .clipToBounds()
+            ) {
+                AndroidView(
+                    factory = { context ->
+                        SpineView.loadFromDrawable(drawable, context, controller)
+                    }
+                )
+            }
         }
     }
 }
