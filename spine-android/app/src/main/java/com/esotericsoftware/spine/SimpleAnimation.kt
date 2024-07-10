@@ -40,11 +40,9 @@ fun SimpleAnimation(nav: NavHostController) {
                     "spineboy.atlas",
                     "spineboy-pro.json",
                     context,
-                    SpineController.Builder()
-                        .setOnInitialized {
-                            it.animationState.setAnimation(0, "walk", true)
-                        }
-                        .build()
+                    SpineController {
+                        it.animationState.setAnimation(0, "walk", true)
+                    }
                 )
             },
             modifier = Modifier.padding(paddingValues)

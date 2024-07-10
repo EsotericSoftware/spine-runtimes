@@ -36,31 +36,30 @@ fun Physics(nav: NavHostController) {
     val lastMousePosition = remember { mutableStateOf<Point?>(null) }
 
     val controller = remember {
-        SpineController.Builder()
-            .setOnInitialized { controller ->
-                controller.animationState.setAnimation(0, "eyeblink-long", true)
-                controller.animationState.setAnimation(1, "wings-and-feet", true)
+        SpineController.Builder { controller ->
+            controller.animationState.setAnimation(0, "eyeblink-long", true)
+            controller.animationState.setAnimation(1, "wings-and-feet", true)
+        }
+        .setOnAfterUpdateWorldTransforms { controller ->
+            val lastMousePositionValue = lastMousePosition.value
+            if (lastMousePositionValue == null) {
+                lastMousePosition.value = mousePosition.value
+                return@setOnAfterUpdateWorldTransforms
             }
-            .setOnAfterUpdateWorldTransforms { controller ->
-                val lastMousePositionValue = lastMousePosition.value
-                if (lastMousePositionValue == null) {
-                    lastMousePosition.value = mousePosition.value
-                    return@setOnAfterUpdateWorldTransforms
-                }
-                val mousePositionValue = mousePosition.value ?: return@setOnAfterUpdateWorldTransforms
+            val mousePositionValue = mousePosition.value ?: return@setOnAfterUpdateWorldTransforms
 
-                val dx = mousePositionValue.x - lastMousePositionValue.x
-                val dy = mousePositionValue.y - lastMousePositionValue.y
-                val position = Point(
-                    controller.skeleton.x.toInt(),
-                    controller.skeleton.y.toInt()
-                )
-                position.x += dx
-                position.y += dy
-                controller.skeleton.setPosition(position.x.toFloat(), position.y.toFloat());
-                lastMousePosition.value = mousePositionValue
-            }
-            .build()
+            val dx = mousePositionValue.x - lastMousePositionValue.x
+            val dy = mousePositionValue.y - lastMousePositionValue.y
+            val position = Point(
+                controller.skeleton.x.toInt(),
+                controller.skeleton.y.toInt()
+            )
+            position.x += dx
+            position.y += dy
+            controller.skeleton.setPosition(position.x.toFloat(), position.y.toFloat());
+            lastMousePosition.value = mousePositionValue
+        }
+        .build()
     }
 
     Scaffold(

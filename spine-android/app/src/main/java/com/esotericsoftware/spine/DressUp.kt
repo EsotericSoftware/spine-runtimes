@@ -75,11 +75,9 @@ fun DressUp(nav: NavHostController) {
     }
 
     val controller = remember {
-        SpineController.Builder()
-            .setOnInitialized {
-                it.animationState.setAnimation(0, "dance", true)
-            }
-            .build()
+        SpineController { controller ->
+            controller.animationState.setAnimation(0, "dance", true)
+        }
     }
 
     fun toggleSkin(skinName: String) {

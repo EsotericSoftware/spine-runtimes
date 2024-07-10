@@ -120,12 +120,12 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 
 	public SpineView (Context context, AttributeSet attrs) {
 		super(context, attrs);
-		this.controller = new SpineController();
+		// TODO Load controller & assets fro attrs
 	}
-
+	
 	public SpineView (Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
-		this.controller = new SpineController();
+		// TODO Load controller & assets fro attrs
 	}
 
 	public static SpineView loadFromAssets(String atlasFileName, String skeletonFileName, Context context, SpineController controller) {

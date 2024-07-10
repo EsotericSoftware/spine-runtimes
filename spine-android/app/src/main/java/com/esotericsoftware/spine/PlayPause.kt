@@ -26,12 +26,9 @@ fun PlayPause(
     nav: NavHostController
 ) {
     val controller = remember {
-        SpineController.Builder()
-            .setOnInitialized {
-                it.animationState.setAnimation(0, "flying", true)
-            }
-
-            .build()
+        SpineController { controller ->
+            controller.animationState.setAnimation(0, "flying", true)
+        }
     }
 
     val isPlaying = remember { mutableStateOf(controller.isPlaying) }

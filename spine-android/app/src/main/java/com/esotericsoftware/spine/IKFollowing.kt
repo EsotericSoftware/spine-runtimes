@@ -35,21 +35,20 @@ fun IKFollowing(nav: NavHostController) {
     val crossHairPosition = remember { mutableStateOf<Point?>(null) }
 
     val controller = remember {
-        SpineController.Builder()
-            .setOnInitialized {
-                it.animationState.setAnimation(0, "walk", true)
-                it.animationState.setAnimation(1, "aim", true)
-            }
-            .setOnAfterUpdateWorldTransforms {
-                val worldPosition = crossHairPosition.value ?: return@setOnAfterUpdateWorldTransforms
-                val skeleton = it.skeleton
-                val bone = skeleton.findBone("crosshair") ?: return@setOnAfterUpdateWorldTransforms
-                val parent = bone.parent ?: return@setOnAfterUpdateWorldTransforms
-                val position = parent.worldToLocal(Vector2(worldPosition.x.toFloat(), worldPosition.y.toFloat()))
-                bone.x = position.x
-                bone.y = position.y
-            }
-            .build()
+        SpineController.Builder { controller ->
+            controller.animationState.setAnimation(0, "walk", true)
+            controller.animationState.setAnimation(1, "aim", true)
+        }
+        .setOnAfterUpdateWorldTransforms {
+            val worldPosition = crossHairPosition.value ?: return@setOnAfterUpdateWorldTransforms
+            val skeleton = it.skeleton
+            val bone = skeleton.findBone("crosshair") ?: return@setOnAfterUpdateWorldTransforms
+            val parent = bone.parent ?: return@setOnAfterUpdateWorldTransforms
+            val position = parent.worldToLocal(Vector2(worldPosition.x.toFloat(), worldPosition.y.toFloat()))
+            bone.x = position.x
+            bone.y = position.y
+        }
+        .build()
     }
 
     Scaffold(

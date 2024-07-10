@@ -47,14 +47,13 @@ fun DebugRendering(nav: NavHostController) {
                     "spineboy.atlas",
                     "spineboy-pro.json",
                     context,
-                    SpineController.Builder()
-                        .setOnInitialized {
-                            it.animationState.setAnimation(0, "walk", true)
-                        }
-                        .setOnAfterPaint { controller, canvas, commands ->
-                            debugRenderer.render(controller.drawable, canvas, commands)
-                        }
-                        .build()
+                    SpineController.Builder { controller ->
+                        controller.animationState.setAnimation(0, "walk", true)
+                    }
+                    .setOnAfterPaint { controller, canvas, commands ->
+                        debugRenderer.render(controller.drawable, canvas, commands)
+                    }
+                    .build()
                 )
             },
             modifier = Modifier.padding(paddingValues)

@@ -17,15 +17,14 @@ import com.esotericsoftware.spine.android.utils.SpineControllerCallback;
 public class SpineController {
 
     public static class Builder {
-        private SpineControllerCallback onInitialized;
+        private final SpineControllerCallback onInitialized;
         private SpineControllerCallback onBeforeUpdateWorldTransforms;
         private SpineControllerCallback onAfterUpdateWorldTransforms;
         private SpineControllerBeforePaintCallback onBeforePaint;
         private SpineControllerAfterPaintCallback onAfterPaint;
 
-        public Builder setOnInitialized(SpineControllerCallback onInitialized) {
+        public Builder(SpineControllerCallback onInitialized) {
             this.onInitialized = onInitialized;
-            return this;
         }
 
         public Builder setOnBeforeUpdateWorldTransforms(SpineControllerCallback onBeforeUpdateWorldTransforms) {
@@ -49,8 +48,7 @@ public class SpineController {
         }
 
         public SpineController build() {
-            SpineController spineController = new SpineController();
-            spineController.onInitialized = onInitialized;
+            SpineController spineController = new SpineController(onInitialized);
             spineController.onBeforeUpdateWorldTransforms = onBeforeUpdateWorldTransforms;
             spineController.onAfterUpdateWorldTransforms = onAfterUpdateWorldTransforms;
             spineController.onBeforePaint = onBeforePaint;
@@ -59,7 +57,7 @@ public class SpineController {
         }
     }
 
-    private @Nullable SpineControllerCallback onInitialized;
+    private final SpineControllerCallback onInitialized;
     private @Nullable SpineControllerCallback onBeforeUpdateWorldTransforms;
     private @Nullable SpineControllerCallback onAfterUpdateWorldTransforms;
     private @Nullable SpineControllerBeforePaintCallback onBeforePaint;
@@ -70,6 +68,10 @@ public class SpineController {
     private double offsetY = 0;
     private double scaleX = 1;
     private double scaleY = 1;
+
+    public SpineController(SpineControllerCallback onInitialized) {
+        this.onInitialized = onInitialized;
+    }
 
     protected void init(AndroidSkeletonDrawable drawable) {
         this.drawable = drawable;
