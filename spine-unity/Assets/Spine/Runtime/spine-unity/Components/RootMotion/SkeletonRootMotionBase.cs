@@ -42,8 +42,7 @@ namespace Spine.Unity {
 
 		#region Inspector
 		[SpineBone]
-		[SerializeField]
-		protected string rootMotionBoneName = "root";
+		public string rootMotionBoneName = "root";
 		public bool transformPositionX = true;
 		public bool transformPositionY = true;
 		public bool transformRotation = false;
@@ -155,6 +154,14 @@ namespace Spine.Unity {
 		}
 
 		protected virtual void Start () {
+			Initialize();
+		}
+
+		protected void InitializeOnRebuild (ISkeletonAnimation animatedSkeletonComponent) {
+			Initialize();
+		}
+
+		public virtual void Initialize () {
 			skeletonComponent = GetComponent<ISkeletonComponent>();
 			GatherTopLevelBones();
 			SetRootMotionBone(rootMotionBoneName);
@@ -167,6 +174,9 @@ namespace Spine.Unity {
 			if (skeletonAnimation != null) {
 				skeletonAnimation.UpdateLocal -= HandleUpdateLocal;
 				skeletonAnimation.UpdateLocal += HandleUpdateLocal;
+
+				skeletonAnimation.OnAnimationRebuild -= InitializeOnRebuild;
+				skeletonAnimation.OnAnimationRebuild += InitializeOnRebuild;
 			}
 		}
 
@@ -271,7 +281,8 @@ namespace Spine.Unity {
 				this.rootMotionBone = bone;
 				FindTransformConstraintsAffectingBone();
 			} else {
-				Debug.Log("Bone named \"" + name + "\" could not be found.");
+				Debug.Log("Bone named \"" + name + "\" could not be found. " +
+					"Set 'skeletonRootMotion.rootMotionBoneName' before calling 'skeletonAnimation.Initialize(true)'.");
 				this.rootMotionBoneIndex = 0;
 				this.rootMotionBone = skeleton.RootBone;
 			}
