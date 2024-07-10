@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../../index.css">
+    <script src="https://unpkg.com/canvaskit-wasm@latest/bin/canvaskit.js"></script>
+    <script src="../dist/iife/spine-canvaskit.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body class="p-4 flex flex-col items-center">
+    <h1>IK Following</h1>
+    <p class="mb-4">Click/touch to set the aim</p>
+    <canvas id=foo style="margin: 0 auto; width: 600px; height: 400px;"></canvas>
+</body>
+
+<script type="module">
+    async function readFile(path) {
+        const response = await fetch(path);
+        if (!response.ok) throw new Error("Could not load file " + path);
+        return await response.arrayBuffer();
+    }
+
+    const canvasElement = document.querySelector("#foo");
+    const dpr = window.devicePixelRatio || 1;
+    canvasElement.width = canvasElement.clientWidth * dpr;
+    canvasElement.height = canvasElement.clientHeight * dpr;
+
+    const ck = await CanvasKitInit();
+    const surface = ck.MakeCanvasSurface('foo');
+    surface.getCanvas().scale(dpr, dpr);
+
+    const atlas = await spine.loadTextureAtlas(ck, "assets/spineboy.atlas", readFile);
+    const skeletonData = await spine.loadSkeletonData("assets/spineboy-pro.skel", atlas, readFile);
+    const drawable = new spine.SkeletonDrawable(skeletonData);
+    drawable.skeleton.scaleX = drawable.skeleton.scaleY = 0.5;
+    drawable.skeleton.x = 100;
+    drawable.skeleton.y = 380;
+
+    // Set the walk animation on track 0 and the aim animation on track 1
+    drawable.animationState.setAnimation(0, "walk", true);
+    drawable.animationState.setAnimation(1, "aim", true);
+
+    // Set up touch and mouse listeners on the canvas element
+    // and set the touch/mouse coordinate on the aim bone
+    const canvasElement = document.querySelector("#foo");
+    let mouseDown = false;
+    canvasElement.addEventListener("touchmove", (ev) => setCrosshairPosition(ev.changedTouches[0].clientX, ev.changedTouches[0].clientY));
+    canvasElement.addEventListener("mousedown", (ev) => {
+        mouseDown = true;
+        setCrosshairPosition(ev.clientX, ev.clientY);
+    });
+    canvasElement.addEventListener("mouseup", () => mouseDown = false)
+    canvasElement.addEventListener("mousemove", (ev) => {
+        if (mouseDown) setCrosshairPosition(ev.clientX, ev.clientY);
+    })
+
+    // Get the crosshair bone. We will adjust its position based on the
+    // touch/mouse coordinates
+    const crosshair = drawable.skeleton.findBone("crosshair");
+
+    // Sets the crosshair bone position based on the touch/mouse position
+    const setCrosshairPosition = (touchX, touchY) => {
+        const clientRect = canvasElement.getBoundingClientRect();
+        let x = touchX - clientRect.left;
+        let y = touchY - clientRect.top;
+
+        // Transform the touch/mouse position to the crosshair
+        // bone's parent bone coordinate system
+        const parent = crosshair.parent;
+        const parentPosition = new spine.Vector2(x, y);
+        parent.worldToLocal(parentPosition)
+
+        // Set the position on the bone (relative to its parent bone)
+        crosshair.x = parentPosition.x;
+        crosshair.y = parentPosition.y;
+    }
+
+
+    const renderer = new spine.SkeletonRenderer(ck);
+    let lastTime = performance.now();
+
+    function drawFrame(canvas) {
+        canvas.clear(ck.Color(52, 52, 54, 1));
+
+        const now = performance.now();
+        const deltaTime = (now - lastTime) / 1000;
+        lastTime = now;
+
+        drawable.update(deltaTime);
+        renderer.render(canvas, drawable);
+
+        surface.requestAnimationFrame(drawFrame);
+    }
+    surface.requestAnimationFrame(drawFrame);
+</script>
+
+</html>

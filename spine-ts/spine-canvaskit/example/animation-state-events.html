@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../../index.css">
+    <script src="https://unpkg.com/canvaskit-wasm@latest/bin/canvaskit.js"></script>
+    <script src="../dist/iife/spine-canvaskit.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body class="p-4 flex flex-col items-center">
+    <h1>Animation State Events</h1>
+    <p class="mb-4">Open the console in the developer tools to view events logs.</p>
+    <canvas id=foo style="margin: 0 auto; width: 600px; height: 400px;"></canvas>
+</body>
+
+<script type="module">
+    async function readFile(path) {
+        const response = await fetch(path);
+        if (!response.ok) throw new Error("Could not load file " + path);
+        return await response.arrayBuffer();
+    }
+
+    const canvasElement = document.querySelector("#foo");
+    const dpr = window.devicePixelRatio || 1;
+    canvasElement.width = canvasElement.clientWidth * dpr;
+    canvasElement.height = canvasElement.clientHeight * dpr;
+
+    const ck = await CanvasKitInit();
+    const surface = ck.MakeCanvasSurface('foo');
+    surface.getCanvas().scale(dpr, dpr);
+
+    const atlas = await spine.loadTextureAtlas(ck, "assets/spineboy.atlas", readFile);
+    const skeletonData = await spine.loadSkeletonData("assets/spineboy-pro.skel", atlas, readFile);
+    const drawable = new spine.SkeletonDrawable(skeletonData);
+    drawable.skeleton.scaleX = drawable.skeleton.scaleY = 0.4;
+    drawable.skeleton.x = 300;
+    drawable.skeleton.y = 380;
+
+    // Set the default mix to 0.2 seconds, queue animations, and set listeners
+    const animationState = drawable.animationState;
+    animationState.data.defaultMix = 0.2;
+    animationState.setAnimation(0, "walk", true).listener = {
+        start: (entry) => console.log("Walk animation started"),
+        end: (entry) => console.log("Walk animation ended"),
+    };
+    animationState.addAnimation(0, "jump", false, 2);
+    animationState.addAnimation(0, "run", true, 0).listener = {
+        event: (entry, event) => console.log(`Custom event "${event.data.name}"`)
+    };
+    animationState.addListener({
+        completed: (entry) => console.log(`Animation ${entry.animation.name} completed`)
+    });
+
+    const renderer = new spine.SkeletonRenderer(ck);
+    let lastTime = performance.now();
+    function drawFrame(canvas) {
+        canvas.clear(ck.Color(52, 52, 54, 1));
+
+        const now = performance.now();
+        const deltaTime = (now - lastTime) / 1000;
+        lastTime = now;
+
+        drawable.update(deltaTime);
+        renderer.render(canvas, drawable);
+
+        surface.requestAnimationFrame(drawFrame);
+    }
+    surface.requestAnimationFrame(drawFrame);
+</script>
+
+</html>

@@ -212,7 +212,7 @@ export class SpinePlayer implements Disposable {
 
 	private playTime = 0;
 	private selectedBones: (Bone | null)[] = [];
-	private cancelId = 0;
+	private cancelId: any = 0;
 	popup: Popup | null = null;
 
 	/* True if the player is unable to load or render the skeleton. */

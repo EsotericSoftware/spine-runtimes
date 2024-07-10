@@ -95,7 +95,7 @@ void USpineAtlasAsset::BeginDestroy() {
 
 class UETextureLoader : public TextureLoader {
 	void load(AtlasPage &page, const String &path) {
-		page.texture = (void*)(uintptr_t)page.index;
+		page.texture = (void *) (uintptr_t) page.index;
 	}
 
 	void unload(void *texture) {

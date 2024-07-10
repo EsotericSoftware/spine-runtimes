@@ -54,26 +54,30 @@ export class DarkSlotMesh extends DarkTintMesh implements ISlotMesh {
 
 		const vertLenght = (finalVerticesLength / (darkTint ? 12 : 8)) * 2;
 
-		if (this.geometry.getBuffer("aTextureCoord").data?.length !== vertLenght) {
-			this.geometry.getBuffer("aTextureCoord").data = new Float32Array(vertLenght);
+		const textureCoord = this.geometry.getBuffer("aTextureCoord");
+		if (textureCoord.data?.length !== vertLenght) {
+			textureCoord.data = new Float32Array(vertLenght);
 		}
 
-		if (this.geometry.getBuffer("aVertexPosition").data?.length !== vertLenght) {
-			this.geometry.getBuffer("aVertexPosition").data = new Float32Array(vertLenght);
+		const vertexCoord = this.geometry.getBuffer("aVertexPosition");
+		if (vertexCoord.data?.length !== vertLenght) {
+			vertexCoord.data = new Float32Array(vertLenght);
 		}
 
 		let vertIndex = 0;
 
+		let textureCoordData = textureCoord.data;
+		let vertexCoordData = vertexCoord.data;
 		for (let i = 0; i < finalVerticesLength; i += darkTint ? 12 : 8) {
 			let auxi = i;
 
-			this.geometry.getBuffer("aVertexPosition").data[vertIndex] = finalVertices[auxi++];
-			this.geometry.getBuffer("aVertexPosition").data[vertIndex + 1] = finalVertices[auxi++];
+			vertexCoordData[vertIndex] = finalVertices[auxi++];
+			vertexCoordData[vertIndex + 1] = finalVertices[auxi++];
 
 			auxi += 4; // color
 
-			this.geometry.getBuffer("aTextureCoord").data[vertIndex] = finalVertices[auxi++];
-			this.geometry.getBuffer("aTextureCoord").data[vertIndex + 1] = finalVertices[auxi++];
+			textureCoordData[vertIndex] = finalVertices[auxi++];
+			textureCoordData[vertIndex + 1] = finalVertices[auxi++];
 
 			vertIndex += 2;
 		}
@@ -101,18 +105,20 @@ export class DarkSlotMesh extends DarkTintMesh implements ISlotMesh {
 		this.blendMode = SpineTexture.toPixiBlending(slotBlendMode);
 		this.alpha = DarkSlotMesh.auxColor[3];
 
-		if (this.geometry.indexBuffer.data.length !== finalIndices.length) {
-			this.geometry.indexBuffer.data = new Uint32Array(finalIndices);
+		const indexBuffer = this.geometry.indexBuffer;
+		if (indexBuffer.data.length !== finalIndices.length) {
+			indexBuffer.data = new Uint32Array(finalIndices);
 		} else {
+			const indexBufferData = indexBuffer.data;
 			for (let i = 0; i < finalIndicesLength; i++) {
-				this.geometry.indexBuffer.data[i] = finalIndices[i];
+				indexBufferData[i] = finalIndices[i];
 			}
 		}
 
 		this.name = slotName;
 
-		this.geometry.getBuffer("aVertexPosition").update();
-		this.geometry.getBuffer("aTextureCoord").update();
-		this.geometry.indexBuffer.update();
+		textureCoord.update();
+		vertexCoord.update();
+		indexBuffer.update();
 	}
 }

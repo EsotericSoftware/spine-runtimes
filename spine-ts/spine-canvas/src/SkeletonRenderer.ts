@@ -178,12 +178,14 @@ export class SkeletonRenderer {
 		x2: number, y2: number, u2: number, v2: number) {
 		let ctx = this.ctx;
 
-		u0 *= img.width;
-		v0 *= img.height;
-		u1 *= img.width;
-		v1 *= img.height;
-		u2 *= img.width;
-		v2 *= img.height;
+		const width = img.width - 1;
+		const height = img.height - 1;
+		u0 *= width;
+		v0 *= height;
+		u1 *= width;
+		v1 *= height;
+		u2 *= width;
+		v2 *= height;
 
 		ctx.beginPath();
 		ctx.moveTo(x0, y0);
@@ -201,17 +203,19 @@ export class SkeletonRenderer {
 		u2 -= u0;
 		v2 -= v0;
 
-		var det = 1 / (u1 * v2 - u2 * v1),
+		let det = u1 * v2 - u2 * v1;
+		if (det == 0) return;
+		det = 1 / det;
 
-			// linear transformation
-			a = (v2 * x1 - v1 * x2) * det,
-			b = (v2 * y1 - v1 * y2) * det,
-			c = (u1 * x2 - u2 * x1) * det,
-			d = (u1 * y2 - u2 * y1) * det,
+		// linear transformation
+		const a = (v2 * x1 - v1 * x2) * det;
+		const b = (v2 * y1 - v1 * y2) * det;
+		const c = (u1 * x2 - u2 * x1) * det;
+		const d = (u1 * y2 - u2 * y1) * det;
 
-			// translation
-			e = x0 - a * u0 - c * v0,
-			f = y0 - b * u0 - d * v0;
+		// translation
+		const e = x0 - a * u0 - c * v0;
+		const f = y0 - b * u0 - d * v0;
 
 		ctx.save();
 		ctx.transform(a, b, c, d, e, f);

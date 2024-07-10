@@ -128,7 +128,7 @@ body { margin: 0px; }
 		this.startPlayer();
 	}
 
-	private timerId = 0;
+	private timerId: any = 0;
 	startPlayer () {
 		clearTimeout(this.timerId);
 		this.timerId = setTimeout(() => {

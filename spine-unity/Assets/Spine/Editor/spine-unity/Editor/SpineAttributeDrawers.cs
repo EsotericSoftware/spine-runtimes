@@ -152,9 +152,24 @@ namespace Spine.Unity.Editor {
 			Texture2D image = Icon;
 			GUIStyle usedStyle = IsValueValid(property) ? EditorStyles.popup : ErrorPopupStyle;
 			string propertyStringValue = (property.hasMultipleDifferentValues) ? SpineInspectorUtility.EmDash : property.stringValue;
-			if (GUI.Button(position, string.IsNullOrEmpty(propertyStringValue) ? NoneLabel(image) :
-				SpineInspectorUtility.TempContent(propertyStringValue, image), usedStyle))
-				Selector(property);
+
+			if (!TargetAttribute.avoidGenericMenu) {
+				if (GUI.Button(position, string.IsNullOrEmpty(propertyStringValue) ? NoneLabel(image) :
+					SpineInspectorUtility.TempContent(propertyStringValue, image), usedStyle))
+					Selector(property);
+			} else {
+				SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(false);
+				List<GUIContent> contentList = new List<GUIContent>();
+				List<string> valueList = new List<string>();
+				PopulatePopupList(ref contentList, ref valueList, image, property, TargetAttribute, skeletonData);
+				int currentIndex = valueList.IndexOf(propertyStringValue);
+				int previousIndex = currentIndex;
+				currentIndex = EditorGUI.Popup(position, currentIndex, contentList.ToArray());
+				if (previousIndex != currentIndex) {
+					property.stringValue = valueList[currentIndex];
+					property.serializedObject.ApplyModifiedProperties();
+				}
+			}
 		}
 
 		public ISkeletonComponent GetTargetSkeletonComponent (SerializedProperty property) {
@@ -190,6 +205,12 @@ namespace Spine.Unity.Editor {
 			if (serializedProperty.serializedObject.isEditingMultipleObjects) serializedProperty.stringValue = "oaifnoiasf��123526"; // HACK: to trigger change on multi-editing.
 			serializedProperty.stringValue = clickedItem.stringValue;
 			serializedProperty.serializedObject.ApplyModifiedProperties();
+		}
+
+		protected virtual void PopulatePopupList (ref List<GUIContent> contentList, ref List<string> valueList,
+			Texture2D image, SerializedProperty property, T targetAttribute, SkeletonData data) {
+			contentList.Add(new GUIContent("Type Not Supported"));
+			valueList.Add(string.Empty);
 		}
 
 		public override float GetPropertyHeight (SerializedProperty property, GUIContent label) {
@@ -302,6 +323,25 @@ namespace Spine.Unity.Editor {
 			}
 		}
 
+		protected override void PopulatePopupList (ref List<GUIContent> contentList, ref List<string> valueList,
+			Texture2D image, SerializedProperty property, SpineSkin targetAttribute, SkeletonData data) {
+
+			if (targetAttribute.includeNone) {
+				contentList.Add(new GUIContent(NoneStringConstant, image));
+				valueList.Add(string.Empty);
+			}
+
+			for (int i = 0; i < data.Skins.Count; i++) {
+				string name = data.Skins.Items[i].Name;
+				if (name.StartsWith(targetAttribute.startsWith, StringComparison.Ordinal)) {
+					bool isDefault = string.Equals(name, DefaultSkinName, StringComparison.Ordinal);
+					string choiceValue = TargetAttribute.defaultAsEmptyString && isDefault ? string.Empty : name;
+					contentList.Add(new GUIContent(name, image));
+					valueList.Add(choiceValue);
+				}
+			}
+		}
+
 	}
 
 	[CustomPropertyDrawer(typeof(SpineAnimation))]
@@ -345,6 +385,24 @@ namespace Spine.Unity.Editor {
 				string name = animations.Items[i].Name;
 				if (name.StartsWith(targetAttribute.startsWith, StringComparison.Ordinal))
 					menu.AddItem(new GUIContent(name), !property.hasMultipleDifferentValues && name == property.stringValue, HandleSelect, new SpineDrawerValuePair(name, property));
+			}
+		}
+
+		protected override void PopulatePopupList (ref List<GUIContent> contentList, ref List<string> valueList,
+			Texture2D image, SerializedProperty property, SpineAnimation targetAttribute, SkeletonData data) {
+
+			ExposedList<Animation> animations = data.Animations;
+			if (targetAttribute.includeNone) {
+				contentList.Add(new GUIContent(NoneString, image));
+				valueList.Add(string.Empty);
+			}
+
+			for (int i = 0; i < animations.Count; i++) {
+				string name = animations.Items[i].Name;
+				if (name.StartsWith(targetAttribute.startsWith, StringComparison.Ordinal)) {
+					contentList.Add(new GUIContent(name, image));
+					valueList.Add(name);
+				}
 			}
 		}
 

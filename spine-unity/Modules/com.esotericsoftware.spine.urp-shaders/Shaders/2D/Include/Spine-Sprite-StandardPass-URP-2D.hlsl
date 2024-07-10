@@ -109,7 +109,8 @@ half4 CombinedShapeLightFragment(VertexOutputSpriteURP2D input) : SV_Target
 #endif
 
 	half4 mask = SAMPLE_TEXTURE2D(_MaskTex, sampler_MaskTex, input.texcoord.xy);
-	main.rgb = main.a == 0 ? main.rgb : main.rgb / main.a; // un-premultiply for additive lights in CombinedShapeLightShared, reapply afterwards
+	// un-premultiply for additive lights in CombinedShapeLightShared, reapply afterwards
+	main.rgb = main.a < 0.001 ? main.rgb : main.rgb / main.a; // < epsilon prevents imprecision issues on some HW.
 #if UNITY_VERSION  < 202120
 	half4 pixel = half4(CombinedShapeLightShared(half4(main.rgb, 1), mask, input.lightingUV).rgb * main.a, main.a);
 #else

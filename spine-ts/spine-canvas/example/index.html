@@ -21,19 +21,19 @@
 		canvas = document.getElementById("canvas");
 		context = canvas.getContext("2d");
 		skeletonRenderer = new spine.SkeletonRenderer(context);
-		// skeletonRenderer.triangleRendering = true;
+		skeletonRenderer.triangleRendering = true;
 
 		// Load the assets.
-		assetManager = new spine.AssetManager("https://esotericsoftware.com/files/examples/4.0/spineboy/export/");
-		assetManager.loadText("spineboy-ess.json");
+		assetManager = new spine.AssetManager("assets/");
+		assetManager.loadBinary("spineboy-pro.skel");
 		assetManager.loadTextureAtlas("spineboy.atlas");
 		await assetManager.loadAll();
 
 		// Create the texture atlas and skeleton data.
 		let atlas = assetManager.require("spineboy.atlas");
 		let atlasLoader = new spine.AtlasAttachmentLoader(atlas);
-		let skeletonJson = new spine.SkeletonJson(atlasLoader);
-		let skeletonData = skeletonJson.readSkeletonData(assetManager.require("spineboy-ess.json"));
+		let skeletonBinary = new spine.SkeletonBinary(atlasLoader);
+		let skeletonData = skeletonBinary.readSkeletonData(assetManager.require("spineboy-pro.skel"));
 
 		// Instantiate a new skeleton based on the atlas and skeleton data.
 		skeleton = new spine.Skeleton(skeletonData);

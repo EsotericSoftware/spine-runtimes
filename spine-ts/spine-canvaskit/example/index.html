@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../../index.css">
+    <script src="https://unpkg.com/canvaskit-wasm@latest/bin/canvaskit.js"></script>
+    <script src="../dist/iife/spine-canvaskit.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body class="p-4 flex flex-col items-center">
+    <h1>CanvasKit Example</h1>
+    <canvas id=foo style="margin: 0 auto; width: 600px; height: 400px;"></canvas>
+</body>
+
+<script type="module">
+    // Function to read file contents from a path, used to load texture atlas and skeleton file.
+    async function readFile(path) {
+        const response = await fetch(path);
+        if (!response.ok) throw new Error("Could not load file " + path);
+        return await response.arrayBuffer();
+    }
+
+    // Ensure we render at full DPI.
+    const canvasElement = document.querySelector("#foo");
+    const dpr = window.devicePixelRatio || 1;
+    canvasElement.width = canvasElement.clientWidth * dpr;
+    canvasElement.height = canvasElement.clientHeight * dpr;
+
+    // Initialize CanvasKit and create a surface from the Canvas element to draw to
+    const ck = await CanvasKitInit();
+    const surface = ck.MakeCanvasSurface('foo');
+
+    // Scale the CanvasKit coordinate system
+    surface.getCanvas().scale(dpr, dpr);
+
+    // Load the texture atlas
+    const atlas = await spine.loadTextureAtlas(ck, "assets/spineboy.atlas", readFile);
+
+    // Load skeleton data
+    const skeletonData = await spine.loadSkeletonData("assets/spineboy-pro.skel", atlas, readFile);
+
+    // Create a drawable and scale and position the skeleton
+    const drawable = new spine.SkeletonDrawable(skeletonData);
+    drawable.skeleton.scaleX = drawable.skeleton.scaleY = 0.4;
+    drawable.skeleton.x = 300;
+    drawable.skeleton.y = 380;
+
+    // Set the "hoverboard" animation on the first track of the animation state.
+    drawable.animationState.setAnimation(0, "hoverboard", true);
+
+    // Create a skeleton renderer to render the skeleton with to the canvas
+    const renderer = new spine.SkeletonRenderer(ck);
+
+    let lastTime = performance.now();
+    // Rendering loop
+    function drawFrame(canvas) {
+        // Clear the canvas
+        canvas.clear(ck.Color(52, 52, 54, 1));
+
+        // Calculate the time that's passed between now and the last frame
+        const now = performance.now();
+        const deltaTime = (now - lastTime) / 1000;
+        lastTime = now;
+
+        // Update the drawable, which will advance the animation(s)
+        // apply them to the skeleton, and update the skeleton's pose.
+        drawable.update(deltaTime);
+
+        // Render the skeleton to the canvas
+        renderer.render(canvas, drawable);
+
+        // Request the next frame
+        surface.requestAnimationFrame(drawFrame);
+    }
+    surface.requestAnimationFrame(drawFrame);
+</script>
+
+</html>

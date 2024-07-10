@@ -1,6 +1,6 @@
 {
   "name": "@esotericsoftware/spine-ts",
-  "version": "4.2.48",
+  "version": "4.2.56",
   "description": "The official Spine Runtimes for the web.",
   "type": "module",
   "files": [
@@ -8,21 +8,23 @@
   ],
   "scripts": {
     "prepublish": "npm run clean && npm run build",
-    "clean": "npx rimraf spine-core/dist spine-canvas/dist spine-webgl/dist spine-phaser/dist spine-player/dist spine-threejs/dist spine-pixi/dist",
-    "build": "npm run clean && npm run build:modules && concurrently \"npm run build:core\" \"npm run build:canvas\" \"npm run build:webgl\" \"npm run build:phaser\" \"npm run build:player\" \"npm run build:threejs\" \"npm run build:pixi\"",
+    "clean": "npx rimraf spine-core/dist spine-canvas/dist spine-canvaskit/dist spine-webgl/dist spine-phaser/dist spine-player/dist spine-threejs/dist spine-pixi/dist",
+    "build": "npm run clean && npm run build:modules && concurrently \"npm run build:core\" \"npm run build:canvas\" \"npm run build:canvaskit\" \"npm run build:webgl\" \"npm run build:phaser\" \"npm run build:player\" \"npm run build:threejs\" \"npm run build:pixi\"",
     "postbuild": "npm run minify",
     "build:modules": "npx tsc -b -clean && npx tsc -b",
     "build:core": "npx esbuild --bundle spine-core/src/index.ts --tsconfig=spine-core/tsconfig.json  --sourcemap --outfile=spine-core/dist/iife/spine-core.js --format=iife --global-name=spine",
     "build:canvas": "npx esbuild --bundle spine-canvas/src/index.ts --tsconfig=spine-canvas/tsconfig.json  --sourcemap --outfile=spine-canvas/dist/iife/spine-canvas.js --format=iife --global-name=spine",
+    "build:canvaskit": "npx esbuild --bundle spine-canvaskit/src/index.ts --tsconfig=spine-canvaskit/tsconfig.json  --sourcemap --outfile=spine-canvaskit/dist/iife/spine-canvaskit.js --external:canvaskit-wasm --format=iife --global-name=spine",
     "build:webgl": "npx esbuild --bundle spine-webgl/src/index.ts --tsconfig=spine-webgl/tsconfig.json  --sourcemap --outfile=spine-webgl/dist/iife/spine-webgl.js --format=iife --global-name=spine",
     "build:player": "npx copyfiles -f spine-player/css/spine-player.css spine-player/dist/ && npx esbuild spine-player/dist/spine-player.css --minify --outfile=spine-player/dist/spine-player.min.css && npx esbuild --bundle spine-player/src/index.ts --tsconfig=spine-player/tsconfig.json  --sourcemap --outfile=spine-player/dist/iife/spine-player.js --format=iife --global-name=spine",
     "build:phaser": "npx esbuild  --bundle spine-phaser/src/index.ts  --tsconfig=spine-phaser/tsconfig.json   --sourcemap --outfile=spine-phaser/dist/iife/spine-phaser.js   --external:Phaser --alias:phaser=Phaser --format=iife --global-name=spine",
     "build:threejs": "npx esbuild --bundle spine-threejs/src/index.ts --tsconfig=spine-threejs/tsconfig.json  --sourcemap --outfile=spine-threejs/dist/iife/spine-threejs.js --external:three --format=iife --global-name=spine",
     "build:pixi": "npx esbuild --bundle spine-pixi/src/index.ts --tsconfig=spine-pixi/tsconfig.json  --sourcemap --outfile=spine-pixi/dist/iife/spine-pixi.js --external:@pixi/* --format=iife --global-name=spine",
-    "minify": "npx esbuild --minify spine-core/dist/iife/spine-core.js --outfile=spine-core/dist/iife/spine-core.min.js && npx esbuild --minify spine-canvas/dist/iife/spine-canvas.js --outfile=spine-canvas/dist/iife/spine-canvas.min.js && npx esbuild --minify spine-player/dist/iife/spine-player.js --outfile=spine-player/dist/iife/spine-player.min.js && npx esbuild --minify spine-phaser/dist/iife/spine-phaser.js --outfile=spine-phaser/dist/iife/spine-phaser.min.js && npx esbuild --minify spine-webgl/dist/iife/spine-webgl.js --outfile=spine-webgl/dist/iife/spine-webgl.min.js && npx esbuild --minify spine-threejs/dist/iife/spine-threejs.js --outfile=spine-threejs/dist/iife/spine-threejs.min.js && npx esbuild --minify spine-pixi/dist/iife/spine-pixi.js --outfile=spine-pixi/dist/iife/spine-pixi.min.js",
-    "dev": "concurrently \"npx live-server\" \"npm run dev:canvas\" \"npm run dev:webgl\" \"npm run dev:phaser\" \"npm run dev:player\" \"npm run dev:threejs\" \"npm run dev:pixi\"",
+    "minify": "npx esbuild --minify spine-core/dist/iife/spine-core.js --outfile=spine-core/dist/iife/spine-core.min.js && npx esbuild --minify spine-canvas/dist/iife/spine-canvas.js --outfile=spine-canvas/dist/iife/spine-canvas.min.js && npx esbuild --minify spine-canvaskit/dist/iife/spine-canvaskit.js --outfile=spine-canvaskit/dist/iife/spine-canvaskit.min.js && npx esbuild --minify spine-player/dist/iife/spine-player.js --outfile=spine-player/dist/iife/spine-player.min.js && npx esbuild --minify spine-phaser/dist/iife/spine-phaser.js --outfile=spine-phaser/dist/iife/spine-phaser.min.js && npx esbuild --minify spine-webgl/dist/iife/spine-webgl.js --outfile=spine-webgl/dist/iife/spine-webgl.min.js && npx esbuild --minify spine-threejs/dist/iife/spine-threejs.js --outfile=spine-threejs/dist/iife/spine-threejs.min.js && npx esbuild --minify spine-pixi/dist/iife/spine-pixi.js --outfile=spine-pixi/dist/iife/spine-pixi.min.js",
+    "dev": "concurrently \"npx live-server\" \"npm run dev:canvas\" \"npm run dev:canvaskit\" \"npm run dev:webgl\" \"npm run dev:phaser\" \"npm run dev:player\" \"npm run dev:threejs\" \"npm run dev:pixi\" \"npm run dev:modules\"",
     "dev:modules": "npm run build:modules -- --watch",
     "dev:canvas": "npm run build:canvas -- --watch",
+    "dev:canvaskit": "npm run build:canvaskit -- --watch",
     "dev:webgl": "npm run build:webgl -- --watch",
     "dev:phaser": "npm run build:phaser -- --watch",
     "dev:player": "npm run build:player -- --watch",
@@ -55,18 +57,19 @@
     "spine-player",
     "spine-threejs",
     "spine-pixi",
+    "spine-canvaskit",
     "spine-webgl"
   ],
   "devDependencies": {
     "@types/offscreencanvas": "^2019.6.4",
+    "@types/three": "^0.146.0",
     "concurrently": "^7.6.0",
     "copyfiles": "^2.4.1",
     "esbuild": "^0.16.4",
     "live-server": "^1.2.2",
+    "phaser": "^3.60.0",
     "rimraf": "^3.0.2",
-    "typescript": "^4.9.4",
-    "@types/three": "^0.146.0",
     "three": "^0.146.0",
-    "phaser": "^3.60.0"
+    "typescript": "^4.9.4"
   }
 }

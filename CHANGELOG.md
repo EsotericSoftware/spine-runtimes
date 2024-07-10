@@ -160,6 +160,7 @@
   - All Spine Outline shaders, including the URP outline shader, now provide an additional parameter `Width in Screen Space`. Enable it to keep the outline width constant in screen space instead of texture space. Requires more expensive computations, so enable only where necessary. Defaults to `disabled` to maintain existing behaviour.
   - Added support for BlendModeMaterials at runtime instantiation from files via an additional method `SkeletonDataAsset.SetupRuntimeBlendModeMaterials`. See example scene `Spine Examples/Other Examples/Instantiate from Script` for a usage example.
   - SkeletonGraphic: You can now offset the skeleton mesh relative to the pivot via a newly added green circle handle. This allows you to e.g. frame only the face of a skeleton inside a masked frame. Previously offsetting the pivot downwards fails when `Layout Scale Mode` scales the mesh smaller and towards the pivot (e.g. the feet) and thus out of the frame. Now you can keep the pivot in the center of the `RectTransform` while offsetting only the mesh downwards, keeping the desired skeleton area (e.g. the face) centered while resizing. Moving the new larger green circle handle moves the mesh offset, while moving the blue pivot circle handle moves the pivot as usual.
+  - `Universal Render Pipeline/Spine/Skeleton` shader now performs proper alpha-testing when `Depth Write` is enabled, using the existing `Shadow alpha cutoff` parameter.
 
 - **Breaking changes**
 
@@ -172,7 +173,6 @@
   - Inspector: String attribute `SpineSkin()` now allows to include `<None>` in the list of parameters. Previously the `includeNone=true` parameter of the `SpineSkin()` attribute defaulted to `true` but was ignored. Now it defaults to `false` and has an effect on the list. Only the Inspector GUI is affected by this behaviour change.
   - `SkeletonGraphicRenderTexture` example component: `protected RawImage quadRawImage` was changed to `protected SkeletonSubmeshGraphic quadMaskableGraphic` for a bugfix. This is only relevant for subclasses of `SkeletonGraphicRenderTexture` or when querying the `RawImage` component via e.g. `skeletonGraphicRenderTexture.quad.GetComponent<RawImage>()`.
   - Fixed a bug where when Linear color space is used and `PMA vertex colors` enabled, additive slots add a too dark (too transparent) color value. If you want the old incorrect behaviour (darker additive slots) or are not using Linear but Gamma color space, you can comment-out the define `LINEAR_COLOR_SPACE_FIX_ADDITIVE_ALPHA` in `MeshGenerator.cs` to deactivate the fix or just to skip unnecessary instructions.
-
 
 - **Changes of default values**
 
@@ -259,6 +259,10 @@
 - Added physics examples
 
 ### Canvas backend
+
+### CanvasKit backend
+
+- Added spine-canvaskit runtime. See https://esotericsoftware.com/spine-canvaskit
 
 ### Three.js backend
 
@@ -418,6 +422,7 @@
 
   - Made `SkeletonGraphic.unscaledTime` parameter protected, use the new property `UnscaledTime` instead.
   - `SkeletonGraphic` `OnRebuild` callback delegate is now issued after the skeleton has been initialized, before the `AnimationState` component is initialized. This makes behaviour consistent with `SkeletonAnimation` and `SkeletonMecanim` component behaviour. Use the new callback `OnAnimationRebuild` if you want to receive a callback after the `SkeletonGraphic` `AnimationState` has been initialized.
+  - Changed name of prefab skeleton meshes stored at prefabs from `Skeleton Prefab Mesh "name"` to `Skeleton Prefab Mesh [name]` to avoid issues with quotes in mesh asset names (see [this issue](https://github.com/EsotericSoftware/spine-runtimes/issues/2572)). Likely this change poses no problems at all, however if you are parsing the prefab's mesh name for whatever reason, be sure to adjust the pattern accordingly.
 
 - **Changes of default values**
 

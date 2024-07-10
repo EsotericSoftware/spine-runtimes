@@ -139,7 +139,7 @@ Shader "Universal Render Pipeline/2D/Spine/Skeleton Lit" {
 					return main;
 				#endif
 				// un-premultiply for additive lights in CombinedShapeLightShared, reapply afterwards
-				main.rgb = main.a == 0 ? main.rgb : main.rgb / main.a;
+				main.rgb = main.a < 0.001 ? main.rgb : main.rgb / main.a;
 			#else
 				#if !defined(_LIGHT_AFFECTS_ADDITIVE)
 				if (i.color.a == 0) {
@@ -149,10 +149,10 @@ Shader "Universal Render Pipeline/2D/Spine/Skeleton Lit" {
 
 				#if !defined(_STRAIGHT_ALPHA_INPUT)
 				// un-premultiply for additive lights in CombinedShapeLightShared, reapply afterwards
-				tex.rgb = tex.a == 0 ? tex.rgb : tex.rgb / tex.a;
+				tex.rgb = tex.a < 0.001 ? tex.rgb : tex.rgb / tex.a; // < epsilon prevents imprecision issues on some HW.
 				#endif
 				half4 main = tex * i.color;
-			#endif
+				#endif
 				half4 mask = SAMPLE_TEXTURE2D(_MaskTex, sampler_MaskTex, i.uv);
 			#if UNITY_VERSION  < 202120
 				return half4(CombinedShapeLightShared(half4(main.rgb, 1), mask, i.lightingUV).rgb * main.a, main.a);

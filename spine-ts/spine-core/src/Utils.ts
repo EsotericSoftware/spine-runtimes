@@ -87,10 +87,8 @@ export class StringSet {
 	}
 }
 
-export interface NumberArrayLike {
-	readonly length: number;
-	[n: number]: number;
-}
+export type NumberArrayLike = Array<number> | Float32Array;
+export type IntArrayLike = Array<number> | Int16Array;
 
 export interface Disposable {
 	dispose (): void;
@@ -313,7 +311,7 @@ export class Utils {
 		}
 	}
 
-	static newShortArray (size: number): NumberArrayLike {
+	static newShortArray (size: number): IntArrayLike {
 		if (Utils.SUPPORTS_TYPED_ARRAYS)
 			return new Int16Array(size)
 		else {
