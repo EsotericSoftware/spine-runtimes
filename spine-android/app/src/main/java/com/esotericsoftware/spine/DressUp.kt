@@ -84,10 +84,10 @@ fun DressUp(nav: NavHostController) {
         selectedSkins[skinName] = !(selectedSkins[skinName] ?: false)
         drawable.skeleton.setSkin("default")
         customSkin.value = Skin("custom-skin");
-        for (skinName2 in selectedSkins.keys) {
-            if (selectedSkins[skinName2] == true) {
-                val skin = drawable.skeletonData.findSkin(skinName)
-                if (skin != null) customSkin.value?.addSkin(skin)
+        for (selectedSkinKey in selectedSkins.keys) {
+            if (selectedSkins[selectedSkinKey] == true) {
+                val selectedSkin = drawable.skeletonData.findSkin(selectedSkinKey)
+                if (selectedSkin != null) customSkin.value?.addSkin(selectedSkin)
             }
         }
         val customSkinValue = customSkin.value
