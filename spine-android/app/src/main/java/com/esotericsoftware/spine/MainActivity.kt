@@ -1,5 +1,6 @@
 package com.esotericsoftware.spine
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -19,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -129,6 +131,10 @@ fun Samples(
             .padding(8.dp)
             .padding(paddingValues)
     ) {
+        item {
+            Text(text = "Kotlin + Jetpack Compose", Modifier.padding(8.dp))
+        }
+
         samples.forEach {
             item {
                 Card(
@@ -139,6 +145,28 @@ fun Samples(
                 ) {
                     Text(text = it.title, Modifier.padding(24.dp))
                 }
+            }
+        }
+
+        item {
+            Text(text = "Java + XML", Modifier.padding(8.dp))
+        }
+
+        item {
+            Card(
+                Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = {
+                        nav.context.startActivity(
+                            Intent(
+                                nav.context,
+                                SimpleAnimationActivity::class.java
+                            )
+                        )
+                    }),
+                shape = MaterialTheme.shapes.large
+            ) {
+                Text(text = "Simple Animation", Modifier.padding(24.dp))
             }
         }
     }

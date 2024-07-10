@@ -152,12 +152,12 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 
 	public SpineView (Context context, AttributeSet attrs) {
 		super(context, attrs);
-		// TODO Load controller & assets fro attrs
+		// Set properties by view id
 	}
-	
+
 	public SpineView (Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
-		// TODO Load controller & assets fro attrs
+		// Set properties by view id
 	}
 
 	public static SpineView loadFromAssets(String atlasFileName, String skeletonFileName, Context context, SpineController controller) {
@@ -253,7 +253,7 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 	@Override
 	public void onDraw (@NonNull Canvas canvas) {
 		super.onDraw(canvas);
-		if (!controller.isInitialized()) {
+		if (controller == null || !controller.isInitialized()) {
 			return;
 		}
 
@@ -284,6 +284,9 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 	}
 
 	private void updateCanvasTransform() {
+		if (controller == null) {
+			return;
+		}
 		x = (float) (-computedBounds.getX() - computedBounds.getWidth() / 2.0 - (alignment.getX() * computedBounds.getWidth() / 2.0));
 		y = (float) (-computedBounds.getY() - computedBounds.getHeight() / 2.0 - (alignment.getY() * computedBounds.getHeight() / 2.0));
 
