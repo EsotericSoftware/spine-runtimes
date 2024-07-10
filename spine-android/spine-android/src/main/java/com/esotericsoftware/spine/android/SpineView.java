@@ -33,6 +33,7 @@ import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.spine.android.bounds.Alignment;
 import com.esotericsoftware.spine.android.bounds.Bounds;
 import com.esotericsoftware.spine.android.bounds.BoundsProvider;
+import com.esotericsoftware.spine.android.bounds.ContentMode;
 import com.esotericsoftware.spine.android.bounds.SetupPoseBounds;
 import com.esotericsoftware.spine.android.utils.AndroidSkeletonDrawableLoader;
 
@@ -58,8 +59,13 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 		private String skeletonFileName;
 		private File atlasFile;
 		private File skeletonFile;
+		private URL atlasUrl;
+		private URL skeletonUrl;
+		private File targetDirectory;
+		private AndroidSkeletonDrawable drawable;
 		private BoundsProvider boundsProvider = new SetupPoseBounds();
 		private Alignment alignment = Alignment.CENTER;
+		private ContentMode contentMode = ContentMode.FIT;
 
 		public Builder(Context context, SpineController controller) {
 			this.context = context;
@@ -78,8 +84,25 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 			return this;
 		}
 
+		public Builder setLoadFromHttp(URL atlasUrl, URL skeletonUrl, File targetDirectory) {
+			this.atlasUrl = atlasUrl;
+			this.skeletonUrl = skeletonUrl;
+			this.targetDirectory = targetDirectory;
+			return this;
+		}
+
+		public Builder setLoadFromDrawable(AndroidSkeletonDrawable drawable) {
+			this.drawable = drawable;
+			return this;
+		}
+
 		public Builder setBoundsProvider(BoundsProvider boundsProvider) {
 			this.boundsProvider = boundsProvider;
+			return this;
+		}
+
+		public Builder setContentMode(ContentMode contentMode) {
+			this.contentMode = contentMode;
 			return this;
 		}
 
@@ -92,10 +115,15 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 			SpineView spineView = new SpineView(context, controller);
 			spineView.boundsProvider = boundsProvider;
 			spineView.alignment = alignment;
+			spineView.contentMode = contentMode;
 			if (atlasFileName != null && skeletonFileName != null) {
 				spineView.loadFromAsset(atlasFileName, skeletonFileName);
 			} else if (atlasFile != null && skeletonFile != null) {
 				spineView.loadFromFile(atlasFile, skeletonFile);
+			} else if (atlasUrl != null && skeletonUrl != null && targetDirectory != null) {
+				spineView.loadFromHttp(atlasUrl, skeletonUrl, targetDirectory);
+			} else if (drawable != null) {
+				spineView.loadFromDrawable(drawable);
 			}
 			return spineView;
 		}
@@ -109,15 +137,13 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 	private float scaleY = 1;
 	private float x = 0;
 	private float y = 0;
-
 	private final SkeletonRenderer renderer = new SkeletonRenderer();
 	private Bounds computedBounds = new Bounds();
 
-	SpineController controller;
-
-	BoundsProvider boundsProvider = new SetupPoseBounds();
-
-	Alignment alignment = Alignment.CENTER;
+	private SpineController controller;
+	private BoundsProvider boundsProvider = new SetupPoseBounds();
+	private Alignment alignment = Alignment.CENTER;
+	private ContentMode contentMode = ContentMode.FIT;
 
 	public SpineView (Context context, SpineController controller) {
 		super(context);
@@ -158,10 +184,6 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 		return spineView;
 	}
 
-	public void setController(SpineController controller) {
-		this.controller = controller;
-	}
-
 	public void loadFromAsset(String atlasFileName, String skeletonFileName) {
 		loadFrom(() -> AndroidSkeletonDrawable.fromAsset(atlasFileName, skeletonFileName, getContext()));
 	}
@@ -176,6 +198,41 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 
 	public void loadFromDrawable(AndroidSkeletonDrawable drawable) {
 		loadFrom(() -> drawable);
+	}
+
+	public SpineController getController() {
+		return controller;
+	}
+
+	public void setController(SpineController controller) {
+		this.controller = controller;
+	}
+
+	public Alignment getAlignment() {
+		return alignment;
+	}
+
+	public void setAlignment(Alignment alignment) {
+		this.alignment = alignment;
+		updateCanvasTransform();
+	}
+
+	public ContentMode getContentMode() {
+		return contentMode;
+	}
+
+	public void setContentMode(ContentMode contentMode) {
+		this.contentMode = contentMode;
+		updateCanvasTransform();
+	}
+
+	public BoundsProvider getBoundsProvider() {
+		return boundsProvider;
+	}
+
+	public void setBoundsProvider(BoundsProvider boundsProvider) {
+		this.boundsProvider = boundsProvider;
+		updateCanvasTransform();
 	}
 
 	private void loadFrom(AndroidSkeletonDrawableLoader loader) {
@@ -230,9 +287,14 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 		x = (float) (-computedBounds.getX() - computedBounds.getWidth() / 2.0 - (alignment.getX() * computedBounds.getWidth() / 2.0));
 		y = (float) (-computedBounds.getY() - computedBounds.getHeight() / 2.0 - (alignment.getY() * computedBounds.getHeight() / 2.0));
 
-		// contain
-		scaleX = scaleY = (float) Math.min(getWidth() / computedBounds.getWidth(), getHeight() / computedBounds.getHeight());
-
+		switch (contentMode) {
+			case FIT:
+				scaleX = scaleY = (float) Math.min(getWidth() / computedBounds.getWidth(), getHeight() / computedBounds.getHeight());
+				break;
+			case FILL:
+				scaleX = scaleY = (float) Math.max(getWidth() / computedBounds.getWidth(), getHeight() / computedBounds.getHeight());
+				break;
+		}
 		offsetX = (float) (getWidth() / 2.0 + (alignment.getX() * getWidth() / 2.0));
 		offsetY = (float) (getHeight() / 2.0 + (alignment.getY() * getHeight() / 2.0));
 

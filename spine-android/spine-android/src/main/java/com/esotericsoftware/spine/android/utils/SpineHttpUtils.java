@@ -2,8 +2,6 @@ package com.esotericsoftware.spine.android.utils;
 
 import android.os.Build;
 
-import com.esotericsoftware.spine.android.AndroidTextureAtlas;
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;

@@ -25,6 +25,7 @@ import androidx.navigation.NavHostController
 import com.badlogic.gdx.math.Vector2
 import com.esotericsoftware.spine.android.SpineController
 import com.esotericsoftware.spine.android.SpineView
+import com.esotericsoftware.spine.android.bounds.Alignment
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -100,7 +101,9 @@ fun IKFollowing(nav: NavHostController) {
                         "spineboy-pro.json",
                         context,
                         controller
-                    )
+                    ).apply {
+                        alignment = Alignment.CENTER_LEFT
+                    }
                 }
             )
         }
