@@ -209,6 +209,12 @@ public class SkeletonRenderer {
 	public void render (Canvas canvas, Array<RenderCommand> commands) {
 		for (int i = 0; i < commands.size; i++) {
 			RenderCommand command = commands.get(i);
+
+			// TODO: Happens when deselecting last skin in DressUp sample
+			if (command.texture == null) {
+				break;
+			}
+
 			canvas.drawVertices(Canvas.VertexMode.TRIANGLES, command.vertices.size, command.vertices.items, 0, command.uvs.items, 0,
 				command.colors.items, 0, command.indices.items, 0, command.indices.size, command.texture.getPaint(command.blendMode));
 		}
