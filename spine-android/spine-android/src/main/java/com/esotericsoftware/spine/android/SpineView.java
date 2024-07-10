@@ -54,11 +54,24 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 	public static class Builder {
 		private final Context context;
 
+		private final SpineController controller;
+
+		private String atlasFileName;
+
+		private String skeletonFileName;
+
 		private BoundsProvider boundsProvider = new SetupPoseBounds();
 		private Alignment alignment = Alignment.CENTER;
 
-		public Builder(Context context) {
+		public Builder(Context context, SpineController controller) {
 			this.context = context;
+			this.controller = controller;
+		}
+
+		public Builder setLoadFromAssets(String atlasFileName, String skeletonFileName) {
+			this.atlasFileName = atlasFileName;
+			this.skeletonFileName = skeletonFileName;
+			return this;
 		}
 
 		public Builder setBoundsProvider(BoundsProvider boundsProvider) {
@@ -72,9 +85,12 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 		}
 
 		public SpineView build() {
-			SpineView spineView = new SpineView(context);
+			SpineView spineView = new SpineView(context, controller);
 			spineView.boundsProvider = boundsProvider;
 			spineView.alignment = alignment;
+			if (atlasFileName != null && skeletonFileName != null) {
+				spineView.loadFromAsset(atlasFileName, skeletonFileName);
+			}
 			return spineView;
 		}
 	}
@@ -97,35 +113,50 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 
 	Alignment alignment = Alignment.CENTER;
 
-	public SpineView (Context context) {
+	public SpineView (Context context, SpineController controller) {
 		super(context);
+		this.controller = controller;
 	}
 
 	public SpineView (Context context, AttributeSet attrs) {
 		super(context, attrs);
+		this.controller = new SpineController();
 	}
 
 	public SpineView (Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
+		this.controller = new SpineController();
 	}
 
-	public void loadFromAsset(String atlasFileName, String skeletonFileName, SpineController controller) {
+	public static SpineView loadFromAssets(String atlasFileName, String skeletonFileName, Context context, SpineController controller) {
+		SpineView spineView = new SpineView(context, controller);
+		spineView.loadFromAsset(atlasFileName, skeletonFileName);
+		return spineView;
+	}
+
+	public static SpineView loadFromDrawable(AndroidSkeletonDrawable drawable, Context context, SpineController controller) {
+		SpineView spineView = new SpineView(context, controller);
+		spineView.loadFromDrawable(drawable);
+		return spineView;
+	}
+
+	public void setController(SpineController controller) {
 		this.controller = controller;
+	}
+
+	public void loadFromAsset(String atlasFileName, String skeletonFileName) {
 		loadFrom(() -> AndroidSkeletonDrawable.fromAsset(atlasFileName, skeletonFileName, getContext()));
 	}
 
-	public void loadFromFile(File atlasFile, File skeletonFile, SpineController controller) {
-		this.controller = controller;
+	public void loadFromFile(File atlasFile, File skeletonFile) {
 		loadFrom(() -> AndroidSkeletonDrawable.fromFile(atlasFile, skeletonFile));
 	}
 
-	public void loadFromHttp(URL atlasUrl, URL skeletonUrl, SpineController controller) {
-		this.controller = controller;
+	public void loadFromHttp(URL atlasUrl, URL skeletonUrl) {
 		loadFrom(() -> AndroidSkeletonDrawable.fromHttp(atlasUrl, skeletonUrl));
 	}
 
-	public void loadFromDrawable(AndroidSkeletonDrawable drawable, SpineController controller) {
-		this.controller = controller;
+	public void loadFromDrawable(AndroidSkeletonDrawable drawable) {
 		loadFrom(() -> drawable);
 	}
 

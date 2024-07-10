@@ -35,18 +35,17 @@ fun SimpleAnimation(nav: NavHostController) {
         }
     ) { paddingValues ->
         AndroidView(
-            factory = { ctx ->
-                SpineView(ctx).apply {
-                    loadFromAsset(
-                        "spineboy.atlas",
-                        "spineboy-pro.json",
-                        SpineController.Builder()
-                            .setOnInitialized {
-                                it.animationState.setAnimation(0, "walk", true)
-                            }
-                            .build()
-                    )
-                }
+            factory = { context ->
+                SpineView.loadFromAssets(
+                    "spineboy.atlas",
+                    "spineboy-pro.json",
+                    context,
+                    SpineController.Builder()
+                        .setOnInitialized {
+                            it.animationState.setAnimation(0, "walk", true)
+                        }
+                        .build()
+                )
             },
             modifier = Modifier.padding(paddingValues)
         )

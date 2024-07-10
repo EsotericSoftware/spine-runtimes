@@ -62,16 +62,10 @@ fun PlayPause(
 
         AndroidView(
             factory = { ctx ->
-                SpineView.Builder(ctx)
+                SpineView.Builder(ctx, controller)
+                    .setLoadFromAssets("dragon.atlas", "dragon-ess.skel")
                     .setBoundsProvider(SkinAndAnimationBounds("flying"))
                     .build()
-                    .apply {
-                        loadFromAsset(
-                            "dragon.atlas",
-                            "dragon-ess.skel",
-                            controller
-                        )
-                    }
             },
             modifier = Modifier.padding(paddingValues)
         )

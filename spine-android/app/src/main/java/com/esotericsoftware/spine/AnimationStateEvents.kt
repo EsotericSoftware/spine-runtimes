@@ -133,14 +133,13 @@ fun AnimationState(nav: NavHostController) {
         ) {
             Text("See output in console!")
             AndroidView(
-                factory = { ctx ->
-                    SpineView(ctx).apply {
-                        loadFromAsset(
-                            "spineboy.atlas",
-                            "spineboy-pro.json",
-                            controller
-                        )
-                    }
+                factory = { context ->
+                    SpineView.loadFromAssets(
+                        "spineboy.atlas",
+                        "spineboy-pro.json",
+                        context,
+                        controller
+                    )
                 }
             )
         }

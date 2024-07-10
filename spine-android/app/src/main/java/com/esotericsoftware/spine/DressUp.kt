@@ -163,10 +163,8 @@ fun DressUp(nav: NavHostController) {
                 }
             }
             AndroidView(
-                factory = { ctx ->
-                    SpineView(ctx).apply {
-                        loadFromDrawable(drawable, controller)
-                    }
+                factory = { context ->
+                    SpineView.loadFromDrawable(drawable, context, controller)
                 },
                 modifier = Modifier.padding(paddingValues)
             )

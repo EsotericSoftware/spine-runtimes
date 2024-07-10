@@ -42,21 +42,20 @@ fun DebugRendering(nav: NavHostController) {
         }
     ) { paddingValues ->
         AndroidView(
-            factory = { ctx ->
-                SpineView(ctx).apply {
-                    loadFromAsset(
-                        "spineboy.atlas",
-                        "spineboy-pro.json",
-                        SpineController.Builder()
-                            .setOnInitialized {
-                                it.animationState.setAnimation(0, "walk", true)
-                            }
-                            .setOnAfterPaint { controller, canvas, commands ->
-                                debugRenderer.render(controller.drawable, canvas, commands)
-                            }
-                            .build()
-                    )
-                }
+            factory = { context ->
+                SpineView.loadFromAssets(
+                    "spineboy.atlas",
+                    "spineboy-pro.json",
+                    context,
+                    SpineController.Builder()
+                        .setOnInitialized {
+                            it.animationState.setAnimation(0, "walk", true)
+                        }
+                        .setOnAfterPaint { controller, canvas, commands ->
+                            debugRenderer.render(controller.drawable, canvas, commands)
+                        }
+                        .build()
+                )
             },
             modifier = Modifier.padding(paddingValues)
         )

@@ -110,14 +110,13 @@ fun Physics(nav: NavHostController) {
             }
         ) {
             AndroidView(
-                factory = { ctx ->
-                    SpineView(ctx).apply {
-                        loadFromAsset(
-                            "celestial-circus.atlas",
-                            "celestial-circus-pro.skel",
-                            controller
-                        )
-                    }
+                factory = { context ->
+                    SpineView.loadFromAssets(
+                        "celestial-circus.atlas",
+                        "celestial-circus-pro.skel",
+                        context,
+                        controller
+                    )
                 },
                 modifier = Modifier.padding(paddingValues)
             )
