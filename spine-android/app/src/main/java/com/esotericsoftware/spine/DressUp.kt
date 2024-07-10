@@ -36,10 +36,12 @@ import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
 import com.esotericsoftware.spine.android.AndroidSkeletonDrawable
 import com.esotericsoftware.spine.android.SkeletonRenderer
 import com.esotericsoftware.spine.android.SpineController
+import com.esotericsoftware.spine.android.SpineView
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -160,15 +162,14 @@ fun DressUp(nav: NavHostController) {
                     }
                 }
             }
-
-//            AndroidView(
-//                factory = { ctx ->
-//                    SpineView(ctx).apply {
-//                        loadFromDrawable(drawable, controller)
-//                    }
-//                },
-//                modifier = Modifier.padding(paddingValues)
-//            )
+            AndroidView(
+                factory = { ctx ->
+                    SpineView(ctx).apply {
+                        loadFromDrawable(drawable, controller)
+                    }
+                },
+                modifier = Modifier.padding(paddingValues)
+            )
         }
     }
 }
