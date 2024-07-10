@@ -15,6 +15,8 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
 import com.esotericsoftware.spine.android.SpineController
 import com.esotericsoftware.spine.android.SpineView
+import java.io.File
+import java.net.URL
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,6 +46,15 @@ fun SimpleAnimation(nav: NavHostController) {
                         it.animationState.setAnimation(0, "walk", true)
                     }
                 )
+//                SpineView.loadFromHttp(
+//                    URL("https://raw.githubusercontent.com/EsotericSoftware/spine-runtimes/4.2/examples/spineboy/export/spineboy.atlas"),
+//                    URL("https://raw.githubusercontent.com/EsotericSoftware/spine-runtimes/4.2/examples/spineboy/export/spineboy-pro.skel"),
+//                    context.filesDir,
+//                    context,
+//                    SpineController {
+//                        it.animationState.setAnimation(0, "walk", true)
+//                    }
+//                )
             },
             modifier = Modifier.padding(paddingValues)
         )

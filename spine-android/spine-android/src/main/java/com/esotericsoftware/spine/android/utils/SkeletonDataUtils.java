@@ -55,7 +55,8 @@ public class SkeletonDataUtils {
         return skeletonLoader.readSkeletonData(new FileHandle(skeletonFile));
     }
 
-    public static SkeletonData fromHttp(AndroidTextureAtlas atlas, URL skeletonUrl) {
-        throw new NotImplementedError("TODO");
+    public static SkeletonData fromHttp(AndroidTextureAtlas atlas, URL skeletonUrl, File targetDirectory) {
+        File skeletonFile = SpineHttpUtils.downloadFrom(skeletonUrl, targetDirectory);
+        return fromFile(atlas, skeletonFile);
     }
 }

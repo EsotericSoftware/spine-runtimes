@@ -35,21 +35,22 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.List;
+import java.nio.file.Files;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.TextureAtlasData;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Null;
+import com.esotericsoftware.spine.android.utils.SpineHttpUtils;
 
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-
-import kotlin.NotImplementedError;
+import android.os.Build;
 
 public class AndroidTextureAtlas {
 	private static interface BitmapLoader {
@@ -131,27 +132,15 @@ public class AndroidTextureAtlas {
 	}
 
 	static public AndroidTextureAtlas fromFile(File atlasFile) {
-		TextureAtlasData data = new TextureAtlasData();
-
+		TextureAtlasData data;
 		try {
-			FileHandle inputFile = new FileHandle() {
-				@Override
-				public InputStream read() {
-					try {
-						return new FileInputStream(atlasFile);
-					} catch (FileNotFoundException e) {
-						throw new RuntimeException(e);
-					}
-				}
-			};
-			data.load(inputFile, new FileHandle(atlasFile).parent(), false);
-		} catch (Throwable t) {
-			throw new RuntimeException(t);
+			data = loadTextureAtlasData(atlasFile);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
-
 		return new AndroidTextureAtlas(data, path -> {
 			File imageFile = new File(path);
-			try (InputStream in = new BufferedInputStream(new FileInputStream(imageFile))) {
+			try (InputStream in = new BufferedInputStream(inputStream(imageFile))) {
 				return BitmapFactory.decodeStream(in);
 			} catch (Throwable t) {
 				throw new RuntimeException(t);
@@ -159,7 +148,59 @@ public class AndroidTextureAtlas {
 		});
 	}
 
-	static public AndroidTextureAtlas fromHttp(URL atlasUrl) {
-		throw new NotImplementedError("TODO");
+	static public AndroidTextureAtlas fromHttp(URL atlasUrl, File targetDirectory) {
+		File atlasFile = SpineHttpUtils.downloadFrom(atlasUrl, targetDirectory);
+		TextureAtlasData data;
+		try {
+			data = loadTextureAtlasData(atlasFile);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		return new AndroidTextureAtlas(data, path -> {
+			String fileName = path.substring(path.lastIndexOf('/') + 1);
+
+			String atlasUrlPath = atlasUrl.getPath();
+			int lastSlashIndex = atlasUrlPath.lastIndexOf('/');
+			String imagePath = atlasUrlPath.substring(0, lastSlashIndex + 1) + fileName;
+
+			File imageFile;
+			try {
+				URL imageUrl = new URL(atlasUrl.getProtocol(), atlasUrl.getHost(), atlasUrl.getPort(), imagePath);
+				imageFile = SpineHttpUtils.downloadFrom(imageUrl, targetDirectory);
+			} catch (MalformedURLException e) {
+				throw new RuntimeException(e);
+			}
+
+			try (InputStream in = new BufferedInputStream(inputStream(imageFile))) {
+				return BitmapFactory.decodeStream(in);
+			} catch (Throwable t) {
+				throw new RuntimeException(t);
+			}
+		});
+	}
+
+	private static InputStream inputStream(File file) throws Exception {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			return Files.newInputStream(file.toPath());
+		} else {
+			//noinspection IOStreamConstructor
+			return new FileInputStream(file);
+		}
+	}
+
+	static private TextureAtlasData loadTextureAtlasData(File atlasFile) {
+		TextureAtlasData data = new TextureAtlasData();
+		FileHandle inputFile = new FileHandle() {
+			@Override
+			public InputStream read() {
+				try {
+					return new FileInputStream(atlasFile);
+				} catch (FileNotFoundException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		};
+		data.load(inputFile, new FileHandle(atlasFile).parent(), false);
+		return data;
 	}
 }

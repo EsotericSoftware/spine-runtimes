@@ -80,9 +80,9 @@ public class AndroidSkeletonDrawable {
         return new AndroidSkeletonDrawable(atlas, skeletonData);
     }
 
-    public static AndroidSkeletonDrawable fromHttp (URL atlasUrl, URL skeletonUrl) {
-        AndroidTextureAtlas atlas = AndroidTextureAtlas.fromHttp(atlasUrl);
-        SkeletonData skeletonData = SkeletonDataUtils.fromHttp(atlas, skeletonUrl);
+    public static AndroidSkeletonDrawable fromHttp (URL atlasUrl, URL skeletonUrl, File targetDirectory) {
+        AndroidTextureAtlas atlas = AndroidTextureAtlas.fromHttp(atlasUrl, targetDirectory);
+        SkeletonData skeletonData = SkeletonDataUtils.fromHttp(atlas, skeletonUrl, targetDirectory);
         return new AndroidSkeletonDrawable(atlas, skeletonData);
     }
 

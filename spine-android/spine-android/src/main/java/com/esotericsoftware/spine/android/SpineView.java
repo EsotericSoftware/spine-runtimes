@@ -146,6 +146,12 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 		return spineView;
 	}
 
+	public static SpineView loadFromHttp(URL atlasUrl, URL skeletonUrl, File targetDirectory, Context context, SpineController controller) {
+		SpineView spineView = new SpineView(context, controller);
+		spineView.loadFromHttp(atlasUrl, skeletonUrl, targetDirectory);
+		return spineView;
+	}
+
 	public static SpineView loadFromDrawable(AndroidSkeletonDrawable drawable, Context context, SpineController controller) {
 		SpineView spineView = new SpineView(context, controller);
 		spineView.loadFromDrawable(drawable);
@@ -164,8 +170,8 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 		loadFrom(() -> AndroidSkeletonDrawable.fromFile(atlasFile, skeletonFile));
 	}
 
-	public void loadFromHttp(URL atlasUrl, URL skeletonUrl) {
-		loadFrom(() -> AndroidSkeletonDrawable.fromHttp(atlasUrl, skeletonUrl));
+	public void loadFromHttp(URL atlasUrl, URL skeletonUrl, File targetDirectory) {
+		loadFrom(() -> AndroidSkeletonDrawable.fromHttp(atlasUrl, skeletonUrl, targetDirectory));
 	}
 
 	public void loadFromDrawable(AndroidSkeletonDrawable drawable) {
