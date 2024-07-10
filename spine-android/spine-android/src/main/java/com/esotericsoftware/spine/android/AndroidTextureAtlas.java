@@ -31,9 +31,12 @@ package com.esotericsoftware.spine.android;
 
 import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.List;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
@@ -128,7 +131,32 @@ public class AndroidTextureAtlas {
 	}
 
 	static public AndroidTextureAtlas fromFile(File atlasFile) {
-		throw new NotImplementedError("TODO");
+		TextureAtlasData data = new TextureAtlasData();
+
+		try {
+			FileHandle inputFile = new FileHandle() {
+				@Override
+				public InputStream read() {
+					try {
+						return new FileInputStream(atlasFile);
+					} catch (FileNotFoundException e) {
+						throw new RuntimeException(e);
+					}
+				}
+			};
+			data.load(inputFile, new FileHandle(atlasFile).parent(), false);
+		} catch (Throwable t) {
+			throw new RuntimeException(t);
+		}
+
+		return new AndroidTextureAtlas(data, path -> {
+			File imageFile = new File(path);
+			try (InputStream in = new BufferedInputStream(new FileInputStream(imageFile))) {
+				return BitmapFactory.decodeStream(in);
+			} catch (Throwable t) {
+				throw new RuntimeException(t);
+			}
+		});
 	}
 
 	static public AndroidTextureAtlas fromHttp(URL atlasUrl) {

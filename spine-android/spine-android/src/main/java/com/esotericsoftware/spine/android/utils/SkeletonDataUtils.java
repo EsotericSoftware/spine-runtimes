@@ -3,6 +3,7 @@ package com.esotericsoftware.spine.android.utils;
 import android.content.Context;
 import android.content.res.AssetManager;
 
+import com.badlogic.gdx.files.FileHandle;
 import com.esotericsoftware.spine.SkeletonBinary;
 import com.esotericsoftware.spine.SkeletonData;
 import com.esotericsoftware.spine.SkeletonJson;
@@ -12,6 +13,7 @@ import com.esotericsoftware.spine.android.AndroidTextureAtlas;
 
 import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -21,7 +23,6 @@ import kotlin.NotImplementedError;
 public class SkeletonDataUtils {
 
     public static SkeletonData fromAsset(AndroidTextureAtlas atlas, String skeletonFileName, Context context) {
-
         AndroidAtlasAttachmentLoader attachmentLoader = new AndroidAtlasAttachmentLoader(atlas);
 
         SkeletonLoader skeletonLoader;
@@ -42,7 +43,16 @@ public class SkeletonDataUtils {
         return skeletonData;
     }
     public static SkeletonData fromFile(AndroidTextureAtlas atlas, File skeletonFile) {
-        throw new NotImplementedError("TODO");
+        AndroidAtlasAttachmentLoader attachmentLoader = new AndroidAtlasAttachmentLoader(atlas);
+
+        SkeletonLoader skeletonLoader;
+        if (skeletonFile.getPath().endsWith(".json")) {
+            skeletonLoader = new SkeletonJson(attachmentLoader);
+        } else {
+            skeletonLoader = new SkeletonBinary(attachmentLoader);
+        }
+
+        return skeletonLoader.readSkeletonData(new FileHandle(skeletonFile));
     }
 
     public static SkeletonData fromHttp(AndroidTextureAtlas atlas, URL skeletonUrl) {

@@ -53,13 +53,11 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 
 	public static class Builder {
 		private final Context context;
-
 		private final SpineController controller;
-
 		private String atlasFileName;
-
 		private String skeletonFileName;
-
+		private File atlasFile;
+		private File skeletonFile;
 		private BoundsProvider boundsProvider = new SetupPoseBounds();
 		private Alignment alignment = Alignment.CENTER;
 
@@ -71,6 +69,12 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 		public Builder setLoadFromAssets(String atlasFileName, String skeletonFileName) {
 			this.atlasFileName = atlasFileName;
 			this.skeletonFileName = skeletonFileName;
+			return this;
+		}
+
+		public Builder setLoadFromFile(File atlasFile, File skeletonFile) {
+			this.atlasFile = atlasFile;
+			this.skeletonFile = skeletonFile;
 			return this;
 		}
 
@@ -90,6 +94,8 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 			spineView.alignment = alignment;
 			if (atlasFileName != null && skeletonFileName != null) {
 				spineView.loadFromAsset(atlasFileName, skeletonFileName);
+			} else if (atlasFile != null && skeletonFile != null) {
+				spineView.loadFromFile(atlasFile, skeletonFile);
 			}
 			return spineView;
 		}
@@ -131,6 +137,12 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 	public static SpineView loadFromAssets(String atlasFileName, String skeletonFileName, Context context, SpineController controller) {
 		SpineView spineView = new SpineView(context, controller);
 		spineView.loadFromAsset(atlasFileName, skeletonFileName);
+		return spineView;
+	}
+
+	public static SpineView loadFromFile(File atlasFile, File skeletonFile, Context context, SpineController controller) {
+		SpineView spineView = new SpineView(context, controller);
+		spineView.loadFromFile(atlasFile, skeletonFile);
 		return spineView;
 	}
 
@@ -183,7 +195,7 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 		}
 
 		if (controller.isPlaying()) {
-            controller.callOnBeforeUpdateWorldTransforms();
+			controller.callOnBeforeUpdateWorldTransforms();
 			controller.getDrawable().update(delta);
 			controller.callOnAfterUpdateWorldTransforms();
 		}
