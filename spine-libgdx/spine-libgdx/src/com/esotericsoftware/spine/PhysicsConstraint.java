@@ -141,6 +141,7 @@ public class PhysicsConstraint implements Updatable {
 			reset();
 			// Fall through.
 		case update:
+			Skeleton skeleton = this.skeleton;
 			float delta = Math.max(skeleton.time - lastTime, 0);
 			remaining += delta;
 			lastTime = skeleton.time;
@@ -151,16 +152,18 @@ public class PhysicsConstraint implements Updatable {
 				ux = bx;
 				uy = by;
 			} else {
-				float a = remaining, i = inertia, q = data.limit * delta, t = data.step, f = skeleton.data.referenceScale, d = -1;
+				float a = remaining, i = inertia, t = data.step, f = skeleton.data.referenceScale, d = -1;
+				float qx = data.limit * delta, qy = qx * skeleton.scaleY;
+				qx *= skeleton.scaleX;
 				if (x || y) {
 					if (x) {
 						float u = (ux - bx) * i;
-						xOffset += u > q ? q : u < -q ? -q : u;
+						xOffset += u > qx ? qx : u < -qx ? -qx : u;
 						ux = bx;
 					}
 					if (y) {
 						float u = (uy - by) * i;
-						yOffset += u > q ? q : u < -q ? -q : u;
+						yOffset += u > qy ? qy : u < -qy ? -qy : u;
 						uy = by;
 					}
 					if (a >= t) {
@@ -186,14 +189,14 @@ public class PhysicsConstraint implements Updatable {
 				if (rotateOrShearX || scaleX) {
 					float ca = atan2(bone.c, bone.a), c, s, mr = 0;
 					float dx = cx - bone.worldX, dy = cy - bone.worldY;
-					if (dx > q)
-						dx = q;
-					else if (dx < -q) //
-						dx = -q;
-					if (dy > q)
-						dy = q;
-					else if (dy < -q) //
-						dy = -q;
+					if (dx > qx)
+						dx = qx;
+					else if (dx < -qx) //
+						dx = -qx;
+					if (dy > qy)
+						dy = qy;
+					else if (dy < -qy) //
+						dy = -qy;
 					if (rotateOrShearX) {
 						mr = (data.rotate + data.shearX) * mix;
 						float r = atan2(dy + ty, dx + tx) - ca - rotateOffset * mr;
