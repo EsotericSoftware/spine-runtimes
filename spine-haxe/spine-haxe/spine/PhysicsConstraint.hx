@@ -141,8 +141,8 @@ class PhysicsConstraint implements Updatable {
 						d:Float = -1;
 
 					var qx:Float = _data.limit * delta,
-						qy:Float = qx * skeleton.scaleY;
-					qx *= skeleton.scaleX;
+						qy:Float = qx * Math.abs(skeleton.scaleY);
+					qx *= Math.abs(skeleton.scaleX);
 					if (x || y) {
 						if (x) {
 							var u:Float = (ux - bx) * i;
