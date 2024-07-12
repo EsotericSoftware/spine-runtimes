@@ -208,6 +208,13 @@ namespace Spine.Unity {
 					}
 
 					Vector2 rigidbodyDisplacement2D = new Vector2(rigidbodyDisplacement.x, rigidbodyDisplacement.y);
+					// Note: MovePosition seems to be the only precise and reliable way to set movement delta,
+					// for both 2D and 3D rigidbodies.
+					// Setting velocity like "rigidBody2D.velocity = movement/deltaTime" works perfectly in mid-air
+					// without gravity and ground collision, unfortunately when on the ground, friction causes severe
+					// slowdown. Using a zero-friction PhysicsMaterial leads to sliding endlessly along the ground as
+					// soon as forces are applied. Additionally, there is no rigidBody2D.isGrounded, requiring our own
+					// checks.
 					rigidBody2D.MovePosition(gravityAndVelocityMovement + new Vector2(rigidBody2D.position.x, rigidBody2D.position.y)
 						+ rigidbodyDisplacement2D + additionalRigidbody2DMovement);
 					rigidBody2D.MoveRotation(rigidbody2DRotation + rigidBody2D.rotation);
