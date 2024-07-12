@@ -153,8 +153,8 @@ public class PhysicsConstraint implements Updatable {
 				uy = by;
 			} else {
 				float a = remaining, i = inertia, t = data.step, f = skeleton.data.referenceScale, d = -1;
-				float qx = data.limit * delta, qy = qx * skeleton.scaleY;
-				qx *= skeleton.scaleX;
+				float qx = data.limit * delta, qy = qx * Math.abs(skeleton.scaleY);
+				qx *= Math.abs(skeleton.scaleX);
 				if (x || y) {
 					if (x) {
 						float u = (ux - bx) * i;
