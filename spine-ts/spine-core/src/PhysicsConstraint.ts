@@ -136,9 +136,10 @@ export class PhysicsConstraint implements Updatable {
 				this.reset();
 			// Fall through.
 			case Physics.update:
+				const skeleton = this.skeleton;
 				const delta = Math.max(this.skeleton.time - this.lastTime, 0);
 				this.remaining += delta;
-				this.lastTime = this.skeleton.time;
+				this.lastTime = skeleton.time;
 
 				const bx = bone.worldX, by = bone.worldY;
 				if (this._reset) {
@@ -146,16 +147,18 @@ export class PhysicsConstraint implements Updatable {
 					this.ux = bx;
 					this.uy = by;
 				} else {
-					let a = this.remaining, i = this.inertia, q = this.data.limit * delta, t = this.data.step, f = this.skeleton.data.referenceScale, d = -1;
+					let a = this.remaining, i = this.inertia, t = this.data.step, f = this.skeleton.data.referenceScale, d = -1;
+					let qx = this.data.limit * delta, qy = qx * skeleton.scaleY;
+					qx *= skeleton.scaleX;
 					if (x || y) {
 						if (x) {
 							const u = (this.ux - bx) * i;
-							this.xOffset += u > q ? q : u < -q ? -q : u;
+							this.xOffset += u > qx ? qx : u < -qx ? -qx : u;
 							this.ux = bx;
 						}
 						if (y) {
 							const u = (this.uy - by) * i;
-							this.yOffset += u > q ? q : u < -q ? -q : u;
+							this.yOffset += u > qy ? qy : u < -qy ? -qy : u;
 							this.uy = by;
 						}
 						if (a >= t) {
@@ -181,14 +184,14 @@ export class PhysicsConstraint implements Updatable {
 					if (rotateOrShearX || scaleX) {
 						let ca = Math.atan2(bone.c, bone.a), c = 0, s = 0, mr = 0;
 						let dx = this.cx - bone.worldX, dy = this.cy - bone.worldY;
-						if (dx > q)
-							dx = q;
-						else if (dx < -q) //
-							dx = -q;
-						if (dy > q)
-							dy = q;
-						else if (dy < -q) //
-							dy = -q;
+						if (dx > qx)
+							dx = qx;
+						else if (dx < -qx) //
+							dx = -qx;
+						if (dy > qy)
+							dy = qy;
+						else if (dy < -qy) //
+							dy = -qy;
 						if (rotateOrShearX) {
 							mr = (this.data.rotate + this.data.shearX) * mix;
 							let r = Math.atan2(dy + this.ty, dx + this.tx) - ca - this.rotateOffset * mr;
