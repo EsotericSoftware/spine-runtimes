@@ -147,6 +147,7 @@ namespace Spine {
 				Reset();
 				goto case Physics.Update; // Fall through.
 			case Physics.Update:
+				Skeleton skeleton = this.skeleton;
 				float delta = Math.Max(skeleton.time - lastTime, 0);
 				remaining += delta;
 				lastTime = skeleton.time;
@@ -157,16 +158,19 @@ namespace Spine {
 					ux = bx;
 					uy = by;
 				} else {
-					float a = this.remaining, i = inertia, q = data.limit * delta, t = data.step, f = skeleton.data.referenceScale;
+					float a = remaining, i = inertia, t = data.step, f = skeleton.data.referenceScale;
+					float qx = data.limit * delta, qy = qx * Math.Abs(skeleton.ScaleY);
+					qx *= Math.Abs(skeleton.ScaleX);
+
 					if (x || y) {
 						if (x) {
 							float u = (ux - bx) * i;
-							xOffset += u > q ? q : u < -q ? -q : u;
+							xOffset += u > qx ? qx : u < -qx ? -qx : u;
 							ux = bx;
 						}
 						if (y) {
 							float u = (uy - by) * i;
-							yOffset += u > q ? q : u < -q ? -q : u;
+							yOffset += u > qy ? qy : u < -qy ? -qy : u;
 							uy = by;
 						}
 						if (a >= t) {
@@ -192,14 +196,14 @@ namespace Spine {
 					if (rotateOrShearX || scaleX) {
 						float ca = (float)Math.Atan2(bone.c, bone.a), c, s, mr = 0;
 						float dx = cx - bone.worldX, dy = cy - bone.worldY;
-						if (dx > q)
-							dx = q;
-						else if (dx < -q)
-							dx = -q;
-						if (dy > q)
-							dy = q;
-						else if (dy < -q)
-							dy = -q;
+						if (dx > qx)
+							dx = qx;
+						else if (dx < -qx)
+							dx = -qx;
+						if (dy > qy)
+							dy = qy;
+						else if (dy < -qy)
+							dy = -qy;
 						if (rotateOrShearX) {
 							mr = (data.rotate + data.shearX) * mix;
 							float r = (float)Math.Atan2(dy + ty, dx + tx) - ca - rotateOffset * mr;
