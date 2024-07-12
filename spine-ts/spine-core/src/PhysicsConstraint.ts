@@ -148,8 +148,8 @@ export class PhysicsConstraint implements Updatable {
 					this.uy = by;
 				} else {
 					let a = this.remaining, i = this.inertia, t = this.data.step, f = this.skeleton.data.referenceScale, d = -1;
-					let qx = this.data.limit * delta, qy = qx * skeleton.scaleY;
-					qx *= skeleton.scaleX;
+					let qx = this.data.limit * delta, qy = qx * Math.abs(skeleton.scaleY);
+					qx *= Math.abs(skeleton.scaleX);
 					if (x || y) {
 						if (x) {
 							const u = (this.ux - bx) * i;
