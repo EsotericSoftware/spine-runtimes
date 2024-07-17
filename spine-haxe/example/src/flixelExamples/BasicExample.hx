@@ -29,6 +29,7 @@
 
 package flixelExamples;
 
+import flixel.ui.FlxButton;
 import flixel.FlxG;
 import spine.flixel.SkeletonSprite;
 import spine.flixel.FlixelTextureLoader;
@@ -43,15 +44,20 @@ class BasicExample extends FlxState {
 
 	var skeletonSprite:SkeletonSprite;
 	override public function create():Void {
+		var button = new FlxButton(0, 0, "Next scene", () -> FlxG.switchState(new SequenceExample()));
+		button.setPosition(FlxG.width * .75, FlxG.height / 10);
+		add(button);
+
 		var atlas = new TextureAtlas(Assets.getText("assets/raptor.atlas"), new FlixelTextureLoader("assets/raptor-pro.atlas"));
-		var skeletondata = SkeletonData.from(loadBinary ? Assets.getBytes("assets/raptor-pro.skel") : Assets.getText("assets/raptor-pro.json"), atlas);
+		var skeletondata = SkeletonData.from(loadBinary ? Assets.getBytes("assets/raptor-pro.skel") : Assets.getText("assets/raptor-pro.json"), atlas, .25);
 		var animationStateData = new AnimationStateData(skeletondata);
 		animationStateData.defaultMix = 0.25;
 
-		skeletonSprite = new SkeletonSprite(skeletondata, animationStateData, .25);
-		// var bounds = skeletonSprite.skeleton.getBounds();
-		// skeletonSprite.scale = Starling.current.stage.stageWidth / bounds.width * 0.5;
-		skeletonSprite.setPosition(.5 * FlxG.width, .5 * FlxG.height);
+		skeletonSprite = new SkeletonSprite(skeletondata, animationStateData);
+		skeletonSprite.setPosition(
+			.5 * FlxG.width - skeletonSprite.width / 2,
+			.5 * FlxG.height - skeletonSprite.height / 2
+		);
 
 		skeletonSprite.state.setAnimationByName(0, "walk", true);
 
@@ -66,31 +72,22 @@ class BasicExample extends FlxState {
 		trace("loaded");
 	}
 
-	// public function onTouch(e:TouchEvent) {
-	// 	var touch = e.getTouch(this);
-	// 	if (touch != null && touch.phase == TouchPhase.ENDED) {
-	// 		SceneManager.getInstance().switchScene(new SequenceExample());
-	// 	}
-	// }
-
 	override public function update(elapsed:Float):Void
 		{
 			if (FlxG.keys.anyPressed([RIGHT])) {
-				skeletonSprite.x += 250 * elapsed;
+				skeletonSprite.x += 15;
 			}
-
 			if (FlxG.keys.anyPressed([LEFT])) {
-				skeletonSprite.x -= 250 * elapsed;
+				skeletonSprite.x -= 15;
 			}
-
 			if (FlxG.keys.anyPressed([UP])) {
-				skeletonSprite.y += 250 * elapsed;
+				skeletonSprite.y += 15;
 			}
-
 			if (FlxG.keys.anyPressed([DOWN])) {
-				skeletonSprite.y -= 250 * elapsed;
+				skeletonSprite.y -= 15;
 			}
 
 			super.update(elapsed);
 		}
+
 }

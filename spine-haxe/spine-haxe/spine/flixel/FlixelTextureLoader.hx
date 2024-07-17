@@ -29,6 +29,7 @@
 
 package spine.flixel;
 
+import flixel.graphics.FlxGraphic;
 import flixel.FlxG;
 import spine.atlas.TextureAtlasPage;
 import spine.atlas.TextureAtlasRegion;
@@ -53,7 +54,11 @@ class FlixelTextureLoader implements TextureLoader
 		if (bitmapData == null) {
 			throw new SpineException("Could not load atlas page texture " + basePath + "/" + path);
 		}
-		page.texture = SpineTexture.from(bitmapData);
+		var texture:FlxGraphic = SpineTexture.from(bitmapData);
+		// TODO: reset this value to true when destroy skeleton
+		// this is needed for sequence, otherwise the previous texture would be detroyed
+		texture.destroyOnNoUse = false;
+		page.texture = texture;
 	}
 
 	public function loadRegion(region:TextureAtlasRegion):Void {

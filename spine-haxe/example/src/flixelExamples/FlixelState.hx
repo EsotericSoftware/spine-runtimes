@@ -30,6 +30,10 @@ class FlixelState extends FlxState
 
 	override public function create():Void
 	{
+		FlxG.switchState(new MixAndMatchExample());
+		// FlxG.switchState(new SequenceExample());
+		// FlxG.switchState(new BasicExample());
+
 		FlxG.cameras.bgColor = 0xffa1b2b0;
 
 		// setting speed of spineboy (450 is the speed to not let him slide)
@@ -50,10 +54,8 @@ class FlixelState extends FlxState
         myText.alignment = CENTER;
         group.add(myText);
 
-		var button = new FlxButton(0, 0, "Click me", () -> {
-			FlxG.switchState(new BasicExample());
-		});
-		button.screenCenter();
+		var button = new FlxButton(0, 0, "Next scene", () -> FlxG.switchState(new BasicExample()));
+		button.setPosition(FlxG.width * .75, FlxG.height / 10);
 		add(button);
 
 		// creating a sprite for the floor
@@ -61,9 +63,6 @@ class FlixelState extends FlxState
 		floor.loadGraphic(FlxGraphic.fromRectangle(FlxG.width, FlxG.height - 100, 0xff822f02));
 		floor.y = FlxG.height - 100;
 		add(floor);
-		var button = new FlxButton("Click me", () -> {
-			trace("clicked");
-		});
 
 		// loading spineboy
 		var atlas = new TextureAtlas(Assets.getText("assets/spineboy.atlas"), new FlixelTextureLoader("assets/spineboy.atlas"));
@@ -119,7 +118,7 @@ class FlixelState extends FlxState
 		// adding spineboy to the stage
 		add(spineSprite);
 
-		FlxG.debugger.visible = !FlxG.debugger.visible;
+		// FlxG.debugger.visible = !FlxG.debugger.visible;
 		// debug ui
 		// FlxG.debugger.visible = true;
 		// FlxG.debugger.drawDebug = true;

@@ -33,7 +33,10 @@ import flixel.system.FlxAssets.FlxGraphicAsset;
 import flixel.FlxStrip;
 
 class SkeletonMesh extends FlxStrip {
-	public function new(texture:FlxGraphicAsset) {
-		super(0, 0, texture);
+	public function new(/*texture:FlxGraphicAsset*/) {
+		super();
+		// graphic = texture;
 	}
+
+
 }

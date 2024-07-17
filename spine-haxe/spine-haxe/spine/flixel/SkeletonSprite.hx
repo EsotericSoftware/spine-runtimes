@@ -56,11 +56,17 @@ class SkeletonSprite extends FlxObject
 		skeleton.updateWorldTransform(Physics.update);
 		state = new AnimationState(animationStateData != null ? animationStateData : new AnimationStateData(skeletonData));
 
+		setBoundingBox();
+	}
+
+	public function setBoundingBox() {
 		var bounds = skeleton.getBounds();
-		width = bounds.width;
-		height = bounds.height;
-		offsetX = bounds.width / 2;
-		offsetY = bounds.height;
+		if (bounds.width > 0 && bounds.height > 0) {
+			width = bounds.width;
+			height = bounds.height;
+			offsetX = bounds.width / 2;
+			offsetY = bounds.height;
+		}
 	}
 
 	override public function destroy():Void
@@ -131,6 +137,7 @@ class SkeletonSprite extends FlxObject
 				region.computeWorldVertices(slot, worldVertices, 0, clippedVertexSize);
 
 				mesh = getFlixelMeshFromRendererAttachment(region);
+				mesh.graphic = region.region.texture;
 				triangles = QUAD_INDICES;
 				uvs = region.uvs;
 				attachmentColor = region.color;
@@ -144,6 +151,7 @@ class SkeletonSprite extends FlxObject
 				meshAttachment.computeWorldVertices(slot, 0, meshAttachment.worldVerticesLength, worldVertices, 0, clippedVertexSize);
 
 				mesh = getFlixelMeshFromRendererAttachment(meshAttachment);
+				mesh.graphic = meshAttachment.region.texture;
 				triangles = meshAttachment.triangles;
 				uvs = meshAttachment.uvs;
 				attachmentColor = meshAttachment.color;
@@ -158,11 +166,41 @@ class SkeletonSprite extends FlxObject
 
 			if (mesh != null) {
 
-				mesh.color.setRGBFloat(
+				// cannot use directly mesh.color.setRGBFloat otherwise the setter won't be called and transfor color not set
+				// trace('${slot.data.name}');
+				// trace(skeleton.color.r * slot.color.r * attachmentColor.r * color.redFloat);
+				// trace(skeleton.color.g * slot.color.g * attachmentColor.g * color.greenFloat);
+				// trace(skeleton.color.b * slot.color.b * attachmentColor.b * color.blueFloat);
+				// trace('${mesh.color}\n');
+				var _tmpColor:Int;
+				// _tmpColor = FlxColor.fromRGBFloat(1,1,1,1);
+
+
+				_tmpColor = FlxColor.fromRGBFloat(
 					skeleton.color.r * slot.color.r * attachmentColor.r * color.redFloat,
 					skeleton.color.g * slot.color.g * attachmentColor.g * color.greenFloat,
-					skeleton.color.b * slot.color.b * attachmentColor.b * color.blueFloat
+					skeleton.color.b * slot.color.b * attachmentColor.b * color.blueFloat,
+					1
 				);
+
+
+				// // if (slot.data.name == "hair-patch") {
+				// if (slot.data.name == "square2") {
+				// 	_tmpColor = FlxColor.fromRGBFloat(
+				// 		skeleton.color.r * slot.color.r * attachmentColor.r * color.redFloat,
+				// 		skeleton.color.g * slot.color.g * attachmentColor.g * color.greenFloat,
+				// 		skeleton.color.b * slot.color.b * attachmentColor.b * color.blueFloat,
+				// 		1
+				// 	);
+				// 	// continue;
+				// 	// trace('${mesh.color.red} | ${mesh.color.green} | ${mesh.color.blue} | ${mesh.color.alpha}');
+				// } else {
+				// 	// trace(slot.data.name);
+				// 	_tmpColor = FlxColor.fromRGBFloat(1,1,1,1);
+				// }
+				// trace('${slot.data.name}\t${mesh.color}');
+
+				mesh.color = _tmpColor;
 				mesh.alpha = skeleton.color.a * slot.color.a * attachmentColor.a * alpha;
 
 				if (clipper.isClipping()) {
@@ -200,7 +238,7 @@ class SkeletonSprite extends FlxObject
 
 	private function getFlixelMeshFromRendererAttachment(region: RenderedAttachment) {
 		if (region.rendererObject == null) {
-			var skeletonMesh = new SkeletonMesh(region.region.texture);
+			var skeletonMesh = new SkeletonMesh();
 			region.rendererObject = skeletonMesh;
 			skeletonMesh.exists = false;
 			_meshes.push(skeletonMesh);
