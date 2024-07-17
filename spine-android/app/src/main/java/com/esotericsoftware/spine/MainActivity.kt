@@ -66,7 +66,8 @@ fun AppContent() {
                                 Destination.DebugRendering,
                                 Destination.DressUp,
                                 Destination.IKFollowing,
-                                Destination.Physics
+                                Destination.Physics,
+                                Destination.TheBoys
                             ),
                             paddingValues
                         )
@@ -113,6 +114,12 @@ fun AppContent() {
                     Destination.Physics.route
                 ) {
                     Physics(navController)
+                }
+
+                composable(
+                    Destination.TheBoys.route
+                ) {
+                    TheBoys(navController)
                 }
             }
         }
@@ -181,4 +188,5 @@ sealed class Destination(val route: String, val title: String) {
     data object DressUp : Destination("dressUp", "Dress Up")
     data object IKFollowing : Destination("ikFollowing", "IK Following")
     data object Physics: Destination("physics", "Physics (drag anywhere)")
+    data object TheBoys: Destination("theBoys", "100 Spine Boys")
 }
