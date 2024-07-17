@@ -122,7 +122,7 @@
 
 ### Unity
 
-- **Officially supported Unity versions are 2017.1-2022.1**.
+- **Officially supported Unity versions are 2017.1-2023.1**.
 
 - **Additions**
 
@@ -161,6 +161,7 @@
   - Added support for BlendModeMaterials at runtime instantiation from files via an additional method `SkeletonDataAsset.SetupRuntimeBlendModeMaterials`. See example scene `Spine Examples/Other Examples/Instantiate from Script` for a usage example.
   - SkeletonGraphic: You can now offset the skeleton mesh relative to the pivot via a newly added green circle handle. This allows you to e.g. frame only the face of a skeleton inside a masked frame. Previously offsetting the pivot downwards fails when `Layout Scale Mode` scales the mesh smaller and towards the pivot (e.g. the feet) and thus out of the frame. Now you can keep the pivot in the center of the `RectTransform` while offsetting only the mesh downwards, keeping the desired skeleton area (e.g. the face) centered while resizing. Moving the new larger green circle handle moves the mesh offset, while moving the blue pivot circle handle moves the pivot as usual.
   - `Universal Render Pipeline/Spine/Skeleton` shader now performs proper alpha-testing when `Depth Write` is enabled, using the existing `Shadow alpha cutoff` parameter.
+  - `SkeletonRootMotion` components now provide a public `Initialize()` method which is automatically called when calling `skeletonAnimation.Initialize(true)` to update the necessary skeleton references. If a different root bone shall be used, be sure to set `skeletonRootMotion.rootMotionBoneName` before calling `skeletonAnimation.Initialize(true)`.
 
 - **Breaking changes**
 
@@ -173,6 +174,7 @@
   - Inspector: String attribute `SpineSkin()` now allows to include `<None>` in the list of parameters. Previously the `includeNone=true` parameter of the `SpineSkin()` attribute defaulted to `true` but was ignored. Now it defaults to `false` and has an effect on the list. Only the Inspector GUI is affected by this behaviour change.
   - `SkeletonGraphicRenderTexture` example component: `protected RawImage quadRawImage` was changed to `protected SkeletonSubmeshGraphic quadMaskableGraphic` for a bugfix. This is only relevant for subclasses of `SkeletonGraphicRenderTexture` or when querying the `RawImage` component via e.g. `skeletonGraphicRenderTexture.quad.GetComponent<RawImage>()`.
   - Fixed a bug where when Linear color space is used and `PMA vertex colors` enabled, additive slots add a too dark (too transparent) color value. If you want the old incorrect behaviour (darker additive slots) or are not using Linear but Gamma color space, you can comment-out the define `LINEAR_COLOR_SPACE_FIX_ADDITIVE_ALPHA` in `MeshGenerator.cs` to deactivate the fix or just to skip unnecessary instructions.
+  - Fixed SkeletonRootMotion components ignoring parent bone scale when set by transform constraints. Using applied scale of parent bone now. If you need the old behaviour, comment out the line `#define USE_APPLIED_PARENT_SCALE` in SkeletonRootMotionBase.cs.
 
 - **Changes of default values**
 

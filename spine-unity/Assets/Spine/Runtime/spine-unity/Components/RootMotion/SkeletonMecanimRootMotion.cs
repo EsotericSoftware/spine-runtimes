@@ -88,8 +88,8 @@ namespace Spine.Unity {
 			mecanimLayerFlags = DefaultMecanimLayerFlags;
 		}
 
-		protected override void Start () {
-			base.Start();
+		public override void Initialize () {
+			base.Initialize();
 			skeletonMecanim = GetComponent<SkeletonMecanim>();
 			if (skeletonMecanim) {
 				skeletonMecanim.Translator.OnClipApplied -= OnClipApplied;
