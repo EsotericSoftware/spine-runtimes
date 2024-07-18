@@ -42,13 +42,20 @@ import android.graphics.Canvas;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Choreographer;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 
+import java.io.Console;
 import java.io.File;
 import java.net.URL;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class SpineView extends View implements Choreographer.FrameCallback {
 
@@ -138,6 +145,7 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 	private float x = 0;
 	private float y = 0;
 	private final SkeletonRenderer renderer = new SkeletonRenderer();
+	private Boolean rendering = true;
 	private Bounds computedBounds = new Bounds();
 
 	private SpineController controller;
@@ -235,6 +243,14 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 		updateCanvasTransform();
 	}
 
+	public Boolean isRendering() {
+		return rendering;
+	}
+
+	public void setRendering(Boolean rendering) {
+		this.rendering = rendering;
+	}
+
 	private void loadFrom(AndroidSkeletonDrawableLoader loader) {
 		Handler mainHandler = new Handler(Looper.getMainLooper());
 		Thread backgroundThread = new Thread(() -> {
@@ -253,7 +269,7 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 	@Override
 	public void onDraw (@NonNull Canvas canvas) {
 		super.onDraw(canvas);
-		if (controller == null || !controller.isInitialized()) {
+		if (controller == null || !controller.isInitialized() || !rendering) {
 			return;
 		}
 

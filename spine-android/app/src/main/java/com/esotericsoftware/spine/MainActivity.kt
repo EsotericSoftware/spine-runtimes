@@ -20,7 +20,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -67,7 +66,7 @@ fun AppContent() {
                                 Destination.DressUp,
                                 Destination.IKFollowing,
                                 Destination.Physics,
-                                Destination.TheBoys
+                                Destination.DisableRendering
                             ),
                             paddingValues
                         )
@@ -117,9 +116,9 @@ fun AppContent() {
                 }
 
                 composable(
-                    Destination.TheBoys.route
+                    Destination.DisableRendering.route
                 ) {
-                    TheBoys(navController)
+                    DisableRendering(navController)
                 }
             }
         }
@@ -188,5 +187,5 @@ sealed class Destination(val route: String, val title: String) {
     data object DressUp : Destination("dressUp", "Dress Up")
     data object IKFollowing : Destination("ikFollowing", "IK Following")
     data object Physics: Destination("physics", "Physics (drag anywhere)")
-    data object TheBoys: Destination("theBoys", "100 Spine Boys")
+    data object DisableRendering: Destination("disableRendering", "Disable Rendering")
 }

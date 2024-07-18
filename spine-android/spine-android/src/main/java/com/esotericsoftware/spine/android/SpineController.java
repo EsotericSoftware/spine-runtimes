@@ -119,17 +119,37 @@ public class SpineController {
     }
 
     public void pause() {
-        playing = false;
+        if (playing) {
+            playing = false;
+        }
     }
 
     public void resume() {
-        playing = true;
+        if (!playing) {
+            playing = true;
+        }
     }
 
     public Point toSkeletonCoordinates(Point position) {
         int x = position.x;
         int y = position.y;
         return new Point((int) (x / scaleX - offsetX), (int) (y / scaleY - offsetY));
+    }
+
+    public void setOnBeforeUpdateWorldTransforms(@Nullable SpineControllerCallback onBeforeUpdateWorldTransforms) {
+        this.onBeforeUpdateWorldTransforms = onBeforeUpdateWorldTransforms;
+    }
+
+    public void setOnAfterUpdateWorldTransforms(@Nullable SpineControllerCallback onAfterUpdateWorldTransforms) {
+        this.onAfterUpdateWorldTransforms = onAfterUpdateWorldTransforms;
+    }
+
+    public void setOnBeforePaint(@Nullable SpineControllerBeforePaintCallback onBeforePaint) {
+        this.onBeforePaint = onBeforePaint;
+    }
+
+    public void setOnAfterPaint(@Nullable SpineControllerAfterPaintCallback onAfterPaint) {
+        this.onAfterPaint = onAfterPaint;
     }
 
     protected void setCoordinateTransform(double offsetX, double offsetY, double scaleX, double scaleY) {
