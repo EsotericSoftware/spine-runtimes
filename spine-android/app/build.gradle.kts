@@ -71,4 +71,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation(project(":spine-android"))
+    // Run `./gradlew publishToMavenLocal` in `spine-android` to use from local maven repo.
+//    implementation("com.esotericsoftware:spine-android:4.2")
 }
