@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
@@ -77,8 +78,8 @@ fun DisableRendering(nav: NavHostController) {
                 modifier = Modifier
                     .padding(8.dp)
             ) {
-                Text("Scroll ${visibleSpineBoys.count()} spine boys out of the viewport")
-                Text("Rendering is disabled when the spine view moves out of the viewport, preserving CPU/GPU resources.")
+                Text("There are ${visibleSpineBoys.count()} spine boys visible. Scroll around to find the odd one out...")
+                Text("Rendering is disabled when the spine view moves out of the viewport, preserving CPU/GPU resources.", color = Color.Gray)
             }
             SpineBoys(visibleSpineBoys)
         }
