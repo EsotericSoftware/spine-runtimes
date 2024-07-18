@@ -31,9 +31,9 @@ android {
 dependencies {
 
     implementation(libs.androidx.appcompat)
-    implementation(libs.material)
-    implementation("com.badlogicgames.gdx:gdx:1.12.2-SNAPSHOT")
-    implementation("com.esotericsoftware.spine:spine-libgdx:4.2.0")
+    api("com.badlogicgames.gdx:gdx:1.12.2-SNAPSHOT")
+    api("com.esotericsoftware.spine:spine-libgdx:4.2.0")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

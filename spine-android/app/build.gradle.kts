@@ -71,8 +71,4 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation(project(":spine-android"))
-
-    // TODO Check if we really need to import `spine-libgdx` in addition to `spine-android`?
-    implementation("com.badlogicgames.gdx:gdx:1.12.2-SNAPSHOT")
-    implementation("com.esotericsoftware.spine:spine-libgdx:4.2.0")
 }
