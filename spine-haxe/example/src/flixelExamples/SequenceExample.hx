@@ -26,12 +26,10 @@ class SequenceExample extends FlxState {
 		animationStateData.defaultMix = 0.25;
 
 		skeletonSprite = new SkeletonSprite(skeletondata, animationStateData);
-		skeletonSprite.screenCenter();
-        skeletonSprite.y -= 100;
 
-		skeletonSprite.state.setAnimationByName(0, "flying", true);
-		FlxG.debugger.visible = !FlxG.debugger.visible;
-		FlxG.debugger.track(skeletonSprite);
+		var animation = skeletonSprite.state.setAnimationByName(0, "flying", true).animation;
+		skeletonSprite.setBoundingBox(animation);
+		skeletonSprite.screenCenter();
 		add(skeletonSprite);
 		super.create();
 	}

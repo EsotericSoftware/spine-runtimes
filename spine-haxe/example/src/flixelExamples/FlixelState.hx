@@ -30,7 +30,8 @@ class FlixelState extends FlxState
 
 	override public function create():Void
 	{
-		FlxG.switchState(new MixAndMatchExample());
+		// FlxG.switchState(new AnimationBoundExample());
+		// FlxG.switchState(new MixAndMatchExample());
 		// FlxG.switchState(new SequenceExample());
 		// FlxG.switchState(new BasicExample());
 

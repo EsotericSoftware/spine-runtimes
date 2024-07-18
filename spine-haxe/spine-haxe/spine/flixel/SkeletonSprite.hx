@@ -1,5 +1,8 @@
 package spine.flixel;
 
+import spine.animation.MixDirection;
+import spine.animation.MixBlend;
+import spine.animation.Animation;
 import spine.TextureRegion;
 import haxe.extern.EitherType;
 import spine.attachments.Attachment;
@@ -59,14 +62,46 @@ class SkeletonSprite extends FlxObject
 		setBoundingBox();
 	}
 
-	public function setBoundingBox() {
-		var bounds = skeleton.getBounds();
+	public function setBoundingBox(?animation:Animation, ?clip:Bool = true) {
+		var bounds = animation == null ? skeleton.getBounds() : getAnimationBounds(animation, clip);
+		trace(bounds);
 		if (bounds.width > 0 && bounds.height > 0) {
 			width = bounds.width;
 			height = bounds.height;
-			offsetX = bounds.width / 2;
-			offsetY = bounds.height;
+			offsetX = -bounds.x;
+			offsetY = -bounds.y;
 		}
+	}
+
+	public function getAnimationBounds(animation:Animation, clip:Bool = true): lime.math.Rectangle {
+		var clipper = clip ? SkeletonSprite.clipper : null;
+		skeleton.setToSetupPose();
+
+		var steps = 100, time = 0.;
+		var stepTime = animation.duration != 0 ? animation.duration / steps : 0;
+		var minX = 100000000., maxX = -100000000., minY = 100000000., maxY = -100000000.;
+
+		var bounds = new lime.math.Rectangle();
+		for (i in 0...steps) {
+			animation.apply(skeleton, time , time, false, [], 1, MixBlend.setup, MixDirection.mixIn);
+			skeleton.updateWorldTransform(Physics.update);
+			bounds = skeleton.getBounds(clipper);
+
+			if (!Math.isNaN(bounds.x) && !Math.isNaN(bounds.y) && !Math.isNaN(bounds.width) && !Math.isNaN(bounds.height)) {
+				minX = Math.min(bounds.x, minX);
+				minY = Math.min(bounds.y, minY);
+				maxX = Math.max(bounds.right, maxX);
+				maxY = Math.max(bounds.bottom, maxY);
+			} else
+				trace("ERROR");
+
+			time += stepTime;
+		}
+		bounds.x = minX;
+		bounds.y = minY;
+		bounds.width = maxX - minX;
+		bounds.height = maxY - minY;
+		return bounds;
 	}
 
 	override public function destroy():Void
@@ -167,41 +202,16 @@ class SkeletonSprite extends FlxObject
 			if (mesh != null) {
 
 				// cannot use directly mesh.color.setRGBFloat otherwise the setter won't be called and transfor color not set
-				// trace('${slot.data.name}');
-				// trace(skeleton.color.r * slot.color.r * attachmentColor.r * color.redFloat);
-				// trace(skeleton.color.g * slot.color.g * attachmentColor.g * color.greenFloat);
-				// trace(skeleton.color.b * slot.color.b * attachmentColor.b * color.blueFloat);
-				// trace('${mesh.color}\n');
 				var _tmpColor:Int;
-				// _tmpColor = FlxColor.fromRGBFloat(1,1,1,1);
-
-
 				_tmpColor = FlxColor.fromRGBFloat(
 					skeleton.color.r * slot.color.r * attachmentColor.r * color.redFloat,
 					skeleton.color.g * slot.color.g * attachmentColor.g * color.greenFloat,
 					skeleton.color.b * slot.color.b * attachmentColor.b * color.blueFloat,
 					1
 				);
-
-
-				// // if (slot.data.name == "hair-patch") {
-				// if (slot.data.name == "square2") {
-				// 	_tmpColor = FlxColor.fromRGBFloat(
-				// 		skeleton.color.r * slot.color.r * attachmentColor.r * color.redFloat,
-				// 		skeleton.color.g * slot.color.g * attachmentColor.g * color.greenFloat,
-				// 		skeleton.color.b * slot.color.b * attachmentColor.b * color.blueFloat,
-				// 		1
-				// 	);
-				// 	// continue;
-				// 	// trace('${mesh.color.red} | ${mesh.color.green} | ${mesh.color.blue} | ${mesh.color.alpha}');
-				// } else {
-				// 	// trace(slot.data.name);
-				// 	_tmpColor = FlxColor.fromRGBFloat(1,1,1,1);
-				// }
-				// trace('${slot.data.name}\t${mesh.color}');
-
-				mesh.color = _tmpColor;
-				mesh.alpha = skeleton.color.a * slot.color.a * attachmentColor.a * alpha;
+				// mesh color and alpha are bugged
+				// mesh.color = _tmpColor;
+				// mesh.alpha = skeleton.color.a * slot.color.a * attachmentColor.a * alpha;
 
 				if (clipper.isClipping()) {
 					clipper.clipTriangles(worldVertices, triangles, triangles.length, uvs);

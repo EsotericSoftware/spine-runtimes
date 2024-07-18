@@ -54,21 +54,13 @@ class BasicExample extends FlxState {
 		animationStateData.defaultMix = 0.25;
 
 		skeletonSprite = new SkeletonSprite(skeletondata, animationStateData);
-		skeletonSprite.setPosition(
-			.5 * FlxG.width - skeletonSprite.width / 2,
-			.5 * FlxG.height - skeletonSprite.height / 2
-		);
-
-		skeletonSprite.state.setAnimationByName(0, "walk", true);
-
+		var animation = skeletonSprite.state.setAnimationByName(0, "walk", true).animation;
+		skeletonSprite.setBoundingBox(animation);
+		skeletonSprite.screenCenter();
 		add(skeletonSprite);
 
-		// addText("Click anywhere for next scene");
-
-		// addEventListener(TouchEvent.TOUCH, onTouch);
 		super.create();
 
-		FlxG.debugger.track(skeletonSprite);
 		trace("loaded");
 	}
 
@@ -80,10 +72,10 @@ class BasicExample extends FlxState {
 			if (FlxG.keys.anyPressed([LEFT])) {
 				skeletonSprite.x -= 15;
 			}
-			if (FlxG.keys.anyPressed([UP])) {
+			if (FlxG.keys.anyPressed([DOWN])) {
 				skeletonSprite.y += 15;
 			}
-			if (FlxG.keys.anyPressed([DOWN])) {
+			if (FlxG.keys.anyPressed([UP])) {
 				skeletonSprite.y -= 15;
 			}
 

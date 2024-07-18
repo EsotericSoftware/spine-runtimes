@@ -18,7 +18,7 @@ class MixAndMatchExample extends FlxState {
 
 	var skeletonSprite:SkeletonSprite;
 	override public function create():Void {
-		var button = new FlxButton(0, 0, "Next scene", () -> FlxG.switchState(new BasicExample()));
+		var button = new FlxButton(0, 0, "Next scene", () -> FlxG.switchState(new TankExample()));
 		button.setPosition(FlxG.width * .75, FlxG.height / 10);
 		add(button);
 
@@ -44,20 +44,9 @@ class MixAndMatchExample extends FlxState {
 		// customSkin.addSkin(data.findSkin("accessories/hat-red-yellow"));
 		// skeletonSprite.skeleton.skin = customSkin;
 
-		camera.zoom = .5;
 		skeletonSprite.skeleton.skinName = "full-skins/girl";
+		skeletonSprite.state.update(0);
 		skeletonSprite.setBoundingBox();
-
-		skeletonSprite.afterUpdateWorldTransforms = s -> {
-			for(slot in s.skeleton.slots) {
-				if (slot.data.name != "hair-patch") {
-					// slot.attachment = null;
-				}
-			}
-		}
-
-		// skeletonSprite.y -=300;
-
 		skeletonSprite.screenCenter();
 		// skeletonSprite.state.setAnimationByName(0, "dance", true);
 		add(skeletonSprite);
@@ -65,7 +54,7 @@ class MixAndMatchExample extends FlxState {
 		// FlxG.debugger.visible = !FlxG.debugger.visible;
 		// FlxG.debugger.track(skeletonSprite);
 		// FlxG.debugger.track(camera);
-		FlxG.debugger.drawDebug = true;
+		// FlxG.debugger.drawDebug = true;
 		super.create();
 	}
 
