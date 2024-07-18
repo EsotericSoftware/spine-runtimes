@@ -42,7 +42,7 @@ dependencies {
 afterEvaluate {
     publishing {
         publications {
-            create<MavenPublication>("spine-android") {
+            create<MavenPublication>("mavenLocal") {
                 groupId = "com.esotericsoftware"
                 artifactId = "spine-android"
                 version = "4.2"
