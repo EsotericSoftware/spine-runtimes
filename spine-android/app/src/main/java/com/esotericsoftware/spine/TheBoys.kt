@@ -1,5 +1,8 @@
 package com.esotericsoftware.spine
 
+import android.view.View
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
@@ -15,15 +18,20 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.viewinterop.AndroidView
@@ -54,17 +62,27 @@ fun TheBoys(nav: NavHostController) {
         }
     ) { paddingValues ->
         var viewportSize by remember { mutableStateOf(Size.Zero) }
+        val offsetX = remember { mutableFloatStateOf(0f) }
+        val offsetY = remember { mutableFloatStateOf(0f) }
 
         Box(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
+                .clipToBounds()
                 .onGloballyPositioned { coordinates ->
                     viewportSize = coordinates.size.toSize()
                 }
+                .pointerInput(Unit) {
+                    detectDragGestures { change, dragAmount ->
+                        change.consume()
+                        offsetX.floatValue += dragAmount.x
+                        offsetY.floatValue += dragAmount.y
+                    }
+                }
         ) {
             if (viewportSize != Size.Zero) {
-                val contentSize = Size(viewportSize.width * 2, viewportSize.height * 2)
+                val contentSize = viewportSize * 4f
 
                 val context = LocalContext.current
                 val cachedAtlas = remember { AndroidTextureAtlas.fromAsset("spineboy.atlas", context) }
@@ -72,25 +90,24 @@ fun TheBoys(nav: NavHostController) {
 
                 val spineboys = remember {
                     val rng = Random(System.currentTimeMillis())
-                    List(100) {
+                    List(100) { index ->
                         val scale = 0.1f + rng.nextFloat() * 0.2f
                         val position = Offset(rng.nextFloat() * contentSize.width, rng.nextFloat() * contentSize.height)
-                        SpineBoyData(scale, position, "walk")
+                        SpineBoyData(scale, position, if (index == 99) "hoverboard" else "walk")
                     }
                 }
 
-                Box(
-                    modifier = Modifier
-                        .size(contentSize.width.dp, contentSize.height.dp)
-                ) {
-                    spineboys.forEach { spineBoyData ->
+                spineboys.forEach { spineBoyData ->
+                    Box(modifier = Modifier
+                        .offset {
+                            IntOffset(
+                                (-(contentSize.width / 2) + spineBoyData.position.x + offsetX.floatValue.toInt()).toInt(),
+                                (-(contentSize.height / 2) + spineBoyData.position.y + offsetY.floatValue.toInt()).toInt(),
+                            )
+                        }
+                        .scale(spineBoyData.scale)
+                    ) {
                         AndroidView(
-                            modifier = Modifier
-                                .scale(spineBoyData.scale)
-                                .offset(
-                                    -(contentSize.width / 2).dp + spineBoyData.position.x.dp,
-                                    -(contentSize.height / 2).dp + spineBoyData.position.y.dp
-                                ),
                             factory = { ctx ->
                                 SpineView.loadFromDrawable(
                                     AndroidSkeletonDrawable(cachedAtlas, cachedSkeletonData),
