@@ -1,6 +1,5 @@
 package com.esotericsoftware.spine
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +18,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -26,11 +26,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
-import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -62,6 +60,11 @@ fun DisableRendering(nav: NavHostController) {
             )
         }
     ) { paddingValues ->
+
+        val visibleSpineBoys = remember {
+            mutableStateListOf<Int>()
+        }
+
         Column(
             modifier = Modifier
                 .padding(paddingValues)
@@ -74,16 +77,16 @@ fun DisableRendering(nav: NavHostController) {
                 modifier = Modifier
                     .padding(8.dp)
             ) {
-                Text("Scroll spine boys out of the viewport")
+                Text("Scroll ${visibleSpineBoys.count()} spine boys out of the viewport")
                 Text("Rendering is disabled when the spine view moves out of the viewport, preserving CPU/GPU resources.")
             }
-            SpineBoys()
+            SpineBoys(visibleSpineBoys)
         }
     }
 }
 
 @Composable
-fun SpineBoys() {
+fun SpineBoys(visibleSpineBoys: MutableList<Int>) {
     var boxSize by remember { mutableStateOf(Size.Zero) }
     val offsetX = remember { mutableFloatStateOf(0f) }
     val offsetY = remember { mutableFloatStateOf(0f) }
@@ -159,6 +162,15 @@ fun SpineBoys() {
                             positionInRoot.y + size.height > 0
 
                         isSpineBoyVisible.value = isInViewport
+
+                        val visibleSpineBoysAsSet = visibleSpineBoys.toMutableSet()
+                        if (isInViewport) {
+                            visibleSpineBoysAsSet.add(spineBoyData.id)
+                        } else {
+                            visibleSpineBoysAsSet.remove(spineBoyData.id)
+                        }
+                        visibleSpineBoys.clear()
+                        visibleSpineBoys.addAll(visibleSpineBoysAsSet)
                     }
                 ) {
                     AndroidView(
@@ -193,4 +205,3 @@ data class SpineBoyData(
     val position: Offset,
     val animation: String
 )
-
