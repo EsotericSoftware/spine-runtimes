@@ -424,7 +424,7 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 
 		controller.callOnBeforePaint(canvas);
 		Array<SkeletonRenderer.RenderCommand> commands = renderer.render(controller.getSkeleton());
-		renderer.render(canvas, commands);
+		renderer.renderToCanvas(canvas, commands);
 		controller.callOnAfterPaint(canvas, commands);
 
 		canvas.restore();

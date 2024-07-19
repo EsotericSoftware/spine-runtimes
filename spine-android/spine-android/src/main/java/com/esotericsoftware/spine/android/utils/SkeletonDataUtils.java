@@ -17,8 +17,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
+/**
+ * Helper to load {@link SkeletonData} from assets.
+ */
 public class SkeletonDataUtils {
 
+    /**
+     * Loads a {@link SkeletonData} from the file {@code skeletonFile} in assets using {@link Context}.
+     * Uses the provided {@link AndroidTextureAtlas} to resolve attachment images.
+     *
+     * Throws a {@link RuntimeException} in case the skeleton data could not be loaded.
+     */
     public static SkeletonData fromAsset(AndroidTextureAtlas atlas, String skeletonFileName, Context context) {
         AndroidAtlasAttachmentLoader attachmentLoader = new AndroidAtlasAttachmentLoader(atlas);
 
@@ -39,6 +48,12 @@ public class SkeletonDataUtils {
         }
         return skeletonData;
     }
+
+    /**
+     * Loads a {@link SkeletonData} from the file {@code skeletonFile}. Uses the provided {@link AndroidTextureAtlas} to resolve attachment images.
+     *
+     * Throws a {@link RuntimeException} in case the skeleton data could not be loaded.
+     */
     public static SkeletonData fromFile(AndroidTextureAtlas atlas, File skeletonFile) {
         AndroidAtlasAttachmentLoader attachmentLoader = new AndroidAtlasAttachmentLoader(atlas);
 
@@ -52,6 +67,11 @@ public class SkeletonDataUtils {
         return skeletonLoader.readSkeletonData(new FileHandle(skeletonFile));
     }
 
+    /**
+     * Loads a {@link SkeletonData} from the URL {@code skeletonURL}. Uses the provided {@link AndroidTextureAtlas} to resolve attachment images.
+     *
+     * Throws a {@link RuntimeException} in case the skeleton data could not be loaded.
+     */
     public static SkeletonData fromHttp(AndroidTextureAtlas atlas, URL skeletonUrl, File targetDirectory) {
         File skeletonFile = HttpUtils.downloadFrom(skeletonUrl, targetDirectory);
         return fromFile(atlas, skeletonFile);

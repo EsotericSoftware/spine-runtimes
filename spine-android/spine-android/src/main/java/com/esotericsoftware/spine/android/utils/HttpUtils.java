@@ -12,8 +12,14 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
 
+/**
+ * Helper to load http resources.
+ */
 public class HttpUtils {
-
+    /**
+     * Download a file from an url into a target directory. It keeps the name from the {@code url}.
+     * This should NOT be executed on the main run loop.
+     */
     public static File downloadFrom(URL url, File targetDirectory) throws RuntimeException {
         HttpURLConnection urlConnection = null;
         InputStream inputStream = null;

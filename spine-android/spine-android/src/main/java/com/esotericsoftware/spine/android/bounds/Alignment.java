@@ -1,5 +1,8 @@
 package com.esotericsoftware.spine.android.bounds;
 
+/**
+ * How a view should be aligned within another view.
+ */
 public enum Alignment {
     TOP_LEFT(-1.0f, -1.0f),
     TOP_CENTER(0.0f, -1.0f),

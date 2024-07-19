@@ -112,11 +112,11 @@ fun DressUp(nav: NavHostController) {
             skeleton.setToSetupPose()
             skeleton.update(0f)
             skeleton.updateWorldTransform(Skeleton.Physics.update)
-            skinImages[skin.getName()] = drawable.renderToBitmap(
-                renderer,
+            skinImages[skin.getName()] = renderer.renderToBitmap(
                 with(localDensity) { thumbnailSize.dp.toPx() },
                 with(localDensity) { thumbnailSize.dp.toPx() },
-                0xffffffff.toInt()
+                0xffffffff.toInt(),
+                skeleton,
             ).asImageBitmap()
             selectedSkins[skin.getName()] = false
         }

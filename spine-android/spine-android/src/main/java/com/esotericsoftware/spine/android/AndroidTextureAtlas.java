@@ -49,16 +49,25 @@ import com.esotericsoftware.spine.android.utils.HttpUtils;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
+import android.graphics.Paint;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 
+/**
+ * Atlas data loaded from a `.atlas` file and its corresponding `.png` files. For each atlas image,
+ * a corresponding {@link Bitmap} and {@link Paint} is constructed, which are used when rendering a skeleton
+ * that uses this atlas.
+ *
+ * Use the static methods {@link AndroidTextureAtlas#fromAsset(String, Context)}, {@link AndroidTextureAtlas#fromFile(File)},
+ * and {@link AndroidTextureAtlas#fromHttp(URL, File)} to load an atlas.
+ */
 public class AndroidTextureAtlas {
-	private static interface BitmapLoader {
+	private interface BitmapLoader {
 		Bitmap load (String path);
 	}
 
-	private Array<AndroidTexture> textures = new Array<>();
-	private Array<AtlasRegion> regions = new Array<>();
+	private final Array<AndroidTexture> textures = new Array<>();
+	private final Array<AtlasRegion> regions = new Array<>();
 
 	private AndroidTextureAtlas (TextureAtlasData data, BitmapLoader bitmapLoader) {
 		for (TextureAtlasData.Page page : data.getPages()) {
@@ -85,8 +94,10 @@ public class AndroidTextureAtlas {
 		}
 	}
 
-	/** Returns the first region found with the specified name. This method uses string comparison to find the region, so the
-	 * result should be cached rather than calling this method multiple times. */
+	/**
+	 * Returns the first region found with the specified name. This method uses string comparison to find the region, so the
+	 * result should be cached rather than calling this method multiple times.
+	 */
 	public @Null AtlasRegion findRegion (String name) {
 		for (int i = 0, n = regions.size; i < n; i++)
 			if (regions.get(i).name.equals(name)) return regions.get(i);
@@ -101,7 +112,12 @@ public class AndroidTextureAtlas {
 		return regions;
 	}
 
-	static public AndroidTextureAtlas fromAsset(String atlasFileName, Context context) {
+	/**
+	 * Loads an {@link AndroidTextureAtlas} from the file {@code atlasFileName} from assets using {@link Context}.
+	 *
+	 * Throws a {@link RuntimeException} in case the atlas could not be loaded.
+	 */
+	public static AndroidTextureAtlas fromAsset(String atlasFileName, Context context) {
 		TextureAtlasData data = new TextureAtlasData();
 		AssetManager assetManager = context.getAssets();
 
@@ -131,7 +147,12 @@ public class AndroidTextureAtlas {
         });
 	}
 
-	static public AndroidTextureAtlas fromFile(File atlasFile) {
+	/**
+	 * Loads an {@link AndroidTextureAtlas} from the file {@code atlasFileName}.
+	 *
+	 * Throws a {@link RuntimeException} in case the atlas could not be loaded.
+	 */
+	public static AndroidTextureAtlas fromFile(File atlasFile) {
 		TextureAtlasData data;
 		try {
 			data = loadTextureAtlasData(atlasFile);
@@ -148,7 +169,12 @@ public class AndroidTextureAtlas {
 		});
 	}
 
-	static public AndroidTextureAtlas fromHttp(URL atlasUrl, File targetDirectory) {
+	/**
+	 * Loads an {@link AndroidTextureAtlas} from the URL {@code atlasURL}.
+	 *
+	 * Throws a {@link Exception} in case the atlas could not be loaded.
+	 */
+	public static AndroidTextureAtlas fromHttp(URL atlasUrl, File targetDirectory) {
 		File atlasFile = HttpUtils.downloadFrom(atlasUrl, targetDirectory);
 		TextureAtlasData data;
 		try {
@@ -188,7 +214,7 @@ public class AndroidTextureAtlas {
 		}
 	}
 
-	static private TextureAtlasData loadTextureAtlasData(File atlasFile) {
+	private static TextureAtlasData loadTextureAtlasData(File atlasFile) {
 		TextureAtlasData data = new TextureAtlasData();
 		FileHandle inputFile = new FileHandle() {
 			@Override

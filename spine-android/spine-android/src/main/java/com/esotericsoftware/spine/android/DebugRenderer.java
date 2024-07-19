@@ -7,6 +7,10 @@ import android.graphics.RectF;
 import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.spine.Bone;
 
+/**
+ * Renders debug information for a {@link AndroidSkeletonDrawable}, like bone locations, to a {@link Canvas}.
+ * See {@link DebugRenderer#render}.
+ */
 public class DebugRenderer {
 
     public void render(AndroidSkeletonDrawable drawable, Canvas canvas, Array<SkeletonRenderer.RenderCommand> commands) {

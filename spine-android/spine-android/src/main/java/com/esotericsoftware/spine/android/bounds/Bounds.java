@@ -4,6 +4,10 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.FloatArray;
 import com.esotericsoftware.spine.Skeleton;
 
+/**
+ * Bounds denoted by the top left corner coordinates {@code x} and {@code y}
+ * and the {@code width} and {@code height}.
+ */
 public class Bounds {
     private double x;
     private double y;
