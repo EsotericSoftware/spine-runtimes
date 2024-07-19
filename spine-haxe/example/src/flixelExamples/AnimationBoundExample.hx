@@ -18,7 +18,10 @@ class AnimationBoundExample extends FlxState {
 	var loadBinary = true;
 
 	override public function create():Void {
-		var button = new FlxButton(0, 0, "Next scene", () -> FlxG.switchState(new CloudPotExample()));
+		var button = new FlxButton(0, 0, "Next scene", () -> {
+			FlxG.debugger.drawDebug = false;
+			FlxG.switchState(new ControlBonesExample());
+		});
 		button.setPosition(FlxG.width * .75, FlxG.height / 10);
 		add(button);
 

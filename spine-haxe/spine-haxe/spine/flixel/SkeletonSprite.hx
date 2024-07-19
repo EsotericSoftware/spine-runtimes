@@ -1,5 +1,8 @@
 package spine.flixel;
 
+import openfl.geom.Point;
+import flixel.math.FlxPoint;
+import flixel.math.FlxMatrix;
 import spine.animation.MixDirection;
 import spine.animation.MixBlend;
 import spine.animation.Animation;
@@ -47,9 +50,18 @@ class SkeletonSprite extends FlxObject
 	public var flipY(default, set):Bool = false;
 	public var antialiasing:Bool = true;
 
+	@:isVar
+	public var scaleX(get, set):Float = 1;
+	@:isVar
+	public var scaleY(get, set):Float = 1;
+
 	var _tempVertices:Array<Float> = new Array<Float>();
 	var _quadTriangles:Array<Int>;
 	var _meshes(default, null):Array<SkeletonMesh> = new Array<SkeletonMesh>();
+
+	private var _tempMatrix = new FlxMatrix();
+	private var _tempPoint = new Point();
+
 	private static var QUAD_INDICES:Array<Int> = [0, 1, 2, 2, 3, 0];
 	public function new(skeletonData:SkeletonData, animationStateData:AnimationStateData = null)
 	{
@@ -58,13 +70,11 @@ class SkeletonSprite extends FlxObject
 		skeleton = new Skeleton(skeletonData);
 		skeleton.updateWorldTransform(Physics.update);
 		state = new AnimationState(animationStateData != null ? animationStateData : new AnimationStateData(skeletonData));
-
 		setBoundingBox();
 	}
 
 	public function setBoundingBox(?animation:Animation, ?clip:Bool = true) {
 		var bounds = animation == null ? skeleton.getBounds() : getAnimationBounds(animation, clip);
-		trace(bounds);
 		if (bounds.width > 0 && bounds.height > 0) {
 			width = bounds.width;
 			height = bounds.height;
@@ -112,6 +122,8 @@ class SkeletonSprite extends FlxObject
 
 		_tempVertices = null;
 		_quadTriangles = null;
+		_tempMatrix = null;
+		_tempPoint = null;
 
 		if (_meshes != null) {
 			for (mesh in _meshes) mesh.destroy();
@@ -154,6 +166,7 @@ class SkeletonSprite extends FlxObject
 		var uvs:Array<Float>;
 		var twoColorTint:Bool = false;
 		var vertexSize:Int = twoColorTint ? 12 : 8;
+		_tempMatrix = getTransformMatrix();
 		for (slot in drawOrder) {
 			var clippedVertexSize:Int = clipper.isClipping() ? 2 : vertexSize;
 			if (!slot.bone.active) {
@@ -202,16 +215,13 @@ class SkeletonSprite extends FlxObject
 			if (mesh != null) {
 
 				// cannot use directly mesh.color.setRGBFloat otherwise the setter won't be called and transfor color not set
-				var _tmpColor:Int;
-				_tmpColor = FlxColor.fromRGBFloat(
+				mesh.color = FlxColor.fromRGBFloat(
 					skeleton.color.r * slot.color.r * attachmentColor.r * color.redFloat,
 					skeleton.color.g * slot.color.g * attachmentColor.g * color.greenFloat,
 					skeleton.color.b * slot.color.b * attachmentColor.b * color.blueFloat,
 					1
 				);
-				// mesh color and alpha are bugged
-				// mesh.color = _tmpColor;
-				// mesh.alpha = skeleton.color.a * slot.color.a * attachmentColor.a * alpha;
+				mesh.alpha = skeleton.color.a * slot.color.a * attachmentColor.a * alpha;
 
 				if (clipper.isClipping()) {
 					clipper.clipTriangles(worldVertices, triangles, triangles.length, uvs);
@@ -224,8 +234,15 @@ class SkeletonSprite extends FlxObject
 					var i = 0;
 					mesh.vertices.length = numVertices;
 					while (v < n) {
-						mesh.vertices[i] = worldVertices[v];
-						mesh.vertices[i + 1] = worldVertices[v + 1];
+						// if (angle != 0) {
+							_tempPoint.setTo(worldVertices[v], worldVertices[v + 1]);
+							_tempPoint = _tempMatrix.transformPoint(_tempPoint);
+							mesh.vertices[i] = _tempPoint.x;
+							mesh.vertices[i + 1] = _tempPoint.y;
+						// } else {
+						// 	mesh.vertices[i] = worldVertices[v];
+						// 	mesh.vertices[i + 1] = worldVertices[v + 1];
+						// }
 						v += 8;
 						i += 2;
 					}
@@ -235,15 +252,61 @@ class SkeletonSprite extends FlxObject
 
 				mesh.antialiasing = antialiasing;
 				mesh.blend = SpineTexture.toFlixelBlending(slot.data.blendMode);
-				mesh.x = x + offsetX;
-				mesh.y = y + offsetY;
-				// mesh._cameras = _cameras;
+				// mesh.x = x + offsetX;
+				// mesh.y = y + offsetY;
+				mesh.angle = angle;
 				mesh.draw();
 			}
 
 			clipper.clipEndWithSlot(slot);
 		}
 		clipper.clipEnd();
+	}
+
+	private function getTransformMatrix():FlxMatrix {
+		_tempMatrix.identity();
+		// scale is connected to the skeleton scale - no need to rescale
+		_tempMatrix.scale(1, 1);
+    	_tempMatrix.rotate(angle * Math.PI / 180);
+		_tempMatrix.translate(x + offsetX, y + offsetY);
+		return _tempMatrix;
+	}
+
+	public function skeletonToHaxeWorldCoordinates(point:Array<Float>):Void {
+		var transform = getTransformMatrix();
+		var a = transform.a,
+			b = transform.b,
+			c = transform.c,
+			d = transform.d,
+			tx = transform.tx,
+			ty = transform.ty;
+			var x = point[0];
+			var y = point[1];
+			point[0] = x * a + y * c + tx;
+			point[1] = x * b + y * d + ty;
+	}
+
+	public function haxeWorldCoordinatesToSkeleton(point:Array<Float>):Void {
+		var transform = getTransformMatrix().invert();
+		var a = transform.a,
+			b = transform.b,
+			c = transform.c,
+			d = transform.d,
+			tx = transform.tx,
+			ty = transform.ty;
+		var x = point[0];
+		var y = point[1];
+		point[0] = x * a + y * c + tx;
+		point[1] = x * b + y * d + ty;
+	}
+
+	public function haxeWorldCoordinatesToBone(point:Array<Float>, bone: Bone):Void {
+		this.haxeWorldCoordinatesToSkeleton(point);
+		if (bone.parent != null) {
+			bone.parent.worldToLocal(point);
+		} else {
+			bone.worldToLocal(point);
+		}
 	}
 
 	private function getFlixelMeshFromRendererAttachment(region: RenderedAttachment) {
@@ -269,6 +332,27 @@ class SkeletonSprite extends FlxObject
 		skeleton.flipY = value;
 		return flipY = value;
 	}
+
+	function set_scale(value:FlxPoint):FlxPoint {
+		return value;
+	}
+
+	function get_scaleX():Float {
+		return skeleton.scaleX;
+	}
+
+	function set_scaleX(value:Float):Float {
+		return skeleton.scaleX = value;
+	}
+
+	function get_scaleY():Float {
+		return skeleton.scaleY;
+	}
+
+	function set_scaleY(value:Float):Float {
+		return skeleton.scaleY = value;
+	}
+
 }
 
 typedef RenderedAttachment = {

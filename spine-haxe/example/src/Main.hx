@@ -29,8 +29,9 @@
 
 package;
 
-import starlingExample.BasicExample;
-import starlingExample.Scene.SceneManager;
+import flixelExamples.FlixelState;
+import starlingExamples.BasicExample;
+import starlingExamples.Scene.SceneManager;
 import starling.core.Starling;
 import flixel.FlxG;
 import flixel.FlxGame;

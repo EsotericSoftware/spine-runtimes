@@ -29,7 +29,6 @@
 
 package spine.flixel;
 
-import flixel.system.FlxAssets.FlxGraphicAsset;
 import flixel.FlxStrip;
 
 class SkeletonMesh extends FlxStrip {
@@ -37,6 +36,4 @@ class SkeletonMesh extends FlxStrip {
 		super();
 		// graphic = texture;
 	}
-
-
 }

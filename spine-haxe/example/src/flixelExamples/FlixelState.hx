@@ -30,7 +30,8 @@ class FlixelState extends FlxState
 
 	override public function create():Void
 	{
-		// FlxG.switchState(new AnimationBoundExample());
+		// FlxG.switchState(new EventsExample());
+		// FlxG.switchState(new ControlBonesExample());
 		// FlxG.switchState(new MixAndMatchExample());
 		// FlxG.switchState(new SequenceExample());
 		// FlxG.switchState(new BasicExample());
@@ -64,6 +65,14 @@ class FlixelState extends FlxState
 		floor.loadGraphic(FlxGraphic.fromRectangle(FlxG.width, FlxG.height - 100, 0xff822f02));
 		floor.y = FlxG.height - 100;
 		add(floor);
+
+		// instructions
+		var groupInstructions = new FlxSpriteGroup();
+		groupInstructions.setPosition(50, 405);
+        groupInstructions.add(new FlxText(0, 0, 200, "Left/Right - Move", 16));
+        groupInstructions.add(new FlxText(0, 25, 150, "Space - Jump", 16));
+        groupInstructions.add(new FlxText(200, 25, 400, "Click the button for the next example", 16));
+		add(groupInstructions);
 
 		// loading spineboy
 		var atlas = new TextureAtlas(Assets.getText("assets/spineboy.atlas"), new FlixelTextureLoader("assets/spineboy.atlas"));
