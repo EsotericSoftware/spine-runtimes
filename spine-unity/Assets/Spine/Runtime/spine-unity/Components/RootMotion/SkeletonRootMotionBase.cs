@@ -183,6 +183,13 @@ namespace Spine.Unity {
 
 				skeletonAnimation.OnAnimationRebuild -= InitializeOnRebuild;
 				skeletonAnimation.OnAnimationRebuild += InitializeOnRebuild;
+
+				SkeletonUtility skeletonUtility = GetComponent<SkeletonUtility>();
+				if (skeletonUtility != null) {
+					// SkeletonUtilityBone shall receive UpdateLocal callbacks for bone-following after root motion
+					// clears the root-bone position.
+					skeletonUtility.ResubscribeEvents();
+				}
 			}
 		}
 
