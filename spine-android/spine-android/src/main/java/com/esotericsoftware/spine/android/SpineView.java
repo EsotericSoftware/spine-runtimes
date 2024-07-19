@@ -36,6 +36,7 @@ import com.esotericsoftware.spine.android.bounds.BoundsProvider;
 import com.esotericsoftware.spine.android.bounds.ContentMode;
 import com.esotericsoftware.spine.android.bounds.SetupPoseBounds;
 import com.esotericsoftware.spine.android.callbacks.AndroidSkeletonDrawableLoader;
+import com.esotericsoftware.spine.Skeleton;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -50,8 +51,20 @@ import androidx.annotation.NonNull;
 import java.io.File;
 import java.net.URL;
 
+/**
+ * A {@link View} to display a Spine skeleton. The skeleton can be loaded from an asset bundle ({@link SpineView#loadFromAssets(String, String, Context, SpineController)}),
+ * local files ({@link SpineView#loadFromFile(File, File, Context, SpineController)}), URLs ({@link SpineView#loadFromHttp(URL, URL, File, Context, SpineController)}), or a pre-loaded {@link AndroidSkeletonDrawable} using ({@link SpineView#loadFromDrawable(AndroidSkeletonDrawable, Context, SpineController)}).
+ *
+ * The skeleton displayed by a {@link SpineView} can be controlled via a {@link SpineController}.
+ *
+ * The size of the widget can be derived from the bounds provided by a {@link BoundsProvider}. If the widget is not sized by the bounds
+ * computed by the {@link BoundsProvider}, the widget will use the computed bounds to fit the skeleton inside the widget's dimensions.
+ */
 public class SpineView extends View implements Choreographer.FrameCallback {
 
+	/**
+	 * Used to build {@link SpineView} instances.
+	 * */
 	public static class Builder {
 		private final Context context;
 		private final SpineController controller;
@@ -67,23 +80,41 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 		private Alignment alignment = Alignment.CENTER;
 		private ContentMode contentMode = ContentMode.FIT;
 
+		/**
+		 * Instantiate a {@link Builder} used to build a {@link SpineView}, which is a {@link View} to display a Spine skeleton.
+		 *
+		 * @param controller The skeleton displayed by a {@link SpineView} can be controlled via a {@link SpineController}.
+		 */
 		public Builder(Context context, SpineController controller) {
 			this.context = context;
 			this.controller = controller;
 		}
 
+		/**
+		 * Loads assets from your app assets for the {@link SpineView} if set. The {@code atlasFileName} specifies the
+		 * `.atlas` file to be loaded for the images used to render the skeleton. The {@code skeletonFileName} specifies either a Skeleton `.json` or
+		 * `.skel` file containing the skeleton data.
+		 */
 		public Builder setLoadFromAssets(String atlasFileName, String skeletonFileName) {
 			this.atlasFileName = atlasFileName;
 			this.skeletonFileName = skeletonFileName;
 			return this;
 		}
 
+		/**
+		 * Loads assets from files for the {@link SpineView} if set. The {@code atlasFile} specifies the `.atlas` file to be loaded for the images used to render
+		 * the skeleton. The {@code skeletonFile} specifies either a Skeleton `.json` or `.skel` file containing the skeleton data.
+		 */
 		public Builder setLoadFromFile(File atlasFile, File skeletonFile) {
 			this.atlasFile = atlasFile;
 			this.skeletonFile = skeletonFile;
 			return this;
 		}
 
+		/**
+		 * Loads assets from http for the {@link SpineView} if set. The {@code atlasUrl} specifies the `.atlas` url to be loaded for the images used to render
+		 * the skeleton. The {@code skeletonUrl} specifies either a Skeleton `.json` or `.skel` url containing the skeleton data.
+		 */
 		public Builder setLoadFromHttp(URL atlasUrl, URL skeletonUrl, File targetDirectory) {
 			this.atlasUrl = atlasUrl;
 			this.skeletonUrl = skeletonUrl;
@@ -91,26 +122,47 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 			return this;
 		}
 
+		/**
+		 * Uses the {@link AndroidSkeletonDrawable} for the {@link SpineView} if set.
+		 */
 		public Builder setLoadFromDrawable(AndroidSkeletonDrawable drawable) {
 			this.drawable = drawable;
 			return this;
 		}
 
+		/**
+		 * Get the {@link BoundsProvider} used to compute the bounds of the {@link Skeleton} inside the view.
+		 * The default is {@link SetupPoseBounds}.
+		 */
 		public Builder setBoundsProvider(BoundsProvider boundsProvider) {
 			this.boundsProvider = boundsProvider;
 			return this;
 		}
 
+		/**
+		 * Get the {@link  ContentMode} used to fit the {@link Skeleton} inside the view.
+		 * The default is {@link  ContentMode#FIT}.
+		 */
 		public Builder setContentMode(ContentMode contentMode) {
 			this.contentMode = contentMode;
 			return this;
 		}
 
+		/**
+		 * Set the {@link  Alignment} used to align the {@link Skeleton} inside the view.
+		 * The default is {@link  Alignment#CENTER}
+		 */
 		public Builder setAlignment(Alignment alignment) {
 			this.alignment = alignment;
 			return this;
 		}
 
+		/**
+		 * Builds a new {@link SpineView}.
+		 *
+		 * After initialization is complete, the provided {@code SpineController} is invoked as per the {@link SpineController} semantics, to allow
+		 * modifying how the skeleton inside the widget is animated and rendered.
+		 */
 		public SpineView build() {
 			SpineView spineView = new SpineView(context, controller);
 			spineView.boundsProvider = boundsProvider;
@@ -146,100 +198,192 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 	private Alignment alignment = Alignment.CENTER;
 	private ContentMode contentMode = ContentMode.FIT;
 
+	/**
+	 * Constructs a new {@link SpineView}.
+	 *
+	 * After initialization is complete, the provided {@code SpineController} is invoked as per the {@link SpineController} semantics, to allow
+	 * modifying how the skeleton inside the widget is animated and rendered.
+	 */
 	public SpineView (Context context, SpineController controller) {
 		super(context);
 		this.controller = controller;
 	}
 
+	/**
+	 * Constructs a new {@link SpineView} without providing a {@link SpineController}, which you need to provide using
+	 * {@link SpineView#setController(SpineController)}.
+	 */
 	public SpineView (Context context, AttributeSet attrs) {
 		super(context, attrs);
 		// Set properties by view id
 	}
 
+	/**
+	 * Constructs a new {@link SpineView} without providing a {@link SpineController}, which you need to provide using
+	 * {@link SpineView#setController(SpineController)}.
+	 */
 	public SpineView (Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		// Set properties by view id
 	}
 
+	/**
+	 * Constructs a new {@link SpineView} from files in your app assets. The {@code atlasFileName} specifies the
+	 * `.atlas` file to be loaded for the images used to render the skeleton. The {@code skeletonFileName} specifies either a Skeleton `.json` or
+	 * `.skel` file containing the skeleton data.
+	 *
+	 * After initialization is complete, the provided {@code controller} is invoked as per the {@link SpineController} semantics, to allow
+	 * modifying how the skeleton inside the widget is animated and rendered.
+	 */
 	public static SpineView loadFromAssets(String atlasFileName, String skeletonFileName, Context context, SpineController controller) {
 		SpineView spineView = new SpineView(context, controller);
 		spineView.loadFromAsset(atlasFileName, skeletonFileName);
 		return spineView;
 	}
 
+	/**
+	 * Constructs a new {@link SpineView} from files. The {@code atlasFile} specifies the `.atlas` file to be loaded for the images used to render
+	 * the skeleton. The {@code skeletonFile} specifies either a Skeleton `.json` or `.skel` file containing the skeleton data.
+	 *
+	 * After initialization is complete, the provided {@code SpineController} is invoked as per the {@link SpineController} semantics, to allow
+	 * modifying how the skeleton inside the widget is animated and rendered.
+	 */
 	public static SpineView loadFromFile(File atlasFile, File skeletonFile, Context context, SpineController controller) {
 		SpineView spineView = new SpineView(context, controller);
 		spineView.loadFromFile(atlasFile, skeletonFile);
 		return spineView;
 	}
 
+	/**
+	 * Constructs a new {@link SpineView} from HTTP URLs. The {@code atlasUrl} specifies the `.atlas` url to be loaded for the images used to render
+	 * the skeleton. The {@code skeletonUrl} specifies either a Skeleton `.json` or `.skel` url containing the skeleton data.
+	 *
+	 * After initialization is complete, the provided {@code SpineController} is invoked as per the {@link SpineController} semantics, to allow
+	 * modifying how the skeleton inside the widget is animated and rendered.
+	 */
 	public static SpineView loadFromHttp(URL atlasUrl, URL skeletonUrl, File targetDirectory, Context context, SpineController controller) {
 		SpineView spineView = new SpineView(context, controller);
 		spineView.loadFromHttp(atlasUrl, skeletonUrl, targetDirectory);
 		return spineView;
 	}
 
+	/**
+	 * Constructs a new {@link SpineView} from a {@link AndroidSkeletonDrawable}.
+	 *
+	 * After initialization is complete, the provided {@code SpineController} is invoked as per the {@link SpineController} semantics, to allow
+	 * modifying how the skeleton inside the widget is animated and rendered.
+	 */
 	public static SpineView loadFromDrawable(AndroidSkeletonDrawable drawable, Context context, SpineController controller) {
 		SpineView spineView = new SpineView(context, controller);
 		spineView.loadFromDrawable(drawable);
 		return spineView;
 	}
 
+	/**
+	 * The same as {@link SpineView#loadFromAssets(String, String, Context, SpineController)}, but can be used after
+	 * instantiating the view via {@link SpineView#SpineView(Context, SpineController)}.
+	 */
 	public void loadFromAsset(String atlasFileName, String skeletonFileName) {
 		loadFrom(() -> AndroidSkeletonDrawable.fromAsset(atlasFileName, skeletonFileName, getContext()));
 	}
 
+	/**
+	 * The same as {@link SpineView#loadFromFile(File, File, Context, SpineController)}, but can be used after
+	 * instantiating the view via {@link SpineView#SpineView(Context, SpineController)}.
+	 */
 	public void loadFromFile(File atlasFile, File skeletonFile) {
 		loadFrom(() -> AndroidSkeletonDrawable.fromFile(atlasFile, skeletonFile));
 	}
 
+	/**
+	 * The same as {@link SpineView#loadFromHttp(URL, URL, File, Context, SpineController)}, but can be used after
+	 * instantiating the view via {@link SpineView#SpineView(Context, SpineController)}.
+	 */
 	public void loadFromHttp(URL atlasUrl, URL skeletonUrl, File targetDirectory) {
 		loadFrom(() -> AndroidSkeletonDrawable.fromHttp(atlasUrl, skeletonUrl, targetDirectory));
 	}
 
+	/**
+	 * The same as {@link SpineView#loadFromDrawable(AndroidSkeletonDrawable, Context, SpineController)}, but can be used after
+	 * instantiating the view via {@link SpineView#SpineView(Context, SpineController)}.
+	 */
 	public void loadFromDrawable(AndroidSkeletonDrawable drawable) {
 		loadFrom(() -> drawable);
 	}
 
+	/**
+	 * Get the {@link  SpineController}
+	 */
 	public SpineController getController() {
 		return controller;
 	}
 
+	/**
+	 * Set the {@link  SpineController}. Only do this if you use {@link SpineView#SpineView(Context, AttributeSet)},
+	 * {@link SpineView#SpineView(Context, AttributeSet, int)}, or create the {@link SpineView} in an XML layout.
+	 */
 	public void setController(SpineController controller) {
 		this.controller = controller;
 	}
 
+	/**
+	 * Get the {@link  Alignment} used to align the {@link Skeleton} inside the view.
+	 * The default is {@link  Alignment#CENTER}
+	 */
 	public Alignment getAlignment() {
 		return alignment;
 	}
 
+	/**
+	 * Set the {@link  Alignment}.
+	 */
 	public void setAlignment(Alignment alignment) {
 		this.alignment = alignment;
 		updateCanvasTransform();
 	}
 
+	/**
+	 * Get the {@link  ContentMode} used to fit the {@link Skeleton} inside the view.
+	 * The default is {@link  ContentMode#FIT}.
+	 */
 	public ContentMode getContentMode() {
 		return contentMode;
 	}
 
+	/**
+	 * Set the {@link  ContentMode}.
+	 */
 	public void setContentMode(ContentMode contentMode) {
 		this.contentMode = contentMode;
 		updateCanvasTransform();
 	}
 
+	/**
+	 * Get the {@link BoundsProvider} used to compute the bounds of the {@link Skeleton} inside the view.
+	 * The default is {@link SetupPoseBounds}.
+	 */
 	public BoundsProvider getBoundsProvider() {
 		return boundsProvider;
 	}
 
+	/**
+	 * Set the {@link  BoundsProvider}.
+	 */
 	public void setBoundsProvider(BoundsProvider boundsProvider) {
 		this.boundsProvider = boundsProvider;
 		updateCanvasTransform();
 	}
 
+	/**
+	 * Check if rendering is enabled.
+	 */
 	public Boolean isRendering() {
 		return rendering;
 	}
 
+	/**
+	 * Set to disable or enable rendering. Disable it when the spine view is out of bounds and you want to preserve CPU/GPU resources.
+	 */
 	public void setRendering(Boolean rendering) {
 		this.rendering = rendering;
 	}

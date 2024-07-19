@@ -43,7 +43,7 @@ import com.esotericsoftware.spine.android.callbacks.SpineControllerCallback;
  */
 public class SpineController {
     /**
-     * Used to create a {@link SpineController} instance.
+     * Used to build {@link SpineController} instances.
      * */
     public static class Builder {
         private final SpineControllerCallback onInitialized;
@@ -53,7 +53,7 @@ public class SpineController {
         private SpineControllerAfterPaintCallback onAfterPaint;
 
         /**
-         * Instantiate a {@link Builder} for {@link SpineController}, which controls how the skeleton of a {@link SpineView}
+         * Instantiate a {@link Builder} used to build a {@link SpineController}, which controls how the skeleton of a {@link SpineView}
          * is animated and rendered. Upon initialization of a {@link SpineView}, the provided {@code onInitialized} callback
          * method is called once. This method can be used to set up the initial animation(s) of the skeleton, among other things.
          *
