@@ -35,27 +35,20 @@ import com.esotericsoftware.spine.android.bounds.Bounds;
 import com.esotericsoftware.spine.android.bounds.BoundsProvider;
 import com.esotericsoftware.spine.android.bounds.ContentMode;
 import com.esotericsoftware.spine.android.bounds.SetupPoseBounds;
-import com.esotericsoftware.spine.android.utils.AndroidSkeletonDrawableLoader;
+import com.esotericsoftware.spine.android.callbacks.AndroidSkeletonDrawableLoader;
 
 import android.content.Context;
 import android.graphics.Canvas;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.Choreographer;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 
-import java.io.Console;
 import java.io.File;
 import java.net.URL;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class SpineView extends View implements Choreographer.FrameCallback {
 

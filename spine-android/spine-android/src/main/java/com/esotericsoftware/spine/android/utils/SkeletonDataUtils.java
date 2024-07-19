@@ -13,12 +13,9 @@ import com.esotericsoftware.spine.android.AndroidTextureAtlas;
 
 import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-
-import kotlin.NotImplementedError;
 
 public class SkeletonDataUtils {
 
@@ -56,7 +53,7 @@ public class SkeletonDataUtils {
     }
 
     public static SkeletonData fromHttp(AndroidTextureAtlas atlas, URL skeletonUrl, File targetDirectory) {
-        File skeletonFile = SpineHttpUtils.downloadFrom(skeletonUrl, targetDirectory);
+        File skeletonFile = HttpUtils.downloadFrom(skeletonUrl, targetDirectory);
         return fromFile(atlas, skeletonFile);
     }
 }

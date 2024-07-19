@@ -1,4 +1,4 @@
-package com.esotericsoftware.spine.android.utils;
+package com.esotericsoftware.spine.android.callbacks;
 
 import android.graphics.Canvas;
 

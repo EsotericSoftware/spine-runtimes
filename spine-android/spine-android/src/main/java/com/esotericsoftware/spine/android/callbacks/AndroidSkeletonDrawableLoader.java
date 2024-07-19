@@ -1,4 +1,4 @@
-package com.esotericsoftware.spine.android.utils;
+package com.esotericsoftware.spine.android.callbacks;
 
 import com.esotericsoftware.spine.android.AndroidSkeletonDrawable;
 

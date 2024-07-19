@@ -12,7 +12,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
 
-public class SpineHttpUtils {
+public class HttpUtils {
 
     public static File downloadFrom(URL url, File targetDirectory) throws RuntimeException {
         HttpURLConnection urlConnection = null;

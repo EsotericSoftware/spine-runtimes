@@ -44,7 +44,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.TextureAtlasData;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Null;
-import com.esotericsoftware.spine.android.utils.SpineHttpUtils;
+import com.esotericsoftware.spine.android.utils.HttpUtils;
 
 import android.content.Context;
 import android.content.res.AssetManager;
@@ -149,7 +149,7 @@ public class AndroidTextureAtlas {
 	}
 
 	static public AndroidTextureAtlas fromHttp(URL atlasUrl, File targetDirectory) {
-		File atlasFile = SpineHttpUtils.downloadFrom(atlasUrl, targetDirectory);
+		File atlasFile = HttpUtils.downloadFrom(atlasUrl, targetDirectory);
 		TextureAtlasData data;
 		try {
 			data = loadTextureAtlasData(atlasFile);
@@ -166,7 +166,7 @@ public class AndroidTextureAtlas {
 			File imageFile;
 			try {
 				URL imageUrl = new URL(atlasUrl.getProtocol(), atlasUrl.getHost(), atlasUrl.getPort(), imagePath);
-				imageFile = SpineHttpUtils.downloadFrom(imageUrl, targetDirectory);
+				imageFile = HttpUtils.downloadFrom(imageUrl, targetDirectory);
 			} catch (MalformedURLException e) {
 				throw new RuntimeException(e);
 			}
