@@ -225,26 +225,46 @@ class SkeletonSprite extends FlxObject
 
 				if (clipper.isClipping()) {
 					clipper.clipTriangles(worldVertices, triangles, triangles.length, uvs);
-					mesh.vertices = Vector.ofArray(clipper.clippedVertices);
+
 					mesh.indices = Vector.ofArray(clipper.clippedTriangles);
 					mesh.uvtData = Vector.ofArray(clipper.clippedUvs);
+
+					if (angle == 0) {
+						mesh.vertices = Vector.ofArray(clipper.clippedVertices);
+						mesh.x = x + offsetX;
+						mesh.y = y + offsetY;
+					} else {
+						var i = 0;
+						mesh.vertices.length = clipper.clippedVertices.length;
+						while (i < mesh.vertices.length) {
+							_tempPoint.setTo(clipper.clippedVertices[i], clipper.clippedVertices[i + 1]);
+							_tempPoint = _tempMatrix.transformPoint(_tempPoint);
+							mesh.vertices[i] = _tempPoint.x;
+							mesh.vertices[i + 1] = _tempPoint.y;
+							i+=2;
+						}
+					}
 				} else {
 					var v = 0;
 					var n = numFloats;
 					var i = 0;
 					mesh.vertices.length = numVertices;
 					while (v < n) {
-						// if (angle != 0) {
+						if (angle == 0) {
+							mesh.vertices[i] = worldVertices[v];
+							mesh.vertices[i + 1] = worldVertices[v + 1];
+						} else {
 							_tempPoint.setTo(worldVertices[v], worldVertices[v + 1]);
 							_tempPoint = _tempMatrix.transformPoint(_tempPoint);
 							mesh.vertices[i] = _tempPoint.x;
 							mesh.vertices[i + 1] = _tempPoint.y;
-						// } else {
-						// 	mesh.vertices[i] = worldVertices[v];
-						// 	mesh.vertices[i + 1] = worldVertices[v + 1];
-						// }
+						}
 						v += 8;
 						i += 2;
+					}
+					if (angle == 0) {
+						mesh.x = x + offsetX;
+						mesh.y = y + offsetY;
 					}
 					mesh.indices = Vector.ofArray(triangles);
 					mesh.uvtData = Vector.ofArray(uvs);
@@ -252,9 +272,12 @@ class SkeletonSprite extends FlxObject
 
 				mesh.antialiasing = antialiasing;
 				mesh.blend = SpineTexture.toFlixelBlending(slot.data.blendMode);
+				// x/y position works for mesh, but angle does not work.
+				// if the transformation matrix is moved into the FlxStrip draw and used there
+				// we can just put vertices without doing any transformation
 				// mesh.x = x + offsetX;
 				// mesh.y = y + offsetY;
-				mesh.angle = angle;
+				// mesh.angle = angle;
 				mesh.draw();
 			}
 
