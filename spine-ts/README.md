@@ -20,6 +20,8 @@ For documentation of `spine-phaser`, please refer to our [spine-phaser Guide](ht
 
 For documentation of `spine-pixi`, please refer to our [spine-pixi Guide](https://esotericsoftware.com/spine-pixi).
 
+For documentation of `spine-canvaskit`, please refer to our [spine-canvaskit Guide](https://esotericsoftware.com/spine-canvaskit).
+
 For module specific APIs in `spine-canvas`, `spine-webgl`, and `spine-threejs`, please refer to the [Examples](#examples) in the respecitve `spine-<modulename>/example` folder. For `spine-webgl` specifically, we have provided additional [demos](spine-webgl/demos), which you can also [view online](http://esotericsoftware.com/spine-demos).
 
 ## Licensing
