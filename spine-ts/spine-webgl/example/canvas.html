@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OverlayCanvas Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .content {
+            margin: 0 auto;
+        }
+        .spine-div {
+            border: 1px solid black;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .spacer {
+            height: 250px;
+        }
+        #canvas {
+            will-change: transform;
+        }
+    </style>
+    <script src="../dist/iife/spine-webgl.js"></script>
+</head>
+<body>
+    <canvas id="canvas" style="display: none;"></canvas>
+
+    <div class="content">
+        <h1>OverlayCanvas Example</h1>
+
+        <p>Scroll down to div.</p>
+
+        <div class="spacer"></div>
+
+        <div class="spine-div" div-spine>
+            <h2>Spine Box 1</h2>
+        </div>
+
+        <div class="spacer"></div>
+
+        <div id="spineboy2" class="spine-div" style="width: 50%; margin-left: 50%;" div-spine>
+            <h2>Spine Box 2</h2>
+        </div>
+
+        <div class="spacer"></div>
+
+        <div id="raptor" class="spine-div" style="width: 50%; margin-left: 50%; transition: transform 1s linear;" div-raptor>
+            <h2>Raptor Box</h2>
+        </div>
+
+        <div class="spacer"></div>
+
+        <div class="spine-div" style="width: 50%; margin-left: 20%;" div-celeste>
+            <h2>Celeste Box</h2>
+        </div>
+
+        <p>End of content.</p>
+    </div>
+
+    <script>
+        class App {
+			constructor() {
+                const selectors = ['div-spine', 'div-raptor', 'div-celeste'];
+                this.selectorToDiv = selectors.reduce((acc, next) => {
+                    const divs = document.querySelectorAll(`[${next}]`);
+                    acc[next] = {
+                        divs: [...document.querySelectorAll(`[${next}]`)].map(div => {
+                            const position = {};
+                            return { div, position };
+                        }),
+                        skeleton: null,
+                    };
+                    return acc;
+                }, {})
+                let divs = Array.from(document.querySelectorAll('[div-spine]'));
+                let divRaptor = Array.from(document.querySelectorAll('[div-raptor]'))[0];
+                let scrolling = false;
+			}
+
+			loadAssets(canvas) {
+				canvas.assetManager.loadBinary("assets/spineboy-pro.skel");
+				canvas.assetManager.loadTextureAtlas("assets/spineboy-pma.atlas");
+
+                canvas.assetManager.loadBinary("assets/raptor-pro.skel");
+				canvas.assetManager.loadTextureAtlas("assets/raptor-pma.atlas");
+
+                canvas.assetManager.loadBinary("assets/celestial-circus-pro.skel");
+				canvas.assetManager.loadTextureAtlas("assets/celestial-circus-pma.atlas");
+			}
+
+			initialize(canvas) {
+				let assetManager = canvas.assetManager;
+                this.selectorToDiv['div-spine'].skeleton = initializeSkeleton(assetManager, "assets/spineboy-pma.atlas", "assets/spineboy-pro.skel", .5, "walk");
+
+                this.selectorToDiv['div-raptor'].skeleton = initializeSkeleton(assetManager, "assets/raptor-pma.atlas", "assets/raptor-pro.skel", .5, "walk");
+
+                this.selectorToDiv['div-celeste'].skeleton = initializeSkeleton(assetManager, "assets/celestial-circus-pma.atlas", "assets/celestial-circus-pro.skel", .2, "swing");
+
+                window.addEventListener('scroll', () => {
+                    // console.log("canceling: " + canvas.reqAnimationFrameId);
+                    // cancelAnimationFrame(canvas.reqAnimationFrameId);
+                    // canvas.loop();
+                    this.render(canvas, true)
+                });
+                window.addEventListener('resize', () => {
+                    canvas.renderer.resize(spine.ResizeMode.Expand);
+                });
+                canvas.renderer.resize(spine.ResizeMode.Expand);
+			}
+
+			update(canvas, delta) {
+                for (let { skeleton: { skeleton, state } } of Object.values(this.selectorToDiv)) {
+                    state.update(delta);
+                    state.apply(skeleton);
+                    skeleton.update(delta);
+                    skeleton.updateWorldTransform(spine.Physics.update);
+                }
+			}
+
+			render(canvas, scroll) {
+				let renderer = canvas.renderer;
+				// renderer.resize(spine.ResizeMode.Expand);
+				canvas.clear(0, 0, 0, 0);
+				renderer.begin();
+
+                // webgl canvas center
+                const vec3 = new spine.Vector3(0, 0);
+                renderer.camera.worldToScreen(vec3, canvas.htmlCanvas.clientWidth, canvas.htmlCanvas.clientHeight);
+
+                // loop over the skeleton/div comination
+                for (const { divs, skeleton } of Object.values(this.selectorToDiv)) {
+                    // loop over each div where to render the current skeleton
+                    for (const { position, div } of divs) {
+
+                        // let rect = position;
+
+                        // const rect = div.getBoundingClientRect();
+                        // rect.x *= window.devicePixelRatio;
+                        // rect.y *= window.devicePixelRatio;
+
+                        const { x, y } = div.getBoundingClientRect();
+                        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                        const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+                        position.x = (x + scrollLeft) * window.devicePixelRatio;
+                        position.y = (y + scrollTop) * window.devicePixelRatio;
+                        const rect = { x: position.x, y: position.y };
+
+                        // if (rect.bottom > 0 && rect.top < window.innerHeight) {
+                            // renderer.drawSkeleton(skeleton.skeleton, true, -1, -1, (vertices, size, vertexSize) => {
+                            //     for (let i = 0; i < size; i+=vertexSize) {
+                            //         vertices[i] = vertices[i] + rect.x - vec3.x * window.devicePixelRatio;
+                            //         vertices[i+1] = vertices[i+1] - rect.y + vec3.y * window.devicePixelRatio;
+                            //     }
+                            // });
+
+                            // if (position.x == rect.x && position.y == rect.y) {
+                            //     renderer.drawSkeleton(skeleton.skeleton, true);
+                            // } else {
+                            //     renderer.drawSkeleton(skeleton.skeleton, true, -1, -1, (vertices, size, vertexSize) => {
+                            //         for (let i = 0; i < size; i+=vertexSize) {
+                            //             vertices[i] = vertices[i] + rect.x - vec3.x * window.devicePixelRatio;
+                            //             vertices[i+1] = vertices[i+1] - rect.y + vec3.y * window.devicePixelRatio;
+                            //         }
+                            //     });
+                            //     position.x = rect.x;
+                            //     position.y = rect.y;
+                            // }
+
+                            skeleton.skeleton.x = ;
+                            renderer.drawSkeleton(skeleton.skeleton, true);
+
+                            // show center
+                            const root = skeleton.skeleton.getRootBone();
+                            const vec3Root = new spine.Vector3(root.x, root.y);
+                            renderer.camera.worldToScreen(vec3Root, canvas.htmlCanvas.clientWidth, canvas.htmlCanvas.clientHeight);
+                            renderer.circle(
+                                true,
+                                rect.x - vec3.x * window.devicePixelRatio,
+                                -rect.y + vec3.y * window.devicePixelRatio,
+                                20,
+                                { r: 1, g: 0, b: 0, a: 1 }
+                            );
+
+
+
+
+
+
+
+
+                            // if (position.x == rect.x && position.y == rect.y) {
+                            //     renderer.circle(
+                            //         true,
+                            //         position.x - vec3.x * window.devicePixelRatio,
+                            //         -position.y + vec3.y * window.devicePixelRatio,
+                            //         20,
+                            //         { r: 1, g: 0, b: 0, a: .5 }
+                            // );
+                            // } else {
+                            //     renderer.circle(
+                            //         true,
+                            //         rect.x - vec3.x * window.devicePixelRatio,
+                            //         -rect.y + vec3.y * window.devicePixelRatio,
+                            //         20,
+                            //         { r: 1, g: 0, b: 0, a: .5 }
+                            //     );
+                            //     position.x = rect.x;
+                            //     position.y = rect.y;
+                            // }
+
+
+
+
+                        // }
+                    }
+                }
+
+				// Complete rendering.
+				renderer.end();
+			}
+		}
+
+
+        const htmlCanvas = document.getElementById("canvas");
+        function updateCanvasSize(htmlCanvas) {
+            htmlCanvas.style.position = 'absolute';
+            htmlCanvas.style.top = '0';
+            htmlCanvas.style.left = '0';
+            const pageSize = getPageSize();
+            htmlCanvas.style.width = pageSize.width + 'px';
+            htmlCanvas.style.height = pageSize.height + 'px';
+            htmlCanvas.style.display = 'inline';
+            htmlCanvas.style["pointer-events"] = 'none';
+        }
+
+		new spine.SpineCanvas(htmlCanvas, {
+			app: new App()
+		})
+
+
+        function initializeSkeleton(assetManager, atlas, skeletonFile, scale, animation) {
+            var atlas = assetManager.require(atlas);
+            var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
+            var skeletonBinary = new spine.SkeletonBinary(atlasLoader);
+            skeletonBinary.scale = scale;
+            var skeletonData = skeletonBinary.readSkeletonData(assetManager.require(skeletonFile));
+            const skeleton = new spine.Skeleton(skeletonData);
+            var animationStateData = new spine.AnimationStateData(skeletonData);
+            const animationState = new spine.AnimationState(animationStateData);
+            animationState.setAnimation(0, animation, true);
+            return { skeleton, state: animationState }
+        }
+
+        function getPageSize() {
+            const width = Math.max(
+                document.body.scrollWidth,
+                document.documentElement.scrollWidth,
+                document.body.offsetWidth,
+                document.documentElement.offsetWidth,
+                document.documentElement.clientWidth
+            );
+
+            const height = Math.max(
+                document.body.scrollHeight,
+                document.documentElement.scrollHeight,
+                document.body.offsetHeight,
+                document.documentElement.offsetHeight,
+                document.documentElement.clientHeight
+            );
+
+            return { width, height };
+        }
+
+        const canvasXY = htmlCanvas.getBoundingClientRect()
+        const resizeObserver = new ResizeObserver(() => {
+            updateCanvasSize(htmlCanvas);
+        });
+        resizeObserver.observe(document.body);
+
+
+//////////
+//////////
+//////////
+//////////
+//////////
+
+        function addRandomDiv() {
+            const div = document.createElement('div');
+            div.style.width = Math.floor(Math.random() * 200 + 100) + 'px';
+            div.style.height = Math.floor(Math.random() * 100 + 50) + 'px';
+            div.style.backgroundColor = getRandomColor();
+            div.style.margin = '10px';
+            div.textContent = 'New Div ' + (document.getElementsByTagName('div').length + 1);
+            document.body.appendChild(div);
+        }
+
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        // Add a button to trigger new div creation
+        const addDivButton = document.createElement('button');
+        addDivButton.textContent = 'Add New Div';
+        addDivButton.style.position = 'fixed';
+        addDivButton.style.top = '10px';
+        addDivButton.style.left = '10px';
+        addDivButton.style.zIndex = '1000';
+        addDivButton.addEventListener('click', addRandomDiv);
+        document.body.appendChild(addDivButton);
+
+
+
+        //////
+        //////
+        //////
+        //////
+        //////
+
+        let isMovingRight = true;
+        setInterval(() => {
+            const div = document.getElementById('raptor');
+            let position = isMovingRight ? 50 : -50;
+            isMovingRight = !isMovingRight;
+            div.style.transform = `translateX(${position}px)`;
+        }, 1000)
+
+
+
+        function makeDraggable(element) {
+            let isDragging = false;
+            let startX, startY;
+            let originalX, originalY;
+
+            element.addEventListener('mousedown', startDragging);
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', stopDragging);
+
+            function startDragging(e) {
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                originalX = element.offsetLeft;
+                originalY = element.offsetTop;
+
+                // Prevent text selection during drag
+                e.preventDefault();
+            }
+
+            function drag(e) {
+                if (!isDragging) return;
+
+                const deltaX = e.clientX - startX;
+                const deltaY = e.clientY - startY;
+
+                // element.style.left = originalX + deltaX + 'px';
+                // element.style.top = originalY + deltaY + 'px';
+                console.log(deltaX)
+                element.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+            }
+
+            function stopDragging() {
+                isDragging = false;
+            }
+        }
+        const draggableDiv = document.getElementById('spineboy2');
+        makeDraggable(draggableDiv);
+
+    </script>
+</body>
+</html>

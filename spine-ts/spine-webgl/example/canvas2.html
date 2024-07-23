@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OverlayCanvas Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .content {
+            margin: 0 auto;
+        }
+        .spine-div {
+            border: 1px solid black;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .spacer {
+            height: 250px;
+        }
+    </style>
+    <script src="./spine-webgl.min.js"></script>
+    <!-- <script src="../dist/iife/spine-webgl.min.js"></script> -->
+</head>
+<body>
+    <canvas id="canvas" style="position: fixed; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none;"></canvas>
+
+    <div class="content">
+        <h1>OverlayCanvas Example</h1>
+
+        <p>Scroll down to div.</p>
+
+        <div class="spacer"></div>
+
+        <div class="spine-div" div-spine>
+            <h2>Spine Box 1</h2>
+        </div>
+
+        <div class="spacer"></div>
+
+        <div class="spine-div" div-spine>
+            <h2>Spine Box 2</h2>
+        </div>
+
+        <div class="spacer"></div>
+
+        <div class="spine-div" style="width: 50%; margin-left: 50%;" div-spine>
+            <h2>Spine Box 3</h2>
+        </div>
+
+        <div class="spacer"></div>
+
+        <div class="spine-div" style="width: 50%; margin-left: 50%;" div-raptor>
+            <h2>Raptor Box</h2>
+        </div>
+
+        <div class="spacer"></div>
+
+        <div class="spine-div" style="width: 50%; margin-left: 20%;" div-celeste>
+            <h2>Celeste Box</h2>
+        </div>
+
+        <p>End of content.</p>
+    </div>
+
+    <script>
+        class App {
+			constructor() {
+                const selectors = ['div-spine', 'div-raptor', 'div-celeste'];
+                this.selectorToDiv = selectors.reduce((acc, next) => {
+                    acc[next] = {
+                        divs: document.querySelectorAll(`[${next}]`),
+                        skeleton: null,
+                    };
+                    return acc;
+                }, {})
+                let divs = Array.from(document.querySelectorAll('[div-spine]'));
+                let divRaptor = Array.from(document.querySelectorAll('[div-raptor]'))[0];
+                console.log(this.selectorToDiv)
+			}
+
+			loadAssets(canvas) {
+				canvas.assetManager.loadBinary("assets/spineboy-pro.skel");
+				canvas.assetManager.loadTextureAtlas("assets/spineboy-pma.atlas");
+
+                canvas.assetManager.loadBinary("assets/raptor-pro.skel");
+				canvas.assetManager.loadTextureAtlas("assets/raptor-pma.atlas");
+
+                canvas.assetManager.loadBinary("assets/celestial-circus-pro.skel");
+				canvas.assetManager.loadTextureAtlas("assets/celestial-circus-pma.atlas");
+			}
+
+			initialize(canvas) {
+				let assetManager = canvas.assetManager;
+                this.selectorToDiv['div-spine'].skeleton = initializeSkeleton(assetManager, "assets/spineboy-pma.atlas", "assets/spineboy-pro.skel", .5, "walk");
+
+                this.selectorToDiv['div-raptor'].skeleton = initializeSkeleton(assetManager, "assets/raptor-pma.atlas", "assets/raptor-pro.skel", .5, "walk");
+
+                this.selectorToDiv['div-celeste'].skeleton = initializeSkeleton(assetManager, "assets/celestial-circus-pma.atlas", "assets/celestial-circus-pro.skel", .2, "swing");
+			}
+
+			update(canvas, delta) {
+                for (let { skeleton: { skeleton, state } } of Object.values(this.selectorToDiv)) {
+                    state.update(delta);
+                    state.apply(skeleton);
+                    skeleton.update(delta);
+                    skeleton.updateWorldTransform(spine.Physics.update);
+                }
+			}
+
+			render(canvas) {
+				let renderer = canvas.renderer;
+				renderer.resize(spine.ResizeMode.Expand);
+				canvas.clear(0, 0, 0, 0);
+
+
+                // webgl canvas center
+                const vec3 = new spine.Vector3(0, 0);
+                renderer.camera.worldToScreen(vec3, canvas.htmlCanvas.clientWidth, canvas.htmlCanvas.clientHeight);
+
+                // loop over the skeleton/div comination
+                for (let { divs, skeleton } of Object.values(this.selectorToDiv)) {
+                    // loop over each div where to render the current skeleton
+                    for (let div of divs) {
+                        const rect = div.getBoundingClientRect();
+                        rect.x *= window.devicePixelRatio;
+                        rect.y *= window.devicePixelRatio;
+
+                        // if (rect.bottom > 0 && rect.top < window.innerHeight) {
+                            // renderer.drawSkeleton(skeleton.skeleton, true, -1, -1, (vertices, size, vertexSize) => {
+                            //     for (let i = 0; i < size; i+=vertexSize) {
+                            //         vertices[i] = vertices[i] + rect.x - vec3.x * window.devicePixelRatio;
+                            //         vertices[i+1] = vertices[i+1] - rect.y + vec3.y * window.devicePixelRatio;
+                            //     }
+                            // });
+                            renderer.begin();
+                            skeleton.skeleton.x = rect.x - vec3.x * window.devicePixelRatio;
+                            skeleton.skeleton.y = - rect.y + vec3.y * window.devicePixelRatio;
+
+                            renderer.drawSkeleton(skeleton.skeleton, true);
+
+                            // show center
+                            const root = skeleton.skeleton.getRootBone();
+                            const vec3Root = new spine.Vector3(root.x, root.y);
+                            renderer.camera.worldToScreen(vec3Root, canvas.htmlCanvas.clientWidth, canvas.htmlCanvas.clientHeight);
+                            renderer.circle(
+                                true,
+                                rect.x - vec3.x * window.devicePixelRatio,
+                                -rect.y + vec3.y * window.devicePixelRatio,
+                                20,
+                                { r: 1, g: 0, b: 0, a: .5 });
+                                renderer.end();
+                        // }
+                    }
+                }
+
+				// Complete rendering.
+
+			}
+		}
+
+
+        const htmlCanvas = document.getElementById("canvas");
+		new spine.SpineCanvas(htmlCanvas, {
+			app: new App()
+		})
+
+
+        function initializeSkeleton(assetManager, atlas, skeletonFile, scale, animation) {
+            var atlas = assetManager.require(atlas);
+            var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
+            var skeletonBinary = new spine.SkeletonBinary(atlasLoader);
+            skeletonBinary.scale = scale;
+            var skeletonData = skeletonBinary.readSkeletonData(assetManager.require(skeletonFile));
+            const skeleton = new spine.Skeleton(skeletonData);
+            var animationStateData = new spine.AnimationStateData(skeletonData);
+            const animationState = new spine.AnimationState(animationStateData);
+            animationState.setAnimation(0, animation, true);
+            return { skeleton, state: animationState }
+        }
+
+    </script>
+</body>
+</html>
