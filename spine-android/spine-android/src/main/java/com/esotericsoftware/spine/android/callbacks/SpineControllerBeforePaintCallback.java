@@ -38,5 +38,5 @@ import java.util.List;
 
 @FunctionalInterface
 public interface SpineControllerBeforePaintCallback {
-    void execute (SpineController controller, Canvas canvas);
+	void execute (SpineController controller, Canvas canvas);
 }

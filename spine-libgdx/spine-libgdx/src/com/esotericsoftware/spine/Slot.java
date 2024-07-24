@@ -95,7 +95,7 @@ public class Slot {
 		return color;
 	}
 
-	public void setColor(Color color) {
+	public void setColor (Color color) {
 		this.color = color;
 	}
 

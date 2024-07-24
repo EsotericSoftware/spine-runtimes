@@ -39,5 +39,5 @@ import java.util.List;
 
 @FunctionalInterface
 public interface SpineControllerAfterPaintCallback {
-    void execute (SpineController controller, Canvas canvas, Array<SkeletonRenderer.RenderCommand> commands);
+	void execute (SpineController controller, Canvas canvas, Array<SkeletonRenderer.RenderCommand> commands);
 }

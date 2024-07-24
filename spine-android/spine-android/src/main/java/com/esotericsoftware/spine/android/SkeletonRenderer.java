@@ -50,17 +50,13 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
 
-/**
- * Is responsible to transform the {@link Skeleton} with its current pose to {@link SkeletonRenderer.RenderCommand} commands
- * and render them to a {@link Canvas}.
- */
+/** Is responsible to transform the {@link Skeleton} with its current pose to {@link SkeletonRenderer.RenderCommand} commands and
+ * render them to a {@link Canvas}. */
 public class SkeletonRenderer {
 
-	/**
-	 * Stores the vertices, indices, and atlas page index to be used for rendering one or more attachments
-	 * of a {@link Skeleton} to a {@link Canvas}. See the implementation of {@link SkeletonRenderer#render(Skeleton)} and
-	 * {@link SkeletonRenderer#renderToCanvas(Canvas, Array)} on how to use this data to render it to a {@link Canvas}.
-	 */
+	/** Stores the vertices, indices, and atlas page index to be used for rendering one or more attachments of a {@link Skeleton}
+	 * to a {@link Canvas}. See the implementation of {@link SkeletonRenderer#render(Skeleton)} and
+	 * {@link SkeletonRenderer#renderToCanvas(Canvas, Array)} on how to use this data to render it to a {@link Canvas}. */
 	public static class RenderCommand implements Pool.Poolable {
 		FloatArray vertices = new FloatArray(32);
 		FloatArray uvs = new FloatArray(32);
@@ -90,10 +86,8 @@ public class SkeletonRenderer {
 	};
 	private final Array<RenderCommand> commandList = new Array<RenderCommand>();
 
-	/**
-	 * Created the {@link RenderCommand} commands from the skeletons current pose.
-	 */
-	public Array<RenderCommand> render(Skeleton skeleton) {
+	/** Created the {@link RenderCommand} commands from the skeletons current pose. */
+	public Array<RenderCommand> render (Skeleton skeleton) {
 		Color color = null, skeletonColor = skeleton.getColor();
 		float r = skeletonColor.r, g = skeletonColor.g, b = skeletonColor.b, a = skeletonColor.a;
 
@@ -228,11 +222,9 @@ public class SkeletonRenderer {
 		return commandList;
 	}
 
-	/**
-	 * Renders the {@link RenderCommand} commands created from the skeleton current pose to the given {@link Canvas}.
-	 * Does not perform any scaling or fitting.
-	 */
-	public void renderToCanvas(Canvas canvas, Array<RenderCommand> commands) {
+	/** Renders the {@link RenderCommand} commands created from the skeleton current pose to the given {@link Canvas}. Does not
+	 * perform any scaling or fitting. */
+	public void renderToCanvas (Canvas canvas, Array<RenderCommand> commands) {
 		for (int i = 0; i < commands.size; i++) {
 			RenderCommand command = commands.get(i);
 
@@ -241,15 +233,13 @@ public class SkeletonRenderer {
 		}
 	}
 
-	/**
-	 * Renders the {@link Skeleton} with its current pose to a {@link Bitmap}.
+	/** Renders the {@link Skeleton} with its current pose to a {@link Bitmap}.
 	 *
-	 * @param width    The width of the bitmap in pixels.
-	 * @param height   The height of the bitmap in pixels.
-	 * @param bgColor  The background color.
-	 * @param skeleton The skeleton to render.
-	 */
-	public Bitmap renderToBitmap(float width, float height, int bgColor, Skeleton skeleton) {
+	 * @param width The width of the bitmap in pixels.
+	 * @param height The height of the bitmap in pixels.
+	 * @param bgColor The background color.
+	 * @param skeleton The skeleton to render. */
+	public Bitmap renderToBitmap (float width, float height, int bgColor, Skeleton skeleton) {
 		Vector2 offset = new Vector2(0, 0);
 		Vector2 size = new Vector2(0, 0);
 		FloatArray floatArray = new FloatArray();
@@ -259,7 +249,7 @@ public class SkeletonRenderer {
 		RectF bounds = new RectF(offset.x, offset.y, offset.x + size.x, offset.y + size.y);
 		float scale = (1 / (bounds.width() > bounds.height() ? bounds.width() / width : bounds.height() / height));
 
-		Bitmap bitmap = Bitmap.createBitmap((int) width, (int) height, Bitmap.Config.ARGB_8888);
+		Bitmap bitmap = Bitmap.createBitmap((int)width, (int)height, Bitmap.Config.ARGB_8888);
 		Canvas canvas = new Canvas(bitmap);
 
 		Paint paint = new Paint();

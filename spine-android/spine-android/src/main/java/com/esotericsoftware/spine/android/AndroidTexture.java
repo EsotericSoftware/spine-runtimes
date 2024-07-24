@@ -40,10 +40,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Shader;
 
-/**
- * A class holding an {@link Bitmap} of an {@link AndroidTextureAtlas} page image with it's associated
- * blend modes and paints.
- */
+/** A class holding an {@link Bitmap} of an {@link AndroidTextureAtlas} page image with it's associated blend modes and paints. */
 public class AndroidTexture extends Texture {
 	private Bitmap bitmap;
 	private ObjectMap<BlendMode, Paint> paints = new ObjectMap<>();

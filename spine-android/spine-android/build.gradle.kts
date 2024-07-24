@@ -40,7 +40,7 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
 }
 
-val libraryVersion = "4.2.2-SNAPSHOT" // Update this as needed
+val libraryVersion = "4.2.3-SNAPSHOT" // Update this as needed
 
 tasks.register<Jar>("sourceJar") {
     archiveClassifier.set("sources")
@@ -125,5 +125,6 @@ afterEvaluate {
     signing {
         useGpgCmd()
         sign(publishing.publications["release"])
+        sign(tasks.getByName("sourceJar"))
     }
 }

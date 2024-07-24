@@ -33,5 +33,5 @@ import com.esotericsoftware.spine.android.SpineController;
 
 @FunctionalInterface
 public interface SpineControllerCallback {
-    void execute (SpineController controller);
+	void execute (SpineController controller);
 }
