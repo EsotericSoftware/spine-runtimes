@@ -24,11 +24,11 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "Spine Android Examples"
-includeBuild("../spine-libgdx") {
-    dependencySubstitution {
-        substitute(module("com.esotericsoftware.spine:spine-libgdx")).using(project(":spine-libgdx"))
-    }
-}
+//includeBuild("../spine-libgdx") {
+//    dependencySubstitution {
+//        substitute(module("com.esotericsoftware.spine:spine-libgdx")).using(project(":spine-libgdx"))
+//    }
+//}
 //includeBuild("../../libgdx") {
 //    dependencySubstitution {
 //        substitute(module("com.badlogicgames.gdx:gdx")).using(project(":gdx"))

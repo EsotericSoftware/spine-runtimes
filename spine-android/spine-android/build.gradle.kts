@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.androidLibrary)
     `maven-publish`
+    signing
 }
 
 android {
@@ -39,16 +40,47 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
 }
 
+val libraryVersion = "4.2.2-SNAPSHOT" // Update this as needed
+
+tasks.register<Jar>("sourceJar") {
+    archiveClassifier.set("sources")
+    from(android.sourceSets["main"].java.srcDirs)
+}
+
 afterEvaluate {
     publishing {
         publications {
-            create<MavenPublication>("mavenLocal") {
-                groupId = "com.esotericsoftware"
-                artifactId = "spine-android"
-                version = "4.2"
+            create<MavenPublication>("release") {
                 artifact(tasks.getByName("bundleReleaseAar"))
+                artifact(tasks.getByName("sourceJar"))
+
+                groupId = "com.esotericsoftware.spine"
+                artifactId = "spine-android"
+                version = libraryVersion
 
                 pom {
+                    packaging = "aar"
+                    name.set("spine-android")
+                    description.set("Spine Runtime for Android")
+                    url.set("https://github.com/esotericsoftware/spine-runtimes")
+                    licenses {
+                        license {
+                            name.set("Spine Runtimes License")
+                            url.set("http://esotericsoftware.com/spine-runtimes-license")
+                        }
+                    }
+                    developers {
+                        developer {
+                            name.set("Esoteric Software")
+                            email.set("contact@esotericsoftware.com")
+                        }
+                    }
+                    scm {
+                        url.set(pom.url.get())
+                        connection.set("scm:git:${url.get()}.git")
+                        developerConnection.set("scm:git:${url.get()}.git")
+                    }
+
                     withXml {
                         val dependenciesNode = asNode().appendNode("dependencies")
                         configurations.api.get().dependencies.forEach { dependency ->
@@ -68,8 +100,30 @@ afterEvaluate {
                             }
                         }
                     }
+
                 }
             }
         }
+
+        repositories {
+            maven {
+                name = "SonaType"
+                url = uri(if (libraryVersion.endsWith("-SNAPSHOT")) {
+                    "https://oss.sonatype.org/content/repositories/snapshots"
+                } else {
+                    "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+                })
+
+                credentials {
+                    username = project.findProperty("ossrhUsername") as String?
+                    password = project.findProperty("ossrhPassword") as String?
+                }
+            }
+        }
+    }
+
+    signing {
+        useGpgCmd()
+        sign(publishing.publications["release"])
     }
 }

@@ -62,7 +62,7 @@ fun AnimationState(nav: NavHostController) {
             controller.skeleton.setScaleX(0.5f)
             controller.skeleton.setScaleY(0.5f)
 
-            controller.skeleton.findSlot("gun")?.color = Color(1f, 0f, 0f, 1f)
+            controller.skeleton.findSlot("gun")?.color?.set(Color(1f, 0f, 0f, 1f))
 
             controller.animationStateData.setDefaultMix(0.2f)
             controller.animationState.setAnimation(0, "walk", true).setListener(object : AnimationState.AnimationStateListener {
