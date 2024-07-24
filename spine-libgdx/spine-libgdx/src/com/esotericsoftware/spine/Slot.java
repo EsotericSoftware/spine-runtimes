@@ -44,7 +44,7 @@ import com.esotericsoftware.spine.attachments.VertexAttachment;
 public class Slot {
 	final SlotData data;
 	final Bone bone;
-	final Color color = new Color();
+	Color color = new Color();
 	@Null final Color darkColor;
 	@Null Attachment attachment;
 	int sequenceIndex;
@@ -93,6 +93,10 @@ public class Slot {
 	 * color tinting. */
 	public Color getColor () {
 		return color;
+	}
+
+	public void setColor(Color color) {
+		this.color = color;
 	}
 
 	/** The dark color used to tint the slot's attachment for two color tinting, or null if two color tinting is not used. The dark
