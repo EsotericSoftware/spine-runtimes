@@ -105,7 +105,7 @@ bool MathUtil::isNan(float v) {
 }
 
 float MathUtil::quietNan() {
-    return std::nan("");
+	return std::nan("");
 }
 
 float MathUtil::random() {

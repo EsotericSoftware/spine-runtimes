@@ -122,20 +122,20 @@ void spPhysicsConstraint_update(spPhysicsConstraint *self, spPhysics physics) {
 				self->uy = by;
 			} else {
 				// float a = self->remaining, i = self->inertia, q = self->data->limit * delta, t = self->data->step, f = self->skeleton->data->referenceScale, d = -1;
-                float a = self->remaining, i = self->inertia, t = self->data->step, f = self->skeleton->data->referenceScale;
-                float qx = self->data->limit * delta, qy = qx * ABS(self->skeleton->scaleX);
-                qx *= ABS(self->skeleton->scaleY);
+				float a = self->remaining, i = self->inertia, t = self->data->step, f = self->skeleton->data->referenceScale;
+				float qx = self->data->limit * delta, qy = qx * ABS(self->skeleton->scaleX);
+				qx *= ABS(self->skeleton->scaleY);
 				if (x || y) {
 					if (x) {
 						float u = (self->ux - bx) * i;
 						self->xOffset += u > qx ? qx : u < -qx ? -qx
-															: u;
+															   : u;
 						self->ux = bx;
 					}
 					if (y) {
 						float u = (self->uy - by) * i;
 						self->yOffset += u > qy ? qy : u < -qy ? -qy
-															: u;
+															   : u;
 						self->uy = by;
 					}
 					if (a >= t) {
@@ -190,7 +190,7 @@ void spPhysicsConstraint_update(spPhysicsConstraint *self, spPhysics physics) {
 					a = self->remaining;
 					if (a >= t) {
 						float m = self->massInverse * t, e = self->strength, w = self->wind, g = self->gravity, h = l / f;
-                        float d = POW(self->damping, 60 * t);
+						float d = POW(self->damping, 60 * t);
 						while (-1) {
 							a -= t;
 							if (scaleX) {

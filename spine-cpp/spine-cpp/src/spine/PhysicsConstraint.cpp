@@ -334,20 +334,20 @@ void PhysicsConstraint::update(Physics physics) {
 				_ux = bx;
 				_uy = by;
 			} else {
-                float a = _remaining, i = _inertia, t = _data._step, f = _skeleton.getData()->getReferenceScale();
-                float qx = _data._limit * delta, qy = qx * MathUtil::abs(_skeleton.getScaleX());
-                qx *= MathUtil::abs(_skeleton.getScaleY());
+				float a = _remaining, i = _inertia, t = _data._step, f = _skeleton.getData()->getReferenceScale();
+				float qx = _data._limit * delta, qy = qx * MathUtil::abs(_skeleton.getScaleX());
+				qx *= MathUtil::abs(_skeleton.getScaleY());
 				if (x || y) {
 					if (x) {
 						float u = (_ux - bx) * i;
 						_xOffset += u > qx ? qx : u < -qx ? -qx
-													   : u;
+														  : u;
 						_ux = bx;
 					}
 					if (y) {
 						float u = (_uy - by) * i;
 						_yOffset += u > qy ? qy : u < -qy ? -qy
-													   : u;
+														  : u;
 						_uy = by;
 					}
 					if (a >= t) {
@@ -402,7 +402,7 @@ void PhysicsConstraint::update(Physics physics) {
 					a = _remaining;
 					if (a >= t) {
 						float m = _massInverse * t, e = _strength, w = _wind, g = _gravity * (Bone::yDown ? -1 : 1), h = l / f;
-                        float d = MathUtil::pow(_damping, 60 * t);
+						float d = MathUtil::pow(_damping, 60 * t);
 						while (true) {
 							a -= t;
 							if (scaleX) {
