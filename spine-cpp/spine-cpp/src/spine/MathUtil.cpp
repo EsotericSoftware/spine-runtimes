@@ -30,6 +30,7 @@
 #include <spine/MathUtil.h>
 #include <math.h>
 #include <stdlib.h>
+#include <cmath>
 
 // Required for division by 0 in _isNaN on MSVC
 #ifdef _MSC_VER
@@ -99,14 +100,12 @@ float MathUtil::cosDeg(float degrees) {
 	return (float) ::cos(degrees * MathUtil::Deg_Rad);
 }
 
-/* Need to pass 0 as an argument, so VC++ doesn't error with C2124 */
-static bool _isNan(float value, float zero) {
-	float _nan = (float) 0.0 / zero;
-	return 0 == memcmp((void *) &value, (void *) &_nan, sizeof(value));
+bool MathUtil::isNan(float v) {
+	return std::isnan(v);
 }
 
-bool MathUtil::isNan(float v) {
-	return _isNan(v, 0);
+float MathUtil::quietNan() {
+    return std::nan("");
 }
 
 float MathUtil::random() {

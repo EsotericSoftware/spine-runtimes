@@ -88,6 +88,8 @@ namespace spine {
 
 		static bool isNan(float v);
 
+        static float quietNan();
+
 		static float random();
 
 		static float randomTriangular(float min, float max);
