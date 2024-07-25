@@ -28,9 +28,9 @@ The spine-libgdx runtime is released to Maven Central through SonaType. We also 
 
 ### Versions
 
-You can find the latest version for release builds [here](http://search.maven.org/#search%7Cga%7C1%7Cspine-libgdx).
+You can find the latest version for release builds [here](https://central.sonatype.com/artifact/com.esotericsoftware.spine/spine-libgdx).
 
-You can find the latest SNAPSHOT version in the project's [pom.xml](spine-libgdx/pom.xml#L13).
+You can find the latest SNAPSHOT version in this listing in the SonaType snapshot repository (https://oss.sonatype.org/content/repositories/snapshots/com/esotericsoftware/spine/spine-libgdx/).
 
 You can also build and install `spine-libgdx` into your local Maven repository:
 
@@ -39,9 +39,7 @@ cd spine-libgdx/spine-libgdx
 mvn install
 ```
 
-Up until Spine 4.0, the version number is composed of the editor number at the time of release of the Maven artifact plus a patch number at the end. E.g. `4.0.18.1` means editor version `4.0.18`, and patch version `1` for the runtime. The editor version is updated everytime a new editor release is performed, the patch version is updated everytime a new fix or enhancement is released in the runtime.
-
-Starting from Spine 4.1, the version number is composed of the corresponding editor `major.minor` version, and runtime update version for the runtime. E.g. `4.1.10` means editor version 4.1, runtime update version 10. All runtime versions are compatible with the exports from the correspongind `major.minor` editor version.
+The version number is composed of the corresponding editor `major.minor` version, and runtime update version for the runtime. E.g. `4.1.10` means editor version 4.1, runtime update version 10. All runtime versions are compatible with the exports from the correspongind `major.minor` editor version.
 
 ### Maven
 
@@ -78,10 +76,12 @@ project(":core") {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
 
-        compile "com.esotericsoftware.spine:spine-libgdx:4.2.0"
+        compile "com.esotericsoftware.spine:spine-libgdx:4.2.+"
     }
 }
 ```
+
+Note that `4.2.+` will pull in the latest `-SNAPSHOT` release. Our snapshot releases are considered stable and based on the latest commit to the Spine Runtimes branch corresponding to the latest Spine Editor release version.
 
 ## Running the examples
 
