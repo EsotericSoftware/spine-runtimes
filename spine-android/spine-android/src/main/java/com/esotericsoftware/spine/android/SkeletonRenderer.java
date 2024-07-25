@@ -177,38 +177,56 @@ public class SkeletonRenderer {
 				| (int)(g * slotColor.g * color.g * 255) << 8 //
 				| (int)(b * slotColor.b * color.b * 255);
 
+			int indicesStart = command.indices.size;
+			int indicesLength = indices.length;
 			if (clipper.isClipping()) {
-				// FIXME
-				throw new RuntimeException("Not implemented, need to split positions, uvs, colors");
-				// clipper.clipTriangles(vertices, verticesLength, triangles, triangles.length, uvs, c, 0, false);
-				// FloatArray clippedVertices = clipper.getClippedVertices();
-				// ShortArray clippedTriangles = clipper.getClippedTriangles();
-				// batch.draw(texture, clippedVertices.items, 0, clippedVertices.size, clippedTriangles.items, 0,
-				// clippedTriangles.size);
+				clipper.clipTrianglesUnpacked(command.vertices.items, vertexStart, indices, indices.length, uvs);
+
+				// Copy clipped vertices over, overwritting the previous vertices of this attachment
+				FloatArray clippedVertices = clipper.getClippedVertices();
+				command.vertices.setSize(vertexStart + clippedVertices.size);
+				System.arraycopy(clippedVertices.items, 0, command.vertices.items, vertexStart, clippedVertices.size);
+
+				// Copy UVs over, post-processing below
+				command.uvs.addAll(clipper.getClippedUvs());
+
+				// Copy indices over, post-processing below
+				command.indices.addAll(clipper.getClippedTriangles());
+
+				// Update verticesLength with the clipped number of vertices * 2, and indices length
+				// with the number of clipped indices.
+				verticesLength = clippedVertices.size;
+				indicesLength = clipper.getClippedTriangles().size;
 			} else {
+				// Copy UVs over, post-processing below
 				command.uvs.addAll(uvs);
-				float[] uvsArray = command.uvs.items;
-				for (int ii = vertexStart, w = command.texture.getWidth(), h = command.texture.getHeight(),
-					nn = vertexStart + verticesLength; ii < nn; ii += 2) {
-					uvsArray[ii] = uvsArray[ii] * w;
-					uvsArray[ii + 1] = uvsArray[ii + 1] * h;
-				}
 
-				command.colors.setSize(command.colors.size + (verticesLength >> 1));
-				int[] colorsArray = command.colors.items;
-				for (int ii = vertexStart >> 1, nn = (vertexStart >> 1) + (verticesLength >> 1); ii < nn; ii++) {
-					colorsArray[ii] = c;
-				}
-
-				int indicesStart = command.indices.size;
+				// Copy indices over, post-processing below
 				command.indices.addAll(indices);
-				int firstIndex = vertexStart >> 1;
-				short[] indicesArray = command.indices.items;
-				for (int ii = indicesStart, nn = indicesStart + indices.length; ii < nn; ii++) {
-					indicesArray[ii] += firstIndex;
-				}
 			}
-			// FIXME wrt clipping
+
+			// Post-process UVs, require scaling by bitmap size
+			float[] uvsArray = command.uvs.items;
+			for (int ii = vertexStart, w = command.texture.getWidth(), h = command.texture.getHeight(),
+				 nn = vertexStart + verticesLength; ii < nn; ii += 2) {
+				uvsArray[ii] = uvsArray[ii] * w;
+				uvsArray[ii + 1] = uvsArray[ii + 1] * h;
+			}
+
+			// Fill colors array
+			command.colors.setSize(command.colors.size + (verticesLength >> 1));
+			int[] colorsArray = command.colors.items;
+			for (int ii = vertexStart >> 1, nn = (vertexStart >> 1) + (verticesLength >> 1); ii < nn; ii++) {
+				colorsArray[ii] = c;
+			}
+
+			// Post-process indices array, need to be offset by index of the mesh's first vertex.
+			int firstIndex = vertexStart >> 1;
+			short[] indicesArray = command.indices.items;
+			for (int ii = indicesStart, nn = indicesStart + indicesLength; ii < nn; ii++) {
+				indicesArray[ii] += firstIndex;
+			}
+
 			vertexStart += verticesLength;
 			clipper.clipEnd(slot);
 		}
