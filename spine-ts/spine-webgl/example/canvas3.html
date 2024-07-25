@@ -25,7 +25,8 @@
             will-change: transform;
         }
     </style>
-    <script src="../dist/iife/spine-webgl.js"></script>
+    <!-- <script src="../dist/iife/spine-webgl.js"></script> -->
+    <script src="./spine-webgl.min.js"></script>
 </head>
 <body>
     <canvas id="canvas" style="display: none;"></canvas>
@@ -43,8 +44,8 @@
 
         <div class="spacer"></div>
 
-        <div id="spineboy2" class="spine-div" style="width: 50%; margin-left: 50%;" div-spine>
-            <h2>Spine Box 2</h2>
+        <div id="spineboy2" class="spine-div" style="width: 50%; margin-left: 50%; touch-action:none" div-spine>
+            <h2>Spine Box 2 (drag me)</h2>
         </div>
 
         <div class="spacer"></div>
@@ -63,10 +64,11 @@
     </div>
 
     <script>
+        let selectorToDiv;
         class App {
 			constructor() {
                 const selectors = ['div-spine', 'div-raptor', 'div-celeste'];
-                this.selectorToDiv = selectors.reduce((acc, next) => {
+                selectorToDiv = selectors.reduce((acc, next) => {
                     const divs = document.querySelectorAll(`[${next}]`);
                     acc[next] = {
                         divs: [...document.querySelectorAll(`[${next}]`)].map(div => {
@@ -77,9 +79,6 @@
                     };
                     return acc;
                 }, {})
-                let divs = Array.from(document.querySelectorAll('[div-spine]'));
-                let divRaptor = Array.from(document.querySelectorAll('[div-raptor]'))[0];
-                let scrolling = false;
 			}
 
 			loadAssets(canvas) {
@@ -93,28 +92,36 @@
 				canvas.assetManager.loadTextureAtlas("assets/celestial-circus-pma.atlas");
 			}
 
+            prevScrollLeft = 0;
+            prevScrollTop = 0;
 			initialize(canvas) {
 				let assetManager = canvas.assetManager;
-                this.selectorToDiv['div-spine'].skeleton = initializeSkeleton(assetManager, "assets/spineboy-pma.atlas", "assets/spineboy-pro.skel", .5, "walk");
+                selectorToDiv['div-spine'].skeleton = initializeSkeleton(assetManager, "assets/spineboy-pma.atlas", "assets/spineboy-pro.skel", .5, "walk");
 
-                this.selectorToDiv['div-raptor'].skeleton = initializeSkeleton(assetManager, "assets/raptor-pma.atlas", "assets/raptor-pro.skel", .5, "walk");
+                selectorToDiv['div-raptor'].skeleton = initializeSkeleton(assetManager, "assets/raptor-pma.atlas", "assets/raptor-pro.skel", .5, "walk");
 
-                this.selectorToDiv['div-celeste'].skeleton = initializeSkeleton(assetManager, "assets/celestial-circus-pma.atlas", "assets/celestial-circus-pro.skel", .2, "swing");
+                selectorToDiv['div-celeste'].skeleton = initializeSkeleton(assetManager, "assets/celestial-circus-pma.atlas", "assets/celestial-circus-pro.skel", .2, "swing");
 
                 window.addEventListener('scroll', () => {
                     // console.log("canceling: " + canvas.reqAnimationFrameId);
                     // cancelAnimationFrame(canvas.reqAnimationFrameId);
                     // canvas.loop();
-                    this.render(canvas, true)
+                    // console.log(this.prevScrollTop, window.pageYOffset, this.prevScrollTop === window.pageYOffset);
+                    // this.prevScrollTop = window.pageYOffset;
+                    // this.render(canvas, true);
                 });
                 window.addEventListener('resize', () => {
                     canvas.renderer.resize(spine.ResizeMode.Expand);
                 });
+                const bodyObserver = new ResizeObserver(() => {
+                    canvas.renderer.resize(spine.ResizeMode.Expand);
+                });
+                bodyObserver.observe(document.body);
                 canvas.renderer.resize(spine.ResizeMode.Expand);
 			}
 
 			update(canvas, delta) {
-                for (let { skeleton: { skeleton, state } } of Object.values(this.selectorToDiv)) {
+                for (let { skeleton: { skeleton, state } } of Object.values(selectorToDiv)) {
                     state.update(delta);
                     state.apply(skeleton);
                     skeleton.update(delta);
@@ -133,19 +140,30 @@
                 renderer.camera.worldToScreen(vec3, canvas.htmlCanvas.clientWidth, canvas.htmlCanvas.clientHeight);
 
                 // loop over the skeleton/div comination
-                for (const { divs, skeleton } of Object.values(this.selectorToDiv)) {
+                for (const { divs, skeleton } of Object.values(selectorToDiv)) {
                     // loop over each div where to render the current skeleton
                     for (const { position, div } of divs) {
-
-                        // let rect = position;
 
                         // const rect = div.getBoundingClientRect();
                         // rect.x *= window.devicePixelRatio;
                         // rect.y *= window.devicePixelRatio;
 
-                        const { x, y } = div.getBoundingClientRect();
-                        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-                        const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+
+                        // TODO-WIP: experiment with caching div position to prevent the transform in the for loop
+                        // Need to find a reliable way to get notified when div origin change position
+                        let { x, y } = position;
+                        if (x === undefined || y === undefined) {
+                            const bounds = div.getBoundingClientRect();
+                            x = bounds.x;
+                            y = bounds.y;
+                        } else {
+                            const bounds = div.getBoundingClientRect();
+                            x = bounds.x;
+                            y = bounds.y;
+                        }
+
+                        const scrollTop = window.pageYOffset;
+                        const scrollLeft = window.pageXOffset;
                         position.x = (x + scrollLeft) * window.devicePixelRatio;
                         position.y = (y + scrollTop) * window.devicePixelRatio;
                         const rect = { x: position.x, y: position.y };
@@ -161,18 +179,19 @@
                             // if (position.x == rect.x && position.y == rect.y) {
                             //     renderer.drawSkeleton(skeleton.skeleton, true);
                             // } else {
-                            //     renderer.drawSkeleton(skeleton.skeleton, true, -1, -1, (vertices, size, vertexSize) => {
-                            //         for (let i = 0; i < size; i+=vertexSize) {
-                            //             vertices[i] = vertices[i] + rect.x - vec3.x * window.devicePixelRatio;
-                            //             vertices[i+1] = vertices[i+1] - rect.y + vec3.y * window.devicePixelRatio;
-                            //         }
-                            //     });
+                                renderer.drawSkeleton(skeleton.skeleton, true, -1, -1, (vertices, size, vertexSize) => {
+                                    for (let i = 0; i < size; i+=vertexSize) {
+                                        vertices[i] = vertices[i] + rect.x - vec3.x * window.devicePixelRatio;
+                                        vertices[i+1] = vertices[i+1] - rect.y + vec3.y * window.devicePixelRatio;
+                                    }
+                                });
                             //     position.x = rect.x;
                             //     position.y = rect.y;
                             // }
 
-                            skeleton.skeleton.x = ;
-                            renderer.drawSkeleton(skeleton.skeleton, true);
+                            // skeleton.skeleton.x = rect.x - vec3.x * window.devicePixelRatio,
+                            // skeleton.skeleton.y = -rect.y + vec3.y * window.devicePixelRatio,
+                            // renderer.drawSkeleton(skeleton.skeleton, true);
 
                             // show center
                             const root = skeleton.skeleton.getRootBone();
@@ -185,36 +204,6 @@
                                 20,
                                 { r: 1, g: 0, b: 0, a: 1 }
                             );
-
-
-
-
-
-
-
-
-                            // if (position.x == rect.x && position.y == rect.y) {
-                            //     renderer.circle(
-                            //         true,
-                            //         position.x - vec3.x * window.devicePixelRatio,
-                            //         -position.y + vec3.y * window.devicePixelRatio,
-                            //         20,
-                            //         { r: 1, g: 0, b: 0, a: .5 }
-                            // );
-                            // } else {
-                            //     renderer.circle(
-                            //         true,
-                            //         rect.x - vec3.x * window.devicePixelRatio,
-                            //         -rect.y + vec3.y * window.devicePixelRatio,
-                            //         20,
-                            //         { r: 1, g: 0, b: 0, a: .5 }
-                            //     );
-                            //     position.x = rect.x;
-                            //     position.y = rect.y;
-                            // }
-
-
-
 
                         // }
                     }
@@ -238,7 +227,7 @@
             htmlCanvas.style["pointer-events"] = 'none';
         }
 
-		new spine.SpineCanvas(htmlCanvas, {
+		const app = new spine.SpineCanvas(htmlCanvas, {
 			app: new App()
 		})
 
@@ -293,24 +282,28 @@
             const div = document.createElement('div');
             div.style.width = Math.floor(Math.random() * 200 + 100) + 'px';
             div.style.height = Math.floor(Math.random() * 100 + 50) + 'px';
-            div.style.backgroundColor = getRandomColor();
             div.style.margin = '10px';
-            div.textContent = 'New Div ' + (document.getElementsByTagName('div').length + 1);
+            div.style.touchAction = 'none';
+            div.className = 'spine-div';
+            const divType = getRandomSpineDiv();
+            div.setAttribute(divType, '');
+            div.innerText = "Drag me";
+
+            console.log(app)
+            selectorToDiv[divType].divs.push({ div, position: {} });
+
+            makeDraggable(div);
             document.body.appendChild(div);
         }
 
-        function getRandomColor() {
-            const letters = '0123456789ABCDEF';
-            let color = '#';
-            for (let i = 0; i < 6; i++) {
-                color += letters[Math.floor(Math.random() * 16)];
-            }
-            return color;
+        function getRandomSpineDiv() {
+            const divs = ['div-spine', 'div-raptor', 'div-celeste'];
+            return divs[Math.floor(Math.random() * 3)];
         }
 
         // Add a button to trigger new div creation
         const addDivButton = document.createElement('button');
-        addDivButton.textContent = 'Add New Div';
+        addDivButton.textContent = 'Add New Div at the bottome of the page';
         addDivButton.style.position = 'fixed';
         addDivButton.style.top = '10px';
         addDivButton.style.left = '10px';
@@ -341,16 +334,26 @@
             let startX, startY;
             let originalX, originalY;
 
-            element.addEventListener('mousedown', startDragging);
-            document.addEventListener('mousemove', drag);
-            document.addEventListener('mouseup', stopDragging);
+            element.addEventListener('pointerdown', startDragging);
+            element.addEventListener('pointermove', drag);
+            element.addEventListener('pointerup', stopDragging);
 
             function startDragging(e) {
                 isDragging = true;
                 startX = e.clientX;
                 startY = e.clientY;
-                originalX = element.offsetLeft;
-                originalY = element.offsetTop;
+
+                const translate = element.style.transform;
+                if (translate !== '') {
+                    // Extract the translate values from the transform string
+                    const translateValues = translate.match(/translate\(([^)]+)\)/)[1].split(', ');
+                    originalX = parseFloat(translateValues[0]);
+                    originalY = parseFloat(translateValues[1]);
+                } else {
+                    // If there is no transform, return 0,0
+                    originalX = 0;
+                    originalY = 0;
+                }
 
                 // Prevent text selection during drag
                 e.preventDefault();
@@ -362,14 +365,13 @@
                 const deltaX = e.clientX - startX;
                 const deltaY = e.clientY - startY;
 
-                // element.style.left = originalX + deltaX + 'px';
-                // element.style.top = originalY + deltaY + 'px';
-                console.log(deltaX)
-                element.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+                element.style.transform = `translate(${originalX + deltaX}px, ${originalY + deltaY}px)`;
+                e.preventDefault();
             }
 
-            function stopDragging() {
+            function stopDragging(e) {
                 isDragging = false;
+                e.preventDefault();
             }
         }
         const draggableDiv = document.getElementById('spineboy2');
