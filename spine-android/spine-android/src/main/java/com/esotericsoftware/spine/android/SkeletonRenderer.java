@@ -208,7 +208,7 @@ public class SkeletonRenderer {
 			// Post-process UVs, require scaling by bitmap size
 			float[] uvsArray = command.uvs.items;
 			for (int ii = vertexStart, w = command.texture.getWidth(), h = command.texture.getHeight(),
-				 nn = vertexStart + verticesLength; ii < nn; ii += 2) {
+				nn = vertexStart + verticesLength; ii < nn; ii += 2) {
 				uvsArray[ii] = uvsArray[ii] * w;
 				uvsArray[ii + 1] = uvsArray[ii + 1] * h;
 			}

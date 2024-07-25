@@ -459,7 +459,7 @@ public class SkeletonClipping {
 	}
 
 	/** Only returns a non-empty array if clipTrianglesUnpacked() was used **/
-	public FloatArray getClippedUvs() {
+	public FloatArray getClippedUvs () {
 		return clippedUvs;
 	}
 
