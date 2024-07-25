@@ -122,11 +122,13 @@ afterEvaluate {
         }
     }
 
-    if (!libraryVersion.endsWith("-SNAPSHOT")) {
-        signing {
-            useGpgCmd()
-            sign(publishing.publications["release"])
-            sign(tasks.getByName("sourceJar"))
-        }
+    signing {
+        useGpgCmd()
+        sign(publishing.publications["release"])
+        sign(tasks.getByName("sourceJar"))
+    }
+
+    tasks.withType<Sign> {
+        onlyIf { !libraryVersion.endsWith("-SNAPSHOT") }
     }
 }
