@@ -25,5 +25,5 @@ jobs:
         restore-keys: ${{ runner.os }}-gradle
 
     - name: Build spine-libgdx
-      working-directory: spine-libgdx/spine-libgdx
+      working-directory: spine-libgdx
       run: ./gradlew publishReleasePublicationToSonaType -PossrhUsername=${{ secrets.SONATYPE_USER }} -PossrhPassword=${{ secrets.SONATYPE_PASSWORD }}
