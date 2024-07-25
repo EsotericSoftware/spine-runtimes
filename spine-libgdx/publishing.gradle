@@ -1,0 +1,76 @@
+project("spine-libgdx") {
+    apply plugin: "java-library"
+    apply plugin: "maven-publish"
+    apply plugin: "signing"
+
+    def libraryVersion = "4.2.3-SNAPSHOT" // Update as needed
+
+    dependencies {
+        implementation "com.badlogicgames.gdx:gdx:$libgdxVersion"
+    }
+
+    tasks.register("sourceJar", Jar) {
+        archiveClassifier.set("sources")
+        from(sourceSets.main.allJava)
+    }
+
+    afterEvaluate {
+        publishing {
+            publications {
+                create("release", MavenPublication) {
+                    from(components.java)
+                    artifact(tasks.getByName("sourceJar"))
+
+                    groupId = "com.esotericsoftware.spine"
+                    artifactId = "spine-libgdx"
+                    version = libraryVersion
+
+                    pom {
+                        packaging = "jar"
+                        name.set("spine-libgdx")
+                        description.set("Spine Runtime for libGDX")
+                        url.set("https://github.com/esotericsoftware/spine-runtimes")
+                        licenses {
+                            license {
+                                name.set("Spine Runtimes License")
+                                url.set("http://esotericsoftware.com/spine-runtimes-license")
+                            }
+                        }
+                        developers {
+                            developer {
+                                name.set("Esoteric Software")
+                                email.set("contact@esotericsoftware.com")
+                            }
+                        }
+                        scm {
+                            url.set(pom.url.get())
+                            connection.set("scm:git:${url.get()}.git")
+                            developerConnection.set("scm:git:${url.get()}.git")
+                        }
+                    }
+                }
+            }
+
+            repositories {
+                maven {
+                    name = "SonaType"
+                    url = uri(libraryVersion.endsWith("-SNAPSHOT") ?
+                            "https://oss.sonatype.org/content/repositories/snapshots" :
+                            "https://oss.sonatype.org/service/local/staging/deploy/maven2")
+
+                    credentials {
+                        username = project.findProperty("ossrhUsername")
+                        password = project.findProperty("ossrhPassword")
+                    }
+                }
+            }
+        }
+
+        if (!libraryVersion.endsWith("-SNAPSHOT")) {
+            signing {
+                useGpgCmd()
+                sign(publishing.publications["release"])
+            }
+        }
+    }
+}

@@ -20,11 +20,14 @@ allprojects {
 
 project("spine-libgdx") {
     apply plugin: "java-library"
+    apply plugin: "maven-publish"
+    apply plugin: "signing"
 
     dependencies {
         implementation "com.badlogicgames.gdx:gdx:$libgdxVersion"
     }
 }
+apply from: 'publishing.gradle'
 
 project("spine-skeletonviewer") {
     jar {
