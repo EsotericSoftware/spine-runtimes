@@ -16,6 +16,11 @@ allprojects {
         maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
         mavenCentral()
     }
+
+    tasks.withType(JavaCompile) {
+        sourceCompatibility = javaVersion.toString()
+        targetCompatibility = javaVersion.toString()
+    }
 }
 
 project("spine-libgdx") {

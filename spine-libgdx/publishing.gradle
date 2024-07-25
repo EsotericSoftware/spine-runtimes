@@ -14,12 +14,23 @@ project("spine-libgdx") {
         from(sourceSets.main.allJava)
     }
 
+    tasks.javadoc {
+        failOnError = false
+    }
+
+    tasks.register("javadocJar", Jar) {
+        dependsOn javadoc
+        archiveClassifier.set("javadoc")
+        from(javadoc.destinationDir)
+    }
+
     afterEvaluate {
         publishing {
             publications {
                 create("release", MavenPublication) {
                     from(components.java)
                     artifact(tasks.getByName("sourceJar"))
+                    artifact(tasks.getByName("javadocJar"))
 
                     groupId = "com.esotericsoftware.spine"
                     artifactId = "spine-libgdx"
