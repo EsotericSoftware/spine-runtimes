@@ -86,7 +86,6 @@ public class SkeletonClipping {
 
 	public void clipTriangles (float[] vertices, short[] triangles, int trianglesLength) {
 		FloatArray clipOutput = this.clipOutput, clippedVertices = this.clippedVertices;
-		FloatArray clippedUvs = this.clippedUvs;
 		ShortArray clippedTriangles = this.clippedTriangles;
 		Object[] polygons = clippingPolygons.items;
 		int polygonsCount = clippingPolygons.size;
@@ -157,7 +156,6 @@ public class SkeletonClipping {
 		boolean twoColor) {
 
 		FloatArray clipOutput = this.clipOutput, clippedVertices = this.clippedVertices;
-		FloatArray clippedUvs = this.clippedUvs;
 		ShortArray clippedTriangles = this.clippedTriangles;
 		Object[] polygons = clippingPolygons.items;
 		int polygonsCount = clippingPolygons.size;
