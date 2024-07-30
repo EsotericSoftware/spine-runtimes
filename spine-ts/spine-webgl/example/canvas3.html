@@ -25,8 +25,8 @@
             will-change: transform;
         }
     </style>
-    <!-- <script src="../dist/iife/spine-webgl.js"></script> -->
-    <script src="./spine-webgl.min.js"></script>
+    <script src="../dist/iife/spine-webgl.js"></script>
+    <!-- <script src="./spine-webgl.min.js"></script> -->
 </head>
 <body>
     <canvas id="canvas" style="display: none;"></canvas>
@@ -335,8 +335,8 @@
             let originalX, originalY;
 
             element.addEventListener('pointerdown', startDragging);
-            element.addEventListener('pointermove', drag);
-            element.addEventListener('pointerup', stopDragging);
+            document.addEventListener('pointermove', drag);
+            document.addEventListener('pointerup', stopDragging);
 
             function startDragging(e) {
                 isDragging = true;

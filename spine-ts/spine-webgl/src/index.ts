@@ -13,6 +13,7 @@ export * from "./ShapeRenderer.js";
 export * from "./SkeletonDebugRenderer.js";
 export * from "./SkeletonRenderer.js";
 export * from "./SpineCanvas.js";
+export * from "./SpineCanvasOverlay.js";
 export * from "./Vector3.js";
 export * from "./WebGL.js";
 export * from "@esotericsoftware/spine-core";

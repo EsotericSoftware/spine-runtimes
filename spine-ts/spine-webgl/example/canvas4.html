@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OverlayCanvas Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .content {
+            margin: 0 auto;
+        }
+        .spine-div {
+            border: 1px solid black;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .spacer {
+            height: 250px;
+        }
+        #canvas {
+            will-change: transform;
+        }
+    </style>
+    <script src="../dist/iife/spine-webgl.js"></script>
+    <!-- <script src="./spine-webgl.min.js"></script> -->
+</head>
+<body>
+    <div class="content">
+        <h1>OverlayCanvas Example</h1>
+
+        <p>Scroll down to div.</p>
+
+        <div class="spacer"></div>
+
+        <div class="spine-div" div-spine>
+            <h2>Spine Box 1</h2>
+        </div>
+
+        <div class="spacer"></div>
+
+        <div id="spineboy2" class="spine-div" style="width: 50%; margin-left: 50%; touch-action:none" div-spine>
+            <h2>Spine Box 2 (drag me)</h2>
+        </div>
+
+        <div class="spacer"></div>
+
+        <div id="raptor" class="spine-div" style="width: 50%; margin-left: 50%; transition: transform 1s linear;" div-raptor>
+            <h2>Raptor Box</h2>
+        </div>
+
+        <div class="spacer"></div>
+
+        <div class="spine-div" style="width: 50%; margin-left: 20%;" div-celeste>
+            <h2>Celeste Box</h2>
+        </div>
+
+        <p>End of content.</p>
+    </div>
+
+    <script>
+
+        const divs = document.querySelectorAll(`[div-spine]`);
+        const overlay = new spine.SpineCanvasOverlay();
+
+        const p = overlay.addSkeleton({
+            atlasPath: "assets/spineboy-pma.atlas",
+            skeletonPath: "assets/spineboy-pro.skel",
+            scale: .5,
+        }, divs);
+
+
+        p.then(({ skeleton, state }) => {
+            state.setAnimation(0, "walk", true);
+        })
+
+
+
+    </script>
+</body>
+</html>
