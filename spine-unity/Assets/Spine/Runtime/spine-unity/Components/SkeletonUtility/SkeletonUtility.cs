@@ -238,6 +238,11 @@ namespace Spine.Unity {
 		bool needToReprocessBones;
 
 		public void ResubscribeEvents () {
+			ResubscribeIndependentEvents();
+			ResubscribeDependentEvents();
+		}
+
+		void ResubscribeIndependentEvents () {
 			if (skeletonRenderer != null) {
 				skeletonRenderer.OnRebuild -= HandleRendererReset;
 				skeletonRenderer.OnRebuild += HandleRendererReset;
@@ -250,10 +255,15 @@ namespace Spine.Unity {
 
 			if (skeletonAnimation != null) {
 				skeletonAnimation.UpdateLocal -= UpdateLocal;
+				skeletonAnimation.UpdateLocal += UpdateLocal;
+			}
+		}
+
+		void ResubscribeDependentEvents () {
+			if (skeletonAnimation != null) {
 				skeletonAnimation.UpdateWorld -= UpdateWorld;
 				skeletonAnimation.UpdateComplete -= UpdateComplete;
 
-				skeletonAnimation.UpdateLocal += UpdateLocal;
 				if (hasOverrideBones || hasConstraints)
 					skeletonAnimation.UpdateWorld += UpdateWorld;
 				if (hasConstraints)
@@ -369,6 +379,7 @@ namespace Spine.Unity {
 				boneComponents.Clear();
 				constraintComponents.Clear();
 			}
+			ResubscribeDependentEvents();
 		}
 
 		void UpdateLocal (ISkeletonAnimation anim) {
