@@ -980,6 +980,11 @@ public class Animation {
 			Bone bone = skeleton.bones.get(boneIndex);
 			if (!bone.active) return;
 
+			if (direction == out) {
+				if (blend == setup) bone.inherit = bone.data.inherit;
+				return;
+			}
+
 			float[] frames = this.frames;
 			if (time < frames[0]) {
 				if (blend == setup || blend == first) bone.inherit = bone.data.inherit;
