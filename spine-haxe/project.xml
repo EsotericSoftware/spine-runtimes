@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project>
 
-	<meta title="spine-haxe-example" package="spine" version="4.1.0" company="Esoteric Software" />
+	<meta title="spine-haxe-example" package="spine" version="4.2.0" company="Esoteric Software" />
 	<app main="Main" path="export" file="SpineHaxeExample" />
 	<window allow-high-dpi="true" />
 

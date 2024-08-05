@@ -22,7 +22,7 @@ read answer
 if [ "$answer" = "Y" ] || [ "$answer" = "y" ]; then
     git add haxelib.json
     git commit -m "[haxe] Release $newVersion"
-    git push origin haxe-ci
+    git push origin 4.2
     echo "Changes committed and pushed."
 else
     echo "Commit and push cancelled, but haxelib.json version updated."
