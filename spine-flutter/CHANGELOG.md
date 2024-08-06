@@ -1,3 +1,6 @@
+# 4.2.31
+- Fix bug in IKConstraint leading to NaNs.
+
 # 4.2.30
 - Switch to spine-cpp SkeletonRenderer
 
