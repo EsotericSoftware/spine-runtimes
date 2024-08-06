@@ -213,7 +213,7 @@ void IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY
 			r0 = q / c2;
 			r1 = c0 / q;
 			r = MathUtil::abs(r0) < MathUtil::abs(r1) ? r0 : r1;
-			if (r * r <= dd) {
+			if (dd - r * r >= 0) {
 				y = MathUtil::sqrt(dd - r * r) * bendDir;
 				a1 = ta - MathUtil::atan2(y, r);
 				a2 = MathUtil::atan2(y / psy, (r - l1) / psx);
