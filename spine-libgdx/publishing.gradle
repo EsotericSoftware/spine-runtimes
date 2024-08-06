@@ -3,7 +3,7 @@ project("spine-libgdx") {
     apply plugin: "maven-publish"
     apply plugin: "signing"
 
-    def libraryVersion = "4.2.6-SNAPSHOT"
+    def libraryVersion = "4.2.6"
 
     dependencies {
         implementation "com.badlogicgames.gdx:gdx:$libgdxVersion"
