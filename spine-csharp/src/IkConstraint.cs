@@ -328,7 +328,7 @@ namespace Spine {
 					q = -(c1 + q) * 0.5f;
 					float r0 = q / c2, r1 = c / q;
 					float r = Math.Abs(r0) < Math.Abs(r1) ? r0 : r1;
-					if (r * r <= dd) {
+					if (dd - r * r >= 0) {
 						y = (float)Math.Sqrt(dd - r * r) * bendDir;
 						a1 = ta - (float)Math.Atan2(y, r);
 						a2 = (float)Math.Atan2(y / psy, (r - l1) / psx);
