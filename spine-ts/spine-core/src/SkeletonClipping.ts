@@ -81,17 +81,58 @@ export class SkeletonClipping {
 		return this.clipAttachment != null;
 	}
 
-	clipTriangles (vertices: NumberArrayLike, triangles: NumberArrayLike, trianglesLength: number): void;
-	clipTriangles (vertices: NumberArrayLike, triangles: NumberArrayLike, trianglesLength: number, uvs: NumberArrayLike,
-		light: Color, dark: Color, twoColor: boolean): void;
-	clipTriangles (vertices: NumberArrayLike, triangles: NumberArrayLike, trianglesLength: number, uvs?: NumberArrayLike,
-		light?: Color, dark?: Color, twoColor?: boolean): void {
+	/**
+    * @deprecated Use clipTriangles without verticesLength parameter. Mark for removal in 4.3.
+    */
+	clipTriangles(vertices: NumberArrayLike, verticesLength: number, triangles: NumberArrayLike, trianglesLength: number): void;
+
+	/**
+	 * @deprecated Use clipTriangles without verticesLength parameter. Mark for removal in 4.3.
+	 */
+	clipTriangles(vertices: NumberArrayLike, verticesLength: number, triangles: NumberArrayLike, trianglesLength: number, uvs: NumberArrayLike, light: Color, dark: Color, twoColor: boolean): void;
+
+	clipTriangles(vertices: NumberArrayLike, triangles: NumberArrayLike, trianglesLength: number): void;
+	clipTriangles(vertices: NumberArrayLike, triangles: NumberArrayLike, trianglesLength: number, uvs: NumberArrayLike, light: Color, dark: Color, twoColor: boolean): void;
+	clipTriangles(
+		vertices: NumberArrayLike,
+		verticesLengthOrTriangles: number | NumberArrayLike,
+		trianglesOrTrianglesLength: NumberArrayLike | number,
+		trianglesLengthOrUvs?: number | NumberArrayLike,
+		uvsOrLight?: NumberArrayLike | Color,
+		lightOrDark?: Color,
+		darkOrTwoColor?: Color | boolean,
+		twoColorParam?: boolean
+	): void {
+		// Determine which overload is being used
+		let triangles: NumberArrayLike;
+		let trianglesLength: number;
+		let uvs: NumberArrayLike | undefined;
+		let light: Color | undefined;
+		let dark: Color | undefined;
+		let twoColor: boolean | undefined;
+
+		if (typeof verticesLengthOrTriangles === 'number') {
+			triangles = trianglesOrTrianglesLength as NumberArrayLike;
+			trianglesLength = trianglesLengthOrUvs as number;
+			uvs = uvsOrLight as NumberArrayLike;
+			light = lightOrDark as Color | undefined;
+			dark = darkOrTwoColor as Color | undefined;
+			twoColor = twoColorParam;
+		} else {
+			triangles = verticesLengthOrTriangles;
+			trianglesLength = trianglesOrTrianglesLength as number;
+			uvs = trianglesLengthOrUvs as NumberArrayLike;
+			light = uvsOrLight as Color | undefined;
+			dark = lightOrDark as Color | undefined;
+			twoColor = darkOrTwoColor as boolean;
+		}
 
 		if (uvs && light && dark && typeof twoColor === 'boolean')
 			this.clipTrianglesRender(vertices, triangles, trianglesLength, uvs, light, dark, twoColor);
 		else
 			this.clipTrianglesNoRender(vertices, triangles, trianglesLength);
 	}
+
 	private clipTrianglesNoRender (vertices: NumberArrayLike, triangles: NumberArrayLike, trianglesLength: number) {
 
 		let clipOutput = this.clipOutput, clippedVertices = this.clippedVertices;
