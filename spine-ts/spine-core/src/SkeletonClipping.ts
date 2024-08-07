@@ -82,18 +82,18 @@ export class SkeletonClipping {
 	}
 
 	/**
-    * @deprecated Use clipTriangles without verticesLength parameter. Mark for removal in 4.3.
-    */
-	clipTriangles(vertices: NumberArrayLike, verticesLength: number, triangles: NumberArrayLike, trianglesLength: number): void;
+	* @deprecated Use clipTriangles without verticesLength parameter. Mark for removal in 4.3.
+	*/
+	clipTriangles (vertices: NumberArrayLike, verticesLength: number, triangles: NumberArrayLike, trianglesLength: number): void;
 
 	/**
 	 * @deprecated Use clipTriangles without verticesLength parameter. Mark for removal in 4.3.
 	 */
-	clipTriangles(vertices: NumberArrayLike, verticesLength: number, triangles: NumberArrayLike, trianglesLength: number, uvs: NumberArrayLike, light: Color, dark: Color, twoColor: boolean): void;
+	clipTriangles (vertices: NumberArrayLike, verticesLength: number, triangles: NumberArrayLike, trianglesLength: number, uvs: NumberArrayLike, light: Color, dark: Color, twoColor: boolean): void;
 
-	clipTriangles(vertices: NumberArrayLike, triangles: NumberArrayLike, trianglesLength: number): void;
-	clipTriangles(vertices: NumberArrayLike, triangles: NumberArrayLike, trianglesLength: number, uvs: NumberArrayLike, light: Color, dark: Color, twoColor: boolean): void;
-	clipTriangles(
+	clipTriangles (vertices: NumberArrayLike, triangles: NumberArrayLike, trianglesLength: number): void;
+	clipTriangles (vertices: NumberArrayLike, triangles: NumberArrayLike, trianglesLength: number, uvs: NumberArrayLike, light: Color, dark: Color, twoColor: boolean): void;
+	clipTriangles (
 		vertices: NumberArrayLike,
 		verticesLengthOrTriangles: number | NumberArrayLike,
 		trianglesOrTrianglesLength: NumberArrayLike | number,
