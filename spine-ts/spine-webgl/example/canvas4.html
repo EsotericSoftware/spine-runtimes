@@ -15,7 +15,7 @@
         }
         .spine-div {
             border: 1px solid black;
-            padding: 20px;
+            /* padding: 20px; */
             margin-bottom: 20px;
         }
         .spacer {
@@ -24,39 +24,64 @@
         #canvas {
             will-change: transform;
         }
+
+        .resize-handle {
+            width: 20%;
+            height: 20%;
+            background-color: #007bff;
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            cursor: se-resize;
+        }
     </style>
-    <script src="../dist/iife/spine-webgl.js"></script>
+    <!-- <script src="../dist/iife/spine-webgl.js"></script> -->
     <!-- <script src="./spine-webgl.min.js"></script> -->
+    <script src="./spine-webgl.js"></script>
 </head>
 <body>
     <div class="content">
-        <h1>OverlayCanvas Example</h1>
+        <h1>Spine Canvas Overlay Example</h1>
 
-        <p>Scroll down to div.</p>
-
-        <div class="spacer"></div>
-
-        <div class="spine-div" div-spine>
-            <h2>Spine Box 1</h2>
+        <div id="spineboy1" class="spine-div" style="width: 200px; height: 300px; margin-left: 200px; touch-action:none; position:relative;" div-spine>
+            <div id="resizeHandle" class="resize-handle"></div>
+            <h2>Drag and resize me</h2>
+            <h3>Mode: inside</h3>
+            <h4>Spineboy will be resize to remain into the div.</h4>
+            <h4>Skeleton cannot be reused (side effect on skeleton scale).</h4>
         </div>
 
         <div class="spacer"></div>
 
-        <div id="spineboy2" class="spine-div" style="width: 50%; margin-left: 50%; touch-action:none" div-spine>
-            <h2>Spine Box 2 (drag me)</h2>
+        <div id="spineboy2" class="spine-div" style="width: 50%; margin-left: 50%; touch-action:none" div-spine2>
+            <h2>Drag me</h2>
+            <h3>Mode: origin</h3>
+            <h4>You can easily change the position using offset or percentage of html element axis (origin is top-left)</h4>
+            <h4>Skeleton can be reused.</h4>
         </div>
 
         <div class="spacer"></div>
 
-        <div id="raptor" class="spine-div" style="width: 50%; margin-left: 50%; transition: transform 1s linear;" div-raptor>
-            <h2>Raptor Box</h2>
+        <div id="spineboy3" class="spine-div" style="width: 50%; margin-left: 50%; touch-action:none" div-spine2>
+            <h3>Skeleton of previous box is being reused here</h3>
         </div>
 
         <div class="spacer"></div>
 
-        <div class="spine-div" style="width: 50%; margin-left: 20%;" div-celeste>
-            <h2>Celeste Box</h2>
+        <div class="spine-div" div-spine3>
+            <h3>Initializer with NodeList</h3>
         </div>
+        <div class="spine-div" div-spine3>
+            <h3>Initializer with NodeList</h3>
+        </div>
+
+        <div class="spacer"></div>
+
+        <div class="spine-div" style="width: 50%; height: 200px;" div-spine4>
+            <h3>Initializer with HTMLElement</h3>
+        </div>
+
+        <div class="spacer"></div>
 
         <p>End of content.</p>
     </div>
@@ -66,18 +91,161 @@
         const divs = document.querySelectorAll(`[div-spine]`);
         const overlay = new spine.SpineCanvasOverlay();
 
-        const p = overlay.addSkeleton({
-            atlasPath: "assets/spineboy-pma.atlas",
-            skeletonPath: "assets/spineboy-pro.skel",
+        const p = overlay.addSkeleton(
+            {
+                atlasPath: "assets/spineboy-pma.atlas",
+                skeletonPath: "assets/spineboy-pro.skel",
+                scale: .5,
+                animation: 'walk',
+            },
+            [
+                {
+                    element: divs[0],
+                    mode: 'inside',
+                    showBounds: true,
+                },
+            ],
+        );
+
+        setTimeout(async () => {
+            const { skeleton, state } = await p;
+            state.setAnimation(0, "run", true);
+            overlay.recalculateBounds(skeleton, state);
+        }, 1000)
+
+        const divs2 = document.querySelectorAll(`[div-spine2]`);
+        const p2 = overlay.addSkeleton({
+            atlasPath: "assets/celestial-circus-pma.atlas",
+            skeletonPath: "assets/celestial-circus-pro.skel",
+            animation: 'swing',
             scale: .5,
-        }, divs);
+        },
+        [
+            {
+                element: divs2[0],
+                mode: 'origin',
+                showBounds: true,
+                xAxis: .5,
+                yAxis: 1,
+                // offsetX: 100
+            },
+            {
+                element: divs2[1],
+                mode: 'origin',
+                showBounds: true,
+                offsetX: 100,
+                offsetY: -50
+            },
+        ],);
+
+        p2.then(({ state }) => state.setAnimation(1, "eyeblink", true));
+
+        const divs3 = document.querySelectorAll(`[div-spine3]`);
+        const p3 = overlay.addSkeleton({
+            atlasPath: "assets/raptor-pma.atlas",
+            skeletonPath: "assets/raptor-pro.skel",
+            animation: 'walk',
+            scale: .5,
+        }, divs3);
+
+        const divs4 = document.querySelectorAll(`[div-spine4]`);
+        const p4 = overlay.addSkeleton({
+            atlasPath: "assets/tank-pma.atlas",
+            skeletonPath: "assets/tank-pro.skel",
+            animation: 'shoot',
+            scale: .5,
+        }, divs4[0]);
+
+        //////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////
+        // Drag utility
 
 
-        p.then(({ skeleton, state }) => {
-            state.setAnimation(0, "walk", true);
-        })
+        function makeDraggable(element) {
+            let isDragging = false;
+            let startX, startY;
+            let originalX, originalY;
+
+            element.addEventListener('pointerdown', startDragging);
+            document.addEventListener('pointermove', drag);
+            document.addEventListener('pointerup', stopDragging);
+
+            function startDragging(e) {
+                e.preventDefault();
+                if (e.target === document.getElementById('resizeHandle')) return;
+
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+
+                const translate = element.style.transform;
+                if (translate !== '') {
+                    const translateValues = translate.match(/translate\(([^)]+)\)/)[1].split(', ');
+                    originalX = parseFloat(translateValues[0]);
+                    originalY = parseFloat(translateValues[1]);
+                } else {
+                    originalX = 0;
+                    originalY = 0;
+                }
+            }
+
+            function drag(e) {
+                if (!isDragging) return;
+
+                const deltaX = e.clientX - startX;
+                const deltaY = e.clientY - startY;
+
+                element.style.transform = `translate(${originalX + deltaX}px, ${originalY + deltaY}px)`;
+                e.preventDefault();
+            }
+
+            function stopDragging(e) {
+                isDragging = false;
+                e.preventDefault();
+            }
+        }
+        makeDraggable(document.getElementById('spineboy1'));
+        makeDraggable(document.getElementById('spineboy2'));
 
 
+        //////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////
+        // Resize utility
+
+        const resizableDiv = document.getElementById('spineboy1');
+        const resizeHandle = document.getElementById('resizeHandle');
+        let isResizing = false;
+        let startX, startY, startWidth, startHeight;
+
+        resizeHandle.addEventListener('pointerdown', initResize);
+
+        function initResize(e) {
+            isResizing = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            startWidth = resizableDiv.offsetWidth;
+            startHeight = resizableDiv.offsetHeight;
+            document.addEventListener('pointermove', resize);
+            document.addEventListener('pointerup', stopResize);
+        }
+
+        function resize(e) {
+            if (!isResizing) return;
+            const width = startWidth + (e.clientX - startX);
+            const height = startHeight + (e.clientY - startY);
+            resizableDiv.style.width = width + 'px';
+            resizableDiv.style.height = height + 'px';
+        }
+
+        function stopResize() {
+            isResizing = false;
+            document.removeEventListener('pointermove', resize);
+            document.removeEventListener('pointerup', stopResize);
+        }
 
     </script>
 </body>

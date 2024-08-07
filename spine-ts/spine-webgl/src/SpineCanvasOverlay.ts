@@ -27,20 +27,49 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { SpineCanvas, SpineCanvasApp, AtlasAttachmentLoader, SkeletonBinary, SkeletonJson, Skeleton, AnimationState, AnimationStateData, Physics, Vector3, ResizeMode, Color } from "./index.js";
+import { SpineCanvas, SpineCanvasApp, AtlasAttachmentLoader, SkeletonBinary, SkeletonJson, Skeleton, Animation, AnimationState, AnimationStateData, Physics, Vector2, Vector3, ResizeMode, Color, MixBlend, MixDirection, SceneRenderer, SkeletonData } from "./index.js";
 
-/** Manages the life-cycle and WebGL context of a {@link SpineCanvasApp}. The app loads
- * assets and initializes itself, then updates and renders its state at the screen refresh rate. */
+interface Rectangle {
+	x: number,
+	y: number,
+	width: number,
+	height: number,
+}
+
+interface OverlaySkeletonOptions {
+	atlasPath: string,
+	skeletonPath: string,
+	scale: number,
+	animation?: string,
+	skeletonData?: SkeletonData,
+}
+
+interface OverlayHTMLOptions {
+	element: HTMLElement,
+	mode?: OverlayElementMode,
+	showBounds?: boolean,
+	offsetX?: number,
+	offsetY?: number,
+	xAxis?: number,
+	yAxis?: number,
+}
+
+type OverlayElementMode = 'inside' | 'origin';
+
+/** Manages the life-cycle and WebGL context of a {@link SpineCanvasOverlay}. */
 export class SpineCanvasOverlay {
 
 	private spineCanvas:SpineCanvas;
 	private canvas:HTMLCanvasElement;
 
-	private skeletonList = new Array<{ skeleton: Skeleton, state: AnimationState, htmlElements: Array<HTMLElement>}>();
+	private skeletonList = new Array<{
+		skeleton: Skeleton,
+		state: AnimationState,
+		bounds: Rectangle,
+		htmlOptionsList: Array<OverlayHTMLOptions>,
+	}>();
 
 	private disposed = false;
-
-
 
 	/** Constructs a new spine canvas, rendering to the provided HTML canvas. */
 	constructor () {
@@ -60,11 +89,12 @@ export class SpineCanvasOverlay {
         resizeObserver.observe(document.body);
 
 		const red = new Color(1, 0, 0, 1);
+		const blue = new Color(0, 0, 1, 1);
 		const spineCanvasApp: SpineCanvasApp = {
 
 			update: (canvas: SpineCanvas, delta: number) => {
-				this.skeletonList.forEach(({ skeleton, state, htmlElements }) => {
-					if (htmlElements.length === 0) return;
+				this.skeletonList.forEach(({ skeleton, state, htmlOptionsList }) => {
+					if (htmlOptionsList.length === 0) return;
 					state.update(delta);
                     state.apply(skeleton);
                     skeleton.update(delta);
@@ -81,29 +111,73 @@ export class SpineCanvasOverlay {
                 renderer.camera.worldToScreen(vec3, canvas.htmlCanvas.clientWidth, canvas.htmlCanvas.clientHeight);
 
 				const devicePixelRatio = window.devicePixelRatio;
-				this.skeletonList.forEach(({ skeleton, htmlElements }) => {
-					if (htmlElements.length === 0) return;
+				const tempVector = new Vector3();
+				this.skeletonList.forEach(({ skeleton, htmlOptionsList, bounds }) => {
+					if (htmlOptionsList.length === 0) return;
 
-					htmlElements.forEach((div) => {
+					let { x: ax, y: ay, width: aw, height: ah } = bounds;
 
-						const bounds = div.getBoundingClientRect();
-						const x = (bounds.x + window.scrollX - vec3.x) * devicePixelRatio;
-						const y = (bounds.y + window.scrollY - vec3.y) * devicePixelRatio;
+					htmlOptionsList.forEach(({ element, mode, showBounds, offsetX = 0, offsetY = 0, xAxis = 0, yAxis = 0 }) => {
+
+						const divBounds = element.getBoundingClientRect();
+						let x = 0, y = 0;
+						if (mode === 'inside') {
+							// scale ratio
+							const scaleWidth = divBounds.width * devicePixelRatio / aw;
+							const scaleHeight = divBounds.height * devicePixelRatio / ah;
+
+							// attempt to use width ratio
+							let ratio = scaleWidth;
+							let scaledW = aw * ratio;
+							let scaledH = ah * ratio;
+
+							// if scaled height is bigger than div height, use height ratio instead
+							if (scaledH > divBounds.height * devicePixelRatio) ratio = scaleHeight;
+
+							const scaledX = (ax + aw / 2) * ratio;
+							const scaledY = (ay + ah / 2) * ratio;
+
+							const divX = divBounds.x + divBounds.width / 2 + window.scrollX;
+							const divY = divBounds.y - 1 + divBounds.height / 2 + window.scrollY;
+
+							tempVector.set(divX, divY, 0);
+                			renderer.camera.screenToWorld(tempVector, canvas.htmlCanvas.clientWidth, canvas.htmlCanvas.clientHeight);
+
+							x = tempVector.x - scaledX;
+							y = tempVector.y - scaledY;
+
+							skeleton.scaleX = ratio;
+							skeleton.scaleY = ratio;
+
+							if (showBounds) {
+								renderer.circle(true, tempVector.x, tempVector.y, 10, blue);
+								renderer.rect(false, ax * ratio + x + offsetX, ay * ratio + y + offsetY, aw * ratio, ah * ratio, blue);
+							}
+
+						} else {
+							const divX = divBounds.x + divBounds.width * xAxis + window.scrollX;
+							const divY = divBounds.y + divBounds.height * yAxis + window.scrollY;
+
+							tempVector.set(divX, divY, 0);
+                			renderer.camera.screenToWorld(tempVector, canvas.htmlCanvas.clientWidth, canvas.htmlCanvas.clientHeight);
+
+							x = tempVector.x;
+							y = tempVector.y;
+
+							if (showBounds) {
+								// show skeleton root
+								const root = skeleton.getRootBone()!;
+								renderer.circle(true, x + root.x + offsetX, y + root.y + offsetY, 10, red);
+							}
+						}
 
 						renderer.drawSkeleton(skeleton, true, -1, -1, (vertices, size, vertexSize) => {
 							for (let i = 0; i < size; i+=vertexSize) {
-								vertices[i] = vertices[i] + x;
-								vertices[i+1] = vertices[i+1] - y;
+								vertices[i] = vertices[i] + x + offsetX;
+								vertices[i+1] = vertices[i+1] + y + offsetY;
 							}
 						});
 
-						// show skeleton center (root)
-						const root = skeleton.getRootBone()!;
-						const vec3Root = new Vector3(root.x, root.y);
-						renderer.camera.worldToScreen(vec3Root, canvas.htmlCanvas.clientWidth, canvas.htmlCanvas.clientHeight);
-						const rootX = (vec3Root.x - vec3.x) * devicePixelRatio;
-						const rootY = (vec3Root.y - vec3.y) * devicePixelRatio;
-						renderer.circle(true, x + rootX, -y + rootY, 20, red);
 					});
 
 				});
@@ -118,6 +192,7 @@ export class SpineCanvasOverlay {
 		})
 	}
 
+	// TODO: Reject error
 	public async loadBinary(path: string) {
 		return new Promise((resolve, reject) => {
 			this.spineCanvas.assetManager.loadBinary(path, () => resolve(null));
@@ -137,10 +212,10 @@ export class SpineCanvasOverlay {
 	}
 
 	public async addSkeleton(
-		skeletonOptions: { atlasPath: string, skeletonPath: string, scale: number },
-		elements: Array<HTMLElement> = [],
+		skeletonOptions: OverlaySkeletonOptions,
+		htmlOptionsList: Array<OverlayHTMLOptions> | Array<HTMLElement> | HTMLElement | NodeList = [],
 	) {
-		const { atlasPath, skeletonPath, scale } = skeletonOptions;
+		const { atlasPath, skeletonPath, scale = 1, animation, skeletonData: skeletonDataInput } = skeletonOptions;
 		const isBinary = skeletonPath.endsWith(".skel");
 		await Promise.all([
 			isBinary ? this.loadBinary(skeletonPath) : this.loadJson(skeletonPath),
@@ -154,17 +229,104 @@ export class SpineCanvasOverlay {
 		skeletonLoader.scale = scale;
 
 		const skeletonFile = this.spineCanvas.assetManager.require(skeletonPath);
-		const skeletonData = skeletonLoader.readSkeletonData(skeletonFile);
+		const skeletonData = skeletonDataInput ?? skeletonLoader.readSkeletonData(skeletonFile);
 
 		const skeleton = new Skeleton(skeletonData);
 		const animationStateData = new AnimationStateData(skeletonData);
 		const state = new AnimationState(animationStateData);
 
-		this.skeletonList.push({ skeleton, state, htmlElements: [...elements] });
+		let animationData;
+		if (animation) {
+			state.setAnimation(0, animation, true);
+			animationData = animation ? skeleton.data.findAnimation(animation)! : undefined;
+		}
+		const bounds = this.calculateAnimationViewport(skeleton, animationData);
+
+		let list: Array<OverlayHTMLOptions>;
+		if (htmlOptionsList instanceof HTMLElement) htmlOptionsList = [htmlOptionsList] as Array<HTMLElement>;
+		if (htmlOptionsList instanceof NodeList) htmlOptionsList = Array.from(htmlOptionsList) as Array<HTMLElement>;
+
+		if (htmlOptionsList.length > 0 && htmlOptionsList[0] instanceof HTMLElement) {
+			list = htmlOptionsList.map(element => ({ element: element } as OverlayHTMLOptions));
+		} else {
+			list = htmlOptionsList as Array<OverlayHTMLOptions>;
+		}
+
+		const mapList = list.map(({ element, mode: givenMode, showBounds = false, offsetX = 0, offsetY = 0, xAxis = 0, yAxis = 0 }, i) => {
+			const mode = givenMode ?? 'inside';
+			if (mode == 'inside' && i > 0) {
+				console.warn("inside option works with multiple html elements only if the elements have the same dimension"
+					+ "This is because the skeleton is scaled to stay into the div."
+					+ "You can call addSkeleton several time (skeleton data can be reuse, if given).");
+			}
+			return {
+				element,
+				mode,
+				showBounds,
+				offsetX,
+				offsetY,
+				xAxis,
+				yAxis,
+			}
+		});
+		this.skeletonList.push({ skeleton, state, bounds, htmlOptionsList: mapList });
 
 		return { skeleton, state }
 	}
 
+	public recalculateBounds(skeleton: Skeleton, state: AnimationState) {
+		const track = state.getCurrent(0);
+		const animation = track?.animation as (Animation | undefined);
+		const bounds = this.calculateAnimationViewport(skeleton, animation);
+		bounds.x /= skeleton.scaleX;
+		bounds.y /= skeleton.scaleY;
+		bounds.width /= skeleton.scaleX;
+		bounds.height /= skeleton.scaleY;
+		const element = this.skeletonList.find(element => element.skeleton === skeleton);
+		if (element) {
+			element.bounds = bounds;
+		}
+	}
+
+	private calculateAnimationViewport (skeleton: Skeleton, animation?: Animation): Rectangle {
+		skeleton.setToSetupPose();
+
+		let offset = new Vector2(), size = new Vector2();
+		const tempArray = new Array<number>(2);
+		if (!animation) {
+			skeleton.updateWorldTransform(Physics.update);
+			skeleton.getBounds(offset, size, tempArray, this.spineCanvas.renderer.skeletonRenderer.getSkeletonClipping());
+			return {
+				x: offset.x,
+				y: offset.y,
+				width: size.x,
+				height: size.y,
+			}
+		}
+
+		let steps = 100, stepTime = animation.duration ? animation.duration / steps : 0, time = 0;
+		let minX = 100000000, maxX = -100000000, minY = 100000000, maxY = -100000000;
+		for (let i = 0; i < steps; i++, time += stepTime) {
+			animation.apply(skeleton, time, time, false, [], 1, MixBlend.setup, MixDirection.mixIn);
+			skeleton.updateWorldTransform(Physics.update);
+			skeleton.getBounds(offset, size, tempArray, this.spineCanvas.renderer.skeletonRenderer.getSkeletonClipping());
+
+			if (!isNaN(offset.x) && !isNaN(offset.y) && !isNaN(size.x) && !isNaN(size.y)) {
+				minX = Math.min(offset.x, minX);
+				maxX = Math.max(offset.x + size.x, maxX);
+				minY = Math.min(offset.y, minY);
+				maxY = Math.max(offset.y + size.y, maxY);
+			} else
+				console.error("Animation bounds are invalid: " + animation.name);
+		}
+
+		return {
+			x: minX,
+			y: minY,
+			width: maxX - minX,
+			height: maxY - minY,
+		}
+	}
 
 	private updateCanvasSize() {
 		const pageSize = this.getPageSize();
@@ -192,7 +354,7 @@ export class SpineCanvasOverlay {
 		return { width, height };
 	}
 
-	/** Disposes the app, so the update() and render() functions are no longer called. Calls the dispose() callback.*/
+	// TODO
 	dispose () {
 		this.disposed = true;
 	}
