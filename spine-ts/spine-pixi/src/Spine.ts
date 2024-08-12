@@ -341,7 +341,7 @@ export class Spine extends Container {
 			if (!pixiMaskSource.computed) {
 				pixiMaskSource.computed = true;
 				const clippingAttachment = pixiMaskSource.slot.attachment as ClippingAttachment;
-				const world = Array.from(clippingAttachment.vertices);
+                const world = new Array(clippingAttachment.worldVerticesLength);
 				clippingAttachment.computeWorldVertices(pixiMaskSource.slot, 0, clippingAttachment.worldVerticesLength, world, 0, 2);
 				mask.clear().lineStyle(0).beginFill(0x000000).drawPolygon(world);
 			}
