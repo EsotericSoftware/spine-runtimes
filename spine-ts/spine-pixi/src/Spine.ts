@@ -227,8 +227,15 @@ export class Spine extends Container {
 	/**
 	 * If you want to manually handle which meshes go on which slot and how you cache, overwrite this method.
 	 */
-	protected getMeshForSlot (slot: Slot): ISlotMesh {
-		if (!this.meshesCache.has(slot)) {
+	protected hasMeshForSlot(slot: Slot) {
+		return this.meshesCache.has(slot);
+	}
+
+	/**
+	 * If you want to manually handle which meshes go on which slot and how you cache, overwrite this method.
+	 */
+	protected getMeshForSlot(slot: Slot): ISlotMesh {
+		if (!this.hasMeshForSlot(slot)) {
 			let mesh = this.slotMeshFactory();
 			this.addChild(mesh);
 			this.meshesCache.set(slot, mesh);
@@ -410,6 +417,9 @@ export class Spine extends Container {
 				pixiMaskSource = { slot, computed: false };
 				continue;
 			} else {
+				if (this.hasMeshForSlot(slot)) {
+					this.getMeshForSlot(slot).renderable = false;
+				}
 				Spine.clipper.clipEndWithSlot(slot);
 				this.pixiMaskCleanup(slot);
 				continue;
@@ -481,6 +491,7 @@ export class Spine extends Container {
 				}
 
 				const mesh = this.getMeshForSlot(slot);
+                mesh.renderable = true;
 				mesh.zIndex = zIndex;
 				mesh.updateFromSpineData(texture, slot.data.blendMode, slot.data.name, finalVertices, finalVerticesLength, finalIndices, finalIndicesLength, useDarkColor);
 			}
