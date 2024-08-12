@@ -341,7 +341,7 @@ export class Spine extends Container {
 			if (!pixiMaskSource.computed) {
 				pixiMaskSource.computed = true;
 				const clippingAttachment = pixiMaskSource.slot.attachment as ClippingAttachment;
-                const world = new Array(clippingAttachment.worldVerticesLength);
+				const world = new Array(clippingAttachment.worldVerticesLength);
 				clippingAttachment.computeWorldVertices(pixiMaskSource.slot, 0, clippingAttachment.worldVerticesLength, world, 0, 2);
 				mask.clear().lineStyle(0).beginFill(0x000000).drawPolygon(world);
 			}
@@ -491,7 +491,7 @@ export class Spine extends Container {
 				}
 
 				const mesh = this.getMeshForSlot(slot);
-                mesh.renderable = true;
+				mesh.renderable = true;
 				mesh.zIndex = zIndex;
 				mesh.updateFromSpineData(texture, slot.data.blendMode, slot.data.name, finalVertices, finalVerticesLength, finalIndices, finalIndicesLength, useDarkColor);
 			}
