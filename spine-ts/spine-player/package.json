@@ -1,6 +1,6 @@
 {
   "name": "@esotericsoftware/spine-player",
-  "version": "4.2.57",
+  "version": "4.2.58",
   "description": "The official Spine Runtimes for the web.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -31,6 +31,6 @@
   },
   "homepage": "https://github.com/esotericsoftware/spine-runtimes#readme",
   "dependencies": {
-    "@esotericsoftware/spine-webgl": "4.2.57"
+    "@esotericsoftware/spine-webgl": "4.2.58"
   }
 }
