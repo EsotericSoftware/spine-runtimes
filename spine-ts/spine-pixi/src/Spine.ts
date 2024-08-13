@@ -329,7 +329,9 @@ export class Spine extends Container {
 		}
 	}
 	private updatePixiObject (pixiObject: Container, slot: Slot, zIndex: number) {
-		pixiObject.setTransform(slot.bone.worldX, slot.bone.worldY, slot.bone.getWorldScaleX(), slot.bone.getWorldScaleX(), slot.bone.getWorldRotationX() * MathUtils.degRad);
+		pixiObject.position.set(slot.bone.worldX, slot.bone.worldY);
+		pixiObject.scale.set(slot.bone.getWorldScaleX(), slot.bone.getWorldScaleX());
+		pixiObject.rotation = slot.bone.getWorldRotationX() * MathUtils.degRad;
 		pixiObject.zIndex = zIndex + 1;
 		pixiObject.alpha = this.skeleton.color.a * slot.color.a;
 	}
