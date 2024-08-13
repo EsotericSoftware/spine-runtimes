@@ -229,7 +229,7 @@ export class Spine extends Container {
 	 * Check the existence of a mesh for the given slot.
 	 * If you want to manually handle which meshes go on which slot and how you cache, overwrite this method.
 	 */
-	protected hasMeshForSlot(slot: Slot) {
+	protected hasMeshForSlot (slot: Slot) {
 		return this.meshesCache.has(slot);
 	}
 
@@ -237,7 +237,7 @@ export class Spine extends Container {
 	 * Search the mesh corresponding to the given slot or create it, if it does not exists.
 	 * If you want to manually handle which meshes go on which slot and how you cache, overwrite this method.
 	 */
-	protected getMeshForSlot(slot: Slot): ISlotMesh {
+	protected getMeshForSlot (slot: Slot): ISlotMesh {
 		if (!this.hasMeshForSlot(slot)) {
 			let mesh = this.slotMeshFactory();
 			this.addChild(mesh);
@@ -349,8 +349,8 @@ export class Spine extends Container {
 				clippingAttachment.computeWorldVertices(pixiMaskSource.slot, 0, worldVerticesLength, this.clippingVertAux, 0, 2);
 				mask.clear().lineStyle(0).beginFill(0x000000);
 				mask.moveTo(this.clippingVertAux[0], this.clippingVertAux[1]);
-				for (let i = 2; i < worldVerticesLength; i+=2) {
-					mask.lineTo(this.clippingVertAux[i], this.clippingVertAux[i+1]);
+				for (let i = 2; i < worldVerticesLength; i += 2) {
+					mask.lineTo(this.clippingVertAux[i], this.clippingVertAux[i + 1]);
 				}
 				mask.finishPoly();
 			}
