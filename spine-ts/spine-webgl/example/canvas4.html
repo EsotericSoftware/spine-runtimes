@@ -3,48 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OverlayCanvas Example</title>
+    <title>WebGL Overlay Example</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
+            /* top: 0;
+            left: 0; */
         }
         .content {
             margin: 0 auto;
         }
         .spine-div {
             border: 1px solid black;
-            /* padding: 20px; */
+            padding: 20px;
+            margin-top: 20px;
             margin-bottom: 20px;
+            position:relative;
+            touch-action:none;
         }
         .spacer {
             height: 250px;
         }
         #canvas {
-            will-change: transform;
+            /* will-change: transform; */
         }
 
-        .resize-handle {
-            width: 20%;
-            height: 20%;
-            background-color: #007bff;
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            cursor: se-resize;
-        }
     </style>
-    <!-- <script src="../dist/iife/spine-webgl.js"></script> -->
+    <script src="../dist/iife/spine-webgl.js"></script>
     <!-- <script src="./spine-webgl.min.js"></script> -->
-    <script src="./spine-webgl.js"></script>
+    <!-- <script src="./spine-webgl.js"></script> -->
 </head>
 <body>
-    <div class="content">
-        <h1>Spine Canvas Overlay Example</h1>
+    <span id="fps" style="position: fixed; top: 0; left: 0">a</span>
 
-        <div id="spineboy1" class="spine-div" style="width: 200px; height: 300px; margin-left: 200px; touch-action:none; position:relative;" div-spine>
-            <div id="resizeHandle" class="resize-handle"></div>
+    <div class="content">
+
+        <div id="spineboy1" class="spine-div" style="width: 200px; height: 300px; margin-left: 200px;" div-spine>
             <h2>Drag and resize me</h2>
             <h3>Mode: inside</h3>
             <h4>Spineboy will be resize to remain into the div.</h4>
@@ -53,7 +49,7 @@
 
         <div class="spacer"></div>
 
-        <div id="spineboy2" class="spine-div" style="width: 50%; margin-left: 50%; touch-action:none" div-spine2>
+        <div id="spineboy2" class="spine-div" style="width: 50%; margin-left: 50%;" div-spine2>
             <h2>Drag me</h2>
             <h3>Mode: origin</h3>
             <h4>You can easily change the position using offset or percentage of html element axis (origin is top-left)</h4>
@@ -62,23 +58,29 @@
 
         <div class="spacer"></div>
 
-        <div id="spineboy3" class="spine-div" style="width: 50%; margin-left: 50%; touch-action:none" div-spine2>
+        <div id="spineboy3" class="spine-div" style="width: 50%; margin-left: 50%;" div-spine2>
             <h3>Skeleton of previous box is being reused here</h3>
         </div>
 
         <div class="spacer"></div>
 
-        <div class="spine-div" div-spine3>
+        <div id="spineboy4" class="spine-div" div-spine3>
             <h3>Initializer with NodeList</h3>
         </div>
-        <div class="spine-div" div-spine3>
+        <div id="spineboy5" class="spine-div" div-spine3>
             <h3>Initializer with NodeList</h3>
         </div>
 
         <div class="spacer"></div>
 
-        <div class="spine-div" style="width: 50%; height: 200px;" div-spine4>
+        <div id="spineboy6" class="spine-div" style="width: 50%; height: 200px;" div-spine4>
             <h3>Initializer with HTMLElement</h3>
+        </div>
+
+        <div class="spacer"></div>
+
+        <div id="spineboy7" class="spine-div" style="width: 50%; height: 200px;" div-spine5>
+            <h3>Bounds using a Spine ounding box</h3>
         </div>
 
         <div class="spacer"></div>
@@ -87,7 +89,6 @@
     </div>
 
     <script>
-
         const divs = document.querySelectorAll(`[div-spine]`);
         const overlay = new spine.SpineCanvasOverlay();
 
@@ -102,32 +103,33 @@
                 {
                     element: divs[0],
                     mode: 'inside',
-                    showBounds: true,
+                    // showBounds: true,
+                    draggable: true,
                 },
             ],
         );
 
-        setTimeout(async () => {
-            const { skeleton, state } = await p;
-            state.setAnimation(0, "run", true);
-            overlay.recalculateBounds(skeleton, state);
-        }, 1000)
+        // setTimeout(async () => {
+        //     const { skeleton, state } = await p;
+        //     state.setAnimation(0, "portal", true);
+        //     overlay.recalculateBounds(skeleton);
+        // }, 1000)
 
         const divs2 = document.querySelectorAll(`[div-spine2]`);
         const p2 = overlay.addSkeleton({
             atlasPath: "assets/celestial-circus-pma.atlas",
             skeletonPath: "assets/celestial-circus-pro.skel",
-            animation: 'swing',
-            scale: .5,
+            animation: 'wings-and-feet',
+            scale: .25,
         },
         [
             {
                 element: divs2[0],
                 mode: 'origin',
-                showBounds: true,
+                // showBounds: true,
                 xAxis: .5,
                 yAxis: 1,
-                // offsetX: 100
+                draggable: true,
             },
             {
                 element: divs2[1],
@@ -154,7 +156,68 @@
             skeletonPath: "assets/tank-pro.skel",
             animation: 'shoot',
             scale: .5,
-        }, divs4[0]);
+        }, [{
+            element: divs4[0],
+            showBounds: true,
+        }]);
+
+        const divs5 = document.querySelectorAll(`[div-spine5]`);
+        const p5 = overlay.addSkeleton({
+            atlasPath: "assets/spineboy-pma.atlas",
+            skeletonPath: "assets/spineboy-pro.skel",
+            animation: 'walk',
+            update: (_, delta, skeleton, state) => {
+                state.update(delta / 3);
+                state.apply(skeleton);
+                skeleton.update(delta / 3);
+                skeleton.updateWorldTransform(spine.Physics.update);
+            }
+        }, [{
+            element: divs5[0],
+            showBounds: true,
+            mode: 'inside',
+            draggable: true,
+        }]);
+
+        p5.then(({ skeleton }) => {
+            const bbAttachmentSlot = skeleton.findSlot("head-bb");
+            const currentAttachment = bbAttachmentSlot.attachment;
+            skeleton.setAttachment("head-bb", "head");
+            const bbAttachment = bbAttachmentSlot.attachment;
+
+            const computedVertices = [];
+            bbAttachment.computeWorldVertices(bbAttachmentSlot, 0, bbAttachment.worldVerticesLength, computedVertices, 0, 2);
+            const vertices = computedVertices;
+            let x = Infinity, maxX = -Infinity, y = Infinity, maxY = -Infinity;
+            for (let i = 0; i < vertices.length; i+=2) {
+                x = Math.min(vertices[i], x);
+                y = Math.min(vertices[i+1], y);
+                maxX = Math.max(vertices[i], maxX);
+                maxY = Math.max(vertices[i+1], maxY);
+            }
+
+            const width = maxX - x;
+            const height = maxY - y;
+            console.log({ x, y, width, height })
+            overlay.setBounds(skeleton, { x, y, width, height })
+            bbAttachmentSlot.setAttachment(currentAttachment)
+        })
+
+
+        // setTimeout(async () => {
+        //     overlay.dispose();
+        // }, 2000)
+
+
+        makeResizable(document.getElementById('spineboy1'))
+        // makeDraggable(document.getElementById('spineboy1'));
+        makeResizable(document.getElementById('spineboy2'))
+        makeDraggable(document.getElementById('spineboy2'));
+        makeResizable(document.getElementById('spineboy7'))
+        makeDraggable(document.getElementById('spineboy7'));
+        makeResizable(document.getElementById('spineboy3'))
+        makeDraggable(document.getElementById('spineboy3'));
+
 
         //////////////////////////////////////////////////////
         //////////////////////////////////////////////////////
@@ -173,8 +236,7 @@
             document.addEventListener('pointerup', stopDragging);
 
             function startDragging(e) {
-                e.preventDefault();
-                if (e.target === document.getElementById('resizeHandle')) return;
+                if (e.target === element.querySelector('#resizeHandle')) return;
 
                 isDragging = true;
                 startX = e.clientX;
@@ -198,17 +260,12 @@
                 const deltaY = e.clientY - startY;
 
                 element.style.transform = `translate(${originalX + deltaX}px, ${originalY + deltaY}px)`;
-                e.preventDefault();
             }
 
             function stopDragging(e) {
                 isDragging = false;
-                e.preventDefault();
             }
         }
-        makeDraggable(document.getElementById('spineboy1'));
-        makeDraggable(document.getElementById('spineboy2'));
-
 
         //////////////////////////////////////////////////////
         //////////////////////////////////////////////////////
@@ -216,35 +273,50 @@
         //////////////////////////////////////////////////////
         // Resize utility
 
-        const resizableDiv = document.getElementById('spineboy1');
-        const resizeHandle = document.getElementById('resizeHandle');
-        let isResizing = false;
-        let startX, startY, startWidth, startHeight;
+        function makeResizable(element) {
+            const resizeHandle = document.createElement('div');
+            element.appendChild(resizeHandle);
+            resizeHandle.id = "resizeHandle";
+            resizeHandle.style.width = "20%";
+            resizeHandle.style.height = "20%";
+            resizeHandle.style.bottom = "0";
+            resizeHandle.style.right = "0";
+            resizeHandle.style.position = "absolute";
+            resizeHandle.style["background-color"] = "#007bff";
+            resizeHandle.style["cursor"] = "se-resize";
 
-        resizeHandle.addEventListener('pointerdown', initResize);
+            let isResizing = false;
+            let startX, startY, startWidth, startHeight, startPaddingLeft, startPaddingRight, startPaddingTop, startPaddingBottom;
 
-        function initResize(e) {
-            isResizing = true;
-            startX = e.clientX;
-            startY = e.clientY;
-            startWidth = resizableDiv.offsetWidth;
-            startHeight = resizableDiv.offsetHeight;
-            document.addEventListener('pointermove', resize);
-            document.addEventListener('pointerup', stopResize);
-        }
+            resizeHandle.addEventListener('pointerdown', initResize);
 
-        function resize(e) {
-            if (!isResizing) return;
-            const width = startWidth + (e.clientX - startX);
-            const height = startHeight + (e.clientY - startY);
-            resizableDiv.style.width = width + 'px';
-            resizableDiv.style.height = height + 'px';
-        }
+            function initResize(e) {
+                isResizing = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                startWidth = element.offsetWidth;
+                startHeight = element.offsetHeight;
+                startPaddingLeft = parseFloat(window.getComputedStyle(element).paddingLeft);
+                startPaddingRight = parseFloat(window.getComputedStyle(element).paddingRight);
+                startPaddingTop = parseFloat(window.getComputedStyle(element).paddingTop);
+                startPaddingBottom = parseFloat(window.getComputedStyle(element).paddingBottom);
+                document.addEventListener('pointermove', resize);
+                document.addEventListener('pointerup', stopResize);
+            }
 
-        function stopResize() {
-            isResizing = false;
-            document.removeEventListener('pointermove', resize);
-            document.removeEventListener('pointerup', stopResize);
+            function resize(e) {
+                if (!isResizing) return;
+                const width = startWidth + (e.clientX - startX) - startPaddingLeft - startPaddingRight;
+                const height = startHeight + (e.clientY - startY) - startPaddingTop - startPaddingBottom;
+                element.style.width = width + 'px';
+                element.style.height = height + 'px';
+            }
+
+            function stopResize() {
+                isResizing = false;
+                document.removeEventListener('pointermove', resize);
+                document.removeEventListener('pointerup', stopResize);
+            }
         }
 
     </script>

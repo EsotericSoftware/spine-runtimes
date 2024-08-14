@@ -203,6 +203,8 @@ export class SkeletonRenderer {
 
 			clipper.clipEndWithSlot(slot);
 		}
+
+		// console.log(renderable.vertices[1])
 		clipper.clipEnd();
 	}
 

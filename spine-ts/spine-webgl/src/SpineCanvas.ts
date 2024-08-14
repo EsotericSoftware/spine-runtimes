@@ -76,9 +76,6 @@ export class SpineCanvas {
 	/** The input processor used to listen to mouse, touch, and keyboard events. */
 	readonly input: Input;
 
-	public reqAnimationFrameId?:number;
-	public loop: FrameRequestCallback;
-
 	private disposed = false;
 
 	/** Constructs a new spine canvas, rendering to the provided HTML canvas. */
@@ -96,16 +93,16 @@ export class SpineCanvas {
 
 		this.htmlCanvas = canvas;
 		this.context = new ManagedWebGLRenderingContext(canvas, config.webglConfig);
-		this.renderer = new SceneRenderer(canvas, this.context, false);
+		this.renderer = new SceneRenderer(canvas, this.context);
 		this.gl = this.context.gl;
 		this.assetManager = new AssetManager(this.context, config.pathPrefix);
 		this.input = new Input(canvas);
 
 		if (config.app.loadAssets) config.app.loadAssets(this);
 
-		this.loop = () => {
+		let loop = () => {
 			if (this.disposed) return;
-			this.reqAnimationFrameId = requestAnimationFrame(this.loop);
+			requestAnimationFrame(loop);
 			this.time.update();
 			if (config.app.update) config.app.update(this, this.time.delta);
 			if (config.app.render) config.app.render(this);
@@ -118,13 +115,13 @@ export class SpineCanvas {
 					if (config.app.error) config.app.error(this, this.assetManager.getErrors());
 				} else {
 					if (config.app.initialize) config.app.initialize(this);
-					this.loop(0);
+					loop();
 				}
 				return;
 			}
-			this.reqAnimationFrameId = requestAnimationFrame(waitForAssets);
+			requestAnimationFrame(waitForAssets);
 		}
-		this.reqAnimationFrameId = requestAnimationFrame(waitForAssets);
+		requestAnimationFrame(waitForAssets);
 	}
 
 	/** Clears the canvas with the given color. The color values are given in the range [0,1]. */

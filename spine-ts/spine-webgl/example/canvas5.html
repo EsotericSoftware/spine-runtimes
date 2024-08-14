@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="../dist/iife/spine-webgl.js"></script>
+    <title>JS Library Showcase</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .section {
+            /* height: 100vh; */
+            height: 1000px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            background-color: #3498db;
+        }
+        .split {
+            display: flex;
+        }
+        .split-left, .split-right {
+            width: 50%;
+            min-height: 50%;
+            padding: 1rem;
+            margin: 1rem;
+            border: 1px solid salmon;
+        }
+        .navigation {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .nav-btn {
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border: none;
+            cursor: pointer;
+        }
+
+        .vertical-split {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .split-top, .split-bottom {
+            width: 100%;
+            height: 50%;
+        }
+
+        .split-top {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .split-bottom {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            overflow: auto;
+        }
+
+        .split-bottom pre {
+            height: 100%;
+            margin: 0;
+        }
+
+        .split-bottom code {
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            display: block;
+            padding: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- <span id="fps" style="position: fixed; top: 0; left: 0">FPS</span> -->
+
+
+    <!--
+    /////////////////////
+    // start section 1 //
+    /////////////////////
+    -->
+
+    <div id="section1" class="section vertical-split">
+
+        <div class="split-top split">
+            <div class="split-left" id="section1-element">
+            </div>
+            <div class="split-right">
+                The skeleton origin is centered into the div by default.
+                The skeleton will be scaled to fit the current animation into the div.
+            </div>
+        </div>
+
+
+        <div class="split-bottom">
+            <pre><code id="code-display">
+const overlay = new spine.SpineCanvasOverlay();
+overlay.addSkeleton(
+    {
+        atlasPath: "assets/spineboy-pma.atlas",
+        skeletonPath: "assets/spineboy-pro.skel",
+        animation: 'walk',
+    },
+    document.getElementById(`section1-element`),
+);
+            </code></pre>
+        </div>
+    </div>
+
+    <!--
+    /////////////////////
+    // end section 1 //
+    /////////////////////
+    -->
+
+
+
+
+
+    <!--
+    /////////////////////
+    // start section 2 //
+    /////////////////////
+    -->
+
+    <div id="section2" class="section vertical-split">
+
+        <div class="split-top split">
+            <div class="split-left">
+                Mode <code>origin</code> uses the HTML element top-left corner as origin for the skeleton. <br>
+                You are responsible to scale the skeleton using this mode. <br>
+                Move the origin by a percentage of the div width and height by using <code>xAxis</code> and <code>yAxis</code> respectively.
+            </div>
+            <div class="split-right" id="section2-element">
+            </div>
+        </div>
+
+
+        <div class="split-bottom">
+            <pre><code id="code-display">
+overlay.addSkeleton(
+    {
+        atlasPath: "assets/spineboy-pma.atlas",
+        skeletonPath: "assets/spineboy-pro.skel",
+        animation: 'run',
+        scale: .25,
+    },
+    {
+        element: document.getElementById(`section2-element`),
+        mode: 'origin',
+        xAxis: .25,
+        yAxis: .75,
+    },
+);
+            </code></pre>
+        </div>
+    </div>
+
+    <!--
+    /////////////////////
+    // end section 2 //
+    /////////////////////
+    -->
+
+    <!--
+    /////////////////////
+    // start section 3 //
+    /////////////////////
+    -->
+
+    <div id="section3" class="section vertical-split">
+
+        <div class="split-top split">
+            <div class="split-left"  id="section3-element">
+            </div>
+            <div class="split-right">
+                Use <code>offsetX</code> and <code>offsetY</code> to move you skeleton left or right by the pixel amount you specify.
+                This works for both mode <code>origin</code> and <code>inside</code>.
+            </div>
+        </div>
+
+
+        <div class="split-bottom">
+            <pre><code id="code-display">
+overlay.addSkeleton(
+    {
+        atlasPath: "assets/spineboy-pma.atlas",
+        skeletonPath: "assets/spineboy-pro.skel",
+        animation: 'run',
+    },
+    {
+        element: document.getElementById(`section3-element`),
+        mode: 'inside', // default
+        offsetX: 100,
+        offsetY: 50,
+    },
+);
+            </code></pre>
+        </div>
+    </div>
+
+    <!--
+    /////////////////////
+    // end section 3 //
+    /////////////////////
+    -->
+
+    <!--
+    /////////////////////
+    // start section 4 //
+    /////////////////////
+    -->
+
+    <div id="section4" class="section vertical-split">
+
+        <div class="split-top split">
+            <div class="split-left">
+                You can easily access the <code>Skeleton</code> and the <code>AnimationState</code> of your character, and use them as if you were using <code>spine-webgl</code>. <br>
+                If you change animation, you can ask to scale the skeleton based on the new animation.
+            </div>
+            <div class="split-right" id="section4-element">
+
+            </div>
+        </div>
+
+
+        <div class="split-bottom">
+            <pre><code id="code-display">
+// access the skeleton and the state asynchronously
+const { skeleton, state } = await overlay.addSkeleton(
+    {
+        atlasPath: "assets/raptor-pma.atlas",
+        skeletonPath: "assets/raptor-pro.skel",
+        animation: 'walk',
+    },
+    document.getElementById(`section4-element`)
+);
+
+let isRoaring = false;
+setInterval(() => {
+    const newAnimation = isRoaring ? "walk" : "roar";
+    state.setAnimation(0, newAnimation, true);
+    overlay.recalculateBounds(skeleton); // scale the skeleton based on the new animation
+    isRoaring = !isRoaring;
+}, 4000);
+            </code></pre>
+        </div>
+    </div>
+
+    <!--
+    /////////////////////
+    // end section 4 //
+    /////////////////////
+    -->
+
+    <!--
+    /////////////////////
+    // start section 5 //
+    /////////////////////
+    -->
+
+    <div id="section5" class="section vertical-split">
+
+        <div class="split-top split">
+            <div class="split-left">
+                You can also set a custom bounds to center a specific element or area of you animation in the div.
+            </div>
+            <div class="split-right" id="section5-element">
+                TODO
+            </div>
+        </div>
+
+
+        <div class="split-bottom">
+            <pre><code id="code-display">
+            </code></pre>
+        </div>
+    </div>
+
+    <!--
+    /////////////////////
+    // end section 5 //
+    /////////////////////
+    -->
+
+
+    <!--
+    /////////////////////
+    // start section 6 //
+    /////////////////////
+    -->
+
+    <div id="section6" class="section vertical-split">
+
+        <div class="split-top split">
+            <div class="split-left">
+                Moving the div will move the skeleton origin. <br>
+                Resizing the div will resize the skeleton in <code>inside</code> mode, but not in <code>origin</code> mode.
+            </div>
+            <div class="split-right" id="section6-element">
+            </div>
+        </div>
+
+
+        <div class="split-bottom">
+            <pre><code id="code-display">
+            </code></pre>
+        </div>
+    </div>
+
+    <!--
+    /////////////////////
+    // end section 6 //
+    /////////////////////
+    -->
+
+
+
+    <!--
+    /////////////////////
+    // start section 7 //
+    /////////////////////
+    -->
+
+    <div id="section7" class="section vertical-split">
+
+        <div class="split-top split">
+            <div class="split-left">
+                As a bonus item, you can move you skeleton around just by setting the <code>draggable</code> property to <code>true</code>.
+            </div>
+            <div class="split-right" id="section7-element">
+            </div>
+        </div>
+
+
+        <div class="split-bottom">
+            <pre><code id="code-display">
+overlay.addSkeleton(
+    {
+        atlasPath: "assets/celestial-circus-pma.atlas",
+        skeletonPath: "assets/celestial-circus-pro.skel",
+        animation: 'wings-and-feet',
+    },
+    {
+        element: document.getElementById(`section7-element`),
+        draggable: true,
+    }
+);
+            </code></pre>
+        </div>
+    </div>
+
+    <!--
+    /////////////////////
+    // end section 7 //
+    /////////////////////
+    -->
+
+
+    <div class="navigation">
+        <button class="nav-btn" onclick="scrollToSection('section1')">1</button>
+        <button class="nav-btn" onclick="scrollToSection('section2')">2</button>
+        <button class="nav-btn" onclick="scrollToSection('section3')">3</button>
+        <button class="nav-btn" onclick="scrollToSection('section4')">4</button>
+        <button class="nav-btn" onclick="scrollToSection('section5')">5</button>
+        <button class="nav-btn" onclick="scrollToSection('section6')">6</button>
+        <button class="nav-btn" onclick="scrollToSection('section7')">7</button>
+    </div>
+
+    <script>
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        let sections = document.querySelectorAll('.section');
+        let currentSection = 0;
+
+        // window.addEventListener('wheel', (e) => {
+        //     if (e.deltaY > 0 && currentSection < sections.length - 1) {
+        //         currentSection++;
+        //     } else if (e.deltaY < 0 && currentSection > 0) {
+        //         currentSection--;
+        //     }
+        //     sections[currentSection].scrollIntoView({ behavior: 'smooth' });
+        // });
+    </script>
+
+    <script>
+        (async () => {
+            const overlay = new spine.SpineCanvasOverlay();
+
+            overlay.addSkeleton(
+                {
+                    atlasPath: "assets/spineboy-pma.atlas",
+                    skeletonPath: "assets/spineboy-pro.skel",
+                    // animation: 'walk',
+                },
+                {
+                    mode: "origin",
+                    xAxis: .5,
+                    yAxis: 1,
+                    element: document.querySelectorAll(`#section1-element`)[0]
+                }
+            );
+
+
+            // /////////////////////
+            // // start section 1 //
+            // /////////////////////
+            // overlay.addSkeleton(
+            //     {
+            //         atlasPath: "assets/spineboy-pma.atlas",
+            //         skeletonPath: "assets/spineboy-pro.skel",
+            //         animation: 'walk',
+            //     },
+            //     document.querySelectorAll(`#section1-element`),
+            // );
+            // /////////////////////
+            // // end section 1   //
+            // /////////////////////
+
+
+
+            // /////////////////////
+            // // start section 2 //
+            // /////////////////////
+            // overlay.addSkeleton(
+            //     {
+            //         atlasPath: "assets/spineboy-pma.atlas",
+            //         skeletonPath: "assets/spineboy-pro.skel",
+            //         animation: 'run',
+            //         scale: .25,
+            //     },
+            //     {
+            //         element: document.getElementById(`section2-element`),
+            //         mode: 'origin',
+            //         xAxis: .25,
+            //         yAxis: .75,
+            //     },
+            // );
+            // /////////////////////
+            // // end section 2   //
+            // /////////////////////
+
+
+            // /////////////////////
+            // // start section 3 //
+            // /////////////////////
+            // overlay.addSkeleton(
+            //     {
+            //         atlasPath: "assets/spineboy-pma.atlas",
+            //         skeletonPath: "assets/spineboy-pro.skel",
+            //         animation: 'jump',
+            //     },
+            //     {
+            //         element: document.getElementById(`section3-element`),
+            //         mode: 'inside', // default
+            //         offsetX: 100,
+            //         offsetY: 50,
+            //     },
+            // );
+            // /////////////////////
+            // // end section 3   //
+            // /////////////////////
+
+
+
+            // /////////////////////
+            // // start section 4 //
+            // /////////////////////
+            // const { skeleton, state } = await overlay.addSkeleton(
+            //     {
+            //         atlasPath: "assets/raptor-pma.atlas",
+            //         skeletonPath: "assets/raptor-pro.skel",
+            //         animation: 'walk',
+            //     },
+            //     document.getElementById(`section4-element`)
+            // );
+
+            // let isRoaring = false;
+            // setInterval(() => {
+            //     const newAnimation = isRoaring ? "walk" : "roar";
+            //     state.setAnimation(0, newAnimation, true);
+            //     overlay.recalculateBounds(skeleton);
+            //     isRoaring = !isRoaring;
+            // }, 4000);
+
+            // /////////////////////
+            // // end section 4   //
+            // /////////////////////
+
+            // /////////////////////
+            // // start section 5 //
+            // /////////////////////
+            // /////////////////////
+            // // end section 5   //
+            // /////////////////////
+
+            // /////////////////////
+            // // start section 6 //
+            // /////////////////////
+            // overlay.addSkeleton(
+            //     {
+            //         atlasPath: "assets/cloud-pot-pma.atlas",
+            //         skeletonPath: "assets/cloud-pot.skel",
+            //         animation: 'playing-in-the-rain',
+            //     },
+            //     document.getElementById(`section6-element`)
+            // );
+            // /////////////////////
+            // // end section 6   //
+            // /////////////////////
+
+
+
+            // /////////////////////
+            // // start section 7 //
+            // /////////////////////
+            // overlay.addSkeleton(
+            //     {
+            //         atlasPath: "assets/celestial-circus-pma.atlas",
+            //         skeletonPath: "assets/celestial-circus-pro.skel",
+            //         animation: 'wings-and-feet',
+            //     },
+            //     {
+            //         element: document.getElementById(`section7-element`),
+            //         draggable: true,
+            //     }
+            // );
+            /////////////////////
+            // end section 7   //
+            /////////////////////
+
+        })();
+
+
+
+    </script>
+
+
+
+
+<script>
+
+    //////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////
+    // Drag utility
+
+
+    function makeDraggable(element) {
+        let isDragging = false;
+        let startX, startY;
+        let originalX, originalY;
+
+        element.addEventListener('pointerdown', startDragging);
+        document.addEventListener('pointermove', drag);
+        document.addEventListener('pointerup', stopDragging);
+
+        function startDragging(e) {
+            if (e.target === element.querySelector('#resizeHandle')) return;
+
+            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+
+            const translate = element.style.transform;
+            if (translate !== '') {
+                const translateValues = translate.match(/translate\(([^)]+)\)/)[1].split(', ');
+                originalX = parseFloat(translateValues[0]);
+                originalY = parseFloat(translateValues[1]);
+            } else {
+                originalX = 0;
+                originalY = 0;
+            }
+        }
+
+        function drag(e) {
+            if (!isDragging) return;
+
+            const deltaX = e.clientX - startX;
+            const deltaY = e.clientY - startY;
+
+            element.style.transform = `translate(${originalX + deltaX}px, ${originalY + deltaY}px)`;
+        }
+
+        function stopDragging(e) {
+            isDragging = false;
+        }
+    }
+
+    //////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////
+    // Resize utility
+
+    function makeResizable(element) {
+        const resizeHandle = document.createElement('div');
+        element.appendChild(resizeHandle);
+        resizeHandle.id = "resizeHandle";
+        resizeHandle.style.width = "20%";
+        resizeHandle.style.height = "20%";
+        resizeHandle.style.bottom = "0";
+        resizeHandle.style.right = "0";
+        resizeHandle.style.position = "absolute";
+        resizeHandle.style["background-color"] = "#007bff";
+        resizeHandle.style["cursor"] = "se-resize";
+
+        element.style["position"] = "relative";
+
+        let isResizing = false;
+        let startX, startY, startWidth, startHeight, startPaddingLeft, startPaddingRight, startPaddingTop, startPaddingBottom;
+
+        resizeHandle.addEventListener('pointerdown', initResize);
+
+        function initResize(e) {
+            isResizing = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            startWidth = element.offsetWidth;
+            startHeight = element.offsetHeight;
+            startPaddingLeft = parseFloat(window.getComputedStyle(element).paddingLeft);
+            startPaddingRight = parseFloat(window.getComputedStyle(element).paddingRight);
+            startPaddingTop = parseFloat(window.getComputedStyle(element).paddingTop);
+            startPaddingBottom = parseFloat(window.getComputedStyle(element).paddingBottom);
+            document.addEventListener('pointermove', resize);
+            document.addEventListener('pointerup', stopResize);
+        }
+
+        function resize(e) {
+            if (!isResizing) return;
+            const width = startWidth + (e.clientX - startX) - startPaddingLeft - startPaddingRight;
+            const height = startHeight + (e.clientY - startY) - startPaddingTop - startPaddingBottom;
+            element.style.width = width + 'px';
+            element.style.height = height + 'px';
+        }
+
+        function stopResize() {
+            isResizing = false;
+            document.removeEventListener('pointermove', resize);
+            document.removeEventListener('pointerup', stopResize);
+        }
+    }
+
+
+    // makeDraggable(document.getElementById(`section6-element`));
+    // makeResizable(document.getElementById(`section6-element`));
+</script>
+</body>
+</html>

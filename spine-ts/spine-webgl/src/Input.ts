@@ -36,10 +36,11 @@ export class Input {
 	touch1: Touch | null = null;
 	initialPinchDistance = 0;
 	private listeners = new Array<InputListener>();
-	private eventListeners: Array<{ target: any, event: any, func: any }> = [];
+	private preventDefault: boolean;
 
-	constructor (element: HTMLElement) {
+	constructor (element: HTMLElement, preventDefault = true) {
 		this.element = element;
+		this.preventDefault = preventDefault;
 		this.setupCallbacks(element);
 	}
 
@@ -50,7 +51,7 @@ export class Input {
 				this.mouseX = ev.clientX - rect.left;;
 				this.mouseY = ev.clientY - rect.top;
 				this.buttonDown = true;
-				this.listeners.map((listener) => { if (listener.down) listener.down(this.mouseX, this.mouseY); });
+				this.listeners.map((listener) => { if (listener.down) listener.down(this.mouseX, this.mouseY, ev); });
 
 				document.addEventListener("mousemove", mouseMove);
 				document.addEventListener("mouseup", mouseUp);
@@ -60,12 +61,12 @@ export class Input {
 		let mouseMove = (ev: UIEvent) => {
 			if (ev instanceof MouseEvent) {
 				let rect = element.getBoundingClientRect();
-				this.mouseX = ev.clientX - rect.left;;
+				this.mouseX = ev.clientX - rect.left;
 				this.mouseY = ev.clientY - rect.top;
 
 				this.listeners.map((listener) => {
 					if (this.buttonDown) {
-						if (listener.dragged) listener.dragged(this.mouseX, this.mouseY);
+						if (listener.dragged) listener.dragged(this.mouseX, this.mouseY, ev);
 					} else {
 						if (listener.moved) listener.moved(this.mouseX, this.mouseY);
 					}
@@ -86,11 +87,11 @@ export class Input {
 			}
 		}
 
-		let mouseWheel = (e: WheelEvent) => {
-			e.preventDefault();
-			let deltaY = e.deltaY;
-			if (e.deltaMode == WheelEvent.DOM_DELTA_LINE) deltaY *= 8;
-			if (e.deltaMode == WheelEvent.DOM_DELTA_PAGE) deltaY *= 24;
+		let mouseWheel = (ev: WheelEvent) => {
+			if (this.preventDefault) ev.preventDefault();
+			let deltaY = ev.deltaY;
+			if (ev.deltaMode == WheelEvent.DOM_DELTA_LINE) deltaY *= 8;
+			if (ev.deltaMode == WheelEvent.DOM_DELTA_PAGE) deltaY *= 24;
 			this.listeners.map((listener) => { if (listener.wheel) listener.wheel(e.deltaY); });
 		};
 
@@ -115,7 +116,7 @@ export class Input {
 
 				if (!this.touch0) {
 					this.touch0 = touch;
-					this.listeners.map((listener) => { if (listener.down) listener.down(touch.x, touch.y) })
+					this.listeners.map((listener) => { if (listener.down) listener.down(touch.x, touch.y, ev) })
 				} else if (!this.touch1) {
 					this.touch1 = touch;
 					let dx = this.touch1.x - this.touch0.x;
@@ -124,8 +125,8 @@ export class Input {
 					this.listeners.map((listener) => { if (listener.zoom) listener.zoom(this.initialPinchDistance, this.initialPinchDistance) });
 				}
 			}
-			ev.preventDefault();
-		}, false);
+			if (this.preventDefault) ev.preventDefault();
+		}, { passive: this.preventDefault });
 
 		element.addEventListener("touchmove", (ev: TouchEvent) => {
 			if (this.touch0) {
@@ -139,7 +140,7 @@ export class Input {
 					if (this.touch0.identifier === nativeTouch.identifier) {
 						this.touch0.x = this.mouseX = x;
 						this.touch0.y = this.mouseY = y;
-						this.listeners.map((listener) => { if (listener.dragged) listener.dragged(x, y) });
+						this.listeners.map((listener) => { if (listener.dragged) listener.dragged(x, y, ev) });
 					}
 					if (this.touch1 && this.touch1.identifier === nativeTouch.identifier) {
 						this.touch1.x = this.mouseX = x;
@@ -153,8 +154,8 @@ export class Input {
 					this.listeners.map((listener) => { if (listener.zoom) listener.zoom(this.initialPinchDistance, distance) });
 				}
 			}
-			ev.preventDefault();
-		}, false);
+			if (this.preventDefault) ev.preventDefault();
+		}, { passive: this.preventDefault });
 
 		let touchEnd = (ev: TouchEvent) => {
 			if (this.touch0) {
@@ -190,7 +191,7 @@ export class Input {
 					}
 				}
 			}
-			ev.preventDefault();
+			if (this.preventDefault) ev.preventDefault();
 		};
 		element.addEventListener("touchend", touchEnd, false);
 		element.addEventListener("touchcancel", touchEnd);
@@ -214,10 +215,10 @@ export class Touch {
 }
 
 export interface InputListener {
-	down?(x: number, y: number): void;
+	down?(x: number, y: number, ev?: MouseEvent | TouchEvent): void;
 	up?(x: number, y: number): void;
 	moved?(x: number, y: number): void;
-	dragged?(x: number, y: number): void;
+	dragged?(x: number, y: number, ev?: MouseEvent | TouchEvent): void;
 	wheel?(delta: number): void;
 	zoom?(initialDistance: number, distance: number): void;
 }

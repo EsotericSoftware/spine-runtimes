@@ -27,7 +27,7 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { SpineCanvas, SpineCanvasApp, AtlasAttachmentLoader, SkeletonBinary, SkeletonJson, Skeleton, Animation, AnimationState, AnimationStateData, Physics, Vector2, Vector3, ResizeMode, Color, MixBlend, MixDirection, SceneRenderer, SkeletonData } from "./index.js";
+import { SpineCanvas, SpineCanvasApp, AtlasAttachmentLoader, SkeletonBinary, SkeletonJson, Skeleton, Animation, AnimationState, AnimationStateData, Physics, Vector2, Vector3, ResizeMode, Color, MixBlend, MixDirection, SceneRenderer, SkeletonData, Input } from "./index.js";
 
 interface Rectangle {
 	x: number,
@@ -42,7 +42,10 @@ interface OverlaySkeletonOptions {
 	scale: number,
 	animation?: string,
 	skeletonData?: SkeletonData,
+	update?: UpdateSpineFunction;
 }
+
+type UpdateSpineFunction = (canvas: SpineCanvas, delta: number, skeleton: Skeleton, state: AnimationState) => void;
 
 interface OverlayHTMLOptions {
 	element: HTMLElement,
@@ -52,7 +55,10 @@ interface OverlayHTMLOptions {
 	offsetY?: number,
 	xAxis?: number,
 	yAxis?: number,
+	draggable?: boolean,
 }
+
+type OverlayHTMLElement = Required<OverlayHTMLOptions> & { element: HTMLElement, worldOffsetX: number, worldOffsetY: number, dragging: boolean, dragX: number, dragY: number };
 
 type OverlayElementMode = 'inside' | 'origin';
 
@@ -61,161 +67,50 @@ export class SpineCanvasOverlay {
 
 	private spineCanvas:SpineCanvas;
 	private canvas:HTMLCanvasElement;
+	private input:Input;
 
 	private skeletonList = new Array<{
 		skeleton: Skeleton,
 		state: AnimationState,
 		bounds: Rectangle,
-		htmlOptionsList: Array<OverlayHTMLOptions>,
+		htmlOptionsList: Array<OverlayHTMLElement>,
+		update?: UpdateSpineFunction,
 	}>();
 
+	private resizeObserver:ResizeObserver;
 	private disposed = false;
 
 	/** Constructs a new spine canvas, rendering to the provided HTML canvas. */
 	constructor () {
 		this.canvas = document.createElement('canvas');
-		document.body.appendChild(this.canvas); // adds the canvas to the body element
+		document.body.appendChild(this.canvas);
 		this.canvas.style.position = "absolute";
 		this.canvas.style.top = "0";
 		this.canvas.style.left = "0";
 		this.canvas.style.display = "inline";
 		this.canvas.style.setProperty("pointer-events", "none");
+		// this.canvas.style.width = "100%";
+		// this.canvas.style.height = "100%";
 		this.updateCanvasSize();
 
-		const resizeObserver = new ResizeObserver(() => {
+		this.resizeObserver = new ResizeObserver(() => {
             this.updateCanvasSize();
 			this.spineCanvas.renderer.resize(ResizeMode.Expand);
         });
-        resizeObserver.observe(document.body);
+        this.resizeObserver.observe(document.body);
 
-		const red = new Color(1, 0, 0, 1);
-		const blue = new Color(0, 0, 1, 1);
-		const spineCanvasApp: SpineCanvasApp = {
+		this.spineCanvas = new SpineCanvas(this.canvas, { app: this.setupSpineCanvasApp() });
 
-			update: (canvas: SpineCanvas, delta: number) => {
-				this.skeletonList.forEach(({ skeleton, state, htmlOptionsList }) => {
-					if (htmlOptionsList.length === 0) return;
-					state.update(delta);
-                    state.apply(skeleton);
-                    skeleton.update(delta);
-                    skeleton.updateWorldTransform(Physics.update);
-				});
-			},
-
-			render: (canvas: SpineCanvas) => {
-				let renderer = canvas.renderer;
-				renderer.begin();
-
-                // webgl canvas center
-                const vec3 = new Vector3(0, 0);
-                renderer.camera.worldToScreen(vec3, canvas.htmlCanvas.clientWidth, canvas.htmlCanvas.clientHeight);
-
-				const devicePixelRatio = window.devicePixelRatio;
-				const tempVector = new Vector3();
-				this.skeletonList.forEach(({ skeleton, htmlOptionsList, bounds }) => {
-					if (htmlOptionsList.length === 0) return;
-
-					let { x: ax, y: ay, width: aw, height: ah } = bounds;
-
-					htmlOptionsList.forEach(({ element, mode, showBounds, offsetX = 0, offsetY = 0, xAxis = 0, yAxis = 0 }) => {
-
-						const divBounds = element.getBoundingClientRect();
-						let x = 0, y = 0;
-						if (mode === 'inside') {
-							// scale ratio
-							const scaleWidth = divBounds.width * devicePixelRatio / aw;
-							const scaleHeight = divBounds.height * devicePixelRatio / ah;
-
-							// attempt to use width ratio
-							let ratio = scaleWidth;
-							let scaledW = aw * ratio;
-							let scaledH = ah * ratio;
-
-							// if scaled height is bigger than div height, use height ratio instead
-							if (scaledH > divBounds.height * devicePixelRatio) ratio = scaleHeight;
-
-							const scaledX = (ax + aw / 2) * ratio;
-							const scaledY = (ay + ah / 2) * ratio;
-
-							const divX = divBounds.x + divBounds.width / 2 + window.scrollX;
-							const divY = divBounds.y - 1 + divBounds.height / 2 + window.scrollY;
-
-							tempVector.set(divX, divY, 0);
-                			renderer.camera.screenToWorld(tempVector, canvas.htmlCanvas.clientWidth, canvas.htmlCanvas.clientHeight);
-
-							x = tempVector.x - scaledX;
-							y = tempVector.y - scaledY;
-
-							skeleton.scaleX = ratio;
-							skeleton.scaleY = ratio;
-
-							if (showBounds) {
-								renderer.circle(true, tempVector.x, tempVector.y, 10, blue);
-								renderer.rect(false, ax * ratio + x + offsetX, ay * ratio + y + offsetY, aw * ratio, ah * ratio, blue);
-							}
-
-						} else {
-							const divX = divBounds.x + divBounds.width * xAxis + window.scrollX;
-							const divY = divBounds.y + divBounds.height * yAxis + window.scrollY;
-
-							tempVector.set(divX, divY, 0);
-                			renderer.camera.screenToWorld(tempVector, canvas.htmlCanvas.clientWidth, canvas.htmlCanvas.clientHeight);
-
-							x = tempVector.x;
-							y = tempVector.y;
-
-							if (showBounds) {
-								// show skeleton root
-								const root = skeleton.getRootBone()!;
-								renderer.circle(true, x + root.x + offsetX, y + root.y + offsetY, 10, red);
-							}
-						}
-
-						renderer.drawSkeleton(skeleton, true, -1, -1, (vertices, size, vertexSize) => {
-							for (let i = 0; i < size; i+=vertexSize) {
-								vertices[i] = vertices[i] + x + offsetX;
-								vertices[i+1] = vertices[i+1] + y + offsetY;
-							}
-						});
-
-					});
-
-				});
-
-				// Complete rendering.
-				renderer.end();
-			},
-		}
-
-		this.spineCanvas = new SpineCanvas(this.canvas, {
-			app: spineCanvasApp,
-		})
+		this.input = new Input(document.body, false);
+		this.setupDragUtility();
 	}
 
-	// TODO: Reject error
-	public async loadBinary(path: string) {
-		return new Promise((resolve, reject) => {
-			this.spineCanvas.assetManager.loadBinary(path, () => resolve(null));
-		});
-	}
-
-	public async loadJson(path: string) {
-		return new Promise((resolve, reject) => {
-			this.spineCanvas.assetManager.loadJson(path, () => resolve(null));
-		});
-	}
-
-	public async loadTextureAtlas(path: string) {
-		return new Promise((resolve, reject) => {
-			this.spineCanvas.assetManager.loadTextureAtlas(path, () => resolve(null));
-		});
-	}
-
+	// add a skeleton to the overlay and set the bounds to the given animation or to the setup pose
 	public async addSkeleton(
 		skeletonOptions: OverlaySkeletonOptions,
-		htmlOptionsList: Array<OverlayHTMLOptions> | Array<HTMLElement> | HTMLElement | NodeList = [],
+		htmlOptionsList: Array<OverlayHTMLOptions> | OverlayHTMLOptions | Array<HTMLElement> | HTMLElement | NodeList = [],
 	) {
-		const { atlasPath, skeletonPath, scale = 1, animation, skeletonData: skeletonDataInput } = skeletonOptions;
+		const { atlasPath, skeletonPath, scale = 1, animation, skeletonData: skeletonDataInput, update } = skeletonOptions;
 		const isBinary = skeletonPath.endsWith(".skel");
 		await Promise.all([
 			isBinary ? this.loadBinary(skeletonPath) : this.loadJson(skeletonPath),
@@ -245,14 +140,15 @@ export class SpineCanvasOverlay {
 		let list: Array<OverlayHTMLOptions>;
 		if (htmlOptionsList instanceof HTMLElement) htmlOptionsList = [htmlOptionsList] as Array<HTMLElement>;
 		if (htmlOptionsList instanceof NodeList) htmlOptionsList = Array.from(htmlOptionsList) as Array<HTMLElement>;
+		if ('element' in htmlOptionsList) htmlOptionsList = [htmlOptionsList] as Array<OverlayHTMLOptions>;
 
 		if (htmlOptionsList.length > 0 && htmlOptionsList[0] instanceof HTMLElement) {
-			list = htmlOptionsList.map(element => ({ element: element } as OverlayHTMLOptions));
+			list = htmlOptionsList.map(element => ({ element } as OverlayHTMLOptions));
 		} else {
 			list = htmlOptionsList as Array<OverlayHTMLOptions>;
 		}
 
-		const mapList = list.map(({ element, mode: givenMode, showBounds = false, offsetX = 0, offsetY = 0, xAxis = 0, yAxis = 0 }, i) => {
+		const mapList = list.map(({ element, mode: givenMode, showBounds = false, offsetX = 0, offsetY = 0, xAxis = 0, yAxis = 0, draggable = false, }, i) => {
 			const mode = givenMode ?? 'inside';
 			if (mode == 'inside' && i > 0) {
 				console.warn("inside option works with multiple html elements only if the elements have the same dimension"
@@ -260,24 +156,39 @@ export class SpineCanvasOverlay {
 					+ "You can call addSkeleton several time (skeleton data can be reuse, if given).");
 			}
 			return {
-				element,
+				element: element as HTMLElement,
 				mode,
 				showBounds,
 				offsetX,
 				offsetY,
 				xAxis,
 				yAxis,
+				draggable,
+				dragX: 0,
+				dragY: 0,
+				worldOffsetX: 0,
+				worldOffsetY: 0,
+				dragging: false,
 			}
 		});
-		this.skeletonList.push({ skeleton, state, bounds, htmlOptionsList: mapList });
+		this.skeletonList.push({ skeleton, state, update, bounds, htmlOptionsList: mapList });
 
-		return { skeleton, state }
+		return { skeleton, state };
 	}
 
-	public recalculateBounds(skeleton: Skeleton, state: AnimationState) {
-		const track = state.getCurrent(0);
+	// calculate bounds of the current animation on track 0, then set it
+	public recalculateBounds(skeleton: Skeleton) {
+		const element = this.skeletonList.find(element => element.skeleton === skeleton);
+		if (!element) return;
+		const track = element.state.getCurrent(0);
 		const animation = track?.animation as (Animation | undefined);
 		const bounds = this.calculateAnimationViewport(skeleton, animation);
+		this.setBounds(skeleton, bounds);
+	}
+
+	// set the given bounds on the current skeleton
+	// bounds is used to center the skeleton in inside mode and as a input area for click events
+	public setBounds(skeleton: Skeleton, bounds: Rectangle) {
 		bounds.x /= skeleton.scaleX;
 		bounds.y /= skeleton.scaleY;
 		bounds.width /= skeleton.scaleX;
@@ -287,6 +198,276 @@ export class SpineCanvasOverlay {
 			element.bounds = bounds;
 		}
 	}
+
+	/*
+	* Load assets utilities
+	*/
+
+	public async loadBinary(path: string) {
+		return new Promise((resolve, reject) => {
+			this.spineCanvas.assetManager.loadBinary(path,
+				(_, binary) => resolve(binary),
+				(_, message) => reject(message),
+			);
+		});
+	}
+
+	public async loadJson(path: string) {
+		return new Promise((resolve, reject) => {
+			this.spineCanvas.assetManager.loadJson(path,
+				(_, object) => resolve(object),
+				(_, message) => reject(message),
+			);
+		});
+	}
+
+	public async loadTextureAtlas(path: string) {
+		return new Promise((resolve, reject) => {
+			this.spineCanvas.assetManager.loadTextureAtlas(path,
+				(_, atlas) => resolve(atlas),
+				(_, message) => reject(message),
+			);
+		});
+	}
+
+	/*
+	* Init utilities
+	*/
+
+	private setupSpineCanvasApp(): SpineCanvasApp {
+		const red = new Color(1, 0, 0, 1);
+		const green = new Color(0, 1, 0, 1);
+		const blue = new Color(0, 0, 1, 1);
+
+		return {
+			update: (canvas: SpineCanvas, delta: number) => {
+				this.skeletonList.forEach(({ skeleton, state, update, htmlOptionsList }) => {
+					if (htmlOptionsList.length === 0) return;
+					if (update) update(canvas, delta, skeleton, state)
+					else {
+						state.update(delta);
+						state.apply(skeleton);
+						skeleton.update(delta);
+						skeleton.updateWorldTransform(Physics.update);
+					}
+				});
+				// (document.body.querySelector("#fps")! as HTMLElement).innerText = canvas.time.framesPerSecond.toFixed(2) + " fps";
+			},
+
+			render: (canvas: SpineCanvas) => {
+				let renderer = canvas.renderer;
+				renderer.begin();
+
+				// console.log(canvas.gl.getParameter(canvas.gl.MAX_RENDERBUFFER_SIZE));
+
+				const devicePixelRatio = window.devicePixelRatio;
+				const tempVector = new Vector3();
+				this.skeletonList.forEach(({ skeleton, htmlOptionsList, bounds }) => {
+					if (htmlOptionsList.length === 0) return;
+
+					let { x: ax, y: ay, width: aw, height: ah } = bounds;
+
+					htmlOptionsList.forEach((list) => {
+						const { element, mode, showBounds, offsetX, offsetY, xAxis, yAxis, dragX, dragY } = list;
+						const divBounds = element.getBoundingClientRect();
+
+						// console.log(divBounds.x, divBounds.y, divBounds.width, divBounds.height)
+
+						let x = 0, y = 0;
+						if (mode === 'inside') {
+							// scale ratio
+							const scaleWidth = divBounds.width * devicePixelRatio / aw;
+							const scaleHeight = divBounds.height * devicePixelRatio / ah;
+
+							// attempt to use width ratio
+							let ratio = scaleWidth;
+							let scaledW = aw * ratio;
+							let scaledH = ah * ratio;
+
+							// if scaled height is bigger than div height, use height ratio instead
+							if (scaledH > divBounds.height * devicePixelRatio) ratio = scaleHeight;
+
+							// get the center of the bounds
+							const boundsX = (ax + aw / 2) * ratio;
+							const boundsY = (ay + ah / 2) * ratio;
+
+							// get the center of the div in world coordinate
+							const divX = divBounds.x + divBounds.width / 2 + window.scrollX;
+							const divY = divBounds.y - 1 + divBounds.height / 2 + window.scrollY;
+							this.screenToWorld(tempVector, divX, divY);
+
+							// get vertices offset: calculate the distance between div center and bounds center
+							x = tempVector.x - boundsX;
+							y = tempVector.y - boundsY;
+
+							// scale the skeleton
+							skeleton.scaleX = ratio;
+							skeleton.scaleY = ratio;
+						} else {
+
+							// TODO: window.devicePixelRatio to manage browser zoom
+
+							// get the center of the div in world coordinate
+							const divX = divBounds.x + divBounds.width * xAxis + window.scrollX;
+							const divY = divBounds.y + divBounds.height * yAxis + window.scrollY;
+							this.screenToWorld(tempVector, divX, divY);
+							// console.log(tempVector.x, tempVector.y)
+							// console.log(window.devicePixelRatio)
+
+							// get vertices offset
+							x = tempVector.x;
+							y = tempVector.y;
+						}
+
+
+						list.worldOffsetX = x + offsetX + dragX;
+						list.worldOffsetY = y + offsetY + dragY;
+
+						console.log(list.worldOffsetY)
+						// console.log("----")
+
+						renderer.drawSkeleton(skeleton, true, -1, -1, (vertices, size, vertexSize) => {
+							for (let i = 0; i < size; i+=vertexSize) {
+								vertices[i] = vertices[i] + list.worldOffsetX;
+								vertices[i+1] = vertices[i+1] + list.worldOffsetY;
+							}
+						});
+
+						// drawing debug stuff
+						if (showBounds) {
+							// show bounds and its center
+							renderer.rect(false,
+								ax * skeleton.scaleX + list.worldOffsetX,
+								ay * skeleton.scaleY + list.worldOffsetY,
+								aw * skeleton.scaleX,
+								ah * skeleton.scaleY,
+								blue);
+							const bbCenterX = (ax + aw / 2) * skeleton.scaleX + list.worldOffsetX;
+							const bbCenterY = (ay + ah / 2) * skeleton.scaleY + list.worldOffsetY;
+							renderer.circle(true, bbCenterX, bbCenterY, 10, blue);
+
+							// show skeleton root
+							const root = skeleton.getRootBone()!;
+							renderer.circle(true, root.x + list.worldOffsetX, root.y + list.worldOffsetY, 10, red);
+
+							// show shifted origin
+							const originX = list.worldOffsetX - dragX - offsetX;
+							const originY = list.worldOffsetY - dragY - offsetY;
+							renderer.circle(true, originX, originY, 10, green);
+
+							// show line from origin to bounds center
+							renderer.line(originX, originY, bbCenterX, bbCenterY, green);
+						}
+
+					});
+
+				});
+
+				renderer.end();
+			},
+		}
+
+	}
+
+	private setupDragUtility() {
+		// TODO: we should use document - body might have some margin that offset the click events - Meanwhile I take event pageX/Y
+		const tempVectorInput = new Vector3();
+
+		let prevX = 0;
+		let prevY = 0;
+		this.input.addListener({
+			down: (x, y, ev) => {
+				const originalEvent = ev instanceof MouseEvent ? ev : ev!.changedTouches[0];
+				tempVectorInput.set(originalEvent.pageX, originalEvent.pageY, 0);
+				this.spineCanvas.renderer.camera.screenToWorld(tempVectorInput, this.canvas.clientWidth, this.canvas.clientHeight);
+				this.skeletonList.forEach(({ htmlOptionsList, bounds, skeleton }) => {
+					htmlOptionsList.forEach((element) => {
+						if (!element.draggable) return;
+
+						const { worldOffsetX, worldOffsetY } = element;
+						const newBounds: Rectangle = {
+							x: bounds.x * skeleton.scaleX + worldOffsetX,
+							y: bounds.y * skeleton.scaleY + worldOffsetY,
+							width: bounds.width * skeleton.scaleX,
+							height: bounds.height * skeleton.scaleY,
+						};
+
+						if (this.inside(tempVectorInput, newBounds)) {
+							element.dragging = true;
+							ev?.preventDefault();
+						}
+
+					});
+				});
+				prevX = tempVectorInput.x;
+				prevY = tempVectorInput.y;
+			},
+			dragged: (x, y, ev) => {
+				const originalEvent = ev instanceof MouseEvent ? ev : ev!.changedTouches[0];
+				tempVectorInput.set(originalEvent.pageX, originalEvent.pageY, 0);
+				this.spineCanvas.renderer.camera.screenToWorld(tempVectorInput, this.canvas.clientWidth, this.canvas.clientHeight);
+				let dragX = tempVectorInput.x - prevX;
+				let dragY = tempVectorInput.y - prevY;
+				this.skeletonList.forEach(({ htmlOptionsList, bounds, skeleton }) => {
+					htmlOptionsList.forEach((element) => {
+						const { dragging } = element;
+
+						if (dragging) {
+							skeleton.physicsTranslate(dragX, dragY);
+							element.dragX += dragX;
+							element.dragY += dragY;
+							ev?.preventDefault();
+							ev?.stopPropagation()
+						}
+
+					});
+				});
+				prevX = tempVectorInput.x;
+				prevY = tempVectorInput.y;
+			},
+			up: () => {
+				this.skeletonList.forEach(({ htmlOptionsList }) => {
+					htmlOptionsList.forEach((element) => {
+						element.dragging = false;
+					});
+				});
+			}
+		})
+	}
+
+	/*
+	* Resize utilities
+	*/
+
+	private updateCanvasSize() {
+		const pageSize = this.getPageSize();
+		this.canvas.style.width = pageSize.width + "px";
+		this.canvas.style.height = pageSize.height + "px";
+	}
+
+	private getPageSize() {
+		const width = Math.max(
+			document.body.scrollWidth,
+			document.documentElement.scrollWidth,
+			document.body.offsetWidth,
+			document.documentElement.offsetWidth,
+			document.documentElement.clientWidth
+		);
+
+		const height = Math.max(
+			document.body.scrollHeight,
+			document.documentElement.scrollHeight,
+			document.body.offsetHeight,
+			document.documentElement.offsetHeight,
+			document.documentElement.clientHeight
+		);
+
+		return { width, height };
+	}
+
+	/*
+	* Other utilities
+	*/
 
 	private calculateAnimationViewport (skeleton: Skeleton, animation?: Animation): Rectangle {
 		skeleton.setToSetupPose();
@@ -328,34 +509,26 @@ export class SpineCanvasOverlay {
 		}
 	}
 
-	private updateCanvasSize() {
-		const pageSize = this.getPageSize();
-		this.canvas.style.width = pageSize.width + "px";
-		this.canvas.style.height = pageSize.height + "px";
+	private screenToWorld(vec: Vector3, x: number, y: number) {
+		vec.set(x, y, 0);
+		this.spineCanvas.renderer.camera.screenToWorld(vec, this.canvas.clientWidth, this.canvas.clientHeight);
+		// console.log(this.canvas.clientWidth, this.canvas.clientHeight);
 	}
 
-	private getPageSize() {
-		const width = Math.max(
-			document.body.scrollWidth,
-			document.documentElement.scrollWidth,
-			document.body.offsetWidth,
-			document.documentElement.offsetWidth,
-			document.documentElement.clientWidth
+	private inside(point: { x: number; y: number }, rectangle: Rectangle): boolean {
+		return (
+			point.x >= rectangle.x &&
+			point.x <= rectangle.x + rectangle.width &&
+			point.y >= rectangle.y &&
+			point.y <= rectangle.y + rectangle.height
 		);
-
-		const height = Math.max(
-			document.body.scrollHeight,
-			document.documentElement.scrollHeight,
-			document.body.offsetHeight,
-			document.documentElement.offsetHeight,
-			document.documentElement.clientHeight
-		);
-
-		return { width, height };
 	}
 
 	// TODO
 	dispose () {
+		this.spineCanvas.dispose();
+		this.canvas.remove();
 		this.disposed = true;
+		this.resizeObserver.disconnect();
 	}
 }

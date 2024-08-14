@@ -82,7 +82,7 @@ export class SceneRenderer implements Disposable {
 	}
 
 	begin () {
-		// this.camera.update();
+		this.camera.update();
 		this.enableRenderer(this.batcher);
 	}
 
