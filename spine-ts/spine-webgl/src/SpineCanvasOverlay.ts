@@ -50,7 +50,7 @@ type UpdateSpineFunction = (canvas: SpineCanvas, delta: number, skeleton: Skelet
 interface OverlayHTMLOptions {
 	element: HTMLElement,
 	mode?: OverlayElementMode,
-	showBounds?: boolean,
+	debug?: boolean,
 	offsetX?: number,
 	offsetY?: number,
 	xAxis?: number,
@@ -80,6 +80,15 @@ export class SpineCanvasOverlay {
 	private resizeObserver:ResizeObserver;
 	private disposed = false;
 
+	// how may pixels to add to the bottom (to avoid cut on edge during scrolling)
+	private readonly additionalPixelsBottom = 300;
+
+	// how much the canvas is translated above (to avoid cut on edge during scrolling)
+	private readonly offsetHeight = 100;
+
+	// the actual base translation
+	private offsetHeightDraw: number;
+
 	/** Constructs a new spine canvas, rendering to the provided HTML canvas. */
 	constructor () {
 		this.canvas = document.createElement('canvas');
@@ -87,17 +96,23 @@ export class SpineCanvasOverlay {
 		this.canvas.style.position = "absolute";
 		this.canvas.style.top = "0";
 		this.canvas.style.left = "0";
-		this.canvas.style.display = "inline";
 		this.canvas.style.setProperty("pointer-events", "none");
-		// this.canvas.style.width = "100%";
-		// this.canvas.style.height = "100%";
+		this.offsetHeightDraw = this.offsetHeight;
+		this.canvas.style.transform =`translate(0px,0px)`;
+		// this.canvas.style.display = "inline";
+		// this.canvas.style.overflow = "hidden"; // useless
+		// this.canvas.style.setProperty("will-change", "transform"); // performance seems to be even worse with this uncommented
 		this.updateCanvasSize();
+		this.scrollHandler();
 
 		this.resizeObserver = new ResizeObserver(() => {
             this.updateCanvasSize();
 			this.spineCanvas.renderer.resize(ResizeMode.Expand);
         });
         this.resizeObserver.observe(document.body);
+
+		window.addEventListener('scroll', this.scrollHandler);
+
 
 		this.spineCanvas = new SpineCanvas(this.canvas, { app: this.setupSpineCanvasApp() });
 
@@ -148,7 +163,7 @@ export class SpineCanvasOverlay {
 			list = htmlOptionsList as Array<OverlayHTMLOptions>;
 		}
 
-		const mapList = list.map(({ element, mode: givenMode, showBounds = false, offsetX = 0, offsetY = 0, xAxis = 0, yAxis = 0, draggable = false, }, i) => {
+		const mapList = list.map(({ element, mode: givenMode, debug = false, offsetX = 0, offsetY = 0, xAxis = 0, yAxis = 0, draggable = false, }, i) => {
 			const mode = givenMode ?? 'inside';
 			if (mode == 'inside' && i > 0) {
 				console.warn("inside option works with multiple html elements only if the elements have the same dimension"
@@ -158,7 +173,7 @@ export class SpineCanvasOverlay {
 			return {
 				element: element as HTMLElement,
 				mode,
-				showBounds,
+				debug,
 				offsetX,
 				offsetY,
 				xAxis,
@@ -251,14 +266,13 @@ export class SpineCanvasOverlay {
 						skeleton.updateWorldTransform(Physics.update);
 					}
 				});
-				// (document.body.querySelector("#fps")! as HTMLElement).innerText = canvas.time.framesPerSecond.toFixed(2) + " fps";
+				(document.body.querySelector("#fps")! as HTMLElement).innerText = canvas.time.framesPerSecond.toFixed(2) + " fps";
 			},
 
 			render: (canvas: SpineCanvas) => {
+				// canvas.clear(1, 0, 0, .1);
 				let renderer = canvas.renderer;
 				renderer.begin();
-
-				// console.log(canvas.gl.getParameter(canvas.gl.MAX_RENDERBUFFER_SIZE));
 
 				const devicePixelRatio = window.devicePixelRatio;
 				const tempVector = new Vector3();
@@ -268,10 +282,9 @@ export class SpineCanvasOverlay {
 					let { x: ax, y: ay, width: aw, height: ah } = bounds;
 
 					htmlOptionsList.forEach((list) => {
-						const { element, mode, showBounds, offsetX, offsetY, xAxis, yAxis, dragX, dragY } = list;
+						const { element, mode, debug, offsetX, offsetY, xAxis, yAxis, dragX, dragY } = list;
 						const divBounds = element.getBoundingClientRect();
-
-						// console.log(divBounds.x, divBounds.y, divBounds.width, divBounds.height)
+						divBounds.y += this.offsetHeightDraw;
 
 						let x = 0, y = 0;
 						if (mode === 'inside') {
@@ -292,8 +305,10 @@ export class SpineCanvasOverlay {
 							const boundsY = (ay + ah / 2) * ratio;
 
 							// get the center of the div in world coordinate
-							const divX = divBounds.x + divBounds.width / 2 + window.scrollX;
-							const divY = divBounds.y - 1 + divBounds.height / 2 + window.scrollY;
+							// const divX = divBounds.x + divBounds.width / 2 + window.scrollX;
+							// const divY = divBounds.y - 1 + divBounds.height / 2 + window.scrollY;
+							const divX = divBounds.x + divBounds.width / 2;
+							const divY = divBounds.y - 1 + divBounds.height / 2;
 							this.screenToWorld(tempVector, divX, divY);
 
 							// get vertices offset: calculate the distance between div center and bounds center
@@ -308,8 +323,10 @@ export class SpineCanvasOverlay {
 							// TODO: window.devicePixelRatio to manage browser zoom
 
 							// get the center of the div in world coordinate
-							const divX = divBounds.x + divBounds.width * xAxis + window.scrollX;
-							const divY = divBounds.y + divBounds.height * yAxis + window.scrollY;
+							// const divX = divBounds.x + divBounds.width * xAxis + window.scrollX;
+							// const divY = divBounds.y + divBounds.height * yAxis + window.scrollY;
+							const divX = divBounds.x + divBounds.width * xAxis;
+							const divY = divBounds.y + divBounds.height * yAxis;
 							this.screenToWorld(tempVector, divX, divY);
 							// console.log(tempVector.x, tempVector.y)
 							// console.log(window.devicePixelRatio)
@@ -323,9 +340,6 @@ export class SpineCanvasOverlay {
 						list.worldOffsetX = x + offsetX + dragX;
 						list.worldOffsetY = y + offsetY + dragY;
 
-						console.log(list.worldOffsetY)
-						// console.log("----")
-
 						renderer.drawSkeleton(skeleton, true, -1, -1, (vertices, size, vertexSize) => {
 							for (let i = 0; i < size; i+=vertexSize) {
 								vertices[i] = vertices[i] + list.worldOffsetX;
@@ -334,7 +348,8 @@ export class SpineCanvasOverlay {
 						});
 
 						// drawing debug stuff
-						if (showBounds) {
+						if (debug) {
+						// if (true) {
 							// show bounds and its center
 							renderer.rect(false,
 								ax * skeleton.scaleX + list.worldOffsetX,
@@ -378,7 +393,7 @@ export class SpineCanvasOverlay {
 		this.input.addListener({
 			down: (x, y, ev) => {
 				const originalEvent = ev instanceof MouseEvent ? ev : ev!.changedTouches[0];
-				tempVectorInput.set(originalEvent.pageX, originalEvent.pageY, 0);
+				tempVectorInput.set(originalEvent.pageX - window.scrollX, originalEvent.pageY - window.scrollY + this.offsetHeightDraw, 0);
 				this.spineCanvas.renderer.camera.screenToWorld(tempVectorInput, this.canvas.clientWidth, this.canvas.clientHeight);
 				this.skeletonList.forEach(({ htmlOptionsList, bounds, skeleton }) => {
 					htmlOptionsList.forEach((element) => {
@@ -404,7 +419,7 @@ export class SpineCanvasOverlay {
 			},
 			dragged: (x, y, ev) => {
 				const originalEvent = ev instanceof MouseEvent ? ev : ev!.changedTouches[0];
-				tempVectorInput.set(originalEvent.pageX, originalEvent.pageY, 0);
+				tempVectorInput.set(originalEvent.pageX - window.scrollX, originalEvent.pageY - window.scrollY + this.offsetHeightDraw, 0);
 				this.spineCanvas.renderer.camera.screenToWorld(tempVectorInput, this.canvas.clientWidth, this.canvas.clientHeight);
 				let dragX = tempVectorInput.x - prevX;
 				let dragY = tempVectorInput.y - prevY;
@@ -436,13 +451,40 @@ export class SpineCanvasOverlay {
 	}
 
 	/*
-	* Resize utilities
+	* Resize/scroll utilities
 	*/
 
 	private updateCanvasSize() {
-		const pageSize = this.getPageSize();
-		this.canvas.style.width = pageSize.width + "px";
-		this.canvas.style.height = pageSize.height + "px";
+		const displayWidth = document.documentElement.clientWidth;
+    	const displayHeight = document.documentElement.clientHeight;
+		this.canvas.style.width = displayWidth + "px";
+		this.canvas.style.height = displayHeight + this.additionalPixelsBottom + "px";
+	}
+
+	private scrollHandler = () => {
+		const { width, height } = this.getPageSize();
+
+		const scrollPositionX = window.scrollX;
+		const floatingDivWidth = this.canvas.offsetWidth;
+		const maxTranslationX = width - floatingDivWidth;
+		const translationX = Math.min(scrollPositionX, maxTranslationX);
+
+		const scrollPositionY = window.scrollY;
+		const floatingDivHeight = this.canvas.offsetHeight;
+		const maxTranslation = height - floatingDivHeight + this.offsetHeight;
+		const translationY = Math.min(scrollPositionY, maxTranslation) - this.offsetHeight;
+
+		const delta = scrollPositionY - maxTranslation
+		this.offsetHeightDraw = this.offsetHeight;
+		if (delta > 0) {
+			this.offsetHeightDraw += delta + 1;
+		}
+
+		// translate should be faster
+		this.canvas.style.transform =`translate(${translationX}px,${translationY}px)`;
+		// this.canvas.style.top = `${this.currentTranslateY}px`;
+		// this.canvas.style.left = `${this.currentTranslateX}px`;
+
 	}
 
 	private getPageSize() {
@@ -512,7 +554,6 @@ export class SpineCanvasOverlay {
 	private screenToWorld(vec: Vector3, x: number, y: number) {
 		vec.set(x, y, 0);
 		this.spineCanvas.renderer.camera.screenToWorld(vec, this.canvas.clientWidth, this.canvas.clientHeight);
-		// console.log(this.canvas.clientWidth, this.canvas.clientHeight);
 	}
 
 	private inside(point: { x: number; y: number }, rectangle: Rectangle): boolean {

@@ -92,7 +92,7 @@ export class Input {
 			let deltaY = ev.deltaY;
 			if (ev.deltaMode == WheelEvent.DOM_DELTA_LINE) deltaY *= 8;
 			if (ev.deltaMode == WheelEvent.DOM_DELTA_PAGE) deltaY *= 24;
-			this.listeners.map((listener) => { if (listener.wheel) listener.wheel(e.deltaY); });
+			this.listeners.map((listener) => { if (listener.wheel) listener.wheel(ev.deltaY); });
 		};
 
 		element.addEventListener("mousedown", mouseDown, true);
