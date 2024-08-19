@@ -67,6 +67,11 @@ void InheritTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vect
 	Bone *bone = skeleton.getBones()[_boneIndex];
 	if (!bone->isActive()) return;
 
+    if (direction == MixDirection_Out) {
+        if (blend == MixBlend_Setup) bone->setInherit(bone->_data.getInherit());
+        return;
+    }
+
 	if (time < _frames[0]) {
 		if (blend == MixBlend_Setup || blend == MixBlend_First) bone->_inherit = bone->_data.getInherit();
 		return;
