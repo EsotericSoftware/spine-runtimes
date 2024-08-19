@@ -368,6 +368,16 @@ bool USpineWidget::HasSlot(const FString SlotName) {
 	return false;
 }
 
+void USpineWidget::SetSlotColor(const FString SlotName, const FColor SlotColor) {
+	CheckState();
+	if (skeleton) {
+		spine::Slot *slot = skeleton->findSlot(TCHAR_TO_UTF8(*SlotName));
+		if (slot) {
+			slot->getColor().set(SlotColor.R / 255.f, SlotColor.G / 255.f, SlotColor.B / 255.f, SlotColor.A / 255.f);
+		}
+	}
+}
+
 void USpineWidget::GetAnimations(TArray<FString> &Animations) {
 	CheckState();
 	if (skeleton) {
