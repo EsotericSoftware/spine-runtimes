@@ -1,9 +1,5 @@
-group = "com.esotericsoftware.spine"
-version = "4.2.0"
-
 ext {
     libgdxVersion = "1.12.2-SNAPSHOT"
-    javaVersion = 8
 }
 
 allprojects {
@@ -17,9 +13,11 @@ allprojects {
         mavenCentral()
     }
 
-    tasks.withType(JavaCompile) {
-        sourceCompatibility = javaVersion.toString()
-        targetCompatibility = javaVersion.toString()
+    // Set Java 8 compatibility using JDK 17
+    tasks.withType(JavaCompile).configureEach {
+        sourceCompatibility = '1.7'
+        targetCompatibility = '1.7'
+        options.release.set(7)  // Ensures Java 8 bytecode is produced
     }
 }
 
@@ -46,6 +44,10 @@ project("spine-skeletonviewer") {
             configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
         }
     }
+
+    tasks.named('jar').configure {
+        dependsOn(project(":spine-libgdx").tasks.named('jar'))
+    }
 }
 
 configure(subprojects - project("spine-libgdx")) {
@@ -60,4 +62,8 @@ configure(subprojects - project("spine-libgdx")) {
         implementation "com.badlogicgames.gdx:gdx-box2d:$libgdxVersion"
         implementation "com.badlogicgames.gdx:gdx-box2d-platform:$libgdxVersion:natives-desktop"
     }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    println "Building with sourceCompatibility = ${sourceCompatibility}, targetCompatibility = ${targetCompatibility}"
 }

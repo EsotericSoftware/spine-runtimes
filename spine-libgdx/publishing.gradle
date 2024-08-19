@@ -1,9 +1,11 @@
+ext {
+    libraryVersion = "4.2.7-SNAPSHOT"
+}
+
 project("spine-libgdx") {
     apply plugin: "java-library"
     apply plugin: "maven-publish"
     apply plugin: "signing"
-
-    def libraryVersion = "4.2.7-SNAPSHOT"
 
     dependencies {
         implementation "com.badlogicgames.gdx:gdx:$libgdxVersion"

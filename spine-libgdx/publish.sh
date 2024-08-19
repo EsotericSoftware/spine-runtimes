@@ -11,4 +11,4 @@
 # After publishing via this script, log into https://oss.sonatype.org and release it manually after
 # checks pass ("Close -> Release & Drop").
 set -e
- ./gradlew publishReleasePublicationToSonaTypeRepository --info
+./gradlew publishReleasePublicationToSonaTypeRepository
