@@ -60,7 +60,8 @@ else
 #endif
 #endif
 
-Ref<CanvasItemMaterial> SpineSprite::default_materials[4] = {};
+		Ref<CanvasItemMaterial>
+				SpineSprite::default_materials[4] = {};
 static int sprite_count = 0;
 static spine::Vector<unsigned short> quad_indices;
 static spine::Vector<float> scratch_vertices;

@@ -182,7 +182,7 @@ void SpineAnimationTrack::setup_animation_player() {
 #if VERSION_MAJOR > 3
 		List<StringName> animation_libraries;
 		animation_player->get_animation_library_list(&animation_libraries);
-		  for (auto iter = animation_libraries.front(); iter; iter = iter->next()) {
+		for (auto iter = animation_libraries.front(); iter; iter = iter->next()) {
 			animation_player->remove_animation_library(iter->get());
 		}
 #else

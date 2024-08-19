@@ -2163,10 +2163,10 @@ void _spInheritTimeline_apply(spTimeline *timeline, spSkeleton *skeleton, float 
 	float *frames = self->super.frames->items;
 	if (!bone->active) return;
 
-    if (direction == SP_MIX_DIRECTION_OUT) {
-        if (blend == SP_MIX_BLEND_SETUP) bone->inherit = bone->data->inherit;
-        return;
-    }
+	if (direction == SP_MIX_DIRECTION_OUT) {
+		if (blend == SP_MIX_BLEND_SETUP) bone->inherit = bone->data->inherit;
+		return;
+	}
 
 	if (time < frames[0]) {
 		if (blend == SP_MIX_BLEND_SETUP || blend == SP_MIX_BLEND_FIRST) bone->inherit = bone->data->inherit;
