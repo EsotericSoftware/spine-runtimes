@@ -53,15 +53,21 @@
 #include "scene/main/viewport.h"
 
 #if TOOLS_ENABLED
-#if VERSION_MAJOR > 4 && VERSION_MINOR > 2
+
+#if VERSION_MAJOR > 3
+#if VERSION_MINOR > 2
 #include "editor/plugins/editor_plugin.h"
-else
+#else
 #include "editor/editor_plugin.h"
 #endif
+#else
+#include "editor/editor_plugin.h"
 #endif
 
-		Ref<CanvasItemMaterial>
-				SpineSprite::default_materials[4] = {};
+#endif
+
+Ref<CanvasItemMaterial>
+		SpineSprite::default_materials[4] = {};
 static int sprite_count = 0;
 static spine::Vector<unsigned short> quad_indices;
 static spine::Vector<float> scratch_vertices;
