@@ -1,5 +1,5 @@
 ext {
-    libraryVersion = "4.2.7-SNAPSHOT"
+    libraryVersion = "4.2.8-SNAPSHOT"
 }
 
 project("spine-libgdx") {
