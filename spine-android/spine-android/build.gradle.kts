@@ -33,14 +33,14 @@ android {
 dependencies {
     implementation(libs.androidx.appcompat)
     api("com.badlogicgames.gdx:gdx:1.12.2-SNAPSHOT")
-    api("com.esotericsoftware.spine:spine-libgdx:4.2.6")
+    api("com.esotericsoftware.spine:spine-libgdx:4.2.7")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }
 
-val libraryVersion = "4.2.6-SNAPSHOT"
+val libraryVersion = "4.2.6";
 
 tasks.register<Jar>("sourceJar") {
     archiveClassifier.set("sources")
