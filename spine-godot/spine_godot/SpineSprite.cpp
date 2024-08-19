@@ -53,7 +53,11 @@
 #include "scene/main/viewport.h"
 
 #if TOOLS_ENABLED
+#if VERSION_MAJOR > 4 && VERSION_MINOR > 2
+#include "editor/plugins/editor_plugin.h"
+else
 #include "editor/editor_plugin.h"
+#endif
 #endif
 
 Ref<CanvasItemMaterial> SpineSprite::default_materials[4] = {};
