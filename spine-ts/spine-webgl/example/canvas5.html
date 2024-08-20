@@ -169,8 +169,8 @@ overlay.addSkeleton(
     {
         element: document.getElementById(`section2-element`),
         mode: 'origin',
-        xAxis: .25,
-        yAxis: .75,
+        xAxis: .5,
+        yAxis: 1,
     },
 );
             </code></pre>
@@ -474,20 +474,20 @@ overlay.addSkeleton(
             // );
 
 
-            // /////////////////////
-            // // start section 1 //
-            // /////////////////////
-            // overlay.addSkeleton(
-            //     {
-            //         atlasPath: "assets/spineboy-pma.atlas",
-            //         skeletonPath: "assets/spineboy-pro.skel",
-            //         animation: 'walk',
-            //     },
-            //     document.querySelectorAll(`#section1-element`),
-            // );
-            // /////////////////////
-            // // end section 1   //
-            // /////////////////////
+            /////////////////////
+            // start section 1 //
+            /////////////////////
+            overlay.addSkeleton(
+                {
+                    atlasPath: "assets/spineboy-pma.atlas",
+                    skeletonPath: "assets/spineboy-pro.skel",
+                    animation: 'walk',
+                },
+                document.querySelectorAll(`#section1-element`),
+            );
+            /////////////////////
+            // end section 1   //
+            /////////////////////
 
 
 
@@ -502,11 +502,10 @@ overlay.addSkeleton(
                     scale: .25,
                 },
                 {
-                    element: document.getElementById(`section1-element-x`),
+                    element: document.getElementById(`section2-element`),
                     mode: 'origin',
-                    xAxis: 0,
-                    yAxis: 0,
-                    debug: true,
+                    xAxis: .5,
+                    yAxis: 1,
                 },
             );
             /////////////////////
@@ -514,114 +513,114 @@ overlay.addSkeleton(
             /////////////////////
 
 
-            // /////////////////////
-            // // start section 3 //
-            // /////////////////////
-            // overlay.addSkeleton(
-            //     {
-            //         atlasPath: "assets/spineboy-pma.atlas",
-            //         skeletonPath: "assets/spineboy-pro.skel",
-            //         animation: 'jump',
-            //     },
-            //     {
-            //         element: document.getElementById(`section3-element`),
-            //         mode: 'inside', // default
-            //         offsetX: 100,
-            //         offsetY: 50,
-            //     },
-            // );
-            // /////////////////////
-            // // end section 3   //
-            // /////////////////////
+            /////////////////////
+            // start section 3 //
+            /////////////////////
+            overlay.addSkeleton(
+                {
+                    atlasPath: "assets/spineboy-pma.atlas",
+                    skeletonPath: "assets/spineboy-pro.skel",
+                    animation: 'jump',
+                },
+                {
+                    element: document.getElementById(`section3-element`),
+                    mode: 'inside', // default
+                    offsetX: 100,
+                    offsetY: 50,
+                },
+            );
+            /////////////////////
+            // end section 3   //
+            /////////////////////
 
 
 
-            // /////////////////////
-            // // start section 4 //
-            // /////////////////////
-            // const { skeleton, state } = await overlay.addSkeleton(
-            //     {
-            //         atlasPath: "assets/raptor-pma.atlas",
-            //         skeletonPath: "assets/raptor-pro.skel",
-            //         animation: 'walk',
-            //     },
-            //     document.getElementById(`section4-element`)
-            // );
+            /////////////////////
+            // start section 4 //
+            /////////////////////
+            const { skeleton, state } = await overlay.addSkeleton(
+                {
+                    atlasPath: "assets/raptor-pma.atlas",
+                    skeletonPath: "assets/raptor-pro.skel",
+                    animation: 'walk',
+                },
+                document.getElementById(`section4-element`)
+            );
 
-            // let isRoaring = false;
-            // setInterval(() => {
-            //     const newAnimation = isRoaring ? "walk" : "roar";
-            //     state.setAnimation(0, newAnimation, true);
-            //     overlay.recalculateBounds(skeleton);
-            //     isRoaring = !isRoaring;
-            // }, 4000);
+            let isRoaring = false;
+            setInterval(() => {
+                const newAnimation = isRoaring ? "walk" : "roar";
+                state.setAnimation(0, newAnimation, true);
+                overlay.recalculateBounds(skeleton);
+                isRoaring = !isRoaring;
+            }, 4000);
 
-            // /////////////////////
-            // // end section 4   //
-            // /////////////////////
+            /////////////////////
+            // end section 4   //
+            /////////////////////
 
-            // /////////////////////
-            // // start section 5 //
-            // /////////////////////
-            // /////////////////////
-            // // end section 5   //
-            // /////////////////////
+            /////////////////////
+            // start section 5 //
+            /////////////////////
+            /////////////////////
+            // end section 5   //
+            /////////////////////
 
-            // /////////////////////
-            // // start section 6 //
-            // /////////////////////
-            // overlay.addSkeleton(
-            //     {
-            //         atlasPath: "assets/cloud-pot-pma.atlas",
-            //         skeletonPath: "assets/cloud-pot.skel",
-            //         animation: 'playing-in-the-rain',
-            //     },
-            //     document.getElementById(`section6-element`)
-            // );
-            // /////////////////////
-            // // end section 6   //
-            // /////////////////////
-
-
-
-            // /////////////////////
-            // // start section 7 //
-            // /////////////////////
-            // overlay.addSkeleton(
-            //     {
-            //         atlasPath: "assets/owl-pma.atlas",
-            //         skeletonPath: "assets/owl-pro.skel",
-            //         animation: 'idle',
-            //     },
-            //     {
-            //         element: document.getElementById(`section7-element`),
-            //         debug: true,
-            //     }
-            // );
-            // //////////////////////
-            // // end section 7   //
-            // //////////////////////
+            /////////////////////
+            // start section 6 //
+            /////////////////////
+            overlay.addSkeleton(
+                {
+                    atlasPath: "assets/cloud-pot-pma.atlas",
+                    skeletonPath: "assets/cloud-pot.skel",
+                    animation: 'playing-in-the-rain',
+                },
+                document.getElementById(`section6-element`)
+            );
+            /////////////////////
+            // end section 6   //
+            /////////////////////
 
 
 
-            // /////////////////////
-            // // start section 8 //
-            // /////////////////////
-            // overlay.addSkeleton(
-            //     {
-            //         atlasPath: "assets/celestial-circus-pma.atlas",
-            //         skeletonPath: "assets/celestial-circus-pro.skel",
-            //         animation: 'wings-and-feet',
-            //     },
-            //     {
-            //         element: document.getElementById(`section8-element`),
-            //         draggable: true,
-            //         debug: true,
-            //     }
-            // );
-            // //////////////////////
-            // // end section 8   //
-            // //////////////////////
+            /////////////////////
+            // start section 7 //
+            /////////////////////
+            overlay.addSkeleton(
+                {
+                    atlasPath: "assets/owl-pma.atlas",
+                    skeletonPath: "assets/owl-pro.skel",
+                    animation: 'idle',
+                },
+                {
+                    element: document.getElementById(`section7-element`),
+                    debug: true,
+                }
+            );
+            //////////////////////
+            // end section 7   //
+            //////////////////////
+
+
+
+            /////////////////////
+            // start section 8 //
+            /////////////////////
+            overlay.addSkeleton(
+                {
+                    atlasPath: "assets/celestial-circus-pma.atlas",
+                    skeletonPath: "assets/celestial-circus-pro.skel",
+                    animation: 'wings-and-feet',
+                },
+                {
+                    element: document.getElementById(`section8-element`),
+                    draggable: true,
+                    debug: true,
+                }
+            );
+            //////////////////////
+            // end section 8   //
+            //////////////////////
 
         })();
 

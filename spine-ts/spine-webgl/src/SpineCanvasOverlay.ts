@@ -80,27 +80,35 @@ export class SpineCanvasOverlay {
 	private resizeObserver:ResizeObserver;
 	private disposed = false;
 
-	// how may pixels to add to the bottom (to avoid cut on edge during scrolling)
-	private readonly additionalPixelsBottom = 300;
+	// how many pixels to add to the edges as parcentages (to avoid cut on edge during scrolling)
+	private overflowTop = .1;
+	private overflowBottom = .2;
+	private overflowLeft = .1;
+	private overflowRight = .1;
+	private overflowLeftSize: number;
+	private overflowTopSize: number;
 
-	// how much the canvas is translated above (to avoid cut on edge during scrolling)
-	private readonly offsetHeight = 100;
-
-	// the actual base translation
-	private offsetHeightDraw: number;
+	private div: HTMLDivElement;
 
 	/** Constructs a new spine canvas, rendering to the provided HTML canvas. */
 	constructor () {
+		this.div = document.createElement('div');
+		this.div.style.position = "absolute";
+		this.div.style.top = "0";
+		this.div.style.left = "0";
+		this.div.style.setProperty("pointer-events", "none");
+		this.div.style.overflow = "hidden"
+		// this.div.style.backgroundColor = "rgba(0, 255, 0, 0.3)";
+
 		this.canvas = document.createElement('canvas');
-		document.body.appendChild(this.canvas);
+		this.div.appendChild(this.canvas);
+		document.body.appendChild(this.div);
 		this.canvas.style.position = "absolute";
 		this.canvas.style.top = "0";
 		this.canvas.style.left = "0";
 		this.canvas.style.setProperty("pointer-events", "none");
-		this.offsetHeightDraw = this.offsetHeight;
 		this.canvas.style.transform =`translate(0px,0px)`;
 		// this.canvas.style.display = "inline";
-		// this.canvas.style.overflow = "hidden"; // useless
 		// this.canvas.style.setProperty("will-change", "transform"); // performance seems to be even worse with this uncommented
 
 		// resize and zoom
@@ -111,7 +119,11 @@ export class SpineCanvasOverlay {
 			this.spineCanvas.renderer.resize(ResizeMode.Expand);
         });
         this.resizeObserver.observe(document.body);
+
 		this.updateCanvasSize();
+		this.overflowLeftSize = this.overflowLeft * document.documentElement.clientWidth;
+		this.overflowTopSize = this.overflowTop * document.documentElement.clientHeight;
+
 		this.zoomHandler();
 
 		// scroll
@@ -297,7 +309,8 @@ export class SpineCanvasOverlay {
 					htmlOptionsList.forEach((list) => {
 						const { element, mode, debug, offsetX, offsetY, xAxis, yAxis, dragX, dragY } = list;
 						const divBounds = element.getBoundingClientRect();
-						divBounds.y += this.offsetHeightDraw;
+						divBounds.x += this.overflowLeftSize;
+						divBounds.y += this.overflowTopSize;
 
 						let x = 0, y = 0;
 						if (mode === 'inside') {
@@ -318,8 +331,6 @@ export class SpineCanvasOverlay {
 							const boundsY = (ay + ah / 2) * ratio;
 
 							// get the center of the div in world coordinate
-							// const divX = divBounds.x + divBounds.width / 2 + window.scrollX;
-							// const divY = divBounds.y - 1 + divBounds.height / 2 + window.scrollY;
 							const divX = divBounds.x + divBounds.width / 2;
 							const divY = divBounds.y - 1 + divBounds.height / 2;
 							this.screenToWorld(tempVector, divX, divY);
@@ -332,19 +343,10 @@ export class SpineCanvasOverlay {
 							skeleton.scaleX = ratio;
 							skeleton.scaleY = ratio;
 						} else {
-
-							// TODO: window.devicePixelRatio to manage browser zoom
-
 							// get the center of the div in world coordinate
 							const divX = divBounds.x + divBounds.width * xAxis;
 							const divY = divBounds.y + divBounds.height * yAxis;
 							this.screenToWorld(tempVector, divX, divY);
-							// console.log(tempVector.x, tempVector.y)
-							// console.log(element.getBoundingClientRect().y, this.canvas.clientWidth)
-
-							// skeleton.scaleX /= window.devicePixelRatio;
-							// skeleton.scaleY /= window.devicePixelRatio;
-
 
 							// get vertices offset
 							x = tempVector.x;
@@ -408,7 +410,7 @@ export class SpineCanvasOverlay {
 		this.input.addListener({
 			down: (x, y, ev) => {
 				const originalEvent = ev instanceof MouseEvent ? ev : ev!.changedTouches[0];
-				tempVectorInput.set(originalEvent.pageX - window.scrollX, originalEvent.pageY - window.scrollY + this.offsetHeightDraw, 0);
+				tempVectorInput.set(originalEvent.pageX - window.scrollX + this.overflowLeftSize, originalEvent.pageY - window.scrollY + this.overflowTopSize, 0);
 				this.spineCanvas.renderer.camera.screenToWorld(tempVectorInput, this.canvas.clientWidth, this.canvas.clientHeight);
 				this.skeletonList.forEach(({ htmlOptionsList, bounds, skeleton }) => {
 					htmlOptionsList.forEach((element) => {
@@ -434,7 +436,7 @@ export class SpineCanvasOverlay {
 			},
 			dragged: (x, y, ev) => {
 				const originalEvent = ev instanceof MouseEvent ? ev : ev!.changedTouches[0];
-				tempVectorInput.set(originalEvent.pageX - window.scrollX, originalEvent.pageY - window.scrollY + this.offsetHeightDraw, 0);
+				tempVectorInput.set(originalEvent.pageX - window.scrollX + this.overflowLeftSize, originalEvent.pageY - window.scrollY + this.overflowTopSize, 0);
 				this.spineCanvas.renderer.camera.screenToWorld(tempVectorInput, this.canvas.clientWidth, this.canvas.clientHeight);
 				let dragX = tempVectorInput.x - prevX;
 				let dragY = tempVectorInput.y - prevY;
@@ -470,57 +472,46 @@ export class SpineCanvasOverlay {
 	*/
 
 	private updateCanvasSize() {
-		const displayWidth = document.documentElement.clientWidth;
-    	const displayHeight = document.documentElement.clientHeight;
-		// this.canvas.style.left = displayWidth * .1 + "px";
-		// this.canvas.style.width = displayWidth * .8 + "px";
-		// this.canvas.style.left = displayWidth + "px";
-		console.log(displayWidth)
-		this.canvas.style.width = displayWidth + "px";
-		this.canvas.style.height = displayHeight + this.additionalPixelsBottom + "px";
+		// resize canvas
+		this.resizeCanvas();
+
+		// recalculate overflow left and size since canvas size changed
+		// we could keep the initial values, avoid this and the translation below - even though we don't have a great gain
+		this.translateCanvas();
+
+		// temporarely remove the div to get the page size without considering the div
+		// this is necessary otherwise if the bigger element in the page is remove and the div
+		// was the second bigger element, now it would be the div to dtermine the page size
+		this.div.remove();
+		const { width, height } = this.getPageSize();
+		document.body.appendChild(this.div);
+
+		this.div.style.width = width + "px";
+		this.div.style.height = height + "px";
 	}
 
 	private scrollHandler = () => {
-		const { width, height } = this.getPageSize();
+		this.translateCanvas();
+	}
 
-		const scrollPositionX = window.scrollX;
-		const canvasWidth = this.canvas.offsetWidth;
-		const maxTranslationX = width - canvasWidth;
-		// const translationX = Math.min(scrollPositionX, maxTranslationX);
-		const translationX = scrollPositionX;
-		console.log(width, canvasWidth, maxTranslationX, translationX)
-		// const translationX = Math.max(0, Math.min(scrollPositionX, maxTranslationX));
+	private resizeCanvas() {
+		const displayWidth = document.documentElement.clientWidth;
+    	const displayHeight = document.documentElement.clientHeight;
+		this.canvas.style.width = displayWidth * (1 + (this.overflowLeft + this.overflowRight)) + "px";
+		this.canvas.style.height = displayHeight * (1 + (this.overflowTop + this.overflowBottom)) + "px";
+		if (this.spineCanvas) this.spineCanvas.renderer.resize(ResizeMode.Expand);
+	}
 
+	private translateCanvas() {
+		const displayWidth = document.documentElement.clientWidth;
+    	const displayHeight = document.documentElement.clientHeight;
 
-		// when the phone zooms in, it happen that it is possible to scroll horizontally
-		// this means that scrollPositionX will have a value > 0
-		// however, at the beginning the webpage is fit horizontally. It means that | maxTranslationX = width - canvasWidth | will be always 0
-		// it means that | translationX = Math.min(scrollPositionX, maxTranslationX) | will be always 0
-		// however, if I simply set translationX = scrollPositionX, the canvas is translated on the right increasing the page size
-		// the solution is probably to shrink the canvas on scroll
-		// CHECK THEN WHAT HAPPENS WHEN HORIZONTAL SCROLLBAR IS AVAILABLE ON BROWSER
+		this.overflowLeftSize = this.overflowLeft * displayWidth;
+		this.overflowTopSize = this.overflowTop * displayHeight;
 
-
-
-		const scrollPositionY = window.scrollY;
-		const canvasHeight = this.canvas.offsetHeight;
-		const maxTranslation = height - canvasHeight + this.offsetHeight;
-		const translationY = Math.min(scrollPositionY, maxTranslation) - this.offsetHeight;
-
-		const delta = scrollPositionY - maxTranslation
-		this.offsetHeightDraw = this.offsetHeight;
-		if (delta > 0) {
-			this.offsetHeightDraw += delta + 1;
-		}
-
-		// translate should be faster
-		this.canvas.style.transform =`translate(${translationX}px,${translationY}px)`;
-
-		// console.log(translationX, translationY)
-
-		// TODO: some browser plugins prevent transform translate - we can think to enable a mode that move by top/left
-		// this.canvas.style.top = `${this.currentTranslateY}px`;
-		// this.canvas.style.left = `${this.currentTranslateX}px`;
+		const scrollPositionX = window.scrollX - this.overflowLeftSize;
+		const scrollPositionY = window.scrollY - this.overflowTopSize;
+		this.canvas.style.transform =`translate(${scrollPositionX}px,${scrollPositionY}px)`;
 	}
 
 	private zoomHandler = () => {
@@ -539,23 +530,10 @@ export class SpineCanvasOverlay {
 	}
 
 	private getPageSize() {
-		const width = Math.max(
-			document.body.scrollWidth,
-			document.documentElement.scrollWidth,
-			document.body.offsetWidth,
-			document.documentElement.offsetWidth,
-			document.documentElement.clientWidth
-		);
-
-		const height = Math.max(
-			document.body.scrollHeight,
-			document.documentElement.scrollHeight,
-			document.body.offsetHeight,
-			document.documentElement.offsetHeight,
-			document.documentElement.clientHeight
-		);
-
-		return { width, height };
+		// we need the bounding client rect otherwise decimals won't be returned
+		// this means that during zoom it might occurs that the div would be resized
+		// rounded 1px more making a scrollbar appear
+		return document.body.getBoundingClientRect();
 	}
 
 	/*
