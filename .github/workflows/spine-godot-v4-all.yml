@@ -14,10 +14,10 @@ jobs:
       matrix:
         version:
           [
+            {"tag": "4.3-stable", "version": "4.3.stable", "mono": false},
+            {"tag": "4.3-stable", "version": "4.3.stable", "mono": true},
             {"tag": "4.2.2-stable", "version": "4.2.2.stable", "mono": false},
             {"tag": "4.2.2-stable", "version": "4.2.2.stable", "mono": true},
-            {"tag": "4.2-stable", "version": "4.2.stable", "mono": false},
-            {"tag": "4.2-stable", "version": "4.2.stable", "mono": true},
           ]
     uses: ./.github/workflows/spine-godot-v4.yml
     with:
