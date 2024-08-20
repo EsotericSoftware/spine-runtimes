@@ -58,7 +58,7 @@ interface OverlayHTMLOptions {
 	draggable?: boolean,
 }
 
-type OverlayHTMLElement = Required<OverlayHTMLOptions> & { element: HTMLElement, scaleDpi: number, worldOffsetX: number, worldOffsetY: number, dragging: boolean, dragX: number, dragY: number };
+type OverlayHTMLElement = Required<OverlayHTMLOptions> & { element: HTMLElement, worldOffsetX: number, worldOffsetY: number, dragging: boolean, dragX: number, dragY: number };
 
 type OverlayElementMode = 'inside' | 'origin';
 
@@ -80,15 +80,11 @@ export class SpineCanvasOverlay {
 	private resizeObserver:ResizeObserver;
 	private disposed = false;
 
-	// how may pixels to add to the bottom (to avoid cut on edge during scrolling)
-	private readonly additionalPixelsBottom = 300;
-
-	// how much the canvas is translated above (to avoid cut on edge during scrolling)
-	private readonly offsetHeight = 100;
-
-	// the actual base translation
+	private currentTranslateX = 0;
+	private currentTranslateY = 0;
+	private additionalPixelsBottom = 200;
+	private offsetHeight = 50;
 	private offsetHeightDraw: number;
-
 	/** Constructs a new spine canvas, rendering to the provided HTML canvas. */
 	constructor () {
 		this.canvas = document.createElement('canvas');
@@ -98,27 +94,20 @@ export class SpineCanvasOverlay {
 		this.canvas.style.left = "0";
 		this.canvas.style.setProperty("pointer-events", "none");
 		this.offsetHeightDraw = this.offsetHeight;
-		this.canvas.style.transform =`translate(0px,0px)`;
+		this.canvas.style.transform =`translate(${this.currentTranslateX}px,${this.currentTranslateY}px)`;
 		// this.canvas.style.display = "inline";
 		// this.canvas.style.overflow = "hidden"; // useless
 		// this.canvas.style.setProperty("will-change", "transform"); // performance seems to be even worse with this uncommented
+		this.updateCanvasSize();
 
-		// resize and zoom
-		// TODO: should I use the resize event?
 		this.resizeObserver = new ResizeObserver(() => {
             this.updateCanvasSize();
-			this.zoomHandler();
 			this.spineCanvas.renderer.resize(ResizeMode.Expand);
         });
         this.resizeObserver.observe(document.body);
-		this.updateCanvasSize();
-		this.zoomHandler();
 
-		// scroll
 		window.addEventListener('scroll', this.scrollHandler);
-		this.scrollHandler();
 
-		// zoom
 
 		this.spineCanvas = new SpineCanvas(this.canvas, { app: this.setupSpineCanvasApp() });
 
@@ -169,7 +158,6 @@ export class SpineCanvasOverlay {
 			list = htmlOptionsList as Array<OverlayHTMLOptions>;
 		}
 
-		const halfDpi = window.devicePixelRatio / 2;
 		const mapList = list.map(({ element, mode: givenMode, debug = false, offsetX = 0, offsetY = 0, xAxis = 0, yAxis = 0, draggable = false, }, i) => {
 			const mode = givenMode ?? 'inside';
 			if (mode == 'inside' && i > 0) {
@@ -190,17 +178,11 @@ export class SpineCanvasOverlay {
 				dragY: 0,
 				worldOffsetX: 0,
 				worldOffsetY: 0,
-				// change this name to something like initialScaleDpi
-				scaleDpi: halfDpi,
-				// scaleDpi: 1,
 				dragging: false,
 			}
 		});
-
-		skeleton.scaleX = halfDpi;
-		skeleton.scaleY = halfDpi;
-
 		this.skeletonList.push({ skeleton, state, update, bounds, htmlOptionsList: mapList });
+
 		return { skeleton, state };
 	}
 
@@ -283,7 +265,7 @@ export class SpineCanvasOverlay {
 			},
 
 			render: (canvas: SpineCanvas) => {
-				// canvas.clear(1, 0 , 0, .1);
+				// canvas.clear(1, 0, 0, .1);
 				let renderer = canvas.renderer;
 				renderer.begin();
 
@@ -297,7 +279,7 @@ export class SpineCanvasOverlay {
 					htmlOptionsList.forEach((list) => {
 						const { element, mode, debug, offsetX, offsetY, xAxis, yAxis, dragX, dragY } = list;
 						const divBounds = element.getBoundingClientRect();
-						divBounds.y += this.offsetHeightDraw;
+						// divBounds.y += this.offsetHeightDraw;
 
 						let x = 0, y = 0;
 						if (mode === 'inside') {
@@ -336,15 +318,13 @@ export class SpineCanvasOverlay {
 							// TODO: window.devicePixelRatio to manage browser zoom
 
 							// get the center of the div in world coordinate
+							// const divX = divBounds.x + divBounds.width * xAxis + window.scrollX;
+							// const divY = divBounds.y + divBounds.height * yAxis + window.scrollY;
 							const divX = divBounds.x + divBounds.width * xAxis;
 							const divY = divBounds.y + divBounds.height * yAxis;
 							this.screenToWorld(tempVector, divX, divY);
 							// console.log(tempVector.x, tempVector.y)
-							// console.log(element.getBoundingClientRect().y, this.canvas.clientWidth)
-
-							// skeleton.scaleX /= window.devicePixelRatio;
-							// skeleton.scaleY /= window.devicePixelRatio;
-
+							// console.log(window.devicePixelRatio)
 
 							// get vertices offset
 							x = tempVector.x;
@@ -408,7 +388,7 @@ export class SpineCanvasOverlay {
 		this.input.addListener({
 			down: (x, y, ev) => {
 				const originalEvent = ev instanceof MouseEvent ? ev : ev!.changedTouches[0];
-				tempVectorInput.set(originalEvent.pageX - window.scrollX, originalEvent.pageY - window.scrollY + this.offsetHeightDraw, 0);
+				tempVectorInput.set(originalEvent.pageX - window.scrollX, originalEvent.pageY - window.scrollY, 0);
 				this.spineCanvas.renderer.camera.screenToWorld(tempVectorInput, this.canvas.clientWidth, this.canvas.clientHeight);
 				this.skeletonList.forEach(({ htmlOptionsList, bounds, skeleton }) => {
 					htmlOptionsList.forEach((element) => {
@@ -434,7 +414,7 @@ export class SpineCanvasOverlay {
 			},
 			dragged: (x, y, ev) => {
 				const originalEvent = ev instanceof MouseEvent ? ev : ev!.changedTouches[0];
-				tempVectorInput.set(originalEvent.pageX - window.scrollX, originalEvent.pageY - window.scrollY + this.offsetHeightDraw, 0);
+				tempVectorInput.set(originalEvent.pageX - window.scrollX, originalEvent.pageY - window.scrollY, 0);
 				this.spineCanvas.renderer.camera.screenToWorld(tempVectorInput, this.canvas.clientWidth, this.canvas.clientHeight);
 				let dragX = tempVectorInput.x - prevX;
 				let dragY = tempVectorInput.y - prevY;
@@ -470,72 +450,93 @@ export class SpineCanvasOverlay {
 	*/
 
 	private updateCanvasSize() {
+		// const pageSize = this.getPageSize();
+		// this.canvas.style.width = pageSize.width + "px";
+		// this.canvas.style.height = pageSize.height + "px";
+
+		// const displayWidth = window.innerWidth;
+    	// const displayHeight = window.innerHeight;
+
+
 		const displayWidth = document.documentElement.clientWidth;
     	const displayHeight = document.documentElement.clientHeight;
-		// this.canvas.style.left = displayWidth * .1 + "px";
-		// this.canvas.style.width = displayWidth * .8 + "px";
-		// this.canvas.style.left = displayWidth + "px";
-		console.log(displayWidth)
 		this.canvas.style.width = displayWidth + "px";
-		this.canvas.style.height = displayHeight + this.additionalPixelsBottom + "px";
+		this.canvas.style.height = displayHeight + "px";
+		// this.canvas.style.height = displayHeight + this.additionalPixelsBottom + "px";
 	}
+
+	// private scrollHandler = () => {
+	// 	const { width, height } = this.getPageSize()
+
+	// 	// const viewportHeightWithScrollbar = window.innerHeight;
+	// 	// const viewportHeightNoScrollbar = document.documentElement.clientHeight;
+	// 	// const scrollbarHeight = viewportHeightWithScrollbar - viewportHeightNoScrollbar;
+	// 	// const bottomY = viewportHeightNoScrollbar + window.scrollY;
+
+	// 	// const viewportWidthWithScrollbar = window.innerWidth;
+	// 	// const viewportWidthNoScrollbar = document.documentElement.clientWidth;
+	// 	// const scrollbarWidth = viewportWidthWithScrollbar - viewportWidthNoScrollbar;
+	// 	// const bottomX = viewportWidthNoScrollbar + window.scrollY;
+
+	// 	// if (bottomX + scrollbarWidth <= width) {
+	// 	// 	this.currentTranslateX = window.scrollX;
+	// 	// }
+
+	// 	// if (bottomY + scrollbarHeight <= height) {
+	// 	// 	this.currentTranslateY = window.scrollY;
+	// 	// }
+
+	// 	const viewportHeightNoScrollbar = document.documentElement.clientHeight;
+	// 	const bottomY = viewportHeightNoScrollbar + window.scrollY;
+
+	// 	const viewportWidthNoScrollbar = document.documentElement.clientWidth;
+	// 	const bottomX = viewportWidthNoScrollbar + window.scrollX;
+
+	// 	if (bottomX <= width) {
+	// 		this.currentTranslateX = window.scrollX;
+	// 	}
+
+	// 	if (window.scrollY <= this.offsetHeight) {
+	// 		console.log(window.scrollY);
+	// 		console.log("aaa")
+	// 		this.currentTranslateY = 0;
+	// 		this.offsetHeightDraw = this.offsetHeight;
+	// 	} else if (bottomY + this.additionalPixelsBottom - this.offsetHeight <= height) {
+	// 		console.log("bbb")
+	// 		this.currentTranslateY = window.scrollY - this.offsetHeight;
+	// 		this.offsetHeightDraw = this.offsetHeight;
+	// 	} else {
+	// 		console.log("ccc")
+	// 		this.currentTranslateY = window.scrollY - this.additionalPixelsBottom;
+	// 		this.offsetHeightDraw = this.additionalPixelsBottom;
+	// 	}
+
+	// 	// translate should be faster
+	// 	this.canvas.style.transform =`translate(${this.currentTranslateX}px,${this.currentTranslateY}px)`;
+	// 	console.log(`translate(${this.currentTranslateX}px,${this.currentTranslateY}px)`)
+	// 	// this.canvas.style.top = `${this.currentTranslateY}px`;
+	// 	// this.canvas.style.left = `${this.currentTranslateX}px`;
+	// }
 
 	private scrollHandler = () => {
-		const { width, height } = this.getPageSize();
+		const { width, height } = this.getPageSize()
 
-		const scrollPositionX = window.scrollX;
-		const canvasWidth = this.canvas.offsetWidth;
-		const maxTranslationX = width - canvasWidth;
-		// const translationX = Math.min(scrollPositionX, maxTranslationX);
-		const translationX = scrollPositionX;
-		console.log(width, canvasWidth, maxTranslationX, translationX)
-		// const translationX = Math.max(0, Math.min(scrollPositionX, maxTranslationX));
+		const viewportHeightNoScrollbar = document.documentElement.clientHeight;
+		const bottomY = viewportHeightNoScrollbar + window.scrollY;
 
+		const viewportWidthNoScrollbar = document.documentElement.clientWidth;
+		const bottomX = viewportWidthNoScrollbar + window.scrollY;
 
-		// when the phone zooms in, it happen that it is possible to scroll horizontally
-		// this means that scrollPositionX will have a value > 0
-		// however, at the beginning the webpage is fit horizontally. It means that | maxTranslationX = width - canvasWidth | will be always 0
-		// it means that | translationX = Math.min(scrollPositionX, maxTranslationX) | will be always 0
-		// however, if I simply set translationX = scrollPositionX, the canvas is translated on the right increasing the page size
-		// the solution is probably to shrink the canvas on scroll
-		// CHECK THEN WHAT HAPPENS WHEN HORIZONTAL SCROLLBAR IS AVAILABLE ON BROWSER
-
-
-
-		const scrollPositionY = window.scrollY;
-		const canvasHeight = this.canvas.offsetHeight;
-		const maxTranslation = height - canvasHeight + this.offsetHeight;
-		const translationY = Math.min(scrollPositionY, maxTranslation) - this.offsetHeight;
-
-		const delta = scrollPositionY - maxTranslation
-		this.offsetHeightDraw = this.offsetHeight;
-		if (delta > 0) {
-			this.offsetHeightDraw += delta + 1;
+		if (bottomX <= width) {
+			this.currentTranslateX = window.scrollX;
 		}
 
-		// translate should be faster
-		this.canvas.style.transform =`translate(${translationX}px,${translationY}px)`;
+		if (bottomY <= height) {
+			this.currentTranslateY = window.scrollY;
+		}
 
-		// console.log(translationX, translationY)
+		this.canvas.style.transform =`translate(${this.currentTranslateX}px,${this.currentTranslateY}px)`;
 
-		// TODO: some browser plugins prevent transform translate - we can think to enable a mode that move by top/left
-		// this.canvas.style.top = `${this.currentTranslateY}px`;
-		// this.canvas.style.left = `${this.currentTranslateX}px`;
-	}
-
-	private zoomHandler = () => {
-		this.skeletonList.forEach(({ skeleton, htmlOptionsList }) => {
-			htmlOptionsList.forEach((options) => {
-				const { mode, scaleDpi } = options;
-				// inside mode scale automatically to fit the skeleton within its parent
-				if (mode !== 'origin') return;
-				const halfDpi = window.devicePixelRatio / 2;
-				const ratio = (skeleton.scaleX / scaleDpi) * halfDpi;
-				skeleton.scaleX = ratio;
-				skeleton.scaleY = ratio;
-				options.scaleDpi = halfDpi;
-			})
-		})
 	}
 
 	private getPageSize() {

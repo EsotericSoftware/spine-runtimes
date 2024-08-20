@@ -182,7 +182,7 @@ export class Input {
 							this.mouseX = this.touch0.x;
 							this.mouseX = this.touch0.x;
 							this.buttonDown = true;
-							this.listeners.map((listener) => { if (listener.down) listener.down(this.touch0!.x, this.touch0!.y) });
+							this.listeners.map((listener) => { if (listener.down) listener.down(this.touch0!.x, this.touch0!.y, ev) });
 						}
 					}
 
