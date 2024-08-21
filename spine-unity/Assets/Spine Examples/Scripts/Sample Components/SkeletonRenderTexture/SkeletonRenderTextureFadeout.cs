@@ -31,8 +31,8 @@
 #define HAS_FORCE_RENDER_OFF
 #endif
 
-#if UNITY_2017_2_OR_NEWER
-#define HAS_VECTOR_INT
+#if UNITY_2018_2_OR_NEWER
+#define HAS_GET_SHARED_MATERIALS
 #endif
 
 using UnityEngine;
@@ -78,10 +78,10 @@ namespace Spine.Unity.Examples {
 				return;
 			}
 			float fadeoutAlpha = fadeoutSecondsRemaining / fadeoutSeconds;
-#if HAS_VECTOR_INT
+#if HAS_GET_SHARED_MATERIALS
 			skeletonRenderTexture.color.a = fadeoutAlpha;
 #else
-			Debug.LogError("The SkeletonRenderTexture component requires Unity 2017.2 or newer.");
+			Debug.LogError("The SkeletonRenderTexture component requires Unity 2018.2 or newer.");
 #endif
 		}
 	}
