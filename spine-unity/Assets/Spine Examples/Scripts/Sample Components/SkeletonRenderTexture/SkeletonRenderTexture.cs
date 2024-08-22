@@ -128,6 +128,8 @@ namespace Spine.Unity.Examples {
 		}
 
 		void RenderOntoQuad (SkeletonRenderer skeletonRenderer) {
+			if (meshFilter == null)
+				meshFilter = this.GetComponent<MeshFilter>();
 			Vector3 size = meshFilter.sharedMesh.bounds.size;
 			if (size.x == 0f || size.y == 0f) {
 				AssignNullMeshAtQuad();
