@@ -29,6 +29,11 @@
         }
         .split {
             display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .full-width {
+            width: 100%;
         }
         .split-left, .split-right {
             width: 50%;
@@ -38,9 +43,11 @@
             border: 1px solid salmon;
         }
         .split-nosize {
-            /* padding: 1rem; */
-            /* margin: 1rem; */
             border: 1px solid salmon;
+        }
+        .split-size {
+            padding: 1rem;
+            margin: 1rem;
         }
         .navigation {
             display: flex;
@@ -63,6 +70,10 @@
             flex-direction: column;
         }
 
+        .high-page {
+            height: 600px;
+        }
+
         .split-top {
             width: 100%;
             height: 600px;
@@ -71,12 +82,6 @@
         .split-bottom {
             width: 100%;
             /* height: 600px; */
-        }
-
-        .split-top {
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
 
         .split-bottom {
@@ -98,17 +103,27 @@
             padding: 1rem;
         }
     </style>
+
+    <script>
+        function escapeHTMLandInject(text) {
+            const escaped = text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+            document.currentScript.parentElement.innerHTML = escaped;
+        }
+    </script>
 </head>
 <body>
-    <span id="fps" style="position: fixed; top: 0; left: 0">FPS</span>
-
     <!--
     /////////////////////
     // start section 0 //
     /////////////////////
     -->
 
-    <div id="section0" class="section vertical-split">
+    <!-- <div id="section0" class="section vertical-split">
 
         <div class="split-top split">
             <div class="split-left">
@@ -125,7 +140,7 @@
 
             </code></pre>
         </div>
-    </div>
+    </div> -->
 
     <!--
     /////////////////////
@@ -142,24 +157,34 @@
     <div id="section1" class="section vertical-split">
 
         <div class="split-top split">
-            <div class="split-left" id="section1-element">
+            <div class="split-left">
+                <spine-widget
+                    atlas="assets/spineboy-pma.atlas"
+                    skeleton="assets/spineboy-pro.skel"
+                    animation="walk"
+                ></spine-widget>
             </div>
             <div class="split-right">
+                The <code>&lt;spine-widget&gt;</code> tag allows you to place your Spine animations into a web page.
+                <br>
+                <br>
+                By default, the animation bounds are calculated using the given animation, or the setup pose if no animation is provided.
+                <br>
+                The bounds is centered and scaled to fit the parent container.
             </div>
         </div>
 
 
         <div class="split-bottom">
             <pre><code id="code-display">
-const overlay = new spine.SpineCanvasOverlay();
-overlay.addSkeleton(
-    {
-        atlasPath: "assets/spineboy-pma.atlas",
-        skeletonPath: "assets/spineboy-pro.skel",
-        animation: 'walk',
-    },
-    document.getElementById(`section1-element`),
-);
+                <script>
+                escapeHTMLandInject(`
+<spine-widget
+    atlas="assets/spineboy-pma.atlas"
+    skeleton="assets/spineboy-pro.skel"
+    animation="walk"
+></spine-widget>`)
+                </script>
             </code></pre>
         </div>
     </div>
@@ -172,43 +197,77 @@ overlay.addSkeleton(
 
 
 
-
-
     <!--
     /////////////////////
     // start section 2 //
     /////////////////////
     -->
 
-    <div id="section2" class="section vertical-split">
+    <div id="section1" class="section vertical-split">
 
-        <div class="split-top split">
-            <div class="split-left">
-                Mode <code>origin</code> uses the HTML element top-left corner as origin for the skeleton. <br>
-                You are responsible to scale the skeleton using this mode. <br>
-                Move the origin by a percentage of the div width and height by using <code>xAxis</code> and <code>yAxis</code> respectively.
+        <div class="full-width">
+
+            <div class="split">
+                <div class="split-left" style="height: 300px;">
+                    <spine-widget
+                        atlas="assets/raptor-pma.atlas"
+                        skeleton="assets/raptor-pro.skel"
+                        animation="walk"
+                        fit="fill"
+                        debug="true"
+                    ></spine-widget>
+                </div>
+                <div class="split-right">
+                    You can change the fit mode of your Spine animation using the <code>fit</code> attribute.
+                    <br>
+                    <br>
+                    This is <code>fit="fill"</code>. Default fit value is <code>fit="contain"</code>.
+                </div>
             </div>
-            <div class="split-right" id="section2-element">
+
+            <div class="split">
+                <div class="split-left" style="height: 300px;">
+                    <spine-widget
+                        atlas="assets/raptor-pma.atlas"
+                        skeleton="assets/raptor-pro.skel"
+                        animation="walk"
+                        scale=".125"
+                        fit="none"
+                    ></spine-widget>
+                </div>
+                <div class="split-right">
+                    If you want to preserve the original scale, you can use the <code>fit="none"</code>.
+                    In combination with that, you can use the <code>scale</code> attribute to choose you desired scale.
+                    <br>
+                    <br>
+                    Other fit modes are <code>fitWidth</code>, <code>fitWidth</code>, <code>fitHeight</code>, <code>cover</code>,and <code>scaleDown</code>.
+                </div>
             </div>
+
         </div>
+
+
 
 
         <div class="split-bottom">
             <pre><code id="code-display">
-overlay.addSkeleton(
-    {
-        atlasPath: "assets/spineboy-pma.atlas",
-        skeletonPath: "assets/spineboy-pro.skel",
-        animation: 'run',
-        scale: .25,
-    },
-    {
-        element: document.getElementById(`section2-element`),
-        mode: 'origin',
-        xAxis: .5,
-        yAxis: 1,
-    },
-);
+                <script>
+                escapeHTMLandInject(`
+<spine-widget
+    atlas="assets/raptor-pma.atlas"
+    skeleton="assets/raptor-pro.skel"
+    animation="walk"
+    fit="fill"
+></spine-widget>
+
+<spine-widget
+    atlas="assets/raptor-pma.atlas"
+    skeleton="assets/raptor-pro.skel"
+    animation="walk"
+    scale=".125"
+    fit="none"
+></spine-widget>`)
+                </script>
             </code></pre>
         </div>
     </div>
@@ -216,6 +275,72 @@ overlay.addSkeleton(
     <!--
     /////////////////////
     // end section 2 //
+    /////////////////////
+    -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!--
+    /////////////////////
+    // start section 3 //
+    /////////////////////
+    -->
+
+    <div id="section2" class="section vertical-split">
+
+        <div class="split-top split">
+            <div class="split-left">
+                Mode <code>origin</code> center the animation world origin with the center of the HTML element.
+                <br>
+                You are responsible to scale the skeleton using this mode.
+                <br>
+                <br>
+                Move the origin by a percentage of the div width and height by using <code>x-axis</code> and <code>y-axis</code> respectively.
+            </div>
+            <div class="split-right">
+                <spine-widget
+                    atlas="assets/vine-pma.atlas"
+                    skeleton="assets/vine-pro.skel"
+                    animation="grow"
+                    mode="origin"
+                    scale=".5"
+                    y-axis="-.5"
+                ></spine-widget>
+            </div>
+        </div>
+
+
+        <div class="split-bottom">
+            <pre><code id="code-display">
+                <script>escapeHTMLandInject(`
+<spine-widget
+    atlas="assets/vine-pma.atlas"
+    skeleton="assets/vine-pro.skel"
+    animation="grow"
+    mode="origin"
+    scale=".5"
+    y-axis="-.5"
+></spine-widget>
+`);</script>
+            </code></pre>
+        </div>
+    </div>
+
+    <!--
+    /////////////////////
+    // end section 3 //
     /////////////////////
     -->
 
@@ -228,30 +353,32 @@ overlay.addSkeleton(
     <div id="section3" class="section vertical-split">
 
         <div class="split-top split">
-            <div class="split-left"  id="section3-element">
+            <div class="split-left">
+                <spine-widget
+                    atlas="assets/snowglobe-pma.atlas"
+                    skeleton="assets/snowglobe-pro.skel"
+                    animation="shake"
+                    offset-x="100"
+                    offset-y="-100"
+                ></spine-widget>
             </div>
             <div class="split-right">
-                Use <code>offsetX</code> and <code>offsetY</code> to move you skeleton left or right by the pixel amount you specify.
-                This works for both mode <code>origin</code> and <code>inside</code>.
+                Use <code>offset-x</code> and <code>offset-y</code> to move you skeleton left or right by the pixel amount you specify.
             </div>
         </div>
 
 
         <div class="split-bottom">
             <pre><code id="code-display">
-overlay.addSkeleton(
-    {
-        atlasPath: "assets/spineboy-pma.atlas",
-        skeletonPath: "assets/spineboy-pro.skel",
-        animation: 'run',
-    },
-    {
-        element: document.getElementById(`section3-element`),
-        mode: 'inside', // default
-        offsetX: 100,
-        offsetY: 50,
-    },
-);
+                <script>escapeHTMLandInject(`
+<spine-widget
+    atlas="assets/snowglobe-pma.atlas"
+    skeleton="assets/snowglobe-pro.skel"
+    animation="shake"
+    offset-x="100"
+    offset-y="-100"
+></spine-widget>
+`);</script>
             </code></pre>
         </div>
     </div>
@@ -272,37 +399,67 @@ overlay.addSkeleton(
 
         <div class="split-top split">
             <div class="split-left">
-                You can easily access the <code>Skeleton</code> and the <code>AnimationState</code> of your character, and use them as if you were using <code>spine-webgl</code>. <br>
-                If you change animation, you can ask to scale the skeleton based on the new animation.
+                Give an <code>identifier</code> to your widget to get it by using the <code>spine.getSpineWidget</code> function.
+                You can easily access the <code>Skeleton</code> and the <code>AnimationState</code> of your character, and use them as if you were using <code>spine-webgl</code>.
+                <br>
+                <br>
+                If you change animation, you can ask the widget to scale the skeleton based on the new animation.
             </div>
-            <div class="split-right" id="section4-element">
-
+            <div class="split-right">
+                <spine-widget
+                    identifier="raptor"
+                    atlas="assets/raptor-pma.atlas"
+                    skeleton="assets/raptor-pro.skel"
+                    animation="walk"
+                ></spine-widget>
             </div>
         </div>
 
+        <script>
+            (async () => {
+                const widget = spine.getSpineWidget("raptor");
+                const { state } = await widget.loadingPromise;
+                let isRoaring = false;
+                setInterval(() => {
+                    const newAnimation = isRoaring ? "walk" : "roar";
+                    state.setAnimation(0, newAnimation, true);
+                    widget.recalculateBounds(); // scale the skeleton based on the new animation
+                    isRoaring = !isRoaring;
+                }, 4000);
+            })();
+        </script>
 
-        <div class="split-bottom">
+                <div class="split-bottom">
             <pre><code id="code-display">
-// access the skeleton and the state asynchronously
-const { skeleton, state } = await overlay.addSkeleton(
-    {
-        atlasPath: "assets/raptor-pma.atlas",
-        skeletonPath: "assets/raptor-pro.skel",
-        animation: 'walk',
-    },
-    document.getElementById(`section4-element`)
-);
+                <script>escapeHTMLandInject(`
+// access the spine widget
+<spine-widget
+    identifier="raptor"
+    atlas="assets/raptor-pma.atlas"
+    skeleton="assets/raptor-pro.skel"
+    animation="walk"
+></spine-widget>
 
-let isRoaring = false;
-setInterval(() => {
-    const newAnimation = isRoaring ? "walk" : "roar";
-    state.setAnimation(0, newAnimation, true);
-    overlay.recalculateBounds(skeleton); // scale the skeleton based on the new animation
-    isRoaring = !isRoaring;
-}, 4000);
+...
+
+// using js, access the skeleton and the state asynchronously
+(async () => {
+    const widget = document.querySelector("spine-widget[identifier=raptor]");
+    const { state } = await widget.loadingPromise;
+    let isRoaring = false;
+    setInterval(() => {
+        const newAnimation = isRoaring ? "walk" : "roar";
+        state.setAnimation(0, newAnimation, true);
+        widget.recalculateBounds(); // scale the skeleton based on the new animation
+        isRoaring = !isRoaring;
+    }, 4000);
+})();
+
+`);</script>
             </code></pre>
         </div>
     </div>
+
 
     <!--
     /////////////////////
@@ -312,63 +469,38 @@ setInterval(() => {
 
     <!--
     /////////////////////
-    // start section 5 //
-    /////////////////////
-    -->
-
-    <div id="section5" class="section vertical-split">
-
-        <div class="split-top split">
-            <div class="split-left">
-                You can also set a custom bounds to center a specific element or area of you animation in the div.
-            </div>
-            <div class="split-right" id="section5-element">
-                TODO
-            </div>
-        </div>
-
-
-        <div class="split-bottom">
-            <pre><code id="code-display">
-            </code></pre>
-        </div>
-    </div>
-
-    <!--
-    /////////////////////
-    // end section 5 //
-    /////////////////////
-    -->
-
-
-    <!--
-    /////////////////////
     // start section 6 //
     /////////////////////
     -->
 
     <div id="section6" class="section vertical-split">
 
-        <div class="split-top split">
-            <div class="split-left">
+        <div class="full-width high-page" style="padding: 1em;">
+            <div class="split-nosize" style="padding: 1em; margin-bottom: 1em;">
                 Moving the div will move the skeleton origin. <br>
                 Resizing the div will resize the skeleton in <code>inside</code> mode, but not in <code>origin</code> mode.
             </div>
-            <div class="split-right" id="section6-element">
+            <div class="split-nosize" style="width: 100%; height: 50%;" id="section6-element">
+                <spine-widget
+                    atlas="assets/cloud-pot-pma.atlas"
+                    skeleton="assets/cloud-pot.skel"
+                    animation="playing-in-the-rain"
+                ></spine-widget>
             </div>
         </div>
+
         <div class="split-bottom">
             <pre><code id="code-display">
-overlay.addSkeleton(
-    {
-        atlasPath: "assets/cloud-pot-pma.atlas",
-        skeletonPath: "assets/cloud-pot.skel",
-        animation: 'playing-in-the-rain',
-    },
-    document.getElementById(`section6-element`)
-);
+                <script>escapeHTMLandInject(`
+<spine-widget
+    atlas="assets/cloud-pot-pma.atlas"
+    skeleton="assets/cloud-pot.skel"
+    animation="playing-in-the-rain"
+></spine-widget>`
+);</script>
             </code></pre>
         </div>
+
     </div>
 
     <!--
@@ -392,25 +524,28 @@ overlay.addSkeleton(
                 You can view the skeleton world origin (green), the root bone position (red), and the bounds rectangle and center (blue) by setting <code>debug</code> to <code>true</code>.
             </div>
             <div class="split-right" id="section7-element">
+                <spine-widget
+                    atlas="assets/sack-pma.atlas"
+                    skeleton="assets/sack-pro.skel"
+                    animation="cape-follow-example"
+                    debug="true"
+                ></spine-widget>
             </div>
         </div>
 
-
         <div class="split-bottom">
             <pre><code id="code-display">
-overlay.addSkeleton(
-    {
-        atlasPath: "assets/owl-pma.atlas",
-        skeletonPath: "assets/owl-pro.skel",
-        animation: 'idle',
-    },
-    {
-        element: document.getElementById(`section7-element`),
-        debug: true,
-    }
-);
+                <script>escapeHTMLandInject(`
+<spine-widget
+    atlas="assets/sack-pma.atlas"
+    skeleton="assets/sack-pro.skel"
+    animation="cape-follow-example"
+    debug="true"
+></spine-widget>`
+);</script>
             </code></pre>
         </div>
+
     </div>
 
     <!--
@@ -432,25 +567,29 @@ overlay.addSkeleton(
                 As a bonus item, you can move you skeleton around just by setting the <code>draggable</code> property to <code>true</code>.
             </div>
             <div class="split-right" id="section8-element">
+                <spine-widget
+                    atlas="assets/celestial-circus-pma.atlas"
+                    skeleton="assets/celestial-circus-pro.skel"
+                    animation="wings-and-feet"
+                    draggable="true"
+                ></spine-widget>
             </div>
         </div>
 
 
         <div class="split-bottom">
             <pre><code id="code-display">
-overlay.addSkeleton(
-    {
-        atlasPath: "assets/celestial-circus-pma.atlas",
-        skeletonPath: "assets/celestial-circus-pro.skel",
-        animation: 'wings-and-feet',
-    },
-    {
-        element: document.getElementById(`section8-element`),
-        draggable: true,
-    }
-);
+                <script>escapeHTMLandInject(`
+<spine-widget
+    atlas="assets/celestial-circus-pma.atlas"
+    skeleton="assets/celestial-circus-pro.skel"
+    animation="wings-and-feet"
+    draggable="true"
+></spine-widget>`
+);</script>
             </code></pre>
         </div>
+
     </div>
 
     <!--
@@ -489,235 +628,7 @@ overlay.addSkeleton(
         // });
     </script>
 
-    <script>
-        (async () => {
-            const overlay = new spine.SpineCanvasOverlay();
-
-            // overlay.addSkeleton(
-            //     {
-            //         atlasPath: "assets/spineboy-pma.atlas",
-            //         skeletonPath: "assets/spineboy-pro.skel",
-            //         // scale: 1,
-            //         // animation: 'walk',
-            //     },
-            //     {
-            //         mode: "origin",
-            //         xAxis: 1,
-            //         yAxis: 1,
-            //         element: document.querySelectorAll(`#section1-element`)[0],
-            //         debug: true
-            //     }
-            // );
-
-            /////////////////////
-            // start section 1 //
-            /////////////////////
-            overlay.addSkeleton(
-                {
-                    atlasPath: "assets/spineboy-pma.atlas",
-                    skeletonPath: "assets/spineboy-pro.skel",
-                    animation: 'walk',
-                },
-                [
-                    {
-                        identifier: `section0`,
-                        debug: true,
-                    }
-                ]
-            );
-            /////////////////////
-            // end section 1   //
-            /////////////////////
-
-            // /////////////////////
-            // // start section 1 //
-            // /////////////////////
-            // overlay.addSkeleton(
-            //     {
-            //         atlasPath: "assets/spineboy-pma.atlas",
-            //         skeletonPath: "assets/spineboy-pro.skel",
-            //         animation: 'walk',
-            //     },
-            //     document.querySelectorAll(`#section1-element`),
-            // );
-            // /////////////////////
-            // // end section 1   //
-            // /////////////////////
-
-
-
-            // /////////////////////
-            // // start section 2 //
-            // /////////////////////
-            // overlay.addSkeleton(
-            //     {
-            //         atlasPath: "assets/spineboy-pma.atlas",
-            //         skeletonPath: "assets/spineboy-pro.skel",
-            //         animation: 'run',
-            //         scale: .25,
-            //     },
-            //     {
-            //         element: document.getElementById(`section2-element`),
-            //         mode: 'origin',
-            //         xAxis: .5,
-            //         yAxis: 1,
-            //     },
-            // );
-            // /////////////////////
-            // // end section 2   //
-            // /////////////////////
-
-
-            // /////////////////////
-            // // start section 3 //
-            // /////////////////////
-            // overlay.addSkeleton(
-            //     {
-            //         atlasPath: "assets/spineboy-pma.atlas",
-            //         skeletonPath: "assets/spineboy-pro.skel",
-            //         animation: 'jump',
-            //     },
-            //     {
-            //         element: document.getElementById(`section3-element`),
-            //         mode: 'inside', // default
-            //         offsetX: 100,
-            //         offsetY: 50,
-            //     },
-            // );
-            // /////////////////////
-            // // end section 3   //
-            // /////////////////////
-
-
-
-            // /////////////////////
-            // // start section 4 //
-            // /////////////////////
-            // const { skeleton, state } = await overlay.addSkeleton(
-            //     {
-            //         atlasPath: "assets/raptor-pma.atlas",
-            //         skeletonPath: "assets/raptor-pro.skel",
-            //         animation: 'walk',
-            //     },
-            //     document.getElementById(`section4-element`)
-            // );
-
-            // let isRoaring = false;
-            // setInterval(() => {
-            //     const newAnimation = isRoaring ? "walk" : "roar";
-            //     state.setAnimation(0, newAnimation, true);
-            //     overlay.recalculateBounds(skeleton);
-            //     isRoaring = !isRoaring;
-            // }, 4000);
-
-            // /////////////////////
-            // // end section 4   //
-            // /////////////////////
-
-            // /////////////////////
-            // // start section 5 //
-            // /////////////////////
-            // // const { skeleton: skeleton5 } = await overlay.addSkeleton(
-            // //     {
-            // //         atlasPath: "assets/spineboy-pma.atlas",
-            // //         skeletonPath: "assets/spineboy-pro.skel",
-            // //         animation: 'walk',
-            // //     },
-            // //     document.getElementById(`section5-element`)
-            // // );
-
-            // // const bbAttachmentSlot = skeleton5.findSlot("head-bb");
-            // // const currentAttachment = bbAttachmentSlot.attachment;
-            // // skeleton5.setAttachment("head-bb", "head");
-            // // const bbAttachment = bbAttachmentSlot.attachment;
-
-            // // const computedVertices = [];
-            // // bbAttachment.computeWorldVertices(bbAttachmentSlot, 0, bbAttachment.worldVerticesLength, computedVertices, 0, 2);
-            // // const vertices = computedVertices;
-            // // let x = Infinity, maxX = -Infinity, y = Infinity, maxY = -Infinity;
-            // // for (let i = 0; i < vertices.length; i+=2) {
-            // //     x = Math.min(vertices[i], x);
-            // //     y = Math.min(vertices[i+1], y);
-            // //     maxX = Math.max(vertices[i], maxX);
-            // //     maxY = Math.max(vertices[i+1], maxY);
-            // // }
-
-            // // const width = maxX - x;
-            // // const height = maxY - y;
-            // // console.log({ x, y, width, height })
-            // // overlay.setBounds(skeleton5, { x, y, width, height })
-            // // bbAttachmentSlot.setAttachment(currentAttachment)
-            // /////////////////////
-            // // end section 5   //
-            // /////////////////////
-
-            // /////////////////////
-            // // start section 6 //
-            // /////////////////////
-            // overlay.addSkeleton(
-            //     {
-            //         atlasPath: "assets/cloud-pot-pma.atlas",
-            //         skeletonPath: "assets/cloud-pot.skel",
-            //         animation: 'playing-in-the-rain',
-            //     },
-            //     document.getElementById(`section6-element`)
-            // );
-            // /////////////////////
-            // // end section 6   //
-            // /////////////////////
-
-
-
-            // /////////////////////
-            // // start section 7 //
-            // /////////////////////
-            // overlay.addSkeleton(
-            //     {
-            //         atlasPath: "assets/owl-pma.atlas",
-            //         skeletonPath: "assets/owl-pro.skel",
-            //         animation: 'idle',
-            //     },
-            //     {
-            //         element: document.getElementById(`section7-element`),
-            //         debug: true,
-            //     }
-            // );
-            // //////////////////////
-            // // end section 7   //
-            // //////////////////////
-
-
-
-            // /////////////////////
-            // // start section 8 //
-            // /////////////////////
-            // overlay.addSkeleton(
-            //     {
-            //         atlasPath: "assets/celestial-circus-pma.atlas",
-            //         skeletonPath: "assets/celestial-circus-pro.skel",
-            //         animation: 'wings-and-feet',
-            //     },
-            //     {
-            //         element: document.getElementById(`section8-element`),
-            //         draggable: true,
-            //         debug: true,
-            //     }
-            // );
-            // //////////////////////
-            // // end section 8   //
-            // //////////////////////
-
-        })();
-
-
-
-    </script>
-
-
-
-
 <script>
-
     //////////////////////////////////////////////////////
     //////////////////////////////////////////////////////
     //////////////////////////////////////////////////////
@@ -822,7 +733,6 @@ overlay.addSkeleton(
             document.removeEventListener('pointerup', stopResize);
         }
     }
-
 
     makeDraggable(document.getElementById(`section6-element`));
     makeResizable(document.getElementById(`section6-element`));

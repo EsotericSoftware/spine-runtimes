@@ -37,8 +37,8 @@ interface Rectangle {
 }
 
 interface OverlaySkeletonOptions {
-	atlasPath: string,
-	skeletonPath: string,
+	atlas: string,
+	skeleton: string,
 	scale: number,
 	animation?: string,
 	skeletonData?: SkeletonData,
@@ -48,7 +48,8 @@ interface OverlaySkeletonOptions {
 type UpdateSpineFunction = (canvas: SpineCanvas, delta: number, skeleton: Skeleton, state: AnimationState) => void;
 
 interface OverlayHTMLOptions {
-	element: HTMLElement,
+	identifier: string,
+	createDivInElement?: boolean,
 	mode?: OverlayElementMode,
 	debug?: boolean,
 	offsetX?: number,
@@ -58,7 +59,7 @@ interface OverlayHTMLOptions {
 	draggable?: boolean,
 }
 
-type OverlayHTMLElement = Required<OverlayHTMLOptions> & { element: HTMLElement, scaleDpi: number, worldOffsetX: number, worldOffsetY: number, dragging: boolean, dragX: number, dragY: number };
+type OverlayHTMLElement = Required<Omit<OverlayHTMLOptions, "identifier">> & { element: HTMLElement, scaleDpi: number, worldOffsetX: number, worldOffsetY: number, dragging: boolean, dragX: number, dragY: number };
 
 type OverlayElementMode = 'inside' | 'origin';
 
@@ -108,7 +109,6 @@ export class SpineCanvasOverlay {
 		this.canvas.style.left = "0";
 		this.canvas.style.setProperty("pointer-events", "none");
 		this.canvas.style.transform =`translate(0px,0px)`;
-		// this.canvas.style.display = "inline";
 		// this.canvas.style.setProperty("will-change", "transform"); // performance seems to be even worse with this uncommented
 
 		// resize and zoom
@@ -130,8 +130,6 @@ export class SpineCanvasOverlay {
 		window.addEventListener('scroll', this.scrollHandler);
 		this.scrollHandler();
 
-		// zoom
-
 		this.spineCanvas = new SpineCanvas(this.canvas, { app: this.setupSpineCanvasApp() });
 
 		this.input = new Input(document.body, false);
@@ -141,17 +139,17 @@ export class SpineCanvasOverlay {
 	// add a skeleton to the overlay and set the bounds to the given animation or to the setup pose
 	public async addSkeleton(
 		skeletonOptions: OverlaySkeletonOptions,
-		htmlOptionsList: Array<OverlayHTMLOptions> | OverlayHTMLOptions | Array<HTMLElement> | HTMLElement | NodeList = [],
+		htmlOptionsList: Array<OverlayHTMLOptions>,
 	) {
-		const { atlasPath, skeletonPath, scale = 1, animation, skeletonData: skeletonDataInput, update } = skeletonOptions;
+		const { atlas, skeleton: skeletonPath, scale = 1, animation, skeletonData: skeletonDataInput, update } = skeletonOptions;
 		const isBinary = skeletonPath.endsWith(".skel");
 		await Promise.all([
 			isBinary ? this.loadBinary(skeletonPath) : this.loadJson(skeletonPath),
-			this.loadTextureAtlas(atlasPath),
+			this.loadTextureAtlas(atlas),
 		]);
 
-		const atlas = this.spineCanvas.assetManager.require(atlasPath);
-		const atlasLoader = new AtlasAttachmentLoader(atlas);
+		const atlasLoaded = this.spineCanvas.assetManager.require(atlas);
+		const atlasLoader = new AtlasAttachmentLoader(atlasLoaded);
 
 		const skeletonLoader = isBinary ? new SkeletonBinary(atlasLoader) : new SkeletonJson(atlasLoader);
 		skeletonLoader.scale = scale;
@@ -170,44 +168,56 @@ export class SpineCanvasOverlay {
 		}
 		const bounds = this.calculateAnimationViewport(skeleton, animationData);
 
-		let list: Array<OverlayHTMLOptions>;
-		if (htmlOptionsList instanceof HTMLElement) htmlOptionsList = [htmlOptionsList] as Array<HTMLElement>;
-		if (htmlOptionsList instanceof NodeList) htmlOptionsList = Array.from(htmlOptionsList) as Array<HTMLElement>;
-		if ('element' in htmlOptionsList) htmlOptionsList = [htmlOptionsList] as Array<OverlayHTMLOptions>;
+		const halfDpi = window.devicePixelRatio / 2;
 
-		if (htmlOptionsList.length > 0 && htmlOptionsList[0] instanceof HTMLElement) {
-			list = htmlOptionsList.map(element => ({ element } as OverlayHTMLOptions));
-		} else {
-			list = htmlOptionsList as Array<OverlayHTMLOptions>;
+		const { identifier, createDivInElement = false, mode: givenMode, debug = false, offsetX = 0, offsetY = 0, xAxis = 0, yAxis = 0, draggable = false, } = htmlOptionsList[0];
+
+		const mode = givenMode ?? 'inside';
+
+		const el = document.querySelector(`spine[identifier="${identifier}"]`) as HTMLElement;
+		if (!el) {
+			throw new Error("Element not found with identifier: " + identifier);
 		}
 
-		const halfDpi = window.devicePixelRatio / 2;
-		const mapList = list.map(({ element, mode: givenMode, debug = false, offsetX = 0, offsetY = 0, xAxis = 0, yAxis = 0, draggable = false, }, i) => {
-			const mode = givenMode ?? 'inside';
-			if (mode == 'inside' && i > 0) {
-				console.warn("inside option works with multiple html elements only if the elements have the same dimension"
-					+ "This is because the skeleton is scaled to stay into the div."
-					+ "You can call addSkeleton several time (skeleton data can be reuse, if given).");
-			}
-			return {
-				element: element as HTMLElement,
-				mode,
-				debug,
-				offsetX,
-				offsetY,
-				xAxis,
-				yAxis,
-				draggable,
-				dragX: 0,
-				dragY: 0,
-				worldOffsetX: 0,
-				worldOffsetY: 0,
-				// change this name to something like initialScaleDpi
-				scaleDpi: halfDpi,
-				// scaleDpi: 1,
-				dragging: false,
-			}
-		});
+		let parent = el.parentElement;
+		if (createDivInElement) {
+			const width = el.getAttribute('width');
+			const height = el.getAttribute('height');
+			parent = el;
+			parent.style.width = `${width}px`;
+			parent.style.height = `${height}px`;
+			parent.style.display = 'block';
+			if (debug) parent.style.backgroundColor = "rgba(0, 0, 0, .5)";
+		}
+
+		if (!parent) {
+			throw new Error("Parent of element not found");
+		}
+
+		console.log(el)
+		console.log(parent)
+
+		const obj = {
+			element: parent,
+			createDivInElement,
+			mode,
+			debug,
+			offsetX,
+			offsetY,
+			xAxis,
+			yAxis,
+			draggable,
+			dragX: 0,
+			dragY: 0,
+			worldOffsetX: 0,
+			worldOffsetY: 0,
+			// change this name to something like initialScaleDpi
+			scaleDpi: halfDpi,
+			// scaleDpi: 1,
+			dragging: false,
+		}
+
+		const mapList = [obj];
 
 		skeleton.scaleX = halfDpi;
 		skeleton.scaleY = halfDpi;
@@ -312,6 +322,7 @@ export class SpineCanvasOverlay {
 						divBounds.x += this.overflowLeftSize;
 						divBounds.y += this.overflowTopSize;
 
+						const fit: "fill" | "fitWidth" | "fitHeight" | "contain" | "cover" | "none" | "scaleDown" = "scaleDown";
 						let x = 0, y = 0;
 						if (mode === 'inside') {
 							// scale ratio
@@ -319,16 +330,52 @@ export class SpineCanvasOverlay {
 							const scaleHeight = divBounds.height * devicePixelRatio / ah;
 
 							// attempt to use width ratio
-							let ratio = scaleWidth;
-							let scaledW = aw * ratio;
-							let scaledH = ah * ratio;
+							let ratioW = 1;
+							let ratioH = 1;
 
-							// if scaled height is bigger than div height, use height ratio instead
-							if (scaledH > divBounds.height * devicePixelRatio) ratio = scaleHeight;
+							if (fit === "fill") { // Fill the target box by distorting the source's aspect ratio.
+								ratioW = scaleWidth;
+								ratioH = scaleHeight;
+							} else if (fit === "fitWidth") {
+								ratioW = scaleWidth;
+								ratioH = scaleWidth;
+							} else if (fit === "fitHeight") {
+								ratioW = scaleHeight;
+								ratioH = scaleHeight;
+							} else if (fit === "contain") {
+								// if scaled height is bigger than div height, use height ratio instead
+								if (ah * scaleWidth > divBounds.height * devicePixelRatio){
+									ratioW = scaleHeight;
+									ratioH = scaleHeight;
+								} else {
+									ratioW = scaleWidth;
+									ratioH = scaleWidth;
+								}
+							} else if (fit === "cover") {
+								if (ah * scaleWidth < divBounds.height * devicePixelRatio){
+									ratioW = scaleHeight;
+									ratioH = scaleHeight;
+								} else {
+									ratioW = scaleWidth;
+									ratioH = scaleWidth;
+								}
+							} else if (fit === "scaleDown") {
+								if (aw > divBounds.width * devicePixelRatio || ah > divBounds.height * devicePixelRatio) {
+									if (ah * scaleWidth > divBounds.height * devicePixelRatio){
+										ratioW = scaleHeight;
+										ratioH = scaleHeight;
+									} else {
+										ratioW = scaleWidth;
+										ratioH = scaleWidth;
+									}
+								}
+							} else if (fit === "none") {
+
+							}
 
 							// get the center of the bounds
-							const boundsX = (ax + aw / 2) * ratio;
-							const boundsY = (ay + ah / 2) * ratio;
+							const boundsX = (ax + aw / 2) * ratioW;
+							const boundsY = (ay + ah / 2) * ratioH;
 
 							// get the center of the div in world coordinate
 							const divX = divBounds.x + divBounds.width / 2;
@@ -340,8 +387,8 @@ export class SpineCanvasOverlay {
 							y = tempVector.y - boundsY;
 
 							// scale the skeleton
-							skeleton.scaleX = ratio;
-							skeleton.scaleY = ratio;
+							skeleton.scaleX = ratioW;
+							skeleton.scaleY = ratioH;
 						} else {
 							// get the center of the div in world coordinate
 							const divX = divBounds.x + divBounds.width * xAxis;
