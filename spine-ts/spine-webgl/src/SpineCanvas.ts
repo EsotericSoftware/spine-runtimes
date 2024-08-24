@@ -110,7 +110,7 @@ export class SpineCanvas {
 
 		let waitForAssets = () => {
 			if (this.disposed) return;
-			if (this.assetManager.isLoadingComplete()) {
+			if (!config.app.loadAssets || this.assetManager.isLoadingComplete()) {
 				if (this.assetManager.hasErrors()) {
 					if (config.app.error) config.app.error(this, this.assetManager.getErrors());
 				} else {

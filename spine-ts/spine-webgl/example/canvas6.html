@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="../dist/iife/spine-webgl.js"></script>
-    <!-- <script src="./spine-webgl.js"></script> -->
+    <!-- <script src="./spine-webgl.min.js"></script> -->
     <title>JS Library Showcase</title>
     <style>
         * {
@@ -117,36 +117,6 @@
     </script>
 </head>
 <body>
-    <!--
-    /////////////////////
-    // start section 0 //
-    /////////////////////
-    -->
-
-    <!-- <div id="section0" class="section vertical-split">
-
-        <div class="split-top split">
-            <div class="split-left">
-                aaa
-            </div>
-            <div class="split-right" id="section0-element">
-                <spine identifier="section0" createDiv="true" width="220" height="50"/>
-            </div>
-        </div>
-
-
-        <div class="split-bottom">
-            <pre><code id="code-display">
-
-            </code></pre>
-        </div>
-    </div> -->
-
-    <!--
-    /////////////////////
-    // end section 0 //
-    /////////////////////
-    -->
 
     <!--
     /////////////////////
@@ -196,7 +166,6 @@
     -->
 
 
-
     <!--
     /////////////////////
     // start section 2 //
@@ -214,7 +183,6 @@
                         skeleton="assets/raptor-pro.skel"
                         animation="walk"
                         fit="fill"
-                        debug="true"
                     ></spine-widget>
                 </div>
                 <div class="split-right">
@@ -282,7 +250,52 @@
 
 
 
+    <!--
+    /////////////////////
+    // start section 1 //
+    /////////////////////
+    -->
 
+    <div id="section1" class="section vertical-split">
+
+        <div class="split-top split">
+            <div class="split-left">
+                <spine-widget
+                    atlas="assets/spineboy-pma.atlas"
+                    skeleton="assets/spineboy-pro.skel"
+                    animation="walk"
+                    height="200"
+                    width="200"
+                ></spine-widget>
+            </div>
+            <div class="split-right">
+                If you want to manually size the Spine widget, specify the attributes <code>width</code> and <code>height</code> in pixels (without the px unit).
+            </div>
+        </div>
+
+
+        <div class="split-bottom">
+            <pre><code id="code-display">
+                <script>
+                escapeHTMLandInject(`
+<spine-widget
+    atlas="assets/spineboy-pma.atlas"
+    skeleton="assets/spineboy-pro.skel"
+    animation="walk"
+    height="200"
+    width="200"
+    fit="fill"
+></spine-widget>`)
+                </script>
+            </code></pre>
+        </div>
+    </div>
+
+    <!--
+    /////////////////////
+    // end section 1 //
+    /////////////////////
+    -->
 
 
 
@@ -444,7 +457,7 @@
 
 // using js, access the skeleton and the state asynchronously
 (async () => {
-    const widget = document.querySelector("spine-widget[identifier=raptor]");
+    const widget = spine.getSpineWidget("raptor");
     const { state } = await widget.loadingPromise;
     let isRoaring = false;
     setInterval(() => {
@@ -506,6 +519,50 @@
     <!--
     /////////////////////
     // end section 6 //
+    /////////////////////
+    -->
+
+
+    <!--
+    /////////////////////
+    // start section 7 //
+    /////////////////////
+    -->
+
+    <div id="section7" class="section vertical-split">
+
+        <div class="split-top split">
+            <div class="split-left">
+                Set the desired skin by using the <code>skin</code> attribute.
+            </div>
+            <div class="split-right" id="section7-element">
+                <spine-widget
+                    atlas="assets/mix-and-match-pma.atlas"
+                    skeleton="assets/mix-and-match-pro.skel"
+                    animation="dance"
+                    skin="full-skins/girl-spring-dress"
+                ></spine-widget>
+            </div>
+        </div>
+
+        <div class="split-bottom">
+            <pre><code id="code-display">
+                <script>escapeHTMLandInject(`
+<spine-widget
+    atlas="assets/sack-pma.atlas"
+    skeleton="assets/sack-pro.skel"
+    animation="cape-follow-example"
+    debug="true"
+></spine-widget>`
+);</script>
+            </code></pre>
+        </div>
+
+    </div>
+
+    <!--
+    /////////////////////
+    // end section 7 //
     /////////////////////
     -->
 

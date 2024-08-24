@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="../dist/iife/spine-webgl.js"></script>
+    <!-- <script src="./spine-webgl.min.js"></script> -->
+    <title>JS Library Showcase</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .section {
+            /* height: 100lvh; */
+            /* height: 800px; */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            background-color: #3498db;
+        }
+        .split {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .full-width {
+            width: 100%;
+        }
+        .split-left, .split-right {
+            width: 50%;
+            min-height: 50%;
+            padding: 1rem;
+            margin: 1rem;
+            border: 1px solid salmon;
+        }
+        .split-nosize {
+            border: 1px solid salmon;
+        }
+        .split-size {
+            padding: 1rem;
+            margin: 1rem;
+        }
+        .navigation {
+            display: flex;
+            position: fixed;
+            left: 20px;
+            bottom: 20px;
+            transform: translateY(-50%);
+        }
+        .nav-btn {
+            display: block;
+            margin: 0px 5px;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border: none;
+            cursor: pointer;
+        }
+
+        .vertical-split {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .high-page {
+            height: 600px;
+        }
+
+        .split-top {
+            width: 100%;
+            height: 600px;
+        }
+
+        .split-bottom {
+            width: 100%;
+            /* height: 600px; */
+        }
+
+        .split-bottom {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            overflow: auto;
+        }
+
+        .split-bottom pre {
+            height: 100%;
+            margin: 0;
+        }
+
+        .split-bottom code {
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            display: block;
+            padding: 1rem;
+        }
+    </style>
+
+    <script>
+        function escapeHTMLandInject(text) {
+            const escaped = text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+            document.currentScript.parentElement.innerHTML = escaped;
+        }
+    </script>
+</head>
+<body>
+
+
+
+    <!--
+    /////////////////////
+    // start section 2 //
+    /////////////////////
+    -->
+
+    <div id="section1" class="section vertical-split">
+        <div class="full-width">
+
+            <div class="split">
+                <div class="split-left" style="height: 300px;">
+                    <spine-widget
+                        atlas="assets/raptor-pma.atlas"
+                        skeleton="assets/raptor-pro.json"
+                        animation="walk"
+                        scale=".125"
+                        fit="none"
+                    ></spine-widget>
+                </div>
+                <div class="split-right">
+                    You can change the fit mode of your Spine animation using the <code>fit</code> attribute.
+                    <br>
+                    <br>
+                    This is <code>fit="fill"</code>. Default fit value is <code>fit="contain"</code>.
+                </div>
+            </div>
+
+            <div class="split">
+                <div class="split-left" style="height: 300px;">
+                    <spine-widget
+                        atlas="assets/raptor-pma.atlas"
+                        skeleton="assets/raptor-pro.json"
+                        animation="walk"
+                        fit="fill"
+                    ></spine-widget>
+                </div>
+                <div class="split-right">
+                    If you want to preserve the original scale, you can use the <code>fit="none"</code>.
+                    In combination with that, you can use the <code>scale</code> attribute to choose you desired scale.
+                    <br>
+                    <br>
+                    Other fit modes are <code>fitWidth</code>, <code>fitWidth</code>, <code>fitHeight</code>, <code>cover</code>,and <code>scaleDown</code>.
+                </div>
+            </div>
+
+        </div>
+
+
+
+
+        <div class="split-bottom">
+            <pre><code id="code-display">
+                <script>
+                escapeHTMLandInject(`
+<spine-widget
+    atlas="assets/raptor-pma.atlas"
+    skeleton="assets/raptor-pro.skel"
+    animation="walk"
+    fit="fill"
+></spine-widget>
+
+<spine-widget
+    atlas="assets/raptor-pma.atlas"
+    skeleton="assets/raptor-pro.skel"
+    animation="walk"
+    scale=".125"
+    fit="none"
+></spine-widget>`)
+                </script>
+            </code></pre>
+        </div>
+    </div>
+
+    <!--
+    /////////////////////
+    // end section 2 //
+    /////////////////////
+    -->
+
+
+</body>
+</html>
