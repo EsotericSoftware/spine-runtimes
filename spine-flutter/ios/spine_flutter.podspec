@@ -19,7 +19,7 @@ A new Flutter FFI plugin project.
   # `../src/*` so that the C sources can be shared among all target platforms.
   s.source           = { :path => '.' }
   s.source_files     = 'Classes/**/*.{cpp}'
-  s.xcconfig = { 'HEADER_SEARCH_PATHS' => '"' + __dir__ + '/Classes/spine-cpp/include"' }
+  s.xcconfig = { 'HEADER_SEARCH_PATHS' => '"$(PODS_TARGET_SRCROOT)/Classes/spine-cpp/include"' }
   s.dependency 'Flutter'
   s.platform = :ios, '9.0'
 
