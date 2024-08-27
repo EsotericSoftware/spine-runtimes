@@ -153,11 +153,12 @@ public class Bone implements Updatable {
 			break;
 		}
 		case noRotationOrReflection: {
+			float sx = 1 / skeleton.scaleX, sy = 1 / skeleton.scaleY;
+			pa *= sx;
+			pc *= sy;
 			float s = pa * pa + pc * pc, prx;
 			if (s > 0.0001f) {
-				s = Math.abs(pa * pd - pb * pc) / s;
-				pa /= skeleton.scaleX;
-				pc /= skeleton.scaleY;
+				s = Math.abs(pa * pd * sy - pb * sx * pc) / s;
 				pb = pc * s;
 				pd = pa * s;
 				prx = atan2Deg(pc, pa);
@@ -441,10 +442,8 @@ public class Bone implements Updatable {
 			switch (inherit) {
 			case noRotationOrReflection: {
 				float s = Math.abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
-				float sa = pa / skeleton.scaleX;
-				float sc = pc / skeleton.scaleY;
-				pb = -sc * s * skeleton.scaleX;
-				pd = sa * s * skeleton.scaleY;
+				pb = -pc * skeleton.scaleX * s / skeleton.scaleY;
+				pd = pa * skeleton.scaleY * s / skeleton.scaleX;
 				pid = 1 / (pa * pd - pb * pc);
 				ia = pd * pid;
 				ib = pb * pid;
