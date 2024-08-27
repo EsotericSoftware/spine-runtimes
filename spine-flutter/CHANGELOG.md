@@ -1,3 +1,6 @@
+# 4.2.32
+- Fix spine-flutter spec checksum in `Podfile.lock`, keeping version control cleaner. See https://github.com/EsotericSoftware/spine-runtimes/pull/2609
+
 # 4.2.31
 - Fix bug in IKConstraint leading to NaNs.
 
