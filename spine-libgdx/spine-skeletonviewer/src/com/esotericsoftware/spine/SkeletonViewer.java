@@ -378,7 +378,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 		float dpiScale = 1;
 		if (os.contains("Windows")) dpiScale = Toolkit.getDefaultToolkit().getScreenResolution() / 96f;
 		if (os.contains("OS X")) {
-			Configuration.GLFW_CHECK_THREAD0.set(false);
+			Configuration.GLFW_CHECK_THREAD0.set(Boolean.FALSE);
 			Configuration.GLFW_LIBRARY_NAME.set("glfw_async");
 			Object object = Toolkit.getDefaultToolkit().getDesktopProperty("apple.awt.contentScaleFactor");
 			if (object instanceof Float && ((Float)object).intValue() >= 2) dpiScale = 2;
