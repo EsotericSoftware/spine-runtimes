@@ -7,13 +7,13 @@
     <!-- <script src="./spine-webgl.min.js"></script> -->
     <title>JS Library Showcase</title>
     <style>
-        * {
+        body {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
         html {
-            scroll-behavior: smooth;
+            /* scroll-behavior: smooth; */
         }
         body {
             font-family: Arial, sans-serif;
@@ -102,8 +102,22 @@
             display: block;
             padding: 1rem;
         }
-    </style>
 
+        .skin-grid {
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: space-evenly;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .skin-grid-element {
+            border: 1px solid #ccc;
+            width: 150px;
+            aspect-ratio: 3 / 3;
+        }
+    </style>
     <script>
         function escapeHTMLandInject(text) {
             const escaped = text
@@ -118,86 +132,274 @@
 </head>
 <body>
 
+    <div style="height: 1200px; flex-direction: column;">
+    </div>
 
 
     <!--
     /////////////////////
-    // start section 2 //
+    // start section 7 //
     /////////////////////
     -->
-
     <div id="section1" class="section vertical-split">
-        <div class="full-width">
 
-            <div class="split">
-                <div class="split-left" style="height: 300px;">
+        <div class="split" style="width: 100%; flex-direction: column;">
+
+            <div class="split-left" style="width: 80%; box-sizing: border-box;">
+                If you have many atlas pages, for example one for each skin, and you want to show only some of the skins,
+                pass to the <code>pages</code> the atlas pages you want to load as a comma concatenated list of indices.
+            </div>
+
+            <div class="skin-grid">
+                <div class="skin-grid-element">
                     <spine-widget
-                        atlas="assets/raptor-pma.atlas"
-                        skeleton="assets/raptor-pro.json"
-                        animation="walk"
-                        scale=".125"
-                        fit="none"
+                        atlas="assets/chibi-stickers-pma.atlas"
+                        skeleton="assets/chibi-stickers.skel"
+                        animation="emotes/wave"
+                        skin="nate"
+                        pages="0,1,4,6"
                     ></spine-widget>
                 </div>
-                <div class="split-right">
-                    You can change the fit mode of your Spine animation using the <code>fit</code> attribute.
-                    <br>
-                    <br>
-                    This is <code>fit="fill"</code>. Default fit value is <code>fit="contain"</code>.
+                <div class="skin-grid-element">
+                    <spine-widget
+                        atlas="assets/chibi-stickers-pma.atlas"
+                        skeleton="assets/chibi-stickers.skel"
+                        animation="movement/trot-left"
+                        skin="nate"
+                        pages="0,1,4,6"
+                    ></spine-widget>
+                </div>
+                <div class="skin-grid-element">
+                    <spine-widget
+                        atlas="assets/chibi-stickers-pma.atlas"
+                        skeleton="assets/chibi-stickers.skel"
+                        animation="emotes/idea"
+                        skin="nate"
+                        pages="0,1,4,6"
+                    ></spine-widget>
+                </div>
+                <div class="skin-grid-element">
+                    <spine-widget
+                        atlas="assets/chibi-stickers-pma.atlas"
+                        skeleton="assets/chibi-stickers.skel"
+                        animation="emotes/hooray"
+                        skin="nate"
+                        pages="0,1,4,6"
+                    ></spine-widget>
                 </div>
             </div>
 
-            <div class="split">
-                <div class="split-left" style="height: 300px;">
+            <div class="skin-grid">
+                <div class="skin-grid-element">
                     <spine-widget
-                        atlas="assets/raptor-pma.atlas"
-                        skeleton="assets/raptor-pro.json"
-                        animation="walk"
-                        fit="fill"
+                        atlas="assets/chibi-stickers-pma.atlas"
+                        skeleton="assets/chibi-stickers.skel"
+                        animation="emotes/wave"
+                        skin="erikari"
+                        pages="0,1,4,6"
                     ></spine-widget>
                 </div>
-                <div class="split-right">
-                    If you want to preserve the original scale, you can use the <code>fit="none"</code>.
-                    In combination with that, you can use the <code>scale</code> attribute to choose you desired scale.
-                    <br>
-                    <br>
-                    Other fit modes are <code>fitWidth</code>, <code>fitWidth</code>, <code>fitHeight</code>, <code>cover</code>,and <code>scaleDown</code>.
+                <div class="skin-grid-element">
+                    <spine-widget
+                        atlas="assets/chibi-stickers-pma.atlas"
+                        skeleton="assets/chibi-stickers.skel"
+                        animation="movement/trot-left"
+                        skin="erikari"
+                        pages="0,1,4,6"
+                    ></spine-widget>
+                </div>
+                <div class="skin-grid-element">
+                    <spine-widget
+                        atlas="assets/chibi-stickers-pma.atlas"
+                        skeleton="assets/chibi-stickers.skel"
+                        animation="emotes/idea"
+                        skin="erikari"
+                        pages="0,1,4,6"
+                    ></spine-widget>
+                </div>
+                <div class="skin-grid-element">
+                    <spine-widget
+                        atlas="assets/chibi-stickers-pma.atlas"
+                        skeleton="assets/chibi-stickers.skel"
+                        animation="emotes/hooray"
+                        skin="erikari"
+                        pages="0,1,4,6"
+                    ></spine-widget>
+                </div>
+            </div>
+
+            <div class="skin-grid">
+                <div class="skin-grid-element">
+                    <spine-widget
+                        atlas="assets/chibi-stickers-pma.atlas"
+                        skeleton="assets/chibi-stickers.skel"
+                        animation="emotes/wave"
+                        skin="mario"
+                        pages="0,1,4,6"
+                    ></spine-widget>
+                </div>
+                <div class="skin-grid-element">
+                    <spine-widget
+                        atlas="assets/chibi-stickers-pma.atlas"
+                        skeleton="assets/chibi-stickers.skel"
+                        animation="movement/trot-left"
+                        skin="mario"
+                        pages="0,1,4,6"
+                    ></spine-widget>
+                </div>
+                <div class="skin-grid-element">
+                    <spine-widget
+                        atlas="assets/chibi-stickers-pma.atlas"
+                        skeleton="assets/chibi-stickers.skel"
+                        animation="emotes/idea"
+                        skin="mario"
+                        pages="0,1,4,6"
+                    ></spine-widget>
+                </div>
+                <div class="skin-grid-element">
+                    <spine-widget
+                        atlas="assets/chibi-stickers-pma.atlas"
+                        skeleton="assets/chibi-stickers.skel"
+                        animation="emotes/hooray"
+                        skin="mario"
+                        pages="0,1,4,6"
+                    ></spine-widget>
                 </div>
             </div>
 
         </div>
-
-
-
 
         <div class="split-bottom">
             <pre><code id="code-display">
                 <script>
                 escapeHTMLandInject(`
-<spine-widget
-    atlas="assets/raptor-pma.atlas"
-    skeleton="assets/raptor-pro.skel"
-    animation="walk"
-    fit="fill"
-></spine-widget>
+<div class="skin-grid">
+    <div class="skin-grid-element">
+        <spine-widget
+            atlas="assets/chibi-stickers-pma.atlas"
+            skeleton="assets/chibi-stickers.skel"
+            animation="emotes/wave"
+            skin="nate"
+            pages="0,1,4,6"
+        ></spine-widget>
+    </div>
+    <div class="skin-grid-element">
+        <spine-widget
+            atlas="assets/chibi-stickers-pma.atlas"
+            skeleton="assets/chibi-stickers.skel"
+            animation="movement/trot-left"
+            skin="nate"
+            pages="0,1,4,6"
+        ></spine-widget>
+    </div>
+    <div class="skin-grid-element">
+        <spine-widget
+            atlas="assets/chibi-stickers-pma.atlas"
+            skeleton="assets/chibi-stickers.skel"
+            animation="emotes/idea"
+            skin="nate"
+            pages="0,1,4,6"
+        ></spine-widget>
+    </div>
+    <div class="skin-grid-element">
+        <spine-widget
+            atlas="assets/chibi-stickers-pma.atlas"
+            skeleton="assets/chibi-stickers.skel"
+            animation="emotes/hooray"
+            skin="nate"
+            pages="0,1,4,6"
+        ></spine-widget>
+    </div>
+</div>
 
-<spine-widget
-    atlas="assets/raptor-pma.atlas"
-    skeleton="assets/raptor-pro.skel"
-    animation="walk"
-    scale=".125"
-    fit="none"
-></spine-widget>`)
+<div class="skin-grid">
+    <div class="skin-grid-element">
+        <spine-widget
+            atlas="assets/chibi-stickers-pma.atlas"
+            skeleton="assets/chibi-stickers.skel"
+            animation="emotes/wave"
+            skin="erikari"
+            pages="0,1,4,6"
+        ></spine-widget>
+    </div>
+    <div class="skin-grid-element">
+        <spine-widget
+            atlas="assets/chibi-stickers-pma.atlas"
+            skeleton="assets/chibi-stickers.skel"
+            animation="movement/trot-left"
+            skin="erikari"
+            pages="0,1,4,6"
+        ></spine-widget>
+    </div>
+    <div class="skin-grid-element">
+        <spine-widget
+            atlas="assets/chibi-stickers-pma.atlas"
+            skeleton="assets/chibi-stickers.skel"
+            animation="emotes/idea"
+            skin="erikari"
+            pages="0,1,4,6"
+        ></spine-widget>
+    </div>
+    <div class="skin-grid-element">
+        <spine-widget
+            atlas="assets/chibi-stickers-pma.atlas"
+            skeleton="assets/chibi-stickers.skel"
+            animation="emotes/hooray"
+            skin="erikari"
+            pages="0,1,4,6"
+        ></spine-widget>
+    </div>
+</div>
+
+<div class="skin-grid">
+    <div class="skin-grid-element">
+        <spine-widget
+            atlas="assets/chibi-stickers-pma.atlas"
+            skeleton="assets/chibi-stickers.skel"
+            animation="emotes/wave"
+            skin="mario"
+            pages="0,1,4,6"
+        ></spine-widget>
+    </div>
+    <div class="skin-grid-element">
+        <spine-widget
+            atlas="assets/chibi-stickers-pma.atlas"
+            skeleton="assets/chibi-stickers.skel"
+            animation="movement/trot-left"
+            skin="mario"
+            pages="0,1,4,6"
+        ></spine-widget>
+    </div>
+    <div class="skin-grid-element">
+        <spine-widget
+            atlas="assets/chibi-stickers-pma.atlas"
+            skeleton="assets/chibi-stickers.skel"
+            animation="emotes/idea"
+            skin="mario"
+            pages="0,1,4,6"
+        ></spine-widget>
+    </div>
+    <div class="skin-grid-element">
+        <spine-widget
+            atlas="assets/chibi-stickers-pma.atlas"
+            skeleton="assets/chibi-stickers.skel"
+            animation="emotes/hooray"
+            skin="mario"
+            pages="0,1,4,6"
+        ></spine-widget>
+    </div>
+</div>`)
                 </script>
             </code></pre>
         </div>
     </div>
-
     <!--
     /////////////////////
-    // end section 2 //
+    // end section 7 //
     /////////////////////
     -->
+
+
 
 
 </body>

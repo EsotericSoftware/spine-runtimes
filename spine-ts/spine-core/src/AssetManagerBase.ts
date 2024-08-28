@@ -94,6 +94,7 @@ export class AssetManagerBase implements Disposable {
 
 		this.assetsLoaded[path] = new Promise<any>((resolve, reject) => {
 			this.downloader.downloadBinary(path, (data: Uint8Array): void => {
+				// setTimeout(() => this.success(success, path, data), 10000);
 				this.success(success, path, data);
 				resolve(data);
 			}, (status: number, responseText: string): void => {
@@ -181,8 +182,7 @@ export class AssetManagerBase implements Disposable {
 					image.onload = () => {
 						const texture = this.textureLoader(image)
 						this.success(success, path, texture);
-						setTimeout(() => resolve(texture), 1000)
-						// resolve(texture);
+						resolve(texture);
 					};
 					image.onerror = () => {
 						const errorMsg = `Couldn't load image: ${path}`;
@@ -204,29 +204,72 @@ export class AssetManagerBase implements Disposable {
 		let parent = index >= 0 ? path.substring(0, index + 1) : "";
 		path = this.start(path);
 
-		this.downloader.downloadText(path, (atlasText: string): void => {
-			try {
-				let atlas = new TextureAtlas(atlasText);
-				let toLoad = atlas.pages.length, abort = false;
-				for (let page of atlas.pages) {
-					this.loadTexture(!fileAlias ? parent + page.name : fileAlias[page.name!],
-						(imagePath: string, texture: Texture) => {
-							if (!abort) {
-								page.setTexture(texture);
-								if (--toLoad == 0) this.success(success, path, atlas);
+		if (this.reuseAssets(path, success, error)) return;
+
+		this.assetsLoaded[path] = new Promise<any>((resolve, reject) => {
+			this.downloader.downloadText(path, (atlasText: string): void => {
+				try {
+					let atlas = new TextureAtlas(atlasText);
+					let toLoad = atlas.pages.length, abort = false;
+					for (let page of atlas.pages) {
+						this.loadTexture(!fileAlias ? parent + page.name : fileAlias[page.name!],
+							(imagePath: string, texture: Texture) => {
+								if (!abort) {
+									page.setTexture(texture);
+									if (--toLoad == 0) {
+										this.success(success, path, atlas);
+										resolve(atlas);
+									}
+								}
+							},
+							(imagePath: string, message: string) => {
+								if (!abort) {
+									const errorMsg = `Couldn't load texture atlas ${path} page image: ${imagePath}`;
+									this.error(error, path, errorMsg);
+									reject(errorMsg);
+								}
+								abort = true;
 							}
-						},
-						(imagePath: string, message: string) => {
-							if (!abort) this.error(error, path, `Couldn't load texture atlas ${path} page image: ${imagePath}`);
-							abort = true;
-						}
-					);
+						);
+					}
+				} catch (e) {
+					const errorMsg = `Couldn't parse texture atlas ${path}: ${(e as any).message}`;
+					this.error(error, path, errorMsg);
+					reject(errorMsg);
 				}
-			} catch (e) {
-				this.error(error, path, `Couldn't parse texture atlas ${path}: ${(e as any).message}`);
-			}
-		}, (status: number, responseText: string): void => {
-			this.error(error, path, `Couldn't load texture atlas ${path}: status ${status}, ${responseText}`);
+			}, (status: number, responseText: string): void => {
+				const errorMsg = `Couldn't load texture atlas ${path}: status ${status}, ${responseText}`;
+				this.error(error, path, errorMsg);
+				reject(errorMsg);
+			});
+		});
+	}
+
+	loadTextureAtlasButNoTextures (path: string,
+		success: (path: string, atlas: TextureAtlas) => void = () => { },
+		error: (path: string, message: string) => void = () => { },
+		fileAlias?: { [keyword: string]: string }
+	) {
+		path = this.start(path);
+
+		if (this.reuseAssets(path, success, error)) return;
+
+		this.assetsLoaded[path] = new Promise<any>((resolve, reject) => {
+			this.downloader.downloadText(path, (atlasText: string): void => {
+				try {
+					const atlas = new TextureAtlas(atlasText);
+					this.success(success, path, atlas);
+					resolve(atlas);
+				} catch (e) {
+					const errorMsg = `Couldn't parse texture atlas ${path}: ${(e as any).message}`;
+					this.error(error, path, errorMsg);
+					reject(errorMsg);
+				}
+			}, (status: number, responseText: string): void => {
+				const errorMsg = `Couldn't load texture atlas ${path}: status ${status}, ${responseText}`;
+				this.error(error, path, errorMsg);
+				reject(errorMsg);
+			});
 		});
 	}
 

@@ -4,6 +4,7 @@ export * from "./CameraController.js";
 export * from "./GLTexture.js";
 export * from "./Input.js";
 export * from "./LoadingScreen.js";
+export * from "./LoadingScreenWidget.js";
 export * from "./Matrix4.js";
 export * from "./Mesh.js";
 export * from "./PolygonBatcher.js";

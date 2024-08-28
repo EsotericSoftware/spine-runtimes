@@ -7,13 +7,13 @@
     <!-- <script src="./spine-webgl.min.js"></script> -->
     <title>JS Library Showcase</title>
     <style>
-        * {
+        body {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
         html {
-            scroll-behavior: smooth;
+            /* scroll-behavior: smooth; */
         }
         body {
             font-family: Arial, sans-serif;
@@ -101,6 +101,21 @@
             line-height: 1.5;
             display: block;
             padding: 1rem;
+        }
+
+        .skin-grid {
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: space-evenly;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .skin-grid-element {
+            border: 1px solid #ccc;
+            width: 150px;
+            aspect-ratio: 3 / 3;
         }
     </style>
 
@@ -487,13 +502,12 @@
     -->
 
     <div id="section6" class="section vertical-split">
-
-        <div class="full-width high-page" style="padding: 1em;">
-            <div class="split-nosize" style="padding: 1em; margin-bottom: 1em;">
+        <div class="split high-page" style="flex-direction: column;">
+            <div class="split-nosize full-width" style="width: 80%; padding: 1em;">
                 Moving the div will move the skeleton origin. <br>
                 Resizing the div will resize the skeleton in <code>inside</code> mode, but not in <code>origin</code> mode.
             </div>
-            <div class="split-nosize" style="width: 100%; height: 50%;" id="section6-element">
+            <div class="split-nosize full-width" style="width: 80%; height: 50%; margin: 1em; padding: 1em;" id="section6-element">
                 <spine-widget
                     atlas="assets/cloud-pot-pma.atlas"
                     skeleton="assets/cloud-pot.skel"
@@ -521,51 +535,6 @@
     // end section 6 //
     /////////////////////
     -->
-
-
-    <!--
-    /////////////////////
-    // start section 7 //
-    /////////////////////
-    -->
-
-    <div id="section7" class="section vertical-split">
-
-        <div class="split-top split">
-            <div class="split-left">
-                Set the desired skin by using the <code>skin</code> attribute.
-            </div>
-            <div class="split-right" id="section7-element">
-                <spine-widget
-                    atlas="assets/mix-and-match-pma.atlas"
-                    skeleton="assets/mix-and-match-pro.skel"
-                    animation="dance"
-                    skin="full-skins/girl-spring-dress"
-                ></spine-widget>
-            </div>
-        </div>
-
-        <div class="split-bottom">
-            <pre><code id="code-display">
-                <script>escapeHTMLandInject(`
-<spine-widget
-    atlas="assets/sack-pma.atlas"
-    skeleton="assets/sack-pro.skel"
-    animation="cape-follow-example"
-    debug="true"
-></spine-widget>`
-);</script>
-            </code></pre>
-        </div>
-
-    </div>
-
-    <!--
-    /////////////////////
-    // end section 7 //
-    /////////////////////
-    -->
-
 
 
     <!--
@@ -610,6 +579,886 @@
     // end section 7 //
     /////////////////////
     -->
+
+
+
+    <!--
+    /////////////////////
+    // start section 7 //
+    /////////////////////
+    -->
+    <div id="section1" class="section vertical-split">
+
+        <div class="split-top split">
+            <div class="split-left">
+                <spine-widget
+                    identifier="widget-loading"
+                    atlas="assets/spineboy-pma.atlas"
+                    skeleton="assets/spineboy-pro.skel"
+                    animation="walk"
+                    spinner="false"
+                ></spine-widget>
+            </div>
+            <div class="split-right">
+                A loading spinner is shown during assets loading. Click the button below to simulate a 2 seconds loading:
+                <br>
+                <br>
+                <input type="button" value="Simulate reload" onclick="reloadWidget(this)">
+                <br>
+                <br>
+                If you do not want to show the loading spinner, set <code>spinner="false"</code>.
+                <br>
+                Click the button below to toggle the spinner.
+                <br>
+                <br>
+                <input type="button" value="Spinner ON" onclick="toggleSpinner(this)">
+            </div>
+        </div>
+
+        <script>
+            const widget = spine.getSpineWidget("widget-loading");
+            async function reloadWidget(element) {
+                element.disabled = true;
+                await widget.loadingPromise;
+                const skeleton = widget.skeleton;
+                widget.skeleton = null;
+                setTimeout(() => {
+                    element.disabled = false;
+                    widget.skeleton = skeleton;
+                }, 1000)
+            }
+            function toggleSpinner(element) {
+                widget.loadingSpinner = !widget.loadingSpinner;
+                element.value = widget.loadingSpinner ? "Spinner ON" : "Spinner OFF";
+            }
+        </script>
+
+        <div class="split-bottom">
+            <pre><code id="code-display">
+                <script>
+                escapeHTMLandInject(`
+<spine-widget
+    atlas="assets/spineboy-pma.atlas"
+    skeleton="assets/spineboy-pro.skel"
+    animation="walk"
+    spinner="true"
+></spine-widget>`)
+                </script>
+            </code></pre>
+        </div>
+    </div>
+    <!--
+    /////////////////////
+    // end section 7 //
+    /////////////////////
+    -->
+
+
+
+    <!--
+    /////////////////////
+    // start section 7 //
+    /////////////////////
+    -->
+    <div id="section1" class="section vertical-split">
+
+        <div class="split" style="width: 100%; flex-direction: column;">
+
+            <div class="split-left" style="width: 80%; box-sizing: border-box;">
+                It's super easy to show your different skins and animations. Just make a table and use the <code>skin</code> and <code>animation</code> attributes.
+            </div>
+
+            <div class="skin-grid">
+                <div class="skin-grid-element">
+                    <spine-widget
+                        atlas="assets/mix-and-match-pma.atlas"
+                        skeleton="assets/mix-and-match-pro.skel"
+                        animation="idle"
+                        skin="full-skins/girl-spring-dress"
+                    ></spine-widget>
+                </div>
+                <div class="skin-grid-element">
+                    <spine-widget
+                        atlas="assets/mix-and-match-pma.atlas"
+                        skeleton="assets/mix-and-match-pro.skel"
+                        animation="dance"
+                        skin="full-skins/girl-spring-dress"
+                    ></spine-widget>
+                </div>
+                <div class="skin-grid-element">
+                    <spine-widget
+                        atlas="assets/mix-and-match-pma.atlas"
+                        skeleton="assets/mix-and-match-pro.skel"
+                        animation="dress-up"
+                        skin="full-skins/girl-spring-dress"
+                    ></spine-widget>
+                </div>
+                <div class="skin-grid-element">
+                    <spine-widget
+                        atlas="assets/mix-and-match-pma.atlas"
+                        skeleton="assets/mix-and-match-pro.skel"
+                        animation="walk"
+                        skin="full-skins/girl-spring-dress"
+                    ></spine-widget>
+                </div>
+            </div>
+
+            <div class="skin-grid">
+                <div class="skin-grid-element">
+                    <spine-widget
+                        atlas="assets/mix-and-match-pma.atlas"
+                        skeleton="assets/mix-and-match-pro.skel"
+                        animation="idle"
+                        skin="full-skins/girl-blue-cape"
+                    ></spine-widget>
+                </div>
+                <div class="skin-grid-element">
+                    <spine-widget
+                        atlas="assets/mix-and-match-pma.atlas"
+                        skeleton="assets/mix-and-match-pro.skel"
+                        animation="dance"
+                        skin="full-skins/girl-blue-cape"
+                    ></spine-widget>
+                </div>
+                <div class="skin-grid-element">
+                    <spine-widget
+                        atlas="assets/mix-and-match-pma.atlas"
+                        skeleton="assets/mix-and-match-pro.skel"
+                        animation="dress-up"
+                        skin="full-skins/girl-blue-cape"
+                    ></spine-widget>
+                </div>
+                <div class="skin-grid-element">
+                    <spine-widget
+                        atlas="assets/mix-and-match-pma.atlas"
+                        skeleton="assets/mix-and-match-pro.skel"
+                        animation="walk"
+                        skin="full-skins/girl-blue-cape"
+                    ></spine-widget>
+                </div>
+            </div>
+
+            <div class="skin-grid">
+                <div class="skin-grid-element">
+                    <spine-widget
+                        atlas="assets/mix-and-match-pma.atlas"
+                        skeleton="assets/mix-and-match-pro.skel"
+                        animation="idle"
+                        skin="full-skins/girl"
+                    ></spine-widget>
+                </div>
+                <div class="skin-grid-element">
+                    <spine-widget
+                        atlas="assets/mix-and-match-pma.atlas"
+                        skeleton="assets/mix-and-match-pro.skel"
+                        animation="dance"
+                        skin="full-skins/girl"
+                    ></spine-widget>
+                </div>
+                <div class="skin-grid-element">
+                    <spine-widget
+                        atlas="assets/mix-and-match-pma.atlas"
+                        skeleton="assets/mix-and-match-pro.skel"
+                        animation="dress-up"
+                        skin="full-skins/girl"
+                    ></spine-widget>
+                </div>
+                <div class="skin-grid-element">
+                    <spine-widget
+                        atlas="assets/mix-and-match-pma.atlas"
+                        skeleton="assets/mix-and-match-pro.skel"
+                        animation="walk"
+                        skin="full-skins/girl"
+                    ></spine-widget>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="split-bottom">
+            <pre><code id="code-display">
+                <script>
+                escapeHTMLandInject(`
+<div class="skin-grid">
+    <div class="skin-grid-element">
+        <spine-widget
+            atlas="assets/mix-and-match-pma.atlas"
+            skeleton="assets/mix-and-match-pro.skel"
+            animation="idle"
+            skin="full-skins/girl-spring-dress"
+        ></spine-widget>
+    </div>
+    <div class="skin-grid-element">
+        <spine-widget
+            atlas="assets/mix-and-match-pma.atlas"
+            skeleton="assets/mix-and-match-pro.skel"
+            animation="dance"
+            skin="full-skins/girl-spring-dress"
+        ></spine-widget>
+    </div>
+    <div class="skin-grid-element">
+        <spine-widget
+            atlas="assets/mix-and-match-pma.atlas"
+            skeleton="assets/mix-and-match-pro.skel"
+            animation="dress-up"
+            skin="full-skins/girl-spring-dress"
+        ></spine-widget>
+    </div>
+    <div class="skin-grid-element">
+        <spine-widget
+            atlas="assets/mix-and-match-pma.atlas"
+            skeleton="assets/mix-and-match-pro.skel"
+            animation="walk"
+            skin="full-skins/girl-spring-dress"
+        ></spine-widget>
+    </div>
+</div>
+
+<div class="skin-grid">
+    <div class="skin-grid-element">
+        <spine-widget
+            atlas="assets/mix-and-match-pma.atlas"
+            skeleton="assets/mix-and-match-pro.skel"
+            animation="idle"
+            skin="full-skins/girl-blue-cape"
+        ></spine-widget>
+    </div>
+    <div class="skin-grid-element">
+        <spine-widget
+            atlas="assets/mix-and-match-pma.atlas"
+            skeleton="assets/mix-and-match-pro.skel"
+            animation="dance"
+            skin="full-skins/girl-blue-cape"
+        ></spine-widget>
+    </div>
+    <div class="skin-grid-element">
+        <spine-widget
+            atlas="assets/mix-and-match-pma.atlas"
+            skeleton="assets/mix-and-match-pro.skel"
+            animation="dress-up"
+            skin="full-skins/girl-blue-cape"
+        ></spine-widget>
+    </div>
+    <div class="skin-grid-element">
+        <spine-widget
+            atlas="assets/mix-and-match-pma.atlas"
+            skeleton="assets/mix-and-match-pro.skel"
+            animation="walk"
+            skin="full-skins/girl-blue-cape"
+        ></spine-widget>
+    </div>
+</div>
+
+<div class="skin-grid">
+    <div class="skin-grid-element">
+        <spine-widget
+            atlas="assets/mix-and-match-pma.atlas"
+            skeleton="assets/mix-and-match-pro.skel"
+            animation="idle"
+            skin="full-skins/girl"
+        ></spine-widget>
+    </div>
+    <div class="skin-grid-element">
+        <spine-widget
+            atlas="assets/mix-and-match-pma.atlas"
+            skeleton="assets/mix-and-match-pro.skel"
+            animation="dance"
+            skin="full-skins/girl"
+        ></spine-widget>
+    </div>
+    <div class="skin-grid-element">
+        <spine-widget
+            atlas="assets/mix-and-match-pma.atlas"
+            skeleton="assets/mix-and-match-pro.skel"
+            animation="dress-up"
+            skin="full-skins/girl"
+        ></spine-widget>
+    </div>
+    <div class="skin-grid-element">
+        <spine-widget
+            atlas="assets/mix-and-match-pma.atlas"
+            skeleton="assets/mix-and-match-pro.skel"
+            animation="walk"
+            skin="full-skins/girl"
+        ></spine-widget>
+    </div>
+</div>`)
+                </script>
+            </code></pre>
+        </div>
+    </div>
+    <!--
+    /////////////////////
+    // end section 7 //
+    /////////////////////
+    -->
+
+
+
+
+    <!--
+    /////////////////////
+    // start section 7 //
+    /////////////////////
+    -->
+    <div id="section1" class="section vertical-split">
+
+        <div class="split" style="width: 100%; flex-direction: column;">
+
+            <div class="split-left" style="width: 80%; box-sizing: border-box;">
+                If you have many atlas pages, for example one for each skin, and you want to show only some of the skins,
+                pass to the <code>pages</code> the atlas pages you want to load as a comma concatenated list of indices.
+            </div>
+
+            <div class="skin-grid">
+                <div class="skin-grid-element">
+                    <spine-widget
+                        atlas="assets/chibi-stickers-pma.atlas"
+                        skeleton="assets/chibi-stickers.skel"
+                        animation="emotes/wave"
+                        skin="nate"
+                        pages="0,1,4,6"
+                    ></spine-widget>
+                </div>
+                <div class="skin-grid-element">
+                    <spine-widget
+                        atlas="assets/chibi-stickers-pma.atlas"
+                        skeleton="assets/chibi-stickers.skel"
+                        animation="movement/trot-left"
+                        skin="nate"
+                        pages="0,1,4,6"
+                    ></spine-widget>
+                </div>
+                <div class="skin-grid-element">
+                    <spine-widget
+                        atlas="assets/chibi-stickers-pma.atlas"
+                        skeleton="assets/chibi-stickers.skel"
+                        animation="emotes/idea"
+                        skin="nate"
+                        pages="0,1,4,6"
+                    ></spine-widget>
+                </div>
+                <div class="skin-grid-element">
+                    <spine-widget
+                        atlas="assets/chibi-stickers-pma.atlas"
+                        skeleton="assets/chibi-stickers.skel"
+                        animation="emotes/hooray"
+                        skin="nate"
+                        pages="0,1,4,6"
+                    ></spine-widget>
+                </div>
+            </div>
+
+            <div class="skin-grid">
+                <div class="skin-grid-element">
+                    <spine-widget
+                        atlas="assets/chibi-stickers-pma.atlas"
+                        skeleton="assets/chibi-stickers.skel"
+                        animation="emotes/wave"
+                        skin="erikari"
+                        pages="0,1,4,6"
+                    ></spine-widget>
+                </div>
+                <div class="skin-grid-element">
+                    <spine-widget
+                        atlas="assets/chibi-stickers-pma.atlas"
+                        skeleton="assets/chibi-stickers.skel"
+                        animation="movement/trot-left"
+                        skin="erikari"
+                        pages="0,1,4,6"
+                    ></spine-widget>
+                </div>
+                <div class="skin-grid-element">
+                    <spine-widget
+                        atlas="assets/chibi-stickers-pma.atlas"
+                        skeleton="assets/chibi-stickers.skel"
+                        animation="emotes/idea"
+                        skin="erikari"
+                        pages="0,1,4,6"
+                    ></spine-widget>
+                </div>
+                <div class="skin-grid-element">
+                    <spine-widget
+                        atlas="assets/chibi-stickers-pma.atlas"
+                        skeleton="assets/chibi-stickers.skel"
+                        animation="emotes/hooray"
+                        skin="erikari"
+                        pages="0,1,4,6"
+                    ></spine-widget>
+                </div>
+            </div>
+
+            <div class="skin-grid">
+                <div class="skin-grid-element">
+                    <spine-widget
+                        atlas="assets/chibi-stickers-pma.atlas"
+                        skeleton="assets/chibi-stickers.skel"
+                        animation="emotes/wave"
+                        skin="mario"
+                        pages="0,1,4,6"
+                    ></spine-widget>
+                </div>
+                <div class="skin-grid-element">
+                    <spine-widget
+                        atlas="assets/chibi-stickers-pma.atlas"
+                        skeleton="assets/chibi-stickers.skel"
+                        animation="movement/trot-left"
+                        skin="mario"
+                        pages="0,1,4,6"
+                    ></spine-widget>
+                </div>
+                <div class="skin-grid-element">
+                    <spine-widget
+                        atlas="assets/chibi-stickers-pma.atlas"
+                        skeleton="assets/chibi-stickers.skel"
+                        animation="emotes/idea"
+                        skin="mario"
+                        pages="0,1,4,6"
+                    ></spine-widget>
+                </div>
+                <div class="skin-grid-element">
+                    <spine-widget
+                        atlas="assets/chibi-stickers-pma.atlas"
+                        skeleton="assets/chibi-stickers.skel"
+                        animation="emotes/hooray"
+                        skin="mario"
+                        pages="0,1,4,6"
+                    ></spine-widget>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="split-bottom">
+            <pre><code id="code-display">
+                <script>
+                escapeHTMLandInject(`
+<div class="skin-grid">
+    <div class="skin-grid-element">
+        <spine-widget
+            atlas="assets/chibi-stickers-pma.atlas"
+            skeleton="assets/chibi-stickers.skel"
+            animation="emotes/wave"
+            skin="nate"
+            pages="0,1,4,6"
+        ></spine-widget>
+    </div>
+    <div class="skin-grid-element">
+        <spine-widget
+            atlas="assets/chibi-stickers-pma.atlas"
+            skeleton="assets/chibi-stickers.skel"
+            animation="movement/trot-left"
+            skin="nate"
+            pages="0,1,4,6"
+        ></spine-widget>
+    </div>
+    <div class="skin-grid-element">
+        <spine-widget
+            atlas="assets/chibi-stickers-pma.atlas"
+            skeleton="assets/chibi-stickers.skel"
+            animation="emotes/idea"
+            skin="nate"
+            pages="0,1,4,6"
+        ></spine-widget>
+    </div>
+    <div class="skin-grid-element">
+        <spine-widget
+            atlas="assets/chibi-stickers-pma.atlas"
+            skeleton="assets/chibi-stickers.skel"
+            animation="emotes/hooray"
+            skin="nate"
+            pages="0,1,4,6"
+        ></spine-widget>
+    </div>
+</div>
+
+<div class="skin-grid">
+    <div class="skin-grid-element">
+        <spine-widget
+            atlas="assets/chibi-stickers-pma.atlas"
+            skeleton="assets/chibi-stickers.skel"
+            animation="emotes/wave"
+            skin="erikari"
+            pages="0,1,4,6"
+        ></spine-widget>
+    </div>
+    <div class="skin-grid-element">
+        <spine-widget
+            atlas="assets/chibi-stickers-pma.atlas"
+            skeleton="assets/chibi-stickers.skel"
+            animation="movement/trot-left"
+            skin="erikari"
+            pages="0,1,4,6"
+        ></spine-widget>
+    </div>
+    <div class="skin-grid-element">
+        <spine-widget
+            atlas="assets/chibi-stickers-pma.atlas"
+            skeleton="assets/chibi-stickers.skel"
+            animation="emotes/idea"
+            skin="erikari"
+            pages="0,1,4,6"
+        ></spine-widget>
+    </div>
+    <div class="skin-grid-element">
+        <spine-widget
+            atlas="assets/chibi-stickers-pma.atlas"
+            skeleton="assets/chibi-stickers.skel"
+            animation="emotes/hooray"
+            skin="erikari"
+            pages="0,1,4,6"
+        ></spine-widget>
+    </div>
+</div>
+
+<div class="skin-grid">
+    <div class="skin-grid-element">
+        <spine-widget
+            atlas="assets/chibi-stickers-pma.atlas"
+            skeleton="assets/chibi-stickers.skel"
+            animation="emotes/wave"
+            skin="mario"
+            pages="0,1,4,6"
+        ></spine-widget>
+    </div>
+    <div class="skin-grid-element">
+        <spine-widget
+            atlas="assets/chibi-stickers-pma.atlas"
+            skeleton="assets/chibi-stickers.skel"
+            animation="movement/trot-left"
+            skin="mario"
+            pages="0,1,4,6"
+        ></spine-widget>
+    </div>
+    <div class="skin-grid-element">
+        <spine-widget
+            atlas="assets/chibi-stickers-pma.atlas"
+            skeleton="assets/chibi-stickers.skel"
+            animation="emotes/idea"
+            skin="mario"
+            pages="0,1,4,6"
+        ></spine-widget>
+    </div>
+    <div class="skin-grid-element">
+        <spine-widget
+            atlas="assets/chibi-stickers-pma.atlas"
+            skeleton="assets/chibi-stickers.skel"
+            animation="emotes/hooray"
+            skin="mario"
+            pages="0,1,4,6"
+        ></spine-widget>
+    </div>
+</div>`)
+                </script>
+            </code></pre>
+        </div>
+    </div>
+    <!--
+    /////////////////////
+    // end section 7 //
+    /////////////////////
+    -->
+
+
+    <!--
+    /////////////////////
+    // start section 7 //
+    /////////////////////
+    -->
+    <div id="section1" class="section vertical-split">
+
+        <div class="split" style="width: 100%; flex-direction: column;">
+
+            <div class="split-left" style="width: 80%; box-sizing: border-box;">
+                Let's do the same thing above, but programmatically!
+                Create two arrays, one for the skin and the other for the animations, and loop over them.
+                <br>
+                <br>
+                <code>spine.createSpineWidget</code> allows you to create a spine widget.
+                <br>
+                <br>
+                By default, assets are loaded immeaditely. You can postpone that by setting <code>manual-start="false"</code>.
+                Then it's your responsibility to call <code>start()</code> on the widget.
+                As usual, just wait on the <code>loadingPromise</code> to act on the skeleton or state.
+            </div>
+
+            <script>
+                const element = document.currentScript.parentElement;
+                const skins = ["soeren", "sinisa", "luke"];
+                const animations = ["emotes/wave", "movement/trot-left", "emotes/idea", "emotes/hooray"];
+                const pages = [3, 7, 8];
+                skins.forEach((skin, i) => {
+                    // create the table (one for each skin)
+                    const grid = document.createElement("div");
+                    grid.classList.add("skin-grid");
+                    element.appendChild(grid);
+
+                    animations.forEach(async (animation, j) => {
+                        // craete the div where to place the widget (one for each animation)
+                        const gridElement = document.createElement("div");
+                        gridElement.classList.add("skin-grid-element");
+                        grid.appendChild(gridElement);
+
+                        // create the widget
+                        const widgetSection = spine.createSpineWidget({
+                            atlas: "assets/chibi-stickers-pma.atlas",
+                            skeleton: "assets/chibi-stickers.json",
+                            animation,
+                            skin,
+                            pages,
+                            manualStart: true,
+                        });
+
+                        // append the widget to the grid element
+                        gridElement.appendChild(widgetSection);
+
+                        // manually start the widget
+                        widgetSection.start();
+
+                        // access the state of the first widget and change the animation
+                        if (i === 0 && j === 0) {
+                            await widgetSection.loadingPromise;
+                            widgetSection.state.setAnimation(0, "emotes/angry", true);
+                        }
+
+                    })
+                })
+            </script>
+
+        </div>
+
+        <div class="split-bottom">
+            <pre><code id="code-display">
+                <script>
+                escapeHTMLandInject(`
+const element = document.currentScript.parentElement;
+const skins = ["soeren", "sinisa", "luke"];
+const animations = ["emotes/wave", "movement/trot-left", "emotes/idea", "emotes/hooray"];
+const pages = [3, 7, 8];
+skins.forEach((skin, i) => {
+    // create the table (one for each skin)
+    const grid = document.createElement("div");
+    grid.classList.add("skin-grid");
+    element.appendChild(grid);
+
+    animations.forEach(async (animation, j) => {
+        // craete the div where to place the widget (one for each animation)
+        const gridElement = document.createElement("div");
+        gridElement.classList.add("skin-grid-element");
+        grid.appendChild(gridElement);
+
+        // create the widget
+        const widgetSection = spine.createSpineWidget({
+            atlas: "assets/chibi-stickers-pma.atlas",
+            skeleton: "assets/chibi-stickers.json",
+            animation,
+            skin,
+            pages,
+            manualStart: true,
+        });
+
+        // append the widget to the grid element
+        gridElement.appendChild(widgetSection);
+
+        // manually start the widget
+        widgetSection.start();
+
+        // access the state of the first widget and change the animation
+        if (i === 0 && j === 0) {
+            await widgetSection.loadingPromise;
+            widgetSection.state.setAnimation(0, "emotes/angry", true);
+        }
+
+    })
+})
+`)
+                </script>
+            </code></pre>
+        </div>
+    </div>
+    <!--
+    /////////////////////
+    // end section 7 //
+    /////////////////////
+    -->
+
+
+
+
+   <!--
+    /////////////////////
+    // start section 7 //
+    /////////////////////
+    -->
+    <div id="section1" class="section vertical-split">
+
+        <div class="split" style="width: 100%; flex-direction: column;">
+
+            <div class="split-left" style="width: 80%; box-sizing: border-box;">
+                When the widget (or the parent element) enters in the viewport, the callback <code>onScreenFunction</code> is invoked.
+                <br>
+                <br>
+                By default, the callback call the widget <code>start</code> the first time the widget enters the viewport.
+                That useful in combination with <code>manual-start="true</code> to load assets only when they are into the viewport.
+                <br>
+                The assets of the coin below are loaded only when the widget enters the viewport.
+                <br>
+                <br>
+                You can overwrite that behaviour. For example, the raptor below changes animation everytime the widget enters the viewport.
+
+            </div>
+
+            <div class="skin-grid">
+                <div class="skin-grid-element">
+                    <spine-widget
+                        atlas="assets/coin-pma.atlas"
+                        skeleton="assets/coin-pro.skel"
+                        animation="animation"
+                        manual-start="true"
+                    ></spine-widget>
+                </div>
+                <div class="skin-grid-element">
+                    <spine-widget
+                        identifier="coin"
+                        atlas="assets/raptor-pma.atlas"
+                        skeleton="assets/raptor-pro.skel"
+                        animation="walk"
+                    ></spine-widget>
+
+                    <script>
+                        (async () => {
+                            const coinWidget = spine.getSpineWidget("coin");
+                            await coinWidget.loadingPromise;
+
+                            let raptorWalking = true;
+                            coinWidget.onScreenFunction = widget => {
+                                raptorWalking = !raptorWalking;
+                                widget.state.setAnimation(0, raptorWalking ? "walk" : "jump", true);
+                            }
+                        })();
+                    </script>
+                </div>
+            </div>
+
+
+        </div>
+
+        <div class="split-bottom">
+            <pre><code id="code-display">
+                <script>
+                escapeHTMLandInject(`
+<spine-widget
+    identifier="coin"
+    atlas="assets/raptor-pma.atlas"
+    skeleton="assets/raptor-pro.skel"
+    animation="walk"
+></spine-widget>
+
+...
+
+(async () => {
+    const coinWidget = spine.getSpineWidget("coin");
+    await coinWidget.loadingPromise;
+
+    let raptorWalking = true;
+    coinWidget.onScreenFunction = widget => {
+        raptorWalking = !raptorWalking;
+        widget.state.setAnimation(0, raptorWalking ? "walk" : "jump", true);
+    }
+})();
+
+`)
+                </script>
+            </code></pre>
+        </div>
+    </div>
+    <!--
+    /////////////////////
+    // end section 7 //
+    /////////////////////
+    -->
+
+
+
+   <!--
+    /////////////////////
+    // start section 7 //
+    /////////////////////
+    -->
+    <div id="section1" class="section vertical-split">
+
+        <div class="split-top split">
+            <div class="split-left">
+                <spine-widget
+                    identifier="dragon"
+                    atlas="assets/dragon-pma.atlas"
+                    skeleton="assets/dragon-ess.skel"
+                    animation="flying"
+                    pages=""
+                ></spine-widget>
+            </div>
+            <div class="split-right">
+                If you want to load textures programmatically, you can just pass as pages to load an empty value liek this <code>pages=""</code>.
+                <br>
+                <br>
+                In this way the skeleton and the atlas are loaded, but not the textures.
+                <br>
+                Then you can loads the textures whenever you want.
+                <br>
+                <br>
+                <input type="button" value="Load page 0" onclick="loadPageDragon(0)">
+                <br>
+                <br>
+                <input type="button" value="Load page 1" onclick="loadPageDragon(1)">
+                <br>
+                <br>
+                <input type="button" value="Load page 2" onclick="loadPageDragon(2)">
+                <br>
+                <br>
+                <input type="button" value="Load page 3" onclick="loadPageDragon(3)">
+                <br>
+                <br>
+                <input type="button" value="Load page 4" onclick="loadPageDragon(4)">
+            </div>
+        </div>
+
+        <script>
+            const dragon = spine.getSpineWidget("dragon");
+            function loadPageDragon(pageIndex) {
+                if (!dragon.pages) {
+                    dragon.pages = [];
+                }
+                if (!dragon.pages.includes(pageIndex)) {
+                    dragon.pages.push(pageIndex);
+                    dragon.loadTexturesInPagesAttribute(dragon.textureAtlas);
+                }
+            }
+        </script>
+
+
+        <div class="split-bottom">
+            <pre><code id="code-display">
+                <script>
+                escapeHTMLandInject(`
+<spine-widget
+    atlas="assets/spineboy-pma.atlas"
+    skeleton="assets/spineboy-pro.skel"
+    animation="walk"
+    spinner="true"
+></spine-widget>`)
+                </script>
+            </code></pre>
+        </div>
+    </div>
+    <!--
+    /////////////////////
+    // end section 7 //
+    /////////////////////
+    -->
+
+
+
+
 
     <!--
     /////////////////////
@@ -668,12 +1517,12 @@
     </div> -->
 
     <script>
-        function scrollToSection(id) {
-            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
-        }
+        // function scrollToSection(id) {
+        //     document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        // }
 
-        let sections = document.querySelectorAll('.section');
-        let currentSection = 0;
+        // let sections = document.querySelectorAll('.section');
+        // let currentSection = 0;
 
         // window.addEventListener('wheel', (e) => {
         //     if (e.deltaY > 0 && currentSection < sections.length - 1) {
