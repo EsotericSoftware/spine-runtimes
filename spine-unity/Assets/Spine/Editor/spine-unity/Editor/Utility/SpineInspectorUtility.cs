@@ -159,7 +159,7 @@ namespace Spine.Unity.Editor {
 						dotIndex = propertyPath.LastIndexOf('.', dotIndex - 1);
 						if (dotIndex < 0)
 							break;
-						newPropertyPath = propertyPath.Remove(dotIndex +  1) + propertyName;
+						newPropertyPath = propertyPath.Remove(dotIndex + 1) + propertyName;
 						relativeProperty = property.serializedObject.FindProperty(newPropertyPath);
 					}
 				}
