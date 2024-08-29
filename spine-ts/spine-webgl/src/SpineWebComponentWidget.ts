@@ -637,6 +637,8 @@ class SpineWebComponentOverlay extends HTMLElement {
 
         this.updateCanvasSize();
         this.zoomHandler();
+
+        // translateCanvas starts a requestAnimationFrame loop
         this.translateCanvas();
 
 		this.overflowLeftSize = this.overflowLeft * document.documentElement.clientWidth;
@@ -955,14 +957,17 @@ class SpineWebComponentOverlay extends HTMLElement {
         }
 	}
 
+    // right now, we scroll the canvas each frame, that makes scrolling on mobile waaay more smoother
+    // this is way scroll handler do nothing
     private scrollHandler = () => {
-		this.translateCanvas();
+		// this.translateCanvas();
 	}
 
     private translateCanvas() {
 		const scrollPositionX = window.scrollX - this.overflowLeftSize;
 		const scrollPositionY = window.scrollY - this.overflowTopSize;
 		this.canvas.style.transform =`translate(${scrollPositionX}px,${scrollPositionY}px)`;
+        requestAnimationFrame(() => this.translateCanvas());
 	}
 
     private zoomHandler = () => {
