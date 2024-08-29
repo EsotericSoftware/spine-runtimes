@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <script src="../dist/iife/spine-webgl.js"></script> -->
-    <script src="./spine-webgl.min.js"></script>
+    <script src="../dist/iife/spine-webgl.js"></script>
+    <!-- <script src="./spine-webgl.min.js"></script> -->
     <title>JS Library Showcase</title>
     <style>
         body {
@@ -621,10 +621,10 @@
                 element.disabled = true;
                 await widget.loadingPromise;
                 const skeleton = widget.skeleton;
-                widget.skeleton = null;
+                widget.loading = true;
                 setTimeout(() => {
                     element.disabled = false;
-                    widget.skeleton = skeleton;
+                    widget.loading = false;
                 }, 1000)
             }
             function toggleSpinner(element) {
