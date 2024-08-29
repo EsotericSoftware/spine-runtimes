@@ -464,7 +464,6 @@ export class SceneRenderer implements Disposable {
 	}
 
 	resize2 () {
-		console.log("RESIZE COMMAND")
 		let canvas = this.canvas;
 		this.context.gl.viewport(0, 0, canvas.width, canvas.height);
 		this.camera.setViewport(canvas.width, canvas.height);

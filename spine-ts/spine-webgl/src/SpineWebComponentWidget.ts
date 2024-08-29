@@ -38,6 +38,15 @@ interface Rectangle {
 
 type UpdateSpineFunction = (canvas: SpineCanvas, delta: number, skeleton: Skeleton, state: AnimationState) => void;
 
+type OffScreenUpdateBehaviourType = "pause" | "update" | "pose";
+function isOffScreenUpdateBehaviourType(value: string): value is OffScreenUpdateBehaviourType {
+    return (
+        value === "pause" ||
+        value === "update" ||
+        value === "pose"
+    );
+}
+
 type ModeType = 'inside' | 'origin';
 function isModeType(value: string): value is ModeType {
     return (
@@ -115,6 +124,7 @@ class SpineWebComponentWidget extends HTMLElement implements WidgetLayoutOptions
     public loadingSpinner = true;
     public manualStart = false;
     public pages?: Array<number>;
+    public offScreenUpdateBehaviour: OffScreenUpdateBehaviourType = "pause";
 
     // state
     public skeleton?: Skeleton;
@@ -137,7 +147,6 @@ class SpineWebComponentWidget extends HTMLElement implements WidgetLayoutOptions
         if (widget.loading && !widget.onScreenAtLeastOnce) {
             widget.onScreenAtLeastOnce = true;
 
-            console.log(widget.manualStart)
             if (widget.manualStart) {
                 widget.start();
             }
@@ -164,27 +173,28 @@ class SpineWebComponentWidget extends HTMLElement implements WidgetLayoutOptions
     public loadingScreen: LoadingScreenWidget | null = null;
 
     static get observedAttributes(): string[] {
-      return [
-        "atlas",
-        "skeleton",
-        "scale",
-        "animation",
-        "skin",
-        "fit",
-        "width",
-        "height",
-        "draggable",
-        "mode",
-        "x-axis",
-        "y-axis",
-        "identifier",
-        "offset-x",
-        "offset-y",
-        "debug",
-        "manual-start",
-        "spinner",
-        "pages"
-    ];
+        return [
+            "atlas",
+            "skeleton",
+            "scale",
+            "animation",
+            "skin",
+            "fit",
+            "width",
+            "height",
+            "draggable",
+            "mode",
+            "x-axis",
+            "y-axis",
+            "identifier",
+            "offset-x",
+            "offset-y",
+            "debug",
+            "manual-start",
+            "spinner",
+            "pages",
+            "offscreen"
+        ];
     }
 
     constructor() {
@@ -252,6 +262,10 @@ class SpineWebComponentWidget extends HTMLElement implements WidgetLayoutOptions
 
             if (name === "mode") {
                 this.mode = isModeType(newValue) ? newValue : "inside";
+            }
+
+            if (name === "offscreen") {
+                this.offScreenUpdateBehaviour = isOffScreenUpdateBehaviourType(newValue) ? newValue : "pause";
             }
 
             if (name === "x-axis") {
@@ -579,7 +593,8 @@ class SpineWebComponentOverlay extends HTMLElement {
 
 	// how many pixels to add to the edges to prevent "edge cuttin" on fast scrolling
     // be aware that the canvas is already big as the display size
-	private overflowTop = .0;
+    // making it bigger might reduce performance significantly
+	private overflowTop = .2;
 	private overflowBottom = .0;
 	private overflowLeft = .0;
 	private overflowRight = .0;
@@ -621,6 +636,9 @@ class SpineWebComponentOverlay extends HTMLElement {
         this.spineCanvas = new SpineCanvas(this.canvas, { app: this.setupSpineCanvasApp() });
 
         this.updateCanvasSize();
+        this.zoomHandler();
+        this.translateCanvas();
+
 		this.overflowLeftSize = this.overflowLeft * document.documentElement.clientWidth;
 		this.overflowTopSize = this.overflowTop * document.documentElement.clientHeight;
 
@@ -635,11 +653,10 @@ class SpineWebComponentOverlay extends HTMLElement {
         const screen = window.screen;
         screen.orientation.onchange = () => {
             this.updateCanvasSize();
+            // after an orientation change the scrolling changes, but the scroll event does not fire
+            this.scrollHandler();
         }
 
-		this.zoomHandler();
-
-		// scroll
 		window.addEventListener('scroll', this.scrollHandler);
 		this.scrollHandler();
 
@@ -658,15 +675,19 @@ class SpineWebComponentOverlay extends HTMLElement {
 		const blue = new Color(0, 0, 1, 1);
 		return {
 			update: (canvas: SpineCanvas, delta: number) => {
-				this.skeletonList.forEach(({ skeleton, state, update }) => {
+				this.skeletonList.forEach(({ skeleton, state, update, onScreen, offScreenUpdateBehaviour, skeletonPath }) => {
                     if (!skeleton || !state) return;
+                    if (!onScreen && offScreenUpdateBehaviour === "pause") return;
 					if (update) update(canvas, delta, skeleton, state)
 					else {
                         // delta = 0
 						state.update(delta);
-						state.apply(skeleton);
 						skeleton.update(delta);
-						skeleton.updateWorldTransform(Physics.update);
+
+                        if (onScreen || (!onScreen && offScreenUpdateBehaviour === "pose") ) {
+                            state.apply(skeleton);
+                            skeleton.updateWorldTransform(Physics.update);
+                        }
 					}
 				});
 				this.fps.innerText = canvas.time.framesPerSecond.toFixed(2) + " fps";
@@ -913,19 +934,13 @@ class SpineWebComponentOverlay extends HTMLElement {
 	}
 
     private resizeCanvas() {
-        console.log("START RESI:")
-        const screen = window.screen;
-        const angle = screen.orientation.angle;
-        const rotated = angle === 90 || angle === 270;
-        const width = rotated ? screen.height : screen.width;
-        const height = rotated ? screen.width : screen.height;
+        const { width, height } = this.getScreenSize();
 
 		if (this.currentCanvasBaseWidth !== width || this.currentCanvasBaseHeight !== height) {
             this.currentCanvasBaseWidth = width;
             this.currentCanvasBaseHeight = height;
             this.overflowLeftSize = this.overflowLeft * width;
 		    this.overflowTopSize = this.overflowTop * height;
-            console.log("FROM RESI: ", width, height)
 
             const totalWidth = width * (1 + (this.overflowLeft + this.overflowRight));
             const totalHeight = height * (1 + (this.overflowTop + this.overflowBottom));
@@ -935,7 +950,6 @@ class SpineWebComponentOverlay extends HTMLElement {
             const dpr = window.devicePixelRatio;
             this.canvas.width = Math.round(totalWidth * dpr);
             this.canvas.height = Math.round(totalHeight * dpr);
-            console.log("FROM RESI2: ", this.canvas.width, this.canvas.height)
 
             this.spineCanvas.renderer.resize2();
         }
@@ -946,20 +960,12 @@ class SpineWebComponentOverlay extends HTMLElement {
 	}
 
     private translateCanvas() {
-        const viewportWidth = document.documentElement.clientWidth;
-    	const viewportHeight = document.documentElement.clientHeight;
-
-		// this.overflowLeftSize = this.overflowLeft * viewportWidth;
-		// this.overflowTopSize = this.overflowTop * viewportHeight;
-
 		const scrollPositionX = window.scrollX - this.overflowLeftSize;
 		const scrollPositionY = window.scrollY - this.overflowTopSize;
-        console.log("FROM TRAN: ", scrollPositionY, window.scrollY, this.overflowTopSize)
 		this.canvas.style.transform =`translate(${scrollPositionX}px,${scrollPositionY}px)`;
 	}
 
     private zoomHandler = () => {
-        console.log("ZOOM")
 		this.skeletonList.forEach((widget) => {
             // inside mode scale automatically to fit the skeleton within its parent
             if (widget.mode !== 'origin' && widget.fit !== 'none') return;
@@ -973,12 +979,24 @@ class SpineWebComponentOverlay extends HTMLElement {
 		})
 	}
 
+    // we need the bounding client rect otherwise decimals won't be returned
+    // this means that during zoom it might occurs that the div would be resized
+    // rounded 1px more making a scrollbar appear
     private getPageSize() {
-		// we need the bounding client rect otherwise decimals won't be returned
-		// this means that during zoom it might occurs that the div would be resized
-		// rounded 1px more making a scrollbar appear
 		return document.body.getBoundingClientRect();
 	}
+
+    // screen size remain the same when it is rotated
+    // we need to swap them based and the orientation angle
+    private getScreenSize() {
+        const { screen } = window;
+        const { width, height } = window.screen;
+        const angle = screen.orientation.angle;
+        const rotated = angle === 90 || angle === 270;
+        return rotated
+            ? { width: height, height: width }
+            : { width, height };
+    }
 
     /*
     * Other utilities

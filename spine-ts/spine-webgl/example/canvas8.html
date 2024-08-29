@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="../dist/iife/spine-webgl.js"></script>
-    <!-- <script src="./spine-webgl.min.js"></script> -->
+    <!-- <script src="../dist/iife/spine-webgl.js"></script> -->
+    <script src="./spine-webgl.min.js"></script>
     <title>JS Library Showcase</title>
     <style>
         body {
@@ -1466,7 +1466,7 @@ skins.forEach((skin, i) => {
         <div class="split" style="width: 100%; flex-direction: column;">
 
             <div class="split-left" style="width: 80%; box-sizing: border-box;">
-                Widgets are not render while they are off screen.
+                Widgets are not rendered while they are off screen.
                 <br>
                 <br>
                 The state and skeleton <code>update</code>, and the skeleton <code>apply</code> and the skeleton <code>updateWorldTransform</code> functions are not invoked when the widget is off screen.
@@ -1550,42 +1550,6 @@ stretchyman.update = (canvas, delta, skeleton, state) => {
                 </script>
             </code></pre>
         </div>
-    </div>
-
-
-
-
-    <div id="section8" class="section vertical-split">
-
-        <div class="split-top split">
-            <div class="split-left">
-                Widgets are not render while they are off screen.
-                <br>
-                The state and skeleton <code>update</code>, and the skeleton <code>apply</code> and the skeleton <code>updateWorldTransform</code> functions are not invoked when the widget is off screen.
-                <br>If you want the update functions to be invoked in any case, set <code>offscreen=update</code>.
-                <br>If you want all the functions to be invoked in any case, set <code>offscreen=pose</code>.
-            </div>
-            <div class="split-right" id="section8-element">
-                <spine-widget
-                    atlas="assets/stretchyman-pma.atlas"
-                    skeleton="assets/stretchyman-pro.skel"
-                    animation="sneak"
-                    offscreen="pose"
-                ></spine-widget>
-            </div>
-        </div>
-        <div class="split-bottom">
-            <pre><code id="code-display">
-                <script>escapeHTMLandInject(`
-<spine-widget
-    atlas="assets/stretchyman-pma.atlas"
-    skeleton="assets/stretchyman-pro.skel"
-    animation="sneak"
-    offscreen="pose"
-></spine-widget>`);</script>
-            </code></pre>
-        </div>
-
     </div>
 
     <!--
