@@ -470,6 +470,17 @@ export class SceneRenderer implements Disposable {
 		this.camera.update();
 	}
 
+	resize3 (width: number, height: number) {
+		console.log("resize gl")
+		let canvas = this.canvas;
+		const dpr = window.devicePixelRatio;
+		this.canvas.width = Math.round(width * dpr);
+		this.canvas.height = Math.round(height * dpr);
+		this.context.gl.viewport(0, 0, canvas.width, canvas.height);
+		this.camera.setViewport(canvas.width, canvas.height);
+		this.camera.update();
+	}
+
 	resize (resizeMode: ResizeMode) {
 		let canvas = this.canvas;
 		var dpr = window.devicePixelRatio || 1;

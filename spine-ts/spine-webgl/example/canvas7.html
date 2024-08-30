@@ -132,196 +132,78 @@
 </head>
 <body>
 
+    <!-- <div style="height: 1200px; flex-direction: column;">
+    </div> -->
+
+    <!--
+    /////////////////////
+    // start section 1 //
+    /////////////////////
+    -->
+
+    <div id="section1" class="section vertical-split">
+
+        <div class="split-top split">
+            <div class="split-left">
+                <spine-widget
+                    atlas="assets/raptor-pma.atlas"
+                    skeleton="assets/raptor-pro.skel"
+                    animation="walk"
+                    scale="3"
+                    clip="true"
+                    fit="fitHeight"
+                ></spine-widget>
+            </div>
+            <div class="split-right">
+                <spine-widget
+                    atlas="assets/spineboy-pma.atlas"
+                    skeleton="assets/spineboy-pro.skel"
+                    animation="walk"
+                    scale="1.5"
+                    fit="none"
+                    clip="true"
+                ></spine-widget>
+            </div>
+            <div class="split-right">
+                <spine-widget
+                    atlas="assets/spineboy-pma.atlas"
+                    skeleton="assets/spineboy-pro.skel"
+                    animation="walk"
+                    scale="1"
+                    fit="none"
+                    clip="true"
+                ></spine-widget>
+            </div>
+            <!-- <div class="split-right">
+                <spine-widget
+                    atlas="assets/cloud-pot-pma.atlas"
+                    skeleton="assets/cloud-pot.skel"
+                    animation="playing-in-the-rain"
+                    draggable="true"
+                ></spine-widget>
+            </div>
+            <div class="split-right">
+                <spine-widget
+                    atlas="assets/celestial-circus-pma.atlas"
+                    skeleton="assets/celestial-circus-pro.skel"
+                    animation="wings-and-feet"
+                    draggable="true"
+                ></spine-widget>
+            </div> -->
+
+        </div>
+
+
+    </div>
+
     <div style="height: 1200px; flex-direction: column;">
     </div>
 
-
     <!--
     /////////////////////
-    // start section 7 //
+    // end section 1 //
     /////////////////////
     -->
-    <div id="section1" class="section vertical-split">
-
-        <div class="split" style="width: 100%; flex-direction: column;">
-
-            <div class="split-left" style="width: 80%; box-sizing: border-box;">
-                If you have many atlas pages, for example one for each skin, and you want to show only some of the skins,
-                pass to the <code>pages</code> the atlas pages you want to load as a comma concatenated list of indices.
-            </div>
-
-            <div class="skin-grid">
-                <div class="skin-grid-element">
-                    <spine-widget
-                        atlas="assets/chibi-stickers-pma.atlas"
-                        skeleton="assets/chibi-stickers.skel"
-                        animation="emotes/wave"
-                        skin="nate"
-                        pages="0,1,4,6"
-                    ></spine-widget>
-                </div>
-                </div>
-            </div>
-
-            <div class="skin-grid">
-                <div class="skin-grid-element">
-                    <spine-widget
-                        atlas="assets/chibi-stickers-pma.atlas"
-                        skeleton="assets/chibi-stickers.skel"
-                        animation="emotes/wave"
-                        skin="erikari"
-                        pages="0,1,4,6"
-                        offscreen="update"
-                    ></spine-widget>
-                </div>
-            </div>
-
-            <div class="skin-grid">
-                <div class="skin-grid-element">
-                    <spine-widget
-                        atlas="assets/chibi-stickers-pma.atlas"
-                        skeleton="assets/chibi-stickers.skel"
-                        animation="emotes/wave"
-                        skin="mario"
-                        pages="0,1,4,6"
-                        offscreen="pose"
-                    ></spine-widget>
-                </div>
-            </div>
-
-        </div>
-
-        <div class="split-bottom">
-            <pre><code id="code-display">
-                <script>
-                escapeHTMLandInject(`
-<div class="skin-grid">
-    <div class="skin-grid-element">
-        <spine-widget
-            atlas="assets/chibi-stickers-pma.atlas"
-            skeleton="assets/chibi-stickers.skel"
-            animation="emotes/wave"
-            skin="nate"
-            pages="0,1,4,6"
-        ></spine-widget>
-    </div>
-    <div class="skin-grid-element">
-        <spine-widget
-            atlas="assets/chibi-stickers-pma.atlas"
-            skeleton="assets/chibi-stickers.skel"
-            animation="movement/trot-left"
-            skin="nate"
-            pages="0,1,4,6"
-        ></spine-widget>
-    </div>
-    <div class="skin-grid-element">
-        <spine-widget
-            atlas="assets/chibi-stickers-pma.atlas"
-            skeleton="assets/chibi-stickers.skel"
-            animation="emotes/idea"
-            skin="nate"
-            pages="0,1,4,6"
-        ></spine-widget>
-    </div>
-    <div class="skin-grid-element">
-        <spine-widget
-            atlas="assets/chibi-stickers-pma.atlas"
-            skeleton="assets/chibi-stickers.skel"
-            animation="emotes/hooray"
-            skin="nate"
-            pages="0,1,4,6"
-        ></spine-widget>
-    </div>
-</div>
-
-<div class="skin-grid">
-    <div class="skin-grid-element">
-        <spine-widget
-            atlas="assets/chibi-stickers-pma.atlas"
-            skeleton="assets/chibi-stickers.skel"
-            animation="emotes/wave"
-            skin="erikari"
-            pages="0,1,4,6"
-        ></spine-widget>
-    </div>
-    <div class="skin-grid-element">
-        <spine-widget
-            atlas="assets/chibi-stickers-pma.atlas"
-            skeleton="assets/chibi-stickers.skel"
-            animation="movement/trot-left"
-            skin="erikari"
-            pages="0,1,4,6"
-        ></spine-widget>
-    </div>
-    <div class="skin-grid-element">
-        <spine-widget
-            atlas="assets/chibi-stickers-pma.atlas"
-            skeleton="assets/chibi-stickers.skel"
-            animation="emotes/idea"
-            skin="erikari"
-            pages="0,1,4,6"
-        ></spine-widget>
-    </div>
-    <div class="skin-grid-element">
-        <spine-widget
-            atlas="assets/chibi-stickers-pma.atlas"
-            skeleton="assets/chibi-stickers.skel"
-            animation="emotes/hooray"
-            skin="erikari"
-            pages="0,1,4,6"
-        ></spine-widget>
-    </div>
-</div>
-
-<div class="skin-grid">
-    <div class="skin-grid-element">
-        <spine-widget
-            atlas="assets/chibi-stickers-pma.atlas"
-            skeleton="assets/chibi-stickers.skel"
-            animation="emotes/wave"
-            skin="mario"
-            pages="0,1,4,6"
-        ></spine-widget>
-    </div>
-    <div class="skin-grid-element">
-        <spine-widget
-            atlas="assets/chibi-stickers-pma.atlas"
-            skeleton="assets/chibi-stickers.skel"
-            animation="movement/trot-left"
-            skin="mario"
-            pages="0,1,4,6"
-        ></spine-widget>
-    </div>
-    <div class="skin-grid-element">
-        <spine-widget
-            atlas="assets/chibi-stickers-pma.atlas"
-            skeleton="assets/chibi-stickers.skel"
-            animation="emotes/idea"
-            skin="mario"
-            pages="0,1,4,6"
-        ></spine-widget>
-    </div>
-    <div class="skin-grid-element">
-        <spine-widget
-            atlas="assets/chibi-stickers-pma.atlas"
-            skeleton="assets/chibi-stickers.skel"
-            animation="emotes/hooray"
-            skin="mario"
-            pages="0,1,4,6"
-        ></spine-widget>
-    </div>
-</div>`)
-                </script>
-            </code></pre>
-        </div>
-    </div>
-    <!--
-    /////////////////////
-    // end section 7 //
-    /////////////////////
-    -->
-
-
 
 
 </body>
