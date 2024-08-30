@@ -127,6 +127,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
 	float GetAnimationDuration(FString AnimationName);
 
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
+	void PhysicsTranslate(float x, float y);
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
+	void PhysicsRotate(float x, float y, float degrees);
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
+	void ResetPhysicsConstraints();
+
 	UPROPERTY(BlueprintAssignable, Category = "Components|Spine|Skeleton")
 	FSpineBeforeUpdateWorldTransformDelegate BeforeUpdateWorldTransform;
 

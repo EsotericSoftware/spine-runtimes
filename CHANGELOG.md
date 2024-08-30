@@ -88,6 +88,7 @@
 - **Breaking**: Starting with Unreal Engine 5.3 imported `.skel`/`.json` and `.atlas` files in the same folder must NOT have a common prefix. E.g. `skeleton.json` and `skeleton.atlas` will not work. Make sure to rename at least one of the two files so there is no prefix collision, e.g. `skeleton-data.json` and `skeleton.atlas`.
 - Added compatibility with UE 5.3
 - Added more example maps
+- Added blueprint-callable methods `PhysicsTranslate()`, `PhysicsRotate()` and `ResetPhysicsConstraints()` (which will reset all physics constraints in the skeleton) to `SpineSkeletonComponent` and `SpineWidget`.
 
 ### Godot
 
