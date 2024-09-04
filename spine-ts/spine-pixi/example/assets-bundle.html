@@ -1,0 +1,57 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>spine-pixi</title>
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@7.4.2/dist/pixi.min.js"></script>
+    <script src="../dist/iife/spine-pixi.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tweakpane@3.1.9/dist/tweakpane.min.js"></script>
+    <link rel="stylesheet" href="../../index.css">
+  </head>
+
+  <body>
+    <script>
+      (async function () {
+        var app = new PIXI.Application({
+          width: window.innerWidth,
+          height: window.innerHeight,
+          resolution: window.devicePixelRatio || 1,
+          autoDensity: true,
+          resizeTo: window,
+          backgroundColor: 0x2c3e50,
+          hello: true,
+        });
+        document.body.appendChild(app.view);
+
+        // Initialize Assets with given manifest and preference
+        await PIXI.Assets.init({
+            basePath: './assets/spineboy-bundle',
+            manifest: './manifest.json',
+            texturePreference: {
+                resolution: Math.min(PIXI.utils.isMobile.any ? window.devicePixelRatio : 3, 3), // Set the preferred resolution to 3 for desktop, or devicePixelRatio for mobile; Pixi.Assets will load the corresponding asset if found
+                format: ['webp', 'png'], // Prefer WEBP, then fallback to PNG if the device doesn't support it
+            },
+        });
+
+        // Load the bundle that includes the skeleton data and atlas
+        await PIXI.Assets.loadBundle("spineboy");
+
+        // Create the spine display object
+        const spineboy = spine.Spine.from("spineboyData", "spineboyAtlas");
+
+        // Set the default mix time to use when transitioning
+        // from one animation to the next.
+        spineboy.state.data.defaultMix = 0.2;
+
+        // Center the spine object on screen.
+        spineboy.x = window.innerWidth / 2;
+        spineboy.y = window.innerHeight / 2 + spineboy.getBounds().height / 2;
+
+        // Set animation "run" on track 0, looped.
+        spineboy.state.setAnimation(0, "run", true);
+
+        // Add the display object to the stage.
+        app.stage.addChild(spineboy);
+      })();
+    </script>
+  </body>
+</html>
