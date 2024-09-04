@@ -1,0 +1,30 @@
+{
+    "bundles": [
+        {
+            "name": "spineboy",
+            "assets": [
+                {
+                    "alias": [
+                        "spineboyAtlas"
+                    ],
+                    "src": [
+                        "spineboy.png.atlas",
+                        "spineboy@2x.png.atlas",
+                        "spineboy@3x.png.atlas",
+                        "spineboy.webp.atlas",
+                        "spineboy@2x.webp.atlas",
+                        "spineboy@3x.webp.atlas"
+                    ]
+                },
+                {
+                    "alias": [
+                        "spineboyData"
+                    ],
+                    "src": [
+                        "spineboy-pro.json"
+                    ]
+                }
+            ]
+        }
+    ]
+}
