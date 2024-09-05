@@ -364,7 +364,7 @@ namespace Spine.Unity {
 				Slot slot = drawOrderItems[i];
 				if (!slot.Bone.Active
 #if SLOT_ALPHA_DISABLES_ATTACHMENT
-					|| slot.A == 0f
+					|| (slot.A == 0f && slot.Data != clippingEndSlot)
 #endif
 					) {
 					workingAttachmentsItems[i] = null;
