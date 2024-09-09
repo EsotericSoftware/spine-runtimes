@@ -1,6 +1,6 @@
 {
   "name": "@esotericsoftware/spine-canvaskit",
-  "version": "4.2.58",
+  "version": "4.2.59",
   "description": "The official Spine Runtimes for CanvasKit for NodeJS",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -31,7 +31,7 @@
   },
   "homepage": "https://github.com/esotericsoftware/spine-runtimes#readme",
   "dependencies": {
-    "@esotericsoftware/spine-core": "4.2.58",
+    "@esotericsoftware/spine-core": "4.2.59",
     "canvaskit-wasm": "0.39.1"
   },
   "devDependencies": {
