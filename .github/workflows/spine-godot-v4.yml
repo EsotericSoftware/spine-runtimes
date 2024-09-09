@@ -394,7 +394,7 @@ jobs:
 
           echo "$GODOT_VERSION" > version.txt
           # Extract the major and minor version from GODOT_VERSION
-          GODOT_MAJOR_MINOR=$(echo "$GODOT_VERSION" | awk -F. '{print $1 "." $2}')
+          GODOT_MAJOR_MINOR=$(echo "$GODOT_VERSION" | sed -E 's/^([0-9]+\.[0-9]+).*/\1/')
 
           # Check if the version is >= 4.3
           if [[ $(echo "$GODOT_MAJOR_MINOR >= 4.3" | bc) -eq 1 ]]; then
