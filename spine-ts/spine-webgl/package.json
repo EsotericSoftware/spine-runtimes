@@ -1,6 +1,6 @@
 {
   "name": "@esotericsoftware/spine-webgl",
-  "version": "4.0.29",
+  "version": "4.0.30",
   "description": "The official Spine Runtimes for the web.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -30,6 +30,6 @@
   },
   "homepage": "https://github.com/esotericsoftware/spine-runtimes#readme",
   "dependencies": {
-    "@esotericsoftware/spine-core": "4.0.29"
+    "@esotericsoftware/spine-core": "4.0.30"
   }
 }
