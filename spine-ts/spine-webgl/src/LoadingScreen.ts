@@ -70,8 +70,8 @@ export class LoadingScreen implements Disposable {
 		}
 	}
 	dispose (): void {
-		this.logo.dispose();
-		this.spinner.dispose();
+		this.logo?.dispose();
+		this.spinner?.dispose();
 	}
 
 	draw (complete = false) {
