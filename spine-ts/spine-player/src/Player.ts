@@ -32,48 +32,48 @@ import { AssetManager, GLTexture, Input, LoadingScreen, ManagedWebGLRenderingCon
 
 export interface SpinePlayerConfig {
 	/* The URL of the skeleton JSON file (.json). */
-	jsonUrl: string
+	jsonUrl?: string
 
 	/* Optional: The name of a field in the JSON that holds the skeleton data. Default: none */
-	jsonField: string
+	jsonField?: string
 
 	/* The URL of the skeleton binary file (.skel). */
-	binaryUrl: string
+	binaryUrl?: string
 
 	/* The URL of the skeleton atlas file (.atlas). Atlas page images are automatically resolved. */
-	atlasUrl: string
+	atlasUrl?: string
 
 	/* Raw data URIs, mapping a path to base64 encoded raw data. When player's asset manager resolves the jsonUrl, binaryUrl,
 	   atlasUrl, or the image paths referenced in the atlas, it will first look for that path in the raw data URIs. This
 	   allows embedding assets directly in HTML/JS. Default: none */
-	rawDataURIs: StringMap<string>
+	rawDataURIs?: StringMap<string>
 
 	/* Optional: The name of the animation to be played. Default: empty animation */
-	animation: string
+	animation?: string
 
 	/* Optional: List of animation names from which the user can choose. Default: all animations */
-	animations: string[]
+	animations?: string[]
 
 	/* Optional: The default mix time used to switch between two animations. Default: 0.25 */
-	defaultMix: number
+	defaultMix?: number
 
 	/* Optional: The name of the skin to be set. Default: the default skin */
-	skin: string
+	skin?: string
 
 	/* Optional: List of skin names from which the user can choose. Default: all skins */
-	skins: string[]
+	skins?: string[]
 
 	/* Optional: Whether the skeleton's atlas images use premultiplied alpha. Default: true */
-	premultipliedAlpha: boolean
+	premultipliedAlpha?: boolean
 
 	/* Optional: Whether to show the player controls. When false, no external CSS file is needed. Default: true */
-	showControls: boolean
+	showControls?: boolean
 
 	/* Optional: Whether to show the loading animation. Default: true */
-	showLoading: boolean
+	showLoading?: boolean
 
 	/* Optional: Which debugging visualizations are shown. Default: none */
-	debug: {
+	debug?: {
 		bones: boolean
 		regions: boolean
 		meshes: boolean
@@ -86,84 +86,84 @@ export interface SpinePlayerConfig {
 
 	/* Optional: The position and size of the viewport in the skeleton's world coordinates. Default: the bounding box that fits
 	  the current animation, 10% padding, 0.25 transition time */
-	viewport: {
+	viewport?: {
 		/* Optional: The position and size of the viewport in the skeleton's world coordinates. Default: the bounding box that
 		   fits the current animation */
-		x: number
-		y: number
-		width: number
-		height: number
+		x?: number
+		y?: number
+		width?: number
+		height?: number
 
 		/* Optional: Padding around the viewport size, given as a number or percentage (eg "25%"). Default: 10% */
-		padLeft: string | number
-		padRight: string | number
-		padTop: string | number
-		padBottom: string | number
+		padLeft?: string | number
+		padRight?: string | number
+		padTop?: string | number
+		padBottom?: string | number
 
 		/* Optional: Whether to draw lines showing the viewport bounds. Default: false */
-		debugRender: boolean,
+		debugRender?: boolean,
 
 		/* Optional: When the current viewport changes, the time to animate to the new viewport. Default: 0.25 */
-		transitionTime: number
+		transitionTime?: number
 
 		/* Optional: Viewports for specific animations. Default: none */
-		animations: StringMap<Viewport>
+		animations?: StringMap<Viewport>
 	}
 
 	/* Optional: Whether the canvas is transparent, allowing the web page behind the canvas to show through when
 	   backgroundColor alpha is < ff. Default: false */
-	alpha: boolean
+	alpha?: boolean
 
 	/* Optional: Whether to preserve the drawing buffer. This is needed if you want to take a screenshot via canvas.getDataURL(), Default: false */
-	preserveDrawingBuffer: boolean
+	preserveDrawingBuffer?: boolean
 
 	/* Optional: The canvas background color, given in the format #rrggbb or #rrggbbaa. Default: #000000ff (black) or when
 	   alpha is true #00000000 (transparent) */
-	backgroundColor: string
+	backgroundColor?: string
 
 	/* Optional: The background color used in fullscreen mode, given in the format #rrggbb or #rrggbbaa. Default: backgroundColor */
-	fullScreenBackgroundColor: string
+	fullScreenBackgroundColor?: string
 
 	/* Optional: An image to draw behind the skeleton. Default: none */
-	backgroundImage: {
+	backgroundImage?: {
 		url: string
 
 		/* Optional: The position and size of the background image in the skeleton's world coordinates. Default: fills the viewport */
-		x: number
-		y: number
-		width: number
-		height: number
+		x?: number
+		y?: number
+		width?: number
+		height?: number
 	}
 
 	/* Optional: Whether mipmapping and anisotropic filtering are used for highest quality scaling when available, otherwise the
 	   filter settings from the texture atlas are used. Default: true */
-	mipmaps: true
+	mipmaps?: true
 
 	/* Optional: List of bone names that the user can drag to position. Default: none */
-	controlBones: string[]
+	controlBones?: string[]
 
 	/* Optional: Callback when the skeleton and its assets have been successfully loaded. If an animation is set on track 0,
 	   the player won't set its own animation. Default: none */
-	success: (player: SpinePlayer) => void
+	success?: (player: SpinePlayer) => void
 
 	/* Optional: Callback when the skeleton could not be loaded or rendered. Default: none */
-	error: (player: SpinePlayer, msg: string) => void
+	error?: (player: SpinePlayer, msg: string) => void
 
 	/* Optional: Callback at the start of each frame, before the skeleton is posed or drawn. Default: none */
-	frame: (player: SpinePlayer, delta: number) => void
+	frame?: (player: SpinePlayer, delta: number) => void
 
 	/* Optional: Callback after the skeleton is posed each frame, before it is drawn. Default: none */
-	update: (player: SpinePlayer, delta: number) => void
+	update?: (player: SpinePlayer, delta: number) => void
 
 	/* Optional: Callback after the skeleton is drawn each frame. Default: none */
-	draw: (player: SpinePlayer, delta: number) => void
+	draw?: (player: SpinePlayer, delta: number) => void
 
 	/* Optional: Callback each frame before the skeleton is loaded. Default: none */
-	loading: (player: SpinePlayer, delta: number) => void
+	loading?: (player: SpinePlayer, delta: number) => void
 
 	/* Optional: The downloader used by the player's asset manager. Passing the same downloader to multiple players using the
 	   same assets ensures the assets are only downloaded once. Default: new instance */
-	downloader: Downloader
+	downloader?: Downloader
 }
 
 export interface Viewport {
