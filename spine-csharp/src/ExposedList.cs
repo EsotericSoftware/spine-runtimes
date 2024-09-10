@@ -76,7 +76,7 @@ namespace Spine {
 		public void Add (T item) {
 			// If we check to see if we need to grow before trying to grow
 			// we can speed things up by 25%
-			if (Count == Items.Length)
+			if (Count == Capacity)
 				GrowIfNeeded(1);
 			Items[Count++] = item;
 			version++;
@@ -84,27 +84,22 @@ namespace Spine {
 
 		public void GrowIfNeeded (int addedCount) {
 			int minimumSize = Count + addedCount;
-			if (minimumSize > Items.Length)
+			if (minimumSize > Capacity)
 				Capacity = Math.Max(Math.Max(Capacity * 2, DefaultCapacity), minimumSize);
 		}
 
-		public ExposedList<T> Resize (int newSize) {
-			int itemsLength = Items.Length;
-			var oldItems = Items;
-			if (newSize > itemsLength) {
-				Array.Resize(ref Items, newSize);
-			} else if (newSize < itemsLength) {
-				// Allow nulling of T reference type to allow GC.
-				for (int i = newSize; i < itemsLength; i++)
-					oldItems[i] = default(T);
-			}
+		public ExposedList<T> Resize(int newSize)
+		{
+			if (newSize > Capacity)
+				GrowIfNeeded(newSize - Count);
+
 			Count = newSize;
 			return this;
 		}
 
 		public void EnsureCapacity (int min) {
-			if (Items.Length < min) {
-				int newCapacity = Items.Length == 0 ? DefaultCapacity : Items.Length * 2;
+			if (Capacity < min) {
+				int newCapacity = Capacity == 0 ? DefaultCapacity : Capacity * 2;
 				//if ((uint)newCapacity > Array.MaxArrayLength) newCapacity = Array.MaxArrayLength;
 				if (newCapacity < min) newCapacity = min;
 				Capacity = newCapacity;
@@ -181,7 +176,7 @@ namespace Spine {
 
 		public void Clear (bool clearArray = true) {
 			if (clearArray)
-				Array.Clear(Items, 0, Items.Length);
+				Array.Clear(Items, 0, Capacity);
 
 			Count = 0;
 			version++;
@@ -364,7 +359,7 @@ namespace Spine {
 
 		public void Insert (int index, T item) {
 			CheckIndex(index);
-			if (Count == Items.Length)
+			if (Count == Capacity)
 				GrowIfNeeded(1);
 			Shift(index, 1);
 			Items[index] = item;
