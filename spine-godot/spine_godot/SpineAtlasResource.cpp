@@ -30,6 +30,8 @@
 #include "SpineAtlasResource.h"
 #include "SpineRendererObject.h"
 #include "core/io/json.h"
+#include "core/io/image.h"
+#include "scene/resources/image_texture.h"
 #include "scene/resources/texture.h"
 #include <spine/TextureLoader.h>
 
@@ -43,32 +45,69 @@ public:
 	GodotSpineTextureLoader(Array *_textures, Array *_normal_maps, const String &normal_map_prefix) : textures(_textures), normal_maps(_normal_maps), normal_map_prefix(normal_map_prefix) {
 	}
 
-	static String fix_path(const String &path) {
-		if (path.size() > 5 && path[4] == '/' && path[5] == '/') return path;
+	static bool fix_path(String &path) {
 		const String prefix = "res:/";
 		auto i = path.find(prefix);
-		auto sub_str_pos = i + prefix.size() - 1;
-		if (sub_str_pos < 0) return path;
-		auto res = path.substr(sub_str_pos);
+		if (i == std::string::npos) {
+			return false;
+		}
 
+		auto sub_str_pos = i + prefix.size() - 1;
+		auto res = path.substr(sub_str_pos);
 		if (!EMPTY(res)) {
 			if (res[0] != '/') {
-				return prefix + "/" + res;
+				path = prefix + "/" + res;
 			} else {
-				return prefix + res;
+				path = prefix + res;
 			}
 		}
-		return path;
+		return true;
 	}
+
+#if VERSION_MAJOR > 3
+	Ref<Texture2D> get_texture_from_image(const String &path, bool is_resource) {
+		Error error = OK;
+		if (is_resource) {
+			return ResourceLoader::load(path, "", ResourceFormatLoader::CACHE_MODE_REUSE, &error);
+		} else {
+			Ref<Image> img;
+			img.instantiate();
+			img = img->load_from_file(path);
+			return ImageTexture::create_from_image(img);
+		}
+	}
+#else
+	Ref<Texture> get_texture_from_image(const String &path, bool is_resource) {
+		Error error = OK;
+		if (is_resource) {
+			return ResourceLoader::load(path, "", false, &error);
+		} else {
+			Vector<uint8_t> buf = FileAccess::get_file_as_array(path, &error);
+			if (error == OK) {
+				Ref<Image> img;
+				img.instantiate();
+				String filename = path.get_filename().to_lower();
+				if (filename.ends_with(".png")) {
+					img->load_png_from_buffer(buf);
+				} else if (filename_lower.ends_with(".jpg")) {
+					img->load_jpg_from_buffer(buf);
+				}
+				return ImageTexture::create_from_image(img);
+			}
+		}
+		return Ref<Texture>();
+	}
+#endif
 
 	void load(spine::AtlasPage &page, const spine::String &path) override {
 		Error error = OK;
-		auto fixed_path = fix_path(String(path.buffer()));
+		String fixed_path = String(path.buffer());
+		bool is_resource = fix_path(fixed_path);
 
 #if VERSION_MAJOR > 3
-		Ref<Texture2D> texture = ResourceLoader::load(fixed_path, "", ResourceFormatLoader::CACHE_MODE_REUSE, &error);
+		Ref<Texture2D> texture = get_texture_from_image(fixed_path, is_resource);
 #else
-		Ref<Texture> texture = ResourceLoader::load(fixed_path, "", false, &error);
+		Ref<Texture> texture = get_texture_from_image(fixed_path, is_resource);
 #endif
 		if (error != OK || !texture.is_valid()) {
 			ERR_PRINT(vformat("Can't load texture: \"%s\"", String(path.buffer())));
@@ -86,7 +125,7 @@ public:
 
 		String new_path = vformat("%s/%s_%s", fixed_path.get_base_dir(), normal_map_prefix, fixed_path.get_file());
 		if (ResourceLoader::exists(new_path)) {
-			Ref<Texture> normal_map = ResourceLoader::load(new_path);
+			Ref<Texture> normal_map = get_texture_from_image(new_path, is_resource);
 			normal_maps->append(normal_map);
 			renderer_object->normal_map = normal_map;
 		}
