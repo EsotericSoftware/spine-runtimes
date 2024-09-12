@@ -37,8 +37,9 @@
 #define MANUALLY_INLINE_VECTOR_OPERATORS
 #endif
 
-// Not for optimization. Do not disable.
-#define SPINE_TRIANGLECHECK // Avoid calling SetTriangles at the cost of checking for mesh differences (vertex counts, memberwise attachment list compare) every frame.
+// Optimization option: Allows faster BuildMeshWithArrays call and avoids calling SetTriangles at the cost of
+// checking for mesh differences (vertex counts, member-wise attachment list compare) every frame.
+#define SPINE_TRIANGLECHECK
 //#define SPINE_DEBUG
 
 // New optimization option to avoid rendering fully transparent attachments at slot alpha 0.
@@ -285,7 +286,12 @@ namespace Spine.Unity {
 			instructionOutput.rawVertexCount = totalRawVertexCount;
 #endif
 
-			if (totalRawVertexCount > 0) {
+#if SPINE_TRIANGLECHECK
+			bool hasAnyVertices = totalRawVertexCount > 0;
+#else
+			bool hasAnyVertices = true;
+#endif
+			if (hasAnyVertices) {
 				workingSubmeshInstructions.Resize(1);
 				workingSubmeshInstructions.Items[0] = current;
 			} else {
@@ -367,7 +373,9 @@ namespace Spine.Unity {
 					|| (slot.A == 0f && slot.Data != clippingEndSlot)
 #endif
 					) {
+#if SPINE_TRIANGLECHECK
 					workingAttachmentsItems[i] = null;
+#endif
 					continue;
 				}
 				if (slot.Data.BlendMode == BlendMode.Additive) current.hasPMAAdditiveSlot = true;
@@ -458,7 +466,11 @@ namespace Spine.Unity {
 					Material material = (region is Material) ? (Material)region : (Material)((AtlasRegion)region).page.rendererObject;
 #endif
 
+#if !SPINE_TRIANGLECHECK
+					if (current.forceSeparate || !System.Object.ReferenceEquals(current.material, material)) { // Material changed. Add the previous submesh.
+#else
 					if (current.forceSeparate || (current.rawVertexCount > 0 && !System.Object.ReferenceEquals(current.material, material))) { // Material changed. Add the previous submesh.
+#endif
 						{ // Add
 							current.endSlot = i;
 							current.preActiveClippingSlotSource = lastPreActiveClipping;
@@ -526,9 +538,9 @@ namespace Spine.Unity {
 					wsii[i].material = overrideMaterial;
 			}
 		}
-		#endregion
+#endregion
 
-		#region Step 2 : Populate vertex data and triangle index buffers.
+#region Step 2 : Populate vertex data and triangle index buffers.
 		public void Begin () {
 			vertexBuffer.Clear(false);
 			colorBuffer.Clear(false);
@@ -799,6 +811,9 @@ namespace Spine.Unity {
 
 		// Use this faster method when no clipping is involved.
 		public void BuildMeshWithArrays (SkeletonRendererInstruction instruction, bool updateTriangles) {
+#if !SPINE_TRIANGLECHECK
+			return;
+#else
 			Settings settings = this.settings;
 			bool canvasGroupTintBlack = settings.tintBlack && settings.canvasGroupCompatible;
 			int totalVertexCount = instruction.rawVertexCount;
@@ -1113,6 +1128,7 @@ namespace Spine.Unity {
 					}
 				}
 			}
+#endif // SPINE_TRIANGLECHECK
 		}
 
 		public void ScaleVertexData (float scale) {
@@ -1202,9 +1218,9 @@ namespace Spine.Unity {
 				}
 			}
 		}
-		#endregion
+#endregion
 
-		#region Step 3 : Transfer vertex and triangle data to UnityEngine.Mesh
+#region Step 3 : Transfer vertex and triangle data to UnityEngine.Mesh
 		public void FillVertexData (Mesh mesh) {
 			Vector3[] vbi = vertexBuffer.Items;
 			Vector2[] ubi = uvBuffer.Items;
@@ -1284,7 +1300,7 @@ namespace Spine.Unity {
 				mesh.SetTriangles(submeshesItems[i].Items, i, false);
 #endif
 		}
-		#endregion
+#endregion
 
 		public void EnsureVertexCapacity (int minimumVertexCount, bool inlcudeTintBlack = false, bool includeTangents = false, bool includeNormals = false) {
 			if (minimumVertexCount > vertexBuffer.Items.Length) {
@@ -1332,7 +1348,7 @@ namespace Spine.Unity {
 			if (tangents != null) Array.Resize(ref tangents, vbiLength);
 		}
 
-		#region TangentSolver2D
+#region TangentSolver2D
 		// Thanks to contributions from forum user ToddRivers
 
 		/// <summary>Step 1 of solving tangents. Ensure you have buffers of the correct size.</summary>
@@ -1419,9 +1435,9 @@ namespace Spine.Unity {
 				tangents[i] = tangent;
 			}
 		}
-		#endregion
+#endregion
 
-		#region AttachmentRendering
+#region AttachmentRendering
 		static List<Vector3> AttachmentVerts = new List<Vector3>();
 		static List<Vector2> AttachmentUVs = new List<Vector2>();
 		static List<Color32> AttachmentColors32 = new List<Color32>();
@@ -1533,6 +1549,6 @@ namespace Spine.Unity {
 			AttachmentColors32.Clear();
 			AttachmentIndices.Clear();
 		}
-		#endregion
+#endregion
 	}
 }
