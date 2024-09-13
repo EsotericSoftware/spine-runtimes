@@ -59,7 +59,7 @@ namespace Spine {
 		public string Path { get; set; }
 		public TextureRegion Region { get { return region; } set { region = value; } }
 
-		/// <summary>For each of the 4 vertices, a pair of <code>x,y</code> values that is the local position of the vertex.</summary>
+		/// <summary>For each of the 4 vertices, a pair of <c>x,y</c> values that is the local position of the vertex.</summary>
 		/// <seealso cref="UpdateRegion"/>
 		public float[] Offset { get { return offset; } }
 		public float[] UVs { get { return uvs; } }
