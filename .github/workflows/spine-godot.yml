@@ -273,72 +273,72 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download godot-editor-windows artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: godot-editor-windows.zip
 
       - name: Download godot-editor-linux artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: godot-editor-linux.zip
 
       - name: Download godot-editor-macos artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: godot-editor-macos.zip
 
       - name: Download godot-template-ios artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: godot-template-ios.zip
 
       - name: Download godot-template-macos artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: godot-template-macos.zip
 
       - name: Download godot-template-windows-release artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: godot-template-windows-release.zip
 
       - name: Download godot-template-windows-debug artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: godot-template-windows-debug.zip
 
       - name: Download godot-template-linux-release artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: godot-template-linux-release.zip
 
       - name: Download godot-template-linux-debug artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: godot-template-linux-debug.zip
 
       - name: Download godot-template-android-release artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: godot-template-android-release.zip
 
       - name: Download godot-template-android-debug artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: godot-template-android-debug.zip
 
       - name: Download godot-template-android-source artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: godot-template-android-source.zip
 
       - name: Download godot-template-web-release artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: godot-template-web-release.zip
 
       - name: Download godot-template-web-debug artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: godot-template-web-debug.zip
 
