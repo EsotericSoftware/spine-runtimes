@@ -1,18 +1,13 @@
 cmake_minimum_required(VERSION 3.10)
 project(spine-glfw)
 
-# Default flags
-include(${CMAKE_SOURCE_DIR}/../flags.cmake)
-
-# Add spine-cpp
-add_subdirectory(${CMAKE_SOURCE_DIR}/../spine-cpp ${CMAKE_BINARY_DIR}/spine-cpp-build)
-
 include(FetchContent)
 # Fetch GLFW
 FetchContent_Declare(
         glfw
         GIT_REPOSITORY https://github.com/glfw/glfw.git
         GIT_TAG latest
+        GIT_SHALLOW 1
 )
 FetchContent_MakeAvailable(glfw)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL " " FORCE)
@@ -24,7 +19,8 @@ set(GLFW_INSTALL OFF CACHE BOOL " " FORCE)
 FetchContent_Declare(
         glbinding
         GIT_REPOSITORY https://github.com/cginternals/glbinding.git
-        GIT_TAG master
+        GIT_TAG v3.3.0
+        GIT_SHALLOW 1
 )
 FetchContent_MakeAvailable(glbinding)
 set(OPTION_BUILD_DOCS OFF CACHE BOOL " " FORCE)
@@ -37,6 +33,12 @@ include_directories(src)
 
 # Find local OpenGL lib
 find_package(OpenGL REQUIRED)
+
+# Default flags
+include(${CMAKE_SOURCE_DIR}/../flags.cmake)
+
+# Add spine-cpp
+add_subdirectory(${CMAKE_SOURCE_DIR}/../spine-cpp ${CMAKE_BINARY_DIR}/spine-cpp-build)
 
 # spine-glfw library
 add_library(spine-glfw STATIC src/spine-glfw.cpp src/spine-glfw.h src/stb_image.h)
