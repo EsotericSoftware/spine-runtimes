@@ -34,7 +34,7 @@ env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   AWS_EC2_METADATA_DISABLED: true
-  EM_VERSION: 3.1.18
+  EM_VERSION: 3.1.26
   GODOT_TAG: ${{ inputs.godot_tag }}
   GODOT_VERSION: ${{ inputs.godot_version }}
   GODOT_MONO: ${{ inputs.godot_mono }}
@@ -302,6 +302,42 @@ jobs:
           name: ${{ format('{0}-{1}{2}.zip', 'godot-template-web-release', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
           path: spine-godot/godot/bin/web_release.zip
 
+      - name: Upload artifacts no threads debug
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-web-nothreads-debug', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
+          path: spine-godot/godot/bin/web_nothreads_debug.zip
+
+      - name: Upload artifacts no threads release
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-web-nothreads-release', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
+          path: spine-godot/godot/bin/web_nothreads_release.zip
+
+      - name: Upload artifacts dlink debug
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-web-dlink-debug', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
+          path: spine-godot/godot/bin/web_dlink_debug.zip
+
+      - name: Upload artifacts dlink release
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-web-dlink-release', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
+          path: spine-godot/godot/bin/web_dlink_release.zip
+
+      - name: Upload artifacts dlink nothreads debug
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-web-dlink-nothreads-debug', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
+          path: spine-godot/godot/bin/web_dlink_nothreads_debug.zip
+
+      - name: Upload artifacts dlink nothreads release
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-web-dlink-nothreads-release', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
+          path: spine-godot/godot/bin/web_dlink_nothreads_release.zip
+
   upload-to-s3:
     needs: [godot-editor-windows, godot-editor-linux, godot-editor-macos, godot-template-ios, godot-template-macos, godot-template-windows, godot-template-linux, godot-template-android, godot-template-web]
     runs-on: ubuntu-latest
@@ -377,6 +413,36 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: ${{ format('{0}-{1}{2}.zip', 'godot-template-web-debug', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
+
+      - name: Download godot-template-web-nothreads-release artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-web-nothreads-release', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
+
+      - name: Download godot-template-web-nothreads-debug artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-web-nothreads-debug', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
+
+      - name: Download godot-template-web-dlink-release artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-web-dlink-release', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
+
+      - name: Download godot-template-web-dlink-debug artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-web-dlink-debug', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
+
+      - name: Download godot-template-web-dlink-nothreads-release artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-web-dlink-nothreads-release', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
+
+      - name: Download godot-template-web-dlink-nothreads-debug artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-web-dlink-nothreads-debug', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
 
       - name: Upload artifacts to S3
         shell: bash
