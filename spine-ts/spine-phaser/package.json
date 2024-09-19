@@ -34,5 +34,8 @@
     "@esotericsoftware/spine-core": "4.2.59",
     "@esotericsoftware/spine-webgl": "4.2.59",
     "@esotericsoftware/spine-canvas": "4.2.59"
+  },
+  "peerDependencies": {
+    "phaser": "3.60.0"
   }
 }
