@@ -3,17 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <script src="../dist/iife/spine-webgl.js"></script> -->
-    <script src="./spine-webgl.min.js"></script>
+    <script src="../dist/iife/spine-webgl.js"></script>
+    <!-- <script src="./spine-webgl.min.js"></script> -->
     <title>JS Library Showcase</title>
     <style>
         body {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }
-        html {
-            /* scroll-behavior: smooth; */
         }
         body {
             font-family: Arial, sans-serif;
@@ -1502,7 +1499,7 @@ skins.forEach((skin, i) => {
 
             <script>
                 const stretchyman = spine.getSpineWidget("stretchyman");
-                stretchyman.update = (canvas, delta, skeleton, state) => {
+                stretchyman.update = (delta, skeleton, state) => {
                     // skin logiv if widget is off screen
                     if (!stretchyman.onScreen) return;
 
@@ -1602,7 +1599,7 @@ stretchyman.update = (canvas, delta, skeleton, state) => {
                     await tank.loadingPromise;
                     await tank2.loadingPromise;
 
-                    tank.beforeUpdateWorldTransforms = (canvas, delta, skeleton, state) => {
+                    tank.beforeUpdateWorldTransforms = (skeleton, state) => {
                         if (!tank.onScreen) return;
                         tank.skeleton.scaleX = tank2.skeleton.scaleX;
                         tank.skeleton.scaleY = tank2.skeleton.scaleY;
