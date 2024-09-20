@@ -592,7 +592,6 @@ class SpineWebComponentOverlay extends HTMLElement {
     private resizeObserver:ResizeObserver;
     private input: Input;
 
-    // TODO: the canvas is now beg as the screen - maybe we can reduce the enhancement of the canvas and just translate
 	// how many pixels to add to the edges to prevent "edge cuttin" on fast scrolling
     // be aware that the canvas is already big as the display size
     // making it bigger might reduce performance significantly
@@ -645,7 +644,7 @@ class SpineWebComponentOverlay extends HTMLElement {
 		this.renderer = new SceneRenderer(this.canvas, context);
 		this.assetManager = new AssetManager(context);
 		this.input = new Input(this.canvas);
-        this.setupSpineCanvasApp(this.canvas);
+        this.setupRenderingElements();
 
         this.updateCanvasSize();
         this.zoomHandler();
@@ -683,7 +682,7 @@ class SpineWebComponentOverlay extends HTMLElement {
         this.intersectionObserver!.observe(widget.getHTMLElementReference());
     }
 
-    private setupSpineCanvasApp(canvas: HTMLCanvasElement) {
+    private setupRenderingElements() {
         const updateWidgets = () => {
             const delta = this.time.delta;
             this.skeletonList.forEach(({ skeleton, state, update, onScreen, offScreenUpdateBehaviour, beforeUpdateWorldTransforms, afterUpdateWorldTransforms }) => {
@@ -711,6 +710,50 @@ class SpineWebComponentOverlay extends HTMLElement {
             this.renderer.context.gl.clear(this.renderer.context.gl.COLOR_BUFFER_BIT);
         }
 
+        const clipToBoundStart = (divBounds: Rectangle) => {
+            // break current batch and start a new one
+            this.renderer.end();
+
+            // set the new viewport to the div bound
+            const viewportWidth = divBounds.width * window.devicePixelRatio;
+            const viewporthHeight = divBounds.height * window.devicePixelRatio;
+            this.renderer.context.gl.viewport(
+                divBounds.x * window.devicePixelRatio,
+                this.canvas.height - (divBounds.y + divBounds.height) * window.devicePixelRatio,
+                viewportWidth,
+                viewporthHeight
+            );
+            this.renderer.camera.setViewport(viewportWidth, viewporthHeight);
+            this.renderer.camera.update();
+
+            // start the new batch that will be filled with only this skeleton
+            this.renderer.begin();
+
+            // Debug viewport
+            // if (true) {
+            //     renderer.circle(true, -viewportWidth / 2, -viewporthHeight / 2, 20, red);
+            //     renderer.circle(true, viewportWidth / 2, -viewporthHeight / 2, 20, red);
+            //     renderer.circle(true, -viewportWidth / 2, viewporthHeight / 2, 20, red);
+            //     renderer.circle(true, viewportWidth / 2, viewporthHeight / 2, 20, red);
+            //     renderer.circle(true, 0, 0, 10, red);
+
+            //     renderer.rect(true, 0, 0, -viewportWidth, -viewporthHeight, transparentWhite);
+            //     renderer.rect(true, 0, 0, viewportWidth, viewporthHeight, transparentWhite);
+            // }
+        }
+
+        const clipToBoundEnd = () =>  {
+            // end clip batch
+            this.renderer.end();
+
+            this.renderer.context.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+            this.renderer.camera.setViewport(this.canvas.width, this.canvas.height);
+            this.renderer.camera.update();
+
+            // start new normal batch
+            this.renderer.begin();
+        }
+
         const renderWidgets = () => {
             clear(0, 0, 0, 0);
             let renderer = this.renderer;
@@ -728,321 +771,140 @@ class SpineWebComponentOverlay extends HTMLElement {
 
                 // TODO: drag does not work while clip is on
 
-                // TODO: now that the clip logic works, remove the code duplication
+                let divOriginX = 0;
+                let divOriginY = 0;
                 if (clip) {
-                    const clipToBoundStart = (divBounds: Rectangle) => {
-                        // break current batch and start a new one
-                        renderer.end();
-
-                        // set the new viewport to the div bound
-                        const viewportWidth = divBounds.width * window.devicePixelRatio;
-                        const viewporthHeight = divBounds.height * window.devicePixelRatio;
-                        renderer.context.gl.viewport(
-                            divBounds.x * window.devicePixelRatio,
-                            this.canvas.height - (divBounds.y + divBounds.height) * window.devicePixelRatio,
-                            viewportWidth,
-                            viewporthHeight
-                        );
-                        renderer.camera.setViewport(viewportWidth, viewporthHeight);
-                        renderer.camera.update();
-
-                        // start the new batch that will be filled with only this skeleton
-                        renderer.begin();
-
-                        // TODO: debug - to remove
-                        if (false) {
-                            renderer.circle(true, -viewportWidth / 2, -viewporthHeight / 2, 20, red);
-                            renderer.circle(true, viewportWidth / 2, -viewporthHeight / 2, 20, red);
-                            renderer.circle(true, -viewportWidth / 2, viewporthHeight / 2, 20, red);
-                            renderer.circle(true, viewportWidth / 2, viewporthHeight / 2, 20, red);
-                            renderer.circle(true, 0, 0, 10, red);
-
-                            renderer.rect(true, 0, 0, -viewportWidth, -viewporthHeight, transparentWhite);
-                            renderer.rect(true, 0, 0, viewportWidth, viewporthHeight, transparentWhite);
-                        }
-                    }
-
-                    const clipToBoundEnd = () =>  {
-                        // end clip batch
-                        renderer.end();
-
-                        renderer.context.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
-                        renderer.camera.setViewport(this.canvas.width, this.canvas.height);
-                        renderer.camera.update();
-
-                        // start new normal batch
-                        renderer.begin();
-                    }
-
-
-
-                    clipToBoundStart(divBounds)
-
-
-
+                    // in clip mode, the world origin is moved to the div top left
+                    clipToBoundStart(divBounds);
+                } else {
                     // get the desired point into the the div (center by default) in world coordinate
                     const divX = divBounds.x + divBounds.width * (xAxis + .5);
                     const divY = divBounds.y + divBounds.height * (-yAxis + .5);
                     this.screenToWorld(tempVector, divX, divY);
-
-                    if (loading) {
-                        if (loadingSpinner) {
-                            if (!widget.loadingScreen) widget.loadingScreen = new LoadingScreenWidget(renderer);
-                            widget.loadingScreen!.draw(true, tempVector.x, tempVector.y, divBounds.width * devicePixelRatio, divBounds.height * devicePixelRatio);
-                        }
-                        return;
-                    }
-
-                    if (skeleton) {
-                        let x = tempVector.x;
-                        let y = tempVector.y;
-                        if (mode === 'inside') {
-                            let { x: ax, y: ay, width: aw, height: ah } = bounds!;
-
-                            // scale ratio
-                            const scaleWidth = divBounds.width * devicePixelRatio / aw;
-                            const scaleHeight = divBounds.height * devicePixelRatio / ah;
-
-                            let ratioW = skeleton.scaleX;
-                            let ratioH = skeleton.scaleY;
-
-                            if (fit === "fill") { // Fill the target box by distorting the source's aspect ratio.
-                                ratioW = scaleWidth;
-                                ratioH = scaleHeight;
-                            } else if (fit === "fitWidth") {
-                                ratioW = scaleWidth;
-                                ratioH = scaleWidth;
-                            } else if (fit === "fitHeight") {
-                                ratioW = scaleHeight;
-                                ratioH = scaleHeight;
-                            } else if (fit === "contain") {
-                                // if scaled height is bigger than div height, use height ratio instead
-                                if (ah * scaleWidth > divBounds.height * devicePixelRatio){
-                                    ratioW = scaleHeight;
-                                    ratioH = scaleHeight;
-                                } else {
-                                    ratioW = scaleWidth;
-                                    ratioH = scaleWidth;
-                                }
-                            } else if (fit === "cover") {
-                                if (ah * scaleWidth < divBounds.height * devicePixelRatio){
-                                    ratioW = scaleHeight;
-                                    ratioH = scaleHeight;
-                                } else {
-                                    ratioW = scaleWidth;
-                                    ratioH = scaleWidth;
-                                }
-                            } else if (fit === "scaleDown") {
-                                if (aw > divBounds.width * devicePixelRatio || ah > divBounds.height * devicePixelRatio) {
-                                    if (ah * scaleWidth > divBounds.height * devicePixelRatio){
-                                        ratioW = scaleHeight;
-                                        ratioH = scaleHeight;
-                                    } else {
-                                        ratioW = scaleWidth;
-                                        ratioH = scaleWidth;
-                                    }
-                                }
-                            }
-
-                            // get the center of the bounds
-                            const boundsX = (ax + aw / 2) * ratioW;
-                            const boundsY = (ay + ah / 2) * ratioH;
-
-                            // get vertices offset: calculate the distance between div center and bounds center
-                            x = - boundsX;
-                            y = - boundsY;
-
-                            if (fit !== "none") {
-                                // scale the skeleton
-                                skeleton.scaleX = ratioW;
-                                skeleton.scaleY = ratioH;
-                                skeleton.updateWorldTransform(Physics.update);
-                            }
-                        }
-
-                        widget.worldOffsetX = x + offsetX + dragX;
-                        widget.worldOffsetY = y + offsetY + dragY;
-
-                        renderer.drawSkeleton(skeleton, true, -1, -1, (vertices, size, vertexSize) => {
-                            for (let i = 0; i < size; i+=vertexSize) {
-                                vertices[i] = vertices[i] + widget.worldOffsetX;
-                                vertices[i+1] = vertices[i+1] + widget.worldOffsetY;
-                            }
-                        });
-
-                        // drawing debug stuff
-                        if (debug) {
-                        // if (true) {
-                            let { x: ax, y: ay, width: aw, height: ah } = bounds!;
-
-                            // show bounds and its center
-                            renderer.rect(false,
-                                ax * skeleton.scaleX + widget.worldOffsetX,
-                                ay * skeleton.scaleY + widget.worldOffsetY,
-                                aw * skeleton.scaleX,
-                                ah * skeleton.scaleY,
-                                blue);
-                            const bbCenterX = (ax + aw / 2) * skeleton.scaleX + widget.worldOffsetX;
-                            const bbCenterY = (ay + ah / 2) * skeleton.scaleY + widget.worldOffsetY;
-                            renderer.circle(true, bbCenterX, bbCenterY, 10, blue);
-
-                            // show skeleton root
-                            const root = skeleton.getRootBone()!;
-                            renderer.circle(true, root.x + widget.worldOffsetX, root.y + widget.worldOffsetY, 10, red);
-
-                            // show shifted origin
-                            const originX = widget.worldOffsetX - dragX - offsetX;
-                            const originY = widget.worldOffsetY - dragY - offsetY;
-                            renderer.circle(true, originX, originY, 10, green);
-
-                            // show line from origin to bounds center
-                            renderer.line(originX, originY, bbCenterX, bbCenterY, green);
-                        }
-                    }
-
-
-
-                    clipToBoundEnd();
-
+                    divOriginX = tempVector.x;
+                    divOriginY = tempVector.y;
                 }
 
+                const divWidthWorld = divBounds.width * devicePixelRatio;
+                const divHeightWorld = divBounds.height * devicePixelRatio;
 
-
-
-
-                else {
-
-
-                    // get the desired point into the the div (center by default) in world coordinate
-                    const divX = divBounds.x + divBounds.width * (xAxis + .5);
-                    const divY = divBounds.y + divBounds.height * (-yAxis + .5);
-                    this.screenToWorld(tempVector, divX, divY);
-
-                    if (loading) {
-                        if (loadingSpinner) {
-                            if (!widget.loadingScreen) widget.loadingScreen = new LoadingScreenWidget(renderer);
-                            widget.loadingScreen!.draw(true, tempVector.x, tempVector.y, divBounds.width * devicePixelRatio, divBounds.height * devicePixelRatio);
-                        }
-                        return;
+                if (loading) {
+                    if (loadingSpinner) {
+                        if (!widget.loadingScreen) widget.loadingScreen = new LoadingScreenWidget(renderer);
+                        widget.loadingScreen!.draw(true, divOriginX, divOriginY, divWidthWorld, divHeightWorld);
                     }
-
-                    if (skeleton) {
-                        let x = tempVector.x;
-                        let y = tempVector.y;
-                        if (mode === 'inside') {
-                            let { x: ax, y: ay, width: aw, height: ah } = bounds!;
-
-                            // scale ratio
-                            const scaleWidth = divBounds.width * devicePixelRatio / aw;
-                            const scaleHeight = divBounds.height * devicePixelRatio / ah;
-
-                            let ratioW = skeleton.scaleX;
-                            let ratioH = skeleton.scaleY;
-
-                            if (fit === "fill") { // Fill the target box by distorting the source's aspect ratio.
-                                ratioW = scaleWidth;
-                                ratioH = scaleHeight;
-                            } else if (fit === "fitWidth") {
-                                ratioW = scaleWidth;
-                                ratioH = scaleWidth;
-                            } else if (fit === "fitHeight") {
-                                ratioW = scaleHeight;
-                                ratioH = scaleHeight;
-                            } else if (fit === "contain") {
-                                // if scaled height is bigger than div height, use height ratio instead
-                                if (ah * scaleWidth > divBounds.height * devicePixelRatio){
-                                    ratioW = scaleHeight;
-                                    ratioH = scaleHeight;
-                                } else {
-                                    ratioW = scaleWidth;
-                                    ratioH = scaleWidth;
-                                }
-                            } else if (fit === "cover") {
-                                if (ah * scaleWidth < divBounds.height * devicePixelRatio){
-                                    ratioW = scaleHeight;
-                                    ratioH = scaleHeight;
-                                } else {
-                                    ratioW = scaleWidth;
-                                    ratioH = scaleWidth;
-                                }
-                            } else if (fit === "scaleDown") {
-                                if (aw > divBounds.width * devicePixelRatio || ah > divBounds.height * devicePixelRatio) {
-                                    if (ah * scaleWidth > divBounds.height * devicePixelRatio){
-                                        ratioW = scaleHeight;
-                                        ratioH = scaleHeight;
-                                    } else {
-                                        ratioW = scaleWidth;
-                                        ratioH = scaleWidth;
-                                    }
-                                }
-                            }
-
-                            // get the center of the bounds
-                            const boundsX = (ax + aw / 2) * ratioW;
-                            const boundsY = (ay + ah / 2) * ratioH;
-
-                            // get vertices offset: calculate the distance between div center and bounds center
-                            x = tempVector.x - boundsX;
-                            y = tempVector.y - boundsY;
-
-                            if (fit !== "none") {
-                                // scale the skeleton
-                                skeleton.scaleX = ratioW;
-                                skeleton.scaleY = ratioH;
-                                skeleton.updateWorldTransform(Physics.update);
-                            }
-                        }
-
-                        widget.worldOffsetX = x + offsetX + dragX;
-                        widget.worldOffsetY = y + offsetY + dragY;
-
-                        renderer.drawSkeleton(skeleton, true, -1, -1, (vertices, size, vertexSize) => {
-                            for (let i = 0; i < size; i+=vertexSize) {
-                                vertices[i] = vertices[i] + widget.worldOffsetX;
-                                vertices[i+1] = vertices[i+1] + widget.worldOffsetY;
-                            }
-                        });
-
-                        // drawing debug stuff
-                        if (debug) {
-                        // if (true) {
-                            let { x: ax, y: ay, width: aw, height: ah } = bounds!;
-
-                            // show bounds and its center
-                            renderer.rect(false,
-                                ax * skeleton.scaleX + widget.worldOffsetX,
-                                ay * skeleton.scaleY + widget.worldOffsetY,
-                                aw * skeleton.scaleX,
-                                ah * skeleton.scaleY,
-                                blue);
-                            const bbCenterX = (ax + aw / 2) * skeleton.scaleX + widget.worldOffsetX;
-                            const bbCenterY = (ay + ah / 2) * skeleton.scaleY + widget.worldOffsetY;
-                            renderer.circle(true, bbCenterX, bbCenterY, 10, blue);
-
-                            // show skeleton root
-                            const root = skeleton.getRootBone()!;
-                            renderer.circle(true, root.x + widget.worldOffsetX, root.y + widget.worldOffsetY, 10, red);
-
-                            // show shifted origin
-                            const originX = widget.worldOffsetX - dragX - offsetX;
-                            const originY = widget.worldOffsetY - dragY - offsetY;
-                            renderer.circle(true, originX, originY, 10, green);
-
-                            // show line from origin to bounds center
-                            renderer.line(originX, originY, bbCenterX, bbCenterY, green);
-                        }
-                    }
-
-
+                    if (clip) clipToBoundEnd();
+                    return;
                 }
 
+                if (skeleton) {
+                    if (mode === 'inside') {
+                        let { x: ax, y: ay, width: aw, height: ah } = bounds!;
 
+                        // scale ratio
+                        const scaleWidth = divWidthWorld / aw;
+                        const scaleHeight = divHeightWorld / ah;
 
+                        // default value is used for fit = none
+                        let ratioW = skeleton.scaleX;
+                        let ratioH = skeleton.scaleY;
 
+                        if (fit === "fill") { // Fill the target box by distorting the source's aspect ratio.
+                            ratioW = scaleWidth;
+                            ratioH = scaleHeight;
+                        } else if (fit === "fitWidth") {
+                            ratioW = scaleWidth;
+                            ratioH = scaleWidth;
+                        } else if (fit === "fitHeight") {
+                            ratioW = scaleHeight;
+                            ratioH = scaleHeight;
+                        } else if (fit === "contain") {
+                            // if scaled height is bigger than div height, use height ratio instead
+                            if (ah * scaleWidth > divHeightWorld){
+                                ratioW = scaleHeight;
+                                ratioH = scaleHeight;
+                            } else {
+                                ratioW = scaleWidth;
+                                ratioH = scaleWidth;
+                            }
+                        } else if (fit === "cover") {
+                            if (ah * scaleWidth < divHeightWorld){
+                                ratioW = scaleHeight;
+                                ratioH = scaleHeight;
+                            } else {
+                                ratioW = scaleWidth;
+                                ratioH = scaleWidth;
+                            }
+                        } else if (fit === "scaleDown") {
+                            if (aw > divWidthWorld || ah > divHeightWorld) {
+                                if (ah * scaleWidth > divHeightWorld){
+                                    ratioW = scaleHeight;
+                                    ratioH = scaleHeight;
+                                } else {
+                                    ratioW = scaleWidth;
+                                    ratioH = scaleWidth;
+                                }
+                            }
+                        }
 
+                        // get the center of the bounds
+                        const boundsX = (ax + aw / 2) * ratioW;
+                        const boundsY = (ay + ah / 2) * ratioH;
 
+                        // get vertices offset: calculate the distance between div center and bounds center
+                        divOriginX = divOriginX - boundsX;
+                        divOriginY = divOriginY - boundsY;
 
+                        if (fit !== "none") {
+                            // scale the skeleton
+                            skeleton.scaleX = ratioW;
+                            skeleton.scaleY = ratioH;
+                            skeleton.updateWorldTransform(Physics.update);
+                        }
+                    }
 
+                    widget.worldOffsetX = divOriginX + offsetX + dragX;
+                    widget.worldOffsetY = divOriginY + offsetY + dragY;
+
+                    renderer.drawSkeleton(skeleton, true, -1, -1, (vertices, size, vertexSize) => {
+                        for (let i = 0; i < size; i+=vertexSize) {
+                            vertices[i] = vertices[i] + widget.worldOffsetX;
+                            vertices[i+1] = vertices[i+1] + widget.worldOffsetY;
+                        }
+                    });
+
+                    // drawing debug stuff
+                    if (debug) {
+                    // if (true) {
+                        let { x: ax, y: ay, width: aw, height: ah } = bounds!;
+
+                        // show bounds and its center
+                        renderer.rect(false,
+                            ax * skeleton.scaleX + widget.worldOffsetX,
+                            ay * skeleton.scaleY + widget.worldOffsetY,
+                            aw * skeleton.scaleX,
+                            ah * skeleton.scaleY,
+                            blue);
+                        const bbCenterX = (ax + aw / 2) * skeleton.scaleX + widget.worldOffsetX;
+                        const bbCenterY = (ay + ah / 2) * skeleton.scaleY + widget.worldOffsetY;
+                        renderer.circle(true, bbCenterX, bbCenterY, 10, blue);
+
+                        // show skeleton root
+                        const root = skeleton.getRootBone()!;
+                        renderer.circle(true, root.x + widget.worldOffsetX, root.y + widget.worldOffsetY, 10, red);
+
+                        // show shifted origin
+                        const originX = widget.worldOffsetX - dragX - offsetX;
+                        const originY = widget.worldOffsetY - dragY - offsetY;
+                        renderer.circle(true, originX, originY, 10, green);
+
+                        // show line from origin to bounds center
+                        renderer.line(originX, originY, bbCenterX, bbCenterY, green);
+                    }
+
+                    if (clip) clipToBoundEnd();
+
+                }
             });
 
             renderer.end();
