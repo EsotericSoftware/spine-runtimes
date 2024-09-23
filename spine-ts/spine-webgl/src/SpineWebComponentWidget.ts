@@ -29,9 +29,12 @@
 
 import { AtlasAttachmentLoader, SkeletonBinary, SkeletonJson, Skeleton, Animation, AnimationState, AnimationStateData, Physics, Vector2, Vector3, Color, MixBlend, MixDirection, SceneRenderer, SkeletonData, Input, LoadingScreenWidget, TextureAtlas, Texture, ManagedWebGLRenderingContext, AssetManager, TimeKeeper } from "./index.js";
 
-interface Rectangle {
+interface Point {
     x: number,
     y: number,
+}
+
+interface Rectangle extends Point {
     width: number,
     height: number,
 }
@@ -140,6 +143,8 @@ class SpineWebComponentWidget extends HTMLElement implements WidgetLayoutOptions
     public started = false;
     public onScreenAtLeastOnce = false;
 
+    public debugDragDiv: HTMLDivElement;
+
     public onScreenFunction: (widget: SpineWebComponentWidget) => void = async (widget) => {
         if (widget.loading && !widget.onScreenAtLeastOnce) {
             widget.onScreenAtLeastOnce = true;
@@ -168,6 +173,7 @@ class SpineWebComponentWidget extends HTMLElement implements WidgetLayoutOptions
     private divLoader: HTMLDivElement;
 
     public loadingScreen: LoadingScreenWidget | null = null;
+    public dragBoundsRectangle: Rectangle = { x: 0, y: 0, width: 0, height: 0 };
 
     static get observedAttributes(): string[] {
         return [
@@ -208,6 +214,11 @@ class SpineWebComponentWidget extends HTMLElement implements WidgetLayoutOptions
         const loader = document.createElement("div");
         loader.classList.add("loader");
         this.divLoader.appendChild(loader);
+
+        this.debugDragDiv = document.createElement('div');
+        this.debugDragDiv.style.position = "absolute";
+        this.debugDragDiv.style.backgroundColor = "rgba(0, 1, 1, 0.3)";
+        this.debugDragDiv.style.setProperty("pointer-events", "none");
     }
 
     connectedCallback() {
@@ -731,14 +742,14 @@ class SpineWebComponentOverlay extends HTMLElement {
 
             // Debug viewport
             // if (true) {
-            //     renderer.circle(true, -viewportWidth / 2, -viewporthHeight / 2, 20, red);
-            //     renderer.circle(true, viewportWidth / 2, -viewporthHeight / 2, 20, red);
-            //     renderer.circle(true, -viewportWidth / 2, viewporthHeight / 2, 20, red);
-            //     renderer.circle(true, viewportWidth / 2, viewporthHeight / 2, 20, red);
-            //     renderer.circle(true, 0, 0, 10, red);
+            //     this.renderer.circle(true, -viewportWidth / 2, -viewporthHeight / 2, 20, red);
+            //     this.renderer.circle(true, viewportWidth / 2, -viewporthHeight / 2, 20, red);
+            //     this.renderer.circle(true, -viewportWidth / 2, viewporthHeight / 2, 20, red);
+            //     this.renderer.circle(true, viewportWidth / 2, viewporthHeight / 2, 20, red);
+            //     this.renderer.circle(true, 0, 0, 10, red);
 
-            //     renderer.rect(true, 0, 0, -viewportWidth, -viewporthHeight, transparentWhite);
-            //     renderer.rect(true, 0, 0, viewportWidth, viewporthHeight, transparentWhite);
+            //     this.renderer.rect(true, 0, 0, -viewportWidth, -viewporthHeight, transparentWhite);
+            //     this.renderer.rect(true, 0, 0, viewportWidth, viewporthHeight, transparentWhite);
             // }
         }
 
@@ -762,7 +773,7 @@ class SpineWebComponentOverlay extends HTMLElement {
             const devicePixelRatio = window.devicePixelRatio;
             const tempVector = new Vector3();
             this.skeletonList.forEach((widget) => {
-                const { skeleton, bounds, mode, debug, offsetX, offsetY, xAxis, yAxis, dragX, dragY, fit, loadingSpinner, onScreen, loading, clip } = widget;
+                const { skeleton, bounds, mode, debug, offsetX, offsetY, xAxis, yAxis, dragX, dragY, fit, loadingSpinner, onScreen, loading, clip, draggable } = widget;
 
                 if ((!onScreen && dragX === 0 && dragY === 0)) return;
                 const divBounds = widget.getHTMLElementReference().getBoundingClientRect();
@@ -774,7 +785,7 @@ class SpineWebComponentOverlay extends HTMLElement {
                 let divOriginX = 0;
                 let divOriginY = 0;
                 if (clip) {
-                    // in clip mode, the world origin is moved to the div top left
+                    // in clip mode, the world origin is the div center (divBounds center)
                     clipToBoundStart(divBounds);
                 } else {
                     // get the desired point into the the div (center by default) in world coordinate
@@ -873,6 +884,21 @@ class SpineWebComponentOverlay extends HTMLElement {
                         }
                     });
 
+                    // store the draggable surface to make darg logic easier
+                    if (draggable) {
+                        let { x: ax, y: ay, width: aw, height: ah } = bounds!;
+                        this.worldToScreen(tempVector, ax * skeleton.scaleX + widget.worldOffsetX, ay * skeleton.scaleY + widget.worldOffsetY);
+                        widget.dragBoundsRectangle.x = tempVector.x + window.scrollX;
+                        widget.dragBoundsRectangle.y = tempVector.y - ah * skeleton.scaleY / window.devicePixelRatio + window.scrollY;
+                        widget.dragBoundsRectangle.width = aw * skeleton.scaleX / window.devicePixelRatio;
+                        widget.dragBoundsRectangle.height = ah * skeleton.scaleY / window.devicePixelRatio;
+
+                        if (clip) {
+                            widget.dragBoundsRectangle.x += divBounds.x;
+                            widget.dragBoundsRectangle.y += divBounds.y;
+                        }
+                    }
+
                     // drawing debug stuff
                     if (debug) {
                     // if (true) {
@@ -900,6 +926,12 @@ class SpineWebComponentOverlay extends HTMLElement {
 
                         // show line from origin to bounds center
                         renderer.line(originX, originY, bbCenterX, bbCenterY, green);
+
+                        if (!widget.debugDragDiv.isConnected) document.body.appendChild(widget.debugDragDiv);
+                        widget.debugDragDiv.style.left = `${widget.dragBoundsRectangle.x - this.overflowLeftSize}px`;
+                        widget.debugDragDiv.style.top = `${widget.dragBoundsRectangle.y - this.overflowTopSize}px`;
+                        widget.debugDragDiv.style.width = `${widget.dragBoundsRectangle.width}px`;
+                        widget.debugDragDiv.style.height = `${widget.dragBoundsRectangle.height}px`;
                     }
 
                     if (clip) clipToBoundEnd();
@@ -947,53 +979,45 @@ class SpineWebComponentOverlay extends HTMLElement {
 
     private setupDragUtility() {
 		// TODO: we should use document - body might have some margin that offset the click events - Meanwhile I take event pageX/Y
-		const tempVectorInput = new Vector3();
+		const point: Point = { x: 0, y: 0 };
+
+        const getInput = (ev?: MouseEvent | TouchEvent): Point => {
+            const originalEvent = ev instanceof MouseEvent ? ev : ev!.changedTouches[0];
+            point.x = originalEvent.pageX + this.overflowLeftSize;
+            point.y = originalEvent.pageY + this.overflowTopSize;
+            return point;
+        }
 
 		let prevX = 0;
 		let prevY = 0;
 		this.input.addListener({
 			down: (x, y, ev) => {
-				const originalEvent = ev instanceof MouseEvent ? ev : ev!.changedTouches[0];
-				tempVectorInput.set(originalEvent.pageX - window.scrollX + this.overflowLeftSize, originalEvent.pageY - window.scrollY + this.overflowTopSize, 0);
-				this.renderer.camera.screenToWorld(tempVectorInput, this.canvas.clientWidth, this.canvas.clientHeight);
+				const input = getInput(ev);
 				this.skeletonList.forEach(widget => {
 					if (!widget.draggable || (!widget.onScreen && widget.dragX === 0 && widget.dragY === 0)) return;
-
-                    const { worldOffsetX, worldOffsetY } = widget;
-                    const bounds = widget.bounds!;
-                    const skeleton = widget.skeleton!;
-                    const newBounds: Rectangle = {
-                        x: bounds.x * skeleton.scaleX + worldOffsetX,
-                        y: bounds.y * skeleton.scaleY + worldOffsetY,
-                        width: bounds.width * skeleton.scaleX,
-                        height: bounds.height * skeleton.scaleY,
-                    };
-
-                    if (inside(tempVectorInput, newBounds)) {
+                    if (inside(input, widget.dragBoundsRectangle)) {
                         widget.dragging = true;
                         ev?.preventDefault();
                     }
 				});
-				prevX = tempVectorInput.x;
-				prevY = tempVectorInput.y;
+				prevX = input.x;
+				prevY = input.y;
 			},
 			dragged: (x, y, ev) => {
-				const originalEvent = ev instanceof MouseEvent ? ev : ev!.changedTouches[0];
-				tempVectorInput.set(originalEvent.pageX - window.scrollX + this.overflowLeftSize, originalEvent.pageY - window.scrollY + this.overflowTopSize, 0);
-				this.renderer.camera.screenToWorld(tempVectorInput, this.canvas.clientWidth, this.canvas.clientHeight);
-				let dragX = tempVectorInput.x - prevX;
-				let dragY = tempVectorInput.y - prevY;
+				const input = getInput(ev);
+				let dragX = input.x - prevX;
+				let dragY = input.y - prevY;
 				this.skeletonList.forEach(widget => {
                     if (!widget.dragging || (!widget.onScreen && widget.dragX === 0 && widget.dragY === 0)) return;
                     const skeleton = widget.skeleton!;
+                    widget.dragX += dragX * window.devicePixelRatio;
+                    widget.dragY -= dragY * window.devicePixelRatio;
                     skeleton.physicsTranslate(dragX, dragY);
-                    widget.dragX += dragX;
-                    widget.dragY += dragY;
                     ev?.preventDefault();
-                    ev?.stopPropagation()
+                    ev?.stopPropagation();
 				});
-				prevX = tempVectorInput.x;
-				prevY = tempVectorInput.y;
+				prevX = input.x;
+				prevY = input.y;
 			},
 			up: () => {
 				this.skeletonList.forEach(widget => {
@@ -1099,6 +1123,12 @@ class SpineWebComponentOverlay extends HTMLElement {
         vec.set(x, y, 0);
         // pay attention that clientWidth/Height rounds the size - if we don't like it, we should use getBoundingClientRect as in getPagSize
         this.renderer.camera.screenToWorld(vec, this.canvas.clientWidth, this.canvas.clientHeight);
+    }
+    private worldToScreen(vec: Vector3, x: number, y: number) {
+        vec.set(x, -y, 0);
+        // pay attention that clientWidth/Height rounds the size - if we don't like it, we should use getBoundingClientRect as in getPagSize
+        // this.renderer.camera.worldToScreen(vec, this.canvas.clientWidth, this.canvas.clientHeight);
+        this.renderer.camera.worldToScreen(vec, this.renderer.camera.viewportWidth / window.devicePixelRatio, this.renderer.camera.viewportHeight / window.devicePixelRatio);
     }
 }
 

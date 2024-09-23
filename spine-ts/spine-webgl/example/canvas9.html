@@ -1717,6 +1717,7 @@ stretchyman.update = (canvas, delta, skeleton, state) => {
                         skeleton="assets/celestial-circus-pro.skel"
                         animation="wings-and-feet"
                         clip="true"
+                        draggable="true"
                     ></spine-widget>
 
                     <script>
@@ -1736,7 +1737,64 @@ stretchyman.update = (canvas, delta, skeleton, state) => {
             <pre><code id="code-display">
                 <script>
                 escapeHTMLandInject(`
-...`);
+<div class="split-left">
+    <spine-widget
+        atlas="assets/spineboy-pma.atlas"
+        skeleton="assets/spineboy-pro.skel"
+        animation="walk"
+        scale="3"
+        fit="none"
+        clip="true"
+    ></spine-widget>
+</div>
+<div class="split-right">
+    <spine-widget
+        atlas="assets/spineboy-pma.atlas"
+        skeleton="assets/spineboy-pro.skel"
+        animation="walk"
+        scale="1.5"
+        fit="none"
+        clip="true"
+    ></spine-widget>
+</div>
+<div class="split-right">
+    <spine-widget
+        atlas="assets/spineboy-pma.atlas"
+        skeleton="assets/spineboy-pro.skel"
+        animation="walk"
+        scale="1"
+        fit="none"
+        clip="true"
+    ></spine-widget>
+</div>
+<div class="split-right">
+    <spine-widget
+        atlas="assets/cloud-pot-pma.atlas"
+        skeleton="assets/cloud-pot.skel"
+        animation="playing-in-the-rain"
+        scale="0.5"
+        fit="none"
+        clip="true"
+    ></spine-widget>
+</div>
+<div class="split-right">
+    <spine-widget
+        identifier="celeste"
+        atlas="assets/celestial-circus-pma.atlas"
+        skeleton="assets/celestial-circus-pro.skel"
+        animation="wings-and-feet"
+        clip="true"
+        draggable="true"
+    ></spine-widget>
+</div>
+
+...
+
+(async () => {
+    const celeste = spine.getSpineWidget("celeste");
+    await celeste.loadingPromise;
+    celeste.state.setAnimation(0, "swing", true);
+})();`);
                 </script>
             </code></pre>
         </div>
