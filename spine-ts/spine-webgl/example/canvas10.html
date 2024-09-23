@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="../dist/iife/spine-webgl.js"></script>
+    <!-- <script src="./spine-webgl.min.js"></script> -->
+    <title>JS Library Showcase</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .section {
+            /* height: 100lvh; */
+            /* height: 800px; */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            background-color: #3498db;
+        }
+        .split {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .full-width {
+            width: 100%;
+        }
+        .split-left, .split-right {
+            width: 50%;
+            min-height: 50%;
+            padding: 1rem;
+            margin: 1rem;
+            border: 1px solid salmon;
+        }
+        .split-nosize {
+            border: 1px solid salmon;
+        }
+        .split-size {
+            padding: 1rem;
+            margin: 1rem;
+        }
+        .navigation {
+            display: flex;
+            position: fixed;
+            left: 20px;
+            bottom: 20px;
+            transform: translateY(-50%);
+        }
+        .nav-btn {
+            display: block;
+            margin: 0px 5px;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border: none;
+            cursor: pointer;
+        }
+
+        .vertical-split {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .high-page {
+            height: 600px;
+        }
+
+        .split-top {
+            width: 100%;
+            height: 600px;
+        }
+
+        .split-bottom {
+            width: 100%;
+            /* height: 600px; */
+        }
+
+        .split-bottom {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            overflow: auto;
+        }
+
+        .split-bottom pre {
+            height: 100%;
+            margin: 0;
+        }
+
+        .split-bottom code {
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            display: block;
+            padding: 1rem;
+        }
+
+        .skin-grid {
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: space-evenly;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .skin-grid-element {
+            border: 1px solid #ccc;
+            width: 150px;
+            aspect-ratio: 3 / 3;
+        }
+    </style>
+
+    <script>
+        function escapeHTMLandInject(text) {
+            const escaped = text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+            document.currentScript.parentElement.innerHTML = escaped;
+        }
+    </script>
+</head>
+<body>
+
+<!--
+    /////////////////////
+    // start section 8 //
+    /////////////////////
+    -->
+    <div id="section1" class="section vertical-split">
+
+        <div class="split" style="width: 100%; flex-direction: column;">
+
+            <div class="split-top split">
+                <!-- <div class="split-left">
+                    <spine-widget
+                        atlas="assets/spineboy-pma.atlas"
+                        skeleton="assets/spineboy-pro.skel"
+                        animation="walk"
+                        scale="3"
+                        fit="none"
+                        clip="true"
+                    ></spine-widget>
+                </div>
+                <div class="split-right">
+                    <spine-widget
+                        atlas="assets/spineboy-pma.atlas"
+                        skeleton="assets/spineboy-pro.skel"
+                        animation="walk"
+                        scale="1.5"
+                        fit="none"
+                        clip="true"
+                    ></spine-widget>
+                </div>
+                <div class="split-right">
+                    <spine-widget
+                        atlas="assets/spineboy-pma.atlas"
+                        skeleton="assets/spineboy-pro.skel"
+                        animation="walk"
+                        scale="1"
+                        fit="none"
+                        clip="true"
+                    ></spine-widget>
+                </div>
+                <div class="split-right">
+                    <spine-widget
+                        atlas="assets/cloud-pot-pma.atlas"
+                        skeleton="assets/cloud-pot.skel"
+                        animation="playing-in-the-rain"
+                        scale="0.5"
+                        fit="none"
+                        clip="true"
+                    ></spine-widget>
+                </div> -->
+                <div class="split-right">
+                    <spine-widget
+                        identifier="celeste"
+                        atlas="assets/celestial-circus-pma.atlas"
+                        skeleton="assets/celestial-circus-pro.skel"
+                        draggable="true"
+                        animation="swing"
+                    ></spine-widget>
+
+                    <script>
+                        (async () => {
+                            const celeste = spine.getSpineWidget("celeste");
+                            await celeste.loadingPromise;
+                            celeste.state.setAnimation(0, "swing", true);
+                        })();
+                    </script>
+                </div>
+
+                <div class="split-right">
+                    <spine-widget
+                        identifier="celeste"
+                        atlas="assets/celestial-circus-pma.atlas"
+                        skeleton="assets/celestial-circus-pro.skel"
+                        animation="swing"
+                        fit="contain"
+                        debug="true"
+                        clip="true"
+                        draggable="true"
+                    ></spine-widget>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="split-bottom">
+            <pre><code id="code-display">
+                <script>
+                escapeHTMLandInject(`
+...`);
+                </script>
+            </code></pre>
+        </div>
+    </div>
+
+    <!--
+    /////////////////////
+    // end section 8 //
+    /////////////////////
+    -->
+
+
+
+    <!-- <div class="navigation">
+        <button class="nav-btn" onclick="scrollToSection('section1')">1</button>
+        <button class="nav-btn" onclick="scrollToSection('section2')">2</button>
+        <button class="nav-btn" onclick="scrollToSection('section3')">3</button>
+        <button class="nav-btn" onclick="scrollToSection('section4')">4</button>
+        <button class="nav-btn" onclick="scrollToSection('section5')">5</button>
+        <button class="nav-btn" onclick="scrollToSection('section6')">6</button>
+        <button class="nav-btn" onclick="scrollToSection('section7')">7</button>
+        <button class="nav-btn" onclick="scrollToSection('section8')">8</button>
+    </div> -->
+
+    <script>
+        // function scrollToSection(id) {
+        //     document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        // }
+
+        // let sections = document.querySelectorAll('.section');
+        // let currentSection = 0;
+
+        // window.addEventListener('wheel', (e) => {
+        //     if (e.deltaY > 0 && currentSection < sections.length - 1) {
+        //         currentSection++;
+        //     } else if (e.deltaY < 0 && currentSection > 0) {
+        //         currentSection--;
+        //     }
+        //     sections[currentSection].scrollIntoView({ behavior: 'smooth' });
+        // });
+    </script>
+
+<script>
+    //////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////
+    // Drag utility
+
+</script>
+</body>
+</html>

@@ -59,12 +59,12 @@ function isModeType(value: string): value is ModeType {
     );
 }
 
-type FitType = "fill" | "fitWidth" | "fitHeight" | "contain" | "cover" | "none" | "scaleDown";
+type FitType = "fill" | "width" | "height" | "contain" | "cover" | "none" | "scaleDown";
 function isFitType(value: string): value is FitType {
     return (
         value === "fill" ||
-        value === "fitWidth" ||
-        value === "fitHeight" ||
+        value === "width" ||
+        value === "height" ||
         value === "contain" ||
         value === "cover" ||
         value === "none" ||
@@ -94,8 +94,6 @@ interface WidgetPublicState {
 
 interface WidgetInternalState {
     currentScaleDpi: number
-    worldOffsetX: number
-    worldOffsetY: number
     dragging: boolean
     dragX: number
     dragY: number
@@ -105,46 +103,255 @@ interface WidgetInternalState {
 
 class SpineWebComponentWidget extends HTMLElement implements WidgetLayoutOptions, WidgetInternalState, Partial<WidgetPublicState> {
 
-    // skeleton options
+    /**
+     * The URL of the skeleton atlas file (.atlas)
+     */
     public atlasPath: string;
+
+    /**
+     * The URL of the skeleton JSON (.json) or binary (.skel) file
+     */
     public skeletonPath: string;
+
+    /**
+     * The scale when loading the skeleton data. Default: 1
+     */
     public scale = 1;
+
+    /**
+     * Optional: The name of the animation to be played
+     */
     public animation?: string;
+
+    /**
+     * Optional: The name of the skin to be set
+     */
     public skin?: string;
-    skeletonData?: SkeletonData; // TODO
+
+    /**
+     * Optional: Pass a `SkeletonData`, if you want to avoid creating a new one
+     */
+    public skeletonData?: SkeletonData;
+
+    /**
+     * Replace the default state and skeleton update logic for this widget.
+     * @param delta - The milliseconds elapsed since the last update.
+	 * @param skeleton - A reference to the widget's skeleton
+	 * @param state - A reference to the widget's state
+     */
 	update?: UpdateSpineWidgetFunction;
+
+    /**
+     * This callback is invoked before the world transforms are computed allows to execute additional logic.
+     */
 	beforeUpdateWorldTransforms: BeforeAfterUpdateSpineWidgetFunction = () => {};
+
+    /**
+     * This callback is invoked after the world transforms are computed allows to execute additional logic.
+     */
 	afterUpdateWorldTransforms: BeforeAfterUpdateSpineWidgetFunction= () => {};
 
-    // layout options
+    /**
+     * Specify the way the skeleton is sized within the element automatically changing its `scaleX` and `scaleY`.
+     * It works only with {@link mode} `inside`. Possible values are:
+     * - `contain`: as large as possible while still containing the skeleton entirely within the element container (Default).
+     * - `fill`: fill the element container by distorting the skeleton's aspect ratio.
+     * - `width`: make sure the full width of the source is shown, regardless of whether this means the skeleton overflows the element container vertically.
+     * - `height`: make sure the full height of the source is shown, regardless of whether this means the skeleton overflows the element container horizontally.
+     * - `cover`: as small as possible while still covering the entire element container.
+     * - `scaleDown`: scale the skeleton down to ensure that the skeleton fits within the element container.
+     * - `none`: display the skeleton without autoscaling it.
+     */
     public fit: FitType = "contain";
+
+    /**
+     * Specify the way the skeleton is centered within the div:
+     * - `inside`: the skeleton bounds center is centered with the div container (Default)
+     * - `origin`: the skeleton origin is centered with the div container regardless of the bounds.
+     * Origin does not allow to specify any {@link fit} type and guarantee the skeleton to not be autoscaled.
+     */
     public mode: ModeType = "inside";
-    public offsetX = 0;
-    public offsetY = 0;
+
+    /**
+     * The x offset of the skeleton world origin x axis in div width units
+     */
     public xAxis = 0;
+
+    /**
+     * The y offset of the skeleton world origin x axis in div width units
+     */
     public yAxis = 0;
+
+    /**
+     * The x offset of the root in pixels wrt to the skeleton world origin
+     */
+    public offsetX = 0;
+
+    /**
+     * The y offset of the root in pixels wrt to the skeleton world origin
+     */
+    public offsetY = 0;
+
+    /**
+     * Specify a fixed width for the widget. If at least one of `width` and `height` is > 0,
+     * the widget will have an actual size and the div reference is the widget itself, not the div parent.
+     */
     public width = -1;
+
+    /**
+     * Specify a fixed height for the widget. If at least one of `width` and `height` is > 0,
+     * the widget will have an actual size and the div reference is the widget itself, not the div parent.
+     */
     public height = -1;
+
+    /**
+     * If true, the widget is draggable
+     */
     public draggable = false;
+
+    /**
+     * If true, some convenience elements are drawn to show the skeleton world origin (green),
+     * the root (red), and the bounds rectangle (blue)
+     */
     public debug = false;
+
+    /**
+     * An identifier to obtain a reference to this widget using the getSpineWidget function
+     */
     public identifier = "";
-    public loadingSpinner = true;
+
+    /**
+     * If true, assets loading are loaded immediately and the skeleton shown as soon as the assets are loaded
+     * If false, it is necessary to invoke the start method to start the loading process
+     */
     public manualStart = false;
+
+    /**
+     * An array of indexes indicating the atlas pages indexes to be loaded.
+     * If undefined, all pages are loaded. If empty (default), no page is loaded;
+     * in this case the user can add later the indexes of the pages they want to load
+     * and call the loadTexturesInPagesAttribute, to lazily load them.
+     */
     public pages?: Array<number>;
-    public offScreenUpdateBehaviour: OffScreenUpdateBehaviourType = "pause";
+
+    /**
+     * If `true`, the skeleton is clipped to the container div bounds.
+     * Be careful on using this feature because it breaks batching!
+     */
     public clip = false;
 
-    // state
-    public skeleton?: Skeleton;
-    public state?: AnimationState;
-    public bounds?: Rectangle;
-    public loadingPromise?: Promise<WidgetPublicState>;
-    public loading = true;
-    public started = false;
-    public onScreenAtLeastOnce = false;
+    /**
+     * The widget update/apply behaviour when the skeleton div container is offscreen:
+     * - `pause`: the state is not updated, neither applied (Default)
+     * - `update`: the state is updated, but not applied
+     * - `pose`: the state is updated and applied
+     */
+    public offScreenUpdateBehaviour: OffScreenUpdateBehaviourType = "pause";
 
+    /**
+     * The skeleton hosted by this widget. It's ready once assets are loaded.
+     * Safely acces this property by using {@link loadingPromise}.
+     */
+    public skeleton?: Skeleton;
+
+    /**
+     * The animation state hosted by this widget. It's ready once assets are loaded.
+     * Safely acces this property by using {@link loadingPromise}.
+     */
+    public state?: AnimationState;
+
+    /**
+     * The textureAtlas used by this widget to reference attachments. It's ready once assets are loaded.
+     * Safely acces this property by using {@link loadingPromise}.
+     */
+    public textureAtlas?: TextureAtlas;
+
+    /**
+     * A rectangle representing the bounds used to fit the skeleton within the element container.
+     * The rectangle coordinates and size are expressed in the Spine world space, not the screen space.
+     * It is automatically calculated using the `skin` and `animation` provided by the user during loading.
+     * If no skin is provided, it is used the default skin.
+     * If no animation is provided, it is used the setup pose.
+     * Once loaded, the bounds are not automatically recalculated, but {@link recalculateBounds} need to be invoked.
+     * Use `setBounds` to set you desired bounds. Bounding Box might be useful to determine the bounds to be used.
+     */
+    public bounds?: Rectangle;
+
+    /**
+     * A Promise that resolve to the widget itself once assets loading is terminated.
+     * Useful to safely access {@link skeleton} and {@link state} after a new widget has been just created.
+     */
+    public loadingPromise?: Promise<this>;
+
+    /**
+     * If true, the widget is in the assets loading process.
+     */
+    public loading = true;
+
+    /**
+     * If true, the a Spine loading spinner is shown during asset loading
+     */
+    public loadingSpinner = true;
+
+    /**
+     * A reference to the {@link LoadingScreenWidget} of this widget.
+     * This is instantiated only if it is really necessary.
+     * For example, if {@link loadingSpinner} is `false`, this property value is null
+     */
+    public loadingScreen: LoadingScreenWidget | null = null;
+
+    /**
+     * If true, the widget is in the assets loading process.
+     */
+    public started = false;
+
+    /**
+     * Holds the dpi (devicePixelRatio) currently used to calculate the scale for this skeleton
+     */
+    public currentScaleDpi = 1;
+
+    /**
+     * The accumulated offset on the x axis due to dragging
+     */
+    public dragX = 0;
+
+    /**
+     * The accumulated offset on the y axis due to dragging
+     */
+    public dragY = 0;
+
+    /**
+     * If true, the widget is currently being dragged
+     */
+    public dragging = false;
+
+    /**
+     * The rectangle in the screen space used to determine if a click is within the skeleton bounds,
+     * so if to start the drag action.
+     */
+    public dragBoundsRectangle: Rectangle = { x: 0, y: 0, width: 0, height: 0 };
+
+    /**
+     * An HTMLDivElement used to show the drag surface in debug mode
+     */
     public debugDragDiv: HTMLDivElement;
 
+    /**
+     * True, when the div hosting the widget enters the screen viewport. It uses an IntersectionObserver internally.
+     */
+    public onScreen = false;
+
+    /**
+     * True, when the div hosting the widget enters the screen viewport at least once.
+     * It uses an IntersectionObserver internally.
+     */
+    public onScreenAtLeastOnce = false;
+
+    /**
+     * A callback invoked each time div hosting the widget enters the screen viewport.
+     * By default, the callback call the {@link start} method the first time the widget
+     * enters the screen viewport.
+     */
     public onScreenFunction: (widget: SpineWebComponentWidget) => void = async (widget) => {
         if (widget.loading && !widget.onScreenAtLeastOnce) {
             widget.onScreenAtLeastOnce = true;
@@ -155,25 +362,9 @@ class SpineWebComponentWidget extends HTMLElement implements WidgetLayoutOptions
         }
     }
 
-    // TODO: makes the interface exposes getter, make getter and make these private
-    // internal state
-    public currentScaleDpi = 1;
-    public worldOffsetX = 0;
-    public worldOffsetY = 0;
-    public dragX = 0;
-    public dragY = 0;
-    public dragging = false;
-    public intersectionObserver? : IntersectionObserver;
-    public onScreen = false;
-    public textureAtlas?: TextureAtlas;
 
     private root: ShadowRoot;
     private overlay: SpineWebComponentOverlay;
-
-    private divLoader: HTMLDivElement;
-
-    public loadingScreen: LoadingScreenWidget | null = null;
-    public dragBoundsRectangle: Rectangle = { x: 0, y: 0, width: 0, height: 0 };
 
     static get observedAttributes(): string[] {
         return [
@@ -207,13 +398,6 @@ class SpineWebComponentWidget extends HTMLElement implements WidgetLayoutOptions
         this.overlay = this.initializeOverlay();
         this.atlasPath = "TODO";
         this.skeletonPath = "TODO";
-
-        this.divLoader = document.createElement("div");
-        this.divLoader.classList.add("container-loader");
-
-        const loader = document.createElement("div");
-        loader.classList.add("loader");
-        this.divLoader.appendChild(loader);
 
         this.debugDragDiv = document.createElement('div');
         this.debugDragDiv.style.position = "absolute";
@@ -383,8 +567,9 @@ class SpineWebComponentWidget extends HTMLElement implements WidgetLayoutOptions
     }
 
     public start() {
-        // if you want to start again the widget, first reset it
-        if (this.started) return;
+        if (this.started) {
+            console.warn("If you want to start again the widget, first reset it");
+        }
         this.started = true;
 
         this.loadingPromise = this.loadSkeleton();
@@ -461,7 +646,7 @@ class SpineWebComponentWidget extends HTMLElement implements WidgetLayoutOptions
 
 		const bounds = this.calculateAnimationViewport(animationData);
         this.bounds = bounds;
-		return { skeleton, state, bounds };
+		return this;
 	}
 
     public getHTMLElementReference(): HTMLElement {
@@ -823,10 +1008,10 @@ class SpineWebComponentOverlay extends HTMLElement {
                         if (fit === "fill") { // Fill the target box by distorting the source's aspect ratio.
                             ratioW = scaleWidth;
                             ratioH = scaleHeight;
-                        } else if (fit === "fitWidth") {
+                        } else if (fit === "width") {
                             ratioW = scaleWidth;
                             ratioH = scaleWidth;
-                        } else if (fit === "fitHeight") {
+                        } else if (fit === "height") {
                             ratioW = scaleHeight;
                             ratioH = scaleHeight;
                         } else if (fit === "contain") {
@@ -874,20 +1059,20 @@ class SpineWebComponentOverlay extends HTMLElement {
                         }
                     }
 
-                    widget.worldOffsetX = divOriginX + offsetX + dragX;
-                    widget.worldOffsetY = divOriginY + offsetY + dragY;
+                    const worldOffsetX = divOriginX + offsetX + dragX;
+                    const worldOffsetY = divOriginY + offsetY + dragY;
 
                     renderer.drawSkeleton(skeleton, true, -1, -1, (vertices, size, vertexSize) => {
                         for (let i = 0; i < size; i+=vertexSize) {
-                            vertices[i] = vertices[i] + widget.worldOffsetX;
-                            vertices[i+1] = vertices[i+1] + widget.worldOffsetY;
+                            vertices[i] = vertices[i] + worldOffsetX;
+                            vertices[i+1] = vertices[i+1] + worldOffsetY;
                         }
                     });
 
                     // store the draggable surface to make darg logic easier
                     if (draggable) {
                         let { x: ax, y: ay, width: aw, height: ah } = bounds!;
-                        this.worldToScreen(tempVector, ax * skeleton.scaleX + widget.worldOffsetX, ay * skeleton.scaleY + widget.worldOffsetY);
+                        this.worldToScreen(tempVector, ax * skeleton.scaleX + worldOffsetX, ay * skeleton.scaleY + worldOffsetY);
                         widget.dragBoundsRectangle.x = tempVector.x + window.scrollX;
                         widget.dragBoundsRectangle.y = tempVector.y - ah * skeleton.scaleY / window.devicePixelRatio + window.scrollY;
                         widget.dragBoundsRectangle.width = aw * skeleton.scaleX / window.devicePixelRatio;
@@ -906,22 +1091,22 @@ class SpineWebComponentOverlay extends HTMLElement {
 
                         // show bounds and its center
                         renderer.rect(false,
-                            ax * skeleton.scaleX + widget.worldOffsetX,
-                            ay * skeleton.scaleY + widget.worldOffsetY,
+                            ax * skeleton.scaleX + worldOffsetX,
+                            ay * skeleton.scaleY + worldOffsetY,
                             aw * skeleton.scaleX,
                             ah * skeleton.scaleY,
                             blue);
-                        const bbCenterX = (ax + aw / 2) * skeleton.scaleX + widget.worldOffsetX;
-                        const bbCenterY = (ay + ah / 2) * skeleton.scaleY + widget.worldOffsetY;
+                        const bbCenterX = (ax + aw / 2) * skeleton.scaleX + worldOffsetX;
+                        const bbCenterY = (ay + ah / 2) * skeleton.scaleY + worldOffsetY;
                         renderer.circle(true, bbCenterX, bbCenterY, 10, blue);
 
                         // show skeleton root
                         const root = skeleton.getRootBone()!;
-                        renderer.circle(true, root.x + widget.worldOffsetX, root.y + widget.worldOffsetY, 10, red);
+                        renderer.circle(true, root.x + worldOffsetX, root.y + worldOffsetY, 10, red);
 
                         // show shifted origin
-                        const originX = widget.worldOffsetX - dragX - offsetX;
-                        const originY = widget.worldOffsetY - dragY - offsetY;
+                        const originX = worldOffsetX - dragX - offsetX;
+                        const originY = worldOffsetY - dragY - offsetY;
                         renderer.circle(true, originX, originY, 10, green);
 
                         // show line from origin to bounds center
