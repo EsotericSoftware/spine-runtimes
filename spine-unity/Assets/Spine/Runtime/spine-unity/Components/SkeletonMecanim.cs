@@ -455,13 +455,13 @@ namespace Spine.Unity {
 						float[] customWeights = layerClipInfos[layer].clipResolvedWeights;
 						for (int c = 0; c < clipInfoCount; c++) {
 							ApplyAnimation(skeleton, clipInfo[c], stateInfo, layer, layerWeight, layerBlendMode,
-								useCustomClipWeight: true, customWeights[c]);
+								true, customWeights[c]);
 						}
 						if (hasNext) {
 							customWeights = layerClipInfos[layer].nextClipResolvedWeights;
 							for (int c = 0; c < nextClipInfoCount; c++) {
 								ApplyAnimation(skeleton, nextClipInfo[c], nextStateInfo, layer, layerWeight, layerBlendMode,
-									useCustomClipWeight: true, customWeights[c]);
+									true, customWeights[c]);
 							}
 						}
 						if (isInterruptionActive) {
@@ -470,7 +470,7 @@ namespace Spine.Unity {
 								ApplyInterruptionAnimation(skeleton, interpolateWeightTo1,
 									interruptingClipInfo[c], interruptingStateInfo,
 									layer, layerWeight, layerBlendMode, interruptingClipTimeAddition,
-									useCustomClipWeight: true, customWeights[c]);
+									true, customWeights[c]);
 							}
 						}
 					} else { // case MixNext || Hard
@@ -478,7 +478,7 @@ namespace Spine.Unity {
 						int c = 0;
 						for (; c < clipInfoCount; c++) {
 							if (!ApplyAnimation(skeleton, clipInfo[c], stateInfo, layer, layerWeight, layerBlendMode,
-								useCustomClipWeight: true, 1.0f))
+								true, 1.0f))
 								continue;
 							++c; break;
 						}
@@ -493,7 +493,7 @@ namespace Spine.Unity {
 							if (mode == MixMode.Hard) {
 								for (; c < nextClipInfoCount; c++) {
 									if (!ApplyAnimation(skeleton, nextClipInfo[c], nextStateInfo, layer, layerWeight, layerBlendMode,
-										useCustomClipWeight: true, 1.0f))
+										true, 1.0f))
 										continue;
 									++c; break;
 								}
@@ -512,7 +512,7 @@ namespace Spine.Unity {
 								for (; c < interruptingClipInfoCount; c++) {
 									if (ApplyInterruptionAnimation(skeleton, interpolateWeightTo1,
 										interruptingClipInfo[c], interruptingStateInfo,
-										layer, layerWeight, layerBlendMode, interruptingClipTimeAddition, useCustomClipWeight: true, 1.0f)) {
+										layer, layerWeight, layerBlendMode, interruptingClipTimeAddition, true, 1.0f)) {
 
 										++c; break;
 									}
