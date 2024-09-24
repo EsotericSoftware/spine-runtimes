@@ -1,0 +1,48 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>spine-pixi</title>
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@latest/dist/pixi.min.js"></script>
+    <script src="../dist/spine-pixi.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tweakpane@3.1.9/dist/tweakpane.min.js"></script>
+    <link rel="stylesheet" href="./index.css">
+  </head>
+
+  <body>
+    <script>
+      (async function () {
+        var app = new PIXI.Application();
+        await app.init({
+          width: window.innerWidth,
+          height: window.innerHeight,
+          resolution: window.devicePixelRatio || 1,
+          autoDensity: true,
+          resizeTo: window,
+          backgroundColor: 0x2c3e50,
+          hello: true,
+        })
+        document.body.appendChild(app.view);
+
+        // Pre-load the skeleton data and atlas. You can also load .json skeleton data.
+        PIXI.Assets.add({alias: "snowglobeData", src: "./assets/snowglobe-pro.skel"});
+        PIXI.Assets.add({alias: "snowglobeAtlas", src: "./assets/snowglobe-pma.atlas"});
+        await PIXI.Assets.load(["snowglobeData", "snowglobeAtlas"]);
+
+        // Create the spine display object
+        const snowglobe = spine.Spine.from({skeleton: "snowglobeData", atlas: "snowglobeAtlas", 
+          scale: 0.25,
+        });
+
+        // Center the spine object on screen.
+        snowglobe.x = window.innerWidth / 2;
+        snowglobe.y = window.innerHeight / 2 + snowglobe.getBounds().height / 4;
+
+        // Set animation "FOA" on track 0, looped.
+        snowglobe.state.setAnimation(0, "shake", true);
+
+        // Add the display object to the stage.
+        app.stage.addChild(snowglobe);
+      })();
+    </script>
+  </body>
+</html>
