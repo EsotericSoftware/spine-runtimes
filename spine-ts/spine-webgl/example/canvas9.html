@@ -1198,8 +1198,8 @@
 
                         // create the widget
                         const widgetSection = spine.createSpineWidget({
-                            atlas: "assets/chibi-stickers-pma.atlas",
-                            skeleton: "assets/chibi-stickers.json",
+                            atlasPath: "assets/chibi-stickers-pma.atlas",
+                            skeletonPath: "assets/chibi-stickers.json",
                             animation,
                             skin,
                             pages,
@@ -1246,8 +1246,8 @@ skins.forEach((skin, i) => {
 
         // create the widget
         const widgetSection = spine.createSpineWidget({
-            atlas: "assets/chibi-stickers-pma.atlas",
-            skeleton: "assets/chibi-stickers.json",
+            atlasPath: "assets/chibi-stickers-pma.atlas",
+            skeletonPath: "assets/chibi-stickers.json",
             animation,
             skin,
             pages,
@@ -1826,7 +1826,7 @@ stretchyman.update = (canvas, delta, skeleton, state) => {
                     atlas="assets/celestial-circus-pma.atlas"
                     skeleton="assets/celestial-circus-pro.skel"
                     animation="wings-and-feet"
-                    draggable="true"
+                    draggable
                 ></spine-widget>
             </div>
         </div>

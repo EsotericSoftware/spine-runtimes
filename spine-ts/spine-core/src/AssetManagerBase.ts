@@ -273,6 +273,52 @@ export class AssetManagerBase implements Disposable {
 		});
 	}
 
+	// Promisified versions of load function
+	async loadBinaryAsync(path: string) {
+		return new Promise((resolve, reject) => {
+			this.loadBinary(path,
+				(_, binary) => resolve(binary),
+				(_, message) => reject(message),
+			);
+		});
+	}
+
+	async loadJsonAsync(path: string) {
+		return new Promise((resolve, reject) => {
+			this.loadJson(path,
+				(_, object) => resolve(object),
+				(_, message) => reject(message),
+			);
+		});
+	}
+
+    async loadTextureAsync(path: string) {
+		return new Promise<Texture>((resolve, reject) => {
+			this.loadTexture(path,
+				(_, texture) => resolve(texture),
+				(_, message) => reject(message),
+			);
+		});
+	}
+
+	async loadTextureAtlasAsync(path: string) {
+		return new Promise((resolve, reject) => {
+			this.loadTextureAtlas(path,
+				(_, atlas) => resolve(atlas),
+				(_, message) => reject(message),
+			);
+		});
+	}
+
+    async loadTextureAtlasButNoTexturesAsync(path: string) {
+		return new Promise<TextureAtlas>((resolve, reject) => {
+			this.loadTextureAtlasButNoTextures(path,
+				(_, atlas) => resolve(atlas),
+				(_, message) => reject(message),
+			);
+		});
+	}
+
 	get (path: string) {
 		return this.assets[this.pathPrefix + path];
 	}

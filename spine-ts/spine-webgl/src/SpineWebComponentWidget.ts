@@ -27,7 +27,29 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { AtlasAttachmentLoader, SkeletonBinary, SkeletonJson, Skeleton, Animation, AnimationState, AnimationStateData, Physics, Vector2, Vector3, Color, MixBlend, MixDirection, SceneRenderer, SkeletonData, Input, LoadingScreenWidget, TextureAtlas, Texture, ManagedWebGLRenderingContext, AssetManager, TimeKeeper } from "./index.js";
+import {
+    Animation,
+    AnimationState,
+    AnimationStateData,
+    AtlasAttachmentLoader,
+    AssetManager,
+    Color,
+    Input,
+    LoadingScreenWidget,
+    ManagedWebGLRenderingContext,
+    MixBlend,
+    MixDirection,
+    Physics,
+    SceneRenderer,
+    SkeletonBinary,
+    SkeletonData,
+    SkeletonJson,
+    Skeleton,
+    TextureAtlas,
+    TimeKeeper,
+    Vector2,
+    Vector3,
+} from "./index.js";
 
 interface Point {
     x: number,
@@ -43,7 +65,7 @@ type BeforeAfterUpdateSpineWidgetFunction = (skeleton: Skeleton, state: Animatio
 type UpdateSpineWidgetFunction = (delta: number, skeleton: Skeleton, state: AnimationState) => void;
 
 type OffScreenUpdateBehaviourType = "pause" | "update" | "pose";
-function isOffScreenUpdateBehaviourType(value: string): value is OffScreenUpdateBehaviourType {
+function isOffScreenUpdateBehaviourType(value: string | null): value is OffScreenUpdateBehaviourType {
     return (
         value === "pause" ||
         value === "update" ||
@@ -51,8 +73,8 @@ function isOffScreenUpdateBehaviourType(value: string): value is OffScreenUpdate
     );
 }
 
-type ModeType = 'inside' | 'origin';
-function isModeType(value: string): value is ModeType {
+type ModeType = "inside" | "origin";
+function isModeType(value: string | null): value is ModeType {
     return (
         value === "inside" ||
         value === "origin"
@@ -60,7 +82,7 @@ function isModeType(value: string): value is ModeType {
 }
 
 type FitType = "fill" | "width" | "height" | "contain" | "cover" | "none" | "scaleDown";
-function isFitType(value: string): value is FitType {
+function isFitType(value: string | null): value is FitType {
     return (
         value === "fill" ||
         value === "width" ||
@@ -72,24 +94,48 @@ function isFitType(value: string): value is FitType {
     );
 }
 
-interface WidgetLayoutOptions {
+type AttributeTypes = "string" | "number" | "boolean" | "string-number" | "fitType" | "modeType" | "offScreenUpdateBehaviourType";
+
+interface WidgetAttributes {
+    atlasPath: string
+    skeletonPath: string
+    scale: number
+    animation?: string
+    skin?: string
+    fit: FitType
     mode: ModeType
-    debug: boolean
-    offsetX: number
-    offsetY: number
     xAxis: number
     yAxis: number
-    draggable: boolean
-    fit: FitType
+    offsetX: number
+    offsetY: number
     width: number
     height: number
+    draggable: boolean
+    debug: boolean
     identifier: string
+    manualStart: boolean
+    pages?: Array<number>
+    clip: boolean
+    offScreenUpdateBehaviour: OffScreenUpdateBehaviourType
+    loadingSpinner: boolean
+}
+
+interface WidgetOverridableMethods {
+	update?: UpdateSpineWidgetFunction;
+	beforeUpdateWorldTransforms: BeforeAfterUpdateSpineWidgetFunction;
+	afterUpdateWorldTransforms: BeforeAfterUpdateSpineWidgetFunction;
 }
 
 interface WidgetPublicState {
     skeleton: Skeleton
     state: AnimationState
     bounds: Rectangle
+    onScreen: boolean
+    onScreenAtLeastOnce: boolean
+    loadingPromise: Promise<SpineWebComponentWidget>
+    loading: boolean
+    started: boolean
+    textureAtlas: TextureAtlas
 }
 
 interface WidgetInternalState {
@@ -101,37 +147,183 @@ interface WidgetInternalState {
 
 // TODO: add missing assets to main assets folder (chibi)
 
-class SpineWebComponentWidget extends HTMLElement implements WidgetLayoutOptions, WidgetInternalState, Partial<WidgetPublicState> {
+class SpineWebComponentWidget extends HTMLElement implements WidgetAttributes, WidgetOverridableMethods, WidgetInternalState, Partial<WidgetPublicState> {
 
     /**
      * The URL of the skeleton atlas file (.atlas)
+     * Connected to `atlas` attribute.
      */
     public atlasPath: string;
 
     /**
      * The URL of the skeleton JSON (.json) or binary (.skel) file
+     * Connected to `skeleton` attribute.
      */
     public skeletonPath: string;
 
     /**
      * The scale when loading the skeleton data. Default: 1
+     * Connected to `scale` attribute.
      */
     public scale = 1;
 
     /**
      * Optional: The name of the animation to be played
+     * Connected to `animation` attribute.
      */
-    public animation?: string;
+    public get animation() : string | undefined {
+        return this._animation;
+    }
+    public set animation(value: string | undefined) {
+        this._animation = value;
+        this.initWidget();
+    }
+    private _animation?: string
 
     /**
      * Optional: The name of the skin to be set
+     * Connected to `skin` attribute.
      */
-    public skin?: string;
+    public get skin() : string | undefined {
+        return this._skin;
+    }
+    public set skin(value: string | undefined) {
+        this._skin = value;
+        this.initWidget();
+    }
+    private _skin?: string
 
     /**
-     * Optional: Pass a `SkeletonData`, if you want to avoid creating a new one
+     * Specify the way the skeleton is sized within the element automatically changing its `scaleX` and `scaleY`.
+     * It works only with {@link mode} `inside`. Possible values are:
+     * - `contain`: as large as possible while still containing the skeleton entirely within the element container (Default).
+     * - `fill`: fill the element container by distorting the skeleton's aspect ratio.
+     * - `width`: make sure the full width of the source is shown, regardless of whether this means the skeleton overflows the element container vertically.
+     * - `height`: make sure the full height of the source is shown, regardless of whether this means the skeleton overflows the element container horizontally.
+     * - `cover`: as small as possible while still covering the entire element container.
+     * - `scaleDown`: scale the skeleton down to ensure that the skeleton fits within the element container.
+     * - `none`: display the skeleton without autoscaling it.
+     * Connected to `fit` attribute.
      */
-    public skeletonData?: SkeletonData;
+    public fit: FitType = "contain";
+
+    /**
+     * Specify the way the skeleton is centered within the div:
+     * - `inside`: the skeleton bounds center is centered with the div container (Default)
+     * - `origin`: the skeleton origin is centered with the div container regardless of the bounds.
+     * Origin does not allow to specify any {@link fit} type and guarantee the skeleton to not be autoscaled.
+     * Connected to `mode` attribute.
+     */
+    public mode: ModeType = "inside";
+
+    /**
+     * The x offset of the skeleton world origin x axis in div width units
+     * Connected to `x-axis` attribute.
+     */
+    public xAxis = 0;
+
+    /**
+     * The y offset of the skeleton world origin x axis in div width units
+     * Connected to `y-axis` attribute.
+     */
+    public yAxis = 0;
+
+    /**
+     * The x offset of the root in pixels wrt to the skeleton world origin
+     * Connected to `offset-x` attribute.
+     */
+    public offsetX = 0;
+
+    /**
+     * The y offset of the root in pixels wrt to the skeleton world origin
+     * Connected to `offset-y` attribute.
+     */
+    public offsetY = 0;
+
+    /**
+     * Specify a fixed width for the widget. If at least one of `width` and `height` is > 0,
+     * the widget will have an actual size and the div reference is the widget itself, not the div parent.
+     * Connected to `width` attribute.
+     */
+    public get width() : number {
+        return this._width;
+    }
+    public set width(value: number) {
+        this._width = value;
+        this.render();
+    }
+    private _width = -1
+
+    /**
+     * Specify a fixed height for the widget. If at least one of `width` and `height` is > 0,
+     * the widget will have an actual size and the div reference is the widget itself, not the div parent.
+     * Connected to `height` attribute.
+     */
+    public get height() : number {
+        return this._height;
+    }
+    public set height(value: number) {
+        this._height = value;
+        this.render();
+    }
+    private _height = -1
+
+    /**
+     * If true, the widget is draggable
+     * Connected to `draggable` attribute.
+     */
+    public draggable = false;
+
+    /**
+     * If true, some convenience elements are drawn to show the skeleton world origin (green),
+     * the root (red), and the bounds rectangle (blue)
+     * Connected to `debug` attribute.
+     */
+    public debug = false;
+
+    /**
+     * An identifier to obtain a reference to this widget using the getSpineWidget function
+     * Connected to `identifier` attribute.
+     */
+    public identifier = "";
+
+    /**
+     * If true, assets loading are loaded immediately and the skeleton shown as soon as the assets are loaded
+     * If false, it is necessary to invoke the start method to start the loading process
+     * Connected to `manual-start` attribute.
+     */
+    public manualStart = false;
+
+    /**
+     * An array of indexes indicating the atlas pages indexes to be loaded.
+     * If undefined, all pages are loaded. If empty (default), no page is loaded;
+     * in this case the user can add later the indexes of the pages they want to load
+     * and call the loadTexturesInPagesAttribute, to lazily load them.
+     * Connected to `pages` attribute.
+     */
+    public pages?: Array<number>;
+
+    /**
+     * If `true`, the skeleton is clipped to the container div bounds.
+     * Be careful on using this feature because it breaks batching!
+     * Connected to `clip` attribute.
+     */
+    public clip = false;
+
+    /**
+     * The widget update/apply behaviour when the skeleton div container is offscreen:
+     * - `pause`: the state is not updated, neither applied (Default)
+     * - `update`: the state is updated, but not applied
+     * - `pose`: the state is updated and applied
+     * Connected to `offscreen` attribute.
+     */
+    public offScreenUpdateBehaviour: OffScreenUpdateBehaviourType = "pause";
+
+    /**
+     * If true, the a Spine loading spinner is shown during asset loading
+     * Connected to `spinner` attribute.
+     */
+    public loadingSpinner = true;
 
     /**
      * Replace the default state and skeleton update logic for this widget.
@@ -150,103 +342,6 @@ class SpineWebComponentWidget extends HTMLElement implements WidgetLayoutOptions
      * This callback is invoked after the world transforms are computed allows to execute additional logic.
      */
 	afterUpdateWorldTransforms: BeforeAfterUpdateSpineWidgetFunction= () => {};
-
-    /**
-     * Specify the way the skeleton is sized within the element automatically changing its `scaleX` and `scaleY`.
-     * It works only with {@link mode} `inside`. Possible values are:
-     * - `contain`: as large as possible while still containing the skeleton entirely within the element container (Default).
-     * - `fill`: fill the element container by distorting the skeleton's aspect ratio.
-     * - `width`: make sure the full width of the source is shown, regardless of whether this means the skeleton overflows the element container vertically.
-     * - `height`: make sure the full height of the source is shown, regardless of whether this means the skeleton overflows the element container horizontally.
-     * - `cover`: as small as possible while still covering the entire element container.
-     * - `scaleDown`: scale the skeleton down to ensure that the skeleton fits within the element container.
-     * - `none`: display the skeleton without autoscaling it.
-     */
-    public fit: FitType = "contain";
-
-    /**
-     * Specify the way the skeleton is centered within the div:
-     * - `inside`: the skeleton bounds center is centered with the div container (Default)
-     * - `origin`: the skeleton origin is centered with the div container regardless of the bounds.
-     * Origin does not allow to specify any {@link fit} type and guarantee the skeleton to not be autoscaled.
-     */
-    public mode: ModeType = "inside";
-
-    /**
-     * The x offset of the skeleton world origin x axis in div width units
-     */
-    public xAxis = 0;
-
-    /**
-     * The y offset of the skeleton world origin x axis in div width units
-     */
-    public yAxis = 0;
-
-    /**
-     * The x offset of the root in pixels wrt to the skeleton world origin
-     */
-    public offsetX = 0;
-
-    /**
-     * The y offset of the root in pixels wrt to the skeleton world origin
-     */
-    public offsetY = 0;
-
-    /**
-     * Specify a fixed width for the widget. If at least one of `width` and `height` is > 0,
-     * the widget will have an actual size and the div reference is the widget itself, not the div parent.
-     */
-    public width = -1;
-
-    /**
-     * Specify a fixed height for the widget. If at least one of `width` and `height` is > 0,
-     * the widget will have an actual size and the div reference is the widget itself, not the div parent.
-     */
-    public height = -1;
-
-    /**
-     * If true, the widget is draggable
-     */
-    public draggable = false;
-
-    /**
-     * If true, some convenience elements are drawn to show the skeleton world origin (green),
-     * the root (red), and the bounds rectangle (blue)
-     */
-    public debug = false;
-
-    /**
-     * An identifier to obtain a reference to this widget using the getSpineWidget function
-     */
-    public identifier = "";
-
-    /**
-     * If true, assets loading are loaded immediately and the skeleton shown as soon as the assets are loaded
-     * If false, it is necessary to invoke the start method to start the loading process
-     */
-    public manualStart = false;
-
-    /**
-     * An array of indexes indicating the atlas pages indexes to be loaded.
-     * If undefined, all pages are loaded. If empty (default), no page is loaded;
-     * in this case the user can add later the indexes of the pages they want to load
-     * and call the loadTexturesInPagesAttribute, to lazily load them.
-     */
-    public pages?: Array<number>;
-
-    /**
-     * If `true`, the skeleton is clipped to the container div bounds.
-     * Be careful on using this feature because it breaks batching!
-     */
-    public clip = false;
-
-    /**
-     * The widget update/apply behaviour when the skeleton div container is offscreen:
-     * - `pause`: the state is not updated, neither applied (Default)
-     * - `update`: the state is updated, but not applied
-     * - `pose`: the state is updated and applied
-     */
-    public offScreenUpdateBehaviour: OffScreenUpdateBehaviourType = "pause";
 
     /**
      * The skeleton hosted by this widget. It's ready once assets are loaded.
@@ -287,11 +382,6 @@ class SpineWebComponentWidget extends HTMLElement implements WidgetLayoutOptions
      * If true, the widget is in the assets loading process.
      */
     public loading = true;
-
-    /**
-     * If true, the a Spine loading spinner is shown during asset loading
-     */
-    public loadingSpinner = true;
 
     /**
      * A reference to the {@link LoadingScreenWidget} of this widget.
@@ -362,44 +452,79 @@ class SpineWebComponentWidget extends HTMLElement implements WidgetLayoutOptions
         }
     }
 
+    // ----
+    // ----
+    // ----
 
+    /**
+     * Optional: Pass a `SkeletonData`, if you want to avoid creating a new one
+     */
+    public skeletonData?: SkeletonData;
+
+    // Reference to the webcomponent shadow root
     private root: ShadowRoot;
+
+    // Reference to the overlay webcomponent
     private overlay: SpineWebComponentOverlay;
+
+    static attributesDescription: Record<string, { propertyName: keyof WidgetAttributes, type: AttributeTypes, defaultValue?: any }> = {
+        atlas: { propertyName: "atlasPath", type: "string" },
+        skeleton: { propertyName: "skeletonPath", type: "string" },
+        scale: { propertyName: "scale", type: "number" },
+        animation: { propertyName: "animation", type: "string" },
+        skin: { propertyName: "skin", type: "string" },
+        width: { propertyName: "width", type: "number", defaultValue: -1 },
+        height: { propertyName: "height", type: "number", defaultValue: -1 },
+        draggable: { propertyName: "draggable", type: "boolean" },
+        "x-axis": { propertyName: "xAxis", type: "number" },
+        "y-axis": { propertyName: "yAxis", type: "number" },
+        "offset-x": { propertyName: "offsetX", type: "number" },
+        "offset-y": { propertyName: "offsetY", type: "number" },
+        identifier: { propertyName: "identifier", type: "string" },
+        debug: { propertyName: "debug", type: "boolean" },
+        "manual-start": { propertyName: "manualStart", type: "boolean" },
+        spinner: { propertyName: "loadingSpinner", type: "boolean" },
+        clip: { propertyName: "clip", type: "boolean" },
+        pages: { propertyName: "pages", type: "string-number" },
+        fit: { propertyName: "fit", type: "fitType", defaultValue: "contain" },
+        mode: { propertyName: "mode", type: "modeType", defaultValue: "inside" },
+        offscreen: { propertyName: "offScreenUpdateBehaviour", type: "offScreenUpdateBehaviourType", defaultValue: "pause" },
+    }
 
     static get observedAttributes(): string[] {
         return [
-            "atlas",
-            "skeleton",
-            "scale",
-            "animation",
-            "skin",
-            "fit",
-            "width",
-            "height",
-            "draggable",
-            "mode",
-            "x-axis",
-            "y-axis",
-            "identifier",
-            "offset-x",
-            "offset-y",
-            "debug",
-            "manual-start",
-            "spinner",
-            "pages",
-            "offscreen",
-            "clip",
+            "atlas",        // atlasPath
+            "skeleton",     // skeletonPath
+            "scale",        // scale
+            "animation",    // animation
+            "skin",         // skin
+            "fit",          // fit
+            "width",        // width
+            "height",       // height
+            "draggable",    // draggable
+            "mode",         // mode
+            "x-axis",       // xAxis
+            "y-axis",       // yAxis
+            "offset-x",     // offsetX
+            "offset-y",     // offsetY
+            "identifier",   // identifier
+            "debug",        // debug
+            "manual-start", // manualStart
+            "spinner",      // loadingSpinner
+            "pages",        // pages
+            "offscreen",    // offScreenUpdateBehaviour
+            "clip",         // clip
         ];
     }
 
     constructor() {
         super();
-        this.root = this.attachShadow({ mode: "open" });
+        this.root = this.attachShadow({ mode: "closed" });
         this.overlay = this.initializeOverlay();
         this.atlasPath = "TODO";
         this.skeletonPath = "TODO";
 
-        this.debugDragDiv = document.createElement('div');
+        this.debugDragDiv = document.createElement("div");
         this.debugDragDiv.style.position = "absolute";
         this.debugDragDiv.style.backgroundColor = "rgba(0, 1, 1, 0.3)";
         this.debugDragDiv.style.setProperty("pointer-events", "none");
@@ -431,112 +556,65 @@ class SpineWebComponentWidget extends HTMLElement implements WidgetLayoutOptions
         });
     }
 
-    attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
-        if (newValue !== null) {
-            if (name === "identifier") {
-                this.identifier = newValue;
-            }
-
-            if (name === "atlas") {
-                this.atlasPath = newValue;
-            }
-
-            if (name === "skeleton") {
-                this.skeletonPath = newValue;
-            }
-
-            if (name === "skin") {
-                this.skin = newValue;
-            }
-
-            if (name === "fit") {
-                this.fit = isFitType(newValue) ? newValue : "contain";
-            }
-
-            if (name === "mode") {
-                this.mode = isModeType(newValue) ? newValue : "inside";
-            }
-
-            if (name === "offscreen") {
-                this.offScreenUpdateBehaviour = isOffScreenUpdateBehaviourType(newValue) ? newValue : "pause";
-            }
-
-            if (name === "x-axis") {
-                let float = this.xAxis;
-                float = parseFloat(newValue);
-                this.xAxis = float;
-            }
-            if (name === "y-axis") {
-                let float = this.yAxis;
-                float = parseFloat(newValue);
-                this.yAxis = float;
-            }
-            if (name === "offset-x") {
-                let float = 0;
-                float = parseInt(newValue);
-                this.offsetX = float;
-            }
-            if (name === "offset-y") {
-                let float = 0;
-                float = parseInt(newValue);
-                this.offsetY = float;
-            }
-
-            if (name === "scale") {
-                let scaleFloat = 1;
-                scaleFloat = parseFloat(newValue);
-                this.scale = scaleFloat;
-            }
-
-            if (name === "width") {
-                let widthFloat = 1;
-                widthFloat = parseFloat(newValue);
-                this.width = widthFloat;
-            }
-
-            if (name === "height") {
-                let heightFloat = 1;
-                heightFloat = parseFloat(newValue);
-                this.height = heightFloat;
-            }
-
-            if (name === "animation") {
-                this.animation = newValue;
-            }
-
-            if (name === "draggable") {
-                this.draggable = Boolean(newValue);
-            }
-
-            if (name === "debug") {
-                this.debug = Boolean(newValue);
-            }
-
-            if (name === "spinner") {
-                this.loadingSpinner = Boolean(newValue);
-            }
-
-            if (name === "manual-start") {
-                this.manualStart = Boolean(newValue);
-            }
-
-            if (name === "clip") {
-                this.clip = Boolean(newValue);
-            }
-
-            if (name === "pages") {
-                this.pages = newValue.split(",").reduce((acc, pageIndex) => {
-                    const index = parseInt(pageIndex);
-                    if (!isNaN(index)) acc.push(index);
-                    return acc;
-                }, [] as Array<number>);
-            }
-        }
-
+    private static castBoolean(value: string | null, defaultValue = "") {
+        return value === "true" || value === "" ? true : false;
     }
 
-    // calculate bounds of the current animation on track 0, then set it
-	public recalculateBounds() {
+    private static castString(value: string | null, defaultValue = "") {
+        return value === null ? defaultValue : value;
+    }
+
+    private static castNumber(value: string | null, defaultValue = 0) {
+        if (value === null) return defaultValue;
+
+        const parsed = parseFloat(value);
+        if (Number.isNaN(parsed)) return defaultValue;
+        return parsed;
+    }
+
+    private static castArrayNumber(value: string | null, defaultValue = undefined) {
+        if (value === null) return defaultValue;
+        return value.split(",").reduce((acc, pageIndex) => {
+            const index = parseInt(pageIndex);
+            if (!isNaN(index)) acc.push(index);
+            return acc;
+        }, [] as Array<number>);
+    }
+
+    private static castValue(type: AttributeTypes, value: string | null, defaultValue?: any) {
+        switch (type) {
+            case "string":
+                return SpineWebComponentWidget.castString(value, defaultValue);
+            case "number":
+                return SpineWebComponentWidget.castNumber(value, defaultValue);
+            case "boolean":
+                return SpineWebComponentWidget.castBoolean(value, defaultValue);
+            case "string-number":
+                return SpineWebComponentWidget.castArrayNumber(value, defaultValue);
+            case "fitType":
+                return isFitType(value) ? value : defaultValue;
+            case "modeType":
+                return isModeType(value) ? value : defaultValue;
+            case "offScreenUpdateBehaviourType":
+                return isOffScreenUpdateBehaviourType(value) ? value : defaultValue;
+            default:
+                break;
+        }
+    }
+
+    attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
+        const { type, propertyName, defaultValue } = SpineWebComponentWidget.attributesDescription[name];
+        const val = SpineWebComponentWidget.castValue(type, newValue, defaultValue ?? this[propertyName]);
+        (this as any)[propertyName] = val;
+        return;
+    }
+
+    /**
+     * Recalculates and sets the bounds of the current animation on track 0.
+     * Useful when animations or skins are set programmatically.
+     * @returns void
+     */
+	public recalculateBounds(): void {
         const { skeleton, state } = this;
 		if (!skeleton || !state) return;
 		const track = state.getCurrent(0);
@@ -545,9 +623,15 @@ class SpineWebComponentWidget extends HTMLElement implements WidgetLayoutOptions
 		this.setBounds(bounds);
 	}
 
-	// set the given bounds on the current skeleton
-	// bounds is used to center the skeleton in inside mode and as a input area for click events
-	public setBounds(bounds: Rectangle) {
+    /**
+     * Set the given bounds on the current skeleton.
+     * Useful when you want you skeleton to have a fixed size, or you want to
+     * focus a certain detail of the skeleton. If the skeleton overflow the element container
+     * consider setting {@link clip} to `true`.
+     * @param bounds
+     * @returns
+     */
+	public setBounds(bounds: Rectangle): void {
         const { skeleton } = this;
 		if (!skeleton) return;
 		bounds.x /= skeleton.scaleX;
@@ -557,15 +641,10 @@ class SpineWebComponentWidget extends HTMLElement implements WidgetLayoutOptions
         this.bounds = bounds;
 	}
 
-    private initializeOverlay(): SpineWebComponentOverlay {
-        let overlay = document.querySelector("spine-overlay") as SpineWebComponentOverlay;
-        if (!overlay) {
-            overlay = document.createElement("spine-overlay") as SpineWebComponentOverlay;
-            document.body.appendChild(overlay);
-        }
-        return overlay;
-    }
-
+    /**
+     * Starts the widget. Starting the widget means to load the assets currently set into
+     * {@link atlasPath} and {@link skeletonPath}.
+     */
     public start() {
         if (this.started) {
             console.warn("If you want to start again the widget, first reset it");
@@ -578,18 +657,35 @@ class SpineWebComponentWidget extends HTMLElement implements WidgetLayoutOptions
         });
     }
 
-    public async loadTexturesInPagesAttribute(atlas: TextureAtlas) {
+    /**
+     * Loads the texture pages in the given `atlas` corresponding to the indexes set into {@link pages}.
+     * This method is automatically called during asset loading. When `pages` is undefined (default),
+     * all pages are loaded. This method is useful when you want to load a subset of pages programmatically.
+     * In that case, set `pages` to an empty array at the beginning.
+     * Then set the pages you want to load and invoke this method.
+     * @param atlas the `TextureAtlas` from which to get the `TextureAtlasPage`s
+     * @returns The list of loaded assets
+     */
+    public async loadTexturesInPagesAttribute(atlas: TextureAtlas): Promise<Array<any>> {
         const pagesIndexToLoad = this.pages ?? atlas.pages.map((_, i) => i); // if no pages provided, loads all
-
-        const atlasPath = this.atlasPath.includes('/') ? this.atlasPath.substring(0, this.atlasPath.lastIndexOf('/') + 1) : '';
-        const promisePageList: Array<Promise<void>> = [];
+        const atlasPath = this.atlasPath.includes("/") ? this.atlasPath.substring(0, this.atlasPath.lastIndexOf("/") + 1) : "";
+        const promisePageList: Array<Promise<any>> = [];
         pagesIndexToLoad.forEach((index) => {
             const page = atlas.pages[index];
-            const promiseTextureLoad = this.loadTexture(`${atlasPath}${page.name}`).then(texture => page.setTexture(texture));
+            const promiseTextureLoad = this.overlay.assetManager.loadTextureAsync(`${atlasPath}${page.name}`).then(texture => page.setTexture(texture));
             promisePageList.push(promiseTextureLoad);
         });
 
         return Promise.all(promisePageList)
+    }
+
+    /**
+     * @returns The `HTMLElement` where the widget is hosted.
+     */
+    public getHTMLElementReference(): HTMLElement {
+        return this.width <= 0 || this.width <= 0
+            ? this.parentElement!
+            : this;
     }
 
     // add a skeleton to the overlay and set the bounds to the given animation or to the setup pose
@@ -605,8 +701,8 @@ class SpineWebComponentWidget extends HTMLElement implements WidgetLayoutOptions
         // - []: no page is loaded
         // - undefined: all pages are loaded (default)
 		await Promise.all([
-			isBinary ? this.loadBinary(skeletonPath) : this.loadJson(skeletonPath),
-			this.loadTextureAtlasButNoTextures(atlasPath).then(atlas => this.loadTexturesInPagesAttribute(atlas)),
+			isBinary ? this.overlay.assetManager.loadBinaryAsync(skeletonPath) : this.overlay.assetManager.loadJsonAsync(skeletonPath),
+			this.overlay.assetManager.loadTextureAtlasButNoTexturesAsync(atlasPath).then(atlas => this.loadTexturesInPagesAttribute(atlas)),
 		]);
 
 		const atlas = this.overlay.assetManager.require(atlasPath);
@@ -616,21 +712,15 @@ class SpineWebComponentWidget extends HTMLElement implements WidgetLayoutOptions
 		skeletonLoader.scale = scale;
 
 		const skeletonFile = this.overlay.assetManager.require(skeletonPath);
-		const skeletonData = skeletonDataInput ?? skeletonLoader.readSkeletonData(skeletonFile);
+		const skeletonData = (skeletonDataInput || this.skeleton?.data) ?? skeletonLoader.readSkeletonData(skeletonFile);
 
 		const skeleton = new Skeleton(skeletonData);
 		const animationStateData = new AnimationStateData(skeletonData);
 		const state = new AnimationState(animationStateData);
 
-        if (skin) {
-			skeleton.setSkinByName(skin);
-		}
-
-		let animationData;
-		if (animation) {
-			state.setAnimation(0, animation, true);
-			animationData = animation ? skeleton.data.findAnimation(animation)! : undefined;
-		}
+        this.skeleton = skeleton;
+        this.state = state;
+        this.textureAtlas = atlas;
 
         // ideally we would know the dpi and the zoom, however they are combined
         // to simplify we just assume that the user wants to load the skeleton at scale 1
@@ -640,19 +730,18 @@ class SpineWebComponentWidget extends HTMLElement implements WidgetLayoutOptions
 		// skeleton.scaleX = this.currentScaleDpi;
 		// skeleton.scaleY = this.currentScaleDpi;
 
-        this.skeleton = skeleton;
-        this.state = state;
-        this.textureAtlas = atlas;
+		this.initWidget();
 
-		const bounds = this.calculateAnimationViewport(animationData);
-        this.bounds = bounds;
 		return this;
 	}
 
-    public getHTMLElementReference(): HTMLElement {
-        return this.width <= 0 || this.width <= 0
-            ? this.parentElement!
-            : this;
+    private initWidget() {
+        const { skeleton, state, animation, skin } = this;
+
+        if (skin) skeleton?.setSkinByName(skin);
+		if (animation) state?.setAnimation(0, animation, true);
+
+		this.recalculateBounds();
     }
 
     private render(): void {
@@ -678,54 +767,17 @@ class SpineWebComponentWidget extends HTMLElement implements WidgetLayoutOptions
         `;
     }
 
-    /*
-	* Load assets utilities
-	*/
-
-	public async loadBinary(path: string) {
-		return new Promise((resolve, reject) => {
-			this.overlay.assetManager.loadBinary(path,
-				(_, binary) => resolve(binary),
-				(_, message) => reject(message),
-			);
-		});
-	}
-
-	public async loadJson(path: string) {
-		return new Promise((resolve, reject) => {
-			this.overlay.assetManager.loadJson(path,
-				(_, object) => resolve(object),
-				(_, message) => reject(message),
-			);
-		});
-	}
-
-    public async loadTexture(path: string) {
-		return new Promise<Texture>((resolve, reject) => {
-			this.overlay.assetManager.loadTexture(path,
-				(_, texture) => resolve(texture),
-				(_, message) => reject(message),
-			);
-		});
-	}
-
-	public async loadTextureAtlas(path: string) {
-		return new Promise((resolve, reject) => {
-			this.overlay.assetManager.loadTextureAtlas(path,
-				(_, atlas) => resolve(atlas),
-				(_, message) => reject(message),
-			);
-		});
-	}
-
-    public async loadTextureAtlasButNoTextures(path: string) {
-		return new Promise<TextureAtlas>((resolve, reject) => {
-			this.overlay.assetManager.loadTextureAtlasButNoTextures(path,
-				(_, atlas) => resolve(atlas),
-				(_, message) => reject(message),
-			);
-		});
-	}
+    // Create a new overlay webcomponent, if no one exists yet.
+    // TODO: allow the possibility to instantiate multiple overlay (eg: background, foreground),
+    // to give them an identifier, and to specify which overlay is assigned to a widget
+    private initializeOverlay(): SpineWebComponentOverlay {
+        let overlay = document.querySelector("spine-overlay") as SpineWebComponentOverlay;
+        if (!overlay) {
+            overlay = document.createElement("spine-overlay") as SpineWebComponentOverlay;
+            document.body.appendChild(overlay);
+        }
+        return overlay;
+    }
 
     /*
     * Other utilities
@@ -808,9 +860,9 @@ class SpineWebComponentOverlay extends HTMLElement {
 
     constructor() {
         super();
-        this.root = this.attachShadow({ mode: 'open' });
+        this.root = this.attachShadow({ mode: "closed" });
 
-        this.div = document.createElement('div');
+        this.div = document.createElement("div");
 		this.div.style.position = "absolute";
 		this.div.style.top = "0";
 		this.div.style.left = "0";
@@ -820,7 +872,7 @@ class SpineWebComponentOverlay extends HTMLElement {
 
         this.root.appendChild(this.div);
 
-		this.canvas = document.createElement('canvas');
+		this.canvas = document.createElement("canvas");
 		this.div.appendChild(this.canvas);
 		this.canvas.style.position = "absolute";
 		this.canvas.style.top = "0";
@@ -830,7 +882,7 @@ class SpineWebComponentOverlay extends HTMLElement {
 		this.canvas.style.transform =`translate(0px,0px)`;
 		// this.canvas.style.setProperty("will-change", "transform"); // performance seems to be even worse with this uncommented
 
-        this.fps = document.createElement('span');
+        this.fps = document.createElement("span");
         this.fps.style.position = "fixed";
 		this.fps.style.top = "0";
 		this.fps.style.left = "0";
@@ -866,7 +918,7 @@ class SpineWebComponentOverlay extends HTMLElement {
             this.scrollHandler();
         }
 
-		window.addEventListener('scroll', this.scrollHandler);
+		window.addEventListener("scroll", this.scrollHandler);
 		this.scrollHandler();
 
         this.input = new Input(document.body, false);
@@ -994,7 +1046,7 @@ class SpineWebComponentOverlay extends HTMLElement {
                 }
 
                 if (skeleton) {
-                    if (mode === 'inside') {
+                    if (mode === "inside") {
                         let { x: ax, y: ay, width: aw, height: ah } = bounds!;
 
                         // scale ratio
@@ -1144,8 +1196,6 @@ class SpineWebComponentOverlay extends HTMLElement {
 	}
 
     connectedCallback(): void {
-        // TODO: move the intersectio observer to the canvas - so that we can instantiate a single one rather than one per widget
-
         this.intersectionObserver = new IntersectionObserver((widgets) => {
             widgets.forEach(({ isIntersecting, target }) => {
 
@@ -1162,6 +1212,7 @@ class SpineWebComponentOverlay extends HTMLElement {
     disconnectedCallback(): void {
     }
 
+    // TODO: drag is bugged when zoom on browser (just zoom and activare debug to see the drag surface has some offset)
     private setupDragUtility() {
 		// TODO: we should use document - body might have some margin that offset the click events - Meanwhile I take event pageX/Y
 		const point: Point = { x: 0, y: 0 };
@@ -1265,7 +1316,7 @@ class SpineWebComponentOverlay extends HTMLElement {
     private zoomHandler = () => {
 		this.skeletonList.forEach((widget) => {
             // inside mode scale automatically to fit the skeleton within its parent
-            if (widget.mode !== 'origin' && widget.fit !== 'none') return;
+            if (widget.mode !== "origin" && widget.fit !== "none") return;
 
             const skeleton = widget.skeleton;
             if (!skeleton) return;
@@ -1326,33 +1377,23 @@ const inside = (point: { x: number; y: number }, rectangle: Rectangle): boolean 
     );
 }
 
-customElements.define('spine-widget', SpineWebComponentWidget);
-customElements.define('spine-overlay', SpineWebComponentOverlay);
+customElements.define("spine-widget", SpineWebComponentWidget);
+customElements.define("spine-overlay", SpineWebComponentOverlay);
 
-export function getSpineWidget(identifier: string) {
-    return document.querySelector(`spine-widget[identifier=${identifier}]`);
+export function getSpineWidget(identifier: string): SpineWebComponentWidget {
+    return document.querySelector(`spine-widget[identifier=${identifier}]`) as SpineWebComponentWidget;
 }
 
-export function createSpineWidget(parameters: { atlas: string, skeleton: string, animation: string, skin: string, manualStart?: boolean, pages: Array<string> }): SpineWebComponentWidget {
-    const {
-        atlas,
-        skeleton,
-        animation,
-        skin,
-        manualStart = false,
-        pages = [],
-    } = parameters;
-
+export function createSpineWidget(parameters: WidgetAttributes): SpineWebComponentWidget {
     const widget = document.createElement("spine-widget") as SpineWebComponentWidget;
 
-    widget.setAttribute("skeleton", skeleton);
-    widget.setAttribute("atlas", atlas);
-    widget.setAttribute("skin", skin);
-    widget.setAttribute("animation", animation);
-    widget.setAttribute("manual-start", `${manualStart}`);
-    widget.setAttribute("pages", `${pages.join(",")}`);
+    Object.entries(SpineWebComponentWidget.attributesDescription).forEach(entry => {
+        const [key, { propertyName }] = entry;
+        const value = parameters[propertyName];
+        if (value) widget.setAttribute(key, value as any);
+    });
 
-    if (!manualStart) {
+    if (!widget.manualStart) {
         widget.start();
     }
 
