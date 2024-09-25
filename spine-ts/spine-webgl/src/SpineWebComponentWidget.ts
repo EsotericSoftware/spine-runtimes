@@ -96,9 +96,10 @@ function isFitType(value: string | null): value is FitType {
 
 type AttributeTypes = "string" | "number" | "boolean" | "string-number" | "fitType" | "modeType" | "offScreenUpdateBehaviourType";
 
+// The properties that map to widget attributes
 interface WidgetAttributes {
-    atlasPath: string
-    skeletonPath: string
+    atlasPath?: string
+    skeletonPath?: string
     scale: number
     animation?: string
     skin?: string
@@ -120,13 +121,16 @@ interface WidgetAttributes {
     loadingSpinner: boolean
 }
 
+// The methods user can override to have custom behaviour
 interface WidgetOverridableMethods {
 	update?: UpdateSpineWidgetFunction;
 	beforeUpdateWorldTransforms: BeforeAfterUpdateSpineWidgetFunction;
 	afterUpdateWorldTransforms: BeforeAfterUpdateSpineWidgetFunction;
+    onScreenFunction: (widget: SpineWebComponentWidget) => void
 }
 
-interface WidgetPublicState {
+// Properties that does not map to any widget attribute, but that might be useful
+interface WidgetPublicProperties {
     skeleton: Skeleton
     state: AnimationState
     bounds: Rectangle
@@ -138,28 +142,29 @@ interface WidgetPublicState {
     textureAtlas: TextureAtlas
 }
 
-interface WidgetInternalState {
+// Usage of this properties is discouraged because they can be made private in the future
+interface WidgetInternalProperties {
     currentScaleDpi: number
     dragging: boolean
     dragX: number
     dragY: number
+    dragBoundsRectangle: Rectangle
+    debugDragDiv: HTMLDivElement
 }
 
-// TODO: add missing assets to main assets folder (chibi)
-
-class SpineWebComponentWidget extends HTMLElement implements WidgetAttributes, WidgetOverridableMethods, WidgetInternalState, Partial<WidgetPublicState> {
+class SpineWebComponentWidget extends HTMLElement implements WidgetAttributes, WidgetOverridableMethods, WidgetInternalProperties, Partial<WidgetPublicProperties> {
 
     /**
      * The URL of the skeleton atlas file (.atlas)
      * Connected to `atlas` attribute.
      */
-    public atlasPath: string;
+    public atlasPath?: string;
 
     /**
      * The URL of the skeleton JSON (.json) or binary (.skel) file
      * Connected to `skeleton` attribute.
      */
-    public skeletonPath: string;
+    public skeletonPath?: string;
 
     /**
      * The scale when loading the skeleton data. Default: 1
@@ -331,17 +336,32 @@ class SpineWebComponentWidget extends HTMLElement implements WidgetAttributes, W
 	 * @param skeleton - A reference to the widget's skeleton
 	 * @param state - A reference to the widget's state
      */
-	update?: UpdateSpineWidgetFunction;
+	public update?: UpdateSpineWidgetFunction;
 
     /**
      * This callback is invoked before the world transforms are computed allows to execute additional logic.
      */
-	beforeUpdateWorldTransforms: BeforeAfterUpdateSpineWidgetFunction = () => {};
+	public beforeUpdateWorldTransforms: BeforeAfterUpdateSpineWidgetFunction = () => {};
 
     /**
      * This callback is invoked after the world transforms are computed allows to execute additional logic.
      */
-	afterUpdateWorldTransforms: BeforeAfterUpdateSpineWidgetFunction= () => {};
+	public afterUpdateWorldTransforms: BeforeAfterUpdateSpineWidgetFunction= () => {};
+
+    /**
+     * A callback invoked each time div hosting the widget enters the screen viewport.
+     * By default, the callback call the {@link start} method the first time the widget
+     * enters the screen viewport.
+     */
+    public onScreenFunction: (widget: SpineWebComponentWidget) => void = async (widget) => {
+        if (widget.loading && !widget.onScreenAtLeastOnce) {
+            widget.onScreenAtLeastOnce = true;
+
+            if (widget.manualStart) {
+                widget.start();
+            }
+        }
+    }
 
     /**
      * The skeleton hosted by this widget. It's ready once assets are loaded.
@@ -396,37 +416,6 @@ class SpineWebComponentWidget extends HTMLElement implements WidgetAttributes, W
     public started = false;
 
     /**
-     * Holds the dpi (devicePixelRatio) currently used to calculate the scale for this skeleton
-     */
-    public currentScaleDpi = 1;
-
-    /**
-     * The accumulated offset on the x axis due to dragging
-     */
-    public dragX = 0;
-
-    /**
-     * The accumulated offset on the y axis due to dragging
-     */
-    public dragY = 0;
-
-    /**
-     * If true, the widget is currently being dragged
-     */
-    public dragging = false;
-
-    /**
-     * The rectangle in the screen space used to determine if a click is within the skeleton bounds,
-     * so if to start the drag action.
-     */
-    public dragBoundsRectangle: Rectangle = { x: 0, y: 0, width: 0, height: 0 };
-
-    /**
-     * An HTMLDivElement used to show the drag surface in debug mode
-     */
-    public debugDragDiv: HTMLDivElement;
-
-    /**
      * True, when the div hosting the widget enters the screen viewport. It uses an IntersectionObserver internally.
      */
     public onScreen = false;
@@ -438,23 +427,42 @@ class SpineWebComponentWidget extends HTMLElement implements WidgetAttributes, W
     public onScreenAtLeastOnce = false;
 
     /**
-     * A callback invoked each time div hosting the widget enters the screen viewport.
-     * By default, the callback call the {@link start} method the first time the widget
-     * enters the screen viewport.
+     * Holds the dpi (devicePixelRatio) currently used to calculate the scale for this skeleton
+     * Do not rely on this properties. It might be made private in the future.
      */
-    public onScreenFunction: (widget: SpineWebComponentWidget) => void = async (widget) => {
-        if (widget.loading && !widget.onScreenAtLeastOnce) {
-            widget.onScreenAtLeastOnce = true;
+    public currentScaleDpi = 1;
 
-            if (widget.manualStart) {
-                widget.start();
-            }
-        }
-    }
+    /**
+     * The accumulated offset on the x axis due to dragging
+     * Do not rely on this properties. It might be made private in the future.
+     */
+    public dragX = 0;
 
-    // ----
-    // ----
-    // ----
+    /**
+     * The accumulated offset on the y axis due to dragging
+     * Do not rely on this properties. It might be made private in the future.
+     */
+    public dragY = 0;
+
+    /**
+     * If true, the widget is currently being dragged
+     * Do not rely on this properties. It might be made private in the future.
+     */
+    public dragging = false;
+
+    /**
+     * The rectangle in the screen space used to determine if a click is within the skeleton bounds,
+     * so if to start the drag action.
+     * Do not rely on this properties. It might be made private in the future.
+     */
+    public dragBoundsRectangle: Rectangle = { x: 0, y: 0, width: 0, height: 0 };
+
+    /**
+     * An HTMLDivElement used to show the drag surface in debug mode
+     * Do not rely on this properties. It might be made private in the future.
+     */
+    public debugDragDiv: HTMLDivElement;
+
 
     /**
      * Optional: Pass a `SkeletonData`, if you want to avoid creating a new one
@@ -521,8 +529,6 @@ class SpineWebComponentWidget extends HTMLElement implements WidgetAttributes, W
         super();
         this.root = this.attachShadow({ mode: "closed" });
         this.overlay = this.initializeOverlay();
-        this.atlasPath = "TODO";
-        this.skeletonPath = "TODO";
 
         this.debugDragDiv = document.createElement("div");
         this.debugDragDiv.style.position = "absolute";
@@ -531,19 +537,10 @@ class SpineWebComponentWidget extends HTMLElement implements WidgetAttributes, W
     }
 
     connectedCallback() {
-        if (!this.atlasPath) {
-            throw new Error("Missing atlas attribute");
-        }
-
-        if (!this.skeletonPath) {
-            throw new Error("Missing skeleton attribute");
-        }
-
         this.overlay.addWidget(this);
         if (!this.manualStart) {
             this.start();
         }
-
         this.render();
     }
 
@@ -668,7 +665,7 @@ class SpineWebComponentWidget extends HTMLElement implements WidgetAttributes, W
      */
     public async loadTexturesInPagesAttribute(atlas: TextureAtlas): Promise<Array<any>> {
         const pagesIndexToLoad = this.pages ?? atlas.pages.map((_, i) => i); // if no pages provided, loads all
-        const atlasPath = this.atlasPath.includes("/") ? this.atlasPath.substring(0, this.atlasPath.lastIndexOf("/") + 1) : "";
+        const atlasPath = this.atlasPath?.includes("/") ? this.atlasPath.substring(0, this.atlasPath.lastIndexOf("/") + 1) : "";
         const promisePageList: Array<Promise<any>> = [];
         pagesIndexToLoad.forEach((index) => {
             const page = atlas.pages[index];
@@ -693,6 +690,9 @@ class SpineWebComponentWidget extends HTMLElement implements WidgetAttributes, W
         this.loading = true;
         // if (this.identifier !== "TODELETE") return Promise.reject();
 		const { atlasPath, skeletonPath, scale = 1, animation, skeletonData: skeletonDataInput, skin } = this;
+        if (!atlasPath || !skeletonPath) {
+            throw new Error(`Missing atlas path or skeleton path. Assets cannot be loaded: atlas: ${atlasPath}, skeleton: ${skeletonPath}`);
+        }
 		const isBinary = skeletonPath.endsWith(".skel");
 
         // skeleton and atlas txt are loaded immeaditely

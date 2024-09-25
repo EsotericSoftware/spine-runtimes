@@ -470,6 +470,11 @@ cp -f ../sack/export/sack-pma.png "$ROOT/spine-ts/spine-webgl/example/assets/"
 
 cp -f ../celestial-circus/export/* "$ROOT/spine-ts/spine-webgl/example/assets/"
 
+cp -f ../chibi-stickers/export/chibi-stickers-pma* "$ROOT/spine-ts/spine-webgl/example/assets/"
+cp -f ../chibi-stickers/export/chibi-stickers.atlas "$ROOT/spine-ts/spine-webgl/example/assets/"
+cp -f ../chibi-stickers/export/chibi-stickers.json "$ROOT/spine-ts/spine-webgl/example/assets/"
+cp -f ../chibi-stickers/export/chibi-stickers.skel "$ROOT/spine-ts/spine-webgl/example/assets/"
+
 rm "$ROOT/spine-ts/spine-canvas/example/assets/"*
 cp -f ../spineboy/export/spineboy-pro.skel "$ROOT/spine-ts/spine-canvas/example/assets/"
 cp -f ../spineboy/export/spineboy-ess.json "$ROOT/spine-ts/spine-canvas/example/assets/"
