@@ -36,6 +36,6 @@
     "@esotericsoftware/spine-canvas": "4.2.60"
   },
   "peerDependencies": {
-    "phaser": "3.60.0"
+    "phaser": "^3.60.0"
   }
 }
