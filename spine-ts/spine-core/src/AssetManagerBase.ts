@@ -94,7 +94,6 @@ export class AssetManagerBase implements Disposable {
 
 		this.assetsLoaded[path] = new Promise<any>((resolve, reject) => {
 			this.downloader.downloadBinary(path, (data: Uint8Array): void => {
-				// setTimeout(() => this.success(success, path, data), 10000);
 				this.success(success, path, data);
 				resolve(data);
 			}, (status: number, responseText: string): void => {
@@ -136,7 +135,6 @@ export class AssetManagerBase implements Disposable {
 			});
 	}
 
-	// TODO: refactor assetsLoaded and assets (we should probably merge them)
 	reuseAssets(path: string,
 		success: (path: string, data: any) => void = () => { },
 		error: (path: string, message: string) => void = () => { }) {
@@ -375,7 +373,6 @@ export class AssetManagerBase implements Disposable {
 export class Downloader {
 	private callbacks: StringMap<Array<Function>> = {};
 	rawDataUris: StringMap<string> = {};
-	cacheTextures: Record<string, Texture> = {};
 
 	dataUriToString (dataUri: string) {
 		if (!dataUri.startsWith("data:")) {

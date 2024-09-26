@@ -1303,7 +1303,7 @@ class SpineWebComponentOverlay extends HTMLElement {
 
             this.canvas.style.width = totalWidth + "px";
 		    this.canvas.style.height = totalHeight + "px";
-            this.renderer.resize3(totalWidth, totalHeight);
+            this.resize(totalWidth, totalHeight);
         }
 	}
 
@@ -1333,8 +1333,18 @@ class SpineWebComponentOverlay extends HTMLElement {
             widget.currentScaleDpi = scale;
 		});
 
-        this.renderer.resize3(parseFloat(this.canvas.style.width), parseFloat(this.canvas.style.height));
+        this.resize(parseFloat(this.canvas.style.width), parseFloat(this.canvas.style.height));
 	}
+
+    private resize(width: number, height: number) {
+        let canvas = this.canvas;
+		const dpr = window.devicePixelRatio;
+		this.canvas.width = Math.round(width * dpr);
+		this.canvas.height = Math.round(height * dpr);
+		this.renderer.context.gl.viewport(0, 0, canvas.width, canvas.height);
+		this.renderer.camera.setViewport(canvas.width, canvas.height);
+		this.renderer.camera.update();
+    }
 
     // we need the bounding client rect otherwise decimals won't be returned
     // this means that during zoom it might occurs that the div would be resized

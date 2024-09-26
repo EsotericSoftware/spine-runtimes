@@ -68,7 +68,7 @@ export class Input {
 					if (this.buttonDown) {
 						if (listener.dragged) listener.dragged(this.mouseX, this.mouseY, ev);
 					} else {
-						if (listener.moved) listener.moved(this.mouseX, this.mouseY);
+						if (listener.moved) listener.moved(this.mouseX, this.mouseY, ev);
 					}
 				});
 			}
@@ -80,7 +80,7 @@ export class Input {
 				this.mouseX = ev.clientX - rect.left;;
 				this.mouseY = ev.clientY - rect.top;
 				this.buttonDown = false;
-				this.listeners.map((listener) => { if (listener.up) listener.up(this.mouseX, this.mouseY); });
+				this.listeners.map((listener) => { if (listener.up) listener.up(this.mouseX, this.mouseY, ev); });
 
 				document.removeEventListener("mousemove", mouseMove);
 				document.removeEventListener("mouseup", mouseUp);
@@ -92,7 +92,7 @@ export class Input {
 			let deltaY = ev.deltaY;
 			if (ev.deltaMode == WheelEvent.DOM_DELTA_LINE) deltaY *= 8;
 			if (ev.deltaMode == WheelEvent.DOM_DELTA_PAGE) deltaY *= 24;
-			this.listeners.map((listener) => { if (listener.wheel) listener.wheel(ev.deltaY); });
+			this.listeners.map((listener) => { if (listener.wheel) listener.wheel(ev.deltaY, ev); });
 		};
 
 		element.addEventListener("mousedown", mouseDown, true);
@@ -122,7 +122,7 @@ export class Input {
 					let dx = this.touch1.x - this.touch0.x;
 					let dy = this.touch1.x - this.touch0.x;
 					this.initialPinchDistance = Math.sqrt(dx * dx + dy * dy);
-					this.listeners.map((listener) => { if (listener.zoom) listener.zoom(this.initialPinchDistance, this.initialPinchDistance) });
+					this.listeners.map((listener) => { if (listener.zoom) listener.zoom(this.initialPinchDistance, this.initialPinchDistance, ev) });
 				}
 			}
 			if (this.preventDefault) ev.preventDefault();
@@ -151,7 +151,7 @@ export class Input {
 					let dx = this.touch1.x - this.touch0.x;
 					let dy = this.touch1.x - this.touch0.x;
 					let distance = Math.sqrt(dx * dx + dy * dy);
-					this.listeners.map((listener) => { if (listener.zoom) listener.zoom(this.initialPinchDistance, distance) });
+					this.listeners.map((listener) => { if (listener.zoom) listener.zoom(this.initialPinchDistance, distance, ev) });
 				}
 			}
 			if (this.preventDefault) ev.preventDefault();
@@ -171,7 +171,7 @@ export class Input {
 						this.touch0 = null;
 						this.mouseX = x;
 						this.mouseY = y;
-						this.listeners.map((listener) => { if (listener.up) listener.up(x, y) });
+						this.listeners.map((listener) => { if (listener.up) listener.up(x, y, ev) });
 
 						if (!this.touch1) {
 							this.buttonDown = false;
@@ -216,9 +216,9 @@ export class Touch {
 
 export interface InputListener {
 	down?(x: number, y: number, ev?: MouseEvent | TouchEvent): void;
-	up?(x: number, y: number): void;
-	moved?(x: number, y: number): void;
+	up?(x: number, y: number, ev?: MouseEvent | TouchEvent): void;
+	moved?(x: number, y: number, ev?: MouseEvent | TouchEvent): void;
 	dragged?(x: number, y: number, ev?: MouseEvent | TouchEvent): void;
-	wheel?(delta: number): void;
-	zoom?(initialDistance: number, distance: number): void;
+	wheel?(delta: number, ev?: MouseEvent | TouchEvent): void;
+	zoom?(initialDistance: number, distance: number, ev?: MouseEvent | TouchEvent): void;
 }
