@@ -1025,7 +1025,7 @@ class SpineWebComponentOverlay extends HTMLElement {
                 } else {
                     // get the desired point into the the div (center by default) in world coordinate
                     const divX = divBounds.x + divBounds.width * (xAxis + .5);
-                    const divY = divBounds.y + divBounds.height * (-yAxis + .5);
+                    const divY = divBounds.y + divBounds.height * (-yAxis + .5) - 1;
                     this.screenToWorld(tempVector, divX, divY);
                     divOriginX = tempVector.x;
                     divOriginY = tempVector.y;
