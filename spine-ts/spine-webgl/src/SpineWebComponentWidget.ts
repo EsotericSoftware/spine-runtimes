@@ -1017,8 +1017,6 @@ class SpineWebComponentOverlay extends HTMLElement {
                 divBounds.x += this.overflowLeftSize;
                 divBounds.y += this.overflowTopSize;
 
-                // TODO: drag does not work while clip is on
-
                 let divOriginX = 0;
                 let divOriginY = 0;
                 if (clip) {
@@ -1283,7 +1281,16 @@ class SpineWebComponentOverlay extends HTMLElement {
 	}
 
     private resizeCanvas() {
-        const { width, height } = this.getScreenSize();
+        let { width, height } = this.getScreenSize();
+
+        // this is needed because screen size is wrong when zoom levels occurs
+        // zooming out will make the canvas smaller and its known that zoom level
+        // on browsers is not reliable
+        // ideally, window.innerWidth/innerHeight would be preferrable. However
+        // on mobile browsers the dynamic search bar makes the innerHeight smaller
+        // at the beginning (changing the canvas size at each scroll is not ideal)
+        width = Math.max(width, window.innerWidth);
+        height = Math.max(height, window.innerHeight);
 
 		if (this.currentCanvasBaseWidth !== width || this.currentCanvasBaseHeight !== height) {
             this.currentCanvasBaseWidth = width;
@@ -1324,13 +1331,9 @@ class SpineWebComponentOverlay extends HTMLElement {
             skeleton.scaleX = skeleton.scaleX / widget.currentScaleDpi * scale;
             skeleton.scaleY = skeleton.scaleY / widget.currentScaleDpi * scale;
             widget.currentScaleDpi = scale;
+		});
 
-            // TODO: improve this horrible thing
-            this.renderer.resize3(
-                +this.canvas.style.width.substring(0, this.canvas.style.width.length - 2),
-                +this.canvas.style.height.substring(0, this.canvas.style.height.length - 2),
-            );
-		})
+        this.renderer.resize3(parseFloat(this.canvas.style.width), parseFloat(this.canvas.style.height));
 	}
 
     // we need the bounding client rect otherwise decimals won't be returned
