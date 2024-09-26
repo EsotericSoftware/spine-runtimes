@@ -152,7 +152,12 @@ interface WidgetInternalProperties {
     debugDragDiv: HTMLDivElement
 }
 
-class SpineWebComponentWidget extends HTMLElement implements WidgetAttributes, WidgetOverridableMethods, WidgetInternalProperties, Partial<WidgetPublicProperties> {
+export class SpineWebComponentWidget extends HTMLElement implements WidgetAttributes, WidgetOverridableMethods, WidgetInternalProperties, Partial<WidgetPublicProperties> {
+
+    /**
+     * If true, enables a top-left span showing FPS (it has black text)
+     */
+    public static SHOW_FPS = false;
 
     /**
      * The URL of the skeleton atlas file (.atlas)
@@ -833,6 +838,7 @@ class SpineWebComponentOverlay extends HTMLElement {
     private div: HTMLDivElement;
     private canvas:HTMLCanvasElement;
     private fps: HTMLSpanElement;
+    private fpsAppended = false;
 
     public skeletonList = new Array<SpineWebComponentWidget>();
 
@@ -886,7 +892,6 @@ class SpineWebComponentOverlay extends HTMLElement {
         this.fps.style.position = "fixed";
 		this.fps.style.top = "0";
 		this.fps.style.left = "0";
-        this.root.appendChild(this.fps);
 
         const context = new ManagedWebGLRenderingContext(this.canvas, { alpha: true });
 		this.renderer = new SceneRenderer(this.canvas, context);
@@ -950,7 +955,20 @@ class SpineWebComponentOverlay extends HTMLElement {
                     }
                 }
             });
-            this.fps.innerText = this.time.framesPerSecond.toFixed(2) + " fps";
+
+            // fps top-left span
+            if (SpineWebComponentWidget.SHOW_FPS) {
+                if (!this.fpsAppended) {
+                    this.root.appendChild(this.fps);
+                    this.fpsAppended = true;
+                }
+                this.fps.innerText = this.time.framesPerSecond.toFixed(2) + " fps";
+            } else {
+                if (this.fpsAppended) {
+                    this.root.removeChild(this.fps);
+                    this.fpsAppended = false;
+                }
+            }
         };
 
         const clear = (r: number, g: number, b: number, a: number) => {
