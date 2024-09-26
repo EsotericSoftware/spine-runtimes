@@ -35,7 +35,7 @@ import {
     AssetManager,
     Color,
     Input,
-    LoadingScreenWidget,
+    LoadingScreen,
     ManagedWebGLRenderingContext,
     MixBlend,
     MixDirection,
@@ -408,7 +408,7 @@ class SpineWebComponentWidget extends HTMLElement implements WidgetAttributes, W
      * This is instantiated only if it is really necessary.
      * For example, if {@link loadingSpinner} is `false`, this property value is null
      */
-    public loadingScreen: LoadingScreenWidget | null = null;
+    public loadingScreen: LoadingScreen | null = null;
 
     /**
      * If true, the widget is in the assets loading process.
@@ -1036,8 +1036,8 @@ class SpineWebComponentOverlay extends HTMLElement {
 
                 if (loading) {
                     if (loadingSpinner) {
-                        if (!widget.loadingScreen) widget.loadingScreen = new LoadingScreenWidget(renderer);
-                        widget.loadingScreen!.draw(true, divOriginX, divOriginY, divWidthWorld, divHeightWorld);
+                        if (!widget.loadingScreen) widget.loadingScreen = new LoadingScreen(renderer);
+                        widget.loadingScreen!.drawInCoordinates(divOriginX, divOriginY);
                     }
                     if (clip) clipToBoundEnd();
                     return;
