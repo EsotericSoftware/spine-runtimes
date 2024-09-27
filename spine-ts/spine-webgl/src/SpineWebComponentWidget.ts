@@ -34,6 +34,7 @@ import {
     AtlasAttachmentLoader,
     AssetManager,
     Color,
+    Disposable,
     Input,
     LoadingScreen,
     ManagedWebGLRenderingContext,
@@ -810,7 +811,12 @@ export class SpineWebComponentWidget extends HTMLElement implements WidgetAttrib
     }
 }
 
-class SpineWebComponentOverlay extends HTMLElement {
+class SpineWebComponentOverlay extends HTMLElement implements Disposable {
+
+    public skeletonList = new Array<SpineWebComponentWidget>();
+    public renderer: SceneRenderer;
+    public assetManager: AssetManager;
+
     private root: ShadowRoot;
 
     private div: HTMLDivElement;
@@ -818,10 +824,8 @@ class SpineWebComponentOverlay extends HTMLElement {
     private fps: HTMLSpanElement;
     private fpsAppended = false;
 
-    public skeletonList = new Array<SpineWebComponentWidget>();
-
     private intersectionObserver? : IntersectionObserver;
-    private input: Input;
+    private input?: Input;
 
 	// how many pixels to add to the edges to prevent "edge cuttin" on fast scrolling
     // be aware that the canvas is already big as the display size
@@ -836,9 +840,8 @@ class SpineWebComponentOverlay extends HTMLElement {
     private currentCanvasBaseWidth = 0;
     private currentCanvasBaseHeight = 0;
 
-    public renderer: SceneRenderer;
-    public assetManager: AssetManager;
     private disposed = false;
+    private detached = true;
     readonly time = new TimeKeeper();
 
     constructor() {
@@ -873,40 +876,40 @@ class SpineWebComponentOverlay extends HTMLElement {
         const context = new ManagedWebGLRenderingContext(this.canvas, { alpha: true });
 		this.renderer = new SceneRenderer(this.canvas, context);
 		this.assetManager = new AssetManager(context);
-		this.input = new Input(this.canvas, false);
-        this.setupRenderingElements();
 
 		this.overflowLeftSize = this.overflowLeft * document.documentElement.clientWidth;
 		this.overflowTopSize = this.overflowTop * document.documentElement.clientHeight;
-
-        window.addEventListener('resize', () => {
-            this.updateCanvasSize();
-            this.zoomHandler();
-        });
-
-        window.screen.orientation.onchange = () => {
-            this.updateCanvasSize();
-            // after an orientation change the scrolling changes, but the scroll event does not fire
-            this.scrollHandler();
-        }
-
-		window.addEventListener("scroll", this.scrollHandler);
-
-        window.onload = () => {
-            this.updateCanvasSize();
-            this.zoomHandler();
-
-            // translateCanvas starts a requestAnimationFrame loop
-            this.translateCanvas();
-
-            this.scrollHandler();
-        };
-
-        this.input = new Input(document.body, false);
-		this.setupDragUtility();
     }
 
+    private resizeCallback = () => {
+        this.updateCanvasSize();
+        this.zoomHandler();
+    }
+    private orientationChangeCallback = () => {
+        this.updateCanvasSize();
+        // after an orientation change the scrolling changes, but the scroll event does not fire
+        this.scrollHandler();
+    }
+    // right now, we scroll the canvas each frame, that makes scrolling on mobile waaay more smoother
+    // this is way scroll handler do nothing
+    private scrollHandler = () => {
+		// this.translateCanvas();
+	}
+    private onLoadCallback = () => {
+        this.updateCanvasSize();
+        this.zoomHandler();
+
+        // translateCanvas starts a requestAnimationFrame loop
+        this.translateCanvas();
+
+        this.scrollHandler();
+    }
     connectedCallback(): void {
+        window.addEventListener("resize", this.resizeCallback);
+		window.addEventListener("scroll", this.scrollHandler);
+		window.addEventListener("load", this.onLoadCallback);
+        window.screen.orientation.addEventListener('change', this.orientationChangeCallback);
+
         this.intersectionObserver = new IntersectionObserver((widgets) => {
             widgets.forEach(({ isIntersecting, target, intersectionRatio }) => {
                 const widget = this.skeletonList.find(w => w.getHTMLElementReference() == target);
@@ -923,17 +926,40 @@ class SpineWebComponentOverlay extends HTMLElement {
                 }
             })
         }, { rootMargin: "30px 20px 30px 20px" });
+        this.skeletonList.forEach((widget) => {
+            this.intersectionObserver?.observe(widget.getHTMLElementReference());
+        })
+        this.input = this.setupDragUtility();
+
+        this.detached = false;
+
+        this.startRenderingLoop();
     }
 
     disconnectedCallback(): void {
+        window.removeEventListener("resize", this.resizeCallback);
+		window.removeEventListener("scroll", this.scrollHandler);
+		window.removeEventListener("load", this.onLoadCallback);
+        window.screen.orientation.removeEventListener('change', this.orientationChangeCallback);
+        this.intersectionObserver?.disconnect();
+        this.input?.dispose();
+        this.detached = true;
+    }
+
+    dispose(): void {
+        document.body.removeChild(this);
+        this.skeletonList.length = 0;
+        this.renderer.dispose();
+        this.disposed = true;
+        this.detached = true;
     }
 
     addWidget(widget: SpineWebComponentWidget) {
         this.skeletonList.push(widget);
-        this.intersectionObserver!.observe(widget.getHTMLElementReference());
+        this.intersectionObserver?.observe(widget.getHTMLElementReference());
     }
 
-    private setupRenderingElements() {
+    private startRenderingLoop() {
         const updateWidgets = () => {
             const delta = this.time.delta;
             this.skeletonList.forEach(({ skeleton, state, update, onScreen, offScreenUpdateBehaviour, beforeUpdateWorldTransforms, afterUpdateWorldTransforms }) => {
@@ -1195,7 +1221,7 @@ class SpineWebComponentOverlay extends HTMLElement {
         }
 
         const loop = () => {
-			if (this.disposed) return;
+			if (this.disposed || this.detached) return;
 			requestAnimationFrame(loop);
 			this.time.update();
 			updateWidgets();
@@ -1210,8 +1236,9 @@ class SpineWebComponentOverlay extends HTMLElement {
 		const transparentWhite = new Color(1, 1, 1, .3);
 	}
 
-    private setupDragUtility() {
-		// TODO: we should use document - body might have some margin that offset the click events - Meanwhile I take event pageX/Y
+    private setupDragUtility(): Input {
+        // TODO: we should use document - body might have some margin that offset the click events - Meanwhile I take event pageX/Y
+        const inputManager = new Input(document.body, false)
 		const point: Point = { x: 0, y: 0 };
 
         const getInput = (ev?: MouseEvent | TouchEvent): Point => {
@@ -1223,7 +1250,7 @@ class SpineWebComponentOverlay extends HTMLElement {
 
 		let prevX = 0;
 		let prevY = 0;
-		this.input.addListener({
+		inputManager.addListener({
 			down: (x, y, ev) => {
 				const input = getInput(ev);
 				this.skeletonList.forEach(widget => {
@@ -1257,7 +1284,9 @@ class SpineWebComponentOverlay extends HTMLElement {
                     widget.dragging = false;
 				});
 			}
-		})
+		});
+
+        return inputManager;
 	}
 
     /*
@@ -1304,12 +1333,6 @@ class SpineWebComponentOverlay extends HTMLElement {
 		    this.canvas.style.height = totalHeight + "px";
             this.resize(totalWidth, totalHeight);
         }
-	}
-
-    // right now, we scroll the canvas each frame, that makes scrolling on mobile waaay more smoother
-    // this is way scroll handler do nothing
-    private scrollHandler = () => {
-		// this.translateCanvas();
 	}
 
     private translateCanvas() {

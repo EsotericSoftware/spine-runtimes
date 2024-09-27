@@ -27,7 +27,8 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-export class Input {
+import { Disposable } from "./index.js"
+export class Input implements Disposable {
 	element: HTMLElement;
 	mouseX = 0;
 	mouseY = 0;
@@ -37,28 +38,34 @@ export class Input {
 	initialPinchDistance = 0;
 	private listeners = new Array<InputListener>();
 	private autoPreventDefault: boolean;
+	private callbacks: {
+		mouseDown: (ev: UIEvent) => void;
+		mouseMove: (ev: UIEvent) => void;
+		mouseUp: (ev: UIEvent) => void;
+		mouseWheel: (ev: WheelEvent) => void;
+		touchStart: (ev: TouchEvent) => void;
+		touchMove: (ev: TouchEvent) => void;
+		touchEnd: (ev: TouchEvent) => void;
+	};
 
 	constructor (element: HTMLElement, autoPreventDefault = true) {
 		this.element = element;
 		this.autoPreventDefault = autoPreventDefault;
-		this.setupCallbacks(element);
+		this.callbacks = this.setupCallbacks(element);
 	}
 
 	private setupCallbacks (element: HTMLElement) {
-		let mouseDown = (ev: UIEvent) => {
+		const mouseDown = (ev: UIEvent) => {
 			if (ev instanceof MouseEvent) {
 				let rect = element.getBoundingClientRect();
 				this.mouseX = ev.clientX - rect.left;
 				this.mouseY = ev.clientY - rect.top;
 				this.buttonDown = true;
 				this.listeners.map((listener) => { if (listener.down) listener.down(this.mouseX, this.mouseY, ev); });
-
-				document.addEventListener("mousemove", mouseMove);
-				document.addEventListener("mouseup", mouseUp);
 			}
 		}
 
-		let mouseMove = (ev: UIEvent) => {
+		const mouseMove = (ev: UIEvent) => {
 			if (ev instanceof MouseEvent) {
 				let rect = element.getBoundingClientRect();
 				this.mouseX = ev.clientX - rect.left;
@@ -74,20 +81,17 @@ export class Input {
 			}
 		};
 
-		let mouseUp = (ev: UIEvent) => {
+		const mouseUp = (ev: UIEvent) => {
 			if (ev instanceof MouseEvent) {
 				let rect = element.getBoundingClientRect();
 				this.mouseX = ev.clientX - rect.left;;
 				this.mouseY = ev.clientY - rect.top;
 				this.buttonDown = false;
 				this.listeners.map((listener) => { if (listener.up) listener.up(this.mouseX, this.mouseY, ev); });
-
-				document.removeEventListener("mousemove", mouseMove);
-				document.removeEventListener("mouseup", mouseUp);
 			}
 		}
 
-		let mouseWheel = (ev: WheelEvent) => {
+		const mouseWheel = (ev: WheelEvent) => {
 			if (this.autoPreventDefault) ev.preventDefault();
 			let deltaY = ev.deltaY;
 			if (ev.deltaMode == WheelEvent.DOM_DELTA_LINE) deltaY *= 8;
@@ -95,13 +99,7 @@ export class Input {
 			this.listeners.map((listener) => { if (listener.wheel) listener.wheel(ev.deltaY, ev); });
 		};
 
-		element.addEventListener("mousedown", mouseDown, true);
-		element.addEventListener("mousemove", mouseMove, true);
-		element.addEventListener("mouseup", mouseUp, true);
-		element.addEventListener("wheel", mouseWheel, true);
-
-
-		element.addEventListener("touchstart", (ev: TouchEvent) => {
+		const touchStart = (ev: TouchEvent) => {
 			if (!this.touch0 || !this.touch1) {
 				var touches = ev.changedTouches;
 				let nativeTouch = touches.item(0);
@@ -126,9 +124,9 @@ export class Input {
 				}
 			}
 			if (this.autoPreventDefault) ev.preventDefault();
-		}, { passive: false, capture: false });
+		}
 
-		element.addEventListener("touchmove", (ev: TouchEvent) => {
+		const touchMove = (ev: TouchEvent) => {
 			if (this.touch0) {
 				var touches = ev.changedTouches;
 				let rect = element.getBoundingClientRect();
@@ -155,9 +153,9 @@ export class Input {
 				}
 			}
 			if (this.autoPreventDefault) ev.preventDefault();
-		}, { passive: false, capture: false });
+		}
 
-		let touchEnd = (ev: TouchEvent) => {
+		const touchEnd = (ev: TouchEvent) => {
 			if (this.touch0) {
 				var touches = ev.changedTouches;
 				let rect = element.getBoundingClientRect();
@@ -193,8 +191,38 @@ export class Input {
 			}
 			if (this.autoPreventDefault) ev.preventDefault();
 		};
+
+		element.addEventListener("mousedown", mouseDown, true);
+		element.addEventListener("mousemove", mouseMove, true);
+		element.addEventListener("mouseup", mouseUp, true);
+		element.addEventListener("wheel", mouseWheel, true);
+		element.addEventListener("touchstart", touchStart, { passive: false, capture: false });
+		element.addEventListener("touchmove", touchMove, { passive: false, capture: false });
 		element.addEventListener("touchend", touchEnd, { passive: false, capture: false });
 		element.addEventListener("touchcancel", touchEnd);
+
+		return {
+			mouseDown,
+			mouseMove,
+			mouseUp,
+			mouseWheel,
+			touchStart,
+			touchMove,
+			touchEnd,
+		}
+	}
+
+	dispose(): void {
+		const element = this.element;
+		element.addEventListener("mousedown", this.callbacks.mouseDown, true);
+		element.addEventListener("mousemove", this.callbacks.mouseMove, true);
+		element.addEventListener("mouseup", this.callbacks.mouseUp, true);
+		element.addEventListener("wheel", this.callbacks.mouseWheel, true);
+		element.addEventListener("touchstart", this.callbacks.touchStart, { passive: false, capture: false });
+		element.addEventListener("touchmove", this.callbacks.touchMove, { passive: false, capture: false });
+		element.addEventListener("touchend", this.callbacks.touchEnd, { passive: false, capture: false });
+		element.addEventListener("touchcancel", this.callbacks.touchEnd);
+		this.listeners.length = 0;
 	}
 
 	addListener (listener: InputListener) {
