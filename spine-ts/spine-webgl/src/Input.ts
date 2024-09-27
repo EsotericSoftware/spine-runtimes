@@ -36,11 +36,11 @@ export class Input {
 	touch1: Touch | null = null;
 	initialPinchDistance = 0;
 	private listeners = new Array<InputListener>();
-	private preventDefault: boolean;
+	private autoPreventDefault: boolean;
 
-	constructor (element: HTMLElement, preventDefault = true) {
+	constructor (element: HTMLElement, autoPreventDefault = true) {
 		this.element = element;
-		this.preventDefault = preventDefault;
+		this.autoPreventDefault = autoPreventDefault;
 		this.setupCallbacks(element);
 	}
 
@@ -48,7 +48,7 @@ export class Input {
 		let mouseDown = (ev: UIEvent) => {
 			if (ev instanceof MouseEvent) {
 				let rect = element.getBoundingClientRect();
-				this.mouseX = ev.clientX - rect.left;;
+				this.mouseX = ev.clientX - rect.left;
 				this.mouseY = ev.clientY - rect.top;
 				this.buttonDown = true;
 				this.listeners.map((listener) => { if (listener.down) listener.down(this.mouseX, this.mouseY, ev); });
@@ -88,7 +88,7 @@ export class Input {
 		}
 
 		let mouseWheel = (ev: WheelEvent) => {
-			if (this.preventDefault) ev.preventDefault();
+			if (this.autoPreventDefault) ev.preventDefault();
 			let deltaY = ev.deltaY;
 			if (ev.deltaMode == WheelEvent.DOM_DELTA_LINE) deltaY *= 8;
 			if (ev.deltaMode == WheelEvent.DOM_DELTA_PAGE) deltaY *= 24;
@@ -125,8 +125,8 @@ export class Input {
 					this.listeners.map((listener) => { if (listener.zoom) listener.zoom(this.initialPinchDistance, this.initialPinchDistance, ev) });
 				}
 			}
-			if (this.preventDefault) ev.preventDefault();
-		}, { passive: this.preventDefault });
+			if (this.autoPreventDefault) ev.preventDefault();
+		}, { passive: false, capture: false });
 
 		element.addEventListener("touchmove", (ev: TouchEvent) => {
 			if (this.touch0) {
@@ -154,8 +154,8 @@ export class Input {
 					this.listeners.map((listener) => { if (listener.zoom) listener.zoom(this.initialPinchDistance, distance, ev) });
 				}
 			}
-			if (this.preventDefault) ev.preventDefault();
-		}, { passive: this.preventDefault });
+			if (this.autoPreventDefault) ev.preventDefault();
+		}, { passive: false, capture: false });
 
 		let touchEnd = (ev: TouchEvent) => {
 			if (this.touch0) {
@@ -191,9 +191,9 @@ export class Input {
 					}
 				}
 			}
-			if (this.preventDefault) ev.preventDefault();
+			if (this.autoPreventDefault) ev.preventDefault();
 		};
-		element.addEventListener("touchend", touchEnd, false);
+		element.addEventListener("touchend", touchEnd, { passive: false, capture: false });
 		element.addEventListener("touchcancel", touchEnd);
 	}
 

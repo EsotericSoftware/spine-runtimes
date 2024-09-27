@@ -111,7 +111,7 @@ interface WidgetAttributes {
     offsetY: number
     width: number
     height: number
-    draggable: boolean
+    isDraggable: boolean
     debug: boolean
     identifier: string
     manualStart: boolean
@@ -280,9 +280,9 @@ export class SpineWebComponentWidget extends HTMLElement implements WidgetAttrib
 
     /**
      * If true, the widget is draggable
-     * Connected to `draggable` attribute.
+     * Connected to `isdraggable` attribute.
      */
-    public draggable = false;
+    public isDraggable = false;
 
     /**
      * If true, some convenience elements are drawn to show the skeleton world origin (green),
@@ -488,7 +488,7 @@ export class SpineWebComponentWidget extends HTMLElement implements WidgetAttrib
         skin: { propertyName: "skin", type: "string" },
         width: { propertyName: "width", type: "number", defaultValue: -1 },
         height: { propertyName: "height", type: "number", defaultValue: -1 },
-        draggable: { propertyName: "draggable", type: "boolean" },
+        isdraggable: { propertyName: "isDraggable", type: "boolean" },
         "x-axis": { propertyName: "xAxis", type: "number" },
         "y-axis": { propertyName: "yAxis", type: "number" },
         "offset-x": { propertyName: "offsetX", type: "number" },
@@ -505,29 +505,7 @@ export class SpineWebComponentWidget extends HTMLElement implements WidgetAttrib
     }
 
     static get observedAttributes(): string[] {
-        return [
-            "atlas",        // atlasPath
-            "skeleton",     // skeletonPath
-            "scale",        // scale
-            "animation",    // animation
-            "skin",         // skin
-            "fit",          // fit
-            "width",        // width
-            "height",       // height
-            "draggable",    // draggable
-            "mode",         // mode
-            "x-axis",       // xAxis
-            "y-axis",       // yAxis
-            "offset-x",     // offsetX
-            "offset-y",     // offsetY
-            "identifier",   // identifier
-            "debug",        // debug
-            "manual-start", // manualStart
-            "spinner",      // loadingSpinner
-            "pages",        // pages
-            "offscreen",    // offScreenUpdateBehaviour
-            "clip",         // clip
-        ];
+        return Object.keys(SpineWebComponentWidget.attributesDescription);
     }
 
     constructor() {
@@ -843,7 +821,6 @@ class SpineWebComponentOverlay extends HTMLElement {
     public skeletonList = new Array<SpineWebComponentWidget>();
 
     private intersectionObserver? : IntersectionObserver;
-    private resizeObserver:ResizeObserver;
     private input: Input;
 
 	// how many pixels to add to the edges to prevent "edge cuttin" on fast scrolling
@@ -896,38 +873,59 @@ class SpineWebComponentOverlay extends HTMLElement {
         const context = new ManagedWebGLRenderingContext(this.canvas, { alpha: true });
 		this.renderer = new SceneRenderer(this.canvas, context);
 		this.assetManager = new AssetManager(context);
-		this.input = new Input(this.canvas);
+		this.input = new Input(this.canvas, false);
         this.setupRenderingElements();
-
-        this.updateCanvasSize();
-        this.zoomHandler();
-
-        // translateCanvas starts a requestAnimationFrame loop
-        this.translateCanvas();
 
 		this.overflowLeftSize = this.overflowLeft * document.documentElement.clientWidth;
 		this.overflowTopSize = this.overflowTop * document.documentElement.clientHeight;
 
-        // resize and zoom
-		// TODO: should I use the resize event?
-		this.resizeObserver = new ResizeObserver(() => {
+        window.addEventListener('resize', () => {
             this.updateCanvasSize();
-			this.zoomHandler();
+            this.zoomHandler();
         });
-        this.resizeObserver.observe(document.body);
 
-        const screen = window.screen;
-        screen.orientation.onchange = () => {
+        window.screen.orientation.onchange = () => {
             this.updateCanvasSize();
             // after an orientation change the scrolling changes, but the scroll event does not fire
             this.scrollHandler();
         }
 
 		window.addEventListener("scroll", this.scrollHandler);
-		this.scrollHandler();
+
+        window.onload = () => {
+            this.updateCanvasSize();
+            this.zoomHandler();
+
+            // translateCanvas starts a requestAnimationFrame loop
+            this.translateCanvas();
+
+            this.scrollHandler();
+        };
 
         this.input = new Input(document.body, false);
 		this.setupDragUtility();
+    }
+
+    connectedCallback(): void {
+        this.intersectionObserver = new IntersectionObserver((widgets) => {
+            widgets.forEach(({ isIntersecting, target, intersectionRatio }) => {
+                const widget = this.skeletonList.find(w => w.getHTMLElementReference() == target);
+                if (!widget) return;
+
+                // old browsers do not have isIntersecting
+                if (isIntersecting === undefined) {
+                    isIntersecting = intersectionRatio > 0;
+                }
+
+                widget.onScreen = isIntersecting;
+                if (isIntersecting) {
+                    widget.onScreenFunction(widget);
+                }
+            })
+        }, { rootMargin: "30px 20px 30px 20px" });
+    }
+
+    disconnectedCallback(): void {
     }
 
     addWidget(widget: SpineWebComponentWidget) {
@@ -1028,12 +1026,13 @@ class SpineWebComponentOverlay extends HTMLElement {
             const devicePixelRatio = window.devicePixelRatio;
             const tempVector = new Vector3();
             this.skeletonList.forEach((widget) => {
-                const { skeleton, bounds, mode, debug, offsetX, offsetY, xAxis, yAxis, dragX, dragY, fit, loadingSpinner, onScreen, loading, clip, draggable } = widget;
+                const { skeleton, bounds, mode, debug, offsetX, offsetY, xAxis, yAxis, dragX, dragY, fit, loadingSpinner, onScreen, loading, clip, isDraggable } = widget;
 
                 if ((!onScreen && dragX === 0 && dragY === 0)) return;
                 const divBounds = widget.getHTMLElementReference().getBoundingClientRect();
-                divBounds.x += this.overflowLeftSize;
-                divBounds.y += this.overflowTopSize;
+                // need to use left and top, because x and y are not available on older browser
+                divBounds.x = divBounds.left + this.overflowLeftSize;
+                divBounds.y = divBounds.top + this.overflowTopSize;
 
                 let divOriginX = 0;
                 let divOriginY = 0;
@@ -1137,8 +1136,8 @@ class SpineWebComponentOverlay extends HTMLElement {
                         }
                     });
 
-                    // store the draggable surface to make darg logic easier
-                    if (draggable) {
+                    // store the draggable surface to make drag logic easier
+                    if (isDraggable) {
                         let { x: ax, y: ay, width: aw, height: ah } = bounds!;
                         this.worldToScreen(tempVector, ax * skeleton.scaleX + worldOffsetX, ay * skeleton.scaleY + worldOffsetY);
                         widget.dragBoundsRectangle.x = tempVector.x + window.scrollX;
@@ -1211,24 +1210,6 @@ class SpineWebComponentOverlay extends HTMLElement {
 		const transparentWhite = new Color(1, 1, 1, .3);
 	}
 
-    connectedCallback(): void {
-        this.intersectionObserver = new IntersectionObserver((widgets) => {
-            widgets.forEach(({ isIntersecting, target }) => {
-
-                const widget = this.skeletonList.find(w => w.getHTMLElementReference() == target);
-                if (!widget) return;
-                widget.onScreen = isIntersecting;
-                if (isIntersecting) {
-                    widget.onScreenFunction(widget);
-                }
-            })
-        }, { rootMargin: "30px 20px 30px 20px" });
-    }
-
-    disconnectedCallback(): void {
-    }
-
-    // TODO: drag is bugged when zoom on browser (just zoom and activare debug to see the drag surface has some offset)
     private setupDragUtility() {
 		// TODO: we should use document - body might have some margin that offset the click events - Meanwhile I take event pageX/Y
 		const point: Point = { x: 0, y: 0 };
@@ -1246,7 +1227,7 @@ class SpineWebComponentOverlay extends HTMLElement {
 			down: (x, y, ev) => {
 				const input = getInput(ev);
 				this.skeletonList.forEach(widget => {
-					if (!widget.draggable || (!widget.onScreen && widget.dragX === 0 && widget.dragY === 0)) return;
+					if (!widget.isDraggable || (!widget.onScreen && widget.dragX === 0 && widget.dragY === 0)) return;
                     if (inside(input, widget.dragBoundsRectangle)) {
                         widget.dragging = true;
                         ev?.preventDefault();

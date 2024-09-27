@@ -14,6 +14,7 @@
         }
         body {
             font-family: Arial, sans-serif;
+            font-size: 16px;
         }
         .section {
             display: flex;
@@ -1712,7 +1713,7 @@ stretchyman.update = (canvas, delta, skeleton, state) => {
                         atlas="assets/celestial-circus-pma.atlas"
                         skeleton="assets/celestial-circus-pro.skel"
                         clip
-                        draggable
+                        isdraggable
                     ></spine-widget>
 
                     <script>
@@ -1779,7 +1780,7 @@ stretchyman.update = (canvas, delta, skeleton, state) => {
         skeleton="assets/celestial-circus-pro.skel"
         animation="wings-and-feet"
         clip
-        draggable
+        isdraggable
     ></spine-widget>
 </div>
 
@@ -1814,14 +1815,14 @@ stretchyman.update = (canvas, delta, skeleton, state) => {
 
         <div class="split-top split">
             <div class="split-left">
-                As a bonus item, you can move you skeleton around just by setting the <code>draggable</code> property to <code>true</code>.
+                As a bonus item, you can move you skeleton around just by setting the <code>isdraggable</code> property to <code>true</code>.
             </div>
             <div class="split-right">
                 <spine-widget
                     atlas="assets/celestial-circus-pma.atlas"
                     skeleton="assets/celestial-circus-pro.skel"
                     animation="wings-and-feet"
-                    draggable
+                    isdraggable
                 ></spine-widget>
             </div>
         </div>
@@ -1833,7 +1834,7 @@ stretchyman.update = (canvas, delta, skeleton, state) => {
     atlas="assets/celestial-circus-pma.atlas"
     skeleton="assets/celestial-circus-pro.skel"
     animation="wings-and-feet"
-    draggable="true"
+    isdraggable="true"
 ></spine-widget>`
 );</script>
             </code></pre>
