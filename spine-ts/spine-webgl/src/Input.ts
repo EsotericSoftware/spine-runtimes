@@ -212,16 +212,16 @@ export class Input implements Disposable {
 		}
 	}
 
-	dispose(): void {
+	dispose (): void {
 		const element = this.element;
-		element.addEventListener("mousedown", this.callbacks.mouseDown, true);
-		element.addEventListener("mousemove", this.callbacks.mouseMove, true);
-		element.addEventListener("mouseup", this.callbacks.mouseUp, true);
-		element.addEventListener("wheel", this.callbacks.mouseWheel, true);
-		element.addEventListener("touchstart", this.callbacks.touchStart, { passive: false, capture: false });
-		element.addEventListener("touchmove", this.callbacks.touchMove, { passive: false, capture: false });
-		element.addEventListener("touchend", this.callbacks.touchEnd, { passive: false, capture: false });
-		element.addEventListener("touchcancel", this.callbacks.touchEnd);
+		element.removeEventListener("mousedown", this.callbacks.mouseDown, true);
+		element.removeEventListener("mousemove", this.callbacks.mouseMove, true);
+		element.removeEventListener("mouseup", this.callbacks.mouseUp, true);
+		element.removeEventListener("wheel", this.callbacks.mouseWheel, true);
+		element.removeEventListener("touchstart", this.callbacks.touchStart, { capture: false });
+		element.removeEventListener("touchmove", this.callbacks.touchMove, { capture: false });
+		element.removeEventListener("touchend", this.callbacks.touchEnd, { capture: false });
+		element.removeEventListener("touchcancel", this.callbacks.touchEnd);
 		this.listeners.length = 0;
 	}
 

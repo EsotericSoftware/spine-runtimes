@@ -119,23 +119,23 @@ export class AssetManagerBase implements Disposable {
 	loadJson (path: string,
 		success: (path: string, object: object) => void = () => { },
 		error: (path: string, message: string) => void = () => { }) {
-			path = this.start(path);
+		path = this.start(path);
 
-			if (this.reuseAssets(path, success, error)) return;
+		if (this.reuseAssets(path, success, error)) return;
 
-			this.assetsLoaded[path] = new Promise<any>((resolve, reject) => {
-				this.downloader.downloadJson(path, (data: object): void => {
-					this.success(success, path, data);
-					resolve(data);
-				}, (status: number, responseText: string): void => {
-					const errorMsg = `Couldn't load JSON ${path}: status ${status}, ${responseText}`;
-					this.error(error, path, errorMsg);
-					reject(errorMsg);
-				});
+		this.assetsLoaded[path] = new Promise<any>((resolve, reject) => {
+			this.downloader.downloadJson(path, (data: object): void => {
+				this.success(success, path, data);
+				resolve(data);
+			}, (status: number, responseText: string): void => {
+				const errorMsg = `Couldn't load JSON ${path}: status ${status}, ${responseText}`;
+				this.error(error, path, errorMsg);
+				reject(errorMsg);
 			});
+		});
 	}
 
-	reuseAssets(path: string,
+	reuseAssets (path: string,
 		success: (path: string, data: any) => void = () => { },
 		error: (path: string, message: string) => void = () => { }) {
 		const loadedStatus = this.assetsLoaded[path];
@@ -152,45 +152,45 @@ export class AssetManagerBase implements Disposable {
 		success: (path: string, texture: Texture) => void = () => { },
 		error: (path: string, message: string) => void = () => { }) {
 
-			path = this.start(path);
+		path = this.start(path);
 
-			if (this.reuseAssets(path, success, error)) return;
+		if (this.reuseAssets(path, success, error)) return;
 
-			this.assetsLoaded[path] = new Promise<any>((resolve, reject) => {
-				let isBrowser = !!(typeof window !== 'undefined' && typeof navigator !== 'undefined' && window.document);
-				let isWebWorker = !isBrowser; // && typeof importScripts !== 'undefined';
-				if (isWebWorker) {
-					fetch(path, { mode: <RequestMode>"cors" }).then((response) => {
-						if (response.ok) return response.blob();
-						const errorMsg = `Couldn't load image: ${path}`;
-						this.error(error, path, `Couldn't load image: ${path}`);
-						reject(errorMsg);
-					}).then((blob) => {
-						return blob ? createImageBitmap(blob, { premultiplyAlpha: "none", colorSpaceConversion: "none" }) : null;
-					}).then((bitmap) => {
-						if (bitmap) {
-							const texture = this.textureLoader(bitmap)
-							this.success(success, path, texture);
-							resolve(texture);
-						};
-					});
-				} else {
-					let image = new Image();
-					image.crossOrigin = "anonymous";
-					image.onload = () => {
-						const texture = this.textureLoader(image)
+		this.assetsLoaded[path] = new Promise<any>((resolve, reject) => {
+			let isBrowser = !!(typeof window !== 'undefined' && typeof navigator !== 'undefined' && window.document);
+			let isWebWorker = !isBrowser; // && typeof importScripts !== 'undefined';
+			if (isWebWorker) {
+				fetch(path, { mode: <RequestMode>"cors" }).then((response) => {
+					if (response.ok) return response.blob();
+					const errorMsg = `Couldn't load image: ${path}`;
+					this.error(error, path, `Couldn't load image: ${path}`);
+					reject(errorMsg);
+				}).then((blob) => {
+					return blob ? createImageBitmap(blob, { premultiplyAlpha: "none", colorSpaceConversion: "none" }) : null;
+				}).then((bitmap) => {
+					if (bitmap) {
+						const texture = this.textureLoader(bitmap)
 						this.success(success, path, texture);
 						resolve(texture);
 					};
-					image.onerror = () => {
-						const errorMsg = `Couldn't load image: ${path}`;
-						this.error(error, path, errorMsg);
-						reject(errorMsg);
-					};
-					if (this.downloader.rawDataUris[path]) path = this.downloader.rawDataUris[path];
-					image.src = path;
-				}
-			});
+				});
+			} else {
+				let image = new Image();
+				image.crossOrigin = "anonymous";
+				image.onload = () => {
+					const texture = this.textureLoader(image)
+					this.success(success, path, texture);
+					resolve(texture);
+				};
+				image.onerror = () => {
+					const errorMsg = `Couldn't load image: ${path}`;
+					this.error(error, path, errorMsg);
+					reject(errorMsg);
+				};
+				if (this.downloader.rawDataUris[path]) path = this.downloader.rawDataUris[path];
+				image.src = path;
+			}
+		});
 	}
 
 	loadTextureAtlas (path: string,
@@ -272,7 +272,7 @@ export class AssetManagerBase implements Disposable {
 	}
 
 	// Promisified versions of load function
-	async loadBinaryAsync(path: string) {
+	async loadBinaryAsync (path: string) {
 		return new Promise((resolve, reject) => {
 			this.loadBinary(path,
 				(_, binary) => resolve(binary),
@@ -281,7 +281,7 @@ export class AssetManagerBase implements Disposable {
 		});
 	}
 
-	async loadJsonAsync(path: string) {
+	async loadJsonAsync (path: string) {
 		return new Promise((resolve, reject) => {
 			this.loadJson(path,
 				(_, object) => resolve(object),
@@ -290,7 +290,7 @@ export class AssetManagerBase implements Disposable {
 		});
 	}
 
-    async loadTextureAsync(path: string) {
+	async loadTextureAsync (path: string) {
 		return new Promise<Texture>((resolve, reject) => {
 			this.loadTexture(path,
 				(_, texture) => resolve(texture),
@@ -299,7 +299,7 @@ export class AssetManagerBase implements Disposable {
 		});
 	}
 
-	async loadTextureAtlasAsync(path: string) {
+	async loadTextureAtlasAsync (path: string) {
 		return new Promise((resolve, reject) => {
 			this.loadTextureAtlas(path,
 				(_, atlas) => resolve(atlas),
@@ -308,7 +308,7 @@ export class AssetManagerBase implements Disposable {
 		});
 	}
 
-    async loadTextureAtlasButNoTexturesAsync(path: string) {
+	async loadTextureAtlasButNoTexturesAsync (path: string) {
 		return new Promise<TextureAtlas>((resolve, reject) => {
 			this.loadTextureAtlasButNoTextures(path,
 				(_, atlas) => resolve(atlas),
