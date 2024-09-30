@@ -28,13 +28,13 @@
  *****************************************************************************/
 
 import {
-    checkExtension,
-    DOMAdapter,
-    extensions,
-    ExtensionType,
-    LoaderParserPriority,
-    path,
-    TextureSource
+	checkExtension,
+	DOMAdapter,
+	extensions,
+	ExtensionType,
+	LoaderParserPriority,
+	path,
+	TextureSource
 } from 'pixi.js';
 import { SpineTexture } from '../SpineTexture';
 import { TextureAtlas } from '@esotericsoftware/spine-core';
@@ -44,113 +44,101 @@ import type { AssetExtension, Loader, ResolvedAsset, Texture } from 'pixi.js';
 type RawAtlas = string;
 
 const spineTextureAtlasLoader: AssetExtension<RawAtlas | TextureAtlas, ISpineAtlasMetadata> = {
-    extension: ExtensionType.Asset,
+	extension: ExtensionType.Asset,
 
-    loader: {
-        extension: {
-            type: ExtensionType.LoadParser,
-            priority: LoaderParserPriority.Normal,
-            name: 'spineTextureAtlasLoader',
-        },
+	loader: {
+		extension: {
+			type: ExtensionType.LoadParser,
+			priority: LoaderParserPriority.Normal,
+			name: 'spineTextureAtlasLoader',
+		},
 
-        test(url: string): boolean
-        {
-            return checkExtension(url, '.atlas');
-        },
+		test (url: string): boolean {
+			return checkExtension(url, '.atlas');
+		},
 
-        async load(url: string): Promise<RawAtlas>
-        {
-            const response = await DOMAdapter.get().fetch(url);
+		async load (url: string): Promise<RawAtlas> {
+			const response = await DOMAdapter.get().fetch(url);
 
-            const txt = await response.text();
+			const txt = await response.text();
 
-            return txt;
-        },
+			return txt;
+		},
 
-        testParse(asset: unknown, options: ResolvedAsset): Promise<boolean>
-        {
-            const isExtensionRight = checkExtension(options.src as string, '.atlas');
-            const isString = typeof asset === 'string';
+		testParse (asset: unknown, options: ResolvedAsset): Promise<boolean> {
+			const isExtensionRight = checkExtension(options.src as string, '.atlas');
+			const isString = typeof asset === 'string';
 
-            return Promise.resolve(isExtensionRight && isString);
-        },
+			return Promise.resolve(isExtensionRight && isString);
+		},
 
-        unload(atlas: TextureAtlas)
-        {
-            atlas.dispose();
-        },
+		unload (atlas: TextureAtlas) {
+			atlas.dispose();
+		},
 
-        async parse(asset: RawAtlas, options: ResolvedAsset, loader: Loader): Promise<TextureAtlas>
-        {
-            const metadata: ISpineAtlasMetadata = options.data || {};
-            let basePath = path.dirname(options.src as string);
+		async parse (asset: RawAtlas, options: ResolvedAsset, loader: Loader): Promise<TextureAtlas> {
+			const metadata: ISpineAtlasMetadata = options.data || {};
+			let basePath = path.dirname(options.src as string);
 
-            if (basePath && basePath.lastIndexOf('/') !== basePath.length - 1)
-            {
-                basePath += '/';
-            }
+			if (basePath && basePath.lastIndexOf('/') !== basePath.length - 1) {
+				basePath += '/';
+			}
 
-            // Retval is going to be a texture atlas. However we need to wait for it's callback to resolve this promise.
-            const retval = new TextureAtlas(asset);
+			// Retval is going to be a texture atlas. However we need to wait for it's callback to resolve this promise.
+			const retval = new TextureAtlas(asset);
 
-            // If the user gave me only one texture, that one is assumed to be the "first" texture in the atlas
-            if (metadata.images instanceof TextureSource || typeof metadata.images === 'string')
-            {
-                const pixiTexture = metadata.images;
+			// If the user gave me only one texture, that one is assumed to be the "first" texture in the atlas
+			if (metadata.images instanceof TextureSource || typeof metadata.images === 'string') {
+				const pixiTexture = metadata.images;
 
-                metadata.images = {} as Record<string, TextureSource | string>;
-                metadata.images[retval.pages[0].name] = pixiTexture;
-            }
+				metadata.images = {} as Record<string, TextureSource | string>;
+				metadata.images[retval.pages[0].name] = pixiTexture;
+			}
 
-            // we will wait for all promises for the textures at the same time at the end.
-            const textureLoadingPromises:Promise<any>[] = [];
+			// we will wait for all promises for the textures at the same time at the end.
+			const textureLoadingPromises: Promise<any>[] = [];
 
-            // fill the pages
-            for (const page of retval.pages)
-            {
-                const pageName = page.name;
-                const providedPage = metadata?.images ? metadata.images[pageName] : undefined;
+			// fill the pages
+			for (const page of retval.pages) {
+				const pageName = page.name;
+				const providedPage = metadata?.images ? metadata.images[pageName] : undefined;
 
-                if (providedPage instanceof TextureSource)
-                {
-                    page.setTexture(SpineTexture.from(providedPage));
-                }
-                else
-                {
-                    // eslint-disable-next-line max-len
-                    const url: string = providedPage ?? path.normalize([...basePath.split(path.sep), pageName].join(path.sep));
+				if (providedPage instanceof TextureSource) {
+					page.setTexture(SpineTexture.from(providedPage));
+				}
+				else {
+					// eslint-disable-next-line max-len
+					const url: string = providedPage ?? path.normalize([...basePath.split(path.sep), pageName].join(path.sep));
 
-                    const assetsToLoadIn = {
-                        src: url,
-                        data: {
-                            ...metadata.imageMetadata,
-                            alphaMode: page.pma ? 'premultiplied-alpha' : 'premultiply-alpha-on-upload'
-                        }
-                    };
+					const assetsToLoadIn = {
+						src: url,
+						data: {
+							...metadata.imageMetadata,
+							alphaMode: page.pma ? 'premultiplied-alpha' : 'premultiply-alpha-on-upload'
+						}
+					};
 
-                    const pixiPromise = loader.load<Texture>(assetsToLoadIn).then((texture) =>
-                    {
-                        page.setTexture(SpineTexture.from(texture.source));
-                    });
+					const pixiPromise = loader.load<Texture>(assetsToLoadIn).then((texture) => {
+						page.setTexture(SpineTexture.from(texture.source));
+					});
 
-                    textureLoadingPromises.push(pixiPromise);
-                }
-            }
+					textureLoadingPromises.push(pixiPromise);
+				}
+			}
 
-            await Promise.all(textureLoadingPromises);
+			await Promise.all(textureLoadingPromises);
 
-            return retval;
-        },
-    },
+			return retval;
+		},
+	},
 } as AssetExtension<RawAtlas | TextureAtlas, ISpineAtlasMetadata>;
 
 extensions.add(spineTextureAtlasLoader);
 
-export interface ISpineAtlasMetadata
-{
-    // If you are downloading an .atlas file, this metadata will go to the Texture loader
-    imageMetadata?: any;
-    // If you already have atlas pages loaded as pixi textures
-    // and want to use that to create the atlas, you can pass them here
-    images?: TextureSource | string | Record<string, TextureSource | string>;
+export interface ISpineAtlasMetadata {
+	// If you are downloading an .atlas file, this metadata will go to the Texture loader
+	imageMetadata?: any;
+	// If you already have atlas pages loaded as pixi textures
+	// and want to use that to create the atlas, you can pass them here
+	images?: TextureSource | string | Record<string, TextureSource | string>;
 }
