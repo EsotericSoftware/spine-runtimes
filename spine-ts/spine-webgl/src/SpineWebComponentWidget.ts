@@ -911,7 +911,7 @@ class SpineWebComponentOverlay extends HTMLElement implements Disposable {
 		this.scrollHandler();
 	}
 
-	// right now, we scroll the canvas each frame, that makes scrolling on mobile waaay more smoother
+	// right now, we scroll the canvas each frame before rendering loop, that makes scrolling on mobile waaay more smoother
 	// this is way scroll handler do nothing
 	private scrollHandler = () => {
 		// this.translateCanvas();
@@ -1358,9 +1358,6 @@ class SpineWebComponentOverlay extends HTMLElement implements Disposable {
 		const scrollPositionX = window.scrollX - this.overflowLeftSize;
 		const scrollPositionY = window.scrollY - this.overflowTopSize;
 		this.canvas.style.transform = `translate(${scrollPositionX}px,${scrollPositionY}px)`;
-		requestAnimationFrame(() => {
-			if (this.isConnected) this.translateCanvas();
-		});
 	}
 
 	private zoomHandler = () => {
