@@ -141,6 +141,7 @@ interface WidgetPublicProperties {
     loading: boolean
     started: boolean
     textureAtlas: TextureAtlas
+    disposed: boolean
 }
 
 // Usage of this properties is discouraged because they can be made private in the future
@@ -153,7 +154,7 @@ interface WidgetInternalProperties {
     debugDragDiv: HTMLDivElement
 }
 
-export class SpineWebComponentWidget extends HTMLElement implements WidgetAttributes, WidgetOverridableMethods, WidgetInternalProperties, Partial<WidgetPublicProperties> {
+export class SpineWebComponentWidget extends HTMLElement implements Disposable, WidgetAttributes, WidgetOverridableMethods, WidgetInternalProperties, Partial<WidgetPublicProperties> {
 
     /**
      * If true, enables a top-left span showing FPS (it has black text)
@@ -469,6 +470,10 @@ export class SpineWebComponentWidget extends HTMLElement implements WidgetAttrib
      */
     public debugDragDiv: HTMLDivElement;
 
+    /**
+     * If true, indicate {@link dispose} has been called and the widget cannot be used anymore
+     */
+    public disposed = false;
 
     /**
      * Optional: Pass a `SkeletonData`, if you want to avoid creating a new one
@@ -521,8 +526,12 @@ export class SpineWebComponentWidget extends HTMLElement implements WidgetAttrib
     }
 
     connectedCallback() {
+        if (this.disposed) {
+            throw new Error("You cannot attach a disposed widget");
+        };
+
         this.overlay.addWidget(this);
-        if (!this.manualStart) {
+        if (!this.manualStart && !this.started) {
             this.start();
         }
         this.render();
@@ -535,52 +544,16 @@ export class SpineWebComponentWidget extends HTMLElement implements WidgetAttrib
                 this.overlay.skeletonList.splice(index, 1);
             }
         });
+        this.debugDragDiv?.remove();
     }
 
-    private static castBoolean(value: string | null, defaultValue = "") {
-        return value === "true" || value === "" ? true : false;
-    }
-
-    private static castString(value: string | null, defaultValue = "") {
-        return value === null ? defaultValue : value;
-    }
-
-    private static castNumber(value: string | null, defaultValue = 0) {
-        if (value === null) return defaultValue;
-
-        const parsed = parseFloat(value);
-        if (Number.isNaN(parsed)) return defaultValue;
-        return parsed;
-    }
-
-    private static castArrayNumber(value: string | null, defaultValue = undefined) {
-        if (value === null) return defaultValue;
-        return value.split(",").reduce((acc, pageIndex) => {
-            const index = parseInt(pageIndex);
-            if (!isNaN(index)) acc.push(index);
-            return acc;
-        }, [] as Array<number>);
-    }
-
-    private static castValue(type: AttributeTypes, value: string | null, defaultValue?: any) {
-        switch (type) {
-            case "string":
-                return SpineWebComponentWidget.castString(value, defaultValue);
-            case "number":
-                return SpineWebComponentWidget.castNumber(value, defaultValue);
-            case "boolean":
-                return SpineWebComponentWidget.castBoolean(value, defaultValue);
-            case "string-number":
-                return SpineWebComponentWidget.castArrayNumber(value, defaultValue);
-            case "fitType":
-                return isFitType(value) ? value : defaultValue;
-            case "modeType":
-                return isModeType(value) ? value : defaultValue;
-            case "offScreenUpdateBehaviourType":
-                return isOffScreenUpdateBehaviourType(value) ? value : defaultValue;
-            default:
-                break;
-        }
+    dispose() {
+        this.remove();
+        this.loadingScreen?.dispose();
+        this.skeletonData = undefined;
+        this.skeleton = undefined;
+        this.state = undefined;
+        this.disposed = true;
     }
 
     attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
@@ -589,38 +562,6 @@ export class SpineWebComponentWidget extends HTMLElement implements WidgetAttrib
         (this as any)[propertyName] = val;
         return;
     }
-
-    /**
-     * Recalculates and sets the bounds of the current animation on track 0.
-     * Useful when animations or skins are set programmatically.
-     * @returns void
-     */
-	public recalculateBounds(): void {
-        const { skeleton, state } = this;
-		if (!skeleton || !state) return;
-		const track = state.getCurrent(0);
-		const animation = track?.animation as (Animation | undefined);
-		const bounds = this.calculateAnimationViewport(animation);
-		this.setBounds(bounds);
-	}
-
-    /**
-     * Set the given bounds on the current skeleton.
-     * Useful when you want you skeleton to have a fixed size, or you want to
-     * focus a certain detail of the skeleton. If the skeleton overflow the element container
-     * consider setting {@link clip} to `true`.
-     * @param bounds
-     * @returns
-     */
-	public setBounds(bounds: Rectangle): void {
-        const { skeleton } = this;
-		if (!skeleton) return;
-		bounds.x /= skeleton.scaleX;
-		bounds.y /= skeleton.scaleY;
-		bounds.width /= skeleton.scaleX;
-		bounds.height /= skeleton.scaleY;
-        this.bounds = bounds;
-	}
 
     /**
      * Starts the widget. Starting the widget means to load the assets currently set into
@@ -669,10 +610,42 @@ export class SpineWebComponentWidget extends HTMLElement implements WidgetAttrib
             : this;
     }
 
+        /**
+     * Recalculates and sets the bounds of the current animation on track 0.
+     * Useful when animations or skins are set programmatically.
+     * @returns void
+     */
+	public recalculateBounds(): void {
+        const { skeleton, state } = this;
+		if (!skeleton || !state) return;
+		const track = state.getCurrent(0);
+		const animation = track?.animation as (Animation | undefined);
+		const bounds = this.calculateAnimationViewport(animation);
+		this.setBounds(bounds);
+	}
+
+    /**
+     * Set the given bounds on the current skeleton.
+     * Useful when you want you skeleton to have a fixed size, or you want to
+     * focus a certain detail of the skeleton. If the skeleton overflow the element container
+     * consider setting {@link clip} to `true`.
+     * @param bounds
+     * @returns
+     */
+	public setBounds(bounds: Rectangle): void {
+        const { skeleton } = this;
+		if (!skeleton) return;
+		bounds.x /= skeleton.scaleX;
+		bounds.y /= skeleton.scaleY;
+		bounds.width /= skeleton.scaleX;
+		bounds.height /= skeleton.scaleY;
+        this.bounds = bounds;
+	}
+
     // add a skeleton to the overlay and set the bounds to the given animation or to the setup pose
     private async loadSkeleton() {
         this.loading = true;
-        // if (this.identifier !== "TODELETE") return Promise.reject();
+
 		const { atlasPath, skeletonPath, scale = 1, animation, skeletonData: skeletonDataInput, skin } = this;
         if (!atlasPath || !skeletonPath) {
             throw new Error(`Missing atlas path or skeleton path. Assets cannot be loaded: atlas: ${atlasPath}, skeleton: ${skeletonPath}`);
@@ -755,7 +728,7 @@ export class SpineWebComponentWidget extends HTMLElement implements WidgetAttrib
     // TODO: allow the possibility to instantiate multiple overlay (eg: background, foreground),
     // to give them an identifier, and to specify which overlay is assigned to a widget
     private initializeOverlay(): SpineWebComponentOverlay {
-        let overlay = document.querySelector("spine-overlay") as SpineWebComponentOverlay;
+        let overlay = this.overlay || document.querySelector("spine-overlay") as SpineWebComponentOverlay;
         if (!overlay) {
             overlay = document.createElement("spine-overlay") as SpineWebComponentOverlay;
             document.body.appendChild(overlay);
@@ -809,6 +782,52 @@ export class SpineWebComponentWidget extends HTMLElement implements WidgetAttrib
             height: maxY - minY,
         }
     }
+
+    private static castBoolean(value: string | null, defaultValue = "") {
+        return value === "true" || value === "" ? true : false;
+    }
+
+    private static castString(value: string | null, defaultValue = "") {
+        return value === null ? defaultValue : value;
+    }
+
+    private static castNumber(value: string | null, defaultValue = 0) {
+        if (value === null) return defaultValue;
+
+        const parsed = parseFloat(value);
+        if (Number.isNaN(parsed)) return defaultValue;
+        return parsed;
+    }
+
+    private static castArrayNumber(value: string | null, defaultValue = undefined) {
+        if (value === null) return defaultValue;
+        return value.split(",").reduce((acc, pageIndex) => {
+            const index = parseInt(pageIndex);
+            if (!isNaN(index)) acc.push(index);
+            return acc;
+        }, [] as Array<number>);
+    }
+
+    private static castValue(type: AttributeTypes, value: string | null, defaultValue?: any) {
+        switch (type) {
+            case "string":
+                return SpineWebComponentWidget.castString(value, defaultValue);
+            case "number":
+                return SpineWebComponentWidget.castNumber(value, defaultValue);
+            case "boolean":
+                return SpineWebComponentWidget.castBoolean(value, defaultValue);
+            case "string-number":
+                return SpineWebComponentWidget.castArrayNumber(value, defaultValue);
+            case "fitType":
+                return isFitType(value) ? value : defaultValue;
+            case "modeType":
+                return isModeType(value) ? value : defaultValue;
+            case "offScreenUpdateBehaviourType":
+                return isOffScreenUpdateBehaviourType(value) ? value : defaultValue;
+            default:
+                break;
+        }
+    }
 }
 
 class SpineWebComponentOverlay extends HTMLElement implements Disposable {
@@ -841,7 +860,7 @@ class SpineWebComponentOverlay extends HTMLElement implements Disposable {
     private currentCanvasBaseHeight = 0;
 
     private disposed = false;
-    private detached = true;
+    private loaded = false;
     readonly time = new TimeKeeper();
 
     constructor() {
@@ -885,29 +904,31 @@ class SpineWebComponentOverlay extends HTMLElement implements Disposable {
         this.updateCanvasSize();
         this.zoomHandler();
     }
+
     private orientationChangeCallback = () => {
         this.updateCanvasSize();
         // after an orientation change the scrolling changes, but the scroll event does not fire
         this.scrollHandler();
     }
+
     // right now, we scroll the canvas each frame, that makes scrolling on mobile waaay more smoother
     // this is way scroll handler do nothing
     private scrollHandler = () => {
 		// this.translateCanvas();
 	}
+
     private onLoadCallback = () => {
         this.updateCanvasSize();
         this.zoomHandler();
-
-        // translateCanvas starts a requestAnimationFrame loop
-        this.translateCanvas();
-
         this.scrollHandler();
+        this.loaded = true;
     }
+
     connectedCallback(): void {
         window.addEventListener("resize", this.resizeCallback);
 		window.addEventListener("scroll", this.scrollHandler);
 		window.addEventListener("load", this.onLoadCallback);
+        if (this.loaded) this.onLoadCallback();
         window.screen.orientation.addEventListener('change', this.orientationChangeCallback);
 
         this.intersectionObserver = new IntersectionObserver((widgets) => {
@@ -931,8 +952,6 @@ class SpineWebComponentOverlay extends HTMLElement implements Disposable {
         })
         this.input = this.setupDragUtility();
 
-        this.detached = false;
-
         this.startRenderingLoop();
     }
 
@@ -943,15 +962,13 @@ class SpineWebComponentOverlay extends HTMLElement implements Disposable {
         window.screen.orientation.removeEventListener('change', this.orientationChangeCallback);
         this.intersectionObserver?.disconnect();
         this.input?.dispose();
-        this.detached = true;
     }
 
     dispose(): void {
-        document.body.removeChild(this);
+        this.remove();
         this.skeletonList.length = 0;
         this.renderer.dispose();
         this.disposed = true;
-        this.detached = true;
     }
 
     addWidget(widget: SpineWebComponentWidget) {
@@ -1221,9 +1238,11 @@ class SpineWebComponentOverlay extends HTMLElement implements Disposable {
         }
 
         const loop = () => {
-			if (this.disposed || this.detached) return;
+			if (this.disposed || !this.isConnected) return;
 			requestAnimationFrame(loop);
+            if (!this.loaded) return;
 			this.time.update();
+            this.translateCanvas();
 			updateWidgets();
 			renderWidgets();
 		}
@@ -1339,7 +1358,9 @@ class SpineWebComponentOverlay extends HTMLElement implements Disposable {
 		const scrollPositionX = window.scrollX - this.overflowLeftSize;
 		const scrollPositionY = window.scrollY - this.overflowTopSize;
 		this.canvas.style.transform =`translate(${scrollPositionX}px,${scrollPositionY}px)`;
-        requestAnimationFrame(() => this.translateCanvas());
+        requestAnimationFrame(() => {
+            if (this.isConnected) this.translateCanvas();
+        });
 	}
 
     private zoomHandler = () => {

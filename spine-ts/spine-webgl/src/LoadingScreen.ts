@@ -142,7 +142,8 @@ export class LoadingScreen implements Disposable {
 		const shiftedY = y - logoHeight / 2;
 		renderer.drawTexture(this.logo, shiftedX, shiftedY, logoWidth, logoHeight);
 
-		if (this.spinner) renderer.drawTextureRotated(this.spinner, shiftedX, shiftedY - 25, spinnerSize, spinnerSize, spinnerSize / 2, spinnerSize / 2, this.timeKeeper.delta * 500);
+		this.angle -= this.timeKeeper.delta * 500;
+		if (this.spinner) renderer.drawTextureRotated(this.spinner, shiftedX, shiftedY - 25, spinnerSize, spinnerSize, spinnerSize / 2, spinnerSize / 2, this.angle);
 	}
 }
 
