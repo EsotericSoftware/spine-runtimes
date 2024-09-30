@@ -36,36 +36,36 @@ export class BatchableSpineSlot implements DefaultBatchableMeshElement
     indexOffset = 0;
     attributeOffset = 0;
 
-    indexSize: number;
-    attributeSize: number;
+    indexSize!: number;
+    attributeSize!: number;
 
     batcherName = 'darkTint';
 
     readonly packAsQuad = false;
 
-    renderable: Spine;
+    renderable!: Spine;
 
-    positions: Float32Array;
-    indices: number[] | Uint16Array;
-    uvs: Float32Array;
+    positions!: Float32Array;
+    indices!: number[] | Uint16Array;
+    uvs!: Float32Array;
 
-    roundPixels: 0 | 1;
-    data: AttachmentCacheData;
-    blendMode: BLEND_MODES;
+    roundPixels!: 0 | 1;
+    data!: AttachmentCacheData;
+    blendMode!: BLEND_MODES;
 
-    darkTint: number;
+    darkTint!: number;
 
-    texture: Texture;
+    texture!: Texture;
 
-    transform: Matrix;
+    transform!: Matrix;
 
-    // used internally by batcher specific..
-    // stored for efficient updating..
-    _textureId: number;
-    _attributeStart: number;
-    _indexStart: number;
-    _batcher: Batcher;
-    _batch: Batch;
+    // used internally by batcher specific. Stored for efficient updating.
+    _textureId!: number;
+    _attributeStart!: number;
+    _indexStart!: number;
+    _batcher!: Batcher;
+    _batch!: Batch;
+
 
     get color()
     {
@@ -99,7 +99,7 @@ export class BatchableSpineSlot implements DefaultBatchableMeshElement
 
     get darkColor()
     {
-        const darkColor = this.data.darkColor;
+        const darkColor = this.data.darkColor!;
 
         return ((darkColor.b * 255) << 16) | ((darkColor.g * 255) << 8) | (darkColor.r * 255);
     }
@@ -120,11 +120,11 @@ export class BatchableSpineSlot implements DefaultBatchableMeshElement
         {
             const clippedData = data.clippedData;
 
-            this.indexSize = clippedData.indicesCount;
-            this.attributeSize = clippedData.vertexCount;
-            this.positions = clippedData.vertices;
-            this.indices = clippedData.indices;
-            this.uvs = clippedData.uvs;
+            this.indexSize = clippedData!.indicesCount;
+            this.attributeSize = clippedData!.vertexCount;
+            this.positions = clippedData!.vertices;
+            this.indices = clippedData!.indices;
+            this.uvs = clippedData!.uvs;
         }
         else
         {

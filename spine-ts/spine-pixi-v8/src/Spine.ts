@@ -129,10 +129,10 @@ export class Spine extends ViewContainer
     // Spine properties
     public skeleton: Skeleton;
     public state: AnimationState;
-    public skeletonBounds: SkeletonBounds;
+    public skeletonBounds?: SkeletonBounds;
     private _debug?: ISpineDebugRenderer | undefined = undefined;
 
-    readonly _slotsObject: Record<string, {slot:Slot, container:Container}> = Object.create(null);
+    readonly _slotsObject: Record<string, {slot:Slot, container:Container} | null> = Object.create(null);
 
     private getSlotFromRef(slotRef: number | string | Slot): Slot
     {
@@ -150,7 +150,7 @@ export class Spine extends ViewContainer
     public spineAttachmentsDirty = true;
     public spineTexturesDirty = true;
 
-    private _lastAttachments: Attachment[];
+    private _lastAttachments: Attachment[] = [];
 
     private _stateChanged = true;
     private attachmentCacheData: Record<string, AttachmentCacheData>[] = [];
@@ -359,7 +359,7 @@ export class Spine extends ViewContainer
     {
         const currentDrawOrder = this.skeleton.drawOrder;
 
-        const lastAttachments = (this._lastAttachments ||= []);
+        const lastAttachments = this._lastAttachments;
 
         let index = 0;
 
@@ -442,7 +442,7 @@ export class Spine extends ViewContainer
 
                     if (slot.darkColor)
                     {
-                        cacheData.darkColor.setFromColor(slot.darkColor);
+                        cacheData.darkColor!.setFromColor(slot.darkColor);
                     }
 
                     cacheData.skipRender = cacheData.clipped = false;
@@ -678,12 +678,10 @@ export class Spine extends ViewContainer
         // TODO only add once??
         this.addChild(container);
 
-        this._slotsObject[slot.data.name] = {
-            container,
-            slot
-        };
+        const slotObject = { container, slot };
+        this._slotsObject[slot.data.name] = slotObject;
 
-        this.updateSlotObject(this._slotsObject[slot.data.name]);
+        this.updateSlotObject(slotObject);
     }
 
     /**
@@ -735,7 +733,7 @@ export class Spine extends ViewContainer
     {
         slot = this.getSlotFromRef(slot);
 
-        return this._slotsObject[slot.data.name].container;
+        return this._slotsObject[slot.data.name]?.container;
     }
 
     private updateBounds()
@@ -803,7 +801,7 @@ export class Spine extends ViewContainer
         this.skeleton = null as any;
         this.state = null as any;
         (this._slotsObject as any) = null;
-        this._lastAttachments = null;
+        this._lastAttachments.length = 0;
         this.attachmentCacheData = null as any;
     }
 

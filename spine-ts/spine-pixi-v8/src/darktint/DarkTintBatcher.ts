@@ -10,7 +10,7 @@ import {
 import { DarkTintBatchGeometry } from './DarkTintBatchGeometry';
 import { DarkTintShader } from './DarkTintShader';
 
-let defaultShader: Shader = null;
+let defaultShader: Shader | null = null;
 
 /** The default batcher is used to batch quads and meshes. */
 export class DarkTintBatcher extends Batcher
