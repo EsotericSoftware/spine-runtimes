@@ -430,13 +430,12 @@ export class Spine extends ViewContainer {
 
 		clipper.clipTriangles(
 			cacheData.vertices,
-			cacheData.vertices.length,
 			cacheData.indices,
 			cacheData.indices.length,
 			cacheData.uvs,
 			lightColor,
 			darkColor,
-			false,
+			cacheData.darkColor != null,
 		);
 
 		const { clippedVertices, clippedTriangles } = clipper;
