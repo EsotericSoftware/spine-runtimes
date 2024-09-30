@@ -1,32 +1,25 @@
 {
-  "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
-    "lib": ["ESNext", "DOM", "ScriptHost"],
-    "strict": true,
-    "esModuleInterop": true,
-    "allowJs": true,
-    "moduleResolution": "node",
-    "sourceMap": false,
-    "declaration": true,
-    "declarationMap": false,
-    "declarationDir": "./lib",
-    "outDir": "./lib",
-    "noImplicitAny": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "strictNullChecks": false,
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "noImplicitOverride": true
-  },
-  "include": ["./src", "./typings", "./stories", "./test"],
-  "ts-node": {
-        "files": true,
-        "compilerOptions": {
-            "esModuleInterop": true,
-            "module": "commonjs"
-        }
-    }
+	"extends": "../tsconfig.base.json",
+	"compilerOptions": {
+		"baseUrl": ".",
+		"rootDir": "./src",
+		"outDir": "./dist",
+		"paths": {
+			"@esotericsoftware/spine-core": [
+				"../spine-core/src"
+			]
+		}
+	},
+	"include": [
+		"**/*.ts",
+	],
+	"exclude": [
+		"dist/**/*.d.ts",
+		"example/**/*.ts"
+	],
+	"references": [
+		{
+			"path": "../spine-core"
+		}
+	]
 }

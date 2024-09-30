@@ -24,6 +24,9 @@
     },
     {
       "path": "./spine-pixi"
+    },
+    {
+      "path": "./spine-pixi-v8"
     }
   ]
 }
