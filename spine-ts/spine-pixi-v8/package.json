@@ -1,70 +1,39 @@
 {
-  "name": "@pixi/spine-pixi",
-  "version": "2.1.0",
-  "description": "A port of the @esotericsoftware/spine-pixi runtime to PixiJS v8.",
-  "homepage": "https://pixijs.com/",
-  "bugs": "https://github.com/pixijs/spine-v8/issues",
+  "name": "@esotericsoftware/spine-pixi-v8",
+  "version": "4.2.60",
+  "description": "The official Spine Runtimes for PixiJS v8.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {},
   "repository": {
     "type": "git",
-    "url": "https://github.com/pixijs/spine-v8.git"
+    "url": "git+https://github.com/esotericsoftware/spine-runtimes.git"
   },
-  "license": "MIT",
-  "author": "PixiJS Team",
-  "exports": {
-    ".": {
-      "import": "./lib/index.mjs",
-      "require": "./lib/index.js",
-      "types": "./lib/index.d.ts"
-    }
-  },
-  "main": "./lib/index.js",
-  "module": "./lib/index.mjs",
-  "types": "./lib/index.d.ts",
-  "files": [
-    "dist/",
-    "lib/"
+  "keywords": [
+    "gamedev",
+    "animations",
+    "2d",
+    "spine",
+    "game-dev",
+    "runtimes",
+    "skeletal"
   ],
-  "scripts": {
-    "build": "xs build && npm run build:iife",
-    "build:iife": "npx esbuild --bundle ./src/index.ts --tsconfig=./tsconfig.json  --sourcemap --outfile=./dist/spine-pixi.js --external:pixi.js --format=iife --global-name=spine",
-    "docs": "xs docs",
-    "lint": "xs lint --max-warnings 0",
-    "lint:fix": "xs lint",
-    "release": "npm run build && xs bump,docs,publish,git-push",
-    "start": "xs serve",
-    "test": "xs test",
-    "types": "xs types",
-    "watch": "xs watch",
-    "upload": "xs upload"
+  "author": "Esoteric Software LLC",
+  "license": "LicenseRef-LICENSE",
+  "bugs": {
+    "url": "https://github.com/esotericsoftware/spine-runtimes/issues"
   },
+  "homepage": "https://github.com/esotericsoftware/spine-runtimes#readme",
   "dependencies": {
-    "@esotericsoftware/spine-core": "~4.2.45"
-  },
-  "devDependencies": {
-    "@pixi/extension-scripts": "^2.4.1",
-    "pixi.js": "8.4.0",
-    "typescript": "^5.4.2"
+    "@esotericsoftware/spine-core": "4.2.60"
   },
   "peerDependencies": {
     "pixi.js": "^8.4.0"
-  },
-  "engines": {
-    "node": ">=16",
-    "npm": ">=8"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "extensionConfig": {
-    "lint": [
-      "src",
-      "test"
-    ],
-    "docsName": "PixiJS Spine",
-    "docsTitle": "PixiJS Spine",
-    "tsconfig": "./tsconfig.build.json",
-    "environments": [
-      "node"
-    ]
   }
 }

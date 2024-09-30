@@ -1,7 +1,7 @@
 {
   "name": "@esotericsoftware/spine-pixi",
   "version": "4.2.60",
-  "description": "The official Spine Runtimes for the web.",
+  "description": "The official Spine Runtimes for PixiJS v7.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",

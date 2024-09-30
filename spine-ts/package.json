@@ -8,8 +8,8 @@
   ],
   "scripts": {
     "prepublish": "npm run clean && npm run build",
-    "clean": "npx rimraf spine-core/dist spine-canvas/dist spine-canvaskit/dist spine-webgl/dist spine-phaser/dist spine-player/dist spine-threejs/dist spine-pixi/dist",
-    "build": "npm run clean && npm run build:modules && concurrently \"npm run build:core\" \"npm run build:canvas\" \"npm run build:canvaskit\" \"npm run build:webgl\" \"npm run build:phaser\" \"npm run build:player\" \"npm run build:threejs\" \"npm run build:pixi\"",
+    "clean": "npx rimraf spine-core/dist spine-canvas/dist spine-canvaskit/dist spine-webgl/dist spine-phaser/dist spine-player/dist spine-threejs/dist spine-pixi/dist spine-pixi-v8/dist",
+    "build": "npm run clean && npm run build:modules && concurrently \"npm run build:core\" \"npm run build:canvas\" \"npm run build:canvaskit\" \"npm run build:webgl\" \"npm run build:phaser\" \"npm run build:player\" \"npm run build:threejs\" \"npm run build:pixi\" \"npm run build:pixi-v8\"",
     "postbuild": "npm run minify",
     "build:modules": "npx tsc -b -clean && npx tsc -b",
     "build:core": "npx esbuild --bundle spine-core/src/index.ts --tsconfig=spine-core/tsconfig.json  --sourcemap --outfile=spine-core/dist/iife/spine-core.js --format=iife --global-name=spine",
@@ -20,8 +20,9 @@
     "build:phaser": "npx esbuild  --bundle spine-phaser/src/index.ts  --tsconfig=spine-phaser/tsconfig.json   --sourcemap --outfile=spine-phaser/dist/iife/spine-phaser.js   --external:Phaser --alias:phaser=Phaser --format=iife --global-name=spine",
     "build:threejs": "npx esbuild --bundle spine-threejs/src/index.ts --tsconfig=spine-threejs/tsconfig.json  --sourcemap --outfile=spine-threejs/dist/iife/spine-threejs.js --external:three --format=iife --global-name=spine",
     "build:pixi": "npx esbuild --bundle spine-pixi/src/index.ts --tsconfig=spine-pixi/tsconfig.json  --sourcemap --outfile=spine-pixi/dist/iife/spine-pixi.js --external:@pixi/* --format=iife --global-name=spine",
-    "minify": "npx esbuild --minify spine-core/dist/iife/spine-core.js --outfile=spine-core/dist/iife/spine-core.min.js && npx esbuild --minify spine-canvas/dist/iife/spine-canvas.js --outfile=spine-canvas/dist/iife/spine-canvas.min.js && npx esbuild --minify spine-canvaskit/dist/iife/spine-canvaskit.js --outfile=spine-canvaskit/dist/iife/spine-canvaskit.min.js && npx esbuild --minify spine-player/dist/iife/spine-player.js --outfile=spine-player/dist/iife/spine-player.min.js && npx esbuild --minify spine-phaser/dist/iife/spine-phaser.js --outfile=spine-phaser/dist/iife/spine-phaser.min.js && npx esbuild --minify spine-webgl/dist/iife/spine-webgl.js --outfile=spine-webgl/dist/iife/spine-webgl.min.js && npx esbuild --minify spine-threejs/dist/iife/spine-threejs.js --outfile=spine-threejs/dist/iife/spine-threejs.min.js && npx esbuild --minify spine-pixi/dist/iife/spine-pixi.js --outfile=spine-pixi/dist/iife/spine-pixi.min.js",
-    "dev": "concurrently \"npx live-server\" \"npm run dev:canvas\" \"npm run dev:canvaskit\" \"npm run dev:webgl\" \"npm run dev:phaser\" \"npm run dev:player\" \"npm run dev:threejs\" \"npm run dev:pixi\" \"npm run dev:modules\"",
+    "build:pixi-v8": "npx esbuild --bundle spine-pixi-v8/src/index.ts --tsconfig=spine-pixi-v8/tsconfig.json  --sourcemap --outfile=spine-pixi-v8/dist/iife/spine-pixi-v8.js --external:pixi.js --format=iife --global-name=spine",
+    "minify": "npx esbuild --minify spine-core/dist/iife/spine-core.js --outfile=spine-core/dist/iife/spine-core.min.js && npx esbuild --minify spine-canvas/dist/iife/spine-canvas.js --outfile=spine-canvas/dist/iife/spine-canvas.min.js && npx esbuild --minify spine-canvaskit/dist/iife/spine-canvaskit.js --outfile=spine-canvaskit/dist/iife/spine-canvaskit.min.js && npx esbuild --minify spine-player/dist/iife/spine-player.js --outfile=spine-player/dist/iife/spine-player.min.js && npx esbuild --minify spine-phaser/dist/iife/spine-phaser.js --outfile=spine-phaser/dist/iife/spine-phaser.min.js && npx esbuild --minify spine-webgl/dist/iife/spine-webgl.js --outfile=spine-webgl/dist/iife/spine-webgl.min.js && npx esbuild --minify spine-threejs/dist/iife/spine-threejs.js --outfile=spine-threejs/dist/iife/spine-threejs.min.js && npx esbuild --minify spine-pixi/dist/iife/spine-pixi.js --outfile=spine-pixi/dist/iife/spine-pixi.min.js && npx esbuild --minify spine-pixi-v8/dist/iife/spine-pixi-v8.js --outfile=spine-pixi-v8/dist/iife/spine-pixi-v8.min.js",
+    "dev": "concurrently \"npx live-server\" \"npm run dev:canvas\" \"npm run dev:canvaskit\" \"npm run dev:webgl\" \"npm run dev:phaser\" \"npm run dev:player\" \"npm run dev:threejs\" \"npm run dev:pixi\" \"npm run dev:pixi-v8\" \"npm run dev:modules\"",
     "dev:modules": "npm run build:modules -- --watch",
     "dev:canvas": "npm run build:canvas -- --watch",
     "dev:canvaskit": "npm run build:canvaskit -- --watch",
@@ -29,7 +30,8 @@
     "dev:phaser": "npm run build:phaser -- --watch",
     "dev:player": "npm run build:player -- --watch",
     "dev:threejs": "npm run build:threejs -- --watch",
-    "dev:pixi": "npm run build:pixi -- --watch"
+    "dev:pixi": "npm run build:pixi -- --watch",
+    "dev:pixi-v8": "npm run build:pixi-v8 -- --watch"
   },
   "repository": {
     "type": "git",
@@ -57,6 +59,7 @@
     "spine-player",
     "spine-threejs",
     "spine-pixi",
+    "spine-pixi-v8",
     "spine-canvaskit",
     "spine-webgl"
   ],
