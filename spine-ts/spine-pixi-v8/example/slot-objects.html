@@ -1,11 +1,10 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>spine-pixi</title>
-    <script src="https://cdn.jsdelivr.net/npm/pixi.js@latest/dist/pixi.min.js"></script>
-    <script src="../dist/spine-pixi.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/tweakpane@3.1.9/dist/tweakpane.min.js"></script>
-    <link rel="stylesheet" href="./index.css">
+    <title>spine-pixi-v8</title>
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@8.4.1/dist/pixi.min.js"></script>
+    <script src="../dist/iife/spine-pixi-v8.js"></script>
+    <link rel="stylesheet" href="../../index.css">
   </head>
 
   <body>
@@ -26,8 +25,8 @@
         // Pre-load the skeleton data and atlas. You can also load .json skeleton data.
         PIXI.Assets.add({alias: "spineboyData", src: "./assets/spineboy-pro.skel" });
         PIXI.Assets.add({alias: "spineboyAtlas", src: "./assets/spineboy-pma.atlas" });
-        PIXI.Assets.add({alias: "spine_logo", src: "./assets/spine_logo.png" });
-        await PIXI.Assets.load(["spineboyData", "spineboyAtlas", "spine_logo"]);
+        PIXI.Assets.add({alias: "raptor_jaw", src: "./assets/raptor-jaw-tooth.png" });
+        await PIXI.Assets.load(["spineboyData", "spineboyAtlas", "raptor_jaw"]);
 
         // Create the spine display object
         const spineboy = spine.Spine.from({skeleton: "spineboyData", atlas: "spineboyAtlas", scale: 0.5 });
@@ -46,79 +45,96 @@
         // Add the display object to the stage.
         app.stage.addChild(spineboy);
 
-        const logo1 = PIXI.Sprite.from('spine_logo');
-        const logo2 = PIXI.Sprite.from('spine_logo');
-        const logo3 = PIXI.Sprite.from('spine_logo');
-        const logo4 = PIXI.Sprite.from('spine_logo');
-        const text = new PIXI.Text('Spine Text');
+        const tooth1 = PIXI.Sprite.from('raptor_jaw');
+        const tooth2 = PIXI.Sprite.from('raptor_jaw');
+        const text = new PIXI.Text('Text GUN');
 
-        // putting logo1 on top of the gun
-        spineboy.addSlotObject("gun", logo1);
+        const toothContainer = new PIXI.Container();
+        toothContainer.addChild(tooth1);
+        toothContainer.name = "tooth";
+        text.name = "text";
 
         // putting logo2 on top of the hand using slot directly and remove the attachment hand
         let frontFist;
         setTimeout(() => {
-          frontFist = spineboy.skeleton.findSlot("front-fist");
-          spineboy.addSlotObject(frontFist, logo2);
+          frontFist = spineboy.skeleton.findSlot("front-foot");
+          tooth1.x = -10;
+          tooth1.y = -70;
+          spineboy.addSlotObject(frontFist, toothContainer);
           frontFist.setAttachment(null);
-        }, 2000)
+        }, 1000);
 
         // scaling the bone, will scale the pixi object too
         setTimeout(() => {
-          frontFist.bone.scaleX = .5
-          frontFist.bone.scaleY = .5
-        }, 3000)
+          frontFist.bone.scaleX = .5;
+          frontFist.bone.scaleY = .5;
+        }, 2000);
 
         // adding a pixi text in a slot using slot index
         let mouth;
         setTimeout(() => {
-          mouth = spineboy.skeleton.findSlot("mouth");
-          spineboy.addSlotObject(mouth, text);
-        }, 4000)
+          spineboy.addSlotObject("gun", text);
+        }, 4000);
 
-        // adding one display object to an already "occupied" slot will remove the old one,
+        // adding one pixi object to an already "occupied" slot will remove the old one,
         // and move the given one to the slot
         setTimeout(() => {
-          spineboy.addSlotObject(mouth, logo1);
-        }, 5000)
+          spineboy.addSlotObject("gun", toothContainer);
+        }, 5000);
 
         // adding multiple DisplayObjects to a slot using a Container to control their offset, size, ...
         setTimeout(() => {
-          const container = new PIXI.Container();
-          container.addChild(logo3, logo4);
-          logo3.y = 20;
-          logo3.scale.set(.5);
-          logo4.scale.set(.5);
-          logo4.tint = 0xFF5500;
-          spineboy.addSlotObject("gun", container);
-        }, 6000)
+          toothContainer.addChild(tooth2);
+          tooth2.x = 30;
+          tooth2.y = -70;
+          tooth2.angle = 30;
+          tooth2.tint = 0xFF5500;
+        }, 6000);
 
         // removing the container won't automatically destroy the displayObject contained, so take care of them
         setTimeout(() => {
-          const container = new PIXI.Container();
           spineboy.removeSlotObject("gun");
-          logo3.destroy();
-          logo4.destroy();
-        }, 7000)
+          console.log(toothContainer.destroyed)
+          console.log(tooth1.destroyed)
+          console.log(tooth2.destroyed)
+          toothContainer.destroy();
+          tooth1.destroy();
+          console.log(toothContainer.destroyed)
+          console.log(tooth1.destroyed)
+          console.log(tooth2.destroyed)
+        }, 7000);
 
         // removing a specific slot object, that is not in that slot do nothing
         setTimeout(() => {
-          const container = new PIXI.Container();
-          spineboy.removeSlotObject(frontFist, text);
-          text.destroy();
-        }, 8000)
+          spineboy.addSlotObject("gun", tooth2);
+          spineboy.removeSlotObject("gun", text);
+        }, 8000);
 
         // removing a specific slot object
         setTimeout(() => {
-          const container = new PIXI.Container();
-          spineboy.removeSlotObject(frontFist, logo2);
-          logo2.destroy();
-        }, 9000)
+          spineboy.removeSlotObject("gun", tooth2);
+          tooth2.destroy();
+        }, 9000);
 
         // resetting the slot with the original attachment
         setTimeout(() => {
           frontFist.setToSetupPose();
-        }, 10000)
+          frontFist.bone.setToSetupPose();
+        }, 10000);
+
+        // showing an animation with clipping -> Pixi masks will be created
+        // for clipping attachments having slot objects
+        setTimeout(() => {
+          spineboy.state.setAnimation(0, "portal", true)
+          const tooth3 = PIXI.Sprite.from('assets/raptor-jaw-tooth.png');
+          tooth3.scale.set(2);
+          tooth3.x = -60;
+          tooth3.y = 120;
+          tooth3.angle = 180;
+          const foot1 = new PIXI.Container();
+          foot1.addChild(tooth3);
+          spineboy.addSlotObject("rear-foot", foot1);
+        }, 11000);
       })();
     </script>
   </body>

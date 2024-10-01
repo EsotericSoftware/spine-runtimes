@@ -1,11 +1,10 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>spine-pixi</title>
-    <script src="https://cdn.jsdelivr.net/npm/pixi.js@latest/dist/pixi.min.js"></script>
-    <script src="../dist/spine-pixi.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/tweakpane@3.1.9/dist/tweakpane.min.js"></script>
-    <link rel="stylesheet" href="./index.css">
+    <title>spine-pixi-v8</title>
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@8.4.1/dist/pixi.min.js"></script>
+    <script src="../dist/iife/spine-pixi-v8.js"></script>
+    <link rel="stylesheet" href="../../index.css">
   </head>
 
   <body>
@@ -29,17 +28,13 @@
         await PIXI.Assets.load(["mixAndMatchData", "mixAndMatchAtlas"]);
 
         // Create the Spine display object
-        const mixAndMatch = spine.Spine.from({skeleton: "mixAndMatchData", atlas: "mixAndMatchAtlas", 
+        const mixAndMatch = spine.Spine.from({skeleton: "mixAndMatchData", atlas: "mixAndMatchAtlas",
           scale: 0.5,
         });
 
         // Set the default mix time to use when transitioning
         // from one animation to the next.
         mixAndMatch.state.data.defaultMix = 0.2;
-
-        // Center the spine object on screen.
-        mixAndMatch.x = window.innerWidth / 2;
-        mixAndMatch.y = window.innerHeight / 2 + mixAndMatch.getBounds().height / 2;
 
         // Add animations.
         mixAndMatch.state.setAnimation(0, "walk", true);
@@ -60,6 +55,10 @@
         skin.addSkin(skeletonData.findSkin("eyelids/girly"));
         mixAndMatch.skeleton.setSkin(skin);
         mixAndMatch.skeleton.setSlotsToSetupPose();
+
+        // Center the spine object on screen.
+        mixAndMatch.x = window.innerWidth / 2;
+        mixAndMatch.y = window.innerHeight / 2 + mixAndMatch.getBounds().height / 2;
 
         // Add the display object to the stage.
         app.stage.addChild(mixAndMatch);

@@ -1,11 +1,10 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>spine-pixi</title>
-    <script src="https://cdn.jsdelivr.net/npm/pixi.js@latest/dist/pixi.min.js"></script>
-    <script src="../dist/spine-pixi.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/tweakpane@3.1.9/dist/tweakpane.min.js"></script>
-    <link rel="stylesheet" href="./index.css">
+    <title>spine-pixi-v8</title>
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@8.4.1/dist/pixi.min.js"></script>
+    <script src="../dist/iife/spine-pixi-v8.js"></script>
+    <link rel="stylesheet" href="../../index.css">
   </head>
 
   <body>
@@ -40,7 +39,7 @@
         await PIXI.Assets.load(["spineboyData", "spineboyAtlas"]);
 
         // Create the Spine display object
-        const spineboy = spine.Spine.from({skeleton: "spineboyData", atlas: "spineboyAtlas", 
+        const spineboy = spine.Spine.from({skeleton: "spineboyData", atlas: "spineboyAtlas",
           scale: 0.5,
         });
 
@@ -63,7 +62,7 @@
           event: (entry, event) =>
           log(`Custom event for ${entry.animation.name}: ${event.data.name}`),
         };
-        
+
         spineboy.state.addAnimation(0, "run", true, 0);
 
         // Set the default mix time to use when transitioning

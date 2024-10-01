@@ -1,11 +1,10 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>spine-pixi</title>
-    <script src="https://cdn.jsdelivr.net/npm/pixi.js@latest/dist/pixi.min.js"></script>
-    <script src="../dist/spine-pixi.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/tweakpane@3.1.9/dist/tweakpane.min.js"></script>
-    <link rel="stylesheet" href="./index.css">
+    <title>spine-pixi-v8</title>
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@8.4.1/dist/pixi.min.js"></script>
+    <script src="../dist/iife/spine-pixi-v8.js"></script>
+    <link rel="stylesheet" href="../../index.css">
   </head>
 
   <body>
@@ -29,11 +28,11 @@
         await PIXI.Assets.load(["spineboyData", "spineboyAtlas"]);
 
         // Create the spine display object
-        const spineboy = spine.Spine.from({skeleton: "spineboyData", atlas: "spineboyAtlas", 
+        const spineboy = spine.Spine.from({skeleton: "spineboyData", atlas: "spineboyAtlas",
           scale: 0.5,
         });
 
-        // Set the default animation and the 
+        // Set the default animation and the
         // default mix for transitioning between animations.
         spineboy.state.setAnimation(0, "hoverboard", true);
         spineboy.state.data.defaultMix = 0.2;
@@ -46,15 +45,15 @@
         // Handle the case that you click/tap the screen.
         spineboy.eventMode = 'static';
         spineboy.on('pointerdown', onClick);
-        
+
         // Add the display object to the stage.
         app.stage.addChild(spineboy);
-        
+
         // Add variables for movement, speed.
         let moveLeft = false;
         let moveRight = false;
         const speed = 5;
-        
+
         // Handle the case that the keyboard keys specified below are pressed.
         function onKeyDown(key) {
           if (key.code === "ArrowLeft" || key.code === "KeyA") {
@@ -79,7 +78,7 @@
         function onClick() {
           spineboy.state.setAnimation(1, "shoot", false, 0);
         }
-        
+
         // Add event listeners so that the window will correctly handle input.
         window.addEventListener("keydown", onKeyDown);
         window.addEventListener("keyup", onKeyUp);
