@@ -40,6 +40,7 @@ import com.esotericsoftware.spine.Skeleton;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.AttributeSet;
@@ -187,6 +188,10 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 	public SpineView (Context context, SpineController controller) {
 		super(context);
 		this.controller = controller;
+		// See https://github.com/EsotericSoftware/spine-runtimes/issues/2638
+		if (Build.VERSION.SDK_INT < 29) {
+			this.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+		}
 	}
 
 	/** Constructs a new {@link SpineView} without providing a {@link SpineController}, which you need to provide using

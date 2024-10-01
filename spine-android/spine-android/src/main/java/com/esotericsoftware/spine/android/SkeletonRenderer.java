@@ -49,6 +49,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.os.Build;
 
 /** Is responsible to transform the {@link Skeleton} with its current pose to {@link SkeletonRenderer.RenderCommand} commands and
  * render them to a {@link Canvas}. */
@@ -246,8 +247,18 @@ public class SkeletonRenderer {
 		for (int i = 0; i < commands.size; i++) {
 			RenderCommand command = commands.get(i);
 
-			canvas.drawVertices(Canvas.VertexMode.TRIANGLES, command.vertices.size, command.vertices.items, 0, command.uvs.items, 0,
-				command.colors.items, 0, command.indices.items, 0, command.indices.size, command.texture.getPaint(command.blendMode));
+			if (Build.VERSION.SDK_INT >= 29) {
+				canvas.drawVertices(Canvas.VertexMode.TRIANGLES, command.vertices.size, command.vertices.items, 0, command.uvs.items, 0,
+						command.colors.items, 0, command.indices.items, 0, command.indices.size, command.texture.getPaint(command.blendMode));
+			} else {
+				// See https://github.com/EsotericSoftware/spine-runtimes/issues/2638
+				int[] colors = command.colors.items;
+				int[] colorsCopy = new int[command.vertices.size];
+				System.arraycopy(colors, 0, colorsCopy, 0, command.colors.size);
+
+				canvas.drawVertices(Canvas.VertexMode.TRIANGLES, command.vertices.size, command.vertices.items, 0, command.uvs.items, 0,
+						colorsCopy, 0, command.indices.items, 0, command.indices.size, command.texture.getPaint(command.blendMode));
+			}
 		}
 	}
 
