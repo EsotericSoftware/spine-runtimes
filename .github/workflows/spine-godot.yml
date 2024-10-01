@@ -203,7 +203,7 @@ jobs:
       - name: Set up Java 11
         uses: actions/setup-java@v1
         with:
-          java-version: 11
+          java-version: 17
 
       - name: Setup python and scons
         uses: ./.github/actions/setup-godot-deps-3
