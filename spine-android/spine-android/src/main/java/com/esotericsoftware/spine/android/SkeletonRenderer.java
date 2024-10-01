@@ -248,16 +248,17 @@ public class SkeletonRenderer {
 			RenderCommand command = commands.get(i);
 
 			if (Build.VERSION.SDK_INT >= 29) {
-				canvas.drawVertices(Canvas.VertexMode.TRIANGLES, command.vertices.size, command.vertices.items, 0, command.uvs.items, 0,
-						command.colors.items, 0, command.indices.items, 0, command.indices.size, command.texture.getPaint(command.blendMode));
+				canvas.drawVertices(Canvas.VertexMode.TRIANGLES, command.vertices.size, command.vertices.items, 0, command.uvs.items,
+					0, command.colors.items, 0, command.indices.items, 0, command.indices.size,
+					command.texture.getPaint(command.blendMode));
 			} else {
 				// See https://github.com/EsotericSoftware/spine-runtimes/issues/2638
 				int[] colors = command.colors.items;
 				int[] colorsCopy = new int[command.vertices.size];
 				System.arraycopy(colors, 0, colorsCopy, 0, command.colors.size);
 
-				canvas.drawVertices(Canvas.VertexMode.TRIANGLES, command.vertices.size, command.vertices.items, 0, command.uvs.items, 0,
-						colorsCopy, 0, command.indices.items, 0, command.indices.size, command.texture.getPaint(command.blendMode));
+				canvas.drawVertices(Canvas.VertexMode.TRIANGLES, command.vertices.size, command.vertices.items, 0, command.uvs.items,
+					0, colorsCopy, 0, command.indices.items, 0, command.indices.size, command.texture.getPaint(command.blendMode));
 			}
 		}
 	}
