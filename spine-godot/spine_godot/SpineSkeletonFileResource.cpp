@@ -177,7 +177,7 @@ Error SpineSkeletonFileResource::copy_from(const Ref<Resource> &p_resource) {
 #if VERSION_MAJOR > 3
 RES SpineSkeletonFileResourceFormatLoader::load(const String &path, const String &original_path, Error *error, bool use_sub_threads, float *progress, CacheMode cache_mode) {
 #else
-#if MINOR_VERSION > 5
+#if VERSION_MINOR > 5
 RES SpineSkeletonFileResourceFormatLoader::load(const String &path, const String &original_path, Error *error, bool no_subresource_cache) {
 #else
 RES SpineSkeletonFileResourceFormatLoader::load(const String &path, const String &original_path, Error *error) {
