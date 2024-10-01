@@ -1082,6 +1082,8 @@ class SpineWebComponentOverlay extends HTMLElement implements Disposable {
 				if (clip) {
 					// in clip mode, the world origin is the div center (divBounds center)
 					clipToBoundStart(divBounds);
+					divOriginX = divBounds.width * (xAxis * window.devicePixelRatio);
+					divOriginY = divBounds.height * (yAxis * window.devicePixelRatio);
 				} else {
 					// get the desired point into the the div (center by default) in world coordinate
 					const divX = divBounds.x + divBounds.width * (xAxis + .5);
