@@ -257,7 +257,11 @@ Error SpineAtlasResource::copy_from(const Ref<Resource> &p_resource) {
 #if VERSION_MAJOR > 3
 RES SpineAtlasResourceFormatLoader::load(const String &path, const String &original_path, Error *error, bool use_sub_threads, float *progress, CacheMode cache_mode) {
 #else
+#if VERSION_MINOR > 5
+RES SpineAtlasResourceFormatLoader::load(const String &path, const String &original_path, Error *error, bool p_no_subresource_cache) {
+#else
 RES SpineAtlasResourceFormatLoader::load(const String &path, const String &original_path, Error *error) {
+#endif
 #endif
 	Ref<SpineAtlasResource> atlas = memnew(SpineAtlasResource);
 	atlas->load_from_file(path);
