@@ -45,7 +45,7 @@ public:
 
 private:
 	spine::SkeletonAnimation *backNode;
-	spine::SkeletonRenderer *frontNode;
+	spine::SkeletonRendererCocos2dX *frontNode;
 	cocos2d::DrawNode *betweenNode;
 };
 
