@@ -298,3 +298,14 @@ void main () {
 		return new Shader(context, vs, fs);
 	}
 }
+
+export class CustomShader extends Shader {
+	constructor (
+		context: ManagedWebGLRenderingContext | WebGLRenderingContext,
+		vertexShader: string,
+		fragmentShader: string,
+		public setUniformsCallback?: (shader: Shader) => void,
+	) {
+		super(context, vertexShader, fragmentShader);
+	}
+}

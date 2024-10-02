@@ -1,0 +1,137 @@
+<!doctype html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<script src="../dist/iife/spine-player.js"></script>
+	<link rel="stylesheet" href="../css/spine-player.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="../../index.css" />
+</head>
+
+<body class="flex flex-col justify-center items-center">
+	<div id="container-raptor" style="max-width:640px; aspect-ratio: 16/9"></div>
+	<div style="color: white;">
+		Red: <input id="red-input" type="range" min="0" max="100" value="100" style="appearance: revert;" /> <output id="red-value"></output>
+		<br>
+		Green: <input id="green-input" type="range" min="0" max="100" value="100" style="appearance: revert;" /> <output id="green-value"></output>
+		<br>
+		Blue: <input id="blue-input" type="range" min="0" max="100" value="100" style="appearance: revert;" /> <output id="blue-value"></output>
+	</div>
+</body>
+<script>
+
+	const inputToValue = input => parseFloat(input) / 100
+	const redInput = document.querySelector("#red-input");
+	const redValue = document.querySelector("#red-value");
+	redValue.textContent = redInput.value;
+
+	const greenInput = document.querySelector("#green-input");
+	const greenValue = document.querySelector("#green-value");
+	greenValue.textContent = greenInput.value;
+
+	const blueInput = document.querySelector("#blue-input");
+	const blueValue = document.querySelector("#blue-value");
+	blueValue.textContent = blueInput.value;
+
+	redInput.addEventListener("input", (event) => {
+		redValue.textContent = event.target.value;
+	});
+	greenInput.addEventListener("input", (event) => {
+		greenValue.textContent = event.target.value;
+	});
+	blueInput.addEventListener("input", (event) => {
+		blueValue.textContent = event.target.value;
+	});
+
+	redInput.addEventListener("input", (event) => {
+					redValue.textContent = event.target.value;
+				});
+				greenInput.addEventListener("input", (event) => {
+					greenValue.textContent = event.target.value;
+				});
+				blueInput.addEventListener("input", (event) => {
+					blueValue.textContent = event.target.value;
+				});
+
+	let vertexShader = `
+attribute vec4 ${spine.Shader.POSITION};
+attribute vec4 ${spine.Shader.COLOR};
+attribute vec4 ${spine.Shader.COLOR2};
+attribute vec2 ${spine.Shader.TEXCOORDS};
+uniform mat4 ${spine.Shader.MVP_MATRIX};
+varying vec4 v_light;
+varying vec4 v_dark;
+varying vec2 v_texCoords;
+
+void main () {
+	v_light = ${spine.Shader.COLOR};
+	v_dark = ${spine.Shader.COLOR2};
+	v_texCoords = ${spine.Shader.TEXCOORDS};
+	gl_Position = ${spine.Shader.MVP_MATRIX} * ${spine.Shader.POSITION};
+}
+`;
+
+	let fragmentShader = `
+#ifdef GL_ES
+	#define LOWP lowp
+	precision mediump float;
+#else
+	#define LOWP
+#endif
+varying LOWP vec4 v_light;
+varying LOWP vec4 v_dark;
+varying vec2 v_texCoords;
+uniform sampler2D u_texture;
+uniform float red_multiplier;
+uniform float green_multiplier;
+uniform float blue_multiplier;
+
+void main () {
+	vec4 texColor = texture2D(u_texture, v_texCoords);
+	gl_FragColor.a = texColor.a * v_light.a;
+	vec3 multipliers = vec3(clamp(red_multiplier, 0.0, 1.0), clamp(green_multiplier, 0.0, 1.0), clamp(blue_multiplier, 0.0, 1.0));
+	gl_FragColor.rgb = ((texColor.a - 1.0) * v_dark.a + 1.0 - texColor.rgb) * v_dark.rgb + texColor.rgb * v_light.rgb * multipliers;
+}
+`;
+
+	// Creates a new spine player with a transparent background,
+	// so content from the website shines through. Hides the controls.
+	// Instead, the user can control the animation via buttons.
+	var jsControlledPlayer = new spine.SpinePlayer("container-raptor", {
+		skeleton: "assets/raptor-pro.json",
+		atlas: "assets/raptor-pma.atlas",
+		animation: "walk",
+		showControls: false,
+		premultipliedAlpha: true,
+		backgroundColor: "#00000000",
+		alpha: true,
+		defaultMix: 1,
+		controlBones: ["root"],
+		success: (player) => {
+			const inputToValue = input => parseFloat(input) / 100;
+			player.sceneRenderer.setCustomBatcherShader(new spine.CustomShader(
+				player.sceneRenderer.context,
+				vertexShader,
+				fragmentShader,
+				(shader) => {
+					shader.setUniformf("red_multiplier", inputToValue(redInput.value));
+					shader.setUniformf("green_multiplier", inputToValue(greenInput.value));
+					shader.setUniformf("blue_multiplier", inputToValue(blueInput.value));
+				},
+			));
+
+			const head = player.skeleton.findSlot("head");
+			console.log(head.color)
+
+			setTimeout(() => {
+				head.color.set(1, 0, 0, 1)
+				player.skeleton.setToSetupPose()
+			})
+
+		}
+	});
+</script>
+</body>
+
+</html>

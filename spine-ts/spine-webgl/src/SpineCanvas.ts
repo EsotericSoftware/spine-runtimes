@@ -27,7 +27,7 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { TimeKeeper, AssetManager, ManagedWebGLRenderingContext, SceneRenderer, Input, StringMap } from "./index.js";
+import { TimeKeeper, AssetManager, ManagedWebGLRenderingContext, SceneRenderer, Input, StringMap, CustomShader, Shader } from "./index.js";
 
 /** An app running inside a {@link SpineCanvas}. The app life-cycle
  * is as follows:
@@ -56,6 +56,12 @@ export interface SpineCanvasConfig {
 	pathPrefix?: string;
 	/* The WebGL context configuration */
 	webglConfig?: any;
+	/** Your custom Shader configuration. See {@link CustomShader} */
+	shader?: {
+		vertexShader: string,
+		fragmentShader: string,
+		setUniformCallback: (shader: Shader) => void,
+	};
 }
 
 /** Manages the life-cycle and WebGL context of a {@link SpineCanvasApp}. The app loads
@@ -75,6 +81,8 @@ export class SpineCanvas {
 	readonly assetManager: AssetManager;
 	/** The input processor used to listen to mouse, touch, and keyboard events. */
 	readonly input: Input;
+	/** The custom shader, if {@link SpineCanvasConfig.shader} config is passed. */
+	readonly shader?: Shader;
 
 	private disposed = false;
 
@@ -93,7 +101,8 @@ export class SpineCanvas {
 
 		this.htmlCanvas = canvas;
 		this.context = new ManagedWebGLRenderingContext(canvas, config.webglConfig);
-		this.renderer = new SceneRenderer(canvas, this.context);
+		this.shader = config.shader ? new CustomShader(this.context, config.shader.vertexShader, config.shader.fragmentShader, config.shader.setUniformCallback) : undefined;
+		this.renderer = new SceneRenderer(canvas, this.context, true, this.shader);
 		this.gl = this.context.gl;
 		this.assetManager = new AssetManager(this.context, config.pathPrefix);
 		this.input = new Input(canvas);

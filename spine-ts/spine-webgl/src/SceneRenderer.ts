@@ -31,7 +31,7 @@ import { Color, Disposable, Skeleton, MathUtils, TextureAtlasRegion } from "@eso
 import { OrthoCamera } from "./Camera.js";
 import { GLTexture } from "./GLTexture.js";
 import { PolygonBatcher } from "./PolygonBatcher.js";
-import { Shader } from "./Shader.js";
+import { CustomShader, Shader } from "./Shader.js";
 import { ShapeRenderer } from "./ShapeRenderer.js";
 import { SkeletonDebugRenderer } from "./SkeletonDebugRenderer.js";
 import { SkeletonRenderer, VertexTransformer } from "./SkeletonRenderer.js";
@@ -60,12 +60,15 @@ export class SceneRenderer implements Disposable {
 	skeletonRenderer: SkeletonRenderer;
 	skeletonDebugRenderer: SkeletonDebugRenderer;
 
-	constructor (canvas: HTMLCanvasElement, context: ManagedWebGLRenderingContext | WebGLRenderingContext, twoColorTint: boolean = true) {
+	constructor (canvas: HTMLCanvasElement, context: ManagedWebGLRenderingContext | WebGLRenderingContext, twoColorTint: boolean = true, customShader?: Shader) {
 		this.canvas = canvas;
 		this.context = context instanceof ManagedWebGLRenderingContext ? context : new ManagedWebGLRenderingContext(context);
 		this.twoColorTint = twoColorTint;
 		this.camera = new OrthoCamera(canvas.width, canvas.height);
-		this.batcherShader = twoColorTint ? Shader.newTwoColoredTextured(this.context) : Shader.newColoredTextured(this.context);
+		if (customShader)
+			this.batcherShader = customShader;
+		else
+			this.batcherShader = twoColorTint ? Shader.newTwoColoredTextured(this.context) : Shader.newColoredTextured(this.context);
 		this.batcher = new PolygonBatcher(this.context, twoColorTint);
 		this.shapesShader = Shader.newColored(this.context);
 		this.shapes = new ShapeRenderer(this.context);
@@ -489,6 +492,10 @@ export class SceneRenderer implements Disposable {
 		this.camera.update();
 	}
 
+	setCustomBatcherShader(shader: CustomShader) {
+		this.batcherShader = shader;
+	}
+
 	private enableRenderer (renderer: PolygonBatcher | ShapeRenderer | SkeletonDebugRenderer) {
 		if (this.activeRenderer === renderer) return;
 		this.end();
@@ -496,6 +503,8 @@ export class SceneRenderer implements Disposable {
 			this.batcherShader.bind();
 			this.batcherShader.setUniform4x4f(Shader.MVP_MATRIX, this.camera.projectionView.values);
 			this.batcherShader.setUniformi("u_texture", 0);
+			if (this.batcherShader instanceof CustomShader && this.batcherShader.setUniformsCallback !== undefined)
+				this.batcherShader.setUniformsCallback(this.batcherShader);
 			this.batcher.begin(this.batcherShader);
 			this.activeRenderer = this.batcher;
 		} else if (renderer instanceof ShapeRenderer) {
