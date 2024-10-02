@@ -35,7 +35,6 @@
 #include "scene/resources/texture.h"
 #include <spine/TextureLoader.h>
 
-#define TOOLS_ENABLED
 #ifdef TOOLS_ENABLED
 #include "editor/editor_file_system.h"
 #endif
@@ -105,13 +104,8 @@ public:
 	}
 #endif
 
-	void load(spine::AtlasPage &page, const spine::String &path) override {
-		Error error = OK;
-		String fixed_path = String(path.buffer());
-		bool is_resource = fix_path(fixed_path);
-
-
-#ifdef VERSION_MAJOR > 4
+	void import_image_resource(const String &path) {
+#ifdef VERSION_MAJOR> 4
 #ifdef TOOLS_ENABLED
 		// Required when importing into editor by e.g. drag & drop. The .png files
 		// of the atlas might not have been imported yet.
@@ -119,10 +113,18 @@ public:
 		if (is_importing) {
 			HashMap<StringName, Variant> custom_options;
 			Dictionary generator_parameters;
-			EditorFileSystem::get_singleton()->reimport_append(fixed_path, custom_options, "", generator_parameters);
+			EditorFileSystem::get_singleton()->reimport_append(path, custom_options, "", generator_parameters);
 		}
 #endif
 #endif
+	}
+
+	void load(spine::AtlasPage &page, const spine::String &path) override {
+		Error error = OK;
+		String fixed_path = String(path.buffer());
+		bool is_resource = fix_path(fixed_path);
+
+		import_image_resource(fixed_path);
 
 #if VERSION_MAJOR > 3
 		Ref<Texture2D> texture = get_texture_from_image(fixed_path, is_resource);
@@ -145,6 +147,7 @@ public:
 
 		String new_path = vformat("%s/%s_%s", fixed_path.get_base_dir(), normal_map_prefix, fixed_path.get_file());
 		if (ResourceLoader::exists(new_path)) {
+			import_image_resource(new_path);
 			Ref<Texture> normal_map = get_texture_from_image(new_path, is_resource);
 			normal_maps->append(normal_map);
 			renderer_object->normal_map = normal_map;
