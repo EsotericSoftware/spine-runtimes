@@ -63,16 +63,21 @@
     <Compile Include="src\Attachments\AttachmentType.cs" />
     <Compile Include="src\Attachments\BoundingBoxAttachment.cs" />
     <Compile Include="src\Attachments\ClippingAttachment.cs" />
+    <Compile Include="src\Attachments\IHasTextureRegion.cs" />
     <Compile Include="src\Attachments\MeshAttachment.cs" />
     <Compile Include="src\Attachments\PathAttachment.cs" />
     <Compile Include="src\Attachments\PointAttachment.cs" />
     <Compile Include="src\Attachments\RegionAttachment.cs" />
+    <Compile Include="src\Attachments\Sequence.cs" />
     <Compile Include="src\Attachments\VertexAttachment.cs" />
     <Compile Include="src\BlendMode.cs" />
     <Compile Include="src\Bone.cs" />
     <Compile Include="src\BoneData.cs" />
     <Compile Include="src\ConstraintData.cs" />
+    <Compile Include="src\PhysicsConstraint.cs" />
+    <Compile Include="src\PhysicsConstraintData.cs" />
     <Compile Include="src\SkeletonLoader.cs" />
+    <Compile Include="src\TextureRegion.cs" />
     <Compile Include="src\Triangulator.cs" />
     <Compile Include="src\Event.cs" />
     <Compile Include="src\EventData.cs" />
@@ -96,7 +101,6 @@
     <Compile Include="src\TransformConstraint.cs" />
     <Compile Include="src\TransformConstraintData.cs" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!--
       To modify your build process, add your task inside one of the targets below and uncomment it.
