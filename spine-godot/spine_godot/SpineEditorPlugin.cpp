@@ -26,6 +26,8 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THE
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
+#define TOOLS_ENABLED
+#define VERSION_MAJOR 4
 
 #ifdef TOOLS_ENABLED
 #include "SpineEditorPlugin.h"
@@ -40,7 +42,7 @@ Error SpineAtlasResourceImportPlugin::import(const String &source_file, const St
 #endif
 	Ref<SpineAtlasResource> atlas(memnew(SpineAtlasResource));
 	atlas->set_normal_texture_prefix(options["normal_map_prefix"]);
-	atlas->load_from_atlas_file(source_file);
+	atlas->load_from_atlas_file_internal(source_file, true);
 
 	String file_name = vformat("%s.%s", save_path, get_save_extension());
 #if VERSION_MAJOR > 3

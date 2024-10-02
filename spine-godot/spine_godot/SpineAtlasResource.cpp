@@ -33,14 +33,20 @@
 #include "scene/resources/texture.h"
 #include <spine/TextureLoader.h>
 
+#define TOOLS_ENABLED
+#ifdef TOOLS_ENABLED
+#include "editor/editor_file_system.h"
+#endif
+
 class GodotSpineTextureLoader : public spine::TextureLoader {
 
 	Array *textures;
 	Array *normal_maps;
 	String normal_map_prefix;
+	bool is_importing;
 
 public:
-	GodotSpineTextureLoader(Array *_textures, Array *_normal_maps, const String &normal_map_prefix) : textures(_textures), normal_maps(_normal_maps), normal_map_prefix(normal_map_prefix) {
+	GodotSpineTextureLoader(Array *_textures, Array *_normal_maps, const String &normal_map_prefix, bool is_importing) : textures(_textures), normal_maps(_normal_maps), normal_map_prefix(normal_map_prefix), is_importing(is_importing) {
 	}
 
 	static String fix_path(const String &path) {
@@ -64,6 +70,20 @@ public:
 	void load(spine::AtlasPage &page, const spine::String &path) override {
 		Error error = OK;
 		auto fixed_path = fix_path(String(path.buffer()));
+
+
+#ifdef VERSION_MAJOR > 4
+#ifdef TOOLS_ENABLED
+		// Required when importing into editor by e.g. drag & drop. The .png files
+		// of the atlas might not have been imported yet.
+		// See https://github.com/EsotericSoftware/spine-runtimes/issues/2385
+		if (is_importing) {
+			HashMap<StringName, Variant> custom_options;
+			Dictionary generator_parameters;
+			EditorFileSystem::get_singleton()->reimport_append(fixed_path, custom_options, "", generator_parameters);
+		}
+#endif
+#endif
 
 #if VERSION_MAJOR > 3
 		Ref<Texture2D> texture = ResourceLoader::load(fixed_path, "", ResourceFormatLoader::CACHE_MODE_REUSE, &error);
@@ -156,13 +176,17 @@ String SpineAtlasResource::get_source_path() {
 }
 
 Error SpineAtlasResource::load_from_atlas_file(const String &path) {
+	load_from_atlas_file_internal(path, false);
+}
+
+Error SpineAtlasResource::load_from_atlas_file_internal(const String &path, bool is_importing) {
 	Error err;
 	source_path = path;
 	atlas_data = FileAccess::get_file_as_string(path, &err);
 	if (err != OK) return err;
 
 	clear();
-	texture_loader = new GodotSpineTextureLoader(&textures, &normal_maps, normal_map_prefix);
+	texture_loader = new GodotSpineTextureLoader(&textures, &normal_maps, normal_map_prefix, is_importing);
 	auto atlas_utf8 = atlas_data.utf8();
 	atlas = new spine::Atlas(atlas_utf8, atlas_utf8.length(), source_path.get_base_dir().utf8(), texture_loader);
 	if (atlas) return OK;
@@ -195,7 +219,7 @@ Error SpineAtlasResource::load_from_file(const String &path) {
 	normal_map_prefix = content["normal_texture_prefix"];
 
 	clear();
-	texture_loader = new GodotSpineTextureLoader(&textures, &normal_maps, normal_map_prefix);
+	texture_loader = new GodotSpineTextureLoader(&textures, &normal_maps, normal_map_prefix, false);
 	auto utf8 = atlas_data.utf8();
 	atlas = new spine::Atlas(utf8.ptr(), utf8.size(), source_path.get_base_dir().utf8(), texture_loader);
 	if (atlas) return OK;
