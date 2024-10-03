@@ -110,6 +110,10 @@ interface WidgetAttributes {
 	yAxis: number
 	offsetX: number
 	offsetY: number
+	padLeft: number
+	padRight: number
+	padTop: number
+	padBottom: number
 	width: number
 	height: number
 	isDraggable: boolean
@@ -220,22 +224,22 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 	public fit: FitType = "contain";
 
 	/**
-	 * Specify the way the skeleton is centered within the div:
-	 * - `inside`: the skeleton bounds center is centered with the div container (Default)
-	 * - `origin`: the skeleton origin is centered with the div container regardless of the bounds.
+	 * Specify the way the skeleton is centered within the element container:
+	 * - `inside`: the skeleton bounds center is centered with the element container (Default)
+	 * - `origin`: the skeleton origin is centered with the element container regardless of the bounds.
 	 * Origin does not allow to specify any {@link fit} type and guarantee the skeleton to not be autoscaled.
 	 * Connected to `mode` attribute.
 	 */
 	public mode: ModeType = "inside";
 
 	/**
-	 * The x offset of the skeleton world origin x axis in div width units
+	 * The x offset of the skeleton world origin x axis as a percentage of the element container width
 	 * Connected to `x-axis` attribute.
 	 */
 	public xAxis = 0;
 
 	/**
-	 * The y offset of the skeleton world origin x axis in div width units
+	 * The y offset of the skeleton world origin x axis as a percentage of the element container height
 	 * Connected to `y-axis` attribute.
 	 */
 	public yAxis = 0;
@@ -253,8 +257,32 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 	public offsetY = 0;
 
 	/**
+	 * A padding that shrink the element container virtually from left as a percentage of the element container width
+	 * Connected to `pad-left` attribute.
+	 */
+	public padLeft = 0;
+
+	/**
+	 * A padding that shrink the element container virtually from right as a percentage of the element container width
+	 * Connected to `pad-right` attribute.
+	 */
+	public padRight = 0;
+
+	/**
+	 * A padding that shrink the element container virtually from the top as a percentage of the element container height
+	 * Connected to `pad-top` attribute.
+	 */
+	public padTop = 0;
+
+	/**
+	 * A padding that shrink the element container virtually from the bottom as a percentage of the element container height
+	 * Connected to `pad-bottom` attribute.
+	 */
+	public padBottom = 0;
+
+	/**
 	 * Specify a fixed width for the widget. If at least one of `width` and `height` is > 0,
-	 * the widget will have an actual size and the div reference is the widget itself, not the div parent.
+	 * the widget will have an actual size and the element container reference is the widget itself, not the element container parent.
 	 * Connected to `width` attribute.
 	 */
 	public get width (): number {
@@ -268,7 +296,7 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 
 	/**
 	 * Specify a fixed height for the widget. If at least one of `width` and `height` is > 0,
-	 * the widget will have an actual size and the div reference is the widget itself, not the div parent.
+	 * the widget will have an actual size and the element container reference is the widget itself, not the element container parent.
 	 * Connected to `height` attribute.
 	 */
 	public get height (): number {
@@ -316,14 +344,14 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 	public pages?: Array<number>;
 
 	/**
-	 * If `true`, the skeleton is clipped to the container div bounds.
+	 * If `true`, the skeleton is clipped to the element container bounds.
 	 * Be careful on using this feature because it breaks batching!
 	 * Connected to `clip` attribute.
 	 */
 	public clip = false;
 
 	/**
-	 * The widget update/apply behaviour when the skeleton div container is offscreen:
+	 * The widget update/apply behaviour when the skeleton element container is offscreen:
 	 * - `pause`: the state is not updated, neither applied (Default)
 	 * - `update`: the state is updated, but not applied
 	 * - `pose`: the state is updated and applied
@@ -356,7 +384,7 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 	public afterUpdateWorldTransforms: BeforeAfterUpdateSpineWidgetFunction = () => { };
 
 	/**
-	 * A callback invoked each time div hosting the widget enters the screen viewport.
+	 * A callback invoked each time the element container enters the screen viewport.
 	 * By default, the callback call the {@link start} method the first time the widget
 	 * enters the screen viewport.
 	 */
@@ -423,12 +451,12 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 	public started = false;
 
 	/**
-	 * True, when the div hosting the widget enters the screen viewport. It uses an IntersectionObserver internally.
+	 * True, when the element container enters the screen viewport. It uses an IntersectionObserver internally.
 	 */
 	public onScreen = false;
 
 	/**
-	 * True, when the div hosting the widget enters the screen viewport at least once.
+	 * True, when the element container enters the screen viewport at least once.
 	 * It uses an IntersectionObserver internally.
 	 */
 	public onScreenAtLeastOnce = false;
@@ -499,6 +527,10 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 		"y-axis": { propertyName: "yAxis", type: "number" },
 		"offset-x": { propertyName: "offsetX", type: "number" },
 		"offset-y": { propertyName: "offsetY", type: "number" },
+		"pad-left": { propertyName: "padLeft", type: "number" },
+		"pad-right": { propertyName: "padRight", type: "number" },
+		"pad-top": { propertyName: "padTop", type: "number" },
+		"pad-bottom": { propertyName: "padBottom", type: "number" },
 		identifier: { propertyName: "identifier", type: "string" },
 		debug: { propertyName: "debug", type: "boolean" },
 		"manual-start": { propertyName: "manualStart", type: "boolean" },
@@ -1029,11 +1061,11 @@ class SpineWebComponentOverlay extends HTMLElement implements Disposable {
 			this.renderer.end();
 
 			// set the new viewport to the div bound
-			const viewportWidth = divBounds.width * window.devicePixelRatio;
-			const viewporthHeight = divBounds.height * window.devicePixelRatio;
+			const viewportWidth = this.screenToWorldLength(divBounds.width);
+			const viewporthHeight = this.screenToWorldLength(divBounds.height);
 			this.renderer.context.gl.viewport(
-				divBounds.x * window.devicePixelRatio,
-				this.canvas.height - (divBounds.y + divBounds.height) * window.devicePixelRatio,
+				this.screenToWorldLength(divBounds.x),
+				this.canvas.height - this.screenToWorldLength(divBounds.y + divBounds.height),
 				viewportWidth,
 				viewporthHeight
 			);
@@ -1073,7 +1105,6 @@ class SpineWebComponentOverlay extends HTMLElement implements Disposable {
 			let renderer = this.renderer;
 			renderer.begin();
 
-			const devicePixelRatio = window.devicePixelRatio;
 			const tempVector = new Vector3();
 			this.skeletonList.forEach((widget) => {
 				const { skeleton, bounds, mode, debug, offsetX, offsetY, xAxis, yAxis, dragX, dragY, fit, loadingSpinner, onScreen, loading, clip, isDraggable } = widget;
@@ -1084,24 +1115,30 @@ class SpineWebComponentOverlay extends HTMLElement implements Disposable {
 				divBounds.x = divBounds.left + this.overflowLeftSize;
 				divBounds.y = divBounds.top + this.overflowTopSize;
 
+
+				const { padLeft, padRight, padTop, padBottom } = widget
+				const paddingShiftHorizontal = (padLeft - padRight) / 2;
+				const paddingShiftVertical = (padTop - padBottom) / 2;
 				let divOriginX = 0;
 				let divOriginY = 0;
 				if (clip) {
 					// in clip mode, the world origin is the div center (divBounds center)
 					clipToBoundStart(divBounds);
-					divOriginX = divBounds.width * (xAxis * window.devicePixelRatio);
-					divOriginY = divBounds.height * (yAxis * window.devicePixelRatio);
+					divOriginX = this.screenToWorldLength(divBounds.width * (xAxis + paddingShiftHorizontal));
+					divOriginY = this.screenToWorldLength(divBounds.height * (yAxis - paddingShiftVertical));
 				} else {
 					// get the desired point into the the div (center by default) in world coordinate
-					const divX = divBounds.x + divBounds.width * (xAxis + .5);
-					const divY = divBounds.y + divBounds.height * (-yAxis + .5) - 1;
+					const divX = divBounds.x + divBounds.width * ((xAxis + .5) + paddingShiftHorizontal);
+					const divY = divBounds.y + divBounds.height * ((-yAxis + .5) + paddingShiftVertical) - 1;
 					this.screenToWorld(tempVector, divX, divY);
 					divOriginX = tempVector.x;
 					divOriginY = tempVector.y;
 				}
 
-				const divWidthWorld = divBounds.width * devicePixelRatio;
-				const divHeightWorld = divBounds.height * devicePixelRatio;
+				const paddingShrinkWidth = 1 - (padLeft + padRight);
+				const paddingShrinkHeight = 1 - (padTop + padBottom);
+				const divWidthWorld = this.screenToWorldLength(divBounds.width * paddingShrinkWidth);
+				const divHeightWorld = this.screenToWorldLength(divBounds.height * paddingShrinkHeight);
 
 				if (loading) {
 					if (loadingSpinner) {
@@ -1193,9 +1230,9 @@ class SpineWebComponentOverlay extends HTMLElement implements Disposable {
 						let { x: ax, y: ay, width: aw, height: ah } = bounds!;
 						this.worldToScreen(tempVector, ax * skeleton.scaleX + worldOffsetX, ay * skeleton.scaleY + worldOffsetY);
 						widget.dragBoundsRectangle.x = tempVector.x + window.scrollX;
-						widget.dragBoundsRectangle.y = tempVector.y - ah * skeleton.scaleY / window.devicePixelRatio + window.scrollY;
-						widget.dragBoundsRectangle.width = aw * skeleton.scaleX / window.devicePixelRatio;
-						widget.dragBoundsRectangle.height = ah * skeleton.scaleY / window.devicePixelRatio;
+						widget.dragBoundsRectangle.y = tempVector.y - this.worldToScreenLength(ah * skeleton.scaleY) + window.scrollY;
+						widget.dragBoundsRectangle.width = this.worldToScreenLength(aw * skeleton.scaleX);
+						widget.dragBoundsRectangle.height = this.worldToScreenLength(ah * skeleton.scaleY);
 
 						if (clip) {
 							widget.dragBoundsRectangle.x += divBounds.x;
@@ -1298,8 +1335,8 @@ class SpineWebComponentOverlay extends HTMLElement implements Disposable {
 				this.skeletonList.forEach(widget => {
 					if (!widget.dragging || (!widget.onScreen && widget.dragX === 0 && widget.dragY === 0)) return;
 					const skeleton = widget.skeleton!;
-					widget.dragX += dragX * window.devicePixelRatio;
-					widget.dragY -= dragY * window.devicePixelRatio;
+					widget.dragX += this.screenToWorldLength(dragX);
+					widget.dragY -= this.screenToWorldLength(dragY);
 					skeleton.physicsTranslate(dragX, dragY);
 					ev?.preventDefault();
 					ev?.stopPropagation();
@@ -1387,9 +1424,8 @@ class SpineWebComponentOverlay extends HTMLElement implements Disposable {
 
 	private resize (width: number, height: number) {
 		let canvas = this.canvas;
-		const dpr = window.devicePixelRatio;
-		this.canvas.width = Math.round(width * dpr);
-		this.canvas.height = Math.round(height * dpr);
+		this.canvas.width = Math.round(this.screenToWorldLength(width));
+		this.canvas.height = Math.round(this.screenToWorldLength(height));
 		this.renderer.context.gl.viewport(0, 0, canvas.width, canvas.height);
 		this.renderer.camera.setViewport(canvas.width, canvas.height);
 		this.renderer.camera.update();
@@ -1417,16 +1453,22 @@ class SpineWebComponentOverlay extends HTMLElement implements Disposable {
 	/*
 	* Other utilities
 	*/
-	private screenToWorld (vec: Vector3, x: number, y: number) {
+	public screenToWorld (vec: Vector3, x: number, y: number) {
 		vec.set(x, y, 0);
 		// pay attention that clientWidth/Height rounds the size - if we don't like it, we should use getBoundingClientRect as in getPagSize
 		this.renderer.camera.screenToWorld(vec, this.canvas.clientWidth, this.canvas.clientHeight);
 	}
-	private worldToScreen (vec: Vector3, x: number, y: number) {
+	public worldToScreen (vec: Vector3, x: number, y: number) {
 		vec.set(x, -y, 0);
 		// pay attention that clientWidth/Height rounds the size - if we don't like it, we should use getBoundingClientRect as in getPagSize
 		// this.renderer.camera.worldToScreen(vec, this.canvas.clientWidth, this.canvas.clientHeight);
-		this.renderer.camera.worldToScreen(vec, this.renderer.camera.viewportWidth / window.devicePixelRatio, this.renderer.camera.viewportHeight / window.devicePixelRatio);
+		this.renderer.camera.worldToScreen(vec, this.worldToScreenLength(this.renderer.camera.viewportWidth), this.worldToScreenLength(this.renderer.camera.viewportHeight));
+	}
+	public screenToWorldLength (length: number) {
+		return length * window.devicePixelRatio;
+	}
+	public worldToScreenLength (length: number) {
+		return length / window.devicePixelRatio;
 	}
 }
 

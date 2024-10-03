@@ -409,6 +409,59 @@
 
         <div class="split-top split">
             <div class="split-left">
+                <spine-widget
+                    atlas="assets/goblins-pma.atlas"
+                    skeleton="assets/goblins-pro.skel"
+                    skin="goblingirl"
+                    animation="walk"
+                    pad-left=".25"
+                    pad-right=".25"
+                    pad-top=".25"
+                    pad-bottom=".25"
+                ></spine-widget>
+            </div>
+            <div class="split-right">
+                You can virtually add a padding to the element container by using <code>pad-left</code>, <code>pad-right</code>, <code>pad-top</code>, <code>pad-bottom</code>.
+                <br>
+                <br>
+                As a value you can use a percentage of the width for left and right, and of the height for top and bottom.
+            </div>
+        </div>
+
+
+        <div class="split-bottom">
+            <pre><code id="code-display">
+                <script>escapeHTMLandInject(`
+<spine-widget
+    atlas="assets/goblins-pma.atlas"
+    skeleton="assets/goblins-pro.skel"
+    skin="goblingirl"
+    animation="walk"
+    pad-left=".25"
+    pad-right=".25"
+    pad-top=".25"
+    pad-bottom=".25"
+></spine-widget>`);</script>
+            </code></pre>
+        </div>
+    </div>
+
+    <!--
+    /////////////////////
+    // end section 5 //
+    /////////////////////
+    -->
+
+    <!--
+    /////////////////////
+    // start section 6 //
+    /////////////////////
+    -->
+
+    <div id="section6" class="section vertical-split">
+
+        <div class="split-top split">
+            <div class="split-left">
                 Give an <code>identifier</code> to your widget to get it by using the <code>spine.getSpineWidget</code> function.
                 You can easily access the <code>Skeleton</code> and the <code>AnimationState</code> of your character, and use them as if you were using <code>spine-webgl</code>.
                 <br>
@@ -473,23 +526,26 @@
 
     <!--
     /////////////////////
-    // end section 5 //
+    // end section 6 //
     /////////////////////
     -->
 
     <!--
     /////////////////////
-    // start section 6 //
+    // start section 7 //
     /////////////////////
     -->
 
-    <div id="section6" class="section vertical-split">
+    <div id="section7" class="section vertical-split">
         <div class="split high-page" style="flex-direction: column;">
             <div class="split-nosize full-width" style="width: 80%; padding: 1em;">
-                Moving the div will move the skeleton origin. <br>
+                Moving the div will move the skeleton origin.
+                <br>
                 Resizing the div will resize the skeleton in <code>inside</code> mode, but not in <code>origin</code> mode.
+                <br>
+                Interact with the example above dragging the div and resizing it
             </div>
-            <div class="split-nosize full-width" style="width: 80%; height: 50%; margin: 1em; padding: 1em;" id="section6-element">
+            <div class="split-nosize full-width" style="width: 80%; height: 50%; margin: 1em; padding: 1em;" id="section7-element">
                 <spine-widget
                     atlas="assets/cloud-pot-pma.atlas"
                     skeleton="assets/cloud-pot.skel"
@@ -514,17 +570,17 @@
 
     <!--
     /////////////////////
-    // end section 6 //
+    // end section 7 //
     /////////////////////
     -->
 
     <!--
     /////////////////////
-    // start section 7 //
+    // start section 8 //
     /////////////////////
     -->
 
-    <div id="section7" class="section vertical-split">
+    <div id="section8" class="section vertical-split">
 
         <div class="split-top split">
             <div class="split-left">
@@ -557,7 +613,7 @@
 
     <!--
     /////////////////////
-    // end section 7 //
+    // end section 8 //
     /////////////////////
     -->
 
@@ -565,10 +621,10 @@
 
     <!--
     /////////////////////
-    // start section 8 //
+    // start section 9 //
     /////////////////////
     -->
-    <div id="section8" class="section vertical-split">
+    <div id="section9" class="section vertical-split">
 
         <div class="split-top split">
             <div class="split-left">
@@ -630,16 +686,16 @@
     </div>
     <!--
     /////////////////////
-    // end section 8 //
+    // end section 9 //
     /////////////////////
     -->
 
     <!--
     /////////////////////
-    // start section 9 //
+    // start section 10 //
     /////////////////////
     -->
-    <div id="section9" class="section vertical-split">
+    <div id="section10" class="section vertical-split">
 
         <div class="split" style="width: 100%; flex-direction: column;">
 
@@ -868,16 +924,16 @@
     </div>
     <!--
     /////////////////////
-    // end section 9 //
+    // end section 10 //
     /////////////////////
     -->
 
     <!--
     /////////////////////
-    // start section 10 //
+    // start section 11 //
     /////////////////////
     -->
-    <div id="section10" class="section vertical-split">
+    <div id="section11" class="section vertical-split">
 
         <div class="split" style="width: 100%; flex-direction: column;">
 
@@ -1131,16 +1187,16 @@
     </div>
     <!--
     /////////////////////
-    // end section 10 //
+    // end section 11 //
     /////////////////////
     -->
 
     <!--
     /////////////////////
-    // start section 11 //
+    // start section 12 //
     /////////////////////
     -->
-    <div id="section11" class="section vertical-split">
+    <div id="section12" class="section vertical-split">
 
         <div class="split" style="width: 100%; flex-direction: column;">
 
@@ -1253,16 +1309,16 @@ skins.forEach((skin, i) => {
     </div>
     <!--
     /////////////////////
-    // end section 11 //
+    // end section 12 //
     /////////////////////
     -->
 
    <!--
     /////////////////////
-    // start section 12 //
+    // start section 13 //
     /////////////////////
     -->
-    <div id="section12" class="section vertical-split">
+    <div id="section13" class="section vertical-split">
 
         <div class="split" style="width: 100%; flex-direction: column;">
 
@@ -1346,16 +1402,16 @@ skins.forEach((skin, i) => {
     </div>
     <!--
     /////////////////////
-    // end section 12 //
+    // end section 13 //
     /////////////////////
     -->
 
    <!--
     /////////////////////
-    // start section 13 //
+    // start section 14 //
     /////////////////////
     -->
-    <div id="section13" class="section vertical-split">
+    <div id="section14" class="section vertical-split">
 
         <div class="split-top split">
             <div class="split-left">
@@ -1441,16 +1497,16 @@ function loadPageDragon(pageIndex) {
     </div>
     <!--
     /////////////////////
-    // end section 13 //
+    // end section 14 //
     /////////////////////
     -->
 
     <!--
     /////////////////////
-    // start section 14 //
+    // start section 15 //
     /////////////////////
     -->
-    <div id="section14" class="section vertical-split">
+    <div id="section15" class="section vertical-split">
 
         <div class="split" style="width: 100%; flex-direction: column;">
 
@@ -1544,16 +1600,16 @@ stretchyman.update = (canvas, delta, skeleton, state) => {
 
     <!--
     /////////////////////
-    // end section 14 //
+    // end section 15 //
     /////////////////////
     -->
 
     <!--
     /////////////////////
-    // start section 15 //
+    // start section 16 //
     /////////////////////
     -->
-    <div id="section15" class="section vertical-split">
+    <div id="section16" class="section vertical-split">
 
         <div class="split" style="width: 100%; flex-direction: column;">
 
@@ -1649,16 +1705,16 @@ stretchyman.update = (canvas, delta, skeleton, state) => {
 
     <!--
     /////////////////////
-    // end section 15 //
+    // end section 16 //
     /////////////////////
     -->
 
     <!--
     /////////////////////
-    // start section 16 //
+    // start section 17 //
     /////////////////////
     -->
-    <div id="section16" class="section vertical-split">
+    <div id="section17" class="section vertical-split">
 
         <div class="split-left" style="width: 80%; box-sizing: border-box;">
             More examples for <code>clip</code> attribute.
@@ -1798,20 +1854,17 @@ stretchyman.update = (canvas, delta, skeleton, state) => {
 
     <!--
     /////////////////////
-    // end section 16 //
+    // end section 17 //
     /////////////////////
     -->
-
-
-
 
     <!--
     /////////////////////
-    // start section 17 //
+    // start section 18 //
     /////////////////////
     -->
 
-    <div id="section17" class="section vertical-split">
+    <div id="section18" class="section vertical-split">
 
         <div class="split-top split">
             <div class="split-left">
@@ -1844,7 +1897,7 @@ stretchyman.update = (canvas, delta, skeleton, state) => {
 
     <!--
     /////////////////////
-    // end section 17 //
+    // end section 18 //
     /////////////////////
     -->
 
@@ -1947,8 +2000,8 @@ stretchyman.update = (canvas, delta, skeleton, state) => {
         }
     }
 
-    makeDraggable(document.getElementById(`section6-element`));
-    makeResizable(document.getElementById(`section6-element`));
+    makeDraggable(document.getElementById(`section7-element`));
+    makeResizable(document.getElementById(`section7-element`));
 </script>
 </body>
 </html>
