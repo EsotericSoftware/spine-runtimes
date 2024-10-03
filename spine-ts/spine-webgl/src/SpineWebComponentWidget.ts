@@ -530,7 +530,7 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 			throw new Error("You cannot attach a disposed widget");
 		};
 
-		this.overlay.addWidget(this);
+		customElements.whenDefined("spine-overlay").then(() => this.overlay.addWidget(this));
 		if (!this.manualStart && !this.started) {
 			this.start();
 		}
@@ -538,12 +538,10 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 	}
 
 	disconnectedCallback (): void {
-		this.loadingPromise?.then(() => {
-			const index = this.overlay.skeletonList.indexOf(this);
-			if (index !== -1) {
-				this.overlay.skeletonList.splice(index, 1);
-			}
-		});
+		const index = this.overlay.skeletonList.indexOf(this);
+		if (index !== -1) {
+			this.overlay.skeletonList.splice(index, 1);
+		}
 		this.debugDragDiv?.remove();
 	}
 
@@ -573,7 +571,8 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 		}
 		this.started = true;
 
-		this.loadingPromise = this.loadSkeleton();
+		this.loadingPromise = customElements.whenDefined("spine-overlay").then(() => this.loadSkeleton());
+
 		this.loadingPromise.then(() => {
 			this.loading = false;
 		});
