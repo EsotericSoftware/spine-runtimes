@@ -843,6 +843,7 @@ class SpineWebComponentOverlay extends HTMLElement implements Disposable {
 	private fpsAppended = false;
 
 	private intersectionObserver?: IntersectionObserver;
+	private resizeObserver?:ResizeObserver;
 	private input?: Input;
 
 	// how many pixels to add to the edges to prevent "edge cuttin" on fast scrolling
@@ -924,7 +925,6 @@ class SpineWebComponentOverlay extends HTMLElement implements Disposable {
 	}
 
 	connectedCallback (): void {
-		window.addEventListener("resize", this.resizeCallback);
 		window.addEventListener("scroll", this.scrollHandler);
 		window.addEventListener("load", this.onLoadCallback);
 		if (this.loaded) this.onLoadCallback();
@@ -946,6 +946,14 @@ class SpineWebComponentOverlay extends HTMLElement implements Disposable {
 				}
 			})
 		}, { rootMargin: "30px 20px 30px 20px" });
+
+		// resize observer is supported by all major browsers today chrome started to support it in version 64 (early 2018)
+		// we cannot use window.resize event since it does not fire when body resizes, but not the window
+		// Alternatively, we can store the body size, check the current body size in the loop (like the translateCanvas), and
+		// if they differs call the resizeCallback. I already tested it, and it works. ResizeObserver should be more efficient.
+		this.resizeObserver = new ResizeObserver(this.resizeCallback);
+        this.resizeObserver.observe(document.body);
+
 		this.skeletonList.forEach((widget) => {
 			this.intersectionObserver?.observe(widget.getHTMLElementReference());
 		})
@@ -955,11 +963,11 @@ class SpineWebComponentOverlay extends HTMLElement implements Disposable {
 	}
 
 	disconnectedCallback (): void {
-		window.removeEventListener("resize", this.resizeCallback);
 		window.removeEventListener("scroll", this.scrollHandler);
 		window.removeEventListener("load", this.onLoadCallback);
 		window.screen.orientation.removeEventListener('change', this.orientationChangeCallback);
 		this.intersectionObserver?.disconnect();
+		this.resizeObserver?.disconnect();
 		this.input?.dispose();
 	}
 
