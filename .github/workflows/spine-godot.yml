@@ -33,7 +33,7 @@ jobs:
           ./spine-godot/build/build.sh release_debug
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: godot-editor-windows.zip
           path: spine-godot/godot/bin/godot.windows.opt.tools.64.exe
@@ -57,7 +57,7 @@ jobs:
           ./spine-godot/build/build.sh release_debug
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: godot-editor-linux.zip
           path: spine-godot/godot/bin/godot.x11.opt.tools.64
@@ -82,7 +82,7 @@ jobs:
           popd
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: godot-editor-macos.zip
           path: spine-godot/godot/bin/godot-editor-macos.zip
@@ -103,7 +103,7 @@ jobs:
           ./spine-godot/build/build-templates.sh ios
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: godot-template-ios.zip
           path: spine-godot/godot/bin/iphone.zip
@@ -124,7 +124,7 @@ jobs:
           ./spine-godot/build/build-templates.sh macos
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: godot-template-macos.zip
           path: spine-godot/godot/bin/osx.zip
@@ -147,13 +147,13 @@ jobs:
           ./spine-godot/build/build-templates.sh linux
 
       - name: Upload artifacts debug
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: godot-template-linux-debug.zip
           path: spine-godot/godot/bin/linux_x11_64_debug
 
       - name: Upload artifacts release
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: godot-template-linux-release.zip
           path: spine-godot/godot/bin/linux_x11_64_release
@@ -175,13 +175,13 @@ jobs:
           ./spine-godot/build/build-templates.sh windows
 
       - name: Upload artifacts debug
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: godot-template-windows-debug.zip
           path: spine-godot/godot/bin/windows_64_debug.exe
 
       - name: Upload artifacts release
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: godot-template-windows-release.zip
           path: spine-godot/godot/bin/windows_64_release.exe
@@ -215,19 +215,19 @@ jobs:
           ./spine-godot/build/build-templates.sh android
 
       - name: Upload artifacts debug
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: godot-template-android-debug.zip
           path: spine-godot/godot/bin/android_debug.apk
 
       - name: Upload artifacts release
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: godot-template-android-release.zip
           path: spine-godot/godot/bin/android_release.apk
 
       - name: Upload artifacts source
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: godot-template-android-source.zip
           path: spine-godot/godot/bin/android_source.zip
@@ -257,13 +257,13 @@ jobs:
           ./spine-godot/build/build-templates.sh web
 
       - name: Upload artifacts debug
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: godot-template-web-debug.zip
           path: spine-godot/godot/bin/webassembly_debug.zip
 
       - name: Upload artifacts release
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: godot-template-web-release.zip
           path: spine-godot/godot/bin/webassembly_release.zip

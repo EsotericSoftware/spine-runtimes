@@ -77,5 +77,5 @@ void InheritTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vect
 		return;
 	}
 	int idx = Animation::search(_frames, time, ENTRIES) + INHERIT;
-	bone->_inherit = (Inherit) _frames[idx];
+	bone->_inherit = static_cast<Inherit>(_frames[idx]);
 }

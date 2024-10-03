@@ -65,6 +65,8 @@ public:
 
 	Error load_from_atlas_file(const String &path);// .atlas
 
+	Error load_from_atlas_file_internal(const String &path, bool is_importing);// .atlas
+
 	Error load_from_file(const String &path);// .spatlas
 
 	Error save_to_file(const String &path);// .spatlas
