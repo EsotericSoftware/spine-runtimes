@@ -114,6 +114,11 @@ interface WidgetAttributes {
 	padRight: number
 	padTop: number
 	padBottom: number
+	boundsX: number
+	boundsY: number
+	boundsWidth: number
+	boundsHeight: number
+	autoRecalculateBounds: boolean
 	width: number
 	height: number
 	isDraggable: boolean
@@ -281,6 +286,69 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 	public padBottom = 0;
 
 	/**
+	 * A rectangle representing the bounds used to fit the skeleton within the element container.
+	 * The rectangle coordinates and size are expressed in the Spine world space, not the screen space.
+	 * It is automatically calculated using the `skin` and `animation` provided by the user during loading.
+	 * If no skin is provided, it is used the default skin.
+	 * If no animation is provided, it is used the setup pose.
+	 * Bounds are not automatically recalculated.when the animation or skin change.
+	 * Invoke {@link recalculateBounds} to recalculate them, or set {@link autoRecalculateBounds} to true.
+	 * Use `setBounds` to set you desired bounds. Bounding Box might be useful to determine the bounds to be used.
+	 * If the skeleton overflow the element container consider setting {@link clip} to `true`.
+	 */
+	public bounds: Rectangle = { x: 0, y: 0, width: 0, height: 0 };
+
+	/**
+	 * The x of the bounds in Spine world coordinates
+	 * Connected to `bound-x` attribute.
+	 */
+	get boundsX(): number {
+		return this.bounds.x;
+	}
+	set boundsX(value: number) {
+		this.bounds.x = value;
+	}
+
+	/**
+	 * The y of the bounds in Spine world coordinates
+	 * Connected to `bound-y` attribute.
+	 */
+	get boundsY(): number {
+		return this.bounds.y;
+	}
+	set boundsY(value: number) {
+		this.bounds.y = value;
+	}
+
+	/**
+	 * The width of the bounds in Spine world coordinates
+	 * Connected to `bound-width` attribute.
+	 */
+	get boundsWidth(): number {
+		return this.bounds.width;
+	}
+	set boundsWidth(value: number) {
+		this.bounds.width = value;
+	}
+
+	/**
+	 * The height of the bounds in Spine world coordinates
+	 * Connected to `bound-height` attribute.
+	 */
+	get boundsHeight(): number {
+		return this.bounds.height;
+	}
+	set boundsHeight(value: number) {
+		this.bounds.height = value;
+	}
+
+	/**
+	 * Whether or not the bounds are recalculated when an animation or a skin is changed. `false` by default.
+	 * Connected to `auto-recalculate-bounds` attribute.
+	 */
+	public autoRecalculateBounds = false;
+
+	/**
 	 * Specify a fixed width for the widget. If at least one of `width` and `height` is > 0,
 	 * the widget will have an actual size and the element container reference is the widget itself, not the element container parent.
 	 * Connected to `width` attribute.
@@ -417,17 +485,6 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 	public textureAtlas?: TextureAtlas;
 
 	/**
-	 * A rectangle representing the bounds used to fit the skeleton within the element container.
-	 * The rectangle coordinates and size are expressed in the Spine world space, not the screen space.
-	 * It is automatically calculated using the `skin` and `animation` provided by the user during loading.
-	 * If no skin is provided, it is used the default skin.
-	 * If no animation is provided, it is used the setup pose.
-	 * Once loaded, the bounds are not automatically recalculated, but {@link recalculateBounds} need to be invoked.
-	 * Use `setBounds` to set you desired bounds. Bounding Box might be useful to determine the bounds to be used.
-	 */
-	public bounds?: Rectangle;
-
-	/**
 	 * A Promise that resolve to the widget itself once assets loading is terminated.
 	 * Useful to safely access {@link skeleton} and {@link state} after a new widget has been just created.
 	 */
@@ -531,6 +588,11 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 		"pad-right": { propertyName: "padRight", type: "number" },
 		"pad-top": { propertyName: "padTop", type: "number" },
 		"pad-bottom": { propertyName: "padBottom", type: "number" },
+		"bounds-x": { propertyName: "boundsX", type: "number" },
+		"bounds-y": { propertyName: "boundsY", type: "number" },
+		"bounds-width": { propertyName: "boundsWidth", type: "number" },
+		"bounds-height": { propertyName: "boundsHeight", type: "number" },
+		"auto-recalculate-bounds": { propertyName: "autoRecalculateBounds", type: "boolean" },
 		identifier: { propertyName: "identifier", type: "string" },
 		debug: { propertyName: "debug", type: "boolean" },
 		"manual-start": { propertyName: "manualStart", type: "boolean" },
@@ -603,7 +665,9 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 		}
 		this.started = true;
 
-		this.loadingPromise = customElements.whenDefined("spine-overlay").then(() => this.loadSkeleton());
+		if (!this.loadingPromise) {
+			this.loadingPromise = customElements.whenDefined("spine-overlay").then(() => this.loadSkeleton());
+		}
 
 		this.loadingPromise.then(() => {
 			this.loading = false;
@@ -642,30 +706,16 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 	}
 
 	/**
- * Recalculates and sets the bounds of the current animation on track 0.
- * Useful when animations or skins are set programmatically.
- * @returns void
- */
+	 * Recalculates and sets the bounds of the current animation on track 0.
+	 * Useful when animations or skins are set programmatically.
+	 * @returns void
+	 */
 	public recalculateBounds (): void {
 		const { skeleton, state } = this;
 		if (!skeleton || !state) return;
 		const track = state.getCurrent(0);
 		const animation = track?.animation as (Animation | undefined);
 		const bounds = this.calculateAnimationViewport(animation);
-		this.setBounds(bounds);
-	}
-
-	/**
-	 * Set the given bounds on the current skeleton.
-	 * Useful when you want you skeleton to have a fixed size, or you want to
-	 * focus a certain detail of the skeleton. If the skeleton overflow the element container
-	 * consider setting {@link clip} to `true`.
-	 * @param bounds
-	 * @returns
-	 */
-	public setBounds (bounds: Rectangle): void {
-		const { skeleton } = this;
-		if (!skeleton) return;
 		bounds.x /= skeleton.scaleX;
 		bounds.y /= skeleton.scaleY;
 		bounds.width /= skeleton.scaleX;
@@ -677,7 +727,7 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 	private async loadSkeleton () {
 		this.loading = true;
 
-		const { atlasPath, skeletonPath, scale = 1, animation, skeletonData: skeletonDataInput, skin } = this;
+		const { atlasPath, skeletonPath, scale, skeletonData: skeletonDataInput } = this;
 		if (!atlasPath || !skeletonPath) {
 			throw new Error(`Missing atlas path or skeleton path. Assets cannot be loaded: atlas: ${atlasPath}, skeleton: ${skeletonPath}`);
 		}
@@ -718,18 +768,19 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 		// skeleton.scaleX = this.currentScaleDpi;
 		// skeleton.scaleY = this.currentScaleDpi;
 
-		this.initWidget();
+		// the bounds are calculated the first time, if no custom bound is provided
+		this.initWidget(this.bounds.width === 0 || this.bounds.height === 0);
 
 		return this;
 	}
 
-	private initWidget () {
+	private initWidget (forceRecalculate = false) {
 		const { skeleton, state, animation, skin } = this;
 
 		if (skin) skeleton?.setSkinByName(skin);
 		if (animation) state?.setAnimation(0, animation, true);
 
-		this.recalculateBounds();
+		if (forceRecalculate || this.autoRecalculateBounds) this.recalculateBounds();
 	}
 
 	private render (): void {
@@ -1151,7 +1202,7 @@ class SpineWebComponentOverlay extends HTMLElement implements Disposable {
 
 				if (skeleton) {
 					if (mode === "inside") {
-						let { x: ax, y: ay, width: aw, height: ah } = bounds!;
+						let { x: ax, y: ay, width: aw, height: ah } = bounds;
 
 						// scale ratio
 						const scaleWidth = divWidthWorld / aw;
@@ -1227,7 +1278,7 @@ class SpineWebComponentOverlay extends HTMLElement implements Disposable {
 
 					// store the draggable surface to make drag logic easier
 					if (isDraggable) {
-						let { x: ax, y: ay, width: aw, height: ah } = bounds!;
+						let { x: ax, y: ay, width: aw, height: ah } = bounds;
 						this.worldToScreen(tempVector, ax * skeleton.scaleX + worldOffsetX, ay * skeleton.scaleY + worldOffsetY);
 						widget.dragBoundsRectangle.x = tempVector.x + window.scrollX;
 						widget.dragBoundsRectangle.y = tempVector.y - this.worldToScreenLength(ah * skeleton.scaleY) + window.scrollY;
@@ -1243,7 +1294,7 @@ class SpineWebComponentOverlay extends HTMLElement implements Disposable {
 					// drawing debug stuff
 					if (debug) {
 						// if (true) {
-						let { x: ax, y: ay, width: aw, height: ah } = bounds!;
+						let { x: ax, y: ay, width: aw, height: ah } = bounds;
 
 						// show bounds and its center
 						renderer.rect(false,

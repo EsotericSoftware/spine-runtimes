@@ -1901,6 +1901,62 @@ stretchyman.update = (canvas, delta, skeleton, state) => {
     /////////////////////
     -->
 
+    <!--
+    /////////////////////
+    // start section 19 //
+    /////////////////////
+    -->
+
+    <div id="section19" class="section vertical-split">
+
+        <div class="split-top split">
+            <div class="split-left">
+                You can customize the bounds, for example to focus on certain details of your animation.
+                <br>
+                <br>
+                The <code>bounds-x</code>, <code>bounds-y</code>, <code>bounds-width</code> and <code>bounds-height</code> allows to define custom bounds.
+                <br>
+                <br>
+                In this example we're zooming in into Celeste's face. You probably want to use <code>clip</code> in this case to avoid the skeleton overflow.
+            </div>
+            <div class="split-right">
+                <spine-widget
+                    atlas="assets/celestial-circus-pma.atlas"
+                    skeleton="assets/celestial-circus-pro.skel"
+                    animation="wings-and-feet"
+                    bounds-x="-155"
+                    bounds-y="650"
+                    bounds-width="300"
+                    bounds-height="350"
+                    clip
+                ></spine-widget>
+            </div>
+        </div>
+
+        <div class="split-bottom">
+            <pre><code id="code-display">
+                <script>escapeHTMLandInject(`
+<spine-widget
+    atlas="assets/celestial-circus-pma.atlas"
+    skeleton="assets/celestial-circus-pro.skel"
+    animation="wings-and-feet"
+    bounds-x="-155"
+    bounds-y="650"
+    bounds-width="300"
+    bounds-height="350"
+    clip
+></spine-widget>`);</script>
+            </code></pre>
+        </div>
+
+    </div>
+
+    <!--
+    /////////////////////
+    // end section 19 //
+    /////////////////////
+    -->
+
 <script>
     spine.SpineWebComponentWidget.SHOW_FPS = true;
 </script>
