@@ -29,16 +29,41 @@
 
 using System;
 using Unity.Collections;
-using Unity.Jobs;
 using UnityEngine;
-using UnityEngine.Profiling;
 using UnityEngine.UIElements;
 using UIVertex = UnityEngine.UIElements.Vertex;
 
 namespace Spine.Unity {
 
+	public class BoundsFromAnimationAttribute : PropertyAttribute {
+
+		public readonly string animationField;
+		public readonly string dataField;
+		public readonly string skinField;
+
+		public BoundsFromAnimationAttribute (string animationField, string skinField, string dataField = "skeletonDataAsset") {
+			this.animationField = animationField;
+			this.skinField = skinField;
+			this.dataField = dataField;
+		}
+	}
+
 	[UxmlElement]
 	public partial class SpineVisualElement : VisualElement {
+
+		[UxmlAttribute]
+		public SkeletonDataAsset SkeletonDataAsset {
+			get { return skeletonDataAsset; }
+			set {
+				if (skeletonDataAsset == value) return;
+				skeletonDataAsset = value;
+#if UNITY_EDITOR
+				if (!Application.isPlaying)
+					Initialize(true);
+#endif
+			}
+		}
+		public SkeletonDataAsset skeletonDataAsset;
 
 		[SpineAnimation(dataField: "SkeletonDataAsset", avoidGenericMenu: true)]
 		[UxmlAttribute]
@@ -55,7 +80,7 @@ namespace Spine.Unity {
 		}
 		public string startingAnimation = "";
 
-		[SpineSkin(dataField: "SkeletonDataAsset", avoidGenericMenu: true)]
+		[SpineSkin(dataField: "SkeletonDataAsset", defaultAsEmptyString: true, avoidGenericMenu: true)]
 		[UxmlAttribute]
 		public string InitialSkinName {
 			get { return initialSkinName; }
@@ -73,19 +98,42 @@ namespace Spine.Unity {
 		[UxmlAttribute] public bool startingLoop { get; set; } = true;
 		[UxmlAttribute] public float timeScale { get; set; } = 1.0f;
 
+		[SpineAnimation(dataField: "SkeletonDataAsset", avoidGenericMenu: true)]
 		[UxmlAttribute]
-		public SkeletonDataAsset SkeletonDataAsset {
-			get { return skeletonDataAsset; }
+		public string BoundsAnimation {
+			get { return boundsAnimation; }
 			set {
-				if (skeletonDataAsset == value) return;
-				skeletonDataAsset = value;
+				boundsAnimation = value;
 #if UNITY_EDITOR
-				if (!Application.isPlaying)
-					Initialize(true);
+				if (!Application.isPlaying) {
+					if (!this.IsValid)
+						Initialize(true);
+					else {
+						UpdateAnimation();
+					}
+				}
 #endif
 			}
 		}
-		public SkeletonDataAsset skeletonDataAsset;
+		public string boundsAnimation = "";
+
+		[UxmlAttribute]
+		[BoundsFromAnimation(animationField: "BoundsAnimation",
+			skinField: "InitialSkinName", dataField: "SkeletonDataAsset")]
+		public Bounds ReferenceBounds {
+			get { return referenceMeshBounds; }
+			set {
+				if (referenceMeshBounds == value) return;
+#if UNITY_EDITOR
+				if (!Application.isPlaying && (value.size.x == 0 || value.size.y == 0)) return;
+#endif
+				referenceMeshBounds = value;
+				if (!this.IsValid) return;
+
+				AdjustOffsetScaleToMeshBounds(rendererElement);
+			}
+		}
+		public Bounds referenceMeshBounds;
 
 		public AnimationState AnimationState {
 			get {
@@ -93,21 +141,22 @@ namespace Spine.Unity {
 				return state;
 			}
 		}
+		[UxmlAttribute]
 		public bool freeze { get; set; }
+		[UxmlAttribute]
 		public bool unscaledTime { get; set; }
 
 		/// <summary>Update mode to optionally limit updates to e.g. only apply animations but not update the mesh.</summary>
 		public UpdateMode UpdateMode { get { return updateMode; } set { updateMode = value; } }
 		protected UpdateMode updateMode = UpdateMode.FullUpdate;
 
-		protected AnimationState state;
-		protected Skeleton skeleton;
+		protected AnimationState state = null;
+		protected Skeleton skeleton = null;
 		protected SkeletonRendererInstruction currentInstructions = new();// to match existing code better
 		protected Spine.Unity.MeshGeneratorUIElements meshGenerator = new MeshGeneratorUIElements();
 
 		protected VisualElement rendererElement;
 		IVisualElementScheduledItem scheduledItem;
-		protected Bounds referenceMeshBounds;
 		protected float scale = 100;
 		protected float offsetX, offsetY;
 
@@ -131,6 +180,10 @@ namespace Spine.Unity {
 		}
 
 		void OnGeometryChanged (GeometryChangedEvent evt) {
+			if (!this.IsValid) return;
+			if (referenceMeshBounds.size.x == 0 || referenceMeshBounds.size.y == 0) {
+				AdjustReferenceMeshBounds();
+			}
 			AdjustOffsetScaleToMeshBounds(rendererElement);
 		}
 
@@ -154,7 +207,6 @@ namespace Spine.Unity {
 				return;
 			}
 #endif
-
 			if (freeze) return;
 			Update(unscaledTime ? Time.unscaledDeltaTime : Time.deltaTime);
 			rendererElement.MarkDirtyRepaint();
@@ -212,16 +264,43 @@ namespace Spine.Unity {
 			if (!string.IsNullOrEmpty(initialSkinName))
 				skeleton.SetSkin(initialSkinName);
 
-			if (!string.IsNullOrEmpty(startingAnimation)) {
-				var animationObject = SkeletonDataAsset.GetSkeletonData(false).FindAnimation(startingAnimation);
+			string displayedAnimation = Application.isPlaying ? startingAnimation : boundsAnimation;
+			if (!string.IsNullOrEmpty(displayedAnimation)) {
+				var animationObject = skeletonData.FindAnimation(displayedAnimation);
 				if (animationObject != null) {
 					state.SetAnimation(0, animationObject, startingLoop);
 				}
 			}
+			if (referenceMeshBounds.size.x == 0 || referenceMeshBounds.size.y == 0) {
+				AdjustReferenceMeshBounds();
+				AdjustOffsetScaleToMeshBounds(rendererElement);
+			}
 
-			AdjustReferenceMeshBounds();
 			if (scheduledItem == null)
 				scheduledItem = schedule.Execute(Update).Every(1);
+
+			if (!Application.isPlaying)
+				Update(0.0f);
+
+			rendererElement.MarkDirtyRepaint();
+		}
+
+		protected void UpdateAnimation () {
+			this.state.ClearTracks();
+			skeleton.SetToSetupPose();
+
+			string displayedAnimation = Application.isPlaying ? startingAnimation : boundsAnimation;
+			if (!string.IsNullOrEmpty(displayedAnimation)) {
+				var animationObject = SkeletonDataAsset.GetSkeletonData(false).FindAnimation(displayedAnimation);
+				if (animationObject != null) {
+					state.SetAnimation(0, animationObject, startingLoop);
+				}
+			}
+			if (referenceMeshBounds.size.x == 0 || referenceMeshBounds.size.y == 0) {
+				AdjustReferenceMeshBounds();
+				AdjustOffsetScaleToMeshBounds(rendererElement);
+			}
+			Update(0.0f);
 
 			rendererElement.MarkDirtyRepaint();
 		}
@@ -320,6 +399,8 @@ namespace Spine.Unity {
 		}
 
 		public void AdjustReferenceMeshBounds () {
+			if (skeleton == null)
+				return;
 
 			// Need one update to obtain valid mesh bounds
 			Update(0.0f);
@@ -332,12 +413,18 @@ namespace Spine.Unity {
 				var submeshInstructionItem = currentInstructions.submeshInstructions.Items[i];
 				meshGenerator.AddSubmesh(submeshInstructionItem);
 			}
-
-			referenceMeshBounds = meshGenerator.GetMeshBounds();
+			Bounds meshBounds = meshGenerator.GetMeshBounds();
+			if (meshBounds.extents.x == 0 || meshBounds.extents.y == 0) {
+				ReferenceBounds = new Bounds(Vector3.zero, Vector3.one * 2f);
+			} else {
+				ReferenceBounds = meshBounds;
+			}
 		}
 
 		void AdjustOffsetScaleToMeshBounds (VisualElement visualElement) {
 			Rect targetRect = visualElement.layout;
+			if (float.IsNaN(targetRect.width)) return;
+
 			float xScale = targetRect.width / referenceMeshBounds.size.x;
 			float yScale = targetRect.height / referenceMeshBounds.size.y;
 			this.scale = Math.Min(xScale, yScale);

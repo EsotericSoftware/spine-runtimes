@@ -288,8 +288,9 @@ class IkConstraint implements Updatable {
 				q = -(c1 + q) / 2;
 				var r0:Float = q / c2, r1:Float = c / q;
 				var r:Float = Math.abs(r0) < Math.abs(r1) ? r0 : r1;
-				if (r * r <= dd) {
-					y = Math.sqrt(dd - r * r) * bendDir;
+				r0 = dd - r * r;
+				if (r0 >= 0) {
+					y = Math.sqrt(r0) * bendDir;
 					a1 = ta - Math.atan2(y, r);
 					a2 = Math.atan2(y / psy, (r - l1) / psx);
 					breakOuter = true;

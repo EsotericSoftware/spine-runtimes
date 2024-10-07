@@ -921,7 +921,7 @@ void AnimationState::setAttachment(Skeleton &skeleton, Slot &slot, const String 
 void AnimationState::queueEvents(TrackEntry *entry, float animationTime) {
 	float animationStart = entry->_animationStart, animationEnd = entry->_animationEnd;
 	float duration = animationEnd - animationStart;
-	float trackLastWrapped = MathUtil::fmod(entry->_trackLast, duration);
+	float trackLastWrapped = duration != 0 ? MathUtil::fmod(entry->_trackLast, duration) : MathUtil::quietNan();
 
 	// Queue events before complete.
 	size_t i = 0, n = _events.size();

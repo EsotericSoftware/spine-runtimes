@@ -200,12 +200,13 @@ export class Bone implements Updatable {
 				break;
 			}
 			case Inherit.NoRotationOrReflection: {
+				let sx = 1 / this.skeleton.scaleX, sy = 1 / this.skeleton.scaleY;
+				pa *= sx;
+				pc *= sy;
 				let s = pa * pa + pc * pc;
 				let prx = 0;
 				if (s > 0.0001) {
-					s = Math.abs(pa * pd - pb * pc) / s;
-					pa /= this.skeleton.scaleX;
-					pc /= this.skeleton.scaleY;
+					s = Math.abs(pa * pd * sy - pb * sx * pc) / s;
 					pb = pc * s;
 					pd = pa * s;
 					prx = Math.atan2(pc, pa) * MathUtils.radDeg;
@@ -311,10 +312,8 @@ export class Bone implements Updatable {
 			switch (this.inherit) {
 				case Inherit.NoRotationOrReflection: {
 					let s = Math.abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
-					let sa = pa / this.skeleton.scaleX;
-					let sc = pc / this.skeleton.scaleY;
-					pb = -sc * s * this.skeleton.scaleX;
-					pd = sa * s * this.skeleton.scaleY;
+					pb = -pc * this.skeleton.scaleX * s / this.skeleton.scaleY;
+					pd = pa * this.skeleton.scaleY * s / this.skeleton.scaleX;
 					pid = 1 / (pa * pd - pb * pc);
 					ia = pd * pid;
 					ib = pb * pid;

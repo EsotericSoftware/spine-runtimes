@@ -835,6 +835,11 @@ export class InheritTimeline extends Timeline implements BoneTimeline {
 		let bone = skeleton.bones[this.boneIndex];
 		if (!bone.active) return;
 
+		if (direction == MixDirection.mixOut) {
+			if (blend == MixBlend.setup) bone.inherit = bone.data.inherit;
+			return;
+		}
+
 		let frames = this.frames;
 		if (time < frames[0]) {
 			if (blend == MixBlend.setup || blend == MixBlend.first) bone.inherit = bone.data.inherit;

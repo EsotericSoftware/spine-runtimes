@@ -128,10 +128,10 @@ namespace Spine.Unity.Editor {
 				Mesh mesh = meshFilter.sharedMesh;
 				if (mesh == null) continue;
 
-				string meshName = string.Format("Skeleton Prefab Mesh \"{0}\"", renderer.name);
+				string meshName = string.Format("Skeleton Prefab Mesh [{0}]", renderer.name);
 				if (nameUsageCount.ContainsKey(meshName)) {
 					nameUsageCount[meshName]++;
-					meshName = string.Format("Skeleton Prefab Mesh \"{0} ({1})\"", renderer.name, nameUsageCount[meshName]);
+					meshName = string.Format("Skeleton Prefab Mesh [{0} ({1})]", renderer.name, nameUsageCount[meshName]);
 				} else {
 					nameUsageCount.Add(meshName, 0);
 				}

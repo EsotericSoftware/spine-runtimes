@@ -17,7 +17,7 @@
 
 <body class="p-4 flex flex-col items-center">
     <h1>CanvasKit Example</h1>
-    <canvas id=foo width=600 height=400 style="margin: 0 auto;"></canvas>
+    <canvas id=foo style="margin: 0 auto; width: 600px; height: 400px;"></canvas>
 </body>
 
 <script type="module">
@@ -28,10 +28,18 @@
         return await response.arrayBuffer();
     }
 
+    // Ensure we render at full DPI.
+    const canvasElement = document.querySelector("#foo");
+    const dpr = window.devicePixelRatio || 1;
+    canvasElement.width = canvasElement.clientWidth * dpr;
+    canvasElement.height = canvasElement.clientHeight * dpr;
 
     // Initialize CanvasKit and create a surface from the Canvas element to draw to
     const ck = await CanvasKitInit();
     const surface = ck.MakeCanvasSurface('foo');
+
+    // Scale the CanvasKit coordinate system
+    surface.getCanvas().scale(dpr, dpr);
 
     // Load the texture atlas
     const atlas = await spine.loadTextureAtlas(ck, "assets/spineboy.atlas", readFile);
@@ -54,6 +62,7 @@
     let lastTime = performance.now();
     // Rendering loop
     function drawFrame(canvas) {
+        // Clear the canvas
         canvas.clear(ck.Color(52, 52, 54, 1));
 
         // Calculate the time that's passed between now and the last frame

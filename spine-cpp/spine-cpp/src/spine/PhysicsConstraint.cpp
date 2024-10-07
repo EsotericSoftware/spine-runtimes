@@ -334,22 +334,24 @@ void PhysicsConstraint::update(Physics physics) {
 				_ux = bx;
 				_uy = by;
 			} else {
-				float a = _remaining, i = _inertia, q = _data._limit * delta, t = _data._step, f = _skeleton.getData()->getReferenceScale(), d = -1;
+				float a = _remaining, i = _inertia, t = _data._step, f = _skeleton.getData()->getReferenceScale();
+				float qx = _data._limit * delta, qy = qx * MathUtil::abs(_skeleton.getScaleX());
+				qx *= MathUtil::abs(_skeleton.getScaleY());
 				if (x || y) {
 					if (x) {
 						float u = (_ux - bx) * i;
-						_xOffset += u > q ? q : u < -q ? -q
-													   : u;
+						_xOffset += u > qx ? qx : u < -qx ? -qx
+														  : u;
 						_ux = bx;
 					}
 					if (y) {
 						float u = (_uy - by) * i;
-						_yOffset += u > q ? q : u < -q ? -q
-													   : u;
+						_yOffset += u > qy ? qy : u < -qy ? -qy
+														  : u;
 						_uy = by;
 					}
 					if (a >= t) {
-						d = MathUtil::pow(_damping, 60 * t);
+						float d = MathUtil::pow(_damping, 60 * t);
 						float m = _massInverse * t, e = _strength, w = _wind * f, g = _gravity * f * (Bone::yDown ? -1 : 1);
 						do {
 							if (x) {
@@ -372,14 +374,14 @@ void PhysicsConstraint::update(Physics physics) {
 				if (rotateOrShearX || scaleX) {
 					float ca = MathUtil::atan2(bone->_c, bone->_a), c, s, mr = 0;
 					float dx = _cx - bone->_worldX, dy = _cy - bone->_worldY;
-					if (dx > q)
-						dx = q;
-					else if (dx < -q)//
-						dx = -q;
-					if (dy > q)
-						dy = q;
-					else if (dy < -q)//
-						dy = -q;
+					if (dx > qx)
+						dx = qx;
+					else if (dx < -qx)//
+						dx = -qx;
+					if (dy > qy)
+						dy = qy;
+					else if (dy < -qy)//
+						dy = -qy;
 					if (rotateOrShearX) {
 						mr = (_data._rotate + _data._shearX) * mix;
 						float r = MathUtil::atan2(dy + _ty, dx + _tx) - ca - _rotateOffset * mr;
@@ -399,8 +401,8 @@ void PhysicsConstraint::update(Physics physics) {
 					}
 					a = _remaining;
 					if (a >= t) {
-						if (d == -1) d = MathUtil::pow(_damping, 60 * t);
 						float m = _massInverse * t, e = _strength, w = _wind, g = _gravity * (Bone::yDown ? -1 : 1), h = l / f;
+						float d = MathUtil::pow(_damping, 60 * t);
 						while (true) {
 							a -= t;
 							if (scaleX) {

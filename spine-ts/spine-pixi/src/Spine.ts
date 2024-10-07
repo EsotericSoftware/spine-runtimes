@@ -143,6 +143,7 @@ export class Spine extends Container {
 
 	private lightColor = new Color();
 	private darkColor = new Color();
+	private clippingVertAux = new Float32Array(6);
 
 	constructor (skeletonData: SkeletonData, options?: ISpineOptions) {
 		super();
@@ -225,10 +226,19 @@ export class Spine extends Container {
 	}
 
 	/**
+	 * Check the existence of a mesh for the given slot.
+	 * If you want to manually handle which meshes go on which slot and how you cache, overwrite this method.
+	 */
+	protected hasMeshForSlot (slot: Slot) {
+		return this.meshesCache.has(slot);
+	}
+
+	/**
+	 * Search the mesh corresponding to the given slot or create it, if it does not exists.
 	 * If you want to manually handle which meshes go on which slot and how you cache, overwrite this method.
 	 */
 	protected getMeshForSlot (slot: Slot): ISlotMesh {
-		if (!this.meshesCache.has(slot)) {
+		if (!this.hasMeshForSlot(slot)) {
 			let mesh = this.slotMeshFactory();
 			this.addChild(mesh);
 			this.meshesCache.set(slot, mesh);
@@ -319,7 +329,9 @@ export class Spine extends Container {
 		}
 	}
 	private updatePixiObject (pixiObject: Container, slot: Slot, zIndex: number) {
-		pixiObject.setTransform(slot.bone.worldX, slot.bone.worldY, slot.bone.getWorldScaleX(), slot.bone.getWorldScaleX(), slot.bone.getWorldRotationX() * MathUtils.degRad);
+		pixiObject.position.set(slot.bone.worldX, slot.bone.worldY);
+		pixiObject.scale.set(slot.bone.getWorldScaleX(), slot.bone.getWorldScaleX());
+		pixiObject.rotation = slot.bone.getWorldRotationX() * MathUtils.degRad;
 		pixiObject.zIndex = zIndex + 1;
 		pixiObject.alpha = this.skeleton.color.a * slot.color.a;
 	}
@@ -334,9 +346,15 @@ export class Spine extends Container {
 			if (!pixiMaskSource.computed) {
 				pixiMaskSource.computed = true;
 				const clippingAttachment = pixiMaskSource.slot.attachment as ClippingAttachment;
-				const world = Array.from(clippingAttachment.vertices);
-				clippingAttachment.computeWorldVertices(pixiMaskSource.slot, 0, clippingAttachment.worldVerticesLength, world, 0, 2);
-				mask.clear().lineStyle(0).beginFill(0x000000).drawPolygon(world);
+				const worldVerticesLength = clippingAttachment.worldVerticesLength;
+				if (this.clippingVertAux.length < worldVerticesLength) this.clippingVertAux = new Float32Array(worldVerticesLength);
+				clippingAttachment.computeWorldVertices(pixiMaskSource.slot, 0, worldVerticesLength, this.clippingVertAux, 0, 2);
+				mask.clear().lineStyle(0).beginFill(0x000000);
+				mask.moveTo(this.clippingVertAux[0], this.clippingVertAux[1]);
+				for (let i = 2; i < worldVerticesLength; i += 2) {
+					mask.lineTo(this.clippingVertAux[i], this.clippingVertAux[i + 1]);
+				}
+				mask.finishPoly();
 			}
 			pixiObject.mask = mask;
 		} else if (pixiObject.mask) {
@@ -344,13 +362,13 @@ export class Spine extends Container {
 		}
 	}
 
-	/* 
+	/*
 	* Colors in pixi are premultiplied.
 	* Pixi blending modes are modified to work with premultiplied colors. We cannot create custom blending modes.
 	* Textures are loaded as premultiplied (see assers/atlasLoader.ts: alphaMode: `page.pma ? ALPHA_MODES.PMA : ALPHA_MODES.UNPACK`):
 	* - textures non premultiplied are premultiplied on GPU on upload
 	* - textures premultiplied are uploaded on GPU as is since they are already premultiplied
-	* 
+	*
 	* We need to take this into consideration and calculates final colors for both light and dark color as if textures were always premultiplied.
 	* This implies for example that alpha for dark tint is always 1. This is way in DarkTintRenderer we have only the alpha of the light color.
 	* If we ever want to load texture as non premultiplied on GPU, we must add a new dark alpha parameter to the TintMaterial and set the alpha.
@@ -410,6 +428,9 @@ export class Spine extends Container {
 				pixiMaskSource = { slot, computed: false };
 				continue;
 			} else {
+				if (this.hasMeshForSlot(slot)) {
+					this.getMeshForSlot(slot).visible = false;
+				}
 				Spine.clipper.clipEndWithSlot(slot);
 				this.pixiMaskCleanup(slot);
 				continue;
@@ -481,6 +502,7 @@ export class Spine extends Container {
 				}
 
 				const mesh = this.getMeshForSlot(slot);
+				mesh.renderable = true;
 				mesh.zIndex = zIndex;
 				mesh.updateFromSpineData(texture, slot.data.blendMode, slot.data.name, finalVertices, finalVerticesLength, finalIndices, finalIndicesLength, useDarkColor);
 			}

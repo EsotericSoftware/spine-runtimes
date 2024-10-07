@@ -149,7 +149,12 @@ VertexOutput vert(appdata v) {
 	half3 vertexSH;
 #if IS_URP_15_OR_NEWER
 	#ifdef OUTPUT_SH4
-		OUTPUT_SH4(positionWS, normalWS.xyz, GetWorldSpaceNormalizeViewDir(positionWS), vertexSH);
+		#if IS_URP_17_OR_NEWER
+			float4 ignoredProbeOcclusion;
+			OUTPUT_SH4(positionWS, normalWS.xyz, GetWorldSpaceNormalizeViewDir(positionWS), vertexSH, ignoredProbeOcclusion);
+		#else // 15 or newer
+			OUTPUT_SH4(positionWS, normalWS.xyz, GetWorldSpaceNormalizeViewDir(positionWS), vertexSH);
+		#endif
 	#else
 		OUTPUT_SH(positionWS, normalWS.xyz, GetWorldSpaceNormalizeViewDir(positionWS), vertexSH);
 	#endif

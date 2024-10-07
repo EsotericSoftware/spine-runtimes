@@ -27,6 +27,12 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+// In order to respect TransformConstraints modifying the scale of parent bones,
+// GetScaleAffectingRootMotion() now uses parentBone.AScaleX and AScaleY instead
+// of previously used ScaleX and ScaleY. If you require the previous behaviour,
+// comment out the define below.
+#define USE_APPLIED_PARENT_SCALE
+
 using Spine.Unity.AnimationTools;
 using System;
 using System.Collections.Generic;
@@ -42,8 +48,7 @@ namespace Spine.Unity {
 
 		#region Inspector
 		[SpineBone]
-		[SerializeField]
-		protected string rootMotionBoneName = "root";
+		public string rootMotionBoneName = "root";
 		public bool transformPositionX = true;
 		public bool transformPositionY = true;
 		public bool transformRotation = false;
@@ -155,6 +160,14 @@ namespace Spine.Unity {
 		}
 
 		protected virtual void Start () {
+			Initialize();
+		}
+
+		protected void InitializeOnRebuild (ISkeletonAnimation animatedSkeletonComponent) {
+			Initialize();
+		}
+
+		public virtual void Initialize () {
 			skeletonComponent = GetComponent<ISkeletonComponent>();
 			GatherTopLevelBones();
 			SetRootMotionBone(rootMotionBoneName);
@@ -167,6 +180,16 @@ namespace Spine.Unity {
 			if (skeletonAnimation != null) {
 				skeletonAnimation.UpdateLocal -= HandleUpdateLocal;
 				skeletonAnimation.UpdateLocal += HandleUpdateLocal;
+
+				skeletonAnimation.OnAnimationRebuild -= InitializeOnRebuild;
+				skeletonAnimation.OnAnimationRebuild += InitializeOnRebuild;
+
+				SkeletonUtility skeletonUtility = GetComponent<SkeletonUtility>();
+				if (skeletonUtility != null) {
+					// SkeletonUtilityBone shall receive UpdateLocal callbacks for bone-following after root motion
+					// clears the root-bone position.
+					skeletonUtility.ResubscribeEvents();
+				}
 			}
 		}
 
@@ -198,6 +221,13 @@ namespace Spine.Unity {
 					}
 
 					Vector2 rigidbodyDisplacement2D = new Vector2(rigidbodyDisplacement.x, rigidbodyDisplacement.y);
+					// Note: MovePosition seems to be the only precise and reliable way to set movement delta,
+					// for both 2D and 3D rigidbodies.
+					// Setting velocity like "rigidBody2D.velocity = movement/deltaTime" works perfectly in mid-air
+					// without gravity and ground collision, unfortunately when on the ground, friction causes severe
+					// slowdown. Using a zero-friction PhysicsMaterial leads to sliding endlessly along the ground as
+					// soon as forces are applied. Additionally, there is no rigidBody2D.isGrounded, requiring our own
+					// checks.
 					rigidBody2D.MovePosition(gravityAndVelocityMovement + new Vector2(rigidBody2D.position.x, rigidBody2D.position.y)
 						+ rigidbodyDisplacement2D + additionalRigidbody2DMovement);
 					rigidBody2D.MoveRotation(rigidbody2DRotation + rigidBody2D.rotation);
@@ -271,7 +301,8 @@ namespace Spine.Unity {
 				this.rootMotionBone = bone;
 				FindTransformConstraintsAffectingBone();
 			} else {
-				Debug.Log("Bone named \"" + name + "\" could not be found.");
+				Debug.Log("Bone named \"" + name + "\" could not be found. " +
+					"Set 'skeletonRootMotion.rootMotionBoneName' before calling 'skeletonAnimation.Initialize(true)'.");
 				this.rootMotionBoneIndex = 0;
 				this.rootMotionBone = skeleton.RootBone;
 			}
@@ -623,8 +654,13 @@ namespace Spine.Unity {
 			parentBoneScale = Vector2.one;
 			Bone scaleBone = rootMotionBone;
 			while ((scaleBone = scaleBone.Parent) != null) {
+#if USE_APPLIED_PARENT_SCALE
+				parentBoneScale.x *= scaleBone.AScaleX;
+				parentBoneScale.y *= scaleBone.AScaleY;
+#else
 				parentBoneScale.x *= scaleBone.ScaleX;
 				parentBoneScale.y *= scaleBone.ScaleY;
+#endif
 			}
 			totalScale = Vector2.Scale(totalScale, parentBoneScale);
 			totalScale *= AdditionalScale;

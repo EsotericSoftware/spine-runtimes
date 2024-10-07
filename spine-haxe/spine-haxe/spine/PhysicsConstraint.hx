@@ -32,7 +32,7 @@ package spine;
 class PhysicsConstraint implements Updatable {
 	private var _data:PhysicsConstraintData;
 	private var _bone:Bone = null;
-	
+
 	public var inertia:Float = 0;
 	public var strength:Float = 0;
 	public var damping:Float = 0;
@@ -63,7 +63,7 @@ class PhysicsConstraint implements Updatable {
 	private var _skeleton:Skeleton;
 	public var remaining:Float = 0;
 	public var lastTime:Float = 0;
-	
+
 	public function new(data: PhysicsConstraintData, skeleton: Skeleton) {
 		_data = data;
 		_skeleton = skeleton;
@@ -123,7 +123,7 @@ class PhysicsConstraint implements Updatable {
 				return;
 			case Physics.reset, Physics.update:
 				if (physics == Physics.reset) reset();
-				
+
 				var delta:Float = Math.max(skeleton.time - lastTime, 0);
 				remaining += delta;
 				lastTime = _skeleton.time;
@@ -136,19 +136,22 @@ class PhysicsConstraint implements Updatable {
 				} else {
 					var a:Float = remaining,
 						i:Float = inertia,
-						q:Float = _data.limit * delta,
 						t:Float = _data.step,
 						f:Float = skeleton.data.referenceScale,
 						d:Float = -1;
+
+					var qx:Float = _data.limit * delta,
+						qy:Float = qx * Math.abs(skeleton.scaleY);
+					qx *= Math.abs(skeleton.scaleX);
 					if (x || y) {
 						if (x) {
 							var u:Float = (ux - bx) * i;
-							xOffset += u > q ? q : u < -q ? -q : u;
+							xOffset += u > qx ? qx : u < -qx ? -qx : u;
 							ux = bx;
 						}
 						if (y) {
 							var u:Float = (uy - by) * i;
-							yOffset += u > q ? q : u < -q ? -q : u;
+							yOffset += u > qy ? qy : u < -qy ? -qy : u;
 							uy = by;
 						}
 						if (a >= t) {
@@ -181,14 +184,14 @@ class PhysicsConstraint implements Updatable {
 							mr:Float = 0;
 						var dx:Float = cx - bone.worldX,
 							dy:Float = cy - bone.worldY;
-						if (dx > q)
-							dx = q;
-						else if (dx < -q) //
-							dx = -q;
-						if (dy > q)
-							dy = q;
-						else if (dy < -q) //
-							dy = -q;
+						if (dx > qx)
+							dx = qx;
+						else if (dx < -qx) //
+							dx = -qx;
+						if (dy > qy)
+							dy = qy;
+						else if (dy < -qy) //
+							dy = -qy;
 						if (rotateOrShearX) {
 							mr = (_data.rotate + _data.shearX) * mix;
 							var r:Float = Math.atan2(dy + ty, dx + tx) - ca - rotateOffset * mr;

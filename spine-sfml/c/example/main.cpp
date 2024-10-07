@@ -760,6 +760,7 @@ void celestialCircus(spSkeletonData *skeletonData, spAtlas *atlas) {
 	spSkeleton *skeleton = drawable->skeleton;
 	skeleton->x = 320;
 	skeleton->y = 480;
+    skeleton->scaleX = skeleton->scaleY = 0.2f;
 	spSkeleton_updateWorldTransform(skeleton, SP_PHYSICS_UPDATE);
 	spAnimationState_setAnimationByName(drawable->state, 0, "swing", true);
 
@@ -784,9 +785,9 @@ void celestialCircus(spSkeletonData *skeletonData, spAtlas *atlas) {
 }
 
 int main() {
+    testcase(celestialCircus, "data/celestial-circus-pro.json", "data/celestial-circus-pro.skel", "data/celestial-circus-pma.atlas", 1);
 	testcase(cloudpot, "data/cloud-pot.json", "data/cloud-pot.skel", "data/cloud-pot-pma.atlas", 0.2);
 	testcase(sack, "data/sack-pro.json", "data/sack-pro.skel", "data/sack-pma.atlas", 0.2f);
-	testcase(celestialCircus, "data/celestial-circus-pro.json", "data/celestial-circus-pro.skel", "data/celestial-circus-pma.atlas", 0.2f);
 	testcase(snowglobe, "data/snowglobe-pro.json", "data/snowglobe-pro.skel", "data/snowglobe-pma.atlas", 0.2f);
 	testcase(raptor, "data/raptor-pro.json", "data/raptor-pro.skel", "data/raptor-pma.atlas", 0.5f);
 	testcase(dragon, "data/dragon-ess.json", "data/dragon-ess.skel", "data/dragon-pma.atlas", 0.6f);

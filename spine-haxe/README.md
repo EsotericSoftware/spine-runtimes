@@ -1,8 +1,10 @@
-> **Note**: this runtime is a work in progress. Please follow this issue to get alerted once the runtime is deemed complete. https://github.com/EsotericSoftware/spine-runtimes/issues/2249
-
 # spine-haxe
 
 The spine-haxe runtime provides functionality to load, manipulate and render [Spine](http://esotericsoftware.com) skeletal animation data using [Haxe](https://haxe.org/) in combination with [OpenFL](https://www.openfl.org/) and [Lime](https://lime.openfl.org/).
+
+For documentation of the core API in `spine-core`, please refer to our [Spine Runtimes Guide](http://esotericsoftware.com/spine-runtimes-guide).
+
+For documentation of `spine-haxe`, please refer to our [spine-haxe Guide](https://esotericsoftware.com/spine-haxe).
 
 ## Licensing
 
@@ -21,12 +23,31 @@ spine-haxe works with data exported from Spine 4.2.xx.
 spine-haxe supports all Spine features except premultiplied alpha atlases and two color tinting.
 
 ## Setup
+The core module of spine-haxe has zero dependencies. The rendering implementation through Starling has two dependencies: openfl and starling.
+To use spine-haxe you have first to install all the necessary dependencies:
 
-TBD
+```
+haxelib install openfl
+haxelib install starling
+```
+
+Once you have installed the dependencies, you can [download the latest version of spine-haxe](https://esotericsoftware.com/files/spine-haxe/4.2/spine-haxe-latest.zip) and install it:
+
+```
+haxelib install spine-haxe-x.y.z.zip
+```
+
+Notice that the spine-haxe library is not available on [lib.haxe.org](https://lib.haxe.org/). This is why you need to download the library and install it through the zip archive.
 
 ## Example
 
-TBD
+The `example/` folder contains the spine-haxe examples. They demonstrates the usage of the API. Enter the the `spine-haxe` folder and run the following command:
+
+```
+lime test html5
+```
+
+This will compile the modules and start a server that serves the example pages at http://127.0.0.1:3000.
 
 ## Development
 

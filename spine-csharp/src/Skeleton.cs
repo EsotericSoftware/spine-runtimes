@@ -68,7 +68,7 @@ namespace Spine {
 		/// <summary>The skeleton's transform constraints.</summary>
 		public ExposedList<TransformConstraint> TransformConstraints { get { return transformConstraints; } }
 
-		/// <summary>The skeleton's current skin.</summary>
+		/// <summary>The skeleton's current skin. May be null. See <see cref="SetSkin(Spine.Skin)"/></summary>
 		public Skin Skin {
 			/// <summary>The skeleton's current skin. May be null.</summary>
 			get { return skin; }
@@ -561,7 +561,7 @@ namespace Spine {
 			return null;
 		}
 
-		/// <summary>Sets a skin by name (see <see cref="SetSkin(Skin)"/>).</summary>
+		/// <summary>Sets a skin by name (see <see cref="SetSkin(Spine.Skin)"/>).</summary>
 		public void SetSkin (string skinName) {
 			Skin foundSkin = data.FindSkin(skinName);
 			if (foundSkin == null) throw new ArgumentException("Skin not found: " + skinName, "skinName");

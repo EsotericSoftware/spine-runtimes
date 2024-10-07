@@ -132,6 +132,18 @@ elif [ "$platform" = "web" ]; then
 	scons platform=web tools=no target=template_debug custom_modules="../spine_godot" --jobs=$cpus
 	mv bin/godot.web.template_release.wasm32.zip bin/web_release.zip
 	mv bin/godot.web.template_debug.wasm32.zip bin/web_debug.zip
+	scons platform=web tools=no threads=no target=template_release custom_modules="../spine_godot" --jobs=$cpus
+	scons platform=web tools=no threads=no target=template_debug custom_modules="../spine_godot" --jobs=$cpus
+	mv bin/godot.web.template_release.wasm32.zip bin/web_nothreads_release.zip
+	mv bin/godot.web.template_debug.wasm32.zip bin/web_nothreads_debug.zip
+	scons platform=web tools=no dlink_enabled=yes target=template_release custom_modules="../spine_godot" --jobs=$cpus
+	scons platform=web tools=no dlink_enabled=yes target=template_debug custom_modules="../spine_godot" --jobs=$cpus
+	mv bin/godot.web.template_release.wasm32.dlink.zip bin/web_dlink_release.zip
+	mv bin/godot.web.template_debug.wasm32.dlink.zip bin/web_dlink_debug.zip
+	scons platform=web tools=no threads=no dlink_enabled=yes target=template_release custom_modules="../spine_godot" --jobs=$cpus
+	scons platform=web tools=no threads=no dlink_enabled=yes target=template_debug custom_modules="../spine_godot" --jobs=$cpus
+	mv bin/godot.web.template_release.wasm32.dlink.zip bin/web_dlink_nothreads_release.zip
+	mv bin/godot.web.template_debug.wasm32.dlink.zip bin/web_dlink_nothreads_debug.zip
 elif [ "$platform" = "android" ]; then
 	# --- ANROID ---
 	# generates android_release.apk, android_debug.apk, android_source.zip

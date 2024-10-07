@@ -100,6 +100,8 @@ void SpineSkeletonDataResource::_bind_methods() {
 			&SpineSkeletonDataResource::find_transform_constraint);
 	ClassDB::bind_method(D_METHOD("find_path_constraint_data", "constraint_name"),
 						 &SpineSkeletonDataResource::find_path_constraint);
+	ClassDB::bind_method(D_METHOD("find_physics_constraint_data", "constraint_name"),
+						 &SpineSkeletonDataResource::find_physics_constraint);
 	ClassDB::bind_method(D_METHOD("get_skeleton_name"),
 						 &SpineSkeletonDataResource::get_skeleton_name);
 	ClassDB::bind_method(D_METHOD("get_bones"),
@@ -122,6 +124,8 @@ void SpineSkeletonDataResource::_bind_methods() {
 						 &SpineSkeletonDataResource::get_transform_constraints);
 	ClassDB::bind_method(D_METHOD("get_path_constraints"),
 						 &SpineSkeletonDataResource::get_path_constraints);
+	ClassDB::bind_method(D_METHOD("get_physics_constraints"),
+						 &SpineSkeletonDataResource::get_physics_constraints);
 	ClassDB::bind_method(D_METHOD("get_x"), &SpineSkeletonDataResource::get_x);
 	ClassDB::bind_method(D_METHOD("get_y"), &SpineSkeletonDataResource::get_y);
 	ClassDB::bind_method(D_METHOD("get_width"),

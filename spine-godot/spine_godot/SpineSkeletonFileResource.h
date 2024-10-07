@@ -84,7 +84,11 @@ public:
 #if VERSION_MAJOR > 3
 	RES load(const String &path, const String &original_path, Error *error, bool use_sub_threads, float *progress, CacheMode cache_mode);
 #else
-	RES load(const String &path, const String &original_path, Error *error) override;
+#if VERSION_MINOR > 5
+	RES load(const String &path, const String &original_path, Error *error, bool no_subresource_cache = false);
+#else
+	RES load(const String &path, const String &original_path, Error *error);
+#endif
 #endif
 
 	void get_recognized_extensions(List<String> *extensions) const override;
@@ -107,7 +111,7 @@ public:
 #if VERSION_MAJOR > 3
 	Error save(const RES &resource, const String &path, uint32_t flags) override;
 #else
-	Error save(const String &path, const RES &resource, uint32_t flags) override;
+	Error save(const String &path, const RES &resource, uint32_t flags);
 #endif
 
 	void get_recognized_extensions(const RES &resource, List<String> *p_extensions) const override;

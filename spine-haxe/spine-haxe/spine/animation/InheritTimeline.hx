@@ -63,6 +63,11 @@ class InheritTimeline extends Timeline implements BoneTimeline {
 		var bone:Bone = skeleton.bones[boneIndex];
 		if (!bone.active) return;
 
+		if (direction == MixDirection.mixOut) {
+			if (blend == MixBlend.setup) bone.inherit = bone.data.inherit;
+			return;
+		}
+
 		var frames:Array<Float> = frames;
 		if (time < frames[0]) {
 			if (blend == MixBlend.setup || blend == MixBlend.first) bone.inherit = bone.data.inherit;

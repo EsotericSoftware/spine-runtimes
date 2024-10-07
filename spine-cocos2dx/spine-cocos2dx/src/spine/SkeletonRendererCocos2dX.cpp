@@ -62,31 +62,31 @@ namespace spine {
 #define VLA_FREE(arr)
 #endif
 
-	SkeletonRenderer *SkeletonRenderer::createWithSkeleton(Skeleton *skeleton, bool ownsSkeleton, bool ownsSkeletonData) {
-		SkeletonRenderer *node = new SkeletonRenderer(skeleton, ownsSkeleton, ownsSkeletonData);
+	SkeletonRendererCocos2dX *SkeletonRendererCocos2dX::createWithSkeleton(Skeleton *skeleton, bool ownsSkeleton, bool ownsSkeletonData) {
+		SkeletonRendererCocos2dX *node = new SkeletonRendererCocos2dX(skeleton, ownsSkeleton, ownsSkeletonData);
 		node->autorelease();
 		return node;
 	}
 
-	SkeletonRenderer *SkeletonRenderer::createWithData(SkeletonData *skeletonData, bool ownsSkeletonData) {
-		SkeletonRenderer *node = new SkeletonRenderer(skeletonData, ownsSkeletonData);
+	SkeletonRendererCocos2dX *SkeletonRendererCocos2dX::createWithData(SkeletonData *skeletonData, bool ownsSkeletonData) {
+		SkeletonRendererCocos2dX *node = new SkeletonRendererCocos2dX(skeletonData, ownsSkeletonData);
 		node->autorelease();
 		return node;
 	}
 
-	SkeletonRenderer *SkeletonRenderer::createWithFile(const std::string &skeletonDataFile, Atlas *atlas, float scale) {
-		SkeletonRenderer *node = new SkeletonRenderer(skeletonDataFile, atlas, scale);
+	SkeletonRendererCocos2dX *SkeletonRendererCocos2dX::createWithFile(const std::string &skeletonDataFile, Atlas *atlas, float scale) {
+		SkeletonRendererCocos2dX *node = new SkeletonRendererCocos2dX(skeletonDataFile, atlas, scale);
 		node->autorelease();
 		return node;
 	}
 
-	SkeletonRenderer *SkeletonRenderer::createWithFile(const std::string &skeletonDataFile, const std::string &atlasFile, float scale) {
-		SkeletonRenderer *node = new SkeletonRenderer(skeletonDataFile, atlasFile, scale);
+	SkeletonRendererCocos2dX *SkeletonRendererCocos2dX::createWithFile(const std::string &skeletonDataFile, const std::string &atlasFile, float scale) {
+		SkeletonRendererCocos2dX *node = new SkeletonRendererCocos2dX(skeletonDataFile, atlasFile, scale);
 		node->autorelease();
 		return node;
 	}
 
-	void SkeletonRenderer::initialize() {
+	void SkeletonRendererCocos2dX::initialize() {
 		_clipper = new (__FILE__, __LINE__) SkeletonClipping();
 
 		_blendFunc = BlendFunc::ALPHA_PREMULTIPLIED;
@@ -98,7 +98,7 @@ namespace spine {
 		_skeleton->updateWorldTransform(Physics_Update);
 	}
 
-	void SkeletonRenderer::setupGLProgramState(bool twoColorTintEnabled) {
+	void SkeletonRendererCocos2dX::setupGLProgramState(bool twoColorTintEnabled) {
 #if COCOS2D_VERSION < 0x00040000
 		if (twoColorTintEnabled) {
 			setGLProgramState(SkeletonTwoColorBatch::getInstance()->getTwoColorTintProgramState());
@@ -109,36 +109,36 @@ namespace spine {
 #endif
 	}
 
-	void SkeletonRenderer::setSkeletonData(SkeletonData *skeletonData, bool ownsSkeletonData) {
+	void SkeletonRendererCocos2dX::setSkeletonData(SkeletonData *skeletonData, bool ownsSkeletonData) {
 		_skeleton = new (__FILE__, __LINE__) Skeleton(skeletonData);
 		_ownsSkeletonData = ownsSkeletonData;
 	}
 
-	SkeletonRenderer::SkeletonRenderer()
+	SkeletonRendererCocos2dX::SkeletonRendererCocos2dX()
 		: _atlas(nullptr), _attachmentLoader(nullptr), _timeScale(1), _debugSlots(false), _debugBones(false), _debugMeshes(false), _debugBoundingRect(false), _startSlotIndex(0), _endSlotIndex(std::numeric_limits<int>::max()) {
 	}
 
-	SkeletonRenderer::SkeletonRenderer(Skeleton *skeleton, bool ownsSkeleton, bool ownsSkeletonData, bool ownsAtlas)
+	SkeletonRendererCocos2dX::SkeletonRendererCocos2dX(Skeleton *skeleton, bool ownsSkeleton, bool ownsSkeletonData, bool ownsAtlas)
 		: _atlas(nullptr), _attachmentLoader(nullptr), _timeScale(1), _debugSlots(false), _debugBones(false), _debugMeshes(false), _debugBoundingRect(false), _startSlotIndex(0), _endSlotIndex(std::numeric_limits<int>::max()) {
 		initWithSkeleton(skeleton, ownsSkeleton, ownsSkeletonData, ownsAtlas);
 	}
 
-	SkeletonRenderer::SkeletonRenderer(SkeletonData *skeletonData, bool ownsSkeletonData)
+	SkeletonRendererCocos2dX::SkeletonRendererCocos2dX(SkeletonData *skeletonData, bool ownsSkeletonData)
 		: _atlas(nullptr), _attachmentLoader(nullptr), _timeScale(1), _debugSlots(false), _debugBones(false), _debugMeshes(false), _debugBoundingRect(false), _startSlotIndex(0), _endSlotIndex(std::numeric_limits<int>::max()) {
 		initWithData(skeletonData, ownsSkeletonData);
 	}
 
-	SkeletonRenderer::SkeletonRenderer(const std::string &skeletonDataFile, Atlas *atlas, float scale)
+	SkeletonRendererCocos2dX::SkeletonRendererCocos2dX(const std::string &skeletonDataFile, Atlas *atlas, float scale)
 		: _atlas(nullptr), _attachmentLoader(nullptr), _timeScale(1), _debugSlots(false), _debugBones(false), _debugMeshes(false), _debugBoundingRect(false), _startSlotIndex(0), _endSlotIndex(std::numeric_limits<int>::max()) {
 		initWithJsonFile(skeletonDataFile, atlas, scale);
 	}
 
-	SkeletonRenderer::SkeletonRenderer(const std::string &skeletonDataFile, const std::string &atlasFile, float scale)
+	SkeletonRendererCocos2dX::SkeletonRendererCocos2dX(const std::string &skeletonDataFile, const std::string &atlasFile, float scale)
 		: _atlas(nullptr), _attachmentLoader(nullptr), _timeScale(1), _debugSlots(false), _debugBones(false), _debugMeshes(false), _debugBoundingRect(false), _startSlotIndex(0), _endSlotIndex(std::numeric_limits<int>::max()) {
 		initWithJsonFile(skeletonDataFile, atlasFile, scale);
 	}
 
-	SkeletonRenderer::~SkeletonRenderer() {
+	SkeletonRendererCocos2dX::~SkeletonRendererCocos2dX() {
 		if (_ownsSkeletonData) delete _skeleton->getData();
 		if (_ownsSkeleton) delete _skeleton;
 		if (_ownsAtlas && _atlas) delete _atlas;
@@ -146,7 +146,7 @@ namespace spine {
 		delete _clipper;
 	}
 
-	void SkeletonRenderer::initWithSkeleton(Skeleton *skeleton, bool ownsSkeleton, bool ownsSkeletonData, bool ownsAtlas) {
+	void SkeletonRendererCocos2dX::initWithSkeleton(Skeleton *skeleton, bool ownsSkeleton, bool ownsSkeletonData, bool ownsAtlas) {
 		_skeleton = skeleton;
 		_ownsSkeleton = ownsSkeleton;
 		_ownsSkeletonData = ownsSkeletonData;
@@ -154,13 +154,13 @@ namespace spine {
 		initialize();
 	}
 
-	void SkeletonRenderer::initWithData(SkeletonData *skeletonData, bool ownsSkeletonData) {
+	void SkeletonRendererCocos2dX::initWithData(SkeletonData *skeletonData, bool ownsSkeletonData) {
 		_ownsSkeleton = true;
 		setSkeletonData(skeletonData, ownsSkeletonData);
 		initialize();
 	}
 
-	void SkeletonRenderer::initWithJsonFile(const std::string &skeletonDataFile, Atlas *atlas, float scale) {
+	void SkeletonRendererCocos2dX::initWithJsonFile(const std::string &skeletonDataFile, Atlas *atlas, float scale) {
 		_atlas = atlas;
 		_attachmentLoader = new (__FILE__, __LINE__) Cocos2dAtlasAttachmentLoader(_atlas);
 
@@ -175,7 +175,7 @@ namespace spine {
 		initialize();
 	}
 
-	void SkeletonRenderer::initWithJsonFile(const std::string &skeletonDataFile, const std::string &atlasFile, float scale) {
+	void SkeletonRendererCocos2dX::initWithJsonFile(const std::string &skeletonDataFile, const std::string &atlasFile, float scale) {
 		_atlas = new (__FILE__, __LINE__) Atlas(atlasFile.c_str(), &textureLoader, true);
 		CCASSERT(_atlas, "Error reading atlas file.");
 
@@ -193,7 +193,7 @@ namespace spine {
 		initialize();
 	}
 
-	void SkeletonRenderer::initWithBinaryFile(const std::string &skeletonDataFile, Atlas *atlas, float scale) {
+	void SkeletonRendererCocos2dX::initWithBinaryFile(const std::string &skeletonDataFile, Atlas *atlas, float scale) {
 		_atlas = atlas;
 		_attachmentLoader = new (__FILE__, __LINE__) Cocos2dAtlasAttachmentLoader(_atlas);
 
@@ -207,7 +207,7 @@ namespace spine {
 		initialize();
 	}
 
-	void SkeletonRenderer::initWithBinaryFile(const std::string &skeletonDataFile, const std::string &atlasFile, float scale) {
+	void SkeletonRendererCocos2dX::initWithBinaryFile(const std::string &skeletonDataFile, const std::string &atlasFile, float scale) {
 		_atlas = new (__FILE__, __LINE__) Atlas(atlasFile.c_str(), &textureLoader, true);
 		CCASSERT(_atlas, "Error reading atlas file.");
 
@@ -225,11 +225,11 @@ namespace spine {
 	}
 
 
-	void SkeletonRenderer::update(float deltaTime) {
+	void SkeletonRendererCocos2dX::update(float deltaTime) {
 		Node::update(deltaTime);
 	}
 
-	void SkeletonRenderer::draw(Renderer *renderer, const Mat4 &transform, uint32_t transformFlags) {
+	void SkeletonRendererCocos2dX::draw(Renderer *renderer, const Mat4 &transform, uint32_t transformFlags) {
 		// Early exit if the skeleton is invisible.
 		if (getDisplayedOpacity() == 0 || _skeleton->getColor().a == 0) {
 			return;
@@ -519,7 +519,7 @@ namespace spine {
 				if (!sibling) {
 					lastTwoColorTrianglesCommand->setForceFlush(true);
 				} else {
-					SkeletonRenderer *siblingSkeleton = dynamic_cast<SkeletonRenderer *>(sibling);
+					SkeletonRendererCocos2dX *siblingSkeleton = dynamic_cast<SkeletonRendererCocos2dX *>(sibling);
 					if (!siblingSkeleton ||                                               // flush is next sibling isn't a SkeletonRenderer
 						!siblingSkeleton->isTwoColorTint() ||                             // flush if next sibling isn't two color tinted
 						!siblingSkeleton->isVisible() ||                                  // flush if next sibling is two color tinted but not visible
@@ -538,7 +538,7 @@ namespace spine {
 	}
 
 
-	void SkeletonRenderer::drawDebug(Renderer *renderer, const Mat4 &transform, uint32_t transformFlags) {
+	void SkeletonRendererCocos2dX::drawDebug(Renderer *renderer, const Mat4 &transform, uint32_t transformFlags) {
 
 #if !defined(USE_MATRIX_STACK_PROJECTION_ONLY)
 		Director *director = Director::getInstance();
@@ -658,7 +658,7 @@ namespace spine {
 #endif
 	}
 
-	cocos2d::Rect SkeletonRenderer::getBoundingBox() const {
+	cocos2d::Rect SkeletonRendererCocos2dX::getBoundingBox() const {
 		const int coordCount = computeTotalCoordCount(*_skeleton, _startSlotIndex, _endSlotIndex);
 		if (coordCount == 0) return {0, 0, 0, 0};
 		VLA(float, worldCoords, coordCount);
@@ -670,57 +670,57 @@ namespace spine {
 
 	// --- Convenience methods for Skeleton_* functions.
 
-	void SkeletonRenderer::updateWorldTransform(Physics physics) {
+	void SkeletonRendererCocos2dX::updateWorldTransform(Physics physics) {
 		_skeleton->updateWorldTransform(physics);
 	}
 
-	void SkeletonRenderer::setToSetupPose() {
+	void SkeletonRendererCocos2dX::setToSetupPose() {
 		_skeleton->setToSetupPose();
 	}
-	void SkeletonRenderer::setBonesToSetupPose() {
+	void SkeletonRendererCocos2dX::setBonesToSetupPose() {
 		_skeleton->setBonesToSetupPose();
 	}
-	void SkeletonRenderer::setSlotsToSetupPose() {
+	void SkeletonRendererCocos2dX::setSlotsToSetupPose() {
 		_skeleton->setSlotsToSetupPose();
 	}
 
-	Bone *SkeletonRenderer::findBone(const std::string &boneName) const {
+	Bone *SkeletonRendererCocos2dX::findBone(const std::string &boneName) const {
 		return _skeleton->findBone(boneName.c_str());
 	}
 
-	Slot *SkeletonRenderer::findSlot(const std::string &slotName) const {
+	Slot *SkeletonRendererCocos2dX::findSlot(const std::string &slotName) const {
 		return _skeleton->findSlot(slotName.c_str());
 	}
 
-	void SkeletonRenderer::setSkin(const std::string &skinName) {
+	void SkeletonRendererCocos2dX::setSkin(const std::string &skinName) {
 		_skeleton->setSkin(skinName.empty() ? 0 : skinName.c_str());
 	}
-	void SkeletonRenderer::setSkin(const char *skinName) {
+	void SkeletonRendererCocos2dX::setSkin(const char *skinName) {
 		_skeleton->setSkin(skinName);
 	}
 
-	Attachment *SkeletonRenderer::getAttachment(const std::string &slotName, const std::string &attachmentName) const {
+	Attachment *SkeletonRendererCocos2dX::getAttachment(const std::string &slotName, const std::string &attachmentName) const {
 		return _skeleton->getAttachment(slotName.c_str(), attachmentName.c_str());
 	}
-	bool SkeletonRenderer::setAttachment(const std::string &slotName, const std::string &attachmentName) {
+	bool SkeletonRendererCocos2dX::setAttachment(const std::string &slotName, const std::string &attachmentName) {
 		bool result = _skeleton->getAttachment(slotName.c_str(), attachmentName.empty() ? 0 : attachmentName.c_str()) ? true : false;
 		_skeleton->setAttachment(slotName.c_str(), attachmentName.empty() ? 0 : attachmentName.c_str());
 		return result;
 	}
-	bool SkeletonRenderer::setAttachment(const std::string &slotName, const char *attachmentName) {
+	bool SkeletonRendererCocos2dX::setAttachment(const std::string &slotName, const char *attachmentName) {
 		bool result = _skeleton->getAttachment(slotName.c_str(), attachmentName) ? true : false;
 		_skeleton->setAttachment(slotName.c_str(), attachmentName);
 		return result;
 	}
 
-	void SkeletonRenderer::setTwoColorTint(bool enabled) {
+	void SkeletonRendererCocos2dX::setTwoColorTint(bool enabled) {
 #if COCOS2D_VERSION >= 0x00040000
 		_twoColorTint = enabled;
 #endif
 		setupGLProgramState(enabled);
 	}
 
-	bool SkeletonRenderer::isTwoColorTint() {
+	bool SkeletonRendererCocos2dX::isTwoColorTint() {
 #if COCOS2D_VERSION < 0x00040000
 		return getGLProgramState() == SkeletonTwoColorBatch::getInstance()->getTwoColorTintProgramState();
 #else
@@ -728,52 +728,52 @@ namespace spine {
 #endif
 	}
 
-	void SkeletonRenderer::setSlotsRange(int startSlotIndex, int endSlotIndex) {
+	void SkeletonRendererCocos2dX::setSlotsRange(int startSlotIndex, int endSlotIndex) {
 		_startSlotIndex = startSlotIndex == -1 ? 0 : startSlotIndex;
 		_endSlotIndex = endSlotIndex == -1 ? std::numeric_limits<int>::max() : endSlotIndex;
 	}
 
-	Skeleton *SkeletonRenderer::getSkeleton() const {
+	Skeleton *SkeletonRendererCocos2dX::getSkeleton() const {
 		return _skeleton;
 	}
 
-	void SkeletonRenderer::setTimeScale(float scale) {
+	void SkeletonRendererCocos2dX::setTimeScale(float scale) {
 		_timeScale = scale;
 	}
-	float SkeletonRenderer::getTimeScale() const {
+	float SkeletonRendererCocos2dX::getTimeScale() const {
 		return _timeScale;
 	}
 
-	void SkeletonRenderer::setDebugSlotsEnabled(bool enabled) {
+	void SkeletonRendererCocos2dX::setDebugSlotsEnabled(bool enabled) {
 		_debugSlots = enabled;
 	}
-	bool SkeletonRenderer::getDebugSlotsEnabled() const {
+	bool SkeletonRendererCocos2dX::getDebugSlotsEnabled() const {
 		return _debugSlots;
 	}
 
-	void SkeletonRenderer::setDebugBonesEnabled(bool enabled) {
+	void SkeletonRendererCocos2dX::setDebugBonesEnabled(bool enabled) {
 		_debugBones = enabled;
 	}
-	bool SkeletonRenderer::getDebugBonesEnabled() const {
+	bool SkeletonRendererCocos2dX::getDebugBonesEnabled() const {
 		return _debugBones;
 	}
 
-	void SkeletonRenderer::setDebugMeshesEnabled(bool enabled) {
+	void SkeletonRendererCocos2dX::setDebugMeshesEnabled(bool enabled) {
 		_debugMeshes = enabled;
 	}
-	bool SkeletonRenderer::getDebugMeshesEnabled() const {
+	bool SkeletonRendererCocos2dX::getDebugMeshesEnabled() const {
 		return _debugMeshes;
 	}
 
-	void SkeletonRenderer::setDebugBoundingRectEnabled(bool enabled) {
+	void SkeletonRendererCocos2dX::setDebugBoundingRectEnabled(bool enabled) {
 		_debugBoundingRect = enabled;
 	}
 
-	bool SkeletonRenderer::getDebugBoundingRectEnabled() const {
+	bool SkeletonRendererCocos2dX::getDebugBoundingRectEnabled() const {
 		return _debugBoundingRect;
 	}
 
-	void SkeletonRenderer::onEnter() {
+	void SkeletonRendererCocos2dX::onEnter() {
 #if CC_ENABLE_SCRIPT_BINDING && COCOS2D_VERSION < 0x00040000
 		if (_scriptType == kScriptTypeJavascript && ScriptEngineManager::sendNodeEventToJSExtended(this, kNodeOnEnter)) return;
 #endif
@@ -781,7 +781,7 @@ namespace spine {
 		scheduleUpdate();
 	}
 
-	void SkeletonRenderer::onExit() {
+	void SkeletonRendererCocos2dX::onExit() {
 #if CC_ENABLE_SCRIPT_BINDING && COCOS2D_VERSION < 0x00040000
 		if (_scriptType == kScriptTypeJavascript && ScriptEngineManager::sendNodeEventToJSExtended(this, kNodeOnExit)) return;
 #endif
@@ -791,19 +791,19 @@ namespace spine {
 
 	// --- CCBlendProtocol
 
-	const BlendFunc &SkeletonRenderer::getBlendFunc() const {
+	const BlendFunc &SkeletonRendererCocos2dX::getBlendFunc() const {
 		return _blendFunc;
 	}
 
-	void SkeletonRenderer::setBlendFunc(const BlendFunc &blendFunc) {
+	void SkeletonRendererCocos2dX::setBlendFunc(const BlendFunc &blendFunc) {
 		_blendFunc = blendFunc;
 	}
 
-	void SkeletonRenderer::setOpacityModifyRGB(bool value) {
+	void SkeletonRendererCocos2dX::setOpacityModifyRGB(bool value) {
 		_premultipliedAlpha = value;
 	}
 
-	bool SkeletonRenderer::isOpacityModifyRGB() const {
+	bool SkeletonRendererCocos2dX::isOpacityModifyRGB() const {
 		return _premultipliedAlpha;
 	}
 

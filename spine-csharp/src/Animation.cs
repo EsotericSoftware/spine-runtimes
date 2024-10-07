@@ -94,16 +94,16 @@ namespace Spine {
 		/// <param name="lastTime">The last time in seconds this animation was applied. Some timelines trigger only at specific times rather
 		///					than every frame. Pass -1 the first time an animation is applied to ensure frame 0 is triggered.</param>
 		/// <param name="time"> The time in seconds the skeleton is being posed for. Most timelines find the frame before and the frame after
-		///					this time and interpolate between the frame values. If beyond the <see cref="Duration"/> and <code>loop</code> is
+		///					this time and interpolate between the frame values. If beyond the <see cref="Duration"/> and <c>loop</c> is
 		///					true then the animation will repeat, else the last frame will be applied.</param>
 		/// <param name="loop">If true, the animation repeats after the <see cref="Duration"/>.</param>
 		/// <param name="events">If any events are fired, they are added to this list. Can be null to ignore fired events or if no timelines
 		///					fire events.</param>
-		/// <param name="alpha"> 0 applies the current or setup values (depending on <code>blend</code>). 1 applies the timeline values. Between
+		/// <param name="alpha"> 0 applies the current or setup values (depending on <c>blend</c>). 1 applies the timeline values. Between
 		///					0 and 1 applies values between the current or setup values and the timeline values. By adjusting
-		///					<code>alpha</code> over time, an animation can be mixed in or out. <code>alpha</code> can also be useful to apply
+		///					<c>alpha</c> over time, an animation can be mixed in or out. <c>alpha</c> can also be useful to apply
 		///					animations on top of each other (layering).</param>
-		/// <param name="blend">Controls how mixing is applied when <code>alpha</code> < 1.</param>
+		/// <param name="blend">Controls how mixing is applied when <c>alpha</c> &lt; 1.</param>
 		/// <param name="direction">Indicates whether the timelines are mixing in or out. Used by timelines which perform instant transitions,
 		///					such as <see cref="DrawOrderTimeline"/> or <see cref="AttachmentTimeline"/>.</param>
 		public void Apply (Skeleton skeleton, float lastTime, float time, bool loop, ExposedList<Event> events, float alpha,
@@ -127,7 +127,7 @@ namespace Spine {
 
 	/// <summary>
 	/// Controls how timeline values are mixed with setup pose values or current pose values when a timeline is applied with
-	/// <code>alpha</code> < 1.</summary>
+	/// <c>alpha</c> &lt; 1.</summary>
 	/// <seealso cref="Timeline.Apply(Skeleton, float, float, ExposedList, float, MixBlend, MixDirection)"/>
 	public enum MixBlend {
 		/// <summary> Transitions from the setup value to the timeline value (the current value is not used). Before the first frame, the
@@ -140,7 +140,7 @@ namespace Spine {
 		/// the setup value. Timelines which perform instant transitions, such as <see cref="DrawOrderTimeline"/> or
 		/// <see cref="AttachmentTimeline"/>, use the setup value before the first frame.</para>
 		/// <para>
-		/// <code>First</code> is intended for the first animations applied, not for animations layered on top of those.</para>
+		/// <c>First</c> is intended for the first animations applied, not for animations layered on top of those.</para>
 		/// </summary>
 		First,
 
@@ -149,7 +149,7 @@ namespace Spine {
 		/// Transitions from the current value to the timeline value. No change is made before the first frame (the current value is
 		/// kept until the first frame).</para>
 		/// <para>
-		/// <code>Replace</code> is intended for animations layered on top of others, not for the first animations applied.</para>
+		/// <c>Replace</c> is intended for animations layered on top of others, not for the first animations applied.</para>
 		/// </summary>
 		Replace,
 
@@ -158,7 +158,7 @@ namespace Spine {
 		/// Transitions from the current value to the current value plus the timeline value. No change is made before the first frame
 		/// (the current value is kept until the first frame).</para>
 		/// <para>
-		/// <code>Add</code> is intended for animations layered on top of others, not for the first animations applied. Properties
+		/// <c>Add</c> is intended for animations layered on top of others, not for the first animations applied. Properties
 		/// set by additive animations must be set manually or by another animation before applying the additive animations, else the
 		/// property values will increase each time the additive animations are applied.
 		/// </para>
@@ -167,7 +167,7 @@ namespace Spine {
 	}
 
 	/// <summary>
-	/// Indicates whether a timeline's <code>alpha</code> is mixing out over time toward 0 (the setup or current pose value) or
+	/// Indicates whether a timeline's <c>alpha</c> is mixing out over time toward 0 (the setup or current pose value) or
 	/// mixing in toward 1 (the timeline's value). Some timelines use this to decide how values are applied.</summary>
 	/// <seealso cref="Timeline.Apply(Skeleton, float, float, ExposedList, float, MixBlend, MixDirection)"/>
 	public enum MixDirection {
@@ -231,26 +231,26 @@ namespace Spine {
 		///					skeleton components the timeline may change.</param>
 		/// <param name="lastTime">The time this timeline was last applied. Timelines such as <see cref="EventTimeline"/> trigger only
 		///					at specific times rather than every frame. In that case, the timeline triggers everything between
-		///					<code>lastTime</code> (exclusive) and <code>time</code> (inclusive). Pass -1 the first time an animation is
+		///					<c>lastTime</c> (exclusive) and <c>time</c> (inclusive). Pass -1 the first time an animation is
 		///					 applied to ensure frame 0 is triggered.</param>
 		/// <param name="time">The time in seconds that the skeleton is being posed for. Most timelines find the frame before and the frame
 		///					after this time and interpolate between the frame values.If beyond the last frame, the last frame will be
 		///					applied.</param>
 		/// <param name="events">If any events are fired, they are added to this list. Can be null to ignore fired events or if the timeline
 		///					does not fire events.</param>
-		/// <param name="alpha">0 applies the current or setup value (depending on <code>blend</code>). 1 applies the timeline value.
+		/// <param name="alpha">0 applies the current or setup value (depending on <c>blend</c>). 1 applies the timeline value.
 		///					Between 0 and 1 applies a value between the current or setup value and the timeline value.By adjusting
-		///					<code>alpha</code> over time, an animation can be mixed in or out. <code>alpha</code> can also be useful to
+		///					<c>alpha</c> over time, an animation can be mixed in or out. <c>alpha</c> can also be useful to
 		///					apply animations on top of each other (layering).</param>
-		/// <param name="blend">Controls how mixing is applied when <code>alpha</code> < 1.</param>
+		/// <param name="blend">Controls how mixing is applied when <c>alpha</c> &lt; 1.</param>
 		/// <param name="direction">Indicates whether the timeline is mixing in or out. Used by timelines which perform instant transitions,
 		///                   such as <see cref="DrawOrderTimeline"/> or <see cref="AttachmentTimeline"/>, and other such as <see cref="ScaleTimeline"/>.</param>
 		public abstract void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha,
 			MixBlend blend, MixDirection direction);
 
 		/// <summary>Search using a stride of 1.</summary>
-		/// <param name="time">Must be >= the first value in <code>frames</code>.</param>
-		/// <returns>The index of the first value <= <code>time</code>.</returns>
+		/// <param name="time">Must be >= the first value in <c>frames</c>.</param>
+		/// <returns>The index of the first value <= <c>time</c>.</returns>
 		internal static int Search (float[] frames, float time) {
 			int n = frames.Length;
 			for (int i = 1; i < n; i++)
@@ -259,8 +259,8 @@ namespace Spine {
 		}
 
 		/// <summary>Search using the specified stride.</summary>
-		/// <param name="time">Must be >= the first value in <code>frames</code>.</param>
-		/// <returns>The index of the first value <= <code>time</code>.</returns>
+		/// <param name="time">Must be >= the first value in <c>frames</c>.</param>
+		/// <returns>The index of the first value <= <c>time</c>.</returns>
 		internal static int Search (float[] frames, float time, int step) {
 			int n = frames.Length;
 			for (int i = step; i < n; i += step)
@@ -297,25 +297,25 @@ namespace Spine {
 		}
 
 		/// <summary>Sets the specified frame to linear interpolation.</summary>
-		/// <param name="frame">Between 0 and <code>frameCount - 1</code>, inclusive.</param>
+		/// <param name="frame">Between 0 and <c>frameCount - 1</c>, inclusive.</param>
 		public void SetLinear (int frame) {
 			curves[frame] = LINEAR;
 		}
 
 		/// <summary>Sets the specified frame to stepped interpolation.</summary>
-		/// <param name="frame">Between 0 and <code>frameCount - 1</code>, inclusive.</param>
+		/// <param name="frame">Between 0 and <c>frameCount - 1</c>, inclusive.</param>
 		public void SetStepped (int frame) {
 			curves[frame] = STEPPED;
 		}
 
 		/// <summary>Returns the interpolation type for the specified frame.</summary>
-		/// <param name="frame">Between 0 and <code>frameCount - 1</code>, inclusive.</param>
+		/// <param name="frame">Between 0 and <c>frameCount - 1</c>, inclusive.</param>
 		/// <returns><see cref="LINEAR"/>, <see cref="STEPPED"/> or <see cref="BEZIER"/> + the index of the Bezier segments.</returns>
 		public float GetCurveType (int frame) {
 			return (int)curves[frame];
 		}
 
-		/// <summary>Shrinks the storage for Bezier curves, for use when <code>bezierCount</code> (specified in the constructor) was larger
+		/// <summary>Shrinks the storage for Bezier curves, for use when <c>bezierCount</c> (specified in the constructor) was larger
 		/// than the actual number of Bezier curves.</summary>
 		public void Shrink (int bezierCount) {
 			int size = FrameCount + bezierCount * BEZIER_SIZE;
@@ -329,9 +329,9 @@ namespace Spine {
 		/// <summary>
 		/// Stores the segments for the specified Bezier curve. For timelines that modify multiple values, there may be more than
 		/// one curve per frame.</summary>
-		/// <param name="bezier">The ordinal of this Bezier curve for this timeline, between 0 and <code>bezierCount - 1</code> (specified
+		/// <param name="bezier">The ordinal of this Bezier curve for this timeline, between 0 and <c>bezierCount - 1</c> (specified
 		///					in the constructor), inclusive.</param>
-		/// <param name="frame">Between 0 and <code>frameCount - 1</code>, inclusive.</param>
+		/// <param name="frame">Between 0 and <c>frameCount - 1</c>, inclusive.</param>
 		/// <param name="value">The index of the value for the frame this curve is used for.</param>
 		/// <param name="time1">The time for the first key.</param>
 		/// <param name="value1">The value for the first key.</param>
@@ -366,8 +366,8 @@ namespace Spine {
 
 		/// <summary>
 		/// Returns the Bezier interpolated value for the specified time.</summary>
-		/// <param name="frameIndex">The index into <see cref="Frames"/> for the values of the frame before <code>time</code>.</param>
-		/// <param name="valueOffset">The offset from <code>frameIndex</code> to the value this curve is used for.</param>
+		/// <param name="frameIndex">The index into <see cref="Frames"/> for the values of the frame before <c>time</c>.</param>
+		/// <param name="valueOffset">The offset from <c>frameIndex</c> to the value this curve is used for.</param>
 		/// <param name="i">The index of the Bezier segments. See <see cref="GetCurveType(int)"/>.</param>
 		public float GetBezierValue (float time, int frameIndex, int valueOffset, int i) {
 			float[] curves = this.curves;
@@ -406,7 +406,7 @@ namespace Spine {
 		}
 
 		/// <summary>Sets the time and value for the specified frame.</summary>
-		/// <param name="frame">Between 0 and <code>frameCount</code>, inclusive.</param>
+		/// <param name="frame">Between 0 and <c>frameCount</c>, inclusive.</param>
 		/// <param name="time">The frame time in seconds</param>
 		public void SetFrame (int frame, float time, float value) {
 			frame <<= 1;
@@ -544,7 +544,7 @@ namespace Spine {
 		}
 
 		/// <summary>Sets the time and values for the specified frame.</summary>
-		/// <param name="frame">Between 0 and <code>frameCount</code>, inclusive.</param>
+		/// <param name="frame">Between 0 and <c>frameCount</c>, inclusive.</param>
 		/// <param name="time">The frame time in seconds.</param>
 		public void SetFrame (int frame, float time, float value1, float value2) {
 			frame *= ENTRIES;
@@ -700,7 +700,7 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes a bone's local <see cref="Bone.ScaleX"> and <see cref="Bone.ScaleY">.</summary>
+	/// <summary>Changes a bone's local <see cref="Bone.ScaleX"/> and <see cref="Bone.ScaleY"/>.</summary>
 	public class ScaleTimeline : CurveTimeline2, IBoneTimeline {
 		readonly int boneIndex;
 
@@ -816,7 +816,7 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes a bone's local <see cref="Bone.ScaleX">.</summary>
+	/// <summary>Changes a bone's local <see cref="Bone.ScaleX"/>.</summary>
 	public class ScaleXTimeline : CurveTimeline1, IBoneTimeline {
 		readonly int boneIndex;
 
@@ -838,7 +838,7 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes a bone's local <see cref="Bone.ScaleY">.</summary>
+	/// <summary>Changes a bone's local <see cref="Bone.ScaleY"/>.</summary>
 	public class ScaleYTimeline : CurveTimeline1, IBoneTimeline {
 		readonly int boneIndex;
 
@@ -1004,7 +1004,7 @@ namespace Spine {
 		}
 
 		/// <summary>Sets the transform mode for the specified frame.</summary>
-		/// <param name="frame">Between 0 and <code>frameCount</code>, inclusive.</param>
+		/// <param name="frame">Between 0 and <c>frameCount</c>, inclusive.</param>
 		/// <param name="time">The frame time in seconds.</param>
 		public void SetFrame (int frame, float time, Inherit inherit) {
 			frame *= ENTRIES;
@@ -1017,6 +1017,11 @@ namespace Spine {
 
 			Bone bone = skeleton.bones.Items[boneIndex];
 			if (!bone.active) return;
+
+			if (direction == MixDirection.Out) {
+				if (blend == MixBlend.Setup) bone.inherit = bone.data.inherit;
+				return;
+			}
 
 			float[] frames = this.frames;
 			if (time < frames[0]) {
@@ -1051,7 +1056,7 @@ namespace Spine {
 		}
 
 		/// <summary>Sets the time and color for the specified frame.</summary>
-		/// <param name="frame">Between 0 and <code>frameCount</code>, inclusive.</param>
+		/// <param name="frame">Between 0 and <c>frameCount</c>, inclusive.</param>
 		/// <param name="time">The frame time in seconds.</param>
 		public void SetFrame (int frame, float time, float r, float g, float b, float a) {
 			frame *= ENTRIES;
@@ -1168,7 +1173,7 @@ namespace Spine {
 		}
 
 		/// <summary>Sets the time and color for the specified frame.</summary>
-		/// <param name="frame">Between 0 and <code>frameCount</code>, inclusive.</param>
+		/// <param name="frame">Between 0 and <c>frameCount</c>, inclusive.</param>
 		/// <param name="time">The frame time in seconds.</param>
 		public void SetFrame (int frame, float time, float r, float g, float b) {
 			frame <<= 2;
@@ -1328,7 +1333,7 @@ namespace Spine {
 		}
 
 		/// <summary>Sets the time, light color, and dark color for the specified frame.</summary>
-		/// <param name="frame">Between 0 and <code>frameCount</code>, inclusive.</param>
+		/// <param name="frame">Between 0 and <c>frameCount</c>, inclusive.</param>
 		/// <param name="time">The frame time in seconds.</param>
 		public void SetFrame (int frame, float time, float r, float g, float b, float a, float r2, float g2, float b2) {
 			frame <<= 3;
@@ -1488,7 +1493,7 @@ namespace Spine {
 		}
 
 		/// <summary>Sets the time, light color, and dark color for the specified frame.</summary>
-		/// <param name="frame">Between 0 and <code>frameCount</code>, inclusive.</param>
+		/// <param name="frame">Between 0 and <c>frameCount</c>, inclusive.</param>
 		/// <param name="time">The frame time in seconds.</param>
 		public void SetFrame (int frame, float time, float r, float g, float b, float r2, float g2, float b2) {
 			frame *= ENTRIES;
@@ -1633,7 +1638,7 @@ namespace Spine {
 		}
 
 		/// <summary>Sets the time and attachment name for the specified frame.</summary>
-		/// <param name="frame">Between 0 and <code>frameCount</code>, inclusive.</param>
+		/// <param name="frame">Between 0 and <c>frameCount</c>, inclusive.</param>
 		/// <param name="time">The frame time in seconds.</param>
 		public void SetFrame (int frame, float time, String attachmentName) {
 			frames[frame] = time;
@@ -1698,7 +1703,7 @@ namespace Spine {
 		}
 
 		/// <summary>Sets the time and vertices for the specified frame.</summary>
-		/// <param name="frame">Between 0 and <code>frameCount</code>, inclusive.</param>
+		/// <param name="frame">Between 0 and <c>frameCount</c>, inclusive.</param>
 		/// <param name="time">The frame time in seconds.</param>
 		/// <param name="vertices">Vertex positions for an unweighted VertexAttachment, or deform offsets if it has weights.</param>
 		public void SetFrame (int frame, float time, float[] vertices) {
@@ -1731,7 +1736,7 @@ namespace Spine {
 		}
 
 		/// <summary>Returns the interpolated percentage for the specified time.</summary>
-		/// <param name="frame">The frame before <code>time</code>.</param>
+		/// <param name="frame">The frame before <c>time</c>.</param>
 		private float GetCurvePercent (float time, int frame) {
 			float[] curves = this.curves;
 			int i = (int)curves[frame];
@@ -1967,13 +1972,13 @@ namespace Spine {
 		}
 
 		/// <summary>Sets the time and event for the specified frame.</summary>
-		/// <param name="frame">Between 0 and <code>frameCount</code>, inclusive.</param>
+		/// <param name="frame">Between 0 and <c>frameCount</c>, inclusive.</param>
 		public void SetFrame (int frame, Event e) {
 			frames[frame] = e.time;
 			events[frame] = e;
 		}
 
-		/// <summary>Fires events for frames &gt; <code>lastTime</code> and &lt;= <code>time</code>.</summary>
+		/// <summary>Fires events for frames &gt; <c>lastTime</c> and &lt;= <c>time</c>.</summary>
 		public override void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha,
 			MixBlend blend, MixDirection direction) {
 
@@ -2025,7 +2030,7 @@ namespace Spine {
 		}
 
 		/// <summary>Sets the time and draw order for the specified frame.</summary>
-		/// <param name="frame">Between 0 and <code>frameCount</code>, inclusive.</param>
+		/// <param name="frame">Between 0 and <c>frameCount</c>, inclusive.</param>
 		/// <param name="time">The frame time in seconds.</param>
 		/// <param name="drawOrder">For each slot in <see cref="Skeleton.Slots"/>, the index of the slot in the new draw order. May be null to use
 		///					 setup pose draw order.</param>
@@ -2088,7 +2093,7 @@ namespace Spine {
 		}
 
 		/// <summary>Sets the time, mix, softness, bend direction, compress, and stretch for the specified frame.</summary>
-		/// <param name="frame">Between 0 and <code>frameCount</code>, inclusive.</param>
+		/// <param name="frame">Between 0 and <c>frameCount</c>, inclusive.</param>
 		/// <param name="time">The frame time in seconds.</param>
 		/// <param name="bendDirection">1 or -1.</param>
 		public void SetFrame (int frame, float time, float mix, float softness, int bendDirection, bool compress,
@@ -2200,7 +2205,7 @@ namespace Spine {
 		}
 
 		/// <summary>Sets the time, rotate mix, translate mix, scale mix, and shear mix for the specified frame.</summary>
-		/// <param name="frame">Between 0 and <code>frameCount</code>, inclusive.</param>
+		/// <param name="frame">Between 0 and <c>frameCount</c>, inclusive.</param>
 		/// <param name="time">The frame time in seconds.</param>
 		public void SetFrame (int frame, float time, float mixRotate, float mixX, float mixY, float mixScaleX, float mixScaleY,
 			float mixShearY) {
@@ -2383,7 +2388,7 @@ namespace Spine {
 		}
 
 		/// <summary>Sets the time and color for the specified frame.</summary>
-		/// <param name="frame">Between 0 and <code>frameCount</code>, inclusive.</param>
+		/// <param name="frame">Between 0 and <c>frameCount</c>, inclusive.</param>
 		/// <param name="time">The frame time in seconds.</param>
 		public void SetFrame (int frame, float time, float mixRotate, float mixX, float mixY) {
 			frame <<= 2;
@@ -2684,13 +2689,13 @@ namespace Spine {
 			get { return frames.Length; }
 		}
 
-		/// <summary>Sets the time for the specified frame.<summary>
-		/// <param name="frame">Between 0 and <code>frameCount</code>, inclusive.</param>
+		/// <summary>Sets the time for the specified frame.</summary>
+		/// <param name="frame">Between 0 and <c>frameCount</c>, inclusive.</param>
 		public void SetFrame (int frame, float time) {
 			frames[frame] = time;
 		}
 
-		/// <summary>Resets the physics constraint when frames > <code>lastTime</code> and <= <code>time</code>.</summary>
+		/// <summary>Resets the physics constraint when frames > <c>lastTime</c> and <= <c>time</c>.</summary>
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
 									MixDirection direction) {
 
@@ -2754,7 +2759,7 @@ namespace Spine {
 		}
 
 		/// <summary>Sets the time, mode, index, and frame time for the specified frame.</summary>
-		/// <param name="frame">Between 0 and <code>frameCount</code>, inclusive.</param>
+		/// <param name="frame">Between 0 and <c>frameCount</c>, inclusive.</param>
 		/// <param name="time">Seconds between frames.</param>
 		public void SetFrame (int frame, float time, SequenceMode mode, int index, float delay) {
 			frame *= ENTRIES;

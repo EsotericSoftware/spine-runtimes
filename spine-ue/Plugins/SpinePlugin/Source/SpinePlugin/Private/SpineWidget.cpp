@@ -368,6 +368,16 @@ bool USpineWidget::HasSlot(const FString SlotName) {
 	return false;
 }
 
+void USpineWidget::SetSlotColor(const FString SlotName, const FColor SlotColor) {
+	CheckState();
+	if (skeleton) {
+		spine::Slot *slot = skeleton->findSlot(TCHAR_TO_UTF8(*SlotName));
+		if (slot) {
+			slot->getColor().set(SlotColor.R / 255.f, SlotColor.G / 255.f, SlotColor.B / 255.f, SlotColor.A / 255.f);
+		}
+	}
+}
+
 void USpineWidget::GetAnimations(TArray<FString> &Animations) {
 	CheckState();
 	if (skeleton) {
@@ -512,5 +522,29 @@ void USpineWidget::ClearTrack(int trackIndex) {
 	CheckState();
 	if (state) {
 		state->clearTrack(trackIndex);
+	}
+}
+
+void USpineWidget::PhysicsTranslate(float x, float y) {
+	CheckState();
+	if (skeleton) {
+		skeleton->physicsTranslate(x, y);
+	}
+}
+
+void USpineWidget::PhysicsRotate(float x, float y, float degrees) {
+	CheckState();
+	if (skeleton) {
+		skeleton->physicsRotate(x, y, degrees);
+	}
+}
+
+void USpineWidget::ResetPhysicsConstraints() {
+	CheckState();
+	if (skeleton) {
+		Vector<PhysicsConstraint *> &constraints = skeleton->getPhysicsConstraints();
+		for (int i = 0, n = (int) constraints.size(); i < n; i++) {
+			constraints[i]->reset();
+		}
 	}
 }

@@ -62,7 +62,7 @@ bool SkeletonRendererSeparatorExample::init() {
 	// Spineboy's front, doesn't manage any skeleton, animation or GPU resources, but simply
 	// renders the back slots of Spineboy. The skeleton, animatio state and GPU resources
 	// are shared with the front node!
-	frontNode = SkeletonRenderer::createWithSkeleton(backNode->getSkeleton());
+	frontNode = SkeletonRendererCocos2dX::createWithSkeleton(backNode->getSkeleton());
 	frontNode->setSlotsRange(frontNode->findSlot("neck")->getData().getIndex(), -1);
 	frontNode->setPosition(Vec2(_contentSize.width / 2, 20));
 

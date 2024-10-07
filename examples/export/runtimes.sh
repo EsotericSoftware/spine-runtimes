@@ -35,6 +35,29 @@ cp -f ../mix-and-match/export/*.json "$ROOT/spine-libgdx/spine-libgdx-tests/asse
 cp -f ../mix-and-match/export/*.skel "$ROOT/spine-libgdx/spine-libgdx-tests/assets/mix-and-match/"
 cp -f ../mix-and-match/export/*-pma.* "$ROOT/spine-libgdx/spine-libgdx-tests/assets/mix-and-match/"
 
+echo "spine-android"
+rm "$ROOT/spine-android/app/src/main/assets/"*
+cp -f ../celestial-circus/export/celestial-circus-pro.skel "$ROOT/spine-android/app/src/main/assets/"
+cp -f ../celestial-circus/export/celestial-circus.atlas "$ROOT/spine-android/app/src/main/assets"
+cp -f ../celestial-circus/export/celestial-circus.png "$ROOT/spine-android/app/src/main/assets"
+
+cp -f ../dragon/export/dragon-ess.skel "$ROOT/spine-android/app/src/main/assets/"
+cp -f ../dragon/export/dragon.atlas "$ROOT/spine-android/app/src/main/assets"
+cp -f ../dragon/export/dragon.png "$ROOT/spine-android/app/src/main/assets"
+cp -f ../dragon/export/dragon_2.png "$ROOT/spine-android/app/src/main/assets"
+cp -f ../dragon/export/dragon_3.png "$ROOT/spine-android/app/src/main/assets"
+cp -f ../dragon/export/dragon_4.png "$ROOT/spine-android/app/src/main/assets"
+cp -f ../dragon/export/dragon_5.png "$ROOT/spine-android/app/src/main/assets"
+
+cp -f ../mix-and-match/export/mix-and-match-pro.skel "$ROOT/spine-android/app/src/main/assets/"
+cp -f ../mix-and-match/export/mix-and-match.atlas "$ROOT/spine-android/app/src/main/assets/"
+cp -f ../mix-and-match/export/mix-and-match.png "$ROOT/spine-android/app/src/main/assets/"
+
+cp -f ../spineboy/export/spineboy-pro.skel "$ROOT/spine-android/app/src/main/assets/"
+cp -f ../spineboy/export/spineboy-pro.json "$ROOT/spine-android/app/src/main/assets/"
+cp -f ../spineboy/export/spineboy.atlas "$ROOT/spine-android/app/src/main/assets/"
+cp -f ../spineboy/export/spineboy.png "$ROOT/spine-android/app/src/main/assets/"
+
 rm -f "$ROOT/spine-libgdx/spine-libgdx-tests/assets/sack/"*
 mkdir -p "$ROOT/spine-libgdx/spine-libgdx-tests/assets/sack/"
 cp -f ../sack/export/sack-pro.json "$ROOT/spine-libgdx/spine-libgdx-tests/assets/sack/"
@@ -452,6 +475,19 @@ cp -f ../spineboy/export/spineboy-pro.skel "$ROOT/spine-ts/spine-canvas/example/
 cp -f ../spineboy/export/spineboy-ess.json "$ROOT/spine-ts/spine-canvas/example/assets/"
 cp -f ../spineboy/export/spineboy.atlas "$ROOT/spine-ts/spine-canvas/example/assets/"
 cp -f ../spineboy/export/spineboy.png "$ROOT/spine-ts/spine-canvas/example/assets/"
+
+rm "$ROOT/spine-ts/spine-canvaskit/example/assets/"*
+cp -f ../spineboy/export/spineboy-pro.skel "$ROOT/spine-ts/spine-canvaskit/example/assets/"
+cp -f ../spineboy/export/spineboy.atlas "$ROOT/spine-ts/spine-canvaskit/example/assets/"
+cp -f ../spineboy/export/spineboy.png "$ROOT/spine-ts/spine-canvaskit/example/assets/"
+
+cp -f ../mix-and-match/export/mix-and-match-pro.skel "$ROOT/spine-ts/spine-canvaskit/example/assets/"
+cp -f ../mix-and-match/export/mix-and-match.atlas "$ROOT/spine-ts/spine-canvaskit/example/assets/"
+cp -f ../mix-and-match/export/mix-and-match.png "$ROOT/spine-ts/spine-canvaskit/example/assets/"
+
+cp -f ../celestial-circus/export/celestial-circus-pro.json "$ROOT/spine-ts/spine-canvaskit/example/assets/"
+cp -f ../celestial-circus/export/celestial-circus.atlas "$ROOT/spine-ts/spine-canvaskit/example/assets/"
+cp -f ../celestial-circus/export/celestial-circus.png "$ROOT/spine-ts/spine-canvaskit/example/assets/"
 
 rm "$ROOT/spine-ts/spine-threejs/example/assets/"*
 cp -f ../raptor/export/raptor-pro.json "$ROOT/spine-ts/spine-threejs/example/assets/"

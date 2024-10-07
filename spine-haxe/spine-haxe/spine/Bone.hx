@@ -173,10 +173,14 @@ class Bone implements Updatable {
 				c = Math.sin(rx) * scaleX;
 				d = Math.sin(ry) * scaleY;
 			case Inherit.noRotationOrReflection:
+				var sx:Float = 1 / skeleton.scaleX;
+				var sy:Float = 1 / skeleton.scaleY;
+				pa *= sx;
+				pc *= sy;
 				s = pa * pa + pc * pc;
 				var prx:Float = 0;
 				if (s > 0.0001) {
-					s = Math.abs(pa * pd - pb * pc) / s;
+					s = Math.abs(pa * pd * sy - pb * sx * pc) / s;
 					pb = pc * s;
 					pd = pa * s;
 					prx = Math.atan2(pc, pa) * MathUtils.radDeg;
@@ -280,10 +284,8 @@ class Bone implements Updatable {
 			switch (inherit) {
 				case Inherit.noRotationOrReflection:
 					var s:Float = Math.abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
-					var sa:Float = pa / skeleton.scaleX;
-					var sc:Float = pc / skeleton.scaleY;
-					pb = -sc * s * skeleton.scaleX;
-					pd = sa * s * skeleton.scaleY;
+					pb = -pc * skeleton.scaleX * s / skeleton.scaleY;
+					pd = pa * skeleton.scaleY * s / skeleton.scaleX;
 					pid = 1 / (pa * pd - pb * pc);
 					ia = pd * pid;
 					ib = pb * pid;

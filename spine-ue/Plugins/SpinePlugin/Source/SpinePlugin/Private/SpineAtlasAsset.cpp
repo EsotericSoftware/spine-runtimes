@@ -95,14 +95,14 @@ void USpineAtlasAsset::BeginDestroy() {
 
 class UETextureLoader : public TextureLoader {
 	void load(AtlasPage &page, const String &path) {
-		page.texture = (void*)(uintptr_t)page.index;
+		page.texture = (void *) (uintptr_t) page.index;
 	}
 
 	void unload(void *texture) {
 	}
 };
 
-UETextureLoader textureLoader;
+UETextureLoader _spineUETextureLoader;
 
 Atlas *USpineAtlasAsset::GetAtlas() {
 	if (!atlas) {
@@ -113,7 +113,7 @@ Atlas *USpineAtlasAsset::GetAtlas() {
 		std::string t = TCHAR_TO_UTF8(*rawData);
 
 		atlas = new (__FILE__, __LINE__)
-				Atlas(t.c_str(), strlen(t.c_str()), "", &textureLoader);
+				Atlas(t.c_str(), strlen(t.c_str()), "", &_spineUETextureLoader);
 	}
 	return this->atlas;
 }

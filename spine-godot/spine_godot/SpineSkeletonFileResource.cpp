@@ -94,6 +94,7 @@ static char *readString(BinaryInput *input) {
 }
 
 void SpineSkeletonFileResource::_bind_methods() {
+	ClassDB::bind_method(D_METHOD("load_from_file", "path"), &SpineSkeletonFileResource::load_from_file);
 	ADD_SIGNAL(MethodInfo("skeleton_file_changed"));
 }
 
@@ -182,7 +183,11 @@ Error SpineSkeletonFileResource::copy_from(const Ref<Resource> &p_resource) {
 #if VERSION_MAJOR > 3
 RES SpineSkeletonFileResourceFormatLoader::load(const String &path, const String &original_path, Error *error, bool use_sub_threads, float *progress, CacheMode cache_mode) {
 #else
+#if VERSION_MINOR > 5
+RES SpineSkeletonFileResourceFormatLoader::load(const String &path, const String &original_path, Error *error, bool no_subresource_cache) {
+#else
 RES SpineSkeletonFileResourceFormatLoader::load(const String &path, const String &original_path, Error *error) {
+#endif
 #endif
 	Ref<SpineSkeletonFileResource> skeleton_file = memnew(SpineSkeletonFileResource);
 	skeleton_file->load_from_file(path);

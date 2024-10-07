@@ -38,13 +38,13 @@ namespace spine {
 	class AttachmentVertices;
 
 	/* Draws a skeleton. */
-	class SkeletonRenderer : public cocos2d::Node, public cocos2d::BlendProtocol {
+	class SkeletonRendererCocos2dX : public cocos2d::Node, public cocos2d::BlendProtocol {
 	public:
-		CREATE_FUNC(SkeletonRenderer);
-		static SkeletonRenderer *createWithSkeleton(Skeleton *skeleton, bool ownsSkeleton = false, bool ownsSkeletonData = false);
-		static SkeletonRenderer *createWithData(SkeletonData *skeletonData, bool ownsSkeletonData = false);
-		static SkeletonRenderer *createWithFile(const std::string &skeletonDataFile, Atlas *atlas, float scale = 1);
-		static SkeletonRenderer *createWithFile(const std::string &skeletonDataFile, const std::string &atlasFile, float scale = 1);
+		CREATE_FUNC(SkeletonRendererCocos2dX);
+		static SkeletonRendererCocos2dX *createWithSkeleton(Skeleton *skeleton, bool ownsSkeleton = false, bool ownsSkeletonData = false);
+		static SkeletonRendererCocos2dX *createWithData(SkeletonData *skeletonData, bool ownsSkeletonData = false);
+		static SkeletonRendererCocos2dX *createWithFile(const std::string &skeletonDataFile, Atlas *atlas, float scale = 1);
+		static SkeletonRendererCocos2dX *createWithFile(const std::string &skeletonDataFile, const std::string &atlasFile, float scale = 1);
 
 		void update(float deltaTime) override;
 		void draw(cocos2d::Renderer *renderer, const cocos2d::Mat4 &transform, uint32_t transformFlags) override;
@@ -111,13 +111,13 @@ namespace spine {
 		void setOpacityModifyRGB(bool value) override;
 		bool isOpacityModifyRGB() const override;
 
-		CC_CONSTRUCTOR_ACCESS : SkeletonRenderer();
-		SkeletonRenderer(Skeleton *skeleton, bool ownsSkeleton = false, bool ownsSkeletonData = false, bool ownsAtlas = false);
-		SkeletonRenderer(SkeletonData *skeletonData, bool ownsSkeletonData = false);
-		SkeletonRenderer(const std::string &skeletonDataFile, Atlas *atlas, float scale = 1);
-		SkeletonRenderer(const std::string &skeletonDataFile, const std::string &atlasFile, float scale = 1);
+		CC_CONSTRUCTOR_ACCESS : SkeletonRendererCocos2dX();
+		SkeletonRendererCocos2dX(Skeleton *skeleton, bool ownsSkeleton = false, bool ownsSkeletonData = false, bool ownsAtlas = false);
+		SkeletonRendererCocos2dX(SkeletonData *skeletonData, bool ownsSkeletonData = false);
+		SkeletonRendererCocos2dX(const std::string &skeletonDataFile, Atlas *atlas, float scale = 1);
+		SkeletonRendererCocos2dX(const std::string &skeletonDataFile, const std::string &atlasFile, float scale = 1);
 
-		virtual ~SkeletonRenderer();
+		virtual ~SkeletonRendererCocos2dX();
 
 		void initWithSkeleton(Skeleton *skeleton, bool ownsSkeleton = false, bool ownsSkeletonData = false, bool ownsAtlas = false);
 		void initWithData(SkeletonData *skeletonData, bool ownsSkeletonData = false);
@@ -147,7 +147,7 @@ namespace spine {
 		bool _debugBones;
 		bool _debugMeshes;
 		bool _debugBoundingRect;
-		SkeletonClipping *_clipper;		
+		SkeletonClipping *_clipper;
 		cocos2d::Rect _boundingRect;
 
 		int _startSlotIndex;

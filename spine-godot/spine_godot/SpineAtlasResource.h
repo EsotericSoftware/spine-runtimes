@@ -74,6 +74,8 @@ public:
 
 	Error load_from_atlas_file(const String &path);// .atlas
 
+	Error load_from_atlas_file_internal(const String &path, bool is_importing);// .atlas
+
 	Error load_from_file(const String &path);// .spatlas
 
 	Error save_to_file(const String &path);// .spatlas
@@ -110,7 +112,11 @@ public:
 #if VERSION_MAJOR > 3
 	RES load(const String &path, const String &original_path, Error *error, bool use_sub_threads, float *progress, CacheMode cache_mode) override;
 #else
+#if VERSION_MINOR > 5
+	RES load(const String &path, const String &original_path, Error *error, bool no_subresource_cache = false) override;
+#else
 	RES load(const String &path, const String &original_path, Error *error) override;
+#endif
 #endif
 
 	void get_recognized_extensions(List<String> *extensions) const override;

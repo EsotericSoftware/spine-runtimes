@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../../index.css">
+    <script src="https://unpkg.com/canvaskit-wasm@latest/bin/canvaskit.js"></script>
+    <script src="../dist/iife/spine-canvaskit.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body class="p-4 flex flex-col items-center">
+    <h1>Micro Benchmark</h1>
+    <div id="timing"></div>
+    <canvas id=foo style="margin: 0 auto; width: 600px; height: 400px;"></canvas>
+</body>
+
+<script type="module">
+    async function readFile(path) {
+        const response = await fetch(path);
+        if (!response.ok) throw new Error("Could not load file " + path);
+        return await response.arrayBuffer();
+    }
+
+    const canvasElement = document.querySelector("#foo");
+    const dpr = window.devicePixelRatio || 1;
+    canvasElement.width = canvasElement.clientWidth * dpr;
+    canvasElement.height = canvasElement.clientHeight * dpr;
+
+    const ck = await CanvasKitInit();
+    const surface = ck.MakeCanvasSurface('foo');
+    surface.getCanvas().scale(dpr, dpr);
+
+    const atlas = await spine.loadTextureAtlas(ck, "assets/spineboy.atlas", readFile);
+    const skeletonData = await spine.loadSkeletonData("assets/spineboy-pro.skel", atlas, readFile);
+
+    // Instantiate 100 drawables, randomly placed and scaled.
+    const drawables = [];
+    for (let i = 0; i < 100; i++) {
+        const drawable = new spine.SkeletonDrawable(skeletonData);
+        drawable.skeleton.scaleX = drawable.skeleton.scaleY = 0.1 + Math.random() * 0.4;
+        drawable.skeleton.x = Math.random() * 600;
+        drawable.skeleton.y = Math.random() * 400;
+        drawable.animationState.setAnimation(0, "walk", true);
+
+        drawables.push(drawable);
+    }
+
+    const timingElement = document.querySelector("#timing");
+    const renderer = new spine.SkeletonRenderer(ck);
+    let lastTime = performance.now();
+    function drawFrame(canvas) {
+        canvas.clear(ck.Color(52, 52, 54, 1));
+
+        const now = performance.now();
+        const deltaTime = (now - lastTime) / 1000;
+        lastTime = now;
+
+        // Render all drawables
+        for (let i = 0; i < drawables.length; i++) {
+            const drawable = drawables[i];
+            drawable.update(deltaTime);
+            renderer.render(canvas, drawable);
+        }
+
+        surface.requestAnimationFrame(drawFrame);
+        timingElement.textContent = (deltaTime * 1000).toFixed(0) + "ms/frame";
+    }
+    surface.requestAnimationFrame(drawFrame);
+</script>
+
+</html>

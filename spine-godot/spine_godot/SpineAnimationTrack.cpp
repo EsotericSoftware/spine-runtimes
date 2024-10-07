@@ -37,7 +37,7 @@
 #include "scene/resources/animation.h"
 
 #ifdef TOOLS_ENABLED
-#include "godot/editor/editor_node.h"
+#include "editor/editor_node.h"
 #include "editor/plugins/animation_player_editor_plugin.h"
 #include "editor/plugins/animation_tree_editor_plugin.h"
 #endif
@@ -78,7 +78,7 @@ void SpineAnimationTrack::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "animation_name", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_STORAGE | PROPERTY_USAGE_INTERNAL | PROPERTY_USAGE_NOEDITOR), "set_animation_name", "get_animation_name");
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "loop", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_STORAGE | PROPERTY_USAGE_INTERNAL | PROPERTY_USAGE_NOEDITOR), "set_loop", "get_loop");
 
-	ADD_PROPERTY(PropertyInfo(Variant::INT, "track_index", PROPERTY_HINT_RANGE, "0,256,0"), "set_track_index", "get_track_index");
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "track_index", PROPERTY_HINT_RANGE, "0,256,1"), "set_track_index", "get_track_index");
 	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "mix_duration"), "set_mix_duration", "get_mix_duration");
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "hold_previous"), "set_hold_previous", "get_hold_previous");
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "reverse"), "set_reverse", "get_reverse");
@@ -182,8 +182,8 @@ void SpineAnimationTrack::setup_animation_player() {
 #if VERSION_MAJOR > 3
 		List<StringName> animation_libraries;
 		animation_player->get_animation_library_list(&animation_libraries);
-		for (int i = 0; i < animation_libraries.size(); i++) {
-			animation_player->remove_animation_library(animation_libraries[i]);
+		for (auto iter = animation_libraries.front(); iter; iter = iter->next()) {
+			animation_player->remove_animation_library(iter->get());
 		}
 #else
 		List<StringName> animation_names;
