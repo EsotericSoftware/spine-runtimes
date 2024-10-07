@@ -218,7 +218,7 @@ String SpineAtlasResource::get_source_path() {
 }
 
 Error SpineAtlasResource::load_from_atlas_file(const String &path) {
-	load_from_atlas_file_internal(path, false);
+	return load_from_atlas_file_internal(path, false);
 }
 
 Error SpineAtlasResource::load_from_atlas_file_internal(const String &path, bool is_importing) {
