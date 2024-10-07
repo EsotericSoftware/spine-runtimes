@@ -1,0 +1,59 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>spine-pixi</title>
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@latest/dist/pixi.min.js"></script>
+    <script src="../dist/spine-pixi.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tweakpane@3.1.9/dist/tweakpane.min.js"></script>
+    <link rel="stylesheet" href="./index.css">
+  </head>
+
+  <body>
+    <script>
+      (async function () {
+        var app = new PIXI.Application();
+        await app.init({
+          width: window.innerWidth,
+          height: window.innerHeight,
+          resolution: window.devicePixelRatio || 1,
+          autoDensity: true,
+          resizeTo: window,
+          backgroundColor: 0x2c3e50,
+          hello: true,
+        })
+        document.body.appendChild(app.view);
+
+        // Pre-load the skeleton data and atlas. You can also load .json skeleton data.
+        PIXI.Assets.add({alias: "spineboyData", src: "./assets/spineboy-pro.skel" });
+        PIXI.Assets.add({alias: "spineboyAtlas", src: "./assets/spineboy-pma.atlas" });
+        await PIXI.Assets.load(["spineboyData", "spineboyAtlas"]);
+
+        // Manually load the data and create a Spine display object from it using
+        // the Spine core API. This will not use the interal cache like Spine.from(),
+        // so you have to cache data yourself.
+        const atlas = PIXI.Assets.get("spineboyAtlas");
+        const attachmentLoader = new spine.AtlasAttachmentLoader(atlas);
+        const binaryLoader = new spine.SkeletonBinary(attachmentLoader);
+        binaryLoader.scale = 0.5;
+        const skeletonData = binaryLoader.readSkeletonData(
+          PIXI.Assets.get("spineboyData")
+        );
+        const spineboy = new spine.Spine(skeletonData);
+
+        // Set the default mix time to use when transitioning
+        // from one animation to the next.
+        spineboy.state.data.defaultMix = 0.2;
+
+        // Center the spine object on screen.
+        spineboy.x = window.innerWidth / 2;
+        spineboy.y = window.innerHeight / 2 + spineboy.getBounds().height / 2;
+
+        // Set animation "run" on track 0, looped.
+        spineboy.state.setAnimation(0, "run", true);
+
+        // Add the display object to the stage.
+        app.stage.addChild(spineboy);
+      })();
+    </script>
+  </body>
+</html>

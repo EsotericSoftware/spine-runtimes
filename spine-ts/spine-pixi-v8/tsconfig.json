@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "lib": ["ESNext", "DOM", "ScriptHost"],
+    "strict": true,
+    "esModuleInterop": true,
+    "allowJs": true,
+    "moduleResolution": "node",
+    "sourceMap": false,
+    "declaration": true,
+    "declarationMap": false,
+    "declarationDir": "./lib",
+    "outDir": "./lib",
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "strictNullChecks": false,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "noImplicitOverride": true
+  },
+  "include": ["./src", "./typings", "./stories", "./test"],
+  "ts-node": {
+        "files": true,
+        "compilerOptions": {
+            "esModuleInterop": true,
+            "module": "commonjs"
+        }
+    }
+}

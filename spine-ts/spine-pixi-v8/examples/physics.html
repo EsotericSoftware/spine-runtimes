@@ -1,0 +1,48 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>spine-pixi</title>
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@latest/dist/pixi.min.js"></script>
+    <script src="../dist/spine-pixi.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tweakpane@3.1.9/dist/tweakpane.min.js"></script>
+    <link rel="stylesheet" href="./index.css">
+  </head>
+
+  <body>
+    <script>
+      (async function () {
+        var app = new PIXI.Application();
+        await app.init({
+          width: window.innerWidth,
+          height: window.innerHeight,
+          resolution: window.devicePixelRatio || 1,
+          autoDensity: true,
+          resizeTo: window,
+          backgroundColor: 0x2c3e50,
+          hello: true,
+        })
+        document.body.appendChild(app.view);
+
+        // Pre-load the skeleton data and atlas. You can also load .json skeleton data.
+        PIXI.Assets.add({alias: "sackData", src: "./assets/sack-pro.skel"});
+        PIXI.Assets.add({alias: "sackAtlas", src: "./assets/sack-pma.atlas"});
+        await PIXI.Assets.load(["sackData", "sackAtlas"]);
+
+        // Create the spine display object
+        const sack = spine.Spine.from({skeleton: "sackData", atlas: "sackAtlas", 
+          scale: 0.2,
+        });
+
+        // Center the spine object on screen.
+        sack.x = window.innerWidth / 2;
+        sack.y = window.innerHeight / 2 + sack.getBounds().height / 2;
+
+        // Set animation "cape-follow-example" on track 0, looped.
+        sack.state.setAnimation(0, "cape-follow-example", true);
+
+        // Add the display object to the stage.
+        app.stage.addChild(sack);
+      })();
+    </script>
+  </body>
+</html>

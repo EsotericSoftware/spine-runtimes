@@ -1,0 +1,48 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>spine-pixi</title>
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@latest/dist/pixi.min.js"></script>
+    <script src="../dist/spine-pixi.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tweakpane@3.1.9/dist/tweakpane.min.js"></script>
+    <link rel="stylesheet" href="./index.css">
+  </head>
+
+  <body>
+    <script>
+      (async function () {
+        var app = new PIXI.Application();
+        await app.init({
+          width: window.innerWidth,
+          height: window.innerHeight,
+          resolution: window.devicePixelRatio || 1,
+          autoDensity: true,
+          resizeTo: window,
+          backgroundColor: 0x2c3e50,
+          hello: true,
+        })
+        document.body.appendChild(app.view);
+
+        // Pre-load the skeleton data and atlas. You can also load .json skeleton data.
+        PIXI.Assets.add({alias: "cloudPotData", src: "./assets/cloud-pot.skel"});
+        PIXI.Assets.add({alias: "cloudPotAtlas", src: "./assets/cloud-pot-pma.atlas"});
+        await PIXI.Assets.load(["cloudPotData", "cloudPotAtlas"]);
+
+        // Create the spine display object
+        const cloudPot = spine.Spine.from({skeleton: "cloudPotData", atlas: "cloudPotAtlas", 
+          scale: 0.25,
+        });
+
+        // Center the spine object on screen.
+        cloudPot.x = window.innerWidth / 2;
+        cloudPot.y = window.innerHeight / 2 + cloudPot.getBounds().height / 4;
+
+        // Set animation "playing-in-the-rain" on track 0, looped.
+        cloudPot.state.setAnimation(0, "playing-in-the-rain", true);
+
+        // Add the display object to the stage.
+        app.stage.addChild(cloudPot);
+      })();
+    </script>
+  </body>
+</html>
