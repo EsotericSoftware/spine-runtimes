@@ -144,7 +144,7 @@ SpineEditorPlugin::SpineEditorPlugin() {
 	add_import_plugin(memnew(SpineJsonResourceImportPlugin));
 	add_import_plugin(memnew(SpineBinaryResourceImportPlugin));
 	add_inspector_plugin(memnew(SpineSkeletonDataResourceInspectorPlugin));
-	add_inspector_plugin(memnew(SpineSpriteInspectorPlugin));
+	// add_inspector_plugin(memnew(SpineSpriteInspectorPlugin));
 }
 #else
 SpineEditorPlugin::SpineEditorPlugin(EditorNode *node) {

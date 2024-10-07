@@ -53,6 +53,8 @@ class SpineAtlasResourceImportPlugin : public EditorImportPlugin {
 
 public:
 #ifdef SPINE_GODOT_EXTENSION
+	static void _bind_methods() {};
+
 	String _get_importer_name() const override { return "spine.atlas"; }
 
 	String _get_visible_name() const override { return "Spine Runtime Atlas"; }
@@ -120,6 +122,8 @@ class SpineJsonResourceImportPlugin : public EditorImportPlugin {
 
 public:
 #ifdef SPINE_GODOT_EXTENSION
+	static void _bind_methods() {};
+
 	String _get_importer_name() const override { return "spine.json"; }
 
 	String _get_visible_name() const override { return "Spine Skeleton Json"; }
@@ -187,6 +191,8 @@ class SpineBinaryResourceImportPlugin : public EditorImportPlugin {
 
 public:
 #ifdef SPINE_GODOT_EXTENSION
+	static void _bind_methods() {};
+
 	String _get_importer_name() const override { return "spine.skel"; }
 
 	String _get_visible_name() const override { return "Spine Skeleton Binary"; }
@@ -271,6 +277,8 @@ class SpineSkeletonDataResourceInspectorPlugin : public EditorInspectorPlugin {
 
 public:
 #ifdef SPINE_GODOT_EXTENSION
+	static void _bind_methods() {}
+
 	bool _can_handle(Object *p_object) const override;
 	bool _parse_property(Object *object, Variant::Type type, const String &path, PropertyHint hint, const String &hint_text, const BitField<PropertyUsageFlags> p_usage, bool wide) override;
 #else

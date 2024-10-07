@@ -165,7 +165,7 @@ protected:
 
 	spine::Vector<spine::Vector<SpineSlotNode *>> slot_nodes;
 	Vector<SpineMesh2D *> mesh_instances;
-	static Ref<CanvasItemMaterial> default_materials[4];
+	// static Ref<CanvasItemMaterial> default_materials[4];
 	Ref<Material> normal_material;
 	Ref<Material> additive_material;
 	Ref<Material> multiply_material;

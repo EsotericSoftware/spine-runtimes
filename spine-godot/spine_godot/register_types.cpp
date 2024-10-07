@@ -27,6 +27,7 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+
 #include "SpineCommon.h"
 #ifdef SPINE_GODOT_EXTENSION
 #else
@@ -79,10 +80,17 @@ static void editor_init_callback() {
 
 #ifdef SPINE_GODOT_EXTENSION
 void initialize_spine_godot_module(ModuleInitializationLevel level) {
+	printf(">>>>>>>>>>>> level: %i\n", level);
 	if (level == MODULE_INITIALIZATION_LEVEL_EDITOR) {
+		GDREGISTER_CLASS(SpineAtlasResourceImportPlugin);
+		GDREGISTER_CLASS(SpineJsonResourceImportPlugin);
+		GDREGISTER_CLASS(SpineBinaryResourceImportPlugin);
+		GDREGISTER_CLASS(SpineSkeletonDataResourceInspectorPlugin);
 		GDREGISTER_CLASS(SpineEditorPlugin);
 		EditorPlugins::add_plugin_class(StringName("SpineEditorPlugin"));
+		printf(">>>>>>>>>>>> registered editor plugin");
 	}
+	if (level != MODULE_INITIALIZATION_LEVEL_SCENE) return;
 #else
 #if VERSION_MAJOR > 3
 void initialize_spine_godot_module(ModuleInitializationLevel level) {
@@ -103,6 +111,12 @@ void register_spine_godot_types() {
 #endif
 #endif
 	spine::Bone::setYDown(true);
+
+	GDREGISTER_CLASS(SpineAtlasResourceFormatLoader);
+	GDREGISTER_CLASS(SpineAtlasResourceFormatSaver);
+	GDREGISTER_CLASS(SpineSkeletonFileResourceFormatLoader);
+	GDREGISTER_CLASS(SpineSkeletonFileResourceFormatSaver);
+
 	GDREGISTER_CLASS(SpineObjectWrapper);
 	GDREGISTER_CLASS(SpineAtlasResource);
 	GDREGISTER_CLASS(SpineSkeletonFileResource);
@@ -180,10 +194,12 @@ void register_spine_godot_types() {
 	ResourceSaver::add_resource_format_saver(skeleton_file_saver);
 #endif
 #endif
+	printf(">>>>>>>>>>>>>>>>>>>> fuck\n");
 }
 
 #if VERSION_MAJOR > 3
 void uninitialize_spine_godot_module(ModuleInitializationLevel level) {
+	return;
 	if (level != MODULE_INITIALIZATION_LEVEL_CORE) return;
 #else
 void unregister_spine_godot_types() {
@@ -208,7 +224,6 @@ extern "C" GDExtensionBool GDE_EXPORT spine_godot_library_init(GDExtensionInterf
 	init_obj.register_initializer(initialize_spine_godot_module);
 	init_obj.register_terminator(uninitialize_spine_godot_module);
 	init_obj.set_minimum_library_initialization_level(MODULE_INITIALIZATION_LEVEL_CORE);
-
 	return init_obj.init();
 }
 #endif

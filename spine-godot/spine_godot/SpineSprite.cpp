@@ -84,7 +84,7 @@
 #endif
 #endif
 
-Ref<CanvasItemMaterial>
+/*Ref<CanvasItemMaterial>
 		SpineSprite::default_materials[4] = {};
 static int sprite_count = 0;
 static spine::Vector<unsigned short> quad_indices;
@@ -93,7 +93,7 @@ static spine::Vector<float> scratch_vertices;
 static PackedVector2Array scratch_points;
 #else
 static Vector<Vector2> scratch_points;
-#endif
+#endif*/
 
 
 static void clear_triangles(SpineMesh2D *mesh_instance) {
@@ -403,7 +403,7 @@ void SpineSprite::_bind_methods() {
 }
 
 SpineSprite::SpineSprite() : update_mode(SpineConstant::UpdateMode_Process), preview_skin("Default"), preview_animation("-- Empty --"), preview_frame(false), preview_time(0), skeleton_clipper(nullptr), modified_bones(false) {
-	skeleton_clipper = new spine::SkeletonClipping();
+	/*skeleton_clipper = new spine::SkeletonClipping();
 
 	// One material per blend mode, shared across all sprites.
 	if (!default_materials[0].is_valid()) {
@@ -453,16 +453,16 @@ SpineSprite::SpineSprite() : update_mode(SpineConstant::UpdateMode_Process), pre
 	debug_clipping = false;
 	debug_clipping_color = Color(0.8, 0, 0, 0.8);
 
-	sprite_count++;
+	sprite_count++;*/
 }
 
 SpineSprite::~SpineSprite() {
 	delete skeleton_clipper;
-	sprite_count--;
+	/*sprite_count--;
 	if (!sprite_count) {
 		for (int i = 0; i < 4; i++)
 			default_materials[i].unref();
-	}
+	}*/
 }
 
 void SpineSprite::set_skeleton_data_res(const Ref<SpineSkeletonDataResource> &_skeleton_data) {
@@ -513,7 +513,7 @@ void SpineSprite::on_skeleton_data_changed() {
 }
 
 void SpineSprite::generate_meshes_for_slots(Ref<SpineSkeleton> skeleton_ref) {
-	auto skeleton = skeleton_ref->get_spine_object();
+	/*auto skeleton = skeleton_ref->get_spine_object();
 	for (int i = 0, n = (int) skeleton->getSlots().size(); i < n; i++) {
 		auto mesh_instance = memnew(SpineMesh2D);
 		mesh_instance->set_position(Vector2(0, 0));
@@ -523,7 +523,7 @@ void SpineSprite::generate_meshes_for_slots(Ref<SpineSkeleton> skeleton_ref) {
 		add_child(mesh_instance);
 		mesh_instances.push_back(mesh_instance);
 		slot_nodes.add(spine::Vector<SpineSlotNode *>());
-	}
+	}*/
 }
 
 void SpineSprite::remove_meshes() {
@@ -758,7 +758,7 @@ void SpineSprite::update_skeleton(float delta) {
 }
 
 void SpineSprite::update_meshes(Ref<SpineSkeleton> skeleton_ref) {
-	spine::Skeleton *skeleton = skeleton_ref->get_spine_object();
+	/*spine::Skeleton *skeleton = skeleton_ref->get_spine_object();
 	for (int i = 0, n = (int) skeleton->getSlots().size(); i < n; ++i) {
 		spine::Slot *slot = skeleton->getDrawOrder()[i];
 		spine::Attachment *attachment = slot->getAttachment();
@@ -917,7 +917,7 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> skeleton_ref) {
 		}
 		skeleton_clipper->clipEnd(*slot);
 	}
-	skeleton_clipper->clipEnd();
+	skeleton_clipper->clipEnd();*/
 }
 
 #ifdef SPINE_GODOT_EXTENSION
@@ -943,7 +943,7 @@ void createLinesFromMesh(Vector<Vector2> &scratch_points, spine::Vector<unsigned
 }
 
 void SpineSprite::draw() {
-	if (!animation_state.is_valid() && !skeleton.is_valid()) return;
+	/*if (!animation_state.is_valid() && !skeleton.is_valid()) return;
 	if (!Engine::get_singleton()->is_editor_hint() && !get_tree()->is_debugging_collisions_hint()) return;
 
 #if VERSION_MAJOR > 3
@@ -1199,7 +1199,7 @@ void SpineSprite::draw() {
 		draw_string(default_font, Vector2(10, 0 + i * default_font->get_height()), hover_text_lines[i], Color(1, 1, 1, 1));
 #endif
 	}
-#endif
+#endif*/
 }
 
 void SpineSprite::draw_bone(spine::Bone *bone, const Color &color) {

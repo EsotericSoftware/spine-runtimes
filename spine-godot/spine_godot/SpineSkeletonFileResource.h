@@ -83,6 +83,8 @@ class SpineSkeletonFileResourceFormatLoader : public ResourceFormatLoader {
 
 public:
 #ifdef SPINE_GODOT_EXTENSION
+	static void _bind_methods() {};
+
 	PackedStringArray _get_recognized_extensions();
 
 	bool _handles_type(const StringName &type);
@@ -114,8 +116,12 @@ class SpineSkeletonFileResourceFormatSaver : public ResourceFormatSaver {
 
 public:
 #ifdef SPINE_GODOT_EXTENSION
+	static void _bind_methods() {};
+
 	Error _save(const Ref<Resource> &resource, const String &path, uint32_t flags) override;
+
 	bool _recognize(const Ref<Resource> &resource);
+
 	PackedStringArray _get_recognized_extensions(const Ref<Resource> &resource);
 #else
 #if VERSION_MAJOR > 3
