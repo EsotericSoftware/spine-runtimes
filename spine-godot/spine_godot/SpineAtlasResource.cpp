@@ -30,10 +30,15 @@
 #include "SpineAtlasResource.h"
 #include "SpineRendererObject.h"
 #include "core/io/json.h"
-#include "core/io/image.h"
-#include "scene/resources/image_texture.h"
 #include "scene/resources/texture.h"
 #include <spine/TextureLoader.h>
+
+#if VERSION_MAJOR > 3
+#include "core/io/image.h"
+#include "scene/resources/image_texture.h"
+#else
+#include "core/image.h"
+#endif
 
 #ifdef TOOLS_ENABLED
 #include "editor/editor_file_system.h"
@@ -90,22 +95,21 @@ public:
 			Vector<uint8_t> buf = FileAccess::get_file_as_array(path, &error);
 			if (error == OK) {
 				Ref<Image> img;
-				img.instantiate();
-				String filename = path.get_filename().to_lower();
-				if (filename.ends_with(".png")) {
-					img->load_png_from_buffer(buf);
-				} else if (filename_lower.ends_with(".jpg")) {
-					img->load_jpg_from_buffer(buf);
-				}
-				return ImageTexture::create_from_image(img);
+				INSTANTIATE(img);
+				img->load(path);
+
+				Ref<ImageTexture> texture;
+				INSTANTIATE(texture);
+				texture->create_from_image(img);
+				return texture;
 			}
+			return Ref<Texture>();
 		}
-		return Ref<Texture>();
 	}
 #endif
 
 	void import_image_resource(const String &path) {
-#ifdef VERSION_MAJOR> 4
+#if VERSION_MAJOR > 4
 #ifdef TOOLS_ENABLED
 		// Required when importing into editor by e.g. drag & drop. The .png files
 		// of the atlas might not have been imported yet.
