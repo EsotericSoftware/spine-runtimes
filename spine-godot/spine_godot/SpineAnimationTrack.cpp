@@ -27,6 +27,8 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#ifndef SPINE_GODOT_EXTENSION
+
 #include "SpineAnimationTrack.h"
 #if VERSION_MAJOR > 3
 #include "core/config/engine.h"
@@ -554,3 +556,5 @@ void SpineAnimationTrack::set_debug(bool _debug) {
 bool SpineAnimationTrack::get_debug() {
 	return debug;
 }
+
+#endif

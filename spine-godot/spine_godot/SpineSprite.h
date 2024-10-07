@@ -58,10 +58,17 @@ protected:
 	void _notification(int what);
 	static void _bind_methods();
 
+#ifdef SPINE_GODOT_EXTENSION
+	PackedVector2Array vertices;
+	PackedVector2Array uvs;
+	PackedColorArray colors;
+	PackedInt32Array indices;
+#else
 	Vector<Vector2> vertices;
 	Vector<Vector2> uvs;
 	Vector<Color> colors;
 	Vector<int> indices;
+#endif
 	SpineRendererObject *renderer_object;
 
 	bool indices_changed;
@@ -89,7 +96,7 @@ protected:
 
 public:
 #if VERSION_MAJOR > 3
-	SpineMesh2D() : renderer_object(nullptr), indices_changed(true), num_vertices(0), num_indices(0), vertex_stride(0), normal_tangent_stride(0), attribute_stride(0){};
+	SpineMesh2D() : renderer_object(nullptr), indices_changed(true), num_vertices(0), num_indices(0), vertex_stride(0), normal_tangent_stride(0), attribute_stride(0) {};
 	~SpineMesh2D() {
 		if (mesh.is_valid()) {
 #ifdef SPINE_GODOT_EXTENSION
@@ -100,7 +107,7 @@ public:
 		}
 	}
 #else
-	SpineMesh2D() : renderer_object(nullptr), indices_changed(true), num_vertices(0), num_indices(0){};
+	SpineMesh2D() : renderer_object(nullptr), indices_changed(true), num_vertices(0), num_indices(0) {};
 	~SpineMesh2D() {
 		if (mesh.is_valid()) {
 			VS::get_singleton()->free(mesh);
@@ -108,11 +115,19 @@ public:
 	}
 #endif
 
+#ifdef SPINE_GODOT_EXTENSION
+	void update_mesh(const PackedVector2Array &vertices,
+					 const PackedVector2Array &uvs,
+					 const PackedColorArray &colors,
+					 const PackedInt32Array &indices,
+					 SpineRendererObject *renderer_object);
+#else
 	void update_mesh(const Vector<Point2> &vertices,
 					 const Vector<Point2> &uvs,
 					 const Vector<Color> &colors,
 					 const Vector<int> &indices,
 					 SpineRendererObject *renderer_object);
+#endif
 };
 
 class SpineSprite : public Node2D,
@@ -276,8 +291,11 @@ public:
 
 	void set_debug_clipping_color(const Color &color) { debug_clipping_color = color; }
 
+#ifndef SPINE_GODOT_EXTENSION
+// FIXME
 #ifdef TOOLS_ENABLED
 	virtual Rect2 _edit_get_rect() const;
 	virtual bool _edit_use_rect() const;
+#endif
 #endif
 };

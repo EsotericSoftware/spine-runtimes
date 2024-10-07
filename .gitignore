@@ -205,3 +205,10 @@ spine-sdl/.vs
 spine-ts/spine-canvaskit/dist
 spine-ts/output.png
 spine-godot/godot-cpp
+spine-godot/__pycache__
+*.os
+spine-godot/.sconsign.dblite
+spine-godot/example-v4-extension/.godot
+spine-godot/src
+spine-godot/compile_commands.json
+spine-godot/bin

@@ -129,16 +129,26 @@ static bool checkBinary(const char *binaryData, int length) {
 Error SpineSkeletonFileResource::load_from_file(const String &path) {
 	Error error = OK;
 	if (path.ends_with(".spjson") || path.ends_with(".spine-json")) {
+#ifdef SPINE_GODOT_EXTENSION
+		json = FileAccess::get_file_as_string(path);
+		if (SSIZE(json) == 0) return ERR_INVALID_DATA;
+#else
 		json = FileAccess::get_file_as_string(path, &error);
 		if (error != OK) return error;
+#endif
 		if (!checkJson(json.utf8())) return ERR_INVALID_DATA;
 	} else {
+#ifdef SPINE_GODOT_EXTENSION
+		binary = FileAccess::get_file_as_bytes(path);
+		if (binary.size() == 0) return ERR_INVALID_DATA;
+#else
 #if VERSION_MAJOR > 3
 		binary = FileAccess::get_file_as_bytes(path, &error);
 #else
 		binary = FileAccess::get_file_as_array(path, &error);
 #endif
 		if (error != OK) return error;
+#endif
 		if (!checkBinary((const char *) binary.ptr(), binary.size())) return ERR_INVALID_DATA;
 	}
 	return error;
@@ -146,6 +156,10 @@ Error SpineSkeletonFileResource::load_from_file(const String &path) {
 
 Error SpineSkeletonFileResource::save_to_file(const String &path) {
 	Error error;
+#ifdef SPINE_GODOT_EXTENSION
+	Ref<FileAccess> file = FileAccess::open(path, FileAccess::WRITE);
+	if (!file.is_valid()) return ERR_FILE_CANT_OPEN;
+#else
 #if VERSION_MAJOR > 3
 	Ref<FileAccess> file = FileAccess::open(path, FileAccess::WRITE, &error);
 	if (error != OK) return error;
@@ -155,6 +169,7 @@ Error SpineSkeletonFileResource::save_to_file(const String &path) {
 		if (file) file->close();
 		return error;
 	}
+#endif
 #endif
 	if (!is_binary())
 		file->store_string(json);
@@ -168,6 +183,7 @@ Error SpineSkeletonFileResource::save_to_file(const String &path) {
 	return OK;
 }
 
+#ifndef SPINE_GODOT_EXTENSION
 #if VERSION_MAJOR > 3
 Error SpineSkeletonFileResource::copy_from(const Ref<Resource> &p_resource) {
 	auto error = Resource::copy_from(p_resource);
@@ -179,7 +195,11 @@ Error SpineSkeletonFileResource::copy_from(const Ref<Resource> &p_resource) {
 	return OK;
 }
 #endif
+#endif
 
+#ifdef SPINE_GODOT_EXTENSION
+Variant SpineSkeletonFileResourceFormatLoader::_load(const String &path, const String &original_path, bool use_sub_threads, int32_t cache_mode) {
+#else
 #if VERSION_MAJOR > 3
 RES SpineSkeletonFileResourceFormatLoader::load(const String &path, const String &original_path, Error *error, bool use_sub_threads, float *progress, CacheMode cache_mode) {
 #else
@@ -189,42 +209,81 @@ RES SpineSkeletonFileResourceFormatLoader::load(const String &path, const String
 RES SpineSkeletonFileResourceFormatLoader::load(const String &path, const String &original_path, Error *error) {
 #endif
 #endif
+#endif
 	Ref<SpineSkeletonFileResource> skeleton_file = memnew(SpineSkeletonFileResource);
 	skeleton_file->load_from_file(path);
+#ifndef SPINE_GODOT_EXTENSION
 	if (error) *error = OK;
+#endif
 	return skeleton_file;
 }
 
+#ifdef SPINE_GODOT_EXTENSION
+PackedStringArray SpineSkeletonFileResourceFormatLoader::_get_recognized_extensions() {
+	PackedStringArray extensions;
+	extensions.push_back("spjson");
+	extensions.push_back("spskel");
+	return extensions;
+}
+#else
 void SpineSkeletonFileResourceFormatLoader::get_recognized_extensions(List<String> *extensions) const {
 	extensions->push_back("spjson");
 	extensions->push_back("spskel");
 }
+#endif
 
+#ifdef SPINE_GODOT_EXTENSION
+String SpineSkeletonFileResourceFormatLoader::_get_resource_type(const String &path) {
+#else
 String SpineSkeletonFileResourceFormatLoader::get_resource_type(const String &path) const {
+#endif
 	return path.ends_with(".spjson") || path.ends_with(".spskel") || path.ends_with(".spine-json") || path.ends_with(".skel") ? "SpineSkeletonFileResource" : "";
 }
 
+#ifdef SPINE_GODOT_EXTENSION
+bool SpineSkeletonFileResourceFormatLoader::_handles_type(const StringName &type) {
+#else
 bool SpineSkeletonFileResourceFormatLoader::handles_type(const String &type) const {
-	return type == "SpineSkeletonFileResource" || ClassDB::is_parent_class(type, "SpineSkeletonFileResource");
+#endif
+	return type == StringName("SpineSkeletonFileResource") || ClassDB::is_parent_class(type, "SpineSkeletonFileResource");
 }
 
+#ifdef SPINE_GODOT_EXTENSION
+Error SpineSkeletonFileResourceFormatSaver::_save(const Ref<Resource> &resource, const String &path, uint32_t flags) {
+#else
 #if VERSION_MAJOR > 3
 Error SpineSkeletonFileResourceFormatSaver::save(const RES &resource, const String &path, uint32_t flags) {
 #else
 Error SpineSkeletonFileResourceFormatSaver::save(const String &path, const RES &resource, uint32_t flags) {
+#endif
 #endif
 	Ref<SpineSkeletonFileResource> res = resource;
 	Error error = res->save_to_file(path);
 	return error;
 }
 
+#ifdef SPINE_GODOT_EXTENSION
+PackedStringArray SpineSkeletonFileResourceFormatSaver::_get_recognized_extensions(const Ref<Resource> &resource) {
+	PackedStringArray extensions;
+	if (Object::cast_to<SpineSkeletonFileResource>(*resource)) {
+		extensions.push_back("spjson");
+		extensions.push_back("spskel");
+	}
+	return extensions;
+}
+#else
 void SpineSkeletonFileResourceFormatSaver::get_recognized_extensions(const RES &resource, List<String> *p_extensions) const {
 	if (Object::cast_to<SpineSkeletonFileResource>(*resource)) {
 		p_extensions->push_back("spjson");
 		p_extensions->push_back("spskel");
 	}
 }
+#endif
 
-bool SpineSkeletonFileResourceFormatSaver::recognize(const RES &p_resource) const {
-	return Object::cast_to<SpineSkeletonFileResource>(*p_resource) != nullptr;
+#ifdef SPINE_GODOT_EXTENSION
+bool SpineSkeletonFileResourceFormatSaver::_recognize(const Ref<Resource> &resource) {
+#else
+bool SpineSkeletonFileResourceFormatSaver::recognize(const RES &resource) const {
+#endif
+	return Object::cast_to<SpineSkeletonFileResource>(*resource) != nullptr;
 }

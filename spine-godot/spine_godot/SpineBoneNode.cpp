@@ -29,10 +29,15 @@
 
 #include "SpineBoneNode.h"
 
+#ifdef SPINE_GODOT_EXTENSION
+#include <godot_cpp/classes/engine.hpp>
+#include <godot_cpp/classes/scene_tree.hpp>
+#else
 #if VERSION_MAJOR > 3
 #include "core/config/engine.h"
 #else
 #include "core/engine.h"
+#endif
 #endif
 
 void SpineBoneNode::_bind_methods() {
@@ -102,7 +107,11 @@ void SpineBoneNode::_notification(int what) {
 }
 
 void SpineBoneNode::_get_property_list(List<PropertyInfo> *list) const {
+#ifdef SPINE_GODOT_EXTENSION
+	PackedStringArray bone_names;
+#else
 	Vector<String> bone_names;
+#endif
 	SpineSprite *sprite = find_parent_sprite();
 	if (sprite) sprite->get_skeleton_data_res()->get_bone_names(bone_names);
 	else
@@ -110,7 +119,7 @@ void SpineBoneNode::_get_property_list(List<PropertyInfo> *list) const {
 	auto element = list->front();
 	while (element) {
 		auto property_info = element->get();
-		if (property_info.name == "SpineBoneNode") break;
+		if (property_info.name == StringName("SpineBoneNode")) break;
 		element = element->next();
 	}
 	PropertyInfo slot_name_property;
@@ -123,7 +132,7 @@ void SpineBoneNode::_get_property_list(List<PropertyInfo> *list) const {
 }
 
 bool SpineBoneNode::_get(const StringName &property, Variant &value) const {
-	if (property == "bone_name") {
+	if (property == StringName("bone_name")) {
 		value = bone_name;
 		return true;
 	}
@@ -131,7 +140,7 @@ bool SpineBoneNode::_get(const StringName &property, Variant &value) const {
 }
 
 bool SpineBoneNode::_set(const StringName &property, const Variant &value) {
-	if (property == "bone_name") {
+	if (property == StringName("bone_name")) {
 		bone_name = value;
 		SpineSprite *sprite = find_parent_sprite();
 		init_transform(sprite);
@@ -218,7 +227,11 @@ void SpineBoneNode::draw() {
 	if (bone_length == 0) {
 		draw_circle(Vector2(0, 0), debug_thickness, debug_color);
 	} else {
+		#ifdef SPINE_GODOT_EXTENSION
+		PackedVector2Array points;
+		#else
 		Vector<Vector2> points;
+		#endif
 		points.push_back(Vector2(-debug_thickness, 0));
 		points.push_back(Vector2(0, debug_thickness));
 		points.push_back(Vector2(bone_length, 0));

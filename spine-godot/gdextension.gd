@@ -1,0 +1,25 @@
+[configuration]
+
+entry_symbol = "spine_godot_library_init"
+compatibility_minimum = "4.1"
+
+[libraries]
+
+macos.debug = "res://bin/macos/macos.framework/libspine_godot.macos.template_debug"
+macos.release = "res://bin/macos/macos.framework/libspine_godot.macos.template_release"
+ios.debug = "res://bin/ios/ios.framework/libspine_godot.ios.template_debug"
+ios.release = "res://bin/ios/ios.framework/libspine_godot.ios.template_release"
+windows.debug.x86_32 = "res://bin/windows/libspine_godot.windows.template_debug.x86_32.dll"
+windows.release.x86_32 = "res://bin/windows/libspine_godot.windows.template_release.x86_32.dll"
+windows.debug.x86_64 = "res://bin/windows/libspine_godot.windows.template_debug.x86_64.dll"
+windows.release.x86_64 = "res://bin/windows/libspine_godot.windows.template_release.x86_64.dll"
+linux.debug.x86_64 = "res://bin/linux/libspine_godot.linux.template_debug.x86_64.so"
+linux.release.x86_64 = "res://bin/linux/libspine_godot.linux.template_release.x86_64.so"
+linux.debug.arm64 = "res://bin/linux/libspine_godot.linux.template_debug.arm64.so"
+linux.release.arm64 = "res://bin/linux/libspine_godot.linux.template_release.arm64.so"
+linux.debug.rv64 = "res://bin/linux/libspine_godot.linux.template_debug.rv64.so"
+linux.release.rv64 = "res://bin/linux/libspine_godot.linux.template_release.rv64.so"
+android.debug.x86_64 = "res://bin/android/libspine_godot.android.template_debug.x86_64.so"
+android.release.x86_64 = "res://bin/android/libspine_godot.android.template_release.x86_64.so"
+android.debug.arm64 = "res://bin/android/libspine_godot.android.template_debug.arm64.so"
+android.release.arm64 = "res://bin/android/libspine_godot.android.template_release.arm64.so"

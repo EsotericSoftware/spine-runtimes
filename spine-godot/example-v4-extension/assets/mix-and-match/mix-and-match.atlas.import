@@ -1,0 +1,15 @@
+[remap]
+
+importer="spine.atlas"
+type="SpineAtlasResource"
+uid="uid://cvu8lycjkd245"
+path="res://.godot/imported/mix-and-match.atlas-3d349b543ecdcc01fb29033adaef0841.spatlas"
+
+[deps]
+
+source_file="res://assets/mix-and-match/mix-and-match.atlas"
+dest_files=["res://.godot/imported/mix-and-match.atlas-3d349b543ecdcc01fb29033adaef0841.spatlas"]
+
+[params]
+
+normal_map_prefix="n"

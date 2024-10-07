@@ -29,14 +29,10 @@
 
 #pragma once
 
+#ifndef SPINE_GODOT_EXTENSION
 #include "SpineSprite.h"
-#ifdef SPINE_GODOT_EXTENSION
-#include <godot_cpp/classes/animation_player.hpp>
-#include <godot_cpp/classes/animation.hpp>
-#else
 #include "scene/animation/animation_player.h"
 #include "scene/resources/animation.h"
-#endif
 
 class SpineAnimationTrack : public Node {
 	GDCLASS(SpineAnimationTrack, Node)
@@ -138,3 +134,5 @@ public:
 
 	bool get_debug();
 };
+
+#endif

@@ -80,8 +80,10 @@ public:
 
 	Error save_to_file(const String &path);// .spatlas
 
+#ifndef SPINE_GODOT_EXTENSION
 #if VERSION_MAJOR > 3
 	virtual Error copy_from(const Ref<Resource> &p_resource);
+#endif
 #endif
 
 	String get_source_path();

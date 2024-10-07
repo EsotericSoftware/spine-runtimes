@@ -30,9 +30,17 @@
 #include "SpineSlotNode.h"
 
 #ifdef TOOLS_ENABLED
+#ifdef SPINE_GODOT_EXTENSION
+// FIXME
+#else
 #include "editor/editor_node.h"
 #endif
+#endif
+#ifdef SPINE_GODOT_EXTENSION
+#include <godot_cpp/classes/viewport.hpp>
+#else
 #include "scene/main/viewport.h"
+#endif
 
 void SpineSlotNode::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("_on_world_transforms_changed", "spine_sprite"), &SpineSlotNode::on_world_transforms_changed);
@@ -99,7 +107,11 @@ void SpineSlotNode::_notification(int what) {
 }
 
 void SpineSlotNode::_get_property_list(List<PropertyInfo> *list) const {
+#ifdef SPINE_GODOT_EXTENSION
+	PackedStringArray slot_names;
+#else
 	Vector<String> slot_names;
+#endif
 	SpineSprite *sprite = cast_to<SpineSprite>(get_parent());
 	if (sprite && sprite->get_skeleton_data_res().is_valid()) sprite->get_skeleton_data_res()->get_slot_names(slot_names);
 	else
@@ -107,7 +119,7 @@ void SpineSlotNode::_get_property_list(List<PropertyInfo> *list) const {
 	auto element = list->front();
 	while (element) {
 		auto property_info = element->get();
-		if (property_info.name == "SpineSlotNode") break;
+		if (property_info.name == StringName("SpineSlotNode")) break;
 		element = element->next();
 	}
 	PropertyInfo slot_name_property;
@@ -120,7 +132,7 @@ void SpineSlotNode::_get_property_list(List<PropertyInfo> *list) const {
 }
 
 bool SpineSlotNode::_get(const StringName &property, Variant &value) const {
-	if (property == "slot_name") {
+	if (property == StringName("slot_name")) {
 		value = slot_name;
 		return true;
 	}
@@ -128,7 +140,7 @@ bool SpineSlotNode::_get(const StringName &property, Variant &value) const {
 }
 
 bool SpineSlotNode::_set(const StringName &property, const Variant &value) {
-	if (property == "slot_name") {
+	if (property == StringName("slot_name")) {
 		slot_name = value;
 		SpineSprite *sprite = cast_to<SpineSprite>(get_parent());
 		update_transform(sprite);

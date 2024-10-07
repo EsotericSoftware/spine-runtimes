@@ -34,8 +34,16 @@
 #include "SpineSkeletonFileResource.h"
 
 #if VERSION_MAJOR > 3
+#ifdef SPINE_GODOT_EXTENSION
+#include <godot_cpp/classes/editor_undo_redo_manager.hpp>
+#else
 #include "editor/editor_undo_redo_manager.h"
+#endif
+#ifdef SPINE_GODOT_EXTENSION
+Error SpineAtlasResourceImportPlugin::_import(const String &source_file, const String &save_path, const Dictionary &options, const TypedArray<String> &platform_variants, const TypedArray<String> &gen_files) const {
+#else
 Error SpineAtlasResourceImportPlugin::import(const String &source_file, const String &save_path, const HashMap<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) {
+#endif
 #else
 Error SpineAtlasResourceImportPlugin::import(const String &source_file, const String &save_path, const Map<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) {
 #endif
@@ -43,15 +51,21 @@ Error SpineAtlasResourceImportPlugin::import(const String &source_file, const St
 	atlas->set_normal_texture_prefix(options["normal_map_prefix"]);
 	atlas->load_from_atlas_file_internal(source_file, true);
 
-	String file_name = vformat("%s.%s", save_path, get_save_extension());
+	String file_name = save_path + String(".") + _get_save_extension();
 #if VERSION_MAJOR > 3
+#ifdef SPINE_GODOT_EXTENSION
+	auto error = ResourceSaver::get_singleton()->save(atlas, file_name);
+#else
 	auto error = ResourceSaver::save(atlas, file_name);
+#endif
 #else
 	auto error = ResourceSaver::save(file_name, atlas);
 #endif
 	return error;
 }
 
+// FIXME get_import_options is not available in godot-cpp
+#ifndef SPINE_GODOT_EXTENSION
 #if VERSION_MAJOR > 3
 void SpineAtlasResourceImportPlugin::get_import_options(const String &path, List<ImportOption> *options, int preset) const {
 #else
@@ -66,9 +80,14 @@ void SpineAtlasResourceImportPlugin::get_import_options(List<ImportOption> *opti
 		options->push_back(op);
 	}
 }
+#endif
 
 #if VERSION_MAJOR > 3
+#ifdef SPINE_GODOT_EXTENSION
+Error SpineJsonResourceImportPlugin::_import(const String &source_file, const String &save_path, const Dictionary &options, const TypedArray<String> &platform_variants, const TypedArray<String> &gen_files) const {
+#else
 Error SpineJsonResourceImportPlugin::import(const String &source_file, const String &save_path, const HashMap<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) {
+#endif
 #else
 Error SpineJsonResourceImportPlugin::import(const String &source_file, const String &save_path, const Map<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) {
 #endif
@@ -76,17 +95,27 @@ Error SpineJsonResourceImportPlugin::import(const String &source_file, const Str
 	Error error = skeleton_file_res->load_from_file(source_file);
 	if (error != OK) return error;
 
-	String file_name = vformat("%s.%s", save_path, get_save_extension());
 #if VERSION_MAJOR > 3
-	error = ResourceSaver::save(skeleton_file_res, file_name);
+#ifdef SPINE_GODOT_EXTENSION
+	String file_name = save_path + String(".") + _get_save_extension();
+	error = ResourceSaver::get_singleton()->save(skeleton_file_res, file_name);
 #else
+	String file_name = save_path + String(".") + get_save_extension();
+	error = ResourceSaver::save(skeleton_file_res, file_name);
+#endif
+#else
+	String file_name = save_path + String(".") + get_save_extension();
 	error = ResourceSaver::save(file_name, skeleton_file_res);
 #endif
 	return error;
 }
 
 #if VERSION_MAJOR > 3
+#ifdef SPINE_GODOT_EXTENSION
+Error SpineBinaryResourceImportPlugin::_import(const String &source_file, const String &save_path, const Dictionary &options, const TypedArray<String> &platform_variants, const TypedArray<String> &gen_files) const {
+#else
 Error SpineBinaryResourceImportPlugin::import(const String &source_file, const String &save_path, const HashMap<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) {
+#endif
 #else
 Error SpineBinaryResourceImportPlugin::import(const String &source_file, const String &save_path, const Map<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) {
 #endif
@@ -94,15 +123,30 @@ Error SpineBinaryResourceImportPlugin::import(const String &source_file, const S
 	Error error = skeleton_file_res->load_from_file(source_file);
 	if (error != OK) return error;
 
-	String file_name = vformat("%s.%s", save_path, get_save_extension());
 #if VERSION_MAJOR > 3
-	error = ResourceSaver::save(skeleton_file_res, file_name);
+#ifdef SPINE_GODOT_EXTENSION
+	String file_name = save_path + String(".") + _get_save_extension();
+	error = ResourceSaver::get_singleton()->save(skeleton_file_res, file_name);
 #else
+	String file_name = save_path + String(".") + get_save_extension();
+	error = ResourceSaver::save(skeleton_file_res, file_name);
+#endif
+#else
+	String file_name = save_path + String(".") + get_save_extension();
 	error = ResourceSaver::save(file_name, skeleton_file_res);
 #endif
 	return error;
 }
 
+#ifdef SPINE_GODOT_EXTENSION
+SpineEditorPlugin::SpineEditorPlugin() {
+	add_import_plugin(memnew(SpineAtlasResourceImportPlugin));
+	add_import_plugin(memnew(SpineJsonResourceImportPlugin));
+	add_import_plugin(memnew(SpineBinaryResourceImportPlugin));
+	add_inspector_plugin(memnew(SpineSkeletonDataResourceInspectorPlugin));
+	add_inspector_plugin(memnew(SpineSpriteInspectorPlugin));
+}
+#else
 SpineEditorPlugin::SpineEditorPlugin(EditorNode *node) {
 	add_import_plugin(memnew(SpineAtlasResourceImportPlugin));
 	add_import_plugin(memnew(SpineJsonResourceImportPlugin));
@@ -110,17 +154,28 @@ SpineEditorPlugin::SpineEditorPlugin(EditorNode *node) {
 	add_inspector_plugin(memnew(SpineSkeletonDataResourceInspectorPlugin));
 	add_inspector_plugin(memnew(SpineSpriteInspectorPlugin));
 }
+#endif
 
+#ifdef SPINE_GODOT_EXTENSION
+bool SpineSkeletonDataResourceInspectorPlugin::_can_handle(Object *object) const {
+#else
 bool SpineSkeletonDataResourceInspectorPlugin::can_handle(Object *object) {
+#endif
 	return object->is_class("SpineSkeletonDataResource");
 }
 
 #if VERSION_MAJOR > 3
+#ifdef SPINE_GODOT_EXTENSION
+bool SpineSkeletonDataResourceInspectorPlugin::_parse_property(Object *object, Variant::Type type, const String &path, PropertyHint hint, const String &hint_text, const BitField<PropertyUsageFlags> p_usage, bool wide) {
+#else
 bool SpineSkeletonDataResourceInspectorPlugin::parse_property(Object *object, const Variant::Type type, const String &path, const PropertyHint hint, const String &hint_text, const BitField<PropertyUsageFlags> p_usage, const bool wide) {
+#endif
 #else
 bool SpineSkeletonDataResourceInspectorPlugin::parse_property(Object *object, Variant::Type type, const String &path,
 															  PropertyHint hint, const String &hint_text, int usage) {
 #endif
+// FIXME can't do this in godot-cpp
+#ifndef SPINE_GODOT_EXTENSION
 	if (path == "animation_mixes") {
 		Ref<SpineSkeletonDataResource> skeleton_data = Object::cast_to<SpineSkeletonDataResource>(object);
 		if (!skeleton_data.is_valid() || !skeleton_data->is_skeleton_data_loaded()) return true;
@@ -129,9 +184,12 @@ bool SpineSkeletonDataResourceInspectorPlugin::parse_property(Object *object, Va
 		add_property_editor(path, mixes_property);
 		return true;
 	}
+#endif
 	return false;
 }
 
+// FIXME can't do this in godot-cpp
+#ifndef SPINE_GODOT_EXTENSION
 SpineEditorPropertyAnimationMixes::SpineEditorPropertyAnimationMixes() : skeleton_data(nullptr), container(nullptr), updating(false) {
 	INSTANTIATE(array_object);
 }
@@ -349,6 +407,7 @@ void SpineEditorPropertyAnimationMix::update_property() {
 
 	updating = false;
 }
+#endif
 
 void SpineSpriteInspectorPlugin::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("button_clicked"), &SpineSpriteInspectorPlugin::button_clicked);
@@ -357,11 +416,19 @@ void SpineSpriteInspectorPlugin::_bind_methods() {
 void SpineSpriteInspectorPlugin::button_clicked(const String &button_name) {
 }
 
+#ifdef SPINE_GODOT_EXTENSION
+bool SpineSpriteInspectorPlugin::_can_handle(Object *object) const {
+#else
 bool SpineSpriteInspectorPlugin::can_handle(Object *object) {
+#endif
 	return Object::cast_to<SpineSprite>(object) != nullptr;
 }
 
+#ifdef SPINE_GODOT_EXTENSION
+void SpineSpriteInspectorPlugin::_parse_begin(Object *object) {
+#else
 void SpineSpriteInspectorPlugin::parse_begin(Object *object) {
+#endif
 	sprite = Object::cast_to<SpineSprite>(object);
 	if (!sprite) return;
 	if (!sprite->get_skeleton_data_res().is_valid() || !sprite->get_skeleton_data_res()->is_skeleton_data_loaded()) return;

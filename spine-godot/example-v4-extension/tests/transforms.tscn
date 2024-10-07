@@ -1,0 +1,26 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://assets/spineboy/spineboy-data-res.tres" type="SpineSkeletonDataResource" id=1]
+[ext_resource path="res://icon.png" type="Texture" id=2]
+
+[node name="Node2D" type="Node2D"]
+
+[node name="SpineSprite" type="SpineSprite" parent="."]
+position = Vector2( 459.397, 501.236 )
+scale = Vector2( 0.742335, 0.742335 )
+skeleton_data_res = ExtResource( 1 )
+preview_animation = "aim"
+preview_frame = true
+preview_time = 0.0
+
+[node name="SpineBoneNode" type="SpineBoneNode" parent="SpineSprite"]
+position = Vector2( 40.8752, -276.036 )
+rotation = 0.837234
+bone_name = "gun"
+bone_mode = 1
+enabled = false
+color = Color( 0, 1, 0.0627451, 0.466667 )
+
+[node name="Sprite" type="Sprite" parent="SpineSprite/SpineBoneNode"]
+visible = false
+texture = ExtResource( 2 )

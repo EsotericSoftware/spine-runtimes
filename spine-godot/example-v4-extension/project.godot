@@ -1,0 +1,35 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="spine-godot-examples"
+run/main_scene="res://examples/08-animation-player/animation-player.tscn"
+config/features=PackedStringArray("4.3")
+run/low_processor_mode=true
+config/icon="res://icon.png"
+
+[global]
+
+batch=false
+
+[physics]
+
+common/enable_pause_aware_picking=true
+
+[rendering]
+
+batching/parameters/max_join_item_commands=100
+batching/parameters/batch_buffer_size=65535
+batching/parameters/item_reordering_lookahead=100
+quality/driver/driver_name="GLES2"
+vram_compression/import_etc=true
+vram_compression/import_etc2=false
+environment/default_environment="res://default_env.tres"

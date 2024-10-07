@@ -33,6 +33,23 @@
 #include "SpineSkeleton.h"
 #include "SpineRendererObject.h"
 #include "SpineSlotNode.h"
+
+#ifdef SPINE_GODOT_EXTENSION
+#include <godot_cpp/core/memory.hpp>
+#include <godot_cpp/classes/engine.hpp>
+#include <godot_cpp/classes/geometry2d.hpp>
+#include <godot_cpp/variant/array.hpp>
+#include <godot_cpp/classes/mesh.hpp>
+#include <godot_cpp/classes/rendering_server.hpp>
+#include <godot_cpp/classes/editor_interface.hpp>
+#include <godot_cpp/classes/control.hpp>
+#include <godot_cpp/classes/viewport.hpp>
+#include <godot_cpp/classes/scene_tree.hpp>
+#if TOOLS_ENABLED
+#include <godot_cpp/classes/editor_plugin.hpp>
+#include <godot_cpp/classes/font.hpp>
+#endif
+#else
 #include "core/os/memory.h"
 
 #if VERSION_MAJOR > 3
@@ -65,13 +82,18 @@
 #endif
 
 #endif
+#endif
 
 Ref<CanvasItemMaterial>
 		SpineSprite::default_materials[4] = {};
 static int sprite_count = 0;
 static spine::Vector<unsigned short> quad_indices;
 static spine::Vector<float> scratch_vertices;
+#ifdef SPINE_GODOT_EXTENSION
+static PackedVector2Array scratch_points;
+#else
 static Vector<Vector2> scratch_points;
+#endif
 
 
 static void clear_triangles(SpineMesh2D *mesh_instance) {
@@ -82,12 +104,21 @@ static void clear_triangles(SpineMesh2D *mesh_instance) {
 #endif
 }
 
+#ifdef SPINE_GODOT_EXTENSION
+static void add_triangles(SpineMesh2D *mesh_instance,
+						  const PackedVector2Array &vertices,
+						  const PackedVector2Array &uvs,
+						  const PackedColorArray &colors,
+						  const PackedInt32Array &indices,
+						  SpineRendererObject *renderer_object) {
+#else
 static void add_triangles(SpineMesh2D *mesh_instance,
 						  const Vector<Point2> &vertices,
 						  const Vector<Point2> &uvs,
 						  const Vector<Color> &colors,
 						  const Vector<int> &indices,
 						  SpineRendererObject *renderer_object) {
+#endif
 #if VERSION_MAJOR > 3
 	mesh_instance->update_mesh(vertices, uvs, colors, indices, renderer_object);
 #else
@@ -137,15 +168,29 @@ void SpineMesh2D::_notification(int what) {
 void SpineMesh2D::_bind_methods() {
 }
 
+#ifdef SPINE_GODOT_EXTENSION
+void SpineMesh2D::update_mesh(const PackedVector2Array &vertices,
+							  const PackedVector2Array &uvs,
+							  const PackedColorArray &colors,
+							  const PackedInt32Array &indices,
+							  SpineRendererObject *renderer_object) {
+#else
 void SpineMesh2D::update_mesh(const Vector<Point2> &vertices,
 							  const Vector<Point2> &uvs,
 							  const Vector<Color> &colors,
 							  const Vector<int> &indices,
 							  SpineRendererObject *renderer_object) {
+#endif
+#if SPINE_GODOT_EXTENSION
+#else
 #if VERSION_MAJOR > 3
 	if (!mesh.is_valid() || vertices.size() != num_vertices || indices.size() != num_indices || indices_changed) {
 		if (mesh.is_valid()) {
+#ifdef SPINE_GODOT_EXTENSION
+			RS::get_singleton()->free_rid(mesh);
+#else
 			RS::get_singleton()->free(mesh);
+#endif
 		}
 		mesh = RS::get_singleton()->mesh_create();
 		Array arrays;
@@ -256,6 +301,7 @@ void SpineMesh2D::update_mesh(const Vector<Point2> &vertices,
 			Color(1, 1, 1, 1),
 			renderer_object->texture.is_null() ? RID() : renderer_object->texture->get_rid(),
 			renderer_object->normal_map.is_null() ? RID() : renderer_object->normal_map->get_rid());
+#endif
 #endif
 }
 
@@ -555,8 +601,13 @@ void SpineSprite::_notification(int what) {
 
 void SpineSprite::_get_property_list(List<PropertyInfo> *list) const {
 	if (!skeleton_data_res.is_valid() || !skeleton_data_res->is_skeleton_data_loaded()) return;
+#ifdef SPINE_GODOT_EXTENSION
+	PackedStringArray animation_names;
+	PackedStringArray skin_names;
+#else
 	Vector<String> animation_names;
 	Vector<String> skin_names;
+#endif
 	skeleton_data_res->get_animation_names(animation_names);
 	skeleton_data_res->get_skin_names(skin_names);
 	animation_names.insert(0, "-- Empty --");
@@ -592,28 +643,32 @@ void SpineSprite::_get_property_list(List<PropertyInfo> *list) const {
 		auto animation = skeleton_data_res->find_animation(preview_animation);
 		if (animation.is_valid()) animation_duration = animation->get_duration();
 	}
+#ifdef SPINE_GODOT_EXTENSION
+	preview_time_property.hint_string = String("0.0,") + String::num(animation_duration) + String(",0.01");
+#else
 	preview_time_property.hint_string = String("0.0,{0},0.01").format(varray(animation_duration));
+#endif
 	preview_time_property.hint = PROPERTY_HINT_RANGE;
 	list->push_back(preview_time_property);
 }
 
 bool SpineSprite::_get(const StringName &property, Variant &value) const {
-	if (property == "preview_skin") {
+	if (property == StringName("preview_skin")) {
 		value = preview_skin;
 		return true;
 	}
 
-	if (property == "preview_animation") {
+	if (property == StringName("preview_animation")) {
 		value = preview_animation;
 		return true;
 	}
 
-	if (property == "preview_frame") {
+	if (property == StringName("preview_frame")) {
 		value = preview_frame;
 		return true;
 	}
 
-	if (property == "preview_time") {
+	if (property == StringName("preview_time")) {
 		value = preview_time;
 		return true;
 	}
@@ -644,27 +699,27 @@ static void update_preview_animation(SpineSprite *sprite, const String &skin, co
 }
 
 bool SpineSprite::_set(const StringName &property, const Variant &value) {
-	if (property == "preview_skin") {
+	if (property == StringName("preview_skin")) {
 		preview_skin = value;
 		update_preview_animation(this, preview_skin, preview_animation, preview_frame, preview_time);
 		NOTIFY_PROPERTY_LIST_CHANGED();
 		return true;
 	}
 
-	if (property == "preview_animation") {
+	if (property == StringName("preview_animation")) {
 		preview_animation = value;
 		update_preview_animation(this, preview_skin, preview_animation, preview_frame, preview_time);
 		NOTIFY_PROPERTY_LIST_CHANGED();
 		return true;
 	}
 
-	if (property == "preview_frame") {
+	if (property == StringName("preview_frame")) {
 		preview_frame = value;
 		update_preview_animation(this, preview_skin, preview_animation, preview_frame, preview_time);
 		return true;
 	}
 
-	if (property == "preview_time") {
+	if (property == StringName("preview_time")) {
 		preview_time = value;
 		update_preview_animation(this, preview_skin, preview_animation, preview_frame, preview_time);
 		return true;
@@ -865,7 +920,11 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> skeleton_ref) {
 	skeleton_clipper->clipEnd();
 }
 
+#ifdef SPINE_GODOT_EXTENSION
+void createLinesFromMesh(PackedVector2Array &scratch_points, spine::Vector<unsigned short> &triangles, spine::Vector<float> *vertices) {
+#else
 void createLinesFromMesh(Vector<Vector2> &scratch_points, spine::Vector<unsigned short> &triangles, spine::Vector<float> *vertices) {
+#endif
 	scratch_points.resize(0);
 	for (int i = 0; i < triangles.size(); i += 3) {
 		int i1 = triangles[i];
@@ -924,7 +983,11 @@ void SpineSprite::draw() {
 			scratch_points.push_back(Vector2(vertices->buffer()[0], vertices->buffer()[1]));
 
 			Color color = debug_regions_color;
+#ifdef SPINE_GODOT_EXTENSION
+			if (GEOMETRY2D::get_singleton()->is_point_in_polygon(mouse_position, scratch_points)) {
+#else
 			if (GEOMETRY2D::is_point_in_polygon(mouse_position, scratch_points)) {
+#endif
 				hovered_slot = slot;
 				color = Color(1, 1, 1, 1);
 			}
@@ -960,7 +1023,11 @@ void SpineSprite::draw() {
 			}
 
 			Color color = debug_meshes_color;
+#ifdef SPINE_GODOT_EXTENSION
+			if (GEOMETRY2D::get_singleton()->is_point_in_polygon(mouse_position, scratch_points)) {
+#else
 			if (GEOMETRY2D::is_point_in_polygon(mouse_position, scratch_points)) {
+#endif
 				hovered_slot = slot;
 				color = Color(1, 1, 1, 1);
 			}
@@ -1029,7 +1096,11 @@ void SpineSprite::draw() {
 		Transform2D bone_transform(spine::MathUtil::Deg_Rad * bone->getWorldRotationX(), Vector2(bone->getWorldX(), bone->getWorldY()));
 		bone_transform.scale_basis(Vector2(bone->getWorldScaleX(), bone->getWorldScaleY()));
 		auto mouse_local_position = bone_transform.affine_inverse().xform(mouse_position);
+#ifdef SPINE_GODOT_EXTENSION
+		if (GEOMETRY2D::get_singleton()->is_point_in_polygon(mouse_local_position, scratch_points)) {
+#else
 		if (GEOMETRY2D::is_point_in_polygon(mouse_local_position, scratch_points)) {
+#endif
 			hovered_bone = bone;
 		}
 	}
@@ -1053,7 +1124,11 @@ void SpineSprite::draw() {
 			Transform2D bone_transform(spine::MathUtil::Deg_Rad * bone->getWorldRotationX(), Vector2(bone->getWorldX(), bone->getWorldY()));
 			bone_transform.scale_basis(Vector2(bone->getWorldScaleX(), bone->getWorldScaleY()));
 			auto mouse_local_position = bone_transform.affine_inverse().xform(mouse_position);
+#ifdef SPINE_GODOT_EXTENSION
+			if (GEOMETRY2D::get_singleton()->is_point_in_polygon(mouse_local_position, scratch_points)) {
+#else
 			if (GEOMETRY2D::is_point_in_polygon(mouse_local_position, scratch_points)) {
+#endif
 				hovered_bone = bone;
 			}
 		}
@@ -1089,7 +1164,12 @@ void SpineSprite::draw() {
 	memdelete(control);
 
 #if VERSION_MAJOR > 3
+#ifdef SPINE_GODOT_EXTENSION
+	// FIXME possibly wrong
+	float line_height = default_font->get_height() + default_font->get_descent();
+#else
 	float line_height = default_font->get_height(Font::DEFAULT_FONT_SIZE) + default_font->get_descent(Font::DEFAULT_FONT_SIZE);
+#endif
 #else
 	float line_height = default_font->get_height() + default_font->get_descent();
 #endif
@@ -1099,14 +1179,22 @@ void SpineSprite::draw() {
 	}
 
 #if VERSION_MAJOR > 3
+#ifdef SPINE_GODOT_EXTENSION
+	Rect2 background_rect(0, -default_font->get_height() - 5, rect_width + 20, line_height * hover_text_lines.size() + 10);
+#else
 	Rect2 background_rect(0, -default_font->get_height(Font::DEFAULT_FONT_SIZE) - 5, rect_width + 20, line_height * hover_text_lines.size() + 10);
+#endif
 #else
 	Rect2 background_rect(0, -default_font->get_height() - 5, rect_width + 20, line_height * hover_text_lines.size() + 10);
 #endif
 	if (hover_text_lines.size() > 0) draw_rect(background_rect, Color(0, 0, 0, 0.8));
 	for (int i = 0; i < hover_text_lines.size(); i++) {
 #if VERSION_MAJOR > 3
+#ifdef SPINE_GODOT_EXTENSION
+		draw_string(default_font, Vector2(10, 0 + i * default_font->get_height()), hover_text_lines[i], HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(1, 1, 1, 1));
+#else
 		draw_string(default_font, Vector2(10, 0 + i * default_font->get_height(Font::DEFAULT_FONT_SIZE)), hover_text_lines[i], HORIZONTAL_ALIGNMENT_LEFT, -1, Font::DEFAULT_FONT_SIZE, Color(1, 1, 1, 1));
+#endif
 #else
 		draw_string(default_font, Vector2(10, 0 + i * default_font->get_height()), hover_text_lines[i], Color(1, 1, 1, 1));
 #endif
@@ -1118,7 +1206,11 @@ void SpineSprite::draw_bone(spine::Bone *bone, const Color &color) {
 	draw_set_transform(Vector2(bone->getWorldX(), bone->getWorldY()), spine::MathUtil::Deg_Rad * bone->getWorldRotationX(), Vector2(bone->getWorldScaleX(), bone->getWorldScaleY()));
 	float bone_length = bone->getData().getLength();
 	if (bone_length == 0) bone_length = debug_bones_thickness * 2;
+#ifdef SPINE_GODOT_EXTENSION
+	PackedVector2Array points;
+#else
 	Vector<Vector2> points;
+#endif
 	points.push_back(Vector2(-debug_bones_thickness, 0));
 	points.push_back(Vector2(0, debug_bones_thickness));
 	points.push_back(Vector2(bone_length, 0));
@@ -1162,7 +1254,6 @@ Transform2D SpineSprite::get_global_bone_transform(const String &bone_name) {
 	if (!animation_state.is_valid() && !skeleton.is_valid()) return get_global_transform();
 	auto bone = skeleton->find_bone(bone_name);
 	if (!bone.is_valid()) {
-		print_error(vformat("Bone: '%s' not found.", bone_name));
 		return get_global_transform();
 	}
 	return bone->get_global_transform();
@@ -1223,17 +1314,19 @@ void SpineSprite::set_screen_material(Ref<Material> material) {
 	screen_material = material;
 }
 
+#ifndef SPINE_GODOT_EXTENSION
+// FIXME
 #ifdef TOOLS_ENABLED
 Rect2 SpineSprite::_edit_get_rect() const {
 	if (skeleton_data_res.is_valid() && skeleton_data_res->is_skeleton_data_loaded()) {
 		auto data = skeleton_data_res->get_skeleton_data();
 		return Rect2(data->getX(), -data->getY() - data->getHeight(), data->getWidth(), data->getHeight());
 	}
-
 	return Node2D::_edit_get_rect();
 }
 
 bool SpineSprite::_edit_use_rect() const {
 	return skeleton_data_res.is_valid() && skeleton_data_res->is_skeleton_data_loaded();
 }
+#endif
 #endif

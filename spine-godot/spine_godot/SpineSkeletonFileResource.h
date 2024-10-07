@@ -50,12 +50,20 @@ protected:
 	static void _bind_methods();
 
 	String json;
+#ifdef SPINE_GODOT_EXTENSION
+	PackedByteArray binary;
+#else
 	Vector<uint8_t> binary;
+#endif
 
 public:
 	bool is_binary() { return binary.size() > 0; }
 
+#ifdef SPINE_GODOT_EXTENSION
+	const PackedByteArray &get_binary() { return binary; }
+#else
 	const Vector<uint8_t> &get_binary() { return binary; }
+#endif
 
 	const String &get_json() { return json; }
 
@@ -63,8 +71,10 @@ public:
 
 	Error save_to_file(const String &path);
 
+#ifndef SPINE_GODOT_EXTENSION
 #if VERSION_MAJOR > 3
 	virtual Error copy_from(const Ref<Resource> &p_resource);
+#endif
 #endif
 };
 

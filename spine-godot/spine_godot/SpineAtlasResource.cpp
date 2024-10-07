@@ -34,22 +34,28 @@
 #include <godot_cpp/classes/json.hpp>
 #include <godot_cpp/classes/texture.hpp>
 #include <godot_cpp/classes/file_access.hpp>
+#include <godot_cpp/classes/image.hpp>
+#include <godot_cpp/classes/image_texture.hpp>
 #else
 #include "core/io/json.h"
 #include "scene/resources/texture.h"
-#endif
-#include <spine/TextureLoader.h>
-
 #if VERSION_MAJOR > 3
 #include "core/io/image.h"
 #include "scene/resources/image_texture.h"
 #else
 #include "core/image.h"
 #endif
+#endif
 
 #ifdef TOOLS_ENABLED
+#ifdef SPINE_GODOT_EXTENSION
+#include <godot_cpp/classes/editor_file_system.hpp>
+#else
 #include "editor/editor_file_system.h"
 #endif
+#endif
+
+#include <spine/TextureLoader.h>
 
 class GodotSpineTextureLoader : public spine::TextureLoader {
 
@@ -69,11 +75,11 @@ public:
 			return false;
 		}
 
-		auto sub_str_pos = i + prefix.size() - 1;
+		auto sub_str_pos = i + SSIZE(prefix) - 1;
 		auto res = path.substr(sub_str_pos);
 		if (!EMPTY(res)) {
 			if (res[0] != '/') {
-				path = prefix + "/" + res;
+				path = prefix + String("/") + res;
 			} else {
 				path = prefix + res;
 			}
@@ -85,7 +91,11 @@ public:
 	Ref<Texture2D> get_texture_from_image(const String &path, bool is_resource) {
 		Error error = OK;
 		if (is_resource) {
+#ifdef SPINE_GODOT_EXTENSION
+			return ResourceLoader::get_singleton()->load(path, "", ResourceLoader::CACHE_MODE_REUSE);
+#else
 			return ResourceLoader::load(path, "", ResourceFormatLoader::CACHE_MODE_REUSE, &error);
+#endif
 		} else {
 			Ref<Image> img;
 			img.instantiate();
@@ -246,10 +256,15 @@ Error SpineAtlasResource::load_from_atlas_file(const String &path) {
 }
 
 Error SpineAtlasResource::load_from_atlas_file_internal(const String &path, bool is_importing) {
-	Error err;
 	source_path = path;
+#ifdef SPINE_GODOT_EXTENSION
+	atlas_data = FileAccess::get_file_as_string(path);
+	if (SSIZE(atlas_data) == 0) return ERR_FILE_UNRECOGNIZED;
+#else
+	Error err;
 	atlas_data = FileAccess::get_file_as_string(path, &err);
 	if (err != OK) return err;
+#endif
 
 	clear();
 	texture_loader = new GodotSpineTextureLoader(&textures, &normal_maps, normal_map_prefix, is_importing);
@@ -263,8 +278,13 @@ Error SpineAtlasResource::load_from_atlas_file_internal(const String &path, bool
 
 Error SpineAtlasResource::load_from_file(const String &path) {
 	Error error;
+#ifdef SPINE_GODOT_EXTENSION
+	String json_string = FileAccess::get_file_as_string(path);
+	if (SSIZE(json_string) == 0) return ERR_FILE_UNRECOGNIZED;
+#else
 	String json_string = FileAccess::get_file_as_string(path, &error);
 	if (error != OK) return error;
+#endif
 
 #if VERSION_MAJOR > 3
 	JSON json;
@@ -297,8 +317,13 @@ Error SpineAtlasResource::load_from_file(const String &path) {
 Error SpineAtlasResource::save_to_file(const String &path) {
 	Error err;
 #if VERSION_MAJOR > 3
+#if SPINE_GODOT_EXTENSION
+	Ref<FileAccess> file = FileAccess::open(path, FileAccess::WRITE);
+	if (file.is_null()) return ERR_FILE_UNRECOGNIZED;
+#else
 	Ref<FileAccess> file = FileAccess::open(path, FileAccess::WRITE, &err);
 	if (err != OK) return err;
+#endif
 #else
 	FileAccess *file = FileAccess::open(path, FileAccess::WRITE, &err);
 	if (err != OK) {
@@ -322,6 +347,7 @@ Error SpineAtlasResource::save_to_file(const String &path) {
 	return OK;
 }
 
+#ifndef SPINE_GODOT_EXTENSION
 #if VERSION_MAJOR > 3
 Error SpineAtlasResource::copy_from(const Ref<Resource> &p_resource) {
 	auto error = Resource::copy_from(p_resource);
@@ -343,7 +369,11 @@ Error SpineAtlasResource::copy_from(const Ref<Resource> &p_resource) {
 	return OK;
 }
 #endif
+#endif
 
+#ifdef SPINE_GODOT_EXTENSION
+Variant SpineAtlasResourceFormatLoader::_load(const String &path, const String &original_path, bool use_sub_threads, int32_t cache_mode) {
+#else
 #if VERSION_MAJOR > 3
 RES SpineAtlasResourceFormatLoader::load(const String &path, const String &original_path, Error *error, bool use_sub_threads, float *progress, CacheMode cache_mode) {
 #else
@@ -353,40 +383,78 @@ RES SpineAtlasResourceFormatLoader::load(const String &path, const String &origi
 RES SpineAtlasResourceFormatLoader::load(const String &path, const String &original_path, Error *error) {
 #endif
 #endif
+#endif
 	Ref<SpineAtlasResource> atlas = memnew(SpineAtlasResource);
 	atlas->load_from_file(path);
+#ifndef SPINE_GODOT_EXTENSION
 	if (error) *error = OK;
+#endif
 	return atlas;
 }
 
+
+#ifdef SPINE_GODOT_EXTENSION
+PackedStringArray SpineAtlasResourceFormatLoader::_get_recognized_extensions() {
+	PackedStringArray extensions;
+	extensions.push_back("spatlas");
+	return extensions;
+}
+#else
 void SpineAtlasResourceFormatLoader::get_recognized_extensions(List<String> *extensions) const {
 	const char atlas_ext[] = "spatlas";
 	if (!extensions->find(atlas_ext))
 		extensions->push_back(atlas_ext);
 }
+#endif
 
+#ifdef SPINE_GODOT_EXTENSION
+String SpineAtlasResourceFormatLoader::_get_resource_type(const String &path) {
+#else
 String SpineAtlasResourceFormatLoader::get_resource_type(const String &path) const {
+#endif
 	return path.ends_with("spatlas") || path.ends_with(".atlas") ? "SpineAtlasResource" : "";
 }
 
+#ifdef SPINE_GODOT_EXTENSION
+bool SpineAtlasResourceFormatLoader::_handles_type(const StringName &type) {
+#else
 bool SpineAtlasResourceFormatLoader::handles_type(const String &type) const {
-	return type == "SpineAtlasResource" || ClassDB::is_parent_class(type, "SpineAtlasResource");
+#endif
+	return type == StringName("SpineAtlasResource") || ClassDB::is_parent_class(type, "SpineAtlasResource");
 }
 
+#ifdef SPINE_GODOT_EXTENSION
+Error SpineAtlasResourceFormatSaver::_save(const Ref<Resource> &resource, const String &path, uint32_t flags) {
+#else
 #if VERSION_MAJOR > 3
 Error SpineAtlasResourceFormatSaver::save(const RES &resource, const String &path, uint32_t flags) {
 #else
 Error SpineAtlasResourceFormatSaver::save(const String &path, const RES &resource, uint32_t flags) {
 #endif
+#endif
 	Ref<SpineAtlasResource> res = resource;
 	return res->save_to_file(path);
 }
 
+#ifdef SPINE_GODOT_EXTENSION
+PackedStringArray SpineAtlasResourceFormatSaver::_get_recognized_extensions(const Ref<Resource> &resource) {
+	PackedStringArray extensions;
+	if (Object::cast_to<SpineAtlasResource>(*resource)) {
+		extensions.push_back("spatlas");
+	}
+	return extensions;
+}
+#else
 void SpineAtlasResourceFormatSaver::get_recognized_extensions(const RES &resource, List<String> *extensions) const {
 	if (Object::cast_to<SpineAtlasResource>(*resource))
 		extensions->push_back("spatlas");
 }
+#endif
 
+#ifdef SPINE_GODOT_EXTENSION
+bool SpineAtlasResourceFormatSaver::_recognize(const RES &resource) {
+#else
 bool SpineAtlasResourceFormatSaver::recognize(const RES &resource) const {
+#endif
 	return Object::cast_to<SpineAtlasResource>(*resource) != nullptr;
 }
