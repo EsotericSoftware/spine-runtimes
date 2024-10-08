@@ -31,15 +31,8 @@
 #ifdef SPINE_GODOT_EXTENSION
 #include "SpineCommon.h"
 #include <godot_cpp/core/memory.hpp>
-#include <godot_cpp/classes/file_access.hpp>
 #else
 #include "core/os/memory.h"
-#include "core/version.h"
-#if VERSION_MAJOR > 3
-#include "core/io/file_access.h"
-#else
-#include "core/os/file_access.h"
-#endif
 #endif
 #include <spine/SpineString.h>
 
@@ -66,23 +59,5 @@ void GodotSpineExtension::_free(void *mem, const char *file, int line) {
 }
 
 char *GodotSpineExtension::_readFile(const spine::String &path, int *length) {
-	Error error;
-#ifdef SPINE_GODOT_EXTENSION
-	// FIXME no error parameter!
-	auto res = FileAccess::get_file_as_bytes(String(path.buffer()));
-#else
-#if VERSION_MAJOR > 3
-	auto res = FileAccess::get_file_as_bytes(String(path.buffer()), &error);
-#else
-	auto res = FileAccess::get_file_as_array(String(path.buffer()), &error);
-#endif
-	if (error != OK) {
-		if (length) *length = 0;
-		return NULL;
-	}
-#endif
-	auto r = alloc<char>(res.size(), __FILE__, __LINE__);
-	memcpy(r, res.ptr(), res.size());
-	if (length) *length = res.size();
-	return r;
+	return NULL;
 }
