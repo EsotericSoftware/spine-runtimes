@@ -213,3 +213,4 @@ spine-godot/src
 spine-godot/compile_commands.json
 spine-godot/bin
 spine-godot/example-v4-extension/bin/macos/macos.framework/libspine_godot.macos.editor
+spine-godot/.idea
