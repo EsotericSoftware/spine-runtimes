@@ -148,7 +148,6 @@ public:
 		import_image_resource(fixed_path);
 
 #if SPINE_GODOT_EXTENSION
-		// FIXME no error parameter
 		Ref<Texture2D> texture = ResourceLoader::get_singleton()->load(fixed_path, "", ResourceLoader::CACHE_MODE_REUSE);
 #else
 #if VERSION_MAJOR > 3

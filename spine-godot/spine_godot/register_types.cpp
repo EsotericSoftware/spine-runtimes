@@ -29,8 +29,7 @@
 
 
 #include "SpineCommon.h"
-#ifdef SPINE_GODOT_EXTENSION
-#else
+#ifndef SPINE_GODOT_EXTENSION
 #include "modules/register_module_types.h"
 #endif
 #include "register_types.h"
@@ -220,7 +219,7 @@ extern "C" GDExtensionBool GDE_EXPORT spine_godot_library_init(GDExtensionInterf
 	GDExtensionBinding::InitObject init_obj(p_get_proc_address, p_library, r_initialization);
 	init_obj.register_initializer(initialize_spine_godot_module);
 	init_obj.register_terminator(uninitialize_spine_godot_module);
-	init_obj.set_minimum_library_initialization_level(MODULE_INITIALIZATION_LEVEL_CORE);
+	init_obj.set_minimum_library_initialization_level(MODULE_INITIALIZATION_LEVEL_SCENE);
 	return init_obj.init();
 }
 #endif
