@@ -18,12 +18,9 @@ if [ $# -lt 2 ] || [ $# -gt 4 ]; then
 fi
 
 branch=${1%/}
-godot_version=$(echo "$branch" | grep -o '^[0-9]*\.[0-9]*')
 dev=${2%/}
 mono=false
 repo=https://github.com/godotengine/godot.git
-
-echo "Godot version: $godot_version"
 
 if [[ $# -eq 3 && "$branch" != 3* ]]; then
 	mono=${3%/}
@@ -44,16 +41,6 @@ if [ $# -eq 4 ]; then
 fi
 
 pushd ..
-
-echo "--- Cloning GDExtensions"
-rm -rf godot-cpp
-git clone https://github.com/godotengine/godot-cpp
-pushd godot-cpp
-git submodule update --init
-git checkout $godot_version
-popd
-
-echo "--- Cloning Godot"
 rm -rf godot
 git clone --depth 1 $repo -b $branch
 if [ $dev = "true" ]; then
