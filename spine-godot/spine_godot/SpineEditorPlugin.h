@@ -94,6 +94,8 @@ public:
 
 	virtual float _get_priority() const override { return 1; }
 
+	TypedArray<Dictionary> _get_import_options(const String &p_path, int32_t p_preset_index) const override;
+
 	virtual bool _get_option_visibility(const String &p_path, const StringName &p_option_name, const Dictionary &p_options) const override { return true; };
 
 	virtual Error _import(const String &p_source_file, const String &p_save_path, const Dictionary &p_options, const TypedArray<String> &p_platform_variants, const TypedArray<String> &p_gen_files) const override;
@@ -163,6 +165,11 @@ public:
 
 	float _get_priority() const override { return 1; }
 
+	TypedArray<Dictionary> _get_import_options(const String &p_path, int32_t p_preset_index) const override {
+		TypedArray<Dictionary> options;
+		return options;
+	}
+
 	virtual bool _get_option_visibility(const String &p_path, const StringName &p_option_name, const Dictionary &p_options) const override { return true; };
 
 	virtual Error _import(const String &p_source_file, const String &p_save_path, const Dictionary &p_options, const TypedArray<String> &p_platform_variants, const TypedArray<String> &p_gen_files) const override;
@@ -231,6 +238,11 @@ public:
 	int _get_import_order() const override { return IMPORT_ORDER_DEFAULT; }
 
 	float _get_priority() const override { return 1; }
+
+	TypedArray<Dictionary> _get_import_options(const String &p_path, int32_t p_preset_index) const override {
+		TypedArray<Dictionary> options;
+		return options;
+	}
 
 	virtual bool _get_option_visibility(const String &p_path, const StringName &p_option_name, const Dictionary &p_options) const override { return true; };
 

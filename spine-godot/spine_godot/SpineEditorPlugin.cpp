@@ -64,8 +64,18 @@ Error SpineAtlasResourceImportPlugin::import(const String &source_file, const St
 	return error;
 }
 
-// FIXME get_import_options is not available in godot-cpp
-#ifndef SPINE_GODOT_EXTENSION
+#ifdef SPINE_GODOT_EXTENSION
+TypedArray<Dictionary> SpineAtlasResourceImportPlugin::_get_import_options(const String &p_path, int32_t p_preset_index) const {
+	TypedArray<Dictionary> options;
+	Dictionary dictionary;
+	dictionary["name"] = "normal_map_prefix";
+	dictionary["type"] = Variant::STRING;
+	dictionary["hint_string"] = "String";
+	dictionary["default_value"] = String("n");
+	options.push_back(dictionary);
+	return options;
+}
+#else
 #if VERSION_MAJOR > 3
 void SpineAtlasResourceImportPlugin::get_import_options(const String &path, List<ImportOption> *options, int preset) const {
 #else

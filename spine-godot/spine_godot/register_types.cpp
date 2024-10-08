@@ -192,7 +192,6 @@ void register_spine_godot_types() {
 	ResourceSaver::add_resource_format_saver(skeleton_file_saver);
 #endif
 #endif
-	printf(">>>>>>>>>>>>>>>>>>>> fuck\n");
 }
 
 #if VERSION_MAJOR > 3
