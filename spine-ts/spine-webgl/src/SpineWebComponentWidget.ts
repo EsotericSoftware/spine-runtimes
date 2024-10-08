@@ -65,7 +65,7 @@ interface Rectangle extends Point {
 type BeforeAfterUpdateSpineWidgetFunction = (skeleton: Skeleton, state: AnimationState) => void;
 type UpdateSpineWidgetFunction = (delta: number, skeleton: Skeleton, state: AnimationState) => void;
 
-type OffScreenUpdateBehaviourType = "pause" | "update" | "pose";
+export type OffScreenUpdateBehaviourType = "pause" | "update" | "pose";
 function isOffScreenUpdateBehaviourType (value: string | null): value is OffScreenUpdateBehaviourType {
 	return (
 		value === "pause" ||
@@ -74,7 +74,7 @@ function isOffScreenUpdateBehaviourType (value: string | null): value is OffScre
 	);
 }
 
-type ModeType = "inside" | "origin";
+export type ModeType = "inside" | "origin";
 function isModeType (value: string | null): value is ModeType {
 	return (
 		value === "inside" ||
@@ -82,7 +82,7 @@ function isModeType (value: string | null): value is ModeType {
 	);
 }
 
-type FitType = "fill" | "width" | "height" | "contain" | "cover" | "none" | "scaleDown";
+export type FitType = "fill" | "width" | "height" | "contain" | "cover" | "none" | "scaleDown";
 function isFitType (value: string | null): value is FitType {
 	return (
 		value === "fill" ||
@@ -95,7 +95,7 @@ function isFitType (value: string | null): value is FitType {
 	);
 }
 
-type AttributeTypes = "string" | "number" | "boolean" | "string-number" | "fitType" | "modeType" | "offScreenUpdateBehaviourType";
+export type AttributeTypes = "string" | "number" | "boolean" | "string-number" | "fitType" | "modeType" | "offScreenUpdateBehaviourType";
 
 // The properties that map to widget attributes
 interface WidgetAttributes {
@@ -183,7 +183,8 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 	public skeletonPath?: string;
 
 	/**
-	 * The scale when loading the skeleton data. Default: 1
+	 * The scale passed to the Skeleton Loader. SkeletonData values will be scaled accordingly.
+	 * Default: 1
 	 * Connected to `scale` attribute.
 	 */
 	public scale = 1;
@@ -196,6 +197,7 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 		return this._animation;
 	}
 	public set animation (value: string | undefined) {
+		if (value === "") value = undefined;
 		this._animation = value;
 		this.initWidget();
 	}
@@ -296,7 +298,7 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 	 * Use `setBounds` to set you desired bounds. Bounding Box might be useful to determine the bounds to be used.
 	 * If the skeleton overflow the element container consider setting {@link clip} to `true`.
 	 */
-	public bounds: Rectangle = { x: 0, y: 0, width: 0, height: 0 };
+	public bounds: Rectangle = { x: 0, y: 0, width: -1, height: -1 };
 
 	/**
 	 * The x of the bounds in Spine world coordinates
@@ -329,6 +331,7 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 	}
 	set boundsWidth(value: number) {
 		this.bounds.width = value;
+		if (value <= 0) this.initWidget(true);
 	}
 
 	/**
@@ -340,6 +343,7 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 	}
 	set boundsHeight(value: number) {
 		this.bounds.height = value;
+		if (value <= 0) this.initWidget(true);
 	}
 
 	/**
@@ -575,7 +579,7 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 		atlas: { propertyName: "atlasPath", type: "string" },
 		skeleton: { propertyName: "skeletonPath", type: "string" },
 		scale: { propertyName: "scale", type: "number" },
-		animation: { propertyName: "animation", type: "string" },
+		animation: { propertyName: "animation", type: "string", defaultValue: undefined },
 		skin: { propertyName: "skin", type: "string" },
 		width: { propertyName: "width", type: "number", defaultValue: -1 },
 		height: { propertyName: "height", type: "number", defaultValue: -1 },
@@ -590,8 +594,8 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 		"pad-bottom": { propertyName: "padBottom", type: "number" },
 		"bounds-x": { propertyName: "boundsX", type: "number" },
 		"bounds-y": { propertyName: "boundsY", type: "number" },
-		"bounds-width": { propertyName: "boundsWidth", type: "number" },
-		"bounds-height": { propertyName: "boundsHeight", type: "number" },
+		"bounds-width": { propertyName: "boundsWidth", type: "number", defaultValue: -1 },
+		"bounds-height": { propertyName: "boundsHeight", type: "number", defaultValue: -1 },
 		"auto-recalculate-bounds": { propertyName: "autoRecalculateBounds", type: "boolean" },
 		identifier: { propertyName: "identifier", type: "string" },
 		debug: { propertyName: "debug", type: "boolean" },
@@ -615,7 +619,7 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 
 		this.debugDragDiv = document.createElement("div");
 		this.debugDragDiv.style.position = "absolute";
-		this.debugDragDiv.style.backgroundColor = "rgba(0, 1, 1, 0.3)";
+		this.debugDragDiv.style.backgroundColor = "rgba(255, 0, 0, .3)";
 		this.debugDragDiv.style.setProperty("pointer-events", "none");
 	}
 
@@ -650,28 +654,28 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 
 	attributeChangedCallback (name: string, oldValue: string | null, newValue: string | null): void {
 		const { type, propertyName, defaultValue } = SpineWebComponentWidget.attributesDescription[name];
-		const val = SpineWebComponentWidget.castValue(type, newValue, defaultValue ?? this[propertyName]);
+		const val = SpineWebComponentWidget.castValue(type, newValue, defaultValue);
 		(this as any)[propertyName] = val;
 		return;
 	}
 
 	/**
 	 * Starts the widget. Starting the widget means to load the assets currently set into
-	 * {@link atlasPath} and {@link skeletonPath}.
+	 * {@link atlasPath} and {@link skeletonPath}. If start is invoked when the widget is already started,
+	 * the skeleton, state, skin and animation will be reset.
 	 */
 	public start () {
 		if (this.started) {
-			console.warn("If you want to start again the widget, first reset it");
+			this.skeleton = undefined;
+			this.state = undefined;
+			this._skin = undefined;
+			this._animation = undefined;
+			this.bounds.width = -1;
+			this.bounds.height = -1;
 		}
 		this.started = true;
 
-		if (!this.loadingPromise) {
-			this.loadingPromise = customElements.whenDefined("spine-overlay").then(() => this.loadSkeleton());
-		}
-
-		this.loadingPromise.then(() => {
-			this.loading = false;
-		});
+		this.loadingPromise = customElements.whenDefined("spine-overlay").then(() => this.loadSkeleton());
 	}
 
 	/**
@@ -700,7 +704,7 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 	 * @returns The `HTMLElement` where the widget is hosted.
 	 */
 	public getHTMLElementReference (): HTMLElement {
-		return this.width <= 0 || this.width <= 0
+		return (this.width <= 0 || this.width <= 0) && !this.getAttribute("style")
 			? this.parentElement!
 			: this;
 	}
@@ -769,16 +773,24 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 		// skeleton.scaleY = this.currentScaleDpi;
 
 		// the bounds are calculated the first time, if no custom bound is provided
-		this.initWidget(this.bounds.width === 0 || this.bounds.height === 0);
+		this.initWidget(this.bounds.width <= 0 || this.bounds.height <= 0);
 
+		this.loading = false;
 		return this;
 	}
 
 	private initWidget (forceRecalculate = false) {
 		const { skeleton, state, animation, skin } = this;
 
-		if (skin) skeleton?.setSkinByName(skin);
-		if (animation) state?.setAnimation(0, animation, true);
+		if (skin) {
+			skeleton?.setSkinByName(skin);
+			skeleton?.setSlotsToSetupPose();
+		}
+		if (animation) {
+			state?.setAnimation(0, animation, true);
+		} else {
+			state?.setEmptyAnimation(0);
+		}
 
 		if (forceRecalculate || this.autoRecalculateBounds) this.recalculateBounds();
 	}
@@ -800,8 +812,11 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
                 display: inline-block;
                 width:  ${width};
                 height: ${height};
-                // background-color: red;
             }
+
+			:host(.debug-background-color) {
+				background-color: rgba(255, 0, 0, 0.3);
+			}
         </style>
         `;
 	}
@@ -848,13 +863,15 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 			skeleton.updateWorldTransform(Physics.update);
 			skeleton.getBounds(offset, size, tempArray, renderer.skeletonRenderer.getSkeletonClipping());
 
-			if (!isNaN(offset.x) && !isNaN(offset.y) && !isNaN(size.x) && !isNaN(size.y)) {
+			if (!isNaN(offset.x) && !isNaN(offset.y) && !isNaN(size.x) && !isNaN(size.y) &&
+				!isNaN(minX) && !isNaN(minY) && !isNaN(maxX) && !isNaN(maxY)) {
 				minX = Math.min(offset.x, minX);
 				maxX = Math.max(offset.x + size.x, maxX);
 				minY = Math.min(offset.y, minY);
 				maxY = Math.max(offset.y + size.y, maxY);
-			} else
-				console.error("Animation bounds are invalid: " + animation.name);
+			} else {
+				return { x: 0, y: 0, width: -1, height: -1 };
+			}
 		}
 
 		return {
@@ -1161,7 +1178,8 @@ class SpineWebComponentOverlay extends HTMLElement implements Disposable {
 				const { skeleton, bounds, mode, debug, offsetX, offsetY, xAxis, yAxis, dragX, dragY, fit, loadingSpinner, onScreen, loading, clip, isDraggable } = widget;
 
 				if ((!onScreen && dragX === 0 && dragY === 0)) return;
-				const divBounds = widget.getHTMLElementReference().getBoundingClientRect();
+				const elementRef = widget.getHTMLElementReference();
+				const divBounds = elementRef.getBoundingClientRect();
 				// need to use left and top, because x and y are not available on older browser
 				divBounds.x = divBounds.left + this.overflowLeftSize;
 				divBounds.y = divBounds.top + this.overflowTopSize;
@@ -1203,6 +1221,7 @@ class SpineWebComponentOverlay extends HTMLElement implements Disposable {
 				if (skeleton) {
 					if (mode === "inside") {
 						let { x: ax, y: ay, width: aw, height: ah } = bounds;
+						if (aw <= 0 || ah <= 0) return;
 
 						// scale ratio
 						const scaleWidth = divWidthWorld / aw;
@@ -1289,6 +1308,16 @@ class SpineWebComponentOverlay extends HTMLElement implements Disposable {
 							widget.dragBoundsRectangle.x += divBounds.x;
 							widget.dragBoundsRectangle.y += divBounds.y;
 						}
+
+						if (!widget.debugDragDiv.isConnected) document.body.appendChild(widget.debugDragDiv);
+						widget.debugDragDiv.style.left = `${widget.dragBoundsRectangle.x - this.overflowLeftSize}px`;
+						widget.debugDragDiv.style.top = `${widget.dragBoundsRectangle.y - this.overflowTopSize}px`;
+						widget.debugDragDiv.style.width = `${widget.dragBoundsRectangle.width}px`;
+						widget.debugDragDiv.style.height = `${widget.dragBoundsRectangle.height}px`;
+
+						if (!debug && widget.debugDragDiv.isConnected) widget.debugDragDiv.remove();
+					} else {
+						if (widget.debugDragDiv.isConnected) widget.debugDragDiv.remove();
 					}
 
 					// drawing debug stuff
@@ -1318,16 +1347,12 @@ class SpineWebComponentOverlay extends HTMLElement implements Disposable {
 
 						// show line from origin to bounds center
 						renderer.line(originX, originY, bbCenterX, bbCenterY, green);
-
-						if (!widget.debugDragDiv.isConnected) document.body.appendChild(widget.debugDragDiv);
-						widget.debugDragDiv.style.left = `${widget.dragBoundsRectangle.x - this.overflowLeftSize}px`;
-						widget.debugDragDiv.style.top = `${widget.dragBoundsRectangle.y - this.overflowTopSize}px`;
-						widget.debugDragDiv.style.width = `${widget.dragBoundsRectangle.width}px`;
-						widget.debugDragDiv.style.height = `${widget.dragBoundsRectangle.height}px`;
+						if (elementRef === widget) widget.classList.add("debug-background-color");
+					} else {
+						if (elementRef === widget) widget.classList.remove("debug-background-color");
 					}
 
 					if (clip) clipToBoundEnd();
-
 				}
 			});
 

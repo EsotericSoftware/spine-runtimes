@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="../dist/iife/spine-webgl.js"></script>
     <!-- <script src="./spine-webgl.min.js"></script> -->
-    <title>JS Library Showcase</title>
+    <title>Webcomponent Tutorial</title>
     <style>
         body {
             margin: 0;
@@ -131,11 +131,11 @@
 
     <!--
     /////////////////////
-    // start section 0 //
+    // start section //
     /////////////////////
     -->
 
-    <div id="section0" class="section vertical-split">
+    <div class="section vertical-split">
 
         <div class="split-top split">
             <div class="split-left">
@@ -172,17 +172,17 @@
 
     <!--
     /////////////////////
-    // end section 0 //
+    // end section //
     /////////////////////
     -->
 
     <!--
     /////////////////////
-    // start section 1 //
+    // start section //
     /////////////////////
     -->
 
-    <div id="section1" class="section vertical-split">
+    <div class="section vertical-split">
 
         <div class="full-width">
 
@@ -252,17 +252,17 @@
 
     <!--
     /////////////////////
-    // end section 1 //
+    // end section //
     /////////////////////
     -->
 
     <!--
     /////////////////////
-    // start section 2 //
+    // start section //
     /////////////////////
     -->
 
-    <div id="section2" class="section vertical-split">
+    <div class="section vertical-split">
 
         <div class="split-top split">
             <div class="split-left">
@@ -270,12 +270,27 @@
                     atlas="assets/spineboy-pma.atlas"
                     skeleton="assets/spineboy-pro.skel"
                     animation="walk"
-                    height="200"
-                    width="200"
+                    height="150"
+                    width="150"
+                ></spine-widget>
+                <spine-widget
+                    atlas="assets/spineboy-pma.atlas"
+                    skeleton="assets/spineboy-pro.skel"
+                    animation="walk"
+                    style="
+                        width: 150px;
+                        height: 150px;
+                        border: 1px solid red;
+                        border-radius: 10px;
+                        box-shadow: -5px 5px 3px rgba(255, 0, 0, 0.3);
+                    "
                 ></spine-widget>
             </div>
             <div class="split-right">
                 If you want to manually size the Spine widget, specify the attributes <code>width</code> and <code>height</code> in pixels (without the px unit).
+                <br>
+                <br>
+                If you prefer you can style the component using the <code>style</code> attribute. There you have more styling options.
             </div>
         </div>
 
@@ -284,13 +299,28 @@
             <pre><code id="code-display">
                 <script>
                 escapeHTMLandInject(`
-<spine-widget
-    atlas="assets/spineboy-pma.atlas"
-    skeleton="assets/spineboy-pro.skel"
-    animation="walk"
-    height="200"
-    width="200"
-></spine-widget>`)
+<div>
+    <spine-widget
+        atlas="assets/spineboy-pma.atlas"
+        skeleton="assets/spineboy-pro.skel"
+        animation="walk"
+        height="150"
+        width="150"
+    ></spine-widget>
+
+    <spine-widget
+        atlas="assets/spineboy-pma.atlas"
+        skeleton="assets/spineboy-pro.skel"
+        animation="walk"
+        style="
+            width: 150px;
+            height: 150px;
+            border: 1px solid red;
+            border-radius: 10px;
+            box-shadow: -5px 5px 3px rgba(255, 0, 0, 0.3);
+        "
+    ></spine-widget>
+</div>`)
                 </script>
             </code></pre>
         </div>
@@ -298,17 +328,17 @@
 
     <!--
     /////////////////////
-    // end section 2 //
+    // end section //
     /////////////////////
     -->
 
     <!--
     /////////////////////
-    // start section 3 //
+    // start section //
     /////////////////////
     -->
 
-    <div id="section3" class="section vertical-split">
+    <div class="section vertical-split">
 
         <div class="split-top split">
             <div class="split-left">
@@ -350,17 +380,17 @@
 
     <!--
     /////////////////////
-    // end section 3 //
+    // end section //
     /////////////////////
     -->
 
     <!--
     /////////////////////
-    // start section 4 //
+    // start section //
     /////////////////////
     -->
 
-    <div id="section4" class="section vertical-split">
+    <div class="section vertical-split">
 
         <div class="split-top split">
             <div class="split-left">
@@ -395,17 +425,17 @@
 
     <!--
     /////////////////////
-    // end section 4 //
+    // end section //
     /////////////////////
     -->
 
     <!--
     /////////////////////
-    // start section 5 //
+    // start section //
     /////////////////////
     -->
 
-    <div id="section5" class="section vertical-split">
+    <div class="section vertical-split">
 
         <div class="split-top split">
             <div class="split-left">
@@ -448,17 +478,73 @@
 
     <!--
     /////////////////////
-    // end section 5 //
+    // end section //
+    /////////////////////
+    -->
+
+        <!--
+    /////////////////////
+    // start section //
+    /////////////////////
+    -->
+
+    <div class="section vertical-split">
+
+        <div class="split-top split">
+            <div class="split-left">
+                You can customize the bounds, for example to focus on certain details of your animation.
+                <br>
+                <br>
+                The <code>bounds-x</code>, <code>bounds-y</code>, <code>bounds-width</code> and <code>bounds-height</code> allows to define custom bounds.
+                <br>
+                <br>
+                In this example we're zooming in into Celeste's face. You probably want to use <code>clip</code> in this case to avoid the skeleton overflow.
+            </div>
+            <div class="split-right">
+                <spine-widget
+                    atlas="assets/celestial-circus-pma.atlas"
+                    skeleton="assets/celestial-circus-pro.skel"
+                    animation="wings-and-feet"
+                    bounds-x="-155"
+                    bounds-y="650"
+                    bounds-width="300"
+                    bounds-height="350"
+                    clip
+                ></spine-widget>
+            </div>
+        </div>
+
+        <div class="split-bottom">
+            <pre><code id="code-display">
+                <script>escapeHTMLandInject(`
+<spine-widget
+    atlas="assets/celestial-circus-pma.atlas"
+    skeleton="assets/celestial-circus-pro.skel"
+    animation="wings-and-feet"
+    bounds-x="-155"
+    bounds-y="650"
+    bounds-width="300"
+    bounds-height="350"
+    clip
+></spine-widget>`);</script>
+            </code></pre>
+        </div>
+
+    </div>
+
+    <!--
+    /////////////////////
+    // end section //
     /////////////////////
     -->
 
     <!--
     /////////////////////
-    // start section 6 //
+    // start section //
     /////////////////////
     -->
 
-    <div id="section6" class="section vertical-split">
+    <div class="section vertical-split">
 
         <div class="split-top split">
             <div class="split-left">
@@ -526,17 +612,17 @@
 
     <!--
     /////////////////////
-    // end section 6 //
+    // end section //
     /////////////////////
     -->
 
     <!--
     /////////////////////
-    // start section 7 //
+    // start section //
     /////////////////////
     -->
 
-    <div id="section7" class="section vertical-split">
+    <div class="section vertical-split">
         <div class="split high-page" style="flex-direction: column;">
             <div class="split-nosize full-width" style="width: 80%; padding: 1em;">
                 Moving the div will move the skeleton origin.
@@ -570,17 +656,17 @@
 
     <!--
     /////////////////////
-    // end section 7 //
+    // end section //
     /////////////////////
     -->
 
     <!--
     /////////////////////
-    // start section 8 //
+    // start section //
     /////////////////////
     -->
 
-    <div id="section8" class="section vertical-split">
+    <div class="section vertical-split">
 
         <div class="split-top split">
             <div class="split-left">
@@ -613,7 +699,7 @@
 
     <!--
     /////////////////////
-    // end section 8 //
+    // end section //
     /////////////////////
     -->
 
@@ -621,10 +707,10 @@
 
     <!--
     /////////////////////
-    // start section 9 //
+    // start section //
     /////////////////////
     -->
-    <div id="section9" class="section vertical-split">
+    <div class="section vertical-split">
 
         <div class="split-top split">
             <div class="split-left">
@@ -686,16 +772,16 @@
     </div>
     <!--
     /////////////////////
-    // end section 9 //
+    // end section //
     /////////////////////
     -->
 
     <!--
     /////////////////////
-    // start section 10 //
+    // start section //
     /////////////////////
     -->
-    <div id="section10" class="section vertical-split">
+    <div class="section vertical-split">
 
         <div class="split" style="width: 100%; flex-direction: column;">
 
@@ -924,16 +1010,16 @@
     </div>
     <!--
     /////////////////////
-    // end section 10 //
+    // end section //
     /////////////////////
     -->
 
     <!--
     /////////////////////
-    // start section 11 //
+    // start section //
     /////////////////////
     -->
-    <div id="section11" class="section vertical-split">
+    <div class="section vertical-split">
 
         <div class="split" style="width: 100%; flex-direction: column;">
 
@@ -1187,16 +1273,16 @@
     </div>
     <!--
     /////////////////////
-    // end section 11 //
+    // end section //
     /////////////////////
     -->
 
     <!--
     /////////////////////
-    // start section 12 //
+    // start section //
     /////////////////////
     -->
-    <div id="section12" class="section vertical-split">
+    <div class="section vertical-split">
 
         <div class="split" style="width: 100%; flex-direction: column;">
 
@@ -1309,16 +1395,16 @@ skins.forEach((skin, i) => {
     </div>
     <!--
     /////////////////////
-    // end section 12 //
+    // end section //
     /////////////////////
     -->
 
    <!--
     /////////////////////
-    // start section 13 //
+    // start section //
     /////////////////////
     -->
-    <div id="section13" class="section vertical-split">
+    <div class="section vertical-split">
 
         <div class="split" style="width: 100%; flex-direction: column;">
 
@@ -1402,16 +1488,16 @@ skins.forEach((skin, i) => {
     </div>
     <!--
     /////////////////////
-    // end section 13 //
+    // end section //
     /////////////////////
     -->
 
    <!--
     /////////////////////
-    // start section 14 //
+    // start section //
     /////////////////////
     -->
-    <div id="section14" class="section vertical-split">
+    <div class="section vertical-split">
 
         <div class="split-top split">
             <div class="split-left">
@@ -1497,16 +1583,16 @@ function loadPageDragon(pageIndex) {
     </div>
     <!--
     /////////////////////
-    // end section 14 //
+    // end section //
     /////////////////////
     -->
 
     <!--
     /////////////////////
-    // start section 15 //
+    // start section //
     /////////////////////
     -->
-    <div id="section15" class="section vertical-split">
+    <div class="section vertical-split">
 
         <div class="split" style="width: 100%; flex-direction: column;">
 
@@ -1600,16 +1686,16 @@ stretchyman.update = (canvas, delta, skeleton, state) => {
 
     <!--
     /////////////////////
-    // end section 15 //
+    // end section //
     /////////////////////
     -->
 
     <!--
     /////////////////////
-    // start section 16 //
+    // start section //
     /////////////////////
     -->
-    <div id="section16" class="section vertical-split">
+    <div class="section vertical-split">
 
         <div class="split" style="width: 100%; flex-direction: column;">
 
@@ -1705,16 +1791,16 @@ stretchyman.update = (canvas, delta, skeleton, state) => {
 
     <!--
     /////////////////////
-    // end section 16 //
+    // end section //
     /////////////////////
     -->
 
     <!--
     /////////////////////
-    // start section 17 //
+    // start section //
     /////////////////////
     -->
-    <div id="section17" class="section vertical-split">
+    <div class="section vertical-split">
 
         <div class="split-left" style="width: 80%; box-sizing: border-box;">
             More examples for <code>clip</code> attribute.
@@ -1854,17 +1940,17 @@ stretchyman.update = (canvas, delta, skeleton, state) => {
 
     <!--
     /////////////////////
-    // end section 17 //
+    // end section //
     /////////////////////
     -->
 
     <!--
     /////////////////////
-    // start section 18 //
+    // start section //
     /////////////////////
     -->
 
-    <div id="section18" class="section vertical-split">
+    <div class="section vertical-split">
 
         <div class="split-top split">
             <div class="split-left">
@@ -1897,63 +1983,7 @@ stretchyman.update = (canvas, delta, skeleton, state) => {
 
     <!--
     /////////////////////
-    // end section 18 //
-    /////////////////////
-    -->
-
-    <!--
-    /////////////////////
-    // start section 19 //
-    /////////////////////
-    -->
-
-    <div id="section19" class="section vertical-split">
-
-        <div class="split-top split">
-            <div class="split-left">
-                You can customize the bounds, for example to focus on certain details of your animation.
-                <br>
-                <br>
-                The <code>bounds-x</code>, <code>bounds-y</code>, <code>bounds-width</code> and <code>bounds-height</code> allows to define custom bounds.
-                <br>
-                <br>
-                In this example we're zooming in into Celeste's face. You probably want to use <code>clip</code> in this case to avoid the skeleton overflow.
-            </div>
-            <div class="split-right">
-                <spine-widget
-                    atlas="assets/celestial-circus-pma.atlas"
-                    skeleton="assets/celestial-circus-pro.skel"
-                    animation="wings-and-feet"
-                    bounds-x="-155"
-                    bounds-y="650"
-                    bounds-width="300"
-                    bounds-height="350"
-                    clip
-                ></spine-widget>
-            </div>
-        </div>
-
-        <div class="split-bottom">
-            <pre><code id="code-display">
-                <script>escapeHTMLandInject(`
-<spine-widget
-    atlas="assets/celestial-circus-pma.atlas"
-    skeleton="assets/celestial-circus-pro.skel"
-    animation="wings-and-feet"
-    bounds-x="-155"
-    bounds-y="650"
-    bounds-width="300"
-    bounds-height="350"
-    clip
-></spine-widget>`);</script>
-            </code></pre>
-        </div>
-
-    </div>
-
-    <!--
-    /////////////////////
-    // end section 19 //
+    // end section //
     /////////////////////
     -->
 

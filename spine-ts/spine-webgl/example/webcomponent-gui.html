@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/lil-gui@0.19.2/dist/lil-gui.umd.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/lil-gui@0.19.2/dist/lil-gui.min.css" rel="stylesheet">
+    <script src="../dist/iife/spine-webgl.js"></script>
+    <title>Webcomponent GUI</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            background-color: #3498db;
+        }
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+        .left-column {
+            flex: 1;
+            overflow-y: auto;
+            margin: 20px;
+            background: url("assets/checker.png")
+        }
+        .right-column {
+            width: 300px;
+            overflow-y: auto;
+            display: flex; /* Enables Flexbox layout */
+            justify-content: center; /* Horizontally centers content */
+        }
+        #lil {
+            flex: 1;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="left-column">
+            <spine-widget
+                identifier="boi"
+                atlas="assets/spineboy-pma.atlas"
+                skeleton="assets/spineboy-pro.skel"
+                auto-recalculate-bounds
+                debug
+            ></spine-widget>
+        </div>
+        <div class="right-column">
+            <div id="lil"></div>
+        </div>
+    </div>
+
+
+    <script>
+        (async () => {
+            const boi = spine.getSpineWidget("boi");
+            let { skeleton } = await boi.loadingPromise;
+
+            const animations = skeleton.data.animations.map(({ name }) => name);
+            animations.push("none");
+
+            const skins = skeleton.data.skins.map(({ name }) => name);
+
+            const gui = new lil.GUI({ container: document.getElementById('lil'), autoPlace: false, width: "100%" });
+
+            const refillAnimations = () => {
+                const animations = skeleton.data.animations.map(({ name }) => name);
+                animations.push("none");
+                const animationController = getController("animation");
+                animationController.options(animations).setValue(animations[animations.length - 1]);
+            }
+
+            const refillSkins = () => {
+                const skins = skeleton.data.skins.map(({ name }) => name);
+                const skinController = getController("skin");
+                skinController.options(skins).setValue(skins[0]);
+            }
+
+            const refillBounds = () => {
+                getController("boundsX").setValue(boi.bounds.x);
+                getController("boundsY").setValue(boi.bounds.y);
+                getController("boundsWidth").setValue(boi.bounds.width);
+                getController("boundsHeight").setValue(boi.bounds.height);
+            }
+
+            const myObject = {
+                isDraggable: false,
+                debug: true,
+                clip: false,
+                animation: "none",
+                skin: "default",
+                padLeft: 0,
+                padRight: 0,
+                padBottom: 0,
+                padTop: 0,
+                customBounds: false,
+                autoRecalculateBounds: true,
+                fit: "contain",
+                mode: "inside",
+                scaleX: 1,
+                scaleY: 1,
+                xAxis: boi.xAxis,
+                yAxis: boi.yAxis,
+                offsetX: boi.offsetX,
+                offsetY: boi.offsetY,
+                skeletonPath: boi.skeletonPath,
+                atlasPath: boi.atlasPath,
+                boundsX: boi.bounds.x,
+                boundsY: boi.bounds.y,
+                boundsWidth: boi.bounds.width,
+                boundsHeight: boi.bounds.height,
+                async reload() {
+                    const { atlas: atlasPath, skeleton: skeletonPath } = gui.save().folders.Assets.controllers;
+                    boi.atlasPath = atlasPath;
+                    boi.skeletonPath = skeletonPath;
+                    boi.start();
+
+                    await boi.loadingPromise;
+                    skeleton = boi.skeleton;
+
+                    refillAnimations();
+                    refillSkins();
+                    refillBounds();
+                },
+            };
+
+
+            const assetFolder = gui.addFolder( 'Assets' );
+            assetFolder.add( myObject, 'skeletonPath' ).name( 'skeleton' );
+            assetFolder.add( myObject, 'atlasPath' ).name( 'atlas' );
+            assetFolder.add( myObject, 'reload' ).name( 'Reload Widget' );
+
+            gui
+                .add(myObject, 'animation', animations)
+                .name( 'animation' )
+                .onChange(value => {
+                    if (value === "none") {
+                        boi.removeAttribute("animation")
+                    } else {
+                        boi.setAttribute("animation", value)
+                    }
+                    refillBounds();
+                });
+
+            gui
+                .add(myObject, 'skin', skins)
+                .name( 'skin' )
+                .onChange(value => {
+                    if (value === "none") {
+                        boi.removeAttribute("skin")
+                    } else {
+                        boi.setAttribute("skin", value)
+                    }
+                    refillBounds();
+                });
+
+            gui
+                .add(myObject, 'fit', ["fill", "width", "height", "contain", "cover", "none", "scaleDown"])
+                .name( 'fit' )
+                .onChange(value => {
+                    boi.setAttribute("fit", value)
+
+                    if (value === "none") {
+                        getController("scaleX").enable();
+                        getController("scaleY").enable();
+                    } else {
+                        getController("scaleX").disable();
+                        getController("scaleY").disable();
+                    }
+                });
+
+            gui
+                .add(myObject, 'mode', ["inside", "origin"])
+                .name( 'mode' )
+                .onChange(value => {
+                    boi.setAttribute("mode", value)
+
+                    if (value === "origin") {
+                        getController("fit").disable();
+                        disableFolder("Bounds");
+                        disableFolder("Padding");
+                        getController("scaleX").enable();
+                        getController("scaleY").enable();
+                    } else {
+                        getController("fit").enable();
+                        enableFolder("Bounds");
+                        enableFolder("Padding");
+                        if (myObject.fit !== "none") {
+                            getController("scaleX").disable();
+                            getController("scaleY").disable();
+                        }
+                    }
+                });
+
+            gui
+                .add(myObject, 'scaleX').min(-20).max(20).step(0.01)
+                .name( 'scale-x' )
+                .onChange(value => {
+                    boi.skeleton.scaleX = value;
+                })
+                .disable();
+
+            gui
+                .add(myObject, 'scaleY').min(-20).max(20).step(0.01)
+                .name( 'scale-y' )
+                .onChange(value => {
+                    boi.skeleton.scaleY = value;
+                })
+                .disable();
+
+            gui
+                .add(myObject, 'isDraggable')
+                .name( 'isdraggable' )
+                .onChange(value => {
+                    if (value) boi.setAttribute("isdraggable", '')
+                    else boi.removeAttribute("isdraggable");
+                });
+
+            gui
+                .add(myObject, 'debug')
+                .name( 'debug' )
+                .onChange(value => {
+                    if (value) boi.setAttribute("debug", '')
+                    else boi.removeAttribute("debug");
+                });
+
+            gui
+                .add(myObject, 'clip')
+                .name( 'clip' )
+                .onChange(value => {
+                    if (value) boi.setAttribute("clip", '')
+                    else boi.removeAttribute("clip");
+                });
+
+            gui
+                .add(myObject, 'xAxis').min(-1).max(1).step(0.01)
+                .name( 'x-axis' )
+                .onChange(value => {
+                    boi.setAttribute("x-axis", value)
+                });
+
+            gui
+                .add(myObject, 'yAxis').min(-1).max(1).step(0.01)
+                .name( 'y-axis' )
+                .onChange(value => {
+                    boi.setAttribute("y-axis", value)
+                });
+
+            gui
+                .add(myObject, 'offsetX').min(-500).max(500).step(0.1)
+                .name( 'offset-x' )
+                .onChange(value => {
+                    boi.setAttribute("offset-x", value)
+                });
+
+            gui
+                .add(myObject, 'offsetY').min(-500).max(500).step(0.1)
+                .name( 'offset-y' )
+                .onChange(value => {
+                    boi.setAttribute("offset-y", value)
+                });
+
+            const paddingFolder = gui.addFolder( 'Padding' );
+            paddingFolder
+                .add(myObject, 'padLeft').min(0).max(1).step(0.01)
+                .name( 'pad-left' )
+                .onChange(value => {
+                    boi.setAttribute("pad-left", value)
+                });
+
+            paddingFolder
+                .add(myObject, 'padTop').min(0).max(1).step(0.01)
+                .name( 'pad-top' )
+                .onChange(value => {
+                    boi.setAttribute("pad-top", value)
+                });
+
+            paddingFolder
+                .add(myObject, 'padRight').min(0).max(1).step(0.01)
+                .name( 'pad-right' )
+                .onChange(value => {
+                    boi.setAttribute("pad-right", value)
+                });
+
+            paddingFolder
+                .add(myObject, 'padBottom').min(0).max(1).step(0.01)
+                .name( 'pad-bottom' )
+                .onChange(value => {
+                    boi.setAttribute("pad-bottom", value)
+                });
+
+
+            const boundsFolder = gui.addFolder( 'Bounds' );
+            boundsFolder
+                .add(myObject, 'autoRecalculateBounds')
+                .name( 'auto-recalculate-bounds' )
+                .onChange(value => {
+                    boi.setAttribute("auto-recalculate-bounds", value)
+                });
+
+            boundsFolder
+                .add(myObject, 'boundsX').min(-500).max(500).step(0.01)
+                .name( 'bounds-x' )
+                .onChange(value => {
+                    boi.setAttribute("bounds-x", value)
+                });
+
+            boundsFolder
+                .add(myObject, 'boundsY').min(-500).max(500).step(0.01)
+                .name( 'bounds-y' )
+                .onChange(value => {
+                    boi.setAttribute("bounds-y", value)
+                });
+
+            boundsFolder
+                .add(myObject, 'boundsWidth').min(0).max(500).step(0.01)
+                .name( 'bounds-width' )
+                .onChange(value => {
+                    boi.setAttribute("bounds-width", value)
+                });
+
+            boundsFolder
+                .add(myObject, 'boundsHeight').min(0).max(500).step(0.01)
+                .name( 'bounds-height' )
+                .onChange(value => {
+                    boi.setAttribute("bounds-height", value)
+                });
+
+            const controllers = gui.controllersRecursive();
+            const getController = (propertyName) => controllers.find(({ property }) => property === propertyName);
+
+            const folders = gui.foldersRecursive();
+            const getFolder = (folderName) => folders.find(({ _title }) => _title === folderName);
+            const disableFolder = (folderName) => getFolder(folderName).controllers.forEach(c => c.disable());
+            const enableFolder = (folderName) => getFolder(folderName).controllers.forEach(c => c.enable());
+
+            setInterval(() => {
+                if (myObject.fit === "none" || myObject.mode === "origin") return;
+                getController("scaleX").setValue(skeleton.scaleX);
+                getController("scaleY").setValue(skeleton.scaleY);
+            }, 100)
+
+        })();
+    </script>
+
+
+</body>
+</html>
