@@ -67,18 +67,6 @@ if [ $dev = "true" ]; then
 	rm -rf example/.import
 	rm -rf example/.godot
 
-	#if [ "$OSTYPE" = "msys" ]; then
-	#	pushd godot
-	#	if [[ $branch == 3* ]]; then
-	#		echo "Applying V3 Live++ patch"
-	#		git apply ../build/livepp.patch
-	#	else
-	#		echo "Applying V4 Live++ patch"
-	#		git apply ../build/livepp-v4.patch
-	#	fi
-	#	popd
-	#fi
-
 	if [ `uname` == 'Darwin' ] && [ ! -d "$HOME/VulkanSDK" ]; then
 		./build/install-macos-vulkan-sdk.sh
 	fi

@@ -31,6 +31,30 @@
             },
         },
         {
+            "label": "build-extension",
+            "group": "build",
+            "type": "shell",
+            "command": "scons",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "args": [
+                "-j",
+                "16",
+                "target=editor",
+                "dev_build=yes",
+            ],
+            "problemMatcher": "$msCompile",
+            "windows": {
+                "args": [
+                    "-j",
+                    "16",
+                    "target=editor",
+                    "dev_build=yes",
+                ]
+            },
+        },
+        {
             "label": "build-v3",
             "group": "build",
             "type": "shell",

@@ -5,7 +5,7 @@ compatibility_minimum = "4.1"
 
 [libraries]
 
-macos.debug = "res://bin/macos/macos.framework/libspine_godot.macos.editor"
+macos.debug = "res://bin/macos/macos.framework/libspine_godot.macos.template_debug"
 macos.release = "res://bin/macos/macos.framework/libspine_godot.macos.template_release"
 ios.debug = "res://bin/ios/ios.framework/libspine_godot.ios.template_debug"
 ios.release = "res://bin/ios/ios.framework/libspine_godot.ios.template_release"

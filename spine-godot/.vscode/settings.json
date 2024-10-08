@@ -1,20 +1,11 @@
 {
   "cmake.configureOnOpen": false,
   "C_Cpp.intelliSenseEngine": "default",
+  "C_Cpp.default.browse.path": [
+    "${workspaceFolder}"
+  ],
   "dotnet.defaultSolution": "disable",
   "files.associations": {
-    "__bit_reference": "cpp",
-    "__hash_table": "cpp",
-    "__tree": "cpp",
-    "map": "cpp",
-    "set": "cpp",
-    "string": "cpp",
-    "string_view": "cpp",
-    "unordered_map": "cpp",
-    "unordered_set": "cpp",
-    "vector": "cpp",
-    "__split_buffer": "cpp",
-    "deque": "cpp",
-    "list": "cpp"
+    "*.inc": "cpp"
   }
 }

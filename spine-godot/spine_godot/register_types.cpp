@@ -80,7 +80,6 @@ static void editor_init_callback() {
 
 #ifdef SPINE_GODOT_EXTENSION
 void initialize_spine_godot_module(ModuleInitializationLevel level) {
-	printf(">>>>>>>>>>>> level: %i\n", level);
 	if (level == MODULE_INITIALIZATION_LEVEL_EDITOR) {
 		GDREGISTER_CLASS(SpineAtlasResourceImportPlugin);
 		GDREGISTER_CLASS(SpineJsonResourceImportPlugin);
@@ -88,7 +87,6 @@ void initialize_spine_godot_module(ModuleInitializationLevel level) {
 		GDREGISTER_CLASS(SpineSkeletonDataResourceInspectorPlugin);
 		GDREGISTER_CLASS(SpineEditorPlugin);
 		EditorPlugins::add_plugin_class(StringName("SpineEditorPlugin"));
-		printf(">>>>>>>>>>>> registered editor plugin");
 	}
 	if (level != MODULE_INITIALIZATION_LEVEL_SCENE) return;
 #else
