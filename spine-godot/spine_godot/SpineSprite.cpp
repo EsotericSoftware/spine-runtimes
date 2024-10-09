@@ -211,15 +211,67 @@ void SpineMesh2D::update_mesh(const PackedVector2Array &vertices,
 							  const PackedColorArray &colors,
 							  const PackedInt32Array &indices,
 							  SpineRendererObject *renderer_object) {
+	if (!mesh.is_valid() || vertices.size() != num_vertices || indices.size() != num_indices || indices_changed) {
+		if (mesh.is_valid()) {
+			RS::get_singleton()->free_rid(mesh);
+		}
+		mesh = RS::get_singleton()->mesh_create();
+		Array arrays;
+		arrays.resize(Mesh::ARRAY_MAX);
+		arrays[Mesh::ARRAY_VERTEX] = vertices;
+		arrays[Mesh::ARRAY_TEX_UV] = uvs;
+		arrays[Mesh::ARRAY_COLOR] = colors;
+		arrays[Mesh::ARRAY_INDEX] = indices;
+		RS::get_singleton()->mesh_add_surface_from_arrays(mesh, RS::PrimitiveType::PRIMITIVE_TRIANGLES, arrays, Array(), Dictionary(), RS::ArrayFormat::ARRAY_FLAG_USE_DYNAMIC_UPDATE);
+		Dictionary surface = RS::get_singleton()->mesh_get_surface(mesh, 0);
+		RS::ArrayFormat surface_format = (RS::ArrayFormat)static_cast<int64_t>(surface["format"]);
+		surface_offsets[RS::ARRAY_VERTEX] = RS::get_singleton()->mesh_surface_get_format_offset(surface_format, vertices.size(), RS::ARRAY_VERTEX);
+		surface_offsets[RS::ARRAY_COLOR] = RS::get_singleton()->mesh_surface_get_format_offset(surface_format, vertices.size(), RS::ARRAY_COLOR);
+		surface_offsets[RS::ARRAY_TEX_UV] = RS::get_singleton()->mesh_surface_get_format_offset(surface_format, vertices.size(), RS::ARRAY_TEX_UV);
+		vertex_stride = RS::get_singleton()->mesh_surface_get_format_vertex_stride(surface_format, vertices.size());
+		attribute_stride = RS::get_singleton()->mesh_surface_get_format_attribute_stride(surface_format, vertices.size());
+		num_vertices = vertices.size();
+		num_indices = indices.size();
+		vertex_buffer = surface["vertex_data"];
+		attribute_buffer = surface["attribute_data"];
+		indices_changed = false;
+	} else {
+		AABB aabb_new;
+		uint8_t color[4] = {
+				uint8_t(CLAMP(colors[0].r * 255.0, 0.0, 255.0)),
+				uint8_t(CLAMP(colors[0].g * 255.0, 0.0, 255.0)),
+				uint8_t(CLAMP(colors[0].b * 255.0, 0.0, 255.0)),
+				uint8_t(CLAMP(colors[0].a * 255.0, 0.0, 255.0))};
+
+		uint8_t *vertex_write_buffer = vertex_buffer.ptrw();
+		uint8_t *attribute_write_buffer = attribute_buffer.ptrw();
+		for (int i = 0; i < vertices.size(); i++) {
+			Vector2 vertex(vertices[i]);
+			if (i == 0) {
+				aabb_new.position = Vector3(vertex.x, vertex.y, 0);
+				aabb_new.size = Vector3();
+			} else {
+				aabb_new.expand_to(Vector3(vertex.x, vertex.y, 0));
+			}
+
+			float uv[2] = {(float) uvs[i].x, (float) uvs[i].y};
+			memcpy(&vertex_write_buffer[i * vertex_stride + surface_offsets[RS::ARRAY_VERTEX]], &vertex, sizeof(float) * 2);
+			memcpy(&attribute_write_buffer[i * attribute_stride + surface_offsets[RS::ARRAY_COLOR]], color, 4);
+			memcpy(&attribute_write_buffer[i * attribute_stride + surface_offsets[RS::ARRAY_TEX_UV]], uv, 8);
+		}
+		RS::get_singleton()->mesh_surface_update_vertex_region(mesh, 0, 0, vertex_buffer);
+		RS::get_singleton()->mesh_surface_update_attribute_region(mesh, 0, 0, attribute_buffer);
+		RS::get_singleton()->mesh_set_custom_aabb(mesh, aabb_new);
+	}
+
+	RenderingServer::get_singleton()->canvas_item_add_mesh(this->get_canvas_item(), mesh, Transform2D(), Color(1, 1, 1, 1), renderer_object->canvas_texture->get_rid());
+}
 #else
 void SpineMesh2D::update_mesh(const Vector<Point2> &vertices,
 							  const Vector<Point2> &uvs,
 							  const Vector<Color> &colors,
 							  const Vector<int> &indices,
 							  SpineRendererObject *renderer_object) {
-#endif
-#if SPINE_GODOT_EXTENSION
-#else
 #if VERSION_MAJOR > 3
 	if (!mesh.is_valid() || vertices.size() != num_vertices || indices.size() != num_indices || indices_changed) {
 		if (mesh.is_valid()) {
@@ -339,8 +391,8 @@ void SpineMesh2D::update_mesh(const Vector<Point2> &vertices,
 			renderer_object->texture.is_null() ? RID() : renderer_object->texture->get_rid(),
 			renderer_object->normal_map.is_null() ? RID() : renderer_object->normal_map->get_rid());
 #endif
-#endif
 }
+#endif
 
 void SpineSprite::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_skeleton_data_res", "skeleton_data_res"), &SpineSprite::set_skeleton_data_res);

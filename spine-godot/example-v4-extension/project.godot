@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="spine-godot-examples"
-run/main_scene="res://examples/08-animation-player/animation-player.tscn"
+run/main_scene="res://examples/01-helloworld/helloworld.tscn"
 config/features=PackedStringArray("4.3")
 run/low_processor_mode=true
 config/icon="res://icon.png"
