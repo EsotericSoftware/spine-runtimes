@@ -4,6 +4,7 @@
     "module": "ESNext",
     "noImplicitAny": true,
     "preserveConstEnums": true,
+    "inlineSources": true,
     "inlineSourceMap": true,
     "esModuleInterop": true,
     "lib": ["DOM", "ES2015", "ScriptHost"],
