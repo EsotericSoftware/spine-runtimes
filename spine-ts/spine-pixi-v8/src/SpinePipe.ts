@@ -38,8 +38,6 @@ import { BatchableSpineSlot } from './BatchableSpineSlot';
 import { Spine } from './Spine';
 import { MeshAttachment, RegionAttachment, SkeletonClipping } from '@esotericsoftware/spine-core';
 
-const clipper = new SkeletonClipping();
-
 const spineBlendModeMap = {
 	0: 'normal',
 	1: 'add',
@@ -144,8 +142,6 @@ export class SpinePipe implements RenderPipe<Spine> {
 				container.includeInBuild = false;
 			}
 		}
-
-		clipper.clipEnd();
 	}
 
 	updateRenderable (spine: Spine) {
