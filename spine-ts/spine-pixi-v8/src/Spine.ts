@@ -435,7 +435,7 @@ export class Spine extends ViewContainer {
 			cacheData.uvs,
 			lightColor,
 			darkColor,
-			cacheData.darkColor != null,
+			cacheData.darkTint,
 		);
 
 		const { clippedVertices, clippedTriangles } = clipper;
