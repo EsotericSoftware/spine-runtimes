@@ -44,7 +44,6 @@ pushd ..
 rm -rf godot
 git clone --depth 1 $repo -b $branch
 if [ $dev = "true" ]; then
-	cp -r .idea godot
 	cp build/custom.py godot
 	if [ "$mono" = "true" ]; then
 		echo "" >> godot/custom.py
