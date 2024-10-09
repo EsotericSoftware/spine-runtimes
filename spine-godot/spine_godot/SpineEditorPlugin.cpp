@@ -51,14 +51,16 @@ Error SpineAtlasResourceImportPlugin::import(const String &source_file, const St
 	atlas->set_normal_texture_prefix(options["normal_map_prefix"]);
 	atlas->load_from_atlas_file_internal(source_file, true);
 
-	String file_name = save_path + String(".") + _get_save_extension();
 #if VERSION_MAJOR > 3
 #ifdef SPINE_GODOT_EXTENSION
+	String file_name = save_path + String(".") + _get_save_extension();
 	auto error = ResourceSaver::get_singleton()->save(atlas, file_name);
 #else
+	String file_name = save_path + String(".") + get_save_extension();
 	auto error = ResourceSaver::save(atlas, file_name);
 #endif
 #else
+	String file_name = save_path + String(".") + get_save_extension();
 	auto error = ResourceSaver::save(file_name, atlas);
 #endif
 	return error;

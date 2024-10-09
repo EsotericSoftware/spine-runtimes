@@ -32,6 +32,8 @@
 
 #ifdef SPINE_GODOT_EXTENSION
 #include <godot_cpp/classes/encoded_object_as_id.hpp>
+#else
+#include <core/io/marshalls.h>
 #endif
 
 void SpineAnimationMix::_bind_methods() {

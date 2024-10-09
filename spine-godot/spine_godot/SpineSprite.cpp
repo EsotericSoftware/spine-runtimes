@@ -98,7 +98,32 @@ public:
 	Vector<Vector2> scratch_points;
 #endif
 
-	SpineSpriteStatics(): sprite_count(0) {}
+	SpineSpriteStatics() : sprite_count(0) {
+		quad_indices.setSize(6, 0);
+		quad_indices[0] = 0;
+		quad_indices[1] = 1;
+		quad_indices[2] = 2;
+		quad_indices[3] = 2;
+		quad_indices[4] = 3;
+		quad_indices[5] = 0;
+		scratch_vertices.ensureCapacity(1200);
+
+		Ref<CanvasItemMaterial> material_normal(memnew(CanvasItemMaterial));
+		material_normal->set_blend_mode(CanvasItemMaterial::BLEND_MODE_MIX);
+		default_materials[spine::BlendMode_Normal] = material_normal;
+
+		Ref<CanvasItemMaterial> material_additive(memnew(CanvasItemMaterial));
+		material_additive->set_blend_mode(CanvasItemMaterial::BLEND_MODE_ADD);
+		default_materials[spine::BlendMode_Additive] = material_additive;
+
+		Ref<CanvasItemMaterial> material_multiply(memnew(CanvasItemMaterial));
+		material_multiply->set_blend_mode(CanvasItemMaterial::BLEND_MODE_MUL);
+		default_materials[spine::BlendMode_Multiply] = material_multiply;
+
+		Ref<CanvasItemMaterial> material_screen(memnew(CanvasItemMaterial));
+		material_screen->set_blend_mode(CanvasItemMaterial::BLEND_MODE_SUB);
+		default_materials[spine::BlendMode_Screen] = material_screen;
+	}
 
 	static SpineSpriteStatics &instance() {
 		static SpineSpriteStatics inst;
@@ -417,36 +442,6 @@ void SpineSprite::_bind_methods() {
 SpineSprite::SpineSprite() : update_mode(SpineConstant::UpdateMode_Process), preview_skin("Default"), preview_animation("-- Empty --"), preview_frame(false), preview_time(0), skeleton_clipper(nullptr), modified_bones(false) {
 	skeleton_clipper = new spine::SkeletonClipping();
 	auto statics = SpineSpriteStatics::instance();
-	// One material per blend mode, shared across all sprites.
-	if (!statics.default_materials[0].is_valid()) {
-		Ref<CanvasItemMaterial> material_normal(memnew(CanvasItemMaterial));
-		material_normal->set_blend_mode(CanvasItemMaterial::BLEND_MODE_MIX);
-		statics.default_materials[spine::BlendMode_Normal] = material_normal;
-
-		Ref<CanvasItemMaterial> material_additive(memnew(CanvasItemMaterial));
-		material_additive->set_blend_mode(CanvasItemMaterial::BLEND_MODE_ADD);
-		statics.default_materials[spine::BlendMode_Additive] = material_additive;
-
-		Ref<CanvasItemMaterial> material_multiply(memnew(CanvasItemMaterial));
-		material_multiply->set_blend_mode(CanvasItemMaterial::BLEND_MODE_MUL);
-		statics.default_materials[spine::BlendMode_Multiply] = material_multiply;
-
-		Ref<CanvasItemMaterial> material_screen(memnew(CanvasItemMaterial));
-		material_screen->set_blend_mode(CanvasItemMaterial::BLEND_MODE_SUB);
-		statics.default_materials[spine::BlendMode_Screen] = material_screen;
-	}
-
-	// Setup static scratch buffers
-	if (statics.quad_indices.size() == 0) {
-		statics.quad_indices.setSize(6, 0);
-		statics.quad_indices[0] = 0;
-		statics.quad_indices[1] = 1;
-		statics.quad_indices[2] = 2;
-		statics.quad_indices[3] = 2;
-		statics.quad_indices[4] = 3;
-		statics.quad_indices[5] = 0;
-		statics.scratch_vertices.ensureCapacity(1200);
-	}
 
 	// Default debug settings
 	debug_root = false;
@@ -1003,7 +998,7 @@ void SpineSprite::draw() {
 #ifdef SPINE_GODOT_EXTENSION
 			if (GEOMETRY2D::get_singleton()->is_point_in_polygon(mouse_position, statics.scratch_points)) {
 #else
-			if (GEOMETRY2D::is_point_in_polygon(mouse_position, scratch_points)) {
+			if (GEOMETRY2D::is_point_in_polygon(mouse_position, statics.scratch_points)) {
 #endif
 				hovered_slot = slot;
 				color = Color(1, 1, 1, 1);
@@ -1043,7 +1038,7 @@ void SpineSprite::draw() {
 #ifdef SPINE_GODOT_EXTENSION
 			if (GEOMETRY2D::get_singleton()->is_point_in_polygon(mouse_position, statics.scratch_points)) {
 #else
-			if (GEOMETRY2D::is_point_in_polygon(mouse_position, scratch_points)) {
+			if (GEOMETRY2D::is_point_in_polygon(mouse_position, statics.scratch_points)) {
 #endif
 				hovered_slot = slot;
 				color = Color(1, 1, 1, 1);
@@ -1116,7 +1111,7 @@ void SpineSprite::draw() {
 #ifdef SPINE_GODOT_EXTENSION
 		if (GEOMETRY2D::get_singleton()->is_point_in_polygon(mouse_local_position, statics.scratch_points)) {
 #else
-		if (GEOMETRY2D::is_point_in_polygon(mouse_local_position, scratch_points)) {
+		if (GEOMETRY2D::is_point_in_polygon(mouse_local_position, statics.scratch_points)) {
 #endif
 			hovered_bone = bone;
 		}
@@ -1144,7 +1139,7 @@ void SpineSprite::draw() {
 #ifdef SPINE_GODOT_EXTENSION
 			if (GEOMETRY2D::get_singleton()->is_point_in_polygon(mouse_local_position, statics.scratch_points)) {
 #else
-			if (GEOMETRY2D::is_point_in_polygon(mouse_local_position, scratch_points)) {
+			if (GEOMETRY2D::is_point_in_polygon(mouse_local_position, statics.scratch_points)) {
 #endif
 				hovered_bone = bone;
 			}
