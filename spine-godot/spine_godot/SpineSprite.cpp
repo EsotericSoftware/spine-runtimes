@@ -87,6 +87,9 @@
 // Needed due to shared lib initializers in GDExtension.
 // See: https://x.com/badlogicgames/status/1843661872404591068
 struct SpineSpriteStatics {
+private:
+	static SpineSpriteStatics *_instance;
+
 public:
 	Ref<CanvasItemMaterial> default_materials[4] = {};
 	int sprite_count;
@@ -126,11 +129,21 @@ public:
 	}
 
 	static SpineSpriteStatics &instance() {
-		static SpineSpriteStatics inst;
-		return inst;
+		if (!_instance) {
+			_instance = new SpineSpriteStatics();
+		}
+		return *_instance;
+	}
+
+	static void clear() {
+		if (_instance) {
+			delete _instance;
+		}
+		_instance = nullptr;
 	}
 };
 
+SpineSpriteStatics *SpineSpriteStatics::_instance = nullptr;
 
 static void
 clear_triangles(SpineMesh2D *mesh_instance) {
@@ -230,10 +243,10 @@ void SpineMesh2D::update_mesh(const PackedVector2Array &vertices,
 		surface_offsets[RS::ARRAY_TEX_UV] = RS::get_singleton()->mesh_surface_get_format_offset(surface_format, vertices.size(), RS::ARRAY_TEX_UV);
 		vertex_stride = RS::get_singleton()->mesh_surface_get_format_vertex_stride(surface_format, vertices.size());
 		attribute_stride = RS::get_singleton()->mesh_surface_get_format_attribute_stride(surface_format, vertices.size());
-		num_vertices = vertices.size();
-		num_indices = indices.size();
 		vertex_buffer = surface["vertex_data"];
 		attribute_buffer = surface["attribute_data"];
+		num_vertices = vertices.size();
+		num_indices = indices.size();
 		indices_changed = false;
 	} else {
 		AABB aabb_new;
@@ -393,6 +406,10 @@ void SpineMesh2D::update_mesh(const Vector<Point2> &vertices,
 #endif
 }
 #endif
+
+void SpineSprite::clear_statics() {
+	SpineSpriteStatics::clear();
+}
 
 void SpineSprite::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_skeleton_data_res", "skeleton_data_res"), &SpineSprite::set_skeleton_data_res);

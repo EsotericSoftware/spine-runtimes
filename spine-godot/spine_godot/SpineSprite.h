@@ -297,4 +297,6 @@ public:
 	virtual bool _edit_use_rect() const;
 #endif
 #endif
+
+	static void clear_statics();
 };

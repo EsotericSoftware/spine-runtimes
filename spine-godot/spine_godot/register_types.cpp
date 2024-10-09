@@ -195,7 +195,10 @@ void register_spine_godot_types() {
 
 #if VERSION_MAJOR > 3
 void uninitialize_spine_godot_module(ModuleInitializationLevel level) {
-	return;
+	if (level == MODULE_INITIALIZATION_LEVEL_SCENE) {
+		SpineSprite::clear_statics();
+		return;
+	}
 	if (level != MODULE_INITIALIZATION_LEVEL_CORE) return;
 #else
 void unregister_spine_godot_types() {
