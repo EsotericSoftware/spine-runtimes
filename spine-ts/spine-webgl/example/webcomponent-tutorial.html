@@ -113,6 +113,22 @@
             width: 150px;
             aspect-ratio: 3 / 3;
         }
+
+        .overflow-grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(4, 100px);
+            gap: 10px;
+        }
+
+        .overflow-grid-item {
+            background-color: lightblue;;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
     </style>
 
     <script>
@@ -1986,6 +2002,115 @@ stretchyman.update = (canvas, delta, skeleton, state) => {
     // end section //
     /////////////////////
     -->
+
+    <!--
+    /////////////////////
+    // start section //
+    /////////////////////
+    -->
+
+    <div class="section vertical-split">
+
+        <div class="split-left">
+            If you use a spine widget in a scrollable element, the effect might not be the desired one. There will be two problems:
+            <br>
+            <br>
+            1) The widget will be slightly slower to scroll than the html behind <br>
+            2) The widget will overflow the scrollable container until the html element container is visible <br>
+            <br>
+            In order to fix this behaviour, it is necessary to insert a dedicated <code>spine-overlay</code> webcomponent as a direct child of the scrollable container.
+            Moreover, it is necessary to perform the following actions: <br>
+            <br>
+            1) The scrollable container must have a <code>transform</code> css attribute. If it hasn't this attribute the <code>spine-overlay</code> will add it for you.
+            If your scrollable container has already this css attribute, or if you prefer to add it by yourself (example: <code>transform: translateZ(0);</code>), set the <code>scrollable-tweak-off</code> to the <code>spine-overlay</code>.
+            <br>
+            2) The <code>spine-overlay</code> must have the <code>scrollable</code> attribute
+            <br>
+            3) The <code>spine-overlay</code> must have an <code>overlay-id</code> attribute. Choose the value you prefer.
+            <br>
+            4) Each <code>spine-widget</code> must have an <code>overlay-id</code> attribute. The same as the hosting <code>spine-overlay</code>.
+            <br>
+            <br>
+            Additionally, you can set <code>overflow-top</code>, <code>overflow-bottom</code>, <code>overflow-left</code>, <code>overflow-right</code> attributes to the <code>spine-overlay</code> in order to make the canvas bigger and prevent scrolling artifacts.
+        </div>
+
+        <div class="split-top split" style="justify-content: space-between">
+            <div class="split-left" style="overflow-y: auto; width: 100px; height: 200px;">
+                <div class="overflow-grid-container">
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+                </div>
+            </div>
+
+            <div class="split-left" style="overflow-y: auto; width: 100px; height: 200px;">
+                <spine-overlay
+                    overlay-id="scroll"
+                    scrollable
+                    scrollable-tweak-off
+                    overflow-top=".2"
+                    overflow-bottom=".2"
+                    overflow-left=".2"
+                    overflow-right=".2"
+                ></spine-overlay>
+                <div class="overflow-grid-container">
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="split-bottom">
+            <pre><code id="code-display">
+                <script>escapeHTMLandInject(`
+<spine-widget
+    atlas="assets/celestial-circus-pma.atlas"
+    skeleton="assets/celestial-circus-pro.skel"
+    animation="wings-and-feet"
+    isdraggable="true"
+></spine-widget>`
+);</script>
+            </code></pre>
+        </div>
+
+    </div>
+    <!--
+    /////////////////////
+    // end section //
+    /////////////////////
+    -->
+
 
 <script>
     spine.SpineWebComponentWidget.SHOW_FPS = true;

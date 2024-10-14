@@ -573,7 +573,7 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 	private root: ShadowRoot;
 
 	// Reference to the overlay webcomponent
-	private overlay: SpineWebComponentOverlay;
+	private overlay!: SpineWebComponentOverlay;
 
 	static attributesDescription: Record<string, { propertyName: keyof WidgetAttributes, type: AttributeTypes, defaultValue?: any }> = {
 		atlas: { propertyName: "atlasPath", type: "string" },
@@ -615,7 +615,6 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 	constructor () {
 		super();
 		this.root = this.attachShadow({ mode: "closed" });
-		this.overlay = this.initializeOverlay();
 
 		this.debugDragDiv = document.createElement("div");
 		this.debugDragDiv.style.position = "absolute";
@@ -628,7 +627,10 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 			throw new Error("You cannot attach a disposed widget");
 		};
 
-		customElements.whenDefined("spine-overlay").then(() => this.overlay.addWidget(this));
+		customElements.whenDefined("spine-overlay").then(() => {
+			if (!this.overlay) this.overlay = this.initializeOverlay(this.getAttribute("overlay-id"));
+			this.overlay.addWidget(this);
+		});
 		if (!this.manualStart && !this.started) {
 			this.start();
 		}
@@ -636,9 +638,9 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 	}
 
 	disconnectedCallback (): void {
-		const index = this.overlay.skeletonList.indexOf(this);
+		const index = this.overlay!.skeletonList.indexOf(this);
 		if (index !== -1) {
-			this.overlay.skeletonList.splice(index, 1);
+			this.overlay!.skeletonList.splice(index, 1);
 		}
 		this.debugDragDiv?.remove();
 	}
@@ -654,7 +656,7 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 
 	attributeChangedCallback (name: string, oldValue: string | null, newValue: string | null): void {
 		const { type, propertyName, defaultValue } = SpineWebComponentWidget.attributesDescription[name];
-		const val = SpineWebComponentWidget.castValue(type, newValue, defaultValue);
+		const val = castValue(type, newValue, defaultValue);
 		(this as any)[propertyName] = val;
 		return;
 	}
@@ -824,8 +826,9 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 	// Create a new overlay webcomponent, if no one exists yet.
 	// TODO: allow the possibility to instantiate multiple overlay (eg: background, foreground),
 	// to give them an identifier, and to specify which overlay is assigned to a widget
-	private initializeOverlay (): SpineWebComponentOverlay {
-		let overlay = this.overlay || document.querySelector("spine-overlay") as SpineWebComponentOverlay;
+	private initializeOverlay (overlayId: string | null): SpineWebComponentOverlay {
+		const queryString = overlayId === null ? "spine-overlay:not([overlay-id])" : `spine-overlay[overlay-id=${overlayId}]`;
+		let overlay = this.overlay || document.querySelector(queryString) as SpineWebComponentOverlay;
 		if (!overlay) {
 			overlay = document.createElement("spine-overlay") as SpineWebComponentOverlay;
 			document.body.appendChild(overlay);
@@ -882,60 +885,26 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 		}
 	}
 
-	private static castBoolean (value: string | null, defaultValue = "") {
-		return value === "true" || value === "" ? true : false;
-	}
-
-	private static castString (value: string | null, defaultValue = "") {
-		return value === null ? defaultValue : value;
-	}
-
-	private static castNumber (value: string | null, defaultValue = 0) {
-		if (value === null) return defaultValue;
-
-		const parsed = parseFloat(value);
-		if (Number.isNaN(parsed)) return defaultValue;
-		return parsed;
-	}
-
-	private static castArrayNumber (value: string | null, defaultValue = undefined) {
-		if (value === null) return defaultValue;
-		return value.split(",").reduce((acc, pageIndex) => {
-			const index = parseInt(pageIndex);
-			if (!isNaN(index)) acc.push(index);
-			return acc;
-		}, [] as Array<number>);
-	}
-
-	private static castValue (type: AttributeTypes, value: string | null, defaultValue?: any) {
-		switch (type) {
-			case "string":
-				return SpineWebComponentWidget.castString(value, defaultValue);
-			case "number":
-				return SpineWebComponentWidget.castNumber(value, defaultValue);
-			case "boolean":
-				return SpineWebComponentWidget.castBoolean(value, defaultValue);
-			case "string-number":
-				return SpineWebComponentWidget.castArrayNumber(value, defaultValue);
-			case "fitType":
-				return isFitType(value) ? value : defaultValue;
-			case "modeType":
-				return isModeType(value) ? value : defaultValue;
-			case "offScreenUpdateBehaviourType":
-				return isOffScreenUpdateBehaviourType(value) ? value : defaultValue;
-			default:
-				break;
-		}
-	}
 }
 
-class SpineWebComponentOverlay extends HTMLElement implements Disposable {
+interface OverlayAttributes {
+	overlayId?: string
+	scrollable: boolean
+	overflowTop: number
+	overflowBottom: number
+	overflowLeft: number
+	overflowRight: number
+}
+
+class SpineWebComponentOverlay extends HTMLElement implements OverlayAttributes, Disposable {
 
 	public skeletonList = new Array<SpineWebComponentWidget>();
 	public renderer: SceneRenderer;
 	public assetManager: AssetManager;
 
 	private root: ShadowRoot;
+	public overlayId?: string;
+	public scrollable = false;
 
 	private div: HTMLDivElement;
 	private canvas: HTMLCanvasElement;
@@ -946,15 +915,15 @@ class SpineWebComponentOverlay extends HTMLElement implements Disposable {
 	private resizeObserver?:ResizeObserver;
 	private input?: Input;
 
-	// how many pixels to add to the edges to prevent "edge cuttin" on fast scrolling
+	// how many pixels to add to the edges to prevent "edge cutting" on fast scrolling
 	// be aware that the canvas is already big as the display size
 	// making it bigger might reduce performance significantly
-	private overflowTop = .2;
-	private overflowBottom = .0;
-	private overflowLeft = .0;
-	private overflowRight = .0;
-	private overflowLeftSize: number
-	private overflowTopSize: number;
+	public overflowTop = .2;
+	public overflowBottom = .0;
+	public overflowLeft = .0;
+	public overflowRight = .0;
+	private overflowLeftSize = 0;
+	private overflowTopSize = 0;
 
 	private currentCanvasBaseWidth = 0;
 	private currentCanvasBaseHeight = 0;
@@ -965,7 +934,7 @@ class SpineWebComponentOverlay extends HTMLElement implements Disposable {
 
 	constructor () {
 		super();
-		this.root = this.attachShadow({ mode: "closed" });
+		this.root = this.attachShadow({ mode: "open" });
 
 		this.div = document.createElement("div");
 		this.div.style.position = "absolute";
@@ -973,11 +942,12 @@ class SpineWebComponentOverlay extends HTMLElement implements Disposable {
 		this.div.style.left = "0";
 		this.div.style.setProperty("pointer-events", "none");
 		this.div.style.overflow = "hidden"
-		// this.div.style.backgroundColor = "rgba(0, 255, 0, 0.3)";
+		// this.div.style.backgroundColor = "rgba(0, 255, 0, 0.1)";
 
 		this.root.appendChild(this.div);
 
 		this.canvas = document.createElement("canvas");
+
 		this.div.appendChild(this.canvas);
 		this.canvas.style.position = "absolute";
 		this.canvas.style.top = "0";
@@ -994,10 +964,28 @@ class SpineWebComponentOverlay extends HTMLElement implements Disposable {
 
 		const context = new ManagedWebGLRenderingContext(this.canvas, { alpha: true });
 		this.renderer = new SceneRenderer(this.canvas, context);
-		this.assetManager = new AssetManager(context);
 
-		this.overflowLeftSize = this.overflowLeft * document.documentElement.clientWidth;
-		this.overflowTopSize = this.overflowTop * document.documentElement.clientHeight;
+		this.assetManager = new AssetManager(context);
+	}
+
+	static attributesDescription: Record<string, { propertyName: keyof OverlayAttributes, type: AttributeTypes, defaultValue?: any }> = {
+		"overlay-id": { propertyName: "overlayId", type: "string" },
+		"scrollable": { propertyName: "scrollable", type: "boolean" },
+		"overflow-top": { propertyName: "overflowTop", type: "number" },
+		"overflow-bottom": { propertyName: "overflowBottom", type: "number" },
+		"overflow-left": { propertyName: "overflowLeft", type: "number" },
+		"overflow-right": { propertyName: "overflowRight", type: "number" },
+	}
+
+	static get observedAttributes (): string[] {
+		return Object.keys(SpineWebComponentOverlay.attributesDescription);
+	}
+
+	attributeChangedCallback (name: string, oldValue: string | null, newValue: string | null): void {
+		const { type, propertyName, defaultValue } = SpineWebComponentOverlay.attributesDescription[name];
+		const val = castValue(type, newValue, defaultValue);
+		(this as any)[propertyName] = val;
+		return;
 	}
 
 	private resizeCallback = () => {
@@ -1025,7 +1013,7 @@ class SpineWebComponentOverlay extends HTMLElement implements Disposable {
 	}
 
 	connectedCallback (): void {
-		window.addEventListener("scroll", this.scrollHandler);
+		// window.addEventListener("scroll", this.scrollHandler);
 		window.addEventListener("load", this.onLoadCallback);
 		if (this.loaded) this.onLoadCallback();
 		window.screen.orientation.addEventListener('change', this.orientationChangeCallback);
@@ -1052,7 +1040,15 @@ class SpineWebComponentOverlay extends HTMLElement implements Disposable {
 		// Alternatively, we can store the body size, check the current body size in the loop (like the translateCanvas), and
 		// if they differs call the resizeCallback. I already tested it, and it works. ResizeObserver should be more efficient.
 		this.resizeObserver = new ResizeObserver(this.resizeCallback);
-        this.resizeObserver.observe(document.body);
+		if (this.scrollable) {
+			const style = getComputedStyle(this.parentElement!);
+			if (style.transform === "none") {
+				this.parentElement!.style.transform = `translateZ(0)`;
+			}
+			this.resizeObserver.observe(this.parentElement!);
+		} else {
+			this.resizeObserver.observe(document.body);
+		}
 
 		this.skeletonList.forEach((widget) => {
 			this.intersectionObserver?.observe(widget.getHTMLElementReference());
@@ -1063,7 +1059,7 @@ class SpineWebComponentOverlay extends HTMLElement implements Disposable {
 	}
 
 	disconnectedCallback (): void {
-		window.removeEventListener("scroll", this.scrollHandler);
+		// window.removeEventListener("scroll", this.scrollHandler);
 		window.removeEventListener("load", this.onLoadCallback);
 		window.screen.orientation.removeEventListener('change', this.orientationChangeCallback);
 		this.intersectionObserver?.disconnect();
@@ -1173,6 +1169,7 @@ class SpineWebComponentOverlay extends HTMLElement implements Disposable {
 			let renderer = this.renderer;
 			renderer.begin();
 
+			const ref = this.parentElement!.getBoundingClientRect();
 			const tempVector = new Vector3();
 			this.skeletonList.forEach((widget) => {
 				const { skeleton, bounds, mode, debug, offsetX, offsetY, xAxis, yAxis, dragX, dragY, fit, loadingSpinner, onScreen, loading, clip, isDraggable } = widget;
@@ -1184,6 +1181,10 @@ class SpineWebComponentOverlay extends HTMLElement implements Disposable {
 				divBounds.x = divBounds.left + this.overflowLeftSize;
 				divBounds.y = divBounds.top + this.overflowTopSize;
 
+				if (this.scrollable) {
+					divBounds.x -= ref.left;
+					divBounds.y -= ref.top;
+				}
 
 				const { padLeft, padRight, padTop, padBottom } = widget
 				const paddingShiftHorizontal = (padLeft - padRight) / 2;
@@ -1441,16 +1442,36 @@ class SpineWebComponentOverlay extends HTMLElement implements Disposable {
 		// temporarely remove the div to get the page size without considering the div
 		// this is necessary otherwise if the bigger element in the page is remove and the div
 		// was the second bigger element, now it would be the div to determine the page size
-		this.div.remove();
-		const { width, height } = this.getPageSize();
-		this.root.appendChild(this.div);
 
-		this.div.style.width = width + "px";
-		this.div.style.height = height + "px";
+
+		if (!this.scrollable) {
+			this.div?.remove();
+			const { width, height } = this.getPageSize();
+			this.div!.style.width = width + "px";
+			this.div!.style.height = height + "px";
+			this.root.appendChild(this.div!);
+		} else {
+			this.div?.remove();
+			this.div!.style.width = this.parentElement!.scrollWidth + "px";
+			this.div!.style.height = this.parentElement!.scrollHeight + "px";
+			// this.canvas.style.transform = `translate(${-this.overflowLeftSize}px,${-this.overflowTopSize}px)`;
+			this.root.appendChild(this.div!);
+		}
+
+
 	}
 
 	private resizeCanvas () {
-		let { width, height } = this.getScreenSize();
+		let width, height;
+		if (!this.overlayId) {
+			const screenSize = this.getScreenSize();
+			width = screenSize.width;
+			height = screenSize.height;
+		} else {
+			width = this.parentElement!.clientWidth;
+			height = this.parentElement!.clientHeight;
+		}
+
 
 		// this is needed because screen size is wrong when zoom levels occurs
 		// zooming out will make the canvas smaller and its known that zoom level
@@ -1458,8 +1479,8 @@ class SpineWebComponentOverlay extends HTMLElement implements Disposable {
 		// ideally, window.innerWidth/innerHeight would be preferrable. However
 		// on mobile browsers the dynamic search bar makes the innerHeight smaller
 		// at the beginning (changing the canvas size at each scroll is not ideal)
-		width = Math.max(width, window.innerWidth);
-		height = Math.max(height, window.innerHeight);
+		// width = Math.max(width, window.innerWidth);
+		// height = Math.max(height, window.innerHeight);
 
 		if (this.currentCanvasBaseWidth !== width || this.currentCanvasBaseHeight !== height) {
 			this.currentCanvasBaseWidth = width;
@@ -1477,8 +1498,17 @@ class SpineWebComponentOverlay extends HTMLElement implements Disposable {
 	}
 
 	private translateCanvas () {
-		const scrollPositionX = window.scrollX - this.overflowLeftSize;
-		const scrollPositionY = window.scrollY - this.overflowTopSize;
+		let scrollPositionX = -this.overflowLeftSize;
+		let scrollPositionY = -this.overflowTopSize;
+
+		if (!this.scrollable) {
+			scrollPositionX += window.scrollX;
+			scrollPositionY += window.scrollY;
+		} else {
+			scrollPositionX += this.parentElement!.scrollLeft;
+			scrollPositionY += this.parentElement!.scrollTop;
+		}
+
 		this.canvas.style.transform = `translate(${scrollPositionX}px,${scrollPositionY}px)`;
 	}
 
@@ -1578,4 +1608,50 @@ export function createSpineWidget (parameters: WidgetAttributes): SpineWebCompon
 	}
 
 	return widget;
+}
+
+function castBoolean (value: string | null, defaultValue = "") {
+	return value === "true" || value === "" ? true : false;
+}
+
+function castString (value: string | null, defaultValue = "") {
+	return value === null ? defaultValue : value;
+}
+
+function castNumber (value: string | null, defaultValue = 0) {
+	if (value === null) return defaultValue;
+
+	const parsed = parseFloat(value);
+	if (Number.isNaN(parsed)) return defaultValue;
+	return parsed;
+}
+
+function castArrayNumber (value: string | null, defaultValue = undefined) {
+	if (value === null) return defaultValue;
+	return value.split(",").reduce((acc, pageIndex) => {
+		const index = parseInt(pageIndex);
+		if (!isNaN(index)) acc.push(index);
+		return acc;
+	}, [] as Array<number>);
+}
+
+function castValue (type: AttributeTypes, value: string | null, defaultValue?: any) {
+	switch (type) {
+		case "string":
+			return castString(value, defaultValue);
+		case "number":
+			return castNumber(value, defaultValue);
+		case "boolean":
+			return castBoolean(value, defaultValue);
+		case "string-number":
+			return castArrayNumber(value, defaultValue);
+		case "fitType":
+			return isFitType(value) ? value : defaultValue;
+		case "modeType":
+			return isModeType(value) ? value : defaultValue;
+		case "offScreenUpdateBehaviourType":
+			return isOffScreenUpdateBehaviourType(value) ? value : defaultValue;
+		default:
+			break;
+	}
 }

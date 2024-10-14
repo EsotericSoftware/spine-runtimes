@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="../dist/iife/spine-webgl.js"></script>
+    <!-- <script src="./spine-webgl.min.js"></script> -->
+    <title>Webcomponent Tutorial</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+        }
+        .section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            background-color: #3498db;
+        }
+        .split {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .full-width {
+            width: 100%;
+        }
+        .split-left, .split-right {
+            width: 50%;
+            min-height: 50%;
+            padding: 1rem;
+            margin: 1rem;
+            border: 1px solid salmon;
+        }
+        .split-nosize {
+            border: 1px solid salmon;
+        }
+        .split-size {
+            padding: 1rem;
+            margin: 1rem;
+        }
+        .navigation {
+            display: flex;
+            position: fixed;
+            left: 20px;
+            bottom: 20px;
+            transform: translateY(-50%);
+        }
+        .nav-btn {
+            display: block;
+            margin: 0px 5px;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border: none;
+            cursor: pointer;
+        }
+
+        .vertical-split {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .high-page {
+            height: 600px;
+        }
+
+        .split-top {
+            width: 100%;
+            height: 600px;
+        }
+
+        .split-bottom {
+            width: 100%;
+            /* height: 600px; */
+        }
+
+        .split-bottom {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            overflow: auto;
+        }
+
+        .split-bottom pre {
+            height: 100%;
+            margin: 0;
+        }
+
+        .split-bottom code {
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            display: block;
+            padding: 1rem;
+        }
+
+        .skin-grid {
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: space-evenly;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .skin-grid-element {
+            border: 1px solid #ccc;
+            width: 150px;
+            aspect-ratio: 3 / 3;
+        }
+
+        .overflow-grid-container {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            grid-template-rows: repeat(4, 100px);
+            gap: 10px;
+        }
+
+        .overflow-grid-item {
+            background-color: lightblue;;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+
+    <script>
+        function escapeHTMLandInject(text) {
+            const escaped = text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+            document.currentScript.parentElement.innerHTML = escaped;
+        }
+    </script>
+</head>
+<body>
+
+
+    <!--
+    /////////////////////
+    // start section //
+    /////////////////////
+    -->
+
+    <div class="section vertical-split">
+
+        <div class="split-top split" style="justify-content: space-between">
+            <!-- <div class="split-left" style="overflow-y: auto; width: 200px; height: 200px;">
+                <div class="overflow-grid-container">
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+                </div>
+            </div> -->
+
+            <div class="split-left" style="overflow-y: auto; width: 200px; height: 200px;">
+                <spine-overlay
+                    overlay-id="scroll"
+                    scrollable
+                    overflow-top=".2"
+                    overflow-bottom=".2"
+                    overflow-left=".2"
+                    overflow-right=".2"
+                ></spine-overlay>
+                <div class="overflow-grid-container">
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="split-bottom">
+            <pre><code id="code-display">
+                <script>escapeHTMLandInject(`
+<spine-widget
+    atlas="assets/celestial-circus-pma.atlas"
+    skeleton="assets/celestial-circus-pro.skel"
+    animation="wings-and-feet"
+    isdraggable="true"
+></spine-widget>`
+);</script>
+            </code></pre>
+        </div>
+
+    </div>
+
+    <div style="height: 1000px;"> SPACE </div>
+
+    <!--
+    /////////////////////
+    // end section //
+    /////////////////////
+    -->
+
+<script>
+    spine.SpineWebComponentWidget.SHOW_FPS = true;
+</script>
+
+</body>
+</html>
