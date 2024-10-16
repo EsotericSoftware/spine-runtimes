@@ -1,0 +1,86 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>spine-pixi-v8</title>
+    <script src="./assets/pixi.min.js"></script>
+    <script src="../dist/iife/spine-pixi-v8.js"></script>
+    <script src="./assets/lil-gui.umd.min.js"></script>
+    <link href="./assets/lil-gui.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../index.css">
+  </head>
+
+  <body>
+    <script>
+      (async function () {
+        var app = new PIXI.Application();
+        await app.init({
+          width: window.innerWidth,
+          height: window.innerHeight,
+          resolution: window.devicePixelRatio || 1,
+          autoDensity: true,
+          resizeTo: window,
+          backgroundColor: 0x2c3e50,
+          hello: true,
+        })
+        document.body.appendChild(app.view);
+
+        // Pre-load the skeleton data and atlas. You can also load .json skeleton data.
+        PIXI.Assets.add({alias: "spineboyData", src: "./assets/dragon-ess.skel" });
+        PIXI.Assets.add({alias: "spineboyAtlas", src: "./assets/dragon-pma.atlas" });
+        PIXI.Assets.add({alias: "spineboyData2", src: "./assets/dragon-ess.skel" });
+        PIXI.Assets.add({alias: "spineboyAtlas2", src: "./assets/dragon-pma.atlas" });
+        await PIXI.Assets.load(["spineboyData", "spineboyAtlas", "spineboyData", "spineboyAtlas2", "raptor_jaw"]);
+
+        // Create the spine display object
+        const spineboy = spine.Spine.from({skeleton: "spineboyData", atlas: "spineboyAtlas", scale: 0.5 });
+        const spineboy2 = spine.Spine.from({skeleton: "spineboyData", atlas: "spineboyAtlas", scale: 0.5 });
+        spineboy.autoUpdate = false;
+        spineboy2.autoUpdate = false;
+
+        // Set the default mix time to use when transitioning
+        // from one animation to the next.
+        spineboy.state.data.defaultMix = 0.2;
+
+        // Center the spine object on screen.
+        spineboy.x = window.innerWidth / 2;
+        spineboy.y = window.innerHeight / 2 - 30;
+
+        spineboy2.x = window.innerWidth / 2;
+        spineboy2.y = window.innerHeight / 2 + 200;
+        spineboy2.state.setAnimation(0, "flying", true);
+
+        // Set animation "run" on track 0, looped.
+        spineboy.state.setAnimation(0, "flying", true);
+
+        // Add the display object to the stage.
+        app.stage.addChild(spineboy);
+        app.stage.addChild(spineboy2);
+
+        const myObject = { time: 0, time2: 0 };
+        let prevValue = myObject.time;
+        let prevValue2 = myObject.time2;
+        spineboy.update(prevValue / 10)
+        spineboy2.update(prevValue2 / 10)
+
+        const gui = new lil.GUI({});
+        gui
+          .add(myObject, 'time').min(0).max(10).step(0.01)
+          .name( 'time' )
+          .onChange(value => {
+            spineboy.update((value - prevValue) / 10)
+            prevValue = value;
+          });
+
+        gui
+          .add(myObject, 'time2').min(0).max(10).step(0.01)
+          .name( 'time2' )
+          .onChange(value => {
+            spineboy2.update((value - prevValue2) / 10)
+            prevValue2 = value;
+          });
+
+
+      })();
+    </script>
+  </body>
+</html>
