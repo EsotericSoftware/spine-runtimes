@@ -35,6 +35,7 @@ import {
 	ContainerOptions,
 	DEG_TO_RAD,
 	DestroyOptions,
+	fastCopy,
 	PointData,
 	Texture,
 	Ticker,
@@ -381,8 +382,8 @@ export class Spine extends ViewContainer {
 						);
 					}
 
-					cacheData.uvs = attachment.uvs as Float32Array;
-
+					fastCopy((attachment.uvs as Float32Array).buffer, cacheData.uvs.buffer);
+				
 					const skeleton = slot.bone.skeleton;
 					const skeletonColor = skeleton.color;
 					const slotColor = slot.color;
@@ -541,7 +542,7 @@ export class Spine extends ViewContainer {
 				vertices,
 				clipped: false,
 				indices: [0, 1, 2, 0, 2, 3],
-				uvs: attachment.uvs as Float32Array,
+				uvs: new Float32Array(attachment.uvs.length),
 				color: new Color(1, 1, 1, 1),
 				darkColor: new Color(0, 0, 0, 0),
 				darkTint: false,
@@ -557,7 +558,7 @@ export class Spine extends ViewContainer {
 				vertices,
 				clipped: false,
 				indices: attachment.triangles,
-				uvs: attachment.uvs as Float32Array,
+				uvs: new Float32Array(attachment.uvs.length),
 				color: new Color(1, 1, 1, 1),
 				darkColor: new Color(0, 0, 0, 0),
 				darkTint: false,
