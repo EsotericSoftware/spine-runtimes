@@ -71,7 +71,7 @@ public:
 	static bool fix_path(String &path) {
 		const String prefix = "res:/";
 		auto i = path.find(prefix);
-		if (i == std::string::npos) {
+		if (i == -1) {
 			return false;
 		}
 
