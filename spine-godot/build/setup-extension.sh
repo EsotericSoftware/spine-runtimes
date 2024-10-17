@@ -65,5 +65,7 @@ git checkout $godot_branch
 scons target=editor dev_build=true optimize=debug --jobs=$cpus
 popd
 
+cp -r ../spine-cpp/spine-cpp spine_godot
+
 popd
 popd > /dev/null
