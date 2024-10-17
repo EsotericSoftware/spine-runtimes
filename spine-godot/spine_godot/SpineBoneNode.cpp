@@ -227,11 +227,11 @@ void SpineBoneNode::draw() {
 	if (bone_length == 0) {
 		draw_circle(Vector2(0, 0), debug_thickness, debug_color);
 	} else {
-		#ifdef SPINE_GODOT_EXTENSION
+#ifdef SPINE_GODOT_EXTENSION
 		PackedVector2Array points;
-		#else
+#else
 		Vector<Vector2> points;
-		#endif
+#endif
 		points.push_back(Vector2(-debug_thickness, 0));
 		points.push_back(Vector2(0, debug_thickness));
 		points.push_back(Vector2(bone_length, 0));

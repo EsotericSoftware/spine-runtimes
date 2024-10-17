@@ -53,7 +53,7 @@ class SpineAtlasResourceImportPlugin : public EditorImportPlugin {
 
 public:
 #ifdef SPINE_GODOT_EXTENSION
-	static void _bind_methods() {};
+	static void _bind_methods(){};
 
 	String _get_importer_name() const override { return "spine.atlas"; }
 
@@ -124,7 +124,7 @@ class SpineJsonResourceImportPlugin : public EditorImportPlugin {
 
 public:
 #ifdef SPINE_GODOT_EXTENSION
-	static void _bind_methods() {};
+	static void _bind_methods(){};
 
 	String _get_importer_name() const override { return "spine.json"; }
 
@@ -198,7 +198,7 @@ class SpineBinaryResourceImportPlugin : public EditorImportPlugin {
 
 public:
 #ifdef SPINE_GODOT_EXTENSION
-	static void _bind_methods() {};
+	static void _bind_methods(){};
 
 	String _get_importer_name() const override { return "spine.skel"; }
 

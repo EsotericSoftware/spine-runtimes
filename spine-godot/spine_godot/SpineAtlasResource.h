@@ -103,7 +103,7 @@ class SpineAtlasResourceFormatLoader : public ResourceFormatLoader {
 
 public:
 #ifdef SPINE_GODOT_EXTENSION
-	static void _bind_methods() {};
+	static void _bind_methods(){};
 
 	PackedStringArray _get_recognized_extensions();
 
@@ -136,7 +136,7 @@ class SpineAtlasResourceFormatSaver : public ResourceFormatSaver {
 
 public:
 #ifdef SPINE_GODOT_EXTENSION
-	static void _bind_methods() {};
+	static void _bind_methods(){};
 
 	Error _save(const Ref<Resource> &resource, const String &path, uint32_t flags) override;
 
