@@ -1311,8 +1311,8 @@
                 <br>
                 <br>
                 By default, assets are loaded immeaditely. You can postpone that by setting <code>manual-start="false"</code>.
-                Then it's your responsibility to call <code>start()</code> on the widget.
-                As usual, just wait on the <code>loadingPromise</code> to act on the skeleton or state.
+                Then add the widget to the dom using the asynchronous method <code>appendTo</code>. It's your responsibility to call <code>start()</code> on the widget.
+                As usual, just wait on the <code>loadingPromise</code> to act on the <code>skeleton</code> or the <code>state</code>.
             </div>
 
             <script>
@@ -1343,7 +1343,7 @@
                         });
 
                         // append the widget to the grid element
-                        gridElement.appendChild(widgetSection);
+                        await widgetSection.appendTo(gridElement);
 
                         // manually start the widget
                         widgetSection.start();
@@ -1428,13 +1428,17 @@ skins.forEach((skin, i) => {
                 When the widget (or the parent element) enters in the viewport, the callback <code>onScreenFunction</code> is invoked.
                 <br>
                 <br>
-                By default, the callback call the widget <code>start</code> the first time the widget enters the viewport.
-                That useful in combination with <code>manual-start="true</code> to load assets only when they are into the viewport.
+                By default, the callback does two things:
+                <ul>
+                    <li>set <code>onScreenAtLeastOnce</code> to <code>true</code> when the widget enters the viewport the first time</li>
+                    <li>if <code>manual-start</code> and <code>on-viewport-manual-start</code> are set the widget <code>start</code> is invoked
+                        the first time the widget enters the viewport and the assets are loaded only in that moment.</li>
+                </ul>
                 <br>
                 The assets of the coin below are loaded only when the widget enters the viewport.
                 <br>
                 <br>
-                You can overwrite that behaviour. For example, the raptor below changes animation everytime the widget enters the viewport.
+                You can overwrite the <code>onScreenFunction</code> behaviour. For example, the raptor below changes animation everytime the widget enters the viewport.
 
             </div>
 
@@ -1444,7 +1448,8 @@ skins.forEach((skin, i) => {
                         atlas="assets/coin-pma.atlas"
                         skeleton="assets/coin-pro.skel"
                         animation="animation"
-                        manual-start="true"
+                        manual-start
+                        on-viewport-manual-start
                     ></spine-widget>
                 </div>
                 <div class="skin-grid-element">
@@ -1968,57 +1973,15 @@ stretchyman.update = (canvas, delta, skeleton, state) => {
 
     <div class="section vertical-split">
 
-        <div class="split-top split">
-            <div class="split-left">
-                As a bonus item, you can move you skeleton around just by setting the <code>isdraggable</code> property to <code>true</code>.
-            </div>
-            <div class="split-right">
-                <spine-widget
-                    atlas="assets/celestial-circus-pma.atlas"
-                    skeleton="assets/celestial-circus-pro.skel"
-                    animation="wings-and-feet"
-                    isdraggable
-                ></spine-widget>
-            </div>
-        </div>
-
-        <div class="split-bottom">
-            <pre><code id="code-display">
-                <script>escapeHTMLandInject(`
-<spine-widget
-    atlas="assets/celestial-circus-pma.atlas"
-    skeleton="assets/celestial-circus-pro.skel"
-    animation="wings-and-feet"
-    isdraggable="true"
-></spine-widget>`
-);</script>
-            </code></pre>
-        </div>
-
-    </div>
-
-    <!--
-    /////////////////////
-    // end section //
-    /////////////////////
-    -->
-
-    <!--
-    /////////////////////
-    // start section //
-    /////////////////////
-    -->
-
-    <div class="section vertical-split">
-
         <div class="split-left">
-            If you use a spine widget in a scrollable element, the effect might not be the desired one. There will be two problems:
+            If you use a spine widget in a element that has an ancestor that does not follow the webpage scroll, the effect might not be the desired one. You might encounter these problems:
             <br>
             <br>
-            1) The widget will be slightly slower to scroll than the html behind <br>
-            2) The widget will overflow the scrollable container until the html element container is visible <br>
+            1) For scrollable containers, the widget will be slightly slower to scroll than the html behind. The effect is more evident for lower refresh rate display.<br>
+            2) For scrollable containers, the widget will overflow the container bounds until the widget html element container is visible <br>
+            3) For fixed containers, the widget will scroll in a jerky way <br>
             <br>
-            In order to fix this behaviour, it is necessary to insert a dedicated <code>spine-overlay</code> webcomponent as a direct child of the scrollable container.
+            In order to fix this behaviour, it is necessary to insert a dedicated <code>spine-overlay</code> webcomponent as a direct child of the  container.
             Moreover, it is necessary to perform the following actions: <br>
             <br>
             1) The scrollable container must have a <code>transform</code> css attribute. If it hasn't this attribute the <code>spine-overlay</code> will add it for you.
@@ -2032,7 +1995,76 @@ stretchyman.update = (canvas, delta, skeleton, state) => {
             <br>
             <br>
             Additionally, you can set <code>overflow-top</code>, <code>overflow-bottom</code>, <code>overflow-left</code>, <code>overflow-right</code> attributes to the <code>spine-overlay</code> in order to make the canvas bigger and prevent scrolling artifacts.
+            <br>
+            <br>
+            See the two examples below:
+            <br>
+            - Click the following button to open two elements with fixed positioned. The left one does not have a dedicated overlay and will scroll in a jerky way. <button id="popup-overlay-button-open">Open Popup</button>
+            <br>
+            - Below there are two scrolling items. The left one does not have a dedicated overlay, it will lag on scroll and the widgets will overflow the container.
+            <br>
+            <br>
         </div>
+
+        <div id="popup-overlay" style="
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center; align-items: center; flex-direction: column;
+            color: black;
+        ">
+            <div style="display: flex; justify-content: center; align-items: center; flex-direction: column; gap: 10px; margin-bottom: 10px;">
+
+                <div id="popup" style="background-color: white; padding: 20px; text-align: center;">
+                    <spine-widget
+                        atlas="../demos/assets/atlas2.atlas"
+                        skeleton="../demos/assets/demos.json"
+                        json-skeleton-key="armorgirl"
+                        animation="animation"
+                        style="width: 200px; height: 200px; border: 1px solid black;"
+                    ></spine-widget>
+                    <br>
+                    This fixed element lags when scrolling.
+                </div>
+
+                <div id="popup" style="background-color: white; padding: 20px; text-align: center;">
+                    <spine-overlay
+                        overlay-id="popup"
+                        scrollable
+                        scrollable-tweak-off
+                    ></spine-overlay>
+                    <spine-widget
+                        atlas="../demos/assets/atlas2.atlas"
+                        skeleton="../demos/assets/demos.json"
+                        json-skeleton-key="armorgirl"
+                        animation="animation"
+                        overlay-id="popup"
+                        style="width: 200px; height: 200px; border: 1px solid black;"
+                    ></spine-widget>
+                    <br>
+                    This fixed element does not lag when scrolling.
+                </div>
+            </div>
+            <button id="popup-overlay-button-close">Close Popup</button>
+        </div>
+
+        <script>
+            // Get the buttons and popup elements
+            const openPopupButton = document.getElementById('popup-overlay-button-open');
+            const closePopupButton = document.getElementById('popup-overlay-button-close');
+            const popupOverlay = document.getElementById('popup-overlay');
+
+            // Event listener to open the popup
+            openPopupButton.addEventListener('click', function() {
+                popupOverlay.style.display = 'flex';
+            });
+
+            // Event listener to close the popup
+            closePopupButton.addEventListener('click', function() {
+                popupOverlay.style.display = 'none';
+            });
+        </script>
 
         <div class="split-top split" style="justify-content: space-between">
             <div class="split-left" style="overflow-y: auto; width: 100px; height: 200px;">
@@ -2094,6 +2126,150 @@ stretchyman.update = (canvas, delta, skeleton, state) => {
         <div class="split-bottom">
             <pre><code id="code-display">
                 <script>escapeHTMLandInject(`
+// POPUP EXAMPLE
+
+<div id="popup-overlay" style="
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center; align-items: center; flex-direction: column;
+    color: black;
+">
+    <div style="display: flex; justify-content: center; align-items: center; flex-direction: column; gap: 10px; margin-bottom: 10px;">
+
+        <div id="popup" style="background-color: white; padding: 20px; text-align: center;">
+            <spine-widget
+                atlas="../demos/assets/atlas2.atlas"
+                skeleton="../demos/assets/demos.json"
+                json-skeleton-key="armorgirl"
+                animation="animation"
+                style="width: 200px; height: 200px; border: 1px solid black;"
+            ></spine-widget>
+            <br>
+            This fixed element lags when scrolling.
+        </div>
+
+        <div id="popup" style="background-color: white; padding: 20px; text-align: center;">
+            <spine-overlay
+                overlay-id="popup"
+                scrollable
+                scrollable-tweak-off
+            ></spine-overlay>
+            <spine-widget
+                atlas="../demos/assets/atlas2.atlas"
+                skeleton="../demos/assets/demos.json"
+                json-skeleton-key="armorgirl"
+                animation="animation"
+                overlay-id="popup"
+                style="width: 200px; height: 200px; border: 1px solid black;"
+            ></spine-widget>
+            <br>
+            This fixed element does not lag when scrolling.
+        </div>
+    </div>
+    <button id="popup-overlay-button-close">Close Popup</button>
+</div>
+
+
+
+// SCROLLABLE CONTAINER EXAMPLE
+<div class="split-top split" style="justify-content: space-between">
+    <div class="split-left" style="overflow-y: auto; width: 100px; height: 200px;">
+        <div class="overflow-grid-container">
+            <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+            <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+            <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+            <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+            <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+            <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+            <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+            <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+            <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+            <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+            <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+            <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+            <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+            <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+            <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+            <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+            <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+            <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
+        </div>
+    </div>
+
+    <div class="split-left" style="overflow-y: auto; width: 100px; height: 200px;">
+        <spine-overlay
+            overlay-id="scroll"
+            scrollable
+            scrollable-tweak-off
+            overflow-top=".2"
+            overflow-bottom=".2"
+            overflow-left=".2"
+            overflow-right=".2"
+        ></spine-overlay>
+        <div class="overflow-grid-container">
+            <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+            <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+            <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+            <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+            <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+            <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+            <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+            <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+            <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+            <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+            <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+            <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+            <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+            <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+            <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+            <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+            <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+            <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
+        </div>
+    </div>
+</div>
+`
+);</script>
+            </code></pre>
+        </div>
+
+    </div>
+    <!--
+    /////////////////////
+    // end section //
+    /////////////////////
+    -->
+
+
+
+
+    <!--
+    /////////////////////
+    // start section //
+    /////////////////////
+    -->
+
+    <div class="section vertical-split" id="above-popup">
+
+        <div class="split-top split">
+            <div class="split-left">
+                As a bonus item, you can move you skeleton around just by setting the <code>isdraggable</code> property to <code>true</code>.
+            </div>
+            <div class="split-right">
+                <spine-widget
+                    atlas="assets/celestial-circus-pma.atlas"
+                    skeleton="assets/celestial-circus-pro.skel"
+                    animation="wings-and-feet"
+                    isdraggable
+                ></spine-widget>
+            </div>
+        </div>
+
+        <div class="split-bottom">
+            <pre><code id="code-display">
+                <script>escapeHTMLandInject(`
 <spine-widget
     atlas="assets/celestial-circus-pma.atlas"
     skeleton="assets/celestial-circus-pro.skel"
@@ -2105,6 +2281,250 @@ stretchyman.update = (canvas, delta, skeleton, state) => {
         </div>
 
     </div>
+
+    <!--
+    /////////////////////
+    // end section //
+    /////////////////////
+    -->
+
+
+    <!--
+    /////////////////////
+    // start section //
+    /////////////////////
+    -->
+
+    <div class="section vertical-split" >
+        <div class="split-left">
+            If you need to determine the cursor position in the overlay world, you might find useful the following properties.
+            <br>
+            For <code>spine-widget</code>:
+            <ul>
+                <li><code>cursorWorldX</code> and <code>cursorWorldY</code> are the x and y of the cursor relative to the skeleton root (spine world).</li>
+                <li><code>worldX</code> and <code>worldY</code> are the x and y of the root relative to the canvas/webgl context origin (spine world).</li>
+            </ul>
+
+            For <code>spine-overlay</code>:
+            <ul>
+                <li><code>cursorCanvasX</code> and <code>cursorCanvasY</code> are the x and y of the cursor relative to the canvas top-left corner (screen world).</li>
+                <li><code>cursorWorldX</code> and <code>cursorWorldY</code> are the x and y of the cursor relative to the canvas/webgl context origin (spine world).</li>
+            </ul>
+
+            You can use these property to interact with your widget. See the following examples where the owl eyes will follow the cursor, even if you drag the owls in another position.
+            Exaggerate the movement by deselection the checkbox below.
+
+            <br>
+            <br>
+            <label>
+                <input type="checkbox" id="owl-checkbox" checked> Limit control bone movement
+            </label>
+            <br>
+            <br>
+            This feature is experimental and might be removed in the future.
+        </div>
+
+        <div id="section-owls"></div>
+
+        <div class="split-bottom">
+            <pre><code id="code-display">
+                <script>escapeHTMLandInject(`
+<div id="section-owls"></div>
+
+...
+
+function createCircleOfDivs(numDivs = 8) {
+    const container = document.createElement('div');
+    container.style.position = 'relative';
+    container.style.width = '400px';
+    container.style.height = '400px';
+    container.style.backgroundColor = '#f3f4f6';
+    container.style.borderRadius = '50%';
+    container.style.display = 'flex';
+    container.style.justifyContent = 'center';
+    container.style.alignItems = 'center';
+
+    const radius = 150;
+
+    for (let i = 0; i < numDivs; i++) {
+        const angle = (i / numDivs) * 2 * Math.PI;
+        const x = Math.cos(angle) * radius;
+        const y = Math.sin(angle) * radius;
+
+        const div = document.createElement('div');
+        div.style.position = 'absolute';
+        div.style.width = '100px';
+        div.style.height = '100px';
+        div.style.backgroundColor = '#3b82f6';
+        div.style.borderRadius = '8px';
+        div.style.display = 'flex';
+        div.style.justifyContent = 'center';
+        div.style.alignItems = 'center';
+        div.style.color = 'white';
+        div.style.fontWeight = 'bold';
+        div.style.transform = \`translate(\${x}px, \${y}px)\`;
+        div.innerHTML = \`
+            <spine-widget
+                identifier="owl\${i}"
+                atlas="../demos/assets/atlas2.atlas"
+                skeleton="../demos/assets/demos.json"
+                json-skeleton-key="owl"
+                animation="idle"
+                isdraggable
+            ></spine-widget>
+        \`;
+
+        container.appendChild(div);
+
+        customElements.whenDefined('spine-widget').then(async () => {
+            const widget = spine.getSpineWidget(\`owl\${i}\`);
+            await widget.loadingPromise;
+            widget.state.setAnimation(1, "blink", true)
+
+            const control = widget.skeleton.findBone("control");
+            const tempVector = new spine.Vector3();
+            const mouse = Ola({ x: 0, y: 0 }, 200);
+            widget.afterUpdateWorldTransforms = () => {
+                updateControl(widget, control, mouse, tempVector);
+            }
+        });
+
+
+    }
+
+    return container;
+}
+
+document.getElementById('section-owls').appendChild(createCircleOfDivs(8));
+
+const checkbox = document.getElementById('owl-checkbox');
+
+let limitOwl = true;
+checkbox.addEventListener('change', () => limitOwl = checkbox.checked);
+
+const updateControl = (widget, controlBone, mouse, tempVector) => {
+    controlBone.parent.worldToLocal(tempVector.set(
+        widget.cursorWorldX,
+        widget.cursorWorldY,
+    ));
+
+    let x = tempVector.x;
+    let y = tempVector.y;
+
+    if (limitOwl) {
+        x = x / widget.overlay.canvas.width * 30;
+        y = y / widget.overlay.canvas.height * 30;
+    }
+
+    mouse.set({ x, y });
+
+    controlBone.x = controlBone.data.x + mouse.x;
+    controlBone.y = controlBone.data.y + mouse.y;
+}
+`
+);</script>
+            </code></pre>
+        </div>
+
+
+    </div>
+
+    <script>
+        function createCircleOfDivs(numDivs = 8) {
+            const container = document.createElement('div');
+            container.style.position = 'relative';
+            container.style.width = '400px';
+            container.style.height = '400px';
+            container.style.backgroundColor = '#f3f4f6';
+            container.style.borderRadius = '50%';
+            container.style.display = 'flex';
+            container.style.justifyContent = 'center';
+            container.style.alignItems = 'center';
+
+            const radius = 150;
+
+            for (let i = 0; i < numDivs; i++) {
+                const angle = (i / numDivs) * 2 * Math.PI;
+                const x = Math.cos(angle) * radius;
+                const y = Math.sin(angle) * radius;
+
+                const div = document.createElement('div');
+                div.style.position = 'absolute';
+                div.style.width = '100px';
+                div.style.height = '100px';
+                div.style.backgroundColor = '#3b82f6';
+                div.style.borderRadius = '8px';
+                div.style.display = 'flex';
+                div.style.justifyContent = 'center';
+                div.style.alignItems = 'center';
+                div.style.color = 'white';
+                div.style.fontWeight = 'bold';
+                div.style.transform = `translate(${x}px, ${y}px)`;
+                div.innerHTML = `
+                    <spine-widget
+                        identifier="owl${i}"
+                        atlas="../demos/assets/atlas2.atlas"
+                        skeleton="../demos/assets/demos.json"
+                        json-skeleton-key="owl"
+                        animation="idle"
+                        isdraggable
+                    ></spine-widget>
+                `;
+
+                container.appendChild(div);
+
+                customElements.whenDefined('spine-widget').then(async () => {
+                    const widget = spine.getSpineWidget(`owl${i}`);
+                    await widget.loadingPromise;
+                    widget.state.setAnimation(1, "blink", true);
+
+                    const control = widget.skeleton.findBone("control");
+                    const tempVector = new spine.Vector3();
+                    const mouse = Ola({ x: 0, y: 0 }, 200);
+                    widget.afterUpdateWorldTransforms = () => {
+                        updateControl(widget, control, mouse, tempVector);
+                    }
+                });
+
+
+            }
+
+            return container;
+        }
+
+        document.getElementById('section-owls').appendChild(createCircleOfDivs(8));
+
+        const checkbox = document.getElementById('owl-checkbox');
+
+        let limitOwl = true;
+        checkbox.addEventListener('change', () => limitOwl = checkbox.checked);
+
+        const updateControl = (widget, controlBone, mouse, tempVector) => {
+            controlBone.parent.worldToLocal(tempVector.set(
+                widget.cursorWorldX,
+                widget.cursorWorldY,
+            ));
+
+            let x = tempVector.x;
+            let y = tempVector.y;
+
+            if (limitOwl) {
+                x = x / widget.overlay.canvas.width * 30;
+                y = y / widget.overlay.canvas.height * 30;
+            }
+
+            mouse.set({ x, y });
+
+            controlBone.x = controlBone.data.x + mouse.x;
+            controlBone.y = controlBone.data.y + mouse.y;
+        }
+    </script>
+
+
+    <script>
+        (function(global,factory){typeof exports==="object"&&typeof module!=="undefined"?module.exports=factory():typeof define==="function"&&define.amd?define(factory):(global=global||self,global.Ola=factory())})(this,function(){"use strict";const position=(x0,v0,t1,t)=>{const a=(v0*t1+2*x0)/t1**3;const b=-(2*v0*t1+3*x0)/t1**2;const c=v0;const d=x0;return a*t**3+b*t**2+c*t+d};const speed=(x0,v0,t1,t)=>{const a=(v0*t1+2*x0)/t1**3;const b=-(2*v0*t1+3*x0)/t1**2;const c=v0;return 3*a*t**2+2*b*t+c};const each=function(values,cb){const multi=typeof values==="number"?{value:values}:values;Object.entries(multi).map(([key,value])=>cb(value,key))};function Single(init,time){this.start=new Date/1e3;this.time=time;this.from=init;this.current=init;this.to=init;this.speed=0}Single.prototype.get=function(now){const t=now/1e3-this.start;if(t<0){throw new Error("Cannot read in the past")}if(t>=this.time){return this.to}return this.to-position(this.to-this.from,this.speed,this.time,t)};Single.prototype.getSpeed=function(now){const t=now/1e3-this.start;if(t>=this.time){return 0}return speed(this.to-this.from,this.speed,this.time,t)};Single.prototype.set=function(value,time){const now=new Date;const current=this.get(now);this.speed=this.getSpeed(now);this.start=now/1e3;this.from=current;this.to=value;if(time){this.time=time}return current};function Ola(values,time=300){if(typeof values==="number"){values={value:values}}each(values,(init,key)=>{const value=new Single(init,time/1e3);Object.defineProperty(values,"_"+key,{value:value});Object.defineProperty(values,"$"+key,{get:()=>value.to});Object.defineProperty(values,key,{get:()=>value.get(new Date),set:val=>value.set(val),enumerable:true})});Object.defineProperty(values,"get",{get:()=>(function(name="value",now=new Date){return this["_"+name].get(now)})});Object.defineProperty(values,"set",{get:()=>(function(values,time=0){each(values,(value,key)=>{this["_"+key].set(value,time/1e3)})})});return values}return Ola});
+    </script>
+
     <!--
     /////////////////////
     // end section //

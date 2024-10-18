@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="../dist/iife/spine-webgl.js"></script>
-    <!-- <script src="./spine-webgl.min.js"></script> -->
     <title>Webcomponent Tutorial</title>
     <style>
         body {
@@ -131,98 +130,44 @@
         }
     </style>
 
-    <script>
-        function escapeHTMLandInject(text) {
-            const escaped = text
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-            document.currentScript.parentElement.innerHTML = escaped;
-        }
-    </script>
 </head>
 <body>
 
-
-    <!--
+        <!--
     /////////////////////
     // start section //
     /////////////////////
     -->
+    <!-- <div class="section vertical-split" id="section-popup">
 
-    <div class="section vertical-split">
-
-        <div class="split-top split" style="justify-content: space-between">
-            <!-- <div class="split-left" style="overflow-y: auto; width: 200px; height: 200px;">
-                <div class="overflow-grid-container">
-                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
-                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
-                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
-                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
-                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
-                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
-                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
-                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
-                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
-                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
-                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
-                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
-                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
-                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
-                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
-                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel"></spine-widget></div>
-                </div>
-            </div> -->
-
-            <div class="split-left" style="overflow-y: auto; width: 200px; height: 200px;">
-                <spine-overlay
-                    overlay-id="scroll"
-                    scrollable
-                    overflow-top=".2"
-                    overflow-bottom=".2"
-                    overflow-left=".2"
-                    overflow-right=".2"
-                ></spine-overlay>
-                <div class="overflow-grid-container">
-                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
-                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
-                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
-                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
-                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
-                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
-                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
-                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
-                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
-                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
-                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
-                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
-                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
-                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
-                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
-                    <div class="overflow-grid-item"><spine-widget atlas="assets/spineboy-pma.atlas" skeleton="assets/spineboy-pro.skel" overlay-id="scroll"></spine-widget></div>
-                </div>
+        <div class="split-top split">
+            <div class="split-right" style="background-color: red;" id="inserting">
             </div>
         </div>
 
+        <script>
+            (async() => {
+                const div = document.getElementById("inserting");
+                const widget = spine.createSpineWidget({
+                    atlasPath: "assets/chibi-stickers-pma.atlas",
+                    skeletonPath: "assets/chibi-stickers.json",
+                    animation: "emotes/wave",
+                    skin: "soeren",
+                    manualStart: false,
+                });
 
-        <div class="split-bottom">
-            <pre><code id="code-display">
-                <script>escapeHTMLandInject(`
-<spine-widget
-    atlas="assets/celestial-circus-pma.atlas"
-    skeleton="assets/celestial-circus-pro.skel"
-    animation="wings-and-feet"
-    isdraggable="true"
-></spine-widget>`
-);</script>
-            </code></pre>
-        </div>
+                await widget.appendTo(div);
 
-    </div>
+                // widget.start();
 
-    <div style="height: 1000px;"> SPACE </div>
+
+            })();
+
+        </script>
+
+    </div> -->
+
+
 
     <!--
     /////////////////////
@@ -230,9 +175,193 @@
     /////////////////////
     -->
 
+        <!--
+    /////////////////////
+    // start section //
+    /////////////////////
+    -->
+    <div class="section vertical-split" id="section-popup">
+
+        <div class="split-top split">
+            <div class="split-right" style="background-color: red;">
+                <spine-widget
+                    atlas="assets/raptor-pma.atlas"
+                    skeleton="assets/raptor-pro.skel"
+                    animation="walk"
+                    fit="fill"
+                ></spine-widget>
+            </div>
+
+            <div class="split-right" style="background-color: red;">
+                <spine-widget
+                    atlas="assets/raptor-pma.atlas"
+                    skeleton="assets/raptor-pro.skel"
+                    animation="walk"
+                    fit="fill"
+                    overlay-id="pippo"
+                    manual-start
+                    identifier="aaa"
+                ></spine-widget>
+            </div>
+        </div>
+
+    </div>
+
+    <spine-overlay overlay-id="pippo"></spine-overlay>
+
+    <script>
+        (async () => {
+            const w = spine.getSpineWidget("aaa");
+
+            await w.overlayAssignedPromise;
+            w.start();
+        })();
+    </script>
+
+
+    <!--
+    /////////////////////
+    // end section //
+    /////////////////////
+    -->
+
+            <!--
+    /////////////////////
+    // start section //
+    /////////////////////
+    -->
+
+    <!--
+    /////////////////////
+    // end section //
+    /////////////////////
+    -->
+
+
+
+///
+///
+///
+///
+///
+///
+///
+
+<div class="section vertical-split" id="section-owls">
+    <label>
+        <input type="checkbox" id="owl-checkbox" checked> Limit control bone movement
+    </label>
+</div>
+
+
+
+<script>
+    function createCircleOfDivs(numDivs = 8) {
+        const container = document.createElement('div');
+        container.style.position = 'relative';
+        container.style.width = '400px';
+        container.style.height = '400px';
+        container.style.backgroundColor = '#f3f4f6';
+        container.style.borderRadius = '50%';
+        container.style.display = 'flex';
+        container.style.justifyContent = 'center';
+        container.style.alignItems = 'center';
+
+        const radius = 150;
+
+        for (let i = 0; i < numDivs; i++) {
+            const angle = (i / numDivs) * 2 * Math.PI;
+            const x = Math.cos(angle) * radius;
+            const y = Math.sin(angle) * radius;
+
+            const div = document.createElement('div');
+            div.style.position = 'absolute';
+            div.style.width = '100px';
+            div.style.height = '100px';
+            div.style.backgroundColor = '#3b82f6';
+            div.style.borderRadius = '8px';
+            div.style.display = 'flex';
+            div.style.justifyContent = 'center';
+            div.style.alignItems = 'center';
+            div.style.color = 'white';
+            div.style.fontWeight = 'bold';
+            div.style.transform = `translate(${x}px, ${y}px)`;
+            div.textContent = i + 1;
+            div.innerHTML = `
+                <spine-widget
+                    identifier="pippo${i + 1}"
+                    atlas="../demos/assets/atlas2.atlas"
+                    skeleton="../demos/assets/demos.json"
+                    json-skeleton-key="owl"
+                    animation="idle"
+                ></spine-widget>
+            `;
+
+            container.appendChild(div);
+
+            customElements.whenDefined('spine-widget').then(async () => {
+                const widget = spine.getSpineWidget(`pippo${i+1}`);
+                await widget.loadingPromise;
+                widget.state.setAnimation(1, "blink", true)
+
+                const control = widget.skeleton.findBone("control");
+                const tempVector = new spine.Vector3();
+                const mouse = Ola({ x: 0, y: 0 }, 200);
+                widget.afterUpdateWorldTransforms = () => {
+                    updateControl(widget, control, mouse, tempVector);
+                }
+            });
+
+
+        }
+
+        return container;
+    }
+
+    setTimeout(() => {
+        // document.getElementById('section-owls').appendChild(createCircleOfDivs(1));
+    }, 1000)
+
+
+    const checkbox = document.getElementById('owl-checkbox');
+
+    let limitOwl = true;
+    checkbox.addEventListener('change', () => {
+        limitOwl = checkbox.checked;
+    });
+
+    const updateControl = (widget, controlBone, mouse, tempVector) => {
+        controlBone.parent.worldToLocal(tempVector.set(
+            widget.cursorWorldX,
+            widget.cursorWorldY,
+        ));
+
+        let x = tempVector.x;
+        let y = tempVector.y;
+
+        if (limitOwl) {
+            x = x / widget.overlay.canvas.width * 30;
+            y = y / widget.overlay.canvas.height * 30;
+        }
+
+        mouse.set({ x, y });
+
+        controlBone.x = controlBone.data.x + mouse.x;
+        controlBone.y = controlBone.data.y + mouse.y;
+    }
+
+</script>
+
 <script>
     spine.SpineWebComponentWidget.SHOW_FPS = true;
 </script>
+
+<script>
+    (function(global,factory){typeof exports==="object"&&typeof module!=="undefined"?module.exports=factory():typeof define==="function"&&define.amd?define(factory):(global=global||self,global.Ola=factory())})(this,function(){"use strict";const position=(x0,v0,t1,t)=>{const a=(v0*t1+2*x0)/t1**3;const b=-(2*v0*t1+3*x0)/t1**2;const c=v0;const d=x0;return a*t**3+b*t**2+c*t+d};const speed=(x0,v0,t1,t)=>{const a=(v0*t1+2*x0)/t1**3;const b=-(2*v0*t1+3*x0)/t1**2;const c=v0;return 3*a*t**2+2*b*t+c};const each=function(values,cb){const multi=typeof values==="number"?{value:values}:values;Object.entries(multi).map(([key,value])=>cb(value,key))};function Single(init,time){this.start=new Date/1e3;this.time=time;this.from=init;this.current=init;this.to=init;this.speed=0}Single.prototype.get=function(now){const t=now/1e3-this.start;if(t<0){throw new Error("Cannot read in the past")}if(t>=this.time){return this.to}return this.to-position(this.to-this.from,this.speed,this.time,t)};Single.prototype.getSpeed=function(now){const t=now/1e3-this.start;if(t>=this.time){return 0}return speed(this.to-this.from,this.speed,this.time,t)};Single.prototype.set=function(value,time){const now=new Date;const current=this.get(now);this.speed=this.getSpeed(now);this.start=now/1e3;this.from=current;this.to=value;if(time){this.time=time}return current};function Ola(values,time=300){if(typeof values==="number"){values={value:values}}each(values,(init,key)=>{const value=new Single(init,time/1e3);Object.defineProperty(values,"_"+key,{value:value});Object.defineProperty(values,"$"+key,{get:()=>value.to});Object.defineProperty(values,key,{get:()=>value.get(new Date),set:val=>value.set(val),enumerable:true})});Object.defineProperty(values,"get",{get:()=>(function(name="value",now=new Date){return this["_"+name].get(now)})});Object.defineProperty(values,"set",{get:()=>(function(values,time=0){each(values,(value,key)=>{this["_"+key].set(value,time/1e3)})})});return values}return Ola});
+</script>
+
+
+
 
 </body>
 </html>

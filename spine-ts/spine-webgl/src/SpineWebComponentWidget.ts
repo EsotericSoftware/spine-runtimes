@@ -101,6 +101,7 @@ export type AttributeTypes = "string" | "number" | "boolean" | "string-number" |
 interface WidgetAttributes {
 	atlasPath?: string
 	skeletonPath?: string
+	jsonSkeletonKey?: string
 	scale: number
 	animation?: string
 	skin?: string
@@ -125,6 +126,7 @@ interface WidgetAttributes {
 	debug: boolean
 	identifier: string
 	manualStart: boolean
+	onViewportManualStart: boolean
 	pages?: Array<number>
 	clip: boolean
 	offScreenUpdateBehaviour: OffScreenUpdateBehaviourType
@@ -164,6 +166,28 @@ interface WidgetInternalProperties {
 }
 
 export class SpineWebComponentWidget extends HTMLElement implements Disposable, WidgetAttributes, WidgetOverridableMethods, WidgetInternalProperties, Partial<WidgetPublicProperties> {
+
+	public worldX = 0;
+	public worldY = 0;
+	public cursorWorldX = 1;
+	public cursorWorldY = 1;
+	public jsonSkeletonKey?: string;
+	public onViewportManualStart = false;
+
+	// this promise in necessary only for manual start. Before calling manual start is necessary that the overlay has been assigned to the widget.
+	// overlay assignment is asynchronous due to webcomponent promotion and dom load termination.
+	// When manual start is false, loadSkeleton is invoked after the overlay is assigned. loadSkeleton needs the assetManager that is owned by the overlay.
+	// the overlay owns the assetManager because the overly owns the gl context.
+	// if it wasn't for the gl context with which textures are created, we could:
+	// - have a unique asset manager independent from the overlay (we literally reload the same assets in two different overlays)
+	// - remove overlayAssignedPromise and the needs to wait for its resolving
+	// - remove appendTo that is just to avoid the user to use the overlayAssignedPromise when the widget is created using js
+	public overlayAssignedPromise: Promise<void>;
+
+	public async appendTo(element: HTMLElement): Promise<void> {
+		element.appendChild(this);
+		await this.overlayAssignedPromise;
+	}
 
 	/**
 	 * If true, enables a top-left span showing FPS (it has black text)
@@ -464,7 +488,7 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 		if (widget.loading && !widget.onScreenAtLeastOnce) {
 			widget.onScreenAtLeastOnce = true;
 
-			if (widget.manualStart) {
+			if (widget.manualStart && widget.onViewportManualStart) {
 				widget.start();
 			}
 		}
@@ -492,7 +516,7 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 	 * A Promise that resolve to the widget itself once assets loading is terminated.
 	 * Useful to safely access {@link skeleton} and {@link state} after a new widget has been just created.
 	 */
-	public loadingPromise?: Promise<this>;
+	public loadingPromise: Promise<this>;
 
 	/**
 	 * If true, the widget is in the assets loading process.
@@ -575,9 +599,16 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 	// Reference to the overlay webcomponent
 	private overlay!: SpineWebComponentOverlay;
 
+	// Invoked when widget is ready
+	private resolveLoadingPromise!: (value: this | PromiseLike<this>) => void;
+
+	// Invoked when widget has an overlay assigned
+	private resolveOverlayAssignedPromise!: () => void;
+
 	static attributesDescription: Record<string, { propertyName: keyof WidgetAttributes, type: AttributeTypes, defaultValue?: any }> = {
 		atlas: { propertyName: "atlasPath", type: "string" },
 		skeleton: { propertyName: "skeletonPath", type: "string" },
+		"json-skeleton-key": { propertyName: "jsonSkeletonKey", type: "string" },
 		scale: { propertyName: "scale", type: "number" },
 		animation: { propertyName: "animation", type: "string", defaultValue: undefined },
 		skin: { propertyName: "skin", type: "string" },
@@ -600,6 +631,7 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 		identifier: { propertyName: "identifier", type: "string" },
 		debug: { propertyName: "debug", type: "boolean" },
 		"manual-start": { propertyName: "manualStart", type: "boolean" },
+		"on-viewport-manual-start": { propertyName: "onViewportManualStart", type: "boolean" },
 		spinner: { propertyName: "loadingSpinner", type: "boolean" },
 		clip: { propertyName: "clip", type: "boolean" },
 		pages: { propertyName: "pages", type: "string-number" },
@@ -620,6 +652,14 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 		this.debugDragDiv.style.position = "absolute";
 		this.debugDragDiv.style.backgroundColor = "rgba(255, 0, 0, .3)";
 		this.debugDragDiv.style.setProperty("pointer-events", "none");
+
+		// these two are terrible code smells
+		this.loadingPromise = new Promise<this>((resolve) => {
+			this.resolveLoadingPromise = resolve;
+		});
+		this.overlayAssignedPromise = new Promise<void>((resolve) => {
+			this.resolveOverlayAssignedPromise = resolve;
+		});
 	}
 
 	connectedCallback () {
@@ -627,17 +667,35 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 			throw new Error("You cannot attach a disposed widget");
 		};
 
-		customElements.whenDefined("spine-overlay").then(() => {
-			if (!this.overlay) this.overlay = this.initializeOverlay(this.getAttribute("overlay-id"));
-			this.overlay.addWidget(this);
-		});
-		if (!this.manualStart && !this.started) {
-			this.start();
+		if (this.overlay) {
+			this.initAfterConnect();
+		} else {
+			window.addEventListener("DOMContentLoaded", this.DOMContentLoadedHandler);
+			if (document.readyState !== "loading") {
+				this.DOMContentLoadedHandler();
+			}
 		}
+
 		this.render();
 	}
 
+	private initAfterConnect() {
+		this.overlay.addWidget(this);
+		if (!this.manualStart && !this.started) {
+			this.start();
+		}
+	}
+
+	private DOMContentLoadedHandler = () => {
+		customElements.whenDefined("spine-overlay").then(async () => {
+			this.overlay = SpineWebComponentOverlay.getOrCreateOverlay(this.getAttribute("overlay-id"));
+			this.resolveOverlayAssignedPromise();
+			this.initAfterConnect();
+		});
+	}
+
 	disconnectedCallback (): void {
+		window.removeEventListener("DOMContentLoaded", this.DOMContentLoadedHandler);
 		const index = this.overlay!.skeletonList.indexOf(this);
 		if (index !== -1) {
 			this.overlay!.skeletonList.splice(index, 1);
@@ -677,7 +735,9 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 		}
 		this.started = true;
 
-		this.loadingPromise = customElements.whenDefined("spine-overlay").then(() => this.loadSkeleton());
+		customElements.whenDefined("spine-overlay").then(() => {
+			this.resolveLoadingPromise(this.loadSkeleton());
+		});
 	}
 
 	/**
@@ -755,7 +815,8 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 		const skeletonLoader = isBinary ? new SkeletonBinary(atlasLoader) : new SkeletonJson(atlasLoader);
 		skeletonLoader.scale = scale;
 
-		const skeletonFile = this.overlay.assetManager.require(skeletonPath);
+		const skeletonFileAsset = this.overlay.assetManager.require(skeletonPath);
+		const skeletonFile = this.jsonSkeletonKey ? skeletonFileAsset[this.jsonSkeletonKey] : skeletonFileAsset;
 		const skeletonData = (skeletonDataInput || this.skeleton?.data) ?? skeletonLoader.readSkeletonData(skeletonFile);
 
 		const skeleton = new Skeleton(skeletonData);
@@ -823,19 +884,6 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
         `;
 	}
 
-	// Create a new overlay webcomponent, if no one exists yet.
-	// TODO: allow the possibility to instantiate multiple overlay (eg: background, foreground),
-	// to give them an identifier, and to specify which overlay is assigned to a widget
-	private initializeOverlay (overlayId: string | null): SpineWebComponentOverlay {
-		const queryString = overlayId === null ? "spine-overlay:not([overlay-id])" : `spine-overlay[overlay-id=${overlayId}]`;
-		let overlay = this.overlay || document.querySelector(queryString) as SpineWebComponentOverlay;
-		if (!overlay) {
-			overlay = document.createElement("spine-overlay") as SpineWebComponentOverlay;
-			document.body.appendChild(overlay);
-		}
-		return overlay;
-	}
-
 	/*
 	* Other utilities
 	*/
@@ -898,6 +946,18 @@ interface OverlayAttributes {
 
 class SpineWebComponentOverlay extends HTMLElement implements OverlayAttributes, Disposable {
 
+	public static OVERLAY_ID = "spine-overlay-default-identifier";
+	public static OVERLAY_LIST = new Map<string, SpineWebComponentOverlay>();
+	static getOrCreateOverlay(overlayId: string | null): SpineWebComponentOverlay {
+		let overlay = SpineWebComponentOverlay.OVERLAY_LIST.get(overlayId || SpineWebComponentOverlay.OVERLAY_ID);
+		if (!overlay) {
+			overlay = document.createElement('spine-overlay') as SpineWebComponentOverlay;
+			overlay.setAttribute('overlay-id', SpineWebComponentOverlay.OVERLAY_ID);
+			document.body.appendChild(overlay);
+		}
+		return overlay;
+	}
+
 	public skeletonList = new Array<SpineWebComponentWidget>();
 	public renderer: SceneRenderer;
 	public assetManager: AssetManager;
@@ -919,7 +979,7 @@ class SpineWebComponentOverlay extends HTMLElement implements OverlayAttributes,
 	// be aware that the canvas is already big as the display size
 	// making it bigger might reduce performance significantly
 	public overflowTop = .2;
-	public overflowBottom = .0;
+	public overflowBottom = .2;
 	public overflowLeft = .0;
 	public overflowRight = .0;
 	private overflowLeftSize = 0;
@@ -968,51 +1028,17 @@ class SpineWebComponentOverlay extends HTMLElement implements OverlayAttributes,
 		this.assetManager = new AssetManager(context);
 	}
 
-	static attributesDescription: Record<string, { propertyName: keyof OverlayAttributes, type: AttributeTypes, defaultValue?: any }> = {
-		"overlay-id": { propertyName: "overlayId", type: "string" },
-		"scrollable": { propertyName: "scrollable", type: "boolean" },
-		"overflow-top": { propertyName: "overflowTop", type: "number" },
-		"overflow-bottom": { propertyName: "overflowBottom", type: "number" },
-		"overflow-left": { propertyName: "overflowLeft", type: "number" },
-		"overflow-right": { propertyName: "overflowRight", type: "number" },
-	}
-
-	static get observedAttributes (): string[] {
-		return Object.keys(SpineWebComponentOverlay.attributesDescription);
-	}
-
-	attributeChangedCallback (name: string, oldValue: string | null, newValue: string | null): void {
-		const { type, propertyName, defaultValue } = SpineWebComponentOverlay.attributesDescription[name];
-		const val = castValue(type, newValue, defaultValue);
-		(this as any)[propertyName] = val;
-		return;
-	}
-
-	private resizeCallback = () => {
-		this.updateCanvasSize();
-		this.zoomHandler();
-	}
-
-	private orientationChangeCallback = () => {
-		this.updateCanvasSize();
-		// after an orientation change the scrolling changes, but the scroll event does not fire
-		this.scrollHandler();
-	}
-
-	// right now, we scroll the canvas each frame before rendering loop, that makes scrolling on mobile waaay more smoother
-	// this is way scroll handler do nothing
-	private scrollHandler = () => {
-		// this.translateCanvas();
-	}
-
-	private onLoadCallback = () => {
-		this.updateCanvasSize();
-		this.zoomHandler();
-		this.scrollHandler();
-		this.loaded = true;
-	}
-
 	connectedCallback (): void {
+		let overlayId = this.getAttribute('overlay-id');
+		if (!overlayId) {
+			overlayId = SpineWebComponentOverlay.OVERLAY_ID;
+			this.setAttribute('overlay-id', overlayId);
+		}
+		const existingOverlay = SpineWebComponentOverlay.OVERLAY_LIST.get(overlayId);
+		if (existingOverlay && existingOverlay !== this) {
+			throw new Error(`"SpineWebComponentOverlay - You cannot have two spine-overlay with the same overlay-id: ${overlayId}"`);
+		}
+		SpineWebComponentOverlay.OVERLAY_LIST.set(overlayId, this);
 		// window.addEventListener("scroll", this.scrollHandler);
 		window.addEventListener("load", this.onLoadCallback);
 		if (this.loaded) this.onLoadCallback();
@@ -1058,13 +1084,64 @@ class SpineWebComponentOverlay extends HTMLElement implements OverlayAttributes,
 		this.startRenderingLoop();
 	}
 
+	private running = false;
 	disconnectedCallback (): void {
+		const id = this.getAttribute('id');
+		if (id) SpineWebComponentOverlay.OVERLAY_LIST.delete(id);
 		// window.removeEventListener("scroll", this.scrollHandler);
 		window.removeEventListener("load", this.onLoadCallback);
 		window.screen.orientation.removeEventListener('change', this.orientationChangeCallback);
 		this.intersectionObserver?.disconnect();
 		this.resizeObserver?.disconnect();
 		this.input?.dispose();
+	}
+
+
+	static attributesDescription: Record<string, { propertyName: keyof OverlayAttributes, type: AttributeTypes, defaultValue?: any }> = {
+		"overlay-id": { propertyName: "overlayId", type: "string" },
+		"scrollable": { propertyName: "scrollable", type: "boolean" },
+		"overflow-top": { propertyName: "overflowTop", type: "number" },
+		"overflow-bottom": { propertyName: "overflowBottom", type: "number" },
+		"overflow-left": { propertyName: "overflowLeft", type: "number" },
+		"overflow-right": { propertyName: "overflowRight", type: "number" },
+	}
+
+	static get observedAttributes (): string[] {
+		return Object.keys(SpineWebComponentOverlay.attributesDescription);
+	}
+
+	attributeChangedCallback (name: string, oldValue: string | null, newValue: string | null): void {
+		const { type, propertyName, defaultValue } = SpineWebComponentOverlay.attributesDescription[name];
+		const val = castValue(type, newValue, defaultValue);
+		(this as any)[propertyName] = val;
+		return;
+	}
+
+	private resizeCallback = () => {
+		this.updateCanvasSize();
+		this.zoomHandler();
+	}
+
+	private orientationChangeCallback = () => {
+		this.updateCanvasSize();
+		// after an orientation change the scrolling changes, but the scroll event does not fire
+		this.scrollHandler();
+	}
+
+	// right now, we scroll the canvas each frame before rendering loop, that makes scrolling on mobile waaay more smoother
+	// this is way scroll handler do nothing
+	private scrollHandler = () => {
+		// this.translateCanvas();
+	}
+
+	private onLoadCallback = () => {
+		this.updateCanvasSize();
+		this.zoomHandler();
+		this.scrollHandler();
+		if (!this.loaded) {
+			this.parentElement!.appendChild(this);
+		}
+		this.loaded = true;
 	}
 
 	dispose (): void {
@@ -1077,9 +1154,14 @@ class SpineWebComponentOverlay extends HTMLElement implements OverlayAttributes,
 	addWidget (widget: SpineWebComponentWidget) {
 		this.skeletonList.push(widget);
 		this.intersectionObserver?.observe(widget.getHTMLElementReference());
+		if (this.loaded) {
+			this.parentElement!.appendChild(this);
+		}
 	}
 
 	private startRenderingLoop () {
+		if (this.running) return;
+
 		const updateWidgets = () => {
 			const delta = this.time.delta;
 			this.skeletonList.forEach(({ skeleton, state, update, onScreen, offScreenUpdateBehaviour, beforeUpdateWorldTransforms, afterUpdateWorldTransforms }) => {
@@ -1289,6 +1371,9 @@ class SpineWebComponentOverlay extends HTMLElement implements OverlayAttributes,
 					const worldOffsetX = divOriginX + offsetX + dragX;
 					const worldOffsetY = divOriginY + offsetY + dragY;
 
+					widget.worldX = worldOffsetX;
+					widget.worldY = worldOffsetY;
+
 					renderer.drawSkeleton(skeleton, true, -1, -1, (vertices, size, vertexSize) => {
 						for (let i = 0; i < size; i += vertexSize) {
 							vertices[i] = vertices[i] + worldOffsetX;
@@ -1310,7 +1395,9 @@ class SpineWebComponentOverlay extends HTMLElement implements OverlayAttributes,
 							widget.dragBoundsRectangle.y += divBounds.y;
 						}
 
-						if (!widget.debugDragDiv.isConnected) document.body.appendChild(widget.debugDragDiv);
+						if (debug && !widget.debugDragDiv.isConnected) {
+							document.body.appendChild(widget.debugDragDiv);
+						}
 						widget.debugDragDiv.style.left = `${widget.dragBoundsRectangle.x - this.overflowLeftSize}px`;
 						widget.debugDragDiv.style.top = `${widget.dragBoundsRectangle.y - this.overflowTopSize}px`;
 						widget.debugDragDiv.style.width = `${widget.dragBoundsRectangle.width}px`;
@@ -1361,7 +1448,10 @@ class SpineWebComponentOverlay extends HTMLElement implements OverlayAttributes,
 		}
 
 		const loop = () => {
-			if (this.disposed || !this.isConnected) return;
+			if (this.disposed || !this.isConnected) {
+				this.running = false;
+				return;
+			};
 			requestAnimationFrame(loop);
 			if (!this.loaded) return;
 			this.time.update();
@@ -1371,6 +1461,7 @@ class SpineWebComponentOverlay extends HTMLElement implements OverlayAttributes,
 		}
 
 		requestAnimationFrame(loop);
+		this.running = true;
 
 		const red = new Color(1, 0, 0, 1);
 		const green = new Color(0, 1, 0, 1);
@@ -1378,10 +1469,16 @@ class SpineWebComponentOverlay extends HTMLElement implements OverlayAttributes,
 		const transparentWhite = new Color(1, 1, 1, .3);
 	}
 
+	public cursorCanvasX = 1;
+	public cursorCanvasY = 1;
+	public cursorWorldX = 1;
+	public cursorWorldY = 1;
+
 	private setupDragUtility (): Input {
 		// TODO: we should use document - body might have some margin that offset the click events - Meanwhile I take event pageX/Y
 		const inputManager = new Input(document.body, false)
 		const point: Point = { x: 0, y: 0 };
+		const tempVector = new Vector3();
 
 		const getInput = (ev?: MouseEvent | TouchEvent): Point => {
 			const originalEvent = ev instanceof MouseEvent ? ev : ev!.changedTouches[0];
@@ -1393,6 +1490,29 @@ class SpineWebComponentOverlay extends HTMLElement implements OverlayAttributes,
 		let prevX = 0;
 		let prevY = 0;
 		inputManager.addListener({
+			// moved is used to pass curson position wrt to canvas and widget position and currently is EXPERIMENTAL
+			moved: (x, y, ev) => {
+				const input = getInput(ev);
+				this.cursorCanvasX = input.x - window.scrollX;
+				this.cursorCanvasY = input.y - window.scrollY;
+
+				const ref = this.parentElement!.getBoundingClientRect();
+				if (this.scrollable) {
+					this.cursorCanvasX -= ref.left;
+					this.cursorCanvasY -= ref.top;
+				}
+
+				tempVector.set(this.cursorCanvasX, this.cursorCanvasY, 0);
+				this.renderer.camera.screenToWorld(tempVector, this.canvas.clientWidth, this.canvas.clientHeight);
+
+				if (Number.isNaN(tempVector.x) || Number.isNaN(tempVector.y)) return;
+				this.cursorWorldX = tempVector.x;
+				this.cursorWorldY = tempVector.y;
+				this.skeletonList.forEach(widget => {
+					widget.cursorWorldX = this.cursorWorldX - widget.worldX;
+					widget.cursorWorldY = this.cursorWorldY - widget.worldY;
+				});
+			},
 			down: (x, y, ev) => {
 				const input = getInput(ev);
 				this.skeletonList.forEach(widget => {
@@ -1463,7 +1583,7 @@ class SpineWebComponentOverlay extends HTMLElement implements OverlayAttributes,
 
 	private resizeCanvas () {
 		let width, height;
-		if (!this.overlayId) {
+		if (!this.scrollable) {
 			const screenSize = this.getScreenSize();
 			width = screenSize.width;
 			height = screenSize.height;
@@ -1471,7 +1591,6 @@ class SpineWebComponentOverlay extends HTMLElement implements OverlayAttributes,
 			width = this.parentElement!.clientWidth;
 			height = this.parentElement!.clientHeight;
 		}
-
 
 		// this is needed because screen size is wrong when zoom levels occurs
 		// zooming out will make the canvas smaller and its known that zoom level
@@ -1602,10 +1721,6 @@ export function createSpineWidget (parameters: WidgetAttributes): SpineWebCompon
 		const value = parameters[propertyName];
 		if (value) widget.setAttribute(key, value as any);
 	});
-
-	if (!widget.manualStart) {
-		widget.start();
-	}
 
 	return widget;
 }
