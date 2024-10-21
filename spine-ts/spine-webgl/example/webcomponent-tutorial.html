@@ -1431,7 +1431,7 @@ skins.forEach((skin, i) => {
                 By default, the callback does two things:
                 <ul>
                     <li>set <code>onScreenAtLeastOnce</code> to <code>true</code> when the widget enters the viewport the first time</li>
-                    <li>if <code>manual-start</code> and <code>on-viewport-manual-start</code> are set the widget <code>start</code> is invoked
+                    <li>if <code>manual-start</code> and <code>on-screen-manual-start</code> are set the widget <code>start</code> is invoked
                         the first time the widget enters the viewport and the assets are loaded only in that moment.</li>
                 </ul>
                 <br>
@@ -1449,7 +1449,7 @@ skins.forEach((skin, i) => {
                         skeleton="assets/coin-pro.skel"
                         animation="animation"
                         manual-start
-                        on-viewport-manual-start
+                        on-screen-manual-start
                     ></spine-widget>
                 </div>
                 <div class="skin-grid-element">
@@ -1981,7 +1981,7 @@ stretchyman.update = (canvas, delta, skeleton, state) => {
             2) For scrollable containers, the widget will overflow the container bounds until the widget html element container is visible <br>
             3) For fixed containers, the widget will scroll in a jerky way <br>
             <br>
-            In order to fix this behaviour, it is necessary to insert a dedicated <code>spine-overlay</code> webcomponent as a direct child of the  container.
+            In order to fix this behaviour, it is necessary to insert a dedicated <code>spine-overlay</code> webcomponent as a direct child of the container.
             Moreover, it is necessary to perform the following actions: <br>
             <br>
             1) The scrollable container must have a <code>transform</code> css attribute. If it hasn't this attribute the <code>spine-overlay</code> will add it for you.

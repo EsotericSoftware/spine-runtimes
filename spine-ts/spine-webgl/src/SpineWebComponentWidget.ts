@@ -126,7 +126,7 @@ interface WidgetAttributes {
 	debug: boolean
 	identifier: string
 	manualStart: boolean
-	onViewportManualStart: boolean
+	onScreenManualStart: boolean
 	pages?: Array<number>
 	clip: boolean
 	offScreenUpdateBehaviour: OffScreenUpdateBehaviourType
@@ -167,13 +167,6 @@ interface WidgetInternalProperties {
 
 export class SpineWebComponentWidget extends HTMLElement implements Disposable, WidgetAttributes, WidgetOverridableMethods, WidgetInternalProperties, Partial<WidgetPublicProperties> {
 
-	public worldX = 0;
-	public worldY = 0;
-	public cursorWorldX = 1;
-	public cursorWorldY = 1;
-	public jsonSkeletonKey?: string;
-	public onViewportManualStart = false;
-
 	// this promise in necessary only for manual start. Before calling manual start is necessary that the overlay has been assigned to the widget.
 	// overlay assignment is asynchronous due to webcomponent promotion and dom load termination.
 	// When manual start is false, loadSkeleton is invoked after the overlay is assigned. loadSkeleton needs the assetManager that is owned by the overlay.
@@ -205,6 +198,12 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 	 * Connected to `skeleton` attribute.
 	 */
 	public skeletonPath?: string;
+
+	/**
+	 * The name of the skeleton when the skeleton file is a JSON and contains multiple skeletons.
+	 * Connected to `json-skeleton-key` attribute.
+	 */
+	public jsonSkeletonKey?: string;
 
 	/**
 	 * The scale passed to the Skeleton Loader. SkeletonData values will be scaled accordingly.
@@ -411,6 +410,30 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 	public isDraggable = false;
 
 	/**
+	 * The x of the root relative to the canvas/webgl context center in spine world coordinates.
+	 * This is an experimental property and might be removed in the future.
+	 */
+	public worldX = 0;
+
+	/**
+	 * The y of the root relative to the canvas/webgl context center in spine world coordinates.
+	 * This is an experimental property and might be removed in the future.
+	 */
+	public worldY = 0;
+
+	/**
+	 * The x coordinate of the cursor relative to the cursor relative to the skeleton root in spine world coordinates.
+	 * This is an experimental property and might be removed in the future.
+	 */
+	public cursorWorldX = 1;
+
+	/**
+	 * The x coordinate of the cursor relative to the cursor relative to the skeleton root in spine world coordinates.
+	 * This is an experimental property and might be removed in the future.
+	 */
+	public cursorWorldY = 1;
+
+	/**
 	 * If true, some convenience elements are drawn to show the skeleton world origin (green),
 	 * the root (red), and the bounds rectangle (blue)
 	 * Connected to `debug` attribute.
@@ -429,6 +452,14 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 	 * Connected to `manual-start` attribute.
 	 */
 	public manualStart = false;
+
+	/**
+	 * If true and manualStart is true, allows the default {@link onScreenFunction} to invoke the {@link start} method.
+	 * This is useful when you want to load the assets only when the widget is revealed.
+	 * By default, is false implying the start method to be invoked manually.
+	 * Connected to `on-screen-manual-start` attribute.
+	 */
+	public onScreenManualStart = false;
 
 	/**
 	 * An array of indexes indicating the atlas pages indexes to be loaded.
@@ -488,7 +519,7 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 		if (widget.loading && !widget.onScreenAtLeastOnce) {
 			widget.onScreenAtLeastOnce = true;
 
-			if (widget.manualStart && widget.onViewportManualStart) {
+			if (widget.manualStart && widget.onScreenManualStart) {
 				widget.start();
 			}
 		}
@@ -631,7 +662,7 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 		identifier: { propertyName: "identifier", type: "string" },
 		debug: { propertyName: "debug", type: "boolean" },
 		"manual-start": { propertyName: "manualStart", type: "boolean" },
-		"on-viewport-manual-start": { propertyName: "onViewportManualStart", type: "boolean" },
+		"on-screen-manual-start": { propertyName: "onScreenManualStart", type: "boolean" },
 		spinner: { propertyName: "loadingSpinner", type: "boolean" },
 		clip: { propertyName: "clip", type: "boolean" },
 		pages: { propertyName: "pages", type: "string-number" },
@@ -703,6 +734,9 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 		this.debugDragDiv?.remove();
 	}
 
+	/**
+	 * Remove the widget from the overlay and the DOM.
+	 */
 	dispose () {
 		this.remove();
 		this.loadingScreen?.dispose();
@@ -938,6 +972,7 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 interface OverlayAttributes {
 	overlayId?: string
 	scrollable: boolean
+	scrollableTweakOff: boolean
 	overflowTop: number
 	overflowBottom: number
 	overflowLeft: number
@@ -946,8 +981,12 @@ interface OverlayAttributes {
 
 class SpineWebComponentOverlay extends HTMLElement implements OverlayAttributes, Disposable {
 
-	public static OVERLAY_ID = "spine-overlay-default-identifier";
-	public static OVERLAY_LIST = new Map<string, SpineWebComponentOverlay>();
+	private static OVERLAY_ID = "spine-overlay-default-identifier";
+	private static OVERLAY_LIST = new Map<string, SpineWebComponentOverlay>();
+
+	/**
+	 * @internal
+	 */
 	static getOrCreateOverlay(overlayId: string | null): SpineWebComponentOverlay {
 		let overlay = SpineWebComponentOverlay.OVERLAY_LIST.get(overlayId || SpineWebComponentOverlay.OVERLAY_ID);
 		if (!overlay) {
@@ -958,13 +997,84 @@ class SpineWebComponentOverlay extends HTMLElement implements OverlayAttributes,
 		return overlay;
 	}
 
+	/**
+	 * A list holding the widgets added to this overlay.
+	 */
 	public skeletonList = new Array<SpineWebComponentWidget>();
+
+	/**
+	 * A reference to the {@link SceneRenderer} used by this overlay.
+	 */
 	public renderer: SceneRenderer;
+
+	/**
+	 * A reference to the {@link AssetManager} used by this overlay.
+	 */
 	public assetManager: AssetManager;
 
-	private root: ShadowRoot;
+	/**
+	 * The identifier of this overlay. This is necessary when multiply overlay are created.
+ 	 * Connected to `overlay-id` attribute.
+	 */
 	public overlayId?: string;
+
+	/**
+	 * If true, the overlay will have the size of the element container in contrast to the default behaviour where the
+	 * overlay has always the size of the screen.
+	 * This is necessary when the overlay is inserted into a container that scroll in a different way with respect to the page.
+	 * Otherwise the following problems might occur:
+	 * 1) For scrollable containers, the widget will be slightly slower to scroll than the html behind. The effect is more evident for lower refresh rate display.
+	 * 2) For scrollable containers, the widget will overflow the container bounds until the widget html element container is visible
+	 * 3) For fixed containers, the widget will scroll in a jerky way
+	 *
+	 * In order to fix this behaviour, it is necessary to insert a dedicated `spine-overlay` webcomponent as a direct child of the container.
+     * Moreover, it is necessary to perform the following actions:
+	 * 1) The scrollable container must have a `transform`css attribute. If it hasn't this attribute the `spine-overlay` will add it for you.
+     * If your scrollable container has already this css attribute, or if you prefer to add it by yourself (example: `transform: translateZ(0);`), set the `scrollable-tweak-off` to the `spine-overlay`.
+     * 2) The `spine-overlay` must have the `scrollable`attribute
+     * 3) The `spine-overlay` must have an `overlay-id` attribute. Choose the value you prefer.
+     * 4) Each `spine-widget` must have an `overlay-id` attribute. The same as the hosting `spine-overlay`.
+ 	 * Connected to `scrollable` attribute.
+	 */
 	public scrollable = false;
+
+	/**
+	 * If `false` (default value), the overlay container style will be affected adding `transform: translateZ(0);` to it.
+	 * The `transform` is not affected if it already exists on the container.
+	 * This is necessary to make the scrolling works with containers that scroll in a different way with respect to the page, as explained in {@link scrollable}.
+	 * Connected to `scrollable-tweak-off` attribute.
+	 */
+	public scrollableTweakOff = false;
+
+	/**
+	 * How many pixels to add to the top of the canvas to prevent "edge cutting" on fast scrolling, in canvas height units.
+	 * By default, the canvas is big as the screen resolution. Making it too big might reduce performance.
+	 * Connected to `overflow-top` attribute.
+	 */
+	public overflowTop = .2;
+
+	/**
+	 * How many pixels to add to the bottom of the canvas to prevent "edge cutting" on fast scrolling, in canvas height units.
+	 * By default, the canvas is big as the screen resolution. Making it too big might reduce performance.
+	 * Connected to `overflow-bottom` attribute.
+	 */
+	public overflowBottom = .0;
+
+	/**
+	 * How many pixels to add to the left of the canvas to prevent "edge cutting" on fast scrolling, in canvas width units.
+	 * By default, the canvas is big as the screen resolution. Making it too big might reduce performance.
+	 * Connected to `overflow-left` attribute.
+	 */
+	public overflowLeft = .0;
+
+	/**
+	 * How many pixels to add to the right of the canvas to prevent "edge cutting" on fast scrolling, in canvas width units.
+	 * By default, the canvas is big as the screen resolution. Making it too big might reduce performance.
+	 * Connected to `overflow-right` attribute.
+	 */
+	public overflowRight = .0;
+
+	private root: ShadowRoot;
 
 	private div: HTMLDivElement;
 	private canvas: HTMLCanvasElement;
@@ -975,13 +1085,6 @@ class SpineWebComponentOverlay extends HTMLElement implements OverlayAttributes,
 	private resizeObserver?:ResizeObserver;
 	private input?: Input;
 
-	// how many pixels to add to the edges to prevent "edge cutting" on fast scrolling
-	// be aware that the canvas is already big as the display size
-	// making it bigger might reduce performance significantly
-	public overflowTop = .2;
-	public overflowBottom = .2;
-	public overflowLeft = .0;
-	public overflowRight = .0;
 	private overflowLeftSize = 0;
 	private overflowTopSize = 0;
 
@@ -1068,7 +1171,7 @@ class SpineWebComponentOverlay extends HTMLElement implements OverlayAttributes,
 		this.resizeObserver = new ResizeObserver(this.resizeCallback);
 		if (this.scrollable) {
 			const style = getComputedStyle(this.parentElement!);
-			if (style.transform === "none") {
+			if (style.transform === "none" && !this.scrollableTweakOff) {
 				this.parentElement!.style.transform = `translateZ(0)`;
 			}
 			this.resizeObserver.observe(this.parentElement!);
@@ -1100,6 +1203,7 @@ class SpineWebComponentOverlay extends HTMLElement implements OverlayAttributes,
 	static attributesDescription: Record<string, { propertyName: keyof OverlayAttributes, type: AttributeTypes, defaultValue?: any }> = {
 		"overlay-id": { propertyName: "overlayId", type: "string" },
 		"scrollable": { propertyName: "scrollable", type: "boolean" },
+		"scrollable-tweak-off": { propertyName: "scrollableTweakOff", type: "boolean" },
 		"overflow-top": { propertyName: "overflowTop", type: "number" },
 		"overflow-bottom": { propertyName: "overflowBottom", type: "number" },
 		"overflow-left": { propertyName: "overflowLeft", type: "number" },
@@ -1144,8 +1248,12 @@ class SpineWebComponentOverlay extends HTMLElement implements OverlayAttributes,
 		this.loaded = true;
 	}
 
+	/**
+	 * Remove the overlay from the DOM, dispose all the contained widgets, and dispose the renderer.
+	 */
 	dispose (): void {
 		this.remove();
+		this.skeletonList.forEach(widget => widget.dispose());
 		this.skeletonList.length = 0;
 		this.renderer.dispose();
 		this.disposed = true;
@@ -1154,7 +1262,7 @@ class SpineWebComponentOverlay extends HTMLElement implements OverlayAttributes,
 	addWidget (widget: SpineWebComponentWidget) {
 		this.skeletonList.push(widget);
 		this.intersectionObserver?.observe(widget.getHTMLElementReference());
-		if (this.loaded) {
+		if (this.loaded && (this.compareDocumentPosition(widget) & Node.DOCUMENT_POSITION_FOLLOWING)) {
 			this.parentElement!.appendChild(this);
 		}
 	}
