@@ -177,7 +177,7 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 	// - remove appendTo that is just to avoid the user to use the overlayAssignedPromise when the widget is created using js
 	public overlayAssignedPromise: Promise<void>;
 
-	public async appendTo(element: HTMLElement): Promise<void> {
+	public async appendTo (element: HTMLElement): Promise<void> {
 		element.appendChild(this);
 		await this.overlayAssignedPromise;
 	}
@@ -327,10 +327,10 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 	 * The x of the bounds in Spine world coordinates
 	 * Connected to `bound-x` attribute.
 	 */
-	get boundsX(): number {
+	get boundsX (): number {
 		return this.bounds.x;
 	}
-	set boundsX(value: number) {
+	set boundsX (value: number) {
 		this.bounds.x = value;
 	}
 
@@ -338,10 +338,10 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 	 * The y of the bounds in Spine world coordinates
 	 * Connected to `bound-y` attribute.
 	 */
-	get boundsY(): number {
+	get boundsY (): number {
 		return this.bounds.y;
 	}
-	set boundsY(value: number) {
+	set boundsY (value: number) {
 		this.bounds.y = value;
 	}
 
@@ -349,10 +349,10 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 	 * The width of the bounds in Spine world coordinates
 	 * Connected to `bound-width` attribute.
 	 */
-	get boundsWidth(): number {
+	get boundsWidth (): number {
 		return this.bounds.width;
 	}
-	set boundsWidth(value: number) {
+	set boundsWidth (value: number) {
 		this.bounds.width = value;
 		if (value <= 0) this.initWidget(true);
 	}
@@ -361,10 +361,10 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 	 * The height of the bounds in Spine world coordinates
 	 * Connected to `bound-height` attribute.
 	 */
-	get boundsHeight(): number {
+	get boundsHeight (): number {
 		return this.bounds.height;
 	}
-	set boundsHeight(value: number) {
+	set boundsHeight (value: number) {
 		this.bounds.height = value;
 		if (value <= 0) this.initWidget(true);
 	}
@@ -710,7 +710,7 @@ export class SpineWebComponentWidget extends HTMLElement implements Disposable, 
 		this.render();
 	}
 
-	private initAfterConnect() {
+	private initAfterConnect () {
 		this.overlay.addWidget(this);
 		if (!this.manualStart && !this.started) {
 			this.start();
@@ -987,7 +987,7 @@ class SpineWebComponentOverlay extends HTMLElement implements OverlayAttributes,
 	/**
 	 * @internal
 	 */
-	static getOrCreateOverlay(overlayId: string | null): SpineWebComponentOverlay {
+	static getOrCreateOverlay (overlayId: string | null): SpineWebComponentOverlay {
 		let overlay = SpineWebComponentOverlay.OVERLAY_LIST.get(overlayId || SpineWebComponentOverlay.OVERLAY_ID);
 		if (!overlay) {
 			overlay = document.createElement('spine-overlay') as SpineWebComponentOverlay;
@@ -1014,7 +1014,7 @@ class SpineWebComponentOverlay extends HTMLElement implements OverlayAttributes,
 
 	/**
 	 * The identifier of this overlay. This is necessary when multiply overlay are created.
- 	 * Connected to `overlay-id` attribute.
+	   * Connected to `overlay-id` attribute.
 	 */
 	public overlayId?: string;
 
@@ -1028,13 +1028,13 @@ class SpineWebComponentOverlay extends HTMLElement implements OverlayAttributes,
 	 * 3) For fixed containers, the widget will scroll in a jerky way
 	 *
 	 * In order to fix this behaviour, it is necessary to insert a dedicated `spine-overlay` webcomponent as a direct child of the container.
-     * Moreover, it is necessary to perform the following actions:
+	 * Moreover, it is necessary to perform the following actions:
 	 * 1) The scrollable container must have a `transform`css attribute. If it hasn't this attribute the `spine-overlay` will add it for you.
-     * If your scrollable container has already this css attribute, or if you prefer to add it by yourself (example: `transform: translateZ(0);`), set the `scrollable-tweak-off` to the `spine-overlay`.
-     * 2) The `spine-overlay` must have the `scrollable`attribute
-     * 3) The `spine-overlay` must have an `overlay-id` attribute. Choose the value you prefer.
-     * 4) Each `spine-widget` must have an `overlay-id` attribute. The same as the hosting `spine-overlay`.
- 	 * Connected to `scrollable` attribute.
+	 * If your scrollable container has already this css attribute, or if you prefer to add it by yourself (example: `transform: translateZ(0);`), set the `scrollable-tweak-off` to the `spine-overlay`.
+	 * 2) The `spine-overlay` must have the `scrollable`attribute
+	 * 3) The `spine-overlay` must have an `overlay-id` attribute. Choose the value you prefer.
+	 * 4) Each `spine-widget` must have an `overlay-id` attribute. The same as the hosting `spine-overlay`.
+	   * Connected to `scrollable` attribute.
 	 */
 	public scrollable = false;
 
@@ -1082,7 +1082,7 @@ class SpineWebComponentOverlay extends HTMLElement implements OverlayAttributes,
 	private fpsAppended = false;
 
 	private intersectionObserver?: IntersectionObserver;
-	private resizeObserver?:ResizeObserver;
+	private resizeObserver?: ResizeObserver;
 	private input?: Input;
 
 	private overflowLeftSize = 0;

@@ -2032,7 +2032,6 @@ stretchyman.update = (canvas, delta, skeleton, state) => {
                     <spine-overlay
                         overlay-id="popup"
                         scrollable
-                        scrollable-tweak-off
                     ></spine-overlay>
                     <spine-widget
                         atlas="../demos/assets/atlas2.atlas"
@@ -2090,7 +2089,7 @@ stretchyman.update = (canvas, delta, skeleton, state) => {
                 </div>
             </div>
 
-            <div class="split-left" style="overflow-y: auto; width: 100px; height: 200px;">
+            <div class="split-left" style="overflow-y: auto; width: 100px; height: 200px; transform: translateZ(0);">
                 <spine-overlay
                     overlay-id="scroll"
                     scrollable
