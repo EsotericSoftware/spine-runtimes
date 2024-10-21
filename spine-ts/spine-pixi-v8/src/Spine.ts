@@ -383,7 +383,7 @@ export class Spine extends ViewContainer {
 					}
 
 					fastCopy((attachment.uvs as Float32Array).buffer, cacheData.uvs.buffer);
-				
+
 					const skeleton = slot.bone.skeleton;
 					const skeletonColor = skeleton.color;
 					const slotColor = slot.color;
@@ -523,6 +523,8 @@ export class Spine extends ViewContainer {
 			container.scale.y = bone.getWorldScaleY();
 
 			container.rotation = bone.getWorldRotationX() * DEG_TO_RAD;
+
+			container.alpha = this.skeleton.color.a * slot.color.a;
 		}
 	}
 
