@@ -29,7 +29,7 @@
 
 import { AttachmentCacheData, Spine } from './Spine';
 
-import type { Batch, Batcher, BLEND_MODES, DefaultBatchableMeshElement, Matrix, Texture } from 'pixi.js';
+import type { Batch, Batcher, BLEND_MODES, DefaultBatchableMeshElement, Matrix, Texture, Topology } from 'pixi.js';
 
 export class BatchableSpineSlot implements DefaultBatchableMeshElement {
 	indexOffset = 0;
@@ -39,6 +39,8 @@ export class BatchableSpineSlot implements DefaultBatchableMeshElement {
 	attributeSize!: number;
 
 	batcherName = 'darkTint';
+
+	topology:Topology = 'triangle-list';
 
 	readonly packAsQuad = false;
 
