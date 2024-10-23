@@ -186,10 +186,10 @@ elif [ "$platform" = "android" ]; then
 			./gradlew generateGodotTemplates
 		popd
 	else
-		scons platform=android target=template_release arch=arm32 --jobs=$cpus
-		scons platform=android target=template_release arch=arm64 generate_apk=yes --jobs=$cpus
-		scons platform=android target=template_debug arch=arm32 --jobs=$cpus
-		scons platform=android target=template_debug arch=arm64 generate_apk=yes --jobs=$cpus
+		scons platform=android target=template_release arch=arm32 custom_modules="../spine_godot" --jobs=$cpus
+		scons platform=android target=template_release arch=arm64 custom_modules="../spine_godot" generate_apk=yes --jobs=$cpus
+		scons platform=android target=template_debug arch=arm32 custom_modules="../spine_godot" --jobs=$cpus
+		scons platform=android target=template_debug arch=arm64 custom_modules="../spine_godot" generate_apk=yes --jobs=$cpus
 	fi
 else
 	echo "Unknown platform: $platform"
