@@ -33,7 +33,7 @@ if [ "$mono" != "true" ] && [ "$mono" != "false" ]; then
     exit 1
 fi
 
-godot_cpp_branch=$(echo $godot_branch | cut -d- -f1)
+godot_cpp_branch=$(echo $godot_branch | cut -d. -f1-2)
 
 cpus=2
 if [ "$OSTYPE" == "msys" ]; then

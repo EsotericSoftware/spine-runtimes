@@ -21,6 +21,8 @@ branch=${1%/}
 dev=${2%/}
 mono=false
 repo=https://github.com/godotengine/godot.git
+version=$(echo $branch | cut -d. -f1-2)
+echo $version > version.txt
 
 if [[ $# -eq 3 && "$branch" != 3* ]]; then
 	mono=${3%/}

@@ -26,6 +26,9 @@ fi
 
 platform=${1%/}
 mono=false
+version=$(cat version.txt)
+major=$(echo $version | cut -d. -f1)
+minor=$(echo $version | cut -d. -f2)
 
 if [[ $# -eq 2 ]]; then
 	mono=${2%/}
@@ -171,15 +174,23 @@ elif [ "$platform" = "web" ]; then
 elif [ "$platform" = "android" ]; then
 	# --- ANROID ---
 	# generates android_release.apk, android_debug.apk, android_source.zip
-	scons platform=android target=template_release android_arch=armv7 custom_modules="../spine_godot" --jobs=$cpus
-	scons platform=android target=template_debug android_arch=armv7 custom_modules="../spine_godot" --jobs=$cpus
-	scons platform=android target=template_release android_arch=arm64v8 custom_modules="../spine_godot" --jobs=$cpus
-	scons platform=android target=template_debug android_arch=arm64v8 custom_modules="../spine_godot" --jobs=$cpus
+	if [[ $major -lt 4 || ($major -eq 4 && $minor -lt 3) ]]; then
+		# Godot < 4.3 generates APKs via Gradle invocation.
+		scons platform=android target=template_release arch=arm32 custom_modules="../spine_godot" --jobs=$cpus
+		scons platform=android target=template_debug arch=arm32 custom_modules="../spine_godot" --jobs=$cpus
+		scons platform=android target=template_release arch=arm64 custom_modules="../spine_godot" --jobs=$cpus
+		scons platform=android target=template_debug arch=arm64 custom_modules="../spine_godot" --jobs=$cpus
 
-	pushd platform/android/java
-		chmod a+x gradlew
-		./gradlew generateGodotTemplates
-	popd
+		pushd platform/android/java
+			chmod a+x gradlew
+			./gradlew generateGodotTemplates
+		popd
+	else
+		scons platform=android target=template_release arch=arm32 --jobs=$cpus
+		scons platform=android target=template_release arch=arm64 generate_apk=yes --jobs=$cpus
+		scons platform=android target=template_debug arch=arm32 --jobs=$cpus
+		scons platform=android target=template_debug arch=arm64 generate_apk=yes --jobs=$cpus
+	fi
 else
 	echo "Unknown platform: $platform"
 	exit 1
