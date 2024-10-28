@@ -69,6 +69,7 @@ export type SpineFromOptions = {
 	skeleton: string;
 	atlas: string;
 	scale?: number;
+	darkTint?: boolean;
 };
 
 const vectorAux = new Vector2();
@@ -82,6 +83,7 @@ const clipper = new SkeletonClipping();
 export interface SpineOptions extends ContainerOptions {
 	skeletonData: SkeletonData;
 	autoUpdate?: boolean;
+	darkTint?: boolean;
 }
 
 export interface SpineEvents {
@@ -100,7 +102,7 @@ export interface AttachmentCacheData {
 	uvs: Float32Array;
 	indices: number[];
 	color: Color;
-	darkColor: Color | null;
+	darkColor: Color;
 	darkTint: boolean;
 	skipRender: boolean;
 	texture: Texture;
@@ -115,6 +117,7 @@ export interface AttachmentCacheData {
 
 export class Spine extends ViewContainer {
 	// Pixi properties
+	public darkTint = false;
 	public batched = true;
 	public buildId = 0;
 	public override readonly renderPipeId = 'spine';
@@ -199,6 +202,11 @@ export class Spine extends ViewContainer {
 		this.state = new AnimationState(new AnimationStateData(skeletonData));
 		this.autoUpdate = options?.autoUpdate ?? true;
 
+		// dark tint can be enabled by options, otherwise is enable if at least one slot has tint black
+		this.darkTint = options?.darkTint === undefined
+			? this.skeleton.slots.some(slot => !!slot.data.darkColor)
+			: options?.darkTint;
+
 		const slots = this.skeleton.slots;
 
 		for (let i = 0; i < slots.length; i++) {
@@ -210,10 +218,7 @@ export class Spine extends ViewContainer {
 
 	public update (dt: number): void {
 		if (this.autoUpdate && !this.autoUpdateWarned) {
-			console.warn(
-				// eslint-disable-next-line max-len
-				'You are calling update on a Spine instance that has autoUpdate set to true. This is probably not what you want.',
-			);
+			console.warn('You are calling update on a Spine instance that has autoUpdate set to true. This is probably not what you want.');
 			this.autoUpdateWarned = true;
 		}
 
@@ -397,10 +402,8 @@ export class Spine extends ViewContainer {
 						skeletonColor.a * slotColor.a * attachmentColor.a,
 					);
 
-					cacheData.darkTint = !!slot.darkColor;
-
 					if (slot.darkColor) {
-						cacheData.darkColor!.setFromColor(slot.darkColor);
+						cacheData.darkColor.setFromColor(slot.darkColor);
 					}
 
 					cacheData.skipRender = cacheData.clipped = false;
@@ -436,12 +439,13 @@ export class Spine extends ViewContainer {
 			cacheData.uvs,
 			lightColor,
 			darkColor,
-			cacheData.darkTint,
+			this.darkTint,
 		);
 
 		const { clippedVertices, clippedTriangles } = clipper;
 
-		const verticesCount = clippedVertices.length / 8;
+		const vertexSize = this.darkTint ? 12 : 8;
+		const verticesCount = clippedVertices.length / vertexSize;
 		const indicesCount = clippedTriangles.length;
 
 		if (!cacheData.clippedData) {
@@ -479,11 +483,11 @@ export class Spine extends ViewContainer {
 		const { vertices, uvs, indices } = clippedData;
 
 		for (let i = 0; i < verticesCount; i++) {
-			vertices[i * 2] = clippedVertices[i * 8];
-			vertices[(i * 2) + 1] = clippedVertices[(i * 8) + 1];
+			vertices[i * 2] = clippedVertices[i * vertexSize];
+			vertices[(i * 2) + 1] = clippedVertices[(i * vertexSize) + 1];
 
-			uvs[i * 2] = clippedVertices[(i * 8) + 6];
-			uvs[(i * 2) + 1] = clippedVertices[(i * 8) + 7];
+			uvs[i * 2] = clippedVertices[(i * vertexSize) + 6];
+			uvs[(i * 2) + 1] = clippedVertices[(i * vertexSize) + 7];
 		}
 
 		clippedData.vertexCount = verticesCount;
@@ -547,7 +551,7 @@ export class Spine extends ViewContainer {
 				uvs: new Float32Array(attachment.uvs.length),
 				color: new Color(1, 1, 1, 1),
 				darkColor: new Color(0, 0, 0, 0),
-				darkTint: false,
+				darkTint: this.darkTint,
 				skipRender: false,
 				texture: attachment.region?.texture.texture,
 			};
@@ -563,7 +567,7 @@ export class Spine extends ViewContainer {
 				uvs: new Float32Array(attachment.uvs.length),
 				color: new Color(1, 1, 1, 1),
 				darkColor: new Color(0, 0, 0, 0),
-				darkTint: false,
+				darkTint: this.darkTint,
 				skipRender: false,
 				texture: attachment.region?.texture.texture,
 			};
@@ -748,7 +752,7 @@ export class Spine extends ViewContainer {
 		}
 	}
 
-	static from ({ skeleton, atlas, scale = 1 }: SpineFromOptions) {
+	static from ({ skeleton, atlas, scale = 1, darkTint }: SpineFromOptions) {
 		const cacheKey = `${skeleton}-${atlas}-${scale}`;
 
 		if (Cache.has(cacheKey)) {
@@ -773,6 +777,7 @@ export class Spine extends ViewContainer {
 
 		return new Spine({
 			skeletonData,
+			darkTint,
 		});
 	}
 }

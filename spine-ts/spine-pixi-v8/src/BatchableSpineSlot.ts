@@ -96,8 +96,7 @@ export class BatchableSpineSlot implements DefaultBatchableMeshElement {
 	}
 
 	get darkColor () {
-		const darkColor = this.data.darkColor!;
-
+		const darkColor = this.data.darkColor;
 		return ((darkColor.b * 255) << 16) | ((darkColor.g * 255) << 8) | (darkColor.r * 255);
 	}
 
