@@ -432,20 +432,16 @@ export class Spine extends ViewContainer {
 	private updateClippingData (cacheData: AttachmentCacheData) {
 		cacheData.clipped = true;
 
-		clipper.clipTriangles(
+		clipper.clipTrianglesUnpacked(
 			cacheData.vertices,
 			cacheData.indices,
 			cacheData.indices.length,
 			cacheData.uvs,
-			lightColor,
-			darkColor,
-			this.darkTint,
 		);
 
-		const { clippedVertices, clippedTriangles } = clipper;
+		const { clippedVertices, clippedUVs, clippedTriangles } = clipper;
 
-		const vertexSize = this.darkTint ? 12 : 8;
-		const verticesCount = clippedVertices.length / vertexSize;
+		const verticesCount = clippedVertices.length / 2;
 		const indicesCount = clippedTriangles.length;
 
 		if (!cacheData.clippedData) {
@@ -483,11 +479,11 @@ export class Spine extends ViewContainer {
 		const { vertices, uvs, indices } = clippedData;
 
 		for (let i = 0; i < verticesCount; i++) {
-			vertices[i * 2] = clippedVertices[i * vertexSize];
-			vertices[(i * 2) + 1] = clippedVertices[(i * vertexSize) + 1];
+			vertices[i * 2] = clippedVertices[i * 2];
+			vertices[(i * 2) + 1] = clippedVertices[(i * 2) + 1];
 
-			uvs[i * 2] = clippedVertices[(i * vertexSize) + 6];
-			uvs[(i * 2) + 1] = clippedVertices[(i * vertexSize) + 7];
+			uvs[i * 2] = clippedUVs[(i * 2)];
+			uvs[(i * 2) + 1] = clippedUVs[(i * 2) + 1];
 		}
 
 		clippedData.vertexCount = verticesCount;
