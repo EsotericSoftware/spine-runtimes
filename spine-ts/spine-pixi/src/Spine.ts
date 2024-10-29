@@ -27,7 +27,7 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import type { BlendMode, Bone, Event, NumberArrayLike, SkeletonData, Slot, TextureAtlas, TrackEntry } from "@esotericsoftware/spine-core";
+import type { BlendMode, Bone, Event, NumberArrayLike, Slot, TextureAtlas, TrackEntry } from "@esotericsoftware/spine-core";
 import {
 	AnimationState,
 	AnimationStateData,
@@ -41,6 +41,7 @@ import {
 	Skeleton,
 	SkeletonBinary,
 	SkeletonClipping,
+	SkeletonData,
 	SkeletonJson,
 	Utils,
 	Vector2,
@@ -57,6 +58,7 @@ import { Container } from "@pixi/display";
 import { Graphics } from "@pixi/graphics";
 
 /**
+ * @deprecated Use SpineFromOptions and SpineOptions.
  * Options to configure a {@link Spine} game object.
  */
 export interface ISpineOptions {
@@ -65,11 +67,47 @@ export interface ISpineOptions {
 	/**  The value passed to the skeleton reader. If omitted, 1 is passed. See {@link SkeletonBinary.scale} for details. */
 	scale?: number;
 	/**
+	 * @deprecated Use darkTint option instead.
 	 * A factory to override the default ones to render Spine meshes ({@link DarkSlotMesh} or {@link SlotMesh}).
 	 * If omitted, a factory returning a ({@link DarkSlotMesh} or {@link SlotMesh}) will be used depending on the presence of
 	 * a dark tint mesh in the skeleton.
 	 * */
 	slotMeshFactory?: () => ISlotMesh;
+}
+
+/**
+ * Options to create a {@link Spine} using {@link Spine.from}.
+ */
+export interface SpineFromOptions {
+	/** the asset name for the skeleton `.skel` or `.json` file previously loaded into the Assets */
+	skeleton: string;
+
+	/** the asset name for the atlas file previously loaded into the Assets */
+	atlas: string;
+
+	/**  The value passed to the skeleton reader. If omitted, 1 is passed. See {@link SkeletonBinary.scale} for details. */
+	scale?: number;
+
+	/**  Set the {@link Spine.autoUpdate} value. If omitted, it is set to `true`. */
+	autoUpdate?: boolean;
+
+	/**
+	 * If `true`, use the dark tint renderer to render the skeleton
+	 * If `false`, use the default pixi renderer to render the skeleton
+	 * If `undefined`, use the dark tint renderer if at least one slot has tint black
+	 */
+	darkTint?: boolean;
+};
+
+export interface SpineOptions {
+	/** the {@link SkeletonData} used to instantiate the skeleton */
+	skeletonData: SkeletonData;
+
+	/**  See {@link SpineFromOptions.autoUpdate}. */
+	autoUpdate?: boolean;
+
+	/**  See {@link SpineFromOptions.darkTint}. */
+	darkTint?: boolean;
 }
 
 /**
@@ -93,6 +131,8 @@ export class Spine extends Container {
 	public skeleton: Skeleton;
 	/** The animation state for this Spine game object. */
 	public state: AnimationState;
+
+	private darkTint = false;
 
 	private _debug?: ISpineDebugRenderer | undefined = undefined;
 	public get debug (): ISpineDebugRenderer | undefined {
@@ -145,25 +185,53 @@ export class Spine extends Container {
 	private darkColor = new Color();
 	private clippingVertAux = new Float32Array(6);
 
-	constructor (skeletonData: SkeletonData, options?: ISpineOptions) {
+	constructor (options: SpineOptions | SkeletonData, oldOptions?: ISpineOptions) {
+		if (options instanceof SkeletonData) {
+			options = {
+				...oldOptions,
+				skeletonData: options,
+			};
+		} else if (oldOptions) {
+			throw new Error("You cannot use options and oldOptions together.");
+		}
+
 		super();
+
+		const skeletonData = options instanceof SkeletonData ? options : options.skeletonData;
 
 		this.skeleton = new Skeleton(skeletonData);
 		const animData = new AnimationStateData(skeletonData);
 		this.state = new AnimationState(animData);
+
+		// dark tint can be enabled by options, otherwise is enable if at least one slot has tint black
+		if (options?.darkTint !== undefined || oldOptions?.slotMeshFactory === undefined) {
+			this.darkTint = options?.darkTint === undefined
+				? this.skeleton.slots.some(slot => !!slot.data.darkColor)
+				: options?.darkTint;
+			if (this.darkTint) this.slotMeshFactory = () => new DarkSlotMesh();
+		} else {
+			this.initializeMeshFactory(oldOptions?.slotMeshFactory);
+		}
+
 		this.autoUpdate = options?.autoUpdate ?? true;
-		this.initializeMeshFactory(options);
 		this.skeleton.setToSetupPose();
 		this.skeleton.updateWorldTransform(Physics.update);
 	}
 
-	private initializeMeshFactory (options?: ISpineOptions) {
-		if (options?.slotMeshFactory) {
-			this.slotMeshFactory = options?.slotMeshFactory;
+	/*
+	* Remove when slotMeshFactory options is removed
+	*/
+	private initializeMeshFactory<T extends () => ISlotMesh> (slotMeshFactory?: T) {
+		if (slotMeshFactory) {
+			this.slotMeshFactory = slotMeshFactory;
+			const tempSlotMeshFactory = this.slotMeshFactory();
+			if (tempSlotMeshFactory instanceof DarkSlotMesh) this.darkTint = true;
+			tempSlotMeshFactory.destroy();
 		} else {
 			for (let i = 0; i < this.skeleton.slots.length; i++) {
 				if (this.skeleton.slots[i].data.darkColor) {
-					this.slotMeshFactory = options?.slotMeshFactory ?? (() => new DarkSlotMesh());
+					this.slotMeshFactory = () => new DarkSlotMesh();
+					this.darkTint = true;
 					break;
 				}
 			}
@@ -588,7 +656,28 @@ export class Spine extends Container {
 	/** A cache containing skeleton data and atlases already loaded by {@link Spine.from}. */
 	public static readonly skeletonCache: Record<string, SkeletonData> = Object.create(null);
 
+	public static aaa() {
+		// Spine.from({})
+	};
+
 	/**
+	 * Use this method to instantiate a Spine game object.
+	 * Before instantiating a Spine game object, the skeleton (`.skel` or `.json`) and the atlas text files must be loaded into the Assets. For example:
+	 * ```
+	 * PIXI.Assets.add("sackData", "./assets/sack-pro.skel");
+	 * PIXI.Assets.add("sackAtlas", "./assets/sack-pma.atlas");
+	 * await PIXI.Assets.load(["sackData", "sackAtlas"]);
+	 * ```
+	 * Once a Spine game object is created, its skeleton data is cached into {@link Spine.skeletonCache} using the key:
+	 * `${skeletonAssetName}-${atlasAssetName}-${options?.scale ?? 1}`
+	 *
+	 * @param options - Options to configure the Spine game object
+	 * @returns {Spine} The Spine game object instantiated
+	 */
+    public static from(options: SpineFromOptions): Spine;
+
+	/**
+	 * @deprecated use the `from(options: SpineFromOptions)` version.
 	 * Use this method to instantiate a Spine game object.
 	 * Before instantiating a Spine game object, the skeleton (`.skel` or `.json`) and the atlas text files must be loaded into the Assets. For example:
 	 * ```
@@ -604,7 +693,34 @@ export class Spine extends Container {
 	 * @param options - Options to configure the Spine game object
 	 * @returns {Spine} The Spine game object instantiated
 	 */
-	public static from (skeletonAssetName: string, atlasAssetName: string, options?: ISpineOptions): Spine {
+	public static from(skeletonAssetName: string, atlasAssetName: string, options?: ISpineOptions): Spine;
+	public static from (
+		paramOne: string | SpineFromOptions,
+        atlasAssetName?: string,
+        options?: ISpineOptions)
+	: Spine {
+		if (typeof paramOne === "string") {
+			return Spine.oldFrom(paramOne, atlasAssetName!, options);
+		}
+
+		const { skeleton, atlas, scale = 1, darkTint, autoUpdate } = paramOne;
+		const cacheKey = `${skeleton}-${atlas}-${scale}`;
+		let skeletonData = Spine.skeletonCache[cacheKey];
+		if (skeletonData) {
+			return new Spine({ skeletonData, darkTint, autoUpdate });
+		}
+		const skeletonAsset = Assets.get<any | Uint8Array>(skeleton);
+		const atlasAsset = Assets.get<TextureAtlas>(atlas);
+		const attachmentLoader = new AtlasAttachmentLoader(atlasAsset);
+		let parser = skeletonAsset instanceof Uint8Array ? new SkeletonBinary(attachmentLoader) : new SkeletonJson(attachmentLoader);
+		parser.scale = scale;
+		skeletonData = parser.readSkeletonData(skeletonAsset);
+		Spine.skeletonCache[cacheKey] = skeletonData;
+		return new Spine({ skeletonData, darkTint, autoUpdate });
+	}
+
+
+	private static oldFrom (skeletonAssetName: string, atlasAssetName: string, options?: ISpineOptions): Spine {
 		const cacheKey = `${skeletonAssetName}-${atlasAssetName}-${options?.scale ?? 1}`;
 		let skeletonData = Spine.skeletonCache[cacheKey];
 		if (skeletonData) {

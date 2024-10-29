@@ -117,7 +117,6 @@ export interface AttachmentCacheData {
 
 export class Spine extends ViewContainer {
 	// Pixi properties
-	public darkTint = false;
 	public batched = true;
 	public buildId = 0;
 	public override readonly renderPipeId = 'spine';
@@ -130,6 +129,7 @@ export class Spine extends ViewContainer {
 	public skeleton: Skeleton;
 	public state: AnimationState;
 	public skeletonBounds?: SkeletonBounds;
+	private darkTint = false;
 	private _debug?: ISpineDebugRenderer | undefined = undefined;
 
 	readonly _slotsObject: Record<string, { slot: Slot, container: Container } | null> = Object.create(null);
@@ -765,7 +765,6 @@ export class Spine extends ViewContainer {
 				? new SkeletonBinary(attachmentLoader)
 				: new SkeletonJson(attachmentLoader);
 
-		// TODO scale?
 		parser.scale = scale;
 		const skeletonData = parser.readSkeletonData(skeletonAsset);
 
