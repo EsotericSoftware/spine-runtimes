@@ -73,8 +73,6 @@ export type SpineFromOptions = {
 };
 
 const vectorAux = new Vector2();
-const lightColor = new Color();
-const darkColor = new Color();
 
 Skeleton.yDown = true;
 
@@ -488,8 +486,11 @@ export class Spine extends ViewContainer {
 
 		clippedData.vertexCount = verticesCount;
 
-		for (let i = 0; i < indices.length; i++) {
-			indices[i] = clippedTriangles[i];
+		for (let i = 0; i < indicesCount; i++) {
+			if (indices[i] !== clippedTriangles[i]) {
+				this.spineAttachmentsDirty = true;
+				indices[i] = clippedTriangles[i];
+			}
 		}
 
 		clippedData.indicesCount = indicesCount;
