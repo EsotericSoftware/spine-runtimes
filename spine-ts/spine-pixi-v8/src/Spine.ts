@@ -36,6 +36,7 @@ import {
 	DEG_TO_RAD,
 	DestroyOptions,
 	fastCopy,
+	Graphics,
 	PointData,
 	Texture,
 	Ticker,
@@ -113,6 +114,13 @@ export interface AttachmentCacheData {
 	};
 }
 
+interface SlotsToClipping {
+	slot: Slot,
+	mask?: Graphics,
+	maskComputed?: boolean,
+	vertices: Array<number>,
+};
+
 export class Spine extends ViewContainer {
 	// Pixi properties
 	public batched = true;
@@ -131,6 +139,7 @@ export class Spine extends ViewContainer {
 	private _debug?: ISpineDebugRenderer | undefined = undefined;
 
 	readonly _slotsObject: Record<string, { slot: Slot, container: Container } | null> = Object.create(null);
+	private clippingSlotToPixiMasks: Record<string, SlotsToClipping> = Object.create(null);
 
 	private getSlotFromRef (slotRef: number | string | Slot): Slot {
 		let slot: Slot | null;
@@ -359,11 +368,71 @@ export class Spine extends ViewContainer {
 		this.spineAttachmentsDirty = spineAttachmentsDirty;
 	}
 
+	private updateAndSetPixiMask (slot: Slot, last: boolean) {
+		// assign/create the currentClippingSlot
+		const attachment = slot.attachment;
+		if (attachment && attachment instanceof ClippingAttachment) {
+			const clip = (this.clippingSlotToPixiMasks[slot.data.name] ||= { slot, vertices: new Array<number>() });
+			clip.maskComputed = false;
+			this.currentClippingSlot = this.clippingSlotToPixiMasks[slot.data.name];
+			return;
+		}
+
+		// assign the currentClippingSlot mask to the slot object
+		let currentClippingSlot = this.currentClippingSlot;
+		let slotObject = this._slotsObject[slot.data.name];
+		if (currentClippingSlot && slotObject) {
+			let slotClipping = currentClippingSlot.slot;
+			let clippingAttachment = slotClipping.attachment as ClippingAttachment;
+
+			// create the pixi mask, only the first time and if the clipped slot is the first one clipped by this currentClippingSlot
+			let mask = currentClippingSlot.mask as Graphics;
+			if (!mask) {
+				mask = new Graphics();
+				currentClippingSlot.mask = mask;
+				this.addChild(mask);
+			}
+
+			// compute the pixi mask polygon, if the clipped slot is the first one clipped by this currentClippingSlot
+			if (!currentClippingSlot.maskComputed) {
+				currentClippingSlot.maskComputed = true;
+				const worldVerticesLength = clippingAttachment.worldVerticesLength;
+				const vertices = currentClippingSlot.vertices;
+				clippingAttachment.computeWorldVertices(slotClipping, 0, worldVerticesLength, vertices, 0, 2);
+				mask.clear().poly(vertices).stroke({ width: 0 }).fill({ alpha: .25 });
+			}
+			slotObject.container.mask = mask;
+		} else if (slotObject?.container.mask) {
+			// remove the mask, if slot object has a mask, but currentClippingSlot is undefined
+			slotObject.container.mask = null;
+		}
+
+		// if current slot is the ending one of the currentClippingSlot mask, set currentClippingSlot to undefined
+		if (currentClippingSlot && (currentClippingSlot.slot.attachment as ClippingAttachment).endSlot == slot.data) {
+			this.currentClippingSlot = undefined;
+		}
+
+		// clean up unused masks
+		if (last) {
+			for (const key in this.clippingSlotToPixiMasks) {
+				const clippingSlotToPixiMask = this.clippingSlotToPixiMasks[key];
+				if ((!(clippingSlotToPixiMask.slot.attachment instanceof ClippingAttachment) || !clippingSlotToPixiMask.maskComputed) && clippingSlotToPixiMask.mask) {
+					this.removeChild(clippingSlotToPixiMask.mask);
+					clippingSlotToPixiMask.mask.destroy();
+					clippingSlotToPixiMask.mask = undefined;
+				}
+			}
+		}
+	}
+
+	private currentClippingSlot: SlotsToClipping | undefined;
 	private transformAttachments () {
 		const currentDrawOrder = this.skeleton.drawOrder;
 
 		for (let i = 0; i < currentDrawOrder.length; i++) {
 			const slot = currentDrawOrder[i];
+
+			this.updateAndSetPixiMask(slot, i === currentDrawOrder.length - 1);
 
 			const attachment = slot.getAttachment();
 

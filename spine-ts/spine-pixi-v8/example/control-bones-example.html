@@ -84,7 +84,6 @@
           control.y = point.y;
           controlBones.push({ bone, control });
           app.stage.addChild(control);
-          console.log(control.x, control.y);
 
           control.interactive = "static";
           control.on('pointerdown', ({ x, y }) => {
