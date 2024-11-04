@@ -66,9 +66,10 @@ import {
 	Vector2,
 } from '@esotericsoftware/spine-core';
 
-export type SpineFromOptions = {
+export interface SpineFromOptions {
 	skeleton: string;
 	atlas: string;
+	autoUpdate?: boolean;
 	scale?: number;
 	darkTint?: boolean;
 };
@@ -818,7 +819,7 @@ export class Spine extends ViewContainer {
 		}
 	}
 
-	static from ({ skeleton, atlas, scale = 1, darkTint }: SpineFromOptions) {
+	static from ({ skeleton, atlas, scale = 1, darkTint, autoUpdate = true }: SpineFromOptions) {
 		const cacheKey = `${skeleton}-${atlas}-${scale}`;
 
 		if (Cache.has(cacheKey)) {
@@ -843,6 +844,7 @@ export class Spine extends ViewContainer {
 		return new Spine({
 			skeletonData,
 			darkTint,
+			autoUpdate,
 		});
 	}
 }
