@@ -28,8 +28,8 @@
         await PIXI.Assets.load(["girlData", "girlAtlas"]);
 
         // Create the spine display object
-        const girl = spine.Spine.from("girlData", "girlAtlas", {
-          scale: 0.20,
+        const girl = spine.Spine.from({skeleton: "girlData", atlas: "girlAtlas",
+          scale: 0.2,
         });
 
         // Center the spine object on screen.

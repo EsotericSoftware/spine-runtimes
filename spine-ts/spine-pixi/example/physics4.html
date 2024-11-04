@@ -28,7 +28,7 @@
         await PIXI.Assets.load(["cloudPotData", "cloudPotAtlas"]);
 
         // Create the spine display object
-        const cloudPot = spine.Spine.from("cloudPotData", "cloudPotAtlas", {
+        const cloudPot = spine.Spine.from({skeleton: "cloudPotData", atlas: "cloudPotAtlas",
           scale: 0.25,
         });
 

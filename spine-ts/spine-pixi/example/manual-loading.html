@@ -37,7 +37,7 @@
         const skeletonData = binaryLoader.readSkeletonData(
           PIXI.Assets.get("spineboyData")
         );
-        const spineboy = new spine.Spine(skeletonData);
+        const spineboy = new spine.Spine({ skeletonData });
 
         // Set the default mix time to use when transitioning
         // from one animation to the next.

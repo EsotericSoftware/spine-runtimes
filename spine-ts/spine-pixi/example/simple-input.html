@@ -28,11 +28,11 @@
         await PIXI.Assets.load(["spineboyData", "spineboyAtlas"]);
 
         // Create the spine display object
-        const spineboy = spine.Spine.from("spineboyData", "spineboyAtlas", {
+        const spineboy = spine.Spine.from({skeleton: "spineboyData", atlas: "spineboyAtlas",
           scale: 0.5,
         });
 
-        // Set the default animation and the 
+        // Set the default animation and the
         // default mix for transitioning between animations.
         spineboy.state.setAnimation(0, "hoverboard", true);
         spineboy.state.data.defaultMix = 0.2;
@@ -45,15 +45,15 @@
         // Handle the case that you click/tap the screen.
         spineboy.eventMode = 'static';
         spineboy.on('pointerdown', onClick);
-        
+
         // Add the display object to the stage.
         app.stage.addChild(spineboy);
-        
+
         // Add variables for movement, speed.
         let moveLeft = false;
         let moveRight = false;
         const speed = 5;
-        
+
         // Handle the case that the keyboard keys specified below are pressed.
         function onKeyDown(key) {
           if (key.code === "ArrowLeft" || key.code === "KeyA") {
@@ -78,7 +78,7 @@
         function onClick() {
           spineboy.state.setAnimation(1, "shoot", false, 0);
         }
-        
+
         // Add event listeners so that the window will correctly handle input.
         window.addEventListener("keydown", onKeyDown);
         window.addEventListener("keyup", onKeyUp);
@@ -92,7 +92,7 @@
             spineboy.x += speed;
           }
         });
-        
+
       })();
     </script>
   </body>

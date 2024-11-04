@@ -11,7 +11,7 @@
     <body>
         <script>
             (async function () {
-                    var app = new PIXI.Application({
+                var app = new PIXI.Application({
                     width: window.innerWidth,
                     height: window.innerHeight,
                     resolution: window.devicePixelRatio || 1,
@@ -28,7 +28,7 @@
                 await PIXI.Assets.load(["spineboyData", "spineboyAtlas"]);
 
                 // Create the spine display object
-                const spineboy = spine.Spine.from("spineboyData", "spineboyAtlas", {
+                const spineboy = spine.Spine.from({skeleton: "spineboyData", atlas: "spineboyAtlas",
                     scale: 0.5,
                 });
 

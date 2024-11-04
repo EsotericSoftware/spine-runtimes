@@ -28,7 +28,7 @@
         await PIXI.Assets.load(["snowglobeData", "snowglobeAtlas"]);
 
         // Create the spine display object
-        const snowglobe = spine.Spine.from("snowglobeData", "snowglobeAtlas", {
+        const snowglobe = spine.Spine.from({skeleton: "snowglobeData", atlas: "snowglobeAtlas",
           scale: 0.25,
         });
 

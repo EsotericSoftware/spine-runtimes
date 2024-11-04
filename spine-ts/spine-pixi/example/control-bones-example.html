@@ -45,9 +45,9 @@
         await PIXI.Assets.load(["stretchymanData", "stretchymanAtlas"]);
 
         // Create the spine display object
-        const stretchyman = spine.Spine.from("stretchymanData", "stretchymanAtlas", { 
+        const stretchyman = spine.Spine.from({skeleton: "stretchymanData", atlas: "stretchymanAtlas",
           scale: 0.75,
-         });
+        });
 
         // Set the default mix time to use when transitioning
         // from one animation to the next.
