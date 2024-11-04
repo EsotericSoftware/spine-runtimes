@@ -219,7 +219,7 @@ export class Spine extends Container {
 	}
 
 	/*
-	* Remove when slotMeshFactory options is removed
+	* @deprecated Remove when slotMeshFactory options is removed
 	*/
 	private initializeMeshFactory<T extends () => ISlotMesh> (slotMeshFactory?: T) {
 		if (slotMeshFactory) {
@@ -667,7 +667,7 @@ export class Spine extends Container {
 	 * Once a Spine game object is created, its skeleton data is cached into {@link Spine.skeletonCache} using the key:
 	 * `${skeletonAssetName}-${atlasAssetName}-${options?.scale ?? 1}`
 	 *
-	 * @param options - Options to configure the Spine game object
+	 * @param options - Options to configure the Spine game object. See {@link SpineFromOptions}
 	 * @returns {Spine} The Spine game object instantiated
 	 */
     public static from(options: SpineFromOptions): Spine;

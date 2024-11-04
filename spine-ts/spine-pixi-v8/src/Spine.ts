@@ -66,11 +66,27 @@ import {
 	Vector2,
 } from '@esotericsoftware/spine-core';
 
+/**
+ * Options to create a {@link Spine} using {@link Spine.from}.
+ */
 export interface SpineFromOptions {
+	/** the asset name for the skeleton `.skel` or `.json` file previously loaded into the Assets */
 	skeleton: string;
+
+	/** the asset name for the atlas file previously loaded into the Assets */
 	atlas: string;
-	autoUpdate?: boolean;
+
+	/**  The value passed to the skeleton reader. If omitted, 1 is passed. See {@link SkeletonBinary.scale} for details. */
 	scale?: number;
+
+	/**  Set the {@link Spine.autoUpdate} value. If omitted, it is set to `true`. */
+	autoUpdate?: boolean;
+
+	/**
+	 * If `true`, use the dark tint renderer to render the skeleton
+	 * If `false`, use the default pixi renderer to render the skeleton
+	 * If `undefined`, use the dark tint renderer if at least one slot has tint black
+	 */
 	darkTint?: boolean;
 };
 
@@ -81,11 +97,19 @@ Skeleton.yDown = true;
 const clipper = new SkeletonClipping();
 
 export interface SpineOptions extends ContainerOptions {
+	/** the {@link SkeletonData} used to instantiate the skeleton */
 	skeletonData: SkeletonData;
+
+	/**  See {@link SpineFromOptions.autoUpdate}. */
 	autoUpdate?: boolean;
+
+	/**  See {@link SpineFromOptions.darkTint}. */
 	darkTint?: boolean;
 }
 
+/**
+ * AnimationStateListener {@link https://en.esotericsoftware.com/spine-api-reference#AnimationStateListener events} exposed for Pixi.
+ */
 export interface SpineEvents {
 	complete: [trackEntry: TrackEntry];
 	dispose: [trackEntry: TrackEntry];
@@ -122,6 +146,10 @@ interface SlotsToClipping {
 	vertices: Array<number>,
 };
 
+/**
+ * The class to instantiate a {@link Spine} game object in Pixi.
+ * The static method {@link Spine.from} should be used to instantiate a Spine game object.
+ */
 export class Spine extends ViewContainer {
 	// Pixi properties
 	public batched = true;
@@ -133,9 +161,12 @@ export class Spine extends ViewContainer {
 	public afterUpdateWorldTransforms: (object: Spine) => void = () => { /** */ };
 
 	// Spine properties
+	/** The skeleton for this Spine game object. */
 	public skeleton: Skeleton;
+	/** The animation state for this Spine game object. */
 	public state: AnimationState;
 	public skeletonBounds?: SkeletonBounds;
+
 	private darkTint = false;
 	private _debug?: ISpineDebugRenderer | undefined = undefined;
 
@@ -166,6 +197,9 @@ export class Spine extends ViewContainer {
 		return this._debug;
 	}
 
+	/** Pass a {@link SpineDebugRenderer} or create your own {@link ISpineDebugRenderer} to render bones, meshes, ...
+	 * @example spineGO.debug = new SpineDebugRenderer();
+	 */
 	public set debug (value: ISpineDebugRenderer | undefined) {
 		if (this._debug) {
 			this._debug.unregisterSpine(this);
@@ -182,7 +216,7 @@ export class Spine extends ViewContainer {
 	public get autoUpdate (): boolean {
 		return this._autoUpdate;
 	}
-
+	/** When `true`, the Spine AnimationState and the Skeleton will be automatically updated using the {@link Ticker.shared} instance. */
 	public set autoUpdate (value: boolean) {
 		if (value) {
 			Ticker.shared.add(this.internalUpdate, this);
@@ -224,6 +258,7 @@ export class Spine extends ViewContainer {
 		this._updateState(0);
 	}
 
+	/** If {@link Spine.autoUpdate} is `false`, this method allows to update the AnimationState and the Skeleton with the given delta. */
 	public update (dt: number): void {
 		if (this.autoUpdate && !this.autoUpdateWarned) {
 			console.warn('You are calling update on a Spine instance that has autoUpdate set to true. This is probably not what you want.');
@@ -247,6 +282,12 @@ export class Spine extends ViewContainer {
 		return this._bounds;
 	}
 
+	/**
+	 * Set the position of the bone given in input through a {@link IPointData}.
+	 * @param bone: the bone name or the bone instance to set the position
+	 * @param outPos: the new position of the bone.
+	 * @throws {Error}: if the given bone is not found in the skeleton, an error is thrown
+	 */
 	public setBonePosition (bone: string | Bone, position: PointData): void {
 		const boneAux = bone;
 
@@ -269,6 +310,12 @@ export class Spine extends ViewContainer {
 		}
 	}
 
+	/**
+	 * Return the position of the bone given in input into an {@link IPointData}.
+	 * @param bone: the bone name or the bone instance to get the position from
+	 * @param outPos: an optional {@link IPointData} to use to return the bone position, rathern than instantiating a new object.
+	 * @returns {IPointData | undefined}: the position of the bone, or undefined if no matching bone is found in the skeleton
+	 */
 	public getBonePosition (bone: string | Bone, outPos?: PointData): PointData | undefined {
 		const boneAux = bone;
 
@@ -819,6 +866,20 @@ export class Spine extends ViewContainer {
 		}
 	}
 
+	/**
+	 * Use this method to instantiate a Spine game object.
+	 * Before instantiating a Spine game object, the skeleton (`.skel` or `.json`) and the atlas text files must be loaded into the Assets. For example:
+	 * ```
+	 * PIXI.Assets.add("sackData", "./assets/sack-pro.skel");
+	 * PIXI.Assets.add("sackAtlas", "./assets/sack-pma.atlas");
+	 * await PIXI.Assets.load(["sackData", "sackAtlas"]);
+	 * ```
+	 * Once a Spine game object is created, its skeleton data is cached into {@link Cache} using the key:
+	 * `${skeletonAssetName}-${atlasAssetName}-${options?.scale ?? 1}`
+	 *
+	 * @param options - Options to configure the Spine game object. See {@link SpineFromOptions}
+	 * @returns {Spine} The Spine game object instantiated
+	 */
 	static from ({ skeleton, atlas, scale = 1, darkTint, autoUpdate = true }: SpineFromOptions) {
 		const cacheKey = `${skeleton}-${atlas}-${scale}`;
 
@@ -830,11 +891,9 @@ export class Spine extends ViewContainer {
 
 		const atlasAsset = Assets.get<TextureAtlas>(atlas);
 		const attachmentLoader = new AtlasAttachmentLoader(atlasAsset);
-		// eslint-disable-next-line max-len
-		const parser
-			= skeletonAsset instanceof Uint8Array
-				? new SkeletonBinary(attachmentLoader)
-				: new SkeletonJson(attachmentLoader);
+		const parser = skeletonAsset instanceof Uint8Array
+			? new SkeletonBinary(attachmentLoader)
+			: new SkeletonJson(attachmentLoader);
 
 		parser.scale = scale;
 		const skeletonData = parser.readSkeletonData(skeletonAsset);
