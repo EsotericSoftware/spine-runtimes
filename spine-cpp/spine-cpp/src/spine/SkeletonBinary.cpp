@@ -608,8 +608,8 @@ Attachment *SkeletonBinary::readAttachment(DataInput *input, Skin *skin, int slo
 				setError("Error reading attachment: ", name.buffer());
 				return NULL;
 			}
-			readVertices(input, box->getVertices(), box->getBones(), (flags & 16) != 0);
-			box->setWorldVerticesLength(box->getVertices().size());
+			int verticesLength = readVertices(input, box->getVertices(), box->getBones(), (flags & 16) != 0);
+			box->setWorldVerticesLength(verticesLength);
 			if (nonessential) {
 				readColor(input, box->getColor());
 			}
