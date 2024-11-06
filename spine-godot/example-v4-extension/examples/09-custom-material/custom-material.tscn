@@ -1,0 +1,45 @@
+[gd_scene load_steps=6 format=3 uid="uid://b4p2vn7bwm52a"]
+
+[ext_resource type="SpineSkeletonDataResource" uid="uid://cb6rn6vonqbx0" path="res://assets/spineboy/spineboy-data-res.tres" id="1"]
+
+[sub_resource type="Shader" id="1"]
+code = "shader_type canvas_item;
+
+void fragment() {
+	COLOR = texture(TEXTURE, UV);
+	COLOR.r = 0.0;
+}"
+
+[sub_resource type="ShaderMaterial" id="2"]
+shader = SubResource("1")
+
+[sub_resource type="Shader" id="3"]
+code = "shader_type canvas_item;
+
+void fragment() {
+	COLOR = texture(TEXTURE, UV);
+	COLOR.b = 0.0;
+}"
+
+[sub_resource type="ShaderMaterial" id="4"]
+shader = SubResource("3")
+
+[node name="Node2D" type="Node2D"]
+
+[node name="SpineSprite" type="SpineSprite" parent="."]
+position = Vector2(501, 507)
+scale = Vector2(0.546374, 0.546373)
+skeleton_data_res = ExtResource("1")
+normal_material = SubResource("2")
+preview_skin = "Default"
+preview_animation = "-- Empty --"
+preview_frame = false
+preview_time = 0.0
+
+[node name="GunSlot" type="SpineSlotNode" parent="SpineSprite"]
+show_behind_parent = true
+position = Vector2(40.8753, -276.036)
+rotation = 0.837234
+scale = Vector2(1, 1)
+slot_name = "gun"
+normal_material = SubResource("4")

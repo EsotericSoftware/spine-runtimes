@@ -104,6 +104,8 @@ SPINE_OPAQUE_TYPE(spine_vector)
 SPINE_OPAQUE_TYPE(spine_skeleton_drawable)
 SPINE_OPAQUE_TYPE(spine_skin_entry)
 SPINE_OPAQUE_TYPE(spine_skin_entries)
+SPINE_OPAQUE_TYPE(spine_skeleton_bounds)
+SPINE_OPAQUE_TYPE(spine_polygon)
 
 // @end: opaque_types
 
@@ -263,7 +265,7 @@ SPINE_CPP_LITE_EXPORT void spine_skeleton_data_set_width(spine_skeleton_data dat
 SPINE_CPP_LITE_EXPORT float spine_skeleton_data_get_height(spine_skeleton_data data);
 SPINE_CPP_LITE_EXPORT void spine_skeleton_data_set_height(spine_skeleton_data data, float height);
 SPINE_CPP_LITE_EXPORT const utf8 *spine_skeleton_data_get_version(spine_skeleton_data data);
-// OMITTED setVersion() 
+// OMITTED setVersion()
 // @ignore
 SPINE_CPP_LITE_EXPORT const utf8 *spine_skeleton_data_get_hash(spine_skeleton_data data);
 // OMITTED setHash()
@@ -1046,6 +1048,28 @@ SPINE_CPP_LITE_EXPORT int32_t spine_texture_region_get_original_width(spine_text
 SPINE_CPP_LITE_EXPORT void spine_texture_region_set_original_width(spine_texture_region textureRegion, int32_t originalWidth);
 SPINE_CPP_LITE_EXPORT int32_t spine_texture_region_get_original_height(spine_texture_region textureRegion);
 SPINE_CPP_LITE_EXPORT void spine_texture_region_set_original_height(spine_texture_region textureRegion, int32_t originalHeight);
+
+SPINE_CPP_LITE_EXPORT spine_skeleton_bounds spine_skeleton_bounds_create();
+SPINE_CPP_LITE_EXPORT void spine_skeleton_bounds_dispose(spine_skeleton_bounds bounds);
+SPINE_CPP_LITE_EXPORT void spine_skeleton_bounds_update(spine_skeleton_bounds bounds, spine_skeleton skeleton, spine_bool updateAabb);
+SPINE_CPP_LITE_EXPORT spine_bool spine_skeleton_bounds_aabb_contains_point(spine_skeleton_bounds bounds, float x, float y);
+SPINE_CPP_LITE_EXPORT spine_bool spine_skeleton_bounds_aabb_intersects_segment(spine_skeleton_bounds bounds, float x1, float y1, float x2, float y2);
+SPINE_CPP_LITE_EXPORT spine_bool spine_skeleton_bounds_aabb_intersects_skeleton(spine_skeleton_bounds bounds, spine_skeleton_bounds otherBounds);
+SPINE_CPP_LITE_EXPORT spine_bool spine_skeleton_bounds_contains_point(spine_skeleton_bounds bounds, spine_polygon polygon, float x, float y);
+SPINE_CPP_LITE_EXPORT spine_bounding_box_attachment spine_skeleton_bounds_contains_point_attachment(spine_skeleton_bounds bounds, float x, float y);
+SPINE_CPP_LITE_EXPORT spine_bounding_box_attachment spine_skeleton_bounds_intersects_segment_attachment(spine_skeleton_bounds bounds, float x1, float y1, float x2, float y2);
+SPINE_CPP_LITE_EXPORT spine_bool spine_skeleton_bounds_intersects_segment(spine_skeleton_bounds bounds, spine_polygon polygon, float x1, float y1, float x2, float y2);
+SPINE_CPP_LITE_EXPORT spine_polygon spine_skeleton_bounds_get_polygon(spine_skeleton_bounds bounds, spine_bounding_box_attachment attachment);
+SPINE_CPP_LITE_EXPORT spine_bounding_box_attachment spine_skeleton_bounds_get_bounding_box(spine_skeleton_bounds bounds, spine_polygon polygon);
+SPINE_CPP_LITE_EXPORT int32_t spine_skeleton_bounds_get_num_polygons(spine_skeleton_bounds bounds);
+SPINE_CPP_LITE_EXPORT spine_polygon *spine_skeleton_bounds_get_polygons(spine_skeleton_bounds bounds);
+SPINE_CPP_LITE_EXPORT int32_t spine_skeleton_bounds_get_num_bounding_boxes(spine_skeleton_bounds bounds);
+SPINE_CPP_LITE_EXPORT spine_bounding_box_attachment *spine_skeleton_bounds_get_bounding_boxes(spine_skeleton_bounds bounds);
+SPINE_CPP_LITE_EXPORT float spine_skeleton_bounds_get_width(spine_skeleton_bounds bounds);
+SPINE_CPP_LITE_EXPORT float spine_skeleton_bounds_get_height(spine_skeleton_bounds bounds);
+
+SPINE_CPP_LITE_EXPORT int32_t spine_polygon_get_num_vertices(spine_polygon polygon);
+SPINE_CPP_LITE_EXPORT float *spine_polygon_get_vertices(spine_polygon polygon);
 
 // @end: function_declarations
 

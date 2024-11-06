@@ -9,6 +9,12 @@
 	<tutorials>
 	</tutorials>
 	<methods>
+		<method name="load_from_file">
+			<return type="int" enum="Error" />
+			<argument index="0" name="path" type="String" />
+			<description>
+			</description>
+		</method>
 	</methods>
 	<constants>
 	</constants>

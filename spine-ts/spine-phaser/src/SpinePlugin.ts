@@ -206,10 +206,12 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 			atlas = new TextureAtlas(atlasFile.data);
 			if (this.isWebGL) {
 				let gl = this.gl!;
-				if (GLTexture.DISABLE_UNPACK_PREMULTIPLIED_ALPHA_WEBGL) gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+				const phaserUnpackPmaValue = gl.getParameter(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL);
+				if (phaserUnpackPmaValue) gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
 				for (let atlasPage of atlas.pages) {
 					atlasPage.setTexture(new GLTexture(gl, this.game.textures.get(atlasKey + "!" + atlasPage.name).getSourceImage() as HTMLImageElement | ImageBitmap, false));
 				}
+				if (phaserUnpackPmaValue) gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
 			} else {
 				for (let atlasPage of atlas.pages) {
 					atlasPage.setTexture(new CanvasTexture(this.game.textures.get(atlasKey + "!" + atlasPage.name).getSourceImage() as HTMLImageElement | ImageBitmap));
@@ -313,12 +315,12 @@ interface SpineAtlasFileConfig {
 }
 
 class SpineAtlasFile extends Phaser.Loader.MultiFile {
-	constructor (loader: Phaser.Loader.LoaderPlugin, key: string | SpineAtlasFileConfig, url?: string, public premultipliedAlpha: boolean = true, xhrSettings?: Phaser.Types.Loader.XHRSettingsObject) {
+	constructor (loader: Phaser.Loader.LoaderPlugin, key: string | SpineAtlasFileConfig, url?: string, public premultipliedAlpha?: boolean, xhrSettings?: Phaser.Types.Loader.XHRSettingsObject) {
 		if (typeof key !== "string") {
 			const config = key;
 			key = config.key;
 			url = config.url;
-			premultipliedAlpha = config.premultipliedAlpha ?? true;
+			premultipliedAlpha = config.premultipliedAlpha;
 			xhrSettings = config.xhrSettings;
 		}
 
@@ -372,9 +374,10 @@ class SpineAtlasFile extends Phaser.Loader.MultiFile {
 						textureManager.addImage(file.key, file.data);
 					}
 				} else {
+					this.premultipliedAlpha = this.premultipliedAlpha ?? (file.data.indexOf("pma: true") >= 0 || file.data.indexOf("pma:true") >= 0);
 					file.data = {
 						data: file.data,
-						premultipliedAlpha: this.premultipliedAlpha || file.data.indexOf("pma: true") >= 0 || file.data.indexOf("pma:true") >= 0
+						premultipliedAlpha: this.premultipliedAlpha,
 					};
 					file.addToCache();
 				}

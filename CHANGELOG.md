@@ -344,6 +344,7 @@
   - `VertexEffect` has been removed.
 
 ### Cocos2d-x
+- Renamed `SkeletonRenderer` to `SkeletonRendererCocos2dX` to avoid name clash with spine-cpp class.
 
 ### SFML
 

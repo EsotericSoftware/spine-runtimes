@@ -33,7 +33,7 @@
 #include "cocos2d.h"
 #include <spine/spine.h>
 
-#include <spine/SkeletonRenderer.h>
+#include <spine/SkeletonRendererCocos2dX.h>
 
 #if COCOS2D_VERSION < 0x00040000
 #include <spine/v3/SkeletonBatch.h>

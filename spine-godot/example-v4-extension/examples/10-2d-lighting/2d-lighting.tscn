@@ -1,0 +1,27 @@
+[gd_scene load_steps=4 format=3 uid="uid://rt2llskmx7xm"]
+
+[ext_resource type="SpineSkeletonDataResource" path="res://assets/raptor/raptor-data.tres" id="1"]
+[ext_resource type="Texture2D" uid="uid://cggfs567rn1ay" path="res://assets/raptor/light-sprite.png" id="2"]
+[ext_resource type="Script" path="res://examples/10-2d-lighting/2d-lighting.gd" id="3"]
+
+[node name="Node2D" type="Node2D"]
+script = ExtResource("3")
+
+[node name="SpineSprite" type="SpineSprite" parent="."]
+position = Vector2(576, 506)
+scale = Vector2(0.458967, 0.458967)
+skeleton_data_res = ExtResource("1")
+preview_skin = "Default"
+preview_animation = "-- Empty --"
+preview_frame = false
+preview_time = 0.0
+
+[node name="Light2D" type="PointLight2D" parent="."]
+position = Vector2(691, 283)
+scale = Vector2(1.51563, 1.51563)
+color = Color(1, 0.0117647, 0.0117647, 1)
+texture = ExtResource("2")
+height = 100.0
+
+[node name="CanvasModulate" type="CanvasModulate" parent="."]
+color = Color(0.223529, 0.160784, 0.160784, 1)

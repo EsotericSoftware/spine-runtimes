@@ -1,0 +1,14 @@
+[remap]
+
+importer="spine.skel"
+type="SpineSkeletonFileResource"
+uid="uid://dor8huwld4f84"
+path="res://.godot/imported/raptor-pro.skel-022e23a5f5581547a2d7faa9fb2c54e3.spskel"
+
+[deps]
+
+source_file="res://assets/raptor/raptor-pro.skel"
+dest_files=["res://.godot/imported/raptor-pro.skel-022e23a5f5581547a2d7faa9fb2c54e3.spskel"]
+
+[params]
+

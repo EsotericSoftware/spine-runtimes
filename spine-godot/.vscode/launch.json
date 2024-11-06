@@ -32,6 +32,23 @@
     {
       "type": "cppvsdbg",
       "request": "launch",
+      "name": "debug editor extension",
+      "program": "godot/bin/godot.windows.editor.dev.x86_64.exe",
+      "args": ["-e", "--path", "example-v4-extension"],
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "build-extension",
+      "linux": {
+        "type": "lldb",
+        "program": "${workspaceFolder}/godot/bin/godot.linux.editor.dev.x86_64"
+      },
+      "osx": {
+        "type": "lldb",
+        "program": "${workspaceFolder}/godot/bin/godot.macos.editor.dev.arm64"
+      }
+    },
+    {
+      "type": "cppvsdbg",
+      "request": "launch",
       "name": "debug editor v4",
       "program": "godot/bin/godot.windows.editor.dev.x86_64.exe",
       "args": ["-e", "--path", "example-v4"],

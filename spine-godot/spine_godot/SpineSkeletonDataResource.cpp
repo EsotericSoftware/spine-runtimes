@@ -29,7 +29,12 @@
 
 #include "SpineSkeletonDataResource.h"
 #include "SpineCommon.h"
-#include "core/io/marshalls.h"
+
+#ifdef SPINE_GODOT_EXTENSION
+#include <godot_cpp/classes/encoded_object_as_id.hpp>
+#else
+#include <core/io/marshalls.h>
+#endif
 
 void SpineAnimationMix::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_from", "from"),
@@ -101,6 +106,8 @@ void SpineSkeletonDataResource::_bind_methods() {
 			&SpineSkeletonDataResource::find_transform_constraint);
 	ClassDB::bind_method(D_METHOD("find_path_constraint_data", "constraint_name"),
 						 &SpineSkeletonDataResource::find_path_constraint);
+	ClassDB::bind_method(D_METHOD("find_physics_constraint_data", "constraint_name"),
+						 &SpineSkeletonDataResource::find_physics_constraint);
 	ClassDB::bind_method(D_METHOD("get_skeleton_name"),
 						 &SpineSkeletonDataResource::get_skeleton_name);
 	ClassDB::bind_method(D_METHOD("get_bones"),
@@ -123,6 +130,8 @@ void SpineSkeletonDataResource::_bind_methods() {
 						 &SpineSkeletonDataResource::get_transform_constraints);
 	ClassDB::bind_method(D_METHOD("get_path_constraints"),
 						 &SpineSkeletonDataResource::get_path_constraints);
+	ClassDB::bind_method(D_METHOD("get_physics_constraints"),
+						 &SpineSkeletonDataResource::get_physics_constraints);
 	ClassDB::bind_method(D_METHOD("get_x"), &SpineSkeletonDataResource::get_x);
 	ClassDB::bind_method(D_METHOD("get_y"), &SpineSkeletonDataResource::get_y);
 	ClassDB::bind_method(D_METHOD("get_width"),
@@ -198,9 +207,15 @@ void SpineSkeletonDataResource::update_skeleton_data() {
 #endif
 }
 
+#ifdef SPINE_GODOT_EXTENSION
+void SpineSkeletonDataResource::load_resources(spine::Atlas *atlas,
+											   const String &json,
+											   const PackedByteArray &binary) {
+#else
 void SpineSkeletonDataResource::load_resources(spine::Atlas *atlas,
 											   const String &json,
 											   const Vector<uint8_t> &binary) {
+#endif
 	if ((EMPTY(json) && EMPTY(binary)) || atlas == nullptr)
 		return;
 
@@ -284,8 +299,13 @@ SpineSkeletonDataResource::get_skeleton_file_res() {
 	return skeleton_file_res;
 }
 
+#ifdef SPINE_GODOT_EXTENSION
+void SpineSkeletonDataResource::get_animation_names(
+		PackedStringArray &animation_names) const {
+#else
 void SpineSkeletonDataResource::get_animation_names(
 		Vector<String> &animation_names) const {
+#endif
 	animation_names.clear();
 	if (!is_skeleton_data_loaded())
 		return;
@@ -296,8 +316,13 @@ void SpineSkeletonDataResource::get_animation_names(
 	}
 }
 
+#ifdef SPINE_GODOT_EXTENSION
+void SpineSkeletonDataResource::get_skin_names(
+		PackedStringArray &skin_names) const {
+#else
 void SpineSkeletonDataResource::get_skin_names(
 		Vector<String> &skin_names) const {
+#endif
 	skin_names.clear();
 	if (!is_skeleton_data_loaded())
 		return;
@@ -308,7 +333,11 @@ void SpineSkeletonDataResource::get_skin_names(
 	}
 }
 
+#ifdef SPINE_GODOT_EXTENSION
+void SpineSkeletonDataResource::get_slot_names(PackedStringArray &slot_names) {
+#else
 void SpineSkeletonDataResource::get_slot_names(Vector<String> &slot_names) {
+#endif
 	slot_names.clear();
 	if (!is_skeleton_data_loaded())
 		return;
@@ -319,7 +348,11 @@ void SpineSkeletonDataResource::get_slot_names(Vector<String> &slot_names) {
 	}
 }
 
+#ifdef SPINE_GODOT_EXTENSION
+void SpineSkeletonDataResource::get_bone_names(PackedStringArray &bone_names) {
+#else
 void SpineSkeletonDataResource::get_bone_names(Vector<String> &bone_names) {
+#endif
 	bone_names.clear();
 	if (!is_skeleton_data_loaded())
 		return;

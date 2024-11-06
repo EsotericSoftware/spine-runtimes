@@ -1721,6 +1721,104 @@ public final class AnimationState: NSObject {
 
 }
 
+@objc(SpineSkeletonBounds)
+@objcMembers
+public final class SkeletonBounds: NSObject {
+
+    internal let wrappee: spine_skeleton_bounds
+    internal var disposed = false
+
+    internal init(_ wrappee: spine_skeleton_bounds) {
+        self.wrappee = wrappee
+        super.init()
+    }
+
+    public var polygons: [Polygon] {
+        let num = Int(spine_skeleton_bounds_get_num_polygons(wrappee))
+        let ptr = spine_skeleton_bounds_get_polygons(wrappee)
+        return (0..<num).compactMap {
+            ptr?[$0].flatMap { .init($0) }
+        }
+    }
+
+    public var boundingBoxes: [BoundingBoxAttachment] {
+        let num = Int(spine_skeleton_bounds_get_num_bounding_boxes(wrappee))
+        let ptr = spine_skeleton_bounds_get_bounding_boxes(wrappee)
+        return (0..<num).compactMap {
+            ptr?[$0].flatMap { .init($0) }
+        }
+    }
+
+    public var width: Float {
+        return spine_skeleton_bounds_get_width(wrappee)
+    }
+
+    public var height: Float {
+        return spine_skeleton_bounds_get_height(wrappee)
+    }
+
+    @discardableResult
+    public func create() -> SkeletonBounds {
+        return .init(spine_skeleton_bounds_create())
+    }
+
+    public func dispose() {
+        if disposed { return }
+        disposed = true
+        spine_skeleton_bounds_dispose(wrappee)
+    }
+
+    public func update(skeleton: Skeleton, updateAabb: Bool) {
+        spine_skeleton_bounds_update(wrappee, skeleton.wrappee, updateAabb ? -1 : 0)
+    }
+
+    @discardableResult
+    public func aabbContainsPoint(x: Float, y: Float) -> Bool {
+        return spine_skeleton_bounds_aabb_contains_point(wrappee, x, y) != 0
+    }
+
+    @discardableResult
+    public func aabbIntersectsSegment(x1: Float, y1: Float, x2: Float, y2: Float) -> Bool {
+        return spine_skeleton_bounds_aabb_intersects_segment(wrappee, x1, y1, x2, y2) != 0
+    }
+
+    @discardableResult
+    public func aabbIntersectsSkeleton(otherBounds: SkeletonBounds) -> Bool {
+        return spine_skeleton_bounds_aabb_intersects_skeleton(wrappee, otherBounds.wrappee) != 0
+    }
+
+    @discardableResult
+    public func containsPoint(polygon: Polygon, x: Float, y: Float) -> Bool {
+        return spine_skeleton_bounds_contains_point(wrappee, polygon.wrappee, x, y) != 0
+    }
+
+    @discardableResult
+    public func containsPointAttachment(x: Float, y: Float) -> BoundingBoxAttachment {
+        return .init(spine_skeleton_bounds_contains_point_attachment(wrappee, x, y))
+    }
+
+    @discardableResult
+    public func intersectsSegmentAttachment(x1: Float, y1: Float, x2: Float, y2: Float) -> BoundingBoxAttachment {
+        return .init(spine_skeleton_bounds_intersects_segment_attachment(wrappee, x1, y1, x2, y2))
+    }
+
+    @discardableResult
+    public func intersectsSegment(polygon: Polygon, x1: Float, y1: Float, x2: Float, y2: Float) -> Bool {
+        return spine_skeleton_bounds_intersects_segment(wrappee, polygon.wrappee, x1, y1, x2, y2) != 0
+    }
+
+    @discardableResult
+    public func getPolygon(attachment: BoundingBoxAttachment) -> Polygon {
+        return .init(spine_skeleton_bounds_get_polygon(wrappee, attachment.wrappee))
+    }
+
+    @discardableResult
+    public func getBoundingBox(polygon: Polygon) -> BoundingBoxAttachment {
+        return .init(spine_skeleton_bounds_get_bounding_box(wrappee, polygon.wrappee))
+    }
+
+}
+
 @objc(SpineTextureRegion)
 @objcMembers
 public final class TextureRegion: NSObject {
@@ -3086,6 +3184,27 @@ public final class Sequence: NSObject {
     @discardableResult
     public func getPath(basePath: String?, index: Int32) -> String? {
         return spine_sequence_get_path(wrappee, basePath, index).flatMap { String(cString: $0) }
+    }
+
+}
+
+@objc(SpinePolygon)
+@objcMembers
+public final class Polygon: NSObject {
+
+    internal let wrappee: spine_polygon
+
+    internal init(_ wrappee: spine_polygon) {
+        self.wrappee = wrappee
+        super.init()
+    }
+
+    public var vertices: [Float?] {
+        let num = Int(spine_polygon_get_num_vertices(wrappee))
+        let ptr = spine_polygon_get_vertices(wrappee)
+        return (0..<num).compactMap {
+            ptr?[$0]
+        }
     }
 
 }

@@ -341,7 +341,7 @@ void spBone_localToWorld(spBone *self, float localX, float localY, float *worldX
 }
 
 void spBone_parentToWorld(spBone *self, float localX, float localY, float *worldX, float *worldY) {
-	if (self->parent != NULL) {
+	if (self->parent == NULL) {
 		*worldX = localX;
 		*worldY = localY;
 	} else {

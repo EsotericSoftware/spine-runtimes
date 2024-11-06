@@ -118,7 +118,7 @@ bool SkeletonBounds::aabbintersectsSegment(float x1, float y1, float x2, float y
 	return false;
 }
 
-bool SkeletonBounds::aabbIntersectsSkeleton(SkeletonBounds bounds) {
+bool SkeletonBounds::aabbIntersectsSkeleton(SkeletonBounds &bounds) {
 	return _minX < bounds._maxX && _maxX > bounds._minX && _minY < bounds._maxY && _maxY > bounds._minY;
 }
 

@@ -65,7 +65,7 @@ namespace spine {
 		bool aabbintersectsSegment(float x1, float y1, float x2, float y2);
 
 		/// Returns true if the axis aligned bounding box intersects the axis aligned bounding box of the specified bounds.
-		bool aabbIntersectsSkeleton(SkeletonBounds bounds);
+		bool aabbIntersectsSkeleton(SkeletonBounds &bounds);
 
 		/// Returns true if the polygon contains the point.
 		bool containsPoint(Polygon *polygon, float x, float y);

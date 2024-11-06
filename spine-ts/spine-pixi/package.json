@@ -1,7 +1,7 @@
 {
   "name": "@esotericsoftware/spine-pixi",
-  "version": "4.2.60",
-  "description": "The official Spine Runtimes for PixiJS v7.",
+  "version": "4.2.62",
+  "description": "The official Spine Runtimes for the web PixiJS v7.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
@@ -31,7 +31,7 @@
   },
   "homepage": "https://github.com/esotericsoftware/spine-runtimes#readme",
   "dependencies": {
-    "@esotericsoftware/spine-core": "4.2.60"
+    "@esotericsoftware/spine-core": "4.2.62"
   },
   "peerDependencies": {
     "@pixi/core": "^7.2.4",

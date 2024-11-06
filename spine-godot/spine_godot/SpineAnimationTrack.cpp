@@ -27,6 +27,8 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#ifndef SPINE_GODOT_EXTENSION
+
 #include "SpineAnimationTrack.h"
 #if VERSION_MAJOR > 3
 #include "core/config/engine.h"
@@ -37,7 +39,7 @@
 #include "scene/resources/animation.h"
 
 #ifdef TOOLS_ENABLED
-#include "godot/editor/editor_node.h"
+#include "editor/editor_node.h"
 #include "editor/plugins/animation_player_editor_plugin.h"
 #include "editor/plugins/animation_tree_editor_plugin.h"
 #endif
@@ -93,6 +95,7 @@ void SpineAnimationTrack::_bind_methods() {
 }
 
 SpineAnimationTrack::SpineAnimationTrack() : loop(false),
+											 animation_changed(false),
 											 track_index(-1),
 											 mix_duration(-1),
 											 hold_previous(false),
@@ -229,6 +232,9 @@ void SpineAnimationTrack::setup_animation_player() {
 	reset_animation_ref->add_track(Animation::TYPE_VALUE);
 	reset_animation_ref->track_set_path(1, NodePath(".:loop"));
 	reset_animation_ref->track_insert_key(1, 0, false);
+	reset_animation_ref->value_track_set_update_mode(0, Animation::UPDATE_DISCRETE);
+	reset_animation_ref->value_track_set_update_mode(1, Animation::UPDATE_DISCRETE);
+
 #if VERSION_MAJOR > 3
 	animation_library->add_animation(reset_animation_ref->get_name(), reset_animation_ref);
 	animation_library->add_animation("-- Empty --", reset_animation_ref);
@@ -259,6 +265,9 @@ Ref<Animation> SpineAnimationTrack::create_animation(spine::Animation *animation
 	animation_ref->add_track(Animation::TYPE_VALUE);
 	animation_ref->track_set_path(1, NodePath(".:loop"));
 	animation_ref->track_insert_key(1, 0, !loop);
+
+	animation_ref->value_track_set_update_mode(0, Animation::UPDATE_DISCRETE);
+	animation_ref->value_track_set_update_mode(1, Animation::UPDATE_DISCRETE);
 
 	return animation_ref;
 }
@@ -414,7 +423,8 @@ void SpineAnimationTrack::update_animation_state(const Variant &variant_sprite) 
 		if (animation_player->is_playing()) {
 			auto current_entry = animation_state->getCurrent(track_index);
 			bool should_set_mix = mix_duration >= 0;
-			bool should_set_animation = !current_entry || (animation_name != current_entry->getAnimation()->getName().buffer() || current_entry->getLoop() != loop);
+			bool should_set_animation = !current_entry || (animation_name != current_entry->getAnimation()->getName().buffer() || current_entry->getLoop() != loop) || animation_changed;
+			animation_changed = false;
 
 			if (should_set_animation) {
 				if (!EMPTY(animation_name)) {
@@ -444,7 +454,9 @@ void SpineAnimationTrack::update_animation_state(const Variant &variant_sprite) 
 }
 
 void SpineAnimationTrack::set_animation_name(const String &_animation_name) {
+	if (debug) print_line(String("Animation name changed"));
 	animation_name = _animation_name;
+	animation_changed = true;
 }
 
 String SpineAnimationTrack::get_animation_name() {
@@ -452,6 +464,7 @@ String SpineAnimationTrack::get_animation_name() {
 }
 
 void SpineAnimationTrack::set_loop(bool _loop) {
+	animation_changed = true;
 	loop = _loop;
 }
 
@@ -554,3 +567,5 @@ void SpineAnimationTrack::set_debug(bool _debug) {
 bool SpineAnimationTrack::get_debug() {
 	return debug;
 }
+
+#endif

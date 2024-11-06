@@ -275,6 +275,13 @@ cp -f ../spineboy/export/spineboy-pro.json "$ROOT/spine-sdl/data/"
 cp -f ../spineboy/export/spineboy-pma.atlas "$ROOT/spine-sdl/data/"
 cp -f ../spineboy/export/spineboy-pma.png "$ROOT/spine-sdl/data/"
 
+echo "spine-glfw"
+rm -f "$ROOT/spine-glfw/data/"*
+cp -f ../spineboy/export/spineboy-pro.json "$ROOT/spine-glfw/data/"
+cp -f ../spineboy/export/spineboy-pro.skel "$ROOT/spine-glfw/data/"
+cp -f ../spineboy/export/spineboy-pma.atlas "$ROOT/spine-glfw/data/"
+cp -f ../spineboy/export/spineboy-pma.png "$ROOT/spine-glfw/data/"
+
 echo "spine-sfml-c"
 rm "$ROOT/spine-sfml/c/data/"*
 cp -f ../coin/export/coin-pro.json "$ROOT/spine-sfml/c/data/"

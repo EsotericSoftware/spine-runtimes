@@ -1,0 +1,61 @@
+[gd_scene load_steps=5 format=3 uid="uid://bhht8dees2pyq"]
+
+[ext_resource type="Script" path="res://examples/07-slot-node/slot-node.gd" id="1"]
+[ext_resource type="SpineSkeletonDataResource" uid="uid://cb6rn6vonqbx0" path="res://assets/spineboy/spineboy-data-res.tres" id="2"]
+[ext_resource type="SpineSkeletonDataResource" path="res://assets/raptor/raptor-data.tres" id="3"]
+[ext_resource type="Texture2D" uid="uid://8ud5n2ywp5ba" path="res://icon.png" id="4"]
+
+[node name="Node2D" type="Node2D"]
+script = ExtResource("1")
+
+[node name="Spineboy" type="SpineSprite" parent="."]
+position = Vector2(474, 506)
+scale = Vector2(0.560712, 0.560712)
+skeleton_data_res = ExtResource("2")
+preview_skin = "Default"
+preview_animation = "-- Empty --"
+preview_frame = false
+preview_time = 0.0
+
+[node name="GunSlot" type="SpineSlotNode" parent="Spineboy"]
+show_behind_parent = true
+position = Vector2(40.8752, -276.036)
+rotation = 0.837234
+scale = Vector2(1, 1)
+slot_name = "gun"
+
+[node name="Raptor" type="SpineSprite" parent="Spineboy/GunSlot"]
+position = Vector2(84.6909, -67.9174)
+scale = Vector2(0.193472, 0.193472)
+skeleton_data_res = ExtResource("3")
+preview_skin = "Default"
+preview_animation = "-- Empty --"
+preview_frame = false
+preview_time = 0.0
+
+[node name="EyeSlot" type="SpineSlotNode" parent="Spineboy"]
+show_behind_parent = true
+position = Vector2(-23.4598, -402.301)
+rotation = -1.71793
+scale = Vector2(1, 1)
+slot_name = "eye"
+
+[node name="Sprite" type="Sprite2D" parent="Spineboy/EyeSlot"]
+position = Vector2(84.4734, 43.4469)
+rotation = 1.66344
+texture = ExtResource("4")
+
+[node name="FrontFistSlot" type="SpineSlotNode" parent="Spineboy"]
+show_behind_parent = true
+position = Vector2(-29.0298, -241.577)
+rotation = 0.995187
+slot_name = "front-fist"
+
+[node name="TinySpineboy" type="SpineSprite" parent="Spineboy/FrontFistSlot"]
+position = Vector2(-2.64624, -10.8111)
+scale = Vector2(0.193389, 0.193389)
+skeleton_data_res = ExtResource("2")
+preview_skin = "Default"
+preview_animation = "-- Empty --"
+preview_frame = false
+preview_time = 0.0
