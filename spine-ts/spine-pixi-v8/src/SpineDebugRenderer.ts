@@ -308,7 +308,7 @@ export class SpineDebugRenderer implements ISpineDebugRenderer {
 			}
 			else if (starX > endX && starY < endY) {
 				// bottom left
-				rotation = 180 * (rad + B);
+				rotation = (180 * rad) + B;
 			}
 			else if (starX > endX && starY > endY) {
 				// top left
@@ -339,7 +339,7 @@ export class SpineDebugRenderer implements ISpineDebugRenderer {
 			// Draw the starting rotation point of the bone
 			gp.circle(0, c, refRation * 1.2)
 				.fill({ color: 0x000000, alpha: 0.6 })
-				.stroke({ width: lineWidth, color: this.skeletonXYColor });
+				.stroke({ width: lineWidth + refRation / 2.4, color: this.bonesColor });
 		}
 
 		// Draw the skeleton starting point "X" form
@@ -472,15 +472,14 @@ export class SpineDebugRenderer implements ISpineDebugRenderer {
 
 	drawBoundingBoxesFunc (spine: Spine, debugDisplayObjects: DebugDisplayObjects, lineWidth: number): void {
 		// draw the total outline of the bounding box
-		debugDisplayObjects.boundingBoxesRect.lineStyle(lineWidth, this.boundingBoxesRectColor, 5);
-
 		const bounds = new SkeletonBounds();
-
 		bounds.update(spine.skeleton, true);
 
-		debugDisplayObjects.boundingBoxesRect
+		if (bounds.minX !== Infinity) {
+			debugDisplayObjects.boundingBoxesRect
 			.rect(bounds.minX, bounds.minY, bounds.getWidth(), bounds.getHeight())
 			.stroke({ width: lineWidth, color: this.boundingBoxesRectColor });
+		}
 
 		const polygons = bounds.polygons;
 		const drawPolygon = (polygonVertices: ArrayLike<number>, _offset: unknown, count: number): void => {
@@ -498,6 +497,10 @@ export class SpineDebugRenderer implements ISpineDebugRenderer {
 				debugDisplayObjects.boundingBoxesCircle.beginFill(this.boundingBoxesCircleColor);
 				debugDisplayObjects.boundingBoxesCircle.drawCircle(x1, y1, dotSize);
 				debugDisplayObjects.boundingBoxesCircle.fill(0);
+
+				debugDisplayObjects.boundingBoxesCircle
+					.circle(x1, y1, dotSize)
+					.fill({ color: this.boundingBoxesCircleColor })
 
 				paths.push(x1, y1);
 			}

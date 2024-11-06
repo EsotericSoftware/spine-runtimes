@@ -444,8 +444,9 @@ export class SpineDebugRenderer implements ISpineDebugRenderer {
 		const bounds = new SkeletonBounds();
 
 		bounds.update(spine.skeleton, true);
-		debugDisplayObjects.boundingBoxesRect.drawRect(bounds.minX, bounds.minY, bounds.getWidth(), bounds.getHeight());
-
+		if (bounds.minX !== Infinity) {
+			debugDisplayObjects.boundingBoxesRect.drawRect(bounds.minX, bounds.minY, bounds.getWidth(), bounds.getHeight());
+		}
 		const polygons = bounds.polygons;
 		const drawPolygon = (polygonVertices: ArrayLike<number>, _offset: unknown, count: number): void => {
 			debugDisplayObjects.boundingBoxesPolygon.lineStyle(lineWidth, this.boundingBoxesPolygonColor, 1);
