@@ -21,6 +21,7 @@ then
 		spine-player/dist/iife/* \
 		spine-threejs/dist/iife/* \
 		spine-pixi/dist/iife/* \
+		spine-pixi-v8/dist/iife/* \
 		spine-phaser/dist/iife/* \
 		spine-player/css/spine-player.css
 	curl -f -F "file=@spine-ts.zip" "$TS_UPDATE_URL$BRANCH"
