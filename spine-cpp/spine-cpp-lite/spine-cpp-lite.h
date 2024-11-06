@@ -1049,6 +1049,7 @@ SPINE_CPP_LITE_EXPORT void spine_texture_region_set_original_width(spine_texture
 SPINE_CPP_LITE_EXPORT int32_t spine_texture_region_get_original_height(spine_texture_region textureRegion);
 SPINE_CPP_LITE_EXPORT void spine_texture_region_set_original_height(spine_texture_region textureRegion, int32_t originalHeight);
 
+// @ignore
 SPINE_CPP_LITE_EXPORT spine_skeleton_bounds spine_skeleton_bounds_create();
 SPINE_CPP_LITE_EXPORT void spine_skeleton_bounds_dispose(spine_skeleton_bounds bounds);
 SPINE_CPP_LITE_EXPORT void spine_skeleton_bounds_update(spine_skeleton_bounds bounds, spine_skeleton skeleton, spine_bool updateAabb);

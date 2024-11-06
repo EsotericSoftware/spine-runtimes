@@ -1757,11 +1757,6 @@ public final class SkeletonBounds: NSObject {
         return spine_skeleton_bounds_get_height(wrappee)
     }
 
-    @discardableResult
-    public func create() -> SkeletonBounds {
-        return .init(spine_skeleton_bounds_create())
-    }
-
     public func dispose() {
         if disposed { return }
         disposed = true

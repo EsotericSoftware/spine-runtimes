@@ -313,3 +313,9 @@ internal enum FileSource {
 extension String: Error {
     
 }
+
+public extension SkeletonBounds {
+    static func create() -> SkeletonBounds {
+        return SkeletonBounds(spine_skeleton_bounds_create())
+    }
+}
