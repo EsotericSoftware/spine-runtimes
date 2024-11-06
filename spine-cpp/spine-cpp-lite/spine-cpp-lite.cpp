@@ -2424,6 +2424,16 @@ spine_attachment spine_attachment_copy(spine_attachment attachment) {
 	return (spine_attachment) _attachment->copy();
 }
 
+spine_bounding_box_attachment spine_attachment_cast_to_bounding_box_attachment(spine_attachment attachment) {
+    if (attachment == nullptr) return nullptr;
+    Attachment *_attachment = (Attachment *)attachment;
+    if (_attachment->getRTTI().isExactly(BoundingBoxAttachment::rtti)) {
+        BoundingBoxAttachment *boundingBox = static_cast<BoundingBoxAttachment *>(_attachment);
+        return (spine_bounding_box_attachment)boundingBox;
+    }
+    return nullptr;
+}
+
 void spine_attachment_dispose(spine_attachment attachment) {
 	if (attachment == nullptr) return;
 	Attachment *_attachment = (Attachment *) attachment;

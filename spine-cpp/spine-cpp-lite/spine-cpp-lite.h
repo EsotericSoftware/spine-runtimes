@@ -630,6 +630,8 @@ SPINE_CPP_LITE_EXPORT const utf8 *spine_attachment_get_name(spine_attachment att
 SPINE_CPP_LITE_EXPORT spine_attachment_type spine_attachment_get_type(spine_attachment attachment);
 // @ignore
 SPINE_CPP_LITE_EXPORT spine_attachment spine_attachment_copy(spine_attachment attachment);
+// @optional
+SPINE_CPP_LITE_EXPORT spine_bounding_box_attachment spine_attachment_cast_to_bounding_box_attachment(spine_attachment attachment);
 SPINE_CPP_LITE_EXPORT void spine_attachment_dispose(spine_attachment attachment);
 
 SPINE_CPP_LITE_EXPORT spine_vector spine_point_attachment_compute_world_position(spine_point_attachment attachment, spine_bone bone);

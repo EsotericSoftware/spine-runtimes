@@ -2553,6 +2553,11 @@ public final class Attachment: NSObject {
         return spine_attachment_get_type(wrappee)
     }
 
+    @discardableResult
+    public func castToBoundingBoxAttachment() -> BoundingBoxAttachment? {
+        return spine_attachment_cast_to_bounding_box_attachment(wrappee).flatMap { .init($0) }
+    }
+
     public func dispose() {
         if disposed { return }
         disposed = true
