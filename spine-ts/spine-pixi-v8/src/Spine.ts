@@ -53,6 +53,7 @@ import {
 	Color,
 	MeshAttachment,
 	Physics,
+	Pool,
 	RegionAttachment,
 	Skeleton,
 	SkeletonBinary,
@@ -145,6 +146,8 @@ interface SlotsToClipping {
 	maskComputed?: boolean,
 	vertices: Array<number>,
 };
+
+const maskPool = new Pool<Graphics>(() => new Graphics);
 
 /**
  * The class to instantiate a {@link Spine} game object in Pixi.
@@ -436,7 +439,7 @@ export class Spine extends ViewContainer {
 			// create the pixi mask, only the first time and if the clipped slot is the first one clipped by this currentClippingSlot
 			let mask = currentClippingSlot.mask as Graphics;
 			if (!mask) {
-				mask = new Graphics();
+				mask = maskPool.obtain();
 				currentClippingSlot.mask = mask;
 				this.addChild(mask);
 			}
@@ -466,7 +469,7 @@ export class Spine extends ViewContainer {
 				const clippingSlotToPixiMask = this.clippingSlotToPixiMasks[key];
 				if ((!(clippingSlotToPixiMask.slot.attachment instanceof ClippingAttachment) || !clippingSlotToPixiMask.maskComputed) && clippingSlotToPixiMask.mask) {
 					this.removeChild(clippingSlotToPixiMask.mask);
-					clippingSlotToPixiMask.mask.destroy();
+					maskPool.free(clippingSlotToPixiMask.mask);
 					clippingSlotToPixiMask.mask = undefined;
 				}
 			}
