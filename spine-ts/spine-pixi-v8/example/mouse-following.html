@@ -36,13 +36,13 @@
                 // from one animation to another.
                 spineboy.state.data.defaultMix = 0.2;
 
-                // Center the Spine object on screen.
-                spineboy.x = window.innerWidth / 2;
-                spineboy.y = window.innerHeight / 2 + spineboy.getBounds().height / 2;
-
                 // Set looping animations "idle" on track 0 and "aim" on track 1.
                 spineboy.state.setAnimation(0, "idle", true);
                 spineboy.state.setAnimation(1, "aim", true);
+
+                // Center the Spine object on screen.
+                spineboy.x = window.innerWidth / 2;
+                spineboy.y = window.innerHeight / 2 + spineboy.getBounds().height / 2;
 
                 // Add the display object to the stage.
                 app.stage.addChild(spineboy);

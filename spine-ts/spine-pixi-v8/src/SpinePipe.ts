@@ -66,7 +66,7 @@ export class SpinePipe implements RenderPipe<Spine> {
 	}
 
 	validateRenderable (spine: Spine): boolean {
-		spine._applyState();
+		spine._validateAndTransformAttachments();
 
 		// if pine attachments have changed, we need to rebuild the batch!
 		if (spine.spineAttachmentsDirty) {
@@ -109,7 +109,7 @@ export class SpinePipe implements RenderPipe<Spine> {
 
 		const roundPixels = (this.renderer._roundPixels | spine._roundPixels) as 0 | 1;
 
-		spine._applyState();
+		spine._validateAndTransformAttachments();
 
 		for (let i = 0, n = drawOrder.length; i < n; i++) {
 			const slot = drawOrder[i];
@@ -148,7 +148,7 @@ export class SpinePipe implements RenderPipe<Spine> {
 		// we assume that spine will always change its verts size..
 		const gpuSpine = this.gpuSpineData[spine.uid];
 
-		spine._applyState();
+		spine._validateAndTransformAttachments();
 
 		const drawOrder = spine.skeleton.drawOrder;
 

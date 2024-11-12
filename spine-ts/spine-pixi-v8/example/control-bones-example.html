@@ -53,12 +53,12 @@
         // from one animation to the next.
         stretchyman.state.data.defaultMix = 0.2;
 
+        // Set animation "run" on track 0, looped.
+        stretchyman.state.setAnimation(0, "idle", true);
+
         // Center the spine object on screen.
         stretchyman.x = window.innerWidth / 2;
         stretchyman.y = window.innerHeight / 2 + stretchyman.getBounds().height / 2;
-
-        // Set animation "run" on track 0, looped.
-        stretchyman.state.setAnimation(0, "idle", true);
         app.stage.addChild(stretchyman);
 
         const controlBoneNames = [

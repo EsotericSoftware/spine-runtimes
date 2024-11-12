@@ -232,6 +232,7 @@ export class Spine extends ViewContainer {
 		this._autoUpdate = value;
 	}
 
+	private hasNeverUpdated = true;
 	constructor (options: SpineOptions | SkeletonData) {
 		if (options instanceof SkeletonData) {
 			options = {
@@ -257,8 +258,6 @@ export class Spine extends ViewContainer {
 		for (let i = 0; i < slots.length; i++) {
 			this.attachmentCacheData[i] = Object.create(null);
 		}
-
-		this._updateState(0);
 	}
 
 	/** If {@link Spine.autoUpdate} is `false`, this method allows to update the AnimationState and the Skeleton with the given delta. */
@@ -274,7 +273,7 @@ export class Spine extends ViewContainer {
 	protected internalUpdate (_deltaFrame: any, deltaSeconds?: number): void {
 		// Because reasons, pixi uses deltaFrames at 60fps.
 		// We ignore the default deltaFrames and use the deltaSeconds from pixi ticker.
-		this._updateState(deltaSeconds ?? Ticker.shared.deltaMS / 1000);
+		this._updateAndApplySpine(deltaSeconds ?? Ticker.shared.deltaMS / 1000);
 	}
 
 	get bounds () {
@@ -343,35 +342,16 @@ export class Spine extends ViewContainer {
 	}
 
 	/**
-	 * Will update the state based on the specified time, this will not apply the state to the skeleton
-	 * as this is differed until the `applyState` method is called.
+	 * Advance the state and skeleton by the given time, then update slot objects too.
+	 * The container transform is not updated.
 	 *
 	 * @param time the time at which to set the state
-	 * @internal
 	 */
-	_updateState (time: number) {
+	private _updateAndApplySpine (time: number) {
+		this.hasNeverUpdated = false;
+
 		this.state.update(time);
 		this.skeleton.update(time);
-
-		this._stateChanged = true;
-
-		this._boundsDirty = true;
-
-		this.onViewUpdate();
-	}
-
-	/**
-	 * Applies the state to this spine instance.
-	 * - updates the state to the skeleton
-	 * - updates its world transform (spine world transform)
-	 * - validates the attachments - to flag if the attachments have changed this state
-	 * - transforms the attachments - to update the vertices of the attachments based on the new positions
-	 * - update the slot attachments - to update the position, rotation, scale, and visibility of the attached containers
-	 * @internal
-	 */
-	_applyState () {
-		if (!this._stateChanged) return;
-		this._stateChanged = false;
 
 		const { skeleton } = this;
 
@@ -381,11 +361,27 @@ export class Spine extends ViewContainer {
 		skeleton.updateWorldTransform(Physics.update);
 		this.afterUpdateWorldTransforms(this);
 
+		this.updateSlotObjects();
+
+		this._stateChanged = true;
+
+		this._boundsDirty = true;
+
+		this.onViewUpdate();
+	}
+
+	/**
+	 * - validates the attachments - to flag if the attachments have changed this state
+	 * - transforms the attachments - to update the vertices of the attachments based on the new positions
+	 * @internal
+	 */
+	_validateAndTransformAttachments () {
+		if (!this._stateChanged) return;
+		this._stateChanged = false;
+
 		this.validateAttachments();
 
 		this.transformAttachments();
-
-		this.updateSlotObjects();
 	}
 
 	private validateAttachments () {
@@ -802,7 +798,11 @@ export class Spine extends ViewContainer {
 		skeletonBounds.update(this.skeleton, true);
 
 		if (skeletonBounds.minX === Infinity) {
-			this._applyState();
+			if (this.hasNeverUpdated) {
+				this._updateAndApplySpine(0);
+				this._boundsDirty = false;
+			}
+			this._validateAndTransformAttachments();
 
 			const drawOrder = this.skeleton.drawOrder;
 			const bounds = this._bounds;
