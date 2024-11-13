@@ -273,7 +273,7 @@ export class Spine extends ViewContainer {
 	protected internalUpdate (_deltaFrame: any, deltaSeconds?: number): void {
 		// Because reasons, pixi uses deltaFrames at 60fps.
 		// We ignore the default deltaFrames and use the deltaSeconds from pixi ticker.
-		this._updateAndApplySpine(deltaSeconds ?? Ticker.shared.deltaMS / 1000);
+		this._updateAndApplyState(deltaSeconds ?? Ticker.shared.deltaMS / 1000);
 	}
 
 	get bounds () {
@@ -347,7 +347,7 @@ export class Spine extends ViewContainer {
 	 *
 	 * @param time the time at which to set the state
 	 */
-	private _updateAndApplySpine (time: number) {
+	private _updateAndApplyState (time: number) {
 		this.hasNeverUpdated = false;
 
 		this.state.update(time);
@@ -799,7 +799,7 @@ export class Spine extends ViewContainer {
 
 		if (skeletonBounds.minX === Infinity) {
 			if (this.hasNeverUpdated) {
-				this._updateAndApplySpine(0);
+				this._updateAndApplyState(0);
 				this._boundsDirty = false;
 			}
 			this._validateAndTransformAttachments();

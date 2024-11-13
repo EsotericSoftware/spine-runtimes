@@ -35,12 +35,12 @@
         // from one animation to the next.
         spineboy.state.data.defaultMix = 0.2;
 
+        // Set animation "run" on track 0, looped.
+        spineboy.state.setAnimation(0, "walk", true);
+
         // Center the spine object on screen.
         spineboy.x = window.innerWidth / 2;
         spineboy.y = window.innerHeight / 2 + spineboy.getBounds().height / 2;
-
-        // Set animation "run" on track 0, looped.
-        spineboy.state.setAnimation(0, "walk", true);
 
         // Add the display object to the stage.
         app.stage.addChild(spineboy);
@@ -126,6 +126,7 @@
         // for clipping attachments having slot objects
         setTimeout(() => {
           spineboy.state.setAnimation(0, "portal", true)
+          spineboy.update(0)
           const tooth3 = PIXI.Sprite.from('raptor_jaw');
           tooth3.scale.set(2);
           tooth3.x = -60;
