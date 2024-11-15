@@ -10,7 +10,7 @@ extension RenderCommand {
         let positions = positions(numVertices: numVertices)
         let uvs = uvs(numVertices: numVertices)
         let colors = colors(numVertices: numVertices)
-        
+        vertices.reserveCapacity(indices.count)
         for i in 0..<indices.count {
             let index = Int(indices[i])
             
