@@ -305,19 +305,19 @@ class SwiftFunctionBodyWriter:
       return function_call
   
   def write_array_spine_class(self, num_function_name, function_call):
-    array_call = f"let num = Int({num_function_name}({self.spine_object.var_name}))"
-    array_call += "\n"
-    array_call += inset + inset
-    array_call += f"let ptr = {function_call}"
+    array_call = f"let ptr = {function_call}"
     array_call += "\n"
     array_call += inset + inset
     array_call += "guard let validPtr = ptr else { return [] }"
     array_call += "\n"
     array_call += inset + inset
+    array_call += f"let num = Int({num_function_name}({self.spine_object.var_name}))"
+    array_call += "\n"
+    array_call += inset + inset
     array_call += "let buffer = UnsafeBufferPointer(start: validPtr, count: num)"
     array_call += "\n"
     array_call += inset + inset
-    array_call += "return Array(buffer).compactMap {"
+    array_call += "return buffer.compactMap {"
     array_call += "\n"
     array_call += inset + inset + inset
     array_call += "$0.flatMap { .init($0) }"
@@ -329,15 +329,16 @@ class SwiftFunctionBodyWriter:
   def write_array_call(self, num_function_name, function_call):
     if self.spine_function.isReturningSpineClass():
        return self.write_array_spine_class(num_function_name, function_call)
-    array_call = f"let num = Int({num_function_name}({self.spine_object.var_name}))"
-    array_call += "\n"
-    array_call += inset + inset
-    array_call += f"let ptr = {function_call}"
+    array_call = f"let ptr = {function_call}"
     array_call += "\n"
     array_call += inset + inset
     array_call += "guard let validPtr = ptr else { return [] }"
     array_call += "\n"
     array_call += inset + inset
+    array_call += f"let num = Int({num_function_name}({self.spine_object.var_name}))"
+    array_call += "\n"
+    array_call += inset + inset
+
     array_call += "let buffer = UnsafeBufferPointer(start: validPtr, count: num)"
     array_call += "\n"
     array_call += inset + inset
