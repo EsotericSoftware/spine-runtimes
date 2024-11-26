@@ -399,7 +399,7 @@ export class Skeleton {
 
 	updateWorldTransformWith (physics: Physics, parent: Bone) {
 		let bones = this.bones;
-		for (let i = 0, n = bones.length; i < n; i++) {
+		for (let i = 1, n = bones.length; i < n; i++) { // Skip root bone.
 			let bone = bones[i];
 			bone.ax = bone.x;
 			bone.ay = bone.y;
