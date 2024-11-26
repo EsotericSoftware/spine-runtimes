@@ -398,6 +398,18 @@ export class Skeleton {
 	}
 
 	updateWorldTransformWith (physics: Physics, parent: Bone) {
+		let bones = this.bones;
+		for (let i = 0, n = bones.length; i < n; i++) {
+			let bone = bones[i];
+			bone.ax = bone.x;
+			bone.ay = bone.y;
+			bone.arotation = bone.rotation;
+			bone.ascaleX = bone.scaleX;
+			bone.ascaleY = bone.scaleY;
+			bone.ashearX = bone.shearX;
+			bone.ashearY = bone.shearY;
+		}
+
 		// Apply the parent bone transform to the root bone. The root bone always inherits scale, rotation and reflection.
 		let rootBone = this.getRootBone();
 		if (!rootBone) throw new Error("Root bone must not be null.");
