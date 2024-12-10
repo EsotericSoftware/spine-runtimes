@@ -5,7 +5,7 @@
 	</brief_description>
 	<description>
 		Stores the current pose for a path constraint. A path constraint adjusts the rotation, translation, and scale of the constrained bones so they follow a {@link PathAttachment}.
-		See [url]http://esotericsoftware.com/spine-path-constraints[/url] in the Spine User Guide.
+		See [url]https://esotericsoftware.com/spine-path-constraints[/url] in the Spine User Guide.
 	</description>
 	<tutorials>
 	</tutorials>

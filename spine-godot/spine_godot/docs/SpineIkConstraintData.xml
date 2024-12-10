@@ -5,7 +5,7 @@
 	</brief_description>
 	<description>
 		Stores the setup pose for an [code]SpineIkConstraint[/code].
-		See [url]http://esotericsoftware.com/spine-ik-constraints[/url] in the Spine User Guide.
+		See [url]https://esotericsoftware.com/spine-ik-constraints[/url] in the Spine User Guide.
 	</description>
 	<tutorials>
 	</tutorials>

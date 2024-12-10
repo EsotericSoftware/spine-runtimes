@@ -1,6 +1,6 @@
 # spine-sfml
 
-The spine-sfml runtime provides functionality to load, manipulate and render [Spine](http://esotericsoftware.com) skeletal animation data using [SFML](http://www.sfml-dev.org/). spine-sfml is based on [spine-c](../../spine-c).
+The spine-sfml runtime provides functionality to load, manipulate and render [Spine](https://esotericsoftware.com) skeletal animation data using [SFML](https://www.sfml-dev.org/). spine-sfml is based on [spine-c](../../spine-c).
 
 ## Licensing
 
@@ -10,7 +10,7 @@ You can integrate the Spine Runtimes into your software free of charge, but user
 
 In order to distribute your software containing the Spine Runtimes to others that don't have a Spine license, you need a [Spine license](https://esotericsoftware.com/spine-purchase) at the time of integration. Then you can distribute your software containing the Spine Runtimes however you like, provided others don't modify it or use it to create new software. If others want to do that, they'll need their own Spine license.
 
-For the official legal terms governing the Spine Runtimes, please read the [Spine Runtimes License Agreement](http://esotericsoftware.com/spine-runtimes-license) and Section 2 of the [Spine Editor License Agreement](http://esotericsoftware.com/spine-editor-license#s2).
+For the official legal terms governing the Spine Runtimes, please read the [Spine Runtimes License Agreement](https://esotericsoftware.com/spine-runtimes-license) and Section 2 of the [Spine Editor License Agreement](https://esotericsoftware.com/spine-editor-license#s2).
 
 ## Spine version
 
@@ -20,12 +20,12 @@ spine-sfml supports all Spine features except two color tinting.
 
 ## Usage
 
-1. Create a new SFML project. See the [SFML documentation](http://www.sfml-dev.org/tutorials/2.1/) or have a look at the example in this repository.
+1. Create a new SFML project. See the [SFML documentation](https://www.sfml-dev.org/tutorials/2.6/) or have a look at the example in this repository.
 2. Download the Spine Runtimes source using git (`git clone https://github.com/esotericsoftware/spine-runtimes`) or download it as a zip via the download button above.
 3. Add the sources from `spine-c/spine-c/src/spine` and `spine-sfml/src/c/spine` to your project
 4. Add the folder `spine-c/spine-c/include` to your header search path. Note that includes are specified as `#inclue <spine/file.h>`, so the `spine` directory cannot be omitted when copying the source files.
 
-See the [Spine Runtimes documentation](http://esotericsoftware.com/spine-documentation#runtimesTitle) on how to use the APIs or check out the Spine SFML example.
+See the [Spine Runtimes documentation](https://esotericsoftware.com/spine-documentation#runtimes) on how to use the APIs or check out the Spine SFML example.
 
 ## Example
 
@@ -33,7 +33,7 @@ The Spine SFML example works on Windows, Linux and Mac OS X.
 
 ### Windows
 
-1. Install [Visual Studio 2022 Community](https://www.visualstudio.com/en-us/downloads/download-visual-studio-vs.aspx). Make sure you install support for C++, CMake as well as th Windows SDK for XP/7/8.
+1. Install [Visual Studio 2022 Community](https://visualstudio.microsoft.com/downloads/). Make sure you install support for C++, CMake as well as th Windows SDK for XP/7/8.
 1. Open Visual Studio and open the `spine-sfml/c` folder via the `Open a local folder` button
 1. Let CMake finish, then select `spine-sfml-cpp-example.exe` as the start-up project
 1. Start debugging to run the example
@@ -51,7 +51,7 @@ The Spine SFML example works on Windows, Linux and Mac OS X.
 ### Mac OS X
 
 1. Install [Xcode](https://developer.apple.com/xcode/)
-2. Install [Homebrew](http://brew.sh/)
+2. Install [Homebrew](https://brew.sh/)
 3. Open a terminal and install CMake via `brew install cmake`
 4. Download the Spine Runtimes repository using git (`git clone https://github.com/esotericsoftware/spine-runtimes`) or download it as a zip via the download button above.
 5. Open a terminal, and `cd` into the `spine-runtimes/spine-sfml/c` folder

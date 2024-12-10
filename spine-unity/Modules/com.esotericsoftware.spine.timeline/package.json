@@ -1,13 +1,13 @@
 {
 	"name": "com.esotericsoftware.spine.timeline",
 	"displayName": "Spine Timeline Extensions",
-	"description": "This plugin provides integration of spine-unity for the Unity Timeline.\n\nPrerequisites:\nIt requires a working installation of the spine-unity and spine-csharp runtimes as UPM packages (not as spine-unity unitypackage), version 4.2.\n(See http://esotericsoftware.com/git/spine-runtimes/spine-unity)",
+	"description": "This plugin provides integration of spine-unity for the Unity Timeline.\n\nPrerequisites:\nIt requires a working installation of the spine-unity and spine-csharp runtimes as UPM packages (not as spine-unity unitypackage), version 4.2.\n(See https://esotericsoftware.com/git/spine-runtimes/spine-unity)",
 	"version": "4.2.15",
 	"unity": "2018.3",
 	"author": {
 		"name": "Esoteric Software",
 		"email": "contact@esotericsoftware.com",
-		"url": "http://esotericsoftware.com/"
+		"url": "https://esotericsoftware.com/"
 	},
 	"dependencies": {
 		"com.unity.timeline": "1.2.10",

@@ -6,7 +6,7 @@ public typealias AnimationStateListener = (_ type: EventType, _ entry: TrackEntr
 /// Wrapper class around ``AnimationState``. Applies animations over time, queues animations for later playback, mixes (crossfading) between animations, and applies
 /// multiple animations on top of each other (layering).
 ///
-/// See [Applying Animations](http://esotericsoftware.com/spine-applying-animations/) in the Spine Runtimes Guide.
+/// See [Applying Animations](https://esotericsoftware.com/spine-applying-animations/) in the Spine Runtimes Guide.
 @objc(SpineAnimationStateWrapper)
 @objcMembers
 public final class AnimationStateWrapper: NSObject {

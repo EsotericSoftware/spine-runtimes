@@ -5,7 +5,7 @@
 	</brief_description>
 	<description>
 		Stores the current pose for a skeleton.
-		See [url]http://esotericsoftware.com/spine-runtime-architecture#Instance-objects[/url] in the Spine Runtimes Guide.
+		See [url]https://esotericsoftware.com/spine-runtime-architecture#Instance-objects[/url] in the Spine Runtimes Guide.
 	</description>
 	<tutorials>
 	</tutorials>
@@ -51,7 +51,7 @@
 			<argument index="1" name="attachment_name" type="String" />
 			<description>
 				Finds an attachment by looking in the active skin and default skin using the slot index and attachment name. First the skin is checked and if the attachment was not found, the default skin is checked.
-				See [url]http://esotericsoftware.com/spine-runtime-skins[/url] in the Spine Runtimes Guide.
+				See [url]https://esotericsoftware.com/spine-runtime-skins[/url] in the Spine Runtimes Guide.
 			</description>
 		</method>
 		<method name="get_attachment_by_slot_name">
@@ -60,7 +60,7 @@
 			<argument index="1" name="attachment_name" type="String" />
 			<description>
 				Finds an attachment by looking in the active skin and default skin using the slot index and attachment name. First the skin is checked and if the attachment was not found, the default skin is checked.
-				See [url]http://esotericsoftware.com/spine-runtime-skins[/url] in the Spine Runtimes Guide.
+				See [url]https://esotericsoftware.com/spine-runtime-skins[/url] in the Spine Runtimes Guide.
 			</description>
 		</method>
 		<method name="get_bones">
@@ -250,7 +250,7 @@
 			<return type="void" />
 			<description>
 				Updates the world transform for each bone and applies all constraints.
-				See [url]http://esotericsoftware.com/spine-runtime-skeletons#World-transforms[/url] in the Spine Runtimes Guide.
+				See [url]https://esotericsoftware.com/spine-runtime-skeletons#World-transforms[/url] in the Spine Runtimes Guide.
 			</description>
 		</method>
 	</methods>

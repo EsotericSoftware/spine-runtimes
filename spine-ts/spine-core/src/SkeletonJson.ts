@@ -1,13 +1,13 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated July 28, 2023. Replaces all prior versions.
+ * Last updated February 20, 2024. Replaces all prior versions.
  *
- * Copyright (c) 2013-2023, Esoteric Software LLC
+ * Copyright (c) 2013-2024, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
  * conditions of Section 2 of the Spine Editor License Agreement:
- * http://esotericsoftware.com/spine-editor-license
+ * https://esotericsoftware.com/spine-editor-license
  *
  * Otherwise, it is permitted to integrate the Spine Runtimes into software or
  * otherwise create derivative works of the Spine Runtimes (collectively,
@@ -48,8 +48,8 @@ import { PhysicsConstraintData } from "./PhysicsConstraintData.js";
 
 /** Loads skeleton data in the Spine JSON format.
  *
- * See [Spine JSON format](http://esotericsoftware.com/spine-json-format) and
- * [JSON and binary data](http://esotericsoftware.com/spine-loading-skeleton-data#JSON-and-binary-data) in the Spine
+ * See [Spine JSON format](https://esotericsoftware.com/spine-json-format) and
+ * [JSON and binary data](https://esotericsoftware.com/spine-loading-skeleton-data#JSON-and-binary-data) in the Spine
  * Runtimes Guide. */
 export class SkeletonJson {
 	attachmentLoader: AttachmentLoader;
@@ -57,7 +57,7 @@ export class SkeletonJson {
 	/** Scales bone positions, image sizes, and translations as they are loaded. This allows different size images to be used at
 	 * runtime than were used in Spine.
 	 *
-	 * See [Scaling](http://esotericsoftware.com/spine-loading-skeleton-data#Scaling) in the Spine Runtimes Guide. */
+	 * See [Scaling](https://esotericsoftware.com/spine-loading-skeleton-data#Scaling) in the Spine Runtimes Guide. */
 	scale = 1;
 	private linkedMeshes = new Array<LinkedMesh>();
 

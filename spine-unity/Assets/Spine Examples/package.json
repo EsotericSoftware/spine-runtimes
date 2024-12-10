@@ -7,7 +7,7 @@
   "author": {
     "name": "Esoteric Software",
     "email": "contact@esotericsoftware.com",
-    "url": "http://esotericsoftware.com/"
+    "url": "https://esotericsoftware.com/"
   },
   "dependencies": {
     "com.esotericsoftware.spine.spine-unity": "4.2.0"

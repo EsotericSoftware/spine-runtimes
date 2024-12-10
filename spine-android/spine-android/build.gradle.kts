@@ -66,7 +66,7 @@ afterEvaluate {
                     licenses {
                         license {
                             name.set("Spine Runtimes License")
-                            url.set("http://esotericsoftware.com/spine-runtimes-license")
+                            url.set("https://esotericsoftware.com/spine-runtimes-license")
                         }
                     }
                     developers {

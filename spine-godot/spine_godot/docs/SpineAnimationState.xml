@@ -4,7 +4,7 @@
 		Applies animations over time, queues animations for later playback, mixes (crossfading) between animations, and applies multiple animations on top of each other (layering).
 	</brief_description>
 	<description>
-		Applies animations over time, queues animations for later playback, mixes (crossfading) between animations, and applies multiple animations on top of each other (layering). See [url]http://esotericsoftware.com/spine-applying-animations[/url] in the Spine Runtimes Guide.
+		Applies animations over time, queues animations for later playback, mixes (crossfading) between animations, and applies multiple animations on top of each other (layering). See [url]https://esotericsoftware.com/spine-applying-animations[/url] in the Spine Runtimes Guide.
 	</description>
 	<tutorials>
 	</tutorials>

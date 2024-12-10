@@ -1,13 +1,13 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated July 28, 2023. Replaces all prior versions.
+ * Last updated February 20, 2024. Replaces all prior versions.
  *
- * Copyright (c) 2013-2023, Esoteric Software LLC
+ * Copyright (c) 2013-2024, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
  * conditions of Section 2 of the Spine Editor License Agreement:
- * http://esotericsoftware.com/spine-editor-license
+ * https://esotericsoftware.com/spine-editor-license
  *
  * Otherwise, it is permitted to integrate the Spine Runtimes into software or
  * otherwise create derivative works of the Spine Runtimes (collectively,
@@ -45,7 +45,7 @@ namespace Spine.Unity {
 	/// For <c>SkeletonAnimation</c> or <c>SkeletonGraphic</c> please use
 	/// <see cref="SkeletonRootMotion">SkeletonRootMotion</see> instead.
 	/// </remarks>
-	[HelpURL("http://esotericsoftware.com/spine-unity#SkeletonMecanimRootMotion")]
+	[HelpURL("https://esotericsoftware.com/spine-unity-utility-components#SkeletonMecanimRootMotion")]
 	public class SkeletonMecanimRootMotion : SkeletonRootMotionBase {
 		#region Inspector
 		const int DefaultMecanimLayerFlags = -1;

@@ -5,7 +5,7 @@
 	</brief_description>
 	<description>
 		Stores the current pose for a transform constraint. A transform constraint adjusts the world transform of the constrained bones to match that of the target bone.
-		See [url]http://esotericsoftware.com/spine-transform-constraints[/url] in the Spine User Guide.
+		See [url]https://esotericsoftware.com/spine-transform-constraints[/url] in the Spine User Guide.
 	</description>
 	<tutorials>
 	</tutorials>

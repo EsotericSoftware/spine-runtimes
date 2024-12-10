@@ -1,13 +1,13 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated July 28, 2023. Replaces all prior versions.
+ * Last updated February 20, 2024. Replaces all prior versions.
  *
- * Copyright (c) 2013-2023, Esoteric Software LLC
+ * Copyright (c) 2013-2024, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
  * conditions of Section 2 of the Spine Editor License Agreement:
- * http://esotericsoftware.com/spine-editor-license
+ * https://esotericsoftware.com/spine-editor-license
  *
  * Otherwise, it is permitted to integrate the Spine Runtimes into software or
  * otherwise create derivative works of the Spine Runtimes (collectively,
@@ -65,7 +65,7 @@ namespace Spine.Unity {
 	[ExecuteInEditMode]
 #endif
 	[RequireComponent(typeof(MeshRenderer)), DisallowMultipleComponent]
-	[HelpURL("http://esotericsoftware.com/spine-unity#SkeletonRenderer-Component")]
+	[HelpURL("https://esotericsoftware.com/spine-unity-main-components#SkeletonRenderer-Component")]
 	public class SkeletonRenderer : MonoBehaviour, ISkeletonComponent, IHasSkeletonDataAsset {
 		public SkeletonDataAsset skeletonDataAsset;
 

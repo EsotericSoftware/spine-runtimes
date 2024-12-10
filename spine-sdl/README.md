@@ -1,8 +1,8 @@
 # spine-sdl
 
-The spine-sdl runtime provides functionality to load, manipulate and render [Spine](http://esotericsoftware.com) skeletal animation data using [SDL](https://www.libsdl.org/). spine-sdl is based on [spine-c](../spine-c) and [spine-cpp](../spine-cpp), depending on whether you want to use a C or C++ implementation.
+The spine-sdl runtime provides functionality to load, manipulate and render [Spine](https://esotericsoftware.com) skeletal animation data using [SDL](https://www.libsdl.org/). spine-sdl is based on [spine-c](../spine-c) and [spine-cpp](../spine-cpp), depending on whether you want to use a C or C++ implementation.
 
-# See the [spine-sdl documentation](http://esotericsoftware.com/spine-sdl) for in-depth information
+# See the [spine-sdl documentation](https://esotericsoftware.com/spine-sdl) for in-depth information
 
 ## Licensing
 
@@ -12,7 +12,7 @@ You can integrate the Spine Runtimes into your software free of charge, but user
 
 In order to distribute your software containing the Spine Runtimes to others that don't have a Spine license, you need a [Spine license](https://esotericsoftware.com/spine-purchase) at the time of integration. Then you can distribute your software containing the Spine Runtimes however you like, provided others don't modify it or use it to create new software. If others want to do that, they'll need their own Spine license.
 
-For the official legal terms governing the Spine Runtimes, please read the [Spine Runtimes License Agreement](http://esotericsoftware.com/spine-runtimes-license) and Section 2 of the [Spine Editor License Agreement](http://esotericsoftware.com/spine-editor-license#s2).
+For the official legal terms governing the Spine Runtimes, please read the [Spine Runtimes License Agreement](https://esotericsoftware.com/spine-runtimes-license) and Section 2 of the [Spine Editor License Agreement](https://esotericsoftware.com/spine-editor-license#s2).
 
 ## Spine version
 
@@ -27,7 +27,7 @@ spine-sdl supports all Spine features except screen blend mode and two color tin
 3. If you are using C, add the sources from `spine-c/spine-c/src/spine` and `spine-sdl/src/spine-sdl-c.c` to your project, and add the folder `spine-c/spine-c/include` and `spine-sdl/src/spine-sdl-c.h` to your header search path. Note that includes are specified as `#inclue <spine/file.h>`, so the `spine` directory cannot be omitted when copying the source files.
 4. If you are using C++, add the sources from `spine-cpp/spine-cpp/src/spine` and `spine-sdl/src/spine-sdl-cpp.cpp` to your project, and add the folder `spine-cpp/spine-cpp/include` and `spine-sdl/src/spine-sdl-cpp.h` to your header search path. Note that includes are specified as `#include <spine/file.h>`, so the `spine` directory cannot be omitted when copying the source files.
 
-See the [Spine Runtimes documentation](http://esotericsoftware.com/spine-documentation#runtimesTitle) on how to use the APIs or check out the Spine SDL example in this repository.
+See the [Spine Runtimes documentation](https://esotericsoftware.com/spine-documentation#runtimes) on how to use the APIs or check out the Spine SDL example in this repository.
 
 ## Example
 
@@ -35,7 +35,7 @@ The Spine SDL example works on Windows, Linux and Mac OS X. For a spine-c based 
 
 ### Windows
 
-1. Install [Visual Studio Community](https://www.visualstudio.com/en-us/downloads/download-visual-studio-vs.aspx). Make sure you install support for C++ as well as th Windows SDK for XP/7/8.
+1. Install [Visual Studio Community](https://visualstudio.microsoft.com/downloads/). Make sure you install support for C++ as well as th Windows SDK for XP/7/8.
 2. Install CMake via the [Windows installer package](https://cmake.org/download/).
 3. Download the Spine Runtimes repository using git (`git clone https://github.com/esotericsoftware/spine-runtimes`) or download it as a zip via the download button above.
 4. Run CMake GUI from the start menu
@@ -60,7 +60,7 @@ The entire example code is contained in [main.cpp](example/main.cpp#L61)
 ### Mac OS X
 
 1. Install [Xcode](https://developer.apple.com/xcode/)
-2. Install [Homebrew](http://brew.sh/)
+2. Install [Homebrew](https://brew.sh/)
 3. Open a terminal and install CMake via `brew install cmake`
 4. Download the Spine Runtimes repository using git (`git clone https://github.com/esotericsoftware/spine-runtimes`) or download it as a zip via the download button above.
 5. Open a terminal, and `cd` into the `spine-runtimes/spine-sdl` folder

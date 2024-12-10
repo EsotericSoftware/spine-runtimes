@@ -1,13 +1,13 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated July 28, 2023. Replaces all prior versions.
+ * Last updated February 20, 2024. Replaces all prior versions.
  *
- * Copyright (c) 2013-2023, Esoteric Software LLC
+ * Copyright (c) 2013-2024, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
  * conditions of Section 2 of the Spine Editor License Agreement:
- * http://esotericsoftware.com/spine-editor-license
+ * https://esotericsoftware.com/spine-editor-license
  *
  * Otherwise, it is permitted to integrate the Spine Runtimes into software or
  * otherwise create derivative works of the Spine Runtimes (collectively,
@@ -38,7 +38,7 @@ import { Event } from "./Event.js";
 /** Applies animations over time, queues animations for later playback, mixes (crossfading) between animations, and applies
  * multiple animations on top of each other (layering).
  *
- * See [Applying Animations](http://esotericsoftware.com/spine-applying-animations/) in the Spine Runtimes Guide. */
+ * See [Applying Animations](https://esotericsoftware.com/spine-applying-animations/) in the Spine Runtimes Guide. */
 export class AnimationState {
 	static _emptyAnimation = new Animation("<empty>", [], 0);
 	private static emptyAnimation (): Animation {
@@ -220,7 +220,7 @@ export class AnimationState {
 					} else if (timeline instanceof AttachmentTimeline) {
 						this.applyAttachmentTimeline(timeline, skeleton, applyTime, blend, attachments);
 					} else {
-						// This fixes the WebKit 602 specific issue described at http://esotericsoftware.com/forum/iOS-10-disappearing-graphics-10109
+						// This fixes the WebKit 602 specific issue described at https://esotericsoftware.com/forum/d/10109-ios-10-disappearing-graphics
 						Utils.webkit602BugfixHelper(alpha, blend);
 						timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, timelineBlend, MixDirection.mixIn);
 					}
@@ -323,7 +323,7 @@ export class AnimationState {
 				else if (timeline instanceof AttachmentTimeline)
 					this.applyAttachmentTimeline(timeline, skeleton, applyTime, timelineBlend, attachments && alpha >= from.alphaAttachmentThreshold);
 				else {
-					// This fixes the WebKit 602 specific issue described at http://esotericsoftware.com/forum/iOS-10-disappearing-graphics-10109
+					// This fixes the WebKit 602 specific issue described at https://esotericsoftware.com/forum/d/10109-ios-10-disappearing-graphics
 					Utils.webkit602BugfixHelper(alpha, blend);
 					if (drawOrder && timeline instanceof DrawOrderTimeline && timelineBlend == MixBlend.setup)
 						direction = MixDirection.mixIn;

@@ -6,8 +6,8 @@
     <authors>Esoteric Software</authors>
     <owners>Esoteric Software</owners>
     <licenseUrl>https://github.com/EsotericSoftware/spine-runtimes/blob/master/LICENSE</licenseUrl>
-    <projectUrl>http://esotericsoftware.com/</projectUrl>
-    <iconUrl>http://esotericsoftware.com/spine/files/logo-420.png</iconUrl>
+    <projectUrl>https://esotericsoftware.com/</projectUrl>
+    <iconUrl>https://esotericsoftware.com/spine/files/logo-420.png</iconUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>Spine is a 2D skeletal animation tool for game development and other animation projects.</description>
 	<summary>Spine features an intuitive workflow to rig and animate skeletons, a multiple-timeline dopesheet for retiming and tweaking animations, powerful exporting capabilities, and runtimes for many programming languages and game toolkits.</summary>

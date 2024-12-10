@@ -1,13 +1,13 @@
 ///
 /// Spine Runtimes License Agreement
-/// Last updated July 28, 2023. Replaces all prior versions.
+/// Last updated February 20, 2024. Replaces all prior versions.
 ///
-/// Copyright (c) 2013-2023, Esoteric Software LLC
+/// Copyright (c) 2013-2024, Esoteric Software LLC
 ///
 /// Integration of the Spine Runtimes into software or otherwise creating
 /// derivative works of the Spine Runtimes is permitted under the terms and
 /// conditions of Section 2 of the Spine Editor License Agreement:
-/// http://esotericsoftware.com/spine-editor-license
+/// https://esotericsoftware.com/spine-editor-license
 ///
 /// Otherwise, it is permitted to integrate the Spine Runtimes into software or
 /// otherwise create derivative works of the Spine Runtimes (collectively,
@@ -197,7 +197,7 @@ class Atlas {
 /// Use the static methods [fromJson], [fromBinary], [fromAsset], [fromFile], and [fromURL] to load
 /// skeleton data. Call [dispose] when the skeleton data is no longer in use to free its resources.
 ///
-/// See [Data objects](http://esotericsoftware.com/spine-runtime-architecture#Data-objects) in the Spine
+/// See [Data objects](https://esotericsoftware.com/spine-runtime-architecture#Data-objects) in the Spine
 /// Runtimes Guide.
 class SkeletonData {
   final spine_skeleton_data _data;
@@ -547,7 +547,7 @@ class SkeletonData {
   }
 }
 
-/// Determines how images are blended with existing pixels when drawn. See [Blending](http://esotericsoftware.com/spine-slots#Blending) in
+/// Determines how images are blended with existing pixels when drawn. See [Blending](https://esotericsoftware.com/spine-slots#Blending) in
 /// the Spine User Guide.
 enum BlendMode {
   normal(0, rendering.BlendMode.srcOver),
@@ -589,7 +589,7 @@ enum Physics {
 
 /// Controls how the first bone is positioned along the path.
 ///
-/// See [Position mode](http://esotericsoftware.com/spine-path-constraints#Position-mode) in the Spine User Guide.
+/// See [Position mode](https://esotericsoftware.com/spine-path-constraints#Position-mode) in the Spine User Guide.
 enum PositionMode {
   fixed(0),
   percent(1);
@@ -601,7 +601,7 @@ enum PositionMode {
 
 /// Controls how bones after the first bone are positioned along the path.
 ///
-/// See [Spacing mode](http://esotericsoftware.com/spine-path-constraints#Spacing-mode) in the Spine User Guide.
+/// See [Spacing mode](https://esotericsoftware.com/spine-path-constraints#Spacing-mode) in the Spine User Guide.
 enum SpacingMode {
   length(0),
   fixed(1),
@@ -615,7 +615,7 @@ enum SpacingMode {
 
 /// Controls how bones are rotated, translated, and scaled to match the path.
 ///
-/// See [Rotate mode](http://esotericsoftware.com/spine-path-constraints#Rotate-mode) in the Spine User Guide.
+/// See [Rotate mode](https://esotericsoftware.com/spine-path-constraints#Rotate-Mix) in the Spine User Guide.
 enum RotateMode {
   tangent(0),
   chain(1),
@@ -795,7 +795,7 @@ class Bone {
   /// Computes the world transform using the parent bone and the specified local transform. The applied transform is set to the
   /// specified local transform. Child bones are not updated.
   ///
-  /// See [World transform](http://esotericsoftware.com/spine-runtime-skeletons#World-transforms) in the Spine
+  /// See [World transform](https://esotericsoftware.com/spine-runtime-skeletons#World-transforms) in the Spine
   /// Runtimes Guide.
   void updateWorldTransformWith(double x, double y, double rotation, double scaleX, double scaleY, double shearX, double shearY) {
     _bindings.spine_bone_update_world_transform_with(_bone, x, y, rotation, scaleX, scaleY, shearX, shearY);
@@ -1492,14 +1492,14 @@ abstract class Attachment<T extends Pointer> {
 
 /// An attachment that displays a textured quadrilateral.
 ///
-/// See [Region attachments](http://esotericsoftware.com/spine-regions) in the Spine User Guide.
+/// See [Region attachments](https://esotericsoftware.com/spine-regions) in the Spine User Guide.
 class RegionAttachment extends Attachment<spine_region_attachment> {
   RegionAttachment._(super.attachment) : super._();
 
   /// Transforms and returns the attachment's four vertices to world coordinates. If the attachment has a [Sequence], the region may
   /// be changed.
   ///
-  /// See [World transforms](http://esotericsoftware.com/spine-runtime-skeletons#World-transforms) in the Spine
+  /// See [World transforms](https://esotericsoftware.com/spine-runtime-skeletons#World-transforms) in the Spine
   /// Runtimes Guide.
   List<double> computeWorldVertices(Slot slot) {
     Pointer<Float> vertices = _allocator.allocate(4 * 8).cast();
@@ -1623,7 +1623,7 @@ class VertexAttachment<T extends Pointer> extends Attachment<T> {
   /// Transforms and returns the attachment's local [getVertices] to world coordinates. If the slot's [Slot.getDeform] is
   /// not empty, it is used to deform the vertices.
 
-  /// See [World transforms](http://esotericsoftware.com/spine-runtime-skeletons#World-transforms) in the Spine
+  /// See [World transforms](https://esotericsoftware.com/spine-runtime-skeletons#World-transforms) in the Spine
   /// Runtimes Guide.
   List<double> computeWorldVertices(Slot slot) {
     final worldVerticesLength = _bindings.spine_vertex_attachment_get_world_vertices_length(_attachment.cast());
@@ -1669,7 +1669,7 @@ class VertexAttachment<T extends Pointer> extends Attachment<T> {
 /// An attachment that displays a textured mesh. A mesh has hull vertices and internal vertices within the hull. Holes are not
 /// supported. Each vertex has UVs (texture coordinates) and triangles are used to map an image on to the mesh.
 ///
-/// See [Mesh attachments](http://esotericsoftware.com/spine-meshes) in the Spine User Guide.
+/// See [Mesh attachments](https://esotericsoftware.com/spine-meshes) in the Spine User Guide.
 class MeshAttachment extends VertexAttachment<spine_mesh_attachment> {
   MeshAttachment._(spine_mesh_attachment attachment) : super._(attachment.cast());
 
@@ -1810,7 +1810,7 @@ class ClippingAttachment extends VertexAttachment<spine_clipping_attachment> {
 /// An attachment with vertices that make up a polygon. Can be used for hit detection, creating physics bodies, spawning particle
 /// effects, and more.
 ///
-/// See [SkeletonBounds] and [Bounding boxes](http://esotericsoftware.com/spine-bounding-boxes) in the Spine User
+/// See [SkeletonBounds] and [Bounding boxes](https://esotericsoftware.com/spine-bounding-boxes) in the Spine User
 /// Guide.
 class BoundingBoxAttachment extends VertexAttachment<spine_bounding_box_attachment> {
   BoundingBoxAttachment._(super.attachment) : super._();
@@ -1830,7 +1830,7 @@ class BoundingBoxAttachment extends VertexAttachment<spine_bounding_box_attachme
 
 /// An attachment whose vertices make up a composite Bezier curve.
 ///
-/// See [PathConstraint] and [Paths](http://esotericsoftware.com/spine-paths) in the Spine User Guide.
+/// See [PathConstraint] and [Paths](https://esotericsoftware.com/spine-paths) in the Spine User Guide.
 class PathAttachment extends VertexAttachment<spine_path_attachment> {
   PathAttachment._(super.attachment) : super._();
 
@@ -1877,7 +1877,7 @@ class PathAttachment extends VertexAttachment<spine_path_attachment> {
 /// used in similar ways, but a PointAttachment is slightly less expensive to compute and can be hidden, shown, and placed in a
 /// skin.
 ///
-/// See [Point Attachments](http://esotericsoftware.com/spine-point-attachments) in the Spine User Guide.
+/// See [Point Attachments](https://esotericsoftware.com/spine-points) in the Spine User Guide.
 class PointAttachment extends Attachment<spine_point_attachment> {
   PointAttachment._(super.attachment) : super._();
 
@@ -1942,7 +1942,7 @@ class SkinEntry {
 /// Skins constructed manually via the `Skin(String name)` constructor must be manually disposed via the [dipose] method if they
 /// are no longer used.
 ///
-/// See [SkeletonData.defaultSkin], [Skeleton.getSkin}, and [Runtime skins](http://esotericsoftware.com/spine-runtime-skins) in the
+/// See [SkeletonData.defaultSkin], [Skeleton.getSkin}, and [Runtime skins](https://esotericsoftware.com/spine-runtime-skins) in the
 /// Spine Runtimes Guide.
 class Skin {
   late final bool _isCustomSkin;
@@ -2093,7 +2093,7 @@ class ConstraintData<T extends Pointer> {
 
 /// Stores the setup pose for an [IkConstraint].
 ///
-/// See [IK constraints](http://esotericsoftware.com/spine-ik-constraints) in the Spine User Guide.
+/// See [IK constraints](https://esotericsoftware.com/spine-ik-constraints) in the Spine User Guide.
 class IkConstraintData extends ConstraintData<spine_ik_constraint_data> {
   IkConstraintData._(super.data) : super._();
 
@@ -2181,7 +2181,7 @@ class IkConstraintData extends ConstraintData<spine_ik_constraint_data> {
 /// Stores the current pose for an IK constraint. An IK constraint adjusts the rotation of 1 or 2 constrained bones so the tip of
 /// the last bone is as close to the target bone as possible.
 /// <p>
-/// See <a href="http://esotericsoftware.com/spine-ik-constraints">IK constraints</a> in the Spine User Guide.
+/// See <a href="https://esotericsoftware.com/spine-ik-constraints">IK constraints</a> in the Spine User Guide.
 class IkConstraint {
   final spine_ik_constraint _constraint;
 
@@ -2283,7 +2283,7 @@ class IkConstraint {
 
 /// Stores the setup pose for a {@link TransformConstraint}.
 ///
-/// See [Transform constraints](http://esotericsoftware.com/spine-transform-constraints) in the Spine User Guide.
+/// See [Transform constraints](https://esotericsoftware.com/spine-transform-constraints) in the Spine User Guide.
 class TransformConstraintData extends ConstraintData<spine_transform_constraint_data> {
   TransformConstraintData._(super.data) : super._();
 
@@ -2436,7 +2436,7 @@ class TransformConstraintData extends ConstraintData<spine_transform_constraint_
 /// Stores the current pose for a transform constraint. A transform constraint adjusts the world transform of the constrained
 /// bones to match that of the target bone.
 ///
-/// See [Transform constraints](http://esotericsoftware.com/spine-transform-constraints) in the Spine User Guide.
+/// See [Transform constraints](https://esotericsoftware.com/spine-transform-constraints) in the Spine User Guide.
 class TransformConstraint {
   final spine_transform_constraint _constraint;
 
@@ -2541,7 +2541,7 @@ class TransformConstraint {
 
 /// Stores the setup pose for a [PathConstraint].
 ///
-/// See [Path constraints](http://esotericsoftware.com/spine-path-constraints) in the Spine User Guide.
+/// See [Path constraints](https://esotericsoftware.com/spine-path-constraints) in the Spine User Guide.
 class PathConstraintData extends ConstraintData<spine_path_constraint_data> {
   PathConstraintData._(super.data) : super._();
 
@@ -2650,7 +2650,7 @@ class PathConstraintData extends ConstraintData<spine_path_constraint_data> {
 /// Stores the current pose for a path constraint. A path constraint adjusts the rotation, translation, and scale of the
 /// constrained bones so they follow a [PathAttachment].
 ///
-/// See [Path constraints](http://esotericsoftware.com/spine-path-constraints) in the Spine User Guide.
+/// See [Path constraints](https://esotericsoftware.com/spine-path-constraints) in the Spine User Guide.
 class PathConstraint {
   final spine_path_constraint _constraint;
 
@@ -2741,7 +2741,7 @@ class PathConstraint {
 
 /// Stores the current pose for a skeleton.
 ///
-/// See [Instance objects](http://esotericsoftware.com/spine-runtime-architecture#Instance-objects) in the Spine
+/// See [Instance objects](https://esotericsoftware.com/spine-runtime-architecture#Instance-objects) in the Spine
 /// Runtimes Guide.
 class Skeleton {
   final spine_skeleton _skeleton;
@@ -2756,7 +2756,7 @@ class Skeleton {
 
   /// Updates the world transform for each bone and applies all constraints.
   ///
-  /// See [World transforms](http://esotericsoftware.com/spine-runtime-skeletons#World-transforms) in the Spine
+  /// See [World transforms](https://esotericsoftware.com/spine-runtime-skeletons#World-transforms) in the Spine
   /// Runtimes Guide.
   void updateWorldTransform(Physics physics) {
     _bindings.spine_skeleton_update_world_transform(_skeleton, physics.value);
@@ -2765,7 +2765,7 @@ class Skeleton {
   /// Temporarily sets the root bone as a child of the specified bone, then updates the world transform for each bone and applies
   /// all constraints.
   ///
-  /// See [World transforms](http://esotericsoftware.com/spine-runtime-skeletons#World-transforms) in the Spine
+  /// See [World transforms](https://esotericsoftware.com/spine-runtime-skeletons#World-transforms) in the Spine
   /// Runtimes Guide.
   void updateWorldTransformBone(Physics physics, Bone parent) {
     _bindings.spine_skeleton_update_world_transform_bone(_skeleton, physics.value, parent._bone);
@@ -2846,7 +2846,7 @@ class Skeleton {
   /// Finds an attachment by looking in the currently set skin (see [getSkin]) and default skin (see [SkeletonData.getDefaultSkin]) using the
   /// slot index and attachment name. First the skin is checked and if the attachment was not found, the default skin is checked.
   ///
-  /// See [Runtime skins](http://esotericsoftware.com/spine-runtime-skins) in the Spine Runtimes Guide.
+  /// See [Runtime skins](https://esotericsoftware.com/spine-runtime-skins) in the Spine Runtimes Guide.
   Attachment? getAttachment(int slotIndex, String attachmentName) {
     final attachmentNameNative = attachmentName.toNativeUtf8(allocator: _allocator);
     final attachment = _bindings.spine_skeleton_get_attachment(_skeleton, slotIndex, attachmentNameNative.cast());
@@ -3513,7 +3513,7 @@ enum EventType {
 
 /// Stores the setup pose values for an [Event].
 ///
-/// See <a href="http://esotericsoftware.com/spine-events">Events</a> in the Spine User Guide.
+/// See <a href="https://esotericsoftware.com/spine-events">Events</a> in the Spine User Guide.
 class EventData {
   final spine_event_data _data;
 
@@ -3577,7 +3577,7 @@ class EventData {
 /// Stores the current pose values for an {@link Event}.
 ///
 /// See [AnimationStateListener], [EventType.event], and
-/// <a href="http://esotericsoftware.com/spine-events">Events</a> in the Spine User Guide.
+/// <a href="https://esotericsoftware.com/spine-events">Events</a> in the Spine User Guide.
 class Event {
   final spine_event _event;
 
@@ -3709,7 +3709,7 @@ class AnimationStateData {
 /// Applies animations over time, queues animations for later playback, mixes (crossfading) between animations, and applies
 /// multiple animations on top of each other (layering).
 ///
-/// See <a href='http://esotericsoftware.com/spine-applying-animations/'>Applying Animations</a> in the Spine Runtimes Guide.
+/// See <a href='https://esotericsoftware.com/spine-applying-animations/'>Applying Animations</a> in the Spine Runtimes Guide.
 class AnimationState {
   final spine_animation_state _state;
   final spine_animation_state_events _events;

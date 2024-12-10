@@ -1,6 +1,6 @@
 # spine-c
 
-The spine-c runtime provides basic functionality to load and manipulate [Spine](http://esotericsoftware.com) skeletal animation data using ANSI C89. It does not perform rendering but can be extended to enable Spine animations for other C-based projects, including C++ or Objective-C projects.
+The spine-c runtime provides basic functionality to load and manipulate [Spine](https://esotericsoftware.com) skeletal animation data using ANSI C89. It does not perform rendering but can be extended to enable Spine animations for other C-based projects, including C++ or Objective-C projects.
 
 ## Licensing
 
@@ -10,7 +10,7 @@ You can integrate the Spine Runtimes into your software free of charge, but user
 
 In order to distribute your software containing the Spine Runtimes to others that don't have a Spine license, you need a [Spine license](https://esotericsoftware.com/spine-purchase) at the time of integration. Then you can distribute your software containing the Spine Runtimes however you like, provided others don't modify it or use it to create new software. If others want to do that, they'll need their own Spine license.
 
-For the official legal terms governing the Spine Runtimes, please read the [Spine Runtimes License Agreement](http://esotericsoftware.com/spine-runtimes-license) and Section 2 of the [Spine Editor License Agreement](http://esotericsoftware.com/spine-editor-license#s2).
+For the official legal terms governing the Spine Runtimes, please read the [Spine Runtimes License Agreement](https://esotericsoftware.com/spine-runtimes-license) and Section 2 of the [Spine Editor License Agreement](https://esotericsoftware.com/spine-editor-license#s2).
 
 ## Spine version
 
@@ -27,7 +27,7 @@ If `SPINE_SHORT_NAMES` is defined, the `sp` prefix for all structs and functions
 
 ## Usage
 
-### [Please see the spine-c guide for full documentation](http://esotericsoftware.com/spine-c)
+### [Please see the spine-c guide for full documentation](https://esotericsoftware.com/spine-c)
 
 ## Extension
 
@@ -39,7 +39,7 @@ Extending spine-c requires implementing three methods:
 
 With these implemented, the spine-c API can then be used to load Spine animation data. Rendering is done by enumerating the slots for a skeleton and rendering the attachment for each slot. Each attachment has a `rendererObject` field that is set when the attachment is loaded.
 
-For example, `AtlasAttachmentLoader` is typically used to load attachments when using a Spine texture atlas. When `AtlasAttachmentLoader` loads a `RegionAttachment`, the attachment's `void* rendererObject` is set to an `AtlasRegion`. Rendering code can then obtain the `AtlasRegion` from the attachment, get the `AtlasPage` it belongs to, and get the page's `void* rendererObject`. This is the renderer specific texture object set by `_spAtlasPage_createTexture`. Attachment loading can be [customized](http://esotericsoftware.com/spine-using-runtimes/#attachmentloader) if not using `AtlasAttachmentLoader` or to provider different renderer specific data.
+For example, `AtlasAttachmentLoader` is typically used to load attachments when using a Spine texture atlas. When `AtlasAttachmentLoader` loads a `RegionAttachment`, the attachment's `void* rendererObject` is set to an `AtlasRegion`. Rendering code can then obtain the `AtlasRegion` from the attachment, get the `AtlasPage` it belongs to, and get the page's `void* rendererObject`. This is the renderer specific texture object set by `_spAtlasPage_createTexture`. Attachment loading can be [customized](https://esotericsoftware.com/spine-using-runtimes/#attachmentloader) if not using `AtlasAttachmentLoader` or to provider different renderer specific data.
 
 [spine-sfml](../spine-sfml/src/c/spine/spine-sfml.cpp#L39) serves as a simple example of extending spine-c.
 
@@ -47,5 +47,6 @@ spine-c uses an OOP style of programming where each "class" is made up of a stru
 
 ## Runtimes extending spine-c
 
-- [spine-cocos2d-objc](../spine-cocos2d-objc)
+- [spine-sdl](../spine-sdl/)
 - [spine-sfml](../spine-sfml)
+

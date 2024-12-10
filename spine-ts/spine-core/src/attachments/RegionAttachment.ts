@@ -1,13 +1,13 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated July 28, 2023. Replaces all prior versions.
+ * Last updated February 20, 2024. Replaces all prior versions.
  *
- * Copyright (c) 2013-2023, Esoteric Software LLC
+ * Copyright (c) 2013-2024, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
  * conditions of Section 2 of the Spine Editor License Agreement:
- * http://esotericsoftware.com/spine-editor-license
+ * https://esotericsoftware.com/spine-editor-license
  *
  * Otherwise, it is permitted to integrate the Spine Runtimes into software or
  * otherwise create derivative works of the Spine Runtimes (collectively,
@@ -37,7 +37,7 @@ import { Slot } from "../Slot.js";
 
 /** An attachment that displays a textured quadrilateral.
  *
- * See [Region attachments](http://esotericsoftware.com/spine-regions) in the Spine User Guide. */
+ * See [Region attachments](https://esotericsoftware.com/spine-regions) in the Spine User Guide. */
 export class RegionAttachment extends Attachment implements HasTextureRegion {
 	/** The local x translation. */
 	x = 0;
@@ -153,7 +153,7 @@ export class RegionAttachment extends Attachment implements HasTextureRegion {
 	/** Transforms the attachment's four vertices to world coordinates. If the attachment has a {@link #sequence}, the region may
 	 * be changed.
 	 * <p>
-	 * See <a href="http://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
+	 * See <a href="https://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
 	 * Runtimes Guide.
 	 * @param worldVertices The output world vertices. Must have a length >= <code>offset</code> + 8.
 	 * @param offset The <code>worldVertices</code> index to begin writing values.

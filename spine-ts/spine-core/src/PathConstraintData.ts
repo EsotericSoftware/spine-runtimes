@@ -1,13 +1,13 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated July 28, 2023. Replaces all prior versions.
+ * Last updated February 20, 2024. Replaces all prior versions.
  *
- * Copyright (c) 2013-2023, Esoteric Software LLC
+ * Copyright (c) 2013-2024, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
  * conditions of Section 2 of the Spine Editor License Agreement:
- * http://esotericsoftware.com/spine-editor-license
+ * https://esotericsoftware.com/spine-editor-license
  *
  * Otherwise, it is permitted to integrate the Spine Runtimes into software or
  * otherwise create derivative works of the Spine Runtimes (collectively,
@@ -34,7 +34,7 @@ import { SlotData } from "./SlotData.js";
 
 /** Stores the setup pose for a {@link PathConstraint}.
  *
- * See [path constraints](http://esotericsoftware.com/spine-path-constraints) in the Spine User Guide. */
+ * See [path constraints](https://esotericsoftware.com/spine-path-constraints) in the Spine User Guide. */
 export class PathConstraintData extends ConstraintData {
 
 	/** The bones that will be modified by this path constraint. */
@@ -77,15 +77,15 @@ export class PathConstraintData extends ConstraintData {
 
 /** Controls how the first bone is positioned along the path.
  *
- * See [position](http://esotericsoftware.com/spine-path-constraints#Position) in the Spine User Guide. */
+ * See [position](https://esotericsoftware.com/spine-path-constraints#Position) in the Spine User Guide. */
 export enum PositionMode { Fixed, Percent }
 
 /** Controls how bones after the first bone are positioned along the path.
  *
- * See [spacing](http://esotericsoftware.com/spine-path-constraints#Spacing) in the Spine User Guide. */
+ * See [spacing](https://esotericsoftware.com/spine-path-constraints#Spacing) in the Spine User Guide. */
 export enum SpacingMode { Length, Fixed, Percent, Proportional }
 
 /** Controls how bones are rotated, translated, and scaled to match the path.
  *
- * See [rotate mix](http://esotericsoftware.com/spine-path-constraints#Rotate-mix) in the Spine User Guide. */
+ * See [rotate mix](https://esotericsoftware.com/spine-path-constraints#Rotate-Mix) in the Spine User Guide. */
 export enum RotateMode { Tangent, Chain, ChainScale }

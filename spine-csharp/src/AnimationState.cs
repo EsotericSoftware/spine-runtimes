@@ -1,13 +1,13 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated July 28, 2023. Replaces all prior versions.
+ * Last updated February 20, 2024. Replaces all prior versions.
  *
- * Copyright (c) 2013-2023, Esoteric Software LLC
+ * Copyright (c) 2013-2024, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
  * conditions of Section 2 of the Spine Editor License Agreement:
- * http://esotericsoftware.com/spine-editor-license
+ * https://esotericsoftware.com/spine-editor-license
  *
  * Otherwise, it is permitted to integrate the Spine Runtimes into software or
  * otherwise create derivative works of the Spine Runtimes (collectively,
@@ -37,7 +37,7 @@ namespace Spine {
 	/// Applies animations over time, queues animations for later playback, mixes (crossfading) between animations, and applies
 	/// multiple animations on top of each other (layering).</para>
 	/// <para>
-	/// See <a href='http://esotericsoftware.com/spine-applying-animations/'>Applying Animations</a> in the Spine Runtimes Guide.</para>
+	/// See <a href='https://esotericsoftware.com/spine-applying-animations/'>Applying Animations</a> in the Spine Runtimes Guide.</para>
 	/// </summary>
 	public class AnimationState {
 		internal static readonly Animation EmptyAnimation = new Animation("<empty>", new ExposedList<Timeline>(), 0);
@@ -87,9 +87,9 @@ namespace Spine {
 		internal void OnEvent (TrackEntry entry, Event e) { if (Event != null) Event(entry, e); }
 
 		public delegate void TrackEntryDelegate (TrackEntry trackEntry);
-		/// <summary>See <see href="http://esotericsoftware.com/spine-api-reference#AnimationStateListener-Methods">
+		/// <summary>See <see href="https://esotericsoftware.com/spine-api-reference#AnimationStateListener-Methods">
 		/// API Reference documentation pages here</see> for details. Usage in C# and spine-unity is explained
-		/// <see href="http://esotericsoftware.com/spine-unity#Processing-AnimationState-Events">here</see>
+		/// <see href="https://esotericsoftware.com/spine-unity-main-components#Processing-AnimationState-Events">here</see>
 		/// on the spine-unity documentation pages.</summary>
 		public event TrackEntryDelegate Start, Interrupt, End, Dispose, Complete;
 
@@ -993,9 +993,9 @@ namespace Spine {
 
 		internal TrackEntry previous, next, mixingFrom, mixingTo;
 		// difference to libgdx reference: delegates are used for event callbacks instead of 'AnimationStateListener listener'.
-		/// <summary>See <see href="http://esotericsoftware.com/spine-api-reference#AnimationStateListener-Methods">
+		/// <summary>See <see href="https://esotericsoftware.com/spine-api-reference#AnimationStateListener-Methods">
 		/// API Reference documentation pages here</see> for details. Usage in C# and spine-unity is explained
-		/// <see href="http://esotericsoftware.com/spine-unity#Processing-AnimationState-Events">here</see>
+		/// <see href="https://esotericsoftware.com/spine-unity-main-components#Processing-AnimationState-Events">here</see>
 		/// on the spine-unity documentation pages.</summary>
 		public event AnimationState.TrackEntryDelegate Start, Interrupt, End, Dispose, Complete;
 		public event AnimationState.TrackEntryEventDelegate Event;

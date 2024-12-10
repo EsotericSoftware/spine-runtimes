@@ -1,4 +1,4 @@
-The latest version of this documentation can also be found at the [spine-unity Runtime Documentation](http://esotericsoftware.com/spine-unity#Timeline-Extension-UPM-Package) webpage.
+The latest version of this documentation can also be found at the [spine-unity Runtime Documentation](https://esotericsoftware.com/spine-unity#Timeline-Extension-UPM-Package) webpage.
 
 ## Timeline Extension UPM Package
 
@@ -57,10 +57,10 @@ You can add a `Spine Animation State Clip` to a `SkeletonAnimation Track` (or `S
 - *Default Mix Duration.* When disabled, the value under `Mix Duration` below is used for transitions from the previous animation to this animation. When enabled, it will use the setup `Mix Duration` value at the SkeletonData asset for the animation pair.
 - *Use Blend Duration.* When enabled, the value under `Mix Duration` will be synced with the timeline clip transition duration 'Ease In Duration'. Enable this value to adjust transition durations by moving the clip into the previous clip, resulting in a cross-fade triangle at the transition.
 - *Mix Duration.* When *Default Mix Duration* is disabled, this mix duration is used for transitions from the previous animation to this animation.
-- *Event Threshold.* See [TrackEntry.EventThreshold](http://esotericsoftware.com/spine-api-reference#TrackEntry-eventThreshold).
-- *Attachment Threshold.* See [TrackEntry.AttachmentThreshold](http://esotericsoftware.com/spine-api-reference#TrackEntry-attachmentThreshold).
-- *Draw Order Threshold.* See [TrackEntry.DrawOrderThreshold](http://esotericsoftware.com/spine-api-reference#TrackEntry-drawOrderThreshold).
-- *Alpha.* See [TrackEntry.Alpha](http://esotericsoftware.com/spine-api-reference#TrackEntry-alpha).
+- *Event Threshold.* See [TrackEntry.EventThreshold](https://esotericsoftware.com/spine-api-reference#TrackEntry-eventThreshold).
+- *Attachment Threshold.* See [TrackEntry.AttachmentThreshold](https://esotericsoftware.com/spine-api-reference#TrackEntry-attachmentThreshold).
+- *Draw Order Threshold.* See [TrackEntry.DrawOrderThreshold](https://esotericsoftware.com/spine-api-reference#TrackEntry-drawOrderThreshold).
+- *Alpha.* See [TrackEntry.Alpha](https://esotericsoftware.com/spine-api-reference#TrackEntry-alpha).
 
 *Ignored Parameters*
 - *Ease Out Duration, Blend Curves*. These parameters are ignored and have no effect.

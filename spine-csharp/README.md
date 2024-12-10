@@ -1,6 +1,6 @@
 # spine-csharp
 
-The spine-csharp runtime provides functionality to load and manipulate [Spine](http://esotericsoftware.com) skeletal animation data using C# (C Sharp). It does not perform rendering but can be extended to enable Spine animations for other C#-based projects.
+The spine-csharp runtime provides functionality to load and manipulate [Spine](https://esotericsoftware.com) skeletal animation data using C# (C Sharp). It does not perform rendering but can be extended to enable Spine animations for other C#-based projects.
 
 ## Licensing
 
@@ -10,7 +10,7 @@ You can integrate the Spine Runtimes into your software free of charge, but user
 
 In order to distribute your software containing the Spine Runtimes to others that don't have a Spine license, you need a [Spine license](https://esotericsoftware.com/spine-purchase) at the time of integration. Then you can distribute your software containing the Spine Runtimes however you like, provided others don't modify it or use it to create new software. If others want to do that, they'll need their own Spine license.
 
-For the official legal terms governing the Spine Runtimes, please read the [Spine Runtimes License Agreement](http://esotericsoftware.com/spine-runtimes-license) and Section 2 of the [Spine Editor License Agreement](http://esotericsoftware.com/spine-editor-license#s2).
+For the official legal terms governing the Spine Runtimes, please read the [Spine Runtimes License Agreement](https://esotericsoftware.com/spine-runtimes-license) and Section 2 of the [Spine Editor License Agreement](https://esotericsoftware.com/spine-editor-license#s2).
 
 ## Spine version
 

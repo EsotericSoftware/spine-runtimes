@@ -1,13 +1,13 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated July 28, 2023. Replaces all prior versions.
+ * Last updated February 20, 2024. Replaces all prior versions.
  *
- * Copyright (c) 2013-2023, Esoteric Software LLC
+ * Copyright (c) 2013-2024, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
  * conditions of Section 2 of the Spine Editor License Agreement:
- * http://esotericsoftware.com/spine-editor-license
+ * https://esotericsoftware.com/spine-editor-license
  *
  * Otherwise, it is permitted to integrate the Spine Runtimes into software or
  * otherwise create derivative works of the Spine Runtimes (collectively,
@@ -35,7 +35,7 @@ import { VertexAttachment, Attachment } from "./Attachment.js";
  * used in similar ways, but a PointAttachment is slightly less expensive to compute and can be hidden, shown, and placed in a
  * skin.
  *
- * See [Point Attachments](http://esotericsoftware.com/spine-point-attachments) in the Spine User Guide. */
+ * See [Point Attachments](https://esotericsoftware.com/spine-points) in the Spine User Guide. */
 export class PointAttachment extends VertexAttachment {
 	x: number = 0;
 	y: number = 0;

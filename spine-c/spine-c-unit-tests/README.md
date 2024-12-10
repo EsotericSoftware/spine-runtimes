@@ -1,6 +1,6 @@
 # spine-c-unit-tests
 
-The spine-c-unit-tests project is to test the [Spine](http://esotericsoftware.com) skeletal animation system. It does not perform rendering.  It is primarily used for regression testing and leak detection.  It is designed to be run from a Continuous Integration server and to passively verify changes automatically on check-in.
+The spine-c-unit-tests project is to test the [Spine](https://esotericsoftware.com) skeletal animation system. It does not perform rendering.  It is primarily used for regression testing and leak detection.  It is designed to be run from a Continuous Integration server and to passively verify changes automatically on check-in.
 
 ## Mini CPP Unit Testing
 [MiniCppUnit](https://sourceforge.net/p/minicppunit/wiki/Home/) is a minimal unit testing framework similar to JUnit.  It is used here to avoid large dependancies.

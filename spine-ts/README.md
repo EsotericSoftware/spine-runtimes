@@ -1,6 +1,6 @@
 # spine-ts
 
-The spine-ts runtime provides functionality to load and manipulate [Spine](http://esotericsoftware.com) skeletal animation data using TypeScript and JavaScript. spine-ts is split
+The spine-ts runtime provides functionality to load and manipulate [Spine](https://esotericsoftware.com) skeletal animation data using TypeScript and JavaScript. spine-ts is split
 up into multiple modules:
 
 1. `spine-core/`, the core classes to load and process Spine skeletons.
@@ -15,7 +15,7 @@ up into multiple modules:
 
 In most cases, the `spine-player` module is best suited for your needs. Please refer to the [Spine Web Player documentation](https://esotericsoftware.com/spine-player) for more information.
 
-For documentation of the core API in `spine-core`, please refer to our [Spine Runtimes Guide](http://esotericsoftware.com/spine-runtimes-guide).
+For documentation of the core API in `spine-core`, please refer to our [Spine Runtimes Guide](https://esotericsoftware.com/spine-runtimes-guide).
 
 For documentation of `spine-phaser`, please refer to our [spine-phaser Guide](https://esotericsoftware.com/spine-phaser).
 
@@ -23,7 +23,7 @@ For documentation of `spine-pixi-v7` and `spine-pixi-v8`, please refer to our [s
 
 For documentation of `spine-canvaskit`, please refer to our [spine-canvaskit Guide](https://esotericsoftware.com/spine-canvaskit).
 
-For module specific APIs in `spine-canvas`, `spine-webgl`, and `spine-threejs`, please refer to the [Examples](#examples) in the respecitve `spine-<modulename>/example` folder. For `spine-webgl` specifically, we have provided additional [demos](spine-webgl/demos), which you can also [view online](http://esotericsoftware.com/spine-demos).
+For module specific APIs in `spine-canvas`, `spine-webgl`, and `spine-threejs`, please refer to the [Examples](#examples) in the respecitve `spine-<modulename>/example` folder. For `spine-webgl` specifically, we have provided additional [demos](spine-webgl/demos), which you can also [view online](https://esotericsoftware.com/spine-demos).
 
 ## Licensing
 
@@ -33,7 +33,7 @@ You can integrate the Spine Runtimes into your software free of charge, but user
 
 In order to distribute your software containing the Spine Runtimes to others that don't have a Spine license, you need a [Spine license](https://esotericsoftware.com/spine-purchase) at the time of integration. Then you can distribute your software containing the Spine Runtimes however you like, provided others don't modify it or use it to create new software. If others want to do that, they'll need their own Spine license.
 
-For the official legal terms governing the Spine Runtimes, please read the [Spine Runtimes License Agreement](http://esotericsoftware.com/spine-runtimes-license) and Section 2 of the [Spine Editor License Agreement](http://esotericsoftware.com/spine-editor-license#s2).
+For the official legal terms governing the Spine Runtimes, please read the [Spine Runtimes License Agreement](https://esotericsoftware.com/spine-runtimes-license) and Section 2 of the [Spine Editor License Agreement](https://esotericsoftware.com/spine-editor-license#s2).
 
 ## Spine version
 
