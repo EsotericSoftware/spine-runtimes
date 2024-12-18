@@ -73,8 +73,10 @@ export class SpinePipe implements RenderPipe<Spine> {
 	validateRenderable (spine: Spine): boolean {
 		spine._validateAndTransformAttachments();
 
+		const gpuSpine = this.gpuSpineData[spine.uid];
+
 		// if spine attachments have changed or destroyed, we need to rebuild the batch!
-		if (spine.spineAttachmentsDirty) {
+		if (spine.spineAttachmentsDirty || !gpuSpine) {
 			return true;
 		}
 
@@ -82,8 +84,7 @@ export class SpinePipe implements RenderPipe<Spine> {
 		else if (spine.spineTexturesDirty) {
 			// loop through and see if the textures have changed..
 			const drawOrder = spine.skeleton.drawOrder;
-			const gpuSpine = this.gpuSpineData[spine.uid];
-
+			
 			for (let i = 0, n = drawOrder.length; i < n; i++) {
 				const slot = drawOrder[i];
 				const attachment = slot.getAttachment();
