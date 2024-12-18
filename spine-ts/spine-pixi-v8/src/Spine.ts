@@ -377,6 +377,7 @@ export class Spine extends ViewContainer {
 	}
 
 	private validateAttachments () {
+
 		const currentDrawOrder = this.skeleton.drawOrder;
 
 		const lastAttachments = this._lastAttachments;
@@ -404,7 +405,7 @@ export class Spine extends ViewContainer {
 			lastAttachments.length = index;
 		}
 
-		this.spineAttachmentsDirty = spineAttachmentsDirty;
+		this.spineAttachmentsDirty ||= spineAttachmentsDirty;
 	}
 
 	private updateAndSetPixiMask (slot: Slot, last: boolean) {
