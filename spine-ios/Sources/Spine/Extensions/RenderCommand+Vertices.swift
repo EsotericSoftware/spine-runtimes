@@ -1,10 +1,11 @@
 import SpineShadersStructs
 import Foundation
+import simd
 
 extension RenderCommand {
     func getVertices() -> [SpineVertex] {
         var vertices = [SpineVertex]()
-        
+
         let indices = indices
         let numVertices = numVertices
         let positions = positions(numVertices: numVertices)
@@ -13,36 +14,30 @@ extension RenderCommand {
         vertices.reserveCapacity(indices.count)
         for i in 0..<indices.count {
             let index = Int(indices[i])
-            
             let xIndex = 2 * index
             let yIndex = xIndex + 1
-            
-            let positionX = positions[xIndex]
-            let positionY = positions[yIndex]
-            let uvX = uvs[xIndex]
-            let uvY = uvs[yIndex]
+            let position = SIMD2<Float>(positions[xIndex], positions[yIndex])
+            let uv = SIMD2<Float>(uvs[xIndex], uvs[yIndex])
             let color = extractRGBA(from: colors[index])
-            
             let vertex = SpineVertex(
-                position: vector_float2(positionX, positionY),
+                position: position,
                 color: color,
-                uv: vector_float2(uvX, uvY)
+                uv: uv
             )
             vertices.append(vertex)
         }
         
         return vertices
     }
-    
-    private func extractRGBA(from color: Int32) -> vector_float4 {
+
+    private func extractRGBA(from color: Int32) -> SIMD4<Float> {
         guard color != -1 else {
-            return vector_float4(1.0, 1.0, 1.0, 1.0)
+            return SIMD4<Float>(1.0, 1.0, 1.0, 1.0)
         }
-        let alpha = (color >> 24) & 0xFF
-        let red = (color >> 16) & 0xFF
-        let green = (color >> 8) & 0xFF
-        let blue = color & 0xFF
-                
-        return vector_float4(Float(red)/255, Float(green)/255, Float(blue)/255, (Float(alpha)/255))
+        let alpha = Float((color >> 24) & 0xFF) / 255.0
+        let red = Float((color >> 16) & 0xFF) / 255.0
+        let green = Float((color >> 8) & 0xFF) / 255.0
+        let blue = Float(color & 0xFF) / 255.0
+        return SIMD4<Float>(red, green, blue, alpha)
     }
 }
