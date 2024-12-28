@@ -166,7 +166,7 @@ void spBone_updateWorldTransformWith(spBone *self, float x, float y, float rotat
 			zc *= s;
 			s = SQRT(za * za + zc * zc);
 			if (self->inherit == SP_INHERIT_NOSCALE &&
-				(pa * pd - pb * pc < 0) != (sx < 0 != sy < 0))
+				(pa * pd - pb * pc < 0) != ((sx < 0) != (sy < 0)))
 				s = -s;
 			rotation = PI / 2 + ATAN2(zc, za);
 			float zb = COS(rotation) * s;
@@ -281,7 +281,7 @@ void spBone_updateAppliedTransform(spBone *self) {
 				pc *= s;
 				s = SQRT(pa * pa + pc * pc);
 				if (self->inherit == SP_INHERIT_NOSCALE &&
-					pid < 0 != (self->skeleton->scaleX < 0 != (self->skeleton->scaleY * yDownScale) < 0))
+					(pid < 0) != ((self->skeleton->scaleX < 0) != ((self->skeleton->scaleY * yDownScale) < 0)))
 					s = -s;
 				r = PI / 2 + ATAN2(pc, pa);
 				pb = COS(r) * s;
