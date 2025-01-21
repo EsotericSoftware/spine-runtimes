@@ -1274,11 +1274,12 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 
 			time = time2;
 			mixRotate = mixRotate2;
+			mixShearY = mixShearY2;
 			mixX = mixX2;
 			mixY = mixY2;
 			mixScaleX = mixScaleX2;
 			mixScaleY = mixScaleY2;
-			mixScaleX = mixScaleX2;
+
 			keyMap = nextMap;
 		}
 
