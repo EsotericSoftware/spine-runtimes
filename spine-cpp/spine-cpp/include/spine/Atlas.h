@@ -39,6 +39,7 @@
 
 namespace spine {
 	enum Format {
+		SP_ATLAS_UNKNOWN_FORMAT,
 		Format_Alpha,
 		Format_Intensity,
 		Format_LuminanceAlpha,

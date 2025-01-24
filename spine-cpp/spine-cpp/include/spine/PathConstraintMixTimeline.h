@@ -61,7 +61,7 @@ namespace spine {
 		static const int ENTRIES = 4;
 		static const int ROTATE = 1;
 		static const int X = 2;
-		static const int Y = 2;
+		static const int Y = 3;
 	};
 }
 
