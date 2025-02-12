@@ -27,7 +27,7 @@ public extension SkeletonDrawableWrapper {
         spineView.delegate?.draw(in: spineView)
         
         guard let texture = spineView.currentDrawable?.texture else {
-            throw "Could not read texture." as SpineError
+            throw SpineError("Could not read texture.")
         }
         let width = texture.width
         let height = texture.height
@@ -47,7 +47,7 @@ public extension SkeletonDrawableWrapper {
         let colorSpace = CGColorSpaceCreateDeviceRGB()
         guard let context = CGContext(data: data, width: width, height: height, bitsPerComponent: 8, bytesPerRow: rowBytes, space: colorSpace, bitmapInfo: bitmapInfo.rawValue),
               let cgImage = context.makeImage() else {
-                throw "Could not create image." as SpineError
+                throw SpineError("Could not create image.")
         }
         return cgImage
     }

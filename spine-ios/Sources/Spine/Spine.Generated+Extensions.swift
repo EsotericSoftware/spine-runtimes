@@ -58,18 +58,18 @@ public extension Atlas {
     
     private static func fromData(data: Data, loadFile: (_ name: String) async throws -> Data) async throws -> (Atlas, [UIImage]) {
         guard let atlasData = String(data: data, encoding: .utf8) else {
-            throw "Couldn't read atlas bytes as utf8 string" as SpineError
+            throw SpineError("Couldn't read atlas bytes as utf8 string")
         }
         let atlas = try atlasData.utf8CString.withUnsafeBufferPointer {
             guard let atlas = spine_atlas_load($0.baseAddress) else {
-                throw "Couldn't load atlas data" as SpineError
+                throw SpineError("Couldn't load atlas data")
             }
             return atlas
         }
         if let error = spine_atlas_get_error(atlas) {
             let message = String(cString: error)
             spine_atlas_dispose(atlas)
-            throw "Couldn't load atlas: \(message)" as SpineError
+            throw SpineError("Couldn't load atlas: \(message)")
         }
         
         var atlasPages = [UIImage]()
@@ -134,7 +134,7 @@ public extension SkeletonData {
         let result = try data.withUnsafeBytes{
             try $0.withMemoryRebound(to: UInt8.self) { buffer in
                 guard let ptr = buffer.baseAddress else {
-                    throw "Couldn't read atlas binary" as SpineError
+                    throw SpineError("Couldn't read atlas binary")
                 }
                 return spine_skeleton_data_load_binary(
                     atlas.wrappee,
@@ -144,17 +144,17 @@ public extension SkeletonData {
             }
         }
         guard let result else {
-            throw "Couldn't load skeleton data" as SpineError
+            throw SpineError("Couldn't load skeleton data")
         }
         defer {
             spine_skeleton_data_result_dispose(result)
         }
         if let error = spine_skeleton_data_result_get_error(result) {
             let message = String(cString: error)
-            throw "Couldn't load skeleton data: \(message)" as SpineError
+            throw SpineError("Couldn't load skeleton data: \(message)")
         }
         guard let data = spine_skeleton_data_result_get_data(result) else {
-            throw "Couldn't load skeleton data from result" as SpineError
+            throw SpineError("Couldn't load skeleton data from result")
         }
         return SkeletonData(data)
     }
@@ -168,7 +168,7 @@ public extension SkeletonData {
             guard
                 let basePtr = buffer.baseAddress,
                 let result = spine_skeleton_data_load_json(atlas.wrappee, basePtr) else {
-                throw "Couldn't load skeleton data json" as SpineError
+                throw SpineError("Couldn't load skeleton data json")
             }
             return result
         }
@@ -177,10 +177,10 @@ public extension SkeletonData {
         }
         if let error = spine_skeleton_data_result_get_error(result) {
             let message = String(cString: error)
-            throw "Couldn't load skeleton data: \(message)" as SpineError
+            throw SpineError("Couldn't load skeleton data: \(message)")
         }
         guard let data = spine_skeleton_data_result_get_data(result) else {
-            throw "Couldn't load skeleton data from result" as SpineError
+            throw SpineError("Couldn't load skeleton data from result")
         }
         return SkeletonData(data)
     }
@@ -188,7 +188,7 @@ public extension SkeletonData {
     private static func fromData(atlas: Atlas, data: Data, isJson: Bool) throws -> SkeletonData {
         if isJson {
             guard let json = String(data: data, encoding: .utf8) else {
-                throw "Couldn't read skeleton data json string" as SpineError
+                throw SpineError("Couldn't read skeleton data json string")
             }
             return try fromJson(atlas: atlas, json: json)
         } else {
@@ -282,12 +282,12 @@ internal enum FileSource {
         case .bundle(let fileName, let bundle):
             let components = fileName.split(separator: ".")
             guard components.count > 1, let ext = components.last else {
-                throw "Provide both file name and file extension" as SpineError
+                throw SpineError("Provide both file name and file extension")
             }
             let name = components.dropLast(1).joined(separator: ".")
             
             guard let fileUrl = bundle.url(forResource: name, withExtension: String(ext)) else {
-                throw "Could not load file with name \(name) from bundle" as SpineError
+                throw SpineError("Could not load file with name \(name) from bundle")
             }
             return try Data(contentsOf: fileUrl, options: [])
         case .file(let fileUrl):
@@ -316,7 +316,7 @@ internal enum FileSource {
                                     return
                                 }
                                 guard let temp else {
-                                    continuation.resume(throwing: "Could not download file." as SpineError)
+                                    continuation.resume(throwing: SpineError("Could not download file."))
                                     return
                                 }
                                 do {
@@ -350,12 +350,12 @@ internal enum FileSource {
     }
 }
 
-public struct SpineError: ExpressibleByStringInterpolation, Error, Hashable {
+public struct SpineError: Error, CustomStringConvertible {
     
-    public let message: String
+    public let description: String
     
-    public init(stringLiteral value: String) {
-        self.message = value
+    internal init(_ description: String) {
+        self.description = description
     }
     
 }
