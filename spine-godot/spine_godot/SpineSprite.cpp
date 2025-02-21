@@ -1216,8 +1216,9 @@ void SpineSprite::draw() {
 	}
 
 #if TOOLS_ENABLED
-
-	float editor_scale = EditorInterface::get_singleton()->get_editor_scale();
+	float editor_scale = 1.0;
+	if (Engine::get_singleton()->is_editor_hint()) editor_scale = EditorInterface::get_singleton()->get_editor_scale();
+	
 	float inverse_zoom = 1 / get_viewport()->get_global_canvas_transform().get_scale().x * editor_scale;
 	Vector<String> hover_text_lines;
 	if (hovered_slot) {
