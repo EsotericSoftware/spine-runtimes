@@ -129,7 +129,7 @@ class Bone implements Updatable {
 		var cos:Float = 0;
 		var s:Float = 0;
 		var sx:Float = skeleton.scaleX;
-		var sy:Float = skeleton.scaleY * (yDown ? -1 : 1);
+		var sy:Float = skeleton.scaleY;
 
 		var parent:Bone = _parent;
 		if (parent == null) {
@@ -152,7 +152,7 @@ class Bone implements Updatable {
 		worldX = pa * x + pb * y + parent.worldX;
 		worldY = pc * x + pd * y + parent.worldY;
 
-		switch (data.inherit) {
+		switch (inherit) {
 			case Inherit.normal:
 				var rx:Float = (rotation + shearX) * MathUtils.degRad;
 				var ry:Float = (rotation + 90 + shearY) * MathUtils.degRad;
@@ -173,10 +173,14 @@ class Bone implements Updatable {
 				c = Math.sin(rx) * scaleX;
 				d = Math.sin(ry) * scaleY;
 			case Inherit.noRotationOrReflection:
+				var sx:Float = 1 / skeleton.scaleX;
+				var sy:Float = 1 / skeleton.scaleY;
+				pa *= sx;
+				pc *= sy;
 				s = pa * pa + pc * pc;
 				var prx:Float = 0;
 				if (s > 0.0001) {
-					s = Math.abs(pa * pd - pb * pc) / s;
+					s = Math.abs(pa * pd * sy - pb * sx * pc) / s;
 					pb = pc * s;
 					pd = pa * s;
 					prx = Math.atan2(pc, pa) * MathUtils.radDeg;
@@ -207,7 +211,7 @@ class Bone implements Updatable {
 				za *= s;
 				zc *= s;
 				s = Math.sqrt(za * za + zc * zc);
-				if (data.inherit == Inherit.noScale && ((pa * pd - pb * pc < 0) != ((sx < 0) != (sy < 0)))) {
+				if (inherit == Inherit.noScale && ((pa * pd - pb * pc < 0) != ((sx < 0) != (sy < 0)))) {
 					s = -s;
 				}
 				rotation = Math.PI / 2 + Math.atan2(zc, za);
@@ -280,10 +284,8 @@ class Bone implements Updatable {
 			switch (inherit) {
 				case Inherit.noRotationOrReflection:
 					var s:Float = Math.abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
-					var sa:Float = pa / skeleton.scaleX;
-					var sc:Float = pc / skeleton.scaleY;
-					pb = -sc * s * skeleton.scaleX;
-					pd = sa * s * skeleton.scaleY;
+					pb = -pc * skeleton.scaleX * s / skeleton.scaleY;
+					pd = pa * skeleton.scaleY * s / skeleton.scaleX;
 					pid = 1 / (pa * pd - pb * pc);
 					ia = pd * pid;
 					ib = pb * pid;

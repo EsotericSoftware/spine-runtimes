@@ -16,7 +16,8 @@ sed -i '' "s/$currentVersion/$newVersion/" spine-canvas/package.json
 sed -i '' "s/$currentVersion/$newVersion/" spine-canvaskit/package.json
 sed -i '' "s/$currentVersion/$newVersion/" spine-core/package.json
 sed -i '' "s/$currentVersion/$newVersion/" spine-phaser/package.json
-sed -i '' "s/$currentVersion/$newVersion/" spine-pixi/package.json
+sed -i '' "s/$currentVersion/$newVersion/" spine-pixi-v7/package.json
+sed -i '' "s/$currentVersion/$newVersion/" spine-pixi-v8/package.json
 sed -i '' "s/$currentVersion/$newVersion/" spine-player/package.json
 sed -i '' "s/$currentVersion/$newVersion/" spine-threejs/package.json
 sed -i '' "s/$currentVersion/$newVersion/" spine-webgl/package.json

@@ -86,6 +86,7 @@ namespace Spine.Unity.Examples {
 		void CreateQuadChild () {
 			quad = new GameObject(this.name + " RenderTexture", typeof(MeshRenderer), typeof(MeshFilter));
 			quad.transform.SetParent(this.transform.parent, false);
+			quad.layer = meshRenderer.gameObject.layer;
 			quadMeshRenderer = quad.GetComponent<MeshRenderer>();
 			quadMeshFilter = quad.GetComponent<MeshFilter>();
 
@@ -128,6 +129,8 @@ namespace Spine.Unity.Examples {
 		}
 
 		void RenderOntoQuad (SkeletonRenderer skeletonRenderer) {
+			if (meshFilter == null)
+				meshFilter = this.GetComponent<MeshFilter>();
 			Vector3 size = meshFilter.sharedMesh.bounds.size;
 			if (size.x == 0f || size.y == 0f) {
 				AssignNullMeshAtQuad();

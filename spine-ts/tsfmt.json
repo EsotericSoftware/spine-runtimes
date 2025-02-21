@@ -3,7 +3,7 @@
 	"indentSize": 4,
 	"tabSize": 4,
 	"indentStyle": 2,
-	"newLineCharacter": "\r\n",
+	"newLineCharacter": "\n",
 	"convertTabsToSpaces": false,
 	"insertSpaceAfterCommaDelimiter": true,
 	"insertSpaceAfterSemicolonInForStatements": true,

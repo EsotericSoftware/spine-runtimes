@@ -363,6 +363,10 @@ bool SkeletonClipping::clip(float x1, float y1, float x2, float y2, float x3, fl
 	} else
 		originalOutput->setSize(originalOutput->size() - 2, 0);
 
+	if (originalOutput->size() < 6) {
+		originalOutput->clear();
+		return false;
+	}
 	return clipped;
 }
 

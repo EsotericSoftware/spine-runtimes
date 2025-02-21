@@ -287,6 +287,30 @@ float USpineSkeletonComponent::GetAnimationDuration(FString AnimationName) {
 	return 0;
 }
 
+void USpineSkeletonComponent::PhysicsTranslate(float x, float y) {
+	CheckState();
+	if (skeleton) {
+		skeleton->physicsTranslate(x, y);
+	}
+}
+
+void USpineSkeletonComponent::PhysicsRotate(float x, float y, float degrees) {
+	CheckState();
+	if (skeleton) {
+		skeleton->physicsRotate(x, y, degrees);
+	}
+}
+
+void USpineSkeletonComponent::ResetPhysicsConstraints() {
+	CheckState();
+	if (skeleton) {
+		Vector<PhysicsConstraint *> &constraints = skeleton->getPhysicsConstraints();
+		for (int i = 0, n = (int) constraints.size(); i < n; i++) {
+			constraints[i]->reset();
+		}
+	}
+}
+
 void USpineSkeletonComponent::BeginPlay() {
 	Super::BeginPlay();
 }

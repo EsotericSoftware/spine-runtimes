@@ -148,17 +148,18 @@ class AnimationState {
 		from.animationLast = from.nextAnimationLast;
 		from.trackLast = from.nextTrackLast;
 
-		// Require mixTime > 0 to ensure the mixing from entry was applied at least once.
-		if (to.mixTime > 0 && to.mixTime >= to.mixDuration) {
-			// Require totalAlpha == 0 to ensure mixing is complete, unless mixDuration == 0 (the transition is a single frame).
-			if (from.totalAlpha == 0 || to.mixDuration == 0) {
-				to.mixingFrom = from.mixingFrom;
-				if (from.mixingFrom != null)
-					from.mixingFrom.mixingTo = to;
-				to.interruptAlpha = from.interruptAlpha;
-				queue.end(from);
+		if (to.nextTrackLast != -1) { // The from entry was applied at least once.
+			var discard:Bool = to.mixTime == 0 && from.mixTime == 0; // Discard the from entry when neither have advanced yet.
+			if (to.mixTime >= to.mixDuration || discard) {
+				// Require totalAlpha == 0 to ensure mixing is complete or the transition is a single frame or discarded.
+				if (from.totalAlpha == 0 || to.mixDuration == 0 || discard) {
+					to.mixingFrom = from.mixingFrom;
+					if (from.mixingFrom != null) from.mixingFrom.mixingTo = to;
+					to.interruptAlpha = from.interruptAlpha;
+					queue.end(from);
+				}
+				return finished;
 			}
-			return finished;
 		}
 
 		from.trackTime += delta * from.timeScale;

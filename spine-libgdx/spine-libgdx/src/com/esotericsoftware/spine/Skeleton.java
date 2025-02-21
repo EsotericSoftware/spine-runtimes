@@ -1,13 +1,13 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated July 28, 2023. Replaces all prior versions.
+ * Last updated February 20, 2024. Replaces all prior versions.
  *
- * Copyright (c) 2013-2023, Esoteric Software LLC
+ * Copyright (c) 2013-2024, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
  * conditions of Section 2 of the Spine Editor License Agreement:
- * http://esotericsoftware.com/spine-editor-license
+ * https://esotericsoftware.com/spine-editor-license
  *
  * Otherwise, it is permitted to integrate the Spine Runtimes into software or
  * otherwise create derivative works of the Spine Runtimes (collectively,
@@ -43,7 +43,7 @@ import com.esotericsoftware.spine.utils.SkeletonClipping;
 
 /** Stores the current pose for a skeleton.
  * <p>
- * See <a href="http://esotericsoftware.com/spine-runtime-architecture#Instance-objects">Instance objects</a> in the Spine
+ * See <a href="https://esotericsoftware.com/spine-runtime-architecture#Instance-objects">Instance objects</a> in the Spine
  * Runtimes Guide. */
 public class Skeleton {
 	static private final short[] quadTriangles = {0, 1, 2, 2, 3, 0};
@@ -368,7 +368,7 @@ public class Skeleton {
 
 	/** Updates the world transform for each bone and applies all constraints.
 	 * <p>
-	 * See <a href="http://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
+	 * See <a href="https://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
 	 * Runtimes Guide. */
 	public void updateWorldTransform (Physics physics) {
 		Object[] bones = this.bones.items;
@@ -391,7 +391,7 @@ public class Skeleton {
 	/** Temporarily sets the root bone as a child of the specified bone, then updates the world transform for each bone and applies
 	 * all constraints.
 	 * <p>
-	 * See <a href="http://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
+	 * See <a href="https://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
 	 * Runtimes Guide. */
 	public void updateWorldTransform (Physics physics, Bone parent) {
 		if (parent == null) throw new IllegalArgumentException("parent cannot be null.");
@@ -588,7 +588,7 @@ public class Skeleton {
 	/** Finds an attachment by looking in the {@link #skin} and {@link SkeletonData#defaultSkin} using the slot index and
 	 * attachment name. First the skin is checked and if the attachment was not found, the default skin is checked.
 	 * <p>
-	 * See <a href="http://esotericsoftware.com/spine-runtime-skins">Runtime skins</a> in the Spine Runtimes Guide. */
+	 * See <a href="https://esotericsoftware.com/spine-runtime-skins">Runtime skins</a> in the Spine Runtimes Guide. */
 	public @Null Attachment getAttachment (int slotIndex, String attachmentName) {
 		if (attachmentName == null) throw new IllegalArgumentException("attachmentName cannot be null.");
 		if (skin != null) {

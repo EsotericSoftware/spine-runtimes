@@ -59,6 +59,7 @@ namespace Spine.Unity.Editor {
 		where TextureRequest : Spine.Unity.IOnDemandRequest {
 
 		protected SerializedProperty atlasAsset;
+		protected SerializedProperty skeletonDataAsset;
 		protected SerializedProperty maxPlaceholderSize;
 		protected SerializedProperty placeholderMap;
 		protected SerializedProperty unloadAfterSecondsUnused;
@@ -172,6 +173,39 @@ namespace Spine.Unity.Editor {
 				// assign late since CreatePlaceholderTextureFor(texture) method above might save assets and clear these values.
 				loader.placeholderMap = materialMap;
 				loader.atlasAsset = atlasAsset;
+				if (loader.skeletonDataAsset == null)
+					AssignSkeletonDataAsset(loader, atlasAsset);
+			}
+
+			protected void AssignSkeletonDataAsset (GenericOnDemandTextureLoader<TargetReference, TextureRequest> loader, AtlasAssetBase atlasAsset) {
+				string atlasAssetPath = AssetDatabase.GetAssetPath(atlasAsset);
+				string parentFolder = System.IO.Path.GetDirectoryName(atlasAssetPath);
+
+				SkeletonDataAsset skeletonDataAsset = FindSkeletonDataAsset(parentFolder, atlasAsset);
+				if (skeletonDataAsset) {
+					loader.skeletonDataAsset = skeletonDataAsset;
+					return;
+				}
+				string nextParentFolder = System.IO.Path.GetDirectoryName(parentFolder);
+				skeletonDataAsset = FindSkeletonDataAsset(nextParentFolder, atlasAsset);
+				if (skeletonDataAsset) {
+					loader.skeletonDataAsset = skeletonDataAsset;
+					return;
+				}
+			}
+
+			protected SkeletonDataAsset FindSkeletonDataAsset (string searchFolder, AtlasAssetBase atlasAsset) {
+				string[] guids = AssetDatabase.FindAssets("t:SkeletonDataAsset", new[] { searchFolder });
+				foreach (string guid in guids) {
+					string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+					SkeletonDataAsset skeletonDataAsset = AssetDatabase.LoadAssetAtPath<SkeletonDataAsset>(assetPath);
+					if (skeletonDataAsset != null) {
+						if (skeletonDataAsset.atlasAssets.Contains(atlasAsset)) {
+							return skeletonDataAsset;
+						}
+					}
+				}
+				return null;
 			}
 
 			public virtual Texture CreatePlaceholderTextureFor (Texture originalTexture, int maxPlaceholderSize,
@@ -244,6 +278,7 @@ namespace Spine.Unity.Editor {
 
 		void OnEnable () {
 			atlasAsset = serializedObject.FindProperty("atlasAsset");
+			skeletonDataAsset = serializedObject.FindProperty("skeletonDataAsset");
 			maxPlaceholderSize = serializedObject.FindProperty("maxPlaceholderSize");
 			placeholderMap = serializedObject.FindProperty("placeholderMap");
 			unloadAfterSecondsUnused = serializedObject.FindProperty("unloadAfterSecondsUnused");
@@ -352,6 +387,7 @@ namespace Spine.Unity.Editor {
 			serializedObject.Update();
 
 			EditorGUILayout.PropertyField(atlasAsset);
+			EditorGUILayout.PropertyField(skeletonDataAsset);
 			EditorGUILayout.PropertyField(maxPlaceholderSize);
 			EditorGUILayout.PropertyField(unloadAfterSecondsUnused);
 

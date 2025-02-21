@@ -131,6 +131,11 @@ namespace Spine {
 			b2 = MathUtils.Clamp(b2, 0, 1);
 		}
 
+		/// <summary>
+		/// The current attachment for the slot, or null if the slot has no attachment.
+		/// If the attachment is changed, resets <see cref="SequenceIndex"/> and clears the <see cref="Deform"/>.
+		/// The deform is not cleared if the old attachment has the same <see cref="VertexAttachment.TimelineAttachment"/> as the
+		/// specified attachment.</summary>
 		public Attachment Attachment {
 			/// <summary>The current attachment for the slot, or null if the slot has no attachment.</summary>
 			get { return attachment; }

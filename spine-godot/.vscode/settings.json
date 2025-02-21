@@ -1,5 +1,18 @@
 {
   "cmake.configureOnOpen": false,
-  "C_Cpp.intelliSenseEngine": "disabled",
-  "dotnet.defaultSolution": "disable"
+  "C_Cpp.intelliSenseEngine": "default",
+  "C_Cpp.default.browse.path": [
+    "${workspaceFolder}/godot-cpp/gen",
+    "${workspaceFolder}"
+  ],
+  "C_Cpp.default.defines": ["TOOLS_ENABLED", "SPINE_GODOT_EXTENSION"],
+  "dotnet.defaultSolution": "disable",
+  "files.associations": {
+    "*.inc": "cpp",
+    "__split_buffer": "cpp",
+    "deque": "cpp",
+    "list": "cpp",
+    "string": "cpp",
+    "vector": "cpp"
+  }
 }

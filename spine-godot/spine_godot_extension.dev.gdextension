@@ -1,0 +1,18 @@
+[configuration]
+
+entry_symbol = "spine_godot_library_init"
+compatibility_minimum = "4.1"
+
+[libraries]
+
+macos.editor = "res://bin/macos/macos.framework/libspine_godot.macos.dev.editor"
+macos.debug = "res://bin/macos/macos.framework/libspine_godot.macos.dev.template_debug"
+macos.release = "res://bin/macos/macos.framework/libspine_godot.macos.template_release"
+
+windows.editor.x86_64 = "res://bin/windows/libspine_godot.windows.editor.dev.x86_64.dll"
+windows.debug.x86_64 = "res://bin/windows/libspine_godot.windows.template_debug.dev.x86_64.dll"
+windows.release.x86_64 = "res://bin/windows/libspine_godot.windows.template_release.dev.x86_64.dll"
+
+linux.editor.x86_64 = "res://bin/linux/libspine_godot.linux.editor.dev.x86_64.so"
+linux.debug.x86_64 = "res://bin/linux/libspine_godot.linux.template_debug.dev.x86_64.so"
+linux.release.x86_64 = "res://bin/linux/libspine_godot.linux.template_release.dev.x86_64.so"

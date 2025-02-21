@@ -175,7 +175,7 @@ namespace Spine {
 						}
 						if (a >= t) {
 							d = (float)Math.Pow(damping, 60 * t);
-							float m = massInverse * t, e = strength, w = wind * f, g = (Bone.yDown ? -gravity : gravity) * f;
+							float m = massInverse * t, e = strength, w = wind * f * skeleton.ScaleX, g = gravity * f * skeleton.ScaleY;
 							do {
 								if (x) {
 									xVelocity += (w - xOffset * e) * m;

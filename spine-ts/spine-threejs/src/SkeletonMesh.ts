@@ -27,10 +27,10 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+import * as THREE from "three";
 import {
 	AnimationState,
 	AnimationStateData,
-	BlendMode,
 	ClippingAttachment,
 	Color,
 	MeshAttachment,
@@ -40,69 +40,51 @@ import {
 	Skeleton,
 	SkeletonClipping,
 	SkeletonData,
-	TextureAtlasRegion,
+	SkeletonBinary,
+	SkeletonJson,
 	Utils,
 	Vector2,
 } from "@esotericsoftware/spine-core";
-import { MeshBatcher } from "./MeshBatcher.js";
-import * as THREE from "three";
+
+import { MaterialWithMap, MeshBatcher } from "./MeshBatcher.js";
 import { ThreeJsTexture } from "./ThreeJsTexture.js";
 
-export type SkeletonMeshMaterialParametersCustomizer = (
-	materialParameters: THREE.ShaderMaterialParameters
-) => void;
+type SkeletonMeshMaterialParametersCustomizer = (materialParameters: THREE.MaterialParameters) => void;
+type SkeletonMeshConfiguration = {
 
-export class SkeletonMeshMaterial extends THREE.ShaderMaterial {
-	constructor (customizer: SkeletonMeshMaterialParametersCustomizer) {
-		let vertexShader = `
-			attribute vec4 color;
-			varying vec2 vUv;
-			varying vec4 vColor;
-			void main() {
-				vUv = uv;
-				vColor = color;
-				gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0);
-			}
-		`;
-		let fragmentShader = `
-			uniform sampler2D map;
-			#ifdef USE_SPINE_ALPHATEST
-			uniform float alphaTest;
-			#endif
-			varying vec2 vUv;
-			varying vec4 vColor;
-			void main(void) {
-				gl_FragColor = texture2D(map, vUv)*vColor;
-				#ifdef USE_SPINE_ALPHATEST
-				if (gl_FragColor.a < alphaTest) discard;
-				#endif
-			}
-		`;
+	/** The skeleton data object loaded by using {@link SkeletonJson} or {@link SkeletonBinary} */
+	skeletonData: SkeletonData,
 
-		let parameters: THREE.ShaderMaterialParameters = {
-			uniforms: {
-				map: { value: null },
-			},
-			vertexShader: vertexShader,
-			fragmentShader: fragmentShader,
-			side: THREE.DoubleSide,
-			transparent: true,
-			depthWrite: true,
-			alphaTest: 0.0,
-		};
-		customizer(parameters);
-		if (parameters.alphaTest && parameters.alphaTest > 0) {
-			parameters.defines = { USE_SPINE_ALPHATEST: 1 };
-			if (!parameters.uniforms) parameters.uniforms = {};
-			parameters.uniforms["alphaTest"] = { value: parameters.alphaTest };
-		}
-		super(parameters);
-		// non-pma textures are premultiply on upload, so we set premultipliedAlpha to true
-		this.premultipliedAlpha = true;
-	}
-}
+	/** Set it to true to enable tint black rendering */
+	twoColorTint?: boolean,
+
+	/**
+	 * The function used to create the materials for the meshes composing this Object3D.
+	 * The material used must have the `map` property.
+	 * By default a MeshStandardMaterial is used, so no light and shadows are available.
+	 * Use a MeshStandardMaterial
+	 *
+	 * @param parameters The default parameters with which this function is invoked.
+	 * You should pass this parameters, once personalized, to the costructor of the material you want to use.
+	 * Default values are defined in {@link SkeletonMesh.DEFAULT_MATERIAL_PARAMETERS}.
+	 *
+	 * @returns An instance of the material you want to be used for the meshes of this Object3D. The material must have the `map` property.
+	 */
+	materialFactory?: (parameters: THREE.MaterialParameters) => MaterialWithMap,
+};
 
 export class SkeletonMesh extends THREE.Object3D {
+	// public static readonly DEFAULT_MATERIAL_PARAMETERS: THREE.MaterialParameters = {
+	public static readonly DEFAULT_MATERIAL_PARAMETERS: THREE.MaterialParameters = {
+		side: THREE.DoubleSide,
+		depthWrite: true,
+		depthTest: true,
+		transparent: true,
+		alphaTest: 0.001,
+		vertexColors: true,
+		premultipliedAlpha: true,
+	}
+
 	tempPos: Vector2 = new Vector2();
 	tempUv: Vector2 = new Vector2();
 	tempLight = new Color();
@@ -112,26 +94,87 @@ export class SkeletonMesh extends THREE.Object3D {
 	zOffset: number = 0.1;
 
 	private batches = new Array<MeshBatcher>();
+	private materialFactory: (parameters: THREE.MaterialParameters) => MaterialWithMap;
 	private nextBatchIndex = 0;
 	private clipper: SkeletonClipping = new SkeletonClipping();
 
 	static QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
 	static VERTEX_SIZE = 2 + 2 + 4;
+	private vertexSize = 2 + 2 + 4;
+	private twoColorTint;
 
 	private vertices = Utils.newFloatArray(1024);
 	private tempColor = new Color();
+	private tempDarkColor = new Color();
 
+	private _castShadow = false;
+	private _receiveShadow = false;
+
+	/**
+	 * Create an Object3D containing meshes representing your Spine animation.
+	 * Personalize your material providing a {@link SkeletonMeshConfiguration}
+	 * @param skeletonData
+	 */
+	constructor (configuration: SkeletonMeshConfiguration)
+	/**
+	 * @deprecated This signature is deprecated, please use the one with a single {@link SkeletonMeshConfiguration} parameter
+	 */
 	constructor (
 		skeletonData: SkeletonData,
-		private materialCustomerizer: SkeletonMeshMaterialParametersCustomizer = (
-			material
-		) => { }
+		materialCustomizer: SkeletonMeshMaterialParametersCustomizer,
+	)
+	constructor (
+		skeletonDataOrConfiguration: SkeletonData | SkeletonMeshConfiguration,
+		materialCustomizer: SkeletonMeshMaterialParametersCustomizer = () => { }
 	) {
 		super();
 
-		this.skeleton = new Skeleton(skeletonData);
-		let animData = new AnimationStateData(skeletonData);
+		if (!('skeletonData' in skeletonDataOrConfiguration)) {
+			const materialFactory = () => {
+				const parameters: THREE.MaterialParameters = { ...SkeletonMesh.DEFAULT_MATERIAL_PARAMETERS };
+				materialCustomizer(parameters);
+				return new THREE.MeshBasicMaterial(parameters);
+			};
+			skeletonDataOrConfiguration = {
+				skeletonData: skeletonDataOrConfiguration,
+				materialFactory,
+			}
+		}
+
+		this.twoColorTint = skeletonDataOrConfiguration.twoColorTint ?? true;
+		if (this.twoColorTint) {
+			this.vertexSize += 4;
+		}
+
+		this.materialFactory = skeletonDataOrConfiguration.materialFactory ?? (() => new THREE.MeshBasicMaterial(SkeletonMesh.DEFAULT_MATERIAL_PARAMETERS));
+		this.skeleton = new Skeleton(skeletonDataOrConfiguration.skeletonData);
+		let animData = new AnimationStateData(skeletonDataOrConfiguration.skeletonData);
 		this.state = new AnimationState(animData);
+
+		Object.defineProperty(this, 'castShadow', {
+			get: () => this._castShadow,
+			set: (value: boolean) => {
+				this._castShadow = value;
+				this.traverse((child) => {
+					if (child instanceof MeshBatcher) {
+						child.castShadow = value;
+					}
+				});
+			},
+		});
+
+		Object.defineProperty(this, 'receiveShadow', {
+			get: () => this._receiveShadow,
+			set: (value: boolean) => {
+				this._receiveShadow = value;
+				// Propagate to children
+				this.traverse((child) => {
+					if (child instanceof MeshBatcher) {
+						child.receiveShadow = value;
+					}
+				});
+			},
+		});
 	}
 
 	update (deltaTime: number) {
@@ -162,7 +205,9 @@ export class SkeletonMesh extends THREE.Object3D {
 
 	private nextBatch () {
 		if (this.batches.length == this.nextBatchIndex) {
-			let batch = new MeshBatcher(10920, this.materialCustomerizer);
+			let batch = new MeshBatcher(MeshBatcher.MAX_VERTICES, this.materialFactory, this.twoColorTint);
+			batch.castShadow = this._castShadow;
+			batch.receiveShadow = this._receiveShadow;
 			this.add(batch);
 			this.batches.push(batch);
 		}
@@ -174,8 +219,6 @@ export class SkeletonMesh extends THREE.Object3D {
 	private updateGeometry () {
 		this.clearBatches();
 
-		let tempPos = this.tempPos;
-		let tempUv = this.tempUv;
 		let tempLight = this.tempLight;
 		let tempDark = this.tempDark;
 		let clipper = this.clipper;
@@ -189,7 +232,7 @@ export class SkeletonMesh extends THREE.Object3D {
 		let z = 0;
 		let zOffset = this.zOffset;
 		for (let i = 0, n = drawOrder.length; i < n; i++) {
-			let vertexSize = clipper.isClipping() ? 2 : SkeletonMesh.VERTEX_SIZE;
+			let vertexSize = clipper.isClipping() ? 2 : this.vertexSize;
 			let slot = drawOrder[i];
 			if (!slot.bone.active) {
 				clipper.clipEndWithSlot(slot);
@@ -249,6 +292,16 @@ export class SkeletonMesh extends THREE.Object3D {
 					alpha
 				);
 
+				let darkColor = this.tempDarkColor;
+				if (!slot.darkColor)
+					darkColor.set(0, 0, 0, 1);
+				else {
+					darkColor.r = slot.darkColor.r * alpha;
+					darkColor.g = slot.darkColor.g * alpha;
+					darkColor.b = slot.darkColor.b * alpha;
+					darkColor.a = 1;
+				}
+
 				let finalVertices: NumberArrayLike;
 				let finalVerticesLength: number;
 				let finalIndices: NumberArrayLike;
@@ -262,7 +315,7 @@ export class SkeletonMesh extends THREE.Object3D {
 						uvs,
 						color,
 						tempLight,
-						false
+						this.twoColorTint,
 					);
 					let clippedVertices = clipper.clippedVertices;
 					let clippedTriangles = clipper.clippedTriangles;
@@ -272,18 +325,30 @@ export class SkeletonMesh extends THREE.Object3D {
 					finalIndicesLength = clippedTriangles.length;
 				} else {
 					let verts = vertices;
-					for (
-						let v = 2, u = 0, n = numFloats;
-						v < n;
-						v += vertexSize, u += 2
-					) {
-						verts[v] = color.r;
-						verts[v + 1] = color.g;
-						verts[v + 2] = color.b;
-						verts[v + 3] = color.a;
-						verts[v + 4] = uvs[u];
-						verts[v + 5] = uvs[u + 1];
+					if (!this.twoColorTint) {
+						for (let v = 2, u = 0, n = numFloats; v < n; v += vertexSize, u += 2) {
+							verts[v] = color.r;
+							verts[v + 1] = color.g;
+							verts[v + 2] = color.b;
+							verts[v + 3] = color.a;
+							verts[v + 4] = uvs[u];
+							verts[v + 5] = uvs[u + 1];
+						}
+					} else {
+						for (let v = 2, u = 0, n = numFloats; v < n; v += vertexSize, u += 2) {
+							verts[v] = color.r;
+							verts[v + 1] = color.g;
+							verts[v + 2] = color.b;
+							verts[v + 3] = color.a;
+							verts[v + 4] = uvs[u];
+							verts[v + 5] = uvs[u + 1];
+							verts[v + 6] = darkColor.r;
+							verts[v + 7] = darkColor.g;
+							verts[v + 8] = darkColor.b;
+							verts[v + 9] = darkColor.a;
+						}
 					}
+
 					finalVertices = vertices;
 					finalVerticesLength = numFloats;
 					finalIndices = triangles;
@@ -298,7 +363,7 @@ export class SkeletonMesh extends THREE.Object3D {
 				// Start new batch if this one can't hold vertices/indices
 				if (
 					!batch.canBatch(
-						finalVerticesLength / SkeletonMesh.VERTEX_SIZE,
+						finalVerticesLength / this.vertexSize,
 						finalIndicesLength
 					)
 				) {

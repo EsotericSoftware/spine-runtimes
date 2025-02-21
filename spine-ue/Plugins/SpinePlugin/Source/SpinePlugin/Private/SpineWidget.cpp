@@ -82,6 +82,7 @@ USpineWidget::USpineWidget(const FObjectInitializer &ObjectInitializer) : Super(
 
 	TextureParameterName = FName(TEXT("SpriteTexture"));
 
+	physicsTimeScale = 1.0f;
 	worldVertices.ensureCapacity(1024 * 2);
 
 	bAutoPlaying = true;
@@ -134,7 +135,7 @@ void USpineWidget::Tick(float DeltaTime, bool CallDelegates) {
 		state->update(DeltaTime);
 		state->apply(*skeleton);
 		if (CallDelegates) BeforeUpdateWorldTransform.Broadcast(this);
-		skeleton->update(DeltaTime);
+		skeleton->update(physicsTimeScale * DeltaTime);
 		skeleton->updateWorldTransform(Physics_Update);
 		if (CallDelegates) AfterUpdateWorldTransform.Broadcast(this);
 	}
@@ -368,6 +369,16 @@ bool USpineWidget::HasSlot(const FString SlotName) {
 	return false;
 }
 
+void USpineWidget::SetSlotColor(const FString SlotName, const FColor SlotColor) {
+	CheckState();
+	if (skeleton) {
+		spine::Slot *slot = skeleton->findSlot(TCHAR_TO_UTF8(*SlotName));
+		if (slot) {
+			slot->getColor().set(SlotColor.R / 255.f, SlotColor.G / 255.f, SlotColor.B / 255.f, SlotColor.A / 255.f);
+		}
+	}
+}
+
 void USpineWidget::GetAnimations(TArray<FString> &Animations) {
 	CheckState();
 	if (skeleton) {
@@ -513,4 +524,36 @@ void USpineWidget::ClearTrack(int trackIndex) {
 	if (state) {
 		state->clearTrack(trackIndex);
 	}
+}
+
+void USpineWidget::PhysicsTranslate(float x, float y) {
+	CheckState();
+	if (skeleton) {
+		skeleton->physicsTranslate(x, y);
+	}
+}
+
+void USpineWidget::PhysicsRotate(float x, float y, float degrees) {
+	CheckState();
+	if (skeleton) {
+		skeleton->physicsRotate(x, y, degrees);
+	}
+}
+
+void USpineWidget::ResetPhysicsConstraints() {
+	CheckState();
+	if (skeleton) {
+		Vector<PhysicsConstraint *> &constraints = skeleton->getPhysicsConstraints();
+		for (int i = 0, n = (int) constraints.size(); i < n; i++) {
+			constraints[i]->reset();
+		}
+	}
+}
+
+void USpineWidget::SetPhysicsTimeScale(float scale) {
+	physicsTimeScale = scale;
+}
+
+float USpineWidget::GetPhysicsTimeScale() {
+	return physicsTimeScale;
 }

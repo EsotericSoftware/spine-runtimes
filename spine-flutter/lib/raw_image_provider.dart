@@ -94,7 +94,7 @@ class _RawImageKey {
 
   @override
   int get hashCode {
-    return hashValues(w, h, format, dataHash.hashCode);
+    return Object.hash(w, h, format, dataHash.hashCode);
   }
 }
 

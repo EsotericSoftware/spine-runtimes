@@ -54,7 +54,12 @@ class Skeleton {
 
 	public var color:Color = new Color(1, 1, 1, 1);
 	public var scaleX:Float = 1;
-	public var scaleY:Float = 1;
+
+	public var scaleY(get, default):Float = 1;
+	function get_scaleY() {
+		return Bone.yDown ? -scaleY : scaleY;
+	}
+
 	public var x:Float = 0;
 	public var y:Float = 0;
 	public var time:Float = 0;

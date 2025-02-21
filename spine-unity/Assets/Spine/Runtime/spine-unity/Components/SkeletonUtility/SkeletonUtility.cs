@@ -238,8 +238,37 @@ namespace Spine.Unity {
 		bool needToReprocessBones;
 
 		public void ResubscribeEvents () {
-			OnDisable();
-			OnEnable();
+			ResubscribeIndependentEvents();
+			ResubscribeDependentEvents();
+		}
+
+		void ResubscribeIndependentEvents () {
+			if (skeletonRenderer != null) {
+				skeletonRenderer.OnRebuild -= HandleRendererReset;
+				skeletonRenderer.OnRebuild += HandleRendererReset;
+			} else if (skeletonGraphic != null) {
+				skeletonGraphic.OnRebuild -= HandleRendererReset;
+				skeletonGraphic.OnRebuild += HandleRendererReset;
+				skeletonGraphic.OnPostProcessVertices -= UpdateToMeshScaleAndOffset;
+				skeletonGraphic.OnPostProcessVertices += UpdateToMeshScaleAndOffset;
+			}
+
+			if (skeletonAnimation != null) {
+				skeletonAnimation.UpdateLocal -= UpdateLocal;
+				skeletonAnimation.UpdateLocal += UpdateLocal;
+			}
+		}
+
+		void ResubscribeDependentEvents () {
+			if (skeletonAnimation != null) {
+				skeletonAnimation.UpdateWorld -= UpdateWorld;
+				skeletonAnimation.UpdateComplete -= UpdateComplete;
+
+				if (hasOverrideBones || hasConstraints)
+					skeletonAnimation.UpdateWorld += UpdateWorld;
+				if (hasConstraints)
+					skeletonAnimation.UpdateComplete += UpdateComplete;
+			}
 		}
 
 		void OnEnable () {
@@ -259,23 +288,8 @@ namespace Spine.Unity {
 									skeletonGraphic != null ? skeletonGraphic.GetComponent<ISkeletonComponent>() :
 									GetComponent<ISkeletonComponent>();
 			}
-
-			if (skeletonRenderer != null) {
-				skeletonRenderer.OnRebuild -= HandleRendererReset;
-				skeletonRenderer.OnRebuild += HandleRendererReset;
-			} else if (skeletonGraphic != null) {
-				skeletonGraphic.OnRebuild -= HandleRendererReset;
-				skeletonGraphic.OnRebuild += HandleRendererReset;
-				skeletonGraphic.OnPostProcessVertices -= UpdateToMeshScaleAndOffset;
-				skeletonGraphic.OnPostProcessVertices += UpdateToMeshScaleAndOffset;
-			}
-
-			if (skeletonAnimation != null) {
-				skeletonAnimation.UpdateLocal -= UpdateLocal;
-				skeletonAnimation.UpdateLocal += UpdateLocal;
-			}
-
 			CollectBones();
+			ResubscribeEvents();
 		}
 
 		void Start () {
@@ -360,23 +374,12 @@ namespace Spine.Unity {
 				}
 
 				hasConstraints |= constraintComponents.Count > 0;
-
-				if (skeletonAnimation != null) {
-					skeletonAnimation.UpdateWorld -= UpdateWorld;
-					skeletonAnimation.UpdateComplete -= UpdateComplete;
-
-					if (hasOverrideBones || hasConstraints)
-						skeletonAnimation.UpdateWorld += UpdateWorld;
-
-					if (hasConstraints)
-						skeletonAnimation.UpdateComplete += UpdateComplete;
-				}
-
 				needToReprocessBones = false;
 			} else {
 				boneComponents.Clear();
 				constraintComponents.Clear();
 			}
+			ResubscribeDependentEvents();
 		}
 
 		void UpdateLocal (ISkeletonAnimation anim) {

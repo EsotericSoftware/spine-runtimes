@@ -74,6 +74,15 @@ void SequenceTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vec
 	if (slotAttachment != _attachment) {
 		if (slotAttachment == NULL || !slotAttachment->getRTTI().instanceOf(VertexAttachment::rtti) || ((VertexAttachment *) slotAttachment)->getTimelineAttachment() != _attachment) return;
 	}
+	Sequence *sequence = NULL;
+	if (_attachment->getRTTI().instanceOf(RegionAttachment::rtti)) sequence = ((RegionAttachment *) _attachment)->getSequence();
+	if (_attachment->getRTTI().instanceOf(MeshAttachment::rtti)) sequence = ((MeshAttachment *) _attachment)->getSequence();
+	if (!sequence) return;
+
+	if (direction == MixDirection_Out) {
+		if (blend == MixBlend_Setup) slot->setSequenceIndex(-1);
+		return;
+	}
 
 	Vector<float> &frames = this->_frames;
 	if (time < frames[0]) {// Time is before first frame.
@@ -86,10 +95,6 @@ void SequenceTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vec
 	int modeAndIndex = (int) frames[i + MODE];
 	float delay = frames[i + DELAY];
 
-	Sequence *sequence = NULL;
-	if (_attachment->getRTTI().instanceOf(RegionAttachment::rtti)) sequence = ((RegionAttachment *) _attachment)->getSequence();
-	if (_attachment->getRTTI().instanceOf(MeshAttachment::rtti)) sequence = ((MeshAttachment *) _attachment)->getSequence();
-	if (!sequence) return;
 	int index = modeAndIndex >> 4, count = (int) sequence->getRegions().size();
 	int mode = modeAndIndex & 0xf;
 	if (mode != SequenceMode::hold) {

@@ -1,0 +1,15 @@
+[remap]
+
+importer="spine.atlas"
+type="SpineAtlasResource"
+uid="uid://dhtyf5vltqsjg"
+path="res://.godot/imported/raptor.atlas-66da4b831eebf404341993162ba3ddb8.spatlas"
+
+[deps]
+
+source_file="res://assets/raptor/raptor.atlas"
+dest_files=["res://.godot/imported/raptor.atlas-66da4b831eebf404341993162ba3ddb8.spatlas"]
+
+[params]
+
+normal_map_prefix="n"

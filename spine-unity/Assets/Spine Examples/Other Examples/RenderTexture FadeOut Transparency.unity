@@ -1059,7 +1059,7 @@ MonoBehaviour:
   quadMaterial: {fileID: 2100000, guid: 4c507f887c6274a44a603d96e0eabf2a, type: 2}
   renderTexture: {fileID: 0}
   targetCamera: {fileID: 0}
-  shaderPasses: ffffffff
+  shaderPasses: 00000000
 --- !u!114 &1786065615
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1357,7 +1357,7 @@ MonoBehaviour:
   quadMaterial: {fileID: 2100000, guid: afeb0ae2ea2cda94796515bf8d1b3cb1, type: 2}
   renderTexture: {fileID: 0}
   targetCamera: {fileID: 0}
-  shaderPasses: ffffffff
+  shaderPasses: 00000000
   customRenderRect: {fileID: 1089682727}
   meshRendererMaterialForTexture:
   - texture: {fileID: 2800000, guid: 4ea2c33e839afb34c98f66e892b3b2d2, type: 3}

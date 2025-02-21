@@ -8,9 +8,9 @@ using namespace gl;
 using namespace spine;
 
 /// Set the default extension used for memory allocations and file I/O
-SpineExtension *spine::getDefaultExtension() {
-	return new spine::DefaultSpineExtension();
-}
+// SpineExtension *spine::getDefaultExtension() {
+// 	return new spine::DefaultSpineExtension();
+// }
 
 /// A blend mode, see https://en.esotericsoftware.com/spine-slots#Blending
 /// Encodes the OpenGL source and destination blend function for both premultiplied and
@@ -283,6 +283,10 @@ void renderer_set_viewport_size(renderer_t *renderer, int width, int height) {
 	matrix_ortho_projection(matrix, (float) width, (float) height);
 	shader_use(renderer->shader);
 	shader_set_matrix4(renderer->shader, "uMatrix", matrix);
+}
+
+void renderer_draw_lite(renderer_t *renderer, spine_skeleton skeleton, bool premultipliedAlpha) {
+	renderer_draw(renderer, (Skeleton *) skeleton, premultipliedAlpha);
 }
 
 void renderer_draw(renderer_t *renderer, Skeleton *skeleton, bool premultipliedAlpha) {

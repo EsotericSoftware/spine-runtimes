@@ -42,12 +42,16 @@ export class ThreeJsTexture extends Texture {
 		// if the texture is not pma, we ask to threejs to premultiply on upload
 		this.texture.premultiplyAlpha = !pma;
 		this.texture.flipY = false;
+
+		// Keep this as a reference - this is necessary in future versions of ThreeJS
+		// this.texture.colorSpace = THREE.SRGBColorSpace;
+
 		this.texture.needsUpdate = true;
 	}
 
 	setFilters (minFilter: TextureFilter, magFilter: TextureFilter) {
-		this.texture.minFilter = ThreeJsTexture.toThreeJsTextureFilter(minFilter);
-		this.texture.magFilter = ThreeJsTexture.toThreeJsTextureFilter(magFilter);
+		this.texture.minFilter = ThreeJsTexture.toThreeJsMinificationTextureFilter(minFilter);
+		this.texture.magFilter = ThreeJsTexture.toThreeJsMagnificationTextureFilter(magFilter);
 	}
 
 	setWraps (uWrap: TextureWrap, vWrap: TextureWrap) {
@@ -59,12 +63,22 @@ export class ThreeJsTexture extends Texture {
 		this.texture.dispose();
 	}
 
-	static toThreeJsTextureFilter (filter: TextureFilter) {
+	static toThreeJsMinificationTextureFilter (filter: TextureFilter): THREE.MinificationTextureFilter {
 		if (filter === TextureFilter.Linear) return THREE.LinearFilter;
 		else if (filter === TextureFilter.MipMap) return THREE.LinearMipMapLinearFilter; // also includes TextureFilter.MipMapLinearLinear
 		else if (filter === TextureFilter.MipMapLinearNearest) return THREE.LinearMipMapNearestFilter;
 		else if (filter === TextureFilter.MipMapNearestLinear) return THREE.NearestMipMapLinearFilter;
 		else if (filter === TextureFilter.MipMapNearestNearest) return THREE.NearestMipMapNearestFilter;
+		else if (filter === TextureFilter.Nearest) return THREE.NearestFilter;
+		else throw new Error("Unknown texture filter: " + filter);
+	}
+
+	static toThreeJsMagnificationTextureFilter (filter: TextureFilter): THREE.MagnificationTextureFilter {
+		if (filter === TextureFilter.Linear) return THREE.LinearFilter;
+		else if (filter === TextureFilter.MipMap) return THREE.LinearFilter;
+		else if (filter === TextureFilter.MipMapLinearNearest) return THREE.NearestFilter;
+		else if (filter === TextureFilter.MipMapNearestLinear) return THREE.LinearFilter;
+		else if (filter === TextureFilter.MipMapNearestNearest) return THREE.NearestFilter;
 		else if (filter === TextureFilter.Nearest) return THREE.NearestFilter;
 		else throw new Error("Unknown texture filter: " + filter);
 	}
@@ -76,9 +90,11 @@ export class ThreeJsTexture extends Texture {
 		else throw new Error("Unknown texture wrap: " + wrap);
 	}
 
+	static fist = true;
 	static toThreeJsBlending (blend: BlendMode): ThreeBlendOptions {
 		if (blend === BlendMode.Normal) return { blending: THREE.NormalBlending };
 		else if (blend === BlendMode.Additive) return { blending: THREE.AdditiveBlending };
+		// else if (blend === BlendMode.Multiply) return { blending: THREE.NormalBlending };
 		else if (blend === BlendMode.Multiply) return {
 			blending: THREE.CustomBlending,
 			blendSrc: THREE.DstColorFactor,

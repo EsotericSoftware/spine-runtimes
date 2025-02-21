@@ -36,6 +36,11 @@ using UnityEngine;
 namespace Spine.Unity {
 	public abstract class OnDemandTextureLoader : ScriptableObject {
 		public AtlasAssetBase atlasAsset;
+		/// <summary>
+		/// Additional <see cref="SkeletonDataAsset"/> reference, currently only used to cover blend mode materials
+		/// which are not stored at <c>atlasAsset</c>.
+		/// </summary>
+		public SkeletonDataAsset skeletonDataAsset;
 
 		/// <param name="originalTextureName">Original texture name without extension.</param>
 		/// <returns>The placeholder texture's name for a given original target texture name.</returns>

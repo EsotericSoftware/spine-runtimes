@@ -1,0 +1,20 @@
+{
+    "name": "spine-threejs-ts-example",
+    "description": "Spine threejs ts example",
+    "author": "Esoteric Software LLC",
+    "license": "LicenseRef-LICENSE",
+    "version": "1.0.0",
+    "scripts": {
+        "build":"npx esbuild index.ts --bundle --sourcemap --outfile=build/index.js",
+        "dev": "npx concurrently \"npx live-server --no-browser\" \"npm run build -- --watch\""
+    },
+    "dependencies": {
+        "@esotericsoftware/spine-threejs": "4.2.67",
+        "three": "0.162.0"
+    },
+    "devDependencies": {
+        "esbuild": "0.17.17",
+        "concurrently": "^7.6.0",
+        "live-server": "^1.2.2"
+    }
+}

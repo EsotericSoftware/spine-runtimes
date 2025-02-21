@@ -82,6 +82,11 @@ class SequenceTimeline extends Timeline implements SlotTimeline {
 				return;
 		}
 
+		if (direction == MixDirection.mixOut) {
+			if (blend == MixBlend.setup) slot.sequenceIndex = -1;
+			return;
+		}
+
 		if (time < frames[0]) {
 			if (blend == MixBlend.setup || blend == MixBlend.first)
 				slot.sequenceIndex = -1;

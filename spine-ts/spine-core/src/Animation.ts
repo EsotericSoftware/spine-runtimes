@@ -30,7 +30,7 @@
 import { VertexAttachment, Attachment } from "./attachments/Attachment.js";
 import { IkConstraint } from "./IkConstraint.js";
 import { PathConstraint } from "./PathConstraint.js";
-import { Physics, Skeleton } from "./Skeleton.js";
+import { Skeleton } from "./Skeleton.js";
 import { Slot } from "./Slot.js";
 import { TransformConstraint } from "./TransformConstraint.js";
 import { StringSet, Utils, MathUtils, NumberArrayLike } from "./Utils.js";
@@ -834,6 +834,11 @@ export class InheritTimeline extends Timeline implements BoneTimeline {
 	public apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 		let bone = skeleton.bones[this.boneIndex];
 		if (!bone.active) return;
+
+		if (direction == MixDirection.mixOut) {
+			if (blend == MixBlend.setup) bone.inherit = bone.data.inherit;
+			return;
+		}
 
 		let frames = this.frames;
 		if (time < frames[0]) {
@@ -2323,6 +2328,11 @@ export class SequenceTimeline extends Timeline implements SlotTimeline {
 		if (slotAttachment != attachment) {
 			if (!(slotAttachment instanceof VertexAttachment)
 				|| (slotAttachment as VertexAttachment).timelineAttachment != attachment) return;
+		}
+
+		if (direction == MixDirection.mixOut) {
+			if (blend == MixBlend.setup) slot.sequenceIndex = -1;
+			return;
 		}
 
 		let frames = this.frames;

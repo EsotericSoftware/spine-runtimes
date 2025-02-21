@@ -30,8 +30,18 @@
 #pragma once
 
 #include "SpineCommon.h"
+#ifdef SPINE_GODOT_EXTENSION
+#include <godot_cpp/classes/resource_loader.hpp>
+#include <godot_cpp/classes/resource_format_loader.hpp>
+#include <godot_cpp/classes/resource_saver.hpp>
+#include <godot_cpp/classes/resource_format_saver.hpp>
+#include <godot_cpp/classes/resource.hpp>
+#include <godot_cpp/templates/vector.hpp>
+#else
 #include "core/io/resource_loader.h"
 #include "core/io/resource_saver.h"
+#endif
+#include <spine/Vector.h>
 
 class SpineSkeletonFileResource : public Resource {
 	GDCLASS(SpineSkeletonFileResource, Resource);
@@ -40,12 +50,20 @@ protected:
 	static void _bind_methods();
 
 	String json;
+#ifdef SPINE_GODOT_EXTENSION
+	PackedByteArray binary;
+#else
 	Vector<uint8_t> binary;
+#endif
 
 public:
 	bool is_binary() { return binary.size() > 0; }
 
+#ifdef SPINE_GODOT_EXTENSION
+	const PackedByteArray &get_binary() { return binary; }
+#else
 	const Vector<uint8_t> &get_binary() { return binary; }
+#endif
 
 	const String &get_json() { return json; }
 
@@ -53,8 +71,10 @@ public:
 
 	Error save_to_file(const String &path);
 
+#ifndef SPINE_GODOT_EXTENSION
 #if VERSION_MAJOR > 3
 	virtual Error copy_from(const Ref<Resource> &p_resource);
+#endif
 #endif
 };
 
@@ -62,10 +82,25 @@ class SpineSkeletonFileResourceFormatLoader : public ResourceFormatLoader {
 	GDCLASS(SpineSkeletonFileResourceFormatLoader, ResourceFormatLoader);
 
 public:
+#ifdef SPINE_GODOT_EXTENSION
+	static void _bind_methods(){};
+
+	PackedStringArray _get_recognized_extensions();
+
+	bool _handles_type(const StringName &type);
+
+	String _get_resource_type(const String &path);
+
+	Variant _load(const String &path, const String &original_path, bool use_sub_threads, int32_t cache_mode);
+#else
 #if VERSION_MAJOR > 3
 	RES load(const String &path, const String &original_path, Error *error, bool use_sub_threads, float *progress, CacheMode cache_mode);
 #else
-	RES load(const String &path, const String &original_path, Error *error) override;
+#if VERSION_MINOR > 5
+	RES load(const String &path, const String &original_path, Error *error, bool no_subresource_cache = false);
+#else
+	RES load(const String &path, const String &original_path, Error *error);
+#endif
 #endif
 
 	void get_recognized_extensions(List<String> *extensions) const override;
@@ -73,19 +108,30 @@ public:
 	bool handles_type(const String &type) const override;
 
 	String get_resource_type(const String &path) const override;
+#endif
 };
 
 class SpineSkeletonFileResourceFormatSaver : public ResourceFormatSaver {
 	GDCLASS(SpineSkeletonFileResourceFormatSaver, ResourceFormatSaver);
 
 public:
+#ifdef SPINE_GODOT_EXTENSION
+	static void _bind_methods(){};
+
+	Error _save(const Ref<Resource> &resource, const String &path, uint32_t flags) override;
+
+	bool _recognize(const Ref<Resource> &resource);
+
+	PackedStringArray _get_recognized_extensions(const Ref<Resource> &resource);
+#else
 #if VERSION_MAJOR > 3
 	Error save(const RES &resource, const String &path, uint32_t flags) override;
 #else
-	Error save(const String &path, const RES &resource, uint32_t flags) override;
+	Error save(const String &path, const RES &resource, uint32_t flags);
 #endif
 
 	void get_recognized_extensions(const RES &resource, List<String> *p_extensions) const override;
 
 	bool recognize(const RES &p_resource) const override;
+#endif
 };

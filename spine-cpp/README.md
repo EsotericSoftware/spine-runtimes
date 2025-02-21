@@ -49,7 +49,8 @@ class MyTextureLoader : public spine::TextureLoader
 ```
 
 ## Runtimes extending spine-cpp
-
+- [spine-glfw](../spine-glfw)
+- [spine-sdl](../spine-sdl)
 - [spine-sfml](../spine-sfml/cpp)
 - [spine-cocos2dx](../spine-cocos2dx)
 - [spine-ue](../spine-ue)

@@ -40,7 +40,32 @@ class DebugRendering extends StatelessWidget {
     const debugRenderer = DebugRenderer();
     final controller = SpineWidgetController(onInitialized: (controller) {
       controller.animationState.setAnimationByName(0, "walk", true);
-    }, onAfterPaint: (controller, canvas, commands) {
+}, onBeforePaint: (controller, canvas) {
+  // Save the current transform and other canvas state
+  canvas.save();
+
+  // Get the current canvas transform an invert it, so we can work in the
+  // canvas coordinate system.
+  final currentMatrix = canvas.getTransform();
+  final invertedMatrix = Matrix4.tryInvert(Matrix4.fromFloat64List(currentMatrix));
+  if (invertedMatrix != null) {
+    canvas.transform(invertedMatrix.storage);
+  }
+
+  // Draw something.
+  final Paint paint = Paint()
+    ..color = Colors.black
+    ..strokeWidth = 2.0;
+
+  canvas.drawLine(
+    Offset(0, 0),
+    Offset(canvas.getLocalClipBounds().width, canvas.getLocalClipBounds().height),
+    paint,
+  );
+
+  // Restore the old transform and canvas state
+  canvas.restore();
+}, onAfterPaint: (controller, canvas, commands) {
       debugRenderer.render(controller.drawable, canvas, commands);
     });
 

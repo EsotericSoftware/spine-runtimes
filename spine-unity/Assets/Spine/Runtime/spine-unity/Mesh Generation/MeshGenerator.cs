@@ -37,8 +37,9 @@
 #define MANUALLY_INLINE_VECTOR_OPERATORS
 #endif
 
-// Not for optimization. Do not disable.
-#define SPINE_TRIANGLECHECK // Avoid calling SetTriangles at the cost of checking for mesh differences (vertex counts, memberwise attachment list compare) every frame.
+// Optimization option: Allows faster BuildMeshWithArrays call and avoids calling SetTriangles at the cost of
+// checking for mesh differences (vertex counts, member-wise attachment list compare) every frame.
+#define SPINE_TRIANGLECHECK
 //#define SPINE_DEBUG
 
 // New optimization option to avoid rendering fully transparent attachments at slot alpha 0.
@@ -285,7 +286,12 @@ namespace Spine.Unity {
 			instructionOutput.rawVertexCount = totalRawVertexCount;
 #endif
 
-			if (totalRawVertexCount > 0) {
+#if SPINE_TRIANGLECHECK
+			bool hasAnyVertices = totalRawVertexCount > 0;
+#else
+			bool hasAnyVertices = true;
+#endif
+			if (hasAnyVertices) {
 				workingSubmeshInstructions.Resize(1);
 				workingSubmeshInstructions.Items[0] = current;
 			} else {
@@ -364,10 +370,12 @@ namespace Spine.Unity {
 				Slot slot = drawOrderItems[i];
 				if (!slot.Bone.Active
 #if SLOT_ALPHA_DISABLES_ATTACHMENT
-					|| slot.A == 0f
+					|| (slot.A == 0f && slot.Data != clippingEndSlot)
 #endif
 					) {
+#if SPINE_TRIANGLECHECK
 					workingAttachmentsItems[i] = null;
+#endif
 					continue;
 				}
 				if (slot.Data.BlendMode == BlendMode.Additive) current.hasPMAAdditiveSlot = true;
@@ -458,7 +466,11 @@ namespace Spine.Unity {
 					Material material = (region is Material) ? (Material)region : (Material)((AtlasRegion)region).page.rendererObject;
 #endif
 
+#if !SPINE_TRIANGLECHECK
+					if (current.forceSeparate || !System.Object.ReferenceEquals(current.material, material)) { // Material changed. Add the previous submesh.
+#else
 					if (current.forceSeparate || (current.rawVertexCount > 0 && !System.Object.ReferenceEquals(current.material, material))) { // Material changed. Add the previous submesh.
+#endif
 						{ // Add
 							current.endSlot = i;
 							current.preActiveClippingSlotSource = lastPreActiveClipping;
@@ -799,6 +811,9 @@ namespace Spine.Unity {
 
 		// Use this faster method when no clipping is involved.
 		public void BuildMeshWithArrays (SkeletonRendererInstruction instruction, bool updateTriangles) {
+#if !SPINE_TRIANGLECHECK
+			return;
+#else
 			Settings settings = this.settings;
 			bool canvasGroupTintBlack = settings.tintBlack && settings.canvasGroupCompatible;
 			int totalVertexCount = instruction.rawVertexCount;
@@ -1113,6 +1128,7 @@ namespace Spine.Unity {
 					}
 				}
 			}
+#endif // SPINE_TRIANGLECHECK
 		}
 
 		public void ScaleVertexData (float scale) {
@@ -1214,9 +1230,11 @@ namespace Spine.Unity {
 			// Zero the extra.
 			{
 				int listCount = vertexBuffer.Count;
-				Vector3 vector3zero = Vector3.zero;
+				// unfortunately even non-indexed vertices are still used by Unity's bounds computation,
+				// (considered a Unity bug), thus avoid Vector3.zero and use last vertex instead.
+				Vector3 extraVertex = listCount == 0 ? Vector3.zero : vbi[listCount - 1];
 				for (int i = listCount; i < vbiLength; i++)
-					vbi[i] = vector3zero;
+					vbi[i] = extraVertex;
 			}
 
 			// Set the vertex buffer.

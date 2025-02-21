@@ -1,4 +1,9 @@
 option(SPINE_SANITIZE "Build with sanitization" OFF)
+option(SPINE_SET_COMPILER_FLAGS "Set compiler flags" ON)
+
+if (NOT SPINE_SET_COMPILER_FLAGS)
+    return()
+endif()
 
 if(MSVC)
     message("MSCV detected")

@@ -2,33 +2,43 @@
   <head>
     <meta charset="UTF-8" />
     <title>spine-threejs</title>
-    <script src="https://unpkg.com/three@0.141.0/build/three.js"></script>
-    <script src="../dist/iife/spine-threejs.js"></script>
-    <script src="./OrbitalControls.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+
+      body,
+      html {
+        height: 100%;
+      }
+
+      canvas {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.162.0/examples/jsm/",
+            "spine-threejs": "../dist/esm/spine-threejs.mjs"
+        }
+    }
+    </script>
   </head>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-    }
-
-    body,
-    html {
-      height: 100%;
-    }
-
-    canvas {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-    }
-  </style>
 
   <body>
-    <script>
-      (function () {
-        let scene, camera, renderer;
-        let geometry, material, mesh, skeletonMesh;
+    <script type="module">
+      import * as THREE from "three";
+      import * as spine from "spine-threejs";
+      import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+
+      let scene, camera, renderer;
+        let geometry, material, mesh, skeletonMesh, atlas, atlasLoader;
         let assetManager;
         let canvas;
         let controls;
@@ -95,11 +105,10 @@
             // Provide a custom vertex/fragment shader pair that supports
             // the logarithmic depth buffer.
             // See https://discourse.threejs.org/t/shadermaterial-render-order-with-logarithmicdepthbuffer-is-wrong/49221/3
-            skeletonMesh = new spine.SkeletonMesh(
+            skeletonMesh = new spine.SkeletonMesh({
               skeletonData,
-              (materialParameters) => {
+              materialFactory: (materialParameters) => {
                 materialParameters.vertexShader = `
-                attribute vec4 color;
                 varying vec2 vUv;
                 varying vec4 vColor;
 
@@ -130,12 +139,14 @@
 
                   gl_FragColor = texture2D(map, vUv)*vColor;
                   #ifdef USE_SPINE_ALPHATEST
-                  if (gl_FragColor.a < alphaTest) discard;
+                    if (gl_FragColor.a < alphaTest) discard;
                   #endif
                 }
                 `;
+
+                return new spine.SkeletonMeshMaterial(materialParameters);
               }
-            );
+            });
             skeletonMesh.state.setAnimation(0, animation, true);
             mesh.add(skeletonMesh);
 
@@ -180,7 +191,7 @@
         }
 
         init();
-      })();
+
     </script>
   </body>
 </html>

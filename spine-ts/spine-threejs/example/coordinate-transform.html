@@ -1,155 +1,159 @@
 <html>
+  <head>
+	<meta charset="UTF-8" />
+    <title>spine-threejs</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
 
-<head>
-	<meta charset="UTF-8">
-	<title>spine-threejs</title>
-	<script src="https://unpkg.com/three@0.141.0/build/three.js"></script>
-	<script src="../dist/iife/spine-threejs.js"></script>
-	<script src="./OrbitalControls.js"></script>
-</head>
-<style>
-	* {
-		margin: 0;
-		padding: 0;
-	}
+      body,
+      html {
+        height: 100%;
+      }
 
-	body,
-	html {
-		height: 100%
-	}
+      canvas {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
 
-	canvas {
-		position: absolute;
-		width: 100%;
-		height: 100%;
-	}
-</style>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.162.0/examples/jsm/",
+            "spine-threejs": "../dist/esm/spine-threejs.mjs"
+        }
+    }
+    </script>
+  </head>
 
-<body>
-	<script>
-		(function () {
-			let scene, camera, renderer;
-			let skeletonMesh, cube, tailBone;
-			let assetManager;
-			let canvas;
-			let controls;
-			let lastFrameTime = Date.now() / 1000;
+  <body>
+    <script type="module">
+		import * as THREE from "three";
+		import * as spine from "spine-threejs";
+		import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 
-			let baseUrl = "assets/";
-			let skeletonFile = "raptor-pro.json";
-			let atlasFile = skeletonFile.replace("-pro", "").replace("-ess", "").replace(".json", ".atlas");
-			let animation = "walk";
+      	let scene, camera, renderer;
+		let skeletonMesh, atlas, atlasLoader, geometry, material, cube, tailBone;
+		let assetManager;
+		let canvas;
+		let controls;
+		let lastFrameTime = Date.now() / 1000;
 
-			function init() {
-				// create the THREE.JS camera, scene and renderer (WebGL)
-				let width = window.innerWidth, height = window.innerHeight;
-				camera = new THREE.PerspectiveCamera(75, width / height, 1, 3000);
-				camera.position.y = 200;
-				camera.position.z = 800;
-				scene = new THREE.Scene();
-				renderer = new THREE.WebGLRenderer();
-				renderer.setSize(width, height);
-				document.body.appendChild(renderer.domElement);
-				canvas = renderer.domElement;
-				controls = new OrbitControls(camera, renderer.domElement);
+		let baseUrl = "assets/";
+		let skeletonFile = "raptor-pro.json";
+		let atlasFile = skeletonFile.replace("-pro", "").replace("-ess", "").replace(".json", ".atlas");
+		let animation = "walk";
 
-				// load the assets required to display the Raptor model
-				assetManager = new spine.AssetManager(baseUrl);
-				assetManager.loadText(skeletonFile);
-				assetManager.loadTextureAtlas(atlasFile);
+		function init() {
+			// create the THREE.JS camera, scene and renderer (WebGL)
+			let width = window.innerWidth, height = window.innerHeight;
+			camera = new THREE.PerspectiveCamera(75, width / height, 1, 3000);
+			camera.position.y = 200;
+			camera.position.z = 800;
+			scene = new THREE.Scene();
+			renderer = new THREE.WebGLRenderer();
+			renderer.setSize(width, height);
+			document.body.appendChild(renderer.domElement);
+			canvas = renderer.domElement;
+			controls = new OrbitControls(camera, renderer.domElement);
 
-				requestAnimationFrame(load);
-			}
+			// load the assets required to display the Raptor model
+			assetManager = new spine.AssetManager(baseUrl);
+			assetManager.loadText(skeletonFile);
+			assetManager.loadTextureAtlas(atlasFile);
 
-			function load(name, scale) {
-				if (assetManager.isLoadingComplete()) {
-					// Load the texture atlas using name.atlas and name.png from the AssetManager.
-					// The function passed to TextureAtlas is used to resolve relative paths.
-					atlas = assetManager.require(atlasFile);
+			requestAnimationFrame(load);
+		}
 
-					// Create a AtlasAttachmentLoader that resolves region, mesh, boundingbox and path attachments
-					atlasLoader = new spine.AtlasAttachmentLoader(atlas);
+		function load(name, scale) {
+			if (assetManager.isLoadingComplete()) {
+				// Load the texture atlas using name.atlas and name.png from the AssetManager.
+				// The function passed to TextureAtlas is used to resolve relative paths.
+				atlas = assetManager.require(atlasFile);
 
-					// Create a SkeletonJson instance for parsing the .json file.
-					let skeletonJson = new spine.SkeletonJson(atlasLoader);
+				// Create a AtlasAttachmentLoader that resolves region, mesh, boundingbox and path attachments
+				atlasLoader = new spine.AtlasAttachmentLoader(atlas);
 
-					// Set the scale to apply during parsing, parse the file, and create a new skeleton.
-					skeletonJson.scale = 0.4;
-					let skeletonData = skeletonJson.readSkeletonData(assetManager.require(skeletonFile));
+				// Create a SkeletonJson instance for parsing the .json file.
+				let skeletonJson = new spine.SkeletonJson(atlasLoader);
 
-					// Create a SkeletonMesh from the data and attach it to the scene
-					skeletonMesh = new spine.SkeletonMesh(skeletonData, (parameters) => {
-						parameters.depthTest = true;
-						parameters.depthWrite = true;
-						parameters.alphaTest = 0.001;
-					});
-					skeletonMesh.state.setAnimation(0, animation, true);
-                    skeletonMesh.position.x = 120;
-                    skeletonMesh.position.y = -20;
-                    skeletonMesh.position.z = 10;
-					scene.add(skeletonMesh);
+				// Set the scale to apply during parsing, parse the file, and create a new skeleton.
+				skeletonJson.scale = 0.4;
+				let skeletonData = skeletonJson.readSkeletonData(assetManager.require(skeletonFile));
 
-                    // Add a wireframe cube which will be positioned at the tail bone
-                    geometry = new THREE.BoxGeometry(20, 20, 20);
-                    material = new THREE.MeshBasicMaterial({ color: 0xff00, wireframe: true });
-                    cube = new THREE.Mesh(geometry, material);
-                    scene.add(cube);
+				// Create a SkeletonMesh from the data and attach it to the scene
+				skeletonMesh = new spine.SkeletonMesh({ skeletonData });
+				skeletonMesh.state.setAnimation(0, animation, true);
+				skeletonMesh.position.x = 120;
+				skeletonMesh.position.y = -20;
+				skeletonMesh.position.z = 10;
+				scene.add(skeletonMesh);
 
-                    // Get the tail bone
-                    tailBone = skeletonMesh.skeleton.findBone("tail10");
+				// Add a wireframe cube which will be positioned at the tail bone
+				geometry = new THREE.BoxGeometry(20, 20, 20);
+				material = new THREE.MeshBasicMaterial({ color: 0xff00, wireframe: true });
+				cube = new THREE.Mesh(geometry, material);
+				scene.add(cube);
 
-					requestAnimationFrame(render);
-				} else requestAnimationFrame(load);
-			}            
-
-			let lastTime = Date.now();
-			function render() {
-				// calculate delta time for animation purposes
-				let now = Date.now() / 1000;
-				let delta = now - lastFrameTime;
-				lastFrameTime = now;
-
-				// resize canvas to use full page, adjust camera/renderer
-				resize();
-
-				// Update orbital controls
-				controls.update();
-
-				// update the animation
-				skeletonMesh.update(delta);
-
-                // Get the tail bone coordinates in the skeleton's local coordinate space.
-                let position = new THREE.Vector3(tailBone.worldX, tailBone.worldY, 0);
-
-                // Convert the tail bone coordinates to world coordinates.
-                skeletonMesh.localToWorld(position)
-
-                // Set the tail bone coordinates as the cube's position.
-                cube.position.set(position.x, position.y, position.z);
-
-				// render the scene
-				renderer.render(scene, camera);
+				// Get the tail bone
+				tailBone = skeletonMesh.skeleton.findBone("tail10");
 
 				requestAnimationFrame(render);
+			} else requestAnimationFrame(load);
+		}
+
+		let lastTime = Date.now();
+		function render() {
+			// calculate delta time for animation purposes
+			let now = Date.now() / 1000;
+			let delta = now - lastFrameTime;
+			lastFrameTime = now;
+
+			// resize canvas to use full page, adjust camera/renderer
+			resize();
+
+			// Update orbital controls
+			controls.update();
+
+			// update the animation
+			skeletonMesh.update(delta);
+
+			// Get the tail bone coordinates in the skeleton's local coordinate space.
+			let position = new THREE.Vector3(tailBone.worldX, tailBone.worldY, 0);
+
+			// Convert the tail bone coordinates to world coordinates.
+			skeletonMesh.localToWorld(position)
+
+			// Set the tail bone coordinates as the cube's position.
+			cube.position.set(position.x, position.y, position.z);
+
+			// render the scene
+			renderer.render(scene, camera);
+
+			requestAnimationFrame(render);
+		}
+
+		function resize() {
+			let w = window.innerWidth;
+			let h = window.innerHeight;
+			if (canvas.width != w || canvas.height != h) {
+				canvas.width = w;
+				canvas.height = h;
 			}
 
-			function resize() {
-				let w = window.innerWidth;
-				let h = window.innerHeight;
-				if (canvas.width != w || canvas.height != h) {
-					canvas.width = w;
-					canvas.height = h;
-				}
+			camera.aspect = w / h;
+			camera.updateProjectionMatrix();
 
-				camera.aspect = w / h;
-				camera.updateProjectionMatrix();
+			renderer.setSize(w, h);
+		}
 
-				renderer.setSize(w, h);
-			}
+		init();
 
-			init();
-		}());
-	</script>
-</body>
-
+    </script>
+  </body>
 </html>

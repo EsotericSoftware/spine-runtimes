@@ -1,13 +1,13 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated July 28, 2023. Replaces all prior versions.
+ * Last updated February 20, 2024. Replaces all prior versions.
  *
- * Copyright (c) 2013-2023, Esoteric Software LLC
+ * Copyright (c) 2013-2024, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
  * conditions of Section 2 of the Spine Editor License Agreement:
- * http://esotericsoftware.com/spine-editor-license
+ * https://esotericsoftware.com/spine-editor-license
  *
  * Otherwise, it is permitted to integrate the Spine Runtimes into software or
  * otherwise create derivative works of the Spine Runtimes (collectively,
@@ -37,7 +37,7 @@ import com.esotericsoftware.spine.PathConstraint;
 
 /** An attachment whose vertices make up a composite Bezier curve.
  * <p>
- * See {@link PathConstraint} and <a href="http://esotericsoftware.com/spine-paths">Paths</a> in the Spine User Guide. */
+ * See {@link PathConstraint} and <a href="https://esotericsoftware.com/spine-paths">Paths</a> in the Spine User Guide. */
 public class PathAttachment extends VertexAttachment {
 	float[] lengths;
 	boolean closed, constantSpeed;

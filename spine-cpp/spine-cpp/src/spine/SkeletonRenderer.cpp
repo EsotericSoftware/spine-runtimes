@@ -151,7 +151,7 @@ RenderCommand *SkeletonRenderer::render(Skeleton &skeleton) {
 		}
 
 		// Early out if the slot color is 0 or the bone is not active
-		if (slot.getColor().a == 0 || !slot.getBone().isActive()) {
+		if ((slot.getColor().a == 0 || !slot.getBone().isActive()) && !attachment->getRTTI().isExactly(ClippingAttachment::rtti)) {
 			clipper.clipEnd(slot);
 			continue;
 		}

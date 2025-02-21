@@ -121,7 +121,7 @@ namespace spine {
 	}
 
 	SkeletonAnimation::SkeletonAnimation()
-		: SkeletonRenderer() {
+		: SkeletonRendererCocos2dX() {
 	}
 
 	SkeletonAnimation::~SkeletonAnimation() {

@@ -215,19 +215,25 @@ internal extension RenderCommand {
     func positions(numVertices: Int) -> [Float] {
         let num = numVertices * 2
         let ptr = spine_render_command_get_positions(wrappee)
-        return (0..<num).compactMap { ptr?[$0] }
+        guard let validPtr = ptr else { return [] }
+        let buffer = UnsafeBufferPointer(start: validPtr, count: num)
+        return Array(buffer)
     }
     
     func uvs(numVertices: Int) -> [Float] {
         let num = numVertices * 2
         let ptr = spine_render_command_get_uvs(wrappee)
-        return (0..<num).compactMap { ptr?[$0] }
+        guard let validPtr = ptr else { return [] }
+        let buffer = UnsafeBufferPointer(start: validPtr, count: num)
+        return Array(buffer)
     }
     
     func colors(numVertices: Int) ->[Int32] {
         let num = numVertices
         let ptr = spine_render_command_get_colors(wrappee)
-        return (0..<num).compactMap { ptr?[$0] }
+        guard let validPtr = ptr else { return [] }
+        let buffer = UnsafeBufferPointer(start: validPtr, count: num)
+        return Array(buffer)
     }
 }
 
@@ -312,4 +318,10 @@ internal enum FileSource {
 
 extension String: Error {
     
+}
+
+public extension SkeletonBounds {
+    static func create() -> SkeletonBounds {
+        return SkeletonBounds(spine_skeleton_bounds_create())
+    }
 }

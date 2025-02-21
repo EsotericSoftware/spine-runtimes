@@ -30,10 +30,17 @@
 #ifndef GODOT_SPINERENDEREROBJECT_H
 #define GODOT_SPINERENDEREROBJECT_H
 
+#include "SpineCommon.h"
+
+#ifdef SPINE_GODOT_EXTENSION
+#include <godot_cpp/classes/texture.hpp>
+#include <godot_cpp/classes/canvas_texture.hpp>
+#else
 #include <scene/resources/texture.h>
 
 #if VERSION_MAJOR > 3
 #include <scene/main/canvas_item.h>
+#endif
 #endif
 
 struct SpineRendererObject {

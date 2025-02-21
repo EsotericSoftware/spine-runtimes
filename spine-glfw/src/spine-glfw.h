@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include <spine/spine.h>
+#include <spine-cpp-lite.h>
 
 /// A vertex of a mesh generated from a Spine skeleton
 struct vertex_t {
@@ -85,6 +86,10 @@ void renderer_set_viewport_size(renderer_t *renderer, int width, int height);
 /// Draws the given skeleton. The atlas must be the atlas from which the drawable
 /// was constructed.
 void renderer_draw(renderer_t *renderer, spine::Skeleton *skeleton, bool premultipliedAlpha);
+
+/// Draws the given skeleton. The atlas must be the atlas from which the drawable
+/// was constructed.
+void renderer_draw_lite(renderer_t *renderer, spine_skeleton skeleton, bool premultipliedAlpha);
 
 /// Disposes the renderer
 void renderer_dispose(renderer_t *renderer);

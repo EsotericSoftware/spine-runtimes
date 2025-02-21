@@ -27,6 +27,12 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+// In order to respect TransformConstraints modifying the scale of parent bones,
+// GetScaleAffectingRootMotion() now uses parentBone.AScaleX and AScaleY instead
+// of previously used ScaleX and ScaleY. If you require the previous behaviour,
+// comment out the define below.
+#define USE_APPLIED_PARENT_SCALE
+
 using Spine.Unity.AnimationTools;
 using System;
 using System.Collections.Generic;
@@ -177,6 +183,13 @@ namespace Spine.Unity {
 
 				skeletonAnimation.OnAnimationRebuild -= InitializeOnRebuild;
 				skeletonAnimation.OnAnimationRebuild += InitializeOnRebuild;
+
+				SkeletonUtility skeletonUtility = GetComponent<SkeletonUtility>();
+				if (skeletonUtility != null) {
+					// SkeletonUtilityBone shall receive UpdateLocal callbacks for bone-following after root motion
+					// clears the root-bone position.
+					skeletonUtility.ResubscribeEvents();
+				}
 			}
 		}
 
@@ -641,8 +654,13 @@ namespace Spine.Unity {
 			parentBoneScale = Vector2.one;
 			Bone scaleBone = rootMotionBone;
 			while ((scaleBone = scaleBone.Parent) != null) {
+#if USE_APPLIED_PARENT_SCALE
+				parentBoneScale.x *= scaleBone.AScaleX;
+				parentBoneScale.y *= scaleBone.AScaleY;
+#else
 				parentBoneScale.x *= scaleBone.ScaleX;
 				parentBoneScale.y *= scaleBone.ScaleY;
+#endif
 			}
 			totalScale = Vector2.Scale(totalScale, parentBoneScale);
 			totalScale *= AdditionalScale;

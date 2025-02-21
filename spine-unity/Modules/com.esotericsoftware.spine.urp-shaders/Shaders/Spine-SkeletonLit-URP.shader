@@ -10,6 +10,7 @@ Shader "Universal Render Pipeline/Spine/Skeleton Lit" {
 		[MaterialToggle(_TINT_BLACK_ON)]  _TintBlack("Tint Black", Float) = 0
 		_Color("    Light Color", Color) = (1,1,1,1)
 		_Black("    Dark Color", Color) = (0,0,0,0)
+		[MaterialToggle(_ADAPTIVE_PROBE_VOLUMES_PER_PIXEL)]  _AdaptiveProbeVolumesPerPixel("APV per Pixel", Float) = 1
 		[HideInInspector] _StencilRef("Stencil Reference", Float) = 1.0
 		[Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Compare", Float) = 8 // Set to Always as default
 	}
@@ -56,6 +57,10 @@ Shader "Universal Render Pipeline/Spine/Skeleton Lit" {
 			#pragma multi_compile_fragment _ _LIGHT_LAYERS
 			#pragma multi_compile _ _FORWARD_PLUS
 			#pragma multi_compile_fragment _ _WRITE_RENDERING_LAYERS
+			#pragma multi_compile _ PROBE_VOLUMES_L1 PROBE_VOLUMES_L2
+			#if defined(PROBE_VOLUMES_L1) || defined(PROBE_VOLUMES_L2)
+			#pragma multi_compile _ _ADAPTIVE_PROBE_VOLUMES_PER_PIXEL
+			#endif
 
 			// -------------------------------------
 			// Unity defined keywords

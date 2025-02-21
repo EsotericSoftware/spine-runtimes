@@ -1,13 +1,13 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated July 28, 2023. Replaces all prior versions.
+ * Last updated February 20, 2024. Replaces all prior versions.
  *
- * Copyright (c) 2013-2023, Esoteric Software LLC
+ * Copyright (c) 2013-2024, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
  * conditions of Section 2 of the Spine Editor License Agreement:
- * http://esotericsoftware.com/spine-editor-license
+ * https://esotericsoftware.com/spine-editor-license
  *
  * Otherwise, it is permitted to integrate the Spine Runtimes into software or
  * otherwise create derivative works of the Spine Runtimes (collectively,
@@ -41,7 +41,7 @@ import com.esotericsoftware.spine.Slot;
 
 /** An attachment that displays a textured quadrilateral.
  * <p>
- * See <a href="http://esotericsoftware.com/spine-regions">Region attachments</a> in the Spine User Guide. */
+ * See <a href="https://esotericsoftware.com/spine-regions">Region attachments</a> in the Spine User Guide. */
 public class RegionAttachment extends Attachment implements HasTextureRegion {
 	static public final int BLX = 0, BLY = 1;
 	static public final int ULX = 2, ULY = 3;
@@ -171,7 +171,7 @@ public class RegionAttachment extends Attachment implements HasTextureRegion {
 	/** Transforms the attachment's four vertices to world coordinates. If the attachment has a {@link #sequence}, the region may
 	 * be changed.
 	 * <p>
-	 * See <a href="http://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
+	 * See <a href="https://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
 	 * Runtimes Guide.
 	 * @param worldVertices The output world vertices. Must have a length >= <code>offset</code> + 8.
 	 * @param offset The <code>worldVertices</code> index to begin writing values.

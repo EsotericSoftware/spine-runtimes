@@ -33,10 +33,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 
 namespace Spine.Unity {
+	using ReplacementMaterial = BlendModeMaterials.ReplacementMaterial;
 
 	/// <summary>
 	/// Interface to derive a concrete target reference struct from which holds
@@ -114,9 +116,11 @@ namespace Spine.Unity {
 			modifiedMaterials = null;
 			if (!atlasAsset) return false;
 
+			int normalMaterialCount = atlasAsset.Materials.Count();
+			IEnumerable<Material> inputMaterials = GetInputMaterials();
 			int materialIndex = 0;
-			foreach (Material targetMaterial in atlasAsset.Materials) {
-				if (materialIndex >= placeholderMap.Length) {
+			foreach (Material targetMaterial in inputMaterials) {
+				if ((materialIndex < normalMaterialCount) && (materialIndex >= placeholderMap.Length)) {
 					Debug.LogError(string.Format("Failed to assign placeholder textures at {0}, material #{1} {2}. " +
 						"It seems like the GenericOnDemandTextureLoader asset was not setup accordingly for the AtlasAsset.",
 						atlasAsset, materialIndex + 1, targetMaterial), this);
@@ -134,17 +138,19 @@ namespace Spine.Unity {
 						mapIndex = foundMapIndex;
 				}
 #endif
-				Texture placeholderTexture = placeholderMap[mapIndex].textures[textureIndex].placeholderTexture;
-				if (placeholderTexture == null) {
-					Debug.LogWarning(string.Format("Placeholder texture set to null at {0}, for material #{1} {2}. " +
-						"It seems like the GenericOnDemandTextureLoader asset was not setup accordingly for the AtlasAsset.",
-						atlasAsset, materialIndex + 1, targetMaterial), this);
-				} else {
-					targetMaterial.mainTexture = placeholderTexture;
+				if (mapIndex < normalMaterialCount) {
+					Texture placeholderTexture = placeholderMap[mapIndex].textures[textureIndex].placeholderTexture;
+					if (placeholderTexture == null) {
+						Debug.LogWarning(string.Format("Placeholder texture set to null at {0}, for material #{1} {2}. " +
+							"It seems like the GenericOnDemandTextureLoader asset was not setup accordingly for the AtlasAsset.",
+							atlasAsset, materialIndex + 1, targetMaterial), this);
+					} else {
+						targetMaterial.mainTexture = placeholderTexture;
+					}
 				}
 				++materialIndex;
 			}
-			modifiedMaterials = atlasAsset.Materials;
+			modifiedMaterials = inputMaterials;
 			return true;
 		}
 
@@ -153,18 +159,14 @@ namespace Spine.Unity {
 			if (!atlasAsset) return false;
 
 			bool anyPlaceholderAssigned = false;
-
-			int materialIndex = 0;
-			foreach (Material material in atlasAsset.Materials) {
-				if (materialIndex >= placeholderMap.Length)
-					return false;
+			IEnumerable<Material> inputMaterials = GetInputMaterials();
+			foreach (Material material in inputMaterials) {
 				bool hasPlaceholderAssigned = HasPlaceholderAssigned(material);
 				if (hasPlaceholderAssigned) {
 					anyPlaceholderAssigned = true;
 					if (placeholderMaterials == null) placeholderMaterials = new List<Material>();
 					placeholderMaterials.Add(material);
 				}
-				materialIndex++;
 			}
 			return anyPlaceholderAssigned;
 		}
@@ -173,20 +175,62 @@ namespace Spine.Unity {
 			modifiedMaterials = null;
 			if (!atlasAsset) return false;
 			BeginCustomTextureLoading();
-			int i = 0;
-			foreach (Material targetMaterial in atlasAsset.Materials) {
-				if (i >= placeholderMap.Length) {
+
+			int normalMaterialCount = atlasAsset.Materials.Count();
+			IEnumerable<Material> inputMaterials = GetInputMaterials();
+
+			// process normal materials
+			int materialIndex = 0;
+			foreach (Material targetMaterial in inputMaterials) {
+				if (materialIndex > normalMaterialCount - 1) break;
+
+				if (materialIndex >= placeholderMap.Length) {
 					Debug.LogError(string.Format("Failed to assign target textures at {0}, material #{1} {2}. " +
 						"It seems like the OnDemandTextureLoader asset was not setup accordingly for the AtlasAsset.",
-						atlasAsset, i + 1, targetMaterial), this);
+						atlasAsset, materialIndex + 1, targetMaterial), this);
 					return false;
 				}
-				AssignTargetTextures(targetMaterial, i);
-				++i;
+
+				AssignTargetTextures(targetMaterial, materialIndex);
+				++materialIndex;
 			}
-			modifiedMaterials = atlasAsset.Materials;
+			// process blend mode materials
+			if (skeletonDataAsset != null) {
+				foreach (ReplacementMaterial replacement in skeletonDataAsset.blendModeMaterials.additiveMaterials) {
+					AssignBlendModeTargetTextures(replacement.material, replacement);
+				}
+				foreach (ReplacementMaterial replacement in skeletonDataAsset.blendModeMaterials.multiplyMaterials) {
+					AssignBlendModeTargetTextures(replacement.material, replacement);
+				}
+				foreach (ReplacementMaterial replacement in skeletonDataAsset.blendModeMaterials.screenMaterials) {
+					AssignBlendModeTargetTextures(replacement.material, replacement);
+				}
+			}
+
+			modifiedMaterials = inputMaterials;
 			EndCustomTextureLoading();
 			return true;
+		}
+
+		protected IEnumerable<Material> GetInputMaterials () {
+			int normalMaterialCount = atlasAsset.Materials.Count();
+			IEnumerable<Material> inputMaterials = atlasAsset.Materials;
+			if (skeletonDataAsset != null) {
+				BlendModeMaterials blendModeMaterials = skeletonDataAsset.blendModeMaterials;
+				int additiveCount = blendModeMaterials.additiveMaterials.Count;
+				int multiplyCount = blendModeMaterials.multiplyMaterials.Count;
+				int screenCount = blendModeMaterials.screenMaterials.Count;
+				int totalBlendModeMaterialCount = additiveCount + multiplyCount + screenCount;
+				if (totalBlendModeMaterialCount > 0) {
+					List<Material> materialsList = new List<Material>(normalMaterialCount + totalBlendModeMaterialCount);
+					materialsList.AddRange(atlasAsset.Materials);
+					materialsList.AddRange(blendModeMaterials.additiveMaterials.Where(r => r.material != null).Select(r => r.material));
+					materialsList.AddRange(blendModeMaterials.multiplyMaterials.Where(r => r.material != null).Select(r => r.material));
+					materialsList.AddRange(blendModeMaterials.screenMaterials.Where(r => r.material != null).Select(r => r.material));
+					inputMaterials = materialsList;
+				}
+			}
+			return inputMaterials;
 		}
 
 		public override void BeginCustomTextureLoading () {
@@ -262,7 +306,27 @@ namespace Spine.Unity {
 
 		protected void AssignTargetTextures (Material material, int materialIndex) {
 			int textureIndex = 0; // Todo: currently only main texture is supported.
+			if (materialIndex > placeholderMap.Length - 1) return;
 			RequestLoadTexture(material, materialIndex, textureIndex, null);
+		}
+
+		protected void AssignBlendModeTargetTextures (Material blendModeMaterial, ReplacementMaterial replacementMaterial) {
+			int textureIndex = 0; // Todo: currently only main texture is supported.
+			int mainMaterialIndex = 0;
+			if (blendModeMaterial.mainTexture != null) {
+				mainMaterialIndex = Array.FindIndex(placeholderMap,
+					entry => entry.textures[textureIndex].placeholderTexture == blendModeMaterial.mainTexture);
+				if (mainMaterialIndex < 0)
+					return;
+			} else {
+				string textureNameFull = Path.GetFileNameWithoutExtension(replacementMaterial.pageName);
+				string placeholderTextureName = GetPlaceholderTextureName(textureNameFull);
+				mainMaterialIndex = Array.FindIndex(placeholderMap,
+					entry => entry.textures[textureIndex].placeholderTexture.name == placeholderTextureName);
+				if (mainMaterialIndex < 0)
+					return;
+			}
+			RequestLoadTexture(blendModeMaterial, mainMaterialIndex, textureIndex, null);
 		}
 
 		protected virtual Texture RequestLoadTexture (Material material, int materialIndex, int textureIndex,
@@ -336,10 +400,33 @@ namespace Spine.Unity {
 
 			// reset material textures to placeholder textures.
 			Material targetMaterial = atlasAsset.Materials.ElementAt(materialIndex);
+			Texture targetTexture = null;
+			Texture placeholderTexture = null;
 			if (targetMaterial) {
-				targetMaterial.mainTexture = placeholderTextures[textureIndex].placeholderTexture;
+				targetTexture = targetMaterial.mainTexture;
+				placeholderTexture = placeholderTextures[textureIndex].placeholderTexture;
+				targetMaterial.mainTexture = placeholderTexture;
 				if (wasReleased)
 					OnTextureUnloaded(targetMaterial, textureIndex);
+			}
+			// also reset material textures of blend mode materials
+			if (targetTexture != null && skeletonDataAsset != null) {
+				BlendModeMaterials blendModeMaterials = skeletonDataAsset.blendModeMaterials;
+				foreach (ReplacementMaterial replacementMaterial in blendModeMaterials.additiveMaterials) {
+					replacementMaterial.material.mainTexture = placeholderTexture;
+					if (wasReleased && replacementMaterial.material.mainTexture == targetTexture)
+						OnTextureUnloaded(targetMaterial, textureIndex);
+				}
+				foreach (ReplacementMaterial replacementMaterial in blendModeMaterials.multiplyMaterials) {
+					replacementMaterial.material.mainTexture = placeholderTexture;
+					if (wasReleased && replacementMaterial.material.mainTexture == targetTexture)
+						OnTextureUnloaded(targetMaterial, textureIndex);
+				}
+				foreach (ReplacementMaterial replacementMaterial in blendModeMaterials.screenMaterials) {
+					replacementMaterial.material.mainTexture = placeholderTexture;
+					if (wasReleased && replacementMaterial.material.mainTexture == targetTexture)
+						OnTextureUnloaded(targetMaterial, textureIndex);
+				}
 			}
 		}
 

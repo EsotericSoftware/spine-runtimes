@@ -48,7 +48,7 @@ public:
 
 	Ref<SpineAttachment> copy();
 
-	void set_spine_object(const SpineSkeletonDataResource *_owner, spine::Attachment *_object) {
+	void set_spine_object(const SpineSkeletonDataResource *_owner, spine::Attachment *_object) override {
 		if (get_spine_object()) get_spine_object()->dereference();
 		_set_spine_object_internal(_owner, _object);
 		if (_object) _object->reference();

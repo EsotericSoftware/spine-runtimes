@@ -14,6 +14,12 @@
 #endif
 #if IS_URP_14_OR_NEWER && !defined(_USE_WEBGL1_LIGHTS)
     #define IS_URP_15_OR_NEWER 1
+    #include "Packages/com.unity.render-pipelines.core/Runtime/Lighting/ProbeVolume/ProbeVolume.hlsl"
+    #if defined(_APVWorldOffset)
+        #define IS_URP_17_OR_NEWER 1
+    #else
+        #define IS_URP_17_OR_NEWER 0
+    #endif
 #else
     #define IS_URP_15_OR_NEWER 0
 #endif

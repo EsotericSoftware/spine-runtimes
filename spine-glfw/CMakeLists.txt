@@ -1,18 +1,13 @@
 cmake_minimum_required(VERSION 3.10)
 project(spine-glfw)
 
-# Default flags
-include(${CMAKE_SOURCE_DIR}/../flags.cmake)
-
-# Add spine-cpp
-add_subdirectory(${CMAKE_SOURCE_DIR}/../spine-cpp ${CMAKE_BINARY_DIR}/spine-cpp-build)
-
 include(FetchContent)
 # Fetch GLFW
 FetchContent_Declare(
         glfw
         GIT_REPOSITORY https://github.com/glfw/glfw.git
         GIT_TAG latest
+        GIT_SHALLOW 1
 )
 FetchContent_MakeAvailable(glfw)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL " " FORCE)
@@ -24,7 +19,8 @@ set(GLFW_INSTALL OFF CACHE BOOL " " FORCE)
 FetchContent_Declare(
         glbinding
         GIT_REPOSITORY https://github.com/cginternals/glbinding.git
-        GIT_TAG master
+        GIT_TAG v3.3.0
+        GIT_SHALLOW 1
 )
 FetchContent_MakeAvailable(glbinding)
 set(OPTION_BUILD_DOCS OFF CACHE BOOL " " FORCE)
@@ -38,10 +34,16 @@ include_directories(src)
 # Find local OpenGL lib
 find_package(OpenGL REQUIRED)
 
+# Default flags
+include(${CMAKE_SOURCE_DIR}/../flags.cmake)
+
+# Add spine-cpp
+add_subdirectory(${CMAKE_SOURCE_DIR}/../spine-cpp ${CMAKE_BINARY_DIR}/spine-cpp-build)
+
 # spine-glfw library
 add_library(spine-glfw STATIC src/spine-glfw.cpp src/spine-glfw.h src/stb_image.h)
 target_link_libraries(spine-glfw PRIVATE glbinding::glbinding)
-target_link_libraries(spine-glfw LINK_PUBLIC spine-cpp)
+target_link_libraries(spine-glfw LINK_PUBLIC spine-cpp-lite)
 
 # Example
 add_executable(spine-glfw-example example/main.cpp)
@@ -50,6 +52,15 @@ target_link_libraries(spine-glfw-example PRIVATE OpenGL::GL)
 target_link_libraries(spine-glfw-example LINK_PUBLIC spine-glfw)
 target_link_libraries(spine-glfw-example PRIVATE glbinding::glbinding)
 set_property(TARGET spine-glfw-example PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/spine-glfw")
+
+# spine-cpp-lite Example
+add_executable(spine-glfw-example-cpp-lite example/main-cpp-lite.cpp)
+target_link_libraries(spine-glfw-example-cpp-lite PRIVATE glfw)
+target_link_libraries(spine-glfw-example-cpp-lite PRIVATE OpenGL::GL)
+target_link_libraries(spine-glfw-example-cpp-lite LINK_PUBLIC spine-glfw)
+target_link_libraries(spine-glfw-example-cpp-lite PRIVATE glbinding::glbinding)
+set_property(TARGET spine-glfw-example-cpp-lite PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/spine-glfw")
+
 
 # copy data to build directory
 add_custom_command(TARGET spine-glfw-example PRE_BUILD

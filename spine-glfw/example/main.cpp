@@ -39,8 +39,8 @@ int main() {
 	// Load the atlas and the skeleton data
 	GlTextureLoader textureLoader;
 	Atlas *atlas = new Atlas("data/spineboy-pma.atlas", &textureLoader);
-	SkeletonJson json(atlas);
-	SkeletonData *skeletonData = json.readSkeletonDataFile("data/spineboy-pro.json");
+	SkeletonBinary binary(atlas);
+	SkeletonData *skeletonData = binary.readSkeletonDataFile("data/spineboy-pro.skel");
 
 	// Create a skeleton from the data, set the skeleton's position to the bottom center of
 	// the screen and scale it to make it smaller.
@@ -52,8 +52,10 @@ int main() {
 	// Create an AnimationState to drive animations on the skeleton. Set the "portal" animation
 	// on track with index 0.
 	AnimationStateData animationStateData(skeletonData);
+	animationStateData.setDefaultMix(0.2f);
 	AnimationState animationState(&animationStateData);
 	animationState.setAnimation(0, "portal", true);
+	animationState.addAnimation(0, "run", true, 0);
 
 	// Create the renderer and set the viewport size to match the window size. This sets up a
 	// pixel perfect orthogonal projection for 2D rendering.

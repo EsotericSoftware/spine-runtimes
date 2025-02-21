@@ -29,6 +29,7 @@
 
 declare global {
 	var require: any;
+	var THREE: any;
 }
 
 if (typeof window !== 'undefined' && window.THREE) {

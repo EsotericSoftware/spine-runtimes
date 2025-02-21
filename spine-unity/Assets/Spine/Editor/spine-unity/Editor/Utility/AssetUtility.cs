@@ -61,6 +61,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using UnityEditor;
+using UnityEditor.VersionControl;
 using UnityEngine;
 using CompatibilityProblemInfo = Spine.Unity.SkeletonDataCompatibility.CompatibilityProblemInfo;
 
@@ -218,7 +219,7 @@ namespace Spine.Unity.Editor {
 				} else {
 					// On a "Reimport All" the order of imports can be wrong, thus LoadAssetAtPath() above could return null.
 					// as a workaround, we provide a fallback reader.
-					input = File.Open(skeletonDataPath, FileMode.Open, FileAccess.Read);
+					input = File.Open(skeletonDataPath, System.IO.FileMode.Open, FileAccess.Read);
 				}
 				binary.ReadSkeletonData(input);
 			} finally {
@@ -493,6 +494,8 @@ namespace Spine.Unity.Editor {
 					}
 				}
 			}
+
+			RevertUnchangedOnPerforce(atlasPaths, skeletonPaths, newAtlases);
 		}
 
 		static void AddDependentAtlasIfImageChanged (List<string> atlasPaths, List<string> imagePaths) {
@@ -523,6 +526,32 @@ namespace Spine.Unity.Editor {
 					if (textAsset != null && IsSpineData(textAsset, out compatibilityProblemInfo, ref problemDescription))
 						skeletonPaths.Add(new PathAndProblemInfo(usedSkeletonPath, compatibilityProblemInfo, problemDescription));
 				}
+			}
+		}
+
+		/// <summary>Prevents automatic check-out of unchanged, identically re-created assets (e.g. when re-imported)
+		/// when using Perforce VCS.</summary>
+		static void RevertUnchangedOnPerforce (List<string> atlasPaths, List<PathAndProblemInfo> skeletonPaths, List<AtlasAssetBase> newAtlases) {
+			Plugin versionControl = Provider.GetActivePlugin();
+			if (versionControl != null && versionControl.name == "Perforce") {
+				AssetList assets = new AssetList();
+
+				foreach (string atlasPath in atlasPaths) {
+					assets.Add(Provider.GetAssetByPath(atlasPath));
+				}
+				foreach (PathAndProblemInfo skeletonPathInfo in skeletonPaths) {
+					if (skeletonPathInfo.compatibilityProblems == null)
+						assets.Add(Provider.GetAssetByPath(skeletonPathInfo.path));
+				}
+				foreach (AtlasAssetBase atlas in newAtlases) {
+					if (atlas != null)
+						assets.Add(Provider.GetAssetByPath(AssetDatabase.GetAssetPath(atlas)));
+					foreach (Material atlasMaterial in atlas.Materials) {
+						if (atlasMaterial != null)
+							assets.Add(Provider.GetAssetByPath(AssetDatabase.GetAssetPath(atlasMaterial)));
+					}
+				}
+				Provider.Revert(assets, RevertMode.Unchanged);
 			}
 		}
 

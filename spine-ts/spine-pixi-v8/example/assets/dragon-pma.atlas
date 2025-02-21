@@ -1,0 +1,117 @@
+dragon-pma.png
+	size: 1024, 1024
+	filter: Linear, Linear
+	pma: true
+front-toe-a
+	bounds: 797, 381, 29, 50
+front-toe-b
+	bounds: 942, 118, 56, 57
+head
+	bounds: 647, 81, 296, 260
+	rotate: 90
+left-front-leg
+	bounds: 942, 250, 84, 57
+	rotate: 90
+left-front-thigh
+	bounds: 852, 7, 84, 72
+left-wing01
+	bounds: 736, 433, 264, 589
+right-rear-toe
+	bounds: 647, 2, 109, 77
+right-wing01
+	bounds: 2, 379, 365, 643
+right-wing02
+	bounds: 369, 379, 365, 643
+right-wing03
+	bounds: 2, 12, 365, 643
+	rotate: 90
+tail03
+	bounds: 758, 6, 73, 92
+	rotate: 90
+tail04
+	bounds: 942, 177, 56, 71
+tail05
+	bounds: 736, 379, 52, 59
+	rotate: 90
+tail06
+	bounds: 942, 336, 95, 68
+	rotate: 90
+thiagobrayner
+	bounds: 909, 81, 350, 31
+	rotate: 90
+
+dragon-pma_2.png
+	size: 1024, 1024
+	filter: Linear, Linear
+	pma: true
+back
+	bounds: 795, 32, 190, 185
+chin
+	bounds: 647, 157, 214, 146
+	rotate: 90
+left-rear-leg
+	bounds: 795, 219, 206, 177
+	rotate: 90
+left-wing02
+	bounds: 736, 427, 264, 589
+right-wing04
+	bounds: 2, 373, 365, 643
+right-wing05
+	bounds: 369, 373, 365, 643
+right-wing06
+	bounds: 2, 6, 365, 643
+	rotate: 90
+tail01
+	bounds: 647, 2, 120, 153
+
+dragon-pma_3.png
+	size: 1024, 1024
+	filter: Linear, Linear
+	pma: true
+chest
+	bounds: 740, 299, 136, 122
+left-rear-thigh
+	bounds: 647, 218, 91, 149
+left-wing03
+	bounds: 736, 423, 264, 589
+right-front-leg
+	bounds: 850, 196, 101, 89
+	rotate: 90
+right-front-thigh
+	bounds: 740, 189, 108, 108
+right-rear-leg
+	bounds: 878, 321, 116, 100
+right-rear-thigh
+	bounds: 647, 67, 91, 149
+right-wing07
+	bounds: 2, 369, 365, 643
+right-wing08
+	bounds: 369, 369, 365, 643
+right-wing09
+	bounds: 2, 2, 365, 643
+	rotate: 90
+tail02
+	bounds: 740, 67, 95, 120
+
+dragon-pma_4.png
+	size: 1024, 1024
+	filter: Linear, Linear
+	pma: true
+left-wing04
+	bounds: 2, 268, 264, 589
+left-wing05
+	bounds: 268, 268, 264, 589
+left-wing06
+	bounds: 534, 268, 264, 589
+left-wing07
+	bounds: 2, 2, 264, 589
+	rotate: 90
+
+dragon-pma_5.png
+	size: 1024, 1024
+	filter: Linear, Linear
+	pma: true
+left-wing08
+	bounds: 2, 2, 264, 589
+left-wing09
+	bounds: 268, 2, 264, 589

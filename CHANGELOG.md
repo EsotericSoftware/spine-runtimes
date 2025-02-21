@@ -88,6 +88,7 @@
 - **Breaking**: Starting with Unreal Engine 5.3 imported `.skel`/`.json` and `.atlas` files in the same folder must NOT have a common prefix. E.g. `skeleton.json` and `skeleton.atlas` will not work. Make sure to rename at least one of the two files so there is no prefix collision, e.g. `skeleton-data.json` and `skeleton.atlas`.
 - Added compatibility with UE 5.3
 - Added more example maps
+- Added blueprint-callable methods `PhysicsTranslate()`, `PhysicsRotate()` and `ResetPhysicsConstraints()` (which will reset all physics constraints in the skeleton) to `SpineSkeletonComponent` and `SpineWidget`.
 
 ### Godot
 
@@ -122,7 +123,7 @@
 
 ### Unity
 
-- **Officially supported Unity versions are 2017.1-2022.1**.
+- **Officially supported Unity versions are 2017.1-6000.0**.
 
 - **Additions**
 
@@ -162,6 +163,12 @@
   - SkeletonGraphic: You can now offset the skeleton mesh relative to the pivot via a newly added green circle handle. This allows you to e.g. frame only the face of a skeleton inside a masked frame. Previously offsetting the pivot downwards fails when `Layout Scale Mode` scales the mesh smaller and towards the pivot (e.g. the feet) and thus out of the frame. Now you can keep the pivot in the center of the `RectTransform` while offsetting only the mesh downwards, keeping the desired skeleton area (e.g. the face) centered while resizing. Moving the new larger green circle handle moves the mesh offset, while moving the blue pivot circle handle moves the pivot as usual.
   - `Universal Render Pipeline/Spine/Skeleton` shader now performs proper alpha-testing when `Depth Write` is enabled, using the existing `Shadow alpha cutoff` parameter.
   - `SkeletonRootMotion` components now provide a public `Initialize()` method which is automatically called when calling `skeletonAnimation.Initialize(true)` to update the necessary skeleton references. If a different root bone shall be used, be sure to set `skeletonRootMotion.rootMotionBoneName` before calling `skeletonAnimation.Initialize(true)`.
+  - Skeleton Mecanim: Added new `Mix Mode` `Match`. When selected, Spine animation weights are calculated to best match the provided Mecanim clip weights. This mix mode is recommended on any layer using blend tree nodes.
+  - URP Shaders: Added `ZWrite` variant of outline shader `Universal Render Pipeline/Spine/Outline/Skeleton-OutlineOnly ZWrite`. Suitable for e.g. depth of field (DoF) effect where writing to the depth buffer is required. Note that for DoF effect, `Render Queue` needs to be set to `Alpha Test`.
+  - SkeletonGraphic: Exposed `SetScaledPivotOffset` as public method outside of the editor to support programatically moving mesh offsets at runtime based on mesh bounds.
+  - SkeletonMecanim: Added `Scene Preview` option to preview an Animation Clip for e.g. easier event placement. When enabled, the Animation Clip selected in the Animation window is previewed in the Scene and Game views. Lock the `SkeletonMecanim` Inspector window, open the Animation window and select the Animation Clip. Then in the Animation window scrub through the timeline to see the current animation frame previewed.
+  - `Universal Render Pipeline/Spine/Skeleton Lit` shader now supports [Adaptive Probe Volumes (APV)](https://docs.unity3d.com/6000.0/Documentation/Manual/urp/probevolumes-concept.html) introduced in Unity 6. The shader also provides a new material property `APV per Pixel` to either calculate APV lighting contribution per pixel (the default) or per vertex.
+  - `Universal Render Pipeline/Spine/Sprite` shader now also supports [Adaptive Probe Volumes (APV)](https://docs.unity3d.com/6000.0/Documentation/Manual/urp/probevolumes-concept.html) introduced in Unity 6. APV lighting contribution is automatically calculated per pixel.
 
 - **Breaking changes**
 
@@ -174,6 +181,9 @@
   - Inspector: String attribute `SpineSkin()` now allows to include `<None>` in the list of parameters. Previously the `includeNone=true` parameter of the `SpineSkin()` attribute defaulted to `true` but was ignored. Now it defaults to `false` and has an effect on the list. Only the Inspector GUI is affected by this behaviour change.
   - `SkeletonGraphicRenderTexture` example component: `protected RawImage quadRawImage` was changed to `protected SkeletonSubmeshGraphic quadMaskableGraphic` for a bugfix. This is only relevant for subclasses of `SkeletonGraphicRenderTexture` or when querying the `RawImage` component via e.g. `skeletonGraphicRenderTexture.quad.GetComponent<RawImage>()`.
   - Fixed a bug where when Linear color space is used and `PMA vertex colors` enabled, additive slots add a too dark (too transparent) color value. If you want the old incorrect behaviour (darker additive slots) or are not using Linear but Gamma color space, you can comment-out the define `LINEAR_COLOR_SPACE_FIX_ADDITIVE_ALPHA` in `MeshGenerator.cs` to deactivate the fix or just to skip unnecessary instructions.
+  - Fixed SkeletonRootMotion components ignoring parent bone scale when set by transform constraints. Using applied scale of parent bone now. If you need the old behaviour, comment out the line `#define USE_APPLIED_PARENT_SCALE` in SkeletonRootMotionBase.cs.
+  - Fixed SkeletonUtility callback update order when used with SkeletonRootMotion components so that the position when following a bone is updated after SkeletonRootMotion clears root-bone position. The order of SkeletonUtilityBone callbacks is changed to be later to achieve this. This is a breaking change in the unlikely case that you are using SkeletonRootMotion together with SkeletonUtility and subscribed to `UpdateLocal`, `UpdateWorld` or `UpdateComplete` yourself and relied on a certain callback order. One solution is to then resubscribe your own callback events accordingly by calling
+  `.UpdateLocal -= Callback; .UpdateLocal += Callback;`.
 
 - **Changes of default values**
 
@@ -339,6 +349,7 @@
   - `VertexEffect` has been removed.
 
 ### Cocos2d-x
+- Renamed `SkeletonRenderer` to `SkeletonRendererCocos2dX` to avoid name clash with spine-cpp class.
 
 ### SFML
 

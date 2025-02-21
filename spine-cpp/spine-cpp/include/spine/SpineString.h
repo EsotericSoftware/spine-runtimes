@@ -179,7 +179,7 @@ namespace spine {
 			return *this;
 		}
 
-		bool startsWith(const String &needle) {
+		bool startsWith(const String &needle) const {
 			if (needle.length() > length()) return false;
 			for (int i = 0; i < (int)needle.length(); i++) {
 				if (buffer()[i] != needle.buffer()[i]) return false;
@@ -187,7 +187,7 @@ namespace spine {
 			return true;
 		}
 
-        int lastIndexOf(const char c) {
+        int lastIndexOf(const char c) const {
             for (int i = (int)length() - 1; i >= 0; i--) {
                 if (buffer()[i] == c) return i;
             }

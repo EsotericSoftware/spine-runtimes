@@ -1,3 +1,3 @@
 # spine-skeletonviewer
 
-Please see the [Skeleton Viewer documentation](http://esotericsoftware.com/spine-skeleton-viewer).
+Please see the [Skeleton Viewer documentation](https://esotericsoftware.com/spine-skeleton-viewer).

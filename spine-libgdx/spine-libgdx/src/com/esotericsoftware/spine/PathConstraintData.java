@@ -1,13 +1,13 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated July 28, 2023. Replaces all prior versions.
+ * Last updated February 20, 2024. Replaces all prior versions.
  *
- * Copyright (c) 2013-2023, Esoteric Software LLC
+ * Copyright (c) 2013-2024, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
  * conditions of Section 2 of the Spine Editor License Agreement:
- * http://esotericsoftware.com/spine-editor-license
+ * https://esotericsoftware.com/spine-editor-license
  *
  * Otherwise, it is permitted to integrate the Spine Runtimes into software or
  * otherwise create derivative works of the Spine Runtimes (collectively,
@@ -33,7 +33,7 @@ import com.badlogic.gdx.utils.Array;
 
 /** Stores the setup pose for a {@link PathConstraint}.
  * <p>
- * See <a href="http://esotericsoftware.com/spine-path-constraints">Path constraints</a> in the Spine User Guide. */
+ * See <a href="https://esotericsoftware.com/spine-path-constraints">Path constraints</a> in the Spine User Guide. */
 public class PathConstraintData extends ConstraintData {
 	final Array<BoneData> bones = new Array();
 	SlotData target;
@@ -148,7 +148,8 @@ public class PathConstraintData extends ConstraintData {
 
 	/** Controls how the first bone is positioned along the path.
 	 * <p>
-	 * See <a href="http://esotericsoftware.com/spine-path-constraints#Position-mode">Position mode</a> in the Spine User Guide. */
+	 * See <a href="https://esotericsoftware.com/spine-path-constraints#Position-mode">Position mode</a> in the Spine User
+	 * Guide. */
 	static public enum PositionMode {
 		fixed, percent;
 
@@ -157,7 +158,7 @@ public class PathConstraintData extends ConstraintData {
 
 	/** Controls how bones after the first bone are positioned along the path.
 	 * <p>
-	 * See <a href="http://esotericsoftware.com/spine-path-constraints#Spacing-mode">Spacing mode</a> in the Spine User Guide. */
+	 * See <a href="https://esotericsoftware.com/spine-path-constraints#Spacing-mode">Spacing mode</a> in the Spine User Guide. */
 	static public enum SpacingMode {
 		length, fixed, percent, proportional;
 
@@ -166,7 +167,7 @@ public class PathConstraintData extends ConstraintData {
 
 	/** Controls how bones are rotated, translated, and scaled to match the path.
 	 * <p>
-	 * See <a href="http://esotericsoftware.com/spine-path-constraints#Rotate-mode">Rotate mode</a> in the Spine User Guide. */
+	 * See <a href="https://esotericsoftware.com/spine-path-constraints#Rotate-mode">Rotate mode</a> in the Spine User Guide. */
 	static public enum RotateMode {
 		tangent, chain,
 		/** When chain scale, constrained bones should all have the same parent. That way when the path constraint scales a bone, it

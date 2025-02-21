@@ -1,3 +1,13 @@
+# 4.2.33
+- Merge fixes in spine-cpp(-lite)
+- Prepare for upcoming Dart/Flutter releases, see https://github.com/EsotericSoftware/spine-runtimes/pull/2690
+
+# 4.2.32
+- Fix spine-flutter spec checksum in `Podfile.lock`, keeping version control cleaner. See https://github.com/EsotericSoftware/spine-runtimes/pull/2609
+
+# 4.2.31
+- Fix bug in IKConstraint leading to NaNs.
+
 # 4.2.30
 - Switch to spine-cpp SkeletonRenderer
 

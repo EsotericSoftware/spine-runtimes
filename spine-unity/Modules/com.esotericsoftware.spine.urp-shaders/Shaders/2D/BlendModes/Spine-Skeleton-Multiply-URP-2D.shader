@@ -7,7 +7,7 @@
 		[MaterialToggle(_TINT_BLACK_ON)]  _TintBlack("Tint Black", Float) = 0
 		_Black("    Dark Color", Color) = (0,0,0,0)
 		[HideInInspector] _StencilRef("Stencil Reference", Float) = 1.0
-		[HideInInspector][Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Comparison", Float) = 8 // Set to Always as default
+		[Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Comparison", Float) = 8 // Set to Always as default
 	}
 
 	SubShader {

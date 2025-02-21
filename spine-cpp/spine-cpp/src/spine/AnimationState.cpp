@@ -794,16 +794,18 @@ bool AnimationState::updateMixingFrom(TrackEntry *to, float delta) {
 	from->_animationLast = from->_nextAnimationLast;
 	from->_trackLast = from->_nextTrackLast;
 
-	// Require mixTime > 0 to ensure the mixing from entry was applied at least once.
-	if (to->_mixTime > 0 && to->_mixTime >= to->_mixDuration) {
-		// Require totalAlpha == 0 to ensure mixing is complete, unless mixDuration == 0 (the transition is a single frame).
-		if (from->_totalAlpha == 0 || to->_mixDuration == 0) {
-			to->_mixingFrom = from->_mixingFrom;
-			if (from->_mixingFrom != NULL) from->_mixingFrom->_mixingTo = to;
-			to->_interruptAlpha = from->_interruptAlpha;
-			_queue->end(from);
+	if (to->_nextTrackLast != -1) {                             // The from entry was applied at least once.
+		bool discard = to->_mixTime == 0 && from->_mixTime == 0;// Discard the from entry when neither have advanced yet.
+		if (to->_mixTime >= to->_mixDuration || discard) {
+			// Require totalAlpha == 0 to ensure mixing is complete or the transition is a single frame or discarded.
+			if (from->_totalAlpha == 0 || to->_mixDuration == 0 || discard) {
+				to->_mixingFrom = from->_mixingFrom;
+				if (from->_mixingFrom) from->_mixingFrom->_mixingTo = to;
+				to->_interruptAlpha = from->_interruptAlpha;
+				_queue->end(from);
+			}
+			return finished;
 		}
-		return finished;
 	}
 
 	from->_trackTime += delta * from->_timeScale;
@@ -921,7 +923,7 @@ void AnimationState::setAttachment(Skeleton &skeleton, Slot &slot, const String 
 void AnimationState::queueEvents(TrackEntry *entry, float animationTime) {
 	float animationStart = entry->_animationStart, animationEnd = entry->_animationEnd;
 	float duration = animationEnd - animationStart;
-	float trackLastWrapped = MathUtil::fmod(entry->_trackLast, duration);
+	float trackLastWrapped = duration != 0 ? MathUtil::fmod(entry->_trackLast, duration) : MathUtil::quietNan();
 
 	// Queue events before complete.
 	size_t i = 0, n = _events.size();

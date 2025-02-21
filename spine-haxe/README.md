@@ -1,5 +1,3 @@
-> **Note**: this runtime is a work in progress. Please follow this issue to get alerted once the runtime is deemed complete. https://github.com/EsotericSoftware/spine-runtimes/issues/2249
-
 # spine-haxe
 
 The spine-haxe runtime provides functionality to load, manipulate and render [Spine](http://esotericsoftware.com) skeletal animation data using [Haxe](https://haxe.org/) in combination with [OpenFL](https://www.openfl.org/) and [Lime](https://lime.openfl.org/).

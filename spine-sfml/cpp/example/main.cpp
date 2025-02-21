@@ -626,6 +626,8 @@ void celestialCircus(SkeletonData *skeletonData, Atlas *atlas) {
 
 	Skeleton *skeleton = drawable.skeleton;
 	skeleton->setPosition(320, 480);
+    skeleton->setScaleX(0.2);
+    skeleton->setScaleY(0.2);
 	skeleton->updateWorldTransform(Physics_Update);
 
 	drawable.state->setAnimation(0, "swing", true);
@@ -778,10 +780,10 @@ extern spine::SkeletonRenderer *skeletonRenderer;
 int main() {
 	SpineExtension::setInstance(&dbgExtension);
 
+    testcase(celestialCircus, "data/celestial-circus-pro.json", "data/celestial-circus-pro.skel", "data/celestial-circus-pma.atlas", 1);
 	testcase(mixAndMatch, "data/mix-and-match-pro.json", "data/mix-and-match-pro.skel", "data/mix-and-match-pma.atlas", 0.5f);
 	testcase(cloudpot, "data/cloud-pot.json", "data/cloud-pot.skel", "data/cloud-pot-pma.atlas", 0.2);
 	testcase(sack, "data/sack-pro.json", "data/sack-pro.skel", "data/sack-pma.atlas", 0.2f);
-	testcase(celestialCircus, "data/celestial-circus-pro.json", "data/celestial-circus-pro.skel", "data/celestial-circus-pma.atlas", 0.2f);
 	testcase(snowglobe, "data/snowglobe-pro.json", "data/snowglobe-pro.skel", "data/snowglobe-pma.atlas", 0.2f);
 	testcase(dragon, "data/dragon-ess.json", "data/dragon-ess.skel", "data/dragon-pma.atlas", 0.6f);
 	testcase(spineboy, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.62f);

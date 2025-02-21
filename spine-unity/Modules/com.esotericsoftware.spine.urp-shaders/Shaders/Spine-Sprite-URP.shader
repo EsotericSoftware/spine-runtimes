@@ -121,6 +121,7 @@ Shader "Universal Render Pipeline/Spine/Sprite"
 			// Unity defined keywords
 			#pragma multi_compile _ DIRLIGHTMAP_COMBINED
 			#pragma multi_compile _ LIGHTMAP_ON
+			#pragma multi_compile _ PROBE_VOLUMES_L1 PROBE_VOLUMES_L2
 
 			//--------------------------------------
 			// GPU Instancing

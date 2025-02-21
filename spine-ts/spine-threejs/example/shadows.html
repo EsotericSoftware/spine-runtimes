@@ -1,0 +1,276 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>spine-threejs</title>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+
+      body,
+      html {
+        height: 100%;
+      }
+
+      canvas {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+
+    <script type="importmap">
+      {
+          "imports": {
+              "three": "https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.module.js",
+              "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.162.0/examples/jsm/",
+              "spine-threejs": "../dist/esm/spine-threejs.mjs"
+          }
+      }
+    </script>
+  </head>
+
+  <body>
+    <script type="module">
+      import * as THREE from "three";
+      import * as spine from "spine-threejs";
+      import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+
+      let scene, camera, renderer;
+      let geometry, material, mesh, skeletonMesh, atlas, atlasLoader, atlas2, atlasLoader2, skeletonMesh2, atlas3, atlasLoader3, skeletonMesh3;
+      let assetManager;
+      let canvas;
+      let controls;
+      let lastFrameTime = Date.now() / 1000;
+
+      let pma = false;
+
+      let baseUrl = "assets/";
+      let skeletonFile = "raptor-pro.json";
+      let atlasFile = "raptor.atlas";
+      let animation = "walk";
+
+      let skeletonFile2 = "celestial-circus-pro.json";
+      let atlasFile2 = "celestial-circus.atlas";
+      let animation2 = "swing";
+
+      let skeletonFile3 = "coin-pro.json";
+      let atlasFile3 = "coin-pma.atlas";
+      let animation3 = "animation";
+
+      function init() {
+        // create the THREE.JS camera, scene and renderer (WebGL)
+        let width = window.innerWidth,
+          height = window.innerHeight;
+        camera = new THREE.PerspectiveCamera(75, width / height, 1, 3000);
+        camera.position.y = 700;
+        camera.position.z = 300;
+        camera.lookAt(new THREE.Vector3(0, 0, 0))
+        scene = new THREE.Scene();
+        renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(width, height);
+        renderer.shadowMap.enabled = true
+
+        document.body.appendChild(renderer.domElement);
+        canvas = renderer.domElement;
+        controls = new OrbitControls(camera, renderer.domElement);
+
+        // LIGHTS - Ambient
+        const ambientLight = new THREE.AmbientLight(0xffffff, 1.0)
+        scene.add(ambientLight)
+
+        // LIGHTS - spotLight
+        const spotLight = new THREE.SpotLight(0xffffff, 5, 1200, Math.PI / 4, 0, 0)
+        spotLight.position.set(0, 1000, 0)
+        spotLight.castShadow = true
+        spotLight.shadow.mapSize.set(8192, 8192)
+        spotLight.shadow.bias = -0.00001;
+
+        scene.add(spotLight)
+
+        const spotLightHepler = new THREE.SpotLightHelper(spotLight)
+        scene.add(spotLightHepler)
+
+        // BOX
+        const boxGeometry = new THREE.BoxGeometry(400, 10, 10)
+        const boxMaterial = new THREE.MeshStandardMaterial({
+          transparent: true,
+          metalness: 0.5,
+          roughness: 1,
+          opacity: 1,
+        })
+        const box = new THREE.Mesh(boxGeometry, boxMaterial)
+        box.position.set(0, 300, -200)
+        box.castShadow = true
+        box.receiveShadow = true
+        scene.add(box)
+
+        // PLANE
+        const planeGeometry = new THREE.PlaneGeometry(2000, 2000)
+        const planeMaterial = new THREE.MeshStandardMaterial({ color: 0x213573 })
+        const plane = new THREE.Mesh(planeGeometry, planeMaterial)
+        plane.rotation.x = -Math.PI / 2
+        plane.material.side = THREE.DoubleSide
+        plane.receiveShadow = true
+        scene.add(plane)
+
+        // load the assets required to display the Raptor model
+        assetManager = new spine.AssetManager(baseUrl, undefined, pma);
+        assetManager.loadText(skeletonFile);
+        assetManager.loadTextureAtlas(atlasFile);
+
+        assetManager.loadText(skeletonFile2);
+        assetManager.loadTextureAtlas(atlasFile2);
+
+        assetManager.loadText(skeletonFile3);
+        assetManager.loadTextureAtlas(atlasFile3);
+
+        requestAnimationFrame(load);
+      }
+
+      function load(name, scale) {
+        if (assetManager.isLoadingComplete()) {
+
+          // Load the texture atlas using name.atlas and name.png from the AssetManager.
+          // The function passed to TextureAtlas is used to resolve relative paths.
+          atlas = assetManager.require(atlasFile);
+          atlas2 = assetManager.require(atlasFile2);
+          atlas3 = assetManager.require(atlasFile3);
+
+          // Create a AtlasAttachmentLoader that resolves region, mesh, boundingbox and path attachments
+          atlasLoader = new spine.AtlasAttachmentLoader(atlas);
+          atlasLoader2 = new spine.AtlasAttachmentLoader(atlas2);
+          atlasLoader3 = new spine.AtlasAttachmentLoader(atlas3);
+
+          // Create a SkeletonJson instance for parsing the .json file.
+          let skeletonJson = new spine.SkeletonJson(atlasLoader);
+          let skeletonJson2 = new spine.SkeletonJson(atlasLoader2);
+          let skeletonJson3 = new spine.SkeletonJson(atlasLoader3);
+
+          // Set the scale to apply during parsing, parse the file, and create a new skeleton.
+          skeletonJson.scale = 0.4;
+          let skeletonData = skeletonJson.readSkeletonData(
+            assetManager.require(skeletonFile)
+          );
+          skeletonJson2.scale = 0.4;
+          let skeletonData2 = skeletonJson2.readSkeletonData(
+            assetManager.require(skeletonFile2)
+          );
+
+          skeletonJson3.scale = 0.4;
+          let skeletonData3 = skeletonJson3.readSkeletonData(
+            assetManager.require(skeletonFile3)
+          );
+
+          // Create a SkeletonMesh from the data and attach it to the scene
+          skeletonMesh = new spine.SkeletonMesh({
+            skeletonData,
+            materialFactory: param => {
+              param.alphaTest = 0.001;
+              return new THREE.MeshStandardMaterial(param);
+            }
+          });
+          skeletonMesh.state.setAnimation(0, animation, true);
+          scene.add(skeletonMesh);
+          skeletonMesh.update(0)
+
+          skeletonMesh.rotation.set(-Math.PI / 2, 0, 0);
+          skeletonMesh.position.set(0, 100, 100);
+
+          skeletonMesh.castShadow = true;
+          skeletonMesh.receiveShadow = true;
+
+          skeletonMesh2 = new spine.SkeletonMesh({
+            skeletonData: skeletonData2,
+            premultipliedAlpha: true,
+            materialFactory: param => {
+              param.alphaTest = 0.001;
+              param.premultipliedAlpha = true;
+              return new THREE.MeshStandardMaterial(param);
+            }
+          });
+
+          skeletonMesh2.state.setAnimation(0, animation2, true);
+          scene.add(skeletonMesh2);
+          skeletonMesh2.update(0)
+
+          skeletonMesh2.rotation.set(-Math.PI / 2.4, 0, 0);
+          skeletonMesh2.position.set(0, 150, 100);
+
+          skeletonMesh2.castShadow = true;
+          skeletonMesh2.receiveShadow = true;
+
+
+
+          skeletonMesh3 = new spine.SkeletonMesh({
+            skeletonData: skeletonData3,
+            premultipliedAlpha: true,
+            twoColorTint: true,
+            materialFactory: param => {
+              param.alphaTest = 0.001;
+              param.premultipliedAlpha = true;
+              return new THREE.MeshStandardMaterial(param);
+            }
+          });
+
+          skeletonMesh3.state.setAnimation(0, animation3, true);
+          scene.add(skeletonMesh3);
+          skeletonMesh3.update(0)
+
+          skeletonMesh3.rotation.set(-Math.PI / 2.4, 0, 0);
+          skeletonMesh3.position.set(100, 150, 50);
+
+          skeletonMesh3.castShadow = true;
+          skeletonMesh3.receiveShadow = true;
+
+          skeletonMesh3.update(1.5);
+
+          requestAnimationFrame(render);
+        } else requestAnimationFrame(load);
+      }
+
+      let lastTime = Date.now();
+      function render() {
+        // calculate delta time for animation purposes
+        let now = Date.now() / 1000;
+        let delta = now - lastFrameTime;
+        lastFrameTime = now;
+
+        // resize canvas to use full page, adjust camera/renderer
+        resize();
+
+        // Update orbital controls
+        controls.update();
+
+        // update the animation
+        skeletonMesh.update(delta);
+        skeletonMesh2.update(delta);
+        skeletonMesh3.update(delta);
+
+        // render the scene
+        renderer.render(scene, camera);
+
+        requestAnimationFrame(render);
+      }
+
+      function resize() {
+        let w = window.innerWidth;
+        let h = window.innerHeight;
+        if (canvas.width != w || canvas.height != h) {
+          canvas.width = w;
+          canvas.height = h;
+        }
+
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(w, h);
+      }
+
+      init();
+    </script>
+  </body>
+</html>

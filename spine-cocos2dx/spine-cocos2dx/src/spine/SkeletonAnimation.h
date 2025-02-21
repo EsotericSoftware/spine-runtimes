@@ -48,7 +48,7 @@ namespace spine {
 
 	/** Draws an animated skeleton, providing an AnimationState for applying one or more animations and queuing animations to be
   * played later. */
-	class SkeletonAnimation : public SkeletonRenderer {
+	class SkeletonAnimation : public SkeletonRendererCocos2dX {
 	public:
 		CREATE_FUNC(SkeletonAnimation);
 		static SkeletonAnimation *createWithData(SkeletonData *skeletonData, bool ownsSkeletonData = false);
@@ -125,7 +125,7 @@ namespace spine {
 		UpdateWorldTransformsListener _postUpdateListener;
 
 	private:
-		typedef SkeletonRenderer super;
+		typedef SkeletonRendererCocos2dX super;
 	};
 
 }// namespace spine

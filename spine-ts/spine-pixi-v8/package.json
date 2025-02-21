@@ -1,0 +1,39 @@
+{
+  "name": "@esotericsoftware/spine-pixi-v8",
+  "version": "4.2.74",
+  "description": "The official Spine Runtimes for PixiJS v8.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/esotericsoftware/spine-runtimes.git"
+  },
+  "keywords": [
+    "gamedev",
+    "animations",
+    "2d",
+    "spine",
+    "game-dev",
+    "runtimes",
+    "skeletal"
+  ],
+  "author": "Esoteric Software LLC",
+  "license": "LicenseRef-LICENSE",
+  "bugs": {
+    "url": "https://github.com/esotericsoftware/spine-runtimes/issues"
+  },
+  "homepage": "https://github.com/esotericsoftware/spine-runtimes#readme",
+  "dependencies": {
+    "@esotericsoftware/spine-core": "4.2.74"
+  },
+  "peerDependencies": {
+    "pixi.js": "^8.4.0"
+  }
+}

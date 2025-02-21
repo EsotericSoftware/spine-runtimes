@@ -462,10 +462,9 @@ void Skeleton::getBounds(float &outX, float &outY, float &outWidth,
 	getBounds(outX, outY, outWidth, outHeight, outVertexBuffer, NULL);
 }
 
-static unsigned short quadIndices[] = {0, 1, 2, 2, 3, 0};
-
 void Skeleton::getBounds(float &outX, float &outY, float &outWidth,
 						 float &outHeight, Vector<float> &outVertexBuffer, SkeletonClipping *clipper) {
+	static unsigned short quadIndices[] = {0, 1, 2, 2, 3, 0};
 	float minX = FLT_MAX;
 	float minY = FLT_MAX;
 	float maxX = -FLT_MAX;

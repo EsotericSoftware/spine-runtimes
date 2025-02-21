@@ -11,11 +11,11 @@
 		}
 	},
 	"include": [
-		"**/*.ts",
-		"src/OrbitControls.js"
+		"**/*.ts"
 	],
 	"exclude": [
-		"dist/**/*.d.ts"
+		"dist/**/*.d.ts",
+		"example/**/*.ts"
 	],
 	"references": [
 		{

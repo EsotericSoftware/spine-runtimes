@@ -10,6 +10,5 @@
 	<classpathentry kind="lib" path="/gdx-box2d/libs/gdx-box2d-natives.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/spine-libgdx"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/gdx-backend-lwjgl3"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/gdx-lwjgl3-glfw-awt-macos"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

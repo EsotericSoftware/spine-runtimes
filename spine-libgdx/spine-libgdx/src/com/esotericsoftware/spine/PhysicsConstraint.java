@@ -1,13 +1,13 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated July 28, 2023. Replaces all prior versions.
+ * Last updated February 20, 2024. Replaces all prior versions.
  *
- * Copyright (c) 2013-2023, Esoteric Software LLC
+ * Copyright (c) 2013-2024, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
  * conditions of Section 2 of the Spine Editor License Agreement:
- * http://esotericsoftware.com/spine-editor-license
+ * https://esotericsoftware.com/spine-editor-license
  *
  * Otherwise, it is permitted to integrate the Spine Runtimes into software or
  * otherwise create derivative works of the Spine Runtimes (collectively,
@@ -35,7 +35,7 @@ import com.esotericsoftware.spine.Skeleton.Physics;
 
 /** Stores the current pose for a physics constraint. A physics constraint applies physics to bones.
  * <p>
- * See <a href="http://esotericsoftware.com/spine-physics-constraints">Physics constraints</a> in the Spine User Guide. */
+ * See <a href="https://esotericsoftware.com/spine-physics-constraints">Physics constraints</a> in the Spine User Guide. */
 public class PhysicsConstraint implements Updatable {
 	final PhysicsConstraintData data;
 	public Bone bone;
@@ -168,7 +168,7 @@ public class PhysicsConstraint implements Updatable {
 					}
 					if (a >= t) {
 						d = (float)Math.pow(damping, 60 * t);
-						float m = massInverse * t, e = strength, w = wind * f, g = gravity * f;
+						float m = massInverse * t, e = strength, w = wind * f * skeleton.scaleX, g = gravity * f * skeleton.scaleY;
 						do {
 							if (x) {
 								xVelocity += (w - xOffset * e) * m;

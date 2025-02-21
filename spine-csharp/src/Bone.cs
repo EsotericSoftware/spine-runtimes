@@ -221,11 +221,12 @@ namespace Spine {
 				break;
 			}
 			case Inherit.NoRotationOrReflection: {
+				float sx = 1 / skeleton.scaleX, sy = 1 / skeleton.ScaleY;
+				pa *= sx;
+				pc *= sy;
 				float s = pa * pa + pc * pc, prx;
 				if (s > 0.0001f) {
-					s = Math.Abs(pa * pd - pb * pc) / s;
-					pa /= skeleton.scaleX;
-					pc /= skeleton.ScaleY;
+					s = Math.Abs(pa * pd * sy - pb * sx * pc) / s;
 					pb = pc * s;
 					pd = pa * s;
 					prx = MathUtils.Atan2Deg(pc, pa);
@@ -334,10 +335,9 @@ namespace Spine {
 				switch (inherit) {
 				case Inherit.NoRotationOrReflection: {
 					float s = Math.Abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
-					float sa = pa / skeleton.scaleX;
-					float sc = pc / skeleton.ScaleY;
-					pb = -sc * s * skeleton.scaleX;
-					pd = sa * s * skeleton.ScaleY;
+					float skeletonScaleY = skeleton.ScaleY;
+					pb = -pc * skeleton.scaleX * s / skeletonScaleY;
+					pd = pa * skeletonScaleY * s / skeleton.scaleX;
 					pid = 1 / (pa * pd - pb * pc);
 					ia = pd * pid;
 					ib = pb * pid;

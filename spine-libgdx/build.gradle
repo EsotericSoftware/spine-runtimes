@@ -1,9 +1,5 @@
-group = "com.esotericsoftware.spine"
-version = "4.2.0"
-
 ext {
-    libgdxVersion = "1.12.1"
-    javaVersion = 8
+    libgdxVersion = "1.12.2-SNAPSHOT"
 }
 
 allprojects {
@@ -16,15 +12,33 @@ allprojects {
         maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
         mavenCentral()
     }
+
+    tasks.withType(JavaCompile).configureEach {
+        sourceCompatibility = '1.7'
+        targetCompatibility = '1.7'
+        options.release.set(7)  // Ensures Java 8 bytecode is produced
+    }
 }
 
 project("spine-libgdx") {
     apply plugin: "java-library"
+    apply plugin: "maven-publish"
+    apply plugin: "signing"
+
+    sourceSets {
+        main {
+            resources {
+                srcDirs = ["src"]  // Add this line to include non-Java files from src directory
+                include "**/*.gwt.xml"  // Add this to specifically include GWT module files
+            }
+        }
+    }
 
     dependencies {
         implementation "com.badlogicgames.gdx:gdx:$libgdxVersion"
     }
 }
+apply from: 'publishing.gradle'
 
 project("spine-skeletonviewer") {
     jar {
@@ -37,6 +51,18 @@ project("spine-skeletonviewer") {
         from {
             configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
         }
+
+        dependsOn(project(":spine-libgdx").tasks.named('jar'))
+    }
+
+    tasks.named('build').configure {
+        dependsOn(tasks.named('jar'))
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
+        options.release.set(8)  // Ensures Java 8 bytecode is produced
     }
 }
 
@@ -48,8 +74,11 @@ configure(subprojects - project("spine-libgdx")) {
         implementation "com.badlogicgames.gdx:gdx:$libgdxVersion"
         implementation "com.badlogicgames.gdx:gdx-platform:$libgdxVersion:natives-desktop"
         implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$libgdxVersion"
-        implementation "com.badlogicgames.gdx:gdx-lwjgl3-glfw-awt-macos:$libgdxVersion"
         implementation "com.badlogicgames.gdx:gdx-box2d:$libgdxVersion"
         implementation "com.badlogicgames.gdx:gdx-box2d-platform:$libgdxVersion:natives-desktop"
     }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    println "Building with sourceCompatibility = ${sourceCompatibility}, targetCompatibility = ${targetCompatibility}"
 }

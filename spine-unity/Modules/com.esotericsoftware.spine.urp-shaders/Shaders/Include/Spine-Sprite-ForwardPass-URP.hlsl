@@ -18,6 +18,10 @@
 	#define NEEDS_POSITION_WS
 #endif
 
+#if !defined(DYNAMICLIGHTMAP_ON) && !defined(LIGHTMAP_ON) && (defined(PROBE_VOLUMES_L1) || defined(PROBE_VOLUMES_L2))
+#define USE_ADAPTIVE_PROBE_VOLUMES
+#endif
+
 ////////////////////////////////////////
 // Vertex output struct
 //
@@ -47,6 +51,9 @@ struct VertexOutputLWRP
 #endif
 #if defined(_TINT_BLACK_ON)
 	float3 darkColor : TEXCOORD9;
+#endif
+#if defined(USE_ADAPTIVE_PROBE_VOLUMES)
+	float3 positionCS : TEXCOORD10;
 #endif
 
 	UNITY_VERTEX_OUTPUT_STEREO
@@ -313,12 +320,20 @@ VertexOutputLWRP ForwardPassVertexSprite(VertexInput input)
 
 #if IS_URP_15_OR_NEWER
 	#ifdef OUTPUT_SH4
-		OUTPUT_SH4(positionWS, normalWS.xyz, GetWorldSpaceNormalizeViewDir(positionWS), output.vertexSH);
+		#if IS_URP_17_OR_NEWER
+			float4 ignoredProbeOcclusion;
+			OUTPUT_SH4(positionWS, normalWS.xyz, GetWorldSpaceNormalizeViewDir(positionWS), output.vertexSH, ignoredProbeOcclusion);
+		#else // 15 or newer
+			OUTPUT_SH4(positionWS, normalWS.xyz, GetWorldSpaceNormalizeViewDir(positionWS), output.vertexSH);
+		#endif
 	#else
 		OUTPUT_SH(positionWS, normalWS.xyz, GetWorldSpaceNormalizeViewDir(positionWS), output.vertexSH);
 	#endif
 #else
 	OUTPUT_SH(normalWS.xyz, output.vertexSH);
+#endif
+#if defined(USE_ADAPTIVE_PROBE_VOLUMES)
+	output.positionCS = output.pos;
 #endif
 	return output;
 }
@@ -365,7 +380,20 @@ half4 ForwardPassFragmentSprite(VertexOutputLWRP input
 #endif
 
 	inputData.normalWS = normalWS;
+#if defined(USE_ADAPTIVE_PROBE_VOLUMES)
+	half4 shadowMask = 1.0;
+	float4 ignoredProbeOcclusion;
+	inputData.bakedGI = SAMPLE_GI(input.vertexSH,
+		GetAbsolutePositionWS(input.positionWS),
+		inputData.normalWS.xyz,
+		GetWorldSpaceNormalizeViewDir(input.positionWS),
+		input.positionCS.xy,
+		ignoredProbeOcclusion,
+		shadowMask);
+#else // USE_ADAPTIVE_PROBE_VOLUMES
 	inputData.bakedGI = SAMPLE_GI(input.lightmapUV, input.vertexSH, inputData.normalWS);
+#endif
+
 #if defined(_RIM_LIGHTING) || defined(_ADDITIONAL_LIGHTS) || defined(USE_LIGHT_COOKIES)
 	inputData.positionWS = input.positionWS.rgb;
 #endif

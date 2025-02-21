@@ -15,7 +15,7 @@
   <script>
     var code =
       '<script src="https://unpkg.com/@esotericsoftware/spine-player@4.2.*/dist/iife/spine-player.js"></' +
-      'script>\n<link rel="stylesheet" href="https://unpkg.com/@esotericsoftware/spine-player@4.1.*/dist/spine-player.css">\n\n<div id="player-container" style="width: 100%; height: 100vh;"></div>\n\n<script>\nnew spine.SpinePlayer("player-container", {\n	skeleton: "http://esotericsoftware.com/files/examples/4.1/spineboy/export/spineboy-pro.json",\n	atlas: "http://esotericsoftware.com/files/examples/4.1/spineboy/export/spineboy.atlas"\n});\n</' +
+      'script>\n<link rel="stylesheet" href="https://unpkg.com/@esotericsoftware/spine-player@4.2.*/dist/spine-player.css">\n\n<div id="player-container" style="width: 100%; height: 100vh;"></div>\n\n<script>\nnew spine.SpinePlayer("player-container", {\n	skeleton: "http://esotericsoftware.com/files/examples/4.2/spineboy/export/spineboy-pro.json",\n	atlas: "http://esotericsoftware.com/files/examples/4.2/spineboy/export/spineboy.atlas",\n	premultipliedAlpha: false\n});\n</' +
       "script>".trim();
     spine.SpinePlayerEditor.DEFAULT_CODE = code;
     var player = new spine.SpinePlayerEditor(

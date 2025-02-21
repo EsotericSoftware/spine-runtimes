@@ -1,13 +1,13 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated July 28, 2023. Replaces all prior versions.
+ * Last updated February 20, 2024. Replaces all prior versions.
  *
- * Copyright (c) 2013-2023, Esoteric Software LLC
+ * Copyright (c) 2013-2024, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
  * conditions of Section 2 of the Spine Editor License Agreement:
- * http://esotericsoftware.com/spine-editor-license
+ * https://esotericsoftware.com/spine-editor-license
  *
  * Otherwise, it is permitted to integrate the Spine Runtimes into software or
  * otherwise create derivative works of the Spine Runtimes (collectively,
@@ -39,7 +39,7 @@ import com.esotericsoftware.spine.Skeleton.Physics;
 /** Stores the current pose for an IK constraint. An IK constraint adjusts the rotation of 1 or 2 constrained bones so the tip of
  * the last bone is as close to the target bone as possible.
  * <p>
- * See <a href="http://esotericsoftware.com/spine-ik-constraints">IK constraints</a> in the Spine User Guide. */
+ * See <a href="https://esotericsoftware.com/spine-ik-constraints">IK constraints</a> in the Spine User Guide. */
 public class IkConstraint implements Updatable {
 	final IkConstraintData data;
 	final Array<Bone> bones;
@@ -339,8 +339,9 @@ public class IkConstraint implements Updatable {
 				q = -(c1 + q) * 0.5f;
 				float r0 = q / c2, r1 = c / q;
 				float r = Math.abs(r0) < Math.abs(r1) ? r0 : r1;
-				if (r * r <= dd) {
-					y = (float)Math.sqrt(dd - r * r) * bendDir;
+				r0 = dd - r * r;
+				if (r0 >= 0) {
+					y = (float)Math.sqrt(r0) * bendDir;
 					a1 = ta - atan2(y, r);
 					a2 = atan2(y / psy, (r - l1) / psx);
 					break outer;

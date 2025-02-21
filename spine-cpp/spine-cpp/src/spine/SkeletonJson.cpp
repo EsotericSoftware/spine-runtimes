@@ -156,6 +156,7 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 		if (!skeletonData->_version.startsWith(SPINE_VERSION_STRING)) {
 			char errorMsg[255];
 			snprintf(errorMsg, 255, "Skeleton version %s does not match runtime version %s", skeletonData->_version.buffer(), SPINE_VERSION_STRING);
+			delete skeletonData;
 			setError(NULL, errorMsg, "");
 			return NULL;
 		}
@@ -1174,6 +1175,7 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 					timeline->setFrame(frame, time, inherit);
 					nextMap = keyMap->_next;
 					if (!nextMap) break;
+					keyMap = nextMap;
 				}
 				timelines.add(timeline);
 			} else {
@@ -1276,7 +1278,7 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 			mixY = mixY2;
 			mixScaleX = mixScaleX2;
 			mixScaleY = mixScaleY2;
-			mixScaleX = mixScaleX2;
+			mixShearY = mixShearY2;
 			keyMap = nextMap;
 		}
 

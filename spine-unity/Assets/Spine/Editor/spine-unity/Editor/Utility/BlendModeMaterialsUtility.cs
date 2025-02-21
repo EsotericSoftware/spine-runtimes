@@ -207,6 +207,18 @@ namespace Spine.Unity.Editor {
 			if (File.Exists(blendMaterialPath)) {
 				newReplacement.material = AssetDatabase.LoadAssetAtPath<Material>(blendMaterialPath);
 			} else {
+				if (materialTemplate == null) {
+					Debug.LogError(string.Format("Failed to create blend mode material: Material template for " +
+						"blend mode '{0}' was null. Re-importing might fix this issue.",
+						materialSuffix), originalMaterial);
+					return null;
+				}
+				if (originalMaterial == null) {
+					Debug.LogError(string.Format("Failed to create blend mode material for atlas page '{0}': Original material for " +
+						"blend mode '{1}' was null. Re-importing might fix this issue.",
+						originalPage.name, materialSuffix));
+					return null;
+				}
 				Material blendModeMaterial = new Material(materialTemplate) {
 					name = originalMaterial.name + " " + materialTemplate.name,
 					mainTexture = originalMaterial.mainTexture

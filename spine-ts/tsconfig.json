@@ -23,7 +23,10 @@
       "path": "./spine-threejs"
     },
     {
-      "path": "./spine-pixi"
+      "path": "./spine-pixi-v7"
+    },
+    {
+      "path": "./spine-pixi-v8"
     }
   ]
 }

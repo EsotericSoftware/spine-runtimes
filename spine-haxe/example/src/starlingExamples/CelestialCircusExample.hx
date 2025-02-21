@@ -81,8 +81,12 @@ class CelestialCircusExample extends Scene {
 		if (skeletonTouch != null) {
 			if (skeletonTouch.phase == TouchPhase.MOVED) {
 				skeletonTouch.getMovement(this, movement);
-				skeletonSprite.skeleton.x += movement.x / skeletonSprite.scale;
-				skeletonSprite.skeleton.y += movement.y / skeletonSprite.scale;
+				skeletonSprite.x += movement.x;
+				skeletonSprite.y += movement.y;
+				skeletonSprite.skeleton.physicsTranslate(
+					movement.x / skeletonSprite.scale,
+					movement.y / skeletonSprite.scale,
+				);
 			}
 		} else {
 			var sceneTouch = e.getTouch(this);

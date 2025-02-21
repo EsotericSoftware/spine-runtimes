@@ -561,8 +561,13 @@ export class SpinePlayer implements Disposable {
 				this.setViewport(entry.animation!);
 				this.pause();
 			}
-		} else if (!this.currentViewport) {
-			this.setViewport(entry.animation!);
+		} else {
+			if (this.currentViewport.x === undefined) {
+				this.setViewport(entry.animation!);
+			}
+			if (!config.animation) {
+				config.animation = entry.animation?.name
+			}
 			this.play();
 		}
 	}

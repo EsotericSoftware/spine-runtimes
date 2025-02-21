@@ -1,0 +1,152 @@
+<!-- This example is adapted from https://github.com/GoodBoyDigital/pixi-bunnymark -->
+<!DOCTYPE html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>spine-pixi-v7 bunnymark</title>
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@7.4.2/dist/pixi.min.js"></script>
+    <script src="../dist/iife/spine-pixi-v7.js"></script>
+    <link rel="stylesheet" href="../../index.css">
+  </head>
+
+  <body>
+    <script>javascript:(function(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();document.body.appendChild(stats.dom);stats.dom.children[1].style.display='block';stats.dom.children[2].style.display='block';requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='https://mrdoob.github.io/stats.js/build/stats.min.js';document.head.appendChild(script);})()</script>
+    <script>
+      (async function () {
+        const params = new URLSearchParams(window.location.search);
+        const totalBunnies = parseInt(params.get('count')) || 100;
+
+        const bunnyPool = [];
+
+        const renderer = new PIXI.Renderer({
+            clearBeforeRender: true,
+            backgroundAlpha: 1,
+            backgroundColor: 0xFFFFFF,
+            width: 800,
+            height: 600,
+            resolution: 1,
+            antialias: false,
+        })
+
+        document.body.appendChild(renderer.view)
+
+        const stage = new PIXI.Container();
+
+        PIXI.Assets.add({ alias: "spineboyData", src: "assets/spineboy-pro.skel" });
+        PIXI.Assets.add({ alias: "spineboyAtlas", src: "assets/spineboy-pma.atlas" });
+        await PIXI.Assets.load(["spineboyData", "spineboyAtlas"]);
+
+        const bounds = new PIXI.Rectangle(0, 0, 800, 600);
+
+        const bunnies = []
+
+        function addBunny() {
+
+          const bunny = new BunnyV7(bounds)
+
+          stage.addChild(bunny.view);
+          bunnies.push(bunny);
+          }
+
+          for (let i = 0; i < totalBunnies; i++) {
+          addBunny();
+          }
+
+          let pause = false;
+
+          renderer.view.addEventListener('mousedown', () => {
+          pause = !pause
+          addBunny();
+          })
+
+          function renderUpdate() {
+
+            if (!pause) {
+                for (let i = 0; i < bunnies.length; i++) {
+                    bunnies[i].update();
+                }
+            }
+
+            renderer.render(stage);
+            requestAnimationFrame(renderUpdate)
+          }
+
+          renderUpdate()
+      })();
+
+      class BunnyV7 {
+
+        view;
+
+        gravity = 0.75
+
+        speedX = Math.random() * 10;
+        speedY = (Math.random() * 10) - 5;
+
+        positionX = 0;
+        positionY = 0;
+
+        bounds;
+
+        constructor(bounds) {
+            const spineboy = spine.Spine.from({
+                atlas: "spineboyAtlas",
+                skeleton: "spineboyData",
+                scale: 0.125,
+            });
+
+            // Set the default mix time to use when transitioning
+            // from one animation to the next.
+            spineboy.state.data.defaultMix = 0.2;
+
+            // Center the spine object on screen.
+            spineboy.x = window.innerWidth / 2;
+            spineboy.y = window.innerHeight / 2 + spineboy.getBounds().height / 2;
+
+            // Set animation "cape-follow-example" on track 0, looped.
+            spineboy.state.setAnimation(0, "run", true);
+
+            this.view = spineboy
+            this.bounds = bounds;
+        }
+
+        update() {
+            let pX = this.positionX;
+            let pY = this.positionY;
+
+            pX += this.speedX;
+            pY += this.speedY;
+            this.speedY += this.gravity;
+
+            if (pX > this.bounds.right) {
+                this.speedX *= -1;
+                pX = this.bounds.right;
+            }
+            else if (pX < this.bounds.left) {
+                this.speedX *= -1;
+                pX = this.bounds.left;
+            }
+
+            if (pY > this.bounds.bottom) {
+                this.speedY *= -0.85;
+                pY = this.bounds.bottom;
+                if (Math.random() > 0.5) {
+                    this.speedY -= Math.random() * 6;
+                }
+            }
+            else if (pY < this.bounds.top) {
+                this.speedY = 0;
+                pY = this.bounds.top;
+            }
+
+            this.view.position.x = this.positionX = pX;
+            this.view.position.y = this.positionY = pY;
+        }
+
+        reset() {
+            this.positionX = 0;
+            this.positionY = 0;
+        }
+      }
+    </script>
+  </body>
+</html>

@@ -63,6 +63,7 @@ void spSkeletonDrawable_dispose(spSkeletonDrawable *self) {
 void spSkeletonDrawable_update(spSkeletonDrawable *self, float delta, spPhysics physics) {
 	spAnimationState_update(self->animationState, delta);
 	spAnimationState_apply(self->animationState, self->skeleton);
+	spSkeleton_update(self->skeleton, delta);
 	spSkeleton_updateWorldTransform(self->skeleton, physics);
 }
 

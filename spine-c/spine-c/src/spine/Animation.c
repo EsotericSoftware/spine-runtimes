@@ -1937,6 +1937,15 @@ void _spSequenceTimeline_apply(spTimeline *timeline, spSkeleton *skeleton, float
 		}
 	}
 
+	if (self->attachment->type == SP_ATTACHMENT_REGION) sequence = ((spRegionAttachment *) self->attachment)->sequence;
+	if (self->attachment->type == SP_ATTACHMENT_MESH) sequence = ((spMeshAttachment *) self->attachment)->sequence;
+	if (!sequence) return;
+
+	if (direction == SP_MIX_DIRECTION_OUT) {
+		if (blend == SP_MIX_BLEND_SETUP) slot->sequenceIndex = -1;
+		return;
+	}
+
 	frames = self->super.frames->items;
 	if (time < frames[0]) { /* Time is before first frame. */
 		if (blend == SP_MIX_BLEND_SETUP || blend == SP_MIX_BLEND_FIRST) slot->sequenceIndex = -1;
@@ -1948,9 +1957,6 @@ void _spSequenceTimeline_apply(spTimeline *timeline, spSkeleton *skeleton, float
 	modeAndIndex = (int) frames[i + MODE];
 	delay = frames[i + DELAY];
 
-	if (self->attachment->type == SP_ATTACHMENT_REGION) sequence = ((spRegionAttachment *) self->attachment)->sequence;
-	if (self->attachment->type == SP_ATTACHMENT_MESH) sequence = ((spMeshAttachment *) self->attachment)->sequence;
-	if (!sequence) return;
 	index = modeAndIndex >> 4;
 	count = sequence->regions->size;
 	mode = modeAndIndex & 0xf;
@@ -2162,6 +2168,11 @@ void _spInheritTimeline_apply(spTimeline *timeline, spSkeleton *skeleton, float 
 	spBone *bone = skeleton->bones[self->boneIndex];
 	float *frames = self->super.frames->items;
 	if (!bone->active) return;
+
+	if (direction == SP_MIX_DIRECTION_OUT) {
+		if (blend == SP_MIX_BLEND_SETUP) bone->inherit = bone->data->inherit;
+		return;
+	}
 
 	if (time < frames[0]) {
 		if (blend == SP_MIX_BLEND_SETUP || blend == SP_MIX_BLEND_FIRST) bone->inherit = bone->data->inherit;

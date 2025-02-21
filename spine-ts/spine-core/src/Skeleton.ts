@@ -398,6 +398,20 @@ export class Skeleton {
 	}
 
 	updateWorldTransformWith (physics: Physics, parent: Bone) {
+		if (!parent) throw new Error("parent cannot be null.");
+
+		let bones = this.bones;
+		for (let i = 1, n = bones.length; i < n; i++) { // Skip root bone.
+			let bone = bones[i];
+			bone.ax = bone.x;
+			bone.ay = bone.y;
+			bone.arotation = bone.rotation;
+			bone.ascaleX = bone.scaleX;
+			bone.ascaleY = bone.scaleY;
+			bone.ashearX = bone.shearX;
+			bone.ashearY = bone.shearY;
+		}
+
 		// Apply the parent bone transform to the root bone. The root bone always inherits scale, rotation and reflection.
 		let rootBone = this.getRootBone();
 		if (!rootBone) throw new Error("Root bone must not be null.");
@@ -599,10 +613,10 @@ export class Skeleton {
 
 	/** Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose as `{ x: number, y: number, width: number, height: number }`.
 	 * Note that this method will create temporary objects which can add to garbage collection pressure. Use `getBounds()` if garbage collection is a concern. */
-	getBoundsRect () {
+	getBoundsRect (clipper?: SkeletonClipping) {
 		let offset = new Vector2();
 		let size = new Vector2();
-		this.getBounds(offset, size);
+		this.getBounds(offset, size, undefined, clipper);
 		return { x: offset.x, y: offset.y, width: size.x, height: size.y };
 	}
 

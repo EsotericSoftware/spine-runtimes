@@ -84,8 +84,13 @@ private:
 
 	void update_skeleton_data();
 
+#ifdef SPINE_GODOT_EXTENSION
+	void load_resources(spine::Atlas *atlas, const String &json,
+						const PackedByteArray &binary);
+#else
 	void load_resources(spine::Atlas *atlas, const String &json,
 						const Vector<uint8_t> &binary);
+#endif
 
 public:
 	SpineSkeletonDataResource();
@@ -106,6 +111,15 @@ public:
 		return animation_state_data;
 	}
 
+#ifdef SPINE_GODOT_EXTENSION
+	void get_animation_names(PackedStringArray &animation_names) const;
+
+	void get_skin_names(PackedStringArray &l) const;
+
+	void get_slot_names(PackedStringArray &slot_names);
+
+	void get_bone_names(PackedStringArray &bone_names);
+#else
 	void get_animation_names(Vector<String> &animation_names) const;
 
 	void get_skin_names(Vector<String> &l) const;
@@ -113,6 +127,7 @@ public:
 	void get_slot_names(Vector<String> &slot_names);
 
 	void get_bone_names(Vector<String> &bone_names);
+#endif
 
 	void set_default_mix(float default_mix);
 

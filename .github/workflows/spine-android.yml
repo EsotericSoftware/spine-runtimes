@@ -1,0 +1,35 @@
+name: Build spine-android
+
+on:
+  push:
+    paths:
+      - 'spine-android/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'zulu'
+        java-version: "17"
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+      with:
+        api-level: 34
+        build-tools: 35.0.0
+
+    - name: Cache Gradle packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.gradle/caches
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+        restore-keys: ${{ runner.os }}-gradle
+
+    - name: Build spine-android
+      working-directory: spine-android
+      run: ./gradlew publishReleasePublicationToSonaType -PossrhUsername=${{ secrets.SONATYPE_USER }} -PossrhPassword=${{ secrets.SONATYPE_PASSWORD }}

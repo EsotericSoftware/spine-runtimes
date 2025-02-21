@@ -21,6 +21,8 @@ branch=${1%/}
 dev=${2%/}
 mono=false
 repo=https://github.com/godotengine/godot.git
+version=$(echo $branch | cut -d. -f1-2)
+echo $version > version.txt
 
 if [[ $# -eq 3 && "$branch" != 3* ]]; then
 	mono=${3%/}
@@ -43,8 +45,8 @@ fi
 pushd ..
 rm -rf godot
 git clone --depth 1 $repo -b $branch
+
 if [ $dev = "true" ]; then
-	cp -r .idea godot
 	cp build/custom.py godot
 	if [ "$mono" = "true" ]; then
 		echo "" >> godot/custom.py
@@ -54,23 +56,20 @@ if [ $dev = "true" ]; then
 	rm -rf example/.import
 	rm -rf example/.godot
 
-	#if [ "$OSTYPE" = "msys" ]; then
-	#	pushd godot
-	#	if [[ $branch == 3* ]]; then
-	#		echo "Applying V3 Live++ patch"
-	#		git apply ../build/livepp.patch
-	#	else
-	#		echo "Applying V4 Live++ patch"
-	#		git apply ../build/livepp-v4.patch
-	#	fi
-	#	popd
-	#fi
-
 	if [ `uname` == 'Darwin' ] && [ ! -d "$HOME/VulkanSDK" ]; then
 		./build/install-macos-vulkan-sdk.sh
 	fi
 fi
 cp -r ../spine-cpp/spine-cpp spine_godot
+
+# Apply patch for 4.3-stable, see https://github.com/godotengine/godot/issues/95861/#issuecomment-2486021565
+if [ "$branch" = "4.3-stable" ]; then
+    pushd godot
+    cp ../build/4.3-stable/tvgLock.h thirdparty/thorvg/src/common/tvgLock.h
+	cp ../build/4.3-stable/tvgTaskScheduler.h thirdparty/thorvg/src/renderer/tvgTaskScheduler.h
+    popd
+fi
+
 popd
 
 popd > /dev/null

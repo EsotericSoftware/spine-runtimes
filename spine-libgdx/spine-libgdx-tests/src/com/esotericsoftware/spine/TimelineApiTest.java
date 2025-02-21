@@ -1,13 +1,13 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated July 28, 2023. Replaces all prior versions.
+ * Last updated February 20, 2024. Replaces all prior versions.
  *
- * Copyright (c) 2013-2023, Esoteric Software LLC
+ * Copyright (c) 2013-2024, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
  * conditions of Section 2 of the Spine Editor License Agreement:
- * http://esotericsoftware.com/spine-editor-license
+ * https://esotericsoftware.com/spine-editor-license
  *
  * Otherwise, it is permitted to integrate the Spine Runtimes into software or
  * otherwise create derivative works of the Spine Runtimes (collectively,
@@ -43,7 +43,7 @@ import com.esotericsoftware.spine.Skeleton.Physics;
 
 /** Demonstrates using the timeline API. See {@link SimpleTest1} for a higher level API using {@link AnimationState}.
  * <p>
- * See: http://esotericsoftware.com/spine-applying-animations */
+ * See: https://esotericsoftware.com/spine-applying-animations */
 public class TimelineApiTest extends ApplicationAdapter {
 	SpriteBatch batch;
 	float time;

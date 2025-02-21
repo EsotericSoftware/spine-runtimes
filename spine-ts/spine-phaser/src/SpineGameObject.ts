@@ -46,6 +46,7 @@ import {
 	MathUtils,
 	Physics,
 	Skeleton,
+	SkeletonClipping,
 	Skin,
 	Vector2,
 } from "@esotericsoftware/spine-core";
@@ -69,6 +70,13 @@ export interface SpineGameObjectBoundsProvider {
 
 /** A bounds provider that calculates the bounding box from the setup pose. */
 export class SetupPoseBoundsProvider implements SpineGameObjectBoundsProvider {
+	/**
+	 * @param clipping If true, clipping attachments are used to compute the bounds. False, by default.
+	 */
+	constructor (
+		private clipping = false,
+	) { }
+
 	calculateBounds (gameObject: SpineGameObject) {
 		if (!gameObject.skeleton) return { x: 0, y: 0, width: 0, height: 0 };
 		// Make a copy of animation state and skeleton as this might be called while
@@ -77,7 +85,7 @@ export class SetupPoseBoundsProvider implements SpineGameObjectBoundsProvider {
 		const skeleton = new Skeleton(gameObject.skeleton.data);
 		skeleton.setToSetupPose();
 		skeleton.updateWorldTransform(Physics.update);
-		const bounds = skeleton.getBoundsRect();
+		const bounds = skeleton.getBoundsRect(this.clipping ? new SkeletonClipping() : undefined);
 		return bounds.width == Number.NEGATIVE_INFINITY
 			? { x: 0, y: 0, width: 0, height: 0 }
 			: bounds;
@@ -91,11 +99,13 @@ export class SkinsAndAnimationBoundsProvider
 	 * @param animation The animation to use for calculating the bounds. If null, the setup pose is used.
 	 * @param skins The skins to use for calculating the bounds. If empty, the default skin is used.
 	 * @param timeStep The time step to use for calculating the bounds. A smaller time step means more precision, but slower calculation.
+	 * @param clipping If true, clipping attachments are used to compute the bounds. False, by default.
 	 */
 	constructor (
 		private animation: string | null,
 		private skins: string[] = [],
-		private timeStep: number = 0.05
+		private timeStep: number = 0.05,
+		private clipping = false,
 	) { }
 
 	calculateBounds (gameObject: SpineGameObject): {
@@ -111,6 +121,7 @@ export class SkinsAndAnimationBoundsProvider
 		// reconstruct that state.
 		const animationState = new AnimationState(gameObject.animationState.data);
 		const skeleton = new Skeleton(gameObject.skeleton.data);
+		const clipper = this.clipping ? new SkeletonClipping() : undefined;
 		const data = skeleton.data;
 		if (this.skins.length > 0) {
 			let customSkin = new Skin("custom-skin");
@@ -127,7 +138,7 @@ export class SkinsAndAnimationBoundsProvider
 			this.animation != null ? data.findAnimation(this.animation!) : null;
 		if (animation == null) {
 			skeleton.updateWorldTransform(Physics.update);
-			const bounds = skeleton.getBoundsRect();
+			const bounds = skeleton.getBoundsRect(clipper);
 			return bounds.width == Number.NEGATIVE_INFINITY
 				? { x: 0, y: 0, width: 0, height: 0 }
 				: bounds;
@@ -146,11 +157,11 @@ export class SkinsAndAnimationBoundsProvider
 				skeleton.update(delta);
 				skeleton.updateWorldTransform(Physics.update);
 
-				const bounds = skeleton.getBoundsRect();
+				const bounds = skeleton.getBoundsRect(clipper);
 				minX = Math.min(minX, bounds.x);
 				minY = Math.min(minY, bounds.y);
-				maxX = Math.max(maxX, minX + bounds.width);
-				maxY = Math.max(maxY, minY + bounds.height);
+				maxX = Math.max(maxX, bounds.x + bounds.width);
+				maxY = Math.max(maxY, bounds.y + bounds.height);
 			}
 			const bounds = {
 				x: minX,

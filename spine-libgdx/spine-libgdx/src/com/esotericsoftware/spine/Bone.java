@@ -1,13 +1,13 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated July 28, 2023. Replaces all prior versions.
+ * Last updated February 20, 2024. Replaces all prior versions.
  *
- * Copyright (c) 2013-2023, Esoteric Software LLC
+ * Copyright (c) 2013-2024, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
  * conditions of Section 2 of the Spine Editor License Agreement:
- * http://esotericsoftware.com/spine-editor-license
+ * https://esotericsoftware.com/spine-editor-license
  *
  * Otherwise, it is permitted to integrate the Spine Runtimes into software or
  * otherwise create derivative works of the Spine Runtimes (collectively,
@@ -99,7 +99,7 @@ public class Bone implements Updatable {
 	/** Computes the world transform using the parent bone and the specified local transform. The applied transform is set to the
 	 * specified local transform. Child bones are not updated.
 	 * <p>
-	 * See <a href="http://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
+	 * See <a href="https://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
 	 * Runtimes Guide. */
 	public void updateWorldTransform (float x, float y, float rotation, float scaleX, float scaleY, float shearX, float shearY) {
 		ax = x;
@@ -153,11 +153,12 @@ public class Bone implements Updatable {
 			break;
 		}
 		case noRotationOrReflection: {
+			float sx = 1 / skeleton.scaleX, sy = 1 / skeleton.scaleY;
+			pa *= sx;
+			pc *= sy;
 			float s = pa * pa + pc * pc, prx;
 			if (s > 0.0001f) {
-				s = Math.abs(pa * pd - pb * pc) / s;
-				pa /= skeleton.scaleX;
-				pc /= skeleton.scaleY;
+				s = Math.abs(pa * pd * sy - pb * sx * pc) / s;
 				pb = pc * s;
 				pd = pa * s;
 				prx = atan2Deg(pc, pa);
@@ -441,10 +442,8 @@ public class Bone implements Updatable {
 			switch (inherit) {
 			case noRotationOrReflection: {
 				float s = Math.abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
-				float sa = pa / skeleton.scaleX;
-				float sc = pc / skeleton.scaleY;
-				pb = -sc * s * skeleton.scaleX;
-				pd = sa * s * skeleton.scaleY;
+				pb = -pc * skeleton.scaleX * s / skeleton.scaleY;
+				pd = pa * skeleton.scaleY * s / skeleton.scaleX;
 				pid = 1 / (pa * pd - pb * pc);
 				ia = pd * pid;
 				ib = pb * pid;
