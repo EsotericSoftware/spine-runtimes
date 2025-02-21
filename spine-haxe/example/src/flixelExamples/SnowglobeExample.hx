@@ -16,7 +16,9 @@ class SnowglobeExample extends FlxState {
 	var loadBinary = false;
 
 	override public function create():Void {
-		var button = new FlxButton(0, 0, "Next scene", () -> FlxG.switchState(new CloudPotExample()));
+		FlxG.cameras.bgColor = 0xffa1b2b0;
+
+		var button = new FlxButton(0, 0, "Next scene", () -> FlxG.switchState(() -> new CloudPotExample()));
 		button.setPosition(FlxG.width * .75, FlxG.height / 10);
 		add(button);
 

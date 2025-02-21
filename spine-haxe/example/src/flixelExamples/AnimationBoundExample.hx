@@ -18,9 +18,11 @@ class AnimationBoundExample extends FlxState {
 	var loadBinary = true;
 
 	override public function create():Void {
+		FlxG.cameras.bgColor = 0xffa1b2b0;
+
 		var button = new FlxButton(0, 0, "Next scene", () -> {
 			FlxG.debugger.drawDebug = false;
-			FlxG.switchState(new ControlBonesExample());
+			FlxG.switchState(() -> new ControlBonesExample());
 		});
 		button.setPosition(FlxG.width * .75, FlxG.height / 10);
 		add(button);

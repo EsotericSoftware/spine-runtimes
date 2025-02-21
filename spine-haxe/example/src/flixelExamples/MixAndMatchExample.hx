@@ -18,7 +18,9 @@ class MixAndMatchExample extends FlxState {
 
 	var skeletonSprite:SkeletonSprite;
 	override public function create():Void {
-		var button = new FlxButton(0, 0, "Next scene", () -> FlxG.switchState(new TankExample()));
+		FlxG.cameras.bgColor = 0xffa1b2b0;
+
+		var button = new FlxButton(0, 0, "Next scene", () -> FlxG.switchState(() -> new TankExample()));
 		button.setPosition(FlxG.width * .75, FlxG.height / 10);
 		add(button);
 

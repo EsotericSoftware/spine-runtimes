@@ -30,12 +30,6 @@ class FlixelState extends FlxState
 
 	override public function create():Void
 	{
-		// FlxG.switchState(new EventsExample());
-		// FlxG.switchState(new ControlBonesExample());
-		// FlxG.switchState(new MixAndMatchExample());
-		// FlxG.switchState(new SequenceExample());
-		// FlxG.switchState(new BasicExample());
-
 		FlxG.cameras.bgColor = 0xffa1b2b0;
 
 		// setting speed of spineboy (450 is the speed to not let him slide)
@@ -56,7 +50,7 @@ class FlixelState extends FlxState
         myText.alignment = CENTER;
         group.add(myText);
 
-		var button = new FlxButton(0, 0, "Next scene", () -> FlxG.switchState(new BasicExample()));
+		var button = new FlxButton(0, 0, "Next scene", () -> FlxG.switchState(() -> new BasicExample()));
 		button.setPosition(FlxG.width * .75, FlxG.height / 10);
 		add(button);
 
