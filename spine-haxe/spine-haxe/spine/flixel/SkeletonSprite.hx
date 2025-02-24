@@ -344,15 +344,13 @@ class SkeletonSprite extends FlxObject
 
 	function set_flipX(value:Bool):Bool
 	{
-		if (value != skeleton.flipX) skeleton.scaleX = -skeleton.scaleX;
-		skeleton.flipX = value;
+		if (value != flipX) skeleton.scaleX = -skeleton.scaleX;
 		return flipX = value;
 	}
 
 	function set_flipY(value:Bool):Bool
 	{
-		if (value != skeleton.flipY) skeleton.scaleY = -skeleton.scaleY;
-		skeleton.flipY = value;
+		if (value != flipY) skeleton.scaleY = -skeleton.scaleY;
 		return flipY = value;
 	}
 
