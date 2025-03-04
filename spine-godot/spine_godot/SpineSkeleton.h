@@ -132,29 +132,29 @@ public:
 
 	void set_position(Vector2 position);
 
-	float get_x();
+	real_t get_x();
 
-	void set_x(float v);
+	void set_x(real_t v);
 
-	float get_y();
+	real_t get_y();
 
-	void set_y(float v);
+	void set_y(real_t v);
 
-	float get_scale_x();
+	real_t get_scale_x();
 
-	void set_scale_x(float v);
+	void set_scale_x(real_t v);
 
-	float get_scale_y();
+	real_t get_scale_y();
 
-	void set_scale_y(float v);
+	void set_scale_y(real_t v);
 
-	float get_time();
+	real_t get_time();
 
-	void set_time(float time);
+	void set_time(real_t time);
 
-	void update(float delta);
+	void update(real_t delta);
 
-	void physics_translate(float x, float y);
+	void physics_translate(real_t x, real_t y);
 
-	void physics_rotate(float x, float y, float degrees);
+	void physics_rotate(real_t x, real_t y, real_t degrees);
 };

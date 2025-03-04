@@ -108,14 +108,14 @@ public:
 
 	virtual bool get_option_visibility(const String &path, const String &option, const HashMap<StringName, Variant> &options) const override { return true; }
 
-	Error import(const String &source_file, const String &save_path, const HashMap<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) override;
+	Error import(ResourceUID::ID source_id, const String &source_file, const String &save_path, const HashMap<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) override;
 #endif
 #else
 	void get_import_options(List<ImportOption> *options, int preset) const override;
 
 	bool get_option_visibility(const String &option, const Map<StringName, Variant> &options) const override { return true; }
 
-	Error import(const String &source_file, const String &save_path, const Map<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) override;
+	Error import(ResourceUID::ID source_id, const String &source_file, const String &save_path, const Map<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) override;
 #endif
 };
 
@@ -172,7 +172,7 @@ public:
 
 	virtual bool _get_option_visibility(const String &p_path, const StringName &p_option_name, const Dictionary &p_options) const override { return true; };
 
-	virtual Error _import(const String &p_source_file, const String &p_save_path, const Dictionary &p_options, const TypedArray<String> &p_platform_variants, const TypedArray<String> &p_gen_files) const override;
+	virtual Error _import(ResourceUID::ID source_id, const String &p_source_file, const String &p_save_path, const Dictionary &p_options, const TypedArray<String> &p_platform_variants, const TypedArray<String> &p_gen_files) const override;
 #else
 	int get_import_order() const override { return IMPORT_ORDER_DEFAULT; }
 
@@ -182,14 +182,14 @@ public:
 
 	bool get_option_visibility(const String &path, const String &option, const HashMap<StringName, Variant> &options) const override { return true; }
 
-	Error import(const String &source_file, const String &save_path, const HashMap<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) override;
+	Error import(ResourceUID::ID source_id, const String &source_file, const String &save_path, const HashMap<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) override;
 #endif
 #else
 	void get_import_options(List<ImportOption> *options, int preset) const override {}
 
 	bool get_option_visibility(const String &option, const Map<StringName, Variant> &options) const override { return true; }
 
-	Error import(const String &source_file, const String &save_path, const Map<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) override;
+	Error import(ResourceUID::ID source_id, const String &source_file, const String &save_path, const Map<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) override;
 #endif
 };
 
@@ -256,14 +256,14 @@ public:
 
 	bool get_option_visibility(const String &path, const String &option, const HashMap<StringName, Variant> &options) const override { return true; }
 
-	Error import(const String &source_file, const String &save_path, const HashMap<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) override;
+	Error import(ResourceUID::ID source_id, const String &source_file, const String &save_path, const HashMap<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) override;
 #endif
 #else
 	void get_import_options(List<ImportOption> *options, int preset) const override {}
 
 	bool get_option_visibility(const String &option, const Map<StringName, Variant> &options) const override { return true; }
 
-	Error import(const String &source_file, const String &save_path, const Map<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) override;
+	Error import(ResourceUID::ID source_id, const String &source_file, const String &save_path, const Map<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) override;
 #endif
 };
 
@@ -280,7 +280,7 @@ public:
 #else
 	explicit SpineEditorPlugin(EditorNode *node);
 
-	String get_name() const override { return "SpineEditorPlugin"; }
+	StringName get_name() const { return "SpineEditorPlugin"; }
 #endif
 };
 

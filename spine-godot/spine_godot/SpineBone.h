@@ -61,15 +61,15 @@ public:
 
 	Vector2 parent_to_world(Vector2 local_position);
 
-	float world_to_local_rotation(float world_rotation);
+	real_t world_to_local_rotation(real_t world_rotation);
 
-	float local_to_world_rotation(float local_rotation);
+	real_t local_to_world_rotation(real_t local_rotation);
 
-	void rotate_world(float degrees);
+	void rotate_world(real_t degrees);
 
-	float get_world_to_local_rotation_x();
+	real_t get_world_to_local_rotation_x();
 
-	float get_world_to_local_rotation_y();
+	real_t get_world_to_local_rotation_y();
 
 	Ref<SpineBoneData> get_data();
 
@@ -77,93 +77,93 @@ public:
 
 	Array get_children();
 
-	float get_x();
+	real_t get_x();
 
-	void set_x(float v);
+	void set_x(real_t v);
 
-	float get_y();
+	real_t get_y();
 
-	void set_y(float v);
+	void set_y(real_t v);
 
-	float get_rotation();
+	real_t get_rotation();
 
-	void set_rotation(float v);
+	void set_rotation(real_t v);
 
-	float get_scale_x();
+	real_t get_scale_x();
 
-	void set_scale_x(float v);
+	void set_scale_x(real_t v);
 
-	float get_scale_y();
+	real_t get_scale_y();
 
-	void set_scale_y(float v);
+	void set_scale_y(real_t v);
 
-	float get_shear_x();
+	real_t get_shear_x();
 
-	void set_shear_x(float v);
+	void set_shear_x(real_t v);
 
-	float get_shear_y();
+	real_t get_shear_y();
 
-	void set_shear_y(float v);
+	void set_shear_y(real_t v);
 
-	float get_applied_rotation();
+	real_t get_applied_rotation();
 
-	void set_applied_rotation(float v);
+	void set_applied_rotation(real_t v);
 
-	float get_a_x();
+	real_t get_a_x();
 
-	void set_a_x(float v);
+	void set_a_x(real_t v);
 
-	float get_a_y();
+	real_t get_a_y();
 
-	void set_a_y(float v);
+	void set_a_y(real_t v);
 
-	float get_a_scale_x();
+	real_t get_a_scale_x();
 
-	void set_a_scale_x(float v);
+	void set_a_scale_x(real_t v);
 
-	float get_a_scale_y();
+	real_t get_a_scale_y();
 
-	void set_a_scale_y(float v);
+	void set_a_scale_y(real_t v);
 
-	float get_a_shear_x();
+	real_t get_a_shear_x();
 
-	void set_a_shear_x(float v);
+	void set_a_shear_x(real_t v);
 
-	float get_a_shear_y();
+	real_t get_a_shear_y();
 
-	void set_a_shear_y(float v);
+	void set_a_shear_y(real_t v);
 
-	float get_a();
+	real_t get_a();
 
-	void set_a(float v);
+	void set_a(real_t v);
 
-	float get_b();
+	real_t get_b();
 
-	void set_b(float v);
+	void set_b(real_t v);
 
-	float get_c();
+	real_t get_c();
 
-	void set_c(float v);
+	void set_c(real_t v);
 
-	float get_d();
+	real_t get_d();
 
-	void set_d(float v);
+	void set_d(real_t v);
 
-	float get_world_x();
+	real_t get_world_x();
 
-	void set_world_x(float v);
+	void set_world_x(real_t v);
 
-	float get_world_y();
+	real_t get_world_y();
 
-	void set_world_y(float v);
+	void set_world_y(real_t v);
 
-	float get_world_rotation_x();
+	real_t get_world_rotation_x();
 
-	float get_world_rotation_y();
+	real_t get_world_rotation_y();
 
-	float get_world_scale_x();
+	real_t get_world_scale_x();
 
-	float get_world_scale_y();
+	real_t get_world_scale_y();
 
 	bool is_active();
 

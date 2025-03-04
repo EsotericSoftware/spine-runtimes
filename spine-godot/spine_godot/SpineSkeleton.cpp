@@ -362,67 +362,67 @@ void SpineSkeleton::set_position(Vector2 position) {
 	skeleton->setPosition(position.x, position.y);
 }
 
-float SpineSkeleton::get_x() {
+real_t SpineSkeleton::get_x() {
 	SPINE_CHECK(skeleton, 0)
 	return skeleton->getX();
 }
 
-void SpineSkeleton::set_x(float v) {
+void SpineSkeleton::set_x(real_t v) {
 	SPINE_CHECK(skeleton, )
 	skeleton->setX(v);
 }
 
-float SpineSkeleton::get_y() {
+real_t SpineSkeleton::get_y() {
 	SPINE_CHECK(skeleton, 0)
 	return skeleton->getY();
 }
 
-void SpineSkeleton::set_y(float v) {
+void SpineSkeleton::set_y(real_t v) {
 	SPINE_CHECK(skeleton, )
 	skeleton->setY(v);
 }
 
-float SpineSkeleton::get_scale_x() {
+real_t SpineSkeleton::get_scale_x() {
 	SPINE_CHECK(skeleton, 1)
 	return skeleton->getScaleX();
 }
 
-void SpineSkeleton::set_scale_x(float v) {
+void SpineSkeleton::set_scale_x(real_t v) {
 	SPINE_CHECK(skeleton, )
 	skeleton->setScaleX(v);
 }
 
-float SpineSkeleton::get_scale_y() {
+real_t SpineSkeleton::get_scale_y() {
 	SPINE_CHECK(skeleton, 1)
 	return -skeleton->getScaleY();
 }
 
-void SpineSkeleton::set_scale_y(float v) {
+void SpineSkeleton::set_scale_y(real_t v) {
 	SPINE_CHECK(skeleton, )
 	skeleton->setScaleY(v);
 }
 
-float SpineSkeleton::get_time() {
+real_t SpineSkeleton::get_time() {
 	SPINE_CHECK(get_spine_object(), 0)
 	return get_spine_object()->getTime();
 }
 
-void SpineSkeleton::set_time(float time) {
+void SpineSkeleton::set_time(real_t time) {
 	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setTime(time);
 }
 
-void SpineSkeleton::update(float delta) {
+void SpineSkeleton::update(real_t delta) {
 	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->update(delta);
 }
 
-void SpineSkeleton::physics_translate(float x, float y) {
+void SpineSkeleton::physics_translate(real_t x, real_t y) {
 	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->physicsTranslate(x, y);
 }
 
-void SpineSkeleton::physics_rotate(float x, float y, float degrees) {
+void SpineSkeleton::physics_rotate(real_t x, real_t y, real_t degrees) {
 	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->physicsRotate(x, y, degrees);
 }

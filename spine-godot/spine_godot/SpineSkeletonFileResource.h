@@ -94,7 +94,7 @@ public:
 	Variant _load(const String &path, const String &original_path, bool use_sub_threads, int32_t cache_mode);
 #else
 #if VERSION_MAJOR > 3
-	RES load(const String &path, const String &original_path, Error *error, bool use_sub_threads, float *progress, CacheMode cache_mode);
+	virtual RES load(const String &path, const String &original_path, Error *error, bool use_sub_threads, float *progress, CacheMode cache_mode) override;
 #else
 #if VERSION_MINOR > 5
 	RES load(const String &path, const String &original_path, Error *error, bool no_subresource_cache = false);

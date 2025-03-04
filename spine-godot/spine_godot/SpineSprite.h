@@ -39,6 +39,7 @@
 #include <godot_cpp/classes/canvas_item_material.hpp>
 #else
 #include "scene/2d/node_2d.h"
+#include "scene/resources/canvas_item_material.h"
 #endif
 
 class SpineSlotNode;
@@ -145,13 +146,13 @@ protected:
 	String preview_skin;
 	String preview_animation;
 	bool preview_frame;
-	float preview_time;
+	real_t preview_time;
 
 	bool debug_root;
 	Color debug_root_color;
 	bool debug_bones;
 	Color debug_bones_color;
-	float debug_bones_thickness;
+	real_t debug_bones_thickness;
 	bool debug_regions;
 	Color debug_regions_color;
 	bool debug_meshes;
@@ -202,7 +203,7 @@ public:
 
 	void on_skeleton_data_changed();
 
-	void update_skeleton(float delta);
+	void update_skeleton(real_t delta);
 
 	Transform2D get_global_bone_transform(const String &bone_name);
 
@@ -246,9 +247,9 @@ public:
 
 	void set_debug_bones_color(const Color &color) { debug_bones_color = color; }
 
-	float get_debug_bones_thickness() { return debug_bones_thickness; }
+	real_t get_debug_bones_thickness() { return debug_bones_thickness; }
 
-	void set_debug_bones_thickness(float thickness) { debug_bones_thickness = thickness; }
+	void set_debug_bones_thickness(real_t thickness) { debug_bones_thickness = thickness; }
 
 	bool get_debug_regions() { return debug_regions; }
 

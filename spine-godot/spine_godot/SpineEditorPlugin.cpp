@@ -40,12 +40,12 @@
 #include "editor/editor_undo_redo_manager.h"
 #endif
 #ifdef SPINE_GODOT_EXTENSION
-Error SpineAtlasResourceImportPlugin::_import(const String &source_file, const String &save_path, const Dictionary &options, const TypedArray<String> &platform_variants, const TypedArray<String> &gen_files) const {
+Error SpineAtlasResourceImportPlugin::_import(ResourceUID::ID source_id, const String &source_file, const String &save_path, const Dictionary &options, const TypedArray<String> &platform_variants, const TypedArray<String> &gen_files) const {
 #else
-Error SpineAtlasResourceImportPlugin::import(const String &source_file, const String &save_path, const HashMap<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) {
+Error SpineAtlasResourceImportPlugin::import(ResourceUID::ID source_id, const String &source_file, const String &save_path, const HashMap<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) {
 #endif
 #else
-Error SpineAtlasResourceImportPlugin::import(const String &source_file, const String &save_path, const Map<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) {
+Error SpineAtlasResourceImportPlugin::import(ResourceUID::ID source_id, const String &source_file, const String &save_path, const Map<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) {
 #endif
 	Ref<SpineAtlasResource> atlas(memnew(SpineAtlasResource));
 	atlas->set_normal_texture_prefix(options["normal_map_prefix"]);
@@ -96,12 +96,12 @@ void SpineAtlasResourceImportPlugin::get_import_options(List<ImportOption> *opti
 
 #if VERSION_MAJOR > 3
 #ifdef SPINE_GODOT_EXTENSION
-Error SpineJsonResourceImportPlugin::_import(const String &source_file, const String &save_path, const Dictionary &options, const TypedArray<String> &platform_variants, const TypedArray<String> &gen_files) const {
+ Error SpineJsonResourceImportPlugin::_import(ResourceUID::ID source_id, const String &source_file, const String &save_path, const Dictionary &options, const TypedArray<String> &platform_variants, const TypedArray<String> &gen_files) const {
 #else
-Error SpineJsonResourceImportPlugin::import(const String &source_file, const String &save_path, const HashMap<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) {
+Error SpineJsonResourceImportPlugin::import(ResourceUID::ID source_id, const String &source_file, const String &save_path, const HashMap<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) {
 #endif
 #else
-Error SpineJsonResourceImportPlugin::import(const String &source_file, const String &save_path, const Map<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) {
+Error SpineJsonResourceImportPlugin::import(ResourceUID::ID source_id, const String &source_file, const String &save_path, const Map<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) {
 #endif
 	Ref<SpineSkeletonFileResource> skeleton_file_res(memnew(SpineSkeletonFileResource));
 	Error error = skeleton_file_res->load_from_file(source_file);
@@ -124,12 +124,12 @@ Error SpineJsonResourceImportPlugin::import(const String &source_file, const Str
 
 #if VERSION_MAJOR > 3
 #ifdef SPINE_GODOT_EXTENSION
-Error SpineBinaryResourceImportPlugin::_import(const String &source_file, const String &save_path, const Dictionary &options, const TypedArray<String> &platform_variants, const TypedArray<String> &gen_files) const {
+Error SpineBinaryResourceImportPlugin::_import(ResourceUID::ID source_id, const String &source_file, const String &save_path, const Dictionary &options, const TypedArray<String> &platform_variants, const TypedArray<String> &gen_files) const {
 #else
-Error SpineBinaryResourceImportPlugin::import(const String &source_file, const String &save_path, const HashMap<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) {
+Error SpineBinaryResourceImportPlugin::import(ResourceUID::ID source_id, const String &source_file, const String &save_path, const HashMap<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) {
 #endif
 #else
-Error SpineBinaryResourceImportPlugin::import(const String &source_file, const String &save_path, const Map<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) {
+Error SpineBinaryResourceImportPlugin::import(ResourceUID::ID source_id, const String &source_file, const String &save_path, const Map<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) {
 #endif
 	Ref<SpineSkeletonFileResource> skeleton_file_res(memnew(SpineSkeletonFileResource));
 	Error error = skeleton_file_res->load_from_file(source_file);

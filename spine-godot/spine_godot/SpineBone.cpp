@@ -140,27 +140,27 @@ Vector2 SpineBone::parent_to_world(Vector2 local_position) {
 	return Vector2(x, y);
 }
 
-float SpineBone::world_to_local_rotation(float world_rotation) {
+real_t SpineBone::world_to_local_rotation(real_t world_rotation) {
 	SPINE_CHECK(get_spine_object(), 0)
 	return get_spine_object()->worldToLocalRotation(world_rotation);
 }
 
-float SpineBone::local_to_world_rotation(float local_rotation) {
+real_t SpineBone::local_to_world_rotation(real_t local_rotation) {
 	SPINE_CHECK(get_spine_object(), 0)
 	return get_spine_object()->localToWorldRotation(local_rotation);
 }
 
-void SpineBone::rotate_world(float degrees) {
+void SpineBone::rotate_world(real_t degrees) {
 	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->rotateWorld(degrees);
 }
 
-float SpineBone::get_world_to_local_rotation_x() {
+real_t SpineBone::get_world_to_local_rotation_x() {
 	SPINE_CHECK(get_spine_object(), 0)
 	return get_spine_object()->getWorldToLocalRotationX();
 }
 
-float SpineBone::get_world_to_local_rotation_y() {
+real_t SpineBone::get_world_to_local_rotation_y() {
 	SPINE_CHECK(get_spine_object(), 0)
 	return get_spine_object()->getWorldToLocalRotationY();
 }
@@ -196,223 +196,223 @@ Array SpineBone::get_children() {
 	return result;
 }
 
-float SpineBone::get_x() {
+real_t SpineBone::get_x() {
 	SPINE_CHECK(get_spine_object(), 0)
 	return get_spine_object()->getX();
 }
 
-void SpineBone::set_x(float v) {
+void SpineBone::set_x(real_t v) {
 	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setX(v);
 }
 
-float SpineBone::get_y() {
+real_t SpineBone::get_y() {
 	SPINE_CHECK(get_spine_object(), 0)
 	return get_spine_object()->getY();
 }
 
-void SpineBone::set_y(float v) {
+void SpineBone::set_y(real_t v) {
 	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setY(v);
 }
 
-float SpineBone::get_rotation() {
+real_t SpineBone::get_rotation() {
 	SPINE_CHECK(get_spine_object(), 0)
 	return get_spine_object()->getRotation();
 }
 
-void SpineBone::set_rotation(float v) {
+void SpineBone::set_rotation(real_t v) {
 	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setRotation(v);
 }
 
-float SpineBone::get_scale_x() {
+real_t SpineBone::get_scale_x() {
 	SPINE_CHECK(get_spine_object(), 0)
 	return get_spine_object()->getScaleX();
 }
 
-void SpineBone::set_scale_x(float v) {
+void SpineBone::set_scale_x(real_t v) {
 	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setScaleX(v);
 }
 
-float SpineBone::get_scale_y() {
+real_t SpineBone::get_scale_y() {
 	SPINE_CHECK(get_spine_object(), 0)
 	return get_spine_object()->getScaleY();
 }
 
-void SpineBone::set_scale_y(float v) {
+void SpineBone::set_scale_y(real_t v) {
 	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setScaleY(v);
 }
 
-float SpineBone::get_shear_x() {
+real_t SpineBone::get_shear_x() {
 	SPINE_CHECK(get_spine_object(), 0)
 	return get_spine_object()->getShearX();
 }
 
-void SpineBone::set_shear_x(float v) {
+void SpineBone::set_shear_x(real_t v) {
 	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setShearX(v);
 }
 
-float SpineBone::get_shear_y() {
+real_t SpineBone::get_shear_y() {
 	SPINE_CHECK(get_spine_object(), 0)
 	return get_spine_object()->getShearY();
 }
 
-void SpineBone::set_shear_y(float v) {
+void SpineBone::set_shear_y(real_t v) {
 	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setShearY(v);
 }
 
-float SpineBone::get_applied_rotation() {
+real_t SpineBone::get_applied_rotation() {
 	SPINE_CHECK(get_spine_object(), 0)
 	return get_spine_object()->getAppliedRotation();
 }
 
-void SpineBone::set_applied_rotation(float v) {
+void SpineBone::set_applied_rotation(real_t v) {
 	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setAppliedRotation(v);
 }
 
-float SpineBone::get_a_x() {
+real_t SpineBone::get_a_x() {
 	SPINE_CHECK(get_spine_object(), 0)
 	return get_spine_object()->getAX();
 }
 
-void SpineBone::set_a_x(float v) {
+void SpineBone::set_a_x(real_t v) {
 	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setAX(v);
 }
 
-float SpineBone::get_a_y() {
+real_t SpineBone::get_a_y() {
 	SPINE_CHECK(get_spine_object(), 0)
 	return get_spine_object()->getAY();
 }
 
-void SpineBone::set_a_y(float v) {
+void SpineBone::set_a_y(real_t v) {
 	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setAY(v);
 }
 
-float SpineBone::get_a_scale_x() {
+real_t SpineBone::get_a_scale_x() {
 	SPINE_CHECK(get_spine_object(), 0)
 	return get_spine_object()->getAScaleX();
 }
 
-void SpineBone::set_a_scale_x(float v) {
+void SpineBone::set_a_scale_x(real_t v) {
 	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setAScaleX(v);
 }
 
-float SpineBone::get_a_scale_y() {
+real_t SpineBone::get_a_scale_y() {
 	SPINE_CHECK(get_spine_object(), 0)
 	return get_spine_object()->getAScaleY();
 }
 
-void SpineBone::set_a_scale_y(float v) {
+void SpineBone::set_a_scale_y(real_t v) {
 	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setAScaleY(v);
 }
 
-float SpineBone::get_a_shear_x() {
+real_t SpineBone::get_a_shear_x() {
 	SPINE_CHECK(get_spine_object(), 0)
 	return get_spine_object()->getAShearX();
 }
 
-void SpineBone::set_a_shear_x(float v) {
+void SpineBone::set_a_shear_x(real_t v) {
 	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setAShearX(v);
 }
 
-float SpineBone::get_a_shear_y() {
+real_t SpineBone::get_a_shear_y() {
 	SPINE_CHECK(get_spine_object(), 0)
 	return get_spine_object()->getAShearY();
 }
 
-void SpineBone::set_a_shear_y(float v) {
+void SpineBone::set_a_shear_y(real_t v) {
 	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setAShearY(v);
 }
 
-float SpineBone::get_a() {
+real_t SpineBone::get_a() {
 	SPINE_CHECK(get_spine_object(), 0)
 	return get_spine_object()->getA();
 }
 
-void SpineBone::set_a(float v) {
+void SpineBone::set_a(real_t v) {
 	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setA(v);
 }
 
-float SpineBone::get_b() {
+real_t SpineBone::get_b() {
 	SPINE_CHECK(get_spine_object(), 0)
 	return get_spine_object()->getB();
 }
 
-void SpineBone::set_b(float v) {
+void SpineBone::set_b(real_t v) {
 	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setB(v);
 }
 
-float SpineBone::get_c() {
+real_t SpineBone::get_c() {
 	SPINE_CHECK(get_spine_object(), 0)
 	return get_spine_object()->getC();
 }
 
-void SpineBone::set_c(float v) {
+void SpineBone::set_c(real_t v) {
 	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setC(v);
 }
 
-float SpineBone::get_d() {
+real_t SpineBone::get_d() {
 	SPINE_CHECK(get_spine_object(), 0)
 	return get_spine_object()->getD();
 }
 
-void SpineBone::set_d(float v) {
+void SpineBone::set_d(real_t v) {
 	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setD(v);
 }
 
-float SpineBone::get_world_x() {
+real_t SpineBone::get_world_x() {
 	SPINE_CHECK(get_spine_object(), 0)
 	return get_spine_object()->getWorldX();
 }
 
-void SpineBone::set_world_x(float v) {
+void SpineBone::set_world_x(real_t v) {
 	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setWorldX(v);
 }
 
-float SpineBone::get_world_y() {
+real_t SpineBone::get_world_y() {
 	SPINE_CHECK(get_spine_object(), 0)
 	return get_spine_object()->getWorldY();
 }
 
-void SpineBone::set_world_y(float v) {
+void SpineBone::set_world_y(real_t v) {
 	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setWorldY(v);
 }
 
-float SpineBone::get_world_rotation_x() {
+real_t SpineBone::get_world_rotation_x() {
 	SPINE_CHECK(get_spine_object(), 0)
 	return get_spine_object()->getWorldRotationX();
 }
 
-float SpineBone::get_world_rotation_y() {
+real_t SpineBone::get_world_rotation_y() {
 	SPINE_CHECK(get_spine_object(), 0)
 	return get_spine_object()->getWorldRotationY();
 }
 
 
-float SpineBone::get_world_scale_x() {
+real_t SpineBone::get_world_scale_x() {
 	SPINE_CHECK(get_spine_object(), 0)
 	return get_spine_object()->getWorldScaleX();
 }
 
-float SpineBone::get_world_scale_y() {
+real_t SpineBone::get_world_scale_y() {
 	SPINE_CHECK(get_spine_object(), 0)
 	return get_spine_object()->getWorldScaleY();
 }
@@ -448,7 +448,7 @@ Transform2D SpineBone::get_transform() {
 void SpineBone::set_transform(Transform2D transform) {
 	SPINE_CHECK(get_spine_object(), )
 	Vector2 position = transform.get_origin();
-	float rotation = spine::MathUtil::Rad_Deg * transform.get_rotation();
+	real_t rotation = spine::MathUtil::Rad_Deg * transform.get_rotation();
 	Vector2 scale = transform.get_scale();
 
 	set_x(position.x);
@@ -481,14 +481,18 @@ void SpineBone::set_global_transform(Transform2D transform) {
 	Transform2D inverse_sprite_transform = get_spine_owner()->get_global_transform().affine_inverse();
 	transform = inverse_sprite_transform * transform;
 	Vector2 position = transform.get_origin();
-	float rotation = spine::MathUtil::Rad_Deg * transform.get_rotation();
+	real_t rotation = spine::MathUtil::Rad_Deg * transform.get_rotation();
 	Vector2 scale = transform.get_scale();
 	Vector2 local_position = position;
-	float local_rotation = bone->worldToLocalRotation(rotation) - 180;
+	real_t local_rotation = bone->worldToLocalRotation(rotation) - 180;
 	Vector2 local_scale = scale;
 	spine::Bone *parent = bone->getParent();
 	if (parent) {
-		parent->worldToLocal(local_position.x, local_position.y, local_position.x, local_position.y);
+        float in_x = local_position.x;
+        float in_y = local_position.y;
+		parent->worldToLocal(local_position.x, local_position.y, in_x, in_y);
+        local_position.x = in_x;
+        local_position.y = in_y;
 	}
 	bone->setX(local_position.x);
 	bone->setY(local_position.y);

@@ -184,7 +184,7 @@ static void add_triangles(SpineMesh2D *mesh_instance,
 																  colors,
 																  uvs,
 																  Vector<int>(),
-																  Vector<float>(),
+																  Vector<real_t>(),
 																  texture.is_null() ? RID() : texture->get_rid(),
 																  -1,
 																  normal_map.is_null() ? RID() : normal_map->get_rid());
@@ -267,8 +267,8 @@ void SpineMesh2D::update_mesh(const PackedVector2Array &vertices,
 				aabb_new.expand_to(Vector3(vertex.x, vertex.y, 0));
 			}
 
-			float uv[2] = {(float) uvs[i].x, (float) uvs[i].y};
-			memcpy(&vertex_write_buffer[i * vertex_stride + surface_offsets[RS::ARRAY_VERTEX]], &vertex, sizeof(float) * 2);
+			float uv[2] = {uvs[i].x, uvs[i].y};
+			memcpy(&vertex_write_buffer[i * vertex_stride + surface_offsets[RS::ARRAY_VERTEX]], &vertices[i], sizeof(float) * 2);
 			memcpy(&attribute_write_buffer[i * attribute_stride + surface_offsets[RS::ARRAY_COLOR]], color, 4);
 			memcpy(&attribute_write_buffer[i * attribute_stride + surface_offsets[RS::ARRAY_TEX_UV]], uv, 8);
 		}
@@ -334,16 +334,17 @@ void SpineMesh2D::update_mesh(const Vector<Point2> &vertices,
 				aabb_new.expand_to(Vector3(vertex.x, vertex.y, 0));
 			}
 
-			float uv[2] = {(float) uvs[i].x, (float) uvs[i].y};
-			memcpy(&vertex_write_buffer[i * vertex_stride + surface_offsets[RS::ARRAY_VERTEX]], &vertex, sizeof(float) * 2);
+			float uv[2] = {(float)uvs[i].x, (float)uvs[i].y};
+            float xy[2] = {(float)vertex.x, (float)vertex.y};
+			memcpy(&vertex_write_buffer[i * vertex_stride + surface_offsets[RS::ARRAY_VERTEX]], xy, sizeof(float) * 2);
 			memcpy(&attribute_write_buffer[i * attribute_stride + surface_offsets[RS::ARRAY_COLOR]], color, 4);
-			memcpy(&attribute_write_buffer[i * attribute_stride + surface_offsets[RS::ARRAY_TEX_UV]], uv, 8);
+			memcpy(&attribute_write_buffer[i * attribute_stride + surface_offsets[RS::ARRAY_TEX_UV]], uv, sizeof(float) * 2);
 		}
 		RS::get_singleton()->mesh_surface_update_vertex_region(mesh, 0, 0, vertex_buffer);
 		RS::get_singleton()->mesh_surface_update_attribute_region(mesh, 0, 0, attribute_buffer);
 		RS::get_singleton()->mesh_set_custom_aabb(mesh, aabb_new);
 	}
-
+    
 	RenderingServer::get_singleton()->canvas_item_add_mesh(this->get_canvas_item(), mesh, Transform2D(), Color(1, 1, 1, 1), renderer_object->canvas_texture->get_rid());
 #else
 	if (!mesh.is_valid() || vertices.size() != num_vertices || indices.size() != num_indices || indices_changed) {
@@ -386,10 +387,11 @@ void SpineMesh2D::update_mesh(const Vector<Point2> &vertices,
 				aabb_new.expand_to(Vector3(vertex.x, vertex.y, 0));
 			}
 
-			float uv[2] = {(float) uvs[i].x, (float) uvs[i].y};
-			memcpy(&write_buffer[i * mesh_stride[VS::ARRAY_VERTEX] + mesh_surface_offsets[VS::ARRAY_VERTEX]], &vertex, sizeof(float) * 2);
+			float uv[2] = { (float) uvs[i].x, (float) uvs[i].y};
+            float xy[2] = {(float)vertex.x, (float)vertex.y};
+			memcpy(&write_buffer[i * mesh_stride[VS::ARRAY_VERTEX] + mesh_surface_offsets[VS::ARRAY_VERTEX]], xy, sizeof(float) * 2);
 			memcpy(&write_buffer[i * mesh_stride[VS::ARRAY_TEX_UV] + mesh_surface_offsets[VS::ARRAY_TEX_UV]], uv, 8);
-			memcpy(&write_buffer[i * mesh_stride[VS::ARRAY_COLOR] + mesh_surface_offsets[VS::ARRAY_COLOR]], color, 4);
+			memcpy(&write_buffer[i * mesh_stride[VS::ARRAY_COLOR] + mesh_surface_offsets[VS::ARRAY_COLOR]], color, sizeof(float) * 2);
 		}
 		write_buffer.release();
 		VS::get_singleton()->mesh_surface_update_region(mesh, 0, 0, mesh_buffer);
@@ -716,7 +718,7 @@ void SpineSprite::_get_property_list(List<PropertyInfo> *list) const {
 	preview_time_property.name = "preview_time";
 	preview_time_property.type = VARIANT_FLOAT;
 	preview_time_property.usage = PROPERTY_USAGE_EDITOR | PROPERTY_USAGE_STORAGE;
-	float animation_duration = 0;
+	real_t animation_duration = 0;
 	if (!EMPTY(preview_animation) && preview_animation != "-- Empty --") {
 		auto animation = skeleton_data_res->find_animation(preview_animation);
 		if (animation.is_valid()) animation_duration = animation->get_duration();
@@ -753,7 +755,7 @@ bool SpineSprite::_get(const StringName &property, Variant &value) const {
 	return false;
 }
 
-static void update_preview_animation(SpineSprite *sprite, const String &skin, const String &animation, bool frame, float time) {
+static void update_preview_animation(SpineSprite *sprite, const String &skin, const String &animation, bool frame, real_t time) {
 	if (!Engine::get_singleton()->is_editor_hint()) return;
 	if (!sprite->get_skeleton().is_valid()) return;
 
@@ -806,7 +808,7 @@ bool SpineSprite::_set(const StringName &property, const Variant &value) {
 	return false;
 }
 
-void SpineSprite::update_skeleton(float delta) {
+void SpineSprite::update_skeleton(real_t delta) {
 	if (!skeleton_data_res.is_valid() ||
 		!skeleton_data_res->is_skeleton_data_loaded() ||
 		!skeleton.is_valid() ||
@@ -914,12 +916,16 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> skeleton_ref) {
 			mesh_instance->set_light_mask(get_light_mask());
 			size_t num_vertices = vertices->size() / 2;
 			mesh_instance->vertices.resize((int) num_vertices);
-			memcpy(mesh_instance->vertices.ptrw(), vertices->buffer(), num_vertices * 2 * sizeof(float));
 			mesh_instance->uvs.resize((int) num_vertices);
-			memcpy(mesh_instance->uvs.ptrw(), uvs->buffer(), num_vertices * 2 * sizeof(float));
 			mesh_instance->colors.resize((int) num_vertices);
-			for (int j = 0; j < (int) num_vertices; j++) {
-				mesh_instance->colors.set(j, Color(tint.r, tint.g, tint.b, tint.a));
+			for (int i = 0, j = 0; i < (int) num_vertices; i++, j += 2) {
+				real_t x = vertices->buffer()[j];
+				real_t y = vertices->buffer()[j + 1];
+				real_t u = uvs->buffer()[j];
+				real_t v = uvs->buffer()[j + 1];
+				mesh_instance->vertices.set(i, Vector2(x, y));
+				mesh_instance->uvs.set(i, Vector2(u, v));
+				mesh_instance->colors.set(i, Color(tint.r, tint.g, tint.b, tint.a));
 			}
 
 			auto indices_changed = false;
@@ -1057,8 +1063,8 @@ void SpineSprite::draw() {
 			// Render hull.
 			statics.scratch_points.resize(0);
 			for (int i = 0, j = 0; i < 4; i++, j += 2) {
-				float x = vertices->buffer()[j];
-				float y = vertices->buffer()[j + 1];
+				real_t x = vertices->buffer()[j];
+				real_t y = vertices->buffer()[j + 1];
 				statics.scratch_points.push_back(Vector2(x, y));
 			}
 			statics.scratch_points.push_back(Vector2(vertices->buffer()[0], vertices->buffer()[1]));
@@ -1098,8 +1104,8 @@ void SpineSprite::draw() {
 			// Render hull
 			statics.scratch_points.resize(0);
 			for (int i = 0, j = 0; i < mesh->getHullLength(); i++, j += 2) {
-				float x = vertices->buffer()[j];
-				float y = vertices->buffer()[j + 1];
+				real_t x = vertices->buffer()[j];
+				real_t y = vertices->buffer()[j + 1];
 				statics.scratch_points.push_back(Vector2(x, y));
 			}
 
@@ -1131,9 +1137,16 @@ void SpineSprite::draw() {
 			vertices->setSize(bounding_box->getWorldVerticesLength(), 0);
 			bounding_box->computeWorldVertices(*slot, *vertices);
 			size_t num_vertices = vertices->size() / 2;
-			statics.scratch_points.resize((int) num_vertices);
-			memcpy(statics.scratch_points.ptrw(), vertices->buffer(), num_vertices * 2 * sizeof(float));
+			// Render hull.
+			statics.scratch_points.resize(0);
+			for (int i = 0, j = 0; i < num_vertices; i++, j += 2) {
+				real_t x = vertices->buffer()[j];
+				real_t y = vertices->buffer()[j + 1];
+				statics.scratch_points.push_back(Vector2(x, y));
+			}
 			statics.scratch_points.push_back(Vector2(vertices->buffer()[0], vertices->buffer()[1]));
+			//memcpy(statics.scratch_points.ptrw(), vertices->buffer(), num_vertices * sizeof(float) * 2);
+			//statics.scratch_points.push_back(Vector2(vertices->buffer()[0], vertices->buffer()[1]));
 			draw_polyline(statics.scratch_points, debug_bounding_boxes_color, 2);
 		}
 	}
@@ -1152,9 +1165,17 @@ void SpineSprite::draw() {
 			vertices->setSize(clipping->getWorldVerticesLength(), 0);
 			clipping->computeWorldVertices(*slot, *vertices);
 			size_t num_vertices = vertices->size() / 2;
-			statics.scratch_points.resize((int) num_vertices);
-			memcpy(statics.scratch_points.ptrw(), vertices->buffer(), num_vertices * 2 * sizeof(float));
+			// Render hull.
+			statics.scratch_points.resize(0);
+			for (int i = 0, j = 0; i < num_vertices; i++, j += 2) {
+				real_t x = vertices->buffer()[j];
+				real_t y = vertices->buffer()[j + 1];
+				statics.scratch_points.push_back(Vector2(x, y));
+			}
 			statics.scratch_points.push_back(Vector2(vertices->buffer()[0], vertices->buffer()[1]));
+			// statics.scratch_points.resize((int) num_vertices);
+			// memcpy(statics.scratch_points.ptrw(), vertices->buffer(), num_vertices * sizeof(real_t));
+			// statics.scratch_points.push_back(Vector2(vertices->buffer()[0], vertices->buffer()[1]));
 			draw_polyline(statics.scratch_points, debug_clipping_color, 2);
 		}
 	}
@@ -1165,7 +1186,7 @@ void SpineSprite::draw() {
 		auto bone = skeleton->get_spine_object()->getRootBone();
 		draw_bone(bone, debug_root_color);
 
-		float bone_length = bone->getData().getLength();
+		real_t bone_length = bone->getData().getLength();
 		if (bone_length == 0) bone_length = debug_bones_thickness * 2;
 
 		statics.scratch_points.resize(5);
@@ -1193,7 +1214,7 @@ void SpineSprite::draw() {
 			if (!bone->isActive()) continue;
 			draw_bone(bone, debug_bones_color);
 
-			float bone_length = bone->getData().getLength();
+			real_t bone_length = bone->getData().getLength();
 			if (bone_length == 0) bone_length = debug_bones_thickness * 2;
 
 			statics.scratch_points.resize(5);
@@ -1216,17 +1237,17 @@ void SpineSprite::draw() {
 	}
 
 #if TOOLS_ENABLED
-	float editor_scale = 1.0;
+	real_t editor_scale = 1.0;
 	if (Engine::get_singleton()->is_editor_hint()) editor_scale = EditorInterface::get_singleton()->get_editor_scale();
 
-	float inverse_zoom = 1 / get_viewport()->get_global_canvas_transform().get_scale().x * editor_scale;
+	real_t inverse_zoom = 1 / get_viewport()->get_global_canvas_transform().get_scale().x * editor_scale;
 	Vector<String> hover_text_lines;
 	if (hovered_slot) {
 		hover_text_lines.push_back(String("Slot: ") + hovered_slot->getData().getName().buffer());
 	}
 
 	if (hovered_bone) {
-		float thickness = debug_bones_thickness;
+		real_t thickness = debug_bones_thickness;
 		debug_bones_thickness *= 1.1;
 		draw_bone(hovered_bone, Color(debug_bones_color.r, debug_bones_color.g, debug_bones_color.b, 1));
 		debug_bones_thickness = thickness;
@@ -1248,14 +1269,14 @@ void SpineSprite::draw() {
 #if VERSION_MAJOR > 3
 #ifdef SPINE_GODOT_EXTENSION
 	// FIXME possibly wrong
-	float line_height = default_font->get_height() + default_font->get_descent();
+	real_t line_height = default_font->get_height() + default_font->get_descent();
 #else
-	float line_height = default_font->get_height(Font::DEFAULT_FONT_SIZE) + default_font->get_descent(Font::DEFAULT_FONT_SIZE);
+	real_t line_height = default_font->get_height(Font::DEFAULT_FONT_SIZE) + default_font->get_descent(Font::DEFAULT_FONT_SIZE);
 #endif
 #else
-	float line_height = default_font->get_height() + default_font->get_descent();
+	real_t line_height = default_font->get_height() + default_font->get_descent();
 #endif
-	float rect_width = 0;
+	real_t rect_width = 0;
 	for (int i = 0; i < hover_text_lines.size(); i++) {
 		rect_width = MAX(rect_width, default_font->get_string_size(hover_text_lines[i]).x);
 	}
@@ -1286,7 +1307,7 @@ void SpineSprite::draw() {
 
 void SpineSprite::draw_bone(spine::Bone *bone, const Color &color) {
 	draw_set_transform(Vector2(bone->getWorldX(), bone->getWorldY()), spine::MathUtil::Deg_Rad * bone->getWorldRotationX(), Vector2(bone->getWorldScaleX(), bone->getWorldScaleY()));
-	float bone_length = bone->getData().getLength();
+	real_t bone_length = bone->getData().getLength();
 	if (bone_length == 0) bone_length = debug_bones_thickness * 2;
 #ifdef SPINE_GODOT_EXTENSION
 	PackedVector2Array points;

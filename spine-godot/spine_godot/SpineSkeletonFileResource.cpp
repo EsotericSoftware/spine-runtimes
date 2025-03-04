@@ -100,7 +100,7 @@ void SpineSkeletonFileResource::_bind_methods() {
 static bool checkVersion(const char *version) {
 	if (!version) return false;
 	char *result = (char *) (strstr(version, SPINE_VERSION_STRING) - version);
-	return result == 0;
+    return result == nullptr;
 }
 
 static bool checkJson(const char *jsonData) {

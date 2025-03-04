@@ -72,6 +72,7 @@ using namespace godot;
 #define REF Ref<RefCounted>
 #define GEOMETRY2D Geometry2D
 #else
+#include "core/math/math_defs.h"
 #include "core/object.h"
 #include "core/reference.h"
 #include "core/error_macros.h"
