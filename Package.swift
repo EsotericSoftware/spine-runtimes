@@ -21,14 +21,14 @@ let package = Package(
             dependencies: [
                 "SpineCppLite", "SpineShadersStructs"
             ],
-            path: "spine-ios/Sources/Spine",
-            swiftSettings: [
-                .interoperabilityMode(.Cxx)
-            ]
+            path: "spine-ios/Sources/Spine"
         ),
         .target(
             name: "SpineCppLite",
-            path: "spine-ios/Sources/SpineCppLite"
+            path: "spine-ios/Sources/SpineCppLite",
+            linkerSettings: [
+                .linkedLibrary("c++"),
+            ]
         ),
         .systemLibrary(
             name: "SpineShadersStructs",
