@@ -151,7 +151,7 @@ public enum Alignment: Int {
         switch self {
         case .topLeft, .topCenter, .topRight: return -1.0
         case .centerLeft, .center, .centerRight: return 0.0
-        case .bottomLeft, .bottomCenter, .bottomRight: return -1.0
+        case .bottomLeft, .bottomCenter, .bottomRight: return 1.0
         }
     }
 }
