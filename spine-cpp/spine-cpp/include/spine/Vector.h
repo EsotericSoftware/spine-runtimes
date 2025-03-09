@@ -86,10 +86,10 @@ namespace spine {
 					construct(_buffer + i, defaultValue);
 				}
 			} else {
-	            for (size_t i = _size; i < oldSize; i++) {
-	                destroy(_buffer + i);
-	            }
-	        }
+				for (size_t i = _size; i < oldSize; i++) {
+					destroy(_buffer + i);
+				}
+			}
 		}
 
 		inline void ensureCapacity(size_t newCapacity = 0) {
