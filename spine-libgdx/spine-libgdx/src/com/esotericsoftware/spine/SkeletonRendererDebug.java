@@ -107,6 +107,7 @@ public class SkeletonRendererDebug {
 			shapes.setColor(boneOriginColor);
 			for (int i = 0, n = slots.size; i < n; i++) {
 				Slot slot = slots.get(i);
+				if (!slot.bone.active) continue;
 				Attachment attachment = slot.attachment;
 				if (!(attachment instanceof PointAttachment)) continue;
 				PointAttachment point = (PointAttachment)attachment;
@@ -123,6 +124,7 @@ public class SkeletonRendererDebug {
 			shapes.setColor(attachmentLineColor);
 			for (int i = 0, n = slots.size; i < n; i++) {
 				Slot slot = slots.get(i);
+				if (!slot.bone.active) continue;
 				Attachment attachment = slot.attachment;
 				if (attachment instanceof RegionAttachment) {
 					RegionAttachment region = (RegionAttachment)attachment;
@@ -139,6 +141,7 @@ public class SkeletonRendererDebug {
 		if (drawMeshHull || drawMeshTriangles) {
 			for (int i = 0, n = slots.size; i < n; i++) {
 				Slot slot = slots.get(i);
+				if (!slot.bone.active) continue;
 				Attachment attachment = slot.attachment;
 				if (!(attachment instanceof MeshAttachment)) continue;
 				MeshAttachment mesh = (MeshAttachment)attachment;
@@ -186,6 +189,7 @@ public class SkeletonRendererDebug {
 		if (drawClipping) {
 			for (int i = 0, n = slots.size; i < n; i++) {
 				Slot slot = slots.get(i);
+				if (!slot.bone.active) continue;
 				Attachment attachment = slot.attachment;
 				if (!(attachment instanceof ClippingAttachment)) continue;
 				ClippingAttachment clip = (ClippingAttachment)attachment;
@@ -202,6 +206,7 @@ public class SkeletonRendererDebug {
 		if (drawPaths) {
 			for (int i = 0, n = slots.size; i < n; i++) {
 				Slot slot = slots.get(i);
+				if (!slot.bone.active) continue;
 				Attachment attachment = slot.attachment;
 				if (!(attachment instanceof PathAttachment)) continue;
 				PathAttachment path = (PathAttachment)attachment;
@@ -252,6 +257,7 @@ public class SkeletonRendererDebug {
 			shapes.setColor(boneOriginColor);
 			for (int i = 0, n = slots.size; i < n; i++) {
 				Slot slot = slots.get(i);
+				if (!slot.bone.active) continue;
 				Attachment attachment = slot.attachment;
 				if (!(attachment instanceof PointAttachment)) continue;
 				PointAttachment point = (PointAttachment)attachment;

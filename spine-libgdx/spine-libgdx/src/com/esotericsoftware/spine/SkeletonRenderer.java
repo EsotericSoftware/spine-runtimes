@@ -150,13 +150,12 @@ public class SkeletonRenderer {
 				continue;
 			}
 			Texture texture = null;
-			int vertexSize = clipper.isClipping() ? 2 : 5;
 			Attachment attachment = slot.attachment;
 			if (attachment instanceof RegionAttachment) {
 				RegionAttachment region = (RegionAttachment)attachment;
-				verticesLength = vertexSize << 2;
+				verticesLength = 20;
 				vertices = this.vertices.items;
-				region.computeWorldVertices(slot, vertices, 0, vertexSize);
+				region.computeWorldVertices(slot, vertices, 0, 5);
 				triangles = quadTriangles;
 				texture = region.getRegion().getTexture();
 				uvs = region.getUVs();
@@ -165,9 +164,9 @@ public class SkeletonRenderer {
 			} else if (attachment instanceof MeshAttachment) {
 				MeshAttachment mesh = (MeshAttachment)attachment;
 				int count = mesh.getWorldVerticesLength();
-				verticesLength = (count >> 1) * vertexSize;
+				verticesLength = (count >> 1) * 5;
 				vertices = this.vertices.setSize(verticesLength);
-				mesh.computeWorldVertices(slot, 0, count, vertices, 0, vertexSize);
+				mesh.computeWorldVertices(slot, 0, count, vertices, 0, 5);
 				triangles = mesh.getTriangles();
 				texture = mesh.getRegion().getTexture();
 				uvs = mesh.getUVs();
@@ -203,8 +202,7 @@ public class SkeletonRenderer {
 					| (int)(g * slotColor.g * color.g * multiplier) << 8 //
 					| (int)(r * slotColor.r * color.r * multiplier));
 
-				if (clipper.isClipping()) {
-					clipper.clipTriangles(vertices, triangles, triangles.length, uvs, c, 0, false);
+				if (clipper.isClipping() && clipper.clipTriangles(vertices, triangles, triangles.length, uvs, c, 0, false, 5)) {
 					FloatArray clippedVertices = clipper.getClippedVertices();
 					ShortArray clippedTriangles = clipper.getClippedTriangles();
 					batch.draw(texture, clippedVertices.items, 0, clippedVertices.size, clippedTriangles.items, 0,
@@ -249,13 +247,12 @@ public class SkeletonRenderer {
 				continue;
 			}
 			Texture texture = null;
-			int vertexSize = clipper.isClipping() ? 2 : 6;
 			Attachment attachment = slot.attachment;
 			if (attachment instanceof RegionAttachment) {
 				RegionAttachment region = (RegionAttachment)attachment;
-				verticesLength = vertexSize << 2;
+				verticesLength = 24;
 				vertices = this.vertices.items;
-				region.computeWorldVertices(slot, vertices, 0, vertexSize);
+				region.computeWorldVertices(slot, vertices, 0, 6);
 				triangles = quadTriangles;
 				texture = region.getRegion().getTexture();
 				uvs = region.getUVs();
@@ -264,9 +261,9 @@ public class SkeletonRenderer {
 			} else if (attachment instanceof MeshAttachment) {
 				MeshAttachment mesh = (MeshAttachment)attachment;
 				int count = mesh.getWorldVerticesLength();
-				verticesLength = (count >> 1) * vertexSize;
+				verticesLength = count * 3;
 				vertices = this.vertices.setSize(verticesLength);
-				mesh.computeWorldVertices(slot, 0, count, vertices, 0, vertexSize);
+				mesh.computeWorldVertices(slot, 0, count, vertices, 0, 6);
 				triangles = mesh.getTriangles();
 				texture = mesh.getRegion().getTexture();
 				uvs = mesh.getUVs();
@@ -310,8 +307,7 @@ public class SkeletonRenderer {
 						| (int)(green * darkColor.g) << 8 //
 						| (int)(red * darkColor.r));
 
-				if (clipper.isClipping()) {
-					clipper.clipTriangles(vertices, triangles, triangles.length, uvs, light, dark, true);
+				if (clipper.isClipping() && clipper.clipTriangles(vertices, triangles, triangles.length, uvs, light, dark, true, 6)) {
 					FloatArray clippedVertices = clipper.getClippedVertices();
 					ShortArray clippedTriangles = clipper.getClippedTriangles();
 					batch.drawTwoColor(texture, clippedVertices.items, 0, clippedVertices.size, clippedTriangles.items, 0,

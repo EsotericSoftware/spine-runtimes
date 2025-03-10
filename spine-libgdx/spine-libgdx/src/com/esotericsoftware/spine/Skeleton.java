@@ -728,8 +728,7 @@ public class Skeleton {
 				continue;
 			}
 			if (vertices != null) {
-				if (clipper != null && clipper.isClipping()) {
-					clipper.clipTriangles(vertices, triangles, triangles.length);
+				if (clipper != null && clipper.isClipping() && clipper.clipTriangles(vertices, triangles, triangles.length)) {
 					vertices = clipper.getClippedVertices().items;
 					verticesLength = clipper.getClippedVertices().size;
 				}
