@@ -1287,7 +1287,7 @@ namespace Spine {
 						}
 					}
 				}
-				return optimizePositive ? result : ((result >> 1) ^ -(result & 1));
+				return optimizePositive ? result : ((int)((uint)result >> 1) ^ -(result & 1));
 			}
 
 			public string ReadString () {
