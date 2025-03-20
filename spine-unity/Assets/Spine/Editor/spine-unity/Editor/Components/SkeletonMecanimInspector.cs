@@ -128,7 +128,7 @@ namespace Spine.Unity.Editor {
 					Spine.Animation animation = skeletonData.FindAnimation(clip.name);
 					animation.Apply(skeleton, 0, time, false, null, 1.0f, MixBlend.First, MixDirection.In);
 				}
-				skeletonRenderer.LateUpdate();
+				skeletonRenderer.CustomLateUpdate();
 			}
 			SceneView.RepaintAll();
 		}

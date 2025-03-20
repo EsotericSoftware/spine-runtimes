@@ -172,12 +172,12 @@ namespace Spine.Unity {
 				_UpdateComplete(this);
 		}
 
-		public override void LateUpdate () {
+		public void LateUpdate () {
 			if (updateTiming == UpdateTiming.InLateUpdate && valid && translator != null && translator.Animator != null)
 				UpdateAnimation(Time.deltaTime);
 			// instantiation can happen from Update() after this component, leading to a missing Update() call.
 			if (!wasUpdatedAfterInit) Update();
-			base.LateUpdate();
+			base.CustomLateUpdate();
 		}
 
 		public override void OnBecameVisible () {

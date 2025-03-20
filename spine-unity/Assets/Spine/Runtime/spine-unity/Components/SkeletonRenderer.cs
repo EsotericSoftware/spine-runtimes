@@ -419,7 +419,7 @@ namespace Spine.Unity {
 #if UNITY_EDITOR
 		void OnEnable () {
 			if (!Application.isPlaying)
-				LateUpdate();
+				CustomLateUpdate();
 		}
 #endif
 
@@ -428,7 +428,7 @@ namespace Spine.Unity {
 				ClearState();
 		}
 
-		void OnDestroy () {
+		public virtual void OnDestroy () {
 			rendererBuffers.Dispose();
 			valid = false;
 		}
@@ -502,7 +502,7 @@ namespace Spine.Unity {
 			UpdateMode updateModeSaved = updateMode;
 			updateMode = UpdateMode.FullUpdate;
 			UpdateWorldTransform(Skeleton.Physics.Update);
-			LateUpdate();
+			// CustomLateUpdate();
 			updateMode = updateModeSaved;
 
 			if (OnRebuild != null)
@@ -518,7 +518,7 @@ namespace Spine.Unity {
 		}
 
 		public virtual void ApplyTransformMovementToPhysics () {
-			if (Application.isPlaying) {
+			if (SpineAnimationAgentManager.isPlaying) {
 				if (physicsPositionInheritanceFactor != Vector2.zero) {
 					Vector3 position = GetPhysicsTransformPosition();
 					Vector3 positionDelta = position - lastPosition;
@@ -568,44 +568,57 @@ namespace Spine.Unity {
 		protected virtual void UpdateWorldTransform (Skeleton.Physics physics) {
 			skeleton.UpdateWorldTransform(physics);
 		}
+		
+		private MeshRendererBuffers.SmartMesh currentSmartMesh;
+		private bool doMeshOverride;
+		private ExposedList<SubmeshInstruction> workingSubmeshInstructions;
+		bool updateTriangles;
 
 		/// <summary>
 		/// Generates a new UnityEngine.Mesh from the internal Skeleton.</summary>
-		public virtual void LateUpdate () {
-			if (!valid) return;
+		public virtual void CustomLateUpdate()
+		{
+		}
+		
+		public virtual bool CheckIsNeedUpdateMesh () {
+			if (!valid) return false;
 
 #if UNITY_EDITOR && NEW_PREFAB_SYSTEM
 			// Don't store mesh or material at the prefab, otherwise it will permanently reload
 			UnityEditor.PrefabAssetType prefabType = UnityEditor.PrefabUtility.GetPrefabAssetType(this);
 			if (UnityEditor.PrefabUtility.IsPartOfPrefabAsset(this) &&
 				(prefabType == UnityEditor.PrefabAssetType.Regular || prefabType == UnityEditor.PrefabAssetType.Variant)) {
-				return;
+				return false;
 			}
 			EditorUpdateMeshFilterHideFlags();
 #endif
 
-			if (updateMode != UpdateMode.FullUpdate) return;
+			if (updateMode != UpdateMode.FullUpdate) return false;
 
-			LateUpdateMesh();
+#if SPINE_OPTIONAL_RENDEROVERRIDE
+			doMeshOverride = generateMeshOverride != null;
+			if ((!meshRenderer || !meshRenderer.enabled) && !doMeshOverride) return false;
+#else
+			doMeshOverride = false;
+			if (!meshRenderer.enabled) return false;
+#endif
+			
+			return true;
 		}
 
-		public virtual void LateUpdateMesh () {
-#if SPINE_OPTIONAL_RENDEROVERRIDE
-			bool doMeshOverride = generateMeshOverride != null;
-			if ((!meshRenderer || !meshRenderer.enabled) && !doMeshOverride) return;
-#else
-			const bool doMeshOverride = false;
-			if (!meshRenderer.enabled) return;
-#endif
+		public virtual void LateUpdateMesh()
+		{
+			Initialize(false);
+
 			SkeletonRendererInstruction currentInstructions = this.currentInstructions;
-			ExposedList<SubmeshInstruction> workingSubmeshInstructions = currentInstructions.submeshInstructions;
-			MeshRendererBuffers.SmartMesh currentSmartMesh = rendererBuffers.GetNextMesh(); // Double-buffer for performance.
+			workingSubmeshInstructions = currentInstructions.submeshInstructions;
+			currentSmartMesh = rendererBuffers.GetNextMesh(); // Double-buffer for performance.
 
-			bool updateTriangles;
-
-			if (this.singleSubmesh) {
+			if (this.singleSubmesh)
+			{
 				// STEP 1. Determine a SmartMesh.Instruction. Split up instructions into submeshes. =============================================
-				MeshGenerator.GenerateSingleSubmeshInstruction(currentInstructions, skeleton, skeletonDataAsset.atlasAssets[0].PrimaryMaterial);
+				MeshGenerator.GenerateSingleSubmeshInstruction(currentInstructions, skeleton,
+					skeletonDataAsset.atlasAssets[0].PrimaryMaterial);
 
 				// STEP 1.9. Post-process workingInstructions. ==================================================================================
 #if SPINE_OPTIONAL_MATERIALOVERRIDE
@@ -614,7 +627,8 @@ namespace Spine.Unity {
 #endif
 
 				// STEP 2. Update vertex buffer based on verts from the attachments. ===========================================================
-				meshGenerator.settings = new MeshGenerator.Settings {
+				meshGenerator.settings = new MeshGenerator.Settings
+				{
 					pmaVertexColors = this.pmaVertexColors,
 					zSpacing = this.zSpacing,
 					useClipping = this.useClipping,
@@ -623,16 +637,23 @@ namespace Spine.Unity {
 					addNormals = this.addNormals
 				};
 				meshGenerator.Begin();
-				updateTriangles = SkeletonRendererInstruction.GeometryNotEqual(currentInstructions, currentSmartMesh.instructionUsed);
-				if (currentInstructions.hasActiveClipping) {
+				updateTriangles =
+					SkeletonRendererInstruction.GeometryNotEqual(currentInstructions, currentSmartMesh.instructionUsed);
+				if (currentInstructions.hasActiveClipping)
+				{
 					meshGenerator.AddSubmesh(workingSubmeshInstructions.Items[0], updateTriangles);
-				} else {
+				}
+				else
+				{
 					meshGenerator.BuildMeshWithArrays(currentInstructions, updateTriangles);
 				}
 
-			} else {
+			}
+			else
+			{
 				// STEP 1. Determine a SmartMesh.Instruction. Split up instructions into submeshes. =============================================
-				MeshGenerator.GenerateSkeletonRendererInstruction(currentInstructions, skeleton, customSlotMaterials, separatorSlots, doMeshOverride, this.immutableTriangles);
+				MeshGenerator.GenerateSkeletonRendererInstruction(currentInstructions, skeleton, customSlotMaterials,
+					separatorSlots, doMeshOverride, this.immutableTriangles);
 
 				// STEP 1.9. Post-process workingInstructions. ==================================================================================
 #if SPINE_OPTIONAL_MATERIALOVERRIDE
@@ -641,16 +662,19 @@ namespace Spine.Unity {
 #endif
 
 #if SPINE_OPTIONAL_RENDEROVERRIDE
-				if (doMeshOverride) {
+				if (doMeshOverride)
+				{
 					this.generateMeshOverride(currentInstructions);
 					if (disableRenderingOnOverride) return;
 				}
 #endif
 
-				updateTriangles = SkeletonRendererInstruction.GeometryNotEqual(currentInstructions, currentSmartMesh.instructionUsed);
+				updateTriangles =
+					SkeletonRendererInstruction.GeometryNotEqual(currentInstructions, currentSmartMesh.instructionUsed);
 
 				// STEP 2. Update vertex buffer based on verts from the attachments. ===========================================================
-				meshGenerator.settings = new MeshGenerator.Settings {
+				meshGenerator.settings = new MeshGenerator.Settings
+				{
 					pmaVertexColors = this.pmaVertexColors,
 					zSpacing = this.zSpacing,
 					useClipping = this.useClipping,
@@ -666,7 +690,14 @@ namespace Spine.Unity {
 			}
 
 			if (OnPostProcessVertices != null) OnPostProcessVertices.Invoke(this.meshGenerator.Buffers);
-
+		}
+		public void FillMesh() 
+		{
+			if (currentSmartMesh == null)
+			{
+				return;
+			}
+			
 			// STEP 3. Move the mesh data into a UnityEngine.Mesh ===========================================================================
 			Mesh currentMesh = currentSmartMesh.mesh;
 			meshGenerator.FillVertexData(currentMesh);
@@ -717,7 +748,7 @@ namespace Spine.Unity {
 
 			// OnBecameVisible is called after LateUpdate()
 			if (previousUpdateMode != UpdateMode.FullUpdate)
-				LateUpdate();
+				CustomLateUpdate();
 		}
 
 		public void OnBecameInvisible () {

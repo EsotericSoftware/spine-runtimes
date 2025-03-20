@@ -81,7 +81,7 @@ namespace Spine.Unity {
 			}
 
 			if (frames > 0) {
-				skeletonAnimation.Update(frames * frameDeltaTime);
+				skeletonAnimation.UpdateData(frames * frameDeltaTime);
 				requiresNewMesh = true;
 			}
 		}
@@ -89,7 +89,7 @@ namespace Spine.Unity {
 		void LateUpdate () {
 			if (frameskipMeshUpdate && !requiresNewMesh) return;
 
-			skeletonAnimation.LateUpdate();
+			skeletonAnimation.CustomLateUpdate();
 			requiresNewMesh = false;
 		}
 	}

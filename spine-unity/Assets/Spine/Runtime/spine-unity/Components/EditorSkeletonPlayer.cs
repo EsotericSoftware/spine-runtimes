@@ -157,7 +157,7 @@ namespace Spine.Unity {
 			public Spine.AnimationState State { get { return skeletonAnimation.state; } }
 
 			public void Update (float deltaTime) {
-				skeletonAnimation.Update(deltaTime);
+				skeletonAnimation.UpdateData(deltaTime);
 			}
 		}
 

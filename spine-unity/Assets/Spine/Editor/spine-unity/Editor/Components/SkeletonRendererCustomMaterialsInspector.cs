@@ -129,7 +129,7 @@ namespace Spine.Unity.Editor {
 				SetCustomMaterials();
 
 				if (skeletonRenderer != null)
-					skeletonRenderer.LateUpdate();
+					skeletonRenderer.CustomLateUpdate();
 			}
 
 			_customMaterialOverridesPrev = CopyList(componentCustomMaterialOverrides);
@@ -143,7 +143,7 @@ namespace Spine.Unity.Editor {
 					skeletonRenderer.CustomSlotMaterials.Clear();
 					RemoveCustomMaterials();
 					SetCustomMaterials();
-					skeletonRenderer.LateUpdate();
+					skeletonRenderer.CustomLateUpdate();
 				}
 			}
 		}

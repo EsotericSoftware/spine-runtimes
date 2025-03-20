@@ -873,7 +873,7 @@ namespace Spine.Unity.Editor {
 						previewGameObject.layer = PreviewLayer;
 						skeletonAnimation = previewGameObject.GetComponent<SkeletonAnimation>();
 						skeletonAnimation.initialSkinName = skinName;
-						skeletonAnimation.LateUpdate();
+						skeletonAnimation.CustomLateUpdate();
 						previewGameObject.GetComponent<Renderer>().enabled = false;
 
 #if SPINE_UNITY_2018_PREVIEW_API
@@ -938,9 +938,9 @@ namespace Spine.Unity.Editor {
 				if (!EditorApplication.isPlaying) {
 					float current = CurrentTime;
 					float deltaTime = (current - animationLastTime);
-					skeletonAnimation.Update(deltaTime);
+					skeletonAnimation.UpdateData(deltaTime);
 					animationLastTime = current;
-					skeletonAnimation.LateUpdate();
+					skeletonAnimation.CustomLateUpdate();
 				}
 
 				Camera thisPreviewUtilityCamera = this.PreviewUtilityCamera;

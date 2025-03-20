@@ -819,7 +819,9 @@ namespace Spine.Unity {
 			int totalVertexCount = instruction.rawVertexCount;
 
 #if LINEAR_COLOR_SPACE_FIX_ADDITIVE_ALPHA
-			bool linearColorSpace = QualitySettings.activeColorSpace == ColorSpace.Linear;
+			// bool linearColorSpace = QualitySettings.activeColorSpace == ColorSpace.Linear;
+			//TODO::: we only use linear color space in our projects
+			bool linearColorSpace = true;
 #endif
 			// Add data to vertex buffers
 			{

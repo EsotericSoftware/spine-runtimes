@@ -137,7 +137,7 @@ namespace Spine.Unity.Examples {
 			}
 
 			skeleton.SetSlotsToSetupPose(); // Use the pose from setup pose.
-			skeletonAnimation.Update(0); // Use the pose in the currently active animation.
+			skeletonAnimation.UpdateData(0); // Use the pose in the currently active animation.
 
 			// `GetRepackedSkin()` and each call to `GetRemappedClone()` with parameter `premultiplyAlpha` set to `true`
 			// cache necessarily created Texture copies which can be cleared by calling AtlasUtilities.ClearCache().

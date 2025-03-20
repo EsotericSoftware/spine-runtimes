@@ -65,7 +65,7 @@ namespace Spine.Unity.Editor {
 			if (skeleton == null) {
 				if (skeletonRenderer != null) {
 					skeletonRenderer.Initialize(false);
-					skeletonRenderer.LateUpdate();
+					skeletonRenderer.CustomLateUpdate();
 				} else if (skeletonGraphic != null) {
 					skeletonGraphic.Initialize(false);
 					skeletonGraphic.LateUpdate();

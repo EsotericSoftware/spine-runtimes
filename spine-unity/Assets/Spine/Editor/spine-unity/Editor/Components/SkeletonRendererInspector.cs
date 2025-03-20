@@ -481,7 +481,7 @@ namespace Spine.Unity.Editor {
 					wasInitParameterChanged = false;
 					if (!Application.isPlaying) {
 						skeletonRenderer.Initialize(true);
-						skeletonRenderer.LateUpdate();
+						skeletonRenderer.CustomLateUpdate();
 						requireRepaint = true;
 					}
 				}
@@ -642,11 +642,11 @@ namespace Spine.Unity.Editor {
 				// solution or in a separate commit. The current solution does not repaint the Game view because
 				// it is first applying values and in the next editor pass is calling this skin-changing method.
 				if (skeletonRenderer is SkeletonAnimation)
-					((SkeletonAnimation)skeletonRenderer).Update(0f);
+					((SkeletonAnimation)skeletonRenderer).UpdateData(0f);
 				else if (skeletonRenderer is SkeletonMecanim)
 					((SkeletonMecanim)skeletonRenderer).Update();
 
-				skeletonRenderer.LateUpdate();
+				skeletonRenderer.CustomLateUpdate();
 				return true;
 			}
 			return false;

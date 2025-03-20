@@ -199,7 +199,7 @@ namespace Spine.Unity {
 					state.SetAnimation(0, animationObject, loop);
 #if UNITY_EDITOR
 					if (!Application.isPlaying)
-						Update(0f);
+						UpdateData(0f);
 #endif
 				}
 			}
@@ -208,24 +208,37 @@ namespace Spine.Unity {
 				_OnAnimationRebuild(this);
 		}
 
-		virtual protected void Update () {
+		public virtual void UpdateAnimation (float deltaTime) {
 #if UNITY_EDITOR
-			if (!Application.isPlaying) {
-				Update(0f);
+			if (!SpineAnimationAgentManager.isPlaying) {
+				UpdateData(0f);
 				return;
 			}
 #endif
 			if (updateTiming != UpdateTiming.InUpdate) return;
-			Update(unscaledTime ? Time.unscaledDeltaTime : Time.deltaTime);
+			UpdateData(unscaledTime ? Time.unscaledDeltaTime : deltaTime);
+			// Debug.Log($"{SpineAnimationAgentManager.currentFrame}  {deltaTime}");
 		}
 
+		public override void Awake()
+		{
+			SpineAnimationAgentManager.Register(this);
+		}
+
+		public override  void OnDestroy()
+		{
+			base.OnDestroy();
+			SpineAnimationAgentManager.Unregister(this);
+		}
+		
 		virtual protected void FixedUpdate () {
 			if (updateTiming != UpdateTiming.InFixedUpdate) return;
-			Update(unscaledTime ? Time.unscaledDeltaTime : Time.deltaTime);
+			UpdateData(unscaledTime ? Time.unscaledDeltaTime : Time.deltaTime);
 		}
-
+		
 		/// <summary>Progresses the AnimationState according to the given deltaTime, and applies it to the Skeleton. Use Time.deltaTime to update manually. Use deltaTime 0 to update without progressing the time.</summary>
-		public void Update (float deltaTime) {
+		public void UpdateData(float deltaTime)
+		{
 			if (!valid || state == null)
 				return;
 
@@ -233,7 +246,19 @@ namespace Spine.Unity {
 			if (updateMode < UpdateMode.OnlyAnimationStatus)
 				return;
 			UpdateAnimationStatus(deltaTime);
+		}
+		public virtual void ApplyPhysicsData()
+		{
+			ApplyTransformMovementToPhysics();
+		}
 
+		public virtual void ApplyData()
+		{
+			if (updateMode == UpdateMode.OnlyAnimationStatus)
+			{
+				state.ApplyEventTimelinesOnly(skeleton, issueEvents: false);
+				return;
+			}
 			if (updateMode == UpdateMode.OnlyAnimationStatus)
 				return;
 			ApplyAnimation();
@@ -243,13 +268,6 @@ namespace Spine.Unity {
 			deltaTime *= timeScale;
 			state.Update(deltaTime);
 			skeleton.Update(deltaTime);
-
-			ApplyTransformMovementToPhysics();
-
-			if (updateMode == UpdateMode.OnlyAnimationStatus) {
-				state.ApplyEventTimelinesOnly(skeleton, issueEvents: false);
-				return;
-			}
 		}
 
 		public virtual void ApplyAnimation () {
@@ -281,14 +299,14 @@ namespace Spine.Unity {
 			}
 		}
 
-		public override void LateUpdate () {
+		public override void CustomLateUpdate () {
 			if (updateTiming == UpdateTiming.InLateUpdate && valid)
-				Update(unscaledTime ? Time.unscaledDeltaTime : Time.deltaTime);
+				UpdateData(unscaledTime ? Time.unscaledDeltaTime : Time.deltaTime);
 
 			// instantiation can happen from Update() after this component, leading to a missing Update() call.
-			if (!wasUpdatedAfterInit) Update(0);
+			if (!wasUpdatedAfterInit) UpdateData(0);
 
-			base.LateUpdate();
+			base.CustomLateUpdate();
 		}
 
 		public override void OnBecameVisible () {
@@ -298,9 +316,9 @@ namespace Spine.Unity {
 			// OnBecameVisible is called after LateUpdate()
 			if (previousUpdateMode != UpdateMode.FullUpdate &&
 				previousUpdateMode != UpdateMode.EverythingExceptMesh)
-				Update(0);
+				UpdateData(0);
 			if (previousUpdateMode != UpdateMode.FullUpdate)
-				LateUpdate();
+				CustomLateUpdate();
 		}
 	}
 

@@ -317,13 +317,13 @@ namespace Spine.Unity.Editor {
 				// Any set animation needs to be applied as well since it might set attachments,
 				// having an effect on generated SpriteMaskMaterials below.
 				stateComponent.AnimationState.Apply(component.skeleton);
-				component.LateUpdate();
+				component.CustomLateUpdate();
 			}
 
 #if BUILT_IN_SPRITE_MASK_COMPONENT
 			SpineMaskUtilities.EditorAssignSpriteMaskMaterials(component);
 #endif
-			component.LateUpdate();
+			component.CustomLateUpdate();
 		}
 
 		public static void ReinitializeComponent (SkeletonGraphic component) {
