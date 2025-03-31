@@ -84,6 +84,8 @@
 #endif
 #endif
 
+
+
 // Needed due to shared lib initializers in GDExtension.
 // See: https://x.com/badlogicgames/status/1843661872404591068
 struct SpineSpriteStatics {

@@ -42,7 +42,11 @@
 #ifdef SPINE_GODOT_EXTENSION
 Error SpineAtlasResourceImportPlugin::_import(const String &source_file, const String &save_path, const Dictionary &options, const TypedArray<String> &platform_variants, const TypedArray<String> &gen_files) const {
 #else
+#if VERSION_MINOR > 3
+Error SpineAtlasResourceImportPlugin::import(ResourceUID::ID p_source_id, const String &source_file, const String &save_path, const HashMap<StringName, Variant> &options, List<String> *r_platform_variants, List<String> *r_gen_files, Variant *r_metadata) {
+#else
 Error SpineAtlasResourceImportPlugin::import(const String &source_file, const String &save_path, const HashMap<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) {
+#endif
 #endif
 #else
 Error SpineAtlasResourceImportPlugin::import(const String &source_file, const String &save_path, const Map<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) {
@@ -98,7 +102,11 @@ void SpineAtlasResourceImportPlugin::get_import_options(List<ImportOption> *opti
 #ifdef SPINE_GODOT_EXTENSION
 Error SpineJsonResourceImportPlugin::_import(const String &source_file, const String &save_path, const Dictionary &options, const TypedArray<String> &platform_variants, const TypedArray<String> &gen_files) const {
 #else
+#if VERSION_MINOR > 3
+Error SpineJsonResourceImportPlugin::import(ResourceUID::ID p_source_id, const String &source_file, const String &save_path, const HashMap<StringName, Variant> &p_options, List<String> *r_platform_variants, List<String> *r_gen_files, Variant *r_metadata) {
+#else
 Error SpineJsonResourceImportPlugin::import(const String &source_file, const String &save_path, const HashMap<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) {
+#endif
 #endif
 #else
 Error SpineJsonResourceImportPlugin::import(const String &source_file, const String &save_path, const Map<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) {
@@ -126,7 +134,11 @@ Error SpineJsonResourceImportPlugin::import(const String &source_file, const Str
 #ifdef SPINE_GODOT_EXTENSION
 Error SpineBinaryResourceImportPlugin::_import(const String &source_file, const String &save_path, const Dictionary &options, const TypedArray<String> &platform_variants, const TypedArray<String> &gen_files) const {
 #else
+#if VERSION_MINOR > 3
+Error SpineBinaryResourceImportPlugin::import(ResourceUID::ID p_source_id, const String &source_file, const String &save_path, const HashMap<StringName, Variant> &p_options, List<String> *r_platform_variants, List<String> *r_gen_files, Variant *r_metadata) {
+#else
 Error SpineBinaryResourceImportPlugin::import(const String &source_file, const String &save_path, const HashMap<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) {
+#endif
 #endif
 #else
 Error SpineBinaryResourceImportPlugin::import(const String &source_file, const String &save_path, const Map<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) {

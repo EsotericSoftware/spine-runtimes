@@ -70,6 +70,7 @@ protected:
 	void setup_animation_player();
 
 	static Ref<Animation> create_animation(spine::Animation *animation, bool loop);
+	static Ref<Animation> create_empty_animation(const char *name);
 
 	void update_animation_state(const Variant &variant_sprite);
 

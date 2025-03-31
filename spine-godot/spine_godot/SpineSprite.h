@@ -39,6 +39,7 @@
 #include <godot_cpp/classes/canvas_item_material.hpp>
 #else
 #include "scene/2d/node_2d.h"
+#include "scene/resources/canvas_item_material.h"
 #endif
 
 class SpineSlotNode;

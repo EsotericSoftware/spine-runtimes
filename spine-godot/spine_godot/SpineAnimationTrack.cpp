@@ -196,7 +196,6 @@ void SpineAnimationTrack::setup_animation_player() {
 		}
 #endif
 	}
-
 	auto skeleton_data = sprite->get_skeleton_data_res()->get_skeleton_data();
 	auto &animations = skeleton_data->getAnimations();
 #if VERSION_MAJOR > 3
@@ -217,9 +216,20 @@ void SpineAnimationTrack::setup_animation_player() {
 #endif
 	}
 
+	auto reset_animation_ref = create_empty_animation("RESET");
+	auto empty_animation_ref = create_empty_animation("Empty");
+#if VERSION_MAJOR > 3
+	animation_library->add_animation(reset_animation_ref->get_name(), reset_animation_ref);
+	animation_library->add_animation("-- Empty --", empty_animation_ref);
+#else
+	animation_player->add_animation(reset_animation_ref->get_name(), reset_animation_ref);
+	animation_player->add_animation("-- Empty --", reset_animation_ref);
+#endif
+}
+Ref<Animation> SpineAnimationTrack::create_empty_animation(const char* name) {
 	Ref<Animation> reset_animation_ref;
 	INSTANTIATE(reset_animation_ref);
-	reset_animation_ref->set_name("RESET");
+	reset_animation_ref->set_name(name);
 #if VERSION_MAJOR > 3
 	// reset_animation_ref->set_loop(true);
 #else
@@ -235,13 +245,7 @@ void SpineAnimationTrack::setup_animation_player() {
 	reset_animation_ref->value_track_set_update_mode(0, Animation::UPDATE_DISCRETE);
 	reset_animation_ref->value_track_set_update_mode(1, Animation::UPDATE_DISCRETE);
 
-#if VERSION_MAJOR > 3
-	animation_library->add_animation(reset_animation_ref->get_name(), reset_animation_ref);
-	animation_library->add_animation("-- Empty --", reset_animation_ref);
-#else
-	animation_player->add_animation(reset_animation_ref->get_name(), reset_animation_ref);
-	animation_player->add_animation("-- Empty --", reset_animation_ref);
-#endif
+	return reset_animation_ref;
 }
 
 Ref<Animation> SpineAnimationTrack::create_animation(spine::Animation *animation, bool loop) {
