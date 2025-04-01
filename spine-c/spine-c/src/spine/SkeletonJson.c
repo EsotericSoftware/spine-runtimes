@@ -391,7 +391,7 @@ static spAnimation *_spSkeletonJson_readAnimation(spSkeletonJson *self, Json *ro
 
 				for (frame = 0, bezier = 0;; ++frame) {
 					float time2;
-					spRGBA2Timeline_setFrame(timeline, frame, time, color.r, color.g, color.b, color.a, color2.g,
+					spRGBA2Timeline_setFrame(timeline, frame, time, color.r, color.g, color.b, color.a, color2.r,
 											 color2.g, color2.b);
 					nextMap = keyMap->next;
 					if (!nextMap) {
