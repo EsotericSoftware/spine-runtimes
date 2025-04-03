@@ -59,7 +59,7 @@ export function createMixin<
 	};
 }
 
-type ComputedSizeMixin = Mixin<Phaser.GameObjects.Components.Transform, Phaser.GameObjects.GameObject>;
+type ComputedSizeMixin = Mixin<Phaser.GameObjects.Components.ComputedSize, Phaser.GameObjects.GameObject>;
 export const ComputedSizeMixin: ComputedSizeMixin = createMixin<Phaser.GameObjects.Components.ComputedSize>(ComputedSize);
 
 type DepthMixin = Mixin<Phaser.GameObjects.Components.Depth, Phaser.GameObjects.GameObject>;

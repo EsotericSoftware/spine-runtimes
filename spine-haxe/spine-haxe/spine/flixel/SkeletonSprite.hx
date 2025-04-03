@@ -116,9 +116,9 @@ class SkeletonSprite extends FlxObject
 
 	override public function destroy():Void
 	{
-		skeleton = null;
+		state.clearListeners();
 		state = null;
-		stateData = null;
+		skeleton = null;
 
 		_tempVertices = null;
 		_quadTriangles = null;
