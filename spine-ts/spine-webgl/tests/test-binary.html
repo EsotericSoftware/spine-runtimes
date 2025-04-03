@@ -98,7 +98,7 @@
 	function render() {
 		var start = Date.now()
 		timeKeeper.update();
-		var delta = 0.016; // timeKeeper.delta;
+		var delta = timeKeeper.delta;
 
 		for (var i = 0; i < skeletons.length; i++) {
 			var state = skeletons[i].state;

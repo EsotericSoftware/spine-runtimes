@@ -178,13 +178,13 @@ VertexOutput vert(appdata v) {
 			GetWorldSpaceNormalizeViewDir(positionWS),
 			o.pos.xy,
 			ignoredProbeOcclusion,
-			shadowMask);
+			shadowMask) * v.color.a;
 	#else // _ADAPTIVE_PROBE_VOLUMES_PER_PIXEL
 		half3 bakedGI = half3(0.0, 0.0, 0.0);
 		o.positionCS = o.pos;
 	#endif
 #else
-	half3 bakedGI = SAMPLE_GI(v.lightmapUV, vertexSH, normalWS);
+	half3 bakedGI = SAMPLE_GI(v.lightmapUV, vertexSH, normalWS) * v.color.a;
 #endif
 	color.rgb += bakedGI;
 	o.color = color;
@@ -223,7 +223,7 @@ half4 frag(VertexOutput i
 		GetWorldSpaceNormalizeViewDir(i.positionWS),
 		i.positionCS.xy,
 		ignoredProbeOcclusion,
-		shadowMask);
+		shadowMask) * i.color.a;
 	i.color.rgb += bakedGI;
 #endif
 
