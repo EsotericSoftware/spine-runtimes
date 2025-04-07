@@ -43,9 +43,9 @@ typedef enum SpineTextureIndex {
 } SpineTextureIndex;
 
 typedef struct {
-    vector_float2 position;
-    vector_float4 color;
-    vector_float2 uv;
+    simd_float2 position;
+    simd_float4 color;
+    simd_float2 uv;
 } SpineVertex;
 
 typedef struct {

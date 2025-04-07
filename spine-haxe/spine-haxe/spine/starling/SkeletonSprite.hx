@@ -416,4 +416,17 @@ class SkeletonSprite extends DisplayObject implements IAnimatable {
 			bone.worldToLocal(point);
 		}
 	}
+
+	override public function dispose():Void {
+		if (_state != null) {
+			_state.clearListeners();
+			_state = null;
+		}
+		if (_skeleton != null) _skeleton = null;
+		dispatchEventWith(starling.events.Event.REMOVE_FROM_JUGGLER);
+		removeFromParent();
+
+		// this will remove also all starling event listeners
+		super.dispose();
+	}
 }

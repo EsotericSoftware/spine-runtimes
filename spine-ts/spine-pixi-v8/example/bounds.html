@@ -1,0 +1,115 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>spine-pixi-v8</title>
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@8.4.1/dist/pixi.min.js"></script>
+    <script src="../dist/iife/spine-pixi-v8.js"></script>
+    <link rel="stylesheet" href="../../index.css">
+  </head>
+
+  <body>
+    <script>
+      (async function () {
+
+        var app = new PIXI.Application();
+        await app.init({
+          width: window.innerWidth,
+          height: window.innerHeight,
+          resolution: window.devicePixelRatio || 1,
+          autoDensity: true,
+          resizeTo: window,
+          backgroundColor: 0x2c3e50,
+          hello: true,
+        })
+        document.body.appendChild(app.view);
+
+        // Pre-load the skeleton data and atlas. You can also load .json skeleton data.
+        PIXI.Assets.add({alias: "spineboyData", src: "./assets/spineboy-pro.skel"});
+        PIXI.Assets.add({alias: "spineboyAtlas", src: "./assets/spineboy-pma.atlas"});
+        await PIXI.Assets.load(["spineboyData", "spineboyAtlas"]);
+
+        // Create the spine display object
+        const spineboy1 = spine.Spine.from({skeleton: "spineboyData", atlas: "spineboyAtlas", scale: .2 });
+
+        const spineboy2 = spine.Spine.from({skeleton: "spineboyData", atlas: "spineboyAtlas", scale: .2,
+          boundsProvider: new spine.SetupPoseBoundsProvider(),
+        });
+
+        const spineboy3 = spine.Spine.from({skeleton: "spineboyData", atlas: "spineboyAtlas", scale: .2,
+          boundsProvider: new spine.SkinsAndAnimationBoundsProvider("portal", undefined, undefined, false),
+        });
+
+        const spineboy4 = spine.Spine.from({skeleton: "spineboyData", atlas: "spineboyAtlas", scale: .2,
+          boundsProvider: new spine.SkinsAndAnimationBoundsProvider("portal", undefined, undefined, true),
+        });
+
+        const spineboy5 = spine.Spine.from({skeleton: "spineboyData", atlas: "spineboyAtlas", scale: .2,
+          boundsProvider: new spine.AABBRectangleBoundsProvider(-100, -100, 100, 100),
+        });
+
+        const maxHeight = spineboy3.getBounds().height;
+        const scaleFactor = 1 / (maxHeight * 5 / window.innerHeight);
+        const scaledMaxHeight = maxHeight * scaleFactor;
+
+        const texts = [
+          "Default bounds: dynamic, recomputed when queried",
+          "Set up pose bound: fixed, based on setup pose",
+          "Skin and animations based bound: fixed, the max AABB rectangle containing the skeleton with the given skin and given animations (clipping is ignored)",
+          "Skin and animations based bound: same as above, but with clipping true. The bounds is smaller because clipped attachments' parts are not considered",
+          "AABB Rectangle bounds: fixed, manually provided bounds. The origin is in skeleton root and size are in skeleton space",
+        ]
+
+        const pointerOn = [];
+
+        const elements = [spineboy1, spineboy2, spineboy3, spineboy4, spineboy5].map((spineboy, i) => {
+
+          const x = 300 * scaleFactor;
+
+          // spineboy placement
+          spineboy.scale.set(scaleFactor);
+          spineboy.state.setAnimation(0, "portal", true);
+          spineboy.x = x;
+          spineboy.y = 70 * scaleFactor + (window.innerHeight / 10 * (1 + 2*i));
+          app.stage.addChild(spineboy);
+
+          // yellow rectangle to show bounds
+          const graphics = new PIXI.Graphics();
+          app.stage.addChild(graphics);
+
+          // text
+          const basicText = new PIXI.Text({
+            text: texts[i],
+            style: {
+              fontSize: 20 * scaleFactor,
+              fill: "white",
+              wordWrap: true,
+              wordWrapWidth: 400 * scaleFactor,
+            }
+          });
+          basicText.x = x + scaledMaxHeight + 0 * scaleFactor;
+          basicText.y = scaledMaxHeight * (i + .5);
+          basicText.anchor.set(0, 0.5);
+          app.stage.addChild(basicText);
+
+          // pointer events
+          spineboy.eventMode = "static";
+          spineboy.cursor = "pointer";
+          spineboy.on("pointerenter", () => pointerOn[i] = true);
+          spineboy.on("pointerleave", () => pointerOn[i] = false);
+
+          return [spineboy, graphics];
+        })
+
+        app.ticker.add((delta) => {
+          elements.forEach(([spineboy, graphic], i) => {
+            const bound = spineboy.getBounds();
+            graphic.clear().rect(bound.x, bound.y, bound.width, bound.height).stroke({ width: 2, color: 0xfeeb77 }).fill({ color: 0xff0000, alpha: pointerOn[i] ? .2 : 0 });
+          })
+        })
+
+
+
+      })();
+    </script>
+  </body>
+</html>

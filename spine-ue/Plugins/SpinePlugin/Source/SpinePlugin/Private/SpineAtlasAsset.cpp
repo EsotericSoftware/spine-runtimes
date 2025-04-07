@@ -56,8 +56,11 @@ void USpineAtlasAsset::PostInitProperties() {
 
 void USpineAtlasAsset::Serialize(FArchive &Ar) {
 	Super::Serialize(Ar);
-	if (Ar.IsLoading() && Ar.UEVer() < VER_UE4_ASSET_IMPORT_DATA_AS_JSON &&
-		!importData)
+#if ENGINE_MAJOR_VERSION == 4 && ENGINE_MINOR_VERSION <= 27
+	if (Ar.IsLoading() && Ar.UE4Ver() < VER_UE4_ASSET_IMPORT_DATA_AS_JSON && !importData)
+#else
+	if (Ar.IsLoading() && Ar.UEVer() < VER_UE4_ASSET_IMPORT_DATA_AS_JSON && !importData)
+#endif
 		importData = NewObject<UAssetImportData>(this, TEXT("AssetImportData"));
 }
 

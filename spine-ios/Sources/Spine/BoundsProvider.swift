@@ -88,7 +88,7 @@ public final class SkinAndAnimationBounds: NSObject, BoundsProvider {
     /// the bounding box of the skeleton. If no skins are given, the default skin is used.
     /// The `stepTime`, given in seconds, defines at what interval the bounds should be sampled
     /// across the entire animation.
-    public init(animation: String? = nil, skins: [String]? = nil, let stepTime: TimeInterval = 0.1) {
+    public init(animation: String? = nil, skins: [String]? = nil, stepTime: TimeInterval = 0.1) {
         self.animation = animation
         if let skins, !skins.isEmpty {
             self.skins = skins

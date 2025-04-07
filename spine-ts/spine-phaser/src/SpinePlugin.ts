@@ -122,22 +122,42 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 		};
 		pluginManager.registerFileType("spineAtlas", atlasFileCallback, scene);
 
-		let self = this;
 		let addSpineGameObject = function (this: Phaser.GameObjects.GameObjectFactory, x: number, y: number, dataKey: string, atlasKey: string, boundsProvider: SpineGameObjectBoundsProvider) {
-			let gameObject = new SpineGameObject(this.scene, self, x, y, dataKey, atlasKey, boundsProvider);
+			if (this.scene.sys.renderer instanceof Phaser.Renderer.WebGL.WebGLRenderer) {
+				this.scene.sys.renderer.pipelines.clear();
+			}
+
+			const spinePlugin = (this.scene.sys as any)[pluginKey] as SpinePlugin;
+			let gameObject = new SpineGameObject(this.scene, spinePlugin, x, y, dataKey, atlasKey, boundsProvider);
 			this.displayList.add(gameObject);
 			this.updateList.add(gameObject);
+
+			if (this.scene.sys.renderer instanceof Phaser.Renderer.WebGL.WebGLRenderer) {
+				this.scene.sys.renderer.pipelines.rebind();
+			}
+
 			return gameObject;
 		};
 
 		let makeSpineGameObject = function (this: Phaser.GameObjects.GameObjectFactory, config: SpineGameObjectConfig, addToScene: boolean = false) {
+			if (this.scene.sys.renderer instanceof Phaser.Renderer.WebGL.WebGLRenderer) {
+				this.scene.sys.renderer.pipelines.clear();
+			}
+
 			let x = config.x ? config.x : 0;
 			let y = config.y ? config.y : 0;
 			let boundsProvider = config.boundsProvider ? config.boundsProvider : undefined;
-			let gameObject = new SpineGameObject(this.scene, self, x, y, config.dataKey, config.atlasKey, boundsProvider);
+
+			const spinePlugin = (this.scene.sys as any)[pluginKey] as SpinePlugin;
+			let gameObject = new SpineGameObject(this.scene, spinePlugin, x, y, config.dataKey, config.atlasKey, boundsProvider);
 			if (addToScene !== undefined) {
 				config.add = addToScene;
 			}
+
+			if (this.scene.sys.renderer instanceof Phaser.Renderer.WebGL.WebGLRenderer) {
+				this.scene.sys.renderer.pipelines.rebind();
+			}
+
 			return Phaser.GameObjects.BuildGameObject(this.scene, gameObject, config);
 		}
 		pluginManager.registerGameObject((window as any).SPINE_GAME_OBJECT_TYPE ? (window as any).SPINE_GAME_OBJECT_TYPE : SPINE_GAME_OBJECT_TYPE, addSpineGameObject, makeSpineGameObject);

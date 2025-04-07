@@ -108,10 +108,9 @@ public class MeshAttachment extends VertexAttachment implements HasTextureRegion
 		float[] uvs = this.uvs;
 		int n = uvs.length;
 		float u, v, width, height;
-		if (region instanceof AtlasRegion) {
+		if (region instanceof AtlasRegion region) {
 			u = region.getU();
 			v = region.getV();
-			AtlasRegion region = (AtlasRegion)this.region;
 			float textureWidth = region.getTexture().getWidth(), textureHeight = region.getTexture().getHeight();
 			switch (region.degrees) {
 			case 90:
@@ -281,7 +280,7 @@ public class MeshAttachment extends VertexAttachment implements HasTextureRegion
 
 	/** Returns a new mesh with the {@link #parentMesh} set to this mesh's parent mesh, if any, else to this mesh. */
 	public MeshAttachment newLinkedMesh () {
-		MeshAttachment mesh = new MeshAttachment(name);
+		var mesh = new MeshAttachment(name);
 		mesh.timelineAttachment = timelineAttachment;
 		mesh.region = region;
 		mesh.path = path;

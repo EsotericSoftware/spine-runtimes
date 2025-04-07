@@ -60,7 +60,7 @@ public class Skin {
 	/** Adds an attachment to the skin for the specified slot index and name. */
 	public void setAttachment (int slotIndex, String name, Attachment attachment) {
 		if (attachment == null) throw new IllegalArgumentException("attachment cannot be null.");
-		SkinEntry entry = new SkinEntry(slotIndex, name, attachment);
+		var entry = new SkinEntry(slotIndex, name, attachment);
 		if (!attachments.add(entry)) attachments.get(entry).attachment = attachment;
 	}
 
@@ -90,8 +90,8 @@ public class Skin {
 			if (!constraints.contains(data, true)) constraints.add(data);
 
 		for (SkinEntry entry : skin.attachments.orderedItems()) {
-			if (entry.attachment instanceof MeshAttachment)
-				setAttachment(entry.slotIndex, entry.name, ((MeshAttachment)entry.attachment).newLinkedMesh());
+			if (entry.attachment instanceof MeshAttachment mesh)
+				setAttachment(entry.slotIndex, entry.name, mesh.newLinkedMesh());
 			else
 				setAttachment(entry.slotIndex, entry.name, entry.attachment != null ? entry.attachment.copy() : null);
 		}
@@ -157,7 +157,7 @@ public class Skin {
 		Object[] slots = skeleton.slots.items;
 		for (SkinEntry entry : oldSkin.attachments.orderedItems()) {
 			int slotIndex = entry.slotIndex;
-			Slot slot = (Slot)slots[slotIndex];
+			var slot = (Slot)slots[slotIndex];
 			if (slot.attachment == entry.attachment) {
 				Attachment attachment = getAttachment(slotIndex, entry.name);
 				if (attachment != null) slot.setAttachment(attachment);
@@ -204,7 +204,7 @@ public class Skin {
 
 		public boolean equals (Object object) {
 			if (object == null) return false;
-			SkinEntry other = (SkinEntry)object;
+			var other = (SkinEntry)object;
 			if (slotIndex != other.slotIndex) return false;
 			return name.equals(other.name);
 		}

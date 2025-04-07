@@ -67,7 +67,7 @@ public class AnimationStateData {
 	public void setMix (Animation from, Animation to, float duration) {
 		if (from == null) throw new IllegalArgumentException("from cannot be null.");
 		if (to == null) throw new IllegalArgumentException("to cannot be null.");
-		Key key = new Key();
+		var key = new Key();
 		key.a1 = from;
 		key.a2 = to;
 		animationToMixTime.put(key, duration);
@@ -102,7 +102,7 @@ public class AnimationStateData {
 		public boolean equals (Object obj) {
 			if (this == obj) return true;
 			if (obj == null) return false;
-			Key other = (Key)obj;
+			var other = (Key)obj;
 			if (a1 == null) {
 				if (other.a1 != null) return false;
 			} else if (!a1.equals(other.a1)) return false;

@@ -99,8 +99,7 @@ public class RegionAttachment extends Attachment implements HasTextureRegion {
 		float localX = -localX2;
 		float localY = -localY2;
 		boolean rotated = false;
-		if (region instanceof AtlasRegion) {
-			AtlasRegion region = (AtlasRegion)this.region;
+		if (region instanceof AtlasRegion region) {
 			localX += region.offsetX / region.originalWidth * width;
 			localY += region.offsetY / region.originalHeight * height;
 			if (region.degrees == 90) {

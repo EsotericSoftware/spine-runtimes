@@ -39,13 +39,8 @@ import { MathUtils } from "./Utils.js";
  * See <a href="https://esotericsoftware.com/spine-physics-constraints">Physics constraints</a> in the Spine User Guide. */
 export class PhysicsConstraint implements Updatable {
 	readonly data: PhysicsConstraintData;
-	private _bone: Bone | null = null;
-	/** The bone constrained by this physics constraint. */
-	public set bone (bone: Bone) { this._bone = bone; }
-	public get bone () {
-		if (!this._bone) throw new Error("Bone not set.")
-		else return this._bone;
-	}
+	bone: Bone;
+
 	inertia = 0;
 	strength = 0;
 	damping = 0;
@@ -80,6 +75,8 @@ export class PhysicsConstraint implements Updatable {
 		this.data = data;
 		this.skeleton = skeleton;
 
+		let bone = skeleton.findBone(data.bone.name);
+		if (!bone) throw new Error(`Couldn't find bone ${data.bone.name}.`);
 		this.bone = skeleton.bones[data.bone.index];
 
 		this.inertia = data.inertia;
@@ -163,7 +160,7 @@ export class PhysicsConstraint implements Updatable {
 						}
 						if (a >= t) {
 							d = Math.pow(this.damping, 60 * t);
-							const m = this.massInverse * t, e = this.strength, w = this.wind * f, g = (Skeleton.yDown ? -this.gravity : this.gravity) * f;
+							const m = this.massInverse * t, e = this.strength, w = this.wind * f * skeleton.scaleX, g = this.gravity * f * skeleton.scaleY;
 							do {
 								if (x) {
 									this.xVelocity += (w - this.xOffset * e) * m;

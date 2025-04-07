@@ -186,7 +186,7 @@ public class Animation {
 	}
 
 	/** The base class for all timelines. */
-	static public abstract class Timeline {
+	static abstract public class Timeline {
 		private final String[] propertyIds;
 		final float[] frames;
 
@@ -277,7 +277,7 @@ public class Animation {
 	}
 
 	/** The base class for timelines that interpolate between frame values using stepped, linear, or a Bezier curve. */
-	static public abstract class CurveTimeline extends Timeline {
+	static abstract public class CurveTimeline extends Timeline {
 		static public final int LINEAR = 0, STEPPED = 1, BEZIER = 2, BEZIER_SIZE = 18;
 
 		float[] curves;
@@ -314,7 +314,7 @@ public class Animation {
 		public void shrink (int bezierCount) {
 			int size = getFrameCount() + bezierCount * BEZIER_SIZE;
 			if (curves.length > size) {
-				float[] newCurves = new float[size];
+				var newCurves = new float[size];
 				arraycopy(curves, 0, newCurves, 0, size);
 				curves = newCurves;
 			}
@@ -380,7 +380,7 @@ public class Animation {
 	}
 
 	/** The base class for a {@link CurveTimeline} that sets one property. */
-	static public abstract class CurveTimeline1 extends CurveTimeline {
+	static abstract public class CurveTimeline1 extends CurveTimeline {
 		static public final int ENTRIES = 2;
 		static final int VALUE = 1;
 
@@ -517,7 +517,7 @@ public class Animation {
 	}
 
 	/** The base class for a {@link CurveTimeline} which sets two properties. */
-	static public abstract class CurveTimeline2 extends CurveTimeline {
+	static abstract public class CurveTimeline2 extends CurveTimeline {
 		static public final int ENTRIES = 3;
 		static final int VALUE1 = 1, VALUE2 = 2;
 
@@ -1639,10 +1639,8 @@ public class Animation {
 			MixDirection direction) {
 
 			Slot slot = skeleton.slots.get(slotIndex);
-			if (!slot.bone.active) return;
-			Attachment slotAttachment = slot.attachment;
-			if (!(slotAttachment instanceof VertexAttachment)
-				|| ((VertexAttachment)slotAttachment).getTimelineAttachment() != attachment) return;
+			if (!slot.bone.active || !(slot.attachment instanceof VertexAttachment vertexAttachment)
+				|| vertexAttachment.getTimelineAttachment() != attachment) return;
 
 			FloatArray deformArray = slot.deform;
 			if (deformArray.size == 0) blend = setup;
@@ -1662,7 +1660,6 @@ public class Animation {
 						return;
 					}
 					float[] deform = deformArray.setSize(vertexCount);
-					VertexAttachment vertexAttachment = (VertexAttachment)slotAttachment;
 					if (vertexAttachment.getBones() == null) {
 						// Unweighted vertex positions.
 						float[] setupVertices = vertexAttachment.getVertices();
@@ -1684,7 +1681,6 @@ public class Animation {
 				float[] lastVertices = vertices[frames.length - 1];
 				if (alpha == 1) {
 					if (blend == add) {
-						VertexAttachment vertexAttachment = (VertexAttachment)slotAttachment;
 						if (vertexAttachment.getBones() == null) {
 							// Unweighted vertex positions, no alpha.
 							float[] setupVertices = vertexAttachment.getVertices();
@@ -1702,7 +1698,6 @@ public class Animation {
 				} else {
 					switch (blend) {
 					case setup: {
-						VertexAttachment vertexAttachment = (VertexAttachment)slotAttachment;
 						if (vertexAttachment.getBones() == null) {
 							// Unweighted vertex positions, with alpha.
 							float[] setupVertices = vertexAttachment.getVertices();
@@ -1724,7 +1719,6 @@ public class Animation {
 							deform[i] += (lastVertices[i] - deform[i]) * alpha;
 						break;
 					case add:
-						VertexAttachment vertexAttachment = (VertexAttachment)slotAttachment;
 						if (vertexAttachment.getBones() == null) {
 							// Unweighted vertex positions, no alpha.
 							float[] setupVertices = vertexAttachment.getVertices();
@@ -1747,7 +1741,6 @@ public class Animation {
 
 			if (alpha == 1) {
 				if (blend == add) {
-					VertexAttachment vertexAttachment = (VertexAttachment)slotAttachment;
 					if (vertexAttachment.getBones() == null) {
 						// Unweighted vertex positions, no alpha.
 						float[] setupVertices = vertexAttachment.getVertices();
@@ -1772,7 +1765,6 @@ public class Animation {
 			} else {
 				switch (blend) {
 				case setup: {
-					VertexAttachment vertexAttachment = (VertexAttachment)slotAttachment;
 					if (vertexAttachment.getBones() == null) {
 						// Unweighted vertex positions, with alpha.
 						float[] setupVertices = vertexAttachment.getVertices();
@@ -1798,7 +1790,6 @@ public class Animation {
 					}
 					break;
 				case add:
-					VertexAttachment vertexAttachment = (VertexAttachment)slotAttachment;
 					if (vertexAttachment.getBones() == null) {
 						// Unweighted vertex positions, with alpha.
 						float[] setupVertices = vertexAttachment.getVertices();
@@ -2307,7 +2298,7 @@ public class Animation {
 	}
 
 	/** The base class for most {@link PhysicsConstraint} timelines. */
-	static public abstract class PhysicsConstraintTimeline extends CurveTimeline1 {
+	static abstract public class PhysicsConstraintTimeline extends CurveTimeline1 {
 		final int constraintIndex;
 
 		/** @param physicsConstraintIndex -1 for all physics constraints in the skeleton. */
@@ -2616,8 +2607,8 @@ public class Animation {
 			if (!slot.bone.active) return;
 			Attachment slotAttachment = slot.attachment;
 			if (slotAttachment != attachment) {
-				if (!(slotAttachment instanceof VertexAttachment)
-					|| ((VertexAttachment)slotAttachment).getTimelineAttachment() != attachment) return;
+				if (!(slotAttachment instanceof VertexAttachment vertexAttachment)
+					|| vertexAttachment.getTimelineAttachment() != attachment) return;
 			}
 			Sequence sequence = ((HasTextureRegion)slotAttachment).getSequence();
 			if (sequence == null) return;

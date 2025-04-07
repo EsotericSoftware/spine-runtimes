@@ -12,6 +12,10 @@
 #define SKELETONLIT_RECEIVE_SHADOWS
 #endif
 
+#if !defined(DYNAMICLIGHTMAP_ON) && !defined(LIGHTMAP_ON) && (defined(PROBE_VOLUMES_L1) || defined(PROBE_VOLUMES_L2))
+#define USE_ADAPTIVE_PROBE_VOLUMES
+#endif
+
 struct appdata {
 	float3 pos : POSITION;
 	float3 normal : NORMAL;
@@ -39,6 +43,9 @@ struct VertexOutput {
 #endif
 #if defined(_TINT_BLACK_ON)
 	float3 darkColor : TEXCOORD5;
+#endif
+#if defined(USE_ADAPTIVE_PROBE_VOLUMES) && defined(_ADAPTIVE_PROBE_VOLUMES_PER_PIXEL)
+	float3 positionCS : TEXCOORD6;
 #endif
 	UNITY_VERTEX_OUTPUT_STEREO
 };
@@ -147,10 +154,10 @@ VertexOutput vert(appdata v) {
 
 	// Note: ambient light is also handled via SH.
 	half3 vertexSH;
+	float4 ignoredProbeOcclusion;
 #if IS_URP_15_OR_NEWER
 	#ifdef OUTPUT_SH4
 		#if IS_URP_17_OR_NEWER
-			float4 ignoredProbeOcclusion;
 			OUTPUT_SH4(positionWS, normalWS.xyz, GetWorldSpaceNormalizeViewDir(positionWS), vertexSH, ignoredProbeOcclusion);
 		#else // 15 or newer
 			OUTPUT_SH4(positionWS, normalWS.xyz, GetWorldSpaceNormalizeViewDir(positionWS), vertexSH);
@@ -161,7 +168,24 @@ VertexOutput vert(appdata v) {
 #else
 	OUTPUT_SH(normalWS.xyz, vertexSH);
 #endif
-	half3 bakedGI = SAMPLE_GI(v.lightmapUV, vertexSH, normalWS);
+
+#if defined(USE_ADAPTIVE_PROBE_VOLUMES)
+	#if !defined(_ADAPTIVE_PROBE_VOLUMES_PER_PIXEL)
+		half4 shadowMask = 1.0;
+		half3 bakedGI = SAMPLE_GI(vertexSH,
+			GetAbsolutePositionWS(positionWS),
+			normalWS.xyz,
+			GetWorldSpaceNormalizeViewDir(positionWS),
+			o.pos.xy,
+			ignoredProbeOcclusion,
+			shadowMask) * v.color.a;
+	#else // _ADAPTIVE_PROBE_VOLUMES_PER_PIXEL
+		half3 bakedGI = half3(0.0, 0.0, 0.0);
+		o.positionCS = o.pos;
+	#endif
+#else
+	half3 bakedGI = SAMPLE_GI(v.lightmapUV, vertexSH, normalWS) * v.color.a;
+#endif
 	color.rgb += bakedGI;
 	o.color = color;
 
@@ -186,6 +210,21 @@ half4 frag(VertexOutput i
 	half4 tex = tex2D(_MainTex, i.uv0);
 #if !defined(_TINT_BLACK_ON) && defined(_STRAIGHT_ALPHA_INPUT)
 	tex.rgb *= tex.a;
+#endif
+
+#if defined(USE_ADAPTIVE_PROBE_VOLUMES) && defined(_ADAPTIVE_PROBE_VOLUMES_PER_PIXEL)
+	half3 vertexSH;
+	float4 ignoredProbeOcclusion;
+	OUTPUT_SH4(i.positionWS, i.normalWS.xyz, GetWorldSpaceNormalizeViewDir(i.positionWS), vertexSH, ignoredProbeOcclusion);
+	half4 shadowMask = 1.0;
+	half3 bakedGI = SAMPLE_GI(vertexSH,
+		GetAbsolutePositionWS(i.positionWS),
+		i.normalWS.xyz,
+		GetWorldSpaceNormalizeViewDir(i.positionWS),
+		i.positionCS.xy,
+		ignoredProbeOcclusion,
+		shadowMask) * i.color.a;
+	i.color.rgb += bakedGI;
 #endif
 
 	if (i.color.a == 0)	{

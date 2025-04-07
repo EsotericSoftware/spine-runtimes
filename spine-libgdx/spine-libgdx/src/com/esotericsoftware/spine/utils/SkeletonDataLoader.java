@@ -82,11 +82,11 @@ public class SkeletonDataLoader extends AsynchronousAssetLoader<SkeletonData, Sk
 			attachmentLoader = new AtlasAttachmentLoader(manager.get(file.pathWithoutExtension() + ".atlas", TextureAtlas.class));
 
 		if (file.extension().equalsIgnoreCase("skel")) {
-			SkeletonBinary skeletonBinary = new SkeletonBinary(attachmentLoader);
+			var skeletonBinary = new SkeletonBinary(attachmentLoader);
 			skeletonBinary.setScale(scale);
 			skeletonData = skeletonBinary.readSkeletonData(file);
 		} else {
-			SkeletonJson skeletonJson = new SkeletonJson(attachmentLoader);
+			var skeletonJson = new SkeletonJson(attachmentLoader);
 			skeletonJson.setScale(scale);
 			skeletonData = skeletonJson.readSkeletonData(file);
 		}
@@ -101,7 +101,7 @@ public class SkeletonDataLoader extends AsynchronousAssetLoader<SkeletonData, Sk
 	public Array<AssetDescriptor> getDependencies (String fileName, FileHandle file, @Null SkeletonDataParameter parameter) {
 		if (parameter == null) return null;
 		if (parameter.attachmentLoader != null) return null;
-		Array<AssetDescriptor> dependencies = new Array();
+		var dependencies = new Array<AssetDescriptor>();
 		dependencies.add(new AssetDescriptor(parameter.atlasName, TextureAtlas.class));
 		return dependencies;
 	}

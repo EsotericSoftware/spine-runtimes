@@ -1341,9 +1341,9 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 	} else {
 		if (!string_starts_with(skeletonData->version, SPINE_VERSION_STRING)) {
 			FREE(input);
-			spSkeletonData_dispose(skeletonData);
 			char errorMsg[255];
 			snprintf(errorMsg, 255, "Skeleton version %s does not match runtime version %s", skeletonData->version, SPINE_VERSION_STRING);
+			spSkeletonData_dispose(skeletonData);
 			_spSkeletonBinary_setError(self, errorMsg, NULL);
 			return NULL;
 		}

@@ -736,8 +736,7 @@ namespace Spine {
 				}
 
 				if (vertices != null) {
-					if (clipper != null && clipper.IsClipping) {
-						clipper.ClipTriangles(vertices, triangles, triangles.Length);
+					if (clipper != null && clipper.IsClipping && clipper.ClipTriangles(vertices, triangles, triangles.Length)) {
 						vertices = clipper.ClippedVertices.Items;
 						verticesLength = clipper.ClippedVertices.Count;
 					}

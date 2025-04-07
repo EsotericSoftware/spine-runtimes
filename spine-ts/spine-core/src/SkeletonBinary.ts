@@ -42,7 +42,7 @@ import { PhysicsConstraintData } from "./PhysicsConstraintData.js";
 import { SkeletonData } from "./SkeletonData.js";
 import { Skin } from "./Skin.js";
 import { SlotData } from "./SlotData.js";
-import { TransformConstraintData } from "./TransformConstraintData.js";
+import { FromProperty, FromRotate, FromScaleX, FromScaleY, FromShearY, FromX, FromY, ToProperty, ToRotate, ToScaleX, ToScaleY, ToShearY, ToX, ToY, TransformConstraintData } from "./TransformConstraintData.js";
 import { Color, Utils } from "./Utils.js";
 
 /** Loads skeleton data in the Spine binary format.
@@ -173,24 +173,61 @@ export class SkeletonBinary {
 			nn = input.readInt(true);
 			for (let ii = 0; ii < nn; ii++)
 				data.bones.push(skeletonData.bones[input.readInt(true)]);
-			data.target = skeletonData.bones[input.readInt(true)];
-			let flags = input.readByte();
+			data.source = skeletonData.bones[input.readInt(true)];
+			let flags = input.readUnsignedByte();
 			data.skinRequired = (flags & 1) != 0;
-			data.local = (flags & 2) != 0;
-			data.relative = (flags & 4) != 0;
-			if ((flags & 8) != 0) data.offsetRotation = input.readFloat();
-			if ((flags & 16) != 0) data.offsetX = input.readFloat() * scale;
-			if ((flags & 32) != 0) data.offsetY = input.readFloat() * scale;
-			if ((flags & 64) != 0) data.offsetScaleX = input.readFloat();
-			if ((flags & 128) != 0) data.offsetScaleY = input.readFloat();
+			data.localSource = (flags & 2) != 0;
+			data.localTarget = (flags & 4) != 0;
+			data.additive = (flags & 8) != 0;
+			data.clamp = (flags & 16) != 0;
+
+			nn = flags >> 5;
+			for (let ii = 0, tn; ii < nn; ii++) {
+				let from: FromProperty | null;
+				let type = input.readByte();
+				switch (type) {
+					case 0: from = new FromRotate(); break;
+					case 1: from = new FromX(); break;
+					case 2: from = new FromY(); break;
+					case 3: from = new FromScaleX(); break;
+					case 4: from = new FromScaleY(); break;
+					case 5: from = new FromShearY(); break;
+					default: from = null;
+				}
+				if (!from) continue;
+				from.offset = input.readFloat() * scale;
+				tn = input.readByte();
+				for (let t = 0; t < tn; t++) {
+					let to: ToProperty | null;
+					type = input.readByte();
+					switch (type) {
+						case 0: to = new ToRotate(); break;
+						case 1: to = new ToX(); break;
+						case 2: to = new ToY(); break;
+						case 3: to = new ToScaleX(); break;
+						case 4: to = new ToScaleY(); break;
+						case 5: to = new ToShearY(); break;
+						default: to = null;
+					}
+					if (!to) continue;
+					to.offset = input.readFloat() * scale;
+					to.max = input.readFloat() * scale;
+					to.scale = input.readFloat();
+					from.to[t] = to;
+				}
+				data.properties[ii] = from;
+			}
+
 			flags = input.readByte();
-			if ((flags & 1) != 0) data.offsetShearY = input.readFloat();
-			if ((flags & 2) != 0) data.mixRotate = input.readFloat();
-			if ((flags & 4) != 0) data.mixX = input.readFloat();
-			if ((flags & 8) != 0) data.mixY = input.readFloat();
-			if ((flags & 16) != 0) data.mixScaleX = input.readFloat();
-			if ((flags & 32) != 0) data.mixScaleY = input.readFloat();
-			if ((flags & 64) != 0) data.mixShearY = input.readFloat();
+			if ((flags & 1) != 0) data.offsetX = input.readFloat();
+			if ((flags & 2) != 0) data.offsetY = input.readFloat();
+			if ((flags & 4) != 0) data.mixRotate = input.readFloat();
+			if ((flags & 8) != 0) data.mixX = input.readFloat();
+			if ((flags & 16) != 0) data.mixY = input.readFloat();
+			if ((flags & 32) != 0) data.mixScaleX = input.readFloat();
+			if ((flags & 64) != 0) data.mixScaleY = input.readFloat();
+			if ((flags & 128) != 0) data.mixShearY = input.readFloat();
+
 			skeletonData.transformConstraints.push(data);
 		}
 
@@ -205,7 +242,7 @@ export class SkeletonBinary {
 			nn = input.readInt(true);
 			for (let ii = 0; ii < nn; ii++)
 				data.bones.push(skeletonData.bones[input.readInt(true)]);
-			data.target = skeletonData.slots[input.readInt(true)];
+			data.slot = skeletonData.slots[input.readInt(true)];
 			const flags = input.readByte();
 			data.positionMode = flags & 1;
 			data.spacingMode = (flags >> 1) & 3;
@@ -972,6 +1009,8 @@ export class SkeletonBinary {
 						break;
 					case PHYSICS_MIX:
 						timelines.push(readTimeline1(input, new PhysicsConstraintMixTimeline(frameCount, bezierCount, index), 1));
+					default:
+						throw new Error("Unknown physics timeline type.");
 				}
 			}
 		}

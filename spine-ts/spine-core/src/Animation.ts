@@ -1421,10 +1421,9 @@ export class DeformTimeline extends CurveTimeline implements SlotTimeline {
 
 	apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 		let slot: Slot = skeleton.slots[this.slotIndex];
-		if (!slot.bone.active) return;
-		let slotAttachment: Attachment | null = slot.getAttachment();
-		if (!slotAttachment) return;
-		if (!(slotAttachment instanceof VertexAttachment) || (<VertexAttachment>slotAttachment).timelineAttachment != this.attachment) return;
+		if (!slot.bone.active || !(slot.attachment instanceof VertexAttachment)) return;
+		let vertexAttachment = slot.attachment;
+		if (vertexAttachment.timelineAttachment != this.attachment) return;
 
 		let deform: Array<number> = slot.deform;
 		if (deform.length == 0) blend = MixBlend.setup;
@@ -1444,7 +1443,6 @@ export class DeformTimeline extends CurveTimeline implements SlotTimeline {
 						return;
 					}
 					deform.length = vertexCount;
-					let vertexAttachment = <VertexAttachment>slotAttachment;
 					if (!vertexAttachment.bones) {
 						// Unweighted vertex positions.
 						let setupVertices = vertexAttachment.vertices;
@@ -1465,7 +1463,6 @@ export class DeformTimeline extends CurveTimeline implements SlotTimeline {
 			let lastVertices = vertices[frames.length - 1];
 			if (alpha == 1) {
 				if (blend == MixBlend.add) {
-					let vertexAttachment = slotAttachment as VertexAttachment;
 					if (!vertexAttachment.bones) {
 						// Unweighted vertex positions, with alpha.
 						let setupVertices = vertexAttachment.vertices;
@@ -1481,7 +1478,6 @@ export class DeformTimeline extends CurveTimeline implements SlotTimeline {
 			} else {
 				switch (blend) {
 					case MixBlend.setup: {
-						let vertexAttachment = slotAttachment as VertexAttachment;
 						if (!vertexAttachment.bones) {
 							// Unweighted vertex positions, with alpha.
 							let setupVertices = vertexAttachment.vertices;
@@ -1502,7 +1498,6 @@ export class DeformTimeline extends CurveTimeline implements SlotTimeline {
 							deform[i] += (lastVertices[i] - deform[i]) * alpha;
 						break;
 					case MixBlend.add:
-						let vertexAttachment = slotAttachment as VertexAttachment;
 						if (!vertexAttachment.bones) {
 							// Unweighted vertex positions, with alpha.
 							let setupVertices = vertexAttachment.vertices;
@@ -1526,7 +1521,6 @@ export class DeformTimeline extends CurveTimeline implements SlotTimeline {
 
 		if (alpha == 1) {
 			if (blend == MixBlend.add) {
-				let vertexAttachment = slotAttachment as VertexAttachment;
 				if (!vertexAttachment.bones) {
 					// Unweighted vertex positions, with alpha.
 					let setupVertices = vertexAttachment.vertices;
@@ -1550,7 +1544,6 @@ export class DeformTimeline extends CurveTimeline implements SlotTimeline {
 		} else {
 			switch (blend) {
 				case MixBlend.setup: {
-					let vertexAttachment = slotAttachment as VertexAttachment;
 					if (!vertexAttachment.bones) {
 						// Unweighted vertex positions, with alpha.
 						let setupVertices = vertexAttachment.vertices;
@@ -1575,7 +1568,6 @@ export class DeformTimeline extends CurveTimeline implements SlotTimeline {
 					}
 					break;
 				case MixBlend.add:
-					let vertexAttachment = slotAttachment as VertexAttachment;
 					if (!vertexAttachment.bones) {
 						// Unweighted vertex positions, with alpha.
 						let setupVertices = vertexAttachment.vertices;
@@ -2327,7 +2319,7 @@ export class SequenceTimeline extends Timeline implements SlotTimeline {
 		let attachment = this.attachment as unknown as Attachment;
 		if (slotAttachment != attachment) {
 			if (!(slotAttachment instanceof VertexAttachment)
-				|| (slotAttachment as VertexAttachment).timelineAttachment != attachment) return;
+				|| slotAttachment.timelineAttachment != attachment) return;
 		}
 
 		if (direction == MixDirection.mixOut) {

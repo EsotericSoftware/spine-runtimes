@@ -46,8 +46,13 @@ float4 computeOutlinePixel(sampler2D mainTexture, float2 mainTextureTexelSize,
 	float average = (pixelTop + pixelBottom + pixelLeft + pixelRight) * vertexColorAlpha / numSamples;
 #endif
 	float thresholdStart = ThresholdEnd * (1.0 - OutlineSmoothness);
-	float outlineAlpha = saturate(saturate((average - thresholdStart) / (ThresholdEnd - thresholdStart)) - pixelCenter);
-	outlineAlpha = pixelCenter > OutlineOpaqueAlpha ? 0 : outlineAlpha;
+	float outlineAlpha = saturate((average - thresholdStart) / (ThresholdEnd - thresholdStart));
+#if !_OUTLINE_FILL_INSIDE
+	outlineAlpha = saturate(outlineAlpha - pixelCenter);
+	outlineAlpha = pixelCenter > OutlineOpaqueAlpha ? 0.0 : outlineAlpha;
+#else
+	outlineAlpha = pixelCenter > OutlineOpaqueAlpha ? 1.0 : outlineAlpha;
+#endif
 	return lerp(texColor, OutlineColor, outlineAlpha);
 }
 

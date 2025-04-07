@@ -55,6 +55,9 @@ pushd ..
 rm -rf godot-cpp
 git clone --depth 1 $godot_cpp_repo -b $godot_cpp_branch
 
+rm -rf example-v4-extension/bin
+mkdir -p example-v4-extension/bin
+
 if [ $dev == "true" ]; then
     echo "Dev build, creating godot-cpp/dev"
     touch godot-cpp/dev

@@ -114,7 +114,7 @@ abstract public class VertexAttachment extends Attachment {
 				int n = bones[v++];
 				n += v;
 				for (; v < n; v++, b += 3) {
-					Bone bone = (Bone)skeletonBones[bones[v]];
+					var bone = (Bone)skeletonBones[bones[v]];
 					float vx = vertices[b], vy = vertices[b + 1], weight = vertices[b + 2];
 					wx += (vx * bone.getA() + vy * bone.getB() + bone.getWorldX()) * weight;
 					wy += (vx * bone.getC() + vy * bone.getD() + bone.getWorldY()) * weight;
@@ -129,7 +129,7 @@ abstract public class VertexAttachment extends Attachment {
 				int n = bones[v++];
 				n += v;
 				for (; v < n; v++, b += 3, f += 2) {
-					Bone bone = (Bone)skeletonBones[bones[v]];
+					var bone = (Bone)skeletonBones[bones[v]];
 					float vx = vertices[b] + deform[f], vy = vertices[b + 1] + deform[f + 1], weight = vertices[b + 2];
 					wx += (vx * bone.getA() + vy * bone.getB() + bone.getWorldX()) * weight;
 					wy += (vx * bone.getC() + vy * bone.getD() + bone.getWorldY()) * weight;

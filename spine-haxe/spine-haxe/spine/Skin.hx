@@ -228,13 +228,15 @@ class Skin {
 			var slotAttachment:Attachment = slot.attachment;
 			if (slotAttachment != null && slotIndex < oldSkin.attachments.length) {
 				var dictionary:StringMap<Attachment> = oldSkin.attachments[slotIndex];
-				for (name in dictionary.keys()) {
-					var skinAttachment:Attachment = dictionary.get(name);
-					if (slotAttachment == skinAttachment) {
-						var attachment:Attachment = getAttachment(slotIndex, name);
-						if (attachment != null)
-							slot.attachment = attachment;
-						break;
+				if (null != dictionary) {
+					for (name in dictionary.keys()) {
+						var skinAttachment:Attachment = dictionary.get(name);
+						if (slotAttachment == skinAttachment) {
+							var attachment:Attachment = getAttachment(slotIndex, name);
+							if (attachment != null)
+								slot.attachment = attachment;
+							break;
+						}
 					}
 				}
 			}

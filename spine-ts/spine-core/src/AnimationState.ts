@@ -138,18 +138,16 @@ export class AnimationState {
 		from.animationLast = from.nextAnimationLast;
 		from.trackLast = from.nextTrackLast;
 
-		if (to.nextTrackLast != -1) { // The from entry was applied at least once.
-			const discard = to.mixTime == 0 && from.mixTime == 0; // Discard the from entry when neither have advanced yet.
-			if (to.mixTime >= to.mixDuration || discard) {
-				// Require totalAlpha == 0 to ensure mixing is complete or the transition is a single frame or discarded.
-				if (from.totalAlpha == 0 || to.mixDuration == 0 || discard) {
-					to.mixingFrom = from.mixingFrom;
-					if (from.mixingFrom != null) from.mixingFrom.mixingTo = to;
-					to.interruptAlpha = from.interruptAlpha;
-					this.queue.end(from);
-				}
-				return finished;
+		// The from entry was applied at least once and the mix is complete.
+		if (to.nextTrackLast != -1 && to.mixTime >= to.mixDuration) {
+			// Mixing is complete for all entries before the from entry or the mix is instantaneous.
+			if (from.totalAlpha == 0 || to.mixDuration == 0) {
+				to.mixingFrom = from.mixingFrom;
+				if (from.mixingFrom != null) from.mixingFrom.mixingTo = to;
+				to.interruptAlpha = from.interruptAlpha;
+				this.queue.end(from);
 			}
+			return finished;
 		}
 
 		from.trackTime += delta * from.timeScale;
@@ -566,7 +564,7 @@ export class AnimationState {
 		return this.addAnimationWith(trackIndex, animation, loop, delay);
 	}
 
-	/** Adds an animation to be played after the current or last queued animation for a track. If the track is empty, it is
+	/** Adds an animation to be played after the current or last queued animation for a track. If the track has no entries, this is
 	 * equivalent to calling {@link #setAnimationWith()}.
 	 * @param delay If > 0, sets {@link TrackEntry#delay}. If <= 0, the delay set is the duration of the previous track entry
 	 *           minus any mix duration (from the {@link AnimationStateData}) plus the specified `delay` (ie the mix
@@ -611,7 +609,10 @@ export class AnimationState {
 	 * {@link #addAnimation()} and on the returned track entry, set the
 	 * {@link TrackEntry#setMixDuration()}. Mixing from an empty animation causes the new animation to be applied more and
 	 * more over the mix duration. Properties keyed in the new animation transition from the value from lower tracks or from the
-	 * setup pose value if no lower tracks key the property to the value keyed in the new animation. */
+	 * setup pose value if no lower tracks key the property to the value keyed in the new animation.
+	 * <p>
+	 * See <a href='https://esotericsoftware.com/spine-applying-animations/#Empty-animations'>Empty animations</a> in the Spine
+	 * Runtimes Guide. */
 	setEmptyAnimation (trackIndex: number, mixDuration: number = 0) {
 		let entry = this.setAnimationWith(trackIndex, AnimationState.emptyAnimation(), false);
 		entry.mixDuration = mixDuration;
@@ -620,16 +621,18 @@ export class AnimationState {
 	}
 
 	/** Adds an empty animation to be played after the current or last queued animation for a track, and sets the track entry's
-	 * {@link TrackEntry#mixDuration}. If the track is empty, it is equivalent to calling
-	 * {@link #setEmptyAnimation()}.
-	 *
-	 * See {@link #setEmptyAnimation()}.
-	 * @param delay If > 0, sets {@link TrackEntry#delay}. If <= 0, the delay set is the duration of the previous track entry
-	 *           minus any mix duration plus the specified `delay` (ie the mix ends at (`delay` = 0) or
-	 *           before (`delay` < 0) the previous track entry duration). If the previous entry is looping, its next
+	 * {@link TrackEntry#getMixDuration()}. If the track has no entries, it is equivalent to calling
+	 * {@link #setEmptyAnimation(int, float)}.
+	 * <p>
+	 * See {@link #setEmptyAnimation(int, float)} and
+	 * <a href='https://esotericsoftware.com/spine-applying-animations/#Empty-animations'>Empty animations</a> in the Spine
+	 * Runtimes Guide.
+	 * @param delay If > 0, sets {@link TrackEntry#getDelay()}. If <= 0, the delay set is the duration of the previous track entry
+	 *           minus any mix duration plus the specified <code>delay</code> (ie the mix ends at (<code>delay</code> = 0) or
+	 *           before (<code>delay</code> < 0) the previous track entry duration). If the previous entry is looping, its next
 	 *           loop completion is used instead of its duration.
 	 * @return A track entry to allow further customization of animation playback. References to the track entry must not be kept
-	 *         after the {@link AnimationStateListener#dispose()} event occurs. */
+	 *         after the {@link AnimationStateListener#dispose(TrackEntry)} event occurs. */
 	addEmptyAnimation (trackIndex: number, mixDuration: number = 0, delay: number = 0) {
 		let entry = this.addAnimationWith(trackIndex, AnimationState.emptyAnimation(), false, delay);
 		if (delay <= 0) entry.delay += entry.mixDuration - mixDuration;
@@ -638,8 +641,10 @@ export class AnimationState {
 		return entry;
 	}
 
-	/** Sets an empty animation for every track, discarding any queued animations, and mixes to it over the specified mix
-	  * duration. */
+	/** Sets an empty animation for every track, discarding any queued animations, and mixes to it over the specified mix duration.
+	 * <p>
+	 * See <a href='https://esotericsoftware.com/spine-applying-animations/#Empty-animations'>Empty animations</a> in the Spine
+	 * Runtimes Guide. */
 	setEmptyAnimations (mixDuration: number = 0) {
 		let oldDrainDisabled = this.queue.drainDisabled;
 		this.queue.drainDisabled = true;
@@ -940,7 +945,7 @@ export class TrackEntry {
 	 *
 	 * The `mixDuration` can be set manually rather than use the value from
 	 * {@link AnimationStateData#getMix()}. In that case, the `mixDuration` can be set for a new
-	 * track entry only before {@link AnimationState#update(float)} is first called.
+	 * track entry only before {@link AnimationState#update(float)} is next called.
 	 *
 	 * When using {@link AnimationState#addAnimation()} with a `delay` <= 0, note the
 	 * {@link #delay} is set using the mix duration from the {@link AnimationStateData}, not a mix duration set
@@ -965,7 +970,7 @@ export class TrackEntry {
 	 * replaces the values from the lower tracks with the animation values. {@link MixBlend#add} adds the animation values to
 	 * the values from the lower tracks.
 	 *
-	 * The `mixBlend` can be set for a new track entry only before {@link AnimationState#apply()} is first
+	 * The `mixBlend` can be set for a new track entry only before {@link AnimationState#apply()} is next
 	 * called. */
 	mixBlend = MixBlend.replace;
 	timelineMode = new Array<number>();
@@ -1157,11 +1162,18 @@ export enum EventType {
 
 /** The interface to implement for receiving TrackEntry events. It is always safe to call AnimationState methods when receiving
  * events.
- *
+ * <p>
+ * TrackEntry events are collected during {@link AnimationState#update} and {@link AnimationState#apply} and
+ * fired only after those methods are finished.
+ * <p>
  * See TrackEntry {@link TrackEntry#listener} and AnimationState
- * {@link AnimationState#addListener()}. */
+ * {@link AnimationState#addListener}. */
 export interface AnimationStateListener {
-	/** Invoked when this entry has been set as the current entry. */
+	/** Invoked when this entry has been set as the current entry. {@link #end(TrackEntry)} will occur when this entry will no
+	 * longer be applied.
+	 * <p>
+	 * When this event is triggered by calling {@link AnimationState#setAnimation}, take care not to
+	 * call {@link AnimationState#update} until after the TrackEntry has been configured. */
 	start?: (entry: TrackEntry) => void;
 
 	/** Invoked when another entry has replaced this entry as the current entry. This entry may continue being applied for

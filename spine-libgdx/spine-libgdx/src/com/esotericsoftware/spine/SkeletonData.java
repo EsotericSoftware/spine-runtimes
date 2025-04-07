@@ -72,7 +72,7 @@ public class SkeletonData {
 		if (boneName == null) throw new IllegalArgumentException("boneName cannot be null.");
 		Object[] bones = this.bones.items;
 		for (int i = 0, n = this.bones.size; i < n; i++) {
-			BoneData bone = (BoneData)bones[i];
+			var bone = (BoneData)bones[i];
 			if (bone.name.equals(boneName)) return bone;
 		}
 		return null;
@@ -91,7 +91,7 @@ public class SkeletonData {
 		if (slotName == null) throw new IllegalArgumentException("slotName cannot be null.");
 		Object[] slots = this.slots.items;
 		for (int i = 0, n = this.slots.size; i < n; i++) {
-			SlotData slot = (SlotData)slots[i];
+			var slot = (SlotData)slots[i];
 			if (slot.name.equals(slotName)) return slot;
 		}
 		return null;
@@ -153,7 +153,7 @@ public class SkeletonData {
 		if (animationName == null) throw new IllegalArgumentException("animationName cannot be null.");
 		Object[] animations = this.animations.items;
 		for (int i = 0, n = this.animations.size; i < n; i++) {
-			Animation animation = (Animation)animations[i];
+			var animation = (Animation)animations[i];
 			if (animation.name.equals(animationName)) return animation;
 		}
 		return null;
@@ -172,7 +172,7 @@ public class SkeletonData {
 		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
 		Object[] ikConstraints = this.ikConstraints.items;
 		for (int i = 0, n = this.ikConstraints.size; i < n; i++) {
-			IkConstraintData constraint = (IkConstraintData)ikConstraints[i];
+			var constraint = (IkConstraintData)ikConstraints[i];
 			if (constraint.name.equals(constraintName)) return constraint;
 		}
 		return null;
@@ -191,7 +191,7 @@ public class SkeletonData {
 		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
 		Object[] transformConstraints = this.transformConstraints.items;
 		for (int i = 0, n = this.transformConstraints.size; i < n; i++) {
-			TransformConstraintData constraint = (TransformConstraintData)transformConstraints[i];
+			var constraint = (TransformConstraintData)transformConstraints[i];
 			if (constraint.name.equals(constraintName)) return constraint;
 		}
 		return null;
@@ -210,7 +210,7 @@ public class SkeletonData {
 		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
 		Object[] pathConstraints = this.pathConstraints.items;
 		for (int i = 0, n = this.pathConstraints.size; i < n; i++) {
-			PathConstraintData constraint = (PathConstraintData)pathConstraints[i];
+			var constraint = (PathConstraintData)pathConstraints[i];
 			if (constraint.name.equals(constraintName)) return constraint;
 		}
 		return null;
@@ -229,7 +229,7 @@ public class SkeletonData {
 		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
 		Object[] physicsConstraints = this.physicsConstraints.items;
 		for (int i = 0, n = this.physicsConstraints.size; i < n; i++) {
-			PhysicsConstraintData constraint = (PhysicsConstraintData)physicsConstraints[i];
+			var constraint = (PhysicsConstraintData)physicsConstraints[i];
 			if (constraint.name.equals(constraintName)) return constraint;
 		}
 		return null;

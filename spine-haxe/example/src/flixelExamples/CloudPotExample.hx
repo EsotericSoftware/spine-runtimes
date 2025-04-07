@@ -27,52 +27,40 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import spine.BlendMode;
-import Scene.SceneManager;
+package flixelExamples;
+
+
+import spine.Skin;
+import flixel.ui.FlxButton;
+import flixel.FlxG;
+import spine.flixel.SkeletonSprite;
+import spine.flixel.FlixelTextureLoader;
+import flixel.FlxState;
 import openfl.utils.Assets;
 import spine.SkeletonData;
-import spine.Physics;
 import spine.animation.AnimationStateData;
 import spine.atlas.TextureAtlas;
-import spine.starling.SkeletonSprite;
-import spine.starling.StarlingTextureLoader;
-import starling.core.Starling;
-import starling.events.TouchEvent;
-import starling.events.TouchPhase;
 
-class CloudPotExample extends Scene {
-	var loadBinary = false;
+class CloudPotExample extends FlxState {
+	var loadBinary = true;
 
-	public function load():Void {
-		background.color = 0x333333;
+	override public function create():Void {
+		FlxG.cameras.bgColor = 0xffa1b2b0;
 
-		var atlas = new TextureAtlas(Assets.getText("assets/cloud-pot.atlas"), new StarlingTextureLoader("assets/cloud-pot.atlas"));
-		var skeletondata = SkeletonData.from(Assets.getText("assets/cloud-pot.json"), atlas);
+		var button = new FlxButton(0, 0, "Next scene", () -> FlxG.switchState(() -> new AnimationBoundExample()));
+		button.setPosition(FlxG.width * .75, FlxG.height / 10);
+		add(button);
 
-		var animationStateData = new AnimationStateData(skeletondata);
+		var atlas = new TextureAtlas(Assets.getText("assets/cloud-pot.atlas"), new FlixelTextureLoader("assets/cloud-pot.atlas"));
+		var data = SkeletonData.from(loadBinary ? Assets.getBytes("assets/cloud-pot.skel") : Assets.getText("assets/cloud-pot.json"), atlas, .25);
+		var animationStateData = new AnimationStateData(data);
 		animationStateData.defaultMix = 0.25;
 
-		var skeletonSprite = new SkeletonSprite(skeletondata, animationStateData);
-		skeletonSprite.skeleton.updateWorldTransform(Physics.update);
-		var bounds = skeletonSprite.skeleton.getBounds();
-
-		
-		skeletonSprite.scale = 0.2;
-		skeletonSprite.x = Starling.current.stage.stageWidth / 2;
-		skeletonSprite.y = Starling.current.stage.stageHeight / 2;
-		
+		var skeletonSprite = new SkeletonSprite(data, animationStateData);
+		skeletonSprite.screenCenter();
 		skeletonSprite.state.setAnimationByName(0, "playing-in-the-rain", true);
+		add(skeletonSprite);
 
-		addChild(skeletonSprite);
-		juggler.add(skeletonSprite);
-
-		addEventListener(TouchEvent.TOUCH, onTouch);
-	}
-
-	public function onTouch(e:TouchEvent) {
-		var touch = e.getTouch(this);
-		if (touch != null && touch.phase == TouchPhase.ENDED) {
-			SceneManager.getInstance().switchScene(new AnimationBoundExample());
-		}
+		super.create();
 	}
 }

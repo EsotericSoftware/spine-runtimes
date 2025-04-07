@@ -95,7 +95,6 @@ static char *readString(BinaryInput *input) {
 
 void SpineSkeletonFileResource::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("load_from_file", "path"), &SpineSkeletonFileResource::load_from_file);
-	ADD_SIGNAL(MethodInfo("skeleton_file_changed"));
 }
 
 static bool checkVersion(const char *version) {

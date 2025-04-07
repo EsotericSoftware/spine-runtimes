@@ -59,7 +59,7 @@ public class AtlasAttachmentLoader implements AttachmentLoader {
 	}
 
 	public RegionAttachment newRegionAttachment (Skin skin, String name, String path, @Null Sequence sequence) {
-		RegionAttachment attachment = new RegionAttachment(name);
+		var attachment = new RegionAttachment(name);
 		if (sequence != null)
 			loadSequence(name, path, sequence);
 		else {
@@ -72,7 +72,7 @@ public class AtlasAttachmentLoader implements AttachmentLoader {
 	}
 
 	public MeshAttachment newMeshAttachment (Skin skin, String name, String path, @Null Sequence sequence) {
-		MeshAttachment attachment = new MeshAttachment(name);
+		var attachment = new MeshAttachment(name);
 		if (sequence != null)
 			loadSequence(name, path, sequence);
 		else {

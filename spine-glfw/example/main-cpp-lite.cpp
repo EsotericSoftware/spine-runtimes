@@ -107,7 +107,10 @@ int main() {
 	// Create an AnimationState to drive animations on the skeleton. Set the "portal" animation
 	// on track with index 0.
 	spine_animation_state animation_state = spine_skeleton_drawable_get_animation_state(drawable);
+	spine_animation_state_data animation_state_data = spine_animation_state_get_data(animation_state);
+	spine_animation_state_data_set_default_mix(animation_state_data, 0.2f);
 	spine_animation_state_set_animation_by_name(animation_state, 0, "portal", true);
+	spine_animation_state_add_animation_by_name(animation_state, 0, "run", true, 0);
 
 	// Create the renderer and set the viewport size to match the window size. This sets up a
 	// pixel perfect orthogonal projection for 2D rendering.

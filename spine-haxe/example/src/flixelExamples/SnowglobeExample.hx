@@ -27,66 +27,40 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import starling.display.Quad;
-import starling.text.TextField;
-import starling.core.Starling;
-import starling.display.Sprite;
+package flixelExamples;
 
-class SceneManager {
-	private static var instance:SceneManager;
 
-	private var currentScene:Sprite;
+import spine.Skin;
+import flixel.ui.FlxButton;
+import flixel.FlxG;
+import spine.flixel.SkeletonSprite;
+import spine.flixel.FlixelTextureLoader;
+import flixel.FlxState;
+import openfl.utils.Assets;
+import spine.SkeletonData;
+import spine.animation.AnimationStateData;
+import spine.atlas.TextureAtlas;
 
-	private function new() {
-		// Singleton pattern to ensure only one instance of SceneManager
-	}
+class SnowglobeExample extends FlxState {
+	var loadBinary = false;
 
-	public static function getInstance():SceneManager {
-		if (instance == null) {
-			instance = new SceneManager();
-		}
-		return instance;
-	}
+	override public function create():Void {
+		FlxG.cameras.bgColor = 0xffa1b2b0;
 
-	public function switchScene(newScene:Scene):Void {
-		if (currentScene != null) {
-			currentScene.dispose();
-			currentScene.removeFromParent(true);
-		}
-		currentScene = newScene;
-		starling.core.Starling.current.stage.addChild(currentScene);
-		newScene.load();
-	}
-}
+		var button = new FlxButton(0, 0, "Next scene", () -> FlxG.switchState(() -> new CloudPotExample()));
+		button.setPosition(FlxG.width * .75, FlxG.height / 10);
+		add(button);
 
-abstract class Scene extends Sprite {
-	var juggler = new starling.animation.Juggler();
+		var atlas = new TextureAtlas(Assets.getText("assets/snowglobe.atlas"), new FlixelTextureLoader("assets/snowglobe.atlas"));
+		var data = SkeletonData.from(loadBinary ? Assets.getBytes("assets/snowglobe-pro.skel") : Assets.getText("assets/snowglobe-pro.json"), atlas, .125);
+		var animationStateData = new AnimationStateData(data);
+		animationStateData.defaultMix = 0.25;
 
-	public var background:Quad;
+		var skeletonSprite = new SkeletonSprite(data, animationStateData);
+		skeletonSprite.screenCenter();
+		skeletonSprite.state.setAnimationByName(0, "shake", true);
+		add(skeletonSprite);
 
-	public function new() {
-		super();
-		var stageWidth = Starling.current.stage.stageWidth;
-		var stageHeight = Starling.current.stage.stageHeight;
-		background = new Quad(stageWidth, stageHeight, 0x0);
-		this.addChild(background);
-		Starling.current.juggler.add(juggler);
-	}
-
-	abstract public function load():Void;
-
-	public override function dispose():Void {
-		juggler.purge();
-		Starling.current.juggler.remove(juggler);
-		super.dispose();
-	}
-
-	public function addText(text:String, x:Int = 10, y:Int = 10) {
-		var textField = new TextField(250, 30, text);
-		textField.x = x;
-		textField.y = y;
-		textField.format.color = 0xffffffff;
-		addChild(textField);
-		return textField;
+		super.create();
 	}
 }

@@ -65,11 +65,10 @@ public class SkeletonBounds {
 		polygons.clear();
 
 		for (int i = 0; i < slotCount; i++) {
-			Slot slot = (Slot)slots[i];
+			var slot = (Slot)slots[i];
 			if (!slot.bone.active) continue;
 			Attachment attachment = slot.attachment;
-			if (attachment instanceof BoundingBoxAttachment) {
-				BoundingBoxAttachment boundingBox = (BoundingBoxAttachment)attachment;
+			if (attachment instanceof BoundingBoxAttachment boundingBox) {
 				boundingBoxes.add(boundingBox);
 
 				FloatArray polygon = polygonPool.obtain();
@@ -93,7 +92,7 @@ public class SkeletonBounds {
 		float minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE;
 		Object[] polygons = this.polygons.items;
 		for (int i = 0, n = this.polygons.size; i < n; i++) {
-			FloatArray polygon = (FloatArray)polygons[i];
+			var polygon = (FloatArray)polygons[i];
 			float[] vertices = polygon.items;
 			for (int ii = 0, nn = polygon.size; ii < nn; ii += 2) {
 				float x = vertices[ii];

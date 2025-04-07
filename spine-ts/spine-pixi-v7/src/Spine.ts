@@ -43,6 +43,7 @@ import {
 	SkeletonClipping,
 	SkeletonData,
 	SkeletonJson,
+	Skin,
 	Utils,
 	Vector2,
 } from "@esotericsoftware/spine-core";
@@ -51,11 +52,12 @@ import { SlotMesh } from "./SlotMesh.js";
 import { DarkSlotMesh } from "./DarkSlotMesh.js";
 import type { ISpineDebugRenderer, SpineDebugRenderer } from "./SpineDebugRenderer.js";
 import { Assets } from "@pixi/assets";
-import type { IPointData } from "@pixi/core";
+import { IPointData, Point, Rectangle } from "@pixi/core";
 import { Ticker } from "@pixi/core";
 import type { IDestroyOptions, DisplayObject } from "@pixi/display";
-import { Container } from "@pixi/display";
+import { Bounds, Container } from "@pixi/display";
 import { Graphics } from "@pixi/graphics";
+import "@pixi/events";
 
 /**
  * @deprecated Use SpineFromOptions and SpineOptions.
@@ -97,6 +99,9 @@ export interface SpineFromOptions {
 	 * If `undefined`, use the dark tint renderer if at least one slot has tint black
 	 */
 	darkTint?: boolean;
+
+	/** The bounds provider to use. If undefined the bounds will be dynamic, calculated when requested and based on the current frame. */
+	boundsProvider?: SpineBoundsProvider,
 };
 
 export interface SpineOptions {
@@ -108,6 +113,9 @@ export interface SpineOptions {
 
 	/**  See {@link SpineFromOptions.darkTint}. */
 	darkTint?: boolean;
+
+	/**  See {@link SpineFromOptions.boundsProvider}. */
+	boundsProvider?: SpineBoundsProvider,
 }
 
 /**
@@ -120,6 +128,138 @@ export interface SpineEvents {
 	event: [trackEntry: TrackEntry, event: Event];
 	interrupt: [trackEntry: TrackEntry];
 	start: [trackEntry: TrackEntry];
+}
+
+/** A bounds provider calculates the bounding box for a skeleton, which is then assigned as the size of the SpineGameObject. */
+export interface SpineBoundsProvider {
+	/** Returns the bounding box for the skeleton, in skeleton space. */
+	calculateBounds (gameObject: Spine): {
+		x: number;
+		y: number;
+		width: number;
+		height: number;
+	};
+}
+
+/** A bounds provider that provides a fixed size given by the user. */
+export class AABBRectangleBoundsProvider implements SpineBoundsProvider {
+	constructor (
+		private x: number,
+		private y: number,
+		private width: number,
+		private height: number,
+	) { }
+	calculateBounds () {
+		return { x: this.x, y: this.y, width: this.width, height: this.height };
+	}
+}
+
+/** A bounds provider that calculates the bounding box from the setup pose. */
+export class SetupPoseBoundsProvider implements SpineBoundsProvider {
+	/**
+	 * @param clipping If true, clipping attachments are used to compute the bounds. False, by default.
+	 */
+	constructor (
+		private clipping = false,
+	) { }
+
+	calculateBounds (gameObject: Spine) {
+		if (!gameObject.skeleton) return { x: 0, y: 0, width: 0, height: 0 };
+		// Make a copy of animation state and skeleton as this might be called while
+		// the skeleton in the GameObject has already been heavily modified. We can not
+		// reconstruct that state.
+		const skeleton = new Skeleton(gameObject.skeleton.data);
+		skeleton.setToSetupPose();
+		skeleton.updateWorldTransform(Physics.update);
+		const bounds = skeleton.getBoundsRect(this.clipping ? new SkeletonClipping() : undefined);
+		return bounds.width == Number.NEGATIVE_INFINITY
+			? { x: 0, y: 0, width: 0, height: 0 }
+			: bounds;
+	}
+}
+
+/** A bounds provider that calculates the bounding box by taking the maximumg bounding box for a combination of skins and specific animation. */
+export class SkinsAndAnimationBoundsProvider
+	implements SpineBoundsProvider {
+	/**
+	 * @param animation The animation to use for calculating the bounds. If null, the setup pose is used.
+	 * @param skins The skins to use for calculating the bounds. If empty, the default skin is used.
+	 * @param timeStep The time step to use for calculating the bounds. A smaller time step means more precision, but slower calculation.
+	 * @param clipping If true, clipping attachments are used to compute the bounds. False, by default.
+	 */
+	constructor (
+		private animation: string | null,
+		private skins: string[] = [],
+		private timeStep: number = 0.05,
+		private clipping = false,
+	) { }
+
+	calculateBounds (gameObject: Spine): {
+		x: number;
+		y: number;
+		width: number;
+		height: number;
+	} {
+		if (!gameObject.skeleton || !gameObject.state)
+			return { x: 0, y: 0, width: 0, height: 0 };
+		// Make a copy of animation state and skeleton as this might be called while
+		// the skeleton in the GameObject has already been heavily modified. We can not
+		// reconstruct that state.
+		const animationState = new AnimationState(gameObject.state.data);
+		const skeleton = new Skeleton(gameObject.skeleton.data);
+		const clipper = this.clipping ? new SkeletonClipping() : undefined;
+		const data = skeleton.data;
+		if (this.skins.length > 0) {
+			let customSkin = new Skin("custom-skin");
+			for (const skinName of this.skins) {
+				const skin = data.findSkin(skinName);
+				if (skin == null) continue;
+				customSkin.addSkin(skin);
+			}
+			skeleton.setSkin(customSkin);
+		}
+		skeleton.setToSetupPose();
+
+		const animation = this.animation != null ? data.findAnimation(this.animation!) : null;
+
+		if (animation == null) {
+			skeleton.updateWorldTransform(Physics.update);
+			const bounds = skeleton.getBoundsRect(clipper);
+			return bounds.width == Number.NEGATIVE_INFINITY
+				? { x: 0, y: 0, width: 0, height: 0 }
+				: bounds;
+		} else {
+			let minX = Number.POSITIVE_INFINITY,
+				minY = Number.POSITIVE_INFINITY,
+				maxX = Number.NEGATIVE_INFINITY,
+				maxY = Number.NEGATIVE_INFINITY;
+			animationState.clearTracks();
+			animationState.setAnimationWith(0, animation, false);
+			const steps = Math.max(animation.duration / this.timeStep, 1.0);
+			for (let i = 0; i < steps; i++) {
+				const delta = i > 0 ? this.timeStep : 0;
+				animationState.update(delta);
+				animationState.apply(skeleton);
+				skeleton.update(delta);
+				skeleton.updateWorldTransform(Physics.update);
+
+				const bounds = skeleton.getBoundsRect(clipper);
+				minX = Math.min(minX, bounds.x);
+				minY = Math.min(minY, bounds.y);
+				maxX = Math.max(maxX, bounds.x + bounds.width);
+				maxY = Math.max(maxY, bounds.y + bounds.height);
+			}
+			const bounds = {
+				x: minX,
+				y: minY,
+				width: maxX - minX,
+				height: maxY - minY,
+			};
+			return bounds.width == Number.NEGATIVE_INFINITY
+				? { x: 0, y: 0, width: 0, height: 0 }
+				: bounds;
+		}
+	}
 }
 
 /**
@@ -186,6 +326,27 @@ export class Spine extends Container {
 	private darkColor = new Color();
 	private clippingVertAux = new Float32Array(6);
 
+	private _boundsProvider?: SpineBoundsProvider;
+	/** The bounds provider to use. If undefined the bounds will be dynamic, calculated when requested and based on the current frame. */
+	public get boundsProvider (): SpineBoundsProvider | undefined {
+		return this._boundsProvider;
+	}
+	public set boundsProvider (value: SpineBoundsProvider | undefined) {
+		this._boundsProvider = value;
+		if (value) {
+			this._boundsSpineID = -1;
+			this._boundsSpineDirty = true;
+			this.interactiveChildren = false;
+		} else {
+			this.interactiveChildren = true;
+			this.hitArea = null;
+		}
+		this.calculateBounds();
+	}
+	private _boundsPoint = new Point();
+	private _boundsSpineID = -1;
+	private _boundsSpineDirty = true;
+
 	constructor (options: SpineOptions | SkeletonData, oldOptions?: ISpineOptions) {
 		if (options instanceof SkeletonData) {
 			options = {
@@ -215,6 +376,8 @@ export class Spine extends Container {
 		}
 
 		this.autoUpdate = options?.autoUpdate ?? true;
+
+		this.boundsProvider = options.boundsProvider;
 	}
 
 	/*
@@ -326,7 +489,7 @@ export class Spine extends Container {
 		}
 	}
 
-	private slotsObject = new Map<Slot, Container>();
+	public slotsObject = new Map<Slot, { container: Container, followAttachmentTimeline: boolean }>();
 	private getSlotFromRef (slotRef: number | string | Slot): Slot {
 		let slot: Slot | null;
 		if (typeof slotRef === 'number') slot = this.skeleton.slots[slotRef];
@@ -348,14 +511,16 @@ export class Spine extends Container {
 	 * slot before adding it to the current one.
 	 * @param slotRef - The slot index, or the slot name, or the Slot where the pixi object will be added to.
 	 * @param pixiObject - The pixi Container to add.
+	 * @param options - Optional settings for the attachment.
+	 * @param options.followAttachmentTimeline - If true, the attachment will follow the slot's attachment timeline.
 	 */
-	addSlotObject (slotRef: number | string | Slot, pixiObject: Container): void {
+	addSlotObject (slotRef: number | string | Slot, pixiObject: Container, options?: { followAttachmentTimeline?: boolean }): void {
 		let slot = this.getSlotFromRef(slotRef);
-		let oldPixiObject = this.slotsObject.get(slot);
-		if (oldPixiObject === pixiObject) return;
+		const oldPixiObject = this.slotsObject.get(slot)?.container;
+		if (oldPixiObject && oldPixiObject === pixiObject) return;
 
 		// search if the pixiObject was already in another slotObject
-		for (const [otherSlot, oldPixiObjectAnotherSlot] of this.slotsObject) {
+		for (const [otherSlot, { container: oldPixiObjectAnotherSlot }] of this.slotsObject) {
 			if (otherSlot !== slot && oldPixiObjectAnotherSlot === pixiObject) {
 				this.removeSlotObject(otherSlot, pixiObject);
 				break;
@@ -364,7 +529,10 @@ export class Spine extends Container {
 
 		if (oldPixiObject) this.removeChild(oldPixiObject);
 
-		this.slotsObject.set(slot, pixiObject);
+		this.slotsObject.set(slot, {
+			container: pixiObject,
+			followAttachmentTimeline: options?.followAttachmentTimeline || false,
+		});
 		this.addChild(pixiObject);
 	}
 	/**
@@ -374,8 +542,10 @@ export class Spine extends Container {
 	 * @returns a Container if any, undefined otherwise.
 	 */
 	getSlotObject (slotRef: number | string | Slot): Container | undefined {
-		return this.slotsObject.get(this.getSlotFromRef(slotRef));
+		const element = this.slotsObject.get(this.getSlotFromRef(slotRef));
+		return element ? element.container : undefined;
 	}
+
 	/**
 	 * Remove a slot object from the given slot.
 	 * If `pixiObject` is passed and attached to the given slot, remove it from the slot.
@@ -385,7 +555,7 @@ export class Spine extends Container {
 	 */
 	removeSlotObject (slotRef: number | string | Slot, pixiObject?: Container): void {
 		let slot = this.getSlotFromRef(slotRef);
-		let slotObject = this.slotsObject.get(slot);
+		let slotObject = this.slotsObject.get(slot)?.container;
 		if (!slotObject) return;
 
 		// if pixiObject is passed, remove only if it is equal to the given one
@@ -393,6 +563,16 @@ export class Spine extends Container {
 
 		this.removeChild(slotObject);
 		this.slotsObject.delete(slot);
+	}
+
+	/**
+	 * Removes all PixiJS containers attached to any slot.
+	 */
+	public removeSlotObjects () {
+		for (const [, slotObject] of this.slotsObject) {
+			slotObject.container.removeFromParent();
+		}
+		this.slotsObject.clear();
 	}
 
 	private verticesCache: NumberArrayLike = Utils.newFloatArray(1024);
@@ -404,13 +584,22 @@ export class Spine extends Container {
 			mask.destroy();
 		}
 	}
-	private updatePixiObject (pixiObject: Container, slot: Slot, zIndex: number) {
-		pixiObject.position.set(slot.bone.worldX, slot.bone.worldY);
-		pixiObject.scale.set(slot.bone.getWorldScaleX(), slot.bone.getWorldScaleY());
-		pixiObject.rotation = slot.bone.getWorldRotationX() * MathUtils.degRad;
-		pixiObject.zIndex = zIndex + 1;
-		pixiObject.alpha = this.skeleton.color.a * slot.color.a;
+
+	private updateSlotObject (element: { container: Container, followAttachmentTimeline: boolean }, slot: Slot, zIndex: number) {
+		const { container: slotObject, followAttachmentTimeline } = element
+
+		const followAttachmentValue = followAttachmentTimeline ? Boolean(slot.attachment) : true;
+		slotObject.visible = this.skeleton.drawOrder.includes(slot) && followAttachmentValue;
+
+		if (slotObject.visible) {
+			slotObject.position.set(slot.bone.worldX, slot.bone.worldY);
+			slotObject.scale.set(slot.bone.getWorldScaleX(), slot.bone.getWorldScaleY());
+			slotObject.rotation = slot.bone.getWorldRotationX() * MathUtils.degRad;
+			slotObject.zIndex = zIndex + 1;
+			slotObject.alpha = this.skeleton.color.a * slot.color.a;
+		}
 	}
+
 	private updateAndSetPixiMask (pixiMaskSource: PixiMaskSource | null, pixiObject: Container) {
 		if (Spine.clipper.isClipping() && pixiMaskSource) {
 			let mask = this.clippingSlotToPixiMasks[pixiMaskSource.slot.data.name] as Graphics;
@@ -464,13 +653,13 @@ export class Spine extends Container {
 			let pixiObject = this.slotsObject.get(slot);
 			let zIndex = i + slotObjectsCounter;
 			if (pixiObject) {
-				this.updatePixiObject(pixiObject, slot, zIndex + 1);
+				this.updateSlotObject(pixiObject, slot, zIndex + 1);
 				slotObjectsCounter++;
-				this.updateAndSetPixiMask(pixiMaskSource, pixiObject);
+				this.updateAndSetPixiMask(pixiMaskSource, pixiObject.container);
 			}
 
 			const useDarkColor = slot.darkColor != null;
-			const vertexSize = Spine.clipper.isClipping() ? 2 : useDarkColor ? Spine.DARK_VERTEX_SIZE : Spine.VERTEX_SIZE;
+			const vertexSize = useDarkColor ? Spine.DARK_VERTEX_SIZE : Spine.VERTEX_SIZE;
 			if (!slot.bone.active) {
 				Spine.clipper.clipEndWithSlot(slot);
 				this.pixiMaskCleanup(slot);
@@ -539,9 +728,7 @@ export class Spine extends Container {
 				let finalIndices: NumberArrayLike;
 				let finalIndicesLength: number;
 
-				if (Spine.clipper.isClipping()) {
-					Spine.clipper.clipTriangles(this.verticesCache, triangles, triangles.length, uvs, this.lightColor, this.darkColor, useDarkColor);
-
+				if (Spine.clipper.isClipping() && Spine.clipper.clipTriangles(this.verticesCache, triangles, triangles.length, uvs, this.lightColor, this.darkColor, useDarkColor, vertexSize)) {
 					finalVertices = Spine.clipper.clippedVertices;
 					finalVerticesLength = finalVertices.length;
 
@@ -587,6 +774,52 @@ export class Spine extends Container {
 			this.pixiMaskCleanup(slot);
 		}
 		Spine.clipper.clipEnd();
+	}
+
+	calculateBounds () {
+		if (!this._boundsProvider) {
+			super.calculateBounds();
+			return;
+		}
+
+		const transform = this.transform;
+		if (this._boundsSpineID === transform._worldID) return;
+
+		this.updateBounds();
+
+		const bounds = this._localBounds;
+		const p = this._boundsPoint;
+
+		p.set(bounds.minX, bounds.minY);
+		transform.worldTransform.apply(p, p);
+		this._bounds.minX = p.x
+		this._bounds.minY = p.y;
+
+		p.set(bounds.maxX, bounds.maxY)
+		transform.worldTransform.apply(p, p);
+		this._bounds.maxX = p.x
+		this._bounds.maxY = p.y;
+	}
+
+	updateBounds () {
+		if (!this._boundsProvider || !this._boundsSpineDirty) return;
+
+		this._boundsSpineDirty = false;
+
+		if (!this._localBounds) {
+			this._localBounds = new Bounds();
+		}
+
+		const boundsSpine = this._boundsProvider.calculateBounds(this);
+
+		const bounds = this._localBounds;
+		bounds.clear();
+		bounds.minX = boundsSpine.x;
+		bounds.minY = boundsSpine.y;
+		bounds.maxX = boundsSpine.x + boundsSpine.width;
+		bounds.maxY = boundsSpine.y + boundsSpine.height;
+
+		this.hitArea = this._localBounds.getRectangle();
 	}
 
 	/**
@@ -707,20 +940,19 @@ export class Spine extends Container {
 			return Spine.oldFrom(paramOne, atlasAssetName!, options);
 		}
 
-		const { skeleton, atlas, scale = 1, darkTint, autoUpdate } = paramOne;
+		const { skeleton, atlas, scale = 1, darkTint, autoUpdate, boundsProvider } = paramOne;
 		const cacheKey = `${skeleton}-${atlas}-${scale}`;
 		let skeletonData = Spine.skeletonCache[cacheKey];
-		if (skeletonData) {
-			return new Spine({ skeletonData, darkTint, autoUpdate });
+		if (!skeletonData) {
+			const skeletonAsset = Assets.get<any | Uint8Array>(skeleton);
+			const atlasAsset = Assets.get<TextureAtlas>(atlas);
+			const attachmentLoader = new AtlasAttachmentLoader(atlasAsset);
+			let parser = skeletonAsset instanceof Uint8Array ? new SkeletonBinary(attachmentLoader) : new SkeletonJson(attachmentLoader);
+			parser.scale = scale;
+			skeletonData = parser.readSkeletonData(skeletonAsset);
+			Spine.skeletonCache[cacheKey] = skeletonData;
 		}
-		const skeletonAsset = Assets.get<any | Uint8Array>(skeleton);
-		const atlasAsset = Assets.get<TextureAtlas>(atlas);
-		const attachmentLoader = new AtlasAttachmentLoader(atlasAsset);
-		let parser = skeletonAsset instanceof Uint8Array ? new SkeletonBinary(attachmentLoader) : new SkeletonJson(attachmentLoader);
-		parser.scale = scale;
-		skeletonData = parser.readSkeletonData(skeletonAsset);
-		Spine.skeletonCache[cacheKey] = skeletonData;
-		return new Spine({ skeletonData, darkTint, autoUpdate });
+		return new Spine({ skeletonData, darkTint, autoUpdate, boundsProvider });
 	}
 
 

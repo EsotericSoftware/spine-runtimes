@@ -140,7 +140,7 @@ void spPhysicsConstraint_update(spPhysicsConstraint *self, spPhysics physics) {
 					}
 					if (a >= t) {
 						float d = POW(self->damping, 60 * t);
-						float m = self->massInverse * t, e = self->strength, w = self->wind * f, g = self->gravity * f * (spBone_isYDown() ? -1 : 1);
+						float m = self->massInverse * t, e = self->strength, w = self->wind * f * self->skeleton->scaleX, g = -(self->gravity) * f * self->skeleton->scaleY;
 						do {
 							if (x) {
 								self->xVelocity += (w - self->xOffset * e) * m;

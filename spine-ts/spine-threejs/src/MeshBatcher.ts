@@ -309,7 +309,7 @@ const spineOnBeforeCompile = (shader: THREE.WebGLProgramParametersWithUniforms) 
 			#ifdef USE_SPINE_DARK_TINT
 				#ifdef USE_COLOR_ALPHA
 						diffuseColor.a *= vColor.a;
-						diffuseColor.rgb *= (1.0 - diffuseColor.rgb) * v_dark.rgb + diffuseColor.rgb * vColor.rgb;
+						diffuseColor.rgb = (diffuseColor.a - diffuseColor.rgb) * v_dark.rgb + diffuseColor.rgb * vColor.rgb;
 				#endif
 			#else
 				#ifdef USE_COLOR_ALPHA

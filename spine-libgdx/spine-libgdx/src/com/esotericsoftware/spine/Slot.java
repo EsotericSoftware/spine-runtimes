@@ -115,9 +115,8 @@ public class Slot {
 	 * specified attachment. */
 	public void setAttachment (@Null Attachment attachment) {
 		if (this.attachment == attachment) return;
-		if (!(attachment instanceof VertexAttachment) || !(this.attachment instanceof VertexAttachment)
-			|| ((VertexAttachment)attachment).getTimelineAttachment() != ((VertexAttachment)this.attachment)
-				.getTimelineAttachment()) {
+		if (!(attachment instanceof VertexAttachment newAttachment) || !(this.attachment instanceof VertexAttachment oldAttachment)
+			|| newAttachment.getTimelineAttachment() != oldAttachment.getTimelineAttachment()) {
 			deform.clear();
 		}
 		this.attachment = attachment;

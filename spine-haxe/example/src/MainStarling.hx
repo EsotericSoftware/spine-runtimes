@@ -27,43 +27,31 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import Scene.SceneManager;
-import openfl.utils.Assets;
-import spine.SkeletonData;
-import spine.animation.AnimationStateData;
-import spine.atlas.TextureAtlas;
-import spine.starling.SkeletonSprite;
-import spine.starling.StarlingTextureLoader;
+package;
+
+import starlingExamples.BasicExample;
+import starlingExamples.Scene.SceneManager;
+import openfl.display.Sprite;
+import openfl.geom.Rectangle;
 import starling.core.Starling;
-import starling.events.TouchEvent;
-import starling.events.TouchPhase;
+import starling.events.Event;
 
-class SequenceExample extends Scene {
-	var loadBinary = false;
+class MainStarling extends Sprite {
+	private var starlingSingleton:Starling;
 
-	public function load():Void {
-		var atlas = new TextureAtlas(Assets.getText("assets/dragon.atlas"), new StarlingTextureLoader("assets/dragon.atlas"));
-		var skeletondata = SkeletonData.from(loadBinary ? Assets.getBytes("assets/dragon-ess.skel") : Assets.getText("assets/dragon-ess.json"), atlas);
-		var animationStateData = new AnimationStateData(skeletondata);
-		animationStateData.defaultMix = 0.25;
+	public function new() {
+		super();
 
-		var skeletonSprite = new SkeletonSprite(skeletondata, animationStateData);
-		var bounds = skeletonSprite.skeleton.getBounds();
-		skeletonSprite.scale = Starling.current.stage.stageWidth / bounds.width * 0.5;
-		skeletonSprite.x = Starling.current.stage.stageWidth / 2;
-		skeletonSprite.y = Starling.current.stage.stageHeight * 0.5;
-		skeletonSprite.state.setAnimationByName(0, "flying", true);
-
-		addChild(skeletonSprite);
-		juggler.add(skeletonSprite);
-
-		addEventListener(TouchEvent.TOUCH, onTouch);
+		starlingSingleton = new Starling(starling.display.Sprite, stage, new Rectangle(0, 0, 800, 600));
+		starlingSingleton.supportHighResolutions = true;
+		starlingSingleton.addEventListener(Event.ROOT_CREATED, onStarlingRootCreated);
 	}
 
-	public function onTouch(e:TouchEvent) {
-		var touch = e.getTouch(this);
-		if (touch != null && touch.phase == TouchPhase.ENDED) {
-			SceneManager.getInstance().switchScene(new MixAndMatchExample());
-		}
+	private function onStarlingRootCreated(event:Event):Void {
+		starlingSingleton.removeEventListener(Event.ROOT_CREATED, onStarlingRootCreated);
+		starlingSingleton.start();
+		Starling.current.stage.color = 0x000000;
+
+		SceneManager.getInstance().switchScene(new BasicExample());
 	}
 }

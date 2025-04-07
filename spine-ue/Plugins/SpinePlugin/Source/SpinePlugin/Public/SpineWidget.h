@@ -162,6 +162,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
 	void ResetPhysicsConstraints();
 
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
+	void SetPhysicsTimeScale(float scale);
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
+	float GetPhysicsTimeScale();
+
 	UPROPERTY(BlueprintAssignable, Category = "Components|Spine|Skeleton")
 	FSpineWidgetBeforeUpdateWorldTransformDelegate BeforeUpdateWorldTransform;
 
@@ -246,6 +252,7 @@ protected:
 	spine::Atlas *lastSpineAtlas = nullptr;
 	USpineSkeletonDataAsset *lastData = nullptr;
 	spine::Skin *customSkin = nullptr;
+	float physicsTimeScale;
 
 	// Need to hold on to the dynamic instances, or the GC will kill us while updating them
 	UPROPERTY()

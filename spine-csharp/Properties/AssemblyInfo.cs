@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyProduct("spine-csharp")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyCompany("Esoteric Software")]
-[assembly: AssemblyCopyright("Copyright © Esoteric Software 2013-2016")]
+[assembly: AssemblyCopyright("Copyright © Esoteric Software 2013-2025")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

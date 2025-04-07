@@ -26,6 +26,7 @@ common/enable_pause_aware_picking=true
 
 [rendering]
 
+textures/vram_compression/import_etc2_astc=true
 batching/parameters/max_join_item_commands=100
 batching/parameters/batch_buffer_size=65535
 batching/parameters/item_reordering_lookahead=100

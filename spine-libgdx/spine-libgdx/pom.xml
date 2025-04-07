@@ -76,8 +76,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.1</version>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
+					<source>16</source>
+					<target>16</target>
 					<fork>true</fork>
 					<showWarnings>true</showWarnings>
 				</configuration>

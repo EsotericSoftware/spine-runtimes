@@ -68,7 +68,7 @@ public class Sequence {
 	}
 
 	public String getPath (String basePath, int index) {
-		StringBuilder buffer = new StringBuilder(basePath.length() + digits);
+		var buffer = new StringBuilder(basePath.length() + digits);
 		buffer.append(basePath);
 		String frame = Integer.toString(start + index);
 		for (int i = digits - frame.length(); i > 0; i--)

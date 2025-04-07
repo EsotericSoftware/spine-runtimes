@@ -51,7 +51,7 @@ export class PathConstraint implements Updatable {
 	bones: Array<Bone>;
 
 	/** The slot whose path attachment will be used to constrained the bones. */
-	target: Slot;
+	slot: Slot;
 
 	/** The position along the path. */
 	position = 0;
@@ -82,9 +82,9 @@ export class PathConstraint implements Updatable {
 			if (!bone) throw new Error(`Couldn't find bone ${data.bones[i].name}.`);
 			this.bones.push(bone);
 		}
-		let target = skeleton.findSlot(data.target.name);
-		if (!target) throw new Error(`Couldn't find target bone ${data.target.name}`);
-		this.target = target;
+		let target = skeleton.findSlot(data.slot.name);
+		if (!target) throw new Error(`Couldn't find target bone ${data.slot.name}`);
+		this.slot = target;
 
 		this.position = data.position;
 		this.spacing = data.spacing;
@@ -107,7 +107,7 @@ export class PathConstraint implements Updatable {
 	}
 
 	update (physics: Physics) {
-		let attachment = this.target.getAttachment();
+		let attachment = this.slot.getAttachment();
 		if (!(attachment instanceof PathAttachment)) return;
 
 		let mixRotate = this.mixRotate, mixX = this.mixX, mixY = this.mixY;
@@ -172,14 +172,14 @@ export class PathConstraint implements Updatable {
 				}
 		}
 
-		let positions = this.computeWorldPositions(<PathAttachment>attachment, spacesCount, tangents);
+		let positions = this.computeWorldPositions(attachment, spacesCount, tangents);
 		let boneX = positions[0], boneY = positions[1], offsetRotation = data.offsetRotation;
 		let tip = false;
 		if (offsetRotation == 0)
 			tip = data.rotateMode == RotateMode.Chain;
 		else {
 			tip = false;
-			let p = this.target.bone;
+			let p = this.slot.bone;
 			offsetRotation *= p.a * p.d - p.b * p.c > 0 ? MathUtils.degRad : -MathUtils.degRad;
 		}
 		for (let i = 0, p = 3; i < boneCount; i++, p += 3) {
@@ -232,7 +232,7 @@ export class PathConstraint implements Updatable {
 	}
 
 	computeWorldPositions (path: PathAttachment, spacesCount: number, tangents: boolean) {
-		let target = this.target;
+		let slot = this.slot;
 		let position = this.position;
 		let spaces = this.spaces, out = Utils.setArraySize(this.positions, spacesCount * 3 + 2), world: Array<number> = this.world;
 		let closed = path.closed;
@@ -268,14 +268,14 @@ export class PathConstraint implements Updatable {
 				} else if (p < 0) {
 					if (prevCurve != PathConstraint.BEFORE) {
 						prevCurve = PathConstraint.BEFORE;
-						path.computeWorldVertices(target, 2, 4, world, 0, 2);
+						path.computeWorldVertices(slot, 2, 4, world, 0, 2);
 					}
 					this.addBeforePosition(p, world, 0, out, o);
 					continue;
 				} else if (p > pathLength) {
 					if (prevCurve != PathConstraint.AFTER) {
 						prevCurve = PathConstraint.AFTER;
-						path.computeWorldVertices(target, verticesLength - 6, 4, world, 0, 2);
+						path.computeWorldVertices(slot, verticesLength - 6, 4, world, 0, 2);
 					}
 					this.addAfterPosition(p - pathLength, world, 0, out, o);
 					continue;
@@ -296,10 +296,10 @@ export class PathConstraint implements Updatable {
 				if (curve != prevCurve) {
 					prevCurve = curve;
 					if (closed && curve == curveCount) {
-						path.computeWorldVertices(target, verticesLength - 4, 4, world, 0, 2);
-						path.computeWorldVertices(target, 0, 4, world, 4, 2);
+						path.computeWorldVertices(slot, verticesLength - 4, 4, world, 0, 2);
+						path.computeWorldVertices(slot, 0, 4, world, 4, 2);
 					} else
-						path.computeWorldVertices(target, curve * 6 + 2, 8, world, 0, 2);
+						path.computeWorldVertices(slot, curve * 6 + 2, 8, world, 0, 2);
 				}
 				this.addCurvePosition(p, world[0], world[1], world[2], world[3], world[4], world[5], world[6], world[7], out, o,
 					tangents || (i > 0 && space == 0));
@@ -311,15 +311,15 @@ export class PathConstraint implements Updatable {
 		if (closed) {
 			verticesLength += 2;
 			world = Utils.setArraySize(this.world, verticesLength);
-			path.computeWorldVertices(target, 2, verticesLength - 4, world, 0, 2);
-			path.computeWorldVertices(target, 0, 2, world, verticesLength - 4, 2);
+			path.computeWorldVertices(slot, 2, verticesLength - 4, world, 0, 2);
+			path.computeWorldVertices(slot, 0, 2, world, verticesLength - 4, 2);
 			world[verticesLength - 2] = world[0];
 			world[verticesLength - 1] = world[1];
 		} else {
 			curveCount--;
 			verticesLength -= 4;
 			world = Utils.setArraySize(this.world, verticesLength);
-			path.computeWorldVertices(target, 2, verticesLength, world, 0, 2);
+			path.computeWorldVertices(slot, 2, verticesLength, world, 0, 2);
 		}
 
 		// Curve lengths.

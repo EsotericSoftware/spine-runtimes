@@ -38,7 +38,11 @@ import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.Null;
 
 import com.esotericsoftware.spine.Skin.SkinEntry;
-import com.esotericsoftware.spine.attachments.*;
+import com.esotericsoftware.spine.attachments.Attachment;
+import com.esotericsoftware.spine.attachments.ClippingAttachment;
+import com.esotericsoftware.spine.attachments.MeshAttachment;
+import com.esotericsoftware.spine.attachments.PathAttachment;
+import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.utils.SkeletonClipping;
 
 /** Stores the current pose for a skeleton.
@@ -71,7 +75,7 @@ public class Skeleton {
 			if (boneData.parent == null)
 				bone = new Bone(boneData, this, null);
 			else {
-				Bone parent = (Bone)bones[boneData.parent.index];
+				var parent = (Bone)bones[boneData.parent.index];
 				bone = new Bone(boneData, this, parent);
 				parent.children.add(bone);
 			}
@@ -81,8 +85,8 @@ public class Skeleton {
 		slots = new Array(data.slots.size);
 		drawOrder = new Array(data.slots.size);
 		for (SlotData slotData : data.slots) {
-			Bone bone = (Bone)bones[slotData.boneData.index];
-			Slot slot = new Slot(slotData, bone);
+			var bone = (Bone)bones[slotData.boneData.index];
+			var slot = new Slot(slotData, bone);
 			slots.add(slot);
 			drawOrder.add(slot);
 		}
@@ -172,14 +176,14 @@ public class Skeleton {
 		int boneCount = bones.size;
 		Object[] bones = this.bones.items;
 		for (int i = 0; i < boneCount; i++) {
-			Bone bone = (Bone)bones[i];
+			var bone = (Bone)bones[i];
 			bone.sorted = bone.data.skinRequired;
 			bone.active = !bone.sorted;
 		}
 		if (skin != null) {
 			Object[] skinBones = skin.bones.items;
 			for (int i = 0, n = skin.bones.size; i < n; i++) {
-				Bone bone = (Bone)bones[((BoneData)skinBones[i]).index];
+				var bone = (Bone)bones[((BoneData)skinBones[i]).index];
 				do {
 					bone.sorted = false;
 					bone.active = true;
@@ -196,28 +200,28 @@ public class Skeleton {
 		outer:
 		for (int i = 0; i < constraintCount; i++) {
 			for (int ii = 0; ii < ikCount; ii++) {
-				IkConstraint constraint = (IkConstraint)ikConstraints[ii];
+				var constraint = (IkConstraint)ikConstraints[ii];
 				if (constraint.data.order == i) {
 					sortIkConstraint(constraint);
 					continue outer;
 				}
 			}
 			for (int ii = 0; ii < transformCount; ii++) {
-				TransformConstraint constraint = (TransformConstraint)transformConstraints[ii];
+				var constraint = (TransformConstraint)transformConstraints[ii];
 				if (constraint.data.order == i) {
 					sortTransformConstraint(constraint);
 					continue outer;
 				}
 			}
 			for (int ii = 0; ii < pathCount; ii++) {
-				PathConstraint constraint = (PathConstraint)pathConstraints[ii];
+				var constraint = (PathConstraint)pathConstraints[ii];
 				if (constraint.data.order == i) {
 					sortPathConstraint(constraint);
 					continue outer;
 				}
 			}
 			for (int ii = 0; ii < physicsCount; ii++) {
-				PhysicsConstraint constraint = (PhysicsConstraint)physicsConstraints[ii];
+				var constraint = (PhysicsConstraint)physicsConstraints[ii];
 				if (constraint.data.order == i) {
 					sortPhysicsConstraint(constraint);
 					continue outer;
@@ -234,8 +238,7 @@ public class Skeleton {
 			&& (!constraint.data.skinRequired || (skin != null && skin.constraints.contains(constraint.data, true)));
 		if (!constraint.active) return;
 
-		Bone target = constraint.target;
-		sortBone(target);
+		sortBone(constraint.target);
 
 		Array<Bone> constrained = constraint.bones;
 		Bone parent = constrained.first();
@@ -255,17 +258,17 @@ public class Skeleton {
 	}
 
 	private void sortTransformConstraint (TransformConstraint constraint) {
-		constraint.active = constraint.target.active
+		constraint.active = constraint.source.active
 			&& (!constraint.data.skinRequired || (skin != null && skin.constraints.contains(constraint.data, true)));
 		if (!constraint.active) return;
 
-		sortBone(constraint.target);
+		sortBone(constraint.source);
 
 		Object[] constrained = constraint.bones.items;
 		int boneCount = constraint.bones.size;
-		if (constraint.data.local) {
+		if (constraint.data.localSource) {
 			for (int i = 0; i < boneCount; i++) {
-				Bone child = (Bone)constrained[i];
+				var child = (Bone)constrained[i];
 				sortBone(child.parent);
 				sortBone(child);
 			}
@@ -283,19 +286,18 @@ public class Skeleton {
 	}
 
 	private void sortPathConstraint (PathConstraint constraint) {
-		constraint.active = constraint.target.bone.active
+		constraint.active = constraint.slot.bone.active
 			&& (!constraint.data.skinRequired || (skin != null && skin.constraints.contains(constraint.data, true)));
 		if (!constraint.active) return;
 
-		Slot slot = constraint.target;
+		Slot slot = constraint.slot;
 		int slotIndex = slot.getData().index;
 		Bone slotBone = slot.bone;
 		if (skin != null) sortPathConstraintAttachment(skin, slotIndex, slotBone);
 		if (data.defaultSkin != null && data.defaultSkin != skin)
 			sortPathConstraintAttachment(data.defaultSkin, slotIndex, slotBone);
 
-		Attachment attachment = slot.attachment;
-		if (attachment instanceof PathAttachment) sortPathConstraintAttachment(attachment, slotBone);
+		sortPathConstraintAttachment(slot.attachment, slotBone);
 
 		Object[] constrained = constraint.bones.items;
 		int boneCount = constraint.bones.size;
@@ -313,14 +315,14 @@ public class Skeleton {
 	private void sortPathConstraintAttachment (Skin skin, int slotIndex, Bone slotBone) {
 		Object[] entries = skin.attachments.orderedItems().items;
 		for (int i = 0, n = skin.attachments.size; i < n; i++) {
-			SkinEntry entry = (SkinEntry)entries[i];
+			var entry = (SkinEntry)entries[i];
 			if (entry.slotIndex == slotIndex) sortPathConstraintAttachment(entry.attachment, slotBone);
 		}
 	}
 
 	private void sortPathConstraintAttachment (Attachment attachment, Bone slotBone) {
-		if (!(attachment instanceof PathAttachment)) return;
-		int[] pathBones = ((PathAttachment)attachment).getBones();
+		if (!(attachment instanceof PathAttachment pathAttachment)) return;
+		int[] pathBones = pathAttachment.getBones();
 		if (pathBones == null)
 			sortBone(slotBone);
 		else {
@@ -359,7 +361,7 @@ public class Skeleton {
 	private void sortReset (Array<Bone> bones) {
 		Object[] items = bones.items;
 		for (int i = 0, n = bones.size; i < n; i++) {
-			Bone bone = (Bone)items[i];
+			var bone = (Bone)items[i];
 			if (!bone.active) continue;
 			if (bone.sorted) sortReset(bone.children);
 			bone.sorted = false;
@@ -373,7 +375,7 @@ public class Skeleton {
 	public void updateWorldTransform (Physics physics) {
 		Object[] bones = this.bones.items;
 		for (int i = 0, n = this.bones.size; i < n; i++) {
-			Bone bone = (Bone)bones[i];
+			var bone = (Bone)bones[i];
 			bone.ax = bone.x;
 			bone.ay = bone.y;
 			bone.arotation = bone.rotation;
@@ -398,7 +400,7 @@ public class Skeleton {
 
 		Object[] bones = this.bones.items;
 		for (int i = 1, n = this.bones.size; i < n; i++) { // Skip root bone.
-			Bone bone = (Bone)bones[i];
+			var bone = (Bone)bones[i];
 			bone.ax = bone.x;
 			bone.ay = bone.y;
 			bone.arotation = bone.rotation;
@@ -428,7 +430,7 @@ public class Skeleton {
 		// Update everything except root bone.
 		Object[] updateCache = this.updateCache.items;
 		for (int i = 0, n = this.updateCache.size; i < n; i++) {
-			Updatable updatable = (Updatable)updateCache[i];
+			var updatable = (Updatable)updateCache[i];
 			if (updatable != rootBone) updatable.update(physics);
 		}
 	}
@@ -497,7 +499,7 @@ public class Skeleton {
 		if (boneName == null) throw new IllegalArgumentException("boneName cannot be null.");
 		Object[] bones = this.bones.items;
 		for (int i = 0, n = this.bones.size; i < n; i++) {
-			Bone bone = (Bone)bones[i];
+			var bone = (Bone)bones[i];
 			if (bone.data.name.equals(boneName)) return bone;
 		}
 		return null;
@@ -514,7 +516,7 @@ public class Skeleton {
 		if (slotName == null) throw new IllegalArgumentException("slotName cannot be null.");
 		Object[] slots = this.slots.items;
 		for (int i = 0, n = this.slots.size; i < n; i++) {
-			Slot slot = (Slot)slots[i];
+			var slot = (Slot)slots[i];
 			if (slot.data.name.equals(slotName)) return slot;
 		}
 		return null;
@@ -562,7 +564,7 @@ public class Skeleton {
 			else {
 				Object[] slots = this.slots.items;
 				for (int i = 0, n = this.slots.size; i < n; i++) {
-					Slot slot = (Slot)slots[i];
+					var slot = (Slot)slots[i];
 					String name = slot.data.attachmentName;
 					if (name != null) {
 						Attachment attachment = newSkin.getAttachment(i, name);
@@ -626,7 +628,7 @@ public class Skeleton {
 		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
 		Object[] ikConstraints = this.ikConstraints.items;
 		for (int i = 0, n = this.ikConstraints.size; i < n; i++) {
-			IkConstraint ikConstraint = (IkConstraint)ikConstraints[i];
+			var ikConstraint = (IkConstraint)ikConstraints[i];
 			if (ikConstraint.data.name.equals(constraintName)) return ikConstraint;
 		}
 		return null;
@@ -643,7 +645,7 @@ public class Skeleton {
 		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
 		Object[] transformConstraints = this.transformConstraints.items;
 		for (int i = 0, n = this.transformConstraints.size; i < n; i++) {
-			TransformConstraint constraint = (TransformConstraint)transformConstraints[i];
+			var constraint = (TransformConstraint)transformConstraints[i];
 			if (constraint.data.name.equals(constraintName)) return constraint;
 		}
 		return null;
@@ -660,7 +662,7 @@ public class Skeleton {
 		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
 		Object[] pathConstraints = this.pathConstraints.items;
 		for (int i = 0, n = this.pathConstraints.size; i < n; i++) {
-			PathConstraint constraint = (PathConstraint)pathConstraints[i];
+			var constraint = (PathConstraint)pathConstraints[i];
 			if (constraint.data.name.equals(constraintName)) return constraint;
 		}
 		return null;
@@ -677,7 +679,7 @@ public class Skeleton {
 		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
 		Object[] physicsConstraints = this.physicsConstraints.items;
 		for (int i = 0, n = this.physicsConstraints.size; i < n; i++) {
-			PhysicsConstraint constraint = (PhysicsConstraint)physicsConstraints[i];
+			var constraint = (PhysicsConstraint)physicsConstraints[i];
 			if (constraint.data.name.equals(constraintName)) return constraint;
 		}
 		return null;
@@ -704,32 +706,28 @@ public class Skeleton {
 		Object[] drawOrder = this.drawOrder.items;
 		float minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE;
 		for (int i = 0, n = this.drawOrder.size; i < n; i++) {
-			Slot slot = (Slot)drawOrder[i];
+			var slot = (Slot)drawOrder[i];
 			if (!slot.bone.active) continue;
 			int verticesLength = 0;
 			float[] vertices = null;
 			short[] triangles = null;
 			Attachment attachment = slot.attachment;
-			if (attachment instanceof RegionAttachment) {
-				RegionAttachment region = (RegionAttachment)attachment;
+			if (attachment instanceof RegionAttachment region) {
 				verticesLength = 8;
 				vertices = temp.setSize(8);
 				region.computeWorldVertices(slot, vertices, 0, 2);
 				triangles = quadTriangles;
-			} else if (attachment instanceof MeshAttachment) {
-				MeshAttachment mesh = (MeshAttachment)attachment;
+			} else if (attachment instanceof MeshAttachment mesh) {
 				verticesLength = mesh.getWorldVerticesLength();
 				vertices = temp.setSize(verticesLength);
 				mesh.computeWorldVertices(slot, 0, verticesLength, vertices, 0, 2);
 				triangles = mesh.getTriangles();
-			} else if (attachment instanceof ClippingAttachment && clipper != null) {
-				ClippingAttachment clip = (ClippingAttachment)attachment;
+			} else if (attachment instanceof ClippingAttachment clip && clipper != null) {
 				clipper.clipStart(slot, clip);
 				continue;
 			}
 			if (vertices != null) {
-				if (clipper != null && clipper.isClipping()) {
-					clipper.clipTriangles(vertices, triangles, triangles.length);
+				if (clipper != null && clipper.isClipping() && clipper.clipTriangles(vertices, triangles, triangles.length)) {
 					vertices = clipper.getClippedVertices().items;
 					verticesLength = clipper.getClippedVertices().size;
 				}

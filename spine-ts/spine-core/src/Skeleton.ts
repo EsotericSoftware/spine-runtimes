@@ -241,8 +241,7 @@ export class Skeleton {
 		constraint.active = constraint.target.isActive() && (!constraint.data.skinRequired || (this.skin && Utils.contains(this.skin.constraints, constraint.data, true)))!;
 		if (!constraint.active) return;
 
-		let target = constraint.target;
-		this.sortBone(target);
+		this.sortBone(constraint.target);
 
 		let constrained = constraint.bones;
 		let parent = constrained[0];
@@ -263,10 +262,11 @@ export class Skeleton {
 	}
 
 	sortPathConstraint (constraint: PathConstraint) {
-		constraint.active = constraint.target.bone.isActive() && (!constraint.data.skinRequired || (this.skin && Utils.contains(this.skin.constraints, constraint.data, true)))!;
+		constraint.active = constraint.slot.bone.isActive()
+			&& (!constraint.data.skinRequired || (this.skin && Utils.contains(this.skin.constraints, constraint.data, true)))!;
 		if (!constraint.active) return;
 
-		let slot = constraint.target;
+		let slot = constraint.slot;
 		let slotIndex = slot.data.index;
 		let slotBone = slot.bone;
 		if (this.skin) this.sortPathConstraintAttachment(this.skin, slotIndex, slotBone);
@@ -275,8 +275,7 @@ export class Skeleton {
 		for (let i = 0, n = this.data.skins.length; i < n; i++)
 			this.sortPathConstraintAttachment(this.data.skins[i], slotIndex, slotBone);
 
-		let attachment = slot.getAttachment();
-		if (attachment instanceof PathAttachment) this.sortPathConstraintAttachmentWith(attachment, slotBone);
+		this.sortPathConstraintAttachmentWith(slot.attachment, slotBone);
 
 		let constrained = constraint.bones;
 		let boneCount = constrained.length;
@@ -292,14 +291,14 @@ export class Skeleton {
 	}
 
 	sortTransformConstraint (constraint: TransformConstraint) {
-		constraint.active = constraint.target.isActive() && (!constraint.data.skinRequired || (this.skin && Utils.contains(this.skin.constraints, constraint.data, true)))!;
+		constraint.active = constraint.source.isActive() && (!constraint.data.skinRequired || (this.skin && Utils.contains(this.skin.constraints, constraint.data, true)))!;
 		if (!constraint.active) return;
 
-		this.sortBone(constraint.target);
+		this.sortBone(constraint.source);
 
 		let constrained = constraint.bones;
 		let boneCount = constrained.length;
-		if (constraint.data.local) {
+		if (constraint.data.localSource) {
 			for (let i = 0; i < boneCount; i++) {
 				let child = constrained[i];
 				this.sortBone(child.parent!);
@@ -327,9 +326,9 @@ export class Skeleton {
 		}
 	}
 
-	sortPathConstraintAttachmentWith (attachment: Attachment, slotBone: Bone) {
+	sortPathConstraintAttachmentWith (attachment: Attachment | null, slotBone: Bone) {
 		if (!(attachment instanceof PathAttachment)) return;
-		let pathBones = (<PathAttachment>attachment).bones;
+		let pathBones = attachment.bones;
 		if (!pathBones)
 			this.sortBone(slotBone);
 		else {
@@ -613,10 +612,10 @@ export class Skeleton {
 
 	/** Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose as `{ x: number, y: number, width: number, height: number }`.
 	 * Note that this method will create temporary objects which can add to garbage collection pressure. Use `getBounds()` if garbage collection is a concern. */
-	getBoundsRect () {
+	getBoundsRect (clipper?: SkeletonClipping) {
 		let offset = new Vector2();
 		let size = new Vector2();
-		this.getBounds(offset, size);
+		this.getBounds(offset, size, undefined, clipper);
 		return { x: offset.x, y: offset.y, width: size.x, height: size.y };
 	}
 
@@ -643,18 +642,16 @@ export class Skeleton {
 				attachment.computeWorldVertices(slot, vertices, 0, 2);
 				triangles = Skeleton.quadTriangles;
 			} else if (attachment instanceof MeshAttachment) {
-				let mesh = (<MeshAttachment>attachment);
-				verticesLength = mesh.worldVerticesLength;
+				verticesLength = attachment.worldVerticesLength;
 				vertices = Utils.setArraySize(temp, verticesLength, 0);
-				mesh.computeWorldVertices(slot, 0, verticesLength, vertices, 0, 2);
-				triangles = mesh.triangles;
+				attachment.computeWorldVertices(slot, 0, verticesLength, vertices, 0, 2);
+				triangles = attachment.triangles;
 			} else if (attachment instanceof ClippingAttachment && clipper != null) {
 				clipper.clipStart(slot, attachment);
 				continue;
 			}
 			if (vertices && triangles) {
-				if (clipper != null && clipper.isClipping()) {
-					clipper.clipTriangles(vertices, triangles, triangles.length);
+				if (clipper != null && clipper.isClipping() && clipper.clipTriangles(vertices, triangles, triangles.length)) {
 					vertices = clipper.clippedVertices;
 					verticesLength = clipper.clippedVertices.length;
 				}

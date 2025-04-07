@@ -204,18 +204,16 @@ namespace Spine {
 			from.animationLast = from.nextAnimationLast;
 			from.trackLast = from.nextTrackLast;
 
-			if (to.nextTrackLast != -1) { // The from entry was applied at least once.
-				bool discard = to.mixTime == 0 && from.mixTime == 0; // Discard the from entry when neither have advanced yet.
-				if (to.mixTime >= to.mixDuration || discard) {
-					// Require totalAlpha == 0 to ensure mixing is complete or the transition is a single frame or discarded.
-					if (from.totalAlpha == 0 || to.mixDuration == 0 || discard) {
-						to.mixingFrom = from.mixingFrom;
-						if (from.mixingFrom != null) from.mixingFrom.mixingTo = to;
-						to.interruptAlpha = from.interruptAlpha;
-						queue.End(from);
-					}
-					return finished;
+			// The from entry was applied at least once and the mix is complete.
+			if (to.nextTrackLast != -1 && to.mixTime >= to.mixDuration) {
+				// Mixing is complete for all entries before the from entry or the mix is instantaneous.
+				if (from.totalAlpha == 0 || to.mixDuration == 0) {
+					to.mixingFrom = from.mixingFrom;
+					if (from.mixingFrom != null) from.mixingFrom.mixingTo = to;
+					to.interruptAlpha = from.interruptAlpha;
+					queue.End(from);
 				}
+				return finished;
 			}
 
 			from.trackTime += delta * from.timeScale;
@@ -1245,7 +1243,7 @@ namespace Spine {
 		/// <para>
 		/// The <c>MixDuration</c> can be set manually rather than use the value from
 		/// <see cref="AnimationStateData.GetMix(Animation, Animation)"/>. In that case, the <c>MixDuration</c> can be set for a new
-		/// track entry only before <see cref="AnimationState.Update(float)"/> is first called.</para>
+		/// track entry only before <see cref="AnimationState.Update(float)"/> is next called.</para>
 		/// <para>
 		/// When using <seealso cref="AnimationState.AddAnimation(int, Animation, bool, float)"/> with a <c>Delay</c> &lt;= 0, the
 		/// <see cref="TrackEntry.Delay"/> is set using the mix duration from the <see cref=" AnimationStateData"/>. If <c>mixDuration</c> is set
@@ -1273,7 +1271,7 @@ namespace Spine {
 		/// </para><para>
 		/// Track entries on track 0 ignore this setting and always use <see cref="MixBlend.First"/>.
 		/// </para><para>
-		///  The <c>MixBlend</c> can be set for a new track entry only before <see cref="AnimationState.Apply(Skeleton)"/> is first
+		///  The <c>MixBlend</c> can be set for a new track entry only before <see cref="AnimationState.Apply(Skeleton)"/> is next
 		///  called.</para>
 		/// </summary>
 		public MixBlend MixBlend { get { return mixBlend; } set { mixBlend = value; } }

@@ -1,5 +1,5 @@
 #include <metal_stdlib>
-
+#include <simd/simd.h> 
 using namespace metal;
 
 typedef enum SpineVertexInputIndex {
@@ -13,21 +13,21 @@ typedef enum SpineTextureIndex {
 } SpineTextureIndex;
 
 typedef struct {
-    vector_float2 position;
-    vector_float4 color;
-    vector_float2 uv;
+    simd_float2 position;
+    simd_float4 color;
+    simd_float2 uv;
 } SpineVertex;
 
 typedef struct {
-    vector_float2 translation;
-    vector_float2 scale;
-    vector_float2 offset;
+    simd_float2 translation;
+    simd_float2 scale;
+    simd_float2 offset;
 } SpineTransform;
 
 struct RasterizerData {
-    float4 position [[position]];
-    float4 color;
-    float2 textureCoordinate;
+    simd_float4 position [[position]];
+    simd_float4 color;
+    simd_float2 textureCoordinate;
 };
 
 vertex RasterizerData
@@ -38,12 +38,12 @@ vertexShader(uint vertexID [[vertex_id]],
 {
     RasterizerData out;
 
-    float2 pixelSpacePosition = vertices[vertexID].position.xy;
+    simd_float2 pixelSpacePosition = vertices[vertexID].position.xy;
 
-    vector_float2 viewportSize = vector_float2(*viewportSizePointer);
-    
-    out.position = vector_float4(0.0, 0.0, 0.0, 1.0);
-    
+    simd_float2 viewportSize = simd_float2(*viewportSizePointer);
+
+    out.position = simd_float4(0.0, 0.0, 0.0, 1.0);
+
     out.position.xy = pixelSpacePosition;
     out.position.xy *= transform->scale;
     out.position.xy += transform->translation * transform->scale + transform->offset;
@@ -57,7 +57,7 @@ vertexShader(uint vertexID [[vertex_id]],
     return out;
 }
 
-fragment float4
+fragment simd_float4
 fragmentShader(RasterizerData in [[stage_in]],
                texture2d<half> colorTexture [[ texture(SpineTextureIndexBaseColor) ]])
 {
@@ -66,5 +66,5 @@ fragmentShader(RasterizerData in [[stage_in]],
     
     const half4 colorSample = colorTexture.sample(textureSampler, in.textureCoordinate);
     
-    return float4(colorSample) * in.color;
+    return simd_float4(colorSample) * in.color;
 }

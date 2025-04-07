@@ -347,7 +347,7 @@ export class SpinePlayer implements Disposable {
 			this.sceneRenderer = new SceneRenderer(this.canvas, this.context, true);
 			if (config.showLoading) this.loadingScreen = new LoadingScreen(this.sceneRenderer);
 		} catch (e) {
-			this.showError("Sorry, your browser does not support WebG, or you have disabled WebGL in your browser settings.\nPlease use the latest version of Firefox, Chrome, Edge, or Safari.", e as any);
+			this.showError("Sorry, your browser does not support WebGL, or you have disabled WebGL in your browser settings.\nPlease use the latest version of Firefox, Chrome, Edge, or Safari.", e as any);
 			return null;
 		}
 
@@ -561,8 +561,13 @@ export class SpinePlayer implements Disposable {
 				this.setViewport(entry.animation!);
 				this.pause();
 			}
-		} else if (!this.currentViewport) {
-			this.setViewport(entry.animation!);
+		} else {
+			if (this.currentViewport.x === undefined) {
+				this.setViewport(entry.animation!);
+			}
+			if (!config.animation) {
+				config.animation = entry.animation?.name
+			}
 			this.play();
 		}
 	}

@@ -32,8 +32,24 @@
 
 #ifdef SPINE_GODOT_EXTENSION
 #include <godot_cpp/classes/encoded_object_as_id.hpp>
+#include <godot_cpp/classes/engine.hpp>
+#include <godot_cpp/classes/editor_interface.hpp>
 #else
+#if VERSION_MAJOR > 3
+#include "core/config/engine.h"
+#include "editor/editor_interface.h"
+#else
+#include "core/engine.h"
+#endif
 #include <core/io/marshalls.h>
+#endif
+
+#ifdef TOOLS_ENABLED
+#ifdef SPINE_GODOT_EXTENSION
+#include <godot_cpp/classes/editor_file_system.hpp>
+#else
+#include "editor/editor_file_system.h"
+#endif
 #endif
 
 void SpineAnimationMix::_bind_methods() {
@@ -175,15 +191,112 @@ void SpineSkeletonDataResource::_bind_methods() {
 #endif
 	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "animation_mixes"),
 				 "set_animation_mixes", "get_animation_mixes");
+
+#ifdef TOOLS_ENABLED
+#if VERSION_MAJOR > 3
+	ClassDB::bind_method(D_METHOD("_on_resources_reimported", "resources"),
+						 &SpineSkeletonDataResource::_on_resources_reimported);
+#else
+	ClassDB::bind_method(D_METHOD("_on_resources_reimported", "resources"),
+						 &SpineSkeletonDataResource::_on_resources_reimported);
+#endif
+#endif
 }
 
+#ifdef TOOLS_ENABLED
+EditorFileSystem *get_editor_file_system() {
+#ifdef SPINE_GODOT_EXTENSION
+	EditorInterface *editor_interface = EditorInterface::get_singleton();
+	if (editor_interface) {
+		return editor_interface->get_resource_filesystem();
+	}
+	return nullptr;
+#else
+	return EditorFileSystem::get_singleton();
+#endif
+}
+#endif
+
 SpineSkeletonDataResource::SpineSkeletonDataResource()
-	: default_mix(0), skeleton_data(nullptr), animation_state_data(nullptr) {}
+	: default_mix(0), skeleton_data(nullptr), animation_state_data(nullptr) {
+
+#ifdef TOOLS_ENABLED
+#if VERSION_MAJOR > 3
+	if (Engine::get_singleton()->is_editor_hint()) {
+		EditorFileSystem *efs = get_editor_file_system();
+		if (efs) {
+			efs->connect("resources_reimported", callable_mp(this, &SpineSkeletonDataResource::_on_resources_reimported));
+		}
+	}
+#else
+	if (Engine::get_singleton()->is_editor_hint()) {
+		EditorFileSystem *efs = EditorFileSystem::get_singleton();
+		if (efs) {
+			efs->connect("resources_reimported", this, "_on_resources_reimported");
+		}
+	}
+#endif
+#endif
+}
 
 SpineSkeletonDataResource::~SpineSkeletonDataResource() {
+#ifdef TOOLS_ENABLED
+#if VERSION_MAJOR > 3
+	if (Engine::get_singleton()->is_editor_hint()) {
+		EditorFileSystem *efs = get_editor_file_system();
+		if (efs && efs->is_connected("resources_reimported", callable_mp(this, &SpineSkeletonDataResource::_on_resources_reimported))) {
+			efs->disconnect("resources_reimported", callable_mp(this, &SpineSkeletonDataResource::_on_resources_reimported));
+		}
+	}
+#else
+	if (Engine::get_singleton()->is_editor_hint()) {
+		EditorFileSystem *efs = EditorFileSystem::get_singleton();
+		if (efs && efs->is_connected("resources_reimported", this, "_on_resources_reimported")) {
+			efs->disconnect("resources_reimported", this, "_on_resources_reimported");
+		}
+	}
+#endif
+#endif
+
 	delete skeleton_data;
 	delete animation_state_data;
 }
+
+#ifdef TOOLS_ENABLED
+#if VERSION_MAJOR > 3
+void SpineSkeletonDataResource::_on_resources_reimported(const PackedStringArray &resources) {
+	for (int i = 0; i < resources.size(); i++) {
+		if (atlas_res.is_valid() && atlas_res->get_path() == resources[i]) {
+#ifdef SPINE_GODOT_EXTENSION
+			atlas_res = ResourceLoader::get_singleton()->load(resources[i], "SpineAtlasResource", ResourceLoader::CACHE_MODE_IGNORE);
+#else
+			atlas_res = ResourceLoader::load(resources[i], "SpineAtlasResource", ResourceFormatLoader::CACHE_MODE_IGNORE);
+#endif
+			update_skeleton_data();
+		} else if (skeleton_file_res.is_valid() && skeleton_file_res->get_path() == resources[i]) {
+#ifdef SPINE_GODOT_EXTENSION
+			skeleton_file_res = ResourceLoader::get_singleton()->load(resources[i], "SpineSkeletonFileResource", ResourceLoader::CACHE_MODE_IGNORE);
+#else
+			skeleton_file_res = ResourceLoader::load(resources[i], "SpineSkeletonFileResource", ResourceFormatLoader::CACHE_MODE_IGNORE);
+#endif
+			update_skeleton_data();
+		}
+	}
+}
+#else
+void SpineSkeletonDataResource::_on_resources_reimported(const PoolStringArray &resources) {
+	for (int i = 0; i < resources.size(); i++) {
+		if (atlas_res.is_valid() && atlas_res->get_path() == resources[i]) {
+			atlas_res = ResourceLoader::load(resources[i]);
+			update_skeleton_data();
+		} else if (skeleton_file_res.is_valid() && skeleton_file_res->get_path() == resources[i]) {
+			skeleton_file_res = ResourceLoader::load(resources[i]);
+			update_skeleton_data();
+		}
+	}
+}
+#endif
+#endif
 
 void SpineSkeletonDataResource::update_skeleton_data() {
 	if (skeleton_data) {
@@ -249,22 +362,6 @@ bool SpineSkeletonDataResource::is_skeleton_data_loaded() const {
 void SpineSkeletonDataResource::set_atlas_res(
 		const Ref<SpineAtlasResource> &atlas) {
 	atlas_res = atlas;
-	if (atlas_res.is_valid()) {
-#if VERSION_MAJOR > 3
-		if (!atlas_res->is_connected(
-					SNAME("skeleton_atlas_changed"),
-					callable_mp(this,
-								&SpineSkeletonDataResource::update_skeleton_data)))
-			atlas_res->connect(
-					SNAME("skeleton_atlas_changed"),
-					callable_mp(this, &SpineSkeletonDataResource::update_skeleton_data));
-#else
-		if (!atlas_res->is_connected(SNAME("skeleton_atlas_changed"), this,
-									 SNAME("update_skeleton_data")))
-			atlas_res->connect(SNAME("skeleton_atlas_changed"), this,
-							   SNAME("update_skeleton_data"));
-#endif
-	}
 	update_skeleton_data();
 }
 
@@ -275,22 +372,6 @@ Ref<SpineAtlasResource> SpineSkeletonDataResource::get_atlas_res() {
 void SpineSkeletonDataResource::set_skeleton_file_res(
 		const Ref<SpineSkeletonFileResource> &skeleton_file) {
 	skeleton_file_res = skeleton_file;
-	if (skeleton_file_res.is_valid()) {
-#if VERSION_MAJOR > 3
-		if (!skeleton_file_res->is_connected(
-					SNAME("skeleton_file_changed"),
-					callable_mp(this,
-								&SpineSkeletonDataResource::update_skeleton_data)))
-			skeleton_file_res->connect(
-					SNAME("skeleton_file_changed"),
-					callable_mp(this, &SpineSkeletonDataResource::update_skeleton_data));
-#else
-		if (!skeleton_file_res->is_connected(SNAME("skeleton_file_changed"), this,
-											 SNAME("update_skeleton_data")))
-			skeleton_file_res->connect(SNAME("skeleton_file_changed"), this,
-									   SNAME("update_skeleton_data"));
-#endif
-	}
 	update_skeleton_data();
 }
 

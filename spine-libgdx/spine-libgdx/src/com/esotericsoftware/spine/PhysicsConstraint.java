@@ -38,7 +38,7 @@ import com.esotericsoftware.spine.Skeleton.Physics;
  * See <a href="https://esotericsoftware.com/spine-physics-constraints">Physics constraints</a> in the Spine User Guide. */
 public class PhysicsConstraint implements Updatable {
 	final PhysicsConstraintData data;
-	public Bone bone;
+	Bone bone;
 	float inertia, strength, damping, massInverse, wind, gravity, mix;
 
 	boolean reset = true;
@@ -61,26 +61,13 @@ public class PhysicsConstraint implements Updatable {
 
 		bone = skeleton.bones.get(data.bone.index);
 
-		inertia = data.inertia;
-		strength = data.strength;
-		damping = data.damping;
-		massInverse = data.massInverse;
-		wind = data.wind;
-		gravity = data.gravity;
-		mix = data.mix;
+		setToSetupPose();
 	}
 
 	/** Copy constructor. */
 	public PhysicsConstraint (PhysicsConstraint constraint, Skeleton skeleton) {
 		this(constraint.data, skeleton);
-
-		inertia = constraint.inertia;
-		strength = constraint.strength;
-		damping = constraint.damping;
-		massInverse = constraint.massInverse;
-		wind = constraint.wind;
-		gravity = constraint.gravity;
-		mix = constraint.mix;
+		setToSetupPose();
 	}
 
 	public void reset () {
@@ -168,7 +155,7 @@ public class PhysicsConstraint implements Updatable {
 					}
 					if (a >= t) {
 						d = (float)Math.pow(damping, 60 * t);
-						float m = massInverse * t, e = strength, w = wind * f, g = gravity * f;
+						float m = massInverse * t, e = strength, w = wind * f * skeleton.scaleX, g = gravity * f * skeleton.scaleY;
 						do {
 							if (x) {
 								xVelocity += (w - xOffset * e) * m;

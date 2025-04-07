@@ -22,7 +22,7 @@ Unity's physics components do not support dynamically assigned vertices so they 
 
 ## Unity version
 
-spine-unity is compatible with Unity 2017.1-2023.1.
+spine-unity is compatible with Unity 2017.1-6000.0.
 
 ## Usage
 

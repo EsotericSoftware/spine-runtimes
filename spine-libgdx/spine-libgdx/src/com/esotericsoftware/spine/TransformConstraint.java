@@ -29,21 +29,23 @@
 
 package com.esotericsoftware.spine;
 
-import static com.esotericsoftware.spine.utils.SpineUtils.*;
+import static com.badlogic.gdx.math.MathUtils.*;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
 import com.esotericsoftware.spine.Skeleton.Physics;
+import com.esotericsoftware.spine.TransformConstraintData.FromProperty;
+import com.esotericsoftware.spine.TransformConstraintData.ToProperty;
 
 /** Stores the current pose for a transform constraint. A transform constraint adjusts the world transform of the constrained
- * bones to match that of the target bone.
+ * bones to match that of the source bone.
  * <p>
  * See <a href="https://esotericsoftware.com/spine-transform-constraints">Transform constraints</a> in the Spine User Guide. */
 public class TransformConstraint implements Updatable {
 	final TransformConstraintData data;
 	final Array<Bone> bones;
-	Bone target;
+	Bone source;
 	float mixRotate, mixX, mixY, mixScaleX, mixScaleY, mixShearY;
 
 	boolean active;
@@ -58,26 +60,15 @@ public class TransformConstraint implements Updatable {
 		for (BoneData boneData : data.bones)
 			bones.add(skeleton.bones.get(boneData.index));
 
-		target = skeleton.bones.get(data.target.index);
+		source = skeleton.bones.get(data.source.index);
 
-		mixRotate = data.mixRotate;
-		mixX = data.mixX;
-		mixY = data.mixY;
-		mixScaleX = data.mixScaleX;
-		mixScaleY = data.mixScaleY;
-		mixShearY = data.mixShearY;
+		setToSetupPose();
 	}
 
 	/** Copy constructor. */
 	public TransformConstraint (TransformConstraint constraint, Skeleton skeleton) {
 		this(constraint.data, skeleton);
-
-		mixRotate = constraint.mixRotate;
-		mixX = constraint.mixX;
-		mixY = constraint.mixY;
-		mixScaleX = constraint.mixScaleX;
-		mixScaleY = constraint.mixScaleY;
-		mixShearY = constraint.mixShearY;
+		setToSetupPose();
 	}
 
 	public void setToSetupPose () {
@@ -93,198 +84,37 @@ public class TransformConstraint implements Updatable {
 	/** Applies the constraint to the constrained bones. */
 	public void update (Physics physics) {
 		if (mixRotate == 0 && mixX == 0 && mixY == 0 && mixScaleX == 0 && mixScaleY == 0 && mixShearY == 0) return;
-		if (data.local) {
-			if (data.relative)
-				applyRelativeLocal();
+
+		TransformConstraintData data = this.data;
+		boolean localFrom = data.localSource, localTarget = data.localTarget, additive = data.additive, clamp = data.clamp;
+		Bone source = this.source;
+		Object[] fromItems = data.properties.items;
+		int fn = data.properties.size;
+		Object[] bones = this.bones.items;
+		for (int i = 0, n = this.bones.size; i < n; i++) {
+			var bone = (Bone)bones[i];
+			for (int f = 0; f < fn; f++) {
+				var from = (FromProperty)fromItems[f];
+				float value = from.value(data, source, localFrom) - from.offset;
+				Object[] toItems = from.to.items;
+				for (int t = 0, tn = from.to.size; t < tn; t++) {
+					var to = (ToProperty)toItems[t];
+					if (to.mix(this) != 0) {
+						float clamped = to.offset + value * to.scale;
+						if (clamp) {
+							if (to.offset < to.max)
+								clamped = clamp(clamped, to.offset, to.max);
+							else
+								clamped = clamp(clamped, to.max, to.offset);
+						}
+						to.apply(this, bone, clamped, localTarget, additive);
+					}
+				}
+			}
+			if (localTarget)
+				bone.update(null);
 			else
-				applyAbsoluteLocal();
-		} else {
-			if (data.relative)
-				applyRelativeWorld();
-			else
-				applyAbsoluteWorld();
-		}
-	}
-
-	private void applyAbsoluteWorld () {
-		float mixRotate = this.mixRotate, mixX = this.mixX, mixY = this.mixY, mixScaleX = this.mixScaleX,
-			mixScaleY = this.mixScaleY, mixShearY = this.mixShearY;
-		boolean translate = mixX != 0 || mixY != 0;
-
-		Bone target = this.target;
-		float ta = target.a, tb = target.b, tc = target.c, td = target.d;
-		float degRadReflect = ta * td - tb * tc > 0 ? degRad : -degRad;
-		float offsetRotation = data.offsetRotation * degRadReflect, offsetShearY = data.offsetShearY * degRadReflect;
-
-		Object[] bones = this.bones.items;
-		for (int i = 0, n = this.bones.size; i < n; i++) {
-			Bone bone = (Bone)bones[i];
-
-			if (mixRotate != 0) {
-				float a = bone.a, b = bone.b, c = bone.c, d = bone.d;
-				float r = atan2(tc, ta) - atan2(c, a) + offsetRotation;
-				if (r > PI)
-					r -= PI2;
-				else if (r < -PI) //
-					r += PI2;
-				r *= mixRotate;
-				float cos = cos(r), sin = sin(r);
-				bone.a = cos * a - sin * c;
-				bone.b = cos * b - sin * d;
-				bone.c = sin * a + cos * c;
-				bone.d = sin * b + cos * d;
-			}
-
-			if (translate) {
-				Vector2 temp = this.temp;
-				target.localToWorld(temp.set(data.offsetX, data.offsetY));
-				bone.worldX += (temp.x - bone.worldX) * mixX;
-				bone.worldY += (temp.y - bone.worldY) * mixY;
-			}
-
-			if (mixScaleX != 0) {
-				float s = (float)Math.sqrt(bone.a * bone.a + bone.c * bone.c);
-				if (s != 0) s = (s + ((float)Math.sqrt(ta * ta + tc * tc) - s + data.offsetScaleX) * mixScaleX) / s;
-				bone.a *= s;
-				bone.c *= s;
-			}
-			if (mixScaleY != 0) {
-				float s = (float)Math.sqrt(bone.b * bone.b + bone.d * bone.d);
-				if (s != 0) s = (s + ((float)Math.sqrt(tb * tb + td * td) - s + data.offsetScaleY) * mixScaleY) / s;
-				bone.b *= s;
-				bone.d *= s;
-			}
-
-			if (mixShearY > 0) {
-				float b = bone.b, d = bone.d;
-				float by = atan2(d, b);
-				float r = atan2(td, tb) - atan2(tc, ta) - (by - atan2(bone.c, bone.a));
-				if (r > PI)
-					r -= PI2;
-				else if (r < -PI) //
-					r += PI2;
-				r = by + (r + offsetShearY) * mixShearY;
-				float s = (float)Math.sqrt(b * b + d * d);
-				bone.b = cos(r) * s;
-				bone.d = sin(r) * s;
-			}
-
-			bone.updateAppliedTransform();
-		}
-	}
-
-	private void applyRelativeWorld () {
-		float mixRotate = this.mixRotate, mixX = this.mixX, mixY = this.mixY, mixScaleX = this.mixScaleX,
-			mixScaleY = this.mixScaleY, mixShearY = this.mixShearY;
-		boolean translate = mixX != 0 || mixY != 0;
-
-		Bone target = this.target;
-		float ta = target.a, tb = target.b, tc = target.c, td = target.d;
-		float degRadReflect = ta * td - tb * tc > 0 ? degRad : -degRad;
-		float offsetRotation = data.offsetRotation * degRadReflect, offsetShearY = data.offsetShearY * degRadReflect;
-
-		Object[] bones = this.bones.items;
-		for (int i = 0, n = this.bones.size; i < n; i++) {
-			Bone bone = (Bone)bones[i];
-
-			if (mixRotate != 0) {
-				float a = bone.a, b = bone.b, c = bone.c, d = bone.d;
-				float r = atan2(tc, ta) + offsetRotation;
-				if (r > PI)
-					r -= PI2;
-				else if (r < -PI) //
-					r += PI2;
-				r *= mixRotate;
-				float cos = cos(r), sin = sin(r);
-				bone.a = cos * a - sin * c;
-				bone.b = cos * b - sin * d;
-				bone.c = sin * a + cos * c;
-				bone.d = sin * b + cos * d;
-			}
-
-			if (translate) {
-				Vector2 temp = this.temp;
-				target.localToWorld(temp.set(data.offsetX, data.offsetY));
-				bone.worldX += temp.x * mixX;
-				bone.worldY += temp.y * mixY;
-			}
-
-			if (mixScaleX != 0) {
-				float s = ((float)Math.sqrt(ta * ta + tc * tc) - 1 + data.offsetScaleX) * mixScaleX + 1;
-				bone.a *= s;
-				bone.c *= s;
-			}
-			if (mixScaleY != 0) {
-				float s = ((float)Math.sqrt(tb * tb + td * td) - 1 + data.offsetScaleY) * mixScaleY + 1;
-				bone.b *= s;
-				bone.d *= s;
-			}
-
-			if (mixShearY > 0) {
-				float r = atan2(td, tb) - atan2(tc, ta);
-				if (r > PI)
-					r -= PI2;
-				else if (r < -PI) //
-					r += PI2;
-				float b = bone.b, d = bone.d;
-				r = atan2(d, b) + (r - PI / 2 + offsetShearY) * mixShearY;
-				float s = (float)Math.sqrt(b * b + d * d);
-				bone.b = cos(r) * s;
-				bone.d = sin(r) * s;
-			}
-
-			bone.updateAppliedTransform();
-		}
-	}
-
-	private void applyAbsoluteLocal () {
-		float mixRotate = this.mixRotate, mixX = this.mixX, mixY = this.mixY, mixScaleX = this.mixScaleX,
-			mixScaleY = this.mixScaleY, mixShearY = this.mixShearY;
-
-		Bone target = this.target;
-
-		Object[] bones = this.bones.items;
-		for (int i = 0, n = this.bones.size; i < n; i++) {
-			Bone bone = (Bone)bones[i];
-
-			float rotation = bone.arotation;
-			if (mixRotate != 0) rotation += (target.arotation - rotation + data.offsetRotation) * mixRotate;
-
-			float x = bone.ax, y = bone.ay;
-			x += (target.ax - x + data.offsetX) * mixX;
-			y += (target.ay - y + data.offsetY) * mixY;
-
-			float scaleX = bone.ascaleX, scaleY = bone.ascaleY;
-			if (mixScaleX != 0 && scaleX != 0)
-				scaleX = (scaleX + (target.ascaleX - scaleX + data.offsetScaleX) * mixScaleX) / scaleX;
-			if (mixScaleY != 0 && scaleY != 0)
-				scaleY = (scaleY + (target.ascaleY - scaleY + data.offsetScaleY) * mixScaleY) / scaleY;
-
-			float shearY = bone.ashearY;
-			if (mixShearY != 0) shearY += (target.ashearY - shearY + data.offsetShearY) * mixShearY;
-
-			bone.updateWorldTransform(x, y, rotation, scaleX, scaleY, bone.ashearX, shearY);
-		}
-	}
-
-	private void applyRelativeLocal () {
-		float mixRotate = this.mixRotate, mixX = this.mixX, mixY = this.mixY, mixScaleX = this.mixScaleX,
-			mixScaleY = this.mixScaleY, mixShearY = this.mixShearY;
-
-		Bone target = this.target;
-
-		Object[] bones = this.bones.items;
-		for (int i = 0, n = this.bones.size; i < n; i++) {
-			Bone bone = (Bone)bones[i];
-
-			float rotation = bone.arotation + (target.arotation + data.offsetRotation) * mixRotate;
-			float x = bone.ax + (target.ax + data.offsetX) * mixX;
-			float y = bone.ay + (target.ay + data.offsetY) * mixY;
-			float scaleX = bone.ascaleX * (((target.ascaleX - 1 + data.offsetScaleX) * mixScaleX) + 1);
-			float scaleY = bone.ascaleY * (((target.ascaleY - 1 + data.offsetScaleY) * mixScaleY) + 1);
-			float shearY = bone.ashearY + (target.ashearY + data.offsetShearY) * mixShearY;
-
-			bone.updateWorldTransform(x, y, rotation, scaleX, scaleY, bone.ashearX, shearY);
+				bone.updateAppliedTransform();
 		}
 	}
 
@@ -293,14 +123,14 @@ public class TransformConstraint implements Updatable {
 		return bones;
 	}
 
-	/** The target bone whose world transform will be copied to the constrained bones. */
-	public Bone getTarget () {
-		return target;
+	/** The bone whose world transform will be copied to the constrained bones. */
+	public Bone getSource () {
+		return source;
 	}
 
-	public void setTarget (Bone target) {
-		if (target == null) throw new IllegalArgumentException("target cannot be null.");
-		this.target = target;
+	public void setSource (Bone source) {
+		if (source == null) throw new IllegalArgumentException("source cannot be null.");
+		this.source = source;
 	}
 
 	/** A percentage (0-1) that controls the mix between the constrained and unconstrained rotation. */

@@ -41,11 +41,11 @@ export class PathConstraintData extends ConstraintData {
 	bones = new Array<BoneData>();
 
 	/** The slot whose path attachment will be used to constrained the bones. */
-	private _target: SlotData | null = null;
-	public set target (slotData: SlotData) { this._target = slotData; }
-	public get target () {
-		if (!this._target) throw new Error("SlotData not set.")
-		else return this._target;
+	private _slot: SlotData | null = null;
+	public set slot (slotData: SlotData) { this._slot = slotData; }
+	public get slot () {
+		if (!this._slot) throw new Error("SlotData not set.")
+		else return this._slot;
 	}
 
 	/** The mode for positioning the first bone on the path. */

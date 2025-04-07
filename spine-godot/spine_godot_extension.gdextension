@@ -9,12 +9,8 @@ macos.editor = "res://bin/macos/macos.framework/libspine_godot.macos.editor"
 macos.debug = "res://bin/macos/macos.framework/libspine_godot.macos.template_debug"
 macos.release = "res://bin/macos/macos.framework/libspine_godot.macos.template_release"
 
-ios.debug = "res://bin/ios/ios.framework/libspine_godot.ios.template_debug"
-ios.release = "res://bin/ios/ios.framework/libspine_godot.ios.template_release"
-
-windows.editor.dev.x86_64 = "res://bin/windows/libspine_godot.windows.editor.dev.x86_64.dll"
-windows.debug.dev.x86_64 = "res://bin/windows/libspine_godot.windows.template_debug.dev.x86_64.dll"
-windows.release.dev.x86_64 = "res://bin/windows/libspine_godot.windows.template_release.dev.x86_64.dll"
+ios.debug = "res://bin/ios/ios.framework/libspine_godot.ios.template_debug.xcframework"
+ios.release = "res://bin/ios/ios.framework/libspine_godot.ios.template_release.xcframework"
 
 windows.editor.x86_64 = "res://bin/windows/libspine_godot.windows.editor.x86_64.dll"
 windows.debug.x86_64 = "res://bin/windows/libspine_godot.windows.template_debug.x86_64.dll"
@@ -37,3 +33,8 @@ android.release.x86_64 = "res://bin/android/libspine_godot.android.template_rele
 
 android.debug.arm64 = "res://bin/android/libspine_godot.android.template_debug.arm64.so"
 android.release.arm64 = "res://bin/android/libspine_godot.android.template_release.arm64.so"
+
+web.debug.threads.wasm32 = "res://bin/web/libgdexample.web.template_debug.wasm32.wasm"
+web.release.threads.wasm32 = "res://bin/web/libgdexample.web.template_release.wasm32.wasm"
+web.debug.wasm32 = "res://bin/web/libgdexample.web.template_debug.wasm32.nothreads.wasm"
+web.release.wasm32 = "res://bin/web/libgdexample.web.template_release.wasm32.nothreads.wasm"

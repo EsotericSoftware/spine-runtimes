@@ -1,75 +1,84 @@
 ext {
-    libgdxVersion = "1.12.2-SNAPSHOT"
+	libgdxVersion = "1.12.2-SNAPSHOT"
 }
 
 allprojects {
-    apply plugin: "java"
+	apply plugin: "java"
 
-    sourceSets.main.java.srcDirs = ["src"]
+	sourceSets.main.java.srcDirs = ["src"]
 
-    repositories {
-        mavenLocal()
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
-        mavenCentral()
-    }
+	repositories {
+		mavenLocal()
+		maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+		mavenCentral()
+	}
 
-    tasks.withType(JavaCompile).configureEach {
-        sourceCompatibility = '1.7'
-        targetCompatibility = '1.7'
-        options.release.set(7)  // Ensures Java 8 bytecode is produced
-    }
+	tasks.withType(JavaCompile).configureEach {
+		sourceCompatibility = '16'
+		targetCompatibility = '16'
+		options.release.set(16)
+	}
 }
 
 project("spine-libgdx") {
-    apply plugin: "java-library"
-    apply plugin: "maven-publish"
-    apply plugin: "signing"
+	apply plugin: "java-library"
+	apply plugin: "maven-publish"
+	apply plugin: "signing"
 
-    dependencies {
-        implementation "com.badlogicgames.gdx:gdx:$libgdxVersion"
-    }
+	sourceSets {
+		main {
+			resources {
+				srcDirs = ["src"]  // Add this line to include non-Java files from src directory
+				include "**/*.gwt.xml"  // Add this to specifically include GWT module files
+			}
+		}
+	}
+
+	dependencies {
+		implementation "com.badlogicgames.gdx:gdx:$libgdxVersion"
+	}
 }
 apply from: 'publishing.gradle'
 
 project("spine-skeletonviewer") {
-    jar {
-        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+	jar {
+		duplicatesStrategy = DuplicatesStrategy.INCLUDE
 
-        manifest {
-            attributes "Main-Class": "com.esotericsoftware.spine.SkeletonViewer"
-        }
+		manifest {
+			attributes "Main-Class": "com.esotericsoftware.spine.SkeletonViewer"
+		}
 
-        from {
-            configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-        }
+		from {
+			configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+		}
 
-        dependsOn(project(":spine-libgdx").tasks.named('jar'))
-    }
+		dependsOn(project(":spine-libgdx").tasks.named('jar'))
+	}
 
-    tasks.named('build').configure {
-        dependsOn(tasks.named('jar'))
-    }
+	tasks.named('build').configure {
+		dependsOn(tasks.named('jar'))
+	}
 
-    tasks.withType(JavaCompile).configureEach {
-        sourceCompatibility = '1.8'
-        targetCompatibility = '1.8'
-        options.release.set(8)  // Ensures Java 8 bytecode is produced
-    }
+	tasks.withType(JavaCompile).configureEach {
+		sourceCompatibility = '16'
+		targetCompatibility = '16'
+		options.release.set(16)
+	}
 }
 
 configure(subprojects - project("spine-libgdx")) {
-    sourceSets.main.resources.srcDirs = ["assets"]
+	sourceSets.main.resources.srcDirs = ["assets"]
 
-    dependencies {
-        implementation project(":spine-libgdx")
-        implementation "com.badlogicgames.gdx:gdx:$libgdxVersion"
-        implementation "com.badlogicgames.gdx:gdx-platform:$libgdxVersion:natives-desktop"
-        implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$libgdxVersion"
-        implementation "com.badlogicgames.gdx:gdx-box2d:$libgdxVersion"
-        implementation "com.badlogicgames.gdx:gdx-box2d-platform:$libgdxVersion:natives-desktop"
-    }
+	dependencies {
+		implementation project(":spine-libgdx")
+		implementation "com.badlogicgames.gdx:gdx:$libgdxVersion"
+		implementation "com.badlogicgames.gdx:gdx-platform:$libgdxVersion:natives-desktop"
+		implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$libgdxVersion"
+		implementation "com.badlogicgames.gdx:gdx-box2d:$libgdxVersion"
+		implementation "com.badlogicgames.gdx:gdx-box2d-platform:$libgdxVersion:natives-desktop"
+	}
 }
 
 tasks.withType(JavaCompile).configureEach {
-    println "Building with sourceCompatibility = ${sourceCompatibility}, targetCompatibility = ${targetCompatibility}"
+	println "Building with sourceCompatibility = ${sourceCompatibility}, targetCompatibility = ${targetCompatibility}"
 }

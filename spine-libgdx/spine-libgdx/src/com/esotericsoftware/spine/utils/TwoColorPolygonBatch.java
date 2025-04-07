@@ -826,7 +826,7 @@ public class TwoColorPolygonBatch implements PolygonBatch {
 
 		final int vertexIndex = this.vertexIndex;
 		int triangleIndex = this.triangleIndex;
-		short vertex = (short)(vertexIndex / VERTEX_SIZE);
+		var vertex = (short)(vertexIndex / VERTEX_SIZE);
 		for (int n = triangleIndex + triangleCount; triangleIndex < n; triangleIndex += 6, vertex += 4) {
 			triangles[triangleIndex] = vertex;
 			triangles[triangleIndex + 1] = (short)(vertex + 1);
@@ -859,7 +859,7 @@ public class TwoColorPolygonBatch implements PolygonBatch {
 
 		final int vertexIndex = this.vertexIndex;
 		int triangleIndex = this.triangleIndex;
-		short vertex = (short)(vertexIndex / VERTEX_SIZE);
+		var vertex = (short)(vertexIndex / VERTEX_SIZE);
 		for (int n = triangleIndex + triangleCount; triangleIndex < n; triangleIndex += 6, vertex += 4) {
 			triangles[triangleIndex] = vertex;
 			triangles[triangleIndex + 1] = (short)(vertex + 1);
@@ -1527,7 +1527,7 @@ public class TwoColorPolygonBatch implements PolygonBatch {
 			+ "  gl_FragColor.rgb = ((texColor.a - 1.0) * u_pma + 1.0 - texColor.rgb) * v_dark.rgb + texColor.rgb * v_light.rgb;\n" //
 			+ "}";
 
-		ShaderProgram shader = new ShaderProgram(vertexShader, fragmentShader);
+		var shader = new ShaderProgram(vertexShader, fragmentShader);
 		if (shader.isCompiled() == false) throw new IllegalArgumentException("Error compiling shader: " + shader.getLog());
 		return shader;
 	}

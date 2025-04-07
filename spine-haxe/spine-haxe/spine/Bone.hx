@@ -129,7 +129,7 @@ class Bone implements Updatable {
 		var cos:Float = 0;
 		var s:Float = 0;
 		var sx:Float = skeleton.scaleX;
-		var sy:Float = skeleton.scaleY * (yDown ? -1 : 1);
+		var sy:Float = skeleton.scaleY;
 
 		var parent:Bone = _parent;
 		if (parent == null) {

@@ -27,8 +27,10 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+package starlingExamples;
+
 import openfl.geom.Point;
-import Scene.SceneManager;
+import starlingExamples.Scene.SceneManager;
 import openfl.utils.Assets;
 import spine.SkeletonData;
 import spine.animation.AnimationStateData;
@@ -42,7 +44,7 @@ import starling.display.Canvas;
 
 class ControlBonesExample extends Scene {
 	var loadBinary = true;
-	
+
 	var skeletonSprite:SkeletonSprite;
 	private var movement = new openfl.geom.Point();
 	private var controlBones = [];
@@ -133,7 +135,7 @@ class ControlBonesExample extends Scene {
 				skeletonSprite.skeleton.y += movement.y / skeletonSprite.scale;
 			}
 		}
-		
+
 		if (touchBackground) {
 			var sceneTouch = e.getTouch(this);
 			if (sceneTouch != null && sceneTouch.phase == TouchPhase.ENDED) {

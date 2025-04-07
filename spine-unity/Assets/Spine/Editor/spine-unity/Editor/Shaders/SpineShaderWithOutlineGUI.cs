@@ -41,6 +41,7 @@ public class SpineShaderWithOutlineGUI : ShaderGUI {
 	MaterialProperty _OutlineWidth = null;
 	MaterialProperty _UseScreenSpaceOutlineWidth = null;
 	MaterialProperty _OutlineColor = null;
+	MaterialProperty _Fill = null;
 	MaterialProperty _OutlineReferenceTexWidth = null;
 	MaterialProperty _ThresholdEnd = null;
 	MaterialProperty _OutlineSmoothness = null;
@@ -54,6 +55,7 @@ public class SpineShaderWithOutlineGUI : ShaderGUI {
 	static GUIContent _OutlineWidthText = new GUIContent("Outline Width", "");
 	static GUIContent _UseScreenSpaceOutlineWidthText = new GUIContent("Width in Screen Space", "Enable to keep the outline width constant in screen space instead of texture space. Requires more expensive computations.");
 	static GUIContent _OutlineColorText = new GUIContent("Outline Color", "");
+	static GUIContent _FillText = new GUIContent("Fill", "Enable to also fill the opaque area inside the outline with the outline color. Prevents a semi-transparent gap between outline and skeleton.");
 	static GUIContent _OutlineReferenceTexWidthText = new GUIContent("Reference Texture Width", "");
 	static GUIContent _ThresholdEndText = new GUIContent("Outline Threshold", "");
 	static GUIContent _OutlineSmoothnessText = new GUIContent("Outline Smoothness", "");
@@ -92,6 +94,7 @@ public class SpineShaderWithOutlineGUI : ShaderGUI {
 		_UseScreenSpaceOutlineWidth = FindProperty("_UseScreenSpaceOutlineWidth", props, false);
 		_OutlineReferenceTexWidth = FindProperty("_OutlineReferenceTexWidth", props, false);
 		_OutlineColor = FindProperty("_OutlineColor", props, false);
+		_Fill = FindProperty("_Fill", props, false);
 		_ThresholdEnd = FindProperty("_ThresholdEnd", props, false);
 		_OutlineSmoothness = FindProperty("_OutlineSmoothness", props, false);
 		_Use8Neighbourhood = FindProperty("_Use8Neighbourhood", props, false);
@@ -157,6 +160,8 @@ public class SpineShaderWithOutlineGUI : ShaderGUI {
 			if (_UseScreenSpaceOutlineWidth != null)
 				_materialEditor.ShaderProperty(_UseScreenSpaceOutlineWidth, _UseScreenSpaceOutlineWidthText);
 			_materialEditor.ShaderProperty(_OutlineColor, _OutlineColorText);
+			if (_Fill != null)
+				_materialEditor.ShaderProperty(_Fill, _FillText);
 
 			_showAdvancedOutlineSettings = EditorGUILayout.Foldout(_showAdvancedOutlineSettings, _OutlineAdvancedText);
 			if (_showAdvancedOutlineSettings) {

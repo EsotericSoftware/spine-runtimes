@@ -94,7 +94,7 @@ public class SkeletonActorPool extends Pool<SkeletonActor> {
 		Object[] obtained = this.obtained.items;
 		outer:
 		for (int i = this.obtained.size - 1; i >= 0; i--) {
-			SkeletonActor actor = (SkeletonActor)obtained[i];
+			var actor = (SkeletonActor)obtained[i];
 			Array<TrackEntry> tracks = actor.state.getTracks();
 			for (int ii = 0, nn = tracks.size; ii < nn; ii++)
 				if (tracks.get(ii) != null) continue outer;
@@ -103,7 +103,7 @@ public class SkeletonActorPool extends Pool<SkeletonActor> {
 	}
 
 	protected SkeletonActor newObject () {
-		SkeletonActor actor = new SkeletonActor();
+		var actor = new SkeletonActor();
 		actor.setRenderer(renderer);
 		return actor;
 	}

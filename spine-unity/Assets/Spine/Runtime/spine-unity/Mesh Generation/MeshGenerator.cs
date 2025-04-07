@@ -682,8 +682,8 @@ namespace Spine.Unity {
 					color.b = (byte)(skeletonB * slot.B * c.b * 255);
 				}
 
-				if (useClipping && clipper.IsClipping) {
-					clipper.ClipTriangles(workingVerts, attachmentTriangleIndices, attachmentIndexCount, uvs);
+				if (useClipping && clipper.IsClipping
+					&& clipper.ClipTriangles(workingVerts, attachmentTriangleIndices, attachmentIndexCount, uvs)) {
 					workingVerts = clipper.ClippedVertices.Items;
 					attachmentVertexCount = clipper.ClippedVertices.Count >> 1;
 					attachmentTriangleIndices = clipper.ClippedTriangles.Items;

@@ -155,12 +155,14 @@ namespace Spine.Unity.Editor {
 				// If this fails as well, try at any base property up the hierarchy
 				if (relativeProperty == null) {
 					int dotIndex = propertyPath.Length - property.name.Length - 1;
-					while (relativeProperty == null) {
-						dotIndex = propertyPath.LastIndexOf('.', dotIndex - 1);
-						if (dotIndex < 0)
-							break;
-						newPropertyPath = propertyPath.Remove(dotIndex + 1) + propertyName;
-						relativeProperty = property.serializedObject.FindProperty(newPropertyPath);
+					if (dotIndex > 0) {
+						while (relativeProperty == null) {
+							dotIndex = propertyPath.LastIndexOf('.', dotIndex - 1);
+							if (dotIndex < 0)
+								break;
+							newPropertyPath = propertyPath.Remove(dotIndex + 1) + propertyName;
+							relativeProperty = property.serializedObject.FindProperty(newPropertyPath);
+						}
 					}
 				}
 			}

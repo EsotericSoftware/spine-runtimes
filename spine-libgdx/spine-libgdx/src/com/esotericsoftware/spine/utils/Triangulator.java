@@ -222,13 +222,13 @@ class Triangulator {
 
 			for (int ii = 0; ii < n; ii++) {
 				if (ii == i) continue;
-				ShortArray otherIndices = (ShortArray)convexPolygonsIndicesItems[ii];
+				var otherIndices = (ShortArray)convexPolygonsIndicesItems[ii];
 				if (otherIndices.size != 3) continue;
 				int otherFirstIndex = otherIndices.first();
 				int otherSecondIndex = otherIndices.get(1);
 				int otherLastIndex = otherIndices.get(2);
 
-				FloatArray otherPoly = (FloatArray)convexPolygonsItems[ii];
+				var otherPoly = (FloatArray)convexPolygonsItems[ii];
 				float x3 = otherPoly.get(otherPoly.size - 2), y3 = otherPoly.get(otherPoly.size - 1);
 
 				if (otherFirstIndex != firstIndex || otherSecondIndex != lastIndex) continue;

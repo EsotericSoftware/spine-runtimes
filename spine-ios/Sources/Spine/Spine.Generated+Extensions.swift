@@ -86,18 +86,19 @@ public extension Atlas {
     }
     
     private static func fromData(data: Data, loadFile: (_ name: String) async throws -> Data) async throws -> (Atlas, [UIImage]) {
-        guard let atlasData = String(data: data, encoding: .utf8) as? NSString else {
-            throw "Couldn't read atlas bytes as utf8 string"
+        guard let atlasData = String(data: data, encoding: .utf8) else {
+            throw SpineError("Couldn't read atlas bytes as utf8 string")
         }
-        let atlasDataNative = UnsafeMutablePointer<CChar>(mutating: atlasData.utf8String)
-        guard let atlas = spine_atlas_load(atlasDataNative) else {
-            throw "Couldn't load atlas data"
+        let atlas = try atlasData.utf8CString.withUnsafeBufferPointer {
+            guard let atlas = spine_atlas_load($0.baseAddress) else {
+                throw SpineError("Couldn't load atlas data")
+            }
+            return atlas
         }
-        
         if let error = spine_atlas_get_error(atlas) {
             let message = String(cString: error)
             spine_atlas_dispose(atlas)
-            throw "Couldn't load atlas: \(message)"
+            throw SpineError("Couldn't load atlas: \(message)")
         }
         
         var atlasPages = [UIImage]()
@@ -159,26 +160,31 @@ public extension SkeletonData {
     ///
     /// Throws an `Error` in case the skeleton data could not be loaded.
     static func fromData(atlas: Atlas, data: Data) throws -> SkeletonData {
-        let binaryNative = try data.withUnsafeBytes { unsafeBytes in
-            guard let bytes = unsafeBytes.bindMemory(to: UInt8.self).baseAddress else {
-                throw "Couldn't read atlas binary"
+        let result = try data.withUnsafeBytes{
+            try $0.withMemoryRebound(to: UInt8.self) { buffer in
+                guard let ptr = buffer.baseAddress else {
+                    throw SpineError("Couldn't read atlas binary")
+                }
+                return spine_skeleton_data_load_binary(
+                    atlas.wrappee,
+                    ptr,
+                    Int32(buffer.count)
+                )
             }
-            return (data: bytes, length: Int32(unsafeBytes.count))
         }
-        let result = spine_skeleton_data_load_binary(
-            atlas.wrappee,
-            binaryNative.data,
-            binaryNative.length
-        )
+        guard let result else {
+            throw SpineError("Couldn't load skeleton data")
+        }
+        defer {
+            spine_skeleton_data_result_dispose(result)
+        }
         if let error = spine_skeleton_data_result_get_error(result) {
             let message = String(cString: error)
-            spine_skeleton_data_result_dispose(result)
-            throw "Couldn't load skeleton data: \(message)"
+            throw SpineError("Couldn't load skeleton data: \(message)")
         }
         guard let data = spine_skeleton_data_result_get_data(result) else {
-            throw "Couldn't load skeleton data from result"
+            throw SpineError("Couldn't load skeleton data from result")
         }
-        spine_skeleton_data_result_dispose(result)
         return SkeletonData(data)
     }
     
@@ -187,26 +193,31 @@ public extension SkeletonData {
     ///
     /// Throws an `Error` in case the atlas could not be loaded.
     static func fromJson(atlas: Atlas, json: String) throws -> SkeletonData {
-        let jsonNative = UnsafeMutablePointer<CChar>(mutating: (json as NSString).utf8String)
-        guard let result = spine_skeleton_data_load_json(atlas.wrappee, jsonNative) else {
-            throw "Couldn't load skeleton data json"
+        let result = try json.utf8CString.withUnsafeBufferPointer { buffer in
+            guard
+                let basePtr = buffer.baseAddress,
+                let result = spine_skeleton_data_load_json(atlas.wrappee, basePtr) else {
+                throw SpineError("Couldn't load skeleton data json")
+            }
+            return result
+        }
+        defer {
+            spine_skeleton_data_result_dispose(result)
         }
         if let error = spine_skeleton_data_result_get_error(result) {
             let message = String(cString: error)
-            spine_skeleton_data_result_dispose(result)
-            throw "Couldn't load skeleton data: \(message)"
+            throw SpineError("Couldn't load skeleton data: \(message)")
         }
         guard let data = spine_skeleton_data_result_get_data(result) else {
-            throw "Couldn't load skeleton data from result"
+            throw SpineError("Couldn't load skeleton data from result")
         }
-        spine_skeleton_data_result_dispose(result)
         return SkeletonData(data)
     }
     
     private static func fromData(atlas: Atlas, data: Data, isJson: Bool) throws -> SkeletonData {
         if isJson {
             guard let json = String(data: data, encoding: .utf8) else {
-                throw "Couldn't read skeleton data json string"
+                throw SpineError("Couldn't read skeleton data json string")
             }
             return try fromJson(atlas: atlas, json: json)
         } else {
@@ -300,12 +311,12 @@ internal enum FileSource {
         case .bundle(let fileName, let bundle):
             let components = fileName.split(separator: ".")
             guard components.count > 1, let ext = components.last else {
-                throw "Provide both file name and file extension"
+                throw SpineError("Provide both file name and file extension")
             }
             let name = components.dropLast(1).joined(separator: ".")
             
             guard let fileUrl = bundle.url(forResource: name, withExtension: String(ext)) else {
-                throw "Could not load file with name \(name) from bundle"
+                throw SpineError("Could not load file with name \(name) from bundle")
             }
             return try Data(contentsOf: fileUrl, options: [])
         case .file(let fileUrl):
@@ -318,34 +329,63 @@ internal enum FileSource {
                 }
                 return try Data(contentsOf: temp, options: [])
             } else {
-                return try await withCheckedThrowingContinuation { continuation in
-                    let task = URLSession.shared.downloadTask(with: url) { temp, response, error in
-                        if let error {
-                            continuation.resume(throwing: error)
-                        } else {
-                            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-                                continuation.resume(throwing: URLError(.badServerResponse))
-                                return
-                            }
-                            guard let temp else {
-                                continuation.resume(throwing: "Could not download file.")
-                                return
-                            }
-                            do {
-                                continuation.resume(returning: try Data(contentsOf: temp, options: []))
-                            } catch {
+                let lock = NSRecursiveLock()
+                nonisolated(unsafe)
+                var isCancelled = false
+                nonisolated(unsafe)
+                var taskHolder:URLSessionDownloadTask? = nil
+                return try await withTaskCancellationHandler {
+                    try await withCheckedThrowingContinuation { continuation in
+                        let task = URLSession.shared.downloadTask(with: url) { temp, response, error in
+                            if let error {
                                 continuation.resume(throwing: error)
+                            } else {
+                                guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+                                    continuation.resume(throwing: URLError(.badServerResponse))
+                                    return
+                                }
+                                guard let temp else {
+                                    continuation.resume(throwing: SpineError("Could not download file."))
+                                    return
+                                }
+                                do {
+                                    continuation.resume(returning: try Data(contentsOf: temp, options: []))
+                                } catch {
+                                    continuation.resume(throwing: error)
+                                }
                             }
                         }
+                        task.resume()
+                        let shouldCancel = lock.withLock {
+                            if !isCancelled {
+                                taskHolder = task
+                            }
+                            return isCancelled
+                        }
+                        if shouldCancel {
+                            task.cancel()
+                        }
                     }
-                    task.resume()
+                } onCancel: {
+                    lock.withLock {
+                        isCancelled = true
+                        let value = taskHolder
+                        taskHolder = nil
+                        return value
+                    }?.cancel()
                 }
             }
         }
     }
 }
 
-extension String: Error {
+public struct SpineError: Error, CustomStringConvertible {
+    
+    public let description: String
+    
+    internal init(_ description: String) {
+        self.description = description
+    }
     
 }
 

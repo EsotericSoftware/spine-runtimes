@@ -27,51 +27,68 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import Scene.SceneManager;
-import openfl.utils.Assets;
-import spine.SkeletonData;
-import spine.Physics;
-import spine.animation.AnimationStateData;
-import spine.atlas.TextureAtlas;
-import spine.starling.SkeletonSprite;
-import spine.starling.StarlingTextureLoader;
+package starlingExamples;
+
+import starling.display.Quad;
+import starling.text.TextField;
 import starling.core.Starling;
-import starling.events.TouchEvent;
-import starling.events.TouchPhase;
+import starling.display.Sprite;
 
-class SnowglobeExample extends Scene {
-	var loadBinary = false;
+class SceneManager {
+	private static var instance:SceneManager;
 
-	public function load():Void {
-		background.color = 0x333333;
+	private var currentScene:Sprite;
 
-		var atlas = new TextureAtlas(Assets.getText("assets/snowglobe.atlas"), new StarlingTextureLoader("assets/snowglobe.atlas"));
-		var skeletondata = SkeletonData.from(Assets.getText("assets/snowglobe-pro.json"), atlas);
-
-		var animationStateData = new AnimationStateData(skeletondata);
-		animationStateData.defaultMix = 0.25;
-
-		var skeletonSprite = new SkeletonSprite(skeletondata, animationStateData);
-		skeletonSprite.skeleton.updateWorldTransform(Physics.update);
-		var bounds = skeletonSprite.skeleton.getBounds();
-
-		
-		skeletonSprite.scale = 0.15;
-		skeletonSprite.x = Starling.current.stage.stageWidth / 2;
-		skeletonSprite.y = Starling.current.stage.stageHeight/ 1.5;
-		
-		skeletonSprite.state.setAnimationByName(0, "shake", true);
-
-		addChild(skeletonSprite);
-		juggler.add(skeletonSprite);
-
-		addEventListener(TouchEvent.TOUCH, onTouch);
+	private function new() {
+		// Singleton pattern to ensure only one instance of SceneManager
 	}
 
-	public function onTouch(e:TouchEvent) {
-		var touch = e.getTouch(this);
-		if (touch != null && touch.phase == TouchPhase.ENDED) {
-			SceneManager.getInstance().switchScene(new CloudPotExample());
+	public static function getInstance():SceneManager {
+		if (instance == null) {
+			instance = new SceneManager();
 		}
+		return instance;
+	}
+
+	public function switchScene(newScene:Scene):Void {
+		if (currentScene != null) {
+			currentScene.dispose();
+			currentScene.removeFromParent(true);
+		}
+		currentScene = newScene;
+		starling.core.Starling.current.stage.addChild(currentScene);
+		newScene.load();
+	}
+}
+
+abstract class Scene extends Sprite {
+	var juggler = new starling.animation.Juggler();
+
+	public var background:Quad;
+
+	public function new() {
+		super();
+		var stageWidth = Starling.current.stage.stageWidth;
+		var stageHeight = Starling.current.stage.stageHeight;
+		background = new Quad(stageWidth, stageHeight, 0x0);
+		this.addChild(background);
+		Starling.current.juggler.add(juggler);
+	}
+
+	abstract public function load():Void;
+
+	public override function dispose():Void {
+		juggler.purge();
+		Starling.current.juggler.remove(juggler);
+		super.dispose();
+	}
+
+	public function addText(text:String, x:Int = 10, y:Int = 10) {
+		var textField = new TextField(250, 30, text);
+		textField.x = x;
+		textField.y = y;
+		textField.format.color = 0xffffffff;
+		addChild(textField);
+		return textField;
 	}
 }

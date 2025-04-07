@@ -132,7 +132,7 @@ export class Bone implements Updatable {
 	}
 
 	/** Computes the world transform using the parent bone and this bone's local applied transform. */
-	update (physics: Physics) {
+	update (physics: Physics | null) {
 		this.updateWorldTransformWith(this.ax, this.ay, this.arotation, this.ascaleX, this.ascaleY, this.ashearX, this.ashearY);
 	}
 

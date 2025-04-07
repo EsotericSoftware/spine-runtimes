@@ -36,7 +36,7 @@ import com.badlogic.gdx.utils.Array;
  * See <a href="https://esotericsoftware.com/spine-path-constraints">Path constraints</a> in the Spine User Guide. */
 public class PathConstraintData extends ConstraintData {
 	final Array<BoneData> bones = new Array();
-	SlotData target;
+	SlotData slot;
 	PositionMode positionMode;
 	SpacingMode spacingMode;
 	RotateMode rotateMode;
@@ -53,13 +53,13 @@ public class PathConstraintData extends ConstraintData {
 	}
 
 	/** The slot whose path attachment will be used to constrained the bones. */
-	public SlotData getTarget () {
-		return target;
+	public SlotData getSlot () {
+		return slot;
 	}
 
-	public void setTarget (SlotData target) {
-		if (target == null) throw new IllegalArgumentException("target cannot be null.");
-		this.target = target;
+	public void setSlot (SlotData slot) {
+		if (slot == null) throw new IllegalArgumentException("slot cannot be null.");
+		this.slot = slot;
 	}
 
 	/** The mode for positioning the first bone on the path. */
@@ -148,7 +148,8 @@ public class PathConstraintData extends ConstraintData {
 
 	/** Controls how the first bone is positioned along the path.
 	 * <p>
-	 * See <a href="https://esotericsoftware.com/spine-path-constraints#Position-mode">Position mode</a> in the Spine User Guide. */
+	 * See <a href="https://esotericsoftware.com/spine-path-constraints#Position-mode">Position mode</a> in the Spine User
+	 * Guide. */
 	static public enum PositionMode {
 		fixed, percent;
 

@@ -78,15 +78,14 @@ export class SkeletonBounds {
 			if (!slot.bone.active) continue;
 			let attachment = slot.getAttachment();
 			if (attachment instanceof BoundingBoxAttachment) {
-				let boundingBox = attachment as BoundingBoxAttachment;
-				boundingBoxes.push(boundingBox);
+				boundingBoxes.push(attachment);
 
 				let polygon = polygonPool.obtain();
-				if (polygon.length != boundingBox.worldVerticesLength) {
-					polygon = Utils.newFloatArray(boundingBox.worldVerticesLength);
+				if (polygon.length != attachment.worldVerticesLength) {
+					polygon = Utils.newFloatArray(attachment.worldVerticesLength);
 				}
 				polygons.push(polygon);
-				boundingBox.computeWorldVertices(slot, 0, boundingBox.worldVerticesLength, polygon, 0, 2);
+				attachment.computeWorldVertices(slot, 0, attachment.worldVerticesLength, polygon, 0, 2);
 			}
 		}
 

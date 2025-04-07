@@ -27,44 +27,58 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import Scene.SceneManager;
+package flixelExamples;
+
+
+import spine.Skin;
+import flixel.ui.FlxButton;
+import flixel.FlxG;
+import spine.flixel.SkeletonSprite;
+import spine.flixel.FlixelTextureLoader;
+import flixel.FlxState;
 import openfl.utils.Assets;
 import spine.SkeletonData;
 import spine.animation.AnimationStateData;
 import spine.atlas.TextureAtlas;
-import spine.starling.SkeletonSprite;
-import spine.starling.StarlingTextureLoader;
-import starling.core.Starling;
-import starling.events.TouchEvent;
-import starling.events.TouchPhase;
 
-class TankExample extends Scene {
+class MixAndMatchExample extends FlxState {
 	var loadBinary = false;
+	// var loadBinary = true;
 
-	public function load():Void {
-		background.color = 0xffffffff;
-		var atlas = new TextureAtlas(Assets.getText("assets/tank.atlas"), new StarlingTextureLoader("assets/tank.atlas"));
-		var skeletondata = SkeletonData.from(loadBinary ? Assets.getBytes("assets/tank-pro.skel") : Assets.getText("assets/tank-pro.json"), atlas);
-		var animationStateData = new AnimationStateData(skeletondata);
+	var skeletonSprite:SkeletonSprite;
+	override public function create():Void {
+		FlxG.cameras.bgColor = 0xffa1b2b0;
+
+		var button = new FlxButton(0, 0, "Next scene", () -> FlxG.switchState(() -> new TankExample()));
+		button.setPosition(FlxG.width * .75, FlxG.height / 10);
+		add(button);
+
+		var atlas = new TextureAtlas(Assets.getText("assets/mix-and-match.atlas"), new FlixelTextureLoader("assets/mix-and-match.atlas"));
+		var data = SkeletonData.from(loadBinary ? Assets.getBytes("assets/mix-and-match-pro.skel") : Assets.getText("assets/mix-and-match-pro.json"), atlas, .5);
+		var animationStateData = new AnimationStateData(data);
 		animationStateData.defaultMix = 0.25;
 
-		var skeletonSprite = new SkeletonSprite(skeletondata, animationStateData);
-		var bounds = skeletonSprite.skeleton.getBounds();
-		skeletonSprite.scale = Starling.current.stage.stageWidth / bounds.width;
-		skeletonSprite.x = Starling.current.stage.stageWidth / 2;
-		skeletonSprite.y = Starling.current.stage.stageHeight * 0.5;
-		skeletonSprite.state.setAnimationByName(0, "drive", true);
+		skeletonSprite = new SkeletonSprite(data, animationStateData);
+		var customSkin = new Skin("custom");
+		var skinBase = data.findSkin("skin-base");
+		customSkin.addSkin(skinBase);
+		customSkin.addSkin(data.findSkin("nose/short"));
+		customSkin.addSkin(data.findSkin("eyelids/girly"));
+		customSkin.addSkin(data.findSkin("eyes/violet"));
+		customSkin.addSkin(data.findSkin("hair/brown"));
+		customSkin.addSkin(data.findSkin("clothes/hoodie-orange"));
+		customSkin.addSkin(data.findSkin("legs/pants-jeans"));
+		customSkin.addSkin(data.findSkin("accessories/bag"));
+		customSkin.addSkin(data.findSkin("accessories/hat-red-yellow"));
+		skeletonSprite.skeleton.skin = customSkin;
 
-		addChild(skeletonSprite);
-		juggler.add(skeletonSprite);
+		skeletonSprite.state.update(0);
+		var animation = skeletonSprite.state.setAnimationByName(0, "dance", true).animation;
+		skeletonSprite.setBoundingBox(animation);
+		skeletonSprite.screenCenter();
+		add(skeletonSprite);
 
-		addEventListener(TouchEvent.TOUCH, onTouch);
+		super.create();
 	}
 
-	public function onTouch(e:TouchEvent) {
-		var touch = e.getTouch(this);
-		if (touch != null && touch.phase == TouchPhase.ENDED) {
-			SceneManager.getInstance().switchScene(new VineExample());
-		}
-	}
 }

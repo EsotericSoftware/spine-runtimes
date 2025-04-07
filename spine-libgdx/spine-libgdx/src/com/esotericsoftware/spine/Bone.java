@@ -130,7 +130,7 @@ public class Bone implements Updatable {
 		worldY = pc * x + pd * y + parent.worldY;
 
 		switch (inherit) {
-		case normal: {
+		case normal -> {
 			float rx = (rotation + shearX) * degRad;
 			float ry = (rotation + 90 + shearY) * degRad;
 			float la = cos(rx) * scaleX;
@@ -143,16 +143,15 @@ public class Bone implements Updatable {
 			d = pc * lb + pd * ld;
 			return;
 		}
-		case onlyTranslation: {
+		case onlyTranslation -> {
 			float rx = (rotation + shearX) * degRad;
 			float ry = (rotation + 90 + shearY) * degRad;
 			a = cos(rx) * scaleX;
 			b = cos(ry) * scaleY;
 			c = sin(rx) * scaleX;
 			d = sin(ry) * scaleY;
-			break;
 		}
-		case noRotationOrReflection: {
+		case noRotationOrReflection -> {
 			float sx = 1 / skeleton.scaleX, sy = 1 / skeleton.scaleY;
 			pa *= sx;
 			pc *= sy;
@@ -177,10 +176,8 @@ public class Bone implements Updatable {
 			b = pa * lb - pb * ld;
 			c = pc * la + pd * lc;
 			d = pc * lb + pd * ld;
-			break;
 		}
-		case noScale:
-		case noScaleOrReflection:
+		case noScale, noScaleOrReflection -> {
 			rotation *= degRad;
 			float cos = cos(rotation), sin = sin(rotation);
 			float za = (pa * cos + pb * sin) / skeleton.scaleX;
@@ -204,6 +201,7 @@ public class Bone implements Updatable {
 			b = za * lb + zb * ld;
 			c = zc * la + zd * lc;
 			d = zc * lb + zd * ld;
+		}
 		}
 		a *= skeleton.scaleX;
 		b *= skeleton.scaleX;
@@ -440,17 +438,15 @@ public class Bone implements Updatable {
 			rd = d;
 		} else {
 			switch (inherit) {
-			case noRotationOrReflection: {
+			case noRotationOrReflection -> {
 				float s = Math.abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
 				pb = -pc * skeleton.scaleX * s / skeleton.scaleY;
 				pd = pa * skeleton.scaleY * s / skeleton.scaleX;
 				pid = 1 / (pa * pd - pb * pc);
 				ia = pd * pid;
 				ib = pb * pid;
-				break;
 			}
-			case noScale:
-			case noScaleOrReflection:
+			case noScale, noScaleOrReflection -> {
 				float r = rotation * degRad, cos = cos(r), sin = sin(r);
 				pa = (pa * cos + pb * sin) / skeleton.scaleX;
 				pc = (pc * cos + pd * sin) / skeleton.scaleY;
@@ -468,6 +464,7 @@ public class Bone implements Updatable {
 				ib = pb * pid;
 				ic = pc * pid;
 				id = pa * pid;
+			}
 			}
 			ra = ia * a - ib * c;
 			rb = ia * b - ib * d;

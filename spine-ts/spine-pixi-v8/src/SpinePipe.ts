@@ -117,6 +117,9 @@ export class SpinePipe implements RenderPipe<Spine> {
 
 		spine._validateAndTransformAttachments();
 
+		spine.spineAttachmentsDirty = false;
+		spine.spineTexturesDirty = false;
+
 		for (let i = 0, n = drawOrder.length; i < n; i++) {
 			const slot = drawOrder[i];
 			const attachment = slot.getAttachment();
@@ -154,6 +157,9 @@ export class SpinePipe implements RenderPipe<Spine> {
 		const gpuSpine = this.gpuSpineData[spine.uid];
 
 		spine._validateAndTransformAttachments();
+
+		spine.spineAttachmentsDirty = false;
+		spine.spineTexturesDirty = false;
 
 		const drawOrder = spine.skeleton.drawOrder;
 

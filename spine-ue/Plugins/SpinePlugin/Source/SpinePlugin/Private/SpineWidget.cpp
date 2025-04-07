@@ -82,6 +82,7 @@ USpineWidget::USpineWidget(const FObjectInitializer &ObjectInitializer) : Super(
 
 	TextureParameterName = FName(TEXT("SpriteTexture"));
 
+	physicsTimeScale = 1.0f;
 	worldVertices.ensureCapacity(1024 * 2);
 
 	bAutoPlaying = true;
@@ -134,7 +135,7 @@ void USpineWidget::Tick(float DeltaTime, bool CallDelegates) {
 		state->update(DeltaTime);
 		state->apply(*skeleton);
 		if (CallDelegates) BeforeUpdateWorldTransform.Broadcast(this);
-		skeleton->update(DeltaTime);
+		skeleton->update(physicsTimeScale * DeltaTime);
 		skeleton->updateWorldTransform(Physics_Update);
 		if (CallDelegates) AfterUpdateWorldTransform.Broadcast(this);
 	}
@@ -547,4 +548,12 @@ void USpineWidget::ResetPhysicsConstraints() {
 			constraints[i]->reset();
 		}
 	}
+}
+
+void USpineWidget::SetPhysicsTimeScale(float scale) {
+	physicsTimeScale = scale;
+}
+
+float USpineWidget::GetPhysicsTimeScale() {
+	return physicsTimeScale;
 }

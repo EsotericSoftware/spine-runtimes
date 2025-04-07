@@ -101,7 +101,7 @@ export class SkeletonMesh extends THREE.Object3D {
 	static QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
 	static VERTEX_SIZE = 2 + 2 + 4;
 	private vertexSize = 2 + 2 + 4;
-	private twoColorTint;
+	private twoColorTint: boolean;
 
 	private vertices = Utils.newFloatArray(1024);
 	private tempColor = new Color();
@@ -231,8 +231,8 @@ export class SkeletonMesh extends THREE.Object3D {
 		batch.begin();
 		let z = 0;
 		let zOffset = this.zOffset;
+		let vertexSize = this.vertexSize;
 		for (let i = 0, n = drawOrder.length; i < n; i++) {
-			let vertexSize = clipper.isClipping() ? 2 : this.vertexSize;
 			let slot = drawOrder[i];
 			if (!slot.bone.active) {
 				clipper.clipEndWithSlot(slot);
@@ -243,36 +243,33 @@ export class SkeletonMesh extends THREE.Object3D {
 			let texture: ThreeJsTexture | null;
 			let numFloats = 0;
 			if (attachment instanceof RegionAttachment) {
-				let region = <RegionAttachment>attachment;
-				attachmentColor = region.color;
+				attachmentColor = attachment.color;
 				vertices = this.vertices;
 				numFloats = vertexSize * 4;
-				region.computeWorldVertices(slot, vertices, 0, vertexSize);
+				attachment.computeWorldVertices(slot, vertices, 0, vertexSize);
 				triangles = SkeletonMesh.QUAD_TRIANGLES;
-				uvs = region.uvs;
-				texture = <ThreeJsTexture>region.region!.texture;
+				uvs = attachment.uvs;
+				texture = <ThreeJsTexture>attachment.region!.texture;
 			} else if (attachment instanceof MeshAttachment) {
-				let mesh = <MeshAttachment>attachment;
-				attachmentColor = mesh.color;
+				attachmentColor = attachment.color;
 				vertices = this.vertices;
-				numFloats = (mesh.worldVerticesLength >> 1) * vertexSize;
+				numFloats = (attachment.worldVerticesLength >> 1) * vertexSize;
 				if (numFloats > vertices.length) {
 					vertices = this.vertices = Utils.newFloatArray(numFloats);
 				}
-				mesh.computeWorldVertices(
+				attachment.computeWorldVertices(
 					slot,
 					0,
-					mesh.worldVerticesLength,
+					attachment.worldVerticesLength,
 					vertices,
 					0,
 					vertexSize
 				);
-				triangles = mesh.triangles;
-				uvs = mesh.uvs;
-				texture = <ThreeJsTexture>mesh.region!.texture;
+				triangles = attachment.triangles;
+				uvs = attachment.uvs;
+				texture = <ThreeJsTexture>attachment.region!.texture;
 			} else if (attachment instanceof ClippingAttachment) {
-				let clip = <ClippingAttachment>attachment;
-				clipper.clipStart(slot, clip);
+				clipper.clipStart(slot, attachment);
 				continue;
 			} else {
 				clipper.clipEndWithSlot(slot);
@@ -294,7 +291,7 @@ export class SkeletonMesh extends THREE.Object3D {
 
 				let darkColor = this.tempDarkColor;
 				if (!slot.darkColor)
-					darkColor.set(1, 1, 1, 0);
+					darkColor.set(0, 0, 0, 1);
 				else {
 					darkColor.r = slot.darkColor.r * alpha;
 					darkColor.g = slot.darkColor.g * alpha;
@@ -307,16 +304,7 @@ export class SkeletonMesh extends THREE.Object3D {
 				let finalIndices: NumberArrayLike;
 				let finalIndicesLength: number;
 
-				if (clipper.isClipping()) {
-					clipper.clipTriangles(
-						vertices,
-						triangles,
-						triangles.length,
-						uvs,
-						color,
-						tempLight,
-						this.twoColorTint,
-					);
+				if (clipper.isClipping() && clipper.clipTriangles(vertices, triangles, triangles.length, uvs, color, tempLight, this.twoColorTint, vertexSize)) {
 					let clippedVertices = clipper.clippedVertices;
 					let clippedTriangles = clipper.clippedTriangles;
 					finalVertices = clippedVertices;

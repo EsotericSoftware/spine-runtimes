@@ -218,3 +218,4 @@ spine-godot/.idea
 spine-godot/build/version.txt
 spine-godot/vc140.pdb
 spine-godot/example-v4-extension/bin
+spine-godot/example-v4-extension/MoltenVK.xcframework

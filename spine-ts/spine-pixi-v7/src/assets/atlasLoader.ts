@@ -30,7 +30,7 @@
 import { TextureAtlas } from "@esotericsoftware/spine-core";
 import { SpineTexture } from "../SpineTexture.js";
 import type { AssetExtension, Loader, UnresolvedAsset } from "@pixi/assets";
-import { Assets } from "@pixi/assets";
+import { Assets, copySearchParams } from "@pixi/assets";
 import { LoaderParserPriority, checkExtension } from "@pixi/assets";
 import type { Texture } from "@pixi/core";
 import { ALPHA_MODES, ExtensionType, settings, utils, BaseTexture, extensions } from "@pixi/core";
@@ -122,7 +122,7 @@ const spineTextureAtlasLoader: AssetExtension<RawAtlas | TextureAtlas, ISpineAtl
 					page.setTexture(SpineTexture.from(providedPage));
 				} else {
 					const url: string = providedPage ?? utils.path.normalize([...basePath.split(utils.path.sep), pageName].join(utils.path.sep));
-					const assetsToLoadIn = { src: url, data: { ...metadata.imageMetadata, ...{ alphaMode: page.pma ? ALPHA_MODES.PMA : ALPHA_MODES.UNPACK } } };
+					const assetsToLoadIn = { src: copySearchParams(url, options.src as string), data: { ...metadata.imageMetadata, ...{ alphaMode: page.pma ? ALPHA_MODES.PMA : ALPHA_MODES.UNPACK } } };
 					const pixiPromise = loader.load<Texture>(assetsToLoadIn)
 						.then((texture) => {
 							page.setTexture(SpineTexture.from(texture.baseTexture));

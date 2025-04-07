@@ -78,7 +78,6 @@ export class SkeletonRenderer {
 		let inRange = false;
 		if (slotRangeStart == -1) inRange = true;
 		for (let i = 0, n = drawOrder.length; i < n; i++) {
-			let clippedVertexSize = clipper.isClipping() ? 2 : vertexSize;
 			let slot = drawOrder[i];
 			if (!slot.bone.active) {
 				clipper.clipEndWithSlot(slot);
@@ -101,31 +100,29 @@ export class SkeletonRenderer {
 			let attachment = slot.getAttachment();
 			let texture: GLTexture;
 			if (attachment instanceof RegionAttachment) {
-				let region = <RegionAttachment>attachment;
 				renderable.vertices = this.vertices;
 				renderable.numVertices = 4;
-				renderable.numFloats = clippedVertexSize << 2;
-				region.computeWorldVertices(slot, renderable.vertices, 0, clippedVertexSize);
+				renderable.numFloats = vertexSize << 2;
+				attachment.computeWorldVertices(slot, renderable.vertices, 0, vertexSize);
 				triangles = SkeletonRenderer.QUAD_TRIANGLES;
-				uvs = region.uvs;
-				texture = <GLTexture>region.region!.texture;
-				attachmentColor = region.color;
+				uvs = attachment.uvs;
+				texture = <GLTexture>attachment.region!.texture;
+				attachmentColor = attachment.color;
 			} else if (attachment instanceof MeshAttachment) {
-				let mesh = <MeshAttachment>attachment;
 				renderable.vertices = this.vertices;
-				renderable.numVertices = (mesh.worldVerticesLength >> 1);
-				renderable.numFloats = renderable.numVertices * clippedVertexSize;
+				renderable.numVertices = (attachment.worldVerticesLength >> 1);
+				renderable.numFloats = renderable.numVertices * vertexSize;
+
 				if (renderable.numFloats > renderable.vertices.length) {
 					renderable.vertices = this.vertices = Utils.newFloatArray(renderable.numFloats);
 				}
-				mesh.computeWorldVertices(slot, 0, mesh.worldVerticesLength, renderable.vertices, 0, clippedVertexSize);
-				triangles = mesh.triangles;
-				texture = <GLTexture>mesh.region!.texture;
-				uvs = mesh.uvs;
-				attachmentColor = mesh.color;
+				attachment.computeWorldVertices(slot, 0, attachment.worldVerticesLength, renderable.vertices, 0, vertexSize);
+				triangles = attachment.triangles;
+				texture = <GLTexture>attachment.region!.texture;
+				uvs = attachment.uvs;
+				attachmentColor = attachment.color;
 			} else if (attachment instanceof ClippingAttachment) {
-				let clip = <ClippingAttachment>(attachment);
-				clipper.clipStart(slot, clip);
+				clipper.clipStart(slot, attachment);
 				continue;
 			} else {
 				clipper.clipEndWithSlot(slot);
@@ -164,8 +161,7 @@ export class SkeletonRenderer {
 					batcher.setBlendMode(blendMode, premultipliedAlpha);
 				}
 
-				if (clipper.isClipping()) {
-					clipper.clipTriangles(renderable.vertices, triangles, triangles.length, uvs, finalColor, darkColor, twoColorTint);
+				if (clipper.isClipping() && clipper.clipTriangles(renderable.vertices, triangles, triangles.length, uvs, finalColor, darkColor, twoColorTint, vertexSize)) {
 					let clippedVertices = new Float32Array(clipper.clippedVertices);
 					let clippedTriangles = clipper.clippedTriangles;
 					if (transformer) transformer(clippedVertices, clippedVertices.length, vertexSize);

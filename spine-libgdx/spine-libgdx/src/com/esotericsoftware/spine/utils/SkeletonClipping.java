@@ -84,7 +84,7 @@ public class SkeletonClipping {
 		return clipAttachment != null;
 	}
 
-	public void clipTriangles (float[] vertices, short[] triangles, int trianglesLength) {
+	public boolean clipTriangles (float[] vertices, short[] triangles, int trianglesLength) {
 		FloatArray clipOutput = this.clipOutput, clippedVertices = this.clippedVertices;
 		ShortArray clippedTriangles = this.clippedTriangles;
 		Object[] polygons = clippingPolygons.items;
@@ -94,24 +94,25 @@ public class SkeletonClipping {
 		clippedVertices.clear();
 		clippedUvs.clear();
 		clippedTriangles.clear();
+		float[] clipOutputItems = null;
 		for (int i = 0; i < trianglesLength; i += 3) {
-			int vertexOffset = triangles[i] << 1;
-			float x1 = vertices[vertexOffset], y1 = vertices[vertexOffset + 1];
+			int v = triangles[i] << 1;
+			float x1 = vertices[v], y1 = vertices[v + 1];
 
-			vertexOffset = triangles[i + 1] << 1;
-			float x2 = vertices[vertexOffset], y2 = vertices[vertexOffset + 1];
+			v = triangles[i + 1] << 1;
+			float x2 = vertices[v], y2 = vertices[v + 1];
 
-			vertexOffset = triangles[i + 2] << 1;
-			float x3 = vertices[vertexOffset], y3 = vertices[vertexOffset + 1];
+			v = triangles[i + 2] << 1;
+			float x3 = vertices[v], y3 = vertices[v + 1];
 
 			for (int p = 0; p < polygonsCount; p++) {
 				int s = clippedVertices.size;
 				if (clip(x1, y1, x2, y2, x3, y3, (FloatArray)polygons[p], clipOutput)) {
+					clipOutputItems = clipOutput.items;
 					int clipOutputLength = clipOutput.size;
 					if (clipOutputLength == 0) continue;
 
 					int clipOutputCount = clipOutputLength >> 1;
-					float[] clipOutputItems = clipOutput.items;
 					float[] clippedVerticesItems = clippedVertices.setSize(s + clipOutputCount * 2);
 					for (int ii = 0; ii < clipOutputLength; ii += 2, s += 2) {
 						float x = clipOutputItems[ii], y = clipOutputItems[ii + 1];
@@ -150,45 +151,46 @@ public class SkeletonClipping {
 				}
 			}
 		}
+		return clipOutputItems != null;
 	}
 
-	public void clipTriangles (float[] vertices, short[] triangles, int trianglesLength, float[] uvs, float light, float dark,
-		boolean twoColor) {
+	public boolean clipTriangles (float[] vertices, short[] triangles, int trianglesLength, float[] uvs, float light, float dark,
+		boolean twoColor, int stride) {
 
 		FloatArray clipOutput = this.clipOutput, clippedVertices = this.clippedVertices;
 		ShortArray clippedTriangles = this.clippedTriangles;
 		Object[] polygons = clippingPolygons.items;
 		int polygonsCount = clippingPolygons.size;
-		int vertexSize = twoColor ? 6 : 5;
 
 		short index = 0;
 		clippedVertices.clear();
 		clippedUvs.clear();
 		clippedTriangles.clear();
+		float[] clipOutputItems = null;
 		for (int i = 0; i < trianglesLength; i += 3) {
-			int vertexOffset = triangles[i] << 1;
-			float x1 = vertices[vertexOffset], y1 = vertices[vertexOffset + 1];
-			float u1 = uvs[vertexOffset], v1 = uvs[vertexOffset + 1];
+			int t = triangles[i];
+			float u1 = uvs[t << 1], v1 = uvs[(t << 1) + 1];
+			float x1 = vertices[t * stride], y1 = vertices[t * stride + 1];
 
-			vertexOffset = triangles[i + 1] << 1;
-			float x2 = vertices[vertexOffset], y2 = vertices[vertexOffset + 1];
-			float u2 = uvs[vertexOffset], v2 = uvs[vertexOffset + 1];
+			t = triangles[i + 1];
+			float u2 = uvs[t << 1], v2 = uvs[(t << 1) + 1];
+			float x2 = vertices[t * stride], y2 = vertices[t * stride + 1];
 
-			vertexOffset = triangles[i + 2] << 1;
-			float x3 = vertices[vertexOffset], y3 = vertices[vertexOffset + 1];
-			float u3 = uvs[vertexOffset], v3 = uvs[vertexOffset + 1];
+			t = triangles[i + 2];
+			float u3 = uvs[t << 1], v3 = uvs[(t << 1) + 1];
+			float x3 = vertices[t * stride], y3 = vertices[t * stride + 1];
 
 			for (int p = 0; p < polygonsCount; p++) {
 				int s = clippedVertices.size;
 				if (clip(x1, y1, x2, y2, x3, y3, (FloatArray)polygons[p], clipOutput)) {
+					clipOutputItems = clipOutput.items;
 					int clipOutputLength = clipOutput.size;
 					if (clipOutputLength == 0) continue;
 					float d0 = y2 - y3, d1 = x3 - x2, d2 = x1 - x3, d4 = y3 - y1;
 					float d = 1 / (d0 * d2 + d1 * (y1 - y3));
 
 					int clipOutputCount = clipOutputLength >> 1;
-					float[] clipOutputItems = clipOutput.items;
-					float[] clippedVerticesItems = clippedVertices.setSize(s + clipOutputCount * vertexSize);
+					float[] clippedVerticesItems = clippedVertices.setSize(s + clipOutputCount * stride);
 					for (int ii = 0; ii < clipOutputLength; ii += 2, s += 2) {
 						float x = clipOutputItems[ii], y = clipOutputItems[ii + 1];
 						clippedVerticesItems[s] = x;
@@ -218,7 +220,7 @@ public class SkeletonClipping {
 					index += clipOutputCount + 1;
 
 				} else {
-					float[] clippedVerticesItems = clippedVertices.setSize(s + 3 * vertexSize);
+					float[] clippedVerticesItems = clippedVertices.setSize(s + 3 * stride);
 					clippedVerticesItems[s] = x1;
 					clippedVerticesItems[s + 1] = y1;
 					clippedVerticesItems[s + 2] = light;
@@ -267,6 +269,7 @@ public class SkeletonClipping {
 				}
 			}
 		}
+		return clipOutputItems != null;
 	}
 
 	public void clipTrianglesUnpacked (float[] vertices, int vertexStart, short[] triangles, int trianglesLength, float[] uvs) {
@@ -282,17 +285,17 @@ public class SkeletonClipping {
 		clippedUvs.clear();
 		clippedTriangles.clear();
 		for (int i = 0; i < trianglesLength; i += 3) {
-			int vertexOffset = triangles[i] << 1;
-			float x1 = vertices[vertexStart + vertexOffset], y1 = vertices[vertexStart + vertexOffset + 1];
-			float u1 = uvs[vertexOffset], v1 = uvs[vertexOffset + 1];
+			int v = triangles[i] << 1;
+			float x1 = vertices[vertexStart + v], y1 = vertices[vertexStart + v + 1];
+			float u1 = uvs[v], v1 = uvs[v + 1];
 
-			vertexOffset = triangles[i + 1] << 1;
-			float x2 = vertices[vertexStart + vertexOffset], y2 = vertices[vertexStart + vertexOffset + 1];
-			float u2 = uvs[vertexOffset], v2 = uvs[vertexOffset + 1];
+			v = triangles[i + 1] << 1;
+			float x2 = vertices[vertexStart + v], y2 = vertices[vertexStart + v + 1];
+			float u2 = uvs[v], v2 = uvs[v + 1];
 
-			vertexOffset = triangles[i + 2] << 1;
-			float x3 = vertices[vertexStart + vertexOffset], y3 = vertices[vertexStart + vertexOffset + 1];
-			float u3 = uvs[vertexOffset], v3 = uvs[vertexOffset + 1];
+			v = triangles[i + 2] << 1;
+			float x3 = vertices[vertexStart + v], y3 = vertices[vertexStart + v + 1];
+			float u3 = uvs[v], v3 = uvs[v + 1];
 
 			for (int p = 0; p < polygonsCount; p++) {
 				int s = clippedVertices.size;
@@ -359,7 +362,7 @@ public class SkeletonClipping {
 
 	/** Clips the input triangle against the convex, clockwise clipping area. If the triangle lies entirely within the clipping
 	 * area, false is returned. The clipping area must duplicate the first vertex at the end of the vertices list. */
-	boolean clip (float x1, float y1, float x2, float y2, float x3, float y3, FloatArray clippingArea, FloatArray output) {
+	private boolean clip (float x1, float y1, float x2, float y2, float x3, float y3, FloatArray clippingArea, FloatArray output) {
 		FloatArray originalOutput = output;
 		boolean clipped = false;
 
