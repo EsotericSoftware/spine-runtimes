@@ -41,7 +41,7 @@ namespace Spine.Unity {
 	[ExecuteInEditMode]
 #endif
 	[RequireComponent(typeof(SkeletonUtilityBone))]
-	[HelpURL("http://esotericsoftware.com/spine-unity#SkeletonUtilityConstraint")]
+	[HelpURL("https://esotericsoftware.com/spine-unity-utility-components#SkeletonUtilityConstraint")]
 	public abstract class SkeletonUtilityConstraint : MonoBehaviour {
 
 		protected SkeletonUtilityBone bone;

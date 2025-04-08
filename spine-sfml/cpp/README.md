@@ -20,12 +20,12 @@ spine-sfml supports all Spine features except two color tinting.
 
 ## Usage
 
-1. Create a new SFML project. See the [SFML documentation](http://www.sfml-dev.org/tutorials/2.1/) or have a look at the example in this repository.
+1. Create a new SFML project. See the [SFML documentation](https://www.sfml-dev.org/tutorials/2.6/) or have a look at the example in this repository.
 2. Download the Spine Runtimes source using git (`git clone https://github.com/esotericsoftware/spine-runtimes`) or download it as a zip via the download button above.
 3. Add the sources from `spine-cpp/spine-cpp/src/spine` and `spine-sfml/cpp/src/spine` to your project
 4. Add the folder `spine-cpp/spine-cpp/include` to your header search path. Note that includes are specified as `#inclue <spine/file.h>`, so the `spine` directory cannot be omitted when copying the source files.
 
-See the [Spine Runtimes documentation](http://esotericsoftware.com/spine-documentation#runtimesTitle) on how to use the APIs or check out the Spine SFML example.
+See the [Spine Runtimes documentation](http://esotericsoftware.com/spine-documentation#runtimes) on how to use the APIs or check out the Spine SFML example.
 
 ## Example
 
@@ -33,7 +33,7 @@ The Spine SFML example works on Windows, Linux and Mac OS X.
 
 ### Windows
 
-1. Install [Visual Studio 2022 Community](https://www.visualstudio.com/en-us/downloads/download-visual-studio-vs.aspx). Make sure you install support for C++, CMake as well as th Windows SDK for XP/7/8.
+1. Install [Visual Studio 2022 Community](https://visualstudio.microsoft.com/downloads/). Make sure you install support for C++, CMake as well as th Windows SDK for XP/7/8.
 1. Open Visual Studio and open the `spine-sfml/cpp` folder via the `Open a local folder` button
 1. Let CMake finish, then select `spine-sfml-cpp-example.exe` as the start-up project
 1. Start debugging to run the example

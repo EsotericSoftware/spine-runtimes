@@ -14,7 +14,7 @@ For the official legal terms governing the Spine Runtimes, please read the [Spin
 
 ## Documentation
 
-See the [Spine Runtimes Guide](http://esotericsoftware.com/spine-runtimes-guide) for detailed information about using the Spine Runtimes. The Spine [documentation page](http://esotericsoftware.com/spine-documentation#runtimesTitle) provides further information about tools and data formats. For runtime specific documentation, refer to the `README.md` file in each runtime directory.
+See the [Spine Runtimes Guide](http://esotericsoftware.com/spine-runtimes-guide) for detailed information about using the Spine Runtimes. The Spine [documentation page](http://esotericsoftware.com/spine-documentation#runtimes) provides further information about tools and data formats. For runtime specific documentation, refer to the `README.md` file in each runtime directory.
 
 ## Bugs, enhancements, and tasks
 

@@ -41,7 +41,7 @@ namespace Spine.Unity {
 #else
 	[ExecuteInEditMode]
 #endif
-	[HelpURL("http://esotericsoftware.com/spine-unity#BoundingBoxFollowerGraphic")]
+	[HelpURL("http://esotericsoftware.com/spine-unity-utility-components#BoundingBoxFollowerGraphic")]
 	public class BoundingBoxFollowerGraphic : MonoBehaviour {
 		internal static bool DebugMessages = true;
 

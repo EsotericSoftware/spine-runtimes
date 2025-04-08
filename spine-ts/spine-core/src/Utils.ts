@@ -329,7 +329,7 @@ export class Utils {
 		return Utils.SUPPORTS_TYPED_ARRAYS ? Math.fround(value) : value;
 	}
 
-	// This function is used to fix WebKit 602 specific issue described at http://esotericsoftware.com/forum/iOS-10-disappearing-graphics-10109
+	// This function is used to fix WebKit 602 specific issue described at https://esotericsoftware.com/forum/d/10109-ios-10-disappearing-graphics
 	static webkit602BugfixHelper (alpha: number, blend: MixBlend) {
 	}
 

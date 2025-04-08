@@ -218,7 +218,7 @@ export class AnimationState {
 					} else if (timeline instanceof AttachmentTimeline) {
 						this.applyAttachmentTimeline(timeline, skeleton, applyTime, blend, attachments);
 					} else {
-						// This fixes the WebKit 602 specific issue described at http://esotericsoftware.com/forum/iOS-10-disappearing-graphics-10109
+						// This fixes the WebKit 602 specific issue described at https://esotericsoftware.com/forum/d/10109-ios-10-disappearing-graphics
 						Utils.webkit602BugfixHelper(alpha, blend);
 						timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, timelineBlend, MixDirection.mixIn);
 					}
@@ -321,7 +321,7 @@ export class AnimationState {
 				else if (timeline instanceof AttachmentTimeline)
 					this.applyAttachmentTimeline(timeline, skeleton, applyTime, timelineBlend, attachments && alpha >= from.alphaAttachmentThreshold);
 				else {
-					// This fixes the WebKit 602 specific issue described at http://esotericsoftware.com/forum/iOS-10-disappearing-graphics-10109
+					// This fixes the WebKit 602 specific issue described at https://esotericsoftware.com/forum/d/10109-ios-10-disappearing-graphics
 					Utils.webkit602BugfixHelper(alpha, blend);
 					if (drawOrder && timeline instanceof DrawOrderTimeline && timelineBlend == MixBlend.setup)
 						direction = MixDirection.mixIn;

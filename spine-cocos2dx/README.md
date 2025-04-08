@@ -1,6 +1,6 @@
 # spine-cocos2dx v3.x & v4.x
 
-The spine-cocos2dx runtime provides functionality to load, manipulate and render [Spine](http://esotericsoftware.com) skeletal animation data using [cocos2d-x](http://www.cocos2d-x.org/). spine-cocos2dx is based on [spine-cpp](../spine-cpp).
+The spine-cocos2dx runtime provides functionality to load, manipulate and render [Spine](http://esotericsoftware.com) skeletal animation data using [cocos2d-x](https://cocos2d-x.org/cocos2dx/). spine-cocos2dx is based on [spine-cpp](../spine-cpp).
 
 ## Licensing
 

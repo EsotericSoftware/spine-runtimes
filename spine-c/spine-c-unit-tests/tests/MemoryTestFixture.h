@@ -34,7 +34,7 @@ public:
 
 	void reproduceIssue_777();
 
-	void reproduceIssue_Loop(); // http://esotericsoftware.com/forum/spine-c-3-5-animation-jerking-7451
+	void reproduceIssue_Loop(); // https://esotericsoftware.com/forum/d/7451-spine-c-35-animation-jerking
 	void triangulator();
 
 	void skeletonClipper();

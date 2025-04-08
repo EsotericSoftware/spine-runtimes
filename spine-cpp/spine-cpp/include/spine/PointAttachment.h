@@ -40,7 +40,7 @@ namespace spine {
 	/// used in similar ways, but a PointAttachment is slightly less expensive to compute and can be hidden, shown, and placed in a
 	/// skin.
 	///
-	/// See http://esotericsoftware.com/spine-point-attachments for Point Attachments in the Spine User Guide.
+	/// See https://esotericsoftware.com/spine-points for Point Attachments in the Spine User Guide.
 	///
 	class SP_API PointAttachment : public Attachment {
 		friend class SkeletonBinary;

@@ -27,7 +27,7 @@ spine-sdl supports all Spine features except screen blend mode and two color tin
 3. If you are using C, add the sources from `spine-c/spine-c/src/spine` and `spine-sdl/src/spine-sdl-c.c` to your project, and add the folder `spine-c/spine-c/include` and `spine-sdl/src/spine-sdl-c.h` to your header search path. Note that includes are specified as `#inclue <spine/file.h>`, so the `spine` directory cannot be omitted when copying the source files.
 4. If you are using C++, add the sources from `spine-cpp/spine-cpp/src/spine` and `spine-sdl/src/spine-sdl-cpp.cpp` to your project, and add the folder `spine-cpp/spine-cpp/include` and `spine-sdl/src/spine-sdl-cpp.h` to your header search path. Note that includes are specified as `#include <spine/file.h>`, so the `spine` directory cannot be omitted when copying the source files.
 
-See the [Spine Runtimes documentation](http://esotericsoftware.com/spine-documentation#runtimesTitle) on how to use the APIs or check out the Spine SDL example in this repository.
+See the [Spine Runtimes documentation](http://esotericsoftware.com/spine-documentation#runtimes) on how to use the APIs or check out the Spine SDL example in this repository.
 
 ## Example
 
@@ -35,7 +35,7 @@ The Spine SDL example works on Windows, Linux and Mac OS X. For a spine-c based 
 
 ### Windows
 
-1. Install [Visual Studio Community](https://www.visualstudio.com/en-us/downloads/download-visual-studio-vs.aspx). Make sure you install support for C++ as well as th Windows SDK for XP/7/8.
+1. Install [Visual Studio Community](https://visualstudio.microsoft.com/downloads/). Make sure you install support for C++ as well as th Windows SDK for XP/7/8.
 2. Install CMake via the [Windows installer package](https://cmake.org/download/).
 3. Download the Spine Runtimes repository using git (`git clone https://github.com/esotericsoftware/spine-runtimes`) or download it as a zip via the download button above.
 4. Run CMake GUI from the start menu

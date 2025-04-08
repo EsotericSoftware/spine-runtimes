@@ -1,6 +1,6 @@
 # spine-monogame
 
-The spine-monogame runtime provides functionality to load, manipulate and render [Spine](http://esotericsoftware.com) skeletal animation data using [MonoGame](http://monogame.codeplex.com/). spine-monogame is based on [spine-xna](../spine-xna) and adds MonoGame project files.
+The spine-monogame runtime provides functionality to load, manipulate and render [Spine](http://esotericsoftware.com) skeletal animation data using [MonoGame](https://monogame.net). spine-monogame is based on [spine-xna](../spine-xna) and adds MonoGame project files.
 
 ## Licensing
 

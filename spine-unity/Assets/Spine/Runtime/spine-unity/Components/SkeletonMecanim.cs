@@ -35,7 +35,7 @@ using UnityEditor.Animations;
 
 namespace Spine.Unity {
 	[RequireComponent(typeof(Animator))]
-	[HelpURL("http://esotericsoftware.com/spine-unity#SkeletonMecanim-Component")]
+	[HelpURL("https://esotericsoftware.com/spine-unity-main-components#SkeletonMecanim-Component")]
 	public class SkeletonMecanim : SkeletonRenderer, ISkeletonAnimation {
 
 		[SerializeField] protected MecanimTranslator translator;

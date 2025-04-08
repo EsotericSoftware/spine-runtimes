@@ -43,7 +43,7 @@ namespace Spine.Unity {
 	[ExecuteInEditMode]
 #endif
 	[AddComponentMenu("Spine/BoneFollower")]
-	[HelpURL("http://esotericsoftware.com/spine-unity#BoneFollower")]
+	[HelpURL("https://esotericsoftware.com/spine-unity-utility-components#BoneFollower")]
 	public class BoneFollower : MonoBehaviour {
 
 		#region Inspector

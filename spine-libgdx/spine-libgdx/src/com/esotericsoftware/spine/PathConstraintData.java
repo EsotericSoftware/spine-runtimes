@@ -167,7 +167,7 @@ public class PathConstraintData extends ConstraintData {
 
 	/** Controls how bones are rotated, translated, and scaled to match the path.
 	 * <p>
-	 * See <a href="https://esotericsoftware.com/spine-path-constraints#Rotate-mode">Rotate mode</a> in the Spine User Guide. */
+	 * See <a href="https://esotericsoftware.com/spine-path-constraints#Rotate-Mix">Rotate mode</a> in the Spine User Guide. */
 	static public enum RotateMode {
 		tangent, chain,
 		/** When chain scale, constrained bones should all have the same parent. That way when the path constraint scales a bone, it

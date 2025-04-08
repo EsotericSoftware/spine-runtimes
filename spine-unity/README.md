@@ -31,7 +31,7 @@ spine-unity is compatible with Unity 2017.1-6000.0.
 1. Create an empty Unity project (or use an existing project).
 2. Download and import the [`spine-unity.unitypackage`](http://esotericsoftware.com/spine-unity-download/).
 
-See the [Spine Runtimes documentation](http://esotericsoftware.com/spine-documentation#runtimesTitle) on how to use the APIs and check out the spine-unity examples for demonstrations of Unity specific features.
+See the [Spine Runtimes documentation](http://esotericsoftware.com/spine-documentation#runtimes) on how to use the APIs and check out the spine-unity examples for demonstrations of Unity specific features.
 
 ## Example
 

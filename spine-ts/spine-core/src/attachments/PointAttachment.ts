@@ -35,7 +35,7 @@ import { VertexAttachment, Attachment } from "./Attachment.js";
  * used in similar ways, but a PointAttachment is slightly less expensive to compute and can be hidden, shown, and placed in a
  * skin.
  *
- * See [Point Attachments](http://esotericsoftware.com/spine-point-attachments) in the Spine User Guide. */
+ * See [Point Attachments](https://esotericsoftware.com/spine-points) in the Spine User Guide. */
 export class PointAttachment extends VertexAttachment {
 	x: number = 0;
 	y: number = 0;

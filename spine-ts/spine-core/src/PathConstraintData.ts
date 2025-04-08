@@ -87,5 +87,5 @@ export enum SpacingMode { Length, Fixed, Percent, Proportional }
 
 /** Controls how bones are rotated, translated, and scaled to match the path.
  *
- * See [rotate mix](http://esotericsoftware.com/spine-path-constraints#Rotate-mix) in the Spine User Guide. */
+ * See [rotate mix](http://esotericsoftware.com/spine-path-constraints#Rotate-Mix) in the Spine User Guide. */
 export enum RotateMode { Tangent, Chain, ChainScale }

@@ -44,7 +44,7 @@ namespace Spine.Unity {
 #endif
 	[RequireComponent(typeof(RectTransform)), DisallowMultipleComponent]
 	[AddComponentMenu("Spine/UI/BoneFollowerGraphic")]
-	[HelpURL("http://esotericsoftware.com/spine-unity#BoneFollowerGraphic")]
+	[HelpURL("https://esotericsoftware.com/spine-unity-utility-components#BoneFollowerGraphic")]
 	public class BoneFollowerGraphic : MonoBehaviour {
 		public SkeletonGraphic skeletonGraphic;
 		public SkeletonGraphic SkeletonGraphic {

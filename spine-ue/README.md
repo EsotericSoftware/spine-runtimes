@@ -31,7 +31,7 @@ spine-ue does not support multiply and screen blending. spine-ue does not suppor
 5. Add `SpinePlugin` to `PublicDependencyModuleNames` in your project's `Build.cs` file.
 6. Open the Unreal Project in the Unreal Editor
 
-See the [Spine Runtimes documentation](http://esotericsoftware.com/spine-documentation#runtimesTitle) on how to use the APIs or check out the Spine UE4 example.
+See the [Spine Runtimes documentation](http://esotericsoftware.com/spine-documentation#runtimes) on how to use the APIs or check out the Spine UE4 example.
 
 ## Example
 

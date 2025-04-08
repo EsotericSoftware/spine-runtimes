@@ -47,5 +47,5 @@ spine-c uses an OOP style of programming where each "class" is made up of a stru
 
 ## Runtimes extending spine-c
 
-- [spine-cocos2d-objc](../spine-cocos2d-objc)
+- [spine-sdl](../spine-sdl)
 - [spine-sfml](../spine-sfml)

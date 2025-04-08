@@ -615,7 +615,7 @@ enum SpacingMode {
 
 /// Controls how bones are rotated, translated, and scaled to match the path.
 ///
-/// See [Rotate mode](http://esotericsoftware.com/spine-path-constraints#Rotate-mode) in the Spine User Guide.
+/// See [Rotate mode](https://esotericsoftware.com/spine-path-constraints#Rotate-Mix) in the Spine User Guide.
 enum RotateMode {
   tangent(0),
   chain(1),
@@ -1877,7 +1877,7 @@ class PathAttachment extends VertexAttachment<spine_path_attachment> {
 /// used in similar ways, but a PointAttachment is slightly less expensive to compute and can be hidden, shown, and placed in a
 /// skin.
 ///
-/// See [Point Attachments](http://esotericsoftware.com/spine-point-attachments) in the Spine User Guide.
+/// See [Point Attachments](https://esotericsoftware.com/spine-points) in the Spine User Guide.
 class PointAttachment extends Attachment<spine_point_attachment> {
   PointAttachment._(super.attachment) : super._();
 

@@ -49,7 +49,7 @@ namespace Spine.Unity {
 #endif
 	[RequireComponent(typeof(CanvasRenderer), typeof(RectTransform)), DisallowMultipleComponent]
 	[AddComponentMenu("Spine/SkeletonGraphic (Unity UI Canvas)")]
-	[HelpURL("http://esotericsoftware.com/spine-unity#SkeletonGraphic-Component")]
+	[HelpURL("https://esotericsoftware.com/spine-unity-main-components#SkeletonGraphic-Component")]
 	public class SkeletonGraphic : MaskableGraphic, ISkeletonComponent, IAnimationStateComponent, ISkeletonAnimation, IHasSkeletonDataAsset {
 
 		#region Inspector

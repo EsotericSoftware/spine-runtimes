@@ -89,7 +89,7 @@ namespace Spine {
 		public delegate void TrackEntryDelegate (TrackEntry trackEntry);
 		/// <summary>See <see href="http://esotericsoftware.com/spine-api-reference#AnimationStateListener-Methods">
 		/// API Reference documentation pages here</see> for details. Usage in C# and spine-unity is explained
-		/// <see href="http://esotericsoftware.com/spine-unity#Processing-AnimationState-Events">here</see>
+		/// <see href="https://esotericsoftware.com/spine-unity-main-components#Processing-AnimationState-Events">here</see>
 		/// on the spine-unity documentation pages.</summary>
 		public event TrackEntryDelegate Start, Interrupt, End, Dispose, Complete;
 
@@ -993,7 +993,7 @@ namespace Spine {
 		// difference to libgdx reference: delegates are used for event callbacks instead of 'AnimationStateListener listener'.
 		/// <summary>See <see href="http://esotericsoftware.com/spine-api-reference#AnimationStateListener-Methods">
 		/// API Reference documentation pages here</see> for details. Usage in C# and spine-unity is explained
-		/// <see href="http://esotericsoftware.com/spine-unity#Processing-AnimationState-Events">here</see>
+		/// <see href="https://esotericsoftware.com/spine-unity-main-components#Processing-AnimationState-Events">here</see>
 		/// on the spine-unity documentation pages.</summary>
 		public event AnimationState.TrackEntryDelegate Start, Interrupt, End, Dispose, Complete;
 		public event AnimationState.TrackEntryEventDelegate Event;
