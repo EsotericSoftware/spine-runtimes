@@ -2,7 +2,15 @@
 #include <simd/simd.h> 
 using namespace metal;
 
-#import "../../SpineShadersStructs/SpineShadersStructs.h"
+#if __has_include("spine-ios/Sources/SpineShadersStructs/SpineShadersStructs.h")
+// Cocoapods Target
+    #include "spine-ios/Sources/SpineShadersStructs/SpineShadersStructs.h"
+#elif  __has_include("../../SpineShadersStructs/SpineShadersStructs.h")
+// Swift Package target
+    #include "../../SpineShadersStructs/SpineShadersStructs.h"
+#else
+    #error "Header not found. Please correct Header search path"
+#endif
 
 struct RasterizerData {
     simd_float4 position [[position]];
