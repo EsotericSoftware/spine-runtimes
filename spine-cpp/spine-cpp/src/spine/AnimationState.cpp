@@ -795,15 +795,15 @@ bool AnimationState::updateMixingFrom(TrackEntry *to, float delta) {
 	from->_trackLast = from->_nextTrackLast;
 
 	// The from entry was applied at least once and the mix is complete.
-	if (to->_nextTrackLast != -1 && to->_mixTime >= to->_mixDuration) {                             
-		 	// Mixing is complete for all entries before the from entry or the mix is instantaneous.
-			if (from->_totalAlpha == 0 || to->_mixDuration == 0) {
-				to->_mixingFrom = from->_mixingFrom;
-				if (from->_mixingFrom) from->_mixingFrom->_mixingTo = to;
-				to->_interruptAlpha = from->_interruptAlpha;
-				_queue->end(from);
-			}
-			return finished;
+	if (to->_nextTrackLast != -1 && to->_mixTime >= to->_mixDuration) {
+		// Mixing is complete for all entries before the from entry or the mix is instantaneous.
+		if (from->_totalAlpha == 0 || to->_mixDuration == 0) {
+			to->_mixingFrom = from->_mixingFrom;
+			if (from->_mixingFrom) from->_mixingFrom->_mixingTo = to;
+			to->_interruptAlpha = from->_interruptAlpha;
+			_queue->end(from);
+		}
+		return finished;
 	}
 
 	from->_trackTime += delta * from->_timeScale;

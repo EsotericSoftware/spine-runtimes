@@ -352,14 +352,14 @@ int /*boolean*/ _spAnimationState_updateMixingFrom(spAnimationState *self, spTra
 
 	// The from entry was applied at least once and the mix is complete.
 	if (to->nextTrackLast != -1 && to->mixTime >= to->mixDuration) {
-		 	// Mixing is complete for all entries before the from entry or the mix is instantaneous.
-			if (from->totalAlpha == 0 || to->mixDuration == 0) {
-				to->mixingFrom = from->mixingFrom;
-				if (from->mixingFrom) from->mixingFrom->mixingTo = to;
-				to->interruptAlpha = from->interruptAlpha;
-				_spEventQueue_end(internal->queue, from);
-			}
-			return finished;
+		// Mixing is complete for all entries before the from entry or the mix is instantaneous.
+		if (from->totalAlpha == 0 || to->mixDuration == 0) {
+			to->mixingFrom = from->mixingFrom;
+			if (from->mixingFrom) from->mixingFrom->mixingTo = to;
+			to->interruptAlpha = from->interruptAlpha;
+			_spEventQueue_end(internal->queue, from);
+		}
+		return finished;
 	}
 
 	from->trackTime += delta * from->timeScale;
