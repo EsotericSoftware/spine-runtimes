@@ -19,7 +19,7 @@ set(GLFW_INSTALL OFF CACHE BOOL " " FORCE)
 FetchContent_Declare(
         glbinding
         GIT_REPOSITORY https://github.com/cginternals/glbinding.git
-        GIT_TAG v3.3.0
+        GIT_TAG v3.4.0
         GIT_SHALLOW 1
 )
 FetchContent_MakeAvailable(glbinding)
