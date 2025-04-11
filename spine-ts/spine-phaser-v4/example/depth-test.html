@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="//cdn.jsdelivr.net/npm/phaser@4.0.0-rc.1/dist/phaser.js"></script>
+    <link rel="stylesheet" href="../../index.css" />
+    <title>Spine Phaser Example</title>
+  </head>
+
+  <body class="p-4 flex flex-col items-center">
+    <h1>Depth test</h1>
+  </body>
+  <script>
+    const config = {
+      type: Phaser.AUTO,
+      width: 800,
+      height: 600,
+      type: Phaser.WEBGL,
+      scene: {
+        preload: preload,
+        create: create,
+        pack: {
+          files: [
+            {
+              type: "scenePlugin",
+              key: "spine.SpinePlugin",
+              url: "../dist/iife/spine-phaser-v4.js",
+              sceneKey: "spine",
+            },
+          ],
+        },
+      },
+    };
+
+    const game = new Phaser.Game(config);
+
+    function preload() {
+      this.load.image("logo", "phaser.png");
+      this.load.spineBinary("spineboy-data", "assets/spineboy-pro.skel");
+      this.load.spineAtlas("spineboy-atlas", "assets/spineboy-pma.atlas");
+    }
+
+    function create() {
+      this.add.image(400, 350, "logo").setName("logo1").setDepth(2);
+      const spineboy = this.add.spine(
+        400,
+        600,
+        "spineboy-data",
+        "spineboy-atlas"
+      );
+      spineboy.animationState.setAnimation(0, "walk", true);
+      spineboy.setScale(0.5);
+      spineboy.setDepth(1);
+      this.add
+        .text(400, 300, "Set Depth Test", {
+          font: "16px Courier",
+          fill: "#00ff00",
+        })
+        .setName("text")
+        .setOrigin(0.5);
+    }
+  </script>
+</html>

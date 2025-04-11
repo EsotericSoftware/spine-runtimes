@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="//cdn.jsdelivr.net/npm/phaser@4.0.0-rc.1/dist/phaser.js"></script>
+    <script src="../dist/iife/spine-phaser-v4.js"></script>
+    <link rel="stylesheet" href="../../index.css" />
+    <title>Spine Phaser Example</title>
+  </head>
+
+  <body class="p-4 flex flex-col items-center">
+    <h1>Camera pipeline test</h1>
+    <script>
+      class MainScene extends Phaser.Scene {
+        constructor() {
+            super({ key: "MainScene" });
+        }
+
+        preload() {
+            this.load.image("img", "assets/raptor-pma.png");
+            this.load.spineBinary("spineboy-data", "assets/spineboy-pro.skel");
+            this.load.spineAtlas("spineboy-atlas", "assets/spineboy-pma.atlas");
+        }
+
+        create() {
+            if (!this.renderer.renderNodes.hasNode("FilterPlasmaPostFX")) {
+                this.renderer.renderNodes.addNodeConstructor("FilterPlasmaPostFX", PlasmaPostFX);
+            }
+
+            const image = this.add.sprite(0, 0, "img").enableFilters();;
+
+            const spineboy = this.add.spine(
+              400,
+              300,
+              "spineboy-data",
+              "spineboy-atlas"
+            ).enableFilters();
+            spineboy.scale = 0.5;
+            spineboy.animationState.setAnimation(0, "walk", true);
+
+            this.plasmaPostFXController = new PlasmaPostFXController(spineboy.filterCamera);
+            console.log(spineboy.filterCamera);
+            spineboy.filters.internal.add(this.plasmaPostFXController);
+
+            // this.plasmaPostFXController2 = new PlasmaPostFXController(image.filterCamera);
+            image.filters.internal.add(this.plasmaPostFXController);
+        }
+
+        update(time) {
+            this.plasmaPostFXController.uTime = time / 1000;
+            // this.plasmaPostFXController2.uTime = time / 1000;
+        }
+      }
+
+
+    const game = new Phaser.Game({
+        width: 800,
+        height: 600,
+        type: Phaser.WEBGL,
+        backgroundColor: "#cdcdcd",
+        scene: [ MainScene ],
+        plugins: {
+        scene: [
+          {
+            key: "spine.SpinePlugin",
+            plugin: spine.SpinePlugin,
+            mapping: "spine",
+          },
+        ],
+      },
+    })
+
+
+    const fragShader = `
+        precision mediump float;
+
+        uniform sampler2D uMainSampler;
+        uniform float uTime;
+        uniform vec2 uResolution;
+
+        varying vec2 outTexCoord;
+
+        void main()
+        {
+            vec2 p = -1.0 + 2.0 * gl_FragCoord.xy / uResolution.xy;
+
+            float x = p.x;
+            float y = p.y;
+            float mov0 = x+y+cos(sin(uTime)*2.0)*100.+sin(x/100.)*1000.;
+            float mov1 = y / 0.9 +  uTime;
+            float mov2 = x / 0.2;
+            float c1 = abs(sin(mov1+uTime)/2.+mov2/2.-mov1-mov2+uTime);
+            float c2 = abs(sin(c1+sin(mov0/1000.+uTime)+sin(y/40.+uTime)+sin((x+y)/100.)*3.));
+            float c3 = abs(sin(c2+cos(mov1+mov2+c2)+cos(mov2)+sin(x/1000.)));
+
+            vec4 pixel = texture2D(uMainSampler, outTexCoord);
+
+            gl_FragColor = pixel * vec4(c1, c2, c3, 1);
+        }
+    `;
+
+    class PlasmaPostFXController extends Phaser.Filters.Controller {
+        constructor (camera) {
+            super(camera, 'FilterPlasmaPostFX');
+            this.uTime = 0;
+            this.uResolution = [0, 0];
+        }
+    }
+
+    class PlasmaPostFX extends Phaser.Renderer.WebGL.RenderNodes.BaseFilterShader {
+        constructor (manager) {
+            super('FilterPlasmaPostFX', manager, null, fragShader);
+        }
+
+        setupUniforms (controller, drawingContext) {
+            const programManager = this.programManager;
+            programManager.setUniform('uResolution', [ drawingContext.width, drawingContext.height ]);
+            programManager.setUniform('uTime', controller.uTime);
+        }
+    }
+
+    </script>
+  </body>
+</html>

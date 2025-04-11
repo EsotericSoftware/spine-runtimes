@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="//cdn.jsdelivr.net/npm/phaser@4.0.0-rc.1/dist/phaser.js"></script>
+    <script src="../dist/iife/spine-phaser-v4.js"></script>
+    <link rel="stylesheet" href="../../index.css" />
+    <title>Spine Phaser Example</title>
+  </head>
+
+  <body class="p-4 flex flex-col items-center">
+    <h1>Visibility Test 2</h1>
+  </body>
+  <script>
+    const config = {
+      type: Phaser.AUTO,
+      width: 800,
+      height: 600,
+      type: Phaser.WEBGL,
+      scene: {
+        preload: preload,
+        create: create,
+        pack: {
+          files: [
+            {
+              type: "scenePlugin",
+              key: "spine.SpinePlugin",
+              url: "../dist/iife/spine-phaser-v4.js",
+              sceneKey: "spine",
+            },
+          ],
+        },
+      },
+    };
+
+    const game = new Phaser.Game(config);
+
+    function preload() {
+      this.load.image("coin", "assets/coin-pma.png");
+      this.load.spineBinary("spineboy-data", "assets/spineboy-pro.skel");
+      this.load.spineAtlas("spineboy-atlas", "assets/spineboy-pma.atlas");
+    }
+
+    function create() {
+      const spineboy = this.add.spine(
+        100,
+        400,
+        "spineboy-data",
+        "spineboy-atlas"
+      );
+      spineboy.scale = 0.25;
+      spineboy.animationState.setAnimation(0, "idle", true);
+
+      const spineboy2 = this.add.spine(
+        250,
+        400,
+        "spineboy-data",
+        "spineboy-atlas"
+      );
+      spineboy2.scale = 0.25;
+      spineboy2.animationState.setAnimation(0, "walk", true);
+
+      window.coin = this.add
+        .image(400, 500, "coin")
+        .setOrigin(0.5, 1)
+        .setScale(0.3)
+        .setCrop(304, 283, 286, 284);
+
+      const spineboy3 = this.add.spine(
+        500,
+        400,
+        "spineboy-data",
+        "spineboy-atlas"
+      );
+      spineboy3.scale = 0.25;
+      spineboy3.animationState.setAnimation(0, "run", true);
+
+      const spineboy4 = this.add.spine(
+        650,
+        400,
+        "spineboy-data",
+        "spineboy-atlas"
+      );
+      spineboy4.scale = 0.25;
+      spineboy4.animationState.setAnimation(0, "shoot", true);
+
+      const grp = this.add
+        .container()
+        .add([spineboy, spineboy2, coin, spineboy3, spineboy4]);
+
+      this.input.on(
+        "pointerdown",
+        () => (spineboy2.visible = !spineboy2.visible)
+      );
+    }
+  </script>
+</html>

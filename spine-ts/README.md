@@ -17,7 +17,7 @@ In most cases, the `spine-player` module is best suited for your needs. Please r
 
 For documentation of the core API in `spine-core`, please refer to our [Spine Runtimes Guide](http://esotericsoftware.com/spine-runtimes-guide).
 
-For documentation of `spine-phaser`, please refer to our [spine-phaser Guide](https://esotericsoftware.com/spine-phaser).
+For documentation of `spine-phaser-v3` and `spine-phaser-v4`, please refer to our [spine-phaser Guide](https://esotericsoftware.com/spine-phaser).
 
 For documentation of `spine-pixi-v7` and `spine-pixi-v8`, please refer to our [spine-pixi Guide](https://esotericsoftware.com/spine-pixi).
 
@@ -75,10 +75,13 @@ You can include a module in your project via a `<script>` tag from the [unpkg](h
 // spine-threejs
 <script src="https://unpkg.com/@esotericsoftware/spine-threejs@4.2.*/dist/iife/spine-threejs.js"></script>
 
-// spine-phaser
-<script src="https://unpkg.com/@esotericsoftware/spine-phaser@4.2.*/dist/iife/spine-phaser.js"></script>
+// spine-phaser-v3
+<script src="https://unpkg.com/@esotericsoftware/spine-phaser-v3@4.2.*/dist/iife/spine-phaser-v3.js"></script>
 
-// spine-pixi
+// spine-phaser-v4
+<script src="https://unpkg.com/@esotericsoftware/spine-phaser-v4@4.2.*/dist/iife/spine-phaser-v4.js"></script>
+
+// spine-pixi-v7
 <script src="https://unpkg.com/@esotericsoftware/spine-pixi-v7@4.2.*/dist/iife/spine-pixi-v7.js"></script>
 
 // spine-pixi-v8

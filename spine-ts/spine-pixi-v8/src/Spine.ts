@@ -389,7 +389,7 @@ export class Spine extends ViewContainer {
 			};
 		}
 
-		super();
+		super({});
 
 		const skeletonData = options instanceof SkeletonData ? options : options.skeletonData;
 

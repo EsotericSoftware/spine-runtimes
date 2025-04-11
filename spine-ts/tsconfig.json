@@ -14,7 +14,10 @@
       "path": "./spine-webgl"
     },
     {
-      "path": "./spine-phaser"
+      "path": "./spine-phaser-v3"
+    },
+    {
+      "path": "./spine-phaser-v4"
     },
     {
       "path": "./spine-player"

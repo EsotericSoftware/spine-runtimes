@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.js"></script>
+    <script src="../dist/iife/spine-phaser-v3.js"></script>
+    <link rel="stylesheet" href="../../index.css" />
+    <title>Spine Phaser Example</title>
+  </head>
+
+  <body class="p-4 flex flex-col items-center">
+    <h1>Basic example</h1>
+  </body>
+  <script>
+    class BasicExample extends Phaser.Scene {
+      preload() {
+        this.load.spineBinary("spineboy-data", "assets/spineboy-pro.skel");
+        this.load.spineAtlas("spineboy-atlas", "assets/spineboy-pma.atlas");
+      }
+
+      create() {
+        const spineboy = this.add.spine(
+          400,
+          500,
+          "spineboy-data",
+          "spineboy-atlas"
+        );
+        spineboy.setInteractive();
+        spineboy.displayWidth = 200;
+        spineboy.displayHeight = (spineboy.height / spineboy.width) * 200;
+        this.input.enableDebug(spineboy, 0xff00ff);
+        spineboy.animationState.setAnimation(0, "walk", true);
+      }
+    }
+
+    new Phaser.Game({
+      type: Phaser.AUTO,
+      width: 800,
+      height: 600,
+      type: Phaser.WEBGL,
+      scene: [BasicExample],
+      plugins: {
+        scene: [
+          {
+            key: "spine.SpinePlugin",
+            plugin: spine.SpinePlugin,
+            mapping: "spine",
+          },
+        ],
+      },
+    });
+  </script>
+</html>

@@ -1,0 +1,30 @@
+export declare const ComputedSize: any;
+export declare const Depth: any;
+export declare const Flip: any;
+export declare const ScrollFactor: any;
+export declare const Transform: any;
+export declare const Visible: any;
+export declare const Origin: any;
+export declare const Alpha: any;
+export interface Type<T, P extends any[] = any[]> extends Function {
+    new (...args: P): T;
+}
+export type Mixin<GameObjectComponent, GameObjectConstraint extends Phaser.GameObjects.GameObject> = <GameObjectType extends Type<GameObjectConstraint>>(BaseGameObject: GameObjectType) => GameObjectType & Type<GameObjectComponent>;
+export declare function createMixin<GameObjectComponent, GameObjectConstraint extends Phaser.GameObjects.GameObject = Phaser.GameObjects.GameObject>(...component: GameObjectComponent[]): Mixin<GameObjectComponent, GameObjectConstraint>;
+type ComputedSizeMixin = Mixin<Phaser.GameObjects.Components.ComputedSize, Phaser.GameObjects.GameObject>;
+export declare const ComputedSizeMixin: ComputedSizeMixin;
+type DepthMixin = Mixin<Phaser.GameObjects.Components.Depth, Phaser.GameObjects.GameObject>;
+export declare const DepthMixin: DepthMixin;
+type FlipMixin = Mixin<Phaser.GameObjects.Components.Flip, Phaser.GameObjects.GameObject>;
+export declare const FlipMixin: FlipMixin;
+type ScrollFactorMixin = Mixin<Phaser.GameObjects.Components.ScrollFactor, Phaser.GameObjects.GameObject>;
+export declare const ScrollFactorMixin: ScrollFactorMixin;
+type TransformMixin = Mixin<Phaser.GameObjects.Components.Transform, Phaser.GameObjects.GameObject>;
+export declare const TransformMixin: TransformMixin;
+type VisibleMixin = Mixin<Phaser.GameObjects.Components.Visible, Phaser.GameObjects.GameObject>;
+export declare const VisibleMixin: VisibleMixin;
+type OriginMixin = Mixin<Phaser.GameObjects.Components.Origin, Phaser.GameObjects.GameObject>;
+export declare const OriginMixin: OriginMixin;
+type AlphaMixin = Mixin<Phaser.GameObjects.Components.Alpha, Phaser.GameObjects.GameObject>;
+export declare const AlphaMixin: AlphaMixin;
+export {};
