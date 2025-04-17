@@ -131,6 +131,10 @@ internal final class SpineRenderer: NSObject, MTKViewDelegate {
               let commandBuffer = commandQueue.makeCommandBuffer(),
               let renderPassDescriptor = view.currentRenderPassDescriptor,
               let renderEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor) else {
+	// this can happen if, 
+	// - CAMetalLayer is configured with drawable timeout, and CAMetalLayer is run out of Drawable 
+	// - CAMetalLayer is added to the window with frame size of zero or incorrect layout constraint -> currentRenderPassDescriptor is null
+            bufferingSemaphore.signal()
             return
         }
         
