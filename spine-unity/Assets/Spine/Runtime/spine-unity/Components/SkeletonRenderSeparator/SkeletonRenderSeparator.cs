@@ -212,6 +212,7 @@ namespace Spine.Unity {
 		}
 
 		public void UpdateVisibility () {
+  			if (skeletonRenderer == null) return;
 			foreach (SkeletonPartsRenderer partsRenderer in partsRenderers) {
 				if (partsRenderer == null) continue;
 
