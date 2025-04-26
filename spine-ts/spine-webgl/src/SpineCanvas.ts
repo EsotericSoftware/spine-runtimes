@@ -89,7 +89,7 @@ export class SpineCanvas {
 			error: () => { },
 			dispose: () => { },
 		}
-		if (config.webglConfig) config.webglConfig = { alpha: true };
+		if (!config.webglConfig) config.webglConfig = { alpha: true };
 
 		this.htmlCanvas = canvas;
 		this.context = new ManagedWebGLRenderingContext(canvas, config.webglConfig);
