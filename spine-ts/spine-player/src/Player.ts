@@ -120,6 +120,9 @@ export interface SpinePlayerConfig {
 
 		/* Optional: Viewports for specific animations. Default: none */
 		animations?: StringMap<Viewport>
+
+		/* Optional: Whether to use the x, y, height and width in skeletonData as global viewport. Default: false */
+		useSkeletonData?: boolean
 	}
 
 	/* Optional: Whether the canvas is transparent, allowing the web page behind the canvas to show through when
@@ -748,7 +751,18 @@ export class SpinePlayer implements Disposable {
 			padTop: globalViewport.padTop !== void 0 ? globalViewport.padTop : "10%",
 			padBottom: globalViewport.padBottom !== void 0 ? globalViewport.padBottom : "10%"
 		} as Viewport;
-		if (globalViewport.x !== void 0 && globalViewport.y !== void 0 && globalViewport.width && globalViewport.height) {
+		if (
+			globalViewport.useSkeletonData &&
+			this.skeleton!.data.x !== void 0 &&
+			this.skeleton!.data.y !== void 0 &&
+			this.skeleton!.data.width &&
+			this.skeleton!.data.height
+		) {
+			viewport.x = this.skeleton!.data.x;
+			viewport.y = this.skeleton!.data.y;
+			viewport.width = this.skeleton!.data.width;
+			viewport.height = this.skeleton!.data.height;
+		} else if (globalViewport.x !== void 0 && globalViewport.y !== void 0 && globalViewport.width && globalViewport.height) {
 			viewport.x = globalViewport.x;
 			viewport.y = globalViewport.y;
 			viewport.width = globalViewport.width;
