@@ -39,6 +39,9 @@ namespace spine {
 	template<typename T>
 	class SP_API Vector : public SpineObject {
 	public:
+		using size_type = size_t;
+		using value_type = T;
+
 		Vector() : _size(0), _capacity(0), _buffer(NULL) {
 		}
 
@@ -114,14 +117,14 @@ namespace spine {
 			}
 		}
 
-		inline void addAll(Vector<T> &inValue) {
+		inline void addAll(const Vector<T> &inValue) {
 			ensureCapacity(this->size() + inValue.size());
 			for (size_t i = 0; i < inValue.size(); i++) {
 				add(inValue[i]);
 			}
 		}
 
-		inline void clearAndAddAll(Vector<T> &inValue) {
+		inline void clearAndAddAll(const Vector<T> &inValue) {
 			this->clear();
 			this->addAll(inValue);
 		}
@@ -168,6 +171,12 @@ namespace spine {
 			return _buffer[inIndex];
 		}
 
+		inline const T &operator[](size_t inIndex) const {
+			assert(inIndex < _size);
+
+			return _buffer[inIndex];
+		}
+
 		inline friend bool operator==(Vector<T> &lhs, Vector<T> &rhs) {
 			if (lhs.size() != rhs.size()) {
 				return false;
@@ -184,6 +193,13 @@ namespace spine {
 
 		inline friend bool operator!=(Vector<T> &lhs, Vector<T> &rhs) {
 			return !(lhs == rhs);
+		}
+
+		Vector &operator=(const Vector &inVector) {
+			if (this != &inVector) {
+				clearAndAddAll(inVector);
+			}
+			return *this;
 		}
 
 		inline T *buffer() {
@@ -219,7 +235,6 @@ namespace spine {
 			buffer->~T();
 		}
 
-		// Vector &operator=(const Vector &inVector) {};
 	};
 }
 
