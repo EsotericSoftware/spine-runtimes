@@ -62,10 +62,9 @@ class GodotSpineTextureLoader : public spine::TextureLoader {
 	Array *textures;
 	Array *normal_maps;
 	String normal_map_prefix;
-	bool is_importing;
 
 public:
-	GodotSpineTextureLoader(Array *_textures, Array *_normal_maps, const String &normal_map_prefix, bool is_importing) : textures(_textures), normal_maps(_normal_maps), normal_map_prefix(normal_map_prefix), is_importing(is_importing) {
+	GodotSpineTextureLoader(Array *_textures, Array *_normal_maps, const String &normal_map_prefix, bool is_importing) : textures(_textures), normal_maps(_normal_maps), normal_map_prefix(normal_map_prefix) {
 	}
 
 	static bool fix_path(String &path) {
@@ -142,7 +141,8 @@ public:
 
 	void load(spine::AtlasPage &page, const spine::String &path) override {
 		Error error = OK;
-		String fixed_path = String(path.buffer());
+		String fixed_path;
+		fixed_path.parse_utf8(path.buffer());
 		bool is_resource = fix_path(fixed_path);
 
 		import_image_resource(fixed_path);
@@ -157,7 +157,7 @@ public:
 #endif
 #endif
 		if (error != OK || !texture.is_valid()) {
-			ERR_PRINT(vformat("Can't load texture: \"%s\"", String(path.buffer())));
+			ERR_PRINT(vformat("Can't load texture: \"%s\"", fixed_path));
 			auto renderer_object = memnew(SpineRendererObject);
 			renderer_object->texture = Ref<Texture>(nullptr);
 			renderer_object->normal_map = Ref<Texture>(nullptr);

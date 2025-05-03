@@ -1,0 +1,19 @@
+{
+    "name": "name",
+    "description": "description",
+    "authors": "author",
+    "version": "1.0.0",
+    "scripts": {
+        "build":"npx esbuild index.ts --bundle --sourcemap --outfile=build/index.js",
+        "dev": "npx concurrently \"npx live-server --no-browser\" \"npm run build -- --watch\""
+    },
+    "dependencies": {
+        "@esotericsoftware/spine-phaser-v4": "~4.2.77",
+        "phaser": "4.0.0-rc.1"
+    },
+    "devDependencies": {
+        "esbuild": "0.17.17",
+        "concurrently": "^7.6.0",
+        "live-server": "^1.2.2"
+    }
+}

@@ -41,6 +41,8 @@ struct SPINEPLUGIN_API FSpineEvent {
 	GENERATED_BODY();
 
 public:
+	FSpineEvent() : IntValue(0), FloatValue(0.0f), Time(0.0f) {}
+
 	void SetEvent(spine::Event *event) {
 		Name = FString(UTF8_TO_TCHAR(event->getData().getName().buffer()));
 		if (!event->getStringValue().isEmpty()) {

@@ -47,7 +47,9 @@ void SpineAnimation::_bind_methods() {
 
 String SpineAnimation::get_name() {
 	SPINE_CHECK(get_spine_object(), "")
-	return get_spine_object()->getName().buffer();
+	String name;
+	name.parse_utf8(get_spine_object()->getName().buffer());
+	return name;
 }
 
 float SpineAnimation::get_duration() {

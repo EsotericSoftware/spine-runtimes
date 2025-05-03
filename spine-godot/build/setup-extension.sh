@@ -66,11 +66,9 @@ if [ $dev == "true" ]; then
     pushd godot
     scons target=editor dev_build=true optimize=debug --jobs=$cpus
     popd
-    cp spine_godot_extension.dev.gdextension example-v4-extension/bin/spine_godot_extension.gdextension
-else
-    cp spine_godot_extension.gdextension example-v4-extension/bin
 fi
 
+cp spine_godot_extension.gdextension example-v4-extension/bin
 cp -r ../spine-cpp/spine-cpp spine_godot
 
 popd

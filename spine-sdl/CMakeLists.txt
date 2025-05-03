@@ -57,3 +57,27 @@ add_custom_command(TARGET spine-sdl-c-example PRE_BUILD
 add_custom_command(TARGET spine-sdl-cpp-example PRE_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy_directory
 		${CMAKE_CURRENT_LIST_DIR}/data $<TARGET_FILE_DIR:spine-sdl-cpp-example>/data)
+
+if(APPLE)
+	# Create the entitlements file in build directory
+	file(WRITE ${CMAKE_BINARY_DIR}/debug.entitlements
+	"<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+	<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
+	<plist version=\"1.0\">
+	<dict>
+		<key>com.apple.security.get-task-allow</key>
+		<true/>
+	</dict>
+	</plist>")
+
+	# Sign the executables
+	add_custom_command(TARGET spine-sdl-cpp-example POST_BUILD
+		COMMAND codesign --force --sign - --entitlements ${CMAKE_BINARY_DIR}/debug.entitlements $<TARGET_FILE:spine-sdl-cpp-example>
+		COMMENT "Signing target with entitlements for Instruments"
+	)
+
+	add_custom_command(TARGET spine-sdl-c-example POST_BUILD
+		COMMAND codesign --force --sign - --entitlements ${CMAKE_BINARY_DIR}/debug.entitlements $<TARGET_FILE:spine-sdl-c-example>
+		COMMENT "Signing target with entitlements for Instruments"
+	)
+endif()

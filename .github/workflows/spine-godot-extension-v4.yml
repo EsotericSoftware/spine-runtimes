@@ -49,7 +49,7 @@ jobs:
           path: spine-godot/example-v4-extension/bin/windows/*.dll
 
   build-linux-x86_64:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
@@ -120,7 +120,7 @@ jobs:
           path: spine-godot/example-v4-extension/bin/ios/*.xcframework/**/*
 
   build-android:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
@@ -163,7 +163,7 @@ jobs:
           path: spine-godot/example-v4-extension/bin/android/*.so
 
   build-web:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:

@@ -2,27 +2,15 @@
 #include <simd/simd.h> 
 using namespace metal;
 
-typedef enum SpineVertexInputIndex {
-    SpineVertexInputIndexVertices     = 0,
-    SpineVertexInputIndexTransform    = 1,
-    SpineVertexInputIndexViewportSize = 2,
-} SpineVertexInputIndex;
-
-typedef enum SpineTextureIndex {
-    SpineTextureIndexBaseColor = 0,
-} SpineTextureIndex;
-
-typedef struct {
-    simd_float2 position;
-    simd_float4 color;
-    simd_float2 uv;
-} SpineVertex;
-
-typedef struct {
-    simd_float2 translation;
-    simd_float2 scale;
-    simd_float2 offset;
-} SpineTransform;
+#if __has_include("spine-ios/Sources/SpineShadersStructs/SpineShadersStructs.h")
+// Cocoapods Target
+    #include "spine-ios/Sources/SpineShadersStructs/SpineShadersStructs.h"
+#elif  __has_include("../../SpineShadersStructs/SpineShadersStructs.h")
+// Swift Package target
+    #include "../../SpineShadersStructs/SpineShadersStructs.h"
+#else
+    #error "Header not found. Please correct Header search path"
+#endif
 
 struct RasterizerData {
     simd_float4 position [[position]];

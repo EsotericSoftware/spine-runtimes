@@ -250,7 +250,9 @@ Ref<Animation> SpineAnimationTrack::create_animation(spine::Animation *animation
 
 	Ref<Animation> animation_ref;
 	INSTANTIATE(animation_ref);
-	animation_ref->set_name(String(animation->getName().buffer()) + (loop ? "" : "_looped"));
+	String name;
+	name.parse_utf8(animation->getName().buffer());
+	animation_ref->set_name(name + (loop ? "" : "_looped"));
 #if VERSION_MAJOR > 3
 	// animation_ref->set_loop(!loop);
 #else
@@ -260,7 +262,7 @@ Ref<Animation> SpineAnimationTrack::create_animation(spine::Animation *animation
 
 	animation_ref->add_track(Animation::TYPE_VALUE);
 	animation_ref->track_set_path(0, NodePath(".:animation_name"));
-	animation_ref->track_insert_key(0, 0, animation->getName().buffer());
+	animation_ref->track_insert_key(0, 0, name);
 
 	animation_ref->add_track(Animation::TYPE_VALUE);
 	animation_ref->track_set_path(1, NodePath(".:loop"));
@@ -298,7 +300,9 @@ void SpineAnimationTrack::update_animation_state(const Variant &variant_sprite) 
 			}
 			auto current_entry = animation_state->getCurrent(track_index);
 			bool should_set_mix = mix_duration >= 0;
-			bool should_set_animation = !current_entry || (animation_name != current_entry->getAnimation()->getName().buffer() || current_entry->getLoop() != loop);
+			String other_name;
+			if (current_entry) other_name.parse_utf8(current_entry->getAnimation()->getName().buffer());
+			bool should_set_animation = !current_entry || (animation_name != other_name || current_entry->getLoop() != loop);
 
 			if (should_set_animation) {
 				if (!EMPTY(animation_name)) {
@@ -316,7 +320,7 @@ void SpineAnimationTrack::update_animation_state(const Variant &variant_sprite) 
 
 					if (debug) print_line(String("Setting animation {0} with mix_duration {1} on track {2} on {3}").format(varray(animation_name, mix_duration, track_index, sprite->get_name())).utf8().ptr());
 				} else {
-					if (!current_entry || (String("<empty>") != current_entry->getAnimation()->getName().buffer())) {
+					if (!current_entry || (String("<empty>") != other_name)) {
 						auto entry = animation_state->setEmptyAnimation(track_index, should_set_mix ? mix_duration : 0);
 						entry->setTrackEnd(FLT_MAX);
 						if (debug) print_line(String("Setting empty animation with mix_duration {0} on track {1} on {2}").format(varray(mix_duration, track_index, sprite->get_name())).utf8().ptr());
@@ -423,7 +427,9 @@ void SpineAnimationTrack::update_animation_state(const Variant &variant_sprite) 
 		if (animation_player->is_playing()) {
 			auto current_entry = animation_state->getCurrent(track_index);
 			bool should_set_mix = mix_duration >= 0;
-			bool should_set_animation = !current_entry || (animation_name != current_entry->getAnimation()->getName().buffer() || current_entry->getLoop() != loop) || animation_changed;
+			String other_name;
+			if (current_entry) other_name.parse_utf8(current_entry->getAnimation()->getName().buffer());
+			bool should_set_animation = !current_entry || (animation_name != other_name || current_entry->getLoop() != loop) || animation_changed;
 			animation_changed = false;
 
 			if (should_set_animation) {
@@ -442,7 +448,7 @@ void SpineAnimationTrack::update_animation_state(const Variant &variant_sprite) 
 
 					if (debug) print_line(String("Setting animation {0} with mix_duration {1} on track {2} on {3}").format(varray(animation_name, mix_duration, track_index, sprite->get_name())).utf8().ptr());
 				} else {
-					if (!current_entry || (String("<empty>") != current_entry->getAnimation()->getName().buffer())) {
+					if (!current_entry || (String("<empty>") != other_name)) {
 						auto entry = animation_state->setEmptyAnimation(track_index, should_set_mix ? mix_duration : 0);
 						entry->setTrackEnd(FLT_MAX);
 						if (debug) print_line(String("Setting empty animation with mix_duration {0} on track {1} on {2}").format(varray(mix_duration, track_index, sprite->get_name())).utf8().ptr());

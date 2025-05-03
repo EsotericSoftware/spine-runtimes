@@ -41,7 +41,9 @@ void SpineConstraintData::_bind_methods() {
 
 String SpineConstraintData::get_constraint_name() {
 	SPINE_CHECK(get_spine_object(), "")
-	return get_spine_object()->getName().buffer();
+	String name;
+	name.parse_utf8(get_spine_object()->getName().buffer());
+	return name;
 }
 
 int SpineConstraintData::get_order() {

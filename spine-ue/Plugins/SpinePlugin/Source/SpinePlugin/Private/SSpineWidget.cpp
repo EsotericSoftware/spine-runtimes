@@ -46,14 +46,32 @@ static int brushNameId = 0;
 // Workaround for https://github.com/EsotericSoftware/spine-runtimes/issues/1458
 // See issue comments for more information.
 struct SpineSlateMaterialBrush : public FSlateBrush {
+	static TArray<FName> NamePool;
+	static FCriticalSection NamePoolLock;
+
 	SpineSlateMaterialBrush(class UMaterialInterface &InMaterial, const FVector2D &InImageSize)
 		: FSlateBrush(ESlateBrushDrawType::Image, FName(TEXT("None")), FMargin(0), ESlateBrushTileType::NoTile, ESlateBrushImageType::FullColor, InImageSize, FLinearColor::White, &InMaterial) {
 		// Workaround for https://github.com/EsotericSoftware/spine-runtimes/issues/2006
-		FString brushName = TEXT("spineslatebrush");
-		brushName.AppendInt(brushNameId++);
-		ResourceName = FName(brushName);
+		FScopeLock Lock(&NamePoolLock);
+
+		if (NamePool.Num() > 0) {
+			ResourceName = NamePool.Pop(false);
+		} else {
+			static uint32 NextId = 0;
+			FString brushName = TEXT("SpineSlateMatBrush");
+			brushName.AppendInt(NextId++);
+			ResourceName = FName(*brushName);
+		}
+	}
+
+	~SpineSlateMaterialBrush() {
+		FScopeLock Lock(&NamePoolLock);
+		NamePool.Add(ResourceName);
 	}
 };
+
+TArray<FName> SpineSlateMaterialBrush::NamePool;
+FCriticalSection SpineSlateMaterialBrush::NamePoolLock;
 
 void SSpineWidget::Construct(const FArguments &args) {
 }

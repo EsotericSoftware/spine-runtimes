@@ -6,13 +6,15 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
 
     - name: Install OS dependencies (needed for act on ubuntu-latest)
       run: |
         sudo apt update
-        sudo apt install -y --force-yes curl xz-utils libicu-dev git dos2unix libncurses5
+        sudo apt install -y --force-yes curl xz-utils libicu-dev git dos2unix
+        wget http://security.ubuntu.com/ubuntu/pool/universe/n/ncurses/libtinfo5_6.3-2ubuntu0.1_amd64.deb
+        sudo apt install ./libtinfo5_6.3-2ubuntu0.1_amd64.deb
 
     - uses: actions/checkout@v3
 

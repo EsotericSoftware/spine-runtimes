@@ -9,7 +9,8 @@ up into multiple modules:
 1. `spine-canvaskit/`, a self-contained [CanvasKit](https://skia.org/docs/user/modules/canvaskit/) backend, built on the core classes for CanvasKit, supporting both NodeJS for headless rendering, and browsers.
 1. `spine-threejs/`, a self-contained [THREE.JS](https://threejs.org/) backend, built on the core classes.
 1. `spine-player/`, a self-contained player to easily display Spine animations on your website, built on the core classes and WebGL backend.
-1. `spine-phaser/`, a [Phaser](https://phaser.io/) backend, built on the core classes.
+1. `spine-phaser-v3/`, a [Phaser v3](https://phaser.io/) backend, built on the core classes.
+1. `spine-phaser-v4/`, a [Phaser v4](https://phaser.io/) backend, built on the core classes.
 1. `spine-pixi-v7/`, a [PixiJS v7](https://pixijs.com/) backend, built on the core classes.
 1. `spine-pixi-v8/`, a [PixiJS v8](https://pixijs.com/) backend, built on the core classes.
 
@@ -17,7 +18,7 @@ In most cases, the `spine-player` module is best suited for your needs. Please r
 
 For documentation of the core API in `spine-core`, please refer to our [Spine Runtimes Guide](http://esotericsoftware.com/spine-runtimes-guide).
 
-For documentation of `spine-phaser`, please refer to our [spine-phaser Guide](https://esotericsoftware.com/spine-phaser).
+For documentation of `spine-phaser-v3` and `spine-phaser-v4`, please refer to our [spine-phaser Guide](https://esotericsoftware.com/spine-phaser).
 
 For documentation of `spine-pixi-v7` and `spine-pixi-v8`, please refer to our [spine-pixi Guide](https://esotericsoftware.com/spine-pixi).
 
@@ -75,10 +76,13 @@ You can include a module in your project via a `<script>` tag from the [unpkg](h
 // spine-threejs
 <script src="https://unpkg.com/@esotericsoftware/spine-threejs@4.2.*/dist/iife/spine-threejs.js"></script>
 
-// spine-phaser
-<script src="https://unpkg.com/@esotericsoftware/spine-phaser@4.2.*/dist/iife/spine-phaser.js"></script>
+// spine-phaser-v3
+<script src="https://unpkg.com/@esotericsoftware/spine-phaser-v3@4.2.*/dist/iife/spine-phaser-v3.js"></script>
 
-// spine-pixi
+// spine-phaser-v4
+<script src="https://unpkg.com/@esotericsoftware/spine-phaser-v4@4.2.*/dist/iife/spine-phaser-v4.js"></script>
+
+// spine-pixi-v7
 <script src="https://unpkg.com/@esotericsoftware/spine-pixi-v7@4.2.*/dist/iife/spine-pixi-v7.js"></script>
 
 // spine-pixi-v8

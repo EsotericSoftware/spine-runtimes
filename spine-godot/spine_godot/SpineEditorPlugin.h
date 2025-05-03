@@ -107,8 +107,11 @@ public:
 	void get_import_options(const String &path, List<ImportOption> *options, int preset) const override;
 
 	virtual bool get_option_visibility(const String &path, const String &option, const HashMap<StringName, Variant> &options) const override { return true; }
-
+#if VERSION_MINOR > 3
+	Error import(ResourceUID::ID p_source_id, const String &source_file, const String &save_path, const HashMap<StringName, Variant> &options, List<String> *r_platform_variants, List<String> *r_gen_files, Variant *r_metadata = nullptr) override;
+#else
 	Error import(const String &source_file, const String &save_path, const HashMap<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) override;
+#endif
 #endif
 #else
 	void get_import_options(List<ImportOption> *options, int preset) const override;
@@ -182,7 +185,11 @@ public:
 
 	bool get_option_visibility(const String &path, const String &option, const HashMap<StringName, Variant> &options) const override { return true; }
 
+#if VERSION_MINOR > 3
+	Error import(ResourceUID::ID p_source_id, const String &p_source_file, const String &p_save_path, const HashMap<StringName, Variant> &p_options, List<String> *r_platform_variants, List<String> *r_gen_files, Variant *r_metadata = nullptr) override;
+#else
 	Error import(const String &source_file, const String &save_path, const HashMap<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) override;
+#endif
 #endif
 #else
 	void get_import_options(List<ImportOption> *options, int preset) const override {}
@@ -255,8 +262,11 @@ public:
 	void get_import_options(const String &path, List<ImportOption> *options, int preset) const override {}
 
 	bool get_option_visibility(const String &path, const String &option, const HashMap<StringName, Variant> &options) const override { return true; }
-
+#if VERSION_MINOR > 3
+	Error import(ResourceUID::ID p_source_id, const String &p_source_file, const String &p_save_path, const HashMap<StringName, Variant> &p_options, List<String> *r_platform_variants, List<String> *r_gen_files, Variant *r_metadata = nullptr) override;
+#else
 	Error import(const String &source_file, const String &save_path, const HashMap<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) override;
+#endif
 #endif
 #else
 	void get_import_options(List<ImportOption> *options, int preset) const override {}
@@ -280,7 +290,11 @@ public:
 #else
 	explicit SpineEditorPlugin(EditorNode *node);
 
+#if VERSION_MAJOR > 3 && VERSION_MINOR > 3
+	String get_plugin_name() const override { return "SpineEditorPlugin"; }
+#else
 	String get_name() const override { return "SpineEditorPlugin"; }
+#endif
 #endif
 };
 

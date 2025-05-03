@@ -145,6 +145,8 @@ spine-ts/spine-canvas/dist
 spine-ts/spine-webgl/dist
 spine-ts/spine-player/dist
 spine-ts/spine-threejs/dist
+spine-ts/spine-phaser-v3/dist
+spine-ts/spine-phaser-v4/dist
 spine-ts/spine-pixi-v7/dist
 spine-ts/spine-pixi-v8/dist
 spine-libgdx/gradle
@@ -189,7 +191,6 @@ spine-flutter/src/spine-cpp
 
 spine-godot/.clang-format
 
-spine-ts/spine-phaser/dist
 spine-godot/.cache
 spine-godot/build/compile_commands.json
 

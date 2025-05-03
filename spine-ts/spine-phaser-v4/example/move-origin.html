@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="//cdn.jsdelivr.net/npm/phaser@4.0.0-rc.1/dist/phaser.js"></script>
+    <script src="../dist/iife/spine-phaser-v4.js"></script>
+    <link rel="stylesheet" href="../../index.css" />
+    <title>Spine Phaser Example</title>
+  </head>
+
+  <body class="p-4 flex flex-col items-center">
+    <h1>Move origin</h1>
+    <h2>Demonstrate moving origin of Spine Gameobject, behaves like a sprite</h2>
+    <h2>When you use matter physics, origin is reset, because the body always stays around the game object.
+      Change game object size only after the object has been added to matter.</h2>
+  </body>
+  <script>
+    let cursors;
+    let spineboy;
+    const levelWidth = 800;
+    const levelHeight = 600;
+    const gameobjects = []
+
+    class BasicExample extends Phaser.Scene {
+      preload() {
+        this.load.spineBinary("spineboy-data", "assets/spineboy-pro.skel");
+        this.load.spineAtlas("spineboy-atlas", "assets/spineboy-pma.atlas");
+        this.load.image("block", "block.png");
+      }
+
+      create() {
+        const graphics = this.add.graphics();
+        const width = levelWidth / 5;
+        const height = levelHeight / 4;
+        let cells = [];
+        for (let i = 0; i < levelWidth / width; i++) {
+          for (let j = 0; j < levelHeight / height; j++) {
+            const x = i * width;
+            const y = j * height;
+            cells.push({ x, y });
+            graphics.lineStyle(1, 0x00ff00, .5);
+            graphics.strokeRect(x, y, width, height);
+
+            graphics.beginPath();
+            graphics.moveTo(x, y);
+            graphics.lineTo(x + width, y + height);
+            graphics.moveTo(x + width, y);
+            graphics.lineTo(x, y + height);
+            graphics.closePath();
+
+            graphics.strokePath();
+          }
+        }
+
+        const physicsCells = cells.splice(cells.length - 2, 2);
+
+        let animations = undefined;
+        let prevWidth = 0;
+        let prevHeight = 0;
+        cells.forEach(({ x, y }, i) => {
+          let gameobject;
+          let animation;
+          if (i % 2 === 1) {
+            gameobject = this.add.image(x, y, "block");
+            gameobject.displayWidth = prevWidth;
+            gameobject.displayHeight = prevHeight;
+          } else {
+            animation = animations ? animations[i % animations.length].name : "aim";
+            gameobject = this.add.spine(x, y, "spineboy-data", "spineboy-atlas", new spine.SkinsAndAnimationBoundsProvider(animation, undefined, undefined, true));
+            if (!animations) animations = gameobject.skeleton.data.animations;
+            gameobject.animationState.setAnimation(0, animation, true);
+
+            let ratio = gameobject.width / gameobject.height;
+            if (ratio > 1) {
+              gameobject.displayHeight = height / ratio;
+              gameobject.displayWidth = width;
+            } else {
+              gameobject.displayWidth = ratio * height;
+              gameobject.displayHeight = height;
+            }
+            prevWidth = gameobject.displayWidth;
+            prevHeight = gameobject.displayHeight;
+          }
+
+          gameobjects.push(gameobject)
+
+          // moving origin at the center of the cell, we're still able to align spineboy and keep gameobject bounds align with the drawn skeleton
+          const origin = 1 / (cells.length / 2 - 1) * Math.floor(i / 2)
+
+          gameobject.setOrigin(origin)
+          gameobject.x += width / 2 - gameobject.displayWidth * (0.5 - origin);
+          gameobject.y += height / 2 - gameobject.displayHeight * (0.5 - origin);
+
+          const graphics = this.add.graphics();
+          const rect = new Phaser.Geom.Rectangle(
+            gameobject.x - gameobject.displayOriginX * gameobject.scaleX,
+            gameobject.y - gameobject.displayOriginY * gameobject.scaleY,
+            gameobject.width * gameobject.scaleX,
+            gameobject.height * gameobject.scaleY,
+          );
+
+          const defaultGraphicsElements = () => {
+            graphics.clear();
+            graphics.lineStyle(7, 0x0000ff, .75);
+            graphics.strokeRectShape(rect);
+            graphics.fillStyle(0xffff00, 10);
+            graphics.fillCircle(gameobject.x, gameobject.y, 10);
+
+            graphics.fillStyle(0xff5500, 1);
+            graphics.fillCircle(gameobject.x - gameobject.displayOriginX * gameobject.scaleX, gameobject.y - gameobject.displayOriginY * gameobject.scaleY, 5);
+
+            graphics.lineStyle(3, 0xffffff, 1);
+            graphics.lineBetween(gameobject.x, gameobject.y, gameobject.x + gameobject.displayOriginX * gameobject.scaleX, gameobject.y + gameobject.displayOriginY * gameobject.scaleY);
+          }
+          defaultGraphicsElements();
+
+          // interactions bounds are aligned with gameobject bounds
+          gameobject.setInteractive();
+          this.input.enableDebug(gameobject, 0xff00ff);
+          gameobject.on("pointerover", () => {
+            defaultGraphicsElements();
+            graphics.fillStyle(0x00ff00, .25);
+            graphics.fillRectShape(rect);
+            graphics.fillStyle(0xff5500, 1);
+          });
+          gameobject.on("pointerout", () => defaultGraphicsElements());
+        })
+
+        const [physicsCell1, physicsCell2] = physicsCells;
+        const spineboy = this.add.spine(0, 0, "spineboy-data", "spineboy-atlas");
+
+        this.matter.add.gameObject(spineboy);
+
+        spineboy.displayWidth = (spineboy.width / spineboy.height) * height * .5;
+        spineboy.displayHeight = height * .5;
+
+        spineboy.x = physicsCell1.x + spineboy.displayWidth;
+        spineboy.y = physicsCell1.y + spineboy.displayHeight;
+
+        spineboy.setInteractive();
+        this.input.enableDebug(spineboy, 0xff00ff);
+        spineboy.on("pointerover", () => {
+          spineboy.y -= 50;
+          spineboy.x += 10;
+        });
+
+        const block = this.add.image(0, 0, "block");
+
+        this.matter.add.gameObject(block);
+
+        block.displayWidth = (block.width / block.height) * height * .5;
+        block.displayHeight = height * .5;
+
+        block.x = physicsCell2.x + block.displayWidth;
+        block.y = physicsCell2.y + block.displayHeight;
+
+        block.setInteractive();
+        this.input.enableDebug(block, 0xff00ff);
+        block.on("pointerover", () => {
+          block.y -= 50;
+          block.x += 10;
+        });
+
+        this.matter.add.rectangle(levelWidth - width, levelHeight - height, levelWidth, 1, { isStatic: true });
+        this.matter.add.rectangle(levelWidth - width, levelHeight - 2 * height, levelWidth, 1, { isStatic: true });
+        this.matter.add.rectangle(levelWidth - width, levelHeight, levelWidth, 1, { isStatic: true });
+        this.matter.add.rectangle(levelWidth - width, levelHeight - 2 * height, 1, height * 4, { isStatic: true });
+        this.matter.add.rectangle(levelWidth, levelHeight - 2 * height, 1, height * 4, { isStatic: true });
+      }
+
+      update(params) {
+        gameobjects.forEach((go) => {
+          go.angle += 0.05;
+        })
+      }
+
+    }
+
+    new Phaser.Game({
+      type: Phaser.AUTO,
+      width: levelWidth,
+      height: levelHeight,
+      type: Phaser.WEBGL,
+      scene: [BasicExample],
+      physics: {
+        default: 'matter',
+        matter: {
+            debug: true,
+            gravity: { y: .15 },
+        },
+      },
+      plugins: {
+        scene: [
+          {
+            key: "spine.SpinePlugin",
+            plugin: spine.SpinePlugin,
+            mapping: "spine",
+          },
+        ],
+      },
+    });
+  </script>
+</html>

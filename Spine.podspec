@@ -18,7 +18,8 @@ Spine runtimes for iOS.
   s.platform         = :ios, '13.0'
 
   s.xcconfig = {
-    'HEADER_SEARCH_PATHS' => '"$(PODS_ROOT)/SpineCppLite/spine-cpp/spine-cpp/include" "$(PODS_ROOT)/SpineCppLite/spine-cpp/spine-cpp-lite"'
+    'HEADER_SEARCH_PATHS' => '"$(PODS_ROOT)/SpineCppLite/spine-cpp/spine-cpp/include" "$(PODS_ROOT)/SpineCppLite/spine-cpp/spine-cpp-lite"',
+    'MTL_HEADER_SEARCH_PATHS' => '"$(PODS_ROOT)/SpineShadersStructs"'
   }
 
   s.resource_bundles = {

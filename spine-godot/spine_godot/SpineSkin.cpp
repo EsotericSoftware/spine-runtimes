@@ -123,7 +123,9 @@ Array SpineSkin::find_attachments_for_slot(int slot_index) {
 
 String SpineSkin::get_name() {
 	SPINE_CHECK(get_spine_object(), "")
-	return get_spine_object()->getName().buffer();
+	String name;
+	name.parse_utf8(get_spine_object()->getName().buffer());
+	return name;
 }
 
 void SpineSkin::add_skin(Ref<SpineSkin> other) {

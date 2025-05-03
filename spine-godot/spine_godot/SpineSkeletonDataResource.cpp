@@ -381,11 +381,9 @@ SpineSkeletonDataResource::get_skeleton_file_res() {
 }
 
 #ifdef SPINE_GODOT_EXTENSION
-void SpineSkeletonDataResource::get_animation_names(
-		PackedStringArray &animation_names) const {
+void SpineSkeletonDataResource::get_animation_names(PackedStringArray &animation_names) const {
 #else
-void SpineSkeletonDataResource::get_animation_names(
-		Vector<String> &animation_names) const {
+void SpineSkeletonDataResource::get_animation_names(Vector<String> &animation_names) const {
 #endif
 	animation_names.clear();
 	if (!is_skeleton_data_loaded())
@@ -393,16 +391,16 @@ void SpineSkeletonDataResource::get_animation_names(
 	auto animations = skeleton_data->getAnimations();
 	for (size_t i = 0; i < animations.size(); ++i) {
 		auto animation = animations[i];
-		animation_names.push_back(animation->getName().buffer());
+		String name;
+		name.parse_utf8(animation->getName().buffer());
+		animation_names.push_back(name);
 	}
 }
 
 #ifdef SPINE_GODOT_EXTENSION
-void SpineSkeletonDataResource::get_skin_names(
-		PackedStringArray &skin_names) const {
+void SpineSkeletonDataResource::get_skin_names(PackedStringArray &skin_names) const {
 #else
-void SpineSkeletonDataResource::get_skin_names(
-		Vector<String> &skin_names) const {
+void SpineSkeletonDataResource::get_skin_names(Vector<String> &skin_names) const {
 #endif
 	skin_names.clear();
 	if (!is_skeleton_data_loaded())
@@ -410,7 +408,9 @@ void SpineSkeletonDataResource::get_skin_names(
 	auto skins = skeleton_data->getSkins();
 	for (size_t i = 0; i < skins.size(); ++i) {
 		auto skin = skins[i];
-		skin_names.push_back(skin->getName().buffer());
+		String name;
+		name.parse_utf8(skin->getName().buffer());
+		skin_names.push_back(name);
 	}
 }
 
@@ -425,7 +425,9 @@ void SpineSkeletonDataResource::get_slot_names(Vector<String> &slot_names) {
 	auto slots = skeleton_data->getSlots();
 	for (size_t i = 0; i < slots.size(); ++i) {
 		auto slot = slots[i];
-		slot_names.push_back(slot->getName().buffer());
+		String name;
+		name.parse_utf8(slot->getName().buffer());
+		slot_names.push_back(name);
 	}
 }
 
@@ -440,7 +442,9 @@ void SpineSkeletonDataResource::get_bone_names(Vector<String> &bone_names) {
 	auto bones = skeleton_data->getBones();
 	for (size_t i = 0; i < bones.size(); ++i) {
 		auto bone = bones[i];
-		bone_names.push_back(bone->getName().buffer());
+		String name;
+		name.parse_utf8(bone->getName().buffer());
+		bone_names.push_back(name);
 	}
 }
 
@@ -623,7 +627,9 @@ SpineSkeletonDataResource::find_physics_constraint(
 
 String SpineSkeletonDataResource::get_skeleton_name() const {
 	SPINE_CHECK(skeleton_data, "")
-	return skeleton_data->getName().buffer();
+	String name;
+	name.parse_utf8(skeleton_data->getName().buffer());
+	return name;
 }
 
 Array SpineSkeletonDataResource::get_bones() const {

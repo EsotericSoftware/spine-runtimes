@@ -68,7 +68,9 @@ int SpineBoneData::get_index() {
 
 String SpineBoneData::get_bone_name() {
 	SPINE_CHECK(get_spine_object(), "")
-	return get_spine_object()->getName().buffer();
+	String name;
+	name.parse_utf8(get_spine_object()->getName().buffer());
+	return name;
 }
 
 Ref<SpineBoneData> SpineBoneData::get_parent() {

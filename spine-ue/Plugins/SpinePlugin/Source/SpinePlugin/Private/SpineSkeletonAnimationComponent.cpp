@@ -35,6 +35,7 @@
 using namespace spine;
 
 void UTrackEntry::SetTrackEntry(TrackEntry *trackEntry) {
+	if (entry) entry->setRendererObject(nullptr);
 	this->entry = trackEntry;
 	if (entry) entry->setRendererObject((void *) this);
 }
@@ -80,6 +81,11 @@ USpineSkeletonAnimationComponent::USpineSkeletonAnimationComponent() {
 
 void USpineSkeletonAnimationComponent::BeginPlay() {
 	Super::BeginPlay();
+	for (UTrackEntry *entry : trackEntries) {
+		if (entry && entry->GetTrackEntry()) {
+			entry->GetTrackEntry()->setRendererObject(nullptr);
+		}
+	}
 	trackEntries.Empty();
 }
 

@@ -3007,7 +3007,10 @@ spine_skin_entries spine_skin_get_entries(spine_skin skin) {
 	_spine_skin_entries *entries = SpineExtension::getInstance()->calloc<_spine_skin_entries>(1, __FILE__, __LINE__);
 	{
 		Skin::AttachmentMap::Entries mapEntries = _skin->getAttachments();
-		while (mapEntries.hasNext()) entries->numEntries++;
+		while (mapEntries.hasNext()) {
+			entries->numEntries++;
+			mapEntries.next();
+		}
 	}
 	{
 		entries->entries = SpineExtension::getInstance()->calloc<_spine_skin_entry>(entries->numEntries, __FILE__, __LINE__);

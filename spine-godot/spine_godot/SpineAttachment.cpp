@@ -41,7 +41,9 @@ SpineAttachment::~SpineAttachment() {
 
 String SpineAttachment::get_attachment_name() {
 	SPINE_CHECK(get_spine_object(), "")
-	return get_spine_object()->getName().buffer();
+	String name;
+	name.parse_utf8(get_spine_object()->getName().buffer());
+	return name;
 }
 
 Ref<SpineAttachment> SpineAttachment::copy() {

@@ -22,7 +22,8 @@ then
 		spine-threejs/dist/iife/* \
 		spine-pixi-v7/dist/iife/* \
 		spine-pixi-v8/dist/iife/* \
-		spine-phaser/dist/iife/* \
+		spine-phaser-v3/dist/iife/* \
+		spine-phaser-v4/dist/iife/* \
 		spine-core/dist/esm/* \
 		spine-canvas/dist/esm/* \
 		spine-webgl/dist/esm/* \
@@ -30,7 +31,8 @@ then
 		spine-threejs/dist/esm/* \
 		spine-pixi-v7/dist/esm/* \
 		spine-pixi-v8/dist/esm/* \
-		spine-phaser/dist/esm/* \
+		spine-phaser-v3/dist/esm/* \
+		spine-phaser-v4/dist/esm/* \
 		spine-player/css/spine-player.css
 	curl -f -F "file=@spine-ts.zip" "$TS_UPDATE_URL$BRANCH"
 else

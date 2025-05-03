@@ -439,6 +439,7 @@ class SwiftFunctionWriter:
       if spine_params and spine_params[0].type == self.spine_object.name:
         spine_params_without_ivar = spine_params[1:] 
       else:
+        function_string = function_string.replace("public func ", "public static func ")
         spine_params_without_ivar = spine_params
 
       swift_params = [
@@ -495,6 +496,39 @@ class SwiftObjectWriter:
         object_string += "\n"
         object_string += inset + inset
         object_string += "super.init()"
+        object_string += "\n"
+        object_string += inset
+        object_string += "}"
+        object_string += "\n"
+        object_string += "\n"
+        
+        object_string += inset
+        object_string += "public override func isEqual(_ object: Any?) -> Bool"
+        object_string += " {"
+        object_string += "\n"
+        object_string += inset + inset
+        object_string += f"guard let other = object as? {class_name} else {{ return false }}"
+        object_string += "\n"
+        object_string += inset + inset
+        object_string += f"return self.{ivar_name} == other.{ivar_name}"
+        object_string += "\n"
+        object_string += inset
+        object_string += "}"
+        object_string += "\n"
+        object_string += "\n"
+        
+        object_string += inset
+        object_string += "public override var hash: Int"
+        object_string += " {"
+        object_string += "\n"
+        object_string += inset + inset
+        object_string += "var hasher = Hasher()"
+        object_string += "\n"
+        object_string += inset + inset
+        object_string += f"hasher.combine(self.{ivar_name})"
+        object_string += "\n"
+        object_string += inset + inset
+        object_string += "return hasher.finalize()"
         object_string += "\n"
         object_string += inset
         object_string += "}"

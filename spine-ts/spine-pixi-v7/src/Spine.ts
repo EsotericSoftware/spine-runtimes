@@ -34,7 +34,6 @@ import {
 	AtlasAttachmentLoader,
 	ClippingAttachment,
 	Color,
-	MathUtils,
 	MeshAttachment,
 	Physics,
 	RegionAttachment,
@@ -52,7 +51,7 @@ import { SlotMesh } from "./SlotMesh.js";
 import { DarkSlotMesh } from "./DarkSlotMesh.js";
 import type { ISpineDebugRenderer, SpineDebugRenderer } from "./SpineDebugRenderer.js";
 import { Assets } from "@pixi/assets";
-import { IPointData, Point, Rectangle } from "@pixi/core";
+import { IPointData, Point } from "@pixi/core";
 import { Ticker } from "@pixi/core";
 import type { IDestroyOptions, DisplayObject } from "@pixi/display";
 import { Bounds, Container } from "@pixi/display";
@@ -593,8 +592,24 @@ export class Spine extends Container {
 
 		if (slotObject.visible) {
 			slotObject.position.set(slot.bone.worldX, slot.bone.worldY);
-			slotObject.scale.set(slot.bone.getWorldScaleX(), slot.bone.getWorldScaleY());
-			slotObject.rotation = slot.bone.getWorldRotationX() * MathUtils.degRad;
+			slotObject.angle = slot.bone.getWorldRotationX();
+
+			let bone: Bone | null = slot.bone;
+			let cumulativeScaleX = 1;
+			let cumulativeScaleY = 1;
+			while (bone) {
+				cumulativeScaleX *= bone.scaleX;
+				cumulativeScaleY *= bone.scaleY;
+				bone = bone.parent;
+			};
+
+			if (cumulativeScaleX < 0) slotObject.angle -= 180;
+
+			slotObject.scale.set(
+				slot.bone.getWorldScaleX() * Math.sign(cumulativeScaleX),
+				slot.bone.getWorldScaleY() * Math.sign(cumulativeScaleY),
+			);
+
 			slotObject.zIndex = zIndex + 1;
 			slotObject.alpha = this.skeleton.color.a * slot.color.a;
 		}

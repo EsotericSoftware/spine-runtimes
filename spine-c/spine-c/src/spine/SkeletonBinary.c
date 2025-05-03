@@ -1178,11 +1178,6 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
 				return NULL;
 			mesh = SUB_CAST(spMeshAttachment, attachment);
 			mesh->path = (char *) path;
-			if (mesh->path) {
-				char *tmp = NULL;
-				MALLOC_STR(tmp, mesh->path);
-				mesh->path = tmp;
-			}
 			spColor_setFromColor(&mesh->color, &color);
 			mesh->sequence = sequence;
 			mesh->width = width;

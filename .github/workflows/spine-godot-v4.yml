@@ -34,7 +34,7 @@ env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   AWS_EC2_METADATA_DISABLED: true
-  EM_VERSION: 3.1.26
+  EM_VERSION: 3.1.64
   GODOT_TAG: ${{ inputs.godot_tag }}
   GODOT_VERSION: ${{ inputs.godot_version }}
   GODOT_MONO: ${{ inputs.godot_mono }}
@@ -65,7 +65,7 @@ jobs:
           path: spine-godot/godot/bin/**/*
 
   godot-editor-linux:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
@@ -161,7 +161,7 @@ jobs:
           path: spine-godot/godot/bin/macos.zip
 
   godot-template-linux:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
@@ -218,7 +218,7 @@ jobs:
           path: spine-godot/godot/bin/windows_release_x86_64.exe
 
   godot-template-android:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     if: ${{ inputs.godot_mono == false }}
     steps:
       - uses: actions/checkout@v3
@@ -266,7 +266,7 @@ jobs:
           path: spine-godot/godot/bin/android_source.zip
 
   godot-template-web:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     if: ${{ inputs.godot_mono == false }}
 
     steps:

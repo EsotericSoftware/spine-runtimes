@@ -48,7 +48,9 @@ void SpineEventData::_bind_methods() {
 
 String SpineEventData::get_event_name() {
 	SPINE_CHECK(get_spine_object(), "")
-	return get_spine_object()->getName().buffer();
+	String name;
+	name.parse_utf8(get_spine_object()->getName().buffer());
+	return name;
 }
 
 int SpineEventData::get_int_value() {

@@ -70,6 +70,14 @@ void USpineSkeletonDataAsset::PostInitProperties() {
 	Super::PostInitProperties();
 }
 
+#if ((ENGINE_MAJOR_VERSION >= 5) && (ENGINE_MINOR_VERSION >= 4))
+void USpineSkeletonDataAsset::GetAssetRegistryTags(FAssetRegistryTagsContext Context) const {
+	if (importData) {
+		Context.AddTag(FAssetRegistryTag(SourceFileTagName(), importData->GetSourceData().ToJson(), FAssetRegistryTag::TT_Hidden));
+	}
+	Super::GetAssetRegistryTags(Context);
+}
+#else
 void USpineSkeletonDataAsset::GetAssetRegistryTags(
 		TArray<FAssetRegistryTag> &OutTags) const {
 	if (importData) {
@@ -80,6 +88,7 @@ void USpineSkeletonDataAsset::GetAssetRegistryTags(
 
 	Super::GetAssetRegistryTags(OutTags);
 }
+#endif
 
 void USpineSkeletonDataAsset::Serialize(FArchive &Ar) {
 	Super::Serialize(Ar);

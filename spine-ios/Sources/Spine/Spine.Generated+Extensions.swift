@@ -365,3 +365,11 @@ public extension SkeletonBounds {
         return SkeletonBounds(spine_skeleton_bounds_create())
     }
 }
+
+@objc public extension Atlas {
+    
+    var imagePathCount:Int32 {
+        spine_atlas_get_num_image_paths(wrappee)
+    }
+    
+}

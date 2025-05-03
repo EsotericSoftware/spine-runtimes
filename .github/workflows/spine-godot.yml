@@ -130,7 +130,7 @@ jobs:
           path: spine-godot/godot/bin/osx.zip
 
   godot-template-linux:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
@@ -187,7 +187,7 @@ jobs:
           path: spine-godot/godot/bin/windows_64_release.exe
 
   godot-template-android:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
@@ -233,7 +233,7 @@ jobs:
           path: spine-godot/godot/bin/android_source.zip
 
   godot-template-web:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:

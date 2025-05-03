@@ -208,11 +208,11 @@ void spDebug_printTimeline(spTimeline *timeline) {
 		case SP_TIMELINE_SEQUENCE: {
 			spSequenceTimeline *t = (spSequenceTimeline *) timeline;
 			_spDebug_printTimelineBase(&t->super);
-		}
+		}// fallthrough
 		case SP_TIMELINE_INHERIT: {
 			spInheritTimeline *t = (spInheritTimeline *) timeline;
 			_spDebug_printTimelineBase(&t->super);
-		}
+		}// fallthrough
 		default: {
 			_spDebug_printTimelineBase(timeline);
 		}

@@ -141,6 +141,7 @@ protected:
 	Ref<SpineSkeleton> skeleton;
 	Ref<SpineAnimationState> animation_state;
 	SpineConstant::UpdateMode update_mode;
+	float time_scale;
 
 	String preview_skin;
 	String preview_animation;
@@ -229,6 +230,10 @@ public:
 	Ref<Material> get_screen_material();
 
 	void set_screen_material(Ref<Material> material);
+
+	void set_time_scale(float time_scale);
+
+	float get_time_scale();
 
 	bool get_debug_root() { return debug_root; }
 

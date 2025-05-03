@@ -1,0 +1,130 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>spine-pixi</title>
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@7.4.2/dist/pixi.min.js"></script>
+    <script src="../dist/iife/spine-pixi-v7.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tweakpane@3.1.9/dist/tweakpane.min.js"></script>
+    <link rel="stylesheet" href="../../index.css">
+    <script src="https://cdn.jsdelivr.net/npm/lil-gui@0.20.0/dist/lil-gui.umd.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/lil-gui@0.20.0/dist/lil-gui.min.css" rel="stylesheet">
+  </head>
+
+  <body>
+    <script>
+      (async function () {
+        await Promise.resolve();
+        var app = new PIXI.Application({
+          width: window.innerWidth,
+          height: window.innerHeight,
+          resolution: window.devicePixelRatio || 1,
+          autoDensity: true,
+          resizeTo: window,
+          backgroundColor: 0x2c3e50,
+          hello: true,
+        });
+        document.body.appendChild(app.view);
+
+        // adding skeleton to cache
+        PIXI.Assets.cache.set("jsonSkel", jsonSkel);
+
+        // adding texture atlas to cache and loading the respective texture page
+        const textureAtlas = new spine.TextureAtlas(txtAtlas);
+        const texturePng = await PIXI.Assets.load(slotPng);
+
+        textureAtlas.pages[0].setTexture(spine.SpineTexture.from(texturePng.baseTexture));
+        PIXI.Assets.cache.set("spineboyAtlas", textureAtlas);
+
+        // creating spine game object
+        const spineGO = spine.Spine.from({skeleton: "jsonSkel", atlas: "spineboyAtlas" });
+        spineGO.position.set(300, 300);
+        app.stage.addChild(spineGO);
+
+        // creating slot object
+        const container = new PIXI.Container();
+        const sprite = await PIXI.Sprite.from(texturePng);
+        sprite.anchor.x = 0.5;
+        sprite.anchor.y = 0.5;
+        sprite.tint = 0x00ff00
+        container.addChild(sprite);
+        spineGO.addSlotObject("replaceMe", container);
+
+        // adding controls
+        const parentBone = spineGO.skeleton.findBone("pivot");
+        const parent2Bone = spineGO.skeleton.findBone("pivot2");
+        const bone = spineGO.skeleton.findBone("replaceMe");
+
+        const myObject = {
+          parentScaleX: 1,  parentScaleY: 1,  parentRotation: 0,
+          parent2ScaleX: 1, parent2ScaleY: 1, parent2Rotation: 0,
+          scaleX: 1,        scaleY: 1,        rotation: 0,
+        };
+
+        const gui = new lil.GUI({});
+        gui.add(myObject, 'parentScaleX').min(-3).max(3).step(0.1).name('parentScaleX').onChange(value => parentBone.scaleX = value);
+        gui.add(myObject, 'parentScaleY').min(-3).max(3).step(0.1).name('parentScaleY').onChange(value => parentBone.scaleY = value);
+        gui.add(myObject, 'parentRotation').min(-180).max(180).step(1).name('parentRotation').onChange(value => parentBone.rotation = value);
+        gui.add(myObject, 'parent2ScaleX').min(-3).max(3).step(0.1).name('parent2ScaleX').onChange(value => parent2Bone.scaleX = value);
+        gui.add(myObject, 'parent2ScaleY').min(-3).max(3).step(0.1).name('parent2ScaleY').onChange(value => parent2Bone.scaleY = value);
+        gui.add(myObject, 'parent2Rotation').min(-180).max(180).step(1).name('parent2Rotation').onChange(value => parent2Bone.rotation = value);
+        gui.add(myObject, 'scaleX').min(-3).max(3).step(0.1).name('scaleX').onChange(value => bone.scaleX = value);
+        gui.add(myObject, 'scaleY').min(-3).max(3).step(0.1).name('scaleY').onChange(value => bone.scaleY = value);
+        gui.add(myObject, 'rotation').min(-180).max(180).step(1).name('rotation').onChange(value => bone.rotation = value);
+
+        // add instructions
+        const basicText = new PIXI.Text(
+          "This example shows that slot objects follow scale and rotation from ancestors too, but if a rotation on a bone occurs scale won't work anymore on ancestors.",
+          { fontSize: 20, fill: "white", wordWrap: true, wordWrapWidth: 300 }
+        );
+        basicText.position.set(10, 10);
+        basicText.anchor.set(0, 0);
+        app.stage.addChild(basicText);
+      })();
+
+
+      const jsonSkel = {
+        "bones": [
+          { "name": "root" },
+          { "name": "pivot", "parent": "root",
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "x": 20,
+            "y": -20
+          },
+          {
+            "name": "pivot2", "parent": "pivot",
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "x": 20,
+            "y": -20
+          },
+          {
+            "name": "replaceMe", "parent": "pivot2",
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "x": 20,
+            "y": -20
+          }
+        ],
+        "slots": [{ "name": "replaceMe", "bone": "replaceMe", "attachment": "image" }],
+        "skins": [{ "name": "default", "attachments": { "replaceMe": { "image": { "width": 100, "height": 100 } } }}],
+        "animations": { "animation": {} }
+      }
+
+      const txtAtlas =
+`skeleton.png
+size:100,100
+filter:Linear,Linear
+image
+bounds:0,0,100,100`;
+
+      const slotPng = "data:image/png;base64,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";
+
+
+   </script>
+
+  </body>
+</html>
