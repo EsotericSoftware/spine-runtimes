@@ -31,3 +31,7 @@ It is highly suggested to [freeze](http://esotericsoftware.com/spine-settings#Ve
 In order to merge your contributions, we need a signed [contributor license agreement (CLA)](http://esotericsoftware.com/licenses/cla.txt) from you. You can send a copy of the CLA to contact@esotericsoftware.com.
 
 When possible, it is best to base your contributions on the current beta branch (`X.X-beta`). Please be sure to follow the style and formatting you find in the respective runtime code to which you are contributing.
+
+## Use examples
+
+Let's use the OpenHarmony adaptation library for [spine-runtimes](https://gitcode.com/openharmony-sig/tpc_c_cplusplus/tree/master/thirdparty/spine-runtimes) as a use case.
