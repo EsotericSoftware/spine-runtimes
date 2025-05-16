@@ -19,6 +19,8 @@
 	<members>
 		<member name="normal_maps" type="Array" setter="" getter="get_normal_maps" default="[  ]">
 		</member>
+		<member name="specular_maps" type="Array" setter="" getter="get_specular_maps" default="[  ]">
+		</member>
 		<member name="source_path" type="String" setter="" getter="get_source_path" default="&quot;&quot;">
 		</member>
 		<member name="textures" type="Array" setter="" getter="get_textures" default="[  ]">

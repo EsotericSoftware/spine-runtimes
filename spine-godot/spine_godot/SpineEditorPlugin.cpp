@@ -54,6 +54,7 @@ Error SpineAtlasResourceImportPlugin::import(const String &source_file, const St
 #endif
 	Ref<SpineAtlasResource> atlas(memnew(SpineAtlasResource));
 	atlas->set_normal_texture_prefix(options["normal_map_prefix"]);
+	atlas->set_specular_texture_prefix(options["specular_map_prefix"]);
 	atlas->load_from_atlas_file_internal(source_file, true);
 
 #if VERSION_MAJOR > 3
@@ -74,12 +75,21 @@ Error SpineAtlasResourceImportPlugin::import(const String &source_file, const St
 #ifdef SPINE_GODOT_EXTENSION
 TypedArray<Dictionary> SpineAtlasResourceImportPlugin::_get_import_options(const String &p_path, int32_t p_preset_index) const {
 	TypedArray<Dictionary> options;
-	Dictionary dictionary;
-	dictionary["name"] = "normal_map_prefix";
-	dictionary["type"] = Variant::STRING;
-	dictionary["hint_string"] = "String";
-	dictionary["default_value"] = String("n");
-	options.push_back(dictionary);
+	
+	Dictionary normal_map_dictionary;
+	normal_map_dictionary["name"] = "normal_map_prefix";
+	normal_map_dictionary["type"] = Variant::STRING;
+	normal_map_dictionary["hint_string"] = "String";
+	normal_map_dictionary["default_value"] = String("n");
+	options.push_back(normal_map_dictionary);
+
+	Dictionary specular_map_dictionary;
+	specular_map_dictionary["name"] = "specular_map_prefix";
+	specular_map_dictionary["type"] = Variant::STRING;
+	specular_map_dictionary["hint_string"] = "String";
+	specular_map_dictionary["default_value"] = String("s");
+	options.push_back(specular_map_dictionary);
+	
 	return options;
 }
 #else
@@ -89,12 +99,19 @@ void SpineAtlasResourceImportPlugin::get_import_options(const String &path, List
 void SpineAtlasResourceImportPlugin::get_import_options(List<ImportOption> *options, int preset) const {
 #endif
 	if (preset == 0) {
-		ImportOption op;
-		op.option.name = "normal_map_prefix";
-		op.option.type = Variant::STRING;
-		op.option.hint_string = "String";
-		op.default_value = String("n");
-		options->push_back(op);
+		ImportOption normal_map_op;
+		normal_map_op.option.name = "normal_map_prefix";
+		normal_map_op.option.type = Variant::STRING;
+		normal_map_op.option.hint_string = "String";
+		normal_map_op.default_value = String("n");
+		options->push_back(normal_map_op);
+
+		ImportOption specular_map_op;
+		specular_map_op.option.name = "specular_map_prefix";
+		specular_map_op.option.type = Variant::STRING;
+		specular_map_op.option.hint_string = "String";
+		specular_map_op.default_value = String("s");
+		options->push_back(specular_map_op);
 	}
 }
 #endif

@@ -60,9 +60,11 @@ protected:
 	String source_path;
 	String atlas_data;
 	String normal_map_prefix;
+	String specular_map_prefix;
 
 	Array textures;
 	Array normal_maps;
+	Array specular_maps;
 
 public:
 	SpineAtlasResource();
@@ -71,6 +73,8 @@ public:
 	spine::Atlas *get_spine_atlas() { return atlas; }
 
 	void set_normal_texture_prefix(const String &prefix) { normal_map_prefix = prefix; }
+
+	void set_specular_texture_prefix(const String &prefix) { specular_map_prefix = prefix; }
 
 	Error load_from_atlas_file(const String &path);// .atlas
 
@@ -91,6 +95,8 @@ public:
 	Array get_textures();
 
 	Array get_normal_maps();
+
+	Array get_specular_maps();
 
 	void clear_native_data() const {
 		this->atlas = nullptr;

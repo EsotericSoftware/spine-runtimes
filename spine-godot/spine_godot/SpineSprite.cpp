@@ -179,6 +179,7 @@ static void add_triangles(SpineMesh2D *mesh_instance,
 #else
 	auto texture = renderer_object->texture;
 	auto normal_map = renderer_object->normal_map;
+	auto specular_map = renderer_object->specular_map;
 	VisualServer::get_singleton()->canvas_item_add_triangle_array(mesh_instance->get_canvas_item(),
 																  indices,
 																  vertices,
@@ -188,7 +189,8 @@ static void add_triangles(SpineMesh2D *mesh_instance,
 																  Vector<float>(),
 																  texture.is_null() ? RID() : texture->get_rid(),
 																  -1,
-																  normal_map.is_null() ? RID() : normal_map->get_rid());
+																  normal_map.is_null() ? RID() : normal_map->get_rid(),
+																  specular_map.is_null() ? RID() : specular_map->get_rid());
 #endif
 #endif
 }
@@ -403,7 +405,8 @@ void SpineMesh2D::update_mesh(const Vector<Point2> &vertices,
 			Transform2D(),
 			Color(1, 1, 1, 1),
 			renderer_object->texture.is_null() ? RID() : renderer_object->texture->get_rid(),
-			renderer_object->normal_map.is_null() ? RID() : renderer_object->normal_map->get_rid());
+			renderer_object->normal_map.is_null() ? RID() : renderer_object->normal_map->get_rid(),
+			renderer_object->specular_map.is_null() ? RID() : renderer_object->specular_map->get_rid());
 #endif
 }
 #endif
