@@ -30,6 +30,9 @@
 using System;
 
 namespace Spine {
+	/// <summary>
+	/// Stores the setup pose for a <see cref="Slot"/>.
+	/// </summary>
 	public class SlotData {
 		internal int index;
 		internal string name;
@@ -49,13 +52,20 @@ namespace Spine {
 		public string Name { get { return name; } }
 		/// <summary>The bone this slot belongs to.</summary>
 		public BoneData BoneData { get { return boneData; } }
+		/// <summary>The color used to tint the slot's attachment. If <see cref="HasSecondColor"/> is set, this is used as the light color for two color tinting.</summary>
 		public float R { get { return r; } set { r = value; } }
+		/// <summary>The color used to tint the slot's attachment. If <see cref="HasSecondColor"/> is set, this is used as the light color for two color tinting.</summary>
 		public float G { get { return g; } set { g = value; } }
+		/// <summary>The color used to tint the slot's attachment. If <see cref="HasSecondColor"/> is set, this is used as the light color for two color tinting.</summary>
 		public float B { get { return b; } set { b = value; } }
+		/// <summary>The color used to tint the slot's attachment. If <see cref="HasSecondColor"/> is set, this is used as the light color for two color tinting.</summary>
 		public float A { get { return a; } set { a = value; } }
 
+		/// <summary>The dark color used to tint the slot's attachment for two color tinting, or null if two color tinting is not used. The dark color's alpha is not used.</summary>
 		public float R2 { get { return r2; } set { r2 = value; } }
+		/// <summary>The dark color used to tint the slot's attachment for two color tinting, or null if two color tinting is not used. The dark color's alpha is not used.</summary>
 		public float G2 { get { return g2; } set { g2 = value; } }
+		/// <summary>The dark color used to tint the slot's attachment for two color tinting, or null if two color tinting is not used. The dark color's alpha is not used.</summary>
 		public float B2 { get { return b2; } set { b2 = value; } }
 		public bool HasSecondColor { get { return hasSecondColor; } set { hasSecondColor = value; } }
 

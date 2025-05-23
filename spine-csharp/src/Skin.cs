@@ -44,8 +44,9 @@ namespace Spine {
 		internal readonly ExposedList<BoneData> bones = new ExposedList<BoneData>();
 		internal readonly ExposedList<ConstraintData> constraints = new ExposedList<ConstraintData>();
 
+		/// <summary>The skin's name, which is unique across all skins in the skeleton.</summary>
 		public string Name { get { return name; } }
-		/// <summary>Returns all attachments contained in this skin.</summary>
+		/// <summary>Returns all attachments in this skin.</summary>
 		public ICollection<SkinEntry> Attachments { get { return attachments.Values; } }
 		public ExposedList<BoneData> Bones { get { return bones; } }
 		public ExposedList<ConstraintData> Constraints { get { return constraints; } }
@@ -55,8 +56,7 @@ namespace Spine {
 			this.name = name;
 		}
 
-		/// <summary>Adds an attachment to the skin for the specified slot index and name.
-		/// If the name already exists for the slot, the previous value is replaced.</summary>
+		/// <summary>Adds an attachment to the skin for the specified slot index and name.</summary>
 		public void SetAttachment (int slotIndex, string name, Attachment attachment) {
 			if (attachment == null) throw new ArgumentNullException("attachment", "attachment cannot be null.");
 			attachments[new SkinKey(slotIndex, name)] = new SkinEntry(slotIndex, name, attachment);
@@ -76,7 +76,8 @@ namespace Spine {
 			}
 		}
 
-		/// <summary>Adds all attachments from the specified skin to this skin. Attachments are deep copied.</summary>
+		/// <summary>Adds all bones and constraints and copies of all attachments from the specified skin to this skin. Mesh attachments are not
+		/// copied, instead a new linked mesh is created. The attachment copies can be modified without affecting the originals.</summary>
 		public void CopySkin (Skin skin) {
 			foreach (BoneData data in skin.bones)
 				if (!bones.Contains(data)) bones.Add(data);
@@ -95,20 +96,19 @@ namespace Spine {
 		}
 
 		/// <summary>Returns the attachment for the specified slot index and name, or null.</summary>
-		/// <returns>May be null.</returns>
 		public Attachment GetAttachment (int slotIndex, string name) {
 			SkinEntry entry;
 			bool containsKey = attachments.TryGetValue(new SkinKey(slotIndex, name), out entry);
 			return containsKey ? entry.attachment : null;
 		}
 
-		/// <summary> Removes the attachment in the skin for the specified slot index and name, if any.</summary>
+		/// <summary>Removes the attachment in the skin for the specified slot index and name, if any.</summary>
 		public void RemoveAttachment (int slotIndex, string name) {
 			attachments.Remove(new SkinKey(slotIndex, name));
 		}
 
 		/// <summary>Returns all attachments in this skin for the specified slot index.</summary>
-		/// <param name="slotIndex">The target slotIndex. To find the slot index, use <see cref="Spine.SkeletonData.FindSlot"/> and <see cref="Spine.SlotData.Index"/></param>.
+		/// <param name="slotIndex">The target slotIndex. To find the slot index, use <see cref="Spine.SkeletonData.FindSlot"/> and <see cref="Spine.SlotData.Index"/>.</param>
 		public void GetAttachments (int slotIndex, List<SkinEntry> attachments) {
 			if (slotIndex < 0) throw new ArgumentException("slotIndex must be >= 0.");
 			if (attachments == null) throw new ArgumentNullException("attachments", "attachments cannot be null.");
@@ -129,7 +129,7 @@ namespace Spine {
 			return name;
 		}
 
-		/// <summary>Attach all attachments from this skin if the corresponding attachment from the old skin is currently attached.</summary>
+		/// <summary>Attach each attachment in this skin if the corresponding attachment in the old skin is currently attached.</summary>
 		internal void AttachAll (Skeleton skeleton, Skin oldSkin) {
 			Slot[] slots = skeleton.slots.Items;
 			foreach (KeyValuePair<SkinKey, SkinEntry> item in oldSkin.attachments) {
@@ -143,7 +143,7 @@ namespace Spine {
 			}
 		}
 
-		/// <summary>Stores an entry in the skin consisting of the slot index, name, and attachment.</summary>
+		/// <summary>Stores an entry in the skin consisting of the slot index and the attachment name.</summary>
 		public struct SkinEntry {
 			internal readonly int slotIndex;
 			internal readonly string name;

@@ -30,7 +30,13 @@
 using System;
 
 namespace Spine {
-	/// <summary>Stores the current pose values for an Event.</summary>
+	/// <summary>
+	/// Stores the current pose values for an Event.
+	/// </summary>
+	/// <remarks>
+	/// See Timeline, AnimationStateListener, and
+	/// <a href="https://esotericsoftware.com/spine-events">Events</a> in the Spine User Guide.
+	/// </remarks>
 	public class Event {
 		internal readonly EventData data;
 		internal readonly float time;
@@ -40,6 +46,7 @@ namespace Spine {
 		internal float volume;
 		internal float balance;
 
+		/// <summary>The event's setup pose data.</summary>
 		public EventData Data { get { return data; } }
 		/// <summary>The animation time this event was keyed.</summary>
 		public float Time { get { return time; } }

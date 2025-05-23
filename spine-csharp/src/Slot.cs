@@ -33,7 +33,7 @@ namespace Spine {
 
 	/// <summary>
 	/// Stores a slot's current pose. Slots organize attachments for <see cref="Skeleton.DrawOrder"/> purposes and provide a place to store
-	/// state for an attachment.State cannot be stored in an attachment itself because attachments are stateless and may be shared
+	/// state for an attachment. State cannot be stored in an attachment itself because attachments are stateless and may be shared
 	/// across multiple skeletons.
 	/// </summary>
 	public class Slot {
@@ -113,13 +113,16 @@ namespace Spine {
 			a = MathUtils.Clamp(a, 0, 1);
 		}
 
-		/// <summary>The dark color used to tint the slot's attachment for two color tinting, ignored if two color tinting is not used.</summary>
+		/// <summary>The dark color used to tint the slot's attachment for two color tinting, or null if two color tinting is not used. The dark
+		/// color's alpha is not used.</summary>
 		/// <seealso cref="HasSecondColor"/>
 		public float R2 { get { return r2; } set { r2 = value; } }
-		/// <summary>The dark color used to tint the slot's attachment for two color tinting, ignored if two color tinting is not used.</summary>
+		/// <summary>The dark color used to tint the slot's attachment for two color tinting, or null if two color tinting is not used. The dark
+		/// color's alpha is not used.</summary>
 		/// <seealso cref="HasSecondColor"/>
 		public float G2 { get { return g2; } set { g2 = value; } }
-		/// <summary>The dark color used to tint the slot's attachment for two color tinting, ignored if two color tinting is not used.</summary>
+		/// <summary>The dark color used to tint the slot's attachment for two color tinting, or null if two color tinting is not used. The dark
+		/// color's alpha is not used.</summary>
 		/// <seealso cref="HasSecondColor"/>
 		public float B2 { get { return b2; } set { b2 = value; } }
 		/// <summary>Whether R2 G2 B2 are used to tint the slot's attachment for two color tinting. False if two color tinting is not used.</summary>
@@ -131,19 +134,15 @@ namespace Spine {
 			b2 = MathUtils.Clamp(b2, 0, 1);
 		}
 
-		/// <summary>
-		/// The current attachment for the slot, or null if the slot has no attachment.
-		/// If the attachment is changed, resets <see cref="SequenceIndex"/> and clears the <see cref="Deform"/>.
-		/// The deform is not cleared if the old attachment has the same <see cref="VertexAttachment.TimelineAttachment"/> as the
-		/// specified attachment.</summary>
+		/// <summary>The current attachment for the slot, or null if the slot has no attachment.</summary>
 		public Attachment Attachment {
-			/// <summary>The current attachment for the slot, or null if the slot has no attachment.</summary>
+	
 			get { return attachment; }
 			/// <summary>
 			/// Sets the slot's attachment and, if the attachment changed, resets <see cref="SequenceIndex"/> and clears the <see cref="Deform"/>.
 			/// The deform is not cleared if the old attachment has the same <see cref="VertexAttachment.TimelineAttachment"/> as the
-			/// specified attachment.</summary>
-			/// <param name="value">May be null.</param>
+			/// specified attachment.
+			/// </summary>
 			set {
 				if (attachment == value) return;
 				if (!(value is VertexAttachment) || !(this.attachment is VertexAttachment)
@@ -161,7 +160,7 @@ namespace Spine {
 		/// </summary>
 		public int SequenceIndex { get { return sequenceIndex; } set { sequenceIndex = value; } }
 
-		/// <summary> Vertices to deform the slot's attachment. For an unweighted mesh, the entries are local positions for each vertex. For a
+		/// <summary>Values to deform the slot's attachment. For an unweighted mesh, the entries are local positions for each vertex. For a
 		/// weighted mesh, the entries are an offset for each vertex which will be added to the mesh's local vertex positions.
 		/// <para />
 		/// See <see cref="VertexAttachment.ComputeWorldVertices(Slot, int, int, float[], int, int)"/> and <see cref="DeformTimeline"/>.</summary>

@@ -31,7 +31,12 @@ using System;
 using System.Collections.Generic;
 
 namespace Spine {
-	/// <summary>Stores the setup pose for an IkConstraint.</summary>
+	/// <summary>
+	/// Stores the setup pose for an <see cref="IkConstraint"/>.
+	/// </summary>
+	/// <remarks>
+	/// See <a href="https://esotericsoftware.com/spine-ik-constraints">IK constraints</a> in the Spine User Guide.
+	/// </remarks>
 	public class IkConstraintData : ConstraintData {
 		internal ExposedList<BoneData> bones = new ExposedList<BoneData>();
 		internal BoneData target;
@@ -42,7 +47,7 @@ namespace Spine {
 		public IkConstraintData (string name) : base(name) {
 		}
 
-		/// <summary>The bones that are constrained by this IK Constraint.</summary>
+		/// <summary>The bones that are constrained by this IK constraint.</summary>
 		public ExposedList<BoneData> Bones {
 			get { return bones; }
 		}

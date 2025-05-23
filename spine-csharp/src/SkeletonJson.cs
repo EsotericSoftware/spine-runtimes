@@ -44,13 +44,15 @@ namespace Spine {
 
 	/// <summary>
 	/// Loads skeleton data in the Spine JSON format.
-	/// <para>
-	/// JSON is human readable but the binary format is much smaller on disk and faster to load. See <see cref="SkeletonBinary"/>.</para>
-	/// <para>
-	/// See <a href="http://esotericsoftware.com/spine-json-format">Spine JSON format</a> and
-	/// <a href = "http://esotericsoftware.com/spine-loading-skeleton-data#JSON-and-binary-data" > JSON and binary data</a> in the Spine
-	/// Runtimes Guide.</para>
 	/// </summary>
+	/// <remarks>
+	/// JSON is human readable but the binary format is much smaller on disk and faster to load. See <see cref="SkeletonBinary"/>.
+	/// <para>
+	/// See <a href="https://esotericsoftware.com/spine-json-format">Spine JSON format</a> and
+	/// <a href="https://esotericsoftware.com/spine-loading-skeleton-data#JSON-and-binary-data">JSON and binary data</a> in the Spine
+	/// Runtimes Guide.
+	/// </para>
+	/// </remarks>
 	public class SkeletonJson : SkeletonLoader {
 		private readonly List<LinkedMesh> linkedMeshes = new List<LinkedMesh>();
 

@@ -34,7 +34,6 @@ namespace Spine {
 	/// An attachment which is a single point and a rotation. This can be used to spawn projectiles, particles, etc. A bone can be
 	/// used in similar ways, but a PointAttachment is slightly less expensive to compute and can be hidden, shown, and placed in a
 	/// skin.
-	/// <p>
 	/// See <a href="http://esotericsoftware.com/spine-point-attachments">Point Attachments</a> in the Spine User Guide.
 	/// </summary>
 	public class PointAttachment : Attachment {

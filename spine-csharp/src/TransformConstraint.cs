@@ -88,6 +88,9 @@ namespace Spine {
 			mixShearY = data.mixShearY;
 		}
 
+		/// <summary>
+		/// Applies the constraint to the constrained bones.
+		/// </summary>
 		public void Update (Physics physics) {
 			if (mixRotate == 0 && mixX == 0 && mixY == 0 && mixScaleX == 0 && mixScaleY == 0 && mixShearY == 0) return;
 			if (data.local) {

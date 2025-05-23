@@ -31,7 +31,7 @@ namespace Spine {
 	/// <summary>
 	/// Stores the setup pose for a <see cref="PhysicsConstraint"/>.
 	/// <para>
-	/// See <a href="http://esotericsoftware.com/spine-physics-constraints">Physics constraints</a> in the Spine User Guide.</para>
+	/// See <a href="https://esotericsoftware.com/spine-physics-constraints">Physics constraints</a> in the Spine User Guide.</para>
 	/// </summary>
 	public class PhysicsConstraintData : ConstraintData {
 		internal BoneData bone;

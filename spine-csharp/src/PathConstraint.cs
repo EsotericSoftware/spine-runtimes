@@ -73,6 +73,8 @@ namespace Spine {
 		}
 
 		/// <summary>Copy constructor.</summary>
+		/// <param name="constraint">The path constraint to copy.</param>
+		/// <param name="skeleton">The skeleton containing the bones and slots.</param>
 		public PathConstraint (PathConstraint constraint, Skeleton skeleton)
 			: this(constraint.data, skeleton) {
 
@@ -97,6 +99,8 @@ namespace Spine {
 			mixY = data.mixY;
 		}
 
+		/// <summary>Applies the constraint to the constrained bones.</summary>
+		/// <param name="physics">The physics settings.</param>
 		public void Update (Physics physics) {
 			PathAttachment attachment = target.Attachment as PathAttachment;
 			if (attachment == null) return;

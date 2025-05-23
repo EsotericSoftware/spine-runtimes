@@ -30,6 +30,7 @@
 using System;
 
 namespace Spine {
+
 	public class Triangulator {
 		private readonly ExposedList<ExposedList<float>> convexPolygons = new ExposedList<ExposedList<float>>();
 		private readonly ExposedList<ExposedList<int>> convexPolygonsIndices = new ExposedList<ExposedList<int>>();

@@ -30,8 +30,10 @@
 using System;
 
 namespace Spine {
-	/// <summary>>An attachment with vertices that are transformed by one or more bones and can be deformed by a slot's
-	/// <see cref="Slot.Deform"/>.</summary>
+	/// <summary>
+	/// Base class for an attachment with vertices that are transformed by one or more bones and can be deformed by a slot's
+	/// <see cref="Slot.Deform"/>.
+	/// </summary>
 	public abstract class VertexAttachment : Attachment {
 		static int nextID = 0;
 		static readonly Object nextIdLock = new Object();
@@ -42,13 +44,29 @@ namespace Spine {
 		internal float[] vertices;
 		internal int worldVerticesLength;
 
-		/// <summary>Gets a unique ID for this attachment.</summary>
+		/// <summary>Returns a unique ID for this attachment.</summary>
 		public int Id { get { return id; } }
+		/// <summary>
+		/// The bones which affect the <see cref="Vertices"/>. The array entries are, for each vertex, the number of bones affecting
+		/// the vertex followed by that many bone indices, which is the index of the bone in <see cref="Skeleton.Bones"/>. Will be null
+		/// if this attachment has no weights.
+		/// </summary>
 		public int[] Bones { get { return bones; } set { bones = value; } }
+		/// <summary>
+		/// The vertex positions in the bone's coordinate system. For a non-weighted attachment, the values are <c>x,y</c>
+		/// entries for each vertex. For a weighted attachment, the values are <c>x,y,weight</c> entries for each bone affecting
+		/// each vertex.
+		/// </summary>
 		public float[] Vertices { get { return vertices; } set { vertices = value; } }
+		/// <summary>
+		/// The maximum number of world vertex values that can be output by
+		/// <see cref="ComputeWorldVertices(Slot, int, int, float[], int, int)"/> using the <c>count</c> parameter.
+		/// </summary>
 		public int WorldVerticesLength { get { return worldVerticesLength; } set { worldVerticesLength = value; } }
-		/// <summary>Timelines for the timeline attachment are also applied to this attachment.
-		/// May be null if no attachment-specific timelines should be applied.</summary>
+		/// <summary>
+		/// Timelines for the timeline attachment are also applied to this attachment.
+		/// May be null if no attachment-specific timelines should be applied.
+		/// </summary>
 		public VertexAttachment TimelineAttachment { get { return timelineAttachment; } set { timelineAttachment = value; } }
 
 		public VertexAttachment (string name)
@@ -91,14 +109,15 @@ namespace Spine {
 		/// Transforms the attachment's local <see cref="Vertices"/> to world coordinates. If the slot's <see cref="Slot.Deform"/> is
 		/// not empty, it is used to deform the vertices.
 		/// <para />
-		/// See <a href="http://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
+		/// See <a href="https://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
 		/// Runtimes Guide.
 		/// </summary>
 		/// <param name="start">The index of the first <see cref="Vertices"/> value to transform. Each vertex has 2 values, x and y.</param>
-		/// <param name="count">The number of world vertex values to output. Must be less than or equal to <see cref="WorldVerticesLength"/> - start.</param>
-		/// <param name="worldVertices">The output world vertices. Must have a length greater than or equal to <paramref name="offset"/> + <paramref name="count"/>.</param>
-		/// <param name="offset">The <paramref name="worldVertices"/> index to begin writing values.</param>
-		/// <param name="stride">The number of <paramref name="worldVertices"/> entries between the value pairs written.</param>
+		/// <param name="count">The number of world vertex values to output. Must be &lt;= <see cref="WorldVerticesLength"/> - <c>start</c>.</param>
+		/// <param name="worldVertices">The output world vertices. Must have a length &gt;= <c>offset</c> + <c>count</c> *
+		/// <c>stride</c> / 2.</param>
+		/// <param name="offset">The <c>worldVertices</c> index to begin writing values.</param>
+		/// <param name="stride">The number of <c>worldVertices</c> entries between the value pairs written.</param>
 		public virtual void ComputeWorldVertices (Slot slot, int start, int count, float[] worldVertices, int offset, int stride = 2) {
 			count = offset + (count >> 1) * stride;
 			ExposedList<float> deformArray = slot.deform;

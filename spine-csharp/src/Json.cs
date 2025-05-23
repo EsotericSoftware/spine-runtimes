@@ -35,6 +35,17 @@ using System.IO;
 using System.Text;
 
 namespace Spine {
+	/// <summary>
+	/// Loads skeleton data in the Spine JSON format.
+	/// </summary>
+	/// <remarks>
+	/// JSON is human readable but the binary format is much smaller on disk and faster to load.
+	/// <para>
+	/// See <a href="https://esotericsoftware.com/spine-json-format">Spine JSON format</a> and
+	/// <a href="https://esotericsoftware.com/spine-loading-skeleton-data#JSON-and-binary-data">JSON and binary data</a> in the Spine
+	/// Runtimes Guide.
+	/// </para>
+	/// </remarks>
 	public static class Json {
 		public static object Deserialize (TextReader text) {
 			SharpJson.JsonDecoder parser = new SharpJson.JsonDecoder();

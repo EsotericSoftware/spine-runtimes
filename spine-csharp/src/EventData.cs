@@ -30,7 +30,12 @@
 using System;
 
 namespace Spine {
-	/// <summary>Stores the setup pose values for an Event.</summary>
+	/// <summary>
+	/// Stores the setup pose values for an <see cref="Event"/>.
+	/// </summary>
+	/// <remarks>
+	/// See <a href="https://esotericsoftware.com/spine-events">Events</a> in the Spine User Guide.
+	/// </remarks>
 	public class EventData {
 		internal string name;
 

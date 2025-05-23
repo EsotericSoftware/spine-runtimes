@@ -31,7 +31,13 @@ using System;
 
 namespace Spine {
 
-	/// <summary>Stores the setup pose and all of the stateless data for a skeleton.</summary>
+	/// <summary>
+	/// Stores the setup pose and all of the stateless data for a skeleton.
+	/// <para>
+	/// See <a href="https://esotericsoftware.com/spine-runtime-architecture#Data-objects">Data objects</a> in the Spine Runtimes
+	/// Guide.
+	/// </para>
+	/// </summary>
 	public class SkeletonData {
 		internal string name;
 		internal ExposedList<BoneData> bones = new ExposedList<BoneData>(); // Ordered parents first
@@ -65,10 +71,12 @@ namespace Spine {
 		public ExposedList<Skin> Skins { get { return skins; } set { skins = value; } }
 
 		/// <summary>
-		/// The skeleton's default skin.
-		/// By default this skin contains all attachments that were not in a skin in Spine.
+		/// The skeleton's default skin. By default this skin contains all attachments that were not in a skin in Spine.
+		/// <para>
+		/// See <see cref="Skeleton.GetAttachment(int, string)"/>.
+		/// </para>
 		/// </summary>
-		/// <return>May be null.</return>
+		/// <returns>May be null.</returns>
 		public Skin DefaultSkin { get { return defaultSkin; } set { defaultSkin = value; } }
 
 		/// <summary>The skeleton's events.</summary>
@@ -84,26 +92,30 @@ namespace Spine {
 		/// <summary>The skeleton's physics constraints.</summary>
 		public ExposedList<PhysicsConstraintData> PhysicsConstraints { get { return physicsConstraints; } set { physicsConstraints = value; } }
 
+		/// <summary>The X coordinate of the skeleton's axis aligned bounding box in the setup pose.</summary>
 		public float X { get { return x; } set { x = value; } }
+		/// <summary>The Y coordinate of the skeleton's axis aligned bounding box in the setup pose.</summary>
 		public float Y { get { return y; } set { y = value; } }
+		/// <summary>The width of the skeleton's axis aligned bounding box in the setup pose.</summary>
 		public float Width { get { return width; } set { width = value; } }
+		/// <summary>The height of the skeleton's axis aligned bounding box in the setup pose.</summary>
 		public float Height { get { return height; } set { height = value; } }
 
-		/// <summary> Baseline scale factor for applying distance-dependent effects on non-scalable properties, such as angle or scale. Default
-		/// is 100.</summary>
+		/// <summary>Baseline scale factor for applying physics and other effects based on distance to non-scalable properties, such as angle or
+		/// scale. Default is 100.</summary>
 		public float ReferenceScale { get { return referenceScale; } set { referenceScale = value; } }
 
-		/// <summary>The Spine version used to export this data, or null.</summary>
+		/// <summary>The Spine version used to export the skeleton data, or null.</summary>
 		public string Version { get { return version; } set { version = value; } }
 
 		/// <summary>The skeleton data hash. This value will change if any of the skeleton data has changed.
 		/// May be null.</summary>
 		public string Hash { get { return hash; } set { hash = value; } }
 
+		/// <summary>The path to the images directory as defined in Spine, or null if nonessential data was not exported.</summary>
 		public string ImagesPath { get { return imagesPath; } set { imagesPath = value; } }
 
-		/// <summary> The path to the audio directory as defined in Spine. Available only when nonessential data was exported.
-		/// May be null.</summary>
+		/// <summary>The path to the audio directory as defined in Spine, or null if nonessential data was not exported.</summary>
 		public string AudioPath { get { return audioPath; } set { audioPath = value; } }
 
 		/// <summary>The dopesheet FPS in Spine, or zero if nonessential data was not exported.</summary>
@@ -112,8 +124,9 @@ namespace Spine {
 		// --- Bones
 
 		/// <summary>
-		/// Finds a bone by comparing each bone's name.
-		/// It is more efficient to cache the results of this method than to call it multiple times.</summary>
+		/// Finds a bone by comparing each bone's name. It is more efficient to cache the results of this method than to call it
+		/// multiple times.
+		/// </summary>
 		/// <returns>May be null.</returns>
 		public BoneData FindBone (string boneName) {
 			if (boneName == null) throw new ArgumentNullException("boneName", "boneName cannot be null.");
@@ -127,6 +140,10 @@ namespace Spine {
 
 		// --- Slots
 
+		/// <summary>
+		/// Finds a slot by comparing each slot's name. It is more efficient to cache the results of this method than to call it
+		/// multiple times.
+		/// </summary>
 		/// <returns>May be null.</returns>
 		public SlotData FindSlot (string slotName) {
 			if (slotName == null) throw new ArgumentNullException("slotName", "slotName cannot be null.");
@@ -140,6 +157,10 @@ namespace Spine {
 
 		// --- Skins
 
+		/// <summary>
+		/// Finds a skin by comparing each skin's name. It is more efficient to cache the results of this method than to call it
+		/// multiple times.
+		/// </summary>
 		/// <returns>May be null.</returns>
 		public Skin FindSkin (string skinName) {
 			if (skinName == null) throw new ArgumentNullException("skinName", "skinName cannot be null.");
@@ -150,6 +171,10 @@ namespace Spine {
 
 		// --- Events
 
+		/// <summary>
+		/// Finds an event by comparing each events's name. It is more efficient to cache the results of this method than to call it
+		/// multiple times.
+		/// </summary>
 		/// <returns>May be null.</returns>
 		public EventData FindEvent (string eventDataName) {
 			if (eventDataName == null) throw new ArgumentNullException("eventDataName", "eventDataName cannot be null.");
@@ -160,6 +185,10 @@ namespace Spine {
 
 		// --- Animations
 
+		/// <summary>
+		/// Finds an animation by comparing each animation's name. It is more efficient to cache the results of this method than to
+		/// call it multiple times.
+		/// </summary>
 		/// <returns>May be null.</returns>
 		public Animation FindAnimation (string animationName) {
 			if (animationName == null) throw new ArgumentNullException("animationName", "animationName cannot be null.");
@@ -173,6 +202,10 @@ namespace Spine {
 
 		// --- IK constraints
 
+		/// <summary>
+		/// Finds an IK constraint by comparing each IK constraint's name. It is more efficient to cache the results of this method
+		/// than to call it multiple times.
+		/// </summary>
 		/// <returns>May be null.</returns>
 		public IkConstraintData FindIkConstraint (string constraintName) {
 			if (constraintName == null) throw new ArgumentNullException("constraintName", "constraintName cannot be null.");
@@ -186,6 +219,10 @@ namespace Spine {
 
 		// --- Transform constraints
 
+		/// <summary>
+		/// Finds a transform constraint by comparing each transform constraint's name. It is more efficient to cache the results of
+		/// this method than to call it multiple times.
+		/// </summary>
 		/// <returns>May be null.</returns>
 		public TransformConstraintData FindTransformConstraint (string constraintName) {
 			if (constraintName == null) throw new ArgumentNullException("constraintName", "constraintName cannot be null.");

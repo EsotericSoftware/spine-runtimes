@@ -30,6 +30,12 @@
 using System;
 
 namespace Spine {
+	/// <summary>
+	/// Stores the setup pose for a <see cref="TransformConstraint"/>.
+	/// </summary>
+	/// <remarks>
+	/// See <a href="https://esotericsoftware.com/spine-transform-constraints">Transform constraints</a> in the Spine User Guide.
+	/// </remarks>
 	public class TransformConstraintData : ConstraintData {
 		internal ExposedList<BoneData> bones = new ExposedList<BoneData>();
 		internal BoneData target;
@@ -37,7 +43,9 @@ namespace Spine {
 		internal float offsetRotation, offsetX, offsetY, offsetScaleX, offsetScaleY, offsetShearY;
 		internal bool relative, local;
 
+		/// <summary>The bones that will be modified by this transform constraint.</summary>
 		public ExposedList<BoneData> Bones { get { return bones; } }
+		/// <summary>The target bone whose world transform will be copied to the constrained bones.</summary>
 		public BoneData Target { get { return target; } set { target = value; } }
 		/// <summary>A percentage (0-1) that controls the mix between the constrained and unconstrained rotation.</summary>
 		public float MixRotate { get { return mixRotate; } set { mixRotate = value; } }
@@ -52,11 +60,17 @@ namespace Spine {
 		/// <summary>A percentage (0-1) that controls the mix between the constrained and unconstrained shear Y.</summary>
 		public float MixShearY { get { return mixShearY; } set { mixShearY = value; } }
 
+		/// <summary>An offset added to the constrained bone rotation.</summary>
 		public float OffsetRotation { get { return offsetRotation; } set { offsetRotation = value; } }
+		/// <summary>An offset added to the constrained bone X translation.</summary>
 		public float OffsetX { get { return offsetX; } set { offsetX = value; } }
+		/// <summary>An offset added to the constrained bone Y translation.</summary>
 		public float OffsetY { get { return offsetY; } set { offsetY = value; } }
+		/// <summary>An offset added to the constrained bone scaleX.</summary>
 		public float OffsetScaleX { get { return offsetScaleX; } set { offsetScaleX = value; } }
+		/// <summary>An offset added to the constrained bone scaleY.</summary>
 		public float OffsetScaleY { get { return offsetScaleY; } set { offsetScaleY = value; } }
+		/// <summary>An offset added to the constrained bone shearY.</summary>
 		public float OffsetShearY { get { return offsetShearY; } set { offsetShearY = value; } }
 
 		public bool Relative { get { return relative; } set { relative = value; } }

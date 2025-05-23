@@ -32,7 +32,7 @@ using System.Text;
 
 namespace Spine {
 	public interface IHasTextureRegion {
-		/// <summary>The name used to find the <see cref="Region"/></summary>
+		/// <summary>The name used to find the <see cref="Region"/>.</summary>
 		string Path { get; set; }
 		/// <summary>
 		/// Sets the region used to draw the attachment. After setting the region or if the region's properties are changed,
@@ -46,9 +46,13 @@ namespace Spine {
 		/// </summary>
 		void UpdateRegion ();
 
+		/// <summary>The color to tint the attachment.</summary>
 		float R { get; set; }
+		/// <summary>The color to tint the attachment.</summary>
 		float G { get; set; }
+		/// <summary>The color to tint the attachment.</summary>
 		float B { get; set; }
+		/// <summary>The color to tint the attachment.</summary>
 		float A { get; set; }
 
 		Sequence Sequence { get; set; }

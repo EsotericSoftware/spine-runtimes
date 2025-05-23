@@ -31,9 +31,13 @@ using System;
 
 namespace Spine {
 
-	/// <summary>The base class for all attachments.</summary>
+	/// <summary>
+	/// The base class for all attachments.
+	/// </summary>
 	abstract public class Attachment {
-		/// <summary>The attachment's name.</summary>
+		/// <summary>
+		/// The attachment's name.
+		/// </summary>
 		public string Name { get; }
 
 		protected Attachment (string name) {
@@ -41,7 +45,9 @@ namespace Spine {
 			this.Name = name;
 		}
 
-		/// <summary>Copy constructor.</summary>
+		/// <summary>
+		/// Copy constructor.
+		/// </summary>
 		protected Attachment (Attachment other) {
 			Name = other.Name;
 		}
@@ -50,7 +56,9 @@ namespace Spine {
 			return Name;
 		}
 
-		/// <summary>Returns a copy of the attachment.</summary>
+		/// <summary>
+		/// Returns a copy of the attachment.
+		/// </summary>
 		public abstract Attachment Copy ();
 	}
 }

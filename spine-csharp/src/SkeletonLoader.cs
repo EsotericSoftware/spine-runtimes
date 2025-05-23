@@ -36,31 +36,36 @@ namespace Spine {
 	/// <summary>
 	/// Base class for loading skeleton data from a file.
 	/// <para>
-	/// See<a href="http://esotericsoftware.com/spine-loading-skeleton-data#JSON-and-binary-data">JSON and binary data</a> in the
+	/// See <a href="https://esotericsoftware.com/spine-loading-skeleton-data#JSON-and-binary-data">JSON and binary data</a> in the
 	/// Spine Runtimes Guide.</para>
 	/// </summary>
 	public abstract class SkeletonLoader {
 		protected readonly AttachmentLoader attachmentLoader;
 		protected float scale = 1;
 
-		/// <summary>Creates a skeleton loader that loads attachments using an <see cref="AtlasAttachmentLoader"/> with the specified atlas.
+		/// <summary>
+		/// Creates a skeleton loader that loads attachments using an <see cref="AtlasAttachmentLoader"/> with the specified atlas.
 		/// </summary>
 		public SkeletonLoader (params Atlas[] atlasArray) {
 			attachmentLoader = new AtlasAttachmentLoader(atlasArray);
 		}
 
-		/// <summary>Creates a skeleton loader that loads attachments using the specified attachment loader.
-		/// <para>See <a href='http://esotericsoftware.com/spine-loading-skeleton-data#JSON-and-binary-data'>Loading skeleton data</a> in the
-		/// Spine Runtimes Guide.</para></summary>
+		/// <summary>
+		/// Creates a skeleton loader that loads attachments using the specified attachment loader.
+		/// <para>
+		/// See <a href="https://esotericsoftware.com/spine-loading-skeleton-data#JSON-and-binary-data">Loading skeleton data</a> in the
+		/// Spine Runtimes Guide.</para>
+		/// </summary>
 		public SkeletonLoader (AttachmentLoader attachmentLoader) {
 			if (attachmentLoader == null) throw new ArgumentNullException("attachmentLoader", "attachmentLoader cannot be null.");
 			this.attachmentLoader = attachmentLoader;
 		}
 
-		/// <summary>Scales bone positions, image sizes, and translations as they are loaded. This allows different size images to be used at
+		/// <summary>
+		/// Scales bone positions, image sizes, and translations as they are loaded. This allows different size images to be used at
 		/// runtime than were used in Spine.
 		/// <para>
-		/// See <a href="http://esotericsoftware.com/spine-loading-skeleton-data#Scaling">Scaling</a> in the Spine Runtimes Guide.</para>
+		/// See <a href="https://esotericsoftware.com/spine-loading-skeleton-data#Scaling">Scaling</a> in the Spine Runtimes Guide.</para>
 		/// </summary>
 		public float Scale {
 			get { return scale; }

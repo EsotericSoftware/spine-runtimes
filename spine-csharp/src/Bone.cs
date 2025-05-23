@@ -56,16 +56,20 @@ namespace Spine {
 
 		internal bool sorted, active;
 
+		/// <summary>The bone's setup pose data.</summary>
 		public BoneData Data { get { return data; } }
+		/// <summary>The skeleton this bone belongs to.</summary>
 		public Skeleton Skeleton { get { return skeleton; } }
+		/// <summary>The parent bone, or null if this is the root bone.</summary>
 		public Bone Parent { get { return parent; } }
+		/// <summary>The immediate children of this bone.</summary>
 		public ExposedList<Bone> Children { get { return children; } }
 		public bool Active { get { return active; } }
-		/// <summary>The local X translation.</summary>
+		/// <summary>The local x translation.</summary>
 		public float X { get { return x; } set { x = value; } }
-		/// <summary>The local Y translation.</summary>
+		/// <summary>The local y translation.</summary>
 		public float Y { get { return y; } set { y = value; } }
-		/// <summary>The local rotation.</summary>
+		/// <summary>The local rotation in degrees, counter clockwise.</summary>
 		public float Rotation { get { return rotation; } set { rotation = value; } }
 
 		/// <summary>The local scaleX.</summary>
@@ -80,10 +84,10 @@ namespace Spine {
 		/// <summary>The local shearY.</summary>
 		public float ShearY { get { return shearY; } set { shearY = value; } }
 
-		/// <summary>Controls how parent world transforms affect this bone.</summary>
+		/// <summary>Determines how parent world transforms affect this bone.</summary>
 		public Inherit Inherit { get { return inherit; } set { inherit = value; } }
 
-		/// <summary>The rotation, as calculated by any constraints.</summary>
+		/// <summary>The applied local rotation in degrees, counter clockwise.</summary>
 		public float AppliedRotation { get { return arotation; } set { arotation = value; } }
 
 		/// <summary>The applied local x translation.</summary>
@@ -122,9 +126,9 @@ namespace Spine {
 		/// <summary>The world rotation for the Y axis, calculated using <see cref="b"/> and <see cref="d"/>.</summary>
 		public float WorldRotationY { get { return MathUtils.Atan2Deg(d, b); } }
 
-		/// <summary>Returns the magnitide (always positive) of the world scale X.</summary>
+		/// <summary>The magnitude (always positive) of the world scale X, calculated using <see cref="a"/> and <see cref="c"/>.</summary>
 		public float WorldScaleX { get { return (float)Math.Sqrt(a * a + c * c); } }
-		/// <summary>Returns the magnitide (always positive) of the world scale Y.</summary>
+		/// <summary>The magnitude (always positive) of the world scale Y, calculated using <see cref="b"/> and <see cref="d"/>.</summary>
 		public float WorldScaleY { get { return (float)Math.Sqrt(b * b + d * d); } }
 
 		public Bone (BoneData data, Skeleton skeleton, Bone parent) {
@@ -137,7 +141,6 @@ namespace Spine {
 		}
 
 		/// <summary>Copy constructor. Does not copy the <see cref="Children"/> bones.</summary>
-		/// <param name="parent">May be null.</param>
 		public Bone (Bone bone, Skeleton skeleton, Bone parent) {
 			if (bone == null) throw new ArgumentNullException("bone", "bone cannot be null.");
 			if (skeleton == null) throw new ArgumentNullException("skeleton", "skeleton cannot be null.");
@@ -159,7 +162,12 @@ namespace Spine {
 			UpdateWorldTransform(ax, ay, arotation, ascaleX, ascaleY, ashearX, ashearY);
 		}
 
-		/// <summary>Computes the world transform using the parent bone and this bone's local transform.</summary>
+		/// <summary>
+		/// Computes the world transform using the parent bone and this bone's local transform.
+		/// <para>
+		/// See <see cref="UpdateWorldTransform(float, float, float, float, float, float, float)"/>.
+		/// </para>
+		/// </summary>
 		public void UpdateWorldTransform () {
 			UpdateWorldTransform(x, y, rotation, scaleX, scaleY, shearX, shearY);
 		}
@@ -167,7 +175,7 @@ namespace Spine {
 		/// <summary>Computes the world transform using the parent bone and the specified local transform. The applied transform is set to the
 		/// specified local transform. Child bones are not updated.
 		/// <para>
-		/// See <a href="http://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
+		/// See <a href="https://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
 		/// Runtimes Guide.</para></summary>
 		public void UpdateWorldTransform (float x, float y, float rotation, float scaleX, float scaleY, float shearX, float shearY) {
 			ax = x;
@@ -300,10 +308,12 @@ namespace Spine {
 		/// If the world transform is modified (by a constraint, <see cref="RotateWorld(float)"/>, etc) then this method should be called so
 		/// the applied transform matches the world transform. The applied transform may be needed by other code (eg to apply another
 		/// constraint).
-		/// </para><para>
-		///  Some information is ambiguous in the world transform, such as -1,-1 scale versus 180 rotation. The applied transform after
+		/// </para>
+		/// <para>
+		/// Some information is ambiguous in the world transform, such as -1,-1 scale versus 180 rotation. The applied transform after
 		/// calling this method is equivalent to the local transform used to compute the world transform, but may not be identical.
-		/// </para></summary>
+		/// </para>
+		/// </summary>
 		public void UpdateAppliedTransform () {
 			Bone parent = this.parent;
 			if (parent == null) {
@@ -440,7 +450,8 @@ namespace Spine {
 		/// <para>
 		/// After changes are made to the world transform, <see cref="UpdateAppliedTransform()"/> should be called and
 		/// <see cref="Update(Skeleton.Physics)"/> will need to be called on any child bones, recursively.
-		/// </para></summary>
+		/// </para>
+		/// </summary>
 		public void RotateWorld (float degrees) {
 			degrees *= MathUtils.DegRad;
 			float sin = (float)Math.Sin(degrees), cos = (float)Math.Cos(degrees);

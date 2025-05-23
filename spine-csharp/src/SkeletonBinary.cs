@@ -42,6 +42,14 @@ using Windows.Storage;
 #endif
 
 namespace Spine {
+	/// <summary>
+	/// Loads skeleton data in the Spine binary format.
+	/// </summary>
+	/// <remarks>
+	/// See <a href="https://esotericsoftware.com/spine-binary-format">Spine binary format</a> and
+	/// <a href="https://esotericsoftware.com/spine-loading-skeleton-data#JSON-and-binary-data">JSON and binary data</a> in the Spine
+	/// Runtimes Guide.
+	/// </remarks>
 	public class SkeletonBinary : SkeletonLoader {
 		public const int BONE_ROTATE = 0;
 		public const int BONE_TRANSLATE = 1;
@@ -650,7 +658,7 @@ namespace Spine {
 		}
 
 		/// <exception cref="SerializationException">SerializationException will be thrown when a Vertex attachment is not found.</exception>
-		/// <exception cref="IOException">Throws IOException when a read operation fails.</exception>
+		/// <exception cref="System.IO.IOException">Throws IOException when a read operation fails.</exception>
 		private Animation ReadAnimation (String name, SkeletonInput input, SkeletonData skeletonData) {
 			ExposedList<Timeline> timelines = new ExposedList<Timeline>(input.ReadInt(true));
 			float scale = this.scale;
@@ -1153,7 +1161,7 @@ namespace Spine {
 			return new Animation(name, timelines, duration);
 		}
 
-		/// <exception cref="IOException">Throws IOException when a read operation fails.</exception>
+		/// <exception cref="System.IO.IOException">Throws IOException when a read operation fails.</exception>
 		private void ReadTimeline (SkeletonInput input, ExposedList<Timeline> timelines, CurveTimeline1 timeline, float scale) {
 			float time = input.ReadFloat(), value = input.ReadFloat() * scale;
 			for (int frame = 0, bezier = 0, frameLast = timeline.FrameCount - 1; ; frame++) {

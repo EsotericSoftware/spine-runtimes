@@ -44,6 +44,9 @@ namespace Spine {
 
 		public ExposedList<float> ClippedVertices { get { return clippedVertices; } }
 		public ExposedList<int> ClippedTriangles { get { return clippedTriangles; } }
+		/// <summary>
+		/// Only returns a non-empty array if ClipTriangles() was used.
+		/// </summary>
 		public ExposedList<float> ClippedUVs { get { return clippedUVs; } }
 
 		public bool IsClipping { get { return clipAttachment != null; } }
@@ -228,8 +231,10 @@ namespace Spine {
 			}
 		}
 
-		///<summary>Clips the input triangle against the convex, clockwise clipping area. If the triangle lies entirely within the clipping
-		/// area, false is returned. The clipping area must duplicate the first vertex at the end of the vertices list.</summary>
+		/// <summary>
+		/// Clips the input triangle against the convex, clockwise clipping area. If the triangle lies entirely within the clipping
+		/// area, false is returned. The clipping area must duplicate the first vertex at the end of the vertices list.
+		/// </summary>
 		internal bool Clip (float x1, float y1, float x2, float y2, float x3, float y3, ExposedList<float> clippingArea, ExposedList<float> output) {
 			ExposedList<float> originalOutput = output;
 			bool clipped = false;

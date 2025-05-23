@@ -42,7 +42,7 @@ namespace Spine {
 			this.name = name;
 		}
 
-		/// <summary> The constraint's name, which is unique across all constraints in the skeleton of the same type.</summary>
+		/// <summary>The constraint's name, which is unique across all constraints in the skeleton of the same type.</summary>
 		public string Name { get { return name; } }
 
 		/// <summary>The ordinal of this constraint for the order a skeleton's constraints will be applied by

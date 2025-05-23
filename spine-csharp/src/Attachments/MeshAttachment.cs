@@ -30,7 +30,9 @@
 using System;
 
 namespace Spine {
-	/// <summary>Attachment that displays a texture region using a mesh.</summary>
+	/// <summary>An attachment that displays a textured mesh. A mesh has hull vertices and internal vertices within the hull. Holes are not
+	/// supported. Each vertex has UVs (texture coordinates) and triangles are used to map an image on to the mesh.
+	/// <para>See <a href="https://esotericsoftware.com/spine-meshes">Mesh attachments</a> in the Spine User Guide.</para></summary>
 	public class MeshAttachment : VertexAttachment, IHasTextureRegion {
 		internal TextureRegion region;
 		internal string path;
@@ -48,11 +50,14 @@ namespace Spine {
 				region = value;
 			}
 		}
+		/// <summary>The number of entries at the beginning of <see cref="VertexAttachment.vertices"/> that make up the mesh hull.</summary>
 		public int HullLength { get { return hullLength; } set { hullLength = value; } }
+		/// <summary>The UV pair for each vertex, normalized within the texture region.</summary>
 		public float[] RegionUVs { get { return regionUVs; } set { regionUVs = value; } }
 		/// <summary>The UV pair for each vertex, normalized within the entire texture.
-		/// <seealso cref="MeshAttachment.UpdateRegion"/></summary>
+		/// <para>See <see cref="UpdateRegion"/>.</para></summary>
 		public float[] UVs { get { return uvs; } set { uvs = value; } }
+		/// <summary>Triplets of vertex indices which describe the mesh's triangulation.</summary>
 		public int[] Triangles { get { return triangles; } set { triangles = value; } }
 
 		public float R { get { return r; } set { r = value; } }
@@ -63,6 +68,9 @@ namespace Spine {
 		public string Path { get { return path; } set { path = value; } }
 		public Sequence Sequence { get { return sequence; } set { sequence = value; } }
 
+		/// <summary>The parent mesh if this is a linked mesh, else null. A linked mesh shares the <see cref="VertexAttachment.bones"/>, <see cref="VertexAttachment.vertices"/>,
+		/// <see cref="RegionUVs"/>, <see cref="Triangles"/>, <see cref="HullLength"/>, <see cref="Edges"/>, <see cref="Width"/>, and <see cref="Height"/> with the
+		/// parent mesh, but may have a different <see cref="Attachment.Name"/> or <see cref="Path"/> (and therefore a different texture).</summary>
 		public MeshAttachment ParentMesh {
 			get { return parentMesh; }
 			set {
@@ -82,8 +90,12 @@ namespace Spine {
 		}
 
 		// Nonessential.
+		/// <summary>Vertex index pairs describing edges for controlling triangulation, or be null if nonessential data was not exported. Mesh
+		/// triangles will never cross edges. Triangulation is not performed at runtime.</summary>
 		public int[] Edges { get; set; }
+		/// <summary>The width of the mesh's image, or zero if nonessential data was not exported.</summary>
 		public float Width { get; set; }
+		/// <summary>The height of the mesh's image, or zero if nonessential data was not exported.</summary>
 		public float Height { get; set; }
 
 		public MeshAttachment (string name)
@@ -94,7 +106,7 @@ namespace Spine {
 		protected MeshAttachment (MeshAttachment other)
 			: base(other) {
 
-			if (parentMesh != null) throw new ArgumentException("Use newLinkedMesh to copy a linked mesh.");
+			if (other.parentMesh != null) throw new ArgumentException("Use newLinkedMesh to copy a linked mesh.");
 
 			region = other.region;
 			path = other.path;
@@ -125,6 +137,8 @@ namespace Spine {
 		}
 
 
+		/// <summary>Calculates <see cref="UVs"/> using the <see cref="RegionUVs"/> and region. Must be called if the region, the region's properties, or
+		/// the <see cref="RegionUVs"/> are changed.</summary>
 		public void UpdateRegion () {
 			float[] regionUVs = this.regionUVs;
 			if (this.uvs == null || this.uvs.Length != regionUVs.Length) this.uvs = new float[regionUVs.Length];
@@ -197,7 +211,7 @@ namespace Spine {
 			base.ComputeWorldVertices(slot, start, count, worldVertices, offset, stride);
 		}
 
-		/// <summary>Returns a new mesh with this mesh set as the <see cref="ParentMesh"/>.
+		/// <summary>Returns a new mesh with the <see cref="ParentMesh"/> set to this mesh's parent mesh, if any, else to this mesh.</summary>
 		public MeshAttachment NewLinkedMesh () {
 			MeshAttachment mesh = new MeshAttachment(Name);
 

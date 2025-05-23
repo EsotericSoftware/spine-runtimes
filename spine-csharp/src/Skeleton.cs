@@ -30,6 +30,12 @@
 using System;
 
 namespace Spine {
+	/// <summary>
+	/// Stores the current pose for a skeleton.
+	/// <para>
+	/// See <a href="https://esotericsoftware.com/spine-runtime-architecture#Instance-objects">Instance objects</a> in the Spine
+	/// Runtimes Guide.</para>
+	/// </summary>
 	public class Skeleton {
 		static private readonly int[] quadTriangles = { 0, 1, 2, 2, 3, 0 };
 		internal SkeletonData data;
@@ -70,9 +76,7 @@ namespace Spine {
 
 		/// <summary>The skeleton's current skin. May be null. See <see cref="SetSkin(Spine.Skin)"/></summary>
 		public Skin Skin {
-			/// <summary>The skeleton's current skin. May be null.</summary>
 			get { return skin; }
-			/// <summary>Sets a skin, <see cref="SetSkin(Skin)"/>.</summary>
 			set { SetSkin(value); }
 		}
 		public float R { get { return r; } set { r = value; } }
@@ -157,6 +161,7 @@ namespace Spine {
 		}
 
 		/// <summary>Copy constructor.</summary>
+		/// <param name="skeleton">The skeleton to copy.</param>
 		public Skeleton (Skeleton skeleton) {
 			if (skeleton == null) throw new ArgumentNullException("skeleton", "skeleton cannot be null.");
 			data = skeleton.data;
@@ -422,7 +427,7 @@ namespace Spine {
 		/// <summary>
 		/// Updates the world transform for each bone and applies all constraints.
 		/// <para>
-		/// See <a href="http://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
+		/// See <a href="https://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
 		/// Runtimes Guide.</para>
 		/// </summary>
 		public void UpdateWorldTransform (Physics physics) {
@@ -446,7 +451,12 @@ namespace Spine {
 		/// <summary>
 		/// Temporarily sets the root bone as a child of the specified bone, then updates the world transform for each bone and applies
 		/// all constraints.
+		/// <para>
+		/// See <a href="https://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
+		/// Runtimes Guide.</para>
 		/// </summary>
+		/// <param name="physics">The physics mode to use.</param>
+		/// <param name="parent">The parent bone.</param>
 		public void UpdateWorldTransform (Physics physics, Bone parent) {
 			if (parent == null) throw new ArgumentNullException("parent", "parent cannot be null.");
 
@@ -478,6 +488,8 @@ namespace Spine {
 		/// <summary>
 		/// Calls <see cref="PhysicsConstraint.Translate(float, float)"/> for each physics constraint.
 		/// </summary>
+		/// <param name="x">The X translation.</param>
+		/// <param name="y">The Y translation.</param>
 		public void PhysicsTranslate (float x, float y) {
 			PhysicsConstraint[] physicsConstraints = this.physicsConstraints.Items;
 			for (int i = 0, n = this.physicsConstraints.Count; i < n; i++)
@@ -487,18 +499,22 @@ namespace Spine {
 		/// <summary>
 		/// Calls <see cref="PhysicsConstraint.Rotate(float, float, float)"/> for each physics constraint.
 		/// </summary>
+		/// <param name="x">The X coordinate of the rotation center.</param>
+		/// <param name="y">The Y coordinate of the rotation center.</param>
+		/// <param name="degrees">The rotation angle in degrees.</param>
 		public void PhysicsRotate (float x, float y, float degrees) {
 			PhysicsConstraint[] physicsConstraints = this.physicsConstraints.Items;
 			for (int i = 0, n = this.physicsConstraints.Count; i < n; i++)
 				physicsConstraints[i].Rotate(x, y, degrees);
 		}
 
-		/// <summary>Increments the skeleton's <see cref="time"/>.</summary>
+		/// <summary>Increments the skeleton's <see cref="Time"/>.</summary>
+		/// <param name="delta">The time delta to add.</param>
 		public void Update (float delta) {
 			time += delta;
 		}
 
-		/// <summary>Sets the bones, constraints, and slots to their setup pose values.</summary>
+		/// <summary>Sets the bones, constraints, slots, and draw order to their setup pose values.</summary>
 		public void SetToSetupPose () {
 			SetBonesToSetupPose();
 			SetSlotsToSetupPose();
@@ -527,6 +543,7 @@ namespace Spine {
 				physicsConstraints[i].SetToSetupPose();
 		}
 
+		/// <summary>Sets the slots and draw order to their setup pose values.</summary>
 		public void SetSlotsToSetupPose () {
 			Slot[] slots = this.slots.Items;
 			int n = this.slots.Count;
@@ -561,24 +578,27 @@ namespace Spine {
 			return null;
 		}
 
-		/// <summary>Sets a skin by name (see <see cref="SetSkin(Spine.Skin)"/>).</summary>
+		/// <summary>Sets a skin by name.
+		/// <para>
+		/// See <see cref="SetSkin(Skin)"/>.</para>
+		/// </summary>
+		/// <param name="skinName">The name of the skin to set.</param>
 		public void SetSkin (string skinName) {
 			Skin foundSkin = data.FindSkin(skinName);
 			if (foundSkin == null) throw new ArgumentException("Skin not found: " + skinName, "skinName");
 			SetSkin(foundSkin);
 		}
 
-		/// <summary>
-		/// <para>Sets the skin used to look up attachments before looking in the <see cref="SkeletonData.DefaultSkin"/>. If the
+		/// <summary>Sets the skin used to look up attachments before looking in the <see cref="SkeletonData.DefaultSkin"/>. If the
 		/// skin is changed, <see cref="UpdateCache()"/> is called.
-		/// </para>
-		/// <para>Attachments from the new skin are attached if the corresponding attachment from the old skin was attached.
-		/// If there was no old skin, each slot's setup mode attachment is attached from the new skin.
+		/// <para>
+		/// Attachments from the new skin are attached if the corresponding attachment from the old skin was attached. If there was no
+		/// old skin, each slot's setup mode attachment is attached from the new skin.
 		/// </para>
 		/// <para>After changing the skin, the visible attachments can be reset to those attached in the setup pose by calling
-		/// <see cref="Skeleton.SetSlotsToSetupPose()"/>.
-		/// Also, often <see cref="AnimationState.Apply(Skeleton)"/> is called before the next time the
-		/// skeleton is rendered to allow any attachment keys in the current animation(s) to hide or show attachments from the new skin.</para>
+		/// <see cref="SetSlotsToSetupPose()"/>. Also, often <see cref="AnimationState.Apply(Skeleton)"/> is called before the next time the
+		/// skeleton is rendered to allow any attachment keys in the current animation(s) to hide or show attachments from the new
+		/// skin.</para>
 		/// </summary>
 		/// <param name="newSkin">May be null.</param>
 		public void SetSkin (Skin newSkin) {
@@ -602,13 +622,21 @@ namespace Spine {
 			UpdateCache();
 		}
 
-		/// <summary>Finds an attachment by looking in the <see cref="Skeleton.Skin"/> and <see cref="SkeletonData.DefaultSkin"/> using the slot name and attachment name.</summary>
+		/// <summary>Finds an attachment by looking in the <see cref="Skin"/> and <see cref="SkeletonData.DefaultSkin"/> using the slot name and attachment
+		/// name.
+		/// <para>
+		/// See <see cref="GetAttachment(int, string)"/>.</para>
+		/// </summary>
 		/// <returns>May be null.</returns>
 		public Attachment GetAttachment (string slotName, string attachmentName) {
 			return GetAttachment(data.FindSlot(slotName).index, attachmentName);
 		}
 
-		/// <summary>Finds an attachment by looking in the skin and skeletonData.defaultSkin using the slot index and attachment name.First the skin is checked and if the attachment was not found, the default skin is checked.</summary>
+		/// <summary>Finds an attachment by looking in the <see cref="Skin"/> and <see cref="SkeletonData.DefaultSkin"/> using the slot index and
+		/// attachment name. First the skin is checked and if the attachment was not found, the default skin is checked.
+		/// <para>
+		/// See <a href="https://esotericsoftware.com/spine-runtime-skins">Runtime skins</a> in the Spine Runtimes Guide.</para>
+		/// </summary>
 		/// <returns>May be null.</returns>
 		public Attachment GetAttachment (int slotIndex, string attachmentName) {
 			if (attachmentName == null) throw new ArgumentNullException("attachmentName", "attachmentName cannot be null.");
@@ -619,7 +647,9 @@ namespace Spine {
 			return data.defaultSkin != null ? data.defaultSkin.GetAttachment(slotIndex, attachmentName) : null;
 		}
 
-		/// <summary>A convenience method to set an attachment by finding the slot with FindSlot, finding the attachment with GetAttachment, then setting the slot's slot.Attachment.</summary>
+		/// <summary>A convenience method to set an attachment by finding the slot with <see cref="FindSlot(string)"/>, finding the attachment with
+		/// <see cref="GetAttachment(int, string)"/>, then setting the slot's <see cref="Slot.Attachment"/>.</summary>
+		/// <param name="slotName">The name of the slot.</param>
 		/// <param name="attachmentName">May be null to clear the slot's attachment.</param>
 		public void SetAttachment (string slotName, string attachmentName) {
 			if (slotName == null) throw new ArgumentNullException("slotName", "slotName cannot be null.");
@@ -680,6 +710,7 @@ namespace Spine {
 
 		/// <summary>Finds a physics constraint by comparing each physics constraint's name. It is more efficient to cache the results of this
 		/// method than to call it repeatedly.</summary>
+		/// <param name="constraintName">The name of the constraint to find.</param>
 		/// <returns>May be null.</returns>
 		public PhysicsConstraint FindPhysicsConstraint (String constraintName) {
 			if (constraintName == null) throw new ArgumentNullException("constraintName", "constraintName cannot be null.");
@@ -691,12 +722,14 @@ namespace Spine {
 			return null;
 		}
 
-		/// <summary>Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose.</summary>
-		/// <param name="x">The horizontal distance between the skeleton origin and the left side of the AABB.</param>
-		/// <param name="y">The vertical distance between the skeleton origin and the bottom side of the AABB.</param>
-		/// <param name="width">The width of the AABB</param>
-		/// <param name="height">The height of the AABB.</param>
-		/// <param name="vertexBuffer">Reference to hold a float[]. May be a null reference. This method will assign it a new float[] with the appropriate size as needed.</param>
+		/// <summary>Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose. Optionally applies
+		/// clipping.</summary>
+		/// <param name="x">An output value, the distance from the skeleton origin to the bottom left corner of the AABB.</param>
+		/// <param name="y">An output value, the distance from the skeleton origin to the bottom left corner of the AABB.</param>
+		/// <param name="width">An output value, the width of the AABB.</param>
+		/// <param name="height">An output value, the height of the AABB.</param>
+		/// <param name="vertexBuffer">Working memory to temporarily store attachments' computed world vertices.</param>
+		/// <param name="clipper"><see cref="SkeletonClipping"/> to use. If null, no clipping is applied.</param>
 		public void GetBounds (out float x, out float y, out float width, out float height, ref float[] vertexBuffer,
 			SkeletonClipping clipper = null) {
 

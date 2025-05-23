@@ -28,21 +28,64 @@
  *****************************************************************************/
 
 namespace Spine {
+	/// <summary>
+	/// The interface which can be implemented to customize creating and populating attachments.
+	/// </summary>
+	/// <remarks>
+	/// See <a href='https://esotericsoftware.com/spine-loading-skeleton-data#AttachmentLoader'>Loading skeleton data</a> in the Spine
+	/// Runtimes Guide.
+	/// </remarks>
 	public interface AttachmentLoader {
-		/// <return>May be null to not load any attachment.</return>
+		/// <summary>
+		/// Creates a new region attachment.
+		/// </summary>
+		/// <param name="skin">The skin that will contain the attachment.</param>
+		/// <param name="name">The name of the attachment.</param>
+		/// <param name="path">The path to the attachment.</param>
+		/// <param name="sequence">The sequence for the attachment.</param>
+		/// <returns>May be null to not load the attachment.</returns>
 		RegionAttachment NewRegionAttachment (Skin skin, string name, string path, Sequence sequence);
 
-		/// <return>May be null to not load any attachment.</return>
+		/// <summary>
+		/// Creates a new mesh attachment.
+		/// </summary>
+		/// <param name="skin">The skin that will contain the attachment.</param>
+		/// <param name="name">The name of the attachment.</param>
+		/// <param name="path">The path to the attachment.</param>
+		/// <param name="sequence">The sequence for the attachment.</param>
+		/// <returns>May be null to not load the attachment. In that case null should also be returned for child meshes.</returns>
 		MeshAttachment NewMeshAttachment (Skin skin, string name, string path, Sequence sequence);
 
-		/// <return>May be null to not load any attachment.</return>
+		/// <summary>
+		/// Creates a new bounding box attachment.
+		/// </summary>
+		/// <param name="skin">The skin that will contain the attachment.</param>
+		/// <param name="name">The name of the attachment.</param>
+		/// <returns>May be null to not load the attachment.</returns>
 		BoundingBoxAttachment NewBoundingBoxAttachment (Skin skin, string name);
 
-		/// <returns>May be null to not load any attachment</returns>
+		/// <summary>
+		/// Creates a new path attachment.
+		/// </summary>
+		/// <param name="skin">The skin that will contain the attachment.</param>
+		/// <param name="name">The name of the attachment.</param>
+		/// <returns>May be null to not load the attachment.</returns>
 		PathAttachment NewPathAttachment (Skin skin, string name);
 
+		/// <summary>
+		/// Creates a new point attachment.
+		/// </summary>
+		/// <param name="skin">The skin that will contain the attachment.</param>
+		/// <param name="name">The name of the attachment.</param>
+		/// <returns>May be null to not load the attachment.</returns>
 		PointAttachment NewPointAttachment (Skin skin, string name);
 
+		/// <summary>
+		/// Creates a new clipping attachment.
+		/// </summary>
+		/// <param name="skin">The skin that will contain the attachment.</param>
+		/// <param name="name">The name of the attachment.</param>
+		/// <returns>May be null to not load the attachment.</returns>
 		ClippingAttachment NewClippingAttachment (Skin skin, string name);
 	}
 }

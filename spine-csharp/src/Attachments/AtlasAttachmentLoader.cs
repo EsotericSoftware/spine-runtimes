@@ -52,6 +52,14 @@ namespace Spine {
 			}
 		}
 
+		/// <summary>
+		/// Creates a region attachment.
+		/// </summary>
+		/// <param name="skin">The skin.</param>
+		/// <param name="name">The attachment name.</param>
+		/// <param name="path">The attachment path.</param>
+		/// <param name="sequence">The sequence.</param>
+		/// <returns>May be null to not load the attachment.</returns>
 		public RegionAttachment NewRegionAttachment (Skin skin, string name, string path, Sequence sequence) {
 			RegionAttachment attachment = new RegionAttachment(name);
 			if (sequence != null)
@@ -65,6 +73,14 @@ namespace Spine {
 			return attachment;
 		}
 
+		/// <summary>
+		/// Creates a mesh attachment.
+		/// </summary>
+		/// <param name="skin">The skin.</param>
+		/// <param name="name">The attachment name.</param>
+		/// <param name="path">The attachment path.</param>
+		/// <param name="sequence">The sequence.</param>
+		/// <returns>May be null to not load the attachment. In that case null should also be returned for child meshes.</returns>
 		public MeshAttachment NewMeshAttachment (Skin skin, string name, string path, Sequence sequence) {
 			MeshAttachment attachment = new MeshAttachment(name);
 			if (sequence != null)
@@ -78,18 +94,42 @@ namespace Spine {
 			return attachment;
 		}
 
+		/// <summary>
+		/// Creates a bounding box attachment.
+		/// </summary>
+		/// <param name="skin">The skin.</param>
+		/// <param name="name">The attachment name.</param>
+		/// <returns>May be null to not load the attachment.</returns>
 		public BoundingBoxAttachment NewBoundingBoxAttachment (Skin skin, string name) {
 			return new BoundingBoxAttachment(name);
 		}
 
+		/// <summary>
+		/// Creates a path attachment.
+		/// </summary>
+		/// <param name="skin">The skin.</param>
+		/// <param name="name">The attachment name.</param>
+		/// <returns>May be null to not load the attachment.</returns>
 		public PathAttachment NewPathAttachment (Skin skin, string name) {
 			return new PathAttachment(name);
 		}
 
+		/// <summary>
+		/// Creates a point attachment.
+		/// </summary>
+		/// <param name="skin">The skin.</param>
+		/// <param name="name">The attachment name.</param>
+		/// <returns>May be null to not load the attachment.</returns>
 		public PointAttachment NewPointAttachment (Skin skin, string name) {
 			return new PointAttachment(name);
 		}
 
+		/// <summary>
+		/// Creates a clipping attachment.
+		/// </summary>
+		/// <param name="skin">The skin.</param>
+		/// <param name="name">The attachment name.</param>
+		/// <returns>May be null to not load the attachment.</returns>
 		public ClippingAttachment NewClippingAttachment (Skin skin, string name) {
 			return new ClippingAttachment(name);
 		}

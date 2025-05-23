@@ -30,6 +30,9 @@
 using System;
 
 namespace Spine {
+	/// <summary>
+	/// Stores the setup pose for a <see cref="Bone"/>.
+	/// </summary>
 	public class BoneData {
 		internal int index;
 		internal string name;
@@ -39,7 +42,7 @@ namespace Spine {
 		internal Inherit inherit = Inherit.Normal;
 		internal bool skinRequired;
 
-		/// <summary>The index of the bone in Skeleton.Bones</summary>
+		/// <summary>The index of the bone in <see cref="Skeleton.Bones"/>.</summary>
 		public int Index { get { return index; } }
 
 		/// <summary>The name of the bone, which is unique across all bones in the skeleton.</summary>
@@ -48,27 +51,28 @@ namespace Spine {
 		/// <summary>May be null.</summary>
 		public BoneData Parent { get { return parent; } }
 
+		/// <summary>The bone's length.</summary>
 		public float Length { get { return length; } set { length = value; } }
 
-		/// <summary>Local X translation.</summary>
+		/// <summary>The local x translation.</summary>
 		public float X { get { return x; } set { x = value; } }
 
-		/// <summary>Local Y translation.</summary>
+		/// <summary>The local y translation.</summary>
 		public float Y { get { return y; } set { y = value; } }
 
-		/// <summary>Local rotation in degrees, counter clockwise.</summary>
+		/// <summary>The local rotation in degrees, counter clockwise.</summary>
 		public float Rotation { get { return rotation; } set { rotation = value; } }
 
-		/// <summary>Local scaleX.</summary>
+		/// <summary>The local scaleX.</summary>
 		public float ScaleX { get { return scaleX; } set { scaleX = value; } }
 
-		/// <summary>Local scaleY.</summary>
+		/// <summary>The local scaleY.</summary>
 		public float ScaleY { get { return scaleY; } set { scaleY = value; } }
 
-		/// <summary>Local shearX.</summary>
+		/// <summary>The local shearX.</summary>
 		public float ShearX { get { return shearX; } set { shearX = value; } }
 
-		/// <summary>Local shearY.</summary>
+		/// <summary>The local shearY.</summary>
 		public float ShearY { get { return shearY; } set { shearY = value; } }
 
 		/// <summary>Determines how parent world transforms affect this bone.</summary>
@@ -76,9 +80,16 @@ namespace Spine {
 
 		/// <summary>When true, <see cref="Skeleton.UpdateWorldTransform(Skeleton.Physics)"/> only updates this bone if the <see cref="Skeleton.Skin"/> contains
 		/// this bone.</summary>
-		/// <seealso cref="Skin.Bones"/>
+		/// <remarks>
+		/// See <see cref="Skin.Bones"/>.
+		/// </remarks>
 		public bool SkinRequired { get { return skinRequired; } set { skinRequired = value; } }
 
+		/// <summary>
+		/// Initializes a new instance of the BoneData class.
+		/// </summary>
+		/// <param name="index">The index of the bone.</param>
+		/// <param name="name">The name of the bone.</param>
 		/// <param name="parent">May be null.</param>
 		public BoneData (int index, string name, BoneData parent) {
 			if (index < 0) throw new ArgumentException("index must be >= 0", "index");
@@ -93,6 +104,9 @@ namespace Spine {
 		}
 	}
 
+	/// <summary>
+	/// Determines how a bone inherits world transforms from parent bones.
+	/// </summary>
 	public enum Inherit {
 		Normal,
 		OnlyTranslation,

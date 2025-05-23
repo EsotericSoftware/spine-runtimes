@@ -30,7 +30,12 @@
 using System;
 
 namespace Spine {
-	/// <summary>Attachment that displays a texture region.</summary>
+	/// <summary>
+	/// An attachment that displays a textured quadrilateral.
+	/// </summary>
+	/// <remarks>
+	/// See <a href="https://esotericsoftware.com/spine-regions">Region attachments</a> in the Spine User Guide.
+	/// </remarks>
 	public class RegionAttachment : Attachment, IHasTextureRegion {
 		public const int BLX = 0, BLY = 1;
 		public const int ULX = 2, ULY = 3;
@@ -43,12 +48,19 @@ namespace Spine {
 		internal float r = 1, g = 1, b = 1, a = 1;
 		internal Sequence sequence;
 
+		/// <summary>The local x translation.</summary>
 		public float X { get { return x; } set { x = value; } }
+		/// <summary>The local y translation.</summary>
 		public float Y { get { return y; } set { y = value; } }
+		/// <summary>The local rotation.</summary>
 		public float Rotation { get { return rotation; } set { rotation = value; } }
+		/// <summary>The local scaleX.</summary>
 		public float ScaleX { get { return scaleX; } set { scaleX = value; } }
+		/// <summary>The local scaleY.</summary>
 		public float ScaleY { get { return scaleY; } set { scaleY = value; } }
+		/// <summary>The width of the region attachment in Spine.</summary>
 		public float Width { get { return width; } set { width = value; } }
+		/// <summary>The height of the region attachment in Spine.</summary>
 		public float Height { get { return height; } set { height = value; } }
 
 		public float R { get { return r; } set { r = value; } }
@@ -60,7 +72,9 @@ namespace Spine {
 		public TextureRegion Region { get { return region; } set { region = value; } }
 
 		/// <summary>For each of the 4 vertices, a pair of <c>x,y</c> values that is the local position of the vertex.</summary>
-		/// <seealso cref="UpdateRegion"/>
+		/// <remarks>
+		/// See <see cref="UpdateRegion"/>.
+		/// </remarks>
 		public float[] Offset { get { return offset; } }
 		public float[] UVs { get { return uvs; } }
 		public Sequence Sequence { get { return sequence; } set { sequence = value; } }
@@ -172,12 +186,16 @@ namespace Spine {
 		}
 
 		/// <summary>
-		/// Transforms the attachment's four vertices to world coordinates. If the attachment has a <see cref="Sequence"/> the region may
-		/// be changed.</summary>
-		/// <param name="bone">The parent bone.</param>
-		/// <param name="worldVertices">The output world vertices. Must have a length greater than or equal to offset + 8.</param>
-		/// <param name="offset">The worldVertices index to begin writing values.</param>
-		/// <param name="stride">The number of worldVertices entries between the value pairs written.</param>
+		/// Transforms the attachment's four vertices to world coordinates. If the attachment has a <see cref="Sequence"/>, the region may
+		/// be changed.
+		/// </summary>
+		/// <remarks>
+		/// See <a href="https://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
+		/// Runtimes Guide.
+		/// </remarks>
+		/// <param name="worldVertices">The output world vertices. Must have a length >= <c>offset</c> + 8.</param>
+		/// <param name="offset">The <c>worldVertices</c> index to begin writing values.</param>
+		/// <param name="stride">The number of <c>worldVertices</c> entries between the value pairs written.</param>
 		public void ComputeWorldVertices (Slot slot, float[] worldVertices, int offset, int stride = 2) {
 			if (sequence != null) sequence.Apply(slot, this);
 

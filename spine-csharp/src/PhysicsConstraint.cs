@@ -114,6 +114,8 @@ namespace Spine {
 		/// Translates the physics constraint so next <see cref="Update(Physics)"/> forces are applied as if the bone moved an additional
 		/// amount in world space.
 		/// </summary>
+		/// <param name="x">The x amount to translate.</param>
+		/// <param name="y">The y amount to translate.</param>
 		public void Translate (float x, float y) {
 			ux -= x;
 			uy -= y;
@@ -125,13 +127,19 @@ namespace Spine {
 		/// Rotates the physics constraint so next <see cref="Update(Physics)"/> forces are applied as if the bone rotated around the
 		/// specified point in world space.
 		/// </summary>
+		/// <param name="x">The x coordinate of the rotation point.</param>
+		/// <param name="y">The y coordinate of the rotation point.</param>
+		/// <param name="degrees">The rotation amount in degrees.</param>
 		public void Rotate (float x, float y, float degrees) {
 			float r = degrees * MathUtils.DegRad, cos = (float)Math.Cos(r), sin = (float)Math.Sin(r);
 			float dx = cx - x, dy = cy - y;
 			Translate(dx * cos - dy * sin - dx, dx * sin + dy * cos - dy);
 		}
 
-		/// <summary>Applies the constraint to the constrained bones.</summary>
+		/// <summary>
+		/// Applies the constraint to the constrained bones.
+		/// </summary>
+		/// <param name="physics">The physics mode to apply.</param>
 		public void Update (Physics physics) {
 			float mix = this.mix;
 			if (mix == 0) return;

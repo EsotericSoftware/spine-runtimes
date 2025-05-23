@@ -28,6 +28,9 @@
  *****************************************************************************/
 
 namespace Spine {
+	/// <summary>
+	/// Determines how images are blended with existing pixels when drawn.
+	/// </summary>
 	public enum BlendMode {
 		Normal, Additive, Multiply, Screen
 	}

@@ -32,20 +32,44 @@ using System;
 namespace Spine {
 
 	/// <summary>
-	/// Collects each BoundingBoxAttachment that is visible and computes the world vertices for its polygon.
-	/// The polygon vertices are provided along with convenience methods for doing hit detection.
+	/// Collects each visible <see cref="BoundingBoxAttachment"/> and computes the world vertices for its polygon. The polygon vertices are
+	/// provided along with convenience methods for doing hit detection.
 	/// </summary>
 	public class SkeletonBounds {
 		private ExposedList<Polygon> polygonPool = new ExposedList<Polygon>();
 		private float minX, minY, maxX, maxY;
 
+		/// <summary>
+		/// The visible bounding boxes.
+		/// </summary>
 		public ExposedList<BoundingBoxAttachment> BoundingBoxes { get; private set; }
+		/// <summary>
+		/// The world vertices for the bounding box polygons.
+		/// </summary>
 		public ExposedList<Polygon> Polygons { get; private set; }
+		/// <summary>
+		/// The left edge of the axis aligned bounding box.
+		/// </summary>
 		public float MinX { get { return minX; } set { minX = value; } }
+		/// <summary>
+		/// The bottom edge of the axis aligned bounding box.
+		/// </summary>
 		public float MinY { get { return minY; } set { minY = value; } }
+		/// <summary>
+		/// The right edge of the axis aligned bounding box.
+		/// </summary>
 		public float MaxX { get { return maxX; } set { maxX = value; } }
+		/// <summary>
+		/// The top edge of the axis aligned bounding box.
+		/// </summary>
 		public float MaxY { get { return maxY; } set { maxY = value; } }
+		/// <summary>
+		/// The width of the axis aligned bounding box.
+		/// </summary>
 		public float Width { get { return maxX - minX; } }
+		/// <summary>
+		/// The height of the axis aligned bounding box.
+		/// </summary>
 		public float Height { get { return maxY - minY; } }
 
 		public SkeletonBounds () {
@@ -54,13 +78,12 @@ namespace Spine {
 		}
 
 		/// <summary>
-		/// Clears any previous polygons, finds all visible bounding box attachments,
-		/// and computes the world vertices for each bounding box's polygon.</summary>
+		/// Clears any previous polygons, finds all visible bounding box attachments, and computes the world vertices for each bounding
+		/// box's polygon.
+		/// </summary>
 		/// <param name="skeleton">The skeleton.</param>
-		/// <param name="updateAabb">
-		/// If true, the axis aligned bounding box containing all the polygons is computed.
-		/// If false, the SkeletonBounds AABB methods will always return true.
-		/// </param>
+		/// <param name="updateAabb">If true, the axis aligned bounding box containing all the polygons is computed. If false, the
+		/// SkeletonBounds AABB methods will always return true.</param>
 		public void Update (Skeleton skeleton, bool updateAabb) {
 			ExposedList<BoundingBoxAttachment> boundingBoxes = BoundingBoxes;
 			ExposedList<Polygon> polygons = Polygons;
@@ -125,12 +148,16 @@ namespace Spine {
 			this.maxY = maxY;
 		}
 
-		/// <summary>Returns true if the axis aligned bounding box contains the point.</summary>
+		/// <summary>
+		/// Returns true if the axis aligned bounding box contains the point.
+		/// </summary>
 		public bool AabbContainsPoint (float x, float y) {
 			return x >= minX && x <= maxX && y >= minY && y <= maxY;
 		}
 
-		/// <summary>Returns true if the axis aligned bounding box intersects the line segment.</summary>
+		/// <summary>
+		/// Returns true if the axis aligned bounding box intersects the line segment.
+		/// </summary>
 		public bool AabbIntersectsSegment (float x1, float y1, float x2, float y2) {
 			float minX = this.minX;
 			float minY = this.minY;
@@ -150,12 +177,20 @@ namespace Spine {
 			return false;
 		}
 
-		/// <summary>Returns true if the axis aligned bounding box intersects the axis aligned bounding box of the specified bounds.</summary>
+		/// <summary>
+		/// Returns true if the axis aligned bounding box intersects the axis aligned bounding box of the specified bounds.
+		/// </summary>
 		public bool AabbIntersectsSkeleton (SkeletonBounds bounds) {
 			return minX < bounds.maxX && maxX > bounds.minX && minY < bounds.maxY && maxY > bounds.minY;
 		}
 
-		/// <summary>Returns true if the polygon contains the point.</summary>
+		/// <summary>
+		/// Returns true if the polygon contains the point.
+		/// </summary>
+		/// <param name="polygon">The polygon to check.</param>
+		/// <param name="x">The x coordinate.</param>
+		/// <param name="y">The y coordinate.</param>
+		/// <returns>True if the polygon contains the point.</returns>
 		public bool ContainsPoint (Polygon polygon, float x, float y) {
 			float[] vertices = polygon.Vertices;
 			int nn = polygon.Count;
@@ -174,8 +209,13 @@ namespace Spine {
 			return inside;
 		}
 
-		/// <summary>Returns the first bounding box attachment that contains the point, or null. When doing many checks, it is usually more
-		/// efficient to only call this method if <see cref="AabbContainsPoint(float, float)"/> returns true.</summary>
+		/// <summary>
+		/// Returns the first bounding box attachment that contains the point, or null. When doing many checks, it is usually more
+		/// efficient to only call this method if <see cref="AabbContainsPoint(float, float)"/> returns true.
+		/// </summary>
+		/// <param name="x">The x coordinate.</param>
+		/// <param name="y">The y coordinate.</param>
+		/// <returns>The first bounding box attachment that contains the point, or null.</returns>
 		public BoundingBoxAttachment ContainsPoint (float x, float y) {
 			Polygon[] polygons = Polygons.Items;
 			for (int i = 0, n = Polygons.Count; i < n; i++)
@@ -183,8 +223,16 @@ namespace Spine {
 			return null;
 		}
 
-		/// <summary>Returns the first bounding box attachment that contains the line segment, or null. When doing many checks, it is usually
-		/// more efficient to only call this method if <see cref="aabbIntersectsSegment(float, float, float, float)"/> returns true.</summary>
+		/// <summary>
+		/// Returns the first bounding box attachment that contains any part of the line segment, or null. When doing many checks, it
+		/// is usually more efficient to only call this method if <see cref="AabbIntersectsSegment(float, float, float, float)"/> returns
+		/// true.
+		/// </summary>
+		/// <param name="x1">The x coordinate of the first point.</param>
+		/// <param name="y1">The y coordinate of the first point.</param>
+		/// <param name="x2">The x coordinate of the second point.</param>
+		/// <param name="y2">The y coordinate of the second point.</param>
+		/// <returns>The first bounding box attachment that contains any part of the line segment, or null.</returns>
 		public BoundingBoxAttachment IntersectsSegment (float x1, float y1, float x2, float y2) {
 			Polygon[] polygons = Polygons.Items;
 			for (int i = 0, n = Polygons.Count; i < n; i++)
@@ -192,7 +240,15 @@ namespace Spine {
 			return null;
 		}
 
-		/// <summary>Returns true if the polygon contains the line segment.</summary>
+		/// <summary>
+		/// Returns true if the polygon contains any part of the line segment.
+		/// </summary>
+		/// <param name="polygon">The polygon to check.</param>
+		/// <param name="x1">The x coordinate of the first point.</param>
+		/// <param name="y1">The y coordinate of the first point.</param>
+		/// <param name="x2">The x coordinate of the second point.</param>
+		/// <param name="y2">The y coordinate of the second point.</param>
+		/// <returns>True if the polygon contains any part of the line segment.</returns>
 		public bool IntersectsSegment (Polygon polygon, float x1, float y1, float x2, float y2) {
 			float[] vertices = polygon.Vertices;
 			int nn = polygon.Count;
@@ -216,6 +272,11 @@ namespace Spine {
 			return false;
 		}
 
+		/// <summary>
+		/// Returns the polygon for the specified bounding box, or null.
+		/// </summary>
+		/// <param name="attachment">The bounding box attachment.</param>
+		/// <returns>The polygon for the specified bounding box, or null.</returns>
 		public Polygon GetPolygon (BoundingBoxAttachment attachment) {
 			int index = BoundingBoxes.IndexOf(attachment);
 			return index == -1 ? null : Polygons.Items[index];

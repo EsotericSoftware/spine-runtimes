@@ -31,11 +31,17 @@ using System;
 using System.Collections.Generic;
 
 namespace Spine {
+	/// <summary>
+	/// An attachment whose vertices make up a composite Bezier curve.
+	/// </summary>
+	/// <remarks>
+	/// See <see cref="PathConstraint"/> and <a href="https://esotericsoftware.com/spine-paths">Paths</a> in the Spine User Guide.
+	/// </remarks>
 	public class PathAttachment : VertexAttachment {
 		internal float[] lengths;
 		internal bool closed, constantSpeed;
 
-		/// <summary>The length in the setup pose from the start of the path to the end of each curve.</summary>
+		/// <summary>The lengths along the path in the setup pose from the start of the path to the end of each Bezier curve.</summary>
 		public float[] Lengths { get { return lengths; } set { lengths = value; } }
 		/// <summary>If true, the start and end knots are connected.</summary>
 		public bool Closed { get { return closed; } set { closed = value; } }

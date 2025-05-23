@@ -86,6 +86,9 @@ namespace Spine {
 			stretch = data.stretch;
 		}
 
+		/// <summary>
+		/// Applies the constraint to the constrained bones.
+		/// </summary>
 		public void Update (Physics physics) {
 			if (mix == 0) return;
 			Bone target = this.target;
