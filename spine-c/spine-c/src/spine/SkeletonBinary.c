@@ -1348,7 +1348,7 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 	skeletonData->y = readFloat(input);
 	skeletonData->width = readFloat(input);
 	skeletonData->height = readFloat(input);
-	skeletonData->referenceScale = readFloat(input);
+	skeletonData->referenceScale = readFloat(input) * self->scale;
 
 	nonessential = readBoolean(input);
 
