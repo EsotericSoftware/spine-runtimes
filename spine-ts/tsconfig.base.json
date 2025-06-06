@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
+    "target": "es2015",
+    "module": "es6",
     "noImplicitAny": true,
     "preserveConstEnums": true,
     "inlineSources": true,
