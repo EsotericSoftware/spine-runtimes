@@ -148,8 +148,8 @@ int main() {
 
 	// Dispose everything
 	renderer_dispose(renderer);
-	// delete skeletonData;
-	delete atlas;
+	spine_skeleton_data_dispose(skeleton_data);
+	spine_atlas_dispose(atlas);
 
 	// Kill the window and GLFW
 	glfwTerminate();

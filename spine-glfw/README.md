@@ -2,6 +2,8 @@
 
 The spine-glfw runtime provides basic functionality to load and manipulate [spine](http://esotericsoftware.com) skeletal animation data using C or C++ and render them via [GLFW](https://www.glfw.org/) and [glbinding](https://github.com/cginternals/glbinding).
 
+# See the [spine-glfw documentation](http://esotericsoftware.com/spine-glfw) for in-depth information
+
 ## Licensing
 
 You are welcome to evaluate the Spine Runtimes and the examples we provide in this repository free of charge.
@@ -16,4 +18,4 @@ For the official legal terms governing the Spine Runtimes, please read the [Spin
 
 spine-cpp works with data exported from spine 4.2.xx.
 
-spine-cpp supports all spine features, except two color tinting.
+spine-glfw supports all spine features.
