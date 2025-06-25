@@ -53,6 +53,7 @@ const spineTextureAtlasLoader: AssetExtension<RawAtlas | TextureAtlas, ISpineAtl
 	},
 
 	loader: {
+		name: "spineTextureAtlasLoader",
 		extension: {
 			type: ExtensionType.LoadParser,
 			priority: LoaderParserPriority.Normal,
@@ -71,11 +72,12 @@ const spineTextureAtlasLoader: AssetExtension<RawAtlas | TextureAtlas, ISpineAtl
 			return txt;
 		},
 
-		testParse(asset: unknown, options: {src: string}): Promise<boolean> {
+		testParse(asset: unknown, options: {src: string, loadParser?: string}): Promise<boolean> {
 			const isExtensionRight = checkExtension(options.src, ".atlas");
 			const isString = typeof asset === "string";
+			const isExplicitLoadParserSet = options.loadParser === "spineTextureAtlasLoader";
 
-			return Promise.resolve(isExtensionRight && isString);
+			return Promise.resolve((isExtensionRight || isExplicitLoadParserSet) && isString);
 		},
 
 		unload(atlas: TextureAtlas) {

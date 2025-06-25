@@ -1,0 +1,69 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>spine-pixi</title>
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@7.4.2/dist/pixi.min.js"></script>
+    <script src="../dist/iife/spine-pixi-v7.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tweakpane@3.1.9/dist/tweakpane.min.js"></script>
+    <link rel="stylesheet" href="../../index.css">
+    <script src="https://cdn.jsdelivr.net/npm/lil-gui@0.20.0/dist/lil-gui.umd.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/lil-gui@0.20.0/dist/lil-gui.min.css" rel="stylesheet">
+  </head>
+
+  <body>
+    <script>
+      (async function () {
+        await Promise.resolve();
+        var app = new PIXI.Application({
+          width: window.innerWidth,
+          height: window.innerHeight,
+          resolution: window.devicePixelRatio || 1,
+          autoDensity: true,
+          resizeTo: window,
+          backgroundColor: 0x2c3e50,
+          hello: true,
+        });
+        document.body.appendChild(app.view);
+
+        const spineboyJsonBlob = await fetch("/assets/spineboy-pro.json").then(res => res.blob())
+        const spineboyAtlasBlob = await fetch("/assets/spineboy-pma.atlas").then(res => res.blob())
+        const spineboyTextureBlob = await fetch("/assets/spineboy-pma.png").then(res => res.blob())
+
+        const texture = await PIXI.Assets.load({
+              alias: 'spineboy-pma.png',
+              loadParser: 'loadTextures',
+              src: URL.createObjectURL(spineboyTextureBlob)
+        })
+
+        PIXI.Assets.add({
+          alias: "spineboyAtlas",
+          loadParser: "spineTextureAtlasLoader",
+          src: URL.createObjectURL(spineboyAtlasBlob),
+          data: {
+            images: {
+              "spineboy-pma.png": texture.baseTexture
+            } 
+          }
+        })
+
+        PIXI.Assets.add({
+            alias: "spineboyData",
+            loadParser: "loadJson",
+            src: URL.createObjectURL(spineboyJsonBlob)
+        })
+        await PIXI.Assets.load(["spineboyData", "spineboyAtlas"]);
+
+        // creating spine game object
+        const spineboy= spine.Spine.from({skeleton: "spineboyData", atlas: "spineboyAtlas" });
+        spineboy.position.set(300, 300);
+        app.stage.addChild(spineboy);
+
+        spineboy.state.setAnimation(0, "run", true);
+        spineboy.x = window.innerWidth / 2;
+        spineboy.y = window.innerHeight / 2 + spineboy.getBounds().height / 2;
+      })();
+
+   </script>
+
+  </body>
+</html>
