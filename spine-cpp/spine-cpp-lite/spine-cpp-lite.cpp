@@ -624,7 +624,7 @@ void spine_skeleton_drawable_dispose(spine_skeleton_drawable drawable) {
 	if (_drawable->skeleton) delete (Skeleton *) _drawable->skeleton;
 	if (_drawable->animationState) delete (AnimationState *) _drawable->animationState;
 	if (_drawable->animationStateData) delete (AnimationStateData *) _drawable->animationStateData;
-	if (_drawable->animationStateEvents) delete (Vector<AnimationStateEvent> *) (_drawable->animationStateEvents);
+	if (_drawable->animationStateEvents) delete (EventListener *) (_drawable->animationStateEvents);
 	if (_drawable->renderer) delete (SkeletonRenderer *) _drawable->renderer;
 	SpineExtension::free(drawable, __FILE__, __LINE__);
 }
