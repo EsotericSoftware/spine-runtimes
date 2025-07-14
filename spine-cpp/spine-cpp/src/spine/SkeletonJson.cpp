@@ -1064,14 +1064,14 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 				}
 				timelines.add(timeline);
 			} else if (strcmp(timelineMap->_name, "rgb2") == 0) {
-				RGBA2Timeline *timeline = new (__FILE__, __LINE__) RGBA2Timeline(frames, frames * 6, slotIndex);
+				RGB2Timeline *timeline = new (__FILE__, __LINE__) RGB2Timeline(frames, frames * 6, slotIndex);
 				keyMap = timelineMap->_child;
 				float time = Json::getFloat(keyMap, "time", 0);
 				toColor(color, Json::getString(keyMap, "light", 0), false);
 				toColor(color2, Json::getString(keyMap, "dark", 0), false);
 
 				for (frame = 0, bezier = 0;; ++frame) {
-					timeline->setFrame(frame, time, color.r, color.g, color.b, color.a, color2.r, color2.g, color2.b);
+					timeline->setFrame(frame, time, color.r, color.g, color.b, color2.r, color2.g, color2.b);
 					nextMap = keyMap->_next;
 					if (!nextMap) {
 						// timeline.shrink(); // BOZO
