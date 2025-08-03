@@ -549,6 +549,7 @@ static spAnimation *_spSkeletonJson_readAnimation(spSkeletonJson *self, Json *ro
 					spInheritTimeline_setFrame(timeline, frame, time, inherit);
 					nextMap = keyMap->next;
 					if (!nextMap) break;
+					keyMap = nextMap;
 				}
 				spTimelineArray_add(timelines, SUPER(timeline));
 			} else {
