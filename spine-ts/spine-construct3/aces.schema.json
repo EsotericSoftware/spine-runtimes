@@ -1,0 +1,249 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://construct.net/sdk/schema/plugin.addon.schema.json",
+    "title": "Plugin aces.json",
+    "description": "Plugin JSON file that describes the available actions, conditions and expressions.",
+    "type": "object",
+    "properties": {
+        "$schema": { "type": "string" }
+    },
+    "additionalProperties": {
+        "description": "ACE definitions for a specific category.",
+        "type": "object",
+        "properties": {
+            "conditions": {
+                "description": "Condition definitions for this category.",
+                "type": "array",
+                "items": {
+                    "description": "Condition definition",
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "description": "A string specifying a unique ID for the condition.",
+                            "type": "string"
+                        },
+                        "c2id": {
+                            "description": "If you are porting a Construct 2 addon to Construct 3, put the corresponding numerical ID that the Construct 2 addon used here. This allows Construct 3 to import Construct 2 projects using your addon.",
+                            "type": "number"
+                        },
+                        "scriptName": {
+                            "description": "The name of the function in the runtime script for this condition.",
+                            "type": "string"
+                        },
+                        "isDeprecated": {
+                            "description": "Set to true to deprecate the condition. This hides it in the editor, but allows existing projects to continue using it.",
+                            "type": "boolean"
+                        },
+                        "highlight": {
+                            "description": "Set to true to highlight the condition in the picker dialog.",
+                            "type": "boolean"
+                        },
+                        "isTrigger": {
+                            "description": "Specifies a trigger condition. This appears with an arrow in the event sheet. Instead of being evaluated every tick, triggers only run when they are explicity triggered by a runtime call.",
+                            "type": "boolean"
+                        },
+                        "isFakeTrigger": {
+                            "description": "Specifies a fake trigger. This appears identical to a trigger in the event sheet, but is actually evaluated every tick. This is useful for conditions which are true for a single tick, such as for APIs which must poll a value every tick.",
+                            "type": "boolean"
+                        },
+                        "isStatic": {
+                            "description": "Normally, the condition runtime method is executed once per picked instance. If the condition is marked static, the runtime method is executed once only, on the object type class. This means the runtime method must also implement the instance picking entirely itself, including respecting negation and OR blocks.",
+                            "type": "boolean"
+                        },
+                        "isLooping": {
+                            "description": "Display an icon in the event sheet to indicate the condition loops. This should only be used with conditions which implement re-triggering.",
+                            "type": "boolean"
+                        },
+                        "isInvertible": {
+                            "description": "Allow the condition to be inverted in the event sheet. Set to false to disable invert.",
+                            "type": "boolean"
+                        },
+                        "isCompatibleWithTriggers": {
+                            "description": "Allow the condition to be used in the same branch as a trigger. Set to false if the condition does not make sense when used in a trigger, such as the Trigger once condition.",
+                            "type": "boolean"
+                        },
+                        "params": {
+                            "description": "Array of parameters for this condition.",
+                            "type": "array",
+                            "items": { "$ref": "#/$defs/acParameter" }
+                        }
+                    },
+                    "required": ["id", "scriptName"],
+                    "additionalProperties": false
+                }
+            },
+            "actions": {
+                "description": "Action definitions for this category.",
+                "type": "array",
+                "items": {
+                    "description": "Action definition",
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "description": "A string specifying a unique ID for the action.",
+                            "type": "string"
+                        },
+                        "c2id": {
+                            "description": "If you are porting a Construct 2 addon to Construct 3, put the corresponding numerical ID that the Construct 2 addon used here. This allows Construct 3 to import Construct 2 projects using your addon.",
+                            "type": "number"
+                        },
+                        "scriptName": {
+                            "description": "The name of the function in the runtime script for this action.",
+                            "type": "string"
+                        },
+                        "isDeprecated": {
+                            "description": "Set to true to deprecate the action. This hides it in the editor, but allows existing projects to continue using it.",
+                            "type": "boolean"
+                        },
+                        "highlight": {
+                            "description": "Set to true to highlight the action in the picker dialog.",
+                            "type": "boolean"
+                        },
+                        "isAsync": {
+                            "description": "Set to true to mark the action as asynchronous. Make the action method an async function, and the system 'Wait for previous actions to complete' action will be able to wait for the action as well.",
+                            "type": "boolean"
+                        },
+                        "params": {
+                            "description": "Array of parameters for this action.",
+                            "type": "array",
+                            "items": { "$ref": "#/$defs/acParameter" }
+                        }
+                    },
+                    "required": ["id", "scriptName"],
+                    "additionalProperties": false
+                }
+            },
+            "expressions": {
+                "description": "Expression definitions for this category.",
+                "type": "array",
+                "items": {
+                    "description": "Expression definition",
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "description": "A string specifying a unique ID for the expression.",
+                            "type": "string"
+                        },
+                        "c2id": {
+                            "description": "If you are porting a Construct 2 addon to Construct 3, put the corresponding numerical ID that the Construct 2 addon used here. This allows Construct 3 to import Construct 2 projects using your addon.",
+                            "type": "number"
+                        },
+                        "expressionName": {
+                            "description": "The name typed in by the user for this expression, which is also used as the name of the function in the runtime script.",
+                            "type": "string"
+                        },
+                        "isDeprecated": {
+                            "description": "Set to true to deprecate the expression. This hides it in the editor, but allows existing projects to continue using it.",
+                            "type": "boolean"
+                        },
+                        "highlight": {
+                            "description": "Set to true to highlight the expression in the picker dialog.",
+                            "type": "boolean"
+                        },
+                        "returnType": {
+                            "description": "The type of value returned by the expression.",
+                            "enum": ["number", "string", "any"]
+                        },
+                        "isVariadicParameters": {
+                            "description": "If true, Construct will allow the user to enter any number of parameters beyond those defined. In other words the parameters (if any) listed in \"params\" are required, but this flag enables adding further \"any\" type parameters beyond the end.",
+                            "type": "boolean"
+                        },
+                        "params": {
+                            "description": "Array of parameters for this action.",
+                            "type": "array",
+                            "items": { "$ref": "#/$defs/expParameter" }
+                        }
+                    },
+                    "required": ["id", "expressionName"],
+                    "additionalProperties": false
+                }
+            }
+        }
+    },
+    "$defs": {
+        "acParameter": {
+            "description": "A parameter for a condition or action.",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "A string with a unique identifier for this parameter.",
+                    "type": "string"
+                },
+                "c2id": {
+                    "description": "In some circumstances, it is necessary to specify which Construct 2 parameter ID a parameter corresponds to. However normally it can be inferred by the parameter index.",
+                    "type": "number"
+                },
+                "type": {
+                    "description": "The parameter type.",
+                    "enum": ["number", "string", "any", "boolean", "combo", "combo-grouped", "cmp", "object", "objectname", "layer", "layout", "keyb", "instancevar", "instancevarbool", "eventvar", "eventvarbool", "animation", "objinstancevar", "projectfile"]
+                },
+                "initialValue": {
+                    "description": "A string which is used as the initial expression for expression-based parameters. Note this is still a string for \"number\" type parameters. It can contain any valid expression for the parameter, such as \"1 + 1\". For \"boolean\" parameters, use a string of either \"true\" or \"false\". For \"combo\" parameters, this is the initial item ID.",
+                    "type": "string"
+                },
+                "items": {
+                    "description": "Only valid with the \"combo\" type. Set to an array of item IDs available in the dropdown list.",
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "minItems": 1
+                },
+                "itemGroups": {
+                    "description": "Only valid with the \"combo-grouped\" type. Set to an array of item groups available in the dropdown list.",
+                    "type": "array",
+                    "items": {
+                        "description": "A combo item group.",
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "description": "The combo item group ID.",
+                                "type": "string"
+                            },
+                            "items": {
+                                "description": "Array of item IDs available in this item group.",
+                                "type": "array",
+                                "items": { "type": "string" },
+                                "minItems": 1
+                            }
+                        }
+                    },
+                    "minItems": 1
+                },
+                "filter": {
+                    "description": "Only valid with the \"projectfile\" type. Set to a string of a file extension e.g. \".txt\" to filter the project file list by.",
+                    "type": "string"
+                },
+                "allowedPluginIds": {
+                    "description": "Optional and only valid with the \"object\" type. Set to an array of plugin IDs allowed to be shown by the object picker. For example, use [\"Sprite\"] to only allow the object parameter to select a Sprite.",
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "minItems": 1
+                },
+                "autocompleteId": {
+                    "description": "Optional and only valid with the \"string\" type. Set to a globally unique ID and string constants with the same ID will offer autocomplete in the editor. Useful for tag parameters.",
+                    "type": "string"
+                }
+            },
+            "required": ["id", "type"]
+        },
+        "expParameter": {
+            "description": "A parameter for an expression.",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "A string with a unique identifier for this parameter.",
+                    "type": "string"
+                },
+                "c2id": {
+                    "description": "In some circumstances, it is necessary to specify which Construct 2 parameter ID a parameter corresponds to. However normally it can be inferred by the parameter index.",
+                    "type": "number"
+                },
+                "type": {
+                    "description": "The parameter type.",
+                    "enum": ["number", "string", "any"]
+                }
+            },
+            "required": ["id", "type"]
+        }
+    }
+}
+    

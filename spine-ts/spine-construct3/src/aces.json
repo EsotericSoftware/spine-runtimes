@@ -1,0 +1,85 @@
+﻿{
+  "$schema": "../aces.schema.json",
+
+  "custom": {
+    "conditions": [
+      {
+        "id": "on-skeleton-loaded",
+        "scriptName": "OnSkeletonLoaded",
+        "isTrigger": true
+      },
+      {
+        "id": "on-animation-event",
+        "scriptName": "OnAnimationEvent",
+        "isTrigger": true,
+        "params": [
+          {
+            "id": "event",
+            "type": "string",
+            "initial-value": "complete"
+          },
+          {
+            "id": "track",
+            "type": "number",
+            "initial-value": 0
+          },
+          {
+            "id": "animation",
+            "type": "string"
+          }
+        ]
+      }
+    ],
+    "actions": [
+      {
+        "id": "do-alert",
+        "scriptName": "Alert",
+        "highlight": true
+      },
+      {
+        "id": "set-skin",
+        "scriptName": "SetSkin",
+        "highlight": false,
+        "params": [
+          {
+            "id": "skin-name",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "set-animation",
+        "scriptName": "SetAnimation",
+        "highlight": false,
+        "params": [
+          {
+            "id": "track",
+            "type": "number"
+          },
+          {
+            "id": "animation",
+            "type": "string"
+          },
+          {
+            "id": "loop",
+            "type": "boolean"
+          }
+        ]
+      }
+    ],
+    "expressions": [
+      {
+        "id": "double",
+        "expressionName": "Double",
+        "highlight": true,
+        "returnType": "number",
+        "params": [
+          {
+            "id": "number",
+            "type": "number"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -27,11 +27,10 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { NumberArrayLike, Color, SkeletonClipping, Vector2, Utils, Skeleton, BlendMode, RegionAttachment, TextureAtlasRegion, MeshAttachment, ClippingAttachment } from "@esotericsoftware/spine-core";
+import { BlendMode, ClippingAttachment, Color, MeshAttachment, NumberArrayLike, RegionAttachment, Skeleton, SkeletonClipping, TextureAtlasRegion, Utils, Vector2 } from "@esotericsoftware/spine-core";
 import { GLTexture } from "./GLTexture.js";
 import { PolygonBatcher } from "./PolygonBatcher.js";
 import { ManagedWebGLRenderingContext } from "./WebGL.js";
-
 
 class Renderable {
 	constructor (public vertices: NumberArrayLike, public numVertices: number, public numFloats: number) { }

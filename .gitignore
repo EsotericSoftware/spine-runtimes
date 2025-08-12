@@ -142,6 +142,8 @@ spine-cocos2dx/example-v4/cocos2dx.zip
 
 spine-ts/spine-core/dist
 spine-ts/spine-canvas/dist
+spine-ts/spine-construct3/dist
+spine-ts/spine-construct3-lib/dist
 spine-ts/spine-webgl/dist
 spine-ts/spine-player/dist
 spine-ts/spine-webcomponents/dist

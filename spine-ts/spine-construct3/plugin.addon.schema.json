@@ -1,0 +1,73 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://construct.net/sdk/schema/plugin.addon.schema.json",
+    "title": "Plugin addon.json",
+    "description": "Main JSON file that describes metadata about a plugin.",
+    "type": "object",
+    "properties": {
+        "is-c3-addon": {
+            "description": "This is used by Construct to identify valid addons.",
+            "const": true
+        },
+        "sdk-version": {
+            "description": "The version of the Addon SDK used for this addon.",
+            "enum": [1, 2]
+        },
+        "type": {
+            "description": "Indicates the addon type. For the plugin schema, this must be \"plugin\".",
+            "const": "plugin"
+        },
+        "name": {
+            "description": "The displayed name of the addon, in English. This can be changed after release.",
+            "type": "string"
+        },
+        "id": {
+            "description": "The unique ID of the addon. This must not be used by any other addon ever published for Construct, and must never change after you first publish your addon. It is recommended to use a vendor-specific prefix, e.g. MyCompany_MyAddon.",
+            "type": "string"
+        },
+        "version": {
+            "description": "A string specifying the addon version in four parts (major, minor, patch, revision).",
+            "type": "string"
+        },
+        "min-construct-version": {
+            "description": "The minimum Construct version required to use this addon, e.g. \"r400\"",
+            "type": "string"
+        },
+        "supports-worker-mode": {
+            "description": "Whether the addon supports running in worker mode, where the Construct runtime is hosted in a Web Worker. Defaults to true; if set to false the presence of the addon in a project will block the runtime from using worker mode.",
+            "type": "boolean"
+        },
+        "author": {
+            "description": "A string identifying the author of the addon.",
+            "type": "string"
+        },
+        "website": {
+            "description": "A string of a URL to the author's website. It is recommended to provide updates to the addon at this URL if any become available. The website should use HTTPS.",
+            "type": "string",
+            "format": "uri"
+        },
+        "documentation": {
+            "description": "A string of a URL to the online documentation for the addon. It is important to provide documentation for your addon to be useful to users.",
+            "type": "string",
+            "format": "uri"
+        },
+        "description": {
+            "description": "A string of a brief description of what the addon does, displayed when prompting the user to install the addon.",
+            "type": "string"
+        },
+        "editor-scripts": {
+            "description": "An array of script files in the addon package to load in the editor.",
+            "type": "array",
+            "items": { "type": "string" },
+            "minItems": 1,
+            "uniqueItems": true
+        },
+        "file-list": {
+            "description": "A list of all files used by the addon. Required for Developer Mode addons to work.",
+            "type": "array",
+            "items": { "type": "string" }
+        }
+    },
+    "required": ["is-c3-addon", "type", "name", "id", "version", "author", "website", "documentation", "description", "editor-scripts"]
+}
+    

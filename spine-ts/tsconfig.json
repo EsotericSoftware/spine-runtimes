@@ -11,6 +11,12 @@
       "path": "./spine-canvaskit"
     },
     {
+      "path": "./spine-construct3"
+    },
+    {
+      "path": "./spine-construct3-lib"
+    },
+    {
       "path": "./spine-webgl"
     },
     {

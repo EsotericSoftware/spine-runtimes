@@ -1,0 +1,38 @@
+﻿{
+  "$schema": "./plugin.addon.schema.json",
+
+  "is-c3-addon": true,
+  "sdk-version": 2,
+  "min-construct-version": "r401",
+  "type": "plugin",
+  "name": "My Spine plugin",
+  "id": "EsotericSoftware_SpineConstruct3",
+  "version": "1.0.0.1",
+  "author": "Esoteric Software",
+  "website": "https://www.esotericsoftware.com",
+  "documentation": "https://www.esotericsoftware.com",
+  "description": "Example custom drawing Construct 3 plugin.",
+  "editor-scripts": [
+    "plugin.js",
+    "type.js",
+    "instance.js",
+    "c3runtime/spine-construct3-lib.js"
+  ],
+  "file-list": [
+    "c3runtime/main.js",
+    "c3runtime/plugin.js",
+    "c3runtime/type.js",
+    "c3runtime/instance.js",
+    "c3runtime/conditions.js",
+    "c3runtime/actions.js",
+    "c3runtime/expressions.js",
+    "lang/en-US.json",
+    "aces.json",
+    "addon.json",
+    "icon.svg",
+    "plugin.js",
+    "c3runtime/spine-construct3-lib.js",
+    "type.js",
+    "instance.js"
+  ]
+}

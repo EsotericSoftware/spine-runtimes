@@ -1084,7 +1084,7 @@ export class TrackEntry {
 }
 
 export class EventQueue {
-	objects: Array<any> = [];
+	objects: Array<AnimationEventType | TrackEntry | Event> = [];
 	drainDisabled = false;
 	animState: AnimationState;
 
@@ -1093,34 +1093,34 @@ export class EventQueue {
 	}
 
 	start (entry: TrackEntry) {
-		this.objects.push(EventType.start);
+		this.objects.push("start");
 		this.objects.push(entry);
 		this.animState.animationsChanged = true;
 	}
 
 	interrupt (entry: TrackEntry) {
-		this.objects.push(EventType.interrupt);
+		this.objects.push("interrupt");
 		this.objects.push(entry);
 	}
 
 	end (entry: TrackEntry) {
-		this.objects.push(EventType.end);
+		this.objects.push("end");
 		this.objects.push(entry);
 		this.animState.animationsChanged = true;
 	}
 
 	dispose (entry: TrackEntry) {
-		this.objects.push(EventType.dispose);
+		this.objects.push("dispose");
 		this.objects.push(entry);
 	}
 
 	complete (entry: TrackEntry) {
-		this.objects.push(EventType.complete);
+		this.objects.push("complete");
 		this.objects.push(entry);
 	}
 
 	event (entry: TrackEntry, event: Event) {
-		this.objects.push(EventType.event);
+		this.objects.push("event");
 		this.objects.push(entry);
 		this.objects.push(event);
 	}
@@ -1133,31 +1133,31 @@ export class EventQueue {
 		const objects = this.objects;
 
 		for (let i = 0; i < objects.length; i += 2) {
-			const type = objects[i] as EventType;
+			const type = objects[i] as AnimationEventType;
 			const entry = objects[i + 1] as TrackEntry;
 			switch (type) {
-				case EventType.start:
+				case "start":
 					if (entry.listener && entry.listener.start) entry.listener.start(entry);
 					for (let ii = 0; ii < listeners.length; ii++) {
 						const listener = listeners[ii];
 						if (listener.start) listener.start(entry);
 					}
 					break;
-				case EventType.interrupt:
+				case "interrupt":
 					if (entry.listener && entry.listener.interrupt) entry.listener.interrupt(entry);
 					for (let ii = 0; ii < listeners.length; ii++) {
 						const listener = listeners[ii];
 						if (listener.interrupt) listener.interrupt(entry);
 					}
 					break;
-				case EventType.end:
+				case "end":
 					if (entry.listener && entry.listener.end) entry.listener.end(entry);
 					for (let ii = 0; ii < listeners.length; ii++) {
 						const listener = listeners[ii];
 						if (listener.end) listener.end(entry);
 					}
 				// Fall through.
-				case EventType.dispose:
+				case "dispose":
 					if (entry.listener && entry.listener.dispose) entry.listener.dispose(entry);
 					for (let ii = 0; ii < listeners.length; ii++) {
 						const listener = listeners[ii];
@@ -1165,14 +1165,14 @@ export class EventQueue {
 					}
 					this.animState.trackEntryPool.free(entry);
 					break;
-				case EventType.complete:
+				case "complete":
 					if (entry.listener && entry.listener.complete) entry.listener.complete(entry);
 					for (let ii = 0; ii < listeners.length; ii++) {
 						const listener = listeners[ii];
 						if (listener.complete) listener.complete(entry);
 					}
 					break;
-				case EventType.event:
+				case "event":
 					const event = objects[i++ + 2] as Event;
 					if (entry.listener && entry.listener.event) entry.listener.event(entry, event);
 					for (let ii = 0; ii < listeners.length; ii++) {
@@ -1190,10 +1190,6 @@ export class EventQueue {
 	clear () {
 		this.objects.length = 0;
 	}
-}
-
-export enum EventType {
-	start, interrupt, end, dispose, complete, event
 }
 
 /** The interface to implement for receiving TrackEntry events. It is always safe to call AnimationState methods when receiving
@@ -1230,7 +1226,17 @@ export interface AnimationStateListener {
 	event?: (entry: TrackEntry, event: Event) => void;
 }
 
-export abstract class AnimationStateAdapter implements AnimationStateListener {
+export type AnimationEventType = keyof AnimationStateListener;
+
+export const EventType: Record<AnimationEventType, number> = {
+	start: 0,
+	interrupt: 1,
+	end: 2,
+	dispose: 3,
+	complete: 4,
+	event: 5,
+};
+export abstract class AnimationStateAdapter implements Required<AnimationStateListener> {
 	start (entry: TrackEntry) {
 	}
 

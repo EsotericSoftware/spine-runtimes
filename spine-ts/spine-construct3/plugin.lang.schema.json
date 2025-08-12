@@ -1,0 +1,208 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://construct.net/sdk/schema/plugin.lang.schema.json",
+    "title": "Plugin language file JSON",
+    "description": "The language file with strings for a plugin.",
+    "type": "object",
+    "properties": {
+        "languageTag": {
+            "description": "An IETF language tag defining the translation language, e.g. \"en-US\".",
+            "type": "string"
+        },
+        "fileDescription": {
+            "description": "Optional description for this file (as a comment only).",
+            "type": "string"
+        },
+        "text": {
+            "type": "object",
+            "properties": {
+                "plugins": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "description": "The display name of the plugin.",
+                                "type": "string"
+                            },
+                            "description": {
+                                "description": "The description of the plugin.",
+                                "type": "string"
+                            },
+                            "help-url": {
+                                "description": "A URL for documentation or support.",
+                                "type": "string",
+                                "format": "uri"
+                            },
+                            "properties": {
+                                "description": "Language strings for plugin properties.",
+                                "type": "object",
+                                "additionalProperties": {
+                                    "description": "Language strings for a plugin property by its ID.",
+                                    "type": "object",
+                                    "properties": {
+                                        "name": {
+                                            "description": "Name of this plugin property.",
+                                            "type": "string"
+                                        },
+                                        "desc": {
+                                            "description": "Description of this plugin property.",
+                                            "type": "string"
+                                        },
+                                        "items": {
+                                            "$ref": "#/$defs/comboItems"
+                                        },
+                                        "itemGroups": {
+                                            "$ref": "#/$defs/comboItemGroups"
+                                        },
+                                        "link-text": {
+                                            "description": "Link text for a \"link\" type property.",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": ["name", "desc"],
+                                    "additionalProperties": false
+                                }
+                            },
+                            "aceCategories": {
+                                "description": "Language strings for action/condition/expression categories.",
+                                "type": "object",
+                                "additionalProperties": {
+                                    "description": "Language string for an action/condition/expression category.",
+                                    "type": "string"
+                                }
+                            },
+                            "conditions": {
+                                "type": "object",
+                                "additionalProperties": { "$ref": "#/$defs/acEntry" }
+                            },
+                            "actions": {
+                                "type": "object",
+                                "additionalProperties": { "$ref": "#/$defs/acEntry" }
+                            },
+                            "expressions": {
+                                "type": "object",
+                                "additionalProperties": { "$ref": "#/$defs/expEntry" }
+                            }
+                        },
+                        "required": ["name", "description", "help-url"]
+                    },
+                    "minProperties": 1,
+                    "maxProperties": 1
+                }
+            },
+            "required": ["plugins"],
+            "additionalProperties": false
+        }
+    },
+    "required": ["languageTag", "text"],
+    "$defs": {
+        "acEntry": {
+            "description": "Language strings for conditions or actions by their ID.",
+            "type": "object",
+            "properties": {
+                "list-name": {
+                    "description": "The name that appears in the condition/action picker dialog.",
+                    "type": "string"
+                },
+                "display-text": {
+                    "description": "The text that appears in the event sheet. You can use simple BBCode tags like [b] and [i], and use {0}, {1} etc. as parameter placeholders.",
+                    "type": "string"
+                },
+                "description": {
+                    "description": "A description of the action or condition, which appears as a tip at the top of the condition/action picker dialog.",
+                    "type": "string"
+                },
+                "params": {
+                    "description": "Language strings for parameters of a condition or action.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "description": "Language strings for a parameter of a condition or action by the parameter ID.",
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "description": "Language string for a parameter name.",
+                                "type": "string"
+                            },
+                            "desc": {
+                                "description": "Language string for a parameter description.",
+                                "type": "string"
+                            },
+                            "items": {
+                                "$ref": "#/$defs/comboItems"
+                            }
+                        },
+                        "required": ["name", "desc"],
+                        "additionalProperties": false
+                    }
+                }
+            },
+            "required": ["list-name", "display-text", "description"],
+            "additionalProperties": false
+        },
+        "expEntry": {
+            "description": "Language strings for expressions by their ID.",
+            "type": "object",
+            "properties": {
+                "description": {
+                    "description": "A description of the action or condition, which appears as a tip at the top of the condition/action picker dialog.",
+                    "type": "string"
+                },
+                "translated-name": {
+                    "description": "The translated name of the expression, which must be a valid expression identifier (e.g. no quotes/apostrophes or other characters with special meaning in expressions). Note for en-US this must match the expression name."
+                },
+                "params": {
+                    "description": "Language strings for parameters of an expression.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "description": "Language strings for a parameter of an expression by the parameter ID.",
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "description": "Language string for a parameter name.",
+                                "type": "string"
+                            },
+                            "desc": {
+                                "description": "Language string for a parameter description.",
+                                "type": "string"
+                            }
+                        },
+                        "required": ["name", "desc"],
+                        "additionalProperties": false
+                    }
+                }
+            },
+            "required": ["description", "translated-name"],
+            "additionalProperties": false
+        },
+        "comboItems": {
+            "description": "Items for a combo property, parameter or group.",
+            "type": "object",
+            "minProperties": 1,
+            "additionalProperties": {
+                "description": "Language string for a combo item, with the item ID as the key.",
+                "type": "string"
+            }
+        },
+        "comboItemGroups": {
+            "description": "Items for a combo-grouped parameter.",
+            "type": "object",
+            "minProperties": 1,
+            "additionalProperties": {
+                "description": "Language string for a combo item group.",
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "description": "Name of this combo item group.",
+                        "type": "string"
+                    },
+                    "items": {
+                        "$ref": "#/$defs/comboItems"
+                    }
+                },
+                "required": ["name", "items"]
+            }
+        }
+    }
+}
+    

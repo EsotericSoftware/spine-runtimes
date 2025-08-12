@@ -1,0 +1,132 @@
+﻿{
+  "$schema": "../../plugin.lang.schema.json",
+
+  "languageTag": "en-US",
+  "fileDescription": "Strings for MyDrawingPlugin.",
+  "text": {
+    "plugins": {
+      "esotericsoftware_spineconstruct3": {
+        "name": "Spine",
+        "description": "Spine runtime for Construct3.",
+        "help-url": "https://www.construct.net",
+        "properties": {
+          "spine-skeleton-file": {
+            "name": "Skeleton",
+            "desc": "Skeleton file"
+          },
+          "spine-atlas-file": {
+            "name": "Atlas",
+            "desc": "Atlas file"
+          },
+          "spine-skeleton-file-blob": {
+            "name": "Skel Blob",
+            "desc": "Skel file blob"
+          },
+          "spine-animation": {
+            "name": "animation",
+            "desc": "animation"
+          },
+          "spine-skin": {
+            "name": "skin",
+            "desc": "skin"
+          },
+          "spine-bounds-provider-group": {
+            "name": "Bounds provider",
+            "desc": "Select the desired buound provider and fill the respective properties."
+          },
+          "spine-bounds-provider": {
+            "name": "Bounds provider",
+            "desc": "The bounds provider to use.",
+            "items": {
+              "AABB": "AABB Rectangle",
+              "setup": "Setup pose bounds",
+              "animation-skin": "Animation + Skin bounds"
+            }
+          },
+          "spine-bounds-provider-move": {
+            "name": "Position bounds",
+            "desc": "Keep the skeleton in a fixed position while adjusting the size and position of the bounds."
+          }
+        },
+        "aceCategories": {
+          "custom": "Custom"
+        },
+        "conditions": {
+          "on-skeleton-loaded": {
+            "list-name": "On skeleton loaded",
+            "display-text": "On skeleton loaded",
+            "description": "Do something when skeleton is loaded"
+          },
+          "on-animation-event": {
+            "list-name": "On animation event",
+            "display-text": "On {0} event triggered by animation {2} on track {1} trigger",
+            "description": "Do something when animation event is triggered",
+            "params": {
+              "event": {
+                "name": "Event name",
+                "desc": "Event name"
+              },
+              "animation": {
+                "name": "Animation",
+                "desc": "Animation"
+              },
+              "track": {
+                "name": "Track number",
+                "desc": "Track number"
+              }
+            }
+          }
+        },
+        "actions": {
+          "do-alert": {
+            "list-name": "Do alert",
+            "display-text": "Do alert",
+            "description": "Do a dummy alert."
+          },
+          "set-skin": {
+            "list-name": "Set skin",
+            "display-text": "Set skin {0}",
+            "description": "Set skin",
+            "params": {
+              "skin-name": {
+                "name": "Skins list",
+                "desc": "A comma separated list of skins to set. Empty string to unset skins."
+              }
+            }
+          },
+          "set-animation": {
+            "list-name": "Set animation",
+            "display-text": "Set animation {1} on track {0} with loop {2}",
+            "description": "Set animation",
+            "params": {
+              "track": {
+                "name": "track",
+                "desc": "track"
+              },
+              "animation": {
+                "name": "animations name",
+                "desc": "animations name"
+              },
+              "loop": {
+                "name": "loop",
+                "desc": "loop"
+              }
+            }
+          }
+        },
+        "expressions": {
+          "double": {
+            "description": "Double a number.",
+            "translated-name": "Double",
+            "params": {
+              "number": {
+                "name": "Number",
+                "desc": "The number to double."
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
