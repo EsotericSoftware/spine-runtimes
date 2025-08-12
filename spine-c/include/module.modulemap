@@ -1,4 +1,13 @@
 module SpineC {
-    header "spine-c.h"
-    export *
+    use c
+    export c
+    explicit module cpp {
+        umbrella header "spine/spine.h"
+        requires cplusplus11
+        export *
+    }
+    explicit module c {
+        header "spine-c.h"
+        export *
+    }
 }
