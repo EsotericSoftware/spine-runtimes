@@ -46,6 +46,26 @@
           "spine-bounds-provider-move": {
             "name": "Position bounds",
             "desc": "Keep the skeleton in a fixed position while adjusting the size and position of the bounds."
+          },
+          "spine-scale-x": {
+            "name": "Scale X",
+            "desc": "Scale X"
+          },
+          "spine-scale-y": {
+            "name": "Scale Y",
+            "desc": "Scale Y"
+          },
+          "spine-bounds-offset-x": {
+            "name": "Offset X",
+            "desc": "Offset X"
+          },
+          "spine-bounds-offset-y": {
+            "name": "Offset Y",
+            "desc": "Offset Y"
+          },
+          "spine-bounds-offset-angle": {
+            "name": "Offset Angle",
+            "desc": "Offset Angle"
           }
         },
         "aceCategories": {

@@ -1,4 +1,4 @@
-import { AnimationEventType, AnimationStateListener, BlendingModeSpineToC3, EventType, TrackEntry, type AnimationState, type AssetLoader, type Event, type Skeleton, type SkeletonRendererCore, type SpineBoundsProvider, type TextureAtlas } from "@esotericsoftware/spine-construct3-lib";
+import { AnimationEventType, type AnimationState, AnimationStateListener, type AssetLoader, BlendingModeSpineToC3, type Event, EventType, type Skeleton, type SkeletonRendererCore, type SpineBoundsProvider, type TextureAtlas, TrackEntry } from "@esotericsoftware/spine-construct3-lib";
 
 const C3 = globalThis.C3;
 const spine = globalThis.spine;
@@ -6,10 +6,15 @@ const spine = globalThis.spine;
 spine.Skeleton.yDown = true;
 
 class DrawingInstance extends globalThis.ISDKWorldInstanceBase {
-	atlasProp = "";
-	skelProp = "";
-	skinProp: string[] = [];
-	animationProp?: string;
+	propAtlas = "";
+	propSkel = "";
+	propSkin: string[] = [];
+	propAnimation?: string;
+	propOffsetX = 0;
+	propOffsetY = 0;
+	propOffsetAngle = 0;
+	propScaleX = 1;
+	propScaleY = 1;
 
 	textureAtlas?: TextureAtlas;
 	renderer?: IRenderer;
@@ -20,41 +25,30 @@ class DrawingInstance extends globalThis.ISDKWorldInstanceBase {
 	skeleton?: Skeleton;
 	state?: AnimationState;
 
-	private ratio: number;
-
 	private assetLoader: AssetLoader;
 	private skeletonRenderer: SkeletonRendererCore;
-	private spineBoundsProvider: SpineBoundsProvider;
-	private _spineBounds?: {
-		x: number;
-		y: number;
-		width: number;
-		height: number;
-	};
 
 	constructor () {
 		super();
 
 		const properties = this._getInitProperties();
 		if (properties) {
-			this.atlasProp = properties[0] as string;
-			this.skelProp = properties[1] as string;
+			this.propAtlas = properties[0] as string;
+			this.propSkel = properties[1] as string;
 			const skinProp = properties[2] as string;
-			this.skinProp = skinProp === "" ? [] : skinProp.split(",");
-			this.animationProp = properties[3] as string;
+			this.propSkin = skinProp === "" ? [] : skinProp.split(",");
+			this.propAnimation = properties[3] as string;
+
+			this.propOffsetX = properties[7] as number;
+			this.propOffsetY = properties[8] as number;
+			this.propOffsetAngle = properties[9] as number;
+			this.propScaleX = properties[10] as number;
+			this.propScaleY = properties[11] as number;
 			console.log(properties);
 		}
 
 		this.assetLoader = new spine.AssetLoader("runtime");
 		this.skeletonRenderer = new spine.SkeletonRendererCore();
-
-		if (this.animationProp || (this.skinProp && this.skinProp.length > 0)) {
-			this.spineBoundsProvider = new spine.SkinsAndAnimationBoundsProvider(this.animationProp, this.skinProp);
-		} else {
-			this.spineBoundsProvider = new spine.SetupPoseBoundsProvider();
-		}
-
-		this.ratio = this.width / this.height;
 
 		this._setTicking(true);
 	}
@@ -84,33 +78,30 @@ class DrawingInstance extends globalThis.ISDKWorldInstanceBase {
 		if (!this.atlasLoaded) return;
 		this.skeletonLoading = true;
 
-		const propValue = this.skelProp;
+		const propValue = this.propSkel;
 
 		if (this.atlasLoaded && this.textureAtlas) {
-			const skeletonData = await this.assetLoader.loadSkeletonRuntime(propValue, this.textureAtlas, 0.25, this.plugin.runtime);
+			const skeletonData = await this.assetLoader.loadSkeletonRuntime(propValue, this.textureAtlas, 1, this.plugin.runtime);
 			if (!skeletonData) return;
 
 			this.skeleton = new spine.Skeleton(skeletonData);
 			const animationStateData = new spine.AnimationStateData(skeletonData);
 			this.state = new spine.AnimationState(animationStateData);
 
-			if (this.animationProp) {
-				this.setAnimation(0, this.animationProp, true);
+			if (this.propAnimation) {
+				this.setAnimation(0, this.propAnimation, true);
 			}
 
 			this._setSkin();
 
 			this.update(0);
 
-			this._spineBounds = this.spineBoundsProvider.calculateBounds(this);
-
 			// Initially, width and height are values set on C3 Editor side that allows to determine the right scale
-			this.skeleton.scaleX = this.width / this._spineBounds.width;
-			this.skeleton.scaleY = this.height / this._spineBounds.height;
+			this.skeleton.scaleX = this.propScaleX;
+			this.skeleton.scaleY = this.propScaleY;
 
-			this.setSize(this._spineBounds.width * this.skeleton.scaleX, this._spineBounds.height * -this.skeleton.scaleY);
-			this.setOrigin(-this._spineBounds.x * this.skeleton.scaleX / this.width, this._spineBounds.y * this.skeleton.scaleY / this.height);
-
+			// this.setSize(this._spineBounds.width * this.skeleton.scaleX, this._spineBounds.height * -this.skeleton.scaleY);
+			// this.setOrigin(-this._spineBounds.x * this.skeleton.scaleX / this.width, this._spineBounds.y * this.skeleton.scaleY / this.height);
 
 			this.skeletonLoaded = true;
 			this._trigger(C3.Plugins.EsotericSoftware_SpineConstruct3.Cnds.OnSkeletonLoaded);
@@ -156,7 +147,7 @@ class DrawingInstance extends globalThis.ISDKWorldInstanceBase {
 	}
 
 	public setSkin (skins: string[]) {
-		this.skinProp = skins;
+		this.propSkin = skins;
 		this._setSkin();
 	}
 
@@ -164,7 +155,7 @@ class DrawingInstance extends globalThis.ISDKWorldInstanceBase {
 		const { skeleton } = this;
 		if (!skeleton) return;
 
-		const skins = this.skinProp;
+		const skins = this.propSkin;
 
 		if (skins.length === 0) {
 			skeleton.skin = null;
@@ -208,7 +199,7 @@ class DrawingInstance extends globalThis.ISDKWorldInstanceBase {
 		if (this.atlasLoading || !this.renderer) return;
 		this.atlasLoading = true;
 
-		const textureAtlas = await this.assetLoader.loadAtlasRuntime(this.atlasProp, this.plugin.runtime, this.renderer);
+		const textureAtlas = await this.assetLoader.loadAtlasRuntime(this.propAtlas, this.plugin.runtime, this.renderer);
 		if (!textureAtlas) return;
 
 		this.textureAtlas = textureAtlas;
@@ -230,6 +221,12 @@ class DrawingInstance extends globalThis.ISDKWorldInstanceBase {
 
 		let command = this.skeletonRenderer.render(this.skeleton);
 		const inv255 = 1 / 255;
+		const offsetX = this.x + this.propOffsetX;
+		const offsetY = this.y + this.propOffsetY;
+		const offsetAngle = this.angle + this.propOffsetAngle;
+
+		const cos = Math.cos(offsetAngle);
+		const sin = Math.sin(offsetAngle);
 		while (command) {
 			const { numVertices, positions, uvs, colors, indices, numIndices, blendMode } = command;
 
@@ -238,8 +235,10 @@ class DrawingInstance extends globalThis.ISDKWorldInstanceBase {
 			for (let i = 0; i < numVertices; i++) {
 				const srcIndex = i * 2;
 				const dstIndex = i * 3;
-				vertices[dstIndex] = positions[srcIndex] + this.x;
-				vertices[dstIndex + 1] = positions[srcIndex + 1] + this.y;
+				const x = positions[srcIndex];
+				const y = positions[srcIndex + 1];
+				vertices[dstIndex] = x * cos - y * sin + offsetX;
+				vertices[dstIndex + 1] = x * sin + y * cos + offsetY;
 				vertices[dstIndex + 2] = 0;
 
 				// there's something wrong with the hand after adding the colors on spineboy portal animation

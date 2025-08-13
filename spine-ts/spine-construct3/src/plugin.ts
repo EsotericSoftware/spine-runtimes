@@ -29,6 +29,11 @@ const PLUGIN_CLASS = class MyDrawingPlugin extends SDK.IPluginBase {
 	static PROP_BOUNDS_PROVIDER_GROUP = "spine-bounds-provider-group";
 	static PROP_BOUNDS_PROVIDER = "spine-bounds-provider";
 	static PROP_BOUNDS_PROVIDER_MOVE = "spine-bounds-provider-move";
+	static PROP_BOUNDS_OFFSET_X = "spine-bounds-offset-x";
+	static PROP_BOUNDS_OFFSET_Y = "spine-bounds-offset-y";
+	static PROP_BOUNDS_OFFSET_ANGLE = "spine-bounds-offset-angle";
+	static PROP_SKELETON_SCALE_X = "spine-scale-x";
+	static PROP_SKELETON_SCALE_Y = "spine-scale-y";
 
 	static TYPE_BOUNDS_SETUP = "setup";
 	static TYPE_BOUNDS_ANIMATION_SKIN = "animation-skin";
@@ -98,6 +103,11 @@ const PLUGIN_CLASS = class MyDrawingPlugin extends SDK.IPluginBase {
 				],
 			}),
 			new SDK.PluginProperty("check", MyDrawingPlugin.PROP_BOUNDS_PROVIDER_MOVE, false),
+			new SDK.PluginProperty("float", MyDrawingPlugin.PROP_BOUNDS_OFFSET_X, 0),
+			new SDK.PluginProperty("float", MyDrawingPlugin.PROP_BOUNDS_OFFSET_Y, 0),
+			new SDK.PluginProperty("float", MyDrawingPlugin.PROP_BOUNDS_OFFSET_ANGLE, 0),
+			new SDK.PluginProperty("float", MyDrawingPlugin.PROP_SKELETON_SCALE_X, 1),
+			new SDK.PluginProperty("float", MyDrawingPlugin.PROP_SKELETON_SCALE_Y, 1),
 
 
 		]);

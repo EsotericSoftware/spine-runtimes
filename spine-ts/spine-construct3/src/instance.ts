@@ -30,18 +30,18 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 	private positioningBounds = false;
 	private spineBoundsProviderType: SpineBoundsProviderType = "setup";
 	private spineBoundsProvider?: SpineBoundsProvider;
-	private spineBounds?: {
-		x: number;
-		y: number;
-		width: number;
-		height: number;
-	};
 	private initialBounds = {
 		x: 0,
 		y: 0,
 		width: 0,
 		height: 0,
 	};
+
+	// position mode
+	private positionModePrevX = 0;
+	private positionModePrevY = 0;
+	private positionModePrevAngle = 0;
+	private tempVertices = new Float32Array(4096);
 
 	constructor (sdkType: SDK.ITypeBase, inst: SDK.IWorldInstance) {
 		super(sdkType, inst);
@@ -51,6 +51,7 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 
 		this.assetLoader = new spine.AssetLoader("editor");
 		this.skeletonRenderer = new spine.SkeletonRendererCore();
+
 	}
 
 	Release () {
@@ -58,16 +59,17 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 
 	OnCreate () {
 		console.log("OnCreate");
+		this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_PROVIDER_MOVE, false);
 	}
 
 	OnPlacedInLayout () {
 		this.OnMakeOriginalSize();
 	}
 
-	private tempVertices = new Float32Array(4096);
 	Draw (iRenderer: SDK.Gfx.IWebGLRenderer, iDrawParams: SDK.Gfx.IDrawParams) {
 		this.layoutView ||= iDrawParams.GetLayoutView();
 		this.renderer ||= iRenderer;
+
 
 		this.loadAtlas();
 		this.loadSkeleton();
@@ -75,19 +77,38 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 		if (this.skeleton) {
 			this.setSkin();
 
-			let offsetX = this.baseOffsetX;
-			let offsetY = this.baseOffsetY;
-			let offsetAngle = this.baseAngleOffset;
-			if (!this.positioningBounds) {
-				this.baseScaleX = this._inst.GetWidth() / this.initialBounds.width;
-				this.baseScaleY = this._inst.GetHeight() / this.initialBounds.height;
-				offsetX += this._inst.GetX();
-				offsetY += this._inst.GetY();
-				offsetAngle += this._inst.GetAngle();
-			}
+			const rectX = this._inst.GetX();
+			const rectY = this._inst.GetY();
+			const rectAngle = this._inst.GetAngle();
+			let offsetX = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_X) as number;
+			let offsetY = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_Y) as number;
+			let offsetAngle = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_ANGLE) as number;
 
-			this.skeleton.scaleX = this.baseScaleX;
-			this.skeleton.scaleY = this.baseScaleY;
+			if (!this.positioningBounds) {
+				offsetX += rectX;
+				offsetY += rectY;
+				offsetAngle += rectAngle;
+
+				const baseScaleX = this._inst.GetWidth() / this.initialBounds.width;
+				const baseScaleY = this._inst.GetHeight() / this.initialBounds.height;
+				this.skeleton.scaleX = baseScaleX;
+				this.skeleton.scaleY = baseScaleY;
+				this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_SKELETON_SCALE_X, baseScaleX);
+				this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_SKELETON_SCALE_Y, baseScaleY);
+			} else {
+				offsetX += this.positionModePrevX;
+				offsetY += this.positionModePrevY;
+				offsetAngle += this.positionModePrevAngle;
+				this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_X, offsetX - rectX);
+				this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_Y, offsetY - rectY);
+				this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_ANGLE, offsetAngle - rectAngle);
+				this.positionModePrevX = rectX;
+				this.positionModePrevY = rectY;
+				this.positionModePrevAngle = rectAngle;
+
+				this.skeleton.scaleX = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_SKELETON_SCALE_X) as number;
+				this.skeleton.scaleY = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_SKELETON_SCALE_Y) as number;
+			}
 
 			const cos = Math.cos(offsetAngle);
 			const sin = Math.sin(offsetAngle);
@@ -123,7 +144,8 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 			iRenderer.SetColorFillMode();
 			iRenderer.SetColorRgba(0.25, 0, 0, 0.25);
 			iRenderer.LineQuad(this._inst.GetQuad());
-
+			iRenderer.Line(rectX, rectY, offsetX, offsetY);
+			console.log(offsetX, offsetY);
 		} else {
 			// render placeholder
 			iRenderer.SetAlphaBlend();
@@ -137,12 +159,6 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 			iRenderer.Quad(this._inst.GetQuad());
 		}
 	}
-
-	private baseOffsetX = 0;
-	private baseOffsetY = 0;
-	private baseAngleOffset = 0;
-	private baseScaleX = 0;
-	private baseScaleY = 0;
 
 	async OnPropertyChanged (id: string, value: EditorPropertyValueType) {
 		console.log(`Prop change - Name: ${id} - Value: ${value}`);
@@ -162,20 +178,22 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 				break;
 			case PLUGIN_CLASS.PROP_BOUNDS_PROVIDER:
 				this.setC3Bounds(true);
+				this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_X, 0);
+				this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_Y, 0);
+				this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_ANGLE, 0);
 				this.layoutView?.Refresh();
 				break;
 			case PLUGIN_CLASS.PROP_BOUNDS_PROVIDER_MOVE: {
 				value = value as boolean
 				if (value) {
-					this.baseOffsetX += this._inst.GetX();
-					this.baseOffsetY += this._inst.GetY();
-					this.baseAngleOffset += this._inst.GetAngle();
+					this.positionModePrevX = this._inst.GetX();
+					this.positionModePrevY = this._inst.GetY();
+					this.positionModePrevAngle = this._inst.GetAngle();
 				} else {
-					this.initialBounds.width = this._inst.GetWidth() / this.baseScaleX;
-					this.initialBounds.height = this._inst.GetHeight() / this.baseScaleY;
-					this.baseOffsetX -= this._inst.GetX();
-					this.baseOffsetY -= this._inst.GetY();
-					this.baseAngleOffset -= this._inst.GetAngle();
+					const scaleX = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_SKELETON_SCALE_X) as number;
+					const scaleY = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_SKELETON_SCALE_Y) as number;
+					this.initialBounds.width = this._inst.GetWidth() / scaleX;
+					this.initialBounds.height = this._inst.GetHeight() / scaleY;
 				}
 				this.positioningBounds = value;
 				break;
@@ -242,7 +260,14 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 			this.update(0);
 
 			this.setSkin();
-			this.setC3Bounds(true);
+
+			const offsetX = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_X) as number;
+			const offsetY = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_Y) as number;
+			const offsetAngle = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_ANGLE) as number;
+			const scaleX = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_SKELETON_SCALE_X) as number;
+			const scaleY = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_SKELETON_SCALE_Y) as number;
+			const init = offsetX !== 0 && offsetY !== 0 && offsetAngle !== 0 && scaleX !== 1 && scaleY !== 1;
+			this.setC3Bounds(init);
 
 			this.layoutView?.Refresh();
 			console.log("SKELETON LOADED");
@@ -251,8 +276,6 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 
 	private setC3Bounds (init = false) {
 		const propValue = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_PROVIDER) as SpineBoundsProviderType;
-
-		console.log(propValue);
 
 		if (propValue === "animation-skin") {
 			const { skins, animation } = this;
@@ -267,16 +290,19 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 			this.spineBoundsProvider = new spine.AABBRectangleBoundsProvider(0, 0, 100, 100);
 		}
 
-
-		this.spineBounds = this.spineBoundsProvider.calculateBounds(this);
 		this.initialBounds = this.spineBoundsProvider.calculateBounds(this);
 
-		const { x, y, width, height } = this.spineBounds;
+		const { x, y, width, height } = this.initialBounds;
 
 		if (width <= 0 || height <= 0 || !init) return;
 
 		this._inst.SetSize(width, height);
-		this._inst.SetOrigin(-x / width, -y / height);
+
+		if (propValue === "AABB") {
+			this._inst.SetOrigin(.5, .5);
+		} else {
+			this._inst.SetOrigin(-x / width, -y / height);
+		}
 	}
 
 	private update (delta: number) {
@@ -315,20 +341,20 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 	}
 
 	GetOriginalWidth () {
-		if (!this.spineBounds) return 100;
-		return this.spineBounds.width;
+		if (!this.initialBounds) return 100;
+		return this.initialBounds.width;
 	}
 
 	GetOriginalHeight () {
-		if (!this.spineBounds) return 100;
-		return this.spineBounds.height;
+		if (!this.initialBounds) return 100;
+		return this.initialBounds.height;
 	}
 
 	OnMakeOriginalSize () {
-		if (!this.spineBounds)
+		if (!this.initialBounds)
 			this._inst.SetSize(100, 100);
 		else
-			this._inst.SetSize(this.spineBounds.width, this.spineBounds.height);
+			this._inst.SetSize(this.initialBounds.width, this.initialBounds.height);
 	}
 
 	HasDoubleTapHandler () {
