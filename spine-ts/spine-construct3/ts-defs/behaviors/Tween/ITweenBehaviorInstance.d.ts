@@ -19,7 +19,7 @@ interface StartTweenOpts {
  * @see {@link https://www.construct.net/make-games/manuals/construct-3/scripting/scripting-reference/behavior-interfaces/tween | ITweenBehaviorInstance documentation } */
 declare class ITweenBehaviorInstance<InstType> extends IBehaviorInstance<InstType>
 {
-	startTween(prop: TweenPropertyType, endValue: TweenEndValueType, time: number, ease: TweenBuiltInEaseType, opts?: StartTweenOpts): ITweenState;
+	startTween(prop: TweenPropertyType, endValue: TweenEndValueType, time: number, ease: TweenBuiltInEaseType | TweenCustomEaseType, opts?: StartTweenOpts): ITweenState;
 
 	allTweens(): Generator<ITweenState>;
 	tweensByTags(tags: string | string[]): Generator<ITweenState>;

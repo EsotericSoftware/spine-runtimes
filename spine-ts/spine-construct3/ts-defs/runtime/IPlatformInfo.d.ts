@@ -1,7 +1,7 @@
 
-type PlatformInfoExportType = "preview" | "html5" | "scirra-arcade" | "cordova-android" | "cordova-ios" | "nwjs" | "windows-webview2" | "macos-wkwebview" | "xbox-uwp-webview2" | "instant-games" | "playable-ad" | "linux-cef";
+type PlatformInfoExportType = "preview" | "html5" | "scirra-arcade" | "cordova-android" | "cordova-ios" | "windows-webview2" | "macos-wkwebview" | "xbox-uwp-webview2" | "instant-games" | "playable-ad" | "linux-cef";
 type PlatformInfoOSType = "windows" | "macos" | "linux" | "chrome-os" | "android" | "ios" | "unknown";
-type PlatformInfoBrowserType = "chrome" | "chromium" | "edge" | "opera" | "nwjs" | "firefox" | "safari" | "unknown";
+type PlatformInfoBrowserType = "chrome" | "chromium" | "edge" | "opera" | "firefox" | "safari" | "unknown";
 type PlatformInfoBrowserEngineType = "chromium" | "gecko" | "webkit";
 
 /** Provides details about the current platform, such as browser, operating system and environment. */

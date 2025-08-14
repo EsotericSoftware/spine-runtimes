@@ -35,7 +35,7 @@ declare class IRenderer
     resetColor(): void;
 
     setCurrentZ(z: number): void;
-    getCurrentZ(): void;
+    getCurrentZ(): number;
 
     setCullFaceMode(m: RendererCullFaceMode): void;
     getCullFaceMode(): RendererCullFaceMode;

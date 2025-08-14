@@ -15,8 +15,14 @@ declare namespace SDK {
 		GetInstanceByUID(uid: number): SDK.IObjectInstance | null;
 
 		AddOrReplaceProjectFile(blob: Blob, filename: string, kind?: EditorProjectFileKind): void;
-		GetProjectFileByName(name: string): SDK.IProjectFile | null;
+		
+		GetProjectFileBySID(sid: number): SDK.IProjectFile | null;
 		GetProjectFileByExportPath(path: string): SDK.IProjectFile | null;
+
+		/**
+		 * @deprecated Use GetProjectFileByExportPath() instead of GetProjectFileByName() as it supports files with the same name in different folders.
+		 */
+		GetProjectFileByName(name: string): SDK.IProjectFile | null;
 
 		ShowImportAudioDialog(fileList: Blob[]): void;
 		EnsureFontLoaded(fontName: string): Promise<void>;

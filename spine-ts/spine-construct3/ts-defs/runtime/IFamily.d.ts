@@ -9,5 +9,5 @@ declare class IFamily<InstanceType extends IInstance, EventMapType = ObjectClass
 	objectTypes(): Generator<IObjectType<InstanceType>>;
 
 	/** Check if a given object type belongs to this family. */
-	hasObjectType(objectType: IObjectType<InstanceType>): boolean;
+	hasObjectType(objectType: IObjectType): boolean;
 }

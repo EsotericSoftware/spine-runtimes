@@ -8,4 +8,6 @@ declare class ITweenState extends ITimelineStateBase
     readonly instance: IWorldInstance;
     isDestroyOnComplete: boolean;
     readonly value: number;
+    readonly finished: Promise<void>;
+    readonly released: Promise<void>;
 }

@@ -31,6 +31,10 @@ interface TextFragmentPositionAndSize {
 	height: number
 }
 
+type Vec2Arr = [number, number];
+type Vec3Arr = [number, number, number];
+type Vec4Arr = [number, number, number, number];
+
 type SDKPropertyType = number | string | boolean;
 type WrapperExtensionParameterType = number | string | boolean;
 
@@ -79,6 +83,8 @@ interface RuntimeEventMap {
 	"suspend": ConstructEvent;
 	"resume": ConstructEvent;
 	"resize": ConstructResizeEvent;
+	"windowmaximize": ConstructEvent,
+	"windowminimize": ConstructEvent,
 	"pretick": ConstructEvent;
 	"tick": ConstructEvent;
 	"tick2": ConstructEvent;
@@ -144,7 +150,7 @@ declare class IRuntime extends ConstructEventTarget<RuntimeEventMap>
 	getViewportSize(): Vec2Arr;
 
 	readonly sampling: SamplingModeType;
-	readonly isPixelRoundingEnabled: boolean;
+	isPixelRoundingEnabled: boolean;
 
 	get dt(): number;
 	get dtRaw(): number;
@@ -182,7 +188,7 @@ declare class IRuntime extends ConstructEventTarget<RuntimeEventMap>
 
 	signal(tag: string): void;
 	waitForSignal(tag: string): Promise<void>;
-
+	
 	/** When called from an event sheet, sets the current function return value,
 	 * much like the 'Set return value' action.	 */
 	setReturnValue(value: number | string): void;
