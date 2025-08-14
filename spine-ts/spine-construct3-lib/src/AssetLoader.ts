@@ -32,32 +32,30 @@ import { C3Texture, C3TextureEditor } from "./C3Texture";
 
 
 export class AssetLoader {
-	constructor (private type: "editor" | "runtime") {
-	}
 
-	public async loadSkeletonEditor (path: string, textureAtlas: TextureAtlas, instance: SDK.IWorldInstance) {
-		const projectFile = instance.GetProject().GetProjectFileByName(path);
+	public async loadSkeletonEditor (sid: number, textureAtlas: TextureAtlas, scale = 1, instance: SDK.IWorldInstance) {
+		const projectFile = instance.GetProject().GetProjectFileBySID(sid);
 		if (!projectFile) return null;
 
 		const blob = projectFile.GetBlob();
 		const atlasLoader = new AtlasAttachmentLoader(textureAtlas);
 
-		const isBinary = path.endsWith(".skel");
+		const isBinary = projectFile.GetName().endsWith(".skel");
 		if (isBinary) {
 			const skeletonFile = await blob.arrayBuffer();
 			const skeletonLoader = new SkeletonBinary(atlasLoader);
-			skeletonLoader.scale = 1;
+			skeletonLoader.scale = scale;
 			return skeletonLoader.readSkeletonData(skeletonFile);
 		}
 
 		const skeletonFile = await blob.text();
 		const skeletonLoader = new SkeletonJson(atlasLoader);
-		skeletonLoader.scale = 1;
+		skeletonLoader.scale = scale;
 		return skeletonLoader.readSkeletonData(skeletonFile);
 	}
 
-	public async loadAtlasEditor (path: string, instance: SDK.IWorldInstance, renderer: SDK.Gfx.IWebGLRenderer) {
-		const projectFile = instance.GetProject().GetProjectFileByName(path);
+	public async loadAtlasEditor (sid: number, instance: SDK.IWorldInstance, renderer: SDK.Gfx.IWebGLRenderer) {
+		const projectFile = instance.GetProject().GetProjectFileBySID(sid);
 		if (!projectFile) return null;
 
 		const blob = projectFile.GetBlob();
@@ -77,31 +75,31 @@ export class AssetLoader {
 	}
 
 	public async loadSpineTextureEditor (pageName: string, pma = false, instance: SDK.IWorldInstance) {
-		const projectFile = instance.GetProject().GetProjectFileByName(pageName);
+		const projectFile = instance.GetProject().GetProjectFileByExportPath(pageName);
 		if (!projectFile) {
 			throw new Error(`An error occured while loading the texture: ${pageName}`);
 		}
 
 		const content = projectFile.GetBlob();
-		return this.createImageBitmapFromBlob(content, pma);
+		return AssetLoader.createImageBitmapFromBlob(content, pma);
 	}
 
 	public async loadSkeletonRuntime (path: string, textureAtlas: TextureAtlas, scale = 1, instance: IRuntime) {
 		const fullPath = await instance.assets.getProjectFileUrl(path);
 		if (!fullPath) return null;
 
-		const content = await instance.assets.fetchArrayBuffer(fullPath);
-		if (!content) return null;
-
 		const atlasLoader = new AtlasAttachmentLoader(textureAtlas);
 
 		const isBinary = path.endsWith(".skel");
 		if (isBinary) {
+			const content = await instance.assets.fetchArrayBuffer(fullPath);
+			if (!content) return null;
 			const skeletonLoader = new SkeletonBinary(atlasLoader);
 			skeletonLoader.scale = scale;
 			return skeletonLoader.readSkeletonData(content);
 		}
-
+		const content = await instance.assets.fetchJson(fullPath);
+		if (!content) return null;
 		const skeletonLoader = new SkeletonJson(atlasLoader);
 		skeletonLoader.scale = scale;
 		return skeletonLoader.readSkeletonData(content);
@@ -133,10 +131,10 @@ export class AssetLoader {
 		const content = await instance.assets.fetchBlob(fullPath);
 		if (!content) return null;
 
-		return this.createImageBitmapFromBlob(content, pma);
+		return AssetLoader.createImageBitmapFromBlob(content, pma);
 	}
 
-	private async createImageBitmapFromBlob (blob: Blob, pma: boolean): Promise<ImageBitmap | null> {
+	static async createImageBitmapFromBlob (blob: Blob, pma: boolean): Promise<ImageBitmap | null> {
 		try {
 			return createImageBitmap(blob, { premultiplyAlpha: pma ? "none" : "premultiply" });
 		} catch (e) {

@@ -14,34 +14,34 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 	private layoutView?: SDK.UI.ILayoutView;
 	private renderer?: SDK.Gfx.IWebGLRenderer;
 
-	private currentSkelName = "";
-	private currentAtlasName = "";
+	private currentAtlasFileSID = -1;
 	private textureAtlas?: TextureAtlas;
 
 	skeleton?: Skeleton;
 	state?: AnimationState;
 	skins: string[] = [];
-	currentSkinString?: string;
 	animation?: string;
 
 	private assetLoader: AssetLoader;
 	private skeletonRenderer: SkeletonRendererCore;
 
-	private positioningBounds = false;
-	private spineBoundsProviderType: SpineBoundsProviderType = "setup";
-	private spineBoundsProvider?: SpineBoundsProvider;
-	private initialBounds = {
-		x: 0,
-		y: 0,
-		width: 0,
-		height: 0,
-	};
-
 	// position mode
+	private positioningBounds = false;
 	private positionModePrevX = 0;
 	private positionModePrevY = 0;
 	private positionModePrevAngle = 0;
+	private spineBounds = {
+		x: 0,
+		y: 0,
+		width: 100,
+		height: 100,
+	};
+
+	// utils for drawing
 	private tempVertices = new Float32Array(4096);
+
+	// errors
+	private errors: Record<string, string> = {};
 
 	constructor (sdkType: SDK.ITypeBase, inst: SDK.IWorldInstance) {
 		super(sdkType, inst);
@@ -49,17 +49,18 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 		if (!spine) spine = globalThis.spine;
 		spine.Skeleton.yDown = true;
 
-		this.assetLoader = new spine.AssetLoader("editor");
+		this.assetLoader = new spine.AssetLoader();
 		this.skeletonRenderer = new spine.SkeletonRendererCore();
 
+		(this._inst as any).errors = this.errors;
 	}
 
 	Release () {
 	}
 
 	OnCreate () {
-		console.log("OnCreate");
 		this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_PROVIDER_MOVE, false);
+		this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_SKELETON) as number;
 	}
 
 	OnPlacedInLayout () {
@@ -69,7 +70,6 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 	Draw (iRenderer: SDK.Gfx.IWebGLRenderer, iDrawParams: SDK.Gfx.IDrawParams) {
 		this.layoutView ||= iDrawParams.GetLayoutView();
 		this.renderer ||= iRenderer;
-
 
 		this.loadAtlas();
 		this.loadSkeleton();
@@ -89,8 +89,8 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 				offsetY += rectY;
 				offsetAngle += rectAngle;
 
-				const baseScaleX = this._inst.GetWidth() / this.initialBounds.width;
-				const baseScaleY = this._inst.GetHeight() / this.initialBounds.height;
+				const baseScaleX = this._inst.GetWidth() / this.spineBounds.width;
+				const baseScaleY = this._inst.GetHeight() / this.spineBounds.height;
 				this.skeleton.scaleX = baseScaleX;
 				this.skeleton.scaleY = baseScaleY;
 				this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_SKELETON_SCALE_X, baseScaleX);
@@ -129,7 +129,9 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 					vertices[dstIndex + 2] = 0;
 				}
 
+				iRenderer.ResetColor();
 				iRenderer.SetAlphaBlend();
+				iRenderer.SetTextureFillMode();
 				iRenderer.SetTexture(command.texture.texture);
 				iRenderer.DrawMesh(
 					vertices.subarray(0, numVertices * 3),
@@ -145,59 +147,96 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 			iRenderer.SetColorRgba(0.25, 0, 0, 0.25);
 			iRenderer.LineQuad(this._inst.GetQuad());
 			iRenderer.Line(rectX, rectY, offsetX, offsetY);
-			console.log(offsetX, offsetY);
+
+			if (this.hasErrors()) {
+				iRenderer.SetColorFillMode();
+				iRenderer.SetColorRgba(1, 0, 0, .5);
+				iRenderer.Quad(this._inst.GetQuad());
+			}
 		} else {
-			// render placeholder
-			iRenderer.SetAlphaBlend();
-			iRenderer.SetColorFillMode();
 
-			if (this.HadTextureError())
-				iRenderer.SetColorRgba(0.25, 0, 0, 0.25);
-			else
-				iRenderer.SetColorRgba(0, 0, 0.1, 0.1);
+			const sdkType = (this._sdkType as any);
 
-			iRenderer.Quad(this._inst.GetQuad());
+
+			const logo = sdkType.getSpineLogo(iRenderer);
+			if (logo) {
+				iRenderer.ResetColor();
+				iRenderer.SetAlphaBlend();
+				iRenderer.SetTexture(logo);
+				iRenderer.Quad(this._inst.GetQuad());
+			} else {
+				iRenderer.SetAlphaBlend();
+				iRenderer.SetColorFillMode();
+
+				if (this.HadTextureError())
+					iRenderer.SetColorRgba(0.25, 0, 0, 0.25);
+				else
+					iRenderer.SetColorRgba(0, 0, 0.1, 0.1);
+
+				iRenderer.Quad(this._inst.GetQuad());
+			}
+
+
 		}
 	}
 
 	async OnPropertyChanged (id: string, value: EditorPropertyValueType) {
 		console.log(`Prop change - Name: ${id} - Value: ${value}`);
 
-		switch (id) {
-			case PLUGIN_CLASS.PROP_ATLAS:
-				this.layoutView?.Refresh();
-				break;
-			case PLUGIN_CLASS.PROP_SKELETON:
-				this.layoutView?.Refresh();
-				break;
-			case PLUGIN_CLASS.PROP_SKIN:
-				this.layoutView?.Refresh();
-				break;
-			case PLUGIN_CLASS.PROP_ANIMATION:
-				this.layoutView?.Refresh();
-				break;
-			case PLUGIN_CLASS.PROP_BOUNDS_PROVIDER:
-				this.setC3Bounds(true);
-				this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_X, 0);
-				this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_Y, 0);
-				this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_ANGLE, 0);
-				this.layoutView?.Refresh();
-				break;
-			case PLUGIN_CLASS.PROP_BOUNDS_PROVIDER_MOVE: {
-				value = value as boolean
-				if (value) {
-					this.positionModePrevX = this._inst.GetX();
-					this.positionModePrevY = this._inst.GetY();
-					this.positionModePrevAngle = this._inst.GetAngle();
-				} else {
-					const scaleX = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_SKELETON_SCALE_X) as number;
-					const scaleY = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_SKELETON_SCALE_Y) as number;
-					this.initialBounds.width = this._inst.GetWidth() / scaleX;
-					this.initialBounds.height = this._inst.GetHeight() / scaleY;
-				}
-				this.positioningBounds = value;
-				break;
+		if (id === PLUGIN_CLASS.PROP_ATLAS) {
+			this.textureAtlas?.dispose();
+			this.textureAtlas = undefined;
+			this.skins = [];
+			this.layoutView?.Refresh();
+			return;
+		}
+
+		if (id === PLUGIN_CLASS.PROP_SKELETON) {
+			this.skeleton = undefined;
+			this.skins = [];
+			this.layoutView?.Refresh();
+			return;
+		}
+
+		if (id === PLUGIN_CLASS.PROP_LOADER_SCALE) {
+			this.skeleton = undefined;
+			this.skins = [];
+			this.layoutView?.Refresh();
+			return;
+		}
+
+		if (id === PLUGIN_CLASS.PROP_SKIN) {
+			this.skins = [];
+			this.setSkin();
+			this.layoutView?.Refresh();
+			return;
+		}
+
+		if (id === PLUGIN_CLASS.PROP_ANIMATION) {
+			this.layoutView?.Refresh();
+			return;
+		}
+
+		if (id === PLUGIN_CLASS.PROP_BOUNDS_PROVIDER) {
+			this.resetBounds();
+			this.layoutView?.Refresh();
+			return
+		}
+
+		if (id === PLUGIN_CLASS.PROP_BOUNDS_PROVIDER_MOVE) {
+			value = value as boolean
+			if (value) {
+				this.positionModePrevX = this._inst.GetX();
+				this.positionModePrevY = this._inst.GetY();
+				this.positionModePrevAngle = this._inst.GetAngle();
+			} else {
+				const scaleX = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_SKELETON_SCALE_X) as number;
+				const scaleY = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_SKELETON_SCALE_Y) as number;
+				this.spineBounds.width = this._inst.GetWidth() / scaleX;
+				this.spineBounds.height = this._inst.GetHeight() / scaleY;
 			}
+			this.positioningBounds = value;
+			return
 		}
 
 		console.log("Prop change end");
@@ -209,13 +248,12 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 
 		const propValue = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_SKIN) as string;
 
-		if (this.currentSkinString === propValue) return;
-		this.currentSkinString = propValue;
-
 		const skins = propValue === "" ? [] : propValue.split(",");
 		this.skins = skins;
 
-		if (skins.length === 1) {
+		if (skins.length === 0) {
+			skeleton.setSkin(null);
+		} else if (skins.length === 1) {
 			const skinName = skins[0];
 			const skin = skeleton.data.findSkin(skinName);
 			if (!skin) {
@@ -223,7 +261,7 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 				return;
 			}
 			skeleton.setSkin(skins[0]);
-		} else if (skins.length > 1) {
+		} else {
 			const customSkin = new spine.Skin(propValue);
 			for (const s of skins) {
 				const skin = skeleton.data.findSkin(s)
@@ -238,71 +276,103 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 
 		skeleton.setupPose();
 		this.update(0);
-
-		this.setC3Bounds();
 	}
 
 	private async loadSkeleton () {
-		const propValue = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_SKELETON) as string;
-		const projectFile = this._inst.GetProject().GetProjectFileByName(propValue);
+		if (!this.renderer || !this.textureAtlas) return;
+		if (this.skeleton) return;
 
-		if (projectFile && this.textureAtlas) {
-			if (this.currentSkelName === propValue) return;
-			this.currentSkelName = propValue;
+		console.log("Loading skeleton");
 
-			const skeletonData = await this.assetLoader.loadSkeletonEditor(propValue, this.textureAtlas, this._inst);
-			if (!skeletonData) return;
+		const propValue = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_SKELETON) as number;
+		const loaderScale = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_LOADER_SCALE) as number;
+		const skeletonData = await this.assetLoader.loadSkeletonEditor(propValue, this.textureAtlas, loaderScale, this._inst);
+		console.log(skeletonData);
+		if (!skeletonData) return;
 
-			this.skeleton = new spine.Skeleton(skeletonData);
-			const animationStateData = new spine.AnimationStateData(skeletonData);
-			this.state = new spine.AnimationState(animationStateData);
+		this.skeleton = new spine.Skeleton(skeletonData);
+		const animationStateData = new spine.AnimationStateData(skeletonData);
+		this.state = new spine.AnimationState(animationStateData);
 
-			this.update(0);
+		this.setSkin();
+		this.update(0);
+		this.setBoundsFromBoundsProvider();
+		this.initBounds();
 
-			this.setSkin();
-
-			const offsetX = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_X) as number;
-			const offsetY = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_Y) as number;
-			const offsetAngle = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_ANGLE) as number;
-			const scaleX = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_SKELETON_SCALE_X) as number;
-			const scaleY = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_SKELETON_SCALE_Y) as number;
-			const init = offsetX !== 0 && offsetY !== 0 && offsetAngle !== 0 && scaleX !== 1 && scaleY !== 1;
-			this.setC3Bounds(init);
-
-			this.layoutView?.Refresh();
-			console.log("SKELETON LOADED");
-		}
+		this.layoutView?.Refresh();
+		console.log("SKELETON LOADED");
 	}
 
-	private setC3Bounds (init = false) {
+	private async loadAtlas () {
+		if (!this.renderer) return;
+
+		const propValue = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_ATLAS) as number;
+		console.log("Loading atlas");
+
+		if (this.currentAtlasFileSID === propValue) return;
+		this.currentAtlasFileSID = propValue;
+
+		const textureAtlas = await this.assetLoader.loadAtlasEditor(propValue, this._inst, this.renderer);
+		if (!textureAtlas) return;
+
+		this.textureAtlas = textureAtlas;
+		this.layoutView?.Refresh();
+	}
+
+	private setBoundsFromBoundsProvider () {
 		const propValue = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_PROVIDER) as SpineBoundsProviderType;
 
+		let spineBoundsProvider: SpineBoundsProvider;
 		if (propValue === "animation-skin") {
 			const { skins, animation } = this;
 			if ((skins && skins.length > 0) || animation) {
-				this.spineBoundsProvider = new spine.SkinsAndAnimationBoundsProvider(animation, skins);
+				spineBoundsProvider = new spine.SkinsAndAnimationBoundsProvider(animation, skins);
 			} else {
-				throw new Error("One among skin and animation needs to have a value to set this bounds provider.");
+				return false;
 			}
 		} else if (propValue === "setup") {
-			this.spineBoundsProvider = new spine.SetupPoseBoundsProvider();
+			spineBoundsProvider = new spine.SetupPoseBoundsProvider();
 		} else {
-			this.spineBoundsProvider = new spine.AABBRectangleBoundsProvider(0, 0, 100, 100);
+			spineBoundsProvider = new spine.AABBRectangleBoundsProvider(0, 0, 100, 100);
 		}
 
-		this.initialBounds = this.spineBoundsProvider.calculateBounds(this);
+		this.spineBounds = spineBoundsProvider.calculateBounds(this);
 
-		const { x, y, width, height } = this.initialBounds;
+		return true;
+	}
 
-		if (width <= 0 || height <= 0 || !init) return;
+	private resetBounds () {
+		this.setBoundsFromBoundsProvider();
 
+		if (this.hasErrors()) return;
+		const { x, y, width, height } = this.spineBounds;
+
+		this._inst.SetOrigin(-x / width, -y / height);
 		this._inst.SetSize(width, height);
 
-		if (propValue === "AABB") {
-			this._inst.SetOrigin(.5, .5);
-		} else {
-			this._inst.SetOrigin(-x / width, -y / height);
+		this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_X, 0);
+		this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_Y, 0);
+		this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_ANGLE, 0);
+		return;
+	}
+
+	private initBounds () {
+		const offsetX = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_X) as number;
+		const offsetY = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_Y) as number;
+		const offsetAngle = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_ANGLE) as number;
+		const shiftedBounds = offsetX !== 0 || offsetY !== 0 || offsetAngle !== 0;
+
+		const scaleX = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_SKELETON_SCALE_X) as number;
+		const scaleY = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_SKELETON_SCALE_Y) as number;
+		const scaledBounds = scaleX !== 1 || scaleY !== 1;
+
+		if (shiftedBounds || scaledBounds) {
+			this.spineBounds.width = this._inst.GetWidth() / scaleX;
+			this.spineBounds.height = this._inst.GetHeight() / scaleY;
+			return;
 		}
+
+		this.resetBounds();
 	}
 
 	private update (delta: number) {
@@ -316,19 +386,31 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 		skeleton.updateWorldTransform(spine.Physics.update);
 	}
 
-	private async loadAtlas () {
-		if (!this.renderer) return;
+	private setError (key: string, condition: boolean, message: string) {
+		if (condition) {
+			this.errors[key] = message;
+			return;
+		}
+		delete this.errors[key];
+	}
+	private hasErrors () {
+		const { errors, skins, animation, spineBounds } = this;
 
-		const propValue = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_ATLAS) as string;
+		const boundsType = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_PROVIDER) as SpineBoundsProviderType;
+		this.setError(
+			"boundsAnimationSkinType",
+			boundsType === "animation-skin" && ((!skins || skins.length === 0) && !animation),
+			"Animation/Skin bounds provider requires one between skin and animation to be set."
+		);
 
-		if (this.currentAtlasName === propValue) return;
-		this.currentAtlasName = propValue;
+		const { width, height } = spineBounds;
+		this.setError(
+			"boundsNoDimension",
+			width <= 0 || height <= 0,
+			"A bounds cannot have negative dimension"
+		);
 
-		const textureAtlas = await this.assetLoader.loadAtlasEditor(propValue, this._inst, this.renderer);
-		if (!textureAtlas) return;
-
-		this.textureAtlas = textureAtlas;
-		this.layoutView?.Refresh();
+		return Object.keys(errors).length > 0;
 	}
 
 	GetTexture () {
@@ -341,20 +423,15 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 	}
 
 	GetOriginalWidth () {
-		if (!this.initialBounds) return 100;
-		return this.initialBounds.width;
+		return this.spineBounds.width;
 	}
 
 	GetOriginalHeight () {
-		if (!this.initialBounds) return 100;
-		return this.initialBounds.height;
+		return this.spineBounds.height;
 	}
 
 	OnMakeOriginalSize () {
-		if (!this.initialBounds)
-			this._inst.SetSize(100, 100);
-		else
-			this._inst.SetSize(this.initialBounds.width, this.initialBounds.height);
+		this._inst.SetSize(this.spineBounds.width, this.spineBounds.height);
 	}
 
 	HasDoubleTapHandler () {

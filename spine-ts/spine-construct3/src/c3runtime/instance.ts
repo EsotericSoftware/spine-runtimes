@@ -8,6 +8,7 @@ spine.Skeleton.yDown = true;
 class DrawingInstance extends globalThis.ISDKWorldInstanceBase {
 	propAtlas = "";
 	propSkel = "";
+	propLoaderScale = 1;
 	propSkin: string[] = [];
 	propAnimation?: string;
 	propOffsetX = 0;
@@ -33,21 +34,23 @@ class DrawingInstance extends globalThis.ISDKWorldInstanceBase {
 
 		const properties = this._getInitProperties();
 		if (properties) {
+			console.log(properties);
 			this.propAtlas = properties[0] as string;
 			this.propSkel = properties[1] as string;
-			const skinProp = properties[2] as string;
+			this.propLoaderScale = properties[2] as number;
+			const skinProp = properties[3] as string;
 			this.propSkin = skinProp === "" ? [] : skinProp.split(",");
-			this.propAnimation = properties[3] as string;
+			this.propAnimation = properties[4] as string;
 
 			this.propOffsetX = properties[7] as number;
 			this.propOffsetY = properties[8] as number;
 			this.propOffsetAngle = properties[9] as number;
 			this.propScaleX = properties[10] as number;
 			this.propScaleY = properties[11] as number;
-			console.log(properties);
+
 		}
 
-		this.assetLoader = new spine.AssetLoader("runtime");
+		this.assetLoader = new spine.AssetLoader();
 		this.skeletonRenderer = new spine.SkeletonRendererCore();
 
 		this._setTicking(true);
@@ -81,7 +84,7 @@ class DrawingInstance extends globalThis.ISDKWorldInstanceBase {
 		const propValue = this.propSkel;
 
 		if (this.atlasLoaded && this.textureAtlas) {
-			const skeletonData = await this.assetLoader.loadSkeletonRuntime(propValue, this.textureAtlas, 1, this.plugin.runtime);
+			const skeletonData = await this.assetLoader.loadSkeletonRuntime(propValue, this.textureAtlas, this.propLoaderScale, this.plugin.runtime);
 			if (!skeletonData) return;
 
 			this.skeleton = new spine.Skeleton(skeletonData);
@@ -96,12 +99,8 @@ class DrawingInstance extends globalThis.ISDKWorldInstanceBase {
 
 			this.update(0);
 
-			// Initially, width and height are values set on C3 Editor side that allows to determine the right scale
 			this.skeleton.scaleX = this.propScaleX;
 			this.skeleton.scaleY = this.propScaleY;
-
-			// this.setSize(this._spineBounds.width * this.skeleton.scaleX, this._spineBounds.height * -this.skeleton.scaleY);
-			// this.setOrigin(-this._spineBounds.x * this.skeleton.scaleX / this.width, this._spineBounds.y * this.skeleton.scaleY / this.height);
 
 			this.skeletonLoaded = true;
 			this._trigger(C3.Plugins.EsotericSoftware_SpineConstruct3.Cnds.OnSkeletonLoaded);

@@ -18,9 +18,9 @@
             "name": "Atlas",
             "desc": "Atlas file"
           },
-          "spine-skeleton-file-blob": {
-            "name": "Skel Blob",
-            "desc": "Skel file blob"
+          "spine-loader-scale": {
+            "name": "Loader scale",
+            "desc": "Loader scale"
           },
           "spine-animation": {
             "name": "animation",
@@ -30,6 +30,10 @@
             "name": "skin",
             "desc": "skin"
           },
+          "spine-errors": {
+            "name": "Errors",
+            "desc": "errors"
+          },
           "spine-bounds-provider-group": {
             "name": "Bounds provider",
             "desc": "Select the desired buound provider and fill the respective properties."
@@ -38,9 +42,8 @@
             "name": "Bounds provider",
             "desc": "The bounds provider to use.",
             "items": {
-              "AABB": "AABB Rectangle",
               "setup": "Setup pose bounds",
-              "animation-skin": "Animation + Skin bounds"
+              "animation-skin": "Animation/Skin bounds"
             }
           },
           "spine-bounds-provider-move": {

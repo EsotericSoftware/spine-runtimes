@@ -15,17 +15,15 @@ const PLUGIN_ID = "EsotericSoftware_SpineConstruct3";
 
 const PLUGIN_CATEGORY = "general";
 
-let app = null;
-
 const PLUGIN_CLASS = class MyDrawingPlugin extends SDK.IPluginBase {
 	static PROP_ATLAS = "spine-atlas-file";
 	static PROP_SKELETON = "spine-skeleton-file";
+	static PROP_LOADER_SCALE = "spine-loader-scale";
 	static PROP_SKIN = "spine-skin";
 	static PROP_ANIMATION = "spine-animation";
 	static PROP_ERRORS = "spine-errors";
 	static PROP_RATIO_WIDTH = "spine-restore-ratio-width";
 	static PROP_RATIO_HEIGHT = "spine-restore-ratio-height";
-	static PROP_SKELETON_BLOB = "spine-skeleton-file-blob";
 	static PROP_BOUNDS_PROVIDER_GROUP = "spine-bounds-provider-group";
 	static PROP_BOUNDS_PROVIDER = "spine-bounds-provider";
 	static PROP_BOUNDS_PROVIDER_MOVE = "spine-bounds-provider-move";
@@ -37,11 +35,9 @@ const PLUGIN_CLASS = class MyDrawingPlugin extends SDK.IPluginBase {
 
 	static TYPE_BOUNDS_SETUP = "setup";
 	static TYPE_BOUNDS_ANIMATION_SKIN = "animation-skin";
-	static TYPE_BOUNDS_AABB = "AABB";
 
 	constructor () {
 		super(PLUGIN_ID);
-
 
 		SDK.Lang.PushContext("plugins." + PLUGIN_ID.toLowerCase());
 
@@ -69,29 +65,19 @@ const PLUGIN_CLASS = class MyDrawingPlugin extends SDK.IPluginBase {
 		SDK.Lang.PushContext(".properties");
 
 		this._info.SetProperties([
-			new SDK.PluginProperty("text", MyDrawingPlugin.PROP_ATLAS, ""),
-			new SDK.PluginProperty("text", MyDrawingPlugin.PROP_SKELETON, ""),
+			new SDK.PluginProperty("projectfile", MyDrawingPlugin.PROP_ATLAS, ""),
+			new SDK.PluginProperty("projectfile", MyDrawingPlugin.PROP_SKELETON, ""),
+			new SDK.PluginProperty("float", MyDrawingPlugin.PROP_LOADER_SCALE, 1),
 			new SDK.PluginProperty("text", MyDrawingPlugin.PROP_SKIN, ""),
 			new SDK.PluginProperty("text", MyDrawingPlugin.PROP_ANIMATION, ""),
-			new SDK.PluginProperty("projectfile", MyDrawingPlugin.PROP_SKELETON_BLOB, ""),
 			new SDK.PluginProperty("info", MyDrawingPlugin.PROP_ERRORS, {
 				infoCallback (inst) {
-					const atlas = inst.GetInstance().GetPropertyValue(MyDrawingPlugin.PROP_ATLAS);
-					const skeleton = inst.GetInstance().GetPropertyValue(MyDrawingPlugin.PROP_SKELETON);
-
-					let error = "";
-					if (atlas && skeleton) {
-						error = "You can't set both .skel and .json skeleton file.";
-					}
-
-					if (!atlas && !skeleton) {
-						error = "Missing skeleton file.";
-					}
-
-					return error;
+					const errors = (inst.GetInstance() as unknown as { errors: Record<string, string> }).errors;
+					return Object.values(errors).reduce((acc, next) => {
+						return acc === "" ? next : `${acc}\n${next}`;
+					}, "");
 				},
 			}),
-
 
 			new SDK.PluginProperty("group", MyDrawingPlugin.PROP_BOUNDS_PROVIDER_GROUP),
 			new SDK.PluginProperty("combo", MyDrawingPlugin.PROP_BOUNDS_PROVIDER, {
@@ -99,7 +85,6 @@ const PLUGIN_CLASS = class MyDrawingPlugin extends SDK.IPluginBase {
 				items: [
 					MyDrawingPlugin.TYPE_BOUNDS_SETUP,
 					MyDrawingPlugin.TYPE_BOUNDS_ANIMATION_SKIN,
-					MyDrawingPlugin.TYPE_BOUNDS_AABB
 				],
 			}),
 			new SDK.PluginProperty("check", MyDrawingPlugin.PROP_BOUNDS_PROVIDER_MOVE, false),
