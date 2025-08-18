@@ -27,24 +27,33 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { BlendMode, Texture, type TextureFilter, type TextureWrap } from "@esotericsoftware/spine-core";
+import { BlendMode, Texture, type TextureAtlasPage, TextureFilter, TextureWrap } from "@esotericsoftware/spine-core";
 
 export class C3TextureEditor extends Texture {
 	texture: SDK.Gfx.IWebGLTexture;
 	renderer: SDK.Gfx.IWebGLRenderer;
 
-	constructor (image: HTMLImageElement | ImageBitmap, renderer: SDK.Gfx.IWebGLRenderer) {
+	constructor (image: HTMLImageElement | ImageBitmap, renderer: SDK.Gfx.IWebGLRenderer, page: TextureAtlasPage) {
 		super(image);
 		this.renderer = renderer;
-		this.texture = renderer.CreateDynamicTexture(image.width, image.height);
-		this.renderer.UpdateTexture(image, this.texture);
+		const options: TextureCreateOptions = {
+			wrapX: toC3TextureWrap(page.uWrap),
+			wrapY: toC3TextureWrap(page.vWrap),
+			sampling: toC3Filter(page.minFilter),
+			mipMap: toC3MipMap(page.minFilter),
+		}
+		this.texture = renderer.CreateDynamicTexture(image.width, image.height, options);
+		this.renderer.UpdateTexture(image, this.texture, { premultiplyAlpha: !page.pma });
 	}
 
-	setFilters (minFilter: TextureFilter, magFilter: TextureFilter) {
+	setFilters () {
+		// cannot change filter after texture creation
 	}
 
-	setWraps (uWrap: TextureWrap, vWrap: TextureWrap) {
+	setWraps () {
+		// cannot change wraps after texture creation
 	}
+
 
 	dispose () {
 		this.renderer.DeleteTexture(this.texture);
@@ -55,21 +64,73 @@ export class C3Texture extends Texture {
 	texture: ITexture;
 	renderer: IRenderer;
 
-	constructor (image: HTMLImageElement | ImageBitmap, renderer: IRenderer) {
+	constructor (image: HTMLImageElement | ImageBitmap, renderer: IRenderer, page: TextureAtlasPage) {
 		super(image);
 		this.renderer = renderer;
-		this.texture = renderer.createDynamicTexture(image.width, image.height);
-		this.renderer.updateTexture(image, this.texture);
+		const options: TextureCreateOptions = {
+			wrapX: toC3TextureWrap(page.uWrap),
+			wrapY: toC3TextureWrap(page.vWrap),
+			sampling: toC3Filter(page.minFilter),
+			mipMap: toC3MipMap(page.minFilter),
+		}
+		this.texture = renderer.createDynamicTexture(image.width, image.height, options);
+		this.renderer.updateTexture(image, this.texture, { premultiplyAlpha: !page.pma });
 	}
 
-	setFilters (minFilter: TextureFilter, magFilter: TextureFilter) {
+
+	setFilters () {
+		// cannot change filter after texture creation
 	}
 
-	setWraps (uWrap: TextureWrap, vWrap: TextureWrap) {
+	setWraps () {
+		// cannot change wraps after texture creation
 	}
 
 	dispose () {
 		this.renderer.deleteTexture(this.texture);
+	}
+}
+
+function toC3TextureWrap (wrap: TextureWrap): TextureWrapMode {
+	if (wrap === TextureWrap.ClampToEdge) return "clamp-to-edge";
+	else if (wrap === TextureWrap.MirroredRepeat) return "mirror-repeat";
+	else if (wrap === TextureWrap.Repeat) return "repeat";
+	else throw new Error(`Unknown texture wrap: ${wrap}`);
+}
+
+function toC3MipMap (filter: TextureFilter): boolean {
+	switch (filter) {
+		case TextureFilter.MipMap:
+		case TextureFilter.MipMapLinearNearest:
+		case TextureFilter.MipMapNearestLinear:
+		case TextureFilter.MipMapNearestNearest:
+			return true;
+
+		case TextureFilter.Linear:
+		case TextureFilter.Nearest:
+			return false;
+
+		default:
+			throw new Error(`Unknown texture filter: ${filter}`);
+	}
+}
+
+function toC3Filter (filter: TextureFilter): TextureSamplingMode {
+	switch (filter) {
+		case TextureFilter.Nearest:
+		case TextureFilter.MipMapNearestNearest:
+			return "nearest";
+
+		case TextureFilter.Linear:
+		case TextureFilter.MipMapLinearNearest:
+		case TextureFilter.MipMapNearestLinear:
+			return "bilinear";
+
+		case TextureFilter.MipMap:
+		case TextureFilter.MipMapLinearLinear:
+			return "trilinear";
+		default:
+			throw new Error(`Unknown texture filter: ${filter}`);
 	}
 }
 

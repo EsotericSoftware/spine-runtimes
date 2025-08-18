@@ -136,10 +136,10 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 				iRenderer.SetTextureFillMode();
 				iRenderer.SetTexture(command.texture.texture);
 
-				const padded = this.padUint16ArrayForWebGPU(indices.subarray(0, numIndices));
 				iRenderer.DrawMesh(
 					vertices.subarray(0, numVertices * 3),
 					uvs.subarray(0, numVertices * 2),
+					// workaround for this bug: https://github.com/Scirra/Construct-bugs/issues/8746
 					this.padUint16ArrayForWebGPU(indices.subarray(0, numIndices)),
 				);
 

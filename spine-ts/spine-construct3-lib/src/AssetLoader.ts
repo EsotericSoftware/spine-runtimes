@@ -65,7 +65,7 @@ export class AssetLoader {
 		await Promise.all(textureAtlas.pages.map(async page => {
 			const texture = await this.loadSpineTextureEditor(page.name, page.pma, instance);
 			if (texture) {
-				const spineTexture = new C3TextureEditor(texture, renderer);
+				const spineTexture = new C3TextureEditor(texture, renderer, page);
 				page.setTexture(spineTexture);
 			}
 			return texture;
@@ -116,7 +116,7 @@ export class AssetLoader {
 		await Promise.all(textureAtlas.pages.map(async page => {
 			const texture = await this.loadSpineTextureRuntime(page.name, page.pma, instance);
 			if (texture) {
-				const spineTexture = new C3Texture(texture, renderer);
+				const spineTexture = new C3Texture(texture, renderer, page);
 				page.setTexture(spineTexture);
 			}
 			return texture;
@@ -136,6 +136,7 @@ export class AssetLoader {
 
 	static async createImageBitmapFromBlob (blob: Blob, pma: boolean): Promise<ImageBitmap | null> {
 		try {
+			// pma parameters seems to do not matter here. It matters in C3 Texture creation
 			return createImageBitmap(blob, { premultiplyAlpha: pma ? "none" : "premultiply" });
 		} catch (e) {
 			console.error("Failed to create ImageBitmap from blob:", e);

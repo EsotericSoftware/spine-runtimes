@@ -71,8 +71,10 @@ class DrawingInstance extends globalThis.ISDKWorldInstanceBase {
 			return;
 		}
 
+		// workaround to request a redraw: https://github.com/Scirra/Construct-feature-requests/issues/615
 		this.x++;
 		this.x--;
+
 		this.update(this.dt);
 	}
 
@@ -224,8 +226,12 @@ class DrawingInstance extends globalThis.ISDKWorldInstanceBase {
 		const offsetY = this.y + this.propOffsetY;
 		const offsetAngle = this.angle + this.propOffsetAngle;
 
-		const cos = Math.cos(offsetAngle);
-		const sin = Math.sin(offsetAngle);
+		let cos = 0;
+		let sin = 0;
+		if (offsetAngle) {
+			cos = Math.cos(offsetAngle);
+			sin = Math.sin(offsetAngle);
+		}
 		while (command) {
 			const { numVertices, positions, uvs, colors, indices, numIndices, blendMode } = command;
 
@@ -236,9 +242,16 @@ class DrawingInstance extends globalThis.ISDKWorldInstanceBase {
 				const dstIndex = i * 3;
 				const x = positions[srcIndex];
 				const y = positions[srcIndex + 1];
-				vertices[dstIndex] = x * cos - y * sin + offsetX;
-				vertices[dstIndex + 1] = x * sin + y * cos + offsetY;
+
+				if (offsetAngle) {
+					vertices[dstIndex] = x * cos - y * sin + offsetX;
+					vertices[dstIndex + 1] = x * sin + y * cos + offsetY;
+				} else {
+					vertices[dstIndex] = x + offsetX;
+					vertices[dstIndex + 1] = y + offsetY;
+				}
 				vertices[dstIndex + 2] = 0;
+
 
 				// there's something wrong with the hand after adding the colors on spineboy portal animation
 				const color = colors[i];
@@ -254,6 +267,7 @@ class DrawingInstance extends globalThis.ISDKWorldInstanceBase {
 			renderer.drawMesh(
 				vertices.subarray(0, numVertices * 3),
 				uvs.subarray(0, numVertices * 2),
+				// workaround for this bug: https://github.com/Scirra/Construct-bugs/issues/8746
 				this.padUint16ArrayForWebGPU(indices.subarray(0, numIndices)),
 				c3colors.subarray(0, numVertices * 4),
 			);
