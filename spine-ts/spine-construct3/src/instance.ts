@@ -74,7 +74,8 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 		this.loadAtlas();
 		this.loadSkeleton();
 
-		if (this.skeleton) {
+		const hasErrors = this.hasErrors();
+		if (this.skeleton && !hasErrors) {
 			this.setSkin();
 
 			const rectX = this._inst.GetX();
@@ -110,6 +111,7 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 				this.skeleton.scaleY = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_SKELETON_SCALE_Y) as number;
 			}
 
+
 			const cos = Math.cos(offsetAngle);
 			const sin = Math.sin(offsetAngle);
 
@@ -133,11 +135,14 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 				iRenderer.SetAlphaBlend();
 				iRenderer.SetTextureFillMode();
 				iRenderer.SetTexture(command.texture.texture);
+
+				const padded = this.padUint16ArrayForWebGPU(indices.subarray(0, numIndices));
 				iRenderer.DrawMesh(
 					vertices.subarray(0, numVertices * 3),
 					uvs.subarray(0, numVertices * 2),
-					indices.subarray(0, numIndices),
+					this.padUint16ArrayForWebGPU(indices.subarray(0, numIndices)),
 				);
+
 
 				command = command.next;
 			}
@@ -148,11 +153,11 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 			iRenderer.LineQuad(this._inst.GetQuad());
 			iRenderer.Line(rectX, rectY, offsetX, offsetY);
 
-			if (this.hasErrors()) {
-				iRenderer.SetColorFillMode();
-				iRenderer.SetColorRgba(1, 0, 0, .5);
-				iRenderer.Quad(this._inst.GetQuad());
-			}
+			// if (this.hasErrors()) {
+			// 	iRenderer.SetColorFillMode();
+			// 	iRenderer.SetColorRgba(1, 0, 0, .5);
+			// 	iRenderer.Quad(this._inst.GetQuad());
+			// }
 		} else {
 
 			const sdkType = (this._sdkType as any);
@@ -163,6 +168,9 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 				iRenderer.ResetColor();
 				iRenderer.SetAlphaBlend();
 				iRenderer.SetTexture(logo);
+				if (hasErrors) {
+					iRenderer.SetColorRgba(1, 0, 0, 1);
+				}
 				iRenderer.Quad(this._inst.GetQuad());
 			} else {
 				iRenderer.SetAlphaBlend();
@@ -178,6 +186,21 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 
 
 		}
+	}
+
+	padUint16ArrayForWebGPU (originalArray: Uint16Array) {
+		const currentLength = originalArray.length;
+
+		const alignedLength = Math.ceil(currentLength / 6) * 6;
+
+		if (alignedLength === currentLength) {
+			return originalArray;
+		}
+
+		const paddedArray = new Uint16Array(alignedLength);
+		paddedArray.set(originalArray);
+
+		return paddedArray;
 	}
 
 	async OnPropertyChanged (id: string, value: EditorPropertyValueType) {
@@ -208,6 +231,7 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 		if (id === PLUGIN_CLASS.PROP_SKIN) {
 			this.skins = [];
 			this.setSkin();
+			this.resetBounds();
 			this.layoutView?.Refresh();
 			return;
 		}
@@ -286,8 +310,10 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 
 		const propValue = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_SKELETON) as number;
 		const loaderScale = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_LOADER_SCALE) as number;
-		const skeletonData = await this.assetLoader.loadSkeletonEditor(propValue, this.textureAtlas, loaderScale, this._inst);
-		console.log(skeletonData);
+		const skeletonData = await this.assetLoader.loadSkeletonEditor(propValue, this.textureAtlas, loaderScale, this._inst)
+			.catch((error) => {
+				console.log("ATLAS AND SKELETON NOT CORRESPONDING", error);
+			});
 		if (!skeletonData) return;
 
 		this.skeleton = new spine.Skeleton(skeletonData);
@@ -307,10 +333,11 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 		if (!this.renderer) return;
 
 		const propValue = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_ATLAS) as number;
-		console.log("Loading atlas");
 
 		if (this.currentAtlasFileSID === propValue) return;
 		this.currentAtlasFileSID = propValue;
+
+		console.log("Loading atlas");
 
 		const textureAtlas = await this.assetLoader.loadAtlasEditor(propValue, this._inst, this.renderer);
 		if (!textureAtlas) return;
@@ -407,7 +434,7 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 		this.setError(
 			"boundsNoDimension",
 			width <= 0 || height <= 0,
-			"A bounds cannot have negative dimension"
+			"A bounds cannot have negative dimensions. This might happen when the setup pose is empty. Try to set a skin and the Animation/Skin bounds provider."
 		);
 
 		return Object.keys(errors).length > 0;
