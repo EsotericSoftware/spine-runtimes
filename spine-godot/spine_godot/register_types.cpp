@@ -106,7 +106,27 @@ void initialize_spine_godot_module(ModuleInitializationLevel level) {
 		return;
 #endif
 	}
-	if (level != MODULE_INITIALIZATION_LEVEL_CORE) return;
+	if (level == MODULE_INITIALIZATION_LEVEL_CORE) {
+		GDREGISTER_CLASS(SpineAtlasResourceFormatSaver);
+		GDREGISTER_CLASS(SpineSkeletonFileResourceFormatLoader);
+		GDREGISTER_CLASS(SpineSkeletonFileResourceFormatSaver);
+		GDREGISTER_CLASS(SpineAtlasResourceFormatLoader);
+        
+		atlas_loader = memnew(SpineAtlasResourceFormatLoader);
+        ResourceLoader::add_resource_format_loader(atlas_loader);
+
+        atlas_saver = memnew(SpineAtlasResourceFormatSaver);
+    	ResourceSaver::add_resource_format_saver(atlas_saver);
+
+        skeleton_file_loader = memnew(SpineSkeletonFileResourceFormatLoader);
+        ResourceLoader::add_resource_format_loader(skeleton_file_loader);
+
+        skeleton_file_saver = memnew(SpineSkeletonFileResourceFormatSaver);
+        ResourceSaver::add_resource_format_saver(skeleton_file_saver);
+
+		return;
+	}
+	if (level != MODULE_INITIALIZATION_LEVEL_SCENE) return;
 #else
 void register_spine_godot_types() {
 #ifdef TOOLS_ENABLED
