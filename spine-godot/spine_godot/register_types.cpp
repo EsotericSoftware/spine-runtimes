@@ -213,7 +213,7 @@ void uninitialize_spine_godot_module(ModuleInitializationLevel level) {
 		SpineSprite::clear_statics();
 		return;
 	}
-	if (level != MODULE_INITIALIZATION_LEVEL_SCENE) return;
+	if (level == MODULE_INITIALIZATION_LEVEL_CORE) {
 #else
 void unregister_spine_godot_types() {
 #endif
@@ -228,7 +228,7 @@ void unregister_spine_godot_types() {
 	ResourceLoader::remove_resource_format_loader(skeleton_file_loader);
 	ResourceSaver::remove_resource_format_saver(skeleton_file_saver);
 #endif
-
+	}
 }
 
 
