@@ -30,7 +30,6 @@
 package spine;
 
 import haxe.io.Bytes;
-import openfl.utils.Assets;
 import spine.animation.Animation;
 import spine.atlas.TextureAtlas;
 import spine.attachments.AtlasAttachmentLoader;

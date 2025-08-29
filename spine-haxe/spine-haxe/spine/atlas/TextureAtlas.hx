@@ -30,7 +30,6 @@
 package spine.atlas;
 
 import haxe.ds.StringMap;
-import openfl.utils.Assets;
 
 class TextureAtlas {
 	private var pages = new Array<TextureAtlasPage>();

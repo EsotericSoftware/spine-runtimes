@@ -29,7 +29,7 @@
 
 package spine;
 
-import lime.math.Rectangle;
+import spine.Rectangle;
 import haxe.ds.StringMap;
 import spine.attachments.Attachment;
 import spine.attachments.ClippingAttachment;
