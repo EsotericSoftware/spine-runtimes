@@ -42,7 +42,7 @@ void SpineConstraintData::_bind_methods() {
 String SpineConstraintData::get_constraint_name() {
 	SPINE_CHECK(get_spine_object(), "")
 	String name;
-	name.parse_utf8(get_spine_object()->getName().buffer());
+	name.utf8(get_spine_object()->getName().buffer());
 	return name;
 }
 

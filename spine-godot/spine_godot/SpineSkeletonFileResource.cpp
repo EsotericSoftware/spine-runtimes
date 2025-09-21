@@ -135,7 +135,7 @@ Error SpineSkeletonFileResource::load_from_file(const String &path) {
 		json = FileAccess::get_file_as_string(path, &error);
 		if (error != OK) return error;
 #endif
-		if (!checkJson(json.utf8())) return ERR_INVALID_DATA;
+		if (!checkJson(json.utf8().get_data())) return ERR_INVALID_DATA;
 	} else {
 #ifdef SPINE_GODOT_EXTENSION
 		binary = FileAccess::get_file_as_bytes(path);

@@ -51,7 +51,7 @@
 #ifdef SPINE_GODOT_EXTENSION
 #include <godot_cpp/classes/editor_file_system.hpp>
 #else
-#include "editor/editor_file_system.h"
+#include "editor/file_system/editor_file_system.h"
 #endif
 #endif
 
@@ -142,10 +142,9 @@ public:
 	}
 
 	void load(spine::AtlasPage &page, const spine::String &path) override {
-		String fixed_path;
-		fixed_path.parse_utf8(path.buffer());
-		bool is_resource = fix_path(fixed_path);
+		String fixed_path = path.buffer();
 
+		bool is_resource = fix_path(fixed_path);
 		import_image_resource(fixed_path);
 
 #if VERSION_MAJOR > 3
@@ -169,8 +168,8 @@ public:
 		renderer_object->normal_map = Ref<Texture>(nullptr);
 		renderer_object->specular_map = Ref<Texture>(nullptr);
 
-		String normal_map_path = vformat("%s/%s_%s", fixed_path.get_base_dir(), normal_map_prefix, fixed_path.get_file());
-		String specular_map_path = vformat("%s/%s_%s", fixed_path.get_base_dir(), specular_map_prefix, fixed_path.get_file());
+		String normal_map_path = vformat("%s/%s_%s", fixed_path.get_base_dir(), normal_map_prefix, fixed_path);
+		String specular_map_path = vformat("%s/%s_%s", fixed_path.get_base_dir(), specular_map_prefix, fixed_path);
 		is_resource = fix_path(normal_map_path);
 		is_resource = fix_path(specular_map_path);
 #if SPINE_GODOT_EXTENSION
@@ -292,7 +291,7 @@ Error SpineAtlasResource::load_from_atlas_file_internal(const String &path, bool
 	clear();
 	texture_loader = new GodotSpineTextureLoader(&textures, &normal_maps, &specular_maps, normal_map_prefix, specular_map_prefix, is_importing);
 	auto atlas_utf8 = atlas_data.utf8();
-	atlas = new spine::Atlas(atlas_utf8, atlas_utf8.length(), source_path.get_base_dir().utf8(), texture_loader);
+	atlas = new spine::Atlas(atlas_utf8.get_data(), atlas_utf8.length(), source_path.get_base_dir().utf8().get_data(), texture_loader);
 	if (atlas) return OK;
 
 	clear();
@@ -335,7 +334,7 @@ Error SpineAtlasResource::load_from_file(const String &path) {
 	clear();
 	texture_loader = new GodotSpineTextureLoader(&textures, &normal_maps, &specular_maps, normal_map_prefix, specular_map_prefix, false);
 	auto utf8 = atlas_data.utf8();
-	atlas = new spine::Atlas(utf8.ptr(), utf8.size(), source_path.get_base_dir().utf8(), texture_loader);
+	atlas = new spine::Atlas(utf8.ptr(), utf8.size(), source_path.get_base_dir().utf8().get_data(), texture_loader);
 	if (atlas) return OK;
 
 	clear();

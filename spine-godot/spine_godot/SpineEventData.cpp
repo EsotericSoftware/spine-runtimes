@@ -49,7 +49,7 @@ void SpineEventData::_bind_methods() {
 String SpineEventData::get_event_name() {
 	SPINE_CHECK(get_spine_object(), "")
 	String name;
-	name.parse_utf8(get_spine_object()->getName().buffer());
+	name.utf8(get_spine_object()->getName().buffer());
 	return name;
 }
 
@@ -80,7 +80,7 @@ String SpineEventData::get_string_value() {
 
 void SpineEventData::set_string_value(const String &v) {
 	SPINE_CHECK(get_spine_object(), )
-	get_spine_object()->setStringValue(spine::String(v.utf8()));
+	get_spine_object()->setStringValue(spine::String(v.utf8().get_data()));
 }
 
 String SpineEventData::get_audio_path() {
@@ -90,7 +90,7 @@ String SpineEventData::get_audio_path() {
 
 void SpineEventData::set_audio_path(const String &v) {
 	SPINE_CHECK(get_spine_object(), )
-	get_spine_object()->setAudioPath(spine::String(v.utf8()));
+	get_spine_object()->setAudioPath(spine::String(v.utf8().get_data()));
 }
 
 float SpineEventData::get_volume() {

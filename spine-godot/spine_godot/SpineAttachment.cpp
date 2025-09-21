@@ -42,7 +42,7 @@ SpineAttachment::~SpineAttachment() {
 String SpineAttachment::get_attachment_name() {
 	SPINE_CHECK(get_spine_object(), "")
 	String name;
-	name.parse_utf8(get_spine_object()->getName().buffer());
+	name.utf8(get_spine_object()->getName().buffer());
 	return name;
 }
 
