@@ -60,9 +60,7 @@
 #include "scene/resources/mesh.h"
 #include "servers/rendering_server.h"
 #include "scene/resources/canvas_item_material.h"
-#if VERSION_MINOR > 0
-#include "editor/editor_interface.h"
-#endif
+
 #else
 #include "core/engine.h"
 #endif
@@ -72,6 +70,7 @@
 
 #if TOOLS_ENABLED
 
+#include "editor/editor_interface.h"
 #if VERSION_MAJOR > 3
 #if VERSION_MINOR > 2
 #include "editor/plugins/editor_plugin.h"

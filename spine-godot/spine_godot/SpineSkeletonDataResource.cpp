@@ -37,7 +37,7 @@
 #else
 #if VERSION_MAJOR > 3
 #include "core/config/engine.h"
-#include "editor/editor_interface.h"
+
 #else
 #include "core/engine.h"
 #endif
@@ -45,6 +45,7 @@
 #endif
 
 #ifdef TOOLS_ENABLED
+#include "editor/editor_interface.h"
 #ifdef SPINE_GODOT_EXTENSION
 #include <godot_cpp/classes/editor_file_system.hpp>
 #else
