@@ -26,6 +26,9 @@
   "references": [
     {
       "path": "../spine-core"
+    },
+    {
+      "path": "../spine-construct3-lib"
     }
   ]
 }
