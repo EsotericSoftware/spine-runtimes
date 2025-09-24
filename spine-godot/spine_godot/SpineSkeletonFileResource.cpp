@@ -135,7 +135,11 @@ Error SpineSkeletonFileResource::load_from_file(const String &path) {
 		json = FileAccess::get_file_as_string(path, &error);
 		if (error != OK) return error;
 #endif
-		if (!checkJson(json.utf8())) return ERR_INVALID_DATA;
+#if GODOT_VERSION_MINOR < 5 || defined(SPINE_GODOT_EXTENSION)
+		if (!checkJson(json.utf8().get_data())) return ERR_INVALID_DATA;
+#else
+        if (!checkJson(json.utf8())) return ERR_INVALID_DATA;
+#endif
 	} else {
 #ifdef SPINE_GODOT_EXTENSION
 		binary = FileAccess::get_file_as_bytes(path);

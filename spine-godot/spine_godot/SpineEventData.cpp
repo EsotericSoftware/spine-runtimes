@@ -45,11 +45,15 @@ void SpineEventData::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_balance"), &SpineEventData::get_balance);
 	ClassDB::bind_method(D_METHOD("set_balance", "v"), &SpineEventData::set_balance);
 }
-
 String SpineEventData::get_event_name() {
 	SPINE_CHECK(get_spine_object(), "")
 	String name;
+#if GODOT_VERSION_MINOR < 5 || defined(SPINE_GODOT_EXTENSION)
+	// reference to godot-cpp/include/godot_cpp/variant/string.hpp
 	name.parse_utf8(get_spine_object()->getName().buffer());
+#else
+	name.append_utf8(get_spine_object()->getName().buffer());
+#endif
 	return name;
 }
 
@@ -80,7 +84,11 @@ String SpineEventData::get_string_value() {
 
 void SpineEventData::set_string_value(const String &v) {
 	SPINE_CHECK(get_spine_object(), )
-	get_spine_object()->setStringValue(spine::String(v.utf8()));
+#if GODOT_VERSION_MINOR < 5 || defined(SPINE_GODOT_EXTENSION)
+    get_spine_object()->setStringValue(spine::String(v.utf8()));
+#else
+	get_spine_object()->setStringValue(spine::String(v.utf8().get_data()));
+#endif
 }
 
 String SpineEventData::get_audio_path() {
@@ -90,7 +98,11 @@ String SpineEventData::get_audio_path() {
 
 void SpineEventData::set_audio_path(const String &v) {
 	SPINE_CHECK(get_spine_object(), )
-	get_spine_object()->setAudioPath(spine::String(v.utf8()));
+#if GODOT_VERSION_MINOR < 5 || defined(SPINE_GODOT_EXTENSION)
+    get_spine_object()->setStringValue(spine::String(v.utf8()));
+#else
+	get_spine_object()->setStringValue(spine::String(v.utf8().get_data()));
+#endif
 }
 
 float SpineEventData::get_volume() {

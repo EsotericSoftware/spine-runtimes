@@ -48,7 +48,12 @@ void SpineAnimation::_bind_methods() {
 String SpineAnimation::get_name() {
 	SPINE_CHECK(get_spine_object(), "")
 	String name;
+// #ifdef SPINE_GODOT_EXTENSION
+#if GODOT_VERSION_MINOR < 5 || defined(SPINE_GODOT_EXTENSION)
 	name.parse_utf8(get_spine_object()->getName().buffer());
+#else
+	name.append_utf8(get_spine_object()->getName().buffer());
+#endif
 	return name;
 }
 

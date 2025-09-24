@@ -69,7 +69,12 @@ int SpineBoneData::get_index() {
 String SpineBoneData::get_bone_name() {
 	SPINE_CHECK(get_spine_object(), "")
 	String name;
+#if GODOT_VERSION_MINOR < 5 || defined(SPINE_GODOT_EXTENSION)
+	// reference to godot-cpp/include/godot_cpp/variant/string.hpp
 	name.parse_utf8(get_spine_object()->getName().buffer());
+#else
+	name.append_utf8(get_spine_object()->getName().buffer());
+#endif
 	return name;
 }
 

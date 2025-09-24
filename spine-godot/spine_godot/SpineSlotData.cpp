@@ -54,7 +54,11 @@ int SpineSlotData::get_index() {
 String SpineSlotData::get_name() {
 	SPINE_CHECK(get_spine_object(), String(""))
 	String name;
+#if GODOT_VERSION_MINOR < 5 || defined(SPINE_GODOT_EXTENSION)
 	name.parse_utf8(get_spine_object()->getName().buffer());
+#else
+	name.append_utf8(get_spine_object()->getName().buffer());
+#endif
 	return name;
 }
 

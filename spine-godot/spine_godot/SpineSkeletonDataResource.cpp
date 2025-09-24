@@ -48,7 +48,7 @@
 #ifdef SPINE_GODOT_EXTENSION
 #include <godot_cpp/classes/editor_file_system.hpp>
 #else
-#include "editor/editor_file_system.h"
+#include "editor/file_system/editor_file_system.h"
 #endif
 #endif
 
@@ -335,7 +335,11 @@ void SpineSkeletonDataResource::load_resources(spine::Atlas *atlas,
 	spine::SkeletonData *data;
 	if (!EMPTY(json)) {
 		spine::SkeletonJson skeletonJson(atlas);
-		data = skeletonJson.readSkeletonData(json.utf8());
+#if GODOT_VERSION_MINOR < 5 || defined(SPINE_GODOT_EXTENSION)
+        data = skeletonJson.readSkeletonData(json.utf8());
+#else
+        data = skeletonJson.readSkeletonData(json.utf8().get_data());
+#endif
 		if (!data) {
 			ERR_PRINT(String("Error while loading skeleton data: ") + get_path());
 			ERR_PRINT(String("Error message: ") + skeletonJson.getError().buffer());
@@ -392,7 +396,12 @@ void SpineSkeletonDataResource::get_animation_names(Vector<String> &animation_na
 	for (size_t i = 0; i < animations.size(); ++i) {
 		auto animation = animations[i];
 		String name;
+#if GODOT_VERSION_MINOR < 5 || defined(SPINE_GODOT_EXTENSION)
 		name.parse_utf8(animation->getName().buffer());
+#else
+		name.append_utf8(animation->getName().buffer());
+#endif
+
 		animation_names.push_back(name);
 	}
 }
@@ -409,7 +418,11 @@ void SpineSkeletonDataResource::get_skin_names(Vector<String> &skin_names) const
 	for (size_t i = 0; i < skins.size(); ++i) {
 		auto skin = skins[i];
 		String name;
+#if GODOT_VERSION_MINOR < 5 || defined(SPINE_GODOT_EXTENSION)
 		name.parse_utf8(skin->getName().buffer());
+#else
+		name.append_utf8(skin->getName().buffer());
+#endif
 		skin_names.push_back(name);
 	}
 }
@@ -426,7 +439,11 @@ void SpineSkeletonDataResource::get_slot_names(Vector<String> &slot_names) {
 	for (size_t i = 0; i < slots.size(); ++i) {
 		auto slot = slots[i];
 		String name;
+#if GODOT_VERSION_MINOR < 5 || defined(SPINE_GODOT_EXTENSION)
 		name.parse_utf8(slot->getName().buffer());
+#else
+		name.append_utf8(slot->getName().buffer());
+#endif
 		slot_names.push_back(name);
 	}
 }
@@ -443,7 +460,11 @@ void SpineSkeletonDataResource::get_bone_names(Vector<String> &bone_names) {
 	for (size_t i = 0; i < bones.size(); ++i) {
 		auto bone = bones[i];
 		String name;
+#if GODOT_VERSION_MINOR < 5 || defined(SPINE_GODOT_EXTENSION)
 		name.parse_utf8(bone->getName().buffer());
+#else
+		name.append_utf8(bone->getName().buffer());
+#endif
 		bone_names.push_back(name);
 	}
 }
@@ -628,7 +649,13 @@ SpineSkeletonDataResource::find_physics_constraint(
 String SpineSkeletonDataResource::get_skeleton_name() const {
 	SPINE_CHECK(skeleton_data, "")
 	String name;
+
+#if GODOT_VERSION_MINOR < 5 || defined(SPINE_GODOT_EXTENSION)
 	name.parse_utf8(skeleton_data->getName().buffer());
+#else
+	name.append_utf8(skeleton_data->getName().buffer());
+#endif
+
 	return name;
 }
 

@@ -33,6 +33,7 @@
 #ifdef SPINE_GODOT_EXTENSION
 #include <godot_cpp/core/version.hpp>
 #include <godot_cpp/classes/ref_counted.hpp>
+#include <godot_cpp/variant/string.hpp>
 #include <godot_cpp/variant/string_name.hpp>
 using namespace godot;
 #define REFCOUNTED RefCounted
@@ -95,9 +96,14 @@ using namespace godot;
 		ERR_PRINT("Native Spine object not set."); \
 		return ret;                                \
 	}
+#if GODOT_VERSION_MINOR < 5 || defined(SPINE_GODOT_EXTENSION)
+    #define SPINE_STRING(x) spine::String((x).utf8())
+    #define SPINE_STRING_TMP(x) spine::String((x).utf8(), true, false)
+#else
+    #define SPINE_STRING(x) spine::String((x).utf8().get_data())
+    #define SPINE_STRING_TMP(x) spine::String((x).utf8().get_data(), true, false)
+#endif
 
-#define SPINE_STRING(x) spine::String((x).utf8())
-#define SPINE_STRING_TMP(x) spine::String((x).utf8(), true, false)
 
 // Can't do template classes with Godot's object model :(
 class SpineObjectWrapper : public REFCOUNTED {

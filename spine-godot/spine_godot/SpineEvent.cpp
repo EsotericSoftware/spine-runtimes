@@ -85,7 +85,11 @@ String SpineEvent::get_string_value() {
 
 void SpineEvent::set_string_value(const String &v) {
 	SPINE_CHECK(get_spine_object(), )
-	get_spine_object()->setStringValue(spine::String(v.utf8()));
+#if GODOT_VERSION_MINOR < 5 || defined(SPINE_GODOT_EXTENSION)
+    get_spine_object()->setStringValue(spine::String(v.utf8()));
+#else
+	get_spine_object()->setStringValue(spine::String(v.utf8().get_data()));
+#endif
 }
 
 float SpineEvent::get_volume() {

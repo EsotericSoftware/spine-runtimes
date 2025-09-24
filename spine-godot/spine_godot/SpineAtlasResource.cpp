@@ -51,7 +51,7 @@
 #ifdef SPINE_GODOT_EXTENSION
 #include <godot_cpp/classes/editor_file_system.hpp>
 #else
-#include "editor/editor_file_system.h"
+#include "editor/file_system/editor_file_system.h"
 #endif
 #endif
 
@@ -92,7 +92,7 @@ public:
 	Ref<Texture2D> get_texture_from_image(const String &path, bool is_resource) {
 		Error error = OK;
 		if (is_resource) {
-#ifdef SPINE_GODOT_EXTENSION
+#if GODOT_VERSION_MINOR < 5 || defined(SPINE_GODOT_EXTENSION)
 			return ResourceLoader::get_singleton()->load(path, "", ResourceLoader::CACHE_MODE_REUSE);
 #else
 			return ResourceLoader::load(path, "", ResourceFormatLoader::CACHE_MODE_REUSE, &error);
@@ -143,7 +143,11 @@ public:
 
 	void load(spine::AtlasPage &page, const spine::String &path) override {
 		String fixed_path;
+#if GODOT_VERSION_MINOR < 5 || defined(SPINE_GODOT_EXTENSION)
 		fixed_path.parse_utf8(path.buffer());
+#else
+		fixed_path.append_utf8(path.buffer());
+#endif
 		bool is_resource = fix_path(fixed_path);
 
 		import_image_resource(fixed_path);
@@ -292,7 +296,11 @@ Error SpineAtlasResource::load_from_atlas_file_internal(const String &path, bool
 	clear();
 	texture_loader = new GodotSpineTextureLoader(&textures, &normal_maps, &specular_maps, normal_map_prefix, specular_map_prefix, is_importing);
 	auto atlas_utf8 = atlas_data.utf8();
-	atlas = new spine::Atlas(atlas_utf8, atlas_utf8.length(), source_path.get_base_dir().utf8(), texture_loader);
+#if GODOT_VERSION_MINOR < 5 || defined(SPINE_GODOT_EXTENSION)
+    atlas = new spine::Atlas(atlas_utf8, atlas_utf8.length(), source_path.get_base_dir().utf8(), texture_loader);
+#else
+	atlas = new spine::Atlas(atlas_utf8.get_data(), atlas_utf8.length(), source_path.get_base_dir().utf8().get_data(), texture_loader);
+#endif
 	if (atlas) return OK;
 
 	clear();
@@ -335,7 +343,11 @@ Error SpineAtlasResource::load_from_file(const String &path) {
 	clear();
 	texture_loader = new GodotSpineTextureLoader(&textures, &normal_maps, &specular_maps, normal_map_prefix, specular_map_prefix, false);
 	auto utf8 = atlas_data.utf8();
-	atlas = new spine::Atlas(utf8.ptr(), utf8.size(), source_path.get_base_dir().utf8(), texture_loader);
+#if GODOT_VERSION_MINOR < 5 || defined(SPINE_GODOT_EXTENSION)
+    atlas = new spine::Atlas(atlas_utf8, atlas_utf8.length(), source_path.get_base_dir().utf8(), texture_loader);
+#else
+	atlas = new spine::Atlas(atlas_utf8.get_data(), atlas_utf8.length(), source_path.get_base_dir().utf8().get_data(), texture_loader);
+#endif
 	if (atlas) return OK;
 
 	clear();
