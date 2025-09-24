@@ -71,11 +71,8 @@ class DrawingInstance extends globalThis.ISDKWorldInstanceBase {
 			return;
 		}
 
-		// workaround to request a redraw: https://github.com/Scirra/Construct-feature-requests/issues/615
-		this.x++;
-		this.x--;
-
 		this.update(this.dt);
+		this.runtime.sdk.updateRender();
 	}
 
 	private async loadSkeleton () {
