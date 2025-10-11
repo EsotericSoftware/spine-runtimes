@@ -11,8 +11,11 @@ on:
         required: true
         type: string
         default: "Godot version not specified!"
-      godot_mono:
+      dev:
         required: true
+        type: boolean
+      godot_mono:
+        required: false
         type: boolean
         default: false
   workflow_dispatch:
