@@ -28,5 +28,5 @@ jobs:
       godot_tag:     ${{ matrix.tag }}
       godot_version: ${{ matrix.version }}
       dev:           ${{ matrix.dev }}
-      godot_mono:    false   # non-Mono; уберите строку, если reusable не ожидает этот input
+      godot_mono:    false
     secrets: inherit
