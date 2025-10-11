@@ -1,190 +1,26 @@
-name: Build spine-godot (Godot 4.x)
+name: Build spine-godot (All Godot 4.x versions)
 
 on:
-  workflow_call:
-    inputs:
-      godot_tag:
-        required: true
-        type: string
-        default: "Godot tag not specified!"
-      godot_version:
-        required: true
-        type: string
-        default: "Godot version not specified!"
-      dev:
-        required: true
-        type: boolean
-      godot_mono:
-        required: false
-        type: boolean
-        default: false
   workflow_dispatch:
-    inputs:
-      godot_tag:
-        required: true
-        type: string
-        default: "Godot tag not specified!"
-      godot_version:
-        required: true
-        type: string
-        default: "Godot version not specified!"
-      godot_mono:
-        required: true
-        type: boolean
-        default: false
-
-env:
-  AWS_EC2_METADATA_DISABLED: true
-  EM_VERSION: 3.1.64
-  GODOT_TAG: ${{ inputs.godot_tag }}
-  GODOT_VERSION: ${{ inputs.godot_version }}
-  GODOT_MONO: ${{ inputs.godot_mono }}
-  GODOT_MONO_UPLOAD_SUFFIX: ${{ inputs.godot_mono == true && '-mono' || '' }}
+  push:
+    paths:
+      - ".github/workflows/**"
+      - "spine-godot/**"
+      - "spine-cpp/**"
 
 jobs:
-
-  # --- РЕДАКТОР WINDOWS ---
-  godot-editor-windows:
-    runs-on: windows-2022
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          submodules: recursive
-
-      - name: Setup python and scons
-        uses: ./.github/actions/setup-godot-deps-4
-
-      - name: Build Godot editor (Windows)
-        shell: bash
-        run: |
-          ./spine-godot/build/setup.sh $GODOT_TAG false $GODOT_MONO
-          ./spine-godot/build/build-v4.sh $GODOT_MONO
-
-      - name: Upload editor (Windows)
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ format('{0}-{1}{2}.zip', 'godot-editor-windows', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
-          path: spine-godot/godot/bin/**/*
-
-  # --- ШАБЛОНЫ WINDOWS ---
-  godot-template-windows:
-    runs-on: windows-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          submodules: recursive
-
-      - name: Setup python and scons
-        uses: ./.github/actions/setup-godot-deps-4
-
-      - name: Build export templates (Windows)
-        shell: bash
-        run: |
-          ./spine-godot/build/setup.sh $GODOT_TAG false $GODOT_MONO
-          ./spine-godot/build/build-templates-v4.sh windows $GODOT_MONO
-
-      - name: Upload template (Windows debug)
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-windows-debug', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
-          path: spine-godot/godot/bin/windows_debug_x86_64.exe
-
-      - name: Upload template (Windows release)
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-windows-release', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
-          path: spine-godot/godot/bin/windows_release_x86_64.exe
-
-  # --- ШАБЛОНЫ ANDROID ---
-  godot-template-android:
-    runs-on: ubuntu-latest
-    if: ${{ inputs.godot_mono == false }}  # Mono нам не нужен
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          submodules: recursive
-
-      # Azure репозитории иногда глючат — оставим как у апстрима
-      - name: Make apt sources.list use the default Ubuntu repositories
-        run: |
-          sudo rm -f /etc/apt/sources.list.d/*
-          sudo cp -f spine-godot/build/sources.lst /etc/apt/sources.list
-          sudo apt-get update
-
-      - name: Set up Java 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 17
-
-      - name: Setup python and scons
-        uses: ./.github/actions/setup-godot-deps-4
-
-      - name: Build export templates (Android)
-        shell: bash
-        run: |
-          ./spine-godot/build/setup.sh $GODOT_TAG false
-          ./spine-godot/build/build-templates-v4.sh android
-
-      - name: Upload template (Android debug)
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-android-debug', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
-          path: spine-godot/godot/bin/android_debug.apk
-
-      - name: Upload template (Android release)
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-android-release', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
-          path: spine-godot/godot/bin/android_release.apk
-
-      - name: Upload template (Android source)
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-android-source', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
-          path: spine-godot/godot/bin/android_source.zip
-
-  # --- ШАБЛОНЫ WEB ---
-  godot-template-web:
-    runs-on: ubuntu-latest
-    if: ${{ inputs.godot_mono == false }}  # Mono нам не нужен
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          submodules: recursive
-
-      - name: Set up Emscripten
-        uses: mymindstorm/setup-emsdk@v11
-        with:
-          version: ${{ env.EM_VERSION }}
-
-      - name: Verify Emscripten
-        run: emcc -v
-
-      - name: Setup python and scons
-        uses: ./.github/actions/setup-godot-deps-4
-
-      - name: Build export templates (Web)
-        run: |
-          ./spine-godot/build/setup.sh $GODOT_TAG false
-          ./spine-godot/build/build-templates-v4.sh web
-
-      - name: Upload template (Web debug)
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-web-debug', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
-          path: spine-godot/godot/bin/web_debug.zip
-
-      - name: Upload template (Web release)
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ format('{0}-{1}{2}.zip', 'godot-template-web-release', env.GODOT_TAG, env.GODOT_MONO_UPLOAD_SUFFIX) }}
-          path: spine-godot/godot/bin/web_release.zip
+  build-versions:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - tag: "4.5-stable"
+            version: "4.5.stable"
+            dev: false
+    uses: ./.github/workflows/spine-godot-v4.yml
+    with:
+      godot_tag:     ${{ matrix.tag }}
+      godot_version: ${{ matrix.version }}
+      dev:           ${{ matrix.dev }}
+      godot_mono:    false
+    secrets: inherit
