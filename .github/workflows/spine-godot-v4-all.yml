@@ -1,26 +1,32 @@
 name: Build spine-godot (All Godot 4.x versions)
 
 on:
+  workflow_dispatch:
   push:
     paths:
       - ".github/workflows/**"
       - "spine-godot/**"
       - "spine-cpp/**"
-  workflow_dispatch:
 
 jobs:
   build-versions:
     strategy:
+      fail-fast: false
       matrix:
-        version:
-          [
-            {"tag": "4.5-stable",  "version": "4.5.stable",  "dev": false},
-            {"tag": "4.4.1-stable","version": "4.4.1.stable","dev": false},
-            {"tag": "4.3-stable",  "version": "4.3.stable",  "dev": false}
-          ]
+        include:
+          - tag: "4.5-stable"
+            version: "4.5.stable"
+            dev: false
+          - tag: "4.4.1-stable"
+            version: "4.4.1.stable"
+            dev: false
+          - tag: "4.3-stable"
+            version: "4.3.stable"
+            dev: false
     uses: ./.github/workflows/spine-godot-v4.yml
     with:
-      godot_tag: ${{ matrix.version.tag }}
-      godot_version: ${{ matrix.version.version }}
-      godot_mono: ${{ matrix.version.mono }}
+      godot_tag:     ${{ matrix.tag }}
+      godot_version: ${{ matrix.version }}
+      dev:           ${{ matrix.dev }}
+      godot_mono:    false   # non-Mono; уберите строку, если reusable не ожидает этот input
     secrets: inherit
