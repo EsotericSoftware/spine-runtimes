@@ -48,9 +48,11 @@ jobs:
   godot-editor-windows:
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          submodules: recursive
 
       - name: Setup python and scons
         uses: ./.github/actions/setup-godot-deps-4
@@ -70,9 +72,11 @@ jobs:
   godot-editor-linux:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          submodules: recursive
 
       - name: Setup python and scons
         uses: ./.github/actions/setup-godot-deps-4
@@ -81,7 +85,7 @@ jobs:
         shell: bash
         run: |
           sudo apt-get update
-          sudo apt-get install build-essential scons pkg-config libx11-dev libxcursor-dev libxinerama-dev libgl1-mesa-dev libglu-dev libasound2-dev libpulse-dev libudev-dev libxi-dev libxrandr-dev
+          sudo apt-get install -y build-essential scons pkg-config libx11-dev libxcursor-dev libxinerama-dev libgl1-mesa-dev libglu-dev libasound2-dev libpulse-dev libudev-dev libxi-dev libxrandr-dev
           ./spine-godot/build/setup.sh $GODOT_TAG false $GODOT_MONO
           ./spine-godot/build/build-v4.sh $GODOT_MONO
 
@@ -94,9 +98,11 @@ jobs:
   godot-editor-macos:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          submodules: recursive
 
       - name: Setup python and scons
         uses: ./.github/actions/setup-godot-deps-4
@@ -120,11 +126,12 @@ jobs:
   godot-template-ios:
     runs-on: macos-latest
     if: ${{ inputs.godot_mono == false }}
-
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          submodules: recursive
 
       - name: Setup python and scons
         uses: ./.github/actions/setup-godot-deps-4
@@ -144,9 +151,11 @@ jobs:
   godot-template-macos:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          submodules: recursive
 
       - name: Setup python and scons
         uses: ./.github/actions/setup-godot-deps-4
@@ -166,9 +175,11 @@ jobs:
   godot-template-linux:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          submodules: recursive
 
       - name: Setup python and scons
         uses: ./.github/actions/setup-godot-deps-4
@@ -176,9 +187,9 @@ jobs:
       - name: Build Godot artifact
         run: |
           sudo apt-get update
-          sudo apt-get install build-essential scons pkg-config libx11-dev libxcursor-dev libxinerama-dev libgl1-mesa-dev libglu-dev libasound2-dev libpulse-dev libudev-dev libxi-dev libxrandr-dev
+          sudo apt-get install -y build-essential scons pkg-config libx11-dev libxcursor-dev libxinerama-dev libgl1-mesa-dev libglu-dev libasound2-dev libpulse-dev libudev-dev libxi-dev libxrandr-dev
           ./spine-godot/build/setup.sh $GODOT_TAG false $GODOT_MONO
-          ./spine-godot/build/build-templates-v4.sh linux $GODOT_MONO
+          ./spine-godot/build-templates-v4.sh linux $GODOT_MONO
 
       - name: Upload artifacts debug
         uses: actions/upload-artifact@v4
@@ -195,9 +206,11 @@ jobs:
   godot-template-windows:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          submodules: recursive
 
       - name: Setup python and scons
         uses: ./.github/actions/setup-godot-deps-4
@@ -224,9 +237,11 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ inputs.godot_mono == false }}
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          submodules: recursive
 
       # Azure repositories are not reliable, we need to prevent azure giving us packages.
       - name: Make apt sources.list use the default Ubuntu repositories
@@ -271,20 +286,20 @@ jobs:
   godot-template-web:
     runs-on: ubuntu-latest
     if: ${{ inputs.godot_mono == false }}
-
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          submodules: recursive
 
       - name: Set up Emscripten latest
         uses: mymindstorm/setup-emsdk@v11
         with:
-          version: ${{env.EM_VERSION}}
+          version: ${{ env.EM_VERSION }}
 
       - name: Verify Emscripten setup
-        run: |
-          emcc -v
+        run: emcc -v
 
       - name: Setup python and scons
         uses: ./.github/actions/setup-godot-deps-4
@@ -343,10 +358,12 @@ jobs:
           path: spine-godot/godot/bin/web_dlink_nothreads_release.zip
 
   upload-to-s3:
-    needs: [godot-editor-windows, godot-editor-linux, godot-editor-macos, godot-template-ios, godot-template-macos, godot-template-windows, godot-template-linux, godot-template-android, godot-template-web]
+    needs:
+      [godot-editor-windows, godot-editor-linux, godot-editor-macos,
+       godot-template-ios, godot-template-macos, godot-template-windows,
+       godot-template-linux, godot-template-android, godot-template-web]
     runs-on: ubuntu-latest
     if: ${{ inputs.godot_mono == false }}
-
     steps:
       - name: Download godot-editor-windows artifact
         uses: actions/download-artifact@v4
@@ -488,7 +505,6 @@ jobs:
     needs: [godot-editor-windows, godot-editor-linux, godot-editor-macos, godot-template-macos, godot-template-windows, godot-template-linux]
     runs-on: ubuntu-latest
     if: ${{ inputs.godot_mono == true }}
-
     steps:
       - name: Download godot-editor-windows artifact
         uses: actions/download-artifact@v4
@@ -548,6 +564,3 @@ jobs:
           echo "$GODOT_VERSION.mono" > version.txt
           zip spine-godot-templates-$BRANCH-$GODOT_TAG-mono.zip macos.zip windows_debug_x86_64.exe windows_release_x86_64.exe linux_debug.x86_64 linux_release.x86_64 version.txt
           aws s3 cp spine-godot-templates-$BRANCH-$GODOT_TAG-mono.zip s3://spine-godot/$BRANCH/$GODOT_TAG/spine-godot-templates-$BRANCH-$GODOT_TAG-mono.tpz
-
-
-
