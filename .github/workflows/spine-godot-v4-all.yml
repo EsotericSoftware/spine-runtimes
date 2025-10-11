@@ -3,7 +3,7 @@ name: Build spine-godot (All Godot 4.x versions)
 on:
   push:
     paths:
-      - ".github/workflows/build-spine-godot-gdextension-all.yml"
+      - ".github/workflows/**"
       - "spine-godot/**"
       - "spine-cpp/**"
   workflow_dispatch:
