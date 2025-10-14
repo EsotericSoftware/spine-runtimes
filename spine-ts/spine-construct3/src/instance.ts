@@ -39,6 +39,7 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 
 	// utils for drawing
 	private tempVertices = new Float32Array(4096);
+	private tempColors = new Float32Array(4096);
 
 	// errors
 	private errors: Record<string, string> = {};
@@ -114,13 +115,15 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 
 			const cos = Math.cos(offsetAngle);
 			const sin = Math.sin(offsetAngle);
+			const inv255 = 1 / 255;
 
 			this.update(0);
 			let command = this.skeletonRenderer.render(this.skeleton);
 			while (command) {
-				const { numVertices, positions, uvs, indices, numIndices } = command;
+				const { numVertices, positions, uvs, colors, indices, numIndices } = command;
 
 				const vertices = this.tempVertices;
+				const c3colors = this.tempColors;
 				for (let i = 0; i < numVertices; i++) {
 					const srcIndex = i * 2;
 					const dstIndex = i * 3;
@@ -129,6 +132,13 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 					vertices[dstIndex] = x * cos - y * sin + offsetX;
 					vertices[dstIndex + 1] = x * sin + y * cos + offsetY;
 					vertices[dstIndex + 2] = 0;
+
+					const color = colors[i];
+					const colorDst = i * 4;
+					c3colors[colorDst] = (color >>> 16 & 0xFF) * inv255;
+					c3colors[colorDst + 1] = (color >>> 8 & 0xFF) * inv255;
+					c3colors[colorDst + 2] = (color & 0xFF) * inv255;
+					c3colors[colorDst + 3] = (color >>> 24 & 0xFF) * inv255;
 				}
 
 				iRenderer.ResetColor();
@@ -141,6 +151,7 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 					uvs.subarray(0, numVertices * 2),
 					// workaround for this bug: https://github.com/Scirra/Construct-bugs/issues/8746
 					this.padUint16ArrayForWebGPU(indices.subarray(0, numIndices)),
+					c3colors,
 				);
 
 
