@@ -44,9 +44,11 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Choreographer;
 import android.view.View;
 
+import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 
 import java.io.File;
@@ -291,7 +293,7 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 	/** The same as {@link SpineView#loadFromDrawable(AndroidSkeletonDrawable, Context, SpineController)}, but can be used after
 	 * instantiating the view via {@link SpineView#SpineView(Context, SpineController)}. */
 	public void loadFromDrawable (AndroidSkeletonDrawable drawable) {
-		loadFrom( () -> drawable);
+		post( () -> setSkeletonDrawable(drawable));
 	}
 
 	/** Get the {@link SpineController} */
@@ -350,19 +352,34 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 		this.rendering = rendering;
 	}
 
-	private void loadFrom (AndroidSkeletonDrawableLoader loader) {
+	/** Load the skeleton from a {@link AndroidSkeletonDrawableLoader}. This method is asynchronous.
+	 * If you want to control the loading thread yourself, obtain an {@link AndroidSkeletonDrawable}
+	 * using {@link AndroidSkeletonDrawable#fromHttp(URL, URL, File)} or another load method,
+	 * then call {@link SpineView#loadFromDrawable(AndroidSkeletonDrawable)} or
+	 * {@link SpineView#setSkeletonDrawable(AndroidSkeletonDrawable)}. */
+	public void loadFrom (AndroidSkeletonDrawableLoader loader) {
 		Handler mainHandler = new Handler(Looper.getMainLooper());
 		Thread backgroundThread = new Thread( () -> {
-			final AndroidSkeletonDrawable skeletonDrawable = loader.load();
-			mainHandler.post( () -> {
-				computedBounds = boundsProvider.computeBounds(skeletonDrawable);
-				updateCanvasTransform();
-
-				controller.init(skeletonDrawable);
-				Choreographer.getInstance().postFrameCallback(SpineView.this);
-			});
+			try {
+				final AndroidSkeletonDrawable skeletonDrawable = loader.load();
+				mainHandler.post( () -> {
+					setSkeletonDrawable(skeletonDrawable);
+				});
+			}catch (Exception e) {
+				Log.e("SpineView", "Error loading skeleton", e);
+			}
 		});
 		backgroundThread.start();
+	}
+
+	/** Set the skeleton drawable. Must be called from the main thread.*/
+	@MainThread
+	public final void setSkeletonDrawable (@NonNull AndroidSkeletonDrawable skeletonDrawable) {
+		computedBounds = boundsProvider.computeBounds(skeletonDrawable);
+		updateCanvasTransform();
+
+		controller.init(skeletonDrawable);
+		Choreographer.getInstance().postFrameCallback(SpineView.this);
 	}
 
 	@Override
