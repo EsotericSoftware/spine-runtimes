@@ -264,29 +264,13 @@ class DrawingInstance extends globalThis.ISDKWorldInstanceBase {
 			renderer.drawMesh(
 				vertices.subarray(0, numVertices * 3),
 				uvs.subarray(0, numVertices * 2),
-				// workaround for this bug: https://github.com/Scirra/Construct-bugs/issues/8746
-				this.padUint16ArrayForWebGPU(indices.subarray(0, numIndices)),
+				indices.subarray(0, numIndices),
 				c3colors.subarray(0, numVertices * 4),
 			);
 
 			command = command.next;
 		}
 
-	}
-
-	padUint16ArrayForWebGPU (originalArray: Uint16Array) {
-		const currentLength = originalArray.length;
-
-		const alignedLength = Math.ceil(currentLength / 6) * 6;
-
-		if (alignedLength === currentLength) {
-			return originalArray;
-		}
-
-		const paddedArray = new Uint16Array(alignedLength);
-		paddedArray.set(originalArray);
-
-		return paddedArray;
 	}
 
 	_saveToJson () {
