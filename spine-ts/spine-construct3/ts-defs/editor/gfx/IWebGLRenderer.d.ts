@@ -4,7 +4,7 @@
 declare namespace SDK.Gfx {
 	class IWebGLRenderer {
 		SetAlphaBlend(): void;
-		
+
 		SetColorFillMode(): void;
 		SetTextureFillMode(): void;
 		SetSmoothLineFillMode(): void;
@@ -28,7 +28,7 @@ declare namespace SDK.Gfx {
 		Quad3D(tlx: number, tly: number, tlz: number, trx: number, try_: number, trz: number, brx: number, bry: number, brz: number, blx: number, bly: number, blz: number, r: SDK.Rect): void;
 		Quad3D2(tlx: number, tly: number, tlz: number, trx: number, try_: number, trz: number, brx: number, bry: number, brz: number, blx: number, bly: number, blz: number, uv: SDK.Quad): void;
 
-		DrawMesh(posArr: Float32Array, uvArr: Float32Array, indexArr: Uint16Array): void;
+		DrawMesh(posArr: Float32Array, uvArr: Float32Array, indexArr: Uint16Array, colorArr?: Float32Array): void;
 
 		ConvexPoly(pts: number[]): void;
 		Line(x1: number, y1: number, x2: number, y2: number): void;

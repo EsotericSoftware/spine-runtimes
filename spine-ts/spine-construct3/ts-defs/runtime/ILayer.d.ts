@@ -16,7 +16,7 @@ declare class ILayer extends ConstructEventTarget<LayerEventMap>
 	readonly name: string;
     readonly layout: IAnyProjectLayout;
     readonly index: number;
-    
+
     isVisible: boolean;
     readonly isSelfAndParentsVisible: boolean;
     isInteractive: boolean;

@@ -5,7 +5,7 @@ declare class BehaviorInstanceEvent<InstType, BehInstType> implements ConstructE
 }
 
 interface BehaviorInstanceEventMap<InstType, BehInstType> {
-	
+
 }
 
 /** Represents an instance of a behavior associated with a specific object instance.

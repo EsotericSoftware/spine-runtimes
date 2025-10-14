@@ -12,7 +12,7 @@ declare class ITimelineStateBase
     isLooping: boolean;
     isPingPong: boolean;
     playbackRate: number;
-    
+
     readonly progress: number;
     readonly tags: string;
     readonly finished: Promise<void>;

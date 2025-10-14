@@ -68,7 +68,7 @@ declare class MultiplayerSignallingState extends ConstructEventTarget<Multiplaye
 	joinRoom(game: string, instance: string, room: string, maxClients?: number): Promise<MultiplayerSignallingJoinResult>;
 	autoJoinRoom(game: string, instance: string, room: string, maxClients?: number, isLocking?: boolean): Promise<MultiplayerSignallingAutoJoinResult>;
 	leaveRoom(): Promise<void>;
-	
+
 	requestGameInstanceList(game: string): Promise<MultiplayerSignallingGameInstanceEntry[]>;
 	requestRoomList(game: string, instance: string, type: MultiplayerRoomListType): Promise<MultiplayerSignallingRoomEntry[]>;
 }

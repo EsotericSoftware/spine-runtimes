@@ -54,7 +54,7 @@ interface CGSObjectTypeEventMap<InstanceType = IInstance> extends ObjectClassEve
 	"signinpopupblocked": ConstructEvent
 }
 
-declare class ICGSObjectType<InstType extends IInstance = IInstance> extends IObjectType<InstType, MultiplayerObjectEventMap<InstType>>
+declare class ICGSObjectType<InstType extends IInstance = IInstance> extends IObjectType<InstType, CGSObjectTypeEventMap<InstType>>
 {
 	addEventListener<K extends keyof CGSObjectTypeEventMap<InstType>>(type: K, listener: (ev: CGSObjectTypeEventMap<InstType>[K]) => any): void;
 	removeEventListener<K extends keyof CGSObjectTypeEventMap<InstType>>(type: K, listener: (ev: CGSObjectTypeEventMap<InstType>[K]) => any): void;
@@ -65,7 +65,7 @@ declare class ICGSObjectType<InstType extends IInstance = IInstance> extends IOb
 	readonly playerName: string;
 	readonly gameId: string;
 	readonly sessionKey: string;
-	
+
 	signInWithProvider(provider: CGSSignInProvider, gameId: string, opts?: CGSSignInOptions): Promise<void>;
 	retryOpenSignInPopup(): void;
 	signInPersistent(gameId: string): Promise<void>;

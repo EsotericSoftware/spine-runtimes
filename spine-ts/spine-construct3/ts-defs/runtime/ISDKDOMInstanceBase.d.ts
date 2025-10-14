@@ -4,7 +4,7 @@
 declare class ISDKDOMInstanceBase_ extends ISDKWorldInstanceBase
 {
     constructor(opts: { domComponentId: string });
-    
+
     _postToDOMElement(handler: string, data: JSONValue): void;
     _postToDOMElementAsync(handler: string, data: JSONValue): Promise<JSONValue>;
     _postToDOMElementMaybeSync(handler: string, data: JSONValue): void;

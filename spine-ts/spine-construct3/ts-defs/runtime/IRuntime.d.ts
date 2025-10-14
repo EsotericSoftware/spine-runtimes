@@ -188,7 +188,7 @@ declare class IRuntime extends ConstructEventTarget<RuntimeEventMap>
 
 	signal(tag: string): void;
 	waitForSignal(tag: string): Promise<void>;
-	
+
 	/** When called from an event sheet, sets the current function return value,
 	 * much like the 'Set return value' action.	 */
 	setReturnValue(value: number | string): void;

@@ -2,7 +2,7 @@ declare namespace SDK {
 	class IBehaviorBase {
 
 		constructor(id: string);
-		
+
 		_info: SDK.IBehaviorInfo;
 
 		Release(): void;

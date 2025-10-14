@@ -2,8 +2,10 @@
 /** Utility class for scripting APIs intended for the Addon SDK. */
 declare class ISDKUtils
 {
+	readonly constructVersionCode: number;
+
 	updateRender(): void;
-	
+
 	addLoadPromise(promise: Promise<void>): void;
 
 	sendWrapperExtensionMessage(wrapperComponentId: string, messageId: string, params?: WrapperExtensionParameterType[]): void;

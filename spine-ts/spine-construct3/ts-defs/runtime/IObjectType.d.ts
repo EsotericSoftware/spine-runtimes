@@ -1,6 +1,6 @@
 /** Represents an object type in the project.
  * @see {@link https://www.construct.net/en/make-games/manuals/construct-3/scripting/scripting-reference/object-interfaces/iobjecttype | IObjectType documentation } */
-declare class IObjectType<InstanceType extends IInstance, EventMapType = ObjectClassEventMap<InstanceType>> extends IObjectClass<InstanceType, EventMapType>
+declare class IObjectType<InstanceType extends IInstance = IInstance, EventMapType = ObjectClassEventMap<InstanceType>> extends IObjectClass<InstanceType, EventMapType>
 {
 	/** Set the instance class for this object type. Used for subclassing.
 	 * @see {@link https://www.construct.net/en/make-games/manuals/construct-3/scripting/guides/subclassing-instances | Subclassing instances} */

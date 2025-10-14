@@ -27,6 +27,6 @@ declare class IFollowBehaviorInstance<InstType> extends IBehaviorInstance<InstTy
 
     saveHistoryToJSON(maxDelay?: number): JSONValue;
     loadHistoryFromJSON(json: JSONValue): void;
-    
+
     isEnabled: boolean;
 }

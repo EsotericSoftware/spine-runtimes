@@ -1,4 +1,9 @@
 
+interface ProjectFileListEntry {
+    name: string;
+    size: number;
+}
+
 /** Provides access to the project's assets.
  * @see {@link https://www.construct.net/make-games/manuals/construct-3/scripting/scripting-reference/interfaces/iassetmanager | IAssetManager documentation } */
 declare class IAssetManager
@@ -17,7 +22,7 @@ declare class IAssetManager
     getProjectFileUrl(url: string): Promise<string>;
     getMediaFileUrl(url: string): Promise<string>;
     readonly mediaFolder: string;
-    
+
     /**
 	 * @deprecated All supported platforms now support WebM Opus, so use the Web Audio API decodeAudioData() method instead.
 	 */
@@ -26,4 +31,6 @@ declare class IAssetManager
     loadScripts(...urls: string[]): Promise<void>;
     compileWebAssembly(url: string): Promise<WebAssembly.Module>;
     loadStyleSheet(url: string): Promise<void>;
+
+    readonly projectFileList: ProjectFileListEntry[];
 }

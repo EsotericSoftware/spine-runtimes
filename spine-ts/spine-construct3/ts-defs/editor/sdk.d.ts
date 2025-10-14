@@ -6,6 +6,5 @@ declare namespace SDK {
 
 type EditorPropertyValueType = number | string | boolean | SDK.Color;
 
-type Vec2Arr = [number, number];
-type Vec3Arr = [number, number, number];
-type Vec4Arr = [number, number, number, number];
+// Relevant type is not defined for editor addons
+type TweenCustomEaseType = never;

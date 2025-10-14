@@ -20,7 +20,7 @@ declare class IInstance
 	addEventListener<K extends keyof InstanceEventMap<this>>(type: K, listener: (ev: InstanceEventMap<this>[K]) => any): void;
 	removeEventListener<K extends keyof InstanceEventMap<this>>(type: K, listener: (ev: InstanceEventMap<this>[K]) => any): void;
 	dispatchEvent(evt: ConstructEvent): void;
-	
+
 	readonly runtime: IRuntime;
 	readonly objectType: IObjectType<this>;
 	readonly plugin: IPlugin_;
