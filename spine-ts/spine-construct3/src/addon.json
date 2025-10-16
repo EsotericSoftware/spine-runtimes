@@ -27,6 +27,7 @@
     "c3runtime/actions.js",
     "c3runtime/expressions.js",
     "lang/en-US.json",
+    "lang/zh-CN.json",
     "aces.json",
     "addon.json",
     "icon.svg",

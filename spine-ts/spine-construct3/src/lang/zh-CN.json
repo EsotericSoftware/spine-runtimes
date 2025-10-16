@@ -1,0 +1,178 @@
+﻿{
+  "$schema": "../../plugin.lang.schema.json",
+
+  "languageTag": "zh-CN",
+  "fileDescription": "Spine插件的字符串资源。",
+  "text": {
+    "plugins": {
+      "esotericsoftware_spineconstruct3": {
+        "name": "Spine",
+        "description": "Spine运行时 for Construct3。",
+        "help-url": "https://www.construct.net",
+        "properties": {
+          "spine-skeleton-file": {
+            "name": "骨架",
+            "desc": "骨架文件"
+          },
+          "spine-atlas-file": {
+            "name": "图集",
+            "desc": "图集文件"
+          },
+          "spine-loader-scale": {
+            "name": "加载比例",
+            "desc": "加载比例"
+          },
+          "spine-animation": {
+            "name": "动画",
+            "desc": "动画"
+          },
+          "spine-skin": {
+            "name": "皮肤",
+            "desc": "皮肤"
+          },
+          "spine-errors": {
+            "name": "错误",
+            "desc": "错误"
+          },
+          "spine-bounds-provider-group": {
+            "name": "边界提供者",
+            "desc": "选择所需的边界提供者并填写相应的属性。"
+          },
+          "spine-bounds-provider": {
+            "name": "边界提供者",
+            "desc": "要使用的边界提供者。",
+            "items": {
+              "setup": "初始姿势边界",
+              "animation-skin": "动画/皮肤边界"
+            }
+          },
+          "spine-bounds-provider-move": {
+            "name": "位置边界",
+            "desc": "在调整边界大小和位置时保持骨架固定在一个位置。"
+          },
+          "spine-scale-x": {
+            "name": "X缩放",
+            "desc": "X缩放"
+          },
+          "spine-scale-y": {
+            "name": "Y缩放",
+            "desc": "Y缩放"
+          },
+          "spine-bounds-offset-x": {
+            "name": "X偏移",
+            "desc": "X偏移"
+          },
+          "spine-bounds-offset-y": {
+            "name": "Y偏移",
+            "desc": "Y偏移"
+          },
+          "spine-bounds-offset-angle": {
+            "name": "偏移角度",
+            "desc": "偏移角度"
+          }
+        },
+        "aceCategories": {
+          "custom": "自定义"
+        },
+        "conditions": {
+          "on-skeleton-loaded": {
+            "list-name": "骨架加载完成时",
+            "display-text": "骨架加载完成时",
+            "description": "当骨架加载完成时执行操作"
+          },
+          "on-animation-event": {
+            "list-name": "动画事件触发时",
+            "display-text": "当轨道{1}上的动画{2}触发{0}事件时",
+            "description": "当动画事件触发时执行操作",
+            "params": {
+              "event": {
+                "name": "事件名称",
+                "desc": "事件名称"
+              },
+              "animation": {
+                "name": "动画",
+                "desc": "动画"
+              },
+              "track": {
+                "name": "轨道编号",
+                "desc": "轨道编号"
+              }
+            }
+          }
+        },
+        "actions": {
+          "do-alert": {
+            "list-name": "显示警告",
+            "display-text": "显示警告",
+            "description": "显示一个示例警告。"
+          },
+          "set-skin": {
+            "list-name": "设置皮肤",
+            "display-text": "设置皮肤 {0}",
+            "description": "设置皮肤",
+            "params": {
+              "skin-name": {
+                "name": "皮肤列表",
+                "desc": "用逗号分隔的要设置的皮肤列表。空字符串表示取消设置所有皮肤。"
+              }
+            }
+          },
+          "add-animation": {
+            "list-name": "添加动画",
+            "display-text": "在轨道{0}上添加动画{1}，循环{2}，延迟{3}",
+            "description": "添加动画",
+            "params": {
+              "track": {
+                "name": "轨道",
+                "desc": "轨道"
+              },
+              "animation": {
+                "name": "动画名称",
+                "desc": "动画名称"
+              },
+              "loop": {
+                "name": "循环",
+                "desc": "循环"
+              },
+              "delay": {
+                "name": "延迟",
+                "desc": "延迟"
+              }
+            }
+          },
+          "set-animation": {
+            "list-name": "设置动画",
+            "display-text": "在轨道{0}上设置动画{1}，循环{2}",
+            "description": "设置动画",
+            "params": {
+              "track": {
+                "name": "轨道",
+                "desc": "轨道"
+              },
+              "animation": {
+                "name": "动画名称",
+                "desc": "动画名称"
+              },
+              "loop": {
+                "name": "循环",
+                "desc": "循环"
+              }
+            }
+          }
+        },
+        "expressions": {
+          "double": {
+            "description": "将数字翻倍。",
+            "translated-name": "Double",
+            "params": {
+              "number": {
+                "name": "数字",
+                "desc": "要翻倍的数字。"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
