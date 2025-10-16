@@ -3,10 +3,8 @@ import type { SDKInstanceClass } from "./instance.ts";
 
 const C3 = globalThis.C3;
 
-C3.Plugins.EsotericSoftware_SpineConstruct3.Type = class DrawingType extends globalThis.ISDKObjectTypeBase<SDKInstanceClass>
-{
-	constructor()
-	{
+C3.Plugins.EsotericSoftware_SpineConstruct3.Type = class DrawingType extends globalThis.ISDKObjectTypeBase<SDKInstanceClass> {
+	constructor () {
 		super();
 	}
 
