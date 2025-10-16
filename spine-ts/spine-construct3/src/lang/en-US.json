@@ -117,6 +117,29 @@
               }
             }
           },
+          "add-animation": {
+            "list-name": "Add animation",
+            "display-text": "Add animation {1} on track {0} with loop {2} and delay {3}",
+            "description": "Add animation",
+            "params": {
+              "track": {
+                "name": "track",
+                "desc": "track"
+              },
+              "animation": {
+                "name": "animations name",
+                "desc": "animations name"
+              },
+              "loop": {
+                "name": "loop",
+                "desc": "loop"
+              },
+              "delay": {
+                "name": "delay",
+                "desc": "delay"
+              }
+            }
+          },
           "set-animation": {
             "list-name": "Set animation",
             "display-text": "Set animation {1} on track {0} with loop {2}",

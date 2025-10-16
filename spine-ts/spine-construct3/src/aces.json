@@ -34,7 +34,7 @@
       {
         "id": "do-alert",
         "scriptName": "Alert",
-        "highlight": true
+        "highlight": false
       },
       {
         "id": "set-skin",
@@ -48,9 +48,32 @@
         ]
       },
       {
+        "id": "add-animation",
+        "scriptName": "AddAnimation",
+        "highlight": true,
+        "params": [
+          {
+            "id": "track",
+            "type": "number"
+          },
+          {
+            "id": "animation",
+            "type": "string"
+          },
+          {
+            "id": "loop",
+            "type": "boolean"
+          },
+          {
+            "id": "delay",
+            "type": "number"
+          }
+        ]
+      },
+      {
         "id": "set-animation",
         "scriptName": "SetAnimation",
-        "highlight": false,
+        "highlight": true,
         "params": [
           {
             "id": "track",

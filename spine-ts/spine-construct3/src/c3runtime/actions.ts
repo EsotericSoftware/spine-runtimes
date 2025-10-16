@@ -15,6 +15,10 @@ C3.Plugins.EsotericSoftware_SpineConstruct3.Acts =
 
 	SetAnimation (this: SDKInstanceClass, track: number, animation: string, loop = false) {
 		this.setAnimation(track, animation, loop);
+	},
+
+	AddAnimation (this: SDKInstanceClass, track: number, animation: string, loop = false, delay = 0) {
+		this.addAnimation(track, animation, loop, delay);
 	}
 
 };
