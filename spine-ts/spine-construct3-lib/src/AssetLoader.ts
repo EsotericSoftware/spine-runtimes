@@ -33,8 +33,8 @@ import { C3Texture, C3TextureEditor } from "./C3Texture";
 
 export class AssetLoader {
 
-	public async loadSkeletonEditor (sid: number, textureAtlas: TextureAtlas, scale = 1, instance: SDK.IWorldInstance) {
-		const projectFile = instance.GetProject().GetProjectFileBySID(sid);
+	public async loadSkeletonEditor (path: string, textureAtlas: TextureAtlas, scale = 1, instance: SDK.IWorldInstance) {
+		const projectFile = instance.GetProject().GetProjectFileByExportPath(path);
 		if (!projectFile) return null;
 
 		const blob = projectFile.GetBlob();
@@ -54,16 +54,17 @@ export class AssetLoader {
 		return skeletonLoader.readSkeletonData(skeletonFile);
 	}
 
-	public async loadAtlasEditor (sid: number, instance: SDK.IWorldInstance, renderer: SDK.Gfx.IWebGLRenderer) {
-		const projectFile = instance.GetProject().GetProjectFileBySID(sid);
+	public async loadAtlasEditor (path: string, instance: SDK.IWorldInstance, renderer: SDK.Gfx.IWebGLRenderer) {
+		const projectFile = instance.GetProject().GetProjectFileByExportPath(path);
 		if (!projectFile) return null;
 
 		const blob = projectFile.GetBlob();
 		const content = await blob.text();
 
+		const basePath = path.substring(0, path.lastIndexOf("/") + 1);
 		const textureAtlas = new TextureAtlas(content);
 		await Promise.all(textureAtlas.pages.map(async page => {
-			const texture = await this.loadSpineTextureEditor(page.name, page.pma, instance);
+			const texture = await this.loadSpineTextureEditor(basePath + page.name, page.pma, instance);
 			if (texture) {
 				const spineTexture = new C3TextureEditor(texture, renderer, page);
 				page.setTexture(spineTexture);
@@ -112,9 +113,10 @@ export class AssetLoader {
 		const content = await instance.assets.fetchText(fullPath);
 		if (!content) return null;
 
+		const basePath = path.substring(0, path.lastIndexOf("/") + 1);
 		const textureAtlas = new TextureAtlas(content);
 		await Promise.all(textureAtlas.pages.map(async page => {
-			const texture = await this.loadSpineTextureRuntime(page.name, page.pma, instance);
+			const texture = await this.loadSpineTextureRuntime(basePath + page.name, page.pma, instance);
 			if (texture) {
 				const spineTexture = new C3Texture(texture, renderer, page);
 				page.setTexture(spineTexture);

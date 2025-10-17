@@ -16,6 +16,8 @@ const PLUGIN_ID = "EsotericSoftware_SpineConstruct3";
 const PLUGIN_CATEGORY = "general";
 
 const PLUGIN_CLASS = class MyDrawingPlugin extends SDK.IPluginBase {
+	static Instance: SDKEditorInstanceClass;
+
 	static PROP_ATLAS = "spine-atlas-file";
 	static PROP_SKELETON = "spine-skeleton-file";
 	static PROP_LOADER_SCALE = "spine-loader-scale";
@@ -64,9 +66,12 @@ const PLUGIN_CLASS = class MyDrawingPlugin extends SDK.IPluginBase {
 
 		SDK.Lang.PushContext(".properties");
 
+		// https://github.com/Scirra/Construct-feature-requests/issues/653
+		// new SDK.PluginProperty("projectfile", MyDrawingPlugin.PROP_ATLAS, {initialValue: "", filter:".atlas"}),
+		// new SDK.PluginProperty("projectfile", MyDrawingPlugin.PROP_SKELETON, {initialValue: "", filter:".json,.skel"}),
 		this._info.SetProperties([
-			new SDK.PluginProperty("projectfile", MyDrawingPlugin.PROP_ATLAS, ""),
-			new SDK.PluginProperty("projectfile", MyDrawingPlugin.PROP_SKELETON, ""),
+			new SDK.PluginProperty("text", MyDrawingPlugin.PROP_ATLAS, ""),
+			new SDK.PluginProperty("text", MyDrawingPlugin.PROP_SKELETON, ""),
 			new SDK.PluginProperty("float", MyDrawingPlugin.PROP_LOADER_SCALE, 1),
 			new SDK.PluginProperty("text", MyDrawingPlugin.PROP_SKIN, ""),
 			new SDK.PluginProperty("text", MyDrawingPlugin.PROP_ANIMATION, ""),
@@ -100,6 +105,7 @@ const PLUGIN_CLASS = class MyDrawingPlugin extends SDK.IPluginBase {
 		SDK.Lang.PopContext();		// .properties
 
 		SDK.Lang.PopContext();
+		console.log('Spine Construct3 plugin loaded', this)
 	}
 };
 

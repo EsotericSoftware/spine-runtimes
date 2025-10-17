@@ -34,7 +34,7 @@ class DrawingInstance extends globalThis.ISDKWorldInstanceBase {
 
 		const properties = this._getInitProperties();
 		if (properties) {
-			console.log(properties);
+			console.log('Runtime Properties', properties);
 			this.propAtlas = properties[0] as string;
 			this.propSkel = properties[1] as string;
 			this.propLoaderScale = properties[2] as number;

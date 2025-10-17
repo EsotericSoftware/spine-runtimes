@@ -14,7 +14,7 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 	private layoutView?: SDK.UI.ILayoutView;
 	private renderer?: SDK.Gfx.IWebGLRenderer;
 
-	private currentAtlasFileSID = -1;
+	private currentAtlasFile = "";
 	private textureAtlas?: TextureAtlas;
 
 	skeleton?: Skeleton;
@@ -61,7 +61,6 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 
 	OnCreate () {
 		this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_PROVIDER_MOVE, false);
-		this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_SKELETON) as number;
 	}
 
 	OnPlacedInLayout () {
@@ -303,7 +302,7 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 
 		console.log("Loading skeleton");
 
-		const propValue = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_SKELETON) as number;
+		const propValue = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_SKELETON) as string;
 		const loaderScale = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_LOADER_SCALE) as number;
 		const skeletonData = await this.assetLoader.loadSkeletonEditor(propValue, this.textureAtlas, loaderScale, this._inst)
 			.catch((error) => {
@@ -327,12 +326,12 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 	private async loadAtlas () {
 		if (!this.renderer) return;
 
-		const propValue = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_ATLAS) as number;
+		const propValue = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_ATLAS) as string;
 
-		if (this.currentAtlasFileSID === propValue) return;
-		this.currentAtlasFileSID = propValue;
+		if (this.currentAtlasFile === propValue) return;
+		this.currentAtlasFile = propValue;
 
-		console.log("Loading atlas");
+		console.log("Loading atlas", propValue);
 
 		const textureAtlas = await this.assetLoader.loadAtlasEditor(propValue, this._inst, this.renderer);
 		if (!textureAtlas) return;
