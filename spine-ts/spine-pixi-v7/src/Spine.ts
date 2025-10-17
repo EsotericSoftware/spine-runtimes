@@ -861,20 +861,14 @@ export class Spine extends Container {
 	public static readonly skeletonCache: Record<string, SkeletonData> = Object.create(null);
 
 	/**
-	 * Use this method to instantiate a Spine game object.
-	 * Before instantiating a Spine game object, the skeleton (`.skel` or `.json`) and the atlas text files must be loaded into the Assets. For example:
-	 * ```
-	 * PIXI.Assets.add("sackData", "/assets/sack-pro.skel");
-	 * PIXI.Assets.add("sackAtlas", "/assets/sack-pma.atlas");
-	 * await PIXI.Assets.load(["sackData", "sackAtlas"]);
-	 * ```
-	 * Once a Spine game object is created, its skeleton data is cached into {@link Spine.skeletonCache} using the key:
-	 * `${skeletonAssetName}-${atlasAssetName}-${options?.scale ?? 1}`
+	 * Prepares the initialization data for creating a Spine game object.
+	 * Handles skeleton data parsing and caching. If the skeleton data is already cached, returns the cached version.
+	 * Otherwise, loads and parses the skeleton and atlas assets, then caches the result.
 	 *
 	 * @param options - Options to configure the Spine game object. See {@link SpineFromOptions}
-	 * @returns {Spine} The Spine game object instantiated
+	 * @returns {SpineOptions} The initialization options object ready to be passed to the Spine constructor
 	 */
-	public static from ({ skeleton, atlas, scale = 1, darkTint, autoUpdate = true, boundsProvider, allowMissingRegions }: SpineFromOptions) {
+	public static getSpineInitData ({ skeleton, atlas, scale = 1, darkTint, autoUpdate = true, boundsProvider, allowMissingRegions }: SpineFromOptions): SpineOptions {
 		const cacheKey = `${skeleton}-${atlas}-${scale}`;
 
 		let skeletonData = Spine.skeletonCache[cacheKey];
@@ -888,7 +882,25 @@ export class Spine extends Container {
 			skeletonData = parser.readSkeletonData(skeletonAsset);
 			Spine.skeletonCache[cacheKey] = skeletonData;
 		}
-		return new Spine({ skeletonData, darkTint, autoUpdate, boundsProvider });
+		return { skeletonData, darkTint, autoUpdate, boundsProvider };
+	}
+
+	/**
+	 * Use this method to instantiate a Spine game object.
+	 * Before instantiating a Spine game object, the skeleton (`.skel` or `.json`) and the atlas text files must be loaded into the Assets. For example:
+	 * ```
+	 * PIXI.Assets.add("sackData", "/assets/sack-pro.skel");
+	 * PIXI.Assets.add("sackAtlas", "/assets/sack-pma.atlas");
+	 * await PIXI.Assets.load(["sackData", "sackAtlas"]);
+	 * ```
+	 * Once a Spine game object is created, its skeleton data is cached into {@link Spine.skeletonCache} using the key:
+	 * `${skeletonAssetName}-${atlasAssetName}-${options?.scale ?? 1}`
+	 *
+	 * @param options - Options to configure the Spine game object. See {@link SpineFromOptions}
+	 * @returns {Spine} The Spine game object instantiated
+	 */
+	public static from (options: SpineFromOptions) {
+		return new Spine(Spine.getSpineInitData(options));
 	}
 
 	public get tint (): number {
