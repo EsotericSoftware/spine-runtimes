@@ -146,7 +146,7 @@ export abstract class VertexAttachment extends Attachment {
 	/** Does not copy id (generated) or name (set on construction). **/
 	copyTo (attachment: VertexAttachment) {
 		if (this.bones) {
-			attachment.bones = new Array<number>(this.bones.length);
+			attachment.bones = [];
 			Utils.arrayCopy(this.bones, 0, attachment.bones, 0, this.bones.length);
 		} else
 			attachment.bones = null;

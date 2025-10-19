@@ -296,7 +296,7 @@ export class Utils {
 	}
 
 	static newArray<T> (size: number, defaultValue: T): Array<T> {
-		let array = new Array<T>(size);
+		let array = new Array<T>();
 		for (let i = 0; i < size; i++) array[i] = defaultValue;
 		return array;
 	}
@@ -305,8 +305,8 @@ export class Utils {
 		if (Utils.SUPPORTS_TYPED_ARRAYS)
 			return new Float32Array(size)
 		else {
-			let array = new Array<number>(size);
-			for (let i = 0; i < array.length; i++) array[i] = 0;
+			let array = new Array<number>();
+			for (let i = 0; i < size; i++) array[i] = 0;
 			return array;
 		}
 	}
@@ -315,8 +315,8 @@ export class Utils {
 		if (Utils.SUPPORTS_TYPED_ARRAYS)
 			return new Int16Array(size)
 		else {
-			let array = new Array<number>(size);
-			for (let i = 0; i < array.length; i++) array[i] = 0;
+			let array = new Array<number>();
+			for (let i = 0; i < size; i++) array[i] = 0;
 			return array;
 		}
 	}

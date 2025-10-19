@@ -56,7 +56,7 @@ export class PathAttachment extends VertexAttachment {
 	copy (): Attachment {
 		let copy = new PathAttachment(this.name);
 		this.copyTo(copy);
-		copy.lengths = new Array<number>(this.lengths.length);
+		copy.lengths = [];
 		Utils.arrayCopy(this.lengths, 0, copy.lengths, 0, this.lengths.length);
 		copy.closed = closed;
 		copy.constantSpeed = this.constantSpeed;

@@ -811,7 +811,7 @@ export class SpinePlayer implements Disposable {
 		let minX = 100000000, maxX = -100000000, minY = 100000000, maxY = -100000000;
 		let offset = new Vector2(), size = new Vector2();
 
-		const tempArray = new Array<number>(2);
+		const tempArray = [0, 0];
 		for (let i = 0; i < steps; i++, time += stepTime) {
 			animation.apply(this.skeleton!, time, time, false, [], 1, MixBlend.setup, MixDirection.in, false);
 			this.skeleton!.updateWorldTransform(Physics.update);

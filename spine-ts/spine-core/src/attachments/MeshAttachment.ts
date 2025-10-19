@@ -176,11 +176,11 @@ export class MeshAttachment extends VertexAttachment implements HasTextureRegion
 		copy.color.setFromColor(this.color);
 
 		this.copyTo(copy);
-		copy.regionUVs = new Array<number>(this.regionUVs.length);
+		copy.regionUVs = [];
 		Utils.arrayCopy(this.regionUVs, 0, copy.regionUVs, 0, this.regionUVs.length);
-		copy.uvs = this.uvs instanceof Float32Array ? Utils.newFloatArray(this.uvs.length) : new Array<number>(this.uvs.length);
+		copy.uvs = this.uvs instanceof Float32Array ? Utils.newFloatArray(this.uvs.length) : [];
 		Utils.arrayCopy(this.uvs, 0, copy.uvs, 0, this.uvs.length);
-		copy.triangles = new Array<number>(this.triangles.length);
+		copy.triangles = [];
 		Utils.arrayCopy(this.triangles, 0, copy.triangles, 0, this.triangles.length);
 		copy.hullLength = this.hullLength;
 
@@ -188,7 +188,7 @@ export class MeshAttachment extends VertexAttachment implements HasTextureRegion
 
 		// Nonessential.
 		if (this.edges) {
-			copy.edges = new Array<number>(this.edges.length);
+			copy.edges = [];
 			Utils.arrayCopy(this.edges, 0, copy.edges, 0, this.edges.length);
 		}
 		copy.width = this.width;
