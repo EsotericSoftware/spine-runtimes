@@ -29,21 +29,21 @@
         await PIXI.Assets.load(["spineboyData", "spineboyAtlas"]);
 
         // Create the spine display object
-        const spineboy1 = spine.Spine.from({skeleton: "spineboyData", atlas: "spineboyAtlas", scale: .2 });
+        const spineboy1 = new spine.Spine({skeleton: "spineboyData", atlas: "spineboyAtlas", scale: .2 });
 
-        const spineboy2 = spine.Spine.from({skeleton: "spineboyData", atlas: "spineboyAtlas", scale: .2,
+        const spineboy2 = new spine.Spine({skeleton: "spineboyData", atlas: "spineboyAtlas", scale: .2,
           boundsProvider: new spine.SetupPoseBoundsProvider(),
         });
 
-        const spineboy3 = spine.Spine.from({skeleton: "spineboyData", atlas: "spineboyAtlas", scale: .2,
+        const spineboy3 = new spine.Spine({skeleton: "spineboyData", atlas: "spineboyAtlas", scale: .2,
           boundsProvider: new spine.SkinsAndAnimationBoundsProvider("portal", undefined, undefined, false),
         });
 
-        const spineboy4 = spine.Spine.from({skeleton: "spineboyData", atlas: "spineboyAtlas", scale: .2,
+        const spineboy4 = new spine.Spine({skeleton: "spineboyData", atlas: "spineboyAtlas", scale: .2,
           boundsProvider: new spine.SkinsAndAnimationBoundsProvider("portal", undefined, undefined, true),
         });
 
-        const spineboy5 = spine.Spine.from({skeleton: "spineboyData", atlas: "spineboyAtlas", scale: .2,
+        const spineboy5 = new spine.Spine({skeleton: "spineboyData", atlas: "spineboyAtlas", scale: .2,
           boundsProvider: new spine.AABBRectangleBoundsProvider(-100, -100, 100, 100),
         });
 

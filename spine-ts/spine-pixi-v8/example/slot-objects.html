@@ -29,7 +29,7 @@
         await PIXI.Assets.load(["spineboyData", "spineboyAtlas", "raptor_jaw"]);
 
         // Create the spine display object
-        const spineboy = spine.Spine.from({skeleton: "spineboyData", atlas: "spineboyAtlas", scale: 0.25 });
+        const spineboy = new spine.Spine({skeleton: "spineboyData", atlas: "spineboyAtlas", scale: 0.25 });
 
         // Set the default mix time to use when transitioning
         // from one animation to the next.

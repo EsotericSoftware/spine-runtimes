@@ -292,7 +292,8 @@ const maskPool = new Pool<Graphics>(() => new Graphics);
 
 /**
  * The class to instantiate a {@link Spine} game object in Pixi.
- * The static method {@link Spine.from} should be used to instantiate a Spine game object.
+ * Create and customize the default configuration using the static method {@link Spine.createOptions},
+ * then pass it to the constructor.
  */
 export class Spine extends ViewContainer {
 	// Pixi properties
@@ -384,14 +385,11 @@ export class Spine extends ViewContainer {
 	}
 
 	private hasNeverUpdated = true;
-	constructor (options: SpineOptions | SkeletonData) {
-		if (options instanceof SkeletonData) {
-			options = {
-				skeletonData: options,
-			};
-		}
-
+	constructor (options: SpineOptions | SpineFromOptions) {
 		super({});
+
+		if ("skeleton" in options)
+			options = new.target.createOptions(options);
 
 		this.allowChildren = true;
 
@@ -1065,14 +1063,20 @@ export class Spine extends ViewContainer {
 	}
 
 	/**
-	 * Prepares the initialization data for creating a Spine game object.
-	 * Handles skeleton data parsing and caching. If the skeleton data is already cached, returns the cached version.
-	 * Otherwise, loads and parses the skeleton and atlas assets, then caches the result.
+	 * Get a convenient initialization configuration for your Spine game object.
+	 * Before instantiating a Spine game object, the skeleton (`.skel` or `.json`) and the atlas text files must be loaded into the {@link Assets}. For example:
+	 * ```
+	 * PIXI.Assets.add("sackData", "/assets/sack-pro.skel");
+	 * PIXI.Assets.add("sackAtlas", "/assets/sack-pma.atlas");
+	 * await PIXI.Assets.load(["sackData", "sackAtlas"]);
+	 * ```
+	 * Once a Spine game object is created, its skeleton data is cached into {@link Cache} using the key:
+	 * `${skeletonAssetName}-${atlasAssetName}-${options?.scale ?? 1}`
 	 *
 	 * @param options - Options to configure the Spine game object. See {@link SpineFromOptions}
-	 * @returns {SpineOptions} The initialization options object ready to be passed to the Spine constructor
+	 * @returns {SpineOptions} The configuration ready to be passed to the Spine constructor
 	 */
-	static getSpineInitData ({ skeleton, atlas, scale = 1, darkTint, autoUpdate = true, boundsProvider, allowMissingRegions = false }: SpineFromOptions): SpineOptions {
+	static createOptions ({ skeleton, atlas, scale = 1, darkTint, autoUpdate = true, boundsProvider, allowMissingRegions = false }: SpineFromOptions): SpineOptions {
 		const cacheKey = `${skeleton}-${atlas}-${scale}`;
 
 		if (Cache.has(cacheKey)) {
@@ -1084,10 +1088,11 @@ export class Spine extends ViewContainer {
 			};
 		}
 
-		const skeletonAsset = Assets.get<any | Uint8Array>(skeleton);
-
 		const atlasAsset = Assets.get<TextureAtlas>(atlas);
 		const attachmentLoader = new AtlasAttachmentLoader(atlasAsset, allowMissingRegions);
+
+		// biome-ignore lint/suspicious/noExplicitAny: json skeleton data is any
+		const skeletonAsset = Assets.get<any | Uint8Array>(skeleton);
 		const parser = skeletonAsset instanceof Uint8Array
 			? new SkeletonBinary(attachmentLoader)
 			: new SkeletonJson(attachmentLoader);
@@ -1106,6 +1111,7 @@ export class Spine extends ViewContainer {
 	}
 
 	/**
+	 * @deprecated Use directly the Spine constructor or {@link createOptions} to make options and customize it to pass to the constructor
 	 * Use this method to instantiate a Spine game object.
 	 * Before instantiating a Spine game object, the skeleton (`.skel` or `.json`) and the atlas text files must be loaded into the Assets. For example:
 	 * ```
@@ -1120,6 +1126,6 @@ export class Spine extends ViewContainer {
 	 * @returns {Spine} The Spine game object instantiated
 	 */
 	static from (options: SpineFromOptions) {
-		return new Spine(Spine.getSpineInitData(options));
+		return new Spine(Spine.createOptions(options));
 	}
 }
