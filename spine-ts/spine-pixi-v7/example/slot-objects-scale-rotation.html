@@ -36,7 +36,7 @@
         PIXI.Assets.cache.set("spineboyAtlas", textureAtlas);
 
         // creating spine game object
-        const spineGO = spine.Spine.from({skeleton: "jsonSkel", atlas: "spineboyAtlas" });
+        const spineGO = new spine.Spine({skeleton: "jsonSkel", atlas: "spineboyAtlas" });
         spineGO.position.set(300, 300);
         app.stage.addChild(spineGO);
 

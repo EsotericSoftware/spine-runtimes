@@ -45,7 +45,7 @@
         await PIXI.Assets.load(["stretchymanData", "stretchymanAtlas"]);
 
         // Create the spine display object
-        const stretchyman = spine.Spine.from({skeleton: "stretchymanData", atlas: "stretchymanAtlas",
+        const stretchyman = new spine.Spine({skeleton: "stretchymanData", atlas: "stretchymanAtlas",
           scale: 0.75,
         });
 

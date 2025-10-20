@@ -53,7 +53,7 @@
 		await PIXI.Assets.load(["skelBase64", "atlasBase64"]);
 
 		// creating spine game object with base64 data
-		const base64GameObject = spine.Spine.from({skeleton: "skelBase64", atlas: "atlasBase64" });
+		const base64GameObject = new spine.Spine({skeleton: "skelBase64", atlas: "atlasBase64" });
 		app.stage.addChild(base64GameObject);
 		base64GameObject.state.setAnimation(0, "animation", true);
 		base64GameObject.position.set(window.innerWidth / 3, window.innerHeight / 2);
@@ -91,7 +91,7 @@
 		await PIXI.Assets.load(["skelBlob", "atlasBlob"]);
 
 		// creating spine game object
-		const blobGameObject = spine.Spine.from({skeleton: "skelBase64", atlas: "atlasBase64" });
+		const blobGameObject = new spine.Spine({skeleton: "skelBase64", atlas: "atlasBase64" });
 		app.stage.addChild(blobGameObject);
 		blobGameObject.state.setAnimation(0, "animation", true);
 		blobGameObject.position.set(window.innerWidth / 3 * 2, window.innerHeight / 2);
