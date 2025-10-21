@@ -43,7 +43,7 @@ import {
 	SkeletonBinary,
 	SkeletonBounds,
 	SkeletonClipping,
-	SkeletonData,
+	type SkeletonData,
 	SkeletonJson,
 	Skin,
 	type Slot,
@@ -393,24 +393,20 @@ export class Spine extends ViewContainer {
 
 		this.allowChildren = true;
 
-		const skeletonData = options instanceof SkeletonData ? options : options.skeletonData;
-
+		const { autoUpdate, boundsProvider, darkTint, skeletonData } = options;
 		this.skeleton = new Skeleton(skeletonData);
 		this.state = new AnimationState(new AnimationStateData(skeletonData));
-		this.autoUpdate = options?.autoUpdate ?? true;
+		this.autoUpdate = autoUpdate ?? true;
+		this._boundsProvider = boundsProvider;
 
 		// dark tint can be enabled by options, otherwise is enable if at least one slot has tint black
-		this.darkTint = options?.darkTint === undefined
+		this.darkTint = darkTint === undefined
 			? this.skeleton.slots.some(slot => !!slot.data.setup.darkColor)
-			: options?.darkTint;
+			: darkTint;
 
 		const slots = this.skeleton.slots;
-
-		for (let i = 0; i < slots.length; i++) {
+		for (let i = 0; i < slots.length; i++)
 			this.attachmentCacheData[i] = Object.create(null);
-		}
-
-		this._boundsProvider = options.boundsProvider;
 	}
 
 	/** If {@link Spine.autoUpdate} is `false`, this method allows to update the AnimationState and the Skeleton with the given delta. */
