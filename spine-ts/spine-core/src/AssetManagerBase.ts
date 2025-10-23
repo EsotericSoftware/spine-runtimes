@@ -27,9 +27,13 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Texture } from "./Texture.js";
+import type { Texture } from "./Texture.js";
 import { TextureAtlas } from "./TextureAtlas.js";
-import { Disposable, StringMap } from "./Utils.js";
+import type { Disposable, StringMap } from "./Utils.js";
+
+type AssetData = (Uint8Array | string | Texture | TextureAtlas | object) & Partial<Disposable>;
+type AssetCallback<T extends AssetData> = (path: string, data: T) => void;
+type ErrorCallback = (path: string, message: string) => void;
 
 export class AssetManagerBase implements Disposable {
 	private pathPrefix: string = "";
@@ -52,7 +56,7 @@ export class AssetManagerBase implements Disposable {
 		return this.pathPrefix + path;
 	}
 
-	private success (callback: (path: string, data: any) => void, path: string, asset: any) {
+	private success<T extends AssetData> (callback: AssetCallback<T>, path: string, asset: T) {
 		this.toLoad--;
 		this.loaded++;
 		this.cache.assets[path] = asset;
@@ -68,8 +72,8 @@ export class AssetManagerBase implements Disposable {
 	}
 
 	loadAll () {
-		let promise = new Promise((resolve: (assetManager: AssetManagerBase) => void, reject: (errors: StringMap<string>) => void) => {
-			let check = () => {
+		const promise = new Promise((resolve: (assetManager: AssetManagerBase) => void, reject: (errors: StringMap<string>) => void) => {
+			const check = () => {
 				if (this.isLoadingComplete()) {
 					if (this.hasErrors()) reject(this.errors);
 					else resolve(this);
@@ -93,7 +97,7 @@ export class AssetManagerBase implements Disposable {
 
 		if (this.reuseAssets(path, success, error)) return;
 
-		this.cache.assetsLoaded[path] = new Promise<any>((resolve, reject) => {
+		this.cache.assetsLoaded[path] = new Promise<Uint8Array>((resolve, reject) => {
 			this.downloader.downloadBinary(path, (data: Uint8Array): void => {
 				this.success(success, path, data);
 				resolve(data);
@@ -124,7 +128,7 @@ export class AssetManagerBase implements Disposable {
 
 		if (this.reuseAssets(path, success, error)) return;
 
-		this.cache.assetsLoaded[path] = new Promise<any>((resolve, reject) => {
+		this.cache.assetsLoaded[path] = new Promise<object>((resolve, reject) => {
 			this.downloader.downloadJson(path, (data: object): void => {
 				this.success(success, path, data);
 				resolve(data);
@@ -136,36 +140,44 @@ export class AssetManagerBase implements Disposable {
 		});
 	}
 
-	reuseAssets (path: string,
-		success: (path: string, data: any) => void = () => { },
-		error: (path: string, message: string) => void = () => { }) {
-		const loadedStatus = this.cache.assetsLoaded[path];
+
+	reuseAssets<T extends AssetData> (
+		path: string,
+		success: AssetCallback<T> = () => { },
+		error: ErrorCallback = () => { }
+	) {
+		const loadedStatus = this.cache.getAsset(path);
 		const alreadyExistsOrLoading = loadedStatus !== undefined;
 		if (alreadyExistsOrLoading) {
 			this.cache.assetsLoaded[path] = loadedStatus
 				.then(data => {
 					// necessary when user preloads an image into the cache.
 					// texture loader is not avaiable in the cache, so we transform in GLTexture at first use
-					data = (data instanceof Image || data instanceof ImageBitmap) ? this.textureLoader(data) : data;
-					this.success(success, path, data);
+					data = (data instanceof Image || data instanceof ImageBitmap) ? this.textureLoader(data) as T : data;
+					this.success(success, path, data as T);
 					return data;
 				})
-				.catch(errorMsg => this.error(error, path, errorMsg));
+				.catch(errorMsg => {
+					this.error(error, path, errorMsg);
+					return undefined;
+				});
 		}
 		return alreadyExistsOrLoading;
 	}
 
-	loadTexture (path: string,
-		success: (path: string, texture: Texture) => void = () => { },
-		error: (path: string, message: string) => void = () => { }) {
+	loadTexture (
+		path: string,
+		success: AssetCallback<Texture> = () => { },
+		error: ErrorCallback = () => { }
+	) {
 
 		path = this.start(path);
 
 		if (this.reuseAssets(path, success, error)) return;
 
-		this.cache.assetsLoaded[path] = new Promise<any>((resolve, reject) => {
-			let isBrowser = !!(typeof window !== 'undefined' && typeof navigator !== 'undefined' && window.document);
-			let isWebWorker = !isBrowser; // && typeof importScripts !== 'undefined';
+		this.cache.assetsLoaded[path] = new Promise<Texture>((resolve, reject) => {
+			const isBrowser = !!(typeof window !== 'undefined' && typeof navigator !== 'undefined' && window.document);
+			const isWebWorker = !isBrowser; // && typeof importScripts !== 'undefined';
 			if (isWebWorker) {
 				fetch(path, { mode: <RequestMode>"cors" }).then((response) => {
 					if (response.ok) return response.blob();
@@ -182,7 +194,7 @@ export class AssetManagerBase implements Disposable {
 					};
 				});
 			} else {
-				let image = new Image();
+				const image = new Image();
 				image.crossOrigin = "anonymous";
 				image.onload = () => {
 					const texture = this.createTexture(path, image);
@@ -200,28 +212,29 @@ export class AssetManagerBase implements Disposable {
 		});
 	}
 
-	loadTextureAtlas (path: string,
-		success: (path: string, atlas: TextureAtlas) => void = () => { },
-		error: (path: string, message: string) => void = () => { },
+	loadTextureAtlas (
+		path: string,
+		success: AssetCallback<TextureAtlas> = () => { },
+		error: ErrorCallback = () => { },
 		fileAlias?: { [keyword: string]: string }
 	) {
-		let index = path.lastIndexOf("/");
-		let parent = index >= 0 ? path.substring(0, index + 1) : "";
+		const index = path.lastIndexOf("/");
+		const parent = index >= 0 ? path.substring(0, index + 1) : "";
 		path = this.start(path);
 
 		if (this.reuseAssets(path, success, error)) return;
 
-		this.cache.assetsLoaded[path] = new Promise<any>((resolve, reject) => {
+		this.cache.assetsLoaded[path] = new Promise<TextureAtlas>((resolve, reject) => {
 			this.downloader.downloadText(path, (atlasText: string): void => {
 				try {
 					const atlas = this.createTextureAtlas(path, atlasText);
 					let toLoad = atlas.pages.length, abort = false;
-					for (let page of atlas.pages) {
-						this.loadTexture(!fileAlias ? parent + page.name : fileAlias[page.name!],
+					for (const page of atlas.pages) {
+						this.loadTexture(!fileAlias ? parent + page.name : fileAlias[page.name],
 							(imagePath: string, texture: Texture) => {
 								if (!abort) {
 									page.setTexture(texture);
-									if (--toLoad == 0) {
+									if (--toLoad === 0) {
 										this.success(success, path, atlas);
 										resolve(atlas);
 									}
@@ -237,8 +250,8 @@ export class AssetManagerBase implements Disposable {
 							}
 						);
 					}
-				} catch (e) {
-					const errorMsg = `Couldn't parse texture atlas ${path}: ${(e as any).message}`;
+				} catch (e: unknown) {
+					const errorMsg = `Couldn't parse texture atlas ${path}: ${(e as Error).message}`;
 					this.error(error, path, errorMsg);
 					reject(errorMsg);
 				}
@@ -250,23 +263,23 @@ export class AssetManagerBase implements Disposable {
 		});
 	}
 
-	loadTextureAtlasButNoTextures (path: string,
-		success: (path: string, atlas: TextureAtlas) => void = () => { },
-		error: (path: string, message: string) => void = () => { },
-		fileAlias?: { [keyword: string]: string }
+	loadTextureAtlasButNoTextures (
+		path: string,
+		success: AssetCallback<TextureAtlas> = () => { },
+		error: ErrorCallback = () => { },
 	) {
 		path = this.start(path);
 
 		if (this.reuseAssets(path, success, error)) return;
 
-		this.cache.assetsLoaded[path] = new Promise<any>((resolve, reject) => {
+		this.cache.assetsLoaded[path] = new Promise<TextureAtlas>((resolve, reject) => {
 			this.downloader.downloadText(path, (atlasText: string): void => {
 				try {
 					const atlas = this.createTextureAtlas(path, atlasText);
 					this.success(success, path, atlas);
 					resolve(atlas);
 				} catch (e) {
-					const errorMsg = `Couldn't parse texture atlas ${path}: ${(e as any).message}`;
+					const errorMsg = `Couldn't parse texture atlas ${path}: ${(e as Error).message}`;
 					this.error(error, path, errorMsg);
 					reject(errorMsg);
 				}
@@ -334,15 +347,15 @@ export class AssetManagerBase implements Disposable {
 
 	require (path: string) {
 		path = this.pathPrefix + path;
-		let asset = this.cache.assets[path];
+		const asset = this.cache.assets[path];
 		if (asset) return asset;
-		let error = this.errors[path];
-		throw Error("Asset not found: " + path + (error ? "\n" + error : ""));
+		const error = this.errors[path];
+		throw Error(`Asset not found: ${path}${error ? `\n${error}` : ""}`);
 	}
 
 	remove (path: string) {
 		path = this.pathPrefix + path;
-		let asset = this.cache.assets[path];
+		const asset = this.cache.assets[path];
 		if (asset.dispose) asset.dispose();
 		delete this.cache.assets[path];
 		delete this.cache.assetsRefCount[path];
@@ -351,8 +364,8 @@ export class AssetManagerBase implements Disposable {
 	}
 
 	removeAll () {
-		for (let path in this.cache.assets) {
-			let asset = this.cache.assets[path];
+		for (const path in this.cache.assets) {
+			const asset = this.cache.assets[path];
 			if (asset.dispose) asset.dispose();
 		}
 		this.cache.assets = {};
@@ -361,7 +374,7 @@ export class AssetManagerBase implements Disposable {
 	}
 
 	isLoadingComplete (): boolean {
-		return this.toLoad == 0;
+		return this.toLoad === 0;
 	}
 
 	getToLoad (): number {
@@ -423,9 +436,9 @@ export class AssetManagerBase implements Disposable {
 }
 
 export class AssetCache {
-	public assets: StringMap<any> = {};
+	public assets: StringMap<AssetData> = {};
 	public assetsRefCount: StringMap<number> = {};
-	public assetsLoaded: StringMap<Promise<any>> = {};
+	public assetsLoaded: StringMap<Promise<AssetData | undefined>> = {};
 
 	static AVAILABLE_CACHES = new Map<string, AssetCache>();
 	static getCache (id: string) {
@@ -437,14 +450,22 @@ export class AssetCache {
 		return newCache;
 	}
 
-	async addAsset (path: string, asset: any) {
+	async addAsset<T extends AssetData> (path: string, asset: T): Promise<T> {
 		this.assetsLoaded[path] = Promise.resolve(asset);
-		this.assets[path] = await asset;
+		this.assets[path] = asset;
+		return asset;
+	}
+
+	getAsset<T extends AssetData> (path: string): Promise<T> | undefined {
+		return this.assetsLoaded[path] as Promise<T> | undefined;
 	}
 }
 
+type DownloaderSuccessCallback<T extends AssetData = AssetData> = (data: T) => void;
+type DownloaderErrorCallback = (status: number, responseText: string) => void;
+
 export class Downloader {
-	private callbacks: StringMap<Array<Function>> = {};
+	private callbacks: StringMap<Array<DownloaderSuccessCallback | DownloaderErrorCallback>> = {};
 	rawDataUris: StringMap<string> = {};
 
 	dataUriToString (dataUri: string) {
@@ -453,7 +474,7 @@ export class Downloader {
 		}
 
 		let base64Idx = dataUri.indexOf("base64,");
-		if (base64Idx != -1) {
+		if (base64Idx !== -1) {
 			base64Idx += "base64,".length;
 			return atob(dataUri.substr(base64Idx));
 		} else {
@@ -465,7 +486,7 @@ export class Downloader {
 		var binary_string = window.atob(base64);
 		var len = binary_string.length;
 		var bytes = new Uint8Array(len);
-		for (var i = 0; i < len; i++) {
+		for (let i = 0; i < len; i++) {
 			bytes[i] = binary_string.charCodeAt(i);
 		}
 		return bytes;
@@ -477,12 +498,12 @@ export class Downloader {
 		}
 
 		let base64Idx = dataUri.indexOf("base64,");
-		if (base64Idx == -1) throw new Error("Not a binary data URI.");
+		if (base64Idx === -1) throw new Error("Not a binary data URI.");
 		base64Idx += "base64,".length;
 		return this.base64ToUint8Array(dataUri.substr(base64Idx));
 	}
 
-	downloadText (url: string, success: (data: string) => void, error: (status: number, responseText: string) => void) {
+	downloadText (url: string, success: DownloaderSuccessCallback<string>, error: DownloaderErrorCallback) {
 		if (this.start(url, success, error)) return;
 
 		const rawDataUri = this.rawDataUris[url];
@@ -496,10 +517,10 @@ export class Downloader {
 			return;
 		}
 
-		let request = new XMLHttpRequest();
+		const request = new XMLHttpRequest();
 		request.overrideMimeType("text/html");
 		request.open("GET", rawDataUri ? rawDataUri : url, true);
-		let done = () => {
+		const done = () => {
 			this.finish(url, request.status, request.responseText);
 		};
 		request.onload = done;
@@ -507,13 +528,13 @@ export class Downloader {
 		request.send();
 	}
 
-	downloadJson (url: string, success: (data: object) => void, error: (status: number, responseText: string) => void) {
+	downloadJson (url: string, success: DownloaderSuccessCallback<object>, error: DownloaderErrorCallback) {
 		this.downloadText(url, (data: string): void => {
 			success(JSON.parse(data));
 		}, error);
 	}
 
-	downloadBinary (url: string, success: (data: Uint8Array) => void, error: (status: number, responseText: string) => void) {
+	downloadBinary (url: string, success: (data: Uint8Array) => void, error: DownloaderErrorCallback) {
 		if (this.start(url, success, error)) return;
 
 		const rawDataUri = this.rawDataUris[url];
@@ -527,14 +548,14 @@ export class Downloader {
 			return;
 		}
 
-		let request = new XMLHttpRequest();
+		const request = new XMLHttpRequest();
 		request.open("GET", rawDataUri ? rawDataUri : url, true);
 		request.responseType = "arraybuffer";
-		let onerror = () => {
+		const onerror = () => {
 			this.finish(url, request.status, request.response);
 		};
 		request.onload = () => {
-			if (request.status == 200 || request.status == 0)
+			if (request.status === 200 || request.status === 0)
 				this.finish(url, 200, new Uint8Array(request.response as ArrayBuffer));
 			else
 				onerror();
@@ -543,21 +564,25 @@ export class Downloader {
 		request.send();
 	}
 
-	private start (url: string, success: any, error: any) {
+	private start<T extends AssetData> (url: string, success: DownloaderSuccessCallback<T>, error: DownloaderErrorCallback) {
 		let callbacks = this.callbacks[url];
 		try {
 			if (callbacks) return true;
 			this.callbacks[url] = callbacks = [];
 		} finally {
-			callbacks.push(success, error);
+			callbacks.push(success as DownloaderSuccessCallback<AssetData>, error);
 		}
 	}
 
-	private finish (url: string, status: number, data: any) {
-		let callbacks = this.callbacks[url];
+	private finish (url: string, status: number, data: AssetData) {
+		const callbacks = this.callbacks[url];
 		delete this.callbacks[url];
-		let args = status == 200 || status == 0 ? [data] : [status, data];
-		for (let i = args.length - 1, n = callbacks.length; i < n; i += 2)
-			callbacks[i].apply(null, args);
+		if (status === 200 || status === 0) {
+			for (let i = 0, n = callbacks.length; i < n; i += 2)
+				(callbacks[i] as DownloaderSuccessCallback)(data);
+		} else {
+			for (let i = 1, n = callbacks.length; i < n; i += 2)
+				(callbacks[i] as DownloaderErrorCallback)(status, data as string);
+		}
 	}
 }

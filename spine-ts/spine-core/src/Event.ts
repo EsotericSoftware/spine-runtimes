@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { EventData } from "./EventData.js";
+import type { EventData } from "./EventData.js";
 
 import type { Timeline } from "./Animation.js";
 import type { AnimationStateListener } from "./AnimationState.js";

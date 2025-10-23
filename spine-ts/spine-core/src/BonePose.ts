@@ -27,13 +27,13 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Bone } from "./Bone.js";
+import type { Bone } from "./Bone.js";
 import { Inherit } from "./BoneData.js";
 import { BoneLocal } from "./BoneLocal.js";
-import { Physics } from "./Physics.js";
-import { Skeleton } from "./Skeleton.js";
-import { Update } from "./Update.js";
-import { MathUtils, Vector2 } from "./Utils.js";
+import type { Physics } from "./Physics.js";
+import type { Skeleton } from "./Skeleton.js";
+import type { Update } from "./Update.js";
+import { MathUtils, type Vector2 } from "./Utils.js";
 
 /** The applied pose for a bone. This is the {@link Bone} pose with constraints applied and the world transform computed by
  * {@link Skeleton#updateWorldTransform()}. */
@@ -76,7 +76,7 @@ export class BonePose extends BoneLocal implements Update {
 		else
 			this.world = skeleton._update;
 
-		let rotation = this.rotation;
+		const rotation = this.rotation;
 		const scaleX = this.scaleX;
 		const scaleY = this.scaleY;
 		const shearX = this.shearX;
@@ -123,7 +123,7 @@ export class BonePose extends BoneLocal implements Update {
 				break;
 			}
 			case Inherit.NoRotationOrReflection: {
-				let sx = 1 / skeleton.scaleX, sy = 1 / skeleton.scaleY;
+				const sx = 1 / skeleton.scaleX, sy = 1 / skeleton.scaleY;
 				pa *= sx;
 				pc *= sy;
 				let s = pa * pa + pc * pc;
@@ -160,7 +160,7 @@ export class BonePose extends BoneLocal implements Update {
 				za *= s;
 				zc *= s;
 				s = Math.sqrt(za * za + zc * zc);
-				if (this.inherit == Inherit.NoScale && (pa * pd - pb * pc < 0) != (skeleton.scaleX < 0 != skeleton.scaleY < 0)) s = -s;
+				if (this.inherit === Inherit.NoScale && (pa * pd - pb * pc < 0) !== (skeleton.scaleX < 0 !== skeleton.scaleY < 0)) s = -s;
 				r = Math.PI / 2 + Math.atan2(zc, za);
 				const zb = Math.cos(r) * s;
 				const zd = Math.sin(r) * s;
@@ -198,7 +198,7 @@ export class BonePose extends BoneLocal implements Update {
 		if (!this.bone.parent) {
 			this.x = this.worldX - skeleton.x;
 			this.y = this.worldY - skeleton.y;
-			let a = this.a, b = this.b, c = this.c, d = this.d;
+			const a = this.a, b = this.b, c = this.c, d = this.d;
 			this.rotation = MathUtils.atan2Deg(c, a);
 			this.scaleX = Math.sqrt(a * a + c * c);
 			this.scaleY = Math.sqrt(b * b + d * d);
@@ -211,12 +211,12 @@ export class BonePose extends BoneLocal implements Update {
 		let pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d;
 		let pid = 1 / (pa * pd - pb * pc);
 		let ia = pd * pid, ib = pb * pid, ic = pc * pid, id = pa * pid;
-		let dx = this.worldX - parent.worldX, dy = this.worldY - parent.worldY;
+		const dx = this.worldX - parent.worldX, dy = this.worldY - parent.worldY;
 		this.x = (dx * ia - dy * ib);
 		this.y = (dy * id - dx * ic);
 
-		let ra, rb, rc, rd;
-		if (this.inherit == Inherit.OnlyTranslation) {
+		let ra: number, rb: number, rc: number, rd: number;
+		if (this.inherit === Inherit.OnlyTranslation) {
 			ra = this.a;
 			rb = this.b;
 			rc = this.c;
@@ -224,7 +224,7 @@ export class BonePose extends BoneLocal implements Update {
 		} else {
 			switch (this.inherit) {
 				case Inherit.NoRotationOrReflection: {
-					let s = Math.abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
+					const s = Math.abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
 					pb = -pc * skeleton.scaleX * s / skeleton.scaleY;
 					pd = pa * skeleton.scaleY * s / skeleton.scaleX;
 					pid = 1 / (pa * pd - pb * pc);
@@ -233,7 +233,7 @@ export class BonePose extends BoneLocal implements Update {
 					break;
 				}
 				case Inherit.NoScale:
-				case Inherit.NoScaleOrReflection:
+				case Inherit.NoScaleOrReflection: {
 					let r = this.rotation * MathUtils.degRad, cos = Math.cos(r), sin = Math.sin(r);
 					pa = (pa * cos + pb * sin) / skeleton.scaleX;
 					pc = (pc * cos + pd * sin) / skeleton.scaleY;
@@ -242,7 +242,7 @@ export class BonePose extends BoneLocal implements Update {
 					pa *= s;
 					pc *= s;
 					s = Math.sqrt(pa * pa + pc * pc);
-					if (this.inherit == Inherit.NoScale && pid < 0 != (skeleton.scaleX < 0 != skeleton.scaleY < 0)) s = -s;
+					if (this.inherit === Inherit.NoScale && pid < 0 !== (skeleton.scaleX < 0 !== skeleton.scaleY < 0)) s = -s;
 					r = MathUtils.PI / 2 + Math.atan2(pc, pa);
 					pb = Math.cos(r) * s;
 					pd = Math.sin(r) * s;
@@ -251,6 +251,7 @@ export class BonePose extends BoneLocal implements Update {
 					ib = pb * pid;
 					ic = pc * pid;
 					id = pa * pid;
+				}
 			}
 			ra = ia * this.a - ib * this.c;
 			rb = ia * this.b - ib * this.d;
@@ -261,7 +262,7 @@ export class BonePose extends BoneLocal implements Update {
 		this.shearX = 0;
 		this.scaleX = Math.sqrt(ra * ra + rc * rc);
 		if (this.scaleX > 0.0001) {
-			let det = ra * rd - rb * rc;
+			const det = ra * rd - rb * rc;
 			this.scaleY = det / this.scaleX;
 			this.shearY = -MathUtils.atan2Deg(ra * rb + rc * rd, det);
 			this.rotation = MathUtils.atan2Deg(rc, ra);
@@ -341,8 +342,8 @@ export class BonePose extends BoneLocal implements Update {
 	/** Transforms a point from world coordinates to the bone's local coordinates. */
 	public worldToLocal (world: Vector2): Vector2 {
 		if (world == null) throw new Error("world cannot be null.");
-		let det = this.a * this.d - this.b * this.c;
-		let x = world.x - this.worldX, y = world.y - this.worldY;
+		const det = this.a * this.d - this.b * this.c;
+		const x = world.x - this.worldX, y = world.y - this.worldY;
 		world.x = (x * this.d - y * this.b) / det;
 		world.y = (y * this.a - x * this.c) / det;
 		return world;
@@ -351,7 +352,7 @@ export class BonePose extends BoneLocal implements Update {
 	/** Transforms a point from the bone's local coordinates to world coordinates. */
 	public localToWorld (local: Vector2): Vector2 {
 		if (local == null) throw new Error("local cannot be null.");
-		let x = local.x, y = local.y;
+		const x = local.x, y = local.y;
 		local.x = x * this.a + y * this.b + this.worldX;
 		local.y = x * this.c + y * this.d + this.worldY;
 		return local;
@@ -372,14 +373,14 @@ export class BonePose extends BoneLocal implements Update {
 	/** Transforms a world rotation to a local rotation. */
 	public worldToLocalRotation (worldRotation: number): number {
 		worldRotation *= MathUtils.degRad;
-		let sin = Math.sin(worldRotation), cos = Math.cos(worldRotation);
+		const sin = Math.sin(worldRotation), cos = Math.cos(worldRotation);
 		return MathUtils.atan2Deg(this.a * sin - this.c * cos, this.d * cos - this.b * sin) + this.rotation - this.shearX;
 	}
 
 	/** Transforms a local rotation to a world rotation. */
 	localToWorldRotation (localRotation: number): number {
 		localRotation = (localRotation - this.rotation - this.shearX) * MathUtils.degRad;
-		let sin = Math.sin(localRotation), cos = Math.cos(localRotation);
+		const sin = Math.sin(localRotation), cos = Math.cos(localRotation);
 		return MathUtils.atan2Deg(cos * this.c + sin * this.d, cos * this.a + sin * this.b);
 	}
 

@@ -27,22 +27,22 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { ClippingAttachment } from "./attachments/ClippingAttachment.js";
-import { Skeleton } from "./Skeleton.js";
-import { Slot } from "./Slot.js";
+import type { ClippingAttachment } from "./attachments/ClippingAttachment.js";
+import type { Skeleton } from "./Skeleton.js";
+import type { Slot } from "./Slot.js";
 import { Triangulator } from "./Triangulator.js";
-import { Utils, Color, NumberArrayLike } from "./Utils.js";
+import { type Color, type NumberArrayLike, Utils } from "./Utils.js";
 
 export class SkeletonClipping {
 	private triangulator = new Triangulator();
-	private clippingPolygon = new Array<number>();
-	private clipOutput = new Array<number>();
-	clippedVertices = new Array<number>();
+	private clippingPolygon = [] as number[];
+	private clipOutput = [] as number[];
+	clippedVertices = [] as number[];
 
 	/** An empty array unless {@link clipTrianglesUnpacked} was used. **/
-	clippedUVs = new Array<number>();
+	clippedUVs = [] as number[];
 
-	clippedTriangles = new Array<number>();
+	clippedTriangles = [] as number[];
 
 	_clippedVerticesTyped = new Float32Array(1024);
 	_clippedUVsTyped = new Float32Array(1024);
@@ -54,7 +54,7 @@ export class SkeletonClipping {
 	clippedUVsLength = 0;
 	clippedTrianglesLength = 0;
 
-	private scratch = new Array<number>();
+	private scratch = [] as number[];
 
 	private clipAttachment: ClippingAttachment | null = null;
 	private clippingPolygons: Array<Array<number>> | null = null;
@@ -63,14 +63,14 @@ export class SkeletonClipping {
 		if (this.clipAttachment) return 0;
 		this.clipAttachment = clip;
 
-		let n = clip.worldVerticesLength;
-		let vertices = Utils.setArraySize(this.clippingPolygon, n);
+		const n = clip.worldVerticesLength;
+		const vertices = Utils.setArraySize(this.clippingPolygon, n);
 		clip.computeWorldVertices(skeleton, slot, 0, n, vertices, 0, 2);
-		let clippingPolygon = this.clippingPolygon;
+		const clippingPolygon = this.clippingPolygon;
 		SkeletonClipping.makeClockwise(clippingPolygon);
-		let clippingPolygons = this.clippingPolygons = this.triangulator.decompose(clippingPolygon, this.triangulator.triangulate(clippingPolygon));
+		const clippingPolygons = this.clippingPolygons = this.triangulator.decompose(clippingPolygon, this.triangulator.triangulate(clippingPolygon));
 		for (let i = 0, n = clippingPolygons.length; i < n; i++) {
-			let polygon = clippingPolygons[i];
+			const polygon = clippingPolygons[i];
 			SkeletonClipping.makeClockwise(polygon);
 			polygon.push(polygon[0]);
 			polygon.push(polygon[1]);
@@ -109,10 +109,11 @@ export class SkeletonClipping {
 
 	private clipTrianglesNoRender (vertices: NumberArrayLike, triangles: NumberArrayLike, trianglesLength: number): boolean {
 
-		let clipOutput = this.clipOutput, clippedVertices = this.clippedVertices;
-		let clippedTriangles = this.clippedTriangles;
-		let polygons = this.clippingPolygons!;
-		let polygonsCount = polygons.length;
+		const clipOutput = this.clipOutput, clippedVertices = this.clippedVertices;
+		const clippedTriangles = this.clippedTriangles;
+		// biome-ignore lint/style/noNonNullAssertion: clipStart define it
+		const polygons = this.clippingPolygons!;
+		const polygonsCount = polygons.length;
 
 		let index = 0;
 		clippedVertices.length = 0;
@@ -120,31 +121,31 @@ export class SkeletonClipping {
 		let clipOutputItems = null;
 		for (let i = 0; i < trianglesLength; i += 3) {
 			let v = triangles[i] << 1;
-			let x1 = vertices[v], y1 = vertices[v + 1];
+			const x1 = vertices[v], y1 = vertices[v + 1];
 
 			v = triangles[i + 1] << 1;
-			let x2 = vertices[v], y2 = vertices[v + 1];
+			const x2 = vertices[v], y2 = vertices[v + 1];
 
 			v = triangles[i + 2] << 1;
-			let x3 = vertices[v], y3 = vertices[v + 1];
+			const x3 = vertices[v], y3 = vertices[v + 1];
 
 			for (let p = 0; p < polygonsCount; p++) {
 				let s = clippedVertices.length;
 				if (this.clip(x1, y1, x2, y2, x3, y3, polygons[p], clipOutput)) {
 					clipOutputItems = this.clipOutput;
-					let clipOutputLength = clipOutput.length;
-					if (clipOutputLength == 0) continue;
+					const clipOutputLength = clipOutput.length;
+					if (clipOutputLength === 0) continue;
 
 					let clipOutputCount = clipOutputLength >> 1;
-					let clippedVerticesItems = Utils.setArraySize(clippedVertices, s + clipOutputCount * 2);
+					const clippedVerticesItems = Utils.setArraySize(clippedVertices, s + clipOutputCount * 2);
 					for (let ii = 0; ii < clipOutputLength; ii += 2, s += 2) {
-						let x = clipOutputItems[ii], y = clipOutputItems[ii + 1];
+						const x = clipOutputItems[ii], y = clipOutputItems[ii + 1];
 						clippedVerticesItems[s] = x;
 						clippedVerticesItems[s + 1] = y;
 					}
 
 					s = clippedTriangles.length;
-					let clippedTrianglesItems = Utils.setArraySize(clippedTriangles, s + 3 * (clipOutputCount - 2));
+					const clippedTrianglesItems = Utils.setArraySize(clippedTriangles, s + 3 * (clipOutputCount - 2));
 					clipOutputCount--;
 					for (let ii = 1; ii < clipOutputCount; ii++, s += 3) {
 						clippedTrianglesItems[s] = index;
@@ -154,7 +155,7 @@ export class SkeletonClipping {
 					index += clipOutputCount + 1;
 
 				} else {
-					let clippedVerticesItems = Utils.setArraySize(clippedVertices, s + 3 * 2);
+					const clippedVerticesItems = Utils.setArraySize(clippedVertices, s + 3 * 2);
 					clippedVerticesItems[s] = x1;
 					clippedVerticesItems[s + 1] = y1;
 
@@ -165,7 +166,7 @@ export class SkeletonClipping {
 					clippedVerticesItems[s + 5] = y3;
 
 					s = clippedTriangles.length;
-					let clippedTrianglesItems = Utils.setArraySize(clippedTriangles, s + 3);
+					const clippedTrianglesItems = Utils.setArraySize(clippedTriangles, s + 3);
 					clippedTrianglesItems[s] = index;
 					clippedTrianglesItems[s + 1] = (index + 1);
 					clippedTrianglesItems[s + 2] = (index + 2);
@@ -180,10 +181,11 @@ export class SkeletonClipping {
 	private clipTrianglesRender (vertices: NumberArrayLike, triangles: NumberArrayLike, trianglesLength: number, uvs: NumberArrayLike,
 		light: Color, dark: Color, twoColor: boolean, stride: number): boolean {
 
-		let clipOutput = this.clipOutput, clippedVertices = this.clippedVertices;
-		let clippedTriangles = this.clippedTriangles;
-		let polygons = this.clippingPolygons!;
-		let polygonsCount = polygons.length;
+		const clipOutput = this.clipOutput, clippedVertices = this.clippedVertices;
+		const clippedTriangles = this.clippedTriangles;
+		// biome-ignore lint/style/noNonNullAssertion: clipStart define it
+		const polygons = this.clippingPolygons!;
+		const polygonsCount = polygons.length;
 
 		let index = 0;
 		clippedVertices.length = 0;
@@ -191,40 +193,40 @@ export class SkeletonClipping {
 		let clipOutputItems = null;
 		for (let i = 0; i < trianglesLength; i += 3) {
 			let t = triangles[i];
-			let u1 = uvs[t << 1], v1 = uvs[(t << 1) + 1];
-			let x1 = vertices[t * stride], y1 = vertices[t * stride + 1];
+			const u1 = uvs[t << 1], v1 = uvs[(t << 1) + 1];
+			const x1 = vertices[t * stride], y1 = vertices[t * stride + 1];
 
 			t = triangles[i + 1];
-			let u2 = uvs[t << 1], v2 = uvs[(t << 1) + 1];
-			let x2 = vertices[t * stride], y2 = vertices[t * stride + 1];
+			const u2 = uvs[t << 1], v2 = uvs[(t << 1) + 1];
+			const x2 = vertices[t * stride], y2 = vertices[t * stride + 1];
 
 			t = triangles[i + 2];
-			let u3 = uvs[t << 1], v3 = uvs[(t << 1) + 1];
-			let x3 = vertices[t * stride], y3 = vertices[t * stride + 1];
+			const u3 = uvs[t << 1], v3 = uvs[(t << 1) + 1];
+			const x3 = vertices[t * stride], y3 = vertices[t * stride + 1];
 
 			for (let p = 0; p < polygonsCount; p++) {
 				let s = clippedVertices.length;
 				if (this.clip(x1, y1, x2, y2, x3, y3, polygons[p], clipOutput)) {
 					clipOutputItems = this.clipOutput;
-					let clipOutputLength = clipOutput.length;
-					if (clipOutputLength == 0) continue;
-					let d0 = y2 - y3, d1 = x3 - x2, d2 = x1 - x3, d4 = y3 - y1;
-					let d = 1 / (d0 * d2 + d1 * (y1 - y3));
+					const clipOutputLength = clipOutput.length;
+					if (clipOutputLength === 0) continue;
+					const d0 = y2 - y3, d1 = x3 - x2, d2 = x1 - x3, d4 = y3 - y1;
+					const d = 1 / (d0 * d2 + d1 * (y1 - y3));
 
 					let clipOutputCount = clipOutputLength >> 1;
-					let clippedVerticesItems = Utils.setArraySize(clippedVertices, s + clipOutputCount * stride);
+					const clippedVerticesItems = Utils.setArraySize(clippedVertices, s + clipOutputCount * stride);
 					for (let ii = 0; ii < clipOutputLength; ii += 2, s += stride) {
-						let x = clipOutputItems[ii], y = clipOutputItems[ii + 1];
+						const x = clipOutputItems[ii], y = clipOutputItems[ii + 1];
 						clippedVerticesItems[s] = x;
 						clippedVerticesItems[s + 1] = y;
 						clippedVerticesItems[s + 2] = light.r;
 						clippedVerticesItems[s + 3] = light.g;
 						clippedVerticesItems[s + 4] = light.b;
 						clippedVerticesItems[s + 5] = light.a;
-						let c0 = x - x3, c1 = y - y3;
-						let a = (d0 * c0 + d1 * c1) * d;
-						let b = (d4 * c0 + d2 * c1) * d;
-						let c = 1 - a - b;
+						const c0 = x - x3, c1 = y - y3;
+						const a = (d0 * c0 + d1 * c1) * d;
+						const b = (d4 * c0 + d2 * c1) * d;
+						const c = 1 - a - b;
 						clippedVerticesItems[s + 6] = u1 * a + u2 * b + u3 * c;
 						clippedVerticesItems[s + 7] = v1 * a + v2 * b + v3 * c;
 						if (twoColor) {
@@ -236,7 +238,7 @@ export class SkeletonClipping {
 					}
 
 					s = clippedTriangles.length;
-					let clippedTrianglesItems = Utils.setArraySize(clippedTriangles, s + 3 * (clipOutputCount - 2));
+					const clippedTrianglesItems = Utils.setArraySize(clippedTriangles, s + 3 * (clipOutputCount - 2));
 					clipOutputCount--;
 					for (let ii = 1; ii < clipOutputCount; ii++, s += 3) {
 						clippedTrianglesItems[s] = index;
@@ -246,7 +248,7 @@ export class SkeletonClipping {
 					index += clipOutputCount + 1;
 
 				} else {
-					let clippedVerticesItems = Utils.setArraySize(clippedVertices, s + 3 * stride);
+					const clippedVerticesItems = Utils.setArraySize(clippedVertices, s + 3 * stride);
 					clippedVerticesItems[s] = x1;
 					clippedVerticesItems[s + 1] = y1;
 					clippedVerticesItems[s + 2] = light.r;
@@ -310,7 +312,7 @@ export class SkeletonClipping {
 					}
 
 					s = clippedTriangles.length;
-					let clippedTrianglesItems = Utils.setArraySize(clippedTriangles, s + 3);
+					const clippedTrianglesItems = Utils.setArraySize(clippedTriangles, s + 3);
 					clippedTrianglesItems[s] = index;
 					clippedTrianglesItems[s + 1] = (index + 1);
 					clippedTrianglesItems[s + 2] = (index + 2);
@@ -325,6 +327,7 @@ export class SkeletonClipping {
 	public clipTrianglesUnpacked (vertices: NumberArrayLike, triangles: NumberArrayLike | Uint32Array, trianglesLength: number, uvs: NumberArrayLike) {
 		const clipOutput = this.clipOutput;
 		let clippedVertices = this._clippedVerticesTyped, clippedUVs = this._clippedUVsTyped, clippedTriangles = this._clippedTrianglesTyped;
+		// biome-ignore lint/style/noNonNullAssertion: clipStart define it
 		const polygons = this.clippingPolygons!;
 		const polygonsCount = polygons.length;
 
@@ -464,7 +467,7 @@ export class SkeletonClipping {
 	/** Clips the input triangle against the convex, clockwise clipping area. If the triangle lies entirely within the clipping
 	 * area, false is returned. The clipping area must duplicate the first vertex at the end of the vertices list. */
 	private clip (x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, clippingArea: Array<number>, output: Array<number>) {
-		let originalOutput = output;
+		const originalOutput = output;
 		let clipped = false;
 
 		// Avoid copy at the end.
@@ -486,20 +489,20 @@ export class SkeletonClipping {
 		input.push(y1);
 		output.length = 0;
 
-		let clippingVerticesLast = clippingArea.length - 4;
-		let clippingVertices = clippingArea;
+		const clippingVerticesLast = clippingArea.length - 4;
+		const clippingVertices = clippingArea;
 		for (let i = 0; ; i += 2) {
-			let edgeX = clippingVertices[i], edgeY = clippingVertices[i + 1];
-			let ex = edgeX - clippingVertices[i + 2], ey = edgeY - clippingVertices[i + 3];
+			const edgeX = clippingVertices[i], edgeY = clippingVertices[i + 1];
+			const ex = edgeX - clippingVertices[i + 2], ey = edgeY - clippingVertices[i + 3];
 
-			let outputStart = output.length;
-			let inputVertices = input;
+			const outputStart = output.length;
+			const inputVertices = input;
 			for (let ii = 0, nn = input.length - 2; ii < nn;) {
-				let inputX = inputVertices[ii], inputY = inputVertices[ii + 1];
+				const inputX = inputVertices[ii], inputY = inputVertices[ii + 1];
 				ii += 2;
-				let inputX2 = inputVertices[ii], inputY2 = inputVertices[ii + 1];
-				let s2 = ey * (edgeX - inputX2) > ex * (edgeY - inputY2);
-				let s1 = ey * (edgeX - inputX) - ex * (edgeY - inputY);
+				const inputX2 = inputVertices[ii], inputY2 = inputVertices[ii + 1];
+				const s2 = ey * (edgeX - inputX2) > ex * (edgeY - inputY2);
+				const s1 = ey * (edgeX - inputX) - ex * (edgeY - inputY);
 				if (s1 > 0) {
 					if (s2) { // v1 inside, v2 inside
 						output.push(inputX2);
@@ -507,7 +510,7 @@ export class SkeletonClipping {
 						continue;
 					}
 					// v1 inside, v2 outside
-					let ix = inputX2 - inputX, iy = inputY2 - inputY, t = s1 / (ix * ey - iy * ex);
+					const ix = inputX2 - inputX, iy = inputY2 - inputY, t = s1 / (ix * ey - iy * ex);
 					if (t >= 0 && t <= 1) {
 						output.push(inputX + ix * t);
 						output.push(inputY + iy * t);
@@ -517,7 +520,7 @@ export class SkeletonClipping {
 						continue;
 					}
 				} else if (s2) { // v1 outside, v2 inside
-					let ix = inputX2 - inputX, iy = inputY2 - inputY, t = s1 / (ix * ey - iy * ex);
+					const ix = inputX2 - inputX, iy = inputY2 - inputY, t = s1 / (ix * ey - iy * ex);
 					if (t >= 0 && t <= 1) {
 						output.push(inputX + ix * t);
 						output.push(inputY + iy * t);
@@ -532,7 +535,7 @@ export class SkeletonClipping {
 				clipped = true;
 			}
 
-			if (outputStart == output.length) { // All edges outside.
+			if (outputStart === output.length) { // All edges outside.
 				originalOutput.length = 0;
 				return true;
 			}
@@ -540,14 +543,14 @@ export class SkeletonClipping {
 			output.push(output[0]);
 			output.push(output[1]);
 
-			if (i == clippingVerticesLast) break;
-			let temp = output;
+			if (i === clippingVerticesLast) break;
+			const temp = output;
 			output = input;
 			output.length = 0;
 			input = temp;
 		}
 
-		if (originalOutput != output) {
+		if (originalOutput !== output) {
 			originalOutput.length = 0;
 			for (let i = 0, n = output.length - 2; i < n; i++)
 				originalOutput[i] = output[i];
@@ -558,8 +561,8 @@ export class SkeletonClipping {
 	}
 
 	public static makeClockwise (polygon: NumberArrayLike) {
-		let vertices = polygon;
-		let verticeslength = polygon.length;
+		const vertices = polygon;
+		const verticeslength = polygon.length;
 
 		let area = vertices[verticeslength - 2] * vertices[1] - vertices[0] * vertices[verticeslength - 1], p1x = 0, p1y = 0, p2x = 0, p2y = 0;
 		for (let i = 0, n = verticeslength - 3; i < n; i += 2) {
@@ -572,8 +575,8 @@ export class SkeletonClipping {
 		if (area < 0) return;
 
 		for (let i = 0, lastX = verticeslength - 2, n = verticeslength >> 1; i < n; i += 2) {
-			let x = vertices[i], y = vertices[i + 1];
-			let other = lastX - i;
+			const x = vertices[i], y = vertices[i + 1];
+			const other = lastX - i;
 			vertices[i] = vertices[other];
 			vertices[i + 1] = vertices[other + 1];
 			vertices[other] = x;

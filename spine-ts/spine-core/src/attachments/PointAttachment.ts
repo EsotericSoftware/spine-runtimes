@@ -27,9 +27,9 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { BonePose } from "src/BonePose.js";
-import { Color, Vector2, MathUtils } from "../Utils.js";
-import { VertexAttachment, Attachment } from "./Attachment.js";
+import type { BonePose } from "src/BonePose.js";
+import { Color, MathUtils, type Vector2 } from "../Utils.js";
+import { type Attachment, VertexAttachment } from "./Attachment.js";
 
 /** An attachment which is a single point and a rotation. This can be used to spawn projectiles, particles, etc. A bone can be
  * used in similar ways, but a PointAttachment is slightly less expensive to compute and can be hidden, shown, and placed in a
@@ -63,7 +63,7 @@ export class PointAttachment extends VertexAttachment {
 	}
 
 	copy (): Attachment {
-		let copy = new PointAttachment(this.name);
+		const copy = new PointAttachment(this.name);
 		copy.x = this.x;
 		copy.y = this.y;
 		copy.rotation = this.rotation;

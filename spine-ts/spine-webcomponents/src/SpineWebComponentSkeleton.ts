@@ -978,7 +978,8 @@ export class SpineWebComponentSkeleton extends HTMLElement implements Disposable
 		const skeletonLoader = isBinary ? new SkeletonBinary(atlasLoader) : new SkeletonJson(atlasLoader);
 		skeletonLoader.scale = scale;
 
-		const skeletonFileAsset = this.overlay.assetManager.require(skeletonPath);
+		// biome-ignore lint/suspicious/noExplicitAny: it is any untile we have a json schema
+		const skeletonFileAsset = this.overlay.assetManager.require(skeletonPath) as Record<string, any>;
 		const skeletonFile = this.jsonSkeletonKey ? skeletonFileAsset[this.jsonSkeletonKey] : skeletonFileAsset;
 		const skeletonData = (skeletonDataInput || this.skeleton?.data) ?? skeletonLoader.readSkeletonData(skeletonFile);
 

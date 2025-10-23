@@ -28,7 +28,7 @@
  *****************************************************************************/
 
 import { Color } from "../Utils.js";
-import { VertexAttachment, Attachment } from "./Attachment.js";
+import { type Attachment, VertexAttachment } from "./Attachment.js";
 
 /** An attachment with vertices that make up a polygon. Can be used for hit detection, creating physics bodies, spawning particle
  * effects, and more.
@@ -43,7 +43,7 @@ export class BoundingBoxAttachment extends VertexAttachment {
 	}
 
 	copy (): Attachment {
-		let copy = new BoundingBoxAttachment(this.name);
+		const copy = new BoundingBoxAttachment(this.name);
 		this.copyTo(copy);
 		copy.color.setFromColor(this.color);
 		return copy;

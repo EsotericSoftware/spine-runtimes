@@ -27,11 +27,11 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Pose } from "./Pose.js";
-import { Color } from "./Utils.js";
+import type { Attachment } from "./attachments/Attachment.js";
 import { VertexAttachment } from "./attachments/Attachment.js";
-import { Attachment } from "./attachments/Attachment.js";
 import type { Sequence } from "./attachments/Sequence.js";
+import type { Pose } from "./Pose.js";
+import { Color } from "./Utils.js";
 
 /** Stores a slot's pose. Slots organize attachments for {@link Skeleton#drawOrder} purposes and provide a place to store state
  * for an attachment. State cannot be stored in an attachment itself because attachments are stateless and may be shared across
@@ -57,7 +57,7 @@ export class SlotPose implements Pose<SlotPose> {
 	 *
 	 * See {@link VertexAttachment.computeWorldVertices()} and
 	 * {@link DeformTimeline}. */
-	readonly deform = new Array<number>();
+	readonly deform = [] as number[];
 
 	SlotPose () {
 	}
@@ -81,9 +81,9 @@ export class SlotPose implements Pose<SlotPose> {
 	 * The deform is not cleared if the old attachment has the same {@link VertexAttachment.getTimelineAttachment()} as the
 	 * specified attachment. */
 	setAttachment (attachment: Attachment | null): void {
-		if (this.attachment == attachment) return;
+		if (this.attachment === attachment) return;
 		if (!(attachment instanceof VertexAttachment) || !(this.attachment instanceof VertexAttachment)
-			|| attachment.timelineAttachment != this.attachment.timelineAttachment) {
+			|| attachment.timelineAttachment !== this.attachment.timelineAttachment) {
 			this.deform.length = 0;
 		}
 		this.attachment = attachment;

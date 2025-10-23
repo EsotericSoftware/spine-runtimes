@@ -27,9 +27,9 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { TextureRegion } from "../Texture.js"
-import { Color } from "../Utils.js"
-import { Sequence } from "./Sequence.js"
+import type { TextureRegion } from "../Texture.js"
+import type { Color } from "../Utils.js"
+import type { Sequence } from "./Sequence.js"
 
 export interface HasTextureRegion {
 	/** The name used to find the {@link #region()}. */

@@ -27,12 +27,12 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Attachment } from "./attachments/Attachment.js";
+import type { Attachment } from "./attachments/Attachment.js";
 import { MeshAttachment } from "./attachments/MeshAttachment.js";
-import { BoneData } from "./BoneData.js";
-import { ConstraintData } from "./ConstraintData.js";
-import { Skeleton } from "./Skeleton.js";
-import { Color, StringMap } from "./Utils.js";
+import type { BoneData } from "./BoneData.js";
+import type { ConstraintData } from "./ConstraintData.js";
+import type { Skeleton } from "./Skeleton.js";
+import { Color, type StringMap } from "./Utils.js";
 
 /** Stores an entry in the skin consisting of the slot index, name, and attachment **/
 export class SkinEntry {
@@ -47,9 +47,10 @@ export class Skin {
 	/** The skin's name, which is unique across all skins in the skeleton. */
 	name: string;
 
-	attachments = new Array<StringMap<Attachment>>();
-	bones = Array<BoneData>();
-	constraints = new Array<ConstraintData<any, any>>();
+	attachments = [] as StringMap<Attachment>[];
+	bones = [] as BoneData[];
+	// biome-ignore lint/suspicious/noExplicitAny: reference runtime does not restrict to specific types
+	constraints = [] as ConstraintData<any, any>[];
 
 	/** The color of the skin as it was in Spine, or a default color if nonessential data was not exported. */
 	color = new Color(0.99607843, 0.61960787, 0.30980393, 1); // fe9e4fff
@@ -62,7 +63,7 @@ export class Skin {
 	/** Adds an attachment to the skin for the specified slot index and name. */
 	setAttachment (slotIndex: number, name: string, attachment: Attachment) {
 		if (!attachment) throw new Error("attachment cannot be null.");
-		let attachments = this.attachments;
+		const attachments = this.attachments;
 		if (slotIndex >= attachments.length) attachments.length = slotIndex + 1;
 		if (!attachments[slotIndex]) attachments[slotIndex] = {};
 		attachments[slotIndex][name] = attachment;
@@ -71,10 +72,10 @@ export class Skin {
 	/** Adds all attachments, bones, and constraints from the specified skin to this skin. */
 	addSkin (skin: Skin) {
 		for (let i = 0; i < skin.bones.length; i++) {
-			let bone = skin.bones[i];
+			const bone = skin.bones[i];
 			let contained = false;
 			for (let ii = 0; ii < this.bones.length; ii++) {
-				if (this.bones[ii] == bone) {
+				if (this.bones[ii] === bone) {
 					contained = true;
 					break;
 				}
@@ -83,10 +84,10 @@ export class Skin {
 		}
 
 		for (let i = 0; i < skin.constraints.length; i++) {
-			let constraint = skin.constraints[i];
+			const constraint = skin.constraints[i];
 			let contained = false;
 			for (let ii = 0; ii < this.constraints.length; ii++) {
-				if (this.constraints[ii] == constraint) {
+				if (this.constraints[ii] === constraint) {
 					contained = true;
 					break;
 				}
@@ -94,9 +95,9 @@ export class Skin {
 			if (!contained) this.constraints.push(constraint);
 		}
 
-		let attachments = skin.getAttachments();
+		const attachments = skin.getAttachments();
 		for (let i = 0; i < attachments.length; i++) {
-			var attachment = attachments[i];
+			const attachment = attachments[i];
 			this.setAttachment(attachment.slotIndex, attachment.name, attachment.attachment);
 		}
 	}
@@ -105,10 +106,10 @@ export class Skin {
 	 * copied, instead a new linked mesh is created. The attachment copies can be modified without affecting the originals. */
 	copySkin (skin: Skin) {
 		for (let i = 0; i < skin.bones.length; i++) {
-			let bone = skin.bones[i];
+			const bone = skin.bones[i];
 			let contained = false;
 			for (let ii = 0; ii < this.bones.length; ii++) {
-				if (this.bones[ii] == bone) {
+				if (this.bones[ii] === bone) {
 					contained = true;
 					break;
 				}
@@ -117,10 +118,10 @@ export class Skin {
 		}
 
 		for (let i = 0; i < skin.constraints.length; i++) {
-			let constraint = skin.constraints[i];
+			const constraint = skin.constraints[i];
 			let contained = false;
 			for (let ii = 0; ii < this.constraints.length; ii++) {
-				if (this.constraints[ii] == constraint) {
+				if (this.constraints[ii] === constraint) {
 					contained = true;
 					break;
 				}
@@ -128,9 +129,9 @@ export class Skin {
 			if (!contained) this.constraints.push(constraint);
 		}
 
-		let attachments = skin.getAttachments();
+		const attachments = skin.getAttachments();
 		for (let i = 0; i < attachments.length; i++) {
-			var attachment = attachments[i];
+			const attachment = attachments[i];
 			if (!attachment.attachment) continue;
 			if (attachment.attachment instanceof MeshAttachment) {
 				attachment.attachment = attachment.attachment.newLinkedMesh();
@@ -144,24 +145,24 @@ export class Skin {
 
 	/** Returns the attachment for the specified slot index and name, or null. */
 	getAttachment (slotIndex: number, name: string): Attachment | null {
-		let dictionary = this.attachments[slotIndex];
+		const dictionary = this.attachments[slotIndex];
 		return dictionary ? dictionary[name] : null;
 	}
 
 	/** Removes the attachment in the skin for the specified slot index and name, if any. */
 	removeAttachment (slotIndex: number, name: string) {
-		let dictionary = this.attachments[slotIndex];
+		const dictionary = this.attachments[slotIndex];
 		if (dictionary) delete dictionary[name];
 	}
 
 	/** Returns all attachments in this skin. */
 	getAttachments (): Array<SkinEntry> {
-		let entries = new Array<SkinEntry>();
-		for (var i = 0; i < this.attachments.length; i++) {
-			let slotAttachments = this.attachments[i];
+		const entries: SkinEntry[] = [];
+		for (let i = 0; i < this.attachments.length; i++) {
+			const slotAttachments = this.attachments[i];
 			if (slotAttachments) {
-				for (let name in slotAttachments) {
-					let attachment = slotAttachments[name];
+				for (const name in slotAttachments) {
+					const attachment = slotAttachments[name];
 					if (attachment) entries.push(new SkinEntry(i, name, attachment));
 				}
 			}
@@ -171,10 +172,10 @@ export class Skin {
 
 	/** Returns all attachments in this skin for the specified slot index. */
 	getAttachmentsForSlot (slotIndex: number, attachments: Array<SkinEntry>) {
-		let slotAttachments = this.attachments[slotIndex];
+		const slotAttachments = this.attachments[slotIndex];
 		if (slotAttachments) {
-			for (let name in slotAttachments) {
-				let attachment = slotAttachments[name];
+			for (const name in slotAttachments) {
+				const attachment = slotAttachments[name];
 				if (attachment) attachments.push(new SkinEntry(slotIndex, name, attachment));
 			}
 		}
@@ -191,14 +192,14 @@ export class Skin {
 	attachAll (skeleton: Skeleton, oldSkin: Skin) {
 		let slotIndex = 0;
 		for (let i = 0; i < skeleton.slots.length; i++) {
-			let slot = skeleton.slots[i];
-			let slotAttachment = slot.pose.getAttachment();
+			const slot = skeleton.slots[i];
+			const slotAttachment = slot.pose.getAttachment();
 			if (slotAttachment && slotIndex < oldSkin.attachments.length) {
-				let dictionary = oldSkin.attachments[slotIndex];
-				for (let key in dictionary) {
-					let skinAttachment: Attachment = dictionary[key];
-					if (slotAttachment == skinAttachment) {
-						let attachment = this.getAttachment(slotIndex, key);
+				const dictionary = oldSkin.attachments[slotIndex];
+				for (const key in dictionary) {
+					const skinAttachment: Attachment = dictionary[key];
+					if (slotAttachment === skinAttachment) {
+						const attachment = this.getAttachment(slotIndex, key);
 						if (attachment) slot.pose.setAttachment(attachment);
 						break;
 					}

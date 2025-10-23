@@ -28,7 +28,7 @@
  *****************************************************************************/
 
 import { Inherit } from "./BoneData.js";
-import { Pose } from "./Pose.js"
+import type { Pose } from "./Pose.js"
 
 /** Stores a bone's local pose. */
 export class BoneLocal implements Pose<BoneLocal> {

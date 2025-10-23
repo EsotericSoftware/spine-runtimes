@@ -27,6 +27,8 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+/** biome-ignore-all lint/suspicious/noExplicitAny: textures can be various type */
+
 export abstract class Texture {
 	protected _image: HTMLImageElement | ImageBitmap | any;
 

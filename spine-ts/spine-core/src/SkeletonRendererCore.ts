@@ -69,6 +69,7 @@ export class SkeletonRendererCore {
 			let indices: number[] | Uint32Array;
 			let indicesCount: number;
 			let attachmentColor: Color;
+			// biome-ignore lint/suspicious/noExplicitAny: texture depends on the runtime
 			let texture: any;
 
 			if (attachment instanceof RegionAttachment) {
@@ -270,6 +271,7 @@ interface RenderCommand {
 	numVertices: number;
 	numIndices: number;
 	blendMode: BlendMode;
+	// biome-ignore lint/suspicious/noExplicitAny: texture depends on the runtime
 	texture: any;
 	next?: RenderCommand;
 }

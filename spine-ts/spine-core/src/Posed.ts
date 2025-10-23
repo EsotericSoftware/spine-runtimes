@@ -27,12 +27,12 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Pose } from "./Pose.js";
-import { PosedData } from "./PosedData.js";
+import type { Pose } from "./Pose.js";
+import type { PosedData } from "./PosedData.js";
 
 export abstract class Posed<
 	D extends PosedData<P>,
-	P extends Pose<any>,
+	P extends Pose<P>,
 	A extends P> {
 
 	/** The constraint's setup pose data. */

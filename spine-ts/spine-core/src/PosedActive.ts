@@ -27,15 +27,15 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Pose } from "./Pose.js";
+import type { Pose } from "./Pose.js";
 import { Posed } from "./Posed.js";
-import { PosedData } from "./PosedData.js";
+import type { PosedData } from "./PosedData.js";
 
 import type { Skeleton } from "./Skeleton";
 
 export abstract class PosedActive<
 	D extends PosedData<P>,
-	P extends Pose<any>,
+	P extends Pose<P>,
 	A extends P>
 	extends Posed<D, P, A> {
 

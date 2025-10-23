@@ -28,8 +28,8 @@
  *****************************************************************************/
 
 import { BoundingBoxAttachment } from "./attachments/BoundingBoxAttachment.js";
-import { Skeleton } from "./Skeleton.js";
-import { NumberArrayLike, Pool, Utils } from "./Utils.js";
+import type { Skeleton } from "./Skeleton.js";
+import { type NumberArrayLike, Pool, Utils } from "./Utils.js";
 
 /** Collects each visible {@link BoundingBoxAttachment} and computes the world vertices for its polygon. The polygon vertices are
  * provided along with convenience methods for doing hit detection. */
@@ -48,10 +48,10 @@ export class SkeletonBounds {
 	maxY = 0;
 
 	/** The visible bounding boxes. */
-	boundingBoxes = new Array<BoundingBoxAttachment>();
+	boundingBoxes = [] as BoundingBoxAttachment[];
 
 	/** The world vertices for the bounding box polygons. */
-	polygons = new Array<NumberArrayLike>();
+	polygons = [] as NumberArrayLike[];
 
 	private polygonPool = new Pool<NumberArrayLike>(() => {
 		return Utils.newFloatArray(16);
@@ -63,25 +63,25 @@ export class SkeletonBounds {
 	 *           SkeletonBounds AABB methods will always return true. */
 	update (skeleton: Skeleton, updateAabb: boolean) {
 		if (!skeleton) throw new Error("skeleton cannot be null.");
-		let boundingBoxes = this.boundingBoxes;
-		let polygons = this.polygons;
-		let polygonPool = this.polygonPool;
-		let slots = skeleton.slots;
-		let slotCount = slots.length;
+		const boundingBoxes = this.boundingBoxes;
+		const polygons = this.polygons;
+		const polygonPool = this.polygonPool;
+		const slots = skeleton.slots;
+		const slotCount = slots.length;
 
 		boundingBoxes.length = 0;
 		polygonPool.freeAll(polygons);
 		polygons.length = 0;
 
 		for (let i = 0; i < slotCount; i++) {
-			let slot = slots[i];
+			const slot = slots[i];
 			if (!slot.bone.active) continue;
-			let attachment = slot.applied.attachment;
+			const attachment = slot.applied.attachment;
 			if (attachment instanceof BoundingBoxAttachment) {
 				boundingBoxes.push(attachment);
 
 				let polygon = polygonPool.obtain();
-				if (polygon.length != attachment.worldVerticesLength) {
+				if (polygon.length !== attachment.worldVerticesLength) {
 					polygon = Utils.newFloatArray(attachment.worldVerticesLength);
 				}
 				polygons.push(polygon);
@@ -101,13 +101,13 @@ export class SkeletonBounds {
 
 	aabbCompute () {
 		let minX = Number.POSITIVE_INFINITY, minY = Number.POSITIVE_INFINITY, maxX = Number.NEGATIVE_INFINITY, maxY = Number.NEGATIVE_INFINITY;
-		let polygons = this.polygons;
+		const polygons = this.polygons;
 		for (let i = 0, n = polygons.length; i < n; i++) {
-			let polygon = polygons[i];
-			let vertices = polygon;
+			const polygon = polygons[i];
+			const vertices = polygon;
 			for (let ii = 0, nn = polygon.length; ii < nn; ii += 2) {
-				let x = vertices[ii];
-				let y = vertices[ii + 1];
+				const x = vertices[ii];
+				const y = vertices[ii + 1];
 				minX = Math.min(minX, x);
 				minY = Math.min(minY, y);
 				maxX = Math.max(maxX, x);
@@ -127,13 +127,13 @@ export class SkeletonBounds {
 
 	/** Returns true if the axis aligned bounding box intersects the line segment. */
 	aabbIntersectsSegment (x1: number, y1: number, x2: number, y2: number) {
-		let minX = this.minX;
-		let minY = this.minY;
-		let maxX = this.maxX;
-		let maxY = this.maxY;
+		const minX = this.minX;
+		const minY = this.minY;
+		const maxX = this.maxX;
+		const maxY = this.maxY;
 		if ((x1 <= minX && x2 <= minX) || (y1 <= minY && y2 <= minY) || (x1 >= maxX && x2 >= maxX) || (y1 >= maxY && y2 >= maxY))
 			return false;
-		let m = (y2 - y1) / (x2 - x1);
+		const m = (y2 - y1) / (x2 - x1);
 		let y = m * (minX - x1) + y1;
 		if (y > minY && y < maxY) return true;
 		y = m * (maxX - x1) + y1;
@@ -153,7 +153,7 @@ export class SkeletonBounds {
 	/** Returns the first bounding box attachment that contains the point, or null. When doing many checks, it is usually more
 	 * efficient to only call this method if {@link #aabbContainsPoint(float, float)} returns true. */
 	containsPoint (x: number, y: number): BoundingBoxAttachment | null {
-		let polygons = this.polygons;
+		const polygons = this.polygons;
 		for (let i = 0, n = polygons.length; i < n; i++)
 			if (this.containsPointPolygon(polygons[i], x, y)) return this.boundingBoxes[i];
 		return null;
@@ -161,16 +161,16 @@ export class SkeletonBounds {
 
 	/** Returns true if the polygon contains the point. */
 	containsPointPolygon (polygon: NumberArrayLike, x: number, y: number) {
-		let vertices = polygon;
-		let nn = polygon.length;
+		const vertices = polygon;
+		const nn = polygon.length;
 
 		let prevIndex = nn - 2;
 		let inside = false;
 		for (let ii = 0; ii < nn; ii += 2) {
-			let vertexY = vertices[ii + 1];
-			let prevY = vertices[prevIndex + 1];
+			const vertexY = vertices[ii + 1];
+			const prevY = vertices[prevIndex + 1];
 			if ((vertexY < y && prevY >= y) || (prevY < y && vertexY >= y)) {
-				let vertexX = vertices[ii];
+				const vertexX = vertices[ii];
 				if (vertexX + (y - vertexY) / (prevY - vertexY) * (vertices[prevIndex] - vertexX) < x) inside = !inside;
 			}
 			prevIndex = ii;
@@ -182,7 +182,7 @@ export class SkeletonBounds {
 	 * is usually more efficient to only call this method if {@link #aabbIntersectsSegment()} returns
 	 * true. */
 	intersectsSegment (x1: number, y1: number, x2: number, y2: number) {
-		let polygons = this.polygons;
+		const polygons = this.polygons;
 		for (let i = 0, n = polygons.length; i < n; i++)
 			if (this.intersectsSegmentPolygon(polygons[i], x1, y1, x2, y2)) return this.boundingBoxes[i];
 		return null;
@@ -190,20 +190,20 @@ export class SkeletonBounds {
 
 	/** Returns true if the polygon contains any part of the line segment. */
 	intersectsSegmentPolygon (polygon: NumberArrayLike, x1: number, y1: number, x2: number, y2: number) {
-		let vertices = polygon;
-		let nn = polygon.length;
+		const vertices = polygon;
+		const nn = polygon.length;
 
-		let width12 = x1 - x2, height12 = y1 - y2;
-		let det1 = x1 * y2 - y1 * x2;
+		const width12 = x1 - x2, height12 = y1 - y2;
+		const det1 = x1 * y2 - y1 * x2;
 		let x3 = vertices[nn - 2], y3 = vertices[nn - 1];
 		for (let ii = 0; ii < nn; ii += 2) {
-			let x4 = vertices[ii], y4 = vertices[ii + 1];
-			let det2 = x3 * y4 - y3 * x4;
-			let width34 = x3 - x4, height34 = y3 - y4;
-			let det3 = width12 * height34 - height12 * width34;
-			let x = (det1 * width34 - width12 * det2) / det3;
+			const x4 = vertices[ii], y4 = vertices[ii + 1];
+			const det2 = x3 * y4 - y3 * x4;
+			const width34 = x3 - x4, height34 = y3 - y4;
+			const det3 = width12 * height34 - height12 * width34;
+			const x = (det1 * width34 - width12 * det2) / det3;
 			if (((x >= x3 && x <= x4) || (x >= x4 && x <= x3)) && ((x >= x1 && x <= x2) || (x >= x2 && x <= x1))) {
-				let y = (det1 * height34 - height12 * det2) / det3;
+				const y = (det1 * height34 - height12 * det2) / det3;
 				if (((y >= y3 && y <= y4) || (y >= y4 && y <= y3)) && ((y >= y1 && y <= y2) || (y >= y2 && y <= y1))) return true;
 			}
 			x3 = x4;
@@ -215,8 +215,8 @@ export class SkeletonBounds {
 	/** Returns the polygon for the specified bounding box, or null. */
 	getPolygon (boundingBox: BoundingBoxAttachment) {
 		if (!boundingBox) throw new Error("boundingBox cannot be null.");
-		let index = this.boundingBoxes.indexOf(boundingBox);
-		return index == -1 ? null : this.polygons[index];
+		const index = this.boundingBoxes.indexOf(boundingBox);
+		return index === -1 ? null : this.polygons[index];
 	}
 
 	/** The width of the axis aligned bounding box. */

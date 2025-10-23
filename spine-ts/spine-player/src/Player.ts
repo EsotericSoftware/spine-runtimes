@@ -919,7 +919,7 @@ export class SpinePlayer implements Disposable {
 				// Draw the background image.
 				let bgImage = config.backgroundImage;
 				if (bgImage) {
-					let texture = this.assetManager!.require(bgImage.url);
+					let texture = this.assetManager!.require(bgImage.url) as GLTexture;
 					if (bgImage.x !== void 0 && bgImage.y !== void 0 && bgImage.width && bgImage.height)
 						renderer.drawTexture(texture, bgImage.x, bgImage.y, bgImage.width, bgImage.height);
 					else

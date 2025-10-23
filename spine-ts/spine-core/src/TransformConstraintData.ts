@@ -27,13 +27,13 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+import type { BoneData } from "./BoneData.js";
+import type { BonePose } from "./BonePose.js";
 import { ConstraintData } from "./ConstraintData.js";
-import { BoneData } from "./BoneData.js";
+import type { Skeleton } from "./Skeleton.js";
 import { TransformConstraint } from "./TransformConstraint.js";
-import { MathUtils } from "./Utils.js";
-import { Skeleton } from "./Skeleton.js";
 import { TransformConstraintPose } from "./TransformConstraintPose.js";
-import { BonePose } from "./BonePose.js";
+import { MathUtils } from "./Utils.js";
 
 /** Stores the setup pose for a {@link TransformConstraint}.
  *
@@ -47,7 +47,7 @@ export class TransformConstraintData extends ConstraintData<TransformConstraint,
 	public static readonly SHEARY = 5;
 
 	/** The bones that will be modified by this transform constraint. */
-	bones = new Array<BoneData>();
+	bones = [] as BoneData[];
 
 	/** The bone whose world transform will be copied to the constrained bones. */
 	public set source (source: BoneData) { this._source = source; }
@@ -275,7 +275,7 @@ export class ToScaleX extends ToProperty {
 		if (local) {
 			if (additive)
 				bone.scaleX *= 1 + (value - 1) * pose.mixScaleX;
-			else if (bone.scaleX != 0) //
+			else if (bone.scaleX !== 0) //
 				bone.scaleX += (value - bone.scaleX) * pose.mixScaleX;
 		} else if (additive) {
 			const s = 1 + (value - 1) * pose.mixScaleX;
@@ -283,7 +283,7 @@ export class ToScaleX extends ToProperty {
 			bone.c *= s;
 		} else {
 			let a = bone.a / skeleton.scaleX, c = bone.c / skeleton.scaleY, s = Math.sqrt(a * a + c * c);
-			if (s != 0) {
+			if (s !== 0) {
 				s = 1 + (value - s) * pose.mixScaleX / s;
 				bone.a *= s;
 				bone.c *= s;
@@ -309,7 +309,7 @@ export class ToScaleY extends ToProperty {
 		if (local) {
 			if (additive)
 				bone.scaleY *= 1 + (value - 1) * pose.mixScaleY;
-			else if (bone.scaleY != 0) //
+			else if (bone.scaleY !== 0) //
 				bone.scaleY += (value - bone.scaleY) * pose.mixScaleY;
 		} else if (additive) {
 			const s = 1 + (value - 1) * pose.mixScaleY;
@@ -317,7 +317,7 @@ export class ToScaleY extends ToProperty {
 			bone.d *= s;
 		} else {
 			let b = bone.b / skeleton.scaleX, d = bone.d / skeleton.scaleY, s = Math.sqrt(b * b + d * d);
-			if (s != 0) {
+			if (s !== 0) {
 				s = 1 + (value - s) * pose.mixScaleY / s;
 				bone.b *= s;
 				bone.d *= s;

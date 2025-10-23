@@ -27,12 +27,12 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { BoneData } from "./BoneData.js";
+import type { BoneData } from "./BoneData.js";
 import { ConstraintData } from "./ConstraintData.js";
 import { PathConstraint } from "./PathConstraint.js";
 import { PathConstraintPose } from "./PathConstraintPose.js";
-import { Skeleton } from "./Skeleton.js";
-import { SlotData } from "./SlotData.js";
+import type { Skeleton } from "./Skeleton.js";
+import type { SlotData } from "./SlotData.js";
 
 
 /** Stores the setup pose for a {@link PathConstraint}.
@@ -40,7 +40,7 @@ import { SlotData } from "./SlotData.js";
  * See [path constraints](http://esotericsoftware.com/spine-path-constraints) in the Spine User Guide. */
 export class PathConstraintData extends ConstraintData<PathConstraint, PathConstraintPose> {
 	/** The bones that will be modified by this path constraint. */
-	bones = new Array<BoneData>();
+	bones = [] as BoneData[];
 
 	/** The slot whose path attachment will be used to constrained the bones. */
 	public set slot (slotData: SlotData) { this._slot = slotData; }

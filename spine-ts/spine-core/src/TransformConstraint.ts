@@ -27,12 +27,12 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Bone } from "./Bone.js";
-import { BonePose } from "./BonePose.js";
+import type { Bone } from "./Bone.js";
+import type { BonePose } from "./BonePose.js";
 import { Constraint } from "./Constraint.js";
-import { Physics } from "./Physics.js";
-import { Skeleton } from "./Skeleton.js";
-import { TransformConstraintData } from "./TransformConstraintData.js";
+import type { Physics } from "./Physics.js";
+import type { Skeleton } from "./Skeleton.js";
+import type { TransformConstraintData } from "./TransformConstraintData.js";
 import { TransformConstraintPose } from "./TransformConstraintPose.js";
 import { MathUtils } from "./Utils.js";
 
@@ -53,7 +53,7 @@ export class TransformConstraint extends Constraint<TransformConstraint, Transfo
 		super(data, new TransformConstraintPose(), new TransformConstraintPose());
 		if (!skeleton) throw new Error("skeleton cannot be null.");
 
-		this.bones = new Array<BonePose>();
+		this.bones = [] as BonePose[];
 		for (const boneData of data.bones)
 			this.bones.push(skeleton.bones[boneData.index].constrained);
 
@@ -70,7 +70,7 @@ export class TransformConstraint extends Constraint<TransformConstraint, Transfo
 
 	update (skeleton: Skeleton, physics: Physics) {
 		const p = this.applied;
-		if (p.mixRotate == 0 && p.mixX == 0 && p.mixY == 0 && p.mixScaleX == 0 && p.mixScaleY == 0 && p.mixShearY == 0) return;
+		if (p.mixRotate === 0 && p.mixX === 0 && p.mixY === 0 && p.mixScaleX === 0 && p.mixScaleY === 0 && p.mixShearY === 0) return;
 
 		const data = this.data;
 		const localSource = data.localSource, localTarget = data.localTarget, additive = data.additive, clamp = data.clamp;

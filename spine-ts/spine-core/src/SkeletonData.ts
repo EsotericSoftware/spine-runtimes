@@ -27,12 +27,12 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Animation } from "./Animation"
-import { BoneData } from "./BoneData.js";
-import { ConstraintData } from "./ConstraintData";
-import { EventData } from "./EventData.js";
-import { Skin } from "./Skin.js";
-import { SlotData } from "./SlotData.js";
+import type { Animation } from "./Animation"
+import type { BoneData } from "./BoneData.js";
+import type { ConstraintData } from "./ConstraintData";
+import type { EventData } from "./EventData.js";
+import type { Skin } from "./Skin.js";
+import type { SlotData } from "./SlotData.js";
 
 /** Stores the setup pose and all of the stateless data for a skeleton.
  *
@@ -44,12 +44,12 @@ export class SkeletonData {
 	name: string | null = null;
 
 	/** The skeleton's bones, sorted parent first. The root bone is always the first bone. */
-	bones = new Array<BoneData>(); // Ordered parents first.
+	bones = [] as BoneData[]; // Ordered parents first.
 
 	/** The skeleton's slots in the setup pose draw order. */
-	slots = new Array<SlotData>(); // Setup pose draw order.
+	slots = [] as SlotData[]; // Setup pose draw order.
 
-	skins = new Array<Skin>();
+	skins = [] as Skin[];
 
 	/** The skeleton's default skin. By default this skin contains all attachments that were not in a skin in Spine.
 	 *
@@ -58,13 +58,14 @@ export class SkeletonData {
 	defaultSkin: Skin | null = null;
 
 	/** The skeleton's events. */
-	events = new Array<EventData>();
+	events = [] as EventData[];
 
 	/** The skeleton's animations. */
-	animations = new Array<Animation>();
+	animations = [] as Animation[];
 
 	/** The skeleton's IK constraints. */
-	constraints = new Array<ConstraintData<any, any>>();
+	// biome-ignore lint/suspicious/noExplicitAny: reference runtime does not restrict to specific types
+	constraints = [] as ConstraintData<any, any>[];
 
 	/** The X coordinate of the skeleton's axis aligned bounding box in the setup pose. */
 	x: number = 0;
@@ -103,9 +104,9 @@ export class SkeletonData {
 	 * @returns May be null. */
 	findBone (boneName: string) {
 		if (!boneName) throw new Error("boneName cannot be null.");
-		let bones = this.bones;
+		const bones = this.bones;
 		for (let i = 0, n = bones.length; i < n; i++)
-			if (bones[i].name == boneName) return bones[i];
+			if (bones[i].name === boneName) return bones[i];
 		return null;
 	}
 
@@ -114,9 +115,9 @@ export class SkeletonData {
 	 * @returns May be null. */
 	findSlot (slotName: string) {
 		if (!slotName) throw new Error("slotName cannot be null.");
-		let slots = this.slots;
+		const slots = this.slots;
 		for (let i = 0, n = slots.length; i < n; i++)
-			if (slots[i].name == slotName) return slots[i];
+			if (slots[i].name === slotName) return slots[i];
 		return null;
 	}
 
@@ -125,9 +126,9 @@ export class SkeletonData {
 	 * @returns May be null. */
 	findSkin (skinName: string) {
 		if (!skinName) throw new Error("skinName cannot be null.");
-		let skins = this.skins;
+		const skins = this.skins;
 		for (let i = 0, n = skins.length; i < n; i++)
-			if (skins[i].name == skinName) return skins[i];
+			if (skins[i].name === skinName) return skins[i];
 		return null;
 	}
 
@@ -136,9 +137,9 @@ export class SkeletonData {
 	 * @returns May be null. */
 	findEvent (eventDataName: string) {
 		if (!eventDataName) throw new Error("eventDataName cannot be null.");
-		let events = this.events;
+		const events = this.events;
 		for (let i = 0, n = events.length; i < n; i++)
-			if (events[i].name == eventDataName) return events[i];
+			if (events[i].name === eventDataName) return events[i];
 		return null;
 	}
 
@@ -147,20 +148,21 @@ export class SkeletonData {
 	 * @returns May be null. */
 	findAnimation (animationName: string) {
 		if (!animationName) throw new Error("animationName cannot be null.");
-		let animations = this.animations;
+		const animations = this.animations;
 		for (let i = 0, n = animations.length; i < n; i++)
-			if (animations[i].name == animationName) return animations[i];
+			if (animations[i].name === animationName) return animations[i];
 		return null;
 	}
 
 	// --- Constraints.
 
+	// biome-ignore lint/suspicious/noExplicitAny: reference runtime does not restrict to specific types
 	findConstraint<T extends ConstraintData<any, any>> (constraintName: string, type: new (name: string) => T): T | null {
 		if (!constraintName) throw new Error("constraintName cannot be null.");
 		if (type == null) throw new Error("type cannot be null.");
 		const constraints = this.constraints;
 		for (let i = 0, n = this.constraints.length; i < n; i++) {
-			let constraint = constraints[i];
+			const constraint = constraints[i];
 			if (constraint instanceof type && constraint.name === constraintName) return constraint as T;
 		}
 		return null;
