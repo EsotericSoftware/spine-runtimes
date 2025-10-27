@@ -40,7 +40,7 @@ import {
 	Skeleton,
 	SkeletonBinary,
 	SkeletonClipping,
-	type SkeletonData,
+	SkeletonData,
 	SkeletonJson,
 	Skin,
 	Utils,
@@ -329,10 +329,12 @@ export class Spine extends Container {
 	private _boundsSpineID = -1;
 	private _boundsSpineDirty = true;
 
-	constructor (options: SpineOptions | SpineFromOptions) {
+	constructor (options: SkeletonData | SpineOptions | SpineFromOptions) {
 		super();
 
-		if ("skeleton" in options)
+		if (options instanceof SkeletonData)
+			options = { skeletonData: options };
+		else if ("skeleton" in options)
 			options = new.target.createOptions(options);
 
 		const { autoUpdate = true, boundsProvider, darkTint, skeletonData } = options;

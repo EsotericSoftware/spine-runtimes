@@ -27,21 +27,15 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Animation, AnimationState, AnimationStateData, AtlasAttachmentLoader, Bone, Color, Disposable, Downloader, MathUtils, MixBlend, MixDirection, Physics, Skeleton, SkeletonBinary, SkeletonData, SkeletonJson, StringMap, TextureAtlas, TextureFilter, TimeKeeper, TrackEntry, Vector2 } from "@esotericsoftware/spine-core"
-import { AssetManager, GLTexture, Input, LoadingScreen, ManagedWebGLRenderingContext, ResizeMode, SceneRenderer, Vector3 } from "@esotericsoftware/spine-webgl"
+import { type Animation, AnimationState, AnimationStateData, AtlasAttachmentLoader, type Bone, Color, type Disposable, type Downloader, MathUtils, MixBlend, MixDirection, Physics, Skeleton, SkeletonBinary, type SkeletonData, SkeletonJson, type StringMap, type TextureAtlas, TextureFilter, TimeKeeper, type TrackEntry, Vector2 } from "@esotericsoftware/spine-core"
+import { AssetManager, type GLTexture, Input, LoadingScreen, ManagedWebGLRenderingContext, ResizeMode, SceneRenderer, Vector3 } from "@esotericsoftware/spine-webgl"
 
 export interface SpinePlayerConfig {
 	/* The URL of the skeleton JSON (.json) or binary (.skel) file */
 	skeleton?: string;
 
-	/* @deprecated Use skeleton instead. The URL of the skeleton JSON file (.json). Undefined if binaryUrl is given. */
-	jsonUrl?: string
-
 	/* Optional: The name of a field in the JSON that holds the skeleton data. Default: none */
 	jsonField?: string
-
-	/* @deprecated Use skeleton instead. The URL of the skeleton binary file (.skel). Undefined if jsonUrl is given. */
-	binaryUrl?: string
 
 	/* The scale when loading the skeleton data. Default: 1 */
 	scale?: number
@@ -245,12 +239,12 @@ export class SpinePlayer implements Disposable {
 	private input?: Input;
 
 	constructor (parent: HTMLElement | string, private config: SpinePlayerConfig) {
-		let parentDom = typeof parent === "string" ? document.getElementById(parent) : parent;
-		if (parentDom == null) throw new Error("SpinePlayer parent not found: " + parent);
+		const parentDom = typeof parent === "string" ? document.getElementById(parent) : parent;
+		if (parentDom == null) throw new Error(`SpinePlayer parent not found: ${parent}`);
 		this.parent = parentDom;
 
 		if (config.showControls === void 0) config.showControls = true;
-		let controls = config.showControls ? /*html*/`
+		const controls = config.showControls ? /*html*/`
 <div class="spine-player-controls spine-player-popup-parent spine-player-controls-hidden">
 <div class="spine-player-timeline"></div>
 <div class="spine-player-buttons">
@@ -287,8 +281,8 @@ export class SpinePlayer implements Disposable {
 		this.loadingScreen?.dispose();
 		this.assetManager?.dispose();
 		this.context?.dispose();
-		for (var i = 0; i < this.eventListeners.length; i++) {
-			var eventListener = this.eventListeners[i];
+		for (let i = 0; i < this.eventListeners.length; i++) {
+			const eventListener = this.eventListeners[i];
 			eventListener.target.removeEventListener(eventListener.event, eventListener.func);
 		}
 		this.input?.dispose();
@@ -308,12 +302,10 @@ export class SpinePlayer implements Disposable {
 	private validateConfig (config: SpinePlayerConfig) {
 		if (!config) throw new Error("A configuration object must be passed to to new SpinePlayer().");
 		if ((config as any).skelUrl) config.skeleton = (config as any).skelUrl;
-		if (!config.skeleton && !config.jsonUrl && !config.binaryUrl) throw new Error("A URL must be specified for the skeleton JSON or binary file.");
+		if (!config.skeleton) throw new Error("A URL must be specified for the skeleton JSON or binary file.");
 		if (!config.scale) config.scale = 1;
 		if (!config.atlas && !config.atlasUrl) throw new Error("A URL must be specified for the atlas file.");
 
-		if (config.jsonUrl && !config.skeleton) config.skeleton = config.jsonUrl;
-		if (config.binaryUrl && !config.skeleton) config.skeleton = config.binaryUrl;
 		if (config.atlasUrl && !config.atlas) config.atlas = config.atlasUrl;
 
 		if (!config.backgroundColor) config.backgroundColor = config.alpha ? "00000000" : "000000";
@@ -334,9 +326,9 @@ export class SpinePlayer implements Disposable {
 			regions: false
 		};
 		if (config.animations && config.animation && config.animations.indexOf(config.animation) < 0)
-			throw new Error("Animation '" + config.animation + "' is not in the config animation list: " + toString(config.animations));
+			throw new Error(`Animation '${config.animation}' is not in the config animation list: ${print(config.animations)}`);
 		if (config.skins && config.skin && config.skins.indexOf(config.skin) < 0)
-			throw new Error("Default skin '" + config.skin + "' is not in the config skins list: " + toString(config.skins));
+			throw new Error(`Default skin '${config.skin}' is not in the config skins list: ${print(config.skins)}`);
 		if (!config.viewport) config.viewport = {} as any;
 		if (!config.viewport!.animations) config.viewport!.animations = {};
 		if (config.viewport!.debugRender === void 0) config.viewport!.debugRender = false;
@@ -347,12 +339,12 @@ export class SpinePlayer implements Disposable {
 	}
 
 	private initialize (): HTMLElement | null {
-		let config = this.config;
-		let dom = this.dom;
+		const config = this.config;
+		const dom = this.dom;
 
 		if (!config.alpha) { // Prevents a flash before the first frame is drawn.
-			let hex = config.backgroundColor!;
-			this.dom.style.backgroundColor = (hex.charAt(0) == '#' ? hex : "#" + hex).substr(0, 7);
+			const hex = config.backgroundColor!;
+			this.dom.style.backgroundColor = (hex.charAt(0) === '#' ? hex : `#${hex}`).substr(0, 7);
 		}
 
 		try {
@@ -371,7 +363,7 @@ export class SpinePlayer implements Disposable {
 		// Load the assets.
 		this.assetManager = new AssetManager(this.context, "", config.downloader);
 		if (config.rawDataURIs) {
-			for (let path in config.rawDataURIs)
+			for (const path in config.rawDataURIs)
 				this.assetManager.setRawDataURI(path, config.rawDataURIs[path]);
 		}
 		if (config.skeleton!.endsWith(".json"))
@@ -386,23 +378,23 @@ export class SpinePlayer implements Disposable {
 		this.bgFullscreen.setFromString(config.fullScreenBackgroundColor!);
 		if (config.showControls) {
 			this.playerControls = dom.children[1] as HTMLElement;
-			let controls = this.playerControls.children;
-			let timeline = controls[0] as HTMLElement;
-			let buttons = controls[1].children;
+			const controls = this.playerControls.children;
+			const timeline = controls[0] as HTMLElement;
+			const buttons = controls[1].children;
 			this.playButton = buttons[0] as HTMLElement;
-			let speedButton = buttons[2] as HTMLElement;
+			const speedButton = buttons[2] as HTMLElement;
 			this.animationButton = buttons[3] as HTMLElement;
 			this.skinButton = buttons[4] as HTMLElement;
-			let settingsButton = buttons[5] as HTMLElement;
-			let fullscreenButton = buttons[6] as HTMLElement;
-			let logoButton = buttons[7] as HTMLElement;
+			const settingsButton = buttons[5] as HTMLElement;
+			const fullscreenButton = buttons[6] as HTMLElement;
+			const logoButton = buttons[7] as HTMLElement;
 
 			this.timelineSlider = new Slider();
 			timeline.appendChild(this.timelineSlider.create());
 			this.timelineSlider.change = (percentage) => {
 				this.pause();
-				let animationDuration = this.animationState!.getCurrent(0)!.animation!.duration;
-				let time = animationDuration * percentage;
+				const animationDuration = this.animationState!.getCurrent(0)!.animation!.duration;
+				const time = animationDuration * percentage;
 				this.animationState!.update(time - this.playTime);
 				this.animationState!.apply(this.skeleton!);
 				this.skeleton!.update(time - this.playTime);
@@ -420,11 +412,11 @@ export class SpinePlayer implements Disposable {
 			let oldStyleWidth = this.canvas.style.width, oldStyleHeight = this.canvas.style.height;
 			let isFullscreen = false;
 			fullscreenButton.onclick = () => {
-				let fullscreenChanged = () => {
+				const fullscreenChanged = () => {
 					isFullscreen = !isFullscreen;
 					if (!isFullscreen) {
-						this.canvas!.style.width = oldWidth + "px";
-						this.canvas!.style.height = oldHeight + "px";
+						this.canvas!.style.width = `${oldWidth}px`;
+						this.canvas!.style.height = `${oldHeight}px`;
 						this.drawFrame(false);
 						// Got to reset the style to whatever the user set after the next layouting.
 						requestAnimationFrame(() => {
@@ -434,11 +426,11 @@ export class SpinePlayer implements Disposable {
 					}
 				};
 
-				let player = dom as any;
+				const player = dom as any;
 				player.onfullscreenchange = fullscreenChanged;
 				player.onwebkitfullscreenchange = fullscreenChanged;
 
-				let doc = document as any;
+				const doc = document as any;
 				if (doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement) {
 					if (doc.exitFullscreen) doc.exitFullscreen();
 					else if (doc.mozCancelFullScreen) doc.mozCancelFullScreen();
@@ -465,18 +457,18 @@ export class SpinePlayer implements Disposable {
 		if (this.error) return;
 
 		if (this.assetManager!.hasErrors())
-			this.showError("Error: Assets could not be loaded.\n" + toString(this.assetManager!.getErrors()));
+			this.showError(`Error: Assets could not be loaded.\n${print(this.assetManager!.getErrors())}`);
 
-		let config = this.config;
+		const config = this.config;
 
 		// Configure filtering, don't use mipmaps in WebGL1 if the atlas page is non-POT
-		let atlas = this.assetManager!.require(config.atlas!) as TextureAtlas;
-		let gl = this.context!.gl, anisotropic = gl.getExtension("EXT_texture_filter_anisotropic");
-		let isWebGL1 = gl.getParameter(gl.VERSION).indexOf("WebGL 1.0") != -1;
-		for (let page of atlas.pages) {
+		const atlas = this.assetManager!.require(config.atlas!) as TextureAtlas;
+		const gl = this.context!.gl, anisotropic = gl.getExtension("EXT_texture_filter_anisotropic");
+		const isWebGL1 = gl.getParameter(gl.VERSION).indexOf("WebGL 1.0") !== -1;
+		for (const page of atlas.pages) {
 			let minFilter = page.minFilter;
-			var useMipMaps: boolean = config.mipmaps!;
-			var isPOT = MathUtils.isPowerOfTwo(page.width) && MathUtils.isPowerOfTwo(page.height);
+			let useMipMaps: boolean = config.mipmaps!;
+			const isPOT = MathUtils.isPowerOfTwo(page.width) && MathUtils.isPowerOfTwo(page.height);
 			if (isWebGL1 && !isPOT) useMipMaps = false;
 
 			if (useMipMaps) {
@@ -487,7 +479,7 @@ export class SpinePlayer implements Disposable {
 					minFilter = TextureFilter.Linear; // Don't use mipmaps without anisotropic.
 				page.texture!.setFilters(minFilter, TextureFilter.Nearest);
 			}
-			if (minFilter != TextureFilter.Nearest && minFilter != TextureFilter.Linear) (page.texture as GLTexture).update(true);
+			if (minFilter !== TextureFilter.Nearest && minFilter !== TextureFilter.Linear) (page.texture as GLTexture).update(true);
 		}
 
 		// Load skeleton data.
@@ -499,7 +491,7 @@ export class SpinePlayer implements Disposable {
 				if (!data) throw new Error("Empty JSON data.");
 				if (config.jsonField) {
 					data = data[config.jsonField];
-					if (!data) throw new Error("JSON field does not exist: " + config.jsonField);
+					if (!data) throw new Error(`JSON field does not exist: ${config.jsonField}`);
 				}
 				loader = new SkeletonJson(attachmentLoader);
 			} else {
@@ -513,7 +505,7 @@ export class SpinePlayer implements Disposable {
 			return;
 		}
 		this.skeleton = new Skeleton(skeletonData);
-		let stateData = new AnimationStateData(skeletonData);
+		const stateData = new AnimationStateData(skeletonData);
 		stateData.defaultMix = config.defaultMix!;
 		this.animationState = new AnimationState(stateData);
 
@@ -560,8 +552,8 @@ export class SpinePlayer implements Disposable {
 
 		if (config.showControls) {
 			// Hide skin and animation if there's only the default skin / no animation
-			if (skeletonData.skins.length == 1 || (config.skins && config.skins.length == 1)) this.skinButton!.classList.add("spine-player-hidden");
-			if (skeletonData.animations.length == 1 || (config.animations && config.animations.length == 1)) this.animationButton!.classList.add("spine-player-hidden");
+			if (skeletonData.skins.length === 1 || (config.skins && config.skins.length === 1)) this.skinButton!.classList.add("spine-player-hidden");
+			if (skeletonData.animations.length === 1 || (config.animations && config.animations.length === 1)) this.animationButton!.classList.add("spine-player-hidden");
 		}
 
 		if (config.success) config.success(this);
@@ -590,30 +582,30 @@ export class SpinePlayer implements Disposable {
 	}
 
 	private setupInput () {
-		let config = this.config;
-		let controlBones = config.controlBones!;
+		const config = this.config;
+		const controlBones = config.controlBones!;
 		if (!controlBones.length && !config.showControls) return;
-		let selectedBones = this.selectedBones = new Array<Bone | null>(controlBones.length);
-		let canvas = this.canvas!;
+		const selectedBones = this.selectedBones = new Array<Bone | null>(controlBones.length);
+		const canvas = this.canvas!;
 		let target: Bone | null = null;
-		let offset = new Vector2();
-		let coords = new Vector3();
-		let mouse = new Vector3();
-		let position = new Vector2();
-		let skeleton = this.skeleton!;
-		let renderer = this.sceneRenderer!;
+		const offset = new Vector2();
+		const coords = new Vector3();
+		const mouse = new Vector3();
+		const position = new Vector2();
+		const skeleton = this.skeleton!;
+		const renderer = this.sceneRenderer!;
 
 		if (config.interactive) {
-			let closest = function (x: number, y: number): Bone | null {
+			const closest = (x: number, y: number): Bone | null => {
 				mouse.set(x, canvas.clientHeight - y, 0)
 				offset.x = offset.y = 0;
 				let bestDistance = 24, index = 0;
 				let best: Bone | null = null;
 				for (let i = 0; i < controlBones.length; i++) {
 					selectedBones[i] = null;
-					let bone = skeleton.findBone(controlBones[i]);
+					const bone = skeleton.findBone(controlBones[i]);
 					if (!bone) continue;
-					let distance = renderer.camera.worldToScreen(
+					const distance = renderer.camera.worldToScreen(
 						coords.set(bone.applied.worldX, bone.applied.worldY, 0),
 						canvas.clientWidth, canvas.clientHeight).distance(mouse);
 					if (distance < bestDistance) {
@@ -668,27 +660,27 @@ export class SpinePlayer implements Disposable {
 			});
 			this.addEventListener(document, "touchmove", (ev: UIEvent) => {
 				if (ev instanceof TouchEvent) {
-					let touches = ev.changedTouches;
+					const touches = ev.changedTouches;
 					if (touches.length) {
-						let touch = touches[0];
+						const touch = touches[0];
 						handleHover(touch.clientX, touch.clientY);
 					}
 
 				}
 			});
 
-			let overlap = (mouseX: number, mouseY: number, rect: DOMRect | ClientRect): boolean => {
-				let x = mouseX - rect.left, y = mouseY - rect.top;
+			const overlap = (mouseX: number, mouseY: number, rect: DOMRect | ClientRect): boolean => {
+				const x = mouseX - rect.left, y = mouseY - rect.top;
 				return x >= 0 && x <= rect.width && y >= 0 && y <= rect.height;
 			}
 
 			let mouseOverControls = true, mouseOverCanvas = false;
-			let handleHover = (mouseX: number, mouseY: number) => {
-				let popup = findWithClass(this.dom, "spine-player-popup");
+			const handleHover = (mouseX: number, mouseY: number) => {
+				const popup = findWithClass(this.dom, "spine-player-popup");
 				mouseOverControls = overlap(mouseX, mouseY, this.playerControls!.getBoundingClientRect());
 				mouseOverCanvas = overlap(mouseX, mouseY, canvas.getBoundingClientRect());
 				clearTimeout(this.cancelId);
-				let hide = !popup && !mouseOverControls && !mouseOverCanvas && !this.paused;
+				const hide = !popup && !mouseOverControls && !mouseOverCanvas && !this.paused;
 				if (hide)
 					this.playerControls!.classList.add("spine-player-controls-hidden");
 				else
@@ -704,7 +696,7 @@ export class SpinePlayer implements Disposable {
 
 	play () {
 		this.paused = false;
-		let config = this.config;
+		const config = this.config;
 		if (config.showControls) {
 			this.cancelId = setTimeout(() => {
 				if (!this.paused) this.playerControls!.classList.add("spine-player-controls-hidden");
@@ -747,17 +739,17 @@ export class SpinePlayer implements Disposable {
 
 	/* Sets the viewport for the specified animation. */
 	setViewport (animation: string | Animation): Animation {
-		if (typeof animation == "string") {
-			let foundAnimation = this.skeleton!.data.findAnimation(animation);
-			if (!foundAnimation) throw new Error("Animation not found: " + animation);
+		if (typeof animation === "string") {
+			const foundAnimation = this.skeleton!.data.findAnimation(animation);
+			if (!foundAnimation) throw new Error(`Animation not found: ${animation}`);
 			animation = foundAnimation;
 		}
 
 		this.previousViewport = this.currentViewport;
 
 		// Determine the base viewport.
-		let globalViewport = this.config.viewport!;
-		let viewport = this.currentViewport = {
+		const globalViewport = this.config.viewport!;
+		const viewport = this.currentViewport = {
 			clip: globalViewport.clip,
 			padLeft: globalViewport.padLeft !== void 0 ? globalViewport.padLeft : "10%",
 			padRight: globalViewport.padRight !== void 0 ? globalViewport.padRight : "10%",
@@ -773,7 +765,7 @@ export class SpinePlayer implements Disposable {
 			this.calculateAnimationViewport(animation, viewport);
 
 		// Override with the animation specific viewport for the final result.
-		let userAnimViewport = this.config.viewport!.animations![animation.name];
+		const userAnimViewport = this.config.viewport!.animations![animation.name];
 		if (userAnimViewport) {
 			if (userAnimViewport.x !== void 0 && userAnimViewport.y !== void 0 && userAnimViewport.width && userAnimViewport.height) {
 				viewport.x = userAnimViewport.x;
@@ -809,7 +801,7 @@ export class SpinePlayer implements Disposable {
 
 		let steps = 100, stepTime = animation.duration ? animation.duration / steps : 0, time = 0;
 		let minX = 100000000, maxX = -100000000, minY = 100000000, maxY = -100000000;
-		let offset = new Vector2(), size = new Vector2();
+		const offset = new Vector2(), size = new Vector2();
 
 		const tempArray = new Array<number>(2);
 		for (let i = 0; i < steps; i++, time += stepTime) {
@@ -817,13 +809,13 @@ export class SpinePlayer implements Disposable {
 			this.skeleton!.updateWorldTransform(Physics.update);
 			this.skeleton!.getBounds(offset, size, tempArray, this.sceneRenderer!.skeletonRenderer.getSkeletonClipping());
 
-			if (!isNaN(offset.x) && !isNaN(offset.y) && !isNaN(size.x) && !isNaN(size.y)) {
+			if (!Number.isNaN(offset.x) && !Number.isNaN(offset.y) && !Number.isNaN(size.x) && !Number.isNaN(size.y)) {
 				minX = Math.min(offset.x, minX);
 				maxX = Math.max(offset.x + size.x, maxX);
 				minY = Math.min(offset.y, minY);
 				maxY = Math.max(offset.y + size.y, maxY);
 			} else
-				this.showError("Animation bounds are invalid: " + animation.name);
+				this.showError(`Animation bounds are invalid: ${animation.name}`);
 		}
 
 		viewport.x = minX;
@@ -838,20 +830,20 @@ export class SpinePlayer implements Disposable {
 			if (this.disposed) return;
 			if (requestNextFrame && !this.stopRequestAnimationFrame) requestAnimationFrame(() => this.drawFrame());
 
-			let doc = document as any;
-			let isFullscreen = doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement;
-			let bg = isFullscreen ? this.bgFullscreen : this.bg;
+			const doc = document as any;
+			const isFullscreen = doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement;
+			const bg = isFullscreen ? this.bgFullscreen : this.bg;
 
 			this.time.update();
-			let delta = this.time.delta;
+			const delta = this.time.delta;
 
 			// Load the skeleton if the assets are ready.
-			let loading = !this.assetManager!.isLoadingComplete();
+			const loading = !this.assetManager!.isLoadingComplete();
 			if (!this.skeleton && !loading) this.loadSkeleton();
-			let skeleton = this.skeleton!;
-			let config = this.config!;
+			const skeleton = this.skeleton!;
+			const config = this.config!;
 			if (skeleton) {
-				let playDelta = this.paused ? 0 : delta * this.speed;
+				const playDelta = this.paused ? 0 : delta * this.speed;
 				if (config.frame) config.frame(this, playDelta);
 
 				// Update animation time and pose the skeleton.
@@ -866,10 +858,10 @@ export class SpinePlayer implements Disposable {
 
 					if (config.showControls) {
 						this.playTime += playDelta;
-						let entry = this.animationState!.getCurrent(0);
+						const entry = this.animationState!.getCurrent(0);
 						if (entry) {
-							let duration = entry.animation!.duration;
-							while (this.playTime >= duration && duration != 0)
+							const duration = entry.animation!.duration;
+							while (this.playTime >= duration && duration !== 0)
 								this.playTime -= duration;
 							this.playTime = Math.max(0, Math.min(this.playTime, duration));
 							this.timelineSlider!.setValue(this.playTime / duration);
@@ -878,19 +870,19 @@ export class SpinePlayer implements Disposable {
 				}
 
 				// Determine the viewport.
-				let viewport = this.viewport;
+				const viewport = this.viewport;
 				viewport.x = this.currentViewport.x - (this.currentViewport.padLeft as number);
 				viewport.y = this.currentViewport.y - (this.currentViewport.padBottom as number);
 				viewport.width = this.currentViewport.width + (this.currentViewport.padLeft as number) + (this.currentViewport.padRight as number);
 				viewport.height = this.currentViewport.height + (this.currentViewport.padBottom as number) + (this.currentViewport.padTop as number);
 
 				if (this.previousViewport) {
-					let transitionAlpha = (performance.now() - this.viewportTransitionStart) / 1000 / config.viewport!.transitionTime!;
+					const transitionAlpha = (performance.now() - this.viewportTransitionStart) / 1000 / config.viewport!.transitionTime!;
 					if (transitionAlpha < 1) {
-						let x = this.previousViewport.x - (this.previousViewport.padLeft as number);
-						let y = this.previousViewport.y - (this.previousViewport.padBottom as number);
-						let width = this.previousViewport.width + (this.previousViewport.padLeft as number) + (this.previousViewport.padRight as number);
-						let height = this.previousViewport.height + (this.previousViewport.padBottom as number) + (this.previousViewport.padTop as number);
+						const x = this.previousViewport.x - (this.previousViewport.padLeft as number);
+						const y = this.previousViewport.y - (this.previousViewport.padBottom as number);
+						const width = this.previousViewport.width + (this.previousViewport.padLeft as number) + (this.previousViewport.padRight as number);
+						const height = this.previousViewport.height + (this.previousViewport.padBottom as number) + (this.previousViewport.padTop as number);
 						viewport.x = x + (viewport.x - x) * transitionAlpha;
 						viewport.y = y + (viewport.y - y) * transitionAlpha;
 						viewport.width = width + (viewport.width - width) * transitionAlpha;
@@ -898,7 +890,7 @@ export class SpinePlayer implements Disposable {
 					}
 				}
 
-				let renderer = this.sceneRenderer!;
+				const renderer = this.sceneRenderer!;
 				renderer.camera.zoom = this.canvas!.height / this.canvas!.width > viewport.height / viewport.width
 					? viewport.width / this.canvas!.width : viewport.height / this.canvas!.height;
 				renderer.camera.position.x = viewport.x + viewport.width / 2;
@@ -908,7 +900,7 @@ export class SpinePlayer implements Disposable {
 				renderer.resize(this.currentViewport.clip ? ResizeMode.FitClip : ResizeMode.Fit, viewport.width, viewport.height);
 
 				// Clear the screen.
-				let gl = this.context!.gl;
+				const gl = this.context!.gl;
 				gl.clearColor(bg.r, bg.g, bg.b, bg.a);
 				gl.clear(gl.COLOR_BUFFER_BIT);
 
@@ -917,9 +909,9 @@ export class SpinePlayer implements Disposable {
 				renderer.begin();
 
 				// Draw the background image.
-				let bgImage = config.backgroundImage;
+				const bgImage = config.backgroundImage;
 				if (bgImage) {
-					let texture = this.assetManager!.require(bgImage.url) as GLTexture;
+					const texture = this.assetManager!.require(bgImage.url) as GLTexture;
 					if (bgImage.x !== void 0 && bgImage.y !== void 0 && bgImage.width && bgImage.height)
 						renderer.drawTexture(texture, bgImage.x, bgImage.y, bgImage.width, bgImage.height);
 					else
@@ -940,15 +932,15 @@ export class SpinePlayer implements Disposable {
 				}
 
 				// Draw the control bones.
-				let controlBones = config.controlBones!;
+				const controlBones = config.controlBones!;
 				if (controlBones.length) {
-					let selectedBones = this.selectedBones;
+					const selectedBones = this.selectedBones;
 					gl.lineWidth(2);
 					for (let i = 0; i < controlBones.length; i++) {
-						let bone = skeleton.findBone(controlBones[i]);
+						const bone = skeleton.findBone(controlBones[i]);
 						if (!bone) continue;
-						let colorInner = selectedBones[i] ? BONE_INNER_OVER : BONE_INNER;
-						let colorOuter = selectedBones[i] ? BONE_OUTER_OVER : BONE_OUTER;
+						const colorInner = selectedBones[i] ? BONE_INNER_OVER : BONE_INNER;
+						const colorOuter = selectedBones[i] ? BONE_OUTER_OVER : BONE_OUTER;
 						const applied = bone.applied;
 						renderer.circle(true, skeleton.x + applied.worldX, skeleton.y + applied.worldY, 20, colorInner);
 						renderer.circle(false, skeleton.x + applied.worldX, skeleton.y + applied.worldY, 20, colorOuter);
@@ -992,10 +984,10 @@ export class SpinePlayer implements Disposable {
 	}
 
 	private showSpeedDialog (speedButton: HTMLElement) {
-		let id = "speed";
+		const id = "speed";
 		if (this.hidePopup(id)) return;
 
-		let popup = new Popup(id, speedButton, this, this.playerControls!, /*html*/`
+		const popup = new Popup(id, speedButton, this, this.playerControls!, /*html*/`
 <div class="spine-player-popup-title">Speed</div>
 <hr>
 <div class="spine-player-row" style="align-items:center;padding:8px">
@@ -1004,7 +996,7 @@ export class SpinePlayer implements Disposable {
 	<div class="spine-player-row" style="justify-content:space-between"><div>0.1x</div><div>1x</div><div>2x</div></div>
 </div>
 </div>`);
-		let slider = new Slider(2, 0.1, true);
+		const slider = new Slider(2, 0.1, true);
 		findWithClass(popup.dom, "spine-player-speed-slider").appendChild(slider.create());
 		slider.setValue(this.speed / 2);
 		slider.change = (percentage) => this.speed = percentage * 2;
@@ -1012,21 +1004,21 @@ export class SpinePlayer implements Disposable {
 	}
 
 	private showAnimationsDialog (animationsButton: HTMLElement) {
-		let id = "animations";
+		const id = "animations";
 		if (this.hidePopup(id)) return;
 		if (!this.skeleton || !this.skeleton.data.animations.length) return;
 
-		let popup = new Popup(id, animationsButton, this, this.playerControls!,
+		const popup = new Popup(id, animationsButton, this, this.playerControls!,
 				/*html*/`<div class="spine-player-popup-title">Animations</div><hr><ul class="spine-player-list"></ul>`);
 
-		let rows = findWithClass(popup.dom, "spine-player-list");
+		const rows = findWithClass(popup.dom, "spine-player-list");
 		this.skeleton.data.animations.forEach((animation) => {
 			// Skip animations not whitelisted if a whitelist was given.
 			if (this.config.animations && this.config.animations.indexOf(animation.name) < 0) return;
 
-			let row = createElement(
+			const row = createElement(
 					/*html*/`<li class="spine-player-list-item selectable"><div class="selectable-circle"></div><div class="selectable-text"></div></li>`);
-			if (animation.name == this.config.animation) row.classList.add("selected");
+			if (animation.name === this.config.animation) row.classList.add("selected");
 			findWithClass(row, "selectable-text").innerText = animation.name;
 			rows.appendChild(row);
 			row.onclick = () => {
@@ -1042,20 +1034,20 @@ export class SpinePlayer implements Disposable {
 	}
 
 	private showSkinsDialog (skinButton: HTMLElement) {
-		let id = "skins";
+		const id = "skins";
 		if (this.hidePopup(id)) return;
 		if (!this.skeleton || !this.skeleton.data.animations.length) return;
 
-		let popup = new Popup(id, skinButton, this, this.playerControls!,
+		const popup = new Popup(id, skinButton, this, this.playerControls!,
 				/*html*/`<div class="spine-player-popup-title">Skins</div><hr><ul class="spine-player-list"></ul>`);
 
-		let rows = findWithClass(popup.dom, "spine-player-list");
+		const rows = findWithClass(popup.dom, "spine-player-list");
 		this.skeleton.data.skins.forEach((skin) => {
 			// Skip skins not whitelisted if a whitelist was given.
 			if (this.config.skins && this.config.skins.indexOf(skin.name) < 0) return;
 
-			let row = createElement(/*html*/`<li class="spine-player-list-item selectable"><div class="selectable-circle"></div><div class="selectable-text"></div></li>`);
-			if (skin.name == this.config.skin) row.classList.add("selected");
+			const row = createElement(/*html*/`<li class="spine-player-list-item selectable"><div class="selectable-circle"></div><div class="selectable-text"></div></li>`);
+			if (skin.name === this.config.skin) row.classList.add("selected");
 			findWithClass(row, "selectable-text").innerText = skin.name;
 			rows.appendChild(row);
 			row.onclick = () => {
@@ -1070,18 +1062,18 @@ export class SpinePlayer implements Disposable {
 	}
 
 	private showSettingsDialog (settingsButton: HTMLElement) {
-		let id = "settings";
+		const id = "settings";
 		if (this.hidePopup(id)) return;
 		if (!this.skeleton || !this.skeleton.data.animations.length) return;
 
-		let popup = new Popup(id, settingsButton, this, this.playerControls!, /*html*/`<div class="spine-player-popup-title">Debug</div><hr><ul class="spine-player-list"></li>`);
+		const popup = new Popup(id, settingsButton, this, this.playerControls!, /*html*/`<div class="spine-player-popup-title">Debug</div><hr><ul class="spine-player-list"></li>`);
 
-		let rows = findWithClass(popup.dom, "spine-player-list");
-		let makeItem = (label: string, name: string) => {
-			let row = createElement(/*html*/`<li class="spine-player-list-item"></li>`);
-			let s = new Switch(label);
+		const rows = findWithClass(popup.dom, "spine-player-list");
+		const makeItem = (label: string, name: string) => {
+			const row = createElement(/*html*/`<li class="spine-player-list-item"></li>`);
+			const s = new Switch(label);
 			row.appendChild(s.create());
-			let debug = this.config.debug as any;
+			const debug = this.config.debug as any;
 			s.setEnabled(debug[name]);
 			s.change = (value) => debug[name] = value;
 			rows.appendChild(row);
@@ -1107,7 +1099,6 @@ export class SpinePlayer implements Disposable {
 				+ message.replace("\n", "<br><br>") + `</div>`));
 			if (this.config.error) this.config.error(this, message);
 			throw (error ? error : new Error(message));
-			console.log(error);
 		}
 	}
 }
@@ -1121,7 +1112,7 @@ class Popup {
 		this.dom = createElement(/*html*/`<div class="spine-player-popup spine-player-hidden"></div>`);
 		this.dom.innerHTML = htmlContent;
 		parent.appendChild(this.dom);
-		this.className = "spine-player-button-icon-" + id + "-selected";
+		this.className = `spine-player-button-icon-${id}-selected`;
 	}
 
 	dispose () {
@@ -1131,7 +1122,7 @@ class Popup {
 	hide (id: string): boolean {
 		this.dom.remove();
 		this.button.classList.remove(this.className);
-		if (this.id == id) {
+		if (this.id === id) {
 			this.player.popup = null;
 			return true;
 		}
@@ -1145,19 +1136,19 @@ class Popup {
 
 		// Make sure the popup isn't bigger than the player.
 		let dismissed = false;
-		let resize = () => {
+		const resize = () => {
 			if (!dismissed) requestAnimationFrame(resize);
-			let playerDom = this.player.dom;
-			let bottomOffset = Math.abs(playerDom.getBoundingClientRect().bottom - playerDom.getBoundingClientRect().bottom);
-			let rightOffset = Math.abs(playerDom.getBoundingClientRect().right - playerDom.getBoundingClientRect().right);
-			this.dom.style.maxHeight = (playerDom.clientHeight - bottomOffset - rightOffset) + "px";
+			const playerDom = this.player.dom;
+			const bottomOffset = Math.abs(playerDom.getBoundingClientRect().bottom - playerDom.getBoundingClientRect().bottom);
+			const rightOffset = Math.abs(playerDom.getBoundingClientRect().right - playerDom.getBoundingClientRect().right);
+			this.dom.style.maxHeight = `${playerDom.clientHeight - bottomOffset - rightOffset}px`;
 		}
 		requestAnimationFrame(resize);
 
 		// Dismiss when clicking somewhere outside the popup.
 		let justClicked = true;
-		let windowClickListener = (event: any) => {
-			if (justClicked || this.player.popup != this) {
+		const windowClickListener = (event: any) => {
+			if (justClicked || this.player.popup !== this) {
 				justClicked = false;
 				return;
 			}
@@ -1250,8 +1241,8 @@ class Slider {
 	setValue (percentage: number): number {
 		percentage = Math.max(0, Math.min(1, percentage));
 		if (this.snaps) {
-			let snap = 1 / this.snaps;
-			let modulo = percentage % snap;
+			const snap = 1 / this.snaps;
+			const modulo = percentage % snap;
 			// floor
 			if (modulo < snap * this.snapPercentage)
 				percentage = percentage - modulo;
@@ -1259,7 +1250,7 @@ class Slider {
 				percentage = percentage - modulo + snap;
 			percentage = Math.max(0, Math.min(1, percentage));
 		}
-		this.value!.style.width = "" + (percentage * 100) + "%";
+		this.value!.style.width = `${percentage * 100}%`;
 		// this.knob.style.left = "" + (-8 + percentage * this.slider.clientWidth) + "px";
 		return percentage;
 	}
@@ -1270,7 +1261,7 @@ function findWithClass (element: HTMLElement, className: string): HTMLElement {
 }
 
 function createElement (html: string): HTMLElement {
-	let div = document.createElement("div");
+	const div = document.createElement("div");
 	div.innerHTML = html;
 	return div.children[0] as HTMLElement;
 }
@@ -1280,7 +1271,7 @@ function removeClass (elements: HTMLCollection, clazz: string) {
 		elements[i].classList.remove(clazz);
 }
 
-function toString (object: any) {
+function print (object: any) {
 	return JSON.stringify(object)
 		.replace(/&/g, "&amp;")
 		.replace(/</g, "&lt;")

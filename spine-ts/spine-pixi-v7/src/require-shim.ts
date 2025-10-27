@@ -27,8 +27,10 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+// biome-ignore-all lint: ignore biome for this file
+
 if (typeof window !== 'undefined' && (window as any).PIXI) {
-	let prevRequire = window.require;
+	const prevRequire = window.require;
 	(window as any).require = (x: string) => {
 		if (prevRequire) return prevRequire(x);
 		else if (x.startsWith("@pixi/")) return (window as any).PIXI;

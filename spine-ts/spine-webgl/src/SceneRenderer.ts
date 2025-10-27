@@ -27,15 +27,16 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Color, Disposable, Skeleton, MathUtils, TextureAtlasRegion } from "@esotericsoftware/spine-core";
+import { Color, type Disposable, MathUtils, type Skeleton, type TextureAtlasRegion } from "@esotericsoftware/spine-core";
 import { OrthoCamera } from "./Camera.js";
-import { GLTexture } from "./GLTexture.js";
+import type { GLTexture } from "./GLTexture.js";
 import { PolygonBatcher } from "./PolygonBatcher.js";
 import { Shader } from "./Shader.js";
 import { ShapeRenderer } from "./ShapeRenderer.js";
 import { SkeletonDebugRenderer } from "./SkeletonDebugRenderer.js";
-import { SkeletonRenderer, VertexTransformer } from "./SkeletonRenderer.js";
+import { SkeletonRenderer, type VertexTransformer } from "./SkeletonRenderer.js";
 import { ManagedWebGLRenderingContext } from "./WebGL.js";
+
 ;
 
 const quad = [
@@ -229,22 +230,22 @@ export class SceneRenderer implements Disposable {
 		if (!color) color = WHITE;
 
 		// bottom left and top right corner points relative to origin
-		let worldOriginX = x + pivotX;
-		let worldOriginY = y + pivotY;
-		let fx = -pivotX;
-		let fy = -pivotY;
-		let fx2 = width - pivotX;
-		let fy2 = height - pivotY;
+		const worldOriginX = x + pivotX;
+		const worldOriginY = y + pivotY;
+		const fx = -pivotX;
+		const fy = -pivotY;
+		const fx2 = width - pivotX;
+		const fy2 = height - pivotY;
 
 		// construct corner points, start from top left and go counter clockwise
-		let p1x = fx;
-		let p1y = fy;
-		let p2x = fx;
-		let p2y = fy2;
-		let p3x = fx2;
-		let p3y = fy2;
-		let p4x = fx2;
-		let p4y = fy;
+		const p1x = fx;
+		const p1y = fy;
+		const p2x = fx;
+		const p2y = fy2;
+		const p3x = fx2;
+		const p3y = fy2;
+		const p4x = fx2;
+		const p4y = fy;
 
 		let x1 = 0;
 		let y1 = 0;
@@ -256,9 +257,9 @@ export class SceneRenderer implements Disposable {
 		let y4 = 0;
 
 		// rotate
-		if (angle != 0) {
-			let cos = MathUtils.cosDeg(angle);
-			let sin = MathUtils.sinDeg(angle);
+		if (angle !== 0) {
+			const cos = MathUtils.cosDeg(angle);
+			const sin = MathUtils.sinDeg(angle);
 
 			x1 = cos * p1x - sin * p1y;
 			y1 = sin * p1x + cos * p1y;
@@ -464,27 +465,27 @@ export class SceneRenderer implements Disposable {
 	}
 
 	resize (resizeMode: ResizeMode, worldWidth?: number, worldHeight?: number) {
-		let canvas = this.canvas;
+		const canvas = this.canvas;
 		var dpr = window.devicePixelRatio || 1;
 		var w = Math.round(canvas.clientWidth * dpr);
 		var h = Math.round(canvas.clientHeight * dpr);
-		if (canvas.width != w || canvas.height != h) {
+		if (canvas.width !== w || canvas.height !== h) {
 			canvas.width = w;
 			canvas.height = h;
 		}
 
 		if (resizeMode === ResizeMode.FitClip && worldWidth !== undefined && worldHeight !== undefined) {
-			let targetRatio = h / w, sourceRatio = worldHeight / worldWidth;
-			let scale = targetRatio > sourceRatio ? w / worldWidth : h / worldHeight;
+			const targetRatio = h / w, sourceRatio = worldHeight / worldWidth;
+			const scale = targetRatio > sourceRatio ? w / worldWidth : h / worldHeight;
 			worldWidth *= scale;
 			worldHeight *= scale;
 			this.camera.setViewport(worldWidth, worldHeight);
 			this.context.gl.viewport((w - worldWidth) / 2, (h - worldHeight) / 2, worldWidth, worldHeight);
 		} else {
 			if (resizeMode === ResizeMode.Fit) {
-				let targetWidth = this.camera.viewportWidth, targetHeight = this.camera.viewportHeight;
-				let targetRatio = targetHeight / targetWidth, sourceRatio = h / w;
-				let scale = targetRatio < sourceRatio ? targetWidth / w : targetHeight / h;
+				const targetWidth = this.camera.viewportWidth, targetHeight = this.camera.viewportHeight;
+				const targetRatio = targetHeight / targetWidth, sourceRatio = h / w;
+				const scale = targetRatio < sourceRatio ? targetWidth / w : targetHeight / h;
 				this.camera.setViewport(w * scale, h * scale);
 			} else if (resizeMode === ResizeMode.Expand)
 				this.camera.setViewport(w, h);

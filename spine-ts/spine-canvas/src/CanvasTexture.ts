@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Texture, TextureFilter, TextureWrap } from "@esotericsoftware/spine-core";
+import { Texture, type TextureFilter, type TextureWrap } from "@esotericsoftware/spine-core";
 
 export class CanvasTexture extends Texture {
 	constructor (image: HTMLImageElement | ImageBitmap) {

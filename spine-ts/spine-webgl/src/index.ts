@@ -1,3 +1,4 @@
+export * from "@esotericsoftware/spine-core";
 export * from "./AssetManager.js";
 export * from "./Camera.js";
 export * from "./CameraController.js";
@@ -15,4 +16,3 @@ export * from "./SkeletonRenderer.js";
 export * from "./SpineCanvas.js";
 export * from "./Vector3.js";
 export * from "./WebGL.js";
-export * from "@esotericsoftware/spine-core";

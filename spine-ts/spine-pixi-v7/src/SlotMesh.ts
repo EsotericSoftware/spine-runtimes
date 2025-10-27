@@ -27,11 +27,11 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { SpineTexture } from "./SpineTexture.js";
 import type { BlendMode, NumberArrayLike } from "@esotericsoftware/spine-core";
-import type { ISlotMesh } from "./Spine.js";
-import { Mesh, MeshGeometry, MeshMaterial } from "@pixi/mesh";
 import { Texture } from "@pixi/core";
+import { Mesh, MeshGeometry, MeshMaterial } from "@pixi/mesh";
+import type { ISlotMesh } from "./Spine.js";
+import { SpineTexture } from "./SpineTexture.js";
 
 export class SlotMesh extends Mesh implements ISlotMesh {
 	public name: string = "";
@@ -74,8 +74,8 @@ export class SlotMesh extends Mesh implements ISlotMesh {
 
 		let vertIndex = 0;
 
-		let textureCoordData = textureCoord.data;
-		let vertexCoordData = vertexCoord.data;
+		const textureCoordData = textureCoord.data;
+		const vertexCoordData = vertexCoord.data;
 		for (let i = 0; i < finalVerticesLength; i += darkTint ? 12 : 8) {
 			let auxi = i;
 

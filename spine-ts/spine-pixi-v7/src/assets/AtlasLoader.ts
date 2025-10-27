@@ -28,12 +28,11 @@
  *****************************************************************************/
 
 import { TextureAtlas } from "@esotericsoftware/spine-core";
-import { SpineTexture } from "../SpineTexture.js";
 import type { AssetExtension, Loader, ResolvedAsset, UnresolvedAsset } from "@pixi/assets";
-import { Assets, copySearchParams } from "@pixi/assets";
-import { LoaderParserPriority, checkExtension } from "@pixi/assets";
+import { Assets, checkExtension, copySearchParams, LoaderParserPriority } from "@pixi/assets";
 import type { Texture } from "@pixi/core";
-import { ALPHA_MODES, ExtensionType, settings, utils, BaseTexture, extensions } from "@pixi/core";
+import { ALPHA_MODES, BaseTexture, ExtensionType, extensions, settings, utils } from "@pixi/core";
+import { SpineTexture } from "../SpineTexture.js";
 
 type RawAtlas = string;
 
@@ -75,7 +74,7 @@ const spineTextureAtlasLoader: AssetExtension<RawAtlas | TextureAtlas, ISpineAtl
 		},
 
 		testParse (asset: unknown, options: ResolvedAsset): Promise<boolean> {
-			const isExtensionRight = checkExtension(options.src!, ".atlas");
+			const isExtensionRight = checkExtension(options.src as string, ".atlas");
 			const isString = typeof asset === "string";
 			const isExplicitLoadParserSet = options.loadParser === loaderName;
 
@@ -111,7 +110,7 @@ const spineTextureAtlasLoader: AssetExtension<RawAtlas | TextureAtlas, ISpineAtl
 			// setting preferCreateImageBitmap to false for loadTextures loader to allow loading PMA images
 			let oldPreferCreateImageBitmap = true;
 			for (const parser of loader.parsers) {
-				if (parser.name == "loadTextures") {
+				if (parser.name === "loadTextures") {
 					oldPreferCreateImageBitmap = parser.config?.preferCreateImageBitmap;
 					break;
 				}
@@ -149,6 +148,7 @@ extensions.add(spineTextureAtlasLoader);
 
 export interface ISpineAtlasMetadata {
 	// If you are downloading an .atlas file, this metadata will go to the Texture loader
+	// biome-ignore lint/suspicious/noExplicitAny: user can pass any
 	imageMetadata?: any;
 	// If you already have atlas pages loaded as pixi textures and want to use that to create the atlas, you can pass them here
 	images?: BaseTexture | string | Record<string, BaseTexture | string>;

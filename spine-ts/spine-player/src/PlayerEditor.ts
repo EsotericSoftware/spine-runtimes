@@ -88,14 +88,14 @@ body { margin: 0px; }
 	}
 
 	private render (parent: HTMLElement) {
-		let dom = /*html*/`
+		const dom = /*html*/`
 				<div style="display: flex; flex-direction: column; width: 100%; height: 100%;">
 					<div style="width: 100%; height: 50%"></div>
 					<iframe style="width: 100%; height: 50%; outline: none; border: none;"></iframe>
 				</div>
 			`;
 		parent.innerHTML = dom;
-		let codeElement = parent.children[0].children[0];
+		const codeElement = parent.children[0].children[0];
 		this.player = parent.children[0].children[1] as HTMLIFrameElement;
 
 		requestAnimationFrame(() => {

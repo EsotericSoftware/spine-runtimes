@@ -27,8 +27,8 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Disposable, Color, SkeletonBounds, Utils, Skeleton, RegionAttachment, MeshAttachment, PathAttachment, ClippingAttachment } from "@esotericsoftware/spine-core";
-import { ShapeRenderer } from "./ShapeRenderer.js";
+import { ClippingAttachment, Color, type Disposable, MeshAttachment, PathAttachment, RegionAttachment, type Skeleton, SkeletonBounds, Utils } from "@esotericsoftware/spine-core";
+import type { ShapeRenderer } from "./ShapeRenderer.js";
 import { ManagedWebGLRenderingContext } from "./WebGL.js";
 
 export class SkeletonDebugRenderer implements Disposable {
@@ -53,7 +53,7 @@ export class SkeletonDebugRenderer implements Disposable {
 
 	private context: ManagedWebGLRenderingContext;
 	private bounds = new SkeletonBounds();
-	private temp = new Array<number>();
+	private temp = [] as number[];
 	private vertices = Utils.newFloatArray(2 * 1024);
 	private static LIGHT_GRAY = new Color(192 / 255, 192 / 255, 192 / 255, 1);
 	private static GREEN = new Color(0, 1, 0, 1);
@@ -63,22 +63,22 @@ export class SkeletonDebugRenderer implements Disposable {
 	}
 
 	draw (shapes: ShapeRenderer, skeleton: Skeleton, ignoredBones?: Array<string>) {
-		let skeletonX = skeleton.x;
-		let skeletonY = skeleton.y;
-		let gl = this.context.gl;
-		let srcFunc = this.premultipliedAlpha ? gl.ONE : gl.SRC_ALPHA;
+		const skeletonX = skeleton.x;
+		const skeletonY = skeleton.y;
+		const gl = this.context.gl;
+		const srcFunc = this.premultipliedAlpha ? gl.ONE : gl.SRC_ALPHA;
 		shapes.setBlendMode(srcFunc, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 
-		let bones = skeleton.bones;
+		const bones = skeleton.bones;
 		if (this.drawBones) {
 			shapes.setColor(this.boneLineColor);
 			for (let i = 0, n = bones.length; i < n; i++) {
-				let bone = bones[i];
+				const bone = bones[i];
 				if (ignoredBones && ignoredBones.indexOf(bone.data.name) > -1) continue;
 				if (!bone.parent) continue;
 				const boneApplied = bone.applied;
-				let x = bone.data.length * boneApplied.a + boneApplied.worldX;
-				let y = bone.data.length * boneApplied.c + boneApplied.worldY;
+				const x = bone.data.length * boneApplied.a + boneApplied.worldX;
+				const y = bone.data.length * boneApplied.c + boneApplied.worldY;
 				shapes.rectLine(true, boneApplied.worldX, boneApplied.worldY, x, y, this.boneWidth * this.scale);
 			}
 			if (this.drawSkeletonXY) shapes.x(skeletonX, skeletonY, 4 * this.scale);
@@ -86,13 +86,13 @@ export class SkeletonDebugRenderer implements Disposable {
 
 		if (this.drawRegionAttachments) {
 			shapes.setColor(this.attachmentLineColor);
-			let slots = skeleton.slots;
+			const slots = skeleton.slots;
 			for (let i = 0, n = slots.length; i < n; i++) {
-				let slot = slots[i];
+				const slot = slots[i];
 				if (!slot.bone.active) continue;
-				let attachment = slot.applied.attachment;
+				const attachment = slot.applied.attachment;
 				if (attachment instanceof RegionAttachment) {
-					let vertices = this.vertices;
+					const vertices = this.vertices;
 					attachment.computeWorldVertices(slot, vertices, 0, 2);
 					shapes.line(vertices[0], vertices[1], vertices[2], vertices[3]);
 					shapes.line(vertices[2], vertices[3], vertices[4], vertices[5]);
@@ -103,20 +103,20 @@ export class SkeletonDebugRenderer implements Disposable {
 		}
 
 		if (this.drawMeshHull || this.drawMeshTriangles) {
-			let slots = skeleton.slots;
+			const slots = skeleton.slots;
 			for (let i = 0, n = slots.length; i < n; i++) {
-				let slot = slots[i];
+				const slot = slots[i];
 				if (!slot.bone.active) continue;
-				let attachment = slot.applied.attachment;
+				const attachment = slot.applied.attachment;
 				if (!(attachment instanceof MeshAttachment)) continue;
-				let vertices = this.vertices;
+				const vertices = this.vertices;
 				attachment.computeWorldVertices(skeleton, slot, 0, attachment.worldVerticesLength, vertices, 0, 2);
-				let triangles = attachment.triangles;
+				const triangles = attachment.triangles;
 				let hullLength = attachment.hullLength;
 				if (this.drawMeshTriangles) {
 					shapes.setColor(this.triangleLineColor);
 					for (let ii = 0, nn = triangles.length; ii < nn; ii += 3) {
-						let v1 = triangles[ii] * 2, v2 = triangles[ii + 1] * 2, v3 = triangles[ii + 2] * 2;
+						const v1 = triangles[ii] * 2, v2 = triangles[ii + 1] * 2, v3 = triangles[ii + 2] * 2;
 						shapes.triangle(false, vertices[v1], vertices[v1 + 1], //
 							vertices[v2], vertices[v2 + 1], //
 							vertices[v3], vertices[v3 + 1] //
@@ -128,7 +128,7 @@ export class SkeletonDebugRenderer implements Disposable {
 					hullLength = (hullLength >> 1) * 2;
 					let lastX = vertices[hullLength - 2], lastY = vertices[hullLength - 1];
 					for (let ii = 0, nn = hullLength; ii < nn; ii += 2) {
-						let x = vertices[ii], y = vertices[ii + 1];
+						const x = vertices[ii], y = vertices[ii + 1];
 						shapes.line(x, y, lastX, lastY);
 						lastX = x;
 						lastY = y;
@@ -138,34 +138,34 @@ export class SkeletonDebugRenderer implements Disposable {
 		}
 
 		if (this.drawBoundingBoxes) {
-			let bounds = this.bounds;
+			const bounds = this.bounds;
 			bounds.update(skeleton, true);
 			shapes.setColor(this.aabbColor);
 			shapes.rect(false, bounds.minX, bounds.minY, bounds.getWidth(), bounds.getHeight());
-			let polygons = bounds.polygons;
-			let boxes = bounds.boundingBoxes;
+			const polygons = bounds.polygons;
+			const boxes = bounds.boundingBoxes;
 			for (let i = 0, n = polygons.length; i < n; i++) {
-				let polygon = polygons[i];
+				const polygon = polygons[i];
 				shapes.setColor(boxes[i].color);
 				shapes.polygon(polygon, 0, polygon.length);
 			}
 		}
 
 		if (this.drawPaths) {
-			let slots = skeleton.slots;
+			const slots = skeleton.slots;
 			for (let i = 0, n = slots.length; i < n; i++) {
-				let slot = slots[i];
+				const slot = slots[i];
 				if (!slot.bone.active) continue;
-				let attachment = slot.applied.attachment;
+				const attachment = slot.applied.attachment;
 				if (!(attachment instanceof PathAttachment)) continue;
 				let nn = attachment.worldVerticesLength;
-				let world = this.temp = Utils.setArraySize(this.temp, nn, 0);
+				const world = this.temp = Utils.setArraySize(this.temp, nn, 0);
 				attachment.computeWorldVertices(skeleton, slot, 0, nn, world, 0, 2);
-				let color = this.pathColor;
+				const color = this.pathColor;
 				let x1 = world[2], y1 = world[3], x2 = 0, y2 = 0;
 				if (attachment.closed) {
 					shapes.setColor(color);
-					let cx1 = world[0], cy1 = world[1], cx2 = world[nn - 2], cy2 = world[nn - 1];
+					const cx1 = world[0], cy1 = world[1], cx2 = world[nn - 2], cy2 = world[nn - 1];
 					x2 = world[nn - 4];
 					y2 = world[nn - 3];
 					shapes.curve(x1, y1, cx1, cy1, cx2, cy2, x2, y2, 32);
@@ -175,7 +175,7 @@ export class SkeletonDebugRenderer implements Disposable {
 				}
 				nn -= 4;
 				for (let ii = 4; ii < nn; ii += 6) {
-					let cx1 = world[ii], cy1 = world[ii + 1], cx2 = world[ii + 2], cy2 = world[ii + 3];
+					const cx1 = world[ii], cy1 = world[ii + 1], cx2 = world[ii + 2], cy2 = world[ii + 3];
 					x2 = world[ii + 4];
 					y2 = world[ii + 5];
 					shapes.setColor(color);
@@ -192,29 +192,29 @@ export class SkeletonDebugRenderer implements Disposable {
 		if (this.drawBones) {
 			shapes.setColor(this.boneOriginColor);
 			for (let i = 0, n = bones.length; i < n; i++) {
-				let bone = bones[i];
+				const bone = bones[i];
 				if (ignoredBones && ignoredBones.indexOf(bone.data.name) > -1) continue;
-				let boneApplied = bone.applied;
+				const boneApplied = bone.applied;
 				shapes.circle(true, boneApplied.worldX, boneApplied.worldY, 3 * this.scale, this.boneOriginColor, 8);
 			}
 		}
 
 		if (this.drawClipping) {
-			let slots = skeleton.slots;
+			const slots = skeleton.slots;
 			shapes.setColor(this.clipColor)
 			for (let i = 0, n = slots.length; i < n; i++) {
-				let slot = slots[i];
+				const slot = slots[i];
 				if (!slot.bone.active) continue;
-				let attachment = slot.applied.attachment;
+				const attachment = slot.applied.attachment;
 				if (!(attachment instanceof ClippingAttachment)) continue;
-				let nn = attachment.worldVerticesLength;
-				let world = this.temp = Utils.setArraySize(this.temp, nn, 0);
+				const nn = attachment.worldVerticesLength;
+				const world = this.temp = Utils.setArraySize(this.temp, nn, 0);
 				attachment.computeWorldVertices(skeleton, slot, 0, nn, world, 0, 2);
 				for (let i = 0, n = world.length; i < n; i += 2) {
-					let x = world[i];
-					let y = world[i + 1];
-					let x2 = world[(i + 2) % world.length];
-					let y2 = world[(i + 3) % world.length];
+					const x = world[i];
+					const y = world[i + 1];
+					const x2 = world[(i + 2) % world.length];
+					const y2 = world[(i + 3) % world.length];
 					shapes.line(x, y, x2, y2);
 				}
 			}

@@ -27,8 +27,8 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Container, Graphics, Text } from 'pixi.js';
-import { Spine } from './Spine.js';
+
+import type { AnimationStateListener } from '@esotericsoftware/spine-core';
 import {
 	ClippingAttachment,
 	MeshAttachment,
@@ -36,8 +36,8 @@ import {
 	RegionAttachment,
 	SkeletonBounds
 } from '@esotericsoftware/spine-core';
-
-import type { AnimationStateListener } from '@esotericsoftware/spine-core';
+import { Container, Graphics, Text } from 'pixi.js';
+import type { Spine } from './Spine.js';
 
 /**
  * Make a class that extends from this interface to create your own debug renderer.
@@ -171,12 +171,12 @@ export class SpineDebugRenderer implements ISpineDebugRenderer {
 		debugDisplayObjects.parentDebugContainer.addChild(debugDisplayObjects.pathsLine);
 		debugDisplayObjects.parentDebugContainer.addChild(debugDisplayObjects.eventText);
 
-		(debugDisplayObjects.parentDebugContainer as any).zIndex = 9999999;
+		debugDisplayObjects.parentDebugContainer.zIndex = 9999999;
 
 		// Disable screen reader and mouse input on debug objects.
-		(debugDisplayObjects.parentDebugContainer as any).accessibleChildren = false;
-		(debugDisplayObjects.parentDebugContainer as any).eventMode = 'none';
-		(debugDisplayObjects.parentDebugContainer as any).interactiveChildren = false;
+		debugDisplayObjects.parentDebugContainer.accessibleChildren = false;
+		debugDisplayObjects.parentDebugContainer.eventMode = 'none';
+		debugDisplayObjects.parentDebugContainer.interactiveChildren = false;
 
 		spine.addChild(debugDisplayObjects.parentDebugContainer);
 

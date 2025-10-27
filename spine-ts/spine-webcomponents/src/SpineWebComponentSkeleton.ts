@@ -28,31 +28,32 @@
  *****************************************************************************/
 
 import {
-	Animation,
+	type Animation,
 	AnimationState,
 	AnimationStateData,
 	AtlasAttachmentLoader,
-	Bone,
-	Disposable,
-	LoadingScreen,
+	type Bone,
+	type Disposable,
+	type LoadingScreen,
 	MeshAttachment,
 	MixBlend,
 	MixDirection,
-	NumberArrayLike,
+	type NumberArrayLike,
 	Physics,
 	RegionAttachment,
 	Skeleton,
 	SkeletonBinary,
-	SkeletonData,
+	type SkeletonData,
 	SkeletonJson,
 	Skin,
-	Slot,
-	TextureAtlas,
+	type Slot,
+	type TextureAtlas,
+	type TrackEntry,
 	Utils,
 	Vector2,
 } from "@esotericsoftware/spine-webgl";
 import { SpineWebComponentOverlay } from "./SpineWebComponentOverlay.js";
-import { AttributeTypes, castValue, isBase64, Rectangle } from "./wcUtils.js";
+import { type AttributeTypes, castValue, isBase64, type Rectangle } from "./wcUtils.js";
 
 type UpdateSpineWidgetFunction = (delta: number, skeleton: Skeleton, state: AnimationState) => void;
 
@@ -456,10 +457,10 @@ export class SpineWebComponentSkeleton extends HTMLElement implements Disposable
 	}
 
 	private getSlotFromRef (slotRef: number | string | Slot): Slot {
-		let slot: Slot | null;
+		let slot: Slot | null | undefined;
 
-		if (typeof slotRef === 'number') slot = this.skeleton!.slots[slotRef];
-		else if (typeof slotRef === 'string') slot = this.skeleton!.findSlot(slotRef);
+		if (typeof slotRef === 'number') slot = this.skeleton?.slots[slotRef];
+		else if (typeof slotRef === 'string') slot = this.skeleton?.findSlot(slotRef);
 		else slot = slotRef;
 
 		if (!slot) throw new Error(`No slot found with the given slot reference: ${slotRef}`);
@@ -686,7 +687,7 @@ export class SpineWebComponentSkeleton extends HTMLElement implements Disposable
 	// - remove appendTo that is just to avoid the user to use the overlayAssignedPromise when the widget is created using js
 	private overlayAssignedPromise: Promise<void>;
 
-	static attributesDescription: Record<string, { propertyName: keyof WidgetAttributes, type: AttributeTypes, defaultValue?: any }> = {
+	static attributesDescription: Record<string, { propertyName: keyof WidgetAttributes, type: AttributeTypes, defaultValue?: WidgetAttributes[keyof WidgetAttributes] }> = {
 		atlas: { propertyName: "atlasPath", type: "string" },
 		skeleton: { propertyName: "skeletonPath", type: "string" },
 		"raw-data": { propertyName: "rawData", type: "object" },
@@ -776,7 +777,7 @@ export class SpineWebComponentSkeleton extends HTMLElement implements Disposable
 		window.removeEventListener("DOMContentLoaded", this.DOMContentLoadedCallback);
 		const index = this.overlay?.widgets.indexOf(this);
 		if (index > 0) {
-			this.overlay!.widgets.splice(index, 1);
+			this.overlay?.widgets.splice(index, 1);
 		}
 	}
 
@@ -797,7 +798,7 @@ export class SpineWebComponentSkeleton extends HTMLElement implements Disposable
 	attributeChangedCallback (name: string, oldValue: string | null, newValue: string | null): void {
 		const { type, propertyName, defaultValue } = SpineWebComponentSkeleton.attributesDescription[name];
 		const val = castValue(type, newValue, defaultValue);
-		(this as any)[propertyName] = val;
+		(this[propertyName] as WidgetAttributes[typeof propertyName]) = val as WidgetAttributes[typeof propertyName];
 		return;
 	}
 
@@ -830,12 +831,12 @@ export class SpineWebComponentSkeleton extends HTMLElement implements Disposable
 	 * @param atlas the `TextureAtlas` from which to get the `TextureAtlasPage`s
 	 * @returns The list of loaded assets
 	 */
-	public async loadTexturesInPagesAttribute (): Promise<Array<any>> {
-		const atlas = this.overlay.assetManager.require(this.atlasPath!) as TextureAtlas;
+	public async loadTexturesInPagesAttribute (): Promise<Array<string>> {
+		const atlas = this.overlay.assetManager.require(this.atlasPath as string) as TextureAtlas;
 		const pagesIndexToLoad = this.pages ?? atlas.pages.map((_, i) => i); // if no pages provided, loads all
 		const atlasPath = this.atlasPath?.includes("/") ? this.atlasPath.substring(0, this.atlasPath.lastIndexOf("/") + 1) : "";
-		const promisePageList: Array<Promise<any>> = [];
-		const texturePaths = [];
+		const promisePageList: Array<Promise<string>> = [];
+		const texturePaths = [] as string[];
 
 		for (const index of pagesIndexToLoad) {
 			const page = atlas.pages[index];
@@ -866,7 +867,7 @@ export class SpineWebComponentSkeleton extends HTMLElement implements Disposable
 	 */
 	public getHostElement (): HTMLElement {
 		return (this.width <= 0 || this.width <= 0) && !this.getAttribute("style") && !this.getAttribute("class")
-			? this.parentElement!
+			? this.parentElement as HTMLElement
 			: this;
 	}
 
@@ -934,7 +935,7 @@ export class SpineWebComponentSkeleton extends HTMLElement implements Disposable
 		const isBinary = skeletonPath.endsWith(".skel");
 
 		if (rawData) {
-			for (let [key, value] of Object.entries(rawData)) {
+			for (const [key, value] of Object.entries(rawData)) {
 				this.overlay.assetManager.setRawDataURI(key, isBase64(value) ? `data:application/octet-stream;base64,${value}` : value);
 			}
 		}
@@ -1032,7 +1033,7 @@ export class SpineWebComponentSkeleton extends HTMLElement implements Disposable
 					const cycleFn = () => {
 						const trackIndex = Number(trackIndexString);
 						for (const [index, { animationName, delay, loop, mixDuration }] of animations.entries()) {
-							let track;
+							let track: TrackEntry;
 							if (index === 0) {
 								if (animationName === "#EMPTY#") {
 									track = state.setEmptyAnimation(trackIndex, mixDuration);
@@ -1076,7 +1077,7 @@ export class SpineWebComponentSkeleton extends HTMLElement implements Disposable
 	}
 
 	private render (): void {
-		let noSize = (!this.getAttribute("style") && !this.getAttribute("class"));
+		const noSize = (!this.getAttribute("style") && !this.getAttribute("class"));
 		this.root.innerHTML = `
         <style>
             :host {
@@ -1155,24 +1156,24 @@ export class SpineWebComponentSkeleton extends HTMLElement implements Disposable
 	}
 
 	private checkSlotInteraction (type: PointerEventTypesInput, originalEvent?: UIEvent) {
-		for (let [slot, interactionState] of this.pointerSlotEventCallbacks) {
+		for (const [slot, interactionState] of this.pointerSlotEventCallbacks) {
 			if (!slot.bone.active) continue;
-			let attachment = slot.applied.attachment;
+			const attachment = slot.applied.attachment;
 
 			if (!(attachment instanceof RegionAttachment || attachment instanceof MeshAttachment)) continue;
 
 			const { slotFunction, inside } = interactionState
 
-			let vertices = this.verticesTemp;
+			const vertices = this.verticesTemp;
 			let hullLength = 8;
 
 			// we could probably cache the vertices from rendering if interaction with this slot is enabled
 			if (attachment instanceof RegionAttachment) {
-				let regionAttachment = <RegionAttachment>attachment;
+				const regionAttachment = <RegionAttachment>attachment;
 				regionAttachment.computeWorldVertices(slot, vertices, 0, 2);
 			} else if (attachment instanceof MeshAttachment) {
-				let mesh = <MeshAttachment>attachment;
-				mesh.computeWorldVertices(this.skeleton!, slot, 0, mesh.worldVerticesLength, vertices, 0, 2);
+				const mesh = <MeshAttachment>attachment;
+				mesh.computeWorldVertices(this.skeleton as Skeleton, slot, 0, mesh.worldVerticesLength, vertices, 0, 2);
 				hullLength = mesh.hullLength;
 			}
 
@@ -1274,7 +1275,7 @@ export class SpineWebComponentSkeleton extends HTMLElement implements Disposable
 		if (!skeleton) return { x: 0, y: 0, width: 0, height: 0 };
 		skeleton.setupPose();
 
-		let offset = new Vector2(), size = new Vector2();
+		const offset = new Vector2(), size = new Vector2();
 		const tempArray = new Array<number>(2);
 		if (!animation) {
 			skeleton.updateWorldTransform(Physics.update);
@@ -1294,8 +1295,8 @@ export class SpineWebComponentSkeleton extends HTMLElement implements Disposable
 			skeleton.updateWorldTransform(Physics.update);
 			skeleton.getBounds(offset, size, tempArray, renderer.skeletonRenderer.getSkeletonClipping());
 
-			if (!isNaN(offset.x) && !isNaN(offset.y) && !isNaN(size.x) && !isNaN(size.y) &&
-				!isNaN(minX) && !isNaN(minY) && !isNaN(maxX) && !isNaN(maxY)) {
+			if (!Number.isNaN(offset.x) && !Number.isNaN(offset.y) && !Number.isNaN(size.x) && !Number.isNaN(size.y) &&
+				!Number.isNaN(minX) && !Number.isNaN(minY) && !Number.isNaN(maxX) && !Number.isNaN(maxY)) {
 				minX = Math.min(offset.x, minX);
 				maxX = Math.max(offset.x + size.x, maxX);
 				minY = Math.min(offset.y, minY);
@@ -1345,7 +1346,7 @@ export function createSkeleton (parameters: WidgetAttributes): SpineWebComponent
 	Object.entries(SpineWebComponentSkeleton.attributesDescription).forEach(entry => {
 		const [key, { propertyName }] = entry;
 		const value = parameters[propertyName];
-		if (value) widget.setAttribute(key, value as any);
+		if (value) widget.setAttribute(key, value as string);
 	});
 
 	return widget;

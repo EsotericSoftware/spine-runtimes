@@ -28,7 +28,7 @@
  *****************************************************************************/
 
 import type { ColorSource } from "@pixi/core";
-import { Shader, TextureMatrix, Color, Texture, Matrix, Program } from "@pixi/core";
+import { Color, Matrix, Program, Shader, Texture, TextureMatrix } from "@pixi/core";
 
 const vertex = `
 attribute vec2 aVertexPosition;
@@ -163,7 +163,7 @@ export class DarkTintMaterial extends Shader {
 		this._colorDirty = true;
 	}
 	public get tint (): ColorSource {
-		return this._tintColor.value!;
+		return this._tintColor.value as ColorSource;
 	}
 
 	public set darkTint (value: ColorSource) {
@@ -176,7 +176,7 @@ export class DarkTintMaterial extends Shader {
 		this._colorDirty = true;
 	}
 	public get darkTint (): ColorSource {
-		return this._darkTintColor.value!;
+		return this._darkTintColor.value as ColorSource;
 	}
 
 	public get tintValue (): number {

@@ -27,9 +27,9 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { AttachmentCacheData, Spine } from './Spine.js';
 
 import type { Batch, Batcher, BLEND_MODES, DefaultBatchableMeshElement, Matrix, Texture, Topology } from 'pixi.js';
+import type { AttachmentCacheData, ClippedData, Spine } from './Spine.js';
 
 export class BatchableSpineSlot implements DefaultBatchableMeshElement {
 	indexOffset = 0;
@@ -112,13 +112,13 @@ export class BatchableSpineSlot implements DefaultBatchableMeshElement {
 		this.data = data;
 
 		if (data.clipped) {
-			const clippedData = data.clippedData;
+			const clippedData = data.clippedData as ClippedData;
 
-			this.indexSize = clippedData!.indicesCount;
-			this.attributeSize = clippedData!.vertexCount;
-			this.positions = clippedData!.vertices;
-			this.indices = clippedData!.indices;
-			this.uvs = clippedData!.uvs;
+			this.indexSize = clippedData.indicesCount;
+			this.attributeSize = clippedData.vertexCount;
+			this.positions = clippedData.vertices;
+			this.indices = clippedData.indices;
+			this.uvs = clippedData.uvs;
 		}
 		else {
 			this.indexSize = data.indices.length;

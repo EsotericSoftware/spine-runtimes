@@ -37,15 +37,18 @@ import {
 	type ResolvedAsset
 } from 'pixi.js';
 
+// biome-ignore lint/suspicious/noExplicitAny: can receive any
 type SkeletonJsonAsset = any;
 type SkeletonBinaryAsset = Uint8Array;
 
 const loaderName = "spineSkeletonLoader";
 
+// biome-ignore lint/suspicious/noExplicitAny: can receive any
 function isJson (resource: any): resource is SkeletonJsonAsset {
 	return Object.prototype.hasOwnProperty.call(resource, 'bones');
 }
 
+// biome-ignore lint/suspicious/noExplicitAny: can receive any
 function isBuffer (resource: any): resource is SkeletonBinaryAsset {
 	return resource instanceof Uint8Array;
 }
@@ -74,8 +77,8 @@ const spineLoaderExtension: AssetExtension<SkeletonJsonAsset | SkeletonBinaryAss
 			return buffer;
 		},
 		testParse (asset: unknown, options: ResolvedAsset): Promise<boolean> {
-			const isJsonSpineModel = checkExtension(options.src!, '.json') && isJson(asset);
-			const isBinarySpineModel = checkExtension(options.src!, '.skel') && isBuffer(asset);
+			const isJsonSpineModel = checkExtension(options.src as string, '.json') && isJson(asset);
+			const isBinarySpineModel = checkExtension(options.src as string, '.skel') && isBuffer(asset);
 			const isExplicitLoadParserSet = options.parser === loaderName || options.loadParser === loaderName;
 
 			return Promise.resolve(isJsonSpineModel || isBinarySpineModel || isExplicitLoadParserSet);

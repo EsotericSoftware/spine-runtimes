@@ -16,7 +16,8 @@
         "useExponentiationOperator": "off"
       },
       "suspicious": {
-        "noAssignInExpressions": "off"
+        "noAssignInExpressions": "off",
+        "noPrototypeBuiltins": "off"
       }
     }
   }

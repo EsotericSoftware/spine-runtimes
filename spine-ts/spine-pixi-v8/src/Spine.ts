@@ -43,7 +43,7 @@ import {
 	SkeletonBinary,
 	SkeletonBounds,
 	SkeletonClipping,
-	type SkeletonData,
+	SkeletonData,
 	SkeletonJson,
 	Skin,
 	type Slot,
@@ -261,6 +261,14 @@ export interface SpineEvents {
 	start: [trackEntry: TrackEntry];
 }
 
+export interface ClippedData {
+	vertices: Float32Array;
+	uvs: Float32Array;
+	indices: Uint16Array;
+	vertexCount: number;
+	indicesCount: number;
+}
+
 export interface AttachmentCacheData {
 	id: string;
 	clipped: boolean;
@@ -272,13 +280,7 @@ export interface AttachmentCacheData {
 	darkTint: boolean;
 	skipRender: boolean;
 	texture: Texture;
-	clippedData?: {
-		vertices: Float32Array;
-		uvs: Float32Array;
-		indices: Uint16Array;
-		vertexCount: number;
-		indicesCount: number;
-	};
+	clippedData?: ClippedData;
 }
 
 interface SlotsToClipping {
@@ -385,10 +387,12 @@ export class Spine extends ViewContainer {
 	}
 
 	private hasNeverUpdated = true;
-	constructor (options: SpineOptions | SpineFromOptions) {
+	constructor (options: SkeletonData | SpineOptions | SpineFromOptions) {
 		super({});
 
-		if ("skeleton" in options)
+		if (options instanceof SkeletonData)
+			options = { skeletonData: options };
+		else if ("skeleton" in options)
 			options = new.target.createOptions(options);
 
 		this.allowChildren = true;
@@ -579,7 +583,7 @@ export class Spine extends ViewContainer {
 			const clippingAttachment = slotClipping.pose.attachment as ClippingAttachment;
 
 			// create the pixi mask, only the first time and if the clipped slot is the first one clipped by this currentClippingSlot
-			let mask = currentClippingSlot.mask as Graphics;
+			let mask = currentClippingSlot.mask;
 			if (!mask) {
 				mask = maskPool.obtain();
 				currentClippingSlot.mask = mask;
@@ -1030,11 +1034,11 @@ export class Spine extends ViewContainer {
 		Ticker.shared.remove(this.internalUpdate, this);
 		this.state.clearListeners();
 		this.debug = undefined;
-		this.skeleton = null as any;
-		this.state = null as any;
-		(this._slotsObject as any) = null;
+		(this.skeleton as unknown) = null;
+		(this.state as unknown) = null;
+		(this._slotsObject as unknown) = null;
+		(this.attachmentCacheData as unknown) = null;
 		this._lastAttachments.length = 0;
-		this.attachmentCacheData = null as any;
 	}
 
 	/** Converts a point from the skeleton coordinate system to the Pixi world coordinate system. */

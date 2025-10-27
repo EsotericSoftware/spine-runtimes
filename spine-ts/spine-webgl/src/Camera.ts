@@ -51,11 +51,11 @@ export class OrthoCamera {
 	}
 
 	update () {
-		let projection = this.projection;
-		let view = this.view;
-		let projectionView = this.projectionView;
-		let inverseProjectionView = this.inverseProjectionView;
-		let zoom = this.zoom, viewportWidth = this.viewportWidth, viewportHeight = this.viewportHeight;
+		const projection = this.projection;
+		const view = this.view;
+		const projectionView = this.projectionView;
+		const inverseProjectionView = this.inverseProjectionView;
+		const zoom = this.zoom, viewportWidth = this.viewportWidth, viewportHeight = this.viewportHeight;
 		projection.ortho(zoom * (-viewportWidth / 2), zoom * (viewportWidth / 2),
 			zoom * (-viewportHeight / 2), zoom * (viewportHeight / 2),
 			this.near, this.far);
@@ -66,7 +66,7 @@ export class OrthoCamera {
 	}
 
 	screenToWorld (screenCoords: Vector3, screenWidth: number, screenHeight: number) {
-		let x = screenCoords.x, y = screenHeight - screenCoords.y - 1;
+		const x = screenCoords.x, y = screenHeight - screenCoords.y - 1;
 		screenCoords.x = (2 * x) / screenWidth - 1;
 		screenCoords.y = (2 * y) / screenHeight - 1;
 		screenCoords.z = (2 * screenCoords.z) - 1;

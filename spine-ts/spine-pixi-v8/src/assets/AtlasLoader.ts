@@ -120,7 +120,7 @@ const spineTextureAtlasLoader: AssetExtension<RawAtlas | TextureAtlas, ISpineAtl
 			}
 
 			// we will wait for all promises for the textures at the same time at the end.
-			const textureLoadingPromises: Promise<any>[] = [];
+			const textureLoadingPromises: Promise<void>[] = [];
 
 			// fill the pages
 			for (const page of retval.pages) {
@@ -161,6 +161,7 @@ extensions.add(spineTextureAtlasLoader);
 
 export interface ISpineAtlasMetadata {
 	// If you are downloading an .atlas file, this metadata will go to the Texture loader
+	// biome-ignore lint/suspicious/noExplicitAny: user can pass any
 	imageMetadata?: any;
 	// If you already have atlas pages loaded as pixi textures
 	// and want to use that to create the atlas, you can pass them here

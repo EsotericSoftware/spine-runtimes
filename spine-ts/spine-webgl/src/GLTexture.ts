@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Texture, Disposable, Restorable, TextureFilter, TextureWrap } from "@esotericsoftware/spine-core";
+import { type Disposable, type Restorable, Texture, TextureFilter, type TextureWrap } from "@esotericsoftware/spine-core";
 import { ManagedWebGLRenderingContext } from "./WebGL.js";
 
 export class GLTexture extends Texture implements Disposable, Restorable {
@@ -47,7 +47,7 @@ export class GLTexture extends Texture implements Disposable, Restorable {
 	}
 
 	setFilters (minFilter: TextureFilter, magFilter: TextureFilter) {
-		let gl = this.context.gl;
+		const gl = this.context.gl;
 		this.bind();
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, minFilter);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, GLTexture.validateMagFilter(magFilter));
@@ -80,14 +80,14 @@ export class GLTexture extends Texture implements Disposable, Restorable {
 	}
 
 	setWraps (uWrap: TextureWrap, vWrap: TextureWrap) {
-		let gl = this.context.gl;
+		const gl = this.context.gl;
 		this.bind();
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, uWrap);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, vWrap);
 	}
 
 	update (useMipMaps: boolean) {
-		let gl = this.context.gl;
+		const gl = this.context.gl;
 		if (!this.texture) this.texture = this.context.gl.createTexture();
 		this.bind();
 		if (GLTexture.DISABLE_UNPACK_PREMULTIPLIED_ALPHA_WEBGL) gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
@@ -105,21 +105,21 @@ export class GLTexture extends Texture implements Disposable, Restorable {
 	}
 
 	bind (unit: number = 0) {
-		let gl = this.context.gl;
+		const gl = this.context.gl;
 		this.boundUnit = unit;
 		gl.activeTexture(gl.TEXTURE0 + unit);
 		gl.bindTexture(gl.TEXTURE_2D, this.texture);
 	}
 
 	unbind () {
-		let gl = this.context.gl;
+		const gl = this.context.gl;
 		gl.activeTexture(gl.TEXTURE0 + this.boundUnit);
 		gl.bindTexture(gl.TEXTURE_2D, null);
 	}
 
 	dispose () {
 		this.context.removeRestorable(this);
-		let gl = this.context.gl;
+		const gl = this.context.gl;
 		gl.deleteTexture(this.texture);
 	}
 }

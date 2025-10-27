@@ -27,10 +27,10 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { SpineTexture } from "./SpineTexture.js";
 import type { BlendMode, NumberArrayLike } from "@esotericsoftware/spine-core";
 import { DarkTintMesh } from "./darkTintMesh/DarkTintMesh.js";
 import type { ISlotMesh } from "./Spine.js";
+import { SpineTexture } from "./SpineTexture.js";
 
 export class DarkSlotMesh extends DarkTintMesh implements ISlotMesh {
 	public name: string = "";
@@ -66,8 +66,8 @@ export class DarkSlotMesh extends DarkTintMesh implements ISlotMesh {
 
 		let vertIndex = 0;
 
-		let textureCoordData = textureCoord.data;
-		let vertexCoordData = vertexCoord.data;
+		const textureCoordData = textureCoord.data;
+		const vertexCoordData = vertexCoord.data;
 		for (let i = 0; i < finalVerticesLength; i += darkTint ? 12 : 8) {
 			let auxi = i;
 
