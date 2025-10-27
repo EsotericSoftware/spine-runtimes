@@ -98,7 +98,7 @@
         bounds;
 
         constructor(bounds) {
-            const spineboy = spine.Spine.from({
+            const spineboy = new spine.Spine({
                 atlas: "spineboyAtlas",
                 skeleton: "spineboyData",
                 scale: 0.125,

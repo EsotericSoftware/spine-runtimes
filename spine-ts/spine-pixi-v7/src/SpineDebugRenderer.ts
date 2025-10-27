@@ -27,12 +27,12 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+import type { AnimationStateListener } from "@esotericsoftware/spine-core";
+import { ClippingAttachment, MeshAttachment, PathAttachment, RegionAttachment, SkeletonBounds } from "@esotericsoftware/spine-core";
 import { Container } from "@pixi/display";
 import { Graphics } from "@pixi/graphics";
 import { Text } from "@pixi/text";
 import type { Spine } from "./Spine.js";
-import type { AnimationStateListener } from "@esotericsoftware/spine-core";
-import { ClippingAttachment, MeshAttachment, PathAttachment, RegionAttachment, SkeletonBounds } from "@esotericsoftware/spine-core";
 
 /**
  * Make a class that extends from this interface to create your own debug renderer.
@@ -159,9 +159,10 @@ export class SpineDebugRenderer implements ISpineDebugRenderer {
 		debugDisplayObjects.parentDebugContainer.zIndex = 9999999;
 
 		// Disable screen reader and mouse input on debug objects.
+		// biome-ignore lint/suspicious/noExplicitAny: this prop is available in later versions
 		(debugDisplayObjects.parentDebugContainer as any).accessibleChildren = false;
-		(debugDisplayObjects.parentDebugContainer as any).eventMode = "none";
-		(debugDisplayObjects.parentDebugContainer as any).interactiveChildren = false;
+		(debugDisplayObjects.parentDebugContainer).eventMode = "none";
+		(debugDisplayObjects.parentDebugContainer).interactiveChildren = false;
 
 		spine.addChild(debugDisplayObjects.parentDebugContainer);
 

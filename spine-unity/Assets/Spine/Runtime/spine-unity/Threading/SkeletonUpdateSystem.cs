@@ -106,18 +106,18 @@ namespace Spine.Unity {
 		}
 
 		public static int SkeletonSortComparer (ISkeletonRenderer first, ISkeletonRenderer second) {
-			Skeleton firstSkeleton = first.Skeleton;
-			Skeleton secondSkeleton = second.Skeleton;
-			if (firstSkeleton == null) return secondSkeleton == null ? 0 : -1;
-			else if (secondSkeleton == null) return 1;
-			else return firstSkeleton.Data.GetHashCode() - secondSkeleton.Data.GetHashCode();
+			SkeletonDataAsset firstDataAsset = first.SkeletonDataAsset;
+			SkeletonDataAsset secondDataAsset = second.SkeletonDataAsset;
+			if (firstDataAsset == null) return secondDataAsset == null ? 0 : -1;
+			else if (secondDataAsset == null) return 1;
+			else return firstDataAsset.GetHashCode() - secondDataAsset.GetHashCode();
 		}
 		public static int SkeletonSortComparer (SkeletonAnimationBase first, SkeletonAnimationBase second) {
-			Skeleton firstSkeleton = first.Skeleton;
-			Skeleton secondSkeleton = second.Skeleton;
-			if (firstSkeleton == null) return secondSkeleton == null ? 0 : -1;
-			else if (secondSkeleton == null) return 1;
-			else return firstSkeleton.Data.GetHashCode() - secondSkeleton.Data.GetHashCode();
+			SkeletonDataAsset firstDataAsset = first.SkeletonDataAsset;
+			SkeletonDataAsset secondDataAsset = second.SkeletonDataAsset;
+			if (firstDataAsset == null) return secondDataAsset == null ? 0 : -1;
+			else if (secondDataAsset == null) return 1;
+			else return firstDataAsset.GetHashCode() - secondDataAsset.GetHashCode();
 		}
 		public static readonly Comparison<ISkeletonRenderer> SkeletonRendererComparer = SkeletonSortComparer;
 		public static readonly Comparison<SkeletonAnimationBase> SkeletonAnimationComparer = SkeletonSortComparer;
@@ -162,6 +162,9 @@ namespace Spine.Unity {
 		protected bool mainThreadUpdateCallbacks = true;
 		protected CoroutineIterator[] splitUpdateMethod = null;
 
+		protected bool sortSkeletonRenderers = false;
+		protected bool sortSkeletonAnimations = false;
+
 		int UsedThreadCount {
 			get {
 				if (usedThreadCount < 0) {
@@ -182,6 +185,26 @@ namespace Spine.Unity {
 		public bool MainThreadUpdateCallbacks {
 			set { mainThreadUpdateCallbacks = value; }
 			get { return mainThreadUpdateCallbacks; }
+		}
+
+		/// <summary>
+		/// Optimization setting. Enable to group ISkeletonRenderers by type (by SkeletonDataAsset) for mesh updates.
+		/// Potentially allows for better cache locality, however this may be detrimental if skeleton types vary in
+		/// complexity.
+		/// </summary>
+		public bool GroupRenderersBySkeletonType {
+			set { sortSkeletonRenderers = value; }
+			get { return sortSkeletonRenderers; }
+		}
+
+		/// <summary>
+		/// Optimization setting. Enable to group skeletons to be animated by type (by SkeletonDataAsset).
+		/// Potentially allows for better cache locality, however this may be detrimental if skeleton types vary in
+		/// complexity.
+		/// </summary>
+		public bool GroupAnimationBySkeletonType {
+			set { sortSkeletonAnimations = value; }
+			get { return sortSkeletonAnimations; }
 		}
 
 #if USE_THREADED_ANIMATION_UPDATE
@@ -240,8 +263,10 @@ namespace Spine.Unity {
 
 		public void UpdateAsync (List<SkeletonAnimationBase> skeletons, UpdateTiming updateTiming) {
 			if (skeletons.Count == 0) return;
-			// sort by skeleton data to allow for better cache utilization.
-			skeletons.Sort(SkeletonAnimationComparer);
+
+			// Sort by skeleton data to allow for better cache utilization.
+			if (sortSkeletonAnimations)
+				skeletons.Sort(SkeletonAnimationComparer);
 
 			int numThreads = UsedThreadCount;
 #if RUN_ALL_ON_MAIN_THREAD
@@ -425,8 +450,9 @@ namespace Spine.Unity {
 		public void LateUpdateAsync () {
 			if (skeletonRenderers.Count == 0) return;
 
-			// sort by skeleton data to allow for better cache utilization.
-			skeletonRenderers.Sort(SkeletonRendererComparer);
+			// Sort by skeleton data to allow for better cache utilization.
+			if (sortSkeletonRenderers)
+				skeletonRenderers.Sort(SkeletonRendererComparer);
 
 			int numThreads = UsedThreadCount;
 #if RUN_ALL_ON_MAIN_THREAD

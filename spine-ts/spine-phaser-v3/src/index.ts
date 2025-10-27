@@ -27,17 +27,21 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-export * from "./require-shim.js"
-export * from "./SpinePlugin.js"
-export * from "./SpineGameObject.js"
-export * from "./mixins.js"
 export * from "@esotericsoftware/spine-core";
 export * from "@esotericsoftware/spine-webgl";
-import { SpineGameObjectConfig, SpinePlugin } from "./SpinePlugin.js";
+export * from "./mixins.js"
+export * from "./require-shim.js"
+export * from "./SpineGameObject.js"
+export * from "./SpinePlugin.js"
+
+import { type SpineGameObjectConfig, SpinePlugin } from "./SpinePlugin.js";
+
+// biome-ignore lint/suspicious/noExplicitAny: need to add spine to window
 (window as any).spine = { SpinePlugin: SpinePlugin };
+// biome-ignore lint/suspicious/noExplicitAny: need to add spine to window
 (window as any)["spine.SpinePlugin"] = SpinePlugin;
 
-import { SpineGameObject, SpineGameObjectBoundsProvider } from "./SpineGameObject.js";
+import type { SpineGameObject, SpineGameObjectBoundsProvider } from "./SpineGameObject.js";
 
 declare global {
 	namespace Phaser.Loader {

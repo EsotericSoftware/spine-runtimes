@@ -27,8 +27,8 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { BoneData } from "./BoneData.js";
-import { BoneLocal } from "./BoneLocal.js";
+import type { BoneData } from "./BoneData.js";
+import type { BoneLocal } from "./BoneLocal.js";
 import { BonePose } from "./BonePose.js";
 import { PosedActive } from "./PosedActive.js";
 
@@ -42,7 +42,7 @@ export class Bone extends PosedActive<BoneData, BoneLocal, BonePose> {
 	parent: Bone | null = null;
 
 	/** The immediate children of this bone. */
-	children = new Array<Bone>();
+	children = [] as Bone[];
 
 	sorted = false;
 

@@ -36,6 +36,7 @@ VaryingsSprite DepthNormalsVertexSprite(VertexInput input)
 
 	float backFaceSign = 1;
 #if defined(FIXED_NORMALS_BACKFACE_RENDERING)
+	float3 positionWS = TransformObjectToWorld(input.vertex.xyz);
 	backFaceSign = calculateBackfacingSign(positionWS.xyz);
 #endif
 

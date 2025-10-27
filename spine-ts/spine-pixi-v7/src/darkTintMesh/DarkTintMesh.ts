@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import type { Texture, ColorSource, Renderer, BLEND_MODES } from "@pixi/core";
+import type { BLEND_MODES, ColorSource, Renderer, Texture } from "@pixi/core";
 import { Mesh } from "@pixi/mesh";
 import { DarkTintGeometry } from "./DarkTintGeom.js";
 import { DarkTintMaterial } from "./DarkTintMaterial.js";
@@ -60,11 +60,11 @@ export class DarkTintMesh extends Mesh<DarkTintMaterial> {
 	}
 
 	public set darkTint (value: ColorSource | null) {
-		(this.shader as unknown as DarkTintMaterial).darkTint = value!;
+		this.shader.darkTint = value as ColorSource;
 	}
 
 	public get darkTintValue (): number {
-		return (this.shader as unknown as DarkTintMaterial).darkTintValue;
+		return this.shader.darkTintValue;
 	}
 
 	// eslint-disable-next-line @typescript-eslint/naming-convention

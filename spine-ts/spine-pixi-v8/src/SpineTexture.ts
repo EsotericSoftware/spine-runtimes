@@ -27,10 +27,9 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Texture as PixiTexture } from 'pixi.js';
 import { BlendMode, Texture, TextureFilter, TextureWrap } from '@esotericsoftware/spine-core';
-
 import type { BLEND_MODES, SCALE_MODE, TextureSource, WRAP_MODE } from 'pixi.js';
+import { Texture as PixiTexture } from 'pixi.js';
 
 export class SpineTexture extends Texture {
 	private static readonly textureMap: Map<TextureSource, SpineTexture> = new Map<TextureSource, SpineTexture>();

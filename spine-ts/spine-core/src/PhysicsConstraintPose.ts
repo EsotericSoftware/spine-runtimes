@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Pose } from "./Pose"
+import type { Pose } from "./Pose"
 
 /** Stores a pose for a physics constraint. */
 export class PhysicsConstraintPose implements Pose<PhysicsConstraintPose> {

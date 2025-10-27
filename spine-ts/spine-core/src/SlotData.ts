@@ -27,11 +27,10 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { BoneData } from "./BoneData.js";
+import type { BoneData } from "./BoneData.js";
 import { PosedData } from "./PosedData.js";
-import { SlotPose } from "./SlotPose.js";
-
 import type { Skeleton } from "./Skeleton.js";
+import { SlotPose } from "./SlotPose.js";
 
 /** Stores the setup pose for a {@link Slot}. */
 export class SlotData extends PosedData<SlotPose> {

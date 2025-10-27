@@ -1,5 +1,5 @@
-import { Application, Assets } from 'pixi.js';
 import { Spine } from '@esotericsoftware/spine-pixi-v8';
+import { Application, Assets } from 'pixi.js';
 
 /** The PixiJS app Application instance, shared across the project */
 export const app = new Application();
@@ -25,7 +25,7 @@ async function init () {
 	await Assets.load(["spineboyData", "spineboyAtlas"]);
 
 	// Create the spine display object
-	const spineboy = Spine.from({
+	const spineboy = new Spine({
 		atlas: "spineboyAtlas",
 		skeleton: "spineboyData",
 		scale: 0.5,

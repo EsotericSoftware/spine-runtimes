@@ -27,18 +27,18 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Attachment } from "./attachments/Attachment.js";
+import type { Attachment } from "./attachments/Attachment.js";
 import { PathAttachment } from "./attachments/PathAttachment.js";
-import { Bone } from "./Bone.js";
-import { BonePose } from "./BonePose.js";
+import type { Bone } from "./Bone.js";
+import type { BonePose } from "./BonePose.js";
 import { Constraint } from "./Constraint.js";
-import { PathConstraintData, RotateMode, SpacingMode, PositionMode } from "./PathConstraintData.js";
+import { type PathConstraintData, PositionMode, RotateMode, SpacingMode } from "./PathConstraintData.js";
 import { PathConstraintPose } from "./PathConstraintPose.js";
-import { Physics } from "./Physics.js";
-import { Skeleton } from "./Skeleton.js";
-import { Skin, SkinEntry } from "./Skin.js";
-import { Slot } from "./Slot.js";
-import { Utils, MathUtils } from "./Utils.js";
+import type { Physics } from "./Physics.js";
+import type { Skeleton } from "./Skeleton.js";
+import type { Skin } from "./Skin.js";
+import type { Slot } from "./Slot.js";
+import { MathUtils, Utils } from "./Utils.js";
 
 
 /** Stores the current pose for a path constraint. A path constraint adjusts the rotation, translation, and scale of the
@@ -58,16 +58,16 @@ export class PathConstraint extends Constraint<PathConstraint, PathConstraintDat
 	/** The slot whose path attachment will be used to constrained the bones. */
 	slot: Slot;
 
-	spaces = new Array<number>(); positions = new Array<number>();
-	world = new Array<number>(); curves = new Array<number>(); lengths = new Array<number>();
-	segments = new Array<number>();
+	spaces = [] as number[]; positions = [] as number[];
+	world = [] as number[]; curves = [] as number[]; lengths = [] as number[];
+	segments = [] as number[];
 
 	constructor (data: PathConstraintData, skeleton: Skeleton) {
 		super(data, new PathConstraintPose(), new PathConstraintPose());
 		if (!skeleton) throw new Error("skeleton cannot be null.");
 		this.data = data;
 
-		this.bones = new Array<BonePose>();
+		this.bones = [] as BonePose[];
 		for (const boneData of this.data.bones)
 			this.bones.push(skeleton.bones[boneData.index].constrained);
 
@@ -81,44 +81,44 @@ export class PathConstraint extends Constraint<PathConstraint, PathConstraintDat
 	}
 
 	update (skeleton: Skeleton, physics: Physics) {
-		let attachment = this.slot.applied.attachment;
+		const attachment = this.slot.applied.attachment;
 		if (!(attachment instanceof PathAttachment)) return;
 
 		const p = this.applied;
-		let mixRotate = p.mixRotate, mixX = p.mixX, mixY = p.mixY;
+		const mixRotate = p.mixRotate, mixX = p.mixX, mixY = p.mixY;
 		if (mixRotate === 0 && mixX === 0 && mixY === 0) return;
 
-		let data = this.data;
-		let tangents = data.rotateMode == RotateMode.Tangent, scale = data.rotateMode == RotateMode.ChainScale;
+		const data = this.data;
+		const tangents = data.rotateMode === RotateMode.Tangent, scale = data.rotateMode === RotateMode.ChainScale;
 
-		let bones = this.bones;
-		let boneCount = bones.length, spacesCount = tangents ? boneCount : boneCount + 1;
-		let spaces = Utils.setArraySize(this.spaces, spacesCount), lengths: Array<number> = scale ? this.lengths = Utils.setArraySize(this.lengths, boneCount) : [];
-		let spacing = p.spacing;
+		const bones = this.bones;
+		const boneCount = bones.length, spacesCount = tangents ? boneCount : boneCount + 1;
+		const spaces = Utils.setArraySize(this.spaces, spacesCount), lengths: Array<number> = scale ? this.lengths = Utils.setArraySize(this.lengths, boneCount) : [];
+		const spacing = p.spacing;
 
 		switch (data.spacingMode) {
 			case SpacingMode.Percent:
 				if (scale) {
 					for (let i = 0, n = spacesCount - 1; i < n; i++) {
-						let bone = bones[i];
-						let setupLength = bone.bone.data.length;
-						let x = setupLength * bone.a, y = setupLength * bone.c;
+						const bone = bones[i];
+						const setupLength = bone.bone.data.length;
+						const x = setupLength * bone.a, y = setupLength * bone.c;
 						lengths[i] = Math.sqrt(x * x + y * y);
 					}
 				}
 				Utils.arrayFill(spaces, 1, spacesCount, spacing);
 				break;
-			case SpacingMode.Proportional:
+			case SpacingMode.Proportional: {
 				let sum = 0;
 				for (let i = 0, n = spacesCount - 1; i < n;) {
-					let bone = bones[i];
-					let setupLength = bone.bone.data.length;
+					const bone = bones[i];
+					const setupLength = bone.bone.data.length;
 					if (setupLength < PathConstraint.epsilon) {
 						if (scale) lengths[i] = 0;
 						spaces[++i] = spacing;
 					} else {
-						let x = setupLength * bone.a, y = setupLength * bone.c;
-						let length = Math.sqrt(x * x + y * y);
+						const x = setupLength * bone.a, y = setupLength * bone.c;
+						const length = Math.sqrt(x * x + y * y);
 						if (scale) lengths[i] = length;
 						spaces[++i] = length;
 						sum += length;
@@ -130,42 +130,44 @@ export class PathConstraint extends Constraint<PathConstraint, PathConstraintDat
 						spaces[i] *= sum;
 				}
 				break;
-			default:
-				let lengthSpacing = data.spacingMode == SpacingMode.Length;
+			}
+			default: {
+				const lengthSpacing = data.spacingMode === SpacingMode.Length;
 				for (let i = 0, n = spacesCount - 1; i < n;) {
-					let bone = bones[i];
-					let setupLength = bone.bone.data.length;
+					const bone = bones[i];
+					const setupLength = bone.bone.data.length;
 					if (setupLength < PathConstraint.epsilon) {
 						if (scale) lengths[i] = 0;
 						spaces[++i] = spacing;
 					} else {
-						let x = setupLength * bone.a, y = setupLength * bone.c;
-						let length = Math.sqrt(x * x + y * y);
+						const x = setupLength * bone.a, y = setupLength * bone.c;
+						const length = Math.sqrt(x * x + y * y);
 						if (scale) lengths[i] = length;
 						spaces[++i] = (lengthSpacing ? Math.max(0, setupLength + spacing) : spacing) * length / setupLength;
 					}
 				}
+			}
 		}
 
-		let positions = this.computeWorldPositions(skeleton, attachment, spacesCount, tangents);
+		const positions = this.computeWorldPositions(skeleton, attachment, spacesCount, tangents);
 		let boneX = positions[0], boneY = positions[1], offsetRotation = data.offsetRotation;
 		let tip = false;
-		if (offsetRotation == 0)
-			tip = data.rotateMode == RotateMode.Chain;
+		if (offsetRotation === 0)
+			tip = data.rotateMode === RotateMode.Chain;
 		else {
 			tip = false;
-			let bone = this.slot.bone.applied;
+			const bone = this.slot.bone.applied;
 			offsetRotation *= bone.a * bone.d - bone.b * bone.c > 0 ? MathUtils.degRad : -MathUtils.degRad;
 		}
 		for (let i = 0, ip = 3, u = skeleton._update; i < boneCount; i++, ip += 3) {
-			let bone = bones[i];
+			const bone = bones[i];
 			bone.worldX += (boneX - bone.worldX) * mixX;
 			bone.worldY += (boneY - bone.worldY) * mixY;
-			let x = positions[ip], y = positions[ip + 1], dx = x - boneX, dy = y - boneY;
+			const x = positions[ip], y = positions[ip + 1], dx = x - boneX, dy = y - boneY;
 			if (scale) {
-				let length = lengths[i];
-				if (length != 0) {
-					let s = (Math.sqrt(dx * dx + dy * dy) / length - 1) * mixRotate + 1;
+				const length = lengths[i];
+				if (length !== 0) {
+					const s = (Math.sqrt(dx * dx + dy * dy) / length - 1) * mixRotate + 1;
 					bone.a *= s;
 					bone.c *= s;
 				}
@@ -176,7 +178,7 @@ export class PathConstraint extends Constraint<PathConstraint, PathConstraintDat
 				let a = bone.a, b = bone.b, c = bone.c, d = bone.d, r = 0, cos = 0, sin = 0;
 				if (tangents)
 					r = positions[ip - 1];
-				else if (spaces[i + 1] == 0)
+				else if (spaces[i + 1] === 0)
 					r = positions[ip + 2];
 				else
 					r = Math.atan2(dy, dx);
@@ -184,7 +186,7 @@ export class PathConstraint extends Constraint<PathConstraint, PathConstraintDat
 				if (tip) {
 					cos = Math.cos(r);
 					sin = Math.sin(r);
-					let length = bone.bone.data.length;
+					const length = bone.bone.data.length;
 					boneX += (length * (cos * a - sin * c) - dx) * mixRotate;
 					boneY += (length * (sin * a + cos * c) - dy) * mixRotate;
 				} else {
@@ -207,19 +209,19 @@ export class PathConstraint extends Constraint<PathConstraint, PathConstraintDat
 	}
 
 	computeWorldPositions (skeleton: Skeleton, path: PathAttachment, spacesCount: number, tangents: boolean) {
-		let slot = this.slot;
+		const slot = this.slot;
 		let position = this.applied.position;
 		let spaces = this.spaces, out = Utils.setArraySize(this.positions, spacesCount * 3 + 2), world: Array<number> = this.world;
-		let closed = path.closed;
+		const closed = path.closed;
 		let verticesLength = path.worldVerticesLength, curveCount = verticesLength / 6, prevCurve = PathConstraint.NONE;
 
 		if (!path.constantSpeed) {
-			let lengths = path.lengths;
+			const lengths = path.lengths;
 			curveCount -= closed ? 1 : 2;
-			let pathLength = lengths[curveCount];
-			if (this.data.positionMode == PositionMode.Percent) position *= pathLength;
+			const pathLength = lengths[curveCount];
+			if (this.data.positionMode === PositionMode.Percent) position *= pathLength;
 
-			let multiplier;
+			let multiplier: number;
 			switch (this.data.spacingMode) {
 				case SpacingMode.Percent: multiplier = pathLength; break;
 				case SpacingMode.Proportional: multiplier = pathLength / spacesCount; break;
@@ -228,7 +230,7 @@ export class PathConstraint extends Constraint<PathConstraint, PathConstraintDat
 
 			world = Utils.setArraySize(this.world, 8);
 			for (let i = 0, o = 0, curve = 0; i < spacesCount; i++, o += 3) {
-				let space = spaces[i] * multiplier;
+				const space = spaces[i] * multiplier;
 				position += space;
 				let p = position;
 
@@ -237,14 +239,14 @@ export class PathConstraint extends Constraint<PathConstraint, PathConstraintDat
 					if (p < 0) p += pathLength;
 					curve = 0;
 				} else if (p < 0) {
-					if (prevCurve != PathConstraint.BEFORE) {
+					if (prevCurve !== PathConstraint.BEFORE) {
 						prevCurve = PathConstraint.BEFORE;
 						path.computeWorldVertices(skeleton, slot, 2, 4, world, 0, 2);
 					}
 					this.addBeforePosition(p, world, 0, out, o);
 					continue;
 				} else if (p > pathLength) {
-					if (prevCurve != PathConstraint.AFTER) {
+					if (prevCurve !== PathConstraint.AFTER) {
 						prevCurve = PathConstraint.AFTER;
 						path.computeWorldVertices(skeleton, slot, verticesLength - 6, 4, world, 0, 2);
 					}
@@ -254,26 +256,26 @@ export class PathConstraint extends Constraint<PathConstraint, PathConstraintDat
 
 				// Determine curve containing position.
 				for (; ; curve++) {
-					let length = lengths[curve];
+					const length = lengths[curve];
 					if (p > length) continue;
-					if (curve == 0)
+					if (curve === 0)
 						p /= length;
 					else {
-						let prev = lengths[curve - 1];
+						const prev = lengths[curve - 1];
 						p = (p - prev) / (length - prev);
 					}
 					break;
 				}
-				if (curve != prevCurve) {
+				if (curve !== prevCurve) {
 					prevCurve = curve;
-					if (closed && curve == curveCount) {
+					if (closed && curve === curveCount) {
 						path.computeWorldVertices(skeleton, slot, verticesLength - 4, 4, world, 0, 2);
 						path.computeWorldVertices(skeleton, slot, 0, 4, world, 4, 2);
 					} else
 						path.computeWorldVertices(skeleton, slot, curve * 6 + 2, 8, world, 0, 2);
 				}
 				this.addCurvePosition(p, world[0], world[1], world[2], world[3], world[4], world[5], world[6], world[7], out, o,
-					tangents || (i > 0 && space == 0));
+					tangents || (i > 0 && space === 0));
 			}
 			return out;
 		}
@@ -294,7 +296,7 @@ export class PathConstraint extends Constraint<PathConstraint, PathConstraintDat
 		}
 
 		// Curve lengths.
-		let curves = Utils.setArraySize(this.curves, curveCount);
+		const curves = Utils.setArraySize(this.curves, curveCount);
 		let pathLength = 0;
 		let x1 = world[0], y1 = world[1], cx1 = 0, cy1 = 0, cx2 = 0, cy2 = 0, x2 = 0, y2 = 0;
 		let tmpx = 0, tmpy = 0, dddfx = 0, dddfy = 0, ddfx = 0, ddfy = 0, dfx = 0, dfy = 0;
@@ -330,19 +332,19 @@ export class PathConstraint extends Constraint<PathConstraint, PathConstraintDat
 			y1 = y2;
 		}
 
-		if (this.data.positionMode == PositionMode.Percent) position *= pathLength;
+		if (this.data.positionMode === PositionMode.Percent) position *= pathLength;
 
-		let multiplier;
+		let multiplier: number;
 		switch (this.data.spacingMode) {
 			case SpacingMode.Percent: multiplier = pathLength; break;
 			case SpacingMode.Proportional: multiplier = pathLength / spacesCount; break;
 			default: multiplier = 1;
 		}
 
-		let segments = this.segments;
+		const segments = this.segments;
 		let curveLength = 0;
 		for (let i = 0, o = 0, curve = 0, segment = 0; i < spacesCount; i++, o += 3) {
-			let space = spaces[i] * multiplier;
+			const space = spaces[i] * multiplier;
 			position += space;
 			let p = position;
 
@@ -361,19 +363,19 @@ export class PathConstraint extends Constraint<PathConstraint, PathConstraintDat
 
 			// Determine curve containing position.
 			for (; ; curve++) {
-				let length = curves[curve];
+				const length = curves[curve];
 				if (p > length) continue;
-				if (curve == 0)
+				if (curve === 0)
 					p /= length;
 				else {
-					let prev = curves[curve - 1];
+					const prev = curves[curve - 1];
 					p = (p - prev) / (length - prev);
 				}
 				break;
 			}
 
 			// Curve segment lengths.
-			if (curve != prevCurve) {
+			if (curve !== prevCurve) {
 				prevCurve = curve;
 				let ii = curve * 6;
 				x1 = world[ii];
@@ -416,30 +418,30 @@ export class PathConstraint extends Constraint<PathConstraint, PathConstraintDat
 			// Weight by segment length.
 			p *= curveLength;
 			for (; ; segment++) {
-				let length = segments[segment];
+				const length = segments[segment];
 				if (p > length) continue;
-				if (segment == 0)
+				if (segment === 0)
 					p /= length;
 				else {
-					let prev = segments[segment - 1];
+					const prev = segments[segment - 1];
 					p = segment + (p - prev) / (length - prev);
 				}
 				break;
 			}
-			this.addCurvePosition(p * 0.1, x1, y1, cx1, cy1, cx2, cy2, x2, y2, out, o, tangents || (i > 0 && space == 0));
+			this.addCurvePosition(p * 0.1, x1, y1, cx1, cy1, cx2, cy2, x2, y2, out, o, tangents || (i > 0 && space === 0));
 		}
 		return out;
 	}
 
 	addBeforePosition (p: number, temp: Array<number>, i: number, out: Array<number>, o: number) {
-		let x1 = temp[i], y1 = temp[i + 1], dx = temp[i + 2] - x1, dy = temp[i + 3] - y1, r = Math.atan2(dy, dx);
+		const x1 = temp[i], y1 = temp[i + 1], dx = temp[i + 2] - x1, dy = temp[i + 3] - y1, r = Math.atan2(dy, dx);
 		out[o] = x1 + p * Math.cos(r);
 		out[o + 1] = y1 + p * Math.sin(r);
 		out[o + 2] = r;
 	}
 
 	addAfterPosition (p: number, temp: Array<number>, i: number, out: Array<number>, o: number) {
-		let x1 = temp[i + 2], y1 = temp[i + 3], dx = x1 - temp[i], dy = y1 - temp[i + 1], r = Math.atan2(dy, dx);
+		const x1 = temp[i + 2], y1 = temp[i + 3], dx = x1 - temp[i], dy = y1 - temp[i + 1], r = Math.atan2(dy, dx);
 		out[o] = x1 + p * Math.cos(r);
 		out[o + 1] = y1 + p * Math.sin(r);
 		out[o + 2] = r;
@@ -447,15 +449,15 @@ export class PathConstraint extends Constraint<PathConstraint, PathConstraintDat
 
 	addCurvePosition (p: number, x1: number, y1: number, cx1: number, cy1: number, cx2: number, cy2: number, x2: number, y2: number,
 		out: Array<number>, o: number, tangents: boolean) {
-		if (p == 0 || isNaN(p)) {
+		if (p === 0 || Number.isNaN(p)) {
 			out[o] = x1;
 			out[o + 1] = y1;
 			out[o + 2] = Math.atan2(cy1 - y1, cx1 - x1);
 			return;
 		}
-		let tt = p * p, ttt = tt * p, u = 1 - p, uu = u * u, uuu = uu * u;
-		let ut = u * p, ut3 = ut * 3, uut3 = u * ut3, utt3 = ut3 * p;
-		let x = x1 * uuu + cx1 * uut3 + cx2 * utt3 + x2 * ttt, y = y1 * uuu + cy1 * uut3 + cy2 * utt3 + y2 * ttt;
+		const tt = p * p, ttt = tt * p, u = 1 - p, uu = u * u, uuu = uu * u;
+		const ut = u * p, ut3 = ut * 3, uut3 = u * ut3, utt3 = ut3 * p;
+		const x = x1 * uuu + cx1 * uut3 + cx2 * utt3 + x2 * ttt, y = y1 * uuu + cy1 * uut3 + cy2 * utt3 + y2 * ttt;
 		out[o] = x;
 		out[o + 1] = y;
 		if (tangents) {
@@ -470,7 +472,7 @@ export class PathConstraint extends Constraint<PathConstraint, PathConstraintDat
 		const slotIndex = this.slot.data.index;
 		const slotBone = this.slot.bone;
 		if (skeleton.skin != null) this.sortPathSlot(skeleton, skeleton.skin, slotIndex, slotBone);
-		if (skeleton.data.defaultSkin != null && skeleton.data.defaultSkin != skeleton.skin)
+		if (skeleton.data.defaultSkin != null && skeleton.data.defaultSkin !== skeleton.skin)
 			this.sortPathSlot(skeleton, skeleton.data.defaultSkin, slotIndex, slotBone);
 		this.sortPath(skeleton, this.slot.pose.attachment, slotBone);
 		const bones = this.bones;
@@ -491,7 +493,7 @@ export class PathConstraint extends Constraint<PathConstraint, PathConstraintDat
 		const entries = skin.getAttachments();
 		for (let i = 0, n = entries.length; i < n; i++) {
 			const entry = entries[i];
-			if (entry.slotIndex == slotIndex) this.sortPath(skeleton, entry.attachment, slotBone);
+			if (entry.slotIndex === slotIndex) this.sortPath(skeleton, entry.attachment, slotBone);
 		}
 	}
 

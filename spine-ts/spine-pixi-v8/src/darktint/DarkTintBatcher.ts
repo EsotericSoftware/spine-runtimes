@@ -30,11 +30,11 @@
 import {
 	Batcher,
 	Color,
-	DefaultBatchableMeshElement,
-	DefaultBatchableQuadElement,
-	extensions,
+	type DefaultBatchableMeshElement,
+	type DefaultBatchableQuadElement,
 	ExtensionType,
-	Shader
+	extensions,
+	type Shader
 } from 'pixi.js';
 import { DarkTintBatchGeometry } from './DarkTintBatchGeometry.js';
 import { DarkTintShader } from './DarkTintShader.js';

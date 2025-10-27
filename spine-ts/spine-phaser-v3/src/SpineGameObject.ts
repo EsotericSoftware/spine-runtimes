@@ -27,29 +27,29 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { SPINE_GAME_OBJECT_TYPE } from "./keys.js";
-import { SpinePlugin } from "./SpinePlugin.js";
-import {
-	ComputedSizeMixin,
-	DepthMixin,
-	FlipMixin,
-	ScrollFactorMixin,
-	TransformMixin,
-	VisibleMixin,
-	AlphaMixin,
-	OriginMixin,
-} from "./mixins.js";
 import {
 	AnimationState,
 	AnimationStateData,
-	Bone,
+	type Bone,
 	MathUtils,
 	Physics,
 	Skeleton,
 	SkeletonClipping,
 	Skin,
-	Vector2,
+	type Vector2,
 } from "@esotericsoftware/spine-core";
+import { SPINE_GAME_OBJECT_TYPE } from "./keys.js";
+import {
+	AlphaMixin,
+	ComputedSizeMixin,
+	DepthMixin,
+	FlipMixin,
+	OriginMixin,
+	ScrollFactorMixin,
+	TransformMixin,
+	VisibleMixin,
+} from "./mixins.js";
+import type { SpinePlugin } from "./SpinePlugin.js";
 
 class BaseSpineGameObject extends Phaser.GameObjects.GameObject {
 	constructor (scene: Phaser.Scene, type: string) {
@@ -99,7 +99,7 @@ export class SetupPoseBoundsProvider implements SpineGameObjectBoundsProvider {
 		skeleton.setupPose();
 		skeleton.updateWorldTransform(Physics.update);
 		const bounds = skeleton.getBoundsRect(this.clipping ? new SkeletonClipping() : undefined);
-		return bounds.width == Number.NEGATIVE_INFINITY
+		return bounds.width === Number.NEGATIVE_INFINITY
 			? { x: 0, y: 0, width: 0, height: 0 }
 			: bounds;
 	}
@@ -137,7 +137,7 @@ export class SkinsAndAnimationBoundsProvider
 		const clipper = this.clipping ? new SkeletonClipping() : undefined;
 		const data = skeleton.data;
 		if (this.skins.length > 0) {
-			let customSkin = new Skin("custom-skin");
+			const customSkin = new Skin("custom-skin");
 			for (const skinName of this.skins) {
 				const skin = data.findSkin(skinName);
 				if (skin == null) continue;
@@ -147,12 +147,11 @@ export class SkinsAndAnimationBoundsProvider
 		}
 		skeleton.setupPose();
 
-		const animation =
-			this.animation != null ? data.findAnimation(this.animation!) : null;
+		const animation = this.animation != null ? data.findAnimation(this.animation) : null;
 		if (animation == null) {
 			skeleton.updateWorldTransform(Physics.update);
 			const bounds = skeleton.getBoundsRect(clipper);
-			return bounds.width == Number.NEGATIVE_INFINITY
+			return bounds.width === Number.NEGATIVE_INFINITY
 				? { x: 0, y: 0, width: 0, height: 0 }
 				: bounds;
 		} else {
@@ -182,7 +181,7 @@ export class SkinsAndAnimationBoundsProvider
 				width: maxX - minX,
 				height: maxY - minY,
 			};
-			return bounds.width == Number.NEGATIVE_INFINITY
+			return bounds.width === Number.NEGATIVE_INFINITY
 				? { x: 0, y: 0, width: 0, height: 0 }
 				: bounds;
 		}
@@ -240,6 +239,7 @@ export class SpineGameObject extends DepthMixin(
 		atlasKey: string,
 		public boundsProvider: SpineGameObjectBoundsProvider = new SetupPoseBoundsProvider()
 	) {
+		// biome-ignore lint/suspicious/noExplicitAny: necessary
 		super(scene, (window as any).SPINE_GAME_OBJECT_TYPE ? (window as any).SPINE_GAME_OBJECT_TYPE : SPINE_GAME_OBJECT_TYPE);
 		this.setPosition(x, y);
 
@@ -253,7 +253,7 @@ export class SpineGameObject extends DepthMixin(
 
 	updateSize () {
 		if (!this.skeleton) return;
-		let bounds = this.boundsProvider.calculateBounds(this);
+		const bounds = this.boundsProvider.calculateBounds(this);
 		this.width = bounds.width;
 		this.height = bounds.height;
 		this.setDisplayOrigin(-bounds.x, -bounds.y);
@@ -263,15 +263,15 @@ export class SpineGameObject extends DepthMixin(
 
 	/** Converts a point from the skeleton coordinate system to the Phaser world coordinate system. */
 	skeletonToPhaserWorldCoordinates (point: { x: number; y: number }) {
-		let transform = this.getWorldTransformMatrix();
-		let a = transform.a,
+		const transform = this.getWorldTransformMatrix();
+		const a = transform.a,
 			b = transform.b,
 			c = transform.c,
 			d = transform.d,
 			tx = transform.tx,
 			ty = transform.ty;
-		let x = point.x;
-		let y = point.y;
+		const x = point.x;
+		const y = point.y;
 		point.x = x * a + y * c + tx;
 		point.y = x * b + y * d + ty;
 	}
@@ -280,14 +280,14 @@ export class SpineGameObject extends DepthMixin(
 	phaserWorldCoordinatesToSkeleton (point: { x: number; y: number }) {
 		let transform = this.getWorldTransformMatrix();
 		transform = transform.invert();
-		let a = transform.a,
+		const a = transform.a,
 			b = transform.b,
 			c = transform.c,
 			d = transform.d,
 			tx = transform.tx,
 			ty = transform.ty;
-		let x = point.x;
-		let y = point.y;
+		const x = point.x;
+		const y = point.y;
 		point.x = x * a + y * c + tx;
 		point.y = x * b + y * d + ty;
 	}
@@ -330,7 +330,7 @@ export class SpineGameObject extends DepthMixin(
 		if (!this.visible) result = false;
 
 		if (!result && this.parentContainer && this.plugin.webGLRenderer) {
-			var sceneRenderer = this.plugin.webGLRenderer;
+			const sceneRenderer = this.plugin.webGLRenderer;
 
 			if (this.plugin.gl && this.plugin.phaserRenderer instanceof Phaser.Renderer.WebGL.WebGLRenderer && sceneRenderer.batcher.isDrawing) {
 				sceneRenderer.end();
@@ -350,27 +350,27 @@ export class SpineGameObject extends DepthMixin(
 		if (!this.skeleton || !this.animationState || !this.plugin.webGLRenderer)
 			return;
 
-		let sceneRenderer = this.plugin.webGLRenderer;
+		const sceneRenderer = this.plugin.webGLRenderer;
 		if (renderer.newType) {
 			renderer.pipelines.clear();
 			sceneRenderer.begin();
 		}
 
 		camera.addToRenderList(src);
-		let transform = Phaser.GameObjects.GetCalcMatrix(
+		const transform = Phaser.GameObjects.GetCalcMatrix(
 			src,
 			camera,
 			parentMatrix
 		).calc;
-		let a = transform.a,
+		const a = transform.a,
 			b = transform.b,
 			c = transform.c,
 			d = transform.d,
 			tx = transform.tx,
 			ty = transform.ty;
 
-		let offsetX = src.offsetX - src.displayOriginX;
-		let offsetY = src.offsetY - src.displayOriginY;
+		const offsetX = src.offsetX - src.displayOriginX;
+		const offsetY = src.offsetY - src.displayOriginY;
 
 		sceneRenderer.drawSkeleton(
 			src.skeleton,
@@ -379,8 +379,8 @@ export class SpineGameObject extends DepthMixin(
 			-1,
 			(vertices, numVertices, stride) => {
 				for (let i = 0; i < numVertices; i += stride) {
-					let vx = vertices[i] + offsetX;
-					let vy = vertices[i + 1] + offsetY;
+					const vx = vertices[i] + offsetX;
+					const vy = vertices[i + 1] + offsetY;
 					vertices[i] = vx * a + vy * c + tx;
 					vertices[i + 1] = vx * b + vy * d + ty;
 				}
@@ -402,22 +402,23 @@ export class SpineGameObject extends DepthMixin(
 		if (!this.skeleton || !this.animationState || !this.plugin.canvasRenderer)
 			return;
 
-		let context = renderer.currentContext;
-		let skeletonRenderer = this.plugin.canvasRenderer;
+		const context = renderer.currentContext;
+		const skeletonRenderer = this.plugin.canvasRenderer;
+		// biome-ignore lint/suspicious/noExplicitAny: necessary for phaser
 		(skeletonRenderer as any).ctx = context;
 
 		camera.addToRenderList(src);
-		let transform = Phaser.GameObjects.GetCalcMatrix(
+		const transform = Phaser.GameObjects.GetCalcMatrix(
 			src,
 			camera,
 			parentMatrix
 		).calc;
-		let skeleton = this.skeleton;
+		const skeleton = this.skeleton;
 		skeleton.x = transform.tx;
 		skeleton.y = transform.ty;
 		skeleton.scaleX = transform.scaleX;
 		skeleton.scaleY = transform.scaleY;
-		let root = skeleton.getRootBone()!;
+		const root = skeleton.getRootBone() as Bone;
 		root.applied.rotation = -MathUtils.radiansToDegrees * transform.rotationNormalized;
 		this.skeleton.updateWorldTransform(Physics.update);
 

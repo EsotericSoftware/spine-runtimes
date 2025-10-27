@@ -33,6 +33,7 @@ import './assets/SkeletonLoader.js'; // Side effects install the loaders into pi
 import './darktint/DarkTintBatcher.js'; // Side effects install the batcher into pixi
 import './SpinePipe.js';
 
+export * from '@esotericsoftware/spine-core';
 export * from './assets/AtlasLoader.js';
 export * from './assets/SkeletonLoader.js';
 export * from './require-shim.js';
@@ -40,4 +41,3 @@ export * from './Spine.js';
 export * from './SpineDebugRenderer.js';
 export * from './SpinePipe.js';
 export * from './SpineTexture.js';
-export * from '@esotericsoftware/spine-core';

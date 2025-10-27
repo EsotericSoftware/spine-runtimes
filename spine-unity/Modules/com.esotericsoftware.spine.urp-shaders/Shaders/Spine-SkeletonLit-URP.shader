@@ -11,6 +11,7 @@ Shader "Universal Render Pipeline/Spine/Skeleton Lit" {
 		_Color("    Light Color", Color) = (1,1,1,1)
 		_Black("    Dark Color", Color) = (0,0,0,0)
 		[MaterialToggle(_ADAPTIVE_PROBE_VOLUMES_PER_PIXEL)]  _AdaptiveProbeVolumesPerPixel("APV per Pixel", Float) = 1
+		[MaterialToggle(_FOG)] _Fog("Fog", Float) = 0
 		[HideInInspector] _StencilRef("Stencil Reference", Float) = 1.0
 		[Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Compare", Float) = 8 // Set to Always as default
 	}
@@ -53,6 +54,7 @@ Shader "Universal Render Pipeline/Spine/Skeleton Lit" {
 			#pragma multi_compile _ _LIGHT_AFFECTS_ADDITIVE
 			#pragma multi_compile_fragment _ _LIGHT_COOKIES
 			#pragma shader_feature _TINT_BLACK_ON
+			#pragma shader_feature _ _FOG
 			// Farward+ renderer keywords
 			#pragma multi_compile_fragment _ _LIGHT_LAYERS
 			#pragma multi_compile _ _FORWARD_PLUS

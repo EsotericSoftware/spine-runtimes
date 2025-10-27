@@ -56,7 +56,7 @@ export class Matrix4 {
 	private static tmpMatrix = new Matrix4();
 
 	constructor () {
-		let v = this.values;
+		const v = this.values;
 		v[M00] = 1;
 		v[M11] = 1;
 		v[M22] = 1;
@@ -69,8 +69,8 @@ export class Matrix4 {
 	}
 
 	transpose (): Matrix4 {
-		let t = this.temp;
-		let v = this.values;
+		const t = this.temp;
+		const v = this.values;
 		t[M00] = v[M00];
 		t[M01] = v[M10];
 		t[M02] = v[M20];
@@ -91,7 +91,7 @@ export class Matrix4 {
 	}
 
 	identity (): Matrix4 {
-		let v = this.values;
+		const v = this.values;
 		v[M00] = 1;
 		v[M01] = 0;
 		v[M02] = 0;
@@ -112,9 +112,9 @@ export class Matrix4 {
 	}
 
 	invert (): Matrix4 {
-		let v = this.values;
-		let t = this.temp;
-		let l_det = v[M30] * v[M21] * v[M12] * v[M03] - v[M20] * v[M31] * v[M12] * v[M03] - v[M30] * v[M11] * v[M22] * v[M03]
+		const v = this.values;
+		const t = this.temp;
+		const l_det = v[M30] * v[M21] * v[M12] * v[M03] - v[M20] * v[M31] * v[M12] * v[M03] - v[M30] * v[M11] * v[M22] * v[M03]
 			+ v[M10] * v[M31] * v[M22] * v[M03] + v[M20] * v[M11] * v[M32] * v[M03] - v[M10] * v[M21] * v[M32] * v[M03]
 			- v[M30] * v[M21] * v[M02] * v[M13] + v[M20] * v[M31] * v[M02] * v[M13] + v[M30] * v[M01] * v[M22] * v[M13]
 			- v[M00] * v[M31] * v[M22] * v[M13] - v[M20] * v[M01] * v[M32] * v[M13] + v[M00] * v[M21] * v[M32] * v[M13]
@@ -122,8 +122,8 @@ export class Matrix4 {
 			+ v[M00] * v[M31] * v[M12] * v[M23] + v[M10] * v[M01] * v[M32] * v[M23] - v[M00] * v[M11] * v[M32] * v[M23]
 			- v[M20] * v[M11] * v[M02] * v[M33] + v[M10] * v[M21] * v[M02] * v[M33] + v[M20] * v[M01] * v[M12] * v[M33]
 			- v[M00] * v[M21] * v[M12] * v[M33] - v[M10] * v[M01] * v[M22] * v[M33] + v[M00] * v[M11] * v[M22] * v[M33];
-		if (l_det == 0) throw new Error("non-invertible matrix");
-		let inv_det = 1.0 / l_det;
+		if (l_det === 0) throw new Error("non-invertible matrix");
+		const inv_det = 1.0 / l_det;
 		t[M00] = v[M12] * v[M23] * v[M31] - v[M13] * v[M22] * v[M31] + v[M13] * v[M21] * v[M32]
 			- v[M11] * v[M23] * v[M32] - v[M12] * v[M21] * v[M33] + v[M11] * v[M22] * v[M33];
 		t[M01] = v[M03] * v[M22] * v[M31] - v[M02] * v[M23] * v[M31] - v[M03] * v[M21] * v[M32]
@@ -176,7 +176,7 @@ export class Matrix4 {
 	}
 
 	determinant (): number {
-		let v = this.values;
+		const v = this.values;
 		return v[M30] * v[M21] * v[M12] * v[M03] - v[M20] * v[M31] * v[M12] * v[M03] - v[M30] * v[M11] * v[M22] * v[M03]
 			+ v[M10] * v[M31] * v[M22] * v[M03] + v[M20] * v[M11] * v[M32] * v[M03] - v[M10] * v[M21] * v[M32] * v[M03]
 			- v[M30] * v[M21] * v[M02] * v[M13] + v[M20] * v[M31] * v[M02] * v[M13] + v[M30] * v[M01] * v[M22] * v[M13]
@@ -188,7 +188,7 @@ export class Matrix4 {
 	}
 
 	translate (x: number, y: number, z: number): Matrix4 {
-		let v = this.values;
+		const v = this.values;
 		v[M03] += x;
 		v[M13] += y;
 		v[M23] += z;
@@ -201,10 +201,10 @@ export class Matrix4 {
 
 	projection (near: number, far: number, fovy: number, aspectRatio: number): Matrix4 {
 		this.identity();
-		let l_fd = (1.0 / Math.tan((fovy * (Math.PI / 180)) / 2.0));
-		let l_a1 = (far + near) / (near - far);
-		let l_a2 = (2 * far * near) / (near - far);
-		let v = this.values;
+		const l_fd = (1.0 / Math.tan((fovy * (Math.PI / 180)) / 2.0));
+		const l_a1 = (far + near) / (near - far);
+		const l_a2 = (2 * far * near) / (near - far);
+		const v = this.values;
 		v[M00] = l_fd / aspectRatio;
 		v[M10] = 0;
 		v[M20] = 0;
@@ -230,15 +230,15 @@ export class Matrix4 {
 
 	ortho (left: number, right: number, bottom: number, top: number, near: number, far: number): Matrix4 {
 		this.identity();
-		let x_orth = 2 / (right - left);
-		let y_orth = 2 / (top - bottom);
-		let z_orth = -2 / (far - near);
+		const x_orth = 2 / (right - left);
+		const y_orth = 2 / (top - bottom);
+		const z_orth = -2 / (far - near);
 
-		let tx = -(right + left) / (right - left);
-		let ty = -(top + bottom) / (top - bottom);
-		let tz = -(far + near) / (far - near);
+		const tx = -(right + left) / (right - left);
+		const ty = -(top + bottom) / (top - bottom);
+		const tz = -(far + near) / (far - near);
 
-		let v = this.values;
+		const v = this.values;
 		v[M00] = x_orth;
 		v[M10] = 0;
 		v[M20] = 0;
@@ -259,9 +259,9 @@ export class Matrix4 {
 	}
 
 	multiply (matrix: Matrix4): Matrix4 {
-		let t = this.temp;
-		let v = this.values;
-		let m = matrix.values;
+		const t = this.temp;
+		const v = this.values;
+		const m = matrix.values;
 		t[M00] = v[M00] * m[M00] + v[M01] * m[M10] + v[M02] * m[M20] + v[M03] * m[M30];
 		t[M01] = v[M00] * m[M01] + v[M01] * m[M11] + v[M02] * m[M21] + v[M03] * m[M31];
 		t[M02] = v[M00] * m[M02] + v[M01] * m[M12] + v[M02] * m[M22] + v[M03] * m[M32];
@@ -282,9 +282,9 @@ export class Matrix4 {
 	}
 
 	multiplyLeft (matrix: Matrix4): Matrix4 {
-		let t = this.temp;
-		let v = this.values;
-		let m = matrix.values;
+		const t = this.temp;
+		const v = this.values;
+		const m = matrix.values;
 		t[M00] = m[M00] * v[M00] + m[M01] * v[M10] + m[M02] * v[M20] + m[M03] * v[M30];
 		t[M01] = m[M00] * v[M01] + m[M01] * v[M11] + m[M02] * v[M21] + m[M03] * v[M31];
 		t[M02] = m[M00] * v[M02] + m[M01] * v[M12] + m[M02] * v[M22] + m[M03] * v[M32];
@@ -305,13 +305,13 @@ export class Matrix4 {
 	}
 
 	lookAt (position: Vector3, direction: Vector3, up: Vector3) {
-		let xAxis = Matrix4.xAxis, yAxis = Matrix4.yAxis, zAxis = Matrix4.zAxis;
+		const xAxis = Matrix4.xAxis, yAxis = Matrix4.yAxis, zAxis = Matrix4.zAxis;
 		zAxis.setFrom(direction).normalize();
 		xAxis.setFrom(direction).normalize();
 		xAxis.cross(up).normalize();
 		yAxis.setFrom(xAxis).cross(zAxis).normalize();
 		this.identity();
-		let val = this.values;
+		const val = this.values;
 		val[M00] = xAxis.x;
 		val[M01] = xAxis.y;
 		val[M02] = xAxis.z;

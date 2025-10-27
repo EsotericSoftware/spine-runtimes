@@ -261,6 +261,14 @@ export interface SpineEvents {
 	start: [trackEntry: TrackEntry];
 }
 
+export interface ClippedData {
+	vertices: Float32Array;
+	uvs: Float32Array;
+	indices: Uint16Array;
+	vertexCount: number;
+	indicesCount: number;
+}
+
 export interface AttachmentCacheData {
 	id: string;
 	clipped: boolean;
@@ -272,13 +280,7 @@ export interface AttachmentCacheData {
 	darkTint: boolean;
 	skipRender: boolean;
 	texture: Texture;
-	clippedData?: {
-		vertices: Float32Array;
-		uvs: Float32Array;
-		indices: Uint16Array;
-		vertexCount: number;
-		indicesCount: number;
-	};
+	clippedData?: ClippedData;
 }
 
 interface SlotsToClipping {
@@ -292,7 +294,8 @@ const maskPool = new Pool<Graphics>(() => new Graphics);
 
 /**
  * The class to instantiate a {@link Spine} game object in Pixi.
- * The static method {@link Spine.from} should be used to instantiate a Spine game object.
+ * Create and customize the default configuration using the static method {@link Spine.createOptions},
+ * then pass it to the constructor.
  */
 export class Spine extends ViewContainer {
 	// Pixi properties
@@ -384,35 +387,30 @@ export class Spine extends ViewContainer {
 	}
 
 	private hasNeverUpdated = true;
-	constructor (options: SpineOptions | SkeletonData) {
-		if (options instanceof SkeletonData) {
-			options = {
-				skeletonData: options,
-			};
-		}
-
+	constructor (options: SkeletonData | SpineOptions | SpineFromOptions) {
 		super({});
+
+		if (options instanceof SkeletonData)
+			options = { skeletonData: options };
+		else if ("skeleton" in options)
+			options = new.target.createOptions(options);
 
 		this.allowChildren = true;
 
-		const skeletonData = options instanceof SkeletonData ? options : options.skeletonData;
-
+		const { autoUpdate, boundsProvider, darkTint, skeletonData } = options;
 		this.skeleton = new Skeleton(skeletonData);
 		this.state = new AnimationState(new AnimationStateData(skeletonData));
-		this.autoUpdate = options?.autoUpdate ?? true;
+		this.autoUpdate = autoUpdate ?? true;
+		this._boundsProvider = boundsProvider;
 
 		// dark tint can be enabled by options, otherwise is enable if at least one slot has tint black
-		this.darkTint = options?.darkTint === undefined
+		this.darkTint = darkTint === undefined
 			? this.skeleton.slots.some(slot => !!slot.data.setup.darkColor)
-			: options?.darkTint;
+			: darkTint;
 
 		const slots = this.skeleton.slots;
-
-		for (let i = 0; i < slots.length; i++) {
+		for (let i = 0; i < slots.length; i++)
 			this.attachmentCacheData[i] = Object.create(null);
-		}
-
-		this._boundsProvider = options.boundsProvider;
 	}
 
 	/** If {@link Spine.autoUpdate} is `false`, this method allows to update the AnimationState and the Skeleton with the given delta. */
@@ -585,7 +583,7 @@ export class Spine extends ViewContainer {
 			const clippingAttachment = slotClipping.pose.attachment as ClippingAttachment;
 
 			// create the pixi mask, only the first time and if the clipped slot is the first one clipped by this currentClippingSlot
-			let mask = currentClippingSlot.mask as Graphics;
+			let mask = currentClippingSlot.mask;
 			if (!mask) {
 				mask = maskPool.obtain();
 				currentClippingSlot.mask = mask;
@@ -1036,11 +1034,11 @@ export class Spine extends ViewContainer {
 		Ticker.shared.remove(this.internalUpdate, this);
 		this.state.clearListeners();
 		this.debug = undefined;
-		this.skeleton = null as any;
-		this.state = null as any;
-		(this._slotsObject as any) = null;
+		(this.skeleton as unknown) = null;
+		(this.state as unknown) = null;
+		(this._slotsObject as unknown) = null;
+		(this.attachmentCacheData as unknown) = null;
 		this._lastAttachments.length = 0;
-		this.attachmentCacheData = null as any;
 	}
 
 	/** Converts a point from the skeleton coordinate system to the Pixi world coordinate system. */
@@ -1065,6 +1063,55 @@ export class Spine extends ViewContainer {
 	}
 
 	/**
+	 * Get a convenient initialization configuration for your Spine game object.
+	 * Before instantiating a Spine game object, the skeleton (`.skel` or `.json`) and the atlas text files must be loaded into the {@link Assets}. For example:
+	 * ```
+	 * PIXI.Assets.add("sackData", "/assets/sack-pro.skel");
+	 * PIXI.Assets.add("sackAtlas", "/assets/sack-pma.atlas");
+	 * await PIXI.Assets.load(["sackData", "sackAtlas"]);
+	 * ```
+	 * Once a Spine game object is created, its skeleton data is cached into {@link Cache} using the key:
+	 * `${skeletonAssetName}-${atlasAssetName}-${options?.scale ?? 1}`
+	 *
+	 * @param options - Options to configure the Spine game object. See {@link SpineFromOptions}
+	 * @returns {SpineOptions} The configuration ready to be passed to the Spine constructor
+	 */
+	static createOptions ({ skeleton, atlas, scale = 1, darkTint, autoUpdate = true, boundsProvider, allowMissingRegions = false }: SpineFromOptions): SpineOptions {
+		const cacheKey = `${skeleton}-${atlas}-${scale}`;
+
+		if (Cache.has(cacheKey)) {
+			return {
+				skeletonData: Cache.get<SkeletonData>(cacheKey),
+				darkTint,
+				autoUpdate,
+				boundsProvider,
+			};
+		}
+
+		const atlasAsset = Assets.get<TextureAtlas>(atlas);
+		const attachmentLoader = new AtlasAttachmentLoader(atlasAsset, allowMissingRegions);
+
+		// biome-ignore lint/suspicious/noExplicitAny: json skeleton data is any
+		const skeletonAsset = Assets.get<any | Uint8Array>(skeleton);
+		const parser = skeletonAsset instanceof Uint8Array
+			? new SkeletonBinary(attachmentLoader)
+			: new SkeletonJson(attachmentLoader);
+
+		parser.scale = scale;
+		const skeletonData = parser.readSkeletonData(skeletonAsset);
+
+		Cache.set(cacheKey, skeletonData);
+
+		return {
+			skeletonData,
+			darkTint,
+			autoUpdate,
+			boundsProvider,
+		};
+	}
+
+	/**
+	 * @deprecated Use directly the Spine constructor or {@link createOptions} to make options and customize it to pass to the constructor
 	 * Use this method to instantiate a Spine game object.
 	 * Before instantiating a Spine game object, the skeleton (`.skel` or `.json`) and the atlas text files must be loaded into the Assets. For example:
 	 * ```
@@ -1078,36 +1125,7 @@ export class Spine extends ViewContainer {
 	 * @param options - Options to configure the Spine game object. See {@link SpineFromOptions}
 	 * @returns {Spine} The Spine game object instantiated
 	 */
-	static from ({ skeleton, atlas, scale = 1, darkTint, autoUpdate = true, boundsProvider, allowMissingRegions = false }: SpineFromOptions) {
-		const cacheKey = `${skeleton}-${atlas}-${scale}`;
-
-		if (Cache.has(cacheKey)) {
-			return new Spine({
-				skeletonData: Cache.get<SkeletonData>(cacheKey),
-				darkTint,
-				autoUpdate,
-				boundsProvider,
-			});
-		}
-
-		const skeletonAsset = Assets.get<any | Uint8Array>(skeleton);
-
-		const atlasAsset = Assets.get<TextureAtlas>(atlas);
-		const attachmentLoader = new AtlasAttachmentLoader(atlasAsset, allowMissingRegions);
-		const parser = skeletonAsset instanceof Uint8Array
-			? new SkeletonBinary(attachmentLoader)
-			: new SkeletonJson(attachmentLoader);
-
-		parser.scale = scale;
-		const skeletonData = parser.readSkeletonData(skeletonAsset);
-
-		Cache.set(cacheKey, skeletonData);
-
-		return new Spine({
-			skeletonData,
-			darkTint,
-			autoUpdate,
-			boundsProvider,
-		});
+	static from (options: SpineFromOptions) {
+		return new Spine(Spine.createOptions(options));
 	}
 }

@@ -27,16 +27,17 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { BlendMode, Disposable } from "@esotericsoftware/spine-core";
-import { GLTexture } from "./GLTexture.js";
-import { Mesh, Position2Attribute, ColorAttribute, TexCoordAttribute, Color2Attribute } from "./Mesh.js";
-import { Shader } from "./Shader.js";
+import type { BlendMode, Disposable } from "@esotericsoftware/spine-core";
+import type { GLTexture } from "./GLTexture.js";
+import { Color2Attribute, ColorAttribute, Mesh, Position2Attribute, TexCoordAttribute } from "./Mesh.js";
+import type { Shader } from "./Shader.js";
 import { ManagedWebGLRenderingContext } from "./WebGL.js";
 
 const GL_ONE = 1;
 const GL_ONE_MINUS_SRC_COLOR = 0x0301;
 const GL_SRC_ALPHA = 0x0302;
 const GL_ONE_MINUS_SRC_ALPHA = 0x0303;
+// biome-ignore lint/correctness/noUnusedVariables: intentional
 const GL_ONE_MINUS_DST_ALPHA = 0x0305;
 const GL_DST_COLOR = 0x0306;
 
@@ -58,13 +59,13 @@ export class PolygonBatcher implements Disposable {
 	private cullWasEnabled = false;
 
 	constructor (context: ManagedWebGLRenderingContext | WebGLRenderingContext, twoColorTint: boolean = true, maxVertices: number = 10920) {
-		if (maxVertices > 10920) throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
+		if (maxVertices > 10920) throw new Error(`Can't have more than 10920 triangles per batch: ${maxVertices}`);
 		this.context = context instanceof ManagedWebGLRenderingContext ? context : new ManagedWebGLRenderingContext(context);
-		let attributes = twoColorTint ?
+		const attributes = twoColorTint ?
 			[new Position2Attribute(), new ColorAttribute(), new TexCoordAttribute(), new Color2Attribute()] :
 			[new Position2Attribute(), new ColorAttribute(), new TexCoordAttribute()];
 		this.mesh = new Mesh(context, attributes, maxVertices, maxVertices * 3);
-		let gl = this.context.gl;
+		const gl = this.context.gl;
 		this.srcColorBlend = gl.SRC_ALPHA;
 		this.srcAlphaBlend = gl.ONE;
 		this.dstBlend = gl.ONE_MINUS_SRC_ALPHA;
@@ -77,7 +78,7 @@ export class PolygonBatcher implements Disposable {
 		this.lastTexture = null;
 		this.isDrawing = true;
 
-		let gl = this.context.gl;
+		const gl = this.context.gl;
 		gl.enable(gl.BLEND);
 		gl.blendFuncSeparate(this.srcColorBlend, this.dstBlend, this.srcAlphaBlend, this.dstBlend);
 
@@ -100,19 +101,19 @@ export class PolygonBatcher implements Disposable {
 		const srcAlphaBlend = blendModeGL.srcAlpha;
 		const dstBlend = blendModeGL.dstRgb;
 
-		if (this.srcColorBlend == srcColorBlend && this.srcAlphaBlend == srcAlphaBlend && this.dstBlend == dstBlend) return;
+		if (this.srcColorBlend === srcColorBlend && this.srcAlphaBlend === srcAlphaBlend && this.dstBlend === dstBlend) return;
 		this.srcColorBlend = srcColorBlend;
 		this.srcAlphaBlend = srcAlphaBlend;
 		this.dstBlend = dstBlend;
 		if (this.isDrawing) {
 			this.flush();
 		}
-		let gl = this.context.gl;
+		const gl = this.context.gl;
 		gl.blendFuncSeparate(srcColorBlend, dstBlend, srcAlphaBlend, dstBlend);
 	}
 
 	draw (texture: GLTexture, vertices: ArrayLike<number>, indices: Array<number>) {
-		if (texture != this.lastTexture) {
+		if (texture !== this.lastTexture) {
 			this.flush();
 			this.lastTexture = texture;
 		} else if (this.verticesLength + vertices.length > this.mesh.getVertices().length ||
@@ -120,12 +121,12 @@ export class PolygonBatcher implements Disposable {
 			this.flush();
 		}
 
-		let indexStart = this.mesh.numVertices();
+		const indexStart = this.mesh.numVertices();
 		this.mesh.getVertices().set(vertices, this.verticesLength);
 		this.verticesLength += vertices.length;
 		this.mesh.setVerticesLength(this.verticesLength)
 
-		let indicesArray = this.mesh.getIndices();
+		const indicesArray = this.mesh.getIndices();
 		for (let i = this.indicesLength, j = 0; j < indices.length; i++, j++)
 			indicesArray[i] = indices[j] + indexStart;
 		this.indicesLength += indices.length;
@@ -133,7 +134,7 @@ export class PolygonBatcher implements Disposable {
 	}
 
 	flush () {
-		if (this.verticesLength == 0) return;
+		if (this.verticesLength === 0) return;
 		if (!this.lastTexture) throw new Error("No texture set.");
 		if (!this.shader) throw new Error("No shader set.");
 		this.lastTexture.bind();
@@ -154,7 +155,7 @@ export class PolygonBatcher implements Disposable {
 		this.lastTexture = null;
 		this.isDrawing = false;
 
-		let gl = this.context.gl;
+		const gl = this.context.gl;
 		gl.disable(gl.BLEND);
 		if (PolygonBatcher.disableCulling) {
 			if (this.cullWasEnabled) gl.enable(gl.CULL_FACE);
@@ -166,7 +167,7 @@ export class PolygonBatcher implements Disposable {
 	}
 
 	static getAndResetGlobalDrawCalls () {
-		let result = PolygonBatcher.globalDrawCalls;
+		const result = PolygonBatcher.globalDrawCalls;
 		PolygonBatcher.globalDrawCalls = 0;
 		return result;
 	}

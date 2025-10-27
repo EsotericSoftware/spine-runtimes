@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Disposable, Restorable } from "@esotericsoftware/spine-core";
+import type { Disposable, Restorable } from "@esotericsoftware/spine-core";
 import { ManagedWebGLRenderingContext } from "./WebGL.js";
 
 export class Shader implements Disposable, Restorable {
@@ -63,7 +63,7 @@ export class Shader implements Disposable, Restorable {
 	}
 
 	private compile () {
-		let gl = this.context.gl;
+		const gl = this.context.gl;
 		try {
 			this.vs = this.compileShader(gl.VERTEX_SHADER, this.vertexShader);
 			if (!this.vs) throw new Error("Couldn't compile vertex shader.");
@@ -77,13 +77,13 @@ export class Shader implements Disposable, Restorable {
 	}
 
 	private compileShader (type: number, source: string) {
-		let gl = this.context.gl;
-		let shader = gl.createShader(type);
+		const gl = this.context.gl;
+		const shader = gl.createShader(type);
 		if (!shader) throw new Error("Couldn't create shader.");
 		gl.shaderSource(shader, source);
 		gl.compileShader(shader);
 		if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-			let error = "Couldn't compile shader: " + gl.getShaderInfoLog(shader);
+			const error = `Couldn't compile shader: ${gl.getShaderInfoLog(shader)}`;
 			gl.deleteShader(shader);
 			if (!gl.isContextLost()) throw new Error(error);
 		}
@@ -91,15 +91,15 @@ export class Shader implements Disposable, Restorable {
 	}
 
 	private compileProgram (vs: WebGLShader, fs: WebGLShader) {
-		let gl = this.context.gl;
-		let program = gl.createProgram();
+		const gl = this.context.gl;
+		const program = gl.createProgram();
 		if (!program) throw new Error("Couldn't compile program.");
 		gl.attachShader(program, vs);
 		gl.attachShader(program, fs);
 		gl.linkProgram(program);
 
 		if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-			let error = "Couldn't compile shader program: " + gl.getProgramInfoLog(program);
+			const error = `Couldn't compile shader program: ${gl.getProgramInfoLog(program)}`;
 			gl.deleteProgram(program);
 			if (!gl.isContextLost()) throw new Error(error);
 		}
@@ -139,43 +139,43 @@ export class Shader implements Disposable, Restorable {
 	}
 
 	public setUniform2x2f (uniform: string, value: ArrayLike<number>) {
-		let gl = this.context.gl;
+		const gl = this.context.gl;
 		this.tmp2x2.set(value);
 		gl.uniformMatrix2fv(this.getUniformLocation(uniform), false, this.tmp2x2);
 	}
 
 	public setUniform3x3f (uniform: string, value: ArrayLike<number>) {
-		let gl = this.context.gl;
+		const gl = this.context.gl;
 		this.tmp3x3.set(value);
 		gl.uniformMatrix3fv(this.getUniformLocation(uniform), false, this.tmp3x3);
 	}
 
 	public setUniform4x4f (uniform: string, value: ArrayLike<number>) {
-		let gl = this.context.gl;
+		const gl = this.context.gl;
 		this.tmp4x4.set(value);
 		gl.uniformMatrix4fv(this.getUniformLocation(uniform), false, this.tmp4x4);
 	}
 
 	public getUniformLocation (uniform: string): WebGLUniformLocation | null {
-		let gl = this.context.gl;
+		const gl = this.context.gl;
 		if (!this.program) throw new Error("Shader not compiled.");
-		let location = gl.getUniformLocation(this.program, uniform);
+		const location = gl.getUniformLocation(this.program, uniform);
 		if (!location && !gl.isContextLost()) throw new Error(`Couldn't find location for uniform ${uniform}`);
 		return location;
 	}
 
 	public getAttributeLocation (attribute: string): number {
-		let gl = this.context.gl;
+		const gl = this.context.gl;
 		if (!this.program) throw new Error("Shader not compiled.");
-		let location = gl.getAttribLocation(this.program, attribute);
-		if (location == -1 && !gl.isContextLost()) throw new Error(`Couldn't find location for attribute ${attribute}`);
+		const location = gl.getAttribLocation(this.program, attribute);
+		if (location === -1 && !gl.isContextLost()) throw new Error(`Couldn't find location for attribute ${attribute}`);
 		return location;
 	}
 
 	public dispose () {
 		this.context.removeRestorable(this);
 
-		let gl = this.context.gl;
+		const gl = this.context.gl;
 		if (this.vs) {
 			gl.deleteShader(this.vs);
 			this.vs = null;
@@ -193,7 +193,7 @@ export class Shader implements Disposable, Restorable {
 	}
 
 	public static newColoredTextured (context: ManagedWebGLRenderingContext | WebGLRenderingContext): Shader {
-		let vs = `
+		const vs = `
 attribute vec4 ${Shader.POSITION};
 attribute vec4 ${Shader.COLOR};
 attribute vec2 ${Shader.TEXCOORDS};
@@ -208,7 +208,7 @@ void main () {
 }
 `;
 
-		let fs = `
+		const fs = `
 #ifdef GL_ES
 	#define LOWP lowp
 	precision mediump float;
@@ -228,7 +228,7 @@ void main () {
 	}
 
 	public static newTwoColoredTextured (context: ManagedWebGLRenderingContext | WebGLRenderingContext): Shader {
-		let vs = `
+		const vs = `
 attribute vec4 ${Shader.POSITION};
 attribute vec4 ${Shader.COLOR};
 attribute vec4 ${Shader.COLOR2};
@@ -246,7 +246,7 @@ void main () {
 }
 `;
 
-		let fs = `
+		const fs = `
 #ifdef GL_ES
 	#define LOWP lowp
 	precision mediump float;
@@ -269,7 +269,7 @@ void main () {
 	}
 
 	public static newColored (context: ManagedWebGLRenderingContext | WebGLRenderingContext): Shader {
-		let vs = `
+		const vs = `
 attribute vec4 ${Shader.POSITION};
 attribute vec4 ${Shader.COLOR};
 uniform mat4 ${Shader.MVP_MATRIX};
@@ -281,7 +281,7 @@ void main () {
 }
 `;
 
-		let fs = `
+		const fs = `
 #ifdef GL_ES
 	#define LOWP lowp
 	precision mediump float;

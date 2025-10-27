@@ -27,20 +27,20 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Attachment } from "./attachments/Attachment.js";
+import type { Attachment } from "./attachments/Attachment.js";
 import { ClippingAttachment } from "./attachments/ClippingAttachment.js";
 import { MeshAttachment } from "./attachments/MeshAttachment.js";
 import { RegionAttachment } from "./attachments/RegionAttachment.js";
 import { Bone } from "./Bone.js";
-import { Constraint } from "./Constraint.js";
-import { Physics } from "./Physics.js";
+import type { Constraint } from "./Constraint.js";
+import type { Physics } from "./Physics.js";
 import { PhysicsConstraint } from "./PhysicsConstraint.js";
-import { Posed } from "./Posed.js";
-import { SkeletonClipping } from "./SkeletonClipping.js";
-import { SkeletonData } from "./SkeletonData.js";
-import { Skin } from "./Skin.js";
+import type { Posed } from "./Posed.js";
+import type { SkeletonClipping } from "./SkeletonClipping.js";
+import type { SkeletonData } from "./SkeletonData.js";
+import type { Skin } from "./Skin.js";
 import { Slot } from "./Slot.js";
-import { Color, NumberArrayLike, Utils, Vector2 } from "./Utils.js";
+import { Color, type NumberArrayLike, Utils, Vector2 } from "./Utils.js";
 
 /** Stores the current pose for a skeleton.
  *
@@ -65,15 +65,18 @@ export class Skeleton {
 	drawOrder: Array<Slot>;
 
 	/** The skeleton's constraints. */
+	// biome-ignore lint/suspicious/noExplicitAny: reference runtime does not restrict to specific types
 	readonly constraints: Array<Constraint<any, any, any>>;
 
 	/** The skeleton's physics constraints. */
 	readonly physics: Array<PhysicsConstraint>;
 
 	/** The list of bones and constraints, sorted in the order they should be updated, as computed by {@link updateCache()}. */
-	readonly _updateCache = new Array();
+	// biome-ignore lint/suspicious/noExplicitAny: reference runtime does not restrict to specific types
+	readonly _updateCache = [] as any[];
 
-	readonly resetCache: Array<Posed<any, any, any>> = new Array();
+	// biome-ignore lint/suspicious/noExplicitAny: reference runtime does not restrict to specific types
+	readonly resetCache: Array<Posed<any, any, any>> = [];
 
 	/** The skeleton's current skin. May be null. */
 	skin: Skin | null = null;
@@ -125,30 +128,31 @@ export class Skeleton {
 		if (!data) throw new Error("data cannot be null.");
 		this.data = data;
 
-		this.bones = new Array<Bone>();
+		this.bones = [] as Bone[];
 		for (let i = 0; i < data.bones.length; i++) {
-			let boneData = data.bones[i];
+			const boneData = data.bones[i];
 			let bone: Bone;
 			if (!boneData.parent)
 				bone = new Bone(boneData, null);
 			else {
-				let parent = this.bones[boneData.parent.index];
+				const parent = this.bones[boneData.parent.index];
 				bone = new Bone(boneData, parent);
 				parent.children.push(bone);
 			}
 			this.bones.push(bone);
 		}
 
-		this.slots = new Array<Slot>();
-		this.drawOrder = new Array<Slot>();
+		this.slots = [] as Slot[];
+		this.drawOrder = [] as Slot[];
 		for (const slotData of this.data.slots) {
-			let slot = new Slot(slotData, this);
+			const slot = new Slot(slotData, this);
 			this.slots.push(slot);
 			this.drawOrder.push(slot);
 		}
 
-		this.physics = new Array<PhysicsConstraint>();
-		this.constraints = new Array<Constraint<any, any, any>>();
+		this.physics = [] as PhysicsConstraint[];
+		// biome-ignore lint/suspicious/noExplicitAny: reference runtime does not restrict to specific types
+		this.constraints = [] as Constraint<any, any, any>[];
 		for (const constraintData of this.data.constraints) {
 			const constraint = constraintData.create(this);
 			if (constraint instanceof PhysicsConstraint) this.physics.push(constraint);
@@ -166,20 +170,20 @@ export class Skeleton {
 		this._updateCache.length = 0;
 		this.resetCache.length = 0;
 
-		let slots = this.slots;
+		const slots = this.slots;
 		for (let i = 0, n = slots.length; i < n; i++)
 			slots[i].usePose();
 
-		let bones = this.bones;
+		const bones = this.bones;
 		const boneCount = bones.length;
 		for (let i = 0, n = boneCount; i < n; i++) {
-			let bone = bones[i];
+			const bone = bones[i];
 			bone.sorted = bone.data.skinRequired;
 			bone.active = !bone.sorted;
 			bone.usePose();
 		}
 		if (this.skin) {
-			let skinBones = this.skin.bones;
+			const skinBones = this.skin.bones;
 			for (let i = 0, n = this.skin.bones.length; i < n; i++) {
 				let bone: Bone | null = this.bones[skinBones[i].index];
 				do {
@@ -190,13 +194,14 @@ export class Skeleton {
 			}
 		}
 
-		let constraints = this.constraints;
+		const constraints = this.constraints;
 		let n = this.constraints.length;
 		for (let i = 0; i < n; i++)
 			constraints[i].usePose();
 		for (let i = 0; i < n; i++) {
 			const constraint = constraints[i];
 			constraint.active = constraint.isSourceActive()
+				// biome-ignore lint/complexity/useOptionalChain: changing to this might return undefined
 				&& (!constraint.data.skinRequired || (this.skin != null && this.skin.constraints.includes(constraint.data)));
 			if (constraint.active) constraint.sort(this);
 		}
@@ -212,6 +217,7 @@ export class Skeleton {
 
 	}
 
+	// biome-ignore lint/suspicious/noExplicitAny: reference runtime does not restrict to specific types
 	constrained (object: Posed<any, any, any>) {
 		if (object.pose === object.applied) {
 			object.useConstrained();
@@ -221,7 +227,7 @@ export class Skeleton {
 
 	sortBone (bone: Bone) {
 		if (bone.sorted || !bone.active) return;
-		let parent = bone.parent;
+		const parent = bone.parent;
 		if (parent) this.sortBone(parent);
 		bone.sorted = true;
 		this._updateCache.push(bone);
@@ -229,7 +235,7 @@ export class Skeleton {
 
 	sortReset (bones: Array<Bone>) {
 		for (let i = 0, n = bones.length; i < n; i++) {
-			let bone = bones[i];
+			const bone = bones[i];
 			if (bone.active) {
 				if (bone.sorted) this.sortReset(bone.children);
 				bone.sorted = false;
@@ -272,7 +278,7 @@ export class Skeleton {
 
 	/** Sets the slots and draw order to their setup pose values. */
 	setupPoseSlots () {
-		let slots = this.slots;
+		const slots = this.slots;
 		Utils.arrayCopy(slots, 0, this.drawOrder, 0, slots.length);
 		for (let i = 0, n = slots.length; i < n; i++)
 			slots[i].setupPose();
@@ -280,7 +286,7 @@ export class Skeleton {
 
 	/** Returns the root bone, or null if the skeleton has no bones. */
 	getRootBone () {
-		if (this.bones.length == 0) return null;
+		if (this.bones.length === 0) return null;
 		return this.bones[0];
 	}
 
@@ -288,9 +294,9 @@ export class Skeleton {
 	 * repeatedly. */
 	findBone (boneName: string) {
 		if (!boneName) throw new Error("boneName cannot be null.");
-		let bones = this.bones;
+		const bones = this.bones;
 		for (let i = 0, n = bones.length; i < n; i++)
-			if (bones[i].data.name == boneName) return bones[i];
+			if (bones[i].data.name === boneName) return bones[i];
 		return null;
 	}
 
@@ -298,9 +304,9 @@ export class Skeleton {
 	 * repeatedly. */
 	findSlot (slotName: string) {
 		if (!slotName) throw new Error("slotName cannot be null.");
-		let slots = this.slots;
+		const slots = this.slots;
 		for (let i = 0, n = slots.length; i < n; i++)
-			if (slots[i].data.name == slotName) return slots[i];
+			if (slots[i].data.name === slotName) return slots[i];
 		return null;
 	}
 
@@ -328,23 +334,23 @@ export class Skeleton {
 	};
 
 	private setSkinByName (skinName: string) {
-		let skin = this.data.findSkin(skinName);
-		if (!skin) throw new Error("Skin not found: " + skinName);
+		const skin = this.data.findSkin(skinName);
+		if (!skin) throw new Error(`Skin not found: ${skinName}`);
 		this.setSkin(skin);
 	}
 
 	private setSkinBySkin (newSkin: Skin | null) {
-		if (newSkin == this.skin) return;
+		if (newSkin === this.skin) return;
 		if (newSkin) {
 			if (this.skin)
 				newSkin.attachAll(this, this.skin);
 			else {
-				let slots = this.slots;
+				const slots = this.slots;
 				for (let i = 0, n = slots.length; i < n; i++) {
-					let slot = slots[i];
-					let name = slot.data.attachmentName;
+					const slot = slots[i];
+					const name = slot.data.attachmentName;
 					if (name) {
-						let attachment = newSkin.getAttachment(i, name);
+						const attachment = newSkin.getAttachment(i, name);
 						if (attachment) slot.pose.setAttachment(attachment);
 					}
 				}
@@ -378,7 +384,7 @@ export class Skeleton {
 	 * See {@link #getAttachment()}.
 	 * @returns May be null. */
 	private getAttachmentByName (slotName: string, attachmentName: string): Attachment | null {
-		let slot = this.data.findSlot(slotName);
+		const slot = this.data.findSlot(slotName);
 		if (!slot) throw new Error(`Can't find slot with name ${slotName}`);
 		return this.getAttachment(slot.index, attachmentName);
 	}
@@ -391,7 +397,7 @@ export class Skeleton {
 	private getAttachmentByIndex (slotIndex: number, attachmentName: string): Attachment | null {
 		if (!attachmentName) throw new Error("attachmentName cannot be null.");
 		if (this.skin) {
-			let attachment = this.skin.getAttachment(slotIndex, attachmentName);
+			const attachment = this.skin.getAttachment(slotIndex, attachmentName);
 			if (attachment) return attachment;
 		}
 		if (this.data.defaultSkin) return this.data.defaultSkin.getAttachment(slotIndex, attachmentName);
@@ -404,16 +410,17 @@ export class Skeleton {
 	setAttachment (slotName: string, attachmentName: string) {
 		if (!slotName) throw new Error("slotName cannot be null.");
 		const slot = this.findSlot(slotName);
-		if (!slot) throw new Error("Slot not found: " + slotName);
+		if (!slot) throw new Error(`Slot not found: ${slotName}`);
 		let attachment: Attachment | null = null;
 		if (attachmentName) {
 			attachment = this.getAttachment(slot.data.index, attachmentName);
 			if (!attachment)
-				throw new Error("Attachment not found: " + attachmentName + ", for slot: " + slotName);
+				throw new Error(`Attachment not found: ${attachmentName}, for slot: ${slotName}`);
 		}
 		slot.pose.setAttachment(attachment);
 	}
 
+	// biome-ignore lint/suspicious/noExplicitAny: reference runtime does not restrict to specific types
 	findConstraint<T extends Constraint<any, any, any>> (constraintName: string, type: new () => T): T | null {
 		if (constraintName == null) throw new Error("constraintName cannot be null.");
 		if (type == null) throw new Error("type cannot be null.");
@@ -428,8 +435,8 @@ export class Skeleton {
 	/** Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose as `{ x: number, y: number, width: number, height: number }`.
 	 * Note that this method will create temporary objects which can add to garbage collection pressure. Use `getBounds()` if garbage collection is a concern. */
 	getBoundsRect (clipper?: SkeletonClipping) {
-		let offset = new Vector2();
-		let size = new Vector2();
+		const offset = new Vector2();
+		const size = new Vector2();
 		this.getBounds(offset, size, undefined, clipper);
 		return { x: offset.x, y: offset.y, width: size.x, height: size.y };
 	}
@@ -442,15 +449,15 @@ export class Skeleton {
 	getBounds (offset: Vector2, size: Vector2, temp: Array<number> = new Array<number>(2), clipper: SkeletonClipping | null = null) {
 		if (!offset) throw new Error("offset cannot be null.");
 		if (!size) throw new Error("size cannot be null.");
-		let drawOrder = this.drawOrder;
+		const drawOrder = this.drawOrder;
 		let minX = Number.POSITIVE_INFINITY, minY = Number.POSITIVE_INFINITY, maxX = Number.NEGATIVE_INFINITY, maxY = Number.NEGATIVE_INFINITY;
 		for (let i = 0, n = drawOrder.length; i < n; i++) {
-			let slot = drawOrder[i];
+			const slot = drawOrder[i];
 			if (!slot.bone.active) continue;
 			let verticesLength = 0;
 			let vertices: NumberArrayLike | null = null;
 			let triangles: NumberArrayLike | null = null;
-			let attachment = slot.pose.attachment;
+			const attachment = slot.pose.attachment;
 			if (attachment) {
 				if (attachment instanceof RegionAttachment) {
 					verticesLength = 8;
@@ -468,12 +475,12 @@ export class Skeleton {
 					continue;
 				}
 				if (vertices && triangles) {
-					if (clipper && clipper.isClipping() && clipper.clipTriangles(vertices, triangles, triangles.length)) {
+					if (clipper?.isClipping() && clipper.clipTriangles(vertices, triangles, triangles.length)) {
 						vertices = clipper.clippedVertices;
 						verticesLength = clipper.clippedVertices.length;
 					}
 					for (let ii = 0, nn = vertices.length; ii < nn; ii += 2) {
-						let x = vertices[ii], y = vertices[ii + 1];
+						const x = vertices[ii], y = vertices[ii + 1];
 						minX = Math.min(minX, x);
 						minY = Math.min(minY, y);
 						maxX = Math.max(maxX, x);

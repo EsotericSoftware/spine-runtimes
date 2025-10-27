@@ -28,15 +28,15 @@
  *****************************************************************************/
 
 import { BlendMode, Texture, TextureFilter, TextureWrap } from "@esotericsoftware/spine-core";
-import type { BaseTexture as PixiBaseTexture, BaseImageResource } from "@pixi/core";
-import { Texture as PixiTexture, SCALE_MODES, MIPMAP_MODES, WRAP_MODES, BLEND_MODES } from "@pixi/core";
+import type { BaseImageResource, BaseTexture as PixiBaseTexture } from "@pixi/core";
+import { BLEND_MODES, MIPMAP_MODES, Texture as PixiTexture, SCALE_MODES, WRAP_MODES } from "@pixi/core";
 
 export class SpineTexture extends Texture {
 	private static textureMap: Map<PixiBaseTexture, SpineTexture> = new Map<PixiBaseTexture, SpineTexture>();
 
 	public static from (texture: PixiBaseTexture): SpineTexture {
 		if (SpineTexture.textureMap.has(texture)) {
-			return SpineTexture.textureMap.get(texture)!;
+			return SpineTexture.textureMap.get(texture) as SpineTexture;
 		}
 		return new SpineTexture(texture);
 	}
@@ -45,7 +45,7 @@ export class SpineTexture extends Texture {
 
 	private constructor (image: PixiBaseTexture) {
 		// Todo: maybe add error handling if you feed a video texture to spine?
-		super((image.resource as BaseImageResource).source as any);
+		super((image.resource as BaseImageResource).source);
 		this.texture = PixiTexture.from(image);
 	}
 

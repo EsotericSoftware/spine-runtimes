@@ -70,7 +70,7 @@ export class ThreeJsTexture extends Texture {
 		else if (filter === TextureFilter.MipMapNearestLinear) return THREE.NearestMipMapLinearFilter;
 		else if (filter === TextureFilter.MipMapNearestNearest) return THREE.NearestMipMapNearestFilter;
 		else if (filter === TextureFilter.Nearest) return THREE.NearestFilter;
-		else throw new Error("Unknown texture filter: " + filter);
+		else throw new Error(`Unknown texture filter: ${filter}`);
 	}
 
 	static toThreeJsMagnificationTextureFilter (filter: TextureFilter): THREE.MagnificationTextureFilter {
@@ -80,14 +80,14 @@ export class ThreeJsTexture extends Texture {
 		else if (filter === TextureFilter.MipMapNearestLinear) return THREE.LinearFilter;
 		else if (filter === TextureFilter.MipMapNearestNearest) return THREE.NearestFilter;
 		else if (filter === TextureFilter.Nearest) return THREE.NearestFilter;
-		else throw new Error("Unknown texture filter: " + filter);
+		else throw new Error(`Unknown texture filter: ${filter}`);
 	}
 
 	static toThreeJsTextureWrap (wrap: TextureWrap) {
 		if (wrap === TextureWrap.ClampToEdge) return THREE.ClampToEdgeWrapping;
 		else if (wrap === TextureWrap.MirroredRepeat) return THREE.MirroredRepeatWrapping;
 		else if (wrap === TextureWrap.Repeat) return THREE.RepeatWrapping;
-		else throw new Error("Unknown texture wrap: " + wrap);
+		else throw new Error(`Unknown texture wrap: ${wrap}`);
 	}
 
 	static fist = true;
@@ -109,7 +109,7 @@ export class ThreeJsTexture extends Texture {
 			blendSrcAlpha: THREE.OneFactor,
 			blendDstAlpha: THREE.OneMinusSrcColorFactor,
 		}
-		else throw new Error("Unknown blendMode: " + blend);
+		else throw new Error(`Unknown blendMode: ${blend}`);
 	}
 }
 

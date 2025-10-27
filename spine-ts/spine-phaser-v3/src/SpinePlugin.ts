@@ -88,7 +88,6 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 
 	constructor (scene: Phaser.Scene, pluginManager: Phaser.Plugins.PluginManager, pluginKey: string) {
 		super(scene, pluginManager, pluginKey);
-		console.log(pluginKey);
 		this.game = pluginManager.game;
 		this.isWebGL = this.game.config.renderType === 2;
 		this.gl = this.isWebGL ? (this.game.renderer as Phaser.Renderer.WebGL.WebGLRenderer).gl : null;

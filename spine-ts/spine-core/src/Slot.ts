@@ -27,10 +27,10 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Bone } from "./Bone.js";
+import type { Bone } from "./Bone.js";
 import { Posed } from "./Posed.js";
-import { Skeleton } from "./Skeleton.js";
-import { SlotData } from "./SlotData.js";
+import type { Skeleton } from "./Skeleton.js";
+import type { SlotData } from "./SlotData.js";
 import { SlotPose } from "./SlotPose.js";
 import { Color } from "./Utils.js";
 
@@ -59,6 +59,7 @@ export class Slot extends Posed<SlotData, SlotPose, SlotPose> {
 
 	setupPose () {
 		this.pose.color.setFromColor(this.data.setup.color);
+		// biome-ignore lint/style/noNonNullAssertion: reference runtime
 		if (this.pose.darkColor) this.pose.darkColor.setFromColor(this.data.setup.darkColor!);
 		this.pose.sequenceIndex = this.data.setup.sequenceIndex;
 		if (!this.data.attachmentName)

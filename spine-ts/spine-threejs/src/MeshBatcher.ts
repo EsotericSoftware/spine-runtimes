@@ -27,11 +27,10 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+import type { BlendMode } from "@esotericsoftware/spine-core";
 import * as THREE from "three"
-
-import { ThreeJsTexture, ThreeBlendOptions } from "./ThreeJsTexture.js";
-import { BlendMode } from "@esotericsoftware/spine-core";
 import { SkeletonMesh } from "./SkeletonMesh.js";
+import { type ThreeBlendOptions, ThreeJsTexture } from "./ThreeJsTexture.js";
 
 export type MaterialWithMap = THREE.Material & { map: THREE.Texture | null };
 export class MeshBatcher extends THREE.Mesh {
@@ -53,25 +52,41 @@ export class MeshBatcher extends THREE.Mesh {
 	) {
 		super();
 
-		if (maxVertices > MeshBatcher.MAX_VERTICES) throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
+		if (maxVertices > MeshBatcher.MAX_VERTICES) throw new Error(`Can't have more than 10920 triangles per batch: ${maxVertices}`);
 
 		if (twoColorTint) {
 			this.vertexSize += 3;
 		}
 
-		let vertices = this.vertices = new Float32Array(maxVertices * this.vertexSize);
-		let indices = this.indices = new Uint16Array(maxVertices * 3);
-		let geo = new THREE.BufferGeometry();
-		let vertexBuffer = this.vertexBuffer = new THREE.InterleavedBuffer(vertices, this.vertexSize);
-		vertexBuffer.usage = WebGLRenderingContext.DYNAMIC_DRAW;
+		this.vertices = new Float32Array(maxVertices * this.vertexSize);
+		this.indices = new Uint16Array(maxVertices * 3);
+
+		const normals = new Float32Array(maxVertices * 3);
+		for (let i = 0; i < maxVertices * 3; i += 3) {
+			normals[i] = 0;
+			normals[i + 1] = 0;
+			normals[i + 2] = -1;
+		}
+
+		const vertexBuffer = new THREE.InterleavedBuffer(this.vertices, this.vertexSize)
+		this.vertexBuffer = vertexBuffer;
+		this.vertexBuffer.usage = WebGLRenderingContext.DYNAMIC_DRAW;
+
+		const geo = new THREE.BufferGeometry();
 		geo.setAttribute("position", new THREE.InterleavedBufferAttribute(vertexBuffer, 3, 0, false));
 		geo.setAttribute("color", new THREE.InterleavedBufferAttribute(vertexBuffer, 4, 3, false));
 		geo.setAttribute("uv", new THREE.InterleavedBufferAttribute(vertexBuffer, 2, 7, false));
-		if (twoColorTint) {
+		if (twoColorTint)
 			geo.setAttribute("darkcolor", new THREE.InterleavedBufferAttribute(vertexBuffer, 3, 9, false));
-		}
-		geo.setIndex(new THREE.BufferAttribute(indices, 1));
-		geo.getIndex()!.usage = WebGLRenderingContext.DYNAMIC_DRAW;
+
+		const normalBuffer = new THREE.BufferAttribute(normals, 3);
+		normalBuffer.usage = WebGLRenderingContext.STATIC_DRAW;
+		geo.setAttribute("normal", normalBuffer);
+
+		const indexBuffer = new THREE.BufferAttribute(this.indices, 1);
+		indexBuffer.usage = WebGLRenderingContext.DYNAMIC_DRAW;
+		geo.setIndex(indexBuffer);
+
 		geo.drawRange.start = 0;
 		geo.drawRange.count = 0;
 		this.geometry = geo;
@@ -84,7 +99,7 @@ export class MeshBatcher extends THREE.Mesh {
 			this.material.dispose();
 		else if (this.material) {
 			for (let i = 0; i < this.material.length; i++) {
-				let material = this.material[i];
+				const material = this.material[i];
 				if (material instanceof THREE.Material)
 					material.dispose();
 			}
@@ -92,7 +107,7 @@ export class MeshBatcher extends THREE.Mesh {
 	}
 
 	clear () {
-		let geo = (<THREE.BufferGeometry>this.geometry);
+		const geo = (<THREE.BufferGeometry>this.geometry);
 		geo.drawRange.start = 0;
 		geo.drawRange.count = 0;
 		geo.clearGroups();
@@ -123,8 +138,8 @@ export class MeshBatcher extends THREE.Mesh {
 	}
 
 	batch (vertices: ArrayLike<number>, verticesLength: number, indices: ArrayLike<number>, indicesLength: number, z: number = 0) {
-		let indexStart = this.verticesLength / this.vertexSize;
-		let vertexBuffer = this.vertices;
+		const indexStart = this.verticesLength / this.vertexSize;
+		const vertexBuffer = this.vertices;
 		let i = this.verticesLength;
 		let j = 0;
 		if (this.twoColorTint) {
@@ -163,7 +178,7 @@ export class MeshBatcher extends THREE.Mesh {
 		}
 		this.verticesLength = i;
 
-		let indicesArray = this.indices;
+		const indicesArray = this.indices;
 		for (i = this.indicesLength, j = 0; j < indicesLength; i++, j++)
 			indicesArray[i] = indices[j] + indexStart;
 		this.indicesLength += indicesLength;
@@ -172,15 +187,14 @@ export class MeshBatcher extends THREE.Mesh {
 	end () {
 		this.vertexBuffer.needsUpdate = this.verticesLength > 0;
 		this.vertexBuffer.addUpdateRange(0, this.verticesLength);
-		let geo = (<THREE.BufferGeometry>this.geometry);
+		const geo = (<THREE.BufferGeometry>this.geometry);
 		this.closeMaterialGroups();
-		let index = geo.getIndex();
+		const index = geo.getIndex();
 		if (!index) throw new Error("BufferAttribute must not be null.");
 		index.needsUpdate = this.indicesLength > 0;
 		index.addUpdateRange(0, this.indicesLength);
 		geo.drawRange.start = 0;
 		geo.drawRange.count = this.indicesLength;
-		geo.computeVertexNormals();
 	}
 
 	addMaterialGroup (indicesLength: number, materialGroup: number) {
@@ -263,7 +277,7 @@ export class MeshBatcher extends THREE.Mesh {
 
 const spineOnBeforeCompile = (shader: THREE.WebGLProgramParametersWithUniforms) => {
 
-	let code;
+	let code: string;
 
 	// VERTEX SHADER MODIFICATIONS
 
@@ -272,7 +286,7 @@ const spineOnBeforeCompile = (shader: THREE.WebGLProgramParametersWithUniforms) 
 		#if defined( USE_SPINE_DARK_TINT )
 			attribute vec3 darkcolor;
 		#endif
-	` + shader.vertexShader;
+	${shader.vertexShader}`;
 
 	// Add dark color attribute
 	code = `
@@ -354,7 +368,7 @@ export class SkeletonMeshMaterial extends THREE.ShaderMaterial {
 
 	constructor (parameters: THREE.ShaderMaterialParameters) {
 
-		let vertexShader = `
+		const vertexShader = `
 			varying vec2 vUv;
 			varying vec4 vColor;
 			void main() {
@@ -363,7 +377,7 @@ export class SkeletonMeshMaterial extends THREE.ShaderMaterial {
 				gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0);
 			}
 		`;
-		let fragmentShader = `
+		const fragmentShader = `
 			uniform sampler2D map;
 			#ifdef USE_SPINE_ALPHATEST
 			uniform float alphaTest;

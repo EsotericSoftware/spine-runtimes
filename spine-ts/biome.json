@@ -6,11 +6,18 @@
     "enabled": true,
     "rules": {
       "recommended": true,
+      "complexity": {
+        "noUselessConstructor": "off"
+      },
       "correctness": {
         "noUnusedFunctionParameters": "off"
       },
+      "style": {
+        "useExponentiationOperator": "off"
+      },
       "suspicious": {
-        "noAssignInExpressions": "off"
+        "noAssignInExpressions": "off",
+        "noPrototypeBuiltins": "off"
       }
     }
   }

@@ -32,8 +32,8 @@
         await PIXI.Assets.load(["spineboyData", "spineboyAtlas", "spineboyData", "spineboyAtlas2"]);
 
         // Create the spine display object
-        const spineboy = spine.Spine.from({skeleton: "spineboyData", atlas: "spineboyAtlas", scale: 0.5 });
-        const spineboy2 = spine.Spine.from({skeleton: "spineboyData", atlas: "spineboyAtlas", scale: 0.5 });
+        const spineboy = new spine.Spine({skeleton: "spineboyData", atlas: "spineboyAtlas", scale: 0.5 });
+        const spineboy2 = new spine.Spine({skeleton: "spineboyData", atlas: "spineboyAtlas", scale: 0.5 });
         spineboy.autoUpdate = false;
         spineboy2.autoUpdate = false;
 

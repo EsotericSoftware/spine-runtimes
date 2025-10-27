@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Disposable } from "./index.js"
+import type { Disposable } from "./index.js"
 export class Input implements Disposable {
 	element: HTMLElement;
 	mouseX = 0;
@@ -36,7 +36,7 @@ export class Input implements Disposable {
 	touch0: Touch | null = null;
 	touch1: Touch | null = null;
 	initialPinchDistance = 0;
-	private listeners = new Array<InputListener>();
+	private listeners = [] as InputListener[];
 	private autoPreventDefault: boolean;
 
 	// this is needed because browsers sends mousedown-mousemove-mousesup after a touch sequence, unless touch end preventDefault
@@ -62,7 +62,7 @@ export class Input implements Disposable {
 	private setupCallbacks (element: HTMLElement) {
 		const mouseDown = (ev: UIEvent) => {
 			if (ev instanceof MouseEvent && !this.isTouch) {
-				let rect = element.getBoundingClientRect();
+				const rect = element.getBoundingClientRect();
 				this.mouseX = ev.clientX - rect.left;
 				this.mouseY = ev.clientY - rect.top;
 				this.buttonDown = true;
@@ -72,7 +72,7 @@ export class Input implements Disposable {
 
 		const mouseMove = (ev: UIEvent) => {
 			if (ev instanceof MouseEvent && !this.isTouch) {
-				let rect = element.getBoundingClientRect();
+				const rect = element.getBoundingClientRect();
 				this.mouseX = ev.clientX - rect.left;
 				this.mouseY = ev.clientY - rect.top;
 
@@ -88,7 +88,7 @@ export class Input implements Disposable {
 
 		const mouseUp = (ev: UIEvent) => {
 			if (ev instanceof MouseEvent && !this.isTouch) {
-				let rect = element.getBoundingClientRect();
+				const rect = element.getBoundingClientRect();
 				this.mouseX = ev.clientX - rect.left;;
 				this.mouseY = ev.clientY - rect.top;
 				this.buttonDown = false;
@@ -99,21 +99,21 @@ export class Input implements Disposable {
 		const mouseWheel = (ev: WheelEvent) => {
 			if (this.autoPreventDefault) ev.preventDefault();
 			let deltaY = ev.deltaY;
-			if (ev.deltaMode == WheelEvent.DOM_DELTA_LINE) deltaY *= 8;
-			if (ev.deltaMode == WheelEvent.DOM_DELTA_PAGE) deltaY *= 24;
-			this.listeners.map((listener) => { if (listener.wheel) listener.wheel(ev.deltaY, ev); });
+			if (ev.deltaMode === WheelEvent.DOM_DELTA_LINE) deltaY *= 8;
+			if (ev.deltaMode === WheelEvent.DOM_DELTA_PAGE) deltaY *= 24;
+			this.listeners.map((listener) => { if (listener.wheel) listener.wheel(deltaY, ev); });
 		};
 
 		const touchStart = (ev: TouchEvent) => {
 			this.isTouch = true;
 			if (!this.touch0 || !this.touch1) {
-				var touches = ev.changedTouches;
-				let nativeTouch = touches.item(0);
+				const touches = ev.changedTouches;
+				const nativeTouch = touches.item(0);
 				if (!nativeTouch) return;
-				let rect = element.getBoundingClientRect();
-				let x = nativeTouch.clientX - rect.left;
-				let y = nativeTouch.clientY - rect.top;
-				let touch = new Touch(nativeTouch.identifier, x, y);
+				const rect = element.getBoundingClientRect();
+				const x = nativeTouch.clientX - rect.left;
+				const y = nativeTouch.clientY - rect.top;
+				const touch = new Touch(nativeTouch.identifier, x, y);
 				this.mouseX = x;
 				this.mouseY = y;
 				this.buttonDown = true;
@@ -123,8 +123,8 @@ export class Input implements Disposable {
 					this.listeners.map((listener) => { if (listener.down) listener.down(touch.x, touch.y, ev) })
 				} else if (!this.touch1) {
 					this.touch1 = touch;
-					let dx = this.touch1.x - this.touch0.x;
-					let dy = this.touch1.x - this.touch0.x;
+					const dx = this.touch1.x - this.touch0.x;
+					const dy = this.touch1.x - this.touch0.x;
 					this.initialPinchDistance = Math.sqrt(dx * dx + dy * dy);
 					this.listeners.map((listener) => { if (listener.zoom) listener.zoom(this.initialPinchDistance, this.initialPinchDistance, ev) });
 				}
@@ -135,12 +135,12 @@ export class Input implements Disposable {
 		const touchMove = (ev: TouchEvent) => {
 			this.isTouch = true;
 			if (this.touch0) {
-				var touches = ev.changedTouches;
-				let rect = element.getBoundingClientRect();
-				for (var i = 0; i < touches.length; i++) {
-					var nativeTouch = touches[i];
-					let x = nativeTouch.clientX - rect.left;
-					let y = nativeTouch.clientY - rect.top;
+				const touches = ev.changedTouches;
+				const rect = element.getBoundingClientRect();
+				for (let i = 0; i < touches.length; i++) {
+					const nativeTouch = touches[i];
+					const x = nativeTouch.clientX - rect.left;
+					const y = nativeTouch.clientY - rect.top;
 
 					if (this.touch0.identifier === nativeTouch.identifier) {
 						this.touch0.x = this.mouseX = x;
@@ -153,9 +153,9 @@ export class Input implements Disposable {
 					}
 				}
 				if (this.touch0 && this.touch1) {
-					let dx = this.touch1.x - this.touch0.x;
-					let dy = this.touch1.x - this.touch0.x;
-					let distance = Math.sqrt(dx * dx + dy * dy);
+					const dx = this.touch1.x - this.touch0.x;
+					const dy = this.touch1.x - this.touch0.x;
+					const distance = Math.sqrt(dx * dx + dy * dy);
 					this.listeners.map((listener) => { if (listener.zoom) listener.zoom(this.initialPinchDistance, distance, ev) });
 				}
 			}
@@ -164,16 +164,17 @@ export class Input implements Disposable {
 
 		const touchEnd = (ev: TouchEvent) => {
 			this.isTouch = true;
-			if (this.touch0) {
-				var touches = ev.changedTouches;
-				let rect = element.getBoundingClientRect();
+			const touch0 = this.touch0 as Touch;
+			if (touch0) {
+				const touches = ev.changedTouches;
+				const rect = element.getBoundingClientRect();
 
-				for (var i = 0; i < touches.length; i++) {
-					var nativeTouch = touches[i];
-					let x = nativeTouch.clientX - rect.left;
-					let y = nativeTouch.clientY - rect.top;
+				for (let i = 0; i < touches.length; i++) {
+					const nativeTouch = touches[i];
+					const x = nativeTouch.clientX - rect.left;
+					const y = nativeTouch.clientY - rect.top;
 
-					if (this.touch0.identifier === nativeTouch.identifier) {
+					if (touch0.identifier === nativeTouch.identifier) {
 						this.touch0 = null;
 						this.mouseX = x;
 						this.mouseY = y;
@@ -183,16 +184,16 @@ export class Input implements Disposable {
 							this.buttonDown = false;
 							break;
 						} else {
-							this.touch0 = this.touch1;
+							const touch0 = this.touch0 = this.touch1;
 							this.touch1 = null;
-							this.mouseX = this.touch0.x;
-							this.mouseX = this.touch0.x;
+							this.mouseX = touch0.x;
+							this.mouseY = touch0.y;
 							this.buttonDown = true;
-							this.listeners.map((listener) => { if (listener.down) listener.down(this.touch0!.x, this.touch0!.y, ev) });
+							this.listeners.map((listener) => { if (listener.down) listener.down(touch0.x, touch0.y, ev) });
 						}
 					}
 
-					if (this.touch1 && this.touch1.identifier) {
+					if (this.touch1?.identifier) {
 						this.touch1 = null;
 					}
 				}
@@ -238,7 +239,7 @@ export class Input implements Disposable {
 	}
 
 	removeListener (listener: InputListener) {
-		let idx = this.listeners.indexOf(listener);
+		const idx = this.listeners.indexOf(listener);
 		if (idx > -1) {
 			this.listeners.splice(idx, 1);
 		}

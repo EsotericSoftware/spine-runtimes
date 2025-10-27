@@ -27,8 +27,10 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+/** biome-ignore-all lint/suspicious/noExplicitAny: necessary here */
+
 if (typeof window !== 'undefined' && (window as any).THREE) {
-	let prevRequire = window.require;
+	const prevRequire = window.require;
 	(window as any).require = (x: string) => {
 		if (prevRequire) return prevRequire(x);
 		else if (x === "three") return (window as any).THREE;

@@ -27,18 +27,18 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { BoneData } from "./BoneData.js";
+import type { BoneData } from "./BoneData.js";
 import { ConstraintData } from "./ConstraintData.js";
 import { IkConstraint } from "./IkConstraint.js";
 import { IkConstraintPose } from "./IkConstraintPose.js";
-import { Skeleton } from "./Skeleton.js";
+import type { Skeleton } from "./Skeleton.js";
 
 /** Stores the setup pose for an {@link IkConstraint}.
  *
  * See [IK constraints](http://esotericsoftware.com/spine-ik-constraints) in the Spine User Guide. */
 export class IkConstraintData extends ConstraintData<IkConstraint, IkConstraintPose> {
 	/** The bones that are constrained by this IK constraint. */
-	bones = new Array<BoneData>();
+	bones = [] as BoneData[];
 
 	private _target: BoneData | null = null;
 	/** The bone that is the IK target. */

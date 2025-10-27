@@ -1,0 +1,64 @@
+{
+  "skeleton": {
+    "hash": "kUVJGzLCHio",
+    "spine": "4.2.43",
+    "x": -66,
+    "y": -141.5,
+    "width": 142,
+    "height": 232,
+    "images": "./images/",
+    "audio": "./audio"
+  },
+  "bones": [
+    { "name": "root" },
+    { "name": "empty_1", "parent": "root", "x": -44, "y": 53.5 },
+    { "name": "empty_8", "parent": "root", "x": 5, "y": -104.5 },
+    { "name": "empty_7", "parent": "root", "x": -44, "y": -104.5 },
+    { "name": "empty_6", "parent": "root", "x": 54, "y": -25.5 },
+    { "name": "empty_5", "parent": "root", "x": 5, "y": -25.5 },
+    { "name": "empty_4", "parent": "root", "x": -44, "y": -25.5 },
+    { "name": "empty_3", "parent": "root", "x": 54, "y": 53.5 },
+    { "name": "empty_2", "parent": "root", "x": 5, "y": 53.5 }
+  ],
+  "slots": [
+    { "name": "mask", "bone": "root", "attachment": "mask" },
+    { "name": "empty_1", "bone": "empty_1", "attachment": "empty" },
+    { "name": "empty_2", "bone": "empty_2", "attachment": "empty" },
+    { "name": "empty_3", "bone": "empty_3", "attachment": "empty" },
+    { "name": "empty_4", "bone": "empty_4", "attachment": "empty" },
+    { "name": "empty_5", "bone": "empty_5", "attachment": "empty" },
+    { "name": "empty_6", "bone": "empty_6", "attachment": "empty" },
+    { "name": "empty_7", "bone": "empty_7", "attachment": "empty" },
+    { "name": "empty_8", "bone": "empty_8", "attachment": "empty" }
+  ],
+  "skins": [
+    {
+      "name": "default",
+      "attachments": {
+        "empty_1": { "empty": { "width": 44, "height": 74 } },
+        "empty_2": { "empty": { "width": 44, "height": 74 } },
+        "empty_3": { "empty": { "width": 44, "height": 74 } },
+        "empty_4": { "empty": { "width": 44, "height": 74 } },
+        "empty_5": { "empty": { "width": 44, "height": 74 } },
+        "empty_6": { "empty": { "width": 44, "height": 74 } },
+        "empty_7": { "empty": { "width": 44, "height": 74 } },
+        "empty_8": { "empty": { "width": 44, "height": 74 } },
+        "mask": {
+          "mask": {
+            "type": "clipping",
+            "end": "mask",
+            "vertexCount": 16,
+            "vertices": [
+              -53.67, -27.41, -147.5, -13.5, -65, 33.5, -92.5, 70.5, -21.01,
+              32.95, 12.5, 114.5, 36.79, 30.32, 129.5, 66.5, 93, 30.5, 124.5,
+              -5.5, 98, -51.5, 139.5, -97.5, 38.8, -65.21, -9.5, -181.5, -26.27,
+              -70.62, -106.5, -105.5
+            ],
+            "color": "ce3a3aff"
+          }
+        }
+      }
+    }
+  ],
+  "animations": { "animation": {} }
+}

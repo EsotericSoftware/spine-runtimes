@@ -245,6 +245,7 @@ export class SkeletonRenderer {
 				positions,
 				uvs,
 				colors,
+				// biome-ignore lint/suspicious/noExplicitAny: canvaskit wants indices as an array of number
 				indices as any as number[],
 				false
 			);

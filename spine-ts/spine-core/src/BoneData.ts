@@ -29,9 +29,8 @@
 
 import { BoneLocal } from "./BoneLocal.js";
 import { PosedData } from "./PosedData.js";
-import { Color } from "./Utils.js";
-
 import type { Skeleton } from "./Skeleton.js";
+import { Color } from "./Utils.js";
 
 /** The setup pose for a bone. */
 export class BoneData extends PosedData<BoneLocal> {

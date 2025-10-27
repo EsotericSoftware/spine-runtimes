@@ -28,7 +28,7 @@
         await PIXI.Assets.load(["girlData", "girlAtlas"]);
 
         // Create the spine display object
-        const girl = spine.Spine.from({skeleton: "girlData", atlas: "girlAtlas",
+        const girl = new spine.Spine({skeleton: "girlData", atlas: "girlAtlas",
           scale: 0.2,
         });
 

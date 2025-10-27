@@ -150,6 +150,7 @@ export class SpinePipe implements RenderPipe<Spine> {
 				if (!skipRender) {
 					container.includeInBuild = true;
 					// See https://github.com/pixijs/pixijs/blob/b4c050a791fe65e979e467c9cba2bda0c01a1c35/src/scene/container/utils/collectAllRenderables.ts#L28
+					// biome-ignore lint/style/noNonNullAssertion: it was in pixi code
 					container.collectRenderables(instructionSet, this.renderer, null!);
 				}
 
@@ -185,13 +186,13 @@ export class SpinePipe implements RenderPipe<Spine> {
 	}
 
 	destroyRenderable (spine: Spine) {
-		this.gpuSpineData[spine.uid] = null as any;
+		(this.gpuSpineData[spine.uid] as unknown) = null;
 		spine.off('destroyed', this._destroyRenderableBound);
 	}
 
 	destroy () {
-		this.gpuSpineData = null as any;
-		this.renderer = null as any;
+		(this.gpuSpineData as unknown) = null;
+		(this.renderer as unknown) = null;
 	}
 
 	private _getSpineData (spine: Spine): GpuSpineDataElement {

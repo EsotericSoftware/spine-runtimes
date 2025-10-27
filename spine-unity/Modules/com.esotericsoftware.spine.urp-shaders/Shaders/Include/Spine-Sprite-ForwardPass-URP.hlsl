@@ -14,12 +14,12 @@
 #endif
 #include "Packages/com.esotericsoftware.spine.urp-shaders/Shaders/Include/SpineCoreShaders/Spine-Skeleton-Tint-Common.cginc"
 
-#if defined(_RIM_LIGHTING) || defined(_ADDITIONAL_LIGHTS) || defined(MAIN_LIGHT_CALCULATE_SHADOWS) || defined(USE_LIGHT_COOKIES)
-	#define NEEDS_POSITION_WS
+#if !defined(DYNAMICLIGHTMAP_ON) && !defined(LIGHTMAP_ON) && (defined(PROBE_VOLUMES_L1) || defined(PROBE_VOLUMES_L2)) && defined(__PROBEVOLUME_HLSL__)
+#define USE_ADAPTIVE_PROBE_VOLUMES
 #endif
 
-#if !defined(DYNAMICLIGHTMAP_ON) && !defined(LIGHTMAP_ON) && (defined(PROBE_VOLUMES_L1) || defined(PROBE_VOLUMES_L2))
-#define USE_ADAPTIVE_PROBE_VOLUMES
+#if defined(_RIM_LIGHTING) || defined(_ADDITIONAL_LIGHTS) || defined(MAIN_LIGHT_CALCULATE_SHADOWS) || defined(USE_LIGHT_COOKIES) || defined(USE_ADAPTIVE_PROBE_VOLUMES)
+	#define NEEDS_POSITION_WS
 #endif
 
 ////////////////////////////////////////

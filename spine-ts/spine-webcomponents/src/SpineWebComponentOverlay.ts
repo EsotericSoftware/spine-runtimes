@@ -27,9 +27,9 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { AssetCache, AssetManager, Color, Disposable, Input, LoadingScreen, ManagedWebGLRenderingContext, Physics, SceneRenderer, TimeKeeper, Vector2, Vector3 } from "@esotericsoftware/spine-webgl"
-import { SpineWebComponentSkeleton } from "./SpineWebComponentSkeleton.js"
-import { AttributeTypes, castValue, Point, Rectangle } from "./wcUtils.js"
+import { AssetCache, AssetManager, type Bone, Color, type Disposable, Input, LoadingScreen, ManagedWebGLRenderingContext, Physics, SceneRenderer, type Skeleton, TimeKeeper, Vector2, Vector3 } from "@esotericsoftware/spine-webgl"
+import type { SpineWebComponentSkeleton } from "./SpineWebComponentSkeleton.js"
+import { type AttributeTypes, castValue, type Point, type Rectangle } from "./wcUtils.js"
 
 interface OverlayAttributes {
 	overlayId?: string
@@ -41,6 +41,8 @@ interface OverlayAttributes {
 }
 
 export class SpineWebComponentOverlay extends HTMLElement implements OverlayAttributes, Disposable {
+	declare parentElement: HTMLElement;
+
 	private static OVERLAY_ID = "spine-overlay-default-identifier";
 	private static OVERLAY_LIST = new Map<string, SpineWebComponentOverlay>();
 
@@ -66,7 +68,7 @@ export class SpineWebComponentOverlay extends HTMLElement implements OverlayAttr
 	/**
 	 * A list holding the widgets added to this overlay.
 	 */
-	public widgets = new Array<SpineWebComponentSkeleton>();
+	public widgets = [] as SpineWebComponentSkeleton[];
 
 	/**
 	 * The {@link SceneRenderer} used by this overlay.
@@ -256,7 +258,7 @@ export class SpineWebComponentOverlay extends HTMLElement implements OverlayAttr
 				const { target, intersectionRatio } = elem;
 				let { isIntersecting } = elem;
 				for (const widget of this.widgets) {
-					if (widget.getHostElement() != target) continue;
+					if (widget.getHostElement() !== target) continue;
 
 					// old browsers do not have isIntersecting
 					if (isIntersecting === undefined) {
@@ -277,13 +279,13 @@ export class SpineWebComponentOverlay extends HTMLElement implements OverlayAttr
 			if (this.hasCssTweakOff()) {
 				this.hasParentTransform = false;
 			} else {
-				this.parentElement!.style.transform = `translateZ(0)`;
+				this.parentElement.style.transform = `translateZ(0)`;
 			}
 		} else {
 			window.addEventListener("resize", this.windowResizeCallback);
 		}
 		this.resizeObserver = new ResizeObserver(() => this.resizedCallback());
-		this.resizeObserver.observe(this.parentElement!);
+		this.resizeObserver.observe(this.parentElement);
 
 		for (const widget of this.widgets) {
 			this.intersectionObserver?.observe(widget.getHostElement());
@@ -308,7 +310,7 @@ export class SpineWebComponentOverlay extends HTMLElement implements OverlayAttr
 		this.input?.dispose();
 	}
 
-	static attributesDescription: Record<string, { propertyName: keyof OverlayAttributes, type: AttributeTypes, defaultValue?: any }> = {
+	static attributesDescription: Record<string, { propertyName: keyof OverlayAttributes, type: AttributeTypes, defaultValue?: OverlayAttributes[keyof OverlayAttributes] }> = {
 		"overlay-id": { propertyName: "overlayId", type: "string" },
 		"no-auto-parent-transform": { propertyName: "noAutoParentTransform", type: "boolean" },
 		"overflow-top": { propertyName: "overflowTop", type: "number" },
@@ -324,7 +326,7 @@ export class SpineWebComponentOverlay extends HTMLElement implements OverlayAttr
 	attributeChangedCallback (name: string, oldValue: string | null, newValue: string | null): void {
 		const { type, propertyName, defaultValue } = SpineWebComponentOverlay.attributesDescription[name];
 		const val = castValue(type, newValue, defaultValue);
-		(this as any)[propertyName] = val;
+		(this[propertyName] as OverlayAttributes[typeof propertyName]) = val as OverlayAttributes[typeof propertyName];
 		return;
 	}
 
@@ -360,12 +362,12 @@ export class SpineWebComponentOverlay extends HTMLElement implements OverlayAttr
 		this.scrolledCallback();
 		if (!this.loaded) {
 			this.loaded = true;
-			this.parentElement!.appendChild(this);
+			this.parentElement.appendChild(this);
 		}
 	}
 
 	private hasCssTweakOff () {
-		return this.noAutoParentTransform && getComputedStyle(this.parentElement!).transform === "none";
+		return this.noAutoParentTransform && getComputedStyle(this.parentElement).transform === "none";
 	}
 
 	/**
@@ -393,7 +395,7 @@ export class SpineWebComponentOverlay extends HTMLElement implements OverlayAttr
 			const comparison = this.compareDocumentPosition(widget);
 			// DOCUMENT_POSITION_DISCONNECTED is needed when a widget is inside the overlay (due to followBone)
 			if ((comparison & Node.DOCUMENT_POSITION_FOLLOWING) && !(comparison & Node.DOCUMENT_POSITION_DISCONNECTED)) {
-				this.parentElement!.appendChild(this);
+				this.parentElement.appendChild(this);
 			}
 		}
 
@@ -448,7 +450,7 @@ export class SpineWebComponentOverlay extends HTMLElement implements OverlayAttr
 					this.div.appendChild(this.fps);
 					this.fpsAppended = true;
 				}
-				this.fps.innerText = this.time.framesPerSecond.toFixed(2) + " fps";
+				this.fps.innerText = `${this.time.framesPerSecond.toFixed(2)} fps`;
 			} else {
 				if (this.fpsAppended) {
 					this.div.removeChild(this.fps);
@@ -482,15 +484,15 @@ export class SpineWebComponentOverlay extends HTMLElement implements OverlayAttr
 
 		const renderWidgets = () => {
 			clear(0, 0, 0, 0);
-			let renderer = this.renderer;
+			const renderer = this.renderer;
 			renderer.begin();
 
 			let ref: DOMRect;
 			let offsetLeftForOevrlay = 0;
 			let offsetTopForOverlay = 0;
 			if (!this.appendedToBody) {
-				ref = this.parentElement!.getBoundingClientRect();
-				const computedStyle = getComputedStyle(this.parentElement!);
+				ref = this.parentElement.getBoundingClientRect();
+				const computedStyle = getComputedStyle(this.parentElement);
 				offsetLeftForOevrlay = ref.left + parseFloat(computedStyle.borderLeftWidth);
 				offsetTopForOverlay = ref.top + parseFloat(computedStyle.borderTopWidth);
 			}
@@ -532,7 +534,7 @@ export class SpineWebComponentOverlay extends HTMLElement implements OverlayAttr
 				if (loading) {
 					if (spinner) {
 						if (!widget.loadingScreen) widget.loadingScreen = new LoadingScreen(renderer);
-						widget.loadingScreen!.drawInCoordinates(divOriginX, divOriginY);
+						widget.loadingScreen?.drawInCoordinates(divOriginX, divOriginY);
 					}
 					if (clip) endScissor();
 					continue;
@@ -540,7 +542,7 @@ export class SpineWebComponentOverlay extends HTMLElement implements OverlayAttr
 
 				if (skeleton) {
 					if (fit !== "origin") {
-						let { x: ax, y: ay, width: aw, height: ah } = bounds;
+						const { x: ax, y: ay, width: aw, height: ah } = bounds;
 						if (aw <= 0 || ah <= 0) continue;
 
 						// scale ratio
@@ -622,7 +624,7 @@ export class SpineWebComponentOverlay extends HTMLElement implements OverlayAttr
 					// drawing debug stuff
 					if (debug) {
 						// if (true) {
-						let { x: ax, y: ay, width: aw, height: ah } = bounds;
+						const { x: ax, y: ay, width: aw, height: ah } = bounds;
 
 						// show bounds and its center
 						if (drag) {
@@ -645,7 +647,7 @@ export class SpineWebComponentOverlay extends HTMLElement implements OverlayAttr
 						renderer.circle(true, bbCenterX, bbCenterY, 10, blue);
 
 						// show skeleton root
-						const root = skeleton.getRootBone()!;
+						const root = skeleton.getRootBone() as Bone;
 						renderer.circle(true, root.applied.x + worldOffsetX, root.applied.y + worldOffsetY, 10, red);
 
 						// show shifted origin
@@ -720,7 +722,6 @@ export class SpineWebComponentOverlay extends HTMLElement implements OverlayAttr
 		const red = new Color(1, 0, 0, 1);
 		const green = new Color(0, 1, 0, 1);
 		const blue = new Color(0, 0, 1, 1);
-		const transparentWhite = new Color(1, 1, 1, .3);
 		const transparentRed = new Color(1, 0, 0, .3);
 	}
 
@@ -735,12 +736,12 @@ export class SpineWebComponentOverlay extends HTMLElement implements OverlayAttr
 		this.pointerCanvasY = input.y - window.scrollY;
 
 		if (!this.appendedToBody) {
-			const ref = this.parentElement!.getBoundingClientRect();
+			const ref = this.parentElement.getBoundingClientRect();
 			this.pointerCanvasX -= ref.left;
 			this.pointerCanvasY -= ref.top;
 		}
 
-		let tempVector = this.tempVector;
+		const tempVector = this.tempVector;
 		tempVector.set(this.pointerCanvasX, this.pointerCanvasY, 0);
 		this.renderer.camera.screenToWorld(tempVector, this.canvas.clientWidth, this.canvas.clientHeight);
 
@@ -763,8 +764,8 @@ export class SpineWebComponentOverlay extends HTMLElement implements OverlayAttr
 		const inputManager = new Input(document.body, false)
 		const inputPointTemp: Point = new Vector2();
 
-		const getInput = (ev?: MouseEvent | TouchEvent): Point => {
-			const originalEvent = ev instanceof MouseEvent ? ev : ev!.changedTouches[0];
+		const getInput = (ev: MouseEvent | TouchEvent): Point => {
+			const originalEvent = ev instanceof MouseEvent ? ev : ev.changedTouches[0];
 			inputPointTemp.x = originalEvent.pageX + this.overflowLeftSize;
 			inputPointTemp.y = originalEvent.pageY + this.overflowTopSize;
 			return inputPointTemp;
@@ -774,7 +775,7 @@ export class SpineWebComponentOverlay extends HTMLElement implements OverlayAttr
 		let lastY = 0;
 		inputManager.addListener({
 			// moved is used to pass pointer position wrt to canvas and widget position and currently is EXPERIMENTAL
-			moved: (x, y, ev) => {
+			moved: (x, y, ev: MouseEvent | TouchEvent) => {
 				const input = getInput(ev);
 				this.updatePointer(input);
 
@@ -784,7 +785,7 @@ export class SpineWebComponentOverlay extends HTMLElement implements OverlayAttr
 					widget.pointerEventUpdate("move", ev);
 				}
 			},
-			down: (x, y, ev) => {
+			down: (x, y, ev: MouseEvent | TouchEvent) => {
 				const input = getInput(ev);
 
 				this.updatePointer(input);
@@ -805,11 +806,11 @@ export class SpineWebComponentOverlay extends HTMLElement implements OverlayAttr
 				lastX = input.x;
 				lastY = input.y;
 			},
-			dragged: (x, y, ev) => {
+			dragged: (x, y, ev: MouseEvent | TouchEvent) => {
 				const input = getInput(ev);
 
-				let dragX = input.x - lastX;
-				let dragY = input.y - lastY;
+				const dragX = input.x - lastX;
+				const dragY = input.y - lastY;
 
 				this.updatePointer(input);
 
@@ -820,7 +821,7 @@ export class SpineWebComponentOverlay extends HTMLElement implements OverlayAttr
 
 					if (!widget.dragging) continue;
 
-					const skeleton = widget.skeleton!;
+					const skeleton = widget.skeleton as Skeleton;
 					widget.dragX += this.screenToWorldLength(dragX);
 					widget.dragY -= this.screenToWorldLength(dragY);
 					skeleton.physicsTranslate(dragX, -dragY);
@@ -861,8 +862,8 @@ export class SpineWebComponentOverlay extends HTMLElement implements OverlayAttr
 			const totalWidth = width * (1 + (this.overflowLeft + this.overflowRight));
 			const totalHeight = height * (1 + (this.overflowTop + this.overflowBottom));
 
-			this.canvas.style.width = totalWidth + "px";
-			this.canvas.style.height = totalHeight + "px";
+			this.canvas.style.width = `${totalWidth}px`;
+			this.canvas.style.height = `${totalHeight}px`;
 			this.resize(totalWidth, totalHeight);
 		}
 
@@ -872,28 +873,28 @@ export class SpineWebComponentOverlay extends HTMLElement implements OverlayAttr
 		// this.div?.remove(); is it better width/height to zero?
 		// this.div!.style.width = 0 + "px";
 		// this.div!.style.height = 0 + "px";
-		this.div!.style.display = "none";
+		this.div.style.display = "none";
 		if (this.appendedToBody) {
 			const { width, height } = this.getPageSize();
-			this.div!.style.width = width + "px";
-			this.div!.style.height = height + "px";
+			this.div.style.width = `${width}px`;
+			this.div.style.height = `${height}px`;
 		} else {
 			if (this.hasCssTweakOff()) {
 				// this case lags if scrolls or position fixed. Users should never use tweak off
-				this.div!.style.width = this.parentElement!.clientWidth + "px";
-				this.div!.style.height = this.parentElement!.clientHeight + "px";
+				this.div.style.width = `${this.parentElement.clientWidth}px`;
+				this.div.style.height = `${this.parentElement.clientHeight}px`;
 				this.canvas.style.transform = `translate(${-this.overflowLeftSize}px,${-this.overflowTopSize}px)`;
 			} else {
-				this.div!.style.width = this.parentElement!.scrollWidth + "px";
-				this.div!.style.height = this.parentElement!.scrollHeight + "px";
+				this.div.style.width = `${this.parentElement.scrollWidth}px`;
+				this.div.style.height = `${this.parentElement.scrollHeight}px`;
 			}
 		}
-		this.div!.style.display = "";
+		this.div.style.display = "";
 		// this.root.appendChild(this.div!);
 	}
 
 	private resize (width: number, height: number) {
-		let canvas = this.canvas;
+		const canvas = this.canvas;
 		canvas.width = Math.round(this.screenToWorldLength(width));
 		canvas.height = Math.round(this.screenToWorldLength(height));
 		this.renderer.context.gl.viewport(0, 0, canvas.width, canvas.height);
@@ -921,13 +922,13 @@ export class SpineWebComponentOverlay extends HTMLElement implements OverlayAttr
 	private getViewportSize (): { width: number, height: number } {
 		if (!this.appendedToBody) {
 			return {
-				width: this.parentElement!.clientWidth,
-				height: this.parentElement!.clientHeight,
+				width: this.parentElement.clientWidth,
+				height: this.parentElement.clientHeight,
 			}
 		}
 
-		let width = window.innerWidth;
-		let height = window.innerHeight;
+		const width = window.innerWidth;
+		const height = window.innerHeight;
 
 		const dpr = this.getDevicePixelRatio();
 		if (dpr !== this.lastDPR) {
@@ -993,10 +994,10 @@ export class SpineWebComponentOverlay extends HTMLElement implements OverlayAttr
 			// Ideally this should be the only appendedToBody case (no-auto-parent-transform not enabled or at least an ancestor has transform)
 			// I'd like to get rid of the else case
 			if (this.hasParentTransform) {
-				scrollPositionX += this.parentElement!.scrollLeft;
-				scrollPositionY += this.parentElement!.scrollTop;
+				scrollPositionX += this.parentElement.scrollLeft;
+				scrollPositionY += this.parentElement.scrollTop;
 			} else {
-				const { left, top } = this.parentElement!.getBoundingClientRect();
+				const { left, top } = this.parentElement.getBoundingClientRect();
 				scrollPositionX += left + window.scrollX;
 				scrollPositionY += top + window.scrollY;
 
@@ -1027,10 +1028,10 @@ export class SpineWebComponentOverlay extends HTMLElement implements OverlayAttr
 		let parent: HTMLElement | null = element;
 		let zIndex: undefined | number;
 		do {
-			let currentZIndex = parseInt(getComputedStyle(parent).zIndex);
+			const currentZIndex = parseInt(getComputedStyle(parent).zIndex);
 
 			// searching the shallowest z-index
-			if (!isNaN(currentZIndex)) zIndex = currentZIndex;
+			if (!Number.isNaN(currentZIndex)) zIndex = currentZIndex;
 			parent = parent.parentElement;
 		} while (parent && parent !== document.body)
 

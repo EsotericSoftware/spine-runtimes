@@ -28,7 +28,7 @@
         await PIXI.Assets.load(["mixAndMatchData", "mixAndMatchAtlas"]);
 
         // Create the Spine display object
-        const mixAndMatch = spine.Spine.from({skeleton: "mixAndMatchData", atlas: "mixAndMatchAtlas",
+        const mixAndMatch = new spine.Spine({skeleton: "mixAndMatchData", atlas: "mixAndMatchAtlas",
           scale: 0.5,
         });
 

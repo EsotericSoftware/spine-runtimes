@@ -27,17 +27,17 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { ConstraintData } from "./ConstraintData.js";
-import { Physics } from "./Physics.js";
-import { Pose } from "./Pose.js";
+import type { ConstraintData } from "./ConstraintData.js";
+import type { Physics } from "./Physics.js";
+import type { Pose } from "./Pose.js";
 import { PosedActive } from "./PosedActive.js";
-import { Skeleton } from "./Skeleton.js";
-import { Update } from "./Update.js";
+import type { Skeleton } from "./Skeleton.js";
+import type { Update } from "./Update.js";
 
 export abstract class Constraint<
 	T extends Constraint<T, D, P>,
 	D extends ConstraintData<T, P>,
-	P extends Pose<any>>
+	P extends Pose<P>>
 	extends PosedActive<D, P, P> implements Update {
 
 	constructor (data: D, pose: P, constrained: P) {

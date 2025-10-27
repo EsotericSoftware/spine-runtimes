@@ -27,14 +27,14 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Bone } from "./Bone.js";
+import type { Bone } from "./Bone.js";
 import { Inherit } from "./BoneData.js";
-import { BonePose } from "./BonePose.js";
+import type { BonePose } from "./BonePose.js";
 import { Constraint } from "./Constraint.js";
-import { IkConstraintData } from "./IkConstraintData.js";
+import type { IkConstraintData } from "./IkConstraintData.js";
 import { IkConstraintPose } from "./IkConstraintPose.js";
-import { Physics } from "./Physics.js";
-import { Skeleton } from "./Skeleton.js";
+import type { Physics } from "./Physics.js";
+import type { Skeleton } from "./Skeleton.js";
 import { MathUtils } from "./Utils.js";
 
 /** Stores the current pose for an IK constraint. An IK constraint adjusts the rotation of 1 or 2 constrained bones so the tip of
@@ -52,7 +52,7 @@ export class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 		super(data, new IkConstraintPose(), new IkConstraintPose());
 		if (!skeleton) throw new Error("skeleton cannot be null.");
 
-		this.bones = new Array<BonePose>();
+		this.bones = [] as BonePose[];
 		for (const boneData of data.bones)
 			this.bones.push(skeleton.bones[boneData.index].constrained);
 
@@ -107,16 +107,17 @@ export class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 		stretchOrBendDir: boolean | number, uniformOrStretch: boolean, mixOrUniform: number | boolean, softness?: number, mix?: number) {
 
 		if (typeof targetXorChild === "number")
-			this.apply1(skeleton, boneOrParent, targetXorChild, targetYOrTargetX, compressOrTargetY as boolean, stretchOrBendDir as boolean, uniformOrStretch, mixOrUniform as number);
+			IkConstraint.apply1(skeleton, boneOrParent, targetXorChild, targetYOrTargetX, compressOrTargetY as boolean, stretchOrBendDir as boolean, uniformOrStretch, mixOrUniform as number);
 		else
-			this.apply2(skeleton, boneOrParent, targetXorChild as BonePose, targetYOrTargetX, compressOrTargetY as number, stretchOrBendDir as number,
+			IkConstraint.apply2(skeleton, boneOrParent, targetXorChild as BonePose, targetYOrTargetX, compressOrTargetY as number, stretchOrBendDir as number,
 				uniformOrStretch, mixOrUniform as boolean, softness as number, mix as number);
 	}
 
 	private static apply1 (skeleton: Skeleton, bone: BonePose, targetX: number, targetY: number, compress: boolean, stretch: boolean, uniform: boolean, mix: number) {
 		bone.modifyLocal(skeleton);
 
-		let p = bone.bone.parent!.applied;
+		// biome-ignore lint/style/noNonNullAssertion: reference runtime
+		const p = bone.bone.parent!.applied;
 
 		let pa = p.a, pb = p.b, pc = p.c, pd = p.d;
 		let rotationIK = -bone.shearX - bone.rotation, tx = 0, ty = 0;
@@ -126,17 +127,19 @@ export class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 				tx = (targetX - bone.worldX) * MathUtils.signum(skeleton.scaleX);
 				ty = (targetY - bone.worldY) * MathUtils.signum(skeleton.scaleY);
 				break;
-			case Inherit.NoRotationOrReflection:
-				let s = Math.abs(pa * pd - pb * pc) / Math.max(0.0001, pa * pa + pc * pc);
-				let sa = pa / skeleton.scaleX;
-				let sc = pc / skeleton.scaleY;
+			// biome-ignore lint/suspicious/noFallthroughSwitchClause: reference runtime
+			case Inherit.NoRotationOrReflection: {
+				const s = Math.abs(pa * pd - pb * pc) / Math.max(0.0001, pa * pa + pc * pc);
+				const sa = pa / skeleton.scaleX;
+				const sc = pc / skeleton.scaleY;
 				pb = -sc * s * skeleton.scaleX;
 				pd = sa * s * skeleton.scaleY;
 				rotationIK += Math.atan2(sc, sa) * MathUtils.radDeg;
+			}
 			// Fall through
-			default:
-				let x = targetX - p.worldX, y = targetY - p.worldY;
-				let d = pa * pd - pb * pc;
+			default: {
+				const x = targetX - p.worldX, y = targetY - p.worldY;
+				const d = pa * pd - pb * pc;
 				if (Math.abs(d) <= 0.0001) {
 					tx = 0;
 					ty = 0;
@@ -144,6 +147,7 @@ export class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 					tx = (x * pd - y * pb) / d - bone.x;
 					ty = (y * pa - x * pc) / d - bone.y;
 				}
+			}
 		}
 		rotationIK += MathUtils.atan2Deg(ty, tx);
 		if (bone.scaleX < 0) rotationIK += 180;
@@ -174,7 +178,7 @@ export class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 	/** Applies 2 bone IK. The target is specified in the world coordinate system.
 	 * @param child A direct descendant of the parent bone. */
 	private static apply2 (skeleton: Skeleton, parent: BonePose, child: BonePose, targetX: number, targetY: number, bendDir: number, stretch: boolean, uniform: boolean, softness: number, mix: number) {
-		if (parent.inherit != Inherit.Normal || child.inherit != Inherit.Normal) return;
+		if (parent.inherit !== Inherit.Normal || child.inherit !== Inherit.Normal) return;
 		parent.modifyLocal(skeleton);
 		child.modifyLocal(skeleton);
 		let px = parent.x, py = parent.y, psx = parent.scaleX, psy = parent.scaleY, csx = child.scaleX;
@@ -197,7 +201,7 @@ export class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 		} else
 			os2 = 0;
 		let cwx = 0, cwy = 0, a = parent.a, b = parent.b, c = parent.c, d = parent.d;
-		let u = Math.abs(psx - psy) <= 0.0001;
+		const u = Math.abs(psx - psy) <= 0.0001;
 		if (!u || stretch) {
 			child.y = 0;
 			cwx = a * child.x + parent.worldX;
@@ -206,15 +210,16 @@ export class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 			cwx = a * child.x + b * child.y + parent.worldX;
 			cwy = c * child.x + d * child.y + parent.worldY;
 		}
-		let pp = parent.bone.parent!.applied;
+		// biome-ignore lint/style/noNonNullAssertion: reference-runtime
+		const pp = parent.bone.parent!.applied;
 		a = pp.a;
 		b = pp.b;
 		c = pp.c;
 		d = pp.d;
 		let id = a * d - b * c, x = cwx - pp.worldX, y = cwy - pp.worldY;
 		id = Math.abs(id) <= 0.0001 ? 0 : 1 / id;
-		let dx = (x * d - y * b) * id - px, dy = (y * a - x * c) * id - py;
-		let l1 = Math.sqrt(dx * dx + dy * dy), l2 = child.bone.data.length * csx, a1, a2;
+		const dx = (x * d - y * b) * id - px, dy = (y * a - x * c) * id - py;
+		let l1 = Math.sqrt(dx * dx + dy * dy), l2 = child.bone.data.length * csx, a1: number, a2: number;
 		if (l1 < 0.0001) {
 			IkConstraint.apply(skeleton, parent, targetX, targetY, false, stretch, false, mix);
 			child.rotation = 0;
@@ -224,9 +229,9 @@ export class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 		y = targetY - pp.worldY;
 		let tx = (x * d - y * b) * id - px, ty = (y * a - x * c) * id - py;
 		let dd = tx * tx + ty * ty;
-		if (softness != 0) {
+		if (softness !== 0) {
 			softness *= psx * (csx + 1) * 0.5;
-			let td = Math.sqrt(dd), sd = td - l1 - l2 * psx + softness;
+			const td = Math.sqrt(dd), sd = td - l1 - l2 * psx + softness;
 			if (sd > 0) {
 				let p = Math.min(1, sd / (softness * 2)) - 1;
 				p = (sd - softness * (1 - p * p)) / td;
@@ -235,6 +240,7 @@ export class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 				dd = tx * tx + ty * ty;
 			}
 		}
+		// biome-ignore lint/suspicious/noConfusingLabels: reference runtime
 		outer:
 		if (u) {
 			l2 *= psx;
@@ -258,16 +264,16 @@ export class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 		} else {
 			a = psx * l2;
 			b = psy * l2;
-			let aa = a * a, bb = b * b, ta = Math.atan2(ty, tx);
+			const aa = a * a, bb = b * b, ta = Math.atan2(ty, tx);
 			c = bb * l1 * l1 + aa * dd - aa * bb;
-			let c1 = -2 * bb * l1, c2 = bb - aa;
+			const c1 = -2 * bb * l1, c2 = bb - aa;
 			d = c1 * c1 - 4 * c2 * c;
 			if (d >= 0) {
 				let q = Math.sqrt(d);
 				if (c1 < 0) q = -q;
 				q = -(c1 + q) * 0.5;
 				let r0 = q / c2, r1 = c / q;
-				let r = Math.abs(r0) < Math.abs(r1) ? r0 : r1;
+				const r = Math.abs(r0) < Math.abs(r1) ? r0 : r1;
 				r0 = dd - r * r;
 				if (r0 >= 0) {
 					y = Math.sqrt(r0) * bendDir;
@@ -305,7 +311,7 @@ export class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 				a2 = maxAngle * bendDir;
 			}
 		}
-		let os = Math.atan2(child.y, child.x) * s2;
+		const os = Math.atan2(child.y, child.x) * s2;
 		a1 = (a1 - os) * MathUtils.radDeg + os1 - parent.rotation;
 		if (a1 > 180)
 			a1 -= 360;

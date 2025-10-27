@@ -27,15 +27,15 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Constraint } from "./Constraint.js";
-import { Pose } from "./Pose.js";
+import type { Constraint } from "./Constraint.js";
+import type { Pose } from "./Pose.js";
 import { PosedData } from "./PosedData.js";
-import { Skeleton } from "./Skeleton.js";
+import type { Skeleton } from "./Skeleton.js";
 
 /** The base class for all constraint datas. */
 export abstract class ConstraintData<
-	T extends Constraint<any, any, any>,
-	P extends Pose<any>>
+	T extends Constraint<T, ConstraintData<T, P>, P>,
+	P extends Pose<P>>
 	extends PosedData<P> {
 
 	constructor (name: string, setup: P) {

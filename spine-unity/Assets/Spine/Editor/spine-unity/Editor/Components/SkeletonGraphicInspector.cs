@@ -141,7 +141,7 @@ namespace Spine.Unity.Editor {
 						foreach (UnityEngine.Object target in targets) {
 							SkeletonGraphic skeletonGraphic = target as SkeletonGraphic;
 							if (skeletonGraphic == null) continue;
-							DetectMaterial(skeletonGraphic);
+							SkeletonGraphicUtility.DetectMaterial(skeletonGraphic);
 						}
 					}
 				}
@@ -165,7 +165,7 @@ namespace Spine.Unity.Editor {
 					foreach (UnityEngine.Object target in targets) {
 						SkeletonGraphic skeletonGraphic = target as SkeletonGraphic;
 						if (skeletonGraphic == null) continue;
-						DetectTintBlack(skeletonGraphic);
+						SkeletonGraphicUtility.DetectTintBlack(skeletonGraphic);
 					}
 				}
 			}
@@ -176,7 +176,7 @@ namespace Spine.Unity.Editor {
 					foreach (UnityEngine.Object target in targets) {
 						SkeletonGraphic skeletonGraphic = target as SkeletonGraphic;
 						if (skeletonGraphic == null) continue;
-						DetectCanvasGroupCompatible(skeletonGraphic);
+						SkeletonGraphicUtility.DetectCanvasGroupCompatible(skeletonGraphic);
 					}
 				}
 			}
@@ -187,7 +187,7 @@ namespace Spine.Unity.Editor {
 					foreach (UnityEngine.Object target in targets) {
 						SkeletonGraphic skeletonGraphic = target as SkeletonGraphic;
 						if (skeletonGraphic == null) continue;
-						DetectPMAVertexColors(skeletonGraphic);
+						SkeletonGraphicUtility.DetectPMAVertexColors(skeletonGraphic);
 					}
 				}
 			}
@@ -198,9 +198,9 @@ namespace Spine.Unity.Editor {
 					foreach (UnityEngine.Object target in targets) {
 						SkeletonGraphic skeletonGraphic = target as SkeletonGraphic;
 						if (skeletonGraphic == null) continue;
-						DetectTintBlack(skeletonGraphic);
-						DetectCanvasGroupCompatible(skeletonGraphic);
-						DetectPMAVertexColors(skeletonGraphic);
+						SkeletonGraphicUtility.DetectTintBlack(skeletonGraphic);
+						SkeletonGraphicUtility.DetectCanvasGroupCompatible(skeletonGraphic);
+						SkeletonGraphicUtility.DetectPMAVertexColors(skeletonGraphic);
 					}
 				}
 				if (GUILayout.Button("Detect Material", EditorStyles.miniButton, GUILayout.Width(100f))) {
@@ -208,7 +208,7 @@ namespace Spine.Unity.Editor {
 					foreach (UnityEngine.Object target in targets) {
 						SkeletonGraphic skeletonGraphic = target as SkeletonGraphic;
 						if (skeletonGraphic == null) continue;
-						DetectMaterial(skeletonGraphic);
+						SkeletonGraphicUtility.DetectMaterial(skeletonGraphic);
 					}
 				}
 			}
@@ -262,7 +262,7 @@ namespace Spine.Unity.Editor {
 								foreach (UnityEngine.Object target in targets) {
 									SkeletonGraphic skeletonGraphic = target as SkeletonGraphic;
 									if (skeletonGraphic == null) continue;
-									DetectBlendModeMaterials(skeletonGraphic);
+									SkeletonGraphicUtility.DetectBlendModeMaterials(skeletonGraphic);
 								}
 							}
 							EditorGUILayout.EndHorizontal();
@@ -283,7 +283,6 @@ namespace Spine.Unity.Editor {
 							EditorGUILayout.PropertyField(screenMaterial, SpineInspectorUtility.TempContent("Screen Material", null, "SkeletonGraphic Material for 'Screen' blend mode slots."));
 						}
 					}
-
 
 					// warning box
 					if (isSeparationEnabledButNotMultipleRenderers) {
@@ -371,158 +370,6 @@ namespace Spine.Unity.Editor {
 			SpineHandles.DrawPivotOffsetHandle(skeletonGraphic, Color.green);
 		}
 
-		#region Auto Detect Setting
-		static void DetectTintBlack (SkeletonGraphic skeletonGraphic) {
-			bool requiresTintBlack = HasTintBlackSlot(skeletonGraphic);
-			if (requiresTintBlack)
-				Debug.Log(string.Format("Found Tint-Black slot at '{0}'", skeletonGraphic));
-			else
-				Debug.Log(string.Format("No Tint-Black slot found at '{0}'", skeletonGraphic));
-			skeletonGraphic.MeshSettings.tintBlack = requiresTintBlack;
-		}
-
-		static bool HasTintBlackSlot (SkeletonGraphic skeletonGraphic) {
-			SlotData[] slotsItems = skeletonGraphic.SkeletonData.Slots.Items;
-			for (int i = 0, count = skeletonGraphic.SkeletonData.Slots.Count; i < count; ++i) {
-				SlotData slotData = slotsItems[i];
-				if (slotData.GetSetupPose().GetDarkColor().HasValue)
-					return true;
-			}
-			return false;
-		}
-
-		static void DetectCanvasGroupCompatible (SkeletonGraphic skeletonGraphic) {
-			bool requiresCanvasGroupCompatible = IsBelowCanvasGroup(skeletonGraphic);
-			if (requiresCanvasGroupCompatible)
-				Debug.Log(string.Format("Skeleton is a child of CanvasGroup: '{0}'", skeletonGraphic));
-			else
-				Debug.Log(string.Format("Skeleton is not a child of CanvasGroup: '{0}'", skeletonGraphic));
-			skeletonGraphic.MeshSettings.canvasGroupCompatible = requiresCanvasGroupCompatible;
-		}
-
-		static bool IsBelowCanvasGroup (SkeletonGraphic skeletonGraphic) {
-			return skeletonGraphic.gameObject.GetComponentInParent<CanvasGroup>() != null;
-		}
-
-		static void DetectPMAVertexColors (SkeletonGraphic skeletonGraphic) {
-			MeshGenerator.Settings settings = skeletonGraphic.MeshSettings;
-			bool usesSpineShader = MaterialChecks.UsesSpineShader(skeletonGraphic.material);
-			if (!usesSpineShader) {
-				Debug.Log(string.Format("Skeleton is not using a Spine shader, thus the shader is likely " +
-					"not using PMA vertex color: '{0}'", skeletonGraphic));
-				skeletonGraphic.MeshSettings.pmaVertexColors = false;
-				return;
-			}
-
-			bool requiresPMAVertexColorsDisabled = settings.canvasGroupCompatible && !settings.tintBlack;
-			if (requiresPMAVertexColorsDisabled) {
-				Debug.Log(string.Format("Skeleton requires PMA Vertex Colors disabled: '{0}'", skeletonGraphic));
-				skeletonGraphic.MeshSettings.pmaVertexColors = false;
-			} else {
-				Debug.Log(string.Format("Skeleton requires or permits PMA Vertex Colors enabled: '{0}'", skeletonGraphic));
-				skeletonGraphic.MeshSettings.pmaVertexColors = true;
-			}
-		}
-
-		static bool IsSkeletonTexturePMA (SkeletonGraphic skeletonGraphic, out bool detectionSucceeded) {
-			Texture texture = skeletonGraphic.mainTexture;
-			string texturePath = AssetDatabase.GetAssetPath(texture.GetInstanceID());
-			TextureImporter importer = (TextureImporter)TextureImporter.GetAtPath(texturePath);
-			if (importer.alphaIsTransparency != importer.sRGBTexture) {
-				Debug.LogWarning(string.Format("Texture '{0}' at skeleton '{1}' is neither configured correctly for " +
-					"PMA nor Straight Alpha.", texture, skeletonGraphic), texture);
-				detectionSucceeded = false;
-				return false;
-			}
-			detectionSucceeded = true;
-			bool isPMATexture = !importer.alphaIsTransparency && !importer.sRGBTexture;
-			return isPMATexture;
-		}
-
-		static void DetectMaterial (SkeletonGraphic skeletonGraphic) {
-			MeshGenerator.Settings settings = skeletonGraphic.MeshSettings;
-
-			bool detectionSucceeded;
-			bool usesPMATexture = IsSkeletonTexturePMA(skeletonGraphic, out detectionSucceeded);
-			if (!detectionSucceeded) {
-				Debug.LogWarning(string.Format("Unable to assign Material for skeleton '{0}'.", skeletonGraphic), skeletonGraphic);
-				return;
-			}
-
-			Material newMaterial = null;
-			if (usesPMATexture) {
-				if (settings.tintBlack) {
-					if (settings.canvasGroupCompatible)
-						newMaterial = MaterialWithName("SkeletonGraphicTintBlack-CanvasGroup");
-					else
-						newMaterial = MaterialWithName("SkeletonGraphicTintBlack");
-				} else { // not tintBlack
-					if (settings.canvasGroupCompatible)
-						newMaterial = MaterialWithName("SkeletonGraphicDefault-CanvasGroup");
-					else
-						newMaterial = MaterialWithName("SkeletonGraphicDefault");
-				}
-			} else { // straight alpha texture
-				if (settings.tintBlack) {
-					if (settings.canvasGroupCompatible)
-						newMaterial = MaterialWithName("SkeletonGraphicTintBlack-CanvasGroupStraight");
-					else
-						newMaterial = MaterialWithName("SkeletonGraphicTintBlack-Straight");
-				} else { // not tintBlack
-					if (settings.canvasGroupCompatible)
-						newMaterial = MaterialWithName("SkeletonGraphicDefault-CanvasGroupStraight");
-					else
-						newMaterial = MaterialWithName("SkeletonGraphicDefault-Straight");
-				}
-			}
-			if (newMaterial != null) {
-				Debug.Log(string.Format("Assigning material '{0}' at skeleton '{1}'",
-					newMaterial, skeletonGraphic), newMaterial);
-				skeletonGraphic.material = newMaterial;
-			}
-		}
-
-		static void DetectBlendModeMaterials (SkeletonGraphic skeletonGraphic) {
-			bool detectionSucceeded;
-			bool usesPMATexture = IsSkeletonTexturePMA(skeletonGraphic, out detectionSucceeded);
-			if (!detectionSucceeded) {
-				Debug.LogWarning(string.Format("Unable to assign Blend Mode materials for skeleton '{0}'.", skeletonGraphic), skeletonGraphic);
-				return;
-			}
-			DetectBlendModeMaterial(skeletonGraphic, BlendMode.Additive, usesPMATexture);
-			DetectBlendModeMaterial(skeletonGraphic, BlendMode.Multiply, usesPMATexture);
-			DetectBlendModeMaterial(skeletonGraphic, BlendMode.Screen, usesPMATexture);
-		}
-
-		static void DetectBlendModeMaterial (SkeletonGraphic skeletonGraphic, BlendMode blendMode, bool usesPMATexture) {
-			MeshGenerator.Settings settings = skeletonGraphic.MeshSettings;
-
-			string optionalTintBlack = settings.tintBlack ? "TintBlack" : "";
-			string blendModeString = blendMode.ToString();
-			string optionalDash = settings.canvasGroupCompatible || !usesPMATexture ? "-" : "";
-			string optionalCanvasGroup = settings.canvasGroupCompatible ? "CanvasGroup" : "";
-			string optionalStraight = !usesPMATexture ? "Straight" : "";
-
-			string materialName = string.Format("SkeletonGraphic{0}{1}{2}{3}{4}",
-				optionalTintBlack, blendModeString, optionalDash, optionalCanvasGroup, optionalStraight);
-			Material newMaterial = MaterialWithName(materialName);
-
-			if (newMaterial != null) {
-				switch (blendMode) {
-				case BlendMode.Additive:
-					skeletonGraphic.additiveMaterial = newMaterial;
-					break;
-				case BlendMode.Multiply:
-					skeletonGraphic.multiplyMaterial = newMaterial;
-					break;
-				case BlendMode.Screen:
-					skeletonGraphic.screenMaterial = newMaterial;
-					break;
-				}
-			}
-		}
-		#endregion
-
 		#region Menus
 		[MenuItem("CONTEXT/SkeletonGraphic/Match RectTransform with Mesh Bounds")]
 		static void MatchRectTransformWithBounds (MenuCommand command) {
@@ -599,10 +446,10 @@ namespace Spine.Unity.Editor {
 				EditorInstantiation.AddComponent(go, true, animationComponentType);
 
 			SkeletonGraphic graphic = go.GetComponent<SkeletonGraphic>();
-			graphic.material = SkeletonGraphicInspector.DefaultSkeletonGraphicMaterial;
-			graphic.additiveMaterial = SkeletonGraphicInspector.DefaultSkeletonGraphicAdditiveMaterial;
-			graphic.multiplyMaterial = SkeletonGraphicInspector.DefaultSkeletonGraphicMultiplyMaterial;
-			graphic.screenMaterial = SkeletonGraphicInspector.DefaultSkeletonGraphicScreenMaterial;
+			graphic.material = SkeletonGraphicUtility.DefaultSkeletonGraphicMaterial;
+			graphic.additiveMaterial = SkeletonGraphicUtility.DefaultSkeletonGraphicAdditiveMaterial;
+			graphic.multiplyMaterial = SkeletonGraphicUtility.DefaultSkeletonGraphicMultiplyMaterial;
+			graphic.screenMaterial = SkeletonGraphicUtility.DefaultSkeletonGraphicScreenMaterial;
 
 #if HAS_CULL_TRANSPARENT_MESH
 			CanvasRenderer canvasRenderer = go.GetComponent<CanvasRenderer>();
@@ -610,62 +457,6 @@ namespace Spine.Unity.Editor {
 #endif
 			return go;
 		}
-
-		public static Material DefaultSkeletonGraphicMaterial {
-			get {
-				return MaterialWithName(SpineEditorUtilities.Preferences.UsesPMAWorkflow ?
-					"SkeletonGraphicDefault" :
-					"SkeletonGraphicDefault-Straight");
-			}
-		}
-
-		public static Material DefaultSkeletonGraphicAdditiveMaterial {
-			get {
-				return MaterialWithName(SpineEditorUtilities.Preferences.UsesPMAWorkflow ?
-					"SkeletonGraphicAdditive" :
-					"SkeletonGraphicAdditive-Straight");
-			}
-		}
-
-		public static Material DefaultSkeletonGraphicMultiplyMaterial {
-			get {
-				return MaterialWithName(SpineEditorUtilities.Preferences.UsesPMAWorkflow ?
-					"SkeletonGraphicMultiply" :
-					"SkeletonGraphicMultiply-Straight");
-			}
-		}
-
-		public static Material DefaultSkeletonGraphicScreenMaterial {
-			get {
-				return MaterialWithName(SpineEditorUtilities.Preferences.UsesPMAWorkflow ?
-					"SkeletonGraphicScreen" :
-					"SkeletonGraphicScreen-Straight");
-			}
-		}
-
-		protected static Material MaterialWithName (string name) {
-			string[] guids = AssetDatabase.FindAssets(name + " t:material");
-			if (guids.Length <= 0) return null;
-
-			int closestNameDistance = int.MaxValue;
-			int closestNameIndex = 0;
-			for (int i = 0; i < guids.Length; ++i) {
-				string assetPath = AssetDatabase.GUIDToAssetPath(guids[i]);
-				string assetName = System.IO.Path.GetFileNameWithoutExtension(assetPath);
-				int distance = string.CompareOrdinal(assetName, name);
-				if (distance < closestNameDistance) {
-					closestNameDistance = distance;
-					closestNameIndex = i;
-				}
-			}
-
-			string foundAssetPath = AssetDatabase.GUIDToAssetPath(guids[closestNameIndex]);
-			if (string.IsNullOrEmpty(foundAssetPath)) return null;
-
-			Material firstMaterial = AssetDatabase.LoadAssetAtPath<Material>(foundAssetPath);
-			return firstMaterial;
-		}
-
 		#endregion
 	}
 }

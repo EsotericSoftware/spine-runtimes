@@ -12,8 +12,12 @@
 #define SKELETONLIT_RECEIVE_SHADOWS
 #endif
 
-#if !defined(DYNAMICLIGHTMAP_ON) && !defined(LIGHTMAP_ON) && (defined(PROBE_VOLUMES_L1) || defined(PROBE_VOLUMES_L2))
+#if !defined(DYNAMICLIGHTMAP_ON) && !defined(LIGHTMAP_ON) && (defined(PROBE_VOLUMES_L1) || defined(PROBE_VOLUMES_L2)) && defined(__PROBEVOLUME_HLSL__)
 #define USE_ADAPTIVE_PROBE_VOLUMES
+#endif
+
+#if !(defined(FOG_LINEAR) || defined(FOG_EXP) || defined(FOG_EXP2))
+#undef _FOG
 #endif
 
 struct appdata {
@@ -30,7 +34,11 @@ struct appdata {
 
 struct VertexOutput {
 	half4 color : COLOR0;
+#if defined(_FOG)
+	float3 uv0AndFog : TEXCOORD0;
+#else
 	float2 uv0 : TEXCOORD0;
+#endif
 	float4 pos : SV_POSITION;
 
 #if defined(SKELETONLIT_RECEIVE_SHADOWS)
@@ -49,6 +57,13 @@ struct VertexOutput {
 #endif
 	UNITY_VERTEX_OUTPUT_STEREO
 };
+
+#if defined(_FOG)
+#define PackedUV0(i) i.uv0AndFog.xy
+#define PackedFog(i) i.uv0AndFog.z
+#else
+#define PackedUV0(i) i.uv0.xy
+#endif
 
 half3 ProcessLight(float3 positionWS, half3 normalWS, uint meshRenderingLayers, int lightIndex)
 {
@@ -116,8 +131,13 @@ VertexOutput vert(appdata v) {
 	float3 positionWS = TransformObjectToWorld(v.pos);
 	half3 fixedNormal = half3(0, 0, -1);
 	half3 normalWS = normalize(mul((float3x3)unity_ObjectToWorld, fixedNormal));
-	o.uv0 = v.uv0;
+
 	o.pos = TransformWorldToHClip(positionWS);
+#if defined(_FOG)
+	half fogFactor = ComputeFogFactor(o.pos.z);
+	PackedFog(o) = fogFactor;
+#endif
+	PackedUV0(o) = v.uv0;
 
 #ifdef _DOUBLE_SIDED_LIGHTING
 	// unfortunately we have to compute the sign here in the vertex shader
@@ -207,7 +227,7 @@ half4 frag(VertexOutput i
 #endif
 ) : SV_Target0
 {
-	half4 tex = tex2D(_MainTex, i.uv0);
+	half4 tex = tex2D(_MainTex, PackedUV0(i));
 #if !defined(_TINT_BLACK_ON) && defined(_STRAIGHT_ALPHA_INPUT)
 	tex.rgb *= tex.a;
 #endif
@@ -254,12 +274,17 @@ half4 frag(VertexOutput i
 	uint renderingLayers = GetMeshRenderingLayerBackwardsCompatible();
 	outRenderingLayers = float4(EncodeMeshRenderingLayer(renderingLayers), 0, 0, 0);
 #endif
-
+	
 #if defined(_TINT_BLACK_ON)
-	return fragTintedColor(tex, i.darkColor, i.color, _Color.a, _Black.a);
+	half4 pixel = fragTintedColor(tex, i.darkColor, i.color, _Color.a, _Black.a);
 #else
-	return tex * i.color;
+	half4 pixel = tex * i.color;
 #endif
+
+#if defined(_FOG)
+	pixel.rgb = MixFogColor(pixel.rgb, unity_FogColor.rgb * pixel.a, PackedFog(i));
+#endif
+	return pixel;
 }
 
 #endif

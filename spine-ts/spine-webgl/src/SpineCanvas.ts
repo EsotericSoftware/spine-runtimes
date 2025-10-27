@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { TimeKeeper, AssetManager, ManagedWebGLRenderingContext, SceneRenderer, Input, StringMap } from "./index.js";
+import { AssetManager, Input, ManagedWebGLRenderingContext, SceneRenderer, type StringMap, TimeKeeper } from "./index.js";
 
 /** An app running inside a {@link SpineCanvas}. The app life-cycle
  * is as follows:
@@ -55,7 +55,7 @@ export interface SpineCanvasConfig {
 	/* The path prefix to be used by the {@link AssetManager}. */
 	pathPrefix?: string;
 	/* The WebGL context configuration */
-	webglConfig?: any;
+	webglConfig?: WebGLContextAttributes;
 }
 
 /** Manages the life-cycle and WebGL context of a {@link SpineCanvasApp}. The app loads
@@ -100,7 +100,7 @@ export class SpineCanvas {
 
 		if (config.app.loadAssets) config.app.loadAssets(this);
 
-		let loop = () => {
+		const loop = () => {
 			if (this.disposed) return;
 			requestAnimationFrame(loop);
 			this.time.update();
@@ -108,7 +108,7 @@ export class SpineCanvas {
 			if (config.app.render) config.app.render(this);
 		}
 
-		let waitForAssets = () => {
+		const waitForAssets = () => {
 			if (this.disposed) return;
 			if (this.assetManager.isLoadingComplete()) {
 				if (this.assetManager.hasErrors()) {

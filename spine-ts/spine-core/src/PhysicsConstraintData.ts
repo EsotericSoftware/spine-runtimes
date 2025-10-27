@@ -27,11 +27,11 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { BoneData } from "./BoneData.js";
+import type { BoneData } from "./BoneData.js";
 import { ConstraintData } from "./ConstraintData.js";
 import { PhysicsConstraint } from "./PhysicsConstraint.js";
 import { PhysicsConstraintPose } from "./PhysicsConstraintPose.js";
-import { Skeleton } from "./Skeleton.js";
+import type { Skeleton } from "./Skeleton.js";
 
 
 /** Stores the setup pose for a {@link PhysicsConstraint}.

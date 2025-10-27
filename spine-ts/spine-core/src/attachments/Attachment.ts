@@ -27,9 +27,9 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Skeleton } from "src/Skeleton.js";
-import { Slot } from "../Slot.js";
-import { NumberArrayLike, Utils } from "../Utils.js";
+import type { Skeleton } from "src/Skeleton.js";
+import type { Slot } from "../Slot.js";
+import { type NumberArrayLike, Utils } from "../Utils.js";
 
 /** The base class for all attachments. */
 export abstract class Attachment {
@@ -88,17 +88,17 @@ export abstract class VertexAttachment extends Attachment {
 		stride: number) {
 
 		count = offset + (count >> 1) * stride;
-		let deformArray = slot.applied.deform;
+		const deformArray = slot.applied.deform;
 		let vertices = this.vertices;
-		let bones = this.bones;
+		const bones = this.bones;
 		if (!bones) {
 			if (deformArray.length > 0) vertices = deformArray;
-			let bone = slot.bone.applied;
-			let x = bone.worldX;
-			let y = bone.worldY;
-			let a = bone.a, b = bone.b, c = bone.c, d = bone.d;
+			const bone = slot.bone.applied;
+			const x = bone.worldX;
+			const y = bone.worldY;
+			const a = bone.a, b = bone.b, c = bone.c, d = bone.d;
 			for (let v = start, w = offset; w < count; v += 2, w += stride) {
-				let vx = vertices[v], vy = vertices[v + 1];
+				const vx = vertices[v], vy = vertices[v + 1];
 				worldVertices[w] = vx * a + vy * b + x;
 				worldVertices[w + 1] = vx * c + vy * d + y;
 			}
@@ -106,19 +106,19 @@ export abstract class VertexAttachment extends Attachment {
 		}
 		let v = 0, skip = 0;
 		for (let i = 0; i < start; i += 2) {
-			let n = bones[v];
+			const n = bones[v];
 			v += n + 1;
 			skip += n;
 		}
-		let skeletonBones = skeleton.bones;
-		if (deformArray.length == 0) {
+		const skeletonBones = skeleton.bones;
+		if (deformArray.length === 0) {
 			for (let w = offset, b = skip * 3; w < count; w += stride) {
 				let wx = 0, wy = 0;
 				let n = bones[v++];
 				n += v;
 				for (; v < n; v++, b += 3) {
-					let bone = skeletonBones[bones[v]].applied;
-					let vx = vertices[b], vy = vertices[b + 1], weight = vertices[b + 2];
+					const bone = skeletonBones[bones[v]].applied;
+					const vx = vertices[b], vy = vertices[b + 1], weight = vertices[b + 2];
 					wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
 					wy += (vx * bone.c + vy * bone.d + bone.worldY) * weight;
 				}
@@ -126,14 +126,14 @@ export abstract class VertexAttachment extends Attachment {
 				worldVertices[w + 1] = wy;
 			}
 		} else {
-			let deform = deformArray;
+			const deform = deformArray;
 			for (let w = offset, b = skip * 3, f = skip << 1; w < count; w += stride) {
 				let wx = 0, wy = 0;
 				let n = bones[v++];
 				n += v;
 				for (; v < n; v++, b += 3, f += 2) {
-					let bone = skeletonBones[bones[v]].applied;
-					let vx = vertices[b] + deform[f], vy = vertices[b + 1] + deform[f + 1], weight = vertices[b + 2];
+					const bone = skeletonBones[bones[v]].applied;
+					const vx = vertices[b] + deform[f], vy = vertices[b + 1] + deform[f + 1], weight = vertices[b + 2];
 					wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
 					wy += (vx * bone.c + vy * bone.d + bone.worldY) * weight;
 				}

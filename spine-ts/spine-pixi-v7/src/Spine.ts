@@ -247,7 +247,8 @@ export class SkinsAndAnimationBoundsProvider
 
 /**
  * The class to instantiate a {@link Spine} game object in Pixi.
- * The static method {@link Spine.from} should be used to instantiate a Spine game object.
+ * Create and customize the default configuration using the static method {@link Spine.createOptions},
+ * then pass it to the constructor.
  */
 export class Spine extends Container {
 	/** The skeleton for this Spine game object. */
@@ -328,29 +329,25 @@ export class Spine extends Container {
 	private _boundsSpineID = -1;
 	private _boundsSpineDirty = true;
 
-	constructor (options: SpineOptions | SkeletonData) {
-		if (options instanceof SkeletonData) {
-			options = {
-				skeletonData: options,
-			};
-		}
-
+	constructor (options: SkeletonData | SpineOptions | SpineFromOptions) {
 		super();
 
-		const skeletonData = options instanceof SkeletonData ? options : options.skeletonData;
+		if (options instanceof SkeletonData)
+			options = { skeletonData: options };
+		else if ("skeleton" in options)
+			options = new.target.createOptions(options);
 
+		const { autoUpdate = true, boundsProvider, darkTint, skeletonData } = options;
 		this.skeleton = new Skeleton(skeletonData);
-		const animData = new AnimationStateData(skeletonData);
-		this.state = new AnimationState(animData);
-		this.autoUpdate = options?.autoUpdate ?? true;
+		this.state = new AnimationState(new AnimationStateData(skeletonData));
+		this.autoUpdate = autoUpdate;
+		this.boundsProvider = boundsProvider;
 
 		// dark tint can be enabled by options, otherwise is enable if at least one slot has tint black
-		this.darkTint = options?.darkTint === undefined
+		this.darkTint = darkTint === undefined
 			? this.skeleton.slots.some(slot => !!slot.data.setup.darkColor)
-			: options?.darkTint;
+			: darkTint;
 		if (this.darkTint) this.slotMeshFactory = () => new DarkSlotMesh();
-
-		this.boundsProvider = options.boundsProvider;
 	}
 
 	/** If {@link Spine.autoUpdate} is `false`, this method allows to update the AnimationState and the Skeleton with the given delta. */
@@ -861,7 +858,7 @@ export class Spine extends Container {
 	public static readonly skeletonCache: Record<string, SkeletonData> = Object.create(null);
 
 	/**
-	 * Use this method to instantiate a Spine game object.
+	 * Get a convenient initialization configuration for your Spine game object.
 	 * Before instantiating a Spine game object, the skeleton (`.skel` or `.json`) and the atlas text files must be loaded into the Assets. For example:
 	 * ```
 	 * PIXI.Assets.add("sackData", "/assets/sack-pro.skel");
@@ -872,9 +869,9 @@ export class Spine extends Container {
 	 * `${skeletonAssetName}-${atlasAssetName}-${options?.scale ?? 1}`
 	 *
 	 * @param options - Options to configure the Spine game object. See {@link SpineFromOptions}
-	 * @returns {Spine} The Spine game object instantiated
+	 * @returns {SpineOptions} The configuration ready to be passed to the Spine constructor
 	 */
-	public static from ({ skeleton, atlas, scale = 1, darkTint, autoUpdate = true, boundsProvider, allowMissingRegions }: SpineFromOptions) {
+	public static createOptions ({ skeleton, atlas, scale = 1, darkTint, autoUpdate = true, boundsProvider, allowMissingRegions }: SpineFromOptions): SpineOptions {
 		const cacheKey = `${skeleton}-${atlas}-${scale}`;
 
 		let skeletonData = Spine.skeletonCache[cacheKey];
@@ -888,7 +885,25 @@ export class Spine extends Container {
 			skeletonData = parser.readSkeletonData(skeletonAsset);
 			Spine.skeletonCache[cacheKey] = skeletonData;
 		}
-		return new Spine({ skeletonData, darkTint, autoUpdate, boundsProvider });
+		return { skeletonData, darkTint, autoUpdate, boundsProvider };
+	}
+
+	/**
+	 * @deprecated Use directly the Spine constructor or {@link createOptions} to make options and customize it to pass to the constructor
+	 * Before instantiating a Spine game object, the skeleton (`.skel` or `.json`) and the atlas text files must be loaded into the Assets. For example:
+	 * ```
+	 * PIXI.Assets.add("sackData", "/assets/sack-pro.skel");
+	 * PIXI.Assets.add("sackAtlas", "/assets/sack-pma.atlas");
+	 * await PIXI.Assets.load(["sackData", "sackAtlas"]);
+	 * ```
+	 * Once a Spine game object is created, its skeleton data is cached into {@link Spine.skeletonCache} using the key:
+	 * `${skeletonAssetName}-${atlasAssetName}-${options?.scale ?? 1}`
+	 *
+	 * @param options - Options to configure the Spine game object. See {@link SpineFromOptions}
+	 * @returns {Spine} The Spine game object instantiated
+	 */
+	public static from (options: SpineFromOptions) {
+		return new Spine(Spine.createOptions(options));
 	}
 
 	public get tint (): number {

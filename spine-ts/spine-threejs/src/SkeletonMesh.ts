@@ -27,27 +27,27 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import * as THREE from "three";
 import {
 	AnimationState,
 	AnimationStateData,
 	ClippingAttachment,
 	Color,
 	MeshAttachment,
-	NumberArrayLike,
+	type NumberArrayLike,
 	Physics,
 	RegionAttachment,
 	Skeleton,
-	SkeletonClipping,
-	SkeletonData,
 	SkeletonBinary,
+	SkeletonClipping,
+	type SkeletonData,
 	SkeletonJson,
 	Utils,
 	Vector2,
 } from "@esotericsoftware/spine-core";
+import * as THREE from "three";
 
-import { MaterialWithMap, MeshBatcher } from "./MeshBatcher.js";
-import { ThreeJsTexture } from "./ThreeJsTexture.js";
+import { type MaterialWithMap, MeshBatcher } from "./MeshBatcher.js";
+import type { ThreeJsTexture } from "./ThreeJsTexture.js";
 
 type SkeletonMeshMaterialParametersCustomizer = (materialParameters: THREE.MaterialParameters) => void;
 type SkeletonMeshConfiguration = {
@@ -93,7 +93,7 @@ export class SkeletonMesh extends THREE.Object3D {
 	state: AnimationState;
 	zOffset: number = 0.1;
 
-	private batches = new Array<MeshBatcher>();
+	private batches = [] as MeshBatcher[];
 	private materialFactory: (parameters: THREE.MaterialParameters) => MaterialWithMap;
 	private nextBatchIndex = 0;
 	private clipper: SkeletonClipping = new SkeletonClipping();
@@ -148,7 +148,7 @@ export class SkeletonMesh extends THREE.Object3D {
 
 		this.materialFactory = skeletonDataOrConfiguration.materialFactory ?? (() => new THREE.MeshBasicMaterial(SkeletonMesh.DEFAULT_MATERIAL_PARAMETERS));
 		this.skeleton = new Skeleton(skeletonDataOrConfiguration.skeletonData);
-		let animData = new AnimationStateData(skeletonDataOrConfiguration.skeletonData);
+		const animData = new AnimationStateData(skeletonDataOrConfiguration.skeletonData);
 		this.state = new AnimationState(animData);
 
 		Object.defineProperty(this, 'castShadow', {
@@ -178,8 +178,8 @@ export class SkeletonMesh extends THREE.Object3D {
 	}
 
 	update (deltaTime: number) {
-		let state = this.state;
-		let skeleton = this.skeleton;
+		const state = this.state;
+		const skeleton = this.skeleton;
 
 		state.update(deltaTime);
 		state.apply(skeleton);
@@ -190,13 +190,13 @@ export class SkeletonMesh extends THREE.Object3D {
 	}
 
 	dispose () {
-		for (var i = 0; i < this.batches.length; i++) {
+		for (let i = 0; i < this.batches.length; i++) {
 			this.batches[i].dispose();
 		}
 	}
 
 	private clearBatches () {
-		for (var i = 0; i < this.batches.length; i++) {
+		for (let i = 0; i < this.batches.length; i++) {
 			this.batches[i].clear();
 			this.batches[i].visible = false;
 		}
@@ -204,14 +204,14 @@ export class SkeletonMesh extends THREE.Object3D {
 	}
 
 	private nextBatch () {
-		if (this.batches.length == this.nextBatchIndex) {
-			let batch = new MeshBatcher(MeshBatcher.MAX_VERTICES, this.materialFactory, this.twoColorTint);
+		if (this.batches.length === this.nextBatchIndex) {
+			const batch = new MeshBatcher(MeshBatcher.MAX_VERTICES, this.materialFactory, this.twoColorTint);
 			batch.castShadow = this._castShadow;
 			batch.receiveShadow = this._receiveShadow;
 			this.add(batch);
 			this.batches.push(batch);
 		}
-		let batch = this.batches[this.nextBatchIndex++];
+		const batch = this.batches[this.nextBatchIndex++];
 		batch.visible = true;
 		return batch;
 	}
@@ -219,26 +219,26 @@ export class SkeletonMesh extends THREE.Object3D {
 	private updateGeometry () {
 		this.clearBatches();
 
-		let clipper = this.clipper;
+		const clipper = this.clipper;
 
 		let vertices: NumberArrayLike = this.vertices;
 		let triangles: Array<number> | null = null;
 		let uvs: NumberArrayLike | null = null;
 		const skeleton = this.skeleton;
-		let drawOrder = skeleton.drawOrder;
+		const drawOrder = skeleton.drawOrder;
 		let batch = this.nextBatch();
 		batch.begin();
 		let z = 0;
-		let zOffset = this.zOffset;
-		let vertexSize = this.vertexSize;
+		const zOffset = this.zOffset;
+		const vertexSize = this.vertexSize;
 		for (let i = 0, n = drawOrder.length; i < n; i++) {
-			let slot = drawOrder[i];
+			const slot = drawOrder[i];
 			if (!slot.bone.active) {
 				clipper.clipEnd(slot);
 				continue;
 			}
-			let pose = slot.applied;
-			let attachment = pose.attachment;
+			const pose = slot.applied;
+			const attachment = pose.attachment;
 			let attachmentColor: Color | null;
 			let texture: ThreeJsTexture | null;
 			let numFloats = 0;
@@ -249,7 +249,7 @@ export class SkeletonMesh extends THREE.Object3D {
 				attachment.computeWorldVertices(slot, vertices, 0, vertexSize);
 				triangles = SkeletonMesh.QUAD_TRIANGLES;
 				uvs = attachment.uvs;
-				texture = <ThreeJsTexture>attachment.region!.texture;
+				texture = <ThreeJsTexture>attachment.region?.texture;
 			} else if (attachment instanceof MeshAttachment) {
 				attachmentColor = attachment.color;
 				vertices = this.vertices;
@@ -268,7 +268,7 @@ export class SkeletonMesh extends THREE.Object3D {
 				);
 				triangles = attachment.triangles;
 				uvs = attachment.uvs;
-				texture = <ThreeJsTexture>attachment.region!.texture;
+				texture = <ThreeJsTexture>attachment.region?.texture;
 			} else if (attachment instanceof ClippingAttachment) {
 				clipper.clipEnd(slot);
 				clipper.clipStart(skeleton, slot, attachment);
@@ -279,10 +279,10 @@ export class SkeletonMesh extends THREE.Object3D {
 			}
 
 			if (texture != null) {
-				let skeletonColor = skeleton.color;
-				let slotColor = pose.color;
-				let alpha = skeletonColor.a * slotColor.a * attachmentColor.a;
-				let color = this.tempColor;
+				const skeletonColor = skeleton.color;
+				const slotColor = pose.color;
+				const alpha = skeletonColor.a * slotColor.a * attachmentColor.a;
+				const color = this.tempColor;
 				color.set(
 					skeletonColor.r * slotColor.r * attachmentColor.r * alpha,
 					skeletonColor.g * slotColor.g * attachmentColor.g * alpha,
@@ -290,7 +290,7 @@ export class SkeletonMesh extends THREE.Object3D {
 					alpha
 				);
 
-				let darkColor = this.tempDarkColor;
+				const darkColor = this.tempDarkColor;
 				if (!pose.darkColor)
 					darkColor.set(0, 0, 0, 1);
 				else {
@@ -306,14 +306,14 @@ export class SkeletonMesh extends THREE.Object3D {
 				let finalIndicesLength: number;
 
 				if (clipper.isClipping() && clipper.clipTriangles(vertices, triangles, triangles.length, uvs, color, darkColor, this.twoColorTint, vertexSize)) {
-					let clippedVertices = clipper.clippedVertices;
-					let clippedTriangles = clipper.clippedTriangles;
+					const clippedVertices = clipper.clippedVertices;
+					const clippedTriangles = clipper.clippedTriangles;
 					finalVertices = clippedVertices;
 					finalVerticesLength = clippedVertices.length;
 					finalIndices = clippedTriangles;
 					finalIndicesLength = clippedTriangles.length;
 				} else {
-					let verts = vertices;
+					const verts = vertices;
 					if (!this.twoColorTint) {
 						for (let v = 2, u = 0, n = numFloats; v < n; v += vertexSize, u += 2) {
 							verts[v] = color.r;
@@ -344,7 +344,7 @@ export class SkeletonMesh extends THREE.Object3D {
 					finalIndicesLength = triangles.length;
 				}
 
-				if (finalVerticesLength == 0 || finalIndicesLength == 0) {
+				if (finalVerticesLength === 0 || finalIndicesLength === 0) {
 					clipper.clipEnd(slot);
 					continue;
 				}
