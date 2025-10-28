@@ -306,7 +306,7 @@ namespace Spine.Unity {
 			int skeletonEnd = skeletons.Count;
 
 			int endIndexThreaded = Math.Min(skeletonEnd, rangePerThread * numAsyncThreads);
-			MainThreadBeforeUpdate(skeletons, endIndexThreaded);
+			MainThreadBeforeUpdate(skeletons, skeletonEnd);
 
 #if RUN_ALL_ON_MAIN_THREAD
 			for (int r = 0; r < skeletons.Count; ++r) {
@@ -320,7 +320,7 @@ namespace Spine.Unity {
 				UpdateAsyncSplitMainThreadCallbacks(skeletons, updateTiming,
 					numAsyncThreads, rangePerThread, skeletonEnd, endIndexThreaded);
 #endif
-			MainThreadAfterUpdate(skeletons, endIndexThreaded);
+			MainThreadAfterUpdate(skeletons, skeletonEnd);
 		}
 
 		protected void UpdateAsyncThreadedCallbacks (List<SkeletonAnimationBase> skeletons, UpdateTiming timing,
@@ -435,14 +435,14 @@ namespace Spine.Unity {
 			}
 		}
 
-		protected void MainThreadBeforeUpdate (List<SkeletonAnimationBase> skeletons, int endIndexThreaded) {
-			for (int i = 0; i < endIndexThreaded; ++i) {
+		protected void MainThreadBeforeUpdate (List<SkeletonAnimationBase> skeletons, int skeletonEnd) {
+			for (int i = 0; i < skeletonEnd; ++i) {
 				skeletons[i].MainThreadBeforeUpdateInternal();
 			}
 		}
 
-		protected void MainThreadAfterUpdate (List<SkeletonAnimationBase> skeletons, int endIndexThreaded) {
-			for (int i = 0; i < endIndexThreaded; ++i) {
+		protected void MainThreadAfterUpdate (List<SkeletonAnimationBase> skeletons, int skeletonEnd) {
+			for (int i = 0; i < skeletonEnd; ++i) {
 				skeletons[i].MainThreadAfterUpdateInternal();
 			}
 		}
@@ -720,7 +720,7 @@ namespace Spine.Unity {
 #endif
 			for (int r = start; r < end; ++r) {
 				try {
-					var targetSkeletonAnimation = skeletonAnimations[r];
+					SkeletonAnimationBase targetSkeletonAnimation = skeletonAnimations[r];
 					if (!splitUpdateMethod[r].IsDone) {
 						splitUpdateMethod[r] = targetSkeletonAnimation.UpdateInternalSplit(splitUpdateMethod[r], deltaTime, frameCount);
 					}
@@ -741,7 +741,7 @@ namespace Spine.Unity {
 
 			for (int r = 0; r < endIndexThreaded; ++r) {
 				try {
-					var targetSkeletonAnimation = skeletons[r];
+					SkeletonAnimationBase targetSkeletonAnimation = skeletons[r];
 					if (splitUpdateMethod[r].IsInitialState) {
 						Debug.LogError("Internal threading logic error: skeletonAnimations never called UpdateInternal before!", skeletons[r]);
 					} else {

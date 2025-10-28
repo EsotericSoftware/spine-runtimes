@@ -39,6 +39,9 @@
 #define HAS_ON_POSTPROCESS_PREFAB
 #endif
 
+#if UNITY_2020_3_16_OR_NEWER || UNITY_2021_1_17_OR_NEWER
+#define HAS_SAVE_ASSET_IF_DIRTY
+#endif
 #define SPINE_OPTIONAL_ON_DEMAND_LOADING
 
 using System.Collections.Generic;
@@ -64,7 +67,8 @@ namespace Spine.Unity.Editor {
 		internal static void PreprocessBuild () {
 			isBuilding = true;
 #if HAS_ON_POSTPROCESS_PREFAB
-			PreprocessSpinePrefabMeshes();
+			if (SpineEditorUtilities.Preferences.removePrefabPreviewMeshes)
+				PreprocessSpinePrefabMeshes();
 #endif
 #if SPINE_OPTIONAL_ON_DEMAND_LOADING
 			PreprocessOnDemandTextureLoaders();
@@ -75,7 +79,8 @@ namespace Spine.Unity.Editor {
 		internal static void PostprocessBuild () {
 			isBuilding = false;
 #if HAS_ON_POSTPROCESS_PREFAB
-			PostprocessSpinePrefabMeshes();
+			if (SpineEditorUtilities.Preferences.removePrefabPreviewMeshes)
+				PostprocessSpinePrefabMeshes();
 #endif
 #if SPINE_OPTIONAL_ON_DEMAND_LOADING
 			PostprocessOnDemandTextureLoaders();
@@ -96,13 +101,17 @@ namespace Spine.Unity.Editor {
 
 					GameObject prefabGameObject = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
 					if (SpineEditorUtilities.CleanupSpinePrefabMesh(prefabGameObject)) {
+#if HAS_SAVE_ASSET_IF_DIRTY
+						AssetDatabase.SaveAssetIfDirty(prefabGameObject);
+#endif
 						prefabsToRestore.Add(assetPath);
 					}
-					EditorUtility.UnloadUnusedAssetsImmediate();
 				}
 				AssetDatabase.StopAssetEditing();
+#if !HAS_SAVE_ASSET_IF_DIRTY
 				if (prefabAssets.Length > 0)
 					AssetDatabase.SaveAssets();
+#endif
 			} finally {
 				BuildUtilities.IsInSkeletonAssetBuildPreProcessing = false;
 			}
@@ -114,9 +123,14 @@ namespace Spine.Unity.Editor {
 				foreach (string assetPath in prefabsToRestore) {
 					GameObject g = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
 					SpineEditorUtilities.SetupSpinePrefabMesh(g, null);
+#if HAS_SAVE_ASSET_IF_DIRTY
+					AssetDatabase.SaveAssetIfDirty(g);
+#endif
 				}
+#if !HAS_SAVE_ASSET_IF_DIRTY
 				if (prefabsToRestore.Count > 0)
 					AssetDatabase.SaveAssets();
+#endif
 				prefabsToRestore.Clear();
 
 			} finally {
@@ -149,7 +163,6 @@ namespace Spine.Unity.Editor {
 #endif
 					}
 				}
-				EditorUtility.UnloadUnusedAssetsImmediate();
 				AssetDatabase.StopAssetEditing();
 #if !HAS_SAVE_ASSET_IF_DIRTY
 				if (textureLoadersToRestore.Count > 0)
@@ -199,11 +212,15 @@ namespace Spine.Unity.Editor {
 						spriteAtlasTexturesToRestore[assetPath] = AssetDatabase.GetAssetPath(atlasAsset.materials[0].mainTexture);
 						atlasAsset.materials[0].mainTexture = null;
 					}
-					EditorUtility.UnloadUnusedAssetsImmediate();
+#if HAS_SAVE_ASSET_IF_DIRTY
+					AssetDatabase.SaveAssetIfDirty(atlasAsset);
+#endif
 				}
 				AssetDatabase.StopAssetEditing();
+#if !HAS_SAVE_ASSET_IF_DIRTY
 				if (spriteAtlasAssets.Length > 0)
 					AssetDatabase.SaveAssets();
+#endif
 			} finally {
 				BuildUtilities.IsInSpriteAtlasBuildPreProcessing = false;
 			}
@@ -219,9 +236,14 @@ namespace Spine.Unity.Editor {
 						Texture atlasTexture = AssetDatabase.LoadAssetAtPath<Texture>(pair.Value);
 						atlasAsset.materials[0].mainTexture = atlasTexture;
 					}
+#if HAS_SAVE_ASSET_IF_DIRTY
+					AssetDatabase.SaveAssetIfDirty(atlasAsset);
+#endif
 				}
+#if !HAS_SAVE_ASSET_IF_DIRTY
 				if (spriteAtlasTexturesToRestore.Count > 0)
 					AssetDatabase.SaveAssets();
+#endif
 				spriteAtlasTexturesToRestore.Clear();
 			} finally {
 				BuildUtilities.IsInSpriteAtlasBuildPostProcessing = false;
