@@ -33,9 +33,11 @@ import { C3Texture, C3TextureEditor } from "./C3Texture";
 
 export class AssetLoader {
 
-	public async loadSkeletonEditor (path: string, textureAtlas: TextureAtlas, scale = 1, instance: SDK.IWorldInstance) {
-		const projectFile = instance.GetProject().GetProjectFileByExportPath(path);
+	public async loadSkeletonEditor (sid: number, textureAtlas: TextureAtlas, scale = 1, instance: SDK.IWorldInstance) {
+		const projectFile = instance.GetProject().GetProjectFileBySID(sid);
 		if (!projectFile) return null;
+
+		console.log("Loading skeleton", projectFile.GetPath());
 
 		const blob = projectFile.GetBlob();
 		const atlasLoader = new AtlasAttachmentLoader(textureAtlas);
@@ -54,9 +56,12 @@ export class AssetLoader {
 		return skeletonLoader.readSkeletonData(skeletonFile);
 	}
 
-	public async loadAtlasEditor (path: string, instance: SDK.IWorldInstance, renderer: SDK.Gfx.IWebGLRenderer) {
-		const projectFile = instance.GetProject().GetProjectFileByExportPath(path);
+	public async loadAtlasEditor (sid: number, instance: SDK.IWorldInstance, renderer: SDK.Gfx.IWebGLRenderer) {
+		const projectFile = instance.GetProject().GetProjectFileBySID(sid);
 		if (!projectFile) return null;
+
+		const path = projectFile.GetPath();
+		console.log("Loading atlas", path);
 
 		const blob = projectFile.GetBlob();
 		const content = await blob.text();
@@ -64,7 +69,9 @@ export class AssetLoader {
 		const basePath = path.substring(0, path.lastIndexOf("/") + 1);
 		const textureAtlas = new TextureAtlas(content);
 		await Promise.all(textureAtlas.pages.map(async page => {
-			const texture = await this.loadSpineTextureEditor(basePath + page.name, page.pma, instance);
+			const texturePath = basePath + page.name;
+			console.log("Loading texture", texturePath);
+			const texture = await this.loadSpineTextureEditor(texturePath, page.pma, instance);
 			if (texture) {
 				const spineTexture = new C3TextureEditor(texture, renderer, page);
 				page.setTexture(spineTexture);
