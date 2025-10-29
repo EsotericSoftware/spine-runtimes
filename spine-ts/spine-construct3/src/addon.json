@@ -1,9 +1,9 @@
 ﻿{
-  "$schema": "./plugin.addon.schema.json",
+  "$schema": "../plugin.addon.schema.json",
 
   "is-c3-addon": true,
   "sdk-version": 2,
-  "min-construct-version": "r401",
+  "min-construct-version": "r459",
   "type": "plugin",
   "name": "My Spine plugin",
   "id": "EsotericSoftware_SpineConstruct3",
