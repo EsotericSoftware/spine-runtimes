@@ -56,4 +56,6 @@ declare class IPhysicsBehaviorInstance<InstType> extends IBehaviorInstance<InstT
 	createLimitedRevoluteJoint(imgPt: ImagePointParameter, otherInst: IWorldInstance, lower: number, upper: number): void;
 	createPrismaticJoint(imgPt: ImagePointParameter, otherInst: IWorldInstance, axisAngle: number, enableLimit: boolean, lowerTranslation: number, upperTranslation: number, enableMotor: boolean, motorSpeed: number, maxMotorForce: number): void;
 	removeAllJoints(): void;
+
+	setCollisionFilter(isInclusive: boolean, tags: string | Iterable<string>): void;
 }

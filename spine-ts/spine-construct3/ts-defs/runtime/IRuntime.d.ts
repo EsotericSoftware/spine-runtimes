@@ -14,7 +14,7 @@ declare namespace C3 {
 type LayoutParameter = string | number;
 type LayerParameter = string | number;
 type ImagePointParameter = string | number;
-type BlendModeParameter = "normal" | "additive" | "copy" | "destination-over" | "source-in" | "destination-in" | "source-out" | "destination-out" | "source-atop" | "destination-atop";
+type BlendModeParameter = "normal" | "additive" | "copy" | "destination-over" | "source-in" | "destination-in" | "source-out" | "destination-out" | "source-atop" | "destination-atop" | "lighten" | "darken" | "multiply" | "screen";
 
 type FramerateModeType = "vsync" | "unlimited-tick" | "unlimited-frame";
 type SamplingModeType = "nearest" | "bilinear" | "trilinear";
@@ -188,7 +188,7 @@ declare class IRuntime extends ConstructEventTarget<RuntimeEventMap>
 
 	signal(tag: string): void;
 	waitForSignal(tag: string): Promise<void>;
-
+	
 	/** When called from an event sheet, sets the current function return value,
 	 * much like the 'Set return value' action.	 */
 	setReturnValue(value: number | string): void;

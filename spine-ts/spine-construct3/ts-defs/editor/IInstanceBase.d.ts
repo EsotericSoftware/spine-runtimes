@@ -2,7 +2,7 @@ declare namespace SDK {
 	class IInstanceBase {
 
 		constructor(sdkType: SDK.ITypeBase, iInstance: SDK.IObjectInstance);
-
+		
 		_sdkType: SDK.ITypeBase;
 		_inst: SDK.IObjectInstance;
 

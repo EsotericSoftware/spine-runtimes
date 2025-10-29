@@ -15,7 +15,7 @@ declare namespace SDK {
 		GetInstanceByUID(uid: number): SDK.IObjectInstance | null;
 
 		AddOrReplaceProjectFile(blob: Blob, filename: string, kind?: EditorProjectFileKind): void;
-
+		
 		GetProjectFileBySID(sid: number): SDK.IProjectFile | null;
 		GetProjectFileByExportPath(path: string): SDK.IProjectFile | null;
 

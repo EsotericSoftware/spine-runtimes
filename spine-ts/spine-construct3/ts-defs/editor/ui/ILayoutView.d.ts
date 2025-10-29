@@ -8,7 +8,7 @@ declare namespace SDK.UI {
 
 		SetDeviceTransform(iRenderer: SDK.Gfx.IWebGLRenderer): void;
 		SetDefaultTransform(iRenderer: SDK.Gfx.IWebGLRenderer): void;
-
+		
 		Refresh(): void;
 
 		GetLayout(): SDK.ILayout;

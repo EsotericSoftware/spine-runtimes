@@ -4,7 +4,8 @@
 declare namespace SDK.Gfx {
 	class IWebGLRenderer {
 		SetAlphaBlend(): void;
-
+		SetBlendMode(blendMode: BlendModeParameter): void;
+		
 		SetColorFillMode(): void;
 		SetTextureFillMode(): void;
 		SetSmoothLineFillMode(): void;

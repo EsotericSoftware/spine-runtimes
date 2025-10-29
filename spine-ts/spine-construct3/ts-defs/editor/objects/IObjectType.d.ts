@@ -10,7 +10,7 @@ declare namespace SDK {
 
 		CreateWorldInstance(layer: SDK.ILayer): SDK.IWorldInstance;
 		GetAllInstances(): SDK.IWorldInstance[];
-
+		
 		IsInContainer(): boolean;
 		GetContainer(): SDK.IContainer | null;
 		CreateContainer(initialObjectTypes: SDK.IObjectType[]): SDK.IContainer;

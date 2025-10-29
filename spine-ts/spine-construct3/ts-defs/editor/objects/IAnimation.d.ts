@@ -16,7 +16,7 @@ declare namespace SDK {
 		GetRepeatCount(): number;
 		SetRepeatTo(f: number): void;
 		GetRepeatTo(): number;
-
+		
 		Delete(): void;
 	}
 }

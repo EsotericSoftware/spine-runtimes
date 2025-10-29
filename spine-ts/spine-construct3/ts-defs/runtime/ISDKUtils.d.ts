@@ -3,13 +3,14 @@
 declare class ISDKUtils
 {
 	readonly constructVersionCode: number;
-
+	
 	updateRender(): void;
-
+	
 	addLoadPromise(promise: Promise<void>): void;
 
+	isWrapperExtensionAvailable(wrapperComponentId: string): boolean;
 	sendWrapperExtensionMessage(wrapperComponentId: string, messageId: string, params?: WrapperExtensionParameterType[]): void;
-    sendWrapperExtensionMessageAsync(wrapperComponentId: string, messageId: string, params?: WrapperExtensionParameterType[]): Promise<JSONValue>;
+	sendWrapperExtensionMessageAsync(wrapperComponentId: string, messageId: string, params?: WrapperExtensionParameterType[]): Promise<JSONValue>;
 
 	createLoopingConditionContext(loopName?: string): ILoopingConditionContext;
 
