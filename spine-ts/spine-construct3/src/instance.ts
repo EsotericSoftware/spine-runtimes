@@ -120,7 +120,7 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 			this.update(0);
 			let command = this.skeletonRenderer.render(this.skeleton);
 			while (command) {
-				const { numVertices, positions, uvs, colors, indices, numIndices } = command;
+				const { numVertices, positions, uvs, colors, indices, numIndices, blendMode } = command;
 
 				const vertices = this.tempVertices;
 				const c3colors = this.tempColors;
@@ -142,7 +142,7 @@ class MyDrawingInstance extends SDK.IWorldInstanceBase {
 				}
 
 				iRenderer.ResetColor();
-				iRenderer.SetAlphaBlend();
+				iRenderer.SetBlendMode(spine.BlendingModeSpineToC3[blendMode]);
 				iRenderer.SetTextureFillMode();
 				iRenderer.SetTexture(command.texture.texture);
 

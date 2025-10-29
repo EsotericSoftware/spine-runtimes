@@ -137,7 +137,7 @@ function toC3Filter (filter: TextureFilter): TextureSamplingMode {
 export const BlendingModeSpineToC3: Record<BlendMode, BlendModeParameter> = {
 	[BlendMode.Normal]: "normal",
 	[BlendMode.Additive]: "additive",
-	[BlendMode.Multiply]: "normal",
-	[BlendMode.Screen]: "normal",
+	[BlendMode.Multiply]: "multiply",
+	[BlendMode.Screen]: "screen",
 }
 
