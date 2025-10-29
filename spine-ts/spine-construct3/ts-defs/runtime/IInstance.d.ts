@@ -20,7 +20,7 @@ declare class IInstance
 	addEventListener<K extends keyof InstanceEventMap<this>>(type: K, listener: (ev: InstanceEventMap<this>[K]) => any): void;
 	removeEventListener<K extends keyof InstanceEventMap<this>>(type: K, listener: (ev: InstanceEventMap<this>[K]) => any): void;
 	dispatchEvent(evt: ConstructEvent): void;
-
+	
 	readonly runtime: IRuntime;
 	readonly objectType: IObjectType<this>;
 	readonly plugin: IPlugin_;
@@ -33,8 +33,9 @@ declare class IInstance
 	restoreTimeScale(): void;
 	readonly dt: number;
 
+	hasTag(tag: string): boolean;
 	hasTags(...tagsArray: string[]): boolean;
-	setAllTags(tagsSet: Set<string>): void;
+	setAllTags(tagsSet: Iterable<string>): void;
 	getAllTags(): Set<string>;
 
 	destroy(): void;

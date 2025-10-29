@@ -7,7 +7,7 @@ declare namespace SDK {
 
 		SetPropertyValue(id: string, value: EditorPropertyValueType): void;
 		GetPropertyValue(id: string): EditorPropertyValueType;
-
+		
 		GetTimelinePropertyValue(id: string): EditorPropertyValueType;
 
 		GetExternalSdkInstance(): SDK.IInstanceBase | null;

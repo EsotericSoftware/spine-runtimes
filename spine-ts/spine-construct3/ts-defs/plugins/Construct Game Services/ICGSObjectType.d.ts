@@ -65,7 +65,7 @@ declare class ICGSObjectType<InstType extends IInstance = IInstance> extends IOb
 	readonly playerName: string;
 	readonly gameId: string;
 	readonly sessionKey: string;
-
+	
 	signInWithProvider(provider: CGSSignInProvider, gameId: string, opts?: CGSSignInOptions): Promise<void>;
 	retryOpenSignInPopup(): void;
 	signInPersistent(gameId: string): Promise<void>;
@@ -76,5 +76,5 @@ declare class ICGSObjectType<InstType extends IInstance = IInstance> extends IOb
 	getLeaderboardScores(leaderboardId: string, opts?: CGSGetLeaderboardScoresOptions): Promise<CGSLeaderboardScoreResults>;
 
 	createCloudSave(opts: CGSCreateCloudSaveOptions): Promise<void>;
-	getCloudSave(opts: CGSGetCloudSaveOptions): Promise<string>;
+	getCloudSave(opts: CGSGetCloudSaveOptions): Promise<string | Blob>;
 }

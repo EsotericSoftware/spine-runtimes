@@ -5,5 +5,5 @@ declare class ISDKBehaviorTypeBase_ extends IBehaviorType
 {
      _onCreate(): void;
 }
-
+ 
 declare var ISDKBehaviorTypeBase: typeof ISDKBehaviorTypeBase_;

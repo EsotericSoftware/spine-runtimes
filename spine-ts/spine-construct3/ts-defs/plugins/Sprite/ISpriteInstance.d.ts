@@ -49,5 +49,5 @@ declare class ISpriteInstance extends IWorldInstance
 	getImageSize(): Vec2Arr;
 
 	replaceCurrentAnimationFrame(blob: Blob): Promise<void>;
-	setSolidCollisionFilter(isInclusive: boolean, tags: string): void;
+	setSolidCollisionFilter(isInclusive: boolean, tags: string | Iterable<string>): void;
 }

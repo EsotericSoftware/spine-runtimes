@@ -22,7 +22,7 @@ declare class IAssetManager
     getProjectFileUrl(url: string): Promise<string>;
     getMediaFileUrl(url: string): Promise<string>;
     readonly mediaFolder: string;
-
+    
     /**
 	 * @deprecated All supported platforms now support WebM Opus, so use the Web Audio API decodeAudioData() method instead.
 	 */
