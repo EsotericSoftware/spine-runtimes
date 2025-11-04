@@ -27,7 +27,9 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Pool;
 using UnityEngine.UI;
 
 namespace Spine.Unity {
@@ -52,6 +54,17 @@ namespace Spine.Unity {
 		protected override void OnEnable () {
 			base.OnEnable();
 			this.canvasRenderer.cull = false;
+		}
+
+		public Material UpdateModifiedMaterial (Material baseMaterial) {
+			List<IMaterialModifier> components = ListPool<IMaterialModifier>.Get();
+			GetComponents<IMaterialModifier>(components);
+
+			Material currentMat = baseMaterial;
+			for (var i = 0; i < components.Count; i++)
+				currentMat = (components[i] as IMaterialModifier).GetModifiedMaterial(currentMat);
+			ListPool<IMaterialModifier>.Release(components);
+			return currentMat;
 		}
 	}
 }
