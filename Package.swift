@@ -25,10 +25,17 @@ let package = Package(
         ),
         .library(
             name: "SpineiOS",
-            targets: ["SpineiOS"]
+            targets: ["SpineiOSWrapper"]
         ),
     ],
     targets: [
+        .target(
+            name: "SpineiOSWrapper",
+            dependencies: [
+                .target(name: "SpineiOS", condition: .when(platforms: [.iOS, .visionOS, .tvOS, .macCatalyst ]))
+            ],
+            path: "spine-ios/Sources/SpineiOSWrapper"
+        ),
         .target(
             name: "SpineiOS",
             dependencies: [
