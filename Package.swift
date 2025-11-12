@@ -18,6 +18,10 @@ let package = Package(
         .library(
             name: "Spine",
             targets: ["SpineModule"]
+        ),
+        .library(
+            name: "SpineCppLite",
+            targets: ["SpineCppLite"]
         )
     ],
     targets: [
