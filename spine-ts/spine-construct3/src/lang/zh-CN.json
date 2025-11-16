@@ -184,351 +184,351 @@
                 "desc": "循环"
               }
             }
-          }
-        },
-        "add-animation": {
-          "list-name": "添加动画",
-          "display-text": "在轨道{0}上添加动画{1}，循环{2}，延迟{3}",
-          "description": "添加动画",
-          "params": {
-            "track": {
-              "name": "轨道",
-              "desc": "轨道"
-            },
-            "animation": {
-              "name": "动画名称",
-              "desc": "动画名称"
-            },
-            "loop": {
-              "name": "循环",
-              "desc": "循环"
-            },
-            "delay": {
-              "name": "延迟",
-              "desc": "延迟"
-            }
-          }
-        },
-        "play": {
-          "list-name": "播放",
-          "display-text": "播放动画",
-          "description": "恢复或播放动画"
-        },
-        "stop": {
-          "list-name": "停止",
-          "display-text": "停止动画",
-          "description": "暂停或停止动画"
-        },
-        "set-empty-animation": {
-          "list-name": "设置空动画",
-          "display-text": "在轨道{0}上设置空动画，混合时长{1}",
-          "description": "在特定轨道上设置空动画",
-          "params": {
-            "track": {
-              "name": "轨道",
-              "desc": "轨道索引"
-            },
-            "mix-duration": {
-              "name": "混合时长",
-              "desc": "从当前动画混合到空动画的持续时间（秒）"
-            }
-          }
-        },
-        "set-attachment": {
-          "list-name": "设置附件",
-          "display-text": "将插槽{0}的附件设置为{1}",
-          "description": "更改特定插槽上的附件",
-          "params": {
-            "slot-name": {
-              "name": "插槽名称",
-              "desc": "插槽的名称"
-            },
-            "attachment-name": {
-              "name": "附件名称",
-              "desc": "要设置的附件名称"
-            }
-          }
-        },
-        "create-custom-skin": {
-          "list-name": "创建自定义皮肤",
-          "display-text": "创建自定义皮肤{0}",
-          "description": "创建一个可以组合多个皮肤的新自定义皮肤",
-          "params": {
-            "skin-name": {
-              "name": "皮肤名称",
-              "desc": "自定义皮肤的名称"
-            }
-          }
-        },
-        "add-custom-skin": {
-          "list-name": "添加到自定义皮肤",
-          "display-text": "将皮肤{1}添加到自定义皮肤{0}",
-          "description": "将现有皮肤添加到自定义皮肤",
-          "params": {
-            "custom-skin-name": {
-              "name": "自定义皮肤名称",
-              "desc": "要添加到的自定义皮肤名称"
-            },
-            "skin-to-add-name": {
-              "name": "要添加的皮肤",
-              "desc": "要添加的现有皮肤名称"
-            }
-          }
-        },
-        "set-custom-skin": {
-          "list-name": "设置自定义皮肤",
-          "display-text": "设置自定义皮肤{0}",
-          "description": "将自定义皮肤应用到骨架",
-          "params": {
-            "skin-name": {
-              "name": "皮肤名称",
-              "desc": "要应用的自定义皮肤名称"
-            }
-          }
-        },
-        "set-animation-speed": {
-          "list-name": "设置动画速度",
-          "display-text": "将动画速度设置为{0}",
-          "description": "设置动画播放速度（1.0 = 正常，2.0 = 两倍速，0.5 = 半速）",
-          "params": {
-            "speed": {
-              "name": "速度",
-              "desc": "动画速度倍数（1.0为正常速度）"
-            }
-          }
-        },
-        "set-animation-time": {
-          "list-name": "设置动画时间",
-          "display-text": "将轨道{2}的动画时间设置为{1}（{0}）",
-          "description": "设置轨道上动画的当前时间",
-          "params": {
-            "units": {
-              "name": "单位",
-              "desc": "时间单位",
-              "items": {
-                "seconds": "秒（绝对时间）",
-                "ratio": "比例（0.0到1.0）"
-              }
-            },
-            "time": {
-              "name": "时间",
-              "desc": "时间值（秒或0.0-1.0的比例）"
-            },
-            "track": {
-              "name": "轨道",
-              "desc": "轨道索引"
-            }
-          }
-        },
-        "set-animation-mix": {
-          "list-name": "设置动画混合",
-          "display-text": "设置从动画{0}到{1}的混合时长为{2}",
-          "description": "设置从一个动画过渡到另一个动画时的混合/淡入淡出时长",
-          "params": {
-            "from-name": {
-              "name": "起始动画",
-              "desc": "过渡起始的动画名称"
-            },
-            "to-name": {
-              "name": "目标动画",
-              "desc": "过渡目标的动画名称"
-            },
-            "duration": {
-              "name": "时长",
-              "desc": "混合时长（秒）"
-            }
-          }
-        },
-        "set-physics-mode": {
-          "list-name": "设置物理模式",
-          "display-text": "设置物理模式为{0}",
-          "description": "设置物理模式以控制物理约束的更新和应用方式",
-          "params": {
-            "physics-mode": {
-              "name": "物理模式",
-              "desc": "物理模式",
-              "items": {
-                "none": "无（物理不更新也不应用）",
-                "reset": "重置（物理重置为当前姿势）",
-                "update": "更新（物理更新并应用）",
-                "pose": "姿势（应用物理姿势但不更新）"
+          },
+          "add-animation": {
+            "list-name": "添加动画",
+            "display-text": "在轨道{0}上添加动画{1}，循环{2}，延迟{3}",
+            "description": "添加动画",
+            "params": {
+              "track": {
+                "name": "轨道",
+                "desc": "轨道"
+              },
+              "animation": {
+                "name": "动画名称",
+                "desc": "动画名称"
+              },
+              "loop": {
+                "name": "循环",
+                "desc": "循环"
+              },
+              "delay": {
+                "name": "延迟",
+                "desc": "延迟"
               }
             }
-          }
-        },
-        "set-skeleton-color": {
-          "list-name": "设置骨架颜色",
-          "display-text": "设置骨架颜色为{0}",
-          "description": "设置整个骨架的颜色。接受十六进制颜色（#RRGGBB 或 #RRGGBBAA）或颜色名称。",
-          "params": {
-            "color": {
-              "name": "颜色",
-              "desc": "颜色值（十六进制如 #FF0000 或颜色名称）"
-            }
-          }
-        },
-        "set-track-alpha": {
-          "list-name": "设置轨道透明度",
-          "display-text": "在轨道{1}上设置透明度为{0}",
-          "description": "设置动画轨道的透明度/不透明度。用于混合不同轨道上的动画。",
-          "params": {
-            "alpha": {
-              "name": "透明度",
-              "desc": "透明度值（0.0 到 1.0，其中 0 为完全透明，1 为完全不透明）"
-            },
-            "track-index": {
-              "name": "轨道索引",
-              "desc": "要设置透明度的轨道索引"
-            }
-          }
-        },
-        "set-track-mix-blend": {
-          "list-name": "设置轨道混合模式",
-          "display-text": "在轨道{1}上设置混合模式为{0}",
-          "description": "设置动画轨道的混合模式。控制动画如何分层和组合。",
-          "params": {
-            "mix-blend": {
-              "name": "混合模式",
-              "desc": "混合模式",
-              "items": {
-                "setup": "设置（过渡到/从设置姿势）",
-                "first": "首次（用于首次应用的动画）",
-                "replace": "替换（用于分层动画）",
-                "add": "叠加（用于分层动画的叠加混合）"
+          },
+          "play": {
+            "list-name": "播放",
+            "display-text": "播放动画",
+            "description": "恢复或播放动画"
+          },
+          "stop": {
+            "list-name": "停止",
+            "display-text": "停止动画",
+            "description": "暂停或停止动画"
+          },
+          "set-empty-animation": {
+            "list-name": "设置空动画",
+            "display-text": "在轨道{0}上设置空动画，混合时长{1}",
+            "description": "在特定轨道上设置空动画",
+            "params": {
+              "track": {
+                "name": "轨道",
+                "desc": "轨道索引"
+              },
+              "mix-duration": {
+                "name": "混合时长",
+                "desc": "从当前动画混合到空动画的持续时间（秒）"
               }
-            },
-            "track-index": {
-              "name": "轨道索引",
-              "desc": "要设置混合模式的轨道索引"
             }
-          }
-        },
-        "set-slot-color": {
-          "list-name": "设置插槽颜色",
-          "display-text": "设置插槽{0}的颜色为{1}",
-          "description": "设置插槽的颜色。接受十六进制颜色（#RRGGBB 或 #RRGGBBAA）或颜色名称。",
-          "params": {
-            "slot-name": {
-              "name": "插槽名称",
-              "desc": "要修改的插槽名称"
-            },
-            "color": {
-              "name": "颜色",
-              "desc": "颜色值（十六进制如 #FF0000 或颜色名称）"
-            }
-          }
-        },
-        "reset-slot-colors": {
-          "list-name": "重置插槽颜色",
-          "display-text": "重置插槽{0}的颜色",
-          "description": "将插槽颜色重置为设置姿势值。留空插槽名称以重置所有插槽。",
-          "params": {
-            "slot-name": {
-              "name": "插槽名称",
-              "desc": "要重置的插槽名称。留空以重置所有插槽。"
-            }
-          }
-        },
-        "update-bone-pose": {
-          "list-name": "更新骨骼姿势",
-          "display-text": "将骨骼{2}的位置设置为({0}, {1})",
-          "description": "将骨骼的姿势位置更新为特定的世界坐标。",
-          "params": {
-            "x": {
-              "name": "X",
-              "desc": "X世界坐标"
-            },
-            "y": {
-              "name": "Y",
-              "desc": "Y世界坐标"
-            },
-            "bone-name": {
-              "name": "骨骼名称",
-              "desc": "要更新的骨骼名称"
-            }
-          }
-        },
-        "attach-instance-to-bone": {
-          "list-name": "将实例附加到骨骼",
-          "display-text": "将实例UID {0}附加到骨骼{1}，偏移({2}, {3}, {4}°)",
-          "description": "使对象实例跟随骨架骨骼的位置和旋转。实例将每帧自动更新其位置和角度以匹配骨骼。偏移量在骨骼的本地空间中应用（随骨骼旋转）。",
-          "params": {
-            "uid": {
-              "name": "UID",
-              "desc": "要附加的对象实例的UID（使用类似Sprite.UID的表达式）"
-            },
-            "bone-name": {
-              "name": "骨骼名称",
-              "desc": "要跟随的骨骼名称"
-            },
-            "offset-x": {
-              "name": "X偏移",
-              "desc": "距骨骼位置的X偏移（在骨骼本地空间中）"
-            },
-            "offset-y": {
-              "name": "Y偏移",
-              "desc": "距骨骼位置的Y偏移（在骨骼本地空间中）"
-            },
-            "offset-angle": {
-              "name": "角度偏移",
-              "desc": "距骨骼旋转的角度偏移（度）"
-            }
-          }
-        },
-        "detach-instance-from-bone": {
-          "list-name": "将实例从骨骼分离",
-          "display-text": "将实例从骨骼{0}分离",
-          "description": "停止对象实例跟随骨骼。实例将保持在其当前位置。",
-          "params": {
-            "bone-name": {
-              "name": "骨骼名称",
-              "desc": "要分离的骨骼名称"
-            }
-          }
-        },
-        "add-handle": {
-          "list-name": "添加控制柄",
-          "display-text": "为{0} {1}添加交互控制柄，半径{2}（调试：{3}）",
-          "description": "为骨骼或插槽添加可以用鼠标拖动的交互控制柄。半径决定可点击区域的大小。",
-          "params": {
-            "type": {
-              "name": "类型",
-              "desc": "要添加的控制柄类型",
-              "items": {
-                "bone": "骨骼（拖动骨骼位置）",
-                "slot": "插槽（拖动插槽附件位置）"
+          },
+          "set-attachment": {
+            "list-name": "设置附件",
+            "display-text": "将插槽{0}的附件设置为{1}",
+            "description": "更改特定插槽上的附件",
+            "params": {
+              "slot-name": {
+                "name": "插槽名称",
+                "desc": "插槽的名称"
+              },
+              "attachment-name": {
+                "name": "附件名称",
+                "desc": "要设置的附件名称"
               }
-            },
-            "name": {
-              "name": "名称",
-              "desc": "要添加控制柄的骨骼或插槽名称"
-            },
-            "radius": {
-              "name": "半径",
-              "desc": "可点击区域的半径（像素）"
-            },
-            "debug": {
-              "name": "调试",
-              "desc": "是否显示控制柄的调试可视化"
             }
-          }
-        },
-        "remove-handle": {
-          "list-name": "移除控制柄",
-          "display-text": "从{0} {1}移除控制柄",
-          "description": "从骨骼或插槽移除交互控制柄。",
-          "params": {
-            "type": {
-              "name": "类型",
-              "desc": "要移除的控制柄类型",
-              "items": {
-                "bone": "骨骼",
-                "slot": "插槽"
+          },
+          "create-custom-skin": {
+            "list-name": "创建自定义皮肤",
+            "display-text": "创建自定义皮肤{0}",
+            "description": "创建一个可以组合多个皮肤的新自定义皮肤",
+            "params": {
+              "skin-name": {
+                "name": "皮肤名称",
+                "desc": "自定义皮肤的名称"
               }
-            },
-            "name": {
-              "name": "名称",
-              "desc": "要移除控制柄的骨骼或插槽名称"
+            }
+          },
+          "add-custom-skin": {
+            "list-name": "添加到自定义皮肤",
+            "display-text": "将皮肤{1}添加到自定义皮肤{0}",
+            "description": "将现有皮肤添加到自定义皮肤",
+            "params": {
+              "custom-skin-name": {
+                "name": "自定义皮肤名称",
+                "desc": "要添加到的自定义皮肤名称"
+              },
+              "skin-to-add-name": {
+                "name": "要添加的皮肤",
+                "desc": "要添加的现有皮肤名称"
+              }
+            }
+          },
+          "set-custom-skin": {
+            "list-name": "设置自定义皮肤",
+            "display-text": "设置自定义皮肤{0}",
+            "description": "将自定义皮肤应用到骨架",
+            "params": {
+              "skin-name": {
+                "name": "皮肤名称",
+                "desc": "要应用的自定义皮肤名称"
+              }
+            }
+          },
+          "set-animation-speed": {
+            "list-name": "设置动画速度",
+            "display-text": "将动画速度设置为{0}",
+            "description": "设置动画播放速度（1.0 = 正常，2.0 = 两倍速，0.5 = 半速）",
+            "params": {
+              "speed": {
+                "name": "速度",
+                "desc": "动画速度倍数（1.0为正常速度）"
+              }
+            }
+          },
+          "set-animation-time": {
+            "list-name": "设置动画时间",
+            "display-text": "将轨道{2}的动画时间设置为{1}（{0}）",
+            "description": "设置轨道上动画的当前时间",
+            "params": {
+              "units": {
+                "name": "单位",
+                "desc": "时间单位",
+                "items": {
+                  "seconds": "秒（绝对时间）",
+                  "ratio": "比例（0.0到1.0）"
+                }
+              },
+              "time": {
+                "name": "时间",
+                "desc": "时间值（秒或0.0-1.0的比例）"
+              },
+              "track": {
+                "name": "轨道",
+                "desc": "轨道索引"
+              }
+            }
+          },
+          "set-animation-mix": {
+            "list-name": "设置动画混合",
+            "display-text": "设置从动画{0}到{1}的混合时长为{2}",
+            "description": "设置从一个动画过渡到另一个动画时的混合/淡入淡出时长",
+            "params": {
+              "from-name": {
+                "name": "起始动画",
+                "desc": "过渡起始的动画名称"
+              },
+              "to-name": {
+                "name": "目标动画",
+                "desc": "过渡目标的动画名称"
+              },
+              "duration": {
+                "name": "时长",
+                "desc": "混合时长（秒）"
+              }
+            }
+          },
+          "set-physics-mode": {
+            "list-name": "设置物理模式",
+            "display-text": "设置物理模式为{0}",
+            "description": "设置物理模式以控制物理约束的更新和应用方式",
+            "params": {
+              "physics-mode": {
+                "name": "物理模式",
+                "desc": "物理模式",
+                "items": {
+                  "none": "无（物理不更新也不应用）",
+                  "reset": "重置（物理重置为当前姿势）",
+                  "update": "更新（物理更新并应用）",
+                  "pose": "姿势（应用物理姿势但不更新）"
+                }
+              }
+            }
+          },
+          "set-skeleton-color": {
+            "list-name": "设置骨架颜色",
+            "display-text": "设置骨架颜色为{0}",
+            "description": "设置整个骨架的颜色。接受十六进制颜色（#RRGGBB 或 #RRGGBBAA）或颜色名称。",
+            "params": {
+              "color": {
+                "name": "颜色",
+                "desc": "颜色值（十六进制如 #FF0000 或颜色名称）"
+              }
+            }
+          },
+          "set-track-alpha": {
+            "list-name": "设置轨道透明度",
+            "display-text": "在轨道{1}上设置透明度为{0}",
+            "description": "设置动画轨道的透明度/不透明度。用于混合不同轨道上的动画。",
+            "params": {
+              "alpha": {
+                "name": "透明度",
+                "desc": "透明度值（0.0 到 1.0，其中 0 为完全透明，1 为完全不透明）"
+              },
+              "track-index": {
+                "name": "轨道索引",
+                "desc": "要设置透明度的轨道索引"
+              }
+            }
+          },
+          "set-track-mix-blend": {
+            "list-name": "设置轨道混合模式",
+            "display-text": "在轨道{1}上设置混合模式为{0}",
+            "description": "设置动画轨道的混合模式。控制动画如何分层和组合。",
+            "params": {
+              "mix-blend": {
+                "name": "混合模式",
+                "desc": "混合模式",
+                "items": {
+                  "setup": "设置（过渡到/从设置姿势）",
+                  "first": "首次（用于首次应用的动画）",
+                  "replace": "替换（用于分层动画）",
+                  "add": "叠加（用于分层动画的叠加混合）"
+                }
+              },
+              "track-index": {
+                "name": "轨道索引",
+                "desc": "要设置混合模式的轨道索引"
+              }
+            }
+          },
+          "set-slot-color": {
+            "list-name": "设置插槽颜色",
+            "display-text": "设置插槽{0}的颜色为{1}",
+            "description": "设置插槽的颜色。接受十六进制颜色（#RRGGBB 或 #RRGGBBAA）或颜色名称。",
+            "params": {
+              "slot-name": {
+                "name": "插槽名称",
+                "desc": "要修改的插槽名称"
+              },
+              "color": {
+                "name": "颜色",
+                "desc": "颜色值（十六进制如 #FF0000 或颜色名称）"
+              }
+            }
+          },
+          "reset-slot-colors": {
+            "list-name": "重置插槽颜色",
+            "display-text": "重置插槽{0}的颜色",
+            "description": "将插槽颜色重置为设置姿势值。留空插槽名称以重置所有插槽。",
+            "params": {
+              "slot-name": {
+                "name": "插槽名称",
+                "desc": "要重置的插槽名称。留空以重置所有插槽。"
+              }
+            }
+          },
+          "update-bone-pose": {
+            "list-name": "更新骨骼姿势",
+            "display-text": "将骨骼{2}的位置设置为({0}, {1})",
+            "description": "将骨骼的姿势位置更新为特定的世界坐标。",
+            "params": {
+              "x": {
+                "name": "X",
+                "desc": "X世界坐标"
+              },
+              "y": {
+                "name": "Y",
+                "desc": "Y世界坐标"
+              },
+              "bone-name": {
+                "name": "骨骼名称",
+                "desc": "要更新的骨骼名称"
+              }
+            }
+          },
+          "attach-instance-to-bone": {
+            "list-name": "将实例附加到骨骼",
+            "display-text": "将实例UID {0}附加到骨骼{1}，偏移({2}, {3}, {4}°)",
+            "description": "使对象实例跟随骨架骨骼的位置和旋转。实例将每帧自动更新其位置和角度以匹配骨骼。偏移量在骨骼的本地空间中应用（随骨骼旋转）。",
+            "params": {
+              "uid": {
+                "name": "UID",
+                "desc": "要附加的对象实例的UID（使用类似Sprite.UID的表达式）"
+              },
+              "bone-name": {
+                "name": "骨骼名称",
+                "desc": "要跟随的骨骼名称"
+              },
+              "offset-x": {
+                "name": "X偏移",
+                "desc": "距骨骼位置的X偏移（在骨骼本地空间中）"
+              },
+              "offset-y": {
+                "name": "Y偏移",
+                "desc": "距骨骼位置的Y偏移（在骨骼本地空间中）"
+              },
+              "offset-angle": {
+                "name": "角度偏移",
+                "desc": "距骨骼旋转的角度偏移（度）"
+              }
+            }
+          },
+          "detach-instance-from-bone": {
+            "list-name": "将实例从骨骼分离",
+            "display-text": "将实例从骨骼{0}分离",
+            "description": "停止对象实例跟随骨骼。实例将保持在其当前位置。",
+            "params": {
+              "bone-name": {
+                "name": "骨骼名称",
+                "desc": "要分离的骨骼名称"
+              }
+            }
+          },
+          "add-handle": {
+            "list-name": "添加控制柄",
+            "display-text": "为{0} {1}添加交互控制柄，半径{2}（调试：{3}）",
+            "description": "为骨骼或插槽添加可以用鼠标拖动的交互控制柄。半径决定可点击区域的大小。",
+            "params": {
+              "type": {
+                "name": "类型",
+                "desc": "要添加的控制柄类型",
+                "items": {
+                  "bone": "骨骼（拖动骨骼位置）",
+                  "slot": "插槽（拖动插槽附件位置）"
+                }
+              },
+              "name": {
+                "name": "名称",
+                "desc": "要添加控制柄的骨骼或插槽名称"
+              },
+              "radius": {
+                "name": "半径",
+                "desc": "可点击区域的半径（像素）"
+              },
+              "debug": {
+                "name": "调试",
+                "desc": "是否显示控制柄的调试可视化"
+              }
+            }
+          },
+          "remove-handle": {
+            "list-name": "移除控制柄",
+            "display-text": "从{0} {1}移除控制柄",
+            "description": "从骨骼或插槽移除交互控制柄。",
+            "params": {
+              "type": {
+                "name": "类型",
+                "desc": "要移除的控制柄类型",
+                "items": {
+                  "bone": "骨骼",
+                  "slot": "插槽"
+                }
+              },
+              "name": {
+                "name": "名称",
+                "desc": "要移除控制柄的骨骼或插槽名称"
+              }
             }
           }
         },
