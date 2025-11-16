@@ -44,8 +44,8 @@
 #include <godot_cpp/classes/editor_property.hpp>
 #else
 #include "editor/editor_node.h"
-#include "editor/editor_properties.h"
-#include "editor/editor_properties_array_dict.h"
+#include "editor/inspector/editor_properties.h"
+#include "editor/inspector/editor_properties_array_dict.h"
 #endif
 
 class SpineAtlasResourceImportPlugin : public EditorImportPlugin {

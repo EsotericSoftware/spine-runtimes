@@ -85,7 +85,7 @@ String SpineEvent::get_string_value() {
 
 void SpineEvent::set_string_value(const String &v) {
 	SPINE_CHECK(get_spine_object(), )
-	get_spine_object()->setStringValue(spine::String(v.utf8()));
+	get_spine_object()->setStringValue(spine::String(v.utf8().get_data()));
 }
 
 float SpineEvent::get_volume() {
