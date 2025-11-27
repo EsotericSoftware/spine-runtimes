@@ -29,7 +29,9 @@
 
 package spine;
 
+#if lime
 import lime.math.Rectangle;
+#end
 import haxe.ds.StringMap;
 import spine.attachments.Attachment;
 import spine.attachments.ClippingAttachment;

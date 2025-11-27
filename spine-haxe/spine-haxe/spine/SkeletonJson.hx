@@ -29,6 +29,7 @@
 
 package spine;
 
+import haxe.DynamicAccess;
 import Reflect;
 import haxe.Json;
 import spine.animation.AlphaTimeline;
@@ -419,7 +420,7 @@ class SkeletonJson {
 		// Events.
 		var events:Dynamic = Reflect.getProperty(root, "events");
 		for (eventName in Reflect.fields(events)) {
-			var eventMap:Map<String, Dynamic> = Reflect.field(events, eventName);
+			var eventMap:DynamicAccess<Dynamic> = Reflect.field(events, eventName);
 			var eventData:EventData = new EventData(eventName);
 			eventData.intValue = getInt(eventMap, "int");
 			eventData.floatValue = getFloat(eventMap, "float");
