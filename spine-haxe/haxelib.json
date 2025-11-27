@@ -17,8 +17,8 @@
       "cpp"
    ],
    "description": "The official Spine Runtime for Haxe",
-   "version": "4.2.7",
-   "releasenote": "Update to 4.2.7",
+   "version": "4.2.8",
+   "releasenote": "Update to 4.2.8",
    "contributors": [
       "esotericsoftware"
    ],
