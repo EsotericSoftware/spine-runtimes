@@ -47,7 +47,6 @@ export class SkeletonDebugRenderer implements Disposable {
 	drawPaths = true;
 	drawSkeletonXY = false;
 	drawClipping = true;
-	premultipliedAlpha = false;
 	scale = 1;
 	boneWidth = 2;
 
@@ -66,8 +65,7 @@ export class SkeletonDebugRenderer implements Disposable {
 		const skeletonX = skeleton.x;
 		const skeletonY = skeleton.y;
 		const gl = this.context.gl;
-		const srcFunc = this.premultipliedAlpha ? gl.ONE : gl.SRC_ALPHA;
-		shapes.setBlendMode(srcFunc, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+		shapes.setBlendMode(gl.ONE, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 
 		const bones = skeleton.bones;
 		if (this.drawBones) {

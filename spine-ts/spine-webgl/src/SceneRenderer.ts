@@ -87,15 +87,13 @@ export class SceneRenderer implements Disposable {
 		this.enableRenderer(this.batcher);
 	}
 
-	drawSkeleton (skeleton: Skeleton, premultipliedAlpha = false, slotRangeStart = -1, slotRangeEnd = -1, transform: VertexTransformer | null = null) {
+	drawSkeleton (skeleton: Skeleton, slotRangeStart = -1, slotRangeEnd = -1, transform: VertexTransformer | null = null) {
 		this.enableRenderer(this.batcher);
-		this.skeletonRenderer.premultipliedAlpha = premultipliedAlpha;
 		this.skeletonRenderer.draw(this.batcher, skeleton, slotRangeStart, slotRangeEnd, transform);
 	}
 
-	drawSkeletonDebug (skeleton: Skeleton, premultipliedAlpha = false, ignoredBones?: Array<string>) {
+	drawSkeletonDebug (skeleton: Skeleton, ignoredBones?: Array<string>) {
 		this.enableRenderer(this.shapes);
-		this.skeletonDebugRenderer.premultipliedAlpha = premultipliedAlpha;
 		this.skeletonDebugRenderer.draw(this.shapes, skeleton, ignoredBones);
 	}
 

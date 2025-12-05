@@ -35,10 +35,7 @@ import { ManagedWebGLRenderingContext } from "./WebGL.js";
 
 const GL_ONE = 1;
 const GL_ONE_MINUS_SRC_COLOR = 0x0301;
-const GL_SRC_ALPHA = 0x0302;
 const GL_ONE_MINUS_SRC_ALPHA = 0x0303;
-// biome-ignore lint/correctness/noUnusedVariables: intentional
-const GL_ONE_MINUS_DST_ALPHA = 0x0305;
 const GL_DST_COLOR = 0x0306;
 
 export class PolygonBatcher implements Disposable {
@@ -88,16 +85,16 @@ export class PolygonBatcher implements Disposable {
 		}
 	}
 
-	private static blendModesGL: { srcRgb: number, srcRgbPma: number, dstRgb: number, srcAlpha: number }[] = [
-		{ srcRgb: GL_SRC_ALPHA, srcRgbPma: GL_ONE, dstRgb: GL_ONE_MINUS_SRC_ALPHA, srcAlpha: GL_ONE },
-		{ srcRgb: GL_SRC_ALPHA, srcRgbPma: GL_ONE, dstRgb: GL_ONE, srcAlpha: GL_ONE },
-		{ srcRgb: GL_DST_COLOR, srcRgbPma: GL_DST_COLOR, dstRgb: GL_ONE_MINUS_SRC_ALPHA, srcAlpha: GL_ONE },
-		{ srcRgb: GL_ONE, srcRgbPma: GL_ONE, dstRgb: GL_ONE_MINUS_SRC_COLOR, srcAlpha: GL_ONE }
+	private static blendModesGL: { srcRgbPma: number, dstRgb: number, srcAlpha: number }[] = [
+		{ srcRgbPma: GL_ONE, dstRgb: GL_ONE_MINUS_SRC_ALPHA, srcAlpha: GL_ONE },
+		{ srcRgbPma: GL_ONE, dstRgb: GL_ONE, srcAlpha: GL_ONE },
+		{ srcRgbPma: GL_DST_COLOR, dstRgb: GL_ONE_MINUS_SRC_ALPHA, srcAlpha: GL_ONE },
+		{ srcRgbPma: GL_ONE, dstRgb: GL_ONE_MINUS_SRC_COLOR, srcAlpha: GL_ONE }
 	]
 
-	setBlendMode (blendMode: BlendMode, premultipliedAlpha: boolean) {
+	setBlendMode (blendMode: BlendMode) {
 		const blendModeGL = PolygonBatcher.blendModesGL[blendMode];
-		const srcColorBlend = premultipliedAlpha ? blendModeGL.srcRgbPma : blendModeGL.srcRgb;
+		const srcColorBlend = blendModeGL.srcRgbPma;
 		const srcAlphaBlend = blendModeGL.srcAlpha;
 		const dstBlend = blendModeGL.dstRgb;
 

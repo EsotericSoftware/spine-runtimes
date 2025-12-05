@@ -66,9 +66,6 @@ export interface SpinePlayerConfig {
 	/* Optional: List of skin names from which the user can choose. Default: all skins */
 	skins?: string[]
 
-	/* Optional: Whether the skeleton's atlas images use premultiplied alpha. Default: true */
-	premultipliedAlpha?: boolean
-
 	/* Optional: Whether to show the player controls. When false, no external CSS file is needed. Default: true */
 	showControls?: boolean
 
@@ -311,7 +308,6 @@ export class SpinePlayer implements Disposable {
 		if (!config.backgroundColor) config.backgroundColor = config.alpha ? "00000000" : "000000";
 		if (!config.fullScreenBackgroundColor) config.fullScreenBackgroundColor = config.backgroundColor;
 		if (config.backgroundImage && !config.backgroundImage.url) config.backgroundImage = undefined;
-		if (config.premultipliedAlpha === void 0) config.premultipliedAlpha = true;
 		if (config.preserveDrawingBuffer === void 0) config.preserveDrawingBuffer = false;
 		if (config.mipmaps === void 0) config.mipmaps = true;
 		if (config.interactive === void 0) config.interactive = true;
@@ -919,7 +915,7 @@ export class SpinePlayer implements Disposable {
 				}
 
 				// Draw the skeleton and debug output.
-				renderer.drawSkeleton(skeleton, config.premultipliedAlpha);
+				renderer.drawSkeleton(skeleton);
 				if (Number(renderer.skeletonDebugRenderer.drawBones = config.debug!.bones! ?? false)
 					+ Number(renderer.skeletonDebugRenderer.drawBoundingBoxes = config.debug!.bounds! ?? false)
 					+ Number(renderer.skeletonDebugRenderer.drawClipping = config.debug!.clipping! ?? false)
@@ -928,7 +924,7 @@ export class SpinePlayer implements Disposable {
 					+ Number(renderer.skeletonDebugRenderer.drawRegionAttachments = config.debug!.regions! ?? false)
 					+ Number(renderer.skeletonDebugRenderer.drawMeshTriangles = config.debug!.meshes! ?? false) > 0
 				) {
-					renderer.drawSkeletonDebug(skeleton, config.premultipliedAlpha);
+					renderer.drawSkeletonDebug(skeleton);
 				}
 
 				// Draw the control bones.

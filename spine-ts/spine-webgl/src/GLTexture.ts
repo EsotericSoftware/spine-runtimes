@@ -34,13 +34,13 @@ export class GLTexture extends Texture implements Disposable, Restorable {
 	context: ManagedWebGLRenderingContext;
 	private texture: WebGLTexture | null = null;
 	private boundUnit = 0;
-	private useMipMaps = false;
+	private pma: boolean;
+	private useMipMaps: boolean;
 
-	public static DISABLE_UNPACK_PREMULTIPLIED_ALPHA_WEBGL = false;
-
-	constructor (context: ManagedWebGLRenderingContext | WebGLRenderingContext, image: HTMLImageElement | ImageBitmap, useMipMaps: boolean = false) {
+	constructor (context: ManagedWebGLRenderingContext | WebGLRenderingContext, image: HTMLImageElement | ImageBitmap, pma: boolean, useMipMaps: boolean = false) {
 		super(image);
 		this.context = context instanceof ManagedWebGLRenderingContext ? context : new ManagedWebGLRenderingContext(context);
+		this.pma = pma;
 		this.useMipMaps = useMipMaps;
 		this.restore();
 		this.context.addRestorable(this);
@@ -90,13 +90,15 @@ export class GLTexture extends Texture implements Disposable, Restorable {
 		const gl = this.context.gl;
 		if (!this.texture) this.texture = this.context.gl.createTexture();
 		this.bind();
-		if (GLTexture.DISABLE_UNPACK_PREMULTIPLIED_ALPHA_WEBGL) gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+		const previousUnpackPmaValue = gl.getParameter(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL);
+		gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, !this.pma);
 		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this._image);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, useMipMaps ? gl.LINEAR_MIPMAP_LINEAR : gl.LINEAR);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 		if (useMipMaps) gl.generateMipmap(gl.TEXTURE_2D);
+		gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, previousUnpackPmaValue);
 	}
 
 	restore () {

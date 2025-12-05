@@ -40,7 +40,7 @@ export class SkeletonRendererCore {
 	private clipping = new SkeletonClipping();
 	private renderCommands: RenderCommand[] = [];
 
-	render (skeleton: Skeleton): RenderCommand | undefined {
+	render (skeleton: Skeleton, pma = false, inColor?: [number, number, number, number]): RenderCommand | undefined {
 		this.commandPool.reset();
 		this.renderCommands.length = 0;
 
@@ -56,8 +56,8 @@ export class SkeletonRendererCore {
 			}
 
 			const slotApplied = slot.applied;
-			const color = slotApplied.color;
-			const alpha = color.a;
+			const slotColor = slotApplied.color;
+			const alpha = slotColor.a;
 			if ((alpha === 0 || !slot.bone.active) && !(attachment instanceof ClippingAttachment)) {
 				clipper.clipEnd(slot);
 				continue;
@@ -115,18 +115,51 @@ export class SkeletonRendererCore {
 			}
 
 			const skelColor = skeleton.color;
-			const r = Math.floor(skelColor.r * slotApplied.color.r * attachmentColor.r * 255);
-			const g = Math.floor(skelColor.g * slotApplied.color.g * attachmentColor.g * 255);
-			const b = Math.floor(skelColor.b * slotApplied.color.b * attachmentColor.b * 255);
-			const a = Math.floor(skelColor.a * slotApplied.color.a * attachmentColor.a * 255);
+			let color: number, darkColor: number;
+			if (pma) {
+				let a: number;
+				if (inColor) {
+					a = Math.floor(inColor[3] * skelColor.a * slotColor.a * attachmentColor.a * 255);
+					const r = Math.floor(a * inColor[0] * skelColor.r * slotColor.r * attachmentColor.r);
+					const g = Math.floor(a * inColor[1] * skelColor.g * slotColor.g * attachmentColor.g);
+					const b = Math.floor(a * inColor[2] * skelColor.b * slotColor.b * attachmentColor.b);
+					color = (a << 24) | (r << 16) | (g << 8) | b;
+				} else {
+					a = Math.floor(skelColor.a * slotColor.a * attachmentColor.a * 255);
+					const r = Math.floor(a * skelColor.r * slotColor.r * attachmentColor.r);
+					const g = Math.floor(a * skelColor.g * slotColor.g * attachmentColor.g);
+					const b = Math.floor(a * skelColor.b * slotColor.b * attachmentColor.b);
+					color = (a << 24) | (r << 16) | (g << 8) | b;
+				}
 
-			let darkColor = 0xff000000;
-			if (slotApplied.darkColor) {
-				const { r, g, b } = slotApplied.darkColor;
-				darkColor = 0xff000000 |
-					(Math.floor(r * 255) << 16) |
-					(Math.floor(g * 255) << 8) |
-					Math.floor(b * 255);
+				darkColor = 0xff000000;
+				if (slotApplied.darkColor) {
+					const { r, g, b } = slotApplied.darkColor;
+					darkColor = 0xff000000 |
+						(Math.floor(r * a) << 16) |
+						(Math.floor(g * a) << 8) |
+						Math.floor(b * a);
+				}
+			} else {
+				if (inColor) {
+					const a = Math.floor(inColor[3] * skelColor.a * slotColor.a * attachmentColor.a * 255);
+					const r = Math.floor(inColor[0] * skelColor.r * slotColor.r * attachmentColor.r * 255);
+					const g = Math.floor(inColor[1] * skelColor.g * slotColor.g * attachmentColor.g * 255);
+					const b = Math.floor(inColor[2] * skelColor.b * slotColor.b * attachmentColor.b * 255);
+					color = (a << 24) | (r << 16) | (g << 8) | b;
+				} else {
+					const a = Math.floor(skelColor.a * slotColor.a * attachmentColor.a * 255);
+					const r = Math.floor(skelColor.r * slotColor.r * attachmentColor.r * 255);
+					const g = Math.floor(skelColor.g * slotColor.g * attachmentColor.g * 255);
+					const b = Math.floor(skelColor.b * slotColor.b * attachmentColor.b * 255);
+					color = (a << 24) | (r << 16) | (g << 8) | b;
+				}
+
+				darkColor = 0;
+				if (slotApplied.darkColor) {
+					const { r, g, b } = slotApplied.darkColor;
+					darkColor = (Math.floor(r * 255) << 16) | (Math.floor(g * 255) << 8) | Math.floor(b * 255);
+				}
 			}
 
 			if (clipper.isClipping()) {
@@ -146,7 +179,7 @@ export class SkeletonRendererCore {
 			cmd.uvs.set(uvs.subarray(0, verticesCount << 1));
 
 			for (let j = 0; j < verticesCount; j++) {
-				cmd.colors[j] = (a << 24) | (r << 16) | (g << 8) | b;
+				cmd.colors[j] = color;
 				cmd.darkColors[j] = darkColor;
 			}
 
@@ -257,6 +290,8 @@ export class SkeletonRendererCore {
 	}
 }
 
+// values with under score is the original sized array, bigger than necessary
+// values without under score is a view of the orignal array, sized as needed
 interface RenderCommand {
 	positions: Float32Array;
 	uvs: Float32Array;

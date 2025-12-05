@@ -132,7 +132,6 @@ interface WidgetPublicProperties {
 
 // Usage of this properties is discouraged because they can be made private in the future
 interface WidgetInternalProperties {
-	pma: boolean
 	dprScale: number
 	dragging: boolean
 	dragX: number
@@ -649,13 +648,6 @@ export class SpineWebComponentSkeleton extends HTMLElement implements Disposable
 	public dragging = false;
 
 	/**
-	 * @internal
-	 * If true, the widget has texture with premultiplied alpha
-	 * Do not rely on this properties. It might be made private in the future.
-	 */
-	public pma = false;
-
-	/**
 	 * If true, indicate {@link dispose} has been called and the widget cannot be used anymore
 	 */
 	public disposed = false;
@@ -972,7 +964,6 @@ export class SpineWebComponentSkeleton extends HTMLElement implements Disposable
 		]);
 
 		const atlas = this.overlay.assetManager.require(atlasPath) as TextureAtlas;
-		this.pma = atlas.pages[0]?.pma
 
 		const atlasLoader = new AtlasAttachmentLoader(atlas);
 
