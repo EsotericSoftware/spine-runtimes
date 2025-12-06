@@ -79,12 +79,10 @@ abstract class C3SkeletonRenderer<
 
 				const color = colors[i];
 				const colorDst = i * 4;
-				const alpha = (color >>> 24) * inv255;
-				const inv255Alpha = alpha * inv255;
-				c3colors[colorDst] = (color >>> 16 & 0xFF) * inv255Alpha;
-				c3colors[colorDst + 1] = (color >>> 8 & 0xFF) * inv255Alpha;
-				c3colors[colorDst + 2] = (color & 0xFF) * inv255Alpha;
-				c3colors[colorDst + 3] = alpha;
+				c3colors[colorDst] = (color >>> 16 & 0xFF) * inv255;
+				c3colors[colorDst + 1] = (color >>> 8 & 0xFF) * inv255;
+				c3colors[colorDst + 2] = (color & 0xFF) * inv255;
+				c3colors[colorDst + 3] = (color >>> 24) * inv255;
 			}
 
 			this.renderSkeleton(
