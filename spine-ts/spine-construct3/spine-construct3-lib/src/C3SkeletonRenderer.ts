@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { type BlendMode, type Bone, ClippingAttachment, MathUtils, MeshAttachment, PathAttachment, RegionAttachment, type Skeleton, SkeletonRendererCore, Utils, Vector2 } from "@esotericsoftware/spine-core";
+import { type BlendMode, type Bone, ClippingAttachment, MathUtils, MeshAttachment, PathAttachment, RegionAttachment, RenderCommand, type Skeleton, SkeletonRendererCore, Utils, Vector2 } from "@esotericsoftware/spine-core";
 import type { C3Matrix } from "./C3Matrix";
 import { BlendingModeSpineToC3, type C3TextureEditor, type C3TextureRuntime } from "./C3Texture";
 
@@ -40,6 +40,7 @@ abstract class C3SkeletonRenderer<
 	Texture extends C3Texture,
 > extends SkeletonRendererCore {
 
+	private command?: RenderCommand;
 	private tempVertices = new Float32Array(4096);
 	private tempColors = new Float32Array(4096);
 	private tempPoint = new Vector2();
@@ -53,10 +54,15 @@ abstract class C3SkeletonRenderer<
 		super();
 	}
 
-	draw (skeleton: Skeleton, inColors: [number, number, number], opacity = 1) {
+	draw (skeleton: Skeleton, inColors: [number, number, number], opacity = 1, isPlaying = true, fromUpdate = true) {
 		const { matrix, inv255 } = this;
 
-		let command = this.render(skeleton, true, [...inColors, opacity]);
+		this.command = (isPlaying || !this.command)
+			? this.render(skeleton, true, [...inColors, opacity])
+			: this.command;
+		let command = this.command;
+
+		const { a, b, c, d, tx, ty } = matrix;
 		while (command) {
 			const { numVertices, positions, uvs, colors, indices, numIndices, blendMode } = command;
 
@@ -70,11 +76,11 @@ abstract class C3SkeletonRenderer<
 
 			for (let i = 0; i < numVertices; i++) {
 				const srcIndex = i * 2;
-				const { x, y } = matrix.skeletonToGame(positions[srcIndex], positions[srcIndex + 1]);
-
 				const dstIndex = i * 3;
-				vertices[dstIndex] = x;
-				vertices[dstIndex + 1] = y;
+				const x = positions[srcIndex];
+				const y = positions[srcIndex + 1];
+				vertices[dstIndex] = a * x + c * y + tx;
+				vertices[dstIndex + 1] = b * x + d * y + ty;
 				vertices[dstIndex + 2] = 0;
 
 				const color = colors[i];

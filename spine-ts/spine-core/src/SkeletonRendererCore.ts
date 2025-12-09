@@ -292,7 +292,7 @@ export class SkeletonRendererCore {
 
 // values with under score is the original sized array, bigger than necessary
 // values without under score is a view of the orignal array, sized as needed
-interface RenderCommand {
+export interface RenderCommand {
 	positions: Float32Array;
 	uvs: Float32Array;
 	colors: Uint32Array;

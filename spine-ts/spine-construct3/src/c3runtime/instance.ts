@@ -19,7 +19,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	propDebugSkeleton = false;
 
 	isFlippedX = false;
-	isPlaying = true;
+	isPlaying = false;
 	animationSpeed = 1.0;
 	physicsMode = spine.Physics.update;
 	customSkins: Record<string, Skin> = {};
@@ -111,11 +111,18 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			return;
 		}
 
-		if (!this.isPlaying) return;
+		this.matrix.update(
+			this.x + this.propOffsetX,
+			this.y + this.propOffsetY,
+			this.angle + this.propOffsetAngle);
 
-		this.update(this.dt);
-		this.runtime.sdk.updateRender();
+		if (this.isPlaying) {
+			this.update(this.dt);
+			this.runtime.sdk.updateRender();
+		}
 	}
+
+	private fromUpdate = false;
 
 	private update (delta: number) {
 		const { state, skeleton, animationSpeed, physicsMode, matrix } = this;
@@ -126,16 +133,14 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		state.update(adjustedDelta);
 		skeleton.update(adjustedDelta);
 		state.apply(skeleton);
-		matrix.update(
-			this.x + this.propOffsetX,
-			this.y + this.propOffsetY,
-			this.angle + this.propOffsetAngle);
 
 		this.updateHandles(skeleton, matrix);
 
 		skeleton.updateWorldTransform(physicsMode);
 
-		this.updateBoneFollowers();
+		this.updateBoneFollowers(matrix);
+
+		this.fromUpdate = true;
 	}
 
 	_draw (renderer: IRenderer) {
@@ -148,7 +153,8 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		if (!skeleton) return;
 
 		this.skeletonRenderer ||= new spine.C3RendererRuntime(renderer, this.matrix);
-		this.skeletonRenderer.draw(skeleton, this.colorRgb, this.opacity);
+		this.skeletonRenderer.draw(skeleton, this.colorRgb, this.opacity, this.isPlaying, this.fromUpdate);
+		this.fromUpdate = false;
 
 		if (this.propDebugSkeleton) this.skeletonRenderer.drawDebug(skeleton, this.x, this.y, this.getBoundingQuad(false));
 		this.renderDragHandles();
@@ -187,6 +193,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			this.runtime.addEventListener("pointermove", this.dragHandleMove);
 			this.runtime.addEventListener("pointerup", this.dragHandleUp);
 		}
+		this.isPlaying = true;
 	}
 
 	private dragHandleDown = (event: ConstructPointerEvent) => {
@@ -394,6 +401,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 
 			if (this.propAnimation) {
 				this.setAnimation(0, this.propAnimation, true);
+				this.isPlaying = true;
 			}
 
 			this._setSkin();
@@ -402,6 +410,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			this.skeleton.scaleY = this.propScaleY;
 
 			this.update(0);
+			this.runtime.sdk.updateRender();
 
 			this.skeletonLoaded = true;
 			this._trigger(C3.Plugins.EsotericSoftware_SpineConstruct3.Cnds.OnSkeletonLoaded);
@@ -582,7 +591,6 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		}
 
 		skeleton.setupPose();
-		this.update(0);
 	}
 
 	public createCustomSkin (skinName: string) {
@@ -691,13 +699,14 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		}
 
 		this.boneFollowers.set(boneName, { uid, offsetX, offsetY, offsetAngle });
+		this.isPlaying = true;
 	}
 
 	public detachInstanceFromBone (boneName: string) {
 		this.boneFollowers.delete(boneName);
 	}
 
-	private updateBoneFollowers () {
+	private updateBoneFollowers (matrix: C3Matrix) {
 		if (this.boneFollowers.size === 0) return;
 
 		for (const [boneName, follower] of this.boneFollowers) {
@@ -707,7 +716,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			const instance = this.runtime.getInstanceByUid(follower.uid) as IWorldInstance;
 			if (!instance) continue;
 
-			const { x, y } = this.matrix.boneToGame(bone);
+			const { x, y } = matrix.boneToGame(bone);
 			const boneRotation = bone.applied.getWorldRotationX();
 
 			// Apply rotation to offset
