@@ -47,6 +47,14 @@ abstract class C3SkeletonRenderer<
 	private tempArray = [] as number[];
 	private inv255 = 1 / 255;
 
+	private prevX = Infinity;
+	private prevY = Infinity;
+	private prevAngle = Infinity;
+	private prevRed = -1;
+	private prevGreen = -1;
+	private prevBlue = -1;
+	private prevAlpha = -1;
+
 	constructor (
 		protected renderer: Renderer,
 		protected matrix: C3Matrix,
@@ -54,45 +62,51 @@ abstract class C3SkeletonRenderer<
 		super();
 	}
 
-	draw (skeleton: Skeleton, inColors: [number, number, number], opacity = 1, isPlaying = true, fromUpdate = true) {
+	draw (skeleton: Skeleton, inColors: [number, number, number], opacity = 1, requestRedraw = true) {
 		const { matrix, inv255 } = this;
+		const { a, b, c, d, tx, ty, prevX, prevY, prevAngle } = matrix;
 
-		this.command = (isPlaying || !this.command)
-			? this.render(skeleton, true, [...inColors, opacity])
-			: this.command;
+		const requestRedrawForMatrix = this.prevX !== prevX || this.prevY !== prevY || this.prevAngle !== prevAngle;
+		this.prevX = prevX;
+		this.prevY = prevY;
+		this.prevAngle = prevAngle;
+
+		const requestRedrawForColor = this.prevRed !== inColors[0] || this.prevGreen !== inColors[1] || this.prevBlue !== inColors[2] || this.prevAlpha !== opacity;
+		this.prevRed = inColors[0];
+		this.prevGreen = inColors[1];
+		this.prevBlue = inColors[2];
+		this.prevAlpha = opacity;
+
+		const newCommand = (requestRedraw || requestRedrawForColor || requestRedrawForMatrix || !this.command);
+		this.command = newCommand ? this.render(skeleton, true, [...inColors, opacity], 3) : this.command;
 		let command = this.command;
 
-		const { a, b, c, d, tx, ty } = matrix;
 		while (command) {
 			const { numVertices, positions, uvs, colors, indices, numIndices, blendMode } = command;
-
-			const vertices = this.tempVertices.length < numVertices * 3
-				? (this.tempVertices = new Float32Array(numVertices * 3))
-				: this.tempVertices;
 
 			const c3colors = this.tempColors.length < numVertices * 4
 				? (this.tempColors = new Float32Array(numVertices * 4))
 				: this.tempColors;
 
-			for (let i = 0; i < numVertices; i++) {
-				const srcIndex = i * 2;
-				const dstIndex = i * 3;
-				const x = positions[srcIndex];
-				const y = positions[srcIndex + 1];
-				vertices[dstIndex] = a * x + c * y + tx;
-				vertices[dstIndex + 1] = b * x + d * y + ty;
-				vertices[dstIndex + 2] = 0;
+			if (newCommand) {
+				for (let i = 0; i < numVertices; i++) {
+					const index = i * 3;
+					const x = positions[index];
+					const y = positions[index + 1];
+					positions[index] = a * x + c * y + tx;
+					positions[index + 1] = b * x + d * y + ty;
 
-				const color = colors[i];
-				const colorDst = i * 4;
-				c3colors[colorDst] = (color >>> 16 & 0xFF) * inv255;
-				c3colors[colorDst + 1] = (color >>> 8 & 0xFF) * inv255;
-				c3colors[colorDst + 2] = (color & 0xFF) * inv255;
-				c3colors[colorDst + 3] = (color >>> 24) * inv255;
+					const color = colors[i];
+					const colorDst = i * 4;
+					c3colors[colorDst] = (color >>> 16 & 0xFF) * inv255;
+					c3colors[colorDst + 1] = (color >>> 8 & 0xFF) * inv255;
+					c3colors[colorDst + 2] = (color & 0xFF) * inv255;
+					c3colors[colorDst + 3] = (color >>> 24) * inv255;
+				}
 			}
 
 			this.renderSkeleton(
-				vertices.subarray(0, numVertices * 3),
+				positions.subarray(0, numVertices * 3),
 				uvs.subarray(0, numVertices * 2),
 				indices.subarray(0, numIndices),
 				c3colors.subarray(0, numVertices * 4),

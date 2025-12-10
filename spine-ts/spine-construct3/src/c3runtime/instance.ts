@@ -41,6 +41,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	private assetLoader: AssetLoader;
 	private skeletonRenderer?: C3RendererRuntime;
 	private matrix: C3Matrix;
+	private requestRedraw = false;
 
 	private verticesTemp = spine.Utils.newFloatArray(2 * 1024);
 
@@ -116,13 +117,8 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			this.y + this.propOffsetY,
 			this.angle + this.propOffsetAngle);
 
-		if (this.isPlaying) {
-			this.update(this.dt);
-			this.runtime.sdk.updateRender();
-		}
+		if (this.isPlaying) this.update(this.dt);
 	}
-
-	private fromUpdate = false;
 
 	private update (delta: number) {
 		const { state, skeleton, animationSpeed, physicsMode, matrix } = this;
@@ -140,7 +136,8 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 
 		this.updateBoneFollowers(matrix);
 
-		this.fromUpdate = true;
+		this.runtime.sdk.updateRender();
+		this.requestRedraw = true;
 	}
 
 	_draw (renderer: IRenderer) {
@@ -153,8 +150,8 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		if (!skeleton) return;
 
 		this.skeletonRenderer ||= new spine.C3RendererRuntime(renderer, this.matrix);
-		this.skeletonRenderer.draw(skeleton, this.colorRgb, this.opacity, this.isPlaying, this.fromUpdate);
-		this.fromUpdate = false;
+		this.skeletonRenderer.draw(skeleton, this.colorRgb, this.opacity, this.requestRedraw);
+		this.requestRedraw = false;
 
 		if (this.propDebugSkeleton) this.skeletonRenderer.drawDebug(skeleton, this.x, this.y, this.getBoundingQuad(false));
 		this.renderDragHandles();
@@ -410,7 +407,6 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			this.skeleton.scaleY = this.propScaleY;
 
 			this.update(0);
-			this.runtime.sdk.updateRender();
 
 			this.skeletonLoaded = true;
 			this._trigger(C3.Plugins.EsotericSoftware_SpineConstruct3.Cnds.OnSkeletonLoaded);

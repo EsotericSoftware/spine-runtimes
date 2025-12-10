@@ -38,9 +38,17 @@ export class C3Matrix {
 	public tx = 0;
 	public ty = 0;
 
+	public prevX = Infinity;
+	public prevY = Infinity;
+	public prevAngle = Infinity;
+
 	private tempPoint = new Vector2();
 
 	public update (x: number, y: number, angle: number) {
+		if (this.prevX === x && this.prevY === y && this.prevAngle === angle) return false;
+		this.prevX = x;
+		this.prevY = y;
+		this.prevAngle = angle;
 		const cos = Math.cos(angle);
 		const sin = Math.sin(angle);
 		this.a = cos;
@@ -49,6 +57,7 @@ export class C3Matrix {
 		this.d = cos;
 		this.tx = x;
 		this.ty = y;
+		return true;
 	}
 
 	public gameToSkeleton (x: number, y: number) {
