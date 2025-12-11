@@ -419,15 +419,23 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	*/
 
 	public setAnimation (track: number, animation: string, loop = false) {
-		const trackEntry = this.state?.setAnimation(track, animation, loop);
-		if (!trackEntry) return;
+		const { state } = this;
+		if (!state) return;
+
+		const trackEntry = state.setAnimation(track, animation, loop);
 		trackEntry.listener = this.makeTrackListener(track, animation);
+
+		this.isPlaying = true;
 	}
 
 	public addAnimation (track: number, animation: string, loop = false, delay = 0) {
-		const trackEntry = this.state?.addAnimation(track, animation, loop, delay);
-		if (!trackEntry) return;
+		const { state } = this;
+		if (!state) return;
+
+		const trackEntry = state.addAnimation(track, animation, loop, delay);
 		trackEntry.listener = this.makeTrackListener(track, animation);
+
+		this.isPlaying = true;
 	}
 
 	public setEmptyAnimation (track: number, mixDuration = 0) {
