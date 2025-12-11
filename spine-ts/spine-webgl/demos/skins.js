@@ -188,7 +188,7 @@ var skinsDemo = function (canvas, bgColor) {
 		skeleton.updateWorldTransform(spine.Physics.update);
 
 		renderer.begin();
-		renderer.drawSkeleton(skeleton, true);
+		renderer.drawSkeleton(skeleton);
 		var texture = assetManager.get("heroes.png");
 		var width = bounds.x * 1.25;
 		var scale = width / texture.getImage().width;

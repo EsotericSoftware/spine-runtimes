@@ -671,7 +671,6 @@ export class Spine extends Container {
 				const skeletonColor = skeleton.color;
 				const slotColor = pose.color;
 				const alpha = skeletonColor.a * slotColor.a * attachmentColor.a;
-				// cannot premultiply the colors because the default mesh renderer already does that
 				this.lightColor.set(
 					skeletonColor.r * slotColor.r * attachmentColor.r,
 					skeletonColor.g * slotColor.g * attachmentColor.g,

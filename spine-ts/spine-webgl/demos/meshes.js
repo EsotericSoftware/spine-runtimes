@@ -137,7 +137,7 @@ var meshesDemo = function (canvas, bgColor) {
 		}
 
 		renderer.begin();
-		renderer.drawSkeleton(skeleton, true);
+		renderer.drawSkeleton(skeleton);
 		renderer.drawSkeletonDebug(skeleton);
 		renderer.end();
 	}

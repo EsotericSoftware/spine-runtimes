@@ -129,8 +129,8 @@ var spritesheetsDemo = function (canvas, bgColor) {
 
 		renderer.begin();
 		var frame = frames[currFrame];
-		renderer.drawSkeleton(skeleton, true);
-		renderer.drawSkeleton(skeletonSeq, true);
+		renderer.drawSkeleton(skeleton);
+		renderer.drawSkeleton(skeletonSeq);
 		renderer.end();
 	}
 

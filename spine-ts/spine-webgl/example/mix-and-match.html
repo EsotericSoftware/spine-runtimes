@@ -37,7 +37,7 @@
 
 			// Create the skeleton
 			let skeletonBinary = new spine.SkeletonBinary(atlasLoader);
-			skeletonBinary.scale = 0.5;
+			skeletonBinary.scale = 1;
 			let skeletonData = skeletonBinary.readSkeletonData(assetManager.require("mix-and-match-pro.skel"));
 			this.skeleton = new spine.Skeleton(skeletonData);
 
@@ -74,7 +74,7 @@
 			renderer.resize(spine.ResizeMode.Expand);
 			canvas.clear(0.2, 0.2, 0.2, 1);
 			renderer.begin();
-			renderer.drawSkeleton(this.skeleton, true);
+			renderer.drawSkeleton(this.skeleton);
 			renderer.end();
 		}
 	}

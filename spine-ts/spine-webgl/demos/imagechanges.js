@@ -146,7 +146,7 @@ var imageChangesDemo = function (canvas, bgColor) {
 		}
 
 		renderer.begin();
-		renderer.drawSkeleton(skeleton, true);
+		renderer.drawSkeleton(skeleton);
 
 		var y = offsetY;
 		var slotsWidth = 0, slotsHeight = 0;

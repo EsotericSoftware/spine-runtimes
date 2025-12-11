@@ -93,7 +93,7 @@ class BasicExample extends Phaser.Scene {
 
 	async preload() {
 		// manually add the text atlas to the game cache
-		this.game.cache.text.add(this.atlasKey, { data: atlasString, premultipliedAlpha: true });
+		this.game.cache.text.add(this.atlasKey, atlasString);
 
 		// manually add the json skeleton to the game cache
 		this.game.cache.json.add("spineboy-data", skeletonJson);
