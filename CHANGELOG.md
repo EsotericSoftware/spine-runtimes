@@ -758,6 +758,8 @@
   - Added `Skeleton` properties `windX`, `windY`, `gravityX`, `gravityY` to allow rotating physics force directions
   - Added `SequenceTimeline` for sequence animation
   - Added `allowMissingRegions` parameter to `AtlasAttachmentLoader` constructor to support skeletons exported with per-skin atlases
+  - Added `TextureLoader` type with optional `pma?: boolean` parameter to `AssetManagerBase`. `AssetManagerBase` now tracks and passes PMA metadata from atlas pages to texture loaders, allowing runtimes to automatically premultiply textures on upload
+  - Added `SkeletonRendererCore` class to reduce complexity of runtime-specific render code
 
 - **Breaking changes**
   - `Bone` now extends `PosedActive` with separate pose, constrained, and applied states
@@ -869,6 +871,12 @@
 
 - **Breaking changes**
   - Updated to use new TypeScript/JavaScript runtime
+  - `GLTexture` constructor now requires `pma: boolean` parameter (automatically read from atlas page metadata)
+  - Removed `GLTexture.DISABLE_UNPACK_PREMULTIPLIED_ALPHA_WEBGL` static property
+  - `SkeletonRenderer` and `SkeletonDebugRenderer` no longer have `premultipliedAlpha` property - PMA is handled automatically
+  - `SceneRenderer.drawSkeleton()` and `drawSkeletonDebug()` no longer take `premultipliedAlpha` parameter
+  - `PolygonBatcher.setBlendMode()` no longer takes `premultipliedAlpha` parameter
+  - `LoadingScreen` no longer accepts PMA parameters
 
 ### Canvas backend
 
@@ -885,11 +893,13 @@
 
 - **Breaking changes**
   - Updated to use new TypeScript/JavaScript runtime
+  - `AssetManager` constructor no longer takes `pma` parameter - PMA is handled automatically
 
 ### Player
 
 - **Breaking changes**
   - Updated to use new TypeScript/JavaScript runtime
+  - Removed `premultipliedAlpha` option from `SpinePlayerConfig` - PMA is now handled automatically
 
 ### Pixi v7
 
@@ -917,17 +927,22 @@
 
 - **Breaking changes**
   - Updated to use new TypeScript/JavaScript runtime
+  - `SpinePlugin.spineAtlas()` loader no longer takes `premultipliedAlpha` parameter - PMA is handled automatically
+  - `SpinePlugin.createSkeleton()` no longer takes `premultipliedAlpha` parameter
 
 ### Phaser v4
 
 - **Breaking changes**
   - Updated to use new TypeScript/JavaScript runtime
+  - `SpinePlugin.spineAtlas()` loader no longer takes `premultipliedAlpha` parameter - PMA is handled automatically
+  - `SpinePlugin.createSkeleton()` no longer takes `premultipliedAlpha` parameter
 
 ### Web Components
 
 - **Breaking changes**
   - Updated to use new TypeScript/JavaScript runtime
   - Updated skeleton and overlay component implementations
+  - Removed `pma` property from `SpineWebComponentSkeleton` - PMA is handled automatically
 
 # 4.2
 
