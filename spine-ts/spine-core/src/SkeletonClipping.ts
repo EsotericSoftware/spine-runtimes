@@ -324,7 +324,7 @@ export class SkeletonClipping {
 		return clipOutputItems != null;
 	}
 
-	public clipTrianglesUnpacked (vertices: NumberArrayLike, triangles: NumberArrayLike | Uint32Array, trianglesLength: number, uvs: NumberArrayLike) {
+	public clipTrianglesUnpacked (vertices: NumberArrayLike, triangles: NumberArrayLike | Uint32Array, trianglesLength: number, uvs: NumberArrayLike, stride = 2) {
 		const clipOutput = this.clipOutput;
 		let clippedVertices = this._clippedVerticesTyped, clippedUVs = this._clippedUVsTyped, clippedTriangles = this._clippedTrianglesTyped;
 		// biome-ignore lint/style/noNonNullAssertion: clipStart define it
@@ -343,17 +343,23 @@ export class SkeletonClipping {
 		let clipped = false;
 
 		for (let i = 0; i < trianglesLength; i += 3) {
-			let v = triangles[i] << 1;
+			let t = triangles[i];
+			let v = t * stride;
 			const x1 = vertices[v], y1 = vertices[v + 1];
-			const u1 = uvs[v], v1 = uvs[v + 1];
+			let uv = t << 1;
+			const u1 = uvs[uv], v1 = uvs[uv + 1];
 
-			v = triangles[i + 1] << 1;
+			t = triangles[i + 1];
+			v = t * stride;
 			const x2 = vertices[v], y2 = vertices[v + 1];
-			const u2 = uvs[v], v2 = uvs[v + 1];
+			uv = t << 1;
+			const u2 = uvs[uv], v2 = uvs[uv + 1];
 
-			v = triangles[i + 2] << 1;
+			t = triangles[i + 2];
+			v = t * stride;
 			const x3 = vertices[v], y3 = vertices[v + 1];
-			const u3 = uvs[v], v3 = uvs[v + 1];
+			uv = t << 1;
+			const u3 = uvs[uv], v3 = uvs[uv + 1];
 
 			for (let p = 0; p < polygonsCount; p++) {
 				let s = this.clippedVerticesLength;
@@ -367,20 +373,22 @@ export class SkeletonClipping {
 					let clipOutputCount = clipOutputLength >> 1;
 					const clipOutputItems = this.clipOutput;
 
-					const newLength = s + clipOutputCount * 2;
+					const newLength = s + clipOutputCount * stride;
 					if (clippedVertices.length < newLength) {
 						this._clippedVerticesTyped = new Float32Array(newLength * 2);
 						this._clippedVerticesTyped.set(clippedVertices.subarray(0, s));
-						this._clippedUVsTyped = new Float32Array(newLength * 2);
-						this._clippedUVsTyped.set(clippedUVs.subarray(0, s));
+						this._clippedUVsTyped = new Float32Array((this.clippedUVsLength + clipOutputCount * 2) * 2);
+						this._clippedUVsTyped.set(clippedUVs.subarray(0, this.clippedUVsLength));
 						clippedVertices = this._clippedVerticesTyped;
 						clippedUVs = this._clippedUVsTyped;
 					}
 					const clippedVerticesItems = clippedVertices;
 					const clippedUVsItems = clippedUVs;
 					this.clippedVerticesLength = newLength;
-					this.clippedUVsLength = newLength;
-					for (let ii = 0; ii < clipOutputLength; ii += 2, s += 2) {
+
+					let uvIndex = this.clippedUVsLength;
+					this.clippedUVsLength = uvIndex + clipOutputCount * 2;
+					for (let ii = 0; ii < clipOutputLength; ii += 2, s += stride, uvIndex += 2) {
 						const x = clipOutputItems[ii], y = clipOutputItems[ii + 1];
 						clippedVerticesItems[s] = x;
 						clippedVerticesItems[s + 1] = y;
@@ -388,8 +396,8 @@ export class SkeletonClipping {
 						const a = (d0 * c0 + d1 * c1) * d;
 						const b = (d4 * c0 + d2 * c1) * d;
 						const c = 1 - a - b;
-						clippedUVsItems[s] = u1 * a + u2 * b + u3 * c;
-						clippedUVsItems[s + 1] = v1 * a + v2 * b + v3 * c;
+						clippedUVsItems[uvIndex] = u1 * a + u2 * b + u3 * c;
+						clippedUVsItems[uvIndex + 1] = v1 * a + v2 * b + v3 * c;
 					}
 
 					s = this.clippedTrianglesLength;
@@ -411,7 +419,7 @@ export class SkeletonClipping {
 
 				} else {
 
-					let newLength = s + 3 * 2;
+					let newLength = s + 3 * stride;
 					if (clippedVertices.length < newLength) {
 						this._clippedVerticesTyped = new Float32Array(newLength * 2);
 						this._clippedVerticesTyped.set(clippedVertices.subarray(0, s));
@@ -419,25 +427,27 @@ export class SkeletonClipping {
 					}
 					clippedVertices[s] = x1;
 					clippedVertices[s + 1] = y1;
-					clippedVertices[s + 2] = x2;
-					clippedVertices[s + 3] = y2;
-					clippedVertices[s + 4] = x3;
-					clippedVertices[s + 5] = y3;
+					clippedVertices[s + stride] = x2;
+					clippedVertices[s + stride + 1] = y2;
+					clippedVertices[s + stride * 2] = x3;
+					clippedVertices[s + stride * 2 + 1] = y3;
 
-					if (clippedUVs.length < newLength) {
-						this._clippedUVsTyped = new Float32Array(newLength * 2);
-						this._clippedUVsTyped.set(clippedUVs.subarray(0, s));
+					let uvLength = this.clippedUVsLength + 3 * 2;
+					if (clippedUVs.length < uvLength) {
+						this._clippedUVsTyped = new Float32Array(uvLength * 2);
+						this._clippedUVsTyped.set(clippedUVs.subarray(0, this.clippedUVsLength));
 						clippedUVs = this._clippedUVsTyped;
 					}
-					clippedUVs[s] = u1;
-					clippedUVs[s + 1] = v1;
-					clippedUVs[s + 2] = u2;
-					clippedUVs[s + 3] = v2;
-					clippedUVs[s + 4] = u3;
-					clippedUVs[s + 5] = v3;
+					let uvIndex = this.clippedUVsLength;
+					clippedUVs[uvIndex] = u1;
+					clippedUVs[uvIndex + 1] = v1;
+					clippedUVs[uvIndex + 2] = u2;
+					clippedUVs[uvIndex + 3] = v2;
+					clippedUVs[uvIndex + 4] = u3;
+					clippedUVs[uvIndex + 5] = v3;
 
 					this.clippedVerticesLength = newLength;
-					this.clippedUVsLength = newLength;
+					this.clippedUVsLength = uvLength;
 
 					s = this.clippedTrianglesLength;
 					newLength = s + 3;
