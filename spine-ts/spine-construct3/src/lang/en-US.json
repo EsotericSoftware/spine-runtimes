@@ -137,6 +137,21 @@
                 "desc": "Name of the slot to check"
               }
             }
+          },
+          "is-animation-playing": {
+            "list-name": "Is animation playing",
+            "display-text": "Is animation {0} playing on track {1}",
+            "description": "Check if animation is playing. Use empty string for animation or -1 for track to match any value.",
+            "params": {
+              "animation-name": {
+                "name": "Animation name",
+                "desc": "Animation name. Empty string matches any animation."
+              },
+              "track-index": {
+                "name": "Track index",
+                "desc": "Track index. Use -1 to check all tracks."
+              }
+            }
           }
         },
         "actions": {

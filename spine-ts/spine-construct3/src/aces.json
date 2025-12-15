@@ -63,6 +63,23 @@
             "type": "string"
           }
         ]
+      },
+      {
+        "id": "is-animation-playing",
+        "scriptName": "IsAnimationPlaying",
+        "isTrigger": false,
+        "params": [
+          {
+            "id": "animation-name",
+            "type": "string",
+            "initial-value": ""
+          },
+          {
+            "id": "track-index",
+            "type": "number",
+            "initial-value": -1
+          }
+        ]
       }
     ],
     "actions": [

@@ -310,6 +310,25 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		return this.isPointInPolygon(vertices, hullLength, coords.x, coords.y);
 	}
 
+	public isAnimationPlaying (animationName: string, trackIndex: number) {
+		if (!this.state) return false;
+
+		if (trackIndex === -1) {
+			for (const track of this.state.tracks) {
+				if (!track) continue;
+				if (animationName === "" || track.animation?.name === animationName) return true;
+			}
+			return false;
+		}
+
+		const track = this.state.tracks[trackIndex];
+		if (!track) return false;
+
+		if (animationName === "") return true;
+
+		return track.animation?.name === animationName;
+	}
+
 	private isPointInPolygon (vertices: NumberArrayLike, hullLength: number, px: number, py: number) {
 		if (hullLength < 6) {
 			throw new Error("A polygon must have at least 3 vertices (6 numbers in the array). ");

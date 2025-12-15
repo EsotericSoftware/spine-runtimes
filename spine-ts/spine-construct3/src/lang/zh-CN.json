@@ -137,6 +137,21 @@
                 "desc": "要检查的插槽名称"
               }
             }
+          },
+          "is-animation-playing": {
+            "list-name": "动画是否正在播放",
+            "display-text": "动画{0}是否在轨道{1}上播放",
+            "description": "检查动画是否正在播放。使用空字符串匹配任何动画，使用-1匹配所有轨道。",
+            "params": {
+              "animation-name": {
+                "name": "动画名称",
+                "desc": "动画名称。空字符串匹配任何动画。"
+              },
+              "track-index": {
+                "name": "轨道索引",
+                "desc": "轨道索引。使用-1检查所有轨道。"
+              }
+            }
           }
         },
         "actions": {
