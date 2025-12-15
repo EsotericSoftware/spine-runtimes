@@ -36,7 +36,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	public triggeredEventTrack = -1;
 	public triggeredEventAnimation = "";
 	public triggeredEventName = "";
-	public triggeredEventData?: Event;
+	public triggeredEventData?: Event & { track: number, animation: string };
 
 	private assetLoader: AssetLoader;
 	private skeletonRenderer?: C3RendererRuntime;
@@ -547,21 +547,21 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		}
 	}
 
-	private triggetAnimationEvent (eventName: string, track: number, animation: string, event?: Event) {
+	private triggerAnimationEvent (eventName: string, track: number, animation: string, event?: Event) {
 		this.triggeredEventTrack = track;
 		this.triggeredEventAnimation = animation;
 		this.triggeredEventName = eventName;
-		this.triggeredEventData = event;
+		if (event) this.triggeredEventData = { ...event, track, animation };
 		this._trigger(C3.Plugins.EsotericSoftware_SpineConstruct3.Cnds.OnAnimationEvent);
 	}
 
 	private makeTrackListener = (track: number, animation: string): AnimationStateListener => ({
-		start: () => this.triggetAnimationEvent("start", track, animation),
-		dispose: () => this.triggetAnimationEvent("dispose", track, animation),
-		event: (_, event) => this.triggetAnimationEvent("event", track, animation, event),
-		interrupt: () => this.triggetAnimationEvent("interrupt", track, animation),
-		end: () => this.triggetAnimationEvent("end", track, animation),
-		complete: () => this.triggetAnimationEvent("complete", track, animation),
+		start: () => this.triggerAnimationEvent("start", track, animation),
+		dispose: () => this.triggerAnimationEvent("dispose", track, animation),
+		event: (_, event) => this.triggerAnimationEvent("event", track, animation, event),
+		interrupt: () => this.triggerAnimationEvent("interrupt", track, animation),
+		end: () => this.triggerAnimationEvent("end", track, animation),
+		complete: () => this.triggerAnimationEvent("complete", track, animation),
 	})
 
 	/**********/
