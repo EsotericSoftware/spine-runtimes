@@ -632,6 +632,16 @@
                 "desc": "轨道的索引"
               }
             }
+          },
+          "get-event-data": {
+            "description": "获取最后触发的动画事件的数据。通常在"动画事件触发时"条件中使用。有效字段: \"float\", \"int\", \"string\", \"balance\", \"volume\", \"audiopath\", \"event\", \"track\", \"animation\"。",
+            "translated-name": "GetEventData",
+            "params": {
+              "field": {
+                "name": "\"float\"|\"int\"|\"string\"|\"balance\"|\"volume\"|\"audiopath\"|\"event\"|\"track\"|\"animation\"",
+                "desc": "要检索的事件数据字段"
+              }
+            }
           }
         }
       }

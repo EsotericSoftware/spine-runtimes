@@ -554,6 +554,18 @@
             "type": "number"
           }
         ]
+      },
+      {
+        "id": "get-event-data",
+        "expressionName": "GetEventData",
+        "highlight": false,
+        "returnType": "any",
+        "params": [
+          {
+            "id": "field",
+            "type": "string"
+          }
+        ]
       }
     ]
   }

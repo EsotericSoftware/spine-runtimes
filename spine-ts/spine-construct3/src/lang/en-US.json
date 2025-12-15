@@ -632,6 +632,16 @@
                 "desc": "Index of the track"
               }
             }
+          },
+          "get-event-data": {
+            "description": "Get data from the last triggered animation event. Typically used within an 'On animation event' trigger. Valid fields: \"float\", \"int\", \"string\", \"balance\", \"volume\", \"audiopath\", \"event\", \"track\", \"animation\".",
+            "translated-name": "GetEventData",
+            "params": {
+              "field": {
+                "name": "\"float\"|\"int\"|\"string\"|\"balance\"|\"volume\"|\"audiopath\"|\"event\"|\"track\"|\"animation\"",
+                "desc": "The event data field to retrieve"
+              }
+            }
           }
         }
       }
