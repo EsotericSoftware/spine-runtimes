@@ -8,7 +8,7 @@ export class SpineC3PluginType extends SDK.ITypeBase {
 	spineLogo?: SDK.Gfx.IWebGLTexture;
 	private spineLogoRequested = false;
 
-	getSpineLogo (iRenderer: SDK.Gfx.IWebGLRenderer) {
+	getSpineLogo (iRenderer: SDK.Gfx.IWebGLRenderer, iLayoutView: SDK.UI.ILayoutView) {
 		if (this.spineLogo) return this.spineLogo;
 		if (this.spineLogoRequested) return undefined;
 
@@ -20,6 +20,7 @@ export class SpineC3PluginType extends SDK.ITypeBase {
 
 			this.spineLogo = iRenderer.CreateDynamicTexture(image.width, image.height);
 			iRenderer.UpdateTexture(image, this.spineLogo);
+			iLayoutView.Refresh();
 		})
 	}
 

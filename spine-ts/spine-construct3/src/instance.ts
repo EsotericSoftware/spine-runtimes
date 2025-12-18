@@ -218,7 +218,7 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 		} else {
 			iRenderer.SetAlphaBlend();
 
-			const logo = (this._sdkType as SpineC3PluginType).getSpineLogo(iRenderer);
+			const logo = (this._sdkType as SpineC3PluginType).getSpineLogo(iRenderer, this.layoutView);
 			if (logo) {
 				iRenderer.SetColorRgba(1, 1, 1, errorsString ? 0.25 : 1);
 				iRenderer.SetTexture(logo);
