@@ -46,13 +46,13 @@
             "name": "Position bounds",
             "desc": "Keep the skeleton in a fixed position while adjusting the size and position of the bounds."
           },
-          "spine-scale-x": {
-            "name": "Scale X",
-            "desc": "Scale X"
+          "spine-offset-scale-x": {
+            "name": "Offset Scale X",
+            "desc": "Offset Scale X"
           },
-          "spine-scale-y": {
-            "name": "Scale Y",
-            "desc": "Scale Y"
+          "spine-offset-scale-y": {
+            "name": "Offset Scale Y",
+            "desc": "Offset Scale Y"
           },
           "spine-debug-skeleton": {
             "name": "Debug skeleton",

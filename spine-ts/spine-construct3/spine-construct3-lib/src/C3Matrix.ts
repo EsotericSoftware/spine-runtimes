@@ -41,20 +41,24 @@ export class C3Matrix {
 	public prevX = Infinity;
 	public prevY = Infinity;
 	public prevAngle = Infinity;
+	public prevScaleX = Infinity;
+	public prevScaleY = Infinity;
 
 	private tempPoint = new Vector2();
 
-	public update (x: number, y: number, angle: number) {
-		if (this.prevX === x && this.prevY === y && this.prevAngle === angle) return false;
+	public update (x: number, y: number, angle: number, scaleX = 1, scaleY = 1) {
+		if (this.prevX === x && this.prevY === y && this.prevAngle === angle && this.prevScaleX === scaleX && this.prevScaleY === scaleY) return false;
 		this.prevX = x;
 		this.prevY = y;
 		this.prevAngle = angle;
+		this.prevScaleX = scaleX;
+		this.prevScaleY = scaleY;
 		const cos = Math.cos(angle);
 		const sin = Math.sin(angle);
-		this.a = cos;
-		this.b = sin;
-		this.c = -sin;
-		this.d = cos;
+		this.a = scaleX * cos;
+		this.b = scaleX * sin;
+		this.c = -scaleY * sin;
+		this.d = scaleY * cos;
 		this.tx = x;
 		this.ty = y;
 		return true;

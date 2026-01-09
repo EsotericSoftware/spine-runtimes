@@ -1,6 +1,6 @@
 // / <reference types="editor/sdk" />
 
-import type { AnimationState, AssetLoader, C3Matrix, C3RendererEditor, Skeleton, SpineBoundsProvider, TextureAtlas, } from "@esotericsoftware/spine-construct3-lib";
+import type { AnimationState, AssetLoader, C3Matrix, C3RendererEditor, Skeleton, SpineBoundsProvider, SpineBoundsProviderType, TextureAtlas, } from "@esotericsoftware/spine-construct3-lib";
 import type { SpineC3PluginType } from "./type";
 
 const SDK = globalThis.SDK;
@@ -8,8 +8,6 @@ const SDK = globalThis.SDK;
 const PLUGIN_CLASS = SDK.Plugins.EsotericSoftware_SpineConstruct3;
 
 let spine: typeof globalThis.spine;
-
-type SpineBoundsProviderType = "setup" | "animation-skin" | "AABB";
 
 class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 	private layoutView?: SDK.UI.ILayoutView;
@@ -33,6 +31,8 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 	private positionModePrevX = 0;
 	private positionModePrevY = 0;
 	private positionModePrevAngle = 0;
+	private positionModePrevWidth = 0;
+	private positionModePrevHeight = 0;
 
 	/*
 	 * C3 GameObjects have two sizes:
@@ -46,14 +46,14 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 	 * In a Spine C3 GameObject:
 	 * - the original size is equivalent to spineBounds that is set selecting the BoundsProvider
 	 * - changing the C3 GameObject size from the editor will scale the skeleton by using skeleton.scaleX/Y
-	 *   This information is stored into (PROP_SKELETON_SCALE_X and Y) and later passed to the runtime
+	 *   This information is stored into (PROP_SKELETON_OFFSET_SCALE_X and Y) and later passed to the runtime
 	 * - the origin is position at the skeleton root
 	 *
 	 * positioningBounds allows to offset the position and the size of the C3 GameObject
 	 * with the one of the skeleton. When selected it allows to:
 	 * - move the C3 GameObjects position (visually the rectangle) keeping the skeleton still.
 	 *   This is obtained by adding an offset to the GameObject position.
-	 *   This information is stored into (PROP_SKELETON_SCALE_X and Y) and later passed to the runtime
+	 *   This information is stored into (PROP_SKELETON_OFFSET_SCALE_X and Y) and later passed to the runtime
 	 * - scale the C3 GameObjects keeping the skeleton.scaleX/Y as-is.
 	 */
 	private spineBounds = {
@@ -137,6 +137,8 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 		}
 
 		if (id === PLUGIN_CLASS.PROP_BOUNDS_PROVIDER) {
+			this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_PROVIDER_MOVE, false);
+			this.positioningBounds = false;
 			this.resetBounds(true);
 			this.layoutView?.Refresh();
 			return
@@ -148,11 +150,8 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 				this.positionModePrevX = this._inst.GetX();
 				this.positionModePrevY = this._inst.GetY();
 				this.positionModePrevAngle = this._inst.GetAngle();
-			} else {
-				const scaleX = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_SKELETON_SCALE_X) as number;
-				const scaleY = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_SKELETON_SCALE_Y) as number;
-				this.spineBounds.width = this._inst.GetWidth() / scaleX;
-				this.spineBounds.height = this._inst.GetHeight() / scaleY;
+				this.positionModePrevWidth = this._inst.GetWidth();
+				this.positionModePrevHeight = this._inst.GetHeight();
 			}
 			this.positioningBounds = value;
 			return
@@ -175,35 +174,26 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 
 			const rectX = _inst.GetX();
 			const rectY = _inst.GetY();
-			const rectAngle = _inst.GetAngle();
-			let offsetX = _inst.GetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_X) as number;
-			let offsetY = _inst.GetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_Y) as number;
-			let offsetAngle = _inst.GetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_ANGLE) as number;
 
-			if (!this.positioningBounds) {
-				offsetX += rectX;
-				offsetY += rectY;
-				offsetAngle += rectAngle;
+			if (this.positioningBounds) {
+				const rectAngle = _inst.GetAngle();
 
-				const baseScaleX = _inst.GetWidth() / this.spineBounds.width;
-				const baseScaleY = _inst.GetHeight() / this.spineBounds.height;
-				skeleton.scaleX = baseScaleX;
-				skeleton.scaleY = baseScaleY;
-				_inst.SetPropertyValue(PLUGIN_CLASS.PROP_SKELETON_SCALE_X, baseScaleX);
-				_inst.SetPropertyValue(PLUGIN_CLASS.PROP_SKELETON_SCALE_Y, baseScaleY);
-			} else {
-				offsetX += this.positionModePrevX;
-				offsetY += this.positionModePrevY;
-				offsetAngle += this.positionModePrevAngle;
-				_inst.SetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_X, offsetX - rectX);
-				_inst.SetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_Y, offsetY - rectY);
-				_inst.SetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_ANGLE, offsetAngle - rectAngle);
+				this.propOffsetX += this.positionModePrevX - rectX;
+				this.propOffsetY += this.positionModePrevY - rectY;
+				this.propOffsetAngle = this.propOffsetAngle + this.positionModePrevAngle - rectAngle;
+
 				this.positionModePrevX = rectX;
 				this.positionModePrevY = rectY;
 				this.positionModePrevAngle = rectAngle;
 
-				skeleton.scaleX = _inst.GetPropertyValue(PLUGIN_CLASS.PROP_SKELETON_SCALE_X) as number;
-				skeleton.scaleY = _inst.GetPropertyValue(PLUGIN_CLASS.PROP_SKELETON_SCALE_Y) as number;
+				const currentWidth = _inst.GetWidth();
+				const currentHeight = _inst.GetHeight();
+				if (currentWidth !== this.positionModePrevWidth || currentHeight !== this.positionModePrevHeight) {
+					this.propScaleX = this.propScaleX * this.positionModePrevWidth / currentWidth;
+					this.propScaleY = this.propScaleY * this.positionModePrevHeight / currentHeight;
+					this.positionModePrevWidth = currentWidth;
+					this.positionModePrevHeight = currentHeight;
+				}
 			}
 
 			this.update(0);
@@ -349,18 +339,21 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 	}
 
 	public resetBounds (keepScale = false) {
+		const { _inst } = this;
+
 		if (!this.skeleton || !this.textureAtlas) {
-			this._inst.SetSize(200, 200);
+			_inst.SetSize(200, 200);
 			this.spineBounds.width = 200;
 			this.spineBounds.height = 200;
-			this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_X, 0);
-			this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_Y, 0);
-			this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_ANGLE, 0);
-			this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_SKELETON_SCALE_X, 1);
-			this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_SKELETON_SCALE_Y, 1);
+			this.propOffsetX = 0;
+			this.propOffsetY = 0;
+			this.propOffsetAngle = 0;
+			this.propScaleX = 1;
+			this.propScaleY = 1;
 			return;
 		}
 
+		const { width: oldBoundsWidth, height: oldBoundsHeight } = this.spineBounds;
 		this.setBoundsFromBoundsProvider();
 		if (this.getErrorsString()) {
 			this.spineBoundsInit = false;
@@ -369,43 +362,37 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 
 		this.spineBoundsInit = true;
 
-		const { x, y, width, height } = this.spineBounds;
-		this._inst.SetOrigin(-x / width, -y / height);
+		let { x, y, width, height } = this.spineBounds;
+		_inst.SetOrigin(-x / width, -y / height);
 
-		let scaleX = 1;
-		let scaleY = 1;
 		if (keepScale) {
-			scaleX = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_SKELETON_SCALE_X) as number;
-			scaleY = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_SKELETON_SCALE_Y) as number;
+			width *= (_inst.GetWidth() / oldBoundsWidth) * this.propScaleX;
+			height *= (_inst.GetHeight() / oldBoundsHeight) * this.propScaleY;
 		}
-		this._inst.SetSize(width * scaleX, height * scaleY);
 
-		this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_X, 0);
-		this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_Y, 0);
-		this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_ANGLE, 0);
+		_inst.SetSize(width, height);
+		_inst.SetXY(_inst.GetX() + this.propOffsetX, _inst.GetY() + this.propOffsetY);
+		_inst.SetAngle(_inst.GetAngle() + this.propOffsetAngle);
+
+		this.propOffsetX = 0;
+		this.propOffsetY = 0;
+		this.propOffsetAngle = 0;
+		this.propScaleX = 1;
+		this.propScaleY = 1;
 		return;
 	}
 
 	private initBounds () {
-		if (this.spineBoundsInit) return;
+		if (this.spineBoundsInit || !this.skeleton) return;
 
-		const offsetX = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_X) as number;
-		const offsetY = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_Y) as number;
-		const offsetAngle = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_ANGLE) as number;
-		const shiftedBounds = offsetX !== 0 || offsetY !== 0 || offsetAngle !== 0;
-
-		const scaleX = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_SKELETON_SCALE_X) as number;
-		const scaleY = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_SKELETON_SCALE_Y) as number;
-		const scaledBounds = scaleX !== 1 || scaleY !== 1;
-
-		if (!shiftedBounds && !scaledBounds) {
-			this.resetBounds();
-			return;
-		}
+		const matchesOldBounds = this._inst.GetWidth() === this.spineBounds.width && this._inst.GetHeight() === this.spineBounds.height;
 
 		this.setBoundsFromBoundsProvider();
-		this.spineBounds.width = this._inst.GetWidth() / scaleX;
-		this.spineBounds.height = this._inst.GetHeight() / scaleY;
+
+		const { x, y, width, height } = this.spineBounds;
+		this._inst.SetOrigin(-x / width, -y / height);
+
+		if (matchesOldBounds) this._inst.SetSize(width, height);
 
 		this.spineBoundsInit = true;
 	}
@@ -473,11 +460,57 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 		state.update(delta);
 		skeleton.update(delta);
 		state.apply(skeleton);
+
+		const actualScaleX = (this._inst.GetWidth() / this.spineBounds.width) * this.propScaleX;
+		const actualScaleY = (this._inst.GetHeight() / this.spineBounds.height) * this.propScaleY;
+
 		this.matrix.update(
-			this._inst.GetX() + (this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_X) as number),
-			this._inst.GetY() + (this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_Y) as number),
-			this._inst.GetAngle() + (this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_ANGLE) as number));
+			this._inst.GetX() + this.propOffsetX,
+			this._inst.GetY() + this.propOffsetY,
+			this._inst.GetAngle() + this.propOffsetAngle,
+			actualScaleX,
+			actualScaleY);
 		skeleton.updateWorldTransform(spine.Physics.update);
+	}
+
+	private get propScaleX () {
+		return this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_SKELETON_OFFSET_SCALE_X) as number
+	}
+
+	private set propScaleX (value: number) {
+		this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_SKELETON_OFFSET_SCALE_X, value);
+	}
+
+	private get propScaleY () {
+		return this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_SKELETON_OFFSET_SCALE_Y) as number
+	}
+
+	private set propScaleY (value: number) {
+		this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_SKELETON_OFFSET_SCALE_Y, value);
+	}
+
+	private get propOffsetX () {
+		return this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_X) as number;
+	}
+
+	private set propOffsetX (value: number) {
+		this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_X, value);
+	}
+
+	private get propOffsetY () {
+		return this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_Y) as number;
+	}
+
+	private set propOffsetY (value: number) {
+		this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_Y, value);
+	}
+
+	private get propOffsetAngle () {
+		return this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_ANGLE) as number;
+	}
+
+	private set propOffsetAngle (value: number) {
+		this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_ANGLE, value);
 	}
 
 	GetTexture () {

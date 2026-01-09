@@ -46,13 +46,13 @@
             "name": "位置边界",
             "desc": "在调整边界大小和位置时保持骨架固定在一个位置。"
           },
-          "spine-scale-x": {
-            "name": "X缩放",
-            "desc": "X缩放"
+          "spine-offset-scale-x": {
+            "name": "偏移缩放X",
+            "desc": "偏移缩放X"
           },
-          "spine-scale-y": {
-            "name": "Y缩放",
-            "desc": "Y缩放"
+          "spine-offset-scale-y": {
+            "name": "偏移缩放Y",
+            "desc": "偏移缩放Y"
           },
           "spine-debug-skeleton": {
             "name": "调试骨架",

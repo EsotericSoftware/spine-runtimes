@@ -1,3 +1,5 @@
+import type { SpineBoundsProviderType } from "@esotericsoftware/spine-construct3-lib";
+
 import type { SDKEditorInstanceClass } from "./instance.ts";
 
 const SDK = globalThis.SDK;
@@ -29,12 +31,12 @@ const PLUGIN_CLASS = class SpineC3Plugin extends SDK.IPluginBase {
 	static PROP_BOUNDS_OFFSET_X = "spine-bounds-offset-x";
 	static PROP_BOUNDS_OFFSET_Y = "spine-bounds-offset-y";
 	static PROP_BOUNDS_OFFSET_ANGLE = "spine-bounds-offset-angle";
-	static PROP_SKELETON_SCALE_X = "spine-scale-x";
-	static PROP_SKELETON_SCALE_Y = "spine-scale-y";
+	static PROP_SKELETON_OFFSET_SCALE_X = "spine-offset-scale-x";
+	static PROP_SKELETON_OFFSET_SCALE_Y = "spine-offset-scale-y";
 	static PROP_DEBUG_SKELETON = "spine-debug-skeleton";
 
-	static TYPE_BOUNDS_SETUP = "setup";
-	static TYPE_BOUNDS_ANIMATION_SKIN = "animation-skin";
+	static TYPE_BOUNDS_SETUP: SpineBoundsProviderType = "setup";
+	static TYPE_BOUNDS_ANIMATION_SKIN: SpineBoundsProviderType = "animation-skin";
 
 	constructor () {
 		super(PLUGIN_ID);
@@ -91,11 +93,12 @@ const PLUGIN_CLASS = class SpineC3Plugin extends SDK.IPluginBase {
 			new SDK.PluginProperty("float", SpineC3Plugin.PROP_BOUNDS_OFFSET_X, 0),
 			new SDK.PluginProperty("float", SpineC3Plugin.PROP_BOUNDS_OFFSET_Y, 0),
 			new SDK.PluginProperty("float", SpineC3Plugin.PROP_BOUNDS_OFFSET_ANGLE, 0),
-			new SDK.PluginProperty("float", SpineC3Plugin.PROP_SKELETON_SCALE_X, 1),
-			new SDK.PluginProperty("float", SpineC3Plugin.PROP_SKELETON_SCALE_Y, 1),
+			new SDK.PluginProperty("float", SpineC3Plugin.PROP_SKELETON_OFFSET_SCALE_X, 1),
+			new SDK.PluginProperty("float", SpineC3Plugin.PROP_SKELETON_OFFSET_SCALE_Y, 1),
 			new SDK.PluginProperty("link", "set-bounds", {
 				linkCallback: (instance) => {
 					const sdkInst = instance as SDKEditorInstanceClass;
+					sdkInst._inst.SetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_PROVIDER_MOVE, false);
 					sdkInst.resetBounds(true);
 				},
 				callbackType: "for-each-instance"

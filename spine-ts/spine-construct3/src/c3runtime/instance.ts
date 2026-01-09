@@ -1,4 +1,4 @@
-import type { AnimationState, AnimationStateListener, AssetLoader, Bone, C3Matrix, C3RendererRuntime, Event, NumberArrayLike, RegionAttachment, Skeleton, Skin, Slot, TextureAtlas, } from "@esotericsoftware/spine-construct3-lib";
+import type { AnimationState, AnimationStateListener, AssetLoader, Bone, C3Matrix, C3RendererRuntime, Event, NumberArrayLike, RegionAttachment, Skeleton, Skin, Slot, SpineBoundsProvider, SpineBoundsProviderType, TextureAtlas, } from "@esotericsoftware/spine-construct3-lib";
 
 const C3 = globalThis.C3;
 const spine = globalThis.spine;
@@ -17,9 +17,10 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	propScaleX = 1;
 	propScaleY = 1;
 	propDebugSkeleton = false;
+	propBoundsProvider: SpineBoundsProviderType = "setup";
 
 	isFlippedX = false;
-	isPlaying = false;
+	isPlaying = true;
 	animationSpeed = 1.0;
 	physicsMode = spine.Physics.update;
 	customSkins: Record<string, Skin> = {};
@@ -42,6 +43,13 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	private skeletonRenderer?: C3RendererRuntime;
 	private matrix: C3Matrix;
 	private requestRedraw = false;
+
+	private spineBounds = {
+		x: 0,
+		y: 0,
+		width: 200,
+		height: 200,
+	};
 
 	private verticesTemp = spine.Utils.newFloatArray(2 * 1024);
 
@@ -71,7 +79,9 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			this.propSkin = skinProp === "" ? [] : skinProp.split(",");
 			this.propAnimation = properties[4] as string;
 			this.propDebugSkeleton = properties[5] as boolean;
-
+			const boundsProviderIndex = properties[6] as number;
+			this.propBoundsProvider = boundsProviderIndex === 0 ? "setup" : "animation-skin";
+			// properties[7] is PROP_BOUNDS_PROVIDER_MOVE
 			this.propOffsetX = properties[8] as number;
 			this.propOffsetY = properties[9] as number;
 			this.propOffsetAngle = properties[10] as number;
@@ -115,7 +125,9 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		this.matrix.update(
 			this.x + this.propOffsetX,
 			this.y + this.propOffsetY,
-			this.angle + this.propOffsetAngle);
+			this.angle + this.propOffsetAngle,
+			this.width / this.spineBounds.width * this.propScaleX * (this.isFlippedX ? -1 : 1),
+			this.height / this.spineBounds.height * this.propScaleY);
 
 		if (this.isPlaying) this.update(this.dt);
 	}
@@ -266,8 +278,8 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 					pose.y = y;
 				} else {
 					const { x, y } = matrix.gameToSkeleton(touchX - handleObject.offsetX, touchY - handleObject.offsetY);
-					pose.x = x / skeleton.scaleX;
-					pose.y = -y / skeleton.scaleY * spine.Skeleton.yDir;
+					pose.x = x;
+					pose.y = -y * spine.Skeleton.yDir;
 				}
 			} else if (!this.prevLeftClickDown) {
 				const applied = bone.applied;
@@ -422,14 +434,35 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 
 			this._setSkin();
 
-			this.skeleton.scaleX = this.isFlippedX ? -this.propScaleX : this.propScaleX;
-			this.skeleton.scaleY = this.propScaleY;
+			this.calculateBounds();
 
 			this.update(0);
 
 			this.skeletonLoaded = true;
 			this._trigger(C3.Plugins.EsotericSoftware_SpineConstruct3.Cnds.OnSkeletonLoaded);
 		}
+	}
+
+	private calculateBounds () {
+		const { skeleton } = this;
+		if (!skeleton) return;
+
+		let boundsProvider: SpineBoundsProvider;
+		console.log(this.propBoundsProvider);
+		if (this.propBoundsProvider === "animation-skin") {
+			const { propSkin, propAnimation } = this;
+			if ((propSkin && propSkin.length > 0) || propAnimation) {
+				boundsProvider = new spine.SkinsAndAnimationBoundsProvider(propAnimation, propSkin);
+			} else {
+				boundsProvider = new spine.SetupPoseBoundsProvider();
+			}
+		} else if (this.propBoundsProvider === "setup") {
+			boundsProvider = new spine.SetupPoseBoundsProvider();
+		} else {
+			boundsProvider = new spine.AABBRectangleBoundsProvider(0, 0, 100, 100);
+		}
+
+		this.spineBounds = boundsProvider.calculateBounds(this);
 	}
 	/**********/
 
@@ -742,7 +775,6 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			const { x, y } = matrix.boneToGame(bone);
 			const boneRotation = bone.applied.getWorldRotationX();
 
-			// Apply rotation to offset
 			const rotationRadians = boneRotation * Math.PI / 180;
 			const cos = Math.cos(rotationRadians);
 			const sin = Math.sin(rotationRadians);
@@ -912,11 +944,6 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 
 	public flipX (isFlippedX: boolean) {
 		this.isFlippedX = isFlippedX;
-
-		const { skeleton } = this;
-		if (skeleton) {
-			skeleton.scaleX = isFlippedX ? -this.propScaleX : this.propScaleX;
-		}
 	}
 
 	public setPhysicsMode (mode: 0 | 1 | 2 | 3) {

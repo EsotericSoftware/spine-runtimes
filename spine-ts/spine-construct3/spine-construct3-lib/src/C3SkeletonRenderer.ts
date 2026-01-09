@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { type BlendMode, type Bone, ClippingAttachment, MathUtils, MeshAttachment, PathAttachment, RegionAttachment, RenderCommand, type Skeleton, SkeletonRendererCore, Utils, Vector2 } from "@esotericsoftware/spine-core";
+import { type BlendMode, type Bone, ClippingAttachment, MathUtils, MeshAttachment, PathAttachment, RegionAttachment, type RenderCommand, type Skeleton, SkeletonRendererCore, Utils, Vector2 } from "@esotericsoftware/spine-core";
 import type { C3Matrix } from "./C3Matrix";
 import { BlendingModeSpineToC3, type C3TextureEditor, type C3TextureRuntime } from "./C3Texture";
 

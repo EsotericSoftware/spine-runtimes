@@ -41,6 +41,8 @@ interface GameObject {
 	state?: AnimationState,
 }
 
+export type SpineBoundsProviderType = "setup" | "animation-skin" | "AABB";
+
 export interface SpineBoundsProvider {
 	/** Returns the bounding box for the skeleton, in skeleton space. */
 	calculateBounds (gameObject: GameObject): Rectangle;
