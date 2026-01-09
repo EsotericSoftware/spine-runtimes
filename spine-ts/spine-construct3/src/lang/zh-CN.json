@@ -61,7 +61,7 @@
           "spine-bounds-offset-x": {
             "name": "X偏移",
             "desc": "X偏移"
-          },
+          }，
           "spine-bounds-offset-y": {
             "name": "Y偏移",
             "desc": "Y偏移"
@@ -634,7 +634,7 @@
             }
           },
           "get-event-data": {
-            "description": "获取最后触发的动画事件的数据。通常在"动画事件触发时"条件中使用。有效字段: \"float\", \"int\", \"string\", \"balance\", \"volume\", \"audiopath\", \"event\", \"track\", \"animation\"。",
+            "description": "获取最后触发的动画事件的数据。通常在'动画事件触发时'条件中使用。有效字段: \"float\", \"int\", \"string\", \"balance\", \"volume\", \"audiopath\", \"event\", \"track\", \"animation\"。"，
             "translated-name": "GetEventData",
             "params": {
               "field": {
