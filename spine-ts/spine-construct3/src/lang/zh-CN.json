@@ -141,7 +141,7 @@
           "is-animation-playing": {
             "list-name": "动画是否正在播放",
             "display-text": "动画{0}是否在轨道{1}上播放",
-            "description": "检查动画是否正在播放。使用空字符串匹配任何动画，使用-1匹配所有轨道。",
+            "description": "检查动画是否正在播放。使用空字符串匹配任何动画,使用-1匹配所有轨道。",
             "params": {
               "animation-name": {
                 "name": "动画名称",
@@ -178,13 +178,13 @@
             "params": {
               "is-flipped-x": {
                 "name": "是否水平翻转",
-                "desc": "设为true时水平翻转骨架，设为false时正常显示。"
+                "desc": "设为true时水平翻转骨架,设为false时正常显示。"
               }
             }
           },
           "set-animation": {
             "list-name": "设置动画",
-            "display-text": "在轨道{0}上设置动画{1}，循环{2}",
+            "display-text": "在轨道{0}上设置动画{1},循环{2}",
             "description": "设置动画",
             "params": {
               "track": {
@@ -203,7 +203,7 @@
           },
           "add-animation": {
             "list-name": "添加动画",
-            "display-text": "在轨道{0}上添加动画{1}，循环{2}，延迟{3}",
+            "display-text": "在轨道{0}上添加动画{1},循环{2},延迟{3}",
             "description": "添加动画",
             "params": {
               "track": {
@@ -236,7 +236,7 @@
           },
           "set-empty-animation": {
             "list-name": "设置空动画",
-            "display-text": "在轨道{0}上设置空动画，混合时长{1}",
+            "display-text": "在轨道{0}上设置空动画,混合时长{1}",
             "description": "在特定轨道上设置空动画",
             "params": {
               "track": {
@@ -304,7 +304,7 @@
           "set-animation-speed": {
             "list-name": "设置动画速度",
             "display-text": "将动画速度设置为{0}",
-            "description": "设置动画播放速度（1.0 = 正常，2.0 = 两倍速，0.5 = 半速）",
+            "description": "设置动画播放速度（1.0 = 正常,2.0 = 两倍速,0.5 = 半速）",
             "params": {
               "speed": {
                 "name": "速度",
@@ -389,7 +389,7 @@
             "params": {
               "alpha": {
                 "name": "透明度",
-                "desc": "透明度值（0.0 到 1.0，其中 0 为完全透明，1 为完全不透明）"
+                "desc": "透明度值（0.0 到 1.0,其中 0 为完全透明,1 为完全不透明）"
               },
               "track-index": {
                 "name": "轨道索引",
@@ -465,7 +465,7 @@
           },
           "attach-instance-to-bone": {
             "list-name": "将实例附加到骨骼",
-            "display-text": "将实例UID {0}附加到骨骼{1}，偏移({2}, {3}, {4}°)",
+            "display-text": "将实例UID {0}附加到骨骼{1},偏移({2}, {3}, {4}°)",
             "description": "使对象实例跟随骨架骨骼的位置和旋转。实例将每帧自动更新其位置和角度以匹配骨骼。偏移量在骨骼的本地空间中应用（随骨骼旋转）。",
             "params": {
               "uid": {
@@ -503,7 +503,7 @@
           },
           "add-handle": {
             "list-name": "添加控制柄",
-            "display-text": "为{0} {1}添加交互控制柄，半径{2}（调试：{3}）",
+            "display-text": "为{0} {1}添加交互控制柄,半径{2}（调试：{3}）",
             "description": "为骨骼或插槽添加可以用鼠标拖动的交互控制柄。半径决定可点击区域的大小。",
             "params": {
               "type": {
@@ -620,7 +620,7 @@
             }
           },
           "current-skin": {
-            "description": "获取当前皮肤名称。如果有多个皮肤处于活动状态，返回逗号分隔的名称。",
+            "description": "获取当前皮肤名称。如果有多个皮肤处于活动状态,返回逗号分隔的名称。",
             "translated-name": "CurrentSkin"
           },
           "current-animation": {
@@ -634,7 +634,7 @@
             }
           },
           "get-event-data": {
-            "description": "获取最后触发的动画事件的数据。通常在'动画事件触发时'条件中使用。有效字段: \"float\", \"int\", \"string\", \"balance\", \"volume\", \"audiopath\", \"event\", \"track\", \"animation\"。"，
+            "description": "获取最后触发的动画事件的数据。通常在'动画事件触发时'条件中使用。有效字段: \"float\", \"int\", \"string\", \"balance\", \"volume\", \"audiopath\", \"event\", \"track\", \"animation\"。",
             "translated-name": "GetEventData",
             "params": {
               "field": {
