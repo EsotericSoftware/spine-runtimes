@@ -1,4 +1,4 @@
-import type { AnimationState, AnimationStateListener, AssetLoader, Bone, C3Matrix, C3RendererRuntime, Event, NumberArrayLike, RegionAttachment, Skeleton, Skin, Slot, SpineBoundsProvider, SpineBoundsProviderType, TextureAtlas, } from "@esotericsoftware/spine-construct3-lib";
+import type { AnimationState, AssetLoader, Bone, C3Matrix, C3RendererRuntime, Event, NumberArrayLike, RegionAttachment, Skeleton, Skin, Slot, SpineBoundsProvider, SpineBoundsProviderType, TextureAtlas, } from "@esotericsoftware/spine-construct3-lib";
 
 const C3 = globalThis.C3;
 const spine = globalThis.spine;
@@ -426,11 +426,16 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			this.skeleton = new spine.Skeleton(skeletonData);
 			const animationStateData = new spine.AnimationStateData(skeletonData);
 			this.state = new spine.AnimationState(animationStateData);
+			this.state.addListener({
+				start: (entry) => this.triggerAnimationEvent("start", entry.trackIndex, entry.animation?.name ?? ""),
+				dispose: (entry) => this.triggerAnimationEvent("dispose", entry.trackIndex, entry.animation?.name ?? ""),
+				event: (entry, event) => this.triggerAnimationEvent("event", entry.trackIndex, entry.animation?.name ?? "", event),
+				interrupt: (entry) => this.triggerAnimationEvent("interrupt", entry.trackIndex, entry.animation?.name ?? ""),
+				end: (entry) => this.triggerAnimationEvent("end", entry.trackIndex, entry.animation?.name ?? ""),
+				complete: (entry) => this.triggerAnimationEvent("complete", entry.trackIndex, entry.animation?.name ?? ""),
+			});
 
-			if (this.propAnimation) {
-				this.setAnimation(0, this.propAnimation, true);
-				this.isPlaying = true;
-			}
+			if (this.propAnimation) this.setAnimation(0, this.propAnimation, true);
 
 			this._setSkin();
 
@@ -473,20 +478,14 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	public setAnimation (track: number, animation: string, loop = false) {
 		const { state } = this;
 		if (!state) return;
-
-		const trackEntry = state.setAnimation(track, animation, loop);
-		trackEntry.listener = this.makeTrackListener(track, animation);
-
+		state.setAnimation(track, animation, loop);
 		this.isPlaying = true;
 	}
 
 	public addAnimation (track: number, animation: string, loop = false, delay = 0) {
 		const { state } = this;
 		if (!state) return;
-
-		const trackEntry = state.addAnimation(track, animation, loop, delay);
-		trackEntry.listener = this.makeTrackListener(track, animation);
-
+		state.addAnimation(track, animation, loop, delay);
 		this.isPlaying = true;
 	}
 
@@ -588,15 +587,6 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		this._trigger(C3.Plugins.EsotericSoftware_SpineConstruct3.Cnds.OnAnimationEvent);
 	}
 
-	private makeTrackListener = (track: number, animation: string): AnimationStateListener => ({
-		start: () => this.triggerAnimationEvent("start", track, animation),
-		dispose: () => this.triggerAnimationEvent("dispose", track, animation),
-		event: (_, event) => this.triggerAnimationEvent("event", track, animation, event),
-		interrupt: () => this.triggerAnimationEvent("interrupt", track, animation),
-		end: () => this.triggerAnimationEvent("end", track, animation),
-		complete: () => this.triggerAnimationEvent("complete", track, animation),
-	})
-
 	/**********/
 
 	/*
@@ -628,19 +618,13 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		} else if (skins.length === 1) {
 			const skinName = skins[0];
 			const skin = skeleton.data.findSkin(skinName);
-			if (!skin) {
-				// TODO: signal error
-				return;
-			}
+			if (!skin) throw new Error(`The given skin is not present in the skeleton data: ${skinName}`);
 			skeleton.setSkin(skins[0]);
 		} else {
 			const customSkin = new spine.Skin(skins.join(","));
 			for (const s of skins) {
 				const skin = skeleton.data.findSkin(s)
-				if (!skin) {
-					// TODO: signal error
-					return;
-				}
+				if (!skin) throw new Error(`The given skin is not present in the skeleton data: ${s}`);
 				customSkin.addSkin(skin);
 			}
 			skeleton.setSkin(customSkin);
