@@ -1,0 +1,112 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>spine-pixi</title>
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@7.4.2/dist/pixi.min.js"></script>
+    <script src="../dist/iife/spine-pixi-v7.js"></script>
+    <link rel="stylesheet" href="../../index.css">
+  </head>
+
+  <body>
+    <script>
+      (async function () {
+        var app = new PIXI.Application({
+          width: window.innerWidth,
+          height: window.innerHeight,
+          resolution: window.devicePixelRatio || 1,
+          autoDensity: true,
+          resizeTo: window,
+          backgroundColor: 0x7CFC00,
+          hello: true,
+        });
+        document.body.appendChild(app.view);
+
+        // Pre-load the skeleton data and atlas. You can also load .json skeleton data.
+        PIXI.Assets.add("spineboyData", "/assets/spineboy-pro.skel");
+        PIXI.Assets.add("spineboyAtlas", "/assets/spineboy-pma.atlas");
+        await PIXI.Assets.load(["spineboyData", "spineboyAtlas"]);
+
+        // Create the spine display object
+        const spineboy = spine.Spine.from({skeleton: "spineboyData", atlas: "spineboyAtlas",
+          scale: 0.5,
+        });
+
+        // Set animation "run" on track 0, looped.
+        spineboy.state.setAnimation(0, "walk", true);
+
+        // Set the default mix time to use when transitioning from one animation to the next.
+        spineboy.state.data.defaultMix = 0.2;
+        
+        // Center the spine object on screen.
+        spineboy.x = window.innerWidth / 2;
+        spineboy.y = window.innerHeight / 2 + spineboy.getBounds().height / 2;
+
+        // Default v4 vertex shader
+        const vertexShader = `
+        attribute vec2 aVertexPosition;
+        attribute vec2 aTextureCoord;
+
+        uniform mat3 projectionMatrix;
+
+        varying vec2 vTextureCoord;
+
+        void main(void) {
+            gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
+            vTextureCoord = aTextureCoord;
+        }
+        `;
+
+        const fragmentShader = `
+        varying vec2 vTextureCoord;
+
+        uniform sampler2D uSampler;
+        uniform vec4 inputSize;
+        uniform vec4 outputFrame;
+        uniform vec2 shadowDirection;
+        uniform float floorY;
+
+        void main(void) {
+            //1. get the screen coordinate
+            vec2 screenCoord = vTextureCoord * inputSize.xy + outputFrame.xy;
+            //2. calculate Y shift of our dimension vector
+            vec2 shadow;
+            //shadow coordinate system is a bit skewed, but it has to be the same for screenCoord.y = floorY
+            float paramY = (screenCoord.y - floorY) / shadowDirection.y;
+            shadow.y = paramY + floorY;
+            shadow.x = screenCoord.x + paramY * shadowDirection.x;
+            vec2 bodyFilterCoord = (shadow - outputFrame.xy) * inputSize.zw; // same as / inputSize.xy
+
+            vec4 originalColor = texture2D(uSampler, vTextureCoord);
+            vec4 shadowColor = texture2D(uSampler, bodyFilterCoord);
+            shadowColor.rgb = vec3(0.0);
+            shadowColor.a *= 0.5;
+
+            // normal blend mode coefficients (1, 1-src_alpha)
+            // shadow is destination (backdrop), original is source
+            gl_FragColor = originalColor + shadowColor * (1.0 - originalColor.a);
+        }
+        `;
+        
+        const shadowFilter = new PIXI.Filter(vertexShader, fragmentShader);
+        
+        // first is the horizontal shift, positive is to the right
+        // second is the same as scaleY
+        shadowFilter.uniforms.shadowDirection = [0.4, 0.5];
+        shadowFilter.uniforms.floorY = 0.0;
+
+        // padding is the max shadow shift to the sides
+        shadowFilter.padding = 200;
+
+        spineboy.filters = [shadowFilter];
+
+        app.ticker.add(() => {
+            // take ground Y in screen coords to uniforms
+            shadowFilter.uniforms.floorY = spineboy.toGlobal(new PIXI.Point(0, 0)).y;
+        });
+
+        // Add the display object to the stage.
+        app.stage.addChild(spineboy);
+      })();
+    </script>
+  </body>
+</html>

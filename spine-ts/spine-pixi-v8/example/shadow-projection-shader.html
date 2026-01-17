@@ -1,0 +1,140 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>spine-pixi-v8</title>
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@8.4.1/dist/pixi.js"></script>
+    <script src="../dist/iife/spine-pixi-v8.js"></script>
+    <link rel="stylesheet" href="../../index.css">
+  </head>
+
+  <body>
+    <script>
+      (async function () {
+        var app = new PIXI.Application();
+        await app.init({
+          width: window.innerWidth,
+          height: window.innerHeight,
+          resolution: window.devicePixelRatio || 1,
+          autoDensity: true,
+          resizeTo: window,
+          backgroundColor: 0x7CFC00,
+          hello: true,
+        })
+        document.body.appendChild(app.canvas);
+
+        // Pre-load the skeleton data and atlas. You can also load .json skeleton data.
+        PIXI.Assets.add({alias: "spineboyData", src: "/assets/spineboy-pro.skel"});
+        PIXI.Assets.add({alias: "spineboyAtlas", src: "/assets/spineboy-pma.atlas"});
+        await PIXI.Assets.load(["spineboyData", "spineboyAtlas"]);
+
+        // Create the spine display object
+        const spineboy = spine.Spine.from({skeleton: "spineboyData", atlas: "spineboyAtlas",
+          scale: 0.5,
+        });
+
+        // Set the default mix time to use when transitioning from one animation to the next.
+        spineboy.state.data.defaultMix = 0.2;
+
+        // Set animation "run" on track 0, looped.
+        spineboy.state.setAnimation(0, "walk", true);
+
+        // Center the spine object on screen.
+        spineboy.x = window.innerWidth / 2;
+        spineboy.y = window.innerHeight / 2 + spineboy.getBounds().height / 2;
+
+        const vertexShader = /* glsl */ `#version 300 es
+        precision highp float;
+        
+        in vec2 aPosition;
+        
+        uniform vec4 uInputSize;
+        uniform vec4 uOutputFrame;
+        uniform vec4 uOutputTexture;
+        
+        out vec2 vTextureCoord;
+        
+        void main() {
+          vec2 position = aPosition * uOutputFrame.zw + uOutputFrame.xy;
+          position.x = position.x * (2.0 / uOutputTexture.x) - 1.0;
+          position.y = position.y * (2.0 * uOutputTexture.z / uOutputTexture.y) - uOutputTexture.z;
+          gl_Position = vec4(position, 0.0, 1.0);
+          vTextureCoord = aPosition * (uOutputFrame.zw * uInputSize.zw);
+        }
+      `;
+
+      const fragmentShader = /* glsl */ `#version 300 es
+        precision highp float;
+        
+        in vec2 vTextureCoord;
+        
+        uniform sampler2D uTexture;
+        uniform vec4 uInputSize;
+        uniform vec4 uOutputFrame;
+        uniform vec2 uShadowDirection;
+        uniform vec3 uShadowColor;
+        uniform float uFloorY;
+        uniform float uAlpha;
+        
+        out vec4 finalColor;
+        
+        void main() {
+          vec2 screenCoord = vTextureCoord * uInputSize.xy + uOutputFrame.xy;
+          
+          // Shadow projection logic
+          float paramY = (screenCoord.y - uFloorY) / uShadowDirection.y;
+          vec2 shadow;
+          shadow.y = paramY + uFloorY;
+          shadow.x = screenCoord.x + paramY * uShadowDirection.x;
+          
+          vec2 bodyFilterCoord = (shadow - uOutputFrame.xy) * uInputSize.zw;
+          
+          vec4 originalColor = texture(uTexture, vTextureCoord);
+          
+          // Boundary Check: Prevents "streaking" if shadow goes outside texture bounds
+          // We strictly check 0.0 to 1.0 range
+          bool outside = bodyFilterCoord.x < 0.0 || bodyFilterCoord.x > 1.0 || 
+                        bodyFilterCoord.y < 0.0 || bodyFilterCoord.y > 1.0;
+                        
+          if (outside) {
+            finalColor = originalColor;
+          } else {
+            vec4 shadowSample = texture(uTexture, bodyFilterCoord);
+            
+            // Apply custom shadow color and alpha
+            vec4 shadowColor = vec4(uShadowColor, shadowSample.a * uAlpha);
+            
+            // Composite: Shadow (backdrop) + Original (source)
+            finalColor = originalColor + shadowColor * (1.0 - originalColor.a);
+          }
+        }
+        `;
+
+        const { Filter, GlProgram } = PIXI;
+        const shadowFilter = new Filter({
+          glProgram: GlProgram.from({ vertex: vertexShader, fragment: fragmentShader }),
+          resources: {
+            shadowUniforms: {
+              uShadowDirection: { value: [0.4, 0.5], type: "vec2<f32>" },
+              uShadowColor: { value: [0.0, 0.0, 0.0], type: "vec3<f32>" },
+              uFloorY: { value: [0.0], type: "f32" },
+              uAlpha: { value: [0.4], type: "f32" },
+            },
+          },
+        })
+        
+        // Padding is the max shadow shift to the sides
+        shadowFilter.padding = 200;
+
+        spineboy.filters = [shadowFilter];
+
+        app.ticker.add(() => {
+            // Calculate global Y of the spine's origin (feet)
+            shadowFilter.resources.shadowUniforms.uniforms.uFloorY = spineboy.toGlobal({ x: 0, y: 0 }).y
+        });
+
+        // Add the display object to the stage.
+        app.stage.addChild(spineboy);
+      })();
+    </script>
+  </body>
+</html>
