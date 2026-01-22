@@ -13,5 +13,6 @@ declare namespace SDK {
 		OnCreate(): void;
 
 		OnPropertyChanged(id: string, value: EditorPropertyValueType): void;
+		OnAddedInEditor(): void;
 	}
 }

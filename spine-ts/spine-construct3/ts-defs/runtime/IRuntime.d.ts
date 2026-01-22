@@ -16,8 +16,10 @@ type LayerParameter = string | number;
 type ImagePointParameter = string | number;
 type BlendModeParameter = "normal" | "additive" | "copy" | "destination-over" | "source-in" | "destination-in" | "source-out" | "destination-out" | "source-atop" | "destination-atop" | "lighten" | "darken" | "multiply" | "screen";
 
-type FramerateModeType = "vsync" | "unlimited-tick" | "unlimited-frame";
+type FramerateModeType = "vsync" | "fixed" | "unlimited-tick" | "unlimited-frame";
 type SamplingModeType = "nearest" | "bilinear" | "trilinear";
+type SamplingModeOrAutoType = "auto" | "nearest" | "bilinear" | "trilinear";
+type AnisotropicFilteringModeType = "auto" | "off" | "2x" | "3x" | "4x" | "8x" | "16x";
 
 type TextAlignHorizontalMode = "left" | "center" | "right";
 type TextAlignVerticalMode = "top" | "center" | "bottom";
@@ -149,8 +151,9 @@ declare class IRuntime extends ConstructEventTarget<RuntimeEventMap>
 	readonly viewportHeight: number;
 	getViewportSize(): Vec2Arr;
 
-	readonly sampling: SamplingModeType;
+	sampling: SamplingModeType;
 	isPixelRoundingEnabled: boolean;
+	anisotropicFiltering: AnisotropicFilteringModeType;
 
 	get dt(): number;
 	get dtRaw(): number;
@@ -170,6 +173,7 @@ declare class IRuntime extends ConstructEventTarget<RuntimeEventMap>
 	get cpuUtilisation(): number;
 	get gpuUtilisation(): number;
 	framerateMode: FramerateModeType;
+	fixedFramerate: number;
 	minDt: number;
 	maxDt: number;
 
@@ -178,6 +182,7 @@ declare class IRuntime extends ConstructEventTarget<RuntimeEventMap>
 
 	getInstanceByUid(uid: number): IInstance | null;
 	sortZOrder(iterable: Iterable<IWorldInstance>, callback: (a: IWorldInstance, b: IWorldInstance) => number): void;
+	destroyMultiple(instances: Iterable<IInstance>): void;
 
 	/** Call a function in an event sheet, by a case-insensitive string of its name.
 	 * Each parameter provided for 'params' is passed to the function.

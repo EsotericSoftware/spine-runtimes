@@ -2,7 +2,7 @@
 /** Represents the Construct Game Services object.
  * @see {@link https://www.construct.net/make-games/manuals/construct-3/scripting/scripting-reference/plugin-interfaces/construct-game-services | ICGSObjectType documentation } */
 
-type CGSSignInProvider = "Apple" | "BattleNet" | "Discord" | "Facebook" | "Github" | "Google" | "ItchIO" | "Microsoft" | "Reddit" | "Steam" | "Twitch" | "X" | "Yandex";
+type CGSSignInProvider = "Apple" | "BattleNet" | "Discord" | "Facebook" | "Github" | "Google" | "ItchIO" | "Microsoft" | "Patreon" | "Reddit" | "Steam" | "X" | "Yandex";
 
 interface CGSSignInOptions {
 	allowPersisting?: boolean;

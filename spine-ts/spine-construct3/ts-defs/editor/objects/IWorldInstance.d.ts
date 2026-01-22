@@ -36,5 +36,10 @@ declare namespace SDK {
 		GetLayout(): SDK.ILayout;
 
 		ApplyBlendMode(iRenderer: SDK.Gfx.IWebGLRenderer): void;
+
+		SetSampling(sampling: SamplingModeOrAutoType): void;
+		GetSampling(): SamplingModeOrAutoType;
+
+		GetActiveSampling(): SamplingModeType;
 	}
 }

@@ -35,7 +35,7 @@ declare class IInstance
 
 	hasTag(tag: string): boolean;
 	hasTags(...tagsArray: string[]): boolean;
-	setAllTags(tagsSet: Iterable<string>): void;
+	setAllTags(tags: Iterable<string>): void;
 	getAllTags(): Set<string>;
 
 	destroy(): void;
@@ -45,4 +45,6 @@ declare class IInstance
 
 	signal(tag: string): void;
 	waitForSignal(tag: string): Promise<void>;
+
+	callCustomAction(name: string, ...params: CallFunctionParameter[]): Promise<void>;
 }

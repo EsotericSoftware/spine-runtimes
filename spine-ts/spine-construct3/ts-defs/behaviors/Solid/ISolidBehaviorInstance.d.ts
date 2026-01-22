@@ -3,13 +3,21 @@
  * @see {@link https://www.construct.net/make-games/manuals/construct-3/scripting/scripting-reference/behavior-interfaces/solid | ISolidBehaviorInstance documentation } */
 declare class ISolidBehaviorInstance<InstType> extends IBehaviorInstance<InstType>
 {
+	isEnabled: boolean;
+	readonly usesInstanceTags: boolean;
+
 	/**
-	 * @deprecated Use setAllTags() or getAllTags() instead, which use more suitable data types than a space-separated string.
+	 * @deprecated Use instance tags instead
 	 */
 	tags: string;
 
+	/**
+	 * @deprecated Use instance tags instead
+	 */
 	setAllTags(tags: Iterable<string>): void;
-	getAllTags(): Set<string>;
 
-	isEnabled: boolean;
+	/**
+	 * @deprecated Use instance tags instead
+	 */
+	getAllTags(): Set<string>;
 }

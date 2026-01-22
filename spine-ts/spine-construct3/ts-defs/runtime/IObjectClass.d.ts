@@ -35,4 +35,7 @@ declare class IObjectClass<InstanceType extends IInstance, EventMapType = Object
 	/** Get the first picked instance of this object type or family when called
 	 * from an event sheet, or null if none is picked. */
 	getFirstPickedInstance<InstT extends InstanceType = InstanceType>(): InstT | null;
+
+	/** Call one of this object class's custom actions in the event sheet. */
+	callCustomAction<InstT extends InstanceType = InstanceType>(name: string, instances: Iterable<InstT>, ...params: CallFunctionParameter[]): Promise<void>;
 }

@@ -44,7 +44,7 @@ declare namespace SDK.Gfx {
 		PushLineCap(type: RendererLineCapMode): void;
 		PopLineCap(): void;
 
-		SetTexture(tex: SDK.Gfx.IWebGLTexture): void;
+		SetTexture(tex: SDK.Gfx.IWebGLTexture, sampling?: SamplingModeOrAutoType): void;
 		CreateDynamicTexture(width: number, height: number, opts?: TextureCreateOptions): SDK.Gfx.IWebGLTexture;
 		UpdateTexture(data: TextureUpdateDataType, tex: SDK.Gfx.IWebGLTexture, opts?: TextureUpdateOptions): void;
 		DeleteTexture(tex: SDK.Gfx.IWebGLTexture): void;

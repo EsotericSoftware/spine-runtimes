@@ -5,29 +5,29 @@ declare class IRendererText
 {
 	release(): void;
 
-    fontFace: string;
-    sizePt: number;
-    lineHeight: number;
-    isBold: boolean;
-    isItalic: boolean;
+	fontFace: string;
+	sizePt: number;
+	lineHeight: number;
+	isBold: boolean;
+	isItalic: boolean;
 
-    setColor(color: Vec3Arr): void;
-    setColorRgb(r: number, g: number, b: number): void;
-    setCssColor(cssColor: string): void;
+	setColor(color: Vec3Arr): void;
+	setColorRgb(r: number, g: number, b: number): void;
+	setCssColor(cssColor: string): void;
 
-    horizontalAlign: TextAlignHorizontalMode;
-    verticalAlign: TextAlignVerticalMode;
-    wordWrapMode: TextWordWrapMode;
-    textDirection: TextDirectionMode;
+	horizontalAlign: TextAlignHorizontalMode;
+	verticalAlign: TextAlignVerticalMode;
+	wordWrapMode: TextWordWrapMode;
+	textDirection: TextDirectionMode;
 
-    text: string;
-    setSize(cssWidth: number, cssHeight: number, zoomScale: number): void;
+	text: string;
+	setSize(cssWidth: number, cssHeight: number, zoomScale: number): void;
 
-    getTexture(): ITexture | null;
-    getTexRect(): DOMRect;
-    setTextureUpdateCallback(cb: () => void): void;
-    releaseTexture(): void;
+	getTexture(): ITexture | null;
+	getTexRect(): DOMRect;
+	setTextureUpdateCallback(cb: () => void): void;
+	releaseTexture(): void;
 
-    readonly textWidth: number;
-    readonly textHeight: number;
+	readonly textWidth: number;
+	readonly textHeight: number;
 }

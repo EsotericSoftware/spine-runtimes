@@ -34,6 +34,9 @@ declare class ILayout extends ConstructEventTarget<LayoutEventMap>
     getScrollPosition(): Vec2Arr;
     readonly isUnboundedScrolling: boolean;
 
+    sampling: SamplingModeOrAutoType;
+    activeSampling: SamplingModeType;
+
     getLayer(nameOrIndex: LayerParameter): IAnyProjectLayer | null;
     getAllLayers(): IAnyProjectLayer[];
     allLayers(): Generator<IAnyProjectLayer>;

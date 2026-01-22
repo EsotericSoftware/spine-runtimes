@@ -35,6 +35,8 @@ declare class ILayer extends ConstructEventTarget<LayerEventMap>
     blendMode: BlendModeParameter;
     backgroundColor: Vec3Arr;
     renderingMode: "2d" | "3d";
+    sampling: SamplingModeOrAutoType;
+    activeSampling: SamplingModeType;
 
     scrollX: number;
     scrollY: number;

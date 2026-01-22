@@ -9,6 +9,8 @@ declare class IAdvancedRandomObjectType<InstType extends IInstance = IInstance> 
 	seed: string;
 	octaves: number;
 
+	random(): number;
+
 	classic2d(x: number, y: number): number;
 	classic3d(x: number, y: number, z: number): number;
 	billow2d(x: number, y: number): number;

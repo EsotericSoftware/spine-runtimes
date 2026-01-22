@@ -53,6 +53,7 @@ declare namespace SDK {
 		SetSupportsColor(v: boolean): void;
 		SetCanBeBundled(v: boolean): void;
 		SetSupportsColor(v: boolean): void;
+		SetSupportsChangingSampling(v: boolean): void;
 
 		AddCommonPositionACEs(): void;
 		AddCommonSizeACEs(): void;

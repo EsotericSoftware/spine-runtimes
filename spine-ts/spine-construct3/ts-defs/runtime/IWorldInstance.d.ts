@@ -78,6 +78,8 @@ declare class IWorldInstance extends IInstance
 	opacity: number;
 	colorRgb: Vec3Arr;
 	blendMode: BlendModeParameter;
+	sampling: SamplingModeOrAutoType;
+    activeSampling: SamplingModeType;
 	effects: IEffectInstance[];
 
 	moveToTop(): void;
