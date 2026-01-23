@@ -18,8 +18,11 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	propScaleY = 1;
 	propDebugSkeleton = false;
 	propBoundsProvider: SpineBoundsProviderType = "setup";
+	propEnableCollision = false;
 
 	isFlippedX = false;
+	collisionSpriteInstance?: IWorldInstance;
+	collisionSpriteClassName = "";
 	isPlaying = true;
 	animationSpeed = 1.0;
 	physicsMode = spine.Physics.update;
@@ -79,15 +82,18 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			this.propSkin = skinProp === "" ? [] : skinProp.split(",");
 			this.propAnimation = properties[4] as string;
 			this.propDebugSkeleton = properties[5] as boolean;
-			const boundsProviderIndex = properties[6] as number;
+			this.propEnableCollision = properties[6] as boolean;
+			const boundsProviderIndex = properties[7] as number;
 			this.propBoundsProvider = boundsProviderIndex === 0 ? "setup" : "animation-skin";
-			// properties[7] is PROP_BOUNDS_PROVIDER_MOVE
-			this.propOffsetX = properties[8] as number;
-			this.propOffsetY = properties[9] as number;
-			this.propOffsetAngle = properties[10] as number;
-			this.propScaleX = properties[11] as number;
-			this.propScaleY = properties[12] as number;
+			// properties[8] is PROP_BOUNDS_PROVIDER_MOVE
+			this.propOffsetX = properties[9] as number;
+			this.propOffsetY = properties[10] as number;
+			this.propOffsetAngle = properties[11] as number;
+			this.propScaleX = properties[12] as number;
+			this.propScaleY = properties[13] as number;
 		}
+
+		this.collisionSpriteClassName = `${this.objectType.name}_CollisionBody`;
 
 		this.assetLoader = new spine.AssetLoader();
 		this.matrix = new spine.C3Matrix();
@@ -128,6 +134,8 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			this.angle + this.propOffsetAngle,
 			this.width / this.spineBounds.width * this.propScaleX * (this.isFlippedX ? -1 : 1),
 			this.height / this.spineBounds.height * this.propScaleY);
+
+		this.updateCollisionSprite();
 
 		if (this.isPlaying) this.update(this.dt);
 	}
@@ -394,6 +402,11 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		this.skeleton = undefined;
 		this.state = undefined;
 		this.dragHandleDispose();
+
+		if (this.collisionSpriteInstance) {
+			this.collisionSpriteInstance.destroy();
+			this.collisionSpriteInstance = undefined;
+		}
 	}
 
 	/**********/
@@ -443,9 +456,32 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 
 			this.update(0);
 
+			this.createCollisionSprite();
+
 			this.skeletonLoaded = true;
 			this._trigger(C3.Plugins.EsotericSoftware_SpineConstruct3.Cnds.OnSkeletonLoaded);
 		}
+	}
+
+	private createCollisionSprite () {
+		if (!this.propEnableCollision) return;
+
+		const objectType = (this.runtime.objects as Record<string, IObjectType<IWorldInstance>>)[this.collisionSpriteClassName];
+		if (!objectType)
+			throw new Error(`[Spine] Collision sprite object type "${this.collisionSpriteClassName}" not found`);
+
+		this.collisionSpriteInstance = objectType.createInstance(this.layer.name, this.x, this.y);
+		this.collisionSpriteInstance.setOrigin(this.originX, this.originY);
+	}
+
+	private updateCollisionSprite () {
+		if (!this.collisionSpriteInstance) return;
+
+		this.collisionSpriteInstance.x = this.x;
+		this.collisionSpriteInstance.y = this.y;
+		this.collisionSpriteInstance.width = this.width;
+		this.collisionSpriteInstance.height = this.height;
+		this.collisionSpriteInstance.angleDegrees = this.angleDegrees;
 	}
 
 	private calculateBounds () {
@@ -489,7 +525,11 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		this.isPlaying = true;
 	}
 
-	public setEmptyAnimation (track: number, mixDuration = 0) {
+	public addEmptyAnimation (track: number, mixDuration: number, delay: number) {
+		this.state?.addEmptyAnimation(track, mixDuration, delay);
+	}
+
+	public setEmptyAnimation (track: number, mixDuration: number) {
 		this.state?.setEmptyAnimation(track, mixDuration);
 	}
 
@@ -577,6 +617,15 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			case 3: track.mixBlend = spine.MixBlend.add; break;
 			default: console.warn('[Spine] Invalid mix blend mode:', mixBlend);
 		}
+	}
+
+	public clearTrack (track: number) {
+		const { state } = this;
+		if (!state) return;
+		if (track === -1)
+			state.clearTracks();
+		else
+			state.clearTrack(track);
 	}
 
 	private triggerAnimationEvent (eventName: string, track: number, animation: string, event?: Event) {

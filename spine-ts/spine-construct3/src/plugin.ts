@@ -34,6 +34,7 @@ const PLUGIN_CLASS = class SpineC3Plugin extends SDK.IPluginBase {
 	static PROP_SKELETON_OFFSET_SCALE_X = "spine-offset-scale-x";
 	static PROP_SKELETON_OFFSET_SCALE_Y = "spine-offset-scale-y";
 	static PROP_DEBUG_SKELETON = "spine-debug-skeleton";
+	static PROP_ENABLE_COLLISION = "spine-enable-collision";
 
 	static TYPE_BOUNDS_SETUP: SpineBoundsProviderType = "setup";
 	static TYPE_BOUNDS_ANIMATION_SKIN: SpineBoundsProviderType = "animation-skin";
@@ -80,6 +81,7 @@ const PLUGIN_CLASS = class SpineC3Plugin extends SDK.IPluginBase {
 			new SDK.PluginProperty("text", SpineC3Plugin.PROP_SKIN, ""),
 			new SDK.PluginProperty("text", SpineC3Plugin.PROP_ANIMATION, ""),
 			new SDK.PluginProperty("check", SpineC3Plugin.PROP_DEBUG_SKELETON, false),
+			new SDK.PluginProperty("check", SpineC3Plugin.PROP_ENABLE_COLLISION, false),
 
 			new SDK.PluginProperty("group", SpineC3Plugin.PROP_BOUNDS_PROVIDER_GROUP),
 			new SDK.PluginProperty("combo", SpineC3Plugin.PROP_BOUNDS_PROVIDER, {

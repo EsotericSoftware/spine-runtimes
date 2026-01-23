@@ -58,6 +58,10 @@
             "name": "Debug skeleton",
             "desc": "Draw debug visualization of the skeleton bones"
           },
+          "spine-enable-collision": {
+            "name": "Enable collision",
+            "desc": "Enable collision detection by creating a Sprite collision body"
+          },
           "spine-bounds-offset-x": {
             "name": "Offset X",
             "desc": "Offset X"
@@ -249,6 +253,25 @@
               }
             }
           },
+          "add-empty-animation": {
+            "list-name": "Add empty animation",
+            "display-text": "Add empty animation on track {0} with mix duration {1} and delay {2}",
+            "description": "Add an empty animation to the animation queue on a specific track",
+            "params": {
+              "track": {
+                "name": "Track",
+                "desc": "Track index"
+              },
+              "mix-duration": {
+                "name": "Mix duration",
+                "desc": "Duration in seconds to mix from the current animation to empty"
+              },
+              "delay": {
+                "name": "Delay",
+                "desc": "Delay in seconds before the animation starts"
+              }
+            }
+          },
           "set-attachment": {
             "list-name": "Set attachment",
             "display-text": "Set slot {0} attachment to {1}",
@@ -415,6 +438,17 @@
               "track-index": {
                 "name": "Track index",
                 "desc": "Track index to set mix blend for"
+              }
+            }
+          },
+          "clear-track": {
+            "list-name": "Clear track(s)",
+            "display-text": "Clear track {0}",
+            "description": "Clear te given track, or all tracks if -1",
+            "params": {
+              "track-index": {
+                "name": "Track index",
+                "desc": "Track index to clear. -1 to clear all tracks."
               }
             }
           },
@@ -640,6 +674,18 @@
               "field": {
                 "name": "\"float\"|\"int\"|\"string\"|\"balance\"|\"volume\"|\"audiopath\"|\"event\"|\"track\"|\"animation\"",
                 "desc": "The event data field to retrieve"
+              }
+            }
+          }
+        },
+        "custom_ui": {
+          "showModal": {
+            "spine-enable-collision": {
+              "title": "Delete Sprite Object Type",
+              "text": "This is the last instance of {0}. You can delete the {0} or just disable the Sprite collision body. Deleting the Sprite collision body will remove all related ACEs in the event sheet, if there's any. How do you want to proceed?",
+              "buttons": {
+                "0": "Just disable",
+                "1": "Disable and delete {0}"
               }
             }
           }

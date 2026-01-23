@@ -33,6 +33,10 @@ C3.Plugins.EsotericSoftware_SpineConstruct3.Acts =
 		this.stop();
 	},
 
+	AddEmptyAnimation (this: SDKInstanceClass, track: number, mixDuration: number, delay: number) {
+		this.addEmptyAnimation(track, mixDuration, delay);
+	},
+
 	SetEmptyAnimation (this: SDKInstanceClass, track: number, mixDuration: number) {
 		this.setEmptyAnimation(track, mixDuration);
 	},
@@ -79,6 +83,10 @@ C3.Plugins.EsotericSoftware_SpineConstruct3.Acts =
 
 	SetTrackMixBlend (this: SDKInstanceClass, mixBlend: 0 | 1 | 2 | 3, trackIndex: number) {
 		this.setTrackMixBlend(mixBlend, trackIndex);
+	},
+
+	ClearTrack (this: SDKInstanceClass, trackIndex: number) {
+		this.clearTrack(trackIndex);
 	},
 
 	SetSlotColor (this: SDKInstanceClass, slotName: string, color: string) {

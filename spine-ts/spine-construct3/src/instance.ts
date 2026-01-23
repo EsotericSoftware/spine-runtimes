@@ -141,7 +141,7 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 			this.positioningBounds = false;
 			this.resetBounds(true);
 			this.layoutView?.Refresh();
-			return
+			return;
 		}
 
 		if (id === PLUGIN_CLASS.PROP_BOUNDS_PROVIDER_MOVE) {
@@ -154,7 +154,12 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 				this.positionModePrevHeight = this._inst.GetHeight();
 			}
 			this.positioningBounds = value;
-			return
+			return;
+		}
+
+		if (id === PLUGIN_CLASS.PROP_ENABLE_COLLISION) {
+			this.managePropCollision(value as boolean);
+			return;
 		}
 	}
 
@@ -203,7 +208,7 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 			const quad = _inst.GetQuad();
 			if (_inst.GetPropertyValue(PLUGIN_CLASS.PROP_DEBUG_SKELETON) as boolean)
 				this.skeletonRenderer.drawDebug(skeleton, rectX, rectY, quad);
-			this.skeletonRenderer.renderGameObjectBounds(rectX, rectY, quad);
+			this.skeletonRenderer.renderGameObjectBounds(rectX, rectY, quad, _inst.GetPropertyValue(PLUGIN_CLASS.PROP_ENABLE_COLLISION) as boolean);
 
 		} else {
 			iRenderer.SetAlphaBlend();
@@ -511,6 +516,58 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 
 	private set propOffsetAngle (value: number) {
 		this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_ANGLE, value);
+	}
+
+	private async managePropCollision (value: boolean) {
+		const project = this._inst.GetProject();
+		const objectType = this._inst.GetObjectType();
+		const objectTypeName = objectType.GetName();
+		const collisionSpriteName = `${objectTypeName}_CollisionBody`;
+		const spriteType = project.GetObjectTypeByName(collisionSpriteName);
+
+		const type = PLUGIN_CLASS.PROP_ENABLE_COLLISION;
+		if (!value) {
+			for (const inst of objectType.GetAllInstances()) {
+				if (inst !== this._inst && inst.GetPropertyValue(PLUGIN_CLASS.PROP_ENABLE_COLLISION) as boolean) return;
+			}
+			if (spriteType) {
+				const action = await spine.showModal({
+					darkMode: false,
+					maxWidth: 500,
+					title: this.lang(`showModal.${type}.title`),
+					text: this.lang(`showModal.${type}.text`, [collisionSpriteName]),
+					buttons: [
+						{
+							text: this.lang(`showModal.${type}.buttons.${0}`),
+							value: 'disable'
+						},
+						{
+							text: this.lang(`showModal.${type}.buttons.${1}`, [collisionSpriteName]),
+							color: '#d9534f',
+							value: 'delete'
+						}
+					]
+				});
+
+				switch (action) {
+					case 'disable': break;
+					case 'delete': spriteType.Delete(); break;
+					default: this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_ENABLE_COLLISION, true); break;
+				}
+			}
+			return;
+		}
+
+		if (!spriteType) await project.CreateObjectType("Sprite", collisionSpriteName);
+	}
+
+	private lang (stringKey: string, interpolate: (string | number)[] = []): string {
+		const pluginContext = "plugins.esotericsoftware_spineconstruct3.custom_ui.";
+		let intlString = globalThis.lang(`${pluginContext}${stringKey}`);
+		interpolate.forEach((toInterpolate, index) => {
+			intlString = intlString.replace(`{${index}}`, `${toInterpolate}`);
+		})
+		return intlString;
 	}
 
 	GetTexture () {

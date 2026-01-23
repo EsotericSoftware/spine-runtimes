@@ -261,7 +261,7 @@ abstract class C3SkeletonRenderer<
 			}
 		}
 
-		this.renderGameObjectBounds(x, y, quad);
+		this.renderGameObjectBounds(x, y, quad, false);
 	}
 
 	protected abstract setColor (r: number, g: number, b: number, a: number): void;
@@ -274,7 +274,7 @@ abstract class C3SkeletonRenderer<
 	};
 
 	protected abstract renderSkeleton (vertices: Float32Array, uvs: Float32Array, indices: Uint16Array, colors: Float32Array, texture: Texture, blendMode: BlendMode): void;
-	public abstract renderGameObjectBounds (x: number, y: number, quad: DOMQuad | SDK.Quad): void;
+	public abstract renderGameObjectBounds (x: number, y: number, quad: DOMQuad | SDK.Quad, spriteBody: boolean): void;
 
 	protected circle (x: number, y: number, radius: number) {
 		let segments = Math.max(1, (6 * MathUtils.cbrt(radius)) | 0);
@@ -432,11 +432,14 @@ export class C3RendererEditor extends C3SkeletonRenderer<SDK.Gfx.IWebGLRenderer,
 		this.renderer.DrawMesh(vertices, uvs, indices, colors);
 	};
 
-	public renderGameObjectBounds (x: number, y: number, quad: SDK.Quad): void {
+	public renderGameObjectBounds (x: number, y: number, quad: SDK.Quad, spriteBody: boolean): void {
 		const { renderer, matrix } = this;
 		renderer.SetAlphaBlend();
 		renderer.SetColorFillMode();
-		renderer.SetColorRgba(0.25, 0, 0, 0.25);
+		if (spriteBody)
+			renderer.SetColorRgba(0, 0, 0.25, 0.25);
+		else
+			renderer.SetColorRgba(0.25, 0, 0, 0.25);
 		renderer.LineQuad(quad);
 		renderer.Line(x, y, matrix.tx, matrix.ty);
 	}
