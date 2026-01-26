@@ -22,6 +22,11 @@
             "name": "Loader scale",
             "desc": "Loader scale"
           },
+          "select-animation": {
+            "name": "Select animation",
+            "desc": "Open a dialog to select an animation from the skeleton",
+            "link-text": "Select"
+          },
           "spine-animation": {
             "name": "animation",
             "desc": "animation"

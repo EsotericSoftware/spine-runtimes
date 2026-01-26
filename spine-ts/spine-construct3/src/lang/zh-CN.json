@@ -22,6 +22,11 @@
             "name": "加载比例",
             "desc": "加载比例"
           },
+          "select-animation": {
+            "name": "选择动画",
+            "desc": "打开对话框从骨架中选择动画",
+            "link-text": "选择"
+          },
           "spine-animation": {
             "name": "动画",
             "desc": "动画"

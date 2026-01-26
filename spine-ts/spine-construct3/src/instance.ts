@@ -561,6 +561,10 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 		if (!spriteType) await project.CreateObjectType("Sprite", collisionSpriteName);
 	}
 
+	public async selectAnimation () {
+		console.log('[Spine] Select animation dialog called');
+	}
+
 	private lang (stringKey: string, interpolate: (string | number)[] = []): string {
 		const pluginContext = "plugins.esotericsoftware_spineconstruct3.custom_ui.";
 		let intlString = globalThis.lang(`${pluginContext}${stringKey}`);

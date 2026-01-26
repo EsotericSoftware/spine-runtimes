@@ -79,6 +79,13 @@ const PLUGIN_CLASS = class SpineC3Plugin extends SDK.IPluginBase {
 			new SDK.PluginProperty("projectfile", SpineC3Plugin.PROP_SKELETON, { initialValue: "", filter: ".json,.skel" }),
 			new SDK.PluginProperty("float", SpineC3Plugin.PROP_LOADER_SCALE, 1),
 			new SDK.PluginProperty("text", SpineC3Plugin.PROP_SKIN, ""),
+			new SDK.PluginProperty("link", "select-animation", {
+				linkCallback: async (instance) => {
+					const sdkInst = instance as SDKEditorInstanceClass;
+					await sdkInst.selectAnimation();
+				},
+				callbackType: "for-each-instance"
+			}),
 			new SDK.PluginProperty("text", SpineC3Plugin.PROP_ANIMATION, ""),
 			new SDK.PluginProperty("check", SpineC3Plugin.PROP_DEBUG_SKELETON, false),
 			new SDK.PluginProperty("check", SpineC3Plugin.PROP_ENABLE_COLLISION, false),
