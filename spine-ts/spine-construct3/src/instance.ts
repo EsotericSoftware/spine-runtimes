@@ -125,6 +125,13 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 
 		if (id === PLUGIN_CLASS.PROP_SKIN) {
 			this.skins = [];
+
+			const validatedString = this.validateSkinString();
+			if (validatedString) {
+				this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_SKIN, validatedString);
+				return;
+			}
+
 			this.setSkin();
 			this.layoutView?.Refresh();
 			return;
@@ -243,6 +250,16 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 	private setAnimation () {
 		const propValue = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_ANIMATION) as string;
 		this.animation = propValue === "" ? undefined : propValue;
+	}
+
+	private validateSkinString () {
+		const skins = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_SKIN) as string;
+		if (skins === "") return;
+		const split = skins.split(",");
+
+		if (!split.includes("")) return;
+
+		return split.filter(s => s !== "").join(",");
 	}
 
 	private setSkin () {
