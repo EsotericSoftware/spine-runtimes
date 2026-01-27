@@ -39,7 +39,7 @@ export class C3TextureEditor extends Texture {
 		const options: TextureCreateOptions = {
 			wrapX: toC3TextureWrap(page.uWrap),
 			wrapY: toC3TextureWrap(page.vWrap),
-			sampling: toC3Filter(page.minFilter),
+			defaultSampling: toC3Filter(page.minFilter),
 			mipMap: toC3MipMap(page.minFilter),
 		}
 		this.texture = renderer.CreateDynamicTexture(image.width, image.height, options);
@@ -70,7 +70,7 @@ export class C3TextureRuntime extends Texture {
 		const options: TextureCreateOptions = {
 			wrapX: toC3TextureWrap(page.uWrap),
 			wrapY: toC3TextureWrap(page.vWrap),
-			sampling: toC3Filter(page.minFilter),
+			defaultSampling: toC3Filter(page.minFilter),
 			mipMap: toC3MipMap(page.minFilter),
 		}
 		this.texture = renderer.createDynamicTexture(image.width, image.height, options);
@@ -116,7 +116,7 @@ function toC3MipMap (filter: TextureFilter): boolean {
 	}
 }
 
-function toC3Filter (filter: TextureFilter): TextureSamplingMode {
+function toC3Filter (filter: TextureFilter): SamplingModeType {
 	switch (filter) {
 		case TextureFilter.Nearest:
 		case TextureFilter.MipMapNearestNearest:
