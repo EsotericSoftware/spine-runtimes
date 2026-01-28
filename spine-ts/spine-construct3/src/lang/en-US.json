@@ -689,15 +689,39 @@
           }
         },
         "custom_ui": {
-          "showModal": {
-            "spine-enable-collision": {
-              "title": "Delete Sprite Object Type",
-              "text": "This is the last instance of {0}. You can delete the {0} or just disable the Sprite collision body. Deleting the Sprite collision body will remove all related ACEs in the event sheet, if there's any. How do you want to proceed?",
-              "buttons": {
-                "0": "Just disable",
-                "1": "Disable and delete {0}"
-              }
+          "spine-enable-collision": {
+            "title": "Delete Sprite Object Type",
+            "message": "This is the last instance of {0}. You can delete the {0} or just disable the Sprite collision body. Deleting the Sprite collision body will remove all related ACEs in the event sheet, if there's any. How do you want to proceed?",
+            "buttons": {
+              "0": "Just disable",
+              "1": "Disable and delete {0}"
             }
+          },
+          "skeleton-not-loaded": {
+            "title": "Error",
+            "message": "Skeleton not loaded. Please ensure atlas and skeleton files are set."
+          },
+          "no-animations": {
+            "title": "No Animations",
+            "message": "No animations found in the skeleton."
+          },
+          "no-skins": {
+            "title": "No Skins",
+            "message": "No skins found in the skeleton."
+          },
+          "select-animation": {
+            "title": "Select Animation"
+          },
+          "select-skins": {
+            "title": "Select Skins"
+          },
+          "invalid-skins": {
+            "title": "Invalid Skins",
+            "message": "The following skins do not exist in the skeleton: {0}.\n\nThey have been removed. Please use the \"Select skin\" button to choose from existing skins."
+          },
+          "invalid-animation": {
+            "title": "Invalid Animation",
+            "message": "The animation \"{0}\" does not exist in the skeleton.\n\nIt has been removed. Please use the \"Select animation\" button to choose from existing animations."
           }
         }
       }

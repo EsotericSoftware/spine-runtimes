@@ -126,8 +126,9 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 		if (id === PLUGIN_CLASS.PROP_SKIN) {
 			this.skins = [];
 
-			const validatedString = this.validateSkinString();
-			if (validatedString) {
+			const skinString = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_SKIN) as string;
+			const validatedString = await this.validateSkinString(skinString);
+			if (validatedString !== undefined && validatedString !== skinString) {
 				this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_SKIN, validatedString);
 				return;
 			}
@@ -138,6 +139,14 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 		}
 
 		if (id === PLUGIN_CLASS.PROP_ANIMATION) {
+
+			const animationString = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_ANIMATION) as string;
+			const validatedString = await this.validateAnimationString(animationString);
+			if (validatedString !== undefined && validatedString !== this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_ANIMATION)) {
+				this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_ANIMATION, validatedString);
+				return;
+			}
+
 			this.setAnimation();
 			this.layoutView?.Refresh();
 			return;
@@ -259,7 +268,6 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 			}
 		}
 		return zoom === -1 ? 1 : zoom;
-
 	}
 
 	private setAnimation () {
@@ -267,14 +275,47 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 		this.animation = propValue === "" ? undefined : propValue;
 	}
 
-	private validateSkinString () {
-		const skins = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_SKIN) as string;
-		if (skins === "") return;
-		const split = skins.split(",");
+	private async validateSkinString (skins: string) {
+		if (skins === "" || !this.skeleton) return;
 
-		if (!split.includes("")) return;
+		const split = skins.split(",").filter(s => s !== "");
+		if (split.length === 0) return;
 
-		return split.filter(s => s !== "").join(",");
+		const availableSkins = this.skeleton.data.skins.map(skin => skin.name).filter(s => s !== "default");
+
+		const invalidSkins = split.filter(skinName => !availableSkins.includes(skinName));
+
+		if (invalidSkins.length > 0) {
+			await spine.showAlertModal({
+				darkMode: false,
+				title: this.lang('invalid-skins.title'),
+				message: this.lang('invalid-skins.message', [invalidSkins.join(", ")])
+			});
+
+			const validSkins = split.filter(skinName => availableSkins.includes(skinName));
+			console.log(validSkins);
+			return validSkins.join(",");
+		}
+
+		return split.join(",");
+	}
+
+	private async validateAnimationString (animation: string) {
+		if (animation === "" || !this.skeleton) return;
+
+		const availableAnimations = this.skeleton.data.animations.map(anim => anim.name);
+
+		if (!availableAnimations.includes(animation)) {
+			await spine.showAlertModal({
+				darkMode: false,
+				title: this.lang('invalid-animation.title'),
+				message: this.lang('invalid-animation.message', [animation])
+			});
+
+			return "";
+		}
+
+		return animation;
 	}
 
 	private setSkin () {
@@ -483,10 +524,10 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 
 		const errorTextC3 = iRenderer.CreateRendererText()
 		this.errorTextC3 = errorTextC3;
-		this.errorTextC3.SetFontSize(12);
-		this.errorTextC3.SetColorRgb(1, 0, 0);
-		this.errorTextC3.SetTextureUpdateCallback(() => iLayoutView.Refresh());
-		return this.errorTextC3;
+		errorTextC3.SetFontSize(12);
+		errorTextC3.SetColorRgb(1, 0, 0);
+		errorTextC3.SetTextureUpdateCallback(() => iLayoutView.Refresh());
+		return errorTextC3;
 	}
 
 	private update (delta: number) {
@@ -566,15 +607,15 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 				const action = await spine.showModal({
 					darkMode: false,
 					maxWidth: 500,
-					title: this.lang(`showModal.${type}.title`),
-					text: this.lang(`showModal.${type}.text`, [collisionSpriteName]),
+					title: this.lang(`${type}.title`),
+					text: this.lang(`${type}.message`, [collisionSpriteName]),
 					buttons: [
 						{
-							text: this.lang(`showModal.${type}.buttons.${0}`),
+							text: this.lang(`${type}.buttons.${0}`),
 							value: 'disable'
 						},
 						{
-							text: this.lang(`showModal.${type}.buttons.${1}`, [collisionSpriteName]),
+							text: this.lang(`${type}.buttons.${1}`, [collisionSpriteName]),
 							color: '#d9534f',
 							value: 'delete'
 						}
@@ -597,8 +638,8 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 		if (!this.skeleton) {
 			await spine.showAlertModal({
 				darkMode: false,
-				title: 'Error',
-				message: 'Skeleton not loaded. Please ensure atlas and skeleton files are set.',
+				title: this.lang('skeleton-not-loaded.title'),
+				message: this.lang('skeleton-not-loaded.message'),
 			});
 			return;
 		}
@@ -607,15 +648,15 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 		if (animations.length === 0) {
 			await spine.showAlertModal({
 				darkMode: false,
-				title: 'No Animations',
-				message: 'No animations found in the skeleton.',
+				title: this.lang('no-animations.title'),
+				message: this.lang('no-animations.message'),
 			});
 			return;
 		}
 
 		const selectedAnimation = await spine.showListSelectionModal({
 			darkMode: false,
-			title: 'Select Animation',
+			title: this.lang('select-animation.title'),
 			items: animations,
 		});
 
@@ -628,8 +669,8 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 		if (!this.skeleton) {
 			await spine.showAlertModal({
 				darkMode: false,
-				title: 'Error',
-				message: 'Skeleton not loaded. Please ensure atlas and skeleton files are set.',
+				title: this.lang('skeleton-not-loaded.title'),
+				message: this.lang('skeleton-not-loaded.message'),
 			});
 			return;
 		}
@@ -638,15 +679,15 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 		if (skins.length === 0) {
 			await spine.showAlertModal({
 				darkMode: false,
-				title: 'No Skins',
-				message: 'No skins found in the skeleton.',
+				title: this.lang('no-skins.title'),
+				message: this.lang('no-skins.message'),
 			});
 			return;
 		}
 
 		const selectedSkins = await spine.showMultiListSelectionModal({
 			darkMode: false,
-			title: 'Select Skins',
+			title: this.lang('select-skins.title'),
 			items: skins,
 			selectedItems: this.skins,
 		});

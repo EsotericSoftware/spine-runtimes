@@ -689,15 +689,39 @@
           }
         },
         "custom_ui": {
-          "showModal": {
-            "spine-enable-collision": {
-              "title": "删除精灵对象类型",
-              "text": "这是{0}的最后一个实例。您可以删除{0}或仅禁用精灵碰撞体。删除精灵碰撞体将移除事件表中所有相关的ACE（如果有）。您想如何继续？",
-              "buttons": {
-                "0": "仅禁用",
-                "1": "禁用并删除{0}"
-              }
+          "spine-enable-collision": {
+            "title": "删除精灵对象类型",
+            "message": "这是{0}的最后一个实例。您可以删除{0}或仅禁用精灵碰撞体。删除精灵碰撞体将移除事件表中所有相关的ACE（如果有）。您想如何继续？",
+            "buttons": {
+              "0": "仅禁用",
+              "1": "禁用并删除{0}"
             }
+          },
+          "skeleton-not-loaded": {
+            "title": "错误",
+            "message": "骨架未加载。请确保已设置图集和骨架文件。"
+          },
+          "no-animations": {
+            "title": "无动画",
+            "message": "在骨架中未找到动画。"
+          },
+          "no-skins": {
+            "title": "无皮肤",
+            "message": "在骨架中未找到皮肤。"
+          },
+          "select-animation": {
+            "title": "选择动画"
+          },
+          "select-skins": {
+            "title": "选择皮肤"
+          },
+          "invalid-skins": {
+            "title": "无效皮肤",
+            "message": "以下皮肤在骨架中不存在：{0}。\n\n它们已被删除。请使用\"选择皮肤\"按钮从现有皮肤中选择。"
+          },
+          "invalid-animation": {
+            "title": "无效动画",
+            "message": "动画\"{0}\"在骨架中不存在。\n\n它已被删除。请使用\"选择动画\"按钮从现有动画中选择。"
           }
         }
       }

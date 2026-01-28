@@ -27,7 +27,6 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-// Common theme type
 interface ModalTheme {
 	overlayBg: string;
 	captionBg: string;
@@ -43,38 +42,36 @@ interface ModalTheme {
 	itemSelectedBg: string;
 }
 
-// Helper: Create theme
 function getTheme (darkMode: boolean): ModalTheme {
 	return darkMode ? {
 		overlayBg: 'rgba(0, 0, 0, 0.5)',
-		captionBg: 'rgb(71, 71, 71)',        // gray9
-		captionText: 'rgb(214, 214, 214)',   // gray27
-		contentBg: 'rgb(87, 87, 87)',        // gray11
-		contentText: 'rgb(214, 214, 214)',   // gray27
-		buttonBg: 'rgb(71, 71, 71)',         // gray9
-		buttonText: 'rgb(214, 214, 214)',    // gray27
-		buttonBorder: 'rgb(56, 56, 56)',     // gray7
-		buttonHoverBg: 'rgb(79, 79, 79)',    // gray10
-		closeColor: 'rgb(168, 168, 168)',    // gray21
-		itemHoverBg: 'rgb(79, 79, 79)',      // gray10
-		itemSelectedBg: 'rgb(56, 56, 56)',   // gray7
+		captionBg: 'rgb(71, 71, 71)',
+		captionText: 'rgb(214, 214, 214)',
+		contentBg: 'rgb(87, 87, 87)',
+		contentText: 'rgb(214, 214, 214)',
+		buttonBg: 'rgb(71, 71, 71)',
+		buttonText: 'rgb(214, 214, 214)',
+		buttonBorder: 'rgb(56, 56, 56)',
+		buttonHoverBg: 'rgb(79, 79, 79)',
+		closeColor: 'rgb(168, 168, 168)',
+		itemHoverBg: 'rgb(79, 79, 79)',
+		itemSelectedBg: 'rgb(56, 56, 56)',
 	} : {
 		overlayBg: 'rgba(0, 0, 0, 0.3)',
-		captionBg: 'rgb(247, 247, 247)',     // gray31
-		captionText: 'rgb(94, 94, 94)',      // gray12
-		contentBg: 'rgb(232, 232, 232)',     // gray29
-		contentText: 'rgb(94, 94, 94)',      // gray12
-		buttonBg: 'rgb(222, 222, 222)',      // gray28
-		buttonText: 'rgb(94, 94, 94)',       // gray12
-		buttonBorder: 'rgb(199, 199, 199)',  // gray25
-		buttonHoverBg: 'rgb(214, 214, 214)', // gray27
-		closeColor: 'rgb(94, 94, 94)',       // gray12
-		itemHoverBg: 'rgb(214, 214, 214)',   // gray27
-		itemSelectedBg: 'rgb(199, 199, 199)', // gray25
+		captionBg: 'rgb(247, 247, 247)',
+		captionText: 'rgb(94, 94, 94)',
+		contentBg: 'rgb(232, 232, 232)',
+		contentText: 'rgb(94, 94, 94)',
+		buttonBg: 'rgb(222, 222, 222)',
+		buttonText: 'rgb(94, 94, 94)',
+		buttonBorder: 'rgb(199, 199, 199)',
+		buttonHoverBg: 'rgb(214, 214, 214)',
+		closeColor: 'rgb(94, 94, 94)',
+		itemHoverBg: 'rgb(214, 214, 214)',
+		itemSelectedBg: 'rgb(199, 199, 199)',
 	};
 }
 
-// Helper: Create overlay
 function createOverlay (theme: ModalTheme): HTMLDivElement {
 	const overlay = document.createElement('div');
 	overlay.style.cssText = `
@@ -94,7 +91,6 @@ function createOverlay (theme: ModalTheme): HTMLDivElement {
 	return overlay;
 }
 
-// Helper: Create dialog
 function createDialog (theme: ModalTheme, minWidth: number): HTMLDivElement {
 	const dialog = document.createElement('div');
 	dialog.style.cssText = `
@@ -109,7 +105,6 @@ function createDialog (theme: ModalTheme, minWidth: number): HTMLDivElement {
 	return dialog;
 }
 
-// Helper: Create caption with close button
 function createCaption (title: string, theme: ModalTheme, onClose: () => void): HTMLDivElement {
 	const caption = document.createElement('div');
 	caption.style.cssText = `
@@ -149,7 +144,6 @@ function createCaption (title: string, theme: ModalTheme, onClose: () => void): 
 	return caption;
 }
 
-// Helper: Create footer
 function createFooter (): HTMLDivElement {
 	const footer = document.createElement('div');
 	footer.style.cssText = `
@@ -161,7 +155,6 @@ function createFooter (): HTMLDivElement {
 	return footer;
 }
 
-// Helper: Create button
 function createButton (text: string, theme: ModalTheme, onClick: () => void): HTMLButtonElement {
 	const btn = document.createElement('button');
 	btn.textContent = text;
@@ -181,7 +174,6 @@ function createButton (text: string, theme: ModalTheme, onClick: () => void): HT
 	return btn;
 }
 
-// Helper: Setup modal event handlers
 function setupModalHandlers (overlay: HTMLDivElement, onCancel: () => void, extraKeyHandler?: (e: KeyboardEvent) => boolean) {
 	const handleKeyDown = (e: KeyboardEvent) => {
 		if (e.key === 'Escape') {
@@ -193,7 +185,9 @@ function setupModalHandlers (overlay: HTMLDivElement, onCancel: () => void, extr
 		}
 	};
 
-	document.addEventListener('keydown', handleKeyDown);
+	setTimeout(() => {
+		document.addEventListener('keydown', handleKeyDown);
+	}, 0);
 
 	overlay.addEventListener('click', (e) => {
 		if (e.target === overlay) {
@@ -207,7 +201,6 @@ function setupModalHandlers (overlay: HTMLDivElement, onCancel: () => void, extr
 	};
 }
 
-// Original interfaces
 interface ModalButton<T> {
 	text: string;
 	color?: string;
@@ -324,11 +317,9 @@ export function showListSelectionModal (options: ListSelectionOptions): Promise<
 			`;
 
 			itemDiv.addEventListener('click', () => {
-				// Deselect all items
 				contents.querySelectorAll('div').forEach(div => {
 					div.style.background = 'transparent';
 				});
-				// Select this item
 				itemDiv.style.background = theme.itemSelectedBg;
 				selectedItem = item;
 			});
@@ -486,7 +477,6 @@ export function showMultiListSelectionModal (options: MultiListSelectionOptions)
 				gap: 8px;
 			`;
 
-			// Create checkbox
 			const checkbox = document.createElement('input');
 			checkbox.type = 'checkbox';
 			checkbox.checked = selectedSet.has(item);
@@ -515,7 +505,6 @@ export function showMultiListSelectionModal (options: MultiListSelectionOptions)
 			};
 
 			itemDiv.addEventListener('click', (e) => {
-				// Don't toggle if clicking directly on checkbox (it handles itself)
 				if (e.target !== checkbox) {
 					toggleSelection();
 				}
