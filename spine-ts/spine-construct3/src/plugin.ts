@@ -78,6 +78,13 @@ const PLUGIN_CLASS = class SpineC3Plugin extends SDK.IPluginBase {
 			new SDK.PluginProperty("projectfile", SpineC3Plugin.PROP_ATLAS, { initialValue: "", filter: ".atlas" }),
 			new SDK.PluginProperty("projectfile", SpineC3Plugin.PROP_SKELETON, { initialValue: "", filter: ".json,.skel" }),
 			new SDK.PluginProperty("float", SpineC3Plugin.PROP_LOADER_SCALE, 1),
+			new SDK.PluginProperty("link", "select-skin", {
+				linkCallback: async (instance) => {
+					const sdkInst = instance as SDKEditorInstanceClass;
+					await sdkInst.selectSkin();
+				},
+				callbackType: "for-each-instance"
+			}),
 			new SDK.PluginProperty("text", SpineC3Plugin.PROP_SKIN, ""),
 			new SDK.PluginProperty("link", "select-animation", {
 				linkCallback: async (instance) => {

@@ -579,7 +579,66 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 	}
 
 	public async selectAnimation () {
-		console.log('[Spine] Select animation dialog called');
+		if (!this.skeleton) {
+			await spine.showAlertModal({
+				darkMode: false,
+				title: 'Error',
+				message: 'Skeleton not loaded. Please ensure atlas and skeleton files are set.',
+			});
+			return;
+		}
+
+		const animations = this.skeleton.data.animations.map(anim => anim.name);
+		if (animations.length === 0) {
+			await spine.showAlertModal({
+				darkMode: false,
+				title: 'No Animations',
+				message: 'No animations found in the skeleton.',
+			});
+			return;
+		}
+
+		const selectedAnimation = await spine.showListSelectionModal({
+			darkMode: false,
+			title: 'Select Animation',
+			items: animations,
+		});
+
+		if (selectedAnimation) {
+			this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_ANIMATION, selectedAnimation);
+		}
+	}
+
+	public async selectSkin () {
+		if (!this.skeleton) {
+			await spine.showAlertModal({
+				darkMode: false,
+				title: 'Error',
+				message: 'Skeleton not loaded. Please ensure atlas and skeleton files are set.',
+			});
+			return;
+		}
+
+		const skins = this.skeleton.data.skins.map(skin => skin.name).filter(s => s !== "default");
+		if (skins.length === 0) {
+			await spine.showAlertModal({
+				darkMode: false,
+				title: 'No Skins',
+				message: 'No skins found in the skeleton.',
+			});
+			return;
+		}
+
+		const selectedSkins = await spine.showMultiListSelectionModal({
+			darkMode: false,
+			title: 'Select Skins',
+			items: skins,
+			selectedItems: this.skins,
+		});
+
+		if (selectedSkins !== undefined) {
+			this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_SKIN, selectedSkins.join(","));
+		}
 	}
 
 	private lang (stringKey: string, interpolate: (string | number)[] = []): string {
