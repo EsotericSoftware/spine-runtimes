@@ -1,4 +1,3 @@
-
 const C3 = globalThis.C3;
 
 C3.Plugins.EsotericSoftware_SpineConstruct3 = class SpineC3 extends globalThis.ISDKPluginBase {

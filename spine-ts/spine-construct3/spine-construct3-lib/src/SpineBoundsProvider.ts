@@ -75,9 +75,7 @@ export class SetupPoseBoundsProvider implements SpineBoundsProvider {
 		skeleton.setupPose();
 		skeleton.updateWorldTransform(Physics.update);
 		const bounds = skeleton.getBoundsRect(this.clipping ? new SkeletonClipping() : undefined);
-		return bounds.width === Number.NEGATIVE_INFINITY
-			? { x: 0, y: 0, width: 0, height: 0 }
-			: bounds;
+		return validateBounds(bounds);
 	}
 }
 
@@ -114,7 +112,7 @@ export class SkinsAndAnimationBoundsProvider implements SpineBoundsProvider {
 			const customSkin = new Skin("custom-skin");
 			for (const skinName of this.skins) {
 				const skin = data.findSkin(skinName);
-				if (skin == null) continue;
+				if (skin === null) continue;
 				customSkin.addSkin(skin);
 			}
 			skeleton.setSkin(customSkin);
@@ -126,9 +124,7 @@ export class SkinsAndAnimationBoundsProvider implements SpineBoundsProvider {
 		if (animation == null) {
 			skeleton.updateWorldTransform(Physics.update);
 			const bounds = skeleton.getBoundsRect(clipper);
-			return bounds.width === Number.NEGATIVE_INFINITY
-				? { x: 0, y: 0, width: 0, height: 0 }
-				: bounds;
+			return validateBounds(bounds);
 		} else {
 			let minX = Number.POSITIVE_INFINITY,
 				minY = Number.POSITIVE_INFINITY,
@@ -156,9 +152,13 @@ export class SkinsAndAnimationBoundsProvider implements SpineBoundsProvider {
 				width: maxX - minX,
 				height: maxY - minY,
 			};
-			return bounds.width === Number.NEGATIVE_INFINITY
-				? { x: 0, y: 0, width: 0, height: 0 }
-				: bounds;
+			return validateBounds(bounds);
 		}
 	}
+}
+
+function validateBounds (bounds: Rectangle): Rectangle {
+	return bounds.width === Number.NEGATIVE_INFINITY
+		? { x: 0, y: 0, width: 0, height: 0 }
+		: bounds;
 }

@@ -3,11 +3,11 @@
 
   "is-c3-addon": true,
   "sdk-version": 2,
-  "min-construct-version": "r459",
+  "min-construct-version": "r470",
   "type": "plugin",
   "name": "Spine Construct3",
   "id": "EsotericSoftware_SpineConstruct3",
-  "version": "1.0.0.1",
+  "version": "4.3.0-beta",
   "author": "Esoteric Software",
   "website": "https://www.esotericsoftware.com",
   "documentation": "https://www.esotericsoftware.com",

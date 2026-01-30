@@ -1,14 +1,9 @@
-
-import type { SDKInstanceClass } from "./instance.ts";
+import type { SDKInstanceClass } from "./instance";
 
 const C3 = globalThis.C3;
 
 C3.Plugins.EsotericSoftware_SpineConstruct3.Acts =
 {
-	Alert (this: SDKInstanceClass) {
-		alert(`Test`);
-	},
-
 	SetSkin (this: SDKInstanceClass, skinList: string) {
 		this.setSkin(skinList.split(","));
 	},
@@ -61,7 +56,7 @@ C3.Plugins.EsotericSoftware_SpineConstruct3.Acts =
 		this.setAnimationSpeed(speed);
 	},
 
-	SetAnimationTime (this: SDKInstanceClass, units: 0 | 1, time: number, track: number) {
+	SetAnimationTime (this: SDKInstanceClass, units: 0 | 1, track: number, time: number) {
 		this.setAnimationTime(units, time, track);
 	},
 

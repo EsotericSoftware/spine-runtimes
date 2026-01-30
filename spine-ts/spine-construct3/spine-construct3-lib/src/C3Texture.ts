@@ -41,7 +41,7 @@ export class C3TextureEditor extends Texture {
 			wrapY: toC3TextureWrap(page.vWrap),
 			defaultSampling: toC3Filter(page.minFilter),
 			mipMap: toC3MipMap(page.minFilter),
-		}
+		};
 		this.texture = renderer.CreateDynamicTexture(image.width, image.height, options);
 		this.renderer.UpdateTexture(image, this.texture, { premultiplyAlpha: !page.pma });
 	}
@@ -72,11 +72,10 @@ export class C3TextureRuntime extends Texture {
 			wrapY: toC3TextureWrap(page.vWrap),
 			defaultSampling: toC3Filter(page.minFilter),
 			mipMap: toC3MipMap(page.minFilter),
-		}
+		};
 		this.texture = renderer.createDynamicTexture(image.width, image.height, options);
 		this.renderer.updateTexture(image, this.texture, { premultiplyAlpha: !page.pma });
 	}
-
 
 	setFilters () {
 		// cannot change filter after texture creation

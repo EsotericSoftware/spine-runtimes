@@ -42,7 +42,7 @@
           },
           "spine-bounds-provider-group": {
             "name": "Bounds provider",
-            "desc": "Select the desired buound provider and fill the respective properties."
+            "desc": "Select the desired bound provider and fill the respective properties."
           },
           "spine-bounds-provider": {
             "name": "Bounds provider",
@@ -169,11 +169,6 @@
           }
         },
         "actions": {
-          "do-alert": {
-            "list-name": "Do alert",
-            "display-text": "Do alert",
-            "description": "Do a dummy alert."
-          },
           "set-skin": {
             "list-name": "Set skin",
             "display-text": "Set skin {0}",
@@ -201,7 +196,7 @@
             "display-text": "Set animation {1} on track {0} with loop {2}",
             "description": "Set animation",
             "params": {
-              "track": {
+              "track-index": {
                 "name": "track",
                 "desc": "track"
               },
@@ -220,7 +215,7 @@
             "display-text": "Add animation {1} on track {0} with loop {2} and delay {3}",
             "description": "Add animation",
             "params": {
-              "track": {
+              "track-index": {
                 "name": "track",
                 "desc": "track"
               },
@@ -253,7 +248,7 @@
             "display-text": "Set empty animation on track {0} with mix duration {1}",
             "description": "Set an empty animation on a specific track",
             "params": {
-              "track": {
+              "track-index": {
                 "name": "Track",
                 "desc": "Track index"
               },
@@ -268,7 +263,7 @@
             "display-text": "Add empty animation on track {0} with mix duration {1} and delay {2}",
             "description": "Add an empty animation to the animation queue on a specific track",
             "params": {
-              "track": {
+              "track-index": {
                 "name": "Track",
                 "desc": "Track index"
               },
@@ -347,9 +342,17 @@
           },
           "set-animation-time": {
             "list-name": "Set animation time",
-            "display-text": "Set track {2} animation time to {1} ({0})",
+            "display-text": "Set track {0} animation time to {1} ({2})",
             "description": "Set the current time of an animation on a track",
             "params": {
+              "track-index": {
+                "name": "Track",
+                "desc": "Track index"
+              },
+              "time": {
+                "name": "Time",
+                "desc": "Time value (in seconds or as a ratio 0.0-1.0)"
+              },
               "units": {
                 "name": "Units",
                 "desc": "Time units",
@@ -357,14 +360,6 @@
                   "seconds": "Seconds (absolute time)",
                   "ratio": "Ratio (0.0 to 1.0)"
                 }
-              },
-              "time": {
-                "name": "Time",
-                "desc": "Time value (in seconds or as a ratio 0.0-1.0)"
-              },
-              "track": {
-                "name": "Track",
-                "desc": "Track index"
               }
             }
           },
@@ -593,16 +588,6 @@
           }
         },
         "expressions": {
-          "double": {
-            "description": "Double a number.",
-            "translated-name": "Double",
-            "params": {
-              "number": {
-                "name": "Number",
-                "desc": "The number to double."
-              }
-            }
-          },
           "slot-attachment": {
             "description": "Get the name of the attachment on a slot. Returns empty string if no attachment.",
             "translated-name": "SlotAttachment",

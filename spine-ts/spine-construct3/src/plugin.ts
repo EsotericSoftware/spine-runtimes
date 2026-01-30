@@ -1,6 +1,6 @@
 import type { SpineBoundsProviderType } from "@esotericsoftware/spine-construct3-lib";
 
-import type { SDKEditorInstanceClass } from "./instance.ts";
+import type { SDKEditorInstanceClass } from "./instance";
 
 const SDK = globalThis.SDK;
 
@@ -70,7 +70,7 @@ const PLUGIN_CLASS = class SpineC3Plugin extends SDK.IPluginBase {
 		this._info.AddFileDependency({
 			filename: "c3runtime/spine-construct3-lib.js",
 			type: "external-runtime-script"
-		})
+		});
 
 		SDK.Lang.PushContext(".properties");
 
@@ -119,8 +119,6 @@ const PLUGIN_CLASS = class SpineC3Plugin extends SDK.IPluginBase {
 				},
 				callbackType: "for-each-instance"
 			}),
-
-
 		]);
 
 		SDK.Lang.PopContext();		// .properties
@@ -132,4 +130,3 @@ const PLUGIN_CLASS = class SpineC3Plugin extends SDK.IPluginBase {
 SDK.Plugins.EsotericSoftware_SpineConstruct3 = PLUGIN_CLASS;
 
 PLUGIN_CLASS.Register(PLUGIN_ID, PLUGIN_CLASS);
-

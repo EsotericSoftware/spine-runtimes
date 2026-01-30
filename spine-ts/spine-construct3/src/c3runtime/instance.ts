@@ -1,4 +1,4 @@
-import type { AnimationState, AssetLoader, Bone, C3Matrix, C3RendererRuntime, Event, NumberArrayLike, RegionAttachment, Skeleton, Skin, Slot, SpineBoundsProvider, SpineBoundsProviderType, TextureAtlas, } from "@esotericsoftware/spine-construct3-lib";
+import type { AnimationState, AssetLoader, Bone, C3Matrix, C3RendererRuntime, Event, NumberArrayLike, Skeleton, Skin, Slot, SpineBoundsProvider, SpineBoundsProviderType, TextureAtlas, } from "@esotericsoftware/spine-construct3-lib";
 
 const C3 = globalThis.C3;
 const spine = globalThis.spine;
@@ -74,7 +74,6 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 
 		const properties = this._getInitProperties();
 		if (properties) {
-			console.log(properties);
 			this.propAtlas = properties[0] as string;
 			this.propSkel = properties[1] as string;
 			this.propLoaderScale = properties[2] as number;
@@ -224,11 +223,11 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		if (!this.touchDown) return;
 		this.touchX = event.clientX;
 		this.touchY = event.clientY;
-	}
+	};
 
 	private dragHandleUp = (event: ConstructPointerEvent) => {
 		if (event.button === 0) this.touchDown = false;
-	}
+	};
 
 	private dragHandleDispose () {
 		this.runtime.removeEventListener("pointerdown", this.dragHandleDown);
@@ -317,8 +316,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		let hullLength = 8;
 
 		if (attachment instanceof spine.RegionAttachment) {
-			const regionAttachment = <RegionAttachment>attachment;
-			regionAttachment.computeWorldVertices(slot, vertices, 0, 2);
+			attachment.computeWorldVertices(slot, vertices, 0, 2);
 		} else if (attachment instanceof spine.MeshAttachment) {
 			attachment.computeWorldVertices(this.skeleton as Skeleton, slot, 0, attachment.worldVerticesLength, vertices, 0, 2);
 			hullLength = attachment.hullLength;
@@ -351,7 +349,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 
 	private isPointInPolygon (vertices: NumberArrayLike, hullLength: number, px: number, py: number) {
 		if (hullLength < 6) {
-			throw new Error("A polygon must have at least 3 vertices (6 numbers in the array). ");
+			throw new Error("A polygon must have at least 3 vertices (6 numbers in the array).");
 		}
 
 		let isInside = false;
@@ -489,7 +487,6 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		if (!skeleton) return;
 
 		let boundsProvider: SpineBoundsProvider;
-		console.log(this.propBoundsProvider);
 		if (this.propBoundsProvider === "animation-skin") {
 			const { propSkin, propAnimation } = this;
 			if ((propSkin && propSkin.length > 0) || propAnimation) {
@@ -549,7 +546,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		this.animationSpeed = speed;
 	}
 
-	public setAnimationTime (units: 0 | 1, time: number, track: number) {
+	public setAnimationTime (units: 0 | 1, track: number, time: number) {
 		if (!this.state) return;
 
 		const trackEntry = this.state.tracks[track];
@@ -672,7 +669,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		} else {
 			const customSkin = new spine.Skin(skins.join(","));
 			for (const s of skins) {
-				const skin = skeleton.data.findSkin(s)
+				const skin = skeleton.data.findSkin(s);
 				if (!skin) throw new Error(`The given skin is not present in the skeleton data: ${s}`);
 				customSkin.addSkin(skin);
 			}

@@ -47,7 +47,9 @@ export class C3Matrix {
 	private tempPoint = new Vector2();
 
 	public update (x: number, y: number, angle: number, scaleX = 1, scaleY = 1) {
-		if (this.prevX === x && this.prevY === y && this.prevAngle === angle && this.prevScaleX === scaleX && this.prevScaleY === scaleY) return false;
+		if (this.prevX === x && this.prevY === y &&
+			this.prevAngle === angle &&
+			this.prevScaleX === scaleX && this.prevScaleY === scaleY) return false;
 		this.prevX = x;
 		this.prevY = y;
 		this.prevAngle = angle;

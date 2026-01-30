@@ -264,7 +264,7 @@ abstract class C3SkeletonRenderer<
 		}
 
 		// clipping
-		this.setColor(0.8, 0, 0, 1)
+		this.setColor(0.8, 0, 0, 1);
 		for (let i = 0, n = slots.length; i < n; i++) {
 			const slot = slots[i];
 			if (!slot.bone.active) continue;
@@ -388,8 +388,8 @@ export class C3RendererRuntime extends C3SkeletonRenderer<IRenderer, C3TextureRu
 		this.renderer.setColorFillMode();
 	}
 
-	protected setBlendMode (blenMode: BlendModeParameter = "normal"): void {
-		this.renderer.setBlendMode(blenMode);
+	protected setBlendMode (blendMode: BlendModeParameter = "normal"): void {
+		this.renderer.setBlendMode(blendMode);
 	}
 
 	protected poly (points: number[]): void {
@@ -433,8 +433,8 @@ export class C3RendererEditor extends C3SkeletonRenderer<SDK.Gfx.IWebGLRenderer,
 		this.renderer.SetColorFillMode();
 	}
 
-	protected setBlendMode (blenMode: BlendModeParameter = "normal"): void {
-		this.renderer.SetBlendMode(blenMode);
+	protected setBlendMode (blendMode: BlendModeParameter = "normal"): void {
+		this.renderer.SetBlendMode(blendMode);
 	}
 
 	protected poly (points: number[]): void {

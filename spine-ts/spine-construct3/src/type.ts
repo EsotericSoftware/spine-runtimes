@@ -1,4 +1,3 @@
-
 const SDK = globalThis.SDK;
 
 const PLUGIN_CLASS = SDK.Plugins.EsotericSoftware_SpineConstruct3;
@@ -21,7 +20,8 @@ export class SpineC3PluginType extends SDK.ITypeBase {
 			this.spineLogo = iRenderer.CreateDynamicTexture(image.width, image.height);
 			iRenderer.UpdateTexture(image, this.spineLogo);
 			iLayoutView.Refresh();
-		})
+		});
+		return undefined;
 	}
 
 };

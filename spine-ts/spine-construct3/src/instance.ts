@@ -1,5 +1,3 @@
-// / <reference types="editor/sdk" />
-
 import type { AnimationState, AssetLoader, C3Matrix, C3RendererEditor, Skeleton, SpineBoundsProvider, SpineBoundsProviderType, TextureAtlas, } from "@esotericsoftware/spine-construct3-lib";
 import type { SpineC3PluginType } from "./type";
 
@@ -45,16 +43,16 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 	 *
 	 * In a Spine C3 GameObject:
 	 * - the original size is equivalent to spineBounds that is set selecting the BoundsProvider
-	 * - changing the C3 GameObject size from the editor will scale the skeleton by using skeleton.scaleX/Y
-	 *   This information is stored into (PROP_SKELETON_OFFSET_SCALE_X and Y) and later passed to the runtime
+	 * - changing the C3 GameObject size from the editor will scale the skeleton by using a C3Matrix,
+	 *   not the skeleton.scaleX/Y.
 	 * - the origin is position at the skeleton root
 	 *
 	 * positioningBounds allows to offset the position and the size of the C3 GameObject
 	 * with the one of the skeleton. When selected it allows to:
 	 * - move the C3 GameObjects position (visually the rectangle) keeping the skeleton still.
 	 *   This is obtained by adding an offset to the GameObject position.
-	 *   This information is stored into (PROP_SKELETON_OFFSET_SCALE_X and Y) and later passed to the runtime
-	 * - scale the C3 GameObjects keeping the skeleton.scaleX/Y as-is.
+	 *   This information is stored into (PROP_BOUNDS_OFFSET_X and Y) and later passed to the runtime
+	 * - scale the C3 GameObjects keeping the skeleton.scaleX/Y as-is, and storing the scale offset in (PROP_SKELETON_OFFSET_SCALE_X and Y).
 	 */
 	private spineBounds = {
 		x: 0, // determine the origin x (-x/width)
@@ -161,7 +159,7 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 		}
 
 		if (id === PLUGIN_CLASS.PROP_BOUNDS_PROVIDER_MOVE) {
-			value = value as boolean
+			value = value as boolean;
 			if (value) {
 				this.positionModePrevX = this._inst.GetX();
 				this.positionModePrevY = this._inst.GetY();
@@ -292,9 +290,7 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 				message: this.lang('invalid-skins.message', [invalidSkins.join(", ")])
 			});
 
-			const validSkins = split.filter(skinName => availableSkins.includes(skinName));
-			console.log(validSkins);
-			return validSkins.join(",");
+			return split.filter(skinName => availableSkins.includes(skinName)).join(",");
 		}
 
 		return split.join(",");
@@ -337,7 +333,7 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 		} else {
 			const customSkin = new spine.Skin(propValue);
 			for (const s of skins) {
-				const skin = skeleton.data.findSkin(s)
+				const skin = skeleton.data.findSkin(s);
 				if (!skin) return;
 				customSkin.addSkin(skin);
 			}
@@ -436,7 +432,7 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 		if (this.getErrorsString()) {
 			this.spineBoundsInit = false;
 			return;
-		};
+		}
 
 		this.spineBoundsInit = true;
 
@@ -457,7 +453,6 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 		this.propOffsetAngle = 0;
 		this.propScaleX = 1;
 		this.propScaleY = 1;
-		return;
 	}
 
 	private initBounds () {
@@ -499,13 +494,13 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 		if (boundsType === "animation-skin" && (skins.length === 0 && !animation))
 			errors.push("Animation/Skin bounds provider requires one between skin and animation to be set.");
 
-		if (Boolean(!animation || skeleton?.data.findAnimation(animation)) === false)
+		if (animation && !skeleton?.data.findAnimation(animation))
 			errors.push("Not existing animation");
 
 		if (skins.length > 0) {
 			const missingSkins = skins.filter(skin => !skeleton?.data.findSkin(skin)).join(", ");
 			if (missingSkins)
-				errors.push("Not existing skin(s): ", missingSkins);
+				errors.push(`Not existing skin(s): ${missingSkins}`);
 		}
 
 		const { width, height } = spineBounds;
@@ -552,7 +547,7 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 	}
 
 	private get propScaleX () {
-		return this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_SKELETON_OFFSET_SCALE_X) as number
+		return this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_SKELETON_OFFSET_SCALE_X) as number;
 	}
 
 	private set propScaleX (value: number) {
@@ -560,7 +555,7 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 	}
 
 	private get propScaleY () {
-		return this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_SKELETON_OFFSET_SCALE_Y) as number
+		return this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_SKELETON_OFFSET_SCALE_Y) as number;
 	}
 
 	private set propScaleY (value: number) {
@@ -606,7 +601,6 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 			if (spriteType) {
 				const action = await spine.showModal({
 					darkMode: false,
-					maxWidth: 500,
 					title: this.lang(`${type}.title`),
 					text: this.lang(`${type}.message`, [collisionSpriteName]),
 					buttons: [
@@ -616,7 +610,6 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 						},
 						{
 							text: this.lang(`${type}.buttons.${1}`, [collisionSpriteName]),
-							color: '#d9534f',
 							value: 'delete'
 						}
 					]
@@ -702,7 +695,7 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 		let intlString = globalThis.lang(`${pluginContext}${stringKey}`);
 		interpolate.forEach((toInterpolate, index) => {
 			intlString = intlString.replace(`{${index}}`, `${toInterpolate}`);
-		})
+		});
 		return intlString;
 	}
 

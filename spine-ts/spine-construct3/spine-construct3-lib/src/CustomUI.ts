@@ -203,7 +203,6 @@ function setupModalHandlers (overlay: HTMLDivElement, onCancel: () => void, extr
 
 interface ModalButton<T> {
 	text: string;
-	color?: string;
 	value?: T;
 	style?: 'primary' | 'secondary';
 }
@@ -213,7 +212,6 @@ interface ModalOptions<T> {
 	title: string;
 	text: string;
 	buttons: ModalButton<T>[];
-	maxWidth?: number;
 }
 
 export function showModal<T> (options: ModalOptions<T>): Promise<T | undefined> {
@@ -268,7 +266,6 @@ interface ListSelectionOptions {
 	darkMode: boolean;
 	title: string;
 	items: string[];
-	maxWidth?: number;
 	maxHeight?: number;
 }
 
@@ -427,7 +424,6 @@ interface MultiListSelectionOptions {
 	title: string;
 	items: string[];
 	selectedItems?: string[];
-	maxWidth?: number;
 	maxHeight?: number;
 }
 

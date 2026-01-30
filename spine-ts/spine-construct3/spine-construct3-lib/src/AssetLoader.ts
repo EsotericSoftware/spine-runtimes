@@ -68,7 +68,7 @@ export class AssetLoader {
 
 	public async loadAtlasEditor (sid: number, instance: SDK.IWorldInstance, renderer: SDK.Gfx.IWebGLRenderer) {
 		const projectFile = instance.GetProject().GetProjectFileBySID(sid);
-		if (!projectFile) throw new Error(`Atlas file not found wit the given SID: ${sid}`);
+		if (!projectFile) throw new Error(`Atlas file not found with the given SID: ${sid}`);
 
 		const blob = projectFile.GetBlob();
 		const content = await blob.text();
@@ -91,7 +91,7 @@ export class AssetLoader {
 	public async loadSpineTextureEditor (pageName: string, pma = false, instance: SDK.IWorldInstance) {
 		const projectFile = instance.GetProject().GetProjectFileByExportPath(pageName);
 		if (!projectFile) {
-			throw new Error(`An error occured while loading the texture: ${pageName}`);
+			throw new Error(`An error occurred while loading the texture: ${pageName}`);
 		}
 
 		const content = projectFile.GetBlob();
@@ -207,9 +207,9 @@ export class AssetLoader {
 	}
 
 	private async addToCache<T> (cache: ResourceCache<T>, cacheKey: string, promise: Promise<T>) {
-		const cachEntry: CacheEntry<T> = { promise, refCount: 1 };
-		cache.set(cacheKey, cachEntry);
-		cachEntry.data = await promise;
+		const cacheEntry: CacheEntry<T> = { promise, refCount: 1 };
+		cache.set(cacheKey, cacheEntry);
+		cacheEntry.data = await promise;
 	}
 
 	private getFromCache<T> (cache: ResourceCache<T>, cacheKey: string) {
@@ -220,7 +220,7 @@ export class AssetLoader {
 		return entry;
 	}
 
-	static async createImageBitmapFromBlob (blob: Blob, pma: boolean): Promise<ImageBitmap | null> {
+	static async createImageBitmapFromBlob (blob: Blob, pma: boolean): Promise<ImageBitmap> {
 		try {
 			return createImageBitmap(blob, { premultiplyAlpha: pma ? "none" : "premultiply" });
 		} catch (e) {
@@ -230,5 +230,3 @@ export class AssetLoader {
 	}
 
 }
-
-

@@ -169,11 +169,6 @@
           }
         },
         "actions": {
-          "do-alert": {
-            "list-name": "显示警告",
-            "display-text": "显示警告",
-            "description": "显示一个示例警告。"
-          },
           "set-skin": {
             "list-name": "设置皮肤",
             "display-text": "设置皮肤 {0}",
@@ -201,7 +196,7 @@
             "display-text": "在轨道{0}上设置动画{1}，循环{2}",
             "description": "设置动画",
             "params": {
-              "track": {
+              "track-index": {
                 "name": "轨道",
                 "desc": "轨道"
               },
@@ -220,7 +215,7 @@
             "display-text": "在轨道{0}上添加动画{1}，循环{2}，延迟{3}",
             "description": "添加动画",
             "params": {
-              "track": {
+              "track-index": {
                 "name": "轨道",
                 "desc": "轨道"
               },
@@ -253,7 +248,7 @@
             "display-text": "在轨道{0}上设置空动画，混合时长{1}",
             "description": "在特定轨道上设置空动画",
             "params": {
-              "track": {
+              "track-index": {
                 "name": "轨道",
                 "desc": "轨道索引"
               },
@@ -268,7 +263,7 @@
             "display-text": "在轨道{0}上添加空动画，混合时长{1}，延迟{2}",
             "description": "将空动画添加到特定轨道的动画队列中",
             "params": {
-              "track": {
+              "track-index": {
                 "name": "轨道",
                 "desc": "轨道索引"
               },
@@ -347,9 +342,17 @@
           },
           "set-animation-time": {
             "list-name": "设置动画时间",
-            "display-text": "将轨道{2}的动画时间设置为{1}（{0}）",
+            "display-text": "将轨道{0}的动画时间设置为{1}（{2}）",
             "description": "设置轨道上动画的当前时间",
             "params": {
+              "track-index": {
+                "name": "轨道",
+                "desc": "轨道索引"
+              },
+              "time": {
+                "name": "时间",
+                "desc": "时间值（秒或0.0-1.0的比例）"
+              },
               "units": {
                 "name": "单位",
                 "desc": "时间单位",
@@ -357,14 +360,6 @@
                   "seconds": "秒（绝对时间）",
                   "ratio": "比例（0.0到1.0）"
                 }
-              },
-              "time": {
-                "name": "时间",
-                "desc": "时间值（秒或0.0-1.0的比例）"
-              },
-              "track": {
-                "name": "轨道",
-                "desc": "轨道索引"
               }
             }
           },
@@ -593,16 +588,6 @@
           }
         },
         "expressions": {
-          "double": {
-            "description": "将数字翻倍。",
-            "translated-name": "Double",
-            "params": {
-              "number": {
-                "name": "数字",
-                "desc": "要翻倍的数字。"
-              }
-            }
-          },
           "slot-attachment": {
             "description": "获取插槽上的附件名称。如果没有附件则返回空字符串。",
             "translated-name": "SlotAttachment",

@@ -1,5 +1,4 @@
-
-import type { SDKInstanceClass as SpineC3Instance } from "./instance.ts";
+import type { SDKInstanceClass as SpineC3Instance } from "./instance";
 
 const C3 = globalThis.C3;
 

@@ -111,8 +111,9 @@
         "highlight": true,
         "params": [
           {
-            "id": "track",
-            "type": "number"
+            "id": "track-index",
+            "type": "number",
+            "initial-value": 0
           },
           {
             "id": "animation",
@@ -130,8 +131,9 @@
         "highlight": true,
         "params": [
           {
-            "id": "track",
-            "type": "number"
+            "id": "track-index",
+            "type": "number",
+            "initial-value": 0
           },
           {
             "id": "animation",
@@ -163,12 +165,14 @@
         "highlight": false,
         "params": [
           {
-            "id": "track",
-            "type": "number"
+            "id": "track-index",
+            "type": "number",
+            "initial-value": 0
           },
           {
             "id": "mix-duration",
-            "type": "number"
+            "type": "number",
+            "initial-value": 0.25
           }
         ]
       },
@@ -178,12 +182,14 @@
         "highlight": false,
         "params": [
           {
-            "id": "track",
-            "type": "number"
+            "id": "track-index",
+            "type": "number",
+            "initial-value": 0
           },
           {
             "id": "mix-duration",
-            "type": "number"
+            "type": "number",
+            "initial-value": 0.25
           },
           {
             "id": "delay",
@@ -260,17 +266,18 @@
         "highlight": false,
         "params": [
           {
-            "id": "units",
-            "type": "combo",
-            "items": ["seconds", "ratio"]
+            "id": "track-index",
+            "type": "number",
+            "initial-value": 0
           },
           {
             "id": "time",
             "type": "number"
           },
           {
-            "id": "track",
-            "type": "number"
+            "id": "units",
+            "type": "combo",
+            "items": ["seconds", "ratio"]
           }
         ]
       },
@@ -483,18 +490,6 @@
       }
     ],
     "expressions": [
-      {
-        "id": "double",
-        "expressionName": "Double",
-        "highlight": true,
-        "returnType": "number",
-        "params": [
-          {
-            "id": "number",
-            "type": "number"
-          }
-        ]
-      },
       {
         "id": "slot-attachment",
         "expressionName": "SlotAttachment",

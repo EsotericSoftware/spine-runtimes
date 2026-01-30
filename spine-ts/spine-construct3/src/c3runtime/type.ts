@@ -1,5 +1,4 @@
-
-import type { SDKInstanceClass } from "./instance.ts";
+import type { SDKInstanceClass } from "./instance";
 
 const C3 = globalThis.C3;
 
