@@ -467,8 +467,7 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 
 		let { x, y, width, height } = this.spineBounds;
 		_inst.SetOrigin(-x / width, -y / height);
-
-		if (keepScale) {
+		if (keepScale && oldBoundsWidth !== Infinity && oldBoundsHeight !== Infinity && oldBoundsWidth !== 0 && oldBoundsHeight !== 0) {
 			width *= (_inst.GetWidth() / oldBoundsWidth) * this.propScaleX;
 			height *= (_inst.GetHeight() / oldBoundsHeight) * this.propScaleY;
 		}
@@ -492,6 +491,10 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 		this.setBoundsFromBoundsProvider();
 
 		const { x, y, width, height } = this.spineBounds;
+		if (width === 0 || height === 0) {
+			this.spineBoundsInit = true;
+			return;
+		}
 		this._inst.SetOrigin(-x / width, -y / height);
 
 		if (matchesOldBounds) this._inst.SetSize(width, height);
