@@ -453,6 +453,34 @@
         ]
       },
       {
+        "id": "setup-pose",
+        "scriptName": "SetupPose",
+        "highlight": false,
+        "params": [
+          {
+            "id": "target",
+            "type": "combo",
+            "items": ["all", "bones", "slots"]
+          }
+        ]
+      },
+      {
+        "id": "setup-bone-slot-pose",
+        "scriptName": "SetupBoneSlotPose",
+        "highlight": false,
+        "params": [
+          {
+            "id": "type",
+            "type": "combo",
+            "items": ["bone", "slot"]
+          },
+          {
+            "id": "name",
+            "type": "string"
+          }
+        ]
+      },
+      {
         "id": "attach-instance-to-bone",
         "scriptName": "AttachInstanceToBone",
         "highlight": false,

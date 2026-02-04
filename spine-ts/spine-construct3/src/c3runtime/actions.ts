@@ -138,6 +138,14 @@ C3.Plugins.EsotericSoftware_SpineConstruct3.Acts =
 		this.releaseBoneHold(boneName, resetToSetup);
 	},
 
+	SetupPose (this: SDKInstanceClass, target: 0 | 1 | 2) {
+		this.setupPose(target);
+	},
+
+	SetupBoneSlotPose (this: SDKInstanceClass, type: 0 | 1, name: string) {
+		this.setupBoneSlotPose(type === 0 ? "bone" : "slot", name);
+	},
+
 	AttachInstanceToBone (this: SDKInstanceClass, uid: number, boneName: string, offsetX: number, offsetY: number, offsetAngle: number) {
 		this.attachInstanceToBone(uid, boneName, offsetX, offsetY, offsetAngle);
 	},

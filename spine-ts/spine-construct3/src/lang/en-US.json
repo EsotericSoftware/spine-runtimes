@@ -545,6 +545,41 @@
               }
             }
           },
+          "setup-pose": {
+            "list-name": "Setup pose",
+            "display-text": "Reset {0} to setup pose",
+            "description": "Reset bones and/or slots to their setup pose values.",
+            "params": {
+              "target": {
+                "name": "Target",
+                "desc": "What to reset to setup pose.",
+                "items": {
+                  "all": "All (bones and slots)",
+                  "bones": "Bones",
+                  "slots": "Slots"
+                }
+              }
+            }
+          },
+          "setup-bone-slot-pose": {
+            "list-name": "Setup bone/slot pose",
+            "display-text": "Reset {0} {1} to setup pose",
+            "description": "Reset a specific bone or slot to its setup pose values.",
+            "params": {
+              "type": {
+                "name": "Type",
+                "desc": "Type of target to reset.",
+                "items": {
+                  "bone": "Bone",
+                  "slot": "Slot"
+                }
+              },
+              "name": {
+                "name": "Name",
+                "desc": "Name of the bone or slot to reset."
+              }
+            }
+          },
           "attach-instance-to-bone": {
             "list-name": "Attach instance to bone",
             "display-text": "Attach instance UID {0} to bone {1} with offset ({2}, {3}, {4}°)",

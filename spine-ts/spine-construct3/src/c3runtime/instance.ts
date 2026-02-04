@@ -1019,6 +1019,26 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		if (resetToSetup) bone.setupPose();
 	}
 
+	public setupPose (target: 0 | 1 | 2) {
+		const { skeleton } = this;
+		if (!skeleton) return;
+		if (target === 0) skeleton.setupPose();
+		else if (target === 1) skeleton.setupPoseBones();
+		else skeleton.setupPoseSlots();
+	}
+
+	public setupBoneSlotPose (type: "bone" | "slot", name: string) {
+		if (type === "bone") {
+			const bone = this.getBone(name);
+			if (!bone) return;
+			bone.setupPose();
+		} else {
+			const slot = this.getSlot(name);
+			if (!slot) return;
+			slot.setupPose();
+		}
+	}
+
 	private getBone (boneName: string | Bone) {
 		if (boneName instanceof spine.Bone) return boneName;
 

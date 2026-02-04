@@ -545,6 +545,41 @@
               }
             }
           },
+          "setup-pose": {
+            "list-name": "重置为初始姿势",
+            "display-text": "将{0}重置为初始姿势",
+            "description": "将骨骼和/或插槽重置为初始姿势值。",
+            "params": {
+              "target": {
+                "name": "目标",
+                "desc": "要重置为初始姿势的内容。",
+                "items": {
+                  "all": "全部（骨骼和插槽）",
+                  "bones": "骨骼",
+                  "slots": "插槽"
+                }
+              }
+            }
+          },
+          "setup-bone-slot-pose": {
+            "list-name": "重置骨骼/插槽为初始姿势",
+            "display-text": "将{0} {1}重置为初始姿势",
+            "description": "将指定的骨骼或插槽重置为初始姿势值。",
+            "params": {
+              "type": {
+                "name": "类型",
+                "desc": "要重置的目标类型。",
+                "items": {
+                  "bone": "骨骼",
+                  "slot": "插槽"
+                }
+              },
+              "name": {
+                "name": "名称",
+                "desc": "要重置的骨骼或插槽名称。"
+              }
+            }
+          },
           "attach-instance-to-bone": {
             "list-name": "将实例附加到骨骼",
             "display-text": "将实例UID {0}附加到骨骼{1}，偏移({2}, {3}, {4}°)",
