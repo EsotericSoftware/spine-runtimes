@@ -392,21 +392,63 @@
         ]
       },
       {
-        "id": "update-bone-pose",
-        "scriptName": "UpdateBonePose",
+        "id": "set-bone-pose",
+        "scriptName": "SetBonePose",
         "highlight": false,
         "params": [
           {
+            "id": "bone-name",
+            "type": "string"
+          },
+          {
+            "id": "mode",
+            "type": "combo",
+            "items": ["local", "game"]
+          },
+          {
+            "id": "apply-mode",
+            "type": "combo",
+            "items": ["once", "hold"]
+          },
+          {
             "id": "x",
-            "type": "number"
+            "type": "any",
+            "initialValue": ""
           },
           {
             "id": "y",
-            "type": "number"
+            "type": "any",
+            "initialValue": ""
           },
+          {
+            "id": "rotation",
+            "type": "any",
+            "initialValue": ""
+          },
+          {
+            "id": "scaleX",
+            "type": "any",
+            "initialValue": ""
+          },
+          {
+            "id": "scaleY",
+            "type": "any",
+            "initialValue": ""
+          }
+        ]
+      },
+      {
+        "id": "release-bone-hold",
+        "scriptName": "ReleaseBoneHold",
+        "highlight": false,
+        "params": [
           {
             "id": "bone-name",
             "type": "string"
+          },
+          {
+            "id": "reset-to-setup",
+            "type": "boolean"
           }
         ]
       },

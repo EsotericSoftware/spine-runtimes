@@ -95,4 +95,15 @@ export class C3Matrix {
 		return this.skeletonToGame(applied.worldX, applied.worldY);
 	}
 
+	public gameToBoneRotation (gameAngleDeg: number, bone: Bone) {
+		return bone.applied.worldToLocalRotation(this.gameToSkeletonRotation(gameAngleDeg)) - 180;
+	}
+
+	public gameToSkeletonRotation (gameAngleDeg: number) {
+		const rad = gameAngleDeg * Math.PI / 180;
+		const sin = Math.sin(rad), cos = Math.cos(rad);
+		const { a, b, c, d } = this;
+		return Math.atan2(a * sin - b * cos, d * cos - c * sin) * (180 / Math.PI);
+	}
+
 }

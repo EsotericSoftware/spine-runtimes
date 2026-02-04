@@ -483,22 +483,65 @@
               }
             }
           },
-          "update-bone-pose": {
-            "list-name": "Update bone pose",
-            "display-text": "Set bone {2} position to ({0}, {1})",
-            "description": "Update the pose position of a bone to specific world coordinates.",
+          "set-bone-pose": {
+            "list-name": "Set bone pose",
+            "display-text": "Set bone {0} position ({3}, {4}), rotation {5}, scale ({6}, {7}) in {1} mode, {2}",
+            "description": "Set a bone's pose. Once: applied for the current frame only. Hold: re-applied every frame, merging with previously held values. Use Release bone hold to stop holding. Position and rotation use the selected coordinate space (game or local). Scale is always local.",
             "params": {
-              "x": {
-                "name": "X",
-                "desc": "X world coordinate"
-              },
-              "y": {
-                "name": "Y",
-                "desc": "Y world coordinate"
-              },
               "bone-name": {
                 "name": "Bone name",
                 "desc": "Name of the bone to update"
+              },
+              "mode": {
+                "name": "Mode",
+                "desc": "Coordinate space for position and rotation. Local: values are applied directly as the bone's local pose. Game: values are converted from game space.",
+                "items": {
+                  "local": "Local",
+                  "game": "Game"
+                }
+              },
+              "apply-mode": {
+                "name": "Apply",
+                "desc": "Once: the pose is applied for the current frame only. Hold: the pose is re-applied every frame until released. In hold mode, values left as empty string preserve the previously held value on that axis.",
+                "items": {
+                  "once": "Once",
+                  "hold": "Hold"
+                }
+              },
+              "x": {
+                "name": "X",
+                "desc": "X position. Game space in game mode, bone-local in local mode. Leave as empty string to keep current value."
+              },
+              "y": {
+                "name": "Y",
+                "desc": "Y position. Game space in game mode, bone-local in local mode. Leave as empty string to keep current value."
+              },
+              "rotation": {
+                "name": "Rotation",
+                "desc": "Rotation in degrees. Game space in game mode, bone-local in local mode. Leave as empty string to keep current value."
+              },
+              "scaleX": {
+                "name": "Scale X",
+                "desc": "Bone's local scale X. Always applied as local scale regardless of mode. Leave as empty string to keep current value."
+              },
+              "scaleY": {
+                "name": "Scale Y",
+                "desc": "Bone's local scale Y. Always applied as local scale regardless of mode. Leave as empty string to keep current value."
+              }
+            }
+          },
+          "release-bone-hold": {
+            "list-name": "Release bone hold",
+            "display-text": "Release hold on bone {0}, reset to setup pose: {1}",
+            "description": "Release a held bone pose, allowing the animation to control the bone again. Optionally resets the bone to its setup pose.",
+            "params": {
+              "bone-name": {
+                "name": "Bone name",
+                "desc": "Name of the bone to release"
+              },
+              "reset-to-setup": {
+                "name": "Reset to setup pose",
+                "desc": "If checked, resets the bone to its setup pose after releasing the hold."
               }
             }
           },

@@ -27,12 +27,14 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import type { AnimationState, AssetLoader, Bone, C3Matrix, C3RendererRuntime, Event, NumberArrayLike, Skeleton, Skin, Slot, SpineBoundsProvider, SpineBoundsProviderType, TextureAtlas, } from "@esotericsoftware/spine-construct3-lib";
+import type { AnimationState, AssetLoader, Bone, BoneLocal, C3Matrix, C3RendererRuntime, Event, NumberArrayLike, Skeleton, Skin, Slot, SpineBoundsProvider, SpineBoundsProviderType, TextureAtlas, } from "@esotericsoftware/spine-construct3-lib";
 
 const C3 = globalThis.C3;
 const spine = globalThis.spine;
 
 spine.Skeleton.yDown = true;
+
+type BoneOverride = Partial<BoneLocal> & { mode: "game" | "local" };
 
 class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	propAtlas = "";
@@ -86,6 +88,8 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	private verticesTemp = spine.Utils.newFloatArray(2 * 1024);
 
 	private boneFollowers = new Map<string, { uid: number, offsetX: number, offsetY: number, offsetAngle: number }>();
+
+	private bonesOverride: Map<Bone, BoneOverride> = new Map();
 
 	private dragHandles = new Set<{
 		slot?: Slot,
@@ -179,6 +183,8 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		state.apply(skeleton);
 
 		this.updateHandles(skeleton, matrix);
+
+		this.updateBonesOverride();
 
 		skeleton.updateWorldTransform(physicsMode);
 
@@ -846,6 +852,37 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		}
 	}
 
+	private updateBonesOverride () {
+		for (const [bone, override] of this.bonesOverride) {
+			this.updateBonePoseOnce(bone, override);
+		}
+	}
+
+	private updateBonePoseOnce (bone: Bone, boneOverride: BoneOverride) {
+		const { mode, x, y, rotation, scaleX, scaleY } = boneOverride;
+		if (mode === "game") {
+			if (x !== undefined || y !== undefined) {
+				const locals = this.matrix.gameToBone(
+					x ?? this.matrix.boneToGame(bone).x,
+					y ?? this.matrix.boneToGame(bone).y,
+					bone);
+				bone.pose.x = locals.x;
+				bone.pose.y = locals.y;
+			}
+
+			if (rotation !== undefined) bone.pose.rotation = this.matrix.gameToBoneRotation(rotation, bone);
+		}
+
+		if (mode === "local") {
+			if (x !== undefined) bone.pose.x = x;
+			if (y !== undefined) bone.pose.y = y;
+			if (rotation !== undefined) bone.pose.rotation = rotation;
+		}
+
+		if (scaleX !== undefined) bone.pose.scaleX = scaleX;
+		if (scaleY !== undefined) bone.pose.scaleY = scaleY;
+	}
+
 	/**********/
 
 	/*
@@ -957,13 +994,29 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		return point.y;
 	}
 
-	public updateBonePose (c3X: number, c3Y: number, boneName: string) {
+	public setBonePose (boneName: string, mode: "game" | "local", applyMode: "once" | "hold", c3X?: number, c3Y?: number, c3Rotation?: number, scaleX?: number, scaleY?: number) {
 		const bone = this.getBone(boneName);
 		if (!bone) return;
+		if (applyMode === "hold") {
+			const existing = this.bonesOverride.get(bone);
+			this.bonesOverride.set(bone, {
+				mode,
+				x: c3X ?? existing?.x,
+				y: c3Y ?? existing?.y,
+				rotation: c3Rotation ?? existing?.rotation,
+				scaleX: scaleX ?? existing?.scaleX,
+				scaleY: scaleY ?? existing?.scaleY,
+			});
+		} else {
+			this.updateBonePoseOnce(bone, { mode, x: c3X, y: c3Y, rotation: c3Rotation, scaleX, scaleY });
+		}
+	}
 
-		const { x, y } = this.matrix.gameToBone(c3X, c3Y, bone);
-		bone.applied.x = x;
-		bone.applied.y = y;
+	public releaseBoneHold (boneName: string, resetToSetup: boolean) {
+		const bone = this.getBone(boneName);
+		if (!bone) return;
+		this.bonesOverride.delete(bone);
+		if (resetToSetup) bone.setupPose();
 	}
 
 	private getBone (boneName: string | Bone) {

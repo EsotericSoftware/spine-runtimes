@@ -121,8 +121,21 @@ C3.Plugins.EsotericSoftware_SpineConstruct3.Acts =
 		this.resetSlotColors(slotName);
 	},
 
-	UpdateBonePose (this: SDKInstanceClass, x: number, y: number, boneName: string) {
-		this.updateBonePose(x, y, boneName);
+	SetBonePose (this: SDKInstanceClass, boneName: string, mode: 0 | 1, applyMode: 0 | 1, x: number | string, y: number | string, rotation: number | string, scaleX: number | string, scaleY: number | string) {
+		this.setBonePose(
+			boneName,
+			mode === 0 ? "local" : "game",
+			applyMode === 0 ? "once" : "hold",
+			toNumberOrUndefined(x),
+			toNumberOrUndefined(y),
+			toNumberOrUndefined(rotation),
+			toNumberOrUndefined(scaleX),
+			toNumberOrUndefined(scaleY),
+		);
+	},
+
+	ReleaseBoneHold (this: SDKInstanceClass, boneName: string, resetToSetup: boolean) {
+		this.releaseBoneHold(boneName, resetToSetup);
 	},
 
 	AttachInstanceToBone (this: SDKInstanceClass, uid: number, boneName: string, offsetX: number, offsetY: number, offsetAngle: number) {
@@ -142,3 +155,19 @@ C3.Plugins.EsotericSoftware_SpineConstruct3.Acts =
 	}
 
 };
+
+function toNumberOrUndefined (x: number | string): number | undefined {
+	if (typeof x === "number") {
+		return Number.isFinite(x) ? x : undefined;
+	}
+
+	if (typeof x === "string") {
+		const trimmed = x.trim();
+		if (trimmed === "") return undefined;
+
+		const n = Number(trimmed);
+		return Number.isFinite(n) ? n : undefined;
+	}
+
+	return undefined;
+}
