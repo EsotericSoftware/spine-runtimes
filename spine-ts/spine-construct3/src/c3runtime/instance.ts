@@ -324,15 +324,14 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 					pose.y = -y * spine.Skeleton.yDir;
 				}
 			} else if (!this.prevLeftClickDown) {
-				const applied = bone.applied;
-				const { x, y } = matrix.gameToSkeleton(touchX, touchY);
+				const { x: boneGameX, y: boneGameY } = matrix.boneToGame(bone);
 				const inside = handleObject.slot
-					? this.isInsideSlot(x, y, handleObject.slot, true)
-					: this.inRadius(x, y, applied.worldX, applied.worldY, handleObject.radius);
+					? this.isInsideSlot(touchX, touchY, handleObject.slot)
+					: this.inRadius(touchX, touchY, boneGameX, boneGameY, handleObject.radius);
 				if (inside) {
 					handleObject.dragging = true;
-					handleObject.offsetX = x - applied.worldX;
-					handleObject.offsetY = y - applied.worldY;
+					handleObject.offsetX = touchX - boneGameX;
+					handleObject.offsetY = touchY - boneGameY;
 				}
 			}
 		}
