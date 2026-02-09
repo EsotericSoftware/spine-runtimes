@@ -8,6 +8,8 @@ interface ProjectFileListEntry {
  * @see {@link https://www.construct.net/make-games/manuals/construct-3/scripting/scripting-reference/interfaces/iassetmanager | IAssetManager documentation } */
 declare class IAssetManager
 {
+    runtime: IRuntime;
+    
     loadImageAsset(iImageInfo: IImageInfo): void;
 
     /**

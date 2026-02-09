@@ -6,7 +6,11 @@ type Shape3DFaceType = "back" | "front" | "left" | "right" | "top" | "bottom";
  * @see {@link https://www.construct.net/make-games/manuals/construct-3/scripting/scripting-reference/plugin-interfaces/3d-shape | I3DShapeInstance documentation } */
 declare class I3DShapeInstance extends IWorldInstance
 {
+	/**
+	 * @deprecated Use 'depth' property instead
+	 */
 	zHeight: number;
+
 	shape: Shape3DShapeType;
 	zTilingFactor: number;
 
