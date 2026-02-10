@@ -572,7 +572,7 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 		this.matrix.update(
 			this._inst.GetX() + this.propOffsetX,
 			this._inst.GetY() + this.propOffsetY,
-			this._inst.GetTotalZElevation(),
+			this._inst.GetTotalZ(),
 			this._inst.GetAngle() + this.propOffsetAngle,
 			actualScaleX,
 			actualScaleY);

@@ -163,7 +163,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		this.matrix.update(
 			this.x + this.propOffsetX,
 			this.y + this.propOffsetY,
-			this.totalZElevation,
+			this.totalZ,
 			this.angle + this.propOffsetAngle,
 			this.width / this.spineBounds.width * this.propScaleX * (this.isFlippedX ? -1 : 1),
 			this.height / this.spineBounds.height * this.propScaleY);
