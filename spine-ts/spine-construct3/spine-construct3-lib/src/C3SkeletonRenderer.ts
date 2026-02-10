@@ -49,6 +49,7 @@ abstract class C3SkeletonRenderer<
 
 	private prevX = Infinity;
 	private prevY = Infinity;
+	private prevZ = Infinity;
 	private prevAngle = Infinity;
 	private prevRed = -1;
 	private prevGreen = -1;
@@ -64,11 +65,12 @@ abstract class C3SkeletonRenderer<
 
 	draw (skeleton: Skeleton, inColors: [number, number, number], opacity = 1, requestRedraw = true) {
 		const { matrix, inv255 } = this;
-		const { a, b, c, d, tx, ty, prevX, prevY, prevAngle } = matrix;
+		const { a, b, c, d, tx, ty, prevX, prevY, prevZ, prevAngle } = matrix;
 
-		const requestRedrawForMatrix = this.prevX !== prevX || this.prevY !== prevY || this.prevAngle !== prevAngle;
+		const requestRedrawForMatrix = this.prevX !== prevX || this.prevY !== prevY || this.prevZ !== prevZ || this.prevAngle !== prevAngle;
 		this.prevX = prevX;
 		this.prevY = prevY;
+		this.prevZ = prevZ;
 		this.prevAngle = prevAngle;
 
 		const requestRedrawForColor = this.prevRed !== inColors[0] || this.prevGreen !== inColors[1] || this.prevBlue !== inColors[2] || this.prevAlpha !== opacity;
@@ -95,6 +97,7 @@ abstract class C3SkeletonRenderer<
 					const y = positions[index + 1];
 					positions[index] = a * x + c * y + tx;
 					positions[index + 1] = b * x + d * y + ty;
+					positions[index + 2] = prevZ;
 
 					const color = colors[i];
 					const colorDst = i * 4;

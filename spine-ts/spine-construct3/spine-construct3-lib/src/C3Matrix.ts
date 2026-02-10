@@ -37,21 +37,24 @@ export class C3Matrix {
 	public d = 0;
 	public tx = 0;
 	public ty = 0;
+	public tz = 0;
 
 	public prevX = Infinity;
 	public prevY = Infinity;
+	public prevZ = Infinity;
 	public prevAngle = Infinity;
 	public prevScaleX = Infinity;
 	public prevScaleY = Infinity;
 
 	private tempPoint = new Vector2();
 
-	public update (x: number, y: number, angle: number, scaleX = 1, scaleY = 1) {
-		if (this.prevX === x && this.prevY === y &&
+	public update (x: number, y: number, z: number, angle: number, scaleX = 1, scaleY = 1) {
+		if (this.prevX === x && this.prevY === y && this.prevZ === z &&
 			this.prevAngle === angle &&
 			this.prevScaleX === scaleX && this.prevScaleY === scaleY) return false;
 		this.prevX = x;
 		this.prevY = y;
+		this.prevZ = z;
 		this.prevAngle = angle;
 		this.prevScaleX = scaleX;
 		this.prevScaleY = scaleY;
@@ -63,6 +66,7 @@ export class C3Matrix {
 		this.d = scaleY * cos;
 		this.tx = x;
 		this.ty = y;
+		this.tz = z;
 		return true;
 	}
 
