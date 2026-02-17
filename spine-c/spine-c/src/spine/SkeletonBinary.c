@@ -1027,8 +1027,28 @@ static int _readVertices(_dataInput *input, float **vertices, int *verticesLengt
 		return *verticesLength;
 	}
 
-	float *v = MALLOC(float, (*verticesLength) * 3 * 3);
-	int *b = MALLOC(int, (*verticesLength) * 3);
+	/* First pass: scan the binary data to compute exact buffer sizes needed. */
+	const unsigned char *savedCursor = input->cursor;
+	int totalBoneEntries = 0;
+	int totalVertexEntries = 0;
+	for (int i = 0; i < vertexCount; ++i) {
+		int boneCount = readVarint(input, 1);
+		totalBoneEntries += 1 + boneCount; /* 1 for the count + 1 per bone index */
+		totalVertexEntries += boneCount * 3; /* 3 floats (x, y, weight) per bone */
+		for (int ii = 0; ii < boneCount; ++ii) {
+			readVarint(input, 1); /* bone index, skip */
+			readFloat(input); /* x, skip */
+			readFloat(input); /* y, skip */
+			readFloat(input); /* weight, skip */
+		}
+	}
+
+	/* Rewind to start of vertex data. */
+	input->cursor = savedCursor;
+
+	/* Second pass: allocate exact sizes and read. */
+	float *v = MALLOC(float, totalVertexEntries);
+	int *b = MALLOC(int, totalBoneEntries);
 	int boneIdx = 0;
 	int vertexIdx = 0;
 	for (int i = 0; i < vertexCount; ++i) {
