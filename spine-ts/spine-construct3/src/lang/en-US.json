@@ -607,10 +607,52 @@
               }
             }
           },
-          "detach-instance-from-bone": {
-            "list-name": "Detach instance from bone",
-            "display-text": "Detach instance from bone {0}",
-            "description": "Stop an object instance from following a bone. The instance will remain at its current position.",
+          "attach-object-to-bone": {
+            "list-name": "Attach object to bone",
+            "display-text": "Attach {0} to bone {1} with offset ({2}, {3}, {4}°)",
+            "description": "Make picked object instances follow a skeleton bone's position and rotation. The instances will automatically update their position and angle to match the bone every frame. Offsets are applied in the bone's local space (rotated with the bone).",
+            "params": {
+              "object": {
+                "name": "Object",
+                "desc": "The object type to attach (picked instances will be attached)"
+              },
+              "bone-name": {
+                "name": "Bone name",
+                "desc": "Name of the bone to follow"
+              },
+              "offset-x": {
+                "name": "Offset X",
+                "desc": "X offset from bone position (in bone's local space)"
+              },
+              "offset-y": {
+                "name": "Offset Y",
+                "desc": "Y offset from bone position (in bone's local space)"
+              },
+              "offset-angle": {
+                "name": "Offset angle",
+                "desc": "Angle offset in degrees from bone rotation"
+              }
+            }
+          },
+          "detach-object-from-bone": {
+            "list-name": "Detach object from bone",
+            "display-text": "Detach {0} from bone {1}",
+            "description": "Stop picked object instances from following a bone. The instances will remain at their current positions.",
+            "params": {
+              "object": {
+                "name": "Object",
+                "desc": "The object type to detach (picked instances will be detached)"
+              },
+              "bone-name": {
+                "name": "Bone name",
+                "desc": "Name of the bone to detach from"
+              }
+            }
+          },
+          "detach-all-from-bone": {
+            "list-name": "Detach all from bone",
+            "display-text": "Detach all instances from bone {0}",
+            "description": "Stop all object instances from following a bone. The instances will remain at their current positions.",
             "params": {
               "bone-name": {
                 "name": "Bone name",

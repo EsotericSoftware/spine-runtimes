@@ -150,8 +150,22 @@ C3.Plugins.EsotericSoftware_SpineConstruct3.Acts =
 		this.attachInstanceToBone(uid, boneName, offsetX, offsetY, offsetAngle);
 	},
 
-	DetachInstanceFromBone (this: SDKInstanceClass, boneName: string) {
-		this.detachInstanceFromBone(boneName);
+	AttachObjectToBone (this: SDKInstanceClass, objectClass: IObjectType, boneName: string, offsetX: number, offsetY: number, offsetAngle: number) {
+		const pickedInstances = objectClass.getPickedInstances();
+		for (const instance of pickedInstances) {
+			this.attachInstanceToBone(instance.uid, boneName, offsetX, offsetY, offsetAngle);
+		}
+	},
+
+	DetachObjectFromBone (this: SDKInstanceClass, objectClass: IObjectType, boneName: string) {
+		const pickedInstances = objectClass.getPickedInstances();
+		for (const instance of pickedInstances) {
+			this.detachInstanceFromBoneByUid(instance.uid, boneName);
+		}
+	},
+
+	DetachAllFromBone (this: SDKInstanceClass, boneName: string) {
+		this.detachAllFromBone(boneName);
 	},
 
 	AddHandle (this: SDKInstanceClass, type: 0 | 1, name: string, radius: number, debug: boolean) {

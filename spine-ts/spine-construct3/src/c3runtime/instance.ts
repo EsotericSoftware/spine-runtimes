@@ -35,6 +35,7 @@ const spine = globalThis.spine;
 spine.Skeleton.yDown = true;
 
 type BoneOverride = Partial<BoneLocal> & { mode: "game" | "local" };
+type BoneFollower = { uid: number, offsetX: number, offsetY: number, offsetAngle: number };
 
 class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	propAtlas = "";
@@ -87,7 +88,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 
 	private verticesTemp = spine.Utils.newFloatArray(2 * 1024);
 
-	private boneFollowers = new Map<string, { uid: number, offsetX: number, offsetY: number, offsetAngle: number }>();
+	private boneFollowers = new Map<string, BoneFollower[]>();
 
 	private bonesOverride: Map<Bone, BoneOverride> = new Map();
 
@@ -819,23 +820,40 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			return;
 		}
 
-		this.boneFollowers.set(boneName, { uid, offsetX, offsetY, offsetAngle });
+		const follower = { uid, offsetX, offsetY, offsetAngle };
+		const followers = this.boneFollowers.get(boneName);
+		if (!followers) {
+			this.boneFollowers.set(boneName, [follower]);
+		} else {
+			followers.push(follower);
+		}
+
 		this.isPlaying = true;
 	}
 
-	public detachInstanceFromBone (boneName: string) {
+	public detachInstanceFromBoneByUid (uid: number, boneName: string) {
+		const followers = this.boneFollowers.get(boneName);
+		if (!followers) return;
+
+		const index = followers.findIndex(f => f.uid === uid);
+		if (index !== -1) {
+			followers.splice(index, 1);
+			if (followers.length === 0) {
+				this.boneFollowers.delete(boneName);
+			}
+		}
+	}
+
+	public detachAllFromBone (boneName: string) {
 		this.boneFollowers.delete(boneName);
 	}
 
 	private updateBoneFollowers (matrix: C3Matrix) {
 		if (this.boneFollowers.size === 0) return;
 
-		for (const [boneName, follower] of this.boneFollowers) {
+		for (const [boneName, followers] of this.boneFollowers) {
 			const bone = this.skeleton?.findBone(boneName);
 			if (!bone) continue;
-
-			const instance = this.runtime.getInstanceByUid(follower.uid) as IWorldInstance;
-			if (!instance) continue;
 
 			const { x, y } = matrix.boneToGame(bone);
 			const boneRotation = bone.applied.getWorldRotationX();
@@ -843,12 +861,21 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			const rotationRadians = boneRotation * Math.PI / 180;
 			const cos = Math.cos(rotationRadians);
 			const sin = Math.sin(rotationRadians);
-			const rotatedOffsetX = follower.offsetX * cos - follower.offsetY * sin;
-			const rotatedOffsetY = follower.offsetX * sin + follower.offsetY * cos;
 
-			instance.x = x + rotatedOffsetX;
-			instance.y = y + rotatedOffsetY;
-			instance.angleDegrees = boneRotation + follower.offsetAngle;
+			for (const follower of followers) {
+				const instance = this.runtime.getInstanceByUid(follower.uid) as IWorldInstance;
+				if (!instance) {
+					this.detachInstanceFromBoneByUid(follower.uid, boneName);
+					continue;
+				}
+
+				const rotatedOffsetX = follower.offsetX * cos - follower.offsetY * sin;
+				const rotatedOffsetY = follower.offsetX * sin + follower.offsetY * cos;
+
+				instance.x = x + rotatedOffsetX;
+				instance.y = y + rotatedOffsetY;
+				instance.angleDegrees = boneRotation + follower.offsetAngle;
+			}
 		}
 	}
 

@@ -508,8 +508,50 @@
         ]
       },
       {
-        "id": "detach-instance-from-bone",
-        "scriptName": "DetachInstanceFromBone",
+        "id": "attach-object-to-bone",
+        "scriptName": "AttachObjectToBone",
+        "highlight": false,
+        "params": [
+          {
+            "id": "object",
+            "type": "object"
+          },
+          {
+            "id": "bone-name",
+            "type": "string"
+          },
+          {
+            "id": "offset-x",
+            "type": "number"
+          },
+          {
+            "id": "offset-y",
+            "type": "number"
+          },
+          {
+            "id": "offset-angle",
+            "type": "number"
+          }
+        ]
+      },
+      {
+        "id": "detach-object-from-bone",
+        "scriptName": "DetachObjectFromBone",
+        "highlight": false,
+        "params": [
+          {
+            "id": "object",
+            "type": "object"
+          },
+          {
+            "id": "bone-name",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "detach-all-from-bone",
+        "scriptName": "DetachAllFromBone",
         "highlight": false,
         "params": [
           {
