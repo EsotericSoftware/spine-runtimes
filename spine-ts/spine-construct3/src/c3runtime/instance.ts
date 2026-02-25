@@ -52,7 +52,8 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	propBoundsProvider: SpineBoundsProviderType = "setup";
 	propEnableCollision = false;
 
-	isFlippedX = false;
+	isMirrored = false;
+	isFlipped = false;
 	collisionSpriteInstance?: IWorldInstance;
 	collisionSpriteClassName = "";
 	isPlaying = true;
@@ -166,7 +167,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			this.y + this.propOffsetY,
 			this.totalZ,
 			this.angle + this.propOffsetAngle,
-			this.width / this.spineBounds.width * this.propScaleX * (this.isFlippedX ? -1 : 1),
+			this.width / this.spineBounds.width * this.propScaleX,
 			this.height / this.spineBounds.height * this.propScaleY);
 
 		this.updateCollisionSprite();
@@ -848,6 +849,14 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		this.boneFollowers.delete(boneName);
 	}
 
+	private mirrorFollower (instance: IWorldInstance) {
+		instance.setSize(-instance.width, instance.height);
+	}
+
+	private flipFollower (instance: IWorldInstance) {
+		instance.setSize(instance.width, -instance.height);
+	}
+
 	private updateBoneFollowers (matrix: C3Matrix) {
 		if (this.boneFollowers.size === 0) return;
 
@@ -872,8 +881,8 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 				const rotatedOffsetX = follower.offsetX * cos - follower.offsetY * sin;
 				const rotatedOffsetY = follower.offsetX * sin + follower.offsetY * cos;
 
-				instance.x = x + rotatedOffsetX;
-				instance.y = y + rotatedOffsetY;
+				instance.x = x + rotatedOffsetX * (this.isMirrored ? -1 : 1);
+				instance.y = y + rotatedOffsetY * (this.isFlipped ? -1 : 1);
 				instance.angleDegrees = boneRotation + follower.offsetAngle;
 			}
 		}
@@ -1101,8 +1110,34 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	*  Skeleton
 	*/
 
-	public flipX (isFlippedX: boolean) {
-		this.isFlippedX = isFlippedX;
+	public mirror (isMirrored: boolean) {
+		if (isMirrored !== this.isMirrored) {
+			this.isMirrored = isMirrored;
+			this.width = -this.width
+
+			for (const [, followers] of this.boneFollowers) {
+				for (const follower of followers) {
+					const instance = this.runtime.getInstanceByUid(follower.uid) as IWorldInstance;
+					if (instance) this.mirrorFollower(instance);
+				}
+			}
+
+		}
+	}
+
+	public flip (isFlipped: boolean) {
+		if (isFlipped !== this.isFlipped) {
+			this.isFlipped = isFlipped;
+			this.height = -this.height;
+
+			for (const [, followers] of this.boneFollowers) {
+				for (const follower of followers) {
+					const instance = this.runtime.getInstanceByUid(follower.uid) as IWorldInstance;
+					if (instance) this.flipFollower(instance);
+				}
+			}
+
+		}
 	}
 
 	public setPhysicsMode (mode: 0 | 1 | 2 | 3) {

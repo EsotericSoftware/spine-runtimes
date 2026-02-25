@@ -118,10 +118,15 @@
               }
             }
           },
-          "is-flipped-x": {
-            "list-name": "是否水平翻转",
-            "display-text": "是否水平翻转",
-            "description": "检查骨架是否水平翻转"
+          "is-mirrored": {
+            "list-name": "是否镜像",
+            "display-text": "是否镜像",
+            "description": "检查骨架是否水平镜像"
+          },
+          "is-flipped": {
+            "list-name": "是否翻转",
+            "display-text": "是否翻转",
+            "description": "检查骨架是否垂直翻转"
           },
           "is-skeleton-loaded": {
             "list-name": "骨架是否已加载",
@@ -180,14 +185,25 @@
               }
             }
           },
-          "flip-x": {
-            "list-name": "水平翻转",
-            "display-text": "设置水平翻转为 {0}",
-            "description": "水平翻转骨架",
+          "mirror": {
+            "list-name": "镜像",
+            "display-text": "设置镜像为 {0}",
+            "description": "水平镜像骨架",
             "params": {
-              "is-flipped-x": {
-                "name": "是否水平翻转",
-                "desc": "设为true时水平翻转骨架，设为false时正常显示。"
+              "is-mirrored": {
+                "name": "是否镜像",
+                "desc": "设为true时水平镜像骨架，设为false时正常显示。"
+              }
+            }
+          },
+          "flip": {
+            "list-name": "翻转",
+            "display-text": "设置翻转为 {0}",
+            "description": "垂直翻转骨架",
+            "params": {
+              "is-flipped": {
+                "name": "是否翻转",
+                "desc": "设为true时垂直翻转骨架，设为false时正常显示。"
               }
             }
           },

@@ -37,8 +37,12 @@ C3.Plugins.EsotericSoftware_SpineConstruct3.Acts =
 		this.setSkin(skinList.split(","));
 	},
 
-	FlipX (this: SDKInstanceClass, isFlippedX: boolean) {
-		this.flipX(isFlippedX);
+	Mirror (this: SDKInstanceClass, isMirrored: boolean) {
+		this.mirror(isMirrored);
+	},
+
+	Flip (this: SDKInstanceClass, isFlipped: boolean) {
+		this.flip(isFlipped);
 	},
 
 	SetAnimation (this: SDKInstanceClass, track: number, animation: string, loop = false) {

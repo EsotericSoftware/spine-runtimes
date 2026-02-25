@@ -129,7 +129,7 @@ abstract class C3SkeletonRenderer<
 		const bones = skeleton.bones;
 		for (let i = 0, n = bones.length; i < n; i++) {
 			const bone = bones[i];
-			if (!bone.parent) continue;
+			// if (!bone.parent) continue;
 			const boneApplied = bone.applied;
 			const { x: x1, y: y1 } = matrix.skeletonToGame(boneApplied.worldX, boneApplied.worldY);
 			const endX = boneApplied.worldX + bone.data.length * boneApplied.a;

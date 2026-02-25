@@ -118,10 +118,15 @@
               }
             }
           },
-          "is-flipped-x": {
-            "list-name": "Is flipped X",
-            "display-text": "Is flipped X",
-            "description": "Check if the skeleton is flipped horizontally"
+          "is-mirrored": {
+            "list-name": "Is mirrored",
+            "display-text": "Is mirrored",
+            "description": "Check if the skeleton is mirrored horizontally"
+          },
+          "is-flipped": {
+            "list-name": "Is flipped",
+            "display-text": "Is flipped",
+            "description": "Check if the skeleton is flipped vertically"
           },
           "is-skeleton-loaded": {
             "list-name": "Is skeleton loaded",
@@ -180,14 +185,25 @@
               }
             }
           },
-          "flip-x": {
-            "list-name": "Flip X",
-            "display-text": "Set flip X to {0}",
-            "description": "Flip the skeleton horizontally",
+          "mirror": {
+            "list-name": "Mirror",
+            "display-text": "Set mirrored to {0}",
+            "description": "Mirror the skeleton horizontally",
             "params": {
-              "is-flipped-x": {
-                "name": "Is flipped X",
-                "desc": "True to flip the skeleton horizontally, false to show normally."
+              "is-mirrored": {
+                "name": "Is mirrored",
+                "desc": "True to mirror the skeleton horizontally, false to show normally."
+              }
+            }
+          },
+          "flip": {
+            "list-name": "Flip",
+            "display-text": "Set flipped to {0}",
+            "description": "Flip the skeleton vertically",
+            "params": {
+              "is-flipped": {
+                "name": "Is flipped",
+                "desc": "True to flip the skeleton vertically, false to show normally."
               }
             }
           },

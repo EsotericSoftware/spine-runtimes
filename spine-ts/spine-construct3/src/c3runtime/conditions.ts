@@ -42,8 +42,11 @@ C3.Plugins.EsotericSoftware_SpineConstruct3.Cnds =
 		const animationMatches = animation === "" || this.triggeredEventAnimation === animation;
 		return eventMatches && trackMatches && animationMatches;
 	},
-	IsFlippedX (this: SpineC3Instance) {
-		return this.isFlippedX;
+	IsMirrored (this: SpineC3Instance) {
+		return this.isMirrored;
+	},
+	IsFlipped (this: SpineC3Instance) {
+		return this.isFlipped;
 	},
 	IsSkeletonLoaded (this: SpineC3Instance) {
 		return this.skeletonLoaded;

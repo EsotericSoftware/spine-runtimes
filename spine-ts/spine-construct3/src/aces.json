@@ -31,8 +31,13 @@
         ]
       },
       {
-        "id": "is-flipped-x",
-        "scriptName": "IsFlippedX",
+        "id": "is-mirrored",
+        "scriptName": "IsMirrored",
+        "isTrigger": false
+      },
+      {
+        "id": "is-flipped",
+        "scriptName": "IsFlipped",
         "isTrigger": false
       },
       {
@@ -95,12 +100,23 @@
         ]
       },
       {
-        "id": "flip-x",
-        "scriptName": "FlipX",
+        "id": "mirror",
+        "scriptName": "Mirror",
         "highlight": false,
         "params": [
           {
-            "id": "is-flipped-x",
+            "id": "is-mirrored",
+            "type": "boolean"
+          }
+        ]
+      },
+      {
+        "id": "flip",
+        "scriptName": "Flip",
+        "highlight": false,
+        "params": [
+          {
+            "id": "is-flipped",
             "type": "boolean"
           }
         ]
