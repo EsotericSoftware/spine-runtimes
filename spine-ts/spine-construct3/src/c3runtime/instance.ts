@@ -57,7 +57,6 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	collisionSpriteInstance?: IWorldInstance;
 	collisionSpriteClassName = "";
 	isPlaying = true;
-	animationSpeed = 1.0;
 	physicsMode = spine.Physics.update;
 	customSkins: Record<string, Skin> = {};
 
@@ -176,13 +175,12 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	}
 
 	private update (delta: number) {
-		const { state, skeleton, animationSpeed, physicsMode, matrix } = this;
+		const { state, skeleton, physicsMode, matrix } = this;
 
 		if (!skeleton || !state) return;
 
-		const adjustedDelta = delta * animationSpeed;
-		state.update(adjustedDelta);
-		skeleton.update(adjustedDelta);
+		state.update(delta);
+		skeleton.update(delta);
 		state.apply(skeleton);
 
 		this.updateHandles(skeleton, matrix);
@@ -580,7 +578,8 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	}
 
 	public setAnimationSpeed (speed: number) {
-		this.animationSpeed = speed;
+		if (!this.state) return;
+		this.state.timeScale = speed;
 	}
 
 	public setAnimationTime (units: 0 | 1, time: number, track: number) {

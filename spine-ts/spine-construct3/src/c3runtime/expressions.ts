@@ -79,5 +79,9 @@ C3.Plugins.EsotericSoftware_SpineConstruct3.Exps =
 		if (field === "animation") return this.triggeredEventData?.animation ?? 0;
 		if (field === "track") return this.triggeredEventData?.track ?? -1;
 		return "";
+	},
+
+	TimeScale (this: SpineC3Instance) {
+		return this.state?.timeScale ?? 1;
 	}
 };

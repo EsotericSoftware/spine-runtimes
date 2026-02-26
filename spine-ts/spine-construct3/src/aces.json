@@ -266,12 +266,12 @@
         ]
       },
       {
-        "id": "set-animation-speed",
-        "scriptName": "SetAnimationSpeed",
+        "id": "set-time-scale",
+        "scriptName": "SetTimeScale",
         "highlight": false,
         "params": [
           {
-            "id": "speed",
+            "id": "time-scale",
             "type": "number"
           }
         ]
@@ -719,6 +719,12 @@
             "type": "string"
           }
         ]
+      },
+      {
+        "id": "time-scale",
+        "expressionName": "TimeScale",
+        "highlight": false,
+        "returnType": "number"
       }
     ]
   }

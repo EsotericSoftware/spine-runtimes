@@ -345,14 +345,14 @@
               }
             }
           },
-          "set-animation-speed": {
-            "list-name": "Set animation speed",
-            "display-text": "Set animation speed to {0}",
-            "description": "Set the playback speed of animations (1.0 = normal, 2.0 = double speed, 0.5 = half speed)",
+          "set-time-scale": {
+            "list-name": "Set time scale",
+            "display-text": "Set time scale to {0}",
+            "description": "Set the time scale of animations (1.0 = normal, 2.0 = double speed, 0.5 = half speed)",
             "params": {
-              "speed": {
-                "name": "Speed",
-                "desc": "Animation speed multiplier (1.0 is normal speed)"
+              "time-scale": {
+                "name": "Time scale",
+                "desc": "Time scale multiplier (1.0 is normal speed)"
               }
             }
           },
@@ -807,6 +807,10 @@
                 "desc": "The event data field to retrieve"
               }
             }
+          },
+          "time-scale": {
+            "description": "Get the current animation time scale (speed multiplier).",
+            "translated-name": "TimeScale"
           }
         },
         "custom_ui": {

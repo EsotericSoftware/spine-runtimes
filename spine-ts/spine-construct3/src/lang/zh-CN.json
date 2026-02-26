@@ -345,14 +345,14 @@
               }
             }
           },
-          "set-animation-speed": {
-            "list-name": "设置动画速度",
-            "display-text": "将动画速度设置为{0}",
-            "description": "设置动画播放速度（1.0 = 正常，2.0 = 两倍速，0.5 = 半速）",
+          "set-time-scale": {
+            "list-name": "设置时间缩放",
+            "display-text": "将时间缩放设置为{0}",
+            "description": "设置动画时间缩放（1.0 = 正常，2.0 = 两倍速，0.5 = 半速）",
             "params": {
-              "speed": {
-                "name": "速度",
-                "desc": "动画速度倍数（1.0为正常速度）"
+              "time-scale": {
+                "name": "时间缩放",
+                "desc": "时间缩放倍数（1.0为正常速度）"
               }
             }
           },
@@ -807,6 +807,10 @@
                 "desc": "要检索的事件数据字段"
               }
             }
+          },
+          "time-scale": {
+            "description": "获取当前动画时间缩放（速度倍数）。",
+            "translated-name": "TimeScale"
           }
         },
         "custom_ui": {
