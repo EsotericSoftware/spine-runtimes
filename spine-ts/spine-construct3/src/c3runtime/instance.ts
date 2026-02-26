@@ -583,7 +583,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		this.animationSpeed = speed;
 	}
 
-	public setAnimationTime (units: 0 | 1, track: number, time: number) {
+	public setAnimationTime (units: 0 | 1, time: number, track: number) {
 		if (!this.state) return;
 
 		const trackEntry = this.state.tracks[track];
