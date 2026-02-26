@@ -599,7 +599,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 				console.warn(`[Spine] Animation time ratio ${time} is out of bounds [0, 1]`);
 				return;
 			}
-			trackEntry.trackTime = time * (trackEntry.animationEnd - trackEntry.animationStart);
+			trackEntry.trackTime = trackEntry.animationStart + time * (trackEntry.animationEnd - trackEntry.animationStart);
 		}
 	}
 
