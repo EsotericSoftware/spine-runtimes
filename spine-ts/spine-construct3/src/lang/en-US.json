@@ -811,6 +811,36 @@
           "time-scale": {
             "description": "Get the current animation time scale (speed multiplier).",
             "translated-name": "TimeScale"
+          },
+          "current-animation-start": {
+            "description": "Get the start time of the current animation on the specified track.",
+            "translated-name": "CurrentAnimationStart",
+            "params": {
+              "track-index": {
+                "name": "Track index",
+                "desc": "The track index"
+              }
+            }
+          },
+          "current-animation-end": {
+            "description": "Get the end time of the current animation on the specified track.",
+            "translated-name": "CurrentAnimationEnd",
+            "params": {
+              "track-index": {
+                "name": "Track index",
+                "desc": "The track index"
+              }
+            }
+          },
+          "current-animation-last": {
+            "description": "Get the last applied time of the current animation on the specified track.",
+            "translated-name": "CurrentAnimationLast",
+            "params": {
+              "track-index": {
+                "name": "Track index",
+                "desc": "The track index"
+              }
+            }
           }
         },
         "custom_ui": {

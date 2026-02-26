@@ -725,6 +725,42 @@
         "expressionName": "TimeScale",
         "highlight": false,
         "returnType": "number"
+      },
+      {
+        "id": "current-animation-start",
+        "expressionName": "CurrentAnimationStart",
+        "highlight": false,
+        "returnType": "number",
+        "params": [
+          {
+            "id": "track-index",
+            "type": "number"
+          }
+        ]
+      },
+      {
+        "id": "current-animation-end",
+        "expressionName": "CurrentAnimationEnd",
+        "highlight": false,
+        "returnType": "number",
+        "params": [
+          {
+            "id": "track-index",
+            "type": "number"
+          }
+        ]
+      },
+      {
+        "id": "current-animation-last",
+        "expressionName": "CurrentAnimationLast",
+        "highlight": false,
+        "returnType": "number",
+        "params": [
+          {
+            "id": "track-index",
+            "type": "number"
+          }
+        ]
       }
     ]
   }

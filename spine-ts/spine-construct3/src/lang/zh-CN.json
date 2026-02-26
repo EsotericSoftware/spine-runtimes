@@ -811,6 +811,36 @@
           "time-scale": {
             "description": "获取当前动画时间缩放（速度倍数）。",
             "translated-name": "TimeScale"
+          },
+          "current-animation-start": {
+            "description": "获取指定轨道上当前动画的开始时间。",
+            "translated-name": "CurrentAnimationStart",
+            "params": {
+              "track-index": {
+                "name": "轨道索引",
+                "desc": "轨道索引"
+              }
+            }
+          },
+          "current-animation-end": {
+            "description": "获取指定轨道上当前动画的结束时间。",
+            "translated-name": "CurrentAnimationEnd",
+            "params": {
+              "track-index": {
+                "name": "轨道索引",
+                "desc": "轨道索引"
+              }
+            }
+          },
+          "current-animation-last": {
+            "description": "获取指定轨道上当前动画的最后应用时间。",
+            "translated-name": "CurrentAnimationLast",
+            "params": {
+              "track-index": {
+                "name": "轨道索引",
+                "desc": "轨道索引"
+              }
+            }
           }
         },
         "custom_ui": {
