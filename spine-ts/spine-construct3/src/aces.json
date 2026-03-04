@@ -444,12 +444,12 @@
           {
             "id": "scaleX",
             "type": "any",
-            "initialValue": ""
+            "initialValue": "1"
           },
           {
             "id": "scaleY",
             "type": "any",
-            "initialValue": ""
+            "initialValue": "1"
           }
         ]
       },
