@@ -642,6 +642,28 @@
             "initial-value": 200
           }
         ]
+      },
+      {
+        "id": "set-bounds-for-skin-animation",
+        "scriptName": "SetBoundsForSkinAnimation",
+        "highlight": false,
+        "params": [
+          {
+            "id": "skins",
+            "type": "string",
+            "initial-value": ""
+          },
+          {
+            "id": "animation",
+            "type": "string",
+            "initial-value": ""
+          }
+        ]
+      },
+      {
+        "id": "set-bounds-for-setup-pose",
+        "scriptName": "SetBoundsForSetupPose",
+        "highlight": false
       }
     ],
     "expressions": [

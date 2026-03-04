@@ -744,6 +744,26 @@
                 "desc": "Height of the bounds in Spine world coordinates"
               }
             }
+          },
+          "set-bounds-for-skin-animation": {
+            "list-name": "Set bounds for skin/animation",
+            "display-text": "Set bounds for skins {0} and animation {1}",
+            "description": "Calculate and set bounds based on the specified skins and animation. Uses a separate skeleton to compute the bounding box by stepping through the animation frames. The skeleton's visual size stays the same.",
+            "params": {
+              "skins": {
+                "name": "Skins",
+                "desc": "Comma-separated list of skin names. Leave empty to use the default skin."
+              },
+              "animation": {
+                "name": "Animation",
+                "desc": "Animation name to calculate bounds for. Leave empty to use setup pose."
+              }
+            }
+          },
+          "set-bounds-for-setup-pose": {
+            "list-name": "Set bounds for setup pose",
+            "display-text": "Set bounds for setup pose",
+            "description": "Calculate and set bounds based on the skeleton's setup pose. The skeleton's visual size stays the same."
           }
         },
         "expressions": {

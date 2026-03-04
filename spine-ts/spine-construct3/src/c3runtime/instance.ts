@@ -1167,7 +1167,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 
 		this.spineBounds = { x, y, width, height };
 
-		this.setOrigin(-x / width, y / height);
+		this.setOrigin(-x / width, 1 + y / height);
 
 		this.width = width * scaleX * (this.isMirrored ? -1 : 1);
 		this.height = height * scaleY * (this.isFlipped ? -1 : 1);
@@ -1179,6 +1179,48 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 
 	public getBounds () {
 		return { ...this.spineBounds };
+	}
+
+	public setBoundsForSkinAnimation (skins: string[], animation: string) {
+		if (!this.skeleton || !this.state) {
+			console.warn('[Spine] setBoundsForSkinAnimation: skeleton or state not loaded');
+			return;
+		}
+
+		const boundsProvider = new spine.SkinsAndAnimationBoundsProvider(
+			animation || undefined,
+			skins
+		);
+
+		const bounds = boundsProvider.calculateBounds(this);
+
+		if (bounds.width <= 0 || bounds.height <= 0) {
+			console.warn('[Spine] setBoundsForSkinAnimation: calculated bounds have invalid dimensions');
+			return;
+		}
+
+		const yUp = -(bounds.y + bounds.height);
+
+		this.setBounds(bounds.x, yUp, bounds.width, bounds.height);
+	}
+
+	public setBoundsForSetupPose () {
+		if (!this.skeleton) {
+			console.warn('[Spine] setBoundsForSetupPose: skeleton not loaded');
+			return;
+		}
+
+		const boundsProvider = new spine.SetupPoseBoundsProvider();
+		const bounds = boundsProvider.calculateBounds(this);
+
+		if (bounds.width <= 0 || bounds.height <= 0) {
+			console.warn('[Spine] setBoundsForSetupPose: calculated bounds have invalid dimensions');
+			return;
+		}
+
+		const yUp = -(bounds.y + bounds.height);
+
+		this.setBounds(bounds.x, yUp, bounds.width, bounds.height);
 	}
 
 	/**********/

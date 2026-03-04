@@ -744,6 +744,26 @@
                 "desc": "边界在Spine世界坐标中的高度"
               }
             }
+          },
+          "set-bounds-for-skin-animation": {
+            "list-name": "根据皮肤/动画设置边界",
+            "display-text": "根据皮肤{0}和动画{1}设置边界",
+            "description": "根据指定的皮肤和动画计算并设置边界。使用独立的骨架通过遍历动画帧来计算边界框。骨架的视觉大小保持不变。",
+            "params": {
+              "skins": {
+                "name": "皮肤",
+                "desc": "逗号分隔的皮肤名称列表。留空以使用默认皮肤。"
+              },
+              "animation": {
+                "name": "动画",
+                "desc": "用于计算边界的动画名称。留空以使用初始姿势。"
+              }
+            }
+          },
+          "set-bounds-for-setup-pose": {
+            "list-name": "根据初始姿势设置边界",
+            "display-text": "根据初始姿势设置边界",
+            "description": "根据骨架的初始姿势计算并设置边界。骨架的视觉大小保持不变。"
           }
         },
         "expressions": {

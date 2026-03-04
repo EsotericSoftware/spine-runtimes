@@ -182,6 +182,14 @@ C3.Plugins.EsotericSoftware_SpineConstruct3.Acts =
 
 	SetBounds (this: SDKInstanceClass, x: number, y: number, width: number, height: number) {
 		this.setBounds(x, y, width, height);
+	},
+
+	SetBoundsForSkinAnimation (this: SDKInstanceClass, skins: string, animation: string) {
+		this.setBoundsForSkinAnimation(skins === "" ? [] : skins.split(","), animation);
+	},
+
+	SetBoundsForSetupPose (this: SDKInstanceClass) {
+		this.setBoundsForSetupPose();
 	}
 
 };
