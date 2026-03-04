@@ -615,6 +615,33 @@
             "type": "string"
           }
         ]
+      },
+      {
+        "id": "set-bounds",
+        "scriptName": "SetBounds",
+        "highlight": false,
+        "params": [
+          {
+            "id": "x",
+            "type": "number",
+            "initial-value": 0
+          },
+          {
+            "id": "y",
+            "type": "number",
+            "initial-value": 0
+          },
+          {
+            "id": "width",
+            "type": "number",
+            "initial-value": 200
+          },
+          {
+            "id": "height",
+            "type": "number",
+            "initial-value": 200
+          }
+        ]
       }
     ],
     "expressions": [
@@ -761,6 +788,30 @@
             "type": "number"
           }
         ]
+      },
+      {
+        "id": "bounds-x",
+        "expressionName": "BoundsX",
+        "highlight": false,
+        "returnType": "number"
+      },
+      {
+        "id": "bounds-y",
+        "expressionName": "BoundsY",
+        "highlight": false,
+        "returnType": "number"
+      },
+      {
+        "id": "bounds-width",
+        "expressionName": "BoundsWidth",
+        "highlight": false,
+        "returnType": "number"
+      },
+      {
+        "id": "bounds-height",
+        "expressionName": "BoundsHeight",
+        "highlight": false,
+        "returnType": "number"
       }
     ]
   }

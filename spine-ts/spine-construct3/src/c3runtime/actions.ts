@@ -178,6 +178,10 @@ C3.Plugins.EsotericSoftware_SpineConstruct3.Acts =
 
 	RemoveHandle (this: SDKInstanceClass, type: 0 | 1, name: string) {
 		this.removeDragHandle(type, name);
+	},
+
+	SetBounds (this: SDKInstanceClass, x: number, y: number, width: number, height: number) {
+		this.setBounds(x, y, width, height);
 	}
 
 };

@@ -721,6 +721,29 @@
                 "desc": "要移除控制柄的骨骼或插槽名称"
               }
             }
+          },
+          "set-bounds": {
+            "list-name": "设置边界",
+            "display-text": "设置边界为({0}, {1}, {2}, {3})",
+            "description": "在Spine世界坐标中设置游戏对象的边界。骨架的视觉大小保持不变（只有边界区域改变）。骨架保持在相同位置渲染。",
+            "params": {
+              "x": {
+                "name": "X",
+                "desc": "边界在Spine世界坐标中的X偏移"
+              },
+              "y": {
+                "name": "Y",
+                "desc": "边界在Spine世界坐标中的Y偏移"
+              },
+              "width": {
+                "name": "宽度",
+                "desc": "边界在Spine世界坐标中的宽度"
+              },
+              "height": {
+                "name": "高度",
+                "desc": "边界在Spine世界坐标中的高度"
+              }
+            }
           }
         },
         "expressions": {
@@ -841,6 +864,22 @@
                 "desc": "轨道索引"
               }
             }
+          },
+          "bounds-x": {
+            "description": "获取当前边界的X偏移。",
+            "translated-name": "BoundsX"
+          },
+          "bounds-y": {
+            "description": "获取当前边界的Y偏移。",
+            "translated-name": "BoundsY"
+          },
+          "bounds-width": {
+            "description": "获取当前边界的宽度。",
+            "translated-name": "BoundsWidth"
+          },
+          "bounds-height": {
+            "description": "获取当前边界的高度。",
+            "translated-name": "BoundsHeight"
           }
         },
         "custom_ui": {

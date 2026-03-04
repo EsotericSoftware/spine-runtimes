@@ -721,6 +721,29 @@
                 "desc": "Name of the bone or slot to remove handle from"
               }
             }
+          },
+          "set-bounds": {
+            "list-name": "Set bounds",
+            "display-text": "Set bounds to ({0}, {1}, {2}, {3})",
+            "description": "Set the bounds of the game object in Spine world coordinates. The skeleton's visual size stays the same (only the bounding area changes). The skeleton remains rendered at the same position.",
+            "params": {
+              "x": {
+                "name": "X",
+                "desc": "X offset of the bounds in Spine world coordinates"
+              },
+              "y": {
+                "name": "Y",
+                "desc": "Y offset of the bounds in Spine world coordinates"
+              },
+              "width": {
+                "name": "Width",
+                "desc": "Width of the bounds in Spine world coordinates"
+              },
+              "height": {
+                "name": "Height",
+                "desc": "Height of the bounds in Spine world coordinates"
+              }
+            }
           }
         },
         "expressions": {
@@ -841,6 +864,22 @@
                 "desc": "The track index"
               }
             }
+          },
+          "bounds-x": {
+            "description": "Get the X offset of the current bounds.",
+            "translated-name": "BoundsX"
+          },
+          "bounds-y": {
+            "description": "Get the Y offset of the current bounds.",
+            "translated-name": "BoundsY"
+          },
+          "bounds-width": {
+            "description": "Get the width of the current bounds.",
+            "translated-name": "BoundsWidth"
+          },
+          "bounds-height": {
+            "description": "Get the height of the current bounds.",
+            "translated-name": "BoundsHeight"
           }
         },
         "custom_ui": {

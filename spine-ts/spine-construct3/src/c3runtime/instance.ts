@@ -515,6 +515,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		this.collisionSpriteInstance.width = this.width;
 		this.collisionSpriteInstance.height = this.height;
 		this.collisionSpriteInstance.angleDegrees = this.angleDegrees;
+		this.collisionSpriteInstance.setOrigin(this.originX, this.originY);
 	}
 
 	private calculateBounds () {
@@ -1147,6 +1148,37 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			case 3: this.physicsMode = spine.Physics.pose; break;
 			default: console.warn('[Spine] Invalid physics mode:', mode);
 		}
+	}
+
+	/**********/
+
+	/*
+	*  Bounds
+	*/
+
+	public setBounds (x: number, y: number, width: number, height: number) {
+		if (width <= 0 || height <= 0) {
+			console.warn('[Spine] setBounds: width and height must be positive');
+			return;
+		}
+
+		const scaleX = (Math.abs(this.width) / this.spineBounds.width) * this.propScaleX;
+		const scaleY = (Math.abs(this.height) / this.spineBounds.height) * this.propScaleY;
+
+		this.spineBounds = { x, y, width, height };
+
+		this.setOrigin(-x / width, y / height);
+
+		this.width = width * scaleX * (this.isMirrored ? -1 : 1);
+		this.height = height * scaleY * (this.isFlipped ? -1 : 1);
+		this.propScaleX = 1;
+		this.propScaleY = 1;
+
+		this.updateCollisionSprite();
+	}
+
+	public getBounds () {
+		return { ...this.spineBounds };
 	}
 
 	/**********/

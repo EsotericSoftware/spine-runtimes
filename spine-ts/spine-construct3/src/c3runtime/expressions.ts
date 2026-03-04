@@ -98,5 +98,21 @@ C3.Plugins.EsotericSoftware_SpineConstruct3.Exps =
 	CurrentAnimationLast (this: SpineC3Instance, trackIndex: number) {
 		const track = this.state?.tracks[trackIndex];
 		return track?.animationLast ?? 0;
+	},
+
+	BoundsX (this: SpineC3Instance) {
+		return this.getBounds().x;
+	},
+
+	BoundsY (this: SpineC3Instance) {
+		return this.getBounds().y;
+	},
+
+	BoundsWidth (this: SpineC3Instance) {
+		return this.getBounds().width;
+	},
+
+	BoundsHeight (this: SpineC3Instance) {
+		return this.getBounds().height;
 	}
 };
