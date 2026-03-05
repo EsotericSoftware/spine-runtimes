@@ -317,6 +317,18 @@
         ]
       },
       {
+        "id": "set-default-mix",
+        "scriptName": "SetDefaultMix",
+        "highlight": false,
+        "params": [
+          {
+            "id": "duration",
+            "type": "number",
+            "initial-value": 0
+          }
+        ]
+      },
+      {
         "id": "set-physics-mode",
         "scriptName": "SetPhysicsMode",
         "highlight": false,

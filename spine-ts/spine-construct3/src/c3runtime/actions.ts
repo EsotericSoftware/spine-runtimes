@@ -97,6 +97,10 @@ C3.Plugins.EsotericSoftware_SpineConstruct3.Acts =
 		this.setAnimationMix(fromName, toName, duration);
 	},
 
+	SetDefaultMix (this: SDKInstanceClass, duration: number) {
+		this.setDefaultMix(duration);
+	},
+
 	SetPhysicsMode (this: SDKInstanceClass, mode: 0 | 1 | 2 | 3) {
 		this.setPhysicsMode(mode);
 	},

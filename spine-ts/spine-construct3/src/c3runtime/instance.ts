@@ -616,6 +616,16 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		}
 	}
 
+	public setDefaultMix (duration: number) {
+		const stateData = this.state?.data;
+		if (!stateData) {
+			console.warn('[Spine] setDefaultMix: no state data');
+			return;
+		}
+
+		stateData.defaultMix = duration;
+	}
+
 	public setTrackAlpha (alpha: number, trackIndex: number) {
 		const { state } = this;
 		if (!state) {

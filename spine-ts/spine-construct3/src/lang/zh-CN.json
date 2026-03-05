@@ -398,6 +398,17 @@
               }
             }
           },
+          "set-default-mix": {
+            "list-name": "设置默认混合",
+            "display-text": "设置默认混合时长为{0}",
+            "description": "设置动画过渡时使用的默认混合时长（当没有为特定动画对定义混合时长时使用）",
+            "params": {
+              "duration": {
+                "name": "时长",
+                "desc": "默认混合时长（秒）"
+              }
+            }
+          },
           "set-physics-mode": {
             "list-name": "设置物理模式",
             "display-text": "设置物理模式为{0}",

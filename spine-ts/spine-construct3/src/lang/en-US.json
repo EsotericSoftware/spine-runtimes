@@ -398,6 +398,17 @@
               }
             }
           },
+          "set-default-mix": {
+            "list-name": "Set default mix",
+            "display-text": "Set default mix duration to {0}",
+            "description": "Set the default crossfade duration used when transitioning between animations that don't have a specific mix defined",
+            "params": {
+              "duration": {
+                "name": "Duration",
+                "desc": "Default blend duration in seconds"
+              }
+            }
+          },
           "set-physics-mode": {
             "list-name": "Set physics mode",
             "display-text": "Set physics mode to {0}",
