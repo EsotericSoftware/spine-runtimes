@@ -113,7 +113,8 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			this.propLoaderScale = properties[2] as number;
 			const skinProp = properties[3] as string;
 			this.propSkin = skinProp === "" ? [] : skinProp.split(",");
-			this.propAnimation = properties[4] as string;
+			const animationProp = properties[4] as string;
+			this.propAnimation = animationProp === "" ? undefined : animationProp;
 			this.propDebugSkeleton = properties[5] as boolean;
 			this.propEnableCollision = properties[6] as boolean;
 			const boundsProviderIndex = properties[7] as number;

@@ -119,7 +119,7 @@ export class SkinsAndAnimationBoundsProvider implements SpineBoundsProvider {
 		}
 		skeleton.setupPose();
 
-		const animation = this.animation != null ? data.findAnimation(this.animation) : null;
+		const animation = this.animation ? data.findAnimation(this.animation) : null;
 
 		if (animation == null) {
 			skeleton.updateWorldTransform(Physics.update);
