@@ -57,6 +57,9 @@ C3.Plugins.EsotericSoftware_SpineConstruct3.Cnds =
 	IsInsideSlot (this: SpineC3Instance, x: number, y: number, slotName: string) {
 		return this.isInsideSlot(x, y, slotName);
 	},
+	IsInsideBoneRadius (this: SpineC3Instance, x: number, y: number, boneName: string, radius: number) {
+		return this.isInsideBone(x, y, boneName, radius);
+	},
 	IsAnimationPlaying (this: SpineC3Instance, animationName: string, trackIndex: number) {
 		return this.isAnimationPlaying(animationName, trackIndex);
 	},

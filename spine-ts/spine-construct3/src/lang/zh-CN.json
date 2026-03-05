@@ -157,6 +157,29 @@
               }
             }
           },
+          "is-inside-bone-radius": {
+            "list-name": "点是否在骨骼半径内",
+            "display-text": "点({0}, {1})是否在骨骼{2}的{3}像素范围内",
+            "description": "检查世界坐标中的点是否在骨骼位置的指定半径范围内",
+            "params": {
+              "x": {
+                "name": "X",
+                "desc": "X世界坐标"
+              },
+              "y": {
+                "name": "Y",
+                "desc": "Y世界坐标"
+              },
+              "bone-name": {
+                "name": "骨骼名称",
+                "desc": "要检查的骨骼名称"
+              },
+              "radius": {
+                "name": "半径",
+                "desc": "骨骼位置周围的半径（像素）"
+              }
+            }
+          },
           "is-animation-playing": {
             "list-name": "动画是否正在播放",
             "display-text": "动画{0}是否在轨道{1}上播放",

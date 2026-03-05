@@ -70,6 +70,30 @@
         ]
       },
       {
+        "id": "is-inside-bone-radius",
+        "scriptName": "IsInsideBoneRadius",
+        "isTrigger": false,
+        "params": [
+          {
+            "id": "x",
+            "type": "number"
+          },
+          {
+            "id": "y",
+            "type": "number"
+          },
+          {
+            "id": "bone-name",
+            "type": "string"
+          },
+          {
+            "id": "radius",
+            "type": "number",
+            "initial-value": 10
+          }
+        ]
+      },
+      {
         "id": "is-animation-playing",
         "scriptName": "IsAnimationPlaying",
         "isTrigger": false,

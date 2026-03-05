@@ -364,6 +364,14 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		return this.isPointInPolygon(vertices, hullLength, coords.x, coords.y);
 	}
 
+	public isInsideBone (x: number, y: number, boneName: string, radius: number) {
+		const bone = this.getBone(boneName);
+		if (!bone || !bone.active) return false;
+
+		const bonePos = this.matrix.boneToGame(bone);
+		return this.inRadius(x, y, bonePos.x, bonePos.y, radius);
+	}
+
 	public isAnimationPlaying (animationName: string, trackIndex: number) {
 		if (!this.state) return false;
 

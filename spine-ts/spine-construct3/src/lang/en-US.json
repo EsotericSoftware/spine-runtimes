@@ -157,6 +157,29 @@
               }
             }
           },
+          "is-inside-bone-radius": {
+            "list-name": "Is point inside bone radius",
+            "display-text": "Is point ({0}, {1}) within {3} pixels of bone {2}",
+            "description": "Check if a point in world coordinates is within a specified radius of a bone's position",
+            "params": {
+              "x": {
+                "name": "X",
+                "desc": "X world coordinate"
+              },
+              "y": {
+                "name": "Y",
+                "desc": "Y world coordinate"
+              },
+              "bone-name": {
+                "name": "Bone name",
+                "desc": "Name of the bone to check"
+              },
+              "radius": {
+                "name": "Radius",
+                "desc": "Radius in pixels around the bone position"
+              }
+            }
+          },
           "is-animation-playing": {
             "list-name": "Is animation playing",
             "display-text": "Is animation {0} playing on track {1}",
