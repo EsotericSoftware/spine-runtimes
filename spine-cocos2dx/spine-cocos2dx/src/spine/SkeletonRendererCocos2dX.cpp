@@ -685,23 +685,38 @@ namespace spine {
 	}
 
 	Bone *SkeletonRendererCocos2dX::findBone(const std::string &boneName) const {
-		return _skeleton->findBone(boneName.c_str());
+		return findBone(boneName.empty() ? nullptr : boneName.c_str());
+	}
+	Bone *SkeletonRendererCocos2dX::findBone(const char *boneName) const {
+		const String spineBoneName{ boneName, true, false };
+		return _skeleton->findBone(spineBoneName);
 	}
 
 	Slot *SkeletonRendererCocos2dX::findSlot(const std::string &slotName) const {
-		return _skeleton->findSlot(slotName.c_str());
+		return findSlot(slotName.empty() ? nullptr : slotName.c_str());
+	}
+	Slot *SkeletonRendererCocos2dX::findSlot(const char *slotName) const {
+		const String spineSlotName{ slotName, true, false };
+		return _skeleton->findSlot(spineSlotName);
 	}
 
 	void SkeletonRendererCocos2dX::setSkin(const std::string &skinName) {
-		_skeleton->setSkin(skinName.empty() ? 0 : skinName.c_str());
+		_skeleton->setSkin(skinName.empty() ? nullptr : skinName.c_str());
 	}
 	void SkeletonRendererCocos2dX::setSkin(const char *skinName) {
+		const String spineSkinName{ skinName, true, false };
 		_skeleton->setSkin(skinName);
 	}
 
 	Attachment *SkeletonRendererCocos2dX::getAttachment(const std::string &slotName, const std::string &attachmentName) const {
-		return _skeleton->getAttachment(slotName.c_str(), attachmentName.c_str());
+		return getAttachment(slotName.c_str(), attachmentName.c_str());
 	}
+	Attachment *SkeletonRendererCocos2dX::getAttachment(const char *slotName, const char *attachmentName) const {
+		const String spineSlotName{ slotName, true, false };
+		const String spineAttachmentName{ attachmentName, true, false };
+		return _skeleton->getAttachment(spineSlotName, spineAttachmentName);
+	}
+
 	bool SkeletonRendererCocos2dX::setAttachment(const std::string &slotName, const std::string &attachmentName) {
 		bool result = _skeleton->getAttachment(slotName.c_str(), attachmentName.empty() ? 0 : attachmentName.c_str()) ? true : false;
 		_skeleton->setAttachment(slotName.c_str(), attachmentName.empty() ? 0 : attachmentName.c_str());

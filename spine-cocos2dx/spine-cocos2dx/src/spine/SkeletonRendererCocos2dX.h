@@ -79,8 +79,10 @@ namespace spine {
 
 		/* Returns 0 if the bone was not found. */
 		Bone *findBone(const std::string &boneName) const;
+		Bone *findBone(const char *boneName) const;
 		/* Returns 0 if the slot was not found. */
 		Slot *findSlot(const std::string &slotName) const;
+		Slot *findSlot(const char *slotName) const;
 
 		/* Sets the skin used to look up attachments not found in the SkeletonData defaultSkin. Attachments from the new skin are
 		 * attached if the corresponding attachment from the old skin was attached.
@@ -91,6 +93,7 @@ namespace spine {
 
 		/* Returns 0 if the slot or attachment was not found. */
 		Attachment *getAttachment(const std::string &slotName, const std::string &attachmentName) const;
+		Attachment *getAttachment(const char *slotName, const char *attachmentName) const;
 		/* Returns false if the slot or attachment was not found.
 		 * @param attachmentName May be empty string ("") for no attachment. */
 		bool setAttachment(const std::string &slotName, const std::string &attachmentName);
