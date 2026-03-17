@@ -903,6 +903,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			const sin = Math.sin(boneGameAngleRad);
 
 			const negateAngle = this.isMirrored !== this.isFlipped;
+			const gameObjectAngleDeg = (this.angle + this.propOffsetAngle) * spine.MathUtils.radDeg;
 
 			for (const follower of followers) {
 				const instance = this.runtime.getInstanceByUid(follower.uid) as IWorldInstance;
@@ -918,7 +919,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 				instance.y = y + rotatedOffsetY;
 
 				const angle = boneRotation + follower.offsetAngle;
-				instance.angleDegrees = negateAngle ? -angle : angle;
+				instance.angleDegrees = gameObjectAngleDeg + (negateAngle ? -angle : angle);
 			}
 		}
 	}
