@@ -352,7 +352,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		let hullLength = 8;
 
 		if (attachment instanceof spine.RegionAttachment) {
-			attachment.computeWorldVertices(slot, vertices, 0, 2);
+			attachment.computeWorldVertices(slot, attachment.getOffsets(slot.applied), vertices, 0, 2);
 		} else if (attachment instanceof spine.MeshAttachment) {
 			attachment.computeWorldVertices(this.skeleton as Skeleton, slot, 0, attachment.worldVerticesLength, vertices, 0, 2);
 			hullLength = attachment.hullLength;

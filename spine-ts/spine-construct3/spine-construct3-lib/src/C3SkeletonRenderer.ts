@@ -166,7 +166,8 @@ abstract class C3SkeletonRenderer<
 			const attachment = slot.applied.attachment;
 			if (attachment instanceof RegionAttachment) {
 				const vertices = this.tempVertices;
-				attachment.computeWorldVertices(slot, vertices, 0, 2);
+
+				attachment.computeWorldVertices(slot, attachment.getOffsets(slot.applied), vertices, 0, 2);
 				let p = matrix.skeletonToGame(vertices[0], vertices[1]);
 				const x1 = p.x, y1 = p.y;
 				p = matrix.skeletonToGame(vertices[2], vertices[3]);
