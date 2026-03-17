@@ -848,6 +848,12 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			followers.push(follower);
 		}
 
+		const instance = this.runtime.getInstanceByUid(uid) as IWorldInstance;
+		if (instance) {
+			if (this.isMirrored) this.mirrorFollower(instance);
+			if (this.isFlipped) this.flipFollower(instance);
+		}
+
 		this.isPlaying = true;
 	}
 
@@ -886,9 +892,17 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			const { x, y } = matrix.boneToGame(bone);
 			const boneRotation = bone.applied.getWorldRotationX();
 
-			const rotationRadians = boneRotation * Math.PI / 180;
-			const cos = Math.cos(rotationRadians);
-			const sin = Math.sin(rotationRadians);
+			const boneRad = boneRotation * spine.MathUtils.degRad;
+			const boneCos = Math.cos(boneRad);
+			const boneSin = Math.sin(boneRad);
+			const gameDirX = matrix.a * boneCos + matrix.c * boneSin;
+			const gameDirY = matrix.b * boneCos + matrix.d * boneSin;
+			const boneGameAngleRad = Math.atan2(gameDirY, gameDirX);
+
+			const cos = Math.cos(boneGameAngleRad);
+			const sin = Math.sin(boneGameAngleRad);
+
+			const negateAngle = this.isMirrored !== this.isFlipped;
 
 			for (const follower of followers) {
 				const instance = this.runtime.getInstanceByUid(follower.uid) as IWorldInstance;
@@ -900,9 +914,11 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 				const rotatedOffsetX = follower.offsetX * cos - follower.offsetY * sin;
 				const rotatedOffsetY = follower.offsetX * sin + follower.offsetY * cos;
 
-				instance.x = x + rotatedOffsetX * (this.isMirrored ? -1 : 1);
-				instance.y = y + rotatedOffsetY * (this.isFlipped ? -1 : 1);
-				instance.angleDegrees = boneRotation + follower.offsetAngle;
+				instance.x = x + rotatedOffsetX;
+				instance.y = y + rotatedOffsetY;
+
+				const angle = boneRotation + follower.offsetAngle;
+				instance.angleDegrees = negateAngle ? -angle : angle;
 			}
 		}
 	}
