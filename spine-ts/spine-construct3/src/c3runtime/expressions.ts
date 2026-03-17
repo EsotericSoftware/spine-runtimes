@@ -76,6 +76,14 @@ C3.Plugins.EsotericSoftware_SpineConstruct3.Exps =
 		return this.getBoneRotation(boneName);
 	},
 
+	BoneLength (this: SpineC3Instance, boneName: string) {
+		const { skeleton } = this;
+		if (!skeleton) return 0;
+		const bone = skeleton.findBone(boneName);
+		if (!bone) return 0;
+		return bone.data.length;
+	},
+
 	BoneWorldX (this: SpineC3Instance, boneName: string) {
 		return this.getBoneWorldX(boneName);
 	},

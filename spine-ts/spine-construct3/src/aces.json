@@ -764,6 +764,18 @@
         ]
       },
       {
+        "id": "bone-length",
+        "expressionName": "BoneLength",
+        "highlight": false,
+        "returnType": "number",
+        "params": [
+          {
+            "id": "bone-name",
+            "type": "string"
+          }
+        ]
+      },
+      {
         "id": "bone-world-x",
         "expressionName": "BoneWorldX",
         "highlight": false,

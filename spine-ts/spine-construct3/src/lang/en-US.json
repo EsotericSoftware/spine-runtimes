@@ -851,6 +851,16 @@
               }
             }
           },
+          "bone-length": {
+            "description": "Get the length of a bone.",
+            "translated-name": "BoneLength",
+            "params": {
+              "bone-name": {
+                "name": "Bone name",
+                "desc": "Name of the bone"
+              }
+            }
+          },
           "bone-world-x": {
             "description": "Get the C3 world X position of a bone.",
             "translated-name": "BoneWorldX",

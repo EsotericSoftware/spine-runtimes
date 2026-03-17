@@ -851,6 +851,16 @@
               }
             }
           },
+          "bone-length": {
+            "description": "获取骨骼的长度。",
+            "translated-name": "BoneLength",
+            "params": {
+              "bone-name": {
+                "name": "骨骼名称",
+                "desc": "骨骼的名称"
+              }
+            }
+          },
           "bone-world-x": {
             "description": "获取骨骼的C3世界X位置。",
             "translated-name": "BoneWorldX",
