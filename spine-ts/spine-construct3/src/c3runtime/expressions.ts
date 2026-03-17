@@ -27,6 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+import type { Attachment, Skin } from "@esotericsoftware/spine-construct3-lib";
 import type { SDKInstanceClass as SpineC3Instance } from "./instance";
 
 const C3 = globalThis.C3;
@@ -34,11 +35,33 @@ const C3 = globalThis.C3;
 C3.Plugins.EsotericSoftware_SpineConstruct3.Exps =
 {
 	SlotAttachment (this: SpineC3Instance, slotName: string) {
-		if (!this.skeleton) return "";
-		const slot = this.skeleton.findSlot(slotName);
+		const { skeleton } = this;
+		if (!skeleton) return "";
+		const slot = skeleton.findSlot(slotName);
 		if (!slot) return "";
 		const attachment = slot.pose.getAttachment();
 		return attachment ? attachment.name : "";
+	},
+
+	SlotAttachmentPlaceholder (this: SpineC3Instance, slotName: string) {
+		const { skeleton } = this;
+		if (!skeleton) return "";
+		const slot = skeleton.findSlot(slotName);
+		if (!slot) return "";
+		const attachment = slot.pose.getAttachment();
+		if (!attachment) return "";
+		const slotIndex = slot.data.index;
+		const skin = skeleton.skin;
+		if (skin) {
+			const name = findPlaceholderName(skin, slotIndex, attachment);
+			if (name) return name;
+		}
+		const defaultSkin = skeleton.data.defaultSkin;
+		if (defaultSkin) {
+			const name = findPlaceholderName(defaultSkin, slotIndex, attachment);
+			if (name) return name;
+		}
+		return attachment.name;
 	},
 
 	BoneX (this: SpineC3Instance, boneName: string) {
@@ -116,3 +139,12 @@ C3.Plugins.EsotericSoftware_SpineConstruct3.Exps =
 		return this.getBounds().height;
 	}
 };
+
+function findPlaceholderName (skin: Skin, slotIndex: number, attachment: Attachment): string | null {
+	const dictionary = skin.attachments[slotIndex];
+	if (!dictionary) return null;
+	for (const name in dictionary) {
+		if (dictionary[name] === attachment) return name;
+	}
+	return null;
+}

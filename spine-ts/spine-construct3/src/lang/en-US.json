@@ -811,6 +811,16 @@
               }
             }
           },
+          "slot-attachment-placeholder": {
+            "description": "Get the skin placeholder name of the attachment on a slot, or the attachment name if using the default skin. Returns empty string if no attachment.",
+            "translated-name": "SlotAttachmentPlaceholder",
+            "params": {
+              "slot-name": {
+                "name": "Slot name",
+                "desc": "Name of the slot"
+              }
+            }
+          },
           "bone-x": {
             "description": "Get the world X position of a bone.",
             "translated-name": "BoneX",

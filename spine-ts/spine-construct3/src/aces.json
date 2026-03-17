@@ -716,6 +716,18 @@
         ]
       },
       {
+        "id": "slot-attachment-placeholder",
+        "expressionName": "SlotAttachmentPlaceholder",
+        "highlight": false,
+        "returnType": "string",
+        "params": [
+          {
+            "id": "slot-name",
+            "type": "string"
+          }
+        ]
+      },
+      {
         "id": "bone-x",
         "expressionName": "BoneX",
         "highlight": false,

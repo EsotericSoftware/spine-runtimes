@@ -811,6 +811,16 @@
               }
             }
           },
+          "slot-attachment-placeholder": {
+            "description": "获取插槽上附件的皮肤占位符名称，如果使用默认皮肤则返回附件名称。如果没有附件则返回空字符串。",
+            "translated-name": "SlotAttachmentPlaceholder",
+            "params": {
+              "slot-name": {
+                "name": "插槽名称",
+                "desc": "插槽的名称"
+              }
+            }
+          },
           "bone-x": {
             "description": "获取骨骼的世界X位置。",
             "translated-name": "BoneX",
