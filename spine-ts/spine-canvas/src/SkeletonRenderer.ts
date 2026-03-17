@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { type BlendMode, Color, MeshAttachment, RegionAttachment, type Skeleton, type Slot, type TextureRegion, Utils } from "@esotericsoftware/spine-core";
+import { type BlendMode, Color, MeshAttachment, type NumberArrayLike, RegionAttachment, type Skeleton, type Slot, type TextureRegion, Utils } from "@esotericsoftware/spine-core";
 import type { CanvasTexture } from "./CanvasTexture.js";
 
 const worldVertices = Utils.newFloatArray(8);
@@ -68,10 +68,14 @@ export class SkeletonRenderer {
 			const pose = slot.applied;
 			const attachment = pose.attachment;
 			if (!(attachment instanceof RegionAttachment)) continue;
-			attachment.computeWorldVertices(slot, worldVertices, 0, 2);
-			const region: TextureRegion = <TextureRegion>attachment.region;
 
-			const image: HTMLImageElement = (<CanvasTexture>region.texture).getImage() as HTMLImageElement;
+			const sequence = attachment.sequence;
+			const sequenceIndex = sequence.resolveIndex(pose);
+			attachment.computeWorldVertices(slot, attachment.getOffsets(pose), worldVertices, 0, 2);
+
+			const region = sequence.regions[sequenceIndex] as TextureRegion;
+
+			const image: HTMLImageElement = region.texture.getImage() as HTMLImageElement;
 
 			const slotColor = pose.color;
 			const regionColor = attachment.color;
@@ -83,7 +87,8 @@ export class SkeletonRenderer {
 			ctx.save();
 			const boneApplied = bone.applied;
 			ctx.transform(boneApplied.a, boneApplied.c, boneApplied.b, boneApplied.d, boneApplied.worldX, boneApplied.worldY);
-			ctx.translate(attachment.offset[0], attachment.offset[1]);
+			const offsets = attachment.getOffsets(pose);
+			ctx.translate(offsets[0], offsets[1]);
 			ctx.rotate(attachment.rotation * Math.PI / 180);
 
 			const atlasScale = attachment.width / region.originalWidth;
@@ -91,7 +96,7 @@ export class SkeletonRenderer {
 
 			let w = region.width, h = region.height;
 			ctx.translate(w / 2, h / 2);
-			if (attachment.region?.degrees === 90) {
+			if (region.degrees === 90) {
 				const t = w;
 				w = h;
 				h = t;
@@ -124,15 +129,25 @@ export class SkeletonRenderer {
 
 			let texture: HTMLImageElement;
 			if (attachment instanceof RegionAttachment) {
-				const regionAttachment = <RegionAttachment>attachment;
-				vertices = this.computeRegionVertices(slot, regionAttachment, false);
+				const sequence = attachment.sequence;
+				const sequenceIndex = sequence.resolveIndex(pose);
+
+				const uvs = sequence.getUVs(sequenceIndex);
+				const offsets = attachment.getOffsets(pose);
+
+				vertices = this.computeRegionVertices(slot, attachment, offsets, uvs, false);
 				triangles = SkeletonRenderer.QUAD_TRIANGLES;
-				texture = (<CanvasTexture>regionAttachment.region?.texture).getImage() as HTMLImageElement;
+
+				texture = (sequence.regions[sequenceIndex]?.texture as CanvasTexture).getImage();
 			} else if (attachment instanceof MeshAttachment) {
-				const mesh = <MeshAttachment>attachment;
-				vertices = this.computeMeshVertices(slot, mesh, false);
-				triangles = mesh.triangles;
-				texture = (<CanvasTexture>mesh.region?.texture).getImage() as HTMLImageElement;
+				const sequence = attachment.sequence;
+				const sequenceIndex = sequence.resolveIndex(pose);
+
+				const uvs = sequence.getUVs(sequenceIndex);
+				vertices = this.computeMeshVertices(slot, attachment, uvs, false);
+				triangles = attachment.triangles;
+
+				texture = (sequence.regions[sequenceIndex]?.texture as CanvasTexture).getImage();
 			} else
 				continue;
 
@@ -226,7 +241,7 @@ export class SkeletonRenderer {
 		ctx.restore();
 	}
 
-	private computeRegionVertices (slot: Slot, region: RegionAttachment, pma: boolean) {
+	private computeRegionVertices (slot: Slot, region: RegionAttachment, offsets: NumberArrayLike, uvs: NumberArrayLike, pma: boolean) {
 		const skeletonColor = slot.skeleton.color;
 		const slotColor = slot.applied.color;
 		const regionColor = region.color;
@@ -238,10 +253,9 @@ export class SkeletonRenderer {
 			skeletonColor.b * slotColor.b * regionColor.b * multiplier,
 			alpha);
 
-		region.computeWorldVertices(slot, this.vertices, 0, SkeletonRenderer.VERTEX_SIZE);
+		region.computeWorldVertices(slot, offsets, this.vertices, 0, SkeletonRenderer.VERTEX_SIZE);
 
 		const vertices = this.vertices;
-		const uvs = region.uvs;
 
 		vertices[RegionAttachment.C1R] = color.r;
 		vertices[RegionAttachment.C1G] = color.g;
@@ -274,7 +288,7 @@ export class SkeletonRenderer {
 		return vertices;
 	}
 
-	private computeMeshVertices (slot: Slot, mesh: MeshAttachment, pma: boolean) {
+	private computeMeshVertices (slot: Slot, mesh: MeshAttachment, uvs: NumberArrayLike, pma: boolean) {
 		const skeleton = slot.skeleton;
 		const skeletonColor = skeleton.color;
 		const slotColor = slot.applied.color;
@@ -292,7 +306,7 @@ export class SkeletonRenderer {
 		if (vertices.length < mesh.worldVerticesLength) this.vertices = vertices = Utils.newFloatArray(mesh.worldVerticesLength);
 		mesh.computeWorldVertices(skeleton, slot, 0, mesh.worldVerticesLength, vertices, 0, SkeletonRenderer.VERTEX_SIZE);
 
-		const uvs = mesh.uvs;
+
 		for (let i = 0, u = 0, v = 2; i < vertexCount; i++) {
 			vertices[v++] = color.r;
 			vertices[v++] = color.g;

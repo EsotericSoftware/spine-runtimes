@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -37,7 +37,6 @@ namespace Spine {
 		static readonly Object nextIdLock = new Object();
 
 		internal readonly int id;
-		internal VertexAttachment timelineAttachment;
 		internal int[] bones;
 		internal float[] vertices;
 		internal int worldVerticesLength;
@@ -47,9 +46,6 @@ namespace Spine {
 		public int[] Bones { get { return bones; } set { bones = value; } }
 		public float[] Vertices { get { return vertices; } set { vertices = value; } }
 		public int WorldVerticesLength { get { return worldVerticesLength; } set { worldVerticesLength = value; } }
-		/// <summary>Timelines for the timeline attachment are also applied to this attachment.
-		/// May be null if no attachment-specific timelines should be applied.</summary>
-		public VertexAttachment TimelineAttachment { get { return timelineAttachment; } set { timelineAttachment = value; } }
 
 		public VertexAttachment (string name)
 			: base(name) {
@@ -57,7 +53,6 @@ namespace Spine {
 			lock (VertexAttachment.nextIdLock) {
 				id = VertexAttachment.nextID++;
 			}
-			timelineAttachment = this;
 		}
 
 		/// <summary>Copy constructor.</summary>

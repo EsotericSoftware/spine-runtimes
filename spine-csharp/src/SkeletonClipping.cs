@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -53,7 +53,7 @@ namespace Spine {
 			clipAttachment = clip;
 
 			int n = clip.worldVerticesLength;
-			float[] vertices = clippingPolygon.Resize(n).Items;
+			float[] vertices = clippingPolygon.EnsureSize(n).Items;
 			clip.ComputeWorldVertices(skeleton, slot, 0, n, vertices, 0, 2);
 			MakeClockwise(clippingPolygon);
 			clippingPolygons = triangulator.Decompose(clippingPolygon, triangulator.Triangulate(clippingPolygon));
@@ -106,7 +106,7 @@ namespace Spine {
 						if (clipOutputLength == 0) continue;
 
 						int clipOutputCount = clipOutputLength >> 1;
-						float[] clippedVerticesItems = clippedVertices.Resize(s + clipOutputCount * 2).Items;
+						float[] clippedVerticesItems = clippedVertices.EnsureSize(s + clipOutputCount * 2).Items;
 						for (int ii = 0; ii < clipOutputLength; ii += 2, s += 2) {
 							float x = clipOutputItems[ii], y = clipOutputItems[ii + 1];
 							clippedVerticesItems[s] = x;
@@ -114,7 +114,7 @@ namespace Spine {
 						}
 
 						s = clippedTriangles.Count;
-						int[] clippedTrianglesItems = clippedTriangles.Resize(s + 3 * (clipOutputCount - 2)).Items;
+						int[] clippedTrianglesItems = clippedTriangles.EnsureSize(s + 3 * (clipOutputCount - 2)).Items;
 						clipOutputCount--;
 						for (int ii = 1; ii < clipOutputCount; ii++, s += 3) {
 							clippedTrianglesItems[s] = index;
@@ -123,7 +123,7 @@ namespace Spine {
 						}
 						index += clipOutputCount + 1;
 					} else {
-						float[] clippedVerticesItems = clippedVertices.Resize(s + 3 * 2).Items;
+						float[] clippedVerticesItems = clippedVertices.EnsureSize(s + 3 * 2).Items;
 						clippedVerticesItems[s] = x1;
 						clippedVerticesItems[s + 1] = y1;
 						clippedVerticesItems[s + 2] = x2;
@@ -132,7 +132,7 @@ namespace Spine {
 						clippedVerticesItems[s + 5] = y3;
 
 						s = clippedTriangles.Count;
-						int[] clippedTrianglesItems = clippedTriangles.Resize(s + 3).Items;
+						int[] clippedTrianglesItems = clippedTriangles.EnsureSize(s + 3).Items;
 						clippedTrianglesItems[s] = index;
 						clippedTrianglesItems[s + 1] = index + 1;
 						clippedTrianglesItems[s + 2] = index + 2;
@@ -178,8 +178,8 @@ namespace Spine {
 						float d = 1 / (d0 * d2 + d1 * (y1 - y3));
 
 						int clipOutputCount = clipOutputLength >> 1;
-						float[] clippedVerticesItems = clippedVertices.Resize(s + clipOutputCount * 2).Items;
-						float[] clippedUVsItems = clippedUVs.Resize(s + clipOutputCount * 2).Items;
+						float[] clippedVerticesItems = clippedVertices.EnsureSize(s + clipOutputCount * 2).Items;
+						float[] clippedUVsItems = clippedUVs.EnsureSize(s + clipOutputCount * 2).Items;
 						for (int ii = 0; ii < clipOutputLength; ii += 2, s += 2) {
 							float x = clipOutputItems[ii], y = clipOutputItems[ii + 1];
 							clippedVerticesItems[s] = x;
@@ -193,7 +193,7 @@ namespace Spine {
 						}
 
 						s = clippedTriangles.Count;
-						int[] clippedTrianglesItems = clippedTriangles.Resize(s + 3 * (clipOutputCount - 2)).Items;
+						int[] clippedTrianglesItems = clippedTriangles.EnsureSize(s + 3 * (clipOutputCount - 2)).Items;
 						clipOutputCount--;
 						for (int ii = 1; ii < clipOutputCount; ii++, s += 3) {
 							clippedTrianglesItems[s] = index;
@@ -202,8 +202,8 @@ namespace Spine {
 						}
 						index += clipOutputCount + 1;
 					} else {
-						float[] clippedVerticesItems = clippedVertices.Resize(s + 3 * 2).Items;
-						float[] clippedUVsItems = clippedUVs.Resize(s + 3 * 2).Items;
+						float[] clippedVerticesItems = clippedVertices.EnsureSize(s + 3 * 2).Items;
+						float[] clippedUVsItems = clippedUVs.EnsureSize(s + 3 * 2).Items;
 						clippedVerticesItems[s] = x1;
 						clippedVerticesItems[s + 1] = y1;
 						clippedVerticesItems[s + 2] = x2;
@@ -219,7 +219,7 @@ namespace Spine {
 						clippedUVsItems[s + 5] = v3;
 
 						s = clippedTriangles.Count;
-						int[] clippedTrianglesItems = clippedTriangles.Resize(s + 3).Items;
+						int[] clippedTrianglesItems = clippedTriangles.EnsureSize(s + 3).Items;
 						clippedTrianglesItems[s] = index;
 						clippedTrianglesItems[s + 1] = index + 1;
 						clippedTrianglesItems[s + 2] = index + 2;
@@ -324,7 +324,7 @@ namespace Spine {
 				for (int i = 0, n = output.Count - 2; i < n; i++)
 					originalOutput.Add(output.Items[i]);
 			} else
-				originalOutput.Resize(originalOutput.Count - 2);
+				originalOutput.EnsureSize(originalOutput.Count - 2);
 
 			return clipped;
 		}

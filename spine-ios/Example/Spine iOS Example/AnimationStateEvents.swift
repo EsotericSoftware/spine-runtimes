@@ -69,6 +69,11 @@ struct AnimationStateEvents: View {
                 controller: controller
             )
         }
+        .onDisappear {
+            // SwiftUI may retain the @StateObject controller after the view disappears.
+            // Explicit disposal is only needed here so leak reporting runs after native teardown.
+            controller.dispose()
+        }
         .navigationTitle("Animation State Listener")
         .navigationBarTitleDisplayMode(.inline)
     }

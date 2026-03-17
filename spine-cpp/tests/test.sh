@@ -23,14 +23,14 @@ SPINEBOY_ANIM="idle"
 # Expected output pattern - first 10 lines of skeleton JSON data
 EXPECTED_OUTPUT="=== SKELETON DATA ===
 {
+  \"refString\": \"<SkeletonData-spineboy-pro>\",
   \"type\": \"SkeletonData\",
   \"bones\": [{
+      \"refString\": \"<BoneData-root>\",
       \"type\": \"BoneData\",
       \"index\": 0,
       \"parent\": null,
-      \"length\": 0,
-      \"color\": {
-        \"r\": 0.607843,"
+      \"length\": 0,"
 
 log_title "Spine-C++ Test"
 log_detail "Platform: $(uname)"

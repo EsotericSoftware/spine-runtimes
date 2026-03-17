@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -54,7 +54,7 @@ namespace Spine.Unity {
 			Complete
 		}
 
-#region Inspector
+		#region Inspector
 		/// <summary>If a bone isn't set, boneName is used to find the bone.</summary>
 		public string boneName;
 		public Transform parentReference;
@@ -62,7 +62,7 @@ namespace Spine.Unity {
 		public bool position, rotation, scale, zPosition = true;
 		[Range(0f, 1f)]
 		public float overrideAlpha = 1;
-#endregion
+		#endregion
 
 		public SkeletonUtility hierarchy;
 		[System.NonSerialized] public Bone bone;
@@ -159,6 +159,7 @@ namespace Spine.Unity {
 				case UpdatePhase.World:
 				case UpdatePhase.Complete:
 					var appliedPose = bone.AppliedPose;
+					appliedPose.ValidateLocalTransform(skeleton);
 					if (position)
 						thisTransform.localPosition = new Vector3(appliedPose.X * positionScale, appliedPose.Y * positionScale,
 							zPosition ? 0 : thisTransform.localPosition.z);

@@ -462,7 +462,7 @@ export class Skeleton {
 				if (attachment instanceof RegionAttachment) {
 					verticesLength = 8;
 					vertices = Utils.setArraySize(temp, verticesLength, 0);
-					attachment.computeWorldVertices(slot, vertices, 0, 2);
+					attachment.computeWorldVertices(slot, attachment.getOffsets(slot.applied), vertices, 0, 2);
 					triangles = Skeleton.quadTriangles;
 				} else if (attachment instanceof MeshAttachment) {
 					verticesLength = attachment.worldVerticesLength;

@@ -136,6 +136,7 @@ void RGBTimeline::setFrame(int frame, float time, float r, float g, float b) {
 
 void RGBTimeline::_apply(Slot &slot, SlotPose &pose, float time, float alpha, MixBlend blend) {
 	Color &color = pose._color;
+	float r, g, b;
 	if (time < _frames[0]) {
 		Color &setup = slot._data._setup._color;
 		switch (blend) {
@@ -145,59 +146,58 @@ void RGBTimeline::_apply(Slot &slot, SlotPose &pose, float time, float alpha, Mi
 				color.b = setup.b;
 				return;
 			case MixBlend_First:
-				color.r += (setup.r - color.r) * alpha;
-				color.g += (setup.g - color.g) * alpha;
-				color.b += (setup.b - color.b) * alpha;
-				return;
+				r = color.r + (setup.r - color.r) * alpha;
+				g = color.g + (setup.g - color.g) * alpha;
+				b = color.b + (setup.b - color.b) * alpha;
+				break;
 			default:
 				return;
 		}
-	}
-
-	float r, g, b;
-	int i = Animation::search(_frames, time, ENTRIES);
-	int curveType = (int) _curves[i >> 2];
-	switch (curveType) {
-		case LINEAR: {
-			float before = _frames[i];
-			r = _frames[i + R];
-			g = _frames[i + G];
-			b = _frames[i + B];
-			float t = (time - before) / (_frames[i + ENTRIES] - before);
-			r += (_frames[i + ENTRIES + R] - r) * t;
-			g += (_frames[i + ENTRIES + G] - g) * t;
-			b += (_frames[i + ENTRIES + B] - b) * t;
-			break;
-		}
-		case STEPPED: {
-			r = _frames[i + R];
-			g = _frames[i + G];
-			b = _frames[i + B];
-			break;
-		}
-		default: {
-			r = getBezierValue(time, i, R, curveType - BEZIER);
-			g = getBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
-			b = getBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
-			break;
-		}
-	}
-
-	if (alpha == 1) {
-		color.r = r;
-		color.g = g;
-		color.b = b;
 	} else {
-		if (blend == MixBlend_Setup) {
-			Color &setup = slot._data._setup._color;
-			color.r = setup.r;
-			color.g = setup.g;
-			color.b = setup.b;
+		int i = Animation::search(_frames, time, ENTRIES);
+		int curveType = (int) _curves[i >> 2];
+		switch (curveType) {
+			case LINEAR: {
+				float before = _frames[i];
+				r = _frames[i + R];
+				g = _frames[i + G];
+				b = _frames[i + B];
+				float t = (time - before) / (_frames[i + ENTRIES] - before);
+				r += (_frames[i + ENTRIES + R] - r) * t;
+				g += (_frames[i + ENTRIES + G] - g) * t;
+				b += (_frames[i + ENTRIES + B] - b) * t;
+				break;
+			}
+			case STEPPED: {
+				r = _frames[i + R];
+				g = _frames[i + G];
+				b = _frames[i + B];
+				break;
+			}
+			default: {
+				r = getBezierValue(time, i, R, curveType - BEZIER);
+				g = getBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
+				b = getBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
+				break;
+			}
 		}
-		color.r += (r - color.r) * alpha;
-		color.g += (g - color.g) * alpha;
-		color.b += (b - color.b) * alpha;
+
+		if (alpha != 1) {
+			if (blend == MixBlend_Setup) {
+				Color &setup = slot._data._setup._color;
+				r = setup.r + (r - setup.r) * alpha;
+				g = setup.g + (g - setup.g) * alpha;
+				b = setup.b + (b - setup.b) * alpha;
+			} else {
+				r = color.r + (r - color.r) * alpha;
+				g = color.g + (g - color.g) * alpha;
+				b = color.b + (b - color.b) * alpha;
+			}
+		}
 	}
+	color.r = r < 0 ? 0 : (r > 1 ? 1 : r);
+	color.g = g < 0 ? 0 : (g > 1 ? 1 : g);
+	color.b = b < 0 ? 0 : (b > 1 ? 1 : b);
 }
 
 RTTI_IMPL(AlphaTimeline, SlotCurveTimeline)
@@ -229,6 +229,7 @@ void AlphaTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<
 	if (!slot->_bone._active) return;
 
 	Color &color = (appliedPose ? *slot->_applied : slot->_pose)._color;
+	float a;
 	if (time < _frames[0]) {
 		Color &setup = slot->_data._setup._color;
 		switch (blend) {
@@ -236,20 +237,22 @@ void AlphaTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<
 				color.a = setup.a;
 				return;
 			case MixBlend_First:
-				color.a += (setup.a - color.a) * alpha;
-				return;
+				a = color.a + (setup.a - color.a) * alpha;
+				break;
 			default:
 				return;
 		}
+	} else {
+		a = getCurveValue(time);
+		if (alpha != 1) {
+			if (blend == MixBlend_Setup) {
+				Color &setup = slot->_data._setup._color;
+				a = setup.a + (a - setup.a) * alpha;
+			} else
+				a = color.a + (a - color.a) * alpha;
+		}
 	}
-
-	float a = getCurveValue(time);
-	if (alpha == 1)
-		color.a = a;
-	else {
-		if (blend == MixBlend_Setup) color.a = slot->_data._setup._color.a;
-		color.a += (a - color.a) * alpha;
-	}
+	color.a = a < 0 ? 0 : (a > 1 ? 1 : a);
 }
 
 RTTI_IMPL(RGBA2Timeline, SlotCurveTimeline)
@@ -278,6 +281,7 @@ void RGBA2Timeline::setFrame(int frame, float time, float r, float g, float b, f
 void RGBA2Timeline::_apply(Slot &slot, SlotPose &pose, float time, float alpha, MixBlend blend) {
 	Color &light = pose._color;
 	Color &dark = pose._darkColor;
+	float r2, g2, b2;
 	if (time < _frames[0]) {
 		SlotPose &setup = slot._data._setup;
 		Color &setupLight = setup._color;
@@ -288,83 +292,84 @@ void RGBA2Timeline::_apply(Slot &slot, SlotPose &pose, float time, float alpha, 
 				dark.r = setupDark.r;
 				dark.g = setupDark.g;
 				dark.b = setupDark.b;
+				/* Fall through. */
+			default:
 				return;
 			case MixBlend_First:
 				light.add((setupLight.r - light.r) * alpha, (setupLight.g - light.g) * alpha, (setupLight.b - light.b) * alpha,
 						  (setupLight.a - light.a) * alpha);
-				dark.r += (setupDark.r - dark.r) * alpha;
-				dark.g += (setupDark.g - dark.g) * alpha;
-				dark.b += (setupDark.b - dark.b) * alpha;
-				return;
-			default:
-				return;
+				r2 = dark.r + (setupDark.r - dark.r) * alpha;
+				g2 = dark.g + (setupDark.g - dark.g) * alpha;
+				b2 = dark.b + (setupDark.b - dark.b) * alpha;
 		}
-	}
-
-	float r, g, b, a, r2, g2, b2;
-	int i = Animation::search(_frames, time, ENTRIES);
-	int curveType = (int) _curves[i >> 3];
-	switch (curveType) {
-		case LINEAR: {
-			float before = _frames[i];
-			r = _frames[i + R];
-			g = _frames[i + G];
-			b = _frames[i + B];
-			a = _frames[i + A];
-			r2 = _frames[i + R2];
-			g2 = _frames[i + G2];
-			b2 = _frames[i + B2];
-			float t = (time - before) / (_frames[i + ENTRIES] - before);
-			r += (_frames[i + ENTRIES + R] - r) * t;
-			g += (_frames[i + ENTRIES + G] - g) * t;
-			b += (_frames[i + ENTRIES + B] - b) * t;
-			a += (_frames[i + ENTRIES + A] - a) * t;
-			r2 += (_frames[i + ENTRIES + R2] - r2) * t;
-			g2 += (_frames[i + ENTRIES + G2] - g2) * t;
-			b2 += (_frames[i + ENTRIES + B2] - b2) * t;
-			break;
-		}
-		case STEPPED: {
-			r = _frames[i + R];
-			g = _frames[i + G];
-			b = _frames[i + B];
-			a = _frames[i + A];
-			r2 = _frames[i + R2];
-			g2 = _frames[i + G2];
-			b2 = _frames[i + B2];
-			break;
-		}
-		default: {
-			r = getBezierValue(time, i, R, curveType - BEZIER);
-			g = getBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
-			b = getBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
-			a = getBezierValue(time, i, A, curveType + BEZIER_SIZE * 3 - BEZIER);
-			r2 = getBezierValue(time, i, R2, curveType + BEZIER_SIZE * 4 - BEZIER);
-			g2 = getBezierValue(time, i, G2, curveType + BEZIER_SIZE * 5 - BEZIER);
-			b2 = getBezierValue(time, i, B2, curveType + BEZIER_SIZE * 6 - BEZIER);
-			break;
-		}
-	}
-
-	if (alpha == 1) {
-		light.set(r, g, b, a);
-		dark.r = r2;
-		dark.g = g2;
-		dark.b = b2;
 	} else {
-		if (blend == MixBlend_Setup) {
-			SlotPose &setup = slot._data._setup;
-			light.set(setup._color);
-			Color &setupDark = setup._darkColor;
-			dark.r = setupDark.r;
-			dark.g = setupDark.g;
-			dark.b = setupDark.b;
+		float r, g, b, a;
+		int i = Animation::search(_frames, time, ENTRIES);
+		int curveType = (int) _curves[i >> 3];
+		switch (curveType) {
+			case LINEAR: {
+				float before = _frames[i];
+				r = _frames[i + R];
+				g = _frames[i + G];
+				b = _frames[i + B];
+				a = _frames[i + A];
+				r2 = _frames[i + R2];
+				g2 = _frames[i + G2];
+				b2 = _frames[i + B2];
+				float t = (time - before) / (_frames[i + ENTRIES] - before);
+				r += (_frames[i + ENTRIES + R] - r) * t;
+				g += (_frames[i + ENTRIES + G] - g) * t;
+				b += (_frames[i + ENTRIES + B] - b) * t;
+				a += (_frames[i + ENTRIES + A] - a) * t;
+				r2 += (_frames[i + ENTRIES + R2] - r2) * t;
+				g2 += (_frames[i + ENTRIES + G2] - g2) * t;
+				b2 += (_frames[i + ENTRIES + B2] - b2) * t;
+				break;
+			}
+			case STEPPED: {
+				r = _frames[i + R];
+				g = _frames[i + G];
+				b = _frames[i + B];
+				a = _frames[i + A];
+				r2 = _frames[i + R2];
+				g2 = _frames[i + G2];
+				b2 = _frames[i + B2];
+				break;
+			}
+			default: {
+				r = getBezierValue(time, i, R, curveType - BEZIER);
+				g = getBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
+				b = getBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
+				a = getBezierValue(time, i, A, curveType + BEZIER_SIZE * 3 - BEZIER);
+				r2 = getBezierValue(time, i, R2, curveType + BEZIER_SIZE * 4 - BEZIER);
+				g2 = getBezierValue(time, i, G2, curveType + BEZIER_SIZE * 5 - BEZIER);
+				b2 = getBezierValue(time, i, B2, curveType + BEZIER_SIZE * 6 - BEZIER);
+				break;
+			}
 		}
-		light.add((r - light.r) * alpha, (g - light.g) * alpha, (b - light.b) * alpha, (a - light.a) * alpha);
-		dark.r += (r2 - dark.r) * alpha;
-		dark.g += (g2 - dark.g) * alpha;
-		dark.b += (b2 - dark.b) * alpha;
+
+		if (alpha == 1)
+			light.set(r, g, b, a);
+		else if (blend == MixBlend_Setup) {
+			SlotPose &setup = slot._data._setup;
+			Color &setupLight = setup._color;
+			light.set(setupLight.r + (r - setupLight.r) * alpha, setupLight.g + (g - setupLight.g) * alpha, setupLight.b + (b - setupLight.b) * alpha,
+					  setupLight.a + (a - setupLight.a) * alpha);
+			Color &setupDark = setup._darkColor;
+			r2 = setupDark.r + (r2 - setupDark.r) * alpha;
+			g2 = setupDark.g + (g2 - setupDark.g) * alpha;
+			b2 = setupDark.b + (b2 - setupDark.b) * alpha;
+		} else {
+			light.add((r - light.r) * alpha, (g - light.g) * alpha, (b - light.b) * alpha, (a - light.a) * alpha);
+			r2 = dark.r + (r2 - dark.r) * alpha;
+			g2 = dark.g + (g2 - dark.g) * alpha;
+			b2 = dark.b + (b2 - dark.b) * alpha;
+		}
 	}
+
+	dark.r = r2 < 0 ? 0 : (r2 > 1 ? 1 : r2);
+	dark.g = g2 < 0 ? 0 : (g2 > 1 ? 1 : g2);
+	dark.b = b2 < 0 ? 0 : (b2 > 1 ? 1 : b2);
 }
 
 RTTI_IMPL(RGB2Timeline, SlotCurveTimeline)
@@ -391,6 +396,7 @@ void RGB2Timeline::setFrame(int frame, float time, float r, float g, float b, fl
 void RGB2Timeline::_apply(Slot &slot, SlotPose &pose, float time, float alpha, MixBlend blend) {
 	Color &light = pose._color;
 	Color &dark = pose._darkColor;
+	float r, g, b, r2, g2, b2;
 	if (time < _frames[0]) {
 		SlotPose &setup = slot._data._setup;
 		Color &setupLight = setup._color;
@@ -403,83 +409,84 @@ void RGB2Timeline::_apply(Slot &slot, SlotPose &pose, float time, float alpha, M
 				dark.r = setupDark.r;
 				dark.g = setupDark.g;
 				dark.b = setupDark.b;
-				return;
-			case MixBlend_First:
-				light.r += (setupLight.r - light.r) * alpha;
-				light.g += (setupLight.g - light.g) * alpha;
-				light.b += (setupLight.b - light.b) * alpha;
-				dark.r += (setupDark.r - dark.r) * alpha;
-				dark.g += (setupDark.g - dark.g) * alpha;
-				dark.b += (setupDark.b - dark.b) * alpha;
-				return;
+				/* Fall through. */
 			default:
 				return;
+			case MixBlend_First:
+				r = light.r + (setupLight.r - light.r) * alpha;
+				g = light.g + (setupLight.g - light.g) * alpha;
+				b = light.b + (setupLight.b - light.b) * alpha;
+				r2 = dark.r + (setupDark.r - dark.r) * alpha;
+				g2 = dark.g + (setupDark.g - dark.g) * alpha;
+				b2 = dark.b + (setupDark.b - dark.b) * alpha;
 		}
-	}
-
-	float r, g, b, r2, g2, b2;
-	int i = Animation::search(_frames, time, ENTRIES);
-	int curveType = (int) _curves[i / ENTRIES];
-	switch (curveType) {
-		case LINEAR: {
-			float before = _frames[i];
-			r = _frames[i + R];
-			g = _frames[i + G];
-			b = _frames[i + B];
-			r2 = _frames[i + R2];
-			g2 = _frames[i + G2];
-			b2 = _frames[i + B2];
-			float t = (time - before) / (_frames[i + ENTRIES] - before);
-			r += (_frames[i + ENTRIES + R] - r) * t;
-			g += (_frames[i + ENTRIES + G] - g) * t;
-			b += (_frames[i + ENTRIES + B] - b) * t;
-			r2 += (_frames[i + ENTRIES + R2] - r2) * t;
-			g2 += (_frames[i + ENTRIES + G2] - g2) * t;
-			b2 += (_frames[i + ENTRIES + B2] - b2) * t;
-			break;
-		}
-		case STEPPED: {
-			r = _frames[i + R];
-			g = _frames[i + G];
-			b = _frames[i + B];
-			r2 = _frames[i + R2];
-			g2 = _frames[i + G2];
-			b2 = _frames[i + B2];
-			break;
-		}
-		default: {
-			r = getBezierValue(time, i, R, curveType - BEZIER);
-			g = getBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
-			b = getBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
-			r2 = getBezierValue(time, i, R2, curveType + BEZIER_SIZE * 3 - BEZIER);
-			g2 = getBezierValue(time, i, G2, curveType + BEZIER_SIZE * 4 - BEZIER);
-			b2 = getBezierValue(time, i, B2, curveType + BEZIER_SIZE * 5 - BEZIER);
-			break;
-		}
-	}
-
-	if (alpha == 1) {
-		light.r = r;
-		light.g = g;
-		light.b = b;
-		dark.r = r2;
-		dark.g = g2;
-		dark.b = b2;
 	} else {
-		if (blend == MixBlend_Setup) {
-			SlotPose &setup = slot._data._setup;
-			light.r = setup._color.r;
-			light.g = setup._color.g;
-			light.b = setup._color.b;
-			dark.r = setup._darkColor.r;
-			dark.g = setup._darkColor.g;
-			dark.b = setup._darkColor.b;
+		int i = Animation::search(_frames, time, ENTRIES);
+		int curveType = (int) _curves[i / ENTRIES];
+		switch (curveType) {
+			case LINEAR: {
+				float before = _frames[i];
+				r = _frames[i + R];
+				g = _frames[i + G];
+				b = _frames[i + B];
+				r2 = _frames[i + R2];
+				g2 = _frames[i + G2];
+				b2 = _frames[i + B2];
+				float t = (time - before) / (_frames[i + ENTRIES] - before);
+				r += (_frames[i + ENTRIES + R] - r) * t;
+				g += (_frames[i + ENTRIES + G] - g) * t;
+				b += (_frames[i + ENTRIES + B] - b) * t;
+				r2 += (_frames[i + ENTRIES + R2] - r2) * t;
+				g2 += (_frames[i + ENTRIES + G2] - g2) * t;
+				b2 += (_frames[i + ENTRIES + B2] - b2) * t;
+				break;
+			}
+			case STEPPED: {
+				r = _frames[i + R];
+				g = _frames[i + G];
+				b = _frames[i + B];
+				r2 = _frames[i + R2];
+				g2 = _frames[i + G2];
+				b2 = _frames[i + B2];
+				break;
+			}
+			default: {
+				r = getBezierValue(time, i, R, curveType - BEZIER);
+				g = getBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
+				b = getBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
+				r2 = getBezierValue(time, i, R2, curveType + BEZIER_SIZE * 3 - BEZIER);
+				g2 = getBezierValue(time, i, G2, curveType + BEZIER_SIZE * 4 - BEZIER);
+				b2 = getBezierValue(time, i, B2, curveType + BEZIER_SIZE * 5 - BEZIER);
+				break;
+			}
 		}
-		light.r += (r - light.r) * alpha;
-		light.g += (g - light.g) * alpha;
-		light.b += (b - light.b) * alpha;
-		dark.r += (r2 - dark.r) * alpha;
-		dark.g += (g2 - dark.g) * alpha;
-		dark.b += (b2 - dark.b) * alpha;
+
+		if (alpha != 1) {
+			if (blend == MixBlend_Setup) {
+				SlotPose &setup = slot._data._setup;
+				Color &setupLight = setup._color;
+				r = setupLight.r + (r - setupLight.r) * alpha;
+				g = setupLight.g + (g - setupLight.g) * alpha;
+				b = setupLight.b + (b - setupLight.b) * alpha;
+				Color &setupDark = setup._darkColor;
+				r2 = setupDark.r + (r2 - setupDark.r) * alpha;
+				g2 = setupDark.g + (g2 - setupDark.g) * alpha;
+				b2 = setupDark.b + (b2 - setupDark.b) * alpha;
+			} else {
+				r = light.r + (r - light.r) * alpha;
+				g = light.g + (g - light.g) * alpha;
+				b = light.b + (b - light.b) * alpha;
+				r2 = dark.r + (r2 - dark.r) * alpha;
+				g2 = dark.g + (g2 - dark.g) * alpha;
+				b2 = dark.b + (b2 - dark.b) * alpha;
+			}
+		}
 	}
+
+	light.r = r < 0 ? 0 : (r > 1 ? 1 : r);
+	light.g = g < 0 ? 0 : (g > 1 ? 1 : g);
+	light.b = b < 0 ? 0 : (b > 1 ? 1 : b);
+	dark.r = r2 < 0 ? 0 : (r2 > 1 ? 1 : r2);
+	dark.g = g2 < 0 ? 0 : (g2 > 1 ? 1 : g2);
+	dark.b = b2 < 0 ? 0 : (b2 > 1 ? 1 : b2);
 }

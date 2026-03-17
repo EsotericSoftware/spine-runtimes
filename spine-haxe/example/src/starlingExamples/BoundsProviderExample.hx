@@ -59,7 +59,7 @@ class BoundsProviderExample extends Scene {
 		var skeletondata = SkeletonData.from(Assets.getText("assets/spineboy-pro.json"), atlas, .5);
 
 		var stateDataClipping = new AnimationStateData(skeletondata);
-		skeletonSpriteClipping = new SkeletonSprite(skeletondata, stateDataClipping, new SkinsAndAnimationBoundsProvider("portal", null, null, false));
+		skeletonSpriteClipping = new SkeletonSprite(skeletondata, stateDataClipping, new SkinsAndAnimationBoundsProvider("portal", null));
 		skeletonSpriteClipping.scale = scale;
 		skeletonSpriteClipping.x = Starling.current.stage.stageWidth / 4 * 3;
 		skeletonSpriteClipping.y = Starling.current.stage.stageHeight / 2;
@@ -74,7 +74,7 @@ class BoundsProviderExample extends Scene {
 		addChild(skeletonSpriteClipping);
 
 		var stateDataNoClipping = new AnimationStateData(skeletondata);
-		skeletonSpriteNoClipping = new SkeletonSprite(skeletondata, stateDataNoClipping, new SkinsAndAnimationBoundsProvider("portal", null, null, true));
+		skeletonSpriteNoClipping = new SkeletonSprite(skeletondata, stateDataNoClipping, new SkinsAndAnimationBoundsProvider("portal", null, true));
 		skeletonSpriteNoClipping.scale = scale;
 		skeletonSpriteNoClipping.x = Starling.current.stage.stageWidth / 4;
 		skeletonSpriteNoClipping.y = Starling.current.stage.stageHeight / 2;

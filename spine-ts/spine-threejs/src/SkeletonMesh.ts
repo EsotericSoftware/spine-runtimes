@@ -246,10 +246,14 @@ export class SkeletonMesh extends THREE.Object3D {
 				attachmentColor = attachment.color;
 				vertices = this.vertices;
 				numFloats = vertexSize * 4;
-				attachment.computeWorldVertices(slot, vertices, 0, vertexSize);
+
+				const sequence = attachment.sequence;
+				const sequenceIndex = sequence.resolveIndex(pose);
+				attachment.computeWorldVertices(slot, attachment.getOffsets(pose), vertices, 0, vertexSize);
+
 				triangles = SkeletonMesh.QUAD_TRIANGLES;
-				uvs = attachment.uvs;
-				texture = <ThreeJsTexture>attachment.region?.texture;
+				uvs = sequence.getUVs(sequenceIndex);
+				texture = sequence.regions[sequenceIndex]?.texture;
 			} else if (attachment instanceof MeshAttachment) {
 				attachmentColor = attachment.color;
 				vertices = this.vertices;
@@ -267,8 +271,12 @@ export class SkeletonMesh extends THREE.Object3D {
 					vertexSize
 				);
 				triangles = attachment.triangles;
-				uvs = attachment.uvs;
-				texture = <ThreeJsTexture>attachment.region?.texture;
+
+				const sequence = attachment.sequence;
+				const sequenceIndex = sequence.resolveIndex(pose);
+
+				uvs = sequence.getUVs(sequenceIndex);
+				texture = sequence.regions[sequenceIndex]?.texture;
 			} else if (attachment instanceof ClippingAttachment) {
 				clipper.clipEnd(slot);
 				clipper.clipStart(skeleton, slot, attachment);

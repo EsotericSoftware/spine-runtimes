@@ -111,6 +111,8 @@ namespace spine {
 
 		void readVertices(Json *attachmentMap, VertexAttachment *attachment, size_t verticesLength);
 
+		bool readDrawOrder(SkeletonData *skeletonData, Json *keyMap, int slotCount, const Array<int> *folderSlots, Array<int> &drawOrder);
+
 		void setError(Json *root, const String &value1, const String &value2);
 
 		int findSlotIndex(SkeletonData *skeletonData, const String &slotName, Array<Timeline *> timelines);

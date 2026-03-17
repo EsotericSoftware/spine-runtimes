@@ -33,11 +33,16 @@ package spine.attachments;
 class Attachment {
 	private var _name:String;
 
+	/** Timelines for the timeline attachment are also applied to this attachment.
+	 * May be null if no attachment-specific timelines should be applied. */
+	public var timelineAttachment:Attachment;
+
 	public function new(name:String) {
 		if (name == null) {
 			throw new SpineException("name cannot be null.");
 		}
 		_name = name;
+		timelineAttachment = this;
 	}
 
 	/** The attachment's name. */

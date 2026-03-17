@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -77,10 +77,12 @@ namespace Spine.Unity {
 					if (templateMaterial == null) continue;
 
 					foreach (Skin.SkinEntry entry in entryBuffer) {
-						IHasTextureRegion renderableAttachment = entry.Attachment as IHasTextureRegion;
-						if (renderableAttachment != null) {
-							renderableAttachment.Region = materialCache.CloneAtlasRegionWithMaterial(
-								(AtlasRegion)renderableAttachment.Region, templateMaterial);
+						IHasSequence renderableAttachment = entry.Attachment as IHasSequence;
+						if (renderableAttachment == null) continue;
+						TextureRegion[] regions = renderableAttachment.Sequence.Regions;
+						for (int i = 0; i < regions.Length; ++i) {
+							regions[i] = materialCache.CloneAtlasRegionWithMaterial(
+								(AtlasRegion)regions[i], templateMaterial);
 						}
 					}
 				}

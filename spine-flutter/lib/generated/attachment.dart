@@ -88,6 +88,40 @@ abstract class Attachment {
     }
   }
 
+  Attachment? get timelineAttachment {
+    final result = SpineBindings.bindings.spine_attachment_get_timeline_attachment(_ptr);
+    if (result.address == 0) return null;
+    final rtti = SpineBindings.bindings.spine_attachment_get_rtti(result);
+    final className = SpineBindings.bindings.spine_rtti_get_class_name(rtti).cast<Utf8>().toDartString();
+    switch (className) {
+      case 'BoundingBoxAttachment':
+        final castedPtr = SpineBindings.bindings.spine_attachment_cast_to_bounding_box_attachment(result);
+        return BoundingBoxAttachment.fromPointer(castedPtr);
+      case 'ClippingAttachment':
+        final castedPtr = SpineBindings.bindings.spine_attachment_cast_to_clipping_attachment(result);
+        return ClippingAttachment.fromPointer(castedPtr);
+      case 'MeshAttachment':
+        final castedPtr = SpineBindings.bindings.spine_attachment_cast_to_mesh_attachment(result);
+        return MeshAttachment.fromPointer(castedPtr);
+      case 'PathAttachment':
+        final castedPtr = SpineBindings.bindings.spine_attachment_cast_to_path_attachment(result);
+        return PathAttachment.fromPointer(castedPtr);
+      case 'PointAttachment':
+        final castedPtr = SpineBindings.bindings.spine_attachment_cast_to_point_attachment(result);
+        return PointAttachment.fromPointer(castedPtr);
+      case 'RegionAttachment':
+        final castedPtr = SpineBindings.bindings.spine_attachment_cast_to_region_attachment(result);
+        return RegionAttachment.fromPointer(castedPtr);
+      default:
+        throw UnsupportedError('Unknown concrete type: $className for abstract class Attachment');
+    }
+  }
+
+  set timelineAttachment(Attachment? value) {
+    SpineBindings.bindings
+        .spine_attachment_set_timeline_attachment(_ptr, value?.nativePtr.cast() ?? Pointer.fromAddress(0));
+  }
+
   int get refCount {
     final result = SpineBindings.bindings.spine_attachment_get_ref_count(_ptr);
     return result;

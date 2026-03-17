@@ -58,7 +58,6 @@ import {
 	Container,
 	type ContainerOptions,
 	type DestroyOptions,
-	fastCopy,
 	Graphics,
 	type PointData,
 	Texture,
@@ -66,6 +65,7 @@ import {
 	ViewContainer,
 } from 'pixi.js';
 import type { ISpineDebugRenderer } from './SpineDebugRenderer.js';
+import type { SpineTexture } from './SpineTexture.js';
 
 /**
  * Options to create a {@link Spine} using {@link Spine.from}.
@@ -95,6 +95,9 @@ export interface SpineFromOptions {
 
 	/** Set {@link AtlasAttachmentLoader.allowMissingRegions} property on the AtlasAttachmentLoader. */
 	allowMissingRegions?: boolean;
+
+	/** The ticker to use when {@link autoUpdate} is `true`. Defaults to {@link Ticker.shared}. */
+	ticker?: Ticker,
 };
 
 const vectorAux = new Vector2();
@@ -247,6 +250,9 @@ export interface SpineOptions extends ContainerOptions {
 
 	/**  See {@link SpineFromOptions.boundsProvider}. */
 	boundsProvider?: SpineBoundsProvider,
+
+	/** See {@link SpineFromOptions.ticker}. */
+	ticker?: Ticker,
 }
 
 /**
@@ -358,19 +364,37 @@ export class Spine extends ViewContainer {
 	}
 
 	private _autoUpdate = false;
+	private _ticker: Ticker = Ticker.shared;
 
 	public get autoUpdate (): boolean {
 		return this._autoUpdate;
 	}
-	/** When `true`, the Spine AnimationState and the Skeleton will be automatically updated using the {@link Ticker.shared} instance. */
+	/** When `true`, the Spine AnimationState and the Skeleton will be automatically updated using the {@link ticker}. */
 	public set autoUpdate (value: boolean) {
 		if (value && !this._autoUpdate) {
-			Ticker.shared.add(this.internalUpdate, this);
+			this._ticker.add(this.internalUpdate, this);
 		} else if (!value && this._autoUpdate) {
-			Ticker.shared.remove(this.internalUpdate, this);
+			this._ticker.remove(this.internalUpdate, this);
 		}
 
 		this._autoUpdate = value;
+	}
+
+	/** The ticker to use when {@link autoUpdate} is `true`. Defaults to {@link Ticker.shared}. */
+	public get ticker (): Ticker {
+		return this._ticker;
+	}
+	/** Sets the ticker to use when {@link autoUpdate} is `true`. If `autoUpdate` is already `true`, the update callback will be moved from the old ticker to the new one. */
+	public set ticker (value: Ticker) {
+		value = value ?? Ticker.shared;
+		if (this._ticker === value) return;
+
+		if (this._autoUpdate) {
+			this._ticker.remove(this.internalUpdate, this);
+			value.add(this.internalUpdate, this);
+		}
+
+		this._ticker = value;
 	}
 
 	private _boundsProvider?: SpineBoundsProvider;
@@ -397,9 +421,10 @@ export class Spine extends ViewContainer {
 
 		this.allowChildren = true;
 
-		const { autoUpdate, boundsProvider, darkTint, skeletonData } = options;
+		const { autoUpdate, boundsProvider, darkTint, skeletonData, ticker } = options;
 		this.skeleton = new Skeleton(skeletonData);
 		this.state = new AnimationState(new AnimationStateData(skeletonData));
+		if (ticker) this._ticker = ticker;
 		this.autoUpdate = autoUpdate ?? true;
 		this._boundsProvider = boundsProvider;
 
@@ -419,9 +444,7 @@ export class Spine extends ViewContainer {
 	}
 
 	protected internalUpdate (ticker?: Ticker, deltaSeconds?: number): void {
-		// Because reasons, pixi uses deltaFrames at 60fps.
-		// We ignore the default deltaFrames and use the deltaSeconds from pixi ticker.
-		this._updateAndApplyState(deltaSeconds ?? Ticker.shared.deltaMS / 1000);
+		this._updateAndApplyState(deltaSeconds ?? this._ticker.deltaMS / 1000);
 	}
 
 	override get bounds () {
@@ -639,8 +662,11 @@ export class Spine extends ViewContainer {
 				if (attachment instanceof MeshAttachment || attachment instanceof RegionAttachment) {
 					const cacheData = this._getCachedData(slot, attachment);
 
+					const sequence = attachment.sequence;
+					const sequenceIndex = sequence.resolveIndex(pose);
+
 					if (attachment instanceof RegionAttachment) {
-						attachment.computeWorldVertices(slot, cacheData.vertices, 0, 2);
+						attachment.computeWorldVertices(slot, attachment.getOffsets(pose), cacheData.vertices, 0, 2);
 					}
 					else {
 						attachment.computeWorldVertices(
@@ -654,13 +680,7 @@ export class Spine extends ViewContainer {
 						);
 					}
 
-					// sequences uvs are known only after computeWorldVertices is invoked
-					if (cacheData.uvs.length < attachment.uvs.length) {
-						cacheData.uvs = new Float32Array(attachment.uvs.length);
-					}
-
-					// need to copy because attachments uvs are shared among skeletons using the same atlas
-					fastCopy((attachment.uvs as Float32Array).buffer, cacheData.uvs.buffer);
+					cacheData.uvs = sequence.getUVs(sequenceIndex);
 
 					const skeletonColor = skeleton.color;
 					const slotColor = pose.color;
@@ -685,7 +705,7 @@ export class Spine extends ViewContainer {
 							cacheData.darkColor.setFromColor(pose.darkColor);
 						}
 
-						const texture = attachment.region?.texture.texture || Texture.EMPTY;
+						const texture = (sequence.regions[sequenceIndex]?.texture as SpineTexture)?.texture || Texture.EMPTY;
 
 						if (cacheData.texture !== texture) {
 							cacheData.texture = texture;
@@ -785,26 +805,16 @@ export class Spine extends ViewContainer {
 		container.visible = this.skeleton.drawOrder.includes(slot) && followAttachmentValue;
 
 		if (container.visible) {
-			let bone: Bone | null = slot.bone;
+			const applied = slot.bone.applied;
 
-			const applied = bone.applied;
-			container.position.set(applied.worldX, applied.worldY);
-			container.angle = applied.getWorldRotationX();
-
-			let cumulativeScaleX = 1;
-			let cumulativeScaleY = 1;
-			while (bone) {
-				cumulativeScaleX *= bone.applied.scaleX;
-				cumulativeScaleY *= bone.applied.scaleY;
-				bone = bone.parent;
-			};
-
-			if (cumulativeScaleX < 0) container.angle -= 180;
-
-			container.scale.set(
-				applied.getWorldScaleX() * Math.sign(cumulativeScaleX),
-				applied.getWorldScaleY() * Math.sign(cumulativeScaleY),
-			);
+			const matrix = container.localTransform;
+			matrix.a = applied.a;
+			matrix.b = applied.c;
+			matrix.c = -applied.b;
+			matrix.d = -applied.d;
+			matrix.tx = applied.worldX;
+			matrix.ty = applied.worldY;
+			container.setFromMatrix(matrix);
 
 			container.alpha = this.skeleton.color.a * pose.color.a;
 		}
@@ -821,33 +831,35 @@ export class Spine extends ViewContainer {
 		if (attachment instanceof RegionAttachment) {
 			vertices = new Float32Array(8);
 
+			const sequence = attachment.sequence;
 			this.attachmentCacheData[slot.data.index][attachment.name] = {
 				id: `${slot.data.index}-${attachment.name}`,
 				vertices,
 				clipped: false,
 				indices: [0, 1, 2, 0, 2, 3],
-				uvs: new Float32Array(attachment.uvs.length),
+				uvs: new Float32Array(sequence.getUVs(0).length),
 				color: new Color(1, 1, 1, 1),
 				darkColor: new Color(0, 0, 0, 0),
 				darkTint: this.darkTint,
 				skipRender: false,
-				texture: attachment.region?.texture.texture,
+				texture: (sequence.regions[0]?.texture as SpineTexture)?.texture,
 			};
 		}
 		else {
 			vertices = new Float32Array(attachment.worldVerticesLength);
 
+			const sequence = attachment.sequence;
 			this.attachmentCacheData[slot.data.index][attachment.name] = {
 				id: `${slot.data.index}-${attachment.name}`,
 				vertices,
 				clipped: false,
 				indices: attachment.triangles,
-				uvs: new Float32Array(attachment.uvs.length),
+				uvs: new Float32Array(sequence.getUVs(0).length),
 				color: new Color(1, 1, 1, 1),
 				darkColor: new Color(0, 0, 0, 0),
 				darkTint: this.darkTint,
 				skipRender: false,
-				texture: attachment.region?.texture.texture,
+				texture: (sequence.regions[0]?.texture as SpineTexture)?.texture,
 			};
 		}
 
@@ -1031,7 +1043,8 @@ export class Spine extends ViewContainer {
 	public override destroy (options: DestroyOptions = false) {
 		super.destroy(options);
 
-		Ticker.shared.remove(this.internalUpdate, this);
+		this._ticker.remove(this.internalUpdate, this);
+		(this._ticker as unknown) = null;
 		this.state.clearListeners();
 		this.debug = undefined;
 		(this.skeleton as unknown) = null;
@@ -1076,7 +1089,7 @@ export class Spine extends ViewContainer {
 	 * @param options - Options to configure the Spine game object. See {@link SpineFromOptions}
 	 * @returns {SpineOptions} The configuration ready to be passed to the Spine constructor
 	 */
-	static createOptions ({ skeleton, atlas, scale = 1, darkTint, autoUpdate = true, boundsProvider, allowMissingRegions = false }: SpineFromOptions): SpineOptions {
+	static createOptions ({ skeleton, atlas, scale = 1, darkTint, autoUpdate = true, boundsProvider, allowMissingRegions = false, ticker }: SpineFromOptions): SpineOptions {
 		const cacheKey = `${skeleton}-${atlas}-${scale}`;
 
 		if (Cache.has(cacheKey)) {
@@ -1085,6 +1098,7 @@ export class Spine extends ViewContainer {
 				darkTint,
 				autoUpdate,
 				boundsProvider,
+				ticker,
 			};
 		}
 
@@ -1107,6 +1121,7 @@ export class Spine extends ViewContainer {
 			darkTint,
 			autoUpdate,
 			boundsProvider,
+			ticker,
 		};
 	}
 

@@ -286,12 +286,13 @@ void SSpineWidget::UpdateMesh(int32 LayerId, FSlateWindowElementList &OutDrawEle
 		float *attachmentUvs = nullptr;
 
 		Slot *slot = Skeleton->getDrawOrder()[i];
+		SlotPose &slotPose = slot->getAppliedPose();
 		if (!slot->getBone().isActive()) {
 			clipper.clipEnd(*slot);
 			continue;
 		}
 
-		Attachment *attachment = slot->getAppliedPose().getAttachment();
+		Attachment *attachment = slotPose.getAttachment();
 		if (!attachment) {
 			clipper.clipEnd(*slot);
 			continue;
@@ -304,22 +305,26 @@ void SSpineWidget::UpdateMesh(int32 LayerId, FSlateWindowElementList &OutDrawEle
 
 		if (attachment->getRTTI().isExactly(RegionAttachment::rtti)) {
 			RegionAttachment *regionAttachment = (RegionAttachment *) attachment;
+			Sequence &sequence = regionAttachment->getSequence();
+			int sequenceIndex = sequence.resolveIndex(slotPose);
 			attachmentColor.set(regionAttachment->getColor());
 			attachmentVertices->setSize(8, 0);
-			regionAttachment->computeWorldVertices(*slot, *attachmentVertices, 0, 2);
-			attachmentAtlasRegion = (AtlasRegion *) regionAttachment->getRegion();
+			regionAttachment->computeWorldVertices(*slot, regionAttachment->getOffsets(slotPose), *attachmentVertices, 0, 2);
+			attachmentAtlasRegion = (AtlasRegion *) sequence.getRegion(sequenceIndex);
 			attachmentIndices = quadIndices;
-			attachmentUvs = regionAttachment->getUVs().buffer();
+			attachmentUvs = sequence.getUVs(sequenceIndex).buffer();
 			numVertices = 4;
 			numIndices = 6;
 		} else if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
 			MeshAttachment *mesh = (MeshAttachment *) attachment;
+			Sequence &sequence = mesh->getSequence();
+			int sequenceIndex = sequence.resolveIndex(slotPose);
 			attachmentColor.set(mesh->getColor());
 			attachmentVertices->setSize(mesh->getWorldVerticesLength(), 0);
 			mesh->computeWorldVertices(*Skeleton, *slot, 0, mesh->getWorldVerticesLength(), attachmentVertices->buffer(), 0, 2);
-			attachmentAtlasRegion = (AtlasRegion *) mesh->getRegion();
+			attachmentAtlasRegion = (AtlasRegion *) sequence.getRegion(sequenceIndex);
 			attachmentIndices = mesh->getTriangles().buffer();
-			attachmentUvs = mesh->getUVs().buffer();
+			attachmentUvs = sequence.getUVs(sequenceIndex).buffer();
 			numVertices = mesh->getWorldVerticesLength() >> 1;
 			numIndices = mesh->getTriangles().size();
 		} else /* clipping */ {

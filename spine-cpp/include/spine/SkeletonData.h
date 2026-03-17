@@ -88,6 +88,9 @@ namespace spine {
 		/// @return May be NULL.
 		Animation *findAnimation(const String &animationName);
 
+		/// Collects animations used by slider constraints.
+		Array<Animation *> &findSliderAnimations(Array<Animation *> &animations);
+
 		/// The skeleton's name, which by default is the name of the skeleton data file when possible, or null when a name hasn't been
 		/// set.
 		const String &getName();

@@ -30,13 +30,10 @@
 package spine.attachments;
 
 import spine.atlas.TextureAtlas;
+import spine.atlas.TextureAtlasRegion;
 import spine.Skin;
+import spine.Sequence;
 
-/**
- * The interface which can be implemented to customize creating and populating attachments.
- *
- * @see https://esotericsoftware.com/spine-loading-skeleton-data#AttachmentLoader Loading skeleton data in the Spine Runtimes Guide
- */
 class AtlasAttachmentLoader implements AttachmentLoader {
 	private var atlas:TextureAtlas;
 
@@ -50,72 +47,41 @@ class AtlasAttachmentLoader implements AttachmentLoader {
 		this.allowMissingRegions = allowMissingRegions;
 	}
 
-	private function loadSequence(name:String, basePath:String, sequence:Sequence) {
+	private function findRegions(name:String, basePath:String, sequence:Sequence):Void {
 		var regions = sequence.regions;
-		for (i in 0...regions.length) {
-			var path = sequence.getPath(basePath, i);
-			regions[i] = this.atlas.findRegion(path);
-			if (regions[i] == null)
-				throw new SpineException("Region not found in atlas: " + path + " (sequence: " + name + ")");
-		}
+		for (i in 0...regions.length)
+			regions[i] = findRegion(name, sequence.getPath(basePath, i));
 	}
 
-	/**
-	 * @return May be null to not load the attachment.
-	 */
+	private function findRegion(name:String, path:String):TextureAtlasRegion {
+		var region = atlas.findRegion(path);
+		if (region == null && !allowMissingRegions)
+			throw new SpineException("Region not found in atlas: " + path + " (attachment: " + name + ")");
+		return region;
+	}
+
 	public function newRegionAttachment(skin:Skin, name:String, path:String, sequence:Sequence):RegionAttachment {
-		var attachment = new RegionAttachment(name, path);
-		if (sequence != null) {
-			this.loadSequence(name, path, sequence);
-		} else {
-			var region = this.atlas.findRegion(path);
-			if (region == null && !this.allowMissingRegions)
-				throw new SpineException("Region not found in atlas: " + path + " (region attachment: " + name + ")");
-			attachment.region = region;
-		}
-		return attachment;
+		findRegions(name, path, sequence);
+		return new RegionAttachment(name, sequence);
 	}
 
-	/**
-	 * @return May be null to not load the attachment. In that case null should also be returned for child meshes.
-	 */
 	public function newMeshAttachment(skin:Skin, name:String, path:String, sequence:Sequence):MeshAttachment {
-		var attachment = new MeshAttachment(name, path);
-		if (sequence != null) {
-			this.loadSequence(name, path, sequence);
-		} else {
-			var region = atlas.findRegion(path);
-			if (region == null && !this.allowMissingRegions)
-				throw new SpineException("Region not found in atlas: " + path + " (mesh attachment: " + name + ")");
-			attachment.region = region;
-		}
-		return attachment;
+		findRegions(name, path, sequence);
+		return new MeshAttachment(name, sequence);
 	}
 
-	/**
-	 * @return May be null to not load the attachment.
-	 */
 	public function newBoundingBoxAttachment(skin:Skin, name:String):BoundingBoxAttachment {
 		return new BoundingBoxAttachment(name);
 	}
 
-	/**
-	 * @return May be null to not load the attachment.
-	 */
 	public function newPathAttachment(skin:Skin, name:String):PathAttachment {
 		return new PathAttachment(name);
 	}
 
-	/**
-	 * @return May be null to not load the attachment.
-	 */
 	public function newPointAttachment(skin:Skin, name:String):PointAttachment {
 		return new PointAttachment(name);
 	}
 
-	/**
-	 * @return May be null to not load the attachment.
-	 */
 	public function newClippingAttachment(skin:Skin, name:String):ClippingAttachment {
 		return new ClippingAttachment(name);
 	}

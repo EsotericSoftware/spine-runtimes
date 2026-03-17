@@ -132,7 +132,7 @@ var additiveBlendingDemo = function (canvas, bgColor) {
 		gl.clear(gl.COLOR_BUFFER_BIT);
 
 		renderer.begin();
-		renderer.drawSkeleton(skeleton, true);
+		renderer.drawSkeleton(skeleton);
 
 		if (isMobileDevice()) {
 			gl.lineWidth(2);

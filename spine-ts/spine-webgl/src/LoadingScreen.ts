@@ -88,7 +88,7 @@ export class LoadingScreen implements Disposable {
 
 		renderer.resize(ResizeMode.Expand);
 		renderer.camera.position.set(canvas.width / 2, canvas.height / 2, 0);
-		renderer.batcher.setBlendMode(BlendMode.Normal, true);
+		renderer.batcher.setBlendMode(BlendMode.Normal);
 
 		if (complete) {
 			this.fadeOut += this.timeKeeper.delta * (this.timeKeeper.totalTime < 1 ? 2 : 1);
@@ -116,8 +116,8 @@ export class LoadingScreen implements Disposable {
 		tempColor.set(a, a, a, a);
 
 		if (!this.logo) {
-			this.logo = new GLTexture(renderer.context, logoImage);
-			this.spinner = new GLTexture(renderer.context, spinnerImage);
+			this.logo = new GLTexture(renderer.context, logoImage, true);
+			this.spinner = new GLTexture(renderer.context, spinnerImage, true);
 		}
 		renderer.camera.zoom = Math.max(1, spinnerSize / canvas.height);
 		renderer.begin();
@@ -131,11 +131,11 @@ export class LoadingScreen implements Disposable {
 
 		this.timeKeeper.update();
 		const renderer = this.renderer;
-		renderer.batcher.setBlendMode(BlendMode.Normal, true);
+		renderer.batcher.setBlendMode(BlendMode.Normal);
 
 		if (!this.logo) {
-			this.logo = new GLTexture(renderer.context, logoImage);
-			this.spinner = new GLTexture(renderer.context, spinnerImage);
+			this.logo = new GLTexture(renderer.context, logoImage, true);
+			this.spinner = new GLTexture(renderer.context, spinnerImage, true);
 		}
 
 		const shiftedX = x - logoWidth / 2;

@@ -259,6 +259,14 @@ public class SkeletonData: NSObject {
         return result.map { Animation(fromPointer: $0) }
     }
 
+    /// Collects animations used by slider constraints.
+    public func findSliderAnimations(_ animations: ArrayAnimation) -> ArrayAnimation {
+        let result = spine_skeleton_data_find_slider_animations(
+            _ptr.assumingMemoryBound(to: spine_skeleton_data_wrapper.self),
+            animations._ptr.assumingMemoryBound(to: spine_array_animation_wrapper.self))
+        return ArrayAnimation(fromPointer: result!)
+    }
+
     public func dispose() {
         spine_skeleton_data_dispose(_ptr.assumingMemoryBound(to: spine_skeleton_data_wrapper.self))
     }

@@ -9,6 +9,18 @@ Shader "Universal Render Pipeline/2D/Spine/Skeleton Lit" {
 		_Black("    Dark Color", Color) = (0,0,0,0)
 		[HideInInspector] _StencilRef("Stencil Reference", Float) = 1.0
 		[Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Compare", Float) = 8 // Set to Always as default
+
+		// Outline properties are drawn via custom editor.
+		[HideInInspector] _OutlineWidth("Outline Width", Range(0,8)) = 3.0
+		[HideInInspector][MaterialToggle(_USE_SCREENSPACE_OUTLINE_WIDTH)] _UseScreenSpaceOutlineWidth("Width in Screen Space", Float) = 0
+		[HideInInspector] _OutlineColor("Outline Color", Color) = (1,1,0,1)
+		[HideInInspector][MaterialToggle(_OUTLINE_FILL_INSIDE)]_Fill("Fill", Float) = 0
+		[HideInInspector] _OutlineReferenceTexWidth("Reference Texture Width", Int) = 1024
+		[HideInInspector] _ThresholdEnd("Outline Threshold", Range(0,1)) = 0.25
+		[HideInInspector] _OutlineSmoothness("Outline Smoothness", Range(0,1)) = 1.0
+		[HideInInspector][MaterialToggle(_USE8NEIGHBOURHOOD_ON)] _Use8Neighbourhood("Sample 8 Neighbours", Float) = 1
+		[HideInInspector] _OutlineOpaqueAlpha("Opaque Alpha", Range(0,1)) = 1.0
+		[HideInInspector] _OutlineMipLevel("Outline Mip Level", Range(0,3)) = 0
 	}
 
 	HLSLINCLUDE
@@ -29,6 +41,7 @@ Shader "Universal Render Pipeline/2D/Spine/Skeleton Lit" {
 		}
 
 		Pass {
+			Name "Universal2D"
 			Tags { "LightMode" = "Universal2D" }
 
 			ZWrite Off
@@ -39,10 +52,12 @@ Shader "Universal Render Pipeline/2D/Spine/Skeleton Lit" {
 			// Required to compile gles 2.0 with standard srp library
 			#pragma prefer_hlslcc gles
 			#pragma exclude_renderers d3d11_9x
-			#pragma multi_compile USE_SHAPE_LIGHT_TYPE_0 __
-			#pragma multi_compile USE_SHAPE_LIGHT_TYPE_1 __
-			#pragma multi_compile USE_SHAPE_LIGHT_TYPE_2 __
-			#pragma multi_compile USE_SHAPE_LIGHT_TYPE_3 __
+			#if UNITY_VERSION < 60030000 // before  Unity 6000.3
+				#pragma multi_compile USE_SHAPE_LIGHT_TYPE_0 __
+				#pragma multi_compile USE_SHAPE_LIGHT_TYPE_1 __
+				#pragma multi_compile USE_SHAPE_LIGHT_TYPE_2 __
+				#pragma multi_compile USE_SHAPE_LIGHT_TYPE_3 __
+			#endif // UNITY_VERSION < 60030000
 			#pragma multi_compile _ _LIGHT_AFFECTS_ADDITIVE
 			#pragma shader_feature _TINT_BLACK_ON
 
@@ -71,7 +86,13 @@ Shader "Universal Render Pipeline/2D/Spine/Skeleton Lit" {
 			#pragma vertex CombinedShapeLightVertex
 			#pragma fragment CombinedShapeLightFragment
 
-			#include "Packages/com.unity.render-pipelines.universal/Shaders/2D/Include/LightingUtility.hlsl"
+			#if UNITY_VERSION < 60030000 // before Unity 6000.3
+				#include "Packages/com.unity.render-pipelines.universal/Shaders/2D/Include/LightingUtility.hlsl"
+			#else
+				#include "Packages/com.unity.render-pipelines.universal/Shaders/2D/Include/Core2D.hlsl"
+				#include_with_pragmas "Packages/com.unity.render-pipelines.universal/Shaders/2D/Include/ShapeLightShared.hlsl"
+			#endif
+
 			#define USE_URP
 			#include "../Include/SpineCoreShaders/Spine-Common.cginc"
 			#include "../Include/SpineCoreShaders/Spine-Skeleton-Tint-Common.cginc"
@@ -88,6 +109,7 @@ Shader "Universal Render Pipeline/2D/Spine/Skeleton Lit" {
 			TEXTURE2D(_MaskTex);
 			SAMPLER(sampler_MaskTex);
 
+		#if UNITY_VERSION < 60030000 // before Unity 6000.3
 			#if USE_SHAPE_LIGHT_TYPE_0
 			SHAPE_LIGHT(0)
 			#endif
@@ -103,6 +125,7 @@ Shader "Universal Render Pipeline/2D/Spine/Skeleton Lit" {
 			#if USE_SHAPE_LIGHT_TYPE_3
 			SHAPE_LIGHT(3)
 			#endif
+		#endif
 
 			Varyings CombinedShapeLightVertex(Attributes v)
 			{
@@ -173,6 +196,7 @@ Shader "Universal Render Pipeline/2D/Spine/Skeleton Lit" {
 
 		Pass
 		{
+			Name "Normals"
 			Tags { "LightMode" = "NormalsRendering"}
 
 			Blend SrcAlpha OneMinusSrcAlpha
@@ -245,4 +269,6 @@ Shader "Universal Render Pipeline/2D/Spine/Skeleton Lit" {
 		}
 	}
 	FallBack "Universal Render Pipeline/2D/Spine/Skeleton"
+	CustomEditor "SpineShaderWithOutlineGUI"
 }
+

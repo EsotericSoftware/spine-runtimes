@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -86,6 +86,13 @@ namespace Spine {
 			color.g = MathUtils.Clamp(color.g, 0, 1);
 			color.b = MathUtils.Clamp(color.b, 0, 1);
 			color.a = MathUtils.Clamp(color.a, 0, 1);
+			return color;
+		}
+
+		public static Color32F ClampRGB (this Color32F color) {
+			color.r = MathUtils.Clamp(color.r, 0, 1);
+			color.g = MathUtils.Clamp(color.g, 0, 1);
+			color.b = MathUtils.Clamp(color.b, 0, 1);
 			return color;
 		}
 

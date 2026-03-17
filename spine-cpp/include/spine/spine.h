@@ -55,6 +55,7 @@
 #include <spine/ArrayUtils.h>
 #include <spine/CurveTimeline.h>
 #include <spine/DeformTimeline.h>
+#include <spine/DrawOrderFolderTimeline.h>
 #include <spine/DrawOrderTimeline.h>
 #include <spine/Event.h>
 #include <spine/EventData.h>

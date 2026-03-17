@@ -29,7 +29,6 @@
 
 package spine.animation;
 
-import spine.attachments.VertexAttachment;
 import spine.attachments.Attachment;
 
 /** Changes a slot's Slot#getSequenceIndex() for an attachment's Sequence. */
@@ -39,9 +38,9 @@ class SequenceTimeline extends Timeline implements SlotTimeline {
 	static var DELAY = 2;
 
 	var slotIndex:Int;
-	var attachment:HasTextureRegion;
+	var attachment:HasSequence;
 
-	public function new(frameCount:Int, slotIndex:Int, attachment:HasTextureRegion) {
+	public function new(frameCount:Int, slotIndex:Int, attachment:HasSequence) {
 		super(frameCount, Std.string(Property.sequence) + "|" + Std.string(slotIndex) + "|" + Std.string(attachment.sequence.id));
 		this.slotIndex = slotIndex;
 		this.attachment = attachment;
@@ -55,6 +54,8 @@ class SequenceTimeline extends Timeline implements SlotTimeline {
 		return this.slotIndex;
 	}
 
+	/** The attachment for which the sequenceIndex will be set.
+	 * See VertexAttachment.timelineAttachment. */
 	public function getAttachment():Attachment {
 		return cast(attachment, Attachment);
 	}
@@ -76,12 +77,11 @@ class SequenceTimeline extends Timeline implements SlotTimeline {
 			return;
 		var pose = appliedPose ? slot.applied : slot.pose;
 
-		var slotAttachment = pose.attachment;
-		var attachment = cast(this.attachment, Attachment);
-		if (slotAttachment != attachment) {
-			if (!Std.isOfType(slotAttachment, VertexAttachment) || cast(slotAttachment, VertexAttachment).timelineAttachment != attachment)
-				return;
-		}
+		var slotAttachment:Attachment = cast(pose.attachment, Attachment);
+		var attachmentRef:Attachment = cast(this.attachment, Attachment);
+
+		if (!Std.isOfType(slotAttachment, HasSequence) || slotAttachment.timelineAttachment != attachmentRef)
+			return;
 
 		if (direction == MixDirection.mixOut) {
 			if (blend == MixBlend.setup)
@@ -100,10 +100,8 @@ class SequenceTimeline extends Timeline implements SlotTimeline {
 		var modeAndIndex = Std.int(frames[i + SequenceTimeline.MODE]);
 		var delay = frames[i + SequenceTimeline.DELAY];
 
-		if (this.attachment.sequence == null)
-			return;
-		var index = modeAndIndex >> 4,
-			count = this.attachment.sequence.regions.length;
+		var hasSeq:HasSequence = cast(slotAttachment, HasSequence);
+		var index = modeAndIndex >> 4, count = hasSeq.sequence.regions.length;
 		var mode = SequenceMode.values[modeAndIndex & 0xf];
 		if (mode != SequenceMode.hold) {
 			index += Std.int(((time - before) / delay + 0.00001));

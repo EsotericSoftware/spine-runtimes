@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -49,40 +49,32 @@ namespace Spine {
 			this.allowMissingRegions = allowMissingRegions;
 		}
 
-		private void LoadSequence (string name, string basePath, Sequence sequence) {
+		protected void FindRegions (string name, string basePath, Sequence sequence) {
 			TextureRegion[] regions = sequence.Regions;
 			for (int i = 0, n = regions.Length; i < n; i++) {
-				string path = sequence.GetPath(basePath, i);
-				regions[i] = FindRegion(path);
-				if (regions[i] == null && !allowMissingRegions)
-					throw new ArgumentException(string.Format("Region not found in atlas: {0} (region attachment: {1})", path, name));
+				regions[i] = FindRegion(name, sequence.GetPath(basePath, i));
 			}
+		}
+
+		protected AtlasRegion FindRegion (string name, string path) {
+			for (int i = 0; i < atlasArray.Length; i++) {
+				AtlasRegion region = atlasArray[i].FindRegion(path);
+				if (region != null)
+					return region;
+			}
+			if (!allowMissingRegions)
+				throw new ArgumentException(string.Format("Region not found in atlas: {0} (attachment: {1})", path, name));
+			return null;
 		}
 
 		public RegionAttachment NewRegionAttachment (Skin skin, string name, string path, Sequence sequence) {
-			var attachment = new RegionAttachment(name);
-			if (sequence != null)
-				LoadSequence(name, path, sequence);
-			else {
-				AtlasRegion region = FindRegion(path);
-				if (region == null && !allowMissingRegions)
-					throw new ArgumentException(string.Format("Region not found in atlas: {0} (region attachment: {1})", path, name));
-				attachment.Region = region;
-			}
-			return attachment;
+			FindRegions(name, path, sequence);
+			return new RegionAttachment(name, sequence);
 		}
 
 		public MeshAttachment NewMeshAttachment (Skin skin, string name, string path, Sequence sequence) {
-			var attachment = new MeshAttachment(name);
-			if (sequence != null)
-				LoadSequence(name, path, sequence);
-			else {
-				AtlasRegion region = FindRegion(path);
-				if (region == null && !allowMissingRegions)
-					throw new ArgumentException(string.Format("Region not found in atlas: {0} (region attachment: {1})", path, name));
-				attachment.Region = region;
-			}
-			return attachment;
+			FindRegions(name, path, sequence);
+			return new MeshAttachment(name, sequence);
 		}
 
 		public BoundingBoxAttachment NewBoundingBoxAttachment (Skin skin, string name) {
@@ -99,18 +91,6 @@ namespace Spine {
 
 		public ClippingAttachment NewClippingAttachment (Skin skin, string name) {
 			return new ClippingAttachment(name);
-		}
-
-		public AtlasRegion FindRegion (string name) {
-			AtlasRegion region;
-
-			for (int i = 0; i < atlasArray.Length; i++) {
-				region = atlasArray[i].FindRegion(name);
-				if (region != null)
-					return region;
-			}
-
-			return null;
 		}
 	}
 }

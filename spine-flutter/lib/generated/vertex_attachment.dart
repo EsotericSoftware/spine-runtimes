@@ -30,17 +30,10 @@
 // AUTO GENERATED FILE, DO NOT EDIT.
 
 import 'package:universal_ffi/ffi.dart';
-import 'package:universal_ffi/ffi_utils.dart';
 import 'spine_dart_bindings_generated.dart';
 import '../spine_bindings.dart';
 import 'arrays.dart';
 import 'attachment.dart';
-import 'bounding_box_attachment.dart';
-import 'clipping_attachment.dart';
-import 'mesh_attachment.dart';
-import 'path_attachment.dart';
-import 'point_attachment.dart';
-import 'region_attachment.dart';
 import 'skeleton.dart';
 import 'slot.dart';
 
@@ -87,40 +80,6 @@ abstract class VertexAttachment extends Attachment {
 
   set worldVerticesLength(int value) {
     SpineBindings.bindings.spine_vertex_attachment_set_world_vertices_length(_ptr, value);
-  }
-
-  Attachment? get timelineAttachment {
-    final result = SpineBindings.bindings.spine_vertex_attachment_get_timeline_attachment(_ptr);
-    if (result.address == 0) return null;
-    final rtti = SpineBindings.bindings.spine_attachment_get_rtti(result);
-    final className = SpineBindings.bindings.spine_rtti_get_class_name(rtti).cast<Utf8>().toDartString();
-    switch (className) {
-      case 'BoundingBoxAttachment':
-        final castedPtr = SpineBindings.bindings.spine_attachment_cast_to_bounding_box_attachment(result);
-        return BoundingBoxAttachment.fromPointer(castedPtr);
-      case 'ClippingAttachment':
-        final castedPtr = SpineBindings.bindings.spine_attachment_cast_to_clipping_attachment(result);
-        return ClippingAttachment.fromPointer(castedPtr);
-      case 'MeshAttachment':
-        final castedPtr = SpineBindings.bindings.spine_attachment_cast_to_mesh_attachment(result);
-        return MeshAttachment.fromPointer(castedPtr);
-      case 'PathAttachment':
-        final castedPtr = SpineBindings.bindings.spine_attachment_cast_to_path_attachment(result);
-        return PathAttachment.fromPointer(castedPtr);
-      case 'PointAttachment':
-        final castedPtr = SpineBindings.bindings.spine_attachment_cast_to_point_attachment(result);
-        return PointAttachment.fromPointer(castedPtr);
-      case 'RegionAttachment':
-        final castedPtr = SpineBindings.bindings.spine_attachment_cast_to_region_attachment(result);
-        return RegionAttachment.fromPointer(castedPtr);
-      default:
-        throw UnsupportedError('Unknown concrete type: $className for abstract class Attachment');
-    }
-  }
-
-  set timelineAttachment(Attachment? value) {
-    SpineBindings.bindings
-        .spine_vertex_attachment_set_timeline_attachment(_ptr, value?.nativePtr.cast() ?? Pointer.fromAddress(0));
   }
 
   void copyTo(VertexAttachment other) {

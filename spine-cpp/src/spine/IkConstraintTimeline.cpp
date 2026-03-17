@@ -108,30 +108,20 @@ void IkConstraintTimeline::apply(Skeleton &skeleton, float lastTime, float time,
 		}
 	}
 
-	switch (blend) {
-		case MixBlend_Setup: {
-			IkConstraintPose &setup = constraint->_data._setup;
-			pose._mix = setup._mix + (mix - setup._mix) * alpha;
-			pose._softness = setup._softness + (softness - setup._softness) * alpha;
-			if (direction == MixDirection_Out) {
-				pose._bendDirection = setup._bendDirection;
-				pose._compress = setup._compress;
-				pose._stretch = setup._stretch;
-				return;
-			}
-			break;
+	if (blend == MixBlend_Setup) {
+		IkConstraintPose &setup = constraint->_data._setup;
+		pose._mix = setup._mix + (mix - setup._mix) * alpha;
+		pose._softness = setup._softness + (softness - setup._softness) * alpha;
+		if (direction == MixDirection_Out) {
+			pose._bendDirection = setup._bendDirection;
+			pose._compress = setup._compress;
+			pose._stretch = setup._stretch;
+			return;
 		}
-		case MixBlend_First:
-		case MixBlend_Replace:
-			pose._mix += (mix - pose._mix) * alpha;
-			pose._softness += (softness - pose._softness) * alpha;
-			if (direction == MixDirection_Out) return;
-			break;
-		case MixBlend_Add:
-			pose._mix += mix * alpha;
-			pose._softness += softness * alpha;
-			if (direction == MixDirection_Out) return;
-			break;
+	} else {
+		pose._mix += (mix - pose._mix) * alpha;
+		pose._softness += (softness - pose._softness) * alpha;
+		if (direction == MixDirection_Out) return;
 	}
 	pose._bendDirection = (int) _frames[i + BEND_DIRECTION];
 	pose._compress = _frames[i + COMPRESS] != 0;

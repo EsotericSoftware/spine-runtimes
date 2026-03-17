@@ -35,6 +35,7 @@ import 'animation_state_events.dart';
 import 'dress_up.dart';
 import 'flame_example.dart';
 import 'ik_following.dart';
+import 'load_from_memory.dart';
 import 'pause_play_animation.dart';
 import 'physics.dart';
 import 'simple_animation.dart';
@@ -97,6 +98,13 @@ class ExampleSelector extends StatelessWidget {
               child: const Text('Physics'),
               onPressed: () {
                 Navigator.push(context, MaterialPageRoute<void>(builder: (context) => const PhysicsTest()));
+              },
+            ),
+            spacer,
+            ElevatedButton(
+              child: const Text('Load From Memory'),
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute<void>(builder: (context) => const LoadFromMemory()));
               },
             ),
             spacer,

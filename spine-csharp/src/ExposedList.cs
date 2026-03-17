@@ -102,6 +102,15 @@ namespace Spine {
 			return this;
 		}
 
+		public ExposedList<T> EnsureSize (int newSize) {
+			int itemsLength = Items.Length;
+			if (newSize > itemsLength) {
+				Array.Resize(ref Items, newSize);
+			}
+			Count = newSize;
+			return this;
+		}
+
 		public void EnsureCapacity (int min) {
 			if (Items.Length < min) {
 				int newCapacity = Items.Length == 0 ? DefaultCapacity : Items.Length * 2;

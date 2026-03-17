@@ -46,7 +46,6 @@ abstract public class VertexAttachment extends Attachment {
 	static private int nextID;
 
 	private final int id = nextID();
-	@Null Attachment timelineAttachment = this;
 	@Null int[] bones;
 	float[] vertices;
 	int worldVerticesLength;
@@ -58,7 +57,6 @@ abstract public class VertexAttachment extends Attachment {
 	/** Copy constructor. */
 	public VertexAttachment (VertexAttachment other) {
 		super(other);
-		timelineAttachment = other.timelineAttachment;
 
 		if (other.bones != null) {
 			bones = new int[other.bones.length];
@@ -175,17 +173,6 @@ abstract public class VertexAttachment extends Attachment {
 
 	public void setWorldVerticesLength (int worldVerticesLength) {
 		this.worldVerticesLength = worldVerticesLength;
-	}
-
-	/** Timelines for the timeline attachment are also applied to this attachment.
-	 * @return May be null if no attachment-specific timelines should be applied. */
-	public @Null Attachment getTimelineAttachment () {
-		return timelineAttachment;
-	}
-
-	/** @param timelineAttachment May be null if no attachment-specific timelines should be applied. */
-	public void setTimelineAttachment (Attachment timelineAttachment) {
-		this.timelineAttachment = timelineAttachment;
 	}
 
 	/** Returns a unique ID for this attachment. */

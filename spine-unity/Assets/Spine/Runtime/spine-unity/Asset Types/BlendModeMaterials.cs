@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -88,7 +88,7 @@ namespace Spine.Unity {
 					skin.GetAttachments(slotIndex, skinEntries);
 
 				foreach (Skin.SkinEntry entry in skinEntries) {
-					if (entry.Attachment is IHasTextureRegion) {
+					if (entry.Attachment is IHasSequence) {
 						requiresBlendModeMaterials = true;
 						return true;
 					}
@@ -165,22 +165,15 @@ namespace Spine.Unity {
 					skin.GetAttachments(slotIndex, skinEntries);
 
 				foreach (Skin.SkinEntry entry in skinEntries) {
-					IHasTextureRegion renderableAttachment = entry.Attachment as IHasTextureRegion;
+					IHasSequence renderableAttachment = entry.Attachment as IHasSequence;
 					if (renderableAttachment != null) {
-						AtlasRegion originalRegion = (AtlasRegion)renderableAttachment.Region;
-						if (originalRegion != null) {
-							anyCreationFailed |= createForRegionFunc(
-								ref replacementMaterials, ref anyReplacementMaterialsChanged,
-								originalRegion, materialTemplate, materialSuffix, skeletonDataAsset);
-						} else {
-							Sequence sequence = renderableAttachment.Sequence;
-							if (sequence != null && sequence.Regions != null) {
-								for (int i = 0, count = sequence.Regions.Length; i < count; ++i) {
-									originalRegion = (AtlasRegion)sequence.Regions[i];
-									anyCreationFailed |= createForRegionFunc(
-										ref replacementMaterials, ref anyReplacementMaterialsChanged,
-										originalRegion, materialTemplate, materialSuffix, skeletonDataAsset);
-								}
+						Sequence sequence = renderableAttachment.Sequence;
+						if (sequence != null && sequence.Regions != null) {
+							for (int i = 0, count = sequence.Regions.Length; i < count; ++i) {
+								AtlasRegion originalRegion = (AtlasRegion)sequence.Regions[i];
+								anyCreationFailed |= createForRegionFunc(
+									ref replacementMaterials, ref anyReplacementMaterialsChanged,
+									originalRegion, materialTemplate, materialSuffix, skeletonDataAsset);
 							}
 						}
 					}
@@ -268,19 +261,12 @@ namespace Spine.Unity {
 					skin.GetAttachments(slotIndex, skinEntries);
 
 				foreach (Skin.SkinEntry entry in skinEntries) {
-					IHasTextureRegion renderableAttachment = entry.Attachment as IHasTextureRegion;
+					IHasSequence renderableAttachment = entry.Attachment as IHasSequence;
 					if (renderableAttachment != null) {
-						if (renderableAttachment.Region != null) {
-							renderableAttachment.Region = CloneAtlasRegionWithMaterial(
-							(AtlasRegion)renderableAttachment.Region, replacementMaterials);
-						} else {
-							if (renderableAttachment.Sequence != null) {
-								TextureRegion[] regions = renderableAttachment.Sequence.Regions;
-								for (int i = 0; i < regions.Length; ++i) {
-									regions[i] = CloneAtlasRegionWithMaterial(
-										(AtlasRegion)regions[i], replacementMaterials);
-								}
-							}
+						TextureRegion[] regions = renderableAttachment.Sequence.Regions;
+						for (int i = 0; i < regions.Length; ++i) {
+							regions[i] = CloneAtlasRegionWithMaterial(
+								(AtlasRegion)regions[i], replacementMaterials);
 						}
 					}
 				}

@@ -35,46 +35,88 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import com.esotericsoftware.spine.SlotPose;
 
+/** Holds texture regions, UVs, and vertex offsets for rendering a region or mesh attachment. {@link #getRegions() Regions} must
+ * be populated and {@link #update(HasSequence)} called before use. */
 public class Sequence {
 	static private int nextID;
 
 	private final int id = nextID();
 	private final TextureRegion[] regions;
+	private final boolean pathSuffix;
+	private float[][] uvs, offsets;
 	private int start, digits, setupIndex;
 
-	public Sequence (int count) {
+	public Sequence (int count, boolean pathSuffix) {
 		regions = new TextureRegion[count];
+		this.pathSuffix = pathSuffix;
 	}
 
 	/** Copy constructor. */
 	protected Sequence (Sequence other) {
-		regions = new TextureRegion[other.regions.length];
-		arraycopy(other.regions, 0, regions, 0, regions.length);
+		int regionCount = other.regions.length;
+		regions = new TextureRegion[regionCount];
+		arraycopy(other.regions, 0, regions, 0, regionCount);
 
 		start = other.start;
 		digits = other.digits;
 		setupIndex = other.setupIndex;
-	}
+		pathSuffix = other.pathSuffix;
 
-	public void apply (SlotPose slot, HasTextureRegion attachment) {
-		int index = slot.getSequenceIndex();
-		if (index == -1) index = setupIndex;
-		if (index >= regions.length) index = regions.length - 1;
-		TextureRegion region = regions[index];
-		if (attachment.getRegion() != region) {
-			attachment.setRegion(region);
-			attachment.updateRegion();
+		if (other.uvs != null) {
+			int length = other.uvs[0].length;
+			uvs = new float[regionCount][length];
+			for (int i = 0; i < regionCount; i++)
+				arraycopy(other.uvs[i], 0, uvs[i], 0, length);
+		}
+		if (other.offsets != null) {
+			offsets = new float[regionCount][8];
+			for (int i = 0; i < regionCount; i++)
+				arraycopy(other.offsets[i], 0, offsets[i], 0, 8);
 		}
 	}
 
-	public String getPath (String basePath, int index) {
-		var buffer = new StringBuilder(basePath.length() + digits);
-		buffer.append(basePath);
-		String frame = Integer.toString(start + index);
-		for (int i = digits - frame.length(); i > 0; i--)
-			buffer.append('0');
-		buffer.append(frame);
-		return buffer.toString();
+	/** Computes UVs and offsets for the specified attachment. Must be called if the regions or attachment properties are
+	 * changed. */
+	public void update (HasSequence attachment) {
+		int regionCount = regions.length;
+		if (attachment instanceof RegionAttachment region) {
+			uvs = new float[regionCount][8];
+			offsets = new float[regionCount][8];
+			for (int i = 0; i < regionCount; i++) {
+				RegionAttachment.computeUVs(regions[i], region.x, region.y, region.scaleX, region.scaleY, region.rotation,
+					region.width, region.height, offsets[i], uvs[i]);
+			}
+		} else if (attachment instanceof MeshAttachment mesh) {
+			float[] regionUVs = mesh.regionUVs;
+			uvs = new float[regionCount][regionUVs.length];
+			offsets = null;
+			for (int i = 0; i < regionCount; i++)
+				MeshAttachment.computeUVs(regions[i], regionUVs, uvs[i]);
+		}
+	}
+
+	public TextureRegion[] getRegions () {
+		return regions;
+	}
+
+	public int resolveIndex (SlotPose pose) {
+		int index = pose.getSequenceIndex();
+		if (index == -1) index = setupIndex;
+		if (index >= regions.length) index = regions.length - 1;
+		return index;
+	}
+
+	public TextureRegion getRegion (int index) {
+		return regions[index];
+	}
+
+	public float[] getUVs (int index) {
+		return uvs[index];
+	}
+
+	/** Returns vertex offsets from the center of a {@link RegionAttachment}. Invalid to call for a {@link MeshAttachment}. */
+	public float[] getOffsets (int index) {
+		return offsets[index];
 	}
 
 	public int getStart () {
@@ -102,8 +144,19 @@ public class Sequence {
 		this.setupIndex = index;
 	}
 
-	public TextureRegion[] getRegions () {
-		return regions;
+	public boolean hasPathSuffix () {
+		return pathSuffix;
+	}
+
+	public String getPath (String basePath, int index) {
+		if (!pathSuffix) return basePath;
+		var buffer = new StringBuilder(basePath.length() + digits);
+		buffer.append(basePath);
+		String frame = Integer.toString(start + index);
+		for (int i = digits - frame.length(); i > 0; i--)
+			buffer.append('0');
+		buffer.append(frame);
+		return buffer.toString();
 	}
 
 	/** Returns a unique ID for this attachment. */

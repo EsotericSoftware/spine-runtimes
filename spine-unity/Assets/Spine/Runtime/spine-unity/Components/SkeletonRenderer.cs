@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -47,7 +47,9 @@
 #define REVERT_HAS_OVERLOADS
 #endif
 
+#if !SPINE_DISABLE_THREADING
 #define USE_THREADED_SKELETON_UPDATE
+#endif
 
 #if !SPINE_AUTO_UPGRADE_COMPONENTS_OFF
 #define AUTO_UPGRADE_TO_43_COMPONENTS
@@ -119,7 +121,7 @@ namespace Spine.Unity {
 
 #if BUILT_IN_SPRITE_MASK_COMPONENT
 		/// <seealso cref="MaskInteraction"/>
-		protected SpriteMaskInteraction maskInteraction = SpriteMaskInteraction.None;
+		[SerializeField] protected SpriteMaskInteraction maskInteraction = SpriteMaskInteraction.None;
 
 		/// <summary>Cached reference to the already setup material override set at the respective
 		/// SkeletonDataAsset.atlasAssets array entry.</summary>
@@ -532,8 +534,7 @@ namespace Spine.Unity {
 			materialsNeedUpdate = false;
 		}
 
-		protected virtual void ConfigureMaterials (ExposedList<SubmeshInstruction> instructions) {
-			Material[] sharedMaterials = rendererBuffers.sharedMaterials;
+		public virtual void ConfigureMaterials (Material[] sharedMaterials, ExposedList<SubmeshInstruction> instructions) {
 			if (customMaterialOverride.Count > 0) {
 				for (int i = 0, count = sharedMaterials.Length; i < count; ++i) {
 					Material material = sharedMaterials[i];
@@ -566,6 +567,10 @@ namespace Spine.Unity {
 				}
 			}
 #endif
+		}
+
+		protected virtual void ConfigureMaterials (ExposedList<SubmeshInstruction> instructions) {
+			ConfigureMaterials(rendererBuffers.sharedMaterials, instructions);
 		}
 
 #if BUILT_IN_SPRITE_MASK_COMPONENT

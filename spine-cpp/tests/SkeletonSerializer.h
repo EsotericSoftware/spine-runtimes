@@ -2552,11 +2552,13 @@ namespace spine {
 			_json.writeName("type");
 			_json.writeValue("MeshAttachment");
 
+			Sequence &sequence = obj->getSequence();
+			int setupIndex = sequence.getSetupIndex();
 			_json.writeName("region");
-			if (obj->getRegion() == nullptr) {
+			if (sequence.getRegion(setupIndex) == nullptr) {
 				_json.writeNull();
 			} else {
-				writeTextureRegion(obj->getRegion());
+				writeTextureRegion(sequence.getRegion(setupIndex));
 			}
 
 			_json.writeName("triangles");
@@ -2575,8 +2577,8 @@ namespace spine {
 
 			_json.writeName("uVs");
 			_json.writeArrayStart();
-			for (size_t i = 0; i < obj->getUVs().size(); i++) {
-				_json.writeValue(obj->getUVs()[i]);
+			for (size_t i = 0; i < sequence.getUVs(setupIndex).size(); i++) {
+				_json.writeValue(sequence.getUVs(setupIndex)[i]);
 			}
 			_json.writeArrayEnd();
 
@@ -2603,10 +2605,10 @@ namespace spine {
 			_json.writeValue(obj->getHeight());
 
 			_json.writeName("sequence");
-			if (obj->getSequence() == nullptr) {
+			if (!obj->getSequence().hasPathSuffix()) {
 				_json.writeNull();
 			} else {
-				writeSequence(obj->getSequence());
+				writeSequence(&obj->getSequence());
 			}
 
 			_json.writeName("parentMesh");
@@ -3075,24 +3077,26 @@ namespace spine {
 			_json.writeName("type");
 			_json.writeValue("RegionAttachment");
 
+			Sequence &sequence = obj->getSequence();
+			int setupIndex = sequence.getSetupIndex();
 			_json.writeName("region");
-			if (obj->getRegion() == nullptr) {
+			if (sequence.getRegion(setupIndex) == nullptr) {
 				_json.writeNull();
 			} else {
-				writeTextureRegion(obj->getRegion());
+				writeTextureRegion(sequence.getRegion(setupIndex));
 			}
 
 			_json.writeName("offset");
 			_json.writeArrayStart();
-			for (size_t i = 0; i < obj->getOffset().size(); i++) {
-				_json.writeValue(obj->getOffset()[i]);
+			for (size_t i = 0; i < sequence.getOffsets(setupIndex).size(); i++) {
+				_json.writeValue(sequence.getOffsets(setupIndex)[i]);
 			}
 			_json.writeArrayEnd();
 
 			_json.writeName("uVs");
 			_json.writeArrayStart();
-			for (size_t i = 0; i < obj->getUVs().size(); i++) {
-				_json.writeValue(obj->getUVs()[i]);
+			for (size_t i = 0; i < sequence.getUVs(setupIndex).size(); i++) {
+				_json.writeValue(sequence.getUVs(setupIndex)[i]);
 			}
 			_json.writeArrayEnd();
 
@@ -3124,10 +3128,10 @@ namespace spine {
 			_json.writeValue(obj->getPath());
 
 			_json.writeName("sequence");
-			if (obj->getSequence() == nullptr) {
+			if (!obj->getSequence().hasPathSuffix()) {
 				_json.writeNull();
 			} else {
-				writeSequence(obj->getSequence());
+				writeSequence(&obj->getSequence());
 			}
 
 			_json.writeName("name");

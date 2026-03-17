@@ -51,40 +51,27 @@ export class AtlasAttachmentLoader implements AttachmentLoader {
 		this.allowMissingRegions = allowMissingRegions;
 	}
 
-	loadSequence (name: string, basePath: string, sequence: Sequence) {
+	protected findRegions (name: string, basePath: string, sequence: Sequence) {
 		const regions = sequence.regions;
-		for (let i = 0, n = regions.length; i < n; i++) {
-			const path = sequence.getPath(basePath, i);
-			regions[i] = this.atlas.findRegion(path);
-			if (regions[i] == null && !this.allowMissingRegions)
-				throw new Error(`Region not found in atlas: ${path} (sequence: ${name})`);
-		}
+		for (let i = 0, n = regions.length; i < n; i++)
+			regions[i] = this.findRegion(name, sequence.getPath(basePath, i));
+	}
+
+	protected findRegion (name: string, path: string) {
+		const region = this.atlas.findRegion(path);
+		if (!region && !this.allowMissingRegions)
+			throw new Error(`Region not found in atlas: ${path} (attachment: ${name})`);
+		return region;
 	}
 
 	newRegionAttachment (skin: Skin, name: string, path: string, sequence: Sequence): RegionAttachment {
-		const attachment = new RegionAttachment(name, path);
-		if (sequence != null) {
-			this.loadSequence(name, path, sequence);
-		} else {
-			const region = this.atlas.findRegion(path);
-			if (region == null && !this.allowMissingRegions)
-				throw new Error(`Region not found in atlas: ${path} (region attachment: ${name})`);
-			attachment.region = region;
-		}
-		return attachment;
+		this.findRegions(name, path, sequence);
+		return new RegionAttachment(name, sequence);
 	}
 
 	newMeshAttachment (skin: Skin, name: string, path: string, sequence: Sequence): MeshAttachment {
-		const attachment = new MeshAttachment(name, path);
-		if (sequence != null) {
-			this.loadSequence(name, path, sequence);
-		} else {
-			const region = this.atlas.findRegion(path);
-			if (region == null && !this.allowMissingRegions)
-				throw new Error(`Region not found in atlas: ${path} (mesh attachment: ${name})`);
-			attachment.region = region;
-		}
-		return attachment;
+		this.findRegions(name, path, sequence);
+		return new MeshAttachment(name, sequence);
 	}
 
 	newBoundingBoxAttachment (skin: Skin, name: string): BoundingBoxAttachment {

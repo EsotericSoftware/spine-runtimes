@@ -71,6 +71,7 @@
 #include "../src/generated/curve_timeline.h"
 #include "../src/generated/curve_timeline1.h"
 #include "../src/generated/deform_timeline.h"
+#include "../src/generated/draw_order_folder_timeline.h"
 #include "../src/generated/draw_order_timeline.h"
 #include "../src/generated/event.h"
 #include "../src/generated/event_data.h"

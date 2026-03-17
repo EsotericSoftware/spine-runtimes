@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -83,7 +83,7 @@ namespace Spine {
 			bool tangents = data.rotateMode == RotateMode.Tangent, scale = data.rotateMode == RotateMode.ChainScale;
 			int boneCount = this.bones.Count, spacesCount = tangents ? boneCount : boneCount + 1;
 			BonePose[] bonesItems = this.bones.Items;
-			float[] spaces = this.spaces.Resize(spacesCount).Items, lengths = scale ? this.lengths.Resize(boneCount).Items : null;
+			float[] spaces = this.spaces.EnsureSize(spacesCount).Items, lengths = scale ? this.lengths.EnsureSize(boneCount).Items : null;
 			float spacing = p.spacing;
 			switch (data.spacingMode) {
 			case SpacingMode.Percent:
@@ -200,7 +200,7 @@ namespace Spine {
 		float[] ComputeWorldPositions (Skeleton skeleton, PathAttachment path, int spacesCount, bool tangents) {
 			Slot slot = this.slot;
 			float position = applied.position;
-			float[] spaces = this.spaces.Items, output = this.positions.Resize(spacesCount * 3 + 2).Items, world;
+			float[] spaces = this.spaces.Items, output = this.positions.EnsureSize(spacesCount * 3 + 2).Items, world;
 			bool closed = path.Closed;
 			int verticesLength = path.WorldVerticesLength, curveCount = verticesLength / 6, prevCurve = NONE;
 
@@ -224,7 +224,7 @@ namespace Spine {
 					break;
 				}
 
-				world = this.world.Resize(8).Items;
+				world = this.world.EnsureSize(8).Items;
 				for (int i = 0, o = 0, curve = 0; i < spacesCount; i++, o += 3) {
 					float space = spaces[i] * multiplier;
 					position += space;
@@ -279,7 +279,7 @@ namespace Spine {
 			// World vertices.
 			if (closed) {
 				verticesLength += 2;
-				world = this.world.Resize(verticesLength).Items;
+				world = this.world.EnsureSize(verticesLength).Items;
 				path.ComputeWorldVertices(skeleton, slot, 2, verticesLength - 4, world, 0, 2);
 				path.ComputeWorldVertices(skeleton, slot, 0, 2, world, verticesLength - 4, 2);
 				world[verticesLength - 2] = world[0];
@@ -287,12 +287,12 @@ namespace Spine {
 			} else {
 				curveCount--;
 				verticesLength -= 4;
-				world = this.world.Resize(verticesLength).Items;
+				world = this.world.EnsureSize(verticesLength).Items;
 				path.ComputeWorldVertices(skeleton, slot, 2, verticesLength, world, 0, 2);
 			}
 
 			// Curve lengths.
-			float[] curves = this.curves.Resize(curveCount).Items;
+			float[] curves = this.curves.EnsureSize(curveCount).Items;
 			pathLength = 0;
 			float x1 = world[0], y1 = world[1], cx1 = 0, cy1 = 0, cx2 = 0, cy2 = 0, x2 = 0, y2 = 0;
 			float tmpx, tmpy, dddfx, dddfy, ddfx, ddfy, dfx, dfy;

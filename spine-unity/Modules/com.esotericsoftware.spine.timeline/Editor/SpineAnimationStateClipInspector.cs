@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -97,14 +97,12 @@ namespace Spine.Unity.Editor {
 		}
 
 		protected TimelineClip FindTimelineClip (SpineAnimationStateClip targetClip) {
-			string[] guids = AssetDatabase.FindAssets("t:TimelineAsset");
-			foreach (string guid in guids) {
-				TimelineAsset timeline = (TimelineAsset)AssetDatabase.LoadAssetAtPath(AssetDatabase.GUIDToAssetPath(guid), typeof(TimelineAsset));
-				foreach (TrackAsset track in timeline.GetOutputTracks()) {
-					foreach (TimelineClip clip in track.GetClips()) {
-						if (clip.asset.GetType() == typeof(SpineAnimationStateClip) && object.ReferenceEquals(clip.asset, targetClip)) {
-							return clip;
-						}
+			string assetPath = AssetDatabase.GetAssetPath(targetClip);
+			TimelineAsset timeline = AssetDatabase.LoadAssetAtPath<TimelineAsset>(assetPath);
+			foreach (TrackAsset track in timeline.GetOutputTracks()) {
+				foreach (TimelineClip clip in track.GetClips()) {
+					if (clip.asset.GetType() == typeof(SpineAnimationStateClip) && object.ReferenceEquals(clip.asset, targetClip)) {
+						return clip;
 					}
 				}
 			}

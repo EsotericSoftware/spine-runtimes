@@ -32,14 +32,13 @@ package com.esotericsoftware.spine;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.DataInput;
-import com.badlogic.gdx.utils.FloatArray;
-import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.SerializationException;
 
@@ -49,6 +48,7 @@ import com.esotericsoftware.spine.Animation.BoneTimeline2;
 import com.esotericsoftware.spine.Animation.CurveTimeline;
 import com.esotericsoftware.spine.Animation.CurveTimeline1;
 import com.esotericsoftware.spine.Animation.DeformTimeline;
+import com.esotericsoftware.spine.Animation.DrawOrderFolderTimeline;
 import com.esotericsoftware.spine.Animation.DrawOrderTimeline;
 import com.esotericsoftware.spine.Animation.EventTimeline;
 import com.esotericsoftware.spine.Animation.IkConstraintTimeline;
@@ -371,9 +371,9 @@ public class SkeletonBinary extends SkeletonLoader {
 					data.slot = slots[input.readInt(true)];
 					int flags = input.read();
 					data.skinRequired = (flags & 1) != 0;
-					data.positionMode = PositionMode.values[(flags >> 1) & 2];
-					data.spacingMode = SpacingMode.values[(flags >> 2) & 3];
-					data.rotateMode = RotateMode.values[(flags >> 4) & 3];
+					data.positionMode = PositionMode.values[(flags >> 1) & 0b1];
+					data.spacingMode = SpacingMode.values[(flags >> 2) & 0b11];
+					data.rotateMode = RotateMode.values[(flags >> 4) & 0b11];
 					if ((flags & 128) != 0) data.offsetRotation = input.readFloat();
 					PathConstraintPose setup = data.setup;
 					setup.position = input.readFloat();
@@ -477,7 +477,7 @@ public class SkeletonBinary extends SkeletonLoader {
 				if (parent == null) throw new SerializationException("Parent mesh not found: " + linkedMesh.parent);
 				linkedMesh.mesh.setTimelineAttachment(linkedMesh.inheritTimelines ? (VertexAttachment)parent : linkedMesh.mesh);
 				linkedMesh.mesh.setParentMesh((MeshAttachment)parent);
-				if (linkedMesh.mesh.getRegion() == null) linkedMesh.mesh.updateRegion();
+				linkedMesh.mesh.updateSequence();
 			}
 			linkedMeshes.clear();
 
@@ -563,7 +563,7 @@ public class SkeletonBinary extends SkeletonLoader {
 		case region -> {
 			String path = (flags & 16) != 0 ? input.readStringRef() : null;
 			int color = (flags & 32) != 0 ? input.readInt() : 0xffffffff;
-			Sequence sequence = (flags & 64) != 0 ? readSequence(input) : null;
+			Sequence sequence = readSequence(input, (flags & 64) != 0);
 			float rotation = (flags & 128) != 0 ? input.readFloat() : 0;
 			float x = input.readFloat();
 			float y = input.readFloat();
@@ -584,8 +584,7 @@ public class SkeletonBinary extends SkeletonLoader {
 			region.setWidth(width * scale);
 			region.setHeight(height * scale);
 			Color.rgba8888ToColor(region.getColor(), color);
-			region.setSequence(sequence);
-			if (region.getRegion() != null) region.updateRegion();
+			region.updateSequence();
 			yield region;
 		}
 		case boundingbox -> {
@@ -603,7 +602,7 @@ public class SkeletonBinary extends SkeletonLoader {
 		case mesh -> {
 			String path = (flags & 16) != 0 ? input.readStringRef() : name;
 			int color = (flags & 32) != 0 ? input.readInt() : 0xffffffff;
-			Sequence sequence = (flags & 64) != 0 ? readSequence(input) : null;
+			Sequence sequence = readSequence(input, (flags & 64) != 0);
 			int hullLength = input.readInt(true);
 			Vertices vertices = readVertices(input, (flags & 128) != 0);
 			float[] uvs = readFloatArray(input, vertices.length, 1);
@@ -621,25 +620,24 @@ public class SkeletonBinary extends SkeletonLoader {
 			if (mesh == null) yield null;
 			mesh.setPath(path);
 			Color.rgba8888ToColor(mesh.getColor(), color);
+			mesh.setHullLength(hullLength << 1);
 			mesh.setBones(vertices.bones);
 			mesh.setVertices(vertices.vertices);
 			mesh.setWorldVerticesLength(vertices.length);
-			mesh.setTriangles(triangles);
 			mesh.setRegionUVs(uvs);
-			if (mesh.getRegion() != null) mesh.updateRegion();
-			mesh.setHullLength(hullLength << 1);
-			mesh.setSequence(sequence);
+			mesh.setTriangles(triangles);
 			if (nonessential) {
 				mesh.setEdges(edges);
 				mesh.setWidth(width * scale);
 				mesh.setHeight(height * scale);
 			}
+			mesh.updateSequence();
 			yield mesh;
 		}
 		case linkedmesh -> {
 			String path = (flags & 16) != 0 ? input.readStringRef() : name;
 			int color = (flags & 32) != 0 ? input.readInt() : 0xffffffff;
-			Sequence sequence = (flags & 64) != 0 ? readSequence(input) : null;
+			Sequence sequence = readSequence(input, (flags & 64) != 0);
 			boolean inheritTimelines = (flags & 128) != 0;
 			int skinIndex = input.readInt(true);
 			String parent = input.readStringRef();
@@ -653,7 +651,6 @@ public class SkeletonBinary extends SkeletonLoader {
 			if (mesh == null) yield null;
 			mesh.setPath(path);
 			Color.rgba8888ToColor(mesh.getColor(), color);
-			mesh.setSequence(sequence);
 			if (nonessential) {
 				mesh.setWidth(width * scale);
 				mesh.setHeight(height * scale);
@@ -713,8 +710,9 @@ public class SkeletonBinary extends SkeletonLoader {
 		};
 	}
 
-	private Sequence readSequence (SkeletonInput input) throws IOException {
-		var sequence = new Sequence(input.readInt(true));
+	private Sequence readSequence (SkeletonInput input, boolean hasPathSuffix) throws IOException {
+		if (!hasPathSuffix) return new Sequence(1, false);
+		var sequence = new Sequence(input.readInt(true), true);
 		sequence.setStart(input.readInt(true));
 		sequence.setDigits(input.readInt(true));
 		sequence.setSetupIndex(input.readInt(true));
@@ -730,20 +728,21 @@ public class SkeletonBinary extends SkeletonLoader {
 			vertices.vertices = readFloatArray(input, vertices.length, scale);
 			return vertices;
 		}
-		var weights = new FloatArray(vertices.length * 3 * 3);
-		var bonesArray = new IntArray(vertices.length * 3);
-		for (int i = 0; i < vertexCount; i++) {
+		int n = input.readInt(true);
+		var bones = new int[n];
+		var weights = new float[(n - vertexCount) * 3];
+		for (int b = 0, w = 0; b < n;) {
 			int boneCount = input.readInt(true);
-			bonesArray.add(boneCount);
-			for (int ii = 0; ii < boneCount; ii++) {
-				bonesArray.add(input.readInt(true));
-				weights.add(input.readFloat() * scale);
-				weights.add(input.readFloat() * scale);
-				weights.add(input.readFloat());
+			bones[b++] = boneCount;
+			for (int ii = 0; ii < boneCount; ii++, w += 3) {
+				bones[b++] = input.readInt(true);
+				weights[w] = input.readFloat() * scale;
+				weights[w + 1] = input.readFloat() * scale;
+				weights[w + 2] = input.readFloat();
 			}
 		}
-		vertices.vertices = weights.toArray();
-		vertices.bones = bonesArray.toArray();
+		vertices.vertices = weights;
+		vertices.bones = bones;
 		return vertices;
 	}
 
@@ -1163,34 +1162,26 @@ public class SkeletonBinary extends SkeletonLoader {
 		}
 
 		// Draw order timeline.
+		int slotCount = skeletonData.slots.size;
 		int drawOrderCount = input.readInt(true);
 		if (drawOrderCount > 0) {
 			var timeline = new DrawOrderTimeline(drawOrderCount);
-			int slotCount = skeletonData.slots.size;
-			for (int i = 0; i < drawOrderCount; i++) {
-				float time = input.readFloat();
-				int offsetCount = input.readInt(true);
-				var drawOrder = new int[slotCount];
-				for (int ii = slotCount - 1; ii >= 0; ii--)
-					drawOrder[ii] = -1;
-				var unchanged = new int[slotCount - offsetCount];
-				int originalIndex = 0, unchangedIndex = 0;
-				for (int ii = 0; ii < offsetCount; ii++) {
-					int slotIndex = input.readInt(true);
-					// Collect unchanged items.
-					while (originalIndex != slotIndex)
-						unchanged[unchangedIndex++] = originalIndex++;
-					// Set changed items.
-					drawOrder[originalIndex + input.readInt(true)] = originalIndex++;
-				}
-				// Collect remaining unchanged items.
-				while (originalIndex < slotCount)
-					unchanged[unchangedIndex++] = originalIndex++;
-				// Fill in unchanged items.
-				for (int ii = slotCount - 1; ii >= 0; ii--)
-					if (drawOrder[ii] == -1) drawOrder[ii] = unchanged[--unchangedIndex];
-				timeline.setFrame(i, time, drawOrder);
-			}
+			for (int i = 0; i < drawOrderCount; i++)
+				timeline.setFrame(i, input.readFloat(), readDrawOrder(input, slotCount));
+			timelines.add(timeline);
+		}
+
+		// Draw order folder timelines.
+		int folderCount = input.readInt(true);
+		for (int i = 0; i < folderCount; i++) {
+			int folderSlotCount = input.readInt(true);
+			var folderSlots = new int[folderSlotCount];
+			for (int ii = 0; ii < folderSlotCount; ii++)
+				folderSlots[ii] = input.readInt(true);
+			int keyCount = input.readInt(true);
+			var timeline = new DrawOrderFolderTimeline(keyCount, folderSlots, slotCount);
+			for (int ii = 0; ii < keyCount; ii++)
+				timeline.setFrame(ii, input.readFloat(), readDrawOrder(input, folderSlotCount));
 			timelines.add(timeline);
 		}
 
@@ -1258,6 +1249,30 @@ public class SkeletonBinary extends SkeletonLoader {
 			value2 = nvalue2;
 		}
 		timelines.add(timeline);
+	}
+
+	private @Null int[] readDrawOrder (SkeletonInput input, int slotCount) throws IOException {
+		int changeCount = input.readInt(true);
+		if (changeCount == 0) return null;
+		var drawOrder = new int[slotCount];
+		Arrays.fill(drawOrder, -1);
+		var unchanged = new int[slotCount - changeCount];
+		int originalIndex = 0, unchangedIndex = 0;
+		for (int i = 0; i < changeCount; i++) {
+			int slotIndex = input.readInt(true);
+			// Collect unchanged items.
+			while (originalIndex != slotIndex)
+				unchanged[unchangedIndex++] = originalIndex++;
+			// Set changed items.
+			drawOrder[originalIndex + input.readInt(true)] = originalIndex++;
+		}
+		// Collect remaining unchanged items.
+		while (originalIndex < slotCount)
+			unchanged[unchangedIndex++] = originalIndex++;
+		// Fill in unchanged items.
+		for (int i = slotCount - 1; i >= 0; i--)
+			if (drawOrder[i] == -1) drawOrder[i] = unchanged[--unchangedIndex];
+		return drawOrder;
 	}
 
 	void setBezier (SkeletonInput input, CurveTimeline timeline, int bezier, int frame, int value, float time1, float time2,

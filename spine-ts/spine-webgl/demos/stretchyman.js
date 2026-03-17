@@ -136,8 +136,8 @@ var stretchymanDemo = function (canvas, bgColor) {
 		gl.clear(gl.COLOR_BUFFER_BIT);
 
 		renderer.begin();
-		renderer.drawSkeleton(skeleton, true);
-		renderer.drawSkeletonDebug(skeleton, false, ["root"]);
+		renderer.drawSkeleton(skeleton);
+		renderer.drawSkeletonDebug(skeleton, ["root"]);
 		gl.lineWidth(2);
 		for (var i = 0; i < controlBones.length; i++) {
 			var bone = skeleton.findBone(controlBones[i]);

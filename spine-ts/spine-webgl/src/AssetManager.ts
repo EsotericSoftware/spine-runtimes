@@ -33,8 +33,10 @@ import type { ManagedWebGLRenderingContext } from "./WebGL.js";
 
 export class AssetManager extends AssetManagerBase {
 	constructor (context: ManagedWebGLRenderingContext | WebGLRenderingContext, pathPrefix: string = "", downloader: Downloader = new Downloader()) {
-		super((image: HTMLImageElement | ImageBitmap) => {
-			return new GLTexture(context, image);
-		}, pathPrefix, downloader);
+		super(
+			(image: HTMLImageElement | ImageBitmap, pma = false) => new GLTexture(context, image, pma),
+			pathPrefix,
+			downloader,
+		);
 	}
 }

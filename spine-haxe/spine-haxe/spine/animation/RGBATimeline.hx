@@ -97,12 +97,15 @@ class RGBATimeline extends SlotCurveTimeline {
 				a = getBezierValue(time, i, A, curveType + CurveTimeline.BEZIER_SIZE * 3 - CurveTimeline.BEZIER);
 		}
 
-		if (alpha == 1) {
+		if (alpha == 1)
 			color.set(r, g, b, a);
-		} else {
-			if (blend == MixBlend.setup)
-				color.setFromColor(slot.data.setup.color);
-			color.add((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha);
+		else {
+			if (blend == MixBlend.setup) {
+				var setup = slot.data.setup.color;
+				color.set(setup.r + (r - setup.r) * alpha, setup.g + (g - setup.g) * alpha, setup.b + (b - setup.b) * alpha,
+					setup.a + (a - setup.a) * alpha);
+			} else
+				color.add((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha);
 		}
 	}
 }

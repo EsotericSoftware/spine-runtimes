@@ -58,10 +58,24 @@ struct DressUp: View {
                 SpineView(
                     from: .drawable(drawable),
                     controller: model.controller,
-                    boundsProvider: SkinAndAnimationBounds(skins: ["full-skins/girl"])
+                    boundsProvider: model.boundsProvider
                 )
             } else {
                 Spacer()
+            }
+        }
+        .onDisappear {
+            // SwiftUI may retain the @StateObject model after the view disappears.
+            // Explicit disposal is only needed here so leak reporting runs after native teardown.
+            model.dispose()
+
+            // This example also passes the drawable directly to SpineView via .drawable(...).
+            // SwiftUI can keep the disappearing view alive for a bit longer, so delay leak
+            // reporting until that view and its source have been released.
+            DispatchQueue.main.async {
+                DispatchQueue.main.async {
+                    reportLeaks()
+                }
             }
         }
         .navigationTitle("Dress Up")
@@ -75,7 +89,23 @@ struct DressUp: View {
 
 final class DressUpModel: ObservableObject {
 
+    // Not strictly necessary for normal usage. SwiftUI will eventually release the
+    // model and controller. We dispose explicitly here so leak reporting runs after
+    // native teardown when navigating back from the example.
+    func dispose() {
+        disposed = true
+        loadTask?.cancel()
+        loadTask = nil
+        controller.dispose()
+        drawable?.dispose()
+        drawable = nil
+        customSkin?.dispose()
+        customSkin = nil
+    }
+
+
     let thumbnailSize = CGSize(width: 200, height: 200)
+    let boundsProvider: BoundsProvider = SkinAndAnimationBounds(skins: ["full-skins/girl"])
 
     @Published
     var controller: SpineController
@@ -90,6 +120,8 @@ final class DressUpModel: ObservableObject {
     var selectedSkins = [String: Bool]()
 
     private var customSkin: Skin?
+    private var loadTask: Task<Void, Never>?
+    private var disposed = false
 
     init() {
         controller = SpineController(
@@ -98,36 +130,56 @@ final class DressUpModel: ObservableObject {
             },
             disposeDrawableOnDeInit: false
         )
-        Task.detached(priority: .high) {
-            let drawable = try await SkeletonDrawableWrapper.fromBundle(
-                atlasFileName: "mix-and-match-pma.atlas",
-                skeletonFileName: "mix-and-match-pro.skel"
-            )
-            try await MainActor.run {
-                let skins = drawable.skeletonData.skins
-                for i in 0..<skins.count {
-                    guard let skin = skins[i] else { continue }
-                    if skin.name == "default" { continue }
-                    let skeleton = drawable.skeleton
-                    skeleton.setSkin2(skin)
-                    skeleton.setupPose()
-                    skeleton.update(0)
-                    skeleton.updateWorldTransform(SpineSwift.Physics.update)
-                    let skinName = skin.name
-                    self.skinImages[skinName] = try drawable.renderToImage(
-                        size: self.thumbnailSize,
-                        backgroundColor: .white,
-                        scaleFactor: UIScreen.main.scale
-                    )
-                    self.selectedSkins[skinName] = false
+        loadTask = Task.detached(priority: .high) { [weak self] in
+            guard let self else { return }
+            do {
+                let drawable = try await SkeletonDrawableWrapper.fromBundle(
+                    atlasFileName: "mix-and-match-pma.atlas",
+                    skeletonFileName: "mix-and-match-pro.skel"
+                )
+                if Task.isCancelled {
+                    drawable.dispose()
+                    return
                 }
-                self.toggleSkin(skinName: "full-skins/girl", drawable: drawable)
-                self.drawable = drawable
+                try await MainActor.run {
+                    if self.disposed || Task.isCancelled {
+                        drawable.dispose()
+                        return
+                    }
+                    let skins = drawable.skeletonData.skins
+                    for i in 0..<skins.count {
+                        if self.disposed || Task.isCancelled {
+                            drawable.dispose()
+                            return
+                        }
+                        guard let skin = skins[i] else { continue }
+                        if skin.name == "default" { continue }
+                        let skeleton = drawable.skeleton
+                        skeleton.setSkin2(skin)
+                        skeleton.setupPose()
+                        skeleton.update(0)
+                        skeleton.updateWorldTransform(SpineSwift.Physics.update)
+                        let skinName = skin.name
+                        self.skinImages[skinName] = try drawable.renderToImage(
+                            size: self.thumbnailSize,
+                            boundsProvider: self.boundsProvider,
+                            backgroundColor: .white,
+                            scaleFactor: UIScreen.main.scale
+                        )
+                        self.selectedSkins[skinName] = false
+                    }
+                    self.toggleSkin(skinName: "full-skins/girl", drawable: drawable)
+                    self.drawable = drawable
+                    self.loadTask = nil
+                }
+            } catch {
+                print(error)
             }
         }
     }
 
     deinit {
+        loadTask?.cancel()
         drawable?.dispose()
         customSkin?.dispose()
     }

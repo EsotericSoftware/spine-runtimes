@@ -49,7 +49,6 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 import com.esotericsoftware.spine.Animation.MixBlend;
@@ -88,12 +87,9 @@ public class Box2DExample extends ApplicationAdapter {
 		// This loader creates Box2dAttachments instead of RegionAttachments for an easy way to keep track of the Box2D body for
 		// each attachment.
 		AtlasAttachmentLoader atlasLoader = new AtlasAttachmentLoader(atlas) {
-			public RegionAttachment newRegionAttachment (Skin skin, String name, String path, @Null Sequence sequence) {
-				Box2dAttachment attachment = new Box2dAttachment(name);
-				AtlasRegion region = atlas.findRegion(attachment.getName());
-				if (region == null) throw new RuntimeException("Region not found in atlas: " + attachment);
-				attachment.setRegion(region);
-				return attachment;
+			public RegionAttachment newRegionAttachment (Skin skin, String name, String path, Sequence sequence) {
+				findRegions(name, path, sequence);
+				return new Box2dAttachment(name, sequence);
 			}
 		};
 		SkeletonJson json = new SkeletonJson(atlasLoader);
@@ -231,8 +227,8 @@ public class Box2DExample extends ApplicationAdapter {
 	static class Box2dAttachment extends RegionAttachment {
 		Body body;
 
-		public Box2dAttachment (String name) {
-			super(name);
+		public Box2dAttachment (String name, Sequence sequence) {
+			super(name, sequence);
 		}
 	}
 

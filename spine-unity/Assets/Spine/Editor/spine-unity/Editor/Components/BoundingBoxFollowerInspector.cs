@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -29,6 +29,10 @@
 
 #if UNITY_2018_3 || UNITY_2019 || UNITY_2018_3_OR_NEWER
 #define NEW_PREFAB_SYSTEM
+#endif
+
+#if UNITY_2023_1_OR_NEWER
+#define USE_COLLIDER_COMPOSITE_OPERATION
 #endif
 
 using System.Collections.Generic;
@@ -136,7 +140,12 @@ namespace Spine.Unity.Editor {
 						foreach (PolygonCollider2D col in follower.colliderTable.Values) {
 							col.isTrigger = isTrigger.boolValue;
 							col.usedByEffector = usedByEffector.boolValue;
+#if USE_COLLIDER_COMPOSITE_OPERATION
+							col.compositeOperation = usedByComposite.boolValue ?
+								Collider2D.CompositeOperation.Merge : Collider2D.CompositeOperation.None;
+#else
 							col.usedByComposite = usedByComposite.boolValue;
+#endif
 						}
 				}
 			}
@@ -201,7 +210,7 @@ namespace Spine.Unity.Editor {
 			}
 		}
 
-		#region Menus
+#region Menus
 		[MenuItem("CONTEXT/SkeletonRenderer/Add BoundingBoxFollower GameObject")]
 		static void AddBoundingBoxFollowerChild (MenuCommand command) {
 			GameObject go = AddBoundingBoxFollowerChild((SkeletonRenderer)command.context);
@@ -214,7 +223,7 @@ namespace Spine.Unity.Editor {
 			foreach (GameObject go in objects)
 				Undo.RegisterCreatedObjectUndo(go, "Add BoundingBoxFollower");
 		}
-		#endregion
+#endregion
 
 		public static GameObject AddBoundingBoxFollowerChild (SkeletonRenderer skeletonRenderer,
 			BoundingBoxFollower original = null, string name = "BoundingBoxFollower",

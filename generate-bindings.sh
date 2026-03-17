@@ -1,7 +1,9 @@
 #!/bin/bash
 
+set -euo pipefail
+
 # Script to generate all Spine runtime bindings
-# This script regenerates bindings for C, Flutter, and cleans GLFW
+# This script regenerates bindings for C, Flutter, and iOS
 
 # Get the directory containing this script
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -18,14 +20,23 @@ log_title "Generating all Spine runtime bindings"
 
 # Generate C bindings and test compilation
 log_info "Generating C bindings"
-cd "$SCRIPT_DIR/spine-c" && ./build.sh codegen
+(
+	cd "$SCRIPT_DIR/spine-c"
+	./build.sh codegen
+)
 
 # Generate Flutter bindings
 log_info "Generating Dart bindings"
-cd "$SCRIPT_DIR/spine-flutter" && ./generate-bindings.sh
+(
+	cd "$SCRIPT_DIR/spine-flutter"
+	./generate-bindings.sh
+)
 
 # Generate iOS Swift bindings
 log_info "Generating Swift bindings for iOS"
-cd "$SCRIPT_DIR/spine-ios" && ./generate-bindings.sh
+(
+	cd "$SCRIPT_DIR/spine-ios"
+	./generate-bindings.sh
+)
 
 log_summary "All bindings generated successfully"

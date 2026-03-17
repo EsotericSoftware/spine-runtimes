@@ -78,6 +78,46 @@ target_link_libraries(spine-glfw-physics LINK_PUBLIC spine-glfw)
 target_link_libraries(spine-glfw-physics PRIVATE glbinding::glbinding)
 set_property(TARGET spine-glfw-physics PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/spine-glfw")
 
+# Physics example (C)
+add_executable(spine-glfw-physics-c example/physics-c.cpp)
+target_link_libraries(spine-glfw-physics-c PRIVATE glfw)
+target_link_libraries(spine-glfw-physics-c PRIVATE OpenGL::GL)
+target_link_libraries(spine-glfw-physics-c LINK_PUBLIC spine-glfw)
+target_link_libraries(spine-glfw-physics-c PRIVATE glbinding::glbinding)
+set_property(TARGET spine-glfw-physics-c PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/spine-glfw")
+
+# Dragon example (sequence attachments, binary)
+add_executable(spine-glfw-dragon example/dragon.cpp)
+target_link_libraries(spine-glfw-dragon PRIVATE glfw)
+target_link_libraries(spine-glfw-dragon PRIVATE OpenGL::GL)
+target_link_libraries(spine-glfw-dragon LINK_PUBLIC spine-glfw)
+target_link_libraries(spine-glfw-dragon PRIVATE glbinding::glbinding)
+set_property(TARGET spine-glfw-dragon PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/spine-glfw")
+
+# Dragon example (sequence attachments, binary, C)
+add_executable(spine-glfw-dragon-c example/dragon-c.cpp)
+target_link_libraries(spine-glfw-dragon-c PRIVATE glfw)
+target_link_libraries(spine-glfw-dragon-c PRIVATE OpenGL::GL)
+target_link_libraries(spine-glfw-dragon-c LINK_PUBLIC spine-glfw)
+target_link_libraries(spine-glfw-dragon-c PRIVATE glbinding::glbinding)
+set_property(TARGET spine-glfw-dragon-c PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/spine-glfw")
+
+# Dragon example (sequence attachments, json)
+add_executable(spine-glfw-dragon-json example/dragon-json.cpp)
+target_link_libraries(spine-glfw-dragon-json PRIVATE glfw)
+target_link_libraries(spine-glfw-dragon-json PRIVATE OpenGL::GL)
+target_link_libraries(spine-glfw-dragon-json LINK_PUBLIC spine-glfw)
+target_link_libraries(spine-glfw-dragon-json PRIVATE glbinding::glbinding)
+set_property(TARGET spine-glfw-dragon-json PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/spine-glfw")
+
+# Dragon example (sequence attachments, json, C)
+add_executable(spine-glfw-dragon-json-c example/dragon-json-c.cpp)
+target_link_libraries(spine-glfw-dragon-json-c PRIVATE glfw)
+target_link_libraries(spine-glfw-dragon-json-c PRIVATE OpenGL::GL)
+target_link_libraries(spine-glfw-dragon-json-c LINK_PUBLIC spine-glfw)
+target_link_libraries(spine-glfw-dragon-json-c PRIVATE glbinding::glbinding)
+set_property(TARGET spine-glfw-dragon-json-c PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/spine-glfw")
+
 # IK Following example
 add_executable(spine-glfw-ik-following example/ik-following.cpp)
 target_link_libraries(spine-glfw-ik-following PRIVATE glfw)
@@ -86,15 +126,37 @@ target_link_libraries(spine-glfw-ik-following LINK_PUBLIC spine-glfw)
 target_link_libraries(spine-glfw-ik-following PRIVATE glbinding::glbinding)
 set_property(TARGET spine-glfw-ik-following PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/spine-glfw")
 
-# copy data to build directory
-add_custom_command(TARGET spine-glfw-example PRE_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_CURRENT_LIST_DIR}/data $<TARGET_FILE_DIR:spine-glfw-example>/data)
+# IK Following example (C)
+add_executable(spine-glfw-ik-following-c example/ik-following-c.cpp)
+target_link_libraries(spine-glfw-ik-following-c PRIVATE glfw)
+target_link_libraries(spine-glfw-ik-following-c PRIVATE OpenGL::GL)
+target_link_libraries(spine-glfw-ik-following-c LINK_PUBLIC spine-glfw)
+target_link_libraries(spine-glfw-ik-following-c PRIVATE glbinding::glbinding)
+set_property(TARGET spine-glfw-ik-following-c PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/spine-glfw")
 
-add_custom_command(TARGET spine-glfw-physics PRE_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_CURRENT_LIST_DIR}/data $<TARGET_FILE_DIR:spine-glfw-physics>/data)
+# Mix-and-match binary loader repro example
+add_executable(spine-glfw-mix-and-match example/mix-and-match.cpp)
+target_link_libraries(spine-glfw-mix-and-match PRIVATE glfw)
+target_link_libraries(spine-glfw-mix-and-match PRIVATE OpenGL::GL)
+target_link_libraries(spine-glfw-mix-and-match LINK_PUBLIC spine-glfw)
+target_link_libraries(spine-glfw-mix-and-match PRIVATE glbinding::glbinding)
+set_property(TARGET spine-glfw-mix-and-match PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/spine-glfw")
 
-add_custom_command(TARGET spine-glfw-ik-following PRE_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_CURRENT_LIST_DIR}/data $<TARGET_FILE_DIR:spine-glfw-ik-following>/data)
+# Copy data to the build directory once. Multiple PRE_BUILD copy_directory commands
+# targeting the same destination can race under ninja.
+set(SPINE_GLFW_DATA_DIR ${CMAKE_CURRENT_BINARY_DIR}/data)
+add_custom_target(spine-glfw-data ALL
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${SPINE_GLFW_DATA_DIR}
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_LIST_DIR}/data ${SPINE_GLFW_DATA_DIR})
+
+add_dependencies(spine-glfw-example spine-glfw-data)
+add_dependencies(spine-glfw-example-c spine-glfw-data)
+add_dependencies(spine-glfw-dragon spine-glfw-data)
+add_dependencies(spine-glfw-dragon-c spine-glfw-data)
+add_dependencies(spine-glfw-dragon-json spine-glfw-data)
+add_dependencies(spine-glfw-dragon-json-c spine-glfw-data)
+add_dependencies(spine-glfw-physics spine-glfw-data)
+add_dependencies(spine-glfw-physics-c spine-glfw-data)
+add_dependencies(spine-glfw-ik-following spine-glfw-data)
+add_dependencies(spine-glfw-ik-following-c spine-glfw-data)
+add_dependencies(spine-glfw-mix-and-match spine-glfw-data)

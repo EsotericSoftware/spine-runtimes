@@ -101,6 +101,14 @@ void initialize_spine_godot_module(ModuleInitializationLevel level) {
 		GDREGISTER_CLASS(SpineEditorPlugin);
 		EditorPlugins::add_plugin_class(StringName("SpineEditorPlugin"));
 #endif
+		return;
+	}
+	if (level == MODULE_INITIALIZATION_LEVEL_CORE) {
+		GDREGISTER_CLASS(SpineAtlasResourceFormatLoader);
+		GDREGISTER_CLASS(SpineAtlasResourceFormatSaver);
+		GDREGISTER_CLASS(SpineSkeletonFileResourceFormatLoader);
+		GDREGISTER_CLASS(SpineSkeletonFileResourceFormatSaver);
+		return;
 	}
 	if (level != MODULE_INITIALIZATION_LEVEL_SCENE) return;
 #else
@@ -124,10 +132,12 @@ void register_spine_godot_types() {
 #endif
 	spine::Bone::setYDown(true);
 
+#ifndef SPINE_GODOT_EXTENSION
 	GDREGISTER_CLASS(SpineAtlasResourceFormatLoader);
 	GDREGISTER_CLASS(SpineAtlasResourceFormatSaver);
 	GDREGISTER_CLASS(SpineSkeletonFileResourceFormatLoader);
 	GDREGISTER_CLASS(SpineSkeletonFileResourceFormatSaver);
+#endif
 
 	GDREGISTER_CLASS(SpineObjectWrapper);
 	GDREGISTER_CLASS(SpineAtlasResource);
@@ -218,28 +228,39 @@ void register_spine_godot_types() {
 #endif
 }
 
-#if VERSION_MAJOR > 3
+#ifdef SPINE_GODOT_EXTENSION
 void uninitialize_spine_godot_module(ModuleInitializationLevel level) {
 	if (level == MODULE_INITIALIZATION_LEVEL_SCENE) {
 		SpineSprite::clear_statics();
 		return;
 	}
 	if (level != MODULE_INITIALIZATION_LEVEL_CORE) return;
-#else
-void unregister_spine_godot_types() {
-#endif
-#ifdef SPINE_GODOT_EXTENSION
+
 	ResourceLoader::get_singleton()->remove_resource_format_loader(atlas_loader);
 	ResourceSaver::get_singleton()->remove_resource_format_saver(atlas_saver);
 	ResourceLoader::get_singleton()->remove_resource_format_loader(skeleton_file_loader);
 	ResourceSaver::get_singleton()->remove_resource_format_saver(skeleton_file_saver);
-#else
+}
+#elif VERSION_MAJOR > 3
+void uninitialize_spine_godot_module(ModuleInitializationLevel level) {
+	if (level == MODULE_INITIALIZATION_LEVEL_SCENE) {
+		SpineSprite::clear_statics();
+		return;
+	}
+	if (level != MODULE_INITIALIZATION_LEVEL_CORE) return;
 	ResourceLoader::remove_resource_format_loader(atlas_loader);
 	ResourceSaver::remove_resource_format_saver(atlas_saver);
 	ResourceLoader::remove_resource_format_loader(skeleton_file_loader);
 	ResourceSaver::remove_resource_format_saver(skeleton_file_saver);
-#endif
 }
+#else
+void unregister_spine_godot_types() {
+	ResourceLoader::remove_resource_format_loader(atlas_loader);
+	ResourceSaver::remove_resource_format_saver(atlas_saver);
+	ResourceLoader::remove_resource_format_loader(skeleton_file_loader);
+	ResourceSaver::remove_resource_format_saver(skeleton_file_saver);
+}
+#endif
 
 
 #ifdef SPINE_GODOT_EXTENSION
@@ -248,7 +269,7 @@ extern "C" GDExtensionBool GDE_EXPORT spine_godot_library_init(GDExtensionInterf
 	GDExtensionBinding::InitObject init_obj(p_get_proc_address, p_library, r_initialization);
 	init_obj.register_initializer(initialize_spine_godot_module);
 	init_obj.register_terminator(uninitialize_spine_godot_module);
-	init_obj.set_minimum_library_initialization_level(MODULE_INITIALIZATION_LEVEL_SCENE);
+	init_obj.set_minimum_library_initialization_level(MODULE_INITIALIZATION_LEVEL_CORE);
 	return init_obj.init();
 }
 #endif

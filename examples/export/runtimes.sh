@@ -36,6 +36,12 @@ cp -f ../spineboy/export/*.json "$ROOT/spine-libgdx/spine-libgdx-tests/assets/sp
 cp -r ../spineboy/export/*.skel "$ROOT/spine-libgdx/spine-libgdx-tests/assets/spineboy/"
 cp -r ../spineboy/export/*-pma.* "$ROOT/spine-libgdx/spine-libgdx-tests/assets/spineboy/"
 
+rm -f "$ROOT/spine-libgdx/spine-libgdx-tests/assets/dragon/"*
+mkdir -p "$ROOT/spine-libgdx/spine-libgdx-tests/assets/dragon/"
+cp -f ../dragon/export/*.skel "$ROOT/spine-libgdx/spine-libgdx-tests/assets/dragon/"
+cp -f ../dragon/export/dragon-pma.atlas "$ROOT/spine-libgdx/spine-libgdx-tests/assets/dragon/"
+cp -f ../dragon/export/dragon-pma*.png "$ROOT/spine-libgdx/spine-libgdx-tests/assets/dragon/"
+
 rm -f "$ROOT/spine-libgdx/spine-libgdx-tests/assets/coin/"*
 cp -f ../coin/export/*.json "$ROOT/spine-libgdx/spine-libgdx-tests/assets/coin/"
 cp -f ../coin/export/*.skel "$ROOT/spine-libgdx/spine-libgdx-tests/assets/coin/"
@@ -241,6 +247,43 @@ cp -f ../celestial-circus/export/celestial-circus-pro.skel "$ROOT/spine-godot/ex
 cp -f ../celestial-circus/export/celestial-circus.atlas "$ROOT/spine-godot/example-v4-csharp/assets/celestial-circus/"
 cp -f ../celestial-circus/export/celestial-circus.png "$ROOT/spine-godot/example-v4-csharp/assets/celestial-circus/"
 
+rm -f "$ROOT"/spine-godot/example-v4-extension/assets/spineboy/*.atlas
+rm -f "$ROOT"/spine-godot/example-v4-extension/assets/spineboy/*.png
+rm -f "$ROOT"/spine-godot/example-v4-extension/assets/spineboy/*.spine-json
+rm -f "$ROOT"/spine-godot/example-v4-extension/assets/spineboy/*.skel
+rm -f "$ROOT"/spine-godot/example-v4-extension/assets/raptor/*.atlas
+rm -f "$ROOT"/spine-godot/example-v4-extension/assets/raptor/*.png
+rm -f "$ROOT"/spine-godot/example-v4-extension/assets/raptor/*.skel
+rm -f "$ROOT"/spine-godot/example-v4-extension/assets/mix-and-match/*.atlas
+rm -f "$ROOT"/spine-godot/example-v4-extension/assets/mix-and-match/*.png
+rm -f "$ROOT"/spine-godot/example-v4-extension/assets/mix-and-match/*.spine-json
+rm -f "$ROOT"/spine-godot/example-v4-extension/assets/mix-and-match/*.skel
+rm -f "$ROOT"/spine-godot/example-v4-extension/assets/raggedyspineboy/*.atlas
+rm -f "$ROOT"/spine-godot/example-v4-extension/assets/raggedyspineboy/*.png
+rm -f "$ROOT"/spine-godot/example-v4-extension/assets/raggedyspineboy/*.spine-json
+rm -f "$ROOT"/spine-godot/example-v4-extension/assets/celestial-circus/*.atlas
+rm -f "$ROOT"/spine-godot/example-v4-extension/assets/celestial-circus/*.png
+rm -f "$ROOT"/spine-godot/example-v4-extension/assets/celestial-circus/*.skel
+
+cp -f ../spineboy/export/spineboy-pro.json "$ROOT/spine-godot/example-v4-extension/assets/spineboy/spineboy-pro.spine-json"
+cp -f ../spineboy/export/spineboy-pro.skel "$ROOT/spine-godot/example-v4-extension/assets/spineboy/"
+cp -f ../spineboy/export/spineboy.atlas "$ROOT/spine-godot/example-v4-extension/assets/spineboy/"
+cp -f ../spineboy/export/spineboy.png "$ROOT/spine-godot/example-v4-extension/assets/spineboy/"
+
+cp -f ../mix-and-match/export/mix-and-match-pro.json "$ROOT/spine-godot/example-v4-extension/assets/mix-and-match/mix-and-match-pro.spine-json"
+cp -f ../mix-and-match/export/mix-and-match.atlas "$ROOT/spine-godot/example-v4-extension/assets/mix-and-match/"
+cp -f ../mix-and-match/export/mix-and-match.png "$ROOT/spine-godot/example-v4-extension/assets/mix-and-match/"
+
+cp -f ../raptor/export/raptor-pro.skel "$ROOT/spine-godot/example-v4-extension/assets/raptor/"
+cp -f ../raptor/export/raptor.atlas "$ROOT/spine-godot/example-v4-extension/assets/raptor/"
+cp -f ../raptor/export/raptor.png "$ROOT/spine-godot/example-v4-extension/assets/raptor/"
+cp -f ../raptor/manual-maps/raptor-normals.png "$ROOT/spine-godot/example-v4-extension/assets/raptor/n_raptor.png"
+cp -f ../raptor/manual-maps/light-sprite.png "$ROOT/spine-godot/example-v4-extension/assets/raptor/light-sprite.png"
+
+cp -f ../celestial-circus/export/celestial-circus-pro.skel "$ROOT/spine-godot/example-v4-extension/assets/celestial-circus/celestial-circus.skel"
+cp -f ../celestial-circus/export/celestial-circus.atlas "$ROOT/spine-godot/example-v4-extension/assets/celestial-circus/"
+cp -f ../celestial-circus/export/celestial-circus.png "$ROOT/spine-godot/example-v4-extension/assets/celestial-circus/"
+
 echo "spine-sdl"
 rm -f "$ROOT/spine-sdl/data/"*
 cp -f ../spineboy/export/spineboy-pro.json "$ROOT/spine-sdl/data/"
@@ -257,6 +300,10 @@ cp -f ../celestial-circus/export/celestial-circus-pro.json "$ROOT/spine-glfw/dat
 cp -f ../celestial-circus/export/celestial-circus-pro.skel "$ROOT/spine-glfw/data/"
 cp -f ../celestial-circus/export/celestial-circus-pma.atlas "$ROOT/spine-glfw/data/"
 cp -f ../celestial-circus/export/celestial-circus-pma.png "$ROOT/spine-glfw/data/"
+cp -f ../dragon/export/dragon-ess.json "$ROOT/spine-glfw/data/"
+cp -f ../dragon/export/dragon-ess.skel "$ROOT/spine-glfw/data/"
+cp -f ../dragon/export/dragon-pma.atlas "$ROOT/spine-glfw/data/"
+cp -f ../dragon/export/dragon-pma*.png "$ROOT/spine-glfw/data/"
 
 echo "spine-sfml"
 rm -f "$ROOT/spine-sfml/data/"*

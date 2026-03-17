@@ -29,6 +29,7 @@
 
 package spine;
 
+import haxe.DynamicAccess;
 import spine.animation.BoneTimeline2;
 import spine.animation.SliderMixTimeline;
 import spine.animation.SliderTimeline;
@@ -41,6 +42,7 @@ import spine.animation.AttachmentTimeline;
 import spine.animation.CurveTimeline1;
 import spine.animation.CurveTimeline;
 import spine.animation.DeformTimeline;
+import spine.animation.DrawOrderFolderTimeline;
 import spine.animation.DrawOrderTimeline;
 import spine.animation.EventTimeline;
 import spine.animation.IkConstraintTimeline;
@@ -496,15 +498,14 @@ class SkeletonJson {
 				throw new SpineException("Parent mesh not found: " + linkedMesh.parent);
 			linkedMesh.mesh.timelineAttachment = linkedMesh.inheritTimeline ? cast(parentMesh, VertexAttachment) : linkedMesh.mesh;
 			linkedMesh.mesh.parentMesh = cast(parentMesh, MeshAttachment);
-			if (linkedMesh.mesh.region != null)
-				linkedMesh.mesh.updateRegion();
+			linkedMesh.mesh.updateSequence();
 		}
 		linkedMeshes.resize(0);
 
 		// Events.
 		var events:Dynamic = Reflect.getProperty(root, "events");
 		for (eventName in Reflect.fields(events)) {
-			var eventMap:Map<String, Dynamic> = Reflect.field(events, eventName);
+			var eventMap:DynamicAccess<Dynamic> = Reflect.field(events, eventName);
 			var eventData:EventData = new EventData(eventName);
 			eventData.intValue = getInt(eventMap, "int");
 			eventData.floatValue = getFloat(eventMap, "float");
@@ -591,14 +592,11 @@ class SkeletonJson {
 				region.rotation = getFloat(map, "rotation");
 				region.width = getFloat(map, "width") * scale;
 				region.height = getFloat(map, "height") * scale;
-				region.sequence = sequence;
-
 				color = Reflect.getProperty(map, "color");
 				if (color != null) {
 					region.color.setFromString(color);
 				}
-				if (region.region != null)
-					region.updateRegion();
+				region.updateSequence();
 				return region;
 			case AttachmentType.mesh, AttachmentType.linkedmesh:
 				var path = getString(map, "path", name);
@@ -615,7 +613,6 @@ class SkeletonJson {
 
 				mesh.width = getFloat(map, "width") * scale;
 				mesh.height = getFloat(map, "height") * scale;
-				mesh.sequence = sequence;
 
 				if (Reflect.field(map, "parent") != null) {
 					var inheritTimelines:Bool = Reflect.hasField(map, "timelines") ? cast(Reflect.field(map, "timelines"), Bool) : true;
@@ -627,12 +624,11 @@ class SkeletonJson {
 				readVertices(map, mesh, uvs.length);
 				mesh.triangles = getIntArray(map, "triangles");
 				mesh.regionUVs = uvs;
-				if (mesh.region != null)
-					mesh.updateRegion();
 
 				if (Reflect.field(map, "edges") != null)
 					mesh.edges = getIntArray(map, "edges");
 				mesh.hullLength = getInt(map, "hull") * 2;
+				mesh.updateSequence();
 				return mesh;
 			case AttachmentType.boundingbox:
 				var box:BoundingBoxAttachment = attachmentLoader.newBoundingBoxAttachment(skin, name);
@@ -646,11 +642,10 @@ class SkeletonJson {
 					return null;
 				path.closed = Reflect.hasField(map, "closed") ? cast(Reflect.field(map, "closed"), Bool) : false;
 				path.constantSpeed = Reflect.hasField(map, "constantSpeed") ? cast(Reflect.field(map, "constantSpeed"), Bool) : true;
-				var vertexCount:Int = getInt(map, "vertexCount", 0);
-				readVertices(map, path, vertexCount << 1);
+				readVertices(map, path, getInt(map, "vertexCount", 0) << 1);
 				var lengths:Array<Float> = new Array<Float>();
 				for (curves in cast(Reflect.field(map, "lengths"), Array<Dynamic>)) {
-					lengths.push(Std.parseFloat(curves) * scale);
+					lengths.push(curves * scale);
 				}
 				path.lengths = lengths;
 				return path;
@@ -677,8 +672,7 @@ class SkeletonJson {
 						throw new SpineException("Clipping end slot not found: " + end);
 					clip.endSlot = slot;
 				}
-				var vertexCount:Int = getInt(map, "vertexCount", 0);
-				readVertices(map, clip, vertexCount << 1);
+				readVertices(map, clip, getInt(map, "vertexCount", 0) << 1);
 				color = Reflect.getProperty(map, "color");
 				if (color != null) {
 					clip.color.setFromString(color);
@@ -690,12 +684,53 @@ class SkeletonJson {
 
 	private function readSequence(map:Dynamic) {
 		if (map == null)
-			return null;
-		var sequence = new Sequence(getInt(map, "count", 0));
+			return new Sequence(1, false);
+		var sequence = new Sequence(getInt(map, "count", 0), true);
 		sequence.start = getInt(map, "start", 1);
 		sequence.digits = getInt(map, "digits", 0);
 		sequence.setupIndex = getInt(map, "setup", 0);
 		return sequence;
+	}
+
+	/** @param folderSlots Slot names are resolved to positions within this array. If null, slot indices are used as positions. */
+	private function readDrawOrder(skeletonData:SkeletonData, keyMap:Dynamic, slotCount:Int, folderSlots:Array<Int>):Array<Int> {
+		var changes:Array<Dynamic> = Reflect.getProperty(keyMap, "offsets");
+		if (changes == null) return null;
+		var drawOrder:Array<Int> = new Array<Int>();
+		drawOrder.resize(slotCount);
+		for (i in 0...slotCount)
+			drawOrder[i] = -1;
+		var unchanged:Array<Int> = new Array<Int>();
+		unchanged.resize(slotCount - changes.length);
+		var originalIndex:Int = 0, unchangedIndex:Int = 0;
+		for (offsetMap in changes) {
+			var slot = skeletonData.findSlot(Reflect.getProperty(offsetMap, "slot"));
+			if (slot == null) throw new SpineException("Draw order slot not found: " + Reflect.getProperty(offsetMap, "slot"));
+			var index:Int;
+			if (folderSlots == null)
+				index = slot.index;
+			else {
+				index = -1;
+				for (i in 0...slotCount) {
+					if (folderSlots[i] == slot.index) {
+						index = i;
+						break;
+					}
+				}
+				if (index == -1) throw new SpineException("Slot not in folder: " + Reflect.getProperty(offsetMap, "slot"));
+			}
+			while (originalIndex != index)
+				unchanged[unchangedIndex++] = originalIndex++;
+			drawOrder[originalIndex + Reflect.getProperty(offsetMap, "offset")] = originalIndex++;
+		}
+		while (originalIndex < slotCount)
+			unchanged[unchangedIndex++] = originalIndex++;
+		var i:Int = slotCount - 1;
+		while (i >= 0) {
+			if (drawOrder[i] == -1) drawOrder[i] = unchanged[--unchangedIndex];
+			i--;
+		}
+		return drawOrder;
 	}
 
 	private function readVertices(map:Dynamic, attachment:VertexAttachment, verticesLength:Int):Void {
@@ -1223,7 +1258,7 @@ class SkeletonJson {
 				slotMap = Reflect.field(attachmentsMap, slotMapName);
 				slotIndex = skeletonData.findSlot(slotMapName).index;
 				if (slotIndex == -1)
-					throw new SpineException("Slot not found: " + slotMapName);
+					throw new SpineException("Attachment slot not found: " + slotMapName);
 				for (attachmentMapName in Reflect.fields(slotMap)) {
 					var attachmentMap = Reflect.field(slotMap, attachmentMapName);
 					var attachment:Attachment = skin.getAttachment(slotIndex, attachmentMapName);
@@ -1296,7 +1331,7 @@ class SkeletonJson {
 
 								timelines.push(deformTimeline);
 							case "sequence":
-								var timeline = new SequenceTimeline(timelineMap.length, slotIndex, cast(attachment, HasTextureRegion));
+								var timeline = new SequenceTimeline(timelineMap.length, slotIndex, cast(attachment, HasSequence));
 								var lastDelay:Float = 0;
 								var frame:Int = 0;
 								while (frame < timelineMap.length) {
@@ -1317,51 +1352,41 @@ class SkeletonJson {
 		}
 
 		// Draw order timelines.
+		// Draw order timeline.
 		if (Reflect.hasField(map, "drawOrder")) {
 			var drawOrders:Array<Dynamic> = cast(Reflect.field(map, "drawOrder"), Array<Dynamic>);
 			if (drawOrders != null) {
 				var drawOrderTimeline:DrawOrderTimeline = new DrawOrderTimeline(drawOrders.length);
 				var slotCount:Int = skeletonData.slots.length;
 				frame = 0;
-				for (drawOrderMap in drawOrders) {
-					var drawOrder:Array<Int> = null;
-					var offsets:Array<Dynamic> = Reflect.getProperty(drawOrderMap, "offsets");
-					if (offsets != null) {
-						drawOrder = new Array<Int>();
-						drawOrder.resize(slotCount);
-						var i = slotCount - 1;
-						while (i >= 0) {
-							drawOrder[i--] = -1;
-						}
-						var unchanged:Array<Int> = new Array<Int>();
-						unchanged.resize(slotCount - offsets.length);
-						var originalIndex:Int = 0, unchangedIndex:Int = 0;
-						for (offsetMap in offsets) {
-							slotIndex = skeletonData.findSlot(Reflect.getProperty(offsetMap, "slot")).index;
-							if (slotIndex == -1)
-								throw new SpineException("Slot not found: " + Reflect.getProperty(offsetMap, "slot"));
-							// Collect unchanged items.
-							while (originalIndex != slotIndex) {
-								unchanged[unchangedIndex++] = originalIndex++;
-							}
-							// Set changed items.
-							drawOrder[originalIndex + Reflect.getProperty(offsetMap, "offset")] = originalIndex++;
-						}
-						// Collect remaining unchanged items.
-						while (originalIndex < slotCount) {
-							unchanged[unchangedIndex++] = originalIndex++;
-						}
-						// Fill in unchanged items.
-						i = slotCount - 1;
-						while (i >= 0) {
-							if (drawOrder[i] == -1)
-								drawOrder[i] = unchanged[--unchangedIndex];
-							i--;
-						}
-					}
-					drawOrderTimeline.setFrame(frame++, getFloat(drawOrderMap, "time"), drawOrder);
-				}
+				for (drawOrderMap in drawOrders)
+					drawOrderTimeline.setFrame(frame++, getFloat(drawOrderMap, "time"), readDrawOrder(skeletonData, drawOrderMap, slotCount, null));
 				timelines.push(drawOrderTimeline);
+			}
+		}
+
+		// Draw order folder timelines.
+		if (Reflect.hasField(map, "drawOrderFolder")) {
+			var drawOrderFolders:Array<Dynamic> = cast(Reflect.field(map, "drawOrderFolder"), Array<Dynamic>);
+			if (drawOrderFolders != null) {
+				for (timelineMap in drawOrderFolders) {
+					var slotEntries:Array<Dynamic> = cast(Reflect.field(timelineMap, "slots"), Array<Dynamic>);
+					var folderSlots:Array<Int> = new Array<Int>();
+					folderSlots.resize(slotEntries.length);
+					var ii:Int = 0;
+					for (slotEntry in slotEntries) {
+						var slot = skeletonData.findSlot(cast(slotEntry, String));
+						if (slot == null) throw new SpineException("Draw order folder slot not found: " + cast(slotEntry, String));
+						folderSlots[ii++] = slot.index;
+					}
+
+					var keys:Array<Dynamic> = cast(Reflect.field(timelineMap, "keys"), Array<Dynamic>);
+					var folderTimeline = new DrawOrderFolderTimeline(keys.length, folderSlots, skeletonData.slots.length);
+					frame = 0;
+					for (keyMap in keys)
+						folderTimeline.setFrame(frame++, getFloat(keyMap, "time"), readDrawOrder(skeletonData, keyMap, folderSlots.length, folderSlots));
+					timelines.push(folderTimeline);
+				}
 			}
 		}
 

@@ -126,7 +126,8 @@ public class SkeletonRendererDebug {
 				if (!slot.bone.active) continue;
 				if (slot.pose.attachment instanceof RegionAttachment region) {
 					float[] vertices = this.vertices.items;
-					region.computeWorldVertices(slot, vertices, 0, 2);
+					float[] offsets = region.getOffsets(slot.applied);
+					region.computeWorldVertices(slot, offsets, vertices, 0, 2);
 					shapes.line(vertices[0], vertices[1], vertices[2], vertices[3]);
 					shapes.line(vertices[2], vertices[3], vertices[4], vertices[5]);
 					shapes.line(vertices[4], vertices[5], vertices[6], vertices[7]);

@@ -35,6 +35,7 @@
 #include <godot_cpp/classes/node2d.hpp>
 #else
 #include "scene/2d/node_2d.h"
+#include "scene/resources/material.h"
 #endif
 
 class SpineSlotNode : public Node2D {

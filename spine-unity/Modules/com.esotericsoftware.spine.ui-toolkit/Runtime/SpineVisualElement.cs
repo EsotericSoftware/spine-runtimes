@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -28,12 +28,20 @@
  *****************************************************************************/
 
 using System;
+using System.Collections.Generic;
 using Unity.Collections;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UIVertex = UnityEngine.UIElements.Vertex;
 
 namespace Spine.Unity {
+
+	public class UITKBlendModeMaterialsAttribute : PropertyAttribute {
+		public readonly string dataField;
+		public UITKBlendModeMaterialsAttribute (string dataField = "skeletonDataAsset") {
+			this.dataField = dataField;
+		}
+	}
 
 	public class BoundsFromAnimationAttribute : PropertyAttribute {
 
@@ -48,6 +56,19 @@ namespace Spine.Unity {
 		}
 	}
 
+	[UxmlObject]
+	[System.Serializable]
+	public partial class UITKBlendModeMaterials {
+		[UxmlAttribute]
+		public Material normalMaterial;
+		[UxmlAttribute]
+		public Material additiveMaterial;
+		[UxmlAttribute]
+		public Material multiplyMaterial;
+		[UxmlAttribute]
+		public Material screenMaterial;
+	}
+
 	[UxmlElement]
 	public partial class SpineVisualElement : VisualElement {
 
@@ -58,27 +79,13 @@ namespace Spine.Unity {
 				if (skeletonDataAsset == value) return;
 				skeletonDataAsset = value;
 #if UNITY_EDITOR
-				if (!Application.isPlaying)
+				if (!Application.isPlaying) {
 					Initialize(true);
+				}
 #endif
 			}
 		}
 		public SkeletonDataAsset skeletonDataAsset;
-
-		[SpineAnimation(dataField: "SkeletonDataAsset", avoidGenericMenu: true)]
-		[UxmlAttribute]
-		public string StartingAnimation {
-			get { return startingAnimation; }
-			set {
-				if (startingAnimation == value) return;
-				startingAnimation = value;
-#if UNITY_EDITOR
-				if (!Application.isPlaying)
-					Initialize(true);
-#endif
-			}
-		}
-		public string startingAnimation = "";
 
 		[SpineSkin(dataField: "SkeletonDataAsset", defaultAsEmptyString: true, avoidGenericMenu: true)]
 		[UxmlAttribute]
@@ -95,8 +102,46 @@ namespace Spine.Unity {
 		}
 		public string initialSkinName;
 
+		[SpineAnimation(dataField: "SkeletonDataAsset", avoidGenericMenu: true)]
+		[UxmlAttribute]
+		public string StartingAnimation {
+			get { return startingAnimation; }
+			set {
+				if (startingAnimation == value) return;
+				startingAnimation = value;
+#if UNITY_EDITOR
+				if (!Application.isPlaying)
+					Initialize(true);
+#endif
+			}
+		}
+		public string startingAnimation = "";
 		[UxmlAttribute] public bool startingLoop { get; set; } = true;
 		[UxmlAttribute] public float timeScale { get; set; } = 1.0f;
+		[UxmlAttribute] public bool unscaledTime { get; set; }
+		[UxmlAttribute] public bool freeze { get; set; }
+
+		[UxmlAttribute] public bool MultipleMaterials {
+			get { return supportMultipleMaterials; }
+			set {
+				if (supportMultipleMaterials == value) return;
+				supportMultipleMaterials = value;
+				if (!supportMultipleMaterials) {
+					RemoveMultiMaterialRendererElements();
+				} else {
+					Update(0);
+				}
+			}
+		}
+		public bool supportMultipleMaterials = true;
+
+		[UxmlObjectReference("blend-mode-materials")]
+		[UITKBlendModeMaterials(dataField: "SkeletonDataAsset")]
+		public UITKBlendModeMaterials blendModeMaterials = new UITKBlendModeMaterials();
+
+		/// <summary>Flip indices of back-faces to correct winding order during mesh generation.
+		/// UI Elements otherwise does not draw back-faces.</summary>
+		[UxmlAttribute] public bool flipBackFaces { get; set; } = true;
 
 		[SpineAnimation(dataField: "SkeletonDataAsset", avoidGenericMenu: true)]
 		[UxmlAttribute]
@@ -130,7 +175,8 @@ namespace Spine.Unity {
 				referenceMeshBounds = value;
 				if (!this.IsValid) return;
 
-				AdjustOffsetScaleToMeshBounds(rendererElement);
+				for (int i = 0, count = rendererElements.Count; i < count; ++i)
+					AdjustOffsetScaleToMeshBounds(rendererElements.Items[i]);
 			}
 		}
 		public Bounds referenceMeshBounds;
@@ -141,21 +187,17 @@ namespace Spine.Unity {
 				return state;
 			}
 		}
-		[UxmlAttribute]
-		public bool freeze { get; set; }
-		[UxmlAttribute]
-		public bool unscaledTime { get; set; }
-
+		
 		/// <summary>Update mode to optionally limit updates to e.g. only apply animations but not update the mesh.</summary>
 		public UpdateMode UpdateMode { get { return updateMode; } set { updateMode = value; } }
 		protected UpdateMode updateMode = UpdateMode.FullUpdate;
 
 		protected AnimationState state = null;
 		protected Skeleton skeleton = null;
-		protected SkeletonRendererInstruction currentInstructions = new();// to match existing code better
+		protected SkeletonRendererInstruction currentInstructions = new();
 		protected Spine.Unity.MeshGeneratorUIElements meshGenerator = new MeshGeneratorUIElements();
 
-		protected VisualElement rendererElement;
+		protected ExposedList<VisualElement> rendererElements = new ExposedList<VisualElement>(1);
 		IVisualElementScheduledItem scheduledItem;
 		protected float scale = 100;
 		protected float offsetX, offsetY;
@@ -166,8 +208,33 @@ namespace Spine.Unity {
 			RegisterCallback<AttachToPanelEvent>(OnAttachedCallback);
 			RegisterCallback<DetachFromPanelEvent>(OnDetatchedCallback);
 
-			rendererElement = new VisualElement();
-			rendererElement.generateVisualContent += GenerateVisualContents;
+			AddRendererElement();
+		}
+
+		protected void SetActiveRendererCount (int count) {
+			if (count == rendererElements.Count)
+				return;
+			else if (count > rendererElements.Count) {
+				int oldCount = rendererElements.Count;
+				int reactivateCount = Math.Min(count, rendererElements.Capacity);
+				for (int i = oldCount; i < reactivateCount; ++i) {
+					EnableRenderElement(rendererElements.Items[i]);
+				}
+				rendererElements.EnsureCapacity(count);
+				for (int i = reactivateCount; i < count; ++i) {
+					AddRendererElement();
+				}
+			} else { // new count < old count
+				for (int i = count, oldCount = rendererElements.Count; i < oldCount; ++i)
+					DisableRenderElement(rendererElements.Items[i]);
+			}
+			rendererElements.Count = count;
+		}
+
+		protected VisualElement AddRendererElement () {
+			VisualElement rendererElement = new VisualElement();
+			int index = rendererElements.Count;
+			rendererElement.generateVisualContent += (context) => GenerateVisualContents(context, index);
 			rendererElement.pickingMode = PickingMode.Ignore;
 			rendererElement.style.position = Position.Absolute;
 			rendererElement.style.top = 0;
@@ -177,6 +244,26 @@ namespace Spine.Unity {
 			Add(rendererElement);
 
 			rendererElement.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
+			rendererElements.Add(rendererElement);
+			return rendererElement;
+		}
+
+		protected void EnableRenderElement (VisualElement rendererElement) {
+			rendererElement.enabledSelf = true;
+			rendererElement.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
+		}
+
+		protected void DisableRenderElement (VisualElement rendererElement) {
+			rendererElement.enabledSelf = false;
+			rendererElement.UnregisterCallback<GeometryChangedEvent>(OnGeometryChanged);
+		}
+
+		protected void RemoveMultiMaterialRendererElements () {
+			for (int i = rendererElements.Capacity - 1; i > 0; --i) {
+				rendererElements.Items[i].RemoveFromHierarchy();
+			}
+			rendererElements.Count = 1;
+			rendererElements.TrimExcess();
 		}
 
 		void OnGeometryChanged (GeometryChangedEvent evt) {
@@ -184,7 +271,8 @@ namespace Spine.Unity {
 			if (referenceMeshBounds.size.x == 0 || referenceMeshBounds.size.y == 0) {
 				AdjustReferenceMeshBounds();
 			}
-			AdjustOffsetScaleToMeshBounds(rendererElement);
+			for (int i = 0, count = rendererElements.Count; i < count; ++i)
+				AdjustOffsetScaleToMeshBounds(rendererElements.Items[i]);
 		}
 
 		void OnAttachedCallback (AttachToPanelEvent evt) {
@@ -209,7 +297,7 @@ namespace Spine.Unity {
 #endif
 			if (freeze) return;
 			Update(unscaledTime ? Time.unscaledDeltaTime : Time.deltaTime);
-			rendererElement.MarkDirtyRepaint();
+			MarkAllDirtyAndRepaint();
 		}
 
 		public virtual void Update (float deltaTime) {
@@ -222,6 +310,7 @@ namespace Spine.Unity {
 			if (updateMode == UpdateMode.OnlyAnimationStatus)
 				return;
 			ApplyAnimation();
+			PrepareInstructionsAndRenderers();
 		}
 
 		protected void UpdateAnimationStatus (float deltaTime) {
@@ -231,7 +320,6 @@ namespace Spine.Unity {
 		}
 
 		protected void ApplyAnimation () {
-
 			if (updateMode != UpdateMode.OnlyEventTimelines)
 				state.Apply(skeleton);
 			else
@@ -261,8 +349,16 @@ namespace Spine.Unity {
 			};
 
 			// Set the initial Skin and Animation
-			if (!string.IsNullOrEmpty(initialSkinName))
+			if (!string.IsNullOrEmpty(initialSkinName)) {
+#if UNITY_EDITOR
+				if (!Application.isPlaying) {
+					if (skeletonData.FindSkin(initialSkinName) == null) {
+						initialSkinName = "default";
+					}
+				}
+#endif
 				skeleton.SetSkin(initialSkinName);
+			}
 
 			string displayedAnimation = Application.isPlaying ? startingAnimation : boundsAnimation;
 			if (!string.IsNullOrEmpty(displayedAnimation)) {
@@ -273,7 +369,8 @@ namespace Spine.Unity {
 			}
 			if (referenceMeshBounds.size.x == 0 || referenceMeshBounds.size.y == 0) {
 				AdjustReferenceMeshBounds();
-				AdjustOffsetScaleToMeshBounds(rendererElement);
+				for (int i = 0, count = rendererElements.Count; i < count; ++i)
+					AdjustOffsetScaleToMeshBounds(rendererElements.Items[i]);
 			}
 
 			if (scheduledItem == null)
@@ -282,7 +379,14 @@ namespace Spine.Unity {
 			if (!Application.isPlaying)
 				Update(0.0f);
 
-			rendererElement.MarkDirtyRepaint();
+			MarkAllDirtyAndRepaint();
+		}
+
+		protected void MarkAllDirtyAndRepaint () {
+			for (int i = 0, count = rendererElements.Count; i < count; ++i) {
+				var rendererElement = rendererElements.Items[i];
+				if (rendererElement != null) rendererElement.MarkDirtyRepaint();
+			}
 		}
 
 		protected void UpdateAnimation () {
@@ -298,11 +402,33 @@ namespace Spine.Unity {
 			}
 			if (referenceMeshBounds.size.x == 0 || referenceMeshBounds.size.y == 0) {
 				AdjustReferenceMeshBounds();
-				AdjustOffsetScaleToMeshBounds(rendererElement);
+				for (int i = 0, count = rendererElements.Count; i < count; ++i)
+					AdjustOffsetScaleToMeshBounds(rendererElements.Items[i]);
 			}
 			Update(0.0f);
+			MarkAllDirtyAndRepaint();
+		}
 
-			rendererElement.MarkDirtyRepaint();
+		protected void PrepareInstructionsAndRenderers () {
+			MeshGeneratorUIElements.GenerateSkeletonRendererInstruction(currentInstructions, skeleton, null,
+				null, false, false);
+
+			int submeshCount = currentInstructions.submeshInstructions.Count;
+			PrepareUISubmeshCount(submeshCount);
+
+			if (supportMultipleMaterials) {
+				SetActiveRendererCount(submeshCount);
+				if (supportMultipleMaterials) {
+					for (int i = 0, count = rendererElements.Count; i < count; ++i) {
+						AssignBlendModeMaterial(i, currentInstructions.submeshInstructions.Items[i].material);
+					}
+				}
+			} else if (rendererElements.Count > 0) {
+				if (blendModeMaterials != null && blendModeMaterials.normalMaterial)
+					rendererElements.Items[0].style.unityMaterial = blendModeMaterials.normalMaterial;
+				else
+					rendererElements.Items[0].style.unityMaterial = null;
+			}
 		}
 
 		protected class UISubmesh {
@@ -314,36 +440,56 @@ namespace Spine.Unity {
 		}
 		protected readonly ExposedList<UISubmesh> uiSubmeshes = new ExposedList<UISubmesh>();
 
-		protected void GenerateVisualContents (MeshGenerationContext context) {
+		protected void GenerateVisualContents (MeshGenerationContext context, int rendererElementIndex) {
 			if (!this.IsValid) return;
+			if (!context.visualElement.enabledInHierarchy) return;
 
-			MeshGeneratorUIElements.GenerateSkeletonRendererInstruction(currentInstructions, skeleton, null,
-				null,
-				 false,
-				false);
+			int submeshesPerRenderer = supportMultipleMaterials ? 1 : currentInstructions.submeshInstructions.Count;
+			int submeshOffset = rendererElementIndex;
 
-			int submeshCount = currentInstructions.submeshInstructions.Count;
-			PrepareUISubmeshCount(submeshCount);
-
-			// Generate meshes.
-			for (int i = 0; i < submeshCount; i++) {
+			meshGenerator.settings.pmaVertexColors = false;
+			for (int i = submeshOffset; i < submeshOffset + submeshesPerRenderer; i++) {
 				var submeshInstructionItem = currentInstructions.submeshInstructions.Items[i];
 				UISubmesh uiSubmesh = uiSubmeshes.Items[i];
 
 				meshGenerator.Begin();
 				meshGenerator.AddSubmesh(submeshInstructionItem);
-				// clipping is done, vertex counts are final.
 
 				PrepareUISubmesh(uiSubmesh, meshGenerator.VertexCount, meshGenerator.SubmeshIndexCount(0));
+				if (flipBackFaces)
+					meshGenerator.FlipBackfaceWindingOrder();
 				meshGenerator.FillVertexData(ref uiSubmesh.verticesSlice);
 				meshGenerator.FillTrianglesSingleSubmesh(ref uiSubmesh.indicesSlice);
-
+			
 				var submeshMaterial = submeshInstructionItem.material;
-
 				Texture usedTexture = submeshMaterial.mainTexture;
-
 				FillContext(context, uiSubmesh, usedTexture);
 			}
+		}
+
+		protected void AssignBlendModeMaterial (int rendererElementIndex, Material originalSubmeshMaterial) {
+			if (skeletonDataAsset == null) return;
+			VisualElement rendererElement = rendererElements.Items[rendererElementIndex];
+			if (blendModeMaterials == null) {
+				rendererElement.style.unityMaterial = null;
+				return;
+			}
+			BlendModeMaterials requiredBlendModeMaterials = skeletonDataAsset.blendModeMaterials;
+			if (!requiredBlendModeMaterials.RequiresBlendModeMaterials) {
+				rendererElement.style.unityMaterial = blendModeMaterials.normalMaterial;
+				return;
+			}
+			Material material = null;
+			BlendMode blendMode = requiredBlendModeMaterials.BlendModeForMaterial(originalSubmeshMaterial);
+			if (blendMode == BlendMode.Normal)
+				material = blendModeMaterials.normalMaterial;
+			else if (blendMode == BlendMode.Additive)
+				material = blendModeMaterials.additiveMaterial;
+			else if (blendMode == BlendMode.Multiply)
+				material = blendModeMaterials.multiplyMaterial;
+			else if (blendMode == BlendMode.Screen)
+				material = blendModeMaterials.screenMaterial;
+			rendererElement.style.unityMaterial = material;
 		}
 
 		protected void PrepareUISubmeshCount (int targetCount) {
@@ -422,6 +568,7 @@ namespace Spine.Unity {
 		}
 
 		void AdjustOffsetScaleToMeshBounds (VisualElement visualElement) {
+			if (visualElement == null) return;
 			Rect targetRect = visualElement.layout;
 			if (float.IsNaN(targetRect.width)) return;
 

@@ -495,7 +495,7 @@ public class Skeleton {
 				if (attachment instanceof RegionAttachment region) {
 					verticesLength = 8;
 					vertices = temp.setSize(8);
-					region.computeWorldVertices(slot, vertices, 0, 2);
+					region.computeWorldVertices(slot, region.getOffsets(slot.applied), vertices, 0, 2);
 					triangles = quadTriangles;
 				} else if (attachment instanceof MeshAttachment mesh) {
 					verticesLength = mesh.getWorldVerticesLength();

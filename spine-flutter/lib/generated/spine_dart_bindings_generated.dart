@@ -6873,6 +6873,23 @@ class SpineDartBindings {
   late final _spine_skeleton_data_find_animation = _spine_skeleton_data_find_animationPtr
       .asFunction<spine_animation Function(spine_skeleton_data, ffi.Pointer<ffi.Char>)>();
 
+  /// Collects animations used by slider constraints.
+  spine_array_animation spine_skeleton_data_find_slider_animations(
+    spine_skeleton_data self,
+    spine_array_animation animations,
+  ) {
+    return _spine_skeleton_data_find_slider_animations(
+      self,
+      animations,
+    );
+  }
+
+  late final _spine_skeleton_data_find_slider_animationsPtr =
+      _lookup<ffi.NativeFunction<spine_array_animation Function(spine_skeleton_data, spine_array_animation)>>(
+          'spine_skeleton_data_find_slider_animations');
+  late final _spine_skeleton_data_find_slider_animations = _spine_skeleton_data_find_slider_animationsPtr
+      .asFunction<spine_array_animation Function(spine_skeleton_data, spine_array_animation)>();
+
   /// The skeleton's name, which by default is the name of the skeleton data file
   /// when possible, or null when a name hasn't been set.
   ffi.Pointer<ffi.Char> spine_skeleton_data_get_name(
@@ -8469,6 +8486,20 @@ class SpineDartBindings {
           'spine_deform_timeline_cast_to_slot_timeline');
   late final _spine_deform_timeline_cast_to_slot_timeline =
       _spine_deform_timeline_cast_to_slot_timelinePtr.asFunction<spine_slot_timeline Function(spine_deform_timeline)>();
+
+  spine_timeline spine_draw_order_folder_timeline_cast_to_timeline(
+    spine_draw_order_folder_timeline obj,
+  ) {
+    return _spine_draw_order_folder_timeline_cast_to_timeline(
+      obj,
+    );
+  }
+
+  late final _spine_draw_order_folder_timeline_cast_to_timelinePtr =
+      _lookup<ffi.NativeFunction<spine_timeline Function(spine_draw_order_folder_timeline)>>(
+          'spine_draw_order_folder_timeline_cast_to_timeline');
+  late final _spine_draw_order_folder_timeline_cast_to_timeline = _spine_draw_order_folder_timeline_cast_to_timelinePtr
+      .asFunction<spine_timeline Function(spine_draw_order_folder_timeline)>();
 
   spine_timeline spine_draw_order_timeline_cast_to_timeline(
     spine_draw_order_timeline obj,
@@ -12519,6 +12550,20 @@ class SpineDartBindings {
           'spine_timeline_cast_to_deform_timeline');
   late final _spine_timeline_cast_to_deform_timeline =
       _spine_timeline_cast_to_deform_timelinePtr.asFunction<spine_deform_timeline Function(spine_timeline)>();
+
+  spine_draw_order_folder_timeline spine_timeline_cast_to_draw_order_folder_timeline(
+    spine_timeline obj,
+  ) {
+    return _spine_timeline_cast_to_draw_order_folder_timeline(
+      obj,
+    );
+  }
+
+  late final _spine_timeline_cast_to_draw_order_folder_timelinePtr =
+      _lookup<ffi.NativeFunction<spine_draw_order_folder_timeline Function(spine_timeline)>>(
+          'spine_timeline_cast_to_draw_order_folder_timeline');
+  late final _spine_timeline_cast_to_draw_order_folder_timeline = _spine_timeline_cast_to_draw_order_folder_timelinePtr
+      .asFunction<spine_draw_order_folder_timeline Function(spine_timeline)>();
 
   spine_draw_order_timeline spine_timeline_cast_to_draw_order_timeline(
     spine_timeline obj,
@@ -17737,6 +17782,36 @@ class SpineDartBindings {
   late final _spine_attachment_copy =
       _spine_attachment_copyPtr.asFunction<spine_attachment Function(spine_attachment)>();
 
+  spine_attachment spine_attachment_get_timeline_attachment(
+    spine_attachment self,
+  ) {
+    return _spine_attachment_get_timeline_attachment(
+      self,
+    );
+  }
+
+  late final _spine_attachment_get_timeline_attachmentPtr =
+      _lookup<ffi.NativeFunction<spine_attachment Function(spine_attachment)>>(
+          'spine_attachment_get_timeline_attachment');
+  late final _spine_attachment_get_timeline_attachment =
+      _spine_attachment_get_timeline_attachmentPtr.asFunction<spine_attachment Function(spine_attachment)>();
+
+  void spine_attachment_set_timeline_attachment(
+    spine_attachment self,
+    spine_attachment attachment,
+  ) {
+    return _spine_attachment_set_timeline_attachment(
+      self,
+      attachment,
+    );
+  }
+
+  late final _spine_attachment_set_timeline_attachmentPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_attachment, spine_attachment)>>(
+          'spine_attachment_set_timeline_attachment');
+  late final _spine_attachment_set_timeline_attachment =
+      _spine_attachment_set_timeline_attachmentPtr.asFunction<void Function(spine_attachment, spine_attachment)>();
+
   int spine_attachment_get_ref_count(
     spine_attachment self,
   ) {
@@ -22354,6 +22429,205 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<spine_rtti Function()>>('spine_deform_timeline_rtti');
   late final _spine_deform_timeline_rtti = _spine_deform_timeline_rttiPtr.asFunction<spine_rtti Function()>();
 
+  spine_draw_order_folder_timeline spine_draw_order_folder_timeline_create(
+    int frameCount,
+    spine_array_int slots,
+    int slotCount,
+  ) {
+    return _spine_draw_order_folder_timeline_create(
+      frameCount,
+      slots,
+      slotCount,
+    );
+  }
+
+  late final _spine_draw_order_folder_timeline_createPtr =
+      _lookup<ffi.NativeFunction<spine_draw_order_folder_timeline Function(ffi.Size, spine_array_int, ffi.Size)>>(
+          'spine_draw_order_folder_timeline_create');
+  late final _spine_draw_order_folder_timeline_create = _spine_draw_order_folder_timeline_createPtr
+      .asFunction<spine_draw_order_folder_timeline Function(int, spine_array_int, int)>();
+
+  void spine_draw_order_folder_timeline_dispose(
+    spine_draw_order_folder_timeline self,
+  ) {
+    return _spine_draw_order_folder_timeline_dispose(
+      self,
+    );
+  }
+
+  late final _spine_draw_order_folder_timeline_disposePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_draw_order_folder_timeline)>>(
+          'spine_draw_order_folder_timeline_dispose');
+  late final _spine_draw_order_folder_timeline_dispose =
+      _spine_draw_order_folder_timeline_disposePtr.asFunction<void Function(spine_draw_order_folder_timeline)>();
+
+  spine_rtti spine_draw_order_folder_timeline_get_rtti(
+    spine_draw_order_folder_timeline self,
+  ) {
+    return _spine_draw_order_folder_timeline_get_rtti(
+      self,
+    );
+  }
+
+  late final _spine_draw_order_folder_timeline_get_rttiPtr =
+      _lookup<ffi.NativeFunction<spine_rtti Function(spine_draw_order_folder_timeline)>>(
+          'spine_draw_order_folder_timeline_get_rtti');
+  late final _spine_draw_order_folder_timeline_get_rtti =
+      _spine_draw_order_folder_timeline_get_rttiPtr.asFunction<spine_rtti Function(spine_draw_order_folder_timeline)>();
+
+  void spine_draw_order_folder_timeline_apply(
+    spine_draw_order_folder_timeline self,
+    spine_skeleton skeleton,
+    double lastTime,
+    double time,
+    spine_array_event events,
+    double alpha,
+    int blend,
+    int direction,
+    bool appliedPose,
+  ) {
+    return _spine_draw_order_folder_timeline_apply(
+      self,
+      skeleton,
+      lastTime,
+      time,
+      events,
+      alpha,
+      blend,
+      direction,
+      appliedPose,
+    );
+  }
+
+  late final _spine_draw_order_folder_timeline_applyPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_draw_order_folder_timeline, spine_skeleton, ffi.Float, ffi.Float, spine_array_event,
+              ffi.Float, ffi.Int32, ffi.Int32, ffi.Bool)>>('spine_draw_order_folder_timeline_apply');
+  late final _spine_draw_order_folder_timeline_apply = _spine_draw_order_folder_timeline_applyPtr.asFunction<
+      void Function(spine_draw_order_folder_timeline, spine_skeleton, double, double, spine_array_event, double, int,
+          int, bool)>();
+
+  int spine_draw_order_folder_timeline_get_frame_count(
+    spine_draw_order_folder_timeline self,
+  ) {
+    return _spine_draw_order_folder_timeline_get_frame_count(
+      self,
+    );
+  }
+
+  late final _spine_draw_order_folder_timeline_get_frame_countPtr =
+      _lookup<ffi.NativeFunction<ffi.Size Function(spine_draw_order_folder_timeline)>>(
+          'spine_draw_order_folder_timeline_get_frame_count');
+  late final _spine_draw_order_folder_timeline_get_frame_count =
+      _spine_draw_order_folder_timeline_get_frame_countPtr.asFunction<int Function(spine_draw_order_folder_timeline)>();
+
+  /// The Skeleton::getSlots() indices that this timeline affects, in setup order.
+  spine_array_int spine_draw_order_folder_timeline_get_slots(
+    spine_draw_order_folder_timeline self,
+  ) {
+    return _spine_draw_order_folder_timeline_get_slots(
+      self,
+    );
+  }
+
+  late final _spine_draw_order_folder_timeline_get_slotsPtr =
+      _lookup<ffi.NativeFunction<spine_array_int Function(spine_draw_order_folder_timeline)>>(
+          'spine_draw_order_folder_timeline_get_slots');
+  late final _spine_draw_order_folder_timeline_get_slots = _spine_draw_order_folder_timeline_get_slotsPtr
+      .asFunction<spine_array_int Function(spine_draw_order_folder_timeline)>();
+
+  /// Sets the time and draw order for the specified frame.
+  ///
+  /// @param frame Between 0 and frameCount, inclusive.
+  /// @param time The frame time in seconds.
+  /// @param drawOrder Ordered getSlots() indices, or null to use setup pose order.
+  void spine_draw_order_folder_timeline_set_frame(
+    spine_draw_order_folder_timeline self,
+    int frame,
+    double time,
+    spine_array_int drawOrder,
+  ) {
+    return _spine_draw_order_folder_timeline_set_frame(
+      self,
+      frame,
+      time,
+      drawOrder,
+    );
+  }
+
+  late final _spine_draw_order_folder_timeline_set_framePtr = _lookup<
+          ffi
+          .NativeFunction<ffi.Void Function(spine_draw_order_folder_timeline, ffi.Size, ffi.Float, spine_array_int)>>(
+      'spine_draw_order_folder_timeline_set_frame');
+  late final _spine_draw_order_folder_timeline_set_frame = _spine_draw_order_folder_timeline_set_framePtr
+      .asFunction<void Function(spine_draw_order_folder_timeline, int, double, spine_array_int)>();
+
+  int spine_draw_order_folder_timeline_get_frame_entries(
+    spine_draw_order_folder_timeline self,
+  ) {
+    return _spine_draw_order_folder_timeline_get_frame_entries(
+      self,
+    );
+  }
+
+  late final _spine_draw_order_folder_timeline_get_frame_entriesPtr =
+      _lookup<ffi.NativeFunction<ffi.Size Function(spine_draw_order_folder_timeline)>>(
+          'spine_draw_order_folder_timeline_get_frame_entries');
+  late final _spine_draw_order_folder_timeline_get_frame_entries =
+      _spine_draw_order_folder_timeline_get_frame_entriesPtr
+          .asFunction<int Function(spine_draw_order_folder_timeline)>();
+
+  spine_array_float spine_draw_order_folder_timeline_get_frames(
+    spine_draw_order_folder_timeline self,
+  ) {
+    return _spine_draw_order_folder_timeline_get_frames(
+      self,
+    );
+  }
+
+  late final _spine_draw_order_folder_timeline_get_framesPtr =
+      _lookup<ffi.NativeFunction<spine_array_float Function(spine_draw_order_folder_timeline)>>(
+          'spine_draw_order_folder_timeline_get_frames');
+  late final _spine_draw_order_folder_timeline_get_frames = _spine_draw_order_folder_timeline_get_framesPtr
+      .asFunction<spine_array_float Function(spine_draw_order_folder_timeline)>();
+
+  double spine_draw_order_folder_timeline_get_duration(
+    spine_draw_order_folder_timeline self,
+  ) {
+    return _spine_draw_order_folder_timeline_get_duration(
+      self,
+    );
+  }
+
+  late final _spine_draw_order_folder_timeline_get_durationPtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_draw_order_folder_timeline)>>(
+          'spine_draw_order_folder_timeline_get_duration');
+  late final _spine_draw_order_folder_timeline_get_duration =
+      _spine_draw_order_folder_timeline_get_durationPtr.asFunction<double Function(spine_draw_order_folder_timeline)>();
+
+  spine_array_property_id spine_draw_order_folder_timeline_get_property_ids(
+    spine_draw_order_folder_timeline self,
+  ) {
+    return _spine_draw_order_folder_timeline_get_property_ids(
+      self,
+    );
+  }
+
+  late final _spine_draw_order_folder_timeline_get_property_idsPtr =
+      _lookup<ffi.NativeFunction<spine_array_property_id Function(spine_draw_order_folder_timeline)>>(
+          'spine_draw_order_folder_timeline_get_property_ids');
+  late final _spine_draw_order_folder_timeline_get_property_ids = _spine_draw_order_folder_timeline_get_property_idsPtr
+      .asFunction<spine_array_property_id Function(spine_draw_order_folder_timeline)>();
+
+  spine_rtti spine_draw_order_folder_timeline_rtti() {
+    return _spine_draw_order_folder_timeline_rtti();
+  }
+
+  late final _spine_draw_order_folder_timeline_rttiPtr =
+      _lookup<ffi.NativeFunction<spine_rtti Function()>>('spine_draw_order_folder_timeline_rtti');
+  late final _spine_draw_order_folder_timeline_rtti =
+      _spine_draw_order_folder_timeline_rttiPtr.asFunction<spine_rtti Function()>();
+
   spine_draw_order_timeline spine_draw_order_timeline_create(
     int frameCount,
   ) {
@@ -25246,17 +25520,19 @@ class SpineDartBindings {
 
   spine_mesh_attachment spine_mesh_attachment_create(
     ffi.Pointer<ffi.Char> name,
+    spine_sequence sequence,
   ) {
     return _spine_mesh_attachment_create(
       name,
+      sequence,
     );
   }
 
   late final _spine_mesh_attachment_createPtr =
-      _lookup<ffi.NativeFunction<spine_mesh_attachment Function(ffi.Pointer<ffi.Char>)>>(
+      _lookup<ffi.NativeFunction<spine_mesh_attachment Function(ffi.Pointer<ffi.Char>, spine_sequence)>>(
           'spine_mesh_attachment_create');
-  late final _spine_mesh_attachment_create =
-      _spine_mesh_attachment_createPtr.asFunction<spine_mesh_attachment Function(ffi.Pointer<ffi.Char>)>();
+  late final _spine_mesh_attachment_create = _spine_mesh_attachment_createPtr
+      .asFunction<spine_mesh_attachment Function(ffi.Pointer<ffi.Char>, spine_sequence)>();
 
   void spine_mesh_attachment_dispose(
     spine_mesh_attachment self,
@@ -25345,48 +25621,6 @@ class SpineDartBindings {
       _spine_mesh_attachment_compute_world_vertices_2Ptr.asFunction<
           void Function(spine_mesh_attachment, spine_skeleton, spine_slot, int, int, spine_array_float, int, int)>();
 
-  void spine_mesh_attachment_update_region(
-    spine_mesh_attachment self,
-  ) {
-    return _spine_mesh_attachment_update_region(
-      self,
-    );
-  }
-
-  late final _spine_mesh_attachment_update_regionPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(spine_mesh_attachment)>>('spine_mesh_attachment_update_region');
-  late final _spine_mesh_attachment_update_region =
-      _spine_mesh_attachment_update_regionPtr.asFunction<void Function(spine_mesh_attachment)>();
-
-  int spine_mesh_attachment_get_hull_length(
-    spine_mesh_attachment self,
-  ) {
-    return _spine_mesh_attachment_get_hull_length(
-      self,
-    );
-  }
-
-  late final _spine_mesh_attachment_get_hull_lengthPtr =
-      _lookup<ffi.NativeFunction<ffi.Int Function(spine_mesh_attachment)>>('spine_mesh_attachment_get_hull_length');
-  late final _spine_mesh_attachment_get_hull_length =
-      _spine_mesh_attachment_get_hull_lengthPtr.asFunction<int Function(spine_mesh_attachment)>();
-
-  void spine_mesh_attachment_set_hull_length(
-    spine_mesh_attachment self,
-    int inValue,
-  ) {
-    return _spine_mesh_attachment_set_hull_length(
-      self,
-      inValue,
-    );
-  }
-
-  late final _spine_mesh_attachment_set_hull_lengthPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(spine_mesh_attachment, ffi.Int)>>(
-          'spine_mesh_attachment_set_hull_length');
-  late final _spine_mesh_attachment_set_hull_length =
-      _spine_mesh_attachment_set_hull_lengthPtr.asFunction<void Function(spine_mesh_attachment, int)>();
-
   spine_array_float spine_mesh_attachment_get_region_u_vs(
     spine_mesh_attachment self,
   ) {
@@ -25416,21 +25650,6 @@ class SpineDartBindings {
           'spine_mesh_attachment_set_region_u_vs');
   late final _spine_mesh_attachment_set_region_u_vs =
       _spine_mesh_attachment_set_region_u_vsPtr.asFunction<void Function(spine_mesh_attachment, spine_array_float)>();
-
-  /// The UV pair for each vertex, normalized within the entire texture. See also
-  /// MeshAttachment::updateRegion
-  spine_array_float spine_mesh_attachment_get_u_vs(
-    spine_mesh_attachment self,
-  ) {
-    return _spine_mesh_attachment_get_u_vs(
-      self,
-    );
-  }
-
-  late final _spine_mesh_attachment_get_u_vsPtr =
-      _lookup<ffi.NativeFunction<spine_array_float Function(spine_mesh_attachment)>>('spine_mesh_attachment_get_u_vs');
-  late final _spine_mesh_attachment_get_u_vs =
-      _spine_mesh_attachment_get_u_vsPtr.asFunction<spine_array_float Function(spine_mesh_attachment)>();
 
   spine_array_unsigned_short spine_mesh_attachment_get_triangles(
     spine_mesh_attachment self,
@@ -25462,18 +25681,60 @@ class SpineDartBindings {
   late final _spine_mesh_attachment_set_triangles = _spine_mesh_attachment_set_trianglesPtr
       .asFunction<void Function(spine_mesh_attachment, spine_array_unsigned_short)>();
 
-  spine_color spine_mesh_attachment_get_color(
+  int spine_mesh_attachment_get_hull_length(
     spine_mesh_attachment self,
   ) {
-    return _spine_mesh_attachment_get_color(
+    return _spine_mesh_attachment_get_hull_length(
       self,
     );
   }
 
-  late final _spine_mesh_attachment_get_colorPtr =
-      _lookup<ffi.NativeFunction<spine_color Function(spine_mesh_attachment)>>('spine_mesh_attachment_get_color');
-  late final _spine_mesh_attachment_get_color =
-      _spine_mesh_attachment_get_colorPtr.asFunction<spine_color Function(spine_mesh_attachment)>();
+  late final _spine_mesh_attachment_get_hull_lengthPtr =
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_mesh_attachment)>>('spine_mesh_attachment_get_hull_length');
+  late final _spine_mesh_attachment_get_hull_length =
+      _spine_mesh_attachment_get_hull_lengthPtr.asFunction<int Function(spine_mesh_attachment)>();
+
+  void spine_mesh_attachment_set_hull_length(
+    spine_mesh_attachment self,
+    int inValue,
+  ) {
+    return _spine_mesh_attachment_set_hull_length(
+      self,
+      inValue,
+    );
+  }
+
+  late final _spine_mesh_attachment_set_hull_lengthPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_mesh_attachment, ffi.Int)>>(
+          'spine_mesh_attachment_set_hull_length');
+  late final _spine_mesh_attachment_set_hull_length =
+      _spine_mesh_attachment_set_hull_lengthPtr.asFunction<void Function(spine_mesh_attachment, int)>();
+
+  spine_sequence spine_mesh_attachment_get_sequence(
+    spine_mesh_attachment self,
+  ) {
+    return _spine_mesh_attachment_get_sequence(
+      self,
+    );
+  }
+
+  late final _spine_mesh_attachment_get_sequencePtr =
+      _lookup<ffi.NativeFunction<spine_sequence Function(spine_mesh_attachment)>>('spine_mesh_attachment_get_sequence');
+  late final _spine_mesh_attachment_get_sequence =
+      _spine_mesh_attachment_get_sequencePtr.asFunction<spine_sequence Function(spine_mesh_attachment)>();
+
+  void spine_mesh_attachment_update_sequence(
+    spine_mesh_attachment self,
+  ) {
+    return _spine_mesh_attachment_update_sequence(
+      self,
+    );
+  }
+
+  late final _spine_mesh_attachment_update_sequencePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_mesh_attachment)>>('spine_mesh_attachment_update_sequence');
+  late final _spine_mesh_attachment_update_sequence =
+      _spine_mesh_attachment_update_sequencePtr.asFunction<void Function(spine_mesh_attachment)>();
 
   ffi.Pointer<ffi.Char> spine_mesh_attachment_get_path(
     spine_mesh_attachment self,
@@ -25505,64 +25766,18 @@ class SpineDartBindings {
   late final _spine_mesh_attachment_set_path =
       _spine_mesh_attachment_set_pathPtr.asFunction<void Function(spine_mesh_attachment, ffi.Pointer<ffi.Char>)>();
 
-  spine_texture_region spine_mesh_attachment_get_region(
+  spine_color spine_mesh_attachment_get_color(
     spine_mesh_attachment self,
   ) {
-    return _spine_mesh_attachment_get_region(
+    return _spine_mesh_attachment_get_color(
       self,
     );
   }
 
-  late final _spine_mesh_attachment_get_regionPtr =
-      _lookup<ffi.NativeFunction<spine_texture_region Function(spine_mesh_attachment)>>(
-          'spine_mesh_attachment_get_region');
-  late final _spine_mesh_attachment_get_region =
-      _spine_mesh_attachment_get_regionPtr.asFunction<spine_texture_region Function(spine_mesh_attachment)>();
-
-  void spine_mesh_attachment_set_region(
-    spine_mesh_attachment self,
-    spine_texture_region region,
-  ) {
-    return _spine_mesh_attachment_set_region(
-      self,
-      region,
-    );
-  }
-
-  late final _spine_mesh_attachment_set_regionPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(spine_mesh_attachment, spine_texture_region)>>(
-          'spine_mesh_attachment_set_region');
-  late final _spine_mesh_attachment_set_region =
-      _spine_mesh_attachment_set_regionPtr.asFunction<void Function(spine_mesh_attachment, spine_texture_region)>();
-
-  spine_sequence spine_mesh_attachment_get_sequence(
-    spine_mesh_attachment self,
-  ) {
-    return _spine_mesh_attachment_get_sequence(
-      self,
-    );
-  }
-
-  late final _spine_mesh_attachment_get_sequencePtr =
-      _lookup<ffi.NativeFunction<spine_sequence Function(spine_mesh_attachment)>>('spine_mesh_attachment_get_sequence');
-  late final _spine_mesh_attachment_get_sequence =
-      _spine_mesh_attachment_get_sequencePtr.asFunction<spine_sequence Function(spine_mesh_attachment)>();
-
-  void spine_mesh_attachment_set_sequence(
-    spine_mesh_attachment self,
-    spine_sequence sequence,
-  ) {
-    return _spine_mesh_attachment_set_sequence(
-      self,
-      sequence,
-    );
-  }
-
-  late final _spine_mesh_attachment_set_sequencePtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(spine_mesh_attachment, spine_sequence)>>(
-          'spine_mesh_attachment_set_sequence');
-  late final _spine_mesh_attachment_set_sequence =
-      _spine_mesh_attachment_set_sequencePtr.asFunction<void Function(spine_mesh_attachment, spine_sequence)>();
+  late final _spine_mesh_attachment_get_colorPtr =
+      _lookup<ffi.NativeFunction<spine_color Function(spine_mesh_attachment)>>('spine_mesh_attachment_get_color');
+  late final _spine_mesh_attachment_get_color =
+      _spine_mesh_attachment_get_colorPtr.asFunction<spine_color Function(spine_mesh_attachment)>();
 
   spine_mesh_attachment spine_mesh_attachment_get_parent_mesh(
     spine_mesh_attachment self,
@@ -25594,7 +25809,6 @@ class SpineDartBindings {
   late final _spine_mesh_attachment_set_parent_mesh = _spine_mesh_attachment_set_parent_meshPtr
       .asFunction<void Function(spine_mesh_attachment, spine_mesh_attachment)>();
 
-  /// Nonessential.
   spine_array_unsigned_short spine_mesh_attachment_get_edges(
     spine_mesh_attachment self,
   ) {
@@ -25709,6 +25923,27 @@ class SpineDartBindings {
           'spine_mesh_attachment_new_linked_mesh');
   late final _spine_mesh_attachment_new_linked_mesh =
       _spine_mesh_attachment_new_linked_meshPtr.asFunction<spine_mesh_attachment Function(spine_mesh_attachment)>();
+
+  /// Computes UVs for a mesh attachment.
+  ///
+  /// @param uvs Output array for the computed UVs, same length as regionUVs.
+  void spine_mesh_attachment_compute_u_vs(
+    spine_texture_region region,
+    spine_array_float regionUVs,
+    spine_array_float uvs,
+  ) {
+    return _spine_mesh_attachment_compute_u_vs(
+      region,
+      regionUVs,
+      uvs,
+    );
+  }
+
+  late final _spine_mesh_attachment_compute_u_vsPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_texture_region, spine_array_float, spine_array_float)>>(
+          'spine_mesh_attachment_compute_u_vs');
+  late final _spine_mesh_attachment_compute_u_vs = _spine_mesh_attachment_compute_u_vsPtr
+      .asFunction<void Function(spine_texture_region, spine_array_float, spine_array_float)>();
 
   /// Gets a unique ID for this attachment.
   int spine_mesh_attachment_get_id(
@@ -34153,6 +34388,36 @@ class SpineDartBindings {
   late final _spine_point_attachment_get_name =
       _spine_point_attachment_get_namePtr.asFunction<ffi.Pointer<ffi.Char> Function(spine_point_attachment)>();
 
+  spine_attachment spine_point_attachment_get_timeline_attachment(
+    spine_point_attachment self,
+  ) {
+    return _spine_point_attachment_get_timeline_attachment(
+      self,
+    );
+  }
+
+  late final _spine_point_attachment_get_timeline_attachmentPtr =
+      _lookup<ffi.NativeFunction<spine_attachment Function(spine_point_attachment)>>(
+          'spine_point_attachment_get_timeline_attachment');
+  late final _spine_point_attachment_get_timeline_attachment = _spine_point_attachment_get_timeline_attachmentPtr
+      .asFunction<spine_attachment Function(spine_point_attachment)>();
+
+  void spine_point_attachment_set_timeline_attachment(
+    spine_point_attachment self,
+    spine_attachment attachment,
+  ) {
+    return _spine_point_attachment_set_timeline_attachment(
+      self,
+      attachment,
+    );
+  }
+
+  late final _spine_point_attachment_set_timeline_attachmentPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_point_attachment, spine_attachment)>>(
+          'spine_point_attachment_set_timeline_attachment');
+  late final _spine_point_attachment_set_timeline_attachment = _spine_point_attachment_set_timeline_attachmentPtr
+      .asFunction<void Function(spine_point_attachment, spine_attachment)>();
+
   int spine_point_attachment_get_ref_count(
     spine_point_attachment self,
   ) {
@@ -34438,17 +34703,19 @@ class SpineDartBindings {
 
   spine_region_attachment spine_region_attachment_create(
     ffi.Pointer<ffi.Char> name,
+    spine_sequence sequence,
   ) {
     return _spine_region_attachment_create(
       name,
+      sequence,
     );
   }
 
   late final _spine_region_attachment_createPtr =
-      _lookup<ffi.NativeFunction<spine_region_attachment Function(ffi.Pointer<ffi.Char>)>>(
+      _lookup<ffi.NativeFunction<spine_region_attachment Function(ffi.Pointer<ffi.Char>, spine_sequence)>>(
           'spine_region_attachment_create');
-  late final _spine_region_attachment_create =
-      _spine_region_attachment_createPtr.asFunction<spine_region_attachment Function(ffi.Pointer<ffi.Char>)>();
+  late final _spine_region_attachment_create = _spine_region_attachment_createPtr
+      .asFunction<spine_region_attachment Function(ffi.Pointer<ffi.Char>, spine_sequence)>();
 
   void spine_region_attachment_dispose(
     spine_region_attachment self,
@@ -34476,28 +34743,17 @@ class SpineDartBindings {
   late final _spine_region_attachment_get_rtti =
       _spine_region_attachment_get_rttiPtr.asFunction<spine_rtti Function(spine_region_attachment)>();
 
-  void spine_region_attachment_update_region(
-    spine_region_attachment self,
-  ) {
-    return _spine_region_attachment_update_region(
-      self,
-    );
-  }
-
-  late final _spine_region_attachment_update_regionPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(spine_region_attachment)>>('spine_region_attachment_update_region');
-  late final _spine_region_attachment_update_region =
-      _spine_region_attachment_update_regionPtr.asFunction<void Function(spine_region_attachment)>();
-
   /// Transforms the attachment's four vertices to world coordinates.
   ///
   /// @param slot The parent slot.
+  /// @param vertexOffsets The vertex offsets.
   /// @param worldVertices The output world vertices. Must have a length greater than or equal to offset + 8.
   /// @param offset The worldVertices index to begin writing values.
   /// @param stride The number of worldVertices entries between the value pairs written.
   void spine_region_attachment_compute_world_vertices_1(
     spine_region_attachment self,
     spine_slot slot,
+    ffi.Pointer<ffi.Float> vertexOffsets,
     ffi.Pointer<ffi.Float> worldVertices,
     int offset,
     int stride,
@@ -34505,6 +34761,7 @@ class SpineDartBindings {
     return _spine_region_attachment_compute_world_vertices_1(
       self,
       slot,
+      vertexOffsets,
       worldVertices,
       offset,
       stride,
@@ -34513,14 +34770,17 @@ class SpineDartBindings {
 
   late final _spine_region_attachment_compute_world_vertices_1Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Void Function(spine_region_attachment, spine_slot, ffi.Pointer<ffi.Float>, ffi.Size,
-              ffi.Size)>>('spine_region_attachment_compute_world_vertices_1');
-  late final _spine_region_attachment_compute_world_vertices_1 = _spine_region_attachment_compute_world_vertices_1Ptr
-      .asFunction<void Function(spine_region_attachment, spine_slot, ffi.Pointer<ffi.Float>, int, int)>();
+          ffi.Void Function(spine_region_attachment, spine_slot, ffi.Pointer<ffi.Float>, ffi.Pointer<ffi.Float>,
+              ffi.Size, ffi.Size)>>('spine_region_attachment_compute_world_vertices_1');
+  late final _spine_region_attachment_compute_world_vertices_1 =
+      _spine_region_attachment_compute_world_vertices_1Ptr.asFunction<
+          void Function(
+              spine_region_attachment, spine_slot, ffi.Pointer<ffi.Float>, ffi.Pointer<ffi.Float>, int, int)>();
 
   void spine_region_attachment_compute_world_vertices_2(
     spine_region_attachment self,
     spine_slot slot,
+    spine_array_float vertexOffsets,
     spine_array_float worldVertices,
     int offset,
     int stride,
@@ -34528,6 +34788,7 @@ class SpineDartBindings {
     return _spine_region_attachment_compute_world_vertices_2(
       self,
       slot,
+      vertexOffsets,
       worldVertices,
       offset,
       stride,
@@ -34536,10 +34797,27 @@ class SpineDartBindings {
 
   late final _spine_region_attachment_compute_world_vertices_2Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Void Function(spine_region_attachment, spine_slot, spine_array_float, ffi.Size,
+          ffi.Void Function(spine_region_attachment, spine_slot, spine_array_float, spine_array_float, ffi.Size,
               ffi.Size)>>('spine_region_attachment_compute_world_vertices_2');
   late final _spine_region_attachment_compute_world_vertices_2 = _spine_region_attachment_compute_world_vertices_2Ptr
-      .asFunction<void Function(spine_region_attachment, spine_slot, spine_array_float, int, int)>();
+      .asFunction<void Function(spine_region_attachment, spine_slot, spine_array_float, spine_array_float, int, int)>();
+
+  /// Returns the vertex offsets for the specified slot pose.
+  spine_array_float spine_region_attachment_get_offsets(
+    spine_region_attachment self,
+    spine_slot_pose pose,
+  ) {
+    return _spine_region_attachment_get_offsets(
+      self,
+      pose,
+    );
+  }
+
+  late final _spine_region_attachment_get_offsetsPtr =
+      _lookup<ffi.NativeFunction<spine_array_float Function(spine_region_attachment, spine_slot_pose)>>(
+          'spine_region_attachment_get_offsets');
+  late final _spine_region_attachment_get_offsets = _spine_region_attachment_get_offsetsPtr
+      .asFunction<spine_array_float Function(spine_region_attachment, spine_slot_pose)>();
 
   double spine_region_attachment_get_x(
     spine_region_attachment self,
@@ -34599,35 +34877,6 @@ class SpineDartBindings {
   late final _spine_region_attachment_set_y =
       _spine_region_attachment_set_yPtr.asFunction<void Function(spine_region_attachment, double)>();
 
-  double spine_region_attachment_get_rotation(
-    spine_region_attachment self,
-  ) {
-    return _spine_region_attachment_get_rotation(
-      self,
-    );
-  }
-
-  late final _spine_region_attachment_get_rotationPtr =
-      _lookup<ffi.NativeFunction<ffi.Float Function(spine_region_attachment)>>('spine_region_attachment_get_rotation');
-  late final _spine_region_attachment_get_rotation =
-      _spine_region_attachment_get_rotationPtr.asFunction<double Function(spine_region_attachment)>();
-
-  void spine_region_attachment_set_rotation(
-    spine_region_attachment self,
-    double inValue,
-  ) {
-    return _spine_region_attachment_set_rotation(
-      self,
-      inValue,
-    );
-  }
-
-  late final _spine_region_attachment_set_rotationPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(spine_region_attachment, ffi.Float)>>(
-          'spine_region_attachment_set_rotation');
-  late final _spine_region_attachment_set_rotation =
-      _spine_region_attachment_set_rotationPtr.asFunction<void Function(spine_region_attachment, double)>();
-
   double spine_region_attachment_get_scale_x(
     spine_region_attachment self,
   ) {
@@ -34685,6 +34934,35 @@ class SpineDartBindings {
           'spine_region_attachment_set_scale_y');
   late final _spine_region_attachment_set_scale_y =
       _spine_region_attachment_set_scale_yPtr.asFunction<void Function(spine_region_attachment, double)>();
+
+  double spine_region_attachment_get_rotation(
+    spine_region_attachment self,
+  ) {
+    return _spine_region_attachment_get_rotation(
+      self,
+    );
+  }
+
+  late final _spine_region_attachment_get_rotationPtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_region_attachment)>>('spine_region_attachment_get_rotation');
+  late final _spine_region_attachment_get_rotation =
+      _spine_region_attachment_get_rotationPtr.asFunction<double Function(spine_region_attachment)>();
+
+  void spine_region_attachment_set_rotation(
+    spine_region_attachment self,
+    double inValue,
+  ) {
+    return _spine_region_attachment_set_rotation(
+      self,
+      inValue,
+    );
+  }
+
+  late final _spine_region_attachment_set_rotationPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_region_attachment, ffi.Float)>>(
+          'spine_region_attachment_set_rotation');
+  late final _spine_region_attachment_set_rotation =
+      _spine_region_attachment_set_rotationPtr.asFunction<void Function(spine_region_attachment, double)>();
 
   double spine_region_attachment_get_width(
     spine_region_attachment self,
@@ -34744,18 +35022,33 @@ class SpineDartBindings {
   late final _spine_region_attachment_set_height =
       _spine_region_attachment_set_heightPtr.asFunction<void Function(spine_region_attachment, double)>();
 
-  spine_color spine_region_attachment_get_color(
+  spine_sequence spine_region_attachment_get_sequence(
     spine_region_attachment self,
   ) {
-    return _spine_region_attachment_get_color(
+    return _spine_region_attachment_get_sequence(
       self,
     );
   }
 
-  late final _spine_region_attachment_get_colorPtr =
-      _lookup<ffi.NativeFunction<spine_color Function(spine_region_attachment)>>('spine_region_attachment_get_color');
-  late final _spine_region_attachment_get_color =
-      _spine_region_attachment_get_colorPtr.asFunction<spine_color Function(spine_region_attachment)>();
+  late final _spine_region_attachment_get_sequencePtr =
+      _lookup<ffi.NativeFunction<spine_sequence Function(spine_region_attachment)>>(
+          'spine_region_attachment_get_sequence');
+  late final _spine_region_attachment_get_sequence =
+      _spine_region_attachment_get_sequencePtr.asFunction<spine_sequence Function(spine_region_attachment)>();
+
+  void spine_region_attachment_update_sequence(
+    spine_region_attachment self,
+  ) {
+    return _spine_region_attachment_update_sequence(
+      self,
+    );
+  }
+
+  late final _spine_region_attachment_update_sequencePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_region_attachment)>>(
+          'spine_region_attachment_update_sequence');
+  late final _spine_region_attachment_update_sequence =
+      _spine_region_attachment_update_sequencePtr.asFunction<void Function(spine_region_attachment)>();
 
   ffi.Pointer<ffi.Char> spine_region_attachment_get_path(
     spine_region_attachment self,
@@ -34787,93 +35080,18 @@ class SpineDartBindings {
   late final _spine_region_attachment_set_path =
       _spine_region_attachment_set_pathPtr.asFunction<void Function(spine_region_attachment, ffi.Pointer<ffi.Char>)>();
 
-  spine_texture_region spine_region_attachment_get_region(
+  spine_color spine_region_attachment_get_color(
     spine_region_attachment self,
   ) {
-    return _spine_region_attachment_get_region(
+    return _spine_region_attachment_get_color(
       self,
     );
   }
 
-  late final _spine_region_attachment_get_regionPtr =
-      _lookup<ffi.NativeFunction<spine_texture_region Function(spine_region_attachment)>>(
-          'spine_region_attachment_get_region');
-  late final _spine_region_attachment_get_region =
-      _spine_region_attachment_get_regionPtr.asFunction<spine_texture_region Function(spine_region_attachment)>();
-
-  void spine_region_attachment_set_region(
-    spine_region_attachment self,
-    spine_texture_region region,
-  ) {
-    return _spine_region_attachment_set_region(
-      self,
-      region,
-    );
-  }
-
-  late final _spine_region_attachment_set_regionPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(spine_region_attachment, spine_texture_region)>>(
-          'spine_region_attachment_set_region');
-  late final _spine_region_attachment_set_region =
-      _spine_region_attachment_set_regionPtr.asFunction<void Function(spine_region_attachment, spine_texture_region)>();
-
-  spine_sequence spine_region_attachment_get_sequence(
-    spine_region_attachment self,
-  ) {
-    return _spine_region_attachment_get_sequence(
-      self,
-    );
-  }
-
-  late final _spine_region_attachment_get_sequencePtr =
-      _lookup<ffi.NativeFunction<spine_sequence Function(spine_region_attachment)>>(
-          'spine_region_attachment_get_sequence');
-  late final _spine_region_attachment_get_sequence =
-      _spine_region_attachment_get_sequencePtr.asFunction<spine_sequence Function(spine_region_attachment)>();
-
-  void spine_region_attachment_set_sequence(
-    spine_region_attachment self,
-    spine_sequence sequence,
-  ) {
-    return _spine_region_attachment_set_sequence(
-      self,
-      sequence,
-    );
-  }
-
-  late final _spine_region_attachment_set_sequencePtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(spine_region_attachment, spine_sequence)>>(
-          'spine_region_attachment_set_sequence');
-  late final _spine_region_attachment_set_sequence =
-      _spine_region_attachment_set_sequencePtr.asFunction<void Function(spine_region_attachment, spine_sequence)>();
-
-  spine_array_float spine_region_attachment_get_offset(
-    spine_region_attachment self,
-  ) {
-    return _spine_region_attachment_get_offset(
-      self,
-    );
-  }
-
-  late final _spine_region_attachment_get_offsetPtr =
-      _lookup<ffi.NativeFunction<spine_array_float Function(spine_region_attachment)>>(
-          'spine_region_attachment_get_offset');
-  late final _spine_region_attachment_get_offset =
-      _spine_region_attachment_get_offsetPtr.asFunction<spine_array_float Function(spine_region_attachment)>();
-
-  spine_array_float spine_region_attachment_get_u_vs(
-    spine_region_attachment self,
-  ) {
-    return _spine_region_attachment_get_u_vs(
-      self,
-    );
-  }
-
-  late final _spine_region_attachment_get_u_vsPtr =
-      _lookup<ffi.NativeFunction<spine_array_float Function(spine_region_attachment)>>(
-          'spine_region_attachment_get_u_vs');
-  late final _spine_region_attachment_get_u_vs =
-      _spine_region_attachment_get_u_vsPtr.asFunction<spine_array_float Function(spine_region_attachment)>();
+  late final _spine_region_attachment_get_colorPtr =
+      _lookup<ffi.NativeFunction<spine_color Function(spine_region_attachment)>>('spine_region_attachment_get_color');
+  late final _spine_region_attachment_get_color =
+      _spine_region_attachment_get_colorPtr.asFunction<spine_color Function(spine_region_attachment)>();
 
   spine_attachment spine_region_attachment_copy(
     spine_region_attachment self,
@@ -34888,6 +35106,44 @@ class SpineDartBindings {
   late final _spine_region_attachment_copy =
       _spine_region_attachment_copyPtr.asFunction<spine_attachment Function(spine_region_attachment)>();
 
+  /// Computes UVs and offsets for a region attachment.
+  ///
+  /// @param uvs Output array for the computed UVs, length of 8.
+  /// @param offset Output array for the computed vertex offsets, length of 8.
+  void spine_region_attachment_compute_u_vs(
+    spine_texture_region region,
+    double x,
+    double y,
+    double scaleX,
+    double scaleY,
+    double rotation,
+    double width,
+    double height,
+    spine_array_float offset,
+    spine_array_float uvs,
+  ) {
+    return _spine_region_attachment_compute_u_vs(
+      region,
+      x,
+      y,
+      scaleX,
+      scaleY,
+      rotation,
+      width,
+      height,
+      offset,
+      uvs,
+    );
+  }
+
+  late final _spine_region_attachment_compute_u_vsPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_texture_region, ffi.Float, ffi.Float, ffi.Float, ffi.Float, ffi.Float, ffi.Float,
+              ffi.Float, spine_array_float, spine_array_float)>>('spine_region_attachment_compute_u_vs');
+  late final _spine_region_attachment_compute_u_vs = _spine_region_attachment_compute_u_vsPtr.asFunction<
+      void Function(spine_texture_region, double, double, double, double, double, double, double, spine_array_float,
+          spine_array_float)>();
+
   ffi.Pointer<ffi.Char> spine_region_attachment_get_name(
     spine_region_attachment self,
   ) {
@@ -34901,6 +35157,36 @@ class SpineDartBindings {
           'spine_region_attachment_get_name');
   late final _spine_region_attachment_get_name =
       _spine_region_attachment_get_namePtr.asFunction<ffi.Pointer<ffi.Char> Function(spine_region_attachment)>();
+
+  spine_attachment spine_region_attachment_get_timeline_attachment(
+    spine_region_attachment self,
+  ) {
+    return _spine_region_attachment_get_timeline_attachment(
+      self,
+    );
+  }
+
+  late final _spine_region_attachment_get_timeline_attachmentPtr =
+      _lookup<ffi.NativeFunction<spine_attachment Function(spine_region_attachment)>>(
+          'spine_region_attachment_get_timeline_attachment');
+  late final _spine_region_attachment_get_timeline_attachment = _spine_region_attachment_get_timeline_attachmentPtr
+      .asFunction<spine_attachment Function(spine_region_attachment)>();
+
+  void spine_region_attachment_set_timeline_attachment(
+    spine_region_attachment self,
+    spine_attachment attachment,
+  ) {
+    return _spine_region_attachment_set_timeline_attachment(
+      self,
+      attachment,
+    );
+  }
+
+  late final _spine_region_attachment_set_timeline_attachmentPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_region_attachment, spine_attachment)>>(
+          'spine_region_attachment_set_timeline_attachment');
+  late final _spine_region_attachment_set_timeline_attachment = _spine_region_attachment_set_timeline_attachmentPtr
+      .asFunction<void Function(spine_region_attachment, spine_attachment)>();
 
   int spine_region_attachment_get_ref_count(
     spine_region_attachment self,
@@ -38007,15 +38293,30 @@ class SpineDartBindings {
 
   spine_sequence spine_sequence_create(
     int count,
+    bool pathSuffix,
   ) {
     return _spine_sequence_create(
       count,
+      pathSuffix,
     );
   }
 
   late final _spine_sequence_createPtr =
-      _lookup<ffi.NativeFunction<spine_sequence Function(ffi.Int)>>('spine_sequence_create');
-  late final _spine_sequence_create = _spine_sequence_createPtr.asFunction<spine_sequence Function(int)>();
+      _lookup<ffi.NativeFunction<spine_sequence Function(ffi.Int, ffi.Bool)>>('spine_sequence_create');
+  late final _spine_sequence_create = _spine_sequence_createPtr.asFunction<spine_sequence Function(int, bool)>();
+
+  /// Copy constructor.
+  spine_sequence spine_sequence_create2(
+    spine_sequence other,
+  ) {
+    return _spine_sequence_create2(
+      other,
+    );
+  }
+
+  late final _spine_sequence_create2Ptr =
+      _lookup<ffi.NativeFunction<spine_sequence Function(spine_sequence)>>('spine_sequence_create2');
+  late final _spine_sequence_create2 = _spine_sequence_create2Ptr.asFunction<spine_sequence Function(spine_sequence)>();
 
   void spine_sequence_dispose(
     spine_sequence self,
@@ -38029,80 +38330,113 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<ffi.Void Function(spine_sequence)>>('spine_sequence_dispose');
   late final _spine_sequence_dispose = _spine_sequence_disposePtr.asFunction<void Function(spine_sequence)>();
 
-  spine_sequence spine_sequence_copy(
+  /// Computes UVs and offsets for the specified attachment. Must be called if the
+  /// regions or attachment properties are changed.
+  void spine_sequence_update_1(
     spine_sequence self,
+    spine_region_attachment attachment,
   ) {
-    return _spine_sequence_copy(
+    return _spine_sequence_update_1(
       self,
-    );
-  }
-
-  late final _spine_sequence_copyPtr =
-      _lookup<ffi.NativeFunction<spine_sequence Function(spine_sequence)>>('spine_sequence_copy');
-  late final _spine_sequence_copy = _spine_sequence_copyPtr.asFunction<spine_sequence Function(spine_sequence)>();
-
-  void spine_sequence_apply(
-    spine_sequence self,
-    spine_slot_pose slot,
-    spine_attachment attachment,
-  ) {
-    return _spine_sequence_apply(
-      self,
-      slot,
       attachment,
     );
   }
 
-  late final _spine_sequence_applyPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(spine_sequence, spine_slot_pose, spine_attachment)>>(
-          'spine_sequence_apply');
-  late final _spine_sequence_apply =
-      _spine_sequence_applyPtr.asFunction<void Function(spine_sequence, spine_slot_pose, spine_attachment)>();
+  late final _spine_sequence_update_1Ptr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_sequence, spine_region_attachment)>>(
+          'spine_sequence_update_1');
+  late final _spine_sequence_update_1 =
+      _spine_sequence_update_1Ptr.asFunction<void Function(spine_sequence, spine_region_attachment)>();
 
-  ffi.Pointer<ffi.Char> spine_sequence_get_path(
+  void spine_sequence_update_2(
     spine_sequence self,
-    ffi.Pointer<ffi.Char> basePath,
+    spine_mesh_attachment attachment,
+  ) {
+    return _spine_sequence_update_2(
+      self,
+      attachment,
+    );
+  }
+
+  late final _spine_sequence_update_2Ptr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_sequence, spine_mesh_attachment)>>('spine_sequence_update_2');
+  late final _spine_sequence_update_2 =
+      _spine_sequence_update_2Ptr.asFunction<void Function(spine_sequence, spine_mesh_attachment)>();
+
+  spine_array_texture_region spine_sequence_get_regions(
+    spine_sequence self,
+  ) {
+    return _spine_sequence_get_regions(
+      self,
+    );
+  }
+
+  late final _spine_sequence_get_regionsPtr =
+      _lookup<ffi.NativeFunction<spine_array_texture_region Function(spine_sequence)>>('spine_sequence_get_regions');
+  late final _spine_sequence_get_regions =
+      _spine_sequence_get_regionsPtr.asFunction<spine_array_texture_region Function(spine_sequence)>();
+
+  int spine_sequence_resolve_index(
+    spine_sequence self,
+    spine_slot_pose pose,
+  ) {
+    return _spine_sequence_resolve_index(
+      self,
+      pose,
+    );
+  }
+
+  late final _spine_sequence_resolve_indexPtr =
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_sequence, spine_slot_pose)>>('spine_sequence_resolve_index');
+  late final _spine_sequence_resolve_index =
+      _spine_sequence_resolve_indexPtr.asFunction<int Function(spine_sequence, spine_slot_pose)>();
+
+  spine_texture_region spine_sequence_get_region(
+    spine_sequence self,
     int index,
   ) {
-    return _spine_sequence_get_path(
+    return _spine_sequence_get_region(
       self,
-      basePath,
       index,
     );
   }
 
-  late final _spine_sequence_get_pathPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function(spine_sequence, ffi.Pointer<ffi.Char>, ffi.Int)>>(
-          'spine_sequence_get_path');
-  late final _spine_sequence_get_path = _spine_sequence_get_pathPtr
-      .asFunction<ffi.Pointer<ffi.Char> Function(spine_sequence, ffi.Pointer<ffi.Char>, int)>();
+  late final _spine_sequence_get_regionPtr =
+      _lookup<ffi.NativeFunction<spine_texture_region Function(spine_sequence, ffi.Int)>>('spine_sequence_get_region');
+  late final _spine_sequence_get_region =
+      _spine_sequence_get_regionPtr.asFunction<spine_texture_region Function(spine_sequence, int)>();
 
-  /// Returns a unique ID for this attachment.
-  int spine_sequence_get_id(
+  spine_array_float spine_sequence_get_u_vs(
     spine_sequence self,
+    int index,
   ) {
-    return _spine_sequence_get_id(
+    return _spine_sequence_get_u_vs(
       self,
+      index,
     );
   }
 
-  late final _spine_sequence_get_idPtr =
-      _lookup<ffi.NativeFunction<ffi.Int Function(spine_sequence)>>('spine_sequence_get_id');
-  late final _spine_sequence_get_id = _spine_sequence_get_idPtr.asFunction<int Function(spine_sequence)>();
+  late final _spine_sequence_get_u_vsPtr =
+      _lookup<ffi.NativeFunction<spine_array_float Function(spine_sequence, ffi.Int)>>('spine_sequence_get_u_vs');
+  late final _spine_sequence_get_u_vs =
+      _spine_sequence_get_u_vsPtr.asFunction<spine_array_float Function(spine_sequence, int)>();
 
-  void spine_sequence_set_id(
+  /// Returns vertex offsets from the center of a RegionAttachment. Invalid to call
+  /// for a MeshAttachment.
+  spine_array_float spine_sequence_get_offsets(
     spine_sequence self,
-    int id,
+    int index,
   ) {
-    return _spine_sequence_set_id(
+    return _spine_sequence_get_offsets(
       self,
-      id,
+      index,
     );
   }
 
-  late final _spine_sequence_set_idPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(spine_sequence, ffi.Int)>>('spine_sequence_set_id');
-  late final _spine_sequence_set_id = _spine_sequence_set_idPtr.asFunction<void Function(spine_sequence, int)>();
+  late final _spine_sequence_get_offsetsPtr =
+      _lookup<ffi.NativeFunction<spine_array_float Function(spine_sequence, ffi.Int)>>('spine_sequence_get_offsets');
+  late final _spine_sequence_get_offsets =
+      _spine_sequence_get_offsetsPtr.asFunction<spine_array_float Function(spine_sequence, int)>();
 
   int spine_sequence_get_start(
     spine_sequence self,
@@ -38186,18 +38520,49 @@ class SpineDartBindings {
   late final _spine_sequence_set_setup_index =
       _spine_sequence_set_setup_indexPtr.asFunction<void Function(spine_sequence, int)>();
 
-  spine_array_texture_region spine_sequence_get_regions(
+  bool spine_sequence_has_path_suffix(
     spine_sequence self,
   ) {
-    return _spine_sequence_get_regions(
+    return _spine_sequence_has_path_suffix(
       self,
     );
   }
 
-  late final _spine_sequence_get_regionsPtr =
-      _lookup<ffi.NativeFunction<spine_array_texture_region Function(spine_sequence)>>('spine_sequence_get_regions');
-  late final _spine_sequence_get_regions =
-      _spine_sequence_get_regionsPtr.asFunction<spine_array_texture_region Function(spine_sequence)>();
+  late final _spine_sequence_has_path_suffixPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_sequence)>>('spine_sequence_has_path_suffix');
+  late final _spine_sequence_has_path_suffix =
+      _spine_sequence_has_path_suffixPtr.asFunction<bool Function(spine_sequence)>();
+
+  ffi.Pointer<ffi.Char> spine_sequence_get_path(
+    spine_sequence self,
+    ffi.Pointer<ffi.Char> basePath,
+    int index,
+  ) {
+    return _spine_sequence_get_path(
+      self,
+      basePath,
+      index,
+    );
+  }
+
+  late final _spine_sequence_get_pathPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function(spine_sequence, ffi.Pointer<ffi.Char>, ffi.Int)>>(
+          'spine_sequence_get_path');
+  late final _spine_sequence_get_path = _spine_sequence_get_pathPtr
+      .asFunction<ffi.Pointer<ffi.Char> Function(spine_sequence, ffi.Pointer<ffi.Char>, int)>();
+
+  /// Returns a unique ID for this attachment.
+  int spine_sequence_get_id(
+    spine_sequence self,
+  ) {
+    return _spine_sequence_get_id(
+      self,
+    );
+  }
+
+  late final _spine_sequence_get_idPtr =
+      _lookup<ffi.NativeFunction<ffi.Int Function(spine_sequence)>>('spine_sequence_get_id');
+  late final _spine_sequence_get_id = _spine_sequence_get_idPtr.asFunction<int Function(spine_sequence)>();
 
   spine_sequence_timeline spine_sequence_timeline_create(
     int frameCount,
@@ -49170,6 +49535,8 @@ final class spine_curve_timeline1_wrapper extends ffi.Opaque {}
 
 final class spine_deform_timeline_wrapper extends ffi.Opaque {}
 
+final class spine_draw_order_folder_timeline_wrapper extends ffi.Opaque {}
+
 final class spine_draw_order_timeline_wrapper extends ffi.Opaque {}
 
 final class spine_event_wrapper extends ffi.Opaque {}
@@ -49786,6 +50153,9 @@ typedef spine_constraint_timeline = ffi.Pointer<spine_constraint_timeline_wrappe
 /// Forward declarations for all non-enum types
 typedef spine_slot_curve_timeline = ffi.Pointer<spine_slot_curve_timeline_wrapper>;
 typedef spine_deform_timeline = ffi.Pointer<spine_deform_timeline_wrapper>;
+
+/// Forward declarations for all non-enum types
+typedef spine_draw_order_folder_timeline = ffi.Pointer<spine_draw_order_folder_timeline_wrapper>;
 
 /// Forward declarations for all non-enum types
 typedef spine_draw_order_timeline = ffi.Pointer<spine_draw_order_timeline_wrapper>;

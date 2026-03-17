@@ -95,78 +95,90 @@ int main() {
 	GLFWwindow *window = init_glfw();
 	if (!window) return -1;
 
+	spine_enable_debug_extension(true);
+
 	// We use a y-down coordinate system, see renderer_set_viewport_size()
 	Bone::setYDown(true);
 
-	// Load the atlas and the skeleton data
-	int atlas_length = 0;
-	uint8_t *atlas_bytes = read_file("data/spineboy-pma.atlas", &atlas_length);
-	spine_atlas_result result = spine_atlas_load_callback((const char *) atlas_bytes, "data/", load_texture, unload_texture);
-	spine_atlas atlas = spine_atlas_result_get_atlas(result);
+	{
 
-	int skeleton_length = 0;
-	// uint8_t *skeleton_bytes = read_file("data/spineboy-pro.skel", &skeleton_length);
-	// spine_skeleton_data_result result = spine_skeleton_data_load_binary(atlas, skeleton_bytes, skeleton_length);
-	uint8_t *skeleton_bytes = read_file("data/spineboy-pro.json", &skeleton_length);
-	spine_skeleton_data_result result2 = spine_skeleton_data_load_json(atlas, (const char *) skeleton_bytes, "data/");
-	spine_skeleton_data skeleton_data = spine_skeleton_data_result_get_data(result2);
+		// Load the atlas and the skeleton data
+		int atlas_length = 0;
+		uint8_t *atlas_bytes = read_file("data/spineboy-pma.atlas", &atlas_length);
+		spine_atlas_result result = spine_atlas_load_callback((const char *) atlas_bytes, "data/", load_texture, unload_texture);
+		spine_atlas atlas = spine_atlas_result_get_atlas(result);
+		spine_atlas_result_dispose(result);
 
-	// Create a skeleton from the data, set the skeleton's position to the bottom center of
-	// the screen and scale it to make it smaller.
-	spine_skeleton_drawable drawable = spine_skeleton_drawable_create(skeleton_data);
-	spine_skeleton skeleton = spine_skeleton_drawable_get_skeleton(drawable);
-	spine_skeleton_set_position(skeleton, width / 2, height - 100);
-	spine_skeleton_set_scale(skeleton, 0.3f, 0.3f);
+		int skeleton_length = 0;
+		// uint8_t *skeleton_bytes = read_file("data/spineboy-pro.skel", &skeleton_length);
+		// spine_skeleton_data_result result = spine_skeleton_data_load_binary(atlas, skeleton_bytes, skeleton_length);
+		uint8_t *skeleton_bytes = read_file("data/spineboy-pro.json", &skeleton_length);
+		spine_skeleton_data_result result2 = spine_skeleton_data_load_json(atlas, (const char *) skeleton_bytes, "data/");
+		spine_skeleton_data skeleton_data = spine_skeleton_data_result_get_data(result2);
+		spine_skeleton_data_result_dispose(result2);
 
-	// Create an AnimationState to drive animations on the skeleton. Set the "portal" animation
-	// on track with index 0.
-	spine_animation_state animation_state = spine_skeleton_drawable_get_animation_state(drawable);
-	spine_animation_state_data animation_state_data = spine_animation_state_get_data(animation_state);
-	spine_animation_state_data_set_default_mix(animation_state_data, 0.2f);
-	spine_animation_state_set_animation_1(animation_state, 0, "portal", true);
-	spine_track_entry entry = spine_animation_state_add_animation_1(animation_state, 0, "run", true, 0);
-	spine_track_entry_set_listener(entry, track_listener, NULL);
+		// Create a skeleton from the data, set the skeleton's position to the bottom center of
+		// the screen and scale it to make it smaller.
+		spine_skeleton_drawable drawable = spine_skeleton_drawable_create(skeleton_data);
+		spine_skeleton skeleton = spine_skeleton_drawable_get_skeleton(drawable);
+		spine_skeleton_set_position(skeleton, width / 2, height - 100);
+		spine_skeleton_set_scale(skeleton, 0.3f, 0.3f);
 
-	// Create the renderer and set the viewport size to match the window size. This sets up a
-	// pixel perfect orthogonal projection for 2D rendering.
-	renderer_t *renderer = renderer_create();
-	renderer_set_viewport_size(renderer, width, height);
+		// Create an AnimationState to drive animations on the skeleton. Set the "portal" animation
+		// on track with index 0.
+		spine_animation_state animation_state = spine_skeleton_drawable_get_animation_state(drawable);
+		spine_animation_state_data animation_state_data = spine_animation_state_get_data(animation_state);
+		spine_animation_state_data_set_default_mix(animation_state_data, 0.2f);
+		spine_animation_state_set_animation_1(animation_state, 0, "portal", true);
+		spine_track_entry entry = spine_animation_state_add_animation_1(animation_state, 0, "run", true, 0);
+		spine_track_entry_set_listener(entry, track_listener, NULL);
 
-	// Rendering loop
-	double lastTime = glfwGetTime();
-	while (!glfwWindowShouldClose(window)) {
-		// Calculate the delta time in seconds
-		double currTime = glfwGetTime();
-		float delta = currTime - lastTime;
-		lastTime = currTime;
+		// Create the renderer and set the viewport size to match the window size. This sets up a
+		// pixel perfect orthogonal projection for 2D rendering.
+		renderer_t *renderer = renderer_create();
+		renderer_set_viewport_size(renderer, width, height);
 
-		// Update and apply the animation state to the skeleton
-		spine_animation_state_update(animation_state, delta);
-		spine_animation_state_apply(animation_state, skeleton);
+		// Rendering loop
+		double lastTime = glfwGetTime();
+		while (!glfwWindowShouldClose(window)) {
+			// Calculate the delta time in seconds
+			double currTime = glfwGetTime();
+			float delta = currTime - lastTime;
+			lastTime = currTime;
 
-		// Update the skeleton time (used for physics)
-		spine_skeleton_update(skeleton, delta);
+			// Update and apply the animation state to the skeleton
+			spine_animation_state_update(animation_state, delta);
+			spine_animation_state_apply(animation_state, skeleton);
 
-		// Calculate the new pose
-		spine_skeleton_update_world_transform(skeleton, SPINE_PHYSICS_UPDATE);
+			// Update the skeleton time (used for physics)
+			spine_skeleton_update(skeleton, delta);
 
-		// Clear the screen
-		gl::glClear(gl::GL_COLOR_BUFFER_BIT);
+			// Calculate the new pose
+			spine_skeleton_update_world_transform(skeleton, SPINE_PHYSICS_UPDATE);
 
-		// Render the skeleton in its current pose
-		renderer_draw_c(renderer, skeleton, true);
+			// Clear the screen
+			gl::glClear(gl::GL_COLOR_BUFFER_BIT);
 
-		// Present the rendering results and poll for events
-		glfwSwapBuffers(window);
-		glfwPollEvents();
+			// Render the skeleton in its current pose
+			renderer_draw_c(renderer, skeleton, true);
+
+			// Present the rendering results and poll for events
+			glfwSwapBuffers(window);
+			glfwPollEvents();
+		}
+
+		// Dispose everything
+		renderer_dispose(renderer);
+		spine_skeleton_drawable_dispose(drawable);
+		spine_skeleton_data_dispose(skeleton_data);
+		spine_atlas_dispose(atlas);
+		free(atlas_bytes);
+		free(skeleton_bytes);
+
+		// Kill the window and GLFW
 	}
 
-	// Dispose everything
-	renderer_dispose(renderer);
-	// delete skeletonData;
-	delete atlas;
-
-	// Kill the window and GLFW
+	spine_report_leaks();
 	glfwTerminate();
 	return 0;
 }

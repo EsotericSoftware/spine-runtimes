@@ -132,7 +132,6 @@ interface WidgetPublicProperties {
 
 // Usage of this properties is discouraged because they can be made private in the future
 interface WidgetInternalProperties {
-	pma: boolean
 	dprScale: number
 	dragging: boolean
 	dragX: number
@@ -649,13 +648,6 @@ export class SpineWebComponentSkeleton extends HTMLElement implements Disposable
 	public dragging = false;
 
 	/**
-	 * @internal
-	 * If true, the widget has texture with premultiplied alpha
-	 * Do not rely on this properties. It might be made private in the future.
-	 */
-	public pma = false;
-
-	/**
 	 * If true, indicate {@link dispose} has been called and the widget cannot be used anymore
 	 */
 	public disposed = false;
@@ -972,7 +964,6 @@ export class SpineWebComponentSkeleton extends HTMLElement implements Disposable
 		]);
 
 		const atlas = this.overlay.assetManager.require(atlasPath) as TextureAtlas;
-		this.pma = atlas.pages[0]?.pma
 
 		const atlasLoader = new AtlasAttachmentLoader(atlas);
 
@@ -1169,12 +1160,10 @@ export class SpineWebComponentSkeleton extends HTMLElement implements Disposable
 
 			// we could probably cache the vertices from rendering if interaction with this slot is enabled
 			if (attachment instanceof RegionAttachment) {
-				const regionAttachment = <RegionAttachment>attachment;
-				regionAttachment.computeWorldVertices(slot, vertices, 0, 2);
+				attachment.computeWorldVertices(slot, attachment.getOffsets(slot.applied), vertices, 0, 2);
 			} else if (attachment instanceof MeshAttachment) {
-				const mesh = <MeshAttachment>attachment;
-				mesh.computeWorldVertices(this.skeleton as Skeleton, slot, 0, mesh.worldVerticesLength, vertices, 0, 2);
-				hullLength = mesh.hullLength;
+				attachment.computeWorldVertices(this.skeleton as Skeleton, slot, 0, attachment.worldVerticesLength, vertices, 0, 2);
+				hullLength = attachment.hullLength;
 			}
 
 			// here we have only "move" and "drag" events

@@ -35,7 +35,7 @@ using namespace spine;
 
 RTTI_IMPL_NOPARENT(Attachment)
 
-Attachment::Attachment(const String &name) : _name(name), _refCount(0) {
+Attachment::Attachment(const String &name) : _name(name), _timelineAttachment(this), _refCount(0) {
 	assert(_name.length() > 0);
 }
 
@@ -44,6 +44,14 @@ Attachment::~Attachment() {
 
 const String &Attachment::getName() const {
 	return _name;
+}
+
+Attachment *Attachment::getTimelineAttachment() {
+	return _timelineAttachment;
+}
+
+void Attachment::setTimelineAttachment(Attachment *attachment) {
+	_timelineAttachment = attachment;
 }
 
 int Attachment::getRefCount() {

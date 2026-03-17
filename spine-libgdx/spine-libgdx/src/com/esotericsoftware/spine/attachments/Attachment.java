@@ -29,18 +29,34 @@
 
 package com.esotericsoftware.spine.attachments;
 
+import com.badlogic.gdx.utils.Null;
+
 /** The base class for all attachments. */
 abstract public class Attachment {
 	final String name;
+	@Null Attachment timelineAttachment;
 
 	public Attachment (String name) {
 		if (name == null) throw new IllegalArgumentException("name cannot be null.");
 		this.name = name;
+		timelineAttachment = this;
 	}
 
 	/** Copy constructor. */
 	protected Attachment (Attachment other) {
 		name = other.name;
+		timelineAttachment = other.timelineAttachment;
+	}
+
+	/** Timelines for the timeline attachment are also applied to this attachment.
+	 * @return May be null if no attachment-specific timelines should be applied. */
+	public @Null Attachment getTimelineAttachment () {
+		return timelineAttachment;
+	}
+
+	/** @param timelineAttachment May be null if no attachment-specific timelines should be applied. */
+	public void setTimelineAttachment (@Null Attachment timelineAttachment) {
+		this.timelineAttachment = timelineAttachment;
 	}
 
 	/** The attachment's name. */

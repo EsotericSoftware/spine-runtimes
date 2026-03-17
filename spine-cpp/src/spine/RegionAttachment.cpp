@@ -31,7 +31,9 @@
 
 #include <spine/Atlas.h>
 #include <spine/Bone.h>
+#include <spine/MathUtil.h>
 #include <spine/Slot.h>
+#include <spine/SlotPose.h>
 
 #include <assert.h>
 
@@ -48,130 +50,51 @@ const int RegionAttachment::URY = 5;
 const int RegionAttachment::BRX = 6;
 const int RegionAttachment::BRY = 7;
 
-RegionAttachment::RegionAttachment(const String &name)
-	: Attachment(name), _region(NULL), _path(), _x(0), _y(0), _scaleX(1), _scaleY(1), _rotation(0), _width(0), _height(0), _color(1, 1, 1, 1),
-	  _sequence(NULL) {
-	_offset.setSize(8, 0);
-	_uvs.setSize(8, 0);
+RegionAttachment::RegionAttachment(const String &name, Sequence *sequence)
+	: Attachment(name), _sequence(sequence), _x(0), _y(0), _scaleX(1), _scaleY(1), _rotation(0), _width(0), _height(0), _path(), _color(1, 1, 1, 1) {
+	assert(sequence);
 }
 
 RegionAttachment::~RegionAttachment() {
-	if (_sequence) delete _sequence;
+	delete _sequence;
 }
 
-void RegionAttachment::updateRegion() {
-	float width = getWidth(), height = getHeight();
-	float localX2 = width / 2;
-	float localY2 = height / 2;
-	float localX = -localX2;
-	float localY = -localY2;
-	bool rotated = false;
-	AtlasRegion *atlasRegion = NULL;
-	if (_region != NULL) {
-		atlasRegion = _region->getRTTI().isExactly(AtlasRegion::rtti) ? static_cast<AtlasRegion *>(_region) : NULL;
-	}
-	if (atlasRegion) {
-		localX += atlasRegion->_offsetX / atlasRegion->_originalWidth * width;
-		localY += atlasRegion->_offsetY / atlasRegion->_originalHeight * height;
-		if (atlasRegion->_degrees == 90) {
-			rotated = true;
-			localX2 -= (atlasRegion->_originalWidth - atlasRegion->_offsetX - atlasRegion->_packedHeight) / atlasRegion->_originalWidth * width;
-			localY2 -= (atlasRegion->_originalHeight - atlasRegion->_offsetY - atlasRegion->_packedWidth) / atlasRegion->_originalHeight * height;
-		} else {
-			localX2 -= (atlasRegion->_originalWidth - atlasRegion->_offsetX - atlasRegion->_packedWidth) / atlasRegion->_originalWidth * width;
-			localY2 -= (atlasRegion->_originalHeight - atlasRegion->_offsetY - atlasRegion->_packedHeight) / atlasRegion->_originalHeight * height;
-		}
-	}
-	float scaleX = getScaleX(), scaleY = getScaleY();
-	localX *= scaleX;
-	localY *= scaleY;
-	localX2 *= scaleX;
-	localY2 *= scaleY;
-	float cos = MathUtil::cosDeg(_rotation);
-	float sin = MathUtil::sinDeg(_rotation);
-	float localXCos = localX * cos + _x;
-	float localXSin = localX * sin;
-	float localYCos = localY * cos + _y;
-	float localYSin = localY * sin;
-	float localX2Cos = localX2 * cos + _x;
-	float localX2Sin = localX2 * sin;
-	float localY2Cos = localY2 * cos + _y;
-	float localY2Sin = localY2 * sin;
-
-	_offset[BLX] = localXCos - localYSin;
-	_offset[BLY] = localYCos + localXSin;
-	_offset[ULX] = localXCos - localY2Sin;
-	_offset[ULY] = localY2Cos + localXSin;
-	_offset[URX] = localX2Cos - localY2Sin;
-	_offset[URY] = localY2Cos + localX2Sin;
-	_offset[BRX] = localX2Cos - localYSin;
-	_offset[BRY] = localYCos + localX2Sin;
-
-	if (_region == NULL) {
-		_uvs[BLX] = 0;
-		_uvs[BLY] = 0;
-		_uvs[ULX] = 0;
-		_uvs[ULY] = 1;
-		_uvs[URX] = 1;
-		_uvs[URY] = 1;
-		_uvs[BRX] = 1;
-		_uvs[BRY] = 0;
-	} else if (rotated) {
-		_uvs[BLX] = _region->_u2;
-		_uvs[BLY] = _region->_v;
-		_uvs[ULX] = _region->_u2;
-		_uvs[ULY] = _region->_v2;
-		_uvs[URX] = _region->_u;
-		_uvs[URY] = _region->_v2;
-		_uvs[BRX] = _region->_u;
-		_uvs[BRY] = _region->_v;
-	} else {
-		_uvs[BLX] = _region->_u2;
-		_uvs[BLY] = _region->_v2;
-		_uvs[ULX] = _region->_u;
-		_uvs[ULY] = _region->_v2;
-		_uvs[URX] = _region->_u;
-		_uvs[URY] = _region->_v;
-		_uvs[BRX] = _region->_u2;
-		_uvs[BRY] = _region->_v;
-	}
-}
-
-void RegionAttachment::computeWorldVertices(Slot &slot, Array<float> &worldVertices, size_t offset, size_t stride) {
+void RegionAttachment::computeWorldVertices(Slot &slot, Array<float> &vertexOffsets, Array<float> &worldVertices, size_t offset, size_t stride) {
 	assert(worldVertices.size() >= (offset + 8));
-	computeWorldVertices(slot, worldVertices.buffer(), offset, stride);
+	computeWorldVertices(slot, vertexOffsets.buffer(), worldVertices.buffer(), offset, stride);
 }
 
-void RegionAttachment::computeWorldVertices(Slot &slot, float *worldVertices, size_t offset, size_t stride) {
-	if (_sequence) _sequence->apply(&slot.getAppliedPose(), this);
-
+void RegionAttachment::computeWorldVertices(Slot &slot, float *vertexOffsets, float *worldVertices, size_t offset, size_t stride) {
 	BonePose &bone = slot.getBone().getAppliedPose();
 	float x = bone.getWorldX(), y = bone.getWorldY();
 	float a = bone.getA(), b = bone.getB(), c = bone.getC(), d = bone.getD();
-	float offsetX, offsetY;
 
-	offsetX = _offset[BRX];
-	offsetY = _offset[BRY];
-	worldVertices[offset] = offsetX * a + offsetY * b + x;// br
+	float offsetX = vertexOffsets[BRX];
+	float offsetY = vertexOffsets[BRY];
+	worldVertices[offset] = offsetX * a + offsetY * b + x;
 	worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
 	offset += stride;
 
-	offsetX = _offset[BLX];
-	offsetY = _offset[BLY];
-	worldVertices[offset] = offsetX * a + offsetY * b + x;// bl
+	offsetX = vertexOffsets[BLX];
+	offsetY = vertexOffsets[BLY];
+	worldVertices[offset] = offsetX * a + offsetY * b + x;
 	worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
 	offset += stride;
 
-	offsetX = _offset[ULX];
-	offsetY = _offset[ULY];
-	worldVertices[offset] = offsetX * a + offsetY * b + x;// ul
+	offsetX = vertexOffsets[ULX];
+	offsetY = vertexOffsets[ULY];
+	worldVertices[offset] = offsetX * a + offsetY * b + x;
 	worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
 	offset += stride;
 
-	offsetX = _offset[URX];
-	offsetY = _offset[URY];
-	worldVertices[offset] = offsetX * a + offsetY * b + x;// ur
+	offsetX = vertexOffsets[URX];
+	offsetY = vertexOffsets[URY];
+	worldVertices[offset] = offsetX * a + offsetY * b + x;
 	worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
+}
+
+Array<float> &RegionAttachment::getOffsets(SlotPose &pose) {
+	return _sequence->getOffsets(_sequence->resolveIndex(pose));
 }
 
 float RegionAttachment::getX() {
@@ -190,14 +113,6 @@ void RegionAttachment::setY(float inValue) {
 	_y = inValue;
 }
 
-float RegionAttachment::getRotation() {
-	return _rotation;
-}
-
-void RegionAttachment::setRotation(float inValue) {
-	_rotation = inValue;
-}
-
 float RegionAttachment::getScaleX() {
 	return _scaleX;
 }
@@ -212,6 +127,14 @@ float RegionAttachment::getScaleY() {
 
 void RegionAttachment::setScaleY(float inValue) {
 	_scaleY = inValue;
+}
+
+float RegionAttachment::getRotation() {
+	return _rotation;
+}
+
+void RegionAttachment::setRotation(float inValue) {
+	_rotation = inValue;
 }
 
 float RegionAttachment::getWidth() {
@@ -230,6 +153,14 @@ void RegionAttachment::setHeight(float inValue) {
 	_height = inValue;
 }
 
+Sequence &RegionAttachment::getSequence() {
+	return *_sequence;
+}
+
+void RegionAttachment::updateSequence() {
+	_sequence->update(*this);
+}
+
 const String &RegionAttachment::getPath() {
 	return _path;
 }
@@ -238,37 +169,13 @@ void RegionAttachment::setPath(const String &inValue) {
 	_path = inValue;
 }
 
-TextureRegion *RegionAttachment::getRegion() {
-	return _region;
-}
-
-void RegionAttachment::setRegion(TextureRegion *region) {
-	_region = region;
-}
-
-Sequence *RegionAttachment::getSequence() {
-	return _sequence;
-}
-
-void RegionAttachment::setSequence(Sequence *sequence) {
-	_sequence = sequence;
-}
-
-Array<float> &RegionAttachment::getOffset() {
-	return _offset;
-}
-
-Array<float> &RegionAttachment::getUVs() {
-	return _uvs;
-}
-
 Color &RegionAttachment::getColor() {
 	return _color;
 }
 
 Attachment &RegionAttachment::copy() {
-	RegionAttachment *copy = new (__FILE__, __LINE__) RegionAttachment(getName());
-	copy->_region = _region;
+	RegionAttachment *copy = new (__FILE__, __LINE__) RegionAttachment(getName(), new (__FILE__, __LINE__) Sequence(*_sequence));
+	copy->setTimelineAttachment(getTimelineAttachment());
 	copy->_path = _path;
 	copy->_x = _x;
 	copy->_y = _y;
@@ -277,9 +184,74 @@ Attachment &RegionAttachment::copy() {
 	copy->_rotation = _rotation;
 	copy->_width = _width;
 	copy->_height = _height;
-	copy->_uvs.clearAndAddAll(_uvs);
-	copy->_offset.clearAndAddAll(_offset);
 	copy->_color.set(_color);
-	copy->_sequence = _sequence != NULL ? &_sequence->copy() : NULL;
 	return *copy;
+}
+
+void RegionAttachment::computeUVs(TextureRegion *region, float x, float y, float scaleX, float scaleY, float rotation, float width, float height,
+								  Array<float> &offset, Array<float> &uvs) {
+	float localX2 = width / 2, localY2 = height / 2;
+	float localX = -localX2, localY = -localY2;
+	bool rotated = false;
+	if (region != NULL && region->getRTTI().instanceOf(AtlasRegion::rtti)) {
+		AtlasRegion *r = static_cast<AtlasRegion *>(region);
+		localX += r->_offsetX / r->_originalWidth * width;
+		localY += r->_offsetY / r->_originalHeight * height;
+		if (r->_degrees == 90) {
+			rotated = true;
+			localX2 -= (r->_originalWidth - r->_offsetX - r->_packedHeight) / r->_originalWidth * width;
+			localY2 -= (r->_originalHeight - r->_offsetY - r->_packedWidth) / r->_originalHeight * height;
+		} else {
+			localX2 -= (r->_originalWidth - r->_offsetX - r->_packedWidth) / r->_originalWidth * width;
+			localY2 -= (r->_originalHeight - r->_offsetY - r->_packedHeight) / r->_originalHeight * height;
+		}
+	}
+	localX *= scaleX;
+	localY *= scaleY;
+	localX2 *= scaleX;
+	localY2 *= scaleY;
+	float cos = MathUtil::cosDeg(rotation);
+	float sin = MathUtil::sinDeg(rotation);
+	float localXCos = localX * cos + x;
+	float localXSin = localX * sin;
+	float localYCos = localY * cos + y;
+	float localYSin = localY * sin;
+	float localX2Cos = localX2 * cos + x;
+	float localX2Sin = localX2 * sin;
+	float localY2Cos = localY2 * cos + y;
+	float localY2Sin = localY2 * sin;
+	offset[BLX] = localXCos - localYSin;
+	offset[BLY] = localYCos + localXSin;
+	offset[ULX] = localXCos - localY2Sin;
+	offset[ULY] = localY2Cos + localXSin;
+	offset[URX] = localX2Cos - localY2Sin;
+	offset[URY] = localY2Cos + localX2Sin;
+	offset[BRX] = localX2Cos - localYSin;
+	offset[BRY] = localYCos + localX2Sin;
+	if (region == NULL) {
+		uvs[BLX] = 0;
+		uvs[BLY] = 0;
+		uvs[ULX] = 0;
+		uvs[ULY] = 1;
+		uvs[URX] = 1;
+		uvs[URY] = 1;
+		uvs[BRX] = 1;
+		uvs[BRY] = 0;
+	} else {
+		uvs[BLX] = region->_u2;
+		uvs[ULY] = region->_v2;
+		uvs[URX] = region->_u;
+		uvs[BRY] = region->_v;
+		if (rotated) {
+			uvs[BLY] = region->_v;
+			uvs[ULX] = region->_u2;
+			uvs[URY] = region->_v2;
+			uvs[BRX] = region->_u;
+		} else {
+			uvs[BLY] = region->_v2;
+			uvs[ULX] = region->_u;
+			uvs[URY] = region->_v;
+			uvs[BRX] = region->_u2;
+		}
+	}
 }

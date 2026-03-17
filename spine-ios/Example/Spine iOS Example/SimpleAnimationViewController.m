@@ -33,6 +33,7 @@
 @interface SimpleAnimationViewController ()
 
 @property (nonatomic, strong) SpineController *spineController;
+@property (nonatomic, strong) SpineUIView *spineView;
 
 @end
 
@@ -55,19 +56,29 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-    SpineUIView *spineView = [[SpineUIView alloc] initWithAtlasFileName:@"spineboy-pma.atlas"
-                                                       skeletonFileName:@"spineboy-pro.skel"
-                                                                 bundle:[NSBundle mainBundle]
-                                                             controller:self.spineController
-                                                                   mode:SpineContentModeFit
-                                                              alignment:SpineAlignmentCenter
-                                                         boundsProvider:[[SpineSetupPoseBounds alloc] init]
-                                                        backgroundColor:[UIColor clearColor]];
-    spineView.frame = self.view.bounds;
-    spineView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    
-    [self.view addSubview:spineView];
+
+    self.spineView = [[SpineUIView alloc] initWithAtlasFileName:@"spineboy-pma.atlas"
+                                               skeletonFileName:@"spineboy-pro.skel"
+                                                         bundle:[NSBundle mainBundle]
+                                                     controller:self.spineController
+                                                           mode:SpineContentModeFit
+                                                      alignment:SpineAlignmentCenter
+                                                 boundsProvider:[[SpineSetupPoseBounds alloc] init]
+                                                backgroundColor:[UIColor clearColor]];
+    self.spineView.frame = self.view.bounds;
+    self.spineView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+
+    [self.view addSubview:self.spineView];
+}
+
+- (void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+
+    // UIKit will eventually release the view controller and controller. We dispose
+    // explicitly here so leak reporting runs after native teardown when navigating back.
+    [self.spineController dispose];
+    [self.spineView removeFromSuperview];
+    self.spineView = nil;
 }
 
 @end

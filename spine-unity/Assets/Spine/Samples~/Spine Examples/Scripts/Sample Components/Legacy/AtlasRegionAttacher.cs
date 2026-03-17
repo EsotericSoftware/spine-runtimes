@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -71,7 +71,9 @@ namespace Spine.Unity.Examples {
 				if (region == null) {
 					slotPose.Attachment = null;
 				} else if (inheritProperties && originalAttachment != null) {
-					slotPose.Attachment = originalAttachment.GetRemappedClone(region, true, true, scale);
+					Attachment newAttachment = originalAttachment.Copy();
+					newAttachment.SetRegion(region, true, scale);
+					slotPose.Attachment = newAttachment;
 				} else {
 					RegionAttachment newRegionAttachment = region.ToRegionAttachment(region.name, scale);
 					slotPose.Attachment = newRegionAttachment;

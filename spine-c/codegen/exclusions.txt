@@ -46,6 +46,7 @@ method: AtlasRegion::setNames
 # Array<Array<T>> returning methods not supported
 method: DeformTimeline::getVertices
 method: DrawOrderTimeline::getDrawOrders
+method: DrawOrderFolderTimeline::getDrawOrders
 
 # Can not emulate AttachmentMap::Entries, as that's stack allocated
 method: Skin::getAttachments

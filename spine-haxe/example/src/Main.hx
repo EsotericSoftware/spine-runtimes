@@ -29,6 +29,8 @@
 
 package;
 
+import openfl.events.Event;
+import starling.events.Event as StarlingEvent;
 import flixelExamples.FlixelState;
 import starlingExamples.BasicExample;
 import starlingExamples.Scene.SceneManager;
@@ -40,7 +42,6 @@ import openfl.text.TextField;
 import openfl.text.TextFormat;
 import openfl.events.MouseEvent;
 import openfl.geom.Rectangle;
-import starling.events.Event;
 
 class Main extends Sprite {
 	private var background:Sprite;
@@ -160,13 +161,15 @@ class Main extends Sprite {
 		trace("Launching Starling game");
 		starlingSingleton = new Starling(starling.display.Sprite, stage, new Rectangle(0, 0, 800, 600));
 		starlingSingleton.supportHighResolutions = true;
-		starlingSingleton.addEventListener(Event.ROOT_CREATED, onStarlingRootCreated);
+		starlingSingleton.addEventListener(StarlingEvent.ROOT_CREATED, onStarlingRootCreated);
 	}
 
-	private function onStarlingRootCreated(event:Event):Void {
+	private function onStarlingRootCreated(event:StarlingEvent):Void {
 		destroyUI();
-		starlingSingleton.removeEventListener(Event.ROOT_CREATED, onStarlingRootCreated);
+		starlingSingleton.removeEventListener(StarlingEvent.ROOT_CREATED, onStarlingRootCreated);
 		starlingSingleton.start();
+		Starling.current.stage.stageWidth = 800;
+		Starling.current.stage.stageHeight = 600;
 		Starling.current.stage.color = 0x000000;
 
 		SceneManager.getInstance().switchScene(new BasicExample());

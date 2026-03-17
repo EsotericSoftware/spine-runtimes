@@ -88,6 +88,8 @@ namespace spine {
 
 		friend class DeformTimeline;
 
+		friend class DrawOrderFolderTimeline;
+
 		friend class DrawOrderTimeline;
 
 		friend class EventTimeline;

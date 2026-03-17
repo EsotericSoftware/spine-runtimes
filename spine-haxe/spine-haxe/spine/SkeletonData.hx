@@ -33,6 +33,7 @@ import haxe.io.Bytes;
 import spine.animation.Animation;
 import spine.atlas.TextureAtlas;
 import spine.attachments.AtlasAttachmentLoader;
+import spine.SliderData;
 
 /** Stores the setup pose and all of the stateless data for a skeleton.
  *
@@ -190,6 +191,20 @@ class SkeletonData {
 	}
 
 	// --- Animations.
+
+	/** Collects animations used by slider constraints.
+	 * Slider animations are designed to be applied by slider constraints rather than on their own. Applications that have a user
+	 * choose an animation may want to exclude them. */
+	public function findSliderAnimations(animations:Array<Animation>):Array<Animation> {
+		for (constraint in constraints) {
+			if (Std.isOfType(constraint, SliderData)) {
+				var data:SliderData = cast(constraint, SliderData);
+				if (data.animation != null)
+					animations.push(data.animation);
+			}
+		}
+		return animations;
+	}
 
 	/** Finds an animation by comparing each animation's name. It is more efficient to cache the results of this method than to
 	 * call it multiple times.

@@ -226,7 +226,6 @@ export class SpineGameObject extends DepthMixin(
 	animationState: AnimationState;
 	beforeUpdateWorldTransforms: (object: SpineGameObject) => void = () => { };
 	afterUpdateWorldTransforms: (object: SpineGameObject) => void = () => { };
-	private premultipliedAlpha = false;
 	private offsetX = 0;
 	private offsetY = 0;
 
@@ -243,7 +242,6 @@ export class SpineGameObject extends DepthMixin(
 		super(scene, (window as any).SPINE_GAME_OBJECT_TYPE ? (window as any).SPINE_GAME_OBJECT_TYPE : SPINE_GAME_OBJECT_TYPE);
 		this.setPosition(x, y);
 
-		this.premultipliedAlpha = this.plugin.isAtlasPremultiplied(atlasKey);
 		this.skeleton = this.plugin.createSkeleton(dataKey, atlasKey);
 		this.animationStateData = new AnimationStateData(this.skeleton.data);
 		this.animationState = new AnimationState(this.animationStateData);
@@ -364,7 +362,7 @@ export class SpineGameObject extends DepthMixin(
 		if (newType) {
 			// Ensure framebuffer is properly set up.
 			if (drawingContext.renderer.renderNodes.currentBatchDrawingContext !== drawingContext) {
-				drawingContext.use();
+				drawingContext.renderer.renderNodes.finishBatch();
 				drawingContext.beginDraw();
 			}
 
@@ -379,7 +377,8 @@ export class SpineGameObject extends DepthMixin(
 		const transform = Phaser.GameObjects.GetCalcMatrix(
 			src,
 			camera,
-			parentMatrix
+			parentMatrix,
+			!drawingContext.useCanvas,
 		).calc;
 		const a = transform.a,
 			b = transform.b,
@@ -393,7 +392,6 @@ export class SpineGameObject extends DepthMixin(
 
 		sceneRenderer.drawSkeleton(
 			src.skeleton,
-			src.premultipliedAlpha,
 			-1,
 			-1,
 			(vertices, numVertices, stride) => {

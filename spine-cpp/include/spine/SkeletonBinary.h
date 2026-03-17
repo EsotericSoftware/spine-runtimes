@@ -243,7 +243,7 @@ namespace spine {
 		Attachment *readAttachment(DataInput &input, Skin &skin, int slotIndex, const String &attachmentName, SkeletonData &skeletonData,
 								   bool nonessential);
 
-		Sequence *readSequence(DataInput &input);
+		Sequence *readSequence(DataInput &input, bool hasPathSuffix);
 
 		int readVertices(DataInput &input, Array<float> &vertices, Array<int> &bones, bool weighted);
 
@@ -256,6 +256,8 @@ namespace spine {
 		void readTimeline(DataInput &input, Array<Timeline *> &timelines, CurveTimeline1 &timeline, float scale);
 
 		void readTimeline(DataInput &input, Array<Timeline *> &timelines, BoneTimeline2 &timeline, float scale);
+
+		void readDrawOrder(DataInput &input, size_t slotCount, Array<int> &drawOrder);
 
 		void setBezier(DataInput &input, CurveTimeline &timeline, int bezier, int frame, int value, float time1, float time2, float value1,
 					   float value2, float scale);

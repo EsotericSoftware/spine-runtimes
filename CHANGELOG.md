@@ -7,11 +7,13 @@
   - Added `spine_slider_timeline` and `spine_slider_mix_timeline` for animating sliders
   - Added new pose system with `spine_bone_local`, `spine_bone_pose`, and related types
   - Added `spine_pose`, `spine_posed`, and `spine_posed_active` base types
+  - Regenerated the C API for the sequence attachment refactor in spine-cpp. `spine_region_attachment` and `spine_mesh_attachment` now mirror the new non-null `Sequence` model exposed by the C++ runtime.
 
 - **Breaking changes**
   - **IMPORTANT**: The C runtime has been completely rewritten as an auto-generated wrapper around the C++ runtime. This is a major breaking change. Users must update their code to use the new API. See https://esotericsoftware.com/spine-c
   - All types, functions, and headers have been restructured
   - The new runtime provides full feature parity with C++ through automatic code generation, has nullability annotations and documentation, and supports lightweight RTTI, allowing language specific wrappers to be built around it that expose the full type hierarchy idiomatically. See spine-ios and spine-flutter for examples.
+  - Sequence attachments now follow the spine-cpp sequence refactor. Region and mesh attachments no longer use the old mutable region/UV update path.
   - Renamed setup pose functions:
     - `spSkeleton_setToSetupPose()` → `spine_skeleton_setup_pose()`
     - `spSkeleton_setBonesToSetupPose()` → `spine_skeleton_setup_pose_bones()`
@@ -44,10 +46,19 @@
   - Added CMakePresets.json for modern CMake configuration
   - Added physics example (physics.cpp)
   - Added IK following example (ik-following.cpp)
+  - Added dragon sequence examples for binary and JSON loading in both C++ and C:
+    - `dragon.cpp`
+    - `dragon-json.cpp`
+    - `dragon-c.cpp`
+    - `dragon-json-c.cpp`
+  - Added C mirrors for the physics and IK following examples:
+    - `physics-c.cpp`
+    - `ik-following-c.cpp`
 
 - **Restructuring**
   - Renamed main-cpp-lite.cpp to main-c.cpp
   - Simplified build system with build.sh script
+  - Fixed the GLFW CMake data copy step to copy shared example assets once, avoiding parallel `copy_directory` races under ninja
 
 - **Breaking changes**
   - Updated to use new C runtime API
@@ -64,6 +75,9 @@
   - Added template method `SkeletonData::findConstraint<T>()` for type-safe constraint queries
   - Added `SkeletonRenderer` class with `RenderCommand` for batched rendering
   - Added `HasRendererObject` interface for attachments with renderer-specific data
+  - Ported the latest parser fixes from spine-libgdx, including the 4.3 path constraint flag fix and the weighted mesh binary vertex allocation/count fix.
+  - Ported the latest additive timeline updates and alpha/RGB timeline flicker fixes from spine-libgdx.
+  - Ported the sequence attachment refactor from spine-libgdx. `Sequence` now precomputes per-frame regions, UVs, and region offsets, and `RegionAttachment` / `MeshAttachment` now mirror the libgdx implementation.
 
 - **Breaking changes**
   - Headers reorganized from `spine-cpp/spine-cpp/include/spine/` to `spine-cpp/include/spine/`
@@ -71,6 +85,7 @@
   - `Bone` now extends `PosedActive` with separate pose, constrained, and applied states
   - Renamed timeline constraint index methods to use unified `getConstraintIndex()`
   - Changed timeline class hierarchy with new base classes `BoneTimeline`, `SlotCurveTimeline`, and `ConstraintTimeline`
+  - Sequence attachments now use the new non-null `Sequence` model. `RegionAttachment` and `MeshAttachment` were refactored to match spine-libgdx and no longer use the old lazy mutable region update path.
   - Renamed setup pose methods:
     ||||
     |-----|-|-----|
@@ -331,10 +346,11 @@
   - Attachment `ComputeWorldVertices()` methods now take an additional `skeleton` parameter
   - Renamed timeline constraint index methods to use unified `ConstraintIndex` property
   - Reorganized timeline class hierarchy with new base classes
+  - Removed `AtlasAttachmentLoader` method `AtlasRegion FindRegion(string name)` from public interface. Added `protected AtlasRegion FindRegion(string name, string path)` instead which may be overridden instead when deriving your own subclass.
 
 ### Unity
 
-- **Officially supported Unity versions are 2017.1-6000.1**.
+- **Officially supported Unity versions are 2017.1-6000.3**.
 
 - **Breaking changes**
   - Updated to use new C# runtime with all breaking changes above
@@ -348,9 +364,15 @@
     - UnityEngine Physics: `Physics.gravity` → `UnityEngine.Physics.gravity`.
   - When enabling `Threaded Animation` at `SkeletonAnimation` components, `SkeletonAnimation.AnimationState` callbacks and `TrackEntry` callbacks are not automatically called on the main thread. There are additional main thread callbacks provided to subscribe to instead, like `MainThreadComplete` for `Complete` and the like - see *Additions* below. Please note that this requires a change of user code to subscribe to these main thread delegate variants instead.
   - `SkeletonRenderer`: `maskInteraction` → `MaskInteraction`.
+  - Removed rather useless old menu entries `GameObject - Spine - SkeletonRenderer` and the like which are spawning e.g. a GameObject with an empty `SkeletonRenderer` component without `SkeletonDataAsset` assigned and thus also not initialized properly.
+  - Removed `attachment.GetRemappedClone()` extension methods. Replace `attachment.GetRemappedClone(parameters)` with `attachment.Copy(); attachment.SetRegion(parameters)`. Removed `AttachmentCloneExtensions` class, `SetRegion` methods are now in `AttachmentRegionExtensions`.
+  - Renamed `ToAtlasRegionPMAClone` to `ToAtlasRegionWithNewPMATexture`.
+  - Renamed `ToRegionAttachmentPMAClone` to `ToRegionAttachmentWithNewPMATexture`.
+  - Removed support for long abandoned thirdparty asset "2D Toolkit" (TK2D) by Unikron Software.
+  
 - **Changes of default values**
   - Changed default atlas texture workflow from PMA to straight alpha textures. This move was done because straight alpha textures are compatible with both Gamma and Linear color space, with the latter being the default for quite some time now in Unity. Note that `PMA Vertex Color` is unaffected and shall be enabled as usual to allow for single-pass additive rendering.
-  
+
 - **Additions**
   - Added Spine Preferences `Switch Texture Workflow` functionality to quickly switch to the respective PMA or straight-alpha texture and material presets.
   - Added a workflow mismatch dialog showing whenever problematic PMA vs. straight alpha settings are detected at a newly imported `.atlas.txt` file. Invalid settings include the atlas being PMA and project using Linear color space, and a mismatch of Auto-Import presets set to straight alpha compared to the atlas being PMA and vice versa. The dialog offers an option to automatically fix the problematic setting on the import side and links website documentation for export settings. This dialog can be disabled and re-enabled via Spine preferences.
@@ -358,9 +380,21 @@
     - `Threaded MeshGeneration`: Default value for SkeletonRenderer and SkeletonGraphic threaded mesh generation
     - `Threaded Animation`: Default value for SkeletonAnimation and SkeletonMecanim threaded animation updates
   - Even when threading is enabled, the threading system defaults to  `SkeletonRenderer` and `SkeletonAnimation` user callbacks like `UpdateWorld` (not including `AnimationState` callbacks) being issued on the main thread to support existing user code. Can be configured via `SkeletonUpdateSystem.Instance.MainThreadUpdateCallbacks = false` to perform callbacks on worker threads if parallel execution is supported and desired by the user code. `OnPostProcessVertices` is an exception, as it it's deliberately left on worker threads so that parallellization can be utilized. Note that most Unity API calls are restricted to the main thread.
-  - For `SkeletonAnimation.AnimationState` callbacks, there are additional main thread callbacks `MainThreadStart`, `MainThreadInterrupt`, `MainThreadEnd`, `MainThreadDispose`, `MainThreadComplete` and `MainThreadEvent` provided directly at `SkeletonAnimation`, e.g. `SkeletonAnimation.MainThreadComplete` for `SkeletonAnimation.AnimationState.Complete` and so on. Please note that this requires a change of user code to subscribe to these main thread delegate variants instead. 
+  - For `SkeletonAnimation.AnimationState` callbacks, there are additional main thread callbacks `MainThreadStart`, `MainThreadInterrupt`, `MainThreadEnd`, `MainThreadDispose`, `MainThreadComplete` and `MainThreadEvent` provided directly at `SkeletonAnimation`, e.g. `SkeletonAnimation.MainThreadComplete` for `SkeletonAnimation.AnimationState.Complete` and so on. Please note that this requires a change of user code to subscribe to these main thread delegate variants instead.
   - The same applies to the `TrackEntry.Start`, `Interrupt`, `End`, `Dispose`, `Complete`, and `Event` events. If you need these callbacks to run on the main thread instead of worker threads, you should register them using the corresponding `SkeletonAnimation.MainThreadStart`, `MainThreadInterrupt`, etc. callbacks. Note that this does require a small code change, since these events are **not** automatically unregistered when the `TrackEntry` is removed. You’ll need to handle that manually, typically with logic such as `if (trackEntry.Animation == attackAnimation) ..`.
   - Added `SkeletonUpdateSystem.Instance.GroupRenderersBySkeletonType` and `GroupAnimationBySkeletonType` properties. Defaults to disabled. Later when smart partitioning is implemented, enabling this parameter might slightly improve cache locality. Until then having it enabled combined with different skeleton complexity would lead to worse load balancing.
+  - Added previously missing editor drag & drop skeleton instantiation option *SkeletonGraphic (UI) Mecanim* combining components `SkeletonGraphic` and `SkeletonMecanim`.
+  - Added define `SPINE_DISABLE_THREADING` to disable threaded animation and mesh generation entirely, removing the respective code. This define can be set as `Scripting Define Symbols` globally or for selective build profiles where desired.
+  - Added automatic load balancing (work stealing) for improved performance when using threaded animation and mesh generation, enabled by default. Load balancing can be disabled via a new Spine preferences parameter `Threading Defaults - Load Balancing` setting a build define accordingly. 
+    Additional configuration parameters `SkeletonUpdateSystem.UpdateChunksPerThread` and `LateUpdateChunksPerThread` are available to fine-tune the chunk count for load balancing. A minimum of 8 chunks is recommended with load balancing enabled. Higher values add higher overhead with potentially detrimental effect on performance.
+  - Spine UI Toolkit UPM package now supports rendering back-face triangles. Enable `Flip Back Faces` to automatically fix back-face geometry in an additional pass (defaults to enabled). Disable the setting to save additional processing overhead.
+  - Spine UI Toolkit UPM package now supports PMA atlas textures. At the `SpineVisualElement` expand `Blend Mode Materials` and hit `Detect Materials` to automatically assign the proper PMA or straight alpha material at `Normal Material`. Unity minimum version increased to 6000.3 which added  support for UI Toolkit materials.
+  - Spine UI Toolkit UPM package now supports all Spine blend modes via blend mode materials and multiple materials per skeleton. Enable `Multiple Materials` (enabled by default), expand `Blend Mode Materials` and hit `Detect Materials` to automatically assign the correct PMA or straight alpha blend mode materials.
+  - Every Spine URP shader now has an `Outline` option to switch to the respective Outline shader variant. Uses multi-pass support of newer URP versions. Requires spine-unity core package version 4.3.44 or newer due to required modifications in custom Sprite Shader GUI.
+  - Added new variants of `GetRepackedSkin` and `GetRepackedAttachments` supporting blend modes. These new variants take a packing configuration input struct `RepackAttachmentsSettings` which provides optional `additiveMaterialSource`, `multiplyMaterialSource` and `screenMaterialSource` properties, enabling blend mode repacking when any is non-null. Create your `RepackAttachmentsSettings` from default settings via `RepackAttachmentsSettings.Default` and then customize settings as needed. Blend mode materials can be set at once using `UseSourceMaterialsFrom(SkeletonDataAsset)` or `UseBlendModeMaterialsFrom(SkeletonDataAsset)`. Uses new `RepackAttachmentsOutput` struct providing `DestroyGeneratedAssets` to easily destroy any previously generated assets.
+  - Updated example scenes to demonstrate new `GetRepackedSkin` variant usage.
+  - AnimationReferenceAsset: Added animation selector drop-down popup next to object assignment field for easy initial assignment and animation switching. Shows red warning color if the assigned AnimationReferenceAsset's SkeletonDataAsset does not match the one at the GameObjects `SkeletonAnimation` component. A mismatch may be intentional for a special split SkeletonDataAsset setup.
+  - AnimationReferenceAssets: The `SkeletonDataAsset` Inspector now generates the set of AnimationReferenceAssets as nested assets below a single asset `<skeletonname>_AnimationReferences.asset` to avoid cluttering the project with hundreds of asset files. This also makes searching the project for a suitable `AnimationReferenceAsset` of a given `SkeletonDataAsset` much faster. Use of existing old individual assets is still supported alongside nested new ones. If you require the old way of creating assets in your project, add `SPINE_INDIVIDUAL_ANIMATION_REFERENCE_ASSETS` to your project's Scripting Define Symbols.
 
 - **Deprecated**
 
@@ -396,6 +430,10 @@
   - Timeline `apply()` methods now take an additional `appliedPose` parameter
 
 ### Flutter
+
+- **Additions**
+  - Added `fromMemory` methods to `AtlasFlutter`, `SkeletonDataFlutter`, `SkeletonDrawableFlutter`, and `SpineWidget` for loading Spine data from custom sources (memory, encrypted storage, databases, custom caching, etc.)
+  - Added example `load_from_memory.dart` demonstrating how to load all assets into memory and use the `fromMemory` API
 
 - **Breaking changes**
   - Updated to use the new auto-generated Dart runtime with all the Dart API changes above
@@ -566,6 +604,7 @@
   - Added `Animation.getBones()` to get bone indices used by an animation
   - Added `Skeleton` methods `getGravityX()`, `getGravityY()`, `getWindX()`, `getWindY()` to allow rotating physics force directions
   - Added `SequenceTimeline` for sequence animation
+  - Added `allowMissingRegions` parameter to `AtlasAttachmentLoader` constructor to support skeletons exported with per-skin atlases
 
 - **Breaking changes**
   - `Bone` now extends `PosedActive` with separate pose, constrained, and applied states
@@ -749,6 +788,9 @@
   - Added `Animation.getBones()` to get bone indices used by an animation
   - Added `Skeleton` properties `windX`, `windY`, `gravityX`, `gravityY` to allow rotating physics force directions
   - Added `SequenceTimeline` for sequence animation
+  - Added `allowMissingRegions` parameter to `AtlasAttachmentLoader` constructor to support skeletons exported with per-skin atlases
+  - Added `TextureLoader` type with optional `pma?: boolean` parameter to `AssetManagerBase`. `AssetManagerBase` now tracks and passes PMA metadata from atlas pages to texture loaders, allowing runtimes to automatically premultiply textures on upload
+  - Added `SkeletonRendererCore` class to reduce complexity of runtime-specific render code
 
 - **Breaking changes**
   - `Bone` now extends `PosedActive` with separate pose, constrained, and applied states
@@ -860,6 +902,12 @@
 
 - **Breaking changes**
   - Updated to use new TypeScript/JavaScript runtime
+  - `GLTexture` constructor now requires `pma: boolean` parameter (automatically read from atlas page metadata)
+  - Removed `GLTexture.DISABLE_UNPACK_PREMULTIPLIED_ALPHA_WEBGL` static property
+  - `SkeletonRenderer` and `SkeletonDebugRenderer` no longer have `premultipliedAlpha` property - PMA is handled automatically
+  - `SceneRenderer.drawSkeleton()` and `drawSkeletonDebug()` no longer take `premultipliedAlpha` parameter
+  - `PolygonBatcher.setBlendMode()` no longer takes `premultipliedAlpha` parameter
+  - `LoadingScreen` no longer accepts PMA parameters
 
 ### Canvas backend
 
@@ -876,37 +924,56 @@
 
 - **Breaking changes**
   - Updated to use new TypeScript/JavaScript runtime
+  - `AssetManager` constructor no longer takes `pma` parameter - PMA is handled automatically
 
 ### Player
 
 - **Breaking changes**
   - Updated to use new TypeScript/JavaScript runtime
+  - Removed `premultipliedAlpha` option from `SpinePlayerConfig` - PMA is now handled automatically
 
 ### Pixi v7
 
+- **Additions**
+  - Added static `createOptions` method for Spine initialization config to simplify subclassing
+  - Added `allowMissingRegions` parameter to game object factory
+
 - **Breaking changes**
   - Updated to use new TypeScript/JavaScript runtime
+  - Deprecated `from()` method in favor of constructor accepting both `SpineOptions` and `SpineFromOptions`
+  - Removed deprecated methods
 
 ### Pixi v8
 
+- **Additions**
+  - Added static `createOptions` method for Spine initialization config to simplify subclassing
+  - Added `allowMissingRegions` parameter to game object factory
+  - Restored control bones example
+
 - **Breaking changes**
   - Updated to use new TypeScript/JavaScript runtime
+  - Deprecated `from()` method in favor of constructor accepting both `SpineOptions` and `SpineFromOptions`
 
 ### Phaser v3
 
 - **Breaking changes**
   - Updated to use new TypeScript/JavaScript runtime
+  - `SpinePlugin.spineAtlas()` loader no longer takes `premultipliedAlpha` parameter - PMA is handled automatically
+  - `SpinePlugin.createSkeleton()` no longer takes `premultipliedAlpha` parameter
 
 ### Phaser v4
 
 - **Breaking changes**
   - Updated to use new TypeScript/JavaScript runtime
+  - `SpinePlugin.spineAtlas()` loader no longer takes `premultipliedAlpha` parameter - PMA is handled automatically
+  - `SpinePlugin.createSkeleton()` no longer takes `premultipliedAlpha` parameter
 
 ### Web Components
 
 - **Breaking changes**
   - Updated to use new TypeScript/JavaScript runtime
   - Updated skeleton and overlay component implementations
+  - Removed `pma` property from `SpineWebComponentSkeleton` - PMA is handled automatically
 
 # 4.2
 

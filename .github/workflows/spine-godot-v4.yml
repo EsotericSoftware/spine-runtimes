@@ -34,7 +34,7 @@ env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   AWS_EC2_METADATA_DISABLED: true
-  EM_VERSION: 3.1.64
+  EM_VERSION: 4.0.20
   GODOT_TAG: ${{ inputs.godot_tag }}
   GODOT_VERSION: ${{ inputs.godot_version }}
   GODOT_MONO: ${{ inputs.godot_mono }}
@@ -277,7 +277,8 @@ jobs:
       - name: Set up Emscripten latest
         uses: mymindstorm/setup-emsdk@v11
         with:
-          version: ${{env.EM_VERSION}}
+          version: 4.0.20
+          no-cache: true
 
       - name: Verify Emscripten setup
         run: |

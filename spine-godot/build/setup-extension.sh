@@ -35,6 +35,11 @@ fi
 
 godot_cpp_branch=$(echo $godot_branch | cut -d. -f1-2 | cut -d- -f1)
 
+if ! git ls-remote --exit-code --heads $godot_cpp_repo $godot_cpp_branch > /dev/null 2>&1; then
+    echo "godot-cpp branch '$godot_cpp_branch' not found, falling back to 'master'"
+    godot_cpp_branch="master"
+fi
+
 cpus=2
 if [ "$OSTYPE" == "msys" ]; then
 	cpus=$NUMBER_OF_PROCESSORS

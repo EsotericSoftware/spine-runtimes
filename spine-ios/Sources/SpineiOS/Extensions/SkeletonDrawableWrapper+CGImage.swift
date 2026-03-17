@@ -39,11 +39,19 @@ import Foundation
         ///
         /// Parameters:
         ///     - size: The size of the `CGImage` that should be rendered.
+        ///     - boundsProvider: The skeleton bounds provider used to compute fitting and positioning.
         ///     - backgroundColor: the background color of the image
         ///     - scaleFactor: The scale factor. Set this to `UIScreen.main.scale` if you want to show the image in a view
-        public func renderToImage(size: CGSize, backgroundColor: UIColor, scaleFactor: CGFloat = 1) throws -> CGImage? {
+        public func renderToImage(
+            size: CGSize,
+            boundsProvider: BoundsProvider = SetupPoseBounds(),
+            backgroundColor: UIColor,
+            scaleFactor: CGFloat = 1
+        ) throws -> CGImage? {
+            let controller = SpineController(disposeDrawableOnDeInit: false)  // Doesn't own the drawable
             let spineView = SpineUIView(
-                controller: SpineController(disposeDrawableOnDeInit: false),  // Doesn't own the drawable
+                controller: controller,
+                boundsProvider: boundsProvider,
                 backgroundColor: backgroundColor
             )
             spineView.frame = CGRect(origin: .zero, size: size)
@@ -51,6 +59,12 @@ import Foundation
             spineView.enableSetNeedsDisplay = false
             spineView.framebufferOnly = false
             spineView.contentScaleFactor = scaleFactor
+
+            defer {
+                controller.drawable = nil
+                spineView.delegate = nil
+                spineView.renderer = nil
+            }
 
             try spineView.load(drawable: self)
             spineView.renderer?.waitUntilCompleted = true

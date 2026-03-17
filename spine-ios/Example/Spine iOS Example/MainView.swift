@@ -36,7 +36,9 @@ struct LeakReporter: ViewModifier {
     func body(content: Content) -> some View {
         content
             .onDisappear {
-                reportLeaks()
+                DispatchQueue.main.async {
+                    reportLeaks()
+                }
             }
     }
 }
@@ -69,7 +71,6 @@ struct MainView: View {
                 }
                 NavigationLink("Dress Up") {
                     DressUp()
-                        .reportLeaksOnDisappear()
                 }
                 NavigationLink("IK Following") {
                     IKFollowing()

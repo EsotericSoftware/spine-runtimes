@@ -4,8 +4,8 @@ import SpineC
 func runSkeletonDrawableTest() {
     print("Testing SkeletonDrawable and event listeners...")
 
-    // Enable debug extension if needed
-    spine_enable_debug_extension(false)
+    // Enable debug extension for leak detection
+    spine_enable_debug_extension(true)
 
     // Load atlas and skeleton data
     let atlasPath = "../../spine-ts/assets/spineboy.atlas"

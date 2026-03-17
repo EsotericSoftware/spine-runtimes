@@ -109,9 +109,6 @@ class FlixelState extends FlxState {
 		var atlas = new TextureAtlas(Assets.getText("assets/spineboy.atlas"), new FlixelTextureLoader("assets/spineboy.atlas"));
 		var skeletondata = SkeletonData.from(Assets.getText("assets/spineboy-pro.json"), atlas, 1);
 
-		// var atlas = new TextureAtlas(Assets.getText("assets/quad.atlas"), new FlixelTextureLoader("assets/quad.atlas"));
-		// var skeletondata = SkeletonData.from(Assets.getText("assets/quad.json"), atlas, 2);
-
 		var animationStateData = new AnimationStateData(skeletondata);
 		// spineSprite = new SkeletonSprite(skeletondata, animationStateData, new SetupPoseBoundsProvider());
 
@@ -193,7 +190,7 @@ class FlixelState extends FlxState {
 		// FlxG.debugger.visible = !FlxG.debugger.visible;
 		// debug ui
 		// FlxG.debugger.visible = true;
-		FlxG.debugger.drawDebug = true;
+		// FlxG.debugger.drawDebug = true;
 		// FlxG.log.redirectTraces = true;
 
 		// FlxG.debugger.track(spineSprite);

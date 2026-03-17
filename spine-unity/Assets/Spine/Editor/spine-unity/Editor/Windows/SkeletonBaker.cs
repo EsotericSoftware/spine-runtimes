@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -473,51 +473,43 @@ namespace Spine.Unity.Editor {
 		}
 
 		#region Attachment Baking
-		static Bone DummyBone;
+		static Skeleton DummySkeleton;
 		static Slot DummySlot;
 
-		internal static Bone GetDummyBone () {
-			if (DummyBone != null)
-				return DummyBone;
+		internal static Skeleton GetDummySkeleton () {
+			if (DummySkeleton != null)
+				return DummySkeleton;
 
 			SkeletonData skelData = new SkeletonData();
-			BoneData data = new BoneData(0, "temp", null) {
+			BoneData boneData = new BoneData(0, "temp", null) {
 				Length = 100
 			};
-			var setup = data.GetSetupPose();
+			var setup = boneData.GetSetupPose();
 			setup.ScaleX = setup.ScaleY = 1;
 
-			skelData.Bones.Add(data);
+			skelData.Bones.Add(boneData);
 
-			Skeleton skeleton = new Skeleton(skelData);
+			SlotData slotData = new SlotData(0, "temp", boneData);
+			skelData.Slots.Add(slotData);
 
-			Bone bone = new Bone(data, null);
-			bone.AppliedPose.UpdateWorldTransform(skeleton);
+			DummySkeleton = new Skeleton(skelData);
+			DummySkeleton.UpdateWorldTransform(Physics.Update);
 
-			DummyBone = bone;
-
-			return DummyBone;
-		}
-
-		internal static Skeleton GetDummySkeleton () {
-			SkeletonData skelData = new SkeletonData();
-			return new Skeleton(skelData);
+			return DummySkeleton;
 		}
 
 		internal static Slot GetDummySlot () {
 			if (DummySlot != null)
 				return DummySlot;
 
-			Bone bone = GetDummyBone();
 			Skeleton skeleton = GetDummySkeleton();
-			SlotData data = new SlotData(0, "temp", bone.Data);
-			Slot slot = new Slot(data, skeleton);
-			DummySlot = slot;
+			DummySlot = skeleton.Slots.Items[0];
 			return DummySlot;
 		}
 
 		internal static Mesh ExtractRegionAttachment (string name, RegionAttachment attachment, Mesh mesh = null, bool centered = true) {
-			Slot slot = GetDummySlot();
+			Skeleton skeleton = GetDummySkeleton();
+			Slot slot = skeleton.Slots.Items[0];
 			Bone bone = slot.Bone;
 
 			if (centered) {
@@ -525,12 +517,13 @@ namespace Spine.Unity.Editor {
 				bone.Pose.Y = -attachment.Y;
 			}
 
-			Skeleton skeleton = GetDummySkeleton();
 			bone.AppliedPose.UpdateWorldTransform(skeleton);
 
 			float[] floatVerts = new float[8];
-			attachment.ComputeWorldVertices(slot, floatVerts, 0);
-			Vector2[] uvs = ExtractUV(attachment.UVs);
+			Sequence sequence = attachment.Sequence;
+			int sequenceIndex = 0;
+			attachment.ComputeWorldVertices(slot, sequence.GetOffsets(sequenceIndex), floatVerts, 0);
+			Vector2[] uvs = ExtractUV(sequence.GetUVs(sequenceIndex));
 			Vector3[] verts = ExtractVerts(floatVerts);
 
 			//unrotate verts now that they're centered
@@ -559,8 +552,8 @@ namespace Spine.Unity.Editor {
 		}
 
 		internal static Mesh ExtractMeshAttachment (string name, MeshAttachment attachment, Mesh mesh = null) {
-			Slot slot = GetDummySlot();
 			Skeleton skeleton = GetDummySkeleton();
+			Slot slot = skeleton.Slots.Items[0];
 
 			slot.Bone.Pose.X = 0;
 			slot.Bone.Pose.Y = 0;
@@ -568,7 +561,10 @@ namespace Spine.Unity.Editor {
 
 			float[] floatVerts = new float[attachment.WorldVerticesLength];
 			attachment.ComputeWorldVertices(skeleton, slot, floatVerts);
-			Vector2[] uvs = ExtractUV(attachment.UVs);
+
+			Sequence sequence = attachment.Sequence;
+			int sequenceIndex = 0;
+			Vector2[] uvs = ExtractUV(sequence.GetUVs(sequenceIndex));
 			Vector3[] verts = ExtractVerts(floatVerts);
 
 			int[] triangles = attachment.Triangles;
@@ -633,7 +629,10 @@ namespace Spine.Unity.Editor {
 
 			float[] floatVerts = new float[attachment.WorldVerticesLength];
 			attachment.ComputeWorldVertices(skeleton, skeleton.Slots.Items[slotIndex], floatVerts);
-			Vector2[] uvs = ExtractUV(attachment.UVs);
+
+			Sequence sequence = attachment.Sequence;
+			int sequenceIndex = 0;
+			Vector2[] uvs = ExtractUV(sequence.GetUVs(sequenceIndex));
 			Vector3[] verts = ExtractVerts(floatVerts);
 
 			int[] triangles = attachment.Triangles;
@@ -1556,9 +1555,11 @@ namespace Spine.Unity.Editor {
 					unityAnimationEvent.stringParameter = spineEvent.String;
 					// if string (separate from name) is set in event, fallback to objectReferenceParameter.
 					unityAnimationEvent.objectReferenceParameter = SpineEventObjectPlaceholder;
-				} else if (spineEvent.Int != 0) {
+				}
+				if (spineEvent.Int != 0) {
 					unityAnimationEvent.intParameter = spineEvent.Int;
-				} else if (spineEvent.Float != 0) {
+				}
+				if (spineEvent.Float != 0) {
 					unityAnimationEvent.floatParameter = spineEvent.Float;
 				} // else, paramless function/Action.
 

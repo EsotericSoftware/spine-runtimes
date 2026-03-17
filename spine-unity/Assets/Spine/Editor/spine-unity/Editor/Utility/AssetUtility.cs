@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -57,6 +57,14 @@
 
 #if UNITY_2018_2_OR_NEWER
 #define HAS_BATCHMODE_QUERY
+#endif
+
+#if UNITY_2018_2_OR_NEWER
+#define HAS_CULL_TRANSPARENT_MESH
+#endif
+
+#if UNITY_6000_3_OR_NEWER
+#define USES_ENTITY_ID
 #endif
 
 using System.Collections.Generic;
@@ -292,24 +300,14 @@ namespace Spine.Unity.Editor {
 			}
 
 			public RegionAttachment NewRegionAttachment (Skin skin, string name, string path, Sequence sequence) {
-				RegionAttachment regionAttachment = new RegionAttachment(name);
-				if (sequence != null)
-					LoadSequence(path, sequence);
-				else {
-					requirementList.Add(path);
-					AssignDummyRegion(regionAttachment);
-				}
+				RegionAttachment regionAttachment = new RegionAttachment(name, sequence);
+				LoadSequence(path, sequence);
 				return regionAttachment;
 			}
 
 			public MeshAttachment NewMeshAttachment (Skin skin, string name, string path, Sequence sequence) {
-				MeshAttachment meshAttachment = new MeshAttachment(name);
-				if (sequence != null)
-					LoadSequence(path, sequence);
-				else {
-					requirementList.Add(path);
-					AssignDummyRegion(meshAttachment);
-				}
+				MeshAttachment meshAttachment = new MeshAttachment(name, sequence);
+				LoadSequence(path, sequence);
 				return meshAttachment;
 			}
 
@@ -335,10 +333,6 @@ namespace Spine.Unity.Editor {
 					string path = sequence.GetPath(basePath, i);
 					requirementList.Add(path);
 				}
-			}
-
-			private static void AssignDummyRegion (IHasTextureRegion attachment) {
-				attachment.Region = new AtlasRegion();
 			}
 		}
 		#endregion
@@ -440,9 +434,6 @@ namespace Spine.Unity.Editor {
 
 				string dir = Path.GetDirectoryName(skeletonPath).Replace('\\', '/');
 
-#if SPINE_TK2D
-				IngestSpineProject(loadedAsset, null);
-#else
 				string skeletonName = Path.GetFileNameWithoutExtension(skeletonPath);
 				List<string> requiredPaths = GetRequiredAtlasRegions(skeletonPath);
 
@@ -476,7 +467,6 @@ namespace Spine.Unity.Editor {
 
 				if (abortSkeletonImport)
 					break;
-#endif
 			}
 
 			if (atlasPaths.Count > 0 || imagePaths.Count > 0 || skeletonPaths.Count > 0) {
@@ -601,7 +591,11 @@ namespace Spine.Unity.Editor {
 									skeletonDataAtlasAssets[i].Equals(null) &&
 									skeletonDataAtlasAssets[i].GetInstanceID() != 0
 								) {
+#if USES_ENTITY_ID
+									skeletonDataAtlasAssets[i] = EditorUtility.EntityIdToObject(skeletonDataAtlasAssets[i].GetEntityId()) as AtlasAssetBase;
+#else
 									skeletonDataAtlasAssets[i] = EditorUtility.InstanceIDToObject(skeletonDataAtlasAssets[i].GetInstanceID()) as AtlasAssetBase;
+#endif
 								}
 							}
 						}
@@ -1125,32 +1119,6 @@ namespace Spine.Unity.Editor {
 		internal static SkeletonDataAsset IngestSpineProject (TextAsset spineJson, params AtlasAssetBase[] atlasAssets) {
 			string filePath = GetSkeletonDataAssetFilePath(spineJson);
 
-#if SPINE_TK2D
-			if (spineJson != null) {
-				SkeletonDataAsset skeletonDataAsset = (SkeletonDataAsset)AssetDatabase.LoadAssetAtPath(filePath, typeof(SkeletonDataAsset));
-				if (skeletonDataAsset == null) {
-					skeletonDataAsset = SkeletonDataAsset.CreateInstance<SkeletonDataAsset>();
-					skeletonDataAsset.skeletonJSON = spineJson;
-					skeletonDataAsset.fromAnimation = new string[0];
-					skeletonDataAsset.toAnimation = new string[0];
-					skeletonDataAsset.duration = new float[0];
-					skeletonDataAsset.defaultMix = SpineEditorUtilities.Preferences.defaultMix;
-					skeletonDataAsset.scale = SpineEditorUtilities.Preferences.defaultScale;
-
-					AssetDatabase.CreateAsset(skeletonDataAsset, filePath);
-					AssetDatabase.SaveAssets();
-				} else {
-					SpineEditorUtilities.ClearSkeletonDataAsset(targetSkeletonDataAsset);
-					skeletonDataAsset.GetSkeletonData(true);
-				}
-
-				return skeletonDataAsset;
-			} else {
-				EditorUtility.DisplayDialog("Error!", "Tried to ingest null Spine data.", "OK");
-				return null;
-			}
-
-#else
 			if (spineJson != null && atlasAssets != null) {
 				SkeletonDataAsset skeletonDataAsset = (SkeletonDataAsset)AssetDatabase.LoadAssetAtPath(filePath, typeof(SkeletonDataAsset));
 				if (skeletonDataAsset == null) {
@@ -1177,7 +1145,6 @@ namespace Spine.Unity.Editor {
 				EditorUtility.DisplayDialog("Error!", "Must specify both Spine JSON and AtlasAsset array", "OK");
 				return null;
 			}
-#endif
 		}
 		#endregion
 
@@ -1386,8 +1353,8 @@ namespace Spine.Unity.Editor {
 
 		internal static readonly List<SkeletonComponentSpawnType> additionalSpawnTypes = new List<SkeletonComponentSpawnType>();
 
-		public static void TryInitializeSkeletonRendererSettings (ISkeletonRenderer skeletonRenderer, Skin skin = null) {
-			const string PMAShaderQuery = "Spine/";
+		public static void TryInitializeSkeletonRenderer (ISkeletonRenderer skeletonRenderer, Skin skin = null) {
+			const string SpineShaderPrefix = "Spine/";
 			const string TintBlackShaderQuery = "Tint Black";
 
 			if (skeletonRenderer == null) return;
@@ -1399,7 +1366,7 @@ namespace Spine.Unity.Editor {
 			foreach (AtlasAssetBase atlasAsset in skeletonDataAsset.atlasAssets) {
 				if (!pmaVertexColors) {
 					foreach (Material m in atlasAsset.Materials) {
-						if (m.shader.name.Contains(PMAShaderQuery)) {
+						if (m.shader.name.Contains(SpineShaderPrefix)) {
 							pmaVertexColors = true;
 							break;
 						}
@@ -1432,6 +1399,46 @@ namespace Spine.Unity.Editor {
 			}
 		}
 
+		static void TryInitializeSkeletonAnimation (SkeletonAnimation skeletonAnimation,
+			SkeletonDataAsset skeletonDataAsset, GameObject gameObject, bool destroyInvalid = true) {
+
+			try {
+				skeletonAnimation.Initialize(false);
+			} catch (System.Exception e) {
+				if (destroyInvalid) {
+					Debug.LogWarning("Editor-instantiated SkeletonAnimation threw an Exception. Destroying GameObject to prevent orphaned GameObject.\n" + e.Message, skeletonDataAsset);
+					GameObject.DestroyImmediate(gameObject);
+				}
+				throw e;
+			}
+			skeletonAnimation.loop = SpineEditorUtilities.Preferences.defaultInstantiateLoop;
+			skeletonAnimation.Update(0);
+			skeletonAnimation.AnimationState.Apply(skeletonAnimation.skeleton);
+			skeletonAnimation.skeleton.UpdateWorldTransform(Physics.Update);
+		}
+
+		static void TryInitializeSkeletonMecanim (SkeletonMecanim skeletonMecanim,
+			SkeletonDataAsset skeletonDataAsset, GameObject gameObject, bool destroyInvalid = true) {
+
+			if (skeletonDataAsset.controller == null) {
+				SkeletonBaker.GenerateMecanimAnimationClips(skeletonDataAsset);
+				Debug.Log(string.Format("Mecanim controller was automatically generated and assigned for {0}", skeletonDataAsset.name), skeletonDataAsset);
+			}
+			gameObject.GetComponent<Animator>().runtimeAnimatorController = skeletonDataAsset.controller;
+
+			try {
+				skeletonMecanim.Initialize(false);
+			} catch (System.Exception e) {
+				if (destroyInvalid) {
+					Debug.LogWarning("Editor-instantiated SkeletonAnimation threw an Exception. Destroying GameObject to prevent orphaned GameObject.", skeletonDataAsset);
+					GameObject.DestroyImmediate(gameObject);
+				}
+				throw e;
+			}
+			skeletonMecanim.UpdateOncePerFrame(0);
+			skeletonMecanim.Renderer.LateUpdate();
+		}
+
 		public static SkeletonAnimation InstantiateSkeletonAnimation (SkeletonDataAsset skeletonDataAsset, string skinName,
 			bool destroyInvalid = true, bool useObjectFactory = true) {
 
@@ -1440,11 +1447,8 @@ namespace Spine.Unity.Editor {
 			return InstantiateSkeletonAnimation(skeletonDataAsset, skin, destroyInvalid, useObjectFactory);
 		}
 
-		public static SkeletonAnimation InstantiateSkeletonAnimation (SkeletonDataAsset skeletonDataAsset, Skin skin = null,
-			bool destroyInvalid = true, bool useObjectFactory = true) {
-
+		static SkeletonData GetSkeletonData (SkeletonDataAsset skeletonDataAsset) {
 			SkeletonData data = skeletonDataAsset.GetSkeletonData(true);
-
 			if (data == null) {
 				for (int i = 0; i < skeletonDataAsset.atlasAssets.Length; i++) {
 					string reloadAtlasPath = AssetDatabase.GetAssetPath(skeletonDataAsset.atlasAssets[i]);
@@ -1452,7 +1456,13 @@ namespace Spine.Unity.Editor {
 				}
 				data = skeletonDataAsset.GetSkeletonData(false);
 			}
+			return data;
+		}
 
+		public static SkeletonAnimation InstantiateSkeletonAnimation (SkeletonDataAsset skeletonDataAsset, Skin skin = null,
+			bool destroyInvalid = true, bool useObjectFactory = true) {
+
+			SkeletonData data = GetSkeletonData(skeletonDataAsset);
 			if (data == null) {
 				Debug.LogWarning("InstantiateSkeletonAnimation tried to instantiate a skeleton from an invalid SkeletonDataAsset.", skeletonDataAsset);
 				return null;
@@ -1464,24 +1474,8 @@ namespace Spine.Unity.Editor {
 			SkeletonRenderer skeletonRenderer = go.GetComponent<SkeletonRenderer>();
 			SkeletonAnimation newSkeletonAnimation = go.GetComponent<SkeletonAnimation>();
 			skeletonRenderer.skeletonDataAsset = skeletonDataAsset;
-			TryInitializeSkeletonRendererSettings(skeletonRenderer, skin);
-
-			// Initialize
-			try {
-				newSkeletonAnimation.Initialize(false);
-			} catch (System.Exception e) {
-				if (destroyInvalid) {
-					Debug.LogWarning("Editor-instantiated SkeletonAnimation threw an Exception. Destroying GameObject to prevent orphaned GameObject.\n" + e.Message, skeletonDataAsset);
-					GameObject.DestroyImmediate(go);
-				}
-				throw e;
-			}
-
-			newSkeletonAnimation.loop = SpineEditorUtilities.Preferences.defaultInstantiateLoop;
-			newSkeletonAnimation.Update(0);
-			newSkeletonAnimation.AnimationState.Apply(newSkeletonAnimation.skeleton);
-			newSkeletonAnimation.skeleton.UpdateWorldTransform(Physics.Update);
-
+			TryInitializeSkeletonRenderer(skeletonRenderer, skin);
+			TryInitializeSkeletonAnimation(newSkeletonAnimation, skeletonDataAsset, go, destroyInvalid);
 			return newSkeletonAnimation;
 		}
 
@@ -1513,17 +1507,6 @@ namespace Spine.Unity.Editor {
 			return gameObject.AddComponent(type);
 		}
 
-		public static void InstantiateEmptySpineGameObject<T> (string name, bool useObjectFactory) where T : MonoBehaviour {
-			GameObject parentGameObject = Selection.activeObject as GameObject;
-			Transform parentTransform = parentGameObject == null ? null : parentGameObject.transform;
-
-			GameObject gameObject = EditorInstantiation.NewGameObject(name, useObjectFactory, typeof(T));
-			gameObject.transform.SetParent(parentTransform, false);
-			EditorUtility.FocusProjectWindow();
-			Selection.activeObject = gameObject;
-			EditorGUIUtility.PingObject(Selection.activeObject);
-		}
-
 		#region SkeletonMecanim
 #if SPINE_SKELETONMECANIM
 		public static SkeletonMecanim InstantiateSkeletonMecanim (SkeletonDataAsset skeletonDataAsset, string skinName) {
@@ -1532,16 +1515,8 @@ namespace Spine.Unity.Editor {
 
 		public static SkeletonMecanim InstantiateSkeletonMecanim (SkeletonDataAsset skeletonDataAsset, Skin skin = null,
 			bool destroyInvalid = true, bool useObjectFactory = true) {
-			SkeletonData data = skeletonDataAsset.GetSkeletonData(true);
-
-			if (data == null) {
-				for (int i = 0; i < skeletonDataAsset.atlasAssets.Length; i++) {
-					string reloadAtlasPath = AssetDatabase.GetAssetPath(skeletonDataAsset.atlasAssets[i]);
-					skeletonDataAsset.atlasAssets[i] = (AtlasAssetBase)AssetDatabase.LoadAssetAtPath(reloadAtlasPath, typeof(AtlasAssetBase));
-				}
-				data = skeletonDataAsset.GetSkeletonData(false);
-			}
-
+			
+			SkeletonData data = GetSkeletonData(skeletonDataAsset);
 			if (data == null) {
 				Debug.LogWarning("InstantiateSkeletonMecanim tried to instantiate a skeleton from an invalid SkeletonDataAsset.", skeletonDataAsset);
 				return null;
@@ -1551,35 +1526,88 @@ namespace Spine.Unity.Editor {
 			GameObject go = EditorInstantiation.NewGameObject(spineGameObjectName, useObjectFactory,
 				typeof(MeshFilter), typeof(MeshRenderer), typeof(Animator), typeof(SkeletonRenderer), typeof(SkeletonMecanim));
 
-			if (skeletonDataAsset.controller == null) {
-				SkeletonBaker.GenerateMecanimAnimationClips(skeletonDataAsset);
-				Debug.Log(string.Format("Mecanim controller was automatically generated and assigned for {0}", skeletonDataAsset.name), skeletonDataAsset);
-			}
-
-			go.GetComponent<Animator>().runtimeAnimatorController = skeletonDataAsset.controller;
-
 			SkeletonRenderer skeletonRenderer = go.GetComponent<SkeletonRenderer>();
 			SkeletonMecanim newSkeletonMecanim = go.GetComponent<SkeletonMecanim>();
 			skeletonRenderer.skeletonDataAsset = skeletonDataAsset;
-			TryInitializeSkeletonRendererSettings(skeletonRenderer, skin);
+			TryInitializeSkeletonRenderer(skeletonRenderer, skin);
+			TryInitializeSkeletonMecanim(newSkeletonMecanim, skeletonDataAsset, go, destroyInvalid);
+			return newSkeletonMecanim;
+		}
 
-			// Initialize
-			try {
-				newSkeletonMecanim.Initialize(false);
-			} catch (System.Exception e) {
-				if (destroyInvalid) {
-					Debug.LogWarning("Editor-instantiated SkeletonAnimation threw an Exception. Destroying GameObject to prevent orphaned GameObject.", skeletonDataAsset);
-					GameObject.DestroyImmediate(go);
-				}
-				throw e;
+		public static SkeletonMecanim InstantiateSkeletonMecanimGraphic (SkeletonDataAsset skeletonDataAsset, string skinName) {
+			return InstantiateSkeletonMecanimGraphic(skeletonDataAsset, skeletonDataAsset.GetSkeletonData(true).FindSkin(skinName));
+		}
+
+		public static SkeletonMecanim InstantiateSkeletonMecanimGraphic (SkeletonDataAsset skeletonDataAsset, Skin skin = null,
+			bool destroyInvalid = true, bool useObjectFactory = true) {
+
+			string spineGameObjectName = string.Format("SkeletonGraphic ({0})", skeletonDataAsset.name.Replace("_SkeletonData", ""));
+			GameObject go = NewSkeletonGraphicGameObject(spineGameObjectName, typeof(SkeletonMecanim));
+			SkeletonGraphic skeletonGraphic = go.GetComponent<SkeletonGraphic>();
+			SkeletonMecanim newSkeletonMecanim = go.GetComponent<SkeletonMecanim>();
+			skeletonGraphic.skeletonDataAsset = skeletonDataAsset;
+
+			SkeletonData data = GetSkeletonData(skeletonDataAsset);
+			if (data == null) {
+				Debug.LogWarning("InstantiateSkeletonMecanimGraphic tried to instantiate a skeleton from an invalid SkeletonDataAsset.", skeletonDataAsset);
+				return null;
 			}
 
-			newSkeletonMecanim.UpdateOncePerFrame(0);
-			newSkeletonMecanim.Renderer.LateUpdate();
-
+			TryInitializeSkeletonRenderer(skeletonGraphic, skin);
+			TryInitializeSkeletonMecanim(newSkeletonMecanim, skeletonDataAsset, go, destroyInvalid);
 			return newSkeletonMecanim;
 		}
 #endif
-		#endregion
+		#endregion SkeletonMecanim
+
+		#region SkeletonGraphic
+		public static Component SpawnSkeletonGraphicFromDrop (SkeletonDataAsset data) {
+			return InstantiateSkeletonGraphic(data);
+		}
+
+		public static SkeletonGraphic InstantiateSkeletonGraphic (SkeletonDataAsset skeletonDataAsset, string skinName) {
+			return InstantiateSkeletonGraphic(skeletonDataAsset, skeletonDataAsset.GetSkeletonData(true).FindSkin(skinName));
+		}
+
+		public static SkeletonGraphic InstantiateSkeletonGraphic (SkeletonDataAsset skeletonDataAsset, Skin skin = null) {
+			string spineGameObjectName = string.Format("SkeletonGraphic ({0})", skeletonDataAsset.name.Replace("_SkeletonData", ""));
+			GameObject go = NewSkeletonGraphicGameObject(spineGameObjectName, typeof(SkeletonAnimation));
+			SkeletonGraphic graphic = go.GetComponent<SkeletonGraphic>();
+			SkeletonAnimation animation = go.GetComponent<SkeletonAnimation>();
+			graphic.skeletonDataAsset = skeletonDataAsset;
+
+			SkeletonData data = GetSkeletonData(skeletonDataAsset);
+			if (data == null) {
+				Debug.LogWarning("InstantiateSkeletonGraphic tried to instantiate a skeleton from an invalid SkeletonDataAsset.", skeletonDataAsset);
+				return null;
+			}
+
+			TryInitializeSkeletonRenderer(graphic, skin);
+			TryInitializeSkeletonAnimation(animation, skeletonDataAsset, go, true);
+
+			return graphic;
+		}
+
+		public static GameObject NewSkeletonGraphicGameObject (string gameObjectName, System.Type animationComponentType) {
+			GameObject go = EditorInstantiation.NewGameObject(gameObjectName, true, typeof(RectTransform),
+				typeof(CanvasRenderer), typeof(SkeletonGraphic));
+			// Note: SkeletonAnimation component was already implicitly added by
+			// SkeletonGraphic.Awake() above, calling UpgradeTo43Components().
+			if (go.GetComponent(animationComponentType) == null)
+				EditorInstantiation.AddComponent(go, true, animationComponentType);
+
+			SkeletonGraphic graphic = go.GetComponent<SkeletonGraphic>();
+			graphic.material = SkeletonGraphicUtility.DefaultSkeletonGraphicMaterial;
+			graphic.additiveMaterial = SkeletonGraphicUtility.DefaultSkeletonGraphicAdditiveMaterial;
+			graphic.multiplyMaterial = SkeletonGraphicUtility.DefaultSkeletonGraphicMultiplyMaterial;
+			graphic.screenMaterial = SkeletonGraphicUtility.DefaultSkeletonGraphicScreenMaterial;
+
+#if HAS_CULL_TRANSPARENT_MESH
+			CanvasRenderer canvasRenderer = go.GetComponent<CanvasRenderer>();
+			canvasRenderer.cullTransparentMesh = false;
+#endif
+			return go;
+		}
+		#endregion SkeletonGraphic
 	}
 }

@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -35,12 +35,16 @@
 #define NEWPLAYMODECALLBACKS
 #endif
 
-#if UNITY_2018_3 || UNITY_2019 || UNITY_2018_3_OR_NEWER
+#if UNITY_2018_3_OR_NEWER
 #define NEW_PREFAB_SYSTEM
 #endif
 
-#if UNITY_2018 || UNITY_2019 || UNITY_2018_3_OR_NEWER
+#if UNITY_2018_3_OR_NEWER
 #define NEWHIERARCHYWINDOWCALLBACKS
+#endif
+
+#if UNITY_2021_2_OR_NEWER
+#define USES_NAMED_BUILD_TARGETS
 #endif
 
 using System.Collections.Generic;
@@ -53,71 +57,55 @@ using UnityEditor;
 using UnityEngine;
 
 namespace Spine.Unity.Editor {
-	public partial class SpineEditorUtilities {
-		public static class SpineTK2DEditorUtility {
-			const string SPINE_TK2D_DEFINE = "SPINE_TK2D";
-
-			internal static bool IsTK2DInstalled () {
-				return (Shader.Find("tk2d/SolidVertexColor") != null ||
-					Shader.Find("tk2d/AdditiveVertexColor") != null);
-			}
-
-			internal static bool IsTK2DAllowed {
-				get {
-					return false; // replace with "return true;" to allow TK2D support
-				}
-			}
-
-			internal static void EnableTK2D () {
-				if (!IsTK2DAllowed)
-					return;
-				SpineBuildEnvUtility.DisableSpineAsmdefFiles();
-				SpineBuildEnvUtility.EnableBuildDefine(SPINE_TK2D_DEFINE);
-			}
-
-			internal static void DisableTK2D () {
-				SpineBuildEnvUtility.EnableSpineAsmdefFiles();
-				SpineBuildEnvUtility.DisableBuildDefine(SPINE_TK2D_DEFINE);
-			}
-		}
-	}
 
 	public static class SpineBuildEnvUtility {
 		public const string SPINE_ALLOW_UNSAFE_CODE = "SPINE_ALLOW_UNSAFE";
 		public const string SPINE_AUTO_UPGRADE_COMPONENTS_OFF = "SPINE_AUTO_UPGRADE_COMPONENTS_OFF";
+		public const string SPINE_ENABLE_THREAD_PROFILING = "SPINE_ENABLE_THREAD_PROFILING";
+		public const string SPINE_DISABLE_LOAD_BALANCING = "SPINE_DISABLE_LOAD_BALANCING";
 
 		static bool IsInvalidGroup (BuildTargetGroup group) {
 			int gi = (int)group;
 			return
-				gi == 15 || gi == 16
-				||
-				group == BuildTargetGroup.Unknown;
+				gi == 15 || gi == 16 || group == BuildTargetGroup.Unknown;
 		}
 
 		public static bool EnableBuildDefine (string define) {
 
 			bool wasDefineAdded = false;
+
+#if !USES_NAMED_BUILD_TARGETS
 			Debug.LogWarning("Please ignore errors \"PlayerSettings Validation: Requested build target group doesn't exist\" below");
+#endif
 			foreach (BuildTargetGroup group in System.Enum.GetValues(typeof(BuildTargetGroup))) {
 				if (IsInvalidGroup(group))
 					continue;
 
 				try {
+#if USES_NAMED_BUILD_TARGETS
+					var target = UnityEditor.Build.NamedBuildTarget.FromBuildTargetGroup(group);
+					string defines = PlayerSettings.GetScriptingDefineSymbols(target);
+#else
 					string defines = PlayerSettings.GetScriptingDefineSymbolsForGroup(group);
+#endif
 					if (!defines.Contains(define)) {
 						wasDefineAdded = true;
 						if (defines.EndsWith(";", System.StringComparison.Ordinal))
 							defines += define;
 						else
 							defines += ";" + define;
-
+#if USES_NAMED_BUILD_TARGETS
+						PlayerSettings.SetScriptingDefineSymbols(target, defines);
+#else
 						PlayerSettings.SetScriptingDefineSymbolsForGroup(group, defines);
+#endif
 					}
 				} catch (System.Exception) {
 				}
 			}
+#if !USES_NAMED_BUILD_TARGETS
 			Debug.LogWarning("Please ignore errors \"PlayerSettings Validation: Requested build target group doesn't exist\" above");
-
+#endif
 			if (wasDefineAdded) {
 				Debug.LogWarning("Setting Scripting Define Symbol " + define);
 			} else {
@@ -134,15 +122,23 @@ namespace Spine.Unity.Editor {
 					continue;
 
 				try {
+#if USES_NAMED_BUILD_TARGETS
+					var target = UnityEditor.Build.NamedBuildTarget.FromBuildTargetGroup(group);
+					string defines = PlayerSettings.GetScriptingDefineSymbols(target);
+#else
 					string defines = PlayerSettings.GetScriptingDefineSymbolsForGroup(group);
+#endif
 					if (defines.Contains(define)) {
 						wasDefineRemoved = true;
 						if (defines.Contains(define + ";"))
 							defines = defines.Replace(define + ";", "");
 						else
 							defines = defines.Replace(define, "");
-
+#if USES_NAMED_BUILD_TARGETS
+						PlayerSettings.SetScriptingDefineSymbols(target, defines);
+#else
 						PlayerSettings.SetScriptingDefineSymbolsForGroup(group, defines);
+#endif
 					}
 				} catch (System.Exception) {
 				}

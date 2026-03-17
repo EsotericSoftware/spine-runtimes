@@ -1,0 +1,14 @@
+diff --git a/platform/ios/detect.py b/platform/ios/detect.py
+index 53b367a0a7..aea9424abe 100644
+--- a/platform/ios/detect.py
++++ b/platform/ios/detect.py
+@@ -144,6 +144,9 @@ def configure(env: "SConsEnvironment"):
+     # Temp fix for ABS/MAX/MIN macros in iOS SDK blocking compilation
+     env.Append(CCFLAGS=["-Wno-ambiguous-macro"])
+ 
++    # Fix for C++ module imports in extern "C" blocks in Vulkan headers
++    env.Append(CCFLAGS=["-Wno-error=module-import-in-extern-c"])
++
+     env.Prepend(
+         CPPPATH=[
+             "$IOS_SDK_PATH/usr/include",

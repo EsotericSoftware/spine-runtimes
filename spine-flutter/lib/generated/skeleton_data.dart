@@ -95,6 +95,12 @@ class SkeletonData {
     return result.address == 0 ? null : Animation.fromPointer(result);
   }
 
+  /// Collects animations used by slider constraints.
+  ArrayAnimation findSliderAnimations(ArrayAnimation animations) {
+    final result = SpineBindings.bindings.spine_skeleton_data_find_slider_animations(_ptr, animations.nativePtr.cast());
+    return ArrayAnimation.fromPointer(result);
+  }
+
   /// The skeleton's name, which by default is the name of the skeleton data
   /// file when possible, or null when a name hasn't been set.
   String get name {

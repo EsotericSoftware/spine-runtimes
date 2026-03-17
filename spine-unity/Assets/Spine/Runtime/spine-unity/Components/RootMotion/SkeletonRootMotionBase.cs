@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -26,6 +26,10 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
+
+#if UNITY_6000_0_OR_NEWER
+#define RIGIDBODY2D_USES_LINEAR_VELOCITY
+#endif
 
 // In order to respect TransformConstraints modifying the scale of parent bones,
 // GetScaleAffectingRootMotion() now uses parentBone.AScaleX and AScaleY instead
@@ -213,9 +217,15 @@ namespace Spine.Unity {
 						float deltaTime = Time.fixedDeltaTime;
 						float deltaTimeSquared = (deltaTime * deltaTime);
 
+#if RIGIDBODY2D_USES_LINEAR_VELOCITY
+						rigidBody2D.linearVelocity += rigidBody2D.gravityScale * Physics2D.gravity * deltaTime;
+						gravityAndVelocityMovement = 0.5f * rigidBody2D.gravityScale * Physics2D.gravity * deltaTimeSquared +
+							rigidBody2D.linearVelocity * deltaTime;
+#else
 						rigidBody2D.velocity += rigidBody2D.gravityScale * Physics2D.gravity * deltaTime;
 						gravityAndVelocityMovement = 0.5f * rigidBody2D.gravityScale * Physics2D.gravity * deltaTimeSquared +
 							rigidBody2D.velocity * deltaTime;
+#endif
 					}
 
 					Vector2 rigidbodyDisplacement2D = new Vector2(rigidbodyDisplacement.x, rigidbodyDisplacement.y);

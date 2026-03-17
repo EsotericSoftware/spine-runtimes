@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -229,18 +229,15 @@ namespace Spine.Unity {
 		#region Attachments
 		public static Material GetMaterial (this Attachment a) {
 			object rendererObject = null;
-			IHasTextureRegion renderableAttachment = a as IHasTextureRegion;
-			if (renderableAttachment != null)
-				rendererObject = renderableAttachment.Region;
+			IHasSequence renderableAttachment = a as IHasSequence;
+			if (renderableAttachment != null) {
+				rendererObject = renderableAttachment.Sequence.Regions[0];
+			}
 
 			if (rendererObject == null)
 				return null;
 
-#if SPINE_TK2D
-			return (rendererObject.GetType() == typeof(Material)) ? (Material)rendererObject : (Material)((AtlasRegion)rendererObject).page.rendererObject;
-#else
 			return (Material)((AtlasRegion)rendererObject).page.rendererObject;
-#endif
 		}
 
 		/// <summary>Fills a Vector2 buffer with local vertices.</summary>

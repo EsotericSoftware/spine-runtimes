@@ -39,6 +39,7 @@
 #include <spine/Skin.h>
 #include <spine/SlotData.h>
 #include <spine/TransformConstraintData.h>
+#include <spine/SliderData.h>
 
 #include <spine/ArrayUtils.h>
 
@@ -82,6 +83,17 @@ EventData *SkeletonData::findEvent(const String &eventDataName) {
 
 Animation *SkeletonData::findAnimation(const String &animationName) {
 	return ArrayUtils::findWithName(_animations, animationName);
+}
+
+Array<Animation *> &SkeletonData::findSliderAnimations(Array<Animation *> &animations) {
+	for (size_t i = 0, n = _constraints.size(); i < n; i++) {
+		ConstraintData *constraint = _constraints[i];
+		if (constraint->getRTTI().instanceOf(SliderData::rtti)) {
+			SliderData *data = static_cast<SliderData *>(constraint);
+			if (data->_animation != NULL) animations.add(data->_animation);
+		}
+	}
+	return animations;
 }
 
 const String &SkeletonData::getName() {

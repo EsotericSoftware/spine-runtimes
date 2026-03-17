@@ -37,10 +37,6 @@
 #define PER_MATERIAL_PROPERTY_BLOCKS
 #endif
 
-#if UNITY_2017_1_OR_NEWER
-#define BUILT_IN_SPRITE_MASK_COMPONENT
-#endif
-
 using UnityEditor;
 using UnityEngine;
 
@@ -216,9 +212,7 @@ namespace Spine.Unity.Editor {
 		protected virtual void VertexDataProperties () { }
 		protected virtual void AfterAdvancedPropertyFields () { }
 
-		protected virtual void AdvancedPropertyFields () {
-			EditorGUILayout.Space();
-			EditorGUILayout.LabelField("Renderer Settings", EditorStyles.boldLabel);
+		protected virtual void RendererProperties () {
 			using (new SpineInspectorUtility.LabelWidthScope()) {
 				// Optimization options
 				if (updateWhenInvisible != null) EditorGUILayout.PropertyField(updateWhenInvisible, UpdateWhenInvisibleLabel);
@@ -243,6 +237,24 @@ namespace Spine.Unity.Editor {
 			const float MinZSpacing = -0.1f;
 			const float MaxZSpacing = 0f;
 			EditorGUILayout.Slider(zSpacing, MinZSpacing, MaxZSpacing, ZSpacingLabel);
+		}
+
+		protected virtual void PhysicsProperties () {
+			using (new GUILayout.HorizontalScope()) {
+				EditorGUILayout.LabelField(PhysicsPositionInheritanceFactorLabel, GUILayout.Width(EditorGUIUtility.labelWidth));
+				int savedIndentLevel = EditorGUI.indentLevel;
+				EditorGUI.indentLevel = 0;
+				EditorGUILayout.PropertyField(physicsPositionInheritanceFactor, GUIContent.none, GUILayout.MinWidth(60));
+				EditorGUI.indentLevel = savedIndentLevel;
+			}
+			EditorGUILayout.PropertyField(physicsRotationInheritanceFactor, PhysicsRotationInheritanceFactorLabel);
+			EditorGUILayout.PropertyField(physicsMovementRelativeTo, PhysicsMovementRelativeToLabel);
+		}
+
+		protected virtual void AdvancedPropertyFields () {
+			EditorGUILayout.Space();
+			EditorGUILayout.LabelField("Renderer Settings", EditorStyles.boldLabel);
+			RendererProperties();
 			EditorGUILayout.Space();
 
 			if (threadedMeshGeneration != null) {
@@ -259,16 +271,8 @@ namespace Spine.Unity.Editor {
 			EditorGUILayout.Space();
 			using (new SpineInspectorUtility.LabelWidthScope()) {
 				EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("Physics Inheritance", SpineEditorUtilities.Icons.constraintPhysics), EditorStyles.boldLabel);
+				PhysicsProperties();
 
-				using (new GUILayout.HorizontalScope()) {
-					EditorGUILayout.LabelField(PhysicsPositionInheritanceFactorLabel, GUILayout.Width(EditorGUIUtility.labelWidth));
-					int savedIndentLevel = EditorGUI.indentLevel;
-					EditorGUI.indentLevel = 0;
-					EditorGUILayout.PropertyField(physicsPositionInheritanceFactor, GUIContent.none, GUILayout.MinWidth(60));
-					EditorGUI.indentLevel = savedIndentLevel;
-				}
-				EditorGUILayout.PropertyField(physicsRotationInheritanceFactor, PhysicsRotationInheritanceFactorLabel);
-				EditorGUILayout.PropertyField(physicsMovementRelativeTo, PhysicsMovementRelativeToLabel);
 			}
 		}
 

@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -26,6 +26,10 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
+
+#if UNITY_2022_2_OR_NEWER
+#define USE_FIND_OBJECTS_BY_TYPE
+#endif
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -54,7 +58,11 @@ namespace Spine.Unity {
 		[DidReloadScripts]
 		private static void OnReloaded () {
 			// Force start when scripts are reloaded
+#if USE_FIND_OBJECTS_BY_TYPE
+			EditorSkeletonPlayer[] editorSpineAnimations = FindObjectsByType<EditorSkeletonPlayer>(FindObjectsSortMode.None);
+#else
 			EditorSkeletonPlayer[] editorSpineAnimations = FindObjectsOfType<EditorSkeletonPlayer>();
+#endif
 
 			foreach (EditorSkeletonPlayer editorSpineAnimation in editorSpineAnimations)
 				editorSpineAnimation.Start();

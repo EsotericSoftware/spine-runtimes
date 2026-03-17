@@ -255,6 +255,12 @@ spine_slot_timeline spine_deform_timeline_cast_to_slot_timeline(spine_deform_tim
 	return (spine_slot_timeline) base;
 }
 
+spine_timeline spine_draw_order_folder_timeline_cast_to_timeline(spine_draw_order_folder_timeline obj) {
+	DrawOrderFolderTimeline *derived = (DrawOrderFolderTimeline *) obj;
+	Timeline *base = static_cast<Timeline *>(derived);
+	return (spine_timeline) base;
+}
+
 spine_timeline spine_draw_order_timeline_cast_to_timeline(spine_draw_order_timeline obj) {
 	DrawOrderTimeline *derived = (DrawOrderTimeline *) obj;
 	Timeline *base = static_cast<Timeline *>(derived);
@@ -1965,6 +1971,12 @@ spine_deform_timeline spine_timeline_cast_to_deform_timeline(spine_timeline obj)
 	Timeline *base = (Timeline *) obj;
 	DeformTimeline *derived = static_cast<DeformTimeline *>(base);
 	return (spine_deform_timeline) derived;
+}
+
+spine_draw_order_folder_timeline spine_timeline_cast_to_draw_order_folder_timeline(spine_timeline obj) {
+	Timeline *base = (Timeline *) obj;
+	DrawOrderFolderTimeline *derived = static_cast<DrawOrderFolderTimeline *>(base);
+	return (spine_draw_order_folder_timeline) derived;
 }
 
 spine_draw_order_timeline spine_timeline_cast_to_draw_order_timeline(spine_timeline obj) {

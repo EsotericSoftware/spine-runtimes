@@ -32,7 +32,6 @@ package com.esotericsoftware.spine.attachments;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.Null;
 
 import com.esotericsoftware.spine.Skin;
 
@@ -55,40 +54,27 @@ public class AtlasAttachmentLoader implements AttachmentLoader {
 		this.allowMissingRegions = allowMissingRegions;
 	}
 
-	private void loadSequence (String name, String basePath, Sequence sequence) {
+	protected void findRegions (String name, String basePath, Sequence sequence) {
 		TextureRegion[] regions = sequence.getRegions();
-		for (int i = 0, n = regions.length; i < n; i++) {
-			String path = sequence.getPath(basePath, i);
-			regions[i] = atlas.findRegion(path);
-			if (regions[i] == null && !allowMissingRegions)
-				throw new RuntimeException("Region not found in atlas: " + path + " (sequence: " + name + ")");
-		}
+		for (int i = 0, n = regions.length; i < n; i++)
+			regions[i] = findRegion(name, sequence.getPath(basePath, i));
 	}
 
-	public RegionAttachment newRegionAttachment (Skin skin, String name, String path, @Null Sequence sequence) {
-		var attachment = new RegionAttachment(name);
-		if (sequence != null)
-			loadSequence(name, path, sequence);
-		else {
-			AtlasRegion region = atlas.findRegion(path);
-			if (region == null && !allowMissingRegions)
-				throw new RuntimeException("Region not found in atlas: " + path + " (region attachment: " + name + ")");
-			attachment.setRegion(region);
-		}
-		return attachment;
+	protected AtlasRegion findRegion (String name, String path) {
+		AtlasRegion region = atlas.findRegion(path);
+		if (region == null && !allowMissingRegions)
+			throw new RuntimeException("Region not found in atlas: " + path + " (attachment: " + name + ")");
+		return region;
 	}
 
-	public MeshAttachment newMeshAttachment (Skin skin, String name, String path, @Null Sequence sequence) {
-		var attachment = new MeshAttachment(name);
-		if (sequence != null)
-			loadSequence(name, path, sequence);
-		else {
-			AtlasRegion region = atlas.findRegion(path);
-			if (region == null && !allowMissingRegions)
-				throw new RuntimeException("Region not found in atlas: " + path + " (mesh attachment: " + name + ")");
-			attachment.setRegion(region);
-		}
-		return attachment;
+	public RegionAttachment newRegionAttachment (Skin skin, String name, String path, Sequence sequence) {
+		findRegions(name, path, sequence);
+		return new RegionAttachment(name, sequence);
+	}
+
+	public MeshAttachment newMeshAttachment (Skin skin, String name, String path, Sequence sequence) {
+		findRegions(name, path, sequence);
+		return new MeshAttachment(name, sequence);
 	}
 
 	public BoundingBoxAttachment newBoundingBoxAttachment (Skin skin, String name) {

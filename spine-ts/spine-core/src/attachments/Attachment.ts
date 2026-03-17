@@ -35,9 +35,14 @@ import { type NumberArrayLike, Utils } from "../Utils.js";
 export abstract class Attachment {
 	name: string;
 
+	/** Timelines for the timeline attachment are also applied to this attachment.
+	 * @return May be null if no attachment-specific timelines should be applied. */
+	timelineAttachment?: Attachment;
+
 	constructor (name: string) {
 		if (!name) throw new Error("name cannot be null.");
 		this.name = name;
+		this.timelineAttachment = this;
 	}
 
 	abstract copy (): Attachment;
@@ -64,10 +69,6 @@ export abstract class VertexAttachment extends Attachment {
 	/** The maximum number of world vertex values that can be output by
 	 * {@link computeWorldVertices} using the `count` parameter. */
 	worldVerticesLength = 0;
-
-	/** Timelines for the timeline attachment are also applied to this attachment.
-	 * May be null if no attachment-specific timelines should be applied. */
-	timelineAttachment: Attachment = this;
 
 	constructor (name: string) {
 		super(name);

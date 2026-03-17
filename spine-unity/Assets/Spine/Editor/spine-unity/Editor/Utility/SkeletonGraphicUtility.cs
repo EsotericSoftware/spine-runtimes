@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -37,6 +37,10 @@
 
 #if UNITY_2017_2_OR_NEWER
 #define NEWPLAYMODECALLBACKS
+#endif
+
+#if UNITY_6000_3_OR_NEWER
+#define GET_ASSET_PATH_USES_ENTITY_ID
 #endif
 
 using UnityEditor;
@@ -100,11 +104,19 @@ namespace Spine.Unity.Editor {
 
 		public static bool IsSkeletonTexturePMA (SkeletonGraphic skeletonGraphic, out bool detectionSucceeded) {
 			Texture texture = skeletonGraphic.mainTexture;
+			return IsSkeletonTexturePMA(texture, skeletonGraphic.name, out detectionSucceeded);
+		}
+
+		public static bool IsSkeletonTexturePMA (Texture texture, string skeletonName, out bool detectionSucceeded) {
+#if GET_ASSET_PATH_USES_ENTITY_ID
+			string texturePath = AssetDatabase.GetAssetPath(texture.GetEntityId());
+#else
 			string texturePath = AssetDatabase.GetAssetPath(texture.GetInstanceID());
+#endif
 			TextureImporter importer = (TextureImporter)TextureImporter.GetAtPath(texturePath);
 			if (importer.alphaIsTransparency != importer.sRGBTexture) {
 				Debug.LogWarning(string.Format("Texture '{0}' at skeleton '{1}' is neither configured correctly for " +
-					"PMA nor Straight Alpha.", texture, skeletonGraphic), texture);
+					"PMA nor Straight Alpha.", texture, skeletonName), texture);
 				detectionSucceeded = false;
 				return false;
 			}

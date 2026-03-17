@@ -41,7 +41,7 @@
 				var skeletonBinary = new spine.SkeletonBinary(atlasLoader);
 
 				// Set the scale to apply during parsing, parse the file, and create a new skeleton.
-				skeletonBinary.scale = 0.2;
+				skeletonBinary.scale = 0.4;
 				var skeletonData = skeletonBinary.readSkeletonData(assetManager.require("/assets/sack-pro.skel"));
 				this.skeleton = new spine.Skeleton(skeletonData);
 
@@ -72,7 +72,7 @@
 				// Begin rendering.
 				renderer.begin();
 				// Draw the skeleton
-				renderer.drawSkeleton(this.skeleton, true);
+				renderer.drawSkeleton(this.skeleton);
 				// Complete rendering.
 				renderer.end();
 			}

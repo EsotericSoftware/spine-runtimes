@@ -32,6 +32,15 @@
 
 #ifdef SPINE_GODOT_EXTENSION
 #include <godot_cpp/core/version.hpp>
+
+// When running scons with deprecated=no, these are not defined in version.h in Godot 4.5.1
+// but our code for older versions of Godot relies on them.
+#ifndef VERSION_MAJOR
+#define VERSION_MAJOR GODOT_VERSION_MAJOR
+#define VERSION_MINOR GODOT_VERSION_MINOR
+#define VERSION_PATCH GODOT_VERSION_PATCH
+#endif
+
 #include <godot_cpp/classes/ref_counted.hpp>
 #include <godot_cpp/variant/string_name.hpp>
 using namespace godot;
@@ -46,17 +55,21 @@ using namespace godot;
 #define RES Ref<Resource>
 #define REF Ref<RefCounted>
 #define GEOMETRY2D Geometry2D
-#ifndef VERSION_MAJOR
-#define VERSION_MAJOR GODOT_VERSION_MAJOR
-#endif
-#ifndef VERSION_MINOR
-#define VERSION_MINOR GODOT_VERSION_MINOR
-#endif
+
 // FIXME this doesn't do the same as the engine SNAME in terms of caching
 #define SNAME(name) StringName(name)
 #define RS RenderingServer
 #else
 #include "core/version.h"
+
+// When running scons with deprecated=no, these are not defined in version.h in Godot 4.5.1
+// but our code for older versions of Godot relies on them.
+#ifndef VERSION_MAJOR
+#define VERSION_MAJOR GODOT_VERSION_MAJOR
+#define VERSION_MINOR GODOT_VERSION_MINOR
+#define VERSION_PATCH GODOT_VERSION_PATCH
+#endif
+
 #if VERSION_MAJOR > 3
 #include "core/core_bind.h"
 #include "core/error/error_macros.h"

@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -96,7 +96,7 @@ namespace Spine.Unity.Editor {
 				Transform parent, int siblingIndex = 0) {
 				GenericMenu menu = new GenericMenu();
 
-				// SkeletonAnimation
+				// SkeletonAnimation + SkeletonRenderer
 				menu.AddItem(new GUIContent("SkeletonAnimation"), false, HandleSkeletonComponentDrop, new SpawnMenuData {
 					skeletonDataAsset = skeletonDataAsset,
 					spawnPoint = spawnPoint,
@@ -106,24 +106,19 @@ namespace Spine.Unity.Editor {
 					isUI = false
 				});
 
-				// SkeletonGraphic
-				System.Type skeletonGraphicInspectorType = System.Type.GetType("Spine.Unity.Editor.SkeletonGraphicInspector");
-				if (skeletonGraphicInspectorType != null) {
-					MethodInfo graphicInstantiateDelegate = skeletonGraphicInspectorType.GetMethod("SpawnSkeletonGraphicFromDrop", BindingFlags.Static | BindingFlags.Public);
-					if (graphicInstantiateDelegate != null)
-						menu.AddItem(new GUIContent("SkeletonGraphic (UI)"), false, HandleSkeletonComponentDrop, new SpawnMenuData {
-							skeletonDataAsset = skeletonDataAsset,
-							spawnPoint = spawnPoint,
-							parent = parent,
-							siblingIndex = siblingIndex,
-							instantiateDelegate = System.Delegate.CreateDelegate(typeof(EditorInstantiation.InstantiateDelegate), graphicInstantiateDelegate) as EditorInstantiation.InstantiateDelegate,
-							isUI = true
-						});
-				}
+				// SkeletonAnimation + SkeletonGraphic
+				menu.AddItem(new GUIContent("SkeletonGraphic (UI)"), false, HandleSkeletonComponentDrop, new SpawnMenuData {
+					skeletonDataAsset = skeletonDataAsset,
+					spawnPoint = spawnPoint,
+					parent = parent,
+					siblingIndex = siblingIndex,
+					instantiateDelegate = (data) => EditorInstantiation.SpawnSkeletonGraphicFromDrop(data),
+					isUI = true
+				});
 
 #if SPINE_SKELETONMECANIM
 				menu.AddSeparator("");
-				// SkeletonMecanim
+				// SkeletonMecanim + SkeletonRenderer
 				menu.AddItem(new GUIContent("SkeletonMecanim"), false, HandleSkeletonComponentDrop, new SpawnMenuData {
 					skeletonDataAsset = skeletonDataAsset,
 					spawnPoint = spawnPoint,
@@ -131,6 +126,16 @@ namespace Spine.Unity.Editor {
 					siblingIndex = siblingIndex,
 					instantiateDelegate = (data) => EditorInstantiation.InstantiateSkeletonMecanim(data),
 					isUI = false
+				});
+
+				// SkeletonMecanim + SkeletonGraphic
+				menu.AddItem(new GUIContent("SkeletonGraphic (UI) Mecanim"), false, HandleSkeletonComponentDrop, new SpawnMenuData {
+					skeletonDataAsset = skeletonDataAsset,
+					spawnPoint = spawnPoint,
+					parent = parent,
+					siblingIndex = siblingIndex,
+					instantiateDelegate = (data) => EditorInstantiation.InstantiateSkeletonMecanimGraphic(data),
+					isUI = true
 				});
 #endif
 
@@ -160,7 +165,7 @@ namespace Spine.Unity.Editor {
 				newTransform.position = isUI ? data.spawnPoint : RoundVector(data.spawnPoint, 2);
 
 				if (isUI) {
-					SkeletonGraphic skeletonGraphic = ((SkeletonGraphic)newSkeletonComponent);
+					SkeletonGraphic skeletonGraphic = newSkeletonComponent.GetComponent<SkeletonGraphic>();
 					if (usedParent != null && usedParent.GetComponent<RectTransform>() != null) {
 						skeletonGraphic.MatchRectTransformWithBounds();
 					} else

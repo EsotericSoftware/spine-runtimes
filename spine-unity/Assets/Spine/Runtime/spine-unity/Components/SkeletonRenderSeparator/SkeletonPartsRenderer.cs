@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -94,7 +94,9 @@ namespace Spine.Unity {
 			meshFilter.sharedMesh = null;
 		}
 
-		public void RenderParts (ExposedList<SubmeshInstruction> instructions, int startSubmesh, int endSubmesh) {
+		public void RenderParts (SkeletonRenderer skeletonRenderer, ExposedList<SubmeshInstruction> instructions,
+			int startSubmesh, int endSubmesh) {
+
 			LazyIntialize();
 
 			// STEP 1: Create instruction
@@ -125,9 +127,12 @@ namespace Spine.Unity {
 				meshGenerator.FillVertexData(mesh);
 				if (updateTriangles) {
 					meshGenerator.FillTriangles(mesh);
-					meshRenderer.sharedMaterials = buffers.UpdateSharedMaterialsArray();
-				} else if (materialsChanged) {
-					meshRenderer.sharedMaterials = buffers.UpdateSharedMaterialsArray();
+				}
+				if (updateTriangles || materialsChanged) {
+					Material[] materials = buffers.UpdateSharedMaterialsArray();
+					if (skeletonRenderer)
+						skeletonRenderer.ConfigureMaterials(materials, currentInstructions.submeshInstructions);
+					meshRenderer.sharedMaterials = materials;
 				}
 				meshGenerator.FillLateVertexData(mesh);
 			}

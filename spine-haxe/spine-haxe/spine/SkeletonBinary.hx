@@ -41,6 +41,7 @@ import spine.animation.BoneTimeline2;
 import spine.animation.CurveTimeline1;
 import spine.animation.CurveTimeline;
 import spine.animation.DeformTimeline;
+import spine.animation.DrawOrderFolderTimeline;
 import spine.animation.DrawOrderTimeline;
 import spine.animation.EventTimeline;
 import spine.animation.IkConstraintTimeline;
@@ -349,7 +350,7 @@ class SkeletonBinary {
 					data.slot = slots[input.readInt(true)];
 					var flags = input.readByte();
 					data.skinRequired = (flags & 1) != 0;
-					data.positionMode = PositionMode.values[(flags >> 1) & 2];
+					data.positionMode = PositionMode.values[(flags >> 1) & 1];
 					data.spacingMode = SpacingMode.values[(flags >> 2) & 3];
 					data.rotateMode = RotateMode.values[(flags >> 4) & 3];
 					if ((flags & 128) != 0)
@@ -467,8 +468,7 @@ class SkeletonBinary {
 				throw new SpineException("Parent mesh not found: " + linkedMesh.parent);
 			linkedMesh.mesh.timelineAttachment = linkedMesh.inheritTimeline ? cast(parent, VertexAttachment) : linkedMesh.mesh;
 			linkedMesh.mesh.parentMesh = cast(parent, MeshAttachment);
-			if (linkedMesh.mesh.region != null)
-				linkedMesh.mesh.updateRegion();
+			linkedMesh.mesh.updateSequence();
 		}
 		linkedMeshes.resize(0);
 
@@ -546,8 +546,10 @@ class SkeletonBinary {
 		return skin;
 	}
 
-	private function readSequence(input:BinaryInput):Sequence {
-		var sequence = new Sequence(input.readInt(true));
+	private function readSequence(input:BinaryInput, hasPathSuffix:Bool):Sequence {
+		if (!hasPathSuffix)
+			return new Sequence(1, false);
+		var sequence = new Sequence(input.readInt(true), true);
 		sequence.start = input.readInt(true);
 		sequence.digits = input.readInt(true);
 		sequence.setupIndex = input.readInt(true);
@@ -574,7 +576,7 @@ class SkeletonBinary {
 			case AttachmentType.region:
 				path = (flags & 16) != 0 ? input.readStringRef() : null;
 				color = (flags & 32) != 0 ? input.readInt32() : 0xffffffff;
-				var sequence = (flags & 64) != 0 ? readSequence(input) : null;
+				var sequence = readSequence(input, (flags & 64) != 0);
 				rotation = (flags & 128) != 0 ? input.readFloat() : 0;
 				x = input.readFloat();
 				y = input.readFloat();
@@ -597,9 +599,7 @@ class SkeletonBinary {
 				region.width = width * scale;
 				region.height = height * scale;
 				region.color.setFromRgba8888(color);
-				region.sequence = sequence;
-				if (region.region == null)
-					region.updateRegion();
+				region.updateSequence();
 				return region;
 			case AttachmentType.boundingbox:
 				vertices = readVertices(input, (flags & 16) != 0);
@@ -618,7 +618,7 @@ class SkeletonBinary {
 			case AttachmentType.mesh:
 				path = (flags & 16) != 0 ? input.readStringRef() : name;
 				color = (flags & 32) != 0 ? input.readInt32() : 0xffffffff;
-				var sequence = (flags & 64) != 0 ? readSequence(input) : null;
+				var sequence = readSequence(input, (flags & 64) != 0);
 				var hullLength = input.readInt(true);
 				vertices = readVertices(input, (flags & 128) != 0);
 				var uvs:Array<Float> = readFloatArray(input, vertices.length, 1);
@@ -637,28 +637,26 @@ class SkeletonBinary {
 					return null;
 				mesh.path = path;
 				mesh.color.setFromRgba8888(color);
+				mesh.hullLength = hullLength << 1;
 				if (vertices.bones.length > 0)
 					mesh.bones = vertices.bones;
 				mesh.vertices = vertices.vertices;
 				mesh.worldVerticesLength = vertices.length;
-				mesh.triangles = triangles;
 				mesh.regionUVs = uvs;
-				if (mesh.region == null)
-					mesh.updateRegion();
-				mesh.hullLength = hullLength << 1;
-				mesh.sequence = sequence;
+				mesh.triangles = triangles;
 				if (nonessential) {
 					mesh.edges = edges;
 					mesh.width = width * scale;
 					mesh.height = height * scale;
 				}
+				mesh.updateSequence();
 				return mesh;
 			case AttachmentType.linkedmesh:
 				path = (flags & 16) != 0 ? input.readStringRef() : name;
 				if (path == null)
 					throw new SpineException("Path of linked mesh must not be null");
 				color = (flags & 32) != 0 ? input.readInt32() : 0xffffffff;
-				var sequence = (flags & 64) != 0 ? this.readSequence(input) : null;
+				var sequence = readSequence(input, (flags & 64) != 0);
 				var inheritTimelines:Bool = (flags & 128) != 0;
 				var skinIndex = input.readInt(true);
 				var parent:String = input.readStringRef();
@@ -672,7 +670,6 @@ class SkeletonBinary {
 					return null;
 				mesh.path = path;
 				mesh.color.setFromRgba8888(color);
-				mesh.sequence = sequence;
 				if (nonessential) {
 					mesh.width = width * scale;
 					mesh.height = height * scale;
@@ -746,21 +743,52 @@ class SkeletonBinary {
 			vertices.vertices = readFloatArray(input, vertices.length, scale);
 			return vertices;
 		}
+		var n:Int = input.readInt(true);
+		var bones:Array<Int> = new Array<Int>();
 		var weights:Array<Float> = new Array<Float>();
-		var bonesArray:Array<Int> = new Array<Int>();
-		for (i in 0...vertexCount) {
+		var b:Int = 0, w:Int = 0;
+		while (b < n) {
 			var boneCount:Int = input.readInt(true);
-			bonesArray.push(boneCount);
+			bones[b++] = boneCount;
 			for (ii in 0...boneCount) {
-				bonesArray.push(input.readInt(true));
-				weights.push(input.readFloat() * scale);
-				weights.push(input.readFloat() * scale);
-				weights.push(input.readFloat());
+				bones[b++] = input.readInt(true);
+				weights[w] = input.readFloat() * scale;
+				weights[w + 1] = input.readFloat() * scale;
+				weights[w + 2] = input.readFloat();
+				w += 3;
 			}
 		}
 		vertices.vertices = weights;
-		vertices.bones = bonesArray;
+		vertices.bones = bones;
 		return vertices;
+	}
+
+	private function readDrawOrder(input:BinaryInput, slotCount:Int):Array<Int> {
+		var changeCount:Int = input.readInt(true);
+		if (changeCount == 0)
+			return null;
+		var drawOrder:Array<Int> = new Array<Int>();
+		drawOrder.resize(slotCount);
+		for (i in 0...slotCount)
+			drawOrder[i] = -1;
+		var unchanged:Array<Int> = new Array<Int>();
+		unchanged.resize(slotCount - changeCount);
+		var originalIndex:Int = 0, unchangedIndex:Int = 0;
+		for (i in 0...changeCount) {
+			var slotIndex:Int = input.readInt(true);
+			while (originalIndex != slotIndex)
+				unchanged[unchangedIndex++] = originalIndex++;
+			drawOrder[originalIndex + input.readInt(true)] = originalIndex++;
+		}
+		while (originalIndex < slotCount)
+			unchanged[unchangedIndex++] = originalIndex++;
+		var i:Int = slotCount - 1;
+		while (i >= 0) {
+			if (drawOrder[i] == -1)
+				drawOrder[i] = unchanged[--unchangedIndex];
+			i--;
+		}
+		return drawOrder;
 	}
 
 	private function readFloatArray(input:BinaryInput, n:Int, scale:Float):Array<Float> {
@@ -1337,7 +1365,7 @@ class SkeletonBinary {
 							}
 							timelines.push(deformTimeline);
 						case ATTACHMENT_SEQUENCE:
-							var timeline = new SequenceTimeline(frameCount, slotIndex, cast(attachment, HasTextureRegion));
+							var timeline = new SequenceTimeline(frameCount, slotIndex, cast(attachment, HasSequence));
 							for (frame in 0...frameCount) {
 								var time = input.readFloat();
 								var modeAndIndex = input.readInt32();
@@ -1350,46 +1378,29 @@ class SkeletonBinary {
 			}
 		}
 
-		// Draw order timelines.
+		// Draw order timeline.
+		var slotCount:Int = skeletonData.slots.length;
 		var drawOrderCount:Int = input.readInt(true);
 		if (drawOrderCount > 0) {
 			var drawOrderTimeline:DrawOrderTimeline = new DrawOrderTimeline(drawOrderCount);
-			var slotCount:Int = skeletonData.slots.length;
-			for (i in 0...drawOrderCount) {
-				time = input.readFloat();
-				var offsetCount:Int = input.readInt(true);
-				var drawOrder:Array<Int> = new Array<Int>();
-				drawOrder.resize(slotCount);
-				var ii:Int = slotCount - 1;
-				while (ii >= 0) {
-					drawOrder[ii--] = -1;
-				}
-				var unchanged:Array<Int> = new Array<Int>();
-				unchanged.resize(slotCount - offsetCount);
-				var originalIndex:Int = 0, unchangedIndex:Int = 0;
-				for (ii in 0...offsetCount) {
-					slotIndex = input.readInt(true);
-					// Collect unchanged items.
-					while (originalIndex != slotIndex) {
-						unchanged[unchangedIndex++] = originalIndex++;
-					}
-					// Set changed items.
-					drawOrder[originalIndex + input.readInt(true)] = originalIndex++;
-				}
-				// Collect remaining unchanged items.
-				while (originalIndex < slotCount) {
-					unchanged[unchangedIndex++] = originalIndex++;
-				}
-				// Fill in unchanged items.
-				ii = slotCount - 1;
-				while (ii >= 0) {
-					if (drawOrder[ii] == -1)
-						drawOrder[ii] = unchanged[--unchangedIndex];
-					ii--;
-				}
-				drawOrderTimeline.setFrame(i, time, drawOrder);
-			}
+			for (i in 0...drawOrderCount)
+				drawOrderTimeline.setFrame(i, input.readFloat(), readDrawOrder(input, slotCount));
 			timelines.push(drawOrderTimeline);
+		}
+
+		// Draw order folder timelines.
+		var folderCount:Int = input.readInt(true);
+		for (i in 0...folderCount) {
+			var folderSlotCount:Int = input.readInt(true);
+			var folderSlots:Array<Int> = new Array<Int>();
+			folderSlots.resize(folderSlotCount);
+			for (ii in 0...folderSlotCount)
+				folderSlots[ii] = input.readInt(true);
+			var keyCount:Int = input.readInt(true);
+			var folderTimeline = new DrawOrderFolderTimeline(keyCount, folderSlots, slotCount);
+			for (ii in 0...keyCount)
+				folderTimeline.setFrame(ii, input.readFloat(), readDrawOrder(input, folderSlotCount));
+			timelines.push(folderTimeline);
 		}
 
 		// Event timelines.

@@ -111,14 +111,14 @@ var transitionsDemo = function (canvas, loadingComplete, bgColor) {
 		skeleton.updateWorldTransform(spine.Physics.update);
 		skeleton.x = -200;
 		skeleton.y = -100;
-		renderer.drawSkeleton(skeleton, true);
+		renderer.drawSkeleton(skeleton);
 
 		stateNoMix.update(delta);
 		stateNoMix.apply(skeletonNoMix);
 		skeletonNoMix.updateWorldTransform(spine.Physics.update);
 		skeletonNoMix.x = size.x + 45;
 		skeletonNoMix.y = -100;
-		renderer.drawSkeleton(skeletonNoMix, true);
+		renderer.drawSkeleton(skeletonNoMix);
 		renderer.end();
 	}
 

@@ -60,6 +60,6 @@ void PathConstraintSpacingTimeline::apply(Skeleton &skeleton, float lastTime, fl
 	if (constraint->isActive()) {
 		PathConstraintPose &pose = appliedPose ? *constraint->_applied : constraint->_pose;
 		PathConstraintData &data = constraint->_data;
-		pose._spacing = getAbsoluteValue(time, alpha, blend, pose._spacing, data._setup._spacing);
+		pose._spacing = getAbsoluteValue(time, alpha, blend == MixBlend_Add ? MixBlend_Replace : blend, pose._spacing, data._setup._spacing);
 	}
 }

@@ -1,26 +1,65 @@
 
 package com.esotericsoftware.spine.utils;
 
-import com.esotericsoftware.spine.*;
-import com.esotericsoftware.spine.Animation.*;
-import com.esotericsoftware.spine.AnimationState.*;
-import com.esotericsoftware.spine.BoneData.Inherit;
-import com.esotericsoftware.spine.Skin.SkinEntry;
-import com.esotericsoftware.spine.PathConstraintData.*;
-import com.esotericsoftware.spine.TransformConstraintData.*;
-import com.esotericsoftware.spine.attachments.*;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.FloatArray;
+import com.badlogic.gdx.utils.IntArray;
 
-import java.util.Locale;
-import java.util.Map;
-import java.util.HashMap;
+import com.esotericsoftware.spine.Animation;
+import com.esotericsoftware.spine.Animation.Timeline;
+import com.esotericsoftware.spine.AnimationState;
+import com.esotericsoftware.spine.AnimationState.TrackEntry;
+import com.esotericsoftware.spine.AnimationStateData;
+import com.esotericsoftware.spine.Bone;
+import com.esotericsoftware.spine.BoneData;
+import com.esotericsoftware.spine.BoneLocal;
+import com.esotericsoftware.spine.BonePose;
+import com.esotericsoftware.spine.Constraint;
+import com.esotericsoftware.spine.ConstraintData;
+import com.esotericsoftware.spine.Event;
+import com.esotericsoftware.spine.EventData;
+import com.esotericsoftware.spine.IkConstraint;
+import com.esotericsoftware.spine.IkConstraintData;
+import com.esotericsoftware.spine.IkConstraintPose;
+import com.esotericsoftware.spine.PathConstraint;
+import com.esotericsoftware.spine.PathConstraintData;
+import com.esotericsoftware.spine.PathConstraintPose;
+import com.esotericsoftware.spine.PhysicsConstraint;
+import com.esotericsoftware.spine.PhysicsConstraintData;
+import com.esotericsoftware.spine.PhysicsConstraintPose;
+import com.esotericsoftware.spine.Skeleton;
+import com.esotericsoftware.spine.SkeletonData;
+import com.esotericsoftware.spine.Skin;
+import com.esotericsoftware.spine.Skin.SkinEntry;
+import com.esotericsoftware.spine.Slider;
+import com.esotericsoftware.spine.SliderData;
+import com.esotericsoftware.spine.SliderPose;
+import com.esotericsoftware.spine.Slot;
+import com.esotericsoftware.spine.SlotData;
+import com.esotericsoftware.spine.SlotPose;
+import com.esotericsoftware.spine.TransformConstraint;
+import com.esotericsoftware.spine.TransformConstraintData;
+import com.esotericsoftware.spine.TransformConstraintData.FromProperty;
+import com.esotericsoftware.spine.TransformConstraintData.ToProperty;
+import com.esotericsoftware.spine.TransformConstraintPose;
+import com.esotericsoftware.spine.Update;
+import com.esotericsoftware.spine.attachments.Attachment;
+import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
+import com.esotericsoftware.spine.attachments.ClippingAttachment;
+import com.esotericsoftware.spine.attachments.MeshAttachment;
+import com.esotericsoftware.spine.attachments.PathAttachment;
+import com.esotericsoftware.spine.attachments.PointAttachment;
+import com.esotericsoftware.spine.attachments.RegionAttachment;
+import com.esotericsoftware.spine.attachments.Sequence;
+import com.esotericsoftware.spine.attachments.VertexAttachment;
 
 public class SkeletonSerializer {
-	private final Map<Object, String> visitedObjects = new HashMap<>();
+	private final Map<Object, String> visitedObjects = new HashMap();
 	private int nextId = 1;
 	private JsonWriter json;
 
@@ -2479,10 +2518,12 @@ public class SkeletonSerializer {
 		json.writeValue("MeshAttachment");
 
 		json.writeName("region");
-		if (obj.getRegion() == null) {
+		Sequence sequence = obj.getSequence();
+		TextureRegion region = sequence.getRegion(sequence.getSetupIndex());
+		if (region == null) {
 			json.writeNull();
 		} else {
-			writeTextureRegion(obj.getRegion());
+			writeTextureRegion(region);
 		}
 
 		json.writeName("triangles");
@@ -2501,8 +2542,10 @@ public class SkeletonSerializer {
 
 		json.writeName("uVs");
 		json.writeArrayStart();
-		for (float item : obj.getUVs()) {
-			json.writeValue(item);
+		float[] uvs = sequence.getUVs(sequence.getSetupIndex());
+		if (uvs != null) {
+			for (float item : uvs)
+				json.writeValue(item);
 		}
 		json.writeArrayEnd();
 
@@ -2533,11 +2576,7 @@ public class SkeletonSerializer {
 		json.writeValue(obj.getHeight());
 
 		json.writeName("sequence");
-		if (obj.getSequence() == null) {
-			json.writeNull();
-		} else {
-			writeSequence(obj.getSequence());
-		}
+		writeSequence(obj.getSequence());
 
 		json.writeName("parentMesh");
 		if (obj.getParentMesh() == null) {
@@ -2954,24 +2993,32 @@ public class SkeletonSerializer {
 		json.writeName("type");
 		json.writeValue("RegionAttachment");
 
+		Sequence sequence = obj.getSequence();
+		int setupIndex = sequence.getSetupIndex();
+		TextureRegion region = sequence.getRegion(setupIndex);
+
 		json.writeName("region");
-		if (obj.getRegion() == null) {
+		if (region == null) {
 			json.writeNull();
 		} else {
-			writeTextureRegion(obj.getRegion());
+			writeTextureRegion(region);
 		}
 
 		json.writeName("offset");
 		json.writeArrayStart();
-		for (float item : obj.getOffset()) {
-			json.writeValue(item);
+		float[] offset = sequence.getOffsets(setupIndex);
+		if (offset != null) {
+			for (float item : offset)
+				json.writeValue(item);
 		}
 		json.writeArrayEnd();
 
 		json.writeName("uVs");
 		json.writeArrayStart();
-		for (float item : obj.getUVs()) {
-			json.writeValue(item);
+		float[] uvs = sequence.getUVs(setupIndex);
+		if (uvs != null) {
+			for (float item : uvs)
+				json.writeValue(item);
 		}
 		json.writeArrayEnd();
 
@@ -3003,11 +3050,7 @@ public class SkeletonSerializer {
 		json.writeValue(obj.getPath());
 
 		json.writeName("sequence");
-		if (obj.getSequence() == null) {
-			json.writeNull();
-		} else {
-			writeSequence(obj.getSequence());
-		}
+		writeSequence(obj.getSequence());
 
 		json.writeName("name");
 		json.writeValue(obj.getName());
@@ -3267,7 +3310,7 @@ public class SkeletonSerializer {
 		json.writeValue("Skin");
 
 		json.writeName("attachments");
-		Array<SkinEntry> sortedAttachments = new Array<>(obj.getAttachments());
+		var sortedAttachments = new Array<SkinEntry>(obj.getAttachments());
 		sortedAttachments.sort( (a, b) -> Integer.compare(a.getSlotIndex(), b.getSlotIndex()));
 		json.writeArrayStart();
 		for (SkinEntry item : sortedAttachments) {

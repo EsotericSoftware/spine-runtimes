@@ -31,40 +31,49 @@
 #define Spine_Sequence_h
 
 #include <spine/Array.h>
+#include <spine/RTTI.h>
 #include <spine/SpineString.h>
 #include <spine/TextureRegion.h>
-#include <spine/RTTI.h>
 
 namespace spine {
 	class SlotPose;
-	class Attachment;
+	class RegionAttachment;
+	class MeshAttachment;
 
 	class SkeletonBinary;
 	class SkeletonJson;
 
+	/// Holds texture regions, UVs, and vertex offsets for rendering a region or mesh attachment.
+	/// Regions must be populated and update() called before use.
 	class SP_API Sequence : public SpineObject {
 		friend class SkeletonBinary;
 		friend class SkeletonJson;
 
 	public:
-		Sequence(int count);
+		Sequence(int count, bool pathSuffix);
+
+		/// Copy constructor.
+		Sequence(const Sequence &other);
 
 		~Sequence();
 
-		Sequence &copy();
+		/// Computes UVs and offsets for the specified attachment. Must be called if the regions
+		/// or attachment properties are changed.
+		void update(RegionAttachment &attachment);
+		void update(MeshAttachment &attachment);
 
-		void apply(SlotPose *slot, Attachment *attachment);
-
-		String &getPath(const String &basePath, int index);
-
-		/// Returns a unique ID for this attachment.
-		int getId() {
-			return _id;
+		Array<TextureRegion *> &getRegions() {
+			return _regions;
 		}
 
-		void setId(int id) {
-			_id = id;
-		}
+		int resolveIndex(SlotPose &pose);
+
+		TextureRegion *getRegion(int index);
+
+		Array<float> &getUVs(int index);
+
+		/// Returns vertex offsets from the center of a RegionAttachment. Invalid to call for a MeshAttachment.
+		Array<float> &getOffsets(int index);
 
 		int getStart() {
 			return _start;
@@ -91,14 +100,24 @@ namespace spine {
 			_setupIndex = setupIndex;
 		}
 
-		Array<TextureRegion *> &getRegions() {
-			return _regions;
+		bool hasPathSuffix() {
+			return _pathSuffix;
+		}
+
+		String &getPath(const String &basePath, int index);
+
+		/// Returns a unique ID for this attachment.
+		int getId() {
+			return _id;
 		}
 
 	private:
 		static int _nextID;
 		int _id;
 		Array<TextureRegion *> _regions;
+		bool _pathSuffix;
+		Array<Array<float>> _uvs;
+		Array<Array<float>> _offsets;
 		int _start;
 		int _digits;
 		int _setupIndex;

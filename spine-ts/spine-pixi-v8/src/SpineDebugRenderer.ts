@@ -366,12 +366,9 @@ export class SpineDebugRenderer implements ISpineDebugRenderer {
 				continue;
 			}
 
-			const regionAttachment = attachment;
-
 			const vertices = new Float32Array(8);
 
-			regionAttachment.computeWorldVertices(slot, vertices, 0, 2);
-
+			attachment.computeWorldVertices(slot, attachment.getOffsets(slot.applied), vertices, 0, 2);
 			debugDisplayObjects.regionAttachmentsShape.poly(Array.from(vertices.slice(0, 8)));
 		}
 

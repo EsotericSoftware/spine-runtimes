@@ -22,3 +22,4 @@
 - Add option to disable drawing when out of viewport (#18)
 - Add docs for public Spine classes/methods (#19)
 - Fix various regressions (#20)
+- Add `boundsProvider` parameter to `SkeletonDrawableWrapper.renderToImage(...)` to align image rendering bounds with `SpineView` (#3002)

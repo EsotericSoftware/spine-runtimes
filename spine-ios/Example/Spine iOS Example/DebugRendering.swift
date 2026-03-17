@@ -51,6 +51,11 @@ struct DebugRendering: View {
                     .frame(width: boneLocation.width, height: boneLocation.height)
             }
         }
+        .onDisappear {
+            // SwiftUI may retain the @StateObject model after the view disappears.
+            // Explicit disposal is only needed here so leak reporting runs after native teardown.
+            model.dispose()
+        }
         .navigationTitle("Debug Rendering")
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -61,6 +66,14 @@ struct DebugRendering: View {
 }
 
 final class DebugRenderingModel: ObservableObject {
+
+    // Not strictly necessary for normal usage. SwiftUI will eventually release the
+    // model and controller. We dispose explicitly here so leak reporting runs after
+    // native teardown when navigating back from the example.
+    func dispose() {
+        controller.dispose()
+    }
+
 
     @Published
     var controller: SpineController!

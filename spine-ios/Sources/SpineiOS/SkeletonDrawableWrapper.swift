@@ -45,7 +45,7 @@ import UIKit
 /// To update the ``AnimationState`` and apply it to the ``Skeleton`` call the ``AnimationStateWrapper/update`` function, providing it
 /// a delta time in seconds to advance the animations.
 ///
-/// To render the current pose of the ``Skeleton`` as a `CGImage`, use ``SkeletonDrawableWrapper/renderToImage(size:backgroundColor:scaleFactor:)``.
+/// To render the current pose of the ``Skeleton`` as a `CGImage`, use ``SkeletonDrawableWrapper/renderToImage(size:boundsProvider:backgroundColor:scaleFactor:)``.
 ///
 /// When the skeleton drawable is no longer needed, call the ``SkeletonDrawableWrapper/dispose()`` method to release its resources. If
 /// the skeleton drawable was constructed from a shared ``Atlas`` and ``SkeletonData``, make sure to dispose the

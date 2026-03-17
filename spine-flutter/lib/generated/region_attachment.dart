@@ -38,6 +38,7 @@ import 'attachment.dart';
 import 'color.dart';
 import 'sequence.dart';
 import 'slot.dart';
+import 'slot_pose.dart';
 import 'texture_region.dart';
 
 /// Attachment that displays a texture region.
@@ -51,8 +52,9 @@ class RegionAttachment extends Attachment {
   @override
   Pointer get nativePtr => _ptr;
 
-  factory RegionAttachment(String name) {
-    final ptr = SpineBindings.bindings.spine_region_attachment_create(name.toNativeUtf8().cast<Char>());
+  factory RegionAttachment(String name, Sequence? sequence) {
+    final ptr = SpineBindings.bindings.spine_region_attachment_create(
+        name.toNativeUtf8().cast<Char>(), sequence?.nativePtr.cast() ?? Pointer.fromAddress(0));
     return RegionAttachment.fromPointer(ptr);
   }
 
@@ -60,8 +62,10 @@ class RegionAttachment extends Attachment {
     SpineBindings.bindings.spine_region_attachment_dispose(_ptr);
   }
 
-  void updateRegion() {
-    SpineBindings.bindings.spine_region_attachment_update_region(_ptr);
+  /// Returns the vertex offsets for the specified slot pose.
+  ArrayFloat getOffsets(SlotPose pose) {
+    final result = SpineBindings.bindings.spine_region_attachment_get_offsets(_ptr, pose.nativePtr.cast());
+    return ArrayFloat.fromPointer(result);
   }
 
   double get x {
@@ -82,15 +86,6 @@ class RegionAttachment extends Attachment {
     SpineBindings.bindings.spine_region_attachment_set_y(_ptr, value);
   }
 
-  double get rotation {
-    final result = SpineBindings.bindings.spine_region_attachment_get_rotation(_ptr);
-    return result;
-  }
-
-  set rotation(double value) {
-    SpineBindings.bindings.spine_region_attachment_set_rotation(_ptr, value);
-  }
-
   double get scaleX {
     final result = SpineBindings.bindings.spine_region_attachment_get_scale_x(_ptr);
     return result;
@@ -107,6 +102,15 @@ class RegionAttachment extends Attachment {
 
   set scaleY(double value) {
     SpineBindings.bindings.spine_region_attachment_set_scale_y(_ptr, value);
+  }
+
+  double get rotation {
+    final result = SpineBindings.bindings.spine_region_attachment_get_rotation(_ptr);
+    return result;
+  }
+
+  set rotation(double value) {
+    SpineBindings.bindings.spine_region_attachment_set_rotation(_ptr, value);
   }
 
   double get width {
@@ -127,9 +131,13 @@ class RegionAttachment extends Attachment {
     SpineBindings.bindings.spine_region_attachment_set_height(_ptr, value);
   }
 
-  Color get color {
-    final result = SpineBindings.bindings.spine_region_attachment_get_color(_ptr);
-    return Color.fromPointer(result);
+  Sequence get sequence {
+    final result = SpineBindings.bindings.spine_region_attachment_get_sequence(_ptr);
+    return Sequence.fromPointer(result);
+  }
+
+  void updateSequence() {
+    SpineBindings.bindings.spine_region_attachment_update_sequence(_ptr);
   }
 
   String get path {
@@ -141,37 +149,23 @@ class RegionAttachment extends Attachment {
     SpineBindings.bindings.spine_region_attachment_set_path(_ptr, value.toNativeUtf8().cast<Char>());
   }
 
-  TextureRegion? get region {
-    final result = SpineBindings.bindings.spine_region_attachment_get_region(_ptr);
-    return result.address == 0 ? null : TextureRegion.fromPointer(result);
+  Color get color {
+    final result = SpineBindings.bindings.spine_region_attachment_get_color(_ptr);
+    return Color.fromPointer(result);
   }
 
-  set region(TextureRegion? value) {
-    SpineBindings.bindings.spine_region_attachment_set_region(_ptr, value?.nativePtr.cast() ?? Pointer.fromAddress(0));
+  /// Computes UVs and offsets for a region attachment.
+  ///
+  /// [uvs] Output array for the computed UVs, length of 8.
+  /// [offset] Output array for the computed vertex offsets, length of 8.
+  static void computeUVs(TextureRegion? region, double x, double y, double scaleX, double scaleY, double rotation,
+      double width, double height, ArrayFloat offset, ArrayFloat uvs) {
+    SpineBindings.bindings.spine_region_attachment_compute_u_vs(region?.nativePtr.cast() ?? Pointer.fromAddress(0), x,
+        y, scaleX, scaleY, rotation, width, height, offset.nativePtr.cast(), uvs.nativePtr.cast());
   }
 
-  Sequence? get sequence {
-    final result = SpineBindings.bindings.spine_region_attachment_get_sequence(_ptr);
-    return result.address == 0 ? null : Sequence.fromPointer(result);
-  }
-
-  set sequence(Sequence? value) {
-    SpineBindings.bindings
-        .spine_region_attachment_set_sequence(_ptr, value?.nativePtr.cast() ?? Pointer.fromAddress(0));
-  }
-
-  ArrayFloat get offset {
-    final result = SpineBindings.bindings.spine_region_attachment_get_offset(_ptr);
-    return ArrayFloat.fromPointer(result);
-  }
-
-  ArrayFloat get uVs {
-    final result = SpineBindings.bindings.spine_region_attachment_get_u_vs(_ptr);
-    return ArrayFloat.fromPointer(result);
-  }
-
-  void computeWorldVertices(Slot slot, ArrayFloat worldVertices, int offset, int stride) {
+  void computeWorldVertices(Slot slot, ArrayFloat vertexOffsets, ArrayFloat worldVertices, int offset, int stride) {
     SpineBindings.bindings.spine_region_attachment_compute_world_vertices_2(
-        _ptr, slot.nativePtr.cast(), worldVertices.nativePtr.cast(), offset, stride);
+        _ptr, slot.nativePtr.cast(), vertexOffsets.nativePtr.cast(), worldVertices.nativePtr.cast(), offset, stride);
   }
 }

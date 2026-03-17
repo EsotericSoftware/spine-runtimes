@@ -25,6 +25,8 @@ SPINE_C_API void spine_point_attachment_compute_world_position(spine_point_attac
 SPINE_C_API float spine_point_attachment_compute_world_rotation(spine_point_attachment self, spine_bone_pose bone);
 SPINE_C_API spine_attachment spine_point_attachment_copy(spine_point_attachment self);
 SPINE_C_API const char *spine_point_attachment_get_name(spine_point_attachment self);
+SPINE_C_API /*@null*/ spine_attachment spine_point_attachment_get_timeline_attachment(spine_point_attachment self);
+SPINE_C_API void spine_point_attachment_set_timeline_attachment(spine_point_attachment self, /*@null*/ spine_attachment attachment);
 SPINE_C_API int spine_point_attachment_get_ref_count(spine_point_attachment self);
 SPINE_C_API void spine_point_attachment_reference(spine_point_attachment self);
 SPINE_C_API void spine_point_attachment_dereference(spine_point_attachment self);

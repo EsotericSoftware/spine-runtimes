@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -192,7 +192,7 @@ namespace Spine {
 					o[i] = input.ReadString();
 
 				// Bones.
-				BoneData[] bones = skeletonData.bones.Resize(n = input.ReadInt(true)).Items;
+				BoneData[] bones = skeletonData.bones.EnsureSize(n = input.ReadInt(true)).Items;
 				for (int i = 0; i < n; i++) {
 					string name = input.ReadString();
 					BoneData parent = i == 0 ? null : bones[input.ReadInt(true)];
@@ -217,7 +217,7 @@ namespace Spine {
 				}
 
 				// Slots.
-				SlotData[] slots = skeletonData.slots.Resize(n = input.ReadInt(true)).Items;
+				SlotData[] slots = skeletonData.slots.EnsureSize(n = input.ReadInt(true)).Items;
 				for (int i = 0; i < n; i++) {
 					string slotName = input.ReadString();
 
@@ -239,7 +239,7 @@ namespace Spine {
 
 				// Constraints.
 				int constraintCount = input.ReadInt(true);
-				IConstraintData[] constraints = skeletonData.constraints.Resize(constraintCount).Items;
+				IConstraintData[] constraints = skeletonData.constraints.EnsureSize(constraintCount).Items;
 				for (int i = 0; i < constraintCount; i++) {
 					string name = input.ReadString();
 					int nn;
@@ -247,7 +247,7 @@ namespace Spine {
 					switch (input.ReadUByte()) {
 					case CONSTRAINT_IK: {
 						var data = new IkConstraintData(name);
-						BoneData[] constraintBones = data.bones.Resize(nn = input.ReadInt(true)).Items;
+						BoneData[] constraintBones = data.bones.EnsureSize(nn = input.ReadInt(true)).Items;
 						for (int ii = 0; ii < nn; ii++)
 							constraintBones[ii] = bones[input.ReadInt(true)];
 						data.target = bones[input.ReadInt(true)];
@@ -265,7 +265,7 @@ namespace Spine {
 					}
 					case CONSTRAINT_TRANSFORM: {
 						var data = new TransformConstraintData(name);
-						BoneData[] constraintBones = data.bones.Resize(nn = input.ReadInt(true)).Items;
+						BoneData[] constraintBones = data.bones.EnsureSize(nn = input.ReadInt(true)).Items;
 						for (int ii = 0; ii < nn; ii++)
 							constraintBones[ii] = bones[input.ReadInt(true)];
 						data.source = bones[input.ReadInt(true)];
@@ -275,7 +275,7 @@ namespace Spine {
 						data.localTarget = (flags & 4) != 0;
 						data.additive = (flags & 8) != 0;
 						data.clamp = (flags & 16) != 0;
-						FromProperty[] froms = data.properties.Resize(nn = flags >> 5).Items;
+						FromProperty[] froms = data.properties.EnsureSize(nn = flags >> 5).Items;
 						for (int ii = 0, tn; ii < nn; ii++) {
 							float fromScale = 1;
 							FromProperty from;
@@ -297,7 +297,7 @@ namespace Spine {
 							default: from = null; break;
 							}
 							from.offset = input.ReadFloat() * fromScale;
-							ToProperty[] tos = from.to.Resize(tn = input.ReadSByte()).Items;
+							ToProperty[] tos = from.to.EnsureSize(tn = input.ReadSByte()).Items;
 							for (int t = 0; t < tn; t++) {
 								float toScale = 1;
 								ToProperty to;
@@ -345,15 +345,15 @@ namespace Spine {
 					}
 					case CONSTRAINT_PATH: {
 						var data = new PathConstraintData(name);
-						BoneData[] constraintBones = data.bones.Resize(nn = input.ReadInt(true)).Items;
+						BoneData[] constraintBones = data.bones.EnsureSize(nn = input.ReadInt(true)).Items;
 						for (int ii = 0; ii < nn; ii++)
 							constraintBones[ii] = bones[input.ReadInt(true)];
 						data.slot = slots[input.ReadInt(true)];
 						int flags = input.Read();
 						data.skinRequired = (flags & 1) != 0;
-						data.positionMode = (PositionMode)Enum.GetValues(typeof(PositionMode)).GetValue((flags >> 1) & 2);
-						data.spacingMode = (SpacingMode)Enum.GetValues(typeof(SpacingMode)).GetValue((flags >> 2) & 3);
-						data.rotateMode = (RotateMode)Enum.GetValues(typeof(RotateMode)).GetValue((flags >> 4) & 3);
+						data.positionMode = (PositionMode)Enum.GetValues(typeof(PositionMode)).GetValue((flags >> 1) & 0x1); // 0b1
+						data.spacingMode = (SpacingMode)Enum.GetValues(typeof(SpacingMode)).GetValue((flags >> 2) & 0x3); // 0b11
+						data.rotateMode = (RotateMode)Enum.GetValues(typeof(RotateMode)).GetValue((flags >> 4) & 0x3); // 0b11
 						if ((flags & 128) != 0) data.offsetRotation = input.ReadFloat();
 						PathConstraintPose setup = data.setup;
 						setup.position = input.ReadFloat();
@@ -447,7 +447,7 @@ namespace Spine {
 				// Skins.
 				{
 					int i = skeletonData.skins.Count;
-					o = skeletonData.skins.Resize(n = i + input.ReadInt(true)).Items;
+					o = skeletonData.skins.EnsureSize(n = i + input.ReadInt(true)).Items;
 					for (; i < n; i++)
 						o[i] = ReadSkin(input, skeletonData, false, nonessential);
 				}
@@ -461,12 +461,12 @@ namespace Spine {
 					if (parent == null) throw new Exception("Parent mesh not found: " + linkedMesh.parent);
 					linkedMesh.mesh.TimelineAttachment = linkedMesh.inheritTimelines ? (VertexAttachment)parent : linkedMesh.mesh;
 					linkedMesh.mesh.ParentMesh = (MeshAttachment)parent;
-					if (linkedMesh.mesh.Region != null) linkedMesh.mesh.UpdateRegion();
+					linkedMesh.mesh.UpdateSequence();
 				}
 				linkedMeshes.Clear();
 
 				// Events.
-				o = skeletonData.events.Resize(n = input.ReadInt(true)).Items;
+				o = skeletonData.events.EnsureSize(n = input.ReadInt(true)).Items;
 				for (int i = 0; i < n; i++) {
 					var data = new EventData(input.ReadString());
 					data.Int = input.ReadInt(false);
@@ -481,7 +481,7 @@ namespace Spine {
 				}
 
 				// Animations.
-				Animation[] animations = skeletonData.animations.Resize(n = input.ReadInt(true)).Items;
+				Animation[] animations = skeletonData.animations.EnsureSize(n = input.ReadInt(true)).Items;
 				for (int i = 0; i < n; i++)
 					animations[i] = ReadAnimation(input, input.ReadString(), skeletonData);
 
@@ -513,12 +513,12 @@ namespace Spine {
 				if (nonessential) input.ReadInt(); // discard, Color.rgba8888ToColor(skin.color, input.readInt());
 
 				int n;
-				object[] from = skeletonData.bones.Items, to = skin.bones.Resize(n = input.ReadInt(true)).Items;
+				object[] from = skeletonData.bones.Items, to = skin.bones.EnsureSize(n = input.ReadInt(true)).Items;
 				for (int i = 0; i < n; i++)
 					to[i] = from[input.ReadInt(true)];
 
 				from = skeletonData.constraints.Items;
-				to = skin.constraints.Resize(n = input.ReadInt(true)).Items;
+				to = skin.constraints.EnsureSize(n = input.ReadInt(true)).Items;
 				for (int i = 0; i < n; i++)
 					to[i] = from[input.ReadInt(true)];
 
@@ -546,7 +546,7 @@ namespace Spine {
 			case AttachmentType.Region: {
 				string path = (flags & 16) != 0 ? input.ReadStringRef() : null;
 				uint color = (flags & 32) != 0 ? (uint)input.ReadInt() : 0xffffffff;
-				Sequence sequence = (flags & 64) != 0 ? ReadSequence(input) : null;
+				Sequence sequence = ReadSequence(input, (flags & 64) != 0);
 				float rotation = (flags & 128) != 0 ? input.ReadFloat() : 0;
 				float x = input.ReadFloat();
 				float y = input.ReadFloat();
@@ -567,8 +567,7 @@ namespace Spine {
 				region.width = width * scale;
 				region.height = height * scale;
 				region.SetColor(color.RGBA8888ToColor());
-				region.sequence = sequence;
-				if (region.Region != null) region.UpdateRegion();
+				region.UpdateSequence();
 				return region;
 			}
 			case AttachmentType.Boundingbox: {
@@ -586,7 +585,7 @@ namespace Spine {
 			case AttachmentType.Mesh: {
 				string path = (flags & 16) != 0 ? input.ReadStringRef() : name;
 				uint color = (flags & 32) != 0 ? (uint)input.ReadInt() : 0xffffffff;
-				Sequence sequence = (flags & 64) != 0 ? ReadSequence(input) : null;
+				Sequence sequence = ReadSequence(input, (flags & 64) != 0);
 				int hullLength = input.ReadInt(true);
 				Vertices vertices = ReadVertices(input, (flags & 128) != 0);
 				float[] uvs = ReadFloatArray(input, vertices.length, 1);
@@ -604,25 +603,24 @@ namespace Spine {
 				if (mesh == null) return null;
 				mesh.Path = path;
 				mesh.SetColor(color.RGBA8888ToColor());
+				mesh.HullLength = hullLength << 1;
 				mesh.bones = vertices.bones;
 				mesh.vertices = vertices.vertices;
 				mesh.WorldVerticesLength = vertices.length;
-				mesh.triangles = triangles;
 				mesh.regionUVs = uvs;
-				if (mesh.Region != null) mesh.UpdateRegion();
-				mesh.HullLength = hullLength << 1;
-				mesh.Sequence = sequence;
+				mesh.triangles = triangles;
 				if (nonessential) {
 					mesh.Edges = edges;
 					mesh.Width = width * scale;
 					mesh.Height = height * scale;
 				}
+				mesh.UpdateSequence();
 				return mesh;
 			}
 			case AttachmentType.Linkedmesh: {
 				string path = (flags & 16) != 0 ? input.ReadStringRef() : name;
 				uint color = (flags & 32) != 0 ? (uint)input.ReadInt() : 0xffffffff;
-				Sequence sequence = (flags & 64) != 0 ? ReadSequence(input) : null;
+				Sequence sequence = ReadSequence(input, (flags & 64) != 0);
 				bool inheritTimelines = (flags & 128) != 0;
 				int skinIndex = input.ReadInt(true);
 				string parent = input.ReadStringRef();
@@ -636,7 +634,6 @@ namespace Spine {
 				if (mesh == null) return null;
 				mesh.Path = path;
 				mesh.SetColor(color.RGBA8888ToColor());
-				mesh.Sequence = sequence;
 				if (nonessential) {
 					mesh.Width = width * scale;
 					mesh.Height = height * scale;
@@ -696,8 +693,9 @@ namespace Spine {
 			return null;
 		}
 
-		private Sequence ReadSequence (SkeletonInput input) {
-			var sequence = new Sequence(input.ReadInt(true));
+		private Sequence ReadSequence (SkeletonInput input, bool hasPathSuffix) {
+			if (!hasPathSuffix) return new Sequence(1, false);
+			var sequence = new Sequence(input.ReadInt(true), true);
 			sequence.Start = input.ReadInt(true);
 			sequence.Digits = input.ReadInt(true);
 			sequence.SetupIndex = input.ReadInt(true);
@@ -713,21 +711,22 @@ namespace Spine {
 				vertices.vertices = ReadFloatArray(input, vertices.length, scale);
 				return vertices;
 			}
-			var weights = new ExposedList<float>(vertices.length * 3 * 3);
-			var bonesArray = new ExposedList<int>(vertices.length * 3);
-			for (int i = 0; i < vertexCount; i++) {
+			int n = input.ReadInt(true);
+			var bones = new int[n];
+			var weights = new float[(n - vertexCount) * 3];
+			for (int b = 0, w = 0; b < n;) {
 				int boneCount = input.ReadInt(true);
-				bonesArray.Add(boneCount);
-				for (int ii = 0; ii < boneCount; ii++) {
-					bonesArray.Add(input.ReadInt(true));
-					weights.Add(input.ReadFloat() * scale);
-					weights.Add(input.ReadFloat() * scale);
-					weights.Add(input.ReadFloat());
+				bones[b++] = boneCount;
+				for (int ii = 0; ii < boneCount; ii++, w += 3) {
+					bones[b++] = input.ReadInt(true);
+					weights[w] = input.ReadFloat() * scale;
+					weights[w + 1] = input.ReadFloat() * scale;
+					weights[w + 2] = input.ReadFloat();
 				}
 			}
 
-			vertices.vertices = weights.ToArray();
-			vertices.bones = bonesArray.ToArray();
+			vertices.vertices = weights;
+			vertices.bones = bones;
 			return vertices;
 		}
 
@@ -1217,34 +1216,26 @@ namespace Spine {
 			}
 
 			// Draw order timeline.
+			int slotCount = skeletonData.slots.Count;
 			int drawOrderCount = input.ReadInt(true);
 			if (drawOrderCount > 0) {
 				var timeline = new DrawOrderTimeline(drawOrderCount);
-				int slotCount = skeletonData.slots.Count;
-				for (int i = 0; i < drawOrderCount; i++) {
-					float time = input.ReadFloat();
-					int offsetCount = input.ReadInt(true);
-					var drawOrder = new int[slotCount];
-					for (int ii = slotCount - 1; ii >= 0; ii--)
-						drawOrder[ii] = -1;
-					var unchanged = new int[slotCount - offsetCount];
-					int originalIndex = 0, unchangedIndex = 0;
-					for (int ii = 0; ii < offsetCount; ii++) {
-						int slotIndex = input.ReadInt(true);
-						// Collect unchanged items.
-						while (originalIndex != slotIndex)
-							unchanged[unchangedIndex++] = originalIndex++;
-						// Set changed items.
-						drawOrder[originalIndex + input.ReadInt(true)] = originalIndex++;
-					}
-					// Collect remaining unchanged items.
-					while (originalIndex < slotCount)
-						unchanged[unchangedIndex++] = originalIndex++;
-					// Fill in unchanged items.
-					for (int ii = slotCount - 1; ii >= 0; ii--)
-						if (drawOrder[ii] == -1) drawOrder[ii] = unchanged[--unchangedIndex];
-					timeline.SetFrame(i, time, drawOrder);
-				}
+				for (int i = 0; i < drawOrderCount; i++)
+					timeline.SetFrame(i, input.ReadFloat(), ReadDrawOrder(input, slotCount));
+				timelines.Add(timeline);
+			}
+
+			// Draw order folder timelines.
+			int folderCount = input.ReadInt(true);
+			for (int i = 0; i < folderCount; i++) {
+				int folderSlotCount = input.ReadInt(true);
+				var folderSlots = new int[folderSlotCount];
+				for (int ii = 0; ii < folderSlotCount; ii++)
+					folderSlots[ii] = input.ReadInt(true);
+				int keyCount = input.ReadInt(true);
+				var timeline = new DrawOrderFolderTimeline(keyCount, folderSlots, slotCount);
+				for (int ii = 0; ii < keyCount; ii++)
+					timeline.SetFrame(ii, input.ReadFloat(), ReadDrawOrder(input, folderSlotCount));
 				timelines.Add(timeline);
 			}
 
@@ -1318,6 +1309,32 @@ namespace Spine {
 				value2 = nvalue2;
 			}
 			timelines.Add(timeline);
+		}
+
+		/// <exception cref="IOException">Throws IOException when a read operation fails.</exception>
+		private int[] ReadDrawOrder (SkeletonInput input, int slotCount) {
+			int changeCount = input.ReadInt(true);
+			if (changeCount == 0) return null;
+			var drawOrder = new int[slotCount];
+			for (int ii = slotCount - 1; ii >= 0; ii--)
+				drawOrder[ii] = -1;
+			var unchanged = new int[slotCount - changeCount];
+			int originalIndex = 0, unchangedIndex = 0;
+			for (int i = 0; i < changeCount; i++) {
+				int slotIndex = input.ReadInt(true);
+				// Collect unchanged items.
+				while (originalIndex != slotIndex)
+					unchanged[unchangedIndex++] = originalIndex++;
+				// Set changed items.
+				drawOrder[originalIndex + input.ReadInt(true)] = originalIndex++;
+			}
+			// Collect remaining unchanged items.
+			while (originalIndex < slotCount)
+				unchanged[unchangedIndex++] = originalIndex++;
+			// Fill in unchanged items.
+			for (int i = slotCount - 1; i >= 0; i--)
+				if (drawOrder[i] == -1) drawOrder[i] = unchanged[--unchangedIndex];
+			return drawOrder;
 		}
 
 		/// <exception cref="IOException">Throws IOException when a read operation fails.</exception>

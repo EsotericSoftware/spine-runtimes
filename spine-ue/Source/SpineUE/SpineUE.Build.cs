@@ -33,7 +33,6 @@ public class SpineUE : ModuleRules
 {
 	public SpineUE(ReadOnlyTargetRules Target) : base(Target)
 	{
-		PrivatePCHHeaderFile = "SpineUE.h";
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "SpinePlugin", "ProceduralMeshComponent" });
 		PrivateDependencyModuleNames.AddRange(new string[] { });
 	}

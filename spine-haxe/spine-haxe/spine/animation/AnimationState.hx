@@ -266,7 +266,7 @@ class AnimationState {
 					attachments = true;
 				for (timeline in timelines) {
 					if (Std.isOfType(timeline, AttachmentTimeline)) {
-						applyAttachmentTimeline(cast(timeline, AttachmentTimeline), skeleton, applyTime, blend, attachments);
+						applyAttachmentTimeline(cast(timeline, AttachmentTimeline), skeleton, applyTime, blend, false, attachments);
 					} else {
 						timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, blend, MixDirection.mixIn, false);
 					}
@@ -286,7 +286,7 @@ class AnimationState {
 						this.applyRotateTimeline(cast(timeline, RotateTimeline), skeleton, applyTime, alpha, timelineBlend, current.timelinesRotation,
 							ii << 1, firstFrame);
 					} else if (Std.isOfType(timeline, AttachmentTimeline)) {
-						this.applyAttachmentTimeline(cast(timeline, AttachmentTimeline), skeleton, applyTime, blend, attachments);
+						this.applyAttachmentTimeline(cast(timeline, AttachmentTimeline), skeleton, applyTime, blend, false, attachments);
 					} else {
 						timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, timelineBlend, MixDirection.mixIn, false);
 					}
@@ -366,7 +366,6 @@ class AnimationState {
 			from.totalAlpha = 0;
 			for (i in 0...timelineCount) {
 				var timeline:Timeline = timelines[i];
-				var direction:MixDirection = MixDirection.mixOut;
 				var timelineBlend:MixBlend;
 				var alpha:Float = 0;
 				switch (timelineMode[i]) {
@@ -395,8 +394,9 @@ class AnimationState {
 					applyRotateTimeline(cast(timeline, RotateTimeline), skeleton, applyTime, alpha, timelineBlend, from.timelinesRotation, i << 1, firstFrame);
 				} else if (Std.isOfType(timeline, AttachmentTimeline)) {
 					applyAttachmentTimeline(cast(timeline, AttachmentTimeline), skeleton, applyTime,
-						timelineBlend, attachments && alpha >= from.alphaAttachmentThreshold);
+						timelineBlend, true, attachments && alpha >= from.alphaAttachmentThreshold);
 				} else {
+					var direction = MixDirection.mixOut;
 					if (drawOrder && Std.isOfType(timeline, DrawOrderTimeline) && timelineBlend == MixBlend.setup)
 						direction = MixDirection.mixIn;
 					timeline.apply(skeleton, animationLast, applyTime, events, alpha, timelineBlend, direction, false);
@@ -419,12 +419,14 @@ class AnimationState {
 	 *           is not the last timeline to set the slot's attachment. In that case the timeline is applied only so subsequent
 	 *           timelines see any deform.
 	 */
-	public function applyAttachmentTimeline(timeline:AttachmentTimeline, skeleton:Skeleton, time:Float, blend:MixBlend, attachments:Bool) {
+	public function applyAttachmentTimeline(timeline:AttachmentTimeline, skeleton:Skeleton, time:Float, blend:MixBlend, out:Bool, attachments:Bool) {
 		var slot = skeleton.slots[timeline.slotIndex];
 		if (!slot.bone.active)
 			return;
 
-		if (time < timeline.frames[0]) { // Time is before first frame.
+		if (out) {
+			if (blend == MixBlend.setup) this.setAttachment(skeleton, slot, slot.data.attachmentName, attachments);
+		} else if (time < timeline.frames[0]) { // Time is before first frame.
 			if (blend == MixBlend.setup || blend == MixBlend.first)
 				this.setAttachment(skeleton, slot, slot.data.attachmentName, attachments);
 		} else
@@ -889,6 +891,7 @@ class AnimationState {
 			} else if (to == null
 				|| Std.isOfType(timeline, AttachmentTimeline)
 				|| Std.isOfType(timeline, DrawOrderTimeline)
+				|| Std.isOfType(timeline, DrawOrderFolderTimeline)
 				|| Std.isOfType(timeline, EventTimeline)
 				|| !to.animation.hasTimeline(ids)) {
 				timelineMode[i] = FIRST;

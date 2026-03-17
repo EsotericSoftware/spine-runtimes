@@ -210,7 +210,7 @@ export class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 			cwx = a * child.x + b * child.y + parent.worldX;
 			cwy = c * child.x + d * child.y + parent.worldY;
 		}
-		// biome-ignore lint/style/noNonNullAssertion: reference-runtime
+		// biome-ignore lint/style/noNonNullAssertion: reference runtime
 		const pp = parent.bone.parent!.applied;
 		a = pp.a;
 		b = pp.b;

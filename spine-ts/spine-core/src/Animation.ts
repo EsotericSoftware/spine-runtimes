@@ -28,7 +28,7 @@
  *****************************************************************************/
 
 import { type Attachment, VertexAttachment } from "./attachments/Attachment.js";
-import type { HasTextureRegion } from "./attachments/HasTextureRegion.js";
+import { type HasSequence, isHasSequence } from "./attachments/HasSequence.js";
 import { SequenceMode, SequenceModeValues } from "./attachments/Sequence.js";
 import type { Inherit } from "./BoneData.js";
 import type { BoneLocal } from "./BoneLocal.js";
@@ -933,8 +933,8 @@ export class RGBATimeline extends SlotCurveTimeline {
 	}
 
 	protected apply1 (slot: Slot, pose: SlotPose, time: number, alpha: number, blend: MixBlend) {
-		const frames = this.frames;
 		const color = pose.color;
+		const frames = this.frames;
 		if (time < frames[0]) {
 			const setup = slot.data.setup.color;
 			switch (blend) {
@@ -977,8 +977,12 @@ export class RGBATimeline extends SlotCurveTimeline {
 		if (alpha === 1)
 			color.set(r, g, b, a);
 		else {
-			if (blend === MixBlend.setup) color.setFromColor(slot.data.setup.color);
-			color.add((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha);
+			if (blend === MixBlend.setup) {
+				const setup = slot.data.setup.color;
+				color.set(setup.r + (r - setup.r) * alpha, setup.g + (g - setup.g) * alpha, setup.b + (b - setup.b) * alpha,
+					setup.a + (a - setup.a) * alpha);
+			} else
+				color.add((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha);
 		}
 	}
 }
@@ -1003,64 +1007,67 @@ export class RGBTimeline extends SlotCurveTimeline {
 	}
 
 	protected apply1 (slot: Slot, pose: SlotPose, time: number, alpha: number, blend: MixBlend) {
-		const frames = this.frames;
 		const color = pose.color;
+		let r = 0, g = 0, b = 0;
+		const frames = this.frames;
 		if (time < frames[0]) {
 			const setup = slot.data.setup.color;
 			switch (blend) {
+				// biome-ignore lint/suspicious/noFallthroughSwitchClause: reference runtime
 				case MixBlend.setup:
 					color.r = setup.r;
 					color.g = setup.g;
 					color.b = setup.b;
+				// Fall through.
+				// biome-ignore lint/suspicious/useDefaultSwitchClauseLast: reference runtime
+				default:
 					return;
 				case MixBlend.first:
-					color.r += (setup.r - color.r) * alpha;
-					color.g += (setup.g - color.g) * alpha;
-					color.b += (setup.b - color.b) * alpha;
+					r = color.r + (setup.r - color.r) * alpha;
+					g = color.g + (setup.g - color.g) * alpha;
+					b = color.b + (setup.b - color.b) * alpha;
 			}
-			return;
-		}
-
-		let r = 0, g = 0, b = 0;
-		const i = Timeline.search(frames, time, 4/*ENTRIES*/);
-		const curveType = this.curves[i >> 2];
-		switch (curveType) {
-			case 0/*LINEAR*/: {
-				const before = frames[i];
-				r = frames[i + 1/*R*/];
-				g = frames[i + 2/*G*/];
-				b = frames[i + 3/*B*/];
-				const t = (time - before) / (frames[i + 4/*ENTRIES*/] - before);
-				r += (frames[i + 4/*ENTRIES*/ + 1/*R*/] - r) * t;
-				g += (frames[i + 4/*ENTRIES*/ + 2/*G*/] - g) * t;
-				b += (frames[i + 4/*ENTRIES*/ + 3/*B*/] - b) * t;
-				break;
-			}
-			case 1/*STEPPED*/:
-				r = frames[i + 1/*R*/];
-				g = frames[i + 2/*G*/];
-				b = frames[i + 3/*B*/];
-				break;
-			default:
-				r = this.getBezierValue(time, i, 1/*R*/, curveType - 2/*BEZIER*/);
-				g = this.getBezierValue(time, i, 2/*G*/, curveType + 18/*BEZIER_SIZE*/ - 2/*BEZIER*/);
-				b = this.getBezierValue(time, i, 3/*B*/, curveType + 18/*BEZIER_SIZE*/ * 2 - 2/*BEZIER*/);
-		}
-		if (alpha === 1) {
-			color.r = r;
-			color.g = g;
-			color.b = b;
 		} else {
-			if (blend === MixBlend.setup) {
-				const setup = slot.data.setup.color;
-				color.r = setup.r;
-				color.g = setup.g;
-				color.b = setup.b;
+			const i = Timeline.search(frames, time, 4/*ENTRIES*/);
+			const curveType = this.curves[i >> 2];
+			switch (curveType) {
+				case 0/*LINEAR*/: {
+					const before = frames[i];
+					r = frames[i + 1/*R*/];
+					g = frames[i + 2/*G*/];
+					b = frames[i + 3/*B*/];
+					const t = (time - before) / (frames[i + 4/*ENTRIES*/] - before);
+					r += (frames[i + 4/*ENTRIES*/ + 1/*R*/] - r) * t;
+					g += (frames[i + 4/*ENTRIES*/ + 2/*G*/] - g) * t;
+					b += (frames[i + 4/*ENTRIES*/ + 3/*B*/] - b) * t;
+					break;
+				}
+				case 1/*STEPPED*/:
+					r = frames[i + 1/*R*/];
+					g = frames[i + 2/*G*/];
+					b = frames[i + 3/*B*/];
+					break;
+				default:
+					r = this.getBezierValue(time, i, 1/*R*/, curveType - 2/*BEZIER*/);
+					g = this.getBezierValue(time, i, 2/*G*/, curveType + 18/*BEZIER_SIZE*/ - 2/*BEZIER*/);
+					b = this.getBezierValue(time, i, 3/*B*/, curveType + 18/*BEZIER_SIZE*/ * 2 - 2/*BEZIER*/);
 			}
-			color.r += (r - color.r) * alpha;
-			color.g += (g - color.g) * alpha;
-			color.b += (b - color.b) * alpha;
+			if (alpha !== 1) {
+				if (blend === MixBlend.setup) {
+					const setup = slot.data.setup.color;
+					r = setup.r + (r - setup.r) * alpha;
+					g = setup.g + (g - setup.g) * alpha;
+					b = setup.b + (b - setup.b) * alpha;
+				} else {
+					r = color.r + (r - color.r) * alpha;
+					g = color.g + (g - color.g) * alpha;
+					b = color.b + (b - color.b) * alpha;
+				}
+			}
 		}
+		color.r = r < 0 ? 0 : (r > 1 ? 1 : r);
+		color.g = g < 0 ? 0 : (g > 1 ? 1 : g);
+		color.b = b < 0 ? 0 : (b > 1 ? 1 : b);
 	}
 }
 
@@ -1080,23 +1087,31 @@ export class AlphaTimeline extends CurveTimeline1 implements SlotTimeline {
 		if (!slot.bone.active) return;
 
 		const color = (appliedPose ? slot.applied : slot.pose).color;
+		let a = 0;
 		const frames = this.frames;
 		if (time < frames[0]) {
 			const setup = slot.data.setup.color;
 			switch (blend) {
-				case MixBlend.setup: color.a = setup.a; break;
-				case MixBlend.first: color.a += (setup.a - color.a) * alpha; break;
-			}
-			return;
-		}
+				// biome-ignore lint/suspicious/noFallthroughSwitchClause: reference runtime
+				case MixBlend.setup:
+					color.a = setup.a;
+				// biome-ignore lint/suspicious/useDefaultSwitchClauseLast: reference runtime
+				default:
+					return;
+				case MixBlend.first: a = color.a + (setup.a - color.a) * alpha; break;
 
-		const a = this.getCurveValue(time);
-		if (alpha === 1)
-			color.a = a;
-		else {
-			if (blend === MixBlend.setup) color.a = slot.data.setup.color.a;
-			color.a += (a - color.a) * alpha;
+			}
+		} else {
+			a = this.getCurveValue(time);
+			if (alpha !== 1) {
+				if (blend === MixBlend.setup) {
+					const setup = slot.data.setup.color;
+					a = setup.a + (a - setup.a) * alpha;
+				} else
+					a = color.a + (a - color.a) * alpha;
+			}
 		}
+		color.a = a < 0 ? 0 : (a > 1 ? 1 : a);
 	}
 }
 
@@ -1127,92 +1142,97 @@ export class RGBA2Timeline extends SlotCurveTimeline {
 	}
 
 	protected apply1 (slot: Slot, pose: SlotPose, time: number, alpha: number, blend: MixBlend) {
-		const frames = this.frames;
-		// biome-ignore lint/style/noNonNullAssertion: expected behavior from reference runtime
+		// biome-ignore lint/style/noNonNullAssertion: reference runtime
 		const light = pose.color, dark = pose.darkColor!;
+		let r2 = 0, g2 = 0, b2 = 0
+		const frames = this.frames;
 		if (time < frames[0]) {
 			const setup = slot.data.setup;
-			// biome-ignore lint/style/noNonNullAssertion: expected behavior from reference runtime
+			// biome-ignore lint/style/noNonNullAssertion: reference runtime
 			const setupLight = setup.color, setupDark = setup.darkColor!;
 			switch (blend) {
+				// biome-ignore lint/suspicious/noFallthroughSwitchClause: reference runtime
 				case MixBlend.setup:
 					light.setFromColor(setupLight);
 					dark.r = setupDark.r;
 					dark.g = setupDark.g;
 					dark.b = setupDark.b;
+				// Fall through.
+				// biome-ignore lint/suspicious/useDefaultSwitchClauseLast: reference runtime
+				default:
 					return;
 				case MixBlend.first:
 					light.add((setupLight.r - light.r) * alpha, (setupLight.g - light.g) * alpha, (setupLight.b - light.b) * alpha,
 						(setupLight.a - light.a) * alpha);
-					dark.r += (setupDark.r - dark.r) * alpha;
-					dark.g += (setupDark.g - dark.g) * alpha;
-					dark.b += (setupDark.b - dark.b) * alpha;
+					r2 = dark.r + (setupDark.r - dark.r) * alpha;
+					g2 = dark.g + (setupDark.g - dark.g) * alpha;
+					b2 = dark.b + (setupDark.b - dark.b) * alpha;
 			}
-			return;
-		}
-
-		let r = 0, g = 0, b = 0, a = 0, r2 = 0, g2 = 0, b2 = 0;
-		const i = Timeline.search(frames, time, 8/*ENTRIES*/);
-		const curveType = this.curves[i >> 3];
-		switch (curveType) {
-			case 0/*LINEAR*/: {
-				const before = frames[i];
-				r = frames[i + 1/*R*/];
-				g = frames[i + 2/*G*/];
-				b = frames[i + 3/*B*/];
-				a = frames[i + 4/*A*/];
-				r2 = frames[i + 5/*R2*/];
-				g2 = frames[i + 6/*G2*/];
-				b2 = frames[i + 7/*B2*/];
-				const t = (time - before) / (frames[i + 8/*ENTRIES*/] - before);
-				r += (frames[i + 8/*ENTRIES*/ + 1/*R*/] - r) * t;
-				g += (frames[i + 8/*ENTRIES*/ + 2/*G*/] - g) * t;
-				b += (frames[i + 8/*ENTRIES*/ + 3/*B*/] - b) * t;
-				a += (frames[i + 8/*ENTRIES*/ + 4/*A*/] - a) * t;
-				r2 += (frames[i + 8/*ENTRIES*/ + 5/*R2*/] - r2) * t;
-				g2 += (frames[i + 8/*ENTRIES*/ + 6/*G2*/] - g2) * t;
-				b2 += (frames[i + 8/*ENTRIES*/ + 7/*B2*/] - b2) * t;
-				break;
-			}
-			case 1/*STEPPED*/:
-				r = frames[i + 1/*R*/];
-				g = frames[i + 2/*G*/];
-				b = frames[i + 3/*B*/];
-				a = frames[i + 4/*A*/];
-				r2 = frames[i + 5/*R2*/];
-				g2 = frames[i + 6/*G2*/];
-				b2 = frames[i + 7/*B2*/];
-				break;
-			default:
-				r = this.getBezierValue(time, i, 1/*R*/, curveType - 2/*BEZIER*/);
-				g = this.getBezierValue(time, i, 2/*G*/, curveType + 18/*BEZIER_SIZE*/ - 2/*BEZIER*/);
-				b = this.getBezierValue(time, i, 3/*B*/, curveType + 18/*BEZIER_SIZE*/ * 2 - 2/*BEZIER*/);
-				a = this.getBezierValue(time, i, 4/*A*/, curveType + 18/*BEZIER_SIZE*/ * 3 - 2/*BEZIER*/);
-				r2 = this.getBezierValue(time, i, 5/*R2*/, curveType + 18/*BEZIER_SIZE*/ * 4 - 2/*BEZIER*/);
-				g2 = this.getBezierValue(time, i, 6/*G2*/, curveType + 18/*BEZIER_SIZE*/ * 5 - 2/*BEZIER*/);
-				b2 = this.getBezierValue(time, i, 7/*B2*/, curveType + 18/*BEZIER_SIZE*/ * 6 - 2/*BEZIER*/);
-		}
-
-		if (alpha === 1) {
-			light.set(r, g, b, a);
-			dark.r = r2;
-			dark.g = g2;
-			dark.b = b2;
 		} else {
-			if (blend === MixBlend.setup) {
-				const setup = slot.data.setup;
-				light.setFromColor(setup.color);
-				// biome-ignore lint/style/noNonNullAssertion: expected behavior from reference runtime
-				const setupDark = setup.darkColor!;
-				dark.r = setupDark.r;
-				dark.g = setupDark.g;
-				dark.b = setupDark.b;
+			let r = 0, g = 0, b = 0, a = 0;
+			const i = Timeline.search(frames, time, 8/*ENTRIES*/);
+			const curveType = this.curves[i >> 3];
+			switch (curveType) {
+				case 0/*LINEAR*/: {
+					const before = frames[i];
+					r = frames[i + 1/*R*/];
+					g = frames[i + 2/*G*/];
+					b = frames[i + 3/*B*/];
+					a = frames[i + 4/*A*/];
+					r2 = frames[i + 5/*R2*/];
+					g2 = frames[i + 6/*G2*/];
+					b2 = frames[i + 7/*B2*/];
+					const t = (time - before) / (frames[i + 8/*ENTRIES*/] - before);
+					r += (frames[i + 8/*ENTRIES*/ + 1/*R*/] - r) * t;
+					g += (frames[i + 8/*ENTRIES*/ + 2/*G*/] - g) * t;
+					b += (frames[i + 8/*ENTRIES*/ + 3/*B*/] - b) * t;
+					a += (frames[i + 8/*ENTRIES*/ + 4/*A*/] - a) * t;
+					r2 += (frames[i + 8/*ENTRIES*/ + 5/*R2*/] - r2) * t;
+					g2 += (frames[i + 8/*ENTRIES*/ + 6/*G2*/] - g2) * t;
+					b2 += (frames[i + 8/*ENTRIES*/ + 7/*B2*/] - b2) * t;
+					break;
+				}
+				case 1/*STEPPED*/:
+					r = frames[i + 1/*R*/];
+					g = frames[i + 2/*G*/];
+					b = frames[i + 3/*B*/];
+					a = frames[i + 4/*A*/];
+					r2 = frames[i + 5/*R2*/];
+					g2 = frames[i + 6/*G2*/];
+					b2 = frames[i + 7/*B2*/];
+					break;
+				default:
+					r = this.getBezierValue(time, i, 1/*R*/, curveType - 2/*BEZIER*/);
+					g = this.getBezierValue(time, i, 2/*G*/, curveType + 18/*BEZIER_SIZE*/ - 2/*BEZIER*/);
+					b = this.getBezierValue(time, i, 3/*B*/, curveType + 18/*BEZIER_SIZE*/ * 2 - 2/*BEZIER*/);
+					a = this.getBezierValue(time, i, 4/*A*/, curveType + 18/*BEZIER_SIZE*/ * 3 - 2/*BEZIER*/);
+					r2 = this.getBezierValue(time, i, 5/*R2*/, curveType + 18/*BEZIER_SIZE*/ * 4 - 2/*BEZIER*/);
+					g2 = this.getBezierValue(time, i, 6/*G2*/, curveType + 18/*BEZIER_SIZE*/ * 5 - 2/*BEZIER*/);
+					b2 = this.getBezierValue(time, i, 7/*B2*/, curveType + 18/*BEZIER_SIZE*/ * 6 - 2/*BEZIER*/);
 			}
-			light.add((r - light.r) * alpha, (g - light.g) * alpha, (b - light.b) * alpha, (a - light.a) * alpha);
-			dark.r += (r2 - dark.r) * alpha;
-			dark.g += (g2 - dark.g) * alpha;
-			dark.b += (b2 - dark.b) * alpha;
+
+			if (alpha === 1)
+				light.set(r, g, b, a);
+			else if (blend === MixBlend.setup) {
+				const setupPose = slot.data.setup;
+				let setup = setupPose.color;
+				light.set(setup.r + (r - setup.r) * alpha, setup.g + (g - setup.g) * alpha, setup.b + (b - setup.b) * alpha,
+					setup.a + (a - setup.a) * alpha);
+				// biome-ignore lint/style/noNonNullAssertion: reference runtime
+				setup = setupPose.darkColor!;
+				r2 = setup.r + (r2 - setup.r) * alpha;
+				g2 = setup.g + (g2 - setup.g) * alpha;
+				b2 = setup.b + (b2 - setup.b) * alpha;
+			} else {
+				light.add((r - light.r) * alpha, (g - light.g) * alpha, (b - light.b) * alpha, (a - light.a) * alpha);
+				r2 = dark.r + (r2 - dark.r) * alpha;
+				g2 = dark.g + (g2 - dark.g) * alpha;
+				b2 = dark.b + (b2 - dark.b) * alpha;
+			}
 		}
+		dark.r = r2 < 0 ? 0 : (r2 > 1 ? 1 : r2);
+		dark.g = g2 < 0 ? 0 : (g2 > 1 ? 1 : g2);
+		dark.b = b2 < 0 ? 0 : (b2 > 1 ? 1 : b2);
 	}
 }
 
@@ -1241,14 +1261,16 @@ export class RGB2Timeline extends SlotCurveTimeline {
 	}
 
 	protected apply1 (slot: Slot, pose: SlotPose, time: number, alpha: number, blend: MixBlend) {
-		const frames = this.frames;
-		// biome-ignore lint/style/noNonNullAssertion: expected behavior from reference runtime
+		// biome-ignore lint/style/noNonNullAssertion: reference runtime
 		const light = pose.color, dark = pose.darkColor!;
+		let r = 0, g = 0, b = 0, r2 = 0, g2 = 0, b2 = 0
+		const frames = this.frames;
 		if (time < frames[0]) {
 			const setup = slot.data.setup;
-			// biome-ignore lint/style/noNonNullAssertion: expected behavior from reference runtime
+			// biome-ignore lint/style/noNonNullAssertion: reference runtime
 			const setupLight = setup.color, setupDark = setup.darkColor!;
 			switch (blend) {
+				// biome-ignore lint/suspicious/noFallthroughSwitchClause: reference runtime
 				case MixBlend.setup:
 					light.r = setupLight.r;
 					light.g = setupLight.g;
@@ -1256,82 +1278,84 @@ export class RGB2Timeline extends SlotCurveTimeline {
 					dark.r = setupDark.r;
 					dark.g = setupDark.g;
 					dark.b = setupDark.b;
+				// Fall through.
+				// biome-ignore lint/suspicious/useDefaultSwitchClauseLast: reference runtime
+				default:
 					return;
 				case MixBlend.first:
-					light.r += (setupLight.r - light.r) * alpha;
-					light.g += (setupLight.g - light.g) * alpha;
-					light.b += (setupLight.b - light.b) * alpha;
-					dark.r += (setupDark.r - dark.r) * alpha;
-					dark.g += (setupDark.g - dark.g) * alpha;
-					dark.b += (setupDark.b - dark.b) * alpha;
+					r = light.r + (setupLight.r - light.r) * alpha;
+					g = light.g + (setupLight.g - light.g) * alpha;
+					b = light.b + (setupLight.b - light.b) * alpha;
+					r2 = dark.r + (setupDark.r - dark.r) * alpha;
+					g2 = dark.g + (setupDark.g - dark.g) * alpha;
+					b2 = dark.b + (setupDark.b - dark.b) * alpha;
 			}
-			return;
-		}
-
-		let r = 0, g = 0, b = 0, r2 = 0, g2 = 0, b2 = 0;
-		const i = Timeline.search(frames, time, 7/*ENTRIES*/);
-		const curveType = this.curves[i / 7/*ENTRIES*/];
-		switch (curveType) {
-			case 0/*LINEAR*/: {
-				const before = frames[i];
-				r = frames[i + 1/*R*/];
-				g = frames[i + 2/*G*/];
-				b = frames[i + 3/*B*/];
-				r2 = frames[i + 4/*R2*/];
-				g2 = frames[i + 5/*G2*/];
-				b2 = frames[i + 6/*B2*/];
-				const t = (time - before) / (frames[i + 7/*ENTRIES*/] - before);
-				r += (frames[i + 7/*ENTRIES*/ + 1/*R*/] - r) * t;
-				g += (frames[i + 7/*ENTRIES*/ + 2/*G*/] - g) * t;
-				b += (frames[i + 7/*ENTRIES*/ + 3/*B*/] - b) * t;
-				r2 += (frames[i + 7/*ENTRIES*/ + 4/*R2*/] - r2) * t;
-				g2 += (frames[i + 7/*ENTRIES*/ + 5/*G2*/] - g2) * t;
-				b2 += (frames[i + 7/*ENTRIES*/ + 6/*B2*/] - b2) * t;
-				break;
-			}
-			case 1/*STEPPED*/:
-				r = frames[i + 1/*R*/];
-				g = frames[i + 2/*G*/];
-				b = frames[i + 3/*B*/];
-				r2 = frames[i + 4/*R2*/];
-				g2 = frames[i + 5/*G2*/];
-				b2 = frames[i + 6/*B2*/];
-				break;
-			default:
-				r = this.getBezierValue(time, i, 1/*R*/, curveType - 2/*BEZIER*/);
-				g = this.getBezierValue(time, i, 2/*G*/, curveType + 18/*BEZIER_SIZE*/ - 2/*BEZIER*/);
-				b = this.getBezierValue(time, i, 3/*B*/, curveType + 18/*BEZIER_SIZE*/ * 2 - 2/*BEZIER*/);
-				r2 = this.getBezierValue(time, i, 4/*R2*/, curveType + 18/*BEZIER_SIZE*/ * 3 - 2/*BEZIER*/);
-				g2 = this.getBezierValue(time, i, 5/*G2*/, curveType + 18/*BEZIER_SIZE*/ * 4 - 2/*BEZIER*/);
-				b2 = this.getBezierValue(time, i, 6/*B2*/, curveType + 18/*BEZIER_SIZE*/ * 5 - 2/*BEZIER*/);
-		}
-
-		if (alpha === 1) {
-			light.r = r;
-			light.g = g;
-			light.b = b;
-			dark.r = r2;
-			dark.g = g2;
-			dark.b = b2;
 		} else {
-			if (blend === MixBlend.setup) {
-				const setup = slot.data.setup;
-				// biome-ignore lint/style/noNonNullAssertion: expected behavior from reference runtime
-				const setupLight = setup.color, setupDark = setup.darkColor!;
-				light.r = setupLight.r;
-				light.g = setupLight.g;
-				light.b = setupLight.b;
-				dark.r = setupDark.r;
-				dark.g = setupDark.g;
-				dark.b = setupDark.b;
+			const i = Timeline.search(frames, time, 7/*ENTRIES*/);
+			const curveType = this.curves[i / 7/*ENTRIES*/];
+			switch (curveType) {
+				case 0/*LINEAR*/: {
+					const before = frames[i];
+					r = frames[i + 1/*R*/];
+					g = frames[i + 2/*G*/];
+					b = frames[i + 3/*B*/];
+					r2 = frames[i + 4/*R2*/];
+					g2 = frames[i + 5/*G2*/];
+					b2 = frames[i + 6/*B2*/];
+					const t = (time - before) / (frames[i + 7/*ENTRIES*/] - before);
+					r += (frames[i + 7/*ENTRIES*/ + 1/*R*/] - r) * t;
+					g += (frames[i + 7/*ENTRIES*/ + 2/*G*/] - g) * t;
+					b += (frames[i + 7/*ENTRIES*/ + 3/*B*/] - b) * t;
+					r2 += (frames[i + 7/*ENTRIES*/ + 4/*R2*/] - r2) * t;
+					g2 += (frames[i + 7/*ENTRIES*/ + 5/*G2*/] - g2) * t;
+					b2 += (frames[i + 7/*ENTRIES*/ + 6/*B2*/] - b2) * t;
+					break;
+				}
+				case 1/*STEPPED*/:
+					r = frames[i + 1/*R*/];
+					g = frames[i + 2/*G*/];
+					b = frames[i + 3/*B*/];
+					r2 = frames[i + 4/*R2*/];
+					g2 = frames[i + 5/*G2*/];
+					b2 = frames[i + 6/*B2*/];
+					break;
+				default:
+					r = this.getBezierValue(time, i, 1/*R*/, curveType - 2/*BEZIER*/);
+					g = this.getBezierValue(time, i, 2/*G*/, curveType + 18/*BEZIER_SIZE*/ - 2/*BEZIER*/);
+					b = this.getBezierValue(time, i, 3/*B*/, curveType + 18/*BEZIER_SIZE*/ * 2 - 2/*BEZIER*/);
+					r2 = this.getBezierValue(time, i, 4/*R2*/, curveType + 18/*BEZIER_SIZE*/ * 3 - 2/*BEZIER*/);
+					g2 = this.getBezierValue(time, i, 5/*G2*/, curveType + 18/*BEZIER_SIZE*/ * 4 - 2/*BEZIER*/);
+					b2 = this.getBezierValue(time, i, 6/*B2*/, curveType + 18/*BEZIER_SIZE*/ * 5 - 2/*BEZIER*/);
 			}
-			light.r += (r - light.r) * alpha;
-			light.g += (g - light.g) * alpha;
-			light.b += (b - light.b) * alpha;
-			dark.r += (r2 - dark.r) * alpha;
-			dark.g += (g2 - dark.g) * alpha;
-			dark.b += (b2 - dark.b) * alpha;
+
+			if (alpha !== 1) {
+				if (blend === MixBlend.setup) {
+					const setupPose = slot.data.setup;
+					let setup = setupPose.color;
+					r = setup.r + (r - setup.r) * alpha;
+					g = setup.g + (g - setup.g) * alpha;
+					b = setup.b + (b - setup.b) * alpha;
+					// biome-ignore lint/style/noNonNullAssertion: reference runtime
+					setup = setupPose.darkColor!;
+					r2 = setup.r + (r2 - setup.r) * alpha;
+					g2 = setup.g + (g2 - setup.g) * alpha;
+					b2 = setup.b + (b2 - setup.b) * alpha;
+				} else {
+					r = light.r + (r - light.r) * alpha;
+					g = light.g + (g - light.g) * alpha;
+					b = light.b + (b - light.b) * alpha;
+					r2 = dark.r + (r2 - dark.r) * alpha;
+					g2 = dark.g + (g2 - dark.g) * alpha;
+					b2 = dark.b + (b2 - dark.b) * alpha;
+				}
+			}
 		}
+		light.r = r < 0 ? 0 : (r > 1 ? 1 : r);
+		light.g = g < 0 ? 0 : (g > 1 ? 1 : g);
+		light.b = b < 0 ? 0 : (b > 1 ? 1 : b);
+		dark.r = r2 < 0 ? 0 : (r2 > 1 ? 1 : r2);
+		dark.g = g2 < 0 ? 0 : (g2 > 1 ? 1 : g2);
+		dark.b = b2 < 0 ? 0 : (b2 > 1 ? 1 : b2);
 	}
 }
 
@@ -1619,10 +1643,10 @@ export class SequenceTimeline extends Timeline implements SlotTimeline {
 	static DELAY = 2;
 
 	readonly slotIndex: number;
-	readonly attachment: HasTextureRegion;
+	readonly attachment: HasSequence;
 
-	constructor (frameCount: number, slotIndex: number, attachment: HasTextureRegion) {
-		// biome-ignore lint/style/noNonNullAssertion: expected behavior from reference runtime
+	constructor (frameCount: number, slotIndex: number, attachment: HasSequence) {
+		// biome-ignore lint/style/noNonNullAssertion: reference runtime
 		super(frameCount, `${Property.sequence}|${slotIndex}|${attachment.sequence!.id}`);
 		this.slotIndex = slotIndex;
 		this.attachment = attachment;
@@ -1636,6 +1660,9 @@ export class SequenceTimeline extends Timeline implements SlotTimeline {
 		return this.slotIndex;
 	}
 
+	/** The attachment for which the {@link SlotPose#getSequenceIndex()} will be set.
+	 * <p>
+	 * See {@link VertexAttachment.timelineAttachment}. */
 	getAttachment () {
 		return this.attachment as unknown as Attachment;
 	}
@@ -1658,15 +1685,10 @@ export class SequenceTimeline extends Timeline implements SlotTimeline {
 		if (!slot.bone.active) return;
 		const pose = appliedPose ? slot.applied : slot.pose;
 
-		const slotAttachment = pose.attachment;
+		const slotAttachment = pose.attachment as Attachment;
 		const attachment = this.attachment as unknown as Attachment;
-		if (slotAttachment !== attachment) {
-			if (!(slotAttachment instanceof VertexAttachment)
-				|| slotAttachment.timelineAttachment !== attachment) return;
-		}
 
-		const sequence = (slotAttachment as unknown as HasTextureRegion).sequence;
-		if (!sequence) return;
+		if (!(isHasSequence(slotAttachment)) || slotAttachment.timelineAttachment !== attachment) return;
 
 		if (direction === MixDirection.out) {
 			if (blend === MixBlend.setup) pose.sequenceIndex = -1;
@@ -1684,7 +1706,7 @@ export class SequenceTimeline extends Timeline implements SlotTimeline {
 		const modeAndIndex = frames[i + SequenceTimeline.MODE];
 		const delay = frames[i + SequenceTimeline.DELAY];
 
-		let index = modeAndIndex >> 4, count = sequence.regions.length;
+		let index = modeAndIndex >> 4, count = slotAttachment.sequence.regions.length;
 		const mode = SequenceModeValues[modeAndIndex & 0xf];
 		if (mode !== SequenceMode.hold) {
 			index += (((time - before) / delay + 0.00001) | 0);
@@ -1770,7 +1792,7 @@ export class DrawOrderTimeline extends Timeline {
 	static propertyIds = [`${Property.drawOrder}`];
 
 	/** The draw order for each key frame. See {@link #setFrame(int, float, int[])}. */
-	drawOrders: Array<Array<number> | null>;
+	private readonly drawOrders: Array<Array<number> | null>;
 
 	constructor (frameCount: number) {
 		super(frameCount, ...DrawOrderTimeline.propertyIds);
@@ -1782,7 +1804,7 @@ export class DrawOrderTimeline extends Timeline {
 	}
 
 	/** Sets the time in seconds and the draw order for the specified key frame.
-	 * @param drawOrder For each slot in {@link Skeleton#slots}, the index of the new draw order. May be null to use setup pose
+	 * @param drawOrder Ordered {@link Skeleton#slots} indices, or null to use setup pose
 	 *           draw order. */
 	setFrame (frame: number, time: number, drawOrder: Array<number> | null) {
 		this.frames[frame] = time;
@@ -1811,6 +1833,85 @@ export class DrawOrderTimeline extends Timeline {
 			const slots: Array<Slot> = skeleton.slots;
 			for (let i = 0, n = drawOrderToSetupIndex.length; i < n; i++)
 				drawOrder[i] = slots[drawOrderToSetupIndex[i]];
+		}
+	}
+}
+
+/** Changes a subset of a skeleton's {@link Skeleton#getDrawOrder()}. */
+export class DrawOrderFolderTimeline extends Timeline {
+	private readonly slots: number[];
+	private readonly inFolder: boolean[];
+	private readonly drawOrders: Array<Array<number> | null>;
+
+	/** @param slots {@link Skeleton#slots} indices controlled by this timeline, in setup order.
+	 * @param slotCount The maximum number of slots in the skeleton. */
+	constructor (frameCount: number, slots: number[], slotCount: number) {
+		super(frameCount, ...DrawOrderTimeline.propertyIds);
+		this.slots = slots;
+		this.drawOrders = new Array(frameCount);
+		this.inFolder = new Array(slotCount);
+		for (const i of slots)
+			this.inFolder[i] = true;
+	}
+
+	getFrameCount (): number {
+		return this.frames.length;
+	}
+
+	/** The {@link Skeleton#getSlots()} indices that this timeline affects, in setup order. */
+	getSlots (): number[] {
+		return this.slots;
+	}
+
+	/** The draw order for each frame. See {@link #setFrame(int, float, int[])}. */
+	getDrawOrders (): Array<Array<number> | null> {
+		return this.drawOrders;
+	}
+
+	/** Sets the time and draw order for the specified frame.
+	 * @param frame Between 0 and <code>frameCount</code>, inclusive.
+	 * @param time The frame time in seconds.
+	 * @param drawOrder Ordered {@link #getSlots()} indices, or null to use setup pose order. */
+	setFrame (frame: number, time: number, drawOrder: Array<number> | null): void {
+		this.frames[frame] = time;
+		this.drawOrders[frame] = drawOrder;
+	}
+
+	apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend,
+		direction: MixDirection, appliedPose: boolean): void {
+
+		if (direction === MixDirection.out) {
+			if (blend === MixBlend.setup) this.setup(skeleton);
+		} else if (time < this.frames[0]) {
+			if (blend === MixBlend.setup || blend === MixBlend.first) this.setup(skeleton);
+		} else {
+			const order = this.drawOrders[Timeline.search(this.frames, time)];
+			if (!order)
+				this.setup(skeleton);
+			else
+				this.apply1(skeleton, order);
+		}
+	}
+
+	private setup (skeleton: Skeleton): void {
+		const { inFolder, slots } = this;
+		const { drawOrder, slots: allSlots } = skeleton;
+		for (let i = 0, found = 0, done = slots.length; ; i++) {
+			if (inFolder[drawOrder[i].data.index]) {
+				drawOrder[i] = allSlots[slots[found]];
+				if (++found === done) break;
+			}
+		}
+	}
+
+	private apply1 (skeleton: Skeleton, order: number[]): void {
+		const { inFolder, slots } = this;
+		const { drawOrder, slots: allSlots } = skeleton;
+		for (let i = 0, found = 0, done = slots.length; ; i++) {
+			if (inFolder[drawOrder[i].data.index]) {
+				drawOrder[i] = allSlots[slots[order[found]]];
+				if (++found === done) break;
+			}
 		}
 	}
 }
@@ -1904,30 +2005,20 @@ export class IkConstraintTimeline extends CurveTimeline implements ConstraintTim
 				softness = this.getBezierValue(time, i, 2/*SOFTNESS*/, curveType + 18/*BEZIER_SIZE*/ - 2/*BEZIER*/);
 		}
 
-		switch (blend) {
-			case MixBlend.setup: {
-				const setup = constraint.data.setup;
-				pose.mix = setup.mix + (mix - setup.mix) * alpha;
-				pose.softness = setup.softness + (softness - setup.softness) * alpha;
-				if (direction === MixDirection.out) {
-					pose.bendDirection = setup.bendDirection;
-					pose.compress = setup.compress;
-					pose.stretch = setup.stretch;
-					return;
-				}
-				break;
+		if (blend === MixBlend.setup) {
+			const setup = constraint.data.setup;
+			pose.mix = setup.mix + (mix - setup.mix) * alpha;
+			pose.softness = setup.softness + (softness - setup.softness) * alpha;
+			if (direction === MixDirection.out) {
+				pose.bendDirection = setup.bendDirection;
+				pose.compress = setup.compress;
+				pose.stretch = setup.stretch;
+				return;
 			}
-			case MixBlend.first:
-			case MixBlend.replace:
-				pose.mix += (mix - pose.mix) * alpha;
-				pose.softness += (softness - pose.softness) * alpha;
-				if (direction === MixDirection.out) return;
-				break;
-			case MixBlend.add:
-				pose.mix += mix * alpha;
-				pose.softness += softness * alpha;
-				if (direction === MixDirection.out) return;
-				break;
+		} else {
+			pose.mix += (mix - pose.mix) * alpha;
+			pose.softness += (softness - pose.softness) * alpha;
+			if (direction === MixDirection.out) return;
 		}
 		pose.bendDirection = frames[i + 3/*BEND_DIRECTION*/];
 		pose.compress = frames[i + 4/*COMPRESS*/] !== 0;
@@ -2105,7 +2196,8 @@ export class PathConstraintSpacingTimeline extends ConstraintTimeline1 {
 		const constraint = skeleton.constraints[this.constraintIndex];
 		if (constraint.active) {
 			const pose = appliedPose ? constraint.applied : constraint.pose;
-			pose.spacing = this.getAbsoluteValue(time, alpha, blend, pose.spacing, constraint.data.setup.spacing);
+			pose.spacing = this.getAbsoluteValue(time, alpha, blend === MixBlend.add ? MixBlend.replace : blend, pose.spacing,
+				constraint.data.setup.spacing);
 		}
 	}
 }
@@ -2186,31 +2278,23 @@ export class PathConstraintMixTimeline extends CurveTimeline implements Constrai
 				y = this.getBezierValue(time, i, 3/*Y*/, curveType + 18/*BEZIER_SIZE*/ * 2 - 2/*BEZIER*/);
 		}
 
-		switch (blend) {
-			case MixBlend.setup: {
-				const setup = constraint.data.setup;
-				pose.mixRotate = setup.mixRotate + (rotate - setup.mixRotate) * alpha;
-				pose.mixX = setup.mixX + (x - setup.mixX) * alpha;
-				pose.mixY = setup.mixY + (y - setup.mixY) * alpha;
-				break;
-			}
-			case MixBlend.first:
-			case MixBlend.replace:
-				pose.mixRotate += (rotate - pose.mixRotate) * alpha;
-				pose.mixX += (x - pose.mixX) * alpha;
-				pose.mixY += (y - pose.mixY) * alpha;
-				break;
-			case MixBlend.add:
-				pose.mixRotate += rotate * alpha;
-				pose.mixX += x * alpha;
-				pose.mixY += y * alpha;
-				break;
+		if (blend === MixBlend.setup) {
+			const setup = constraint.data.setup;
+			pose.mixRotate = setup.mixRotate + (rotate - setup.mixRotate) * alpha;
+			pose.mixX = setup.mixX + (x - setup.mixX) * alpha;
+			pose.mixY = setup.mixY + (y - setup.mixY) * alpha;
+		} else {
+			pose.mixRotate += (rotate - pose.mixRotate) * alpha;
+			pose.mixX += (x - pose.mixX) * alpha;
+			pose.mixY += (y - pose.mixY) * alpha;
 		}
 	}
 }
 
 /** The base class for most {@link PhysicsConstraint} timelines. */
 export abstract class PhysicsConstraintTimeline extends ConstraintTimeline1 {
+	additive = false;
+
 	/** @param constraintIndex -1 for all physics constraints in the skeleton. */
 	constructor (frameCount: number, bezierCount: number, constraintIndex: number, property: number) {
 		super(frameCount, bezierCount, constraintIndex, property);
@@ -2219,6 +2303,7 @@ export abstract class PhysicsConstraintTimeline extends ConstraintTimeline1 {
 	apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, blend: MixBlend,
 		direction: MixDirection, appliedPose: boolean) {
 
+		if (blend === MixBlend.add && !this.additive) blend = MixBlend.replace;
 		if (this.constraintIndex === -1) {
 			const value = time >= this.frames[0] ? this.getCurveValue(time) : 0;
 			const constraints = skeleton.physics;
@@ -2323,6 +2408,7 @@ export class PhysicsConstraintMassTimeline extends PhysicsConstraintTimeline {
 export class PhysicsConstraintWindTimeline extends PhysicsConstraintTimeline {
 	constructor (frameCount: number, bezierCount: number, constraintIndex: number) {
 		super(frameCount, bezierCount, constraintIndex, Property.physicsConstraintWind);
+		this.additive = true;
 	}
 
 	get (pose: PhysicsConstraintPose): number {
@@ -2342,6 +2428,7 @@ export class PhysicsConstraintWindTimeline extends PhysicsConstraintTimeline {
 export class PhysicsConstraintGravityTimeline extends PhysicsConstraintTimeline {
 	constructor (frameCount: number, bezierCount: number, constraintIndex: number) {
 		super(frameCount, bezierCount, constraintIndex, Property.physicsConstraintGravity);
+		this.additive = true;
 	}
 
 	get (pose: PhysicsConstraintPose): number {

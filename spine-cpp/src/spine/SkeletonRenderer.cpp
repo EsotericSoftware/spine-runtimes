@@ -167,37 +167,41 @@ RenderCommand *SkeletonRenderer::render(Skeleton &skeleton) {
 			RegionAttachment *regionAttachment = (RegionAttachment *) attachment;
 			attachmentColor = &regionAttachment->getColor();
 
-			// Early out if the slot color is 0
 			if (attachmentColor->a == 0) {
 				clipper.clipEnd(slot);
 				continue;
 			}
 
+			Sequence &sequence = regionAttachment->getSequence();
+			int sequenceIndex = sequence.resolveIndex(slot.getAppliedPose());
+			TextureRegion *region = sequence.getRegion(sequenceIndex);
 			worldVertices->setSize(8, 0);
-			regionAttachment->computeWorldVertices(slot, *worldVertices, 0, 2);
+			regionAttachment->computeWorldVertices(slot, regionAttachment->getOffsets(slot.getAppliedPose()), *worldVertices, 0, 2);
 			verticesCount = 4;
-			uvs = &regionAttachment->getUVs();
+			uvs = &sequence.getUVs(sequenceIndex);
 			indices = quadIndices;
 			indicesCount = 6;
-			texture = regionAttachment->getRegion()->_rendererObject;
+			texture = region->_rendererObject;
 
 		} else if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
 			MeshAttachment *mesh = (MeshAttachment *) attachment;
 			attachmentColor = &mesh->getColor();
 
-			// Early out if the slot color is 0
 			if (attachmentColor->a == 0) {
 				clipper.clipEnd(slot);
 				continue;
 			}
 
+			Sequence &sequence = mesh->getSequence();
+			int sequenceIndex = sequence.resolveIndex(slot.getAppliedPose());
+			TextureRegion *region = sequence.getRegion(sequenceIndex);
 			worldVertices->setSize(mesh->getWorldVerticesLength(), 0);
 			mesh->computeWorldVertices(skeleton, slot, 0, mesh->getWorldVerticesLength(), worldVertices->buffer(), 0, 2);
 			verticesCount = (int32_t) (mesh->getWorldVerticesLength() >> 1);
-			uvs = &mesh->getUVs();
+			uvs = &sequence.getUVs(sequenceIndex);
 			indices = &mesh->getTriangles();
 			indicesCount = (int32_t) indices->size();
-			texture = mesh->getRegion()->_rendererObject;
+			texture = region->_rendererObject;
 
 		} else if (attachment->getRTTI().isExactly(ClippingAttachment::rtti)) {
 			ClippingAttachment *clip = (ClippingAttachment *) slot.getAppliedPose().getAttachment();

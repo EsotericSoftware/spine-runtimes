@@ -41,6 +41,10 @@ SPINE_C_API /*@null*/ spine_event_data spine_skeleton_data_find_event(spine_skel
  */
 SPINE_C_API /*@null*/ spine_animation spine_skeleton_data_find_animation(spine_skeleton_data self, const char *animationName);
 /**
+ * Collects animations used by slider constraints.
+ */
+SPINE_C_API spine_array_animation spine_skeleton_data_find_slider_animations(spine_skeleton_data self, spine_array_animation animations);
+/**
  * The skeleton's name, which by default is the name of the skeleton data file
  * when possible, or null when a name hasn't been set.
  */

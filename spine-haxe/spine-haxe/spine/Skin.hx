@@ -142,7 +142,7 @@ class Skin {
 				continue;
 			if (Std.isOfType(attachment.attachment, MeshAttachment)) {
 				var mesh = cast(attachment.attachment, MeshAttachment);
-				attachment.attachment = new MeshAttachment(mesh.name, mesh.path).newLinkedMesh();
+				attachment.attachment = mesh.newLinkedMesh();
 				setAttachment(attachment.slotIndex, attachment.name, attachment.attachment);
 			} else {
 				attachment.attachment = attachment.attachment.copy();

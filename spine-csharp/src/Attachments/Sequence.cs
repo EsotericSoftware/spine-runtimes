@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -31,12 +31,18 @@ using System;
 using System.Text;
 
 namespace Spine {
+	/// <summary>
+	/// Holds texture regions, UVs, and vertex offsets for rendering a region or mesh attachment. <see cref="Regions"/> must
+	/// be populated and <see cref="Update(IHasSequence)"/> called before use.
+	/// </summary>
 	public class Sequence {
 		static int nextID = 0;
 		static readonly Object nextIdLock = new Object();
 
 		internal readonly int id;
 		internal readonly TextureRegion[] regions;
+		internal readonly bool pathSuffix;
+		internal float[][] uvs, offsets;
 		internal int start, digits, setupIndex;
 
 		public int Start { get { return start; } set { start = value; } }
@@ -44,14 +50,16 @@ namespace Spine {
 		/// <summary>The index of the region to show for the setup pose.</summary>
 		public int SetupIndex { get { return setupIndex; } set { setupIndex = value; } }
 		public TextureRegion[] Regions { get { return regions; } }
+		public bool HasPathSuffix { get { return pathSuffix; } }
 		/// <summary>Returns a unique ID for this attachment.</summary>
 		public int Id { get { return id; } }
 
-		public Sequence (int count) {
+		public Sequence (int count, bool pathSuffix) {
 			lock (Sequence.nextIdLock) {
 				id = Sequence.nextID++;
 			}
 			regions = new TextureRegion[count];
+			this.pathSuffix = pathSuffix;
 		}
 
 		/// <summary>Copy constructor.</summary>
@@ -59,26 +67,82 @@ namespace Spine {
 			lock (Sequence.nextIdLock) {
 				id = Sequence.nextID++;
 			}
-			regions = new TextureRegion[other.regions.Length];
-			Array.Copy(other.regions, 0, regions, 0, regions.Length);
+			int regionCount = other.regions.Length;
+			regions = new TextureRegion[regionCount];
+			Array.Copy(other.regions, 0, regions, 0, regionCount);
 
 			start = other.start;
 			digits = other.digits;
 			setupIndex = other.setupIndex;
-		}
+			pathSuffix = other.pathSuffix;
 
-		public void Apply (SlotPose slot, IHasTextureRegion attachment) {
-			int index = slot.SequenceIndex;
-			if (index == -1) index = setupIndex;
-			if (index >= regions.Length) index = regions.Length - 1;
-			TextureRegion region = regions[index];
-			if (attachment.Region != region) {
-				attachment.Region = region;
-				attachment.UpdateRegion();
+			if (other.uvs != null) {
+				int length = other.uvs[0].Length;
+				uvs = new float[regionCount][];
+				for (int i = 0; i < regionCount; i++) {
+					uvs[i] = new float[length];
+					Array.Copy(other.uvs[i], 0, uvs[i], 0, length);
+				}
+			}
+			if (other.offsets != null) {
+				offsets = new float[regionCount][];
+				for (int i = 0; i < regionCount; i++) {
+					offsets[i] = new float[8];
+					Array.Copy(other.offsets[i], 0, offsets[i], 0, 8);
+				}
 			}
 		}
 
+		public void Update (IHasSequence attachment) {
+			int regionCount = regions.Length;
+			RegionAttachment region = attachment as RegionAttachment;
+			if (region != null) {
+				uvs = new float[regionCount][];
+				offsets = new float[regionCount][];
+				for (int i = 0; i < regionCount; i++) {
+					uvs[i] = new float[8];
+					offsets[i] = new float[8];
+					RegionAttachment.ComputeUVs(regions[i], region.x, region.y, region.scaleX, region.scaleY, region.rotation,
+						region.width, region.height, offsets[i], uvs[i]);
+				}
+			} else {
+				MeshAttachment mesh = attachment as MeshAttachment;
+				if (mesh != null) {
+					float[] regionUVs = mesh.regionUVs;
+					uvs = new float[regionCount][];
+					offsets = null;
+					for (int i = 0; i < regionCount; i++) {
+						uvs[i] = new float[regionUVs.Length];
+						MeshAttachment.ComputeUVs(regions[i], regionUVs, uvs[i]);
+					}
+				}
+			}
+		}
+
+		public int ResolveIndex (SlotPose pose) {
+			int index = pose.SequenceIndex;
+			if (index == -1) index = setupIndex;
+			if (index >= regions.Length) index = regions.Length - 1;
+			return index;
+		}
+
+		public TextureRegion GetRegion (int index) {
+			return regions[index];
+		}
+
+		public float[] GetUVs (int index) {
+			return uvs[index];
+		}
+
+		/// <summary>
+		/// Returns vertex offsets from the center of a <see cref="RegionAttachment"/>. Invalid to call for a <see cref="MeshAttachment"/>.
+		/// </summary>
+		public float[] GetOffsets (int index) {
+			return offsets[index];
+		}
+
 		public string GetPath (string basePath, int index) {
+			if (!pathSuffix) return basePath;
 			var buffer = new StringBuilder(basePath.Length + digits);
 			buffer.Append(basePath);
 			string frame = (start + index).ToString();

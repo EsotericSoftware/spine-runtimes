@@ -36,6 +36,11 @@ void spine_skeleton_data_dispose(spine_skeleton_data self) {
 	return (spine_animation) _self->findAnimation(String(animationName));
 }
 
+spine_array_animation spine_skeleton_data_find_slider_animations(spine_skeleton_data self, spine_array_animation animations) {
+	SkeletonData *_self = (SkeletonData *) self;
+	return (spine_array_animation) &_self->findSliderAnimations(*((Array<Animation *> *) animations));
+}
+
 const char *spine_skeleton_data_get_name(spine_skeleton_data self) {
 	SkeletonData *_self = (SkeletonData *) self;
 	return _self->getName().buffer();

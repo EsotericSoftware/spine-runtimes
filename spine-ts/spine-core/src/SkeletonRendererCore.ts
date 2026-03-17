@@ -55,8 +55,8 @@ export class SkeletonRendererCore {
 				continue;
 			}
 
-			const slotApplied = slot.applied;
-			const slotColor = slotApplied.color;
+			const pose = slot.applied;
+			const slotColor = pose.color;
 			const alpha = slotColor.a;
 			if ((alpha === 0 || !slot.bone.active) && !(attachment instanceof ClippingAttachment)) {
 				clipper.clipEnd(slot);
@@ -80,13 +80,16 @@ export class SkeletonRendererCore {
 					continue;
 				}
 
-				attachment.computeWorldVertices(slot, this.worldVertices, 0, stride);
+				const sequence = attachment.sequence;
+				const sequenceIndex = sequence.resolveIndex(pose);
+				attachment.computeWorldVertices(slot, attachment.getOffsets(pose), this.worldVertices, 0, stride);
+
 				vertices = this.worldVertices;
 				verticesCount = 4;
-				uvs = attachment.uvs as Float32Array;
+				uvs = sequence.getUVs(sequenceIndex);
 				indices = this.quadIndices;
 				indicesCount = 6;
-				texture = attachment.region?.texture;
+				texture = sequence.regions[sequenceIndex]?.texture;
 
 			} else if (attachment instanceof MeshAttachment) {
 				attachmentColor = attachment.color;
@@ -102,10 +105,14 @@ export class SkeletonRendererCore {
 				attachment.computeWorldVertices(skeleton, slot, 0, attachment.worldVerticesLength, this.worldVertices, 0, stride);
 				vertices = this.worldVertices;
 				verticesCount = attachment.worldVerticesLength >> 1;
-				uvs = attachment.uvs as Float32Array;
+
+				const sequence = attachment.sequence;
+				const sequenceIndex = sequence.resolveIndex(pose);
+
+				uvs = sequence.getUVs(sequenceIndex);
 				indices = attachment.triangles;
 				indicesCount = indices.length;
-				texture = attachment.region?.texture;
+				texture = sequence.regions[sequenceIndex]?.texture;
 
 			} else if (attachment instanceof ClippingAttachment) {
 				clipper.clipStart(skeleton, slot, attachment);
@@ -133,8 +140,8 @@ export class SkeletonRendererCore {
 				}
 
 				darkColor = 0xff000000;
-				if (slotApplied.darkColor) {
-					const { r, g, b } = slotApplied.darkColor;
+				if (pose.darkColor) {
+					const { r, g, b } = pose.darkColor;
 					darkColor = 0xff000000 |
 						(Math.floor(r * a) << 16) |
 						(Math.floor(g * a) << 8) |
@@ -156,8 +163,8 @@ export class SkeletonRendererCore {
 				}
 
 				darkColor = 0;
-				if (slotApplied.darkColor) {
-					const { r, g, b } = slotApplied.darkColor;
+				if (pose.darkColor) {
+					const { r, g, b } = pose.darkColor;
 					darkColor = (Math.floor(r * 255) << 16) | (Math.floor(g * 255) << 8) | Math.floor(b * 255);
 				}
 			}

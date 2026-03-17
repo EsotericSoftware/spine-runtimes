@@ -72,13 +72,8 @@ Attachment *SlotPose::getAttachment() {
 void SlotPose::setAttachment(Attachment *attachment) {
 	if (_attachment == attachment) return;
 
-	// Check if we need to clear deform based on timeline attachment
-	if (!attachment || !_attachment || !attachment->getRTTI().instanceOf(VertexAttachment::rtti) ||
-		!_attachment->getRTTI().instanceOf(VertexAttachment::rtti) ||
-		static_cast<VertexAttachment *>(attachment)->getTimelineAttachment() !=
-			static_cast<VertexAttachment *>(_attachment)->getTimelineAttachment()) {
-		_deform.clear();
-	}
+	// Check if we need to clear deform based on timeline attachment.
+	if (!attachment || !_attachment || attachment->getTimelineAttachment() != _attachment->getTimelineAttachment()) _deform.clear();
 	_attachment = attachment;
 	_sequenceIndex = -1;
 }

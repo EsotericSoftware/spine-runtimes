@@ -2,6 +2,13 @@ name: Check TypeScript Formatting
 
 on:
   push:
+    paths:
+      - 'spine-ts/**'
+      - 'tests/**/*.ts'
+      - 'tests/tsfmt.json'
+      - 'formatters/tsfmt.json'
+      - 'formatters/format-ts.sh'
+      - '.github/workflows/format-check-typescript.yml'
   workflow_dispatch:
 
 jobs:

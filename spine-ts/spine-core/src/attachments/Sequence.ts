@@ -29,45 +29,103 @@
 
 import type { SlotPose } from "src/SlotPose.js";
 import type { TextureRegion } from "../Texture.js";
-import { Utils } from "../Utils.js";
-import type { HasTextureRegion } from "./HasTextureRegion.js";
+import { type NumberArrayLike, Utils } from "../Utils.js";
+import type { HasSequence } from "./HasSequence.js";
+import { MeshAttachment } from "./MeshAttachment.js";
+import { RegionAttachment } from "./RegionAttachment.js";
 
-
+/** Holds texture regions, UVs, and vertex offsets for rendering a region or mesh attachment. {@link #getRegions() Regions} must
+ * be populated and {@link #update(HasSequence)} called before use. */
 export class Sequence {
 	private static _nextID = 0;
 
 	id = Sequence.nextID();
 	regions: Array<TextureRegion | null>;
+	readonly pathSuffix: boolean;
+	uvs?: NumberArrayLike[];
+
+	/** Returns vertex offsets from the center of a {@link RegionAttachment}. Invalid to call for a {@link MeshAttachment}. */
+	offsets?: number[][];
+
 	start = 0;
 	digits = 0;
 	/** The index of the region to show for the setup pose. */
 	setupIndex = 0;
 
-	constructor (count: number) {
+	constructor (count: number, pathSuffix: boolean) {
 		this.regions = new Array<TextureRegion>(count);
+		this.pathSuffix = pathSuffix;
 	}
 
 	copy (): Sequence {
-		const copy = new Sequence(this.regions.length);
-		Utils.arrayCopy(this.regions, 0, copy.regions, 0, this.regions.length);
+		const regionCount = this.regions.length;
+		const copy = new Sequence(regionCount, this.pathSuffix);
+		Utils.arrayCopy(this.regions, 0, copy.regions, 0, regionCount);
 		copy.start = this.start;
 		copy.digits = this.digits;
 		copy.setupIndex = this.setupIndex;
+
+		if (this.uvs != null) {
+			const length = this.uvs[0].length;
+			copy.uvs = [];
+			for (let i = 0; i < regionCount; i++) {
+				copy.uvs[i] = Utils.newFloatArray(length);
+				Utils.arrayCopy(this.uvs[i], 0, copy.uvs[i], 0, length);
+			}
+		}
+		if (this.offsets != null) {
+			copy.offsets = [];
+			for (let i = 0; i < regionCount; i++) {
+				copy.offsets[i] = [];
+				Utils.arrayCopy(this.offsets[i], 0, copy.offsets[i], 0, 8);
+			}
+		}
+
 		return copy;
 	}
 
-	apply (slot: SlotPose, attachment: HasTextureRegion) {
-		let index = slot.sequenceIndex;
-		if (index === -1) index = this.setupIndex;
-		if (index >= this.regions.length) index = this.regions.length - 1;
-		const region = this.regions[index];
-		if (attachment.region !== region) {
-			attachment.region = region;
-			attachment.updateRegion();
+	/** Computes UVs and offsets for the specified attachment. Must be called if the regions or attachment properties are
+	  * changed. */
+	public update (attachment: HasSequence) {
+		const regionCount = this.regions.length;
+		if (attachment instanceof RegionAttachment) {
+			this.uvs = [];
+			this.offsets = [];
+			for (let i = 0; i < regionCount; i++) {
+				this.uvs[i] = Utils.newFloatArray(8);
+				this.offsets[i] = [];
+				RegionAttachment.computeUVs(this.regions[i], attachment.x, attachment.y, attachment.scaleX, attachment.scaleY, attachment.rotation,
+					attachment.width, attachment.height, this.offsets[i], this.uvs[i]);
+			}
+		} else if (attachment instanceof MeshAttachment) {
+			const regionUVs = attachment.regionUVs;
+			this.uvs = [];
+			this.offsets = undefined;
+			for (let i = 0; i < regionCount; i++) {
+				this.uvs[i] = Utils.newFloatArray(regionUVs.length);
+				MeshAttachment.computeUVs(this.regions[i], regionUVs, this.uvs[i]);
+			}
 		}
 	}
 
+	resolveIndex (pose: SlotPose): number {
+		let index = pose.sequenceIndex;
+		if (index === -1) index = this.setupIndex;
+		if (index >= this.regions.length) index = this.regions.length - 1;
+		return index;
+	}
+
+	getUVs (index: number): Float32Array {
+		// biome-ignore lint/style/noNonNullAssertion: uvs are always defined after updateSequence
+		return this.uvs![index] as Float32Array;
+	}
+
+	public hasPathSuffix (): boolean {
+		return this.pathSuffix;
+	}
+
 	getPath (basePath: string, index: number): string {
+		if (!this.pathSuffix) return basePath;
 		let result = basePath;
 		const frame = (this.start + index).toString();
 		for (let i = this.digits - frame.length; i > 0; i--)

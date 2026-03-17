@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -33,17 +33,25 @@ namespace Spine {
 
 	/// <summary>The base class for all attachments.</summary>
 	abstract public class Attachment {
+		internal Attachment timelineAttachment;
+
 		/// <summary>The attachment's name.</summary>
 		public string Name { get; }
+
+		/// <summary>Timelines for the timeline attachment are also applied to this attachment.
+		/// May be null if no attachment-specific timelines should be applied.</summary>
+		public Attachment TimelineAttachment { get { return timelineAttachment; } set { timelineAttachment = value; } }
 
 		protected Attachment (string name) {
 			if (name == null) throw new ArgumentNullException("name", "name cannot be null");
 			this.Name = name;
+			timelineAttachment = this;
 		}
 
 		/// <summary>Copy constructor.</summary>
 		protected Attachment (Attachment other) {
 			Name = other.Name;
+			timelineAttachment = other.timelineAttachment;
 		}
 
 		override public string ToString () {

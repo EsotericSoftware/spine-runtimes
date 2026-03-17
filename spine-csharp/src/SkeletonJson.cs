@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -469,7 +469,9 @@ namespace Spine {
 						skin.constraints.TrimExcess();
 						if (skinMap.ContainsKey("attachments")) {
 							foreach (KeyValuePair<string, Object> slotEntry in (Dictionary<string, Object>)skinMap["attachments"]) {
-								int slotIndex = FindSlotIndex(skeletonData, slotEntry.Key);
+								SlotData slot = skeletonData.FindSlot(slotEntry.Key);
+								if (slot == null) throw new Exception("Skin slot not found: " + slotEntry.Key);
+								int slotIndex = slot.Index;
 								foreach (KeyValuePair<string, Object> entry in ((Dictionary<string, Object>)slotEntry.Value)) {
 									try {
 										Attachment attachment = ReadAttachment((Dictionary<string, Object>)entry.Value, skin, slotIndex, entry.Key, skeletonData);
@@ -494,7 +496,7 @@ namespace Spine {
 					if (parent == null) throw new Exception("Parent mesh not found: " + linkedMesh.parent);
 					linkedMesh.mesh.TimelineAttachment = linkedMesh.inheritTimelines ? (VertexAttachment)parent : linkedMesh.mesh;
 					linkedMesh.mesh.ParentMesh = (MeshAttachment)parent;
-					if (linkedMesh.mesh.Region != null) linkedMesh.mesh.UpdateRegion();
+					linkedMesh.mesh.UpdateSequence();
 				}
 				linkedMeshes.Clear();
 
@@ -596,14 +598,13 @@ namespace Spine {
 				region.rotation = GetFloat(map, "rotation", 0);
 				region.width = GetFloat(map, "width") * scale;
 				region.height = GetFloat(map, "height") * scale;
-				region.sequence = sequence;
 
 				if (map.ContainsKey("color")) {
 					string color = (string)map["color"];
 					region.SetColor(ToColor32(color, 8));
 				}
 
-				if (region.Region != null) region.UpdateRegion();
+				region.UpdateSequence();
 				return region;
 			}
 			case AttachmentType.Boundingbox:
@@ -628,7 +629,6 @@ namespace Spine {
 
 				mesh.Width = GetFloat(map, "width", 0) * scale;
 				mesh.Height = GetFloat(map, "height", 0) * scale;
-				mesh.Sequence = sequence;
 
 				string parent = GetString(map, "parent", null);
 				if (parent != null) {
@@ -640,10 +640,10 @@ namespace Spine {
 				ReadVertices(map, mesh, uvs.Length);
 				mesh.triangles = GetIntArray(map, "triangles");
 				mesh.regionUVs = uvs;
-				if (mesh.Region != null) mesh.UpdateRegion();
 
 				if (map.ContainsKey("hull")) mesh.HullLength = GetInt(map, "hull", 0) << 1;
 				if (map.ContainsKey("edges")) mesh.Edges = GetIntArray(map, "edges");
+				mesh.UpdateSequence();
 				return mesh;
 			}
 			case AttachmentType.Path: {
@@ -693,8 +693,8 @@ namespace Spine {
 
 		public static Sequence ReadSequence (object sequenceJson) {
 			Dictionary<string, object> map = sequenceJson as Dictionary<string, Object>;
-			if (map == null) return null;
-			var sequence = new Sequence(GetInt(map, "count"));
+			if (map == null) return new Sequence(1, false);
+			var sequence = new Sequence(GetInt(map, "count"), true);
 			sequence.start = GetInt(map, "start", 1);
 			sequence.digits = GetInt(map, "digits", 0);
 			sequence.setupIndex = GetInt(map, "setup", 0);
@@ -730,13 +730,6 @@ namespace Spine {
 			attachment.vertices = weights.ToArray();
 		}
 
-		private int FindSlotIndex (SkeletonData skeletonData, string slotName) {
-			SlotData[] slots = skeletonData.slots.Items;
-			for (int i = 0, n = skeletonData.slots.Count; i < n; i++)
-				if (slots[i].name == slotName) return i;
-			throw new Exception("Slot not found: " + slotName);
-		}
-
 		private void ReadAnimation (Dictionary<string, Object> map, string name, SkeletonData skeletonData) {
 			float scale = this.scale;
 			var timelines = new ExposedList<Timeline>();
@@ -745,7 +738,9 @@ namespace Spine {
 			if (map.ContainsKey("slots")) {
 				foreach (KeyValuePair<string, Object> entry in (Dictionary<string, Object>)map["slots"]) {
 					string slotName = entry.Key;
-					int slotIndex = FindSlotIndex(skeletonData, slotName);
+					SlotData slot = skeletonData.FindSlot(slotName);
+					if (slot == null) throw new SerializationException("Slot not found: " + slotName);
+					int slotIndex = slot.Index;
 					Dictionary<string, object> timelineMap = (Dictionary<string, Object>)entry.Value;
 					foreach (KeyValuePair<string, Object> timelineEntry in timelineMap) {
 						List<object> values = (List<Object>)timelineEntry.Value;
@@ -754,7 +749,7 @@ namespace Spine {
 						string timelineName = (string)timelineEntry.Key;
 						switch (timelineName) {
 						case "attachment": {
-							var timeline = new AttachmentTimeline(frames, slotIndex);
+							var timeline = new AttachmentTimeline(frames, slot.Index);
 							int frame = 0;
 							foreach (Dictionary<string, Object> keyMap in values) {
 								timeline.SetFrame(frame++, GetFloat(keyMap, "time", 0), GetString(keyMap, "name", null));
@@ -1278,7 +1273,7 @@ namespace Spine {
 					Skin skin = skeletonData.FindSkin(attachmentsMap.Key);
 					foreach (KeyValuePair<string, Object> slotMap in (Dictionary<string, Object>)attachmentsMap.Value) {
 						SlotData slot = skeletonData.FindSlot(slotMap.Key);
-						if (slot == null) throw new Exception("Slot not found: " + slotMap.Key);
+						if (slot == null) throw new Exception("Attachment slot not found: " + slotMap.Key);
 						foreach (KeyValuePair<string, Object> attachmentMap in (Dictionary<string, Object>)slotMap.Value) {
 							Attachment attachment = skin.GetAttachment(slot.index, attachmentMap.Key);
 							if (attachment == null) throw new Exception("Timeline attachment not found: " + attachmentMap.Key);
@@ -1360,39 +1355,40 @@ namespace Spine {
 
 			// Draw order timeline.
 			if (map.ContainsKey("drawOrder")) {
-				List<object> values = (List<Object>)map["drawOrder"];
-				var timeline = new DrawOrderTimeline(values.Count);
-				int slotCount = skeletonData.slots.Count;
-				int frame = 0;
-				foreach (Dictionary<string, Object> keyMap in values) {
-					int[] drawOrder = null;
-					if (keyMap.ContainsKey("offsets")) {
-						drawOrder = new int[slotCount];
-						for (int i = slotCount - 1; i >= 0; i--)
-							drawOrder[i] = -1;
-						List<object> offsets = (List<Object>)keyMap["offsets"];
-						int[] unchanged = new int[slotCount - offsets.Count];
-						int originalIndex = 0, unchangedIndex = 0;
-						foreach (Dictionary<string, Object> offsetMap in offsets) {
-							int slotIndex = FindSlotIndex(skeletonData, (string)offsetMap["slot"]);
-							// Collect unchanged items.
-							while (originalIndex != slotIndex)
-								unchanged[unchangedIndex++] = originalIndex++;
-							// Set changed items.
-							int index = originalIndex + (int)(float)offsetMap["offset"];
-							drawOrder[index] = originalIndex++;
-						}
-						// Collect remaining unchanged items.
-						while (originalIndex < slotCount)
-							unchanged[unchangedIndex++] = originalIndex++;
-						// Fill in unchanged items.
-						for (int i = slotCount - 1; i >= 0; i--)
-							if (drawOrder[i] == -1) drawOrder[i] = unchanged[--unchangedIndex];
-					}
-					timeline.SetFrame(frame, GetFloat(keyMap, "time", 0), drawOrder);
-					++frame;
+				List<object> drawOrderMap = (List<object>)map["drawOrder"];
+				var timeline = new DrawOrderTimeline(drawOrderMap.Count);
+				int slotCount = skeletonData.slots.Count, frame = 0;
+				foreach (Dictionary<string, object> keyMap in drawOrderMap) {
+					timeline.SetFrame(frame, GetFloat(keyMap, "time", 0), ReadDrawOrder(skeletonData, keyMap, slotCount, null));
+					frame++;
 				}
 				timelines.Add(timeline);
+			}
+
+			// Draw order folder timelines.
+			if (map.ContainsKey("drawOrderFolder")) {
+				List<object> drawOrderFolderMap = (List<object>)map["drawOrderFolder"];
+				foreach (Dictionary<string, object> timelineMap in drawOrderFolderMap) {
+					List<object> slotEntries = (List<object>)timelineMap["slots"];
+					var folderSlots = new int[slotEntries.Count];
+					int ii = 0;
+					foreach (string slotEntry in slotEntries) {
+						SlotData slot = skeletonData.FindSlot(slotEntry);
+						if (slot == null) throw new SerializationException("Draw order folder slot not found: " + slotEntry);
+						folderSlots[ii] = slot.index;
+						ii++;
+					}
+
+					List<object> keys = (List<object>)timelineMap["keys"];
+					var timeline = new DrawOrderFolderTimeline(keys.Count, folderSlots, skeletonData.slots.Count);
+					int frame = 0;
+					foreach (Dictionary<string, object> keyMap in keys) {
+						timeline.SetFrame(frame, GetFloat(keyMap, "time", 0),
+							ReadDrawOrder(skeletonData, keyMap, folderSlots.Length, folderSlots));
+						frame++;
+					}
+					timelines.Add(timeline);
+				}
 			}
 
 			// Event timeline.
@@ -1477,6 +1473,48 @@ namespace Spine {
 				value2 = nvalue2;
 				keyMap = nextMap;
 			}
+		}
+
+		/// <param name="folderSlots">
+		/// Slot names are resolved to positions within this array. If null, slot indices are used as positions.</param>
+		private int[] ReadDrawOrder (SkeletonData skeletonData, Dictionary<string, object> keyMap, int slotCount, int[] folderSlots) {
+			if (!keyMap.ContainsKey("offsets")) return null; // Setup draw order.
+			List<object> changes = (List<object>)keyMap["offsets"];
+			var drawOrder = new int[slotCount];
+			for (int ii = slotCount - 1; ii >= 0; ii--)
+				drawOrder[ii] = -1;
+			var unchanged = new int[slotCount - changes.Count];
+			int originalIndex = 0, unchangedIndex = 0;
+
+			foreach (Dictionary<string, object> offsetMap in changes) {
+				SlotData slot = skeletonData.FindSlot((string)offsetMap["slot"]);
+				if (slot == null) throw new SerializationException("Draw order slot not found: " + (string)offsetMap["slot"]);
+				int index;
+				if (folderSlots == null)
+					index = slot.index;
+				else {
+					index = -1;
+					for (int i = 0; i < slotCount; i++) {
+						if (folderSlots[i] == slot.index) {
+							index = i;
+							break;
+						}
+					}
+					if (index == -1) throw new SerializationException("Slot not in folder: " + (string)offsetMap["slot"]);
+				}
+				// Collect unchanged items.
+				while (originalIndex != index)
+					unchanged[unchangedIndex++] = originalIndex++;
+				// Set changed items.
+				drawOrder[originalIndex + GetInt(offsetMap, "offset")] = originalIndex++;
+			}
+			// Collect remaining unchanged items.
+			while (originalIndex < slotCount)
+				unchanged[unchangedIndex++] = originalIndex++;
+			// Fill in unchanged items.
+			for (int i = slotCount - 1; i >= 0; i--)
+				if (drawOrder[i] == -1) drawOrder[i] = unchanged[--unchangedIndex];
+			return drawOrder;
 		}
 
 		static int ReadCurve (object curve, CurveTimeline timeline, int bezier, int frame, int value, float time1, float time2,

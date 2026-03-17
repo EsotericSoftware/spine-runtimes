@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -254,15 +254,17 @@ namespace Spine.Unity {
 
 				RegionAttachment regionAttachment = attachment as RegionAttachment;
 				if (regionAttachment != null) {
-					if (regionAttachment.Sequence != null) regionAttachment.Sequence.Apply(slot.AppliedPose, regionAttachment);
-					rendererObject = regionAttachment.Region;
+					Sequence sequence = regionAttachment.Sequence;
+					int sequenceIndex = sequence.ResolveIndex(slot.AppliedPose);
+					rendererObject = sequence.GetRegion(sequenceIndex);
 					attachmentVertexCount = 4;
 					attachmentTriangleCount = 6;
 				} else {
 					MeshAttachment meshAttachment = attachment as MeshAttachment;
 					if (meshAttachment != null) {
-						if (meshAttachment.Sequence != null) meshAttachment.Sequence.Apply(slot.AppliedPose, meshAttachment);
-						rendererObject = meshAttachment.Region;
+						Sequence sequence = meshAttachment.Sequence;
+						int sequenceIndex = sequence.ResolveIndex(slot.AppliedPose);
+						rendererObject = sequence.GetRegion(sequenceIndex);
 						attachmentVertexCount = meshAttachment.WorldVerticesLength >> 1;
 						attachmentTriangleCount = meshAttachment.Triangles.Length;
 					} else {
@@ -280,13 +282,8 @@ namespace Spine.Unity {
 				totalRawVertexCount += attachmentVertexCount;
 			}
 
-#if !SPINE_TK2D
 			if (material == null && rendererObject != null)
 				current.material = (Material)((AtlasRegion)rendererObject).page.rendererObject;
-#else
-			if (material == null && rendererObject != null)
-				current.material = (rendererObject is Material) ? (Material)rendererObject : (Material)((AtlasRegion)rendererObject).page.rendererObject;
-#endif
 
 			instructionOutput.hasActiveClipping = skeletonHasClipping;
 			instructionOutput.rawVertexCount = totalRawVertexCount;
@@ -307,9 +304,6 @@ namespace Spine.Unity {
 
 		public static bool RequiresMultipleSubmeshesByDrawOrder (Skeleton skeleton) {
 
-#if SPINE_TK2D
-			return false;
-#endif
 			ExposedList<Slot> drawOrder = skeleton.DrawOrder;
 			int drawOrderCount = drawOrder.Count;
 			Slot[] drawOrderItems = drawOrder.Items;
@@ -323,10 +317,11 @@ namespace Spine.Unity {
 #endif
 					) continue;
 				Attachment attachment = slot.AppliedPose.Attachment;
-				IHasTextureRegion rendererAttachment = attachment as IHasTextureRegion;
+				IHasSequence rendererAttachment = attachment as IHasSequence;
 				if (rendererAttachment != null) {
-					if (rendererAttachment.Sequence != null) rendererAttachment.Sequence.Apply(slot.AppliedPose, rendererAttachment);
-					AtlasRegion atlasRegion = (AtlasRegion)rendererAttachment.Region;
+					Sequence sequence = rendererAttachment.Sequence;
+					int sequenceIndex = sequence.ResolveIndex(slot.AppliedPose);
+					AtlasRegion atlasRegion = (AtlasRegion)sequence.GetRegion(sequenceIndex);
 					Material material = (Material)atlasRegion.page.rendererObject;
 					if (lastRendererMaterial != material) {
 						if (lastRendererMaterial != null)
@@ -363,9 +358,7 @@ namespace Spine.Unity {
 				preActiveClippingSlotSource = -1
 			};
 
-#if !SPINE_TK2D
 			bool isCustomSlotMaterialsPopulated = customSlotMaterials != null && customSlotMaterials.Count > 0;
-#endif
 
 			int separatorCount = separatorSlots == null ? 0 : separatorSlots.Count;
 			bool hasSeparators = separatorCount > 0;
@@ -399,8 +392,9 @@ namespace Spine.Unity {
 
 				RegionAttachment regionAttachment = attachment as RegionAttachment;
 				if (regionAttachment != null) {
-					if (regionAttachment.Sequence != null) regionAttachment.Sequence.Apply(slot.AppliedPose, regionAttachment);
-					region = regionAttachment.Region;
+					Sequence sequence = regionAttachment.Sequence;
+					int sequenceIndex = sequence.ResolveIndex(slot.AppliedPose);
+					region = sequence.GetRegion(sequenceIndex);
 #if SPINE_TRIANGLECHECK
 					attachmentVertexCount = 4;
 					attachmentTriangleCount = 6;
@@ -408,8 +402,9 @@ namespace Spine.Unity {
 				} else {
 					MeshAttachment meshAttachment = attachment as MeshAttachment;
 					if (meshAttachment != null) {
-						if (meshAttachment.Sequence != null) meshAttachment.Sequence.Apply(slot.AppliedPose, meshAttachment);
-						region = meshAttachment.Region;
+						Sequence sequence = meshAttachment.Sequence;
+						int sequenceIndex = sequence.ResolveIndex(slot.AppliedPose);
+						region = sequence.GetRegion(sequenceIndex);
 #if SPINE_TRIANGLECHECK
 						attachmentVertexCount = meshAttachment.WorldVerticesLength >> 1;
 						attachmentTriangleCount = meshAttachment.Triangles.Length;
@@ -462,7 +457,6 @@ namespace Spine.Unity {
 #endif
 					}
 				} else {
-#if !SPINE_TK2D
 					Material material;
 					if (isCustomSlotMaterialsPopulated) {
 						if (!customSlotMaterials.TryGetValue(slot, out material))
@@ -470,10 +464,6 @@ namespace Spine.Unity {
 					} else {
 						material = (Material)((AtlasRegion)region).page.rendererObject;
 					}
-#else
-					// An AtlasRegion in plain spine-unity, spine-TK2D hooks into TK2D's system. eventual source of Material object.
-					Material material = (region is Material) ? (Material)region : (Material)((AtlasRegion)region).page.rendererObject;
-#endif
 
 #if !SPINE_TRIANGLECHECK
 					if (current.forceSeparate || !System.Object.ReferenceEquals(current.material, material)) { // Material changed. Add the previous submesh.
@@ -558,9 +548,7 @@ namespace Spine.Unity {
 			Settings settings = this.settings;
 
 			int newSubmeshCount = submeshIndex + 1;
-			if (submeshes.Items.Length < newSubmeshCount)
-				submeshes.Resize(newSubmeshCount);
-			submeshes.Count = newSubmeshCount;
+			submeshes.EnsureSize(newSubmeshCount);
 			ExposedList<int> submesh = submeshes.Items[submeshIndex];
 			if (submesh == null)
 				submeshes.Items[submeshIndex] = submesh = new ExposedList<int>();
@@ -622,8 +610,10 @@ namespace Spine.Unity {
 				// Identify and prepare values.
 				RegionAttachment region = attachment as RegionAttachment;
 				if (region != null) {
-					region.ComputeWorldVertices(slot, workingVerts, 0);
-					uvs = region.UVs;
+					Sequence sequence = region.Sequence;
+					int sequenceIndex = sequence.ResolveIndex(slotPose);
+					region.ComputeWorldVertices(slot, sequence.GetOffsets(sequenceIndex), workingVerts, 0);
+					uvs = sequence.GetUVs(sequenceIndex);
 					attachmentTriangleIndices = regionTriangles;
 					regionC = region.GetColor();
 					attachmentVertexCount = 4;
@@ -636,8 +626,10 @@ namespace Spine.Unity {
 							workingVerts = new float[meshVerticesLength];
 							this.tempVerts = workingVerts;
 						}
-						mesh.ComputeWorldVertices(skeleton, slot, 0, meshVerticesLength, workingVerts, 0); //meshAttachment.ComputeWorldVertices(slot, tempVerts);
-						uvs = mesh.UVs;
+						Sequence sequence = mesh.Sequence;
+						int sequenceIndex = sequence.ResolveIndex(slotPose);
+						mesh.ComputeWorldVertices(skeleton, slot, 0, meshVerticesLength, workingVerts, 0);
+						uvs = sequence.GetUVs(sequenceIndex);
 						attachmentTriangleIndices = mesh.Triangles;
 						regionC = mesh.GetColor();
 						attachmentVertexCount = meshVerticesLength >> 1; // meshVertexCount / 2;
@@ -944,7 +936,10 @@ namespace Spine.Unity {
 
 					RegionAttachment regionAttachment = attachment as RegionAttachment;
 					if (regionAttachment != null) {
-						regionAttachment.ComputeWorldVertices(slot, tempVerts, 0);
+						Sequence sequence = regionAttachment.Sequence;
+						int sequenceIndex = sequence.ResolveIndex(slotPose);
+						regionAttachment.ComputeWorldVertices(slot, sequence.GetOffsets(sequenceIndex), tempVerts, 0);
+
 						Color regionC = regionAttachment.GetColor();
 						Color combinedC = skeletonC * slotC * regionC;
 
@@ -980,7 +975,7 @@ namespace Spine.Unity {
 
 						cbi[vertexIndex] = color; cbi[vertexIndex + 1] = color; cbi[vertexIndex + 2] = color; cbi[vertexIndex + 3] = color;
 
-						float[] regionUVs = regionAttachment.UVs;
+						float[] regionUVs = sequence.GetUVs(sequenceIndex);
 						ubi[vertexIndex] = new Vector2(regionUVs[RegionAttachment.BLX], regionUVs[RegionAttachment.BLY]);
 						ubi[vertexIndex + 1] = new Vector2(regionUVs[RegionAttachment.BRX], regionUVs[RegionAttachment.BRY]);
 						ubi[vertexIndex + 2] = new Vector2(regionUVs[RegionAttachment.ULX], regionUVs[RegionAttachment.ULY]);
@@ -1034,7 +1029,9 @@ namespace Spine.Unity {
 								color.b = (byte)(combinedC.b * 255);
 							}
 
-							float[] attachmentUVs = meshAttachment.UVs;
+							Sequence sequence = meshAttachment.Sequence;
+							int sequenceIndex = sequence.ResolveIndex(slotPose);
+							float[] attachmentUVs = sequence.GetUVs(sequenceIndex);
 
 							// Potential first attachment bounds initialization. See conditions in RegionAttachment logic.
 							if (vertexIndex == 0) {
@@ -1078,7 +1075,7 @@ namespace Spine.Unity {
 			if (updateTriangles) {
 				// Match submesh buffers count with submeshInstruction count.
 				if (this.submeshes.Items.Length < submeshInstructionCount) {
-					this.submeshes.Resize(submeshInstructionCount);
+					this.submeshes.EnsureSize(submeshInstructionCount);
 					for (int i = 0, n = submeshInstructionCount; i < n; i++) {
 						ExposedList<int> submeshBuffer = this.submeshes.Items[i];
 						if (submeshBuffer == null)
@@ -1232,6 +1229,33 @@ namespace Spine.Unity {
 				}
 			}
 		}
+
+		public void FlipBackfaceWindingOrder () {
+			int submeshCount = submeshes.Count;
+			ExposedList<int>[] submeshesItems = submeshes.Items;
+			Vector3[] vertexPositions = vertexBuffer.Items;
+
+			for (int s = 0; s < submeshCount; ++s) {
+				ExposedList<int> submeshIndices = submeshesItems[s];
+				int indexCount = submeshIndices.Count;
+				int[] indices = submeshIndices.Items;
+				for (int i = 0; i < indexCount; i += 3) {
+					int iA = indices[i];
+					int iB = indices[i + 1];
+					int iC = indices[i + 2];
+					Vector3 a = vertexPositions[iA];
+					Vector3 b = vertexPositions[iB];
+					Vector3 c = vertexPositions[iC];
+					Vector2 d1 = new Vector2(b.x - a.x, b.y - a.y);
+					Vector2 d2 = new Vector2(c.x - b.x, c.y - b.y);
+					float z = d1.x * d2.y - d1.y * d2.x;
+					if (z < 0.0f) {
+						indices[i + 1] = iC;
+						indices[i + 2] = iB;
+					}
+				}
+			}
+		}
 		#endregion
 
 		#region Step 3 : Transfer vertex and triangle data to UnityEngine.Mesh
@@ -1329,8 +1353,8 @@ namespace Spine.Unity {
 						uv2 = new ExposedList<Vector2>(minimumVertexCount);
 						uv3 = new ExposedList<Vector2>(minimumVertexCount);
 					}
-					uv2.Resize(minimumVertexCount);
-					uv3.Resize(minimumVertexCount);
+					uv2.EnsureSize(minimumVertexCount);
+					uv3.EnsureSize(minimumVertexCount);
 				}
 
 				if (includeNormals) {

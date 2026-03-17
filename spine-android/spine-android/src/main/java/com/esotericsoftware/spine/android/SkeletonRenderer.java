@@ -44,6 +44,7 @@ import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.ClippingAttachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
+import com.esotericsoftware.spine.attachments.Sequence;
 import com.esotericsoftware.spine.utils.SkeletonClipping;
 
 import android.graphics.Bitmap;
@@ -121,8 +122,9 @@ public class SkeletonRenderer {
 			if (attachment instanceof RegionAttachment) {
 				RegionAttachment region = (RegionAttachment)attachment;
 				verticesLength = vertexSize << 2;
-				if (region.getSequence() != null) region.getSequence().apply(pose, region);
-				AndroidTexture texture = (AndroidTexture)region.getRegion().getTexture();
+				Sequence sequence = region.getSequence();
+				int sequenceIndex = sequence.resolveIndex(pose);
+				AndroidTexture texture = (AndroidTexture)sequence.getRegion(sequenceIndex).getTexture();
 				BlendMode blendMode = slot.getData().getBlendMode();
 				if (command.blendMode == null && command.texture == null) {
 					command.blendMode = blendMode;
@@ -138,15 +140,17 @@ public class SkeletonRenderer {
 				}
 
 				command.vertices.setSize(command.vertices.size + verticesLength);
-				region.computeWorldVertices(slot, command.vertices.items, vertexStart, vertexSize);
-				uvs = region.getUVs();
+				region.computeWorldVertices(slot, sequence.getOffsets(sequenceIndex), command.vertices.items, vertexStart,
+					vertexSize);
+				uvs = sequence.getUVs(sequenceIndex);
 				indices = quadTriangles;
 				color = region.getColor();
 			} else if (attachment instanceof MeshAttachment) {
 				MeshAttachment mesh = (MeshAttachment)attachment;
 				verticesLength = mesh.getWorldVerticesLength();
-				if (mesh.getSequence() != null) mesh.getSequence().apply(pose, mesh);
-				AndroidTexture texture = (AndroidTexture)mesh.getRegion().getTexture();
+				Sequence sequence = mesh.getSequence();
+				int sequenceIndex = sequence.resolveIndex(pose);
+				AndroidTexture texture = (AndroidTexture)sequence.getRegion(sequenceIndex).getTexture();
 				BlendMode blendMode = slot.getData().getBlendMode();
 
 				if (command.blendMode == null && command.texture == null) {
@@ -164,7 +168,7 @@ public class SkeletonRenderer {
 
 				command.vertices.setSize(command.vertices.size + verticesLength);
 				mesh.computeWorldVertices(skeleton, slot, 0, verticesLength, command.vertices.items, vertexStart, vertexSize);
-				uvs = mesh.getUVs();
+				uvs = sequence.getUVs(sequenceIndex);
 				indices = mesh.getTriangles();
 				color = mesh.getColor();
 			} else if (attachment instanceof ClippingAttachment) {

@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -31,6 +31,10 @@
 
 #if UNITY_2019_2 || UNITY_2019_3 || UNITY_2019_4 || UNITY_2020_1 || UNITY_2020_2 // note: 2020.3+ uses old bahavior again
 #define HINGE_JOINT_2019_BEHAVIOUR
+#endif
+
+#if UNITY_2023_1_OR_NEWER
+#define USE_COLLIDER_COMPOSITE_OPERATION
 #endif
 
 using System.Collections;
@@ -138,7 +142,11 @@ namespace Spine.Unity.Examples {
 			RecursivelyCreateBoneProxies(startingBone);
 
 			RootRigidbody = boneTable[startingBone].GetComponent<Rigidbody2D>();
+#if USE_COLLIDER_COMPOSITE_OPERATION
+			RootRigidbody.bodyType = pinStartBone ? RigidbodyType2D.Kinematic : RigidbodyType2D.Dynamic;
+#else
 			RootRigidbody.isKinematic = pinStartBone;
+#endif
 			RootRigidbody.mass = rootMass;
 			List<Collider2D> boneColliders = new List<Collider2D>();
 			foreach (KeyValuePair<Bone, Transform> pair in boneTable) {

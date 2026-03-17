@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -47,6 +47,10 @@
 #define HAS_ANY_UNSAFE_OPTIONS
 #endif
 
+#if UNITY_2017_3_OR_NEWER
+#define ALLOWS_CUSTOM_PROFILING
+#endif
+
 #if !SPINE_AUTO_UPGRADE_COMPONENTS_OFF
 #define AUTO_UPGRADE_TO_43_COMPONENTS
 #endif
@@ -80,11 +84,7 @@ namespace Spine.Unity.Editor {
 
 		public const string SPINE_SETTINGS_ASSET_PATH = "Assets/Editor/SpineSettings.asset";
 
-#if SPINE_TK2D
-		internal const float DEFAULT_DEFAULT_SCALE = 1f;
-#else
 		internal const float DEFAULT_DEFAULT_SCALE = 0.01f;
-#endif
 		public float defaultScale = DEFAULT_DEFAULT_SCALE;
 
 		internal const float DEFAULT_DEFAULT_MIX = 0.2f;
@@ -347,9 +347,9 @@ namespace Spine.Unity.Editor {
 					SpineEditorUtilities.FloatPropertyField(settings.FindProperty("defaultScale"), new GUIContent("Default SkeletonData Scale", "The Default skeleton import scale for newly imported SkeletonDataAssets."), min: 0.0000001f);
 
 					SpineEditorUtilities.ShaderPropertyField(settings.FindProperty("defaultShader"), new GUIContent("Default Shader"), SpinePreferences.DEFAULT_DEFAULT_SHADER);
-					
+
 					TextureWorkflowProperties textureProperties = new TextureWorkflowProperties(settings);
-					
+
 					EditorGUILayout.Space();
 					using (new GUILayout.HorizontalScope()) {
 						EditorGUILayout.PrefixLabel("Switch Texture Workflow");
@@ -481,30 +481,6 @@ namespace Spine.Unity.Editor {
 					}
 				}
 
-#if SPINE_TK2D_DEFINE
-				bool isTK2DDefineSet = true;
-#else
-				bool isTK2DDefineSet = false;
-#endif
-				bool isTK2DAllowed = SpineEditorUtilities.SpineTK2DEditorUtility.IsTK2DAllowed;
-				if (SpineEditorUtilities.SpineTK2DEditorUtility.IsTK2DInstalled() || isTK2DDefineSet) {
-					GUILayout.Space(20);
-					EditorGUILayout.LabelField("3rd Party Settings", EditorStyles.boldLabel);
-					using (new GUILayout.HorizontalScope()) {
-						EditorGUILayout.PrefixLabel("Define TK2D");
-						if (GUILayout.Button("Disable", GUILayout.Width(64)))
-							SpineEditorUtilities.SpineTK2DEditorUtility.DisableTK2D();
-						if (isTK2DAllowed && GUILayout.Button("Enable", GUILayout.Width(64)))
-							SpineEditorUtilities.SpineTK2DEditorUtility.EnableTK2D();
-					}
-#if !SPINE_TK2D_DEFINE
-					if (!isTK2DAllowed) {
-						EditorGUILayout.LabelField("To allow TK2D support, please modify line 67 in", EditorStyles.boldLabel);
-						EditorGUILayout.LabelField("Spine/Editor/spine-unity/Editor/Util./BuildSettings.cs", EditorStyles.boldLabel);
-					}
-#endif
-				}
-
 				GUILayout.Space(20);
 				EditorGUILayout.LabelField("Threading Defaults", EditorStyles.boldLabel);
 				{
@@ -517,6 +493,33 @@ namespace Spine.Unity.Editor {
 					SpineEditorUtilities.BoolRuntimePropertiesField(
 						() => RuntimeSettings.UseThreadedAnimation, value => RuntimeSettings.UseThreadedAnimation = value,
 						new GUIContent("Threaded Animation", "Global setting for the equally named SkeletonAnimation and SkeletonGraphic Inspector parameter."));
+
+#if SPINE_DISABLE_LOAD_BALANCING
+					bool loadBalancingEnabled = false;
+#else
+					bool loadBalancingEnabled = true;
+#endif
+					using (new GUILayout.HorizontalScope()) {
+						EditorGUILayout.PrefixLabel(new GUIContent("Load Balancing",
+							"Enable load balancing to better utilize threads." +
+							"Only has an effect when using threaded animation or threaded mesh generation."));
+						SpineEditorUtilities.EnableDisableDefineButtons(SpineBuildEnvUtility.SPINE_DISABLE_LOAD_BALANCING,
+							loadBalancingEnabled, invert: true);
+					}
+
+#if ALLOWS_CUSTOM_PROFILING
+#if SPINE_ENABLE_THREAD_PROFILING
+					bool threadProfilingEnabled = true;
+#else
+					bool threadProfilingEnabled = false;
+#endif
+					using (new GUILayout.HorizontalScope()) {
+						EditorGUILayout.PrefixLabel(new GUIContent("Thread Profiling",
+							"Enable profiling of Spine worker threads in the Unity Profiler. " +
+							"Enable only when needed, as it adds some overhead."));
+						SpineEditorUtilities.EnableDisableDefineButtons(SpineBuildEnvUtility.SPINE_ENABLE_THREAD_PROFILING, threadProfilingEnabled);
+					}
+#endif
 				}
 
 				GUILayout.Space(20);

@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated July 28, 2023. Replaces all prior versions.
  *
- * Copyright (c) 2013-2024, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -27,14 +27,10 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#if UNITY_2017_3_OR_NEWER
-#define ENABLE_THREAD_PROFILING
-#endif
-
 using System;
 using System.Collections.Generic;
 using System.Threading;
-#if ENABLE_THREAD_PROFILING
+#if SPINE_ENABLE_THREAD_PROFILING
 using UnityEngine.Profiling;
 #endif
 
@@ -85,7 +81,7 @@ public class LockFreeWorkerPool<T> : IDisposable {
 	}
 
 	private void WorkerLoop (int threadIndex) {
-#if ENABLE_THREAD_PROFILING
+#if SPINE_ENABLE_THREAD_PROFILING
 		Profiler.BeginThreadProfiling("Spine Threads", "Spine Thread " + threadIndex);
 #endif
 		while (_running) {
@@ -97,7 +93,7 @@ public class LockFreeWorkerPool<T> : IDisposable {
 				_taskAvailable[threadIndex].WaitOne();
 			}
 		}
-#if ENABLE_THREAD_PROFILING
+#if SPINE_ENABLE_THREAD_PROFILING
 		Profiler.EndThreadProfiling();
 #endif
 	}

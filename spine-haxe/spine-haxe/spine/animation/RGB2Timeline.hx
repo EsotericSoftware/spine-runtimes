@@ -63,9 +63,10 @@ class RGB2Timeline extends SlotCurveTimeline {
 
 	public function apply1(slot:Slot, pose:SlotPose, time:Float, alpha:Float, blend:MixBlend) {
 		var light:Color = pose.color, dark:Color = pose.darkColor;
+		var r:Float = 0, g:Float = 0, b:Float = 0, r2:Float = 0, g2:Float = 0, b2:Float = 0;
 		if (time < frames[0]) {
 			var setup = slot.data.setup;
-			var setupLight = setup.color, setupDark = setup.darkColor;
+			var setupLight:Color = setup.color, setupDark:Color = setup.darkColor;
 			switch (blend) {
 				case MixBlend.setup:
 					light.r = setupLight.r;
@@ -74,76 +75,78 @@ class RGB2Timeline extends SlotCurveTimeline {
 					dark.r = setupDark.r;
 					dark.g = setupDark.g;
 					dark.b = setupDark.b;
+					return;
 				case MixBlend.first:
-					light.r += (setupLight.r - light.r) * alpha;
-					light.g += (setupLight.g - light.g) * alpha;
-					light.b += (setupLight.b - light.b) * alpha;
-					dark.r += (setupDark.r - dark.r) * alpha;
-					dark.g += (setupDark.g - dark.g) * alpha;
-					dark.b += (setupDark.b - dark.b) * alpha;
+					r = light.r + (setupLight.r - light.r) * alpha;
+					g = light.g + (setupLight.g - light.g) * alpha;
+					b = light.b + (setupLight.b - light.b) * alpha;
+					r2 = dark.r + (setupDark.r - dark.r) * alpha;
+					g2 = dark.g + (setupDark.g - dark.g) * alpha;
+					b2 = dark.b + (setupDark.b - dark.b) * alpha;
+				default:
+					return;
 			}
-			return;
-		}
-
-		var r:Float = 0, g:Float = 0, b:Float = 0, a:Float = 0, r2:Float = 0, g2:Float = 0, b2:Float = 0;
-		var i:Int = Timeline.search(frames, time, ENTRIES);
-		var curveType:Int = Std.int(curves[Std.int(i / ENTRIES)]);
-		switch (curveType) {
-			case CurveTimeline.LINEAR:
-				var before:Float = frames[i];
-				r = frames[i + R];
-				g = frames[i + G];
-				b = frames[i + B];
-				r2 = frames[i + R2];
-				g2 = frames[i + G2];
-				b2 = frames[i + B2];
-				var t:Float = (time - before) / (frames[i + ENTRIES] - before);
-				r += (frames[i + ENTRIES + R] - r) * t;
-				g += (frames[i + ENTRIES + G] - g) * t;
-				b += (frames[i + ENTRIES + B] - b) * t;
-				r2 += (frames[i + ENTRIES + R2] - r2) * t;
-				g2 += (frames[i + ENTRIES + G2] - g2) * t;
-				b2 += (frames[i + ENTRIES + B2] - b2) * t;
-			case CurveTimeline.STEPPED:
-				r = frames[i + R];
-				g = frames[i + G];
-				b = frames[i + B];
-				r2 = frames[i + R2];
-				g2 = frames[i + G2];
-				b2 = frames[i + B2];
-			default:
-				r = getBezierValue(time, i, R, curveType - CurveTimeline.BEZIER);
-				g = getBezierValue(time, i, G, curveType + CurveTimeline.BEZIER_SIZE - CurveTimeline.BEZIER);
-				b = getBezierValue(time, i, B, curveType + CurveTimeline.BEZIER_SIZE * 2 - CurveTimeline.BEZIER);
-				r2 = getBezierValue(time, i, R2, curveType + CurveTimeline.BEZIER_SIZE * 3 - CurveTimeline.BEZIER);
-				g2 = getBezierValue(time, i, G2, curveType + CurveTimeline.BEZIER_SIZE * 4 - CurveTimeline.BEZIER);
-				b2 = getBezierValue(time, i, B2, curveType + CurveTimeline.BEZIER_SIZE * 5 - CurveTimeline.BEZIER);
-		}
-
-		if (alpha == 1) {
-			light.r = r;
-			light.g = g;
-			light.b = b;
-			dark.r = r2;
-			dark.g = g2;
-			dark.b = b2;
 		} else {
-			if (blend == MixBlend.setup) {
-				var setup = slot.data.setup;
-				var setupLight = setup.color, setupDark = setup.darkColor;
-				light.r = setupLight.r;
-				light.g = setupLight.g;
-				light.b = setupLight.b;
-				dark.r = setupDark.r;
-				dark.g = setupDark.g;
-				dark.b = setupDark.b;
+			var i:Int = Timeline.search(frames, time, ENTRIES);
+			var curveType:Int = Std.int(curves[Std.int(i / ENTRIES)]);
+			switch (curveType) {
+				case CurveTimeline.LINEAR:
+					var before:Float = frames[i];
+					r = frames[i + R];
+					g = frames[i + G];
+					b = frames[i + B];
+					r2 = frames[i + R2];
+					g2 = frames[i + G2];
+					b2 = frames[i + B2];
+					var t:Float = (time - before) / (frames[i + ENTRIES] - before);
+					r += (frames[i + ENTRIES + R] - r) * t;
+					g += (frames[i + ENTRIES + G] - g) * t;
+					b += (frames[i + ENTRIES + B] - b) * t;
+					r2 += (frames[i + ENTRIES + R2] - r2) * t;
+					g2 += (frames[i + ENTRIES + G2] - g2) * t;
+					b2 += (frames[i + ENTRIES + B2] - b2) * t;
+				case CurveTimeline.STEPPED:
+					r = frames[i + R];
+					g = frames[i + G];
+					b = frames[i + B];
+					r2 = frames[i + R2];
+					g2 = frames[i + G2];
+					b2 = frames[i + B2];
+				default:
+					r = getBezierValue(time, i, R, curveType - CurveTimeline.BEZIER);
+					g = getBezierValue(time, i, G, curveType + CurveTimeline.BEZIER_SIZE - CurveTimeline.BEZIER);
+					b = getBezierValue(time, i, B, curveType + CurveTimeline.BEZIER_SIZE * 2 - CurveTimeline.BEZIER);
+					r2 = getBezierValue(time, i, R2, curveType + CurveTimeline.BEZIER_SIZE * 3 - CurveTimeline.BEZIER);
+					g2 = getBezierValue(time, i, G2, curveType + CurveTimeline.BEZIER_SIZE * 4 - CurveTimeline.BEZIER);
+					b2 = getBezierValue(time, i, B2, curveType + CurveTimeline.BEZIER_SIZE * 5 - CurveTimeline.BEZIER);
 			}
-			light.r += (r - light.r) * alpha;
-			light.g += (g - light.g) * alpha;
-			light.b += (b - light.b) * alpha;
-			dark.r += (r2 - dark.r) * alpha;
-			dark.g += (g2 - dark.g) * alpha;
-			dark.b += (b2 - dark.b) * alpha;
+
+			if (alpha != 1) {
+				if (blend == MixBlend.setup) {
+					var setupPose = slot.data.setup;
+					var setup = setupPose.color;
+					r = setup.r + (r - setup.r) * alpha;
+					g = setup.g + (g - setup.g) * alpha;
+					b = setup.b + (b - setup.b) * alpha;
+					setup = setupPose.darkColor;
+					r2 = setup.r + (r2 - setup.r) * alpha;
+					g2 = setup.g + (g2 - setup.g) * alpha;
+					b2 = setup.b + (b2 - setup.b) * alpha;
+				} else {
+					r = light.r + (r - light.r) * alpha;
+					g = light.g + (g - light.g) * alpha;
+					b = light.b + (b - light.b) * alpha;
+					r2 = dark.r + (r2 - dark.r) * alpha;
+					g2 = dark.g + (g2 - dark.g) * alpha;
+					b2 = dark.b + (b2 - dark.b) * alpha;
+				}
+			}
 		}
+		light.r = r < 0 ? 0 : (r > 1 ? 1 : r);
+		light.g = g < 0 ? 0 : (g > 1 ? 1 : g);
+		light.b = b < 0 ? 0 : (b > 1 ? 1 : b);
+		dark.r = r2 < 0 ? 0 : (r2 > 1 ? 1 : r2);
+		dark.g = g2 < 0 ? 0 : (g2 > 1 ? 1 : g2);
+		dark.b = b2 < 0 ? 0 : (b2 > 1 ? 1 : b2);
 	}
 }

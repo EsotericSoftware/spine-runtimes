@@ -173,7 +173,7 @@
 					// Clear the canvas and render the skeleton
 					canvas.clear(0.5, 0.5, 0.5, 1);
 					renderer.begin();
-					renderer.drawSkeleton(this.skeleton, true);
+					renderer.drawSkeleton(this.skeleton);
 					renderer.end();
 
 					// Get the image data and convert it to an img element
@@ -236,7 +236,7 @@
 
 				canvas.clear(0.2, 0.2, 0.2, 1);
 				renderer.begin();
-				renderer.drawSkeleton(this.skeleton, true);
+				renderer.drawSkeleton(this.skeleton);
 				renderer.end();
 			}
 		}

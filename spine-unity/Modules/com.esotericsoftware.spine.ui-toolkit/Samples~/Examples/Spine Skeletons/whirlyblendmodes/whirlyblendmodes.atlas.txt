@@ -1,0 +1,5 @@
+whirlyblendmodes.png
+	size: 512, 512
+	filter: Linear, Linear
+whirly
+	bounds: 2, 2, 256, 256

@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -29,6 +29,10 @@
 
 #if UNITY_2018_3 || UNITY_2019 || UNITY_2018_3_OR_NEWER
 #define NEW_PREFAB_SYSTEM
+#endif
+
+#if UNITY_6000_0_OR_NEWER
+#define USE_RIGIDBODY_BODY_TYPE
 #endif
 
 #if !SPINE_AUTO_UPGRADE_COMPONENTS_OFF
@@ -128,7 +132,11 @@ namespace Spine.Unity {
 			Rigidbody2D rb = gameObject.GetComponent<Rigidbody2D>();
 			if (rb == null) {
 				rb = gameObject.AddComponent<Rigidbody2D>();
+#if USE_RIGIDBODY_BODY_TYPE
+				rb.bodyType = isKinematic ? RigidbodyType2D.Kinematic : RigidbodyType2D.Dynamic;
+#else
 				rb.isKinematic = isKinematic;
+#endif
 				rb.gravityScale = gravityScale;
 			}
 			return rb;
@@ -196,8 +204,8 @@ namespace Spine.Unity {
 				UpdateLocal(skeletonGraphic);
 				UpdateWorld(skeletonGraphic);
 				UpdateComplete(skeletonGraphic);
- 			}
- 		}
+			}
+		}
 
 		[HideInInspector] public SkeletonRenderer skeletonRenderer;
 		[HideInInspector] public SkeletonGraphic skeletonGraphic;
@@ -354,16 +362,21 @@ namespace Spine.Unity {
 			if (skeleton == null) return;
 
 			if (boneRoot != null) {
-				List<object> constraintTargets = new List<object>();
+				List<Bone> constrainedBones = new List<Bone>();
 				ExposedList<IConstraint> constraints = skeleton.Constraints;
 				for (int i = 0, n = constraints.Count; i < n; i++) {
 					IConstraint constraint = constraints.Items[i];
+					ExposedList<BonePose> bones = null;
 					if (constraint is IkConstraint)
-						constraintTargets.Add(((IkConstraint)constraint).Bones);
+						bones = ((IkConstraint)constraint).Bones;
 					else if (constraint is TransformConstraint)
-						constraintTargets.Add(((TransformConstraint)constraint).Bones);
+						bones = ((TransformConstraint)constraint).Bones;
 					else if (constraint is PathConstraint)
-						constraintTargets.Add(((PathConstraint)constraint).Bones);
+						bones = ((PathConstraint)constraint).Bones;
+					if (bones != null) {
+						for (int j = 0, m = bones.Count; j < m; j++)
+							constrainedBones.Add(bones.Items[j].bone);
+					}
 				}
 
 				List<SkeletonUtilityBone> boneComponents = this.boneComponents;
@@ -374,7 +387,7 @@ namespace Spine.Unity {
 						if (b.bone == null) continue;
 					}
 					hasOverrideBones |= (b.mode == SkeletonUtilityBone.Mode.Override);
-					hasConstraintTargetBones |= constraintTargets.Contains(b.bone);
+					hasConstraintTargetBones |= constrainedBones.Contains(b.bone);
 				}
 
 				needToReprocessBones = false;

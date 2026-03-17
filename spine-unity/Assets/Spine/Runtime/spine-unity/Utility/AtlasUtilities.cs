@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -31,11 +31,9 @@
 #define CONFIGURABLE_ENTER_PLAY_MODE
 #endif
 
-
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-
 
 namespace Spine.Unity.AttachmentTools {
 
@@ -101,13 +99,13 @@ namespace Spine.Unity.AttachmentTools {
 
 		/// <summary>
 		/// Creates a Spine.AtlasRegion that uses a premultiplied alpha duplicate of the Sprite's texture data.</summary>
-		public static AtlasRegion ToAtlasRegionPMAClone (this Texture2D t, Material materialPropertySource, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps) {
-			return t.ToAtlasRegionPMAClone(materialPropertySource.shader, textureFormat, mipmaps, materialPropertySource);
+		public static AtlasRegion ToAtlasRegionWithNewPMATexture (this Texture2D t, Material materialPropertySource, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps) {
+			return t.ToAtlasRegionWithNewPMATexture(materialPropertySource.shader, textureFormat, mipmaps, materialPropertySource);
 		}
 
 		/// <summary>
 		/// Creates a Spine.AtlasRegion that uses a premultiplied alpha duplicate of the Sprite's texture data.</summary>
-		public static AtlasRegion ToAtlasRegionPMAClone (this Texture2D t, Shader shader, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps, Material materialPropertySource = null) {
+		public static AtlasRegion ToAtlasRegionWithNewPMATexture (this Texture2D t, Shader shader, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps, Material materialPropertySource = null) {
 			Material material = new Material(shader);
 			if (materialPropertySource != null) {
 				material.CopyPropertiesFromMaterial(materialPropertySource);
@@ -161,13 +159,13 @@ namespace Spine.Unity.AttachmentTools {
 			return region;
 		}
 
-		public static AtlasRegion ToAtlasRegionPMAClone (this Sprite s, Material materialPropertySource, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps) {
-			return s.ToAtlasRegionPMAClone(materialPropertySource.shader, textureFormat, mipmaps, materialPropertySource);
+		public static AtlasRegion ToAtlasRegionWithNewPMATexture (this Sprite s, Material materialPropertySource, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps) {
+			return s.ToAtlasRegionWithNewPMATexture(materialPropertySource.shader, textureFormat, mipmaps, materialPropertySource);
 		}
 
 		/// <summary>
 		/// Creates a Spine.AtlasRegion that uses a premultiplied alpha duplicate of the Sprite's texture data.</summary>
-		public static AtlasRegion ToAtlasRegionPMAClone (this Sprite s, Shader shader, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps, Material materialPropertySource = null) {
+		public static AtlasRegion ToAtlasRegionWithNewPMATexture (this Sprite s, Shader shader, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps, Material materialPropertySource = null) {
 			Material material = new Material(shader);
 			if (materialPropertySource != null) {
 				material.CopyPropertiesFromMaterial(materialPropertySource);
@@ -237,8 +235,408 @@ namespace Spine.Unity.AttachmentTools {
 		static List<Attachment> inoutAttachments = new List<Attachment>();
 
 		/// <summary>
+		/// Repack output struct for <see cref="GetRepackedAttachments"/> and <see cref="GetRepackedSkin"/>.
+		/// Returned <c>Material</c> and <c>Texture</c> behave like <c>new Texture2D()</c>, thus you need to
+		/// call <c>Destroy()</c> to free resources.
+		/// </summary>
+		public struct RepackAttachmentsOutput {
+			/// <summary>The newly generated Material for the normal blend mode, holding the repacked texture
+			/// as main texture.
+			/// Materials and textures returned behave like <c>new Texture2D()</c> and need to be destroyed.</summary>
+			public Material outputMaterial;
+			/// <summary>The newly generated main repacked texture, assigned at <c>outputMaterial.mainTexture</c>.
+			/// Materials and textures returned behave like <c>new Texture2D()</c> and need to be destroyed.</summary>
+			public Texture2D outputTexture;
+			/// <summary>When non-null, this array will be filled with the resulting repacked texture for every property,
+			/// just as the main repacked texture is assigned to <c>outputTexture</c>. This serves to avoid unnecessary
+			/// allocations.
+			/// Materials and textures returned behave like <c>new Texture2D()</c> and need to be destroyed.</summary>
+			public Texture2D[] additionalOutputTextures;
+			/// <summary>The optional generated Material for additive blend mode, holding the repacked texture
+			/// as main texture.
+			/// Materials and textures returned behave like <c>new Texture2D()</c> and need to be destroyed.</summary>
+			public Material outputAdditiveMaterial;
+			/// <summary>The optional generated Material for multiply blend mode, holding the repacked texture
+			/// as main texture.
+			/// Materials and textures returned behave like <c>new Texture2D()</c> and need to be destroyed.</summary>
+			public Material outputMultiplyMaterial;
+			/// <summary>The optional generated Material for screen blend mode, holding the repacked texture
+			/// as main texture.
+			/// Materials and textures returned behave like <c>new Texture2D()</c> and need to be destroyed.</summary>
+			public Material outputScreenMaterial;
+
+			/// <summary>
+			/// Destroys any assigned previously generated assets. If you decide to store
+			/// <see cref="RepackAttachmentsOutput"/> in a MonoBehaviour for re-use, call this method before each
+			/// <see cref="GetRepackedSkin"/> or <see cref="GetRepackedAttachments"/> call, and also once in OnDestroy.
+			/// </summary>
+			public void DestroyGeneratedAssets () {
+				if (outputMaterial) { UnityEngine.Object.Destroy(outputMaterial); outputMaterial = null; }
+				if (outputTexture) { UnityEngine.Object.Destroy(outputTexture); outputTexture = null; }
+				if (additionalOutputTextures != null) {
+					for (int i = 0; i < additionalOutputTextures.Length; ++i) {
+						if (additionalOutputTextures[i]) {
+							UnityEngine.Object.Destroy(additionalOutputTextures[i]);
+							additionalOutputTextures[i] = null;
+						}
+					}
+				}
+				if (outputAdditiveMaterial) { UnityEngine.Object.Destroy(outputAdditiveMaterial); outputAdditiveMaterial = null; }
+				if (outputMultiplyMaterial) { UnityEngine.Object.Destroy(outputMultiplyMaterial); outputMultiplyMaterial = null; }
+				if (outputScreenMaterial) { UnityEngine.Object.Destroy(outputScreenMaterial); outputScreenMaterial = null; }
+			}
+		}
+
+		/// <summary>
+		/// Repack configuration settings for <see cref="GetRepackedAttachments"/> and <see cref="GetRepackedSkin"/>.
+		/// </summary>
+		public struct RepackAttachmentsSettings {
+			public static readonly string DefaultTextureName = "Repacked Attachments";
+
+			/// <summary>
+			/// Name used for newly created textures, materials and atlas pages.
+			/// </summary>
+			public string newAssetName;
+
+			/// <summary>
+			/// Optional shader to be used, overrides the shader of <c>materialPropertySource.shader</c>.
+			/// </summary>
+			public Shader shader;
+
+			/// <summary>
+			/// Normal blend mode Material reference. The generated normal blend mode Material copies these settings.
+			/// </summary>
+			public Material materialPropertySource;
+			/// <summary>
+			/// Additive blend mode Material reference. Optional, assign when repacking any additive blend mode
+			/// attachments. The generated additive blend mode Material copies these settings.
+			/// If all three blend mode materials <c>additiveMaterialSource</c>, <c>multiplyMaterialSource</c> and
+			/// <c>screenMaterialSource</c> are null, blend mode attachments are treated as normal blend mode and
+			/// repacked using a single material and atlas page.
+			/// </summary>
+			public Material additiveMaterialSource;
+			/// <summary>
+			/// Multiply blend mode Material reference. Optional, assign when repacking any multiply blend mode
+			/// attachments. The generated multiply blend mode Material copies these settings.
+			/// If all three blend mode materials <c>additiveMaterialSource</c>, <c>multiplyMaterialSource</c> and
+			/// <c>screenMaterialSource</c> are null, blend mode attachments are treated as normal blend mode and
+			/// repacked using a single material and atlas page.
+			/// </summary>
+			public Material multiplyMaterialSource;
+			/// <summary>
+			/// Screen blend mode Material reference. Optional, assign when repacking any screen blend mode attachments.
+			/// The generated screen blend mode Material copies these settings.
+			/// If all three blend mode materials <c>additiveMaterialSource</c>, <c>multiplyMaterialSource</c> and
+			/// <c>screenMaterialSource</c> are null, blend mode attachments are treated as normal blend mode and
+			/// repacked using a single material and atlas page.
+			/// </summary>
+			public Material screenMaterialSource;
+
+			/// <summary>Max atlas size of a repacked texture. Packed attachments are scaled down to fit into a single
+			/// texture, not using multiple repacked texture pages.</summary>
+			public int maxAtlasSize;
+			/// <summary>Padding between packed texture regions in pixels.</summary>
+			public int padding;
+			/// <summary>Texture format of the main repacked texture.</summary>
+			public TextureFormat textureFormat;
+			/// <summary>
+			/// Whether mip-maps shall be generated for newly created repacked textures.
+			/// </summary>
+			public bool mipmaps;
+			/// <summary>When set to <c>true</c>, <see cref="AtlasUtilities.ClearCache()"/> is called after
+			/// repacking to clear the texture cache. See remarks in <see cref="GetRepackedAttachments"/> and
+			/// <see cref="GetRepackedSkin"/> for additional info.</summary>
+			public bool clearCache;
+			/// <summary>
+			/// When <c>true</c>, original non-texture-region attachments (e.g. bounding box or point attachments) are
+			/// attached to the new skin as-is.
+			/// </summary>
+			public bool useOriginalNonrenderables;
+
+			/// <summary>Optional additional textures (such as normal maps) to copy while repacking.
+			/// To copy e.g. the main texture and normal maps, set it to
+			/// <c>new int[] { Shader.PropertyToID("_BumpMap") }</c>.
+			/// </summary>
+			public int[] additionalTexturePropertyIDsToCopy;
+			/// <summary>When non-null, this array will be used as <c>TextureFormat</c> at the Texture at the respective property.
+			/// When set to <c>null</c> or when its array size is smaller, <c>textureFormat</c> is used where there
+			/// exists no corresponding array item.</summary>
+			public TextureFormat[] additionalTextureFormats;
+			/// <summary>When non-null, this array will be used to determine whether <c>linear</c> or <c>sRGB</c> color space is
+			/// used at the Texture at the respective property.
+			/// When set to <c>null</c>, <c>linear</c> color space is assumed at every additional Texture element.
+			/// When e.g. packing the main texture and normal maps, assign <c>new bool[] { true }</c> at this parameters,
+			/// because normal maps use linear color space.</summary>
+			public bool[] additionalTextureIsLinear;
+
+			/// <summary>Default settings providing reasonable parameters, modify according to your needs.</summary>
+			public static RepackAttachmentsSettings Default = new RepackAttachmentsSettings(true);
+
+			/// <summary>Hidden pseudo-default ctor, use <see cref="Default"/> instead.</summary>
+			private RepackAttachmentsSettings (bool _) {
+				newAssetName = DefaultTextureName;
+
+				maxAtlasSize = 1024;
+				padding = 2;
+				textureFormat = SpineTextureFormat;
+				mipmaps = UseMipMaps;
+				clearCache = false;
+				useOriginalNonrenderables = true;
+
+				shader = null;
+				materialPropertySource = null;
+				additiveMaterialSource = null;
+				multiplyMaterialSource = null;
+				screenMaterialSource = null;
+
+				additionalTexturePropertyIDsToCopy = null;
+				additionalTextureFormats = null;
+				additionalTextureIsLinear = null;
+			}
+
+			/// <summary>
+			/// Default settings providing reasonable parameters, with source materials assigned according to the
+			/// provided <paramref name="skeletonDataAsset"/>. Modify according to your needs.
+			/// </summary>
+			/// <param name="skeletonDataAsset">Reference <see cref="SkeletonDataAsset"/> used to provide source
+			/// materials for all blend modes.</param>
+			public RepackAttachmentsSettings (SkeletonDataAsset skeletonDataAsset)
+				: this(true) {
+				UseSourceMaterialsFrom(skeletonDataAsset);
+			}
+
+			/// <summary>
+			/// Assigns source materials from the provided <paramref name="skeletonDataAsset"/> for all blend modes
+			/// including normal blend mode.
+			/// </summary>
+			public void UseSourceMaterialsFrom (SkeletonDataAsset skeletonDataAsset) {
+				materialPropertySource = skeletonDataAsset.atlasAssets[0].PrimaryMaterial;
+				UseBlendModeMaterialsFrom(skeletonDataAsset);
+			}
+
+			/// <summary>
+			/// Assigns source materials from the provided <paramref name="skeletonDataAsset"/> for
+			/// additive, multiply and screen blend modes.
+			/// </summary>
+			public void UseBlendModeMaterialsFrom (SkeletonDataAsset skeletonDataAsset) {
+				BlendModeMaterials materials = skeletonDataAsset.blendModeMaterials;
+				if (materials.additiveMaterials.Count > 0)
+					additiveMaterialSource = materials.additiveMaterials[0].material;
+				if (materials.multiplyMaterials.Count > 0)
+					multiplyMaterialSource = materials.multiplyMaterials[0].material;
+				if (materials.screenMaterials.Count > 0)
+					screenMaterialSource = materials.screenMaterials[0].material;
+			}
+		}
+
+		private struct BlendModeAtlasPages {
+			public AtlasPage normalPage;
+			public AtlasPage additivePage;
+			public AtlasPage multiplyPage;
+			public AtlasPage screenPage;
+		}
+
+		/// <summary>
 		/// Fills the outputAttachments list with new attachment objects based on the attachments in sourceAttachments,
 		/// but mapped to a new single texture using the same material.</summary>
+		/// <remarks>
+		/// This variant of <c>GetRepackedAttachments</c> supports repacking blend mode attachments.
+		/// To enable blend mode repacking, assign a reference material at either
+		/// <see cref="RepackAttachmentsSettings.additiveMaterialSource"/>,
+		/// <see cref="RepackAttachmentsSettings.multiplyMaterialSource"/> or
+		/// <see cref="RepackAttachmentsSettings.screenMaterialSource"/> of parameter <paramref name="settings"/>.
+		/// Otherwise any blend mode attachments are treated as normal blend mode and repacked using a single material
+		/// and atlas page.
+		/// </remarks>
+		/// <remarks>Returned <c>Material</c> and <c>Texture</c> behave like <c>new Texture2D()</c>, thus you need to
+		/// call <c>Destroy()</c> to free resources.
+		/// This method caches necessary Texture copies for later re-use, which might steadily increase the texture
+		/// memory footprint when used excessively.
+		/// Set <see cref="RepackAttachmentsSettings.clearCache"/> to <c>true</c> at the argument
+		/// <paramref name="settings"/> or call <see cref="AtlasUtilities.ClearCache()"/> to clear this texture cache.
+		/// You may want to call <c>Resources.UnloadUnusedAssets()</c> after that.
+		/// </remarks>
+		/// <param name="sourceAttachments">The list of attachments to be repacked.</param>
+		/// <param name = "outputAttachments">The List(Attachment) to populate with the newly created Attachment objects.
+		/// May be equal to <c>sourceAttachments</c> for in-place operation.</param>
+		/// <param name="settings">Repack configuration settings, see <see cref="RepackAttachmentsSettings"/>.</param>
+		/// <param name="output">Repack output struct holding generated material and texture references for
+		/// potential later cleanup.</param>
+		public static void GetRepackedAttachments (List<Attachment> sourceAttachments, List<Attachment> outputAttachments,
+			RepackAttachmentsSettings settings, ref RepackAttachmentsOutput output) {
+
+			if (sourceAttachments == null) throw new System.ArgumentNullException("sourceAttachments");
+			if (outputAttachments == null) throw new System.ArgumentNullException("outputAttachments");
+
+			if (settings.shader == null)
+				settings.shader = settings.materialPropertySource == null ?
+					Shader.Find("Spine/Skeleton") : settings.materialPropertySource.shader;
+
+			output.outputTexture = null;
+			if (settings.additionalTexturePropertyIDsToCopy != null && settings.additionalTextureIsLinear == null) {
+				settings.additionalTextureIsLinear = new bool[settings.additionalTexturePropertyIDsToCopy.Length];
+				for (int i = 0; i < settings.additionalTextureIsLinear.Length; ++i) {
+					settings.additionalTextureIsLinear[i] = true;
+				}
+			}
+
+			// Use these to detect and use shared regions.
+			existingRegions.Clear();
+			regionIndices.Clear();
+
+			// Collect all textures from original attachments.
+			int numTextureParamsToRepack = 1 + (settings.additionalTexturePropertyIDsToCopy == null ?
+				0 : settings.additionalTexturePropertyIDsToCopy.Length);
+
+			if (texturesToPackAtParam.Length < numTextureParamsToRepack)
+				Array.Resize(ref texturesToPackAtParam, numTextureParamsToRepack);
+			for (int i = 0; i < numTextureParamsToRepack; ++i) {
+				if (texturesToPackAtParam[i] != null)
+					texturesToPackAtParam[i].Clear();
+				else
+					texturesToPackAtParam[i] = new List<Texture2D>();
+			}
+			originalRegions.Clear();
+
+			bool isInPlaceOperation = object.ReferenceEquals(sourceAttachments, outputAttachments);
+			if (!isInPlaceOperation) {
+				outputAttachments.Clear();
+				outputAttachments.AddRange(sourceAttachments);
+			}
+
+			int newRegionIndex = 0;
+			for (int attachmentIndex = 0, n = sourceAttachments.Count; attachmentIndex < n; attachmentIndex++) {
+				Attachment originalAttachment = sourceAttachments[attachmentIndex];
+
+				if (originalAttachment is IHasSequence) {
+					IHasSequence originalTextureAttachment = (IHasSequence)originalAttachment;
+					Attachment newAttachment = originalAttachment.Copy();
+					AtlasRegion firstRegion = (AtlasRegion)originalTextureAttachment.Sequence.Regions[0];
+					int existingIndex;
+					if (existingRegions.TryGetValue(firstRegion, out existingIndex)) {
+						regionIndices.Add(existingIndex);
+					} else {
+						existingRegions.Add(firstRegion, newRegionIndex);
+						Sequence originalSequence = originalTextureAttachment.Sequence;
+						for (int i = 0, regionCount = originalSequence.Regions.Length; i < regionCount; ++i) {
+							AtlasRegion sequenceRegion = (AtlasRegion)originalSequence.Regions[i];
+							AddRegionTexturesToPack(numTextureParamsToRepack, sequenceRegion,
+								settings.textureFormat, settings.mipmaps, settings.additionalTextureFormats,
+								settings.additionalTexturePropertyIDsToCopy, settings.additionalTextureIsLinear);
+							originalRegions.Add(sequenceRegion);
+							regionIndices.Add(newRegionIndex);
+							newRegionIndex++;
+						}
+					}
+					outputAttachments[attachmentIndex] = newAttachment;
+				} else {
+					outputAttachments[attachmentIndex] = settings.useOriginalNonrenderables ?
+						originalAttachment : originalAttachment.Copy();
+					regionIndices.Add(NonrenderingRegion); // Output attachments pairs with regionIndices list 1:1. Pad with a sentinel if the attachment doesn't have a region.
+				}
+			}
+
+			// Rehydrate the repacked textures as a Material, Spine atlas and Spine.AtlasAttachments
+			Material newMaterial = new Material(settings.shader);
+			if (settings.materialPropertySource != null) {
+				newMaterial.CopyPropertiesFromMaterial(settings.materialPropertySource);
+				newMaterial.shaderKeywords = settings.materialPropertySource.shaderKeywords;
+			}
+			newMaterial.name = settings.newAssetName;
+
+			Rect[] rects = null;
+			for (int i = 0; i < numTextureParamsToRepack; ++i) {
+				// Fill a new texture with the collected attachment textures.
+				TextureFormat format = (i > 0 &&
+					settings.additionalTextureFormats != null &&
+					i - 1 < settings.additionalTextureFormats.Length) ?
+						settings.additionalTextureFormats[i - 1] : settings.textureFormat;
+				bool linear = (i > 0) ? settings.additionalTextureIsLinear[i - 1] : false;
+				Texture2D newTexture = new Texture2D(settings.maxAtlasSize, settings.maxAtlasSize,
+					format, settings.mipmaps, linear);
+				newTexture.mipMapBias = AtlasUtilities.DefaultMipmapBias;
+
+				List<Texture2D> texturesToPack = texturesToPackAtParam[i];
+				if (texturesToPack.Count > 0) {
+					Texture2D sourceTexture = texturesToPack[0];
+					newTexture.CopyTextureAttributesFrom(sourceTexture);
+				}
+				newTexture.name = settings.newAssetName;
+				Rect[] rectsForTexParam = newTexture.PackTextures(texturesToPack.ToArray(),
+					settings.padding, settings.maxAtlasSize);
+				if (i == 0) {
+					rects = rectsForTexParam;
+					newMaterial.mainTexture = newTexture;
+					output.outputTexture = newTexture;
+				} else {
+					newMaterial.SetTexture(settings.additionalTexturePropertyIDsToCopy[i - 1], newTexture);
+					if (output.additionalOutputTextures != null && output.additionalOutputTextures.Length > i - 1)
+						output.additionalOutputTextures[i - 1] = newTexture;
+				}
+			}
+
+			AtlasPage page = newMaterial.ToSpineAtlasPage();
+			page.name = settings.newAssetName;
+
+			BlendModeAtlasPages blendModePages = new BlendModeAtlasPages();
+			blendModePages.normalPage = page;
+
+			repackedRegions.Clear();
+			for (int i = 0, n = originalRegions.Count; i < n; i++) {
+				AtlasRegion oldRegion = originalRegions[i];
+				AtlasRegion newRegion = UVRectToAtlasRegion(rects[i], oldRegion, page);
+				repackedRegions.Add(newRegion);
+			}
+
+			Material additiveMaterialSource = settings.additiveMaterialSource;
+			Material multiplyMaterialSource = settings.multiplyMaterialSource;
+			Material screenMaterialSource = settings.screenMaterialSource;
+			bool enableBlendModes =
+				(additiveMaterialSource != null) ||
+				(multiplyMaterialSource != null) ||
+				(screenMaterialSource != null);
+			Shader normalShader = settings.shader;
+
+			// Map the cloned attachments to the repacked atlas.
+			for (int attachmentIndex = 0, repackedIndex = 0, n = outputAttachments.Count;
+				attachmentIndex < n; ++attachmentIndex, ++repackedIndex) {
+
+				Attachment attachment = outputAttachments[attachmentIndex];
+				IHasSequence textureAttachment = attachment as IHasSequence;
+				if (textureAttachment != null) {
+					TextureRegion[] regions = textureAttachment.Sequence.Regions;
+					for (int r = 0, regionCount = regions.Length; r < regionCount; ++r) {
+						TextureRegion originalRegion = regions[r];
+						TextureRegion repackedRegion = repackedRegions[regionIndices[repackedIndex++]];
+						if (enableBlendModes) {
+							AssignBlendMode(ref repackedRegion, originalRegion, normalShader, ref blendModePages,
+								additiveMaterialSource, multiplyMaterialSource, screenMaterialSource);
+						}
+						regions[r] = repackedRegion;
+					}
+					--repackedIndex;
+					
+					textureAttachment.UpdateSequence();
+				}
+			}
+
+			// Clean up.
+			if (settings.clearCache)
+				AtlasUtilities.ClearCache();
+
+			output.outputMaterial = newMaterial;
+
+			output.outputAdditiveMaterial = blendModePages.additivePage != null ? (Material)blendModePages.additivePage.rendererObject : null;
+			output.outputMultiplyMaterial = blendModePages.multiplyPage != null ? (Material)blendModePages.multiplyPage.rendererObject : null;
+			output.outputScreenMaterial = blendModePages.screenPage != null ? (Material)blendModePages.screenPage.rendererObject : null;
+		}
+
+		/// <summary>
+		/// Fills the outputAttachments list with new attachment objects based on the attachments in sourceAttachments,
+		/// but mapped to a new single texture using the same material. All blend modes are treated as normal blend mode.
+		/// Use <see cref="GetRepackedAttachments(List{Attachment}, List{Attachment}, RepackAttachmentsSettings,
+		/// ref RepackAttachmentsOutput)"/> if blend modes shall be retained.
+		/// </summary>
 		/// <remarks>Returned <c>Material</c> and <c>Texture</c> behave like <c>new Texture2D()</c>, thus you need to call <c>Destroy()</c>
 		/// to free resources.
 		/// This method caches necessary Texture copies for later re-use, which might steadily increase the texture memory
@@ -285,7 +683,10 @@ namespace Spine.Unity.AttachmentTools {
 
 		/// <summary>
 		/// Fills the outputAttachments list with new attachment objects based on the attachments in sourceAttachments,
-		/// but mapped to a new single texture using the same material.</summary>
+		/// but mapped to a new single texture using the same material. All blend modes are treated as normal blend mode.
+		/// Use <see cref="GetRepackedAttachments(List{Attachment}, List{Attachment}, RepackAttachmentsSettings,
+		/// ref RepackAttachmentsOutput)"/> if blend modes shall be retained.
+		/// </summary>
 		/// <remarks>Returned <c>Material</c> and <c>Texture</c> behave like <c>new Texture2D()</c>, thus you need to call <c>Destroy()</c>
 		/// to free resources.</remarks>
 		/// <param name="sourceAttachments">The list of attachments to be repacked.</param>
@@ -316,157 +717,60 @@ namespace Spine.Unity.AttachmentTools {
 			int[] additionalTexturePropertyIDsToCopy = null, Texture2D[] additionalOutputTextures = null,
 			TextureFormat[] additionalTextureFormats = null, bool[] additionalTextureIsLinear = null) {
 
-			if (sourceAttachments == null) throw new System.ArgumentNullException("sourceAttachments");
-			if (outputAttachments == null) throw new System.ArgumentNullException("outputAttachments");
-			outputTexture = null;
-			if (additionalTexturePropertyIDsToCopy != null && additionalTextureIsLinear == null) {
-				additionalTextureIsLinear = new bool[additionalTexturePropertyIDsToCopy.Length];
-				for (int i = 0; i < additionalTextureIsLinear.Length; ++i) {
-					additionalTextureIsLinear[i] = true;
+			RepackAttachmentsSettings settings = new RepackAttachmentsSettings {
+				shader = shader,
+				maxAtlasSize = maxAtlasSize,
+				padding = padding,
+				textureFormat = textureFormat,
+				mipmaps = mipmaps,
+				newAssetName = newAssetName,
+				materialPropertySource = materialPropertySource,
+				clearCache = clearCache,
+				useOriginalNonrenderables = useOriginalNonrenderables,
+				additionalTexturePropertyIDsToCopy = additionalTexturePropertyIDsToCopy,
+				additionalTextureFormats = additionalTextureFormats,
+				additionalTextureIsLinear = additionalTextureIsLinear
+			};
+			RepackAttachmentsOutput output = new RepackAttachmentsOutput();
+			output.additionalOutputTextures = additionalOutputTextures;
+			GetRepackedAttachments(sourceAttachments, outputAttachments, settings, ref output);
+
+			outputMaterial = output.outputMaterial;
+			outputTexture = output.outputTexture;
+		}
+
+		private static void AssignBlendMode (ref TextureRegion repackedRegion, TextureRegion originalRegion,
+			Shader normalShader, ref BlendModeAtlasPages blendModePages,
+			Material additiveMaterialSource, Material multiplyMaterialSource, Material screenMaterialSource) {
+
+			Material material = ((AtlasRegion)originalRegion).page.rendererObject as Material;
+			if (material == null) return;
+
+			if (material.shader != normalShader) {
+				if (material.shader.name.Contains("Multiply")) {
+					((AtlasRegion)repackedRegion).page = GetBlendModePage(ref blendModePages.multiplyPage,
+						blendModePages.normalPage, multiplyMaterialSource, "-Multiply");
+				} else if (material.shader.name.Contains("Screen")) {
+					((AtlasRegion)repackedRegion).page = GetBlendModePage(ref blendModePages.screenPage,
+						blendModePages.normalPage, screenMaterialSource, "-Screen");
+				} else if (material.shader.name.Contains("Additive")) {
+					((AtlasRegion)repackedRegion).page = GetBlendModePage(ref blendModePages.additivePage,
+						blendModePages.normalPage, additiveMaterialSource, "-Additive");
 				}
 			}
+		}
 
-			// Use these to detect and use shared regions.
-			existingRegions.Clear();
-			regionIndices.Clear();
+		private static AtlasPage GetBlendModePage (ref AtlasPage targetPage, AtlasPage normalReferencePage,
+			Material materialSource, string nameSuffix) {
 
-			// Collect all textures from original attachments.
-			int numTextureParamsToRepack = 1 + (additionalTexturePropertyIDsToCopy == null ? 0 : additionalTexturePropertyIDsToCopy.Length);
-			additionalOutputTextures = (additionalTexturePropertyIDsToCopy == null ? null : new Texture2D[additionalTexturePropertyIDsToCopy.Length]);
-			if (texturesToPackAtParam.Length < numTextureParamsToRepack)
-				Array.Resize(ref texturesToPackAtParam, numTextureParamsToRepack);
-			for (int i = 0; i < numTextureParamsToRepack; ++i) {
-				if (texturesToPackAtParam[i] != null)
-					texturesToPackAtParam[i].Clear();
-				else
-					texturesToPackAtParam[i] = new List<Texture2D>();
+			if (targetPage == null) {
+				targetPage = normalReferencePage.Clone();
+				Material material = new Material(materialSource);
+				material.mainTexture = ((Material)normalReferencePage.rendererObject).mainTexture;
+				material.name = material.mainTexture.name + nameSuffix;
+				targetPage.rendererObject = material;
 			}
-			originalRegions.Clear();
-
-			if (!object.ReferenceEquals(sourceAttachments, outputAttachments)) {
-				outputAttachments.Clear();
-				outputAttachments.AddRange(sourceAttachments);
-			}
-
-			int newRegionIndex = 0;
-			for (int attachmentIndex = 0, n = sourceAttachments.Count; attachmentIndex < n; attachmentIndex++) {
-				Attachment originalAttachment = sourceAttachments[attachmentIndex];
-
-				if (originalAttachment is IHasTextureRegion) {
-					MeshAttachment originalMeshAttachment = originalAttachment as MeshAttachment;
-					IHasTextureRegion originalTextureAttachment = (IHasTextureRegion)originalAttachment;
-
-					Attachment newAttachment = (originalTextureAttachment.Sequence != null) ? originalAttachment :
-						(originalMeshAttachment != null) ? originalMeshAttachment.NewLinkedMesh() :
-						originalAttachment.Copy();
-					IHasTextureRegion newTextureAttachment = (IHasTextureRegion)newAttachment;
-					AtlasRegion region = newTextureAttachment.Region as AtlasRegion;
-					if (region == null && originalTextureAttachment.Sequence != null)
-						region = (AtlasRegion)originalTextureAttachment.Sequence.Regions[0];
-
-					int existingIndex;
-					if (existingRegions.TryGetValue(region, out existingIndex)) {
-						regionIndices.Add(existingIndex);
-					} else {
-						existingRegions.Add(region, newRegionIndex);
-						Sequence originalSequence = originalTextureAttachment.Sequence;
-						if (originalSequence != null) {
-							newTextureAttachment.Sequence = new Sequence(originalSequence);
-							for (int i = 0, regionCount = originalSequence.Regions.Length; i < regionCount; ++i) {
-								AtlasRegion sequenceRegion = (AtlasRegion)originalSequence.Regions[i];
-								AddRegionTexturesToPack(numTextureParamsToRepack, sequenceRegion, textureFormat, mipmaps,
-									additionalTextureFormats, additionalTexturePropertyIDsToCopy, additionalTextureIsLinear);
-								originalRegions.Add(sequenceRegion);
-								regionIndices.Add(newRegionIndex);
-								newRegionIndex++;
-							}
-						} else {
-							AddRegionTexturesToPack(numTextureParamsToRepack, region, textureFormat, mipmaps,
-								additionalTextureFormats, additionalTexturePropertyIDsToCopy, additionalTextureIsLinear);
-							originalRegions.Add(region);
-							regionIndices.Add(newRegionIndex);
-							newRegionIndex++;
-						}
-					}
-					outputAttachments[attachmentIndex] = newAttachment;
-				} else {
-					outputAttachments[attachmentIndex] = useOriginalNonrenderables ? originalAttachment : originalAttachment.Copy();
-					regionIndices.Add(NonrenderingRegion); // Output attachments pairs with regionIndices list 1:1. Pad with a sentinel if the attachment doesn't have a region.
-				}
-			}
-
-			// Rehydrate the repacked textures as a Material, Spine atlas and Spine.AtlasAttachments
-			Material newMaterial = new Material(shader);
-			if (materialPropertySource != null) {
-				newMaterial.CopyPropertiesFromMaterial(materialPropertySource);
-				newMaterial.shaderKeywords = materialPropertySource.shaderKeywords;
-			}
-			newMaterial.name = newAssetName;
-
-			Rect[] rects = null;
-			for (int i = 0; i < numTextureParamsToRepack; ++i) {
-				// Fill a new texture with the collected attachment textures.
-				Texture2D newTexture = new Texture2D(maxAtlasSize, maxAtlasSize,
-									(i > 0 && additionalTextureFormats != null && i - 1 < additionalTextureFormats.Length) ?
-									additionalTextureFormats[i - 1] : textureFormat,
-									mipmaps,
-									(i > 0) ? additionalTextureIsLinear[i - 1] : false);
-				newTexture.mipMapBias = AtlasUtilities.DefaultMipmapBias;
-
-				List<Texture2D> texturesToPack = texturesToPackAtParam[i];
-				if (texturesToPack.Count > 0) {
-					Texture2D sourceTexture = texturesToPack[0];
-					newTexture.CopyTextureAttributesFrom(sourceTexture);
-				}
-				newTexture.name = newAssetName;
-				Rect[] rectsForTexParam = newTexture.PackTextures(texturesToPack.ToArray(), padding, maxAtlasSize);
-				if (i == 0) {
-					rects = rectsForTexParam;
-					newMaterial.mainTexture = newTexture;
-					outputTexture = newTexture;
-				} else {
-					newMaterial.SetTexture(additionalTexturePropertyIDsToCopy[i - 1], newTexture);
-					additionalOutputTextures[i - 1] = newTexture;
-				}
-			}
-
-			AtlasPage page = newMaterial.ToSpineAtlasPage();
-			page.name = newAssetName;
-
-			repackedRegions.Clear();
-			for (int i = 0, n = originalRegions.Count; i < n; i++) {
-				AtlasRegion oldRegion = originalRegions[i];
-				AtlasRegion newRegion = UVRectToAtlasRegion(rects[i], oldRegion, page);
-				repackedRegions.Add(newRegion);
-			}
-
-			// Map the cloned attachments to the repacked atlas.
-			for (int attachmentIndex = 0, repackedIndex = 0, n = outputAttachments.Count;
-				attachmentIndex < n;
-				++attachmentIndex, ++repackedIndex) {
-
-				Attachment attachment = outputAttachments[attachmentIndex];
-				IHasTextureRegion textureAttachment = attachment as IHasTextureRegion;
-				if (textureAttachment != null) {
-					if (textureAttachment.Sequence != null) {
-						TextureRegion[] regions = textureAttachment.Sequence.Regions;
-						textureAttachment.Region = repackedRegions[regionIndices[repackedIndex]];
-						for (int r = 0, regionCount = regions.Length; r < regionCount; ++r) {
-							regions[r] = repackedRegions[regionIndices[repackedIndex++]];
-						}
-						--repackedIndex;
-					} else {
-						textureAttachment.Region = repackedRegions[regionIndices[repackedIndex]];
-					}
-					textureAttachment.UpdateRegion();
-				}
-			}
-
-			// Clean up.
-			if (clearCache)
-				AtlasUtilities.ClearCache();
-
-			outputMaterial = newMaterial;
+			return targetPage;
 		}
 
 		private static void AddRegionTexturesToPack (int numTextureParamsToRepack, AtlasRegion region,
@@ -485,7 +789,59 @@ namespace Spine.Unity.AttachmentTools {
 
 		/// <summary>
 		/// Creates and populates a duplicate skin with cloned attachments that are backed by a new packed texture atlas
-		/// comprised of all the regions from the original skin.</summary>
+		/// comprised of all the regions from the original skin. Supports blend modes if configured accordingly.
+		/// </summary>
+		/// <remarks>
+		/// <para>GetRepackedSkin is an expensive operation, preferably call it at level load time.
+		/// No Spine.Atlas object is created so there is no way to find AtlasRegions except through the Attachments
+		/// using them. Returned <c>Material</c> and <c>Texture</c> behave like <c>new Texture2D()</c>, thus you
+		/// need to call <c>Destroy()</c> to free resources.
+		/// This method caches necessary Texture copies for later re-use, which might steadily increase the texture memory
+		/// footprint when used excessively.
+		/// Set <see cref="RepackAttachmentsSettings.clearCache"/> to <c>true</c> at the argument
+		/// <paramref name="settings"/> or call <see cref="AtlasUtilities.ClearCache()"/> to clear this texture cache.
+		/// You may want to call <c>Resources.UnloadUnusedAssets()</c> after that.
+		/// </para><para>
+		/// This variant of <c>GetRepackedSkin</c> supports repacking blend mode attachments.
+		/// To enable blend mode repacking, assign a reference material at either
+		/// <see cref="RepackAttachmentsSettings.additiveMaterialSource"/>,
+		/// <see cref="RepackAttachmentsSettings.multiplyMaterialSource"/> or
+		/// <see cref="RepackAttachmentsSettings.screenMaterialSource"/> of parameter <paramref name="settings"/>.
+		/// Otherwise any blend mode attachments are treated as normal blend mode and repacked using a single material
+		/// and atlas page.</para>
+		/// </remarks>
+		/// <param name="settings">Repack configuration settings, see <see cref="RepackAttachmentsSettings"/>.</param>
+		/// <param name="output">Repack output struct holding generated material and texture references for
+		/// potential later cleanup.</param>
+		public static Skin GetRepackedSkin (this Skin o, string newName,
+			RepackAttachmentsSettings settings, ref RepackAttachmentsOutput output) {
+
+			if (o == null) throw new System.NullReferenceException("Skin was null");
+			ICollection<Skin.SkinEntry> skinAttachments = o.Attachments;
+			Skin newSkin = new Skin(newName);
+
+			newSkin.Bones.AddRange(o.Bones);
+			newSkin.Constraints.AddRange(o.Constraints);
+
+			inoutAttachments.Clear();
+			foreach (Skin.SkinEntry entry in skinAttachments) {
+				inoutAttachments.Add(entry.Attachment);
+			}
+			GetRepackedAttachments(inoutAttachments, inoutAttachments, settings, ref output);
+			int i = 0;
+			foreach (Skin.SkinEntry originalSkinEntry in skinAttachments) {
+				Attachment newAttachment = inoutAttachments[i++];
+				newSkin.SetAttachment(originalSkinEntry.SlotIndex, originalSkinEntry.Name, newAttachment);
+			}
+			return newSkin;
+		}
+
+		/// <summary>
+		/// Creates and populates a duplicate skin with cloned attachments that are backed by a new packed texture atlas
+		/// comprised of all the regions from the original skin. All blend modes are treated as normal blend mode.
+		/// Use <see cref="GetRepackedSkin(Skin, string, RepackAttachmentsSettings, ref RepackAttachmentsOutput)"/> if
+		/// blend modes shall be retained.
+		/// </summary>
 		/// <remarks>GetRepackedSkin is an expensive operation, preferably call it at level load time.
 		/// No Spine.Atlas object is created so there is no way to find AtlasRegions except through the Attachments using them.
 		/// Returned <c>Material</c> and <c>Texture</c> behave like <c>new Texture2D()</c>, thus you need to call <c>Destroy()</c>
@@ -526,36 +882,36 @@ namespace Spine.Unity.AttachmentTools {
 
 		/// <summary>
 		/// Creates and populates a duplicate skin with cloned attachments that are backed by a new packed texture atlas
-		/// comprised of all the regions from the original skin.</summary>
-		/// See documentation of <see cref="GetRepackedSkin"/> for details.
+		/// comprised of all the regions from the original skin. All blend modes are treated as normal blend mode.
+		/// </summary>
+		/// <remarks>See documentation of <see cref="GetRepackedSkin"/> for details.</remarks>
 		public static Skin GetRepackedSkin (this Skin o, string newName, Shader shader, out Material outputMaterial, out Texture2D outputTexture,
 			int maxAtlasSize = 1024, int padding = 2, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps,
 			Material materialPropertySource = null, bool clearCache = false, bool useOriginalNonrenderables = true,
 			int[] additionalTexturePropertyIDsToCopy = null, Texture2D[] additionalOutputTextures = null,
 			TextureFormat[] additionalTextureFormats = null, bool[] additionalTextureIsLinear = null) {
 
-			outputTexture = null;
+			RepackAttachmentsSettings settings = new RepackAttachmentsSettings {
+				shader = shader,
+				maxAtlasSize = maxAtlasSize,
+				padding = padding,
+				textureFormat = textureFormat,
+				mipmaps = mipmaps,
+				newAssetName = newName,
+				materialPropertySource = materialPropertySource,
+				clearCache = clearCache,
+				useOriginalNonrenderables = useOriginalNonrenderables,
+				additionalTexturePropertyIDsToCopy = additionalTexturePropertyIDsToCopy,
+				additionalTextureFormats = additionalTextureFormats,
+				additionalTextureIsLinear = additionalTextureIsLinear
+			};
+			RepackAttachmentsOutput output = new RepackAttachmentsOutput();
+			output.additionalOutputTextures = additionalOutputTextures;
 
-			if (o == null) throw new System.NullReferenceException("Skin was null");
-			ICollection<Skin.SkinEntry> skinAttachments = o.Attachments;
-			Skin newSkin = new Skin(newName);
-
-			newSkin.Bones.AddRange(o.Bones);
-			newSkin.Constraints.AddRange(o.Constraints);
-
-			inoutAttachments.Clear();
-			foreach (Skin.SkinEntry entry in skinAttachments) {
-				inoutAttachments.Add(entry.Attachment);
-			}
-			GetRepackedAttachments(inoutAttachments, inoutAttachments, materialPropertySource, out outputMaterial, out outputTexture,
-				maxAtlasSize, padding, textureFormat, mipmaps, newName, clearCache, useOriginalNonrenderables,
-				additionalTexturePropertyIDsToCopy, additionalOutputTextures, additionalTextureFormats, additionalTextureIsLinear);
-			int i = 0;
-			foreach (Skin.SkinEntry originalSkinEntry in skinAttachments) {
-				Attachment newAttachment = inoutAttachments[i++];
-				newSkin.SetAttachment(originalSkinEntry.SlotIndex, originalSkinEntry.Name, newAttachment);
-			}
-			return newSkin;
+			Skin repackedSkin = o.GetRepackedSkin(newName, settings, ref output);
+			outputMaterial = output.outputMaterial;
+			outputTexture = output.outputTexture;
+			return repackedSkin;
 		}
 
 		public static Sprite ToSprite (this AtlasRegion ar, float pixelsPerUnit = 100) {
@@ -581,14 +937,15 @@ namespace Spine.Unity.AttachmentTools {
 		/// <summary>
 		/// Frees up textures cached by repacking and remapping operations.
 		///
-		/// Calling <see cref="AttachmentCloneExtensions.GetRemappedClone"/> with parameter <c>premultiplyAlpha=true</c>,
+		/// Calling <see cref="AttachmentRegionExtensions.SetRegion(Attachment, Sprite, Material, bool, bool, bool, bool, TextureFormat, bool)"/>
+		/// with parameter <c>premultiplyAlpha=true</c>,
 		/// <see cref="GetRepackedAttachments"/> or <see cref="GetRepackedSkin"/> will cache textures for later re-use,
 		///	which might steadily increase the texture memory footprint when used excessively.
 		///	You can clear this Texture cache by calling <see cref="AtlasUtilities.ClearCache()"/>.
 		/// You may also want to call <c>Resources.UnloadUnusedAssets()</c> after that. Be aware that while this cleanup
 		/// frees up memory, it is also a costly operation and will likely cause a spike in the framerate.
 		/// Thus it is recommended to perform costly repacking and cleanup operations after e.g. a character customization
-		/// screen has been exited, and if required additionally after a certain number of <c>GetRemappedClone()</c> calls.
+		/// screen has been exited, and if required additionally after a certain number of <c>SetRegion()</c> calls.
 		/// </summary>
 		public static void ClearCache () {
 			foreach (Texture2D t in CachedRegionTexturesList) {
@@ -693,7 +1050,7 @@ namespace Spine.Unity.AttachmentTools {
 		}
 
 		static bool IsRenderable (Attachment a) {
-			return a is IHasTextureRegion;
+			return a is IHasSequence;
 		}
 
 		/// <summary>

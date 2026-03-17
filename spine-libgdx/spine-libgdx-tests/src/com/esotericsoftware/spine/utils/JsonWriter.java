@@ -4,7 +4,7 @@ package com.esotericsoftware.spine.utils;
 import java.util.Locale;
 
 public class JsonWriter {
-	private final StringBuffer buffer = new StringBuffer();
+	private final StringBuilder buffer = new StringBuilder();
 	private int depth = 0;
 	private boolean needsComma = false;
 

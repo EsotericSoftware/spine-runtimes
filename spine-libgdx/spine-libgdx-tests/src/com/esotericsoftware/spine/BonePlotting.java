@@ -30,7 +30,6 @@
 package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.Null;
 
 import com.esotericsoftware.spine.Animation.MixBlend;
 import com.esotericsoftware.spine.Animation.MixDirection;
@@ -48,11 +47,11 @@ public class BonePlotting {
 	static public void main (String[] args) throws Exception {
 		// Create a skeleton loader that doesn't use an atlas and doesn't create any attachments.
 		SkeletonJson json = new SkeletonJson(new AttachmentLoader() {
-			public RegionAttachment newRegionAttachment (Skin skin, String name, String path, @Null Sequence sequence) {
+			public RegionAttachment newRegionAttachment (Skin skin, String name, String path, Sequence sequence) {
 				return null;
 			}
 
-			public MeshAttachment newMeshAttachment (Skin skin, String name, String path, @Null Sequence sequence) {
+			public MeshAttachment newMeshAttachment (Skin skin, String name, String path, Sequence sequence) {
 				return null;
 			}
 

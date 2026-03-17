@@ -2,6 +2,10 @@ name: Check Haxe Formatting
 
 on:
   push:
+    paths:
+      - 'spine-haxe/**'
+      - 'formatters/format-haxe.sh'
+      - '.github/workflows/format-check-haxe.yml'
   workflow_dispatch:
 
 jobs:

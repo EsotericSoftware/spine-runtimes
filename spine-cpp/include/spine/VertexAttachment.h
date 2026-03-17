@@ -96,7 +96,6 @@ namespace spine {
 		Array<int> _bones;
 		Array<float> _vertices;
 		size_t _worldVerticesLength;
-		Attachment *_timelineAttachment;
 
 	private:
 		const int _id;

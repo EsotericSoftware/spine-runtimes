@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -148,7 +148,7 @@ namespace Spine.Unity.Editor {
 
 		protected void PreviewAnimationInScene (AnimationClip clip, float time) {
 			foreach (UnityEngine.Object c in targets) {
-				SkeletonRenderer skeletonRenderer = c as SkeletonRenderer;
+				SkeletonRenderer skeletonRenderer = ((SkeletonMecanim)c).Renderer as SkeletonRenderer;
 				if (skeletonRenderer == null) continue;
 				Skeleton skeleton = skeletonRenderer.Skeleton;
 				SkeletonData skeletonData = skeleton.Data;

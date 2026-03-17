@@ -65,9 +65,10 @@ const spineLoaderExtension: AssetExtension<SkeletonJsonAsset | SkeletonBinaryAss
 		async load (url: string): Promise<SkeletonBinaryAsset> {
 			const response = await settings.ADAPTER.fetch(url);
 
-			const buffer = new Uint8Array(await response.arrayBuffer());
+			if (!response.ok)
+				throw new Error(`[${loaderName}] Failed to fetch ${url}: ${response.status} ${response.statusText}`);
 
-			return buffer;
+			return new Uint8Array(await response.arrayBuffer());
 		},
 		testParse (asset: unknown, options: ResolvedAsset): Promise<boolean> {
 			const isJsonSpineModel = checkExtension(options.src as string, ".json") && isJson(asset);

@@ -194,6 +194,8 @@ SpineSkeletonDataResource::SpineSkeletonDataResource() : default_mix(0), skeleto
 	if (Engine::get_singleton()->is_editor_hint()) {
 		EditorFileSystem *efs = get_editor_file_system();
 		if (efs) {
+			// Store the ObjectID for safe validation in destructor
+			editor_file_system_id = efs->get_instance_id();
 			efs->connect("resources_reimported", callable_mp(this, &SpineSkeletonDataResource::_on_resources_reimported));
 		}
 	}
@@ -201,6 +203,8 @@ SpineSkeletonDataResource::SpineSkeletonDataResource() : default_mix(0), skeleto
 	if (Engine::get_singleton()->is_editor_hint()) {
 		EditorFileSystem *efs = EditorFileSystem::get_singleton();
 		if (efs) {
+			// Store the ObjectID for safe validation in destructor
+			editor_file_system_id = efs->get_instance_id();
 			efs->connect("resources_reimported", this, "_on_resources_reimported");
 		}
 	}
@@ -212,14 +216,14 @@ SpineSkeletonDataResource::~SpineSkeletonDataResource() {
 #ifdef TOOLS_ENABLED
 #if VERSION_MAJOR > 3
 	if (Engine::get_singleton()->is_editor_hint()) {
-		EditorFileSystem *efs = get_editor_file_system();
+		EditorFileSystem *efs = Object::cast_to<EditorFileSystem>(ObjectDB::get_instance(editor_file_system_id));
 		if (efs && efs->is_connected("resources_reimported", callable_mp(this, &SpineSkeletonDataResource::_on_resources_reimported))) {
 			efs->disconnect("resources_reimported", callable_mp(this, &SpineSkeletonDataResource::_on_resources_reimported));
 		}
 	}
 #else
 	if (Engine::get_singleton()->is_editor_hint()) {
-		EditorFileSystem *efs = EditorFileSystem::get_singleton();
+		EditorFileSystem *efs = Object::cast_to<EditorFileSystem>(ObjectDB::get_instance(editor_file_system_id));
 		if (efs && efs->is_connected("resources_reimported", this, "_on_resources_reimported")) {
 			efs->disconnect("resources_reimported", this, "_on_resources_reimported");
 		}

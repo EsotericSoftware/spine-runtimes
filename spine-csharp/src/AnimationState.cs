@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -263,7 +263,7 @@ namespace Spine {
 					for (int ii = 0; ii < timelineCount; ii++) {
 						Timeline timeline = timelines[ii];
 						if (timeline is AttachmentTimeline)
-							ApplyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, blend, attachments);
+							ApplyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, blend, false, attachments);
 						else {
 							timeline.Apply(skeleton, animationLast, applyTime, applyEvents, alpha, blend, MixDirection.In,
 								false);
@@ -274,7 +274,7 @@ namespace Spine {
 
 					bool shortestRotation = current.shortestRotation;
 					bool firstFrame = !shortestRotation && current.timelinesRotation.Count != timelineCount << 1;
-					if (firstFrame) current.timelinesRotation.Resize(timelineCount << 1);
+					if (firstFrame) current.timelinesRotation.EnsureSize(timelineCount << 1);
 					float[] timelinesRotation = current.timelinesRotation.Items;
 
 					for (int ii = 0; ii < timelineCount; ii++) {
@@ -285,7 +285,7 @@ namespace Spine {
 							ApplyRotateTimeline(rotateTimeline, skeleton, applyTime, alpha, timelineBlend, timelinesRotation,
 												ii << 1, firstFrame);
 						else if (timeline is AttachmentTimeline)
-							ApplyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, blend, attachments);
+							ApplyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, blend, false, attachments);
 						else
 							timeline.Apply(skeleton, animationLast, applyTime, applyEvents, alpha, timelineBlend, MixDirection.In, false);
 					}
@@ -390,13 +390,12 @@ namespace Spine {
 
 				bool shortestRotation = from.shortestRotation;
 				bool firstFrame = !shortestRotation && from.timelinesRotation.Count != timelineCount << 1;
-				if (firstFrame) from.timelinesRotation.Resize(timelineCount << 1);
+				if (firstFrame) from.timelinesRotation.EnsureSize(timelineCount << 1);
 				float[] timelinesRotation = from.timelinesRotation.Items;
 
 				from.totalAlpha = 0;
 				for (int i = 0; i < timelineCount; i++) {
 					Timeline timeline = timelines[i];
-					MixDirection direction = MixDirection.Out;
 					MixBlend timelineBlend;
 					float alpha;
 					switch (timelineMode[i]) {
@@ -429,9 +428,10 @@ namespace Spine {
 						ApplyRotateTimeline(rotateTimeline, skeleton, applyTime, alpha, timelineBlend, timelinesRotation, i << 1,
 							firstFrame);
 					} else if (timeline is AttachmentTimeline) {
-						ApplyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, timelineBlend,
+						ApplyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, timelineBlend, true,
 							attachments && alpha >= from.alphaAttachmentThreshold);
 					} else {
+						MixDirection direction = MixDirection.Out;
 						if (drawOrder && timeline is DrawOrderTimeline && timelineBlend == MixBlend.Setup)
 							direction = MixDirection.In;
 						timeline.Apply(skeleton, animationLast, applyTime, events, alpha, timelineBlend, direction, false);
@@ -490,14 +490,16 @@ namespace Spine {
 		/// <param name="attachments">False when: 1) the attachment timeline is mixing out, 2) mix &lt; attachmentThreshold, and 3) the timeline
 		/// is not the last timeline to set the slot's attachment. In that case the timeline is applied only so subsequent
 		/// timelines see any deform.</param>
-		private void ApplyAttachmentTimeline (AttachmentTimeline timeline, Skeleton skeleton, float time, MixBlend blend,
+		private void ApplyAttachmentTimeline (AttachmentTimeline timeline, Skeleton skeleton, float time, MixBlend blend, bool mixOut,
 			bool attachments) {
 
 			Slot slot = skeleton.slots.Items[timeline.SlotIndex];
 			if (!slot.bone.active) return;
 
 			float[] frames = timeline.frames;
-			if (time < frames[0]) { // Time is before first frame.
+			if (mixOut) {
+				if (blend == MixBlend.Setup) SetAttachment(skeleton, slot, slot.data.attachmentName, attachments);
+			} else if (time < frames[0]) { // Time is before first frame.
 				if (blend == MixBlend.Setup || blend == MixBlend.First)
 					SetAttachment(skeleton, slot, slot.data.attachmentName, attachments);
 			} else
@@ -692,8 +694,12 @@ namespace Spine {
 			return SetAnimation(trackIndex, animation, loop);
 		}
 
-		/// <summary>Sets the current animation for a track, discarding any queued animations. If the formerly current track entry was never
-		/// applied to a skeleton, it is replaced (not mixed from).</summary>
+		/// <summary><para>
+		/// Sets the current animation for a track, discarding any queued animations.</para>
+		/// <para>
+		/// If the formerly current track entry is for the same animation and was never applied to a skeleton, it is replaced (not mixed
+		/// from).
+		/// </para></summary>
 		/// <param name="loop">If true, the animation will repeat. If false it will not, instead its last frame is applied if played beyond its
 		///          duration. In either case<see cref="TrackEntry.TrackEnd"/> determines when the track is cleared.</param>
 		/// <returns> A track entry to allow further customization of animation playback. References to the track entry must not be kept
@@ -703,7 +709,7 @@ namespace Spine {
 			bool interrupt = true;
 			TrackEntry current = ExpandToIndex(trackIndex);
 			if (current != null) {
-				if (current.nextTrackLast == -1) {
+				if (current.nextTrackLast == -1 && current.animation == animation) {
 					// Don't mix from an entry that was never applied.
 					tracks.Items[trackIndex] = current.mixingFrom;
 					queue.Interrupt(current);
@@ -827,7 +833,7 @@ namespace Spine {
 
 		private TrackEntry ExpandToIndex (int index) {
 			if (index < tracks.Count) return tracks.Items[index];
-			tracks.Resize(index + 1);
+			tracks.EnsureSize(index + 1);
 			return null;
 		}
 
@@ -898,7 +904,7 @@ namespace Spine {
 			TrackEntry to = entry.mixingTo;
 			Timeline[] timelines = entry.animation.timelines.Items;
 			int timelinesCount = entry.animation.timelines.Count;
-			int[] timelineMode = entry.timelineMode.Resize(timelinesCount).Items;
+			int[] timelineMode = entry.timelineMode.EnsureSize(timelinesCount).Items;
 			entry.timelineHoldMix.Clear();
 			TrackEntry[] timelineHoldMix = entry.timelineHoldMix.Resize(timelinesCount).Items;
 			HashSet<string> propertyIds = this.propertyIds;
@@ -917,7 +923,8 @@ namespace Spine {
 				if (!propertyIds.AddAll(ids))
 					timelineMode[i] = AnimationState.Subsequent;
 				else if (to == null || timeline is AttachmentTimeline || timeline is DrawOrderTimeline
-						|| timeline is EventTimeline || !to.animation.HasTimeline(ids)) {
+						|| timeline is DrawOrderFolderTimeline || timeline is EventTimeline
+						|| !to.animation.HasTimeline(ids)) {
 					timelineMode[i] = AnimationState.First;
 				} else {
 					for (TrackEntry next = to.mixingTo; next != null; next = next.mixingTo) {
@@ -1180,6 +1187,7 @@ namespace Spine {
 		/// Typically track 0 is used to completely pose the skeleton, then alpha is used on higher tracks. It doesn't make sense to
 		/// use alpha on track 0 if the skeleton pose is from the last frame render.</para>
 		/// </summary>
+		/// <seealso cref="AlphaAttachmentThreshold"/>
 		public float Alpha { get { return alpha; } set { alpha = value; } }
 
 		public float InterruptAlpha { get { return interruptAlpha; } }

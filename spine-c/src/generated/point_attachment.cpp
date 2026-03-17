@@ -71,6 +71,16 @@ const char *spine_point_attachment_get_name(spine_point_attachment self) {
 	return _self->getName().buffer();
 }
 
+/*@null*/ spine_attachment spine_point_attachment_get_timeline_attachment(spine_point_attachment self) {
+	PointAttachment *_self = (PointAttachment *) self;
+	return (spine_attachment) _self->getTimelineAttachment();
+}
+
+void spine_point_attachment_set_timeline_attachment(spine_point_attachment self, /*@null*/ spine_attachment attachment) {
+	PointAttachment *_self = (PointAttachment *) self;
+	_self->setTimelineAttachment((Attachment *) attachment);
+}
+
 int spine_point_attachment_get_ref_count(spine_point_attachment self) {
 	PointAttachment *_self = (PointAttachment *) self;
 	return _self->getRefCount();

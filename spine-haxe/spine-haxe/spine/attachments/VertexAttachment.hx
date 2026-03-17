@@ -55,13 +55,8 @@ class VertexAttachment extends Attachment {
 	/** Returns a unique ID for this attachment. */
 	public var id:Int = nextID++;
 
-	/** Timelines for the timeline attachment are also applied to this attachment.
-	 * May be null if no attachment-specific timelines should be applied. */
-	public var timelineAttachment:VertexAttachment;
-
 	public function new(name:String) {
 		super(name);
-		timelineAttachment = this;
 	}
 
 	/** Transforms the attachment's local vertices to world coordinates. If the slot's spine.SlotPose.deform is

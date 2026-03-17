@@ -60,7 +60,11 @@
 #include "core/math/transform_2d.h"
 #include "core/variant/array.h"
 #include "scene/resources/mesh.h"
+#if (VERSION_MAJOR >= 4 && VERSION_MINOR >= 6)
+#include "servers/rendering/rendering_server.h"
+#else
 #include "servers/rendering_server.h"
+#endif
 #include "scene/resources/canvas_item_material.h"
 #if VERSION_MINOR > 0 && defined(TOOLS_ENABLED)
 #include "editor/editor_interface.h"
@@ -869,11 +873,13 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> skeleton_ref) {
 
 		if (attachment->getRTTI().isExactly(spine::RegionAttachment::rtti)) {
 			auto region = (spine::RegionAttachment *) attachment;
+			auto &sequence = region->getSequence();
+			int sequenceIndex = sequence.resolveIndex(slot->getAppliedPose());
 
 			vertices->setSize(8, 0);
-			region->computeWorldVertices(*slot, *vertices, 0);
-			renderer_object = (SpineRendererObject *) ((spine::AtlasRegion *) region->getRegion())->getPage()->texture;
-			uvs = &region->getUVs();
+			region->computeWorldVertices(*slot, sequence.getOffsets(sequenceIndex).buffer(), vertices->buffer(), 0);
+			renderer_object = (SpineRendererObject *) ((spine::AtlasRegion *) sequence.getRegion(sequenceIndex))->getPage()->texture;
+			uvs = &sequence.getUVs(sequenceIndex);
 			indices = &statics.quad_indices;
 
 			auto &attachment_color = region->getColor();
@@ -883,12 +889,14 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> skeleton_ref) {
 			tint.a *= attachment_color.a;
 		} else if (attachment->getRTTI().isExactly(spine::MeshAttachment::rtti)) {
 			auto mesh = (spine::MeshAttachment *) attachment;
+			auto &sequence = mesh->getSequence();
+			int sequenceIndex = sequence.resolveIndex(slot->getAppliedPose());
 
 			vertices->setSize(mesh->getWorldVerticesLength(), 0);
 			mesh->computeWorldVertices(*skeleton, *slot, 0, mesh->getWorldVerticesLength(), vertices->buffer(), 0, 2);
 
-			renderer_object = (SpineRendererObject *) ((spine::AtlasRegion *) mesh->getRegion())->getPage()->texture;
-			uvs = &mesh->getUVs();
+			renderer_object = (SpineRendererObject *) ((spine::AtlasRegion *) sequence.getRegion(sequenceIndex))->getPage()->texture;
+			uvs = &sequence.getUVs(sequenceIndex);
 			indices = &mesh->getTriangles();
 
 			auto &attachment_color = mesh->getColor();
@@ -1054,9 +1062,11 @@ void SpineSprite::draw() {
 			if (!attachment) continue;
 			if (!attachment->getRTTI().isExactly(spine::RegionAttachment::rtti)) continue;
 			auto region = (spine::RegionAttachment *) attachment;
+			auto &sequence = region->getSequence();
+			int sequenceIndex = sequence.resolveIndex(slot->getAppliedPose());
 			auto vertices = &statics.scratch_vertices;
 			vertices->setSize(8, 0);
-			region->computeWorldVertices(*slot, *vertices, 0);
+			region->computeWorldVertices(*slot, sequence.getOffsets(sequenceIndex).buffer(), vertices->buffer(), 0);
 
 			// Render triangles.
 			createLinesFromMesh(statics.scratch_points, statics.quad_indices, vertices);

@@ -41,19 +41,9 @@ public class MeshAttachment: VertexAttachment {
         super.init(fromPointer: UnsafeMutableRawPointer(ptr).assumingMemoryBound(to: spine_vertex_attachment_wrapper.self))
     }
 
-    public convenience init(_ name: String) {
-        let ptr = spine_mesh_attachment_create(name)
+    public convenience init(_ name: String, _ sequence: Sequence?) {
+        let ptr = spine_mesh_attachment_create(name, sequence?._ptr.assumingMemoryBound(to: spine_sequence_wrapper.self))
         self.init(fromPointer: ptr!)
-    }
-
-    public var hullLength: Int32 {
-        get {
-            let result = spine_mesh_attachment_get_hull_length(_ptr.assumingMemoryBound(to: spine_mesh_attachment_wrapper.self))
-            return result
-        }
-        set {
-            spine_mesh_attachment_set_hull_length(_ptr.assumingMemoryBound(to: spine_mesh_attachment_wrapper.self), newValue)
-        }
     }
 
     public var regionUVs: ArrayFloat {
@@ -68,13 +58,6 @@ public class MeshAttachment: VertexAttachment {
         }
     }
 
-    /// The UV pair for each vertex, normalized within the entire texture. See also
-    /// MeshAttachment::updateRegion
-    public var uVs: ArrayFloat {
-        let result = spine_mesh_attachment_get_u_vs(_ptr.assumingMemoryBound(to: spine_mesh_attachment_wrapper.self))
-        return ArrayFloat(fromPointer: result!)
-    }
-
     public var triangles: ArrayUnsignedShort {
         get {
             let result = spine_mesh_attachment_get_triangles(_ptr.assumingMemoryBound(to: spine_mesh_attachment_wrapper.self))
@@ -87,9 +70,19 @@ public class MeshAttachment: VertexAttachment {
         }
     }
 
-    public var color: Color {
-        let result = spine_mesh_attachment_get_color(_ptr.assumingMemoryBound(to: spine_mesh_attachment_wrapper.self))
-        return Color(fromPointer: result!)
+    public var hullLength: Int32 {
+        get {
+            let result = spine_mesh_attachment_get_hull_length(_ptr.assumingMemoryBound(to: spine_mesh_attachment_wrapper.self))
+            return result
+        }
+        set {
+            spine_mesh_attachment_set_hull_length(_ptr.assumingMemoryBound(to: spine_mesh_attachment_wrapper.self), newValue)
+        }
+    }
+
+    public var sequence: Sequence {
+        let result = spine_mesh_attachment_get_sequence(_ptr.assumingMemoryBound(to: spine_mesh_attachment_wrapper.self))
+        return Sequence(fromPointer: result!)
     }
 
     public var path: String {
@@ -102,27 +95,9 @@ public class MeshAttachment: VertexAttachment {
         }
     }
 
-    public var region: TextureRegion? {
-        get {
-            let result = spine_mesh_attachment_get_region(_ptr.assumingMemoryBound(to: spine_mesh_attachment_wrapper.self))
-            return result.map { TextureRegion(fromPointer: $0) }
-        }
-        set {
-            spine_mesh_attachment_set_region(
-                _ptr.assumingMemoryBound(to: spine_mesh_attachment_wrapper.self),
-                newValue?._ptr.assumingMemoryBound(to: spine_texture_region_wrapper.self))
-        }
-    }
-
-    public var sequence: Sequence? {
-        get {
-            let result = spine_mesh_attachment_get_sequence(_ptr.assumingMemoryBound(to: spine_mesh_attachment_wrapper.self))
-            return result.map { Sequence(fromPointer: $0) }
-        }
-        set {
-            spine_mesh_attachment_set_sequence(
-                _ptr.assumingMemoryBound(to: spine_mesh_attachment_wrapper.self), newValue?._ptr.assumingMemoryBound(to: spine_sequence_wrapper.self))
-        }
+    public var color: Color {
+        let result = spine_mesh_attachment_get_color(_ptr.assumingMemoryBound(to: spine_mesh_attachment_wrapper.self))
+        return Color(fromPointer: result!)
     }
 
     public var parentMesh: MeshAttachment? {
@@ -137,7 +112,6 @@ public class MeshAttachment: VertexAttachment {
         }
     }
 
-    /// Nonessential.
     public var edges: ArrayUnsignedShort {
         get {
             let result = spine_mesh_attachment_get_edges(_ptr.assumingMemoryBound(to: spine_mesh_attachment_wrapper.self))
@@ -170,13 +144,22 @@ public class MeshAttachment: VertexAttachment {
         }
     }
 
-    public func updateRegion() {
-        spine_mesh_attachment_update_region(_ptr.assumingMemoryBound(to: spine_mesh_attachment_wrapper.self))
+    public func updateSequence() {
+        spine_mesh_attachment_update_sequence(_ptr.assumingMemoryBound(to: spine_mesh_attachment_wrapper.self))
     }
 
     public func newLinkedMesh() -> MeshAttachment {
         let result = spine_mesh_attachment_new_linked_mesh(_ptr.assumingMemoryBound(to: spine_mesh_attachment_wrapper.self))
         return MeshAttachment(fromPointer: result!)
+    }
+
+    /// Computes UVs for a mesh attachment.
+    ///
+    /// - Parameter uvs: Output array for the computed UVs, same length as regionUVs.
+    public static func computeUVs(_ region: TextureRegion?, _ regionUVs: ArrayFloat, _ uvs: ArrayFloat) {
+        spine_mesh_attachment_compute_u_vs(
+            region?._ptr.assumingMemoryBound(to: spine_texture_region_wrapper.self),
+            regionUVs._ptr.assumingMemoryBound(to: spine_array_float_wrapper.self), uvs._ptr.assumingMemoryBound(to: spine_array_float_wrapper.self))
     }
 
     public func dispose() {

@@ -393,7 +393,7 @@ void Skeleton::getBounds(float &outX, float &outY, float &outWidth, float &outHe
 				RegionAttachment *regionAttachment = static_cast<RegionAttachment *>(attachment);
 				verticesLength = 8;
 				outVertexBuffer.setSize(8, 0);
-				regionAttachment->computeWorldVertices(*slot, outVertexBuffer.buffer(), 0, 2);
+				regionAttachment->computeWorldVertices(*slot, regionAttachment->getOffsets(slot->getAppliedPose()), outVertexBuffer, 0, 2);
 				vertices = outVertexBuffer.buffer();
 				triangles = quadIndices;
 				trianglesLength = 6;

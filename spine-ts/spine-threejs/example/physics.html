@@ -44,10 +44,9 @@
       let controls;
       let lastFrameTime = Date.now() / 1000;
 
-      let pma = true;
       let baseUrl = "/assets/";
       let skeletonFile = "celestial-circus-pro.json";
-      let atlasFile = `celestial-circus${pma ? "-pma" : ""}.atlas`;
+      let atlasFile = `celestial-circus-pma.atlas`;
 
       function init() {
         // create the THREE.JS camera, scene and renderer (WebGL)
@@ -64,7 +63,7 @@
         controls = new OrbitControls(camera, renderer.domElement);
 
         // load the assets required to display the Raptor model
-        assetManager = new spine.AssetManager(baseUrl, undefined, pma);
+        assetManager = new spine.AssetManager(baseUrl);
         assetManager.loadText(skeletonFile);
         assetManager.loadTextureAtlas(atlasFile);
 

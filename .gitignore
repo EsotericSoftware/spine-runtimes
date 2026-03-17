@@ -266,3 +266,4 @@ spine-c/.docker-built
 .cache/
 spine-godot/class_info.txt
 spine-godot/class_meta.json
+spine-ue/DerivedDataCache

@@ -45,8 +45,6 @@
       let controls;
       let lastFrameTime = Date.now() / 1000;
 
-      let pma = false;
-
       let baseUrl = "/assets/";
       let skeletonFile = "raptor-pro.json";
       let atlasFile = "raptor.atlas";
@@ -117,7 +115,7 @@
         scene.add(plane)
 
         // load the assets required to display the Raptor model
-        assetManager = new spine.AssetManager(baseUrl, undefined, pma);
+        assetManager = new spine.AssetManager(baseUrl);
         assetManager.loadText(skeletonFile);
         assetManager.loadTextureAtlas(atlasFile);
 

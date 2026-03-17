@@ -113,11 +113,11 @@ void USpineSkeletonDataAsset::BeginDestroy() {
 class SP_API NullAttachmentLoader : public AttachmentLoader {
 public:
 	virtual RegionAttachment *newRegionAttachment(Skin &skin, const String &name, const String &path, Sequence *sequence) {
-		return new (__FILE__, __LINE__) RegionAttachment(name);
+		return new (__FILE__, __LINE__) RegionAttachment(name, sequence);
 	}
 
 	virtual MeshAttachment *newMeshAttachment(Skin &skin, const String &name, const String &path, Sequence *sequence) {
-		return new (__FILE__, __LINE__) MeshAttachment(name);
+		return new (__FILE__, __LINE__) MeshAttachment(name, sequence);
 	}
 
 	virtual BoundingBoxAttachment *newBoundingBoxAttachment(Skin &skin, const String &name) {

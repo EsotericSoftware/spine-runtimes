@@ -48,6 +48,7 @@ import 'clipping_attachment.dart';
 import 'constraint.dart';
 import 'constraint_data.dart';
 import 'deform_timeline.dart';
+import 'draw_order_folder_timeline.dart';
 import 'draw_order_timeline.dart';
 import 'event.dart';
 import 'event_data.dart';
@@ -2042,6 +2043,9 @@ class ArrayTimeline extends NativeArray<Timeline?> {
       case 'DeformTimeline':
         final castedPtr = SpineBindings.bindings.spine_timeline_cast_to_deform_timeline(buffer[index]);
         return DeformTimeline.fromPointer(castedPtr);
+      case 'DrawOrderFolderTimeline':
+        final castedPtr = SpineBindings.bindings.spine_timeline_cast_to_draw_order_folder_timeline(buffer[index]);
+        return DrawOrderFolderTimeline.fromPointer(castedPtr);
       case 'DrawOrderTimeline':
         final castedPtr = SpineBindings.bindings.spine_timeline_cast_to_draw_order_timeline(buffer[index]);
         return DrawOrderTimeline.fromPointer(castedPtr);

@@ -86,6 +86,7 @@ export 'constraint_timeline.dart';
 export 'constraint_timeline1.dart';
 export 'slot_curve_timeline.dart';
 export 'deform_timeline.dart';
+export 'draw_order_folder_timeline.dart';
 export 'draw_order_timeline.dart';
 export 'event.dart';
 export 'event_data.dart';

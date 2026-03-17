@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -66,12 +66,7 @@ namespace Spine.Unity {
 		#region Inspector
 		public AtlasAssetBase[] atlasAssets = new AtlasAssetBase[0];
 
-#if SPINE_TK2D
-		public tk2dSpriteCollectionData spriteCollection;
-		public float scale = 1f;
-#else
 		public float scale = 0.01f;
-#endif
 		public TextAsset skeletonJSON;
 
 		public bool isUpgradingBlendModeMaterials = false;
@@ -173,17 +168,10 @@ namespace Spine.Unity {
 			//				Clear();
 			//				return null;
 			//			}
-			//			#if !SPINE_TK2D
 			//			if (atlasAssets.Length == 0) {
 			//				Clear();
 			//				return null;
 			//			}
-			//			#else
-			//			if (atlasAssets.Length == 0 && spriteCollection == null) {
-			//				Clear();
-			//				return null;
-			//			}
-			//			#endif
 
 			if (skeletonData != null)
 				return skeletonData;
@@ -192,23 +180,8 @@ namespace Spine.Unity {
 			float skeletonDataScale;
 			Atlas[] atlasArray = this.GetAtlasArray();
 
-#if !SPINE_TK2D
 			attachmentLoader = (atlasArray.Length == 0) ? (AttachmentLoader)new RegionlessAttachmentLoader() : (AttachmentLoader)new AtlasAttachmentLoader(atlasArray);
 			skeletonDataScale = scale;
-#else
-			if (spriteCollection != null) {
-				attachmentLoader = new Spine.Unity.TK2D.SpriteCollectionAttachmentLoader(spriteCollection);
-				skeletonDataScale = (1.0f / (spriteCollection.invOrthoSize * spriteCollection.halfTargetHeight) * scale);
-			} else {
-				if (atlasArray.Length == 0) {
-					Reset();
-					if (!quiet) Debug.LogError("Atlas not set for SkeletonData asset: " + name, this);
-					return null;
-				}
-				attachmentLoader = new AtlasAttachmentLoader(atlasArray);
-				skeletonDataScale = scale;
-			}
-#endif
 
 			bool hasBinaryExtension = skeletonJSON.name.ToLower().Contains(".skel");
 			SkeletonData loadedSkeletonData = null;
@@ -225,8 +198,12 @@ namespace Spine.Unity {
 				} else
 					loadedSkeletonData = SkeletonDataAsset.ReadSkeletonData(skeletonJSON.text, attachmentLoader, skeletonDataScale);
 			} catch (Exception ex) {
-				if (!quiet)
-					Debug.LogError("Error reading skeleton JSON file for SkeletonData asset: " + name + "\n" + ex.Message + "\n" + ex.StackTrace, skeletonJSON);
+				if (!quiet) {
+					string formatString = hasBinaryExtension ? ".skel" : "JSON";
+					string innerExceptionLine = ex.InnerException != null ? ex.InnerException + "\n" : "";
+					Debug.LogError(string.Format("Error reading skeleton {0} file for SkeletonData asset: {1}\n{2}\n{3}{4}",
+						formatString, name, ex.Message, innerExceptionLine, ex.StackTrace), skeletonJSON);
+				}
 			}
 
 #if UNITY_EDITOR

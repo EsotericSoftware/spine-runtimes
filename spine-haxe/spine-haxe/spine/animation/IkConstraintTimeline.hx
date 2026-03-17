@@ -115,27 +115,21 @@ class IkConstraintTimeline extends CurveTimeline implements ConstraintTimeline {
 				softness = getBezierValue(time, i, SOFTNESS, curveType + CurveTimeline.BEZIER_SIZE - CurveTimeline.BEZIER);
 		}
 
-		switch (blend) {
-			case MixBlend.setup:
-				var setup = constraint.data.setup;
-				pose.mix = setup.mix + (mix - setup.mix) * alpha;
-				pose.softness = setup.softness + (softness - setup.softness) * alpha;
-				if (direction == MixDirection.mixOut) {
-					pose.bendDirection = setup.bendDirection;
-					pose.compress = setup.compress;
-					pose.stretch = setup.stretch;
-					return;
-				}
-			case MixBlend.first, MixBlend.replace:
-				pose.mix += (mix - pose.mix) * alpha;
-				pose.softness += (softness - pose.softness) * alpha;
-				if (direction == MixDirection.mixOut)
-					return;
-			case MixBlend.add:
-				pose.mix += mix * alpha;
-				pose.softness += softness * alpha;
-				if (direction == MixDirection.mixOut)
-					return;
+		if (blend == MixBlend.setup) {
+			var setup = constraint.data.setup;
+			pose.mix = setup.mix + (mix - setup.mix) * alpha;
+			pose.softness = setup.softness + (softness - setup.softness) * alpha;
+			if (direction == MixDirection.mixOut) {
+				pose.bendDirection = setup.bendDirection;
+				pose.compress = setup.compress;
+				pose.stretch = setup.stretch;
+				return;
+			}
+		} else {
+			pose.mix += (mix - pose.mix) * alpha;
+			pose.softness += (softness - pose.softness) * alpha;
+			if (direction == MixDirection.mixOut)
+				return;
 		}
 		pose.bendDirection = Std.int(frames[i + BEND_DIRECTION]);
 		pose.compress = frames[i + COMPRESS] != 0;

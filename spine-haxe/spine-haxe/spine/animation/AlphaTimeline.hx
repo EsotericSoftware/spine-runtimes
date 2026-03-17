@@ -62,24 +62,28 @@ class AlphaTimeline extends CurveTimeline1 implements SlotTimeline {
 			return;
 
 		var color = (appliedPose ? slot.applied : slot.pose).color;
+		var a:Float = 0;
 		if (time < frames[0]) {
 			var setup:Color = slot.data.setup.color;
 			switch (blend) {
 				case MixBlend.setup:
 					color.a = setup.a;
+					return;
 				case MixBlend.first:
-					color.a += (setup.a - color.a) * alpha;
+					a = color.a + (setup.a - color.a) * alpha;
+				default:
+					return;
 			}
-			return;
-		}
-
-		var a:Float = getCurveValue(time);
-		if (alpha == 1) {
-			color.a = a;
 		} else {
-			if (blend == MixBlend.setup)
-				color.a = slot.data.setup.color.a;
-			color.a += (a - color.a) * alpha;
+			a = getCurveValue(time);
+			if (alpha != 1) {
+				if (blend == MixBlend.setup) {
+					var setup = slot.data.setup.color;
+					a = setup.a + (a - setup.a) * alpha;
+				} else
+					a = color.a + (a - color.a) * alpha;
+			}
 		}
+		color.a = a < 0 ? 0 : (a > 1 ? 1 : a);
 	}
 }

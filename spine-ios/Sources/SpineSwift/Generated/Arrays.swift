@@ -1985,6 +1985,9 @@ public class ArrayTimeline: NSObject {
             case "DeformTimeline":
                 let castedPtr = spine_timeline_cast_to_deform_timeline(ptr)
                 return DeformTimeline(fromPointer: castedPtr!)
+            case "DrawOrderFolderTimeline":
+                let castedPtr = spine_timeline_cast_to_draw_order_folder_timeline(ptr)
+                return DrawOrderFolderTimeline(fromPointer: castedPtr!)
             case "DrawOrderTimeline":
                 let castedPtr = spine_timeline_cast_to_draw_order_timeline(ptr)
                 return DrawOrderTimeline(fromPointer: castedPtr!)

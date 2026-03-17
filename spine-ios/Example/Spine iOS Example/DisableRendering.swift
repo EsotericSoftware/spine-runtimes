@@ -76,6 +76,11 @@ struct DisableRendering: View {
                     .frame(minHeight: 400)
             }
         }
+        .onDisappear {
+            // SwiftUI may retain the @StateObject controller after the view disappears.
+            // Explicit disposal is only needed here so leak reporting runs after native teardown.
+            controller.dispose()
+        }
         .navigationTitle("Disable Rendering")
         .navigationBarTitleDisplayMode(.inline)
     }

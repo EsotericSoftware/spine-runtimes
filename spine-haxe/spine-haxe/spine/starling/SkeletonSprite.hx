@@ -127,15 +127,18 @@ class SkeletonSprite extends DisplayObject implements IAnimatable {
 				verticesCount = verticesLength >> 1;
 				if (worldVertices.length < verticesLength)
 					worldVertices.resize(verticesLength);
-				region.computeWorldVertices(slot, worldVertices, 0, 2);
+				var sequence = region.sequence;
+				var sequenceIndex = sequence.resolveIndex(pose);
+				region.computeWorldVertices(slot, sequence.offsets[sequenceIndex], worldVertices, 0, 2);
 
 				mesh = null;
+				var regionTexture = sequence.regions[sequenceIndex].texture;
 				if (Std.isOfType(region.rendererObject, SkeletonMesh)) {
 					mesh = cast(region.rendererObject, SkeletonMesh);
-					mesh.texture = region.region.texture;
+					mesh.texture = regionTexture;
 					indices = QUAD_INDICES;
 				} else {
-					mesh = region.rendererObject = new SkeletonMesh(cast(region.region.texture, Texture));
+					mesh = region.rendererObject = new SkeletonMesh(cast(regionTexture, Texture));
 
 					indexData = mesh.getIndexData();
 					indices = QUAD_INDICES;
@@ -148,7 +151,7 @@ class SkeletonSprite extends DisplayObject implements IAnimatable {
 
 				indexData = mesh.getIndexData();
 				attachmentColor = region.color;
-				uvs = region.uvs;
+				uvs = sequence.getUVs(sequenceIndex);
 			} else if (Std.isOfType(attachment, MeshAttachment)) {
 				var meshAttachment:MeshAttachment = cast(attachment, MeshAttachment);
 				verticesLength = meshAttachment.worldVerticesLength;
@@ -157,13 +160,16 @@ class SkeletonSprite extends DisplayObject implements IAnimatable {
 					worldVertices.resize(verticesLength);
 				meshAttachment.computeWorldVertices(skeleton, slot, 0, meshAttachment.worldVerticesLength, worldVertices, 0, 2);
 
+				var sequence = meshAttachment.sequence;
+				var sequenceIndex = sequence.resolveIndex(pose);
 				mesh = null;
+				var regionTexture = sequence.regions[sequenceIndex].texture;
 				if (Std.isOfType(meshAttachment.rendererObject, SkeletonMesh)) {
 					mesh = cast(meshAttachment.rendererObject, SkeletonMesh);
-					mesh.texture = meshAttachment.region.texture;
+					mesh.texture = regionTexture;
 					indices = meshAttachment.triangles;
 				} else {
-					mesh = meshAttachment.rendererObject = new SkeletonMesh(cast(meshAttachment.region.texture, Texture));
+					mesh = meshAttachment.rendererObject = new SkeletonMesh(cast(regionTexture, Texture));
 
 					indexData = mesh.getIndexData();
 					indices = meshAttachment.triangles;
@@ -177,7 +183,7 @@ class SkeletonSprite extends DisplayObject implements IAnimatable {
 
 				indexData = mesh.getIndexData();
 				attachmentColor = meshAttachment.color;
-				uvs = meshAttachment.uvs;
+				uvs = sequence.getUVs(sequenceIndex);
 			} else if (Std.isOfType(attachment, ClippingAttachment)) {
 				var clip:ClippingAttachment = cast(attachment, ClippingAttachment);
 				clipper.clipEnd(slot);

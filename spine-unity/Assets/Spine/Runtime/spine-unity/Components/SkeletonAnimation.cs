@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -35,7 +35,9 @@
 #define BUILT_IN_SPRITE_MASK_COMPONENT
 #endif
 
+#if !SPINE_DISABLE_THREADING
 #define USE_THREADED_ANIMATION_UPDATE
+#endif
 
 #if !SPINE_AUTO_UPGRADE_COMPONENTS_OFF
 #define AUTO_UPGRADE_TO_43_COMPONENTS
@@ -386,6 +388,13 @@ namespace Spine.Unity {
 			}
 		}
 
+#if USE_THREADED_ANIMATION_UPDATE
+		public override float UsedExternalDeltaTime {
+			get {
+				return unscaledTime ? ExternalUnscaledDeltaTime : ExternalDeltaTime;
+			}
+		}
+#endif
 		protected override float DeltaTime {
 			get {
 				return unscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;

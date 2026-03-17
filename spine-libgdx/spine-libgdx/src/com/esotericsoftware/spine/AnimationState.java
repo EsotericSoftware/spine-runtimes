@@ -39,6 +39,7 @@ import com.badlogic.gdx.utils.Pool.Poolable;
 import com.badlogic.gdx.utils.SnapshotArray;
 
 import com.esotericsoftware.spine.Animation.AttachmentTimeline;
+import com.esotericsoftware.spine.Animation.DrawOrderFolderTimeline;
 import com.esotericsoftware.spine.Animation.DrawOrderTimeline;
 import com.esotericsoftware.spine.Animation.EventTimeline;
 import com.esotericsoftware.spine.Animation.MixBlend;
@@ -237,7 +238,7 @@ public class AnimationState {
 				for (int ii = 0; ii < timelineCount; ii++) {
 					Timeline timeline = timelines[ii];
 					if (timeline instanceof AttachmentTimeline attachmentTimeline)
-						applyAttachmentTimeline(attachmentTimeline, skeleton, applyTime, blend, attachments);
+						applyAttachmentTimeline(attachmentTimeline, skeleton, applyTime, blend, false, attachments);
 					else
 						timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, blend, MixDirection.in, false);
 				}
@@ -256,7 +257,7 @@ public class AnimationState {
 						applyRotateTimeline(rotateTimeline, skeleton, applyTime, alpha, timelineBlend, timelinesRotation, ii << 1,
 							firstFrame);
 					} else if (timeline instanceof AttachmentTimeline attachmentTimeline)
-						applyAttachmentTimeline(attachmentTimeline, skeleton, applyTime, blend, attachments);
+						applyAttachmentTimeline(attachmentTimeline, skeleton, applyTime, blend, false, attachments);
 					else
 						timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, timelineBlend, MixDirection.in, false);
 				}
@@ -326,7 +327,6 @@ public class AnimationState {
 			from.totalAlpha = 0;
 			for (int i = 0; i < timelineCount; i++) {
 				Timeline timeline = timelines[i];
-				MixDirection direction = MixDirection.out;
 				MixBlend timelineBlend;
 				float alpha;
 				switch (timelineMode[i]) {
@@ -358,9 +358,10 @@ public class AnimationState {
 					applyRotateTimeline(rotateTimeline, skeleton, applyTime, alpha, timelineBlend, timelinesRotation, i << 1,
 						firstFrame);
 				} else if (timeline instanceof AttachmentTimeline attachmentTimeline)
-					applyAttachmentTimeline(attachmentTimeline, skeleton, applyTime, timelineBlend,
+					applyAttachmentTimeline(attachmentTimeline, skeleton, applyTime, timelineBlend, true,
 						attachments && alpha >= from.alphaAttachmentThreshold);
 				else {
+					MixDirection direction = MixDirection.out;
 					if (drawOrder && timeline instanceof DrawOrderTimeline && timelineBlend == MixBlend.setup)
 						direction = MixDirection.in;
 					timeline.apply(skeleton, animationLast, applyTime, events, alpha, timelineBlend, direction, false);
@@ -380,13 +381,15 @@ public class AnimationState {
 	 * @param attachments False when: 1) the attachment timeline is mixing out, 2) mix < attachmentThreshold, and 3) the timeline
 	 *           is not the last timeline to set the slot's attachment. In that case the timeline is applied only so subsequent
 	 *           timelines see any deform. */
-	private void applyAttachmentTimeline (AttachmentTimeline timeline, Skeleton skeleton, float time, MixBlend blend,
+	private void applyAttachmentTimeline (AttachmentTimeline timeline, Skeleton skeleton, float time, MixBlend blend, boolean out,
 		boolean attachments) {
 
 		Slot slot = skeleton.slots.items[timeline.slotIndex];
 		if (!slot.bone.active) return;
 
-		if (time < timeline.frames[0]) { // Time is before first frame.
+		if (out) {
+			if (blend == MixBlend.setup) setAttachment(skeleton, slot, slot.data.attachmentName, attachments);
+		} else if (time < timeline.frames[0]) { // Time is before first frame.
 			if (blend == MixBlend.setup || blend == MixBlend.first)
 				setAttachment(skeleton, slot, slot.data.attachmentName, attachments);
 		} else
@@ -805,7 +808,8 @@ public class AnimationState {
 			if (!propertyIds.addAll(ids))
 				timelineMode[i] = SUBSEQUENT;
 			else if (to == null || timeline instanceof AttachmentTimeline || timeline instanceof DrawOrderTimeline
-				|| timeline instanceof EventTimeline || !to.animation.hasTimeline(ids)) {
+				|| timeline instanceof DrawOrderFolderTimeline || timeline instanceof EventTimeline
+				|| !to.animation.hasTimeline(ids)) {
 				timelineMode[i] = FIRST;
 			} else {
 				for (TrackEntry next = to.mixingTo; next != null; next = next.mixingTo) {
@@ -1096,7 +1100,8 @@ public class AnimationState {
 		 * to 1, which overwrites the skeleton's current pose with this animation.
 		 * <p>
 		 * Typically track 0 is used to completely pose the skeleton, then alpha is used on higher tracks. It doesn't make sense to
-		 * use alpha on track 0 if the skeleton pose is from the last frame render. */
+		 * use alpha on track 0 if the skeleton pose is from the last frame render.
+		 * @see #getAlphaAttachmentThreshold() */
 		public float getAlpha () {
 			return alpha;
 		}
@@ -1364,8 +1369,8 @@ public class AnimationState {
 			drainDisabled = true;
 
 			SnapshotArray<AnimationStateListener> listenersArray = AnimationState.this.listeners;
-			Object[] objects = this.objects.items;
 			for (int i = 0; i < this.objects.size; i += 2) {
+				Object[] objects = this.objects.items;
 				var type = (EventType)objects[i];
 				var entry = (TrackEntry)objects[i + 1];
 				int nn = listenersArray.size;

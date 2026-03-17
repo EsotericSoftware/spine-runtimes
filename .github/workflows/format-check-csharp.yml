@@ -2,6 +2,13 @@ name: Check C# Formatting
 
 on:
   push:
+    paths:
+      - 'spine-csharp/**'
+      - 'spine-monogame/**'
+      - 'spine-unity/**'
+      - 'formatters/.editorconfig'
+      - 'formatters/format-csharp.sh'
+      - '.github/workflows/format-check-csharp.yml'
   workflow_dispatch:
 
 jobs:

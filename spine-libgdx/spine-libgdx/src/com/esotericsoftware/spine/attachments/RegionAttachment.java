@@ -38,32 +38,31 @@ import com.badlogic.gdx.utils.Null;
 
 import com.esotericsoftware.spine.BonePose;
 import com.esotericsoftware.spine.Slot;
+import com.esotericsoftware.spine.SlotPose;
 
 /** An attachment that displays a textured quadrilateral.
  * <p>
  * See <a href="https://esotericsoftware.com/spine-regions">Region attachments</a> in the Spine User Guide. */
-public class RegionAttachment extends Attachment implements HasTextureRegion {
+public class RegionAttachment extends Attachment implements HasSequence {
 	static public final int BLX = 0, BLY = 1;
 	static public final int ULX = 2, ULY = 3;
 	static public final int URX = 4, URY = 5;
 	static public final int BRX = 6, BRY = 7;
 
-	private TextureRegion region;
+	private final Sequence sequence;
+	float x, y, scaleX = 1, scaleY = 1, rotation, width, height;
 	private String path;
-	private float x, y, scaleX = 1, scaleY = 1, rotation, width, height;
-	private final float[] uvs = new float[8];
-	private final float[] offset = new float[8];
 	private final Color color = new Color(1, 1, 1, 1);
-	private @Null Sequence sequence;
 
-	public RegionAttachment (String name) {
+	public RegionAttachment (String name, Sequence sequence) {
 		super(name);
+		if (sequence == null) throw new IllegalArgumentException("sequence cannot be null.");
+		this.sequence = sequence;
 	}
 
 	/** Copy constructor. */
 	protected RegionAttachment (RegionAttachment other) {
 		super(other);
-		region = other.region;
 		path = other.path;
 		x = other.x;
 		y = other.y;
@@ -72,148 +71,50 @@ public class RegionAttachment extends Attachment implements HasTextureRegion {
 		rotation = other.rotation;
 		width = other.width;
 		height = other.height;
-		arraycopy(other.uvs, 0, uvs, 0, 8);
-		arraycopy(other.offset, 0, offset, 0, 8);
 		color.set(other.color);
-		sequence = other.sequence != null ? new Sequence(other.sequence) : null;
+		sequence = new Sequence(other.sequence);
 	}
 
-	/** Calculates the {@link #offset} and {@link #uvs} using the region and the attachment's transform. Must be called if the
-	 * region, the region's properties, or the transform are changed. */
-	public void updateRegion () {
-		float width = getWidth(), height = getHeight();
-		float localX2 = width / 2;
-		float localY2 = height / 2;
-		float localX = -localX2;
-		float localY = -localY2;
-		boolean rotated = false;
-		if (region instanceof AtlasRegion region) {
-			localX += region.offsetX / region.originalWidth * width;
-			localY += region.offsetY / region.originalHeight * height;
-			if (region.degrees == 90) {
-				rotated = true;
-				localX2 -= (region.originalWidth - region.offsetX - region.packedHeight) / region.originalWidth * width;
-				localY2 -= (region.originalHeight - region.offsetY - region.packedWidth) / region.originalHeight * height;
-			} else {
-				localX2 -= (region.originalWidth - region.offsetX - region.packedWidth) / region.originalWidth * width;
-				localY2 -= (region.originalHeight - region.offsetY - region.packedHeight) / region.originalHeight * height;
-			}
-		}
-		float scaleX = getScaleX(), scaleY = getScaleY();
-		localX *= scaleX;
-		localY *= scaleY;
-		localX2 *= scaleX;
-		localY2 *= scaleY;
-		float r = getRotation() * degRad, cos = cos(r), sin = sin(r);
-		float x = getX(), y = getY();
-		float localXCos = localX * cos + x;
-		float localXSin = localX * sin;
-		float localYCos = localY * cos + y;
-		float localYSin = localY * sin;
-		float localX2Cos = localX2 * cos + x;
-		float localX2Sin = localX2 * sin;
-		float localY2Cos = localY2 * cos + y;
-		float localY2Sin = localY2 * sin;
-		float[] offset = this.offset;
-		offset[BLX] = localXCos - localYSin;
-		offset[BLY] = localYCos + localXSin;
-		offset[ULX] = localXCos - localY2Sin;
-		offset[ULY] = localY2Cos + localXSin;
-		offset[URX] = localX2Cos - localY2Sin;
-		offset[URY] = localY2Cos + localX2Sin;
-		offset[BRX] = localX2Cos - localYSin;
-		offset[BRY] = localYCos + localX2Sin;
-
-		float[] uvs = this.uvs;
-		if (region == null) {
-			uvs[BLX] = 0;
-			uvs[BLY] = 0;
-			uvs[ULX] = 0;
-			uvs[ULY] = 1;
-			uvs[URX] = 1;
-			uvs[URY] = 1;
-			uvs[BRX] = 1;
-			uvs[BRY] = 0;
-		} else if (rotated) {
-			uvs[BLX] = region.getU2();
-			uvs[BLY] = region.getV();
-			uvs[ULX] = region.getU2();
-			uvs[ULY] = region.getV2();
-			uvs[URX] = region.getU();
-			uvs[URY] = region.getV2();
-			uvs[BRX] = region.getU();
-			uvs[BRY] = region.getV();
-		} else {
-			uvs[BLX] = region.getU2();
-			uvs[BLY] = region.getV2();
-			uvs[ULX] = region.getU();
-			uvs[ULY] = region.getV2();
-			uvs[URX] = region.getU();
-			uvs[URY] = region.getV();
-			uvs[BRX] = region.getU2();
-			uvs[BRY] = region.getV();
-		}
-	}
-
-	public void setRegion (TextureRegion region) {
-		if (region == null) throw new IllegalArgumentException("region cannot be null.");
-		this.region = region;
-	}
-
-	public @Null TextureRegion getRegion () {
-		return region;
-	}
-
-	/** Transforms the attachment's four vertices to world coordinates. If the attachment has a {@link #sequence}, the region may
-	 * be changed.
+	/** Transforms the attachment's four vertices to world coordinates.
 	 * <p>
 	 * See <a href="https://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
 	 * Runtimes Guide.
 	 * @param worldVertices The output world vertices. Must have a length >= <code>offset</code> + 8.
+	 * @param vertexOffsets The vertex {@link Sequence#getOffsets(int) offsets}.
 	 * @param offset The <code>worldVertices</code> index to begin writing values.
 	 * @param stride The number of <code>worldVertices</code> entries between the value pairs written. */
-	public void computeWorldVertices (Slot slot, float[] worldVertices, int offset, int stride) {
-		if (sequence != null) sequence.apply(slot.getAppliedPose(), this);
-
-		float[] vertexOffset = this.offset;
+	public void computeWorldVertices (Slot slot, float[] vertexOffsets, float[] worldVertices, int offset, int stride) {
 		BonePose bone = slot.getBone().getAppliedPose();
 		float x = bone.getWorldX(), y = bone.getWorldY();
 		float a = bone.getA(), b = bone.getB(), c = bone.getC(), d = bone.getD();
-		float offsetX, offsetY;
 
-		offsetX = vertexOffset[BRX];
-		offsetY = vertexOffset[BRY];
+		float offsetX = vertexOffsets[BRX];
+		float offsetY = vertexOffsets[BRY];
 		worldVertices[offset] = offsetX * a + offsetY * b + x; // br
 		worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
 		offset += stride;
 
-		offsetX = vertexOffset[BLX];
-		offsetY = vertexOffset[BLY];
+		offsetX = vertexOffsets[BLX];
+		offsetY = vertexOffsets[BLY];
 		worldVertices[offset] = offsetX * a + offsetY * b + x; // bl
 		worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
 		offset += stride;
 
-		offsetX = vertexOffset[ULX];
-		offsetY = vertexOffset[ULY];
+		offsetX = vertexOffsets[ULX];
+		offsetY = vertexOffsets[ULY];
 		worldVertices[offset] = offsetX * a + offsetY * b + x; // ul
 		worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
 		offset += stride;
 
-		offsetX = vertexOffset[URX];
-		offsetY = vertexOffset[URY];
+		offsetX = vertexOffsets[URX];
+		offsetY = vertexOffsets[URY];
 		worldVertices[offset] = offsetX * a + offsetY * b + x; // ur
 		worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
 	}
 
-	/** For each of the 4 vertices, a pair of <code>x,y</code> values that is the local position of the vertex.
-	 * <p>
-	 * See {@link #updateRegion()}. */
-	public float[] getOffset () {
-		return offset;
-	}
-
-	public float[] getUVs () {
-		return uvs;
+	/** Returns the vertex {@link Sequence#getOffsets(int) offsets} for the specified slot pose. */
+	public float[] getOffsets (SlotPose pose) {
+		return sequence.getOffsets(sequence.resolveIndex(pose));
 	}
 
 	/** The local x translation. */
@@ -279,8 +180,12 @@ public class RegionAttachment extends Attachment implements HasTextureRegion {
 		this.height = height;
 	}
 
-	public Color getColor () {
-		return color;
+	public Sequence getSequence () {
+		return sequence;
+	}
+
+	public void updateSequence () {
+		sequence.update(this);
 	}
 
 	public String getPath () {
@@ -291,15 +196,80 @@ public class RegionAttachment extends Attachment implements HasTextureRegion {
 		this.path = path;
 	}
 
-	public @Null Sequence getSequence () {
-		return sequence;
-	}
-
-	public void setSequence (@Null Sequence sequence) {
-		this.sequence = sequence;
+	public Color getColor () {
+		return color;
 	}
 
 	public RegionAttachment copy () {
 		return new RegionAttachment(this);
+	}
+
+	/** Computes {@link Sequence#getUVs(int) UVs} and {@link Sequence#getOffsets(int) offsets} for a region attachment.
+	 * @param uvs Output array for the computed UVs, length of 8.
+	 * @param offset Output array for the computed vertex offsets, length of 8. */
+	static void computeUVs (@Null TextureRegion region, float x, float y, float scaleX, float scaleY, float rotation, float width,
+		float height, float[] offset, float[] uvs) {
+		float localX2 = width / 2, localY2 = height / 2;
+		float localX = -localX2, localY = -localY2;
+		boolean rotated = false;
+		if (region instanceof AtlasRegion r) {
+			localX += r.offsetX / r.originalWidth * width;
+			localY += r.offsetY / r.originalHeight * height;
+			if (r.degrees == 90) {
+				rotated = true;
+				localX2 -= (r.originalWidth - r.offsetX - r.packedHeight) / r.originalWidth * width;
+				localY2 -= (r.originalHeight - r.offsetY - r.packedWidth) / r.originalHeight * height;
+			} else {
+				localX2 -= (r.originalWidth - r.offsetX - r.packedWidth) / r.originalWidth * width;
+				localY2 -= (r.originalHeight - r.offsetY - r.packedHeight) / r.originalHeight * height;
+			}
+		}
+		localX *= scaleX;
+		localY *= scaleY;
+		localX2 *= scaleX;
+		localY2 *= scaleY;
+		float r = rotation * degRad, cos = cos(r), sin = sin(r);
+		float localXCos = localX * cos + x;
+		float localXSin = localX * sin;
+		float localYCos = localY * cos + y;
+		float localYSin = localY * sin;
+		float localX2Cos = localX2 * cos + x;
+		float localX2Sin = localX2 * sin;
+		float localY2Cos = localY2 * cos + y;
+		float localY2Sin = localY2 * sin;
+		offset[BLX] = localXCos - localYSin;
+		offset[BLY] = localYCos + localXSin;
+		offset[ULX] = localXCos - localY2Sin;
+		offset[ULY] = localY2Cos + localXSin;
+		offset[URX] = localX2Cos - localY2Sin;
+		offset[URY] = localY2Cos + localX2Sin;
+		offset[BRX] = localX2Cos - localYSin;
+		offset[BRY] = localYCos + localX2Sin;
+		if (region == null) {
+			uvs[BLX] = 0;
+			uvs[BLY] = 0;
+			uvs[ULX] = 0;
+			uvs[ULY] = 1;
+			uvs[URX] = 1;
+			uvs[URY] = 1;
+			uvs[BRX] = 1;
+			uvs[BRY] = 0;
+		} else {
+			uvs[BLX] = region.getU2();
+			uvs[ULY] = region.getV2();
+			uvs[URX] = region.getU();
+			uvs[BRY] = region.getV();
+			if (rotated) {
+				uvs[BLY] = region.getV();
+				uvs[ULX] = region.getU2();
+				uvs[URY] = region.getV2();
+				uvs[BRX] = region.getU();
+			} else {
+				uvs[BLY] = region.getV2();
+				uvs[ULX] = region.getU();
+				uvs[URY] = region.getV();
+				uvs[BRX] = region.getU2();
+			}
+		}
 	}
 }

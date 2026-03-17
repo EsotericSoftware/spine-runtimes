@@ -45,6 +45,7 @@ namespace spine {
 	/// Stores the setup pose for a Slider
 	class SP_API SliderData : public ConstraintDataGeneric<Slider, SliderPose> {
 		friend class SkeletonBinary;
+		friend class SkeletonData;
 		friend class SkeletonJson;
 		friend class Slider;
 		friend class SliderMixTimeline;

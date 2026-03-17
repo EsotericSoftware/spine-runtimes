@@ -1,11 +1,11 @@
 {
 "skeleton": {
-	"hash": "acq/cF9RZNM",
-	"spine": "4.3.39-beta",
+	"hash": "DFau1C+kFtw",
+	"spine": "4.3.45-beta",
 	"x": -252.71397,
 	"y": -232.55397,
 	"width": 456.70795,
-	"height": 360.68793,
+	"height": 360.6879,
 	"images": "./images/",
 	"audio": null
 },
@@ -63,7 +63,7 @@
 			"_rotation": {
 				"rotate": [
 					{},
-					{ "time": 0.33333334, "value": -120 },
+					{ "time": 0.3333333, "value": -120 },
 					{ "time": 0.6666667, "value": -240 },
 					{ "time": 1, "value": -360 }
 				]

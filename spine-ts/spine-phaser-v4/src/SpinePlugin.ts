@@ -58,7 +58,7 @@ export interface SpineGameObjectConfig extends Phaser.Types.GameObjects.GameObje
  * The scene's {@link LoaderPlugin} (`Scene.load`) gets these additional functions:
  * * `spineBinary(key: string, url: string, xhrSettings?: XHRSettingsObject)`: loads a skeleton binary `.skel` file from the `url`.
  * * `spineJson(key: string, url: string, xhrSettings?: XHRSettingsObject)`: loads a skeleton binary `.skel` file from the `url`.
- * * `spineAtlas(key: string, url: string, premultipliedAlpha: boolean = true, xhrSettings?: XHRSettingsObject)`: loads a texture atlas `.atlas` file from the `url` as well as its correponding texture atlas page images.
+ * * `spineAtlas(key: string, url: string, xhrSettings?: XHRSettingsObject)`: loads a texture atlas `.atlas` file from the `url` as well as its correponding texture atlas page images.
  *
  * The scene's {@link GameObjectFactory} (`Scene.add`) gets these additional functions:
  * * `spine(x: number, y: number, dataKey: string, atlasKey: string, boundsProvider: SpineGameObjectBoundsProvider = SetupPoseBoundsProvider())`:
@@ -70,8 +70,7 @@ export interface SpineGameObjectConfig extends Phaser.Types.GameObjects.GameObje
  * The plugin has additional public methods to work with Spine Runtime core API objects:
  * * `getAtlas(atlasKey: string)`: returns the {@link TextureAtlas} instance for the given atlas key.
  * * `getSkeletonData(skeletonDataKey: string)`: returns the {@link SkeletonData} instance for the given skeleton data key.
- * * `createSkeleton(skeletonDataKey: string, atlasKey: string, premultipliedAlpha: boolean = true)`: creates a new {@link Skeleton} instance from the given skeleton data and atlas key.
- * * `isPremultipliedAlpha(atlasKey: string)`: returns `true` if the atlas with the given key has premultiplied alpha.
+ * * `createSkeleton(atlasKey: string)`: creates a new {@link Skeleton} instance from the given skeleton data and atlas key.
  */
 export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 	game: Phaser.Game;
@@ -116,9 +115,8 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 
 		const atlasFileCallback = function (this: Phaser.Loader.LoaderPlugin, key: string,
 			url: string,
-			premultipliedAlpha: boolean,
 			xhrSettings: Phaser.Types.Loader.XHRSettingsObject) {
-			const file = new SpineAtlasFile(this, key, url, premultipliedAlpha, xhrSettings);
+			const file = new SpineAtlasFile(this, key, url, xhrSettings);
 			this.addFile(file.files);
 			return this;
 		};
@@ -204,35 +202,26 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 
 	/** Returns the TextureAtlas instance for the given key */
 	getAtlas (atlasKey: string) {
-		let atlas: TextureAtlas;
-		if (this.atlasCache.exists(atlasKey)) {
-			atlas = this.atlasCache.get(atlasKey);
+		if (this.atlasCache.exists(atlasKey)) return this.atlasCache.get(atlasKey);
+
+		const atlas = new TextureAtlas(this.game.cache.text.get(atlasKey));
+		if (this.isWebGL && this.gl) {
+			const gl = this.gl;
+			for (const atlasPage of atlas.pages)
+				atlasPage.setTexture(new GLTexture(gl, this.game.textures.get(`${atlasKey}!${atlasPage.name}`).getSourceImage() as HTMLImageElement | ImageBitmap, atlasPage.pma, false));
 		} else {
-			const atlasFile = this.game.cache.text.get(atlasKey) as { data: string, premultipliedAlpha: boolean };
-			atlas = new TextureAtlas(atlasFile.data);
-			if (this.isWebGL && this.gl) {
-				const gl = this.gl;
-				const phaserUnpackPmaValue = gl.getParameter(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL);
-				if (phaserUnpackPmaValue) gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
-				for (const atlasPage of atlas.pages) {
-					atlasPage.setTexture(new GLTexture(gl, this.game.textures.get(`${atlasKey}!${atlasPage.name}`).getSourceImage() as HTMLImageElement | ImageBitmap, false));
-				}
-				if (phaserUnpackPmaValue) gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
-			} else {
-				for (const atlasPage of atlas.pages) {
-					atlasPage.setTexture(new CanvasTexture(this.game.textures.get(`${atlasKey}!${atlasPage.name}`).getSourceImage() as HTMLImageElement | ImageBitmap));
-				}
-			}
-			this.atlasCache.add(atlasKey, atlas);
+			for (const atlasPage of atlas.pages)
+				atlasPage.setTexture(new CanvasTexture(this.game.textures.get(`${atlasKey}!${atlasPage.name}`).getSourceImage() as HTMLImageElement | ImageBitmap));
 		}
+		this.atlasCache.add(atlasKey, atlas);
 		return atlas;
 	}
 
 	/** Returns whether the TextureAtlas uses premultiplied alpha */
 	isAtlasPremultiplied (atlasKey: string) {
-		const atlasFile = this.game.cache.text.get(atlasKey);
-		if (!atlasFile) return false;
-		return atlasFile.premultipliedAlpha;
+		const atlas: TextureAtlas = this.atlasCache.get(atlasKey);
+		if (!atlas || atlas.pages.length === 0) return false;
+		return atlas.pages[0].pma;
 	}
 
 	/** Returns the SkeletonData instance for the given data and atlas key */
@@ -326,17 +315,15 @@ class SpineSkeletonDataFile extends Phaser.Loader.MultiFile {
 interface SpineAtlasFileConfig {
 	key: string;
 	url: string;
-	premultipliedAlpha?: boolean;
 	xhrSettings?: Phaser.Types.Loader.XHRSettingsObject;
 }
 
 class SpineAtlasFile extends Phaser.Loader.MultiFile {
-	constructor (loader: Phaser.Loader.LoaderPlugin, key: string | SpineAtlasFileConfig, url?: string, public premultipliedAlpha?: boolean, xhrSettings?: Phaser.Types.Loader.XHRSettingsObject) {
+	constructor (loader: Phaser.Loader.LoaderPlugin, key: string | SpineAtlasFileConfig, url?: string, xhrSettings?: Phaser.Types.Loader.XHRSettingsObject) {
 		if (typeof key !== "string") {
 			const config = key;
 			key = config.key;
 			url = config.url;
-			premultipliedAlpha = config.premultipliedAlpha;
 			xhrSettings = config.xhrSettings;
 		}
 
@@ -395,11 +382,6 @@ class SpineAtlasFile extends Phaser.Loader.MultiFile {
 						textureManager.addImage(file.key, file.data);
 					}
 				} else {
-					this.premultipliedAlpha = this.premultipliedAlpha ?? (file.data.indexOf("pma: true") >= 0 || file.data.indexOf("pma:true") >= 0);
-					file.data = {
-						data: file.data,
-						premultipliedAlpha: this.premultipliedAlpha,
-					};
 					file.addToCache();
 				}
 			}

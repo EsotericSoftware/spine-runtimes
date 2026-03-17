@@ -1,9 +1,9 @@
 {
 "skeleton": {
-	"hash": "N2gk9CUSu68",
-	"spine": "4.3.39-beta",
+	"hash": "TEE5XFfllls",
+	"spine": "4.3.44-beta",
 	"x": -625.5,
-	"y": -1171.1199,
+	"y": -1171.12,
 	"width": 1251,
 	"height": 909,
 	"images": "./images/",
@@ -11,9 +11,9 @@
 },
 "bones": [
 	{ "name": "root", "y": -974.1199 },
-	{ "name": "sword", "parent": "root", "length": 56.190308, "rotation": 90, "x": 124.54503, "y": 520.16 },
-	{ "name": "stick", "parent": "root", "length": 56.190308, "rotation": 90, "x": -7.184067, "y": 570.25415 },
-	{ "name": "rock", "parent": "root", "length": 35.781616, "rotation": 90, "x": -133.34703, "y": 565.6158 }
+	{ "name": "sword", "parent": "root", "length": 56.19031, "rotation": 90, "x": 124.54503, "y": 520.16 },
+	{ "name": "stick", "parent": "root", "length": 56.19031, "rotation": 90, "x": -7.184067, "y": 570.2542 },
+	{ "name": "rock", "parent": "root", "length": 35.78162, "rotation": 90, "x": -133.34703, "y": 565.6158 }
 ],
 "slots": [
 	{ "name": "ground-bg", "bone": "root", "attachment": "ground-bg" },
@@ -33,13 +33,13 @@
 				"ground-cover": { "x": 132.5, "y": -138, "width": 341, "height": 118 }
 			},
 			"rock": {
-				"rock": { "x": 3.8842163, "y": 3.6529388, "rotation": -90, "width": 88, "height": 75 }
+				"rock": { "x": 3.884216, "y": 3.652939, "rotation": -90, "width": 88, "height": 75 }
 			},
 			"stick": {
 				"stick": { "x": -0.7541504, "y": -7.184067, "rotation": -90, "width": 44, "height": 267 }
 			},
 			"sword": {
-				"sword": { "x": 54.340042, "y": 0.545023, "rotation": -90, "width": 44, "height": 275 }
+				"sword": { "x": 54.34004, "y": 0.545023, "rotation": -90, "width": 44, "height": 275 }
 			}
 		}
 	}

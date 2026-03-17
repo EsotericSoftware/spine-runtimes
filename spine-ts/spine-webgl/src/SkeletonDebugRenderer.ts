@@ -47,7 +47,6 @@ export class SkeletonDebugRenderer implements Disposable {
 	drawPaths = true;
 	drawSkeletonXY = false;
 	drawClipping = true;
-	premultipliedAlpha = false;
 	scale = 1;
 	boneWidth = 2;
 
@@ -66,8 +65,7 @@ export class SkeletonDebugRenderer implements Disposable {
 		const skeletonX = skeleton.x;
 		const skeletonY = skeleton.y;
 		const gl = this.context.gl;
-		const srcFunc = this.premultipliedAlpha ? gl.ONE : gl.SRC_ALPHA;
-		shapes.setBlendMode(srcFunc, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+		shapes.setBlendMode(gl.ONE, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 
 		const bones = skeleton.bones;
 		if (this.drawBones) {
@@ -93,7 +91,8 @@ export class SkeletonDebugRenderer implements Disposable {
 				const attachment = slot.applied.attachment;
 				if (attachment instanceof RegionAttachment) {
 					const vertices = this.vertices;
-					attachment.computeWorldVertices(slot, vertices, 0, 2);
+
+					attachment.computeWorldVertices(slot, attachment.getOffsets(slot.applied), vertices, 0, 2);
 					shapes.line(vertices[0], vertices[1], vertices[2], vertices[3]);
 					shapes.line(vertices[2], vertices[3], vertices[4], vertices[5]);
 					shapes.line(vertices[4], vertices[5], vertices[6], vertices[7]);

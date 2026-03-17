@@ -31,9 +31,9 @@
   },
   "homepage": "https://github.com/esotericsoftware/spine-runtimes#readme",
   "dependencies": {
-    "@esotericsoftware/spine-core": "4.2.82"
+    "@esotericsoftware/spine-canvas": "4.2.82"
   },
   "peerDependencies": {
-    "pixi.js": "^8.12.0"
+    "pixi.js": "^8.16.0"
   }
 }

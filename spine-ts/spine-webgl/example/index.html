@@ -117,36 +117,36 @@
 			if (assetManager.isLoadingComplete()) {
 				skeletons = {
 					coin: {
-						Binary: loadSkeleton("coin-pro.skel", "animation", true),
-						JSON: loadSkeleton("coin-pro.json", "animation", true)
+						Binary: loadSkeleton("coin-pro.skel", "animation"),
+						JSON: loadSkeleton("coin-pro.json", "animation")
 					},
 					goblins: {
-						Binary: loadSkeleton("goblins-pro.skel", "walk", true, "goblin"),
-						JSON: loadSkeleton("goblins-pro.json", "walk", true, "goblin")
+						Binary: loadSkeleton("goblins-pro.skel", "walk", "goblin"),
+						JSON: loadSkeleton("goblins-pro.json", "walk", "goblin")
 					},
 					"mix-and-match-pro": {
-						Binary: loadSkeleton("mix-and-match-pro.skel", "dance", true, "full-skins/girl-blue-cape"),
-						JSON: loadSkeleton("mix-and-match-pro.json", "dance", true, "full-skins/girl-blue-cape")
+						Binary: loadSkeleton("mix-and-match-pro.skel", "dance", "full-skins/girl-blue-cape"),
+						JSON: loadSkeleton("mix-and-match-pro.json", "dance", "full-skins/girl-blue-cape")
 					},
 					raptor: {
-						Binary: loadSkeleton("raptor-pro.skel", "walk", true),
-						JSON: loadSkeleton("raptor-pro.json", "walk", true)
+						Binary: loadSkeleton("raptor-pro.skel", "walk"),
+						JSON: loadSkeleton("raptor-pro.json", "walk")
 					},
 					spineboy: {
-						Binary: loadSkeleton("spineboy-pro.skel", "run", true),
-						JSON: loadSkeleton("spineboy-pro.json", "run", true)
+						Binary: loadSkeleton("spineboy-pro.skel", "run"),
+						JSON: loadSkeleton("spineboy-pro.json", "run")
 					},
 					stretchyman: {
-						Binary: loadSkeleton("stretchyman-pro.skel", "sneak", true),
-						JSON: loadSkeleton("stretchyman-pro.json", "sneak", true)
+						Binary: loadSkeleton("stretchyman-pro.skel", "sneak"),
+						JSON: loadSkeleton("stretchyman-pro.json", "sneak")
 					},
 					tank: {
-						Binary: loadSkeleton("tank-pro.skel", "drive", true),
-						JSON: loadSkeleton("tank-pro.json", "drive", true)
+						Binary: loadSkeleton("tank-pro.skel", "drive"),
+						JSON: loadSkeleton("tank-pro.json", "drive")
 					},
 					vine: {
-						Binary: loadSkeleton("vine-pro.skel", "grow", true),
-						JSON: loadSkeleton("vine-pro.json", "grow", true)
+						Binary: loadSkeleton("vine-pro.skel", "grow"),
+						JSON: loadSkeleton("vine-pro.json", "grow")
 					}
 				};
 				setupUI();
@@ -156,11 +156,11 @@
 				requestAnimationFrame(load);
 		}
 
-		function loadSkeleton(name, initialAnimation, premultipliedAlpha, skin) {
+		function loadSkeleton(name, initialAnimation, skin) {
 			if (skin === undefined) skin = "default";
 
 			// Load the texture atlas using name.atlas from the AssetManager.
-			let atlas = assetManager.require(name.replace(/(?:-ess|-pro)\.(skel|json)/, "") + (premultipliedAlpha ? "-pma" : "") + ".atlas");
+			let atlas = assetManager.require(name.replace(/(?:-ess|-pro)\.(skel|json)/, "") + "-pma.atlas");
 
 			// Create an AtlasAttachmentLoader that resolves region, mesh, boundingbox and path attachments
 			let atlasLoader = new spine.AtlasAttachmentLoader(atlas);
@@ -219,7 +219,7 @@
 			})
 
 			// Pack everything up and return to caller.
-			return { skeleton: skeleton, state: animationState, bounds: bounds, premultipliedAlpha: premultipliedAlpha };
+			return { skeleton: skeleton, state: animationState, bounds: bounds };
 		}
 
 		function calculateSetupPoseBounds(skeleton) {
@@ -318,7 +318,6 @@
 			let skeleton = skeletons[activeSkeleton][format].skeleton;
 			let state = skeletons[activeSkeleton][format].state;
 			let bounds = skeletons[activeSkeleton][format].bounds;
-			let premultipliedAlpha = skeletons[activeSkeleton][format].premultipliedAlpha;
 			state.update(delta);
 			state.apply(skeleton);
 			skeleton.updateWorldTransform(spine.Physics.update);
@@ -331,7 +330,6 @@
 			// Start the batch and tell the SkeletonRenderer to render the active skeleton.
 			batcher.begin(shader);
 
-			skeletonRenderer.premultipliedAlpha = premultipliedAlpha;
 			skeletonRenderer.draw(batcher, skeleton);
 			batcher.end();
 
@@ -342,7 +340,6 @@
 			if (debug) {
 				debugShader.bind();
 				debugShader.setUniform4x4f(spine.Shader.MVP_MATRIX, mvp.values);
-				debugRenderer.premultipliedAlpha = premultipliedAlpha;
 				shapes.begin(debugShader);
 				debugRenderer.draw(shapes, skeleton);
 				shapes.end();

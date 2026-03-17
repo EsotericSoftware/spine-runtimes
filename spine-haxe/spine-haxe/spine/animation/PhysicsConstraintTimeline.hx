@@ -35,6 +35,8 @@ import spine.Skeleton;
 
 /** The base class for most spine.PhysicsConstraint timelines. */
 abstract class PhysicsConstraintTimeline extends ConstraintTimeline1 {
+	public var additive:Bool = false;
+
 	/**
 	 * @param constraintIndex -1 for all physics constraints in the skeleton.
 	 */
@@ -44,6 +46,7 @@ abstract class PhysicsConstraintTimeline extends ConstraintTimeline1 {
 
 	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, blend:MixBlend, direction:MixDirection,
 			appliedPose:Bool) {
+		if (blend == MixBlend.add && !additive) blend = MixBlend.replace;
 		if (constraintIndex == -1) {
 			var value:Float = time >= frames[0] ? getCurveValue(time) : 0;
 			for (constraint in skeleton.physics) {

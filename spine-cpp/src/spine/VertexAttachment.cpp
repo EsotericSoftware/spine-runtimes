@@ -38,7 +38,7 @@ using namespace spine;
 
 RTTI_IMPL(VertexAttachment, Attachment)
 
-VertexAttachment::VertexAttachment(const String &name) : Attachment(name), _worldVerticesLength(0), _timelineAttachment(this), _id(getNextID()) {
+VertexAttachment::VertexAttachment(const String &name) : Attachment(name), _worldVerticesLength(0), _id(getNextID()) {
 }
 
 VertexAttachment::~VertexAttachment() {
@@ -146,11 +146,11 @@ void VertexAttachment::setWorldVerticesLength(size_t inValue) {
 }
 
 Attachment *VertexAttachment::getTimelineAttachment() {
-	return _timelineAttachment;
+	return Attachment::getTimelineAttachment();
 }
 
 void VertexAttachment::setTimelineAttachment(Attachment *attachment) {
-	_timelineAttachment = attachment;
+	Attachment::setTimelineAttachment(attachment);
 }
 
 int VertexAttachment::getNextID() {
@@ -162,5 +162,5 @@ void VertexAttachment::copyTo(VertexAttachment &other) {
 	other._bones.clearAndAddAll(this->_bones);
 	other._vertices.clearAndAddAll(this->_vertices);
 	other._worldVerticesLength = this->_worldVerticesLength;
-	other._timelineAttachment = this->_timelineAttachment;
+	other.setTimelineAttachment(this->getTimelineAttachment());
 }

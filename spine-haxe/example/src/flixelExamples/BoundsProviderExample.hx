@@ -61,7 +61,7 @@ class BoundsProviderExample extends FlxState {
 		var animationStateData = new AnimationStateData(data);
 		animationStateData.defaultMix = 0.25;
 
-		var skeletonSpriteClipping = new SkeletonSprite(data, animationStateData, new SkinsAndAnimationBoundsProvider("portal", null, null, true));
+		var skeletonSpriteClipping = new SkeletonSprite(data, animationStateData, new SkinsAndAnimationBoundsProvider("portal", null, true));
 		skeletonSpriteClipping.state.setAnimationByName(0, "portal", true);
 		skeletonSpriteClipping.screenCenter();
 		skeletonSpriteClipping.x = FlxG.width / 4;

@@ -33,6 +33,7 @@ package spine.animation;
 class PhysicsConstraintGravityTimeline extends PhysicsConstraintTimeline {
 	public function new(frameCount:Int, bezierCount:Int, constraintIndex:Int) {
 		super(frameCount, bezierCount, constraintIndex, Property.physicsConstraintGravity);
+		this.additive = true;
 	}
 
 	public function get(pose:PhysicsConstraintPose):Float {

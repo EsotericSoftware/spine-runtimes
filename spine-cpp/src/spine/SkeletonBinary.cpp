@@ -47,6 +47,7 @@
 #include <spine/ColorTimeline.h>
 #include <spine/ArrayUtils.h>
 #include <spine/DeformTimeline.h>
+#include <spine/DrawOrderFolderTimeline.h>
 #include <spine/DrawOrderTimeline.h>
 #include <spine/Event.h>
 #include <spine/EventData.h>
@@ -340,7 +341,7 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 					data->_slot = slots[input.readInt(true)];
 					int flags = input.read();
 					data->_skinRequired = (flags & 1) != 0;
-					data->_positionMode = (PositionMode) ((flags >> 1) & 2);
+					data->_positionMode = (PositionMode) ((flags >> 1) & 1);
 					data->_spacingMode = (SpacingMode) ((flags >> 2) & 3);
 					data->_rotateMode = (RotateMode) ((flags >> 4) & 3);
 					if ((flags & 128) != 0) data->_offsetRotation = input.readFloat();
@@ -474,9 +475,9 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 				setError("Parent mesh not found: ", linkedMesh->_parent.buffer());
 				return NULL;
 			}
-			linkedMesh->_mesh->_timelineAttachment = linkedMesh->_inheritTimelines ? static_cast<VertexAttachment *>(parent) : linkedMesh->_mesh;
+			linkedMesh->_mesh->setTimelineAttachment(linkedMesh->_inheritTimelines ? static_cast<VertexAttachment *>(parent) : linkedMesh->_mesh);
 			linkedMesh->_mesh->setParentMesh(static_cast<MeshAttachment *>(parent));
-			if (linkedMesh->_mesh->getSequence() == NULL) linkedMesh->_mesh->updateRegion();
+			linkedMesh->_mesh->updateSequence();
 		}
 		ArrayUtils::deleteElements(_linkedMeshes);
 		_linkedMeshes.clear();
@@ -582,7 +583,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput &input, Skin &skin, int slo
 		case AttachmentType_Region: {
 			String path = (flags & 16) != 0 ? input.readStringRef() : name;
 			int color = (flags & 32) != 0 ? input.readInt() : 0xffffffff;
-			Sequence *sequence = (flags & 64) != 0 ? readSequence(input) : nullptr;
+			Sequence *sequence = readSequence(input, (flags & 64) != 0);
 			float rotation = (flags & 128) != 0 ? input.readFloat() : 0;
 			float x = input.readFloat();
 			float y = input.readFloat();
@@ -602,8 +603,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput &input, Skin &skin, int slo
 			region->setWidth(width * scale);
 			region->setHeight(height * scale);
 			Color::rgba8888ToColor(region->getColor(), color);
-			region->setSequence(sequence);
-			if (sequence == NULL) region->updateRegion();
+			region->updateSequence();
 			return region;
 		}
 		case AttachmentType_Boundingbox: {
@@ -623,7 +623,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput &input, Skin &skin, int slo
 		case AttachmentType_Mesh: {
 			String path = (flags & 16) != 0 ? input.readStringRef() : name;
 			int color = (flags & 32) != 0 ? input.readInt() : 0xffffffff;
-			Sequence *sequence = (flags & 64) != 0 ? readSequence(input) : nullptr;
+			Sequence *sequence = readSequence(input, (flags & 64) != 0);
 			int hullLength = input.readInt(true);
 			Array<float> vertices;
 			Array<int> bones;
@@ -645,25 +645,24 @@ Attachment *SkeletonBinary::readAttachment(DataInput &input, Skin &skin, int slo
 			if (!mesh) return NULL;
 			mesh->setPath(path);
 			Color::rgba8888ToColor(mesh->getColor(), color);
+			mesh->setHullLength(hullLength << 1);
 			mesh->setBones(bones);
 			mesh->setVertices(vertices);
 			mesh->setWorldVerticesLength(verticesLength);
-			mesh->setTriangles(triangles);
 			mesh->setRegionUVs(uvs);
-			if (sequence == NULL) mesh->updateRegion();
-			mesh->setHullLength(hullLength << 1);
-			mesh->setSequence(sequence);
+			mesh->setTriangles(triangles);
 			if (nonessential) {
 				mesh->setEdges(edges);
 				mesh->setWidth(width * scale);
 				mesh->setHeight(height * scale);
 			}
+			mesh->updateSequence();
 			return mesh;
 		}
 		case AttachmentType_Linkedmesh: {
 			String path = (flags & 16) != 0 ? input.readStringRef() : name;
 			int color = (flags & 32) != 0 ? input.readInt() : 0xffffffff;
-			Sequence *sequence = (flags & 64) != 0 ? readSequence(input) : nullptr;
+			Sequence *sequence = readSequence(input, (flags & 64) != 0);
 			bool inheritTimelines = (flags & 128) != 0;
 			int skinIndex = input.readInt(true);
 			String parent = input.readStringRef();
@@ -677,7 +676,6 @@ Attachment *SkeletonBinary::readAttachment(DataInput &input, Skin &skin, int slo
 			if (!mesh) return NULL;
 			mesh->setPath(path);
 			Color::rgba8888ToColor(mesh->getColor(), color);
-			mesh->setSequence(sequence);
 			if (nonessential) {
 				mesh->setWidth(width * scale);
 				mesh->setHeight(height * scale);
@@ -741,8 +739,9 @@ Attachment *SkeletonBinary::readAttachment(DataInput &input, Skin &skin, int slo
 	return NULL;
 }
 
-Sequence *SkeletonBinary::readSequence(DataInput &input) {
-	Sequence *sequence = new (__FILE__, __LINE__) Sequence(input.readInt(true));
+Sequence *SkeletonBinary::readSequence(DataInput &input, bool hasPathSuffix) {
+	if (!hasPathSuffix) return new (__FILE__, __LINE__) Sequence(1, false);
+	Sequence *sequence = new (__FILE__, __LINE__) Sequence(input.readInt(true), true);
 	sequence->setStart(input.readInt(true));
 	sequence->setDigits(input.readInt(true));
 	sequence->setSetupIndex(input.readInt(true));
@@ -757,16 +756,17 @@ int SkeletonBinary::readVertices(DataInput &input, Array<float> &vertices, Array
 		readFloatArray(input, verticesLength, scale, vertices.setSize(verticesLength, 0));
 		return verticesLength;
 	}
-	vertices.ensureCapacity(verticesLength * 3 * 3);
-	bones.ensureCapacity(verticesLength * 3);
-	for (int i = 0; i < vertexCount; ++i) {
+	int n = input.readInt(true);
+	bones.setSize(n, 0);
+	vertices.setSize((n - vertexCount) * 3, 0);
+	for (int b = 0, w = 0; b < n;) {
 		int boneCount = input.readInt(true);
-		bones.add(boneCount);
-		for (int ii = 0; ii < boneCount; ++ii) {
-			bones.add(input.readInt(true));
-			vertices.add(input.readFloat() * scale);
-			vertices.add(input.readFloat() * scale);
-			vertices.add(input.readFloat());
+		bones[b++] = boneCount;
+		for (int ii = 0; ii < boneCount; ++ii, w += 3) {
+			bones[b++] = input.readInt(true);
+			vertices[w] = input.readFloat() * scale;
+			vertices[w + 1] = input.readFloat() * scale;
+			vertices[w + 2] = input.readFloat();
 		}
 	}
 	return verticesLength;
@@ -1305,33 +1305,33 @@ Animation *SkeletonBinary::readAnimation(DataInput &input, const String &name, S
 	}
 
 	// Draw order timeline.
+	size_t slotCount = skeletonData._slots.size();
 	size_t drawOrderCount = (size_t) input.readInt(true);
 	if (drawOrderCount > 0) {
 		DrawOrderTimeline *timeline = new (__FILE__, __LINE__) DrawOrderTimeline(drawOrderCount);
-		size_t slotCount = skeletonData._slots.size();
 		for (size_t i = 0; i < drawOrderCount; ++i) {
 			float time = input.readFloat();
-			size_t offsetCount = (size_t) input.readInt(true);
 			Array<int> drawOrder;
-			drawOrder.setSize(slotCount, 0);
-			for (int ii = (int) slotCount - 1; ii >= 0; --ii) drawOrder[ii] = -1;
-			Array<int> unchanged;
-			unchanged.setSize(slotCount - offsetCount, 0);
-			size_t originalIndex = 0, unchangedIndex = 0;
-			for (size_t ii = 0; ii < offsetCount; ++ii) {
-				size_t slotIndex = (size_t) input.readInt(true);
-				// Collect unchanged items.
-				while (originalIndex != slotIndex) unchanged[unchangedIndex++] = (int) originalIndex++;
-				// Set changed items.
-				size_t index = originalIndex;
-				drawOrder[index + (size_t) input.readInt(true)] = (int) originalIndex++;
-			}
-			// Collect remaining unchanged items.
-			while (originalIndex < slotCount) unchanged[unchangedIndex++] = (int) originalIndex++;
-			// Fill in unchanged items.
-			for (int ii = (int) slotCount - 1; ii >= 0; --ii)
-				if (drawOrder[ii] == -1) drawOrder[ii] = unchanged[--unchangedIndex];
-			timeline->setFrame(i, time, &drawOrder);
+			readDrawOrder(input, slotCount, drawOrder);
+			timeline->setFrame(i, time, drawOrder.size() == 0 ? NULL : &drawOrder);
+		}
+		timelines.add(timeline);
+	}
+
+	// Draw order folder timelines.
+	size_t folderCount = (size_t) input.readInt(true);
+	for (size_t i = 0; i < folderCount; ++i) {
+		size_t folderSlotCount = (size_t) input.readInt(true);
+		Array<int> folderSlots;
+		folderSlots.setSize(folderSlotCount, 0);
+		for (size_t ii = 0; ii < folderSlotCount; ++ii) folderSlots[ii] = input.readInt(true);
+		size_t keyCount = (size_t) input.readInt(true);
+		DrawOrderFolderTimeline *timeline = new (__FILE__, __LINE__) DrawOrderFolderTimeline(keyCount, folderSlots, slotCount);
+		for (size_t ii = 0; ii < keyCount; ++ii) {
+			float time = input.readFloat();
+			Array<int> drawOrder;
+			readDrawOrder(input, folderSlotCount, drawOrder);
+			timeline->setFrame(ii, time, drawOrder.size() == 0 ? NULL : &drawOrder);
 		}
 		timelines.add(timeline);
 	}
@@ -1408,6 +1408,27 @@ void SkeletonBinary::readTimeline(DataInput &input, Array<Timeline *> &timelines
 		value2 = nvalue2;
 	}
 	timelines.add(&timeline);
+}
+
+void SkeletonBinary::readDrawOrder(DataInput &input, size_t slotCount, Array<int> &drawOrder) {
+	size_t changeCount = (size_t) input.readInt(true);
+	drawOrder.clear();
+	if (changeCount == 0) return;
+
+	drawOrder.setSize(slotCount, 0);
+	for (int i = (int) slotCount - 1; i >= 0; --i) drawOrder[i] = -1;
+	Array<int> unchanged;
+	unchanged.setSize(slotCount - changeCount, 0);
+	size_t originalIndex = 0, unchangedIndex = 0;
+	for (size_t i = 0; i < changeCount; ++i) {
+		size_t slotIndex = (size_t) input.readInt(true);
+		while (originalIndex != slotIndex) unchanged[unchangedIndex++] = (int) originalIndex++;
+		size_t index = originalIndex;
+		drawOrder[index + (size_t) input.readInt(true)] = (int) originalIndex++;
+	}
+	while (originalIndex < slotCount) unchanged[unchangedIndex++] = (int) originalIndex++;
+	for (int i = (int) slotCount - 1; i >= 0; --i)
+		if (drawOrder[i] == -1) drawOrder[i] = unchanged[--unchangedIndex];
 }
 
 void SkeletonBinary::setBezier(DataInput &input, CurveTimeline &timeline, int bezier, int frame, int value, float time1, float time2, float value1,

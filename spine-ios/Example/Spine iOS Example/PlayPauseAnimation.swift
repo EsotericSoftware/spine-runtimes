@@ -49,6 +49,11 @@ struct PlayPauseAnimation: View {
             controller: controller,
             boundsProvider: SkinAndAnimationBounds(animation: "flying")
         )
+        .onDisappear {
+            // SwiftUI may retain the @StateObject controller after the view disappears.
+            // Explicit disposal is only needed here so leak reporting runs after native teardown.
+            controller.dispose()
+        }
         .navigationTitle("Play/Pause")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

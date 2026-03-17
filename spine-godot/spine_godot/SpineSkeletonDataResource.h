@@ -82,6 +82,10 @@ private:
 	spine::SkeletonData *skeleton_data;
 	spine::AnimationStateData *animation_state_data;
 
+#ifdef TOOLS_ENABLED
+	ObjectID editor_file_system_id;
+#endif
+
 	void update_skeleton_data();
 
 #ifdef SPINE_GODOT_EXTENSION

@@ -71,6 +71,7 @@ class RGBA2Timeline extends SlotCurveTimeline {
 
 	public function apply1(slot:Slot, pose:SlotPose, time:Float, alpha:Float, blend:MixBlend) {
 		var light = pose.color, dark = pose.darkColor;
+		var r2:Float = 0, g2:Float = 0, b2:Float = 0;
 		if (time < frames[0]) {
 			var setup = slot.data.setup;
 			var setupLight = setup.color, setupDark = setup.darkColor;
@@ -80,70 +81,76 @@ class RGBA2Timeline extends SlotCurveTimeline {
 					dark.r = setupDark.r;
 					dark.g = setupDark.g;
 					dark.b = setupDark.b;
+					return;
 				case MixBlend.first:
 					light.add((setupLight.r - light.r) * alpha, (setupLight.g - light.g) * alpha, (setupLight.b - light.b) * alpha,
 						(setupLight.a - light.a) * alpha);
-					dark.r += (setupDark.r - dark.r) * alpha;
-					dark.g += (setupDark.g - dark.g) * alpha;
-					dark.b += (setupDark.b - dark.b) * alpha;
+					r2 = dark.r + (setupDark.r - dark.r) * alpha;
+					g2 = dark.g + (setupDark.g - dark.g) * alpha;
+					b2 = dark.b + (setupDark.b - dark.b) * alpha;
+				default:
+					return;
 			}
-			return;
-		}
-
-		var r:Float = 0, g:Float = 0, b:Float = 0, a:Float = 0, r2:Float = 0, g2:Float = 0, b2:Float = 0;
-		var i:Int = Timeline.search(frames, time, ENTRIES);
-		var curveType:Int = Std.int(curves[i >> 3]);
-		switch (curveType) {
-			case CurveTimeline.LINEAR:
-				var before:Float = frames[i];
-				r = frames[i + R];
-				g = frames[i + G];
-				b = frames[i + B];
-				a = frames[i + A];
-				r2 = frames[i + R2];
-				g2 = frames[i + G2];
-				b2 = frames[i + B2];
-				var t:Float = (time - before) / (frames[i + ENTRIES] - before);
-				r += (frames[i + ENTRIES + R] - r) * t;
-				g += (frames[i + ENTRIES + G] - g) * t;
-				b += (frames[i + ENTRIES + B] - b) * t;
-				a += (frames[i + ENTRIES + A] - a) * t;
-				r2 += (frames[i + ENTRIES + R2] - r2) * t;
-				g2 += (frames[i + ENTRIES + G2] - g2) * t;
-				b2 += (frames[i + ENTRIES + B2] - b2) * t;
-			case CurveTimeline.STEPPED:
-				r = frames[i + R];
-				g = frames[i + G];
-				b = frames[i + B];
-				a = frames[i + A];
-				r2 = frames[i + R2];
-				g2 = frames[i + G2];
-				b2 = frames[i + B2];
-			default:
-				r = getBezierValue(time, i, R, curveType - CurveTimeline.BEZIER);
-				g = getBezierValue(time, i, G, curveType + CurveTimeline.BEZIER_SIZE - CurveTimeline.BEZIER);
-				b = getBezierValue(time, i, B, curveType + CurveTimeline.BEZIER_SIZE * 2 - CurveTimeline.BEZIER);
-				a = getBezierValue(time, i, A, curveType + CurveTimeline.BEZIER_SIZE * 3 - CurveTimeline.BEZIER);
-				r2 = getBezierValue(time, i, R2, curveType + CurveTimeline.BEZIER_SIZE * 4 - CurveTimeline.BEZIER);
-				g2 = getBezierValue(time, i, G2, curveType + CurveTimeline.BEZIER_SIZE * 5 - CurveTimeline.BEZIER);
-				b2 = getBezierValue(time, i, B2, curveType + CurveTimeline.BEZIER_SIZE * 6 - CurveTimeline.BEZIER);
-		}
-
-		if (alpha == 1) {
-			light.set(r, g, b, a);
-			dark.r = r2;
-			dark.g = g2;
-			dark.b = b2;
 		} else {
-			if (blend == MixBlend.setup) {
-				var setup = slot.data.setup;
-				light.setFromColor(setup.color);
-				dark.setFromColor(setup.darkColor);
+			var r:Float = 0, g:Float = 0, b:Float = 0, a:Float = 0;
+			var i:Int = Timeline.search(frames, time, ENTRIES);
+			var curveType:Int = Std.int(curves[i >> 3]);
+			switch (curveType) {
+				case CurveTimeline.LINEAR:
+					var before:Float = frames[i];
+					r = frames[i + R];
+					g = frames[i + G];
+					b = frames[i + B];
+					a = frames[i + A];
+					r2 = frames[i + R2];
+					g2 = frames[i + G2];
+					b2 = frames[i + B2];
+					var t:Float = (time - before) / (frames[i + ENTRIES] - before);
+					r += (frames[i + ENTRIES + R] - r) * t;
+					g += (frames[i + ENTRIES + G] - g) * t;
+					b += (frames[i + ENTRIES + B] - b) * t;
+					a += (frames[i + ENTRIES + A] - a) * t;
+					r2 += (frames[i + ENTRIES + R2] - r2) * t;
+					g2 += (frames[i + ENTRIES + G2] - g2) * t;
+					b2 += (frames[i + ENTRIES + B2] - b2) * t;
+				case CurveTimeline.STEPPED:
+					r = frames[i + R];
+					g = frames[i + G];
+					b = frames[i + B];
+					a = frames[i + A];
+					r2 = frames[i + R2];
+					g2 = frames[i + G2];
+					b2 = frames[i + B2];
+				default:
+					r = getBezierValue(time, i, R, curveType - CurveTimeline.BEZIER);
+					g = getBezierValue(time, i, G, curveType + CurveTimeline.BEZIER_SIZE - CurveTimeline.BEZIER);
+					b = getBezierValue(time, i, B, curveType + CurveTimeline.BEZIER_SIZE * 2 - CurveTimeline.BEZIER);
+					a = getBezierValue(time, i, A, curveType + CurveTimeline.BEZIER_SIZE * 3 - CurveTimeline.BEZIER);
+					r2 = getBezierValue(time, i, R2, curveType + CurveTimeline.BEZIER_SIZE * 4 - CurveTimeline.BEZIER);
+					g2 = getBezierValue(time, i, G2, curveType + CurveTimeline.BEZIER_SIZE * 5 - CurveTimeline.BEZIER);
+					b2 = getBezierValue(time, i, B2, curveType + CurveTimeline.BEZIER_SIZE * 6 - CurveTimeline.BEZIER);
 			}
-			light.add((r - light.r) * alpha, (g - light.g) * alpha, (b - light.b) * alpha, (a - light.a) * alpha);
-			dark.r += (r2 - dark.r) * alpha;
-			dark.g += (g2 - dark.g) * alpha;
-			dark.b += (b2 - dark.b) * alpha;
+
+			if (alpha == 1)
+				light.set(r, g, b, a);
+			else if (blend == MixBlend.setup) {
+				var setupPose = slot.data.setup;
+				var setup = setupPose.color;
+				light.set(setup.r + (r - setup.r) * alpha, setup.g + (g - setup.g) * alpha, setup.b + (b - setup.b) * alpha,
+					setup.a + (a - setup.a) * alpha);
+				setup = setupPose.darkColor;
+				r2 = setup.r + (r2 - setup.r) * alpha;
+				g2 = setup.g + (g2 - setup.g) * alpha;
+				b2 = setup.b + (b2 - setup.b) * alpha;
+			} else {
+				light.add((r - light.r) * alpha, (g - light.g) * alpha, (b - light.b) * alpha, (a - light.a) * alpha);
+				r2 = dark.r + (r2 - dark.r) * alpha;
+				g2 = dark.g + (g2 - dark.g) * alpha;
+				b2 = dark.b + (b2 - dark.b) * alpha;
+			}
 		}
+		dark.r = r2 < 0 ? 0 : (r2 > 1 ? 1 : r2);
+		dark.g = g2 < 0 ? 0 : (g2 > 1 ? 1 : g2);
+		dark.b = b2 < 0 ? 0 : (b2 > 1 ? 1 : b2);
 	}
 }

@@ -43,7 +43,7 @@ import com.badlogic.gdx.utils.ObjectSet;
 
 import com.esotericsoftware.spine.BoneData.Inherit;
 import com.esotericsoftware.spine.attachments.Attachment;
-import com.esotericsoftware.spine.attachments.HasTextureRegion;
+import com.esotericsoftware.spine.attachments.HasSequence;
 import com.esotericsoftware.spine.attachments.Sequence;
 import com.esotericsoftware.spine.attachments.Sequence.SequenceMode;
 import com.esotericsoftware.spine.attachments.VertexAttachment;
@@ -987,8 +987,8 @@ public class Animation {
 		}
 
 		protected void apply (Slot slot, SlotPose pose, float time, float alpha, MixBlend blend) {
-			float[] frames = this.frames;
 			Color color = pose.color;
+			float[] frames = this.frames;
 			if (time < frames[0]) {
 				Color setup = slot.data.setup.color;
 				switch (blend) {
@@ -1031,8 +1031,12 @@ public class Animation {
 			if (alpha == 1)
 				color.set(r, g, b, a);
 			else {
-				if (blend == setup) color.set(slot.data.setup.color);
-				color.add((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha);
+				if (blend == setup) {
+					Color setup = slot.data.setup.color;
+					color.set(setup.r + (r - setup.r) * alpha, setup.g + (g - setup.g) * alpha, setup.b + (b - setup.b) * alpha,
+						setup.a + (a - setup.a) * alpha);
+				} else
+					color.add((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha);
 			}
 		}
 	}
@@ -1062,65 +1066,65 @@ public class Animation {
 		}
 
 		protected void apply (Slot slot, SlotPose pose, float time, float alpha, MixBlend blend) {
-			float[] frames = this.frames;
 			Color color = pose.color;
+			float r, g, b;
+			float[] frames = this.frames;
 			if (time < frames[0]) {
 				Color setup = slot.data.setup.color;
 				switch (blend) {
-				case setup -> {
+				case setup:
 					color.r = setup.r;
 					color.g = setup.g;
 					color.b = setup.b;
+					// Fall through.
+				default:
+					return;
+				case first:
+					r = color.r + (setup.r - color.r) * alpha;
+					g = color.g + (setup.g - color.g) * alpha;
+					b = color.b + (setup.b - color.b) * alpha;
 				}
-				case first -> {
-					color.r += (setup.r - color.r) * alpha;
-					color.g += (setup.g - color.g) * alpha;
-					color.b += (setup.b - color.b) * alpha;
-				}
-				}
-				return;
-			}
-
-			float r, g, b;
-			int i = search(frames, time, ENTRIES), curveType = (int)curves[i >> 2];
-			switch (curveType) {
-			case LINEAR -> {
-				float before = frames[i];
-				r = frames[i + R];
-				g = frames[i + G];
-				b = frames[i + B];
-				float t = (time - before) / (frames[i + ENTRIES] - before);
-				r += (frames[i + ENTRIES + R] - r) * t;
-				g += (frames[i + ENTRIES + G] - g) * t;
-				b += (frames[i + ENTRIES + B] - b) * t;
-			}
-			case STEPPED -> {
-				r = frames[i + R];
-				g = frames[i + G];
-				b = frames[i + B];
-			}
-			default -> {
-				r = getBezierValue(time, i, R, curveType - BEZIER);
-				g = getBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
-				b = getBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
-			}
-			}
-
-			if (alpha == 1) {
-				color.r = r;
-				color.g = g;
-				color.b = b;
 			} else {
-				if (blend == setup) {
-					Color setup = slot.data.setup.color;
-					color.r = setup.r;
-					color.g = setup.g;
-					color.b = setup.b;
+				int i = search(frames, time, ENTRIES), curveType = (int)curves[i >> 2];
+				switch (curveType) {
+				case LINEAR -> {
+					float before = frames[i];
+					r = frames[i + R];
+					g = frames[i + G];
+					b = frames[i + B];
+					float t = (time - before) / (frames[i + ENTRIES] - before);
+					r += (frames[i + ENTRIES + R] - r) * t;
+					g += (frames[i + ENTRIES + G] - g) * t;
+					b += (frames[i + ENTRIES + B] - b) * t;
 				}
-				color.r += (r - color.r) * alpha;
-				color.g += (g - color.g) * alpha;
-				color.b += (b - color.b) * alpha;
+				case STEPPED -> {
+					r = frames[i + R];
+					g = frames[i + G];
+					b = frames[i + B];
+				}
+				default -> {
+					r = getBezierValue(time, i, R, curveType - BEZIER);
+					g = getBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
+					b = getBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
+				}
+				}
+
+				if (alpha != 1) {
+					if (blend == setup) {
+						Color setup = slot.data.setup.color;
+						r = setup.r + (r - setup.r) * alpha;
+						g = setup.g + (g - setup.g) * alpha;
+						b = setup.b + (b - setup.b) * alpha;
+					} else {
+						r = color.r + (r - color.r) * alpha;
+						g = color.g + (g - color.g) * alpha;
+						b = color.b + (b - color.b) * alpha;
+					}
+				}
 			}
+			color.r = r < 0 ? 0 : (r > 1 ? 1 : r);
+			color.g = g < 0 ? 0 : (g > 1 ? 1 : g);
+			color.b = b < 0 ? 0 : (b > 1 ? 1 : b);
 		}
 	}
 
@@ -1144,23 +1148,30 @@ public class Animation {
 			if (!slot.bone.active) return;
 
 			Color color = (appliedPose ? slot.applied : slot.pose).color;
+			float a;
 			float[] frames = this.frames;
 			if (time < frames[0]) {
 				Color setup = slot.data.setup.color;
 				switch (blend) {
-				case setup -> color.a = setup.a;
-				case first -> color.a += (setup.a - color.a) * alpha;
+				case setup:
+					color.a = setup.a;
+					// Fall through.
+				default:
+					return;
+				case first:
+					a = color.a + (setup.a - color.a) * alpha;
 				}
-				return;
+			} else {
+				a = getCurveValue(time);
+				if (alpha != 1) {
+					if (blend == setup) {
+						Color setup = slot.data.setup.color;
+						a = setup.a + (a - setup.a) * alpha;
+					} else
+						a = color.a + (a - color.a) * alpha;
+				}
 			}
-
-			float a = getCurveValue(time);
-			if (alpha == 1)
-				color.a = a;
-			else {
-				if (blend == setup) color.a = slot.data.setup.color.a;
-				color.a += (a - color.a) * alpha;
-			}
+			color.a = a < 0 ? 0 : (a > 1 ? 1 : a);
 		}
 	}
 
@@ -1196,89 +1207,91 @@ public class Animation {
 		}
 
 		protected void apply (Slot slot, SlotPose pose, float time, float alpha, MixBlend blend) {
-			float[] frames = this.frames;
 			Color light = pose.color, dark = pose.darkColor;
+			float r2, g2, b2;
+			float[] frames = this.frames;
 			if (time < frames[0]) {
 				SlotPose setup = slot.data.setup;
 				Color setupLight = setup.color, setupDark = setup.darkColor;
 				switch (blend) {
-				case setup -> {
+				case setup:
 					light.set(setupLight);
 					dark.r = setupDark.r;
 					dark.g = setupDark.g;
 					dark.b = setupDark.b;
-				}
-				case first -> {
+					// Fall through.
+				default:
+					return;
+				case first:
 					light.add((setupLight.r - light.r) * alpha, (setupLight.g - light.g) * alpha, (setupLight.b - light.b) * alpha,
 						(setupLight.a - light.a) * alpha);
-					dark.r += (setupDark.r - dark.r) * alpha;
-					dark.g += (setupDark.g - dark.g) * alpha;
-					dark.b += (setupDark.b - dark.b) * alpha;
+					r2 = dark.r + (setupDark.r - dark.r) * alpha;
+					g2 = dark.g + (setupDark.g - dark.g) * alpha;
+					b2 = dark.b + (setupDark.b - dark.b) * alpha;
 				}
-				}
-				return;
-			}
-
-			float r, g, b, a, r2, g2, b2;
-			int i = search(frames, time, ENTRIES), curveType = (int)curves[i >> 3];
-			switch (curveType) {
-			case LINEAR -> {
-				float before = frames[i];
-				r = frames[i + R];
-				g = frames[i + G];
-				b = frames[i + B];
-				a = frames[i + A];
-				r2 = frames[i + R2];
-				g2 = frames[i + G2];
-				b2 = frames[i + B2];
-				float t = (time - before) / (frames[i + ENTRIES] - before);
-				r += (frames[i + ENTRIES + R] - r) * t;
-				g += (frames[i + ENTRIES + G] - g) * t;
-				b += (frames[i + ENTRIES + B] - b) * t;
-				a += (frames[i + ENTRIES + A] - a) * t;
-				r2 += (frames[i + ENTRIES + R2] - r2) * t;
-				g2 += (frames[i + ENTRIES + G2] - g2) * t;
-				b2 += (frames[i + ENTRIES + B2] - b2) * t;
-			}
-			case STEPPED -> {
-				r = frames[i + R];
-				g = frames[i + G];
-				b = frames[i + B];
-				a = frames[i + A];
-				r2 = frames[i + R2];
-				g2 = frames[i + G2];
-				b2 = frames[i + B2];
-			}
-			default -> {
-				r = getBezierValue(time, i, R, curveType - BEZIER);
-				g = getBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
-				b = getBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
-				a = getBezierValue(time, i, A, curveType + BEZIER_SIZE * 3 - BEZIER);
-				r2 = getBezierValue(time, i, R2, curveType + BEZIER_SIZE * 4 - BEZIER);
-				g2 = getBezierValue(time, i, G2, curveType + BEZIER_SIZE * 5 - BEZIER);
-				b2 = getBezierValue(time, i, B2, curveType + BEZIER_SIZE * 6 - BEZIER);
-			}
-			}
-
-			if (alpha == 1) {
-				light.set(r, g, b, a);
-				dark.r = r2;
-				dark.g = g2;
-				dark.b = b2;
 			} else {
-				if (blend == setup) {
-					SlotPose setup = slot.data.setup;
-					light.set(setup.color);
-					Color setupDark = setup.darkColor;
-					dark.r = setupDark.r;
-					dark.g = setupDark.g;
-					dark.b = setupDark.b;
+				float r, g, b, a;
+				int i = search(frames, time, ENTRIES), curveType = (int)curves[i >> 3];
+				switch (curveType) {
+				case LINEAR -> {
+					float before = frames[i];
+					r = frames[i + R];
+					g = frames[i + G];
+					b = frames[i + B];
+					a = frames[i + A];
+					r2 = frames[i + R2];
+					g2 = frames[i + G2];
+					b2 = frames[i + B2];
+					float t = (time - before) / (frames[i + ENTRIES] - before);
+					r += (frames[i + ENTRIES + R] - r) * t;
+					g += (frames[i + ENTRIES + G] - g) * t;
+					b += (frames[i + ENTRIES + B] - b) * t;
+					a += (frames[i + ENTRIES + A] - a) * t;
+					r2 += (frames[i + ENTRIES + R2] - r2) * t;
+					g2 += (frames[i + ENTRIES + G2] - g2) * t;
+					b2 += (frames[i + ENTRIES + B2] - b2) * t;
 				}
-				light.add((r - light.r) * alpha, (g - light.g) * alpha, (b - light.b) * alpha, (a - light.a) * alpha);
-				dark.r += (r2 - dark.r) * alpha;
-				dark.g += (g2 - dark.g) * alpha;
-				dark.b += (b2 - dark.b) * alpha;
+				case STEPPED -> {
+					r = frames[i + R];
+					g = frames[i + G];
+					b = frames[i + B];
+					a = frames[i + A];
+					r2 = frames[i + R2];
+					g2 = frames[i + G2];
+					b2 = frames[i + B2];
+				}
+				default -> {
+					r = getBezierValue(time, i, R, curveType - BEZIER);
+					g = getBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
+					b = getBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
+					a = getBezierValue(time, i, A, curveType + BEZIER_SIZE * 3 - BEZIER);
+					r2 = getBezierValue(time, i, R2, curveType + BEZIER_SIZE * 4 - BEZIER);
+					g2 = getBezierValue(time, i, G2, curveType + BEZIER_SIZE * 5 - BEZIER);
+					b2 = getBezierValue(time, i, B2, curveType + BEZIER_SIZE * 6 - BEZIER);
+				}
+				}
+
+				if (alpha == 1)
+					light.set(r, g, b, a);
+				else if (blend == setup) {
+					SlotPose setupPose = slot.data.setup;
+					Color setup = setupPose.color;
+					light.set(setup.r + (r - setup.r) * alpha, setup.g + (g - setup.g) * alpha, setup.b + (b - setup.b) * alpha,
+						setup.a + (a - setup.a) * alpha);
+					setup = setupPose.darkColor;
+					r2 = setup.r + (r2 - setup.r) * alpha;
+					g2 = setup.g + (g2 - setup.g) * alpha;
+					b2 = setup.b + (b2 - setup.b) * alpha;
+				} else {
+					light.add((r - light.r) * alpha, (g - light.g) * alpha, (b - light.b) * alpha, (a - light.a) * alpha);
+					r2 = dark.r + (r2 - dark.r) * alpha;
+					g2 = dark.g + (g2 - dark.g) * alpha;
+					b2 = dark.b + (b2 - dark.b) * alpha;
+				}
 			}
+			dark.r = r2 < 0 ? 0 : (r2 > 1 ? 1 : r2);
+			dark.g = g2 < 0 ? 0 : (g2 > 1 ? 1 : g2);
+			dark.b = b2 < 0 ? 0 : (b2 > 1 ? 1 : b2);
 		}
 	}
 
@@ -1312,94 +1325,95 @@ public class Animation {
 		}
 
 		protected void apply (Slot slot, SlotPose pose, float time, float alpha, MixBlend blend) {
-			float[] frames = this.frames;
 			Color light = pose.color, dark = pose.darkColor;
+			float r, g, b, r2, g2, b2;
+			float[] frames = this.frames;
 			if (time < frames[0]) {
 				SlotPose setup = slot.data.setup;
 				Color setupLight = setup.color, setupDark = setup.darkColor;
 				switch (blend) {
-				case setup -> {
+				case setup:
 					light.r = setupLight.r;
 					light.g = setupLight.g;
 					light.b = setupLight.b;
 					dark.r = setupDark.r;
 					dark.g = setupDark.g;
 					dark.b = setupDark.b;
+					// Fall through.
+				default:
+					return;
+				case first:
+					r = light.r + (setupLight.r - light.r) * alpha;
+					g = light.g + (setupLight.g - light.g) * alpha;
+					b = light.b + (setupLight.b - light.b) * alpha;
+					r2 = dark.r + (setupDark.r - dark.r) * alpha;
+					g2 = dark.g + (setupDark.g - dark.g) * alpha;
+					b2 = dark.b + (setupDark.b - dark.b) * alpha;
 				}
-				case first -> {
-					light.r += (setupLight.r - light.r) * alpha;
-					light.g += (setupLight.g - light.g) * alpha;
-					light.b += (setupLight.b - light.b) * alpha;
-					dark.r += (setupDark.r - dark.r) * alpha;
-					dark.g += (setupDark.g - dark.g) * alpha;
-					dark.b += (setupDark.b - dark.b) * alpha;
-				}
-				}
-				return;
-			}
-
-			float r, g, b, r2, g2, b2;
-			int i = search(frames, time, ENTRIES), curveType = (int)curves[i / ENTRIES];
-			switch (curveType) {
-			case LINEAR -> {
-				float before = frames[i];
-				r = frames[i + R];
-				g = frames[i + G];
-				b = frames[i + B];
-				r2 = frames[i + R2];
-				g2 = frames[i + G2];
-				b2 = frames[i + B2];
-				float t = (time - before) / (frames[i + ENTRIES] - before);
-				r += (frames[i + ENTRIES + R] - r) * t;
-				g += (frames[i + ENTRIES + G] - g) * t;
-				b += (frames[i + ENTRIES + B] - b) * t;
-				r2 += (frames[i + ENTRIES + R2] - r2) * t;
-				g2 += (frames[i + ENTRIES + G2] - g2) * t;
-				b2 += (frames[i + ENTRIES + B2] - b2) * t;
-			}
-			case STEPPED -> {
-				r = frames[i + R];
-				g = frames[i + G];
-				b = frames[i + B];
-				r2 = frames[i + R2];
-				g2 = frames[i + G2];
-				b2 = frames[i + B2];
-			}
-			default -> {
-				r = getBezierValue(time, i, R, curveType - BEZIER);
-				g = getBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
-				b = getBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
-				r2 = getBezierValue(time, i, R2, curveType + BEZIER_SIZE * 3 - BEZIER);
-				g2 = getBezierValue(time, i, G2, curveType + BEZIER_SIZE * 4 - BEZIER);
-				b2 = getBezierValue(time, i, B2, curveType + BEZIER_SIZE * 5 - BEZIER);
-			}
-			}
-
-			if (alpha == 1) {
-				light.r = r;
-				light.g = g;
-				light.b = b;
-				dark.r = r2;
-				dark.g = g2;
-				dark.b = b2;
 			} else {
-				if (blend == setup) {
-					SlotPose setup = slot.data.setup;
-					Color setupLight = setup.color, setupDark = setup.darkColor;
-					light.r = setupLight.r;
-					light.g = setupLight.g;
-					light.b = setupLight.b;
-					dark.r = setupDark.r;
-					dark.g = setupDark.g;
-					dark.b = setupDark.b;
+				int i = search(frames, time, ENTRIES), curveType = (int)curves[i / ENTRIES];
+				switch (curveType) {
+				case LINEAR -> {
+					float before = frames[i];
+					r = frames[i + R];
+					g = frames[i + G];
+					b = frames[i + B];
+					r2 = frames[i + R2];
+					g2 = frames[i + G2];
+					b2 = frames[i + B2];
+					float t = (time - before) / (frames[i + ENTRIES] - before);
+					r += (frames[i + ENTRIES + R] - r) * t;
+					g += (frames[i + ENTRIES + G] - g) * t;
+					b += (frames[i + ENTRIES + B] - b) * t;
+					r2 += (frames[i + ENTRIES + R2] - r2) * t;
+					g2 += (frames[i + ENTRIES + G2] - g2) * t;
+					b2 += (frames[i + ENTRIES + B2] - b2) * t;
 				}
-				light.r += (r - light.r) * alpha;
-				light.g += (g - light.g) * alpha;
-				light.b += (b - light.b) * alpha;
-				dark.r += (r2 - dark.r) * alpha;
-				dark.g += (g2 - dark.g) * alpha;
-				dark.b += (b2 - dark.b) * alpha;
+				case STEPPED -> {
+					r = frames[i + R];
+					g = frames[i + G];
+					b = frames[i + B];
+					r2 = frames[i + R2];
+					g2 = frames[i + G2];
+					b2 = frames[i + B2];
+				}
+				default -> {
+					r = getBezierValue(time, i, R, curveType - BEZIER);
+					g = getBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
+					b = getBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
+					r2 = getBezierValue(time, i, R2, curveType + BEZIER_SIZE * 3 - BEZIER);
+					g2 = getBezierValue(time, i, G2, curveType + BEZIER_SIZE * 4 - BEZIER);
+					b2 = getBezierValue(time, i, B2, curveType + BEZIER_SIZE * 5 - BEZIER);
+				}
+				}
+
+				if (alpha != 1) {
+					if (blend == setup) {
+						SlotPose setupPose = slot.data.setup;
+						Color setup = setupPose.color;
+						r = setup.r + (r - setup.r) * alpha;
+						g = setup.g + (g - setup.g) * alpha;
+						b = setup.b + (b - setup.b) * alpha;
+						setup = setupPose.darkColor;
+						r2 = setup.r + (r2 - setup.r) * alpha;
+						g2 = setup.g + (g2 - setup.g) * alpha;
+						b2 = setup.b + (b2 - setup.b) * alpha;
+					} else {
+						r = light.r + (r - light.r) * alpha;
+						g = light.g + (g - light.g) * alpha;
+						b = light.b + (b - light.b) * alpha;
+						r2 = dark.r + (r2 - dark.r) * alpha;
+						g2 = dark.g + (g2 - dark.g) * alpha;
+						b2 = dark.b + (b2 - dark.b) * alpha;
+					}
+				}
 			}
+			light.r = r < 0 ? 0 : (r > 1 ? 1 : r);
+			light.g = g < 0 ? 0 : (g > 1 ? 1 : g);
+			light.b = b < 0 ? 0 : (b > 1 ? 1 : b);
+			dark.r = r2 < 0 ? 0 : (r2 > 1 ? 1 : r2);
+			dark.g = g2 < 0 ? 0 : (g2 > 1 ? 1 : g2);
+			dark.b = b2 < 0 ? 0 : (b2 > 1 ? 1 : b2);
 		}
 	}
 
@@ -1700,13 +1714,12 @@ public class Animation {
 		static private final int MODE = 1, DELAY = 2;
 
 		final int slotIndex;
-		final HasTextureRegion attachment;
+		final HasSequence attachment;
 
 		public SequenceTimeline (int frameCount, int slotIndex, Attachment attachment) {
-			super(frameCount,
-				Property.sequence.ordinal() + "|" + slotIndex + "|" + ((HasTextureRegion)attachment).getSequence().getId());
+			super(frameCount, Property.sequence.ordinal() + "|" + slotIndex + "|" + ((HasSequence)attachment).getSequence().getId());
 			this.slotIndex = slotIndex;
-			this.attachment = (HasTextureRegion)attachment;
+			this.attachment = (HasSequence)attachment;
 		}
 
 		public int getFrameEntries () {
@@ -1717,6 +1730,9 @@ public class Animation {
 			return slotIndex;
 		}
 
+		/** The attachment for which the {@link SlotPose#getSequenceIndex()} will be set.
+		 * <p>
+		 * See {@link VertexAttachment#getTimelineAttachment()}. */
 		public Attachment getAttachment () {
 			return (Attachment)attachment;
 		}
@@ -1739,12 +1755,7 @@ public class Animation {
 			SlotPose pose = appliedPose ? slot.applied : slot.pose;
 
 			Attachment slotAttachment = pose.attachment;
-			if (slotAttachment != attachment) {
-				if (!(slotAttachment instanceof VertexAttachment vertexAttachment)
-					|| vertexAttachment.getTimelineAttachment() != attachment) return;
-			}
-			Sequence sequence = ((HasTextureRegion)slotAttachment).getSequence();
-			if (sequence == null) return;
+			if (!(slotAttachment instanceof HasSequence hasSequence) || slotAttachment.getTimelineAttachment() != attachment) return;
 
 			if (direction == out) {
 				if (blend == setup) pose.setSequenceIndex(-1);
@@ -1762,7 +1773,7 @@ public class Animation {
 			int modeAndIndex = (int)frames[i + MODE];
 			float delay = frames[i + DELAY];
 
-			int index = modeAndIndex >> 4, count = sequence.getRegions().length;
+			int index = modeAndIndex >> 4, count = hasSequence.getSequence().getRegions().length;
 			SequenceMode mode = SequenceMode.values[modeAndIndex & 0xf];
 			if (mode != SequenceMode.hold) {
 				index += (time - before) / delay + 0.0001f;
@@ -1869,8 +1880,7 @@ public class Animation {
 		/** Sets the time and draw order for the specified frame.
 		 * @param frame Between 0 and <code>frameCount</code>, inclusive.
 		 * @param time The frame time in seconds.
-		 * @param drawOrder For each slot in {@link Skeleton#slots}, the index of the slot in the new draw order. May be null to use
-		 *           setup pose draw order. */
+		 * @param drawOrder Ordered {@link Skeleton#slots} indices, or null to use setup pose order. */
 		public void setFrame (int frame, float time, @Null int[] drawOrder) {
 			frames[frame] = time;
 			drawOrders[frame] = drawOrder;
@@ -1898,6 +1908,87 @@ public class Animation {
 				Slot[] drawOrder = skeleton.drawOrder.items;
 				for (int i = 0, n = drawOrderToSetupIndex.length; i < n; i++)
 					drawOrder[i] = slots[drawOrderToSetupIndex[i]];
+			}
+		}
+	}
+
+	/** Changes a subset of a skeleton's {@link Skeleton#getDrawOrder()}. */
+	static public class DrawOrderFolderTimeline extends Timeline {
+		private final int[] slots;
+		private final boolean[] inFolder;
+		private final int[][] drawOrders;
+
+		/** @param slots {@link Skeleton#getSlots()} indices controlled by this timeline, in setup order.
+		 * @param slotCount The maximum number of slots in the skeleton. */
+		public DrawOrderFolderTimeline (int frameCount, int[] slots, int slotCount) {
+			super(frameCount, DrawOrderTimeline.propertyIds);
+			this.slots = slots;
+			drawOrders = new int[frameCount][];
+			inFolder = new boolean[slotCount];
+			for (int i : slots)
+				inFolder[i] = true;
+		}
+
+		public int getFrameCount () {
+			return frames.length;
+		}
+
+		/** The {@link Skeleton#getSlots()} indices that this timeline affects, in setup order. */
+		public int[] getSlots () {
+			return slots;
+		}
+
+		/** The draw order for each frame. See {@link #setFrame(int, float, int[])}. */
+		public int[][] getDrawOrders () {
+			return drawOrders;
+		}
+
+		/** Sets the time and draw order for the specified frame.
+		 * @param frame Between 0 and <code>frameCount</code>, inclusive.
+		 * @param time The frame time in seconds.
+		 * @param drawOrder Ordered {@link #getSlots()} indices, or null to use setup pose order. */
+		public void setFrame (int frame, float time, @Null int[] drawOrder) {
+			frames[frame] = time;
+			drawOrders[frame] = drawOrder;
+		}
+
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
+			MixDirection direction, boolean appliedPose) {
+
+			if (direction == out) {
+				if (blend == setup) setup(skeleton);
+			} else if (time < frames[0]) {
+				if (blend == setup || blend == first) setup(skeleton);
+			} else {
+				int[] order = drawOrders[search(frames, time)];
+				if (order == null)
+					setup(skeleton);
+				else
+					apply(skeleton, order);
+			}
+		}
+
+		private void setup (Skeleton skeleton) {
+			boolean[] inFolder = this.inFolder;
+			Slot[] drawOrder = skeleton.drawOrder.items, allSlots = skeleton.slots.items;
+			int[] slots = this.slots;
+			for (int i = 0, found = 0, done = slots.length;; i++) {
+				if (inFolder[drawOrder[i].data.index]) {
+					drawOrder[i] = allSlots[slots[found]];
+					if (++found == done) break;
+				}
+			}
+		}
+
+		private void apply (Skeleton skeleton, int[] order) {
+			boolean[] inFolder = this.inFolder;
+			Slot[] drawOrder = skeleton.drawOrder.items, allSlots = skeleton.slots.items;
+			int[] slots = this.slots;
+			for (int i = 0, found = 0, done = slots.length;; i++) {
+				if (inFolder[drawOrder[i].data.index]) {
+					drawOrder[i] = allSlots[slots[order[found]]];
+					if (++found == done) break;
+				}
 			}
 		}
 	}
@@ -1995,8 +2086,7 @@ public class Animation {
 			}
 			}
 
-			switch (blend) {
-			case setup -> {
+			if (blend == setup) {
 				IkConstraintPose setup = constraint.data.setup;
 				pose.mix = setup.mix + (mix - setup.mix) * alpha;
 				pose.softness = setup.softness + (softness - setup.softness) * alpha;
@@ -2006,17 +2096,10 @@ public class Animation {
 					pose.stretch = setup.stretch;
 					return;
 				}
-			}
-			case first, replace -> {
+			} else {
 				pose.mix += (mix - pose.mix) * alpha;
 				pose.softness += (softness - pose.softness) * alpha;
 				if (direction == out) return;
-			}
-			case add -> {
-				pose.mix += mix * alpha;
-				pose.softness += softness * alpha;
-				if (direction == out) return;
-			}
 			}
 			pose.bendDirection = (int)frames[i + BEND_DIRECTION];
 			pose.compress = frames[i + COMPRESS] != 0;
@@ -2201,7 +2284,8 @@ public class Animation {
 			var constraint = (PathConstraint)skeleton.constraints.items[constraintIndex];
 			if (constraint.active) {
 				PathConstraintPose pose = appliedPose ? constraint.applied : constraint.pose;
-				pose.spacing = getAbsoluteValue(time, alpha, blend, pose.spacing, constraint.data.setup.spacing);
+				pose.spacing = getAbsoluteValue(time, alpha, blend == add ? replace : blend, pose.spacing,
+					constraint.data.setup.spacing);
 			}
 		}
 	}
@@ -2288,29 +2372,23 @@ public class Animation {
 			}
 			}
 
-			switch (blend) {
-			case setup -> {
+			if (blend == setup) {
 				PathConstraintPose setup = constraint.data.setup;
 				pose.mixRotate = setup.mixRotate + (rotate - setup.mixRotate) * alpha;
 				pose.mixX = setup.mixX + (x - setup.mixX) * alpha;
 				pose.mixY = setup.mixY + (y - setup.mixY) * alpha;
-			}
-			case first, replace -> {
+			} else {
 				pose.mixRotate += (rotate - pose.mixRotate) * alpha;
 				pose.mixX += (x - pose.mixX) * alpha;
 				pose.mixY += (y - pose.mixY) * alpha;
-			}
-			case add -> {
-				pose.mixRotate += rotate * alpha;
-				pose.mixX += x * alpha;
-				pose.mixY += y * alpha;
-			}
 			}
 		}
 	}
 
 	/** The base class for most {@link PhysicsConstraint} timelines. */
 	static abstract public class PhysicsConstraintTimeline extends ConstraintTimeline1 {
+		boolean additive;
+
 		/** @param constraintIndex -1 for all physics constraints in the skeleton. */
 		public PhysicsConstraintTimeline (int frameCount, int bezierCount, int constraintIndex, Property property) {
 			super(frameCount, bezierCount, constraintIndex, property);
@@ -2319,6 +2397,7 @@ public class Animation {
 		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
 			MixDirection direction, boolean appliedPose) {
 
+			if (blend == add && !additive) blend = replace;
 			if (constraintIndex == -1) {
 				float value = time >= frames[0] ? getCurveValue(time) : 0;
 				PhysicsConstraint[] constraints = skeleton.physics.items;
@@ -2425,6 +2504,7 @@ public class Animation {
 	static public class PhysicsConstraintWindTimeline extends PhysicsConstraintTimeline {
 		public PhysicsConstraintWindTimeline (int frameCount, int bezierCount, int constraintIndex) {
 			super(frameCount, bezierCount, constraintIndex, Property.physicsConstraintWind);
+			additive = true;
 		}
 
 		protected float get (PhysicsConstraintPose pose) {
@@ -2444,6 +2524,7 @@ public class Animation {
 	static public class PhysicsConstraintGravityTimeline extends PhysicsConstraintTimeline {
 		public PhysicsConstraintGravityTimeline (int frameCount, int bezierCount, int constraintIndex) {
 			super(frameCount, bezierCount, constraintIndex, Property.physicsConstraintGravity);
+			additive = true;
 		}
 
 		protected float get (PhysicsConstraintPose pose) {

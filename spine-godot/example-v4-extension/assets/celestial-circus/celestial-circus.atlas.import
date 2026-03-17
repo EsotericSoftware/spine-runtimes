@@ -13,3 +13,4 @@ dest_files=["res://.godot/imported/celestial-circus.atlas-8277f39286d729eed930dc
 [params]
 
 normal_map_prefix="n"
+specular_map_prefix="s"

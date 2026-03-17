@@ -100,8 +100,8 @@ var tankDemo = function (canvas, bgColor) {
 		gl.clear(gl.COLOR_BUFFER_BIT);
 
 		renderer.begin();
-		renderer.drawSkeleton(skeleton, true);
-		renderer.drawSkeletonDebug(skeleton, true);
+		renderer.drawSkeleton(skeleton);
+		renderer.drawSkeletonDebug(skeleton);
 		renderer.end();
 	}
 

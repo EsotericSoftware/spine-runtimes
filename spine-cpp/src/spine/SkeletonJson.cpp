@@ -47,6 +47,7 @@
 #include <spine/ColorTimeline.h>
 #include <spine/ArrayUtils.h>
 #include <spine/DeformTimeline.h>
+#include <spine/DrawOrderFolderTimeline.h>
 #include <spine/DrawOrderTimeline.h>
 #include <spine/Event.h>
 #include <spine/EventData.h>
@@ -559,9 +560,9 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 		if (skin == NULL) SKELETON_JSON_ERROR(root, "Skin not found: ", linkedMesh->_skin.buffer());
 		Attachment *parent = skin->getAttachment(linkedMesh->_slotIndex, linkedMesh->_parent);
 		if (parent == NULL) SKELETON_JSON_ERROR(root, "Parent mesh not found: ", linkedMesh->_parent.buffer());
-		linkedMesh->_mesh->_timelineAttachment = linkedMesh->_inheritTimelines ? static_cast<VertexAttachment *>(parent) : linkedMesh->_mesh;
+		linkedMesh->_mesh->setTimelineAttachment(linkedMesh->_inheritTimelines ? static_cast<VertexAttachment *>(parent) : linkedMesh->_mesh);
 		linkedMesh->_mesh->setParentMesh(static_cast<MeshAttachment *>(parent));
-		if (linkedMesh->_mesh->_region != NULL) linkedMesh->_mesh->updateRegion();
+		linkedMesh->_mesh->updateSequence();
 	}
 	ArrayUtils::deleteElements(_linkedMeshes);
 	_linkedMeshes.clear();
@@ -639,12 +640,11 @@ Attachment *SkeletonJson::readAttachment(Json *map, Skin *skin, int slotIndex, c
 			region->setRotation(Json::getFloat(map, "rotation", 0));
 			region->setWidth(Json::getFloat(map, "width", 0) * scale);
 			region->setHeight(Json::getFloat(map, "height", 0) * scale);
-			region->setSequence(sequence);
 
 			const char *color = Json::getString(map, "color", NULL);
 			if (color) Color::valueOf(color, region->getColor());
 
-			if (region->_region != NULL) region->updateRegion();
+			region->updateSequence();
 			return region;
 		}
 		case AttachmentType_Boundingbox: {
@@ -669,7 +669,6 @@ Attachment *SkeletonJson::readAttachment(Json *map, Skin *skin, int slotIndex, c
 
 			mesh->setWidth(Json::getFloat(map, "width", 0) * scale);
 			mesh->setHeight(Json::getFloat(map, "height", 0) * scale);
-			mesh->setSequence(sequence);
 
 			const char *parent = Json::getString(map, "parent", NULL);
 			if (parent) {
@@ -686,12 +685,13 @@ Attachment *SkeletonJson::readAttachment(Json *map, Skin *skin, int slotIndex, c
 			if (!Json::asUnsignedShortArray(Json::getItem(map, "triangles"), triangles)) return NULL;
 			mesh->_triangles.clearAndAddAll(triangles);
 			mesh->_regionUVs.clearAndAddAll(uvs);
-			if (mesh->_region != NULL) mesh->updateRegion();
 
 			if (Json::getInt(map, "hull", 0)) mesh->setHullLength(Json::getInt(map, "hull", 0) << 1);
 			Array<unsigned short> edges;
 			Json::asUnsignedShortArray(Json::getItem(map, "edges"), edges);
 			if (edges.size() > 0) mesh->_edges.clearAndAddAll(edges);
+
+			mesh->updateSequence();
 			return mesh;
 		}
 		case AttachmentType_Path: {
@@ -744,8 +744,8 @@ Attachment *SkeletonJson::readAttachment(Json *map, Skin *skin, int slotIndex, c
 }
 
 Sequence *SkeletonJson::readSequence(Json *item) {
-	if (item == NULL) return NULL;
-	Sequence *sequence = new Sequence(Json::getInt(item, "count", 0));
+	if (item == NULL) return new (__FILE__, __LINE__) Sequence(1, false);
+	Sequence *sequence = new (__FILE__, __LINE__) Sequence(Json::getInt(item, "count", 0), true);
 	sequence->_start = Json::getInt(item, "start", 1);
 	sequence->_digits = Json::getInt(item, "digits", 0);
 	sequence->_setupIndex = Json::getInt(item, "setup", 0);
@@ -1243,8 +1243,13 @@ Animation *SkeletonJson::readAnimation(Json *map, SkeletonData *skeletonData) {
 			return NULL;
 		}
 		for (Json *slotMap = attachmentsMap->_child; slotMap; slotMap = slotMap->_next) {
-			int slotIndex = findSlotIndex(skeletonData, slotMap->_name, timelines);
-			if (slotIndex == -1) return NULL;
+			SlotData *slot = skeletonData->findSlot(slotMap->_name);
+			if (!slot) {
+				ArrayUtils::deleteElements(timelines);
+				setError(NULL, "Attachment slot not found: ", slotMap->_name);
+				return NULL;
+			}
+			int slotIndex = slot->getIndex();
 			for (Json *attachmentMap = slotMap->_child; attachmentMap; attachmentMap = attachmentMap->_next) {
 				Attachment *attachment = skin->getAttachment(slotIndex, attachmentMap->_name);
 				if (!attachment) {
@@ -1328,34 +1333,46 @@ Animation *SkeletonJson::readAnimation(Json *map, SkeletonData *skeletonData) {
 		int frame = 0;
 		for (Json *keyMap = drawOrder->_child; keyMap; keyMap = keyMap->_next, ++frame) {
 			Array<int> drawOrder2;
-			Json *offsets = Json::getItem(keyMap, "offsets");
-			if (offsets) {
-				drawOrder2.setSize(slotCount, 0);
-				for (int i = slotCount - 1; i >= 0; i--) drawOrder2[i] = -1;
-				Array<int> unchanged;
-				unchanged.setSize(slotCount - offsets->_size, 0);
-				int originalIndex = 0, unchangedIndex = 0;
-				for (Json *offsetMap = offsets->_child; offsetMap; offsetMap = offsetMap->_next) {
-					SlotData *slot = skeletonData->findSlot(Json::getString(offsetMap, "slot", 0));
-					if (!slot) {
-						ArrayUtils::deleteElements(timelines);
-						return NULL;
-					}
-					/* Collect unchanged items. */
-					while (originalIndex != slot->_index) unchanged[unchangedIndex++] = originalIndex++;
-					/* Set changed items. */
-					int index = originalIndex;
-					drawOrder2[index + Json::getInt(offsetMap, "offset", 0)] = originalIndex++;
-				}
-				/* Collect remaining unchanged items. */
-				while (originalIndex < slotCount) unchanged[unchangedIndex++] = originalIndex++;
-				/* Fill in unchanged items. */
-				for (int i = slotCount - 1; i >= 0; i--)
-					if (drawOrder2[i] == -1) drawOrder2[i] = unchanged[--unchangedIndex];
+			if (!readDrawOrder(skeletonData, keyMap, slotCount, NULL, drawOrder2)) {
+				ArrayUtils::deleteElements(timelines);
+				return NULL;
 			}
-			timeline->setFrame(frame, Json::getFloat(keyMap, "time", 0), &drawOrder2);
+			timeline->setFrame(frame, Json::getFloat(keyMap, "time", 0), drawOrder2.size() == 0 ? NULL : &drawOrder2);
 		}
 		timelines.add(timeline);
+	}
+
+	// Draw order folder timelines.
+	Json *drawOrderFolder = Json::getItem(map, "drawOrderFolder");
+	if (drawOrderFolder) {
+		for (Json *timelineMap = drawOrderFolder->_child; timelineMap; timelineMap = timelineMap->_next) {
+			Json *slotEntry = Json::getItem(timelineMap, "slots");
+			Array<int> folderSlots;
+			folderSlots.setSize(slotEntry ? slotEntry->_size : 0, 0);
+			int ii = 0;
+			for (Json *entry = slotEntry ? slotEntry->_child : NULL; entry; entry = entry->_next, ++ii) {
+				SlotData *slot = skeletonData->findSlot(entry->_valueString);
+				if (!slot) {
+					ArrayUtils::deleteElements(timelines);
+					setError(NULL, "Draw order folder slot not found: ", entry->_valueString);
+					return NULL;
+				}
+				folderSlots[ii] = slot->getIndex();
+			}
+			Json *keyMap = Json::getItem(timelineMap, "keys");
+			DrawOrderFolderTimeline *timeline = new (__FILE__, __LINE__)
+				DrawOrderFolderTimeline(keyMap ? keyMap->_size : 0, folderSlots, skeletonData->_slots.size());
+			int frame = 0;
+			for (Json *entry = keyMap ? keyMap->_child : NULL; entry; entry = entry->_next, ++frame) {
+				Array<int> folderDrawOrder;
+				if (!readDrawOrder(skeletonData, entry, (int) folderSlots.size(), &folderSlots, folderDrawOrder)) {
+					ArrayUtils::deleteElements(timelines);
+					return NULL;
+				}
+				timeline->setFrame(frame, Json::getFloat(entry, "time", 0), folderDrawOrder.size() == 0 ? NULL : &folderDrawOrder);
+			}
+			timelines.add(timeline);
+		}
 	}
 
 	// Event timeline.
@@ -1461,6 +1478,49 @@ int SkeletonJson::findSlotIndex(SkeletonData *skeletonData, const String &slotNa
 		setError(NULL, "Slot not found: ", slotName);
 	}
 	return slotIndex;
+}
+
+bool SkeletonJson::readDrawOrder(SkeletonData *skeletonData, Json *keyMap, int slotCount, const Array<int> *folderSlots, Array<int> &drawOrder) {
+	Json *changes = Json::getItem(keyMap, "offsets");
+	drawOrder.clear();
+	if (changes == NULL) return true;
+
+	drawOrder.setSize(slotCount, 0);
+	for (int i = slotCount - 1; i >= 0; i--) drawOrder[i] = -1;
+	Array<int> unchanged;
+	unchanged.setSize(slotCount - changes->_size, 0);
+	int originalIndex = 0, unchangedIndex = 0;
+	for (Json *offsetMap = changes->_child; offsetMap; offsetMap = offsetMap->_next) {
+		const char *slotName = Json::getString(offsetMap, "slot", 0);
+		SlotData *slot = skeletonData->findSlot(slotName);
+		if (slot == NULL) {
+			setError(NULL, "Draw order slot not found: ", slotName);
+			return false;
+		}
+		int index;
+		if (folderSlots == NULL) {
+			index = slot->getIndex();
+		} else {
+			index = -1;
+			for (int i = 0; i < slotCount; i++) {
+				if ((*folderSlots)[i] == slot->getIndex()) {
+					index = i;
+					break;
+				}
+			}
+			if (index == -1) {
+				setError(NULL, "Slot not in folder: ", slotName);
+				return false;
+			}
+		}
+		while (originalIndex != index) unchanged[unchangedIndex++] = originalIndex++;
+		int drawOrderIndex = originalIndex;
+		drawOrder[drawOrderIndex + Json::getInt(offsetMap, "offset", 0)] = originalIndex++;
+	}
+	while (originalIndex < slotCount) unchanged[unchangedIndex++] = originalIndex++;
+	for (int i = slotCount - 1; i >= 0; i--)
+		if (drawOrder[i] == -1) drawOrder[i] = unchanged[--unchangedIndex];
+	return true;
 }
 
 void SkeletonJson::setError(Json *root, const String &value1, const String &value2) {

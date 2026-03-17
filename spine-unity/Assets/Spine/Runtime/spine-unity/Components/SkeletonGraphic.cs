@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -35,7 +35,9 @@
 #define HAS_CULL_TRANSPARENT_MESH
 #endif
 
+#if !SPINE_DISABLE_THREADING
 #define USE_THREADED_SKELETON_UPDATE
+#endif
 
 #if !SPINE_AUTO_UPGRADE_COMPONENTS_OFF
 #define AUTO_UPGRADE_TO_43_COMPONENTS
@@ -1155,14 +1157,13 @@ namespace Spine.Unity {
 			BlendModeMaterials blendModeMaterials = skeletonDataAsset.blendModeMaterials;
 			bool hasBlendModeMaterials = blendModeMaterials.RequiresBlendModeMaterials;
 			bool hasMaterialOrTextureOverride = HasMaterialOrTextureOverride;
+			bool hasPMAAdditiveSlots = HasPMAAdditiveSlots(instructions);
 			MeshGenerator meshGenerator = meshGenerators.Items[0];
 			bool pmaVertexColors = meshGenerator.settings.pmaVertexColors;
-			bool allowCullTransparentMesh = true;
 #if HAS_CULL_TRANSPARENT_MESH
 			bool mainCullTransparentMesh = this.canvasRenderer.cullTransparentMesh;
 #endif
-
-			if (HasMaterialOrTextureOverride || hasBlendModeMaterials) {
+			if (HasMaterialOrTextureOverride || hasBlendModeMaterials || hasPMAAdditiveSlots) {
 				for (int i = 0, count = sharedMaterials.Length; i < count; ++i) {
 					Texture originalTexture = instructionItems[i].material.mainTexture;
 
@@ -1175,14 +1176,16 @@ namespace Spine.Unity {
 							customTextureOverride.TryGetValue(Texture2D.whiteTexture, out replacementTexture)) // white texture entry = replace-all
 							usedTextureItems[i] = replacementTexture;
 					}
-					if (hasBlendModeMaterials) {
+					if (hasBlendModeMaterials || hasPMAAdditiveSlots) {
+						bool allowCullTransparentMesh = true;
 						Material blendModeMaterial = GetBlendModeMaterial(instructionItems[i], blendModeMaterials,
 							pmaVertexColors, ref allowCullTransparentMesh);
 						if (blendModeMaterial != null)
 							sharedMaterials[i] = blendModeMaterial;
 #if HAS_CULL_TRANSPARENT_MESH
-						canvasRenderers[i].cullTransparentMesh = allowCullTransparentMesh ?
-							mainCullTransparentMesh : false;
+						if (!UsesSingleSubmesh)
+							canvasRenderers[i].cullTransparentMesh = allowCullTransparentMesh ?
+								mainCullTransparentMesh : false;
 #endif
 					}
 				}
@@ -1190,9 +1193,20 @@ namespace Spine.Unity {
 
 			if (!UsesSingleSubmesh) {
 				for (int i = 0, count = sharedMaterials.Length; i < count; ++i) {
-					sharedMaterials[i] = submeshGraphics[i].GetModifiedMaterial(sharedMaterials[i]);
+					sharedMaterials[i] = submeshGraphics[i].UpdateModifiedMaterial(sharedMaterials[i]);
 				}
 			}
+		}
+
+		/// <returns>True if any element of the given <c>instructions</c> list has
+		/// <see cref="SubmeshInstruction.hasPMAAdditiveSlot"/> set, false otherwise.</returns>
+		protected bool HasPMAAdditiveSlots (ExposedList<SubmeshInstruction> instructions) {
+			SubmeshInstruction[] items = instructions.Items;
+			for (int i = 0, count = instructions.Count; i < count; ++i) {
+				if (items[i].hasPMAAdditiveSlot)
+					return true;
+			}
+			return false;
 		}
 
 		/// <returns>The respective blend mode material, or null if no blend mode material is required.</returns>

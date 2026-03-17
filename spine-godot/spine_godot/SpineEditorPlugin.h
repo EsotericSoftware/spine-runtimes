@@ -424,6 +424,13 @@ class SpineEditorPlugin : public EditorPlugin {
 	static void _bind_methods() {
 	}
 
+#ifdef SPINE_GODOT_EXTENSION
+	Ref<EditorImportPlugin> atlas_import_plugin;
+	Ref<EditorImportPlugin> json_import_plugin;
+	Ref<EditorImportPlugin> binary_import_plugin;
+	Ref<EditorInspectorPlugin> skeleton_data_inspector_plugin;
+#endif
+
 public:
 #ifdef SPINE_GODOT_EXTENSION
 	explicit SpineEditorPlugin();
@@ -431,6 +438,8 @@ public:
 	String _get_plugin_name() const override {
 		return "SpineEditorPlugin";
 	}
+
+	void _notification(int p_what);
 #else
 	explicit SpineEditorPlugin(EditorNode *node);
 

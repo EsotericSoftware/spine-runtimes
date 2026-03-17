@@ -50,26 +50,14 @@ class MeshAttachment extends VertexAttachment {
   @override
   Pointer get nativePtr => _ptr;
 
-  factory MeshAttachment(String name) {
-    final ptr = SpineBindings.bindings.spine_mesh_attachment_create(name.toNativeUtf8().cast<Char>());
+  factory MeshAttachment(String name, Sequence? sequence) {
+    final ptr = SpineBindings.bindings.spine_mesh_attachment_create(
+        name.toNativeUtf8().cast<Char>(), sequence?.nativePtr.cast() ?? Pointer.fromAddress(0));
     return MeshAttachment.fromPointer(ptr);
   }
 
   void dispose() {
     SpineBindings.bindings.spine_mesh_attachment_dispose(_ptr);
-  }
-
-  void updateRegion() {
-    SpineBindings.bindings.spine_mesh_attachment_update_region(_ptr);
-  }
-
-  int get hullLength {
-    final result = SpineBindings.bindings.spine_mesh_attachment_get_hull_length(_ptr);
-    return result;
-  }
-
-  set hullLength(int value) {
-    SpineBindings.bindings.spine_mesh_attachment_set_hull_length(_ptr, value);
   }
 
   ArrayFloat get regionUVs {
@@ -81,13 +69,6 @@ class MeshAttachment extends VertexAttachment {
     SpineBindings.bindings.spine_mesh_attachment_set_region_u_vs(_ptr, value.nativePtr.cast());
   }
 
-  /// The UV pair for each vertex, normalized within the entire texture. See
-  /// also MeshAttachment::updateRegion
-  ArrayFloat get uVs {
-    final result = SpineBindings.bindings.spine_mesh_attachment_get_u_vs(_ptr);
-    return ArrayFloat.fromPointer(result);
-  }
-
   ArrayUnsignedShort get triangles {
     final result = SpineBindings.bindings.spine_mesh_attachment_get_triangles(_ptr);
     return ArrayUnsignedShort.fromPointer(result);
@@ -97,9 +78,22 @@ class MeshAttachment extends VertexAttachment {
     SpineBindings.bindings.spine_mesh_attachment_set_triangles(_ptr, value.nativePtr.cast());
   }
 
-  Color get color {
-    final result = SpineBindings.bindings.spine_mesh_attachment_get_color(_ptr);
-    return Color.fromPointer(result);
+  int get hullLength {
+    final result = SpineBindings.bindings.spine_mesh_attachment_get_hull_length(_ptr);
+    return result;
+  }
+
+  set hullLength(int value) {
+    SpineBindings.bindings.spine_mesh_attachment_set_hull_length(_ptr, value);
+  }
+
+  Sequence get sequence {
+    final result = SpineBindings.bindings.spine_mesh_attachment_get_sequence(_ptr);
+    return Sequence.fromPointer(result);
+  }
+
+  void updateSequence() {
+    SpineBindings.bindings.spine_mesh_attachment_update_sequence(_ptr);
   }
 
   String get path {
@@ -111,22 +105,9 @@ class MeshAttachment extends VertexAttachment {
     SpineBindings.bindings.spine_mesh_attachment_set_path(_ptr, value.toNativeUtf8().cast<Char>());
   }
 
-  TextureRegion? get region {
-    final result = SpineBindings.bindings.spine_mesh_attachment_get_region(_ptr);
-    return result.address == 0 ? null : TextureRegion.fromPointer(result);
-  }
-
-  set region(TextureRegion? value) {
-    SpineBindings.bindings.spine_mesh_attachment_set_region(_ptr, value?.nativePtr.cast() ?? Pointer.fromAddress(0));
-  }
-
-  Sequence? get sequence {
-    final result = SpineBindings.bindings.spine_mesh_attachment_get_sequence(_ptr);
-    return result.address == 0 ? null : Sequence.fromPointer(result);
-  }
-
-  set sequence(Sequence? value) {
-    SpineBindings.bindings.spine_mesh_attachment_set_sequence(_ptr, value?.nativePtr.cast() ?? Pointer.fromAddress(0));
+  Color get color {
+    final result = SpineBindings.bindings.spine_mesh_attachment_get_color(_ptr);
+    return Color.fromPointer(result);
   }
 
   MeshAttachment? get parentMesh {
@@ -139,7 +120,6 @@ class MeshAttachment extends VertexAttachment {
         .spine_mesh_attachment_set_parent_mesh(_ptr, value?.nativePtr.cast() ?? Pointer.fromAddress(0));
   }
 
-  /// Nonessential.
   ArrayUnsignedShort get edges {
     final result = SpineBindings.bindings.spine_mesh_attachment_get_edges(_ptr);
     return ArrayUnsignedShort.fromPointer(result);
@@ -170,5 +150,13 @@ class MeshAttachment extends VertexAttachment {
   MeshAttachment newLinkedMesh() {
     final result = SpineBindings.bindings.spine_mesh_attachment_new_linked_mesh(_ptr);
     return MeshAttachment.fromPointer(result);
+  }
+
+  /// Computes UVs for a mesh attachment.
+  ///
+  /// [uvs] Output array for the computed UVs, same length as regionUVs.
+  static void computeUVs(TextureRegion? region, ArrayFloat regionUVs, ArrayFloat uvs) {
+    SpineBindings.bindings.spine_mesh_attachment_compute_u_vs(
+        region?.nativePtr.cast() ?? Pointer.fromAddress(0), regionUVs.nativePtr.cast(), uvs.nativePtr.cast());
   }
 }

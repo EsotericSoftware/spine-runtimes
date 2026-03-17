@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -35,15 +35,13 @@
 #define PER_MATERIAL_PROPERTY_BLOCKS
 #endif
 
-#if UNITY_2017_1_OR_NEWER
-#define BUILT_IN_SPRITE_MASK_COMPONENT
-#endif
-
 #if UNITY_2019_3_OR_NEWER
 #define CONFIGURABLE_ENTER_PLAY_MODE
 #endif
 
+#if !SPINE_DISABLE_THREADING
 #define USE_THREADED_SKELETON_UPDATE
+#endif
 
 #if !SPINE_AUTO_UPGRADE_COMPONENTS_OFF
 #define AUTO_UPGRADE_TO_43_COMPONENTS

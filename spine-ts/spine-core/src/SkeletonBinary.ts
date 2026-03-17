@@ -27,10 +27,10 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { AlphaTimeline, Animation, AttachmentTimeline, type BoneTimeline2, type CurveTimeline, CurveTimeline1, DeformTimeline, DrawOrderTimeline, EventTimeline, IkConstraintTimeline, InheritTimeline, PathConstraintMixTimeline, PathConstraintPositionTimeline, PathConstraintSpacingTimeline, PhysicsConstraintDampingTimeline, PhysicsConstraintGravityTimeline, PhysicsConstraintInertiaTimeline, PhysicsConstraintMassTimeline, PhysicsConstraintMixTimeline, PhysicsConstraintResetTimeline, PhysicsConstraintStrengthTimeline, PhysicsConstraintWindTimeline, RGB2Timeline, RGBA2Timeline, RGBATimeline, RGBTimeline, RotateTimeline, ScaleTimeline, ScaleXTimeline, ScaleYTimeline, SequenceTimeline, ShearTimeline, ShearXTimeline, ShearYTimeline, SliderMixTimeline, SliderTimeline, type Timeline, TransformConstraintTimeline, TranslateTimeline, TranslateXTimeline, TranslateYTimeline } from "./Animation.js";
+import { AlphaTimeline, Animation, AttachmentTimeline, type BoneTimeline2, type CurveTimeline, CurveTimeline1, DeformTimeline, DrawOrderFolderTimeline, DrawOrderTimeline, EventTimeline, IkConstraintTimeline, InheritTimeline, PathConstraintMixTimeline, PathConstraintPositionTimeline, PathConstraintSpacingTimeline, PhysicsConstraintDampingTimeline, PhysicsConstraintGravityTimeline, PhysicsConstraintInertiaTimeline, PhysicsConstraintMassTimeline, PhysicsConstraintMixTimeline, PhysicsConstraintResetTimeline, PhysicsConstraintStrengthTimeline, PhysicsConstraintWindTimeline, RGB2Timeline, RGBA2Timeline, RGBATimeline, RGBTimeline, RotateTimeline, ScaleTimeline, ScaleXTimeline, ScaleYTimeline, SequenceTimeline, ShearTimeline, ShearXTimeline, ShearYTimeline, SliderMixTimeline, SliderTimeline, type Timeline, TransformConstraintTimeline, TranslateTimeline, TranslateXTimeline, TranslateYTimeline } from "./Animation.js";
 import type { Attachment, VertexAttachment } from "./attachments/Attachment.js";
 import type { AttachmentLoader } from "./attachments/AttachmentLoader.js";
-import type { HasTextureRegion } from "./attachments/HasTextureRegion.js";
+import type { HasSequence } from "./attachments/HasSequence.js";
 import type { MeshAttachment } from "./attachments/MeshAttachment.js";
 import { Sequence, SequenceModeValues } from "./attachments/Sequence.js";
 import { BoneData } from "./BoneData.js";
@@ -261,9 +261,9 @@ export class SkeletonBinary {
 					data.slot = skeletonData.slots[input.readInt(true)];
 					const flags = input.readByte();
 					data.skinRequired = (flags & 1) !== 0;
-					data.positionMode = (flags >> 1) & 2;
-					data.spacingMode = (flags >> 2) & 3;
-					data.rotateMode = (flags >> 4) & 3;
+					data.positionMode = (flags >> 1) & 0b1;
+					data.spacingMode = (flags >> 2) & 0b11;
+					data.rotateMode = (flags >> 4) & 0b11;
 					if ((flags & 128) !== 0) data.offsetRotation = input.readFloat();
 					const setup = data.setup;
 					setup.position = input.readFloat();
@@ -375,7 +375,7 @@ export class SkeletonBinary {
 			if (!parent) throw new Error(`Parent mesh not found: ${linkedMesh.parent}`);
 			linkedMesh.mesh.timelineAttachment = linkedMesh.inheritTimeline ? parent as VertexAttachment : linkedMesh.mesh;
 			linkedMesh.mesh.setParentMesh(parent as MeshAttachment);
-			if (linkedMesh.mesh.region != null) linkedMesh.mesh.updateRegion();
+			linkedMesh.mesh.updateSequence();
 		}
 		this.linkedMeshes.length = 0;
 
@@ -465,7 +465,7 @@ export class SkeletonBinary {
 			case AttachmentType.Region: {
 				let path = (flags & 16) !== 0 ? input.readStringRef() : null;
 				const color = (flags & 32) !== 0 ? input.readInt32() : 0xffffffff;
-				const sequence = (flags & 64) !== 0 ? this.readSequence(input) : null;
+				const sequence = this.readSequence(input, (flags & 64) !== 0);
 				const rotation = (flags & 128) !== 0 ? input.readFloat() : 0;
 				const x = input.readFloat();
 				const y = input.readFloat();
@@ -486,8 +486,7 @@ export class SkeletonBinary {
 				region.width = width * scale;
 				region.height = height * scale;
 				Color.rgba8888ToColor(region.color, color);
-				region.sequence = sequence;
-				if (region.region != null) region.updateRegion();
+				region.updateSequence();
 				return region;
 			}
 			case AttachmentType.BoundingBox: {
@@ -505,7 +504,7 @@ export class SkeletonBinary {
 			case AttachmentType.Mesh: {
 				let path = (flags & 16) !== 0 ? input.readStringRef() : name;
 				const color = (flags & 32) !== 0 ? input.readInt32() : 0xffffffff;
-				const sequence = (flags & 64) !== 0 ? this.readSequence(input) : null;
+				const sequence = this.readSequence(input, (flags & 64) !== 0);
 				const hullLength = input.readInt(true);
 				const vertices = this.readVertices(input, (flags & 128) !== 0);
 				const uvs = this.readFloatArray(input, vertices.length, 1);
@@ -523,26 +522,25 @@ export class SkeletonBinary {
 				if (!mesh) return null;
 				mesh.path = path;
 				Color.rgba8888ToColor(mesh.color, color);
+				mesh.hullLength = hullLength << 1;
 				mesh.bones = vertices.bones;
 				mesh.vertices = vertices.vertices;
 				mesh.worldVerticesLength = vertices.length;
-				mesh.triangles = triangles;
 				mesh.regionUVs = uvs;
-				if (mesh.region != null) mesh.updateRegion();
-				mesh.hullLength = hullLength << 1;
-				mesh.sequence = sequence;
+				mesh.triangles = triangles;
 				if (nonessential) {
 					mesh.edges = edges;
 					mesh.width = width * scale;
 					mesh.height = height * scale;
 				}
+				mesh.updateSequence();
 				return mesh;
 			}
 			case AttachmentType.LinkedMesh: {
 				const path = (flags & 16) !== 0 ? input.readStringRef() : name;
 				if (path == null) throw new Error("Path of linked mesh must not be null");
 				const color = (flags & 32) !== 0 ? input.readInt32() : 0xffffffff;
-				const sequence = (flags & 64) !== 0 ? this.readSequence(input) : null;
+				const sequence = this.readSequence(input, (flags & 64) !== 0);
 				const inheritTimelines = (flags & 128) !== 0;
 				const skinIndex = input.readInt(true);
 				const parent = input.readStringRef();
@@ -556,7 +554,6 @@ export class SkeletonBinary {
 				if (!mesh) return null;
 				mesh.path = path;
 				Color.rgba8888ToColor(mesh.color, color);
-				mesh.sequence = sequence;
 				if (nonessential) {
 					mesh.width = width * scale;
 					mesh.height = height * scale;
@@ -616,8 +613,9 @@ export class SkeletonBinary {
 		}
 	}
 
-	private readSequence (input: BinaryInput) {
-		const sequence = new Sequence(input.readInt(true));
+	private readSequence (input: BinaryInput, hasPathSuffix: boolean) {
+		if (!hasPathSuffix) return new Sequence(1, false);
+		const sequence = new Sequence(input.readInt(true), true);
 		sequence.start = input.readInt(true);
 		sequence.digits = input.readInt(true);
 		sequence.setupIndex = input.readInt(true);
@@ -632,19 +630,20 @@ export class SkeletonBinary {
 		if (!weighted)
 			return new Vertices(null, this.readFloatArray(input, length, scale), length);
 
+		const n = input.readInt(true);
+		const bones: number[] = [];
 		const weights: number[] = [];
-		const bonesArray: number[] = [];
-		for (let i = 0; i < vertexCount; i++) {
+		for (let b = 0, w = 0; b < n;) {
 			const boneCount = input.readInt(true);
-			bonesArray.push(boneCount);
-			for (let ii = 0; ii < boneCount; ii++) {
-				bonesArray.push(input.readInt(true));
-				weights.push(input.readFloat() * scale);
-				weights.push(input.readFloat() * scale);
-				weights.push(input.readFloat());
+			bones[b++] = boneCount;
+			for (let ii = 0; ii < boneCount; ii++, w += 3) {
+				bones[b++] = input.readInt(true);
+				weights[w] = input.readFloat() * scale;
+				weights[w + 1] = input.readFloat() * scale;
+				weights[w + 2] = input.readFloat();
 			}
 		}
-		return new Vertices(bonesArray, Utils.toFloatArray(weights), length);
+		return new Vertices(bones, Utils.toFloatArray(weights), length);
 	}
 
 	private readFloatArray (input: BinaryInput, n: number, scale: number): number[] {
@@ -1115,7 +1114,7 @@ export class SkeletonBinary {
 							break;
 						}
 						case ATTACHMENT_SEQUENCE: {
-							const timeline = new SequenceTimeline(frameCount, slotIndex, attachment as unknown as HasTextureRegion);
+							const timeline = new SequenceTimeline(frameCount, slotIndex, attachment as unknown as HasSequence);
 							for (let frame = 0; frame < frameCount; frame++) {
 								const time = input.readFloat();
 								const modeAndIndex = input.readInt32();
@@ -1131,34 +1130,26 @@ export class SkeletonBinary {
 		}
 
 		// Draw order timeline.
+		const slotCount = skeletonData.slots.length;
 		const drawOrderCount = input.readInt(true);
 		if (drawOrderCount > 0) {
 			const timeline = new DrawOrderTimeline(drawOrderCount);
-			const slotCount = skeletonData.slots.length;
-			for (let i = 0; i < drawOrderCount; i++) {
-				const time = input.readFloat();
-				const offsetCount = input.readInt(true);
-				const drawOrder = Utils.newArray(slotCount, 0);
-				for (let ii = slotCount - 1; ii >= 0; ii--)
-					drawOrder[ii] = -1;
-				const unchanged = Utils.newArray(slotCount - offsetCount, 0);
-				let originalIndex = 0, unchangedIndex = 0;
-				for (let ii = 0; ii < offsetCount; ii++) {
-					const slotIndex = input.readInt(true);
-					// Collect unchanged items.
-					while (originalIndex !== slotIndex)
-						unchanged[unchangedIndex++] = originalIndex++;
-					// Set changed items.
-					drawOrder[originalIndex + input.readInt(true)] = originalIndex++;
-				}
-				// Collect remaining unchanged items.
-				while (originalIndex < slotCount)
-					unchanged[unchangedIndex++] = originalIndex++;
-				// Fill in unchanged items.
-				for (let ii = slotCount - 1; ii >= 0; ii--)
-					if (drawOrder[ii] === -1) drawOrder[ii] = unchanged[--unchangedIndex];
-				timeline.setFrame(i, time, drawOrder);
-			}
+			for (let i = 0; i < drawOrderCount; i++)
+				timeline.setFrame(i, input.readFloat(), readDrawOrder(input, slotCount));
+			timelines.push(timeline);
+		}
+
+		// Draw order folder timelines.
+		const folderCount = input.readInt(true);
+		for (let i = 0; i < folderCount; i++) {
+			const folderSlotCount = input.readInt(true);
+			const folderSlots = new Array<number>(folderSlotCount);
+			for (let ii = 0; ii < folderSlotCount; ii++)
+				folderSlots[ii] = input.readInt(true);
+			const keyCount = input.readInt(true);
+			const timeline = new DrawOrderFolderTimeline(keyCount, folderSlots, slotCount);
+			for (let ii = 0; ii < keyCount; ii++)
+				timeline.setFrame(ii, input.readFloat(), readDrawOrder(input, folderSlotCount));
 			timelines.push(timeline);
 		}
 
@@ -1350,6 +1341,29 @@ function readTimeline2 (input: BinaryInput, timelines: Array<Timeline>, timeline
 		value2 = nvalue2;
 	}
 	timelines.push(timeline);
+}
+
+function readDrawOrder (input: BinaryInput, slotCount: number): number[] | null {
+	const changeCount = input.readInt(true);
+	if (changeCount === 0) return null;
+	const drawOrder = new Array<number>(slotCount).fill(-1);
+	const unchanged = new Array<number>(slotCount - changeCount);
+	let originalIndex = 0, unchangedIndex = 0;
+	for (let i = 0; i < changeCount; i++) {
+		const slotIndex = input.readInt(true);
+		// Collect unchanged items.
+		while (originalIndex !== slotIndex)
+			unchanged[unchangedIndex++] = originalIndex++;
+		// Set changed items.
+		drawOrder[originalIndex + input.readInt(true)] = originalIndex++;
+	}
+	// Collect remaining unchanged items.
+	while (originalIndex < slotCount)
+		unchanged[unchangedIndex++] = originalIndex++;
+	// Fill in unchanged items.
+	for (let i = slotCount - 1; i >= 0; i--)
+		if (drawOrder[i] === -1) drawOrder[i] = unchanged[--unchangedIndex];
+	return drawOrder;
 }
 
 function setBezier (input: BinaryInput, timeline: CurveTimeline, bezier: number, frame: number, value: number,

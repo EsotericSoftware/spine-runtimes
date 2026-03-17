@@ -1,3 +1,11 @@
+# 4.3.1
+
+## Flutter
+
+- **Additions**
+  - Added `fromMemory` methods to `AtlasFlutter`, `SkeletonDataFlutter`, `SkeletonDrawableFlutter`, and `SpineWidget` for loading Spine data from custom sources (memory, encrypted storage, databases, custom caching, etc.)
+  - Added example `load_from_memory.dart` demonstrating how to load all assets into memory and use the `fromMemory` API
+
 # 4.3.0
 
 ## Dart

@@ -7,7 +7,7 @@ export * from './attachments/Attachment.js';
 export * from './attachments/AttachmentLoader.js';
 export * from './attachments/BoundingBoxAttachment.js';
 export * from './attachments/ClippingAttachment.js';
-export * from './attachments/HasTextureRegion.js';
+export * from './attachments/HasSequence.js';
 export * from './attachments/MeshAttachment.js';
 export * from './attachments/PathAttachment.js';
 export * from './attachments/PointAttachment.js';

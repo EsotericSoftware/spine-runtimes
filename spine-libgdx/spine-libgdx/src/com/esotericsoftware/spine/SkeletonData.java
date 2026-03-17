@@ -140,6 +140,17 @@ public class SkeletonData {
 		return animations;
 	}
 
+	/** Collects animations used by {@link SliderData slider constraints}.
+	 * <p>
+	 * Slider animations are designed to be applied by slider constraints rather than on their own. Applications that have a user
+	 * choose an animation may want to exclude them. */
+	public Array<Animation> findSliderAnimations (Array<Animation> animations) {
+		ConstraintData[] constraints = this.constraints.items;
+		for (int i = 0, n = this.constraints.size; i < n; i++)
+			if (constraints[i] instanceof SliderData data && data.animation != null) animations.add(data.animation);
+		return animations;
+	}
+
 	/** Finds an animation by comparing each animation's name. It is more efficient to cache the results of this method than to
 	 * call it multiple times. */
 	public @Null Animation findAnimation (String animationName) {

@@ -2,6 +2,13 @@ name: Check Java Formatting
 
 on:
   push:
+    paths:
+      - 'spine-libgdx/**'
+      - 'spine-android/**'
+      - 'formatters/eclipse-formatter.xml'
+      - 'formatters/eclipse-formatter/**'
+      - 'formatters/format-java.sh'
+      - '.github/workflows/format-check-java.yml'
   workflow_dispatch:
 
 jobs:

@@ -174,12 +174,14 @@ class SkeletonSprite extends FlxTypedGroup<FlxObject> {
 				numFloats = clippedVertexSize << 2;
 				if (numFloats > worldVertices.length)
 					worldVertices.resize(numFloats);
-				region.computeWorldVertices(slot, worldVertices, 0, clippedVertexSize);
+				var sequence = region.sequence;
+				var sequenceIndex = sequence.resolveIndex(pose);
+				region.computeWorldVertices(slot, sequence.offsets[sequenceIndex], worldVertices, 0, clippedVertexSize);
 
 				mesh = getFlixelMeshFromRendererAttachment(region);
-				mesh.graphic = region.region.texture;
+				mesh.graphic = sequence.regions[sequenceIndex].texture;
 				triangles = QUAD_INDICES;
-				uvs = region.uvs;
+				uvs = sequence.getUVs(sequenceIndex);
 				attachmentColor = region.color;
 			} else if (Std.isOfType(attachment, MeshAttachment)) {
 				var meshAttachment:MeshAttachment = cast(attachment, MeshAttachment);
@@ -190,10 +192,12 @@ class SkeletonSprite extends FlxTypedGroup<FlxObject> {
 				}
 				meshAttachment.computeWorldVertices(skeleton, slot, 0, meshAttachment.worldVerticesLength, worldVertices, 0, clippedVertexSize);
 
+				var sequence = meshAttachment.sequence;
+				var sequenceIndex = sequence.resolveIndex(pose);
 				mesh = getFlixelMeshFromRendererAttachment(meshAttachment);
-				mesh.graphic = meshAttachment.region.texture;
+				mesh.graphic = sequence.regions[sequenceIndex].texture;
 				triangles = meshAttachment.triangles;
-				uvs = meshAttachment.uvs;
+				uvs = sequence.getUVs(sequenceIndex);
 				attachmentColor = meshAttachment.color;
 			} else if (Std.isOfType(attachment, ClippingAttachment)) {
 				var clip:ClippingAttachment = cast(attachment, ClippingAttachment);
@@ -553,5 +557,4 @@ class SkeletonSprite extends FlxTypedGroup<FlxObject> {
 
 typedef RenderedAttachment = {
 	var rendererObject:Dynamic;
-	var region:TextureRegion;
 }

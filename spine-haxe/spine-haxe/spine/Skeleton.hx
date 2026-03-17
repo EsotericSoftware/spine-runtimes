@@ -180,7 +180,7 @@ class Skeleton {
 		for (c in constraints) {
 			var constraint:Constraint<Dynamic, Dynamic, Dynamic> = c;
 			constraint.active = constraint.isSourceActive()
-				&& (!constraint.data.skinRequired || (skin != null && contains(skin.constraints, constraint.data)));
+				&& (!constraint.data.skinRequired || (skin != null && contains(skin.constraints, cast constraint.data)));
 			if (constraint.active)
 				constraint.sort(this);
 		}
@@ -443,7 +443,8 @@ class Skeleton {
 					verticesLength = 8;
 					_tempVertices.resize(verticesLength);
 					vertices = _tempVertices;
-					cast(attachment, RegionAttachment).computeWorldVertices(slot, vertices, 0, 2);
+					var region:RegionAttachment = cast(attachment, RegionAttachment);
+					region.computeWorldVertices(slot, region.getOffsets(slot.applied), vertices, 0, 2);
 					triangles = Skeleton.quadTriangles;
 				} else if (Std.isOfType(attachment, MeshAttachment)) {
 					var mesh:MeshAttachment = cast(attachment, MeshAttachment);

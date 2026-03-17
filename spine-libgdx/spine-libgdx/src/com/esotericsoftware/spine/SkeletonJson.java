@@ -32,6 +32,7 @@ package com.esotericsoftware.spine;
 import static com.esotericsoftware.spine.utils.SpineUtils.*;
 
 import java.io.InputStream;
+import java.util.Arrays;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
@@ -50,6 +51,7 @@ import com.esotericsoftware.spine.Animation.BoneTimeline2;
 import com.esotericsoftware.spine.Animation.CurveTimeline;
 import com.esotericsoftware.spine.Animation.CurveTimeline1;
 import com.esotericsoftware.spine.Animation.DeformTimeline;
+import com.esotericsoftware.spine.Animation.DrawOrderFolderTimeline;
 import com.esotericsoftware.spine.Animation.DrawOrderTimeline;
 import com.esotericsoftware.spine.Animation.EventTimeline;
 import com.esotericsoftware.spine.Animation.IkConstraintTimeline;
@@ -464,7 +466,7 @@ public class SkeletonJson extends SkeletonLoader {
 				skin.constraints.shrink();
 				for (JsonValue slotEntry = skinMap.getChild("attachments"); slotEntry != null; slotEntry = slotEntry.next) {
 					SlotData slot = skeletonData.findSlot(slotEntry.name);
-					if (slot == null) throw new SerializationException("Slot not found: " + slotEntry.name);
+					if (slot == null) throw new SerializationException("Skin slot not found: " + slotEntry.name);
 					for (JsonValue entry = slotEntry.child; entry != null; entry = entry.next) {
 						try {
 							Attachment attachment = readAttachment(entry, skin, slot.index, entry.name, skeletonData);
@@ -492,7 +494,7 @@ public class SkeletonJson extends SkeletonLoader {
 				if (parent == null) throw new SerializationException("Parent mesh not found: " + linkedMesh.parent);
 				linkedMesh.mesh.setTimelineAttachment(linkedMesh.inheritTimelines ? (VertexAttachment)parent : linkedMesh.mesh);
 				linkedMesh.mesh.setParentMesh((MeshAttachment)parent);
-				if (linkedMesh.mesh.getRegion() != null) linkedMesh.mesh.updateRegion();
+				linkedMesh.mesh.updateSequence();
 			}
 			linkedMeshes.clear();
 
@@ -580,12 +582,11 @@ public class SkeletonJson extends SkeletonLoader {
 			region.setRotation(map.getFloat("rotation", 0));
 			region.setWidth(map.getFloat("width") * scale);
 			region.setHeight(map.getFloat("height") * scale);
-			region.setSequence(sequence);
 
 			String color = map.getString("color", null);
 			if (color != null) Color.valueOf(color, region.getColor());
 
-			if (region.getRegion() != null) region.updateRegion();
+			region.updateSequence();
 			yield region;
 		}
 		case boundingbox -> {
@@ -609,7 +610,6 @@ public class SkeletonJson extends SkeletonLoader {
 
 			mesh.setWidth(map.getFloat("width", 0) * scale);
 			mesh.setHeight(map.getFloat("height", 0) * scale);
-			mesh.setSequence(sequence);
 
 			String parent = map.getString("parent", null);
 			if (parent != null) {
@@ -622,10 +622,11 @@ public class SkeletonJson extends SkeletonLoader {
 			readVertices(map, mesh, uvs.length);
 			mesh.setTriangles(map.require("triangles").asShortArray());
 			mesh.setRegionUVs(uvs);
-			if (mesh.getRegion() != null) mesh.updateRegion();
 
 			if (map.has("hull")) mesh.setHullLength(map.require("hull").asInt() << 1);
 			if (map.has("edges")) mesh.setEdges(map.require("edges").asShortArray());
+
+			mesh.updateSequence();
 			yield mesh;
 		}
 		case path -> {
@@ -680,8 +681,8 @@ public class SkeletonJson extends SkeletonLoader {
 	}
 
 	private Sequence readSequence (@Null JsonValue map) {
-		if (map == null) return null;
-		var sequence = new Sequence(map.getInt("count"));
+		if (map == null) return new Sequence(1, false);
+		var sequence = new Sequence(map.getInt("count"), true);
 		sequence.setStart(map.getInt("start", 1));
 		sequence.setDigits(map.getInt("digits", 0));
 		sequence.setSetupIndex(map.getInt("setup", 0));
@@ -1137,7 +1138,7 @@ public class SkeletonJson extends SkeletonLoader {
 			if (skin == null) throw new SerializationException("Skin not found: " + attachmentsMap.name);
 			for (JsonValue slotMap = attachmentsMap.child; slotMap != null; slotMap = slotMap.next) {
 				SlotData slot = skeletonData.findSlot(slotMap.name);
-				if (slot == null) throw new SerializationException("Slot not found: " + slotMap.name);
+				if (slot == null) throw new SerializationException("Attachment slot not found: " + slotMap.name);
 				for (JsonValue attachmentMap = slotMap.child; attachmentMap != null; attachmentMap = attachmentMap.next) {
 					Attachment attachment = skin.getAttachment(slot.index, attachmentMap.name);
 					if (attachment == null) throw new SerializationException("Timeline attachment not found: " + attachmentMap.name);
@@ -1207,36 +1208,33 @@ public class SkeletonJson extends SkeletonLoader {
 		JsonValue drawOrderMap = map.get("drawOrder");
 		if (drawOrderMap != null) {
 			var timeline = new DrawOrderTimeline(drawOrderMap.size);
-			int slotCount = skeletonData.slots.size;
-			int frame = 0;
-			for (JsonValue keyMap = drawOrderMap.child; keyMap != null; keyMap = keyMap.next, frame++) {
-				int[] drawOrder = null;
-				JsonValue offsets = keyMap.get("offsets");
-				if (offsets != null) {
-					drawOrder = new int[slotCount];
-					for (int i = slotCount - 1; i >= 0; i--)
-						drawOrder[i] = -1;
-					var unchanged = new int[slotCount - offsets.size];
-					int originalIndex = 0, unchangedIndex = 0;
-					for (JsonValue offsetMap = offsets.child; offsetMap != null; offsetMap = offsetMap.next) {
-						SlotData slot = skeletonData.findSlot(offsetMap.getString("slot"));
-						if (slot == null) throw new SerializationException("Slot not found: " + offsetMap.getString("slot"));
-						// Collect unchanged items.
-						while (originalIndex != slot.index)
-							unchanged[unchangedIndex++] = originalIndex++;
-						// Set changed items.
-						drawOrder[originalIndex + offsetMap.getInt("offset")] = originalIndex++;
-					}
-					// Collect remaining unchanged items.
-					while (originalIndex < slotCount)
-						unchanged[unchangedIndex++] = originalIndex++;
-					// Fill in unchanged items.
-					for (int i = slotCount - 1; i >= 0; i--)
-						if (drawOrder[i] == -1) drawOrder[i] = unchanged[--unchangedIndex];
-				}
-				timeline.setFrame(frame, keyMap.getFloat("time", 0), drawOrder);
-			}
+			int slotCount = skeletonData.slots.size, frame = 0;
+			for (JsonValue keyMap = drawOrderMap.child; keyMap != null; keyMap = keyMap.next, frame++)
+				timeline.setFrame(frame, keyMap.getFloat("time", 0), readDrawOrder(skeletonData, keyMap, slotCount, null));
 			timelines.add(timeline);
+		}
+
+		// Draw order folder timelines.
+		JsonValue drawOrderFoldersMap = map.get("drawOrderFolder");
+		if (drawOrderFoldersMap != null) {
+			for (JsonValue timelineMap = drawOrderFoldersMap.child; timelineMap != null; timelineMap = timelineMap.next) {
+				JsonValue slotEntry = timelineMap.get("slots");
+				var folderSlots = new int[slotEntry.size];
+				int ii = 0;
+				for (slotEntry = slotEntry.child; slotEntry != null; slotEntry = slotEntry.next, ii++) {
+					SlotData slot = skeletonData.findSlot(slotEntry.asString());
+					if (slot == null) throw new SerializationException("Draw order folder slot not found: " + slotEntry.asString());
+					folderSlots[ii] = slot.index;
+				}
+
+				JsonValue keyMap = timelineMap.get("keys");
+				var timeline = new DrawOrderFolderTimeline(keyMap.size, folderSlots, skeletonData.slots.size);
+				int frame = 0;
+				for (keyMap = keyMap.child; keyMap != null; keyMap = keyMap.next, frame++)
+					timeline.setFrame(frame, keyMap.getFloat("time", 0),
+						readDrawOrder(skeletonData, keyMap, folderSlots.length, folderSlots));
+				timelines.add(timeline);
+			}
 		}
 
 		// Event timeline.
@@ -1313,6 +1311,45 @@ public class SkeletonJson extends SkeletonLoader {
 			value2 = nvalue2;
 			keyMap = nextMap;
 		}
+	}
+
+	/** @param folderSlots Slot names are resolved to positions within this array. If null, slot indices are used as positions. */
+	private @Null int[] readDrawOrder (SkeletonData skeletonData, JsonValue keyMap, int slotCount, @Null int[] folderSlots) {
+		JsonValue changes = keyMap.get("offsets");
+		if (changes == null) return null; // Setup draw order.
+		var drawOrder = new int[slotCount];
+		Arrays.fill(drawOrder, -1);
+		var unchanged = new int[slotCount - changes.size];
+		int originalIndex = 0, unchangedIndex = 0;
+		for (JsonValue offsetMap = changes.child; offsetMap != null; offsetMap = offsetMap.next) {
+			SlotData slot = skeletonData.findSlot(offsetMap.getString("slot"));
+			if (slot == null) throw new SerializationException("Draw order slot not found: " + offsetMap.getString("slot"));
+			int index;
+			if (folderSlots == null)
+				index = slot.index;
+			else {
+				index = -1;
+				for (int i = 0; i < slotCount; i++) {
+					if (folderSlots[i] == slot.index) {
+						index = i;
+						break;
+					}
+				}
+				if (index == -1) throw new SerializationException("Slot not in folder: " + offsetMap.getString("slot"));
+			}
+			// Collect unchanged items.
+			while (originalIndex != index)
+				unchanged[unchangedIndex++] = originalIndex++;
+			// Set changed items.
+			drawOrder[originalIndex + offsetMap.getInt("offset")] = originalIndex++;
+		}
+		// Collect remaining unchanged items.
+		while (originalIndex < slotCount)
+			unchanged[unchangedIndex++] = originalIndex++;
+		// Fill in unchanged items.
+		for (int i = slotCount - 1; i >= 0; i--)
+			if (drawOrder[i] == -1) drawOrder[i] = unchanged[--unchangedIndex];
+		return drawOrder;
 	}
 
 	int readCurve (JsonValue curve, CurveTimeline timeline, int bezier, int frame, int value, float time1, float time2,

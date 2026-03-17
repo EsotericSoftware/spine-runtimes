@@ -72,87 +72,93 @@ int main() {
 	GLFWwindow *window = init_glfw();
 	if (!window) return -1;
 
+	spine_enable_debug_extension(true);
+
 	// We use a y-down coordinate system, see renderer_set_viewport_size()
 	Bone::setYDown(true);
 
-	// Load the atlas and the skeleton data
-	GlTextureLoader textureLoader;
-	Atlas *atlas = new Atlas("data/spineboy-pma.atlas", &textureLoader);
-	SkeletonBinary binary(*atlas);
-	// SkeletonData *skeletonData = binary.readSkeletonDataFile("data/spineboy-pro.skel");
+	{
+		// Load the atlas and the skeleton data
+		GlTextureLoader textureLoader;
+		Atlas *atlas = new Atlas("data/spineboy-pma.atlas", &textureLoader);
+		SkeletonBinary binary(*atlas);
+		// SkeletonData *skeletonData = binary.readSkeletonDataFile("data/spineboy-pro.skel");
 
-	SkeletonJson json(*atlas);
-	SkeletonData *skeletonData = json.readSkeletonDataFile("data/spineboy-pro.json");
+		SkeletonJson json(*atlas);
+		SkeletonData *skeletonData = json.readSkeletonDataFile("data/spineboy-pro.json");
 
-	// Create a skeleton from the data, set the skeleton's position to the bottom center of
-	// the screen and scale it to make it smaller.
-	Skeleton skeleton(*skeletonData);
-	skeleton.setPosition(width / 2, height - 100);
-	skeleton.setScaleX(0.3);
-	skeleton.setScaleY(0.3);
-	skeleton.setupPose();
+		// Create a skeleton from the data, set the skeleton's position to the bottom center of
+		// the screen and scale it to make it smaller.
+		Skeleton skeleton(*skeletonData);
+		skeleton.setPosition(width / 2, height - 100);
+		skeleton.setScaleX(0.3);
+		skeleton.setScaleY(0.3);
+		skeleton.setupPose();
 
-	// Create an AnimationState to drive animations on the skeleton. Set the "portal" animation
-	// on track with index 0.
-	AnimationStateData animationStateData(*skeletonData);
-	animationStateData.setDefaultMix(0.2f);
-	AnimationState animationState(animationStateData);
-	globalAnimationState = &animationState;
-	animationState.setAnimation(0, "portal", true);
-	animationState.addAnimation(0, "run", true, 0)
-		.setListener([](AnimationState *state, EventType type, TrackEntry *entry, Event *event, void *userData) {
-			SP_UNUSED(state);
-			SP_UNUSED(entry);
-			SP_UNUSED(event);
-			SP_UNUSED(userData);
-			if (type == EventType_Event) {
-				printf("Custom event fired: %s\n", event->getData().getName().buffer());
-			}
-		});
+		// Create an AnimationState to drive animations on the skeleton. Set the "portal" animation
+		// on track with index 0.
+		AnimationStateData animationStateData(*skeletonData);
+		animationStateData.setDefaultMix(0.2f);
+		AnimationState animationState(animationStateData);
+		globalAnimationState = &animationState;
+		animationState.setAnimation(0, "portal", true);
+		animationState.addAnimation(0, "run", true, 0)
+			.setListener([](AnimationState *state, EventType type, TrackEntry *entry, Event *event, void *userData) {
+				SP_UNUSED(state);
+				SP_UNUSED(entry);
+				SP_UNUSED(event);
+				SP_UNUSED(userData);
+				if (type == EventType_Event) {
+					printf("Custom event fired: %s\n", event->getData().getName().buffer());
+				}
+			});
 
-	// Create the renderer and set the viewport size to match the window size. This sets up a
-	// pixel perfect orthogonal projection for 2D rendering.
-	renderer_t *renderer = renderer_create();
-	renderer_set_viewport_size(renderer, width, height);
+		// Create the renderer and set the viewport size to match the window size. This sets up a
+		// pixel perfect orthogonal projection for 2D rendering.
+		renderer_t *renderer = renderer_create();
+		renderer_set_viewport_size(renderer, width, height);
 
-	// Set up keyboard callback. When space is pressed, we switch to the "walk" animation.
-	glfwSetKeyCallback(window, key_callback);
+		// Set up keyboard callback. When space is pressed, we switch to the "walk" animation.
+		glfwSetKeyCallback(window, key_callback);
 
-	// Rendering loop
-	double lastTime = glfwGetTime();
-	while (!glfwWindowShouldClose(window)) {
-		// Calculate the delta time in seconds
-		double currTime = glfwGetTime();
-		float delta = currTime - lastTime;
-		lastTime = currTime;
+		// Rendering loop
+		double lastTime = glfwGetTime();
+		while (!glfwWindowShouldClose(window)) {
+			// Calculate the delta time in seconds
+			double currTime = glfwGetTime();
+			float delta = currTime - lastTime;
+			lastTime = currTime;
 
-		// Update and apply the animation state to the skeleton
-		animationState.update(delta);
-		animationState.apply(skeleton);
+			// Update and apply the animation state to the skeleton
+			animationState.update(delta);
+			animationState.apply(skeleton);
 
-		// Update the skeleton time (used for physics)
-		skeleton.update(delta);
+			// Update the skeleton time (used for physics)
+			skeleton.update(delta);
 
-		// Calculate the new pose
-		skeleton.updateWorldTransform(spine::Physics_Update);
+			// Calculate the new pose
+			skeleton.updateWorldTransform(spine::Physics_Update);
 
-		// Clear the screen
-		gl::glClear(gl::GL_COLOR_BUFFER_BIT);
+			// Clear the screen
+			gl::glClear(gl::GL_COLOR_BUFFER_BIT);
 
-		// Render the skeleton in its current pose
-		renderer_draw(renderer, &skeleton, true);
+			// Render the skeleton in its current pose
+			renderer_draw(renderer, &skeleton, true);
 
-		// Present the rendering results and poll for events
-		glfwSwapBuffers(window);
-		glfwPollEvents();
+			// Present the rendering results and poll for events
+			glfwSwapBuffers(window);
+			glfwPollEvents();
+		}
+
+		// Dispose everything
+		globalAnimationState = nullptr;
+		renderer_dispose(renderer);
+		delete skeletonData;
+		delete atlas;
 	}
 
-	// Dispose everything
-	renderer_dispose(renderer);
-	delete skeletonData;
-	delete atlas;
-
 	// Kill the window and GLFW
+	spine_report_leaks();
 	glfwTerminate();
 	return 0;
 }

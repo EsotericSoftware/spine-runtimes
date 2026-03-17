@@ -68,9 +68,10 @@ const spineTextureAtlasLoader: AssetExtension<RawAtlas | TextureAtlas, ISpineAtl
 		async load (url: string): Promise<RawAtlas> {
 			const response = await settings.ADAPTER.fetch(url);
 
-			const txt = await response.text();
+			if (!response.ok)
+				throw new Error(`[${loaderName}] Failed to fetch ${url}: ${response.status} ${response.statusText}`);
 
-			return txt;
+			return await response.text();
 		},
 
 		testParse (asset: unknown, options: ResolvedAsset): Promise<boolean> {
@@ -105,7 +106,6 @@ const spineTextureAtlasLoader: AssetExtension<RawAtlas | TextureAtlas, ISpineAtl
 
 			// we will wait for all promises for the textures at the same time at the end.
 			const textureLoadingPromises = [];
-
 
 			// setting preferCreateImageBitmap to false for loadTextures loader to allow loading PMA images
 			let oldPreferCreateImageBitmap = true;

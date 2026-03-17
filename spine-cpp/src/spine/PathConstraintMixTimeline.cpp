@@ -109,25 +109,15 @@ void PathConstraintMixTimeline::apply(Skeleton &skeleton, float lastTime, float 
 		}
 	}
 
-	switch (blend) {
-		case MixBlend_Setup: {
-			PathConstraintPose &setup = constraint->_data._setup;
-			pose._mixRotate = setup._mixRotate + (rotate - setup._mixRotate) * alpha;
-			pose._mixX = setup._mixX + (x - setup._mixX) * alpha;
-			pose._mixY = setup._mixY + (y - setup._mixY) * alpha;
-			break;
-		}
-		case MixBlend_First:
-		case MixBlend_Replace:
-			pose._mixRotate += (rotate - pose._mixRotate) * alpha;
-			pose._mixX += (x - pose._mixX) * alpha;
-			pose._mixY += (y - pose._mixY) * alpha;
-			break;
-		case MixBlend_Add:
-			pose._mixRotate += rotate * alpha;
-			pose._mixX += x * alpha;
-			pose._mixY += y * alpha;
-			break;
+	if (blend == MixBlend_Setup) {
+		PathConstraintPose &setup = constraint->_data._setup;
+		pose._mixRotate = setup._mixRotate + (rotate - setup._mixRotate) * alpha;
+		pose._mixX = setup._mixX + (x - setup._mixX) * alpha;
+		pose._mixY = setup._mixY + (y - setup._mixY) * alpha;
+	} else {
+		pose._mixRotate += (rotate - pose._mixRotate) * alpha;
+		pose._mixX += (x - pose._mixX) * alpha;
+		pose._mixY += (y - pose._mixY) * alpha;
 	}
 }
 

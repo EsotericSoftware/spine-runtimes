@@ -36,29 +36,27 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Null;
 
-import com.esotericsoftware.spine.Skeleton;
-import com.esotericsoftware.spine.Slot;
-
 /** An attachment that displays a textured mesh. A mesh has hull vertices and internal vertices within the hull. Holes are not
  * supported. Each vertex has UVs (texture coordinates) and triangles are used to map an image on to the mesh.
  * <p>
  * See <a href="https://esotericsoftware.com/spine-meshes">Mesh attachments</a> in the Spine User Guide. */
-public class MeshAttachment extends VertexAttachment implements HasTextureRegion {
-	private TextureRegion region;
-	private String path;
-	private float[] regionUVs, uvs;
+public class MeshAttachment extends VertexAttachment implements HasSequence {
+	private final Sequence sequence;
+	float[] regionUVs;
 	private short[] triangles;
-	private final Color color = new Color(1, 1, 1, 1);
 	private int hullLength;
+	private String path;
+	private final Color color = new Color(1, 1, 1, 1);
 	private @Null MeshAttachment parentMesh;
-	private @Null Sequence sequence;
 
 	// Nonessential.
 	private @Null short[] edges;
 	private float width, height;
 
-	public MeshAttachment (String name) {
+	public MeshAttachment (String name, Sequence sequence) {
 		super(name);
+		if (sequence == null) throw new IllegalArgumentException("sequence cannot be null.");
+		this.sequence = sequence;
 	}
 
 	/** Copy constructor. Use {@link #newLinkedMesh()} if the other mesh is a linked mesh. */
@@ -67,21 +65,17 @@ public class MeshAttachment extends VertexAttachment implements HasTextureRegion
 
 		if (parentMesh != null) throw new IllegalArgumentException("Use newLinkedMesh to copy a linked mesh.");
 
-		region = other.region;
 		path = other.path;
 		color.set(other.color);
 
 		regionUVs = new float[other.regionUVs.length];
 		arraycopy(other.regionUVs, 0, regionUVs, 0, regionUVs.length);
 
-		uvs = new float[other.uvs.length];
-		arraycopy(other.uvs, 0, uvs, 0, uvs.length);
-
 		triangles = new short[other.triangles.length];
 		arraycopy(other.triangles, 0, triangles, 0, triangles.length);
 
 		hullLength = other.hullLength;
-		sequence = other.sequence != null ? new Sequence(other.sequence) : null;
+		sequence = new Sequence(other.sequence);
 
 		// Nonessential.
 		if (other.edges != null) {
@@ -90,99 +84,6 @@ public class MeshAttachment extends VertexAttachment implements HasTextureRegion
 		}
 		width = other.width;
 		height = other.height;
-	}
-
-	public void setRegion (TextureRegion region) {
-		if (region == null) throw new IllegalArgumentException("region cannot be null.");
-		this.region = region;
-	}
-
-	public @Null TextureRegion getRegion () {
-		return region;
-	}
-
-	/** Calculates {@link #uvs} using the {@link #regionUVs} and region. Must be called if the region, the region's properties, or
-	 * the {@link #regionUVs} are changed. */
-	public void updateRegion () {
-		float[] regionUVs = this.regionUVs;
-		if (this.uvs == null || this.uvs.length != regionUVs.length) this.uvs = new float[regionUVs.length];
-		float[] uvs = this.uvs;
-		int n = uvs.length;
-		float u, v, width, height;
-		if (region instanceof AtlasRegion region) {
-			u = region.getU();
-			v = region.getV();
-			float textureWidth = region.getTexture().getWidth(), textureHeight = region.getTexture().getHeight();
-			switch (region.degrees) {
-			case 90 -> {
-				u -= (region.originalHeight - region.offsetY - region.packedWidth) / textureWidth;
-				v -= (region.originalWidth - region.offsetX - region.packedHeight) / textureHeight;
-				width = region.originalHeight / textureWidth;
-				height = region.originalWidth / textureHeight;
-				for (int i = 0; i < n; i += 2) {
-					uvs[i] = u + regionUVs[i + 1] * width;
-					uvs[i + 1] = v + (1 - regionUVs[i]) * height;
-				}
-				return;
-			}
-			case 180 -> {
-				u -= (region.originalWidth - region.offsetX - region.packedWidth) / textureWidth;
-				v -= region.offsetY / textureHeight;
-				width = region.originalWidth / textureWidth;
-				height = region.originalHeight / textureHeight;
-				for (int i = 0; i < n; i += 2) {
-					uvs[i] = u + (1 - regionUVs[i]) * width;
-					uvs[i + 1] = v + (1 - regionUVs[i + 1]) * height;
-				}
-				return;
-			}
-			case 270 -> {
-				u -= region.offsetY / textureWidth;
-				v -= region.offsetX / textureHeight;
-				width = region.originalHeight / textureWidth;
-				height = region.originalWidth / textureHeight;
-				for (int i = 0; i < n; i += 2) {
-					uvs[i] = u + (1 - regionUVs[i + 1]) * width;
-					uvs[i + 1] = v + regionUVs[i] * height;
-				}
-				return;
-			}
-			default -> {
-				u -= region.offsetX / textureWidth;
-				v -= (region.originalHeight - region.offsetY - region.packedHeight) / textureHeight;
-				width = region.originalWidth / textureWidth;
-				height = region.originalHeight / textureHeight;
-			}
-			}
-		} else if (region == null) {
-			u = v = 0;
-			width = height = 1;
-		} else {
-			u = region.getU();
-			v = region.getV();
-			width = region.getU2() - u;
-			height = region.getV2() - v;
-		}
-		for (int i = 0; i < n; i += 2) {
-			uvs[i] = u + regionUVs[i] * width;
-			uvs[i + 1] = v + regionUVs[i + 1] * height;
-		}
-	}
-
-	/** If the attachment has a {@link #sequence}, the region may be changed. */
-	public void computeWorldVertices (Skeleton skeleton, Slot slot, int start, int count, float[] worldVertices, int offset,
-		int stride) {
-		if (sequence != null) sequence.apply(slot.getAppliedPose(), this);
-		super.computeWorldVertices(skeleton, slot, start, count, worldVertices, offset, stride);
-	}
-
-	/** Triplets of vertex indices which describe the mesh's triangulation. */
-	public short[] getTriangles () {
-		return triangles;
-	}
-
-	public void setTriangles (short[] triangles) {
-		this.triangles = triangles;
 	}
 
 	/** The UV pair for each vertex, normalized within the texture region. */
@@ -195,27 +96,13 @@ public class MeshAttachment extends VertexAttachment implements HasTextureRegion
 		this.regionUVs = regionUVs;
 	}
 
-	/** The UV pair for each vertex, normalized within the entire texture.
-	 * <p>
-	 * See {@link #updateRegion()}. */
-	public float[] getUVs () {
-		return uvs;
+	/** Triplets of vertex indices which describe the mesh's triangulation. */
+	public short[] getTriangles () {
+		return triangles;
 	}
 
-	public void setUVs (float[] uvs) {
-		this.uvs = uvs;
-	}
-
-	public Color getColor () {
-		return color;
-	}
-
-	public String getPath () {
-		return path;
-	}
-
-	public void setPath (String path) {
-		this.path = path;
+	public void setTriangles (short[] triangles) {
+		this.triangles = triangles;
 	}
 
 	/** The number of entries at the beginning of {@link #vertices} that make up the mesh hull. */
@@ -227,12 +114,32 @@ public class MeshAttachment extends VertexAttachment implements HasTextureRegion
 		this.hullLength = hullLength;
 	}
 
+	public Sequence getSequence () {
+		return sequence;
+	}
+
+	public void updateSequence () {
+		sequence.update(this);
+	}
+
+	public String getPath () {
+		return path;
+	}
+
+	public void setPath (String path) {
+		this.path = path;
+	}
+
+	public Color getColor () {
+		return color;
+	}
+
 	public void setEdges (short[] edges) {
 		this.edges = edges;
 	}
 
 	/** Vertex index pairs describing edges for controlling triangulation, or be null if nonessential data was not exported. Mesh
-	 * triangles will never cross edges. Triangulation is not performed at runtime. */
+	 * triangles never cross edges. Triangulation is not performed at runtime. */
 	public @Null short[] getEdges () {
 		return edges;
 	}
@@ -253,14 +160,6 @@ public class MeshAttachment extends VertexAttachment implements HasTextureRegion
 
 	public void setHeight (float height) {
 		this.height = height;
-	}
-
-	public @Null Sequence getSequence () {
-		return sequence;
-	}
-
-	public void setSequence (@Null Sequence sequence) {
-		this.sequence = sequence;
 	}
 
 	/** The parent mesh if this is a linked mesh, else null. A linked mesh shares the {@link #bones}, {@link #vertices},
@@ -287,17 +186,81 @@ public class MeshAttachment extends VertexAttachment implements HasTextureRegion
 
 	/** Returns a new mesh with the {@link #parentMesh} set to this mesh's parent mesh, if any, else to this mesh. */
 	public MeshAttachment newLinkedMesh () {
-		var mesh = new MeshAttachment(name);
+		var mesh = new MeshAttachment(name, new Sequence(sequence));
 		mesh.timelineAttachment = timelineAttachment;
-		mesh.region = region;
 		mesh.path = path;
 		mesh.color.set(color);
 		mesh.setParentMesh(parentMesh != null ? parentMesh : this);
-		if (mesh.getRegion() != null) mesh.updateRegion();
+		mesh.updateSequence();
 		return mesh;
 	}
 
 	public MeshAttachment copy () {
 		return parentMesh != null ? newLinkedMesh() : new MeshAttachment(this);
+	}
+
+	/** Computes {@link Sequence#getUVs(int) UVs} for a mesh attachment.
+	 * @param uvs Output array for the computed UVs, same length as regionUVs. */
+	static void computeUVs (@Null TextureRegion region, float[] regionUVs, float[] uvs) {
+		int n = uvs.length;
+		float u, v, width, height;
+		if (region instanceof AtlasRegion r) {
+			u = r.getU();
+			v = r.getV();
+			float textureWidth = r.getTexture().getWidth(), textureHeight = r.getTexture().getHeight();
+			switch (r.degrees) {
+			case 90 -> {
+				u -= (r.originalHeight - r.offsetY - r.packedWidth) / textureWidth;
+				v -= (r.originalWidth - r.offsetX - r.packedHeight) / textureHeight;
+				width = r.originalHeight / textureWidth;
+				height = r.originalWidth / textureHeight;
+				for (int i = 0; i < n; i += 2) {
+					uvs[i] = u + regionUVs[i + 1] * width;
+					uvs[i + 1] = v + (1 - regionUVs[i]) * height;
+				}
+				return;
+			}
+			case 180 -> {
+				u -= (r.originalWidth - r.offsetX - r.packedWidth) / textureWidth;
+				v -= r.offsetY / textureHeight;
+				width = r.originalWidth / textureWidth;
+				height = r.originalHeight / textureHeight;
+				for (int i = 0; i < n; i += 2) {
+					uvs[i] = u + (1 - regionUVs[i]) * width;
+					uvs[i + 1] = v + (1 - regionUVs[i + 1]) * height;
+				}
+				return;
+			}
+			case 270 -> {
+				u -= r.offsetY / textureWidth;
+				v -= r.offsetX / textureHeight;
+				width = r.originalHeight / textureWidth;
+				height = r.originalWidth / textureHeight;
+				for (int i = 0; i < n; i += 2) {
+					uvs[i] = u + (1 - regionUVs[i + 1]) * width;
+					uvs[i + 1] = v + regionUVs[i] * height;
+				}
+				return;
+			}
+			default -> {
+				u -= r.offsetX / textureWidth;
+				v -= (r.originalHeight - r.offsetY - r.packedHeight) / textureHeight;
+				width = r.originalWidth / textureWidth;
+				height = r.originalHeight / textureHeight;
+			}
+			}
+		} else if (region == null) {
+			u = v = 0;
+			width = height = 1;
+		} else {
+			u = region.getU();
+			v = region.getV();
+			width = region.getU2() - u;
+			height = region.getV2() - v;
+		}
+		for (int i = 0; i < n; i += 2) {
+			uvs[i] = u + regionUVs[i] * width;
+			uvs[i + 1] = v + regionUVs[i + 1] * height;
+		}
 	}
 }

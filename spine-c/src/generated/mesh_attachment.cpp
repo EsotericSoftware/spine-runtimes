@@ -3,8 +3,8 @@
 
 using namespace spine;
 
-spine_mesh_attachment spine_mesh_attachment_create(const char *name) {
-	return (spine_mesh_attachment) new (__FILE__, __LINE__) MeshAttachment(String(name));
+spine_mesh_attachment spine_mesh_attachment_create(const char *name, /*@null*/ spine_sequence sequence) {
+	return (spine_mesh_attachment) new (__FILE__, __LINE__) MeshAttachment(String(name), (Sequence *) sequence);
 }
 
 void spine_mesh_attachment_dispose(spine_mesh_attachment self) {
@@ -28,21 +28,6 @@ void spine_mesh_attachment_compute_world_vertices_2(spine_mesh_attachment self, 
 	_self->computeWorldVertices(*((Skeleton *) skeleton), *((Slot *) slot), start, count, *((Array<float> *) worldVertices), offset, stride);
 }
 
-void spine_mesh_attachment_update_region(spine_mesh_attachment self) {
-	MeshAttachment *_self = (MeshAttachment *) self;
-	_self->updateRegion();
-}
-
-int spine_mesh_attachment_get_hull_length(spine_mesh_attachment self) {
-	MeshAttachment *_self = (MeshAttachment *) self;
-	return _self->getHullLength();
-}
-
-void spine_mesh_attachment_set_hull_length(spine_mesh_attachment self, int inValue) {
-	MeshAttachment *_self = (MeshAttachment *) self;
-	_self->setHullLength(inValue);
-}
-
 spine_array_float spine_mesh_attachment_get_region_u_vs(spine_mesh_attachment self) {
 	MeshAttachment *_self = (MeshAttachment *) self;
 	return (spine_array_float) &_self->getRegionUVs();
@@ -51,11 +36,6 @@ spine_array_float spine_mesh_attachment_get_region_u_vs(spine_mesh_attachment se
 void spine_mesh_attachment_set_region_u_vs(spine_mesh_attachment self, spine_array_float inValue) {
 	MeshAttachment *_self = (MeshAttachment *) self;
 	_self->setRegionUVs(*((Array<float> *) inValue));
-}
-
-spine_array_float spine_mesh_attachment_get_u_vs(spine_mesh_attachment self) {
-	MeshAttachment *_self = (MeshAttachment *) self;
-	return (spine_array_float) &_self->getUVs();
 }
 
 spine_array_unsigned_short spine_mesh_attachment_get_triangles(spine_mesh_attachment self) {
@@ -68,9 +48,24 @@ void spine_mesh_attachment_set_triangles(spine_mesh_attachment self, spine_array
 	_self->setTriangles(*((Array<unsigned short> *) inValue));
 }
 
-spine_color spine_mesh_attachment_get_color(spine_mesh_attachment self) {
+int spine_mesh_attachment_get_hull_length(spine_mesh_attachment self) {
 	MeshAttachment *_self = (MeshAttachment *) self;
-	return (spine_color) &_self->getColor();
+	return _self->getHullLength();
+}
+
+void spine_mesh_attachment_set_hull_length(spine_mesh_attachment self, int inValue) {
+	MeshAttachment *_self = (MeshAttachment *) self;
+	_self->setHullLength(inValue);
+}
+
+spine_sequence spine_mesh_attachment_get_sequence(spine_mesh_attachment self) {
+	MeshAttachment *_self = (MeshAttachment *) self;
+	return (spine_sequence) &_self->getSequence();
+}
+
+void spine_mesh_attachment_update_sequence(spine_mesh_attachment self) {
+	MeshAttachment *_self = (MeshAttachment *) self;
+	_self->updateSequence();
 }
 
 const char *spine_mesh_attachment_get_path(spine_mesh_attachment self) {
@@ -83,24 +78,9 @@ void spine_mesh_attachment_set_path(spine_mesh_attachment self, const char *inVa
 	_self->setPath(String(inValue));
 }
 
-/*@null*/ spine_texture_region spine_mesh_attachment_get_region(spine_mesh_attachment self) {
+spine_color spine_mesh_attachment_get_color(spine_mesh_attachment self) {
 	MeshAttachment *_self = (MeshAttachment *) self;
-	return (spine_texture_region) _self->getRegion();
-}
-
-void spine_mesh_attachment_set_region(spine_mesh_attachment self, /*@null*/ spine_texture_region region) {
-	MeshAttachment *_self = (MeshAttachment *) self;
-	_self->setRegion((TextureRegion *) region);
-}
-
-/*@null*/ spine_sequence spine_mesh_attachment_get_sequence(spine_mesh_attachment self) {
-	MeshAttachment *_self = (MeshAttachment *) self;
-	return (spine_sequence) _self->getSequence();
-}
-
-void spine_mesh_attachment_set_sequence(spine_mesh_attachment self, /*@null*/ spine_sequence sequence) {
-	MeshAttachment *_self = (MeshAttachment *) self;
-	_self->setSequence((Sequence *) sequence);
+	return (spine_color) &_self->getColor();
 }
 
 /*@null*/ spine_mesh_attachment spine_mesh_attachment_get_parent_mesh(spine_mesh_attachment self) {
@@ -151,6 +131,10 @@ spine_attachment spine_mesh_attachment_copy(spine_mesh_attachment self) {
 spine_mesh_attachment spine_mesh_attachment_new_linked_mesh(spine_mesh_attachment self) {
 	MeshAttachment *_self = (MeshAttachment *) self;
 	return (spine_mesh_attachment) &_self->newLinkedMesh();
+}
+
+void spine_mesh_attachment_compute_u_vs(/*@null*/ spine_texture_region region, spine_array_float regionUVs, spine_array_float uvs) {
+	MeshAttachment::computeUVs((TextureRegion *) region, *((Array<float> *) regionUVs), *((Array<float> *) uvs));
 }
 
 int spine_mesh_attachment_get_id(spine_mesh_attachment self) {

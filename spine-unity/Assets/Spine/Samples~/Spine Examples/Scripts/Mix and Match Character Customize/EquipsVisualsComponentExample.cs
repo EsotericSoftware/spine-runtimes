@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -43,8 +43,7 @@ namespace Spine.Unity.Examples {
 		Spine.Skin equipsSkin;
 		Spine.Skin collectedSkin;
 
-		public Material runtimeMaterial;
-		public Texture2D runtimeAtlas;
+		AtlasUtilities.RepackAttachmentsOutput repackingOutput;
 
 		void Start () {
 			equipsSkin = new Skin("Equips");
@@ -56,6 +55,11 @@ namespace Spine.Unity.Examples {
 
 			skeletonAnimation.Skeleton.Skin = equipsSkin;
 			RefreshSkeletonAttachments();
+		}
+
+		void OnDestroy () {
+			// Note: materials and textures returned by GetRepackedSkin() behave like 'new Texture2D()' and need to be destroyed
+			repackingOutput.DestroyGeneratedAssets();
 		}
 
 		public void Equip (int slotIndex, string attachmentName, Attachment attachment) {
@@ -72,13 +76,13 @@ namespace Spine.Unity.Examples {
 			collectedSkin.AddSkin(equipsSkin);
 
 			// 2. Create a repacked skin.
-			// Note: materials and textures returned by GetRepackedSkin() behave like 'new Texture2D()' and need to be destroyed
-			if (runtimeMaterial)
-				Destroy(runtimeMaterial);
-			if (runtimeAtlas)
-				Destroy(runtimeAtlas);
-			Skin repackedSkin = collectedSkin.GetRepackedSkin("Repacked skin", skeletonAnimation.SkeletonDataAsset.atlasAssets[0].PrimaryMaterial,
-				out runtimeMaterial, out runtimeAtlas, maxAtlasSize: 1024, clearCache: false);
+			// Note: materials and textures returned by previous GetRepackedSkin() calls behave like 'new Texture2D()'
+			// and need to be destroyed.
+			repackingOutput.DestroyGeneratedAssets();
+			AtlasUtilities.RepackAttachmentsSettings settings = AtlasUtilities.RepackAttachmentsSettings.Default;
+			settings.UseSourceMaterialsFrom(skeletonAnimation.SkeletonDataAsset);
+			settings.maxAtlasSize = 1024;
+			Skin repackedSkin = collectedSkin.GetRepackedSkin("repacked skin", settings, ref repackingOutput);
 			collectedSkin.Clear();
 
 			// You can optionally clear the textures cache after each ore multiple repack operations are done.

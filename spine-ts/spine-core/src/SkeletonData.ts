@@ -27,11 +27,12 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import type { Animation } from "./Animation"
+import type { Animation } from "./Animation.js"
 import type { BoneData } from "./BoneData.js";
-import type { ConstraintData } from "./ConstraintData";
+import type { ConstraintData } from "./ConstraintData.js";
 import type { EventData } from "./EventData.js";
 import type { Skin } from "./Skin.js";
+import { SliderData } from "./SliderData.js";
 import type { SlotData } from "./SlotData.js";
 
 /** Stores the setup pose and all of the stateless data for a skeleton.
@@ -141,6 +142,19 @@ export class SkeletonData {
 		for (let i = 0, n = events.length; i < n; i++)
 			if (events[i].name === eventDataName) return events[i];
 		return null;
+	}
+
+	/** Collects animations used by {@link SliderData slider constraints}.
+	 * <p>
+	 * Slider animations are designed to be applied by slider constraints rather than on their own. Applications that have a user
+	 * choose an animation may want to exclude them. */
+	findSliderAnimations (animations: Animation[]): Animation[] {
+		const constraints = this.constraints;
+		for (let i = 0, n = this.constraints.length; i < n; i++) {
+			const data = constraints[i];
+			if (data instanceof SliderData && data.animation != null) animations.push(data.animation);
+		}
+		return animations;
 	}
 
 	/** Finds an animation by comparing each animation's name. It is more efficient to cache the results of this method than to

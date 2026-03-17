@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -47,12 +47,12 @@ namespace Spine {
 
 			ExposedList<int> indicesArray = this.indicesArray;
 			indicesArray.Clear();
-			int[] indices = indicesArray.Resize(vertexCount).Items;
+			int[] indices = indicesArray.EnsureSize(vertexCount).Items;
 			for (int i = 0; i < vertexCount; i++)
 				indices[i] = i;
 
 			ExposedList<bool> isConcaveArray = this.isConcaveArray;
-			bool[] isConcave = isConcaveArray.Resize(vertexCount).Items;
+			bool[] isConcave = isConcaveArray.EnsureSize(vertexCount).Items;
 			for (int i = 0, n = vertexCount; i < n; ++i)
 				isConcave[i] = IsConcave(i, vertexCount, vertices, indices);
 

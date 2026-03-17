@@ -35,20 +35,19 @@ type AssetData = (Uint8Array | string | Texture | TextureAtlas | object) & Parti
 type AssetCallback<T extends AssetData> = (path: string, data: T) => void;
 type ErrorCallback = (path: string, message: string) => void;
 
+export type TextureLoader = (image: HTMLImageElement | ImageBitmap, pma?: boolean) => Texture;
+
 export class AssetManagerBase implements Disposable {
-	private pathPrefix: string = "";
-	private textureLoader: (image: HTMLImageElement | ImageBitmap) => Texture;
-	private downloader: Downloader;
-	private cache: AssetCache;
 	private errors: StringMap<string> = {};
 	private toLoad = 0;
 	private loaded = 0;
+	private texturePmaInfo: Record<string, boolean> = {};
 
-	constructor (textureLoader: (image: HTMLImageElement | ImageBitmap) => Texture, pathPrefix: string = "", downloader = new Downloader(), cache = new AssetCache()) {
-		this.textureLoader = textureLoader;
-		this.pathPrefix = pathPrefix;
-		this.downloader = downloader;
-		this.cache = cache;
+	constructor (
+		private textureLoader: TextureLoader,
+		private pathPrefix: string = "",
+		private downloader = new Downloader(),
+		private cache = new AssetCache()) {
 	}
 
 	private start (path: string): string {
@@ -175,6 +174,7 @@ export class AssetManagerBase implements Disposable {
 
 		if (this.reuseAssets(path, success, error)) return;
 
+		const pma = this.texturePmaInfo[path];
 		this.cache.assetsLoaded[path] = new Promise<Texture>((resolve, reject) => {
 			const isBrowser = !!(typeof window !== 'undefined' && typeof navigator !== 'undefined' && window.document);
 			const isWebWorker = !isBrowser; // && typeof importScripts !== 'undefined';
@@ -188,7 +188,7 @@ export class AssetManagerBase implements Disposable {
 					return blob ? createImageBitmap(blob, { premultiplyAlpha: "none", colorSpaceConversion: "none" }) : null;
 				}).then((bitmap) => {
 					if (bitmap) {
-						const texture = this.createTexture(path, bitmap);
+						const texture = this.createTexture(path, pma, bitmap);
 						this.success(success, path, texture);
 						resolve(texture);
 					};
@@ -197,7 +197,7 @@ export class AssetManagerBase implements Disposable {
 				const image = new Image();
 				image.crossOrigin = "anonymous";
 				image.onload = () => {
-					const texture = this.createTexture(path, image);
+					const texture = this.createTexture(path, pma, image);
 					this.success(success, path, texture);
 					resolve(texture);
 				};
@@ -216,7 +216,7 @@ export class AssetManagerBase implements Disposable {
 		path: string,
 		success: AssetCallback<TextureAtlas> = () => { },
 		error: ErrorCallback = () => { },
-		fileAlias?: { [keyword: string]: string }
+		fileAlias?: Record<string, string>
 	) {
 		const index = path.lastIndexOf("/");
 		const parent = index >= 0 ? path.substring(0, index + 1) : "";
@@ -227,10 +227,11 @@ export class AssetManagerBase implements Disposable {
 		this.cache.assetsLoaded[path] = new Promise<TextureAtlas>((resolve, reject) => {
 			this.downloader.downloadText(path, (atlasText: string): void => {
 				try {
-					const atlas = this.createTextureAtlas(path, atlasText);
+					const atlas = this.createTextureAtlas(atlasText, parent, path, fileAlias);
 					let toLoad = atlas.pages.length, abort = false;
 					for (const page of atlas.pages) {
-						this.loadTexture(!fileAlias ? parent + page.name : fileAlias[page.name],
+						this.loadTexture(
+							this.texturePath(parent, page.name, fileAlias),
 							(imagePath: string, texture: Texture) => {
 								if (!abort) {
 									page.setTexture(texture);
@@ -268,6 +269,8 @@ export class AssetManagerBase implements Disposable {
 		success: AssetCallback<TextureAtlas> = () => { },
 		error: ErrorCallback = () => { },
 	) {
+		const index = path.lastIndexOf("/");
+		const parent = index >= 0 ? path.substring(0, index + 1) : "";
 		path = this.start(path);
 
 		if (this.reuseAssets(path, success, error)) return;
@@ -275,7 +278,7 @@ export class AssetManagerBase implements Disposable {
 		this.cache.assetsLoaded[path] = new Promise<TextureAtlas>((resolve, reject) => {
 			this.downloader.downloadText(path, (atlasText: string): void => {
 				try {
-					const atlas = this.createTextureAtlas(path, atlasText);
+					const atlas = this.createTextureAtlas(atlasText, parent, path);
 					this.success(success, path, atlas);
 					resolve(atlas);
 				} catch (e) {
@@ -291,7 +294,6 @@ export class AssetManagerBase implements Disposable {
 		});
 	}
 
-	// Promisified versions of load function
 	async loadBinaryAsync (path: string) {
 		return new Promise((resolve, reject) => {
 			this.loadBinary(path,
@@ -413,7 +415,7 @@ export class AssetManagerBase implements Disposable {
 		}
 	}
 
-	private createTextureAtlas (path: string, atlasText: string): TextureAtlas {
+	private createTextureAtlas (atlasText: string, parentPath: string, path: string, fileAlias?: Record<string, string>): TextureAtlas {
 		const atlas = new TextureAtlas(atlasText);
 		atlas.dispose = () => {
 			if (this.cache.assetsRefCount[path] <= 0) return;
@@ -422,16 +424,25 @@ export class AssetManagerBase implements Disposable {
 				page.texture?.dispose();
 			}
 		}
+		for (const page of atlas.pages) {
+			const texturePath = this.texturePath(parentPath, page.name, fileAlias);
+			this.texturePmaInfo[this.pathPrefix + texturePath] = page.pma;
+		}
 		return atlas;
 	}
 
-	private createTexture (path: string, image: HTMLImageElement | ImageBitmap): Texture {
-		const texture = this.textureLoader(image);
+	private createTexture (path: string, pma: boolean, image: HTMLImageElement | ImageBitmap): Texture {
+		const texture = this.textureLoader(image, pma);
 		const textureDispose = texture.dispose.bind(texture);
 		texture.dispose = () => {
 			if (this.disposeAssetInternal(path)) textureDispose();
 		}
 		return texture;
+	}
+
+	private texturePath (parentPath: string, pageName: string, fileAlias?: Record<string, string>) {
+		if (!fileAlias) return parentPath + pageName;
+		return fileAlias[pageName];
 	}
 }
 

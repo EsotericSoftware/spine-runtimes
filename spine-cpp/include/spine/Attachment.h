@@ -47,6 +47,10 @@ namespace spine {
 
 		virtual Attachment &copy() = 0;
 
+		Attachment *getTimelineAttachment();
+
+		void setTimelineAttachment(Attachment *attachment);
+
 		int getRefCount();
 
 		void reference();
@@ -55,6 +59,7 @@ namespace spine {
 
 	private:
 		const String _name;
+		Attachment *_timelineAttachment;
 		int _refCount;
 	};
 }

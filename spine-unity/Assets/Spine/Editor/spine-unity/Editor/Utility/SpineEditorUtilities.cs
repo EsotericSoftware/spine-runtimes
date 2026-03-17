@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -78,7 +78,8 @@ namespace Spine.Unity.Editor {
 	// Analysis disable once ConvertToStaticType
 	[InitializeOnLoad]
 	public partial class SpineEditorUtilities : AssetPostprocessor {
-
+		public const string ReferenceAssetsFolderName = "ReferenceAssets";
+		public const string AnimationReferenceContainerSuffix = "_AnimationReferences";
 		public static string editorPath = "";
 		public static string editorGUIPath = "";
 		public static bool initialized;

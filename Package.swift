@@ -25,10 +25,17 @@ let package = Package(
         ),
         .library(
             name: "SpineiOS",
-            targets: ["SpineiOS"]
+            targets: ["SpineiOSWrapper"]
         ),
     ],
     targets: [
+        .target(
+            name: "SpineiOSWrapper",
+            dependencies: [
+                .target(name: "SpineiOS", condition: .when(platforms: [.iOS, .visionOS, .tvOS, .macCatalyst]))
+            ],
+            path: "spine-ios/Sources/SpineiOSWrapper"
+        ),
         .target(
             name: "SpineiOS",
             dependencies: [
@@ -41,17 +48,8 @@ let package = Package(
             name: "SpineC",
             path: "spine-ios/Sources/SpineC",
             sources: [
-                "spine-c/src/extensions.cpp",
-                "spine-c/src/generated",
-                "spine-cpp/src/spine",
-            ],
-            publicHeadersPath: "spine-c/include",
-            cxxSettings: [
-                .headerSearchPath("spine-c/include"),
-                .headerSearchPath("spine-c/src"),
-                .headerSearchPath("spine-c/src/generated"),
-                .headerSearchPath("spine-cpp/include"),
-                .headerSearchPath("spine-cpp/src"),
+                "src",
+                "spine",
             ],
             linkerSettings: [
                 .linkedLibrary("c++")

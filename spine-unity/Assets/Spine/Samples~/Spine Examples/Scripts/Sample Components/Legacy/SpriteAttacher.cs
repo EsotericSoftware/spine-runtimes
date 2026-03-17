@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -119,7 +119,7 @@ namespace Spine.Unity.Examples {
 				if (sprite == null)
 					attachment = null;
 				else
-					attachment = applyPMA ? sprite.ToRegionAttachmentPMAClone(attachmentShader) : sprite.ToRegionAttachment(SpriteAttacher.GetPageFor(sprite.texture, attachmentShader));
+					attachment = applyPMA ? sprite.ToRegionAttachmentWithNewPMATexture(attachmentShader) : sprite.ToRegionAttachment(SpriteAttacher.GetPageFor(sprite.texture, attachmentShader));
 			}
 		}
 
@@ -151,14 +151,14 @@ namespace Spine.Unity.Examples {
 
 		[System.Obsolete]
 		public static RegionAttachment AttachUnitySprite (this Skeleton skeleton, string slotName, Sprite sprite, Shader shader, bool applyPMA, float rotation = 0f) {
-			RegionAttachment att = applyPMA ? sprite.ToRegionAttachmentPMAClone(shader, rotation: rotation) : sprite.ToRegionAttachment(new Material(shader), rotation: rotation);
+			RegionAttachment att = applyPMA ? sprite.ToRegionAttachmentWithNewPMATexture(shader, rotation: rotation) : sprite.ToRegionAttachment(new Material(shader), rotation: rotation);
 			skeleton.FindSlot(slotName).AppliedPose.Attachment = att;
 			return att;
 		}
 
 		[System.Obsolete]
 		public static RegionAttachment AddUnitySprite (this SkeletonData skeletonData, string slotName, Sprite sprite, string skinName, Shader shader, bool applyPMA, float rotation = 0f) {
-			RegionAttachment att = applyPMA ? sprite.ToRegionAttachmentPMAClone(shader, rotation: rotation) : sprite.ToRegionAttachment(new Material(shader), rotation);
+			RegionAttachment att = applyPMA ? sprite.ToRegionAttachmentWithNewPMATexture(shader, rotation: rotation) : sprite.ToRegionAttachment(new Material(shader), rotation);
 
 			int slotIndex = skeletonData.FindSlot(slotName).Index;
 			Skin skin = skeletonData.DefaultSkin;

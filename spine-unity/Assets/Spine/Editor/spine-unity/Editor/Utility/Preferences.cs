@@ -2,7 +2,7 @@
  * Spine Runtimes License Agreement
  * Last updated April 5, 2025. Replaces all prior versions.
  *
- * Copyright (c) 2013-2025, Esoteric Software LLC
+ * Copyright (c) 2013-2026, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -41,6 +41,10 @@
 
 #if UNITY_2018_3_OR_NEWER
 #define NEW_PREFERENCES_SETTINGS_PROVIDER
+#endif
+
+#if UNITY_2017_3_OR_NEWER
+#define ALLOWS_CUSTOM_PROFILING
 #endif
 
 #if !SPINE_AUTO_UPGRADE_COMPONENTS_OFF
@@ -438,30 +442,6 @@ namespace Spine.Unity.Editor {
 					}
 				}
 
-#if SPINE_TK2D_DEFINE
-				bool isTK2DDefineSet = true;
-#else
-				bool isTK2DDefineSet = false;
-#endif
-				bool isTK2DAllowed = SpineTK2DEditorUtility.IsTK2DAllowed;
-				if (SpineTK2DEditorUtility.IsTK2DInstalled() || isTK2DDefineSet) {
-					GUILayout.Space(20);
-					EditorGUILayout.LabelField("3rd Party Settings", EditorStyles.boldLabel);
-					using (new GUILayout.HorizontalScope()) {
-						EditorGUILayout.PrefixLabel("Define TK2D");
-						if (isTK2DAllowed && GUILayout.Button("Enable", GUILayout.Width(64)))
-							SpineTK2DEditorUtility.EnableTK2D();
-						if (GUILayout.Button("Disable", GUILayout.Width(64)))
-							SpineTK2DEditorUtility.DisableTK2D();
-					}
-#if !SPINE_TK2D_DEFINE
-					if (!isTK2DAllowed) {
-						EditorGUILayout.LabelField("To allow TK2D support, please modify line 67 in", EditorStyles.boldLabel);
-						EditorGUILayout.LabelField("Spine/Editor/spine-unity/Editor/Util./BuildSettings.cs", EditorStyles.boldLabel);
-					}
-#endif
-				}
-
 				GUILayout.Space(20);
 				EditorGUILayout.LabelField("Automatic Component Upgrade", EditorStyles.boldLabel);
 #if SPINE_AUTO_UPGRADE_COMPONENTS_OFF
@@ -507,6 +487,32 @@ namespace Spine.Unity.Editor {
 					SpineEditorUtilities.BoolRuntimePropertiesField(
 						() => RuntimeSettings.UseThreadedAnimation, value => RuntimeSettings.UseThreadedAnimation = value,
 						new GUIContent("Threaded Animation", "Global setting for the equally named SkeletonAnimation and SkeletonGraphic Inspector parameter."));
+
+#if SPINE_DISABLE_LOAD_BALANCING
+					bool loadBalancingEnabled = false;
+#else
+					bool loadBalancingEnabled = true;
+#endif
+					using (new GUILayout.HorizontalScope()) {
+						EditorGUILayout.PrefixLabel(new GUIContent("Load Balancing",
+							"Enable load balancing to better utilize threads." +
+							"Only has an effect when using threaded animation or threaded mesh generation."));
+						EnableDisableDefineButtons(SpineBuildEnvUtility.SPINE_DISABLE_LOAD_BALANCING, loadBalancingEnabled, invert: true);
+					}
+
+#if ALLOWS_CUSTOM_PROFILING
+#if SPINE_ENABLE_THREAD_PROFILING
+					bool threadProfilingEnabled = true;
+#else
+					bool threadProfilingEnabled = false;
+#endif
+					using (new GUILayout.HorizontalScope()) {
+						EditorGUILayout.PrefixLabel(new GUIContent("Thread Profiling",
+							"Enable profiling of Spine worker threads in the Unity Profiler. " +
+							"Enable only when needed, as it adds some overhead."));
+						EnableDisableDefineButtons(SpineBuildEnvUtility.SPINE_ENABLE_THREAD_PROFILING, threadProfilingEnabled);
+					}
+#endif
 				}
 
 				GUILayout.Space(20);

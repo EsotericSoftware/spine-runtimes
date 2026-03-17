@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.37311953, g: 0.38074014, b: 0.3587274, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -98,7 +98,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_UseShadowmask: 1
+  m_UseShadowmask: 0
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -507,7 +507,7 @@ MonoBehaviour:
   multiplyMaterial: {fileID: 0}
   screenMaterial: {fileID: 0}
   layoutScaleMode: 0
-  referenceSize: {x: 683.73193, y: 853.6634}
+  referenceSize: {x: 683.7319, y: 689.6365}
   pivotOffset: {x: 0, y: 0}
   referenceScale: 1
   layoutScale: 1
@@ -640,7 +640,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   updateTiming: 1
   threadedAnimation: 2
-  isUpdatedExternally: 0
   animationName: main
   loop: 1
   timeScale: 1
@@ -1176,7 +1175,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 12
+    m_FontSize: 10
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 1
@@ -1187,22 +1186,14 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'In URP the Outline has to be a separate GameObject.
-
-    To add an outline
-    to your SkeletenRenderer:
-
-    1) Add a child GameObject and move it a bit back.
-
-    2)
-    Add a `RenderExistingMesh` component, found in latest `Spine Examples`
-
-    3)
-    Copy the original material, add  _Outline to its name and set the shader to `Universal
-    Render Pipeline/Spine/Outline/Skeleton-OutlineOnly`.
-
-    4) Assign this _Outline
-    material at the `RenderExistingMesh` under Replacement Materials.'
+  m_Text: "In URP you can draw the Outline as a separate GameObject.\nTo add an outline
+    to your SkeletenRenderer:\n1) Add a child GameObject and move it a bit back.\n2)
+    Add a `RenderExistingMesh` component, found in latest `Spine Examples`\n3) Copy
+    the original material, add  _Outline to its name and set the shader to `Universal
+    Render Pipeline/Spine/Outline/Skeleton-OutlineOnly`.\n4) Assign this _Outline
+    material at the `RenderExistingMesh` under Replacement Materials.\n\nAlternatively
+    you can use the new 'Outline' property to switch to a two-pass shader. See the
+    example scene\n 'Outline Shaders URP OutlinePass'."
 --- !u!222 &832862687
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1656,7 +1647,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   updateTiming: 1
   threadedAnimation: 2
-  isUpdatedExternally: 0
   animationName: walk
   loop: 1
   timeScale: 1
@@ -1916,7 +1906,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   updateTiming: 1
   threadedAnimation: 2
-  isUpdatedExternally: 0
   animationName: sneak
   loop: 1
   timeScale: 0.5

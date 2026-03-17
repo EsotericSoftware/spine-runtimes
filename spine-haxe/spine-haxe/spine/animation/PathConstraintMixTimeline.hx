@@ -114,20 +114,15 @@ class PathConstraintMixTimeline extends CurveTimeline implements ConstraintTimel
 				y = getBezierValue(time, i, Y, curveType + CurveTimeline.BEZIER_SIZE * 2 - CurveTimeline.BEZIER);
 		}
 
-		switch (blend) {
-			case MixBlend.setup:
-				var setup = constraint.data.setup;
-				pose.mixRotate = setup.mixRotate + (rotate - setup.mixRotate) * alpha;
-				pose.mixX = setup.mixX + (x - setup.mixX) * alpha;
-				pose.mixY = setup.mixY + (y - setup.mixY) * alpha;
-			case MixBlend.first, MixBlend.replace:
-				pose.mixRotate += (rotate - pose.mixRotate) * alpha;
-				pose.mixX += (x - pose.mixX) * alpha;
-				pose.mixY += (y - pose.mixY) * alpha;
-			case MixBlend.add:
-				pose.mixRotate += rotate * alpha;
-				pose.mixX += x * alpha;
-				pose.mixY += y * alpha;
+		if (blend == MixBlend.setup) {
+			var setup = constraint.data.setup;
+			pose.mixRotate = setup.mixRotate + (rotate - setup.mixRotate) * alpha;
+			pose.mixX = setup.mixX + (x - setup.mixX) * alpha;
+			pose.mixY = setup.mixY + (y - setup.mixY) * alpha;
+		} else {
+			pose.mixRotate += (rotate - pose.mixRotate) * alpha;
+			pose.mixX += (x - pose.mixX) * alpha;
+			pose.mixY += (y - pose.mixY) * alpha;
 		}
 	}
 }

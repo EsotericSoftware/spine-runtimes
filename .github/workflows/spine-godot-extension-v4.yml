@@ -144,7 +144,7 @@ jobs:
       - name: Install NDK
         run: |
           yes | sudo ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager --licenses
-          ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager --install "ndk;23.2.8568313"
+          ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager --install "ndk;28.1.13356709"
 
       - name: Setup python and scons
         uses: ./.github/actions/setup-godot-deps-4
@@ -153,8 +153,8 @@ jobs:
         run: |
           cd spine-godot/build
           ./setup-extension.sh $GODOT_TAG $DEV_BUILD
-          ANDROID_NDK_ROOT=$ANDROID_SDK_ROOT/ndk/23.2.8568313 ./build-extension.sh android
-          ANDROID_NDK_ROOT=$ANDROID_SDK_ROOT/ndk/23.2.8568313 ./build-extension.sh android x86_64
+          ANDROID_NDK_ROOT=$ANDROID_SDK_ROOT/ndk/28.1.13356709 ./build-extension.sh android
+          ANDROID_NDK_ROOT=$ANDROID_SDK_ROOT/ndk/28.1.13356709 ./build-extension.sh android x86_64
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -172,7 +172,7 @@ jobs:
       - name: Set up Emscripten latest
         uses: mymindstorm/setup-emsdk@v11
         with:
-          version: 3.1.26
+          version: 4.0.20
 
       - name: Setup python and scons
         uses: ./.github/actions/setup-godot-deps-4

@@ -46,7 +46,7 @@ class SkinsAndAnimationBoundsProvider extends BoundsProvider {
 	 * @param timeStep The time step to use for calculating the bounds. A smaller time step means more precision, but slower calculation.
 	 * @param clipping If true, clipping attachments are used to compute the bounds. False, by default.
 	 */
-	public function new(?animation:String, ?skins:Array<String>, timeStep:Float = 0.05, clipping = false) {
+	public function new(?animation:String, ?skins:Array<String>, clipping = false, timeStep:Float = 0.05) {
 		if (skins == null)
 			skins = [];
 		this.animation = animation;

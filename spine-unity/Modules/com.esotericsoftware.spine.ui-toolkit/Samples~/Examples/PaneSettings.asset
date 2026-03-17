@@ -12,10 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 19101, guid: 0000000000000000e000000000000000, type: 0}
   m_Name: PaneSettings
   m_EditorClassIdentifier: 
-  themeUss: {fileID: -4733365628477956816, guid: 6fd02a62ce112e547aa19d3af6f42b02, type: 3}
+  themeUss: {fileID: -4733365628477956816, guid: 979e15cdd57e0ce42b2b97c7a4361084, type: 3}
+  m_DisableNoThemeWarning: 0
   m_TargetTexture: {fileID: 0}
   m_RenderMode: 0
-  m_WorldSpaceLayer: 0
+  m_ColliderUpdateMode: 0
+  m_ColliderIsTrigger: 1
   m_ScaleMode: 1
   m_ReferenceSpritePixelsPerUnit: 100
   m_PixelsPerUnit: 100
@@ -32,12 +34,19 @@ MonoBehaviour:
   m_ClearColor: 0
   m_ColorClearValue: {r: 0, g: 0, b: 0, a: 0}
   m_VertexBudget: 0
+  m_TextureSlotCount: 8
   m_DynamicAtlasSettings:
     m_MinAtlasSize: 64
     m_MaxAtlasSize: 4096
     m_MaxSubTextureSize: 64
     m_ActiveFilters: -1
   m_AtlasBlitShader: {fileID: 9101, guid: 0000000000000000f000000000000000, type: 0}
-  m_RuntimeShader: {fileID: 9100, guid: 0000000000000000f000000000000000, type: 0}
-  m_RuntimeWorldShader: {fileID: 9102, guid: 0000000000000000f000000000000000, type: 0}
+  m_DefaultShader: {fileID: 9100, guid: 0000000000000000f000000000000000, type: 0}
+  m_RuntimeGaussianBlurShader: {fileID: 20300, guid: 0000000000000000f000000000000000, type: 0}
+  m_RuntimeColorEffectShader: {fileID: 20301, guid: 0000000000000000f000000000000000, type: 0}
+  m_SDFShader: {fileID: 19011, guid: 0000000000000000f000000000000000, type: 0}
+  m_BitmapShader: {fileID: 9001, guid: 0000000000000000f000000000000000, type: 0}
+  m_SpriteShader: {fileID: 19012, guid: 0000000000000000f000000000000000, type: 0}
+  m_ICUDataAsset: {fileID: 0}
+  forceGammaRendering: 0
   textSettings: {fileID: 0}

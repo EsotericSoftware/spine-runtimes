@@ -3,8 +3,8 @@
 
 using namespace spine;
 
-spine_region_attachment spine_region_attachment_create(const char *name) {
-	return (spine_region_attachment) new (__FILE__, __LINE__) RegionAttachment(String(name));
+spine_region_attachment spine_region_attachment_create(const char *name, /*@null*/ spine_sequence sequence) {
+	return (spine_region_attachment) new (__FILE__, __LINE__) RegionAttachment(String(name), (Sequence *) sequence);
 }
 
 void spine_region_attachment_dispose(spine_region_attachment self) {
@@ -16,21 +16,21 @@ spine_rtti spine_region_attachment_get_rtti(spine_region_attachment self) {
 	return (spine_rtti) &_self->getRTTI();
 }
 
-void spine_region_attachment_update_region(spine_region_attachment self) {
+void spine_region_attachment_compute_world_vertices_1(spine_region_attachment self, spine_slot slot, /*@null*/ float *vertexOffsets,
+													  /*@null*/ float *worldVertices, size_t offset, size_t stride) {
 	RegionAttachment *_self = (RegionAttachment *) self;
-	_self->updateRegion();
+	_self->computeWorldVertices(*((Slot *) slot), vertexOffsets, worldVertices, offset, stride);
 }
 
-void spine_region_attachment_compute_world_vertices_1(spine_region_attachment self, spine_slot slot, /*@null*/ float *worldVertices, size_t offset,
-													  size_t stride) {
+void spine_region_attachment_compute_world_vertices_2(spine_region_attachment self, spine_slot slot, spine_array_float vertexOffsets,
+													  spine_array_float worldVertices, size_t offset, size_t stride) {
 	RegionAttachment *_self = (RegionAttachment *) self;
-	_self->computeWorldVertices(*((Slot *) slot), worldVertices, offset, stride);
+	_self->computeWorldVertices(*((Slot *) slot), *((Array<float> *) vertexOffsets), *((Array<float> *) worldVertices), offset, stride);
 }
 
-void spine_region_attachment_compute_world_vertices_2(spine_region_attachment self, spine_slot slot, spine_array_float worldVertices, size_t offset,
-													  size_t stride) {
+spine_array_float spine_region_attachment_get_offsets(spine_region_attachment self, spine_slot_pose pose) {
 	RegionAttachment *_self = (RegionAttachment *) self;
-	_self->computeWorldVertices(*((Slot *) slot), *((Array<float> *) worldVertices), offset, stride);
+	return (spine_array_float) &_self->getOffsets(*((SlotPose *) pose));
 }
 
 float spine_region_attachment_get_x(spine_region_attachment self) {
@@ -53,16 +53,6 @@ void spine_region_attachment_set_y(spine_region_attachment self, float inValue) 
 	_self->setY(inValue);
 }
 
-float spine_region_attachment_get_rotation(spine_region_attachment self) {
-	RegionAttachment *_self = (RegionAttachment *) self;
-	return _self->getRotation();
-}
-
-void spine_region_attachment_set_rotation(spine_region_attachment self, float inValue) {
-	RegionAttachment *_self = (RegionAttachment *) self;
-	_self->setRotation(inValue);
-}
-
 float spine_region_attachment_get_scale_x(spine_region_attachment self) {
 	RegionAttachment *_self = (RegionAttachment *) self;
 	return _self->getScaleX();
@@ -81,6 +71,16 @@ float spine_region_attachment_get_scale_y(spine_region_attachment self) {
 void spine_region_attachment_set_scale_y(spine_region_attachment self, float inValue) {
 	RegionAttachment *_self = (RegionAttachment *) self;
 	_self->setScaleY(inValue);
+}
+
+float spine_region_attachment_get_rotation(spine_region_attachment self) {
+	RegionAttachment *_self = (RegionAttachment *) self;
+	return _self->getRotation();
+}
+
+void spine_region_attachment_set_rotation(spine_region_attachment self, float inValue) {
+	RegionAttachment *_self = (RegionAttachment *) self;
+	_self->setRotation(inValue);
 }
 
 float spine_region_attachment_get_width(spine_region_attachment self) {
@@ -103,9 +103,14 @@ void spine_region_attachment_set_height(spine_region_attachment self, float inVa
 	_self->setHeight(inValue);
 }
 
-spine_color spine_region_attachment_get_color(spine_region_attachment self) {
+spine_sequence spine_region_attachment_get_sequence(spine_region_attachment self) {
 	RegionAttachment *_self = (RegionAttachment *) self;
-	return (spine_color) &_self->getColor();
+	return (spine_sequence) &_self->getSequence();
+}
+
+void spine_region_attachment_update_sequence(spine_region_attachment self) {
+	RegionAttachment *_self = (RegionAttachment *) self;
+	_self->updateSequence();
 }
 
 const char *spine_region_attachment_get_path(spine_region_attachment self) {
@@ -118,34 +123,9 @@ void spine_region_attachment_set_path(spine_region_attachment self, const char *
 	_self->setPath(String(inValue));
 }
 
-/*@null*/ spine_texture_region spine_region_attachment_get_region(spine_region_attachment self) {
+spine_color spine_region_attachment_get_color(spine_region_attachment self) {
 	RegionAttachment *_self = (RegionAttachment *) self;
-	return (spine_texture_region) _self->getRegion();
-}
-
-void spine_region_attachment_set_region(spine_region_attachment self, /*@null*/ spine_texture_region region) {
-	RegionAttachment *_self = (RegionAttachment *) self;
-	_self->setRegion((TextureRegion *) region);
-}
-
-/*@null*/ spine_sequence spine_region_attachment_get_sequence(spine_region_attachment self) {
-	RegionAttachment *_self = (RegionAttachment *) self;
-	return (spine_sequence) _self->getSequence();
-}
-
-void spine_region_attachment_set_sequence(spine_region_attachment self, /*@null*/ spine_sequence sequence) {
-	RegionAttachment *_self = (RegionAttachment *) self;
-	_self->setSequence((Sequence *) sequence);
-}
-
-spine_array_float spine_region_attachment_get_offset(spine_region_attachment self) {
-	RegionAttachment *_self = (RegionAttachment *) self;
-	return (spine_array_float) &_self->getOffset();
-}
-
-spine_array_float spine_region_attachment_get_u_vs(spine_region_attachment self) {
-	RegionAttachment *_self = (RegionAttachment *) self;
-	return (spine_array_float) &_self->getUVs();
+	return (spine_color) &_self->getColor();
 }
 
 spine_attachment spine_region_attachment_copy(spine_region_attachment self) {
@@ -153,9 +133,25 @@ spine_attachment spine_region_attachment_copy(spine_region_attachment self) {
 	return (spine_attachment) &_self->copy();
 }
 
+void spine_region_attachment_compute_u_vs(/*@null*/ spine_texture_region region, float x, float y, float scaleX, float scaleY, float rotation,
+										  float width, float height, spine_array_float offset, spine_array_float uvs) {
+	RegionAttachment::computeUVs((TextureRegion *) region, x, y, scaleX, scaleY, rotation, width, height, *((Array<float> *) offset),
+								 *((Array<float> *) uvs));
+}
+
 const char *spine_region_attachment_get_name(spine_region_attachment self) {
 	RegionAttachment *_self = (RegionAttachment *) self;
 	return _self->getName().buffer();
+}
+
+/*@null*/ spine_attachment spine_region_attachment_get_timeline_attachment(spine_region_attachment self) {
+	RegionAttachment *_self = (RegionAttachment *) self;
+	return (spine_attachment) _self->getTimelineAttachment();
+}
+
+void spine_region_attachment_set_timeline_attachment(spine_region_attachment self, /*@null*/ spine_attachment attachment) {
+	RegionAttachment *_self = (RegionAttachment *) self;
+	_self->setTimelineAttachment((Attachment *) attachment);
 }
 
 int spine_region_attachment_get_ref_count(spine_region_attachment self) {

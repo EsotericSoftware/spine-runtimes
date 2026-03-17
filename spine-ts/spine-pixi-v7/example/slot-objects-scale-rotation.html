@@ -55,25 +55,34 @@
         const bone = spineGO.skeleton.findBone("replaceMe");
 
         const myObject = {
-          parentScaleX: 1,  parentScaleY: 1,  parentRotation: 0,
-          parent2ScaleX: 1, parent2ScaleY: 1, parent2Rotation: 0,
+          parentScaleX: 1,  parentScaleY: 1,  parentRotation: 0,  parentShearX: 0, parentShearY: 0,
+          parent2ScaleX: 1, parent2ScaleY: 1, parent2Rotation: 0, parent2ShearX: 0, parent2ShearY: 0,
           scaleX: 1,        scaleY: 1,        rotation: 0,
+          shearX: 0,        shearY: 0,
+          spriteAlpha: 1,
         };
 
         const gui = new lil.GUI({});
         gui.add(myObject, 'parentScaleX').min(-3).max(3).step(0.1).name('parentScaleX').onChange(value => parentBone.pose.scaleX = value);
         gui.add(myObject, 'parentScaleY').min(-3).max(3).step(0.1).name('parentScaleY').onChange(value => parentBone.pose.scaleY = value);
         gui.add(myObject, 'parentRotation').min(-180).max(180).step(1).name('parentRotation').onChange(value => parentBone.pose.rotation = value);
+        gui.add(myObject, 'parentShearX').min(-180).max(180).step(1).name('parentShearX').onChange(value => parentBone.pose.shearX = value);
+        gui.add(myObject, 'parentShearY').min(-180).max(180).step(1).name('parentShearY').onChange(value => parentBone.pose.shearY = value);
         gui.add(myObject, 'parent2ScaleX').min(-3).max(3).step(0.1).name('parent2ScaleX').onChange(value => parent2Bone.pose.scaleX = value);
         gui.add(myObject, 'parent2ScaleY').min(-3).max(3).step(0.1).name('parent2ScaleY').onChange(value => parent2Bone.pose.scaleY = value);
         gui.add(myObject, 'parent2Rotation').min(-180).max(180).step(1).name('parent2Rotation').onChange(value => parent2Bone.pose.rotation = value);
+        gui.add(myObject, 'parent2ShearX').min(-180).max(180).step(1).name('parent2ShearX').onChange(value => parent2Bone.pose.shearX = value);
+        gui.add(myObject, 'parent2ShearY').min(-180).max(180).step(1).name('parent2ShearY').onChange(value => parent2Bone.pose.shearY = value);
         gui.add(myObject, 'scaleX').min(-3).max(3).step(0.1).name('scaleX').onChange(value => bone.pose.scaleX = value);
         gui.add(myObject, 'scaleY').min(-3).max(3).step(0.1).name('scaleY').onChange(value => bone.pose.scaleY = value);
         gui.add(myObject, 'rotation').min(-180).max(180).step(1).name('rotation').onChange(value => bone.pose.rotation = value);
+        gui.add(myObject, 'shearX').min(-180).max(180).step(1).name('shearX').onChange(value => bone.pose.shearX = value);
+        gui.add(myObject, 'shearY').min(-180).max(180).step(1).name('shearY').onChange(value => bone.pose.shearY = value);
+        gui.add(myObject, 'spriteAlpha').min(0).max(1).step(0.01).name('spriteAlpha').onChange(value => sprite.alpha = value);
 
         // add instructions
         const basicText = new PIXI.Text(
-          "This example shows that slot objects follow scale and rotation from ancestors too, but if a rotation on a bone occurs scale won't work anymore on ancestors.",
+          "This example shows that slot objects can follow scale, shear and rotation from ancestors too.",
           { fontSize: 20, fill: "white", wordWrap: true, wordWrapWidth: 300 }
         );
         basicText.position.set(10, 10);

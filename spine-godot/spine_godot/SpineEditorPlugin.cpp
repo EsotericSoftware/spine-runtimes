@@ -197,11 +197,24 @@ Error SpineBinaryResourceImportPlugin::import(const String &source_file, const S
 
 #ifdef SPINE_GODOT_EXTENSION
 SpineEditorPlugin::SpineEditorPlugin() {
-	add_import_plugin(memnew(SpineAtlasResourceImportPlugin));
-	add_import_plugin(memnew(SpineJsonResourceImportPlugin));
-	add_import_plugin(memnew(SpineBinaryResourceImportPlugin));
-	add_inspector_plugin(memnew(SpineSkeletonDataResourceInspectorPlugin));
-	// add_inspector_plugin(memnew(SpineSpriteInspectorPlugin));
+	atlas_import_plugin = Ref<EditorImportPlugin>(memnew(SpineAtlasResourceImportPlugin));
+	json_import_plugin = Ref<EditorImportPlugin>(memnew(SpineJsonResourceImportPlugin));
+	binary_import_plugin = Ref<EditorImportPlugin>(memnew(SpineBinaryResourceImportPlugin));
+	skeleton_data_inspector_plugin = Ref<EditorInspectorPlugin>(memnew(SpineSkeletonDataResourceInspectorPlugin));
+
+	add_import_plugin(atlas_import_plugin);
+	add_import_plugin(json_import_plugin);
+	add_import_plugin(binary_import_plugin);
+	add_inspector_plugin(skeleton_data_inspector_plugin);
+}
+
+void SpineEditorPlugin::_notification(int p_what) {
+	if (p_what == NOTIFICATION_PREDELETE) {
+		remove_import_plugin(atlas_import_plugin);
+		remove_import_plugin(json_import_plugin);
+		remove_import_plugin(binary_import_plugin);
+		remove_inspector_plugin(skeleton_data_inspector_plugin);
+	}
 }
 #else
 SpineEditorPlugin::SpineEditorPlugin(EditorNode *node) {
@@ -456,7 +469,20 @@ void SpineEditorPropertyAnimationMix::update_property() {
 	mix_float->set_h_size_flags(SIZE_EXPAND_FILL);
 	mix_float->set_name_split_ratio(0);
 	mix_float->set_selectable(false);
+#if (VERSION_MAJOR >= 4 && VERSION_MINOR >= 6)
+	EditorPropertyRangeHint range_hint;
+	range_hint.min = 0;
+	range_hint.max = 9999999;
+	range_hint.step = 0.001;
+	range_hint.or_greater = true;
+	range_hint.or_less = false;
+	range_hint.exp_range = false;
+	range_hint.hide_control = false;
+	range_hint.radians_as_degrees = false;
+	mix_float->setup(range_hint);
+#else
 	mix_float->setup(0, 9999999, 0.001, true, false, false, false);
+#endif
 	mix_float->set_object_and_property(mix, "mix");
 	mix_float->update_property();
 #if VERSION_MAJOR > 3

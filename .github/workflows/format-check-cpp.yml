@@ -2,6 +2,22 @@ name: Check C++ Formatting
 
 on:
   push:
+    paths:
+      - 'spine-cpp/**'
+      - 'spine-c/**'
+      - 'spine-godot/**'
+      - 'spine-ue/**'
+      - 'spine-glfw/**'
+      - 'spine-sdl/**'
+      - 'spine-sfml/**'
+      - 'spine-cocos2dx/**'
+      - 'spine-ios/**'
+      - 'spine-flutter/ios/**'
+      - 'spine-flutter/macos/**'
+      - 'spine-flutter/src/**'
+      - 'formatters/.clang-format'
+      - 'formatters/format-cpp.sh'
+      - '.github/workflows/format-check-cpp.yml'
   workflow_dispatch:
 
 jobs:

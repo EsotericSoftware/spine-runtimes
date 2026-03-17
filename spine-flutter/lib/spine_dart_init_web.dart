@@ -105,6 +105,7 @@ Future<SpineDartFFI> initSpineDartFFI(bool useStaticLinkage) async {
     registerOpaqueType<spine_curve_timeline1_wrapper>();
     registerOpaqueType<spine_curve_timeline_wrapper>();
     registerOpaqueType<spine_deform_timeline_wrapper>();
+    registerOpaqueType<spine_draw_order_folder_timeline_wrapper>();
     registerOpaqueType<spine_draw_order_timeline_wrapper>();
     registerOpaqueType<spine_event_data_wrapper>();
     registerOpaqueType<spine_event_queue_entry_wrapper>();
