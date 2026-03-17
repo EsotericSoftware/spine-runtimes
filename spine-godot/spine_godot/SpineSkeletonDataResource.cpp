@@ -505,6 +505,7 @@ void SpineSkeletonDataResource::update_mixes() {
 	animation_state_data->setDefaultMix(default_mix);
 	for (int i = 0; i < animation_mixes.size(); i++) {
 		Ref<SpineAnimationMix> mix = animation_mixes[i];
+		if (mix.is_null()) continue;
 		spine::Animation *from =
 				skeleton_data->findAnimation(mix->get_from().utf8().ptr());
 		spine::Animation *to =

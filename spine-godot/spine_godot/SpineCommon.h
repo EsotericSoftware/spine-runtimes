@@ -32,6 +32,7 @@
 
 #ifdef SPINE_GODOT_EXTENSION
 #include <godot_cpp/core/version.hpp>
+#include <godot_cpp/classes/ref.hpp>
 
 // When running scons with deprecated=no, these are not defined in version.h in Godot 4.5.1
 // but our code for older versions of Godot relies on them.

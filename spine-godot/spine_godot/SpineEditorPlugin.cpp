@@ -35,6 +35,11 @@
 #if VERSION_MAJOR > 3
 #ifdef SPINE_GODOT_EXTENSION
 #include <godot_cpp/classes/editor_undo_redo_manager.hpp>
+#include <godot_cpp/classes/editor_interface.hpp>
+#include <godot_cpp/classes/h_box_container.hpp>
+#include <godot_cpp/classes/option_button.hpp>
+#include <godot_cpp/classes/spin_box.hpp>
+#include <godot_cpp/classes/button.hpp>
 #else
 #include "editor/editor_undo_redo_manager.h"
 #endif
@@ -225,8 +230,16 @@ bool SpineSkeletonDataResourceInspectorPlugin::parse_property(Object *object, co
 bool SpineSkeletonDataResourceInspectorPlugin::parse_property(Object *object, Variant::Type type, const String &path,
 															  PropertyHint hint, const String &hint_text, int usage) {
 #endif
-// FIXME can't do this in godot-cpp
 #ifndef SPINE_GODOT_EXTENSION
+	if (path == "animation_mixes") {
+		Ref<SpineSkeletonDataResource> skeleton_data = Object::cast_to<SpineSkeletonDataResource>(object);
+		if (!skeleton_data.is_valid() || !skeleton_data->is_skeleton_data_loaded()) return true;
+		auto mixes_property = memnew(SpineEditorPropertyAnimationMixes);
+		mixes_property->setup(skeleton_data);
+		add_property_editor(path, mixes_property);
+		return true;
+	}
+#else
 	if (path == "animation_mixes") {
 		Ref<SpineSkeletonDataResource> skeleton_data = Object::cast_to<SpineSkeletonDataResource>(object);
 		if (!skeleton_data.is_valid() || !skeleton_data->is_skeleton_data_loaded()) return true;
@@ -239,7 +252,6 @@ bool SpineSkeletonDataResourceInspectorPlugin::parse_property(Object *object, Va
 	return false;
 }
 
-// FIXME can't do this in godot-cpp
 #ifndef SPINE_GODOT_EXTENSION
 SpineEditorPropertyAnimationMixes::SpineEditorPropertyAnimationMixes() : skeleton_data(nullptr), container(nullptr), updating(false) {
 	INSTANTIATE(array_object);
@@ -471,6 +483,198 @@ void SpineEditorPropertyAnimationMix::update_property() {
 
 	updating = false;
 }
+
+// *** NEW: GDExtension implementation of the animation mixes editor. ***
+// Uses plain Godot Controls (OptionButton, SpinBox, Button) instead of
+// internal editor classes (EditorPropertyTextEnum, EditorPropertyFloat,
+// EditorPropertyArrayObject) which are not exposed to GDExtension.
+// Undo/redo is supported via EditorUndoRedoManager, which IS available in godot-cpp.
+#else
+SpineEditorPropertyAnimationMixes::SpineEditorPropertyAnimationMixes() : container(nullptr), updating(false) {
+}
+
+void SpineEditorPropertyAnimationMixes::_bind_methods() {
+	ClassDB::bind_method(D_METHOD("rebuild_ui"), &SpineEditorPropertyAnimationMixes::rebuild_ui);
+}
+
+void SpineEditorPropertyAnimationMixes::setup(const Ref<SpineSkeletonDataResource> &_skeleton_data) {
+	this->skeleton_data = _skeleton_data;
+	rebuild_ui();
+}
+
+void SpineEditorPropertyAnimationMixes::_update_property() {
+	if (updating) return;
+	rebuild_ui();
+}
+
+void SpineEditorPropertyAnimationMixes::rebuild_ui() {
+	updating = true;
+
+	if (container) {
+		remove_child(container);
+		memdelete(container);
+		container = nullptr;
+	}
+
+	if (!skeleton_data.is_valid() || !skeleton_data->is_skeleton_data_loaded()) {
+		updating = false;
+		return;
+	}
+
+	container = memnew(VBoxContainer);
+	add_child(container);
+	set_bottom_editor(container);
+
+	Array mixes = skeleton_data->get_animation_mixes();
+	PackedStringArray animation_names;
+	skeleton_data->get_animation_names(animation_names);
+
+	for (int i = 0; i < mixes.size(); i++) {
+		Ref<SpineAnimationMix> mix = mixes[i];
+		if (mix.is_null()) continue;
+
+		auto hbox = memnew(HBoxContainer);
+		hbox->set_h_size_flags(SIZE_EXPAND_FILL);
+		container->add_child(hbox);
+
+		auto from_option = memnew(OptionButton);
+		from_option->set_h_size_flags(SIZE_EXPAND_FILL);
+		for (int j = 0; j < animation_names.size(); j++) {
+			from_option->add_item(animation_names[j]);
+			if (animation_names[j] == mix->get_from()) {
+				from_option->select(j);
+			}
+		}
+
+		from_option->connect("item_selected", callable_mp(this, &SpineEditorPropertyAnimationMixes::on_from_changed).bind(i), CONNECT_DEFERRED);
+		hbox->add_child(from_option);
+
+		auto to_option = memnew(OptionButton);
+		to_option->set_h_size_flags(SIZE_EXPAND_FILL);
+		for (int j = 0; j < animation_names.size(); j++) {
+			to_option->add_item(animation_names[j]);
+			if (animation_names[j] == mix->get_to()) {
+				to_option->select(j);
+			}
+		}
+		to_option->connect("item_selected", callable_mp(this, &SpineEditorPropertyAnimationMixes::on_to_changed).bind(i), CONNECT_DEFERRED);
+		hbox->add_child(to_option);
+
+		auto spin_box = memnew(SpinBox);
+		spin_box->set_h_size_flags(SIZE_EXPAND_FILL);
+		spin_box->set_min(0.0);
+		spin_box->set_max(9999.0);
+		spin_box->set_step(0.01);
+		spin_box->set_value(mix->get_mix());
+		spin_box->connect("value_changed", callable_mp(this, &SpineEditorPropertyAnimationMixes::on_mix_value_changed).bind(i), CONNECT_DEFERRED);
+		hbox->add_child(spin_box);
+
+		auto delete_button = memnew(Button);
+		delete_button->set_text("Remove");
+		delete_button->connect("pressed", callable_mp(this, &SpineEditorPropertyAnimationMixes::delete_mix).bind(i), CONNECT_DEFERRED);
+		hbox->add_child(delete_button);
+	}
+
+	auto add_mix_button = memnew(Button);
+	add_mix_button->set_text("Add mix");
+	add_mix_button->connect("pressed", callable_mp(this, &SpineEditorPropertyAnimationMixes::add_mix), CONNECT_DEFERRED);
+	container->add_child(add_mix_button);
+
+	updating = false;
+}
+
+void SpineEditorPropertyAnimationMixes::add_mix() {
+	if (updating || !skeleton_data.is_valid() || !skeleton_data->is_skeleton_data_loaded()) return;
+
+	PackedStringArray animation_names;
+	skeleton_data->get_animation_names(animation_names);
+
+	Ref<SpineAnimationMix> mix = Ref<SpineAnimationMix>(memnew(SpineAnimationMix));
+	mix->set_from(animation_names[0]);
+	mix->set_to(animation_names[0]);
+	mix->set_mix(0);
+
+	Array mixes = skeleton_data->get_animation_mixes().duplicate();
+	mixes.push_back(mix);
+	emit_changed(get_edited_property(), mixes);
+}
+
+void SpineEditorPropertyAnimationMixes::delete_mix(int idx) {
+	if (updating || !skeleton_data.is_valid() || !skeleton_data->is_skeleton_data_loaded()) return;
+
+	Array mixes = skeleton_data->get_animation_mixes().duplicate();
+	mixes.remove_at(idx);
+	emit_changed(get_edited_property(), mixes);
+}
+
+void SpineEditorPropertyAnimationMixes::on_from_changed(int option_idx, int mix_idx) {
+	if (updating) return;
+
+	PackedStringArray animation_names;
+	skeleton_data->get_animation_names(animation_names);
+	String new_value = animation_names[option_idx];
+
+	Array mixes = skeleton_data->get_animation_mixes();
+	Ref<SpineAnimationMix> mix = mixes[mix_idx];
+	String old_value = mix->get_from();
+
+	auto undo_redo = EditorInterface::get_singleton()->get_editor_undo_redo();
+	undo_redo->create_action("Set mix from animation");
+	undo_redo->add_do_property(mix.ptr(), "from", new_value);
+	undo_redo->add_undo_property(mix.ptr(), "from", old_value);
+	undo_redo->add_do_method(this, "rebuild_ui");
+	undo_redo->add_undo_method(this, "rebuild_ui");
+	updating = true;
+	undo_redo->commit_action();
+	updating = false;
+
+	emit_changed(get_edited_property(), skeleton_data->get_animation_mixes());
+}
+
+void SpineEditorPropertyAnimationMixes::on_to_changed(int option_idx, int mix_idx) {
+	if (updating) return;
+
+	PackedStringArray animation_names;
+	skeleton_data->get_animation_names(animation_names);
+	String new_value = animation_names[option_idx];
+
+	Array mixes = skeleton_data->get_animation_mixes();
+	Ref<SpineAnimationMix> mix = mixes[mix_idx];
+	String old_value = mix->get_to();
+
+	auto undo_redo = EditorInterface::get_singleton()->get_editor_undo_redo();
+	undo_redo->create_action("Set mix to animation");
+	undo_redo->add_do_property(mix.ptr(), "to", new_value);
+	undo_redo->add_undo_property(mix.ptr(), "to", old_value);
+	undo_redo->add_do_method(this, "rebuild_ui");
+	undo_redo->add_undo_method(this, "rebuild_ui");
+	updating = true;
+	undo_redo->commit_action();
+	updating = false;
+
+	emit_changed(get_edited_property(), skeleton_data->get_animation_mixes());
+}
+
+void SpineEditorPropertyAnimationMixes::on_mix_value_changed(float value, int mix_idx) {
+	if (updating) return;
+
+	Array mixes = skeleton_data->get_animation_mixes();
+	Ref<SpineAnimationMix> mix = mixes[mix_idx];
+	float old_value = mix->get_mix();
+
+	auto undo_redo = EditorInterface::get_singleton()->get_editor_undo_redo();
+	undo_redo->create_action("Set mix duration");
+	undo_redo->add_do_property(mix.ptr(), "mix", value);
+	undo_redo->add_undo_property(mix.ptr(), "mix", old_value);
+	undo_redo->add_do_method(this, "rebuild_ui");
+	undo_redo->add_undo_method(this, "rebuild_ui");
+	updating = true;
+	undo_redo->commit_action();
+	updating = false;
+
+	emit_changed(get_edited_property(), skeleton_data->get_animation_mixes());
+}
+
 #endif
 
 void SpineSpriteInspectorPlugin::_bind_methods() {
