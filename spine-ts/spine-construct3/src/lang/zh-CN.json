@@ -379,6 +379,17 @@
               }
             }
           },
+          "set-ignore-global-time-scale": {
+            "list-name": "设置忽略全局时间缩放",
+            "display-text": "将忽略全局时间缩放设置为{0}",
+            "description": "设置此实例是否忽略Construct 3中设置的全局时间缩放",
+            "params": {
+              "ignore-global-time-scale": {
+                "name": "忽略全局时间缩放",
+                "desc": "设置为true则忽略全局时间缩放，设置为false则使用全局时间缩放。"
+              }
+            }
+          },
           "set-animation-time": {
             "list-name": "设置动画时间",
             "display-text": "将轨道{0}的动画时间设置为{1}（{2}）",
@@ -908,6 +919,10 @@
           "time-scale": {
             "description": "获取当前动画时间缩放（速度倍数）。",
             "translated-name": "TimeScale"
+          },
+          "ignore-global-time-scale": {
+            "description": "获取此实例是否忽略全局时间缩放（1 = 忽略，0 = 不忽略）。",
+            "translated-name": "IgnoreGlobalTimeScale"
           },
           "current-animation-start": {
             "description": "获取指定轨道上当前动画的开始时间。",

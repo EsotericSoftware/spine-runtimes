@@ -301,6 +301,17 @@
         ]
       },
       {
+        "id": "set-ignore-global-time-scale",
+        "scriptName": "SetIgnoreGlobalTimeScale",
+        "highlight": false,
+        "params": [
+          {
+            "id": "ignore-global-time-scale",
+            "type": "boolean"
+          }
+        ]
+      },
+      {
         "id": "set-animation-time",
         "scriptName": "SetAnimationTime",
         "highlight": false,
@@ -832,6 +843,12 @@
       {
         "id": "time-scale",
         "expressionName": "TimeScale",
+        "highlight": false,
+        "returnType": "number"
+      },
+      {
+        "id": "ignore-global-time-scale",
+        "expressionName": "IgnoreGlobalTimeScale",
         "highlight": false,
         "returnType": "number"
       },

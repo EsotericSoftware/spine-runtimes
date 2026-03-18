@@ -68,12 +68,14 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	skeletonLoading = false;
 	skeleton?: Skeleton;
 	state?: AnimationState;
+	ignoreGlobalTimeScale = false;
 
 	public triggeredEventTrack = -1;
 	public triggeredEventAnimation = "";
 	public triggeredEventName = "";
 	public triggeredEventData?: Event & { track: number, animation: string };
 
+	private time = new spine.TimeKeeper();
 	private assetLoader: AssetLoader;
 	private skeletonRenderer?: C3RendererRuntime;
 	private matrix: C3Matrix;
@@ -148,6 +150,8 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	}
 
 	_tick (): void {
+		this.time.update();
+
 		const { renderer } = this;
 
 		if (!renderer) return;
@@ -172,7 +176,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 
 		this.updateCollisionSprite();
 
-		if (this.isPlaying) this.update(this.dt);
+		if (this.isPlaying) this.update(this.ignoreGlobalTimeScale ? this.time.delta : this.dt);
 	}
 
 	private update (delta: number) {
