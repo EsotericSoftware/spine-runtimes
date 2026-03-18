@@ -916,8 +916,9 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 					continue;
 				}
 
-				const rotatedOffsetX = follower.offsetX * cos - follower.offsetY * sin;
-				const rotatedOffsetY = follower.offsetX * sin + follower.offsetY * cos;
+				const offsetY = negateAngle ? -follower.offsetY : follower.offsetY;
+				const rotatedOffsetX = follower.offsetX * cos - offsetY * sin;
+				const rotatedOffsetY = follower.offsetX * sin + offsetY * cos;
 
 				instance.x = x + rotatedOffsetX;
 				instance.y = y + rotatedOffsetY;
