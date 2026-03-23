@@ -35,7 +35,16 @@ const spine = globalThis.spine;
 spine.Skeleton.yDown = true;
 
 type BoneOverride = Partial<BoneLocal> & { mode: "game" | "local" };
-type BoneFollower = { uid: number, offsetX: number, offsetY: number, offsetAngle: number };
+type BoneFollower = {
+	uid: number,
+	offsetX: number,
+	offsetY: number,
+	offsetAngle: number,
+	originalWidth: number,
+	originalHeight: number,
+	refSkeletonWidth: number,
+	refSkeletonHeight: number,
+};
 
 class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	propAtlas = "";
@@ -844,7 +853,16 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			return;
 		}
 
-		const follower = { uid, offsetX, offsetY, offsetAngle };
+		const instance = this.runtime.getInstanceByUid(uid) as IWorldInstance;
+		if (!instance) return;
+
+		const follower: BoneFollower = {
+			uid, offsetX, offsetY, offsetAngle,
+			originalWidth: Math.abs(instance.width),
+			originalHeight: Math.abs(instance.height),
+			refSkeletonWidth: Math.abs(this.width),
+			refSkeletonHeight: Math.abs(this.height),
+		};
 		const followers = this.boneFollowers.get(boneName);
 		if (!followers) {
 			this.boneFollowers.set(boneName, [follower]);
@@ -852,11 +870,8 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			followers.push(follower);
 		}
 
-		const instance = this.runtime.getInstanceByUid(uid) as IWorldInstance;
-		if (instance) {
-			if (this.isMirrored) this.mirrorFollower(instance);
-			if (this.isFlipped) this.flipFollower(instance);
-		}
+		if (this.isMirrored) this.mirrorFollower(instance);
+		if (this.isFlipped) this.flipFollower(instance);
 
 		this.isPlaying = true;
 	}
@@ -876,6 +891,32 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 
 	public detachAllFromBone (boneName: string) {
 		this.boneFollowers.delete(boneName);
+	}
+
+	setSize (w: number, h: number): void {
+		const prevW = this.width;
+		const prevH = this.height;
+		super.setSize(w, h);
+
+		if (prevW === 0 || prevH === 0) return;
+
+		const mirrorChanged = (prevW > 0) !== (this.width > 0);
+		const flipChanged = (prevH > 0) !== (this.height > 0);
+
+		if (mirrorChanged) this.isMirrored = !this.isMirrored;
+		if (flipChanged) this.isFlipped = !this.isFlipped;
+
+		if (this.boneFollowers.size === 0) return;
+		if (!mirrorChanged && !flipChanged) return;
+
+		for (const [, followers] of this.boneFollowers) {
+			for (const follower of followers) {
+				const instance = this.runtime.getInstanceByUid(follower.uid) as IWorldInstance;
+				if (!instance) continue;
+				if (mirrorChanged) this.mirrorFollower(instance);
+				if (flipChanged) this.flipFollower(instance);
+			}
+		}
 	}
 
 	private mirrorFollower (instance: IWorldInstance) {
@@ -925,6 +966,15 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 
 				const angle = boneRotation + follower.offsetAngle;
 				instance.angleDegrees = gameObjectAngleDeg + (negateAngle ? -angle : angle);
+
+				const sx = Math.abs(this.width) / follower.refSkeletonWidth;
+				const sy = Math.abs(this.height) / follower.refSkeletonHeight;
+				const mirrorSign = this.isMirrored ? -1 : 1;
+				const flipSign = this.isFlipped ? -1 : 1;
+				instance.setSize(
+					follower.originalWidth * sx * mirrorSign,
+					follower.originalHeight * sy * flipSign
+				);
 			}
 		}
 	}
