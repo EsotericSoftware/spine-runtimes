@@ -89,10 +89,6 @@ C3.Plugins.EsotericSoftware_SpineConstruct3.Acts =
 		this.setAnimationSpeed(timeScale);
 	},
 
-	SetIgnoreGlobalTimeScale (this: SDKInstanceClass, ignoreGlobalTimeScale: boolean) {
-		this.ignoreGlobalTimeScale = ignoreGlobalTimeScale;
-	},
-
 	SetAnimationTime (this: SDKInstanceClass, track: number, time: number, units: 0 | 1) {
 		this.setAnimationTime(units, time, track);
 	},

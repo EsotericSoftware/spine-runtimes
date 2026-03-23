@@ -379,17 +379,6 @@
               }
             }
           },
-          "set-ignore-global-time-scale": {
-            "list-name": "Set ignore global time scale",
-            "display-text": "Set ignore global time scale to {0}",
-            "description": "Set whether this instance ignores the global time scale set in Construct 3",
-            "params": {
-              "ignore-global-time-scale": {
-                "name": "Ignore global time scale",
-                "desc": "True to ignore the global time scale, false to use it."
-              }
-            }
-          },
           "set-animation-time": {
             "list-name": "Set animation time",
             "display-text": "Set track {0} animation time to {1} ({2})",
@@ -919,10 +908,6 @@
           "time-scale": {
             "description": "Get the current animation time scale (speed multiplier).",
             "translated-name": "TimeScale"
-          },
-          "ignore-global-time-scale": {
-            "description": "Get whether this instance ignores the global time scale (1 = ignoring, 0 = not ignoring).",
-            "translated-name": "IgnoreGlobalTimeScale"
           },
           "current-animation-start": {
             "description": "Get the start time of the current animation on the specified track.",
