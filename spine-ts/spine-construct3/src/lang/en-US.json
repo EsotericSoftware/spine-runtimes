@@ -370,12 +370,16 @@
           },
           "set-time-scale": {
             "list-name": "Set time scale",
-            "display-text": "Set time scale to {0}",
-            "description": "Set the time scale of animations (1.0 = normal, 2.0 = double speed, 0.5 = half speed)",
+            "display-text": "Set track {0} time scale to {1}",
+            "description": "Set the time scale for a specific track or the entire animation state. When targeting a track, the time scale affects only the current animation on that track. Use -1 for the track to set the global animation state time scale. Set to 0 to pause.",
             "params": {
+              "track-index": {
+                "name": "Track",
+                "desc": "Track index to set the time scale for, or -1 to set the global animation state time scale."
+              },
               "time-scale": {
                 "name": "Time scale",
-                "desc": "Time scale multiplier (1.0 is normal speed)"
+                "desc": "Time scale multiplier (1.0 is normal speed, 0 to pause)"
               }
             }
           },
@@ -906,8 +910,14 @@
             }
           },
           "time-scale": {
-            "description": "Get the current animation time scale (speed multiplier).",
-            "translated-name": "TimeScale"
+            "description": "Get the time scale for a specific track or the global animation state. Use -1 for the global animation state time scale.",
+            "translated-name": "TimeScale",
+            "params": {
+              "track-index": {
+                "name": "Track",
+                "desc": "Track index, or -1 for the global animation state time scale."
+              }
+            }
           },
           "current-animation-start": {
             "description": "Get the start time of the current animation on the specified track.",

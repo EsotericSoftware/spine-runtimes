@@ -112,8 +112,11 @@ C3.Plugins.EsotericSoftware_SpineConstruct3.Exps =
 		return "";
 	},
 
-	TimeScale (this: SpineC3Instance) {
-		return this.state?.timeScale ?? 1;
+	TimeScale (this: SpineC3Instance, track: number) {
+		if (!this.state) return 1;
+		if (track < 0) return this.state.timeScale;
+		const entry = this.state.getCurrent(track);
+		return entry?.timeScale ?? 1;
 	},
 
 	CurrentAnimationStart (this: SpineC3Instance, trackIndex: number) {

@@ -370,12 +370,16 @@
           },
           "set-time-scale": {
             "list-name": "设置时间缩放",
-            "display-text": "将时间缩放设置为{0}",
-            "description": "设置动画时间缩放（1.0 = 正常，2.0 = 两倍速，0.5 = 半速）",
+            "display-text": "将轨道{0}的时间缩放设置为{1}",
+            "description": "设置特定轨道或整个动画状态的时间缩放。针对轨道时，时间缩放仅影响该轨道上的当前动画。使用-1设置全局动画状态时间缩放。设置为0可暂停。",
             "params": {
+              "track-index": {
+                "name": "轨道",
+                "desc": "要设置时间缩放的轨道索引，或-1设置全局动画状态时间缩放。"
+              },
               "time-scale": {
                 "name": "时间缩放",
-                "desc": "时间缩放倍数（1.0为正常速度）"
+                "desc": "时间缩放倍数（1.0为正常速度，0为暂停）"
               }
             }
           },
@@ -906,8 +910,14 @@
             }
           },
           "time-scale": {
-            "description": "获取当前动画时间缩放（速度倍数）。",
-            "translated-name": "TimeScale"
+            "description": "获取特定轨道或全局动画状态的时间缩放。使用-1获取全局动画状态时间缩放。",
+            "translated-name": "TimeScale",
+            "params": {
+              "track-index": {
+                "name": "轨道",
+                "desc": "轨道索引，或-1获取全局动画状态时间缩放。"
+              }
+            }
           },
           "current-animation-start": {
             "description": "获取指定轨道上当前动画的开始时间。",

@@ -295,6 +295,11 @@
         "highlight": false,
         "params": [
           {
+            "id": "track-index",
+            "type": "number",
+            "initial-value": -1
+          },
+          {
             "id": "time-scale",
             "type": "number"
           }
@@ -833,7 +838,14 @@
         "id": "time-scale",
         "expressionName": "TimeScale",
         "highlight": false,
-        "returnType": "number"
+        "returnType": "number",
+        "params": [
+          {
+            "id": "track-index",
+            "type": "number",
+            "initial-value": -1
+          }
+        ]
       },
       {
         "id": "current-animation-start",

@@ -85,8 +85,8 @@ C3.Plugins.EsotericSoftware_SpineConstruct3.Acts =
 		this.setCustomSkin(skinName);
 	},
 
-	SetTimeScale (this: SDKInstanceClass, timeScale: number) {
-		this.setAnimationSpeed(timeScale);
+	SetTimeScale (this: SDKInstanceClass, track: number, timeScale: number) {
+		this.setTimeScale(track, timeScale);
 	},
 
 	SetAnimationTime (this: SDKInstanceClass, track: number, time: number, units: 0 | 1) {
