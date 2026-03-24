@@ -180,14 +180,14 @@ void TransformConstraint::applyAbsoluteWorld() {
 			bone._worldY += (ty - bone._worldY) * mixY;
 		}
 
-		if (mixScaleX > 0) {
+		if (mixScaleX != 0) {
 			float s = MathUtil::sqrt(bone._a * bone._a + bone._c * bone._c);
 			if (s != 0) s = (s + (MathUtil::sqrt(ta * ta + tc * tc) - s + _data._offsetScaleX) * mixScaleX) / s;
 			bone._a *= s;
 			bone._c *= s;
 		}
 
-		if (mixScaleY > 0) {
+		if (mixScaleY != 0) {
 			float s = MathUtil::sqrt(bone._b * bone._b + bone._d * bone._d);
 			if (s != 0) s = (s + (MathUtil::sqrt(tb * tb + td * td) - s + _data._offsetScaleY) * mixScaleY) / s;
 			bone._b *= s;
