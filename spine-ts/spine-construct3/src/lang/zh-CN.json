@@ -919,6 +919,16 @@
               }
             }
           },
+          "loop": {
+            "description": "获取轨道上当前动画是否设置为循环（1 = 循环，0 = 不循环）。",
+            "translated-name": "Loop",
+            "params": {
+              "track-index": {
+                "name": "轨道",
+                "desc": "轨道索引。"
+              }
+            }
+          },
           "current-animation-start": {
             "description": "获取指定轨道上当前动画的开始时间。",
             "translated-name": "CurrentAnimationStart",

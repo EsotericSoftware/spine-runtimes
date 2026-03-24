@@ -919,6 +919,16 @@
               }
             }
           },
+          "loop": {
+            "description": "Get whether the current animation on a track is set to loop (1 = looping, 0 = not looping).",
+            "translated-name": "Loop",
+            "params": {
+              "track-index": {
+                "name": "Track",
+                "desc": "Track index."
+              }
+            }
+          },
           "current-animation-start": {
             "description": "Get the start time of the current animation on the specified track.",
             "translated-name": "CurrentAnimationStart",

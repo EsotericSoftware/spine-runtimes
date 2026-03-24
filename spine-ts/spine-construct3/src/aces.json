@@ -848,6 +848,19 @@
         ]
       },
       {
+        "id": "loop",
+        "expressionName": "Loop",
+        "highlight": false,
+        "returnType": "number",
+        "params": [
+          {
+            "id": "track-index",
+            "type": "number",
+            "initial-value": 0
+          }
+        ]
+      },
+      {
         "id": "current-animation-start",
         "expressionName": "CurrentAnimationStart",
         "highlight": false,
