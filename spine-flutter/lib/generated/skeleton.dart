@@ -145,7 +145,8 @@ class Skeleton {
     return result.address == 0 ? null : Bone.fromPointer(result);
   }
 
-  /// The skeleton's slots. To add a slot, also add it to DrawOrder::getPose().
+  /// The skeleton's slots in setup pose order. To change the order use
+  /// DrawOrder::getPose(). For rendering use DrawOrder::getAppliedPose().
   ArraySlot get slots {
     final result = SpineBindings.bindings.spine_skeleton_get_slots(_ptr);
     return ArraySlot.fromPointer(result);

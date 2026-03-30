@@ -50,7 +50,8 @@ SPINE_C_API /*@null*/ spine_bone spine_skeleton_get_root_bone(spine_skeleton sel
  */
 SPINE_C_API /*@null*/ spine_bone spine_skeleton_find_bone(spine_skeleton self, const char *boneName);
 /**
- * The skeleton's slots. To add a slot, also add it to DrawOrder::getPose().
+ * The skeleton's slots in setup pose order. To change the order use
+ * DrawOrder::getPose(). For rendering use DrawOrder::getAppliedPose().
  */
 SPINE_C_API spine_array_slot spine_skeleton_get_slots(spine_skeleton self);
 /**

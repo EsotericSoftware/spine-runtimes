@@ -41732,7 +41732,8 @@ class SpineDartBindings {
   late final _spine_skeleton_find_bone =
       _spine_skeleton_find_bonePtr.asFunction<spine_bone Function(spine_skeleton, ffi.Pointer<ffi.Char>)>();
 
-  /// The skeleton's slots. To add a slot, also add it to DrawOrder::getPose().
+  /// The skeleton's slots in setup pose order. To change the order use
+  /// DrawOrder::getPose(). For rendering use DrawOrder::getAppliedPose().
   spine_array_slot spine_skeleton_get_slots(
     spine_skeleton self,
   ) {

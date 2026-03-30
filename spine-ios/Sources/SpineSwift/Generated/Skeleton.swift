@@ -72,7 +72,8 @@ public class Skeleton: NSObject {
         return result.map { Bone(fromPointer: $0) }
     }
 
-    /// The skeleton's slots. To add a slot, also add it to DrawOrder::getPose().
+    /// The skeleton's slots in setup pose order. To change the order use DrawOrder::getPose(). For
+    /// rendering use DrawOrder::getAppliedPose().
     public var slots: ArraySlot {
         let result = spine_skeleton_get_slots(_ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self))
         return ArraySlot(fromPointer: result!)

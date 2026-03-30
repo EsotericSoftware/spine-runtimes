@@ -104,12 +104,14 @@ Use lowercase prefixes exactly as listed below.
    ./tests/test.sh
    ```
 4. Run the snapshot harness to confirm Java and C++ functional equivalence for assets that exercise the change. Choose the skeleton, atlas, and animation based on the code that changed. For parser-related work, run both binary and JSON inputs.
+   - Use `tests/src/headless-test-runner.ts` with `-f` so the harness normalizes accepted Java vs C++ differences such as `propertyIds`, tiny float drift, and `null` vs empty-string serializer output.
+   - Clean `tests/output` before a manual binary+JSON pair of runs, otherwise stale files from a previous format can cause false diff failures.
    Example:
    ```bash
+   rm -rf tests/output && mkdir -p tests/output
    cd tests
-   ./test.sh java ../examples/spineboy/export/spineboy-pro.skel ../examples/spineboy/export/spineboy-pma.atlas walk > /tmp/spine-java.json
-   ./test.sh cpp ../examples/spineboy/export/spineboy-pro.skel ../examples/spineboy/export/spineboy-pma.atlas walk > /tmp/spine-cpp.json
-   diff -u /tmp/spine-java.json /tmp/spine-cpp.json
+   npx -y tsx src/headless-test-runner.ts cpp ../examples/spineboy/export/spineboy-pro.skel ../examples/spineboy/export/spineboy-pma.atlas walk -f
+   npx -y tsx src/headless-test-runner.ts cpp ../examples/spineboy/export/spineboy-pro.json ../examples/spineboy/export/spineboy-pma.atlas walk -f
    ```
 5. Compile `spine-glfw` and all examples:
    ```bash
@@ -141,7 +143,9 @@ Files:
 - `spine-libgdx/spine-libgdx-tests/src/com/esotericsoftware/spine/utils/SkeletonSerializer.java` - Java equivalent
 
 When tests disagree:
-1. Check if the skeleton was loaded from JSON or binary. Run both to isolate which parser differs.
-2. Compare the SkeletonSerializer implementations. They must output identical JSON structure.
-3. Check for unported changes in spine-libgdx (SkeletonBinary.java, SkeletonJson.java) and port them to spine-cpp.
-4. Update `spine-cpp/tests/test.sh` expected output if the serializer format changed intentionally.
+1. Check if the snapshot harness was run with `-f`. Raw output diffs are noisy and can report accepted Java vs C++ differences.
+2. Clean `tests/output` and rerun both binary and JSON inputs so stale files do not contaminate the comparison.
+3. Check if the skeleton was loaded from JSON or binary. Run both to isolate which parser differs.
+4. Compare the SkeletonSerializer implementations. They must output identical JSON structure for non-normalized fields.
+5. Check for unported changes in spine-libgdx (SkeletonBinary.java, SkeletonJson.java) and port them to spine-cpp.
+6. Update `spine-cpp/tests/test.sh` expected output if the serializer format changed intentionally.

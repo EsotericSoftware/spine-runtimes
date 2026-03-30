@@ -58,7 +58,7 @@ namespace spine {
 		virtual void update(Skeleton &skeleton, Physics physics) override = 0;
 
 	protected:
-		virtual void pose() = 0;
+		virtual void unconstrained() = 0;
 
 		virtual void setupPose() = 0;
 
@@ -79,8 +79,8 @@ namespace spine {
 		}
 
 	protected:
-		virtual void pose() override {
-			PosedGeneric<D, P, P>::pose();
+		virtual void unconstrained() override {
+			PosedGeneric<D, P, P>::unconstrained();
 		}
 
 		virtual void setupPose() override {
