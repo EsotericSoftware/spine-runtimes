@@ -1,6 +1,5 @@
 ﻿{
   "$schema": "../aces.schema.json",
-
   "custom": {
     "conditions": [
       {
@@ -162,6 +161,14 @@
           {
             "id": "loop",
             "type": "boolean"
+          },
+          {
+            "id": "additive",
+            "type": "combo",
+            "items": [
+              "disabled",
+              "enabled"
+            ]
           }
         ]
       },
@@ -186,6 +193,14 @@
           {
             "id": "delay",
             "type": "number"
+          },
+          {
+            "id": "additive",
+            "type": "combo",
+            "items": [
+              "disabled",
+              "enabled"
+            ]
           }
         ]
       },
@@ -322,7 +337,10 @@
           {
             "id": "units",
             "type": "combo",
-            "items": ["seconds", "ratio"]
+            "items": [
+              "seconds",
+              "ratio"
+            ]
           }
         ]
       },
@@ -365,7 +383,12 @@
           {
             "id": "physics-mode",
             "type": "combo",
-            "items": ["none", "reset", "update", "pose"]
+            "items": [
+              "none",
+              "reset",
+              "update",
+              "pose"
+            ]
           }
         ]
       },
@@ -388,22 +411,6 @@
           {
             "id": "alpha",
             "type": "number"
-          },
-          {
-            "id": "track-index",
-            "type": "number"
-          }
-        ]
-      },
-      {
-        "id": "set-track-mix-blend",
-        "scriptName": "SetTrackMixBlend",
-        "highlight": false,
-        "params": [
-          {
-            "id": "mix-blend",
-            "type": "combo",
-            "items": ["setup", "first", "replace", "add"]
           },
           {
             "id": "track-index",
@@ -460,12 +467,18 @@
           {
             "id": "mode",
             "type": "combo",
-            "items": ["local", "game"]
+            "items": [
+              "local",
+              "game"
+            ]
           },
           {
             "id": "apply-mode",
             "type": "combo",
-            "items": ["once", "hold"]
+            "items": [
+              "once",
+              "hold"
+            ]
           },
           {
             "id": "x",
@@ -517,7 +530,11 @@
           {
             "id": "target",
             "type": "combo",
-            "items": ["all", "bones", "slots"]
+            "items": [
+              "all",
+              "bones",
+              "slots"
+            ]
           }
         ]
       },
@@ -529,7 +546,10 @@
           {
             "id": "type",
             "type": "combo",
-            "items": ["bone", "slot"]
+            "items": [
+              "bone",
+              "slot"
+            ]
           },
           {
             "id": "name",
@@ -625,7 +645,10 @@
           {
             "id": "type",
             "type": "combo",
-            "items": ["bone", "slot"]
+            "items": [
+              "bone",
+              "slot"
+            ]
           },
           {
             "id": "name",
@@ -649,7 +672,10 @@
           {
             "id": "type",
             "type": "combo",
-            "items": ["bone", "slot"]
+            "items": [
+              "bone",
+              "slot"
+            ]
           },
           {
             "id": "name",

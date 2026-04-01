@@ -1,6 +1,5 @@
 ﻿{
   "$schema": "../../plugin.lang.schema.json",
-
   "languageTag": "en-US",
   "fileDescription": "Strings for SpineC3Plugin.",
   "text": {
@@ -232,7 +231,7 @@
           },
           "set-animation": {
             "list-name": "Set animation",
-            "display-text": "Set animation {1} on track {0} with loop {2}",
+            "display-text": "Set animation {1} on track {0} with loop {2} additive {3}",
             "description": "Set animation",
             "params": {
               "track-index": {
@@ -246,12 +245,20 @@
               "loop": {
                 "name": "loop",
                 "desc": "loop"
+              },
+              "additive": {
+                "name": "Additive",
+                "desc": "Whether to use additive blending (values added to pose instead of replacing)",
+                "items": {
+                  "disabled": "Disabled",
+                  "enabled": "Enabled"
+                }
               }
             }
           },
           "add-animation": {
             "list-name": "Add animation",
-            "display-text": "Add animation {1} on track {0} with loop {2} and delay {3}",
+            "display-text": "Add animation {1} on track {0} with loop {2} delay {3} additive {4}",
             "description": "Add animation",
             "params": {
               "track-index": {
@@ -269,6 +276,14 @@
               "delay": {
                 "name": "delay",
                 "desc": "delay"
+              },
+              "additive": {
+                "name": "Additive",
+                "desc": "Whether to use additive blending (values added to pose instead of replacing)",
+                "items": {
+                  "disabled": "Disabled",
+                  "enabled": "Enabled"
+                }
               }
             }
           },
@@ -476,27 +491,6 @@
               "track-index": {
                 "name": "Track index",
                 "desc": "Track index to set alpha for"
-              }
-            }
-          },
-          "set-track-mix-blend": {
-            "list-name": "Set track mix blend",
-            "display-text": "Set mix blend {0} on track {1}",
-            "description": "Set the mix blend mode for an animation track. Controls how animations are layered and combined.",
-            "params": {
-              "mix-blend": {
-                "name": "Mix blend",
-                "desc": "Mix blend mode",
-                "items": {
-                  "setup": "Setup (transition to/from setup pose)",
-                  "first": "First (for first animations applied)",
-                  "replace": "Replace (for layered animations)",
-                  "add": "Add (additive blending for layered animations)"
-                }
-              },
-              "track-index": {
-                "name": "Track index",
-                "desc": "Track index to set mix blend for"
               }
             }
           },

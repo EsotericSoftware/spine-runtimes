@@ -27,14 +27,14 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import type { AnimationState, AssetLoader, Bone, BoneLocal, C3Matrix, C3RendererRuntime, Event, NumberArrayLike, Skeleton, Skin, Slot, SpineBoundsProvider, SpineBoundsProviderType, TextureAtlas, } from "@esotericsoftware/spine-construct3-lib";
+import type { AnimationState, AssetLoader, Bone, BonePose, C3Matrix, C3RendererRuntime, Event, NumberArrayLike, Skeleton, Skin, Slot, SpineBoundsProvider, SpineBoundsProviderType, TextureAtlas, } from "@esotericsoftware/spine-construct3-lib";
 
 const C3 = globalThis.C3;
 const spine = globalThis.spine;
 
 spine.Skeleton.yDown = true;
 
-type BoneOverride = Partial<BoneLocal> & { mode: "game" | "local" };
+type BoneOverride = Partial<BonePose> & { mode: "game" | "local" };
 type BoneFollower = {
 	uid: number,
 	offsetX: number,
@@ -352,14 +352,14 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		const slot = this.getSlot(slotName);
 		if (!slot || !slot.bone.active) return false;
 
-		const attachment = slot.applied.attachment;
+		const attachment = slot.appliedPose.attachment;
 		if (!(attachment instanceof spine.RegionAttachment || attachment instanceof spine.MeshAttachment)) return false;
 
 		const vertices = this.verticesTemp;
 		let hullLength = 8;
 
 		if (attachment instanceof spine.RegionAttachment) {
-			attachment.computeWorldVertices(slot, attachment.getOffsets(slot.applied), vertices, 0, 2);
+			attachment.computeWorldVertices(slot, attachment.getOffsets(slot.appliedPose), vertices, 0, 2);
 		} else if (attachment instanceof spine.MeshAttachment) {
 			attachment.computeWorldVertices(this.skeleton as Skeleton, slot, 0, attachment.worldVerticesLength, vertices, 0, 2);
 			hullLength = attachment.hullLength;
@@ -560,17 +560,19 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	*  Animations
 	*/
 
-	public setAnimation (track: number, animation: string, loop = false) {
+	public setAnimation (track: number, animation: string, loop = false, additive = false) {
 		const { state } = this;
 		if (!state) return;
-		state.setAnimation(track, animation, loop);
+		const entry = state.setAnimation(track, animation, loop);
+		entry.additive = additive;
 		this.isPlaying = true;
 	}
 
-	public addAnimation (track: number, animation: string, loop = false, delay = 0) {
+	public addAnimation (track: number, animation: string, loop = false, delay = 0, additive = false) {
 		const { state } = this;
 		if (!state) return;
-		state.addAnimation(track, animation, loop, delay);
+		const entry = state.addAnimation(track, animation, loop, delay);
+		entry.additive = additive;
 		this.isPlaying = true;
 	}
 
@@ -662,27 +664,6 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		track.alpha = spine.MathUtils.clamp(0, 1, alpha);
 	}
 
-	public setTrackMixBlend (mixBlend: 0 | 1 | 2 | 3, trackIndex: number) {
-		const { state } = this;
-		if (!state) {
-			console.warn('[Spine] setMixBlend: no state');
-			return;
-		}
-
-		const track = state.tracks[trackIndex];
-		if (!track) {
-			console.warn(`[Spine] setMixBlend: track ${trackIndex} not found`);
-			return;
-		}
-
-		switch (mixBlend) {
-			case 0: track.mixBlend = spine.MixBlend.setup; break;
-			case 1: track.mixBlend = spine.MixBlend.first; break;
-			case 2: track.mixBlend = spine.MixBlend.replace; break;
-			case 3: track.mixBlend = spine.MixBlend.add; break;
-			default: console.warn('[Spine] Invalid mix blend mode:', mixBlend);
-		}
-	}
 
 	public clearTrack (track: number) {
 		const { state } = this;
@@ -826,14 +807,14 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 
 		if (slotName === "") {
 			for (const slot of skeleton.slots)
-				slot.pose.color.setFromColor(slot.data.setup.color);
+				slot.pose.color.setFromColor(slot.data.setupPose.color);
 		} else {
 			const slot = skeleton.findSlot(slotName);
 			if (!slot) {
 				console.warn(`[Spine] resetSlotColors: slot not found: ${slotName}`);
 				return;
 			}
-			slot.pose.color.setFromColor(slot.data.setup.color);
+			slot.pose.color.setFromColor(slot.data.setupPose.color);
 		}
 	}
 
@@ -934,7 +915,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			if (!bone) continue;
 
 			const { x, y } = matrix.boneToGame(bone);
-			const boneRotation = bone.applied.getWorldRotationX();
+			const boneRotation = bone.appliedPose.getWorldRotationX();
 
 			const boneRad = boneRotation * spine.MathUtils.degRad;
 			const boneCos = Math.cos(boneRad);
@@ -1028,8 +1009,8 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			return 0;
 		}
 
-		const x = bone.applied.worldX;
-		const y = bone.applied.worldY;
+		const x = bone.appliedPose.worldX;
+		const y = bone.appliedPose.worldY;
 		const offsetX = this.x + this.propOffsetX;
 		const offsetAngle = this.angle + this.propOffsetAngle;
 
@@ -1054,8 +1035,8 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			return 0;
 		}
 
-		const x = bone.applied.worldX;
-		const y = bone.applied.worldY;
+		const x = bone.appliedPose.worldX;
+		const y = bone.appliedPose.worldY;
 		const offsetY = this.y + this.propOffsetY;
 		const offsetAngle = this.angle + this.propOffsetAngle;
 
@@ -1080,7 +1061,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			return 0;
 		}
 
-		const boneRotation = bone.applied.getWorldRotationX();
+		const boneRotation = bone.appliedPose.getWorldRotationX();
 		const offsetAngle = this.angle + this.propOffsetAngle;
 
 		return boneRotation + (offsetAngle * 180 / Math.PI);

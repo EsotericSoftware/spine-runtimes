@@ -130,7 +130,7 @@ abstract class C3SkeletonRenderer<
 		for (let i = 0, n = bones.length; i < n; i++) {
 			const bone = bones[i];
 			// if (!bone.parent) continue;
-			const boneApplied = bone.applied;
+			const boneApplied = bone.appliedPose;
 			const { x: x1, y: y1 } = matrix.skeletonToGame(boneApplied.worldX, boneApplied.worldY);
 			const endX = boneApplied.worldX + bone.data.length * boneApplied.a;
 			const endY = boneApplied.worldY + bone.data.length * boneApplied.c;
@@ -163,11 +163,11 @@ abstract class C3SkeletonRenderer<
 		for (let i = 0, n = slots.length; i < n; i++) {
 			const slot = slots[i];
 			if (!slot.bone.active) continue;
-			const attachment = slot.applied.attachment;
+			const attachment = slot.appliedPose.attachment;
 			if (attachment instanceof RegionAttachment) {
 				const vertices = this.tempVertices;
 
-				attachment.computeWorldVertices(slot, attachment.getOffsets(slot.applied), vertices, 0, 2);
+				attachment.computeWorldVertices(slot, attachment.getOffsets(slot.appliedPose), vertices, 0, 2);
 				let p = matrix.skeletonToGame(vertices[0], vertices[1]);
 				const x1 = p.x, y1 = p.y;
 				p = matrix.skeletonToGame(vertices[2], vertices[3]);
@@ -187,7 +187,7 @@ abstract class C3SkeletonRenderer<
 		for (let i = 0, n = slots.length; i < n; i++) {
 			const slot = slots[i];
 			if (!slot.bone.active) continue;
-			const attachment = slot.applied.attachment;
+			const attachment = slot.appliedPose.attachment;
 			if (!(attachment instanceof MeshAttachment)) continue;
 			const vertices = this.tempVertices;
 			attachment.computeWorldVertices(skeleton, slot, 0, attachment.worldVerticesLength, vertices, 0, 2);
@@ -227,7 +227,7 @@ abstract class C3SkeletonRenderer<
 		for (let i = 0, n = slots.length; i < n; i++) {
 			const slot = slots[i];
 			if (!slot.bone.active) continue;
-			const attachment = slot.applied.attachment;
+			const attachment = slot.appliedPose.attachment;
 			if (!(attachment instanceof PathAttachment)) continue;
 			let nn = attachment.worldVerticesLength;
 			const world = this.tempArray = Utils.setArraySize(this.tempArray, nn, 0);
@@ -272,7 +272,7 @@ abstract class C3SkeletonRenderer<
 		for (let i = 0, n = slots.length; i < n; i++) {
 			const slot = slots[i];
 			if (!slot.bone.active) continue;
-			const attachment = slot.applied.attachment;
+			const attachment = slot.appliedPose.attachment;
 			if (!(attachment instanceof ClippingAttachment)) continue;
 			const nn = attachment.worldVerticesLength;
 			const world = this.tempArray = Utils.setArraySize(this.tempArray, nn, 0);
@@ -411,7 +411,7 @@ export class C3RendererRuntime extends C3SkeletonRenderer<IRenderer, C3TextureRu
 	};
 
 	public renderDragHandles (bone: Bone, radius: number) {
-		const boneApplied = bone.applied;
+		const boneApplied = bone.appliedPose;
 		const { x: x1, y: y1 } = this.matrix.skeletonToGame(boneApplied.worldX, boneApplied.worldY);
 		this.renderer.setColorFillMode();
 		this.renderer.setColor([1, 0, 0, .2]);

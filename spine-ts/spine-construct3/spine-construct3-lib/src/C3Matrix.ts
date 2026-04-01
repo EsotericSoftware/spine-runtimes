@@ -83,8 +83,8 @@ export class C3Matrix {
 	public gameToBone (x: number, y: number, bone: Bone) {
 		const point = this.gameToSkeleton(x, y);
 		if (bone.parent)
-			return bone.parent.applied.worldToLocal(point);
-		return bone.applied.worldToLocal(point);
+			return bone.parent.appliedPose.worldToLocal(point);
+		return bone.appliedPose.worldToLocal(point);
 	}
 
 	public skeletonToGame = (skeletonX: number, skeletonY: number) => {
@@ -95,12 +95,12 @@ export class C3Matrix {
 	}
 
 	public boneToGame (bone: Bone) {
-		const { applied } = bone;
-		return this.skeletonToGame(applied.worldX, applied.worldY);
+		const { appliedPose } = bone;
+		return this.skeletonToGame(appliedPose.worldX, appliedPose.worldY);
 	}
 
 	public gameToBoneRotation (gameAngleDeg: number, bone: Bone) {
-		return bone.applied.worldToLocalRotation(this.gameToSkeletonRotation(gameAngleDeg)) - 180;
+		return bone.appliedPose.worldToLocalRotation(this.gameToSkeletonRotation(gameAngleDeg)) - 180;
 	}
 
 	public gameToSkeletonRotation (gameAngleDeg: number) {

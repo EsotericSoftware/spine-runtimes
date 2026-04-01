@@ -45,12 +45,12 @@ C3.Plugins.EsotericSoftware_SpineConstruct3.Acts =
 		this.flip(isFlipped);
 	},
 
-	SetAnimation (this: SDKInstanceClass, track: number, animation: string, loop = false) {
-		this.setAnimation(track, animation, loop);
+	SetAnimation (this: SDKInstanceClass, track: number, animation: string, loop = false, additive: 0 | 1 = 0) {
+		this.setAnimation(track, animation, loop, additive === 1);
 	},
 
-	AddAnimation (this: SDKInstanceClass, track: number, animation: string, loop = false, delay = 0) {
-		this.addAnimation(track, animation, loop, delay);
+	AddAnimation (this: SDKInstanceClass, track: number, animation: string, loop = false, delay = 0, additive: 0 | 1 = 0) {
+		this.addAnimation(track, animation, loop, delay, additive === 1);
 	},
 
 	Play (this: SDKInstanceClass) {
@@ -113,9 +113,6 @@ C3.Plugins.EsotericSoftware_SpineConstruct3.Acts =
 		this.setTrackAlpha(alpha, trackIndex);
 	},
 
-	SetTrackMixBlend (this: SDKInstanceClass, mixBlend: 0 | 1 | 2 | 3, trackIndex: number) {
-		this.setTrackMixBlend(mixBlend, trackIndex);
-	},
 
 	ClearTrack (this: SDKInstanceClass, trackIndex: number) {
 		this.clearTrack(trackIndex);
