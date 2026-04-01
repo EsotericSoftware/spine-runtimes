@@ -3,8 +3,9 @@
 
 <head>
 	<meta charset="utf-8">
-	<script src="../dist/iife/spine-player.js"></script>
-	<link rel="stylesheet" href="../css/spine-player.css">
+
+	<script src="https://cdn.jsdelivr.net/npm/@esotericsoftware/spine-player@4.0.31/dist/iife/spine-player.min.js"></script>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@esotericsoftware/spine-player@4.0.30/dist/spine-player.css">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
@@ -45,9 +46,9 @@
 	// so content from the website shines through. Hides the controls.
 	// Instead, the user can control the animation via buttons.
 	var jsControlledPlayer = new spine.SpinePlayer("container-raptor", {
-		jsonUrl: "assets/raptor-pro.json",
-		atlasUrl: "assets/raptor-pma.atlas",
-		animation: "walk",
+		binaryUrl: "/assets/sleep-rare/sleep-rare.skel",
+		atlasUrl: "/assets/sleep-rare/sleep-rare.atlas",
+		animation: "idle",
 		showControls: false,
 		premultipliedAlpha: true,
 		backgroundColor: "#00000000",
