@@ -753,19 +753,21 @@ export class SpinePlayer implements Disposable {
 			this.skeleton.updateWorldTransform();
 			this.skeleton.getBounds(offset, size);
 
-			if (!isNaN(offset.x) && !isNaN(offset.y) && !isNaN(size.x) && !isNaN(size.y)) {
+			if (Number.isFinite(offset.x) && Number.isFinite(offset.y) && Number.isFinite(size.x) && Number.isFinite(size.y)) {
 				minX = Math.min(offset.x, minX);
 				maxX = Math.max(offset.x + size.x, maxX);
 				minY = Math.min(offset.y, minY);
 				maxY = Math.max(offset.y + size.y, maxY);
-			} else
-				this.showError("Animation bounds are invalid: " + animation.name);
+			}
 		}
 
 		viewport.x = minX;
 		viewport.y = minY;
 		viewport.width = maxX - minX;
 		viewport.height = maxY - minY;
+
+		if (!Number.isFinite(viewport.width) || !Number.isFinite(viewport.height) || viewport.width <= 0 || viewport.height <= 0)
+			this.showError("Animation bounds are invalid: " + animation.name);
 	}
 
 	private drawFrame (requestNextFrame = true) {
